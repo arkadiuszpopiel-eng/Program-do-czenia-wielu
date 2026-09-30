@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: Rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Test
+        run: cargo test --workspace
+      - name: Schematy generowane są aktualne
+        run: git diff --exit-code -- packages/schemas
+      - name: Graf zależności modułów (tylko -contract)
+        if: runner.os == 'Linux'
+        run: bash scripts/check-deps.sh
+
+  cargo-deny:
+    name: cargo-deny
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories bans licenses sources
+
+  ui:
+    name: UI (Svelte 5)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Tokeny designu są aktualne
+        run: pnpm --filter @alfa/ui-kit build:tokens && git diff --exit-code -- packages/ui-kit/src/tokens.css packages/ui-kit/src/tokens.ts
+      - name: Kontrast WCAG
+        run: pnpm --filter @alfa/ui-kit check:contrast
+      - run: pnpm lint
+      - run: pnpm check
+      - run: pnpm -r build
+      - name: Budżet bundla
+        run: node apps/desktop/ui/scripts/bundle-size.mjs
+      - name: Storybook build
+        run: pnpm --filter @alfa/ui-kit build-storybook
+
+  docs:
+    name: Dokumentacja
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: JSON i TOML są poprawne
+        run: |
+          python3 - <<'PY'
+          import json, glob, sys, tomllib
+          bad = 0
+          for f in glob.glob("**/*.json", recursive=True):
+              if "node_modules" in f or "storybook-static" in f: continue
+              try: json.load(open(f, encoding="utf-8"))
+              except Exception as e: print(f, e); bad += 1
+          for f in glob.glob("**/*.toml", recursive=True):
+              if "node_modules" in f or "target" in f: continue
+              try: tomllib.load(open(f, "rb"))
+              except Exception as e: print(f, e); bad += 1
+          sys.exit(1 if bad else 0)
+          PY
+      - name: AGENTS.md ma ≤ 120 linii
+        run: test "$(wc -l < AGENTS.md)" -le 120
