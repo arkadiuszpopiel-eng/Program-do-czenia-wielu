@@ -11,7 +11,8 @@ members = ["crates/*"]
 [workspace.package]
 version = "0.0.1"
 edition = "2021"
-license = "UNLICENSED" # do ustalenia
+license = "UNLICENSED" # do ustalenia (nie-SPDX; crate'y są prywatne: publish = false)
+publish = false
 rust-version = "1.94"
 repository = "https://github.com/arkadiuszpopiel/Program-do-czenia-wielu"
 

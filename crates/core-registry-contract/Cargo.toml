@@ -4,6 +4,7 @@ description = "Kontrakt rejestru modułów: manifest module.toml (§3.2), parser
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish.workspace = true
 rust-version.workspace = true
 repository.workspace = true
 

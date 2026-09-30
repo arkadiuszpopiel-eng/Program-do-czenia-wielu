@@ -33,6 +33,7 @@ private = { ignore = true }
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"
+allow-wildcard-paths = true # zależności path w workspace bez wersji
 highlight = "all"
 deny = [
     # Tylko jeden crate windows-rs w jednej wersji (AGENTS.md); dozwolony wyłącznie w platform-impl.

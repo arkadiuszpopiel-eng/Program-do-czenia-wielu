@@ -4,6 +4,7 @@ description = "Kontrakt magistrali zdarzeń jądra Alfy: typy zdarzeń (§13), t
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish.workspace = true
 rust-version.workspace = true
 repository.workspace = true
 
