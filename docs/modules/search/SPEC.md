@@ -59,3 +59,26 @@ FTS zapytanie ≤ 30 ms na 100k tur; wyniki palety ≤ 16 ms/znak (z `ui-shell`)
 ## Otwarte pytania
 - Wybór modelu embeddingów wielojęzycznych (jakość PL) — pomiar w F1/F7, do ustalenia w SPEC v1.
 - Tokenizacja FTS5 dla polskiego (unicode61 + stemming?) — do ustalenia w SPEC v1.
+
+## Zmiany po implementacji (F1, `search-contract/-impl/-fake`, 2026-09-30)
+- Kontrakt synchroniczny. `Search::remove(session, id)` wymaga sesji (indeks żyje w bazie sesji). Nowy trait
+  **`TxIndexer`** (`prepare`, `index_in`, `remove_in`) — indeksowanie w transakcji modułu zapisującego dane
+  (`sessions` przy `append_turn`, `memory` przy `remember`/`forget`); zapis i indeks są atomowe.
+- `DocId { kind: Turn | Memory | Artifact, key }`; `Query { text, sessions: One | Many | All, mode, limit,
+  kinds }`; `Hit.snippet` to **dane strukturalne** `Snippet { text, highlights: [start, end) w znakach }` —
+  bez HTML (UI tylko wstawia tekst).
+- `SessionSet::Many/All` wyłącznie dla `Caller::Owner` (funkcja UI `Ctrl+Shift+F`, otwiera wiele baz przez
+  `SessionDbProvider`); agentka — tylko `One(własna)` (`authorize`, test 0/1000).
+- FTS5: jedna kolumna z tekstem złożonym `lib_sqlstore::fold_pl` (`ł→l` + NFD), tokenizer `unicode61
+  remove_diacritics 2`; zapytanie: każde słowo cytowane z prefiksem (`"zolc"*`), AND; ranking bm25.
+  Stemming PL — nadal otwarte (F7).
+- Wektory: `vec0` z metryką kosinusową, **osobna tabela na rodzaj dokumentu** (kNN z filtrem nie gubi rzadkich
+  wpisów pamięci), `chunk_size=128` (mniejsza prealokacja w małych sesjach). Identyfikator/wymiar embeddera
+  zapisany w bazie; zmiana → `EmbedderMismatch` (reindeksacja — później).
+- Hybryda: RRF (k = 60) po top max(4·limit, 20) z każdej listy; porządek deterministyczny.
+- Embedder: w v0 tylko trait + deterministyczna atrapa `search_fake::HashEmbedder` (trygramy + słowa → FNV-1a
+  → 64 wym.). Produkcyjny embedder lokalny (ONNX) — F7; do tego czasu kompozycja musi dostarczyć `Embedder`.
+- Artefakty (`DocKind::Artifact`) nie są jeszcze indeksowane przez `artifacts`.
+- Zdarzenia: `search.query` (Debug, tylko liczniki), `search.removed`.
+- Pomiary (debug): 1000 dokumentów, FTS 0,5–1,1 ms, kNN 0,6–1,8 ms, hybryda 1,0–2,8 ms; indeksowanie 1000
+  dokumentów, każdy we własnej transakcji: 0,8–0,96 s (0,51 s z kodem C w `opt-level = 3`).

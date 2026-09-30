@@ -64,3 +64,33 @@ Panel Sesje (lista, wyszukiwanie, projekty, tagi, przypięte, kropka aktywności
 ## Otwarte pytania
 - Schemat IR tury (wersjonowany; wspólny z `providers-api` do renderowania historii per dostawca) — do ustalenia w SPEC v1 i ADR (6).
 - Kompaktowanie okna kontekstu: w `sessions` czy `memory` (warstwa robocza) — do ustalenia w SPEC v1.
+
+## Zmiany po implementacji (F1, `sessions-contract/-impl/-fake`, 2026-09-30)
+- **Kontrakt synchroniczny** (SQLite blokuje; z async — `spawn_blocking`), podzielony na `SessionCatalog`
+  (katalog) i `SessionHistory` (historia) + `Sessions` = oba. W kontrakcie także `KeyVault` (sejf kluczy;
+  produkcyjny Credential Manager — `platform-windows`) i `SessionDbProvider` (dostęp `search`/`memory`/
+  `artifacts` do tej samej bazy sesji, `Arc<lib_sqlstore::Db>`).
+- Operacje historii: `append_turn(id, parent, NewTurn)` — **tylko do liścia** (`NotALeaf`), pierwsza tura
+  z `parent = None` (`RootExists` dla kolejnych); `fork_from(id, sibling_of, NewTurn)` — „edytuj/ponów”
+  = wariant (ten sam rodzic) w **nowej gałęzi**; `branch_projection(id, leaf)` zamiast `view(branch, range)`
+  (stronicowanie — później); `siblings` (`‹ 1/3 ›`), `latest_leaf`, `set_active_leaf`/`active_leaf`,
+  `set_hidden` (flaga widoku w osobnej tabeli), `save_draft`/`draft`, `turn_count`.
+- **Usłyszany prefiks** = osobny fakt append-only (`turn_heard`), `HeardPrefix { chars, approximate }`
+  liczony w znakach `assistant_full` (= `content.text`); można go podać przy zapisie albo dopisać **raz**
+  później (TTS kończy odtwarzanie po zapisie tury). Treść tury nigdy się nie zmienia.
+- `fork(id, at)` do nowej sesji i `session.context.handoff` — poza v0 (UI/`transfer`). `delete(id,
+  undo_window)` → `trash_session`/`restore_session` (okno 10 s liczy wywołujący) + `delete_session`
+  (crypto-shredding: klucz z sejfu → pliki bazy z `-wal`/`-shm` → wpis katalogu; sieroty sprzątane przy starcie).
+- Metadane v0: bez `cast`, `memory_scope`, `permission_profile`, `autonomy` (należą do `personas`/Brokera —
+  dojdą z tymi modułami); dodane `template`, `trashed`, `tags`, `created_at/updated_at`. `tainted` tylko rośnie
+  (`mark_tainted`; brak pola w `SessionPatch`).
+- Identyfikatory: sesja UUIDv7 (atrapa `sess-NNNN`); tura i gałąź — kolejne liczby od 1 w obrębie sesji.
+- Magazyn: `index.db` (katalog + liczniki listy) i `<id>.db` per sesja; `turns.body` = kanoniczny JSON
+  niezmiennej części tury; **wyzwalacze odrzucają `UPDATE`/`DELETE`** na `turns`, `branches`, `turn_heard`.
+  Liczniki w `index.db` aktualizowane po transakcji tury (dwie bazy — bez atomowości; przeliczanie — później).
+- Indeksowanie tur przez `search_contract::TxIndexer` w tej samej transakcji co zapis tury.
+- Zdarzenia dodatkowe: `session.updated`, `session.trashed`, `session.restored`; ładunki bez treści tur.
+- Pomiary (debug, kontener 4 rdzenie współdzielony z innymi buildami): 1000 tur `append_turn` 0,36–0,39 s,
+  projekcja 1000 tur 9–10 ms, lista sesji 0,14 ms. Z indeksowaniem FTS+wektor (`search-impl`) dochodzi
+  0,5–0,9 s/1000 tur w debug (kod C bez optymalizacji) — zalecane `[profile.dev.package.libsqlite3-sys]
+  opt-level = 3` w root `Cargo.toml`.

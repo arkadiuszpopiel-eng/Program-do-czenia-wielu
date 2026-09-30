@@ -31,6 +31,12 @@ wyłącznie od innych `lib-*` i `*-contract`.
 | `compliance` | `compliance-contract`, `-impl`, `-fake` | rejestr tras (zielona/szara/zabroniona, degradacja nieświeżych), tagi prywatności/jurysdykcji, `route_allowed`, deny-listy ścieżek i domen z normalizacją Windows, `KernelAuthority` |
 | `accounts-hub` | `accounts-hub-contract`, `-impl`, `-fake` | katalog dostawców (walidacja schematu), konta i klucze (`SecretStore`: Credential Manager / pamięć), kreator jako maszyna stanów, import z env, wykrywanie mostów CLI |
 | `cost-meter` | `cost-meter-contract`, `-impl`, `-fake` | koszty w liczbach całkowitych (mikro-USD/PLN), kurs NBP z cache i zapasem, limit miesięczny Enforced/AlertOnly/Off, budżet tła, NDJSON |
+| `lib-sqlstore` | `lib-sqlstore` (biblioteka) | SQLCipher kluczem surowym, WAL, migracje, sqlite-vec (`OnceLock`, jedyne `unsafe`), `fold_pl` dla FTS, usuwanie z `-wal/-shm` |
+| `sessions` | `sessions-contract`, `-impl`, `-fake` | baza per sesja, historia append-only jako drzewo gałęzi (wyzwalacze blokują UPDATE/DELETE), usłyszany prefiks, katalog `index.db`, `KeyVault`, crypto-shredding |
+| `search` | `search-contract`, `-impl`, `-fake` | FTS5 z `fold_pl` + `vec0` (kosinus), hybryda RRF, indeksowanie w transakcji zapisu (`TxIndexer`), szukanie między sesjami tylko dla właściciela |
+| `memory` | `memory-contract`, `-impl`, `-fake` | v0: remember/recall/forget w zakresie sesji, proweniencja, treść niezaufana nie awansuje |
+| `artifacts` | `artifacts-contract`, `-impl`, `-fake` | rejestr plików wyjściowych z wersjami i hashami, podgląd, diff, intencje UI |
+| `providers` | `providers-contract`, `providers-fake`, `providers-api-impl` | `ModelProvider`, neutralny IR (thinking z podpisem, tool use), zdarzenia strumienia; adaptery Anthropic, OpenAI Chat/Responses, generyczne zgodne z OpenAI/Anthropic; retry, timeouty, anulowanie < 100 ms |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

@@ -1,0 +1,29 @@
+[package]
+name = "search-contract"
+description = "Wyszukiwanie: kontrakt — FTS5 + wektory w bazie sesji, zapytania z podświetleniem, hybryda RRF, izolacja wywołującego"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+lib-sqlstore = { path = "../lib-sqlstore" }
+serde.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

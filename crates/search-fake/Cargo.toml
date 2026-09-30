@@ -1,0 +1,20 @@
+[package]
+name = "search-fake"
+description = "Wyszukiwanie: atrapa — indeks w pamięci, deterministyczny embedder (hash n-gramów → 64 wym.), rejestrujący indekser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+search-contract = { path = "../search-contract" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+
+[dev-dependencies]
+search-contract = { path = "../search-contract", features = ["contract-tests"] }
+proptest.workspace = true
+
+[lints]
+workspace = true

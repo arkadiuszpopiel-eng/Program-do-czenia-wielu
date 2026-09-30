@@ -58,6 +58,21 @@ unimplemented = "deny"
 dbg_macro = "deny"
 print_stdout = "warn"
 
+# Lekki profil dev/test: ~175 binariów testowych z pełnym debuginfo zajmowało > 25 GB.
+# Własny kod: numery linii (czytelne backtrace'y), zależności: bez debuginfo.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+# Kod C bazy (SQLCipher, sqlite-vec) zoptymalizowany także w dev — budżety czasowe testów danych.
+[profile.dev.package.libsqlite3-sys]
+opt-level = 3
+
+[profile.dev.package.sqlite-vec]
+opt-level = 3
+
 [profile.release]
 lto = "fat"
 strip = true

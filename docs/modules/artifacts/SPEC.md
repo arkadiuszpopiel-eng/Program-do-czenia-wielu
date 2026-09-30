@@ -58,3 +58,22 @@ Panel Pliki/Artefakty (karty, podgląd, diff, wersje, akcje), podglądy plików 
 ## Otwarte pytania
 - Silnik podglądu PDF w WebView2 (wbudowany vs pdf.js) — do ustalenia w SPEC v1 z budżetem JS.
 - Kopiowanie „jako plik" do schowka (CF_HDROP) — potwierdzić w spike (j).
+
+## Zmiany po implementacji (F1, `artifacts-contract/-impl/-fake`, 2026-09-30)
+- Kontrakt synchroniczny: `out_dir(dir_name)` (`<root>\Sesje\<nazwa>\out`, `root` wstrzykiwany, `dir_name` =
+  nazwa katalogu roboczego sesji), `register(session, path, origin, source_turn)`, `add_version(session, id,
+  path, source_turn)`, `get`, `list`, `preview(session, id, version, max_bytes)`, `diff(session, id, from,
+  to)`, `intent(session, id, version, action) -> ArtifactIntent` zamiast `export(...) -> ()` — **akcje UI
+  (Open, Reveal, CopyAsFile, SaveAs, Zip, SendToSession) to intencje**; wykonuje je `platform-windows` jako
+  użytkownik (intencja niesie SHA-256 wersji do sprawdzenia). `attach_input` (wejście plików) — później.
+- Wersje niezmienne (wyzwalacze w bazie); ta sama ścieżka → nowa wersja istniejącego artefaktu; identyczny
+  hash → bez nowej wersji. Migawka treści wersji ≤ 1 MiB jako BLOB w **szyfrowanej bazie sesji** (podgląd i
+  diff działają po nadpisaniu pliku; usunięcie sesji kasuje rejestr i migawki). Większe pliki: tylko najnowsza
+  wersja z dysku, gdy rozmiar się nie zmienił (`ContentUnavailable` w pozostałych przypadkach).
+- `Preview::{Text { text, truncated }, Binary { mime, bytes }}` (NUL lub błędny UTF-8 w pierwszych 8 KiB →
+  binarny); rodzaj podglądu (obraz, PDF, audio…) UI wyprowadza z MIME. `TextDiff` — linie z numerami +
+  format ujednolicony (crate `similar`).
+- Atrapa czyta prawdziwe pliki (katalog tymczasowy w testach) zamiast wirtualnego FS `platform-fake`;
+  zamiast Eksploratora rejestruje intencje.
+- Zdarzenia: `artifact.registered`, `artifact.version.added`, `artifact.exported`, `artifact.handoff`.
+- Pomiar: podgląd 1 MiB tekstu z pliku 2,3 MB — ~3 ms (budżet 100 ms).

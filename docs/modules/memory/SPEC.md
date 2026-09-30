@@ -61,3 +61,21 @@ Akcja „zapamiętaj" na wiadomości (z wyborem zakresu), `/pamięć`, panel Pam
 ## Otwarte pytania
 - Kompaktowanie okna kontekstu (warstwa robocza) — tu czy w `agent-runtime`; do ustalenia w SPEC v1.
 - Model ekstrakcji faktów (lokalny 3–4B vs API zależnie od tagu prywatności) — do ustalenia w F7.
+
+## Zmiany po implementacji (v0 F1, `memory-contract/-impl/-fake`, 2026-09-30)
+- Kontrakt synchroniczny: `remember(NewMemory, RememberMode) -> MemoryEntry`, `recall(scopes, query, k) ->
+  Vec<Recalled { entry, score }>`, `get`, `list` (Inspektor), `approve`, `forget(scope, id) -> ForgetReport`,
+  `promote(scope, id, to)`. **`forget`/`promote`/`get` przyjmują zakres**, bo wpis żyje w bazie swojej sesji.
+  `pin` (warstwa robocza) — poza v0.
+- v0: zakres `Session` i warstwy `Episodic`/`Semantic`; pozostałe → `Unsupported`. `promote`: wpis z
+  `UntrustedContent` → `UntrustedCannotPromote` **do każdego zakresu** (surowiej niż „nie do Global”);
+  zaufane → `Unsupported` (F7). Automatyczne zapamiętanie z treści niezaufanej → `UntrustedAutoRemember`.
+- `MemoryEntry`: `entities: Vec<String>`, `trusted` (kopia proweniencji), `ttl_secs`, `approved` (tryb
+  `AutoPendingApproval` → niezatwierdzony, niewidoczny w `recall` do `approve`).
+- Magazyn: `memory_entries` w szyfrowanej bazie sesji + dokumenty `DocKind::Memory` w indeksie `search`
+  (w tej samej transakcji). `recall` = hybryda RRF przez `Search` wywoływany jako `Caller::Agent{sesja}`,
+  potem filtr zatwierdzone/niewygasłe. `forget` = wpis + FTS + wektor w jednej transakcji;
+  `ForgetReport { entry, fts_rows, vectors, derived }` (`derived` — streszczenia/kopie od F7, w v0 = 0).
+- Atrapa bez przełącznika „bateria/pełny ekran” (konsolidacja poza v0).
+- Zdarzenia: `memory.remembered`, `memory.pending_approval`, `memory.recalled` (Debug), `memory.forgotten` —
+  bez treści wpisów.
