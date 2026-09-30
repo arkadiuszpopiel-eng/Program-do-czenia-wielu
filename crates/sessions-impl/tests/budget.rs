@@ -34,6 +34,22 @@ fn append_and_project_1000_turns_within_budget() {
     eprintln!(
         "[budżet sessions] append 1000 tur: {append:?}; projekcja 1000 tur: {projection:?}; lista: {listing:?}"
     );
-    assert!(append.as_millis() < 1000, "append 1000 tur: {append:?}");
-    assert!(projection.as_millis() < 50, "projekcja: {projection:?}");
+    assert!(
+        append.as_millis() < budget_ms(1000),
+        "append 1000 tur: {append:?}"
+    );
+    assert!(
+        projection.as_millis() < budget_ms(50),
+        "projekcja: {projection:?}"
+    );
+}
+
+/// Budżet czasowy: ściśle przy `ALFA_PERF_BUDGETS=1` (maszyna pomiarowa, baseline),
+/// na współdzielonym CI tylko próg bezpieczeństwa ×10 (łapie patologiczne regresje).
+fn budget_ms(strict_ms: u128) -> u128 {
+    if std::env::var_os("ALFA_PERF_BUDGETS").is_some() {
+        strict_ms
+    } else {
+        strict_ms * 10
+    }
 }

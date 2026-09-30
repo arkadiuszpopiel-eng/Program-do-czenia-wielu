@@ -58,5 +58,15 @@ fn fts_query_on_1000_turns_within_budget() {
     eprintln!(
         "[budżet search] indeksowanie 1000 tur: {indexing:?}; FTS: {fts_time:?}; wektor: {vector_time:?}; hybryda: {hybrid_time:?}"
     );
-    assert!(fts_time.as_millis() < 20, "FTS {fts_time:?}");
+    assert!(fts_time.as_millis() < budget_ms(20), "FTS {fts_time:?}");
+}
+
+/// Budżet czasowy: ściśle przy `ALFA_PERF_BUDGETS=1` (maszyna pomiarowa, baseline),
+/// na współdzielonym CI tylko próg bezpieczeństwa ×10 (łapie patologiczne regresje).
+fn budget_ms(strict_ms: u128) -> u128 {
+    if std::env::var_os("ALFA_PERF_BUDGETS").is_some() {
+        strict_ms
+    } else {
+        strict_ms * 10
+    }
 }

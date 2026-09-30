@@ -62,3 +62,8 @@ Wzór: skopiuj `example-module-*`. Wszystkie wersje zależności bierz z `[works
 (w testach wyłączane przez `#![cfg_attr(test, allow(...))]` / `#![allow(...)]` na górze pliku testu),
 `too_many_lines` = warn z progiem 300 (`clippy.toml`), `unsafe_code` = forbid (poza przyszłym `platform-windows-impl`
 po ADR), `missing_docs` = warn. Plik ≤ 400 linii, crate ≤ 8 000 linii (AGENTS.md).
+
+## Testy budżetów czasowych
+Testy mierzące czas (`tests/budget.rs` itp.) na współdzielonym CI sprawdzają tylko próg bezpieczeństwa
+(×10 budżetu — łapie patologiczne regresje); **ścisłe budżety z planu obowiązują przy `ALFA_PERF_BUDGETS=1`**
+(self-hosted runner z emulacją baseline, pomiary lokalne). Budżet zawsze wypisuj przez `eprintln!`.

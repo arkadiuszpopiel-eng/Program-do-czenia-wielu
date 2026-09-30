@@ -94,7 +94,10 @@ fn large_files_have_no_snapshot_and_preview_is_fast() {
         }
     ));
     eprintln!("[budżet artifacts] podgląd 1 MiB: {elapsed:?}");
-    assert!(elapsed.as_millis() < 100);
+    assert!(
+        elapsed.as_millis() < budget_ms(100),
+        "podgląd 1 MiB: {elapsed:?}"
+    );
     std::fs::write(&path, "nadpisany").unwrap();
     assert!(matches!(
         h.preview(&s, &art.id, Some(1), 100),
@@ -141,4 +144,14 @@ async fn module_events() {
         (1, 1, 1)
     );
     h.artifacts.stop().await.unwrap();
+}
+
+/// Budżet czasowy: ściśle przy `ALFA_PERF_BUDGETS=1` (maszyna pomiarowa, baseline),
+/// na współdzielonym CI tylko próg bezpieczeństwa ×10 (łapie patologiczne regresje).
+fn budget_ms(strict_ms: u128) -> u128 {
+    if std::env::var_os("ALFA_PERF_BUDGETS").is_some() {
+        strict_ms
+    } else {
+        strict_ms * 10
+    }
 }
