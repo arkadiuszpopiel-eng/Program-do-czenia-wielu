@@ -1,0 +1,91 @@
+# Zamrożony zestaw NEGATYWNY voice-cmd (F2): zdania ze słowami-komendami w innym znaczeniu,
+# backchannel i „nie” niesamodzielne lub poza `Speaking`. Kolumny: faza<TAB>wypowiedź[<TAB>pauza przed ms].
+# Zmiana pliku wymaga nowej sumy w SHA256SUMS i przeglądu człowieka.
+speaking	nie no, dobrze
+speaking	nie no dobrze
+speaking	nie, nie o to chodzi
+speaking	nie wiem
+speaking	nie ma sprawy
+silent	nie
+thinking	nie
+speaking	nie	60
+speaking	nie	150
+speaking	stop-klatka w filmie
+speaking	stop klatka w filmie
+speaking	pauza w szkole była długa
+speaking	na pauzie zjadłem kanapkę
+speaking	przestań się martwić o to
+silent	czekaj na mnie przy wejściu
+speaking	czekaj, a co z pocztą
+speaking	ciszej się nie da
+speaking	rozmawialiśmy ciszej niż zwykle
+speaking	było coraz głośniej na sali
+speaking	powtórzę to jutro
+speaking	powtórzyłem to trzy razy
+speaking	dalej nie wiem co robić
+speaking	idź dalej prosto
+speaking	kontynuuj pracę nad raportem
+speaking	wznów subskrypcję netflixa
+speaking	anuluj spotkanie na jutro
+speaking	anulowanie lotu kosztuje
+speaking	przełącz na inny kanał
+speaking	przełącz się na angielski
+speaking	zmień na wersję drugą
+speaking	delta w rzece jest szeroka
+speaking	alfa i omega
+speaking	beta testy trwają
+speaking	gama promieniowania
+speaking	wycisz powiadomienia w telefonie
+speaking	mikrofon nie działa
+speaking	nie przeszkadzać to trudna sztuka
+speaking	stop wszystkim wojnom
+speaking	zatrzymaj się na stacji
+speaking	koniec filmu był słaby
+speaking	cisza przed burzą
+speaking	moment obrotowy silnika
+speaking	chwileczkę zapomnienia
+speaking	sekunda po sekundzie
+speaking	stok narciarski
+speaking	stopa mnie boli
+speaking	stopa
+speaking	pause for thought
+speaking	the pause was long
+speaking	continue the story about dragons
+speaking	repeat after me
+speaking	louder than words
+speaking	cancel my subscription
+speaking	wait for the bus
+speaking	hold on to your dreams
+speaking	switch to dark mode
+speaking	stop the car
+speaking	do not disturb the neighbours
+speaking	mute the tv
+speaking	tak, to dobry pomysł
+speaking	mhm
+speaking	aha
+speaking	dobrze
+speaking	okej
+speaking	no tak
+speaking	tak tak
+speaking	jasne
+speaking	powiedz mi coś o pogodzie
+speaking	a co z pocztą
+speaking	chodziło mi o wersję z zeszłego tygodnia
+speaking	głośny sąsiad znowu imprezuje
+speaking	cichy wieczór
+speaking	podgłośnij radio w kuchni
+speaking	przycisz telewizor
+speaking	powtórka z rozrywki
+speaking	kontynuacja serialu
+speaking	wznowienie produkcji
+speaking	dalekie kraje
+speaking	zostaw to mnie
+speaking	nie zostawiaj mnie
+speaking	nieważne co mówią
+speaking	daj mi chwilę do namysłu
+speaking	dość długo to trwało
+speaking	wystarczy mleka na jutro
+speaking	przejdź do rzeczy
+speaking	jeszcze raz dziękuję za pomoc
+speaking	powtórz za mną ten wierszyk
+speaking	ile kosztuje stop aluminium

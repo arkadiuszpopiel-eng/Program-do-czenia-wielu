@@ -1,0 +1,21 @@
+[package]
+name = "voice-turn-impl"
+description = "voice-turn: polityka cierpliwości końca tury (VAD + model + hezytacje PL) i heurystyczny model tekstowy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-turn-contract = { path = "../voice-turn-contract" }
+
+[dev-dependencies]
+voice-turn-contract = { path = "../voice-turn-contract", features = ["contract-tests"] }
+voice-turn-fake = { path = "../voice-turn-fake" }
+core-registry-contract.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

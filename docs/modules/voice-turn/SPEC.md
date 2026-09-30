@@ -1,4 +1,4 @@
-# voice-turn — SPEC (szkic v0)
+# voice-turn — SPEC (v1: kontrakt, fake i impl w repo; F2)
 
 ## Cel
 Wykrywanie końca tury użytkownika: Smart Turn v3.2 (PL wśród 23 języków, ~8 MB, ~10 ms CPU) + polityka cierpliwości (dłużej czeka po hezytacjach „yyy", regulowana), by odpowiedź startowała szybko, ale nie w środku wypowiedzi (PLAN §6.2, §6.4, §6.5).
@@ -6,19 +6,18 @@ Wykrywanie końca tury użytkownika: Smart Turn v3.2 (PL wśród 23 języków, ~
 ## Fala i priorytet
 F2. P0. Budżet etapu: 250–500 ms (§6.4).
 
-## Kontrakt (szkic Rust)
+## Kontrakt (v1, `crates/voice-turn-contract`)
 ```rust
-// voice-turn-contract — SZKIC
-pub struct TurnCfg { pub patience: Patience /* Low | Normal | High | Custom { base_ms, hesitation_bonus_ms, max_ms } */, pub model: TurnModel /* SmartTurnV3 */ }
-pub struct TurnInput<'a> { pub audio_tail: &'a [f32] /* ostatnie ~8 s po VAD */, pub partial_text: Option<&'a str> /* z STT dwuprzebiegowego */, pub silence_ms: u16 }
-pub enum TurnDecision { Continue { wait_ms: u16 }, EndOfTurn { confidence: f32, ts: Instant }, Uncertain { ask_after_ms: u16 } }
-pub trait TurnDetector: Send + Sync {
-    fn configure(&self, cfg: TurnCfg) -> Result<()>;
-    fn decide(&self, input: TurnInput) -> TurnDecision;      // wywoływane po VAD SpeechEnd i cyklicznie w ciszy
-    fn reset(&self);
-}
+pub enum Patience { Low, Normal, High, Custom(PatienceCfg) }   // Normal: min 200, base 300, hesitation +400, low_prob +500, max 1500 ms
+pub struct TurnCfg { patience, use_partial_text, eot_threshold /*0.5*/, confident_threshold /*0.85*/ }   // validate()
+pub enum TurnEvent { SpeechStart { at_ms }, SpeechEnd { at_ms }, Partial { at_ms, text }, Reset }
+pub enum TurnDecision { Idle, Wait { until_ms, reason: UserSpeaking|Silence|Hesitation|ModelUnsure }, EndOfTurn { at_ms, confidence, reason: ClearEnd|Patience|MaxSilence } }
+pub trait TurnModel { fn name(&self) -> &str; fn end_probability(&self, input: &TurnModelInput /* audio_tail?, partial?, silence_ms */) -> Result<f32>; }
+pub trait TurnDetector: Send { fn configure(&mut self, TurnCfg) -> Result<()>; fn config(&self) -> &TurnCfg;
+    fn observe(&mut self, &TurnEvent); fn decide(&mut self, now_ms: u64, audio: Option<AudioTail>) -> TurnDecision; }
 ```
-Zdarzenia: `turn.end` (pewność, czas od ostatniej ramki mowy), `turn.hesitation` (wydłużona cierpliwość), `turn.model.loaded/unloaded`.
+Polityka (`PatienceTurnDetector`): wymagana cisza = `base`; model ≥ 0,85 → `min_silence`; model < 0,5 → `+low_prob`; bez modelu a z interpunkcją końcową → `min_silence`; hezytacja („yyy”, „eee”, „znaczy”, „hmm”, „mhm”, niedokończone „i/że/bo”, przyimek, przecinek, wielokropek) → `+hesitation`; zawsze w `[min_silence, max]`. Wynik modelu liczony raz na (koniec mowy, wersja transkryptu); błąd modelu → sama polityka. `HeuristicTurnModel` (tekstowy) zastępuje Smart Turn do czasu impl ONNX. `Uncertain` ze szkicu zastąpione przez `Wait { reason }`.
+Zdarzenia: `voice.turn.end`, `voice.turn.hesitation`, `voice.turn.model_loaded/unloaded`.
 
 ## Zależności
 `core-bus/config/log-contract`, `voice-vad-contract` (SpeechEnd, cisza), `voice-stt-contract` (partial), `model-residency-contract` (mały model CPU). Zewnętrzne: Smart Turn (ONNX, hash), sherpa-onnx/ONNX Runtime CPU.
@@ -51,7 +50,10 @@ Suwak cierpliwości (Ustawienia → Głos → Tury i barge-in); w trybie głosow
 - `ACC-F2-voice-turn-03`: hezytacje z korpusu — ≥ 90% nie przerwane przed dokończeniem.
 
 ## Fake
-`voice-turn-fake`: decyzje z adnotacji (czas końca tury per wypowiedź) — deterministyczne testy `voice-dialog`.
+`voice-turn-fake`: `ScriptedTurnDetector` (koniec tury po adnotowanej ciszy), `ScriptedTurnModel` (prawdopodobieństwa/błędy z kolejki); przechodzi test kontraktowy.
+
+## Stan testów (v1)
+Kontrakt (impl z modelem heurystycznym i skryptowym, fake), scenariusze z wirtualnym zegarem (pytanie → 200 ms, hezytacja → 1200 ms, twardy limit, poziomy cierpliwości, błąd modelu), property-based (nigdy koniec w trakcie mowy, zawsze w granicach, raz na turę).
 
 ## Otwarte pytania
 - Wersja Smart Turn i format modelu (ONNX/CoreML) do przypięcia — `docs/vendor/`; jakość PL — Voice Lab.

@@ -44,6 +44,10 @@ od niego nie zależy żaden crate.
 | `lib-markdown` | `lib-markdown` (biblioteka) | Markdown z LLM → bezpieczny HTML (pulldown-cmark + ammonia, 72 wektory XSS), renderowanie przyrostowe dla strumienia, tekst mówiony |
 | `personas` | `personas-contract`, `-impl`, `-fake` | Alfa/Beta/Gama/Delta, katalog ról, obsady i szablony, adresowanie z polską odmianą imion, polecenia zmiany obsady, prompt w rodzaju żeńskim |
 | `scheduler-lite` | `scheduler-lite-contract`, `-impl`, `-fake` | zasoby wyłączne (mikrofon, głośnik, ekran, pliki), kolejka priorytetowa, voice-first, kolejka mówienia z przekazaniem, wykrywanie zakleszczeń |
+| `voice-persona` | `voice-persona-contract`, `-impl`, `-fake` | normalizator PL do mowy (liczby z rodzajem i przypadkiem, daty, godziny, waluty, jednostki, skróty, URL), słownik wymowy, chunker strumieniowy, planista stylu per silnik |
+| `voice-cmd` | `voice-cmd-contract`, `-impl`, `-fake` | szybkie komendy PL/EN bez LLM (tolerancja szumu ASR, odmiana imion), reguła „nie" tylko w `Speaking`; zestaw zamrożony: recall 100%, 0 fałszywych |
+| `voice-turn` | `voice-turn-contract`, `-impl`, `-fake` | polityka końca tury z cierpliwością i hezytacjami, trait `TurnModel` (Smart Turn ONNX później) |
+| `voice-dialog` | `voice-dialog-contract`, `-impl`, `-fake` | czysty automat dialogu §6.5: ducking + twardy stop (p95 350 ms), backchannel, usłyszany prefiks, 6 klas intencji przerwania, wznawianie |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

@@ -1,0 +1,20 @@
+[package]
+name = "voice-persona-impl"
+description = "voice-persona: normalizator PL, słownik wymowy, chunker strumienia TTS, planista stylu, plan mówione/ekranowe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-persona-contract = { path = "../voice-persona-contract" }
+
+[dev-dependencies]
+voice-persona-contract = { path = "../voice-persona-contract", features = ["contract-tests"] }
+core-registry-contract.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

@@ -3179,6 +3179,124 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "voice-cmd-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-cmd-fake"
+version = "0.0.1"
+dependencies = [
+ "voice-cmd-contract",
+]
+
+[[package]]
+name = "voice-cmd-impl"
+version = "0.0.1"
+dependencies = [
+ "core-registry-contract",
+ "proptest",
+ "voice-cmd-contract",
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-dialog-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "voice-cmd-contract",
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-dialog-fake"
+version = "0.0.1"
+dependencies = [
+ "voice-cmd-contract",
+ "voice-dialog-contract",
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-dialog-impl"
+version = "0.0.1"
+dependencies = [
+ "core-registry-contract",
+ "proptest",
+ "voice-cmd-contract",
+ "voice-dialog-contract",
+ "voice-dialog-fake",
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-persona-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "voice-persona-fake"
+version = "0.0.1"
+dependencies = [
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-persona-impl"
+version = "0.0.1"
+dependencies = [
+ "core-registry-contract",
+ "proptest",
+ "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-turn-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "voice-turn-fake"
+version = "0.0.1"
+dependencies = [
+ "voice-turn-contract",
+]
+
+[[package]]
+name = "voice-turn-impl"
+version = "0.0.1"
+dependencies = [
+ "core-registry-contract",
+ "proptest",
+ "voice-turn-contract",
+ "voice-turn-fake",
+]
+
+[[package]]
 name = "vsimd"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

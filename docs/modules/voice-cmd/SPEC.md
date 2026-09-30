@@ -1,4 +1,4 @@
-# voice-cmd — SPEC (szkic v0)
+# voice-cmd — SPEC (v1: kontrakt, fake i impl w repo; F2)
 
 ## Cel
 Szybka ścieżka komend głosowych bez LLM: „stop", „czekaj", „pauza", „głośniej/ciszej", „wycisz mikrofon", „przełącz na Deltę", „powtórz", „wznów", „anuluj" — z keyword-spotterem (cel < 300 ms od początku słowa) i dopasowaniem z transkryptu partial (PLAN §6.2, §6.5).
@@ -6,21 +6,23 @@ Szybka ścieżka komend głosowych bez LLM: „stop", „czekaj", „pauza", „
 ## Fala i priorytet
 F2. P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (v1, `crates/voice-cmd-contract`)
 ```rust
-// voice-cmd-contract — SZKIC
-pub enum VoiceCommand { Stop, Wait, Pause, Resume, Repeat, Cancel, VolumeUp, VolumeDown, MuteMic, SwitchPersona(PersonaId), SetAutonomy(AutonomyLevel) /* wymaga Brokera */ }
-pub struct CmdHit { pub cmd: VoiceCommand, pub source: CmdSource /* Kws | Partial | Final */, pub confidence: f32, pub ts: Instant, pub standalone: bool }
-pub trait VoiceCmd: Send + Sync {
-    fn push_audio(&self, frame: &Processed) -> Option<CmdHit>;         // KWS „stop/czekaj" na CPU
-    fn push_text(&self, t: &Transcript, state: DialogState) -> Option<CmdHit>; // reguły na partial/final
-    fn grammar(&self) -> Grammar;                                          // frazy PL/EN, synonimy, edytowalne
-}
+pub enum VoiceCommand { Stop, Wait, Pause, Resume, Repeat, Cancel, VolumeUp, VolumeDown, MuteMic,
+    SwitchPersona { persona: PersonaId }, DoNotDisturb, StopAll /* kill-switch: zatrzymuje → natychmiast */, No /* samodzielne „nie” */ }
+pub enum AgentActivity { Silent, Thinking, Speaking }           // z DialogPhase::agent_activity() — bez cyklu voice-cmd ↔ voice-dialog
+pub struct Token { text, start_ms, end_ms, confidence }
+pub struct CmdInput { tokens, source: Kws|Partial|Final, activity, now_ms, prev_speech_end_ms, addressed }
+pub enum CmdDecision { Hit(CmdHit { command, source, confidence, at_ms, standalone, addressed }),
+    Pending { recheck_at_ms }, Ignored { command, reason: NieOutsideSpeaking|NotAddressed|LowConfidence }, NoMatch }
+pub struct Grammar { rules: Vec<GrammarRule { command, phrases }>, fillers, personas: Vec<PersonaForms>, nie: NieRule, threshold /*0.6*/, settle_ms /*80*/ }
+pub trait CommandRecognizer { fn recognize(&self, input: &CmdInput) -> CmdDecision; fn grammar(&self) -> Grammar; }
 ```
-Zdarzenia: `cmd.detected` (komenda, źródło, opóźnienie), `cmd.ignored` (np. „nie" poza `Speaking`), `cmd.forwarded_to_broker` (zmiana autonomii, akcja ryzykowna).
+Składnia frazy: `a|b` alternatywy, `[a]` opcjonalne, `{persona}` slot (formy imion w przypadkach). Wypowiedź jest komendą tylko, gdy składa się wyłącznie z fraz komend, wypełniaczy i imion (adresowanie) — każde inne słowo = zwykła wypowiedź (LLM). Tolerancja ASR: `fold` (bez polskich znaków, interpunkcji) + odległość edycyjna (1 dla słów ≥ 5 znaków, 2 dla ≥ 8). Partial → trafienie po `settle_ms` ciszy po ostatnim słowie. KWS na audio (`push_audio`) przyjdzie z modelem (spike h) jako osobna implementacja traitu.
+Zdarzenia: `voice.cmd.detected`, `voice.cmd.ignored`, `voice.cmd.forwarded_to_broker`.
 
 ## Zależności
-`core-bus/config/log-contract`, `voice-dsp-contract` (ramki), `voice-stt-contract` (partial), `voice-dialog-contract` (stan), `voice-audio-contract` (głośność/mute), `personas-contract` (imiona), `safety-broker-contract` (F3: komendy zmieniające uprawnienia). Zewnętrzne: mały model KWS (spike h, CPU).
+v1: `core-bus-contract`, `voice-persona-contract` (`PersonaId`). Stan dialogu przez `AgentActivity` (nie `voice-dialog-contract` — unikamy cyklu). Później: `voice-dsp/stt/audio-contract`, `safety-broker-contract` (F3: `SetAutonomy` → Broker). Zewnętrzne: mały model KWS (spike h, CPU).
 
 ## Niezmienniki
 - Zero LLM w ścieżce; decyzja z KWS ≤ 300 ms od początku słowa; z partial ≤ 100 ms od transkryptu.
@@ -50,7 +52,10 @@ KWS CPU ≤ 3% jednego rdzenia baseline; RAM ≤ 20 MB; reakcja < 300 ms.
 - `ACC-F2-voice-cmd-03`: 1 h tła TV → 0 wykonanych komend.
 
 ## Fake
-`voice-cmd-fake`: trafienia z adnotacji (czas, komenda) — testy `voice-dialog` i UI.
+`voice-cmd-fake`: trafienia z adnotacji (`script`) + dokładne frazy gramatyki (bez tolerancji literówek), ta sama reguła „nie” i adresowanie; przechodzi test kontraktowy.
+
+## Stan testów (v1)
+Zestaw deweloperski zamrożony w `crates/voice-cmd-impl/tests/data/` (113 pozytywów, 88 negatywów; SHA-256 + FNV-1a): recall 100 %, odrzucenie negatywów 100 %. Oficjalny zestaw ACC (≥ 200 prób z korpusu) tworzy recenzent w `evals/`.
 
 ## Otwarte pytania
 - Model KWS (własny trening na mowie syntetycznej + korpus) — spike (h); wspólny z `voice-wake` v1.

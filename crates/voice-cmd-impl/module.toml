@@ -1,0 +1,17 @@
+# Manifest modułu voice-cmd (docs/modules/voice-cmd/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "voice-cmd"
+version = "0.0.1"
+kind = "service"
+provides = ["voice-cmd-contract@1"]
+requires = ["core-bus-contract@1", "voice-persona-contract@1"]
+capabilities = []
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+ram_mb = 20
+cpu_pct = 3
+
+[health]
+check = "ping"
+interval_s = 60

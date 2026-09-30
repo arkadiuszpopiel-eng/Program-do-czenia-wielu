@@ -1,0 +1,20 @@
+[package]
+name = "voice-dialog-fake"
+description = "voice-dialog: atrapy (uproszczony automat skryptowy, zasób głośnika, klasyfikator z adnotacji, alignment równomierny)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-cmd-contract = { path = "../voice-cmd-contract" }
+voice-persona-contract = { path = "../voice-persona-contract" }
+
+[dev-dependencies]
+voice-dialog-contract = { path = "../voice-dialog-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

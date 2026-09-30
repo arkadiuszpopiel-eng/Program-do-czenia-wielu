@@ -1,4 +1,4 @@
-# voice-dialog — SPEC (szkic v0)
+# voice-dialog — SPEC (v1: kontrakt, fake i impl w repo; F2)
 
 ## Cel
 Automat rozmowy głosowej: `Idle → Listening → UserSpeaking → Thinking → Speaking → Interrupted → …`; zatrzymanie dwustopniowe (ducking → twardy stop), keyword-spotter „stop/czekaj" z `voice-cmd`, backchannel, klasy intencji przerwania, „usłyszany prefiks", wznawianie, fillery, mowa proaktywna z etykietą, kolejka mówienia; przerwanie także tekstem i w trakcie narzędzi (PLAN §6.5, §6.9).
@@ -6,31 +6,37 @@ Automat rozmowy głosowej: `Idle → Listening → UserSpeaking → Thinking →
 ## Fala i priorytet
 F0: spike (a) pętla z barge-in; F2: moduł. P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (v1, `crates/voice-dialog-contract`)
+Automat **czysto funkcyjny**, bez I/O: `DialogAutomaton::step(&DialogState, &DialogEvent, now_ms) -> Transition { state, commands }`.
 ```rust
-// voice-dialog-contract — SZKIC
-pub enum DialogState { Idle, Listening, UserSpeaking, Thinking, Speaking { persona: PersonaId, utterance: UtteranceId }, Interrupted { heard_prefix: usize, approximate: bool } }
+pub enum DialogPhase { Idle, Listening, UserSpeaking, Thinking, Speaking, Interrupted }   // agent_activity() → voice-cmd
+pub enum DialogEvent { Activate, Deactivate, IdleTimeout, VadSpeechStart, VadSpeechEnd, UserPartial { text }, TurnEnded,
+    Command { VoiceCommand }, UserTyped { text }, ResponseReady { persona }, SpeakerGranted/Denied { persona, utterance }, SpeakerReleased,
+    TtsChunkQueued { utterance, text, audio_ms }, TtsWordMarks { utterance, chunk, marks, source: Tts|Alignment },
+    PlaybackProgress { utterance, played_samples, sample_rate, device_latency_ms }, ResponseFinished { utterance },
+    ProactiveRequest { persona, text, label }, SetDoNotDisturb { enabled }, StopSpeech /* Esc */, Tick }
+pub enum Command { StartListening, StopListening, DuckOutput { db }, RestoreOutput, StopTts { utterance }, CancelGeneration,
+    ClearSpeechQueue, CancelTask, AcquireSpeaker/ReleaseSpeaker { persona, utterance }, StartTts, SpeakProactive { label, .. },
+    ResumeFrom { from, offset, text, utterance }, SubmitTurn { turn, text, heard_prefix, interrupted_intent, source: Voice|Text },
+    PlayFiller, StopFiller, ForwardCommand { VoiceCommand }, KillSwitch, Notify { DialogNotice } }
+pub struct HeardPrefix { utterance, chars, words, text, approximate, source: WordMarks|Alignment|SampleCount|NothingPlayed }
 pub enum InterruptIntent { Correction, Addition, Clarify, TopicChange, StopCancel, Continue, Backchannel }
-pub struct BargeInPolicy { pub duck_db: f32, pub confirm_ms: u16 /* 150–250 */, pub headphones_aggressive: bool, pub no_single_word_nie_outside_speaking: bool }
-pub trait Dialog: Send + Sync {
-    fn state(&self) -> DialogState;
-    fn on_vad(&self, ev: VadEvent, aec_conf: f32);
-    fn on_turn_end(&self, t: Transcript);
-    fn on_text_input(&self, text: String);                   // przerwanie pisaniem
-    fn stop_speech(&self);                                   // Esc / „stop" — nie zabija pracy w tle
-    fn resume(&self);                                        // od punktu cięcia
-    fn proactive(&self, persona: PersonaId, text: String, label: ProactiveLabel) -> Result<()>;
-}
+pub trait InterruptClassifier { fn classify(&self, &InterruptContext { heard_prefix, unsaid, utterance }) -> IntentResult; }
+pub trait SpeakerLock { fn try_acquire(&SpeakerOwner) -> Result<(), SpeakerBusy>; fn release(&SpeakerOwner) -> bool; fn holder() -> Option<SpeakerOwner>; }
+pub trait WordAligner { fn align(&self, text, audio: &[f32], sample_rate) -> Result<Vec<WordMark>, AlignError>; }
 ```
-Zdarzenia: `dialog.state_changed`, `dialog.ducked`, `dialog.interrupted { heard_prefix, approximate }`, `dialog.intent_classified`, `dialog.backchannel`, `dialog.proactive`, `dialog.filler`, `dialog.metrics` (p50/p95 etapów, fałszywe przerwania — strumień Voice).
+`DialogConfig`: `duck_db −15`, `confirm_ms 200` (słuchawki 150), `max_confirm_ms 350` (brak transkryptu), `backchannel_max_ms 900`, `min_speech_ms 80` (szum), frazy backchannelu (m.in. „mhm”, „tak”, „aha”, „okej”, „nie no, dobrze”), `approx_trim word|sentence`, fillery po 1200 ms, `proactive labeled|off`.
+Impl: `DialogMachine<C>` (+ `HeuristicClassifier` PL, `DialogDriver` wykonujący polecenia głośnika na `SpeakerLock`). Id wypowiedzi nadaje automat; zdarzenia nieaktualnych wypowiedzi są ignorowane (po `StopTts` brak dalszego audio tej wypowiedzi; wznowienie = nowa wypowiedź).
+Zdarzenia magistrali: `voice.dialog.state_changed`, `.ducked`, `.interrupted`, `.intent_classified`, `.backchannel`, `.proactive`, `.filler`, `.metrics` (z `Command::Notify`).
 
 ## Zależności
-`core-bus/config/log-contract`, `voice-audio/dsp/vad/turn/stt/tts/cmd/persona-contract`, `scheduler-lite-contract` (`speaker`, `mic` jako zasoby wyłączne), `personas-contract` (Mówczyni/obsada), `router-contract` (VoiceFast/Conversation), `sessions-contract` (tury, prefiks, gałęzie), `agent-runtime-contract` (F3: steering, anulowanie LLM).
+v1: `core-bus-contract`, `voice-cmd-contract` (komendy), `voice-persona-contract` (`PersonaId`). Automat nie zależy od `voice-turn` ani VAD — dostaje zdarzenia `VadSpeech*`/`TurnEnded` od runtime potoku. Później: `scheduler-lite-contract` (realny `SpeakerLock`), `sessions-contract` (tury, prefiks, gałęzie), `router-contract`, `agent-runtime-contract` (F3: steering, anulowanie LLM).
 
 ## Niezmienniki
 - Ducking (−15 dB, < 50 ms) przy VAD po AEC w `Speaking`; twardy stop po ≥ 150–250 ms mowy sklasyfikowanej ≠ backchannel: stop TTS, anulowanie LLM, czyszczenie kolejki — ≤ ~400 ms od początku wypowiedzi.
 - „nie" przerywa tylko jako samodzielne słowo z pauzą przed i po, wyłącznie w `Speaking`.
-- Prefiks usłyszany liczony wg hierarchii (znaczniki → alignment → próbki + `GetStreamLatency`), zawsze z flagą `approximate`; `assistant_full` i `heard_prefix` zapisywane osobno; historia append-only (nowe gałęzie, nigdy edycja).
+- Prefiks usłyszany liczony wg hierarchii (znaczniki TTS → alignment (`WordAligner` → `TtsWordMarks{source: Alignment}`) → próbki − `GetStreamLatency`, przycięcie do słowa/zdania), zawsze z flagą `approximate`; `assistant_full` i `heard_prefix` zapisywane osobno; historia append-only (nowe gałęzie, nigdy edycja).
+- Twardy stop: treść ≠ backchannel po `confirm_ms`; brak transkryptu po `max_confirm_ms`; backchannel/prefiks backchannelu dłuższy niż `backchannel_max_ms`. „Czekaj/pauza” zatrzymuje mowę bez anulowania generowania (wznowienie); „stop/Esc” anuluje generowanie mówionej odpowiedzi; „anuluj” dodatkowo `CancelTask`.
 - Backchannel („mhm", „tak") nie przerywa; fillery poza prefiksem i przerywalne; mowa proaktywna nigdy podczas mowy użytkownika ani w DND.
 - Jedna agentka mówi naraz; przekazanie głosu jawne („Przekazuję Delcie…").
 - Stop mowy ≠ Stop wszystkiego (kill-switch obsługuje watchdog/broker).
@@ -58,7 +64,10 @@ Pełny tryb głosowy (orb, napisy, „przerwano tutaj", stany mikrofonu), piguł
 - `ACC-F2-voice-dialog-04`: prefiks ±1 słowo ≥ 90%; klasyfikacja intencji ≥ 90% per klasa (≥ 50 przykładów na klasę).
 
 ## Fake
-`voice-dialog-fake`: automat sterowany skryptem zdarzeń (VAD/turn/STT/TTS z fake'ów) na wirtualnym zegarze; udostępnia stany dla UI i `agent-runtime`.
+`voice-dialog-fake`: `FakeDialog` (uproszczony automat: natychmiastowy stop przy mowie, intencja zawsze korekta), `FakeSpeakerLock`, `ScriptedClassifier`, `UniformAligner`; skrypt zdarzeń na wirtualnym zegarze przez `drive`; przechodzi test kontraktowy.
+
+## Stan testów (v1, scenariusze syntetyczne)
+Twardy stop od początku mowy: p50 220 ms, p95/max 350 ms (120 scenariuszy; ducking w tym samym kroku co VAD). Backchannel co 3 s przez 60 s: 0 fałszywych przerwań (20/20 backchanneli rozpoznanych). Prefiks ±1 słowo: znaczniki 100 %, liczenie próbek 93 %. Klasyfikator heurystyczny: 100 % per klasa na tabeli deweloperskiej (7–12 przykładów/klasę; oficjalny zestaw ≥ 50/klasę — recenzent). Property-based (768 przypadków): brak „mówi+słucha” bez duckingu, brak audio po `StopTts`, głośnik tylko w `Speaking`, mowa proaktywna tylko z `Idle` bez DND.
 
 ## Otwarte pytania
 - Model klasyfikacji intencji przerwania (mały lokalny vs LLM) — pomiar F2; do ustalenia w SPEC v1.

@@ -1,0 +1,23 @@
+[package]
+name = "voice-dialog-impl"
+description = "voice-dialog: czysto funkcyjny automat rozmowy (barge-in dwustopniowy, backchannel, prefiks, intencje PL, wznawianie, mowa proaktywna)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-cmd-contract = { path = "../voice-cmd-contract" }
+voice-persona-contract = { path = "../voice-persona-contract" }
+
+[dev-dependencies]
+voice-dialog-contract = { path = "../voice-dialog-contract", features = ["contract-tests"] }
+voice-dialog-fake = { path = "../voice-dialog-fake" }
+core-registry-contract.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true
