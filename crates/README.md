@@ -37,6 +37,9 @@ wyłącznie od innych `lib-*` i `*-contract`.
 | `memory` | `memory-contract`, `-impl`, `-fake` | v0: remember/recall/forget w zakresie sesji, proweniencja, treść niezaufana nie awansuje |
 | `artifacts` | `artifacts-contract`, `-impl`, `-fake` | rejestr plików wyjściowych z wersjami i hashami, podgląd, diff, intencje UI |
 | `providers` | `providers-contract`, `providers-fake`, `providers-api-impl` | `ModelProvider`, neutralny IR (thinking z podpisem, tool use), zdarzenia strumienia; adaptery Anthropic, OpenAI Chat/Responses, generyczne zgodne z OpenAI/Anthropic; retry, timeouty, anulowanie < 100 ms |
+| `lib-markdown` | `lib-markdown` (biblioteka) | Markdown z LLM → bezpieczny HTML (pulldown-cmark + ammonia, 72 wektory XSS), renderowanie przyrostowe dla strumienia, tekst mówiony |
+| `personas` | `personas-contract`, `-impl`, `-fake` | Alfa/Beta/Gama/Delta, katalog ról, obsady i szablony, adresowanie z polską odmianą imion, polecenia zmiany obsady, prompt w rodzaju żeńskim |
+| `scheduler-lite` | `scheduler-lite-contract`, `-impl`, `-fake` | zasoby wyłączne (mikrofon, głośnik, ekran, pliki), kolejka priorytetowa, voice-first, kolejka mówienia z przekazaniem, wykrywanie zakleszczeń |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

@@ -1,4 +1,4 @@
-# personas — SPEC (szkic v0)
+# personas — SPEC (v1: kontrakt zaimplementowany)
 
 ## Cel
 Cztery persony na start (Alfa, Beta, Gama, Delta: imię + głos + charakter + fraza + kolor) i **obsada ról** (Dyrygentka, Mówczyni, Myślicielka, Wykonawczyni, Koderka, Krytyczka, Badaczka, Strażniczka pamięci, Pisarka/Tłumaczka + własne) per sesja/zadanie/szablon; szablony obsad Standard/Solo/Kodowanie/Badania; zmiana obsady z UI, paska sesji, głosem lub przez Marszałka (PLAN §9.2, `docs/PERSONAS.md`).
@@ -6,23 +6,30 @@ Cztery persony na start (Alfa, Beta, Gama, Delta: imię + głos + charakter + fr
 ## Fala i priorytet
 F2 (persony + obsada; rola = prompt + polityka modelu). F3: tokeny zdolności per rola (Broker). F5: Kreator agentek (`agent-builder`). P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (źródło prawdy: `crates/personas-contract`)
 ```rust
-// personas-contract — SZKIC
-pub struct Persona { pub id: PersonaId /* alfa|beta|gama|delta|custom */, pub name: String, pub glyph: char /* α β γ δ */, pub color: ColorToken,
-                     pub character: String, pub wake_phrase: String, pub voice: VoiceRef, pub system_prompt: PromptRef /* język żeński */ }
-pub struct Role { pub id: RoleId, pub name: String, pub prompt: PromptRef, pub model_policy: ModelPolicy, pub tools: Vec<ToolId>,
-                  pub permission_profile: PermissionProfileRef /* F3 */, pub memory_scope: MemoryScopePolicy, pub read_only: bool /* Krytyczka */ }
-pub struct Cast { pub id: CastId, pub name: String, pub assignments: Vec<(PersonaId, Vec<RoleId>)>, pub conductor: PersonaId, pub speaker: PersonaId }
-pub trait Personas: Send + Sync {
-    fn personas(&self) -> Vec<Persona>;
-    fn roles(&self) -> Vec<Role>;
-    fn cast(&self, session: SessionId) -> Cast;
-    fn set_cast(&self, session: SessionId, cast: Cast, origin: Origin) -> Result<()>;   // natychmiast, do dziennika
-    fn resolve_addressee(&self, session: SessionId, name: Option<&str>) -> PersonaId;   // imię wygrywa, inaczej Dyrygentka
+pub struct Persona { id: PersonaId, name, glyph: char, color: ColorToken /* "color.agent.alfa" — nazwa tokenu ui-kit */,
+                     character, wake_phrases: Vec<String>, forms: NameForms /* 7 przypadków: Delta/Delty/Delcie/Deltę/Deltą/Delcie/Delto */,
+                     voice: VoiceBible /* wiek 18–25, barwa, rejestr, tempo, energia, emocje, prompt, pochodzenie */, builtin }
+pub struct Role { id: RoleId, name, description, prompt /* żeński */, model_policy, tools, read_only, untrusted_isolated, author, unique, builtin }
+pub struct Cast { template: Option<TemplateId>, voice: bool, assignments: BTreeMap<PersonaId, BTreeSet<RoleId>> } // Dyrygentka/Mówczyni wynikają z przydziału
+#[async_trait] pub trait Personas: Send + Sync {
+    fn personas(&self) -> Vec<Persona>; fn roles(&self) -> Vec<Role>; fn templates(&self) -> Vec<CastTemplate>;
+    fn cast(&self, s: &SessionId) -> Cast;                                                   // domyślny szablon, gdy brak
+    async fn set_cast(&self, s, cast, origin: ChangeOrigin) -> Result<CastChange, PersonasError>;
+    async fn set_voice(&self, s, voice: bool, origin) -> Result<CastChange, PersonasError>;   // bez Mówczyni → Dyrygentka
+    async fn apply_command(&self, s, text: &str, origin) -> Result<Option<CastChange>, PersonasError>;
+    fn resolve_addressee(&self, s, text: &str) -> PersonaId;                                 // imię wygrywa, inaczej Dyrygentka
+    fn system_prompt(&self, s, p: &PersonaId) -> Result<String, PersonasError>;
+    async fn add_persona(&self, p: Persona) -> Result<(), PersonasError>;                     // + add_role, add_template (Kreator: model + walidacja)
+    fn export(&self) -> PersonasExport;                                                      // `.alfa`: elementy własne + obsady
 }
 ```
-Zdarzenia: `personas.cast.changed` (Audyt: kto, skąd — UI/głos/Marszałek), `personas.role.assigned`, `personas.persona.added` (Kreator, F5).
+Czyste funkcje (wspólne dla `-impl`/`-fake`, dostępne dla `voice-dialog`/`voice-wake`): `Catalog::validate_cast`, `parse_addressee`,
+`parse_cast_command` + `apply_command`, `render_system_prompt`, `Cast::verifier_for`; rdzeń stanu `PersonasState`.
+Zdarzenia: `personas.cast.changed` (origin: ui/voice/text/marshal/system/import; before/after/assigned/removed/warnings), `personas.role.assigned` (per para), `personas.persona.added`.
+Decyzje v1: `SessionId` z `core-bus-contract`; „Krytyczka ≠ autorka, gdy możliwe” = ostrzeżenie walidacji + zastępczyni w `verifier_for`
+(nie błąd — „Delta, przejmij weryfikację” w Standard jest poprawne); szablon *Kodowanie* ma Alfę jako Mówczynię; definicje z TOML — F2 (config).
 
 ## Zależności
 `core-bus/config/log-contract`, `sessions-contract`, `voice-persona-contract` (biblie), `router-contract` (polityka modelu roli), `safety-broker-contract` (F3: nowe tokeny przy zmianie obsady), `ui-kit` (kolory, glify).

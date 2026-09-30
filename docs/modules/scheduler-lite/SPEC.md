@@ -1,4 +1,4 @@
-# scheduler-lite — SPEC (szkic v0)
+# scheduler-lite — SPEC (v1: kontrakt zaimplementowany)
 
 ## Cel
 Deterministyczny, lekki scheduler F2: zasoby wyłączne `speaker` (głośnik/mówienie) i `mic`, kolejka mowy (jedna agentka naraz), timeouty, delegacja v0 = przekazanie tury/rozmowy innej personie bez pracy w tle. Pełny `scheduler` (priorytety, DAG, zasoby ekran/mysz/pliki, cykle, zakleszczenia, okna czasowe) — F5 (PLAN §9.3, §16.2).
@@ -6,21 +6,26 @@ Deterministyczny, lekki scheduler F2: zasoby wyłączne `speaker` (głośnik/mó
 ## Fala i priorytet
 F2. P0. Kontrakt projektowany tak, by pełny `scheduler` (F5) był jego nadzbiorem.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (źródło prawdy: `crates/scheduler-lite-contract`)
 ```rust
-// scheduler-lite-contract — SZKIC
-pub enum Resource { Speaker, Mic /* F5: ScreenInput, File(PathBuf), ... */ }
-pub struct LockRequest { pub resource: Resource, pub holder: Holder /* Persona(PersonaId) | System(ModuleId) */, pub priority: Priority, pub max_wait: Duration, pub preemptible: bool }
-pub struct LockGuard { pub id: LockId, pub resource: Resource, pub holder: Holder }
-pub trait SchedulerLite: Send + Sync {
-    fn acquire(&self, r: LockRequest) -> BoxFuture<Result<LockGuard, SchedError /* Timeout | Preempted | Cancelled */>>;
-    fn release(&self, g: LockGuard);
-    fn preempt(&self, resource: Resource, by: Holder, reason: PreemptReason /* UserSpeaks | KillSwitch | Handoff */) -> Result<()>;
-    fn queue(&self, resource: Resource) -> Vec<QueuedHolder>;
-    fn handoff(&self, from: PersonaId, to: PersonaId) -> Result<()>;   // delegacja v0
+pub enum Resource { Speaker, Mic, ScreenInput, File(String /* znormalizowana ścieżka */) }
+pub enum Holder { User, Persona(PersonaId), System(String) }
+pub enum Priority { Background, Narration, Normal, Interactive, UserSpeech, Critical }
+pub struct ResourcePolicy { preemptible_at_atomic: bool, on_timeout: OnTimeout /* AskUser | Fail */, handoff_reserve_ms: u64 }
+pub struct LeaseRequest { resource, holder, priority, max_wait: Duration /* ≤ 600 s; 0 = próba */, on_timeout: Option<OnTimeout> }
+pub struct Lease { .. } // RAII: drop = release; signal(): Active | PreemptRequested{by, reason} | Revoked{reason}; handoff(to)
+#[async_trait] pub trait SchedulerLite: Send + Sync {
+    async fn acquire(&self, r: LeaseRequest) -> Result<Lease, SchedError /* Timeout{on_timeout} | Deadlock | Cancelled | AlreadyHeld | SystemCannotSpeak | … */>;
+    fn preempt(&self, r: &Resource, by: Holder, reason: PreemptReason /* UserSpeaks | HigherPriority | Handoff | KillSwitch */) -> Result<(), SchedError>;
+    fn handoff(&self, r: &Resource, from: &Holder, to: Holder) -> Result<(), SchedError>;   // delegacja v0, bez luki
+    fn holder(&self, r: &Resource) -> Option<LeaseInfo>; fn queue(&self, r: &Resource) -> Vec<QueuedRequest>;
+    fn kill_all(&self) -> usize;
 }
 ```
-Zdarzenia: `sched.acquired/released`, `sched.queued`, `sched.preempted` (powód), `sched.timeout`, `sched.handoff`.
+Rdzeń decyzyjny w kontrakcie (`LockTable` + sterownik `Core<H: Host>`): `-impl` (zegar tokio, timer, magistrala) i `-fake` (wirtualny zegar) różnią się tylko `Host`.
+Zdarzenia: `scheduler.lease.granted/released/preempted/timeout` + `queued/handoff/deadlock/revoked/cancelled`.
+Zakres v1 poszerzony względem v0 (zadanie F2): także `ScreenInput` i `File`, wykrywanie zakleszczeń (cykl w grafie oczekiwania → błąd dla najmłodszego żądania),
+wywłaszczanie tylko w punktach atomowych (sygnał, nie zabijanie). DAG, okna czasowe i limity współbieżności — pełny `scheduler` (F5) jako nadzbiór.
 
 ## Zależności
 `core-bus/config/log-contract`, `personas-contract`. Klienci: `voice-dialog`, `voice-audio`, `voice-tts`, `notify` (earcony nie biorą `speaker` — miksowane z duckingiem), `agent-runtime` (F3).
@@ -57,4 +62,5 @@ Kolejka mówienia widoczna w panelu Agentki (kto mówi, kto czeka); kapsuła akt
 `scheduler-lite-fake`: natychmiastowe przyznania lub skryptowane kolejki/timeouty na wirtualnym zegarze.
 
 ## Otwarte pytania
-- Czy `scheduler` (F5) zastępuje crate, czy rozszerza kontrakt `-lite` (preferencja: rozszerza; `scheduler-lite-contract` zostaje podzbiorem) — do ustalenia w SPEC v1.
+- `scheduler` (F5) rozszerza kontrakt `-lite` (typy `Resource/Holder/Priority/Lease` zostają); DAG i okna czasowe dokłada F5.
+- Klucze `[scheduler]` z `core-config` → `ResourcePolicy` (na razie `set_policy`) — po ustabilizowaniu `core-config-contract`.

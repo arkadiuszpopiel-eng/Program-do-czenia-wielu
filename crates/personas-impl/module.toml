@@ -1,0 +1,17 @@
+# Manifest modułu person i obsady ról (docs/modules/personas/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "personas"
+version = "0.0.1"
+kind = "service"
+provides = ["personas-contract@1"]
+requires = ["core-bus-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "inproc"
+
+[budget]
+ram_mb = 1
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 60
