@@ -47,3 +47,16 @@ Każdy czat ma osobną pamięć (zakres `sesja` domyślny); pamięć semantyczna
 
 - Niezgodność SQLCipher + sqlite-vec: wariant zapasowy to szyfrowanie payloadów na poziomie aplikacji (kolumny szyfrowane kluczem sesji, indeks wektorowy na zaszyfrowanych blobach niemożliwy → sqlite-vec na osobnym pliku per sesja, także szyfrowanym) — decyzja po spike'u (i), aktualizacja tego ADR.
 - Przejście na osobną bazę wektorową jest możliwe za kontraktem `search-contract`; koszt: drugi silnik i ręczna kaskada `forget`.
+
+## Wynik spike'u (i) — 2026-09-30 (`crates/spike-data`, `evals/spikes/i-dane/RESULT.md`)
+
+**Potwierdzone:** SQLCipher 4.14 (rusqlite `bundled-sqlcipher-vendored-openssl`, SQLite 3.51.3) + sqlite-vec 0.1.9 (statycznie, `sqlite3_auto_extension`) + FTS5 (w bundlu, `bundled-full` niepotrzebne) działają w jednej szyfrowanej bazie; crypto-shredding (dwa pliki, dwa klucze, klucz A nie otwiera B) i zły/brak klucza → `file is not a database`. Wariant zapasowy z „Jak cofnąć" **nie jest potrzebny**.
+
+Uzupełnienia decyzji:
+- **Klucze surowe 32 B** (`x'…'`) z Credential Manager, bez KDF — otwarcie 67 µs vs 142 ms z hasłem (PBKDF2 256k).
+- `PRAGMA cipher_log_level = NONE` — SQLCipher pisze na stderr przy złym kluczu.
+- Kaskada `forget`/usunięcia sesji kasuje także pliki `-wal` i `-shm`.
+- FTS5 `unicode61` nie składa „ł" (żółć↔zółc tak, zolc nie) → normalizacja polskich znaków w module `search`.
+- Crate danych wymaga jednego `unsafe` (rejestracja rozszerzenia) → wyjątek od `unsafe_code = forbid` tylko dla tego crate'a, z komentarzem.
+- Build: OpenSSL ze źródeł (+1–2 min czystego builda, +~7 MB binarki); na Windows/MSVC wymaga Perla (Strawberry) — jest na `windows-latest`, na self-hosted runnerach do zainstalowania.
+- sqlite-vec = kNN brute-force; wydajność przy realnych wymiarach embeddingów mierzona w F7.

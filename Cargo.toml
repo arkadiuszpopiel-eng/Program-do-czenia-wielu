@@ -34,7 +34,7 @@ futures-util = "0.3.31"
 tokio-stream = { version = "0.1.19", features = ["sync"] }
 proptest = "1.11.0"
 # Dane (ADR 0008, spike i): SQLCipher w pakiecie z OpenSSL (vendored) + FTS5 w bundlu; sqlite-vec statycznie.
-rusqlite = { version = "0.40.2", features = ["bundled-sqlcipher-vendored-openssl"] }
+rusqlite = { version = "0.40.2", default-features = false, features = ["cache", "bundled-sqlcipher-vendored-openssl"] }
 sqlite-vec = "0.1.9"
 
 # Crate'y workspace (moduły zależą wyłącznie od `*-contract`; sprawdza scripts/check-deps.sh)
