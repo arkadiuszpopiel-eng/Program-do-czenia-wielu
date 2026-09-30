@@ -1,0 +1,113 @@
+/* Bazowe style Alfy: reset, typografia systemowa, fokus. Wymaga tokens.css. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--alfa-font-sans);
+  font-size: var(--alfa-font-size-md);
+  line-height: var(--alfa-leading-text);
+  font-weight: var(--alfa-weight-regular);
+  color: var(--alfa-color-text);
+  background: var(--alfa-color-bg);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--alfa-color-bg);
+  color: var(--alfa-color-text);
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: var(--alfa-leading-heading);
+  font-weight: var(--alfa-weight-semibold);
+}
+
+h1 {
+  font-size: var(--alfa-font-size-2xl);
+}
+h2 {
+  font-size: var(--alfa-font-size-xl);
+}
+h3 {
+  font-size: var(--alfa-font-size-lg);
+}
+h4 {
+  font-size: var(--alfa-font-size-md);
+}
+
+p {
+  margin: 0;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--alfa-font-mono);
+  font-size: var(--alfa-font-size-sm);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: default;
+}
+
+a {
+  color: var(--alfa-color-info);
+}
+
+/* Widoczny fokus 2 px (WCAG 2.4.11), tylko dla klawiatury. */
+:focus-visible {
+  outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--alfa-color-surface3);
+}
+
+/* Cienkie paski przewijania w stylu Windows 11 (WebView2 = Chromium). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--alfa-color-border-strong) transparent;
+}
+
+.alfa-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

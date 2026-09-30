@@ -1,0 +1,31 @@
+[package]
+name = "alfa-desktop"
+version = "0.0.1"
+description = "Alfa — powłoka okna głównego (Tauri 2 + WebView2)."
+edition = "2024"
+rust-version = "1.94"
+publish = false
+
+# Samodzielny pakiet: NIE należy do workspace Rust w katalogu głównym repo
+# (root Cargo.toml ma go wykluczyć wpisem `exclude = ["apps/desktop/src-tauri"]`;
+# pusta sekcja [workspace] poniżej sprawia, że cargo nie szuka workspace'u wyżej).
+[workspace]
+
+[lib]
+name = "alfa_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.7.0", features = [] }
+
+[dependencies]
+tauri = { version = "=2.12.0", features = [] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

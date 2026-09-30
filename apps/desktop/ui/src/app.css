@@ -1,0 +1,17 @@
+/* Okno główne: pełna wysokość, bez przewijania strony (przewijają się kolumny). */
+html,
+body,
+#app {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Przeładowanie strony (F5/Ctrl+R) i menu kontekstowe WebView wyłączane w Rust/JS — §14.8. */
+body {
+  user-select: none;
+}
+textarea,
+input,
+[data-selectable] {
+  user-select: text;
+}
