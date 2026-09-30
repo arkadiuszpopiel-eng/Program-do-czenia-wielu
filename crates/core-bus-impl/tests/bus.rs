@@ -6,7 +6,7 @@ use std::collections::BTreeSet;
 use std::sync::Arc;
 
 use core_bus_contract::{
-    contract_tests, BusError, BusItem, Event, EventBus, EventFilter, EventKind, Level,
+    BusError, BusItem, Event, EventBus, EventFilter, EventKind, Level, contract_tests,
 };
 use core_bus_impl::{BroadcastBus, BusConfig};
 use futures_util::StreamExt;

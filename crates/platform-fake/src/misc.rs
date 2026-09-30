@@ -193,12 +193,13 @@ mod tests {
         p.kill_tree(h).unwrap();
         assert_eq!(p.status(h).unwrap(), ProcessStatus::Killed);
         assert_eq!(p.spawned().len(), 1);
-        assert!(p
-            .spawn(ProcessSpec {
+        assert!(
+            p.spawn(ProcessSpec {
                 cmd: PathBuf::new(),
                 ..spec
             })
-            .is_err());
+            .is_err()
+        );
         assert!(!p.foreground_is_elevated());
         p.set_foreground_elevated(true);
         assert!(p.foreground_is_elevated());

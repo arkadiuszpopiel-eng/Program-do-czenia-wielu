@@ -5,8 +5,8 @@
 use std::time::Instant;
 
 use spike_data::{
-    embedding_for, fts_search, init_schema, insert_messages, knn, open, remove_database,
-    sample_messages, versions, SpikeError,
+    SpikeError, embedding_for, fts_search, init_schema, insert_messages, knn, open,
+    remove_database, sample_messages, versions,
 };
 
 const N: usize = 100;

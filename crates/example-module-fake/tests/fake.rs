@@ -2,7 +2,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
-use example_module_contract::{contract_tests, Echo, EchoError};
+use example_module_contract::{Echo, EchoError, contract_tests};
 use example_module_fake::FakeEcho;
 
 #[tokio::test]

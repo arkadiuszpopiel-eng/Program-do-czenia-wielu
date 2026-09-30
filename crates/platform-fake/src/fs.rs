@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
 use platform_contract::{
-    is_credential_path, DirEntry, FsOperation, FsPort, KnownFolder, OpReceipt, PlatformError,
-    UndoToken,
+    DirEntry, FsOperation, FsPort, KnownFolder, OpReceipt, PlatformError, UndoToken,
+    is_credential_path,
 };
 
 /// Migawka zawartości (do porównań w testach).
@@ -283,12 +283,16 @@ mod tests {
         ]);
         let entries = fs.list_dir(Path::new("/d")).unwrap();
         assert_eq!(entries.len(), 2);
-        assert!(entries
-            .iter()
-            .any(|e| e.path == Path::new("/d/a.txt") && !e.is_dir && e.size == 2));
-        assert!(entries
-            .iter()
-            .any(|e| e.path == Path::new("/d/sub") && e.is_dir));
+        assert!(
+            entries
+                .iter()
+                .any(|e| e.path == Path::new("/d/a.txt") && !e.is_dir && e.size == 2)
+        );
+        assert!(
+            entries
+                .iter()
+                .any(|e| e.path == Path::new("/d/sub") && e.is_dir)
+        );
         assert!(fs.exists(Path::new("/d/sub")));
         assert!(fs.list_dir(Path::new("/nope")).is_err());
     }

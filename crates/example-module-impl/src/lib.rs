@@ -2,15 +2,15 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use async_trait::async_trait;
 use core_bus_contract::{Event, EventBus, Level};
 use core_registry_contract::{
     HealthStatus, ManifestError, Module, ModuleContext, ModuleError, ModuleManifest,
 };
-use example_module_contract::{echo_called_kind, validate_input, Echo, EchoError, EchoReply};
+use example_module_contract::{Echo, EchoError, EchoReply, echo_called_kind, validate_input};
 use tokio::sync::RwLock;
 
 /// Treść `module.toml` tego modułu (parsowana raz w `EchoModule::new`).

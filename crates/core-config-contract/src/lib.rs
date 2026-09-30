@@ -7,5 +7,5 @@ mod layers;
 mod store;
 
 pub use key::{ConfigKey, KeyError};
-pub use layers::{resolve, ConfigLayer, MachineId, Scope};
+pub use layers::{ConfigLayer, MachineId, Scope, resolve};
 pub use store::{ConfigChange, ConfigError, ConfigStore, ConfigValue, ConfigWatch, Origin};

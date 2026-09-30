@@ -5,7 +5,7 @@
 
 use std::path::PathBuf;
 
-use core_bus_contract::{event_schema_json, EVENT_SCHEMA_VERSION};
+use core_bus_contract::{EVENT_SCHEMA_VERSION, event_schema_json};
 
 fn schema_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))

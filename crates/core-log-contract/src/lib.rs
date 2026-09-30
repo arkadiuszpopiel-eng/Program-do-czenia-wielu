@@ -5,7 +5,7 @@
 mod redact;
 mod sink;
 
-pub use redact::{Redactor, RegexRedactor, REDACTED};
+pub use redact::{REDACTED, Redactor, RegexRedactor};
 pub use sink::{
     AuditRecordRef, AuditWriter, LogError, LogQuery, LogRecord, LogSink, LogStream, RecordRef,
 };

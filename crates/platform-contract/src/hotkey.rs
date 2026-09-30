@@ -68,12 +68,14 @@ impl Hotkey {
     /// (poza klawiszami funkcyjnymi).
     pub fn validate(&self) -> Result<(), PlatformError> {
         let m = self.modifiers;
-        if let Key::Letter(c) = self.key {
-            if m.ctrl && m.alt && ALTGR_LETTERS.contains(&c.to_ascii_uppercase()) {
-                return Err(PlatformError::HotkeyRejected(format!(
-                    "{self}: Ctrl+Alt+{c} koliduje z AltGr (polskie znaki)"
-                )));
-            }
+        if let Key::Letter(c) = self.key
+            && m.ctrl
+            && m.alt
+            && ALTGR_LETTERS.contains(&c.to_ascii_uppercase())
+        {
+            return Err(PlatformError::HotkeyRejected(format!(
+                "{self}: Ctrl+Alt+{c} koliduje z AltGr (polskie znaki)"
+            )));
         }
         if *self == KILL_SWITCH {
             return Err(PlatformError::HotkeyRejected(format!(
@@ -161,9 +163,11 @@ mod tests {
                 hk(true, true, false, Key::Letter(c)).validate().is_err(),
                 "{c}"
             );
-            assert!(hk(true, true, true, Key::Letter(c.to_ascii_lowercase()))
-                .validate()
-                .is_err());
+            assert!(
+                hk(true, true, true, Key::Letter(c.to_ascii_lowercase()))
+                    .validate()
+                    .is_err()
+            );
         }
         assert!(hk(true, true, false, Key::Letter('B')).validate().is_ok());
         assert!(hk(true, false, false, Key::Letter('S')).validate().is_ok());
@@ -173,9 +177,11 @@ mod tests {
     fn kill_switch_reserved_and_display() {
         assert!(KILL_SWITCH.validate().is_err());
         assert_eq!(KILL_SWITCH.to_string(), "Ctrl+Shift+F12");
-        assert!(hk(false, false, false, Key::Letter('A'))
-            .validate()
-            .is_err());
+        assert!(
+            hk(false, false, false, Key::Letter('A'))
+                .validate()
+                .is_err()
+        );
         assert!(hk(false, false, false, Key::Function(5)).validate().is_ok());
         assert_eq!(
             hk(true, true, false, Key::Space).to_string(),

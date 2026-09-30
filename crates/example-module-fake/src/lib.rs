@@ -5,7 +5,7 @@
 use std::sync::{Mutex, MutexGuard};
 
 use async_trait::async_trait;
-use example_module_contract::{validate_input, Echo, EchoError, EchoReply};
+use example_module_contract::{Echo, EchoError, EchoReply, validate_input};
 
 #[derive(Debug, Default)]
 struct State {

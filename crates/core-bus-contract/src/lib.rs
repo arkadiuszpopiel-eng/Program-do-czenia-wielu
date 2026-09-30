@@ -17,4 +17,4 @@ pub mod contract_tests;
 pub use bus::{BusError, BusItem, BusStats, EventBus, EventStream};
 pub use event::{AgentId, Cost, Event, EventKind, Level, RunId, SessionId, SpanId};
 pub use filter::EventFilter;
-pub use schema::{event_schema, event_schema_json, EVENT_SCHEMA_VERSION};
+pub use schema::{EVENT_SCHEMA_VERSION, event_schema, event_schema_json};

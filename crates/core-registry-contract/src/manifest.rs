@@ -6,7 +6,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::refs::{Capability, ContractRef, ModuleId};
-use crate::validate::{validate, ManifestError};
+use crate::validate::{ManifestError, validate};
 
 /// Rodzaj modułu (PLAN §3.2).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]

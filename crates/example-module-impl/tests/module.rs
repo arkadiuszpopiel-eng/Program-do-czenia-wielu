@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use core_bus_fake::FakeBus;
 use core_registry_contract::{HealthStatus, Lifecycle, Module, ModuleContext, ModuleError};
-use example_module_contract::{contract_tests, echo_called_kind, Echo, EchoError};
+use example_module_contract::{Echo, EchoError, contract_tests, echo_called_kind};
 use example_module_impl::{EchoModule, MODULE_TOML};
 
 async fn started() -> (EchoModule, FakeBus) {

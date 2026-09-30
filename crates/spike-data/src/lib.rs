@@ -7,7 +7,7 @@ use std::ffi::{c_char, c_int};
 use std::path::Path;
 use std::sync::Once;
 
-use rusqlite::{ffi, params, Connection, OpenFlags};
+use rusqlite::{Connection, OpenFlags, ffi, params};
 
 /// Liczba wymiarów embeddingu w spike'u (mała, żeby testy były szybkie).
 pub const DIMS: usize = 8;

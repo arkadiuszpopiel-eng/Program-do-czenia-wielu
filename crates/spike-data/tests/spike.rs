@@ -7,8 +7,8 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Instant;
 
 use spike_data::{
-    embedding_for, fts_search, init_schema, insert_messages, knn, open, remove_database,
-    sample_messages, versions, DIMS,
+    DIMS, embedding_for, fts_search, init_schema, insert_messages, knn, open, remove_database,
+    sample_messages, versions,
 };
 
 static COUNTER: AtomicU32 = AtomicU32::new(0);

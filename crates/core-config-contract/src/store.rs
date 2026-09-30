@@ -75,7 +75,7 @@ pub type ConfigWatch = Pin<Box<dyn Stream<Item = ConfigChange> + Send>>;
 pub trait ConfigStore: Send + Sync {
     /// Wartość wynikowa (po nałożeniu warstw i zakresu); `None` = brak wartości i domyślnej.
     async fn get(&self, key: &ConfigKey, scope: &Scope)
-        -> Result<Option<ConfigValue>, ConfigError>;
+    -> Result<Option<ConfigValue>, ConfigError>;
 
     /// Zapis wartości do warstwy w danym zakresie; `None` usuwa nadpisanie.
     async fn set(

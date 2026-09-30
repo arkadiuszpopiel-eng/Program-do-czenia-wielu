@@ -6,7 +6,7 @@ use std::str::FromStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::validate::{is_kebab_case, ManifestError};
+use crate::validate::{ManifestError, is_kebab_case};
 
 /// Identyfikator modułu w kebab-case (np. `voice-stt`).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, JsonSchema)]

@@ -108,7 +108,7 @@ impl HotkeyPort for FakeHotkeys {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use platform_contract::{Key, Modifiers, KILL_SWITCH};
+    use platform_contract::{KILL_SWITCH, Key, Modifiers};
 
     fn ctrl_alt(key: Key) -> Hotkey {
         Hotkey::new(

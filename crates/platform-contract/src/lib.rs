@@ -16,9 +16,9 @@ mod window;
 pub use clipboard::{ClipboardContent, ClipboardPort};
 pub use error::PlatformError;
 pub use fs::{
-    is_credential_path, DirEntry, FsOperation, FsPort, KnownFolder, OpReceipt, UndoToken,
+    DirEntry, FsOperation, FsPort, KnownFolder, OpReceipt, UndoToken, is_credential_path,
 };
-pub use hotkey::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, Key, Modifiers, KILL_SWITCH};
+pub use hotkey::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, KILL_SWITCH, Key, Modifiers};
 pub use process::{Integrity, ProcessHandle, ProcessPort, ProcessSpec, ProcessStatus};
 pub use tray::{Notification, TrayMenuItem, TrayPort, TrayState};
 pub use window::{WindowId, WindowInfo, WindowPort};

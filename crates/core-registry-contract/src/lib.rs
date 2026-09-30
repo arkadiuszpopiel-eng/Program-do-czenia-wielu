@@ -13,5 +13,5 @@ pub use manifest::{
 };
 pub use module::{HealthStatus, Module, ModuleContext, ModuleError};
 pub use refs::{Capability, ContractRef, ModuleId};
-pub use schema::{manifest_schema, manifest_schema_json, MANIFEST_SCHEMA_VERSION};
+pub use schema::{MANIFEST_SCHEMA_VERSION, manifest_schema, manifest_schema_json};
 pub use validate::ManifestError;

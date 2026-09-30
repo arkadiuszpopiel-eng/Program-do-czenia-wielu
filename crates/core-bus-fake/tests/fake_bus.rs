@@ -2,7 +2,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
-use core_bus_contract::{contract_tests, Event, EventBus, EventFilter, EventKind, Level};
+use core_bus_contract::{Event, EventBus, EventFilter, EventKind, Level, contract_tests};
 use core_bus_fake::{FakeBus, FakeBusError, VirtualClock};
 use futures_util::StreamExt;
 

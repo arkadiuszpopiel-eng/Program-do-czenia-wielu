@@ -5,8 +5,8 @@
 use std::path::PathBuf;
 
 use core_registry_contract::{
-    manifest_schema_json, Isolation, Lifecycle, ManifestError, ModuleKind, ModuleManifest,
-    MANIFEST_SCHEMA_VERSION,
+    Isolation, Lifecycle, MANIFEST_SCHEMA_VERSION, ManifestError, ModuleKind, ModuleManifest,
+    manifest_schema_json,
 };
 
 const VALID: &str = include_str!("fixtures/valid.toml");

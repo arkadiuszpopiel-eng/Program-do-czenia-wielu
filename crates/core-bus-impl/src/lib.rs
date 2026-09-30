@@ -2,15 +2,15 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
-use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use async_trait::async_trait;
 use core_bus_contract::{BusError, BusItem, BusStats, Event, EventBus, EventFilter, EventStream};
 use futures_util::StreamExt;
 use tokio::sync::broadcast;
-use tokio_stream::wrappers::errors::BroadcastStreamRecvError;
 use tokio_stream::wrappers::BroadcastStream;
+use tokio_stream::wrappers::errors::BroadcastStreamRecvError;
 
 /// Konfiguracja magistrali (klucze `[core.bus]` z SPEC).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
