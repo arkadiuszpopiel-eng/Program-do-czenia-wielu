@@ -1,0 +1,30 @@
+[package]
+name = "spike-data"
+description = "Spike (i) F0: jedna szyfrowana baza SQLite (SQLCipher) z sqlite-vec i FTS5 w jednym pliku — dowód wykonalności ADR 0008"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+rusqlite.workspace = true
+sqlite-vec.workspace = true
+thiserror.workspace = true
+
+# Linty jak w workspace, z jednym wyjątkiem: `unsafe_code = "allow"` (workspace ma `forbid`, którego nie da się
+# nadpisać). Jedyne `unsafe` to rejestracja sqlite-vec przez FFI `sqlite3_auto_extension` w `src/lib.rs`.
+# Docelowy crate danych będzie wymagał ADR na to jedno wywołanie.
+[lints.rust]
+unsafe_code = "allow"
+missing_docs = "warn"
+
+[lints.clippy]
+too_many_lines = "warn"
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "warn"
