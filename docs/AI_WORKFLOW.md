@@ -220,7 +220,7 @@ Zamyka #<issue> · moduł `<m>` · fala F<n> · autor: <model> · recenzent: <mo
 ## Jak zweryfikowano
 - Testy: kontraktowe (fake + impl) / jednostkowe / property-based / regresyjne — liczby
 - Budżety na baseline emulowanym: RAM … · CPU … · opóźnienie p50/p95 … (link do artefaktu self-hosted)
-- Kryteria `docs/ACCEPTANCE.md`: F<n>-XX ✔ / ✘ z wartością
+- Kryteria `docs/ACCEPTANCE.md`: F<n>-XX spełnione / niespełnione, ze zmierzoną wartością
 
 ## Bezpieczeństwo
 - Zdolności / tokeny: …
