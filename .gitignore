@@ -1,0 +1,23 @@
+# Rust
+/target/
+**/target/
+# Node / Vite / Svelte
+node_modules/
+dist/
+.svelte-kit/
+# Tauri
+/apps/desktop/src-tauri/target/
+# Korpus własny i nagrania — nigdy do repo
+/evals/corpus/
+/evals/**/*.wav
+/evals/**/*.flac
+# Modele i sekrety
+/models/
+*.gguf
+*.onnx
+*.safetensors
+.env
+*.key
+# System
+Thumbs.db
+.DS_Store
