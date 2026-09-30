@@ -112,7 +112,9 @@ fn resolve_canonicalizes_existing_prefix_and_keeps_missing_rest() {
     let target = tmp.path().join("a").join("..").join("b").join("c.txt");
     let resolved = p.resolve(&target, Follow::Final).unwrap();
     assert_eq!(resolved, canonical_root.join("b").join("c.txt"));
-    let root = p.resolve(Path::new("/"), Follow::NoFinal).unwrap();
+    // Korzeń woluminu właściwy dla systemu (`C:\` na Windows, `/` na Uniksie).
+    let volume_root = canonical_root.ancestors().last().unwrap();
+    let root = p.resolve(volume_root, Follow::NoFinal).unwrap();
     assert!(root.has_root());
 }
 
