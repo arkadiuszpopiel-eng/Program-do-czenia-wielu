@@ -1,70 +1,74 @@
+<!-- Korzeń okna głównego: kontekst stanu, wygląd, skróty, widok (start / wprowadzenie / powłoka). -->
 <script lang="ts">
-  import { CommandPalette, ConversationScreen, mock, type MicState } from '@alfa/ui-kit';
+  import { untrack } from 'svelte';
+  import { applyAppearance, effectiveWidth } from './lib/appearance';
+  import AppShell from './lib/components/shell/AppShell.svelte';
+  import Lazy from './lib/components/shell/Lazy.svelte';
+  import type { AppState } from './lib/state/app.svelte';
+  import { handleKeydown } from './lib/state/commands';
+  import { provideApp } from './lib/state/context';
 
-  // F0: makieta rozmowy z atrapami danych. Docelowo dane płyną z rdzenia przez IPC Tauri (zdarzenia batchowane per klatka).
-  let micState = $state<MicState>('listening');
-  let paletteOpen = $state(false);
-  let leftOpen = $state(true);
-  let rightOpen = $state(true);
-  let theme = $state<'auto' | 'light' | 'dark'>('auto');
+  interface Props {
+    app: AppState;
+  }
+
+  const props: Props = $props();
+  // Instancja stanu jest stała przez całe życie okna — odczyt raz, poza śledzeniem.
+  const app = untrack(() => props.app);
+  provideApp(app);
+  const { t } = app.i18n;
+  const loadOnboarding = () => import('./lib/views/onboarding/OnboardingView.svelte');
 
   $effect(() => {
-    const root = document.documentElement;
-    if (theme === 'auto') root.removeAttribute('data-theme');
-    else root.setAttribute('data-theme', theme);
+    applyAppearance(document.documentElement, {
+      theme: app.str('ui.theme', 'auto'),
+      density: app.str('ui.density', 'comfortable'),
+      animations: app.bool('ui.animations', true),
+      zoom: app.num('ui.zoom', 100),
+    });
   });
 
-  const commands = mock.mockCommands.map((c) => ({
-    ...c,
-    onSelect: () => {
-      if (c.id === 'theme') theme = theme === 'dark' ? 'light' : 'dark';
-      if (c.id === 'left') leftOpen = !leftOpen;
-      if (c.id === 'right') rightOpen = !rightOpen;
-      if (c.id === 'mic') micState = micState === 'off' ? 'listening' : 'off';
-    },
-  }));
+  $effect(() => {
+    const zoom = app.num('ui.zoom', 100);
+    const update = () => (app.layout.width = effectiveWidth(window, zoom));
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  });
 
-  function onWindowKeydown(event: KeyboardEvent) {
-    // §14.8: przeładowanie WebView wyłączone.
+  $effect(() => () => app.dispose());
+
+  function onContextMenu(event: MouseEvent) {
+    // Menu kontekstowe WebView tylko w polach tekstowych i treści do zaznaczania.
+    const target = event.target;
     if (
-      event.key === 'F5' ||
-      ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'r')
-    ) {
-      event.preventDefault();
+      target instanceof Element &&
+      target.closest('input, textarea, [data-selectable], .alfa-prose')
+    )
       return;
-    }
-    if (event.ctrlKey && event.key.toLowerCase() === 'b') {
-      event.preventDefault();
-      leftOpen = !leftOpen;
-    }
-    if (event.ctrlKey && event.key === '\\') {
-      event.preventDefault();
-      rightOpen = !rightOpen;
-    }
+    event.preventDefault();
   }
 </script>
 
-<svelte:window onkeydown={onWindowKeydown} />
+<svelte:window onkeydown={(e) => handleKeydown(app, e)} oncontextmenu={onContextMenu} />
 
-<ConversationScreen
-  project="Projekt X"
-  session="Raport Q3"
-  sessions={mock.mockSessions}
-  messages={mock.mockMessages}
-  activity={{
-    agent: 'delta',
-    description: 'edytuję raport.docx',
-    step: 3,
-    totalSteps: 7,
-    elapsedSeconds: 42,
-  }}
-  {micState}
-  bind:leftOpen
-  bind:rightOpen
-  toast={{ message: 'Delta: przeniesiono 14 plików · 2,1 s', actionLabel: 'Cofnij' }}
-  onsubmit={() => {}}
-  onstop={() => {}}
-  onsettings={() => (paletteOpen = true)}
-/>
+{#if app.view === 'loading'}
+  <div class="boot" role="status" aria-label={t('app.loading')}></div>
+{:else if app.view === 'error'}
+  <p class="fatal" role="alert">{t('app.failed', { error: app.fatal ?? '' })}</p>
+{:else if app.view === 'onboarding'}
+  <Lazy load={loadOnboarding} props={{}} label={t('app.loading')} />
+{:else}
+  <AppShell />
+{/if}
 
-<CommandPalette bind:open={paletteOpen} items={commands} />
+<style>
+  .boot {
+    height: 100%;
+    background: var(--alfa-color-bg);
+  }
+  .fatal {
+    margin: var(--alfa-space-8);
+    color: var(--alfa-color-error);
+  }
+</style>

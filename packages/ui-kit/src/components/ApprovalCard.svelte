@@ -15,45 +15,84 @@
     risk: RiskLevel;
     /** Tylko wygląd: samo zatwierdzenie odbywa się w oknie Brokera (§8.2). */
     onopenbroker?: () => void;
+    /** Stan prośby; po decyzji w Brokerze karta pokazuje wynik zamiast przycisku. */
+    status?: 'pending' | 'approved' | 'denied' | 'expired';
+    labels?: Partial<ApprovalLabels>;
   }
 
-  let { agent, what, why, reversible, risk, onopenbroker }: Props = $props();
-  const riskLabel: Record<RiskLevel, string> = {
-    low: 'niskie ryzyko',
-    medium: 'średnie ryzyko',
-    high: 'wysokie ryzyko',
-  };
+  interface ApprovalLabels {
+    title: string;
+    what: string;
+    why: string;
+    reversible: string;
+    reversibleYes: string;
+    reversibleNo: string;
+    hint: string;
+    open: string;
+    risk: Record<RiskLevel, string>;
+    status: Record<'approved' | 'denied' | 'expired', string>;
+  }
+
+  let {
+    agent,
+    what,
+    why,
+    reversible,
+    risk,
+    onopenbroker,
+    status = 'pending',
+    labels = {},
+  }: Props = $props();
+
+  const text = $derived<ApprovalLabels>({
+    title: `${agents[agent].name} prosi o zatwierdzenie`,
+    what: 'Co',
+    why: 'Dlaczego',
+    reversible: 'Cofalne',
+    reversibleYes: 'tak — jednym kliknięciem',
+    reversibleNo: 'nie — zmiana trwała',
+    hint: 'Zatwierdzasz tylko w oknie Brokera.',
+    open: 'Otwórz w oknie Brokera',
+    risk: { low: 'niskie ryzyko', medium: 'średnie ryzyko', high: 'wysokie ryzyko' },
+    status: {
+      approved: 'Zatwierdzone w oknie Brokera',
+      denied: 'Odmówiono w oknie Brokera',
+      expired: 'Prośba wygasła',
+    },
+    ...labels,
+  });
 </script>
 
-<article
-  class="card risk-{risk}"
-  aria-label="Prośba o zatwierdzenie od agentki {agents[agent].name}"
->
+<article class="card risk-{risk}" aria-label={text.title}>
   <header class="head">
     <Avatar {agent} size={24} />
-    <span class="who">{agents[agent].name} prosi o zatwierdzenie</span>
+    <span class="who">{text.title}</span>
     <span class="risk">
       <ShieldAlert size={14} strokeWidth={1.5} aria-hidden="true" />
-      {riskLabel[risk]}
+      {text.risk[risk]}
     </span>
   </header>
   <dl class="grid">
-    <dt>Co</dt>
+    <dt>{text.what}</dt>
     <dd>{what}</dd>
-    <dt>Dlaczego</dt>
+    <dt>{text.why}</dt>
     <dd>{why}</dd>
-    <dt>Cofalne</dt>
+    <dt>{text.reversible}</dt>
     <dd class="rev">
       {#if reversible}
-        <Undo2 size={14} strokeWidth={1.5} aria-hidden="true" /> tak — jednym kliknięciem
+        <Undo2 size={14} strokeWidth={1.5} aria-hidden="true" /> {text.reversibleYes}
       {:else}
-        nie — zmiana trwała
+        {text.reversibleNo}
       {/if}
     </dd>
   </dl>
   <footer class="foot">
-    <span class="hint">Zatwierdzasz tylko w oknie Brokera.</span>
-    <Button variant="primary" size="sm" onclick={onopenbroker}>Otwórz w oknie Brokera</Button>
+    {#if status === 'pending'}
+      <span class="hint">{text.hint}</span>
+      <Button variant="primary" size="sm" onclick={onopenbroker}>{text.open}</Button>
+    {:else}
+      <span class="done" role="status">{text.status[status]}</span>
+    {/if}
   </footer>
 </article>
 
@@ -120,5 +159,9 @@
   .hint {
     color: var(--alfa-color-text-subtle);
     font-size: var(--alfa-font-size-xs);
+  }
+  .done {
+    color: var(--alfa-color-text-muted);
+    font-weight: var(--alfa-weight-semibold);
   }
 </style>

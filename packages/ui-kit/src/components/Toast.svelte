@@ -15,14 +15,35 @@
     actionLabel?: string;
     onaction?: () => void;
     onclose?: () => void;
+    closeLabel?: string;
+    /** Wstrzymanie odliczania przy najechaniu / fokusie (WCAG 2.2.1). */
+    onpause?: () => void;
+    onresume?: () => void;
   }
 
-  let { kind = 'info', title, message, actionLabel, onaction, onclose }: Props = $props();
+  let {
+    kind = 'info',
+    title,
+    message,
+    actionLabel,
+    onaction,
+    onclose,
+    closeLabel = 'Zamknij powiadomienie',
+    onpause,
+    onresume,
+  }: Props = $props();
   const Icon = $derived(kind === 'success' ? Check : kind === 'info' ? Info : TriangleAlert);
   const role = $derived(kind === 'error' || kind === 'warning' ? 'alert' : 'status');
 </script>
 
-<div class="toast {kind}" {role}>
+<div
+  class="toast {kind}"
+  {role}
+  onpointerenter={onpause}
+  onpointerleave={onresume}
+  onfocusin={onpause}
+  onfocusout={onresume}
+>
   <span class="icon" aria-hidden="true"><Icon size={16} strokeWidth={1.5} /></span>
   <div class="text">
     {#if title}<strong class="title">{title}</strong>{/if}
@@ -32,7 +53,7 @@
     <Button size="sm" variant="ghost" onclick={onaction}>{actionLabel}</Button>
   {/if}
   {#if onclose}
-    <IconButton label="Zamknij powiadomienie" size="sm" onclick={onclose}>
+    <IconButton label={closeLabel} size="sm" onclick={onclose}>
       <X size={14} strokeWidth={1.5} />
     </IconButton>
   {/if}

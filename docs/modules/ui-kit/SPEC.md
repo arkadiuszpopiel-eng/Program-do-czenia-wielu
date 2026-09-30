@@ -54,8 +54,11 @@ Wszystkie komponenty i makiety 1–20 (§14.10) w Storybooku, w wariantach jasny
 - `ACC-F1-ui-kit-03`: Storybook: axe 0 critical/serious; regresja wizualna 0 nieoczekiwanych zmian; `svelte-check` czysty.
 
 ## Fake
-Storybook z danymi z fixture'ów (rozmowy, kroki narzędzi, karty zatwierdzeń); brak crate `-fake`.
+Storybook z danymi z fixture'ów (rozmowy, kroki narzędzi, karty zatwierdzeń); brak crate `-fake`. Od F1 Storybook pokazuje też makiety ekranów aplikacji (`apps/desktop/ui/src/stories`: 1, 2, 5, 6, 7, 8, 11, 12, 13, 14 — każdy krok, 18, 20; jasny i ciemny, 1280 px) na prawdziwych komponentach z `FakeAlfaClient`.
+
+## Komponenty F1
+Formularze: `Switch`, `Select` (natywny), `TextField`, `Checkbox`, `SegmentedControl` (radiogroup, także karty z opisem). Nakładki: `Menu` (wzorzec menu button, bez bibliotek pozycjonujących), `Popover`, `ConfirmDialog` (bits-ui AlertDialog — potwierdzenia decyzji, nie zatwierdzenia akcji agentek), `CommandPalette` (natywny `<dialog>` stale zamontowany, otwarcie `show()` ≤ 50 ms; jedyne miejsce z `backdrop-filter`). Treść: `SanitizedHtml` (jedyne `{@html}` — wyłącznie `html_sanitized` z Rust), `VariantSwitcher` (‹ 1/3 ›), `Banner` (stany systemowe), `Skeleton` (po 300 ms), `EmptyState`, `Kbd`, `Stepper`, `LevelMeter`, `ResizeHandle` (separator ARIA z klawiaturą). Istniejące komponenty dostały etykiety i18n (`labels`) z polskimi wartościami domyślnymi; `Composer` — hak klawiszy, `busy`/Stop, atrybuty pola; `Avatar` — tryb `decorative`. Podścieżki `@alfa/ui-kit/components/*` pozwalają oknom z małym budżetem (Szybkie pytanie) importować pojedyncze komponenty.
 
 ## Otwarte pytania
 - Ostateczne odcienie kolorów agentek (koral / mięta / indygo / lazur — propozycja) — z makiet.
-- Tailwind vs czysty CSS z tokenami — do ustalenia w SPEC v1 (kryterium: budżet CSS 30 KB).
+- Tailwind vs czysty CSS z tokenami — w F1 czysty CSS z tokenami (CSS okna głównego ~9 KB gzip przy budżecie 30 KB); decyzja do zatwierdzenia w SPEC v1.

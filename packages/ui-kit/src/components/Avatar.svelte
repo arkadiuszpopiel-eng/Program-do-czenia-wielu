@@ -11,9 +11,18 @@
     working?: boolean;
     /** Pokazuj imię jako tooltip (domyślnie) i w aria-label. */
     label?: string;
+    /** Awatar wewnątrz elementu, który sam ma nazwę (np. przycisku) — ukryty dla czytników. */
+    decorative?: boolean;
   }
 
-  let { agent, size = 28, speaking = false, working = false, label }: Props = $props();
+  let {
+    agent,
+    size = 28,
+    speaking = false,
+    working = false,
+    label,
+    decorative = false,
+  }: Props = $props();
   const meta = $derived(agents[agent]);
   const status = $derived(speaking ? 'mówi' : working ? 'pracuje' : undefined);
   const aria = $derived(label ?? `${meta.name}${status ? ` (${status})` : ''}`);
@@ -26,9 +35,10 @@
   style:--size="{size}px"
   style:--accent="var(--alfa-agent-{agent})"
   style:--soft="var(--alfa-agent-{agent}-soft)"
-  role="img"
-  aria-label={aria}
-  title={aria}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : aria}
+  aria-hidden={decorative ? 'true' : undefined}
+  title={decorative ? undefined : aria}
 >
   <span class="ring" aria-hidden="true"></span>
   <span class="glyph" aria-hidden="true">{meta.glyph}</span>

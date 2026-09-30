@@ -21,6 +21,10 @@
     /** Szerokość w px; panel prawy 300–520 px. */
     width?: number;
     side?: 'left' | 'right';
+    closeLabel?: string;
+    tabsLabel?: string;
+    /** Ukryj nagłówek z tytułem (np. gdy karty same nazywają panel). */
+    hideHeader?: boolean;
   }
 
   let {
@@ -32,6 +36,9 @@
     children,
     width,
     side = 'right',
+    closeLabel,
+    tabsLabel,
+    hideHeader = false,
   }: Props = $props();
 
   const tablistId = $props.id();
@@ -61,34 +68,44 @@
 </script>
 
 <section class="panel {side}" style:width={width ? `${width}px` : undefined} aria-label={title}>
-  <header class="head">
-    <h2 class="title">{title}</h2>
+  {#snippet headActions()}
     <div class="actions">
       {#if actions}{@render actions()}{/if}
       {#if onclose}
-        <IconButton label="Zamknij panel {title}" size="sm" onclick={onclose}>
+        <IconButton label={closeLabel ?? `Zamknij panel ${title}`} size="sm" onclick={onclose}>
           <X size={16} strokeWidth={1.5} />
         </IconButton>
       {/if}
     </div>
-  </header>
+  {/snippet}
+  {#if hideHeader}
+    <h2 class="alfa-visually-hidden">{title}</h2>
+  {:else}
+    <header class="head">
+      <h2 class="title">{title}</h2>
+      {@render headActions()}
+    </header>
+  {/if}
   {#if tabs.length > 0}
-    <div class="tabs" role="tablist" aria-label="Karty panelu {title}">
-      {#each tabs as tab, i (tab.id)}
-        <button
-          type="button"
-          role="tab"
-          id="{tablistId}-tab-{tab.id}"
-          class="tab"
-          aria-selected={activeTab === tab.id}
-          aria-controls="{tablistId}-panel"
-          tabindex={activeTab === tab.id ? 0 : -1}
-          onclick={() => (activeTab = tab.id)}
-          onkeydown={(e) => onTabKeydown(e, i)}
-        >
-          {tab.label}
-        </button>
-      {/each}
+    <div class="tabs-row">
+      <div class="tabs" role="tablist" aria-label={tabsLabel ?? `Karty panelu ${title}`}>
+        {#each tabs as tab, i (tab.id)}
+          <button
+            type="button"
+            role="tab"
+            id="{tablistId}-tab-{tab.id}"
+            class="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls="{tablistId}-panel"
+            tabindex={activeTab === tab.id ? 0 : -1}
+            onclick={() => (activeTab = tab.id)}
+            onkeydown={(e) => onTabKeydown(e, i)}
+          >
+            {tab.label}
+          </button>
+        {/each}
+      </div>
+      {#if hideHeader}{@render headActions()}{/if}
     </div>
   {/if}
   <div
@@ -103,6 +120,7 @@
 
 <style>
   .panel {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -135,12 +153,22 @@
     display: inline-flex;
     gap: var(--alfa-space-1);
   }
+  .tabs-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--alfa-color-border);
+  }
+  .tabs-row > .actions {
+    padding: 0 var(--alfa-space-1);
+  }
   .tabs {
     display: flex;
+    flex: 1;
+    min-width: 0;
     gap: var(--alfa-space-1);
     padding: 0 var(--alfa-space-2);
-    border-bottom: 1px solid var(--alfa-color-border);
     overflow-x: auto;
+    scrollbar-width: none;
   }
   .tab {
     position: relative;

@@ -6,11 +6,22 @@
   "description": "Tokeny designu, komponenty Svelte 5 i Storybook Alfy (PLAN.md §14.3).",
   "svelte": "./src/index.ts",
   "types": "./src/index.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.ts",
       "svelte": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./components/*": {
+      "svelte": "./src/components/*",
+      "default": "./src/components/*"
+    },
+    "./tokens": {
+      "types": "./src/tokens.ts",
+      "default": "./src/tokens.ts"
     },
     "./tokens.css": "./src/tokens.css",
     "./base.css": "./src/base.css",

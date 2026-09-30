@@ -19,9 +19,19 @@
     showLabel?: boolean;
     onclick?: (event: MouseEvent) => void;
     disabled?: boolean;
+    /** Teksty per stan (i18n); domyślnie po polsku. */
+    labels?: Partial<Record<MicState, { label: string; hint: string }>>;
   }
 
-  let { state, agent, level = 0, showLabel = true, onclick, disabled = false }: Props = $props();
+  let {
+    state,
+    agent,
+    level = 0,
+    showLabel = true,
+    onclick,
+    disabled = false,
+    labels = {},
+  }: Props = $props();
 
   const STATES = {
     off: { label: 'Mikrofon wyłączony', icon: MicOff, hint: 'Włącz mikrofon' },
@@ -33,7 +43,7 @@
     dnd: { label: 'Nie przeszkadzać', icon: BellOff, hint: 'Wyłącz „nie przeszkadzać"' },
   } as const;
 
-  const s = $derived(STATES[state]);
+  const s = $derived({ ...STATES[state], ...labels[state] });
   const Icon = $derived(s.icon);
   const active = $derived(state === 'listening' || state === 'hearing');
   const accent = $derived(

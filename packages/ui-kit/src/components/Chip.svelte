@@ -1,14 +1,16 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
   import type { AgentId, SemanticColor } from '../tokens';
 
-  interface Props {
+  interface Props extends Omit<HTMLButtonAttributes, 'onclick' | 'children'> {
     /** Akcent agentki (pierścień/tekst w jej kolorze). */
     agent?: AgentId;
     tone?: SemanticColor;
     size?: 'sm' | 'md';
     /** Chip klikalny (np. wybór agentki w composerze) — renderuje <button>. */
     onclick?: (event: MouseEvent) => void;
+    /** Przełącznik (aria-pressed); pomiń dla przycisków menu. */
     selected?: boolean;
     disabled?: boolean;
     /** Etykieta dostępności, gdy treść to np. sama ikona. */
@@ -22,11 +24,12 @@
     tone,
     size = 'md',
     onclick,
-    selected = false,
+    selected,
     disabled = false,
     label,
     icon,
     children,
+    ...rest
   }: Props = $props();
 
   const accent = $derived(
@@ -36,6 +39,7 @@
 
 {#if onclick}
   <button
+    {...rest}
     type="button"
     class="chip {size} interactive"
     class:selected

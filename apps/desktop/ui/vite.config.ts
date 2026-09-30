@@ -30,10 +30,17 @@ export default defineConfig({
     reportCompressedSize: true,
     // Ostrzeżenie Vite liczy rozmiar przed gzip; twardy budżet gzip egzekwuje scripts/bundle-size.mjs.
     chunkSizeWarningLimit: 600,
+    // Manifest: skrypt budżetu liczy statyczny graf importów każdego punktu wejścia.
+    manifest: true,
+    // Bez wstępnego ładowania dynamicznych modułów przez helper Vite — leniwe znaczy leniwe.
+    modulePreload: { polyfill: false },
     rollupOptions: {
-      output: {
-        manualChunks: undefined,
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        quick: fileURLToPath(new URL('./quick.html', import.meta.url)),
+        pill: fileURLToPath(new URL('./pill.html', import.meta.url)),
       },
     },
   },
+  worker: { format: 'es' },
 });

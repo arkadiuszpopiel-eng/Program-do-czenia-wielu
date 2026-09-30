@@ -1,9 +1,12 @@
 <!--
   Paleta poleceń (Ctrl+K). UWAGA: to JEDYNY plik w repo, w którym dozwolony jest
-  `backdrop-filter` (PLAN.md §14.3 / §14.7). Dostępność i pułapka fokusu: bits-ui Dialog + Command.
+  `backdrop-filter` (PLAN.md §14.3 / §14.7). <dialog> jest stale zamontowany, a lista bits-ui Command
+  renderuje się raz — otwarcie to `show()` (~5 ms), co mieści się w budżecie ≤ 50 ms (§14.7).
+  `showModal()` kosztował ~30 ms (usztywnienie całego dokumentu jako `inert`), więc modalność
+  zapewniamy sami: `aria-modal`, pułapka fokusu (Tab), Esc, tło zamykające kliknięciem.
 -->
 <script lang="ts">
-  import { Command, Dialog } from 'bits-ui';
+  import { Command } from 'bits-ui';
   import Search from '@lucide/svelte/icons/search';
   import type { CommandItem } from '../types';
 
@@ -14,6 +17,14 @@
     placeholder?: string;
     /** Rejestruj globalny skrót Ctrl+K (domyślnie tak). */
     hotkey?: boolean;
+    /**
+     * Własne dopasowanie (0 = ukryj, 1 = idealne). Dostaje zapytanie oraz etykietę i słowa kluczowe
+     * pozycji. Domyślnie — algorytm bits-ui.
+     */
+    filter?: (search: string, label: string, keywords: readonly string[]) => number;
+    labels?: Partial<{ title: string; search: string; empty: string }>;
+    /** Bieżące zapytanie (bindable) — np. by dołączać rzadkie pozycje dopiero przy wyszukiwaniu. */
+    search?: string;
   }
 
   let {
@@ -21,7 +32,25 @@
     items,
     placeholder = 'Wpisz polecenie…',
     hotkey = true,
+    filter,
+    labels = {},
+    search = $bindable(''),
   }: Props = $props();
+
+  const text = $derived({
+    title: 'Paleta poleceń',
+    search: 'Szukaj polecenia',
+    empty: 'Brak poleceń pasujących do zapytania.',
+    ...labels,
+  });
+
+  /** bits-ui przekazuje `value` (id) i `keywords` (etykieta jako pierwsze słowo kluczowe). */
+  const bitsFilter = $derived(
+    filter
+      ? (_value: string, search: string, keywords: string[] = []) =>
+          filter(search, keywords[0] ?? '', keywords.slice(1))
+      : undefined,
+  );
 
   /** Grupy w kolejności pierwszego wystąpienia (lokalna, niereaktywna struktura). */
   const groups = $derived.by(() => {
@@ -45,6 +74,65 @@
     }
   }
 
+  let dialog = $state<HTMLDialogElement | null>(null);
+  let returnFocus: HTMLElement | null = null;
+
+  // Stan okna ustalamy synchronicznie w efekcie; zdarzenie `close` przychodzi asynchronicznie,
+  // więc nie może nadpisać ponownego otwarcia (szybkie Esc → Ctrl+K).
+  $effect(() => {
+    const el = dialog;
+    if (!el) return;
+    if (open && !el.open) {
+      const active = document.activeElement;
+      returnFocus = active instanceof HTMLElement && !el.contains(active) ? active : null;
+      el.show();
+      el.querySelector<HTMLInputElement>('input')?.focus();
+    } else if (!open && el.open) {
+      el.close();
+      restore();
+    }
+  });
+
+  function restore() {
+    search = '';
+    // Fokus nie może zostać w ukrytym oknie (przeglądarka poprawia go dopiero przy renderowaniu).
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && dialog?.contains(active)) active.blur();
+    if (returnFocus?.isConnected) returnFocus.focus();
+    returnFocus = null;
+  }
+
+  /** Zamknięcie spoza komponentu (np. przez przeglądarkę) — tylko gdy okno faktycznie zamknięte. */
+  function onClose() {
+    if (open && dialog && !dialog.open) {
+      open = false;
+      restore();
+    }
+  }
+
+  function onKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      open = false;
+      return;
+    }
+    if (event.key !== 'Tab' || !dialog) return;
+    const focusable = Array.from(
+      dialog.querySelectorAll<HTMLElement>('input, [tabindex]:not([tabindex="-1"])'),
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (!first || !last) return;
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   function select(item: CommandItem) {
     open = false;
     item.onSelect?.();
@@ -53,64 +141,86 @@
 
 <svelte:window onkeydown={onWindowKeydown} />
 
-<Dialog.Root bind:open>
-  <Dialog.Portal>
-    <Dialog.Overlay class="alfa-palette-overlay" />
-    <Dialog.Content class="alfa-palette" aria-describedby={undefined}>
-      <Dialog.Title class="alfa-visually-hidden">Paleta poleceń</Dialog.Title>
-      <Command.Root class="alfa-palette-cmd" loop>
-        <div class="input-row">
-          <Search size={16} strokeWidth={1.5} aria-hidden="true" />
-          <Command.Input class="alfa-palette-input" {placeholder} aria-label="Szukaj polecenia" />
-          <kbd class="esc">Esc</kbd>
-        </div>
-        <Command.List class="alfa-palette-list">
-          <Command.Viewport>
-            <Command.Empty class="alfa-palette-empty"
-              >Brak poleceń pasujących do zapytania.</Command.Empty
-            >
-            {#each groups as [group, list] (group)}
-              <Command.Group class="alfa-palette-group">
-                <Command.GroupHeading class="alfa-palette-heading">{group}</Command.GroupHeading>
-                <Command.GroupItems>
-                  {#each list as item (item.id)}
-                    <Command.Item
-                      class="alfa-palette-item"
-                      value={item.label}
-                      keywords={item.keywords ? [...item.keywords] : undefined}
-                      onSelect={() => select(item)}
-                    >
-                      <span class="item-label">{item.label}</span>
-                      {#if item.shortcut}<kbd class="shortcut">{item.shortcut}</kbd>{/if}
-                    </Command.Item>
-                  {/each}
-                </Command.GroupItems>
-              </Command.Group>
-            {/each}
-          </Command.Viewport>
-        </Command.List>
-      </Command.Root>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+<!-- Tło zamyka paletę kliknięciem; z klawiatury zamyka ją Esc (obsługa w oknie dialogu). -->
+<div
+  class="alfa-palette-scrim"
+  hidden={!open}
+  aria-hidden="true"
+  onclick={() => (open = false)}
+></div>
+<dialog
+  bind:this={dialog}
+  class="alfa-palette"
+  aria-label={text.title}
+  aria-modal="true"
+  onclose={onClose}
+  onkeydown={onKeydown}
+>
+  <!-- vimBindings wyłączone: Ctrl+K/N/P/J to skróty aplikacji (m.in. zamknięcie palety Ctrl+K). -->
+  <Command.Root
+    class="alfa-palette-cmd"
+    loop
+    vimBindings={false}
+    filter={bitsFilter}
+    label={text.title}
+  >
+    <div class="input-row">
+      <Search size={16} strokeWidth={1.5} aria-hidden="true" />
+      <Command.Input
+        class="alfa-palette-input"
+        {placeholder}
+        aria-label={text.search}
+        bind:value={search}
+      />
+      <kbd class="esc">Esc</kbd>
+    </div>
+    <!-- tabindex: przewijana lista dostępna z klawiatury także poza polem wyszukiwania. -->
+    <Command.List class="alfa-palette-list" tabindex={0}>
+      <Command.Viewport>
+        <Command.Empty class="alfa-palette-empty">{text.empty}</Command.Empty>
+        {#each groups as [group, list] (group)}
+          <Command.Group class="alfa-palette-group">
+            <Command.GroupHeading class="alfa-palette-heading">{group}</Command.GroupHeading>
+            <Command.GroupItems>
+              {#each list as item (item.id)}
+                <Command.Item
+                  class="alfa-palette-item"
+                  value={item.id}
+                  keywords={[item.label, ...(item.keywords ?? [])]}
+                  onSelect={() => select(item)}
+                >
+                  <span class="item-label">{item.label}</span>
+                  {#if item.shortcut}<kbd class="shortcut">{item.shortcut}</kbd>{/if}
+                </Command.Item>
+              {/each}
+            </Command.GroupItems>
+          </Command.Group>
+        {/each}
+      </Command.Viewport>
+    </Command.List>
+  </Command.Root>
+</dialog>
 
 <style>
-  :global(.alfa-palette-overlay) {
+  .alfa-palette-scrim {
     position: fixed;
     inset: 0;
     z-index: 100;
     background: var(--alfa-color-scrim);
   }
-  :global(.alfa-palette) {
+  .alfa-palette-scrim[hidden] {
+    display: none;
+  }
+  .alfa-palette {
     position: fixed;
     z-index: 101;
-    top: 15vh;
-    left: 50%;
+    inset: 15vh 0 auto 0;
     width: min(640px, calc(100vw - 32px));
+    max-width: none;
     max-height: 60vh;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 0;
+    color: var(--alfa-color-text);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-overlay);
     background: color-mix(in srgb, var(--alfa-color-surface) 86%, transparent);
@@ -119,8 +229,12 @@
     box-shadow: var(--alfa-shadow-3);
     overflow: hidden;
   }
+  .alfa-palette[open] {
+    display: flex;
+    flex-direction: column;
+  }
   @media (forced-colors: active), (prefers-reduced-transparency: reduce) {
-    :global(.alfa-palette) {
+    .alfa-palette {
       background: var(--alfa-color-surface);
       backdrop-filter: none;
     }

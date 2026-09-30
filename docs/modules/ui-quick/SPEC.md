@@ -53,7 +53,13 @@ Makiety 4 (pigułka), 5 (Szybkie pytanie), 20 (menu zasobnika).
 - `ACC-F3-ui-quick-03`: STOP WSZYSTKIEGO z zasobnika < 200 ms p95 (z `watchdog`).
 
 ## Fake
-UI testowane z `platform-windows-fake` (skrót, zasobnik) i `voice-dialog-fake` (stany dla pigułki).
+UI testowane z `platform-windows-fake` (skrót, zasobnik) i `voice-dialog-fake` (stany dla pigułki). W F1 strona Szybkiego pytania działa na `FakeAlfaClient` (Storybook, Playwright), pigułka — w trybie demo bez Tauri.
+
+## Implementacja UI (F1)
+- `apps/desktop/ui/quick.html` → `src/quick/` (Svelte, osobny punkt wejścia Vite, własny mały słownik PL/EN): pole, odpowiedź strumieniowana pod spodem (ten sam bufor rAF i `SanitizedHtml`), `Enter` — zapytaj; po odpowiedzi `Enter` w pustym polu — `quick_expand_to_main`; `Esc` — `quick_hide`. Budżet: JS + CSS ≤ 40 KB gzip (sprawdza `scripts/bundle-size.mjs`; obecnie ~27 KB).
+- `apps/desktop/ui/pill.html` → `src/pill/` — strona **bez frameworka** (DOM + SVG budowane bez innerHTML): awatar mówiącej agentki, fala głośności ≤ 30 kl./s (pauza, gdy okno ukryte; brak ruchu przy `prefers-reduced-motion`), stan mikrofonu ikoną + tekstem, Stop i Wycisz (`voice_stop_speech`, `voice_set_muted`), dane ze zdarzeń `VoicePill`/`MicLevel`. Budżet: JS + CSS ≤ 8 KB gzip (obecnie ~4 KB).
+- Menu zasobnika pozostaje natywne (0 WebView); w Storybooku jest tylko podgląd układu i tekstów (makieta 20).
+- Komendy i zdarzenia: `apps/desktop/ui/src/lib/api/COMMANDS.md` (sekcja „Okna").
 
 ## Otwarte pytania
-- Czy Szybkie pytanie ma własną stałą sesję czy tworzy nową za każdym razem — do ustalenia w SPEC v1 (domyślnie: jedna sesja „Szybkie pytania").
+- Czy Szybkie pytanie ma własną stałą sesję czy tworzy nową za każdym razem — w F1 ustawienie `quick.session_mode` (domyślnie: jedna sesja „Szybkie pytania"); do potwierdzenia w SPEC v1.

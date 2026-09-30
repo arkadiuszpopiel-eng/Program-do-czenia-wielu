@@ -56,8 +56,21 @@ To jest UI: makiety 1, 2, 7, 11, 18 (§14.10); rejestracja paneli z `PanelContri
 - `ACC-F1-ui-shell-04`: test CI — port CDP zamknięty w buildzie produkcyjnym; CSP bez inline.
 
 ## Fake
-Frontend testowany z `core-bus-fake` przez most IPC-fake (Storybook + Playwright): skryptowane strumienie (100 tok/s), kroki narzędzi, karty zatwierdzeń.
+Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake/`, Storybook + Playwright): skryptowane strumienie (~100 tok/s, wirtualny zegar w testach), kroki narzędzi, karty zatwierdzeń, warianty/gałęzie, scenariusze `offline`, `rate-limited` (429 z czasem odnowienia), `no-keys`, `first-run`, `no-mic`, `disk-low`, `empty`. Docelowo ten sam kontrakt zasila most do `core-bus-fake`.
+
+## Warstwa danych UI (F1)
+- Interfejs `AlfaClient` (`src/lib/api/client.ts`) z dwiema implementacjami: `TauriAlfaClient` (cienki adapter `invoke`/`listen`) i `FakeAlfaClient`; wybór: `window.__TAURI_INTERNALS__` ? Tauri : atrapa (atrapa ładowana leniwie, poza paczką startową).
+- Kontrakt IPC (komendy `snake_case`, jeden kanał zdarzeń `alfa://events` z paczkami `AlfaEvent[]`, nazwy strumienia `TurnAppended/TextDelta/ThinkingDelta/ToolCall/ApprovalPending/Usage/Stop/Error`): `apps/desktop/ui/src/lib/api/COMMANDS.md` — do zaimplementowania w `src-tauri`. Typy DTO w `types*.ts` (pola `snake_case`) zostaną zastąpione generowanymi (ADR 0013).
+- Strumień: `TextDelta.blocks[].html_sanitized` z Rust; UI wstawia HTML wyłącznie w `SanitizedHtml.svelte`. Zdarzenia buforowane w `RafBatcher` — stan i DOM aktualizowane najwyżej raz na klatkę; `aria-live` ogłasza pełne zdania z throttlingiem (`SentenceAnnouncer`).
+- Lista wiadomości wirtualizowana (`VirtualList`, pomiar per klucz, ± 1 ekran), rola `feed`; podświetlanie składni w Web Workerze (tokenizer bez zależności) po zamknięciu bloku.
+- Leniwie (`import()`): panele prawe, Ustawienia, wprowadzenie, paleta (wstępnie pobierana w bezczynności; otwarcie = `dialog.show()`), ściągawka, słownik EN, atrapa.
+- i18n PL/EN od dnia 0: `src/lib/i18n` (słowniki `pl*.ts`/`en*.ts`, liczby mnogie `Intl.PluralRules`, formaty pl-PL przez `Intl`); kompletność kluczy sprawdza TypeScript i test.
+- Skróty: rejestr z §14.8 (`logic/shortcut-registry.ts`), wykrywanie konfliktów (duplikat, AltGr, zarezerwowane), nadpisania użytkownika; „karty" w F1 = ostatnio używane sesje (Ctrl+Tab, Ctrl+1…9, Ctrl+W, Ctrl+Shift+T). Zoom przez CSS `zoom` (80–200 %), responsywność z szerokości efektywnej.
+
+## Weryfikacja (F1, UI)
+`pnpm --filter @alfa/desktop-ui test` (vitest: logika, store'y z runami, i18n, atrapa), `test:e2e` (Playwright + axe na zbudowanym UI: 0 naruszeń critical/serious na ekranach w motywie jasnym i ciemnym, klawiatura, paleta ≤ 50 ms, DOM raz na klatkę przy 100 tok/s), `bundle-size` (statyczny graf importów z manifestu Vite: start JS ≤ 150 KB, CSS ≤ 30 KB gzip).
 
 ## Otwarte pytania
-- Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.
-- Pisownia PL w WebView2 (spike j).
+- Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.
+- Pisownia PL w WebView2 (spike j) — composer ma `spellcheck` i `lang` z bieżącego języka.
+- Odłączanie paneli do osobnych okien i widok dzielony — po F1 (panele są już osobnymi modułami ładowanymi leniwie).

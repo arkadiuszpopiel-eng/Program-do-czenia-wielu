@@ -67,6 +67,12 @@ jobs:
         run: node apps/desktop/ui/scripts/bundle-size.mjs
       - name: Storybook build
         run: pnpm --filter @alfa/ui-kit build-storybook
+      - name: Testy jednostkowe UI (vitest)
+        run: pnpm --filter @alfa/desktop-ui test
+      - name: Przeglądarka dla E2E
+        run: pnpm --filter @alfa/desktop-ui exec playwright install --with-deps chromium
+      - name: E2E + axe (Playwright)
+        run: pnpm --filter @alfa/desktop-ui test:e2e
 
   docs:
     name: Dokumentacja

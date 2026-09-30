@@ -37,8 +37,8 @@
   }: Props = $props();
 </script>
 
-<!-- TODO(F0-j): własny pasek tytułu z natywnymi przyciskami i Snap Layouts (Tauri: decorations=false
-     + data-tauri-drag-region). Na razie okno ma natywne dekoracje, a ten pasek jest paskiem narzędzi. -->
+<!-- Makieta F0. Pasek okna głównego z F1 jest w apps/desktop/ui (TitleBar z regionem przeciągania
+     `data-tauri-drag-region`); Snap Layouts i przyciski natywne ocenia spike F0 (j). -->
 <header class="titlebar" data-tauri-drag-region>
   <IconButton
     label={leftOpen ? 'Ukryj panel Sesje' : 'Pokaż panel Sesje'}

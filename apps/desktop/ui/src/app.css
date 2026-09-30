@@ -6,12 +6,21 @@ body,
   overflow: hidden;
 }
 
-/* Przeładowanie strony (F5/Ctrl+R) i menu kontekstowe WebView wyłączane w Rust/JS — §14.8. */
+/* Przeładowanie strony (F5/Ctrl+R) i menu kontekstowe WebView wyłączane w JS — §14.8. */
 body {
   user-select: none;
 }
 textarea,
 input,
-[data-selectable] {
+[data-selectable],
+.alfa-prose {
   user-select: text;
+}
+
+/* Gęstość kompaktowa: mniejsze odstępy i kontrolki (tokeny nadpisane lokalnie). */
+:root[data-density='compact'] {
+  --alfa-size-control: 28px;
+  --alfa-space-3: 8px;
+  --alfa-space-4: 12px;
+  --alfa-font-size-md: 13px;
 }

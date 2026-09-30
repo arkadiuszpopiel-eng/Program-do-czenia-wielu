@@ -12,15 +12,31 @@
     totalSteps: number;
     elapsedSeconds: number;
     onstop?: () => void;
+    labels?: Partial<{ step: string; stop: string; stopLabel: string; progress: string }>;
   }
 
-  let { agent, description, step, totalSteps, elapsedSeconds, onstop }: Props = $props();
+  let {
+    agent,
+    description,
+    step,
+    totalSteps,
+    elapsedSeconds,
+    onstop,
+    labels = {},
+  }: Props = $props();
 
   const name = $derived(agents[agent].name);
   const pct = $derived(totalSteps > 0 ? Math.min(100, Math.round((step / totalSteps) * 100)) : 0);
   const elapsed = $derived(
     `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, '0')}`,
   );
+  const text = $derived({
+    step: `krok ${step}/${totalSteps}`,
+    stop: 'Stop',
+    stopLabel: `Zatrzymaj zadanie ${name}`,
+    progress: 'Postęp zadania',
+    ...labels,
+  });
 </script>
 
 <div
@@ -28,7 +44,7 @@
   style:--accent="var(--alfa-agent-{agent})"
   role="status"
   aria-live="polite"
-  aria-label="{name} · {description} · krok {step} z {totalSteps} · {elapsed}"
+  aria-label="{name} · {description} · {text.step} · {elapsed}"
 >
   <Avatar {agent} size={24} working />
   <div class="text">
@@ -38,14 +54,14 @@
       <span class="desc">{description}</span>
     </div>
     <div class="line meta">
-      <span>krok {step}/{totalSteps}</span>
+      <span>{text.step}</span>
       <span
         class="bar"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}
-        aria-label="Postęp zadania"
+        aria-label={text.progress}
       >
         <span class="fill" style:transform="scaleX({pct / 100})"></span>
       </span>
@@ -53,9 +69,9 @@
     </div>
   </div>
   {#if onstop}
-    <Button size="sm" variant="secondary" onclick={onstop} aria-label="Zatrzymaj zadanie {name}">
+    <Button size="sm" variant="secondary" onclick={onstop} aria-label={text.stopLabel}>
       {#snippet icon()}<Square size={12} strokeWidth={2} />{/snippet}
-      Stop
+      {text.stop}
     </Button>
   {/if}
 </div>

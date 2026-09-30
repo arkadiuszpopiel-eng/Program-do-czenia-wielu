@@ -1,8 +1,17 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLTextareaAttributes } from 'svelte/elements';
   import Paperclip from '@lucide/svelte/icons/paperclip';
   import Send from '@lucide/svelte/icons/send';
+  import Square from '@lucide/svelte/icons/square';
   import IconButton from './IconButton.svelte';
+
+  interface Labels {
+    field: string;
+    send: string;
+    attach: string;
+    stop: string;
+  }
 
   interface Props {
     /** Treść (bindable). */
@@ -12,12 +21,26 @@
     sendOnEnter?: boolean;
     disabled?: boolean;
     maxLines?: number;
+    /** Trwa generowanie: zamiast „Wyślij" pokazuje „Stop". */
+    busy?: boolean;
+    lang?: string;
+    labels?: Partial<Labels>;
+    /** Element pola (bindable) — np. do ustawienia kursora po podpowiedzi. */
+    textarea?: HTMLTextAreaElement | null;
+    /** Dodatkowe atrybuty pola (np. ARIA combobox dla podpowiedzi @/ ). */
+    fieldAttrs?: HTMLTextareaAttributes;
+    /** Wywoływane przed domyślną obsługą klawiszy; `preventDefault()` ją pomija. */
+    onkeydown?: (event: KeyboardEvent) => void;
+    oninput?: (event: Event) => void;
     onsubmit?: (text: string) => void;
+    onstop?: () => void;
     onattach?: () => void;
     /** Chipy wyboru agentki / profilu (po lewej od mikrofonu). */
     chips?: Snippet;
     /** Przycisk mikrofonu (MicButton) — po prawej. */
     trailing?: Snippet;
+    /** Treść nad polem (np. lista podpowiedzi). */
+    above?: Snippet;
   }
 
   let {
@@ -26,37 +49,54 @@
     sendOnEnter = true,
     disabled = false,
     maxLines = 12,
+    busy = false,
+    lang = 'pl',
+    labels = {},
+    textarea = $bindable(null),
+    fieldAttrs = {},
+    onkeydown,
+    oninput,
     onsubmit,
+    onstop,
     onattach,
     chips,
     trailing,
+    above,
   }: Props = $props();
 
-  let textarea = $state<HTMLTextAreaElement | null>(null);
+  const text = $derived<Labels>({
+    field: 'Wiadomość',
+    send: 'Wyślij',
+    attach: 'Dołącz plik',
+    stop: 'Zatrzymaj generowanie',
+    ...labels,
+  });
   const LINE_PX = 21; // 14 px × 1,5
   const PAD_PX = 16;
   const canSend = $derived(value.trim().length > 0 && !disabled);
 
-  /** Auto-wzrost 1–maxLines linii (aktualizacja przy każdej zmianie wartości). */
+  /** Auto-wzrost 1–maxLines linii, najwyżej ~40% wysokości okna (§14.8). */
   $effect(() => {
     void value;
     const el = textarea;
     if (!el) return;
     el.style.height = 'auto';
-    const max = LINE_PX * maxLines + PAD_PX;
+    const max = Math.min(LINE_PX * maxLines + PAD_PX, Math.max(80, window.innerHeight * 0.4));
     el.style.height = `${Math.min(el.scrollHeight, max)}px`;
     el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden';
   });
 
   function submit() {
     if (!canSend) return;
-    const text = value.trim();
-    onsubmit?.(text);
+    const message = value.trim();
+    onsubmit?.(message);
     value = '';
     textarea?.focus();
   }
 
-  function onkeydown(event: KeyboardEvent) {
+  function handleKeydown(event: KeyboardEvent) {
+    onkeydown?.(event);
+    if (event.defaultPrevented) return;
     if (event.key !== 'Enter' || event.isComposing) return;
     const wantsNewline = sendOnEnter ? event.shiftKey : !event.ctrlKey;
     if (wantsNewline) return;
@@ -65,41 +105,55 @@
   }
 </script>
 
-<form
-  class="composer"
-  onsubmit={(e) => {
-    e.preventDefault();
-    submit();
-  }}
->
-  {#if onattach}
-    <IconButton label="Dołącz plik" onclick={onattach} {disabled}>
-      <Paperclip size={18} strokeWidth={1.5} />
-    </IconButton>
-  {/if}
-  <label class="field">
-    <span class="alfa-visually-hidden">Wiadomość</span>
-    <textarea
-      bind:this={textarea}
-      bind:value
-      rows="1"
-      {placeholder}
-      {disabled}
-      {onkeydown}
-      spellcheck="true"
-      lang="pl"
-      aria-keyshortcuts={sendOnEnter ? 'Enter' : 'Control+Enter'}></textarea>
-  </label>
-  {#if chips}
-    <div class="chips">{@render chips()}</div>
-  {/if}
-  {#if trailing}{@render trailing()}{/if}
-  <IconButton label="Wyślij" type="submit" disabled={!canSend} class="send">
-    <Send size={18} strokeWidth={1.5} />
-  </IconButton>
-</form>
+<div class="wrap">
+  {#if above}{@render above()}{/if}
+  <form
+    class="composer"
+    onsubmit={(e) => {
+      e.preventDefault();
+      submit();
+    }}
+  >
+    {#if onattach}
+      <IconButton label={text.attach} onclick={onattach} {disabled}>
+        <Paperclip size={18} strokeWidth={1.5} />
+      </IconButton>
+    {/if}
+    <label class="field">
+      <span class="alfa-visually-hidden">{text.field}</span>
+      <textarea
+        {...fieldAttrs}
+        bind:this={textarea}
+        bind:value
+        rows="1"
+        {placeholder}
+        {disabled}
+        {lang}
+        {oninput}
+        onkeydown={handleKeydown}
+        spellcheck="true"
+        aria-keyshortcuts={sendOnEnter ? 'Enter' : 'Control+Enter'}></textarea>
+    </label>
+    {#if chips}
+      <div class="chips">{@render chips()}</div>
+    {/if}
+    {#if trailing}{@render trailing()}{/if}
+    {#if busy && onstop}
+      <IconButton label={text.stop} onclick={onstop} class="stop">
+        <Square size={16} strokeWidth={2} />
+      </IconButton>
+    {:else}
+      <IconButton label={text.send} type="submit" disabled={!canSend} class="send">
+        <Send size={18} strokeWidth={1.5} />
+      </IconButton>
+    {/if}
+  </form>
+</div>
 
 <style>
+  .wrap {
+    position: relative;
+  }
   .composer {
     display: flex;
     align-items: flex-end;
@@ -110,8 +164,10 @@
     background: var(--alfa-color-surface);
     box-shadow: var(--alfa-shadow-1);
   }
-  .composer:focus-within {
-    border-color: var(--alfa-color-border-strong);
+  /* Fokus pola widoczny na całej ramce (2 px, WCAG 2.4.11). */
+  .composer:has(textarea:focus) {
+    outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
+    outline-offset: 1px;
   }
   .field {
     flex: 1;
@@ -141,7 +197,8 @@
     gap: var(--alfa-space-1);
     padding-bottom: 2px;
   }
-  :global(.composer .send:not(:disabled)) {
+  :global(.composer .send:not(:disabled)),
+  :global(.composer .stop) {
     color: var(--alfa-color-text);
   }
 </style>
