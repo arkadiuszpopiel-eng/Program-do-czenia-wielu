@@ -33,7 +33,7 @@ emulujemy limity (`h-sprzet/emulate-baseline.ps1`) i stosujemy korekty: **czasy 
 | 6 | (k) Broker-UI na wyższym poziomie integralności + odrzucenie SendInput | `k-broker-ui/` | ~2 h (po zbudowaniu exe w osobnej sesji) | ADR (3); F0-16 |
 | 7 | (b) most CLI: zimny start, `--permission-prompt-tool`, approvals, 0 odczytów tokenów | `b-most-cli/` | ~2 h | ADR (5); F0-05…F0-07 |
 
-Spike (i) (SQLCipher + sqlite-vec + FTS5) jest testem integracyjnym w CI — nie ma tu katalogu.
+Spike (i) (SQLCipher + sqlite-vec + FTS5) nie wymaga Windows — zrobiony w chmurze: `crates/spike-data` (test w CI) i wynik w `evals/spikes/i-dane/RESULT.md`.
 
 ## Wymagania wstępne (bramka ludzka #8 — przygotowanie maszyn)
 
