@@ -26,6 +26,12 @@ fn schema_snapshot_matches_repo_file() {
             path.display()
         )
     });
+    // Porównanie semantyczne (sparsowany JSON): odporne na formattery i na CRLF
+    // przy checkout na Windows (`core.autocrlf`).
+    let on_disk: serde_json::Value =
+        serde_json::from_str(&on_disk).expect("schemat w repo to JSON");
+    let generated: serde_json::Value =
+        serde_json::from_str(&generated).expect("wygenerowany schemat to JSON");
     assert_eq!(
         on_disk,
         generated,
