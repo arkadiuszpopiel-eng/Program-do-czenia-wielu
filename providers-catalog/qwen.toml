@@ -1,0 +1,23 @@
+# providers-catalog/qwen.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "qwen"
+display_name = "Qwen (Alibaba DashScope)"
+kind = "multi"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "sg"
+jurisdiction = "SG|EU"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Klucz przypisany do regionu: Singapur (tag sg) lub Frankfurt (tag eu) — tag ustawiany per profil w konfiguracji [W]. Qwen3-ASR (STT z polskim) — kandydat voice-stt [W]; Qwen3-TTS-Realtime bez PL. Qwen Coding/Token Plan: zabronione jako most (rejestr) — tylko API."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

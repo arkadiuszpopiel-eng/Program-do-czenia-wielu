@@ -1,0 +1,23 @@
+# providers-catalog/anthropic.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "anthropic"
+display_name = "Anthropic (Claude)"
+kind = "chat"
+auth = "api_key"
+base_url = "TODO"
+compat = "native"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Klasa B (§5.2); adapter natywny (§5.3): effort zamiast wyłączania myślenia, tool_choice auto + strict, streaming domyślnie, cache promptów, historia append-only. Wizja przez computer_toolset_20260801 [V]. Tag prywatności API nie potwierdzony w planie [?]. Most CLI (Claude Code) jest w compliance-registry.json, nie tu."
+
+[capabilities]
+vision = true
+tools = true
+streaming = true
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

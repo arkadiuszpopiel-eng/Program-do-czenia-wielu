@@ -1,0 +1,23 @@
+# providers-catalog/minimax.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "minimax"
+display_name = "MiniMax"
+kind = "multi"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Adapter generyczny (chat). MiniMax Speech 2.8: TTS z polskim i klonowaniem — kandydat do Voice Lab i castingu [W, niezweryfikowane odsłuchem]. Jurysdykcja nie podana w planie [?]."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

@@ -1,0 +1,23 @@
+# providers-catalog/xai.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "xai"
+display_name = "xAI (Grok)"
+kind = "multi"
+auth = "api_key"
+base_url = "https://api.x.ai/v1"
+compat = "openai"
+privacy_tag = "xai-retention-30d"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "api.x.ai/v1 wymieniony w planie (§5.5). API: retencja 30 dni [W]. xAI Voice Agent zgodny z OpenAI Realtime, PL niepotwierdzony [W]. Grok Build przez klucz API — trasa grok-build-api w rejestrze."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

@@ -1,0 +1,23 @@
+# providers-catalog/openrouter.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "openrouter"
+display_name = "OpenRouter"
+kind = "chat"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Agregator; jurysdykcja i trening zależą od modelu docelowego — tag do ustalenia per model [?]. Domyślnie traktowany jak 'może trenować'."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

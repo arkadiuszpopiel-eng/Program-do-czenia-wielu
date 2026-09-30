@@ -1,0 +1,23 @@
+# providers-catalog/google.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "google"
+display_name = "Google (Gemini)"
+kind = "multi"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "google-paid-eea-no-train"
+jurisdiction = "unknown"
+terms_url = "https://geminicli.com/docs/resources/tos-privacy/"
+compliance_status = "gray"
+notes = "Przez adapter generyczny (endpoint OpenAI-compat) z kluczem API [V w planie §5.5]. Tag zależy od konta: osobiste = google-personal-may-train (może trenować), klucz płatny/EOG = nie trenuje [V]. Gemini Live (PL deklarowany, zgłaszana regresja akcentu), Chirp 3 HD, Gemini TTS — wymagają osobnych modułów voice-*. agy/Gemini CLI: patrz rejestr zgodności (szary)."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

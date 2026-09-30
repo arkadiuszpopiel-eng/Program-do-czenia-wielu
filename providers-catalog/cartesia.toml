@@ -1,0 +1,23 @@
+# providers-catalog/cartesia.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "cartesia"
+display_name = "Cartesia"
+kind = "tts"
+auth = "api_key"
+base_url = "TODO"
+compat = "native"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "TTS chmurowe (profile B/C). Jakość PL niezweryfikowana odsłuchem (Voice Lab). Jurysdykcja [?]."
+
+[capabilities]
+vision = false
+tools = false
+streaming = true
+long_context = false
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

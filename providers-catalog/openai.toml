@@ -1,0 +1,23 @@
+# providers-catalog/openai.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "openai"
+display_name = "OpenAI"
+kind = "multi"
+auth = "api_key"
+base_url = "TODO"
+compat = "native"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Klasa B; modele (GPT-6 Sol/Astra/Luna) wykrywane przez Models API w accounts-hub. Głos: OpenAI Realtime (S2S, truncate natywne), gpt-4o-transcribe (STT), TTS [W]. Tag prywatności nie potwierdzony [?]. Most Codex CLI — w rejestrze zgodności."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]
