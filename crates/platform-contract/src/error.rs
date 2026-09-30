@@ -30,6 +30,9 @@ pub enum PlatformError {
     /// Skrót narusza regułę AltGr / jest zarezerwowany.
     #[error("niedozwolony skrót: {0}")]
     HotkeyRejected(String),
+    /// Skrót poprawny, ale zajęty w systemie przez inną aplikację (`RegisterHotKey` odmówił).
+    #[error("skrót zajęty przez inną aplikację: {0}")]
+    HotkeyConflict(String),
     /// Zasób nie istnieje (okno, proces, skrót).
     #[error("nieznany zasób: {0}")]
     UnknownResource(String),

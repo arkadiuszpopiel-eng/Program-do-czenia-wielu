@@ -26,7 +26,8 @@ wyłącznie od innych `lib-*` i `*-contract`.
 | `core-registry` | `core-registry-contract`, `-impl`, `-fake` | manifest `module.toml`, trait `Module`/`Registry`, graf zależności, cykl życia lazy/on-demand/always, zwalnianie po bezczynności |
 | `core-config` | `core-config-contract`, `-impl`, `-fake` | warstwy TOML wspólna/maszyna/sesja/agentka, JSON Schema, `kernel.*` tylko Broker, historia NDJSON, watch |
 | `core-log` | `core-log-contract`, `-impl`, `-fake` | NDJSON z rotacją/retencją/limitem dysku, redakcja, audyt pre-broker z łańcuchem SHA-256 |
-| `platform-windows` | `platform-contract`, `platform-fake` | `SystemPort` neutralny; `-impl` (windows-rs) w F1 |
+| `platform-windows` | `platform-contract`, `platform-fake`, `platform-windows-impl` | `SystemPort` + `HardwarePort`; impl: Kosz (IFileOperation), Job Objects, schowek, okna, skróty + `WH_KEYBOARD_LL` (PTT), DXGI/MMDevice; jedyny crate z windows-rs |
+| `device-profile` | `device-profile-contract`, `-impl`, `-fake` | autodetekcja sprzętu, klasy §3.5, rekomendacja profilu głosu A–D i rezydencji, emulacja baseline, `MachineId` |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

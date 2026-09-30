@@ -6,28 +6,26 @@ Autodetekcja sprzętu przy pierwszym uruchomieniu i po zmianie (CPU, RAM, produc
 ## Fala i priorytet
 F1 (detekcja, id maszyny, klasa, nakładka `config/machine/<id>.toml`, onboarding). F2: profile głosu A–D, tryb baterii/termika. P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (stan F1 — źródło prawdy: `crates/device-profile-contract`)
 ```rust
-// device-profile-contract — SZKIC
-pub struct MachineInfo { pub id: MachineId /* stabilny, z identyfikatorów sprzętu */, pub name: String, pub os: OsInfo,
-    pub cpu: CpuInfo { cores, threads, l3_mb }, pub ram_mb: u32, pub gpus: Vec<GpuInfo { vendor, model, vram_mb, backends: Vec<Backend> }>,
-    pub npu: Option<NpuInfo>, pub battery: Option<BatteryInfo>, pub audio: Vec<AudioDevice> }
-pub enum HwClass { Baseline, StandardAmd, LaptopCuda, Strong, Unknown }
-pub enum VoiceProfile { A, B, C, D }
-pub struct Recommendation { pub class: HwClass, pub voice_profile: VoiceProfile, pub llm_backend: Backend, pub resident: Vec<ModuleId>,
-                            pub limits: ResourceLimits, pub tradeoffs: Vec<String> }
-pub trait DeviceProfile: Send + Sync {
-    fn current(&self) -> MachineInfo;
-    fn recommend(&self) -> Recommendation;
-    fn power_state(&self) -> PowerState /* Ac | Battery { pct } */;
-    fn fullscreen_active(&self) -> bool;
-    fn emulate(&self, limits: Option<ResourceLimits>) -> Result<()>;   // emulacja baseline (testy)
-}
+pub struct Profile { machine_id: MachineId /* 32 hex, SHA-256 */, os, cpu: CpuInfo { physical_cores, logical_cores, l3_cache_mb },
+    ram_mb, gpus: Vec<GpuInfo { vendor, vram_mb, backends }>, npu: Option<NpuInfo>, battery: Option<BatteryInfo>,
+    power: PowerState /* Ac | Battery { percent } | Unknown */, audio: Option<Vec<AudioDevice>>, emulation: Option<Emulation> }
+pub enum HwClass { Baseline, StandardAmd, LaptopCuda, Strong, Unknown }   pub enum VoiceProfile { A, B, C, D }
+pub fn classify(&Profile) -> HwClass; pub fn recommend(&Profile) -> Recommendation;   // czyste, wspólne dla impl/fake
+pub fn apply_overlay(&Profile, &MachineOverlay) -> Recommendation;                     // nadpisania użytkownika
+impl Profile { pub fn emulate_baseline(&self) -> Profile }  // 6c/12t, 16 GB, VRAM 8 GB + korekta GPU ×2,2 / CPU +25%
+pub struct Recommendation { class, voice_profile, voice_variant /* Amd16|Cuda|Full */, stt_backend, stt_model,
+    llm_backend, local_llm, heavy_local_tts, residency: ResidencyBudget { vram_mb, ram_mb, desktop_reserve_mb,
+    stt_tts_exclusive }, power_saving, emulation, tradeoffs: Vec<String> }
+pub trait DeviceProfile { fn current(&self) -> Profile; fn recommend(&self) -> Recommendation; fn power_state(&self) -> PowerState;
+    fn fullscreen_active(&self) -> bool; fn emulate(&self, Option<ResourceLimits>) -> Result<()>; fn refresh(&self) -> Result<bool>; }
 ```
-Zdarzenia: `device.detected`, `device.changed` (hot-plug, nowa karta), `device.power.changed`, `device.fullscreen.changed`, `device.thermal.throttled`, `device.override` (użytkownik nadpisał).
+Zdarzenia (`DeviceEvent`): `device.detected`, `device.changed` (hot-plug, nowa karta), `device.power.changed`, `device.fullscreen.changed`, `device.thermal.throttled` (F2), `device.override` (użytkownik nadpisał).
+Klasy: NVIDIA ≥ 12 GB + ≥ 32 GB RAM → Mocny; NVIDIA ≥ 6 GB → Laptop-CUDA; AMD/Intel ≥ 20 GB → Mocny; ≥ 12 GB + ≥ 24 GB RAM + ≥ 12 wątków → Standard-AMD; ≥ 8 GB + 16 GB + ≥ 8 wątków → Baseline; reszta Unknown (STT na CPU, rozmowa przez API). Na baterii: bez lokalnego LLM, D → B.
 
 ## Zależności
-`core-bus/config/log-contract`, `platform-windows-contract` (WMI/DXGI/zasilanie/audio/okna). Konsumenci: `model-residency`, `voice-*`, `providers-local`, `memory` (konsolidacja), `notify` (nie przeszkadzać), `transfer` (`hw_class` w manifeście).
+`core-bus/registry-contract`, `platform-contract` (`HardwarePort`: DXGI/DXCore/zasilanie/MMDevice/rejestr na Windows; `WindowPort` — pełny ekran). Poza Windows sonda `sysinfo` (CPU/RAM). Konsumenci: `model-residency`, `voice-*`, `providers-local`, `memory` (konsolidacja), `notify` (nie przeszkadzać), `transfer` (`hw_class` w manifeście).
 
 ## Niezmienniki
 - `MachineId` stabilny między uruchomieniami i wersjami; zmiana sprzętu (GPU/RAM) = nowa detekcja, ten sam id (nakładka pyta o ponowny dobór).
@@ -60,5 +58,6 @@ Onboarding „pomiar sprzętu", Ustawienia → Urządzenia (profil per maszyna, 
 `device-profile-fake`: profile z fixture'ów (baseline, desktop, laptop), sterowane zdarzenia zasilania/pełnego ekranu/hot-plug.
 
 ## Otwarte pytania
-- Źródło `MachineId` (hash z UUID płyty/dysku vs losowy zapisany w `%LOCALAPPDATA%`) — do ustalenia w SPEC v1.
-- Detekcja NPU i jej użycie — poza v1, tylko raportowanie.
+- Ustalone (F1): `MachineId` = SHA-256 z separacją domeny nad `MachineGuid` (Windows) / `/etc/machine-id`, a bez nich nad losowym UUID zapisanym raz w katalogu stanu.
+- Detekcja NPU: DXCore (adapter „generic ML” bez grafiki) — tylko raportowanie; użycie poza v1.
+- Nasłuch zmian bez pollingu (`WM_POWERBROADCAST`, zdarzenia okien) — F2; w F1 `poll_changes()` wołane przez jądro.

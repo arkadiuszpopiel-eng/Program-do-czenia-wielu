@@ -4,36 +4,34 @@
 Jedyny crate z windows-rs/COM, zamknięty za traitem `SystemPort`: pliki, procesy, schowek, okna, zasobnik, skróty globalne, hook klawiatury (PTT), ścieżki i ACL. Wszystkie moduły korzystają z systemu **wyłącznie** przez ten kontrakt (PLAN §1.2, §3.2). UIA i SendInput dochodzą w v1.5/v2.
 
 ## Fala i priorytet
-F0: `SystemPort`-contract + fake (pkt 2 w §4.5a). F1: v1 (fs, procesy, schowek, okna, zasobnik, skróty globalne + `WH_KEYBOARD_LL`; bez UIA/SendInput). F5: v1.5 (SendInput tekstu, UIA `TextPattern` odczyt). F6: v2 (UIA, SendInput, zrzuty). P0.
+F0: `SystemPort`-contract + fake (pkt 2 w §4.5a). F1 (zrobione: `platform-windows-impl`): v1 (fs, procesy, schowek, okna, zasobnik, skróty globalne + `WH_KEYBOARD_LL`; bez UIA/SendInput). F5: v1.5 (SendInput tekstu, UIA `TextPattern` odczyt). F6: v2 (UIA, SendInput, zrzuty). P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (stan F1 — źródło prawdy: `crates/platform-contract`)
 ```rust
-// platform-windows-contract — SZKIC (trait SystemPort dzielony na pod-porty)
-pub trait SystemPort: FsPort + ProcessPort + ClipboardPort + WindowPort + ShellPort + HotkeyPort {}
-pub trait FsPort { fn read(&self, p: &Path) -> Result<Vec<u8>>; fn write_atomic(&self, p: &Path, data: &[u8]) -> Result<()>;
-    fn move_to_recycle_bin(&self, p: &Path) -> Result<()>; fn watch(&self, p: &Path) -> Subscription<FsChange>;
-    fn known_folder(&self, k: KnownFolder) -> PathBuf; }
-pub trait ProcessPort { fn spawn(&self, spec: ProcessSpec) -> Result<ProcessHandle>;   // Job Object, token, stdio/pipe
-    fn kill_tree(&self, h: &ProcessHandle) -> Result<()>; fn foreground_is_elevated(&self) -> bool; }
-pub trait ClipboardPort { fn get(&self) -> Result<ClipboardContent>; fn set(&self, c: ClipboardContent) -> Result<()>;
-    fn watch(&self) -> Subscription<ClipboardChange>; }
-pub trait WindowPort { fn list(&self) -> Vec<WindowInfo>; fn focus(&self, id: WindowId) -> Result<()>;
-    fn fullscreen_app_active(&self) -> bool; }
-pub trait HotkeyPort { fn register(&self, combo: Hotkey) -> Result<Subscription<HotkeyEvent>>;   // z regułą AltGr
-    fn ptt_hook(&self) -> Result<Subscription<KeyState>>; }                                    // WH_KEYBOARD_LL
-pub struct ProcessSpec { pub cmd: PathBuf, pub args: Vec<OsString>, pub cwd: PathBuf,
-                         pub integrity: Integrity, pub job: JobLimits, pub app_container: bool }
+pub trait SystemPort: FsPort + ProcessPort + ClipboardPort + WindowPort + HotkeyPort + TrayPort {}
+pub trait HardwarePort { fn os/cpu/memory_total_mb/gpus/npu/power_status/audio_endpoints/machine_seed } // osobno, dla device-profile
+// FsPort: read, write_atomic → OpReceipt{op, reversible, undo}, copy, move_path, delete_to_recycle_bin,
+//         delete_permanent (nieodwracalne), exists, list_dir, undo(UndoToken), known_folder
+// ProcessPort: spawn(ProcessSpec{cmd, args, cwd, integrity, memory_limit_mb}) (Job Object), kill_tree,
+//              status, foreground_is_elevated · HotkeyPort: register (validate: AltGr, kill-switch),
+//              unregister, drain_events(HotkeyEvent{id, pressed}) · PlatformError::{…, HotkeyConflict}
 ```
-Zdarzenia: `platform.hotkey`, `platform.ptt`, `platform.clipboard.changed`, `platform.fs.changed`, `platform.device.changed`, `platform.fullscreen.changed`, `platform.session.locked`.
+Impl (`platform-windows-impl`) ponad kontrakt: `WinWindows::list_detailed/minimize/restore` (PID, prostokąt,
+monitor, DPI; `WindowGuard` chroni procesy Alfy/Brokera), `WinProcesses::spawn_with_limits(JobLimits)`
+(emulacja baseline), `tree_size`, `release`, `list`; `WinHotkeys::register_kill_switch/wait_events`;
+`WinClipboard::set_sensitive`; `TrayAdapter` + `TrayBackend` (ikonę rysuje powłoka Tauri).
+Zdarzenia: `platform.hotkey`, `platform.ptt`, `platform.clipboard.changed`, `platform.fs.changed`, `platform.device.changed`, `platform.fullscreen.changed`, `platform.session.locked` (publikacja przez jądro — F2).
 
 ## Zależności
-`core-bus-contract`, `core-log-contract`. Zewnętrzne: windows-rs (jedna wersja, `docs/vendor/windows-rs.md`).
+`platform-contract` (F1 bez magistrali — zdarzenia publikuje jądro). Zewnętrzne: `windows`/`windows-core` 0.62.2 (jedna wersja, `docs/vendor/windows.md`).
 
 ## Niezmienniki
 - Poza tym crate'em brak `windows`/`windows-sys` w workspace (test CI grafu zależności).
 - Skrót globalny naruszający regułę AltGr (`Ctrl+Alt(+Shift)` + a, c, e, l, n, o, s, x, z) jest odrzucany (PLAN §8.6; test CI).
 - Usuwanie plików domyślnie do Kosza; `write_atomic` = tmp + rename.
-- COM/UIA na dedykowanym wątku MTA; brak wywołań COM z wątku audio RT.
+- COM/UIA na dedykowanym wątku MTA; brak wywołań COM z wątku audio RT. F1: `IFileOperation` na krótkotrwałym wątku STA, MMDevice na wątku MTA, skróty i hook `WH_KEYBOARD_LL` na własnym wątku z pętlą komunikatów.
+- Deny-lista sprawdzana na postaci surowej, po `%ZMIENNYCH%`, leksykalnej (`\\?\`, wielkość liter, końcowe kropki/spacje, ADS) i kanonicznej (dowiązania, junctions, 8.3); kopiowanie drzewa sprawdza każdy wpis.
+- Usuwanie do Kosza, którego nie da się przenieść do Kosza, pyta użytkownika (`FOF_WANTNUKEWARNING`); zgoda = pokwitowanie nieodwracalne.
 - Deny-lista ścieżek poświadczeń (`~/.claude`, `~/.codex`, profile przeglądarek, Credential Manager) egzekwowana tu jako ostatnia linia (nawet gdy `tools-fs` zawiedzie).
 - Hooki/PTT nie działają przy oknie administratora na pierwszym planie bez helpera `uiAccess` → `foreground_is_elevated()` i zdarzenie do UI (PLAN §7.3).
 
@@ -62,5 +60,8 @@ Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, st
 `platform-windows-fake`: wirtualny system plików, schowek i lista okien w pamięci, skrypty zdarzeń (hotkey/PTT/hot-plug) z wirtualnym zegarem — testy na Linux/CI bez Windows.
 
 ## Otwarte pytania
+- Kontrakt F0 nie ma `watch` (FS, schowek) ani subskrypcji zdarzeń skrótów — do dodania w SPEC v1 (zdarzenia na magistrali).
+- Rozszerzyć kontrakt: `WindowInfo` o PID/prostokąt/DPI, `WindowPort` o minimalizację, `ProcessSpec` o limity CPU/affinity i stdio (dziś metody impl).
+- Dziennik cofnięć FS jest w pamięci procesu — trwały dziennik to `undo-journal` (F3).
 - Podział `SystemPort` na osobne crate'y kontraktowe per pod-port (ładowanie leniwe) — do ustalenia w SPEC v1.
 - Snap Layouts/Mica przez Tauri (spike j) — czy własny pasek tytułu wymaga kodu tutaj.

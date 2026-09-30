@@ -1,0 +1,18 @@
+# Manifest modułu platform-windows (docs/modules/platform-windows/SPEC.md, PLAN §3.2).
+# Schemat: packages/schemas/module-manifest.v1.json
+id = "platform-windows"
+version = "0.0.1"
+kind = "service"
+provides = ["platform-contract@1"]
+requires = []
+capabilities = []
+lifecycle = "always"
+isolation = "inproc"
+
+[budget]
+ram_mb = 4
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 60
