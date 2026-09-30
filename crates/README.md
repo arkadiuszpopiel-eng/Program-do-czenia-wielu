@@ -15,6 +15,10 @@ Reguła twarda: **moduł zależy od innego modułu wyłącznie przez `-contract`
 od cudzego `-impl` (w dowolnym rodzaju zależności) albo od cudzego `-fake` w zależnościach produkcyjnych
 jest błędem CI — sprawdza to `scripts/check-deps.sh` (przez `cargo metadata` + `jq`).
 
+Wyjątek: **`lib-*`** — wspólna biblioteka narzędziowa bez logiki modułu (np. `lib-sqlstore`: szyfrowane
+połączenie SQLCipher, migracje, rejestracja sqlite-vec). Moduły mogą od niej zależeć; ona sama zależy
+wyłącznie od innych `lib-*` i `*-contract`.
+
 ## Crate'y w F0 (pkt 2 §4.5a)
 | Moduł | Crate'y | Uwagi |
 |---|---|---|

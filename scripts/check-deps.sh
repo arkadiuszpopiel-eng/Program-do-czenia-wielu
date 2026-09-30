@@ -2,7 +2,9 @@
 # Sprawdza graf zależności workspace (docs/PLAN.md §3.2, §4.3; crates/README.md):
 #  - żaden crate workspace nie zależy od cudzego `*-impl` (w żadnym rodzaju zależności),
 #  - `*-fake` innego modułu wolno używać tylko w `dev-dependencies`,
-#  - zależność między modułami idzie wyłącznie przez `*-contract`.
+#  - zależność między modułami idzie wyłącznie przez `*-contract`,
+#  - wyjątek: `lib-*` = wspólna biblioteka narzędziowa bez logiki modułu (np. szyfrowana baza);
+#    wolno od niej zależeć, a sama może zależeć tylko od `lib-*` i `*-contract`.
 # Użycie: scripts/check-deps.sh [--self-test]   (wymaga cargo + jq)
 set -euo pipefail
 
@@ -22,6 +24,10 @@ check_edges() {
     pkg_mod="$(module_of "$pkg")"
     dep_mod="$(module_of "$dep")"
     [[ "$pkg_mod" == "$dep_mod" ]] && continue   # ta sama trójka: impl→contract, fake→contract OK
+    if [[ "$pkg" == lib-* && "$dep" != lib-* && "$dep" != *-contract ]]; then
+      echo "NARUSZENIE: biblioteka $pkg może zależeć tylko od lib-* i *-contract: $dep ($kind)"; violations=1
+      continue
+    fi
     case "$dep" in
       *-impl)
         echo "NARUSZENIE: $pkg zależy od cudzego -impl: $dep ($kind)"; violations=1 ;;
@@ -29,7 +35,7 @@ check_edges() {
         if [[ "$kind" != "dev" ]]; then
           echo "NARUSZENIE: $pkg zależy od cudzego -fake poza dev-dependencies: $dep ($kind)"; violations=1
         fi ;;
-      *-contract) ;;
+      *-contract|lib-*) ;;
       *)
         echo "NARUSZENIE: $pkg zależy od crate'a workspace bez sufiksu -contract/-impl/-fake: $dep ($kind)"; violations=1 ;;
     esac
@@ -47,10 +53,13 @@ b-impl a-fake dev
 b-impl a-impl normal
 b-fake a-fake normal
 c-impl d-utils normal
+c-impl lib-sqlstore normal
+lib-sqlstore a-contract normal
+lib-sqlstore a-fake dev
 CASES
   local out; out="$(check_edges "$tmp" || true)"
   rm -f "$tmp"
-  local expected=3
+  local expected=4
   local got; got="$(grep -c NARUSZENIE <<<"$out" || true)"
   if [[ "$got" -ne "$expected" ]]; then
     echo "self-test: oczekiwano $expected naruszeń, wykryto $got"; echo "$out"; exit 1
