@@ -23,13 +23,12 @@ wyłącznie od innych `lib-*` i `*-contract`.
 | Moduł | Crate'y | Uwagi |
 |---|---|---|
 | `core-bus` | `core-bus-contract`, `core-bus-impl`, `core-bus-fake` | zdarzenia §13, schemat `event.v1.json` |
-| `core-registry` | `core-registry-contract` | manifest `module.toml`, trait `Module`, schemat manifestu |
-| `core-config` | `core-config-contract` | warstwy wspólna/maszyna, klucze-ścieżki, `ConfigStore` |
-| `core-log` | `core-log-contract` | `LogSink` append-only, `AuditWriter` (Broker), `Redactor` |
+| `core-registry` | `core-registry-contract`, `-impl`, `-fake` | manifest `module.toml`, trait `Module`/`Registry`, graf zależności, cykl życia lazy/on-demand/always, zwalnianie po bezczynności |
+| `core-config` | `core-config-contract`, `-impl`, `-fake` | warstwy TOML wspólna/maszyna/sesja/agentka, JSON Schema, `kernel.*` tylko Broker, historia NDJSON, watch |
+| `core-log` | `core-log-contract`, `-impl`, `-fake` | NDJSON z rotacją/retencją/limitem dysku, redakcja, audyt pre-broker z łańcuchem SHA-256 |
 | `platform-windows` | `platform-contract`, `platform-fake` | `SystemPort` neutralny; `-impl` (windows-rs) w F1 |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
-Brakujące `-impl`/`-fake` rejestru, konfiguracji i logów powstają w F0/F1 wg SPEC-ów w `docs/modules/`.
 
 ## Jak dodać moduł
 1. `docs/modules/<m>/SPEC.md` (1 strona) → 2. `<m>-contract` (+ `contract_tests` pod feature) →

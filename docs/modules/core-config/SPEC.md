@@ -61,3 +61,22 @@ Ustawienia (drzewo + wyszukiwarka) buduje się z metadanych `Setting`; edytor su
 ## Otwarte pytania
 - Repo git konfiguracji: `git2` vs własny prosty dziennik rewizji — do ustalenia w SPEC v1.
 - Format „zawężająca zmiana" dla R0 (jak wyrazić w schemacie) — do ustalenia w SPEC v1 razem z `improver`.
+
+## Zmiany po implementacji (F0: `core-config-impl`, `core-config-fake`)
+- **Kontrakt (dodane):** `KERNEL_POLICY_PREFIX = "kernel"`, `ConfigKey::is_kernel_policy()`, `authorize(key, origin)` (wspólna reguła
+  `-impl`/`-fake`) i `contract_tests` (feature). F0: polityka Jądra = prefiks `kernel.*` (flaga `kernel_policy` w schemacie — później).
+- **Pliki:** `shared.toml` (Shared), `machine/<id>.toml` (Machine bieżącej maszyny; `id` = `[A-Za-z0-9_-]{1,64}`), `history.ndjson`.
+  Nadpisania zakresów w tabelach `["@session".<id>]` / `["@agent".<id>]` (znak `@` nie występuje w `ConfigKey`). Priorytet:
+  zakres(maszyna) > zakres(wspólna) > maszyna > wspólna > domyślna. Warstwa Default (z `default` schematów) i nakładka innej maszyny
+  są tylko do odczytu (`Persist`). Wartości `null` i obiekty → `SchemaViolation` (klucze są liśćmi).
+- **Schematy:** `register_schema(prefix, JSON Schema)` — walidacja wynikowego poddrzewa `prefix.*` przy `set` i `reload`
+  (crate `jsonschema` 0.58.3 bez domyślnych funkcji: bez pobierania zdalnych `$ref`). Tryb `strict_keys` → `UnknownKey` poza schematami.
+  Rejestracja nie waliduje wstecz wartości już zapisanych.
+- **Historia:** zamiast repo git — append-only `history.ndjson` (`ts, key, scope, layer, old, new, origin, source=api|file`);
+  rollback — później (otwarte pytanie „git2 vs dziennik” rozstrzygnięte na razie na dziennik).
+- **Przeładowanie:** jawne `reload()` i `watch_files` (`notify` 8.2.0, debounce domyślnie 100 ms). Plik niepoprawny (składnia, sekret,
+  zmiana `kernel.*` z pominięciem Brokera, naruszenie schematu) → wartości bez zmian, `config.invalid`, a zapis do tego pliku jest
+  wstrzymany do naprawy (by nie nadpisać ręcznej edycji). Przy otwarciu niepoprawny plik nie blokuje startu (`load_problems()`).
+- **Zdarzenia:** `config.changed` (tylko przy zmianie wartości wynikowej), `config.reloaded`, `config.invalid`,
+  `config.kernel_policy_rejected` (poziom Warn; zdarzenie Audytu zapisze Broker w F3). `watch` dostaje zmiany zakresu, w którym zapisano.
+- **Nie w F0:** `Origin::Improver` tylko R0/zawężająco, rollback, profile, zdarzenie `config.rolled_back`.

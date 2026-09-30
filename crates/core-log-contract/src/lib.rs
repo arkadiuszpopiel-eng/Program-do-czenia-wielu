@@ -5,6 +5,9 @@
 mod redact;
 mod sink;
 
+#[cfg(feature = "contract-tests")]
+pub mod contract_tests;
+
 pub use redact::{REDACTED, Redactor, RegexRedactor};
 pub use sink::{
     AuditRecordRef, AuditWriter, LogError, LogQuery, LogRecord, LogSink, LogStream, RecordRef,

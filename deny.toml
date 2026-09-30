@@ -25,6 +25,7 @@ allow = [
     "MPL-2.0",
     "Zlib",
     "CC0-1.0",
+    "MIT-0", # borrow-or-share (przez jsonschema → referencing → fluent-uri); MIT bez wymogu atrybucji
 ]
 confidence-threshold = 0.8
 # Crate'y własne workspace mają `license = "UNLICENSED"` (do ustalenia) — nie są publikowane.

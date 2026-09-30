@@ -67,6 +67,15 @@ pub enum ConfigError {
     Persist(String),
 }
 
+/// Reguła polityk Jądra: klucz `kernel.*` zmienia tylko `Origin::Broker` (SPEC, ACC-F0-core-config-02).
+/// Wspólna dla `-impl` i `-fake`; wywoływana przed jakąkolwiek inną walidacją zapisu.
+pub fn authorize(key: &ConfigKey, origin: &Origin) -> Result<(), ConfigError> {
+    if key.is_kernel_policy() && *origin != Origin::Broker {
+        return Err(ConfigError::KernelPolicy(key.clone()));
+    }
+    Ok(())
+}
+
 /// Strumień zmian.
 pub type ConfigWatch = Pin<Box<dyn Stream<Item = ConfigChange> + Send>>;
 
@@ -94,6 +103,25 @@ pub trait ConfigStore: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn only_broker_changes_kernel_keys() {
+        let kernel = ConfigKey::new("kernel.egress.allow").unwrap();
+        for origin in [
+            Origin::User,
+            Origin::Module("x".into()),
+            Origin::Improver,
+            Origin::Import,
+        ] {
+            assert_eq!(
+                authorize(&kernel, &origin),
+                Err(ConfigError::KernelPolicy(kernel.clone()))
+            );
+        }
+        assert_eq!(authorize(&kernel, &Origin::Broker), Ok(()));
+        let plain = ConfigKey::new("voice.tts.engine").unwrap();
+        assert_eq!(authorize(&plain, &Origin::Improver), Ok(()));
+    }
 
     #[test]
     fn origin_and_change_round_trip() {

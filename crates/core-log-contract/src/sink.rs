@@ -1,12 +1,16 @@
 //! Traity zapisu logów: `LogSink` (jądro) i `AuditWriter` (Broker).
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use core_bus_contract::{Event, EventKind, SessionId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// Strumienie zapisywane przez `core-log` (bez Audytu — ten pisze Broker, `AuditWriter`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
+/// Porządek (`Ord`) = kolejność deklaracji; rozstrzyga remisy przy zapytaniu o wiele strumieni.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum LogStream {
     /// Wywołania modeli: dostawca, model, tokeny, koszt, opóźnienie.
@@ -20,6 +24,14 @@ pub enum LogStream {
 }
 
 impl LogStream {
+    /// Wszystkie strumienie w kolejności deklaracji.
+    pub const ALL: [LogStream; 4] = [
+        LogStream::ModelCalls,
+        LogStream::ToolsGui,
+        LogStream::Voice,
+        LogStream::Diagnostics,
+    ];
+
     /// Domyślny strumień dla rodzaju zdarzenia; `None` dla Audytu (Broker) i UI.
     pub fn for_kind(kind: &EventKind) -> Option<Self> {
         match kind {
@@ -61,17 +73,41 @@ pub struct LogRecord {
     pub schema_version: u32,
 }
 
-/// Zapytanie o rekordy.
+/// Zapytanie o rekordy. Wynik: rosnąco po (`event.ts`, strumień, `seq`); `limit` na końcu.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LogQuery {
-    /// Strumień (wymagany).
+    /// Strumień; `None` = wszystkie strumienie `LogSink` (scalone).
     pub stream: Option<LogStream>,
     /// Tylko sesja.
     pub session: Option<SessionId>,
-    /// Od numeru sekwencyjnego (włącznie).
+    /// Od numeru sekwencyjnego (włącznie; ma sens przy jednym strumieniu).
     pub from_seq: Option<u64>,
     /// Maksymalna liczba rekordów.
     pub limit: Option<usize>,
+    /// Tylko rodzaj zdarzenia.
+    #[serde(default)]
+    pub kind: Option<EventKind>,
+    /// Od czasu zdarzenia (`event.ts`, włącznie).
+    #[serde(default)]
+    pub since: Option<DateTime<Utc>>,
+    /// Do czasu zdarzenia (`event.ts`, wyłącznie).
+    #[serde(default)]
+    pub until: Option<DateTime<Utc>>,
+}
+
+impl LogQuery {
+    /// Czy rekord spełnia filtry zapytania (bez `limit`). Wspólne dla `-impl` i `-fake`.
+    pub fn matches(&self, reference: &RecordRef, event: &Event) -> bool {
+        self.stream.is_none_or(|s| s == reference.stream)
+            && self.from_seq.is_none_or(|from| reference.seq >= from)
+            && self
+                .session
+                .as_ref()
+                .is_none_or(|s| event.session.as_ref() == Some(s))
+            && self.kind.as_ref().is_none_or(|k| *k == event.kind)
+            && self.since.is_none_or(|t| event.ts >= t)
+            && self.until.is_none_or(|t| event.ts < t)
+    }
 }
 
 /// Błędy logów.
@@ -114,6 +150,59 @@ pub trait AuditWriter: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn query_matches_all_filters() {
+        let t0 = chrono::DateTime::<Utc>::from_timestamp(1_000, 0).unwrap();
+        let mut ev = Event::new(EventKind::Voice, core_bus_contract::Level::Info, 1.into())
+            .with_session(SessionId::from("s1"));
+        ev.ts = t0;
+        let r = RecordRef {
+            stream: LogStream::Voice,
+            seq: 5,
+        };
+        assert!(LogQuery::default().matches(&r, &ev));
+        let q = LogQuery {
+            stream: Some(LogStream::Voice),
+            session: Some(SessionId::from("s1")),
+            from_seq: Some(5),
+            kind: Some(EventKind::Voice),
+            since: Some(t0),
+            until: Some(t0 + chrono::Duration::seconds(1)),
+            ..LogQuery::default()
+        };
+        assert!(q.matches(&r, &ev));
+        let miss = [
+            LogQuery {
+                stream: Some(LogStream::Diagnostics),
+                ..q.clone()
+            },
+            LogQuery {
+                session: Some(SessionId::from("s2")),
+                ..q.clone()
+            },
+            LogQuery {
+                from_seq: Some(6),
+                ..q.clone()
+            },
+            LogQuery {
+                kind: Some(EventKind::Tool),
+                ..q.clone()
+            },
+            LogQuery {
+                since: Some(t0 + chrono::Duration::seconds(1)),
+                ..q.clone()
+            },
+            LogQuery {
+                until: Some(t0),
+                ..q.clone()
+            },
+        ];
+        for m in miss {
+            assert!(!m.matches(&r, &ev), "{m:?}");
+        }
+        assert!(LogStream::ModelCalls < LogStream::Diagnostics);
+    }
 
     #[test]
     fn stream_mapping() {

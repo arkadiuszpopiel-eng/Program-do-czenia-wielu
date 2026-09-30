@@ -68,3 +68,23 @@ Strona Ustawienia → Moduły (lista, włącz/wyłącz, budżety, stan zdrowia) 
 ## Otwarte pytania
 - Schemat `module.toml` (JSON Schema) — powstaje w F0 pkt 2; wersjonowanie manifestu — do ustalenia w SPEC v1.
 - Protokół JSON-RPC dla modułów `process` (nazwa metod, heartbeat) — wspólna z `watchdog`; do ustalenia w SPEC v1.
+
+## Zmiany po implementacji (F0: `core-registry-impl`, `core-registry-fake`)
+- **Kontrakt (dodane, bez zmian istniejącego API):** trait `Registry` (async, object-safe) zamiast szkicu z `resolve<C>()`:
+  `register(Box<dyn Module>)`, `start_order`, `boot`, `activate`, `acquire(&ContractRef) -> ModuleId`, `deactivate`,
+  `set_enabled`, `list`, `health`, `unload_idle`, `shutdown`; `ModuleState` (`Disabled|Unloaded|Loading|Ready|Degraded{reason}|Failed{restarts,reason}`),
+  `ModuleStatus`, `RegistryError`, stałe zdarzeń; czysta funkcja grafu `DependencyGraph::build` (wspólna dla `-impl`/`-fake`)
+  i `contract_tests` (feature). Typowany uchwyt kontraktu (`resolve<C>() -> Arc<C>`) — odłożony: `acquire` zwraca `id` dostawcy.
+- **Graf:** `requires` spełnia moduł z identycznym `nazwa-contract@major` albo kontrakt jądra (`external_contracts`, domyślnie
+  `core-bus/registry/config/log-contract@1`). Braki → `MissingContract`, dwóch dostawców (lub moduł + jądro) → `ConflictingProviders`,
+  cykl → `Cycle(ścieżka)`. Kolejność: Kahn, remisy leksykograficznie po `id` (deterministycznie). Graf liczony tylko z modułów włączonych.
+- **Cykl życia:** `always` — `boot`; `lazy` — pierwsze `acquire`; `on-demand` — tylko `activate` (`acquire` bez aktywacji → `NotActivated`).
+  Start modułu zawsze uruchamia najpierw zależności (także `on-demand` — potrzeba zależności jest żądaniem).
+  `deactivate` zatrzymuje najpierw zależne; `always` → `Resident`, zależny `always` → `InUse`.
+- **Bezczynność:** `unload_idle` zwalnia `lazy`/`on-demand` z `now - last_used > limit` (domyślnie 10 min, per moduł `idle_overrides`),
+  tylko gdy nie mają uruchomionych zależnych; `spawn_idle_reaper(period)` woła to okresowo. Zegar wstrzykiwany (`Clock`).
+- **Crash-loop:** po `crash_loop_limit` (3) nieudanych startach → `CrashLoop` bez wołania `start`; reset przez wyłącz/włącz.
+- **Health:** `Degraded`/`Unhealthy` z modułu → stan `Degraded{reason}`, `Healthy` → `Ready`; zdarzenie `registry.module.health`.
+- **Zdarzenia:** `registry.module.state_changed` `{module, from, to, reason?}`, `registry.module.health`, `registry.resolve_failed`.
+- **Nie w F0:** budżety (`budget_exceeded`), izolacja `process`/`wasm`, przekazywanie zdolności do Brokera, konfiguracja z `core-config`.
+- **Współbieżność:** operacje serializowane jednym zamkiem async — `Module::start` nie może wołać rejestru.

@@ -24,6 +24,9 @@ pub enum KeyError {
 #[serde(transparent)]
 pub struct ConfigKey(String);
 
+/// Prefiks kluczy polityk Jądra (`kernel.*`): zmienia je wyłącznie `Origin::Broker`.
+pub const KERNEL_POLICY_PREFIX: &str = "kernel";
+
 /// Ostatni segment równy jednemu z tych słów lub kończący się na `_<słowo>` oznacza sekret.
 const SECRET_WORDS: [&str; 4] = ["token", "secret", "password", "passphrase"];
 
@@ -60,6 +63,11 @@ impl ConfigKey {
     /// Segmenty klucza.
     pub fn segments(&self) -> impl Iterator<Item = &str> {
         self.0.split('.')
+    }
+
+    /// Czy klucz jest polityką Jądra (prefiks `kernel.`) — zmienia go tylko Broker.
+    pub fn is_kernel_policy(&self) -> bool {
+        self.has_prefix(KERNEL_POLICY_PREFIX)
     }
 
     /// Czy klucz leży pod prefiksem (`"voice"` pasuje do `voice.stt.engine`, nie do `voices.x`).
@@ -106,6 +114,13 @@ mod tests {
         assert!(k.has_prefix(""));
         assert!(!k.has_prefix("voic"));
         assert!(!k.has_prefix("voice.stt.engine.x"));
+        assert!(!k.is_kernel_policy());
+        assert!(
+            ConfigKey::new("kernel.egress.allow")
+                .unwrap()
+                .is_kernel_policy()
+        );
+        assert!(!ConfigKey::new("kernels.x").unwrap().is_kernel_policy());
     }
 
     #[test]

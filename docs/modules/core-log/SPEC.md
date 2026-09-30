@@ -59,3 +59,21 @@ Dane dla Osi czasu/Replay, pulpitu kosztów/opóźnień, ekranu „co poszło do
 ## Otwarte pytania
 - Kotwiczenie głowy łańcucha hashy poza zasięgiem agentów (gdzie: Broker, TPM?) — ADR z THREAT_MODEL, do ustalenia w SPEC v1.
 - Format indeksu (osobna baza `logs.db` vs baza per sesja) — do ustalenia po spike (i).
+
+## Zmiany po implementacji (F0: `core-log-impl`, `core-log-fake`)
+- **Kontrakt (dodane):** `LogQuery` ma `kind`, `since` (włącznie), `until` (wyłącznie) — `#[serde(default)]`; `LogQuery::matches`
+  (wspólny filtr); `stream: None` = wszystkie strumienie; wynik zawsze rosnąco po (`event.ts`, strumień, `seq`), `limit` na końcu;
+  `LogStream::ALL` i `Ord`; `contract_tests` (feature). `seq` numerowane od 0 per strumień.
+- **Pliki:** `<root>/<strumień>/<pierwszy seq, 20 cyfr>.ndjson`, linia `{seq, schema_version, written_at, event}`; rotacja po
+  `max_segment_bytes` (8 MiB); limit dysku per strumień (512 MiB = 2 GiB / 4) — usuwane najstarsze segmenty; retencja w dniach
+  (Narzędzia/GUI 7, reszta bez) wg `written_at`; po usunięciu wszystkiego zostaje pusty segment od `next_seq` (numeracja przetrwa restart).
+  Urwany ogon po awarii → nowy segment (stare dane niemodyfikowane); uszkodzone linie pomijane przy odczycie.
+- **Redakcja:** `Redactor` (domyślnie `RegexRedactor`) na ładunku przed zapisem — strumienie i Audyt. Redakcja po nazwach pól
+  (`password`, `api_key` jako klucz JSON) — propozycja do kontraktu `Redactor` (dziś tylko wzorce w wartościach).
+- **Audyt pre-broker:** `PreBrokerAuditWriter` (plik NDJSON), rekord `{event, hash, seq, writer: "pre-broker", written_at}`
+  w kanonicznym JSON (klucze posortowane, bez spacji), `event.prev_hash` = hash poprzednika, `hash` = SHA-256 rekordu bez `hash`.
+  `verify_bytes/verify_file` wykrywają modyfikację (w tym dowolny bajt), usunięcie i wstawienie; ucięcie ogona — porównanie z głową
+  (`verify_chain`/`verify_against`). Otwarcie naruszonego łańcucha → `AuditOpenError::Broken` (bez dopisywania).
+- **Magistrala:** `spawn_bus_writer` — rodzaje wbudowane wg `LogStream::for_kind`, `audit` → łańcuch, zdarzenia modułów → Diagnostyka, `ui` pominięte.
+- **Nie w F0:** indeks SQLite, szyfrowanie payloadów i `shred_session`, upcastery, deny-lista, kolejka + wątek zapisu (zapis synchroniczny
+  pod zamkiem, bez fsync per rekord), `diagnostics_bundle`, zdarzenia `log.rotated`/`log.disk_limit_reached`, fsync Audytu.

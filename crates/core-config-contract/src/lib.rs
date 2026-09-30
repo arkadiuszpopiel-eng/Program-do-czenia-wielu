@@ -6,6 +6,11 @@ mod key;
 mod layers;
 mod store;
 
-pub use key::{ConfigKey, KeyError};
+#[cfg(feature = "contract-tests")]
+pub mod contract_tests;
+
+pub use key::{ConfigKey, KERNEL_POLICY_PREFIX, KeyError};
 pub use layers::{ConfigLayer, MachineId, Scope, resolve};
-pub use store::{ConfigChange, ConfigError, ConfigStore, ConfigValue, ConfigWatch, Origin};
+pub use store::{
+    ConfigChange, ConfigError, ConfigStore, ConfigValue, ConfigWatch, Origin, authorize,
+};
