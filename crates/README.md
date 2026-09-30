@@ -19,6 +19,10 @@ Wyjątek: **`lib-*`** — wspólna biblioteka narzędziowa bez logiki modułu (n
 połączenie SQLCipher, migracje, rejestracja sqlite-vec). Moduły mogą od niej zależeć; ona sama zależy
 wyłącznie od innych `lib-*` i `*-contract`.
 
+Wyjątek: **`app-*`** — korzeń kompozycji aplikacji (np. `app-core`: składa moduły `-impl`, wystawia komendy
+i zdarzenia dla powłoki Tauri). Jako jedyny może zależeć od `*-impl`; od `*-fake` tylko w dev-dependencies;
+od niego nie zależy żaden crate.
+
 ## Crate'y w F0 (pkt 2 §4.5a)
 | Moduł | Crate'y | Uwagi |
 |---|---|---|

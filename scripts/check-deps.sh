@@ -4,7 +4,9 @@
 #  - `*-fake` innego modułu wolno używać tylko w `dev-dependencies`,
 #  - zależność między modułami idzie wyłącznie przez `*-contract`,
 #  - wyjątek: `lib-*` = wspólna biblioteka narzędziowa bez logiki modułu (np. szyfrowana baza);
-#    wolno od niej zależeć, a sama może zależeć tylko od `lib-*` i `*-contract`.
+#    wolno od niej zależeć, a sama może zależeć tylko od `lib-*` i `*-contract`,
+#  - wyjątek: `app-*` = korzeń kompozycji aplikacji (składa moduły); może zależeć od `*-impl`,
+#    `*-contract`, `lib-*`, a od `*-fake` tylko w dev-dependencies. Od `app-*` nie zależy nikt.
 # Użycie: scripts/check-deps.sh [--self-test]   (wymaga cargo + jq)
 set -euo pipefail
 
@@ -24,6 +26,16 @@ check_edges() {
     pkg_mod="$(module_of "$pkg")"
     dep_mod="$(module_of "$dep")"
     [[ "$pkg_mod" == "$dep_mod" ]] && continue   # ta sama trójka: impl→contract, fake→contract OK
+    if [[ "$dep" == app-* ]]; then
+      echo "NARUSZENIE: nikt nie może zależeć od korzenia kompozycji $dep ($pkg, $kind)"; violations=1
+      continue
+    fi
+    if [[ "$pkg" == app-* ]]; then
+      if [[ "$dep" == *-fake && "$kind" != "dev" ]]; then
+        echo "NARUSZENIE: $pkg zależy od -fake poza dev-dependencies: $dep ($kind)"; violations=1
+      fi
+      continue
+    fi
     if [[ "$pkg" == lib-* && "$dep" != lib-* && "$dep" != *-contract ]]; then
       echo "NARUSZENIE: biblioteka $pkg może zależeć tylko od lib-* i *-contract: $dep ($kind)"; violations=1
       continue
@@ -56,10 +68,14 @@ c-impl d-utils normal
 c-impl lib-sqlstore normal
 lib-sqlstore a-contract normal
 lib-sqlstore a-fake dev
+app-core a-impl normal
+app-core a-fake dev
+app-core a-fake normal
+b-impl app-core normal
 CASES
   local out; out="$(check_edges "$tmp" || true)"
   rm -f "$tmp"
-  local expected=4
+  local expected=6
   local got; got="$(grep -c NARUSZENIE <<<"$out" || true)"
   if [[ "$got" -ne "$expected" ]]; then
     echo "self-test: oczekiwano $expected naruszeń, wykryto $got"; echo "$out"; exit 1
