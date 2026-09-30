@@ -1,0 +1,23 @@
+[package]
+name = "core-bus-impl"
+description = "Magistrala zdarzeń in-proc na tokio::sync::broadcast z ograniczonym buforem i licznikiem zgubionych zdarzeń"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+core-bus-contract.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+futures-util.workspace = true
+tracing.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+core-bus-contract = { workspace = true, features = ["contract-tests"] }
+
+[lints]
+workspace = true

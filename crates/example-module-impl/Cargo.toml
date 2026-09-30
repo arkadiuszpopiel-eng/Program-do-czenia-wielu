@@ -1,0 +1,23 @@
+[package]
+name = "example-module-impl"
+description = "Wzorzec modułu (echo): implementacja z manifestem module.toml, publikuje zdarzenia na magistralę"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+example-module-contract.workspace = true
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+example-module-contract = { workspace = true, features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+
+[lints]
+workspace = true

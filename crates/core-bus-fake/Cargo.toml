@@ -1,0 +1,25 @@
+[package]
+name = "core-bus-fake"
+description = "Deterministyczna magistrala do testów: rejestruje wszystko, odtwarza w zadanej kolejności, wirtualny zegar"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+core-bus-contract.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+core-bus-contract = { workspace = true, features = ["contract-tests"] }
+futures-util.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

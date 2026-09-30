@@ -1,0 +1,16 @@
+[package]
+name = "platform-contract"
+description = "Neutralny kontrakt dostępu do systemu (SystemPort = FsPort + ProcessPort + ClipboardPort + WindowPort + HotkeyPort + TrayPort); implementacja Windows w platform-windows-impl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

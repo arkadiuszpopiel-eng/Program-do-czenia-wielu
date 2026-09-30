@@ -1,0 +1,61 @@
+# Workspace Rust Alfy (docs/PLAN.md §3.6). Każdy moduł to trójka crate'ów
+# `<m>-contract` / `<m>-impl` / `<m>-fake` w `crates/` (zasady: crates/README.md).
+# Wersje zależności są przypięte tutaj (jedno źródło prawdy) i w Cargo.lock;
+# podnoszenie wersji wymaga ADR (AGENTS.md).
+
+[workspace]
+resolver = "2"
+exclude = ["apps/desktop/src-tauri"]
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+license = "UNLICENSED" # do ustalenia
+rust-version = "1.94"
+repository = "https://github.com/arkadiuszpopiel/Program-do-czenia-wielu"
+
+[workspace.dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.21"
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "sync", "time", "macros"] }
+tracing = "0.1.44"
+schemars = { version = "1.2.2", features = ["chrono04", "uuid1"] }
+uuid = { version = "1.26.1", features = ["v4", "serde"] }
+chrono = { version = "0.4.45", features = ["serde"] }
+async-trait = "0.1.92"
+toml = "0.8.23"
+semver = { version = "1.0.28", features = ["serde"] }
+regex = "1.13.1"
+futures-core = "0.3.31"
+futures-util = "0.3.31"
+tokio-stream = { version = "0.1.19", features = ["sync"] }
+proptest = "1.11.0"
+
+# Crate'y workspace (moduły zależą wyłącznie od `*-contract`; sprawdza scripts/check-deps.sh)
+core-bus-contract = { path = "crates/core-bus-contract" }
+core-registry-contract = { path = "crates/core-registry-contract" }
+core-config-contract = { path = "crates/core-config-contract" }
+core-log-contract = { path = "crates/core-log-contract" }
+platform-contract = { path = "crates/platform-contract" }
+example-module-contract = { path = "crates/example-module-contract" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+too_many_lines = "warn" # próg w clippy.toml
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "warn"
+
+[profile.release]
+lto = "fat"
+strip = true
+codegen-units = 1
+opt-level = 3

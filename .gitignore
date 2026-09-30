@@ -8,7 +8,8 @@ dist/
 # Tauri
 /apps/desktop/src-tauri/target/
 # Korpus własny i nagrania — nigdy do repo
-/evals/corpus/
+/evals/corpus/*
+!/evals/corpus/.gitkeep
 /evals/**/*.wav
 /evals/**/*.flac
 # Modele i sekrety
