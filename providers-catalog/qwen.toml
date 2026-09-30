@@ -12,6 +12,7 @@ jurisdiction = "SG|EU"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "Klucz przypisany do regionu: Singapur (tag sg) lub Frankfurt (tag eu) — tag ustawiany per profil w konfiguracji [W]. Qwen3-ASR (STT z polskim) — kandydat voice-stt [W]; Qwen3-TTS-Realtime bez PL. Qwen Coding/Token Plan: zabronione jako most (rejestr) — tylko API."
+env_vars = ["DASHSCOPE_API_KEY"]
 
 [capabilities]
 vision = "unknown"

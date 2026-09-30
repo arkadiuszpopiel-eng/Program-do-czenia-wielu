@@ -12,6 +12,7 @@ jurisdiction = "CN"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "Adapter generyczny. CN: dane w Chinach/Singapurze, może trenować [W] — sesje 'prywatne' nie kierują tu ruchu. Cena orientacyjna w planie (DeepSeek Flash) tylko jako przykład; cennik w konfiguracji."
+env_vars = ["DEEPSEEK_API_KEY"]
 
 [capabilities]
 vision = "unknown"

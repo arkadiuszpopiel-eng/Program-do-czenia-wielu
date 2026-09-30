@@ -12,6 +12,7 @@ jurisdiction = "unknown"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "Wymieniony w klasie B (adapter generyczny). Voxtral Realtime bez polskiego (wg badania [W]). Jurysdykcja nie potwierdzona w planie [?]."
+env_vars = ["MISTRAL_API_KEY"]
 
 [capabilities]
 vision = "unknown"

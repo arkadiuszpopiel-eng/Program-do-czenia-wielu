@@ -12,6 +12,7 @@ jurisdiction = "unknown"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "STT: Scribe v2 Realtime (profil C). TTS: streaming, znaczniki słów (źródło 'usłyszanego prefiksu', §6.5). Voice Design do castingu — ToS użycia wyjścia jako referencji do klonu do sprawdzenia [?]. Audio w chmurze — tag prywatności obowiązkowy przed użyciem."
+env_vars = ["ELEVENLABS_API_KEY"]
 
 [capabilities]
 vision = false

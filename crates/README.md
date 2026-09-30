@@ -28,6 +28,9 @@ wyłącznie od innych `lib-*` i `*-contract`.
 | `core-log` | `core-log-contract`, `-impl`, `-fake` | NDJSON z rotacją/retencją/limitem dysku, redakcja, audyt pre-broker z łańcuchem SHA-256 |
 | `platform-windows` | `platform-contract`, `platform-fake`, `platform-windows-impl` | `SystemPort` + `HardwarePort`; impl: Kosz (IFileOperation), Job Objects, schowek, okna, skróty + `WH_KEYBOARD_LL` (PTT), DXGI/MMDevice; jedyny crate z windows-rs |
 | `device-profile` | `device-profile-contract`, `-impl`, `-fake` | autodetekcja sprzętu, klasy §3.5, rekomendacja profilu głosu A–D i rezydencji, emulacja baseline, `MachineId` |
+| `compliance` | `compliance-contract`, `-impl`, `-fake` | rejestr tras (zielona/szara/zabroniona, degradacja nieświeżych), tagi prywatności/jurysdykcji, `route_allowed`, deny-listy ścieżek i domen z normalizacją Windows, `KernelAuthority` |
+| `accounts-hub` | `accounts-hub-contract`, `-impl`, `-fake` | katalog dostawców (walidacja schematu), konta i klucze (`SecretStore`: Credential Manager / pamięć), kreator jako maszyna stanów, import z env, wykrywanie mostów CLI |
+| `cost-meter` | `cost-meter-contract`, `-impl`, `-fake` | koszty w liczbach całkowitych (mikro-USD/PLN), kurs NBP z cache i zapasem, limit miesięczny Enforced/AlertOnly/Off, budżet tła, NDJSON |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

@@ -12,6 +12,7 @@ jurisdiction = "unknown"
 terms_url = "https://geminicli.com/docs/resources/tos-privacy/"
 compliance_status = "gray"
 notes = "Przez adapter generyczny (endpoint OpenAI-compat) z kluczem API [V w planie §5.5]. Tag zależy od konta: osobiste = google-personal-may-train (może trenować), klucz płatny/EOG = nie trenuje [V]. Gemini Live (PL deklarowany, zgłaszana regresja akcentu), Chirp 3 HD, Gemini TTS — wymagają osobnych modułów voice-*. agy/Gemini CLI: patrz rejestr zgodności (szary)."
+env_vars = ["GEMINI_API_KEY", "GOOGLE_API_KEY"]
 
 [capabilities]
 vision = "unknown"

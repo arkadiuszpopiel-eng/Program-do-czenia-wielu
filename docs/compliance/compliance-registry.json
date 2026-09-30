@@ -248,7 +248,7 @@
     { "id": "mistral", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie podaje jurysdykcji; do weryfikacji." },
     { "id": "elevenlabs", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Audio w chmurze (STT Scribe v2 RT, TTS, Voice Design — ToS użycia wyjścia jako referencji do sprawdzenia)." },
     { "id": "cartesia", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Audio w chmurze (TTS); do weryfikacji." },
-    { "id": "azure", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Azure Speech pl-PL; region wybierany w konfiguracji — do weryfikacji." },
+    { "id": "azure-speech", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Azure Speech pl-PL; region wybierany w konfiguracji — do weryfikacji." },
     { "id": "soniox", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "STT w chmurze; do weryfikacji." },
     { "id": "deepgram", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Aura-2 bez polskiego; STT do weryfikacji." }
   ]

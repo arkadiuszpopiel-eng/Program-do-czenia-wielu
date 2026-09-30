@@ -1,0 +1,22 @@
+[package]
+name = "accounts-hub-fake"
+description = "Atrapa huba kont: MemorySecretStore, skryptowany tester połączenia i lister modeli, FakeAccountsHub w pamięci"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+compliance-contract = { path = "../compliance-contract" }
+async-trait.workspace = true
+chrono.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+accounts-hub-contract = { path = "../accounts-hub-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

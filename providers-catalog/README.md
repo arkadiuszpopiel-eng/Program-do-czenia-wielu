@@ -20,6 +20,7 @@ Stan: **szkice** z 30.09.2026. Wartości, których plan nie potwierdza, mają `"
 | `terms_url` | string | link do regulaminu lub `"TODO"` |
 | `compliance_status` | `green` / `gray` / `forbidden` / `unverified` | status API-dostawcy (nie mostu CLI; mosty są w rejestrze zgodności) |
 | `notes` | string | uwagi, w tym oznaczenia [V]/[W]/[?] |
+| `env_vars` | lista string (opcjonalne) | nazwy zmiennych środowiskowych, z których kreator importuje klucz **na życzenie** użytkownika (np. `ANTHROPIC_API_KEY`); wartości nigdy nie trafiają do plików |
 
 Zasady:
 - `"unknown"` jest wartością legalną i oznacza „nie wiemy" — Router traktuje ją ostrożnie (jak brak możliwości / „może trenować").

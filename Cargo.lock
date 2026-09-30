@@ -3,6 +3,60 @@
 version = 4
 
 [[package]]
+name = "accounts-hub-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "core-bus-contract",
+ "proptest",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "toml",
+ "zeroize",
+]
+
+[[package]]
+name = "accounts-hub-fake"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "tokio",
+]
+
+[[package]]
+name = "accounts-hub-impl"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "accounts-hub-fake",
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "compliance-fake",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "jsonschema",
+ "keyring-core",
+ "proptest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+ "uuid",
+ "windows-native-keyring-store",
+ "zeroize",
+]
+
+[[package]]
 name = "ahash"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -106,6 +160,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "175812e0be2bccb6abe50bb8d566126198344f707e304f45c648fd8f2cc0365e"
 
 [[package]]
+name = "byteorder"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
+
+[[package]]
 name = "bytes"
 version = "1.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -139,6 +199,47 @@ dependencies = [
  "serde",
  "wasm-bindgen",
  "windows-link",
+]
+
+[[package]]
+name = "compliance-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "proptest",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "compliance-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "tokio",
+]
+
+[[package]]
+name = "compliance-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "proptest",
+ "serde_json",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]
@@ -329,6 +430,49 @@ dependencies = [
  "serde_json",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "cost-meter-contract"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "proptest",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "cost-meter-fake"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "async-trait",
+ "chrono",
+ "cost-meter-contract",
+ "tokio",
+]
+
+[[package]]
+name = "cost-meter-impl"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "cost-meter-contract",
+ "cost-meter-fake",
+ "proptest",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -769,6 +913,15 @@ dependencies = [
  "num-traits",
  "serde_json",
  "zmij",
+]
+
+[[package]]
+name = "keyring-core"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb1e621458ca9c51aa110bd0339d4751a056b9576bf1253aee1aa560dda0fc9d"
+dependencies = [
+ "log",
 ]
 
 [[package]]
@@ -1933,6 +2086,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5"
 
 [[package]]
+name = "windows-native-keyring-store"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "063426e76fdec7438d56bb777f67e318a84a25c707b07e575cb8b78e10c028f8"
+dependencies = [
+ "byteorder",
+ "keyring-core",
+ "regex",
+ "windows-sys 0.61.2",
+ "zeroize",
+]
+
+[[package]]
 name = "windows-numerics"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2086,6 +2252,12 @@ dependencies = [
  "quote",
  "syn 2.0.119",
 ]
+
+[[package]]
+name = "zeroize"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e"
 
 [[package]]
 name = "zmij"

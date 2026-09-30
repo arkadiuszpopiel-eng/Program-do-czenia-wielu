@@ -12,6 +12,7 @@ jurisdiction = "CN"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "Open Platform przez adapter generyczny. CN [W]. Kimi Code CLI (plan abonamentowy) — trasa kimi-code-cli w rejestrze (szary, [W])."
+env_vars = ["MOONSHOT_API_KEY"]
 
 [capabilities]
 vision = "unknown"

@@ -1,65 +1,54 @@
-# accounts-hub — SPEC (szkic v0)
+# accounts-hub — SPEC (v0)
 
 ## Cel
-Konta i klucze dostawców dodawane w dowolnym momencie, bez restartu i bez zmian w kodzie: deklaratywny katalog dostawców (`providers-catalog/*.toml`), kreator „Dodaj dostawcę / konto / klucz" (test połączenia, wykrycie modeli, przypisanie do klas zadań i głosu, limit kosztów), klucze wyłącznie w Windows Credential Manager (PLAN §5.6). Wykrywanie CLI mostów i logowanie w ConPTY — od F4.
+Konta i klucze dostawców dodawane w dowolnym momencie, bez restartu i bez zmian w kodzie: deklaratywny katalog dostawców (`providers-catalog/*.toml`), kreator „Dodaj dostawcę / konto / klucz" (test połączenia, wykrycie modeli, przypisanie do klas zadań i głosu, limit kosztów), klucze wyłącznie w Windows Credential Manager (PLAN §5.6). Wykrywanie mostów CLI (tylko PATH + wersja) od F1; logowanie w ConPTY — F4.
 
 ## Fala i priorytet
-F1 (katalog, kreator, Credential Manager, stany „nieskonfigurowany"). F4: krok „mosty CLI". P0.
+F1 (katalog, kreator, Credential Manager, stany, import ze zmiennych, wykrywanie CLI) — **zrobione w v0**. F4: krok „mosty CLI" (logowanie). P0.
 
-## Kontrakt (szkic Rust)
-```rust
-// accounts-hub-contract — SZKIC
-pub struct ProviderCatalogEntry { pub id: ProviderId, pub name: String, pub base_url: Url, pub auth: AuthKind /* ApiKey | Bearer | None | Cli */,
-    pub models: Vec<ModelInfo>, pub caps: Capabilities, pub pricing: PriceTableRef, pub privacy: PrivacyTag,
-    pub jurisdiction: Jurisdiction, pub tos_url: Url, pub compliance: ComplianceStatus }
-pub struct Account { pub id: AccountId, pub provider: ProviderId, pub label: String, pub secret: SecretRef /* uchwyt, nie wartość */,
-    pub state: AccountState /* Unconfigured | Testing | Ok | Invalid | RateLimited | Disabled */,
-    pub assignments: Assignments /* klasy zadań, agentki/role, STT/TTS */, pub cost_limit: Option<CostLimit> }
-pub trait AccountsHub: Send + Sync {
-    fn catalog(&self) -> Vec<ProviderCatalogEntry>;
-    fn add_account(&self, provider: ProviderId, secret: SecretInput, label: String) -> Result<AccountId>;
-    fn test(&self, id: AccountId) -> Result<TestReport>;          // połączenie + wykrycie modeli (np. Models API)
-    fn rotate(&self, id: AccountId, secret: SecretInput) -> Result<()>;
-    fn remove(&self, id: AccountId) -> Result<()>;
-    fn secret_handle(&self, id: AccountId, caller: ModuleId) -> Result<SecretRef>; // tylko providers-*
-}
-```
-Zdarzenia: `accounts.added`, `accounts.tested`, `accounts.state_changed`, `accounts.removed`, `accounts.catalog.updated`, `accounts.models.discovered`.
+## Kontrakt (`accounts-hub-contract` — źródło prawdy)
+- `ProviderCatalogEntry::from_toml` (pola `schema.json` + opcjonalne `env_vars`; `base_url`/`terms_url` `None` = `"TODO"`), `models` (wykryte), `pricing: PriceTable` (mikro-USD/Mtok z konfiguracji, `*` = domyślna), `policy_input()` → `compliance`.
+- `Account { id, provider, label, created_at, last_test, state, secret: SecretName, base_url, assignments, cost_limit: Option<CostLimit>, source, models }`; `AccountState` = `Unconfigured | Active | Error { kind } | Disabled`; `provider_state()` (brak kont = `Unconfigured`).
+- `SecretString` (zeroize, `Debug` = `***`, bez `Serialize`/`Display`); `trait SecretStore { put, get, delete, list }`.
+- `Wizard` — maszyna stanów: `ChooseProvider → EnterKey → TestConnection → DiscoverModels → Assign → CostLimit → Confirm`; zabroniony dostawca / `oauth_cli` odrzucone; `finish` tylko po udanym teście bieżącego klucza.
+- Porty: `ConnectionTester`, `ModelLister`, `EnvSource`, `CliProbe` (+ `detect_cli_bridges_with`, `parse_version`).
+- `trait AccountsHub`: `catalog`, `provider`, `provider_state`, `accounts`, `account`, `set_pricing`, `add_account`, `test_account`, `rotate`, `remove`, `set_disabled`, `update_settings`, `import_from_env`, `resolve_secret(id, caller)` (tylko `providers-*`), `wizard_test`, `wizard_discover`, `wizard_finish`; `AccountsRepository` (metadane bez sekretów).
+Zdarzenia (bez wartości kluczy): `accounts.key.added`, `accounts.key.removed`, `accounts.key.tested`, `accounts.key.rotated`, `accounts.state_changed`.
 
 ## Zależności
-`core-bus/config/log-contract`, `platform-windows-contract` (Credential Manager, env), `compliance-contract` (status trasy), `cost-meter-contract` (limity), `providers-api-contract`/`providers-local-contract` (test połączenia przez adapter).
+`compliance-contract` (tagi, status API, opcjonalnie trasa `<provider>.api` zabroniona), `core-bus-contract`, `core-registry-contract`. **Kierunek z `cost-meter`:** to `cost-meter-contract` zależy od `accounts-hub-contract` (ceny, `CostLimit`), nie odwrotnie. Test połączenia przez adaptery `providers-*` (kompozycja wstrzykuje `ConnectionTester`/`ModelLister`).
 
 ## Niezmienniki
-- Wartość klucza nigdy nie opuszcza `accounts-hub` inaczej niż jako `SecretRef` odczytywany przez adapter dostawcy; nigdy w TOML, logach, paczkach `.alfa` (redakcja + test szpiegowski).
-- Dodanie/rotacja/usunięcie klucza działa bez restartu (zdarzenie → Router przelicza trasy).
-- Dostawca bez konta ma stan `Unconfigured`; Router go pomija; UI pokazuje „dodaj klucz, aby odblokować X".
-- Katalog jest danymi (TOML), nie kodem; nowy dostawca kompatybilny z OpenAI/Anthropic = wpis + adapter generyczny.
-- Trasa ze statusem zgodności „zabroniona" nie może dostać konta typu `Cli`; „szara" — z ostrzeżeniem.
-- Alfa nigdy nie czyta ani nie przechowuje tokenów CLI (`~/.claude`, `~/.codex`).
+- Wartość klucza istnieje tylko w `SecretStore` i jako `SecretString`; nigdy w metadanych, zdarzeniach, `Debug`, komunikatach błędów (redakcja) — testy szpiegowskie.
+- Dodanie/rotacja/usunięcie działa bez restartu (zdarzenie → Router przelicza trasy); po usunięciu `resolve_secret` → `UnknownAccount`.
+- Konto bez klucza w magazynie (np. metadane z innej maszyny) ma stan `Unconfigured`.
+- Import ze środowiska tylko na życzenie i tylko ze zmiennych `env_vars` katalogu; bez zabronionych dostawców i duplikatów.
+- Kod huba nie odwołuje się do katalogów poświadczeń CLI (test grep w źródłach); `--version` uruchamiane z wyczyszczonym środowiskiem i limitem czasu.
 
 ## Zdolności / uprawnienia
-`secrets.read` / `secrets.write` (Credential Manager) — tylko ten moduł; `net.egress(host)` dla testu połączenia z hostem z katalogu.
+`secrets.read` / `secrets.write` (Credential Manager) — tylko ten moduł; `net.egress(host)` dla testu połączenia (w adapterze).
 
 ## Izolacja
-`inproc`, `lazy` (aktywny przy kreatorze i przy odczycie `SecretRef`).
+`inproc`, `lazy`.
 
 ## Budżet zasobów
-RAM ≤ 3 MB; test połączenia ≤ 10 s z timeoutem; zero CPU w bezczynności.
+RAM ≤ 3 MB; test połączenia i wykrywanie modeli ≤ 10 s (timeout → `Error { Timeout }`); zero CPU w bezczynności.
 
 ## Konfiguracja (klucze TOML)
-`[accounts.<account_id>] provider, label, assignments.*, cost_limit_pln` (bez sekretów); `[accounts] catalog_dir = "providers-catalog"`, `import_env = ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"]` (import na życzenie).
+`[accounts.<account_id>] provider, label, assignments.*, cost_limit` (bez sekretów; plik `accounts.json` w `JsonFileRepository` do czasu `core-config-impl`), `[accounts] catalog_dir = "providers-catalog"`. Nazwy zmiennych do importu — pole `env_vars` w katalogu.
 
 ## Wkład do UI
-Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, kreator, test, limity, usuń; krok onboardingu „konta i klucze: dodaj teraz / pomiń"; podpowiedzi „dodaj klucz, aby odblokować X".
+Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, kreator (kroki `WizardStep`, ostrzeżenia `WizardWarning`), test, limity, usuń; onboarding „konta i klucze: dodaj teraz / pomiń".
 
 ## Testy akceptacyjne
-- `ACC-F1-accounts-hub-01`: dodanie klucza (atrapa dostawcy) bez restartu → trasa dostępna ≤ 2 s.
-- `ACC-F1-accounts-hub-02`: test szpiegowski — wartość klucza nieobecna w konfiguracji, logach, eksporcie `.alfa`.
-- `ACC-F1-accounts-hub-03`: usunięcie klucza → dostawca `Unconfigured`, 0 wywołań po usunięciu.
+- `ACC-F1-accounts-hub-01`: dodanie klucza (atrapa) bez restartu → konto `Active`, zdarzenie `accounts.key.added`.
+- `ACC-F1-accounts-hub-02`: test szpiegowski — klucz nieobecny w metadanych, zdarzeniach, `Debug`, komunikatach.
+- `ACC-F1-accounts-hub-03`: usunięcie → dostawca `Unconfigured`, 0 odczytów klucza po usunięciu.
+- Katalog z repo: każdy plik przechodzi JSON Schema; tagi spójne z rejestrem zgodności.
 
 ## Fake
-`accounts-hub-fake`: katalog z fixture'ów, sekrety w pamięci, `test()` zwraca skryptowane raporty (Ok/Invalid/RateLimited) i listy modeli.
+`accounts-hub-fake`: `FakeAccountsHub` (id `acc-N`, zegar sterowany, `set_state`, `secret_reads`), `MemorySecretStore`, `ScriptedConnectionTester`/`ScriptedModelLister` (kolejka albo prefiks klucza `sk-ok|sk-bad|sk-rate|sk-net|sk-slow`), `MapEnv`.
 
 ## Otwarte pytania
-- Schemat `providers-catalog/*.toml` (powstaje w §20 pkt 4) i jego aktualizacja (z repo aktualizacji?) — do ustalenia w SPEC v1.
-- Import kluczy z eksportu sekretów `.alfa` (format `secrets.enc`) — razem z `transfer` v1.
+- Credential Manager przez `keyring-core` + `windows-native-keyring-store` w tym crate'cie vs przez `platform-windows-impl` (`SystemPort`) — do decyzji przy F1 platformy (ADR).
+- Egzekwowanie `resolve_secret` tokenem zdolności Brokera (F3); aktualizacja katalogu z repo aktualizacji; import z `secrets.enc` (`transfer` v1).

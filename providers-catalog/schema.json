@@ -47,7 +47,13 @@
       "anyOf": [ { "const": "TODO" }, { "format": "uri", "pattern": "^https://" } ]
     },
     "compliance_status": { "enum": ["green", "gray", "forbidden", "unverified"] },
-    "notes": { "type": "string" }
+    "notes": { "type": "string" },
+    "env_vars": {
+      "type": "array",
+      "description": "Opcjonalne: nazwy zmiennych środowiskowych, z których kreator importuje klucz na życzenie użytkownika (nigdy automatycznie).",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+      "uniqueItems": true
+    }
   },
   "$defs": {
     "tribool": { "anyOf": [ { "type": "boolean" }, { "const": "unknown" } ] }

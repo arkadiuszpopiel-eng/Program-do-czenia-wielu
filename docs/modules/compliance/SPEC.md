@@ -1,62 +1,56 @@
-# compliance — SPEC (szkic v0)
+# compliance — SPEC (v0)
 
 ## Cel
-Rejestr zgodności tras (`compliance-registry.json`): status trasy (zielona/szara/zabroniona), data weryfikacji, cytat źródła i archiwalna kopia regulaminu, wyłącznik trasy, tagi prywatności/jurysdykcji; nieświeży rejestr degraduje trasę do „szarej". Karty zgodności w UI (PLAN §1.3, §5.5).
+Rejestr zgodności tras (`compliance-registry.json`): status trasy (zielona/szara/zabroniona), data weryfikacji, cytat źródła i archiwalna kopia regulaminu, wyłącznik trasy, tagi prywatności/jurysdykcji; nieświeży rejestr degraduje trasę do „szarej". Polityka sesji „prywatne" i deny-listy Jądra jako dane. Karty zgodności w UI (PLAN §1.3, §5.5).
 
 ## Fala i priorytet
-F1: v0 (rejestr, tagi z katalogu, wyłącznik trasy). F4: v1 (karty zgodności w UI, archiwum regulaminów, statusy „CLI `-p`" i „Agent SDK" osobno). P0 (v0).
+F1: v0 (rejestr, tagi z katalogu, wyłącznik trasy, deny-listy jako dane) — **zrobione**. F4: v1 (karty zgodności w UI, archiwum regulaminów, przypięte wersje CLI, `providers[].deny_domains`). P0 (v0).
 
-## Kontrakt (szkic Rust)
-```rust
-// compliance-contract — SZKIC
-pub enum RouteStatus { Green, Grey { reason: String }, Forbidden { reason: String } }
-pub enum RouteKind { Api, CliHeadless, AgentSdk, Voice }
-pub struct RouteEntry { pub id: RouteId /* np. "anthropic.api", "claude-code.cli" */, pub kind: RouteKind, pub status: RouteStatus,
-    pub verified_at: Date, pub stale_after: Duration, pub source_quote: String, pub source_url: Url, pub archive: Option<PathBuf>,
-    pub privacy: PrivacyTag /* may_train | no_train */, pub jurisdiction: Jurisdiction /* EU | US | CN | SG | ... */,
-    pub retention: Option<Duration>, pub enabled: bool, pub pinned_cli_version: Option<Version> }
-pub trait Compliance: Send + Sync {
-    fn route(&self, id: &RouteId) -> Option<RouteEntry>;
-    fn effective_status(&self, id: &RouteId) -> RouteStatus;   // uwzględnia świeżość i wyłącznik
-    fn set_enabled(&self, id: &RouteId, on: bool, origin: Origin) -> Result<()>;   // wyłączenie: User; włączenie: Broker/User
-    fn tags(&self, id: &RouteId) -> (PrivacyTag, Jurisdiction);
-}
-```
-Zdarzenia: `compliance.route.status_changed`, `compliance.route.stale`, `compliance.route.disabled/enabled`, `compliance.cli_version.unknown` (trasa wyłączona).
+## Kontrakt (`compliance-contract` — źródło prawdy)
+- `Registry::from_json` — format wersjonowany (`schema_version` ∈ `SUPPORTED_SCHEMA_VERSIONS = [1]`), walidacja: duplikaty, nieznany dostawca, `forbidden` + `enabled_by_default`, sufiks `.api` zarezerwowany. JSON Schema: `registry_schema()`.
+- `RouteId`: trasy rejestru (`claude-code-cli`) + trasy API z katalogu `<provider>.api` (status z `compliance_status` katalogu; `unverified` = szara z ostrzeżeniem, domyślnie włączona).
+- `effective_status(declared, verified_at, today, max_age_days)`: `dziś − verified_at > max_age_days` → co najwyżej `Grey` (`stale`); `Forbidden` zostaje.
+- `RouteTable` (czysta logika wspólna `-impl`/`-fake`): widoki `RouteView`, tagi = suma rejestr ∪ katalog (nigdy nie zmniejsza ryzyka), wyłączniki.
+- `route_allowed(route, SessionTag) -> Decision { allowed, reason: DecisionReason }`; kolejność: istnienie → `Forbidden` → wyłącznik → polityka sesji prywatnej (jurysdykcja `CN`; tag „może trenować": `cn-may-train`, `google-personal-may-train`; `unknown`/brak tagów = jak „może trenować") → `AllowedWithWarning` dla szarej.
+- `trait Compliance`: `route`, `view(s)`, `effective_status`, `tags`, `route_allowed`, `set_enabled(id, on, ChangeOrigin)`, `deny_lists`, `is_denied_path`, `is_denied_domain`, `replace_deny_lists(&KernelAuthority, DenyLists)`.
+- Deny-listy (`DenyLists`, dane): prefiksy (profile Chrome/Edge/Brave/Firefox/Opera, `Microsoft\Credentials|Vault|Protect`), segmenty (`.claude`, `.claude.json`, `.codex`, `.gemini`, `.grok`, `.kimi`, `.agy`), domeny webowych UI dostawców (z subdomenami). Normalizacja ścieżek Windows: `%VAR%`, `$env:`, `~`, `\\?\`, `\\.\`, `\??\`, `UNC`, `\\localhost\c$`, separatory, wielkość liter, `.`/`..`, końcowe kropki/spacje, ADS, aliasy 8.3, `file:`; hostów: schemat, userinfo, port, `%XX`, kropki unikodowe.
+- `KernelAuthority(())` z ukrytym konstruktorem `__broker_only()` — umowa do F3 (Broker). Segmentów `.claude`/`.codex` nie da się usunąć.
+Zdarzenia: `compliance.route.enabled`, `compliance.route.disabled`, `compliance.route.stale` (przy starcie), `compliance.denylist.updated`. (`status_changed`, `cli_version.unknown` — F4.)
 
 ## Zależności
-`core-bus/config/log-contract`. Dane: `docs/compliance/compliance-registry.json` (wersjonowany w repo), `docs/compliance/archive/`.
+`core-bus-contract`, `core-registry-contract`. Dane: `docs/compliance/compliance-registry.json` (wbudowany jako domyślny), tagi katalogu jako `ProviderPolicyInput` (dostarcza kompozycja z `accounts-hub`).
 
 ## Niezmienniki
-- Trasa `Forbidden` (np. Qwen Coding Plan, GLM/ZCode przez plan) nie może być włączona z UI ani przez agentkę.
-- `verified_at + stale_after < dziś` → status efektywny co najwyżej `Grey`.
-- Nieznana (nieprzypięta) wersja CLI mostu wyłącza trasę `CliHeadless` (F4).
-- Rejestr jest polityką Jądra: `improver`/agentki nie zmieniają wpisów; edycja = commit w repo + przegląd.
-- Tagi z rejestru są źródłem prawdy dla Routera (nie z konfiguracji użytkownika).
+- Trasa `Forbidden` nie może być włączona (użytkownik ani Broker); agentki, Ulepszacz i moduły nie przestawiają wyłączników (`NotPermitted`).
+- `verified_at + max_age_days < dziś` → status co najwyżej `Grey`; nieświeża trasa domyślnie wyłączona, jawne włączenie → ostrzeżenie.
+- Tagi to suma źródeł; sesja prywatna nigdy nie trafia do CN / „może trenować" / `unknown`.
+- Rejestr i deny-listy są polityką Jądra; zmiana deny-list tylko z `KernelAuthority`.
 
 ## Zdolności / uprawnienia
 Brak.
 
 ## Izolacja
-`inproc`, `always` (mały, odczyt przy starcie).
+`inproc`, `always`.
 
 ## Budżet zasobów
-RAM ≤ 1 MB; odczyt rejestru ≤ 5 ms.
+RAM ≤ 1 MB; odczyt rejestru ≤ 5 ms; `route_allowed` bez I/O.
 
 ## Konfiguracja (klucze TOML)
-`[compliance] registry = "compliance-registry.json"`, `stale_after_default = "90d"`, `[compliance.routes.<id>] enabled = true` (wyłącznik użytkownika).
+`[compliance] registry = "compliance-registry.json"`, `stale_after_days` (domyślnie `max_age_days` z rejestru = 30), `[compliance.routes.<id>] enabled = true|false` (wyłącznik użytkownika; niepoprawne → `ignored_overrides`).
 
 ## Wkład do UI
-Karty zgodności przy dostawcach/mostach (Ustawienia → Modele i dostawcy): status, data, cytat, link, wyłącznik; ostrzeżenie „szara trasa" przy dodawaniu konta.
+Karty zgodności przy dostawcach/mostach (Ustawienia → Modele i dostawcy): status, data, cytat, link, wyłącznik; ostrzeżenie „szara trasa" przy dodawaniu konta; komunikaty z `DecisionReason` (Display po polsku).
 
 ## Testy akceptacyjne
-- `ACC-F1-compliance-01`: rejestr z fixture'ów — statusy efektywne (świeży/nieświeży/wyłączony) zgodne z regułami, property-based na datach.
-- `ACC-F1-compliance-02`: wyłącznik — 0 wywołań wyłączonej trasy w 100 próbach (z `router`).
-- `ACC-F4-compliance-03`: nieznana wersja CLI → trasa wyłączona (z `agent-backends`).
+- `ACC-F1-compliance-01`: statusy efektywne (świeży/nieświeży/wyłączony) — kontrakt + property-based na datach (`staleness_is_monotonic_in_age`).
+- `ACC-F1-compliance-02` / F1-13: wyłączona trasa — 0 zgód w 100 próbach (`disabled_route_zero_calls`).
+- Deny-listy: property-based obejścia (`..`, wielkość liter, ukośniki, prefiksy urządzeń, zmienne, kropki, ADS).
+- `ACC-F4-compliance-03`: nieznana wersja CLI → trasa wyłączona (F4).
 
 ## Fake
-`compliance-fake`: rejestr w pamięci ze sterowanymi statusami i datą „dziś".
+`compliance-fake::FakeCompliance`: rejestr w pamięci, sterowana data (`set_today`, `advance_days`) i statusy (`set_status`), rejestr zapytań `route_allowed`; ta sama logika `RouteTable`.
 
 ## Otwarte pytania
-- Schemat JSON rejestru (powstaje w §20 pkt 4); podpis rejestru (minisign) — do ustalenia w SPEC v1.
-- Wpisy [W] (z cytatów wtórnych) — jak oznaczać stopień pewności w UI.
+- Podpis rejestru (minisign) i archiwum regulaminów — v1 (F4).
+- Kanonizacja ścieżek przez OS (junction, symlink, prawdziwe 8.3) — `platform-windows-impl` przed dostępem do pliku.
+- Tag konta Google (osobiste vs płatne/EOG) per konto zamiast sumy tagów dostawcy — SPEC v1.

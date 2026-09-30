@@ -12,6 +12,7 @@ jurisdiction = "unknown"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "Klasa B (§5.2); adapter natywny (§5.3): effort zamiast wyłączania myślenia, tool_choice auto + strict, streaming domyślnie, cache promptów, historia append-only. Wizja przez computer_toolset_20260801 [V]. Tag prywatności API nie potwierdzony w planie [?]. Most CLI (Claude Code) jest w compliance-registry.json, nie tu."
+env_vars = ["ANTHROPIC_API_KEY"]
 
 [capabilities]
 vision = true

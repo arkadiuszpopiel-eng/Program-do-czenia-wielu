@@ -12,6 +12,7 @@ jurisdiction = "unknown"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "api.x.ai/v1 wymieniony w planie (§5.5). API: retencja 30 dni [W]. xAI Voice Agent zgodny z OpenAI Realtime, PL niepotwierdzony [W]. Grok Build przez klucz API — trasa grok-build-api w rejestrze."
+env_vars = ["XAI_API_KEY"]
 
 [capabilities]
 vision = "unknown"

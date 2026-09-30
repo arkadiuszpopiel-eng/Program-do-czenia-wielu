@@ -12,6 +12,7 @@ jurisdiction = "unknown"
 terms_url = "TODO"
 compliance_status = "unverified"
 notes = "Klasa B; modele (GPT-6 Sol/Astra/Luna) wykrywane przez Models API w accounts-hub. Głos: OpenAI Realtime (S2S, truncate natywne), gpt-4o-transcribe (STT), TTS [W]. Tag prywatności nie potwierdzony [?]. Most Codex CLI — w rejestrze zgodności."
+env_vars = ["OPENAI_API_KEY"]
 
 [capabilities]
 vision = "unknown"
