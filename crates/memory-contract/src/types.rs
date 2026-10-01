@@ -7,6 +7,9 @@ use core_bus_contract::{AgentId, SessionId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+pub use crate::error::MemoryError;
+use crate::model::{Origin, Supersession};
+
 /// Zakres pamięci (PLAN §10). Domyślny: sesja — każdy czat ma osobną pamięć.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
@@ -98,6 +101,13 @@ pub struct NewMemory {
     pub confidence: f32,
     /// Czas życia w sekundach (`None` = bez wygasania; SPEC: domyślnie 90 dni ustawia wywołujący).
     pub ttl_secs: Option<u64>,
+    /// Temat faktu (klucz sprzeczności, np. „ulubiony kolor”; F7). Fakt o tym samym temacie
+    /// w tym samym zakresie tworzy nową wersję zamiast nadpisania.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject: Option<String>,
+    /// Pochodzenie: sesja/tura źródłowa, wpisy źródłowe (F7).
+    #[serde(default, skip_serializing_if = "Origin::is_empty")]
+    pub origin: Origin,
 }
 
 impl NewMemory {
@@ -111,6 +121,28 @@ impl NewMemory {
             provenance: Provenance::User,
             confidence: 1.0,
             ttl_secs: None,
+            subject: None,
+            origin: Origin::default(),
+        }
+    }
+
+    /// Wpis w dowolnym zakresie i warstwie (pewność 1, bez TTL, bez encji).
+    pub fn new(
+        scope: MemoryScope,
+        layer: Layer,
+        text: impl Into<String>,
+        provenance: Provenance,
+    ) -> Self {
+        Self {
+            scope,
+            layer,
+            text: text.into(),
+            entities: Vec::new(),
+            provenance,
+            confidence: 1.0,
+            ttl_secs: None,
+            subject: None,
+            origin: Origin::default(),
         }
     }
 }
@@ -140,6 +172,68 @@ pub struct MemoryEntry {
     pub created_at: DateTime<Utc>,
     /// Zatwierdzony (tryb `AutoPendingApproval` → `false` do czasu `approve`).
     pub approved: bool,
+    /// Temat faktu (klucz sprzeczności; F7).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject: Option<String>,
+    /// Pochodzenie: sesja, tura, wpisy źródłowe, rodzaj wyprowadzenia (F7).
+    #[serde(default, skip_serializing_if = "Origin::is_empty")]
+    pub origin: Origin,
+    /// Numer wersji faktu (1 = pierwsza; edycja/sprzeczność → +1).
+    #[serde(default = "first_version")]
+    pub version: u32,
+    /// Poprzednia wersja (ten sam zakres).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub supersedes: Option<MemoryId>,
+    /// Zastąpiony nowszą wersją lub scalony (zostaje w historii, nie wraca w `recall`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub superseded: Option<Supersession>,
+    /// Przypięty (warstwa robocza: zawsze w zestawie roboczym).
+    #[serde(default)]
+    pub pinned: bool,
+    /// Kiedy Strażniczka pamięci przetworzyła wpis (konsolidacja epizodów).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub consolidated_at: Option<DateTime<Utc>>,
+}
+
+fn first_version() -> u32 {
+    1
+}
+
+impl MemoryEntry {
+    /// Wpis z nowego (wspólne dla `-impl`, `-fake` i silnika F7): wersja 1, nieprzypięty
+    /// (poza warstwą roboczą), bez zastąpienia.
+    pub fn from_new(
+        id: MemoryId,
+        new: NewMemory,
+        created_at: DateTime<Utc>,
+        approved: bool,
+    ) -> Self {
+        Self {
+            id,
+            trusted: new.provenance.is_trusted(),
+            pinned: new.layer == Layer::Working,
+            scope: new.scope,
+            layer: new.layer,
+            text: new.text,
+            entities: new.entities,
+            provenance: new.provenance,
+            confidence: new.confidence,
+            ttl_secs: new.ttl_secs,
+            created_at,
+            approved,
+            subject: new.subject,
+            origin: new.origin,
+            version: 1,
+            supersedes: None,
+            superseded: None,
+            consolidated_at: None,
+        }
+    }
+
+    /// Odwołanie do wpisu.
+    pub fn entry_ref(&self) -> crate::EntryRef {
+        crate::EntryRef::new(self.scope.clone(), self.id.clone())
+    }
 }
 
 /// Tryb zapamiętania.
@@ -172,51 +266,6 @@ pub struct ForgetReport {
     pub vectors: usize,
     /// Usunięte streszczenia/kopie (F7; w v0 zawsze 0).
     pub derived: usize,
-}
-
-/// Błędy pamięci.
-#[derive(Debug, thiserror::Error, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "error", rename_all = "snake_case")]
-pub enum MemoryError {
-    /// Funkcja poza v0 (zakres inny niż sesja, warstwa robocza/proceduralna, awans).
-    #[error("nieobsługiwane w v0: {what}")]
-    Unsupported {
-        /// Czego dotyczy.
-        what: String,
-    },
-    /// Wpis nie istnieje.
-    #[error("wpis {id} nie istnieje")]
-    NotFound {
-        /// Identyfikator.
-        id: MemoryId,
-    },
-    /// Wpis z treści niezaufanej nie może awansować do innego zakresu.
-    #[error("wpis z treści niezaufanej nie może awansować")]
-    UntrustedCannotPromote,
-    /// Automatyczne zapamiętywanie z treści niezaufanej jest wyłączone.
-    #[error("automatyczne zapamiętywanie z treści niezaufanej jest wyłączone")]
-    UntrustedAutoRemember,
-    /// Nieprawidłowe dane.
-    #[error("nieprawidłowe dane: {reason}")]
-    Invalid {
-        /// Opis.
-        reason: String,
-    },
-    /// Błąd magazynu lub indeksu.
-    #[error("magazyn: {reason}")]
-    Storage {
-        /// Opis.
-        reason: String,
-    },
-}
-
-impl MemoryError {
-    /// Skrót: błąd magazynu.
-    pub fn storage(e: impl fmt::Display) -> Self {
-        MemoryError::Storage {
-            reason: e.to_string(),
-        }
-    }
 }
 
 /// Pamięć agentek.

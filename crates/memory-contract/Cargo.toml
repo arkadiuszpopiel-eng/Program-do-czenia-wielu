@@ -1,6 +1,6 @@
 [package]
 name = "memory-contract"
-description = "Pamięć v0: kontrakt — remember/recall/forget w zakresie sesji, proweniencja (zaufane/niezaufane), pewność, TTL, kaskada forget"
+description = "Pamięć: kontrakt v0 (sesja) i F7 — cztery warstwy, zakresy z uprawnieniami, wersje faktów, Inspektor, forget kaskadowo, dziennik z cofaniem, silnik wspólny dla -impl i -fake"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,13 +15,15 @@ contract-tests = []
 
 [dependencies]
 core-bus-contract.workspace = true
+lib-sqlstore = { path = "../lib-sqlstore" }
 serde.workspace = true
+serde_json.workspace = true
 thiserror.workspace = true
 schemars.workspace = true
 chrono.workspace = true
 
 [dev-dependencies]
-serde_json.workspace = true
+proptest.workspace = true
 
 [lints]
 workspace = true

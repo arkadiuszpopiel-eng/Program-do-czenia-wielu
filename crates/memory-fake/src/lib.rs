@@ -1,8 +1,11 @@
-//! Atrapa modułu `memory` v0 (docs/modules/memory/SPEC.md, „Fake”).
+//! Atrapa modułu `memory` (docs/modules/memory/SPEC.md, „Fake”).
 //!
-//! Wpisy w pamięci, `recall` po prostym dopasowaniu słów (bez diakrytyków, prefiksy), wirtualny
-//! zegar (+1 s na operację), deterministyczne identyfikatory (`mem-0001`…), licznik kaskady
-//! `forget`. Reguły (zakresy, proweniencja, TTL) — wspólne z `memory-impl` (`memory-contract`).
+//! - [`FakeMemory`] (v0): wpisy w pamięci, `recall` po prostym dopasowaniu słów (bez
+//!   diakrytyków, prefiksy), wirtualny zegar (+1 s na operację), deterministyczne identyfikatory
+//!   (`mem-0001`…), licznik kaskady `forget`.
+//! - [`FakeMemoryService`] (F7): silnik [`MemoryEngine`] z `memory-contract` nad magazynem w
+//!   pamięci [`FakeBackend`] — ta sama logika co `memory-impl` (uprawnienia, prywatność, wersje,
+//!   kaskada, dziennik), wyszukiwanie leksykalne po rdzeniach zamiast FTS + wektorów.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -12,9 +15,28 @@ use std::sync::{Mutex, MutexGuard, PoisonError};
 use chrono::{DateTime, TimeZone, Utc};
 use lib_sqlstore::search_tokens;
 use memory_contract::{
-    ForgetReport, Memory, MemoryEntry, MemoryError, MemoryId, MemoryScope, NewMemory, Recalled,
-    RememberMode, SessionId, check_promotion, is_expired, recall_sessions, validate_new,
+    EnginePorts, ForgetReport, Memory, MemoryEngine, MemoryEntry, MemoryError, MemoryId,
+    MemoryScope, NewMemory, Recalled, RememberMode, SessionId, check_promotion, is_expired,
+    recall_sessions, validate_new,
 };
+
+mod backend;
+
+pub use backend::FakeBackend;
+
+/// Pamięć F7 atrapy: silnik kontraktu nad magazynem w pamięci.
+pub type FakeMemoryService = MemoryEngine<FakeBackend>;
+
+/// Pamięć F7 z portami deterministycznymi (zegar wirtualny, kolejne identyfikatory, wszystkie
+/// sesje publiczne, reranker heurystyczny).
+pub fn service() -> FakeMemoryService {
+    MemoryEngine::new(FakeBackend::new(), EnginePorts::deterministic())
+}
+
+/// Pamięć F7 z podanymi portami.
+pub fn service_with(ports: EnginePorts) -> FakeMemoryService {
+    MemoryEngine::new(FakeBackend::new(), ports)
+}
 
 #[derive(Debug, Default)]
 struct State {
@@ -86,19 +108,8 @@ impl Memory for FakeMemory {
         let session = validate_new(&new, mode)?;
         let mut st = self.lock();
         st.next_id += 1;
-        let entry = MemoryEntry {
-            id: MemoryId(format!("mem-{:04}", st.next_id)),
-            trusted: new.provenance.is_trusted(),
-            scope: new.scope,
-            layer: new.layer,
-            text: new.text,
-            entities: new.entities,
-            provenance: new.provenance,
-            confidence: new.confidence,
-            ttl_secs: new.ttl_secs,
-            created_at: st.now(),
-            approved: mode == RememberMode::Explicit,
-        };
+        let id = MemoryId(format!("mem-{:04}", st.next_id));
+        let entry = MemoryEntry::from_new(id, new, st.now(), mode == RememberMode::Explicit);
         st.entries
             .entry(session)
             .or_default()

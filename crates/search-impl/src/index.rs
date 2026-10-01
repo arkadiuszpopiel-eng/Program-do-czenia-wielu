@@ -170,3 +170,11 @@ pub fn remove_doc(conn: &Connection, id: &DocId) -> Result<RemoveReport, SearchE
         vectors,
     })
 }
+
+/// Zatarcie usuniętych danych indeksu: FTS5 `optimize` scala segmenty (znikają wpisy usuniętych
+/// dokumentów z `search_fts_data`); `vec0` zeruje wektor przy usunięciu sam.
+pub fn compact(conn: &Connection) -> Result<(), SearchError> {
+    conn.execute("INSERT INTO search_fts(search_fts) VALUES ('optimize')", [])
+        .map_err(storage)?;
+    Ok(())
+}

@@ -191,3 +191,60 @@ where
         case(&*harness);
     }
 }
+
+/// `TxSearcher` + `TxIndexer` w połączeniu wywołującego (baza zakresu pamięci): FTS „dowolne słowo”
+/// (OR) i „wszystkie słowa” (AND), osobny tekst embeddingu, filtr rodzajów, etykieta bazy,
+/// usunięcie i zatarcie (`compact_in`). `conn` — świeża baza (w `-impl` szyfrowana z sqlite-vec).
+pub fn tx_search_suite(
+    indexer: &dyn crate::api::TxIndexer,
+    searcher: &dyn crate::api::TxSearcher,
+    conn: &lib_sqlstore::rusqlite::Connection,
+) {
+    use crate::types::ConnQuery;
+    let label = sid("@global");
+    ok(indexer.prepare(conn));
+    for (key, text) in [
+        ("m1", "Herbata zielona bez cukru"),
+        ("m2", "Kawa czarna z cukrem"),
+        ("m3", "Rower stoi w garażu"),
+    ] {
+        ok(indexer.index_in(conn, &doc("@global", DocKind::Memory, key, text)));
+    }
+    ok(indexer.index_in(
+        conn,
+        &doc("@global", DocKind::Turn, "t1", "Herbata w turze"),
+    ));
+    let mut q = ConnQuery::hybrid("herbat kaw", 10, vec![DocKind::Memory]);
+    q.mode = Mode::Fts;
+    assert!(ok(searcher.query_in(conn, &label, &q)).is_empty(), "AND");
+    q.match_any = true;
+    let mut any = keys(&ok(searcher.query_in(conn, &label, &q)));
+    any.sort();
+    assert_eq!(any, vec!["m1", "m2"], "OR");
+    q.kinds = vec![];
+    assert_eq!(ok(searcher.query_in(conn, &label, &q)).len(), 3);
+    let mut v = ConnQuery::hybrid("xyz", 2, vec![DocKind::Memory]);
+    v.mode = Mode::Vector;
+    v.vector_text = Some("Rower stoi w garażu".into());
+    let hits = ok(searcher.query_in(conn, &label, &v));
+    assert_eq!(hits.first().map(|h| h.doc.key.as_str()), Some("m3"));
+    assert!(hits.iter().all(|h| h.session == label) && hits.len() <= 2);
+    let mut h = ConnQuery::hybrid("rower garaz", 5, vec![DocKind::Memory]);
+    h.match_any = true;
+    assert_eq!(
+        ok(searcher.query_in(conn, &label, &h))
+            .first()
+            .map(|h| h.doc.key.clone()),
+        Some("m3".into())
+    );
+    let removed = ok(indexer.remove_in(conn, &label, &DocId::new(DocKind::Memory, "m3")));
+    assert_eq!((removed.docs, removed.fts_rows, removed.vectors), (1, 1, 1));
+    ok(indexer.compact_in(conn));
+    for mode in [Mode::Fts, Mode::Vector, Mode::Hybrid] {
+        h.mode = mode;
+        let hits = ok(searcher.query_in(conn, &label, &h));
+        assert!(hits.iter().all(|x| x.doc.key != "m3"), "tryb {mode:?}");
+    }
+    h.limit = 0;
+    assert!(ok(searcher.query_in(conn, &label, &h)).is_empty());
+}

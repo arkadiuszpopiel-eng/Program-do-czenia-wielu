@@ -79,19 +79,12 @@ mod tests {
     use crate::types::{MemoryId, Provenance};
 
     fn entry(ttl: Option<u64>, provenance: Provenance) -> MemoryEntry {
-        MemoryEntry {
-            id: MemoryId("m".into()),
-            scope: MemoryScope::Session(SessionId::new("s")),
-            layer: Layer::Semantic,
-            text: "x".into(),
-            entities: vec![],
-            trusted: provenance.is_trusted(),
-            provenance,
-            confidence: 1.0,
+        let new = NewMemory {
             ttl_secs: ttl,
-            created_at: DateTime::<Utc>::default(),
-            approved: true,
-        }
+            provenance,
+            ..NewMemory::user_fact(SessionId::new("s"), "x")
+        };
+        MemoryEntry::from_new(MemoryId("m".into()), new, DateTime::<Utc>::default(), true)
     }
 
     #[test]

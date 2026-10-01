@@ -79,3 +79,62 @@ Akcja „zapamiętaj" na wiadomości (z wyborem zakresu), `/pamięć`, panel Pam
 - Atrapa bez przełącznika „bateria/pełny ekran” (konsolidacja poza v0).
 - Zdarzenia: `memory.remembered`, `memory.pending_approval`, `memory.recalled` (Debug), `memory.forgotten` —
   bez treści wpisów.
+
+## Zmiany po implementacji (F7 — pamięć pełna, `memory-*` + `memory-consolidation-*`, 2026-10-01)
+- **Silnik w kontrakcie.** Cała logika F7 jest w `memory_contract::MemoryEngine<B>` nad portem magazynu
+  `MemoryBackend` (wpisy, kandydaci wyszukiwania, transakcja z indeksem, dziennik, notatki eksportów, usunięcie
+  zakresu). `memory-impl::SqliteBackend` (SQLCipher + `search`) i `memory-fake::FakeBackend` (mapy) różnią się tylko
+  magazynem — atrapa zachowuje się jak implementacja (wzór: silnik `transfer`). Kontrakt v0 (`Memory`) zostaje jako
+  **fasada zakresu sesji** (API v0 nie niesie tożsamości wywołującego); `SqliteMemory` v0 działa dalej na tej samej
+  bazie (wspólne migracje `0001`, `0002`), pomija wersje zastąpione.
+- **Warstwy:** robocza = wpisy przypięte (`pinned`; warstwa `Working` tylko w zakresie sesji, zawsze przypięta) +
+  `working_set(sesja, zapytanie, budżet znaków)`; kompaktowanie okna kontekstu zostaje w `agent-runtime`.
+  Epizodyczna (zdarzenia, streszczenia), semantyczna (fakty z tematem `subject`), proceduralna (umiejętności).
+- **Zakresy i magazyn:** sesja → baza sesji (`SessionDbProvider`); projekt/agentka/globalna → **osobne szyfrowane
+  bazy** `memory/{global,project-<id>,agent-<id>}.db` z kluczem `alfa/memory/<zakres>` w `KeyVault`
+  (`VaultScopeDbs`; identyfikatory `[A-Za-z0-9_-]{1,64}`). Odczyt nie tworzy pustych baz.
+- **Uprawnienia** (`Accessor`): `Owner` (UI) — wszystko; `Guardian` (Strażniczka) — odczyt wszystkiego, zapis tylko
+  zmianami konsolidacji i propozycjami awansu (oczekującymi); `Agent(AgentAccess)` — zakresy względne
+  `Session/Project/Agent/Global` osobno do odczytu i zapisu (manifest roli; mosty CLI: `read_only`). Zakres
+  nieprzyznany → `Forbidden` (nie cicha pustka). Agentka nie nadaje proweniencji `User`; zapis agentki poza sesją
+  → wpis oczekujący (zgoda użytkownika). Inspektor, edycja, eksport, import, cofanie — tylko właściciel.
+- **Proweniencja:** `Provenance` + `Origin { session, turn, derived_from: [EntryRef], derivation }`
+  (`Extracted/Summary/Skill/Promoted/Edited/Imported`), `trusted`, `confidence`, `created_at`.
+- **Wersje:** sprzeczność tematu (ten sam `subject`, inna treść) przy zapisie/zatwierdzeniu → nowa wersja
+  (`version+1`, `supersedes`), stara zostaje jako `superseded {by, reason, at}`; niższe zaufanie nowszego → konflikt
+  w dzienniku. Edycja w Inspektorze = nowa wersja (`Edited`). Stan liczony: `Active/Pending/Superseded/Expired`.
+- **Prywatność:** sesja prywatna (`private`, `local_only`; nieznana → prywatna) nigdy nie zasila zakresów szerszych
+  (`PrivateSource` przy zapisie z `origin.session`, awansie, zmianach konsolidacji); treść niezaufana — tylko zakres
+  sesji, nigdy auto-zapamiętanie, nigdy awans (także przez import i zmiany konsolidacji; pochodna niezaufanego źródła
+  jest niezaufana).
+- **Recall:** kandydaci = hybryda FTS (rdzenie słów, dopasowanie „dowolne słowo”) + wektor w bazie zakresu
+  (`search_contract::TxSearcher`) → filtr aktywnych → **reranking** przez port `Reranker` (domyślnie
+  `HeuristicReranker`: pokrycie rdzeni PL z obocznościami, wynik RRF, pewność, przypięcie, zaufanie, świeżość) →
+  top-k. Pamięć podręczna 64 wyników / 30 s, czyszczona każdym zapisem.
+- **Inspektor:** `inspect` (zakresy, tekst — tylko dopasowanie leksykalne, warstwy, stany, zaufanie, przypięcie, sesja,
+  źródło, daty, stronicowanie ≤ 500), `explain` („dlaczego to pamiętam”: powody PL, źródła z istnieniem, historia
+  wersji, scalone duplikaty, pochodne, dziennik, wygaśnięcie), `edit`, `set_pinned`, `approve_as`, `export_scope`,
+  `scopes`, `journal`, `undo`.
+- **`forget` kaskadowo** (`ForgetTarget::{Entry, Scope, Session, Turn, Source}`), plan czysty `plan_cascade`:
+  nasiona → (cel „wpis”) rodzina wersji i scalone duplikaty → pochodne, gdy **którekolwiek** źródło znika (wariant
+  bezpieczniejszy niż „wyłącznie z tego źródła”; konsolidacja może odtworzyć fakt z pozostałych źródeł) →
+  przywrócenie wpisów zastąpionych przez usunięte. Wykonanie: zakresy szersze najpierw; wpis + FTS + wektor + rekordy
+  dziennika z migawkami + pamięć podręczna; po usunięciach `secure_delete`, `optimize` FTS5, `wal_checkpoint(TRUNCATE)`;
+  zakres własny → crypto-shredding (klucz + pliki); `CascadeReport` z eksportami do ponownego wygenerowania.
+  Sesja usuwana w `sessions` → najpierw `forget(Session)` (kopie w zakresach szerszych), potem crypto-shredding bazy.
+- **Dziennik i cofanie:** `apply_changes(ChangeSet)` — `Create/Supersede/Resolve/Merge/Expire/MarkConsolidated/
+  FlagConflict`, atomowo w zakresie, rekord z migawkami i `run`; `undo` (wygaszenie nieodwracalne — dziennik nie
+  trzyma treści wygaszonych).
+- **`transfer`:** `MemoryDocuments` = `DocumentStore` kategorii `memory` (`global.ndjson`, `project/<id>.ndjson`,
+  `agent/<id>.ndjson`, `session/<id>.ndjson`; linia = wpis z wersjami); pamięć sesji prywatnych nie jest wystawiana;
+  zapis = import „dokładnie zawartość” z walidacją całego dokumentu (wiersz łamiący reguły → nic nie zapisano);
+  wektory budowane na nowo.
+- **Recall@5:** `memory_impl::eval` + `evals/F7/recall/` (249 zapytań PL, format na korpus użytkownika). Wynik na
+  `HashEmbedder` (CI, nieblokujący): 0,964 (hybryda), 0,948 (atrapa leksykalna). Próg 0,85 — na prawdziwym embedderze
+  w kompozycji `app-*`.
+- **Konsolidacja** — osobny moduł `memory-consolidation` (docs/modules/memory-consolidation/SPEC.md).
+- Zdarzenia dodatkowe: `memory.approved`, `memory.pinned`, `memory.edited`, `memory.promoted`,
+  `memory.changes.applied`, `memory.change.undone`, `memory.exported`, `memory.imported`,
+  `memory.consolidation.{started,finished,skipped}` — bez treści.
+- Otwarte: produkcyjny embedder wielojęzyczny (ONNX lub `ModelProvider::embed`) i reranker modelowy; stemming PL
+  w FTS5 (dziś: rdzenie po stronie pamięci); „dzielenie jawne” między projektami poza awansem.

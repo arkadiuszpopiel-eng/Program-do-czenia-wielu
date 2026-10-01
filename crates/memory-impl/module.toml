@@ -1,5 +1,6 @@
-# Manifest modułu `memory` v0 (docs/modules/memory/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
-# Brak własnych zdolności: wpisy żyją w bazie sesji (SessionDbProvider), indeks przez search-contract.
+# Manifest modułu `memory` (v0 + F7, docs/modules/memory/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Brak własnych zdolności: zakres sesji w bazie sesji (SessionDbProvider), projekt/agentka/globalna w osobnych
+# szyfrowanych bazach z kluczem w sejfie (KeyVault), indeks i zapytania przez search-contract (TxIndexer/TxSearcher).
 id = "memory"
 version = "0.0.1"
 kind = "service"

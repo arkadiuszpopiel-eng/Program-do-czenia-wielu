@@ -1,9 +1,10 @@
 //! Zapytanie w jednej bazie sesji: FTS5 (bm25), kNN `vec0` (kosinus), hybryda RRF.
 
 use lib_sqlstore::rusqlite::{Connection, params};
-use lib_sqlstore::{fts5_match, vector_to_blob};
+use lib_sqlstore::{fts5_match, search_tokens, vector_to_blob};
 use search_contract::{
-    DocId, DocKind, Embedder, Hit, Mode, Query, SearchError, SessionId, fuse_rrf, make_snippet,
+    ConnQuery, DocId, DocKind, Embedder, Hit, Mode, Query, SearchError, SessionId, fuse_rrf,
+    make_snippet,
 };
 
 use crate::index::{embed_one, storage, vec_table};
@@ -11,15 +12,69 @@ use crate::index::{embed_one, storage, vec_table};
 /// Lista rankingowa: `(rowid, wynik)` malejąco po wyniku.
 type Ranked = Vec<(i64, f32)>;
 
-fn kinds_filter(q: &Query) -> Vec<DocKind> {
-    DocKind::ALL.into_iter().filter(|k| q.accepts(*k)).collect()
+/// Zapytanie rozłożone na części (wspólne dla [`Query`] i [`ConnQuery`]).
+pub struct Parts<'a> {
+    /// Tekst FTS.
+    pub fts_text: &'a str,
+    /// Tekst embeddingu.
+    pub vector_text: &'a str,
+    /// Tryb.
+    pub mode: Mode,
+    /// Rodzaje (już przefiltrowane).
+    pub kinds: Vec<DocKind>,
+    /// FTS: dowolne słowo (OR) zamiast wszystkich (AND).
+    pub match_any: bool,
 }
 
-fn fts_list(conn: &Connection, q: &Query, n: usize) -> Result<Ranked, SearchError> {
-    let Some(expr) = fts5_match(&q.text) else {
+impl<'a> Parts<'a> {
+    /// Części zapytania użytkownika (`Query`).
+    pub fn of_query(q: &'a Query) -> Self {
+        Self {
+            fts_text: &q.text,
+            vector_text: &q.text,
+            mode: q.mode,
+            kinds: DocKind::ALL.into_iter().filter(|k| q.accepts(*k)).collect(),
+            match_any: false,
+        }
+    }
+
+    /// Części zapytania w połączeniu wywołującego (`ConnQuery`).
+    pub fn of_conn(q: &'a ConnQuery) -> Self {
+        Self {
+            fts_text: &q.text,
+            vector_text: q.vector_text(),
+            mode: q.mode,
+            kinds: DocKind::ALL.into_iter().filter(|k| q.accepts(*k)).collect(),
+            match_any: q.match_any,
+        }
+    }
+}
+
+/// Wyrażenie FTS5 „dowolne słowo”: `"a"* OR "b"*` (słowa cytowane — składnia użytkownika nie
+/// przechodzi).
+fn fts5_match_any(text: &str) -> Option<String> {
+    let terms = search_tokens(text);
+    if terms.is_empty() {
+        return None;
+    }
+    let parts: Vec<String> = terms
+        .iter()
+        .map(|t| format!("\"{}\"*", t.replace('"', "\"\"")))
+        .collect();
+    Some(parts.join(" OR "))
+}
+
+fn fts_list(conn: &Connection, q: &Parts<'_>, n: usize) -> Result<Ranked, SearchError> {
+    let expr = if q.match_any {
+        fts5_match_any(q.fts_text)
+    } else {
+        fts5_match(q.fts_text)
+    };
+    let Some(expr) = expr else {
         return Ok(Vec::new());
     };
-    let kinds: String = kinds_filter(q)
+    let kinds: String = q
+        .kinds
         .iter()
         .map(|k| format!(",{},", k.as_str()))
         .collect();
@@ -42,12 +97,12 @@ fn fts_list(conn: &Connection, q: &Query, n: usize) -> Result<Ranked, SearchErro
 fn vector_list(
     conn: &Connection,
     embedder: &dyn Embedder,
-    q: &Query,
+    q: &Parts<'_>,
     n: usize,
 ) -> Result<Ranked, SearchError> {
-    let blob = vector_to_blob(&embed_one(embedder, &q.text)?);
+    let blob = vector_to_blob(&embed_one(embedder, q.vector_text)?);
     let mut all: Vec<(i64, f64)> = Vec::new();
-    for kind in kinds_filter(q) {
+    for kind in q.kinds.iter().copied() {
         let sql = format!(
             "SELECT rowid, distance FROM {} WHERE embedding MATCH ?1 AND k = ?2",
             vec_table(kind)
@@ -89,7 +144,7 @@ pub fn query_conn(
     conn: &Connection,
     embedder: &dyn Embedder,
     session: &SessionId,
-    q: &Query,
+    q: &Parts<'_>,
     limit: usize,
     snippet_chars: usize,
 ) -> Result<Vec<Hit>, SearchError> {
@@ -110,7 +165,7 @@ pub fn query_conn(
     for (rowid, score) in ranked.into_iter().take(limit) {
         if let Some((doc, text)) = load_doc(conn, rowid)? {
             hits.push(Hit {
-                snippet: make_snippet(&text, &q.text, snippet_chars),
+                snippet: make_snippet(&text, q.vector_text, snippet_chars),
                 doc,
                 session: session.clone(),
                 score,

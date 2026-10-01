@@ -82,3 +82,13 @@ FTS zapytanie ≤ 30 ms na 100k tur; wyniki palety ≤ 16 ms/znak (z `ui-shell`)
 - Zdarzenia: `search.query` (Debug, tylko liczniki), `search.removed`.
 - Pomiary (debug): 1000 dokumentów, FTS 0,5–1,1 ms, kNN 0,6–1,8 ms, hybryda 1,0–2,8 ms; indeksowanie 1000
   dokumentów, każdy we własnej transakcji: 0,8–0,96 s (0,51 s z kodem C w `opt-level = 3`).
+
+## Zmiany dla `memory` F7 (2026-10-01; addytywne)
+- **`TxSearcher::query_in(conn, label, &ConnQuery)`** — zapytanie w połączeniu modułu-właściciela bazy (pamięć w bazie
+  zakresu projektu/agentki/globalnego albo sesji), bez `authorize` (moduł sam sprawdził uprawnienia); `label` trafia do
+  `Hit::session`. `ConnQuery { text, vector_text, mode, limit, kinds, match_any }`: osobny tekst FTS i embeddingu,
+  `match_any = true` → FTS „dowolne słowo” (`"a"* OR "b"*`, ranking bm25) — recall pamięci po rdzeniach.
+- **`TxIndexer::compact_in(conn)`** (domyślnie nic) — w `-impl` FTS5 `optimize`: słowa usuniętych dokumentów znikają
+  z segmentów indeksu (test: surowe tabele bez słowa po `remove_in` + `compact_in`); `vec0` zeruje wektor sam.
+- Atrapa: `FakeSearch` implementuje `TxSearcher` (indeks w pamięci po etykiecie). Kontrakt: `tx_search_suite`
+  (AND/OR, osobny tekst embeddingu, rodzaje, etykieta, usunięcie, zatarcie) na `-fake` i `-impl`.

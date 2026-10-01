@@ -25,3 +25,13 @@ fn deterministic_ids_and_forget_counter() {
     assert_eq!(a.forget_count(), 1);
     assert!(a.list(&scope).unwrap().is_empty());
 }
+
+#[test]
+fn contract_suite_v0_on_engine() {
+    contract_tests::run_all(|| Box::new(memory_fake::service()));
+}
+
+#[test]
+fn contract_suite_f7() {
+    memory_contract::contract_tests_f7::run_all(|ports| Box::new(memory_fake::service_with(ports)));
+}

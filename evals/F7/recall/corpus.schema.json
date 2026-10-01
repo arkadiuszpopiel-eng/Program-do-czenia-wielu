@@ -1,0 +1,65 @@
+{
+  "$defs": {
+    "Layer": {
+      "description": "Warstwa pamięci.",
+      "oneOf": [
+        {
+          "const": "working",
+          "description": "Robocza (RAM + checkpoint) — poza v0.",
+          "type": "string"
+        },
+        {
+          "const": "episodic",
+          "description": "Epizodyczna (zdarzenia, streszczenia).",
+          "type": "string"
+        },
+        {
+          "const": "semantic",
+          "description": "Semantyczna (fakty, preferencje).",
+          "type": "string"
+        },
+        {
+          "const": "procedural",
+          "description": "Proceduralna (umiejętności, pliki) — poza v0.",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Wpis korpusu (linia `corpus.ndjson`).",
+  "properties": {
+    "id": {
+      "description": "Identyfikator (`[A-Za-z0-9_-]`, unikalny).",
+      "type": "string"
+    },
+    "layer": {
+      "$ref": "#/$defs/Layer",
+      "description": "Warstwa (`semantic`, `episodic`, `procedural`)."
+    },
+    "scope": {
+      "description": "Zakres: `global`, `project:<id>`, `agent:<id>`, `session:<id>`.",
+      "type": "string"
+    },
+    "subject": {
+      "description": "Temat (opcjonalnie).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "text": {
+      "description": "Treść.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "scope",
+    "layer",
+    "text"
+  ],
+  "title": "CorpusItem",
+  "type": "object"
+}

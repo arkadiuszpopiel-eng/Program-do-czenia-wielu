@@ -3,7 +3,7 @@
 use lib_sqlstore::rusqlite::Connection;
 
 use crate::error::SearchError;
-use crate::types::{Caller, Doc, DocId, Hit, Query, RemoveReport};
+use crate::types::{Caller, ConnQuery, Doc, DocId, Hit, Query, RemoveReport};
 use core_bus_contract::SessionId;
 
 /// Usługa wyszukiwania (UI, pamięć, narzędzia agentek w obrębie własnej sesji).
@@ -33,6 +33,27 @@ pub trait TxIndexer: Send + Sync {
         session: &SessionId,
         id: &DocId,
     ) -> Result<RemoveReport, SearchError>;
+
+    /// Zaciera dane usuniętych dokumentów w indeksie (FTS5 `optimize` scala segmenty, więc słowa
+    /// usuniętych dokumentów znikają także z wewnętrznych tabel indeksu). Wywoływane po kaskadzie
+    /// `forget` poza transakcją. Domyślnie nic nie robi.
+    fn compact_in(&self, conn: &Connection) -> Result<(), SearchError> {
+        let _ = conn;
+        Ok(())
+    }
+}
+
+/// Zapytanie **w połączeniu modułu, który jest właścicielem bazy** (np. `memory` w bazie zakresu
+/// projektu/agentki/globalnego albo w bazie sesji) — bez [`crate::authorize`]: moduł wywołujący
+/// sam sprawdził uprawnienia do bazy. `label` trafia do [`Hit::session`] (etykieta bazy).
+pub trait TxSearcher: Send + Sync {
+    /// Trafienia w jednej bazie, deterministycznie posortowane (co najwyżej `query.limit`).
+    fn query_in(
+        &self,
+        conn: &Connection,
+        label: &SessionId,
+        query: &ConnQuery,
+    ) -> Result<Vec<Hit>, SearchError>;
 }
 
 /// Lokalny embedder tekstu (ONNX w F7; w testach deterministyczna atrapa z `search-fake`).

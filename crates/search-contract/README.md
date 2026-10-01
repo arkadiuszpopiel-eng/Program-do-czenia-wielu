@@ -11,3 +11,6 @@ Kontrakt modułu `search` (docs/modules/search/SPEC.md).
   `Ctrl+Shift+F`), otwiera wiele baz — **nigdy narzędzie agentki**.
 - `contract_tests` (feature): FTS bez diakrytyków + podświetlenia, wektor/hybryda, rodzaje/limit/determinizm,
   zastąpienie dokumentu, kaskada usunięcia, izolacja agentki (0/1000).
+- F7 (addytywnie): `TxSearcher::query_in` + `ConnQuery` — zapytanie w połączeniu modułu-właściciela bazy (np.
+  `memory` w bazie zakresu globalnego), osobny tekst FTS i embeddingu, FTS „dowolne słowo” (`match_any`);
+  `TxIndexer::compact_in` — zatarcie usuniętych danych indeksu (FTS5 `optimize`); `contract_tests::tx_search_suite`.

@@ -17,7 +17,7 @@ pub struct Outbox {
 }
 
 impl Outbox {
-    fn start(&self, bus: Arc<dyn EventBus>) -> Result<(), ModuleError> {
+    pub(crate) fn start(&self, bus: Arc<dyn EventBus>) -> Result<(), ModuleError> {
         let mut guard = self.tx.lock().unwrap_or_else(PoisonError::into_inner);
         if guard.is_some() {
             return Err(ModuleError::AlreadyStarted);
@@ -32,7 +32,7 @@ impl Outbox {
         Ok(())
     }
 
-    fn stop(&self) -> Result<(), ModuleError> {
+    pub(crate) fn stop(&self) -> Result<(), ModuleError> {
         self.tx
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -41,7 +41,7 @@ impl Outbox {
             .ok_or(ModuleError::NotStarted)
     }
 
-    fn started(&self) -> bool {
+    pub(crate) fn started(&self) -> bool {
         self.tx
             .lock()
             .unwrap_or_else(PoisonError::into_inner)

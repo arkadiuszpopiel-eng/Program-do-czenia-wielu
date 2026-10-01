@@ -20,12 +20,13 @@ mod types;
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
 
-pub use api::{Embedder, Search, TxIndexer};
+pub use api::{Embedder, Search, TxIndexer, TxSearcher};
 pub use error::SearchError;
 pub use rules::{MAX_LIMIT, RRF_K, authorize, fuse_rrf, sort_hits};
 pub use snippet::{DEFAULT_SNIPPET_CHARS, make_snippet};
 pub use types::{
-    Caller, Doc, DocId, DocKind, Highlight, Hit, Mode, Query, RemoveReport, SessionSet, Snippet,
+    Caller, ConnQuery, Doc, DocId, DocKind, Highlight, Hit, Mode, Query, RemoveReport, SessionSet,
+    Snippet,
 };
 
 pub use core_bus_contract::SessionId;

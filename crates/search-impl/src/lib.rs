@@ -7,6 +7,10 @@
 //!
 //! Wyszukiwanie między sesjami (`SessionSet::Many/All`) to funkcja UI właściciela — otwiera wiele
 //! baz przez dostawcę; agentka dostaje wyłącznie własną sesję (`search_contract::authorize`).
+//!
+//! [`TxSearcher`] pyta w połączeniu modułu-właściciela bazy (np. `memory` w bazie zakresu globalnego
+//! lub projektu) — FTS z dopasowaniem „dowolne słowo” dla recall pamięci; [`TxIndexer::compact_in`]
+//! scala segmenty FTS5, żeby słowa usuniętych dokumentów nie zostały w tabelach indeksu.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -22,8 +26,9 @@ use core_registry_contract::{ManifestError, ModuleManifest};
 use lib_sqlstore::Db;
 use lib_sqlstore::rusqlite::Connection;
 use search_contract::{
-    Caller, DEFAULT_SNIPPET_CHARS, Doc, DocId, Embedder, Hit, MAX_LIMIT, Query, RemoveReport,
-    Search, SearchError, SessionId, SessionSet, TxIndexer, authorize, events as names, sort_hits,
+    Caller, ConnQuery, DEFAULT_SNIPPET_CHARS, Doc, DocId, Embedder, Hit, MAX_LIMIT, Query,
+    RemoveReport, Search, SearchError, SessionId, SessionSet, TxIndexer, TxSearcher, authorize,
+    events as names, sort_hits,
 };
 use serde_json::json;
 use sessions_contract::{SessionDbProvider, SessionError};
@@ -139,7 +144,7 @@ impl Search for SqliteSearch {
                     conn,
                     self.embedder.as_ref(),
                     session,
-                    query,
+                    &query::Parts::of_query(query),
                     limit,
                     self.snippet_chars,
                 )
@@ -175,5 +180,35 @@ impl TxIndexer for SqliteSearch {
     ) -> Result<RemoveReport, SearchError> {
         index::prepare(conn, self.embedder.as_ref())?;
         index::remove_doc(conn, id)
+    }
+
+    fn compact_in(&self, conn: &Connection) -> Result<(), SearchError> {
+        index::prepare(conn, self.embedder.as_ref())?;
+        index::compact(conn)
+    }
+}
+
+impl TxSearcher for SqliteSearch {
+    fn query_in(
+        &self,
+        conn: &Connection,
+        label: &SessionId,
+        query: &ConnQuery,
+    ) -> Result<Vec<Hit>, SearchError> {
+        let limit = query.limit.min(MAX_LIMIT);
+        if limit == 0 {
+            return Ok(Vec::new());
+        }
+        index::prepare(conn, self.embedder.as_ref())?;
+        let mut hits = query::query_conn(
+            conn,
+            self.embedder.as_ref(),
+            label,
+            &query::Parts::of_conn(query),
+            limit,
+            self.snippet_chars,
+        )?;
+        sort_hits(&mut hits);
+        Ok(hits)
     }
 }

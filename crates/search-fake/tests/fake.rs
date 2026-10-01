@@ -12,6 +12,13 @@ fn contract_suite() {
     contract_tests::run_all(|| Box::new(FakeSearch::new()));
 }
 
+#[test]
+fn tx_search_suite_in_memory() {
+    let conn = lib_sqlstore::rusqlite::Connection::open_in_memory().unwrap();
+    let s = FakeSearch::new();
+    contract_tests::tx_search_suite(&s, &s, &conn);
+}
+
 proptest! {
     #![proptest_config(ProptestConfig { cases: 64, failure_persistence: None, ..ProptestConfig::default() })]
 

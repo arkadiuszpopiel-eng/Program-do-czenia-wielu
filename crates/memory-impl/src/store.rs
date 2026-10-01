@@ -10,18 +10,35 @@ use search_contract::{Doc, DocId, DocKind, TxIndexer};
 /// Przestrzeń nazw migracji.
 pub const NAMESPACE: &str = "memory";
 
-/// Migracje: wpis jako JSON (`body`) + kolumny do filtrowania i porządku.
-pub const MIGRATIONS: &[(&str, &str)] = &[(
-    "0001",
-    "CREATE TABLE memory_entries(
+/// Migracje: wpis jako JSON (`body`) + kolumny do filtrowania i porządku (0001, v0); dziennik
+/// zmian z migawkami i notatki eksportów (0002, F7). Wspólne dla v0 i silnika F7 — ta sama baza
+/// sesji może być otwierana przez oba (nowe pola wpisu mają wartości domyślne serde).
+pub const MIGRATIONS: &[(&str, &str)] = &[
+    (
+        "0001",
+        "CREATE TABLE memory_entries(
         id TEXT PRIMARY KEY,
         body TEXT NOT NULL,
         approved INTEGER NOT NULL,
         created_at INTEGER NOT NULL
     ) WITHOUT ROWID;",
-)];
+    ),
+    (
+        "0002",
+        "CREATE TABLE memory_journal(
+        id TEXT PRIMARY KEY,
+        at INTEGER NOT NULL,
+        run TEXT,
+        body TEXT NOT NULL
+    ) WITHOUT ROWID;
+    CREATE TABLE memory_exports(
+        name TEXT PRIMARY KEY,
+        at INTEGER NOT NULL
+    ) WITHOUT ROWID;",
+    ),
+];
 
-fn storage(e: impl std::fmt::Display) -> MemoryError {
+pub(crate) fn storage(e: impl std::fmt::Display) -> MemoryError {
     MemoryError::storage(e)
 }
 
@@ -32,12 +49,12 @@ pub struct Store<'a> {
     session: SessionId,
 }
 
-fn prepare(conn: &Connection, indexer: &dyn TxIndexer) -> Result<(), MemoryError> {
+pub(crate) fn prepare(conn: &Connection, indexer: &dyn TxIndexer) -> Result<(), MemoryError> {
     migrate(conn, NAMESPACE, MIGRATIONS).map_err(storage)?;
     indexer.prepare(conn).map_err(storage)
 }
 
-fn doc_id(id: &MemoryId) -> DocId {
+pub(crate) fn doc_id(id: &MemoryId) -> DocId {
     DocId::new(DocKind::Memory, id.0.clone())
 }
 

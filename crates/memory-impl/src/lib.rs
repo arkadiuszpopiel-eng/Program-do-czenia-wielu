@@ -1,14 +1,25 @@
-//! Implementacja modułu `memory` v0 (docs/modules/memory/SPEC.md, PLAN §10, ADR 0008).
+//! Implementacja modułu `memory` (docs/modules/memory/SPEC.md, PLAN §10, ADR 0008).
 //!
-//! Wpisy zakresu `sesja` żyją w tabeli `memory_entries` **szyfrowanej bazy sesji**
-//! ([`SessionDbProvider`]); indeks FTS + wektor to dokumenty `DocKind::Memory` modułu `search`,
-//! zapisywane w tej samej transakcji ([`TxIndexer`]). `recall` = hybryda (RRF) przez [`Search`]
-//! wywoływany jako agentka tej sesji (najmniejsze uprawnienia). `forget` usuwa wpis, wiersz FTS i
-//! wektor w jednej transakcji i zwraca raport kaskady.
+//! **v0** ([`SqliteMemory`]): wpisy zakresu `sesja` w tabeli `memory_entries` **szyfrowanej bazy
+//! sesji** ([`SessionDbProvider`]); indeks FTS + wektor to dokumenty `DocKind::Memory` modułu
+//! `search`, zapisywane w tej samej transakcji ([`TxIndexer`]). `recall` = hybryda (RRF) przez
+//! [`Search`] wywoływany jako agentka tej sesji. `forget` usuwa wpis, FTS i wektor w jednej
+//! transakcji.
+//!
+//! **F7** ([`MemoryModule`], [`SqliteMemoryService`]): silnik `memory-contract` nad
+//! [`SqliteBackend`] — zakresy sesji w bazach sesji, projekt/agentka/globalna w osobnych
+//! szyfrowanych bazach z kluczem w sejfie ([`VaultScopeDbs`], crypto-shredding), recall przez
+//! [`search_contract::TxSearcher`] w bazie zakresu, dziennik zmian, zatarcie po usunięciach;
+//! adapter `transfer` ([`MemoryDocuments`]); zestaw recall@k ([`eval`], `evals/F7/recall/`).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod backend;
+mod documents;
+pub mod eval;
 mod events;
+mod scopes;
+mod service;
 mod store;
 
 use std::sync::Arc;
@@ -27,6 +38,10 @@ use sessions_contract::SessionDbProvider;
 
 use crate::events::Outbox;
 
+pub use backend::{SqliteBackend, index_label};
+pub use documents::MemoryDocuments;
+pub use scopes::{ScopeDbs, VaultScopeDbs, scope_file_name, scope_key_name};
+pub use service::{CatalogPrivacy, MemoryModule, MemoryParts, SqliteMemoryService, UuidIds};
 pub use store::{MIGRATIONS, NAMESPACE};
 
 /// Treść `module.toml` tego modułu.
@@ -105,6 +120,7 @@ impl SqliteMemory {
             let id = MemoryId(hit.doc.key);
             if let Some(entry) = store.load(&id)?
                 && entry.approved
+                && entry.superseded.is_none()
                 && !is_expired(&entry, now)
             {
                 out.push(Recalled {
@@ -120,19 +136,8 @@ impl SqliteMemory {
 impl Memory for SqliteMemory {
     fn remember(&self, new: NewMemory, mode: RememberMode) -> Result<MemoryEntry, MemoryError> {
         let session = validate_new(&new, mode)?;
-        let entry = MemoryEntry {
-            id: MemoryId(uuid::Uuid::now_v7().to_string()),
-            trusted: new.provenance.is_trusted(),
-            scope: new.scope,
-            layer: new.layer,
-            text: new.text,
-            entities: new.entities,
-            provenance: new.provenance,
-            confidence: new.confidence,
-            ttl_secs: new.ttl_secs,
-            created_at: Utc::now(),
-            approved: mode == RememberMode::Explicit,
-        };
+        let id = MemoryId(uuid::Uuid::now_v7().to_string());
+        let entry = MemoryEntry::from_new(id, new, Utc::now(), mode == RememberMode::Explicit);
         self.store(&session)?.insert(&entry)?;
         let payload = json!({
             "memory": entry.id, "layer": entry.layer, "trusted": entry.trusted, "approved": entry.approved,

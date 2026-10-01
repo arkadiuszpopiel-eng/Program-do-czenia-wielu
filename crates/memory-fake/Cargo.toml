@@ -1,6 +1,6 @@
 [package]
 name = "memory-fake"
-description = "Pamięć v0: deterministyczna atrapa w pamięci (dopasowanie słów, wirtualny zegar, licznik kaskady forget)"
+description = "Pamięć: deterministyczne atrapy — v0 w pamięci oraz silnik F7 z memory-contract nad magazynem w pamięci (dopasowanie rdzeni, wirtualny zegar, licznik kaskady)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

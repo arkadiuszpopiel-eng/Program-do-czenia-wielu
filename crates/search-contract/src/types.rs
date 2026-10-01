@@ -151,6 +151,51 @@ impl Query {
     }
 }
 
+/// Zapytanie [`crate::TxSearcher::query_in`] (w bazie wywołującego).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct ConnQuery {
+    /// Tekst do FTS (słowa cytowane, prefiksy).
+    pub text: String,
+    /// Tekst do embeddingu (`None` = `text`).
+    #[serde(default)]
+    pub vector_text: Option<String>,
+    /// Tryb.
+    pub mode: Mode,
+    /// Maksymalna liczba trafień (przycinana do [`crate::MAX_LIMIT`]).
+    pub limit: usize,
+    /// Rodzaje dokumentów (pusta lista = wszystkie).
+    #[serde(default)]
+    pub kinds: Vec<DocKind>,
+    /// FTS: `false` — wszystkie słowa (AND, jak [`Query`]); `true` — dowolne słowo (OR; ranking
+    /// bm25 premiuje dokumenty z większą liczbą słów) — recall pamięci po rdzeniach słów.
+    #[serde(default)]
+    pub match_any: bool,
+}
+
+impl ConnQuery {
+    /// Zapytanie hybrydowe (AND) o podanych rodzajach.
+    pub fn hybrid(text: impl Into<String>, limit: usize, kinds: Vec<DocKind>) -> Self {
+        Self {
+            text: text.into(),
+            vector_text: None,
+            mode: Mode::Hybrid,
+            limit,
+            kinds,
+            match_any: false,
+        }
+    }
+
+    /// Tekst embeddingu.
+    pub fn vector_text(&self) -> &str {
+        self.vector_text.as_deref().unwrap_or(&self.text)
+    }
+
+    /// Czy rodzaj przechodzi przez filtr.
+    pub fn accepts(&self, kind: DocKind) -> bool {
+        self.kinds.is_empty() || self.kinds.contains(&kind)
+    }
+}
+
 /// Podświetlony zakres w [`Snippet::text`] (indeksy znaków, nie bajtów; `end` wyłącznie).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Highlight {
