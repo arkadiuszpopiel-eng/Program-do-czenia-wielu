@@ -71,8 +71,19 @@ impl KernelGuard {
         if inside(&p, &self.windows) {
             return Some(KernelRule::SystemRootDeletion);
         }
-        if destroys && scope.subtree() && inside(&self.windows, &p) {
+        // Usunięcie katalogu jest rekurencyjne niezależnie od rodzaju zakresu (`fs_delete` prosi
+        // o zakres dokładny): przodek `%SystemRoot%` albo obszaru Jądra = blokada (SR-07).
+        if destroys && inside(&self.windows, &p) {
             return Some(KernelRule::SystemRootDeletion);
+        }
+        if destroys
+            && self
+                .policy
+                .kernel_paths
+                .iter()
+                .any(|k| inside(&k.norm(), &p))
+        {
+            return Some(KernelRule::KernelPolicyChange);
         }
         None
     }
@@ -133,10 +144,16 @@ impl KernelGuard {
                     .as_deref()
                     .and_then(|c| check_command(c, &self.shell_ctx(Some(s))))
             }),
-            Capability::GuiControl(app) => self
-                .policy
-                .is_protected_process(app)
-                .then_some(KernelRule::GuiControlOfKernelProcess),
+            Capability::GuiControl(app) => {
+                if self.policy.is_protected_process(app) {
+                    Some(KernelRule::GuiControlOfKernelProcess)
+                } else {
+                    // Aplikacje dostawców planów: agentka nie „używa” ich UI (SR-09).
+                    self.policy
+                        .is_provider_app(app)
+                        .then_some(KernelRule::ProviderWebUi)
+                }
+            }
             Capability::NetEgress(host) => self.egress_rule(host),
             Capability::SecretsRead(_) => None,
             Capability::SystemAdmin(op) => self.admin_rule(op),

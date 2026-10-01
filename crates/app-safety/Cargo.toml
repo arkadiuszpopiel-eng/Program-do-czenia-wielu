@@ -33,6 +33,7 @@ watchdog-impl = { path = "../watchdog-impl" }
 compliance-contract = { path = "../compliance-contract" }
 platform-contract.workspace = true
 platform-windows-impl = { path = "../platform-windows-impl" }
+platform-windows-kernel-impl = { path = "../platform-windows-kernel-impl" }
 serde_json.workspace = true
 tokio.workspace = true
 

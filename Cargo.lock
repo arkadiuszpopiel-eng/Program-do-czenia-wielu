@@ -128,6 +128,63 @@ dependencies = [
 ]
 
 [[package]]
+name = "agent-runtime-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "personas-contract",
+ "proptest",
+ "providers-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "agent-runtime-fake"
+version = "0.0.1"
+dependencies = [
+ "agent-runtime-contract",
+ "async-trait",
+ "safety-broker-contract",
+ "tokio",
+ "tokio-util",
+]
+
+[[package]]
+name = "agent-runtime-impl"
+version = "0.0.1"
+dependencies = [
+ "agent-runtime-contract",
+ "async-trait",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "futures-util",
+ "personas-contract",
+ "proptest",
+ "providers-contract",
+ "providers-fake",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tokio-util",
+ "tools-common-contract",
+ "tools-fs-contract",
+ "tools-fs-fake",
+ "uuid",
+]
+
+[[package]]
 name = "ahash"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -190,11 +247,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb5dfbc6d8d2675589ccbe4d0fd61df2419075625f8c1a62325e718e2b0049f9"
 
 [[package]]
+name = "app-api"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "artifacts-contract",
+ "async-trait",
+ "chrono",
+ "core-config-contract",
+ "cost-meter-contract",
+ "memory-contract",
+ "personas-contract",
+ "providers-contract",
+ "search-contract",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+ "thiserror",
+ "tokio",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
 name = "app-core"
 version = "0.0.1"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-impl",
+ "app-api",
+ "app-modules",
  "artifacts-contract",
  "artifacts-impl",
  "async-trait",
@@ -219,6 +301,8 @@ dependencies = [
  "lib-sqlstore",
  "memory-contract",
  "memory-impl",
+ "model-residency-contract",
+ "model-residency-impl",
  "personas-contract",
  "personas-impl",
  "platform-contract",
@@ -226,21 +310,90 @@ dependencies = [
  "providers-api-impl",
  "providers-contract",
  "providers-fake",
+ "providers-local-impl",
  "reqwest",
+ "risk-classifier-contract",
+ "risk-classifier-impl",
+ "router-contract",
+ "router-impl",
+ "safety-broker-contract",
+ "safety-broker-impl",
  "scheduler-lite-contract",
  "scheduler-lite-impl",
  "search-contract",
  "search-impl",
+ "semver",
  "serde",
  "serde_json",
  "sessions-contract",
  "sessions-impl",
  "tempfile",
- "thiserror",
+ "tokio",
+ "toml",
+ "tracing",
+ "transfer-contract",
+ "transfer-impl",
+ "undo-journal-contract",
+ "undo-journal-impl",
+ "updater-contract",
+ "updater-impl",
+ "uuid",
+ "voice-audio-contract",
+ "voice-audio-fake",
+ "voice-audio-impl",
+ "voice-tts-contract",
+ "voice-tts-fake",
+ "voice-tts-impl",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "app-modules"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "app-api",
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "core-config-impl",
+ "personas-contract",
+ "providers-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-impl",
+ "sessions-contract",
  "tokio",
  "tracing",
- "uuid",
- "zeroize",
+ "transfer-contract",
+ "transfer-impl",
+ "undo-journal-contract",
+ "undo-journal-impl",
+ "voice-audio-contract",
+ "voice-tts-contract",
+ "voice-tts-impl",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "app-safety"
+version = "0.0.1"
+dependencies = [
+ "broker-ui-contract",
+ "broker-ui-impl",
+ "compliance-contract",
+ "platform-contract",
+ "platform-fake",
+ "platform-windows-impl",
+ "platform-windows-kernel-impl",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-impl",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "watchdog-contract",
+ "watchdog-impl",
 ]
 
 [[package]]
@@ -436,6 +589,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "broker-ui-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "platform-contract",
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "broker-ui-fake"
+version = "0.0.1"
+dependencies = [
+ "broker-ui-contract",
+ "safety-broker-contract",
+]
+
+[[package]]
+name = "broker-ui-impl"
+version = "0.0.1"
+dependencies = [
+ "broker-ui-contract",
+ "compliance-contract",
+ "core-registry-contract",
+ "platform-contract",
+ "platform-fake",
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "tokio",
+ "watchdog-contract",
+]
+
+[[package]]
 name = "bstr"
 version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -578,6 +769,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "core-bus-contract",
+ "idna",
  "proptest",
  "schemars",
  "serde",
@@ -2613,6 +2805,7 @@ dependencies = [
 name = "platform-windows-impl"
 version = "0.0.1"
 dependencies = [
+ "compliance-contract",
  "core-registry-contract",
  "platform-contract",
  "proptest",
@@ -2621,6 +2814,14 @@ dependencies = [
  "tempfile",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "platform-windows-kernel-impl"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "windows",
 ]
 
 [[package]]
@@ -3446,6 +3647,7 @@ dependencies = [
  "getrandom 0.4.3",
  "hmac",
  "platform-contract",
+ "platform-fake",
  "risk-classifier-contract",
  "safety-broker-contract",
  "serde",
@@ -4264,6 +4466,174 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
+name = "tools-clipboard-contract"
+version = "0.0.1"
+dependencies = [
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-clipboard-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-clipboard-contract",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-clipboard-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-contract",
+ "platform-fake",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "tokio",
+ "tools-clipboard-contract",
+ "tools-common-contract",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-common-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "platform-contract",
+ "proptest",
+ "providers-contract",
+ "regex",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tokio-util",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-fs-contract"
+version = "0.0.1"
+dependencies = [
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-fs-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-fs-contract",
+]
+
+[[package]]
+name = "tools-fs-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-contract",
+ "platform-fake",
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-fs-contract",
+ "undo-journal-contract",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-shell-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-shell-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-shell-contract",
+]
+
+[[package]]
+name = "tools-shell-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-contract",
+ "platform-fake",
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-shell-contract",
+ "undo-journal-contract",
+ "watchdog-contract",
+]
+
+[[package]]
 name = "tower"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4840,11 +5210,11 @@ name = "voice-cmd-contract"
 version = "0.0.1"
 dependencies = [
  "core-bus-contract",
+ "personas-contract",
  "schemars",
  "serde",
  "serde_json",
  "thiserror",
- "voice-persona-contract",
 ]
 
 [[package]]
@@ -4859,9 +5229,9 @@ name = "voice-cmd-impl"
 version = "0.0.1"
 dependencies = [
  "core-registry-contract",
+ "personas-contract",
  "proptest",
  "voice-cmd-contract",
- "voice-persona-contract",
 ]
 
 [[package]]
@@ -4869,21 +5239,21 @@ name = "voice-dialog-contract"
 version = "0.0.1"
 dependencies = [
  "core-bus-contract",
+ "personas-contract",
  "schemars",
  "serde",
  "serde_json",
  "thiserror",
  "voice-cmd-contract",
- "voice-persona-contract",
 ]
 
 [[package]]
 name = "voice-dialog-fake"
 version = "0.0.1"
 dependencies = [
+ "personas-contract",
  "voice-cmd-contract",
  "voice-dialog-contract",
- "voice-persona-contract",
 ]
 
 [[package]]
@@ -4891,11 +5261,11 @@ name = "voice-dialog-impl"
 version = "0.0.1"
 dependencies = [
  "core-registry-contract",
+ "personas-contract",
  "proptest",
  "voice-cmd-contract",
  "voice-dialog-contract",
  "voice-dialog-fake",
- "voice-persona-contract",
 ]
 
 [[package]]
@@ -4940,6 +5310,7 @@ name = "voice-persona-contract"
 version = "0.0.1"
 dependencies = [
  "core-bus-contract",
+ "personas-contract",
  "schemars",
  "serde",
  "serde_json",
@@ -4960,6 +5331,82 @@ dependencies = [
  "core-registry-contract",
  "proptest",
  "voice-persona-contract",
+]
+
+[[package]]
+name = "voice-pipeline-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "futures-core",
+ "personas-contract",
+ "providers-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "voice-dialog-contract",
+ "voice-persona-contract",
+ "voice-wake-contract",
+]
+
+[[package]]
+name = "voice-pipeline-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "personas-contract",
+ "tokio",
+ "voice-dialog-contract",
+ "voice-pipeline-contract",
+ "voice-wake-contract",
+]
+
+[[package]]
+name = "voice-pipeline-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "device-profile-contract",
+ "futures-core",
+ "model-residency-contract",
+ "model-residency-fake",
+ "personas-contract",
+ "proptest",
+ "providers-contract",
+ "providers-fake",
+ "scheduler-lite-contract",
+ "scheduler-lite-fake",
+ "schemars",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "voice-audio-contract",
+ "voice-audio-fake",
+ "voice-cmd-contract",
+ "voice-cmd-fake",
+ "voice-dialog-contract",
+ "voice-dsp-contract",
+ "voice-dsp-fake",
+ "voice-persona-contract",
+ "voice-persona-fake",
+ "voice-pipeline-contract",
+ "voice-stt-contract",
+ "voice-stt-fake",
+ "voice-tts-contract",
+ "voice-tts-fake",
+ "voice-turn-contract",
+ "voice-turn-fake",
+ "voice-vad-contract",
+ "voice-vad-fake",
+ "voice-wake-contract",
+ "voice-wake-fake",
 ]
 
 [[package]]
@@ -5132,6 +5579,7 @@ dependencies = [
  "core-bus-contract",
  "personas-contract",
  "platform-contract",
+ "scheduler-lite-contract",
  "schemars",
  "serde",
  "serde_json",

@@ -12,14 +12,15 @@ use platform_contract::{
 };
 use windows::Win32::Foundation::{HANDLE, HLOCAL, LocalFree};
 use windows::Win32::Security::Authorization::{
-    ConvertSidToStringSidW, ConvertStringSecurityDescriptorToSecurityDescriptorW, SDDL_REVISION_1,
-    SE_FILE_OBJECT, SetNamedSecurityInfoW,
+    ConvertSidToStringSidW, ConvertStringSecurityDescriptorToSecurityDescriptorW,
+    GetNamedSecurityInfoW, SDDL_REVISION_1, SE_FILE_OBJECT, SetNamedSecurityInfoW,
 };
 use windows::Win32::Security::{
     ACL, DACL_SECURITY_INFORMATION, GetSecurityDescriptorDacl, GetSidSubAuthority,
-    GetSidSubAuthorityCount, GetTokenInformation, PROTECTED_DACL_SECURITY_INFORMATION,
-    PSECURITY_DESCRIPTOR, PSID, SECURITY_ATTRIBUTES, TOKEN_INFORMATION_CLASS,
-    TOKEN_MANDATORY_LABEL, TOKEN_QUERY, TOKEN_USER, TokenIntegrityLevel, TokenSessionId, TokenUser,
+    GetSidSubAuthorityCount, GetTokenInformation, OWNER_SECURITY_INFORMATION,
+    PROTECTED_DACL_SECURITY_INFORMATION, PSECURITY_DESCRIPTOR, PSID, SECURITY_ATTRIBUTES,
+    TOKEN_INFORMATION_CLASS, TOKEN_MANDATORY_LABEL, TOKEN_QUERY, TOKEN_USER, TokenIntegrityLevel,
+    TokenSessionId, TokenUser,
 };
 use windows::Win32::Storage::FileSystem::{CreateDirectoryW, GetDiskFreeSpaceExW};
 use windows::Win32::System::Threading::{
@@ -178,8 +179,68 @@ pub(crate) fn current_user() -> Result<Sid, PlatformError> {
     token_user(token.raw())
 }
 
+/// Właściciele dopuszczalni dla istniejącego katalogu prywatnego (obok konta usługi).
+const TRUSTED_OWNERS: [&str; 2] = [Sid::LOCAL_SYSTEM, "S-1-5-32-544"];
+
+/// SID właściciela obiektu plikowego.
+fn path_owner(path: &Path) -> Result<Sid, PlatformError> {
+    let w = wide(path);
+    let mut sid = PSID::default();
+    let mut sd = PSECURITY_DESCRIPTOR::default();
+    // SAFETY: ścieżka zakończona zerem; `sid` wskazuje do wnętrza `sd` (pamięć systemu), które
+    // zwalniamy dopiero po skopiowaniu SID-u do napisu.
+    let err = unsafe {
+        GetNamedSecurityInfoW(
+            pcwstr(&w),
+            SE_FILE_OBJECT,
+            OWNER_SECURITY_INFORMATION,
+            Some(&raw mut sid),
+            None,
+            None,
+            None,
+            &raw mut sd,
+        )
+    };
+    if err.is_err() {
+        return Err(from_hresult(
+            "GetNamedSecurityInfoW",
+            hresult_from_win32(err.0),
+            "",
+        ));
+    }
+    let owner = sid_of(sid);
+    // SAFETY: deskryptor zaalokowany przez `GetNamedSecurityInfoW`, zwalniany dokładnie raz.
+    unsafe { LocalFree(Some(HLOCAL(sd.0))) };
+    owner
+}
+
+/// Istniejący katalog prywatny musi być zwykłym katalogiem (nie dowiązaniem ani junction —
+/// `SetNamedSecurityInfoW` poszłoby za nim) i należeć do konta usługi, SYSTEM albo
+/// Administratorów. Katalog założony zawczasu przez użytkownika (np. w `ProgramData`, gdzie
+/// każdy może tworzyć podkatalogi) zachowałby mu niejawne `WRITE_DAC` właściciela — Audyt
+/// i kotwica byłyby w zasięgu agentek mimo chronionego DACL (przegląd 2026-10, SR-08).
+fn check_existing_private_dir(path: &Path, owner: &Sid) -> Result<(), PlatformError> {
+    let meta = std::fs::symlink_metadata(path).map_err(|e| from_io(&e, path))?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
+        return Err(PlatformError::PermissionDenied(format!(
+            "{}: katalog prywatny nie może być dowiązaniem, junction ani plikiem",
+            path.display()
+        )));
+    }
+    let actual = path_owner(path)?;
+    if actual != *owner && !TRUSTED_OWNERS.contains(&actual.as_str()) {
+        return Err(PlatformError::PermissionDenied(format!(
+            "{}: właścicielem katalogu prywatnego jest {actual} (nie konto usługi) — możliwe \
+             przejęcie; usuń katalog albo przejmij go kontem usługi",
+            path.display()
+        )));
+    }
+    Ok(())
+}
+
 /// Katalog prywatny: nowy — `CreateDirectoryW` z deskryptorem (bez okna wyścigu), istniejący —
-/// `SetNamedSecurityInfoW` z chronionym DACL (propagowany do plików).
+/// sprawdzenie rodzaju i właściciela, potem `SetNamedSecurityInfoW` z chronionym DACL
+/// (propagowany do plików).
 pub(crate) fn ensure_private_dir(path: &Path, owner: &Sid) -> Result<(), PlatformError> {
     let sd = SecurityDescriptor::from_sddl(&private_dir_sddl(owner))?;
     let w = wide(path);
@@ -192,6 +253,7 @@ pub(crate) fn ensure_private_dir(path: &Path, owner: &Sid) -> Result<(), Platfor
         return unsafe { CreateDirectoryW(pcwstr(&w), Some(&raw const sa)) }
             .map_err(|e| win_error("CreateDirectoryW", &e));
     }
+    check_existing_private_dir(path, owner)?;
     let (mut present, mut defaulted) = (BOOL::default(), BOOL::default());
     let mut dacl: *mut ACL = null_mut();
     // SAFETY: DACL wskazuje do wnętrza `sd`, które żyje do końca funkcji.

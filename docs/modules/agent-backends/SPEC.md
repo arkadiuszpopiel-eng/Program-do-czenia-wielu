@@ -25,7 +25,7 @@ Zdarzenia magistrali: `agent.bridge.event` (koperta), `agent.bridge.refused`.
 ## Niezmienniki
 - Kolejność bramki: specyfikacja → pochodzenie → trasa w `compliance` → program → `--version` przypięta → hash (opcjonalny) → dopiero wtedy worktree i proces. Odmowa = 0 procesów zadania.
 - `Trigger` i `Improver` — zawsze odmowa; `Scheduled` — tylko z `[agent_backends.launch.scheduled.<trasa>] max_per_day > 0`, licznik dobowy.
-- Proces CLI dostaje wyłącznie listę dozwoloną środowiska (bez `*_API_KEY`, `*TOKEN*`, `ALFA_*`, `ANTHROPIC_*`, `OPENAI_*`, `CODEX_*`…); praca tylko pod katalogiem worktree Alfy; kopia pomija dowiązania.
+- Proces CLI dostaje wyłącznie listę dozwoloną środowiska (bez `*_API_KEY`, `*TOKEN*`, `ALFA_*`, `ANTHROPIC_*`, `OPENAI_*`, `CODEX_*`…); praca tylko pod katalogiem worktree Alfy; kopia pomija dowiązania, `.git` i wszystko z bazowej deny-listy Jądra (`compliance`: poświadczenia CLI, klucze, profile przeglądarek) — kod Alfy ich nie czyta ani nie powiela (przegląd 2026-10, SR-06, `tests/review.rs`).
 - Dokładnie jedno zdarzenie końcowe; brak decyzji w `approval_timeout` = odmowa; anulowanie zabija drzewo procesów (grupa procesów / `taskkill /T`; port `TreeKiller` na Job Object) i odrzuca oczekujące prośby.
 
 ## Zdolności / uprawnienia

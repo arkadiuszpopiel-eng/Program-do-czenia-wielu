@@ -23,12 +23,13 @@ monitor, DPI; `WindowGuard` chroni procesy Alfy/Brokera), `WinProcesses::spawn_w
 Zdarzenia: `platform.hotkey`, `platform.ptt`, `platform.clipboard.changed`, `platform.fs.changed`, `platform.device.changed`, `platform.fullscreen.changed`, `platform.session.locked` (publikacja przez jądro — F2).
 
 ### Porty Jądra bezpieczeństwa (F3, część 2 — poza sumą `SystemPort`)
+Implementacja Windows żyje w crate'cie `platform-windows-kernel-impl` (wydzielony z `platform-windows-impl` przez limit rozmiaru; przegląd 2026-10; używa go tylko `app-safety`).
 | Port (kontrakt) | Windows (`WinKernel`, `WinSessionLauncher`, `WinApprovalSurface`) | Atrapa |
 |---|---|---|
 | `SecurePipePort` + `PipeSecurity` (SDDL: chroniony DACL na SID-y, klienci bez `FILE_CREATE_PIPE_INSTANCE`, etykieta `NW`) | `CreateNamedPipeW` z deskryptorem, `PIPE_REJECT_REMOTE_CLIENTS`, `FILE_FLAG_FIRST_PIPE_INSTANCE`, zawsze wolna instancja; klient `SECURITY_SQOS_PRESENT \| SECURITY_IDENTIFICATION`; `peer_pid` = `GetNamedPipeClient/ServerProcessId` | `FakePipes` (DACL, etykieta, przejęcie nazwy, PID-y) |
 | `ProcessIdentityPort` + `PeerRequirement::check` (konto, min. integralność, obraz, sesja, podpis) | `OpenProcess` → `QueryFullProcessImageNameW`, token: `TokenUser`, `TokenIntegrityLevel` (RID), `TokenSessionId` | `FakePipes` (rejestr tożsamości) |
 | `CodeSignaturePort` | `UnverifiedSignatures` („niezweryfikowane” w dev; WinVerifyTrust + przypięcie certyfikatu po bramce #10) | — |
-| `PrivateDirPort` (`private_dir_sddl`) | nowy: `CreateDirectoryW` z deskryptorem; istniejący: `SetNamedSecurityInfoW` (chroniony DACL) | `FakePrivateDirs` |
+| `PrivateDirPort` (`private_dir_sddl`) | nowy: `CreateDirectoryW` z deskryptorem; istniejący: odmowa dla dowiązania/junction/pliku i dla właściciela spoza {konto usługi, SYSTEM, Administratorzy} (`GetNamedSecurityInfoW`; katalog założony zawczasu przez użytkownika zachowałby mu `WRITE_DAC`), potem `SetNamedSecurityInfoW` (chroniony DACL) | `FakePrivateDirs` |
 | `SessionLauncherPort` (`LaunchIntegrity`) | `UserSessionHigh`: `WTSGetActiveConsoleSessionId` + `WTSQueryUserToken` → `DuplicateTokenEx` → etykieta High → `CreateProcessAsUserW` (`winsta0\default`, stdin = anonimowy potok); `AsCaller` — `app-safety::ChildLauncher` | `FakeLauncher` |
 | `ServiceHostPort` + `StopSignal` | `StartServiceCtrlDispatcherW`, `RegisterServiceCtrlHandlerExW` (STOP/SHUTDOWN), `SetServiceStatus` | `FakeServiceHost` |
 | `ApprovalSurfacePort` (`SurfaceView`, `SurfaceView::layout`, `SurfaceEvent`) | okno Win32 na własnym wątku (szczegóły: `broker-ui` SPEC) | `FakeSurface` (skrypt zdarzeń) |
@@ -46,7 +47,7 @@ Zdarzenia: `platform.hotkey`, `platform.ptt`, `platform.clipboard.changed`, `pla
 - COM/UIA na dedykowanym wątku MTA; brak wywołań COM z wątku audio RT. F1: `IFileOperation` na krótkotrwałym wątku STA, MMDevice na wątku MTA, skróty i hook `WH_KEYBOARD_LL` na własnym wątku z pętlą komunikatów.
 - Deny-lista sprawdzana na postaci surowej, po `%ZMIENNYCH%`, leksykalnej (`\\?\`, wielkość liter, końcowe kropki/spacje, ADS) i kanonicznej (dowiązania, junctions, 8.3); kopiowanie drzewa sprawdza każdy wpis.
 - Usuwanie do Kosza, którego nie da się przenieść do Kosza, pyta użytkownika (`FOF_WANTNUKEWARNING`); zgoda = pokwitowanie nieodwracalne.
-- Deny-lista ścieżek poświadczeń (`~/.claude`, `~/.codex`, profile przeglądarek, Credential Manager) egzekwowana tu jako ostatnia linia (nawet gdy `tools-fs` zawiedzie).
+- Deny-lista ścieżek poświadczeń (`~/.claude`, `~/.codex`, profile przeglądarek, Credential Manager) egzekwowana tu jako ostatnia linia (nawet gdy `tools-fs` zawiedzie). Domyślne `extra_deny_names`/`extra_deny_prefixes` obejmują **całą** bazową deny-listę Jądra (`compliance`), bo tylko tu sprawdzana jest postać kanoniczna — dowiązanie/junction w profilu nie omija listy (przegląd 2026-10, SR-05; spójność: `tests/review.rs`).
 - Hooki/PTT nie działają przy oknie administratora na pierwszym planie bez helpera `uiAccess` → `foreground_is_elevated()` i zdarzenie do UI (PLAN §7.3).
 
 ## Zdolności / uprawnienia
@@ -80,5 +81,5 @@ Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, st
 - Dziennik cofnięć FS jest w pamięci procesu — trwały dziennik to `undo-journal` (F3).
 - Podział `SystemPort` na osobne crate'y kontraktowe per pod-port (ładowanie leniwe) — do ustalenia w SPEC v1.
 - Snap Layouts/Mica przez Tauri (spike j) — czy własny pasek tytułu wymaga kodu tutaj.
-- Rozmiar crate'a: z modułami procesów (agent-runtime) i Jądra (F3/2) ~8 070 linii `.rs` z testami (src ~7 300) — przy kolejnym przyroście wydzielić `platform-windows-kernel-impl` (wymaga dopisania do `wrappers` w `deny.toml`).
+- Rozmiar crate'a: porty Jądra (F3/2) wydzielone do `platform-windows-kernel-impl` (`deny.toml`: `wrappers` dla `windows`); `platform-windows-impl` ~6 400 linii `.rs` z testami, `platform-windows-kernel-impl` ~2 100.
 - Authenticode (`WinVerifyTrust` + przypięcie wystawcy) i druga ścieżka tożsamości klienta (`ImpersonateNamedPipeClient`) — po bramce #10 (certyfikat).

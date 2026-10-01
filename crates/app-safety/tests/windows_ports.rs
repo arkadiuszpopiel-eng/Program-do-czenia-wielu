@@ -16,7 +16,7 @@ use platform_contract::{
     PrivateDirPort, ProcessIdentityPort, SecurePipePort, ServiceHostPort, SessionLaunch,
     SessionLauncherPort, Sid, same_image,
 };
-use platform_windows_impl::{WinKernel, WinSessionLauncher};
+use platform_windows_kernel_impl::{WinKernel, WinSessionLauncher};
 
 fn name(tag: &str) -> String {
     format!("alfa-test-{tag}-{}", std::process::id())

@@ -69,6 +69,9 @@ impl DenyLists {
                 r"%LOCALAPPDATA%\Microsoft\Vault",
                 r"%APPDATA%\Microsoft\Vault",
                 r"%APPDATA%\Microsoft\Protect",
+                // Klucze i tokeny innych narzędzi (przegląd 2026-10, utwardzenie a).
+                r"%USERPROFILE%\.docker\config.json",
+                r"%APPDATA%\gh",
             ]),
             path_segments: own(&[
                 ".claude",
@@ -78,6 +81,16 @@ impl DenyLists {
                 ".grok",
                 ".kimi",
                 ".agy",
+                ".ssh",
+                ".gnupg",
+                ".aws",
+                ".azure",
+                ".kube",
+                ".npmrc",
+                ".pypirc",
+                ".netrc",
+                "_netrc",
+                ".git-credentials",
             ]),
             domains: own(&[
                 "claude.ai",

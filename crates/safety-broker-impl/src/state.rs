@@ -3,7 +3,9 @@
 use std::collections::{BTreeMap, VecDeque};
 
 use core_bus_contract::{AgentId, SessionId};
-use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Destructiveness, Reversibility};
+use risk_classifier_contract::{
+    AutonomyLevel, CommandOrigin, Destructiveness, Reversibility, RuleId, describe,
+};
 use safety_broker_contract::{
     ActionRequest, ApprovalId, ApprovalRequest, AutonomyTable, AutonomyTarget, CapToken,
     Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce, PlanStep, SessionSecurity,
@@ -25,7 +27,7 @@ pub(crate) enum PendingAction {
     Plan {
         holder: Holder,
         origin: CommandOrigin,
-        steps: Vec<PlanStep>,
+        steps: Vec<ApprovedStep>,
         ttl_ms: u64,
     },
     Autonomy {
@@ -60,12 +62,30 @@ pub(crate) struct Grant {
     pub until_ms: u64,
 }
 
-/// Zatwierdzony plan.
+/// Krok planu pokazany właścicielowi wraz z regułami, które zadziałały przy złożeniu planu.
+pub(crate) struct ApprovedStep {
+    pub step: PlanStep,
+    pub rules: Vec<RuleId>,
+}
+
+impl ApprovedStep {
+    /// Czy krok pokrywa żądanie: zakres i fakty (`step_covers`), a każda reguła „każdego
+    /// poziomu” (niepokrywalna „zawsze zezwalaj”) z bieżącego werdyktu była na karcie planu.
+    /// Reguła dodana po zatwierdzeniu (np. taint sesji, trifecta) wymaga nowej zgody.
+    pub(crate) fn covers(&self, cap: &Capability, f: &DeclaredFacts, rules: &[RuleId]) -> bool {
+        step_covers(&self.step, cap, f)
+            && rules
+                .iter()
+                .all(|r| describe(*r).grantable || self.rules.contains(r))
+    }
+}
+
+/// Zatwierdzony plan (wyłącznie kroki, które właściciel zatwierdził w Broker-UI).
 pub(crate) struct ApprovedPlan {
     pub session: SessionId,
     pub agent: Option<AgentId>,
     pub origin_kind: &'static str,
-    pub steps: Vec<PlanStep>,
+    pub steps: Vec<ApprovedStep>,
     pub until_ms: u64,
 }
 

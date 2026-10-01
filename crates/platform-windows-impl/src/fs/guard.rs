@@ -11,14 +11,24 @@ use std::path::{Component, Path, PathBuf};
 use platform_contract::{PlatformError, is_credential_path};
 
 /// Dodatkowe nazwy segmentów blokowane przez implementację (obrona w głąb ponad listę kontraktu).
-pub const DEFAULT_EXTRA_DENY_NAMES: [&str; 12] = [
+/// Zawiera wszystkie segmenty bazowej deny-listy Jądra (`compliance`), bo tylko tu sprawdzana jest
+/// ścieżka kanoniczna — po rozwiązaniu dowiązań i junctions (przegląd 2026-10, SR-05; spójność
+/// pilnuje `tests/review.rs`).
+pub const DEFAULT_EXTRA_DENY_NAMES: [&str; 19] = [
+    ".agy",
     ".aws",
     ".azure",
+    ".claude.json",
     ".docker",
+    ".gemini",
     ".git-credentials",
     ".gnupg",
+    ".grok",
+    ".kimi",
     ".kube",
     ".netrc",
+    ".npmrc",
+    ".pypirc",
     "_netrc",
     "cookies.sqlite",
     "key4.db",
@@ -26,12 +36,19 @@ pub const DEFAULT_EXTRA_DENY_NAMES: [&str; 12] = [
     "logins.json",
 ];
 
-/// Dodatkowe prefiksy blokowane przez implementację (klucze DPAPI, sejf poświadczeń).
-pub const DEFAULT_EXTRA_DENY_PREFIXES: [&str; 4] = [
+/// Dodatkowe prefiksy blokowane przez implementację: klucze DPAPI, sejf poświadczeń, profile
+/// przeglądarek i token `gh` (prefiksy bazowej deny-listy Jądra — tu sprawdzane po kanonizacji).
+pub const DEFAULT_EXTRA_DENY_PREFIXES: [&str; 10] = [
     "%APPDATA%\\Microsoft\\Protect",
     "%APPDATA%\\Microsoft\\Crypto",
     "%APPDATA%\\Microsoft\\Vault",
     "%LOCALAPPDATA%\\Microsoft\\Vault",
+    "%LOCALAPPDATA%\\Google\\Chrome\\User Data",
+    "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data",
+    "%LOCALAPPDATA%\\BraveSoftware\\Brave-Browser\\User Data",
+    "%APPDATA%\\Mozilla\\Firefox\\Profiles",
+    "%APPDATA%\\Opera Software",
+    "%APPDATA%\\gh",
 ];
 
 /// Czy operacja dotyczy celu dowiązania (`Final`) czy samego wpisu (`NoFinal`: usuwanie, przenoszenie).

@@ -134,6 +134,11 @@ impl BrokerEngine {
         all.len()
     }
 
+    /// Podmiot zarejestrowanego tokenu (autoryzacja `Revoke` po IPC).
+    pub(crate) fn token_holder(&self, id: TokenId) -> Option<Holder> {
+        self.lock().tokens.get(&id).map(|m| m.holder.clone())
+    }
+
     /// `Broker::revoke`.
     pub(crate) fn revoke_sync(&self, id: TokenId) -> Result<usize, BrokerError> {
         let mut st = self.lock();

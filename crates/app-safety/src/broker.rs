@@ -14,7 +14,8 @@ use platform_contract::{
     IntegrityLevel, LaunchIntegrity, PeerRequirement, PrivateDirPort, ProcessPort,
     SessionLauncherPort, Sid, StopSignal, UnverifiedSignatures,
 };
-use platform_windows_impl::{JobLimits, WinKernel, WinProcesses, WinSessionLauncher};
+use platform_windows_impl::{JobLimits, WinProcesses};
+use platform_windows_kernel_impl::{WinKernel, WinSessionLauncher};
 use safety_broker_contract::KernelPolicy;
 use safety_broker_impl::service::{
     BrokerService, RoleBinding, RoleBindings, ServiceConfig, ServicePorts, UiLaunchConfig,

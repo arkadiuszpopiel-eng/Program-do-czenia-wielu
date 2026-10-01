@@ -9,7 +9,7 @@ use safety_broker_contract::{
 use serde_json::json;
 
 use crate::engine::BrokerEngine;
-use crate::state::{ApprovedPlan, PendingAction, State, step_covers};
+use crate::state::{ApprovedStep, PendingAction, State};
 
 /// Maksymalna liczba kroków planu.
 const MAX_PLAN_STEPS: usize = 64;
@@ -107,7 +107,7 @@ impl BrokerEngine {
                         && p.origin_kind == req.origin.kind()
                         && p.steps
                             .iter()
-                            .any(|s| step_covers(s, &req.capability, &req.facts))
+                            .any(|s| s.covers(&req.capability, &req.facts, &verdict.rules))
                 });
                 if by_plan {
                     return self.issue_for(&mut st, &req, &verdict, "plan", now);
@@ -165,6 +165,7 @@ impl BrokerEngine {
             .autonomy
             .effective(&plan.holder.session, plan.holder.agent.as_ref(), now);
         let mut summaries = Vec::new();
+        let mut shown = Vec::new();
         let mut meta_rules = Vec::new();
         let (mut risk, mut non_voice, mut tainted) = (RiskLevel::Low, false, session.tainted);
         for (i, step) in plan.steps.iter().enumerate() {
@@ -192,19 +193,18 @@ impl BrokerEngine {
                         description: step.description.clone(),
                         risk: v.level,
                     });
+                    shown.push(ApprovedStep {
+                        step: step.clone(),
+                        rules: v.rules.clone(),
+                    });
                 }
                 Verdict::Proceed => {}
             }
         }
-        let until_ms = now.saturating_add(plan.ttl_ms.min(st.policy().plan_ttl_max_ms));
         if summaries.is_empty() {
-            st.plans.push(ApprovedPlan {
-                session: plan.holder.session.clone(),
-                agent: plan.holder.agent.clone(),
-                origin_kind: plan.origin.kind(),
-                steps: plan.steps,
-                until_ms,
-            });
+            // Nic nie wymaga zgody: plan niczego nie zapisuje — kroki przejdą same, dopóki nie
+            // zmienią się warunki (taint, poziom). Zapisany plan „wyprałby” późniejsze reguły
+            // każdego poziomu bez wiedzy właściciela (regresja SR-01 w `tests/review.rs`).
             return Ok(PlanDecision::Approved);
         }
         meta_rules.dedup();
@@ -233,7 +233,7 @@ impl BrokerEngine {
         let action = PendingAction::Plan {
             holder: plan.holder,
             origin: plan.origin,
-            steps: plan.steps,
+            steps: shown,
             ttl_ms: plan.ttl_ms,
         };
         self.open_approval(&mut st, subject, meta, action, now)

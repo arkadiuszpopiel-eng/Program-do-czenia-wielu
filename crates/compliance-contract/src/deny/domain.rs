@@ -5,8 +5,9 @@ use super::path::percent_decode;
 const SPECIAL_SCHEMES: [&str; 6] = ["http", "https", "ws", "wss", "ftp", "file"];
 
 /// Wyciąga i normalizuje host: małe litery, bez schematu, userinfo, portu, ścieżki,
-/// z dekodowaniem `%XX`, kropkami unikodowymi zamienionymi na `.` i bez kropek brzegowych.
-/// `None`, gdy nie da się wyciągnąć niepustego hosta.
+/// z dekodowaniem `%XX`, kropkami unikodowymi zamienionymi na `.`, bez kropek brzegowych,
+/// a host z nie-ASCII — po mapowaniu IDNA (UTS 46) do postaci ASCII. `None`, gdy nie da się
+/// wyciągnąć niepustego hosta albo host z nie-ASCII nie przechodzi mapowania IDNA.
 pub fn normalize_host(input: &str) -> Option<String> {
     let lowered = input.trim().to_lowercase().replace('\\', "/");
     let mut s = lowered.as_str();
@@ -38,7 +39,16 @@ pub fn normalize_host(input: &str) -> Option<String> {
         })
         .collect();
     let trimmed = dotted.trim_matches('.').trim();
-    (!trimmed.is_empty() && !trimmed.contains(char::is_whitespace)).then(|| trimmed.to_owned())
+    // Host z nie-ASCII: mapowanie UTS 46 / WHATWG „domain to ASCII” — to samo, co zrobi klient
+    // HTTP i WebView2 (`ⅽlaude.ai`, pełna szerokość, litery matematyczne → `claude.ai`; IDN →
+    // punycode). Bez tego deny-lista porównywałaby inną postać niż ta, z którą się połączymy.
+    let mapped = if trimmed.is_ascii() {
+        trimmed.to_owned()
+    } else {
+        idna::domain_to_ascii(trimmed).ok()?
+    };
+    let host = mapped.trim_matches('.');
+    (!host.is_empty() && !host.contains(char::is_whitespace)).then(|| host.to_owned())
 }
 
 /// Czy host (już znormalizowany) to domena z listy albo jej subdomena.

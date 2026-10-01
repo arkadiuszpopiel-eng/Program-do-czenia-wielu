@@ -5,11 +5,14 @@
 
 use std::sync::Arc;
 
+use core_bus_contract::AgentId;
 use safety_broker_contract::ipc::{
     ClientRole, Envelope, FrameError, Hello, HelloReply, MAX_FRAME_BYTES, PROTOCOL_VERSION,
     Request, Response, UserChannel, decode_body, encode_frame, frame_len,
 };
-use safety_broker_contract::{ApprovalChannel, Broker, BrokerError, ChangeOrigin, broker_ui_only};
+use safety_broker_contract::{
+    ApprovalChannel, Broker, BrokerError, ChangeOrigin, Holder, broker_ui_only,
+};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, DuplexStream};
@@ -153,6 +156,10 @@ impl BrokerServer {
                 ))
             } else if !env.body.permitted(role) {
                 Response::Error(BrokerError::Unauthorized(format!("rola {role:?}")))
+            } else if self.foreign_holder(role, &client, &env.body) {
+                Response::Error(BrokerError::Unauthorized(
+                    "agentka działa wyłącznie we własnym imieniu".into(),
+                ))
             } else {
                 self.handle(role, &client, env.body).await
             };
@@ -164,6 +171,30 @@ impl BrokerServer {
             write_frame(&mut stream, &reply).await?;
         }
         Ok(())
+    }
+
+    /// Proces agentki (rola `Agent`) występuje wyłącznie jako agentka z poświadczenia: podmiot
+    /// żądań, okaziciel i podmiot okazywanego tokenu muszą się zgadzać z `client_id` (SR-03 —
+    /// inaczej agentka prosi o tokeny cudzym imieniem i dostaje cudzy poziom autonomii).
+    /// Jądro przekazuje żądania wielu agentek i nie jest tu ograniczane.
+    fn foreign_holder(&self, role: ClientRole, client: &str, req: &Request) -> bool {
+        if role != ClientRole::Agent {
+            return false;
+        }
+        let foreign = |h: &Holder| h.agent.as_ref().map(AgentId::as_str) != Some(client);
+        match req {
+            Request::Decide(a) => foreign(&a.holder),
+            Request::SubmitPlan(p) => foreign(&p.holder),
+            Request::Verify {
+                token, presenter, ..
+            } => foreign(presenter) || foreign(&token.holder),
+            Request::Attenuate {
+                parent, presenter, ..
+            } => foreign(presenter) || foreign(&parent.holder),
+            Request::ApprovalStatus { requester, .. } => foreign(requester),
+            Request::Revoke { id } => self.engine.token_holder(*id).is_some_and(|h| foreign(&h)),
+            _ => false,
+        }
     }
 
     fn origin(role: ClientRole, client: &str, via: UserChannel) -> ChangeOrigin {

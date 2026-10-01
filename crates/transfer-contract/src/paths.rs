@@ -28,9 +28,12 @@ pub const MAX_PATH_BYTES: usize = 512;
 /// Maksymalna głębokość (liczba segmentów).
 pub const MAX_DEPTH: usize = 16;
 
-const RESERVED: [&str; 22] = [
-    "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
-    "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+/// Nazwy urządzeń Windows (także `COM0`/`LPT0`, cyfry w indeksie górnym i konsola `CONIN$`/
+/// `CONOUT$` — przegląd 2026-10).
+const RESERVED: [&str; 32] = [
+    "CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
+    "COM8", "COM9", "COM¹", "COM²", "COM³", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6",
+    "LPT7", "LPT8", "LPT9", "LPT¹", "LPT²", "LPT³", "CONIN$", "CONOUT$",
 ];
 
 /// Powód odrzucenia ścieżki.
@@ -225,6 +228,9 @@ mod tests {
             ("a/CON", PathError::Reserved),
             ("a/nul.txt", PathError::Reserved),
             ("a/com1", PathError::Reserved),
+            ("a/COM¹.txt", PathError::Reserved),
+            ("lpt0", PathError::Reserved),
+            ("a/conout$.log", PathError::Reserved),
             ("a/b.", PathError::TrailingDotOrSpace),
             ("a/b ", PathError::TrailingDotOrSpace),
             ("a\u{0}b", PathError::Control),

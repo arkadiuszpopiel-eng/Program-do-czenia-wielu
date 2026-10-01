@@ -1,9 +1,22 @@
-//! Porty Jądra bezpieczeństwa (F3, część 2; docs/modules/platform-windows/SPEC.md): named pipe
-//! z DACL na SID-y (`PIPE_REJECT_REMOTE_CLIENTS`, `FILE_FLAG_FIRST_PIPE_INSTANCE`, etykieta
-//! integralności), tożsamość klienta potoku (obraz, SID tokenu, integralność, sesja), katalogi
-//! prywatne, MMCSS „Pro Audio”, wolne miejsce, host usługi Windows, uruchamianie Broker-UI w sesji
-//! użytkownika z wysoką integralnością, natywne okno zatwierdzeń z rozpoznawaniem wstrzyknięć.
-//! Poza Windows wszystko zwraca `Unsupported` (logikę testuje się na `platform-fake`).
+//! Porty Jądra bezpieczeństwa dla Windows (F3, część 2; docs/modules/platform-windows/SPEC.md):
+//! named pipe z DACL na SID-y (`PIPE_REJECT_REMOTE_CLIENTS`, `FILE_FLAG_FIRST_PIPE_INSTANCE`,
+//! etykieta integralności), tożsamość klienta potoku (obraz, SID tokenu, integralność, sesja),
+//! katalogi prywatne, MMCSS „Pro Audio”, wolne miejsce, host usługi Windows, uruchamianie
+//! Broker-UI w sesji użytkownika z wysoką integralnością, natywne okno zatwierdzeń
+//! z rozpoznawaniem wstrzyknięć. Poza Windows wszystko zwraca `Unsupported` (logikę testuje się
+//! na `platform-fake`).
+//!
+//! Wydzielone z `platform-windows-impl` (limit rozmiaru crate'a; przegląd bezpieczeństwa
+//! 2026-10). Drugi — obok `platform-windows-impl` — crate z windows-rs (`deny.toml`: `wrappers`).
+
+#![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
+// Poza Windows mapowania błędów są używane tylko przez testy; martwy kod wyłapuje
+// `cargo clippy --target x86_64-pc-windows-msvc`.
+#![cfg_attr(not(windows), allow(dead_code))]
+
+mod error;
+#[cfg(windows)]
+mod win;
 
 #[cfg(not(windows))]
 mod portable;

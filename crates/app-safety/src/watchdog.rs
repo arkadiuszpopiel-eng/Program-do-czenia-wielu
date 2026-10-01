@@ -10,7 +10,8 @@ use std::time::Duration;
 use platform_contract::{
     Integrity, ProcessIdentityPort, ProcessPort, ProcessSpec, SecurePipePort, Sid,
 };
-use platform_windows_impl::{JobLimits, WinHotkeys, WinKernel, WinProcesses};
+use platform_windows_impl::{JobLimits, WinHotkeys, WinProcesses};
+use platform_windows_kernel_impl::WinKernel;
 use safety_broker_contract::ipc::{
     ClientCredential, ClientRole, Hello, PROTOCOL_VERSION, Request, Response,
 };

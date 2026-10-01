@@ -147,7 +147,19 @@ impl BrokerEngine {
                 "termin zmiany poziomu w przeszłości".into(),
             ));
         }
-        if req.level <= current {
+        // Wpis celu już jest dokładnie taki (poziom i termin) — nic się nie zmienia.
+        let unchanged = st.autonomy.entries().iter().any(|(t, e)| {
+            *t == req.target
+                && e.level == req.level
+                && e.until_ms == req.until_ms
+                && e.until_ms.is_none_or(|u| now < u)
+        });
+        if unchanged {
+            return Ok(None);
+        }
+        // Tylko poziom ściśle niższy jest obniżeniem. Równy poziom bez terminu (albo z dłuższym)
+        // utrwala czasowe L4 właściciela — to podniesienie w czasie (regresja SR-02).
+        if req.level < current {
             // Obniżenie „na czas” nie może po wygaśnięciu skończyć się poziomem wyższym niż
             // przed żądaniem (np. nadpisanie jawnego L2 właściciela krótkim L1 → powrót do L4).
             let fallback = st.fallback_level(&req.target, now);

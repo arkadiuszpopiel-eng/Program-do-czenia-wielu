@@ -21,6 +21,9 @@ thiserror.workspace = true
 schemars.workspace = true
 chrono.workspace = true
 async-trait.workspace = true
+# Mapowanie hostów UTS 46 (ta sama wersja co w `url`, już w Cargo.lock) — deny-lista domen musi
+# porównywać postać, do której łączy się klient HTTP/WebView2 (przegląd 2026-10, SR-04).
+idna = "1.1.0"
 
 [dev-dependencies]
 proptest.workspace = true

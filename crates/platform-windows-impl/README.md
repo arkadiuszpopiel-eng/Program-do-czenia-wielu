@@ -23,8 +23,5 @@ MMDevice — krótkotrwały wątek MTA; schowek i okna — wątek wywołującego
 wątku wywołującego (może to być wątek audio RT). Testy: `tests/fs_port.rs` (każdy OS, w tym
 proptest LIFO), `tests/windows_system.rs` (Windows; skróty/schowek/Kosz `#[ignore]` — pulpit).
 
-F3/2 (`src/kernel/`, porty Jądra bezpieczeństwa): `WinKernel` — `SecurePipePort` (`win_pipe.rs`), `ProcessIdentityPort`,
-`PrivateDirPort`, `MmcssPort`, `DiskPort` (`win_sec.rs`), `ServiceHostPort` (`win_launch.rs`); `WinSessionLauncher`
-(Broker-UI w sesji konsoli z etykietą High, stdin = bilet); `WinApprovalSurface` (`surface/`: okno Win32, hooki LL
-i `GetCurrentInputMessageSource`, test zasłonięcia). Testy Windows CI tych portów — `app-safety/tests/windows_ports.rs`;
-tu `tests/kernel_windows.rs` (`SendInput` w okno, `#[ignore]`).
+F3/2: porty Jądra bezpieczeństwa (`WinKernel`, `WinSessionLauncher`, `WinApprovalSurface`) wydzielono
+do `platform-windows-kernel-impl` (limit 8 000 linii na crate; przegląd bezpieczeństwa 2026-10).

@@ -75,7 +75,8 @@ od `*-impl`; od `*-fake` tylko w dev-dependencies; `app-*` mogą zależeć od in
 | `tools-clipboard` | `tools-clipboard-contract`, `-impl`, `-fake` | odczyt (taint) i zapis tekstu/obrazu schowka, cofanie zapisu z wykrywaniem konfliktu |
 | `agent-runtime` | `agent-runtime-contract`, `-impl`, `-fake` | v0: pętla jednej agentki plan → narzędzie → obserwacja → weryfikacja, budżety, checkpointy, anulowanie, steering, zdarzenia `agent.*` dla Replay i „Cofnij" |
 | `broker-ui` | `broker-ui-contract`, `-impl`, `-fake` | okno zatwierdzeń Brokera: karta prośby, `PhysicalInputProof` tylko z fizycznego wejścia (odrzuca wstrzyknięte, clickjacking ≥ 500 ms), Enter nie zatwierdza. **Wymaga przeglądu człowieka** |
-| `app-api`, `app-modules`, `app-safety` | (korzeń kompozycji `app-*`) | `app-api`: DTO, zdarzenia, porty, protokół; `app-modules`: adaptery modułów dla `app-core`; `app-safety`: binaria `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` złożone z `platform-windows-impl` |
+| `app-api`, `app-modules`, `app-safety` | (korzeń kompozycji `app-*`) | `app-api`: DTO, zdarzenia, porty, protokół; `app-modules`: adaptery modułów dla `app-core`; `app-safety`: binaria `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` złożone z `platform-windows-kernel-impl` |
+| `platform-windows-kernel` | `platform-windows-kernel-impl` (kontrakt: `platform-contract`) | prymitywy Windows dla Jądra wydzielone z `platform-windows-impl`: named pipe z chronionym DACL, tożsamość klienta, katalog prywatny, okno zatwierdzeń Win32, start z integralnością High, host usługi, MMCSS |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

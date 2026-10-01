@@ -10,6 +10,7 @@ use agent_backends_contract::{
     Workspace,
 };
 use async_trait::async_trait;
+use compliance_contract::{DenyChecker, DenyLists, PathEnv};
 
 use crate::process::cli_env;
 
@@ -105,13 +106,50 @@ impl GitWorkspace {
     }
 }
 
-fn copy_tree(from: &Path, to: &Path, skip: &Path, budget: &mut u64) -> Result<(), BackendError> {
+/// Deny-lista Jądra dla kopii: poświadczenia CLI, klucze, profile przeglądarek (PLAN §1.3).
+struct CopyDeny {
+    checker: DenyChecker,
+    env: PathEnv,
+}
+
+impl CopyDeny {
+    fn from_process_env() -> Self {
+        let mut env = PathEnv::new();
+        for name in ["USERPROFILE", "LOCALAPPDATA", "APPDATA", "SYSTEMDRIVE"] {
+            if let Ok(value) = std::env::var(name) {
+                env = env.with(name, &value);
+            }
+        }
+        let env = env.derived();
+        Self {
+            checker: DenyChecker::new(DenyLists::baseline(), &env),
+            env,
+        }
+    }
+
+    fn denied(&self, path: &Path) -> bool {
+        self.checker
+            .is_denied_path(&path.to_string_lossy(), &self.env)
+    }
+}
+
+fn copy_tree(
+    from: &Path,
+    to: &Path,
+    skip: &Path,
+    deny: &CopyDeny,
+    budget: &mut u64,
+) -> Result<(), BackendError> {
     std::fs::create_dir_all(to).map_err(|e| ws_err("kopia", e))?;
     for entry in std::fs::read_dir(from).map_err(|e| ws_err("kopia", e))? {
         let entry = entry.map_err(|e| ws_err("kopia", e))?;
         let path = entry.path();
         // `.git` (konfiguracja zdalnych z możliwymi poświadczeniami, haki) nie trafia do kopii.
         if path == skip || entry.file_name() == ".git" {
+            continue;
+        }
+        // Poświadczenia CLI i klucze: kod Alfy ich nie czyta ani nie powiela (SR-06).
+        if deny.denied(&path) {
             continue;
         }
         let kind = entry.file_type().map_err(|e| ws_err("kopia", e))?;
@@ -121,7 +159,7 @@ fn copy_tree(from: &Path, to: &Path, skip: &Path, budget: &mut u64) -> Result<()
             continue;
         }
         if kind.is_dir() {
-            copy_tree(&path, &target, skip, budget)?;
+            copy_tree(&path, &target, skip, deny, budget)?;
         } else if kind.is_file() {
             let len = entry.metadata().map_err(|e| ws_err("kopia", e))?.len();
             *budget = budget
@@ -179,9 +217,12 @@ impl Workspace for GitWorkspace {
         }
         let (from, to, skip) = (source.clone(), dest.clone(), root.clone());
         let mut budget = self.max_copy_bytes;
-        let copied = tokio::task::spawn_blocking(move || copy_tree(&from, &to, &skip, &mut budget))
-            .await
-            .map_err(|e| ws_err("kopia", e))?;
+        let copied = tokio::task::spawn_blocking(move || {
+            let deny = CopyDeny::from_process_env();
+            copy_tree(&from, &to, &skip, &deny, &mut budget)
+        })
+        .await
+        .map_err(|e| ws_err("kopia", e))?;
         if let Err(e) = copied {
             let _ = std::fs::remove_dir_all(&dest);
             return Err(e);

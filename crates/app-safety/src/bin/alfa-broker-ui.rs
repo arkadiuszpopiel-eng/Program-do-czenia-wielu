@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use app_safety::ui::{read_ticket, run};
 use platform_contract::StopSignal;
-use platform_windows_impl::{WinApprovalSurface, WinKernel};
+use platform_windows_kernel_impl::{WinApprovalSurface, WinKernel};
 use watchdog_contract::SystemClock;
 
 fn main() -> ExitCode {

@@ -48,6 +48,6 @@ F4-07: `host_passes_contract` (impl i fake), `proxy_binary_end_to_end_with_platf
 `FakeMcpServer` (serwer w procesie przez duplex; zmiana opisu z powiadomieniem lub bez; rejestr wywołań), `FakeBridgeMcpHost` (prawdziwy kanał lokalny, ręczny zegar TTL, rejestr `approve`).
 
 ## Otwarte pytania
-- Jawny DACL named pipe na SID użytkownika wymaga windows-rs → port w `platform-windows-impl` (dziś: domyślny DACL — zapis tylko właściciel/SYSTEM/Administratorzy — + token).
+- Jawny DACL named pipe na SID użytkownika wymaga windows-rs → port w `platform-windows-impl` (dziś: domyślny DACL — zapis tylko właściciel/SYSTEM/Administratorzy — + token). Przegląd 2026-10 (utwardzenie b): `SecurePipePort` z `platform-contract` jest blokujący i półdupleksowy (synchroniczny uchwyt serializuje `ReadFile`/`WriteFile`), a host MCP potrzebuje pełnego dupleksu (równoległe `tools/call`); klient `alfa-mcp-proxy` otwiera potok przez tokio z `GENERIC_WRITE`, czego DACL `PipeSecurity` (klient `0x12008B`) nie przyzna. Wymaga decyzji: (1) wariant asynchroniczny/overlapped w kontrakcie (`SecureAsyncPipePort` albo `PipeConnection::try_clone` na uchwycie `FILE_FLAG_OVERLAPPED`) + proxy łączące się przez port, albo (2) dwa połączenia półdupleksowe na sesję (osobno w górę i w dół, parowane tokenem).
 - Trwały magazyn zgód (`PinStore`) w `core-config`; UI karty serwera MCP — F4 `ui-shell`.
 - Limit częstości `approve` (zmęczenie zatwierdzeniami) — z Brokerem w F3/F4.

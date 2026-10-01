@@ -39,7 +39,7 @@ highlight = "all"
 deny = [
     # Tylko jeden crate windows-rs w jednej wersji (AGENTS.md); dozwolony wyłącznie w platform-impl.
     { crate = "cpal", reason = "audio przez crate `wasapi` (AGENTS.md)" },
-    { crate = "windows", wrappers = ["platform-windows-impl", "sysinfo", "wasapi"], reason = "windows-rs tylko w platform-windows-impl (AGENTS.md); sysinfo używany wyłącznie poza Windows; wasapi = audio (ADR 0011), ta sama wersja windows" },
+    { crate = "windows", wrappers = ["platform-windows-impl", "platform-windows-kernel-impl", "sysinfo", "wasapi"], reason = "windows-rs tylko w platform-windows-impl (AGENTS.md); sysinfo używany wyłącznie poza Windows; wasapi = audio (ADR 0011), ta sama wersja windows" },
 ]
 
 [sources]

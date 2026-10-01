@@ -7,7 +7,7 @@ use std::process::ExitCode;
 use app_safety::broker::{SERVICE_NAME, dev_config, load_config, run};
 use app_safety::{arg_value, has_flag};
 use platform_contract::{ProcessIdentityPort, ServiceHostPort, StopSignal};
-use platform_windows_impl::WinKernel;
+use platform_windows_kernel_impl::WinKernel;
 use safety_broker_impl::service::ServiceConfig;
 
 fn console_config(config: Option<String>) -> Result<ServiceConfig, String> {

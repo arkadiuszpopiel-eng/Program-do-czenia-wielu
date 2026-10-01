@@ -1,0 +1,54 @@
+[package]
+name = "platform-windows-kernel-impl"
+description = "Porty Jądra bezpieczeństwa dla Windows (windows-rs): named pipe z DACL na SID, tożsamość procesu po drugiej stronie potoku, katalogi prywatne, MMCSS, wolne miejsce, host usługi, uruchamianie Broker-UI z wysoką integralnością, natywne okno zatwierdzeń"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Wydzielone z `platform-windows-impl` (limit 8 000 linii na crate, przegląd 2026-10). Ta sama
+# kategoria co `platform-windows-impl`: implementacja portów `platform-contract`, jedyne miejsca
+# z windows-rs (`deny.toml`: `wrappers` dla `windows`). Bez zależności od `platform-windows-impl`
+# (zakaz `-impl` → cudzy `-impl`); wspólne narzędzia FFI są tu w `win.rs`/`error.rs`.
+[dependencies]
+platform-contract.workspace = true
+
+# Ta sama wersja windows-rs co w `platform-windows-impl` (AGENTS.md: jeden crate, jedna wersja).
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Gdi",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Pipes",
+    "Win32_System_RemoteDesktop",
+    "Win32_System_Services",
+    "Win32_System_Threading",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Input",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+
+# Kopia [workspace.lints] z jedną różnicą: `unsafe_code = "deny"` zamiast `forbid`, żeby moduły FFI
+# mogły mieć `#[allow(unsafe_code)]` (tylko one; każdy blok `unsafe` z komentarzem `// SAFETY:`).
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+too_many_lines = "warn"
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "warn"
+undocumented_unsafe_blocks = "deny"

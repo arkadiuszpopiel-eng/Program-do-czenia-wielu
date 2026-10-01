@@ -19,6 +19,19 @@ pub const PROTECTED_PROCESSES: [&str; 6] = [
     "alfa-uiaccess-helper.exe",
 ];
 
+/// Aplikacje desktopowe (i CLI) dostawców planów — `gui.control` = „używanie UI dostawcy”
+/// (PLAN §1.3 zasada 6, THREAT_MODEL §7, §9): twarda blokada `ProviderWebUi` na każdym poziomie.
+/// Mosty CLI działają przez oficjalne tryby nieinteraktywne (`agent-backends`), nie przez GUI.
+pub const PROVIDER_APPS: [&str; 7] = [
+    "claude.exe",
+    "chatgpt.exe",
+    "codex.exe",
+    "gemini.exe",
+    "grok.exe",
+    "kimi.exe",
+    "deepseek.exe",
+];
+
 /// Usługi Windows Jądra i audytu systemowego — zatrzymanie/usunięcie = twarda blokada.
 pub const PROTECTED_SERVICES: [&str; 3] = ["alfabroker", "alfawatchdog", "eventlog"];
 
@@ -88,10 +101,14 @@ impl KernelPolicy {
             allowed_apps: Vec::new(),
             egress_allowlist: Vec::new(),
             extra_protected_processes: Vec::new(),
+            // Pliki samej Alfy: instalacja i wersje (launcher, `current.json`), bazy, logi,
+            // profil WebView2, konfiguracja — zapis przez narzędzia agentek podmieniłby Jądro
+            // albo jego ustawienia (przegląd 2026-10, SR-07). Katalogi robocze sesji
+            // (`%USERPROFILE%\Alfa\Sesje`) zostają w zasięgu agentek.
             kernel_paths: vec![
                 PathScope::tree(broker_dir, &env)?,
-                PathScope::tree(r"%APPDATA%\Alfa\kernel", &env)?,
-                PathScope::tree(r"%LOCALAPPDATA%\Alfa\audit", &env)?,
+                PathScope::tree(r"%APPDATA%\Alfa", &env)?,
+                PathScope::tree(r"%LOCALAPPDATA%\Alfa", &env)?,
             ],
             system_drive,
             deny_lists: DenyLists::baseline(),
@@ -116,6 +133,12 @@ impl KernelPolicy {
         }
         self.deny_lists.validate().map_err(|e| e.to_string())?;
         self.risk.validate()
+    }
+
+    /// Czy aplikacja jest aplikacją dostawcy planu ([`PROVIDER_APPS`]; także alias 8.3).
+    pub fn is_provider_app(&self, app: &AppSelector) -> bool {
+        use compliance_contract::deny::comp_matches;
+        PROVIDER_APPS.iter().any(|p| comp_matches(app.exe(), p))
     }
 
     /// Czy aplikacja jest procesem chronionym (bazowym lub dodatkowym; także alias 8.3).

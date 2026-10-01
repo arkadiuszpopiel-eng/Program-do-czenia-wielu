@@ -76,7 +76,7 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
   rozwijanego równolegle `personas-contract`.
 - **Kontener**: ZIP (crate `zip` 8.6, tylko deflate), manifest pierwszy i nieskompresowany; zapis atomowy (plik tymczasowy
   + `rename`). Limity (`Limits`): wpisy 200 000, wpis 2 GiB, łącznie 16 GiB, manifest 64 MiB, stopień kompresji 1000
-  (wpisy > 1 MiB). Reguła ścieżek rozszerzona o realia Windows (`\`, `:`, UNC, `CON`/`NUL`…, kropka/spacja na końcu).
+  (wpisy > 1 MiB). Reguła ścieżek rozszerzona o realia Windows (`\`, `:`, UNC, `CON`/`NUL`/`COM0–9`/`LPT0–9` z cyframi w indeksie górnym, `CONIN$`/`CONOUT$`, kropka/spacja na końcu — przegląd 2026-10).
 - **Szyfrowanie (rozstrzygnięte)**: `ALFAENC1` + nagłówek JSON (AAD) + **XChaCha20-Poly1305 STREAM** (fragmenty 64 KiB,
   nonce prefiks 19 B ‖ licznik BE32 ‖ flaga ostatniego) — crate'y RustCrypto `chacha20poly1305` 0.10 i `argon2` 0.5;
   klucz **Argon2id** m = 46 MiB, t = 2, p = 1 (w budżecie RAM 50 MB), sól 16 B; odczyt nagłówka obcej paczki ograniczony

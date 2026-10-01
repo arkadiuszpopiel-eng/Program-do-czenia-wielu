@@ -1,7 +1,7 @@
 //! Okno Broker-UI z prawdziwym `SendInput` (ACC-F3-broker-ui-02, część sprzętowa) — wymaga
 //! interaktywnego pulpitu, więc `#[ignore]` (self-hosted). Pozostałe testy portów Jądra na
 //! Windows (potok z DACL, tożsamość, katalog prywatny, MMCSS, dysk, usługa) są w
-//! `crates/app-safety/tests/windows_ports.rs` (limit rozmiaru tego crate'a).
+//! `crates/app-safety/tests/windows_ports.rs`.
 
 #![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used, unsafe_code)]
@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 use platform_contract::{
     ApprovalSurfacePort, SurfaceButton, SurfaceEvent, SurfaceTone, SurfaceView,
 };
-use platform_windows_impl::WinApprovalSurface;
+use platform_windows_kernel_impl::WinApprovalSurface;
 use windows::Win32::Foundation::RECT;
 use windows::Win32::UI::Input::KeyboardAndMouse::{
     INPUT, INPUT_0, INPUT_KEYBOARD, INPUT_MOUSE, KEYBD_EVENT_FLAGS, KEYBDINPUT, KEYEVENTF_KEYUP,

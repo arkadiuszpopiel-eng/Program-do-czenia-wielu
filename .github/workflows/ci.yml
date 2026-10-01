@@ -24,7 +24,10 @@ jobs:
           toolchain: "1.94"
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      # Formatowanie nie zależy od systemu; na Windows `cargo fmt --all` przekracza limit
+      # długości wiersza poleceń (os error 206) przy ~230 crate'ach — sprawdzamy na Linuksie.
       - name: Format
+        if: runner.os == 'Linux'
         run: cargo fmt --all --check
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
