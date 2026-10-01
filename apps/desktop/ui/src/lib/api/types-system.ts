@@ -18,7 +18,7 @@ import type {
   TurnStatus,
   TurnUsage,
 } from './types';
-import type { Account } from './types-hub';
+import type { Account, LocalDownloadState } from './types-hub';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
 
@@ -203,6 +203,17 @@ export type AlfaEvent =
       readonly type: 'Toast';
       readonly kind: 'info' | 'success' | 'warning' | 'error';
       readonly message: LocalizedText;
+    }
+  /** Przejdź do sesji (zasobnik, `alfa://session/…`, Szybkie pytanie → pełne okno). */
+  | { readonly type: 'OpenSession'; readonly session_id: string }
+  | {
+      /** Postęp pobierania modelu lokalnego (onboarding, Ustawienia). */
+      readonly type: 'LocalModelProgress';
+      readonly model_id: string;
+      readonly state: LocalDownloadState;
+      readonly bytes: number;
+      readonly total: number | null;
+      readonly error: string | null;
     };
 
 export type AlfaEventType = AlfaEvent['type'];

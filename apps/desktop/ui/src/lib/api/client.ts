@@ -35,6 +35,7 @@ import type {
   ImportRequest,
   ImportResult,
   InspectResult,
+  LocalModelInfo,
   PermissionsState,
   ProviderInfo,
   TestReport,
@@ -150,6 +151,8 @@ export interface AccountsApi {
 export interface TransferApi {
   /** Intencja: natywny dialog zapisu + eksport. */
   exportPackage(request: ExportRequest): Promise<ExportResult>;
+  /** Intencja: osobna, jawna paczka sekretów — zawsze szyfrowana hasłem (min. 8 znaków). */
+  exportSecrets(password: string): Promise<ExportResult>;
   /** Intencja: natywny dialog otwarcia + podgląd (dry-run). */
   inspect(password: string | null, path: string | null): Promise<InspectResult>;
   importPackage(request: ImportRequest): Promise<ImportResult>;
@@ -162,6 +165,15 @@ export interface PermissionsApi {
   requestLevel(level: AutonomyLevel, sessionId: string | null): Promise<BrokerIntentResult>;
   /** Intencja: przenosi do okna Brokera z tą prośbą o zatwierdzenie. */
   openApproval(approvalId: string): Promise<BrokerIntentResult>;
+}
+
+export interface ModelsApi {
+  /** Modele lokalne z manifestu (`providers-local`). */
+  localList(): Promise<readonly LocalModelInfo[]>;
+  /** Pobieranie (wznawiane, SHA-256); `null` = model domyślny. Postęp: `LocalModelProgress`. */
+  localDownload(modelId: string | null): Promise<void>;
+  /** Anulowanie pobierania (`null` = wszystkich). */
+  localCancel(modelId: string | null): Promise<void>;
 }
 
 export interface DeviceApi {
@@ -205,6 +217,7 @@ export interface AlfaClient {
   readonly accounts: AccountsApi;
   readonly transfer: TransferApi;
   readonly permissions: PermissionsApi;
+  readonly models: ModelsApi;
   readonly device: DeviceApi;
   readonly voice: VoiceApi;
   readonly system: SystemApi;

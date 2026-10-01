@@ -90,7 +90,7 @@
       "session_id": "s-q3",
       "parent_id": "t-munv0mw0-4",
       "author": "delta",
-      "role_id": "executor",
+      "role_id": "operator",
       "created_at": "2026-09-30T08:45:00.000Z",
       "status": "streaming",
       "text": "",
@@ -140,7 +140,7 @@
       {
         "id": "delta",
         "role_ids": [
-          "executor",
+          "operator",
           "coder"
         ],
         "status": "speaking",
@@ -331,7 +331,7 @@
       {
         "id": "delta",
         "role_ids": [
-          "executor",
+          "operator",
           "coder"
         ],
         "status": "idle",
@@ -451,7 +451,7 @@
       {
         "id": "delta",
         "role_ids": [
-          "executor",
+          "operator",
           "coder"
         ],
         "status": "idle",
@@ -774,6 +774,30 @@
     }
   },
   {
+    "type": "LocalModelProgress",
+    "model_id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+    "state": "downloading",
+    "bytes": 0,
+    "total": 3040870400,
+    "error": null
+  },
+  {
+    "type": "LocalModelProgress",
+    "model_id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+    "state": "downloading",
+    "bytes": 304087040,
+    "total": 3040870400,
+    "error": null
+  },
+  {
+    "type": "LocalModelProgress",
+    "model_id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+    "state": "downloading",
+    "bytes": 608174080,
+    "total": 3040870400,
+    "error": null
+  },
+  {
     "type": "MicLevel",
     "level": 0.28716582341864194
   },
@@ -841,17 +865,17 @@
   {
     "type": "TurnStatus",
     "session_id": "s-api",
-    "turn_id": "t-muo1g4as-19",
+    "turn_id": "t-muo3lajg-19",
     "status": "complete"
   },
   {
     "type": "Error",
     "session_id": "s-trip",
-    "turn_id": "t-muo3la2s-23",
+    "turn_id": "t-muo5qgbg-23",
     "error": {
       "code": "rate_limited",
       "message": "Limit zapytań u dostawcy Anthropic.",
-      "retry_at": "2026-09-30T11:48:00.100Z",
+      "retry_at": "2026-09-30T12:48:00.700Z",
       "provider": "Anthropic"
     }
   }

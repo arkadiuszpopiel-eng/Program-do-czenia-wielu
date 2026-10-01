@@ -32,7 +32,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'role.conductor': 'Conductor',
   'role.speaker': 'Speaker',
   'role.thinker': 'Thinker',
-  'role.executor': 'Executor',
+  'role.operator': 'Operator',
   'role.coder': 'Coder',
   'role.critic': 'Critic',
   'role.researcher': 'Researcher',

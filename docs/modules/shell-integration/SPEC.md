@@ -60,15 +60,25 @@ Ikona i menu zasobnika (z `ui-quick`), plakietki paska zadań, Ustawienia → Og
 ## Implementacja F1 (stan)
 - **Zasobnik:** Tauri `tray-icon` — menu: Pokaż Alfę, Nowa rozmowa, Szybkie pytanie, Głos (przełącznik →
   `voice_set_mic_enabled`; bez modułu głosu cofa zaznaczenie), Nie przeszkadzać (wycisza toasty Windows),
-  STOP WSZYSTKIEGO (`AppCore::system_kill_all`), Wyjście; lewy klik = okno główne. Stany ikony — F2.
-- **Skróty globalne:** `Ctrl+Alt+Space` (Szybkie pytanie), `Ctrl+Shift+F12` (STOP: w F1 anulowanie
-  wszystkich generacji; właściwy kill-switch przez Broker w F3). Konflikt rejestracji → `Toast` w UI.
+  STOP WSZYSTKIEGO (`AppCore::system_kill_all(KillOrigin::Tray)`), Wyjście; lewy klik = okno główne.
+  „Nowa rozmowa" tworzy sesję i otwiera ją w oknie głównym przez zdarzenie `OpenSession` (okno pokazuje
+  rdzeń; przy błędzie zasobnik pokazuje samo okno). Stany ikony — F2.
+- **Skróty globalne:** `Ctrl+Alt+Space` (Szybkie pytanie), `Ctrl+Shift+F12` (STOP:
+  `system_kill_all(KillOrigin::Hotkey)` — anulowanie generacji i pobierań modeli, kill-switch Brokera
+  (`BrokerPort::kill_all`: unieważnienie tokenów, drzewa procesów, wpis audytu `broker.kill_switch`),
+  zatrzymanie mowy; ≤ 200 ms). Konflikt rejestracji → `Toast` w UI.
   Reguła AltGr i zarezerwowany kill-switch sprawdzane też w `settings_set_shortcut`.
 - **Jedna instancja:** `tauri-plugin-single-instance` (pierwsza wtyczka) — druga instancja przekazuje
   argumenty; URI `alfa://` parsuje `app_core::protocol` z listą dozwolonych akcji: `open`, `quick`,
   `session/<id>` (id `[A-Za-z0-9_-]`), `new?text=` (tekst trafia do szkicu, nigdy nie jest wysyłany);
   reszta odrzucana (limit 2048 znaków, bez znaków sterujących). Rejestracja schematu: `plugins.deep-link`
   w `tauri.conf.json` (instalator). Single-instance przez mutex/IPC wtyczki — decyzja z pytania otwartego.
+- **Przejście do sesji:** zdarzenie `OpenSession { sessionId }` (rdzeń → UI; `AppCore::open_session_in_ui`)
+  pokazuje okno główne i przełącza je na sesję — używają go zasobnik („Nowa rozmowa"),
+  `quick_expand_to_main` i URI `alfa://session/<id>`.
+- **Dialogi plików:** `tauri-plugin-dialog` (=2.8.1) implementuje `ShellPort::pick_save_path`
+  (filtr „Paczka Alfy" `*.alfa`), `pick_open_path` i „Zapisz jako" kodu; anulowanie dialogu = `None`
+  (komenda kończy się bez błędu). Dialogi blokujące wołane z `spawn_blocking`, nigdy z wątku UI.
 - **Do F1+/launcher:** autostart, „Wyślij do", AUMID, pasek zadań; rejestracje mają wskazywać stały launcher
   (ADR 0007), którego jeszcze nie ma — dziś wskazują binarium instalatora.
 

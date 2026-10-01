@@ -29,8 +29,23 @@
 
   async function request() {
     const level = wanted as AutonomyLevel;
-    await app.client.permissions.requestLevel(level, scope === 'session' ? app.activeId : null);
-    app.toasts.show({ kind: 'info', message: t('perm.requested', { level }) });
+    try {
+      const result = await app.client.permissions.requestLevel(
+        level,
+        scope === 'session' ? app.activeId : null,
+      );
+      if (result.status === 'applied') {
+        perms = await app.client.permissions.get(app.activeId);
+        app.toasts.show({ kind: 'success', message: t('perm.applied', { level }) });
+      } else {
+        app.toasts.show({ kind: 'info', message: t('perm.requested', { level }) });
+      }
+    } catch (error) {
+      app.toasts.show({
+        kind: 'error',
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 </script>
 

@@ -117,6 +117,11 @@ export const plSettings = {
   'tr.passwordRepeat': 'Powtórz hasło',
   'tr.passwordMismatch': 'Hasła się różnią.',
   'tr.exportButton': 'Eksportuj…',
+  'tr.secrets.title': 'Eksport sekretów',
+  'tr.secrets.desc':
+    'Klucze API nie wchodzą do zwykłego eksportu. Tutaj możesz jawnie zapisać je do osobnej paczki — zawsze zaszyfrowanej hasłem.',
+  'tr.secrets.button': 'Eksportuj sekrety',
+  'tr.secrets.saved': 'Zapisano sekrety (zaszyfrowane): {path}',
   'tr.exported': 'Zapisano {path} · {files} · {size}',
   'tr.files': { one: '{n} plik', few: '{n} pliki', many: '{n} plików', other: '{n} pliku' },
   'tr.importIntro':
@@ -172,6 +177,7 @@ export const plSettings = {
     'Nie pyta o nic poza twardymi blokadami Jądra i potwierdzeniem destrukcji zleconej głosem.',
   'perm.current': 'obecny',
   'perm.request': 'Zmień na {level}',
+  'perm.applied': 'Poziom zmieniony na {level} — obniżenie nie wymaga potwierdzenia.',
   'perm.requested': 'Otworzono okno Brokera — potwierdź tam zmianę na {level}.',
   'perm.scope': 'Zakres zmiany',
   'perm.scope.global': 'Globalnie',
@@ -306,6 +312,15 @@ export const plSettings = {
     many: 'Dodano {n} kont.',
     other: 'Dodano {n} konta.',
   },
+  'ob.local.title': 'Model lokalny',
+  'ob.local.desc':
+    'Działa bez kluczy i bez internetu (komendy, praca offline). Pobranie jest jednorazowe i wznawiane.',
+  'ob.local.download': 'Pobierz {name} ({size})',
+  'ob.local.cancel': 'Anuluj pobieranie',
+  'ob.local.progress': 'Pobieranie modelu lokalnego',
+  'ob.local.done': 'Model lokalny jest gotowy.',
+  'ob.local.failed': 'Pobieranie nie powiodło się: {error}',
+  'ob.local.cancelled': 'Pobieranie anulowane — możesz wznowić później.',
   'ob.autonomy.title': 'Jak bardzo agentki działają same?',
   'ob.autonomy.desc':
     'Zaczynamy od L3. Zmienisz to jednym przełącznikiem w Ustawieniach, a każdą zmianę potwierdzisz w oknie Brokera.',

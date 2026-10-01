@@ -7,22 +7,6 @@ use crate::dto::{self, BlockKind, RenderedBlock, ThinkingInfo, TurnStatus};
 use crate::ids;
 use crate::store::TurnMeta;
 
-/// Rola w personas → identyfikator w UI (UI używa `executor` dla roli `operator`).
-pub fn ui_role(role: &str) -> String {
-    match role {
-        "operator" => "executor".to_owned(),
-        other => other.to_owned(),
-    }
-}
-
-/// Rola z UI → identyfikator w personas.
-pub fn core_role(role: &str) -> String {
-    match role {
-        "executor" => "operator".to_owned(),
-        other => other.to_owned(),
-    }
-}
-
 /// Blok lib-markdown → DTO (blok kodu = jeden fenced block najwyższego poziomu).
 pub fn block_dto(block: &Block, closed: bool) -> RenderedBlock {
     let is_code = block.code.len() == 1 && block.html.trim_start().starts_with("<pre");
@@ -127,12 +111,5 @@ mod tests {
         let html: String = blocks.iter().map(|b| b.html_sanitized.as_str()).collect();
         assert!(!html.contains("<script"));
         assert!(!html.contains("javascript:"));
-    }
-
-    #[test]
-    fn roles_alias_operator_as_executor() {
-        assert_eq!(ui_role("operator"), "executor");
-        assert_eq!(core_role("executor"), "operator");
-        assert_eq!(ui_role("coder"), "coder");
     }
 }

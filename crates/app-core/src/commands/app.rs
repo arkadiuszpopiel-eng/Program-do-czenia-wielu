@@ -85,4 +85,16 @@ impl AppCore {
         };
         self.config_set(keys::ACTIVE_SESSION, value, true).await
     }
+
+    /// „Przejdź do sesji" spoza okna głównego (zasobnik, protokół `alfa://session/…`,
+    /// Szybkie pytanie): aktywna sesja + zdarzenie `OpenSession` (UI przełącza widok) + okno.
+    pub async fn open_session_in_ui(&self, session_id: String) -> Result<(), AppError> {
+        let id = crate::ids::session(&session_id)?;
+        self.ensure_session(&id)?;
+        self.app_set_active_session(Some(id.to_string())).await?;
+        self.emit(crate::dto::AlfaEvent::OpenSession {
+            session_id: id.to_string(),
+        });
+        self.inner.shell.show_main(Some(id.as_str()))
+    }
 }

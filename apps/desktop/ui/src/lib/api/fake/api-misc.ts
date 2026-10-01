@@ -1,12 +1,13 @@
 // Atrapa: aplikacja, agentki, koszty, ustawienia, oś czasu, pliki, uprawnienia, urządzenia, głos, system.
 import type { AlfaClient } from '../client';
-import type { EventLevel } from '../types';
+import type { AutonomyLevel, EventLevel } from '../types';
 import type { FakeChat } from './api-chat';
 import type { FakeCore } from './core';
 import { seedDevice } from './fixtures';
 import { SETTINGS_SCHEMA, defaultValues } from './settings-schema';
 
 const LEVELS: readonly EventLevel[] = ['trace', 'debug', 'info', 'warn', 'error', 'audit'];
+const ORDER: readonly AutonomyLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
 
 export function appApi(core: FakeCore): AlfaClient['app'] {
   return {
@@ -125,15 +126,24 @@ export function filesApi(core: FakeCore): AlfaClient['files'] {
 }
 
 export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
+  // Jak Broker: obniżenie działa od razu (`applied`), podniesienie czeka w oknie Brokera.
+  let global: AutonomyLevel = 'L3';
   return {
     get: (sid) =>
       core.reply({
-        global: 'L3' as const,
+        global,
         session: sid ? (core.session(sid)?.autonomy ?? null) : null,
         hello_enabled: false,
       }),
-    requestLevel: () =>
-      core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
+    requestLevel: (level, sid) => {
+      const current = sid ? (core.session(sid)?.autonomy ?? global) : global;
+      if (ORDER.indexOf(level) > ORDER.indexOf(current)) {
+        return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
+      }
+      if (sid) core.updateSession(sid, { autonomy: level });
+      else global = level;
+      return core.reply({ status: 'applied' as const, request_id: '' });
+    },
     openApproval: () =>
       core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
   };

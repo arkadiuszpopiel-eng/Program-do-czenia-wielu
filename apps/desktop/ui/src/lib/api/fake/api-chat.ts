@@ -269,7 +269,7 @@ export class FakeChat {
     switch (template) {
       case 'solo':
         return {
-          alfa: ['conductor', 'speaker', 'researcher', 'executor', 'writer'],
+          alfa: ['conductor', 'speaker', 'researcher', 'operator', 'writer'],
           beta: [],
           gama: [],
           delta: [],

@@ -12,6 +12,10 @@ repository.workspace = true
 # od `*-fake` wyłącznie w dev-dependencies; od app-core nie zależy żaden crate workspace
 # (powłoka `apps/desktop/src-tauri` jest poza workspace).
 [dependencies]
+# Kontrakt IPC wydzielony z app-core (DTO, błędy, zdarzenia, porty) — reeksportowany.
+app-api = { path = "../app-api" }
+# Adaptery portów na modułach -impl (transfer, Broker w procesie, głos) — część korzenia.
+app-modules = { path = "../app-modules" }
 # Jądro
 core-bus-contract.workspace = true
 core-bus-impl = { path = "../core-bus-impl" }
@@ -50,24 +54,49 @@ personas-contract = { path = "../personas-contract" }
 personas-impl = { path = "../personas-impl" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
 scheduler-lite-impl = { path = "../scheduler-lite-impl" }
+# Router, model lokalny, rezydencja modeli
+router-contract = { path = "../router-contract" }
+router-impl = { path = "../router-impl" }
+providers-local-impl = { path = "../providers-local-impl" }
+model-residency-contract = { path = "../model-residency-contract" }
+model-residency-impl = { path = "../model-residency-impl" }
+# Bezpieczeństwo: Broker w procesie (tryb deweloperski), klasyfikator ryzyka, dziennik cofania
+safety-broker-contract = { path = "../safety-broker-contract" }
+safety-broker-impl = { path = "../safety-broker-impl" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+risk-classifier-impl = { path = "../risk-classifier-impl" }
+undo-journal-contract = { path = "../undo-journal-contract" }
+undo-journal-impl = { path = "../undo-journal-impl" }
+watchdog-contract = { path = "../watchdog-contract" }
+# Paczki .alfa, aktualizacje
+transfer-contract = { path = "../transfer-contract" }
+transfer-impl = { path = "../transfer-impl" }
+updater-contract = { path = "../updater-contract" }
+updater-impl = { path = "../updater-impl" }
+# Głos: audio (WASAPI) i TTS
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-audio-impl = { path = "../voice-audio-impl" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+voice-tts-impl = { path = "../voice-tts-impl" }
 # Zewnętrzne (wersje z [workspace.dependencies] albo już obecne w Cargo.lock)
 async-trait.workspace = true
 chrono.workspace = true
+semver.workspace = true
+toml.workspace = true
 futures-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-thiserror.workspace = true
 tokio = { workspace = true, features = ["rt"] }
 tracing.workspace = true
 uuid.workspace = true
-# Zerowanie sekretów z kreatora kont (ta sama wersja co w accounts-hub/lib-sqlstore).
-zeroize = "1.9.0"
 # Klient HTTP kursu NBP dla cost-meter (ta sama wersja i cechy co providers-api-impl: rustls, bez OpenSSL).
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 
 [dev-dependencies]
 providers-fake = { path = "../providers-fake" }
 device-profile-fake = { path = "../device-profile-fake" }
+voice-audio-fake = { path = "../voice-audio-fake" }
+voice-tts-fake = { path = "../voice-tts-fake" }
 tempfile = "3.27.0"
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
 

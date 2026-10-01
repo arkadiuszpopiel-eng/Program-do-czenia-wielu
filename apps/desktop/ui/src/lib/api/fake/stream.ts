@@ -167,7 +167,7 @@ export class FakeStreamer {
           ...running,
           status: 'done' as const,
           duration_ms: tool.ms,
-          undo_token: tool.undo ? `undo-${id}` : null,
+          undo_token: tool.undo ? `${sid}:u${toolIndex + 1}` : null,
         };
         turn.tools = turn.tools.map((s) => (s.id === id ? done : s));
         emit({ type: 'ToolCall', session_id: sid, turn_id: tid, step: done });

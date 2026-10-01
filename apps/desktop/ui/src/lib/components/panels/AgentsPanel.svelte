@@ -24,7 +24,7 @@
     'conductor',
     'speaker',
     'thinker',
-    'executor',
+    'operator',
     'coder',
     'critic',
     'researcher',

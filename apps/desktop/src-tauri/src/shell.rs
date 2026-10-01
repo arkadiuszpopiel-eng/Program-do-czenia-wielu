@@ -1,11 +1,15 @@
-//! `ShellPort` dla `AppCore` (okna, akcje plików jako użytkownik, ustawienia Windows) oraz
-//! obsługa argumentów drugiej instancji / protokołu `alfa://` (lista dozwolonych w app-core).
+//! `ShellPort` dla `AppCore` (okna, natywne dialogi „Zapisz jako"/„Otwórz", akcje plików jako
+//! użytkownik, ustawienia Windows) oraz obsługa argumentów drugiej instancji / protokołu `alfa://`
+//! (lista dozwolonych w app-core; „przejdź do sesji" = zdarzenie `OpenSession` dla UI).
+
+use std::path::PathBuf;
 
 use app_core::dto::{AlfaEvent, LocalizedText, SessionTemplate, ToastKind};
 use app_core::ports::{ArtifactIntent, ArtifactIntentAction, ShellPort};
 use app_core::protocol::{ProtocolAction, from_args};
 use app_core::{AppCore, AppError};
 use tauri::{AppHandle, Manager};
+use tauri_plugin_dialog::{DialogExt, FilePath};
 
 use crate::windows;
 
@@ -23,6 +27,15 @@ impl TauriShell {
 
 fn window_error(e: tauri::Error) -> AppError {
     AppError::internal(format!("okno: {e}"))
+}
+
+/// Ścieżka z dialogu (na pulpicie zawsze ścieżka pliku, nie URI).
+fn picked(path: Option<FilePath>) -> Result<Option<PathBuf>, AppError> {
+    path.map(|p| {
+        p.into_path()
+            .map_err(|e| AppError::internal(format!("okno wyboru pliku: {e}")))
+    })
+    .transpose()
 }
 
 /// Uruchamia `explorer.exe` z argumentami (Windows); poza Windows — funkcja niedostępna.
@@ -66,11 +79,33 @@ impl ShellPort for TauriShell {
         }
     }
 
-    fn save_text_as(&self, _suggested_name: &str, _text: &str) -> Result<bool, AppError> {
-        Err(AppError::unavailable(
-            "Zapis przez okno dialogowe",
-            "shell-integration",
-        ))
+    fn save_text_as(&self, suggested_name: &str, text: &str) -> Result<bool, AppError> {
+        let dialog = self.app.dialog().file().set_file_name(suggested_name);
+        let Some(path) = picked(dialog.blocking_save_file())? else {
+            return Ok(false);
+        };
+        std::fs::write(&path, text)
+            .map(|()| true)
+            .map_err(|e| AppError::storage(format!("{}: {e}", path.display())))
+    }
+
+    fn pick_save_path(&self, suggested_name: &str) -> Result<Option<PathBuf>, AppError> {
+        let dialog = self
+            .app
+            .dialog()
+            .file()
+            .add_filter("Paczka Alfy", &["alfa"])
+            .set_file_name(suggested_name);
+        picked(dialog.blocking_save_file())
+    }
+
+    fn pick_open_path(&self) -> Result<Option<PathBuf>, AppError> {
+        let dialog = self
+            .app
+            .dialog()
+            .file()
+            .add_filter("Paczka Alfy", &["alfa"]);
+        picked(dialog.blocking_pick_file())
     }
 }
 
@@ -90,16 +125,8 @@ pub fn handle_args(app: &AppHandle, argv: Vec<String>) {
         let result = match action {
             None | Some(ProtocolAction::Open) => windows::show_main(&app).map_err(window_error),
             Some(ProtocolAction::QuickAsk) => windows::toggle_quick(&app).map_err(window_error),
-            Some(ProtocolAction::OpenSession(id)) => {
-                match core.app_set_active_session(Some(id)).await {
-                    Ok(()) => windows::show_main(&app).map_err(window_error),
-                    Err(e) => Err(e),
-                }
-            }
-            Some(ProtocolAction::NewChat(text)) => match new_chat(&core, text).await {
-                Ok(()) => windows::show_main(&app).map_err(window_error),
-                Err(e) => Err(e),
-            },
+            Some(ProtocolAction::OpenSession(id)) => core.open_session_in_ui(id).await,
+            Some(ProtocolAction::NewChat(text)) => new_chat(&core, text).await,
         };
         if let Err(e) = result {
             tracing::warn!(error = %e, "akcja protokołu alfa:// nie powiodła się");
@@ -108,11 +135,12 @@ pub fn handle_args(app: &AppHandle, argv: Vec<String>) {
     });
 }
 
-/// Nowa rozmowa (zasobnik, protokół): sesja + szkic (tekst z zewnątrz nie jest wysyłany).
+/// Nowa rozmowa (zasobnik, protokół): sesja + szkic (tekst z zewnątrz nie jest wysyłany),
+/// UI przechodzi do niej (`OpenSession`), okno główne na wierzch.
 pub async fn new_chat(core: &AppCore, text: Option<String>) -> Result<(), AppError> {
     let session = core.sessions_create(SessionTemplate::Empty).await?;
     if let Some(text) = text {
         core.sessions_save_draft(session.id.clone(), text).await?;
     }
-    core.app_set_active_session(Some(session.id)).await
+    core.open_session_in_ui(session.id).await
 }

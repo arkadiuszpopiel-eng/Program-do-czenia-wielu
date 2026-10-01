@@ -5,7 +5,7 @@ use memory_contract::{Memory, NewMemory, RememberMode};
 use sessions_contract::{SessionHistory, SessionId};
 
 use crate::core::AppCore;
-use crate::dto::{BrokerIntentResult, Rating, RememberScope};
+use crate::dto::{BrokerIntentResult, EventLevel, Rating, RememberScope, TimelineKind};
 use crate::error::AppError;
 use crate::ids;
 
@@ -84,9 +84,12 @@ impl AppCore {
             .as_deref()
             .filter(|l| l.chars().all(|c| c.is_ascii_alphanumeric()) && !l.is_empty())
             .unwrap_or("txt");
-        self.inner
-            .shell
-            .save_text_as(&format!("kod.{ext}"), &code)?;
+        // Natywny dialog blokuje wątek — poza pulą zadań async.
+        let shell = self.inner.shell.clone();
+        let name = format!("kod.{ext}");
+        tokio::task::spawn_blocking(move || shell.save_text_as(&name, &code))
+            .await
+            .map_err(|e| AppError::internal(format!("okno zapisu: {e}")))??;
         Ok(())
     }
 
@@ -103,8 +106,19 @@ impl AppCore {
             .await
     }
 
-    /// `turns_undo_step` ⟶ dziennik cofania (`fs.*`, przez Brokera).
+    /// `turns_undo_step` ⟶ dziennik cofania (`fs.*`): token `"<sesja>:u<krok>"` z karty kroku.
     pub async fn turns_undo_step(&self, undo_token: String) -> Result<(), AppError> {
-        self.inner.broker.undo_step(&undo_token).await
+        let (session, step) = ids::parse_undo(&undo_token)?;
+        self.ensure_session(&session)?;
+        let result = self.inner.broker.undo_step(&session, step).await;
+        let (level, title) = match &result {
+            Ok(text) => (EventLevel::Audit, format!("Cofnięto: {text}")),
+            Err(e) => (
+                EventLevel::Warn,
+                format!("Cofnięcie nieudane: {}", e.message),
+            ),
+        };
+        self.timeline_note(&session, TimelineKind::Tool, level, title, Some(undo_token));
+        result.map(|_| ())
     }
 }

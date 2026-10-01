@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::common::LocalizedText;
-use super::hub::Account;
+use super::hub::{Account, LocalDownloadState};
 use super::panels::{ActivityInfo, AgentState, CostSummary, TimelineEvent};
 use super::sessions::{
     ApprovalPending, RenderedBlock, SessionSummary, ToolStep, Turn, TurnError, TurnStatus,
@@ -118,5 +118,17 @@ pub enum AlfaEvent {
     Toast {
         kind: ToastKind,
         message: LocalizedText,
+    },
+    /// Przejdź do sesji (zasobnik, protokół `alfa://session/…`, powiadomienie, Szybkie pytanie).
+    OpenSession {
+        session_id: String,
+    },
+    /// Postęp pobierania modelu lokalnego (onboarding, Ustawienia).
+    LocalModelProgress {
+        model_id: String,
+        state: LocalDownloadState,
+        bytes: u64,
+        total: Option<u64>,
+        error: Option<String>,
     },
 }

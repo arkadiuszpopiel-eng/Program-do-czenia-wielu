@@ -89,8 +89,17 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
   uprawnienia `allow-<komenda>` z manifestu aplikacji w `build.rs`); CSP mapą dyrektyw bez `unsafe-inline`
   dla skryptów; DevTools tylko w debug; port CDP wyłącznie z cechą `e2e`. Trusted Types — jeszcze nie
   wymuszane w CSP (wymaga polityki dla `SanitizedHtml.svelte`).
-- **Luka kontraktu:** brak zdarzenia „przejdź do sesji" — „Nowa rozmowa" z zasobnika/protokołu ustawia
-  aktywną sesję (widoczną po starcie UI) i wysyła `SessionUpdated`, ale działające UI nie przełącza widoku.
+- **Przejście do sesji:** zdarzenie `OpenSession { sessionId }` (rdzeń → UI) — „Nowa rozmowa" z zasobnika,
+  `alfa://session/<id>` i `quick_expand_to_main` ustawiają aktywną sesję, a działające UI przełącza widok
+  (`focusSession`).
+- **Moduły za komendami (po F1):** `turns_send` idzie przez Router (kapsuła aktywności „Odpowiada X · model
+  (lokalnie/przez API)" + wpis osi czasu „Router → …"); `models_local_list/download/cancel` + zdarzenie
+  `LocalModelProgress` (karta modelu lokalnego w kroku kluczy wprowadzenia); `transfer_*` z natywnymi
+  dialogami i `transfer_export_secrets` (Ustawienia → Przenoszenie, tylko jawnie, z hasłem);
+  `permissions_request_level` zwraca `applied` (obniżenie — od razu) albo `opened_broker` (podniesienie —
+  tylko przez okno Brokera; bez Broker-UI odmowa); `turns_undo_step` przyjmuje token `"<sesja>:u<krok>"`;
+  `turns_read_aloud` czyta głosem agentki (bez silnika TTS — komunikat „pobierz w Ustawieniach → Głos").
+  Rola agentki wykonującej działania ma jedną nazwę: `operator` (jak w `personas-contract`).
 
 ## Otwarte pytania
 - Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.

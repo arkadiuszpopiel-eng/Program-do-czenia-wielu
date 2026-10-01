@@ -189,6 +189,10 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             vec![("request", parse_only::<ExportRequest>)],
             roundtrip::<ExportResult>,
         ),
+        "transfer_export_secrets" => (
+            vec![("password", parse_only::<SecretInput>)],
+            roundtrip::<ExportResult>,
+        ),
         "transfer_inspect" => (
             vec![("password", os), ("path", os)],
             roundtrip::<InspectResult>,
@@ -204,6 +208,8 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             roundtrip::<BrokerIntentResult>,
         ),
         "permissions_open_approval" => (vec![("approvalId", s)], roundtrip::<BrokerIntentResult>),
+        "models_local_list" => (vec![], roundtrip::<Vec<LocalModelInfo>>),
+        "models_local_download" | "models_local_cancel" => (vec![("modelId", os)], unit),
         "device_profile" | "device_measure" => (vec![], roundtrip::<DeviceProfile>),
         "voice_devices" => (vec![], roundtrip::<Vec<AudioDevice>>),
         "voice_start_mic_test"
@@ -278,8 +284,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 20 typów z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 20, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 22 typy z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 22, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

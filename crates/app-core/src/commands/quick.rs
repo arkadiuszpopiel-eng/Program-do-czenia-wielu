@@ -59,12 +59,10 @@ impl AppCore {
         })
     }
 
-    /// `quick_expand_to_main`: aktywna sesja + pokazanie okna głównego.
+    /// `quick_expand_to_main`: aktywna sesja + pokazanie okna głównego z tą sesją.
     pub async fn quick_expand_to_main(&self, session_id: String) -> Result<(), AppError> {
-        let id = ids::session(&session_id)?;
-        self.app_set_active_session(Some(id.to_string())).await?;
         self.inner.shell.hide_quick()?;
-        self.inner.shell.show_main(Some(id.as_str()))
+        self.open_session_in_ui(session_id).await
     }
 
     /// `quick_hide` (`Esc` w oknie Szybkiego pytania).

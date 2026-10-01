@@ -12,6 +12,15 @@ impl AppCore {
         self.inner.transfer.export(request).await
     }
 
+    /// `transfer_export_secrets` ⟶ natywny dialog; osobna, jawna paczka sekretów — zawsze
+    /// szyfrowana hasłem (min. 8 znaków), nigdy w zwykłym eksporcie.
+    pub async fn transfer_export_secrets(
+        &self,
+        password: SecretInput,
+    ) -> Result<ExportResult, AppError> {
+        self.inner.transfer.export_secrets(password).await
+    }
+
     /// `transfer_inspect` ⟶ dialog otwarcia (gdy `path = None`) + dry-run.
     pub async fn transfer_inspect(
         &self,

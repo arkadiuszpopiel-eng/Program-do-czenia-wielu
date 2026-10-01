@@ -258,7 +258,7 @@
           "session_id": "s-q3",
           "parent_id": "q5",
           "author": "delta",
-          "role_id": "executor",
+          "role_id": "operator",
           "created_at": "2026-09-30T08:43:00.000Z",
           "status": "complete",
           "text": "Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.",
@@ -279,7 +279,7 @@
               "label": "Utworzono szkic raport-Q3.docx",
               "status": "done",
               "duration_ms": 2100,
-              "undo_token": "undo-st5"
+              "undo_token": "s-q3:u5"
             }
           ],
           "approval": {
@@ -423,7 +423,7 @@
   {
     "command": "turns_undo_step",
     "args": {
-      "undoToken": "undo-st5"
+      "undoToken": "s-q3:u5"
     },
     "result": null
   },
@@ -686,7 +686,7 @@
           "session_id": "s-q3",
           "parent_id": "q5",
           "author": "delta",
-          "role_id": "executor",
+          "role_id": "operator",
           "created_at": "2026-09-30T08:43:00.000Z",
           "status": "complete",
           "text": "Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.",
@@ -707,7 +707,7 @@
               "label": "Utworzono szkic raport-Q3.docx",
               "status": "done",
               "duration_ms": 2100,
-              "undo_token": "undo-st5"
+              "undo_token": "s-q3:u5"
             }
           ],
           "approval": {
@@ -766,7 +766,7 @@
           "session_id": "s-q3",
           "parent_id": "t-munv0mw0-4",
           "author": "delta",
-          "role_id": "executor",
+          "role_id": "operator",
           "created_at": "2026-09-30T08:45:00.000Z",
           "status": "complete",
           "text": "Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym kliknięciem.",
@@ -795,7 +795,7 @@
               "label": "Przeniesiono 14 plików do Archiwum/2026",
               "status": "done",
               "duration_ms": 1200,
-              "undo_token": "undo-t-munv0mw0-5-t1"
+              "undo_token": "s-q3:u2"
             }
           ],
           "approval": {
@@ -934,7 +934,7 @@
           "session_id": "s-q3",
           "parent_id": "t-munv0mw0-5",
           "author": "delta",
-          "role_id": "executor",
+          "role_id": "operator",
           "created_at": "2026-09-30T11:45:00.000Z",
           "status": "cancelled",
           "text": "…co",
@@ -991,7 +991,7 @@
       }
     },
     "result": {
-      "user_turn_id": "t-muo1g4as-19",
+      "user_turn_id": "t-muo3lajg-19",
       "assistant_turn_id": null
     }
   },
@@ -1007,8 +1007,8 @@
       }
     },
     "result": {
-      "user_turn_id": "t-muo3la2s-22",
-      "assistant_turn_id": "t-muo3la2s-23"
+      "user_turn_id": "t-muo5qgbg-22",
+      "assistant_turn_id": "t-muo5qgbg-23"
     }
   }
 ]

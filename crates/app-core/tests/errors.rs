@@ -1,6 +1,7 @@
-//! Scenariusze błędów: brak kluczy („brak mózgu"), profil lokalny bez `providers-local`,
-//! 429 z czasem odnowienia, błąd sieci, kolejka offline i jej ponowienie, limit kosztów,
-//! porty niepodłączonych modułów, lista dozwolonych ustawień Windows.
+//! Scenariusze błędów: brak kluczy („brak mózgu" — Router bez kandydatów, także w profilu
+//! lokalnym bez pobranego modelu), 429 z czasem odnowienia, błąd sieci, kolejka offline i jej
+//! ponowienie, limit kosztów, czytelne błędy podpiętych modułów (dialogi, Broker bez okna
+//! zatwierdzeń, brak silnika TTS), lista dozwolonych ustawień Windows.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -67,8 +68,11 @@ async fn no_keys_gives_no_brain_error_and_local_profile_explains_missing_module(
         .unwrap()
         .assistant_turn_id
         .unwrap();
+    // Bez kluczy i bez pobranego modelu lokalnego Router nie ma kandydata także w profilu
+    // lokalnym — wciąż „brak mózgu" (NO_LOCAL dotyczy profilu lokalnego przy kluczach API).
     let events = until(&mut h.rx, ends(&local)).await;
-    assert_eq!(error_of(&events, &local).message, NO_LOCAL);
+    assert_eq!(error_of(&events, &local).message, NO_BRAIN);
+    assert_ne!(NO_LOCAL, NO_BRAIN);
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -193,7 +197,7 @@ async fn monthly_limit_blocks_paid_turns() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn unconnected_modules_report_readable_errors() {
+async fn connected_modules_report_readable_errors() {
     let h = harness().await;
     let core = &h.core;
     let sid = core
@@ -201,14 +205,12 @@ async fn unconnected_modules_report_readable_errors() {
         .await
         .unwrap()
         .id;
-    let check = |e: app_core::AppError, module: &str| {
+    // Powłoka bez okien: dialog pliku niedostępny (eksport nie zgaduje ścieżki).
+    let no_dialog = |e: app_core::AppError| {
         assert_eq!(e.code, ErrorCode::Unavailable, "{e:?}");
-        assert!(e.message.contains(module), "{}", e.message);
+        assert!(e.message.contains("shell-integration"), "{}", e.message);
     };
-    check(
-        core.sessions_export(sid.clone()).await.unwrap_err(),
-        "transfer",
-    );
+    no_dialog(core.sessions_export(sid.clone()).await.unwrap_err());
     let scope = ExportScope {
         config_common: true,
         personas: false,
@@ -220,27 +222,31 @@ async fn unconnected_modules_report_readable_errors() {
     };
     let request =
         serde_json::from_value(serde_json::json!({ "scope": scope, "password": null })).unwrap();
-    check(core.transfer_export(request).await.unwrap_err(), "transfer");
-    check(
-        core.transfer_rollback("x".into()).await.unwrap_err(),
-        "transfer",
-    );
-    check(
-        core.permissions_request_level(app_core::dto::AutonomyLevel::L4, None)
-            .await
-            .unwrap_err(),
-        "safety-broker",
-    );
-    check(
-        core.permissions_open_approval("ap".into())
-            .await
-            .unwrap_err(),
-        "safety-broker",
-    );
-    check(
-        core.voice_start_mic_test(None).await.unwrap_err(),
-        "voice-audio",
-    );
+    no_dialog(core.transfer_export(request).await.unwrap_err());
+    let missing = core.transfer_rollback("x".into()).await.unwrap_err();
+    assert_eq!(missing.code, ErrorCode::NotFound, "{missing:?}");
+    // Podniesienie poziomu tylko przez okno Brokera — bez Broker-UI odmowa.
+    let raise = core
+        .permissions_request_level(app_core::dto::AutonomyLevel::L4, None)
+        .await
+        .unwrap_err();
+    assert_eq!(raise.code, ErrorCode::Forbidden);
+    assert_eq!(raise.message, app_core::ports::NEEDS_BROKER_WINDOW);
+    let bad = core
+        .permissions_open_approval("ap".into())
+        .await
+        .unwrap_err();
+    assert_eq!(bad.code, ErrorCode::InvalidInput);
+    let undo = core
+        .turns_undo_step(format!("{sid}:u77"))
+        .await
+        .unwrap_err();
+    assert_eq!(undo.code, ErrorCode::NotFound, "{undo:?}");
+    // Rozmowa głosowa należy do potoku `voice-pipeline`; czytanie bez sidecara TTS — komunikat.
+    let mic = core.voice_set_mic_enabled(true).await.unwrap_err();
+    assert!(mic.message.contains("voice-pipeline"), "{}", mic.message);
+    core.voice_start_mic_test(None).await.unwrap();
+    core.voice_stop_mic_test().await.unwrap();
     core.voice_stop_speech().await.unwrap();
     core.voice_set_muted(true).await.unwrap();
     let _microphones = core.voice_devices().await.unwrap();

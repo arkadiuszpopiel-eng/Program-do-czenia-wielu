@@ -62,6 +62,22 @@ pub fn timeline_dto(session: &SessionId) -> String {
     format!("{session}:e{}", uuid::Uuid::new_v4().simple())
 }
 
+/// Token cofnięcia kroku dziennika `undo-journal` w DTO (`ToolStep.undo_token`): `"<sesja>:u<krok>"`.
+pub fn undo_dto(session: &SessionId, step: u64) -> String {
+    format!("{session}:u{step}")
+}
+
+/// Parsuje token cofnięcia z DTO.
+pub fn parse_undo(token: &str) -> Result<(SessionId, u64), AppError> {
+    let bad = || AppError::invalid(format!("Nieprawidłowy token cofnięcia „{token}”."));
+    let (session_id, rest) = token.split_once(':').ok_or_else(bad)?;
+    let step = rest
+        .strip_prefix('u')
+        .and_then(|n| n.parse::<u64>().ok())
+        .ok_or_else(bad)?;
+    Ok((session(session_id)?, step))
+}
+
 /// Waliduje identyfikator sesji z UI (niepusty, bez `:` i znaków sterujących).
 pub fn session(id: &str) -> Result<SessionId, AppError> {
     if id.is_empty() || id.len() > 128 || id.contains(':') || id.chars().any(char::is_control) {
@@ -99,5 +115,16 @@ mod tests {
         assert!(session("").is_err());
         assert_eq!(session("s-q3").unwrap(), SessionId::new("s-q3"));
         assert!(timeline_dto(&s).starts_with("s1:e"));
+    }
+
+    #[test]
+    fn undo_tokens_carry_session() {
+        let s = SessionId::new("s-1");
+        let token = undo_dto(&s, 42);
+        assert_eq!(token, "s-1:u42");
+        assert_eq!(parse_undo(&token).unwrap(), (s, 42));
+        for bad in ["", "s-1", "s-1:x4", ":u1", "s:u", "s:u-1"] {
+            assert!(parse_undo(bad).is_err(), "{bad}");
+        }
     }
 }

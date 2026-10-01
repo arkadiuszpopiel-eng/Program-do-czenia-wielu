@@ -64,12 +64,16 @@ pub(crate) struct Runtime {
     pub gens: HashMap<SessionId, GenHandle>,
     pub trash: HashMap<String, (SessionId, tokio::task::AbortHandle)>,
     pub context_window: HashMap<SessionId, u64>,
+    /// Trwające pobierania modeli lokalnych (model → anulowanie).
+    pub downloads: HashMap<String, CancellationToken>,
 }
 
 /// Współdzielony stan kompozycji.
 pub(crate) struct Inner {
     pub paths: AppPaths,
     pub app_version: String,
+    /// Po jakim czasie bez awarii start jest zdrowy (`updater::mark_good`).
+    pub healthy_after: Duration,
     pub undo_window: Option<Duration>,
     pub bus: Arc<dyn EventBus>,
     pub registry: Arc<ModuleRegistry>,
@@ -88,6 +92,9 @@ pub(crate) struct Inner {
     /// Utrzymuje `scheduler-lite` (zasoby wyłączne — użyje go głos/agentki w kolejnych falach).
     pub _scheduler: Arc<SchedulerModule>,
     pub brain: Arc<dyn BrainPort>,
+    /// Moduły podpięte po F1 (rezydencja, model lokalny, Router, Broker, transfer, głos,
+    /// aktualizacje) — trzymane przez cały czas życia rdzenia.
+    pub extra: crate::parts::Extra,
     pub transfer: Arc<dyn TransferPort>,
     pub voice: Arc<dyn VoicePort>,
     pub broker: Arc<dyn BrokerPort>,
@@ -119,6 +126,16 @@ impl AppCore {
     /// Wersja aplikacji.
     pub fn app_version(&self) -> &str {
         &self.inner.app_version
+    }
+
+    /// Dziennik cofania `fs.*` (`undo-journal`) dla narzędzi plików (agent-runtime) — tokeny kart
+    /// „Cofnij" w UI: `ids::undo_dto(sesja, krok)`. `None` = moduł niepodłączony.
+    pub fn undo_journal(&self) -> Option<Arc<dyn undo_journal_contract::UndoJournal>> {
+        self.inner
+            .extra
+            .undo
+            .clone()
+            .map(|u| u as Arc<dyn undo_journal_contract::UndoJournal>)
     }
 
     pub(crate) fn rt(&self) -> MutexGuard<'_, Runtime> {
@@ -225,9 +242,33 @@ impl AppCore {
 
     /// Poziom autonomii globalny.
     pub(crate) async fn autonomy(&self) -> AutonomyLevel {
+        if let Some(view) = self.inner.broker.levels(None).await {
+            return view.global;
+        }
         let raw = self.config_str(keys::AUTONOMY).await;
         raw.and_then(|s| serde_json::from_value(serde_json::Value::String(s)).ok())
             .unwrap_or_default()
+    }
+
+    /// Poziom autonomii obowiązujący w sesji (z Brokera; bez niego — globalny z konfiguracji).
+    pub(crate) async fn session_autonomy(&self, session: &SessionId) -> AutonomyLevel {
+        match self.inner.broker.levels(Some(session)).await {
+            Some(view) => view.session.unwrap_or(view.global),
+            None => self.autonomy().await,
+        }
+    }
+
+    /// `SessionUpdated` dla wszystkich sesji (np. po zmianie poziomu globalnego).
+    pub(crate) async fn announce_all_sessions(&self) {
+        let all = self
+            .inner
+            .sessions
+            .list_sessions(&sessions_contract::SessionQuery::default())
+            .unwrap_or_default();
+        for s in &all {
+            let session = self.session_dto(s).await;
+            self.emit(AlfaEvent::SessionUpdated { session });
+        }
     }
 
     /// Profil modelu domyślny (bez kluczy — lokalny).
@@ -264,7 +305,7 @@ impl AppCore {
             unread: s.unread > 0,
             updated_at: dto::iso(s.activity_at().max(s.meta.updated_at)),
             tags: s.meta.tags.clone(),
-            autonomy: self.autonomy().await,
+            autonomy: self.session_autonomy(&s.meta.id).await,
             profile,
         }
     }

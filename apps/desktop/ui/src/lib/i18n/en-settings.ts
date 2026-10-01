@@ -111,6 +111,11 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'tr.passwordRepeat': 'Repeat password',
   'tr.passwordMismatch': 'Passwords do not match.',
   'tr.exportButton': 'Export…',
+  'tr.secrets.title': 'Export secrets',
+  'tr.secrets.desc':
+    'API keys never go into a regular export. Here you can explicitly save them to a separate package — always encrypted with a password.',
+  'tr.secrets.button': 'Export secrets',
+  'tr.secrets.saved': 'Secrets saved (encrypted): {path}',
   'tr.exported': 'Saved {path} · {files} · {size}',
   'tr.files': { one: '{n} file', other: '{n} files' },
   'tr.importIntro':
@@ -161,6 +166,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
     'Asks about nothing except the Kernel’s hard blocks and confirming destruction ordered by voice.',
   'perm.current': 'current',
   'perm.request': 'Change to {level}',
+  'perm.applied': 'Level changed to {level} — lowering needs no confirmation.',
   'perm.requested': 'The Broker window is open — confirm the change to {level} there.',
   'perm.scope': 'Scope of change',
   'perm.scope.global': 'Globally',
@@ -285,6 +291,15 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'ob.keys.addNow': 'Add now',
   'ob.keys.skip': 'Skip — I will add it later',
   'ob.keys.added': { one: '{n} account added.', other: '{n} accounts added.' },
+  'ob.local.title': 'Local model',
+  'ob.local.desc':
+    'Works without keys and offline (commands, offline work). A one-time, resumable download.',
+  'ob.local.download': 'Download {name} ({size})',
+  'ob.local.cancel': 'Cancel download',
+  'ob.local.progress': 'Downloading the local model',
+  'ob.local.done': 'The local model is ready.',
+  'ob.local.failed': 'Download failed: {error}',
+  'ob.local.cancelled': 'Download cancelled — you can resume later.',
   'ob.autonomy.title': 'How much should the agents act on their own?',
   'ob.autonomy.desc':
     'We start at L3. You change it with one switch in Settings and confirm each change in the Broker window.',

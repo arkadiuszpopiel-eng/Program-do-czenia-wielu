@@ -25,6 +25,18 @@
     }
   },
   {
+    "command": "transfer_export_secrets",
+    "args": {
+      "password": "długie hasło sekretów"
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\alfa-sekrety-2026-09-30.alfa",
+      "files": 2,
+      "bytes": 4096
+    }
+  },
+  {
     "command": "transfer_inspect",
     "args": {
       "password": null,

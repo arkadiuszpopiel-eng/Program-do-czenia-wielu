@@ -57,7 +57,7 @@ export const STANDARD_CAST: Readonly<Record<AgentId, readonly string[]>> = {
   alfa: ['conductor', 'speaker'],
   beta: ['keeper', 'writer'],
   gama: ['researcher', 'critic', 'thinker'],
-  delta: ['executor', 'coder'],
+  delta: ['operator', 'coder'],
 };
 
 const SMALL_TOPICS: Readonly<Record<string, string>> = {

@@ -18,6 +18,7 @@ import {
   timelineApi,
   voiceApi,
 } from './api-misc';
+import { modelsApi } from './api-models';
 import { FakeCore, type FakeOptions } from './core';
 
 export { FAKE_SCENARIOS, type FakeScenario, type FakeOptions } from './core';
@@ -40,6 +41,7 @@ export class FakeAlfaClient implements AlfaClient {
   readonly accounts: AlfaClient['accounts'];
   readonly transfer: AlfaClient['transfer'];
   readonly permissions: AlfaClient['permissions'];
+  readonly models: AlfaClient['models'];
   readonly device: AlfaClient['device'];
   readonly voice: AlfaClient['voice'];
   readonly system: AlfaClient['system'];
@@ -61,6 +63,7 @@ export class FakeAlfaClient implements AlfaClient {
     this.accounts = accountsApi(core);
     this.transfer = transferApi(core);
     this.permissions = permissionsApi(core);
+    this.models = modelsApi(core);
     this.device = deviceApi(core);
     this.voice = voiceApi(core);
     this.system = systemApi(core, chat);

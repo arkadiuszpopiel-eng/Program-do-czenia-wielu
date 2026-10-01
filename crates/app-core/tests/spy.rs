@@ -238,5 +238,8 @@ async fn stopping_one_session_does_not_touch_others() {
     assert_eq!(reasons[&turns[1]], app_core::dto::StopReason::Cancelled);
     assert_eq!(reasons[&turns[0]], app_core::dto::StopReason::End);
     assert_eq!(reasons[&turns[2]], app_core::dto::StopReason::End);
-    assert_eq!(core.system_kill_all().await, 0);
+    assert_eq!(
+        core.system_kill_all(app_core::ports::KillOrigin::Ui).await,
+        0
+    );
 }

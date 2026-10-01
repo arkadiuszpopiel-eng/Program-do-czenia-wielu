@@ -96,12 +96,12 @@ async function run(): Promise<void> {
   await both('turns', 'readAloud', 'q4b');
   await both('turns', 'saveCode', 'q4b', 2);
   await both('turns', 'runCode', 'q4b', 2);
-  await both('turns', 'undoStep', 'undo-st5');
+  await both('turns', 'undoStep', 's-q3:u5');
   await both('sessions', 'search', 'raport');
   await both('turns', 'list', 's-q3');
 
   await both('agents', 'list', 's-q3');
-  await both('agents', 'setRoles', 's-q3', 'delta', ['executor', 'coder']);
+  await both('agents', 'setRoles', 's-q3', 'delta', ['operator', 'coder']);
   await both('agents', 'applyCast', 's-q3', 'research');
 
   await both('costs', 'summary', 's-q3');
@@ -156,6 +156,7 @@ async function run(): Promise<void> {
     },
     password: null,
   });
+  await both('transfer', 'exportSecrets', 'długie hasło sekretów');
   await both('transfer', 'inspect', null, 'C:\\Users\\Ty\\Pobrane\\laptop-encrypted.alfa');
   await both('transfer', 'inspect', 'hasło', null);
   await both('transfer', 'importPackage', {
@@ -168,7 +169,18 @@ async function run(): Promise<void> {
 
   await both('permissions', 'get', 's-q3');
   await both('permissions', 'requestLevel', 'L4', 's-q3');
+  await both('permissions', 'requestLevel', 'L1', null);
   await both('permissions', 'openApproval', 'ap-1');
+
+  await both('models', 'localList');
+  await both('models', 'localDownload', null);
+  scheduler.advance(600);
+  await flush();
+  await both('models', 'localCancel', null);
+  await both('models', 'localDownload', 'bielik-4.5b-v3.0-instruct-q4_k_m');
+  scheduler.runAll();
+  await flush();
+  await both('models', 'localList');
 
   await both('device', 'profile');
   await both('device', 'measure');

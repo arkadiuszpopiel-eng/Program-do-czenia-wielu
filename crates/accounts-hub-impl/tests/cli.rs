@@ -20,6 +20,16 @@ mod unix {
 
     use super::common;
 
+    /// Testy zapisujące i uruchamiające skrypty idą po kolei: `fork` równoległego testu
+    /// w trakcie zapisu skryptu dziedziczy deskryptor zapisu i `exec` dostaje `ETXTBSY`.
+    static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    fn serial() -> std::sync::MutexGuard<'static, ()> {
+        SERIAL
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
     fn write_script(dir: &Path, name: &str, body: &str) -> PathBuf {
         use std::os::unix::fs::PermissionsExt;
         let path = dir.join(name);
@@ -30,6 +40,7 @@ mod unix {
 
     #[test]
     fn detects_bridge_in_path_with_version() {
+        let _serial = serial();
         let dir = common::temp_dir("cli");
         let bin = dir.join("bin");
         std::fs::create_dir_all(&bin).unwrap();
@@ -50,6 +61,7 @@ mod unix {
 
     #[test]
     fn hanging_or_failing_version_is_bounded() {
+        let _serial = serial();
         let dir = common::temp_dir("cli-slow");
         let slow = write_script(&dir, "claude", "sleep 30");
         let failing = write_script(&dir, "codex", "echo 1.0.0; exit 3");
@@ -64,6 +76,7 @@ mod unix {
 
     #[test]
     fn version_probe_runs_with_cleared_environment() {
+        let _serial = serial();
         // `cargo test` ustawia CARGO_PKG_NAME w procesie testu; dziecko nie może jej dostać
         // (środowisko jest czyszczone do listy dozwolonej — tak samo znikają klucze API).
         let dir = common::temp_dir("cli-env");

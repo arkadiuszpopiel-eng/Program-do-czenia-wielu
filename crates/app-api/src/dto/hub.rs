@@ -176,11 +176,13 @@ pub struct PermissionsState {
     pub hello_enabled: bool,
 }
 
-/// Stan intencji Brokera.
+/// Stan intencji Brokera: `opened_broker` — prośba czeka w oknie Brokera; `applied` — zmiana
+/// niewymagająca zatwierdzenia (obniżenie poziomu) została zastosowana od razu.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum BrokerIntentStatus {
     OpenedBroker,
+    Applied,
 }
 
 /// Wynik intencji Brokera.
@@ -270,4 +272,25 @@ pub struct AudioDevice {
     pub id: String,
     pub name: String,
     pub default: bool,
+}
+
+/// Model lokalny z manifestu `providers-local` (onboarding, Ustawienia → Modele lokalne).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LocalModelInfo {
+    pub id: String,
+    pub name: String,
+    pub size_bytes: u64,
+    pub installed: bool,
+    pub default: bool,
+    pub downloading: bool,
+}
+
+/// Stan pobierania modelu lokalnego (zdarzenie `LocalModelProgress`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LocalDownloadState {
+    Downloading,
+    Done,
+    Failed,
+    Cancelled,
 }

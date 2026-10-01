@@ -284,4 +284,22 @@ impl AppCore {
         let id = ids::session(&session_id)?;
         Ok(self.inner.sessions.save_draft(&id, &text)?)
     }
+
+    /// Tag prywatności sesji (`normal` / `private` / `local_only`) — trasy Routera, eksport.
+    /// Na razie API rdzenia (powłoka, testy); przełącznik w UI — kolejna fala `ui-shell`.
+    pub async fn sessions_set_privacy(
+        &self,
+        session_id: String,
+        privacy: sessions_contract::PrivacyTag,
+    ) -> Result<(), AppError> {
+        let id = ids::session(&session_id)?;
+        self.ensure_session(&id)?;
+        let patch = SessionPatch {
+            privacy: Some(privacy),
+            ..SessionPatch::default()
+        };
+        self.inner.sessions.update_session(&id, patch)?;
+        self.announce_session(&id).await;
+        Ok(())
+    }
 }

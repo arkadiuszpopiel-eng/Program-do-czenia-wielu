@@ -101,6 +101,7 @@ export class TauriAlfaClient implements AlfaClient {
 
   readonly transfer: AlfaClient['transfer'] = {
     exportPackage: (request) => call('transfer_export', { request }),
+    exportSecrets: (password) => call('transfer_export_secrets', { password }),
     inspect: (password, path) => call('transfer_inspect', { password, path }),
     importPackage: (request) => call('transfer_import', { request }),
     rollback: (snapshotId) => call('transfer_rollback', { snapshotId }),
@@ -110,6 +111,12 @@ export class TauriAlfaClient implements AlfaClient {
     get: (sessionId) => call('permissions_get', { sessionId }),
     requestLevel: (level, sessionId) => call('permissions_request_level', { level, sessionId }),
     openApproval: (approvalId) => call('permissions_open_approval', { approvalId }),
+  };
+
+  readonly models: AlfaClient['models'] = {
+    localList: () => call('models_local_list'),
+    localDownload: (modelId) => call('models_local_download', { modelId }),
+    localCancel: (modelId) => call('models_local_cancel', { modelId }),
   };
 
   readonly device: AlfaClient['device'] = {

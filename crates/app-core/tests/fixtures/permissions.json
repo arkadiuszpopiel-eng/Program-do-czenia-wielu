@@ -22,6 +22,17 @@
     }
   },
   {
+    "command": "permissions_request_level",
+    "args": {
+      "level": "L1",
+      "sessionId": null
+    },
+    "result": {
+      "status": "applied",
+      "request_id": ""
+    }
+  },
+  {
     "command": "permissions_open_approval",
     "args": {
       "approvalId": "ap-1"

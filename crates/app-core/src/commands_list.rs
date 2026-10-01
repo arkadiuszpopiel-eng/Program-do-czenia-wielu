@@ -60,12 +60,16 @@ macro_rules! with_commands {
             accounts_set_limit(account_id: String, enabled: bool, monthly: $crate::dto::Money) -> ();
             accounts_remove(account_id: String) -> ();
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
+            transfer_export_secrets(password: $crate::dto::SecretInput) -> $crate::dto::ExportResult;
             transfer_inspect(password: Option<$crate::dto::SecretInput>, path: Option<String>) -> $crate::dto::InspectResult;
             transfer_import(request: $crate::dto::ImportRequest) -> $crate::dto::ImportResult;
             transfer_rollback(snapshot_id: String) -> ();
             permissions_get(session_id: Option<String>) -> $crate::dto::PermissionsState;
             permissions_request_level(level: $crate::dto::AutonomyLevel, session_id: Option<String>) -> $crate::dto::BrokerIntentResult;
             permissions_open_approval(approval_id: String) -> $crate::dto::BrokerIntentResult;
+            models_local_list() -> Vec<$crate::dto::LocalModelInfo>;
+            models_local_download(model_id: Option<String>) -> ();
+            models_local_cancel(model_id: Option<String>) -> ();
             device_profile() -> $crate::dto::DeviceProfile;
             device_measure() -> $crate::dto::DeviceProfile;
             voice_devices() -> Vec<$crate::dto::AudioDevice>;

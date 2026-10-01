@@ -6,6 +6,7 @@ pub(crate) mod app;
 mod costs;
 pub(crate) mod device;
 pub(crate) mod files;
+mod models;
 mod permissions;
 mod queue;
 mod quick;

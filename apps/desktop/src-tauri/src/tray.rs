@@ -4,6 +4,7 @@
 use std::sync::atomic::Ordering;
 
 use app_core::AppCore;
+use app_core::ports::KillOrigin;
 use tauri::menu::{CheckMenuItem, Menu, MenuEvent, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Manager, Wry};
@@ -102,11 +103,11 @@ fn on_menu(app: &AppHandle, event: MenuEvent) {
             "new" => {
                 if let Err(e) = shell::new_chat(&core, None).await {
                     tracing::warn!(error = %e, "nowa rozmowa z zasobnika nie powiodła się");
+                    let _ = windows::show_main(&app);
                 }
-                let _ = windows::show_main(&app);
             }
             "stop" => {
-                let stopped = core.system_kill_all().await;
+                let stopped = core.system_kill_all(KillOrigin::Tray).await;
                 tracing::warn!(zatrzymane = stopped, "STOP WSZYSTKIEGO z zasobnika");
             }
             "voice" => {

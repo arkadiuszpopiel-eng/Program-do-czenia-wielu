@@ -1,79 +1,26 @@
-//! Porty modułów, których jeszcze nie ma w repo (router, transfer, głos, Broker) i powłoki
-//! (okna, dialogi). Każdy ma domyślną implementację: czytelny błąd „funkcja dostępna po
-//! podłączeniu modułu X" albo rozsądny zapas — kolejna sesja podpina moduł w jednym miejscu
-//! (`AppOptions` → `compose.rs`).
+//! Porty modułów podpinanych w `app-core`: transfer, głos, Broker (z dziennikiem cofania) i okno
+//! zatwierdzeń Brokera. Implementacje „niepodłączone" zwracają czytelny błąd z nazwą modułu.
 
-use std::path::Path;
-use std::sync::{Arc, Mutex, PoisonError};
-
-pub use artifacts_contract::{ArtifactAction as ArtifactIntentAction, ArtifactIntent};
 use async_trait::async_trait;
-use providers_contract::ModelProvider;
-use sessions_contract::{PrivacyTag, SessionId};
+use sessions_contract::SessionId;
 
 use crate::dto::{
     AudioDevice, AutonomyLevel, BrokerIntentResult, ExportRequest, ExportResult, ImportRequest,
-    ImportResult, InspectResult, ModelProfile, SecretInput,
+    ImportResult, InspectResult, SecretInput,
 };
 use crate::error::AppError;
 
-/// Zapytanie o model dla tury (wejście routera, PLAN §5.4).
-#[derive(Debug, Clone)]
-pub struct BrainRequest {
-    /// Sesja.
-    pub session: SessionId,
-    /// Agentka odpowiadająca.
-    pub agent: String,
-    /// Profil wybrany w UI (`None` = domyślny sesji/ustawień).
-    pub profile: Option<ModelProfile>,
-    /// Tag prywatności sesji (egzekwuje router; adapter — obrona w głąb).
-    pub privacy: PrivacyTag,
-}
-
-/// Wybrany dostawca i model.
-#[derive(Clone)]
-pub struct BrainChoice {
-    /// Dostawca (`ModelProvider`).
-    pub provider: Arc<dyn ModelProvider>,
-    /// Identyfikator dostawcy z katalogu (np. `anthropic`).
-    pub provider_id: String,
-    /// Nazwa dostawcy do UI.
-    pub provider_name: String,
-    /// Konto w `accounts-hub` (koszty per konto).
-    pub account: Option<String>,
-    /// Model.
-    pub model: String,
-    /// Okno kontekstu modelu, jeśli znane.
-    pub context_window: Option<u64>,
-}
-
-/// Brak możliwości odpowiedzi.
-#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
-pub enum BrainError {
-    /// Brak kluczy/modelu („brak mózgu").
-    #[error("{0}")]
-    NoKeys(String),
-    /// Dostawca skonfigurowany, ale niedostępny (np. nie da się wykryć modelu).
-    #[error("{0}")]
-    Provider(String),
-}
-
-/// „Mózg": wybór dostawcy i modelu. Docelowo moduł `router` (reguły, fallback, budżety).
-#[async_trait]
-pub trait BrainPort: Send + Sync {
-    /// Wybiera dostawcę i model dla tury.
-    async fn choose(&self, request: &BrainRequest) -> Result<BrainChoice, BrainError>;
-    /// Czy jest choć jeden skonfigurowany dostawca czatu.
-    fn keys_configured(&self) -> bool;
-}
-
-/// Import/eksport `.alfa` — docelowo moduł `transfer` (natywne dialogi po stronie powłoki).
+/// Import/eksport `.alfa` — moduł `transfer` (natywne dialogi po stronie powłoki).
 #[async_trait]
 pub trait TransferPort: Send + Sync {
     /// Eksport wg zakresu.
     async fn export(&self, request: ExportRequest) -> Result<ExportResult, AppError>;
     /// Eksport jednej sesji.
     async fn export_session(&self, session: &SessionId) -> Result<ExportResult, AppError>;
+    /// Jawny eksport sekretów — zawsze szyfrowany hasłem (PLAN §15.1).
+    async fn export_secrets(&self, _password: SecretInput) -> Result<ExportResult, AppError> {
+        Err(AppError::unavailable("Eksport sekretów", TRANSFER))
+    }
     /// Podgląd paczki (dry-run).
     async fn inspect(
         &self,
@@ -86,7 +33,7 @@ pub trait TransferPort: Send + Sync {
     async fn rollback(&self, snapshot: &str) -> Result<(), AppError>;
 }
 
-/// Domyślny port: moduł `transfer` niepodłączony.
+/// Port: moduł `transfer` niepodłączony.
 pub struct TransferUnavailable;
 
 const TRANSFER: &str = "transfer";
@@ -114,7 +61,7 @@ impl TransferPort for TransferUnavailable {
     }
 }
 
-/// Głos — docelowo moduły `voice-*` (audio, STT/TTS, pigułka).
+/// Głos — moduły `voice-*` (audio, TTS; potok rozmowy głosowej — `voice-pipeline`).
 #[async_trait]
 pub trait VoicePort: Send + Sync {
     /// Urządzenia wejściowe; `None` = użyj listy z `device-profile`.
@@ -133,8 +80,8 @@ pub trait VoicePort: Send + Sync {
     async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError>;
 }
 
-/// Domyślny port: głos niepodłączony. Operacje „wyłączające" (stop, wycisz, mikrofon wył.)
-/// są bezpiecznym no-op, „włączające" zwracają błąd z nazwą modułu.
+/// Port: głos niepodłączony. Operacje „wyłączające" (stop, wycisz, mikrofon wył.) są bezpiecznym
+/// no-op, „włączające" zwracają błąd z nazwą modułu.
 pub struct VoiceUnavailable;
 
 #[async_trait]
@@ -150,7 +97,7 @@ impl VoicePort for VoiceUnavailable {
     }
     async fn set_mic_enabled(&self, enabled: bool) -> Result<(), AppError> {
         if enabled {
-            return Err(AppError::unavailable("Mikrofon", "voice-audio"));
+            return Err(AppError::unavailable("Mikrofon", "voice-pipeline"));
         }
         Ok(())
     }
@@ -165,10 +112,34 @@ impl VoicePort for VoiceUnavailable {
     }
 }
 
-/// Broker (okno zatwierdzeń, poziomy autonomii, uruchamianie kodu) — docelowo `safety-broker`.
+/// Poziomy autonomii obowiązujące teraz (z Brokera).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AutonomyView {
+    /// Poziom globalny.
+    pub global: AutonomyLevel,
+    /// Poziom sesji, gdy różni się od globalnego.
+    pub session: Option<AutonomyLevel>,
+}
+
+/// Skąd przyszło „STOP WSZYSTKIEGO".
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KillOrigin {
+    /// `Ctrl+Shift+F12`.
+    Hotkey,
+    /// Menu zasobnika.
+    Tray,
+    /// Przycisk w oknie (kapsuła aktywności).
+    Ui,
+}
+
+/// Broker (poziomy autonomii, decyzje o akcjach, kill-switch) i dziennik cofania `fs.*`.
 #[async_trait]
 pub trait BrokerPort: Send + Sync {
-    /// Prośba o zmianę poziomu autonomii (potwierdzenie tylko w oknie Brokera).
+    /// Poziomy z Brokera; `None` = Broker niepodłączony (rdzeń pokazuje poziom z konfiguracji).
+    async fn levels(&self, _session: Option<&SessionId>) -> Option<AutonomyView> {
+        None
+    }
+    /// Prośba o zmianę poziomu autonomii (podniesienie — tylko przez okno Brokera).
     async fn request_level(
         &self,
         level: AutonomyLevel,
@@ -176,18 +147,22 @@ pub trait BrokerPort: Send + Sync {
     ) -> Result<BrokerIntentResult, AppError>;
     /// Przeniesienie do karty zatwierdzenia w oknie Brokera.
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError>;
-    /// Uruchomienie bloku kodu w terminalu (zawsze przez Brokera).
+    /// Uruchomienie bloku kodu w terminalu (zawsze decyzja Brokera).
     async fn run_code(
         &self,
         session: &SessionId,
         lang: Option<&str>,
         code: &str,
     ) -> Result<BrokerIntentResult, AppError>;
-    /// Cofnięcie kroku narzędzia (dziennik cofania `fs.*`).
-    async fn undo_step(&self, token: &str) -> Result<(), AppError>;
+    /// Cofnięcie kroku narzędzia (dziennik cofania `fs.*`); zwraca opis cofniętego kroku.
+    async fn undo_step(&self, session: &SessionId, step: u64) -> Result<String, AppError>;
+    /// Kill-switch Brokera: unieważnia tokeny, zabija drzewa procesów, wycisza audio.
+    async fn kill_all(&self, _origin: KillOrigin) -> Result<(), AppError> {
+        Ok(())
+    }
 }
 
-/// Domyślny port: Broker niepodłączony (F3).
+/// Port: Broker niepodłączony.
 pub struct BrokerUnavailable;
 
 #[async_trait]
@@ -216,73 +191,27 @@ impl BrokerPort for BrokerUnavailable {
             "safety-broker",
         ))
     }
-    async fn undo_step(&self, _token: &str) -> Result<(), AppError> {
+    async fn undo_step(&self, _session: &SessionId, _step: u64) -> Result<String, AppError> {
         Err(AppError::unavailable("Cofnięcie kroku", "undo-journal"))
     }
 }
 
-/// Powłoka (Tauri): okna, natywne dialogi i akcje systemowe wykonywane jako użytkownik.
-pub trait ShellPort: Send + Sync {
-    /// Pokazuje okno główne (opcjonalnie z sesją).
-    fn show_main(&self, session: Option<&str>) -> Result<(), AppError>;
-    /// Chowa okno Szybkiego pytania.
-    fn hide_quick(&self) -> Result<(), AppError>;
-    /// Otwiera stronę ustawień Windows (URI już sprawdzony z listą dozwolonych).
-    fn open_system_settings(&self, uri: &str) -> Result<(), AppError>;
-    /// Wykonuje zwalidowaną intencję pliku (Otwórz, Pokaż w Eksploratorze, Kopiuj, Zapisz jako).
-    fn artifact_action(&self, intent: &ArtifactIntent) -> Result<(), AppError>;
-    /// Natywny dialog „Zapisz jako" dla tekstu; `false` = anulowano.
-    fn save_text_as(&self, suggested_name: &str, text: &str) -> Result<bool, AppError>;
-    /// Wolne miejsce na dysku z `path` (`None` = nieznane).
-    fn disk_free(&self, _path: &Path) -> Option<u64> {
-        None
-    }
+/// Okno Brokera (Broker-UI, osobny proces) — jedyny kanał zatwierdzeń (PLAN §8.2). WebView nigdy
+/// nie zatwierdza; rdzeń może tylko poprosić o pokazanie karty.
+pub trait ApprovalWindow: Send + Sync {
+    /// Pokazuje kartę prośby `approval` w oknie Brokera.
+    fn present(&self, approval: &str) -> Result<(), AppError>;
 }
 
-/// Powłoka bez okien (testy, tryb bezgłowy): zapisuje wywołania; dialogi niedostępne.
-#[derive(Default)]
-pub struct HeadlessShell {
-    calls: Mutex<Vec<String>>,
-}
+/// Komunikat trybu deweloperskiego bez Broker-UI.
+pub const NEEDS_BROKER_WINDOW: &str = "Ta zmiana wymaga potwierdzenia w oknie Brokera, które nie \
+     jest uruchomione (tryb deweloperski bez Broker-UI) — prośba odrzucona.";
 
-impl HeadlessShell {
-    /// Zarejestrowane wywołania (do asercji w testach).
-    pub fn calls(&self) -> Vec<String> {
-        self.calls
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .clone()
-    }
+/// Brak okna Brokera (tryb deweloperski): każda prośba wymagająca zatwierdzenia jest odrzucana.
+pub struct NoApprovalWindow;
 
-    fn record(&self, call: String) {
-        self.calls
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .push(call);
-    }
-}
-
-impl ShellPort for HeadlessShell {
-    fn show_main(&self, session: Option<&str>) -> Result<(), AppError> {
-        self.record(format!("show_main:{}", session.unwrap_or("-")));
-        Ok(())
-    }
-    fn hide_quick(&self) -> Result<(), AppError> {
-        self.record("hide_quick".into());
-        Ok(())
-    }
-    fn open_system_settings(&self, uri: &str) -> Result<(), AppError> {
-        self.record(format!("open_system_settings:{uri}"));
-        Ok(())
-    }
-    fn artifact_action(&self, intent: &ArtifactIntent) -> Result<(), AppError> {
-        self.record(format!("artifact:{}:{:?}", intent.artifact, intent.action));
-        Ok(())
-    }
-    fn save_text_as(&self, _suggested_name: &str, _text: &str) -> Result<bool, AppError> {
-        Err(AppError::unavailable(
-            "Zapis przez okno dialogowe",
-            "shell-integration",
-        ))
+impl ApprovalWindow for NoApprovalWindow {
+    fn present(&self, _approval: &str) -> Result<(), AppError> {
+        Err(AppError::forbidden(NEEDS_BROKER_WINDOW))
     }
 }

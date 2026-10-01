@@ -29,7 +29,7 @@ export const plApp = {
   'role.conductor': 'Dyrygentka',
   'role.speaker': 'Mówczyni',
   'role.thinker': 'Myślicielka',
-  'role.executor': 'Wykonawczyni',
+  'role.operator': 'Wykonawczyni',
   'role.coder': 'Koderka',
   'role.critic': 'Krytyczka',
   'role.researcher': 'Badaczka',

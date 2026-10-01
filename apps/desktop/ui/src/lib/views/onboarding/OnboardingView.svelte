@@ -1,6 +1,7 @@
 <!--
   Wprowadzenie (PLAN §14.5, makieta 14): mikrofon → profil głosu → pomiar sprzętu → konta i klucze
-  („dodaj teraz" / „pomiń — dodam później") → poziomy autonomii (start L3) → korpus (opcjonalnie)
+  („dodaj teraz" / „pomiń — dodam później") + pobranie modelu lokalnego → poziomy autonomii (start
+  L3) → korpus (opcjonalnie)
   → import `.alfa` (opcjonalnie). Krok „mosty CLI" pojawi się od fali 4.
 -->
 <script lang="ts">
@@ -18,6 +19,7 @@
   import type { AudioDevice, DeviceProfile, InspectResult } from '../../api/types-hub';
   import { useApp } from '../../state/context';
   import AddProviderWizard from '../settings/pages/AddProviderWizard.svelte';
+  import LocalModelCard from './LocalModelCard.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -78,7 +80,17 @@
   }
 
   async function finish() {
-    if (level !== 'L3') await app.client.permissions.requestLevel(level as AutonomyLevel, null);
+    if (level !== 'L3') {
+      // Podniesienie potwierdza tylko okno Brokera — odmowa nie blokuje końca wprowadzenia.
+      try {
+        await app.client.permissions.requestLevel(level as AutonomyLevel, null);
+      } catch (error) {
+        app.toasts.show({
+          kind: 'warning',
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
     await app.client.app.completeOnboarding();
     app.system = await app.client.system.status();
     app.view = 'chat';
@@ -199,6 +211,7 @@
             <Button variant="primary" onclick={() => (wizard = true)}>{t('ob.keys.addNow')}</Button>
             <Button variant="secondary" onclick={next}>{t('ob.keys.skip')}</Button>
           </div>
+          <LocalModelCard />
         {/if}
       {:else if current === 'autonomy'}
         <h2>{t('ob.autonomy.title')}</h2>

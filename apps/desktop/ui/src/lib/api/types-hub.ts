@@ -150,9 +150,12 @@ export interface PermissionsState {
   readonly hello_enabled: boolean;
 }
 
-/** Zmiana poziomu to intencja: Broker otwiera swoje okno i tam ją potwierdzasz. */
+/**
+ * Zmiana poziomu to intencja: podniesienie — Broker otwiera swoje okno i tam ją potwierdzasz
+ * (`opened_broker`); obniżenie nie wymaga zgody i działa od razu (`applied`, `request_id` pusty).
+ */
 export interface BrokerIntentResult {
-  readonly status: 'opened_broker';
+  readonly status: 'opened_broker' | 'applied';
   readonly request_id: string;
 }
 
@@ -193,3 +196,18 @@ export interface AudioDevice {
   readonly name: string;
   readonly default: boolean;
 }
+
+// ── Modele lokalne (providers-local, PLAN §14.5) ────────────────────────────────────────────────
+
+/** Model z manifestu `providers-local` (GGUF z SHA-256, bez kwantów IQ). */
+export interface LocalModelInfo {
+  readonly id: string;
+  readonly name: string;
+  readonly size_bytes: number;
+  readonly installed: boolean;
+  /** Model domyślny (onboarding pobiera go jednym kliknięciem). */
+  readonly default: boolean;
+  readonly downloading: boolean;
+}
+
+export type LocalDownloadState = 'downloading' | 'done' | 'failed' | 'cancelled';

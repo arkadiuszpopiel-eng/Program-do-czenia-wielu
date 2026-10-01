@@ -11,7 +11,7 @@ use providers_contract::{
     ChatRequest, ProviderError, ProviderErrorKind, ProviderEvent, StopReason as PStop,
     TurnAccumulator, Usage,
 };
-use sessions_contract::{Block as SBlock, SessionCatalog};
+use sessions_contract::{Block as SBlock, PrivacyTag, SessionCatalog};
 
 use super::GenRequest;
 use super::project::block_dto;
@@ -128,7 +128,7 @@ fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
     }
 }
 
-/// Wybór modelu i przygotowanie żądania.
+/// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
 async fn prepare(
     core: &AppCore,
     req: &GenRequest,
@@ -139,11 +139,28 @@ async fn prepare(
         .session(&req.session)
         .map(|m| m.privacy)
         .unwrap_or_default();
+    let messages = core
+        .branch_messages(&req.session, req.history_leaf, req.continues.is_some())
+        .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
+    let mut request = ChatRequest::new(router_contract::AUTO_MODEL, messages);
+    if let Ok(system) = core
+        .inner
+        .personas
+        .system_prompt(&req.session, &PersonaId::new(req.agent.as_str()))
+    {
+        request = request.with_system(system);
+    }
+    request.meta.session = Some(req.session.to_string());
+    request.meta.privacy.tag = match privacy {
+        PrivacyTag::Normal => providers_contract::PrivacyTag::Normal,
+        PrivacyTag::Private | PrivacyTag::LocalOnly => providers_contract::PrivacyTag::Private,
+    };
     let brain_req = BrainRequest {
         session: req.session.clone(),
         agent: req.agent.clone(),
         profile: req.profile,
         privacy,
+        chat: Some(request.clone()),
     };
     let choice = core
         .inner
@@ -153,22 +170,24 @@ async fn prepare(
         .map_err(|e| match e {
             BrainError::NoKeys(m) => turn_error(TurnErrorCode::NoKeys, m, None),
             BrainError::Provider(m) => turn_error(TurnErrorCode::Provider, m, None),
+            BrainError::Budget(m) => turn_error(TurnErrorCode::BudgetBlocked, m, None),
         })?;
-    let messages = core
-        .branch_messages(&req.session, req.history_leaf, req.continues.is_some())
-        .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
-    let mut request = ChatRequest::new(choice.model.clone(), messages);
-    if let Ok(system) = core
-        .inner
-        .personas
-        .system_prompt(&req.session, &PersonaId::new(req.agent.as_str()))
-    {
-        request = request.with_system(system);
+    request.model.clone_from(&choice.model);
+    if !choice.routed {
+        budget_gate(core, &choice, &request).await?;
     }
-    request.meta.session = Some(req.session.to_string());
+    Ok((choice, request))
+}
+
+/// Budżet dla dostawcy wybranego poza Routerem (Router sprawdza go sam, per kandydat).
+async fn budget_gate(
+    core: &AppCore,
+    choice: &crate::ports::BrainChoice,
+    request: &ChatRequest,
+) -> Result<(), TurnError> {
     let estimate = choice
         .provider
-        .estimate_cost(&request)
+        .estimate_cost(request)
         .map_or(0, |e| e.min.micro_usd_ceil());
     let rate = core.inner.costs.current_rate().rate_e4;
     let provider_id = accounts_hub_contract::ProviderId::new(choice.provider_id.as_str()).ok();
@@ -187,7 +206,7 @@ async fn prepare(
             Some(&choice.provider_name),
         ));
     }
-    Ok((choice, request))
+    Ok(())
 }
 
 /// Pełny przebieg generacji.
@@ -196,12 +215,13 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
         Ok(x) => x,
         Err(e) => return Outcome::failed(e),
     };
-    let chosen = Chosen {
+    let mut chosen = Chosen {
         provider_id: choice.provider_id.clone(),
         provider_name: choice.provider_name.clone(),
         account: choice.account.clone(),
         model: choice.model.clone(),
     };
+    let mut announced = false;
     if let Some(window) = choice.context_window {
         core.rt().context_window.insert(req.session.clone(), window);
     }
@@ -222,6 +242,13 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
         };
         acc.push(&event);
         match &event {
+            ProviderEvent::Started { model, .. } if choice.routed && !announced => {
+                announced = true;
+                if let Some(target) = core.inner.brain.target(model) {
+                    super::routing::announce(core, req, &tid, &choice, &target);
+                    chosen = super::routing::chosen_of(&target);
+                }
+            }
             ProviderEvent::ThinkingDelta { .. } => {
                 let now = Instant::now();
                 let (start, last) = thinking.get_or_insert((now, now - Duration::from_secs(1)));
@@ -295,8 +322,7 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
         .and_then(|m| choice.provider.cost(m, &turn.usage))
         .or_else(|| choice.provider.cost(&chosen.model, &turn.usage));
     let (status, stop, error) = classify(cancelled, &turn, &chosen.provider_name);
-    let mut chosen = chosen;
-    if let Some(model) = turn.model.clone() {
+    if let Some(model) = turn.model.clone().filter(|_| !choice.routed) {
         chosen.model = model;
     }
     Outcome {

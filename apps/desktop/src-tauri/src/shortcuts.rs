@@ -1,9 +1,10 @@
 //! Skróty globalne obsługiwane przez rdzeń (nie przez WebView): `Ctrl+Alt+Space` — Szybkie
-//! pytanie, `Ctrl+Shift+F12` — STOP WSZYSTKIEGO (F1: anulowanie wszystkich generacji; właściwy
-//! kill-switch przez Broker w F3). Konflikt rejestracji → `Toast` w UI.
+//! pytanie, `Ctrl+Shift+F12` — STOP WSZYSTKIEGO (anulowanie wszystkich generacji + kill-switch
+//! Brokera: tokeny, drzewa procesów, cisza audio). Konflikt rejestracji → `Toast` w UI.
 
 use app_core::AppCore;
 use app_core::dto::{AlfaEvent, LocalizedText, ToastKind};
+use app_core::ports::KillOrigin;
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
@@ -31,7 +32,7 @@ pub fn plugin<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             } else if shortcut.id() == kill_switch().id() {
                 let core = app.state::<AppCore>().inner().clone();
                 tauri::async_runtime::spawn(async move {
-                    let stopped = core.system_kill_all().await;
+                    let stopped = core.system_kill_all(KillOrigin::Hotkey).await;
                     tracing::warn!(zatrzymane = stopped, "STOP WSZYSTKIEGO (Ctrl+Shift+F12)");
                 });
             }

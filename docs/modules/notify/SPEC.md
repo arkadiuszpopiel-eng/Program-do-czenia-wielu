@@ -63,6 +63,9 @@ Toasty w aplikacji (ui-kit `Toast`), karta „Cofnij", Ustawienia → Powiadomie
 - Wysyłka: `tauri-plugin-notification` z pompy zdarzeń powłoki; tryb „nie przeszkadzać" z zasobnika
   wycisza toasty. Toasty w aplikacji = zdarzenie `Toast` (UI). Earcony, dedupe 5 s, AUMID przez launcher —
   w module `notify` (F1+/F2).
+- Zdarzenia nawigacyjne i postępu (`OpenSession`, `LocalModelProgress`, `MicLevel`) nie dają toastu
+  Windows. STOP WSZYSTKIEGO (`system_kill_all`) kończy się toastem w aplikacji (`Toast`, ostrzeżenie).
+  Karta „Cofnij" kroku agentki niesie token `"<sesja>:u<krok>"` (`turns_undo_step` → `undo-journal`).
 
 ## Otwarte pytania
 - Zestaw earconów (własne vs systemowe) i ich licencja — do ustalenia w SPEC v1.

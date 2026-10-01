@@ -4,7 +4,6 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use personas_contract::{Cast, ChangeOrigin, PersonaId, Personas, RoleId, TemplateId};
 
-use crate::chat::project::core_role;
 use crate::core::AppCore;
 use crate::dto::{AgentState, CastTemplateId};
 use crate::error::AppError;
@@ -38,7 +37,7 @@ impl AppCore {
             return Err(AppError::not_found(format!("Nieznana agentka „{agent}”.")));
         }
         let mut cast = self.inner.personas.cast(&id);
-        let roles: BTreeSet<RoleId> = role_ids.iter().map(|r| RoleId::new(core_role(r))).collect();
+        let roles: BTreeSet<RoleId> = role_ids.iter().map(|r| RoleId::new(r.as_str())).collect();
         cast.assignments.insert(persona, roles);
         cast.template = None;
         self.inner

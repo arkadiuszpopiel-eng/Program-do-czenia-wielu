@@ -33,19 +33,35 @@ const MODULES: &[(&str, &str)] = &[
     ("artifacts", artifacts_impl::MODULE_TOML),
     ("personas", personas_impl::MODULE_TOML),
     ("scheduler-lite", scheduler_lite_impl::MODULE_TOML),
+    ("model-residency", model_residency_impl::MODULE_TOML),
+    ("providers-local", providers_local_impl::MODULE_TOML),
+    ("router", router_impl::MODULE_TOML),
+    ("risk-classifier", risk_classifier_impl::MODULE_TOML),
+    ("safety-broker", safety_broker_impl::MODULE_TOML),
+    ("undo-journal", undo_journal_impl::MODULE_TOML),
+    ("transfer", transfer_impl::MODULE_TOML),
+    ("voice-audio", voice_audio_impl::MODULE_TOML),
+    ("voice-tts", voice_tts_impl::MODULE_TOML),
+    ("updater", updater_impl::MODULE_TOML),
 ];
 
 pub(crate) fn internal(what: &str) -> impl Fn(String) -> AppError + '_ {
     move |e| AppError::internal(format!("{what}: {e}"))
 }
 
-/// Manifest z poprawką cyklu: `sessions` wymaga `search-contract` tylko jako indeksera
-/// wiązanego później (`with_indexer` + `LateDbProvider`), a `search` wymaga `sessions-contract`.
-/// W grafie startu zostaje krawędź search → sessions.
+/// Manifest dla grafu startu z poprawkami kompozycji:
+/// - `sessions` wymaga `search-contract` tylko jako indeksera wiązanego później (`with_indexer`
+///   + `LateDbProvider`), a `search` wymaga `sessions-contract` — zostaje krawędź search → sessions;
+/// - `providers-local` dostarcza `providers-contract` tak jak `providers-api` — obaj są
+///   kandydatami Routera, więc w grafie dostawcą kontraktu zostaje `providers-api`;
+/// - `safety-broker` w procesie (tryb deweloperski) działa bez `watchdog` (osobny proces).
 fn manifest_for_graph(id: &str, toml: &str) -> Result<ModuleManifest, AppError> {
     let mut manifest = ModuleManifest::parse_toml(toml).map_err(|e| internal(id)(e.to_string()))?;
-    if id == "sessions" {
-        manifest.requires.retain(|c| c.name != "search-contract");
+    match id {
+        "sessions" => manifest.requires.retain(|c| c.name != "search-contract"),
+        "providers-local" => manifest.provides.clear(),
+        "safety-broker" => manifest.requires.retain(|c| c.name != "watchdog-contract"),
+        _ => {}
     }
     Ok(manifest)
 }

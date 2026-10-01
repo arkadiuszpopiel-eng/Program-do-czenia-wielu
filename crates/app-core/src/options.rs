@@ -1,109 +1,20 @@
-//! Ścieżki danych i opcje budowy `AppCore` (porty modułów do podmiany w testach i kolejnych falach).
+//! Opcje budowy `AppCore` (porty modułów do podmiany w testach i kolejnych falach); ścieżki
+//! danych — `app_api::paths::AppPaths` (reeksport).
 
-use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
 use accounts_hub_contract::SecretStore;
 use device_profile_contract::DeviceProfile as DeviceProfileService;
+use providers_contract::ModelProvider;
+use router_contract::RouteKind;
+use voice_audio_contract::AudioIo;
+use voice_tts_contract::Tts;
 
-use crate::error::AppError;
+pub use app_api::paths::AppPaths;
+
 use crate::events::DEFAULT_FRAME;
-use crate::ports::{BrainPort, BrokerPort, ShellPort, TransferPort, VoicePort};
-
-/// Katalogi aplikacji (ADR 0007, PLAN §15):
-/// `%APPDATA%\Alfa\config`, `%LOCALAPPDATA%\Alfa\{sessions,models,logs,state,webview-data}`,
-/// katalogi robocze sesji `%USERPROFILE%\Alfa\Sesje`.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AppPaths {
-    /// Konfiguracja (`*.toml`, `machine/<id>.toml`, `accounts.json`).
-    pub config: PathBuf,
-    /// Dane lokalne (`%LOCALAPPDATA%\Alfa`).
-    pub local: PathBuf,
-    /// Korzeń plików użytkownika (`%USERPROFILE%\Alfa`; sesje w `Sesje\<nazwa>`).
-    pub user_root: PathBuf,
-}
-
-impl AppPaths {
-    /// Ścieżki ze zmiennych środowiskowych Windows (`APPDATA`, `LOCALAPPDATA`, `USERPROFILE`);
-    /// poza Windows — `~/.config/alfa`, `~/.local/share/alfa`, `~/Alfa` (tryb deweloperski).
-    pub fn from_env() -> Result<Self, AppError> {
-        let var = |name: &str| std::env::var_os(name).map(PathBuf::from);
-        if cfg!(windows) {
-            let missing = |n: &str| AppError::internal(format!("brak zmiennej środowiskowej {n}"));
-            let appdata = var("APPDATA").ok_or_else(|| missing("APPDATA"))?;
-            let local = var("LOCALAPPDATA").ok_or_else(|| missing("LOCALAPPDATA"))?;
-            let profile = var("USERPROFILE").ok_or_else(|| missing("USERPROFILE"))?;
-            return Ok(Self {
-                config: appdata.join("Alfa").join("config"),
-                local: local.join("Alfa"),
-                user_root: profile.join("Alfa"),
-            });
-        }
-        let home = var("HOME").ok_or_else(|| AppError::internal("brak zmiennej HOME"))?;
-        Ok(Self {
-            config: home.join(".config").join("alfa"),
-            local: home.join(".local").join("share").join("alfa"),
-            user_root: home.join("Alfa"),
-        })
-    }
-
-    /// Wszystko pod jednym katalogiem (testy, tryb przenośny).
-    pub fn under(root: &Path) -> Self {
-        Self {
-            config: root.join("config"),
-            local: root.join("local"),
-            user_root: root.join("user"),
-        }
-    }
-
-    /// Bazy sesji.
-    pub fn sessions(&self) -> PathBuf {
-        self.local.join("sessions")
-    }
-
-    /// Modele lokalne.
-    pub fn models(&self) -> PathBuf {
-        self.local.join("models")
-    }
-
-    /// Logi NDJSON.
-    pub fn logs(&self) -> PathBuf {
-        self.local.join("logs")
-    }
-
-    /// Stan (zapasowy `MachineId`, dziennik kosztów).
-    pub fn state(&self) -> PathBuf {
-        self.local.join("state")
-    }
-
-    /// Stały folder danych WebView2 (poza katalogiem wersji — ADR 0007).
-    pub fn webview_data(&self) -> PathBuf {
-        self.local.join("webview-data")
-    }
-
-    /// Katalogi robocze sesji.
-    pub fn workdirs(&self) -> PathBuf {
-        self.user_root.join("Sesje")
-    }
-
-    /// Tworzy wszystkie katalogi.
-    pub fn ensure(&self) -> Result<(), AppError> {
-        for dir in [
-            self.config.clone(),
-            self.sessions(),
-            self.models(),
-            self.logs(),
-            self.state(),
-            self.webview_data(),
-            self.workdirs(),
-        ] {
-            std::fs::create_dir_all(&dir)
-                .map_err(|e| AppError::storage(format!("{}: {e}", dir.display())))?;
-        }
-        Ok(())
-    }
-}
+use crate::ports::{ApprovalWindow, BrainPort, BrokerPort, ShellPort, TransferPort, VoicePort};
 
 /// Opcje budowy. `None` w porcie = domyślna implementacja (produkcyjna albo „niepodłączony moduł").
 pub struct AppOptions {
@@ -119,16 +30,26 @@ pub struct AppOptions {
     pub secrets: Option<Arc<dyn SecretStore>>,
     /// Profil urządzenia (`None` = detekcja sprzętu).
     pub device: Option<Arc<dyn DeviceProfileService>>,
-    /// Wybór modelu (`None` = pierwszy skonfigurowany dostawca; docelowo `router`).
+    /// Wybór modelu (`None` = Router z dostawcami z `accounts-hub` i modelem lokalnym).
     pub brain: Option<Arc<dyn BrainPort>>,
-    /// Import/eksport (`None` = moduł `transfer` niepodłączony).
+    /// Dodatkowi dostawcy rejestrowani w Routerze (własne endpointy, testy na atrapach).
+    pub providers: Vec<(Arc<dyn ModelProvider>, RouteKind)>,
+    /// Import/eksport (`None` = moduł `transfer`).
     pub transfer: Option<Arc<dyn TransferPort>>,
-    /// Głos (`None` = moduły `voice-*` niepodłączone).
+    /// Głos (`None` = `voice-audio` + `voice-tts`).
     pub voice: Option<Arc<dyn VoicePort>>,
-    /// Broker (`None` = `safety-broker` niepodłączony).
+    /// Wejście/wyjście audio dla `voice-audio` (`None` = WASAPI; poza Windows — niedostępne).
+    pub audio: Option<Arc<dyn AudioIo>>,
+    /// Synteza mowy (`None` = sidecary Pocket TTS / Piper, jeśli zainstalowane).
+    pub tts: Option<Arc<dyn Tts>>,
+    /// Broker (`None` = `safety-broker` w procesie, tryb deweloperski).
     pub broker: Option<Arc<dyn BrokerPort>>,
+    /// Okno zatwierdzeń Brokera (`None` = brak Broker-UI: prośby o zgodę są odrzucane).
+    pub approval_window: Option<Arc<dyn ApprovalWindow>>,
     /// Powłoka (`None` = bez okien).
     pub shell: Option<Arc<dyn ShellPort>>,
+    /// Po jakim czasie bez awarii start uznać za zdrowy (`updater::mark_good`).
+    pub healthy_after: Duration,
     /// Zapis logów NDJSON z magistrali (`core-log`).
     pub file_logs: bool,
 }
@@ -143,24 +64,16 @@ impl Default for AppOptions {
             secrets: None,
             device: None,
             brain: None,
+            providers: Vec::new(),
             transfer: None,
             voice: None,
+            audio: None,
+            tts: None,
             broker: None,
+            approval_window: None,
             shell: None,
+            healthy_after: Duration::from_secs(30),
             file_logs: true,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn paths_under_root_follow_layout() {
-        let p = AppPaths::under(Path::new("/x"));
-        assert_eq!(p.sessions(), Path::new("/x/local/sessions"));
-        assert_eq!(p.webview_data(), Path::new("/x/local/webview-data"));
-        assert_eq!(p.workdirs(), Path::new("/x/user/Sesje"));
     }
 }

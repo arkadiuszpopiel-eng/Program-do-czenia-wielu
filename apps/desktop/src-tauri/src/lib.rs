@@ -22,6 +22,7 @@ pub fn run() {
         }))
         .plugin(shortcuts::plugin())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(commands::handler())
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {

@@ -69,7 +69,8 @@ const step = (id: string, icon: ToolStep['icon'], label: string, ms: number, und
     label,
     status: 'done',
     duration_ms: ms,
-    undo_token: undo ? `undo-${id}` : null,
+    // Token dziennika cofania jak w rdzeniu: `<sesja>:u<krok>` (fixture'y to sesja `s-q3`).
+    undo_token: undo ? `s-q3:u${id.replace(/\D/g, '')}` : null,
   }) as ToolStep;
 
 const usage = (inTok: number, outTok: number, minor: number, ms: number) => ({
@@ -165,7 +166,7 @@ export function seedQ3(now: number): Turn[] {
       'Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.',
       t + 4 * MIN,
       {
-        role_id: 'executor',
+        role_id: 'operator',
         tools: [step('st5', 'edit', 'Utworzono szkic raport-Q3.docx', 2100, true)],
         approval: {
           id: 'ap-1',

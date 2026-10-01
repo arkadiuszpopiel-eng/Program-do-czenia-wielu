@@ -36,7 +36,7 @@
       {
         "id": "delta",
         "role_ids": [
-          "executor",
+          "operator",
           "coder"
         ],
         "status": "idle",
@@ -50,7 +50,7 @@
       "sessionId": "s-q3",
       "agent": "delta",
       "roleIds": [
-        "executor",
+        "operator",
         "coder"
       ]
     },

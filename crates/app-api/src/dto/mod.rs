@@ -21,8 +21,9 @@ pub use events::{AlfaEvent, StopReason, ToastKind};
 pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountState, AddAccountInput, AudioDevice,
     AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind, ComplianceStatus,
-    CpuView, DeviceProfile, GpuView, HwClass, MachineView, ModelInfo, ModelKind, PermissionsState,
-    ProviderInfo, ProviderKind, RecommendationView, SecretInput, TestReport, VoiceProfileId,
+    CpuView, DeviceProfile, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView,
+    ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView,
+    SecretInput, TestReport, VoiceProfileId,
 };
 pub use panels::{
     ActivityInfo, AgentState, AgentStatus, ArtifactAction, ArtifactInfo, ArtifactPreview,

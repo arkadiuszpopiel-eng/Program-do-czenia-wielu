@@ -2,7 +2,7 @@
 
 Źródło: `src/lib/api/client.ts` (interfejs `AlfaClient`), `types.ts`, `types-hub.ts`, `types-system.ts`,
 adapter `tauri-client.ts`. Atrapa referencyjna: `fake/` (zachowanie, scenariusze błędów).
-Ten plik jest listą do zaimplementowania po stronie `apps/desktop/src-tauri` (sesja backendowa).
+Implementacja: `crates/app-core` (metoda `AppCore::<komenda>`), powłoka `apps/desktop/src-tauri` tylko deleguje.
 Gdy kontrakty `*-contract` dostaną generator typów (ADR 0013: tauri-specta / ts-rs), typy TS
 z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w `snake_case` (serde).
 
@@ -23,6 +23,8 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
   (kreator); rdzeń zapisuje go w Windows Credential Manager i nigdy nie odsyła do UI (`Account`
   ma tylko `key_stored: bool`). Hasła paczek `.alfa` — tylko w argumentach `transfer_*`.
 - **Błędy** komend: odrzucenie `invoke` z komunikatem tekstowym (PL/EN wg `ui.locale`).
+- **Role agentek** w DTO (`role_id`, `role_ids`) to identyfikatory `personas-contract`
+  (`conductor`, `operator`, `coder`, …) — bez aliasów po stronie UI.
 - Uprawnienia okien (capabilities): okno główne — wszystkie komendy poniżej; okno `quick` —
   `app_bootstrap`, `quick_*`; okno `pill` — `voice_stop_speech`, `voice_set_muted` + zdarzenia.
 
@@ -59,7 +61,7 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 | `turns_read_aloud`                                                | `turnId`                                 | `()`                           | ⟶ TTS głosem agentki                                                                               |
 | `turns_save_code`                                                 | `turnId, blockIndex`                     | `()`                           | ⟶ natywny dialog zapisu                                                                            |
 | `turns_run_code`                                                  | `turnId, blockIndex`                     | `BrokerIntentResult`           | ⟶ zawsze przez Brokera                                                                             |
-| `turns_undo_step`                                                 | `undoToken`                              | `()`                           | ⟶ dziennik cofania (`fs.*`)                                                                        |
+| `turns_undo_step`                                                 | `undoToken`                              | `()`                           | ⟶ dziennik cofania (`fs.*`); token `"<sesja>:u<krok>"` z `ToolStep.undo_token`                     |
 | `agents_list`                                                     | `sessionId`                              | `AgentState[]`                 |                                                                                                    |
 | `agents_set_roles`                                                | `sessionId, agent, roleIds`              | `()`                           | natychmiast, do dziennika                                                                          |
 | `agents_apply_cast`                                               | `sessionId, template`                    | `()`                           | `standard \| solo \| coding \| research`                                                           |
@@ -82,12 +84,15 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 | `accounts_set_limit`                                              | `accountId, enabled, monthly`            | `()`                           |                                                                                                    |
 | `accounts_remove`                                                 | `accountId`                              | `()`                           | usuwa też wpis z Credential Managera                                                               |
 | `transfer_export`                                                 | `request: ExportRequest`                 | `ExportResult`                 | ⟶ natywny dialog; sekrety nigdy                                                                    |
+| `transfer_export_secrets`                                         | `password`                               | `ExportResult`                 | ⟶ natywny dialog; osobna paczka sekretów, zawsze szyfrowana hasłem (min. 8 znaków)                 |
 | `transfer_inspect`                                                | `password, path: string \| null`         | `InspectResult`                | ⟶ dialog otwarcia (gdy `path = null`) + dry-run                                                    |
 | `transfer_import`                                                 | `request: ImportRequest`                 | `ImportResult`                 | snapshot przed importem                                                                            |
 | `transfer_rollback`                                               | `snapshotId`                             | `()`                           |                                                                                                    |
 | `permissions_get`                                                 | `sessionId`                              | `PermissionsState`             |                                                                                                    |
-| `permissions_request_level`                                       | `level, sessionId`                       | `BrokerIntentResult`           | ⟶ okno Brokera potwierdza zmianę                                                                   |
+| `permissions_request_level`                                       | `level, sessionId`                       | `BrokerIntentResult`           | ⟶ obniżenie od razu (`applied`); podniesienie — okno Brokera (`opened_broker`; bez okna — odmowa)  |
 | `permissions_open_approval`                                       | `approvalId`                             | `BrokerIntentResult`           | ⟶ przenosi do karty w oknie Brokera                                                                |
+| `models_local_list`                                               | —                                        | `LocalModelInfo[]`             | modele lokalne z manifestu `providers-local`                                                       |
+| `models_local_download` / `models_local_cancel`                   | `modelId: string \| null`                | `()`                           | pobieranie (wznawiane, SHA-256); `null` = domyślny / wszystkie; postęp: `LocalModelProgress`       |
 | `device_profile` / `device_measure`                               | —                                        | `DeviceProfile`                |                                                                                                    |
 | `voice_devices`                                                   | —                                        | `AudioDevice[]`                |                                                                                                    |
 | `voice_start_mic_test` / `voice_stop_mic_test`                    | `deviceId` / —                           | `()`                           | poziomy przez `MicLevel` (≤ 30/s)                                                                  |
@@ -121,6 +126,8 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 | `MicLevel`                          | `level: 0..1`                                        | test mikrofonu, pigułka (≤ 30/s)                                                                  |
 | `VoicePill`                         | `state: { agent, mic, level }`                       | pigułka głosowa                                                                                   |
 | `Toast`                             | `kind, message: {pl, en}`                            | komunikaty rdzenia (np. konflikt skrótu globalnego)                                               |
+| `OpenSession`                       | `session_id`                                         | przejdź do sesji (zasobnik, `alfa://session/…`, Szybkie pytanie → pełne okno)                     |
+| `LocalModelProgress`                | `model_id, state, bytes, total, error`               | pobieranie modelu lokalnego: `downloading \| done \| failed \| cancelled`                         |
 
 ## Okna
 

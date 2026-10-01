@@ -212,7 +212,7 @@ async fn bootstrap_layout_settings_shortcuts_and_cast() {
     );
     assert_eq!(core.settings_schema().await.unwrap().len(), 22);
 
-    // Obsada: role UI (`executor` ↔ `operator` w personas), szablony.
+    // Obsada: identyfikatory ról jak w `personas-contract` (`operator`), szablony.
     let agents = core.agents_list(sid.clone()).await.unwrap();
     assert_eq!(agents.len(), 4);
     let alfa = agents.iter().find(|a| a.id == "alfa").unwrap();
@@ -220,13 +220,13 @@ async fn bootstrap_layout_settings_shortcuts_and_cast() {
     core.agents_set_roles(
         sid.clone(),
         "delta".into(),
-        vec!["executor".into(), "coder".into()],
+        vec!["operator".into(), "coder".into()],
     )
     .await
     .unwrap();
     let delta = core.agents_list(sid.clone()).await.unwrap();
     let delta = delta.iter().find(|a| a.id == "delta").unwrap();
-    assert!(delta.role_ids.contains(&"executor".to_owned()));
+    assert!(delta.role_ids.contains(&"operator".to_owned()));
     core.agents_apply_cast(sid.clone(), CastTemplateId::Solo)
         .await
         .unwrap();

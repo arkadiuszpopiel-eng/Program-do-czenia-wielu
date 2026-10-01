@@ -110,6 +110,15 @@
       "type": "Toast",
       "kind": "success",
       "message": { "pl": "Zapisano.", "en": "Saved." }
+    },
+    { "type": "OpenSession", "session_id": "s-q3" },
+    {
+      "type": "LocalModelProgress",
+      "model_id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+      "state": "failed",
+      "bytes": 0,
+      "total": 3040870400,
+      "error": "Pobieranie modelu nie powiodło się: pobieranie: HTTP 503"
     }
   ],
   "results": {

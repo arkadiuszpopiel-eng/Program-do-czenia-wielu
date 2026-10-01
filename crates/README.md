@@ -19,9 +19,10 @@ Wyjątek: **`lib-*`** — wspólna biblioteka narzędziowa bez logiki modułu (n
 połączenie SQLCipher, migracje, rejestracja sqlite-vec). Moduły mogą od niej zależeć; ona sama zależy
 wyłącznie od innych `lib-*` i `*-contract`.
 
-Wyjątek: **`app-*`** — korzeń kompozycji aplikacji (np. `app-core`: składa moduły `-impl`, wystawia komendy
-i zdarzenia dla powłoki Tauri). Jako jedyny może zależeć od `*-impl`; od `*-fake` tylko w dev-dependencies;
-od niego nie zależy żaden crate.
+Wyjątek: **`app-*`** — korzeń kompozycji aplikacji (`app-core`, `app-api`, `app-modules`, `app-safety`: składają
+moduły `-impl`, wystawiają komendy i zdarzenia dla powłoki Tauri, budują binaria usług). Tylko `app-*` mogą zależeć
+od `*-impl`; od `*-fake` tylko w dev-dependencies; `app-*` mogą zależeć od innych `app-*`, ale żaden crate spoza
+`app-*` nie zależy od `app-*`.
 
 ## Crate'y w F0 (pkt 2 §4.5a)
 | Moduł | Crate'y | Uwagi |
@@ -67,6 +68,14 @@ od niego nie zależy żaden crate.
 | `agent-backends` | `agent-backends-contract`, `-impl`, `-fake` | mosty do oficjalnych CLI (`claude -p`, `codex app-server`) jako opaque worker: tylko na żądanie użytkownika, przypięte wersje, zero dostępu do poświadczeń CLI, prośby o uprawnienia do kanału zatwierdzeń |
 | `mcp` | `mcp-contract`, `-impl` (+ bin `alfa-mcp-proxy`), `-fake` | klient MCP (stdio, odcisk opisów narzędzi, skaner prompt injection, poziomy zaufania) i serwer MCP Alfy v0 (schowek, okna, `approve`) przez named pipe / gniazdo 0600 z tokenem; bez TCP |
 | `app` | `app-core` (korzeń kompozycji `app-*`) | składa moduły, wszystkie komendy z `COMMANDS.md`, zdarzenia paczkowane co klatkę, czat ze strumieniem i markdownem, porty dla modułów jeszcze niepodpiętych |
+| `voice-pipeline` | `voice-pipeline-contract`, `-impl` (+ bin `alfa-voice-eval`), `-fake` | runtime potoku głosu: mikrofon → DSP → VAD → STT → komendy/koniec tury → automat dialogu → odpowiedź → persona → TTS → wyjście; dzierżawy głośnika/mikrofonu, barge-in z usłyszanym prefiksem, zdarzenia `voice.*`; runner zestawu F2 |
+| `tools-common` | `tools-common-contract` | wspólny kontrakt narzędzi agentek: manifest (JSON Schema, odwracalność, zdolności), `Tool`, `BrokerGate` (decide → verify → revoke), delimitacja treści niezaufanej |
+| `tools-fs` | `tools-fs-contract`, `-impl`, `-fake` | 11 narzędzi plikowych przez `FsPort` i Broker; mutacje przez `undo-journal`, usuwanie do Kosza, trwałe tylko po zatwierdzeniu w Broker-UI |
+| `tools-shell` | `tools-shell-contract`, `-impl`, `-fake` | polecenia w zakresie katalogu: snapshot przed wykonaniem, Job Object, filtrowane środowisko, tokeny `shell.exec`/`net.egress`, „uruchom w terminalu" |
+| `tools-clipboard` | `tools-clipboard-contract`, `-impl`, `-fake` | odczyt (taint) i zapis tekstu/obrazu schowka, cofanie zapisu z wykrywaniem konfliktu |
+| `agent-runtime` | `agent-runtime-contract`, `-impl`, `-fake` | v0: pętla jednej agentki plan → narzędzie → obserwacja → weryfikacja, budżety, checkpointy, anulowanie, steering, zdarzenia `agent.*` dla Replay i „Cofnij" |
+| `broker-ui` | `broker-ui-contract`, `-impl`, `-fake` | okno zatwierdzeń Brokera: karta prośby, `PhysicalInputProof` tylko z fizycznego wejścia (odrzuca wstrzyknięte, clickjacking ≥ 500 ms), Enter nie zatwierdza. **Wymaga przeglądu człowieka** |
+| `app-api`, `app-modules`, `app-safety` | (korzeń kompozycji `app-*`) | `app-api`: DTO, zdarzenia, porty, protokół; `app-modules`: adaptery modułów dla `app-core`; `app-safety`: binaria `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` złożone z `platform-windows-impl` |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

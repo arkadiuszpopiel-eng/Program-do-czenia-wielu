@@ -127,6 +127,8 @@ impl BrainPort for TestBrain {
             account: None,
             model: FAKE_MODEL.into(),
             context_window: Some(32_000),
+            routed: false,
+            route: None,
         })
     }
     fn keys_configured(&self) -> bool {
@@ -153,6 +155,8 @@ pub fn options(provider: Option<Arc<ScriptedProvider>>, shell: Arc<HeadlessShell
         device: Some(Arc::new(FakeDeviceProfile::desktop())),
         brain: provider.map(|p| Arc::new(TestBrain { provider: p }) as Arc<dyn BrainPort>),
         shell: Some(shell),
+        // Wirtualne audio (deterministyczne na każdym systemie); TTS — brak sidecarów.
+        audio: Some(Arc::new(voice_audio_fake::FakeAudio::new())),
         ..AppOptions::default()
     }
 }

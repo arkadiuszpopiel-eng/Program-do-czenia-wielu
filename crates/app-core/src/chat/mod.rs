@@ -7,6 +7,7 @@
 mod finish;
 pub(crate) mod history;
 pub(crate) mod project;
+mod routing;
 mod stream;
 
 use std::sync::{Arc, Mutex};
@@ -68,7 +69,6 @@ impl AppCore {
             .find(|r| roles.iter().any(|x| x.as_str() == **r))
             .map(|r| (*r).to_owned())
             .or_else(|| roles.iter().next().map(|r| r.as_str().to_owned()))
-            .map(|r| project::ui_role(&r))
     }
 
     /// Agentki sesji ze stanem (mówi = aktywna generacja).
@@ -84,7 +84,7 @@ impl AppCore {
                 role_ids: cast
                     .roles_of(&p.id)
                     .iter()
-                    .map(|r| project::ui_role(r.as_str()))
+                    .map(|r| r.as_str().to_owned())
                     .collect(),
                 status: if speaking.as_deref() == Some(p.id.as_str()) {
                     AgentStatus::Speaking
@@ -155,15 +155,33 @@ impl AppCore {
         Ok(id)
     }
 
-    /// Anuluje generacje we wszystkich sesjach (kill-switch F1 — `Ctrl+Shift+F12`).
-    pub async fn system_kill_all(&self) -> usize {
+    /// STOP WSZYSTKIEGO (`Ctrl+Shift+F12`, zasobnik): anuluje generacje we wszystkich sesjach
+    /// (natychmiast), potem kill-switch Brokera (tokeny, drzewa procesów, cisza audio) i stop mowy;
+    /// czeka na zapis przerwanych tur. Zwraca liczbę zatrzymanych generacji.
+    pub async fn system_kill_all(&self, origin: crate::ports::KillOrigin) -> usize {
         let handles: Vec<GenHandle> = self.rt().gens.values().cloned().collect();
         for h in &handles {
             h.cancel.cancel();
         }
+        for cancel in self.rt().downloads.values() {
+            cancel.cancel();
+        }
+        if let Err(e) = self.inner.broker.kill_all(origin).await {
+            tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
+        }
+        if let Err(e) = self.inner.voice.stop_speech().await {
+            tracing::warn!(error = %e, "stop mowy przy kill-switchu nie powiódł się");
+        }
         for h in &handles {
             h.wait(std::time::Duration::from_secs(5)).await;
         }
+        self.emit(AlfaEvent::Toast {
+            kind: crate::dto::ToastKind::Warning,
+            message: crate::dto::LocalizedText::new(
+                "STOP WSZYSTKIEGO: zatrzymano pracę agentek.",
+                "STOP EVERYTHING: agents stopped.",
+            ),
+        });
         handles.len()
     }
 }

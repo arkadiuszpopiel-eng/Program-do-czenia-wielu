@@ -42,6 +42,24 @@ Powód: Tauri ciągnie duże drzewo zależności (wry/tao/webview2-com) i osobne
 nie chcemy, by `cargo clippy --workspace` na Linuksie próbował je kompilować. Ikony w `src-tauri/icons/`
 są placeholderami — docelowe wygeneruj: `cargo tauri icon sciezka/do/logo.png`.
 
+## Wtyczki Tauri i ich rola
+`tauri-plugin-single-instance` (pierwsza: druga instancja przekazuje URI `alfa://`), `tauri-plugin-global-shortcut`
+(`Ctrl+Alt+Space`, kill-switch `Ctrl+Shift+F12` → `system_kill_all(KillOrigin::Hotkey)` → Broker),
+`tauri-plugin-notification` (toasty Windows z `app_core::notify`), `tauri-plugin-dialog` (=2.8.1: natywne
+dialogi „Zapisz jako" i wyboru paczki `.alfa` dla portu `ShellPort`; wołane z `spawn_blocking`).
+Każda nowa wtyczka/zależność powłoki trafia do `src-tauri/Cargo.lock` (osobny lockfile — root `cargo deny`
+go nie obejmuje). Licencje i źródła: `cargo deny --manifest-path apps/desktop/src-tauri/Cargo.toml check
+licenses sources` (zielone); `bans` pada na samym Tauri (wry/tao/webview2-com ciągną `windows`, który
+`deny.toml` dopuszcza tylko w `platform-windows-impl`) — znany wyjątek powłoki, nie ruszać bez ADR.
+
+## Weryfikacja powłoki poza Windows
+Job CI „Powłoka Tauri (Windows)" (`.github/workflows/ci.yml`) robi `cargo fmt --check` i `cargo clippy
+--all-targets [--features e2e] -- -D warnings` z prawdziwym `app-core`. Na Linuksie `cargo fmt --check`
+działa wprost; `cargo clippy --target x86_64-pc-windows-msvc` wymaga kopii powłoki z **zaślepką
+`app-core`** (te same typy z `app-api` i sygnatury z `with_commands!`, bez modułów z zależnościami C —
+SQLCipher/OpenSSL, whisper.cpp — których nie da się skompilować krzyżowo bez MSVC). Zaślepka sprawdza
+tylko kod powłoki; zgodność z prawdziwym rdzeniem potwierdza job Windows.
+
 ## Okno i pasek tytułu
 `tauri.conf.json`: okno 1200×800, min. 400×500, **natywne dekoracje** (`decorations: true`).
 TODO F0(j): własny pasek tytułu (`decorations: false` + `data-tauri-drag-region`) z natywnymi przyciskami
@@ -84,5 +102,6 @@ apps/desktop/
     scripts/bundle-size.mjs
   src-tauri/          Cargo.toml (tauri = 2.12.0, samodzielny [workspace]), tauri.conf.json,
     capabilities/{main,quick,pill}.json, src/ (lib.rs, commands.rs, windows.rs, tray.rs,
-    shortcuts.rs, pump.rs, shell.rs), build.rs, icons/ (placeholdery); logika w crates/app-core
+    shortcuts.rs, pump.rs, shell.rs — ShellPort: okna, dialogi, OpenSession), build.rs,
+    icons/ (placeholdery); logika w crates/app-core (+ app-api: DTO/porty, app-modules: adaptery modułów)
 ```

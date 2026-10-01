@@ -287,9 +287,14 @@ async fn markdown_code_blocks_stream_as_code_and_annotations_persist() {
         .await
         .unwrap_err();
     assert_eq!(err.code, app_core::ErrorCode::Unavailable);
+    // Uruchomienie kodu zawsze przez decyzję Brokera: zgoda wymaga okna Brokera (w trybie
+    // deweloperskim bez Broker-UI — odmowa), a zezwolenie bez `tools-shell` nie jest wykonywane.
     let err = core
         .turns_run_code(answer.clone(), code.index)
         .await
         .unwrap_err();
-    assert!(err.message.contains("safety-broker"));
+    assert!(
+        err.message == app_core::ports::NEEDS_BROKER_WINDOW || err.message.contains("tools-shell"),
+        "{err:?}"
+    );
 }

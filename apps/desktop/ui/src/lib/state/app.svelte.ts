@@ -4,6 +4,9 @@ import type { MicState } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
 import type { ActivityInfo, AgentState, CostSummary, SessionTemplate } from '../api/types';
 import type { AlfaEvent, PanelId, SettingValue, SystemStatus } from '../api/types-system';
+
+/** Zdarzenie postępu pobierania modelu lokalnego. */
+export type LocalModelProgress = Extract<AlfaEvent, { type: 'LocalModelProgress' }>;
 import { i18n, type I18n } from '../i18n/i18n.svelte';
 import { isChatEvent } from '../logic/apply-event';
 import { RafBatcher, type FrameScheduler } from '../logic/raf-batcher';
@@ -57,6 +60,8 @@ export class AppState {
   announcement = $state('');
   dismissed = $state<Record<string, boolean>>({});
   appVersion = $state('');
+  /** Ostatni postęp pobierania modelu lokalnego (onboarding, Ustawienia). */
+  localDownload = $state<LocalModelProgress | null>(null);
 
   readonly keymap = $derived(buildKeymap(SHORTCUTS, this.shortcutOverrides));
   readonly bindings = $derived(effectiveBindings(SHORTCUTS, this.shortcutOverrides));
@@ -152,6 +157,12 @@ export class AppState {
         case 'Toast':
           this.toasts.show({ kind: event.kind, message: this.i18n.text(event.message) });
           break;
+        case 'OpenSession':
+          void this.focusSession(event.session_id);
+          break;
+        case 'LocalModelProgress':
+          this.localDownload = event;
+          break;
         case 'TimelineAppended':
         case 'AccountChanged':
           for (const listener of this.listeners) listener(event);
@@ -209,6 +220,15 @@ export class AppState {
     await Promise.all(loads);
     void this.client.app.setActiveSession(id);
     if (this.sessions.active?.unread) void this.client.sessions.markRead(id);
+  }
+
+  /** „Przejdź do sesji" spoza okna (zasobnik, `alfa://session/…`, Szybkie pytanie). */
+  async focusSession(id: string): Promise<void> {
+    if (!this.sessions.list.some((s) => s.id === id)) {
+      this.sessions.list = [...(await this.client.sessions.list())];
+    }
+    if (this.view === 'settings') this.view = 'chat';
+    await this.openSession(id);
   }
 
   private async loadAgents(id: string): Promise<void> {

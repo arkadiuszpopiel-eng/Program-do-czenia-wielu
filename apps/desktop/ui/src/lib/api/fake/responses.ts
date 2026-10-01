@@ -56,7 +56,7 @@ export function pickResponse(
     return {
       ...base(
         addressed ?? 'delta',
-        'executor',
+        'operator',
         'Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym kliknięciem.',
       ),
       tools: [
