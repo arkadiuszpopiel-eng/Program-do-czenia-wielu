@@ -1,0 +1,35 @@
+[package]
+name = "tools-fs-impl"
+description = "tools-fs: narzędzia plikowe agentek przez Brokera (decide → zatwierdzenie → verify) i FsPort, mutacje w dzienniku cofania, deny-listy przed wykonaniem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-fs-contract = { path = "../tools-fs-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+undo-journal-contract = { path = "../undo-journal-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+compliance-contract = { path = "../compliance-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-fs-contract = { path = "../tools-fs-contract", features = ["contract-tests"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+proptest.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

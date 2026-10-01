@@ -15,3 +15,5 @@ Kontrakt Brokera — Safety Kernel (docs/modules/safety-broker/SPEC.md, PLAN §8
   **protokół IPC** (`ipc`: role, poświadczenia, ramki z limitem 1 MiB, uprawnienia żądań per rola).
 Testy: zakresy i guard (jednostkowe/negatywne, 43 polecenia blokowane + 15 dozwolonych), 6 własności
 po 3000 przypadków, współdzielone testy kontraktowe (`contract-tests`).
+`ipc_blocking`: klient blokujący (`BlockingClient` nad `Read + Write`, ramki jak w `ipc`) dla Broker-UI
+i watchdoga oraz bilet startowy Broker-UI `UiLaunchTicket` (poświadczenie, potok, SID konta usługi).

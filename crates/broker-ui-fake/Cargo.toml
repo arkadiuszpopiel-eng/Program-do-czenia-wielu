@@ -1,0 +1,19 @@
+[package]
+name = "broker-ui-fake"
+description = "Atrapa Broker-UI do testów: skryptowane decyzje (zezwól / zawsze w zakresie / odmów / wstrzyknięcie odrzucone) z syntetycznym dowodem z nonce wyzwania"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+broker-ui-contract = { path = "../broker-ui-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+
+[dev-dependencies]
+broker-ui-contract = { path = "../broker-ui-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

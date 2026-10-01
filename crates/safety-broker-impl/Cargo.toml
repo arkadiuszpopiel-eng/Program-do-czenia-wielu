@@ -32,6 +32,7 @@ getrandom = "0.4.3"
 core-registry-contract.workspace = true
 safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
 core-bus-fake = { path = "../core-bus-fake" }
+platform-fake = { path = "../platform-fake" }
 tempfile = "3.27.0"
 tokio = { workspace = true, features = ["io-util"] }
 

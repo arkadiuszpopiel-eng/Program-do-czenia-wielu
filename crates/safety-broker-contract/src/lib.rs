@@ -18,6 +18,7 @@ mod capability;
 mod guard;
 pub mod hex;
 pub mod ipc;
+pub mod ipc_blocking;
 mod policy;
 mod proof;
 mod scope;

@@ -12,3 +12,10 @@ sekretów). `ipc`: serwer/klient na dowolnym strumieniu (`tokio::io::duplex` w t
 sieciowych (test skanuje źródła). Named pipe z ACL na SID, usługa Windows na osobnym koncie i Broker-UI —
 część 2. Testy: kontrakt, Audyt 10 000 zdarzeń + manipulacje, 116 scenariuszy negatywnych (0 sukcesów),
 IPC, kill-switch 50 prób (budżet ściśle przy `ALFA_PERF_BUDGETS=1`).
+
+**Część 2** (`service`): `BrokerService` — named pipe z ACL (`SecurePipePort`), wątek na połączenie (`BlockingIo`
+nad `BrokerServer::serve_with`), rola klienta wiązana z tożsamością procesu (`RoleBindings`: konto, integralność,
+obraz, podpis; jądro/watchdog bez MAC po tożsamości obrazu, Broker-UI zawsze z biletem i wysoką integralnością;
+odrzucenia → `broker.ipc.rejected`), `open_audit` w katalogu prywatnym (`PrivateDirPort`), `UiSupervisor`
+(bilet `UiLaunchTicket` przez stdin, restart z przerwą). Binarka `alfa-broker` — crate `app-safety`. Testy:
+`tests/service.rs` na `platform-fake`.

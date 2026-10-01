@@ -10,3 +10,10 @@ Błędy: `PlatformError` (m.in. `Denylisted` dla ścieżek poświadczeń, `NotRe
 dla `device-profile`) daje surowe dane o sprzęcie: CPU, RAM, GPU, NPU, zasilanie, audio, ziarno
 identyfikatora maszyny. `Hotkey::validate` egzekwuje regułę AltGr (zakaz `Ctrl+Alt(+Shift)` + a, c, e, l, n, o, s, x, z)
 i rezerwuje kill-switch `Ctrl+Shift+F12`. Implementacje: `platform-fake` (Linux/CI), `platform-windows-impl` (F1).
+
+F3/2 — porty Jądra bezpieczeństwa (poza `SystemPort`): `SecurePipePort` + `PipeSecurity` (SDDL z chronionym DACL
+na SID-y, klient bez prawa tworzenia instancji, etykieta integralności), `ProcessIdentityPort` + `PeerRequirement`
+(`Sid`, `IntegrityLevel`, `SignatureStatus`, `CodeSignaturePort`/`UnverifiedSignatures`), `ApprovalSurfacePort`
+(`SurfaceView` z walidacją i układem, `SurfaceEvent`), rozpoznawanie wstrzyknięć (`HookOrigin`, `MessageOrigin`,
+`input_is_injected` — fail-closed), `ServiceHostPort`/`StopSignal`, `SessionLauncherPort` (`LaunchIntegrity`),
+`PrivateDirPort` (`private_dir_sddl`), `MmcssPort`/`ThreadBoost` (RAII, `!Send`), `DiskPort`.

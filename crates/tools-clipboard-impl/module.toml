@@ -1,0 +1,18 @@
+# Manifest narzędzi schowka (docs/modules/tools-clipboard/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Do czasu rodziny `clipboard.*` w Brokerze: `gui.control(clipboard.exe)` (pseudo-aplikacja schowka).
+id = "tools-clipboard"
+version = "0.0.1"
+kind = "tool"
+provides = ["tools-clipboard-contract@1"]
+requires = ["tools-common-contract@1", "safety-broker-contract@1", "platform-contract@1", "core-bus-contract@1"]
+capabilities = ["gui.control(clipboard.exe)"]
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+ram_mb = 3
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 60

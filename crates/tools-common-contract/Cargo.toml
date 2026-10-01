@@ -1,0 +1,39 @@
+[package]
+name = "tools-common-contract"
+description = "Wspólny kontrakt narzędzi agentek (tools-*): manifest (JSON Schema, odwracalność, zdolności), trait Tool, protokół Brokera (decide → zatwierdzenie z limitem → verify), wyniki z oznaczeniem niezaufanej treści, redakcja sekretów, ścieżki"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na każdym narzędziu (-impl i -fake).
+contract-tests = []
+
+[dependencies]
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+providers-contract = { path = "../providers-contract" }
+compliance-contract = { path = "../compliance-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+regex.workspace = true
+tokio.workspace = true
+tokio-util = { version = "0.7.19", default-features = false }
+
+[dev-dependencies]
+safety-broker-fake = { path = "../safety-broker-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+proptest.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

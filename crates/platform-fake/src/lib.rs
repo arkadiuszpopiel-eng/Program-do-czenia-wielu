@@ -3,9 +3,12 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod clipboard;
+mod exec;
 mod fs;
 mod hotkeys;
+mod kernel_host;
 mod misc;
+mod pipes;
 
 use std::path::{Path, PathBuf};
 
@@ -16,9 +19,15 @@ use platform_contract::{
 };
 
 pub use clipboard::FakeClipboard;
+pub use exec::{ExecEffect, FakeExec, FakeRun, command_text};
 pub use fs::{FakeFs, FsSnapshot};
 pub use hotkeys::FakeHotkeys;
 pub use misc::{FakeProcesses, FakeTray, FakeWindows};
+// Porty Jądra bezpieczeństwa (F3, część 2).
+pub use kernel_host::{
+    FakeDisk, FakeLauncher, FakeMmcss, FakePrivateDirs, FakeServiceHost, FakeSurface,
+};
+pub use pipes::{FakePipeConnection, FakePipeListener, FakePipes};
 
 /// Pełna atrapa systemu: składa wszystkie fake'i w jeden `SystemPort`.
 #[derive(Debug, Default)]

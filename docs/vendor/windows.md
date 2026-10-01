@@ -16,7 +16,10 @@
 `Win32_System_Power`, `Win32_System_Registry`, `Win32_System_SystemInformation`,
 `Win32_UI_WindowsAndMessaging`, `Win32_UI_Input_KeyboardAndMouse`, `Win32_UI_Shell`,
 `Win32_UI_Shell_PropertiesSystem`, `Win32_UI_HiDpi`, `Win32_Graphics_Gdi`, `Win32_Graphics_Dwm`,
-`Win32_Graphics_Dxgi`, `Win32_Graphics_DXCore`, `Win32_Media_Audio`, `Win32_Devices_FunctionDiscovery`.
+`Win32_Graphics_Dxgi`, `Win32_Graphics_DXCore`, `Win32_Media_Audio`, `Win32_Devices_FunctionDiscovery`;
+F3/2 (porty Jądra): `Win32_System_IO` (`ReadFile`/`WriteFile`/`ConnectNamedPipe` wymagają typu `OVERLAPPED`),
+`Win32_System_Pipes`, `Win32_System_RemoteDesktop` (`WTS*`), `Win32_System_Services`, `Win32_UI_Input`
+(`GetCurrentInputMessageSource`).
 
 ## Konwencje API 0.62 (różnice względem starszej wiedzy)
 - Funkcje zwracające `BOOL` z `SetLastError` mają postać `-> windows_core::Result<()>`
@@ -49,9 +52,17 @@
 | `hotkey/thread.rs` | `PeekMessageW(PM_NOREMOVE)` (utworzenie kolejki), `SetWindowsHookExW(WH_KEYBOARD_LL, Some(proc), GetModuleHandleW(None).map(HINSTANCE::from), 0)`, `GetMessageW`, `PostThreadMessageW(WM_APP+1 / WM_QUIT)`, `RegisterHotKey(None, id, HOT_KEY_MODIFIERS(m \| MOD_NOREPEAT), vk)` (błąd 1409 = zajęty), `SetTimer(None, 0, 15, None)` (licznik wątku → `WM_TIMER`), `GetAsyncKeyState` |
 | `hardware/win.rs` | `GetLogicalProcessorInformation` (`RelationProcessorCore`, `RelationCache` L3), `GetPhysicallyInstalledSystemMemory`, `IDXGIFactory1::EnumAdapters1` + `GetDesc1` (koniec: `DXGI_ERROR_NOT_FOUND`), DXCore `CreateAdapterList(&[GENERIC_ML])` (GUID `b71b0d41-…-0250b7d3a988` zdefiniowany lokalnie — brak w 0.62), `GetSystemPowerStatus`, MMDevice (`IMMDeviceEnumerator::EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE)`, `OpenPropertyStore(STGM_READ)`, `GetValue(&PKEY_Device_FriendlyName)` → `PROPVARIANT::to_string()`) na wątku MTA |
 
+| `kernel/win_pipe.rs` | `ConvertStringSecurityDescriptorToSecurityDescriptorW(SDDL_REVISION_1)` → `SECURITY_ATTRIBUTES`, `CreateNamedPipeW(PIPE_ACCESS_DUPLEX \| FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE \| PIPE_READMODE_BYTE \| PIPE_WAIT \| PIPE_REJECT_REMOTE_CLIENTS, …)` (zwraca `HANDLE`, błąd = `INVALID_HANDLE_VALUE`), `ConnectNamedPipe(h, None)` (`ERROR_PIPE_CONNECTED` = sukces), `GetNamedPipeClientProcessId`/`GetNamedPipeServerProcessId`, klient `CreateFileW(…, 0x12008B, FILE_SHARE_NONE, None, OPEN_EXISTING, SECURITY_SQOS_PRESENT \| SECURITY_IDENTIFICATION, None)` + `WaitNamedPipeW` przy `ERROR_PIPE_BUSY`, `ReadFile` → `ERROR_BROKEN_PIPE` = koniec strumienia |
+| `kernel/win_sec.rs` | `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)`, `OpenProcessToken(TOKEN_QUERY)`, `GetTokenInformation(TokenUser / TokenIntegrityLevel / TokenSessionId)` (bufor `Vec<u64>` — wyrównanie), `ConvertSidToStringSidW` + `LocalFree`, `GetSidSubAuthorityCount`/`GetSidSubAuthority` (RID), `CreateDirectoryW` z deskryptorem / `GetSecurityDescriptorDacl` + `SetNamedSecurityInfoW(SE_FILE_OBJECT, DACL \| PROTECTED_DACL)`, `AvSetMmThreadCharacteristicsW` / `AvRevertMmThreadCharacteristics`, `GetDiskFreeSpaceExW` |
+| `kernel/win_launch.rs` | `WTSGetActiveConsoleSessionId`, `WTSQueryUserToken` (SeTcbPrivilege), `DuplicateTokenEx(TokenPrimary)`, `SetTokenInformation(TokenIntegrityLevel, S-1-16-12288)`, `CreatePipe` + `SetHandleInformation(HANDLE_FLAG_INHERIT, 0)`, `CreateProcessAsUserW(lpDesktop = winsta0\\default, STARTF_USESTDHANDLES)`; usługa: `StartServiceCtrlDispatcherW`, `RegisterServiceCtrlHandlerExW`, `SetServiceStatus` |
+| `kernel/surface/*` | `RegisterClassExW`, `CreateWindowExW(WS_EX_TOPMOST \| WS_EX_DLGMODALFRAME)`, STATIC `0x80` (`SS_NOPREFIX` bez feature `Win32_UI_Controls`), BUTTON `BS_PUSHBUTTON` (bez `BS_DEFPUSHBUTTON`), `IsDialogMessageW`, `WM_CTLCOLORSTATIC`, `FlashWindowEx`, `ShowWindow(SW_SHOWNOACTIVATE)`, `SetWindowsHookExW(WH_KEYBOARD_LL / WH_MOUSE_LL)`, `GetCurrentInputMessageSource`, `GetWindow(GW_HWNDPREV)` + `DwmGetWindowAttribute(DWMWA_CLOAKED)` (zasłonięcie) |
+
 ## Pułapki
 - `#[implement]` bez zależności `windows-core` → „could not find `windows_core`”.
 - `IFileOperation` działa tylko w STA — nigdy na wątku tokio; `run_in_apartment(Apartment::Sta, ..)`.
 - Callback `WH_KEYBOARD_LL` musi wracać natychmiast (limit `LowLevelHooksTimeout`), a wątek hooka
   musi pompować komunikaty; hook nie widzi klawiszy przy oknie administratora na wierzchu (UIPI).
 - `FOF_NOCONFIRMATION` bez `FOF_WANTNUKEWARNING` po cichu usuwa trwale elementy za duże na Kosz.
+- Synchroniczny uchwyt potoku serializuje operacje na obiekcie pliku — połączenie czyta i pisze jeden wątek
+  (protokół żądanie → odpowiedź); `DisconnectNamedPipe` gubi nieodczytane dane, więc serwer tylko zamyka uchwyt.
+- Podniesienie etykiety integralności tokenu i `WTSQueryUserToken` wymagają `SeTcbPrivilege` (usługa).

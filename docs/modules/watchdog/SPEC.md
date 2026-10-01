@@ -1,4 +1,4 @@
-# watchdog — SPEC (v1: logika zaimplementowana — część 1; proces i hook skrótu — część 2)
+# watchdog — SPEC (v1: logika — część 1; proces `alfa-watchdog` i hook skrótu — część 2)
 
 ## Cel
 Osobny proces nadzoru: heartbeat jądra i modułów `process`, restart modułów z limitem, **safe-mode** po pętli awarii, rollback do ostatniej dobrej wersji/konfiguracji (`updater`, `core-config`), kill-switch (skrót, zasobnik) i zabijanie drzew procesów przez Job Objects — poza UI, < 200 ms (PLAN §8.6, §12.2, §3.1).
@@ -22,6 +22,11 @@ pub trait Watchdog: KillSwitch + JobRegistry {
 ```
 Zdarzenia (Diagnostyka; safe-mode/rollback/kill także Audyt przez Brokera): `watchdog.heartbeat.missed`, `watchdog.restart`, `watchdog.crash_loop`, `watchdog.safe_mode.entered/left`, `watchdog.rollback`, `watchdog.kill_switch {latency_us}`, `kernel.audio.silence`.
 
+## Proces (część 2: `watchdog-impl::daemon`, binarka `alfa-watchdog` w `app-safety`)
+- `KillSwitchDaemon`: zdarzenia `HotkeyPort` (kill-switch `Ctrl+Shift+F12` rejestrowany wyłącznie przez `WinHotkeys::register_kill_switch`; `RegisterHotKey` + `WH_KEYBOARD_LL`) → `kill_all(Hotkey)`, odbicie 300 ms.
+- `ThreadedPeer`: Broker jako peer wołany blokująco (IPC `KillAll`, rola `Watchdog` przyjmowana przez Brokera po tożsamości obrazu `alfa-watchdog.exe`, konto serwera sprawdzane) na osobnym wątku — limit 100 ms działa także przy zawieszonym Brokerze; kolejność: cisza audio → drzewa procesów (od razu) → Broker → Audyt.
+- `alfa-watchdog [--broker-pipe P] [--broker-user SID] [-- <jądro> …]`: jądro uruchamiane w Job Object watchdoga (potomkowie dziedziczą zadanie — `TerminateJobObject` zabija całe drzewo, także zagnieżdżone zadania narzędzi). Ikona zasobnika i heartbeat przez IPC — następna iteracja (kill-switch z zasobnika obsługuje dziś powłoka Tauri → Broker).
+
 ## Zależności
 `core-bus-contract`, `core-log-contract` (`AuditWriter` Brokera), `platform-contract` (`ProcessPort`). Brak zależności od `safety-broker-contract` — Broker jest peerem `KillSwitch` (działa, gdy Brokera brak).
 
@@ -38,7 +43,7 @@ Zdarzenia (Diagnostyka; safe-mode/rollback/kill także Audyt przez Brokera): `wa
 `[watchdog] heartbeat_timeout = "5s"`, `max_restarts = 3`, `window = "10m"`, `cooldown = "30m"`, `safe_mode_after_crash_loop = true`, `auto_rollback = true`; `kill_switch.hotkey` (współdzielony z `[security]`).
 
 ## Testy akceptacyjne
-- `ACC-F3-watchdog-01`: kill-switch < 200 ms p95 z 50 prób — logika na atrapach (ściśle przy `ALFA_PERF_BUDGETS=1`); prawdziwy system (hook, Job Objects, audio) — część 2, CI self-hosted.
+- `ACC-F3-watchdog-01`: kill-switch < 200 ms p95 z 50 prób — logika na atrapach (ściśle przy `ALFA_PERF_BUDGETS=1`); zawieszony Broker (1,5 s) nie blokuje: drzewa zabite, wynik w ~100 ms (`tests/daemon.rs`); prawdziwy system (hook, Job Objects, audio) — CI self-hosted.
 - `ACC-F3-watchdog-02`: zabity sidecar → restart; 4. awaria w oknie → safe-mode, jądro i Broker-UI działają (`tests/watchdog.rs`).
 - `ACC-F3-watchdog-03`: brak heartbeatu jądra → restart jądra (wirtualny zegar).
 
@@ -46,5 +51,6 @@ Zdarzenia (Diagnostyka; safe-mode/rollback/kill także Audyt przez Brokera): `wa
 `watchdog-fake`: rejestruje heartbeaty, awarie i kill-switch jako zdarzenia (bez zabijania), safe-mode z testu, akcje `tick` ze skryptu.
 
 ## Otwarte pytania
-- Hook skrótu kill-switcha w watchdogu (sesja użytkownika) — usługa Brokera w sesji 0 nie ma hooka; ADR (3)/(15) w części 2.
+- Hook skrótu kill-switcha: w watchdogu (sesja użytkownika) — zrobione; usługa Brokera w sesji 0 nie ma hooka.
+- Własna ikona zasobnika watchdoga (`Shell_NotifyIconW`) i heartbeat jądra przez potok — SPEC v2 (limit rozmiaru `platform-windows-impl`).
 - Katalog awarii chaosowych (≥ 20) — `evals/` w F8.

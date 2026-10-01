@@ -1,0 +1,19 @@
+# Manifest Broker-UI (docs/modules/broker-ui/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Osobny natywny proces (`alfa-broker-ui.exe`) w sesji użytkownika, uruchamiany przez usługę Brokera
+# z wyższym poziomem integralności (UIPI); komunikuje się wyłącznie z Brokerem (named pipe z ACL).
+id = "broker-ui"
+version = "0.0.1"
+kind = "service"
+provides = ["broker-ui-contract@1"]
+requires = ["safety-broker-contract@1", "platform-contract@1", "watchdog-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "process"
+
+[budget]
+ram_mb = 8
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 5

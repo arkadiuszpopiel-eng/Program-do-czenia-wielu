@@ -1,0 +1,28 @@
+[package]
+name = "broker-ui-contract"
+description = "Kontrakt Broker-UI: model karty zatwierdzenia (kto, co, zakres, ryzyko, odwracalność, plan, „tylko teraz / zawsze w tym zakresie ≤ 24 h”), reguły dowodu fizycznego wejścia (wstrzyknięcia, 500 ms na pierwszym planie, nakładki), traity BrokerUi, BrokerLink, HelloPort"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+platform-contract.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+core-bus-contract.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

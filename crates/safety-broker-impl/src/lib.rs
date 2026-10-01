@@ -12,6 +12,7 @@
 
 pub mod audit;
 pub mod ipc;
+pub mod service;
 
 mod apply;
 mod approvals;

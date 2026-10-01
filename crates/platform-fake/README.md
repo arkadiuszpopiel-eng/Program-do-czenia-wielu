@@ -8,3 +8,6 @@ nieodwracalne. Deny-lista poświadczeń (`.claude`, `.codex`, `Cookies`…) dzia
 `FakeClipboard`, `FakeHotkeys` (`press`/`release` symulują zdarzenia), `FakeWindows`, `FakeProcesses`
 i `FakeTray` rejestrują wywołania do asercji. `FakePlatform` składa wszystko w jeden `SystemPort`.
 Testy właściwościowe (proptest) sprawdzają, że każda odwracalna operacja FS cofa się do migawki.
+F3/2: `FakePipes` (potoki w pamięci z DACL, etykietą i ochroną pierwszej instancji + rejestr tożsamości procesów —
+„proces o innym SID”), `FakeSurface` (skrypt zdarzeń okna), `FakeLauncher`, `FakePrivateDirs`, `FakeServiceHost`,
+`FakeMmcss`, `FakeDisk` (`tests/kernel_ports.rs`).

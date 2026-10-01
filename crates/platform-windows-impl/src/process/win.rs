@@ -3,6 +3,8 @@
 
 #![allow(unsafe_code)]
 
+pub(crate) mod exec;
+
 use std::ffi::c_void;
 use std::mem::size_of;
 

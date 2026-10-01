@@ -3,6 +3,7 @@
 //! `TerminateJobObject` (cel kill-switcha < 200 ms, PLAN §8.6), lista procesów, test „okno admina”.
 
 mod cmdline;
+mod exec;
 #[cfg(windows)]
 mod win;
 

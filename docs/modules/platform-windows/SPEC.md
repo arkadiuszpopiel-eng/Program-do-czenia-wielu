@@ -22,6 +22,20 @@ monitor, DPI; `WindowGuard` chroni procesy Alfy/Brokera), `WinProcesses::spawn_w
 `WinClipboard::set_sensitive`; `TrayAdapter` + `TrayBackend` (ikonę rysuje powłoka Tauri).
 Zdarzenia: `platform.hotkey`, `platform.ptt`, `platform.clipboard.changed`, `platform.fs.changed`, `platform.device.changed`, `platform.fullscreen.changed`, `platform.session.locked` (publikacja przez jądro — F2).
 
+### Porty Jądra bezpieczeństwa (F3, część 2 — poza sumą `SystemPort`)
+| Port (kontrakt) | Windows (`WinKernel`, `WinSessionLauncher`, `WinApprovalSurface`) | Atrapa |
+|---|---|---|
+| `SecurePipePort` + `PipeSecurity` (SDDL: chroniony DACL na SID-y, klienci bez `FILE_CREATE_PIPE_INSTANCE`, etykieta `NW`) | `CreateNamedPipeW` z deskryptorem, `PIPE_REJECT_REMOTE_CLIENTS`, `FILE_FLAG_FIRST_PIPE_INSTANCE`, zawsze wolna instancja; klient `SECURITY_SQOS_PRESENT \| SECURITY_IDENTIFICATION`; `peer_pid` = `GetNamedPipeClient/ServerProcessId` | `FakePipes` (DACL, etykieta, przejęcie nazwy, PID-y) |
+| `ProcessIdentityPort` + `PeerRequirement::check` (konto, min. integralność, obraz, sesja, podpis) | `OpenProcess` → `QueryFullProcessImageNameW`, token: `TokenUser`, `TokenIntegrityLevel` (RID), `TokenSessionId` | `FakePipes` (rejestr tożsamości) |
+| `CodeSignaturePort` | `UnverifiedSignatures` („niezweryfikowane” w dev; WinVerifyTrust + przypięcie certyfikatu po bramce #10) | — |
+| `PrivateDirPort` (`private_dir_sddl`) | nowy: `CreateDirectoryW` z deskryptorem; istniejący: `SetNamedSecurityInfoW` (chroniony DACL) | `FakePrivateDirs` |
+| `SessionLauncherPort` (`LaunchIntegrity`) | `UserSessionHigh`: `WTSGetActiveConsoleSessionId` + `WTSQueryUserToken` → `DuplicateTokenEx` → etykieta High → `CreateProcessAsUserW` (`winsta0\default`, stdin = anonimowy potok); `AsCaller` — `app-safety::ChildLauncher` | `FakeLauncher` |
+| `ServiceHostPort` + `StopSignal` | `StartServiceCtrlDispatcherW`, `RegisterServiceCtrlHandlerExW` (STOP/SHUTDOWN), `SetServiceStatus` | `FakeServiceHost` |
+| `ApprovalSurfacePort` (`SurfaceView`, `SurfaceView::layout`, `SurfaceEvent`) | okno Win32 na własnym wątku (szczegóły: `broker-ui` SPEC) | `FakeSurface` (skrypt zdarzeń) |
+| wejście wstrzyknięte: `HookOrigin` (flagi `LLKHF_INJECTED`, `LLKHF_LOWER_IL_INJECTED`, `LLMHF_*`), `MessageOrigin` (`IMO_*`), `input_is_injected` (fail-closed) | hooki LL na wątku okna + `GetCurrentInputMessageSource` | logika w kontrakcie |
+| `MmcssPort` → `ThreadBoost` (RAII, `!Send`) | `AvSetMmThreadCharacteristicsW("Pro Audio")` / `AvRevertMmThreadCharacteristics` | `FakeMmcss` |
+| `DiskPort::free_disk_space` | `GetDiskFreeSpaceExW` | `FakeDisk` |
+
 ## Zależności
 `platform-contract` (F1 bez magistrali — zdarzenia publikuje jądro). Zewnętrzne: `windows`/`windows-core` 0.62.2 (jedna wersja, `docs/vendor/windows.md`).
 
@@ -55,6 +69,7 @@ Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, st
 - `ACC-F1-platform-windows-02`: reguła AltGr — zestaw zakazanych skrótów odrzucony 100%.
 - `ACC-F1-platform-windows-03`: PTT — puszczenie klawisza zgłoszone ≤ 10 ms (hook), na runnerze desktop.
 - `ACC-F1-platform-windows-04`: `kill_tree` zabija całe drzewo (Job Object) ≤ 50 ms.
+- F3/2: logika portów Jądra na Linuksie (SDDL, SID, integralność, flagi wstrzyknięć, układ okna, `platform-fake/tests/kernel_ports.rs`); Windows CI: DACL egzekwowany (konto spoza listy = odmowa), pierwsza instancja, PID-y, tożsamość, katalog prywatny, MMCSS, dysk, host usługi (`app-safety/tests/windows_ports.rs`); pulpit/usługa `#[ignore]`: `SendInput` w okno = zawsze „wstrzyknięte”, uruchomienie z wysoką integralnością.
 
 ## Fake
 `platform-windows-fake`: wirtualny system plików, schowek i lista okien w pamięci, skrypty zdarzeń (hotkey/PTT/hot-plug) z wirtualnym zegarem — testy na Linux/CI bez Windows.
@@ -65,3 +80,5 @@ Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, st
 - Dziennik cofnięć FS jest w pamięci procesu — trwały dziennik to `undo-journal` (F3).
 - Podział `SystemPort` na osobne crate'y kontraktowe per pod-port (ładowanie leniwe) — do ustalenia w SPEC v1.
 - Snap Layouts/Mica przez Tauri (spike j) — czy własny pasek tytułu wymaga kodu tutaj.
+- Rozmiar crate'a: z modułami procesów (agent-runtime) i Jądra (F3/2) ~8 070 linii `.rs` z testami (src ~7 300) — przy kolejnym przyroście wydzielić `platform-windows-kernel-impl` (wymaga dopisania do `wrappers` w `deny.toml`).
+- Authenticode (`WinVerifyTrust` + przypięcie wystawcy) i druga ścieżka tożsamości klienta (`ImpersonateNamedPipeClient`) — po bramce #10 (certyfikat).

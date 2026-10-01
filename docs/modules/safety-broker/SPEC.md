@@ -1,4 +1,4 @@
-# safety-broker — SPEC (v1: logika zaimplementowana — część 1; usługa Windows — część 2)
+# safety-broker — SPEC (v1: logika — część 1; usługa, potok z ACL, Broker-UI — część 2)
 
 ## Cel
 Usługa Brokera na osobnym koncie Windows: wydaje **tokeny zdolności** (`fs.read/write(zakres)`, `shell.exec(zakres)`, `gui.control(app)`, `net.egress(host)`, `secrets.read(id)`, `system.admin(op)`; TTL; potomek ≤ rodzic), prowadzi zatwierdzenia, jest **jedynym writerem Audytu** (łańcuch hashy, kotwica), trzyma polityki Jądra, poziomy autonomii L0–L4, kill-switch (PLAN §8.1–8.4, §8.6). Logika bez UI — okno zatwierdzeń to `broker-ui`.
@@ -14,6 +14,13 @@ F3, P0. Część 1 (ten stan): kontrakt, silnik, Audyt, IPC na dowolnym strumien
 - `PhysicalInputProof`: prywatne pola, brak `Clone/Default/Deserialize`, konstruktor `broker_ui_only::physical_input_proof` (umowa jak `KernelAuthority`; doctesty `compile_fail`). Siłę daje Broker: jednorazowy nonce wysyłany tylko kanałem Broker-UI, wejście niewstrzyknięte, świeżość, opcjonalnie Hello.
 - `KernelGuard`/`check_command`, `KernelPolicy`, `AnchorStore`, `ipc::{Hello, Request, Response, ClientRole}`; `KillSwitch`/`JobRegistry` z `watchdog-contract`.
 Zdarzenia (Audyt): `broker.token.issued/revoked/denied`, `broker.approval.requested/decided`, `broker.autonomy.changed`, `broker.kernel_block`, `broker.kill_switch`, `broker.policy.changed`, `broker.session.tainted`, `broker.key.rotated`, `broker.audit.chain_started`.
+
+## Usługa (część 2: `safety-broker-impl::service`, binarka `alfa-broker` w `app-safety`)
+- Potok `\\.\pipe\alfa-broker` z `PipeSecurity`: DACL chroniony — pełny dostęp konto usługi, klienci (konto użytkownika) tylko `FILE_GENERIC_READ | FILE_WRITE_DATA` (bez tworzenia instancji), etykieta `ML;;NW;;;ME` (procesy niskiej integralności nie piszą), `PIPE_REJECT_REMOTE_CLIENTS`, `FILE_FLAG_FIRST_PIPE_INSTANCE` (zajęta nazwa = start odmówiony: możliwe przejęcie). Wątek na połączenie, protokół z części 1 (`BrokerServer::serve_with` + adapter `BlockingIo`).
+- Rola klienta wiązana z tożsamością procesu ustaloną przez system (`GetNamedPipeClientProcessId` → token: SID, integralność, sesja; obraz; Authenticode przez port — w dev „niezweryfikowane”): `RoleBindings` (`core`, `agent`, `broker_ui`, `watchdog`; brak = rola wyłączona na potoku). Jądro i watchdog mogą się przedstawić bez MAC (zapis po tożsamości obrazu — startują z launchera), Broker-UI **zawsze** z poświadczeniem z biletu i z wysoką integralnością (walidacja konfiguracji). Odrzucenia → Audyt `broker.ipc.rejected`.
+- Audyt i kotwica w katalogu prywatnym (`PrivateDirPort`: nowy — `CreateDirectoryW` z deskryptorem, istniejący — chroniony DACL tylko konto usługi + SYSTEM).
+- Nadzór Broker-UI (`UiSupervisor`): bilet `UiLaunchTicket` (poświadczenie per uruchomienie, nazwa potoku, SID konta usługi) przez stdin, ponowne uruchomienie z przerwą 1 s → 30 s.
+- Host usługi Windows z `platform-windows-impl` (`StartServiceCtrlDispatcherW`, STOP/SHUTDOWN) — bez crate'a `windows-service` (jedna wersja windows-rs, kod OS tylko w `platform-windows`); `--console` = tryb deweloperski.
 
 ## Zależności
 `risk-classifier-contract`, `compliance-contract` (deny-listy, normalizacja), `watchdog-contract` (kill-switch, Job Objects, zegar), `core-bus/log/registry-contract`, `platform-contract`. Krypto: `hmac 0.12.1`, `sha2 0.10.9`, `getrandom 0.4.3`.
@@ -44,12 +51,15 @@ RAM ≤ 15 MB; `verify` ≤ 0,2 ms; `issue` bez zatwierdzenia ≤ 5 ms; zapis Au
 - `ACC-F3-safety-broker-01`: kill-switch < 200 ms p95 z 50 prób (logika: `tests/budget.rs`; prawdziwy system — część 2, CI self-hosted).
 - `ACC-F3-safety-broker-02`: „agentka zmienia Jądro / zatwierdza sama siebie” — logika: 116 scenariuszy = 0 sukcesów (`tests/negative.rs`, `tests/ipc.rs`); SendInput do Broker-UI — część 2.
 - `ACC-F3-safety-broker-03`: property — potomek nigdy szerszy, zmiana dowolnego bajtu wykrywana, wygasły/obcy token odrzucony (`tests/props.rs`, testy kontraktowe).
-- `ACC-F3-safety-broker-04`: łańcuch Audytu weryfikowalny po 10 000 zdarzeń, manipulacje i ucięcie ogona wykrywane kotwicą (`tests/audit.rs`); ACL pliku — część 2.
+- `ACC-F3-safety-broker-04`: łańcuch Audytu weryfikowalny po 10 000 zdarzeń, manipulacje i ucięcie ogona wykrywane kotwicą (`tests/audit.rs`); katalog prywatny — `tests/service.rs` (atrapa) i `app-safety/tests/windows_ports.rs` (Windows CI).
+- Część 2: wiązanie ról z tożsamością (obcy obraz jako jądro, rola wyłączona, Broker-UI bez biletu / ze średnią integralnością, inne konto na DACL = odmowa), przejęcie nazwy potoku, nadzór Broker-UI (`tests/service.rs`); pełny łańcuch procesów (`app-safety/tests/chain.rs`); DACL egzekwowany przez system (`windows_ports.rs`).
 
 ## Fake
 `safety-broker-fake`: prawdziwy silnik z kluczem z jawnego ziarna, Audyt w pamięci, cisza audio jako zdarzenie, skrypt `Allow/NeedsApproval/Deny` per narzędzie (blokady Jądra nie do zdjęcia), `auto_approve` jak `broker-ui-fake`.
 
 ## Otwarte pytania
-- Kotwica: plik pod ACL konta usługi (część 2) vs TPM — ADR (THREAT_MODEL §11).
+- Kotwica: plik w katalogu z chronionym DACL konta usługi (część 2, zrobione) vs TPM — ADR (THREAT_MODEL §11).
+- Konto usługi: LocalSystem vs osobne konto z `SeTcbPrivilege` (potrzebne do `WTSQueryUserToken` i podniesienia etykiety) — bramka ludzka #10.
+- Weryfikacja PID-em ma okno wyścigu przy przekazaniu uchwytu potoku i ponownym użyciu PID — obrona: MAC dla Broker-UI, wysoka integralność; `ImpersonateNamedPipeClient` jako drugie źródło — SPEC v2.
 - Źródło polecenia (`CommandOrigin`) deklaruje jądro; Broker utwardza je własnym taintem — pełna niezależność po przeniesieniu `voice-cmd` → Broker (F5).
 - Strażnik poleceń powłoki jest leksykalny (obrona w głąb obok ograniczonego tokenu procesu); polecenia zakodowane (`-EncodedCommand`, `iex`) blokowane jako nieczytelne.

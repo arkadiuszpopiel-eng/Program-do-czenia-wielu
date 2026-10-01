@@ -19,6 +19,7 @@ mod error;
 mod fs;
 mod hardware;
 mod hotkey;
+mod kernel;
 mod process;
 mod tray;
 #[cfg(windows)]
@@ -39,6 +40,8 @@ pub use config::PlatformConfig;
 pub use fs::{DEFAULT_EXTRA_DENY_NAMES, DEFAULT_EXTRA_DENY_PREFIXES, FsConfig, WinFs};
 pub use hardware::WinHardware;
 pub use hotkey::WinHotkeys;
+// Porty Jądra bezpieczeństwa (F3, część 2): potok z ACL, tożsamość, okno Broker-UI, usługa, MMCSS.
+pub use kernel::{WinApprovalSurface, WinKernel, WinSessionLauncher};
 pub use process::{JobLimits, ProcessInfo, WinProcesses, affinity_mask_for};
 pub use tray::{TrayAdapter, TrayBackend};
 pub use window::{DEFAULT_PROTECTED_PROCESSES, Rect, WinWindows, WindowDetails, WindowGuard};

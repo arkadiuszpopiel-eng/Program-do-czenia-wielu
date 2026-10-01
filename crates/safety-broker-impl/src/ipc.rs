@@ -83,10 +83,38 @@ impl BrokerServer {
         Self { engine }
     }
 
-    /// Obsługuje jedno połączenie do końca strumienia.
-    pub async fn serve<S>(&self, mut stream: S) -> Result<(), IpcError>
+    /// Obsługuje jedno połączenie do końca strumienia (powitanie: poświadczenie z MAC).
+    pub async fn serve<S>(&self, stream: S) -> Result<(), IpcError>
     where
         S: AsyncRead + AsyncWrite + Unpin,
+    {
+        let engine = self.engine.clone();
+        self.serve_with(
+            stream,
+            move |hello: &Hello| {
+                engine
+                    .verify_client_credential(&hello.credential)
+                    .map_err(|e| e.to_string())
+            },
+            |_| {},
+        )
+        .await
+    }
+
+    /// Jak [`Self::serve`], ale o przyjęciu powitania decyduje `authorize` — usługa sprawdza
+    /// w nim tożsamość procesu po drugiej stronie potoku (SID, integralność, obraz) i poświadczenie.
+    /// `on_reject` dostaje powód odmowy **zanim** klient zobaczy odpowiedź (najpierw Audyt,
+    /// potem odpowiedź — klient nie wyprzedzi zapisu).
+    pub async fn serve_with<S, F, R>(
+        &self,
+        mut stream: S,
+        authorize: F,
+        on_reject: R,
+    ) -> Result<(), IpcError>
+    where
+        S: AsyncRead + AsyncWrite + Unpin,
+        F: FnOnce(&Hello) -> Result<(), String>,
+        R: FnOnce(&str),
     {
         let Some(hello) = read_frame::<_, Hello>(&mut stream).await? else {
             return Err(IpcError::Closed);
@@ -97,11 +125,10 @@ impl BrokerServer {
                 hello.protocol
             ))
         } else {
-            self.engine
-                .verify_client_credential(&hello.credential)
-                .map_err(|e| e.to_string())
+            authorize(&hello)
         };
         if let Err(reason) = verdict {
+            on_reject(&reason);
             write_frame(
                 &mut stream,
                 &HelloReply::Rejected {
