@@ -1,0 +1,18 @@
+# Manifest watchdoga (docs/modules/watchdog/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Osobny minimalny proces startowany pierwszy z launchera (część 2: binarka i hook skrótu).
+id = "watchdog"
+version = "0.0.1"
+kind = "service"
+provides = ["watchdog-contract@1"]
+requires = ["core-bus-contract@1", "core-log-contract@1", "platform-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "process"
+
+[budget]
+ram_mb = 5
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 1

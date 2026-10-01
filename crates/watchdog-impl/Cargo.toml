@@ -1,0 +1,27 @@
+[package]
+name = "watchdog-impl"
+description = "Watchdog (logika): heartbeat, restart z limitem w oknie, safe-mode po pętli awarii, rollback konfiguracji i wersji z cooldownem, rejestr Job Objects, kill-switch < 200 ms"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+watchdog-contract = { path = "../watchdog-contract" }
+core-bus-contract.workspace = true
+core-log-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+core-registry-contract.workspace = true
+watchdog-contract = { path = "../watchdog-contract", features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+platform-fake = { path = "../platform-fake" }
+
+[lints]
+workspace = true

@@ -1,0 +1,33 @@
+[package]
+name = "safety-broker-contract"
+description = "Kontrakt Brokera (Safety Kernel): tokeny zdolności z atenuacją, poziomy autonomii, dowód fizycznego wejścia, reguły Jądra, Audyt, protokół IPC"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+compliance-contract = { path = "../compliance-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

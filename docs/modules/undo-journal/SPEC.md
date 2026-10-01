@@ -1,63 +1,57 @@
-# undo-journal — SPEC (szkic v0)
+# undo-journal — SPEC (v1: kontrakt i rdzeń zaimplementowane)
 
 ## Cel
-Dziennik cofania dla operacji `fs.*` (pre-image, przeniesienia do Kosza, shadow-git/snapshot zakresu dla shella), „Cofnij" jednym kliknięciem (toast 8 s, karty kroków), VSS tylko dla operacji masowych; flaga `reversible: yes|scoped|no` z manifestu narzędzia jako wejście klasyfikatora ryzyka (PLAN §8.7, §14.8, §8.3).
+Dziennik cofania dla operacji `fs.*` (pre-image, Kosz, snapshot zakresu dla shella), „Cofnij” jednym kliknięciem (toast 8 s, karty kroków); flaga `reversible: yes|scoped|no` z manifestu narzędzia jako wejście klasyfikatora (PLAN §8.7, §14.8, §8.3). VSS dla operacji masowych — poza v1 części 1.
 
 ## Fala i priorytet
 F3. P0. Mosty CLI: snapshot przed/po (F4) przez ten sam kontrakt.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (źródło prawdy: `crates/undo-journal-contract`)
 ```rust
-// undo-journal-contract — SZKIC
-pub enum Reversibility { Yes, Scoped(Scope), No }
-pub enum UndoOp { FileWrite { path, pre_image: BlobRef }, FileMove { from, to }, FileDelete { path, recycle_id }, DirCreate { path },
-                  ShellScoped { scope: Scope, snapshot: SnapshotId }, Bulk { ops: Vec<UndoOp>, vss: Option<VssId> } }
-pub struct UndoEntry { pub id: UndoId, pub session: SessionId, pub run: RunId, pub step: StepId, pub persona: PersonaId, pub op: UndoOp, pub ts: Timestamp, pub undone: bool }
 pub trait UndoJournal: Send + Sync {
-    fn begin(&self, ctx: StepCtx) -> Result<TxId>;
-    fn record(&self, tx: TxId, op: UndoOp) -> Result<()>;
-    fn commit(&self, tx: TxId) -> Result<UndoId>;
-    fn undo(&self, id: UndoId) -> Result<UndoReport>;                    // odwrotna kolejność, atomowo gdzie możliwe
-    fn snapshot_scope(&self, scope: &Scope) -> Result<SnapshotId>;       // shadow-git / kopia
-    fn list(&self, session: SessionId) -> Vec<UndoEntry>;
+    fn begin_step(&self, ctx: StepCtx /* session, agent, run, turn, label, allow_irreversible */) -> Result<StepId, UndoError>;
+    fn write / copy / move_path / delete /* Kosz */ / delete_permanent(&self, step, ...) -> Result<(), UndoError>;
+    fn snapshot_scope(&self, step, root: &Path) -> Result<(), UndoError>;   // przed poleceniem powłoki
+    fn commit_step(&self, step) -> Result<StepSummary /* „Delta: przeniesiono 14 plików” */, UndoError>;
+    fn abort_step(&self, step) -> Result<UndoReport, UndoError>;          // cofa niezatwierdzony krok
+    fn undo(&self, step) -> Result<UndoReport, UndoError>;
+    fn undo_last(&self, session, n) -> Result<Vec<UndoReport>, UndoError>;
+    fn steps(&self, session) -> Vec<StepSummary>;  fn prune(&self) -> usize;
 }
+pub enum UndoOp { Write{path, before, pre_image, after}, Copy{from, to, after}, Move{from, to, after}, Delete{path, before, pre_image},
+                  DeletePermanent{path, before, pre_image}, ScopeSnapshot{root, files: Manifest} }
+pub struct JournalEntry { step, seq, op, platform_undo: Option<UndoToken>, boot }
+pub enum UndoError { UnknownStep, BadState, Expired, Conflict{path, expected, found}, PreImageTooLarge, StoreFull, SnapshotTooLarge, Partial(UndoReport), Platform, Store }
 ```
-Zdarzenia (Audyt): `undo.recorded`, `undo.undone { ok, partial }`, `undo.snapshot.created`, `undo.pruned`, `undo.failed`.
+Rdzeń `Journal` (w kontrakcie, jak `scheduler-lite`) nad `FsPort` i `JournalStore` (`MemStore` / `DirStore` w `-impl`).
+Zdarzenia: `undo.recorded`, `undo.undone {ok, partial}`, `undo.snapshot.created`, `undo.pruned`, `undo.failed`.
 
 ## Zależności
-`core-bus/config/log-contract`, `platform-windows-contract` (Kosz, VSS, pliki), `tools-fs-contract`/`tools-shell-contract` (wywołujący), `notify-contract` (toast „Cofnij"), `safety-broker-contract` (Audyt).
+`core-bus-contract`, `platform-contract` (`FsPort`, `UndoToken`); `sha2 0.10.9`. Wywołujący: `tools-fs`, `tools-shell`, UI.
 
 ## Niezmienniki
-- Każda operacja `fs.*` agentki przechodzi przez transakcję dziennika; brak wpisu = narzędzie nie wykonuje operacji (kontrakt `tools-fs`).
-- Usuwanie domyślnie do Kosza; pre-image plików do limitu rozmiaru (większe → VSS lub `Scoped` z ostrzeżeniem).
-- `undo` odtwarza stan w odwrotnej kolejności; przy częściowym niepowodzeniu raport wskazuje, co nie wróciło (nigdy cicho).
-- Shell w zakresie: snapshot zakresu przed wykonaniem; poza zakresem — potwierdzenie w Broker-UI.
-- Dziennik cofania obowiązuje także na L4 (PLAN §8.3).
-- Pre-image szyfrowane kluczem sesji (crypto-shredding jak logi); retencja i limit dysku.
+- Kolejność: pre-image → operacja platformy → wpis; błąd wpisu cofa operację tokenem platformy (brak wpisu = brak operacji); nieudana operacja nie zmienia stanu.
+- Cofnięcie: najpierw kontrola konfliktów całego kroku (stan bieżący = stan „po” ostatniej operacji kroku; dla snapshotu — manifest „po” z zatwierdzenia); konflikt → czytelny błąd, nic nie jest ruszane. Potem odwrotna kolejność: token platformy z tego uruchomienia, inaczej pre-image (także po restarcie).
+- Częściowe niepowodzenie → `UndoError::Partial` z listą tego, co nie wróciło; pre-image zostają.
+- Trwałe usunięcie i nadpisanie bez pre-image (za duże / pełny magazyn) wymagają `allow_irreversible` (po zgodzie Brokera); usunięcie do Kosza ma pre-image jako zapas.
+- Snapshot zakresu = kopia plików z limitem (decyzja: prostsze i bezpieczniejsze niż shadow-git — bez zewnętrznego narzędzia, przywracanie przez `FsPort`); za duży zakres → `SnapshotTooLarge` (shell poza snapshotem = `reversible: no` → potwierdzenie).
+- Retencja i limit magazynu wypierają najstarsze kroki (stają się `Expired`); pre-image współdzielone (dedup SHA-256) usuwane dopiero, gdy nieużywane.
+- Dziennik obowiązuje także na L4.
 
-## Zdolności / uprawnienia
-Działa w zakresie tokenu operacji pierwotnej; `undo` wykonywane jako Ty z UI (bez tokenu agentki).
-
-## Izolacja
-`inproc`, `lazy`.
-
-## Budżet zasobów
-Narzut na operację fs ≤ 5 ms + kopia pre-image (limit domyślnie 50 MB/plik); magazyn ≤ 2 GB z rotacją; VSS tylko masowo (≥ N plików).
+## Izolacja / budżet
+`inproc`, `lazy`. Narzut ≤ 5 ms + kopia pre-image; limit 50 MB/plik, magazyn 2 GB, retencja 7 dni.
 
 ## Konfiguracja (klucze TOML)
-`[undo] pre_image_max_mb = 50`, `store_limit_gb = 2`, `retention = "7d"`, `vss_threshold_files = 200`, `toast_seconds = 8`, `shell.snapshot_scope = true` (kernel_policy).
-
-## Wkład do UI
-Toast „Cofnij" po cofalnej akcji, przycisk „Cofnij" na kartach kroków („Delta: przeniesiono 14 plików · 2,1 s · Cofnij"), lista w Osi czasu, Ustawienia → Pliki.
+`[undo] pre_image_max_mb = 50`, `store_limit_gb = 2`, `retention = "7d"`, `snapshot_max_files = 10000`, `snapshot_max_mb = 500`, `toast_seconds = 8`, `shell.snapshot_scope = true` (kernel_policy).
 
 ## Testy akceptacyjne
-- `ACC-F3-undo-journal-01`: ≥ 200 losowych operacji `fs.*` (property-based: zapis/przeniesienie/usunięcie/katalogi) → undo przywraca stan 100%.
-- `ACC-F3-undo-journal-02`: snapshot zakresu dla shella → po skrypcie modyfikującym pliki undo przywraca zakres.
-- `ACC-F3-undo-journal-03`: chaos — przerwanie w trakcie `undo` → raport częściowy, brak utraty pre-image.
+- `ACC-F3-undo-journal-01`: 3 × 256 losowych sekwencji `fs.*` (tokeny platformy / wyłącznie pre-image / restart) + 200 na dysku z restartem → 100% przywrócenia.
+- `ACC-F3-undo-journal-02`: snapshot zakresu → zmiany „skryptu” (nowe, zmienione, usunięte pliki) cofnięte (test kontraktowy); zestaw ≥ 50 skryptów (F3-03) — `evals/`.
+- `ACC-F3-undo-journal-03`: chaos — awaria w trakcie cofania → raport częściowy, pre-image nietknięte (`undo-journal-fake`).
 
 ## Fake
-`undo-journal-fake`: dziennik w pamięci na wirtualnym FS (`platform-windows-fake`), sterowane błędy przywracania.
+`undo-journal-fake`: rdzeń w pamięci nad dowolnym `FsPort`, `FlakyFs` (awarie operacji i przywracania), awaria zapisu dziennika.
 
 ## Otwarte pytania
-- Shadow-git vs kopia katalogu dla snapshotu zakresu (duże drzewa) — do ustalenia w SPEC v1.
-- VSS wymaga uprawnień admina? — sprawdzić; jeśli tak, przez Broker/UAC lub rezygnacja z VSS w v1.
+- Szyfrowanie pre-image kluczem sesji (crypto-shredding) — integracja z `sessions` `KeyVault` (następny krok).
+- VSS dla operacji masowych (uprawnienia admina) — przez Broker/UAC lub rezygnacja w v1.

@@ -1,61 +1,58 @@
-# risk-classifier — SPEC (szkic v0)
+# risk-classifier — SPEC (v1: kontrakt zaimplementowany)
 
 ## Cel
-Deterministyczna ocena ryzyka akcji dla Brokera i poziomów autonomii: odwracalność, zakres (w profilu / poza), wpływ zewnętrzny (egress), destrukcyjność, pewność STT (gdy zlecenie głosem), taint sesji, źródło (niezaufana treść) → werdykt: wykonaj / zapytaj / twarda blokada; „lethal trifecta" (dane prywatne + niezaufana treść + kanał wyjścia) (PLAN §8.3, §8.0, §6.10).
+Deterministyczna ocena ryzyka akcji dla Brokera i poziomów autonomii: odwracalność, zakres, wpływ zewnętrzny (egress), destrukcyjność, masowość, pewność STT, źródło polecenia, taint, „lethal trifecta”, reguły Jądra → klasa ryzyka + werdykt + wyjaśnienie (PLAN §8.3, §8.0, §6.10). Bez LLM.
 
 ## Fala i priorytet
 F3. P0. Jądro (agent nie zmienia; progi to polityka).
 
-## Kontrakt (szkic Rust)
+## Kontrakt (źródło prawdy: `crates/risk-classifier-contract`)
 ```rust
-// risk-classifier-contract — SZKIC
-pub struct ActionFacts { pub tool: ToolId, pub reversible: Reversibility, pub scope: ScopeRelation /* InProfile | AllowedApp | Outside */, pub egress: Option<HostPattern>,
-                         pub destructive: Destructiveness /* None | Recoverable | Permanent */, pub bulk: Option<u32>, pub stt_confidence: Option<f32>,
-                         pub source_voice: bool, pub tainted: bool, pub untrusted_input_in_args: bool, pub touches_private_data: bool, pub kernel_area: bool }
-pub enum RiskLevel { Low, Mid, High }
-pub enum Verdict { Proceed, Ask { reason: Vec<Reason> }, HardBlock { rule: KernelRule } }
-pub struct RiskVerdict { pub level: RiskLevel, pub verdict: Verdict, pub explanation: String /* do karty zatwierdzenia */ }
-pub trait RiskClassifier: Send + Sync {
-    fn classify(&self, facts: &ActionFacts, autonomy: AutonomyLevel) -> RiskVerdict;
-    fn rules(&self) -> Vec<RuleDescription>;    // do UI „dlaczego pyta”
-}
+pub struct ActionFacts { tool, class: ActionClass /* Read|Write|Shell|GuiControl|Egress|SecretsRead|Admin */, reversible: Reversibility /* Yes|Scoped|No */,
+    scope: ScopeRelation /* InScope|AllowedApp|Outside */, egress: Option<String>, egress_allowlisted, destructive /* None|Recoverable|Permanent */,
+    bulk: u32, install, origin: CommandOrigin /* UserText|UserVoice{confidence: SttConfidence(‰), speaker_verified}|Agent|UntrustedContent */,
+    tainted, untrusted_input_in_args, touches_private_data, kernel_rule: Option<KernelRule> }
+pub enum RiskLevel { Low, Medium, High, Critical }
+pub enum Verdict { Proceed, Ask { non_voice, grantable }, HardBlock { rule: KernelRule } }
+pub fn evaluate(&ActionFacts, AutonomyLevel, &RiskPolicy) -> RiskVerdict { level, verdict, rules, factors, explanation }
+pub trait RiskClassifier { fn policy(&self) -> RiskPolicy; fn evaluate(&self, f, autonomy) -> RiskVerdict; fn rules(&self) -> Vec<RuleDescription>; }
 ```
-Zdarzenia: `risk.classified` (Audyt przy `Ask`/`HardBlock`), `risk.trifecta_detected`, `risk.rules.changed` (tylko Broker).
+Zdarzenia: `risk.classified` (przy `Ask`/`HardBlock`), `risk.trifecta_detected`, `risk.rules.changed` (tylko z `KernelAuthority` Brokera).
 
-## Zależności
-`core-bus/config/log-contract`; wywoływany przez `safety-broker` (i podglądowo przez `agent-runtime`). Brak zależności od modeli.
+## Tabela reguł (kolejność oceny; „każdy” = także L4, nigdy `grantable`)
+| Reguła | Zasięg | Warunek |
+|---|---|---|
+| KernelBlock | każdy (blokada) | `kernel_rule` ustawione przez Brokera |
+| VoiceDestructive | każdy, nie-głosem | głos + destrukcja (także do Kosza — bezpieczniejsza interpretacja §6.10) |
+| VoiceLowConfidence | każdy, nie-głosem | głos + zmiana stanu + pewność < `stt_confidence_min` (800‰) |
+| VoiceUnverifiedRisky | każdy, nie-głosem | głos bez weryfikacji mówcy + ryzyko ≥ średnie (do F5) |
+| AdminConsent / Trifecta / TaintedEgress | każdy | `system.admin`; dane prywatne + niezaufane + egress; egress z sesji tainted |
+| MutationNeedsYes | ≤ L1 | każda zmiana |
+| RiskyAtL2 | ≤ L2 | usuwanie, egress, instalacja, sekrety, admin, nieodwracalne |
+| TaintedHighRisk / UntrustedSource / CriticalRisk | ≤ L3 | tainted + ≥ wysokie; polecenie z niezaufanej treści; krytyczne (np. masowe trwałe usunięcie) |
+| IrreversibleOutside / EgressNotAllowlisted / GuiOutsideApps | ≤ L3, grantable | nieodwracalne poza zakresem; host spoza allowlisty; aplikacja spoza wskazanych |
+Klasa ryzyka: baza wg klasy akcji, podniesienia (destrukcja, masowość ≥ `bulk_threshold`, nieodwracalność, poza zakresem, instalacja, egress z danymi/taintem, trifecta = krytyczne, niezaufane źródło, obszar Jądra), niska pewność STT podnosi o stopień.
 
 ## Niezmienniki
-- Deterministyczny, bez LLM; ten sam `ActionFacts` + poziom = ten sam werdykt (property-based).
-- Twarde blokady niezależne od poziomu (także L4): wyłączenie audytu, formatowanie dysku systemowego, zmiana polityk Jądra przez agentkę, `gui.control` wobec Alfy/Brokera/helpera, deny-listy §1.3, destrukcja zlecona głosem bez potwierdzenia nie-głosem.
-- Mapowanie poziomów: L0 → wszystko `Ask`/blok zmian; L1 → każda zmiana `Ask`; L2 → `Ask` przy usuwaniu, egressie, instalacji; L3 → `Ask` przy nieodwracalnych poza zakresem lub przy niezaufanym wejściu; L4 → `Ask` tylko przy twardych regułach i głosowej destrukcji.
-- Taint: `tainted && (egress || High)` → `Ask` na każdym poziomie ≤ L3; trifecta → `Ask`.
-- Niska pewność STT podnosi poziom ryzyka akcji zleconej głosem.
-- Progi i reguły to polityka Jądra (`kernel_policy`): `improver` i agentki nie zmieniają.
+- Deterministyczny; monotoniczny w poziomie autonomii z konstrukcji (każda reguła „do poziomu X” albo „każdy”) i w czynnikach ryzyka (taint, niezaufane, dane prywatne, instalacja, masowość, niższa pewność STT nigdy nie luzują) — testy własności.
+- Twarde blokady i destrukcja głosem pytają/blokują na L4; L4 poza nimi pyta tylko o egress z taintem, trifectę, admina i głos.
 
-## Zdolności / uprawnienia
-Brak.
+## Zależności
+`core-bus-contract`; wywoływany przez `safety-broker` (in-proc), podglądowo przez `agent-runtime`.
 
-## Izolacja
-`inproc` w usłudze Brokera (i kopia read-only w jądrze dla podglądu), `always`.
-
-## Budżet zasobów
-`classify` ≤ 0,1 ms; RAM ≤ 1 MB.
+## Izolacja / budżet
+`inproc` w usłudze Brokera, `always`. `classify` ≤ 0,1 ms; RAM ≤ 1 MB.
 
 ## Konfiguracja (klucze TOML)
-`[security.risk] stt_confidence_min = 0.8`, `bulk_threshold = 50`, `[security.risk.rules]` (tabela reguł, kernel_policy), `explain_in_ui = true`.
-
-## Wkład do UI
-Kolor/etykieta ryzyka i wyjaśnienie na karcie zatwierdzenia (Broker-UI), „dlaczego pyta" w Ustawieniach → Uprawnienia, prosty opis poziomów w onboardingu.
+`[security.risk] stt_confidence_min = 0.8` (500–990‰), `bulk_threshold = 50` (≥ 2) — `kernel_policy`.
 
 ## Testy akceptacyjne
-- `ACC-F3-risk-classifier-01`: tabela decyzyjna (≥ 200 przypadków × 5 poziomów) zamrożona w `evals/` — 100% zgodności; property-based determinizm i monotoniczność (wyższy poziom nigdy nie pyta więcej niż niższy, poza twardymi regułami).
-- `ACC-F3-risk-classifier-02`: red-team injection ≥ 100 przypadków → 0 `Proceed` dla egressu z sesji tainted ≤ L3.
-- `ACC-F3-risk-classifier-03`: destrukcja głosem na L4 → zawsze `Ask` (100/100).
+- `ACC-F3-risk-classifier-01`: tabela 80 przypadków × 5 poziomów (`tests/table.rs`) + własności po 2000 przypadków (`tests/props.rs`); zamrożenie ≥ 200 × 5 w `evals/` — przez recenzenta.
+- `ACC-F3-risk-classifier-02`: egress z sesji tainted nigdy `Proceed` (własność, każdy poziom).
+- `ACC-F3-risk-classifier-03`: destrukcja głosem na L4 → zawsze `Ask{non_voice}` (własność + tabela).
 
 ## Fake
-`risk-classifier-fake`: werdykty ze skryptu (per narzędzie) — testy `agent-runtime`, `broker-ui`.
+`risk-classifier-fake`: tabela + skrypt per narzędzie, rejestr wywołań; reguł Jądra nie da się zaskryptować.
 
 ## Otwarte pytania
-- Dokładna tabela reguł i wagi — `THREAT_MODEL.md` (F0) i ADR (15); do ustalenia w SPEC v1.
-- Czy klasyfikator ma dostęp do treści argumentów (np. ścieżek) czy tylko do faktów wyliczonych przez narzędzie — preferencja: fakty z narzędzia + walidacja ścieżek w Brokerze.
+- Czy `Critical` z niezaufanego źródła ma pytać także na L4 — dziś nie (zgodnie z PLAN §8.3); decyzja właściciela.

@@ -1,61 +1,50 @@
-# watchdog — SPEC (szkic v0)
+# watchdog — SPEC (v1: logika zaimplementowana — część 1; proces i hook skrótu — część 2)
 
 ## Cel
-Osobny proces nadzoru: heartbeat jądra i modułów `process`, restart modułów, **safe-mode** po N awariach, rollback do ostatniej dobrej wersji/konfiguracji (z `updater`), obsługa kill-switch (skrót globalny, zasobnik) i zabijanie drzew procesów przez Job Objects — poza UI, < 200 ms (PLAN §8.6, §12.2, §3.1).
+Osobny proces nadzoru: heartbeat jądra i modułów `process`, restart modułów z limitem, **safe-mode** po pętli awarii, rollback do ostatniej dobrej wersji/konfiguracji (`updater`, `core-config`), kill-switch (skrót, zasobnik) i zabijanie drzew procesów przez Job Objects — poza UI, < 200 ms (PLAN §8.6, §12.2, §3.1).
 
 ## Fala i priorytet
-F3. P0. Diagnosta (klasteryzacja, propozycje) — F8, osobny moduł.
+F3. P0. Diagnosta — F8, osobny moduł.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (źródło prawdy: `crates/watchdog-contract`)
 ```rust
-// watchdog-contract — SZKIC
-pub struct Heartbeat { pub from: ProcessRole /* Core | Sidecar(ModuleId) | BrokerUi */, pub ts: Instant, pub health: HealthReport }
-pub enum WatchAction { RestartModule(ModuleId), RestartCore, SafeMode { reason: String }, RollbackVersion, RollbackConfig(RevisionId), KillAll(KillReason) }
-pub struct Policy { pub heartbeat_timeout: Duration, pub max_restarts: u8, pub window: Duration, pub cooldown: Duration }
-pub trait Watchdog: Send + Sync {
-    fn heartbeat(&self, hb: Heartbeat);
-    fn register_job(&self, job: JobHandle, owner: ProcessRole);       // wszystkie drzewa procesów Alfy
-    fn kill_switch(&self, reason: KillReason) -> Result<()>;           // < 200 ms: audio cisza + Job Objects
-    fn actions(&self) -> Subscription<WatchAction>;
-    fn safe_mode(&self) -> bool;
+pub struct Heartbeat { pub from: ProcessRole /* Core|Sidecar(id)|BrokerUi|Broker|CliBridge(id)|Tool(id) */, pub health: Health /* Ok|Degraded|Failing */ }
+pub enum WatchAction { Restart{role, attempt}, EnterSafeMode{reason}, StopForSafeMode{role}, LeaveSafeMode, RollbackConfig{revision}, RollbackVersion{to}, RollbackSkipped{reason} }
+pub struct WatchPolicy { heartbeat_timeout_ms, max_restarts, window_ms, cooldown_ms, safe_mode_after_crash_loop, auto_rollback }
+pub trait Watchdog: KillSwitch + JobRegistry {
+    fn watch(&self, role, critical: bool); fn heartbeat(&self, hb) -> Result<Vec<WatchAction>, WatchdogError>;
+    fn report_crash(&self, role, detail) -> Vec<WatchAction>; fn tick(&self) -> Vec<WatchAction>;   // wirtualny zegar
+    fn mark_last_good(&self); fn safe_mode(&self) -> Option<SafeModeState>; fn may_start(&self, role) -> bool;
+    fn leave_safe_mode(&self, ManualConfirmation) -> Result<(), WatchdogError>; fn action_log(&self) -> Vec<WatchAction>;
 }
+// wspólne z Brokerem: KillSwitch::kill_all(KillReason) -> KillReport, JobRegistry, JobTable, Clock/ManualClock
+// porty: Supervisor (restart/stop), ConfigHistory (core-config), UpdaterSignal (updater)
 ```
-Zdarzenia (Diagnostics + Audyt dla kill/safe-mode): `watchdog.heartbeat.missed`, `watchdog.restart`, `watchdog.crash_loop`, `watchdog.safe_mode.entered/left`, `watchdog.rollback`, `watchdog.kill_switch { latency_ms }`.
+Zdarzenia (Diagnostyka; safe-mode/rollback/kill także Audyt przez Brokera): `watchdog.heartbeat.missed`, `watchdog.restart`, `watchdog.crash_loop`, `watchdog.safe_mode.entered/left`, `watchdog.rollback`, `watchdog.kill_switch {latency_us}`, `kernel.audio.silence`.
 
 ## Zależności
-`core-bus-contract` (przez pipe), `safety-broker-contract` (kill-switch współobsługiwany; Audyt), `updater-contract` (rollback wersji), `core-config-contract` (rollback konfiguracji), `platform-windows-contract` (Job Objects, hook skrótu, zasobnik). Minimalne zależności — musi działać, gdy jądro leży.
+`core-bus-contract`, `core-log-contract` (`AuditWriter` Brokera), `platform-contract` (`ProcessPort`). Brak zależności od `safety-broker-contract` — Broker jest peerem `KillSwitch` (działa, gdy Brokera brak).
 
 ## Niezmienniki
-- Watchdog nie zależy od jądra, UI ani modeli; startuje pierwszy (z launchera) i przeżywa awarię jądra.
-- Kill-switch: skrót globalny (`Ctrl+Shift+F12`, reguła AltGr), przycisk w kapsule/zasobniku (przekazany bez WebView), „stop" głosem (przez `voice-cmd` → Broker) — od klawisza do ciszy audio i zabicia wszystkich Job Objects < 200 ms p95.
-- Restarty ograniczone (`max_restarts` w `window`), potem safe-mode: tylko jądro + UI + Broker, bez głosu/narzędzi/agentek; wyjście z safe-mode ręczne.
-- Rollback tylko do wersji/konfiguracji oznaczonej jako „ostatnia dobra" (health po starcie); nigdy w pętli (cooldown).
-- Kill-switch nie wymaga zatwierdzenia; nigdy nie jest blokowany przez brak Brokera.
-- Zabijanie = całe drzewa (Job Objects), także sidecary i mosty CLI.
+- Watchdog nie zależy od jądra, UI ani modeli; startuje pierwszy i przeżywa awarię jądra.
+- Kill-switch: cisza audio → zabicie wszystkich drzew → peer Brokera (limit 100 ms) → Audyt (limit 50 ms); nie wymaga zatwierdzenia, nie blokuje go brak ani zawieszenie Brokera; błąd jednego drzewa nie zatrzymuje pozostałych (raport, nigdy cicho).
+- Restarty: `max_restarts` w `window`; procesy niekrytyczne potem nie są restartowane → safe-mode (jądro, Broker, Broker-UI i procesy krytyczne działają; reszta zatrzymana; heartbeat niekrytycznego w safe-mode → zatrzymanie); procesy krytyczne restartowane zawsze. Wyjście z safe-mode ręczne.
+- Rollback tylko do „ostatniej dobrej” (`mark_last_good` po zdrowym starcie), nigdy w pętli (cooldown) i tylko, gdy bieżąca różni się od dobrej.
 
-## Zdolności / uprawnienia
-Brak tokenów; działa jako Ty (kill własnych procesów) — bez elewacji.
-
-## Izolacja
-`process` (osobny, minimalny binarny), `always`.
-
-## Budżet zasobów
-RAM ≤ 5 MB; CPU ≈ 0 w bezczynności; heartbeat co 1 s (konfigurowalnie); reakcja na skrót ≤ 20 ms + zabicie ≤ 180 ms.
+## Izolacja / budżet
+`process` (osobny, minimalny), `always`. RAM ≤ 5 MB; heartbeat co 1 s; kill-switch (logika, 50 prób): p95 ≈ 1,2 ms; z zawieszonym Brokerem ≈ 102 ms.
 
 ## Konfiguracja (klucze TOML)
 `[watchdog] heartbeat_timeout = "5s"`, `max_restarts = 3`, `window = "10m"`, `cooldown = "30m"`, `safe_mode_after_crash_loop = true`, `auto_rollback = true`; `kill_switch.hotkey` (współdzielony z `[security]`).
 
-## Wkład do UI
-Stan „crash-loop modułu" i „safe-mode" (§14.4), Zdrowie systemu (F8), ostrzeżenie o rollbacku, „Co nowego" po rollbacku.
-
 ## Testy akceptacyjne
-- `ACC-F3-watchdog-01`: kill-switch < 200 ms p95 z 50 prób pod obciążeniem UI (od klawisza do ciszy audio i zabicia Job Objects).
-- `ACC-F3-watchdog-02`: chaos — zabity sidecar STT/LLM → restart ≤ 3 s; 4. awaria w oknie → safe-mode, jądro i UI działają.
-- `ACC-F3-watchdog-03`: jądro zawieszone (brak heartbeat) → restart jądra, sesje nietknięte (dziennik append-only).
+- `ACC-F3-watchdog-01`: kill-switch < 200 ms p95 z 50 prób — logika na atrapach (ściśle przy `ALFA_PERF_BUDGETS=1`); prawdziwy system (hook, Job Objects, audio) — część 2, CI self-hosted.
+- `ACC-F3-watchdog-02`: zabity sidecar → restart; 4. awaria w oknie → safe-mode, jądro i Broker-UI działają (`tests/watchdog.rs`).
+- `ACC-F3-watchdog-03`: brak heartbeatu jądra → restart jądra (wirtualny zegar).
 
 ## Fake
-`watchdog-fake`: rejestruje heartbeaty i akcje, kill-switch jako zdarzenie (bez zabijania) — testy `ui-quick`, `safety-broker`.
+`watchdog-fake`: rejestruje heartbeaty, awarie i kill-switch jako zdarzenia (bez zabijania), safe-mode z testu, akcje `tick` ze skryptu.
 
 ## Otwarte pytania
-- Kto trzyma hook skrótu kill-switch: watchdog czy usługa Brokera (usługa w sesji 0 nie ma hooka klawiatury → watchdog w sesji użytkownika) — ADR (3)/(15), do ustalenia w SPEC v1.
-- Katalog awarii chaosowych (≥ 20) — `evals/` w F8, część już w F3.
+- Hook skrótu kill-switcha w watchdogu (sesja użytkownika) — usługa Brokera w sesji 0 nie ma hooka; ADR (3)/(15) w części 2.
+- Katalog awarii chaosowych (≥ 20) — `evals/` w F8.

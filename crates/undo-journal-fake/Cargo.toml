@@ -1,0 +1,21 @@
+[package]
+name = "undo-journal-fake"
+description = "Atrapa dziennika cofania: rdzeń z kontraktu w pamięci nad dowolnym FsPort, sterowane błędy przywracania (chaos), awaria zapisu dziennika"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+undo-journal-contract = { path = "../undo-journal-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+
+[dev-dependencies]
+undo-journal-contract = { path = "../undo-journal-contract", features = ["contract-tests"] }
+platform-fake = { path = "../platform-fake" }
+
+[lints]
+workspace = true
