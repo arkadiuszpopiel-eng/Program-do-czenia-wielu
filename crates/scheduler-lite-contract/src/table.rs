@@ -150,8 +150,7 @@ impl LockTable {
                 holder: req.holder,
             });
         }
-        self.next_request += 1;
-        let id = RequestId(self.next_request);
+        let id = self.next_request_id();
         let on_timeout = req
             .on_timeout
             .unwrap_or_else(|| self.policy(&req.resource).on_timeout);
@@ -226,6 +225,12 @@ impl LockTable {
         }];
         effects.extend(self.grant_next(&resource, now_ms));
         effects
+    }
+
+    /// Kolejny identyfikator żądania (monotoniczny).
+    pub(crate) fn next_request_id(&mut self) -> RequestId {
+        self.next_request += 1;
+        RequestId(self.next_request)
     }
 
     pub(crate) fn grant(

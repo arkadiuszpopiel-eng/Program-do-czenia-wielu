@@ -1,0 +1,17 @@
+# Manifest pełnego schedulera (docs/modules/scheduler/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "scheduler"
+version = "0.0.1"
+kind = "service"
+provides = ["scheduler-contract@1", "scheduler-lite-contract@1"]
+requires = ["core-bus-contract@1", "personas-contract@1", "cost-meter-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "inproc"
+
+[budget]
+ram_mb = 8
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 30

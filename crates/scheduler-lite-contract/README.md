@@ -33,3 +33,5 @@ bez cykli, kolejka uporządkowana, nikt nie czeka po terminie, każde żądanie 
 raz, na końcu wszystko zwolnione; test pokrycia (w 300 scenariuszach występują wszystkie rodzaje
 decyzji, w tym ~65 rozwiązanych zakleszczeń); determinizm. Kontraktowe (7 przypadków) pod feature
 `contract-tests` z uprzężą `Harness` sterującą czasem.
+
+Rozszerzenie F5 (addytywne): `Core::try_acquire_all` — atomowe przyznanie kompletu zasobów zadaniom pełnego `scheduler` (wszystko albo nic, bez czekania).

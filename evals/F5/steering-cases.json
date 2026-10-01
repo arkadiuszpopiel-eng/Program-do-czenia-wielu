@@ -1,0 +1,217 @@
+{
+  "id": "F5-02",
+  "criterion": "Steering uwzględniony w ≤ 1 kroku atomowym",
+  "threshold": {
+    "passed": 20,
+    "of": 20
+  },
+  "rule": "wiadomość wysłana w trakcie kroku k trafia do wykonawczyni przed krokiem k+1; wysłana przed startem, w pauzie albo po wywłaszczeniu — przed pierwszym krokiem następnego wysłania; zdarzenie scheduler.task.steered ma latency_steps ≤ 1",
+  "start_modes": {
+    "running": "zadanie w toku od t=0",
+    "queued": "zadanie czeka (okno „nie wcześniej niż” +1000 ms)",
+    "paused": "pauza po bieżącym kroku wysłana razem z wiadomością, wznowienie po 500 ms",
+    "preempted": "zadanie trzyma głośnik; w chwili wysłania mowa użytkownika (UserSpeech) przejmuje głośnik na 300 ms"
+  },
+  "cases": [
+    {
+      "id": "s01",
+      "via": "text",
+      "kind": "message",
+      "start": "running",
+      "steps": 6,
+      "step_ms": 100,
+      "send_at_ms": 150,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s02",
+      "via": "voice",
+      "kind": "message",
+      "start": "running",
+      "steps": 6,
+      "step_ms": 100,
+      "send_at_ms": 150,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s03",
+      "via": "text",
+      "kind": "change_goal",
+      "start": "running",
+      "steps": 5,
+      "step_ms": 200,
+      "send_at_ms": 250,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s04",
+      "via": "voice",
+      "kind": "change_goal",
+      "start": "running",
+      "steps": 5,
+      "step_ms": 200,
+      "send_at_ms": 610,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s05",
+      "via": "text",
+      "kind": "message",
+      "start": "running",
+      "steps": 8,
+      "step_ms": 50,
+      "send_at_ms": 20,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s06",
+      "via": "voice",
+      "kind": "message",
+      "start": "running",
+      "steps": 8,
+      "step_ms": 50,
+      "send_at_ms": 330,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s07",
+      "via": "text",
+      "kind": "message",
+      "start": "running",
+      "steps": 4,
+      "step_ms": 1000,
+      "send_at_ms": 1500,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s08",
+      "via": "voice",
+      "kind": "message",
+      "start": "running",
+      "steps": 4,
+      "step_ms": 1000,
+      "send_at_ms": 2999,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s09",
+      "via": "text",
+      "kind": "message",
+      "start": "running",
+      "steps": 10,
+      "step_ms": 30,
+      "send_at_ms": 31,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s10",
+      "via": "voice",
+      "kind": "message",
+      "start": "running",
+      "steps": 10,
+      "step_ms": 30,
+      "send_at_ms": 245,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s11",
+      "via": "text",
+      "kind": "message",
+      "start": "queued",
+      "steps": 3,
+      "step_ms": 100,
+      "send_at_ms": 0,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s12",
+      "via": "voice",
+      "kind": "message",
+      "start": "queued",
+      "steps": 3,
+      "step_ms": 100,
+      "send_at_ms": 0,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s13",
+      "via": "text",
+      "kind": "change_goal",
+      "start": "queued",
+      "steps": 2,
+      "step_ms": 100,
+      "send_at_ms": 0,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s14",
+      "via": "voice",
+      "kind": "change_goal",
+      "start": "queued",
+      "steps": 2,
+      "step_ms": 100,
+      "send_at_ms": 0,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s15",
+      "via": "text",
+      "kind": "message",
+      "start": "paused",
+      "steps": 6,
+      "step_ms": 100,
+      "send_at_ms": 150,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s16",
+      "via": "voice",
+      "kind": "message",
+      "start": "paused",
+      "steps": 6,
+      "step_ms": 100,
+      "send_at_ms": 150,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s17",
+      "via": "text",
+      "kind": "message",
+      "start": "preempted",
+      "steps": 6,
+      "step_ms": 100,
+      "send_at_ms": 150,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s18",
+      "via": "voice",
+      "kind": "message",
+      "start": "preempted",
+      "steps": 6,
+      "step_ms": 100,
+      "send_at_ms": 150,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    },
+    {
+      "id": "s19",
+      "via": "text",
+      "kind": "message",
+      "start": "running",
+      "steps": 3,
+      "step_ms": 500,
+      "send_at_ms": 10,
+      "text": "zmień kolejność: najpierw faktury"
+    },
+    {
+      "id": "s20",
+      "via": "voice",
+      "kind": "message",
+      "start": "running",
+      "steps": 3,
+      "step_ms": 500,
+      "send_at_ms": 990,
+      "text": "a jednak bez zdjęć, tylko PDF-y"
+    }
+  ]
+}

@@ -120,6 +120,38 @@ impl<H: Host> Core<H> {
         result
     }
 
+    /// Atomowo przyznaje komplet zasobów — wszystko albo nic, bez czekania (pełny `scheduler`, F5).
+    /// Zajęty zasób → `Timeout { waited_ms: 0 }` i żadna dzierżawa nie powstaje.
+    pub fn try_acquire_all(&self, requests: &[LeaseRequest]) -> Result<Vec<Lease>, SchedError> {
+        let now = self.host.now_ms();
+        let mut out = Outcome::default();
+        let leases = {
+            let mut engine = self.lock();
+            let effects = engine.table.grant_all(requests, now)?;
+            let mut leases = Vec::with_capacity(effects.len());
+            for effect in effects {
+                out.events.push(effect_event(&effect, now));
+                if let Effect::Granted(info) = effect {
+                    let (tx, rx) = watch::channel(LeaseSignal::Active);
+                    engine.signals.insert(info.id, tx);
+                    leases.push(Lease::new(info, self.control(), rx));
+                }
+            }
+            leases
+        };
+        self.finish(out);
+        Ok(leases)
+    }
+
+    /// Czy wszystkie zasoby są teraz wolne dla `holder` (bez przyznawania).
+    pub fn all_free_for(&self, resources: &[Resource], holder: &Holder) -> bool {
+        let now = self.host.now_ms();
+        let engine = self.lock();
+        resources
+            .iter()
+            .all(|r| engine.table.is_free_for(r, holder, now))
+    }
+
     /// Wywłaszczenie (np. `UserSpeaks` wobec narracji). `KillSwitch` odbiera dzierżawę.
     pub fn preempt(
         &self,
@@ -159,6 +191,11 @@ impl<H: Host> Core<H> {
     /// Nadpisuje politykę zasobu.
     pub fn set_policy(&self, resource: Resource, policy: ResourcePolicy) {
         self.lock().table.set_policy(resource, policy);
+    }
+
+    /// Polityka zasobu (domyślna albo nadpisana).
+    pub fn policy(&self, resource: &Resource) -> ResourcePolicy {
+        self.lock().table.policy(resource)
     }
 
     /// Bieżąca posiadaczka zasobu.

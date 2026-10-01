@@ -16,6 +16,7 @@ mod core;
 mod events;
 mod graph;
 mod lease;
+mod multi;
 mod ops;
 mod query;
 mod table;

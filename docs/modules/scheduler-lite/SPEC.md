@@ -64,3 +64,8 @@ Kolejka mówienia widoczna w panelu Agentki (kto mówi, kto czeka); kapsuła akt
 ## Otwarte pytania
 - `scheduler` (F5) rozszerza kontrakt `-lite` (typy `Resource/Holder/Priority/Lease` zostają); DAG i okna czasowe dokłada F5.
 - Klucze `[scheduler]` z `core-config` → `ResourcePolicy` (na razie `set_policy`) — po ustabilizowaniu `core-config-contract`.
+
+## Rozszerzenia dla pełnego `scheduler` (F5, addytywne)
+`LockTable::is_free_for` / `grant_all` i `Core::try_acquire_all` / `all_free_for` / `policy` — atomowe przyznanie kompletu zasobów
+(wszystko albo nic, bez czekania; zajęte → `Timeout { waited_ms: 0 }`). Zadania pełnego schedulera nie czekają w kolejce `-lite`
+(brak „hold and wait”); żądania mowy mają pierwszeństwo (zasób z niepustą kolejką nie jest wolny dla zadań).
