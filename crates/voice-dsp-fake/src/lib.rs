@@ -150,9 +150,9 @@ impl Dsp for FakeDsp {
         let rate = mic.format.sample_rate;
         let r = self
             .resampler
-            .get_or_insert_with(|| Resampler::new(rate, OUTPUT_RATE));
+            .get_or_insert_with(|| Resampler::with_zero_crossings(rate, OUTPUT_RATE, 8));
         if r.from_rate() != rate {
-            *r = Resampler::new(rate, OUTPUT_RATE);
+            *r = Resampler::with_zero_crossings(rate, OUTPUT_RATE, 8);
         }
         let mut tmp = Vec::new();
         r.process(&mic.to_mono(), &mut tmp);

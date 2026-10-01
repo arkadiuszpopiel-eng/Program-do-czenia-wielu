@@ -6,6 +6,7 @@
 
 use std::collections::BTreeSet;
 
+use personas_contract::PersonaId;
 use proptest::prelude::*;
 use voice_cmd_contract::VoiceCommand;
 use voice_dialog_contract::{
@@ -13,7 +14,6 @@ use voice_dialog_contract::{
     ProactiveLabel, UtteranceId,
 };
 use voice_dialog_impl::default_machine;
-use voice_persona_contract::PersonaId;
 
 #[derive(Debug, Clone)]
 enum Op {

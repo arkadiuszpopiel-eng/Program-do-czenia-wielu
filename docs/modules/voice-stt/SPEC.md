@@ -16,6 +16,7 @@ pub struct Transcript { pub utterance: UtteranceId, pub text: String, pub words:
     async fn configure(&self, cfg: SttCfg) -> Result<(), SttError>;          // prywatność sprawdzana przed ruchem sieciowym
     async fn start_utterance(&self, id: UtteranceId) -> Result<(), SttError>;
     async fn push(&self, id: UtteranceId, frame: &Frame) -> Result<Option<Transcript>, SttError>;   // partial co partial_every_ms
+    async fn partial_now(&self, id: UtteranceId) -> Result<Option<Transcript>, SttError>;          // partial na żądanie (KWS barge-in potoku co 100 ms); domyślnie None
     async fn end_utterance(&self, id: UtteranceId) -> Result<Transcript, SttError>;                 // final (pusty, gdy bramka VAD)
     async fn cancel(&self, id: UtteranceId);  fn health(&self) -> Health;  fn take_events(&self) -> Vec<SttEvent>;
 }

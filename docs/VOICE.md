@@ -313,3 +313,44 @@ Kolumny obowiązkowe: kandydat × PL × licencja × streaming × zasoby × TTFB.
 - Tryb głosowy w UI, pigułka, stany mikrofonu, skróty: `docs/UI.md`.
 - Progi akceptacyjne fal: `docs/ACCEPTANCE.md` (zamrażane hashami w `evals/`).
 - ADR (4) ML runtime, ADR (6) historia append-only, ADR (11) silniki głosu v0 i audio.
+
+## 18. Implementacja
+
+Stan repo (F2): wszystkie moduły `voice-*` z §2 oznaczone „F2” mają trójkę crate'ów; runtime składający je w rozmowę to moduł **`voice-pipeline`** (`docs/modules/voice-pipeline/SPEC.md`). Rdzenie deterministyczne (bez I/O) mieszkają w kontraktach, żeby runtime i runnery ewaluacji nie zależały od cudzego `-impl`: `VadMachine` (`voice-vad`), `WakeMachine` + `MicArbiter` (`voice-wake`), `DialogMachine` + `HeuristicClassifier` + `DialogDriver` (`voice-dialog`), `GrammarRecognizer` (`voice-cmd`), `LockTable`/`LeaseTable` (`scheduler-lite`). `PersonaId` ma jedno źródło prawdy: `personas-contract` (`voice-persona-contract` tylko go reeksportuje, walidacja formatu w `PersonaId::parse` / `parse_persona_id`).
+
+### 18.1 Potok i wątki
+
+```
+wątek RT (voice-audio, bez alokacji) ──SPSC──▶ przechwytywanie ─┐       ┌─▶ mikser ──▶ urządzenie
+                                                               ▼       │        └─▶ referencja AEC ─┐
+wątek przetwarzania: Pipeline::step() co 10 ms ── DSP (AEC) ─▶ reguła echa ─▶ VAD ─▶ STT ─▶ voice-cmd / voice-turn
+       ▲                                                                                │
+       └── voice-wake (PTT, przełącznik, adresowanie)        voice-dialog (automat) ◀───┘
+                                                                     │ polecenia
+     ReplySource (LLM + historia) ─▶ voice-persona (normalizacja PL, chunker, styl) ─▶ voice-tts (głos persony) ─▶ mikser
+```
+- Krok nie blokuje: STT, LLM, TTS i magistrala to przyszłości odpytywane raz na krok (bez spawnowania zadań). Kolejność kroku: wejścia UI → aktywacja → wyniki asynchroniczne → wyjście (referencja AEC, raporty, `PlaybackProgress` z licznika próbek) → mikrofon → timery → wyniki zleceń z tego kroku → zdarzenia modułów → pigułka/rezydencja → magistrala.
+- Punkty anulowania: `CancellationToken` generowania (barge-in, „stop”, `Esc`), `CancelToken` syntezy per wypowiedź (`StopTts`), `stop_all` wyjścia, `cancel` wypowiedzi STT. Po `StopTts` żadna ramka tej wypowiedzi nie trafia do miksera (sprawdzane property-testem).
+- Keyword-spotter: gdy agentka mówi/myśli, potok co 100 ms prosi STT o partial na żądanie (`Stt::partial_now`) i podaje go `voice-cmd` jako `CmdSource::Kws` — „stop”/„czekaj” bez czekania na koniec tury.
+- Reguła echa obok AEC (`EchoGate`, detektor podwójnej mowy na poziomach): przewidywane echo = szczyt referencji w oknie 300 ms + nauczone sprzężenie − ERLE; ramka jest mową bliską tylko przy poziomie ≥ przewidywanie + 6 dB i pewnej AEC — inaczej do VAD idzie cisza.
+- Kontrola przepływu: synteza wyprzedza odtwarzanie najwyżej o `speak_ahead_ms` (8 s), licząc zaległość z pozycji wyjścia.
+- Wyłączność: głośnik i mikrofon to dzierżawy `scheduler-lite` (`SchedSpeakerLock`, `MicArbiter` z `lease_now` — bez czekania w kroku); filler tylko przy wolnym głośniku albo tej samej personie.
+- Historia append-only (`ProviderReply`): tura użytkownika; odpowiedź zapisywana raz, po wyniku — pełna albo `Interrupted { heard }`, renderowana `render_interrupted_turn` z usłyszanym prefiksem (zmapowanym z tekstu mówionego na oryginał przez `raw_prefix`). Następna tura widzi, co użytkownik naprawdę usłyszał.
+- Zmiana agentki w locie („Gama, …”, komenda, UI): następna wypowiedź idzie głosem i promptem nowej persony, bez restartu potoku.
+- Zdarzenia `voice.pipeline.*` (pigułka, transkrypt, prefiks, zmiana agentki, opóźnienia, głośność, degradacja) nie niosą audio.
+
+### 18.2 Wyniki na atrapach (CI, wirtualny zegar)
+
+| Scenariusz | Wynik |
+|---|---|
+| TTFA profilu A (100 losowych scenariuszy, opóźnienia atrap z budżetu §4) | p50 1380 ms, p95 1610 ms (próg p50 ≤ 2000, p95 ≤ 3000) |
+| Barge-in (bez / z echem pokoju) | ducking 40 / 90 ms, twardy stop 240 / 290 ms od początku mowy; prefiks w historii, kolejna tura odpowiada na korektę |
+| Backchannel co 3 s przez 60 s | 20/20 rozpoznanych, 0 przerwań |
+| „stop” / „czekaj” | reakcja 190 ms |
+| Echo własnego TTS przez „pokój” | 0 duckingów i 0 stopów (kontrola bez reguły: 18 duckingów, 15 stopów) |
+| Zmiana agentki | 20/20 (głos — F0 z syntezy, persona — prompt) |
+| PTT, awaria STT GPU → CPU, property (40 przypadków) | mikrofon tylko w czasie przytrzymania; wypowiedź zachowana; nigdy dwie agentki na głośniku, brak audio po `StopTts`, mikrofon w jednym stanie |
+
+### 18.3 Zestaw F2 na prawdziwych modelach
+
+`evals/F2/` (README: nagrywanie, format manifestu NDJSON, podział dev/test, zamrożenie hashem) + CLI `alfa-voice-eval` (`voice-pipeline-impl`): WER PL, recall „stop/anuluj” z reakcją, precision backchannelu, fałszywe przerwania/h (z dziennika sesji), prefiks ±1 słowo, intencje per klasa — z progami `docs/ACCEPTANCE.md` §5. STT: whisper.cpp przez `whisper-cli` (tryb `prefix`: partial = model na audio do teraz, jak w potoku; tryb `timeline`: jedna oś słów na pozycję); komendy i automat — te same rdzenie co w potoku. Na CI tylko format i 3 próbki syntetyczne; pomiar wymaga korpusu (bramka #3) i maszyny użytkownika.

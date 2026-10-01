@@ -1,13 +1,13 @@
 //! Mowa użytkownika w trakcie mowy/myślenia agentki: ducking → potwierdzenie → twardy stop;
 //! backchannel nie przerywa; mowa krótsza niż `min_speech_ms` to szum.
 
-use voice_dialog_contract::{
+use crate::{
     BargeIn, Command, DialogNotice, DialogPhase, InterruptClassifier, Interruption, UserTurn,
 };
 
 use super::Step;
-use crate::backchannel::{BackchannelClass, classify};
-use crate::prefix::{heard_prefix, unsaid};
+use crate::engine::backchannel::{BackchannelClass, classify};
+use crate::engine::prefix::{heard_prefix, unsaid};
 
 impl<C: InterruptClassifier> Step<'_, C> {
     pub(crate) fn on_vad_start(&mut self) {

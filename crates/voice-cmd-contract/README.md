@@ -8,3 +8,6 @@ przełącz na personę, nie przeszkadzać, stop wszystko = kill-switch, samodzie
 `Grammar` (frazy PL/EN z alternatywami, słowami opcjonalnymi i slotem `{persona}`, wypełniacze, formy imion,
 reguła „nie”, próg, `settle_ms`), wspólne reguły `fold`, `split_tokens`, `nie_verdict`, trait
 `CommandRecognizer`, zdarzenia `voice.cmd.*` i — pod feature `contract-tests` — `contract_tests::run_all`.
+Deterministyczny rdzeń `GrammarRecognizer` (kompilacja fraz do wzorców, dopasowanie rozmyte `levenshtein` /
+`word_score`) jest w kontrakcie — czyste funkcje bez I/O, jak `DialogMachine` — żeby runner zestawu F2
+(`voice-pipeline`) używał tej samej gramatyki bez zależności od `voice-cmd-impl`.

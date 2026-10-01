@@ -1,11 +1,11 @@
 //! `GrammarRecognizer` — rozpoznawanie komend z gramatyki na transkrypcie partial/final.
 
-use voice_cmd_contract::{
+use crate::{
     AgentActivity, CmdDecision, CmdHit, CmdInput, CmdSource, CommandKind, CommandRecognizer,
     Grammar, IgnoreReason, Token, VoiceCommand, nie_verdict, split_tokens,
 };
 
-use crate::pattern::Compiled;
+use super::pattern::Compiled;
 
 /// Wynik analizy wypowiedzi.
 struct Parse {

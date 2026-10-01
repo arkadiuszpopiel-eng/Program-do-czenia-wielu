@@ -4,11 +4,11 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+use personas_contract::PersonaId;
 use voice_cmd_contract::{
     AgentActivity, CmdInput, CmdSource, CommandRecognizer, Token, VoiceCommand,
 };
 use voice_cmd_impl::GrammarRecognizer;
-use voice_persona_contract::PersonaId;
 
 const POSITIVE: &str = include_str!("data/positive.tsv");
 const NEGATIVE: &str = include_str!("data/negative.tsv");
@@ -54,7 +54,7 @@ fn expected(label: &str) -> VoiceCommand {
         other => {
             let id = other.strip_prefix("switch:").expect("etykieta");
             VoiceCommand::SwitchPersona {
-                persona: PersonaId::new(id).unwrap(),
+                persona: PersonaId::parse(id).unwrap(),
             }
         }
     }

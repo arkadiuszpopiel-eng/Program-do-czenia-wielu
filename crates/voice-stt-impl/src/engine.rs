@@ -215,6 +215,20 @@ impl WhisperStt {
         Ok((base, backend))
     }
 
+    /// Partial (szybka wiązka) z całego dotychczasowego audio + zdarzenie `voice.stt.partial`.
+    async fn partial(
+        &self,
+        id: UtteranceId,
+        samples: &[f32],
+        beam: u8,
+    ) -> Result<Option<Transcript>, SttError> {
+        let t = self.transcribe(id, samples, beam, false).await?;
+        self.emit(SttEvent::Partial {
+            transcript: t.clone(),
+        });
+        Ok(Some(t))
+    }
+
     async fn transcribe(
         &self,
         id: UtteranceId,
@@ -305,7 +319,7 @@ impl Stt for WhisperStt {
     }
 
     async fn push(&self, id: UtteranceId, frame: &Frame) -> Result<Option<Transcript>, SttError> {
-        let (due, samples, beam) = {
+        let (due, beam) = {
             let mut st = self.lock();
             let two_pass = st.cfg.two_pass;
             let min_speech = st.cfg.min_speech_ms;
@@ -317,24 +331,27 @@ impl Stt for WhisperStt {
             let due = two_pass.enabled
                 && audio.take_partial_due(two_pass.partial_every_ms)
                 && audio.speech_ms() >= min_speech;
-            (
-                due,
-                if due {
-                    audio.samples().to_vec()
-                } else {
-                    Vec::new()
-                },
-                two_pass.partial_beam,
-            )
+            (due.then(|| audio.samples().to_vec()), two_pass.partial_beam)
         };
-        if !due {
-            return Ok(None);
+        match due {
+            Some(samples) => self.partial(id, &samples, beam).await,
+            None => Ok(None),
         }
-        let t = self.transcribe(id, &samples, beam, false).await?;
-        self.emit(SttEvent::Partial {
-            transcript: t.clone(),
-        });
-        Ok(Some(t))
+    }
+
+    async fn partial_now(&self, id: UtteranceId) -> Result<Option<Transcript>, SttError> {
+        let (samples, beam) = {
+            let st = self.lock();
+            let audio = st
+                .utterances
+                .get(&id)
+                .ok_or(SttError::UnknownUtterance(id))?;
+            if audio.speech_ms() == 0 {
+                return Ok(None);
+            }
+            (audio.samples().to_vec(), st.cfg.two_pass.partial_beam)
+        };
+        self.partial(id, &samples, beam).await
     }
 
     async fn end_utterance(&self, id: UtteranceId) -> Result<Transcript, SttError> {

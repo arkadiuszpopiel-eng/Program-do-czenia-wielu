@@ -3,15 +3,14 @@
 //! komendą tylko wtedy, gdy składa się wyłącznie z fraz komend, wypełniaczy i imion person —
 //! dzięki temu zdania z tymi słowami w innym znaczeniu („pauza w szkole była długa”) nie są
 //! komendami. Tolerancja szumu ASR: `fold` (bez polskich znaków) i odległość edycyjna.
+//!
+//! Rdzeń (`GrammarRecognizer`, dopasowanie rozmyte) mieszka w `voice-cmd-contract` (deterministyczne
+//! funkcje bez I/O, jak `DialogMachine`), żeby runnery ewaluacji F2 mogły go użyć bez zależności od
+//! `-impl`; ten crate jest implementacją modułu (manifest, testy kontraktowe na zamrożonym zestawie).
 
-#![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
-
-mod fuzzy;
-mod pattern;
-mod recognizer;
-
-pub use fuzzy::{EXACT, ONE_EDIT, TWO_EDITS, levenshtein, word_score};
-pub use recognizer::GrammarRecognizer;
+pub use voice_cmd_contract::{
+    EXACT, GrammarRecognizer, ONE_EDIT, TWO_EDITS, levenshtein, word_score,
+};
 
 /// Treść `module.toml` tego modułu.
 pub const MODULE_TOML: &str = include_str!("../module.toml");

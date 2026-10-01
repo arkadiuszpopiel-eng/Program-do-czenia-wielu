@@ -1,9 +1,9 @@
 //! Polecenia wyjściowe automatu i powiadomienia.
 
+use personas_contract::PersonaId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use voice_cmd_contract::VoiceCommand;
-use voice_persona_contract::PersonaId;
 
 use crate::{DialogPhase, ProactiveLabel, TurnId, UtteranceId};
 

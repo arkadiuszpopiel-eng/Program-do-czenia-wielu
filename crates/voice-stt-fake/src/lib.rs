@@ -1,7 +1,7 @@
 //! Atrapa `voice-stt` (SPEC §Fake): transkrypty z adnotacji (kolejka tekstów), partiale jako
-//! prefiks słów proporcjonalny do audio, deterministyczne znaczniki słów, sterowane opóźnienie
-//! (wirtualne — wpisywane w transkrypt), symulacja awarii sidecara GPU (fallback CPU bez utraty
-//! wypowiedzi). Wspólne reguły (bramka VAD, prywatność) z kontraktu.
+//! prefiks słów proporcjonalny do audio (także na żądanie — `partial_now`), deterministyczne
+//! znaczniki słów w zakresie mowy, sterowane opóźnienie (wirtualne — wpisywane w transkrypt),
+//! symulacja awarii sidecara GPU (fallback CPU bez utraty wypowiedzi). Wspólne reguły (bramka VAD, prywatność) z kontraktu.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -81,32 +81,59 @@ impl FakeStt {
     pub fn backend(&self) -> Backend {
         self.lock().backend
     }
+
+    /// Opóźnienie rozpoznania (ms, czas wirtualny) — uprząż testów stosuje je na zegarze wirtualnym.
+    pub fn latency_ms(&self) -> u32 {
+        self.lock().latency_ms
+    }
+
+    /// Liczba tekstów czekających w skrypcie.
+    pub fn pending_script(&self) -> usize {
+        self.lock().script.len()
+    }
 }
 
-fn words_for(text: &str, duration_ms: u32) -> Vec<Word> {
+/// Partial = prefiks słów proporcjonalny do audio (≈ 3 słowa na sekundę, co najmniej jedno).
+fn partial_prefix(next_text: &str, duration_ms: u32) -> String {
+    let n = (duration_ms / 333).max(1) as usize;
+    next_text
+        .split_whitespace()
+        .take(n)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// Słowa rozłożone równo w zakresie mowy (wg detektora energii; bez mowy — całe audio), jak
+/// znaczniki czasu prawdziwego ASR: cisza przed i po wypowiedzi nie należy do słów.
+fn words_for(text: &str, span: (u32, u32)) -> Vec<Word> {
     let words: Vec<&str> = text.split_whitespace().collect();
     let n = words.len().max(1) as u32;
-    let step = duration_ms / n;
+    let (start, end) = span;
+    let step = end.saturating_sub(start) / n;
     words
         .iter()
         .enumerate()
         .map(|(i, w)| Word {
             text: (*w).to_owned(),
-            start_ms: i as u32 * step,
-            end_ms: (i as u32 + 1) * step,
+            start_ms: start + i as u32 * step,
+            end_ms: start + (i as u32 + 1) * step,
             confidence: 0.9,
         })
         .collect()
+}
+
+fn span_of(audio: &UtteranceAudio) -> (u32, u32) {
+    audio.speech_span_ms().unwrap_or((0, audio.duration_ms()))
 }
 
 fn transcript(
     st: &State,
     id: UtteranceId,
     text: &str,
-    duration_ms: u32,
+    span: (u32, u32),
     is_final: bool,
 ) -> Transcript {
-    let words = words_for(text, duration_ms);
+    let words = words_for(text, span);
     Transcript {
         utterance: id,
         text: text.to_owned(),
@@ -152,11 +179,30 @@ impl Stt for FakeStt {
         if !(two_pass.enabled && audio.take_partial_due(two_pass.partial_every_ms)) {
             return Ok(None);
         }
-        let duration = audio.duration_ms();
-        // Partial = prefiks słów proporcjonalny do audio (≈ 3 słowa na sekundę).
-        let n = (duration / 333).max(1) as usize;
-        let prefix: Vec<&str> = next_text.split_whitespace().take(n).collect();
-        let t = transcript(&st, id, &prefix.join(" "), duration, false);
+        let (duration, span) = (audio.duration_ms(), span_of(audio));
+        let t = transcript(&st, id, &partial_prefix(&next_text, duration), span, false);
+        st.events.push(SttEvent::Partial {
+            transcript: t.clone(),
+        });
+        Ok(Some(t))
+    }
+
+    async fn partial_now(&self, id: UtteranceId) -> Result<Option<Transcript>, SttError> {
+        let mut st = self.lock();
+        let next_text = st
+            .script
+            .front()
+            .cloned()
+            .unwrap_or_else(|| DEFAULT_TEXT.to_owned());
+        let audio = st
+            .utterances
+            .get(&id)
+            .ok_or(SttError::UnknownUtterance(id))?;
+        if audio.speech_ms() == 0 {
+            return Ok(None);
+        }
+        let (duration, span) = (audio.duration_ms(), span_of(audio));
+        let t = transcript(&st, id, &partial_prefix(&next_text, duration), span, false);
         st.events.push(SttEvent::Partial {
             transcript: t.clone(),
         });
@@ -190,7 +236,7 @@ impl Stt for FakeStt {
             .script
             .pop_front()
             .unwrap_or_else(|| DEFAULT_TEXT.to_owned());
-        let t = transcript(&st, id, &text, audio.duration_ms(), true);
+        let t = transcript(&st, id, &text, span_of(&audio), true);
         st.events.push(SttEvent::Final {
             transcript: t.clone(),
         });

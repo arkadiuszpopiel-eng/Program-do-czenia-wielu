@@ -1,8 +1,8 @@
 //! Komendy głosowe szybkiej ścieżki.
 
+use personas_contract::PersonaId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use voice_persona_contract::PersonaId;
 
 /// Komenda głosowa (bez akcji destrukcyjnych — SPEC).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]

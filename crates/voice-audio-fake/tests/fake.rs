@@ -58,6 +58,16 @@ fn mic_plays_wav_and_output_is_recorded() {
     assert_eq!(rec.len(), 28_800);
     assert!(rms(&rec[..9_600]) > 0.05, "TTS zagrał");
     assert!(rms(&rec[10_000..]) < 1e-6);
+    assert_eq!(fake.recorded_len(), 28_800);
+    assert_eq!(fake.recorded_range(100, 200), rec[100..200].to_vec());
+    assert!(fake.recorded_range(28_000, 99_999).len() == 800);
+    assert_eq!(voice_audio_contract::MediaClock::now(&fake).as_ms(), 600);
+    // Zamknięcie strumienia mikrofonu jest widoczne (wskaźnik prywatności, PTT).
+    assert_eq!(fake.open_inputs(), 1);
+    drop(input);
+    assert_eq!(fake.open_inputs(), 0);
+    fake.advance(Duration::from_millis(10));
+    assert_eq!(fake.open_inputs(), 0);
 }
 
 #[test]

@@ -19,10 +19,11 @@ pub struct Grammar { rules: Vec<GrammarRule { command, phrases }>, fillers, pers
 pub trait CommandRecognizer { fn recognize(&self, input: &CmdInput) -> CmdDecision; fn grammar(&self) -> Grammar; }
 ```
 Składnia frazy: `a|b` alternatywy, `[a]` opcjonalne, `{persona}` slot (formy imion w przypadkach). Wypowiedź jest komendą tylko, gdy składa się wyłącznie z fraz komend, wypełniaczy i imion (adresowanie) — każde inne słowo = zwykła wypowiedź (LLM). Tolerancja ASR: `fold` (bez polskich znaków, interpunkcji) + odległość edycyjna (1 dla słów ≥ 5 znaków, 2 dla ≥ 8). Partial → trafienie po `settle_ms` ciszy po ostatnim słowie. KWS na audio (`push_audio`) przyjdzie z modelem (spike h) jako osobna implementacja traitu.
+Rdzeń `GrammarRecognizer` (wzorce + dopasowanie rozmyte, czyste funkcje bez I/O) mieszka w `voice-cmd-contract` — jak `DialogMachine` czy `VadMachine` — żeby runner zestawu F2 (`voice-pipeline`, `alfa-voice-eval`) używał tej samej gramatyki bez zależności od `-impl`; `voice-cmd-impl` go reeksportuje i trzyma manifest oraz testy na zamrożonym zestawie.
 Zdarzenia: `voice.cmd.detected`, `voice.cmd.ignored`, `voice.cmd.forwarded_to_broker`.
 
 ## Zależności
-v1: `core-bus-contract`, `voice-persona-contract` (`PersonaId`). Stan dialogu przez `AgentActivity` (nie `voice-dialog-contract` — unikamy cyklu). Później: `voice-dsp/stt/audio-contract`, `safety-broker-contract` (F3: `SetAutonomy` → Broker). Zewnętrzne: mały model KWS (spike h, CPU).
+v1: `core-bus-contract`, `personas-contract` (`PersonaId` — jedno źródło prawdy o personach). Stan dialogu przez `AgentActivity` (nie `voice-dialog-contract` — unikamy cyklu). Później: `voice-dsp/stt/audio-contract`, `safety-broker-contract` (F3: `SetAutonomy` → Broker). Zewnętrzne: mały model KWS (spike h, CPU).
 
 ## Niezmienniki
 - Zero LLM w ścieżce; decyzja z KWS ≤ 300 ms od początku słowa; z partial ≤ 100 ms od transkryptu.

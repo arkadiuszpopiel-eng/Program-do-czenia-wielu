@@ -1,7 +1,8 @@
 //! Kontrakt modułu `voice-wake` v0 (docs/modules/voice-wake/SPEC.md, PLAN §6.2, §7.3):
 //! push-to-talk (wciśnięcie i puszczenie z `HotkeyPort` — hook `WH_KEYBOARD_LL`), przełącznik,
 //! przycisk w UI, adresowanie po imieniu z transkryptu (`personas-contract::resolve_addressee`),
-//! „nie przeszkadzać”, stan mikrofonu jako zdarzenia. Słowa wywoławcze „Hej …” i „zawsze słucham”
+//! „nie przeszkadzać”, stan mikrofonu jako zdarzenia, mikrofon jako zasób wyłączny `scheduler-lite`
+//! ([`MicArbiter`], [`lease_now`]). Słowa wywoławcze „Hej …” i „zawsze słucham”
 //! to v1 (F5) — tutaj tylko typy ([`WakeWordCfg`]), konfiguracja ich włączenia jest odrzucana.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -9,6 +10,7 @@
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
 mod machine;
+mod mic;
 
 use core_bus_contract::{Event, EventKind, Level};
 use personas_contract::PersonaId;
@@ -17,6 +19,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 pub use machine::WakeMachine;
+pub use mic::{MicArbiter, lease_now};
 
 /// Początek słuchania.
 pub const EVENT_LISTEN_START: &str = "voice.wake.listen_start";

@@ -6,6 +6,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod device;
 mod echo;
 
 use std::collections::VecDeque;
@@ -15,8 +16,8 @@ use std::time::Duration;
 pub use echo::EchoPath;
 use voice_audio_contract::{
     AudioDevice, AudioError, AudioFormat, AudioIo, CaptureWriter, DeviceEvent, DeviceId,
-    DeviceKind, DeviceStatus, InputStream, MediaTime, MixerConfig, MixerOutput, MixerRender,
-    OutputStream, Resampler, StreamConfig, capture_ring, mixer::mixer, wav,
+    DeviceKind, DeviceStatus, InputStream, MediaClock, MediaTime, MixerConfig, MixerOutput,
+    MixerRender, OutputStream, Resampler, StreamConfig, capture_ring, mixer::mixer, wav,
 };
 
 /// Częstotliwość wirtualnych urządzeń.
@@ -52,6 +53,8 @@ struct Inner {
     mic_pos: usize,
     mic_loop: bool,
     echo: Option<EchoPath>,
+    /// Niezerowe współczynniki echa (indeks, wartość) — rzadki „pokój” liczony szybko.
+    echo_taps: Vec<(usize, f32)>,
     output_latency: Duration,
     /// Zmiksowane wyjście (mono) — całe od startu (do asercji w testach).
     recorded: Vec<f32>,
@@ -136,7 +139,16 @@ impl FakeAudio {
 
     /// Ścieżka echa głośnik → mikrofon (`None` = słuchawki, brak echa).
     pub fn set_echo(&self, echo: Option<EchoPath>) {
-        self.lock().echo = echo;
+        let mut g = self.lock();
+        g.echo_taps = echo.as_ref().map_or_else(Vec::new, |e| {
+            e.taps
+                .iter()
+                .enumerate()
+                .filter(|(_, t)| **t != 0.0)
+                .map(|(k, t)| (k, *t))
+                .collect()
+        });
+        g.echo = echo;
     }
 
     /// Opóźnienie wyjścia urządzenia (bufor + sprzęt).
@@ -151,6 +163,30 @@ impl FakeAudio {
     /// Całe wyrenderowane wyjście (mono, 48 kHz).
     pub fn recorded_output(&self) -> Vec<f32> {
         self.lock().recorded.clone()
+    }
+
+    /// Liczba próbek wyrenderowanego wyjścia (bez kopiowania nagrania).
+    pub fn recorded_len(&self) -> usize {
+        self.lock().recorded.len()
+    }
+
+    /// Fragment wyrenderowanego wyjścia `[from, to)` (indeksy próbek 48 kHz, przycięte do nagrania).
+    pub fn recorded_range(&self, from: usize, to: usize) -> Vec<f32> {
+        let g = self.lock();
+        let to = to.min(g.recorded.len());
+        g.recorded
+            .get(from.min(to)..to)
+            .map(<[f32]>::to_vec)
+            .unwrap_or_default()
+    }
+
+    /// Liczba otwartych (niezamkniętych przez konsumenta) strumieni mikrofonu — bez pętli zwrotnej.
+    pub fn open_inputs(&self) -> usize {
+        self.lock()
+            .inputs
+            .iter()
+            .filter(|i| !i.loopback && !i.writer.is_abandoned())
+            .count()
     }
 
     /// Następne `open_*` zwróci błąd (np. `ExclusiveConflict`, `PermissionDenied`).
@@ -227,88 +263,6 @@ impl FakeAudio {
     }
 }
 
-impl Inner {
-    fn step(&mut self) {
-        let t = self.now;
-        let play_ts = t.plus(self.output_latency);
-        let mut mix = vec![0.0f32; PERIOD_SAMPLES];
-        for o in &mut self.outputs {
-            let ch = usize::from(o.channels);
-            let mut buf = vec![0.0f32; PERIOD_SAMPLES * ch];
-            o.render.render(&mut buf, o.channels, play_ts);
-            for (m, f) in mix.iter_mut().zip(buf.chunks_exact(ch)) {
-                *m += f[0];
-            }
-        }
-        self.recorded.extend_from_slice(&mix);
-        // Historia „odtworzonego” dźwięku: próbka renderowana w chwili t gra w t + opóźnienie.
-        self.history.extend(mix.iter().copied());
-        while self.history.len() > HISTORY {
-            self.history.pop_front();
-            self.history_start += 1;
-        }
-        let rendered_start = t.to_samples(FAKE_RATE);
-        let lat = MediaTime(self.output_latency.as_nanos() as u64).to_samples(FAKE_RATE);
-        let mut mic = vec![0.0f32; PERIOD_SAMPLES];
-        for (i, m) in mic.iter_mut().enumerate() {
-            if self.mic_pos < self.mic.len() {
-                *m = self.mic[self.mic_pos];
-                self.mic_pos += 1;
-                if self.mic_loop && self.mic_pos == self.mic.len() {
-                    self.mic_pos = 0;
-                }
-            }
-            if let Some(echo) = &self.echo {
-                let now = rendered_start + i as u64;
-                let delay = echo.delay_samples(FAKE_RATE) as u64 + lat;
-                let mut acc = 0.0f32;
-                for (k, tap) in echo.taps.iter().enumerate() {
-                    let Some(src) = now.checked_sub(delay + k as u64) else {
-                        break;
-                    };
-                    if src < self.history_start {
-                        break;
-                    }
-                    if let Some(v) = self.history.get((src - self.history_start) as usize) {
-                        acc += tap * v;
-                    }
-                }
-                *m += acc;
-            }
-        }
-        for input in &mut self.inputs {
-            let src = if input.loopback { &mix } else { &mic };
-            let ch = usize::from(input.channels);
-            let block: Vec<f32> = src
-                .iter()
-                .flat_map(|&s| std::iter::repeat_n(s, ch))
-                .collect();
-            let ts = if input.loopback { play_ts } else { t };
-            input.writer.write(&block, ts);
-        }
-        self.now = t.plus(PERIOD);
-    }
-
-    fn check_open(
-        &mut self,
-        device: Option<&DeviceId>,
-        kind: DeviceKind,
-    ) -> Result<DeviceId, AudioError> {
-        if let Some(err) = self.fail_next_open.take() {
-            return Err(err);
-        }
-        let found = self
-            .devices
-            .iter()
-            .find(|d| d.kind == kind && device.map_or(d.is_default, |id| &d.id == id));
-        match (found, device) {
-            (Some(d), _) => Ok(d.id.clone()),
-            (None, Some(id)) => Err(AudioError::DeviceNotFound(id.to_string())),
-            (None, None) => Err(AudioError::NoDefaultDevice),
-        }
-    }
-}
-
 impl FakeAudio {
     fn open_capture(
         &self,
@@ -335,6 +289,12 @@ impl FakeAudio {
             loopback,
         });
         Ok(Box::new(reader))
+    }
+}
+
+impl MediaClock for FakeAudio {
+    fn now(&self) -> MediaTime {
+        self.lock().now
     }
 }
 

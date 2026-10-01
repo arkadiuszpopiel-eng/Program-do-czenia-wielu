@@ -51,6 +51,12 @@ impl CaptureWriter {
         self.written += frames as u64;
     }
 
+    /// Czy czytelnik został zamknięty (strumień wejściowy porzucony przez konsumenta) — wątek
+    /// urządzenia może przestać przechwytywać.
+    pub fn is_abandoned(&self) -> bool {
+        self.samples.is_abandoned()
+    }
+
     /// Aktualizuje opóźnienie wejścia (np. z rozmiaru bufora urządzenia).
     pub fn set_latency(&self, latency: Duration) {
         self.shared.latency_ns.store(

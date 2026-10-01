@@ -5,9 +5,9 @@
 //! (bez wielkości liter i polskich znaków). Wypowiedź jest komendą tylko wtedy, gdy składa się
 //! wyłącznie z fraz komend, wypełniaczy i imion — każde inne słowo = zwykła wypowiedź do LLM.
 
+use personas_contract::PersonaId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use voice_persona_contract::PersonaId;
 
 use crate::CommandKind;
 

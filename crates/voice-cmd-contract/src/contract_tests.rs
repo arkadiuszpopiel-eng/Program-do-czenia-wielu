@@ -5,7 +5,7 @@ use crate::{
     AgentActivity, CmdDecision, CmdInput, CmdSource, CommandRecognizer, IgnoreReason, Token,
     VoiceCommand,
 };
-use voice_persona_contract::PersonaId;
+use personas_contract::PersonaId;
 
 /// Wejście testowe: słowa po 250 ms z przerwami 60 ms, 800 ms ciszy przed i po.
 pub fn utterance(text: &str, activity: AgentActivity) -> CmdInput {

@@ -3,9 +3,7 @@
 
 use std::collections::VecDeque;
 
-use voice_dialog_contract::{
-    Command, DialogAutomaton, DialogEvent, DialogState, SpeakerLock, SpeakerOwner,
-};
+use crate::{Command, DialogAutomaton, DialogEvent, DialogState, SpeakerLock, SpeakerOwner};
 
 /// Maksymalna liczba zdarzeń wtórnych na jedno wejście (ochrona przed pętlą).
 const MAX_FOLLOWUPS: usize = 8;

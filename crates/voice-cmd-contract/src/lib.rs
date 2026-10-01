@@ -4,11 +4,14 @@
 //! Wejście: tokeny transkryptu ze znacznikami czasu (partial/final) + aktywność agentki
 //! (`AgentActivity`, mapowana ze stanu `voice-dialog`, żeby uniknąć cyklu zależności).
 //! Wyjście: `CmdDecision` (trafienie z pewnością, oczekiwanie na pauzę, zignorowanie, brak).
-//! Gramatyka PL/EN jest edytowalna (`Grammar`, serde; pierścień R0).
+//! Gramatyka PL/EN jest edytowalna (`Grammar`, serde; pierścień R0). Deterministyczny rdzeń
+//! [`GrammarRecognizer`] (wzorce, tolerancja szumu ASR) jest w kontrakcie — `voice-cmd-impl` go
+//! udostępnia, a runnery ewaluacji (zestaw F2) mogą go użyć bez zależności od `-impl`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod command;
+mod engine;
 mod grammar;
 mod input;
 mod text;
@@ -17,6 +20,7 @@ mod text;
 pub mod contract_tests;
 
 pub use command::{AgentActivity, CommandKind, CommandSafety, VoiceCommand};
+pub use engine::{EXACT, GrammarRecognizer, ONE_EDIT, TWO_EDITS, levenshtein, word_score};
 pub use grammar::{Grammar, GrammarRule, NieRule, PersonaForms};
 pub use input::{CmdDecision, CmdHit, CmdInput, CmdSource, IgnoreReason, Token};
 pub use text::{fold, nie_verdict, split_tokens};

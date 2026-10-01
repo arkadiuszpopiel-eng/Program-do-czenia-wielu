@@ -48,3 +48,39 @@ async fn scripted_text_and_gpu_crash_fallback() {
         }
     )));
 }
+
+#[tokio::test]
+async fn words_cover_speech_only_and_partial_on_demand() {
+    let stt = FakeStt::new();
+    stt.script("stop");
+    let id = UtteranceId(7);
+    stt.start_utterance(id).await.unwrap();
+    assert_eq!(
+        stt.partial_now(id).await.unwrap(),
+        None,
+        "cisza → brak partiala"
+    );
+    let mut signal = vec![0.0f32; 3_200];
+    signal.extend(synthetic_speech(16_000, 0.3, SpeechParams::default()));
+    signal.extend(vec![0.0f32; 4_800]);
+    for (i, c) in signal.chunks(160).enumerate() {
+        stt.push(
+            id,
+            &Frame::mono(c.to_vec(), 16_000, MediaTime::from_ms(10 * i as u64)),
+        )
+        .await
+        .unwrap();
+    }
+    let p = stt.partial_now(id).await.unwrap().unwrap();
+    assert_eq!((p.text.as_str(), p.is_final), ("stop", false));
+    let w = &p.words[0];
+    assert!(
+        (190..=230).contains(&w.start_ms) && (480..=520).contains(&w.end_ms),
+        "{w:?}"
+    );
+    let t = stt.end_utterance(id).await.unwrap();
+    assert_eq!(t.words[0].end_ms, w.end_ms);
+    assert_eq!(stt.latency_ms(), 200);
+    assert_eq!(stt.pending_script(), 0);
+    assert!(stt.partial_now(id).await.is_err());
+}

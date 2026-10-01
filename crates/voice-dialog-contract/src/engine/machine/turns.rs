@@ -1,11 +1,11 @@
 //! Tury użytkownika: koniec tury, przerwanie tekstem, komendy głosowe, klasyfikacja intencji,
 //! stop mowy (`Esc`) i stop wszystkiego (kill-switch).
 
-use voice_cmd_contract::VoiceCommand;
-use voice_dialog_contract::{
+use crate::{
     Command, DialogNotice, DialogPhase, HeardPrefix, InterruptClassifier, InterruptContext,
     InterruptIntent, TurnId, TurnSource,
 };
+use voice_cmd_contract::VoiceCommand;
 
 use super::Step;
 

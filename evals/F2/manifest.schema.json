@@ -1,0 +1,482 @@
+{
+  "$defs": {
+    "CommandKind": {
+      "description": "Rodzaj komendy (bez danych) — klucz reguł gramatyki.",
+      "oneOf": [
+        {
+          "const": "stop",
+          "description": "Zob. [`VoiceCommand::Stop`].",
+          "type": "string"
+        },
+        {
+          "const": "wait",
+          "description": "Zob. [`VoiceCommand::Wait`].",
+          "type": "string"
+        },
+        {
+          "const": "pause",
+          "description": "Zob. [`VoiceCommand::Pause`].",
+          "type": "string"
+        },
+        {
+          "const": "resume",
+          "description": "Zob. [`VoiceCommand::Resume`].",
+          "type": "string"
+        },
+        {
+          "const": "repeat",
+          "description": "Zob. [`VoiceCommand::Repeat`].",
+          "type": "string"
+        },
+        {
+          "const": "cancel",
+          "description": "Zob. [`VoiceCommand::Cancel`].",
+          "type": "string"
+        },
+        {
+          "const": "volume_up",
+          "description": "Zob. [`VoiceCommand::VolumeUp`].",
+          "type": "string"
+        },
+        {
+          "const": "volume_down",
+          "description": "Zob. [`VoiceCommand::VolumeDown`].",
+          "type": "string"
+        },
+        {
+          "const": "mute_mic",
+          "description": "Zob. [`VoiceCommand::MuteMic`].",
+          "type": "string"
+        },
+        {
+          "const": "switch_persona",
+          "description": "Zob. [`VoiceCommand::SwitchPersona`] (wymaga slotu `{persona}`).",
+          "type": "string"
+        },
+        {
+          "const": "do_not_disturb",
+          "description": "Zob. [`VoiceCommand::DoNotDisturb`].",
+          "type": "string"
+        },
+        {
+          "const": "stop_all",
+          "description": "Zob. [`VoiceCommand::StopAll`].",
+          "type": "string"
+        },
+        {
+          "const": "no",
+          "description": "Zob. [`VoiceCommand::No`].",
+          "type": "string"
+        }
+      ]
+    },
+    "Conditions": {
+      "additionalProperties": false,
+      "description": "Warunki nagrania.",
+      "properties": {
+        "environment": {
+          "$ref": "#/$defs/Environment",
+          "description": "Otoczenie."
+        },
+        "machine": {
+          "$ref": "#/$defs/Machine",
+          "description": "Maszyna."
+        },
+        "mic": {
+          "$ref": "#/$defs/Mic",
+          "description": "Mikrofon."
+        }
+      },
+      "required": [
+        "machine",
+        "environment",
+        "mic"
+      ],
+      "type": "object"
+    },
+    "Environment": {
+      "description": "Otoczenie nagrania.",
+      "oneOf": [
+        {
+          "const": "quiet",
+          "description": "Cisza.",
+          "type": "string"
+        },
+        {
+          "const": "noise",
+          "description": "Szum (wentylator, ulica, muzyka cicho).",
+          "type": "string"
+        },
+        {
+          "const": "speakers",
+          "description": "Głośniki (echo TTS / TV).",
+          "type": "string"
+        },
+        {
+          "const": "headphones",
+          "description": "Słuchawki.",
+          "type": "string"
+        }
+      ]
+    },
+    "InterruptIntent": {
+      "description": "Klasa intencji przerwania (PLAN §6.5, VOICE.md §9).",
+      "oneOf": [
+        {
+          "const": "correction",
+          "description": "„nie, chodziło mi o…”.",
+          "type": "string"
+        },
+        {
+          "const": "addition",
+          "description": "„a jeszcze…”.",
+          "type": "string"
+        },
+        {
+          "const": "clarify",
+          "description": "„czyli…?”.",
+          "type": "string"
+        },
+        {
+          "const": "topic_change",
+          "description": "„zostaw, powiedz mi o…”.",
+          "type": "string"
+        },
+        {
+          "const": "stop_cancel",
+          "description": "„stop”, „zostaw to”.",
+          "type": "string"
+        },
+        {
+          "const": "continue",
+          "description": "„dalej”, „kontynuuj”.",
+          "type": "string"
+        },
+        {
+          "const": "backchannel",
+          "description": "„mhm”, „tak” — nie przerwanie.",
+          "type": "string"
+        }
+      ]
+    },
+    "ItemKind": {
+      "description": "Rodzaj nagrania (typy z `evals/spikes/e-voice-lab/protokol-nagran.md`).",
+      "oneOf": [
+        {
+          "const": "free_speech",
+          "description": "Typy 1–4: swobodna mowa (WER).",
+          "type": "string"
+        },
+        {
+          "const": "mixed_pl_en",
+          "description": "Typ 5: mieszane PL/EN (WER).",
+          "type": "string"
+        },
+        {
+          "const": "names",
+          "description": "Typ 6: nazwy własne (WER).",
+          "type": "string"
+        },
+        {
+          "const": "command",
+          "description": "Typ 7: komendy (`stop`, `anuluj`… — recall, reakcja).",
+          "type": "string"
+        },
+        {
+          "const": "interruption",
+          "description": "Typ 8: przerwania w trakcie TTS (klasy intencji, prefiks).",
+          "type": "string"
+        },
+        {
+          "const": "backchannel",
+          "description": "Typ 9: backchannel w trakcie TTS (precision).",
+          "type": "string"
+        },
+        {
+          "const": "wake",
+          "description": "Typ 10: słowa wywoławcze (F5).",
+          "type": "string"
+        },
+        {
+          "const": "enroll",
+          "description": "Typ 11: enrollment mówcy (F5).",
+          "type": "string"
+        },
+        {
+          "const": "dictation",
+          "description": "Typ 12: dyktowanie z interpunkcją mówioną (F5, WER).",
+          "type": "string"
+        }
+      ]
+    },
+    "Machine": {
+      "description": "Maszyna nagrania.",
+      "oneOf": [
+        {
+          "const": "desktop",
+          "description": "Desktop (Standard-AMD).",
+          "type": "string"
+        },
+        {
+          "const": "laptop",
+          "description": "Laptop (Laptop-CUDA).",
+          "type": "string"
+        },
+        {
+          "const": "synthetic",
+          "description": "Próbka syntetyczna (CI).",
+          "type": "string"
+        }
+      ]
+    },
+    "Mic": {
+      "description": "Mikrofon.",
+      "oneOf": [
+        {
+          "const": "usb",
+          "description": "USB / przewodowy.",
+          "type": "string"
+        },
+        {
+          "const": "builtin",
+          "description": "Wbudowany (laptop).",
+          "type": "string"
+        },
+        {
+          "const": "headset",
+          "description": "Mikrofon słuchawek.",
+          "type": "string"
+        },
+        {
+          "const": "virtual",
+          "description": "Wirtualny (próbka syntetyczna).",
+          "type": "string"
+        }
+      ]
+    },
+    "Segment": {
+      "additionalProperties": false,
+      "description": "Fragment pliku (wiele wypowiedzi w jednym nagraniu).",
+      "properties": {
+        "end_ms": {
+          "description": "Koniec (ms, wyłącznie).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start_ms": {
+          "description": "Początek (ms).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_ms",
+        "end_ms"
+      ],
+      "type": "object"
+    },
+    "Split": {
+      "description": "Podział zestawu (test zamrożony hashem przed implementacją F2).",
+      "oneOf": [
+        {
+          "const": "dev",
+          "description": "Strojenie.",
+          "type": "string"
+        },
+        {
+          "const": "test",
+          "description": "Ocena (zamrożony).",
+          "type": "string"
+        }
+      ]
+    },
+    "SynthSpec": {
+      "additionalProperties": false,
+      "description": "Przepis próbki syntetycznej (CI — audio generowane, nie trzymane w gicie).",
+      "properties": {
+        "lead_ms": {
+          "description": "Cisza przed mową (ms).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "seed": {
+          "description": "Ziarno.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "speech_ms": {
+          "description": "Długość mowy (ms).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "tail_ms": {
+          "description": "Cisza po mowie (ms).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed",
+        "lead_ms",
+        "speech_ms",
+        "tail_ms"
+      ],
+      "type": "object"
+    },
+    "TtsContext": {
+      "additionalProperties": false,
+      "description": "Co mówiła agentka w chwili nagrania (typy 8–9 nagrywane na tle TTS): pozwala runnerowi offline\npoliczyć usłyszany prefiks tym samym automatem co potok.",
+      "properties": {
+        "audio_ms": {
+          "description": "Długość audio wypowiedzi (ms).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "played_at_start_ms": {
+          "default": 0,
+          "description": "Ile ms wypowiedzi było już odtworzone na początku pozycji (pliku / segmentu).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "text": {
+          "description": "Tekst odtwarzanej wypowiedzi.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "audio_ms"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Pozycja manifestu.",
+  "properties": {
+    "audio": {
+      "description": "Plik WAV względem katalogu korpusu (`16k/<maszyna>/<data>/t<NN>-….wav`).",
+      "type": "string"
+    },
+    "command": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommandKind"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Komenda oczekiwana (typ 7)."
+    },
+    "conditions": {
+      "$ref": "#/$defs/Conditions",
+      "description": "Warunki."
+    },
+    "heard_words": {
+      "description": "Prawdziwa liczba usłyszanych słów przed przerwaniem (typ 8, z odsłuchu/loopbacku).",
+      "format": "uint",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "id": {
+      "description": "Identyfikator (unikalny, `[a-z0-9._-]`).",
+      "type": "string"
+    },
+    "intent": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InterruptIntent"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Klasa intencji przerwania (typ 8)."
+    },
+    "kind": {
+      "$ref": "#/$defs/ItemKind",
+      "description": "Rodzaj nagrania."
+    },
+    "note": {
+      "description": "Uwagi (co szumiało, odległość…).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "onset_ms": {
+      "description": "Początek słowa komendy w pliku (ms) — punkt odniesienia reakcji < 300 ms.",
+      "format": "uint64",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Segment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Fragment pliku."
+    },
+    "split": {
+      "$ref": "#/$defs/Split",
+      "description": "Podział."
+    },
+    "synth": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SynthSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Przepis próbki syntetycznej."
+    },
+    "transcript": {
+      "description": "Transkrypcja referencyjna (liczby słownie, jak wypowiedziane; wtrącenia EN w oryginale).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tts": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TtsContext"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Wypowiedź agentki w tle (typy 8–9)."
+    }
+  },
+  "required": [
+    "id",
+    "audio",
+    "kind",
+    "split",
+    "conditions"
+  ],
+  "title": "ManifestEntry",
+  "type": "object"
+}

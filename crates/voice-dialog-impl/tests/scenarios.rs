@@ -6,13 +6,13 @@
 mod common;
 
 use common::Sim;
+use personas_contract::PersonaId;
 use voice_cmd_contract::VoiceCommand;
 use voice_dialog_contract::{
     ActivationSource, Command, DialogEvent, DialogNotice, DialogPhase, InterruptIntent,
     ProactiveLabel, ProactiveRejection, TurnSource,
 };
 use voice_dialog_impl::default_machine;
-use voice_persona_contract::PersonaId;
 
 fn speaking_sim() -> (
     Sim<voice_dialog_impl::DialogMachine<voice_dialog_impl::HeuristicClassifier>>,

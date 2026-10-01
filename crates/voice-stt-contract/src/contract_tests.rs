@@ -123,10 +123,36 @@ pub async fn cancel_and_format<S: Stt>(stt: &S) {
     ));
 }
 
+/// Partial na żądanie (`partial_now`): niefinalny transkrypt tej wypowiedzi albo `None`;
+/// nie zamyka wypowiedzi (final dalej działa).
+pub async fn partial_on_demand<S: Stt>(stt: &S) {
+    let id = UtteranceId(4);
+    stt.start_utterance(id)
+        .await
+        .unwrap_or_else(|e| panic!("{e}"));
+    let speech = synthetic_speech(16_000, 0.4, SpeechParams::default());
+    feed(stt, id, &speech).await;
+    if let Some(p) = stt.partial_now(id).await.unwrap_or_else(|e| panic!("{e}")) {
+        assert!(!p.is_final);
+        assert_eq!(p.utterance, id);
+        assert!(p.words.iter().all(|w| w.end_ms >= w.start_ms));
+    }
+    let t = stt
+        .end_utterance(id)
+        .await
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(t.is_final);
+    assert!(matches!(
+        stt.partial_now(UtteranceId(98)).await,
+        Ok(None) | Err(SttError::UnknownUtterance(_))
+    ));
+}
+
 /// Cały zestaw na jednej instancji (kolejność ma znaczenie: konfiguracja chmurowa na końcu).
 pub async fn run_all<S: Stt>(stt: &S) {
     speech_gives_partials_and_final(stt).await;
     noise_is_gated(stt).await;
     cancel_and_format(stt).await;
+    partial_on_demand(stt).await;
     private_session_never_goes_to_cloud(stt).await;
 }

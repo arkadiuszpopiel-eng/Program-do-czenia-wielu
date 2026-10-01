@@ -12,6 +12,9 @@ const TABLE_OVERSAMPLE: usize = 256;
 const KAISER_BETA: f64 = 8.0;
 /// Pasmo przepustowe względem Nyquista niższej częstotliwości.
 const CUTOFF: f64 = 0.92;
+/// Ile zestawów współczynników (faz) pamiętać — stosunki całkowite i proste ułamki (48→16, 24→48,
+/// 16→48 kHz) mają ich kilka; dowolny stosunek liczy jądro na bieżąco.
+const PHASE_CACHE: usize = 16;
 
 /// Resampler mono ze stanem (ciągłość między fragmentami).
 #[derive(Debug, Clone)]
@@ -22,10 +25,26 @@ pub struct Resampler {
     half: usize,
     fc: f64,
     table: Vec<f32>,
+    /// Pamięć faz: (część ułamkowa położenia, współczynniki dla k = 1−half ..= half).
+    phases: Vec<(f64, Vec<f32>)>,
     buf: Vec<f32>,
     t: f64,
     in_total: u64,
     out_total: u64,
+}
+
+/// Jądro z tablicy faz z interpolacją liniową (0 poza zakresem).
+fn kernel_at(table: &[f32], half: usize, x: f64) -> f32 {
+    let pos = (x + half as f64) * TABLE_OVERSAMPLE as f64;
+    if pos < 0.0 {
+        return 0.0;
+    }
+    let i = pos.floor() as usize;
+    if i + 1 >= table.len() {
+        return 0.0;
+    }
+    let frac = (pos - i as f64) as f32;
+    table[i] + (table[i + 1] - table[i]) * frac
 }
 
 fn bessel_i0(x: f64) -> f64 {
@@ -50,9 +69,20 @@ impl Resampler {
 
     /// Resampler o dowolnym stosunku `ratio = wyjście / wejście` (np. 1/1,12 przy podnoszeniu tonu).
     pub fn with_ratio(from: u32, to: u32, ratio: f64) -> Self {
+        Self::build(from, to, ratio, ZERO_CROSSINGS)
+    }
+
+    /// Resampler o krótszym jądrze (`zero_crossings` przejść przez zero po stronie, min. 4) —
+    /// tańszy, z łagodniejszym zboczem filtra; dla atrap i podglądu, nie dla toru produkcyjnego.
+    pub fn with_zero_crossings(from: u32, to: u32, zero_crossings: usize) -> Self {
+        let ratio = f64::from(to.max(1)) / f64::from(from.max(1));
+        Self::build(from, to, ratio, zero_crossings.clamp(4, ZERO_CROSSINGS))
+    }
+
+    fn build(from: u32, to: u32, ratio: f64, zero_crossings: usize) -> Self {
         let ratio = ratio.clamp(1e-3, 1e3);
         let fc = CUTOFF * ratio.min(1.0);
-        let half = ((ZERO_CROSSINGS as f64) / ratio.min(1.0)).ceil() as usize;
+        let half = ((zero_crossings as f64) / ratio.min(1.0)).ceil() as usize;
         let len = 2 * half * TABLE_OVERSAMPLE + 1;
         let denom = bessel_i0(KAISER_BETA);
         let table = (0..len)
@@ -79,6 +109,7 @@ impl Resampler {
             half,
             fc,
             table,
+            phases: Vec::new(),
             buf: vec![0.0; half],
             t: half as f64,
             in_total: 0,
@@ -112,16 +143,27 @@ impl Resampler {
     }
 
     fn kernel(&self, x: f64) -> f32 {
-        let pos = (x + self.half as f64) * TABLE_OVERSAMPLE as f64;
-        if pos < 0.0 {
-            return 0.0;
+        kernel_at(&self.table, self.half, x)
+    }
+
+    /// Indeks zestawu współczynników dla fazy `frac` (liczony raz); `None` = pamięć pełna.
+    fn phase(&mut self, frac: f64) -> Option<usize> {
+        if let Some(i) = self
+            .phases
+            .iter()
+            .position(|(f, _)| (f - frac).abs() < 1e-9)
+        {
+            return Some(i);
         }
-        let i = pos.floor() as usize;
-        if i + 1 >= self.table.len() {
-            return 0.0;
+        if self.phases.len() >= PHASE_CACHE {
+            return None;
         }
-        let frac = (pos - i as f64) as f32;
-        self.table[i] + (self.table[i + 1] - self.table[i]) * frac
+        let half = self.half as isize;
+        let coeffs = ((1 - half)..=half)
+            .map(|k| kernel_at(&self.table, self.half, k as f64 - frac))
+            .collect();
+        self.phases.push((frac, coeffs));
+        Some(self.phases.len() - 1)
     }
 
     /// Przetwarza fragment; wynik dopisuje do `out`. Wyjście jest opóźnione o [`Self::latency_in`]
@@ -141,9 +183,20 @@ impl Resampler {
             }
             let frac = self.t - ti as f64;
             let mut acc = 0.0f32;
-            for k in (1 - half)..=half {
-                let idx = (ti + k) as usize;
-                acc += self.buf[idx] * self.kernel(k as f64 - frac);
+            match self.phase(frac) {
+                Some(p) => {
+                    let start = (ti + 1 - half) as usize;
+                    let window = &self.buf[start..start + self.phases[p].1.len()];
+                    for (x, c) in window.iter().zip(&self.phases[p].1) {
+                        acc += x * c;
+                    }
+                }
+                None => {
+                    for k in (1 - half)..=half {
+                        let idx = (ti + k) as usize;
+                        acc += self.buf[idx] * self.kernel(k as f64 - frac);
+                    }
+                }
             }
             out.push(acc);
             self.out_total += 1;

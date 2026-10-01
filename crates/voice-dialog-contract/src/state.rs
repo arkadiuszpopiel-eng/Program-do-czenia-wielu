@@ -1,9 +1,9 @@
 //! Stan automatu (czysta wartość — automat nie ma I/O).
 
+use personas_contract::PersonaId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use voice_cmd_contract::AgentActivity;
-use voice_persona_contract::PersonaId;
 
 use crate::{HeardPrefix, InterruptIntent, MarkSource, ProactiveLabel, UtteranceId, WordMark};
 

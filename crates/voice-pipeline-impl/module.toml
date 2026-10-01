@@ -1,0 +1,34 @@
+# Manifest modułu voice-pipeline (docs/modules/voice-pipeline/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "voice-pipeline"
+version = "0.0.1"
+kind = "service"
+provides = ["voice-pipeline-contract@1"]
+requires = [
+    "core-bus-contract@1",
+    "voice-audio-contract@1",
+    "voice-dsp-contract@1",
+    "voice-vad-contract@1",
+    "voice-stt-contract@1",
+    "voice-turn-contract@1",
+    "voice-cmd-contract@1",
+    "voice-dialog-contract@1",
+    "voice-persona-contract@1",
+    "voice-tts-contract@1",
+    "voice-wake-contract@1",
+    "personas-contract@1",
+    "providers-contract@1",
+    "scheduler-lite-contract@1",
+    "model-residency-contract@1",
+]
+capabilities = []
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+# SPEC: sam runtime (bez modeli) RAM ≤ 20 MB, krok ≤ 2 ms CPU na baseline (DSP/VAD liczone w swoich modułach).
+ram_mb = 20
+cpu_pct = 3
+
+[health]
+check = "ping"
+interval_s = 30

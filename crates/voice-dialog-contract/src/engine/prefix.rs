@@ -2,7 +2,7 @@
 //! ze źródłem `Alignment`), (3) liczenie odtworzonych próbek skorygowane o opóźnienie urządzenia →
 //! przycięcie do granicy słowa/zdania + flaga `approximate`.
 
-use voice_dialog_contract::{ApproxTrim, HeardPrefix, MarkSource, PrefixSource, Utterance};
+use crate::{ApproxTrim, HeardPrefix, MarkSource, PrefixSource, Utterance};
 
 /// Największa granica słowa (indeks spacji lub 0) nie dalej niż `est` znaków.
 fn word_boundary(text: &str, est: usize) -> usize {
@@ -86,8 +86,8 @@ pub fn unsaid(u: &Utterance, heard: &HeardPrefix) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use voice_dialog_contract::{SpokenChunk, UtteranceId, WordMark};
-    use voice_persona_contract::PersonaId;
+    use crate::{SpokenChunk, UtteranceId, WordMark};
+    use personas_contract::PersonaId;
 
     fn utt(played_ms: u64, marks: bool) -> Utterance {
         let first = "Ala ma kota.";

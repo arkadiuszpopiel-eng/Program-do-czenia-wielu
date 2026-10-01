@@ -1,12 +1,12 @@
 //! Mowa agentki: głośnik (zasób wyłączny), fragmenty TTS, znaczniki, postęp, koniec,
 //! mowa proaktywna i wznawianie od punktu cięcia.
 
-use voice_dialog_contract::{
+use crate::{
     Command, DialogNotice, DialogPhase, InterruptClassifier, MarkSource, PendingSpeech,
     ProactiveLabel, ProactiveMode, ProactiveRejection, SpokenChunk, UserTurn, Utterance,
     UtteranceId, WordMark,
 };
-use voice_persona_contract::PersonaId;
+use personas_contract::PersonaId;
 
 use super::Step;
 

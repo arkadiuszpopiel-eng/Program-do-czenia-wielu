@@ -13,6 +13,8 @@ pub struct UtteranceAudio {
     detector: EnergyDetector,
     speech_ms: u32,
     partial_at: usize,
+    /// Pierwsze i ostatnie okno 10 ms z mową (indeksy okien).
+    span: Option<(u32, u32)>,
 }
 
 impl UtteranceAudio {
@@ -28,9 +30,12 @@ impl UtteranceAudio {
         self.samples.extend_from_slice(&frame.pcm);
         let aligned = start - start % 160;
         // Okno [aligned, start) było wcześniej niepełne — liczymy je teraz (każde okno raz).
-        for w in self.samples[aligned..].chunks_exact(160) {
+        let first_window = u32::try_from(aligned / 160).unwrap_or(u32::MAX);
+        for (i, w) in self.samples[aligned..].chunks_exact(160).enumerate() {
             if self.detector.prob(w) >= 0.5 {
                 self.speech_ms += 10;
+                let idx = first_window.saturating_add(u32::try_from(i).unwrap_or(u32::MAX));
+                self.span = Some(self.span.map_or((idx, idx), |(a, _)| (a, idx)));
             }
         }
         Ok(())
@@ -49,6 +54,11 @@ impl UtteranceAudio {
     /// Mowa wg detektora energii (ms).
     pub fn speech_ms(&self) -> u32 {
         self.speech_ms
+    }
+
+    /// Zakres mowy wg detektora energii: (początek, koniec) w ms od początku wypowiedzi.
+    pub fn speech_span_ms(&self) -> Option<(u32, u32)> {
+        self.span.map(|(a, b)| (a * 10, b * 10 + 10))
     }
 
     /// Czy przybyło dość audio na kolejny partial (`every_ms`); oznacza moment partiala.
@@ -102,6 +112,12 @@ mod tests {
                 .unwrap();
         }
         assert_eq!(u.duration_ms(), 1_500);
+        let (a, b) = u.speech_span_ms().unwrap();
+        assert!(
+            (490..=530).contains(&a) && (1_480..=1_500).contains(&b),
+            "{a}–{b}"
+        );
+        assert!(UtteranceAudio::default().speech_span_ms().is_none());
         assert!(
             u.speech_ms() >= 950 && u.speech_ms() <= 1_010,
             "{}",

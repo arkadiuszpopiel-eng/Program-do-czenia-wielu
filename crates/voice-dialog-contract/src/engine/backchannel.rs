@@ -49,7 +49,7 @@ pub fn classify(text: &str, phrases: &[String]) -> BackchannelClass {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use voice_dialog_contract::DialogConfig;
+    use crate::DialogConfig;
 
     #[test]
     fn classes() {

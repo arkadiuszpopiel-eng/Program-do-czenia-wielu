@@ -7,7 +7,7 @@ mod barge;
 mod speech;
 mod turns;
 
-use voice_dialog_contract::{
+use crate::{
     Command, DialogAutomaton, DialogConfig, DialogEvent, DialogNotice, DialogPhase, DialogState,
     InterruptClassifier, Transition, UserTurn,
 };

@@ -3,13 +3,13 @@
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use core_registry_contract::ModuleManifest;
+use personas_contract::PersonaId;
 use voice_dialog_contract::{
     ActivationSource, Command, DialogEvent, DialogNotice, DialogPhase, SpeakerLock, SpeakerOwner,
     UtteranceId, contract_tests,
 };
 use voice_dialog_fake::{FakeSpeakerLock, LockCall, ScriptedClassifier};
 use voice_dialog_impl::{DialogDriver, DialogMachine, MODULE_TOML, default_machine};
-use voice_persona_contract::PersonaId;
 
 #[test]
 fn contract_suite() {

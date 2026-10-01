@@ -1,9 +1,9 @@
 //! Kompilacja fraz gramatyki do wzorców i dopasowanie od pozycji w wypowiedzi.
 
-use voice_cmd_contract::{CommandKind, Grammar, fold};
-use voice_persona_contract::PersonaId;
+use crate::{CommandKind, Grammar, fold};
+use personas_contract::PersonaId;
 
-use crate::fuzzy::word_score;
+use super::fuzzy::word_score;
 
 /// Element wzorca.
 #[derive(Debug, Clone)]

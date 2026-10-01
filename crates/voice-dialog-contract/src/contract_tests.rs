@@ -1,8 +1,8 @@
 //! Współdzielony test kontraktowy `DialogAutomaton` (feature `contract-tests`): niezmienniki,
 //! które musi spełniać każdy automat (impl i fake), na wirtualnym zegarze.
 
+use personas_contract::PersonaId;
 use voice_cmd_contract::VoiceCommand;
-use voice_persona_contract::PersonaId;
 
 use crate::{
     ActivationSource, Command, DialogAutomaton, DialogEvent, DialogPhase, DialogState,

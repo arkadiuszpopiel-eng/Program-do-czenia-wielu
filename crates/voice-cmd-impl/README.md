@@ -1,6 +1,7 @@
 # voice-cmd-impl
 
-Szybka ścieżka komend głosowych bez LLM (`GrammarRecognizer`). Gramatyka PL/EN z `voice-cmd-contract`
+Szybka ścieżka komend głosowych bez LLM (`GrammarRecognizer` — rdzeń w `voice-cmd-contract`, tu
+reeksport, manifest i testy na zamrożonym zestawie). Gramatyka PL/EN z `voice-cmd-contract`
 jest kompilowana do wzorców (alternatywy, słowa opcjonalne, slot `{persona}` z odmianą imion).
 Wypowiedź jest komendą tylko, gdy składa się wyłącznie z fraz komend, wypełniaczy („proszę”, „dobra”,
 „yyy”…) i imion person — każde inne słowo oznacza zwykłą wypowiedź (→ LLM). Tolerancja szumu ASR:

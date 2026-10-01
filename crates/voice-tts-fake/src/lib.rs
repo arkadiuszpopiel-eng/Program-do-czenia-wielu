@@ -65,6 +65,11 @@ impl FakeTts {
         self.lock().ttfb_ms = ms;
     }
 
+    /// TTFB (ms, czas wirtualny) — uprząż testów stosuje go na zegarze wirtualnym.
+    pub fn ttfb_ms(&self) -> u32 {
+        self.lock().ttfb_ms
+    }
+
     fn render(voice: &VoiceRef, rate: f32, sentence: &str, seed: u64) -> Vec<f32> {
         let chars = sentence
             .chars()
@@ -124,7 +129,12 @@ impl Tts for FakeTts {
         }
         let (mut offset_ms, mut word_idx) = (0u32, 0u32);
         for (seq, s) in sentences.iter().enumerate() {
-            let pcm = Self::render(&voice, req.style.rate, s, req.utterance * 31 + seq as u64);
+            let pcm = Self::render(
+                &voice,
+                req.style.rate,
+                s,
+                req.utterance.wrapping_mul(31).wrapping_add(seq as u64),
+            );
             let dur = (pcm.len() as u64 * 1000 / u64::from(TTS_RATE)) as u32;
             let words: Vec<&str> = s.split_whitespace().collect();
             let marks = estimate_marks(&words, word_idx, offset_ms, dur);

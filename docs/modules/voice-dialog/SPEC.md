@@ -26,11 +26,11 @@ pub trait SpeakerLock { fn try_acquire(&SpeakerOwner) -> Result<(), SpeakerBusy>
 pub trait WordAligner { fn align(&self, text, audio: &[f32], sample_rate) -> Result<Vec<WordMark>, AlignError>; }
 ```
 `DialogConfig`: `duck_db −15`, `confirm_ms 200` (słuchawki 150), `max_confirm_ms 350` (brak transkryptu), `backchannel_max_ms 900`, `min_speech_ms 80` (szum), frazy backchannelu (m.in. „mhm”, „tak”, „aha”, „okej”, „nie no, dobrze”), `approx_trim word|sentence`, fillery po 1200 ms, `proactive labeled|off`.
-Impl: `DialogMachine<C>` (+ `HeuristicClassifier` PL, `DialogDriver` wykonujący polecenia głośnika na `SpeakerLock`). Id wypowiedzi nadaje automat; zdarzenia nieaktualnych wypowiedzi są ignorowane (po `StopTts` brak dalszego audio tej wypowiedzi; wznowienie = nowa wypowiedź).
+Rdzeń: `DialogMachine<C>` (+ `HeuristicClassifier` PL, `DialogDriver` wykonujący polecenia głośnika na `SpeakerLock`, `machine_with`/`default_machine`) — czyste funkcje w `voice-dialog-contract` (moduł `engine`), żeby runtime `voice-pipeline` i runner F2 używały tego samego automatu bez zależności od `-impl`; `voice-dialog-impl` go reeksportuje (manifest, testy). Kontrakt dodaje też `DialogNotice::to_bus_event()` i `SpeakerLock` dla `Arc<T>`. Id wypowiedzi nadaje automat; zdarzenia nieaktualnych wypowiedzi są ignorowane (po `StopTts` brak dalszego audio tej wypowiedzi; wznowienie = nowa wypowiedź).
 Zdarzenia magistrali: `voice.dialog.state_changed`, `.ducked`, `.interrupted`, `.intent_classified`, `.backchannel`, `.proactive`, `.filler`, `.metrics` (z `Command::Notify`).
 
 ## Zależności
-v1: `core-bus-contract`, `voice-cmd-contract` (komendy), `voice-persona-contract` (`PersonaId`). Automat nie zależy od `voice-turn` ani VAD — dostaje zdarzenia `VadSpeech*`/`TurnEnded` od runtime potoku. Później: `scheduler-lite-contract` (realny `SpeakerLock`), `sessions-contract` (tury, prefiks, gałęzie), `router-contract`, `agent-runtime-contract` (F3: steering, anulowanie LLM).
+v1: `core-bus-contract`, `voice-cmd-contract` (komendy), `personas-contract` (`PersonaId` — jedno źródło prawdy o personach). Automat nie zależy od `voice-turn` ani VAD — dostaje zdarzenia `VadSpeech*`/`TurnEnded` od runtime potoku. Realny `SpeakerLock` na `scheduler-lite` dostarcza `voice-pipeline` (`SchedSpeakerLock`). Później: `sessions-contract` (tury, prefiks, gałęzie), `router-contract`, `agent-runtime-contract` (F3: steering, anulowanie LLM).
 
 ## Niezmienniki
 - Ducking (−15 dB, < 50 ms) przy VAD po AEC w `Speaking`; twardy stop po ≥ 150–250 ms mowy sklasyfikowanej ≠ backchannel: stop TTS, anulowanie LLM, czyszczenie kolejki — ≤ ~400 ms od początku wypowiedzi.

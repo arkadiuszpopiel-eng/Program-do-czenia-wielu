@@ -3,11 +3,9 @@
 //! Kolejność: backchannel → stop/anuluj → zmiana tematu → kontynuuj → korekta → uzupełnienie →
 //! pytanie doprecyzowujące → domyślnie korekta (niska pewność). Docelowo mały model lub LLM (SPEC).
 
-use voice_dialog_contract::{
-    DialogConfig, IntentResult, InterruptClassifier, InterruptContext, InterruptIntent,
-};
+use crate::{DialogConfig, IntentResult, InterruptClassifier, InterruptContext, InterruptIntent};
 
-use crate::backchannel::words;
+use crate::engine::backchannel::words;
 
 const STOP: &[&str] = &[
     "stop",

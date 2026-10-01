@@ -8,7 +8,7 @@ F2. P0. Biblie z `docs/PERSONAS.md`.
 
 ## Kontrakt (v1, `crates/voice-persona-contract`)
 ```rust
-pub struct PersonaId(String);                    // alfa | beta | gama | delta | własne (Kreator); do unifikacji z personas-contract
+pub use personas_contract::PersonaId;             // jedno źródło prawdy (re-eksport); walidacja: parse_persona_id(&str) -> Result<PersonaId, PersonaError>
 pub struct VoiceBible { persona, display_name, lang, perceived_age /* 18..=25 */, timbre, register, tempo, energy,
     pitch_semitones, default_emotion, emotion_range, voice_prompt, provenance, consent }   // validate(): wiek, „girl/cute/child”, real_person=false
 pub struct Lexicon;                              // serde; klucz = słowo/fraza (bez wielkości liter); wymowa bez cyfr i znaczników; Origin: Builtin|User|Improver
@@ -29,7 +29,7 @@ Zdarzenia: `voice.persona.plan_created` (Diagnostics), `voice.persona.lexicon_ch
 **Normalizator (impl):** liczebniki 0–999 999 999 999 z rodzajem (dwie minuty, jedno zadanie) i dopełniaczem po przyimkach (od pięciu), większe i z zerami wiodącymi — cyfra po cyfrze; daty (`1 października 2026`, `1.10.2026`, `2026-10-01` → „pierwszego października dwa tysiące dwudziestego szóstego roku”), lata z „r./roku/rok” i po „w”; godziny z przypadkiem wg przyimka (o czternastej, przed dwunastą); waluty zł/PLN/$/USD/€/EUR/£ z groszami i odmianą; tys./mln/mld; procenty; jednostki (km, kg, GB, MB, °C, km/h, ms, min, h…); zakresy („pięć do dziesięciu minut”); wersje; telefony; skróty z odmianą (np., itd., m.in., tzn., dr, ul., godz., nr…); URL („link do github kropka com”), e-mail („… małpa firma kropka pl”), domeny/pliki; kod → „(kod na ekranie)”; PL/EN bez zmian. **Chunker:** koniec zdania/średnik/linia, długie zdania na przecinku, blok kodu w całości; nie tnie po skrótach, inicjałach i w liczbach dziesiętnych; wynik niezależny od podziału strumienia.
 
 ## Zależności
-`core-bus-contract` (nazwy zdarzeń). v1 bez `personas-contract` (w budowie równolegle) — `PersonaId` zgodny na drucie (string), do unifikacji; zamiast `voice-tts-contract::EngineCaps` tabela `EngineStyleTable` w tym kontrakcie. Zewnętrzne: brak.
+`core-bus-contract` (nazwy zdarzeń), `personas-contract` (`PersonaId` — ujednolicony, re-eksport w tym kontrakcie); zamiast `voice-tts-contract::EngineCaps` tabela `EngineStyleTable` w tym kontrakcie. Zewnętrzne: brak.
 
 ## Niezmienniki
 - Kanał mówiony bez markdown/kodu/tabel — te idą na ekran; model streszcza głosem.

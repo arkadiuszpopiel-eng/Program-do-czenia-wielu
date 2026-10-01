@@ -3,13 +3,19 @@
 //! Automat rozmowy jest **czysto funkcyjny**: `step(stan, zdarzenie, teraz) → (stan, polecenia)`,
 //! bez I/O. Polecenia (`Command`) wykonuje runtime potoku: ducking, stop TTS, anulowanie LLM,
 //! zasób głośnika, przekazanie tury, wznowienie od punktu cięcia. Zasób „głośnik” (`SpeakerLock`)
-//! jest traitem — realna implementacja przyjdzie ze `scheduler-lite`. Klasyfikacja intencji przerwania
-//! (`InterruptClassifier`) i alignment słów (`WordAligner`) też są traitami.
+//! jest traitem — realna implementacja (dzierżawa `scheduler-lite`) jest w runtime potoku głosu.
+//! Klasyfikacja intencji przerwania (`InterruptClassifier`) i alignment słów (`WordAligner`) też są
+//! traitami.
+//!
+//! Deterministyczny rdzeń ([`DialogMachine`], [`HeuristicClassifier`], [`heard_prefix`],
+//! [`DialogDriver`]) jest częścią kontraktu — jak `VadMachine`/`WakeMachine`/`LockTable`: decyzje
+//! automatu są czystą funkcją wspólną dla `voice-dialog-impl` i potoku `voice-pipeline`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod command;
 mod config;
+mod engine;
 mod event;
 mod ids;
 mod state;
@@ -22,6 +28,10 @@ pub use command::{
     TurnSource,
 };
 pub use config::{ApproxTrim, DialogConfig, ProactiveMode};
+pub use engine::{
+    BackchannelClass, DialogDriver, DialogMachine, HeuristicClassifier, classify_backchannel,
+    default_machine, heard_prefix, machine_with, unsaid,
+};
 pub use event::{ActivationSource, DialogEvent, MarkSource, ProactiveLabel, WordMark};
 pub use ids::{TurnId, UtteranceId};
 pub use state::{
@@ -29,10 +39,10 @@ pub use state::{
     Utterance,
 };
 
-use core_bus_contract::EventKind;
+use core_bus_contract::{Event, EventKind, Level};
+use personas_contract::PersonaId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use voice_persona_contract::PersonaId;
 
 /// Zmiana fazy.
 pub const EVENT_STATE_CHANGED: &str = "voice.dialog.state_changed";
@@ -50,10 +60,67 @@ pub const EVENT_PROACTIVE: &str = "voice.dialog.proactive";
 pub const EVENT_FILLER: &str = "voice.dialog.filler";
 /// Metryki (p50/p95 etapów, fałszywe przerwania).
 pub const EVENT_METRICS: &str = "voice.dialog.metrics";
+/// Przywrócenie głośności po duckingu.
+pub const EVENT_RESTORED: &str = "voice.dialog.restored";
+/// Głośnik zajęty — wypowiedź czeka w kolejce mówienia.
+pub const EVENT_SPEAKER_BUSY: &str = "voice.dialog.speaker_busy";
+/// Zdarzenie zignorowane przez automat (diagnostyka).
+pub const EVENT_IGNORED: &str = "voice.dialog.ignored";
 
 /// Rodzaj zdarzenia magistrali dla nazwy z tego modułu.
 pub fn event_kind(name: &str) -> EventKind {
     EventKind::Custom(name.to_owned())
+}
+
+impl DialogNotice {
+    /// Nazwa zdarzenia magistrali `voice.dialog.*`.
+    pub fn event_name(&self) -> &'static str {
+        match self {
+            Self::StateChanged { .. } => EVENT_STATE_CHANGED,
+            Self::Ducked => EVENT_DUCKED,
+            Self::Restored => EVENT_RESTORED,
+            Self::Backchannel { .. } => EVENT_BACKCHANNEL,
+            Self::Interrupted { .. } => EVENT_INTERRUPTED,
+            Self::IntentClassified { .. } => EVENT_INTENT_CLASSIFIED,
+            Self::ProactiveRejected { .. } => EVENT_PROACTIVE,
+            Self::SpeakerBusy { .. } => EVENT_SPEAKER_BUSY,
+            Self::Ignored { .. } => EVENT_IGNORED,
+        }
+    }
+
+    /// Zdarzenie magistrali (bez treści audio; prefiks i transkrypty jako tekst).
+    pub fn to_bus_event(&self) -> Event {
+        let level = match self {
+            Self::StateChanged { .. } | Self::Interrupted { .. } => Level::Info,
+            Self::Ignored { .. } => Level::Trace,
+            _ => Level::Debug,
+        };
+        Event::new(
+            event_kind(self.event_name()),
+            level,
+            serde_json::to_value(self).unwrap_or_default(),
+        )
+    }
+}
+
+impl<T: DialogAutomaton + ?Sized> DialogAutomaton for Box<T> {
+    fn step(&self, state: &DialogState, event: &DialogEvent, now_ms: u64) -> Transition {
+        (**self).step(state, event, now_ms)
+    }
+}
+
+impl<T: SpeakerLock + ?Sized> SpeakerLock for std::sync::Arc<T> {
+    fn try_acquire(&self, owner: &SpeakerOwner) -> Result<(), SpeakerBusy> {
+        (**self).try_acquire(owner)
+    }
+
+    fn release(&self, owner: &SpeakerOwner) -> bool {
+        (**self).release(owner)
+    }
+
+    fn holder(&self) -> Option<SpeakerOwner> {
+        (**self).holder()
+    }
 }
 
 /// Wynik kroku automatu.
@@ -174,6 +241,9 @@ mod tests {
             EVENT_PROACTIVE,
             EVENT_FILLER,
             EVENT_METRICS,
+            EVENT_RESTORED,
+            EVENT_SPEAKER_BUSY,
+            EVENT_IGNORED,
         ] {
             assert!(name.starts_with("voice.dialog."));
             assert_eq!(event_kind(name).to_string(), name);
@@ -203,6 +273,41 @@ mod tests {
             .effective_confirm_ms()
                 < DialogConfig::default().effective_confirm_ms()
         );
+    }
+
+    #[test]
+    fn notices_map_to_bus_events() {
+        let notices = [
+            DialogNotice::StateChanged {
+                from: DialogPhase::Idle,
+                to: DialogPhase::Listening,
+            },
+            DialogNotice::Ducked,
+            DialogNotice::Restored,
+            DialogNotice::Backchannel { text: "mhm".into() },
+            DialogNotice::IntentClassified {
+                intent: InterruptIntent::Correction,
+                confidence: 0.9,
+            },
+            DialogNotice::ProactiveRejected {
+                reason: ProactiveRejection::DoNotDisturb,
+            },
+            DialogNotice::SpeakerBusy {
+                utterance: UtteranceId(2),
+            },
+            DialogNotice::Ignored { reason: "x".into() },
+        ];
+        for n in notices {
+            let e = n.to_bus_event();
+            assert_eq!(e.kind.as_str(), n.event_name());
+            assert_eq!(
+                e.payload["notice"],
+                serde_json::to_value(&n).unwrap()["notice"]
+            );
+        }
+        let boxed: Box<dyn DialogAutomaton> = Box::new(default_machine());
+        let t = boxed.step(&DialogState::default(), &DialogEvent::Tick, 0);
+        assert_eq!(t.state.phase, DialogPhase::Idle);
     }
 
     #[test]

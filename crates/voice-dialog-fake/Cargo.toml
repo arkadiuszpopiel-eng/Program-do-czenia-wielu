@@ -11,7 +11,7 @@ repository.workspace = true
 [dependencies]
 voice-dialog-contract = { path = "../voice-dialog-contract" }
 voice-cmd-contract = { path = "../voice-cmd-contract" }
-voice-persona-contract = { path = "../voice-persona-contract" }
+personas-contract = { path = "../personas-contract" }
 
 [dev-dependencies]
 voice-dialog-contract = { path = "../voice-dialog-contract", features = ["contract-tests"] }

@@ -3,13 +3,13 @@
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use core_registry_contract::ModuleManifest;
+use personas_contract::PersonaId;
 use voice_cmd_contract::contract_tests::{self, utterance};
 use voice_cmd_contract::{
     AgentActivity, CmdDecision, CommandKind, CommandRecognizer, Grammar, GrammarRule, IgnoreReason,
     Token, VoiceCommand,
 };
 use voice_cmd_impl::{GrammarRecognizer, MODULE_TOML};
-use voice_persona_contract::PersonaId;
 
 #[test]
 fn contract_suite() {

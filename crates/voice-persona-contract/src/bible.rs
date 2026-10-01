@@ -249,7 +249,7 @@ mod tests {
         let gama = VoiceBible::builtin(&PersonaId::gama()).unwrap();
         let delta = VoiceBible::builtin(&PersonaId::delta()).unwrap();
         assert!(gama.tempo < delta.tempo && gama.pitch_semitones < delta.pitch_semitones);
-        assert!(VoiceBible::builtin(&PersonaId::new("zeta").unwrap()).is_none());
+        assert!(VoiceBible::builtin(&PersonaId::new("zeta")).is_none());
     }
 
     #[test]

@@ -116,6 +116,39 @@ async fn microphone_is_an_exclusive_lease_while_listening() {
     assert!(format!("{mic:?}").contains("held"));
 }
 
+#[test]
+fn microphone_lease_without_waiting_and_conflict() {
+    let sched = Arc::new(FakeScheduler::new());
+    let start = [WakeEvent::ListenStart {
+        addressed: None,
+        source: WakeSource::Ui,
+    }];
+    let stop = [WakeEvent::ListenStop {
+        source: WakeSource::Ui,
+    }];
+    let mut mic = MicArbiter::new(sched.clone(), Duration::ZERO);
+    mic.apply_now(&start).unwrap();
+    assert!(mic.held() && !mic.revoked());
+    mic.apply_now(&stop).unwrap();
+    assert!(!mic.held());
+    // Mikrofon zajęty przez kogoś innego (np. dyktowanie) → natychmiastowy błąd, bez czekania.
+    let other = voice_wake_contract::lease_now(
+        sched.as_ref(),
+        Resource::Mic,
+        Holder::System("dictation".into()),
+        scheduler_lite_contract::Priority::Interactive,
+    )
+    .unwrap();
+    assert!(mic.apply_now(&start).is_err());
+    assert!(!mic.held());
+    drop(other);
+    mic.apply_now(&start).unwrap();
+    assert!(sched.kill_all() >= 1);
+    assert!(mic.revoked());
+    mic.release();
+    assert!(!mic.held());
+}
+
 #[tokio::test]
 async fn module_publishes_events() {
     let mut m = VoiceWakeModule::new().unwrap();

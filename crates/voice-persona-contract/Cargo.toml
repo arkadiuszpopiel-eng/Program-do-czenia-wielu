@@ -15,6 +15,7 @@ contract-tests = []
 
 [dependencies]
 core-bus-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

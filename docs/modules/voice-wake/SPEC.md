@@ -20,6 +20,8 @@ pub trait Wake: Send {
     fn mic_state(&self) -> MicState;  fn is_listening(&self) -> bool;
 }
 // Wspólne: WakeMachine (deterministyczny automat; adresowanie przez personas-contract::resolve_addressee).
+// Wspólne: MicArbiter (dzierżawa mikrofonu w scheduler-lite: Holder::User, Priority::UserSpeech; apply/apply_now)
+//          i lease_now (dzierżawa bez czekania — dla wątku przetwarzania potoku, który nie może blokować kroku).
 ```
 Zdarzenia: `voice.wake.listen_start/stop`, `voice.wake.addressed`, `voice.wake.blocked_elevated_foreground` (okno admina — hook nie działa), `voice.wake.false_alarm_suspected` (v1), `voice.wake.dnd`, `voice.wake.mic_state`.
 

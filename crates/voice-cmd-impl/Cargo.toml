@@ -10,9 +10,9 @@ repository.workspace = true
 
 [dependencies]
 voice-cmd-contract = { path = "../voice-cmd-contract" }
-voice-persona-contract = { path = "../voice-persona-contract" }
 
 [dev-dependencies]
+personas-contract = { path = "../personas-contract" }
 voice-cmd-contract = { path = "../voice-cmd-contract", features = ["contract-tests"] }
 core-registry-contract.workspace = true
 proptest.workspace = true

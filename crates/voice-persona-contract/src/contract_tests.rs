@@ -22,7 +22,7 @@ pub fn builtin_bibles<P: Persona>(p: &P) {
         assert!((MIN_AGE..=MAX_AGE).contains(&bible.perceived_age));
         bible.validate().unwrap_or_else(|e| panic!("{e}"));
     }
-    let unknown = PersonaId::new("omega").unwrap_or_else(|e| panic!("{e}"));
+    let unknown = crate::parse_persona_id("omega").unwrap_or_else(|e| panic!("{e}"));
     assert!(matches!(
         p.bible(&unknown),
         Err(PersonaError::UnknownPersona { .. })
@@ -86,7 +86,7 @@ pub fn plan_separates_channels<P: Persona>(p: &P) {
     assert!(spoken.contains("Gotowe") && spoken.contains("To wszystko"));
     assert!(
         p.plan(
-            &PersonaId::new("omega").unwrap_or_else(|e| panic!("{e}")),
+            &crate::parse_persona_id("omega").unwrap_or_else(|e| panic!("{e}")),
             "x",
             &table
         )

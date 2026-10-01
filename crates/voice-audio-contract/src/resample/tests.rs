@@ -97,3 +97,28 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn short_kernel_and_phase_cache_match_reference() {
+    let x: Vec<f32> = sine(440.0, 48_000, 0.2, 0.5);
+    let run = |mut r: Resampler| -> Vec<f32> {
+        let mut out = Vec::new();
+        for c in x.chunks(480) {
+            r.process(c, &mut out);
+        }
+        // Wyjście jest wyrównane z wejściem (out[i] ↔ x[3i]); różni się tylko chwila wydania.
+        out
+    };
+    let full = run(Resampler::new(48_000, 16_000));
+    let short = run(Resampler::with_zero_crossings(48_000, 16_000, 2));
+    assert!(
+        Resampler::with_zero_crossings(48_000, 16_000, 8).latency_in()
+            < Resampler::new(48_000, 16_000).latency_in()
+    );
+    let n = full.len().min(short.len());
+    assert!(n > 2_000);
+    let err = (100..n)
+        .map(|i| (full[i] - short[i]).abs())
+        .fold(0.0f32, f32::max);
+    assert!(err < 0.05, "krótkie jądro bliskie pełnemu: {err}");
+}

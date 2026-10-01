@@ -17,6 +17,7 @@ contract-tests = []
 core-bus-contract.workspace = true
 platform-contract.workspace = true
 personas-contract = { path = "../personas-contract" }
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

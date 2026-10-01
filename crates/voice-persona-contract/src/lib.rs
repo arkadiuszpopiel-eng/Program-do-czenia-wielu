@@ -1,7 +1,8 @@
 //! Kontrakt modułu `voice-persona` (docs/PLAN.md §6.6–6.7, docs/VOICE.md §12,
 //! docs/modules/voice-persona/SPEC.md).
 //!
-//! Zawiera: tożsamość persony (`PersonaId`), biblię głosu (`VoiceBible`), edytowalny słownik
+//! Zawiera: tożsamość persony (`PersonaId` — re-eksport z `personas-contract`, walidacja
+//! [`parse_persona_id`]), biblię głosu (`VoiceBible`), edytowalny słownik
 //! wymowy (`Lexicon`), typy chunkera strumienia TTS (`Chunk`, `ChunkerCfg`), typy planisty stylu
 //! (`StyleTags` → `SpeechStyle` przez tabelę silnika `EngineStyleTable`), plan mówienia
 //! (`SpokenPlan`: kanał mówiony + ekranowy) oraz traity `Persona`, `TextNormalizer`,
@@ -27,7 +28,7 @@ pub use bible::{
 pub use chunk::{Boundary, Chunk, ChunkerCfg};
 pub use error::PersonaError;
 pub use lexicon::{Lexicon, LexiconEntry, MAX_PRON_CHARS, MAX_WORD_CHARS, Origin};
-pub use persona_id::PersonaId;
+pub use persona_id::{PersonaId, parse_persona_id};
 pub use plan::{CODE_ON_SCREEN, SpokenPlan, SpokenSentence};
 pub use style::{
     Emotion, EmotionTag, Energy, EngineKind, EngineStyleTable, ParamRange, SpeechStyle, StylePlan,

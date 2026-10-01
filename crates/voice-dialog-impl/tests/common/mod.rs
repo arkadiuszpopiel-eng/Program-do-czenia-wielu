@@ -2,11 +2,11 @@
 
 #![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
 
+use personas_contract::PersonaId;
 use voice_dialog_contract::{
     ActivationSource, Command, DialogAutomaton, DialogEvent, DialogPhase, DialogState, UtteranceId,
     WordMark,
 };
-use voice_persona_contract::PersonaId;
 
 /// Automat + stan + dziennik poleceń z czasem.
 pub struct Sim<A> {

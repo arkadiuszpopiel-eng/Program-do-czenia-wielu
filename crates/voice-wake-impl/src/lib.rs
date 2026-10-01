@@ -5,8 +5,6 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
-mod mic;
-
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -14,9 +12,9 @@ use core_bus_contract::EventBus;
 use core_registry_contract::{
     HealthStatus, ManifestError, Module, ModuleContext, ModuleError, ModuleManifest,
 };
-pub use mic::MicArbiter;
 use personas_contract::{Cast, Persona, PersonaId};
 use platform_contract::{HotkeyId, HotkeyPort, ProcessPort};
+pub use voice_wake_contract::MicArbiter;
 use voice_wake_contract::{MicState, Wake, WakeCfg, WakeError, WakeEvent, WakeInput, WakeMachine};
 
 /// Treść `module.toml`.

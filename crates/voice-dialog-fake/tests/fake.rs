@@ -2,6 +2,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+use personas_contract::PersonaId;
 use voice_dialog_contract::{
     InterruptClassifier, InterruptContext, InterruptIntent, SpeakerLock, SpeakerOwner, UtteranceId,
     WordAligner, contract_tests,
@@ -9,7 +10,6 @@ use voice_dialog_contract::{
 use voice_dialog_fake::{
     FakeDialog, FakeSpeakerLock, LockCall, ScriptedClassifier, UniformAligner,
 };
-use voice_persona_contract::PersonaId;
 
 #[test]
 fn contract_suite() {

@@ -143,6 +143,14 @@ pub trait Stt: Send + Sync {
     async fn start_utterance(&self, id: UtteranceId) -> Result<(), SttError>;
     /// Dokłada ramkę 16 kHz mono; przy polityce dwóch przebiegów co `partial_every_ms` zwraca partial.
     async fn push(&self, id: UtteranceId, frame: &Frame) -> Result<Option<Transcript>, SttError>;
+    /// Partial na żądanie z całego dotychczasowego audio wypowiedzi (szybka wiązka), niezależnie
+    /// od rytmu `partial_every_ms` — ścieżka keyword-spottera „stop/czekaj” w trakcie mowy agentki
+    /// (potok woła co ~100 ms przy barge-in). `Ok(None)`, gdy silnik tego nie obsługuje albo
+    /// w wypowiedzi nie ma jeszcze mowy.
+    async fn partial_now(&self, id: UtteranceId) -> Result<Option<Transcript>, SttError> {
+        let _ = id;
+        Ok(None)
+    }
     /// Zamyka wypowiedź i zwraca final (pusty, gdy bramka VAD uznała audio za szum).
     async fn end_utterance(&self, id: UtteranceId) -> Result<Transcript, SttError>;
     /// Porzuca wypowiedź (barge-in, anulowanie).

@@ -84,6 +84,16 @@ impl PersonaId {
     pub fn delta() -> Self {
         Self::from("delta")
     }
+
+    /// Cztery persony wbudowane w kolejności Alfa, Beta, Gama, Delta.
+    pub fn builtin() -> [Self; 4] {
+        [Self::alfa(), Self::beta(), Self::gama(), Self::delta()]
+    }
+
+    /// Identyfikator po walidacji formatu ([`is_valid_id`]); `None` dla niepoprawnego.
+    pub fn parse(value: &str) -> Option<Self> {
+        is_valid_id(value).then(|| Self::from(value))
+    }
 }
 
 impl RoleId {
@@ -165,5 +175,21 @@ mod tests {
             Some("\"gama\"")
         );
         assert_eq!(RoleId::critic().to_string(), "critic");
+    }
+
+    #[test]
+    fn persona_builtin_and_parse() {
+        assert_eq!(
+            PersonaId::builtin().map(|p| p.0),
+            ["alfa", "beta", "gama", "delta"].map(str::to_owned)
+        );
+        assert_eq!(PersonaId::parse("delta"), Some(PersonaId::delta()));
+        assert_eq!(
+            PersonaId::parse("moja-agentka2").map(|p| p.0).as_deref(),
+            Some("moja-agentka2")
+        );
+        for bad in ["Delta", "", "a b", "a-", "1a"] {
+            assert!(PersonaId::parse(bad).is_none(), "{bad}");
+        }
     }
 }
