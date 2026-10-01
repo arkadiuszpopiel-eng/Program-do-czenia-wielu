@@ -79,3 +79,67 @@ async fn approval_card_and_pause() {
         Err(RunError::AlreadyFinished(run.clone()))
     );
 }
+
+mod v1 {
+    use super::*;
+    use agent_runtime_contract::contract_tests::sample_spec;
+    use agent_runtime_contract::contract_tests_v1 as ct1;
+    use agent_runtime_contract::{RunOptions, RunReport};
+
+    fn quick() -> RunScript {
+        RunScript::new().finish(
+            20,
+            RunOutcome::Completed {
+                summary: "ok".into(),
+                verified: None,
+            },
+        )
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn contract_v1() {
+        let rt = FakeAgentRuntime::new();
+        rt.set_default(quick());
+        ct1::default_options_behave_like_v0(&rt, sample_spec("m", &[])).await;
+        let specs = ["A", "B", "C"]
+            .iter()
+            .map(|g| {
+                let mut s = sample_spec("m", &[]);
+                s.goal = format!("cel {g}");
+                s
+            })
+            .collect();
+        ct1::parallel_runs_are_isolated(&rt, specs).await;
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn children_and_report() {
+        let rt = FakeAgentRuntime::new();
+        rt.set_default(quick());
+        let parent = rt.start(sample_spec("m", &[])).await.unwrap();
+        let opts = RunOptions {
+            parent: Some(parent.clone()),
+            depth: 1,
+            ..RunOptions::default()
+        };
+        let child = rt
+            .start_with(sample_spec("m", &[]), opts.clone())
+            .await
+            .unwrap();
+        rt.wait(&parent).await.unwrap();
+        rt.wait(&child).await.unwrap();
+        assert_eq!(rt.children(&parent).unwrap(), vec![child.clone()]);
+        assert_eq!(rt.options(&child), Some(opts));
+        let report: RunReport = rt.report(&parent).unwrap();
+        assert_eq!(report.children.len(), 1);
+        assert_eq!(report.children[0].run, child);
+        let orphan = RunOptions {
+            parent: Some(agent_runtime_contract::RunId::new("brak")),
+            ..RunOptions::default()
+        };
+        assert!(matches!(
+            rt.start_with(sample_spec("m", &[]), orphan).await,
+            Err(RunError::UnknownRun(_))
+        ));
+    }
+}

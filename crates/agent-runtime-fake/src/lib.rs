@@ -3,6 +3,9 @@
 //! deterministycznie). Sterowanie daje `Steered`/`Paused`/`Resumed`, anulowanie kończy
 //! przebieg `Cancelled`; skrypt bez `Finished` trwa do anulowania. Do testów UI, Replay,
 //! `voice-dialog` i `broker-ui` (karty „czeka na zatwierdzenie”).
+//!
+//! v1: `start_with` przyjmuje opcje (zapisywane do asercji: [`FakeAgentRuntime::options`]);
+//! przebieg z `options.parent` jest podprzebiegiem rodzica (`children`, raport z dziećmi).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -12,8 +15,8 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
 use agent_runtime_contract::{
-    AgentRuntime, RunError, RunEvent, RunEventEnvelope, RunId, RunOutcome, RunSpec, RunStatus,
-    Steer,
+    AgentRuntime, RunError, RunEvent, RunEventEnvelope, RunId, RunOptions, RunOutcome, RunSpec,
+    RunStatus, Steer,
 };
 use async_trait::async_trait;
 use tokio::sync::{Notify, broadcast, watch};
@@ -170,6 +173,7 @@ pub struct FakeAgentRuntime {
     default: Mutex<RunScript>,
     runs: Mutex<BTreeMap<RunId, Arc<FakeRunState>>>,
     steers: Mutex<Vec<(RunId, Steer)>>,
+    options: Mutex<Vec<(RunId, RunOptions)>>,
     next: AtomicU64,
 }
 
@@ -194,6 +198,14 @@ impl FakeAgentRuntime {
         lock(&self.steers).clone()
     }
 
+    /// Opcje, z którymi wystartował przebieg (do asercji).
+    pub fn options(&self, run: &RunId) -> Option<RunOptions> {
+        lock(&self.options)
+            .iter()
+            .find(|(r, _)| r == run)
+            .map(|(_, o)| o.clone())
+    }
+
     fn state(&self, run: &RunId) -> Result<Arc<FakeRunState>, RunError> {
         lock(&self.runs)
             .get(run)
@@ -205,7 +217,14 @@ impl FakeAgentRuntime {
 #[async_trait]
 impl AgentRuntime for FakeAgentRuntime {
     async fn start(&self, spec: RunSpec) -> Result<RunId, RunError> {
+        self.start_with(spec, RunOptions::default()).await
+    }
+
+    async fn start_with(&self, spec: RunSpec, options: RunOptions) -> Result<RunId, RunError> {
         spec.validate().map_err(RunError::InvalidSpec)?;
+        if let Some(parent) = &options.parent {
+            self.state(parent)?;
+        }
         let n = self.next.fetch_add(1, Ordering::SeqCst) + 1;
         let run = RunId::new(format!("fake-run-{n}"));
         let script = lock(&self.scripts)
@@ -226,6 +245,7 @@ impl AgentRuntime for FakeAgentRuntime {
             run: run.clone(),
         });
         lock(&self.runs).insert(run.clone(), state.clone());
+        lock(&self.options).push((run.clone(), options));
         tokio::spawn(state.play(spec, script));
         Ok(run)
     }
@@ -283,5 +303,14 @@ impl AgentRuntime for FakeAgentRuntime {
 
     fn subscribe(&self, run: &RunId) -> Result<broadcast::Receiver<RunEventEnvelope>, RunError> {
         Ok(self.state(run)?.tx.subscribe())
+    }
+
+    fn children(&self, run: &RunId) -> Result<Vec<RunId>, RunError> {
+        self.state(run)?;
+        Ok(lock(&self.options)
+            .iter()
+            .filter(|(_, o)| o.parent.as_ref() == Some(run))
+            .map(|(r, _)| r.clone())
+            .collect())
     }
 }

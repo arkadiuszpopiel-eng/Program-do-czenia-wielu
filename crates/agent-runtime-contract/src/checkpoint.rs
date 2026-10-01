@@ -10,7 +10,10 @@ use providers_contract::{Message, ToolUse};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use safety_broker_contract::TaintSource;
+
 use crate::event::{RunOutcome, UsageTotals};
+use crate::options::RunOptions;
 use crate::spec::RunSpec;
 
 /// Wersja formatu checkpointu.
@@ -51,11 +54,28 @@ pub struct Checkpoint {
     pub paused: bool,
     /// Wynik (przebieg zakończony).
     pub finished: Option<RunOutcome>,
+    /// Opcje v1 (delegacja, Krytyczka, koperta uprawnień, pochodzenie); domyślne = v0.
+    #[serde(default)]
+    pub options: RunOptions,
+    /// Pierwsze źródło niezaufanej treści (taint dziedziczony przez podprzebiegi).
+    #[serde(default)]
+    pub taint_source: Option<TaintSource>,
+    /// Zużycie podprzebiegów (delegacje, Krytyczka) — liczone do budżetu tego przebiegu.
+    #[serde(default)]
+    pub delegated: UsageTotals,
 }
 
 impl Checkpoint {
     /// Stan początkowy dla specyfikacji.
     pub fn initial(run: RunId, spec: RunSpec) -> Self {
+        Self::with_options(run, spec, RunOptions::default())
+    }
+
+    /// Stan początkowy z opcjami v1 (taint i proweniencja odziedziczone po rodzicu).
+    pub fn with_options(run: RunId, spec: RunSpec, options: RunOptions) -> Self {
+        let taint_source = options.inherited_taint.clone();
+        let trusted_text = options.trusted_context.clone();
+        let untrusted_text = options.untrusted_context.clone();
         Self {
             version: CHECKPOINT_VERSION,
             run,
@@ -63,9 +83,9 @@ impl Checkpoint {
             spec,
             messages: Vec::new(),
             usage: UsageTotals::default(),
-            tainted: false,
-            trusted_text: String::new(),
-            untrusted_text: String::new(),
+            tainted: taint_source.is_some(),
+            trusted_text,
+            untrusted_text,
             pending: Vec::new(),
             recent_calls: Vec::new(),
             verifying: false,
@@ -73,6 +93,9 @@ impl Checkpoint {
             planned: false,
             paused: false,
             finished: None,
+            options,
+            taint_source,
+            delegated: UsageTotals::default(),
         }
     }
 }

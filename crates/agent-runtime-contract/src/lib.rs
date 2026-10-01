@@ -6,15 +6,27 @@
 //! stanu z dziennika ([`RunStatus::replay`]), sterowanie w locie ([`Steer`]), checkpointy
 //! ([`Checkpoint`], [`CheckpointStore`]) oraz trait [`AgentRuntime`]. Wyniki narzędzi są
 //! treścią niezaufaną — runtime delimituje je w prompcie i oznacza sesję (taint).
+//!
+//! v1 (F5, addytywnie): opcje przebiegu ([`RunOptions`]: obsada do delegacji i Krytyczki,
+//! koperta uprawnień [`RunGrant`] z atenuacją „potomek ≤ rodzic”, taint i proweniencja
+//! odziedziczone), raport końcowy ([`RunReport`]) i podprzebiegi ([`AgentRuntime::children`]).
+//! Zdarzenia `agent.*` bez nowych wariantów: delegacja to krok narzędzia [`DELEGATE_TOOL`],
+//! Krytyczka to krok `Verify` + `Verified`, oddanie zadania schedulerowi to `Paused`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod checkpoint;
 mod event;
+mod grant;
+mod options;
+mod report;
 mod spec;
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
+/// Współdzielone testy kontraktowe v1 (opcje, raport, równoległość) — `-impl` i `-fake`.
+#[cfg(feature = "contract-tests")]
+pub mod contract_tests_v1;
 
 pub use checkpoint::{
     CHECKPOINT_VERSION, Checkpoint, CheckpointError, CheckpointStore, MemCheckpointStore,
@@ -22,6 +34,11 @@ pub use checkpoint::{
 pub use event::{
     RunEvent, RunEventEnvelope, RunOutcome, RunStatus, StepKind, StepStatus, UsageTotals,
 };
+pub use grant::{RunGrant, budget_within, min_budget};
+pub use options::{
+    AgentTaskPayload, Crew, DELEGATE_GROUP, DELEGATE_TOOL, DelegateArgs, RunOptions,
+};
+pub use report::{RunReport, StepLine, VerificationLine, steps_before_delivery};
 pub use spec::{BudgetKind, RunBudget, RunSpec};
 
 pub use core_bus_contract::RunId;
@@ -98,6 +115,32 @@ pub trait AgentRuntime: Send + Sync {
         &self,
         run: &RunId,
     ) -> Result<tokio::sync::broadcast::Receiver<RunEventEnvelope>, RunError>;
+
+    /// v1: start z opcjami (delegacja, Krytyczka, koperta uprawnień, taint odziedziczony).
+    /// Domyślnie: opcje domyślne = [`AgentRuntime::start`], inne — `InvalidSpec` (runtime v0).
+    async fn start_with(&self, spec: RunSpec, options: RunOptions) -> Result<RunId, RunError> {
+        if options == RunOptions::default() {
+            self.start(spec).await
+        } else {
+            Err(RunError::InvalidSpec(
+                "ten runtime nie obsługuje opcji v1 (delegacja, Krytyczka, koperta)".into(),
+            ))
+        }
+    }
+
+    /// v1: podprzebiegi (delegacje, Krytyczka) w kolejności startu.
+    fn children(&self, run: &RunId) -> Result<Vec<RunId>, RunError> {
+        self.events(run).map(|_| Vec::new())
+    }
+
+    /// v1: raport końcowy (co zrobiono, kroki cofalne, koszty) z raportami podprzebiegów.
+    fn report(&self, run: &RunId) -> Result<RunReport, RunError> {
+        let mut report = RunReport::from_events(run.clone(), &self.events(run)?);
+        for child in self.children(run)? {
+            report.children.push(self.report(&child)?);
+        }
+        Ok(report)
+    }
 }
 
 #[cfg(test)]

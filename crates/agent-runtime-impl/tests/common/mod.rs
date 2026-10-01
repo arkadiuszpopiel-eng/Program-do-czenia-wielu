@@ -5,6 +5,8 @@
 
 use std::sync::Arc;
 
+pub mod v1;
+
 use agent_runtime_contract::{MemCheckpointStore, RunSpec, contract_tests::sample_spec};
 use agent_runtime_impl::{Runtime, RuntimeConfig, RuntimeDeps};
 use core_bus_fake::FakeBus;

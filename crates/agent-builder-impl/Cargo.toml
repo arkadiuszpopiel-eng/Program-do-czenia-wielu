@@ -1,0 +1,30 @@
+[package]
+name = "agent-builder-impl"
+description = "Kreator agentów (F5): moduł — katalog person z usługi personas, sufit autonomii z sesji, test na sucho, zapis po zatwierdzeniu do personas i biblioteki manifestów (JSON, zapis atomowy), zdarzenia agent_builder.* na magistrali"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+agent-builder-contract = { path = "../agent-builder-contract" }
+personas-contract = { path = "../personas-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+agent-builder-contract = { path = "../agent-builder-contract", features = ["contract-tests"] }
+personas-fake = { path = "../personas-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

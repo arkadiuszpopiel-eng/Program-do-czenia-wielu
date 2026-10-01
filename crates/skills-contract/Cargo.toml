@@ -1,0 +1,38 @@
+[package]
+name = "skills-contract"
+description = "Umiejętności agentek (F5, PLAN §9.5, §12.1 R1): wersjonowany przepis (opis, narzędzia i zdolności, parametry ze schematem, kroki/prompt, przykłady, testy akceptacyjne), instalacja i aktualizacja tylko po zatwierdzeniu właściciela, kwarantanna treści niezaufanej, uprawnienia ≤ roli wywołującej, wyszukiwanie deterministyczne + port LLM, eksport/import JSON z hashem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na -impl i -fake.
+contract-tests = ["agent-runtime-contract/contract-tests"]
+
+[dependencies]
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+personas-contract = { path = "../personas-contract" }
+memory-contract = { path = "../memory-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+semver.workspace = true
+thiserror.workspace = true
+# Hash treści umiejętności i paczek eksportu (ta sama wersja co w reszcie workspace; MIT OR Apache-2.0).
+sha2 = "0.10.9"
+
+[dev-dependencies]
+chrono.workspace = true
+proptest.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

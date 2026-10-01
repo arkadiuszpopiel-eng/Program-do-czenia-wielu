@@ -1,32 +1,24 @@
-//! Pętla przebiegu: punkt atomowy (sterowanie, pauza, anulowanie, budżety, checkpoint) →
-//! tura modelu → narzędzia → … → weryfikacja → wynik. Każdy krok jest zdarzeniem.
+//! Pętla przebiegu: punkt atomowy (granica kroku schedulera, sterowanie, pauza, anulowanie,
+//! budżety, checkpoint) → tura modelu → narzędzia → … → weryfikacja (Krytyczka albo
+//! samoweryfikacja) → wynik. Każdy krok jest zdarzeniem.
 
 use std::sync::Arc;
 
-use agent_runtime_contract::{
-    BudgetKind, Checkpoint, CheckpointStore, RunEvent, RunOutcome, Steer,
-};
-use providers_contract::{ContentBlock, Message, ModelProvider, Role};
-use tools_common_contract::Tool;
+use agent_runtime_contract::{BudgetKind, Checkpoint, RunEvent, RunOutcome, Steer};
+use providers_contract::{ContentBlock, Message, Role};
 
-use crate::RuntimeConfig;
 use crate::flow::append_capped;
-use crate::handle::RunHandle;
+use crate::handle::{Queued, RunHandle};
 use crate::prompt::{goal_message, skipped};
 use crate::registry::ToolRegistry;
-
-/// Zależności pętli.
-pub(crate) struct Shared {
-    pub(crate) provider: Arc<dyn ModelProvider>,
-    pub(crate) tools: Vec<Arc<dyn Tool>>,
-    pub(crate) store: Arc<dyn CheckpointStore>,
-    pub(crate) config: RuntimeConfig,
-}
+use crate::shared::{Exit, Hooks, Shared};
 
 /// Co dalej po turze.
 pub(crate) enum Next {
     Continue,
     Finish(RunOutcome),
+    /// Oddanie zadania schedulerowi (pauza/wywłaszczenie w punkcie atomowym).
+    Yield,
 }
 
 pub(crate) struct Engine {
@@ -34,8 +26,19 @@ pub(crate) struct Engine {
     pub(crate) handle: Arc<RunHandle>,
     pub(crate) cp: Checkpoint,
     pub(crate) registry: ToolRegistry,
+    pub(crate) hooks: Hooks,
     started: tokio::time::Instant,
     base_elapsed: u64,
+    /// Kroki ukończone przy ostatnim wywołaniu `StepGate::boundary`.
+    pub(crate) boundary_at: u32,
+    /// Koszt (nano-USD) przy ostatnim wywołaniu granicy.
+    pub(crate) cost_at_boundary: u64,
+    /// Odcisk ostatniego kroku narzędzia (wykrywanie pętli przez scheduler).
+    pub(crate) last_fingerprint: Option<u64>,
+    /// Scheduler zażądał oddania zadania w trakcie podprzebiegu.
+    pub(crate) yield_requested: bool,
+    /// Scheduler zatrzymał zadanie (`StepDirective::Stop`).
+    pub(crate) gate_stopped: bool,
 }
 
 impl Engine {
@@ -44,15 +47,24 @@ impl Engine {
         handle: Arc<RunHandle>,
         cp: Checkpoint,
         registry: ToolRegistry,
+        hooks: Hooks,
     ) -> Self {
         let base_elapsed = cp.usage.elapsed_ms;
+        let boundary_at = cp.usage.steps;
+        let cost_at_boundary = cp.usage.cost_nano_usd;
         Self {
             shared,
             handle,
             cp,
             registry,
+            hooks,
             started: tokio::time::Instant::now(),
             base_elapsed,
+            boundary_at,
+            cost_at_boundary,
+            last_fingerprint: None,
+            yield_requested: false,
+            gate_stopped: false,
         }
     }
 
@@ -83,22 +95,24 @@ impl Engine {
     pub(crate) fn exceeded(&self) -> Option<BudgetKind> {
         let b = &self.cp.spec.budget;
         let u = &self.cp.usage;
-        if u.steps >= b.max_steps {
+        let d = &self.cp.delegated;
+        if u.steps.saturating_add(d.steps) >= b.max_steps {
             return Some(BudgetKind::Steps);
         }
-        if u.tokens() >= b.max_tokens {
+        if u.tokens().saturating_add(d.tokens()) >= b.max_tokens {
             return Some(BudgetKind::Tokens);
         }
         if self.elapsed_ms() >= b.max_wall_ms {
             return Some(BudgetKind::Wall);
         }
+        let cost = u.cost_nano_usd.saturating_add(d.cost_nano_usd);
         match b.max_cost_micro_usd {
-            Some(max) if u.cost_nano_usd / 1000 >= max => Some(BudgetKind::Cost),
+            Some(max) if cost / 1000 >= max => Some(BudgetKind::Cost),
             _ => None,
         }
     }
 
-    /// Start świeży albo po restarcie: wiadomość celu, wyniki dla przerwanych wywołań.
+    /// Start świeży albo po restarcie/oddaniu: wiadomość celu, wyniki dla przerwanych wywołań.
     async fn prepare(&mut self) {
         if self.cp.messages.is_empty() {
             let spec = self.cp.spec.clone();
@@ -107,7 +121,10 @@ impl Engine {
                 Role::User,
                 vec![ContentBlock::text(goal_message(&spec.goal))],
             );
-            self.trust(&spec.goal);
+            if self.cp.options.parent.is_none() {
+                // Cel od właściciela jest zaufany; cel podprzebiegu napisał model rodzica.
+                self.trust(&spec.goal);
+            }
             if let Some(dir) = &spec.workdir {
                 self.trust(dir);
             }
@@ -119,6 +136,9 @@ impl Engine {
                     budget: spec.budget,
                 })
                 .await;
+            if let Some(source) = self.cp.taint_source.clone() {
+                self.handle.emit(RunEvent::Tainted { source }).await;
+            }
         } else {
             self.handle.emit(RunEvent::Resumed).await;
         }
@@ -136,15 +156,40 @@ impl Engine {
         }
     }
 
-    /// Punkt atomowy: sterowanie, pauza, anulowanie, budżety.
-    async fn atomic_point(&mut self) -> Option<RunOutcome> {
+    /// Czeka w pauzie (użytkownika) na wznowienie albo anulowanie; `false` = anulowano.
+    pub(crate) async fn wait_while_paused(&mut self) -> bool {
+        self.handle.emit(RunEvent::Paused).await;
+        loop {
+            tokio::select! {
+                () = self.handle.wake.notified() => {}
+                () = self.handle.cancel.cancelled() => return false,
+            }
+            for op in self.handle.take_ops() {
+                self.apply_op(op);
+            }
+            if self.handle.cancel.is_cancelled() {
+                return false;
+            }
+            if !self.cp.paused {
+                self.handle.emit(RunEvent::Resumed).await;
+                return true;
+            }
+        }
+    }
+
+    /// Punkt atomowy przed turą modelu: granica schedulera, sterowanie, pauza, anulowanie, budżety.
+    async fn atomic_point(&mut self) -> Next {
+        match self.gate_boundary().await {
+            Next::Continue => {}
+            other => return other,
+        }
         loop {
             let was_paused = self.cp.paused;
             for s in self.handle.drain_steer() {
                 self.apply_steer(s).await;
             }
             if self.handle.cancel.is_cancelled() {
-                return Some(RunOutcome::Cancelled);
+                return Next::Finish(RunOutcome::Cancelled);
             }
             if was_paused && !self.cp.paused {
                 self.handle.emit(RunEvent::Resumed).await;
@@ -163,15 +208,29 @@ impl Engine {
         }
         if let Some(budget) = self.exceeded() {
             self.handle.emit(RunEvent::BudgetExceeded { budget }).await;
-            return Some(RunOutcome::BudgetExceeded { budget });
+            return Next::Finish(RunOutcome::BudgetExceeded { budget });
         }
-        None
+        Next::Continue
     }
 
-    async fn apply_steer(&mut self, s: Steer) {
+    pub(crate) fn apply_op(&mut self, s: Steer) {
         match s {
+            Steer::PauseAfterCurrent => self.cp.paused = true,
+            Steer::Resume => self.cp.paused = false,
+            Steer::Cancel => self.handle.cancel.cancel(),
+            Steer::Message(_) | Steer::ChangeGoal(_) => {}
+        }
+    }
+
+    async fn apply_steer(&mut self, q: Queued) {
+        let who = if q.voice {
+            "Wiadomość głosowa od właściciela w trakcie zadania"
+        } else {
+            "Wiadomość od właściciela w trakcie zadania"
+        };
+        match q.steer {
             Steer::Message(m) => {
-                let text = format!("[Wiadomość od właściciela w trakcie zadania] {m}");
+                let text = format!("[{who}] {m}");
                 self.push(Role::User, vec![ContentBlock::text(text)]);
                 self.trust(&m);
                 self.handle.emit(RunEvent::Steered { message: m }).await;
@@ -185,13 +244,11 @@ impl Engine {
                 self.cp.spec.goal = g.clone();
                 self.handle.emit(RunEvent::Steered { message: g }).await;
             }
-            Steer::PauseAfterCurrent => self.cp.paused = true,
-            Steer::Resume => self.cp.paused = false,
-            Steer::Cancel => self.handle.cancel.cancel(),
+            op => self.apply_op(op),
         }
     }
 
-    async fn finish(&mut self, outcome: RunOutcome) {
+    async fn finish(&mut self, outcome: RunOutcome) -> Exit {
         self.cp.finished = Some(outcome.clone());
         self.cp.pending.clear();
         self.checkpoint().await;
@@ -200,19 +257,38 @@ impl Engine {
                 outcome: outcome.clone(),
             })
             .await;
-        self.handle.set_outcome(outcome);
+        self.handle.set_outcome(outcome.clone());
+        if self.gate_stopped {
+            Exit::Stopped(outcome)
+        } else {
+            Exit::Finished(outcome)
+        }
+    }
+
+    /// Oddanie schedulerowi: checkpoint, `Paused` w dzienniku, uchwyt czeka na ponowny start.
+    async fn suspend(&mut self) -> Exit {
+        self.cp.pending.clear();
+        self.checkpoint().await;
+        self.handle.emit(RunEvent::Paused).await;
+        self.handle.set_running(false);
+        Exit::Yielded
     }
 
     /// Cała pętla przebiegu.
-    pub(crate) async fn run(mut self) {
+    pub(crate) async fn run(mut self) -> Exit {
+        let initial = std::mem::take(&mut self.hooks.initial_steering);
+        self.queue_task_steering(initial);
         self.prepare().await;
         loop {
-            if let Some(outcome) = self.atomic_point().await {
-                return self.finish(outcome).await;
+            match self.atomic_point().await {
+                Next::Continue => {}
+                Next::Finish(outcome) => return self.finish(outcome).await,
+                Next::Yield => return self.suspend().await,
             }
             match self.model_turn().await {
                 Next::Continue => self.checkpoint().await,
                 Next::Finish(outcome) => return self.finish(outcome).await,
+                Next::Yield => return self.suspend().await,
             }
         }
     }
