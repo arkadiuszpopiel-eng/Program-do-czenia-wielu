@@ -1,0 +1,33 @@
+[package]
+name = "mcp-impl"
+description = "Klient MCP (stdio) z odciskiem opisów narzędzi i serwer MCP Alfy v0 (schowek, okna, approve) przez stdio-proxy i kanał lokalny z tokenem — bez TCP"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "alfa-mcp-proxy"
+path = "src/bin/alfa-mcp-proxy.rs"
+
+[dependencies]
+mcp-contract = { path = "../mcp-contract" }
+platform-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+# `process` dodaje signal-hook-registry 1.4.8 (MIT OR Apache-2.0) na Unix.
+tokio = { workspace = true, features = ["net", "io-util", "io-std", "process", "rt", "time", "sync"] }
+
+[dev-dependencies]
+mcp-contract = { path = "../mcp-contract", features = ["contract-tests"] }
+mcp-fake = { path = "../mcp-fake" }
+platform-fake = { path = "../platform-fake" }
+core-registry-contract.workspace = true
+tokio = { workspace = true, features = ["net", "io-util", "rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true

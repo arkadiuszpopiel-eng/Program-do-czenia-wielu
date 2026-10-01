@@ -1,0 +1,17 @@
+# Manifest modułu mostów CLI (docs/modules/agent-backends/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "agent-backends"
+version = "0.0.1"
+kind = "service"
+provides = ["agent-backends-contract@1"]
+requires = ["core-bus-contract@1", "compliance-contract@1", "mcp-contract@1"]
+capabilities = ["process.spawn(cli-bridge)", "fs.write(worktrees)"]
+lifecycle = "on-demand"
+isolation = "process"
+
+[budget]
+ram_mb = 8
+cpu_pct = 2
+
+[health]
+check = "ping"
+interval_s = 60

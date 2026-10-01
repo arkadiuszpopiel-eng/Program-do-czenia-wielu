@@ -1,0 +1,23 @@
+[package]
+name = "mcp-fake"
+description = "Atrapy MCP: zewnętrzny serwer w procesie ze zmiennym opisem narzędzi i host mostów z kanałem lokalnym (bez TCP) i ręcznym zegarem TTL"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+mcp-contract = { path = "../mcp-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+tokio = { workspace = true, features = ["net", "io-util", "rt", "sync"] }
+
+[dev-dependencies]
+mcp-contract = { path = "../mcp-contract", features = ["contract-tests"] }
+tokio = { workspace = true, features = ["net", "io-util", "rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true
