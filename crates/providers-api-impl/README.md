@@ -11,7 +11,7 @@ manifest `module.toml` (`providers-api`, `inproc`, `lazy`).
 | `OpenAiProvider` + `native_chat()`/`compatible()` | Chat Completions | `max_completion_tokens`/`max_tokens`, `stream_options.include_usage`, `reasoning_content` → myślenie, równoległe narzędzia, `insufficient_quota` → `Auth` |
 | `build_provider(CatalogEntry, AccountProfile)` | wg `compat` | adapter generyczny z `providers-catalog/<id>.toml`: `base_url` (konto > katalog > natywny domyślny), auth, prywatność/jurysdykcja, możliwości modelu domyślnego z tribooli |
 
-Wspólny silnik (`engine.rs`, `run.rs`): zadanie tła na żądanie; ponawianie z backoffem i jitterem
+Wspólny silnik (wydzielony do `lib-openai-compat`, dzielony z `providers-local-impl`): zadanie tła na żądanie; ponawianie z backoffem i jitterem
 **tylko przed pierwszym tokenem** i tylko dla odrzuceń idempotentnych (429/5xx/529, błąd połączenia;
 `retry-after` ≤ 1 s, budżet 1,5 s); limity connect / first-token / idle; anulowanie i upuszczenie
 strumienia zrywają połączenie (test: < 100 ms po stronie serwera); klucz z `SecretSource` w chwili

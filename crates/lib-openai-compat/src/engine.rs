@@ -1,5 +1,9 @@
 //! Wspólny silnik HTTP adapterów: ponawianie przed pierwszym tokenem, limity czasu, SSE,
 //! anulowanie (zadanie w tle trzyma połączenie; anulowanie zrywa je natychmiast), zdrowie.
+//!
+//! Adapter dostarcza [`WireCodec`] (budowa żądania, dekoder SSE, klasyfikacja błędów HTTP);
+//! [`Engine`] robi resztę. Używają go `providers-api-impl` (API chmurowe) i
+//! `providers-local-impl` (`llama-server` na `127.0.0.1`).
 
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -16,14 +20,14 @@ use crate::sse::SseEvent;
 
 /// Opcje budowy żądania dla kolejnej próby.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub(crate) struct BuildOptions {
+pub struct BuildOptions {
     /// Pomiń bloki myślenia (jednorazowe odzyskanie po odrzuceniu podpisu).
     pub strip_thinking: bool,
 }
 
 /// Żądanie w formacie dostawcy.
 #[derive(Debug, Clone)]
-pub(crate) struct WireRequest {
+pub struct WireRequest {
     /// Ścieżka względem `base_url`.
     pub path: &'static str,
     /// Ciało JSON.
@@ -33,7 +37,7 @@ pub(crate) struct WireRequest {
 }
 
 /// Dekoder zdarzeń SSE dostawcy (stan jednej odpowiedzi).
-pub(crate) trait StreamDecoder: Send + 'static {
+pub trait StreamDecoder: Send + 'static {
     /// Zdarzenia neutralne z jednego zdarzenia SSE (może zawierać zdarzenie końcowe).
     fn on_event(&mut self, event: SseEvent) -> Vec<ProviderEvent>;
     /// Koniec strumienia bajtów.
@@ -41,7 +45,7 @@ pub(crate) trait StreamDecoder: Send + 'static {
 }
 
 /// Kodek formatu dostawcy.
-pub(crate) trait WireCodec: Send + Sync + 'static {
+pub trait WireCodec: Send + Sync + 'static {
     /// Typ dekodera.
     type Decoder: StreamDecoder;
     /// Buduje żądanie strumieniowe.
@@ -68,21 +72,26 @@ struct Stats {
 }
 
 /// Silnik jednego endpointu.
-pub(crate) struct Engine<C> {
+pub struct Engine<C> {
+    /// Profil dostawcy (tożsamość, prywatność, cennik).
     pub profile: ProviderProfile,
+    /// Endpoint, uwierzytelnienie, limity czasu, ponawianie.
     pub http: HttpConfig,
+    /// Źródło klucza (odczyt w chwili wywołania).
     pub key: Arc<dyn SecretSource>,
+    /// Kodek formatu dostawcy.
     pub codec: C,
     pub(crate) client: reqwest::Client,
     stats: Mutex<Stats>,
 }
 
 /// Strumień z jednym zdarzeniem.
-pub(crate) fn single(event: ProviderEvent) -> ProviderStream {
+pub fn single(event: ProviderEvent) -> ProviderStream {
     Box::pin(futures_util::stream::iter([event]))
 }
 
-pub(crate) fn cancelled() -> ProviderEvent {
+/// Zdarzenie końcowe anulowania.
+pub fn cancelled() -> ProviderEvent {
     ProviderEvent::stop(StopReason::Cancelled)
 }
 
@@ -90,6 +99,7 @@ pub(crate) fn cancelled() -> ProviderEvent {
 const MAX_ERROR_MESSAGE: usize = 500;
 
 impl<C: WireCodec> Engine<C> {
+    /// Silnik z klientem HTTP (limit połączenia z `http.timeouts.connect`).
     pub fn new(
         profile: ProviderProfile,
         http: HttpConfig,
@@ -115,6 +125,7 @@ impl<C: WireCodec> Engine<C> {
         self.stats.lock().unwrap_or_else(|p| p.into_inner())
     }
 
+    /// Zdrowie z historii wywołań (`Unconfigured`, gdy brak wymaganego klucza).
     pub fn health(&self) -> ProviderHealth {
         if self.http.auth.requires_key() && self.key.api_key().is_none_or(|k| k.is_empty()) {
             return ProviderHealth {

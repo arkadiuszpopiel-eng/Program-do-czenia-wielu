@@ -1,4 +1,4 @@
-# model-residency — SPEC (szkic v0)
+# model-residency — SPEC (v1)
 
 ## Cel
 Zarządca rezydencji modeli w RAM/VRAM: limity per maszyna, dzierżawy (lease) dla STT/TTS/LLM/embeddera/VAD, kolejność wymiany (STT+TTS+LLM nie zawsze naraz), zwalnianie po bezczynności, brak wyścigu o VRAM z grami (pełny ekran → STT/LLM na CPU lub chmurę), tryb baterii (PLAN §3.4, §3.5, §6.3).
@@ -6,22 +6,34 @@ Zarządca rezydencji modeli w RAM/VRAM: limity per maszyna, dzierżawy (lease) d
 ## Fala i priorytet
 F2. P0. (W F1 `providers-local` używa prostego limitu; migracja do lease w F2.)
 
-## Kontrakt (szkic Rust)
+## Kontrakt (v1 — `crates/model-residency-contract`)
 ```rust
-// model-residency-contract — SZKIC
-pub struct Budget { pub vram_mb: u32, pub ram_mb: u32, pub reserved_desktop_vram_mb: u32 /* 512–1024 */ }
-pub struct LeaseRequest { pub owner: ModuleId, pub model: ModelId, pub vram_mb: u32, pub ram_mb: u32, pub priority: Priority /* VoiceRt > Conversation > Background */,
-                          pub placement: Placement /* GpuPreferred | CpuOnly | Any */, pub idle_unload: Duration }
-pub struct Lease { pub id: LeaseId, pub placement: Placement, pub granted: Timestamp }
+pub struct Budget { pub vram_mb: u32 /* po rezerwie pulpitu */, pub ram_mb: u32, pub desktop_reserve_mb: u32, pub stt_tts_exclusive: bool }
+pub struct LeaseRequest { pub owner: String, pub model: String, pub role: ModelRole /* Stt|Tts|Llm|Embedder|Vad */,
+                          pub priority: Priority /* VoiceRt > Conversation > Background */, pub placement: Placement /* GpuOnly|GpuPreferred|CpuOnly */,
+                          pub vram_mb: u32, pub ram_mb: u32 /* na GPU */, pub cpu_ram_mb: u32 /* na CPU */, pub idle_unload_ms: u64 }
+pub struct Grant { pub lease: Lease /* id, device Gpu|Cpu, in_use, last_used */, pub evicted: Vec<Revocation> }
 pub trait Residency: Send + Sync {
-    fn acquire(&self, r: LeaseRequest) -> Result<Lease, ResidencyError /* Wait { eta } | Evictable { victims } | Denied */>;
-    fn release(&self, id: LeaseId);
-    fn touch(&self, id: LeaseId);                          // odświeża licznik bezczynności
-    fn snapshot(&self) -> ResidencyState;                  // co jest gdzie, ile wolne
-    fn set_mode(&self, m: Mode /* Normal | Gaming | Battery | EmulatedBaseline(Budget) */);
+    fn acquire(&self, r: LeaseRequest) -> Result<Grant, ResidencyError /* Wait{blockers} | TooLarge | Gaming | Battery | Invalid */>;
+    fn release(&self, id: LeaseId) -> Result<(), ResidencyError>;
+    fn touch(&self, id: LeaseId) -> Result<(), ResidencyError>;
+    fn set_in_use(&self, id: LeaseId, in_use: bool) -> Result<(), ResidencyError>;
+    fn lease(&self, id: LeaseId) -> Option<Lease>;
+    fn snapshot(&self) -> ResidencyState;
+    fn set_mode(&self, m: Mode /* { gaming, battery, emulated: Option<Budget> } */) -> Vec<Change>;
+    fn set_budget(&self, b: Budget) -> Vec<Change>;
+    fn reap_idle(&self) -> Vec<Revocation>;
+    fn listen(&self, owner: &str, l: Arc<dyn LeaseListener /* revoked, moved */>);
+    fn refresh_mode(&self, source: &dyn ModeSource /* fullscreen_active, on_battery */) -> Vec<Change>;
 }
 ```
-Zdarzenia: `residency.granted/released/evicted` (kto, dlaczego), `residency.mode_changed`, `residency.oom_avoided`, `residency.budget_exceeded`.
+Reguły (czysta maszyna stanów `LeaseTable`, wspólna dla `-impl`/`-fake`): najpierw wolne miejsce, potem eksmisja
+ustępujących — **LRU z priorytetami**: dzierżawa ustępuje, gdy ma niższy priorytet albo równy i nie jest w użyciu
+(`in_use`); `GpuPreferred`: GPU bez eksmisji → GPU z eksmisją → CPU; `Wait` tylko na blokery o priorytecie ≥ żądania.
+Tryb (flagi łączą się): gra → nowe `GpuOnly` odrzucane, `GpuPreferred` na CPU, istniejące dzierżawy GPU przenoszone na CPU
+(`moved`) albo eksmitowane; bateria → tło eksmitowane i odrzucane; emulacja → budżet = min(rzeczywisty, emulowany).
+
+Zdarzenia: `residency.granted/released/evicted/moved`, `residency.mode_changed`, `residency.oom_avoided`, `residency.budget_exceeded`.
 
 ## Zależności
 `core-bus/config/log-contract`, `device-profile-contract` (VRAM, bateria, pełny ekran), `platform-windows-contract` (pomiar użycia VRAM/RAM). Klienci: `voice-stt/tts/vad/turn`, `providers-local`, `search` (embedder).
@@ -44,7 +56,7 @@ Brak.
 RAM ≤ 1 MB; `acquire` ≤ 1 ms (bez ładowania — ładuje klient po przyznaniu).
 
 ## Konfiguracja (klucze TOML)
-Per maszyna: `[machine.residency] vram_mb = "auto"`, `ram_mb = "auto"`, `desktop_reserve_mb = 768`, `gaming_mode = "auto"`, `battery_mode = "auto"`, `idle_unload_default = "10m"`; wspólne: `[residency] priority_order = ["voice_rt", "conversation", "background"]`.
+Per maszyna: `[machine.residency] vram_mb = "auto"`, `ram_mb = "auto"`, `desktop_reserve_mb = 768`, `gaming_mode = "auto" | "off"`, `battery_mode = "auto" | "off"`, `tick = "30s"` (bezczynność i odświeżenie trybu; limit bezczynności podaje klient w `idle_unload_ms`); wspólne: `[residency] priority_order = ["voice_rt", "conversation", "background"]`.
 
 ## Wkład do UI
 Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU OOM" (§14.4), Zdrowie systemu (F8).

@@ -8,7 +8,7 @@ use reqwest::header::HeaderMap;
 use serde_json::Value;
 
 /// URL obrazu: `data:` dla base64, bez zmian dla URL; referencje muszą być rozwiązane wcześniej.
-pub(crate) fn image_url(source: &ImageSource) -> Result<String, ProviderError> {
+pub fn image_url(source: &ImageSource) -> Result<String, ProviderError> {
     match source {
         ImageSource::Base64 { media_type, data } => Ok(format!("data:{media_type};base64,{data}")),
         ImageSource::Url { url } => Ok(url.clone()),
@@ -19,7 +19,7 @@ pub(crate) fn image_url(source: &ImageSource) -> Result<String, ProviderError> {
 }
 
 /// Tekst wyniku narzędzia (obrazy w wynikach nie są przenoszone przez format funkcji).
-pub(crate) fn tool_result_text(parts: &[ToolResultPart], is_error: bool) -> String {
+pub fn tool_result_text(parts: &[ToolResultPart], is_error: bool) -> String {
     let text: Vec<&str> = parts
         .iter()
         .map(|p| match p {
@@ -38,7 +38,7 @@ pub(crate) fn tool_result_text(parts: &[ToolResultPart], is_error: bool) -> Stri
 }
 
 /// Wysiłek na drucie (`reasoning_effort` / `reasoning.effort`): poziomy powyżej `high` → `high`.
-pub(crate) fn effort(e: Effort) -> &'static str {
+pub fn effort(e: Effort) -> &'static str {
     match e {
         Effort::Low => "low",
         Effort::Medium => "medium",
@@ -47,7 +47,7 @@ pub(crate) fn effort(e: Effort) -> &'static str {
 }
 
 /// Normalizacja zużycia: `input_tokens` bez cache (OpenAI wlicza cache do `prompt_tokens`).
-pub(crate) fn usage(prompt: u64, cached: u64, completion: u64) -> Usage {
+pub fn usage(prompt: u64, cached: u64, completion: u64) -> Usage {
     Usage {
         input_tokens: prompt.saturating_sub(cached),
         output_tokens: completion,
@@ -57,7 +57,7 @@ pub(crate) fn usage(prompt: u64, cached: u64, completion: u64) -> Usage {
 }
 
 /// Mapowanie `finish_reason` Chat Completions.
-pub(crate) fn finish_reason(reason: &str) -> StopReason {
+pub fn finish_reason(reason: &str) -> StopReason {
     match reason {
         "length" => StopReason::MaxTokens,
         "tool_calls" | "function_call" => StopReason::ToolUse,
@@ -74,7 +74,7 @@ fn retry_after(headers: &HeaderMap) -> Option<u64> {
 }
 
 /// Klasyfikacja błędu z ciała `{"error": {"message", "type", "code"}}`.
-pub(crate) fn error_from_value(
+pub fn error_from_value(
     status: Option<u16>,
     retry_after_ms: Option<u64>,
     err: &Value,
@@ -114,7 +114,7 @@ pub(crate) fn error_from_value(
 }
 
 /// Klasyfikacja odpowiedzi HTTP z błędem.
-pub(crate) fn classify(status: u16, headers: &HeaderMap, body: &str) -> ProviderError {
+pub fn classify(status: u16, headers: &HeaderMap, body: &str) -> ProviderError {
     let ra = retry_after(headers);
     let request_id = headers
         .get("x-request-id")

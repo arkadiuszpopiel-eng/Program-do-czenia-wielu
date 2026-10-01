@@ -1,0 +1,23 @@
+# Manifest modeli lokalnych (providers-local, ADR 0014, PLAN §1.2).
+# Zasady: tylko GGUF, bez kwantów IQ (crashe RDNA3/Vulkan), 3–4,5B Q4_K_M domyślnie.
+# `sha256 = ""` oznacza hash jeszcze nieznany w repozytorium: menedżer pobierania liczy go
+# przy pierwszym pobraniu, zapisuje obok pliku (`<plik>.sha256`, zaufanie przy pierwszym
+# użyciu) i ostrzega w logach; kolejne ładowania sprawdzają rozmiar i zapisany hash.
+# Wpisanie hasha tutaj włącza pełną weryfikację łańcucha dostaw (PLAN §8.7).
+schema_version = 1
+
+[[model]]
+id = "bielik-4.5b-v3.0-instruct-q4_k_m"
+name = "Bielik 4.5B v3.0 Instruct (Q4_K_M)"
+url = "https://huggingface.co/speakleash/Bielik-4.5B-v3.0-Instruct-GGUF/resolve/main/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf"
+file = "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf"
+size_mb = 2900
+sha256 = ""
+params_b = 4.6
+quant = "Q4_K_M"
+layers = 60
+ctx = 32768
+vram_mb = 3400
+ram_mb = 3600
+tools = true
+license = "Apache-2.0"

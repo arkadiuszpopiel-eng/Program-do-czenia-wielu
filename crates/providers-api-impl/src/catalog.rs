@@ -10,8 +10,10 @@ use providers_contract::{
 use serde::Deserialize;
 
 use crate::anthropic::{ANTHROPIC_BASE_URL, AnthropicOptions, AnthropicProvider};
-use crate::config::{AuthScheme, ConfigError, HttpConfig, ProviderProfile, RetryPolicy, Timeouts};
 use crate::openai::{OPENAI_BASE_URL, OpenAiApi, OpenAiOptions, OpenAiProvider};
+use lib_openai_compat::{
+    AuthScheme, ConfigError, HttpConfig, ProviderProfile, RetryPolicy, Timeouts,
+};
 
 /// Wartość `true`/`false`/`"unknown"` z katalogu.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]

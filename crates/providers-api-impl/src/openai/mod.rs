@@ -1,7 +1,5 @@
 //! Adapter OpenAI (Chat Completions i Responses API) oraz generyczny „endpoint zgodny z OpenAI".
 
-mod chat;
-mod common;
 mod responses;
 
 use std::sync::Arc;
@@ -16,10 +14,11 @@ use providers_contract::{
 use reqwest::header::HeaderMap;
 use serde_json::{Value, json};
 
-use crate::config::{AuthScheme, ConfigError, HttpConfig, ProviderProfile};
-use crate::engine::{BuildOptions, Engine, StreamDecoder, WireCodec, WireRequest};
 use crate::registry::{ModelRegistry, cost};
-use crate::sse::SseEvent;
+use lib_openai_compat::chat::{self, ChatOptions};
+use lib_openai_compat::sse::SseEvent;
+use lib_openai_compat::{AuthScheme, ConfigError, HttpConfig, ProviderProfile};
+use lib_openai_compat::{BuildOptions, Engine, StreamDecoder, WireCodec, WireRequest};
 
 /// Oficjalny endpoint OpenAI (z `/v1`; profil może nadpisać).
 pub const OPENAI_BASE_URL: &str = "https://api.openai.com/v1";
@@ -33,24 +32,8 @@ pub enum OpenAiApi {
     Responses,
 }
 
-/// Nazwa pola limitu wyjścia w Chat Completions.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MaxTokensField {
-    /// `max_completion_tokens` (OpenAI, modele rozumujące).
-    MaxCompletionTokens,
-    /// `max_tokens` (większość endpointów zgodnych).
-    MaxTokens,
-}
-
-impl MaxTokensField {
-    /// Nazwa pola.
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::MaxCompletionTokens => "max_completion_tokens",
-            Self::MaxTokens => "max_tokens",
-        }
-    }
-}
+/// Nazwa pola limitu wyjścia w Chat Completions (wspólna z `lib-openai-compat`).
+pub use lib_openai_compat::MaxTokensField;
 
 /// Opcje adaptera OpenAI.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,6 +49,14 @@ pub struct OpenAiOptions {
 }
 
 impl OpenAiOptions {
+    /// Opcje formatu Chat Completions (wspólny kodek `lib-openai-compat`).
+    pub fn chat(&self) -> ChatOptions {
+        ChatOptions {
+            max_tokens_field: self.max_tokens_field,
+            stream_usage: self.stream_usage,
+        }
+    }
+
     /// Oficjalne OpenAI przez Responses API.
     pub fn native() -> Self {
         Self {
@@ -130,7 +121,7 @@ impl WireCodec for OpenAiCodec {
         let (path, body) = match self.options.api {
             OpenAiApi::ChatCompletions => (
                 "/chat/completions",
-                chat::build_body(req, &caps, &self.profile, &self.options)?,
+                chat::build_body(req, &caps, &self.profile, &self.options.chat())?,
             ),
             OpenAiApi::Responses => (
                 "/responses",
@@ -154,7 +145,7 @@ impl WireCodec for OpenAiCodec {
     }
 
     fn classify(&self, status: u16, headers: &HeaderMap, body: &str) -> ProviderError {
-        common::classify(status, headers, body)
+        lib_openai_compat::common::classify(status, headers, body)
     }
 }
 

@@ -1,4 +1,4 @@
-# providers-local — SPEC (szkic v0)
+# providers-local — SPEC (v1, F1)
 
 ## Cel
 Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie modelu 3–4,5B Q4_K_M w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
@@ -6,24 +6,31 @@ Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proce
 ## Fala i priorytet
 F1 (chat + embeddings lokalne, pobieranie modelu, Vulkan/CUDA/CPU). P0 — wymagany w MVP.
 
-## Kontrakt (szkic Rust)
-```rust
-// providers-local-contract — SZKIC (implementuje ModelProvider z providers-api-contract / providers-common)
-pub struct LocalModel { pub id: ModelId, pub file: PathBuf, pub sha256: Hash, pub params_b: f32, pub quant: Quant /* Q4_K_M | Q5_0 | ... (bez IQ) */,
-                        pub ctx: u32, pub vram_mb_est: u32, pub ram_mb_est: u32, pub license: String }
-pub enum Backend { Vulkan, Cuda, Cpu }
-pub trait LocalProvider: ModelProvider {
-    fn models(&self) -> Vec<LocalModel>;
-    fn download(&self, spec: ModelSpec, cancel: CancelToken) -> BoxStream<DownloadProgress>;  // wznawialne, hash po pobraniu
-    fn load(&self, id: ModelId, backend: Backend, budget: ResidencyLease) -> Result<()>;
-    fn unload(&self, id: ModelId) -> Result<()>;
-    fn bench(&self, id: ModelId) -> Result<Bench /* tok/s, ttft */>;
-}
-```
-Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/unloaded`, `local.backend.fallback` (Vulkan → CPU), `local.sidecar.crashed`.
+## Kontrakt (v1)
+Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates/providers-local-impl`
+(`LocalProvider`, `Sidecar`, `Downloader`, `LocalModule`). Osobny `providers-local-contract` nie jest potrzebny w F1
+(UI/onboarding używa modułu z kompozycji); do rozważenia, gdy inne moduły będą sterować pobieraniem.
+- **Protokół sidecara (rozstrzygnięte):** `llama-server` (OpenAI-compatible HTTP) na `127.0.0.1`, losowy port i losowy
+  `--api-key` (192 bity, tylko w pamięci, redagowany w logach) per uruchomienie; nigdy `0.0.0.0`. Strumień przez wspólny
+  silnik `lib-openai-compat` (ten sam co `providers-api`). Job Object / brak tokenu egress — przez `platform-windows` (F2).
+- **Cykl życia:** start na żądanie (jeden naraz), zdrowie `GET /health`, `Started` od razu po przyjęciu żądania (zimny
+  start modelu nie jest milczeniem dla Routera), restart po awarii z limitem (`max_restarts` w `restart_window`),
+  fallback GPU → CPU (`-ngl 0`), zwolnienie po bezczynności, `kill_on_drop`.
+- **Argumenty z profilu urządzenia:** backend (Vulkan/CUDA/CPU = osobne pliki `llama-server`; bateria lub słaby sprzęt
+  → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie warstwy, CPU → 0) albo proporcjonalnie do budżetu VRAM,
+  `-c`, `--threads` (rdzenie fizyczne), `--alias`, `-np 1`, `--jinja` (narzędzia).
+- **Modele:** `models.toml` (GGUF, URL HF, rozmiar, SHA-256, kwant, warstwy, kontekst, szacunki VRAM/RAM, licencja);
+  walidacja: `.gguf`, bez kwantów IQ, https. Domyślny: Bielik 4.5B v3.0 Instruct Q4_K_M.
+- **Pobieranie:** wznawianie HTTP Range z pliku `.part` (≤ 3 automatyczne wznowienia), SHA-256; zły hash → błąd
+  i usunięcie `.part`. Hash nieznany w manifeście (`sha256 = ""`) → zapis przy pierwszym pobraniu (`<plik>.sha256`,
+  zaufanie przy pierwszym użyciu) + ostrzeżenie w logach; model bez zapisanego hasha = niezainstalowany.
+- Bez pobranego modelu dostawca jest `Unconfigured` (Router go pomija).
+
+Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/unloaded`, `local.backend.fallback`
+(GPU → CPU), `local.sidecar.crashed` — bez treści rozmowy i bez klucza.
 
 ## Zależności
-`providers-api-contract` (ModelProvider), `core-bus/config/log-contract`, `model-residency-contract` (lease VRAM/RAM — F2; w F1 prosty limit), `device-profile-contract` (backend), `platform-windows-contract` (spawn sidecar, Job Object). Zewnętrzne: llama.cpp (wersja przypięta, `docs/vendor/llama-cpp.md`).
+`providers-contract` (ModelProvider), `lib-openai-compat` (silnik HTTP/SSE), `core-bus/registry-contract`, `model-residency-contract` (dzierżawa VRAM/RAM; bez zarządcy — budżet z `device-profile`), `device-profile-contract` (backend, VRAM, rdzenie), `platform-windows-contract` (Job Object — F2). Zewnętrzne: llama.cpp (wersja przypięta, `docs/vendor/llama-cpp.md`).
 
 ## Niezmienniki
 - Model tylko GGUF z hashem (łańcuch dostaw, PLAN §8.7); nieznany hash = brak ładowania.
@@ -57,5 +64,7 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 `providers-local-fake`: udaje sidecar (skryptowane odpowiedzi, tok/s z wirtualnym zegarem), pobieranie z lokalnych fixture'ów, symulacja OOM/crash.
 
 ## Otwarte pytania
-- Wybór modelu domyślnego (Bielik 4.5B vs inne) i próg jakości tool-use po polsku — pomiar F3; do ustalenia w SPEC v1.
-- Protokół sidecara: własny JSON-RPC vs `llama-server` HTTP na localhost (ryzyko: nasłuch TCP) — do ustalenia w SPEC v1 (preferencja: pipe).
+- Próg jakości tool-use po polsku na Bielik 4.5B — pomiar F3.
+- SHA-256 i dokładny rozmiar GGUF Bielika — wpisać do `models.toml` po pierwszym pobraniu (pełna weryfikacja łańcucha dostaw).
+- Nasłuch TCP na `127.0.0.1` z kluczem zamiast named pipe (llama-server nie obsługuje pipe) — ryzyko ograniczone (localhost,
+  losowy port i klucz per uruchomienie); Job Object bez sieci dla sidecara — F2 przez `platform-windows`.

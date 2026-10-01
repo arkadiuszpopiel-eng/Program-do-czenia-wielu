@@ -8,7 +8,7 @@ use providers_contract::{
     ProviderCapabilities, Usage,
 };
 
-use crate::config::ProviderProfile;
+use lib_openai_compat::ProviderProfile;
 
 /// Funkcja „znanych modeli" adaptera.
 pub(crate) type KnownModels = fn(&str) -> Option<ModelCapabilities>;

@@ -11,10 +11,10 @@ use providers_contract::{
 };
 use serde_json::{Map, Value, json};
 
-use super::common::{effort, error_from_value, image_url, tool_result_text, usage};
-use crate::config::ProviderProfile;
-use crate::engine::StreamDecoder;
-use crate::sse::SseEvent;
+use lib_openai_compat::ProviderProfile;
+use lib_openai_compat::StreamDecoder;
+use lib_openai_compat::common::{effort, error_from_value, image_url, tool_result_text, usage};
+use lib_openai_compat::sse::SseEvent;
 
 fn render(msg: &Message, own: &ProviderId, out: &mut Vec<Value>) -> Result<(), ProviderError> {
     match msg.role {

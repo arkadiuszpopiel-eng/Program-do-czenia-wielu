@@ -10,11 +10,38 @@ use providers_contract::{
 };
 use serde_json::{Map, Value, json};
 
-use super::OpenAiOptions;
-use super::common::{effort, error_from_value, finish_reason, image_url, tool_result_text, usage};
+use crate::common::{effort, error_from_value, finish_reason, image_url, tool_result_text, usage};
 use crate::config::ProviderProfile;
 use crate::engine::StreamDecoder;
 use crate::sse::SseEvent;
+
+/// Nazwa pola limitu wyjścia w Chat Completions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MaxTokensField {
+    /// `max_completion_tokens` (OpenAI, modele rozumujące).
+    MaxCompletionTokens,
+    /// `max_tokens` (większość endpointów zgodnych, w tym `llama-server`).
+    MaxTokens,
+}
+
+impl MaxTokensField {
+    /// Nazwa pola.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::MaxCompletionTokens => "max_completion_tokens",
+            Self::MaxTokens => "max_tokens",
+        }
+    }
+}
+
+/// Opcje formatu Chat Completions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ChatOptions {
+    /// Pole limitu wyjścia.
+    pub max_tokens_field: MaxTokensField,
+    /// `stream_options.include_usage` (niektóre serwery zgodne go nie przyjmują).
+    pub stream_usage: bool,
+}
 
 fn user_parts(msg: &Message) -> Result<Vec<Value>, ProviderError> {
     let mut parts = Vec::new();
@@ -74,12 +101,12 @@ fn render(msg: &Message, out: &mut Vec<Value>) -> Result<(), ProviderError> {
     Ok(())
 }
 
-/// Buduje ciało żądania.
-pub(crate) fn build_body(
+/// Buduje ciało żądania `POST /chat/completions` (`stream: true`).
+pub fn build_body(
     req: &ChatRequest,
     caps: &ModelCapabilities,
     profile: &ProviderProfile,
-    o: &OpenAiOptions,
+    o: &ChatOptions,
 ) -> Result<Value, ProviderError> {
     if !req.tools.is_empty() && !caps.tools {
         return Err(ProviderError::new(
@@ -155,7 +182,7 @@ struct ToolState {
 
 /// Dekoder `chat.completion.chunk`.
 #[derive(Debug, Default)]
-pub(crate) struct ChatDecoder {
+pub struct ChatDecoder {
     started: bool,
     next_index: u32,
     text_index: Option<u32>,

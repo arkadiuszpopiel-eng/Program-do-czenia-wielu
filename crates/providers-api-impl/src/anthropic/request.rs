@@ -14,7 +14,7 @@ use providers_contract::{
 use serde_json::{Map, Value, json};
 
 use super::AnthropicOptions;
-use crate::config::ProviderProfile;
+use lib_openai_compat::ProviderProfile;
 
 /// Beta: notki postępu w blokach myślenia (`display: "updates"`).
 pub const BETA_THINKING_UPDATES: &str = "thinking-display-updates-2026-08-18";

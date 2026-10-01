@@ -10,6 +10,7 @@ repository.workspace = true
 
 [dependencies]
 providers-contract = { path = "../providers-contract" }
+lib-openai-compat = { path = "../lib-openai-compat" }
 core-bus-contract.workspace = true
 core-registry-contract.workspace = true
 async-trait.workspace = true

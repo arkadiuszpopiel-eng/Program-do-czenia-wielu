@@ -14,8 +14,8 @@ use providers_contract::{
 use reqwest::header::HeaderMap;
 use serde_json::Value;
 
-use crate::engine::StreamDecoder;
-use crate::sse::SseEvent;
+use lib_openai_compat::StreamDecoder;
+use lib_openai_compat::sse::SseEvent;
 
 #[derive(Debug)]
 enum Block {

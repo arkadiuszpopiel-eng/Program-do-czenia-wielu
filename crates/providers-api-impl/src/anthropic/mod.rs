@@ -14,9 +14,9 @@ use providers_contract::{
 };
 use reqwest::header::HeaderMap;
 
-use crate::config::{AuthScheme, ConfigError, HttpConfig, ProviderProfile};
-use crate::engine::{BuildOptions, Engine, WireCodec, WireRequest};
 use crate::registry::{ModelRegistry, cost};
+use lib_openai_compat::{AuthScheme, ConfigError, HttpConfig, ProviderProfile};
+use lib_openai_compat::{BuildOptions, Engine, WireCodec, WireRequest};
 
 pub use request::{
     BETA_SERVER_FALLBACK, BETA_THINKING_BINDING, BETA_THINKING_UPDATES, MID_SYSTEM_PREFIX,
