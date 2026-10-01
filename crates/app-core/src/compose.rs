@@ -19,7 +19,8 @@ use crate::infra::proxy::{HealthFn, ProxyModule};
 use crate::options::{AppOptions, AppPaths};
 use crate::parts::{Built, Kernel};
 
-/// Manifesty modułów składanych w F1 (identyfikator → `module.toml`).
+/// Manifesty modułów (identyfikator → `module.toml`); narzędzia i runtime agentek —
+/// `app_agents::MODULES`.
 const MODULES: &[(&str, &str)] = &[
     ("platform-windows", platform_windows_impl::MODULE_TOML),
     ("device-profile", device_profile_impl::MODULE_TOML),
@@ -61,6 +62,12 @@ fn manifest_for_graph(id: &str, toml: &str) -> Result<ModuleManifest, AppError> 
         "sessions" => manifest.requires.retain(|c| c.name != "search-contract"),
         "providers-local" => manifest.provides.clear(),
         "safety-broker" => manifest.requires.retain(|c| c.name != "watchdog-contract"),
+        // Narzędzia i runtime agentek: `tools-common-contract` to kontrakt bez modułu (manifest,
+        // `Tool`, bramka Brokera), a rejestr Job Objects (`watchdog-contract`) dostarcza Broker
+        // w procesie (kill-switch zabija drzewa procesów `shell_run`).
+        "tools-fs" | "tools-shell" | "tools-clipboard" | "agent-runtime" => manifest
+            .requires
+            .retain(|c| c.name != "tools-common-contract" && c.name != "watchdog-contract"),
         _ => {}
     }
     Ok(manifest)
@@ -82,7 +89,7 @@ async fn plan(
 > {
     let mut slots = BTreeMap::new();
     let mut lifecycles = BTreeMap::new();
-    for (id, toml) in MODULES {
+    for (id, toml) in MODULES.iter().chain(app_agents::MODULES) {
         let manifest = manifest_for_graph(id, toml)?;
         lifecycles.insert((*id).to_owned(), manifest.lifecycle);
         let slot: HealthSlot = Arc::new(OnceLock::new());

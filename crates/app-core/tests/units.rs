@@ -63,6 +63,8 @@ mod notify {
                 reversible: false,
                 risk: RiskLevel::High,
                 status: ApprovalStatus::Pending,
+                broker_window: false,
+                expires_at: None,
             },
         })
         .unwrap();

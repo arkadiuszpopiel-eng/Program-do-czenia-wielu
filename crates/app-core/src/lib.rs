@@ -17,14 +17,18 @@ mod parts;
 mod route;
 mod settings;
 mod store;
+mod store_agents;
+mod voice_chat;
 
 // Kontrakt IPC (DTO, błędy, zdarzenia, porty) — crate `app-api`, pod dawnymi ścieżkami.
 use app_api::error;
 pub use app_api::{dto, events, ids, notify, ports, protocol};
 
 pub use crate::core::AppCore;
+pub use app_agents::eval;
 pub use app_api::{AppError, DEFAULT_FRAME, ErrorCode, EventBatch};
 pub use app_modules::NO_TTS;
+pub use app_voice::{Pacer, VoiceEngine, VoiceEngineFactory};
 pub use commands::app::SYSTEM_SETTINGS_ALLOWED;
 pub use commands::settings::{KILL_SWITCH_CHORD, validate_chord};
 pub use commands_list::COMMANDS;

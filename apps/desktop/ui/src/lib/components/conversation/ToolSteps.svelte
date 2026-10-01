@@ -32,13 +32,8 @@
   };
   const running = $derived(steps.find((s) => s.status === 'running'));
   const total = $derived(steps.reduce((sum, s) => sum + (s.duration_ms ?? 0), 0));
-  let undone = $state<Record<string, boolean>>({});
-
   async function undo(step: ToolStep) {
-    if (!step.undo_token) return;
-    await app.client.turns.undoStep(step.undo_token);
-    undone[step.id] = true;
-    app.toasts.show({ kind: 'success', message: t('conv.undone', { label: step.label }) });
+    if (step.undo_token) await app.undoStep(step.undo_token, step.label);
   }
 </script>
 
@@ -74,7 +69,7 @@
           {#if step.duration_ms !== null}
             <span class="time">{app.i18n.duration(step.duration_ms)}</span>
           {/if}
-          {#if step.undo_token && !undone[step.id]}
+          {#if step.undo_token && !app.runs.isUndone(step.undo_token, step.undone)}
             <button type="button" class="undo" onclick={() => undo(step)}>
               <Undo2 size={12} strokeWidth={1.5} aria-hidden="true" />
               {t('common.undo')}

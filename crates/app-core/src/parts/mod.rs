@@ -1,6 +1,7 @@
 //! Części kompozycji: jądro (sekrety, katalog, konfiguracja, logi, zdarzenia, sprzęt) i budowa
 //! poszczególnych modułów wywoływana w kolejności z rejestru (`compose.rs`).
 
+mod agents;
 mod extra;
 mod kernel;
 mod ports;
@@ -34,6 +35,7 @@ use crate::infra::secrets::StoreKeyVault;
 use crate::options::{AppOptions, AppPaths};
 use crate::ports::HeadlessShell;
 use crate::store::AppStore;
+pub(crate) use agents::AgentStack;
 pub(crate) use extra::Extra;
 pub(crate) use kernel::Kernel;
 
@@ -208,12 +210,23 @@ impl Built {
             .shell
             .clone()
             .unwrap_or_else(|| Arc::new(HeadlessShell::default()));
-        let ports = self
-            .extra
-            .ports(&options, &hub, &kernel, &sessions, &shell)?;
+        let scheduler = need(&self.scheduler, "scheduler-lite")?;
+        let ports = self.extra.ports(
+            &options,
+            ports::PortDeps {
+                hub: &hub,
+                kernel: &kernel,
+                sessions: &sessions,
+                shell: &shell,
+                paths: &paths,
+                bus: &bus,
+                scheduler: scheduler.clone(),
+            },
+        )?;
         let provider: Arc<dyn SessionDbProvider> = sessions.clone();
         let inner = Inner {
             undo_window: options.undo_window,
+            approval_timeout: options.approval_timeout,
             healthy_after: options.healthy_after,
             app_version: options.app_version,
             bus,
@@ -226,7 +239,7 @@ impl Built {
             costs: need(&self.costs, "cost-meter")?,
             _compliance: need(&self.compliance, "compliance")?,
             personas: need(&self.personas, "personas")?,
-            _scheduler: need(&self.scheduler, "scheduler-lite")?,
+            _scheduler: scheduler,
             hub,
             sessions,
             device,
@@ -235,6 +248,7 @@ impl Built {
             transfer: ports.transfer,
             voice: ports.voice,
             broker: ports.broker,
+            agents: ports.agents,
             shell,
             events: kernel.events,
             store: AppStore::new(provider),

@@ -222,6 +222,49 @@
     "result": "Szkic: dopisz wnioski"
   },
   {
+    "command": "sessions_workdir",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3",
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3"
+    }
+  },
+  {
+    "command": "sessions_choose_workdir",
+    "args": {
+      "sessionId": "s-trip",
+      "choice": "dialog"
+    },
+    "result": {
+      "path": "C:\\Users\\Ty\\Dokumenty\\Projekt",
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska"
+    }
+  },
+  {
+    "command": "sessions_choose_workdir",
+    "args": {
+      "sessionId": "s-trip",
+      "choice": "default"
+    },
+    "result": {
+      "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska",
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska"
+    }
+  },
+  {
+    "command": "sessions_choose_workdir",
+    "args": {
+      "sessionId": "s-trip",
+      "choice": "none"
+    },
+    "result": {
+      "path": null,
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska"
+    }
+  },
+  {
     "command": "sessions_search",
     "args": {
       "query": "raport"

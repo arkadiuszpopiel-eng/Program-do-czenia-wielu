@@ -12,6 +12,7 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import { useApp } from '../../state/context';
   import CostDetails from './CostDetails.svelte';
+  import MicIndicator from './MicIndicator.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -120,6 +121,7 @@
       </button>
     {/each}
   </div>
+  <MicIndicator />
   <Popover label={t('costs.title')} bind:open={costOpen}>
     {#snippet trigger(props)}
       <button

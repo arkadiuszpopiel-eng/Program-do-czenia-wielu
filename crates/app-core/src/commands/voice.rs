@@ -2,9 +2,10 @@
 //! dopóki moduł audio nie jest podłączony.
 
 use device_profile_contract::AudioDirection;
+use personas_contract::Personas;
 
 use crate::core::AppCore;
-use crate::dto::AudioDevice;
+use crate::dto::{AudioDevice, VoiceStatus};
 use crate::error::AppError;
 
 impl AppCore {
@@ -44,9 +45,12 @@ impl AppCore {
         self.inner.voice.stop_mic_test().await
     }
 
-    /// `voice_set_mic_enabled`.
+    /// `voice_set_mic_enabled` (rozmowa głosowa; bez modeli — błąd „głos niedostępny").
     pub async fn voice_set_mic_enabled(&self, enabled: bool) -> Result<(), AppError> {
-        self.inner.voice.set_mic_enabled(enabled).await
+        let result = self.inner.voice.set_mic_enabled(enabled).await;
+        let status = self.inner.voice.status().await;
+        self.emit(crate::dto::AlfaEvent::VoiceStatusChanged { status });
+        result
     }
 
     /// `voice_set_muted`.
@@ -57,5 +61,31 @@ impl AppCore {
     /// `voice_stop_speech`.
     pub async fn voice_stop_speech(&self) -> Result<(), AppError> {
         self.inner.voice.stop_speech().await
+    }
+}
+
+impl AppCore {
+    /// `voice_status`: dostępność trybu głosowego (brak modeli → powód), mikrofon, tryb, agentka.
+    pub async fn voice_status(&self) -> Result<VoiceStatus, AppError> {
+        Ok(self.inner.voice.status().await)
+    }
+
+    /// `voice_ptt`: mówienie z przytrzymaniem (wciśnięcie / puszczenie).
+    pub async fn voice_ptt(&self, pressed: bool) -> Result<(), AppError> {
+        self.inner.voice.ptt(pressed).await
+    }
+
+    /// `voice_preview` ⟶ próbka głosu agentki (głosy v0).
+    pub async fn voice_preview(&self, agent: String) -> Result<(), AppError> {
+        let known = self
+            .inner
+            .personas
+            .personas()
+            .iter()
+            .any(|p| p.id.as_str() == agent);
+        if !known {
+            return Err(AppError::not_found(format!("Nieznana agentka „{agent}”.")));
+        }
+        self.inner.voice.preview(&agent).await
     }
 }

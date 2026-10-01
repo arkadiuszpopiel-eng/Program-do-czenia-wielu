@@ -43,10 +43,14 @@ pub(crate) struct Outcome {
     pub chosen: Option<Chosen>,
     pub latency_ms: u64,
     pub thinking_ms: Option<u64>,
+    /// Kroki narzędzi (przebieg agentki).
+    pub tools: Vec<crate::dto::ToolStep>,
+    /// Karta „czeka na zatwierdzenie" (przebieg agentki).
+    pub approval: Option<crate::dto::ApprovalPending>,
 }
 
 impl Outcome {
-    fn failed(error: TurnError) -> Self {
+    pub(crate) fn failed(error: TurnError) -> Self {
         Self {
             text: String::new(),
             thinking: Vec::new(),
@@ -58,6 +62,8 @@ impl Outcome {
             chosen: None,
             latency_ms: 0,
             thinking_ms: None,
+            tools: Vec::new(),
+            approval: None,
         }
     }
 }
@@ -129,7 +135,7 @@ fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
 }
 
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
-async fn prepare(
+pub(crate) async fn prepare(
     core: &AppCore,
     req: &GenRequest,
 ) -> Result<(crate::ports::BrainChoice, ChatRequest), TurnError> {
@@ -273,6 +279,9 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
                         done: true,
                     });
                 }
+                if let Some(tap) = &req.tap {
+                    let _ = tap.send(crate::ports::VoiceChunk::Text(text.clone()));
+                }
                 let blocks = update_blocks(renderer.push(text));
                 if let Ok(mut live) = handle.live.lock() {
                     merge_live(&mut live, text, &blocks);
@@ -336,6 +345,8 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
         chosen: Some(chosen),
         latency_ms: millis(started.elapsed()),
         thinking_ms: thinking_ms.or_else(|| thinking.map(|(s, _)| millis(s.elapsed()))),
+        tools: Vec::new(),
+        approval: None,
     }
 }
 

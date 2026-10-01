@@ -1,6 +1,6 @@
 [package]
 name = "app-modules"
-description = "Adaptery portów aplikacji na modułach -impl (kategoria app-*): transfer .alfa z dialogami powłoki, Broker w procesie z dziennikiem cofania, głos (audio + TTS) i silniki TTS z sidecarów"
+description = "Adaptery portów aplikacji na modułach -impl (kategoria app-*): transfer .alfa z dialogami powłoki, Broker w procesie z dziennikiem cofania, głos (audio + TTS), silniki TTS z sidecarów, katalog i sonda dostawców"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -14,9 +14,11 @@ repository.workspace = true
 [dependencies]
 app-api = { path = "../app-api" }
 accounts-hub-contract = { path = "../accounts-hub-contract" }
+accounts-hub-impl = { path = "../accounts-hub-impl" }
 compliance-contract = { path = "../compliance-contract" }
 core-config-impl = { path = "../core-config-impl" }
 personas-contract = { path = "../personas-contract" }
+providers-api-impl = { path = "../providers-api-impl" }
 providers-contract = { path = "../providers-contract" }
 risk-classifier-contract = { path = "../risk-classifier-contract" }
 safety-broker-contract = { path = "../safety-broker-contract" }

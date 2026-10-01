@@ -12,14 +12,17 @@ use lib_sqlstore::{Db, migrate};
 use serde::{Deserialize, Serialize};
 use sessions_contract::{SessionDbProvider, SessionId, TurnId};
 
-use crate::dto::{Rating, TimelineEvent, TurnError, TurnStatus, TurnUsage};
+use crate::dto::{
+    ApprovalPending, Rating, TimelineEvent, ToolStep, TurnError, TurnStatus, TurnUsage,
+};
 use crate::error::AppError;
 
 const NAMESPACE: &str = "app-core";
 
-const MIGRATIONS: &[(&str, &str)] = &[(
-    "0001",
-    "CREATE TABLE app_turn_meta(turn_id INTEGER PRIMARY KEY, body TEXT NOT NULL);
+const MIGRATIONS: &[(&str, &str)] = &[
+    (
+        "0001",
+        "CREATE TABLE app_turn_meta(turn_id INTEGER PRIMARY KEY, body TEXT NOT NULL);
      CREATE TABLE app_turn_status(seq INTEGER PRIMARY KEY AUTOINCREMENT,
          turn_id INTEGER NOT NULL, status TEXT NOT NULL, at INTEGER NOT NULL);
      CREATE TABLE app_ratings(seq INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +38,9 @@ const MIGRATIONS: &[(&str, &str)] = &[(
          BEGIN SELECT RAISE(ABORT, 'app_ratings: append-only'); END;
      CREATE TRIGGER app_timeline_ro_u BEFORE UPDATE ON app_timeline
          BEGIN SELECT RAISE(ABORT, 'app_timeline: append-only'); END;",
-)];
+    ),
+    ("0002", crate::store_agents::MIGRATION_0002),
+];
 
 /// Fakty o turze zapisywane raz, razem z turą.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -58,6 +63,12 @@ pub struct TurnMeta {
     pub usage: Option<TurnUsage>,
     /// Błąd.
     pub error: Option<TurnError>,
+    /// Kroki narzędzi (tura agentki z narzędziami).
+    #[serde(default)]
+    pub tools: Vec<ToolStep>,
+    /// Ostatnia karta „czeka na zatwierdzenie".
+    #[serde(default)]
+    pub approval: Option<ApprovalPending>,
 }
 
 /// Dostęp do tabel `app-core` w bazach sesji.
@@ -92,7 +103,7 @@ fn parse_status(s: &str) -> Option<TurnStatus> {
     .find(|t| status_name(*t) == s)
 }
 
-fn to_i64(n: u64) -> i64 {
+pub(crate) fn to_i64(n: u64) -> i64 {
     i64::try_from(n).unwrap_or(i64::MAX)
 }
 
@@ -123,7 +134,7 @@ impl AppStore {
         Ok(db)
     }
 
-    fn with<R>(
+    pub(crate) fn with<R>(
         &self,
         session: &SessionId,
         f: impl FnOnce(&mut Connection) -> Result<R, lib_sqlstore::rusqlite::Error>,

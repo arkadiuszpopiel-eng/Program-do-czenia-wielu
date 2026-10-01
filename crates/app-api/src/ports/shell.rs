@@ -30,6 +30,15 @@ pub trait ShellPort: Send + Sync {
     fn pick_open_path(&self) -> Result<Option<PathBuf>, AppError> {
         Err(AppError::unavailable("Okno wyboru pliku", SHELL))
     }
+    /// Natywny dialog wyboru katalogu (katalog roboczy sesji); `None` = anulowano.
+    fn pick_folder(&self) -> Result<Option<PathBuf>, AppError> {
+        Err(AppError::unavailable("Okno wyboru katalogu", SHELL))
+    }
+    /// „Uruchom w terminalu": otwiera terminal (`shell`: `pwsh`, `powershell`, `cmd`) w katalogu
+    /// `cwd` **bez wykonywania** polecenia — właściciel wkleja je i uruchamia sam.
+    fn open_terminal(&self, _cwd: &Path, _shell: &str) -> Result<(), AppError> {
+        Err(AppError::unavailable("Otwarcie terminala", SHELL))
+    }
     /// Wolne miejsce na dysku z `path` (`None` = nieznane).
     fn disk_free(&self, _path: &Path) -> Option<u64> {
         None
@@ -103,5 +112,12 @@ impl ShellPort for HeadlessShell {
     }
     fn pick_open_path(&self) -> Result<Option<PathBuf>, AppError> {
         self.dialog("pick_open".into())
+    }
+    fn pick_folder(&self) -> Result<Option<PathBuf>, AppError> {
+        self.dialog("pick_folder".into())
+    }
+    fn open_terminal(&self, cwd: &Path, shell: &str) -> Result<(), AppError> {
+        self.record(format!("open_terminal:{shell}:{}", cwd.display()));
+        Ok(())
     }
 }

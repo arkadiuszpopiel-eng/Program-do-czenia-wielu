@@ -3,20 +3,28 @@
 import type { MicState } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
 import type { ActivityInfo, AgentState, CostSummary, SessionTemplate } from '../api/types';
-import type { AlfaEvent, PanelId, SettingValue, SystemStatus } from '../api/types-system';
+import type {
+  AlfaEvent,
+  ChatStreamEvent,
+  PanelId,
+  SettingValue,
+  SystemStatus,
+} from '../api/types-system';
 
 /** Zdarzenie postępu pobierania modelu lokalnego. */
 export type LocalModelProgress = Extract<AlfaEvent, { type: 'LocalModelProgress' }>;
 import { i18n, type I18n } from '../i18n/i18n.svelte';
-import { isChatEvent } from '../logic/apply-event';
 import { RafBatcher, type FrameScheduler } from '../logic/raf-batcher';
 import { SentenceAnnouncer, type Timers } from '../logic/sentence-announcer';
 import { SHORTCUTS } from '../logic/shortcut-registry';
 import { buildKeymap, effectiveBindings } from '../logic/shortcuts';
+import { applyEvent } from './apply-batch';
 import { ConversationState } from './conversation.svelte';
 import { LayoutState } from './layout.svelte';
+import { RunsState } from './runs.svelte';
 import { SessionsState } from './sessions.svelte';
 import { ToastState } from './toasts.svelte';
+import { VoiceUiState } from './voice.svelte';
 
 export type View = 'loading' | 'chat' | 'settings' | 'onboarding' | 'error';
 
@@ -33,6 +41,8 @@ export class AppState {
   readonly i18n: I18n = i18n;
   readonly toasts = new ToastState();
   readonly sessions = new SessionsState();
+  readonly runs = new RunsState();
+  readonly voice = new VoiceUiState();
   readonly layout: LayoutState;
 
   view = $state<View>('loading');
@@ -109,6 +119,7 @@ export class AppState {
       ]);
       this.sessions.list = [...list];
       this.system = status;
+      void this.client.voice.status().then((v) => this.voice.applyStatus(v));
       const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;
       if (first) await this.openSession(first);
       else await this.refreshCosts();
@@ -128,49 +139,24 @@ export class AppState {
 
   /** Stosuje paczkę zdarzeń (najwyżej raz na klatkę). */
   applyBatch(batch: readonly AlfaEvent[]): void {
-    for (const event of batch) {
-      switch (event.type) {
-        case 'SessionUpdated':
-          this.sessions.upsert(event.session);
-          break;
-        case 'SessionRemoved':
-          this.sessions.remove(event.session_id);
-          break;
-        case 'AgentsChanged':
-          this.agents[event.session_id] = [...event.agents];
-          break;
-        case 'ActivityChanged':
-          this.activity[event.session_id] = event.activity;
-          break;
-        case 'CostsChanged':
-          if (event.session_id === this.activeId || !event.session_id) this.costs = event.costs;
-          break;
-        case 'SystemStatusChanged':
-          this.system = event.status;
-          break;
-        case 'MicLevel':
-          this.micLevel = event.level;
-          break;
-        case 'VoicePill':
-          this.micState = event.state.mic;
-          break;
-        case 'Toast':
-          this.toasts.show({ kind: event.kind, message: this.i18n.text(event.message) });
-          break;
-        case 'OpenSession':
-          void this.focusSession(event.session_id);
-          break;
-        case 'LocalModelProgress':
-          this.localDownload = event;
-          break;
-        case 'TimelineAppended':
-        case 'AccountChanged':
-          for (const listener of this.listeners) listener(event);
-          break;
-        default:
-          if (isChatEvent(event)) this.cache[event.session_id]?.apply(event);
-      }
-    }
+    for (const event of batch) applyEvent(this, event);
+  }
+
+  /** Zdarzenie strumienia do rozmowy sesji (jeśli jest w pamięci podręcznej). */
+  applyChat(event: ChatStreamEvent): void {
+    this.cache[event.session_id]?.apply(event);
+  }
+
+  /** Przekazuje zdarzenie panelom ładowanym leniwie. */
+  notify(event: AlfaEvent): void {
+    for (const listener of this.listeners) listener(event);
+  }
+
+  /** Cofa krok agentki (karta, toast, Replay) — przez dziennik cofania w rdzeniu. */
+  async undoStep(token: string, label: string): Promise<void> {
+    await this.client.turns.undoStep(token);
+    this.runs.markUndone(token);
+    this.toasts.show({ kind: 'success', message: this.i18n.t('conv.undone', { label }) });
   }
 
   /** Subskrypcje paneli ładowanych leniwie (oś czasu, Hub kont). */

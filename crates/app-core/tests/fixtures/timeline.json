@@ -94,8 +94,8 @@
         "turn_id": null
       },
       {
-        "id": "ev-munv0oe6-6",
-        "ts": "2026-09-30T08:45:01.950Z",
+        "id": "ev-munv0omi-6",
+        "ts": "2026-09-30T08:45:02.250Z",
         "session_id": "s-q3",
         "kind": "model_call",
         "level": "info",
@@ -106,7 +106,7 @@
           "minor": 1,
           "currency": "PLN"
         },
-        "latency_ms": 1950,
+        "latency_ms": 2250,
         "turn_id": "t-munv0mw0-5"
       },
       {
@@ -231,8 +231,8 @@
         "turn_id": "q6"
       },
       {
-        "id": "ev-munv0oe6-6",
-        "ts": "2026-09-30T08:45:01.950Z",
+        "id": "ev-munv0omi-6",
+        "ts": "2026-09-30T08:45:02.250Z",
         "session_id": "s-q3",
         "kind": "model_call",
         "level": "info",
@@ -243,7 +243,7 @@
           "minor": 1,
           "currency": "PLN"
         },
-        "latency_ms": 1950,
+        "latency_ms": 2250,
         "turn_id": "t-munv0mw0-5"
       },
       {

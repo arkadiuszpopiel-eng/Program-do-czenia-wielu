@@ -16,6 +16,7 @@ export class FakeChat {
       scheduler: core.scheduler,
       tokensPerSecond: core.tokensPerSecond,
       emit: (events) => core.emit(events),
+      runs: core.runs,
       finished: (turn, agent, usage) => this.finished(turn, agent, usage),
     });
   }
@@ -217,7 +218,10 @@ export class FakeChat {
       saveCode: () => core.reply(undefined),
       runCode: () =>
         core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
-      undoStep: () => core.reply(undefined),
+      undoStep: (token) => {
+        core.runs.markUndone(token);
+        return core.reply(undefined);
+      },
     };
   }
 

@@ -178,6 +178,8 @@ impl AppCore {
                     thinking_ms: outcome.thinking_ms,
                     usage: usage.clone(),
                     error: outcome.error.clone(),
+                    tools: outcome.tools.clone(),
+                    approval: outcome.approval.clone(),
                 };
                 if let Err(e) = self.inner.store.put_meta(&req.session, turn.id, &meta) {
                     tracing::error!(error = %e, "zapis faktów tury nie powiódł się");

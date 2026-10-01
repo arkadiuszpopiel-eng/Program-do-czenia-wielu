@@ -6,6 +6,7 @@
 
 #![allow(missing_docs)]
 
+mod agents;
 mod common;
 mod events;
 mod hub;
@@ -14,6 +15,11 @@ mod sessions;
 mod system;
 mod transfer;
 
+pub use agents::{
+    AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
+    RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,
+    VoiceStatus, WorkdirChoice,
+};
 pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };

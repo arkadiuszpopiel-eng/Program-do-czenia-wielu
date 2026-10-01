@@ -2,7 +2,7 @@
 //! użytkownik, ustawienia Windows) oraz obsługa argumentów drugiej instancji / protokołu `alfa://`
 //! (lista dozwolonych w app-core; „przejdź do sesji" = zdarzenie `OpenSession` dla UI).
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use app_core::dto::{AlfaEvent, LocalizedText, SessionTemplate, ToastKind};
 use app_core::ports::{ArtifactIntent, ArtifactIntentAction, ShellPort};
@@ -49,6 +49,42 @@ fn explorer(args: &[&std::ffi::OsStr]) -> Result<(), AppError> {
     } else {
         Err(AppError::unavailable("Akcja systemowa", "platform-windows"))
     }
+}
+
+/// Plik wykonywalny powłoki terminala (tylko znane powłoki).
+fn shell_exe(shell: &str) -> Result<&'static str, AppError> {
+    match shell {
+        "pwsh" => Ok("pwsh.exe"),
+        "powershell" => Ok("powershell.exe"),
+        "cmd" => Ok("cmd.exe"),
+        other => Err(AppError::invalid(format!("Nieznana powłoka „{other}”."))),
+    }
+}
+
+/// Nowe okno konsoli (Windows 11: w domyślnym terminalu) z powłoką w `cwd`. Katalog trafia do
+/// procesu jako katalog bieżący, nie jako argument — bez parsowania wiersza poleceń; żadne
+/// polecenie nie jest przekazywane ani wykonywane.
+#[cfg(windows)]
+fn spawn_terminal(exe: &str, cwd: &Path) -> std::io::Result<()> {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NEW_CONSOLE: u32 = 0x0000_0010;
+    let mut command = std::process::Command::new(exe);
+    if exe != "cmd.exe" {
+        command.arg("-NoLogo");
+    }
+    command
+        .current_dir(cwd)
+        .creation_flags(CREATE_NEW_CONSOLE)
+        .spawn()
+        .map(|_| ())
+}
+
+#[cfg(not(windows))]
+fn spawn_terminal(_exe: &str, _cwd: &Path) -> std::io::Result<()> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "terminal tylko na Windows",
+    ))
 }
 
 impl ShellPort for TauriShell {
@@ -106,6 +142,38 @@ impl ShellPort for TauriShell {
             .file()
             .add_filter("Paczka Alfy", &["alfa"]);
         picked(dialog.blocking_pick_file())
+    }
+
+    fn pick_folder(&self) -> Result<Option<PathBuf>, AppError> {
+        let dialog = self
+            .app
+            .dialog()
+            .file()
+            .set_title("Katalog roboczy agentek");
+        picked(dialog.blocking_pick_folder())
+    }
+
+    fn open_terminal(&self, cwd: &Path, shell: &str) -> Result<(), AppError> {
+        let exe = shell_exe(shell)?;
+        if !cwd.is_dir() {
+            return Err(AppError::invalid(format!(
+                "„{}” nie jest katalogiem.",
+                cwd.display()
+            )));
+        }
+        let result = match spawn_terminal(exe, cwd) {
+            // Bez PowerShell 7 — Windows PowerShell 5.1.
+            Err(e) if exe == "pwsh.exe" && e.kind() == std::io::ErrorKind::NotFound => {
+                spawn_terminal("powershell.exe", cwd)
+            }
+            other => other,
+        };
+        result.map_err(|e| match e.kind() {
+            std::io::ErrorKind::Unsupported => {
+                AppError::unavailable("Otwarcie terminala", "platform-windows")
+            }
+            _ => AppError::internal(format!("{exe}: {e}")),
+        })
     }
 }
 

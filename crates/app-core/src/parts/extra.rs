@@ -39,7 +39,7 @@ use crate::error::AppError;
 use crate::options::{AppOptions, AppPaths};
 use crate::parts::Kernel;
 use crate::route::{Routers, local};
-use app_modules::broker::{dev_dir, path_env};
+use app_modules::broker::{dev_dir, path_env_for};
 
 /// Zależności z modułów podstawowych.
 pub(crate) struct Deps<'a> {
@@ -62,12 +62,22 @@ pub(crate) struct Extra {
     pub router: Option<Arc<RouterModule>>,
     pub classifier: Option<Arc<TableClassifier>>,
     pub broker: Option<Arc<BrokerEngine>>,
+    /// Wykonanie poleceń narzędzi i zabijanie ich przez Brokera (jedna instancja).
+    pub exec: Option<Arc<dyn platform_contract::ExecPort>>,
     pub undo: Option<Arc<UndoService>>,
     pub transfer: Option<Arc<ZipTransfer>>,
     pub audio: Option<Arc<VoiceAudioModule>>,
     pub tts_module: Option<Arc<VoiceTtsModule>>,
     pub tts: Option<Arc<dyn Tts>>,
     pub updater: Option<Arc<FsUpdater>>,
+}
+
+/// System plików narzędzi i dziennika cofania (ten sam port — cofnięcie widzi te same pliki).
+pub(crate) fn platform_fs(options: &AppOptions) -> Arc<dyn platform_contract::FsPort> {
+    options
+        .fs
+        .clone()
+        .unwrap_or_else(|| Arc::new(platform_windows_impl::WindowsPlatform::default()))
 }
 
 fn unhealthy(slot: Option<&HealthSlot>, id: &str, e: &AppError) {
@@ -96,6 +106,11 @@ impl Extra {
             "voice-audio" => self.audio(&deps).await,
             "voice-tts" => self.tts(&deps).await,
             "updater" => self.updater(&deps).await,
+            // Narzędzia i runtime agentek składa `Extra::agents` po zbudowaniu Brokera
+            // i dziennika cofania (wymagane przez manifesty — są wcześniej w kolejności).
+            "tools-fs" | "tools-shell" | "tools-clipboard" | "agent-runtime" => {
+                self.agents_ready(id, &deps)
+            }
             _ => return false,
         };
         if let Err(e) = result {
@@ -172,7 +187,7 @@ impl Extra {
 
     /// Broker w procesie: polityka bazowa profilu, Audyt w pliku z łańcuchem i kotwicą.
     fn broker(&mut self, deps: &Deps<'_>) -> Result<(), AppError> {
-        let (profile, env) = path_env();
+        let (profile, env) = path_env_for(&deps.paths.user_root);
         let dir = dev_dir(&deps.paths.local);
         let policy = KernelPolicy::baseline(&profile, &dir.to_string_lossy())
             .or_else(|_| KernelPolicy::baseline(&profile, r"C:\ProgramData\AlfaBroker"))
@@ -192,7 +207,14 @@ impl Extra {
             env,
             key_mode: KeyMode::Random,
         };
-        let processes = Arc::new(platform_windows_impl::WinProcesses::new(Default::default()));
+        // Procesy narzędzi (`shell_run`) zabija ten sam port (ta sama tablica uchwytów Job
+        // Objects), który je uruchomił — jedna instancja dla Brokera i narzędzi agentek.
+        let exec: Arc<dyn platform_contract::ExecPort> = match &deps.options.exec {
+            Some(exec) => exec.clone(),
+            None => Arc::new(platform_windows_impl::WindowsPlatform::default()),
+        };
+        self.exec = Some(exec.clone());
+        let processes: Arc<dyn platform_contract::ProcessPort> = exec;
         let mut engine = BrokerEngine::new(config, clock, Arc::new(audit), processes)
             .map_err(|e| err("safety-broker")(e.to_string()))?
             .with_bus(deps.bus.clone());
@@ -207,7 +229,7 @@ impl Extra {
     }
 
     async fn undo(&mut self, deps: &Deps<'_>) -> Result<(), AppError> {
-        let fs = Arc::new(platform_windows_impl::WindowsPlatform::default());
+        let fs = platform_fs(deps.options);
         let clock = Arc::new(|| u64::try_from(chrono::Utc::now().timestamp_millis()).unwrap_or(0));
         let boot = u64::try_from(chrono::Utc::now().timestamp_micros()).unwrap_or(0);
         let service = UndoService::open(
@@ -294,6 +316,18 @@ impl Extra {
             Some(tts) => Some(tts.clone()),
             None => app_modules::tts::engines(deps.paths)?,
         };
+        Ok(())
+    }
+
+    fn agents_ready(&mut self, id: &str, deps: &Deps<'_>) -> Result<(), AppError> {
+        if self.broker.is_none() || self.undo.is_none() {
+            return Err(AppError::internal(format!(
+                "{id}: brak Brokera albo dziennika cofania"
+            )));
+        }
+        if let Some(slot) = deps.slot {
+            let _ = slot.set(Arc::new(|| HealthStatus::Healthy));
+        }
         Ok(())
     }
 

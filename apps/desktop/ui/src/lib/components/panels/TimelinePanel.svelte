@@ -1,4 +1,7 @@
-<!-- Oś czasu v0 (makieta 7): zdarzenia sesji z filtrami (rodzaj, poziom), koszt i opóźnienie. -->
+<!--
+  Oś czasu (makieta 7): zdarzenia sesji z filtrami (rodzaj, poziom), koszt i opóźnienie, oraz
+  Replay przebiegów agentek krok po kroku (ReplayView).
+-->
 <script lang="ts">
   import { Avatar, Button, Chip, Select } from '@alfa/ui-kit';
   import Cpu from '@lucide/svelte/icons/cpu';
@@ -9,6 +12,7 @@
   import Activity from '@lucide/svelte/icons/activity';
   import type { EventLevel, TimelineEvent, TimelineKind } from '../../api/types';
   import { useApp } from '../../state/context';
+  import ReplayView from './ReplayView.svelte';
 
   interface Props {
     sessionId: string;
@@ -35,6 +39,7 @@
     diagnostics: Activity,
   };
 
+  let mode = $state<'events' | 'replay'>('events');
   let kinds = $state<TimelineKind[]>([]);
   let minLevel = $state<string>('info');
   let events = $state<TimelineEvent[]>([]);
@@ -64,62 +69,74 @@
 </script>
 
 <div class="timeline">
-  <div class="filters">
-    <div class="kinds" role="group" aria-label={t('timeline.kind')}>
-      {#each KINDS as kind (kind)}
-        <Chip size="sm" selected={kinds.includes(kind)} onclick={() => toggle(kind)}
-          >{t(`timeline.kind.${kind}`)}</Chip
-        >
-      {/each}
-    </div>
-    <label class="level">
-      <span>{t('timeline.level')}</span>
-      <Select
-        bind:value={minLevel}
-        size="sm"
-        label={t('timeline.level')}
-        options={LEVELS.map((l) => ({ value: l, label: t(`timeline.level.${l}`) }))}
-      />
-    </label>
+  <div class="modes" role="group" aria-label={t('timeline.view')}>
+    <Chip size="sm" selected={mode === 'events'} onclick={() => (mode = 'events')}
+      >{t('timeline.events')}</Chip
+    >
+    <Chip size="sm" selected={mode === 'replay'} onclick={() => (mode = 'replay')}
+      >{t('timeline.replay')}</Chip
+    >
   </div>
-  {#if app.timelineTurn}
-    <div class="turn-filter">
-      <span>{t('timeline.forTurn')}</span>
-      <Button size="sm" variant="ghost" onclick={() => (app.timelineTurn = null)}
-        >{t('timeline.showAll')}</Button
-      >
-    </div>
-  {/if}
-  <p class="summary" aria-live="polite">
-    {t('timeline.count', { n: shown.length })}{#if total > 0}
-      · {t('timeline.total', { cost: app.i18n.money({ minor: total, currency: 'PLN' }) })}{/if}
-  </p>
-  {#if shown.length === 0}
-    <p class="empty">{t('timeline.empty')}</p>
+  {#if mode === 'replay'}
+    <ReplayView {sessionId} />
   {:else}
-    <ol class="list" aria-label={t('timeline.list')}>
-      {#each [...shown].reverse() as e (e.id)}
-        {@const Icon = ICONS[e.kind]}
-        <li class="event level-{e.level}">
-          <span class="icon" aria-hidden="true"><Icon size={14} strokeWidth={1.5} /></span>
-          <div class="text">
-            <div class="line">
-              <time datetime={e.ts} title={app.i18n.dateTime(e.ts)}>{app.i18n.time(e.ts)}</time>
-              {#if e.agent}<Avatar agent={e.agent} size={20} />{:else}<span class="sys"
-                  >{t('timeline.system')}</span
-                >{/if}
-              <span class="title">{e.title}</span>
+    <div class="filters">
+      <div class="kinds" role="group" aria-label={t('timeline.kind')}>
+        {#each KINDS as kind (kind)}
+          <Chip size="sm" selected={kinds.includes(kind)} onclick={() => toggle(kind)}
+            >{t(`timeline.kind.${kind}`)}</Chip
+          >
+        {/each}
+      </div>
+      <label class="level">
+        <span>{t('timeline.level')}</span>
+        <Select
+          bind:value={minLevel}
+          size="sm"
+          label={t('timeline.level')}
+          options={LEVELS.map((l) => ({ value: l, label: t(`timeline.level.${l}`) }))}
+        />
+      </label>
+    </div>
+    {#if app.timelineTurn}
+      <div class="turn-filter">
+        <span>{t('timeline.forTurn')}</span>
+        <Button size="sm" variant="ghost" onclick={() => (app.timelineTurn = null)}
+          >{t('timeline.showAll')}</Button
+        >
+      </div>
+    {/if}
+    <p class="summary" aria-live="polite">
+      {t('timeline.count', { n: shown.length })}{#if total > 0}
+        · {t('timeline.total', { cost: app.i18n.money({ minor: total, currency: 'PLN' }) })}{/if}
+    </p>
+    {#if shown.length === 0}
+      <p class="empty">{t('timeline.empty')}</p>
+    {:else}
+      <ol class="list" aria-label={t('timeline.list')}>
+        {#each [...shown].reverse() as e (e.id)}
+          {@const Icon = ICONS[e.kind]}
+          <li class="event level-{e.level}">
+            <span class="icon" aria-hidden="true"><Icon size={14} strokeWidth={1.5} /></span>
+            <div class="text">
+              <div class="line">
+                <time datetime={e.ts} title={app.i18n.dateTime(e.ts)}>{app.i18n.time(e.ts)}</time>
+                {#if e.agent}<Avatar agent={e.agent} size={20} />{:else}<span class="sys"
+                    >{t('timeline.system')}</span
+                  >{/if}
+                <span class="title">{e.title}</span>
+              </div>
+              {#if e.detail}<p class="detail">{e.detail}</p>{/if}
+              <p class="meta">
+                <span>{t(`timeline.kind.${e.kind}`)} · {t(`timeline.level.${e.level}`)}</span>
+                {#if e.cost}<span>· {app.i18n.money(e.cost)}</span>{/if}
+                {#if e.latency_ms !== null}<span>· {app.i18n.duration(e.latency_ms)}</span>{/if}
+              </p>
             </div>
-            {#if e.detail}<p class="detail">{e.detail}</p>{/if}
-            <p class="meta">
-              <span>{t(`timeline.kind.${e.kind}`)} · {t(`timeline.level.${e.level}`)}</span>
-              {#if e.cost}<span>· {app.i18n.money(e.cost)}</span>{/if}
-              {#if e.latency_ms !== null}<span>· {app.i18n.duration(e.latency_ms)}</span>{/if}
-            </p>
-          </div>
-        </li>
-      {/each}
-    </ol>
+          </li>
+        {/each}
+      </ol>
+    {/if}
   {/if}
 </div>
 
@@ -128,6 +145,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-3);
+  }
+  .modes {
+    display: flex;
+    gap: var(--alfa-space-1);
   }
   .filters {
     display: flex;

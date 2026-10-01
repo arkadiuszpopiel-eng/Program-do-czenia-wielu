@@ -66,6 +66,10 @@ pub(crate) struct Runtime {
     pub context_window: HashMap<SessionId, u64>,
     /// Trwające pobierania modeli lokalnych (model → anulowanie).
     pub downloads: HashMap<String, CancellationToken>,
+    /// Trwające przebiegi agentek (sesja → sterowanie).
+    pub runs: HashMap<SessionId, crate::chat::agent::RunCtl>,
+    /// Zapisy schowka cofalne w sesji (token schowka należy do sesji, która go utworzyła).
+    pub clip_undo: HashMap<SessionId, std::collections::BTreeSet<u64>>,
 }
 
 /// Współdzielony stan kompozycji.
@@ -75,6 +79,7 @@ pub(crate) struct Inner {
     /// Po jakim czasie bez awarii start jest zdrowy (`updater::mark_good`).
     pub healthy_after: Duration,
     pub undo_window: Option<Duration>,
+    pub approval_timeout: Option<Duration>,
     pub bus: Arc<dyn EventBus>,
     pub registry: Arc<ModuleRegistry>,
     pub config: Arc<FileConfigStore>,
@@ -98,6 +103,8 @@ pub(crate) struct Inner {
     pub transfer: Arc<dyn TransferPort>,
     pub voice: Arc<dyn VoicePort>,
     pub broker: Arc<dyn BrokerPort>,
+    /// Narzędzia agentek (`None` — Broker albo dziennik cofania niepodłączony: bez narzędzi).
+    pub agents: Option<crate::parts::AgentStack>,
     pub shell: Arc<dyn ShellPort>,
     pub events: EventHub,
     pub store: AppStore,

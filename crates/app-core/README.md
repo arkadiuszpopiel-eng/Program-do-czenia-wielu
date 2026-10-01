@@ -7,12 +7,14 @@ zdarzeń `alfa://events` (paczki `AlfaEvent[]`, najwyżej jedna na klatkę ≈ 1
 
 Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, które mogą zależeć od
 `*-impl`; od `*-fake` tylko w `dev-dependencies`; `app-*` mogą zależeć od siebie nawzajem, ale od żadnego
-`app-*` nie zależy crate spoza tej kategorii. Ze względu na limit 8 000 linii korzeń jest rozcięty na trzy:
+`app-*` nie zależy crate spoza tej kategorii. Ze względu na limit 8 000 linii korzeń jest rozcięty na pięć:
 
 | Crate | Zawartość |
 |---|---|
 | `app-api` | kontrakt IPC: DTO (`dto/*`), `AppError`, identyfikatory DTO (`ids`), `EventHub`, porty (`ports/*`), `AppPaths`, protokół `alfa://`, powiadomienia; zależy tylko od `*-contract` |
-| `app-modules` | adaptery portów na modułach `-impl`: `TransferAdapter`, `InprocBroker`, `VoiceAdapter`, `tts::engines` |
+| `app-modules` | adaptery portów na modułach `-impl`: `TransferAdapter`, `InprocBroker`, `VoiceAdapter`, `tts::engines`, katalog dostawców (`catalog`), sonda kont (`probe`) |
+| `app-agents` | agentki z narzędziami: zestaw `tools-fs/shell/clipboard` (`AgentTools`), `RunSpec` z obsady i ustawień, `RunHandle` (przebieg `agent-runtime`), projekcja `agent.*` → Replay/karty UI (`RunProjector`), `TicketLog` (fakty kart zatwierdzenia), eval narzędzi F3 (`eval`) |
+| `app-voice` | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów) |
 | `app-core` | kompozycja (`AppOptions` → `parts`), komendy, czat, Router (`route/*`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
 
 ## Kompozycja (`AppCore::build(AppPaths, AppOptions)`) — jedno miejsce: `parts/`
@@ -38,6 +40,30 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
    (`AppOptions::audio` albo WASAPI), voice-tts (sidecary Pocket TTS / Piper, jeśli zainstalowane),
    updater (`FsUpdater`; `mark_good` po `healthy_after` ≈ 30 s zdrowego startu).
 
+5. Agentki i głos (`parts/agents.rs`): `AgentTools` nad Brokerem (`TicketLog`), dziennikiem cofania,
+   `FsPort`/`ExecPort` z `platform-windows` (**ta sama instancja `ExecPort` zabija procesy w Brokerze**
+   — kill-switch obejmuje Job Objects poleceń) i deny-listą bazową; port głosu `PipelineVoice` z
+   fabryką `AppOptions::voice_engine` albo `SystemVoice` (bez modeli/sidecarów — stan „głos
+   niedostępny: pobierz modele w Ustawieniach → Głos").
+
+## Agentki z narzędziami (`chat/agent.rs`, `store_agents.rs`, `commands/workdir.rs`)
+Wiadomość do agentki idzie przez `agent-runtime`, gdy sesja ma katalog roboczy (`sessions_choose_workdir`:
+dialog powłoki / katalog sesji / brak; katalogi danych Alfy, deny-lista i segmenty poświadczeń
+odrzucane) i role agentki dają narzędzia; inaczej zwykły czat. Budżety z Ustawień → Agentki
+(`agents.*`); bez okna Brokera czekanie na zgodę ≤ 60 s, potem odmowa z powodem dla modelu
+(`AppOptions::approval_timeout` — testy). Zdarzenia: `AgentRunUpdated`, `AgentStep` (Replay, trwały w
+`app_agent_runs/steps`, append-only), `ToolCall` z „Cofnij" i intencją, `ApprovalPending`
+(`broker_window`, `expires_at`). Komendy: `agents_runs`, `agents_steer` (wiadomość w trakcie zadania),
+`agents_open_terminal` (terminal w katalogu kroku, bez wykonania), `turns_undo_step` (dziennik albo
+schowek `"<sesja>:c<id>"`). Stop/Esc i kill-switch anulują przebieg i polecenia.
+
+## Tryb głosowy (`voice_chat.rs`, `app-voice`)
+`voice_set_mic_enabled/ptt/set_muted/stop_speech/status/preview`; wypowiedź → tura użytkownika w
+aktywnej sesji (albo nowej sesji „Asystent głosowy"), odpowiedź strumieniuje się do UI i do TTS;
+barge-in → `record_heard_prefix` (tura agentki ma `heard_prefix`, kolejne żądanie widzi, co
+użytkownik usłyszał). Pigułka (`VoicePill`: kto mówi, poziom, transkrypt częściowy), `MicLevel` ≤ 30/s,
+`VoiceStatusChanged`; „stop wszystko" głosem = kill-switch, „anuluj" = Stop aktywnej sesji.
+
 ## Router (`route/`)
 Trzy rdzenie `router-impl`: **hybryda** (API + lokalne), **chmura** (tylko API) i **lokalny** (tylko
 lokalne — profil `Local` albo sesja z tagiem `LocalOnly`). Kandydaci = konta z `accounts-hub`
@@ -57,9 +83,9 @@ Kolejność: nadpisanie z `AppOptions` → adapter na module → „moduł niepo
 |---|---|---|
 | `BrainPort` | `RouterBrain` (Router + konta hubu + dostawcy lokalni; `AppOptions::providers` dokłada dostawców testowych) | `RouterUnavailable` |
 | `TransferPort` | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; eksport sekretów tylko jawnie, z hasłem; sesji prywatnej nie eksportuje) | `TransferUnavailable` |
-| `VoicePort` | `VoiceAdapter` (lista wejść i test mikrofonu `MicLevel` ≤ 30/s z `voice-audio`; czytanie na głos z `voice-tts`, bez silnika — `NO_TTS`) | włączenie mikrofonu/wyciszenie/pigułka: `voice-pipeline` |
+| `VoicePort` | `PipelineVoice` (`app-voice`): rozmowa, PTT, wyciszenie, pigułka — `voice-pipeline`; lista wejść, test mikrofonu (`MicLevel` ≤ 30/s) i czytanie na głos — `VoiceAdapter` (`voice-audio`, `voice-tts`; bez silnika — `NO_TTS`) | bez modeli/sidecarów: `VoiceStatus::Unavailable` z listą braków |
 | `BrokerPort` | `InprocBroker` (poziomy autonomii, `request_level`, `run_code`, `undo_step`, `kill_all`) | podniesienie poziomu wymaga `ApprovalWindow`; bez Broker-UI — `NEEDS_BROKER_WINDOW` (odmowa); dozwolone `run_code` — brak wykonawcy `tools-shell` |
-| `ShellPort` | powłoka Tauri (dialogi `tauri-plugin-dialog`, okna, zasobnik) | `HeadlessShell` (testy; kolejka odpowiedzi dialogów) |
+| `ShellPort` | powłoka Tauri (dialogi `tauri-plugin-dialog` w tym wybór katalogu, terminal w katalogu bez wykonania, okna, zasobnik) | `HeadlessShell` (testy; kolejka odpowiedzi dialogów) |
 
 Kill-switch (`system_kill_all`, `Ctrl+Shift+F12`, zasobnik): anulowanie generacji i pobierań →
 `BrokerPort::kill_all` (audyt `broker.kill_switch`) → zatrzymanie mowy → toast.
@@ -76,7 +102,7 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
 `"<sesja>:u<krok>"` (`turns_undo_step` → `undo-journal` przez Brokera, wpis „Cofnięto: …" na osi czasu).
 
 ## Testy
-- `tests/dto_roundtrip.rs` — każdy ładunek atrapy UI (76 komend, 22 typy zdarzeń) deserializuje się
+- `tests/dto_roundtrip.rs` — każdy ładunek atrapy UI (84 komendy, 25 typów zdarzeń) deserializuje się
   do DTO i wraca bez strat; zbiór komend = COMMANDS.md = `app_core::COMMANDS`.
 - `tests/ipc_signatures.rs` — sygnatury z `with_commands!` istnieją w `AppCore`, przyszłości `Send + 'static`.
 - `tests/scenario.rs`, `tests/errors.rs`, `tests/commands.rs` — scenariusze na atrapach
@@ -90,6 +116,15 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
   eksport sekretów).
 - `tests/spy.rs` — ≥ 3 sesje równolegle, zero przecieków (żądania, historia, zdarzenia, wyszukiwanie,
   oś czasu, pliki baz na dysku).
+- `tests/agents.rs` — zadanie fs przez agentkę → krok w Replay → „Cofnij" przywraca stan; odmowa
+  Brokera (blokada Jądra) → powód w wyniku narzędzia; zgoda bez decyzji → odmowa po czasie;
+  kill-switch zatrzymuje pętlę i wiszące polecenie; steering i Stop.
+- `tests/workdir.rs` — wybór katalogu roboczego (dialog, odrzucenia), sesja bez katalogu = czat;
+  intencja „uruchom w terminalu" bez wykonania.
+- `tests/voice.rs` — rozmowa na atrapach potoku (zegar wirtualny) z barge-in → usłyszany prefiks w
+  historii i w kontekście kolejnego żądania; pigułka i stan trybu.
+- `tests/spy_modes.rs` — agentka z narzędziami, rozmowa głosowa i czat równolegle: 0 przecieków
+  (żądania, historia, Replay, zdarzenia, katalogi robocze, pliki danych Alfy).
 - Progi czasu ścisłe tylko przy `ALFA_PERF_BUDGETS=1` (inaczej ×10).
 
 ## Fixture'y z atrapy UI

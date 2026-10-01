@@ -142,15 +142,95 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     L('Klasy zadań i fallbacki', 'Task classes and fallbacks'),
     L('Tagi prywatności i jurysdykcji', 'Privacy and jurisdiction tags'),
   ]),
-  later('voice', L('Głos', 'Voice'), 2, [
-    L('Urządzenia audio, STT, TTS', 'Audio devices, STT, TTS'),
-    L('Słowa wywoławcze i barge-in', 'Wake words and barge-in'),
-    L('Voice Lab i słownik wymowy', 'Voice Lab and pronunciation dictionary'),
-  ]),
-  later('agents', L('Agentki', 'Agents'), 2, [
-    L('Biblie głosu i charaktery', 'Voice bibles and characters'),
-    L('Szablony obsad ról', 'Role cast templates'),
-    L('Kreator agentek', 'Agent creator'),
+  page(
+    'voice',
+    L('Głos', 'Voice'),
+    1,
+    [
+      select(
+        'voice.mode',
+        L('Włączanie mikrofonu', 'Microphone activation'),
+        L(
+          'Przełącznik (Ctrl+Shift+M) albo mówienie z przytrzymaniem Spacji (PTT).',
+          'Toggle (Ctrl+Shift+M) or push-to-talk with the Space key.',
+        ),
+        [
+          ['toggle', L('Przełącznik', 'Toggle')],
+          ['ptt', L('Przytrzymaj, aby mówić (PTT)', 'Push to talk')],
+        ],
+        'toggle',
+      ),
+      toggle(
+        'voice.show_pill',
+        L('Pigułka głosowa', 'Voice pill'),
+        L(
+          'Małe okno z mówiącą agentką i stanem mikrofonu, gdy okno główne jest ukryte.',
+          'A small window with the speaking agent and microphone state when the main window is hidden.',
+        ),
+        true,
+      ),
+    ],
+    { custom: 'voice' },
+  ),
+  page('agents', L('Agentki', 'Agents'), 1, [
+    number(
+      'agents.max_steps',
+      L('Limit kroków zadania', 'Task step limit'),
+      L(
+        'Agentka zatrzyma się po tylu krokach (tura modelu albo narzędzie) i pokaże raport.',
+        'The agent stops after this many steps (model turn or tool) and shows a report.',
+      ),
+      40,
+      5,
+      200,
+      1,
+      null,
+    ),
+    number(
+      'agents.max_minutes',
+      L('Limit czasu zadania', 'Task time limit'),
+      L('Najdłuższy czas jednego zadania agentki.', 'The longest time of a single agent task.'),
+      15,
+      1,
+      120,
+      1,
+      'min',
+    ),
+    number(
+      'agents.max_cost_pln',
+      L('Limit kosztu zadania', 'Task cost limit'),
+      L(
+        'Najwyższy koszt modeli w jednym zadaniu (0 = bez limitu; limit miesięczny obowiązuje zawsze).',
+        'Highest model cost of a single task (0 = no limit; the monthly limit always applies).',
+      ),
+      0,
+      0,
+      500,
+      1,
+      'zł',
+    ),
+    number(
+      'agents.approval_timeout_s',
+      L('Czekanie na zatwierdzenie', 'Waiting for approval'),
+      L(
+        'Po tym czasie bez decyzji w oknie Brokera agentka dostaje odmowę.',
+        'Without a decision in the Broker window after this time, the agent is denied.',
+      ),
+      300,
+      30,
+      1800,
+      30,
+      's',
+    ),
+    toggle(
+      'agents.verify_before_done',
+      L('„Gotowe" po samoweryfikacji', '"Done" after self-check'),
+      L(
+        'Agentka sprawdza wynik narzędziami tylko do odczytu, zanim ogłosi koniec zadania.',
+        'The agent checks the result with read-only tools before declaring the task done.',
+      ),
+      true,
+    ),
   ]),
   page('permissions', L('Uprawnienia i bezpieczeństwo', 'Permissions and security'), 1, [], {
     custom: 'permissions',

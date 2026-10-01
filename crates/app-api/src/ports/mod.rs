@@ -4,6 +4,7 @@
 
 mod modules;
 mod shell;
+mod voice;
 
 use std::sync::Arc;
 
@@ -14,9 +15,13 @@ use sessions_contract::{PrivacyTag, SessionId};
 
 pub use modules::{
     ApprovalWindow, AutonomyView, BrokerPort, BrokerUnavailable, KillOrigin, NEEDS_BROKER_WINDOW,
-    NoApprovalWindow, TransferPort, TransferUnavailable, VoicePort, VoiceUnavailable,
+    NoApprovalWindow, TransferPort, TransferUnavailable,
 };
 pub use shell::{HeadlessShell, ShellPort};
+pub use voice::{
+    VOICE_PREVIEW_TEXT, VoiceChat, VoiceChunk, VoicePort, VoiceTurn, VoiceTurnRef,
+    VoiceUnavailable, voice_unavailable_reason,
+};
 
 use crate::dto::ModelProfile;
 

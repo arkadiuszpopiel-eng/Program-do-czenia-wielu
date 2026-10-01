@@ -12,6 +12,7 @@
   } from '@alfa/ui-kit';
   import type { CastTemplateId } from '../../api/types';
   import { useApp } from '../../state/context';
+  import WorkdirCard from './WorkdirCard.svelte';
 
   interface Props {
     sessionId: string;
@@ -51,6 +52,7 @@
 </script>
 
 <div class="agents">
+  <WorkdirCard {sessionId} />
   <div class="template">
     <label for="cast-template" class="label">{t('agents.template')}</label>
     <div class="row">

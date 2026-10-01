@@ -4,6 +4,7 @@ import type { AgentId } from '@alfa/ui-kit';
 import type { RenderedBlock, Turn, TurnError, TurnUsage } from '../types';
 import type { AlfaEvent } from '../types-system';
 import { changedBlocks, renderBlocks, tokenize } from './render';
+import { replayStep, terminalIntent, type FakeRuns } from './api-agents';
 import type { ResponseScript } from './responses';
 import type { Scheduler } from './scheduler';
 
@@ -11,6 +12,8 @@ export interface StreamHost {
   readonly scheduler: Scheduler;
   readonly tokensPerSecond: number;
   emit(events: readonly AlfaEvent[]): void;
+  /** Przebiegi agentek (Replay) — kroki narzędzi trafiają też tutaj. */
+  readonly runs?: FakeRuns;
   /** Wywoływane po zakończeniu (także błędem / anulowaniem). */
   finished(turn: Turn, agent: AgentId, usage: TurnUsage | null): void;
 }
@@ -55,6 +58,11 @@ export class FakeStreamer {
       stop: () => finish('cancelled'),
     };
     this.active.set(sid, entry);
+    const runs = this.host.runs;
+    const runId =
+      runs && script.tools.some((t) => t.tool)
+        ? runs.begin(sid, tid, script.agent, script.text.slice(0, 80))
+        : null;
 
     const at = (ms: number, fn: () => void): void => {
       entry.timer = scheduler.setTimeout(() => {
@@ -81,6 +89,12 @@ export class FakeStreamer {
     const finish = (reason: 'end' | 'max_tokens' | 'cancelled' | 'error'): void => {
       if (phase === 'done') return;
       phase = 'done';
+      if (runId && runs)
+        runs.setState(
+          runId,
+          reason === 'cancelled' ? 'cancelled' : reason === 'error' ? 'failed' : 'completed',
+          turn.text.slice(0, 200) || null,
+        );
       if (entry.timer !== null) scheduler.clearTimeout(entry.timer);
       this.active.delete(sid);
       if (turn.thinking?.active) turn.thinking = { ...turn.thinking, active: false };
@@ -142,7 +156,13 @@ export class FakeStreamer {
       const tool = script.tools[toolIndex];
       if (!tool) {
         if (script.approval) {
-          const approval = { ...script.approval, id: `ap-${tid}`, status: 'pending' as const };
+          const approval = {
+            ...script.approval,
+            id: `ap-${tid}`,
+            status: 'pending' as const,
+            broker_window: true,
+            expires_at: null,
+          };
           turn.approval = approval;
           emit({ type: 'ApprovalPending', session_id: sid, turn_id: tid, approval });
         }
@@ -150,7 +170,8 @@ export class FakeStreamer {
         nextToken();
         return;
       }
-      const id = `${tid}-t${toolIndex}`;
+      const n = toolIndex + 1;
+      const id = runId ? `${runId}:s${n}` : `${tid}-t${toolIndex}`;
       const running = {
         id,
         icon: tool.icon,
@@ -158,17 +179,40 @@ export class FakeStreamer {
         status: 'running' as const,
         duration_ms: null,
         undo_token: null,
+        undone: false,
+        intent: null,
       };
+      const replay = runId
+        ? replayStep(runId, n, {
+            tool: tool.tool ?? null,
+            title: tool.label,
+            at_ms: scheduler.now() - started,
+          })
+        : null;
+      if (runId && replay) runs?.step(runId, replay);
       turn.tools = [...turn.tools, running];
       emit({ type: 'ToolCall', session_id: sid, turn_id: tid, step: running });
       activity(tool.label, toolIndex + 1, script.tools.length);
       at(tool.ms, () => {
+        const intent = tool.terminal
+          ? terminalIntent(tool.terminal, 'C:\\Users\\Ty\\Pobrane')
+          : null;
         const done = {
           ...running,
           status: 'done' as const,
           duration_ms: tool.ms,
           undo_token: tool.undo ? `${sid}:u${toolIndex + 1}` : null,
+          intent,
         };
+        if (runId && replay)
+          runs?.step(runId, {
+            ...replay,
+            status: intent ? 'needs_confirmation' : 'ok',
+            output: tool.label,
+            duration_ms: tool.ms,
+            undo_token: done.undo_token,
+            intent,
+          });
         turn.tools = turn.tools.map((s) => (s.id === id ? done : s));
         emit({ type: 'ToolCall', session_id: sid, turn_id: tid, step: done });
         toolIndex++;

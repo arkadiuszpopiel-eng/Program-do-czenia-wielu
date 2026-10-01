@@ -78,8 +78,8 @@ pub fn turn_dto(
             duration_ms: ms,
             active: false,
         }),
-        tools: Vec::new(),
-        approval: None,
+        tools: meta.map(|m| m.tools.clone()).unwrap_or_default(),
+        approval: meta.and_then(|m| m.approval.clone()),
         usage,
         error: meta.and_then(|m| m.error.clone()),
         continues: meta
@@ -87,6 +87,9 @@ pub fn turn_dto(
             .map(|c| ids::turn_dto(session, sessions_contract::TurnId(c))),
         addressed_to: meta.and_then(|m| m.addressed_to.clone()),
         truncated: meta.is_some_and(|m| m.truncated),
+        heard_prefix: turn
+            .heard_prefix
+            .map(|h| turn.content.text.chars().take(h.chars).collect()),
     }
 }
 

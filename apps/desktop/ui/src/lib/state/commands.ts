@@ -121,8 +121,15 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'voice.mic': {
       const on = app.micState === 'off' || app.micState === 'muted';
+      const before = app.micState;
       app.micState = on ? 'listening' : 'off';
-      void app.client.voice.setMicEnabled(on);
+      app.client.voice.setMicEnabled(on).catch((error: unknown) => {
+        app.micState = before;
+        app.toasts.show({
+          kind: 'warning',
+          message: error instanceof Error ? error.message : String(error),
+        });
+      });
       break;
     }
     case 'action.theme': {

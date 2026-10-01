@@ -242,9 +242,14 @@ async fn connected_modules_report_readable_errors() {
         .await
         .unwrap_err();
     assert_eq!(undo.code, ErrorCode::NotFound, "{undo:?}");
-    // Rozmowa głosowa należy do potoku `voice-pipeline`; czytanie bez sidecara TTS — komunikat.
+    // Rozmowa głosowa bez modeli/sidecarów: czytelny stan „głos niedostępny" z listą braków.
     let mic = core.voice_set_mic_enabled(true).await.unwrap_err();
-    assert!(mic.message.contains("voice-pipeline"), "{}", mic.message);
+    assert_eq!(mic.code, ErrorCode::Unavailable, "{mic:?}");
+    assert!(mic.message.contains("Głos niedostępny"), "{}", mic.message);
+    let voice = core.voice_status().await.unwrap();
+    assert_eq!(voice.state, app_core::dto::VoiceState::Unavailable);
+    assert!(!voice.missing.is_empty(), "{voice:?}");
+    assert!(voice.reason.is_some_and(|r| r.pl.contains("Ustawieniach")));
     core.voice_start_mic_test(None).await.unwrap();
     core.voice_stop_mic_test().await.unwrap();
     core.voice_stop_speech().await.unwrap();

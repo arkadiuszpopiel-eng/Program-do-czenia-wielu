@@ -7,6 +7,10 @@ export interface ScriptTool {
   readonly label: string;
   readonly ms: number;
   readonly undo: boolean;
+  /** Narzędzie (nazwa z manifestu) — krok w Replay. */
+  readonly tool?: string;
+  /** „Uruchom w terminalu": polecenie do skopiowania (bez wykonania). */
+  readonly terminal?: string;
 }
 
 export interface ResponseScript {
@@ -15,7 +19,7 @@ export interface ResponseScript {
   readonly text: string;
   readonly thinkingMs: number;
   readonly tools: readonly ScriptTool[];
-  readonly approval: Omit<ApprovalPending, 'id' | 'status'> | null;
+  readonly approval: Omit<ApprovalPending, 'id' | 'status' | 'broker_window' | 'expires_at'> | null;
   /** Odpowiedź ucięta (StopReason MaxTokens) → akcja „Kontynuuj". */
   readonly truncated: boolean;
 }
@@ -60,8 +64,28 @@ export function pickResponse(
         'Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym kliknięciem.',
       ),
       tools: [
-        { icon: 'search', label: 'Przeszukano Pobrane (31 plików)', ms: 500, undo: false },
-        { icon: 'file', label: 'Przeniesiono 14 plików do Archiwum/2026', ms: 1200, undo: true },
+        {
+          icon: 'search',
+          label: 'Przeszukano Pobrane (31 plików)',
+          ms: 500,
+          undo: false,
+          tool: 'fs_search',
+        },
+        {
+          icon: 'edit',
+          label: 'Delta: przeniesiono 14 plików',
+          ms: 1200,
+          undo: true,
+          tool: 'fs_move',
+        },
+        {
+          icon: 'terminal',
+          label: 'Uruchom w terminalu',
+          ms: 300,
+          undo: false,
+          tool: 'shell_terminal',
+          terminal: 'Get-ChildItem -Recurse Archiwum/2026 | Measure-Object',
+        },
       ],
       approval: {
         what: 'Usunięcie 6 duplikatów z folderu Pobrane',

@@ -101,6 +101,26 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
   `turns_read_aloud` czyta głosem agentki (bez silnika TTS — komunikat „pobierz w Ustawieniach → Głos").
   Rola agentki wykonującej działania ma jedną nazwę: `operator` (jak w `personas-contract`).
 
+## Implementacja F3 — agentki z narzędziami i głos (stan)
+- **Replay** (panel Oś czasu → przełącznik „Zdarzenia | Replay”): przebiegi sesji (`agents_runs`, na
+  żywo `AgentRunUpdated`/`AgentStep`) — krok, narzędzie, wejście/wyjście skrócone (zwykły tekst), status
+  (ikona + tekst), czas, „Cofnij krok”, „Otwórz terminal”; odtwarzanie Od początku / Poprzedni / Następny /
+  Wszystkie (`aria-live`).
+- **Wątek:** linie kroków (`ToolCall`), karta „Cofnij” (cofalne kroki zakończonej tury) i toast „Cofnij” 8 s
+  po cofalnej akcji, karta intencji „Uruchom w terminalu” (polecenie do skopiowania + `agents_open_terminal`)
+  i „trwałe usunięcie” (tylko okno Brokera), karta „czeka na zatwierdzenie” z wyjaśnieniem bez okna
+  Brokera (`broker_window = false`, czas odmowy z `expires_at`).
+- **Steering:** wiadomość wysłana w trakcie przebiegu agentki trafia do `agents_steer` (podpowiedź w
+  composerze); Esc/Stop = `turns_stop`.
+- **Katalog roboczy:** karta w panelu Agentki (`sessions_workdir`, `sessions_choose_workdir`:
+  dialog / katalog sesji / bez narzędzi).
+- **Głos:** wskaźnik mikrofonu w pasku tytułu (stan z `VoiceStatusChanged`/`VoicePill`), pigułka
+  (`pill.html`, bez frameworka, ≤ 8 KB gzip: kto mówi, poziom, transkrypt częściowy, Stop, Wycisz),
+  Ustawienia → Głos (stan trybu i braki modeli, urządzenia, test mikrofonu, tryb przełącznik/PTT,
+  pigułka, próbki głosów agentek `voice_preview`).
+- **Testy:** vitest (`logic/replay`, `state/agents`), Playwright `e2e/agents-voice.spec.ts` (Replay, karta
+  „Cofnij”, terminal, pigułka) + axe 0 critical/serious w obu motywach.
+
 ## Otwarte pytania
 - Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.
 - Pisownia PL w WebView2 (spike j) — composer ma `spellcheck` i `lang` z bieżącego języka.

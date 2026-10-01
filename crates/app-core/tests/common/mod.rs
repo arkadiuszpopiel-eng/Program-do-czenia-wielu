@@ -3,6 +3,9 @@
 
 #![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
 
+pub mod agents;
+pub mod voice;
+
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -54,10 +57,12 @@ pub fn last_user_text(request: &ChatRequest) -> String {
         .unwrap_or_default()
 }
 
-/// Dostawca testowy: skrypt z kolejki albo echo ostatniej wiadomości (słowami, z odstępem).
+/// Dostawca testowy: skrypt z kolejki sesji, z kolejki wspólnej albo echo ostatniej wiadomości
+/// (słowami, z odstępem).
 pub struct ScriptedProvider {
     base: FakeProvider,
     queue: Mutex<VecDeque<Script>>,
+    by_session: Mutex<std::collections::BTreeMap<String, VecDeque<Script>>>,
     seen: Mutex<Vec<ChatRequest>>,
     gap: Duration,
 }
@@ -67,6 +72,7 @@ impl ScriptedProvider {
         Self {
             base: fresh(),
             queue: Mutex::new(VecDeque::new()),
+            by_session: Mutex::default(),
             seen: Mutex::new(Vec::new()),
             gap,
         }
@@ -74,6 +80,16 @@ impl ScriptedProvider {
 
     pub fn push(&self, script: Script) {
         self.queue.lock().unwrap().push_back(script);
+    }
+
+    /// Skrypt tylko dla żądań sesji `session` (sesje równoległe nie podbierają sobie skryptów).
+    pub fn push_for(&self, session: &str, script: Script) {
+        self.by_session
+            .lock()
+            .unwrap()
+            .entry(session.to_owned())
+            .or_default()
+            .push_back(script);
     }
 
     pub fn requests(&self) -> Vec<ChatRequest> {
@@ -91,7 +107,15 @@ impl ModelProvider for ScriptedProvider {
     }
     fn stream(&self, request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
         self.seen.lock().unwrap().push(request.clone());
-        let script = self.queue.lock().unwrap().pop_front().unwrap_or_else(|| {
+        let own = request.meta.session.as_ref().and_then(|s| {
+            self.by_session
+                .lock()
+                .unwrap()
+                .get_mut(s.as_str())
+                .and_then(VecDeque::pop_front)
+        });
+        let queued = || self.queue.lock().unwrap().pop_front();
+        let script = own.or_else(queued).unwrap_or_else(|| {
             let echo = format!("Echo: {}", last_user_text(&request));
             let words: Vec<String> = echo.split_inclusive(' ').map(str::to_owned).collect();
             Script::chunks(FAKE_MODEL, &words, self.gap)

@@ -103,5 +103,7 @@ export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
       core.drafts[id] = text;
       return core.reply(undefined);
     },
+    workdir: (id) => core.reply(core.runs.workdir(id)),
+    chooseWorkdir: (id, choice) => core.reply(core.runs.chooseWorkdir(id, choice)),
   };
 }

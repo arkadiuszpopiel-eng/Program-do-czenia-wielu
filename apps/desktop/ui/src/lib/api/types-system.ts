@@ -18,6 +18,7 @@ import type {
   TurnStatus,
   TurnUsage,
 } from './types';
+import type { AgentRun, ReplayStep, VoiceSpeaker, VoiceStatus } from './types-agents';
 import type { Account, LocalDownloadState } from './types-hub';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
@@ -51,7 +52,7 @@ export interface SettingDef {
 
 /** Strona o specjalnym widoku w UI (reszta renderowana generycznie z `settings`). */
 export type SettingsCustomPage =
-  'providers' | 'costs' | 'shortcuts' | 'transfer' | 'permissions' | 'devices';
+  'providers' | 'costs' | 'shortcuts' | 'transfer' | 'permissions' | 'devices' | 'voice';
 
 export interface SettingsPageDef {
   readonly id: string;
@@ -119,6 +120,10 @@ export interface VoicePillState {
   readonly agent: AgentId;
   readonly mic: MicState;
   readonly level: number;
+  /** Kto mówi teraz. */
+  readonly speaker: VoiceSpeaker;
+  /** Transkrypt częściowy wypowiedzi użytkownika (szary). */
+  readonly partial: string | null;
 }
 
 // ── Zdarzenia (jeden kanał, batch co klatkę) ────────────────────────────────────────────────────
@@ -206,6 +211,17 @@ export type AlfaEvent =
     }
   /** Przejdź do sesji (zasobnik, `alfa://session/…`, Szybkie pytanie → pełne okno). */
   | { readonly type: 'OpenSession'; readonly session_id: string }
+  /** Przebieg agentki: start, stan, zużycie, koniec (nagłówek; kroki — `AgentStep`). */
+  | { readonly type: 'AgentRunUpdated'; readonly session_id: string; readonly run: AgentRun }
+  /** Krok przebiegu (Replay na żywo). */
+  | {
+      readonly type: 'AgentStep';
+      readonly session_id: string;
+      readonly run_id: string;
+      readonly step: ReplayStep;
+    }
+  /** Stan trybu głosowego (dostępność, mikrofon, tryb). */
+  | { readonly type: 'VoiceStatusChanged'; readonly status: VoiceStatus }
   | {
       /** Postęp pobierania modelu lokalnego (onboarding, Ustawienia). */
       readonly type: 'LocalModelProgress';

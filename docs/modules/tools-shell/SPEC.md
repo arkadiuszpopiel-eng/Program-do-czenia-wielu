@@ -1,4 +1,4 @@
-# tools-shell — SPEC (szkic v0)
+# tools-shell — SPEC (v0, zaimplementowany)
 
 ## Cel
 Wykonywanie poleceń przez agentki: PowerShell 7/5, cmd, ConPTY (strumień wyjścia, interaktywność ograniczona), z tokenem `shell.exec(zakres)`, snapshotem zakresu przed wykonaniem (shadow-git/kopia), limitami czasu/wyjścia, Job Object i możliwością „uruchom w terminalu" z bloku kodu (PLAN §7.2, §8.7, §14.8). WSL2/SSH/Git/Docker — F6.
@@ -6,21 +6,18 @@ Wykonywanie poleceń przez agentki: PowerShell 7/5, cmd, ConPTY (strumień wyjś
 ## Fala i priorytet
 F3 (PowerShell/cmd przez ConPTY, snapshot zakresu). P0. `ui-terminal` (logowanie do CLI) — F4, osobny moduł.
 
-## Kontrakt (szkic Rust)
+## Kontrakt
+Format wspólny: `tools-common` (docs/modules/tools-common/SPEC.md).
 ```rust
-// tools-shell-contract — SZKIC
-pub struct ShellCall { pub shell: Shell /* Pwsh7 | Pwsh5 | Cmd */, pub command: String, pub cwd: PathBuf, pub env: Vec<(String, String)>, pub timeout: Duration,
-                       pub scope: Scope /* katalogi, których polecenie może dotykać */, pub interactive: bool }
-pub enum ShellEvent { Started { pid }, Stdout(Bytes), Stderr(Bytes), Exited { code, elapsed }, TimedOut, Killed(KillReason) }
-pub struct ShellCallCtx { pub token: CapToken, pub session: SessionId, pub run: RunId, pub step: StepId, pub snapshot: Option<SnapshotId> }
-pub trait ToolsShell: Send + Sync {
-    fn spec(&self) -> ToolSpec;                                      // reversible: Scoped
-    fn facts(&self, call: &ShellCall) -> ActionFacts;                // heurystyki destrukcyjności (rm/format/reg delete…), egress, zakres
-    fn run(&self, call: ShellCall, ctx: ShellCallCtx, cancel: CancelToken) -> BoxStream<ShellEvent>;
-    fn open_in_terminal(&self, call: ShellCall, ctx: ShellCallCtx) -> Result<TerminalHandle>;   // „uruchom w terminalu” (widoczne okno ConPTY w UI)
-}
+// tools-shell-contract
+shell_run { command, cwd? /* domyślnie katalog roboczy */, shell?: pwsh | powershell | cmd, timeout_s? }   // reversible: scoped
+shell_terminal { command, cwd?, shell? }   // intencja shell.open_in_terminal — właściciel uruchamia sam, nic nie jest wykonywane
+pub struct ShellToolsConfig { default_shell, pwsh_path, powershell_path, cmd_path, timeout_default_s, timeout_max_s,
+                              output_max_bytes, output_max_chars, memory_limit_mb, env_allowlist }
+// tools-shell-impl
+pub struct ShellTools; impl ShellTools { pub fn new(deps: ShellToolsDeps /* broker, journal, exec: ExecPort, jobs: JobRegistry, env, deny, config, base_env, bus */) -> Self }
 ```
-Zdarzenia (Narzędzia i GUI + Audyt): `tool.shell.started`, `tool.shell.output` (limit, redakcja), `tool.shell.exited`, `tool.shell.killed`, `tool.shell.out_of_scope_ask`.
+Zdolności: `shell.exec(zakres)` (polecenie trafia do reguł Jądra/klasyfikatora), `net.egress(host)` dla poleceń sieciowych (polecenie sieciowe bez jawnego hosta = odmowa `Policy`). Przed wykonaniem snapshot zakresu w dzienniku cofania (`UndoRef { service: Journal }`); proces w Job Object zarejestrowanym w `JobRegistry` (kill-switch Brokera). Wyjście niezaufane (`TaintSource::Tool`), redagowane i obcinane.
 
 ## Zależności
 `core-bus/config/log-contract`, `platform-windows-contract` (`ProcessPort`: ConPTY, Job Object, restricted token), `safety-broker-contract`, `undo-journal-contract` (snapshot zakresu), `risk-classifier-contract`, `tools-fs-contract` (deny-listy).
@@ -47,15 +44,18 @@ Start powłoki ≤ 300 ms (pwsh7 cold start bywa wolniejszy — mierzone); RAM k
 `[tools.shell] default = "pwsh7"`, `timeout = "120s"`, `output_max_kb = 1024`, `env_allowlist = ["PATH", "TEMP", ...]`, `job.max_ram_mb = 2048`, `snapshot_required = true` (kernel_policy).
 
 ## Wkład do UI
-Krok narzędzia z podglądem wyjścia (zwinięty, przewijany), „uruchom w terminalu" w bloku kodu, karta „czeka na zatwierdzenie" dla poleceń poza zakresem, Ustawienia → Komputer.
+Krok w wątku i Replay (polecenie, skrócone wyjście, kod wyjścia), karta „czeka na zatwierdzenie” dla poleceń poza zakresem/sieciowych, karta intencji „Uruchom w terminalu” (polecenie do skopiowania, `agents_open_terminal` otwiera Windows Terminal/pwsh w `cwd` bez wykonania), Ustawienia → Komputer.
+
+## Integracja w aplikacji
+`app-agents::AgentTools` składa `ShellTools` z tą samą instancją `ExecPort`, którą Broker zabija procesy (`JobRegistry` = silnik Brokera): kill-switch (`Ctrl+Shift+F12`, „stop wszystko” głosem) i Stop/Esc przebiegu kończą drzewa procesów. Bez okna Brokera prośba o zgodę wygasa po ≤ 60 s (odmowa z powodem dla modelu).
 
 ## Testy akceptacyjne
 - `ACC-F3-tools-shell-01`: snapshot zakresu → skrypt modyfikujący pliki → cofnięcie przywraca zakres (z `undo-journal`).
 - `ACC-F3-tools-shell-02`: ≥ 100 poleceń poza zakresem / na deny-liście / czytających `~/.claude` = 0 wykonanych bez zatwierdzenia; ETW: 0 odczytów ścieżek poświadczeń.
-- `ACC-F3-tools-shell-03`: timeout i kill-switch zabijają drzewo procesów (w tym potomków) 100/100; eval narzędzi shell na lokalnym modelu ≥ próg z F0.
+- `ACC-F3-tools-shell-03`: timeout i kill-switch zabijają drzewo procesów (w tym potomków) 100/100 (`app-core/tests/agents.rs` na atrapie; sprzętowo — runner self-hosted); eval narzędzi shell na lokalnym modelu ≥ próg z F0 (`evals/F3/tools/`, zadania `sh-*`).
 
 ## Fake
-`tools-shell-fake`: skryptowane wyniki poleceń (stdout/stderr/kod, opóźnienia z wirtualnym zegarem) bez uruchamiania procesów.
+`tools-shell-fake`: skryptowane wyniki poleceń; testy aplikacji — `platform-fake::FakeExec` (wyniki, procesy „wiszące” do testów anulowania i kill-switcha).
 
 ## Otwarte pytania
 - Heurystyki destrukcyjności poleceń (lista wzorców) — `THREAT_MODEL.md`; do ustalenia w SPEC v1.

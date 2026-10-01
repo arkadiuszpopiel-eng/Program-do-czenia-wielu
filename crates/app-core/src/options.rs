@@ -5,7 +5,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use accounts_hub_contract::SecretStore;
+use app_voice::VoiceEngineFactory;
 use device_profile_contract::DeviceProfile as DeviceProfileService;
+use platform_contract::{ClipboardPort, ExecPort, FsPort};
 use providers_contract::ModelProvider;
 use router_contract::RouteKind;
 use voice_audio_contract::AudioIo;
@@ -24,6 +26,8 @@ pub struct AppOptions {
     pub frame: Duration,
     /// Okno cofnięcia usunięcia sesji (domyślnie z ustawień, 10 s).
     pub undo_window: Option<Duration>,
+    /// Limit czekania agentki na zatwierdzenie (domyślnie z ustawień `agents.approval_timeout_s`).
+    pub approval_timeout: Option<Duration>,
     /// Pobieranie kursu NBP (wyłączone → kurs zapasowy).
     pub fetch_fx: bool,
     /// Magazyn sekretów (`None` = Credential Manager; poza Windows — pamięć procesu).
@@ -42,6 +46,15 @@ pub struct AppOptions {
     pub audio: Option<Arc<dyn AudioIo>>,
     /// Synteza mowy (`None` = sidecary Pocket TTS / Piper, jeśli zainstalowane).
     pub tts: Option<Arc<dyn Tts>>,
+    /// Potok rozmowy głosowej (`None` = moduły `voice-*` z modelami z `AppPaths::models()`
+    /// i sidecarami; bez nich — stan „głos niedostępny").
+    pub voice_engine: Option<Arc<dyn VoiceEngineFactory>>,
+    /// System plików narzędzi agentek i dziennika cofania (`None` = `platform-windows`).
+    pub fs: Option<Arc<dyn FsPort>>,
+    /// Wykonanie poleceń `shell_run` w Job Object (`None` = `platform-windows`).
+    pub exec: Option<Arc<dyn ExecPort>>,
+    /// Schowek narzędzi agentek (`None` = `platform-windows`).
+    pub clipboard: Option<Arc<dyn ClipboardPort>>,
     /// Broker (`None` = `safety-broker` w procesie, tryb deweloperski).
     pub broker: Option<Arc<dyn BrokerPort>>,
     /// Okno zatwierdzeń Brokera (`None` = brak Broker-UI: prośby o zgodę są odrzucane).
@@ -60,6 +73,7 @@ impl Default for AppOptions {
             app_version: env!("CARGO_PKG_VERSION").to_owned(),
             frame: DEFAULT_FRAME,
             undo_window: None,
+            approval_timeout: None,
             fetch_fx: true,
             secrets: None,
             device: None,
@@ -69,6 +83,10 @@ impl Default for AppOptions {
             voice: None,
             audio: None,
             tts: None,
+            voice_engine: None,
+            fs: None,
+            exec: None,
+            clipboard: None,
             broker: None,
             approval_window: None,
             shell: None,

@@ -32,6 +32,11 @@ impl AppCore {
             costs.refresh_fx().await;
         });
         self.restore_autonomy().await;
+        self.inner
+            .voice
+            .attach(std::sync::Arc::new(crate::voice_chat::CoreVoiceChat::new(
+                self,
+            )));
         self.spawn_bus_bridge().await;
         self.spawn_download_bridge().await;
         self.spawn_mark_good(self.inner.healthy_after);

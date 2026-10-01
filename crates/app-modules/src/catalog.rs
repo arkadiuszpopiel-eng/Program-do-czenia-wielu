@@ -11,72 +11,60 @@ use providers_api_impl::CatalogEntry;
 pub const CATALOG_FILES: &[(&str, &str)] = &[
     (
         "anthropic",
-        include_str!("../../../../providers-catalog/anthropic.toml"),
+        include_str!("../../../providers-catalog/anthropic.toml"),
     ),
     (
         "azure-speech",
-        include_str!("../../../../providers-catalog/azure-speech.toml"),
+        include_str!("../../../providers-catalog/azure-speech.toml"),
     ),
     (
         "cartesia",
-        include_str!("../../../../providers-catalog/cartesia.toml"),
+        include_str!("../../../providers-catalog/cartesia.toml"),
     ),
     (
         "custom-anthropic-compatible",
-        include_str!("../../../../providers-catalog/custom-anthropic-compatible.toml"),
+        include_str!("../../../providers-catalog/custom-anthropic-compatible.toml"),
     ),
     (
         "custom-openai-compatible",
-        include_str!("../../../../providers-catalog/custom-openai-compatible.toml"),
+        include_str!("../../../providers-catalog/custom-openai-compatible.toml"),
     ),
     (
         "deepseek",
-        include_str!("../../../../providers-catalog/deepseek.toml"),
+        include_str!("../../../providers-catalog/deepseek.toml"),
     ),
     (
         "elevenlabs",
-        include_str!("../../../../providers-catalog/elevenlabs.toml"),
+        include_str!("../../../providers-catalog/elevenlabs.toml"),
     ),
     (
         "google",
-        include_str!("../../../../providers-catalog/google.toml"),
+        include_str!("../../../providers-catalog/google.toml"),
     ),
-    (
-        "kimi",
-        include_str!("../../../../providers-catalog/kimi.toml"),
-    ),
+    ("kimi", include_str!("../../../providers-catalog/kimi.toml")),
     (
         "minimax",
-        include_str!("../../../../providers-catalog/minimax.toml"),
+        include_str!("../../../providers-catalog/minimax.toml"),
     ),
     (
         "mistral",
-        include_str!("../../../../providers-catalog/mistral.toml"),
+        include_str!("../../../providers-catalog/mistral.toml"),
     ),
     (
         "openai",
-        include_str!("../../../../providers-catalog/openai.toml"),
+        include_str!("../../../providers-catalog/openai.toml"),
     ),
     (
         "openrouter",
-        include_str!("../../../../providers-catalog/openrouter.toml"),
+        include_str!("../../../providers-catalog/openrouter.toml"),
     ),
-    (
-        "qwen",
-        include_str!("../../../../providers-catalog/qwen.toml"),
-    ),
+    ("qwen", include_str!("../../../providers-catalog/qwen.toml")),
     (
         "soniox",
-        include_str!("../../../../providers-catalog/soniox.toml"),
+        include_str!("../../../providers-catalog/soniox.toml"),
     ),
-    (
-        "xai",
-        include_str!("../../../../providers-catalog/xai.toml"),
-    ),
-    (
-        "zai",
-        include_str!("../../../../providers-catalog/zai.toml"),
-    ),
+    ("xai", include_str!("../../../providers-catalog/xai.toml")),
+    ("zai", include_str!("../../../providers-catalog/zai.toml")),
 ];
 
 /// Katalog w dwóch widokach (hub kont i adaptery dostawców).

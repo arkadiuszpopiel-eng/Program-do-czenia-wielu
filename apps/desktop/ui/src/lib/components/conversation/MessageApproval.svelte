@@ -14,9 +14,18 @@
   const { t } = app.i18n;
 
   async function openBroker() {
-    await app.client.permissions.openApproval(approval.id);
-    app.toasts.show({ kind: 'info', message: t('msg.brokerOpened') });
+    try {
+      await app.client.permissions.openApproval(approval.id);
+      app.toasts.show({ kind: 'info', message: t('msg.brokerOpened') });
+    } catch (error) {
+      app.toasts.show({
+        kind: 'warning',
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
+
+  const expires = $derived(approval.expires_at ? app.i18n.time(approval.expires_at) : null);
 </script>
 
 <ApprovalCard
@@ -34,7 +43,7 @@
     reversible: t('approval.reversible'),
     reversibleYes: t('approval.reversibleYes'),
     reversibleNo: t('approval.reversibleNo'),
-    hint: t('approval.hint'),
+    hint: approval.broker_window ? t('approval.hint') : t('approval.noWindow'),
     open: t('approval.open'),
     risk: {
       low: t('approval.risk.low'),
@@ -48,3 +57,17 @@
     },
   }}
 />
+
+{#if !approval.broker_window && approval.status === 'pending'}
+  <p class="dev" role="note">
+    {expires ? t('approval.noWindowExpires', { time: expires }) : t('approval.noWindowDeny')}
+  </p>
+{/if}
+
+<style>
+  .dev {
+    margin-top: var(--alfa-space-1);
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-xs);
+  }
+</style>

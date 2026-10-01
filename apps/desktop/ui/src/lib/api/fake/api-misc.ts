@@ -4,6 +4,7 @@ import type { AutonomyLevel, EventLevel } from '../types';
 import type { FakeChat } from './api-chat';
 import type { FakeCore } from './core';
 import { seedDevice } from './fixtures';
+export { voiceApi } from './api-voice';
 import { SETTINGS_SCHEMA, defaultValues } from './settings-schema';
 
 const LEVELS: readonly EventLevel[] = ['trace', 'debug', 'info', 'warn', 'error', 'audit'];
@@ -46,6 +47,21 @@ export function agentsApi(core: FakeCore, chat: FakeChat): AlfaClient['agents'] 
       const cast = chat.castFor(template);
       core.agents[sid] = core.agentsOf(sid).map((a) => ({ ...a, role_ids: cast[a.id] }));
       core.emit([{ type: 'AgentsChanged', session_id: sid, agents: core.agents[sid] ?? [] }]);
+      return core.reply(undefined);
+    },
+    runs: (sid) => core.reply(core.runs.list(sid)),
+    steer: (sid, text) => {
+      try {
+        core.runs.steer(sid, text);
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+      }
+      return core.reply(undefined);
+    },
+    openTerminal: (stepId) => {
+      const step = core.runs.stepById(stepId);
+      if (step?.intent?.kind !== 'open_in_terminal')
+        return Promise.reject(new Error('Ten krok nie proponuje uruchomienia w terminalu.'));
       return core.reply(undefined);
     },
   };
@@ -153,41 +169,6 @@ export function deviceApi(core: FakeCore): AlfaClient['device'] {
   return {
     profile: () => core.reply(seedDevice(core.scheduler.now())),
     measure: () => core.reply(seedDevice(core.scheduler.now())),
-  };
-}
-
-export function voiceApi(core: FakeCore): AlfaClient['voice'] {
-  let timer: number | null = null;
-  let phase = 0;
-  const tick = (): void => {
-    phase++;
-    // Deterministyczna „mowa": obwiednia sinusoidalna, 30 kl./s.
-    const level = Math.max(0, Math.sin(phase / 4) * 0.6 + Math.sin(phase / 1.7) * 0.25);
-    core.emit([{ type: 'MicLevel', level: Math.min(1, level) }]);
-    timer = core.scheduler.setTimeout(tick, 33);
-  };
-  return {
-    devices: () =>
-      core.reply(
-        core.status.mic === 'missing'
-          ? []
-          : [
-              { id: 'mic-1', name: 'Mikrofon (Realtek Audio)', default: true },
-              { id: 'mic-2', name: 'Zestaw słuchawkowy USB', default: false },
-            ],
-      ),
-    startMicTest: () => {
-      if (timer === null && core.status.mic === 'ok') tick();
-      return core.reply(undefined);
-    },
-    stopMicTest: () => {
-      if (timer !== null) core.scheduler.clearTimeout(timer);
-      timer = null;
-      return core.reply(undefined);
-    },
-    setMicEnabled: () => core.reply(undefined),
-    setMuted: () => core.reply(undefined),
-    stopSpeech: () => core.reply(undefined),
   };
 }
 

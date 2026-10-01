@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+use super::agents::ToolIntent;
 use super::common::{AutonomyLevel, Iso8601, ModelProfile, Money};
 
 /// Projekt (folder sesji).
@@ -127,6 +128,10 @@ pub struct ToolStep {
     pub status: ToolStatus,
     pub duration_ms: Option<u64>,
     pub undo_token: Option<String>,
+    #[serde(default)]
+    pub undone: bool,
+    #[serde(default)]
+    pub intent: Option<ToolIntent>,
 }
 
 /// Poziom ryzyka akcji.
@@ -157,6 +162,12 @@ pub struct ApprovalPending {
     pub reversible: bool,
     pub risk: RiskLevel,
     pub status: ApprovalStatus,
+    /// Czy działa okno Brokera (Broker-UI); bez niego prośba czeka do limitu i kończy się odmową.
+    #[serde(default)]
+    pub broker_window: bool,
+    /// Kiedy prośba wygaśnie (limit czekania agentki).
+    #[serde(default)]
+    pub expires_at: Option<Iso8601>,
 }
 
 /// Zużycie i koszt tury.
@@ -218,6 +229,9 @@ pub struct Turn {
     pub continues: Option<String>,
     pub addressed_to: Option<String>,
     pub truncated: bool,
+    /// Usłyszany prefiks przerwanej odpowiedzi głosowej (tekst; `None` = wysłuchana w całości).
+    #[serde(default)]
+    pub heard_prefix: Option<String>,
 }
 
 /// Ocena tury.

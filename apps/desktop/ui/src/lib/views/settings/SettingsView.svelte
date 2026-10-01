@@ -17,6 +17,7 @@
   import ProvidersPage from './pages/ProvidersPage.svelte';
   import ShortcutsPage from './pages/ShortcutsPage.svelte';
   import TransferPage from './pages/TransferPage.svelte';
+  import VoicePage from './pages/VoicePage.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -131,6 +132,7 @@
         {:else if page.custom === 'transfer'}<TransferPage />
         {:else if page.custom === 'permissions'}<PermissionsPage />
         {:else if page.custom === 'devices'}<DevicesPage />
+        {:else if page.custom === 'voice'}<VoicePage />
         {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />

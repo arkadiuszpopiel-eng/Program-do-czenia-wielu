@@ -23,6 +23,7 @@
   import MessageApproval from './MessageApproval.svelte';
   import MessageError from './MessageError.svelte';
   import MessageActions from './MessageActions.svelte';
+  import AgentCards from './AgentCards.svelte';
   import ToolSteps from './ToolSteps.svelte';
 
   interface Props {
@@ -212,9 +213,15 @@
       <p class="note">{t('conv.cancelled')}</p>
     {/if}
 
+    {#if turn.heard_prefix !== null && agent}
+      <p class="note">{t('conv.heardPrefix', { text: turn.heard_prefix })}</p>
+    {/if}
+
     {#if turn.approval && agent}
       <div class="indent"><MessageApproval {agent} approval={turn.approval} /></div>
     {/if}
+
+    {#if agent && turn.tools.length}<div class="indent"><AgentCards {turn} /></div>{/if}
 
     {#if turn.error}
       <div class="indent"><MessageError {turn} error={turn.error} {conv} /></div>

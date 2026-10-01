@@ -25,6 +25,8 @@ macro_rules! with_commands {
             sessions_mark_read(session_id: String) -> ();
             sessions_get_draft(session_id: String) -> String;
             sessions_save_draft(session_id: String, text: String) -> ();
+            sessions_workdir(session_id: String) -> $crate::dto::SessionWorkdir;
+            sessions_choose_workdir(session_id: String, choice: $crate::dto::WorkdirChoice) -> $crate::dto::SessionWorkdir;
             turns_list(session_id: String) -> $crate::dto::TurnsSnapshot;
             turns_send(session_id: String, options: $crate::dto::SendOptions) -> $crate::dto::SendResult;
             turns_regenerate(session_id: String, turn_id: String, profile: Option<String>) -> String;
@@ -41,6 +43,9 @@ macro_rules! with_commands {
             agents_list(session_id: String) -> Vec<$crate::dto::AgentState>;
             agents_set_roles(session_id: String, agent: String, role_ids: Vec<String>) -> ();
             agents_apply_cast(session_id: String, template: $crate::dto::CastTemplateId) -> ();
+            agents_runs(session_id: String) -> Vec<$crate::dto::AgentRunDetail>;
+            agents_steer(session_id: String, text: String) -> ();
+            agents_open_terminal(step_id: String) -> ();
             costs_summary(session_id: Option<String>) -> $crate::dto::CostSummary;
             costs_set_monthly_limit(enabled: bool, monthly: $crate::dto::Money) -> ();
             settings_schema() -> Vec<$crate::dto::SettingsPageDef>;
@@ -78,6 +83,9 @@ macro_rules! with_commands {
             voice_set_mic_enabled(enabled: bool) -> ();
             voice_set_muted(muted: bool) -> ();
             voice_stop_speech() -> ();
+            voice_status() -> $crate::dto::VoiceStatus;
+            voice_ptt(pressed: bool) -> ();
+            voice_preview(agent: String) -> ();
             system_status() -> $crate::dto::SystemStatus;
             system_retry_queue() -> ();
             quick_ask(text: String) -> $crate::dto::QuickAskResult;

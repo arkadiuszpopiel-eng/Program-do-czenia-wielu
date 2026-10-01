@@ -1,12 +1,13 @@
 //! Komendy `turns_*` dotyczące jednej tury: adnotacje (ocena, ukrycie) i intencje
 //! (pamięć, czytanie na głos, zapis/uruchomienie kodu, cofnięcie kroku).
 
+use app_agents::ClipboardUndoError;
 use memory_contract::{Memory, NewMemory, RememberMode};
 use sessions_contract::{SessionHistory, SessionId};
 
 use crate::core::AppCore;
 use crate::dto::{BrokerIntentResult, EventLevel, Rating, RememberScope, TimelineKind};
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::ids;
 
 impl AppCore {
@@ -106,11 +107,15 @@ impl AppCore {
             .await
     }
 
-    /// `turns_undo_step` ⟶ dziennik cofania (`fs.*`): token `"<sesja>:u<krok>"` z karty kroku.
+    /// `turns_undo_step` ⟶ dziennik cofania (`fs.*`, snapshot powłoki: token `"<sesja>:u<krok>"`)
+    /// albo zapis schowka (`"<sesja>:c<id>"`) — tylko kroki tej sesji.
     pub async fn turns_undo_step(&self, undo_token: String) -> Result<(), AppError> {
-        let (session, step) = ids::parse_undo(&undo_token)?;
+        let (session, kind, step) = ids::parse_any_undo(&undo_token)?;
         self.ensure_session(&session)?;
-        let result = self.inner.broker.undo_step(&session, step).await;
+        let result = match kind {
+            ids::UndoKind::Journal => self.inner.broker.undo_step(&session, step).await,
+            ids::UndoKind::Clipboard => self.undo_clipboard(&session, step),
+        };
         let (level, title) = match &result {
             Ok(text) => (EventLevel::Audit, format!("Cofnięto: {text}")),
             Err(e) => (
@@ -118,7 +123,40 @@ impl AppCore {
                 format!("Cofnięcie nieudane: {}", e.message),
             ),
         };
+        if result.is_ok()
+            && let Err(e) = self.inner.store.push_undone(&session, &undo_token)
+        {
+            tracing::warn!(error = %e, "zapis cofniętego kroku nie powiódł się");
+        }
         self.timeline_note(&session, TimelineKind::Tool, level, title, Some(undo_token));
         result.map(|_| ())
+    }
+
+    /// Cofnięcie zapisu schowka agentki (wykrywa konflikt: schowek zmieniony później).
+    fn undo_clipboard(&self, session: &SessionId, id: u64) -> Result<String, AppError> {
+        let owned = self
+            .rt()
+            .clip_undo
+            .get(session)
+            .is_some_and(|ids| ids.contains(&id));
+        if !owned {
+            return Err(AppError::not_found("Ten krok nie należy do tej sesji."));
+        }
+        let agents =
+            self.inner.agents.as_ref().ok_or_else(|| {
+                AppError::unavailable("Cofnięcie zapisu schowka", "tools-clipboard")
+            })?;
+        agents.tools.undo_clipboard(id).map_err(|e| {
+            let code = match e {
+                ClipboardUndoError::Unknown(_) => ErrorCode::NotFound,
+                ClipboardUndoError::Conflict => ErrorCode::Forbidden,
+                ClipboardUndoError::Platform(_) => ErrorCode::Unavailable,
+            };
+            AppError::new(code, format!("Cofnięcie: {e}"))
+        })?;
+        if let Some(ids) = self.rt().clip_undo.get_mut(session) {
+            ids.remove(&id);
+        }
+        Ok("przywrócono poprzednią zawartość schowka".into())
     }
 }

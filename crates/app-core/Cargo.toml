@@ -16,6 +16,12 @@ repository.workspace = true
 app-api = { path = "../app-api" }
 # Adaptery portów na modułach -impl (transfer, Broker w procesie, głos) — część korzenia.
 app-modules = { path = "../app-modules" }
+# Agentki z narzędziami (tools-*, agent-runtime, Replay) i tryb głosowy (voice-pipeline) — część korzenia.
+app-agents = { path = "../app-agents" }
+app-voice = { path = "../app-voice" }
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+voice-pipeline-contract = { path = "../voice-pipeline-contract" }
 # Jądro
 core-bus-contract.workspace = true
 core-bus-impl = { path = "../core-bus-impl" }
@@ -94,6 +100,18 @@ reqwest = { version = "0.12.28", default-features = false, features = ["rustls-t
 
 [dev-dependencies]
 providers-fake = { path = "../providers-fake" }
+platform-fake = { path = "../platform-fake" }
+voice-pipeline-impl = { path = "../voice-pipeline-impl" }
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-turn-contract = { path = "../voice-turn-contract" }
+voice-dsp-fake = { path = "../voice-dsp-fake" }
+voice-vad-fake = { path = "../voice-vad-fake" }
+voice-stt-fake = { path = "../voice-stt-fake" }
+voice-turn-fake = { path = "../voice-turn-fake" }
+voice-cmd-fake = { path = "../voice-cmd-fake" }
+voice-wake-fake = { path = "../voice-wake-fake" }
+voice-persona-fake = { path = "../voice-persona-fake" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
 device-profile-fake = { path = "../device-profile-fake" }
 voice-audio-fake = { path = "../voice-audio-fake" }
 voice-tts-fake = { path = "../voice-tts-fake" }

@@ -165,6 +165,19 @@
         return;
       }
     }
+    const run = app.runs.active(app.activeId);
+    if (run && app.activeId) {
+      try {
+        await app.client.agents.steer(app.activeId, text);
+        app.toasts.show({
+          kind: 'info',
+          message: t('composer.steered', { name: agents[run.agent].name }),
+        });
+        return;
+      } catch {
+        // Zadanie właśnie się skończyło — wiadomość idzie zwykłą drogą.
+      }
+    }
     if (!conv) {
       await app.newSession();
       if (app.conversation)
@@ -211,6 +224,8 @@
     dnd: { label: t('mic.dnd'), hint: t('mic.hint.dnd') },
   });
   const sendOnEnter = $derived(app.bool('composer.enter_sends', true));
+  /** Trwające zadanie agentki — wiadomość trafia do niej w trakcie (steering, PLAN §9.6). */
+  const steering = $derived(app.runs.active(app.activeId));
 </script>
 
 <div class="composer-area">
@@ -220,7 +235,9 @@
     {sendOnEnter}
     busy={Boolean(conv?.streaming)}
     lang={app.i18n.locale}
-    placeholder={t('composer.placeholder')}
+    placeholder={steering
+      ? t('composer.steerPlaceholder', { name: agents[steering.agent].name })
+      : t('composer.placeholder')}
     labels={{ field: t('composer.label'), send: t('composer.send'), stop: t('composer.stop') }}
     fieldAttrs={{
       'aria-autocomplete': 'list',

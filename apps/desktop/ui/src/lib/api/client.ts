@@ -23,6 +23,7 @@ import type {
   TurnsSnapshot,
   UndoTicket,
 } from './types';
+import type { AgentRunDetail, SessionWorkdir, VoiceStatus, WorkdirChoice } from './types-agents';
 import type {
   Account,
   AccountAssignment,
@@ -79,6 +80,10 @@ export interface SessionsApi {
   markRead(sessionId: string): Promise<void>;
   getDraft(sessionId: string): Promise<string>;
   saveDraft(sessionId: string, text: string): Promise<void>;
+  /** Katalog roboczy sesji = zakres narzędzi agentek (`path: null` — agentki bez narzędzi). */
+  workdir(sessionId: string): Promise<SessionWorkdir>;
+  /** Intencja: wybór katalogu (natywny dialog), katalog sesji albo wyłączenie narzędzi. */
+  chooseWorkdir(sessionId: string, choice: WorkdirChoice): Promise<SessionWorkdir>;
 }
 
 export interface TurnsApi {
@@ -111,6 +116,12 @@ export interface AgentsApi {
   /** Zmiana obsady jest natychmiastowa i trafia do dziennika (PLAN §9.2). */
   setRoles(sessionId: string, agent: AgentId, roleIds: readonly string[]): Promise<void>;
   applyCast(sessionId: string, template: CastTemplateId): Promise<void>;
+  /** Przebiegi agentek z krokami (Replay na Osi czasu). */
+  runs(sessionId: string): Promise<readonly AgentRunDetail[]>;
+  /** Wiadomość w trakcie zadania — agentka uwzględnia ją w następnym kroku (PLAN §9.6). */
+  steer(sessionId: string, text: string): Promise<void>;
+  /** Intencja: terminal w katalogu kroku „uruchom w terminalu" (polecenie NIE jest wykonywane). */
+  openTerminal(stepId: string): Promise<void>;
 }
 
 export interface CostsApi {
@@ -189,6 +200,12 @@ export interface VoiceApi {
   setMicEnabled(enabled: boolean): Promise<void>;
   setMuted(muted: boolean): Promise<void>;
   stopSpeech(): Promise<void>;
+  /** Stan trybu głosowego (bez modeli — `unavailable` z powodem). */
+  status(): Promise<VoiceStatus>;
+  /** Mówienie z przytrzymaniem (Spacja / przycisk mikrofonu). */
+  ptt(pressed: boolean): Promise<void>;
+  /** Intencja: próbka głosu agentki (głosy v0). */
+  preview(agent: AgentId): Promise<void>;
 }
 
 export interface SystemApi {

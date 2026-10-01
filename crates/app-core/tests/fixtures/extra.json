@@ -3,7 +3,7 @@
   "events": [
     {
       "type": "VoicePill",
-      "state": { "agent": "gama", "mic": "hearing", "level": 0.42 }
+      "state": { "agent": "gama", "mic": "hearing", "level": 0.42, "speaker": "user", "partial": "Co mam" }
     },
     {
       "type": "Stop",
@@ -72,7 +72,16 @@
         "label": "Pobrano stronę",
         "status": "error",
         "duration_ms": 120,
-        "undo_token": null
+        "undo_token": null,
+        "undone": false,
+        "intent": {
+          "kind": "confirm_delete_permanent",
+          "title": "Usuń trwale",
+          "command": "Remove-Item -LiteralPath 'stare.log'",
+          "cwd": "C:\\Users\\Ty\\Projekt",
+          "shell": "pwsh",
+          "paths": ["C:\\Users\\Ty\\Projekt\\stare.log"]
+        }
       }
     },
     {
@@ -85,7 +94,9 @@
         "label": "Zapisano w pamięci",
         "status": "done",
         "duration_ms": 3,
-        "undo_token": "undo-10"
+        "undo_token": "undo-10",
+        "undone": true,
+        "intent": null
       }
     },
     {
@@ -98,7 +109,9 @@
         "why": "Prośba użytkownika.",
         "reversible": false,
         "risk": "low",
-        "status": "expired"
+        "status": "expired",
+        "broker_window": false,
+        "expires_at": "2026-10-01T12:05:00Z"
       }
     },
     {

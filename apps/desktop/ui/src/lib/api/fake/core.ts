@@ -20,6 +20,7 @@ import {
   seedSmall,
   seedTimeline,
 } from './fixtures';
+import { FakeRuns } from './api-agents';
 import { realScheduler, type Scheduler } from './scheduler';
 import { defaultValues } from './settings-schema';
 
@@ -96,6 +97,10 @@ export class FakeCore {
   monthCost = 4_870;
   limit = { enabled: true, monthly: { minor: 30_000, currency: 'PLN' as const } };
   status: SystemStatus;
+  /** Przebiegi agentek (Replay) i katalogi robocze sesji. */
+  readonly runs: FakeRuns;
+  /** Tryb głosowy: rozmowa włączona, wyciszenie. */
+  voice = { active: false, muted: false, mode: 'toggle' as 'toggle' | 'ptt' };
 
   constructor(options: FakeOptions = {}) {
     this.scheduler = options.scheduler ?? realScheduler;
@@ -128,6 +133,7 @@ export class FakeCore {
           : { free_bytes: 212_000_000_000, low: false },
     };
     if (this.status.profile === 'local') this.settings['models.default_profile'] = 'local';
+    this.runs = new FakeRuns(this);
   }
 
   nextId(prefix: string): string {

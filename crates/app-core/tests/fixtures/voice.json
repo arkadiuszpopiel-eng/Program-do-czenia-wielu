@@ -45,5 +45,38 @@
     "command": "voice_stop_speech",
     "args": {},
     "result": null
+  },
+  {
+    "command": "voice_status",
+    "args": {},
+    "result": {
+      "state": "active",
+      "reason": null,
+      "missing": [],
+      "mode": "toggle",
+      "muted": false,
+      "agent": "alfa"
+    }
+  },
+  {
+    "command": "voice_ptt",
+    "args": {
+      "pressed": true
+    },
+    "result": null
+  },
+  {
+    "command": "voice_ptt",
+    "args": {
+      "pressed": false
+    },
+    "result": null
+  },
+  {
+    "command": "voice_preview",
+    "args": {
+      "agent": "beta"
+    },
+    "result": null
   }
 ]

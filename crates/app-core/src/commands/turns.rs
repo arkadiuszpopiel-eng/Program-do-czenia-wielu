@@ -67,7 +67,7 @@ impl AppCore {
     }
 
     /// Dopisuje turę użytkownika (+ fakty), opcjonalnie w kolejce offline.
-    async fn append_user(
+    pub(crate) async fn append_user(
         &self,
         id: &SessionId,
         parent: Option<TurnId>,
@@ -139,7 +139,7 @@ impl AppCore {
     }
 
     /// Adresatka: wskazana w UI albo wynikająca z tekstu (imię) / Dyrygentka obsady.
-    fn addressee(&self, id: &SessionId, text: &str, addressed: Option<&str>) -> String {
+    pub(crate) fn addressee(&self, id: &SessionId, text: &str, addressed: Option<&str>) -> String {
         match addressed {
             Some(a) => a.to_owned(),
             None => self
@@ -186,6 +186,8 @@ impl AppCore {
                     agent,
                     profile: options.profile,
                     continues: None,
+                    origin: risk_classifier_contract::CommandOrigin::UserText,
+                    tap: None,
                 })
                 .await?,
             )
@@ -234,6 +236,8 @@ impl AppCore {
             agent,
             profile: profile.as_deref().and_then(ModelProfile::parse),
             continues: None,
+            origin: risk_classifier_contract::CommandOrigin::UserText,
+            tap: None,
         })
         .await
     }
@@ -275,6 +279,8 @@ impl AppCore {
                     agent,
                     profile: None,
                     continues: None,
+                    origin: risk_classifier_contract::CommandOrigin::UserText,
+                    tap: None,
                 })
                 .await?,
             )
@@ -304,6 +310,8 @@ impl AppCore {
             agent,
             profile: None,
             continues: Some(target),
+            origin: risk_classifier_contract::CommandOrigin::UserText,
+            tap: None,
         })
         .await
     }

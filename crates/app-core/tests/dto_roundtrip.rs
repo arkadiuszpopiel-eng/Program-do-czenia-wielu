@@ -101,6 +101,11 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
         "sessions_export" => (vec![("sessionId", s)], roundtrip::<ExportResult>),
         "sessions_search" => (vec![("query", s)], roundtrip::<Vec<SessionSearchHit>>),
         "sessions_get_draft" => (vec![("sessionId", s)], s),
+        "sessions_workdir" => (vec![("sessionId", s)], roundtrip::<SessionWorkdir>),
+        "sessions_choose_workdir" => (
+            vec![("sessionId", s), ("choice", roundtrip::<WorkdirChoice>)],
+            roundtrip::<SessionWorkdir>,
+        ),
         "turns_list" => (vec![("sessionId", s)], roundtrip::<TurnsSnapshot>),
         "turns_send" => (
             vec![("sessionId", s), ("options", roundtrip::<SendOptions>)],
@@ -142,6 +147,9 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             vec![("sessionId", s), ("template", roundtrip::<CastTemplateId>)],
             unit,
         ),
+        "agents_runs" => (vec![("sessionId", s)], roundtrip::<Vec<AgentRunDetail>>),
+        "agents_steer" => (vec![("sessionId", s), ("text", s)], unit),
+        "agents_open_terminal" => (vec![("stepId", s)], unit),
         "costs_summary" => (vec![("sessionId", os)], roundtrip::<CostSummary>),
         "costs_set_monthly_limit" => (vec![("enabled", b), ("monthly", roundtrip::<Money>)], unit),
         "settings_schema" => (vec![], roundtrip::<Vec<SettingsPageDef>>),
@@ -224,6 +232,9 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             ],
             unit,
         ),
+        "voice_status" => (vec![], roundtrip::<VoiceStatus>),
+        "voice_ptt" => (vec![("pressed", b)], unit),
+        "voice_preview" => (vec![("agent", s)], unit),
         "system_status" => (vec![], roundtrip::<SystemStatus>),
         "system_retry_queue" | "quick_hide" => (vec![], unit),
         "quick_ask" => (vec![("text", s)], roundtrip::<QuickAskResult>),
@@ -284,8 +295,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 22 typy z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 22, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 25 typów z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 25, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

@@ -78,6 +78,62 @@ pub fn parse_undo(token: &str) -> Result<(SessionId, u64), AppError> {
     Ok((session(session_id)?, step))
 }
 
+/// Token cofnięcia zapisu schowka (`tools-clipboard`) w DTO: `"<sesja>:c<id>"`.
+pub fn undo_clip_dto(session: &SessionId, id: u64) -> String {
+    format!("{session}:c{id}")
+}
+
+/// Rodzaj tokenu cofnięcia.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UndoKind {
+    /// Krok dziennika `undo-journal` (`fs.*`, snapshot shella).
+    Journal,
+    /// Zapis schowka.
+    Clipboard,
+}
+
+/// Parsuje token cofnięcia dowolnej usługi (`u` — dziennik, `c` — schowek).
+pub fn parse_any_undo(token: &str) -> Result<(SessionId, UndoKind, u64), AppError> {
+    let bad = || AppError::invalid(format!("Nieprawidłowy token cofnięcia „{token}”."));
+    let (session_id, rest) = token.split_once(':').ok_or_else(bad)?;
+    let (kind, number) = match rest.split_at_checked(1) {
+        Some(("u", n)) => (UndoKind::Journal, n),
+        Some(("c", n)) => (UndoKind::Clipboard, n),
+        _ => return Err(bad()),
+    };
+    let id = number.parse::<u64>().map_err(|_| bad())?;
+    Ok((session(session_id)?, kind, id))
+}
+
+/// Id przebiegu agentki w DTO: `"<sesja>:r<przebieg>"`.
+pub fn run_dto(session: &SessionId, run: &str) -> String {
+    format!("{session}:r{run}")
+}
+
+/// Id kroku przebiegu w DTO: `"<sesja>:r<przebieg>:s<n>"`.
+pub fn step_dto(session: &SessionId, run: &str, step: u32) -> String {
+    format!("{session}:r{run}:s{step}")
+}
+
+/// Parsuje id kroku przebiegu → (sesja, przebieg, numer).
+pub fn parse_step(id: &str) -> Result<(SessionId, String, u32), AppError> {
+    let bad = || AppError::invalid(format!("Nieprawidłowy identyfikator kroku „{id}”."));
+    let (session_id, rest) = id.split_once(':').ok_or_else(bad)?;
+    let (run, step) = rest.rsplit_once(':').ok_or_else(bad)?;
+    let run = run
+        .strip_prefix('r')
+        .filter(|r| !r.is_empty())
+        .ok_or_else(bad)?;
+    let n = step
+        .strip_prefix('s')
+        .and_then(|n| n.parse::<u32>().ok())
+        .ok_or_else(bad)?;
+    if run.contains(':') {
+        return Err(bad());
+    }
+    Ok((session(session_id)?, run.to_owned(), n))
+}
+
 /// Waliduje identyfikator sesji z UI (niepusty, bez `:` i znaków sterujących).
 pub fn session(id: &str) -> Result<SessionId, AppError> {
     if id.is_empty() || id.len() > 128 || id.contains(':') || id.chars().any(char::is_control) {
@@ -125,6 +181,31 @@ mod tests {
         assert_eq!(parse_undo(&token).unwrap(), (s, 42));
         for bad in ["", "s-1", "s-1:x4", ":u1", "s:u", "s:u-1"] {
             assert!(parse_undo(bad).is_err(), "{bad}");
+            assert!(parse_any_undo(bad).is_err(), "{bad}");
+        }
+        let clip = undo_clip_dto(&SessionId::new("s-1"), 7);
+        assert_eq!(
+            parse_any_undo(&clip).unwrap(),
+            (SessionId::new("s-1"), UndoKind::Clipboard, 7)
+        );
+        assert_eq!(parse_any_undo("s-1:u3").unwrap().1, UndoKind::Journal);
+    }
+
+    #[test]
+    fn step_ids_carry_session_and_run() {
+        let s = SessionId::new("s-1");
+        assert_eq!(run_dto(&s, "ab-12"), "s-1:rab-12");
+        let id = step_dto(&s, "ab-12", 4);
+        assert_eq!(parse_step(&id).unwrap(), (s, "ab-12".to_owned(), 4));
+        for bad in [
+            "",
+            "s-1:rab",
+            "s-1:r:s1",
+            "s-1:rab:x1",
+            ":rab:s1",
+            "s:ra:b:s1",
+        ] {
+            assert!(parse_step(bad).is_err(), "{bad}");
         }
     }
 }

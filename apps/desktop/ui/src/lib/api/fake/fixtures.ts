@@ -58,6 +58,7 @@ export function turn(
     continues: null,
     addressed_to: null,
     truncated: false,
+    heard_prefix: null,
     ...extra,
   };
 }
@@ -71,6 +72,8 @@ const step = (id: string, icon: ToolStep['icon'], label: string, ms: number, und
     duration_ms: ms,
     // Token dziennika cofania jak w rdzeniu: `<sesja>:u<krok>` (fixture'y to sesja `s-q3`).
     undo_token: undo ? `s-q3:u${id.replace(/\D/g, '')}` : null,
+    undone: false,
+    intent: null,
   }) as ToolStep;
 
 const usage = (inTok: number, outTok: number, minor: number, ms: number) => ({
@@ -175,6 +178,8 @@ export function seedQ3(now: number): Turn[] {
           reversible: true,
           risk: 'medium',
           status: 'pending',
+          broker_window: true,
+          expires_at: null,
         },
         usage: usage(2100, 190, 12, 1500),
       },

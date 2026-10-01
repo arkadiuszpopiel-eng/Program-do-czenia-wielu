@@ -4,18 +4,18 @@
 use std::sync::Arc;
 
 use accounts_hub_impl::AccountsHubService;
-use app_modules::broker::{InprocBroker, path_env};
+use app_modules::broker::{InprocBroker, path_env_for};
 use app_modules::transfer::TransferAdapter;
-use app_modules::voice::VoiceAdapter;
 use sessions_contract::SessionCatalog;
 use sessions_impl::SqliteSessions;
 
+use super::agents::AgentStack;
 use super::{Extra, Kernel};
 use crate::error::AppError;
 use crate::options::AppOptions;
 use crate::ports::{
     BrainPort, BrokerPort, BrokerUnavailable, NoApprovalWindow, ShellPort, TransferPort,
-    TransferUnavailable, VoicePort, VoiceUnavailable,
+    TransferUnavailable, VoicePort,
 };
 use crate::route::{RouterBrain, RouterUnavailable};
 
@@ -25,18 +25,32 @@ pub(crate) struct Ports {
     pub transfer: Arc<dyn TransferPort>,
     pub voice: Arc<dyn VoicePort>,
     pub broker: Arc<dyn BrokerPort>,
+    pub agents: Option<AgentStack>,
+}
+
+/// Wspólne zależności portów.
+pub(crate) struct PortDeps<'a> {
+    pub hub: &'a Arc<AccountsHubService>,
+    pub kernel: &'a Kernel,
+    pub sessions: &'a Arc<SqliteSessions>,
+    pub shell: &'a Arc<dyn ShellPort>,
+    pub paths: &'a crate::options::AppPaths,
+    pub bus: &'a Arc<dyn core_bus_contract::EventBus>,
+    pub scheduler: Arc<dyn scheduler_lite_contract::SchedulerLite>,
 }
 
 impl Extra {
     /// Porty: nadpisanie z opcji → adapter modułu → moduł niepodłączony.
-    pub fn ports(
-        &self,
-        options: &AppOptions,
-        hub: &Arc<AccountsHubService>,
-        kernel: &Kernel,
-        sessions: &Arc<SqliteSessions>,
-        shell: &Arc<dyn ShellPort>,
-    ) -> Result<Ports, AppError> {
+    pub fn ports(&self, options: &AppOptions, deps: PortDeps<'_>) -> Result<Ports, AppError> {
+        let PortDeps {
+            hub,
+            kernel,
+            sessions,
+            shell,
+            paths,
+            bus,
+            scheduler,
+        } = deps;
         let brain: Arc<dyn BrainPort> = match (&options.brain, &self.routers) {
             (Some(brain), _) => brain.clone(),
             (None, Some(routers)) => Arc::new(RouterBrain::new(
@@ -59,15 +73,8 @@ impl Extra {
             }
             (None, None) => Arc::new(TransferUnavailable),
         };
-        let voice: Arc<dyn VoicePort> = match (&options.voice, &self.audio) {
-            (Some(port), _) => port.clone(),
-            (None, Some(audio)) => Arc::new(VoiceAdapter::new(
-                audio.io(),
-                self.tts.clone(),
-                kernel.events.clone(),
-            )),
-            (None, None) => Arc::new(VoiceUnavailable),
-        };
+        let voice: Arc<dyn VoicePort> =
+            self.voice_port(options, paths, &kernel.events, bus, scheduler);
         let broker: Arc<dyn BrokerPort> = match (&options.broker, &self.broker) {
             (Some(port), _) => port.clone(),
             (None, Some(engine)) => {
@@ -79,7 +86,7 @@ impl Extra {
                     engine.clone(),
                     self.undo.clone(),
                     window,
-                    path_env().1,
+                    path_env_for(&paths.user_root).1,
                 ))
             }
             (None, None) => Arc::new(BrokerUnavailable),
@@ -89,6 +96,7 @@ impl Extra {
             transfer,
             voice,
             broker,
+            agents: self.agent_stack(options, paths, bus),
         })
     }
 }

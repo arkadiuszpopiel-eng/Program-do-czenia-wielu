@@ -39,7 +39,7 @@ od `*-impl`; od `*-fake` tylko w dev-dependencies; `app-*` mogą zależeć od in
 | `lib-sqlstore` | `lib-sqlstore` (biblioteka) | SQLCipher kluczem surowym, WAL, migracje, sqlite-vec (`OnceLock`, jedyne `unsafe`), `fold_pl` dla FTS, usuwanie z `-wal/-shm` |
 | `sessions` | `sessions-contract`, `-impl`, `-fake` | baza per sesja, historia append-only jako drzewo gałęzi (wyzwalacze blokują UPDATE/DELETE), usłyszany prefiks, katalog `index.db`, `KeyVault`, crypto-shredding |
 | `search` | `search-contract`, `-impl`, `-fake` | FTS5 z `fold_pl` + `vec0` (kosinus), hybryda RRF, indeksowanie w transakcji zapisu (`TxIndexer`), szukanie między sesjami tylko dla właściciela |
-| `memory` | `memory-contract`, `-impl`, `-fake` | v0: remember/recall/forget w zakresie sesji, proweniencja, treść niezaufana nie awansuje |
+| `memory` | `memory-contract`, `-impl`, `-fake` | F7: cztery warstwy (robocza, epizodyczna, semantyczna, proceduralna), zakresy sesja/projekt/agentka/globalna z uprawnieniami, wersje faktów, Inspektor, `forget` kaskadowo z zatarciem, recall hybrydowy z rerankingiem, eksport w `.alfa` |
 | `artifacts` | `artifacts-contract`, `-impl`, `-fake` | rejestr plików wyjściowych z wersjami i hashami, podgląd, diff, intencje UI |
 | `providers` | `providers-contract`, `providers-fake`, `providers-api-impl` | `ModelProvider`, neutralny IR (thinking z podpisem, tool use), zdarzenia strumienia; adaptery Anthropic, OpenAI Chat/Responses, generyczne zgodne z OpenAI/Anthropic; retry, timeouty, anulowanie < 100 ms |
 | `lib-markdown` | `lib-markdown` (biblioteka) | Markdown z LLM → bezpieczny HTML (pulldown-cmark + ammonia, 72 wektory XSS), renderowanie przyrostowe dla strumienia, tekst mówiony |
@@ -77,6 +77,11 @@ od `*-impl`; od `*-fake` tylko w dev-dependencies; `app-*` mogą zależeć od in
 | `broker-ui` | `broker-ui-contract`, `-impl`, `-fake` | okno zatwierdzeń Brokera: karta prośby, `PhysicalInputProof` tylko z fizycznego wejścia (odrzuca wstrzyknięte, clickjacking ≥ 500 ms), Enter nie zatwierdza. **Wymaga przeglądu człowieka** |
 | `app-api`, `app-modules`, `app-safety` | (korzeń kompozycji `app-*`) | `app-api`: DTO, zdarzenia, porty, protokół; `app-modules`: adaptery modułów dla `app-core`; `app-safety`: binaria `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` złożone z `platform-windows-kernel-impl` |
 | `platform-windows-kernel` | `platform-windows-kernel-impl` (kontrakt: `platform-contract`) | prymitywy Windows dla Jądra wydzielone z `platform-windows-impl`: named pipe z chronionym DACL, tożsamość klienta, katalog prywatny, okno zatwierdzeń Win32, start z integralnością High, host usługi, MMCSS |
+| `memory-consolidation` | `memory-consolidation-contract`, `-impl`, `-fake` | Strażniczka pamięci: konsolidacja epizodów w fakty i umiejętności (reguły + LLM przez port), okna bezczynności, budżet tła, nie na baterii ani w grze, dziennik i cofanie przebiegu |
+| `scheduler` | `scheduler-contract`, `-impl`, `-fake` | pełny scheduler (nadzbiór `scheduler-lite`): DAG z warunkami, równoległe agentki z atomowym przydziałem zasobów, priorytety voice-first, okna czasowe, budżety, ponowienia, steering, trwałość; 0/1000 zakleszczeń |
+| `triggers` | `triggers-contract`, `-impl`, `-fake` | wyzwalacze czasowe (cron z polską strefą i DST), zdarzeniowe i ręczne; limity, cisza/DND, taint treści; wyzwalacz nigdy nie uruchamia mostu CLI |
+| `marshal` | `marshal-contract`, `-impl`, `-fake` | Marszałek: polecenia użytkownika → reguły, które tylko zawężają uprawnienia; nadzór postępu, eskalacje, raport dzienny |
+| `app-agents`, `app-voice` | (korzeń kompozycji `app-*`) | `app-agents`: agentka z narzędziami w aplikacji (runtime + tools + Broker + cofanie, Replay, eval F3); `app-voice`: potok głosu w aplikacji (rozmowa, barge-in z usłyszanym prefiksem, pigułka) |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

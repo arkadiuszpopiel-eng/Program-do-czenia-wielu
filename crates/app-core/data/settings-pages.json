@@ -314,23 +314,59 @@
    "pl": "Głos",
    "en": "Voice"
   },
-  "wave": 2,
-  "custom": null,
-  "settings": [],
-  "upcoming": [
+  "wave": 1,
+  "custom": "voice",
+  "settings": [
    {
-    "pl": "Urządzenia audio, STT, TTS",
-    "en": "Audio devices, STT, TTS"
+    "key": "voice.mode",
+    "label": {
+     "pl": "Włączanie mikrofonu",
+     "en": "Microphone activation"
+    },
+    "description": {
+     "pl": "Przełącznik (Ctrl+Shift+M) albo mówienie z przytrzymaniem Spacji (PTT).",
+     "en": "Toggle (Ctrl+Shift+M) or push-to-talk with the Space key."
+    },
+    "default": "toggle",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "toggle",
+       "label": {
+        "pl": "Przełącznik",
+        "en": "Toggle"
+       }
+      },
+      {
+       "value": "ptt",
+       "label": {
+        "pl": "Przytrzymaj, aby mówić (PTT)",
+        "en": "Push to talk"
+       }
+      }
+     ]
+    }
    },
    {
-    "pl": "Słowa wywoławcze i barge-in",
-    "en": "Wake words and barge-in"
-   },
-   {
-    "pl": "Voice Lab i słownik wymowy",
-    "en": "Voice Lab and pronunciation dictionary"
+    "key": "voice.show_pill",
+    "label": {
+     "pl": "Pigułka głosowa",
+     "en": "Voice pill"
+    },
+    "description": {
+     "pl": "Małe okno z mówiącą agentką i stanem mikrofonu, gdy okno główne jest ukryte.",
+     "en": "A small window with the speaking agent and microphone state when the main window is hidden."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": true,
+    "scope": "global"
    }
-  ]
+  ],
+  "upcoming": []
  },
  {
   "id": "agents",
@@ -338,23 +374,107 @@
    "pl": "Agentki",
    "en": "Agents"
   },
-  "wave": 2,
+  "wave": 1,
   "custom": null,
-  "settings": [],
-  "upcoming": [
+  "settings": [
    {
-    "pl": "Biblie głosu i charaktery",
-    "en": "Voice bibles and characters"
+    "key": "agents.max_steps",
+    "label": {
+     "pl": "Limit kroków zadania",
+     "en": "Task step limit"
+    },
+    "description": {
+     "pl": "Agentka zatrzyma się po tylu krokach (tura modelu albo narzędzie) i pokaże raport.",
+     "en": "The agent stops after this many steps (model turn or tool) and shows a report."
+    },
+    "default": 40,
+    "scope": "global",
+    "control": {
+     "kind": "number",
+     "min": 5,
+     "max": 200,
+     "step": 1,
+     "unit": null
+    }
    },
    {
-    "pl": "Szablony obsad ról",
-    "en": "Role cast templates"
+    "key": "agents.max_minutes",
+    "label": {
+     "pl": "Limit czasu zadania",
+     "en": "Task time limit"
+    },
+    "description": {
+     "pl": "Najdłuższy czas jednego zadania agentki.",
+     "en": "The longest time of a single agent task."
+    },
+    "default": 15,
+    "scope": "global",
+    "control": {
+     "kind": "number",
+     "min": 1,
+     "max": 120,
+     "step": 1,
+     "unit": "min"
+    }
    },
    {
-    "pl": "Kreator agentek",
-    "en": "Agent creator"
+    "key": "agents.max_cost_pln",
+    "label": {
+     "pl": "Limit kosztu zadania",
+     "en": "Task cost limit"
+    },
+    "description": {
+     "pl": "Najwyższy koszt modeli w jednym zadaniu (0 = bez limitu; limit miesięczny obowiązuje zawsze).",
+     "en": "Highest model cost of a single task (0 = no limit; the monthly limit always applies)."
+    },
+    "default": 0,
+    "scope": "global",
+    "control": {
+     "kind": "number",
+     "min": 0,
+     "max": 500,
+     "step": 1,
+     "unit": "zł"
+    }
+   },
+   {
+    "key": "agents.approval_timeout_s",
+    "label": {
+     "pl": "Czekanie na zatwierdzenie",
+     "en": "Waiting for approval"
+    },
+    "description": {
+     "pl": "Po tym czasie bez decyzji w oknie Brokera agentka dostaje odmowę.",
+     "en": "Without a decision in the Broker window after this time, the agent is denied."
+    },
+    "default": 300,
+    "scope": "global",
+    "control": {
+     "kind": "number",
+     "min": 30,
+     "max": 1800,
+     "step": 30,
+     "unit": "s"
+    }
+   },
+   {
+    "key": "agents.verify_before_done",
+    "label": {
+     "pl": "„Gotowe\" po samoweryfikacji",
+     "en": "\"Done\" after self-check"
+    },
+    "description": {
+     "pl": "Agentka sprawdza wynik narzędziami tylko do odczytu, zanim ogłosi koniec zadania.",
+     "en": "The agent checks the result with read-only tools before declaring the task done."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": true,
+    "scope": "global"
    }
-  ]
+  ],
+  "upcoming": []
  },
  {
   "id": "permissions",

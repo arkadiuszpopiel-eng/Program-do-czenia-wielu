@@ -1,6 +1,7 @@
 // Pigułka głosowa (ui-quick, makieta 4): minimalna strona BEZ frameworka (≤ 8 KB gzip).
 // Awatar mówiącej agentki, fala głośności (≤ 30 kl./s, pauza gdy okno ukryte), stan mikrofonu
-// (ikona + tekst, nigdy sam kolor), przyciski Stop i Wycisz. Dane: zdarzenia `VoicePill`/`MicLevel`.
+// (ikona + tekst, nigdy sam kolor), kto mówi i transkrypt częściowy użytkownika, przyciski Stop
+// i Wycisz. Dane: zdarzenia `VoicePill`/`MicLevel`.
 import '@alfa/ui-kit/tokens.css';
 import './pill.css';
 import { invoke } from '@tauri-apps/api/core';
@@ -8,8 +9,12 @@ import { listen } from '@tauri-apps/api/event';
 
 type Agent = 'alfa' | 'beta' | 'gama' | 'delta';
 type Mic = 'off' | 'listening' | 'hearing' | 'processing' | 'speaking' | 'muted' | 'dnd';
+type Speaker = 'nobody' | 'user' | 'agent';
 type PillEvent =
-  | { type: 'VoicePill'; state: { agent: Agent; mic: Mic; level: number } }
+  | {
+      type: 'VoicePill';
+      state: { agent: Agent; mic: Mic; level: number; speaker?: Speaker; partial?: string | null };
+    }
   | { type: 'MicLevel'; level: number };
 
 const GLYPH: Record<Agent, string> = { alfa: 'α', beta: 'β', gama: 'γ', delta: 'δ' };
@@ -93,7 +98,25 @@ function icon(shapes: readonly Shape[]): SVGSVGElement {
 const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'pl';
 const L = TEXT[lang];
 const tauri = '__TAURI_INTERNALS__' in window;
-const state = { agent: 'beta' as Agent, mic: 'speaking' as Mic, level: 0 };
+const state = {
+  agent: 'beta' as Agent,
+  mic: 'speaking' as Mic,
+  level: 0,
+  speaker: 'agent' as Speaker,
+  partial: null as string | null,
+};
+
+// Podgląd poza Tauri (przeglądarka, testy E2E): stan z adresu, np. `?mic=hearing&partial=…`.
+if (!tauri) {
+  const query = new URLSearchParams(location.search);
+  const mic = query.get('mic');
+  if (mic && mic in ICON) state.mic = mic as Mic;
+  const partial = query.get('partial');
+  if (partial) {
+    state.speaker = 'user';
+    state.partial = partial.slice(0, 120);
+  }
+}
 
 const root = document.getElementById('pill');
 if (!root) throw new Error('Brak elementu #pill');
@@ -126,7 +149,10 @@ function render(): void {
   root?.style.setProperty('--accent', `var(--alfa-agent-${state.agent})`);
   avatar.textContent = GLYPH[state.agent];
   const label = state.mic === 'speaking' ? `${NAME[state.agent]} ${L.speaking}` : L[state.mic];
-  status.textContent = `${ICON[state.mic]} ${label}`;
+  // Transkrypt częściowy (szary w pełnym trybie) — w pigułce w cudzysłowie po stanie.
+  const partial = state.speaker === 'user' && state.partial ? ` „${state.partial}”` : '';
+  status.textContent = `${ICON[state.mic]} ${label}${partial}`;
+  status.title = status.textContent;
   stop.setAttribute('aria-label', L.stop);
   stop.title = L.stop;
   const muted = state.mic === 'muted';

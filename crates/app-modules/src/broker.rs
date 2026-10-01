@@ -224,11 +224,16 @@ impl BrokerPort for InprocBroker {
         ))
     }
 
+    fn approval_window(&self) -> bool {
+        self.window.available()
+    }
+
     async fn kill_all(&self, origin: KillOrigin) -> Result<(), AppError> {
         let reason = match origin {
             KillOrigin::Hotkey => KillReason::Hotkey,
             KillOrigin::Tray => KillReason::TrayButton,
             KillOrigin::Ui => KillReason::CapsuleButton,
+            KillOrigin::Voice => KillReason::VoiceStop,
         };
         let report = self.engine.kill_all(reason).await;
         tracing::warn!(
@@ -250,6 +255,18 @@ pub fn path_env() -> (String, PathEnv) {
         .unwrap_or_else(|| r"C:\Users\alfa".to_owned());
     let env = PathEnv::windows_profile(&profile);
     (profile, env)
+}
+
+/// Środowisko ścieżek dla katalogów aplikacji: profil właściciela = katalog nadrzędny
+/// `user_root` (`%USERPROFILE%\Alfa` → `%USERPROFILE%`; w testach — katalog tymczasowy), żeby
+/// zakresy Brokera i narzędzi agentek dotyczyły tych samych ścieżek, na których działa `FsPort`.
+pub fn path_env_for(user_root: &std::path::Path) -> (String, PathEnv) {
+    match user_root.parent().and_then(|p| p.to_str()) {
+        Some(profile) if !profile.is_empty() => {
+            (profile.to_owned(), PathEnv::windows_profile(profile))
+        }
+        _ => path_env(),
+    }
 }
 
 /// Katalog danych Brokera w trybie deweloperskim.

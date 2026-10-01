@@ -38,6 +38,8 @@ impl AppCore {
                 agent,
                 profile: None,
                 continues: None,
+                origin: risk_classifier_contract::CommandOrigin::UserText,
+                tap: None,
             })
             .await?;
         }

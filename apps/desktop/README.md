@@ -46,7 +46,10 @@ są placeholderami — docelowe wygeneruj: `cargo tauri icon sciezka/do/logo.png
 `tauri-plugin-single-instance` (pierwsza: druga instancja przekazuje URI `alfa://`), `tauri-plugin-global-shortcut`
 (`Ctrl+Alt+Space`, kill-switch `Ctrl+Shift+F12` → `system_kill_all(KillOrigin::Hotkey)` → Broker),
 `tauri-plugin-notification` (toasty Windows z `app_core::notify`), `tauri-plugin-dialog` (=2.8.1: natywne
-dialogi „Zapisz jako" i wyboru paczki `.alfa` dla portu `ShellPort`; wołane z `spawn_blocking`).
+dialogi „Zapisz jako", wyboru paczki `.alfa` i katalogu roboczego agentek dla portu `ShellPort`; wołane
+z `spawn_blocking`). „Uruchom w terminalu" (`ShellPort::open_terminal`): nowe okno konsoli (Windows 11 —
+w domyślnym terminalu) z `pwsh`/`powershell`/`cmd` w katalogu kroku; katalog jest katalogiem bieżącym
+procesu (nie argumentem), polecenie nie jest przekazywane ani wykonywane — właściciel wkleja je sam.
 Każda nowa wtyczka/zależność powłoki trafia do `src-tauri/Cargo.lock` (osobny lockfile — root `cargo deny`
 go nie obejmuje). Licencje i źródła: `cargo deny --manifest-path apps/desktop/src-tauri/Cargo.toml check
 licenses sources` (zielone); `bans` pada na samym Tauri (wry/tao/webview2-com ciągną `windows`, który
@@ -102,6 +105,7 @@ apps/desktop/
     scripts/bundle-size.mjs
   src-tauri/          Cargo.toml (tauri = 2.12.0, samodzielny [workspace]), tauri.conf.json,
     capabilities/{main,quick,pill}.json, src/ (lib.rs, commands.rs, windows.rs, tray.rs,
-    shortcuts.rs, pump.rs, shell.rs — ShellPort: okna, dialogi, OpenSession), build.rs,
-    icons/ (placeholdery); logika w crates/app-core (+ app-api: DTO/porty, app-modules: adaptery modułów)
+    shortcuts.rs, pump.rs, shell.rs — ShellPort: okna, dialogi, terminal, OpenSession), build.rs,
+    icons/ (placeholdery); logika w crates/app-core (+ app-api: DTO/porty, app-modules: adaptery modułów,
+    app-agents: agentki z narzędziami, app-voice: tryb głosowy)
 ```

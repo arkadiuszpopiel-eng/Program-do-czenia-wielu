@@ -3,6 +3,7 @@
 // dostaną generator (tauri-specta / ts-rs, ADR 0013), ten plik zostanie zastąpiony typami
 // generowanymi 1:1; do tego czasu jest jedynym miejscem definicji kształtu danych w UI.
 import type { AgentId, RiskLevel } from '@alfa/ui-kit';
+import type { ToolIntent } from './types-agents';
 
 export type Locale = 'pl' | 'en';
 /** Data i czas w RFC 3339 (UTC). */
@@ -85,8 +86,12 @@ export interface ToolStep {
   readonly label: string;
   readonly status: 'running' | 'done' | 'error';
   readonly duration_ms: number | null;
-  /** Token dziennika cofania (akcje `fs.*`) — przycisk „Cofnij". */
+  /** Token dziennika cofania (akcje `fs.*`, snapshot powłoki, schowek) — przycisk „Cofnij". */
   readonly undo_token: string | null;
+  /** Krok już cofnięty (po ponownym wczytaniu sesji). */
+  readonly undone: boolean;
+  /** Akcja do wykonania przez właściciela („uruchom w terminalu", trwałe usunięcie). */
+  readonly intent: ToolIntent | null;
 }
 
 /** Karta „czeka na zatwierdzenie": UI tylko przenosi do okna Brokera (PLAN §8.2). */
@@ -97,6 +102,10 @@ export interface ApprovalPending {
   readonly reversible: boolean;
   readonly risk: RiskLevel;
   readonly status: 'pending' | 'approved' | 'denied' | 'expired';
+  /** Czy działa okno Brokera; bez niego (tryb deweloperski) prośba wygaśnie i agentka dostanie odmowę. */
+  readonly broker_window: boolean;
+  /** Kiedy prośba wygaśnie (limit czekania agentki). */
+  readonly expires_at: Iso8601 | null;
 }
 
 export interface TurnUsage {
@@ -141,6 +150,8 @@ export interface Turn {
   readonly addressed_to: AgentId | null;
   /** StopReason MaxTokens → akcja „Kontynuuj". */
   truncated: boolean;
+  /** Odpowiedź głosowa przerwana: tekst, który usłyszał użytkownik (`null` = cała). */
+  heard_prefix: string | null;
 }
 
 /** Adnotacje widoku — osobne rekordy dziennika, nie zmieniają tury. */
@@ -251,5 +262,6 @@ export type ArtifactPreview =
 
 export type ArtifactAction = 'open' | 'reveal' | 'copy' | 'save_as';
 
+export type * from './types-agents';
 export type * from './types-hub';
 export type * from './types-system';

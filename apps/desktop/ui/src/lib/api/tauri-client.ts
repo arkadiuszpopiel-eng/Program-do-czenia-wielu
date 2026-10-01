@@ -38,6 +38,8 @@ export class TauriAlfaClient implements AlfaClient {
     markRead: (sessionId) => call('sessions_mark_read', { sessionId }),
     getDraft: (sessionId) => call('sessions_get_draft', { sessionId }),
     saveDraft: (sessionId, text) => call('sessions_save_draft', { sessionId, text }),
+    workdir: (sessionId) => call('sessions_workdir', { sessionId }),
+    chooseWorkdir: (sessionId, choice) => call('sessions_choose_workdir', { sessionId, choice }),
   };
 
   readonly turns: AlfaClient['turns'] = {
@@ -63,6 +65,9 @@ export class TauriAlfaClient implements AlfaClient {
     setRoles: (sessionId, agent, roleIds) =>
       call('agents_set_roles', { sessionId, agent, roleIds }),
     applyCast: (sessionId, template) => call('agents_apply_cast', { sessionId, template }),
+    runs: (sessionId) => call('agents_runs', { sessionId }),
+    steer: (sessionId, text) => call('agents_steer', { sessionId, text }),
+    openTerminal: (stepId) => call('agents_open_terminal', { stepId }),
   };
 
   readonly costs: AlfaClient['costs'] = {
@@ -131,6 +136,9 @@ export class TauriAlfaClient implements AlfaClient {
     setMicEnabled: (enabled) => call('voice_set_mic_enabled', { enabled }),
     setMuted: (muted) => call('voice_set_muted', { muted }),
     stopSpeech: () => call('voice_stop_speech'),
+    status: () => call('voice_status'),
+    ptt: (pressed) => call('voice_ptt', { pressed }),
+    preview: (agent) => call('voice_preview', { agent }),
   };
 
   readonly system: AlfaClient['system'] = {

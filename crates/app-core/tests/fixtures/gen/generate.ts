@@ -70,6 +70,10 @@ async function run(): Promise<void> {
   await both('sessions', 'markRead', 's-shop');
   await both('sessions', 'saveDraft', 's-q3', 'Szkic: dopisz wnioski');
   await both('sessions', 'getDraft', 's-q3');
+  await both('sessions', 'workdir', 's-q3');
+  await both('sessions', 'chooseWorkdir', 's-trip', 'dialog');
+  await both('sessions', 'chooseWorkdir', 's-trip', 'default');
+  await both('sessions', 'chooseWorkdir', 's-trip', 'none');
 
   await both('turns', 'list', 's-q3');
   const sent = (await both('turns', 'send', 's-q3', {
@@ -103,6 +107,15 @@ async function run(): Promise<void> {
   await both('agents', 'list', 's-q3');
   await both('agents', 'setRoles', 's-q3', 'delta', ['operator', 'coder']);
   await both('agents', 'applyCast', 's-q3', 'research');
+  await both('agents', 'steer', 's-q3', 'Pomiń pliki PDF');
+  const runs = (await both('agents', 'runs', 's-q3')) as {
+    steps: { id: string; intent: { kind: string } | null }[];
+  }[];
+  const terminal = runs
+    .flatMap((r) => r.steps)
+    .find((step) => step.intent?.kind === 'open_in_terminal');
+  if (!terminal) throw new Error('brak kroku z intencją terminala');
+  await both('agents', 'openTerminal', terminal.id);
 
   await both('costs', 'summary', 's-q3');
   await both('costs', 'summary', null);
@@ -193,6 +206,12 @@ async function run(): Promise<void> {
   await both('voice', 'setMicEnabled', true);
   await both('voice', 'setMuted', false);
   await both('voice', 'stopSpeech');
+  await both('voice', 'status');
+  scheduler.advance(2_000);
+  await flush();
+  await both('voice', 'ptt', true);
+  await both('voice', 'ptt', false);
+  await both('voice', 'preview', 'beta');
 
   fake.setOnline(false);
   await both('system', 'status');

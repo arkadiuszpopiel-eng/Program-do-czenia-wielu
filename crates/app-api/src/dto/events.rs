@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::agents::{AgentRun, ReplayStep, VoiceStatus};
 use super::common::LocalizedText;
 use super::hub::{Account, LocalDownloadState};
 use super::panels::{ActivityInfo, AgentState, CostSummary, TimelineEvent};
@@ -122,6 +123,21 @@ pub enum AlfaEvent {
     /// Przejdź do sesji (zasobnik, protokół `alfa://session/…`, powiadomienie, Szybkie pytanie).
     OpenSession {
         session_id: String,
+    },
+    /// Przebieg agentki: start, zmiana stanu, zużycie, koniec (nagłówek bez kroków).
+    AgentRunUpdated {
+        session_id: String,
+        run: AgentRun,
+    },
+    /// Krok przebiegu (Replay na żywo): start, koniec, „czeka na zatwierdzenie", cofnięcie.
+    AgentStep {
+        session_id: String,
+        run_id: String,
+        step: ReplayStep,
+    },
+    /// Stan trybu głosowego (dostępność, mikrofon, tryb PTT, aktywna agentka).
+    VoiceStatusChanged {
+        status: VoiceStatus,
     },
     /// Postęp pobierania modelu lokalnego (onboarding, Ustawienia).
     LocalModelProgress {

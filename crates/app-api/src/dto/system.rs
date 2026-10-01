@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+use super::agents::VoiceSpeaker;
 use super::common::{Iso8601, Locale, LocalizedText, ModelProfile, px};
 
 /// Wartość ustawienia (`boolean | number | string`); liczba zachowuje postać całkowitą/ułamkową.
@@ -89,6 +90,7 @@ pub enum SettingsCustomPage {
     Transfer,
     Permissions,
     Devices,
+    Voice,
 }
 
 /// Strona ustawień (drzewo §15).
@@ -208,4 +210,10 @@ pub struct VoicePillState {
     pub agent: String,
     pub mic: MicState,
     pub level: f64,
+    /// Kto mówi teraz.
+    #[serde(default)]
+    pub speaker: VoiceSpeaker,
+    /// Transkrypt częściowy wypowiedzi użytkownika (szary w UI).
+    #[serde(default)]
+    pub partial: Option<String>,
 }

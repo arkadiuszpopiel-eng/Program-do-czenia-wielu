@@ -4,11 +4,12 @@
 //! Identyfikator tury agentki jest rezerwowany przy starcie (numery tur są kolejne, a wszystkie
 //! zapisy historii sesji przechodzą przez blokadę sesji i czekają na zapis aktywnej generacji).
 
+pub(crate) mod agent;
 mod finish;
 pub(crate) mod history;
 pub(crate) mod project;
 mod routing;
-mod stream;
+pub(crate) mod stream;
 
 use std::sync::{Arc, Mutex};
 
@@ -41,6 +42,33 @@ pub(crate) struct GenRequest {
     pub agent: String,
     pub profile: Option<ModelProfile>,
     pub continues: Option<TurnId>,
+    /// Źródło polecenia (tekst / głos — fakty dla Brokera w przebiegu agentki).
+    pub origin: risk_classifier_contract::CommandOrigin,
+    /// Odbiorca tekstu odpowiedzi (rozmowa głosowa) — obok zdarzeń UI.
+    pub tap: Option<tokio::sync::mpsc::UnboundedSender<crate::ports::VoiceChunk>>,
+}
+
+impl GenRequest {
+    /// Żądanie tekstowe (bez odbiorcy głosowego).
+    pub(crate) fn text(
+        session: SessionId,
+        placement: Placement,
+        history_leaf: TurnId,
+        agent: String,
+        profile: Option<ModelProfile>,
+        continues: Option<TurnId>,
+    ) -> Self {
+        Self {
+            session,
+            placement,
+            history_leaf,
+            agent,
+            profile,
+            continues,
+            origin: risk_classifier_contract::CommandOrigin::UserText,
+            tap: None,
+        }
+    }
 }
 
 /// Rola w obsadzie w kolejności ważności (pierwsza obsadzona = rola tury).
@@ -75,6 +103,11 @@ impl AppCore {
     pub(crate) fn agents_of(&self, session: &SessionId) -> Vec<AgentState> {
         let cast = self.inner.personas.cast(session);
         let speaking = self.generation(session).map(|g| g.agent);
+        let working = self
+            .rt()
+            .runs
+            .get(session)
+            .map(|r| (r.agent.clone(), r.waiting()));
         self.inner
             .personas
             .personas()
@@ -86,10 +119,11 @@ impl AppCore {
                     .iter()
                     .map(|r| r.as_str().to_owned())
                     .collect(),
-                status: if speaking.as_deref() == Some(p.id.as_str()) {
-                    AgentStatus::Speaking
-                } else {
-                    AgentStatus::Idle
+                status: match &working {
+                    Some((a, true)) if a == p.id.as_str() => AgentStatus::WaitingApproval,
+                    Some((a, false)) if a == p.id.as_str() => AgentStatus::Working,
+                    _ if speaking.as_deref() == Some(p.id.as_str()) => AgentStatus::Speaking,
+                    _ => AgentStatus::Idle,
                 },
                 activity: None,
             })
@@ -130,6 +164,7 @@ impl AppCore {
             continues: req.continues.map(|c| ids::turn_dto(&req.session, c)),
             addressed_to: None,
             truncated: false,
+            heard_prefix: None,
         };
         let (done_tx, done_rx) = watch::channel(false);
         let handle = GenHandle {
@@ -147,8 +182,22 @@ impl AppCore {
         self.announce_agents(&req.session);
         self.announce_session(&req.session).await;
         let core = self.clone();
+        let setup = match req.continues {
+            None => self.agent_setup(&req.session, &req.agent),
+            Some(_) => None,
+        };
         tokio::spawn(async move {
-            let outcome = stream::generate(&core, &req, &handle).await;
+            let outcome = match setup {
+                Some(setup) => agent::run(&core, &req, &handle, setup).await,
+                None => stream::generate(&core, &req, &handle).await,
+            };
+            if let Some(tap) = &req.tap {
+                let last = match &outcome.error {
+                    Some(e) => crate::ports::VoiceChunk::Failed(e.message.clone()),
+                    None => crate::ports::VoiceChunk::Done,
+                };
+                let _ = tap.send(last);
+            }
             core.finish_generation(&req, &handle, outcome).await;
             let _ = done_tx.send(true);
         });
@@ -162,6 +211,10 @@ impl AppCore {
         let handles: Vec<GenHandle> = self.rt().gens.values().cloned().collect();
         for h in &handles {
             h.cancel.cancel();
+        }
+        let runs: Vec<_> = self.rt().runs.values().map(|r| r.handle.clone()).collect();
+        for run in &runs {
+            run.cancel();
         }
         for cancel in self.rt().downloads.values() {
             cancel.cancel();
