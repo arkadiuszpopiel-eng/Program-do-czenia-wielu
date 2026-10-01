@@ -5,20 +5,30 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod capture;
 mod clipboard;
+mod desktop;
 mod error;
 mod exec;
 mod fs;
+mod gui;
 mod hardware;
 mod host;
 mod hotkey;
+mod image;
 mod input;
+mod keys;
 mod media;
 mod peer;
 mod pipe;
 mod process;
+mod pty;
 mod surface;
+mod synth;
+mod synth_plan;
 mod tray;
+mod uia;
+mod uia_action;
 mod window;
 
 pub use clipboard::{ClipboardContent, ClipboardPort};
@@ -60,6 +70,33 @@ pub use pipe::{
 pub use surface::{
     ApprovalSurfacePort, MAX_BUTTONS, MAX_DETAILS, MAX_TEXT_CHARS, MIN_BUTTON_ID, PixelRect,
     SurfaceButton, SurfaceEvent, SurfaceLayout, SurfaceTone, SurfaceView,
+};
+
+// F6 (computer use) i F4 (terminal): okna v2, UI Automation, wejście syntetyczne, zrzuty
+// z maskowaniem, strażnik celów (zakaz wobec okien Alfy/Brokera), pseudokonsola ConPTY.
+pub use capture::{
+    CAPTURE_SIDE_RANGE, CaptureRequest, CaptureTarget, DEFAULT_CAPTURE_MAX_SIDE,
+    DEFAULT_MASKED_APPS, MaskReason, MaskedArea, ScreenCapturePort, Screenshot, finish_capture,
+    mask_and_scale, mask_plan,
+};
+pub use desktop::{
+    DesktopPort, DesktopWindow, MIN_WINDOW_SIZE, MonitorInfo, WindowState, validate_bounds,
+};
+pub use gui::{GuiError, PROTECTED_IMAGES, ScreenRect, TargetGuard, image_file_name};
+pub use image::{
+    MASK_COLOR, MAX_IMAGE_PIXELS, RgbaImage, encode_png, encode_png_with, zlib_stored,
+};
+pub use keys::{ChordKey, KeyChord, is_extended_vk};
+pub use pty::{PseudoConsolePort, PtySession, PtySize, PtySpec};
+pub use synth::{
+    Aim, InputBackend, InputBatch, InputControl, InputPacing, InputPlan, InputPort, InputReport,
+    InputStep, MouseButton, RawInput, TargetWindow, execute as execute_input,
+};
+pub use synth_plan::plan_batches;
+pub use uia::{
+    ElementRef, ExpandState, MAX_SET_VALUE_CHARS, SPARSE_TREE_NODES, ScrollAmount, ScrollDirection,
+    ToggleState, TreeOptions, UIA_CALL_TIMEOUT_MS, UIA_TREE_TIMEOUT_MS, UiaAction, UiaNode,
+    UiaPattern, UiaPort, UiaQuery, UiaText, UiaTree, control_type_name,
 };
 
 /// Pełny port systemowy: suma sub-portów. Implementowany automatycznie przez każdy typ,

@@ -17,3 +17,10 @@ na SID-y, klient bez prawa tworzenia instancji, etykieta integralności), `Proce
 (`SurfaceView` z walidacją i układem, `SurfaceEvent`), rozpoznawanie wstrzyknięć (`HookOrigin`, `MessageOrigin`,
 `input_is_injected` — fail-closed), `ServiceHostPort`/`StopSignal`, `SessionLauncherPort` (`LaunchIntegrity`),
 `PrivateDirPort` (`private_dir_sddl`), `MmcssPort`/`ThreadBoost` (RAII, `!Send`), `DiskPort`.
+
+F6/F4 — computer use i terminal (poza `SystemPort`): `TargetGuard` + `GuiError` (okna Alfy/Brokera/helpera
+i procesów nieznanych nigdy nie są celem — fail-closed), `DesktopPort` (okna v2, monitory), `UiaPort`
+(`UiaTree`, `UiaQuery`, `UiaAction::check` — zakaz wpisywania w pole hasła, `ElementRef` = okno + `RuntimeId`),
+`InputPort` + `InputBackend` + `execute_input` (paczki atomowe, cel/strażnik/UIPI/fizyczne wejście przed każdą
+paczką, `KeyChord::system_scope` — zakaz skrótów systemowych), `ScreenCapturePort` + `mask_plan`/`finish_capture`
+(maskowanie, `RgbaImage`, PNG z wymiennym zlib), `PseudoConsolePort`/`PtySession` (ConPTY).

@@ -4,7 +4,7 @@
 Jedyny crate z windows-rs/COM, zamknięty za traitem `SystemPort`: pliki, procesy, schowek, okna, zasobnik, skróty globalne, hook klawiatury (PTT), ścieżki i ACL. Wszystkie moduły korzystają z systemu **wyłącznie** przez ten kontrakt (PLAN §1.2, §3.2). UIA i SendInput dochodzą w v1.5/v2.
 
 ## Fala i priorytet
-F0: `SystemPort`-contract + fake (pkt 2 w §4.5a). F1 (zrobione: `platform-windows-impl`): v1 (fs, procesy, schowek, okna, zasobnik, skróty globalne + `WH_KEYBOARD_LL`; bez UIA/SendInput). F5: v1.5 (SendInput tekstu, UIA `TextPattern` odczyt). F6: v2 (UIA, SendInput, zrzuty). P0.
+F6 (zrobione: `platform-windows-gui-impl`, `platform-windows-pty-impl`): v2 — okna v2, UIA, SendInput, zrzuty z maskowaniem, ConPTY (F4). F0: `SystemPort`-contract + fake (pkt 2 w §4.5a). F1 (zrobione: `platform-windows-impl`): v1 (fs, procesy, schowek, okna, zasobnik, skróty globalne + `WH_KEYBOARD_LL`; bez UIA/SendInput). F5: v1.5 (SendInput tekstu, UIA `TextPattern` odczyt). F6: v2 (UIA, SendInput, zrzuty). P0.
 
 ## Kontrakt (stan F1 — źródło prawdy: `crates/platform-contract`)
 ```rust
@@ -36,6 +36,19 @@ Implementacja Windows żyje w crate'cie `platform-windows-kernel-impl` (wydzielo
 | wejście wstrzyknięte: `HookOrigin` (flagi `LLKHF_INJECTED`, `LLKHF_LOWER_IL_INJECTED`, `LLMHF_*`), `MessageOrigin` (`IMO_*`), `input_is_injected` (fail-closed) | hooki LL na wątku okna + `GetCurrentInputMessageSource` | logika w kontrakcie |
 | `MmcssPort` → `ThreadBoost` (RAII, `!Send`) | `AvSetMmThreadCharacteristicsW("Pro Audio")` / `AvRevertMmThreadCharacteristics` | `FakeMmcss` |
 | `DiskPort::free_disk_space` | `GetDiskFreeSpaceExW` | `FakeDisk` |
+
+### v2 (F6) — computer use i terminal (poza sumą `SystemPort`)
+Implementacja Windows: `platform-windows-gui-impl` (`WinGui`) i `platform-windows-pty-impl` (`WinPty`) — wydzielone przez limit rozmiaru crate'a (`deny.toml`: `wrappers` dla `windows`); składa je korzeń kompozycji (`app-*`).
+| Port (kontrakt) | Windows | Atrapa (`FakeDesktop`, `FakePty`) |
+|---|---|---|
+| `TargetGuard` + `GuiError` | strażnik celów: PID (bieżący proces, PID-y usług), obraz (`PROTECTED_IMAGES` = suma list Brokera i v1, alias 8.3), katalog instalacji; **obraz nieznany = chroniony** | ten sam typ |
+| `DesktopPort` (okna v2) | `EnumWindows` (kolejność Z, bez okien ukrytych przez DWM), PID/obraz/`TokenElevation`, monitory (`EnumDisplayMonitors`, `GetDpiForMonitor`), fokus (`SetForegroundWindow` + `AttachThreadInput`), `SetWindowPos(SWP_ASYNCWINDOWPOS)` z korektą ramki DWM, `ShowWindowAsync`; strażnik tuż przed zmianą | okna w pamięci, kolejność Z |
+| `UiaPort` | wątek COM MTA (`CUIAutomation8`), `IUIAutomation2` z limitami połączenia/transakcji, każde wywołanie z `recv_timeout` (5 s, drzewo 15 s); wiszący wątek porzucany i zastępowany (≤ 4 naraz, potem odmowa); `CacheRequest` (jedno wywołanie międzyprocesowe na węzeł), `ControlViewWalker`, odwołanie = HWND + `RuntimeId`; akcje przez wzorce; `TextPattern` tylko odczyt; wartość pola hasła nigdy nie wychodzi | drzewa elementów, symulacja zawieszenia |
+| `InputPort` + `InputBackend` + `execute_input` | `SendInput` paczkami atomowymi (Unicode, VK z `EXTENDEDKEY`, mysz bezwzględnie na pulpicie wirtualnym); cel/strażnik/UIPI/fizyczne wejście przed każdą paczką (logika w kontrakcie); hook `WH_KEYBOARD_LL`+`WH_MOUSE_LL` na wątku z pętlą komunikatów — wejście niewstrzyknięte = użytkownik (brak hooka = odmowa wejścia) | wirtualny zegar, skrypty: fizyczne wejście, Broker-UI na wierzch |
+| `ScreenCapturePort` + `mask_plan`/`finish_capture` | **BitBlt (`CAPTUREBLT`) / `PrintWindow(PW_RENDERFULLCONTENT)`** zamiast Windows.Graphics.Capture (synchronicznie, bez WinRT/D3D11 i żółtej ramki); maskowanie okien chronionych, `DEFAULT_MASKED_APPS` + żądania, pól haseł (UIA w budżecie 4 s, niesprawdzone okno = całe zamaskowane); czarna klatka wykrywana; skalowanie średnią z obszaru; PNG (`flate2`) | render kolorami, PNG bez kompresji |
+| `PseudoConsolePort` | `CreatePseudoConsole` + potoki anonimowe, proces `CREATE_SUSPENDED` → Job Object `KILL_ON_JOB_CLOSE` → wznowienie; środowisko jawne (blok UTF-16), wiersz poleceń MSVCRT; `close` = `TerminateJobObject` + `ClosePseudoConsole` na osobnym wątku | `FakePty` |
+
+Testy: `platform-fake/tests/desktop.rs` (property 0/200 skutków w oknach chronionych, przerwanie, maskowanie, limit czasu UIA), `platform-contract` (wykonawca wejścia, skróty systemowe, PNG/CRC/Adler, maski), Windows CI: `platform-windows-gui-impl/tests/gui_windows.rs` (pulpit `#[ignore]`: Notatnik — UIA, pisanie, zrzut), `platform-windows-pty-impl/tests/conpty_windows.rs` (wyjście, kod, zabicie drzewa).
 
 ## Zależności
 `platform-contract` (F1 bez magistrali — zdarzenia publikuje jądro). Zewnętrzne: `windows`/`windows-core` 0.62.2 (jedna wersja, `docs/vendor/windows.md`).

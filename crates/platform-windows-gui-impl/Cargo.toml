@@ -1,0 +1,56 @@
+[package]
+name = "platform-windows-gui-impl"
+description = "platform-windows v2 (F6): UI Automation na wątku MTA z limitem czasu, wejście syntetyczne SendInput z hookiem aktywności użytkownika, zrzuty BitBlt/PrintWindow z maskowaniem, okna v2 — zawsze ze strażnikiem okien Alfy/Brokera"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Wydzielone z `platform-windows-impl` (limit 8 000 linii na crate). Ta sama kategoria: implementacja
+# portów `platform-contract`, jedyne miejsca z windows-rs (`deny.toml`: `wrappers` dla `windows`).
+# Bez zależności od `platform-windows-impl` (zakaz `-impl` → cudzy `-impl`).
+[dependencies]
+platform-contract.workspace = true
+# Kompresja PNG zrzutów (ta sama wersja i backend co transfer-impl; już w Cargo.lock).
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
+
+# Ta sama wersja windows-rs co w `platform-windows-impl` (AGENTS.md: jeden crate, jedna wersja).
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Gdi",
+    "Win32_Security",
+    "Win32_Storage_Xps",
+    "Win32_System_Com",
+    "Win32_System_Com_StructuredStorage",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Ole",
+    "Win32_System_Threading",
+    "Win32_System_Variant",
+    "Win32_UI_Accessibility",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[dev-dependencies]
+proptest.workspace = true
+
+# Kopia [workspace.lints] z jedną różnicą: `unsafe_code = "deny"` zamiast `forbid`, żeby moduły FFI
+# mogły mieć `#[allow(unsafe_code)]` (tylko one; każdy blok `unsafe` z komentarzem `// SAFETY:`).
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+too_many_lines = "warn"
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "warn"
+undocumented_unsafe_blocks = "deny"

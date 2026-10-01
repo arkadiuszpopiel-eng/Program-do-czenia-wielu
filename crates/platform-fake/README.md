@@ -11,3 +11,7 @@ Testy właściwościowe (proptest) sprawdzają, że każda odwracalna operacja F
 F3/2: `FakePipes` (potoki w pamięci z DACL, etykietą i ochroną pierwszej instancji + rejestr tożsamości procesów —
 „proces o innym SID”), `FakeSurface` (skrypt zdarzeń okna), `FakeLauncher`, `FakePrivateDirs`, `FakeServiceHost`,
 `FakeMmcss`, `FakeDisk` (`tests/kernel_ports.rs`).
+F6/F4: `FakeDesktop` — wirtualny pulpit (okna z kolejnością Z, drzewa elementów UIA, kursor, wirtualny zegar,
+fizyczne wejście, skrypty „Broker-UI na wierzch po N paczkach”, zawieszenie UIA, render do zrzutów); każdy skutek
+w oknie trafia do `GuiRecord` z PID-em i obrazem (property w `tests/desktop.rs`: 0/200 w oknach chronionych).
+`FakePty` — pseudokonsola w pamięci (wyjście skryptowane, echo, `exit`, `tree_killed`; `Debug` bez treści).

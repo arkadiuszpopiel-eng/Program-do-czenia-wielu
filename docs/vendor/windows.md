@@ -20,6 +20,10 @@
 F3/2 (porty Jądra): `Win32_System_IO` (`ReadFile`/`WriteFile`/`ConnectNamedPipe` wymagają typu `OVERLAPPED`),
 `Win32_System_Pipes`, `Win32_System_RemoteDesktop` (`WTS*`), `Win32_System_Services`, `Win32_UI_Input`
 (`GetCurrentInputMessageSource`).
+F6 (`platform-windows-gui-impl`): `Win32_UI_Accessibility` (UIA), `Win32_System_Ole`, `Win32_System_Variant` +
+`Win32_System_Com_StructuredStorage` (bez niej brak `TryFrom<&VARIANT> for BSTR`), `Win32_Storage_Xps` (`PrintWindow`),
+`Win32_UI_Input_KeyboardAndMouse` (`SendInput`). F4 (`platform-windows-pty-impl`): `Win32_System_Console`
+(`CreatePseudoConsole`), `Win32_System_JobObjects`, `Win32_System_Pipes`, `Win32_Storage_FileSystem` + `Win32_System_IO`.
 
 ## Konwencje API 0.62 (różnice względem starszej wiedzy)
 - Funkcje zwracające `BOOL` z `SetLastError` mają postać `-> windows_core::Result<()>`
@@ -57,6 +61,11 @@ F3/2 (porty Jądra): `Win32_System_IO` (`ReadFile`/`WriteFile`/`ConnectNamedPipe
 | `kernel/win_launch.rs` | `WTSGetActiveConsoleSessionId`, `WTSQueryUserToken` (SeTcbPrivilege), `DuplicateTokenEx(TokenPrimary)`, `SetTokenInformation(TokenIntegrityLevel, S-1-16-12288)`, `CreatePipe` + `SetHandleInformation(HANDLE_FLAG_INHERIT, 0)`, `CreateProcessAsUserW(lpDesktop = winsta0\\default, STARTF_USESTDHANDLES)`; usługa: `StartServiceCtrlDispatcherW`, `RegisterServiceCtrlHandlerExW`, `SetServiceStatus` |
 | `kernel/surface/*` | `RegisterClassExW`, `CreateWindowExW(WS_EX_TOPMOST \| WS_EX_DLGMODALFRAME)`, STATIC `0x80` (`SS_NOPREFIX` bez feature `Win32_UI_Controls`), BUTTON `BS_PUSHBUTTON` (bez `BS_DEFPUSHBUTTON`), `IsDialogMessageW`, `WM_CTLCOLORSTATIC`, `FlashWindowEx`, `ShowWindow(SW_SHOWNOACTIVATE)`, `SetWindowsHookExW(WH_KEYBOARD_LL / WH_MOUSE_LL)`, `GetCurrentInputMessageSource`, `GetWindow(GW_HWNDPREV)` + `DwmGetWindowAttribute(DWMWA_CLOAKED)` (zasłonięcie) |
 
+| `gui/uia/*` (wątek MTA) | `CoCreateInstance(&CUIAutomation8 → CUIAutomation, CLSCTX_INPROC_SERVER)`, `cast::<IUIAutomation2>()` → `SetConnectionTimeout`/`SetTransactionTimeout`, `CreateCacheRequest` + `AddProperty(UIA_*PropertyId)` (w tym `UIA_Is*PatternAvailablePropertyId`), `ElementFromHandleBuildCache`, `ControlViewWalker` + `GetFirstChildElementBuildCache`/`GetNextSiblingElementBuildCache` (brak dziecka = `Err`), `GetCachedPropertyValue` → `VARIANT` (`bool/i32/BSTR::try_from(&v)`), `RuntimeId`: `VariantToInt32ArrayAlloc` + `CoTaskMemFree`, `BuildUpdatedCache`, `GetCurrentPatternAs::<IUIAutomation*Pattern>(UIA_*PatternId)` (`Invoke`, `SetValue(&BSTR)`, `Toggle`, `Expand/Collapse`, `Select`, `Scroll(h, v)`), `TextPattern.DocumentRange().GetText(max)`, `CreatePropertyCondition(UIA_IsPasswordPropertyId, &VARIANT::from(true))` + `FindAllBuildCache(TreeScope_Descendants)` |
+| `gui/input.rs`, `gui/hook.rs` | `SendInput(&[INPUT], size_of::<INPUT>())` (`KEYEVENTF_UNICODE`, `KEYEVENTF_EXTENDEDKEY`, `MOUSEEVENTF_ABSOLUTE \| VIRTUALDESK` — 0–65535 względem `SM_*VIRTUALSCREEN`), `WindowFromPoint` + `GetAncestor(GA_ROOT)`, hooki `WH_KEYBOARD_LL`/`WH_MOUSE_LL` (flagi `LL*HF_INJECTED` → wejście użytkownika) na wątku z `GetMessageW` |
+| `gui/capture.rs` | `GetDC(None)`, `CreateCompatibleDC`, `CreateCompatibleBitmap`, `SelectObject`, `BitBlt(…, SRCCOPY \| CAPTUREBLT)`, `PrintWindow(hwnd, hdc, PRINT_WINDOW_FLAGS(PW_RENDERFULLCONTENT))` (stała w `WindowsAndMessaging` jako `u32`), `GetDIBits` (bitmapa odznaczona z DC, `biHeight` ujemne = od góry, 32 bpp BGRA) |
+| `pty/conpty.rs` | `CreatePipe` ×2, `CreatePseudoConsole(COORD, in_read, out_write, 0)` (końcówki conhosta zamykamy od razu), `InitializeProcThreadAttributeList` (dwa wywołania) + `UpdateProcThreadAttribute(PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, wartość HPCON)`, `CreateProcessW(EXTENDED_STARTUPINFO_PRESENT \| CREATE_UNICODE_ENVIRONMENT \| CREATE_SUSPENDED, STARTUPINFOEXW)`, `AssignProcessToJobObject` → `ResumeThread`, `ResizePseudoConsole`, `ReadFile` (`ERROR_BROKEN_PIPE` = EOF), `WaitForSingleObject(proc, 0)` + `GetExitCodeProcess` |
+
 ## Pułapki
 - `#[implement]` bez zależności `windows-core` → „could not find `windows_core`”.
 - `IFileOperation` działa tylko w STA — nigdy na wątku tokio; `run_in_apartment(Apartment::Sta, ..)`.
@@ -66,3 +75,10 @@ F3/2 (porty Jądra): `Win32_System_IO` (`ReadFile`/`WriteFile`/`ConnectNamedPipe
 - Synchroniczny uchwyt potoku serializuje operacje na obiekcie pliku — połączenie czyta i pisze jeden wątek
   (protokół żądanie → odpowiedź); `DisconnectNamedPipe` gubi nieodczytane dane, więc serwer tylko zamyka uchwyt.
 - Podniesienie etykiety integralności tokenu i `WTSQueryUserToken` wymagają `SeTcbPrivilege` (usługa).
+- UIA potrafi wisieć na zawieszonej aplikacji (wywołanie międzyprocesowe) — tylko na dedykowanym wątku MTA z
+  `recv_timeout`; wiszący wątek porzucamy (nie da się go przerwać), limit porzuconych.
+- `SendInput` zablokowany przez UIPI (okno o wyższej integralności) **nie zgłasza błędu** — sprawdzaj
+  `TokenElevation` celu przed wysłaniem.
+- ConPTY nie kończy strumienia wyjścia, gdy proces się zakończy — trzeba wykryć koniec (`WaitForSingleObject`) i
+  wywołać `ClosePseudoConsole`; przed Windows 11 24H2 `ClosePseudoConsole` czeka na opróżnienie wyjścia (osobny wątek).
+- Współrzędne myszy i zrzutów w pikselach fizycznych wymagają procesu per-monitor DPI aware (powłoka Tauri jest).

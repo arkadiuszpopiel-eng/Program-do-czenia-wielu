@@ -3,12 +3,14 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod clipboard;
+mod desktop;
 mod exec;
 mod fs;
 mod hotkeys;
 mod kernel_host;
 mod misc;
 mod pipes;
+mod pty;
 
 use std::path::{Path, PathBuf};
 
@@ -28,6 +30,12 @@ pub use kernel_host::{
     FakeDisk, FakeLauncher, FakeMmcss, FakePrivateDirs, FakeServiceHost, FakeSurface,
 };
 pub use pipes::{FakePipeConnection, FakePipeListener, FakePipes};
+// F6 (computer use) i F4 (terminal): wirtualny pulpit z drzewem UIA, wejściem i zrzutami; ConPTY.
+pub use desktop::{
+    DESKTOP_COLOR, FAKE_PID_BASE, FakeDesktop, FakeElement, FakeWindow, GuiRecord, GuiRecordKind,
+    PASSWORD_COLOR, ScriptEvent,
+};
+pub use pty::FakePty;
 
 /// Pełna atrapa systemu: składa wszystkie fake'i w jeden `SystemPort`.
 #[derive(Debug, Default)]
