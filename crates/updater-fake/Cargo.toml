@@ -1,0 +1,22 @@
+[package]
+name = "updater-fake"
+description = "Launcher i aktualizacje: deterministyczna atrapa — wersje w pamięci, switch_to bez restartu, wydania z dobrymi i złymi podpisami, wirtualny zegar"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+updater-contract = { path = "../updater-contract" }
+chrono.workspace = true
+semver.workspace = true
+# Skróty paczek fixture'ów (ta sama wersja co w workspace; MIT OR Apache-2.0).
+sha2 = "0.10.9"
+
+[dev-dependencies]
+updater-contract = { path = "../updater-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

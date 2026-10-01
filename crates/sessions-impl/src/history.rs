@@ -26,7 +26,7 @@ enum Target {
     Fork(TurnId),
 }
 
-fn role_str(role: Role) -> &'static str {
+pub(crate) fn role_str(role: Role) -> &'static str {
     match role {
         Role::User => "user",
         Role::Assistant => "assistant",
@@ -105,18 +105,7 @@ impl SqliteSessions {
                 insert_heard(&tx, turn_id, prefix)?;
             }
             state_set(&tx, ACTIVE_LEAF, Some(&turn_id.0.to_string()))?;
-            if let Some(indexer) = &self.indexer {
-                let text = stored.content.searchable_text();
-                if !text.is_empty() {
-                    let doc = Doc {
-                        id: DocId::new(DocKind::Turn, turn_id.0.to_string()),
-                        session: id.clone(),
-                        text,
-                        ts: stored.created_at,
-                    };
-                    indexer.index_in(&tx, &doc).map_err(SessionError::storage)?;
-                }
-            }
+            self.index_turn(&tx, id, turn_id, &stored)?;
             let turn = load_turn(&tx, turn_id)?;
             tx.commit().map_err(db_err)?;
             Ok((turn, branched))
@@ -134,6 +123,30 @@ impl SqliteSessions {
         Ok(turn)
     }
 
+    /// Indeksuje turę (`search`) w bieżącej transakcji zapisu.
+    pub(crate) fn index_turn(
+        &self,
+        conn: &Connection,
+        id: &SessionId,
+        turn_id: TurnId,
+        stored: &StoredTurn,
+    ) -> Result<(), SessionError> {
+        let Some(indexer) = &self.indexer else {
+            return Ok(());
+        };
+        let text = stored.content.searchable_text();
+        if text.is_empty() {
+            return Ok(());
+        }
+        let doc = Doc {
+            id: DocId::new(DocKind::Turn, turn_id.0.to_string()),
+            session: id.clone(),
+            text,
+            ts: stored.created_at,
+        };
+        indexer.index_in(conn, &doc).map_err(SessionError::storage)
+    }
+
     fn read<R>(
         &self,
         id: &SessionId,
@@ -143,7 +156,11 @@ impl SqliteSessions {
     }
 }
 
-fn insert_heard(conn: &Connection, turn: TurnId, prefix: HeardPrefix) -> Result<(), SessionError> {
+pub(crate) fn insert_heard(
+    conn: &Connection,
+    turn: TurnId,
+    prefix: HeardPrefix,
+) -> Result<(), SessionError> {
     conn.execute(
         "INSERT INTO turn_heard(turn_id, chars, approximate, recorded_at) VALUES (?1, ?2, ?3, ?4)",
         params![
@@ -282,5 +299,29 @@ impl SessionHistory for SqliteSessions {
 
     fn turn_count(&self, id: &SessionId) -> Result<u64, SessionError> {
         self.read(id, turn_count)
+    }
+
+    fn all_turns(&self, id: &SessionId) -> Result<Vec<Turn>, SessionError> {
+        self.read(id, |c| {
+            let sql = format!("SELECT {TURN_COLUMNS} FROM turns t {TURN_JOINS} ORDER BY t.id");
+            let mut stmt = c.prepare_cached(&sql).map_err(db_err)?;
+            stmt.query_map([], turn_from_row)
+                .map_err(db_err)?
+                .collect::<Result<Vec<Turn>, _>>()
+                .map_err(db_err)
+        })
+    }
+
+    fn import_turns(&self, id: &SessionId, turns: &[Turn]) -> Result<u64, SessionError> {
+        if turns.is_empty() {
+            self.session_db(id)?;
+            return Ok(0);
+        }
+        let count = self.import_batch(id, turns)?;
+        let latest = turns.iter().map(|t| t.created_at).max();
+        self.add_imported(id, count, latest)?;
+        let payload = json!({ "session": id, "count": count });
+        self.outbox.emit(events::TURNS_IMPORTED, id, payload);
+        Ok(count)
     }
 }

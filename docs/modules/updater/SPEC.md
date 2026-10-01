@@ -61,3 +61,28 @@ Ustawienia → Aktualizacje (stan, „Co nowego", rollback ręczny), baner „wy
 ## Otwarte pytania
 - Format repo wydań (manifest JSON + zip; delta-update poza v1) — do ustalenia w SPEC v1.
 - Aktualizacja samego launchera (self-replace) — do ustalenia w SPEC v1.
+
+## Zmiany po implementacji (F1, `updater-contract/-impl/-fake`, 2026-10-01)
+- **Kontrakt synchroniczny** `Updater { layout, state, installed, select_launch, switch_to, rollback, mark_good,
+  record_exit, prune, check, verify_release }`; `download_and_stage` (pobieranie, wznawianie, rozpakowanie) — F3.
+- `current.json`: `{ schema: 1, active, previous, pending, crashes, bad[], updated_at }`, zapis atomowy (tymczasowy +
+  `fsync` + `rename`). Brak/uszkodzony/nieznany schemat → launcher bierze najnowszą poprawną wersję (bez zapisu).
+- Wersja poprawna = katalog o kanonicznej nazwie semver z `alfa-desktop.exe` i (opcjonalnie) zgodnym `version.json`.
+- Wybór: aktywna → (brak/uszkodzona/wycofana) poprzednia → błąd. Rollback = zamiana aktywnej z poprzednią.
+- **Crash-loop** (`CrashPolicy`: okno 15 s, 2 awarie): wyjście ≠ 0 w oknie albo błąd startu = szybka awaria; wersja
+  `pending` (przed `mark_good`) wraca do poprzedniej po pierwszej, dobra — po drugiej (wcześniej ponowienie); wersja
+  wycofana trafia do `bad` (zdejmuje ją dopiero jawne `switch_to`). Kod 0 i wyjście po oknie to nie awaria startu.
+  `mark_good` woła aplikacja po zdrowym starcie (launcher tylko zeruje licznik).
+- `prune(keep)`: zostaje `keep` najnowszych, zawsze aktywna, poprzednia i wersje nowsze od aktywnej (przygotowana
+  aktualizacja); obcych katalogów nie dotyka.
+- **minisign**: `minisign-verify` 0.3 (bez zależności), weryfikacja strumieniowa, tylko podpisy „prehashed”; klucz
+  publiczny z konfiguracji (`[updates] public_key`, base64 albo plik `.pub`); **komentarz zaufany musi zawierać
+  `version:<wersja>`** (`require_version_tag`, domyślnie tak) — wiąże podpis z wersją z manifestu (ochrona przed
+  podsunięciem starszej paczki). Manifest wydań: `{ schema, channel, releases: [{ version, url (https), sha256,
+  minisign, notes, min_previous }] }`; `select_update` = najnowsze osiągalne wprost, niewycofane.
+- **Launcher**: binarium `alfa` w pakiecie `updater-impl` (`[[bin]]`; osobny pakiet nie może zależeć od `-impl` —
+  `scripts/check-deps.sh`), `#![windows_subsystem = "windows"]`, katalog instalacji = katalog `alfa.exe` z `versions\`
+  albo `%LOCALAPPDATA%\Alfa`; argumenty przekazywane bez zmian (`OsString`, bez powłoki); błędy do `launcher.log`
+  (≤ 64 KiB) — okno błędu przez `platform-windows` później. Launcher zostaje na czas okna obserwacji (15 s), potem kończy.
+- **Do zrobienia (F3)**: pobieranie i rozpakowanie wydań, aktualizacja samego launchera, rollback z `watchdog`,
+  okno błędu launchera, pomiar RAM/startu launchera na Windows.

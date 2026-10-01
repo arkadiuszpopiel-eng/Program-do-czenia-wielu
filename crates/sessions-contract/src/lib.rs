@@ -12,6 +12,7 @@
 mod api;
 mod error;
 mod ids;
+mod import;
 mod naming;
 mod session;
 mod turn;
@@ -25,6 +26,7 @@ pub use api::{
 };
 pub use error::SessionError;
 pub use ids::{AgentId, BranchId, ProjectId, SessionId, TurnId};
+pub use import::{MAX_PORTABLE_ID_LEN, PortableSession, TreeCursor, is_portable_session_id};
 pub use naming::{DEFAULT_TITLE, session_dir_name, title_key, unique_dir_name};
 pub use session::{
     NewSession, PrivacyTag, SessionMeta, SessionPatch, SessionQuery, SessionSort, SessionSummary,
@@ -60,4 +62,7 @@ pub mod events {
     pub const SESSION_RESTORED: &str = "session.restored";
     /// Sesja usunięta ostatecznie — crypto-shredding (`{ "session" }`).
     pub const SESSION_DELETED: &str = "session.deleted";
+    /// Zaimportowano partię tur (`{ "session", "count" }`) — jedno zdarzenie zamiast `count` razy
+    /// `session.turn.appended` (import `.alfa`).
+    pub const TURNS_IMPORTED: &str = "session.turns.imported";
 }

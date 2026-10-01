@@ -94,3 +94,16 @@ Panel Sesje (lista, wyszukiwanie, projekty, tagi, przypięte, kropka aktywności
   projekcja 1000 tur 9–10 ms, lista sesji 0,14 ms. Z indeksowaniem FTS+wektor (`search-impl`) dochodzi
   0,5–0,9 s/1000 tur w debug (kod C bez optymalizacji) — zalecane `[profile.dev.package.libsqlite3-sys]
   opt-level = 3` w root `Cargo.toml`.
+
+## Zmiany dla `transfer` (F1, 2026-10-01; addytywne)
+- `SessionHistory::all_turns(id)` — całe drzewo rosnąco po `id` (domyślnie przez `turn_count` + `turn`; `-impl` jednym
+  zapytaniem).
+- `SessionCatalog::adopt_session(PortableSession { meta, turns, active_leaf, draft })` — import z zachowaniem `id`,
+  metadanych i znaczników czasu, **atomowo** (baza sesji w jednej transakcji, wpis katalogu na końcu; po awarii plik bez
+  wpisu sprząta `sweep_orphans`); nowy klucz w sejfie tej maszyny; `id` musi spełniać `is_portable_session_id`
+  (`[A-Za-z0-9_-]{1,64}` — trafia do nazwy pliku); istniejąca sesja → nowy błąd `SessionError::AlreadyExists`.
+- `SessionHistory::import_turns(id, &[Turn])` — dopisanie partii pełnych tur (scalanie przy imporcie) z regułami
+  `TreeCursor` (kolejne `id` bez luk; gałąź jak przy `append_turn`/`fork_from`), wszystko albo nic, indeksowanie w tej
+  samej transakcji, zdarzenie `session.turns.imported`; tury importowane nie zwiększają licznika nieprzeczytanych.
+- Domyślne implementacje `adopt_session`/`import_turns` zwracają `Invalid` („nieobsługiwane”) — istniejące
+  implementacje traitów się kompilują. Testy kontraktowe: +3 przypadki (round-trip, odrzucenia, atomowość).

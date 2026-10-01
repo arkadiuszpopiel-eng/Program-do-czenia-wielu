@@ -1,0 +1,40 @@
+[package]
+name = "transfer-contract"
+description = "Import/eksport paczek .alfa: kontrakt — manifest, zakres, ścieżki, format przenośny sesji, strażnik sekretów, silnik planu/zapisu nad portami, testy kontraktowe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+core-log-contract.workspace = true
+sessions-contract = { path = "../sessions-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+chrono.workspace = true
+semver.workspace = true
+toml.workspace = true
+regex.workspace = true
+# Sumy kontrolne wpisów paczki (ta sama wersja co w reszcie workspace; MIT OR Apache-2.0).
+sha2 = "0.10.9"
+# Szybkie wyszukiwanie podciągów bajtowych w skanerze sekretów (już w Cargo.lock przez `regex`; MIT OR Unlicense).
+memchr = "2.8.3"
+# Zerowanie buforów z sekretami (ta sama wersja co w accounts-hub-contract; MIT OR Apache-2.0).
+zeroize = "1.9.0"
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

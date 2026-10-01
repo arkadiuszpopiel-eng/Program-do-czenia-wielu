@@ -15,6 +15,12 @@ pub enum SessionError {
         /// Identyfikator sesji.
         id: SessionId,
     },
+    /// Sesja o tym identyfikatorze już istnieje (import z zachowaniem identyfikatora).
+    #[error("sesja {id} już istnieje")]
+    AlreadyExists {
+        /// Identyfikator sesji.
+        id: SessionId,
+    },
     /// Tura nie istnieje w tej sesji.
     #[error("tura {turn} nie istnieje w tej sesji")]
     TurnNotFound {

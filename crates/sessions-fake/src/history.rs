@@ -1,8 +1,8 @@
 //! Historia (drzewo append-only) w atrapie.
 
 use sessions_contract::{
-    BranchId, HeardPrefix, NewTurn, Role, SessionError, SessionHistory, SessionId, Siblings, Turn,
-    TurnId, validate_heard_prefix, validate_new_turn,
+    BranchId, HeardPrefix, NewTurn, Role, SessionError, SessionHistory, SessionId, Siblings,
+    TreeCursor, Turn, TurnId, validate_heard_prefix, validate_new_turn,
 };
 
 use crate::FakeSessions;
@@ -171,5 +171,22 @@ impl SessionHistory for FakeSessions {
 
     fn turn_count(&self, id: &SessionId) -> Result<u64, SessionError> {
         Ok(self.lock().get(id)?.turns.len() as u64)
+    }
+
+    fn all_turns(&self, id: &SessionId) -> Result<Vec<Turn>, SessionError> {
+        Ok(self.lock().get(id)?.turns.values().cloned().collect())
+    }
+
+    fn import_turns(&self, id: &SessionId, turns: &[Turn]) -> Result<u64, SessionError> {
+        let mut st = self.lock();
+        let session = st.get_mut(id)?;
+        let cursor = TreeCursor::from_turns(session.turns.values());
+        cursor.check_batch(turns)?;
+        for turn in turns {
+            session.next_branch = session.next_branch.max(turn.branch.0);
+            session.last_turn_at = session.last_turn_at.max(Some(turn.created_at));
+            session.turns.insert(turn.id, turn.clone());
+        }
+        Ok(turns.len() as u64)
     }
 }

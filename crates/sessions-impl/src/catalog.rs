@@ -6,8 +6,9 @@ use chrono::{DateTime, Utc};
 use lib_sqlstore::rusqlite::{OptionalExtension, params};
 use serde_json::json;
 use sessions_contract::{
-    DeleteReport, NewSession, SessionCatalog, SessionError, SessionId, SessionMeta, SessionPatch,
-    SessionQuery, SessionSummary, apply_query, events, load_or_create_key, session_key_name,
+    DEFAULT_TITLE, DeleteReport, NewSession, PortableSession, SessionCatalog, SessionError,
+    SessionId, SessionMeta, SessionPatch, SessionQuery, SessionSummary, apply_query, events,
+    normalize_tags, session_key_name,
 };
 
 use crate::rows::{db_err, to_u64};
@@ -124,6 +125,45 @@ impl SqliteSessions {
     }
 }
 
+impl SqliteSessions {
+    /// Po imporcie tur: liczniki listy (`turns += count`, `last_turn_at` = późniejszy z dwóch).
+    pub(crate) fn add_imported(
+        &self,
+        id: &SessionId,
+        count: u64,
+        latest: Option<DateTime<Utc>>,
+    ) -> Result<(), SessionError> {
+        let current: Option<String> = self
+            .index
+            .with(|c| {
+                c.query_row(
+                    "SELECT last_turn_at FROM sessions WHERE id = ?1",
+                    [id.as_str()],
+                    |r| r.get(0),
+                )
+            })
+            .map_err(db_err)?;
+        let current: Option<DateTime<Utc>> = match current {
+            Some(t) => Some(serde_json::from_str(&t).map_err(SessionError::storage)?),
+            None => None,
+        };
+        let last = current.max(latest);
+        let last = match last {
+            Some(t) => Some(serde_json::to_string(&t).map_err(SessionError::storage)?),
+            None => None,
+        };
+        self.index
+            .with(|c| {
+                c.execute(
+                    "UPDATE sessions SET turns = turns + ?2, last_turn_at = ?3 WHERE id = ?1",
+                    params![id.as_str(), crate::rows::to_i64(count), last],
+                )
+            })
+            .map(|_| ())
+            .map_err(db_err)
+    }
+}
+
 impl SessionCatalog for SqliteSessions {
     fn create_session(&self, new: NewSession) -> Result<SessionMeta, SessionError> {
         let id = SessionId::new(uuid::Uuid::now_v7().to_string());
@@ -139,27 +179,43 @@ impl SessionCatalog for SqliteSessions {
             &self.config.workdir_root,
             &taken,
         );
-        let key = load_or_create_key(self.vault.as_ref(), &session_key_name(&id))?;
-        let mut open = lock(&self.open);
-        let db = self.open_db(&id, &key)?;
-        let json = meta_json(&meta)?;
-        let inserted = self.index.with(|c| {
-            c.execute(
-                "INSERT INTO sessions(id, meta) VALUES (?1, ?2)",
-                params![id.as_str(), json],
-            )
-        });
-        if let Err(e) = inserted {
-            drop(db);
-            let _ = self.vault.delete(&session_key_name(&id));
-            let _ = lib_sqlstore::remove_database(&self.session_path(&id));
-            return Err(db_err(e));
-        }
-        open.insert(id.clone(), Arc::clone(&db));
-        drop(open);
+        let session = PortableSession {
+            meta,
+            turns: Vec::new(),
+            active_leaf: None,
+            draft: None,
+        };
+        self.insert_portable(&session)?;
         self.outbox
             .emit(events::SESSION_CREATED, &id, json!({ "session": id }));
-        Ok(meta)
+        Ok(session.meta)
+    }
+
+    fn adopt_session(&self, session: PortableSession) -> Result<SessionMeta, SessionError> {
+        session.validate()?;
+        let mut session = session;
+        let meta = &mut session.meta;
+        match self.exists(&meta.id) {
+            Ok(()) => {
+                return Err(SessionError::AlreadyExists {
+                    id: meta.id.clone(),
+                });
+            }
+            Err(SessionError::NotFound { .. }) => {}
+            Err(other) => return Err(other),
+        }
+        if meta.title.trim().is_empty() {
+            DEFAULT_TITLE.clone_into(&mut meta.title);
+        }
+        meta.tags = normalize_tags(&meta.tags);
+        // Plik bez wpisu w katalogu to sierota (np. po przerwanym usuwaniu) — nieczytelna bez klucza.
+        lib_sqlstore::remove_database(&self.session_path(&meta.id))
+            .map_err(SessionError::storage)?;
+        self.insert_portable(&session)?;
+        let id = session.meta.id.clone();
+        let payload = json!({ "session": id, "imported": true, "turns": session.turns.len() });
+        self.outbox.emit(events::SESSION_CREATED, &id, payload);
+        Ok(session.meta)
     }
 
     fn session(&self, id: &SessionId) -> Result<SessionMeta, SessionError> {

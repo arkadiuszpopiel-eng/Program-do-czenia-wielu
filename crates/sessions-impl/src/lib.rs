@@ -15,6 +15,7 @@ mod events;
 #[cfg(feature = "dev-file-vault")]
 mod file_vault;
 mod history;
+mod import;
 mod rows;
 mod schema;
 

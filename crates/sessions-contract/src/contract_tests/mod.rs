@@ -4,6 +4,7 @@
 mod catalog;
 mod history;
 pub mod ops;
+mod transfer;
 
 use std::ops::Deref;
 
@@ -17,6 +18,10 @@ pub use history::{
     append_and_project, append_rules, blocks_round_trip, drafts_per_session, fork_creates_variants,
     heard_prefix_is_append_only, hide_keeps_content, set_active_leaf_rules,
 };
+pub use transfer::{
+    adopt_and_import_round_trip, adopt_rejects_existing_and_unsafe_ids,
+    import_turns_validated_and_atomic,
+};
 
 /// Uruchamia cały zestaw; `factory` daje świeżą, pustą instancję (np. w nowym katalogu tymczasowym).
 pub fn run_all<H, S>(factory: impl Fn() -> H)
@@ -24,7 +29,7 @@ where
     H: Deref<Target = S>,
     S: Sessions,
 {
-    let cases: [fn(&dyn Sessions); 16] = [
+    let cases: [fn(&dyn Sessions); 19] = [
         create_and_get,
         update_meta,
         tainted_only_grows,
@@ -41,6 +46,9 @@ where
         drafts_per_session,
         blocks_round_trip,
         set_active_leaf_rules,
+        adopt_and_import_round_trip,
+        adopt_rejects_existing_and_unsafe_ids,
+        import_turns_validated_and_atomic,
     ];
     for case in cases {
         let harness = factory();

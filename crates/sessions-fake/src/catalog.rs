@@ -3,8 +3,9 @@
 use std::collections::BTreeMap;
 
 use sessions_contract::{
-    DeleteReport, NewSession, SessionCatalog, SessionError, SessionId, SessionMeta, SessionPatch,
-    SessionQuery, SessionSummary, apply_query, load_or_create_key, session_key_name,
+    DEFAULT_TITLE, DeleteReport, NewSession, PortableSession, SessionCatalog, SessionError,
+    SessionId, SessionMeta, SessionPatch, SessionQuery, SessionSummary, apply_query,
+    load_or_create_key, normalize_tags, session_key_name,
 };
 
 use crate::{FakeSession, FakeSessions};
@@ -99,6 +100,40 @@ impl SessionCatalog for FakeSessions {
 
     fn restore_session(&self, id: &SessionId) -> Result<SessionMeta, SessionError> {
         set_trashed(self, id, false)
+    }
+
+    fn adopt_session(&self, session: PortableSession) -> Result<SessionMeta, SessionError> {
+        session.validate()?;
+        let PortableSession {
+            mut meta,
+            turns,
+            active_leaf,
+            draft,
+        } = session;
+        let mut st = self.lock();
+        if st.sessions.contains_key(&meta.id) {
+            return Err(SessionError::AlreadyExists { id: meta.id });
+        }
+        if meta.title.trim().is_empty() {
+            DEFAULT_TITLE.clone_into(&mut meta.title);
+        }
+        meta.tags = normalize_tags(&meta.tags);
+        load_or_create_key(self.vault.as_ref(), &session_key_name(&meta.id))?;
+        let last_turn_at = turns.iter().map(|t| t.created_at).max();
+        let next_branch = turns.iter().map(|t| t.branch.0).max().unwrap_or(0);
+        st.sessions.insert(
+            meta.id.clone(),
+            FakeSession {
+                meta: meta.clone(),
+                turns: turns.into_iter().map(|t| (t.id, t)).collect(),
+                next_branch,
+                active_leaf,
+                draft: draft.filter(|d| !d.is_empty()),
+                unread: 0,
+                last_turn_at,
+            },
+        );
+        Ok(meta)
     }
 
     fn delete_session(&self, id: &SessionId) -> Result<DeleteReport, SessionError> {
