@@ -1,0 +1,32 @@
+[package]
+name = "diagnostician-impl"
+description = "Diagnosta (F8): usługa — rdzeń z dziennikiem napraw NDJSON (fsync, odzysk przerwanych napraw), zbieranie sygnałów z magistrali (rejestr, watchdog, Diagnostyka, config.invalid), cykliczny skan, adaptery portów naprawy (core-config z porównaj-i-zamień, historia konfiguracji, pliki w dozwolonych korzeniach z kwarantanną i kontrolą SHA-256) i moduł rejestru"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+diagnostician-contract = { path = "../diagnostician-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+sha2 = "0.10.9"
+tokio.workspace = true
+
+[dev-dependencies]
+diagnostician-contract = { path = "../diagnostician-contract", features = ["contract-tests"] }
+diagnostician-fake = { path = "../diagnostician-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+core-config-fake = { path = "../core-config-fake" }
+serde.workspace = true
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

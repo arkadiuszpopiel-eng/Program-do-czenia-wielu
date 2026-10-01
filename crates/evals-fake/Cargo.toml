@@ -1,0 +1,20 @@
+[package]
+name = "evals-fake"
+description = "Harness ewaluacji (F8): atrapa — katalog zestawów i bramka z holdoutem w pamięci (te same reguły co -impl), wstrzykiwanie zmian plików"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+evals-contract = { path = "../evals-contract" }
+async-trait.workspace = true
+
+[dev-dependencies]
+evals-contract = { path = "../evals-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

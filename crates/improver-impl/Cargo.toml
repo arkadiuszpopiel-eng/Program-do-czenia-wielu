@@ -1,0 +1,31 @@
+[package]
+name = "improver-impl"
+description = "Ulepszacz (F8): usługa — rdzeń ImproverCore z zegarem, publikacją zdarzeń na magistralę, trwałą kolejką propozycji (zapis atomowy), cyklem bezczynności (obserwacja → ocena → nadzór) i modułem rejestru"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+improver-contract = { path = "../improver-contract" }
+evals-contract = { path = "../evals-contract" }
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+improver-contract = { path = "../improver-contract", features = ["contract-tests"] }
+evals-contract = { path = "../evals-contract", features = ["contract-tests"] }
+evals-fake = { path = "../evals-fake" }
+core-config-fake = { path = "../core-config-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

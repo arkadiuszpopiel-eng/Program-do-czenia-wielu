@@ -22,3 +22,6 @@ dist/
 # System
 Thumbs.db
 .DS_Store
+
+# Holdout ewaluacji jest poza gitem (ACCEPTANCE §13)
+/evals/holdout/
