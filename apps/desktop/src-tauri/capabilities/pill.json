@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "pill",
+  "description": "Pigułka głosowa: stop mowy, wyciszenie i zdarzenia VoicePill/MicLevel; przesuwanie okna.",
+  "windows": ["pill"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:window:allow-start-dragging",
+    "allow-voice-stop-speech",
+    "allow-voice-set-muted"
+  ]
+}

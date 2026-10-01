@@ -1,9 +1,58 @@
-//! Powłoka Alfy: minimalny `run()` uruchamiający okno główne z UI Svelte 5 (`../ui`).
-//! F0: bez komend IPC; komendy i zdarzenia rdzenia dojdą wraz z kontraktami `core-*`.
+//! Powłoka Alfy (Tauri 2 + WebView2): składa `AppCore` (crates/app-core), rejestruje komendy IPC
+//! z COMMANDS.md, emituje paczki zdarzeń na `alfa://events`, prowadzi okna `main`/`quick`/`pill`,
+//! zasobnik, skróty globalne, powiadomienia, jedną instancję i protokół `alfa://`.
+//! Logika aplikacji jest w `app-core`; tu tylko kleje systemowe.
 
-/// Uruchamia aplikację Tauri. Błąd startu jest fatalny — nie ma sensownego stanu bez okna.
+mod commands;
+mod pump;
+mod shell;
+mod shortcuts;
+mod tray;
+mod windows;
+
+use app_core::{AppCore, AppOptions, AppPaths};
+use tauri::{Manager, WindowEvent};
+
+/// Uruchamia aplikację. Błąd startu jest fatalny — nie ma sensownego stanu bez rdzenia i okna.
 pub fn run() {
-    let result = tauri::Builder::default().run(tauri::generate_context!());
+    let result = tauri::Builder::default()
+        // Single-instance musi być pierwszą wtyczką: druga instancja przekazuje argumenty/URI.
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            shell::handle_args(app, argv);
+        }))
+        .plugin(shortcuts::plugin())
+        .plugin(tauri_plugin_notification::init())
+        .invoke_handler(commands::handler())
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                windows::on_close_requested(window, api);
+            }
+            if let WindowEvent::Focused(false) = event
+                && window.label() == windows::QUICK
+            {
+                let _ = window.hide();
+            }
+        })
+        .setup(|app| {
+            let paths = AppPaths::from_env().map_err(|e| e.message)?;
+            let handle = app.handle().clone();
+            let options = AppOptions {
+                app_version: app.package_info().version.to_string(),
+                shell: Some(std::sync::Arc::new(shell::TauriShell::new(handle.clone()))),
+                ..AppOptions::default()
+            };
+            let core = tauri::async_runtime::block_on(AppCore::build(paths.clone(), options))
+                .map_err(|e| e.message)?;
+            app.manage(core.clone());
+            app.manage(windows::WindowState::new(paths.webview_data()));
+            windows::create_all(&handle)?;
+            tray::build(&handle)?;
+            shortcuts::register(&handle, &core);
+            pump::spawn(handle.clone(), core);
+            shell::handle_args(&handle, std::env::args().collect());
+            Ok(())
+        })
+        .run(tauri::generate_context!());
     if let Err(error) = result {
         eprintln!("alfa-desktop: błąd uruchomienia Tauri: {error}");
         std::process::exit(1);

@@ -46,8 +46,9 @@ są placeholderami — docelowe wygeneruj: `cargo tauri icon sciezka/do/logo.png
 `tauri.conf.json`: okno 1200×800, min. 400×500, **natywne dekoracje** (`decorations: true`).
 TODO F0(j): własny pasek tytułu (`decorations: false` + `data-tauri-drag-region`) z natywnymi przyciskami
 i obsługą **Snap Layouts** Windows 11 — do sprawdzenia w Tauri 2 (PLAN.md §14.2). Tło Mica: również F0(j).
-`capabilities/default.json` daje oknu `main` tylko `core:default` + tytuł/stan maksymalizacji; każde nowe
-uprawnienie to osobna decyzja (AGENTS.md → Broker).
+Uprawnienia są osobne dla każdego okna (`capabilities/main.json`, `quick.json`, `pill.json`; PLAN §8.2):
+każde okno dostaje tylko komendy, których używa (lista generowana w `build.rs` z `ui/src/lib/api/COMMANDS.md`);
+każde nowe uprawnienie to osobna decyzja (AGENTS.md → Broker).
 
 ## Bramki jakości UI (lokalnie, przed commitem)
 ```bash
@@ -82,5 +83,6 @@ apps/desktop/
   ui/                 Vite + Svelte 5 (index.html, src/main.ts, src/App.svelte — makieta Rozmowy z atrapami)
     scripts/bundle-size.mjs
   src-tauri/          Cargo.toml (tauri = 2.12.0, samodzielny [workspace]), tauri.conf.json,
-    capabilities/default.json, src/main.rs, src/lib.rs, build.rs, icons/ (placeholdery)
+    capabilities/{main,quick,pill}.json, src/ (lib.rs, commands.rs, windows.rs, tray.rs,
+    shortcuts.rs, pump.rs, shell.rs), build.rs, icons/ (placeholdery); logika w crates/app-core
 ```

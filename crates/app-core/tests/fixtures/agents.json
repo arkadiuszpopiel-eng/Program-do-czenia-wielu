@@ -1,0 +1,67 @@
+[
+  {
+    "command": "agents_list",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": [
+      {
+        "id": "alfa",
+        "role_ids": [
+          "conductor",
+          "speaker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "beta",
+        "role_ids": [
+          "keeper",
+          "writer"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "gama",
+        "role_ids": [
+          "researcher",
+          "critic",
+          "thinker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "delta",
+        "role_ids": [
+          "executor",
+          "coder"
+        ],
+        "status": "idle",
+        "activity": null
+      }
+    ]
+  },
+  {
+    "command": "agents_set_roles",
+    "args": {
+      "sessionId": "s-q3",
+      "agent": "delta",
+      "roleIds": [
+        "executor",
+        "coder"
+      ]
+    },
+    "result": null
+  },
+  {
+    "command": "agents_apply_cast",
+    "args": {
+      "sessionId": "s-q3",
+      "template": "research"
+    },
+    "result": null
+  }
+]

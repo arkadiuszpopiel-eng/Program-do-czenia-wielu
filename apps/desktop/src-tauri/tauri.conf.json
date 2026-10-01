@@ -11,25 +11,44 @@
   },
   "app": {
     "withGlobalTauri": false,
-    "windows": [
-      {
-        "label": "main",
-        "title": "Alfa",
-        "width": 1200,
-        "height": 800,
-        "minWidth": 400,
-        "minHeight": 500,
-        "center": true,
-        "resizable": true,
-        "decorations": true,
-        "theme": null,
-        "visible": true,
-        "dragDropEnabled": true
-      }
-    ],
+    "windows": [],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src ipc: http://ipc.localhost",
-      "capabilities": ["default"]
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' asset: http://asset.localhost data:",
+        "font-src": "'self'",
+        "connect-src": "ipc: http://ipc.localhost",
+        "worker-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'"
+      },
+      "devCsp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' asset: http://asset.localhost data:",
+        "font-src": "'self'",
+        "connect-src": "ipc: http://ipc.localhost ws://localhost:1421 http://localhost:1420",
+        "worker-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'"
+      },
+      "capabilities": ["main", "quick", "pill"],
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$HOME/Alfa/**"]
+      }
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["alfa"]
+      }
     }
   },
   "bundle": {

@@ -1,0 +1,25 @@
+[
+  {
+    "command": "quick_ask",
+    "args": {
+      "text": "Ile to 17% z 2 400 zł?"
+    },
+    "result": {
+      "session_id": "s-quick",
+      "user_turn_id": "t-muo5qfus-24",
+      "assistant_turn_id": "t-muo5qfus-25"
+    }
+  },
+  {
+    "command": "quick_expand_to_main",
+    "args": {
+      "sessionId": "s-quick"
+    },
+    "result": null
+  },
+  {
+    "command": "quick_hide",
+    "args": {},
+    "result": null
+  }
+]

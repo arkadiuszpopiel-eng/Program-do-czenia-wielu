@@ -1,0 +1,100 @@
+[
+  {
+    "command": "device_profile",
+    "args": {},
+    "result": {
+      "machine": {
+        "id": "m-7f3a",
+        "name": "DESKTOP-ALFA",
+        "os": "Windows 11 Pro 24H2",
+        "cpu": {
+          "model": "AMD Ryzen 7 7840HS",
+          "cores": 8,
+          "threads": 16
+        },
+        "ram_mb": 32768,
+        "gpus": [
+          {
+            "vendor": "AMD",
+            "model": "Radeon 780M",
+            "vram_mb": 4096,
+            "backends": [
+              "Vulkan",
+              "CPU"
+            ]
+          }
+        ],
+        "npu": "AMD XDNA (10 TOPS)",
+        "battery": {
+          "percent": 84,
+          "on_ac": true
+        }
+      },
+      "recommendation": {
+        "hw_class": "standard_amd",
+        "voice_profile": "B",
+        "llm_backend": "llama.cpp · Vulkan",
+        "tradeoffs": [
+          {
+            "pl": "Lokalny model 3–4,5B na GPU; większe modele przez chmurę.",
+            "en": "Local 3–4.5B model on GPU; larger models via cloud."
+          },
+          {
+            "pl": "Na baterii rozpoznawanie mowy przełącza się na lżejszy model.",
+            "en": "On battery, speech recognition switches to a lighter model."
+          }
+        ]
+      },
+      "measured_at": "2026-09-28T11:45:00.000Z"
+    }
+  },
+  {
+    "command": "device_measure",
+    "args": {},
+    "result": {
+      "machine": {
+        "id": "m-7f3a",
+        "name": "DESKTOP-ALFA",
+        "os": "Windows 11 Pro 24H2",
+        "cpu": {
+          "model": "AMD Ryzen 7 7840HS",
+          "cores": 8,
+          "threads": 16
+        },
+        "ram_mb": 32768,
+        "gpus": [
+          {
+            "vendor": "AMD",
+            "model": "Radeon 780M",
+            "vram_mb": 4096,
+            "backends": [
+              "Vulkan",
+              "CPU"
+            ]
+          }
+        ],
+        "npu": "AMD XDNA (10 TOPS)",
+        "battery": {
+          "percent": 84,
+          "on_ac": true
+        }
+      },
+      "recommendation": {
+        "hw_class": "standard_amd",
+        "voice_profile": "B",
+        "llm_backend": "llama.cpp · Vulkan",
+        "tradeoffs": [
+          {
+            "pl": "Lokalny model 3–4,5B na GPU; większe modele przez chmurę.",
+            "en": "Local 3–4.5B model on GPU; larger models via cloud."
+          },
+          {
+            "pl": "Na baterii rozpoznawanie mowy przełącza się na lżejszy model.",
+            "en": "On battery, speech recognition switches to a lighter model."
+          }
+        ]
+      },
+      "measured_at": "2026-09-28T11:45:00.000Z"
+    }
+  }
+]

@@ -55,5 +55,14 @@ Toasty w aplikacji (ui-kit `Toast`), karta „Cofnij", Ustawienia → Powiadomie
 ## Fake
 `notify-fake`: kolejka w pamięci, skryptowane kliknięcia akcji, licznik earconów — do asercji w testach `agent-runtime`/`undo-journal`.
 
+## Implementacja F1 (stan)
+- `app_core::notify::native_notice` mapuje zdarzenia na toast Windows (tylko gdy okno główne jest
+  ukryte): odpowiedź gotowa (`Stop end/max_tokens`), błąd (bez `offline`), prośba o zatwierdzenie
+  („Otwórz okno Brokera" — **bez akcji zatwierdzania**, test), komunikat rdzenia ostrzeżenie/błąd.
+  Treść bez fragmentów odpowiedzi; komunikat błędu skrócony do 160 znaków.
+- Wysyłka: `tauri-plugin-notification` z pompy zdarzeń powłoki; tryb „nie przeszkadzać" z zasobnika
+  wycisza toasty. Toasty w aplikacji = zdarzenie `Toast` (UI). Earcony, dedupe 5 s, AUMID przez launcher —
+  w module `notify` (F1+/F2).
+
 ## Otwarte pytania
 - Zestaw earconów (własne vs systemowe) i ich licencja — do ustalenia w SPEC v1.

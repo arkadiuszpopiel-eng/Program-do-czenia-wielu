@@ -1,0 +1,244 @@
+[
+  {
+    "command": "sessions_list",
+    "args": {},
+    "result": [
+      {
+        "id": "s-q3",
+        "title": "Raport Q3",
+        "project": {
+          "id": "p-x",
+          "name": "Projekt X"
+        },
+        "pinned": true,
+        "archived": false,
+        "working": true,
+        "unread": false,
+        "updated_at": "2026-09-30T08:43:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      },
+      {
+        "id": "s-api",
+        "title": "Kod: API płatności",
+        "project": {
+          "id": "p-shop",
+          "name": "Sklep"
+        },
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-30T08:00:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      },
+      {
+        "id": "s-shop",
+        "title": "Zakupy na weekend",
+        "project": null,
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": true,
+        "updated_at": "2026-09-30T05:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      },
+      {
+        "id": "s-trip",
+        "title": "Plan wyjazdu do Gdańska",
+        "project": null,
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-29T06:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      },
+      {
+        "id": "s-db",
+        "title": "Migracja bazy",
+        "project": {
+          "id": "p-shop",
+          "name": "Sklep"
+        },
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-28T06:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      },
+      {
+        "id": "s-long",
+        "title": "Długa rozmowa (1000 wiadomości)",
+        "project": null,
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-27T08:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      },
+      {
+        "id": "s-old",
+        "title": "Stare notatki",
+        "project": null,
+        "pinned": false,
+        "archived": true,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-08-31T08:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid"
+      }
+    ]
+  },
+  {
+    "command": "sessions_create",
+    "args": {
+      "template": "coding"
+    },
+    "result": {
+      "id": "s-munv0mw0-1",
+      "title": "Kodowanie",
+      "project": null,
+      "pinned": false,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid"
+    }
+  },
+  {
+    "command": "sessions_rename",
+    "args": {
+      "sessionId": "s-munv0mw0-1",
+      "title": "API płatności — refaktor"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_set_pinned",
+    "args": {
+      "sessionId": "s-munv0mw0-1",
+      "pinned": true
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_set_archived",
+    "args": {
+      "sessionId": "s-munv0mw0-1",
+      "archived": false
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_remove",
+    "args": {
+      "sessionId": "s-munv0mw0-1"
+    },
+    "result": {
+      "token": "undo-munv0mw0-2",
+      "expires_at": "2026-09-30T08:45:10.000Z"
+    }
+  },
+  {
+    "command": "sessions_undo_remove",
+    "args": {
+      "token": "undo-munv0mw0-2"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_duplicate_as_template",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "id": "s-munv0mw0-3",
+      "title": "Raport Q3 (szablon)",
+      "project": {
+        "id": "p-x",
+        "name": "Projekt X"
+      },
+      "pinned": false,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid"
+    }
+  },
+  {
+    "command": "sessions_export",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\s-q3.alfa",
+      "files": 4,
+      "bytes": 18422
+    }
+  },
+  {
+    "command": "sessions_mark_read",
+    "args": {
+      "sessionId": "s-shop"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_save_draft",
+    "args": {
+      "sessionId": "s-q3",
+      "text": "Szkic: dopisz wnioski"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_get_draft",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": "Szkic: dopisz wnioski"
+  },
+  {
+    "command": "sessions_search",
+    "args": {
+      "query": "raport"
+    },
+    "result": [
+      {
+        "session_id": "s-munv0mw0-3",
+        "title": "Raport Q3 (szablon)",
+        "snippet": "",
+        "turn_id": null
+      },
+      {
+        "session_id": "s-q3",
+        "title": "Raport Q3",
+        "snippet": "Zbierz dane do raportu Q3 z folderu Finanse/2026-Q3.",
+        "turn_id": "q1"
+      }
+    ]
+  }
+]

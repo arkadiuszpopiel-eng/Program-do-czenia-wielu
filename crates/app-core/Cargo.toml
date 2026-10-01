@@ -1,0 +1,75 @@
+[package]
+name = "app-core"
+description = "Korzeń kompozycji aplikacji: składa moduły -impl, komendy i zdarzenia dla powłoki Tauri (COMMANDS.md)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` = korzeń kompozycji (crates/README.md, scripts/check-deps.sh): jako jedyny zależy od `*-impl`;
+# od `*-fake` wyłącznie w dev-dependencies; od app-core nie zależy żaden crate workspace
+# (powłoka `apps/desktop/src-tauri` jest poza workspace).
+[dependencies]
+# Jądro
+core-bus-contract.workspace = true
+core-bus-impl = { path = "../core-bus-impl" }
+core-registry-contract.workspace = true
+core-registry-impl = { path = "../core-registry-impl" }
+core-config-contract.workspace = true
+core-config-impl = { path = "../core-config-impl" }
+core-log-contract.workspace = true
+core-log-impl = { path = "../core-log-impl" }
+platform-contract.workspace = true
+platform-windows-impl = { path = "../platform-windows-impl" }
+# Dane
+lib-sqlstore = { path = "../lib-sqlstore" }
+lib-markdown = { path = "../lib-markdown" }
+sessions-contract = { path = "../sessions-contract" }
+sessions-impl = { path = "../sessions-impl" }
+search-contract = { path = "../search-contract" }
+search-impl = { path = "../search-impl" }
+memory-contract = { path = "../memory-contract" }
+memory-impl = { path = "../memory-impl" }
+artifacts-contract = { path = "../artifacts-contract" }
+artifacts-impl = { path = "../artifacts-impl" }
+# Modele, konta, koszty, zgodność
+providers-contract = { path = "../providers-contract" }
+providers-api-impl = { path = "../providers-api-impl" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+accounts-hub-impl = { path = "../accounts-hub-impl" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+cost-meter-impl = { path = "../cost-meter-impl" }
+compliance-contract = { path = "../compliance-contract" }
+compliance-impl = { path = "../compliance-impl" }
+# Sprzęt, agentki, zasoby
+device-profile-contract = { path = "../device-profile-contract" }
+device-profile-impl = { path = "../device-profile-impl" }
+personas-contract = { path = "../personas-contract" }
+personas-impl = { path = "../personas-impl" }
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+scheduler-lite-impl = { path = "../scheduler-lite-impl" }
+# Zewnętrzne (wersje z [workspace.dependencies] albo już obecne w Cargo.lock)
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+uuid.workspace = true
+# Zerowanie sekretów z kreatora kont (ta sama wersja co w accounts-hub/lib-sqlstore).
+zeroize = "1.9.0"
+# Klient HTTP kursu NBP dla cost-meter (ta sama wersja i cechy co providers-api-impl: rustls, bez OpenSSL).
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
+
+[dev-dependencies]
+providers-fake = { path = "../providers-fake" }
+device-profile-fake = { path = "../device-profile-fake" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+
+[lints]
+workspace = true

@@ -70,6 +70,28 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
 ## Weryfikacja (F1, UI)
 `pnpm --filter @alfa/desktop-ui test` (vitest: logika, store'y z runami, i18n, atrapa), `test:e2e` (Playwright + axe na zbudowanym UI: 0 naruszeń critical/serious na ekranach w motywie jasnym i ciemnym, klawiatura, paleta ≤ 50 ms, DOM raz na klatkę przy 100 tok/s), `bundle-size` (statyczny graf importów z manifestu Vite: start JS ≤ 150 KB, CSS ≤ 30 KB gzip).
 
+## Implementacja F1 — rdzeń i powłoka (stan)
+- **Rdzeń komend:** `crates/app-core` (korzeń kompozycji `app-*`): każda komenda z COMMANDS.md jako
+  `AppCore::<przestrzeń>_<nazwa>`; DTO serde 1:1 z `types*.ts` (test round-trip na ładunkach atrapy UI);
+  lista komend jednym źródłem — makro `app_core::with_commands!` (handlery Tauri + test sygnatur `Send`).
+- **Zdarzenia:** `EventHub` grupuje zdarzenia w paczki raz na klatkę (16 ms, `AppOptions::frame`),
+  scala sąsiednie `TextDelta` tej samej tury i `MicLevel`; brak zdarzeń = brak wybudzeń. Powłoka emituje
+  paczkę na `alfa://events`.
+- **Strumień:** delty dostawcy → `lib-markdown::IncrementalRenderer` → `TextDelta.blocks[]` (zamknięte +
+  otwarty, `kind: code` dla bloku kodu najwyższego poziomu z `lang`); anulowanie (`turns_stop`, kill-switch)
+  przez `CancellationToken` z `select!` (≤ 100 ms niezależnie od dostawcy).
+- **Okna (Tauri):** tworzone w `setup` na wspólnym, stałym folderze danych WebView2
+  (`%LOCALAPPDATA%\Alfa\webview-data`): `main` (natywne dekoracje do czasu spike'u j — Snap Layouts),
+  `quick` (640 px, bez dekoracji, przezroczyste, ukryte, chowane przy utracie fokusu), `pill` (220×48, zawsze
+  na wierzchu, ukryte). Zamknięcie `main` = ukrycie; po `general.destroy_webview_after` min WebView jest
+  niszczony i odtwarzany przy pokazaniu (`general.close_to_tray = false` → wyjście).
+- **Bezpieczeństwo:** capabilities per okno (`capabilities/{main,quick,pill}.json`, bez `core:default`,
+  uprawnienia `allow-<komenda>` z manifestu aplikacji w `build.rs`); CSP mapą dyrektyw bez `unsafe-inline`
+  dla skryptów; DevTools tylko w debug; port CDP wyłącznie z cechą `e2e`. Trusted Types — jeszcze nie
+  wymuszane w CSP (wymaga polityki dla `SanitizedHtml.svelte`).
+- **Luka kontraktu:** brak zdarzenia „przejdź do sesji" — „Nowa rozmowa" z zasobnika/protokołu ustawia
+  aktywną sesję (widoczną po starcie UI) i wysyła `SessionUpdated`, ale działające UI nie przełącza widoku.
+
 ## Otwarte pytania
 - Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.
 - Pisownia PL w WebView2 (spike j) — composer ma `spellcheck` i `lang` z bieżącego języka.

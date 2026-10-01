@@ -48,6 +48,25 @@ od niego nie zależy żaden crate.
 | `voice-cmd` | `voice-cmd-contract`, `-impl`, `-fake` | szybkie komendy PL/EN bez LLM (tolerancja szumu ASR, odmiana imion), reguła „nie" tylko w `Speaking`; zestaw zamrożony: recall 100%, 0 fałszywych |
 | `voice-turn` | `voice-turn-contract`, `-impl`, `-fake` | polityka końca tury z cierpliwością i hezytacjami, trait `TurnModel` (Smart Turn ONNX później) |
 | `voice-dialog` | `voice-dialog-contract`, `-impl`, `-fake` | czysty automat dialogu §6.5: ducking + twardy stop (p95 350 ms), backchannel, usłyszany prefiks, 6 klas intencji przerwania, wznawianie |
+| `lib-openai-compat` | `lib-openai-compat` (biblioteka) | wspólny silnik HTTP/SSE zgodny z OpenAI (Chat Completions, retry, timeouty, klasyfikacja błędów) dla `providers-api-impl` i `providers-local-impl` |
+| `router` | `router-contract`, `-impl`, `-fake` | klasy zadań × ograniczenia (prywatność, jurysdykcja, budżet, możliwości), fallback ≤ 2 s bez utraty wiadomości, circuit breaker, `router.decision` z uzasadnieniem; Router sam jest `ModelProvider` |
+| `providers-local` | `providers-local-impl` (kontrakt: `providers-contract`) | llama.cpp jako sidecar `llama-server` (127.0.0.1, losowy port i klucz), cykl życia, GPU→CPU, menedżer pobierania z wznawianiem i SHA-256, zakaz kwantów IQ |
+| `model-residency` | `model-residency-contract`, `-impl`, `-fake` | zarządca RAM/VRAM: rejestr modeli, budżety z profilu urządzenia, wymiana wg priorytetów (głos > rozmowa > tło), tryb gry |
+| `transfer` | `transfer-contract`, `-impl`, `-fake` | paczki `.alfa` (ZIP + manifest), sekrety nigdy w zwykłym eksporcie, szyfrowanie hasłem (Argon2id + XChaCha20-Poly1305 STREAM), podgląd importu, tryby dodaj/scal/zastąp, snapshot i rollback, kopie z rotacją, ochrona przed path traversal i zip-bomb |
+| `updater` | `updater-contract`, `-impl` (+ bin `alfa` = launcher), `-fake` | wersje obok siebie, `current.json` atomowo, wybór wersji z fallbackiem i crash-loop, minisign + SHA-256 z wersją w podpisie |
+| `voice-audio` | `voice-audio-contract`, `-impl`, `-fake` | WASAPI (crate `wasapi`), mikser z duckingiem i `stop_all`, licznik odtworzonych próbek, referencja AEC, resampler; wątek RT bez alokacji |
+| `voice-dsp` | `voice-dsp-contract`, `-impl`, `-fake` | AEC3 (`sonora`, ERLE 49 dB w teście), RNNoise (`nnnoiseless`), AGC, kalibracja pętli |
+| `voice-vad` | `voice-vad-contract`, `-impl`, `-fake` | Silero VAD przez `tract-onnx` (bez ONNX Runtime), histereza, próg adaptacyjny, zapas energetyczny |
+| `voice-stt` | `voice-stt-contract`, `-impl`, `-fake` | sidecar `whisper-server` (whisper.cpp), bramka VAD, partial + final, hotwords, fallback GPU→CPU |
+| `voice-tts` | `voice-tts-contract`, `-impl`, `-fake` | Pocket TTS (sidecar JSON-lines) i Piper, głosy v0 (wysokość/tempo WSOLA), łańcuch fallback per agentka, cache fraz, TTFB |
+| `voice-wake` | `voice-wake-contract`, `-impl`, `-fake` | PTT, przełącznik, DND, stan mikrofonu, adresowanie po imieniu, mikrofon jako zasób wyłączny |
+| `risk-classifier` | `risk-classifier-contract`, `-impl`, `-fake` | deterministyczna tabela reguł ryzyka (odwracalność, zakres, źródło polecenia, pewność STT, taint) |
+| `safety-broker` | `safety-broker-contract`, `-impl`, `-fake` | tokeny zdolności z atenuacją i HMAC, L0–L4, twarde blokady Jądra (także na L4), plan do zatwierdzenia, `PhysicalInputProof`, audyt z łańcuchem i kotwicą, kill-switch, IPC bez TCP. **Wymaga przeglądu człowieka** |
+| `undo-journal` | `undo-journal-contract`, `-impl`, `-fake` | trwały dziennik cofania `fs.*` z pre-image, kroki, konflikty; 100% przywrócenia w testach losowych |
+| `watchdog` | `watchdog-contract`, `-impl`, `-fake` | heartbeat, restart z limitem, safe-mode, rollback konfiguracji i wersji, tabela Job Objects. **Wymaga przeglądu człowieka** |
+| `agent-backends` | `agent-backends-contract`, `-impl`, `-fake` | mosty do oficjalnych CLI (`claude -p`, `codex app-server`) jako opaque worker: tylko na żądanie użytkownika, przypięte wersje, zero dostępu do poświadczeń CLI, prośby o uprawnienia do kanału zatwierdzeń |
+| `mcp` | `mcp-contract`, `-impl` (+ bin `alfa-mcp-proxy`), `-fake` | klient MCP (stdio, odcisk opisów narzędzi, skaner prompt injection, poziomy zaufania) i serwer MCP Alfy v0 (schowek, okna, `approve`) przez named pipe / gniazdo 0600 z tokenem; bez TCP |
+| `app` | `app-core` (korzeń kompozycji `app-*`) | składa moduły, wszystkie komendy z `COMMANDS.md`, zdarzenia paczkowane co klatkę, czat ze strumieniem i markdownem, porty dla modułów jeszcze niepodpiętych |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

@@ -36,6 +36,37 @@ jobs:
         if: runner.os == 'Linux'
         run: bash scripts/check-deps.sh
 
+  tauri:
+    name: Powłoka Tauri (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # `tauri::generate_context!` wczytuje `frontendDist` (../ui/dist) w czasie kompilacji.
+      - name: Build UI (frontendDist)
+        run: pnpm --filter @alfa/desktop-ui build
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+      - name: Format
+        working-directory: apps/desktop/src-tauri
+        run: cargo fmt --check
+      - name: Clippy
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Clippy (build testowy z portem CDP, feature e2e)
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets --features e2e -- -D warnings
+
   cargo-deny:
     name: cargo-deny
     runs-on: ubuntu-latest

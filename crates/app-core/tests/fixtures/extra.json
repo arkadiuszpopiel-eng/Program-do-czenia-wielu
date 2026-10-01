@@ -1,0 +1,159 @@
+{
+  "_comment": "Warianty typów z types*.ts, których atrapa UI nie emituje (pisane ręcznie, zgodne z typami TS).",
+  "events": [
+    {
+      "type": "VoicePill",
+      "state": { "agent": "gama", "mic": "hearing", "level": 0.42 }
+    },
+    {
+      "type": "Stop",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "reason": "refusal"
+    },
+    {
+      "type": "Stop",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "reason": "tool_use"
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": { "code": "no_keys", "message": "Brak mózgu.", "retry_at": null, "provider": null }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": {
+        "code": "context_overflow",
+        "message": "Za długa rozmowa.",
+        "retry_at": null,
+        "provider": "anthropic"
+      }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": {
+        "code": "budget_blocked",
+        "message": "Limit miesięczny.",
+        "retry_at": null,
+        "provider": null
+      }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": { "code": "offline", "message": "Brak sieci.", "retry_at": null, "provider": null }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": { "code": "provider", "message": "Błąd 500.", "retry_at": null, "provider": "openai" }
+    },
+    {
+      "type": "ActivityChanged",
+      "session_id": "s-q3",
+      "activity": null
+    },
+    {
+      "type": "ToolCall",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "step": {
+        "id": "st-9",
+        "icon": "web",
+        "label": "Pobrano stronę",
+        "status": "error",
+        "duration_ms": 120,
+        "undo_token": null
+      }
+    },
+    {
+      "type": "ToolCall",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "step": {
+        "id": "st-10",
+        "icon": "memory",
+        "label": "Zapisano w pamięci",
+        "status": "done",
+        "duration_ms": 3,
+        "undo_token": "undo-10"
+      }
+    },
+    {
+      "type": "ApprovalPending",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "approval": {
+        "id": "ap-9",
+        "what": "Wysłanie maila",
+        "why": "Prośba użytkownika.",
+        "reversible": false,
+        "risk": "low",
+        "status": "expired"
+      }
+    },
+    {
+      "type": "Toast",
+      "kind": "error",
+      "message": { "pl": "Skrót zajęty przez inny program.", "en": "Shortcut taken by another app." }
+    },
+    {
+      "type": "Toast",
+      "kind": "success",
+      "message": { "pl": "Zapisano.", "en": "Saved." }
+    }
+  ],
+  "results": {
+    "ExportResult": [{ "status": "cancelled" }],
+    "InspectResult": [{ "status": "cancelled" }],
+    "ArtifactPreview": [
+      { "kind": "image", "src": "asset://localhost/C%3A%5CUsers%5CTy%5Cobraz.png" },
+      { "kind": "none" }
+    ],
+    "SystemStatus": [
+      {
+        "online": true,
+        "queued_messages": 0,
+        "rate_limit": null,
+        "keys_configured": false,
+        "profile": "local",
+        "mic": "missing",
+        "disk": { "free_bytes": 1800000000, "low": true }
+      }
+    ],
+    "PermissionsState": [{ "global": "L0", "session": "L2", "hello_enabled": true }],
+    "TestReport": [
+      { "ok": false, "latency_ms": null, "models": [], "error": "Klucz odrzucony (401)." }
+    ],
+    "DeviceProfile": [
+      {
+        "machine": {
+          "id": "m-1",
+          "name": "LAPTOP",
+          "os": "Windows 11",
+          "cpu": { "model": "Intel i7-13700H", "cores": 14, "threads": 20 },
+          "ram_mb": 16384,
+          "gpus": [],
+          "npu": null,
+          "battery": null
+        },
+        "recommendation": {
+          "hw_class": "laptop_cuda",
+          "voice_profile": "D",
+          "llm_backend": "CUDA",
+          "tradeoffs": []
+        },
+        "measured_at": "2026-09-30T08:45:00.000Z"
+      }
+    ]
+  }
+}

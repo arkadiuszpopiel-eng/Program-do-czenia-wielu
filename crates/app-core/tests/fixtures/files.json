@@ -1,0 +1,71 @@
+[
+  {
+    "command": "files_list",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": [
+      {
+        "id": "a1",
+        "session_id": "s-q3",
+        "name": "raport-Q3.docx",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3\\out\\raport-Q3.docx",
+        "size_bytes": 48213,
+        "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "created_at": "2026-09-30T08:42:00.000Z",
+        "agent": "delta",
+        "versions": 2
+      },
+      {
+        "id": "a2",
+        "session_id": "s-q3",
+        "name": "sumy-Q3.csv",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3\\out\\sumy-Q3.csv",
+        "size_bytes": 1904,
+        "mime": "text/csv",
+        "created_at": "2026-09-30T08:40:00.000Z",
+        "agent": "gama",
+        "versions": 1
+      },
+      {
+        "id": "a3",
+        "session_id": "s-q3",
+        "name": "notatki.md",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3\\out\\notatki.md",
+        "size_bytes": 612,
+        "mime": "text/markdown",
+        "created_at": "2026-09-30T08:25:00.000Z",
+        "agent": "beta",
+        "versions": 3
+      }
+    ]
+  },
+  {
+    "command": "files_preview",
+    "args": {
+      "artifactId": "a2"
+    },
+    "result": {
+      "kind": "text",
+      "text": "segment;przychod;koszty\nB2B;2 914 000;1 802 300\nB2C;1 898 300;1 304 600",
+      "truncated": false
+    }
+  },
+  {
+    "command": "files_preview",
+    "args": {
+      "artifactId": "a1"
+    },
+    "result": {
+      "kind": "none"
+    }
+  },
+  {
+    "command": "files_act",
+    "args": {
+      "artifactId": "a1",
+      "action": "reveal"
+    },
+    "result": null
+  }
+]

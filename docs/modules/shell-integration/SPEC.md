@@ -57,6 +57,21 @@ Ikona i menu zasobnika (z `ui-quick`), plakietki paska zadań, Ustawienia → Og
 ## Fake
 `shell-integration-fake`: rejestr i zasobnik w pamięci, skryptowane wywołania protokołu/„Wyślij do".
 
+## Implementacja F1 (stan)
+- **Zasobnik:** Tauri `tray-icon` — menu: Pokaż Alfę, Nowa rozmowa, Szybkie pytanie, Głos (przełącznik →
+  `voice_set_mic_enabled`; bez modułu głosu cofa zaznaczenie), Nie przeszkadzać (wycisza toasty Windows),
+  STOP WSZYSTKIEGO (`AppCore::system_kill_all`), Wyjście; lewy klik = okno główne. Stany ikony — F2.
+- **Skróty globalne:** `Ctrl+Alt+Space` (Szybkie pytanie), `Ctrl+Shift+F12` (STOP: w F1 anulowanie
+  wszystkich generacji; właściwy kill-switch przez Broker w F3). Konflikt rejestracji → `Toast` w UI.
+  Reguła AltGr i zarezerwowany kill-switch sprawdzane też w `settings_set_shortcut`.
+- **Jedna instancja:** `tauri-plugin-single-instance` (pierwsza wtyczka) — druga instancja przekazuje
+  argumenty; URI `alfa://` parsuje `app_core::protocol` z listą dozwolonych akcji: `open`, `quick`,
+  `session/<id>` (id `[A-Za-z0-9_-]`), `new?text=` (tekst trafia do szkicu, nigdy nie jest wysyłany);
+  reszta odrzucana (limit 2048 znaków, bez znaków sterujących). Rejestracja schematu: `plugins.deep-link`
+  w `tauri.conf.json` (instalator). Single-instance przez mutex/IPC wtyczki — decyzja z pytania otwartego.
+- **Do F1+/launcher:** autostart, „Wyślij do", AUMID, pasek zadań; rejestracje mają wskazywać stały launcher
+  (ADR 0007), którego jeszcze nie ma — dziś wskazują binarium instalatora.
+
 ## Otwarte pytania
 - Single-instance: named pipe z ACL na SID vs mutex + WM_COPYDATA — do ustalenia w SPEC v1.
 - Menu kontekstowe Eksploratora w Win11 (klasyczne vs IExplorerCommand wymagające pakietu) — spike j.
