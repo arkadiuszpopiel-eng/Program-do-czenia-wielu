@@ -3,12 +3,16 @@
 import type { Message } from './core';
 import { plAgents } from './pl-agents';
 import { plApp } from './pl-app';
+import { plMemory } from './pl-memory';
 import { plSettings } from './pl-settings';
+import { plTasks } from './pl-tasks';
 
 export const pl = {
   ...plApp,
   ...plAgents,
   ...plSettings,
+  ...plMemory,
+  ...plTasks,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

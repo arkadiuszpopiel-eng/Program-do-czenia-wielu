@@ -54,6 +54,7 @@ export const SHORTCUTS: readonly ShortcutDef[] = [
   app('panel.memory', 'panels', ['Alt+4']),
   app('panel.screen', 'panels', ['Alt+5']),
   app('panel.voice', 'panels', ['Alt+6']),
+  app('panel.tasks', 'panels', ['Alt+7']),
   app('voice.mic', 'voice', ['Ctrl+Shift+M']),
   app('voice.ptt', 'voice', ['Space'], { customizable: false }),
   app('conversation.escape', 'conversation', ['Esc'], { customizable: false, inInput: true }),

@@ -219,6 +219,7 @@ async fn connected_modules_report_readable_errors() {
         artifacts: false,
         logs: false,
         config_machine: false,
+        memory: vec![],
     };
     let request =
         serde_json::from_value(serde_json::json!({ "scope": scope, "password": null })).unwrap();

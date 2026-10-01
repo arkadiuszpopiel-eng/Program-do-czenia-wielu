@@ -246,6 +246,7 @@ pub(crate) async fn run(
         approval_timeout_ms,
         usd_pln_e4: rate,
         started_at: chrono::Utc::now(),
+        task_id: None,
     };
     let mut projector = RunProjector::new(ctx, titles, Some(stack.tickets.clone()));
     let mut totals = UsageTotals::default();

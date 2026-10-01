@@ -5,6 +5,7 @@
 //! zapisy historii sesji przechodzą przez blokadę sesji i czekają na zapis aktywnej generacji).
 
 pub(crate) mod agent;
+mod delegate;
 mod finish;
 pub(crate) mod history;
 pub(crate) mod project;
@@ -182,14 +183,16 @@ impl AppCore {
         self.announce_agents(&req.session);
         self.announce_session(&req.session).await;
         let core = self.clone();
-        let setup = match req.continues {
-            None => self.agent_setup(&req.session, &req.agent),
-            Some(_) => None,
+        let delegation = self.delegation(&req);
+        let setup = match (req.continues, &delegation) {
+            (None, None) => self.agent_setup(&req.session, &req.agent),
+            _ => None,
         };
         tokio::spawn(async move {
-            let outcome = match setup {
-                Some(setup) => agent::run(&core, &req, &handle, setup).await,
-                None => stream::generate(&core, &req, &handle).await,
+            let outcome = match (delegation, setup) {
+                (Some(d), _) => delegate::run(&core, &req, &handle, d).await,
+                (None, Some(setup)) => agent::run(&core, &req, &handle, setup).await,
+                (None, None) => stream::generate(&core, &req, &handle).await,
             };
             if let Some(tap) = &req.tap {
                 let last = match &outcome.error {
@@ -219,6 +222,13 @@ impl AppCore {
         for cancel in self.rt().downloads.values() {
             cancel.cancel();
         }
+        // Zadania schedulera (agentki i mosty) — wykonawczynie przerwane od razu.
+        let tasks =
+            scheduler_lite_contract::SchedulerLite::kill_all(&*self.inner.tasks.scheduler());
+        tracing::info!(
+            zadania = tasks,
+            "kill-switch: zatrzymano zadania schedulera"
+        );
         if let Err(e) = self.inner.broker.kill_all(origin).await {
             tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
         }

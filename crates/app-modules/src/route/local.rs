@@ -14,16 +14,16 @@ use providers_local_impl::{
     BackendKey, LocalConfig, LocalModule, LocalProvider, Sidecar, TokioLauncher, builtin_models,
 };
 
-use crate::error::AppError;
-use crate::options::AppPaths;
 use crate::route::LOCAL_PROVIDER;
+use app_api::error::AppError;
+use app_api::paths::AppPaths;
 
 /// Okres zadania tła dostawcy lokalnego (zwalnianie bezczynnego sidecara).
 const LOCAL_TICK: Duration = Duration::from_secs(30);
 
 /// Konfiguracja `[providers.local]`: katalog modeli, osobne kompilacje `llama-server` per backend
 /// (`sidecars/llama-<backend>/`, zapasowo wspólna `sidecars/llama/`).
-pub(crate) fn local_config(paths: &AppPaths) -> LocalConfig {
+pub fn local_config(paths: &AppPaths) -> LocalConfig {
     let common = paths.sidecar("llama", "llama-server");
     let mut config = LocalConfig::new(paths.models(), common.clone());
     config.provider_id = LOCAL_PROVIDER.into();
@@ -40,7 +40,7 @@ pub(crate) fn local_config(paths: &AppPaths) -> LocalConfig {
 }
 
 /// Zarządca rezydencji z budżetem z rekomendacji `device-profile` (konfiguracja domyślna „auto").
-pub(crate) fn residency(device: &Arc<dyn DeviceProfile>) -> Result<ResidencyModule, AppError> {
+pub fn residency(device: &Arc<dyn DeviceProfile>) -> Result<ResidencyModule, AppError> {
     let config = ResidencyConfig::default();
     let manager = Arc::new(ResidencyManager::from_device(device.clone(), &config));
     let signals = Arc::new(config.signals(DeviceSignals(device.clone())));
@@ -49,7 +49,7 @@ pub(crate) fn residency(device: &Arc<dyn DeviceProfile>) -> Result<ResidencyModu
 }
 
 /// Moduł dostawcy lokalnego (sidecar uruchamiany dopiero przy pierwszym żądaniu).
-pub(crate) fn provider_module(
+pub fn provider_module(
     paths: &AppPaths,
     device: &Arc<dyn DeviceProfile>,
     residency: Option<Arc<dyn Residency>>,

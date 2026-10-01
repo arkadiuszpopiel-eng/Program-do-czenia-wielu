@@ -83,6 +83,10 @@ export interface AgentRun {
   readonly summary: string | null;
   readonly usage: RunUsage;
   readonly budget: RunBudgetView;
+  /** Przebieg mostu CLI (`claude_code`, `codex`) — wynik niezweryfikowany przez Alfę. */
+  readonly bridge?: string;
+  /** Zadanie schedulera, w ramach którego trwa przebieg. */
+  readonly task_id?: string;
 }
 
 export interface AgentRunDetail {

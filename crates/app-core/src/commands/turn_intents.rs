@@ -2,7 +2,6 @@
 //! (pamięć, czytanie na głos, zapis/uruchomienie kodu, cofnięcie kroku).
 
 use app_agents::ClipboardUndoError;
-use memory_contract::{Memory, NewMemory, RememberMode};
 use sessions_contract::{SessionHistory, SessionId};
 
 use crate::core::AppCore;
@@ -28,28 +27,23 @@ impl AppCore {
         Ok(self.inner.sessions.set_hidden(&id, turn, hidden)?)
     }
 
-    /// `turns_remember` ⟶ pamięć (v0: zakres sesji; projekt/globalna/agentka — F7).
+    /// `turns_remember` ⟶ pamięć F7: sesja, projekt sesji, globalna albo agentka tury (jako
+    /// właściciel — od razu aktywny; sesja prywatna nie zasila zakresów szerszych).
     pub async fn turns_remember(
         &self,
         turn_id: String,
         scope: RememberScope,
     ) -> Result<(), AppError> {
-        let (id, turn) = ids::parse_turn(&turn_id)?;
-        if scope != RememberScope::Session {
-            return Err(AppError::unavailable(
-                "Pamięć projektu, globalna i agentki",
-                "memory (zakresy F7)",
-            ));
-        }
-        let turn = self.inner.sessions.turn(&id, turn)?;
+        let (id, number) = ids::parse_turn(&turn_id)?;
+        let turn = self.inner.sessions.turn(&id, number)?;
         let text = turn.content.text.trim();
         if text.is_empty() {
             return Err(AppError::invalid("Ta tura nie ma treści do zapamiętania."));
         }
+        let agent = self.agent_of(&id, &turn);
         self.inner
             .memory
-            .remember(NewMemory::user_fact(id, text), RememberMode::Explicit)?;
-        Ok(())
+            .remember_turn(&id, number.0, text, scope, &agent)
     }
 
     /// `turns_read_aloud` ⟶ TTS głosem agentki.

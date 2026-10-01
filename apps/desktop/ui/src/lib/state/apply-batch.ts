@@ -53,6 +53,16 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
     case 'AgentStep':
     case 'TimelineAppended':
     case 'AccountChanged':
+    case 'MemoryChanged':
+    case 'TaskUpdated':
+    case 'TriggerFired':
+      app.notify(event);
+      break;
+    case 'MarshalReportReady':
+      app.toasts.show({
+        kind: 'info',
+        message: app.i18n.t('marshal.reportToast', { text: event.report.text }),
+      });
       app.notify(event);
       break;
     default:

@@ -4,7 +4,9 @@
 mod agents;
 mod extra;
 mod kernel;
+mod memory;
 mod ports;
+mod tasks;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -13,13 +15,12 @@ use accounts_hub_impl::{AccountsHubService, JsonFileRepository};
 use artifacts_impl::SqliteArtifacts;
 use compliance_impl::ComplianceService;
 use core_bus_contract::EventBus;
-use core_registry_contract::HealthStatus;
 use core_registry_impl::ModuleRegistry;
 use cost_meter_impl::CostMeterService;
-use memory_impl::SqliteMemory;
+use memory_consolidation_impl::ConsolidationModule;
+use memory_impl::MemoryModule;
 use personas_impl::PersonasModule;
 use providers_api_impl::ProvidersApiModule;
-use scheduler_lite_impl::SchedulerModule;
 use search_contract::TxIndexer;
 use search_impl::SqliteSearch;
 use sessions_contract::SessionDbProvider;
@@ -28,14 +29,14 @@ use sessions_impl::{SessionsConfig, SqliteSessions};
 use crate::compose::{HealthSlot, internal, started};
 use crate::core::{AppCore, Inner, Runtime};
 use crate::error::AppError;
-use crate::infra::embedder::LexicalEmbedder;
-use crate::infra::late::{LateDbProvider, LateIndexer};
 use crate::infra::probe::ProviderProbe;
-use crate::infra::secrets::StoreKeyVault;
 use crate::options::{AppOptions, AppPaths};
 use crate::ports::HeadlessShell;
 use crate::store::AppStore;
 pub(crate) use agents::AgentStack;
+use app_modules::embedder::LexicalEmbedder;
+use app_modules::late::{LateDbProvider, LateIndexer};
+use app_modules::secrets::StoreKeyVault;
 pub(crate) use extra::Extra;
 pub(crate) use kernel::Kernel;
 
@@ -50,10 +51,12 @@ pub(crate) struct Built {
     late_db: Arc<LateDbProvider>,
     late_index: Arc<LateIndexer>,
     search: Option<Arc<SqliteSearch>>,
-    memory: Option<Arc<SqliteMemory>>,
+    memory: Option<Arc<MemoryModule>>,
+    privacy: Option<Arc<dyn memory_contract::PrivacyOracle>>,
+    consolidation: Option<Arc<ConsolidationModule>>,
     artifacts: Option<Arc<SqliteArtifacts>>,
     personas: Option<Arc<PersonasModule>>,
-    scheduler: Option<Arc<SchedulerModule>>,
+    tasks: tasks::TaskParts,
     extra: Extra,
 }
 
@@ -74,11 +77,10 @@ impl Built {
         kernel: &mut Kernel,
         slot: Option<&HealthSlot>,
     ) -> Result<(), AppError> {
-        let healthy = || {
-            if let Some(slot) = slot {
-                let _ = slot.set(Arc::new(|| HealthStatus::Healthy));
-            }
-        };
+        let healthy = || extra::healthy(slot);
+        if self.build_tasks(id, paths, kernel, bus, slot).await? {
+            return Ok(());
+        }
         match id {
             "platform-windows" => healthy(),
             "device-profile" => match kernel.device_pending.take() {
@@ -148,11 +150,11 @@ impl Built {
                 self.late_index.bind(&indexer);
                 self.search = Some(search);
             }
-            "memory" => {
-                let search = need(&self.search, "search")?;
-                let memory = SqliteMemory::new(self.late_db.clone(), search.clone(), search)
-                    .map_err(|e| internal("memory")(e.to_string()))?;
-                self.memory = Some(started(memory, bus, slot).await?);
+            "memory" => self.build_memory(paths, kernel, bus, slot).await?,
+            "memory-consolidation" => {
+                if let Err(e) = self.build_consolidation(kernel, bus, slot).await {
+                    extra::unhealthy(slot, id, &e);
+                }
             }
             "artifacts" => {
                 let artifacts = SqliteArtifacts::new(self.late_db.clone(), paths.user_root.clone())
@@ -163,11 +165,6 @@ impl Built {
                 let personas =
                     PersonasModule::new().map_err(|e| internal("personas")(e.to_string()))?;
                 self.personas = Some(started(personas, bus, slot).await?);
-            }
-            "scheduler-lite" => {
-                let scheduler = SchedulerModule::new()
-                    .map_err(|e| internal("scheduler-lite")(e.to_string()))?;
-                self.scheduler = Some(started(scheduler, bus, slot).await?);
             }
             other => {
                 let deps = extra::Deps {
@@ -181,6 +178,11 @@ impl Built {
                         .map(|c| c as Arc<dyn compliance_contract::Compliance>),
                     costs: self.costs.clone(),
                     sessions: self.sessions.clone(),
+                    memory: self
+                        .memory
+                        .as_ref()
+                        .map(|m| m.service() as Arc<dyn memory_contract::MemoryService>)
+                        .zip(self.privacy.clone()),
                     slot,
                 };
                 if !self.extra.build(other, deps).await {
@@ -192,7 +194,7 @@ impl Built {
     }
 
     /// Składa `AppCore` z gotowych modułów i portów.
-    pub fn into_core(
+    pub async fn into_core(
         self,
         paths: AppPaths,
         options: AppOptions,
@@ -210,7 +212,8 @@ impl Built {
             .shell
             .clone()
             .unwrap_or_else(|| Arc::new(HeadlessShell::default()));
-        let scheduler = need(&self.scheduler, "scheduler-lite")?;
+        let scheduler = need(&self.tasks.scheduler, "scheduler")?;
+        let memory = self.memory_app(&kernel).await?;
         let ports = self.extra.ports(
             &options,
             ports::PortDeps {
@@ -220,9 +223,20 @@ impl Built {
                 shell: &shell,
                 paths: &paths,
                 bus: &bus,
-                scheduler: scheduler.clone(),
+                scheduler,
+                tools: memory.tools(),
             },
         )?;
+        let stack = self.task_stack(tasks::StackDeps {
+            options: &options,
+            paths: &paths,
+            kernel: &kernel,
+            bus: &bus,
+            shell: &shell,
+            brain: &ports.brain,
+            agents: ports.agents.as_ref(),
+            translator: options.brain.is_some() || self.extra.routers.is_some(),
+        })?;
         let provider: Arc<dyn SessionDbProvider> = sessions.clone();
         let inner = Inner {
             undo_window: options.undo_window,
@@ -234,12 +248,13 @@ impl Built {
             config: kernel.config,
             machine: kernel.machine,
             search: need(&self.search, "search")?,
-            memory: need(&self.memory, "memory")?,
+            memory,
             artifacts: need(&self.artifacts, "artifacts")?,
             costs: need(&self.costs, "cost-meter")?,
             _compliance: need(&self.compliance, "compliance")?,
             personas: need(&self.personas, "personas")?,
-            _scheduler: scheduler,
+            tasks: stack.tasks,
+            bridges: stack.bridges,
             hub,
             sessions,
             device,
@@ -260,8 +275,10 @@ impl Built {
             locks: Mutex::new(HashMap::new()),
             paths,
         };
-        Ok(AppCore {
+        let core = AppCore {
             inner: Arc::new(inner),
-        })
+        };
+        stack.binder.bind(&core);
+        Ok(core)
     }
 }

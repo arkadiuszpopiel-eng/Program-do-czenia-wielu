@@ -79,6 +79,8 @@ export interface ExportScope {
   readonly artifacts: boolean;
   readonly logs: boolean;
   readonly config_machine: boolean;
+  /** Zakresy pamięci (dokumenty `memory/<zakres>`; sesje prywatne poza eksportem). */
+  readonly memory?: readonly string[];
 }
 
 export interface ExportRequest {
@@ -100,7 +102,7 @@ export type ItemDiff = 'new' | 'same' | 'changed' | 'collision';
 
 export interface DryRunItem {
   readonly key: string;
-  readonly kind: 'session' | 'config' | 'persona' | 'cast';
+  readonly kind: 'session' | 'config' | 'persona' | 'cast' | 'memory';
   readonly label: string;
   readonly diff: ItemDiff;
 }

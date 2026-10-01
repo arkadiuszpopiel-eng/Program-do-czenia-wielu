@@ -19,6 +19,13 @@ app-modules = { path = "../app-modules" }
 # Agentki z narzędziami (tools-*, agent-runtime, Replay) i tryb głosowy (voice-pipeline) — część korzenia.
 app-agents = { path = "../app-agents" }
 app-voice = { path = "../app-voice" }
+# Pamięć F7 (Inspektor, narzędzia pamięci, Strażniczka) — część korzenia.
+app-memory = { path = "../app-memory" }
+# Zadania, wyzwalacze, Marszałek (scheduler-impl zamiast scheduler-lite-impl) i mosty CLI + MCP.
+app-tasks = { path = "../app-tasks" }
+app-bridges = { path = "../app-bridges" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+mcp-impl = { path = "../mcp-impl" }
 agent-runtime-contract = { path = "../agent-runtime-contract" }
 tools-common-contract = { path = "../tools-common-contract" }
 voice-pipeline-contract = { path = "../voice-pipeline-contract" }
@@ -42,6 +49,7 @@ search-contract = { path = "../search-contract" }
 search-impl = { path = "../search-impl" }
 memory-contract = { path = "../memory-contract" }
 memory-impl = { path = "../memory-impl" }
+memory-consolidation-impl = { path = "../memory-consolidation-impl" }
 artifacts-contract = { path = "../artifacts-contract" }
 artifacts-impl = { path = "../artifacts-impl" }
 # Modele, konta, koszty, zgodność
@@ -59,7 +67,7 @@ device-profile-impl = { path = "../device-profile-impl" }
 personas-contract = { path = "../personas-contract" }
 personas-impl = { path = "../personas-impl" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
-scheduler-lite-impl = { path = "../scheduler-lite-impl" }
+scheduler-contract = { path = "../scheduler-contract" }
 # Router, model lokalny, rezydencja modeli
 router-contract = { path = "../router-contract" }
 router-impl = { path = "../router-impl" }
@@ -112,6 +120,7 @@ voice-cmd-fake = { path = "../voice-cmd-fake" }
 voice-wake-fake = { path = "../voice-wake-fake" }
 voice-persona-fake = { path = "../voice-persona-fake" }
 scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+agent-backends-fake = { path = "../agent-backends-fake" }
 device-profile-fake = { path = "../device-profile-fake" }
 voice-audio-fake = { path = "../voice-audio-fake" }
 voice-tts-fake = { path = "../voice-tts-fake" }

@@ -17,9 +17,9 @@ use crate::error::AppError;
 use crate::events::EventHub;
 use crate::infra::catalog::ProviderCatalog;
 use crate::infra::http::{OfflineFx, ReqwestGet};
-use crate::infra::secrets::system_secret_store;
 use crate::options::{AppOptions, AppPaths};
 use crate::settings::{SettingsCatalog, keys};
+use app_modules::secrets::system_secret_store;
 
 /// Jądro: wszystko, co nie jest modułem rejestru albo jest potrzebne przed modułami.
 pub(crate) struct Kernel {

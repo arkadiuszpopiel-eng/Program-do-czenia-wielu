@@ -1,0 +1,52 @@
+[package]
+name = "app-tasks"
+description = "Zadania, wyzwalacze i Marszałek w aplikacji (kategoria app-*): pełny scheduler (DAG, wspólna tablica blokad z głosem), wykonawczyni zadań na agent-runtime i mostach CLI z granicą kroku, wyzwalacze z DND, Marszałek (reguły tylko zawężające), DTO panelu Zadania"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `scheduler-impl`, `triggers-impl`, `marshal-impl` i wykonawczynię
+# zadań (agentki z `app-agents`, mosty przez `agent-backends-contract`); używa jej `app-core`.
+[dependencies]
+app-api = { path = "../app-api" }
+app-agents = { path = "../app-agents" }
+scheduler-contract = { path = "../scheduler-contract" }
+scheduler-impl = { path = "../scheduler-impl" }
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+triggers-contract = { path = "../triggers-contract" }
+triggers-impl = { path = "../triggers-impl" }
+marshal-contract = { path = "../marshal-contract" }
+marshal-impl = { path = "../marshal-impl" }
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+agent-runtime-impl = { path = "../agent-runtime-impl" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+compliance-contract = { path = "../compliance-contract" }
+sessions-contract = { path = "../sessions-contract" }
+voice-wake-contract = { path = "../voice-wake-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "macros", "rt-multi-thread"] }
+core-bus-impl = { path = "../core-bus-impl" }
+core-registry-contract.workspace = true
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

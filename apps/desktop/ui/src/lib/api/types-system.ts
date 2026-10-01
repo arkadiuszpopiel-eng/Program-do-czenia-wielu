@@ -20,6 +20,7 @@ import type {
 } from './types';
 import type { AgentRun, ReplayStep, VoiceSpeaker, VoiceStatus } from './types-agents';
 import type { Account, LocalDownloadState } from './types-hub';
+import type { MarshalReport, TaskInfo, TriggerRunInfo } from './types-tasks';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
 
@@ -52,7 +53,16 @@ export interface SettingDef {
 
 /** Strona o specjalnym widoku w UI (reszta renderowana generycznie z `settings`). */
 export type SettingsCustomPage =
-  'providers' | 'costs' | 'shortcuts' | 'transfer' | 'permissions' | 'devices' | 'voice';
+  | 'providers'
+  | 'costs'
+  | 'shortcuts'
+  | 'transfer'
+  | 'permissions'
+  | 'devices'
+  | 'voice'
+  | 'memory'
+  | 'triggers'
+  | 'marshal';
 
 export interface SettingsPageDef {
   readonly id: string;
@@ -80,7 +90,7 @@ export interface SystemStatus {
 
 // ── Start aplikacji i układ okna ────────────────────────────────────────────────────────────────
 
-export type PanelId = 'agents' | 'timeline' | 'files' | 'memory' | 'screen' | 'voice';
+export type PanelId = 'agents' | 'timeline' | 'files' | 'memory' | 'screen' | 'voice' | 'tasks';
 
 /** Które panele są otwarte — per sesja (PLAN §14.2). */
 export interface SessionPanels {
@@ -230,7 +240,15 @@ export type AlfaEvent =
       readonly bytes: number;
       readonly total: number | null;
       readonly error: string | null;
-    };
+    }
+  /** Pamięć zmieniona (zapis, edycja, zapomnienie, porządkowanie); `null` — wiele zakresów. */
+  | { readonly type: 'MemoryChanged'; readonly scope_key: string | null }
+  /** Zadanie schedulera: zgłoszone, zmiana stanu, postęp, zakończenie. */
+  | { readonly type: 'TaskUpdated'; readonly task: TaskInfo }
+  /** Uruchomienie wyzwalacza (dziennik). */
+  | { readonly type: 'TriggerFired'; readonly run: TriggerRunInfo }
+  /** Raport dzienny Marszałka (powiadomienie). */
+  | { readonly type: 'MarshalReportReady'; readonly report: MarshalReport };
 
 export type AlfaEventType = AlfaEvent['type'];
 export type Unsubscribe = () => void;

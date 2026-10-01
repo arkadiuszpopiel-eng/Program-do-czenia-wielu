@@ -1,0 +1,43 @@
+[package]
+name = "app-memory"
+description = "Pamięć F7 w aplikacji (kategoria app-*): MemoryModule na bazach zakresów z kluczami w sejfie, Inspektor (DTO), zapomnienie z podglądem kaskady, narzędzia pamięci agentek, kontekst pamięci czatu, Strażniczka pamięci (konsolidacja)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `memory-impl` i `memory-consolidation-impl` nad kontraktami
+# sesji, wyszukiwania, person, dostawców i kosztów; używa jej `app-core` (jedno miejsce kompozycji).
+[dependencies]
+app-api = { path = "../app-api" }
+memory-contract = { path = "../memory-contract" }
+memory-impl = { path = "../memory-impl" }
+memory-consolidation-contract = { path = "../memory-consolidation-contract" }
+memory-consolidation-impl = { path = "../memory-consolidation-impl" }
+search-contract = { path = "../search-contract" }
+sessions-contract = { path = "../sessions-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+device-profile-contract = { path = "../device-profile-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+memory-fake = { path = "../memory-fake" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

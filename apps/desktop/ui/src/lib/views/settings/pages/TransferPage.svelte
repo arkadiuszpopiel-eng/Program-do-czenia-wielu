@@ -13,6 +13,7 @@
     Switch,
     TextField,
   } from '@alfa/ui-kit';
+  import type { MemoryScopeInfo } from '../../../api/types-memory';
   import type {
     CollisionResolution,
     ImportMode,
@@ -24,12 +25,20 @@
 
   const app = useApp();
   const { t } = app.i18n;
-  const LATER = ['memory', 'artifacts', 'logs', 'config_machine'] as const;
+  const LATER = ['artifacts', 'logs', 'config_machine'] as const;
 
   let common = $state(true);
   let personas = $state(true);
   let casts = $state(true);
   let chosen = $state<string[]>(app.activeId ? [app.activeId] : []);
+  let memoryScopes = $state<readonly MemoryScopeInfo[]>([]);
+  let memory = $state<string[]>([]);
+
+  $effect(() => {
+    void app.client.memory.scopes().then((list) => {
+      memoryScopes = list.filter((s) => s.document !== null);
+    });
+  });
   let encrypt = $state(false);
   let password = $state('');
   let repeat = $state('');
@@ -56,6 +65,7 @@
         artifacts: false,
         logs: false,
         config_machine: false,
+        memory,
       },
       password: encrypt ? password : null,
     });
@@ -112,6 +122,19 @@
     <Checkbox label={t('tr.scope.casts')} bind:checked={casts} />
     {#each LATER as key (key)}
       <Checkbox label={t(`tr.scope.${key}`)} description={t('tr.f7')} disabled />
+    {/each}
+  </fieldset>
+  <fieldset>
+    <legend>{t('tr.scope.memory')}</legend>
+    <p class="note">{t('tr.memoryHint')}</p>
+    {#each memoryScopes as s (s.key)}
+      <Checkbox
+        label={`${app.i18n.tk(`memory.scopeKind.${s.scope.kind}`)}: ${s.label}`}
+        checked={memory.includes(s.key)}
+        onchange={(on) => (memory = on ? [...memory, s.key] : memory.filter((x) => x !== s.key))}
+      />
+    {:else}
+      <p class="note">{t('tr.memoryEmpty')}</p>
     {/each}
   </fieldset>
   <fieldset>

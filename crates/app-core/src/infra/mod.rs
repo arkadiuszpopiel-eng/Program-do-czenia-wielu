@@ -1,9 +1,6 @@
-//! Kleje kompozycji: sekrety, katalog dostawców, sonda kont, osadzacz, pośrednicy.
+//! Kleje kompozycji: HTTP, pośrednicy modułów w rejestrze (osadzacz i późne wiązanie — `app-modules`).
 
-pub mod embedder;
 pub mod http;
-pub mod late;
 pub mod proxy;
-pub mod secrets;
 
 pub use app_modules::{catalog, probe};

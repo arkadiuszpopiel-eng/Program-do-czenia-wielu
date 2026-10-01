@@ -67,6 +67,7 @@ fn kind_of(item: &ItemRef) -> DryRunKind {
         Category::Sessions => DryRunKind::Session,
         Category::Personas => DryRunKind::Persona,
         Category::Casts => DryRunKind::Cast,
+        Category::Memory => DryRunKind::Memory,
         _ => DryRunKind::Config,
     }
 }
@@ -181,6 +182,11 @@ impl TransferPort for TransferAdapter {
             artifacts: request.scope.artifacts,
             logs: request.scope.logs,
             config_machine: request.scope.config_machine,
+            memory: if request.scope.memory.is_empty() {
+                Selection::None
+            } else {
+                Selection::Only(request.scope.memory.clone())
+            },
             ..TScope::default()
         };
         let mut req = TExportRequest::new(scope, dest);

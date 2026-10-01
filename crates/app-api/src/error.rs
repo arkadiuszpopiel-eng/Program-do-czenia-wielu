@@ -163,7 +163,17 @@ impl From<personas_contract::PersonasError> for AppError {
 
 impl From<memory_contract::MemoryError> for AppError {
     fn from(e: memory_contract::MemoryError) -> Self {
-        Self::invalid(e.to_string())
+        use memory_contract::MemoryError as E;
+        let text = format!("Pamięć: {e}");
+        match e {
+            E::NotFound { .. } => Self::not_found(text),
+            E::Forbidden { .. }
+            | E::PrivateSource { .. }
+            | E::UntrustedCannotPromote
+            | E::UntrustedAutoRemember => Self::forbidden(text),
+            E::Storage { .. } => Self::storage(text),
+            _ => Self::invalid(text),
+        }
     }
 }
 

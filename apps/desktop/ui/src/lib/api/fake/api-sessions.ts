@@ -103,6 +103,11 @@ export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
       core.drafts[id] = text;
       return core.reply(undefined);
     },
+    setProject: (id, project) => {
+      const name = project?.trim() ?? '';
+      const next = name ? { id: name.toLowerCase().replace(/\s+/g, '-'), name } : null;
+      return core.reply(void core.updateSession(id, { project: next }));
+    },
     workdir: (id) => core.reply(core.runs.workdir(id)),
     chooseWorkdir: (id, choice) => core.reply(core.runs.chooseWorkdir(id, choice)),
   };

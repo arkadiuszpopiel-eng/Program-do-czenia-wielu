@@ -15,10 +15,8 @@ use core_config_impl::FileConfigStore;
 use core_registry_impl::ModuleRegistry;
 use cost_meter_impl::CostMeterService;
 use device_profile_contract::DeviceProfile as DeviceProfileService;
-use memory_impl::SqliteMemory;
 use personas_impl::PersonasModule;
 use providers_contract::CancellationToken;
-use scheduler_lite_impl::SchedulerModule;
 use search_impl::SqliteSearch;
 use sessions_contract::{SessionCatalog, SessionId, TurnId};
 use sessions_impl::SqliteSessions;
@@ -86,7 +84,8 @@ pub(crate) struct Inner {
     pub machine: MachineId,
     pub sessions: Arc<SqliteSessions>,
     pub search: Arc<SqliteSearch>,
-    pub memory: Arc<SqliteMemory>,
+    /// Pamięć F7 (Inspektor, narzędzia agentek, kontekst czatu, Strażniczka).
+    pub memory: Arc<app_memory::MemoryApp>,
     pub artifacts: Arc<SqliteArtifacts>,
     pub hub: Arc<AccountsHubService>,
     pub costs: Arc<CostMeterService>,
@@ -94,8 +93,10 @@ pub(crate) struct Inner {
     pub _compliance: Arc<ComplianceService>,
     pub device: Arc<dyn DeviceProfileService>,
     pub personas: Arc<PersonasModule>,
-    /// Utrzymuje `scheduler-lite` (zasoby wyłączne — użyje go głos/agentki w kolejnych falach).
-    pub _scheduler: Arc<SchedulerModule>,
+    /// Zadania (DAG, scheduler z tablicą blokad głosu), wyzwalacze i reguły Marszałka.
+    pub tasks: Arc<app_tasks::TasksApp>,
+    /// Mosty CLI (karty zgodności, delegacja, logowanie w terminalu) i serwer MCP na żądanie.
+    pub bridges: Arc<app_bridges::BridgesApp>,
     pub brain: Arc<dyn BrainPort>,
     /// Moduły podpięte po F1 (rezydencja, model lokalny, Router, Broker, transfer, głos,
     /// aktualizacje) — trzymane przez cały czas życia rdzenia.

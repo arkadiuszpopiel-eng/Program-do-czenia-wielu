@@ -282,11 +282,15 @@ async fn markdown_code_blocks_stream_as_code_and_annotations_persist() {
     core.turns_remember(answer.clone(), app_core::dto::RememberScope::Session)
         .await
         .unwrap();
+    // F7: pamięć globalna działa; projekt wymaga sesji w projekcie.
+    core.turns_remember(answer.clone(), app_core::dto::RememberScope::Global)
+        .await
+        .unwrap();
     let err = core
-        .turns_remember(answer.clone(), app_core::dto::RememberScope::Global)
+        .turns_remember(answer.clone(), app_core::dto::RememberScope::Project)
         .await
         .unwrap_err();
-    assert_eq!(err.code, app_core::ErrorCode::Unavailable);
+    assert_eq!(err.code, app_core::ErrorCode::InvalidInput);
     // Uruchomienie kodu zawsze przez decyzję Brokera: zgoda wymaga okna Brokera (w trybie
     // deweloperskim bez Broker-UI — odmowa), a zezwolenie bez `tools-shell` nie jest wykonywane.
     let err = core

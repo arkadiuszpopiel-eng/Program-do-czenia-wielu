@@ -132,6 +132,32 @@
       "bytes": 0,
       "total": 3040870400,
       "error": "Pobieranie modelu nie powiodło się: pobieranie: HTTP 503"
+    },
+    {
+      "type": "MarshalReportReady",
+      "report": {
+        "day": "2026-09-30",
+        "submitted": 4,
+        "succeeded": 2,
+        "failed": 1,
+        "escalations": 0,
+        "text": "Dziś: 4 zadania, 2 udane, 1 nieudane."
+      }
+    },
+    {
+      "type": "TriggerFired",
+      "run": {
+        "at": "2026-09-30T06:00:00.000Z",
+        "trigger_id": "pobrane",
+        "cause": "nowy plik: faktura.pdf",
+        "outcome": "suppressed",
+        "task_id": null,
+        "detail": "nie przeszkadzać"
+      }
+    },
+    {
+      "type": "MemoryChanged",
+      "scope_key": null
     }
   ],
   "results": {

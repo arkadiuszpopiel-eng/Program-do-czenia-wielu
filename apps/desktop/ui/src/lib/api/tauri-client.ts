@@ -38,6 +38,7 @@ export class TauriAlfaClient implements AlfaClient {
     markRead: (sessionId) => call('sessions_mark_read', { sessionId }),
     getDraft: (sessionId) => call('sessions_get_draft', { sessionId }),
     saveDraft: (sessionId, text) => call('sessions_save_draft', { sessionId, text }),
+    setProject: (sessionId, project) => call('sessions_set_project', { sessionId, project }),
     workdir: (sessionId) => call('sessions_workdir', { sessionId }),
     chooseWorkdir: (sessionId, choice) => call('sessions_choose_workdir', { sessionId, choice }),
   };
@@ -150,6 +151,59 @@ export class TauriAlfaClient implements AlfaClient {
     ask: (text) => call('quick_ask', { text }),
     expandToMain: (sessionId) => call('quick_expand_to_main', { sessionId }),
     hide: () => call('quick_hide'),
+  };
+
+  readonly memory: AlfaClient['memory'] = {
+    status: () => call('memory_status'),
+    scopes: () => call('memory_scopes'),
+    inspect: (query) => call('memory_inspect', { query }),
+    explain: (entryId) => call('memory_explain', { entryId }),
+    edit: (entryId, edit) => call('memory_edit', { entryId, edit }),
+    setPinned: (entryId, pinned) => call('memory_set_pinned', { entryId, pinned }),
+    approve: (entryId) => call('memory_approve', { entryId }),
+    promote: (entryId, to) => call('memory_promote', { entryId, to }),
+    forgetPreview: (target) => call('memory_forget_preview', { target }),
+    forget: (target) => call('memory_forget', { target }),
+    journal: (scope) => call('memory_journal', { scope }),
+    undo: (scope, changeId) => call('memory_undo', { scope, changeId }),
+    consolidateNow: () => call('memory_consolidate_now'),
+  };
+
+  readonly tasks: AlfaClient['tasks'] = {
+    list: () => call('tasks_list'),
+    create: (input) => call('tasks_create', { input }),
+    cancel: (taskId) => call('tasks_cancel', { taskId }),
+    retry: (taskId) => call('tasks_retry', { taskId }),
+    steer: (taskId, text) => call('tasks_steer', { taskId, text }),
+    pause: (taskId) => call('tasks_pause', { taskId }),
+    resume: (taskId) => call('tasks_resume', { taskId }),
+  };
+
+  readonly triggers: AlfaClient['triggers'] = {
+    list: () => call('triggers_list'),
+    create: (draft) => call('triggers_create', { draft }),
+    remove: (triggerId) => call('triggers_remove', { triggerId }),
+    setEnabled: (triggerId, enabled) => call('triggers_set_enabled', { triggerId, enabled }),
+    fireNow: (triggerId) => call('triggers_fire_now', { triggerId }),
+    log: (triggerId) => call('triggers_log', { triggerId }),
+    previewCron: (expr) => call('triggers_preview_cron', { expr }),
+  };
+
+  readonly marshal: AlfaClient['marshal'] = {
+    state: () => call('marshal_state'),
+    propose: (text, drafts) => call('marshal_propose', { text, drafts }),
+    approve: (proposalId) => call('marshal_approve', { proposalId }),
+    reject: (proposalId) => call('marshal_reject', { proposalId }),
+    revoke: (ruleId) => call('marshal_revoke', { ruleId }),
+    report: () => call('marshal_report'),
+  };
+
+  readonly bridges: AlfaClient['bridges'] = {
+    list: (refresh) => call('bridges_list', { refresh }),
+    setEnabled: (routeId, enabled) => call('bridges_set_enabled', { routeId, enabled }),
+    setSchedule: (bridge, perDay) => call('bridges_set_schedule', { bridge, perDay }),
+    pin: (bridge, version) => call('bridges_pin', { bridge, version }),
+    openLogin: (bridge) => call('bridges_open_login', { bridge }),
   };
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

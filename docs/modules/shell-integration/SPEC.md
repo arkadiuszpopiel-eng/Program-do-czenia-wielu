@@ -79,6 +79,9 @@ Ikona i menu zasobnika (z `ui-quick`), plakietki paska zadań, Ustawienia → Og
 - **Dialogi plików:** `tauri-plugin-dialog` (=2.8.1) implementuje `ShellPort::pick_save_path`
   (filtr „Paczka Alfy" `*.alfa`), `pick_open_path` i „Zapisz jako" kodu; anulowanie dialogu = `None`
   (komenda kończy się bez błędu). Dialogi blokujące wołane z `spawn_blocking`, nigdy z wątku UI.
+- **Logowanie do mostów CLI (F5):** `bridges_open_login` → `ShellPort::open_terminal` w katalogu domowym
+  (bez wykonania polecenia); UI pokazuje polecenie do skopiowania (`claude /login`, `codex login`) także
+  gdy terminala nie da się otworzyć. Alfa nie czyta ani nie przechowuje tokenów CLI.
 - **Do F1+/launcher:** autostart, „Wyślij do", AUMID, pasek zadań; rejestracje mają wskazywać stały launcher
   (ADR 0007), którego jeszcze nie ma — dziś wskazują binarium instalatora.
 

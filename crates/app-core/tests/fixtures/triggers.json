@@ -1,0 +1,202 @@
+[
+  {
+    "command": "triggers_list",
+    "args": {},
+    "result": [
+      {
+        "id": "poranek",
+        "name": "Poranny przegląd",
+        "kind": {
+          "kind": "cron",
+          "expr": "0 8 * * 1-5"
+        },
+        "enabled": true,
+        "owner": "user",
+        "title": "Poranny przegląd",
+        "goal": "Poranny przegląd: przygotuj krótkie podsumowanie.",
+        "agent": "alfa",
+        "bridge": null,
+        "tz": "Europe/Warsaw",
+        "next_fire_at": "2026-10-01T08:00:00.000Z",
+        "last_fire_at": null,
+        "fired": 0,
+        "suppressed": 0,
+        "deferred_until": null,
+        "respect_dnd": true,
+        "watch_unavailable": false
+      },
+      {
+        "id": "pobrane",
+        "name": "Nowy plik w Pobranych",
+        "kind": {
+          "kind": "file_in_dir",
+          "dir": "C:\\Users\\Ty\\Downloads",
+          "pattern": "*.pdf"
+        },
+        "enabled": true,
+        "owner": "user",
+        "title": "Nowy plik w Pobranych",
+        "goal": "Nowy plik w Pobranych: przygotuj krótkie podsumowanie.",
+        "agent": "alfa",
+        "bridge": null,
+        "tz": "Europe/Warsaw",
+        "next_fire_at": null,
+        "last_fire_at": null,
+        "fired": 0,
+        "suppressed": 0,
+        "deferred_until": null,
+        "respect_dnd": true,
+        "watch_unavailable": true
+      },
+      {
+        "id": "porzadki",
+        "name": "Sprzątanie Pobranych",
+        "kind": {
+          "kind": "manual"
+        },
+        "enabled": true,
+        "owner": "user",
+        "title": "Sprzątanie Pobranych",
+        "goal": "Sprzątanie Pobranych: przygotuj krótkie podsumowanie.",
+        "agent": "alfa",
+        "bridge": null,
+        "tz": "Europe/Warsaw",
+        "next_fire_at": null,
+        "last_fire_at": null,
+        "fired": 0,
+        "suppressed": 0,
+        "deferred_until": null,
+        "respect_dnd": true,
+        "watch_unavailable": false
+      }
+    ]
+  },
+  {
+    "command": "triggers_preview_cron",
+    "args": {
+      "expr": "0 8 * * 1-5"
+    },
+    "result": {
+      "valid": true,
+      "error": null,
+      "next": [
+        "2026-10-01T08:00:00.000Z",
+        "2026-10-02T08:00:00.000Z",
+        "2026-10-05T08:00:00.000Z",
+        "2026-10-06T08:00:00.000Z",
+        "2026-10-07T08:00:00.000Z"
+      ]
+    }
+  },
+  {
+    "command": "triggers_preview_cron",
+    "args": {
+      "expr": "61 * * * *"
+    },
+    "result": {
+      "valid": false,
+      "error": "Nieprawidłowe pole wyrażenia cron.",
+      "next": []
+    }
+  },
+  {
+    "command": "triggers_create",
+    "args": {
+      "draft": {
+        "name": "Kopia notatek",
+        "kind": {
+          "kind": "interval",
+          "every_minutes": 90
+        },
+        "title": "Kopia notatek",
+        "goal": "Zrób kopię notatek ze spotkań",
+        "agent": "beta",
+        "bridge": null,
+        "respect_dnd": true
+      }
+    },
+    "result": {
+      "id": "kopia-notatek-3",
+      "name": "Kopia notatek",
+      "kind": {
+        "kind": "interval",
+        "every_minutes": 90
+      },
+      "enabled": true,
+      "owner": "user",
+      "title": "Kopia notatek",
+      "goal": "Zrób kopię notatek ze spotkań",
+      "agent": "beta",
+      "bridge": null,
+      "tz": "Europe/Warsaw",
+      "next_fire_at": "2026-09-30T18:15:03.200Z",
+      "last_fire_at": null,
+      "fired": 0,
+      "suppressed": 0,
+      "deferred_until": null,
+      "respect_dnd": true,
+      "watch_unavailable": false
+    }
+  },
+  {
+    "command": "triggers_set_enabled",
+    "args": {
+      "triggerId": "kopia-notatek-3",
+      "enabled": false
+    },
+    "result": null
+  },
+  {
+    "command": "triggers_fire_now",
+    "args": {
+      "triggerId": "porzadki"
+    },
+    "result": {
+      "at": "2026-09-30T16:45:03.200Z",
+      "trigger_id": "porzadki",
+      "cause": "ręcznie",
+      "outcome": "submitted",
+      "task_id": "tr-muoc5zkw-35",
+      "detail": null
+    }
+  },
+  {
+    "command": "triggers_log",
+    "args": {
+      "triggerId": null
+    },
+    "result": [
+      {
+        "at": "2026-09-30T16:45:03.200Z",
+        "trigger_id": "porzadki",
+        "cause": "ręcznie",
+        "outcome": "submitted",
+        "task_id": "tr-muoc5zkw-35",
+        "detail": null
+      }
+    ]
+  },
+  {
+    "command": "triggers_log",
+    "args": {
+      "triggerId": "porzadki"
+    },
+    "result": [
+      {
+        "at": "2026-09-30T16:45:03.200Z",
+        "trigger_id": "porzadki",
+        "cause": "ręcznie",
+        "outcome": "submitted",
+        "task_id": "tr-muoc5zkw-35",
+        "detail": null
+      }
+    ]
+  },
+  {
+    "command": "triggers_remove",
+    "args": {
+      "triggerId": "kopia-notatek-3"
+    },
+    "result": null
+  }
+]

@@ -66,6 +66,9 @@ Toasty w aplikacji (ui-kit `Toast`), karta „Cofnij", Ustawienia → Powiadomie
 - Zdarzenia nawigacyjne i postępu (`OpenSession`, `LocalModelProgress`, `MicLevel`) nie dają toastu
   Windows. STOP WSZYSTKIEGO (`system_kill_all`) kończy się toastem w aplikacji (`Toast`, ostrzeżenie).
   Karta „Cofnij" kroku agentki niesie token `"<sesja>:u<krok>"` (`turns_undo_step` → `undo-journal`).
+- F5–F7: raport dnia Marszałka (`MarshalReportReady`) → toast Windows „Alfa — raport dnia” (okno ukryte)
+  i toast w aplikacji; eskalacje Marszałka → `Toast` (ostrzeżenie). Zadania (`TaskUpdated`), wyzwalacze
+  (`TriggerFired`) i pamięć (`MemoryChanged`) — bez toastu Windows (stan w panelach).
 
 ## Otwarte pytania
 - Zestaw earconów (własne vs systemowe) i ich licencja — do ustalenia w SPEC v1.

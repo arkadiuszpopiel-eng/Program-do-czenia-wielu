@@ -1,6 +1,6 @@
 // Drzewo ustawień (PLAN §15), część 1: Ogólne … Pamięć.
 import type { SettingsPageDef } from '../types-system';
-import { L, later, number, page, select, toggle } from './settings-helpers';
+import { L, later, number, page, select, text, toggle } from './settings-helpers';
 
 export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
   page('general', L('Ogólne', 'General'), 1, [
@@ -231,7 +231,25 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
       ),
       true,
     ),
+    number(
+      'scheduler.max_parallel',
+      L('Zadania naraz', 'Tasks at once'),
+      L(
+        'Najwięcej zadań agentek wykonywanych równolegle (reguły Marszałka mogą tylko zmniejszyć). Zmiana działa od następnego uruchomienia.',
+        'The most agent tasks running in parallel (Marshal rules can only lower it). Takes effect after the next start.',
+      ),
+      4,
+      1,
+      16,
+      1,
+      null,
+      'machine',
+    ),
   ]),
+  page('triggers', L('Zadania w tle i wyzwalacze', 'Background tasks and triggers'), 1, [], {
+    custom: 'triggers',
+  }),
+  page('marshal', L('Reguły Marszałka', 'Marshal rules'), 1, [], { custom: 'marshal' }),
   page('permissions', L('Uprawnienia i bezpieczeństwo', 'Permissions and security'), 1, [], {
     custom: 'permissions',
   }),
@@ -239,8 +257,42 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     L('Trasy: API › UIA › wizja › wejście', 'Routes: API › UIA › vision › input'),
     L('Aplikacje i przeglądarka', 'Apps and browser'),
   ]),
-  later('memory', L('Pamięć', 'Memory'), 7, [
-    L('Zakresy i konsolidacja nocna', 'Scopes and nightly consolidation'),
-    L('Inspektor pamięci', 'Memory inspector'),
-  ]),
+  page(
+    'memory',
+    L('Pamięć', 'Memory'),
+    1,
+    [
+      toggle(
+        'memory.consolidation_enabled',
+        L('Porządkowanie nocne', 'Nightly tidy-up'),
+        L(
+          'Strażniczka pamięci łączy powtórzenia, wygasza nieaktualne wpisy i proponuje fakty — lokalnie, w oknie nocnym, tylko gdy komputer jest bezczynny. Zmiana działa od następnego uruchomienia.',
+          'The memory keeper merges duplicates, expires stale entries and proposes facts — locally, in the night window, only when the computer is idle. Takes effect after the next start.',
+        ),
+        true,
+      ),
+      text(
+        'memory.consolidation_window',
+        L('Okno porządkowania', 'Tidy-up window'),
+        L('Godziny w formacie GG:MM-GG:MM (czas lokalny).', 'Hours as HH:MM-HH:MM (local time).'),
+        '02:00-05:00',
+        'machine',
+      ),
+      select(
+        'memory.auto_extract',
+        L('Fakty z rozmów', 'Facts from conversations'),
+        L(
+          'Czy Strażniczka może sama zapisywać fakty wyciągnięte z rozmów, czy tylko je proponuje do zatwierdzenia.',
+          'Whether the keeper may store facts extracted from conversations on its own, or only propose them for approval.',
+        ),
+        [
+          ['ask', L('Proponuj do zatwierdzenia', 'Propose for approval')],
+          ['on', L('Zapisuj sama', 'Store automatically')],
+          ['off', L('Wyłączone', 'Off')],
+        ],
+        'ask',
+      ),
+    ],
+    { custom: 'memory' },
+  ),
 ];

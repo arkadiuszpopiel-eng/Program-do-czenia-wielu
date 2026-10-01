@@ -4,6 +4,8 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+mod dto_spec;
+
 use std::collections::BTreeSet;
 use std::path::PathBuf;
 
@@ -239,7 +241,8 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
         "system_retry_queue" | "quick_hide" => (vec![], unit),
         "quick_ask" => (vec![("text", s)], roundtrip::<QuickAskResult>),
         "quick_expand_to_main" => (vec![("sessionId", s)], unit),
-        other => panic!("komenda bez specyfikacji w teście: {other}"),
+        other => dto_spec::spec(other)
+            .unwrap_or_else(|| panic!("komenda bez specyfikacji w teście: {other}")),
     }
 }
 
@@ -261,7 +264,11 @@ fn fixture_entries() -> Vec<Value> {
 #[test]
 fn every_command_payload_roundtrips() {
     let entries = fixture_entries();
-    assert!(entries.len() >= 80, "za mało przykładów: {}", entries.len());
+    assert!(
+        entries.len() >= 150,
+        "za mało przykładów: {}",
+        entries.len()
+    );
     for entry in &entries {
         let command = entry["command"].as_str().unwrap();
         let (args, result) = spec(command);
@@ -295,8 +302,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 25 typów z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 25, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 29 typów z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 29, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

@@ -99,6 +99,7 @@ fn tools(env: &EvalEnv) -> AgentTools {
         bus: None,
         shell: ShellToolsConfig::default(),
         base_env: None,
+        extra: Vec::new(),
     })
 }
 

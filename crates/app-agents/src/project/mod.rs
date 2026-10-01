@@ -51,6 +51,8 @@ pub struct RunContext {
     pub usd_pln_e4: u64,
     /// Start przebiegu.
     pub started_at: DateTime<Utc>,
+    /// Zadanie schedulera (przebieg z panelu Zadania / wyzwalacza).
+    pub task_id: Option<String>,
 }
 
 /// Wynik zastosowania zdarzenia.
@@ -115,6 +117,8 @@ impl RunProjector {
                 elapsed_ms: 0,
             },
             budget: ctx.budget.clone(),
+            bridge: None,
+            task_id: ctx.task_id.clone(),
         };
         Self {
             ctx,

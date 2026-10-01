@@ -6,8 +6,8 @@
 //! Stan „brak mózgu" tylko wtedy, gdy Router nie ma żadnego kandydata.
 
 mod accounts;
-pub(crate) mod config;
-pub(crate) mod local;
+pub mod config;
+pub mod local;
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -25,9 +25,9 @@ use router_contract::{
 use router_impl::{RoutedProvider, RouterCore};
 use sessions_contract::PrivacyTag;
 
-use crate::dto::ModelProfile;
-use crate::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, BrainTarget, RouteNote};
 use accounts::AccountRoutes;
+use app_api::dto::ModelProfile;
+use app_api::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, BrainTarget, RouteNote};
 
 /// Komunikat „brak mózgu" (PLAN §14.5: bez kluczy startuje profil lokalny).
 pub const NO_BRAIN: &str = "Brak mózgu: dodaj klucz API w Ustawieniach → Modele i dostawcy \
@@ -41,7 +41,7 @@ pub const LOCAL_PROVIDER: &str = "local";
 
 /// Rdzenie Routera.
 #[derive(Clone)]
-pub(crate) struct Routers {
+pub struct Routers {
     /// API + lokalny (domyślny profil „Hybryda").
     pub hybrid: Arc<RouterCore>,
     /// Tylko API (profil „Chmura").
@@ -109,7 +109,8 @@ pub struct RouterBrain {
 }
 
 impl RouterBrain {
-    pub(crate) fn new(
+    /// Router na rdzeniach z kontami hubu i katalogiem dostawców API.
+    pub fn new(
         routers: Routers,
         hub: Arc<AccountsHubService>,
         catalog: Arc<BTreeMap<String, CatalogEntry>>,

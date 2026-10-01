@@ -91,6 +91,12 @@ pub enum SettingsCustomPage {
     Permissions,
     Devices,
     Voice,
+    /// Pamięć: porządkowanie (Strażniczka), Inspektor na pełną szerokość.
+    Memory,
+    /// Zadania w tle: wyzwalacze (czas, zdarzenia, ręczne) i dziennik uruchomień.
+    Triggers,
+    /// Reguły Marszałka: propozycja → podgląd zawężenia → zatwierdź / cofnij.
+    Marshal,
 }
 
 /// Strona ustawień (drzewo §15).
@@ -149,6 +155,8 @@ pub enum PanelId {
     Memory,
     Screen,
     Voice,
+    /// Zadania (DAG schedulera, sterowanie, anuluj, ponów).
+    Tasks,
 }
 
 /// Otwarte panele sesji.

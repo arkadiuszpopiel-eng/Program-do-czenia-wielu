@@ -92,6 +92,28 @@ impl AppCore {
         self.patch_session(&session_id, patch).await
     }
 
+    /// `sessions_set_project`: projekt sesji (pamięć projektu dzielą sesje tego projektu);
+    /// `null`/pusty = poza projektem.
+    pub async fn sessions_set_project(
+        &self,
+        session_id: String,
+        project: Option<String>,
+    ) -> Result<(), AppError> {
+        let project = project
+            .map(|p| p.trim().to_owned())
+            .filter(|p| !p.is_empty());
+        if project.as_ref().is_some_and(|p| p.chars().count() > 80) {
+            return Err(AppError::invalid(
+                "Nazwa projektu może mieć najwyżej 80 znaków.",
+            ));
+        }
+        let patch = SessionPatch {
+            project: Some(project.map(sessions_contract::ProjectId::new)),
+            ..SessionPatch::default()
+        };
+        self.patch_session(&session_id, patch).await
+    }
+
     /// `sessions_set_pinned`.
     pub async fn sessions_set_pinned(
         &self,
@@ -163,6 +185,10 @@ impl AppCore {
 
     /// Ostateczne usunięcie: klucz z sejfu (crypto-shredding), pliki bazy, wpis katalogu.
     pub(crate) fn shred_session(&self, id: &SessionId) {
+        // Najpierw kopie w zakresach szerszych i pochodne (kaskada), potem baza sesji.
+        if let Err(e) = self.inner.memory.forget_session(id) {
+            tracing::error!(sesja = %id, error = %e.message, "zapomnienie pamięci sesji nie powiodło się");
+        }
         self.inner.sessions.close_session(id);
         match self.inner.sessions.delete_session(id) {
             Ok(report) => tracing::info!(sesja = %id, klucz = report.key_deleted, "sesja usunięta"),

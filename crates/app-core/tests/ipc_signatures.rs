@@ -28,5 +28,5 @@ app_core::with_commands!(check_signatures);
 #[test]
 fn every_command_has_a_send_future_with_matching_types() {
     assert_eq!(CHECKED, app_core::COMMANDS);
-    assert_eq!(CHECKED.len(), 84);
+    assert_eq!(CHECKED.len(), 123);
 }

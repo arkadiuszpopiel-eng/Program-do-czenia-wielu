@@ -14,6 +14,7 @@ use core_registry_contract::HealthStatus;
 use cost_meter_contract::CostMeter;
 use cost_meter_impl::CostMeterService;
 use device_profile_contract::DeviceProfile;
+use memory_contract::{MemoryService, PrivacyOracle};
 use model_residency_contract::Residency;
 use model_residency_impl::ResidencyModule;
 use providers_local_impl::LocalModule;
@@ -38,8 +39,8 @@ use crate::compose::{HealthSlot, started};
 use crate::error::AppError;
 use crate::options::{AppOptions, AppPaths};
 use crate::parts::Kernel;
-use crate::route::{Routers, local};
 use app_modules::broker::{dev_dir, path_env_for};
+use app_modules::route::{Routers, local};
 
 /// Zależności z modułów podstawowych.
 pub(crate) struct Deps<'a> {
@@ -50,6 +51,8 @@ pub(crate) struct Deps<'a> {
     pub compliance: Option<Arc<dyn Compliance>>,
     pub costs: Option<Arc<CostMeterService>>,
     pub sessions: Option<Arc<SqliteSessions>>,
+    /// Pamięć F7 i prywatność sesji (dokumenty `memory` w paczce `.alfa`).
+    pub memory: Option<(Arc<dyn MemoryService>, Arc<dyn PrivacyOracle>)>,
     pub slot: Option<&'a HealthSlot>,
 }
 
@@ -80,7 +83,14 @@ pub(crate) fn platform_fs(options: &AppOptions) -> Arc<dyn platform_contract::Fs
         .unwrap_or_else(|| Arc::new(platform_windows_impl::WindowsPlatform::default()))
 }
 
-fn unhealthy(slot: Option<&HealthSlot>, id: &str, e: &AppError) {
+/// Moduł zdrowy bez usługi (budowany leniwie albo w procesie powłoki).
+pub(crate) fn healthy(slot: Option<&HealthSlot>) {
+    if let Some(slot) = slot {
+        let _ = slot.set(Arc::new(|| HealthStatus::Healthy));
+    }
+}
+
+pub(crate) fn unhealthy(slot: Option<&HealthSlot>, id: &str, e: &AppError) {
     tracing::error!(modul = id, error = %e, "moduł niepodłączony — budowa nie powiodła się");
     if let Some(slot) = slot {
         let message = e.message.clone();
@@ -169,7 +179,7 @@ impl Extra {
         for (provider, kind) in &deps.options.providers {
             routers.register(provider.clone(), *kind);
         }
-        crate::route::config::apply(&deps.kernel.config, &routers).await;
+        app_modules::route::config::apply(&deps.kernel.config, &routers).await;
         routers.forward_secondary(deps.bus);
         let module =
             RouterModule::new(routers.hybrid.clone()).map_err(|e| err("router")(e.to_string()))?;
@@ -272,6 +282,10 @@ impl Extra {
             Category::Logs,
             store(deps.paths.logs(), DirFilter::flat(&["ndjson"])),
         );
+        if let Some((memory, privacy)) = &deps.memory {
+            let docs = app_memory::MemoryDocuments::new(memory.clone(), privacy.clone());
+            documents.insert(Category::Memory, Arc::new(docs) as Arc<dyn DocumentStore>);
+        }
         let secrets: Arc<dyn SecretStore> = deps.kernel.secrets.clone();
         let ports = TransferPorts {
             sessions: Some(sessions),

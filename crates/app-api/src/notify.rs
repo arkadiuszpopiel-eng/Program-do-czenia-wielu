@@ -1,6 +1,6 @@
 //! Powiadomienia natywne (toast Windows) gdy okno główne jest ukryte (PLAN §14.8, SPEC notify):
 //! zakończenie odpowiedzi, błąd, prośba o zatwierdzenie (bez przycisku zatwierdzania — tylko
-//! przekierowanie do okna Brokera). Treść bez sekretów i bez treści odpowiedzi.
+//! przekierowanie do okna Brokera), raport dzienny Marszałka. Treść bez sekretów i bez treści odpowiedzi.
 
 use crate::dto::{AlfaEvent, StopReason, ToastKind, TurnErrorCode};
 
@@ -51,6 +51,11 @@ pub fn native_notice(event: &AlfaEvent) -> Option<NativeNotice> {
             kind: ToastKind::Error | ToastKind::Warning,
             message,
         } => Some(notice("Alfa", message.pl.clone(), None)),
+        AlfaEvent::MarshalReportReady { report } => Some(notice(
+            "Alfa — raport dnia",
+            report.text.chars().take(200).collect(),
+            None,
+        )),
         _ => None,
     }
 }

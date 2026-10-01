@@ -1,6 +1,6 @@
 <!--
-  Panel prawy — jedna karta naraz: Agentki · Oś czasu · Pliki · Pamięć · Ekran · Głos (Alt+1…6).
-  Zawartość kart ładowana leniwie; w F1 działają Agentki, Oś czasu v0 i Pliki.
+  Panel prawy — jedna karta naraz: Agentki · Oś czasu · Pliki · Pamięć · Ekran · Głos · Zadania
+  (Alt+1…7). Zawartość kart ładowana leniwie; Ekran i Głos — puste stany kolejnych fal.
 -->
 <script lang="ts">
   import { Panel } from '@alfa/ui-kit';
@@ -10,15 +10,25 @@
 
   const app = useApp();
   const { t } = app.i18n;
-  const TABS: readonly PanelId[] = ['agents', 'timeline', 'files', 'memory', 'screen', 'voice'];
+  const TABS: readonly PanelId[] = [
+    'agents',
+    'timeline',
+    'files',
+    'memory',
+    'tasks',
+    'screen',
+    'voice',
+  ];
   const tabs = $derived(TABS.map((id) => ({ id, label: t(`panel.${id}`) })));
   const current = $derived(app.layout.current(app.activeId).right_tab);
-  const WAVES: Readonly<Record<string, number>> = { memory: 7, screen: 6, voice: 2 };
+  const WAVES: Readonly<Record<string, number>> = { screen: 6, voice: 2 };
 
   const loaders = {
     agents: () => import('../panels/AgentsPanel.svelte'),
     timeline: () => import('../panels/TimelinePanel.svelte'),
     files: () => import('../panels/FilesPanel.svelte'),
+    memory: () => import('../panels/MemoryPanel.svelte'),
+    tasks: () => import('../panels/TasksPanel.svelte'),
   };
 </script>
 
@@ -39,7 +49,11 @@
     <Lazy load={loaders.timeline} props={{ sessionId: app.activeId }} label={t('common.loading')} />
   {:else if current === 'files'}
     <Lazy load={loaders.files} props={{ sessionId: app.activeId }} label={t('common.loading')} />
-  {:else}
+  {:else if current === 'memory'}
+    <Lazy load={loaders.memory} props={{ sessionId: app.activeId }} label={t('common.loading')} />
+  {:else if current === 'tasks'}
+    <Lazy load={loaders.tasks} props={{ sessionId: app.activeId }} label={t('common.loading')} />
+  {:else if current === 'screen' || current === 'voice'}
     <div class="later">
       <h3>{t(`panel.${current}`)}</h3>
       <p>{app.i18n.tk(`panel.later.${current}`)}</p>

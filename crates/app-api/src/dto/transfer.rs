@@ -18,6 +18,9 @@ pub struct ExportScope {
     pub artifacts: bool,
     pub logs: bool,
     pub config_machine: bool,
+    /// Zakresy pamięci (nazwy dokumentów, np. `global.ndjson`, `project/dom.ndjson`).
+    #[serde(default)]
+    pub memory: Vec<String>,
 }
 
 /// Żądanie eksportu. Hasło nigdy nie trafia do logów (`Debug` redaguje).
@@ -66,6 +69,7 @@ pub enum DryRunKind {
     Config,
     Persona,
     Cast,
+    Memory,
 }
 
 /// Element podglądu importu.

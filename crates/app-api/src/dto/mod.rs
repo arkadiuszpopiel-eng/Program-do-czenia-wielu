@@ -7,12 +7,15 @@
 #![allow(missing_docs)]
 
 mod agents;
+mod bridges;
 mod common;
 mod events;
 mod hub;
+mod memory;
 mod panels;
 mod sessions;
 mod system;
+mod tasks;
 mod transfer;
 
 pub use agents::{
@@ -20,6 +23,7 @@ pub use agents::{
     RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,
     VoiceStatus, WorkdirChoice,
 };
+pub use bridges::{BridgeCard, BridgeLogin, BridgeSource};
 pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };
@@ -30,6 +34,12 @@ pub use hub::{
     CpuView, DeviceProfile, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView,
     ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView,
     SecretInput, TestReport, VoiceProfileId,
+};
+pub use memory::{
+    ConsolidationReport, MemoryCascadeItem, MemoryEdit, MemoryExplanation, MemoryForgetPreview,
+    MemoryForgetReport, MemoryForgetTarget, MemoryItem, MemoryJournalEntry, MemoryLayer,
+    MemoryPage, MemoryQuery, MemoryScopeInfo, MemoryScopeKind, MemoryScopeRef, MemorySourceKind,
+    MemorySourceLink, MemoryState, MemoryStatus, MemoryUndoResult,
 };
 pub use panels::{
     ActivityInfo, AgentState, AgentStatus, ArtifactAction, ArtifactInfo, ArtifactPreview,
@@ -46,6 +56,11 @@ pub use system::{
     AppBootstrap, DiskInfo, LayoutPrefs, MicAvailability, MicState, PanelId, QuickAskResult,
     RateLimitInfo, SelectOption, SessionPanels, SettingControl, SettingDef, SettingScope,
     SettingValue, SettingsCustomPage, SettingsPageDef, SystemStatus, VoicePillState,
+};
+pub use tasks::{
+    CronPreview, MarshalProposalInfo, MarshalRejected, MarshalReport, MarshalRuleInfo,
+    MarshalState, NewTaskInput, TaskClassKind, TaskDep, TaskInfo, TaskOriginKind, TaskResultKind,
+    TaskStateKind, TriggerDraft, TriggerInfo, TriggerKindView, TriggerRunInfo,
 };
 pub use transfer::{
     CollisionResolution, DryRunItem, DryRunKind, ExportRequest, ExportResult, ExportScope,

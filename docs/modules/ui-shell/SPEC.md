@@ -121,6 +121,31 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
 - **Testy:** vitest (`logic/replay`, `state/agents`), Playwright `e2e/agents-voice.spec.ts` (Replay, karta
   „Cofnij”, terminal, pigułka) + axe 0 critical/serious w obu motywach.
 
+## Implementacja F5–F7 — pamięć, zadania, wyzwalacze, Marszałek, mosty (stan)
+- **Panel Pamięć (Alt+4) = Inspektor pamięci** (makieta 9): lista wpisów z filtrami zakres / warstwa /
+  zaufanie / stan i wyszukiwaniem (`memory_inspect`), szczegóły wpisu: „Dlaczego to pamiętam”
+  (`memory_explain`: powody, źródła, historia wersji, wywiedzione), edycja = nowa wersja, przypięcie,
+  zatwierdzenie propozycji, awans do szerszego zakresu, „Zapomnij” z podglądem kaskady
+  (`memory_forget_preview` → `memory_forget`), dziennik zakresu z „Cofnij” (`memory_journal/undo`);
+  odświeżanie po `MemoryChanged`.
+- **Panel Zadania (Alt+7, nowy `PanelId::Tasks`)**: drzewo DAG (`parent_id` = podzadania, „Po: …” =
+  zależności), stan/wynik, postęp krok/limit, pochodzenie, koszt, zadania mostu oznaczone „wynik
+  niezweryfikowany przez Alfę”; wiadomość dla agentki, wstrzymaj/wznów, anuluj (z poddrzewem), ponów;
+  nowe zadanie w sesji (opcjonalnie „po zadaniu”); aktualizacje `TaskUpdated`.
+- **Ustawienia → Pamięć** (`custom: memory`): stan Strażniczki (okno, brak licznika bezczynności, brak
+  modelu lokalnego, ostatni raport), „Porządkuj teraz”, zakresy z „Zapomnij cały zakres”.
+  **Zadania w tle i wyzwalacze** (`custom: triggers`): lista (włącznik, Uruchom teraz, Usuń,
+  „obserwacja katalogów niedostępna”), formularz (harmonogram cron z podglądem 5 najbliższych
+  uruchomień, co N minut, nowy plik, ręcznie), dziennik uruchomień. **Reguły Marszałka**
+  (`custom: marshal`): polecenie / edytor JSON → propozycja z podglądem zawężenia → Zatwierdź/Odrzuć,
+  reguły z „Cofnij regułę”, polityka obowiązująca, raport dnia. **Modele i dostawcy → Mosty CLI**: karty
+  zgodności (stan, wpis nieświeży, wersja wykryta vs przypięta, regulamin — adres do skopiowania, data
+  weryfikacji), wyłącznik trasy, zgoda na harmonogram z ostrzeżeniem, „Zaloguj w terminalu” (polecenie
+  do skopiowania). **Import i eksport**: wybór zakresów pamięci (sesje prywatne pominięte).
+- Raport dnia Marszałka (`MarshalReportReady`) → toast w aplikacji (natywny — `notify`).
+- **Testy:** vitest `api/__tests__/fake-work.test.ts`, Playwright `e2e/memory-tasks.spec.ts` + axe
+  0 critical/serious w obu motywach.
+
 ## Otwarte pytania
 - Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.
 - Pisownia PL w WebView2 (spike j) — composer ma `spellcheck` i `lang` z bieżącego języka.

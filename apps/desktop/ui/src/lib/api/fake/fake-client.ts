@@ -18,7 +18,10 @@ import {
   timelineApi,
   voiceApi,
 } from './api-misc';
+import { bridgesApi, marshalApi } from './api-marshal';
+import { memoryApi } from './api-memory';
 import { modelsApi } from './api-models';
+import { FakeTasks } from './api-tasks';
 import { FakeCore, type FakeOptions } from './core';
 
 export { FAKE_SCENARIOS, type FakeScenario, type FakeOptions } from './core';
@@ -46,6 +49,11 @@ export class FakeAlfaClient implements AlfaClient {
   readonly voice: AlfaClient['voice'];
   readonly system: AlfaClient['system'];
   readonly quick: AlfaClient['quick'];
+  readonly memory: AlfaClient['memory'];
+  readonly tasks: AlfaClient['tasks'];
+  readonly triggers: AlfaClient['triggers'];
+  readonly marshal: AlfaClient['marshal'];
+  readonly bridges: AlfaClient['bridges'];
 
   constructor(options: FakeOptions = {}) {
     this.core = new FakeCore(options);
@@ -67,6 +75,12 @@ export class FakeAlfaClient implements AlfaClient {
     this.device = deviceApi(core);
     this.voice = voiceApi(core);
     this.system = systemApi(core, chat);
+    this.memory = memoryApi(core);
+    const tasks = new FakeTasks(core);
+    this.tasks = tasks.api();
+    this.triggers = tasks.triggersApi();
+    this.marshal = marshalApi(core, tasks);
+    this.bridges = bridgesApi(core);
   }
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

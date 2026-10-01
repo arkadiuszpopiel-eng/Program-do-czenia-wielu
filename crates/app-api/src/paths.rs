@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use crate::error::AppError;
 
 /// Katalogi aplikacji (ADR 0007, PLAN §15):
-/// `%APPDATA%\Alfa\config`, `%LOCALAPPDATA%\Alfa\{sessions,models,logs,state,webview-data}`,
+/// `%APPDATA%\Alfa\config`, `%LOCALAPPDATA%\Alfa\{sessions,models,logs,state,webview-data,memory,scheduler,bridges}`,
 /// katalogi robocze sesji `%USERPROFILE%\Alfa\Sesje`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AppPaths {
@@ -90,6 +90,21 @@ impl AppPaths {
         self.user_root.join("Sesje")
     }
 
+    /// Bazy pamięci projekt/agentka/globalna (`%LOCALAPPDATA%\Alfa\memory`).
+    pub fn memory(&self) -> PathBuf {
+        self.local.join("memory")
+    }
+
+    /// Stan schedulera, wyzwalaczy i Marszałka (`%LOCALAPPDATA%\Alfa\scheduler`).
+    pub fn scheduler(&self) -> PathBuf {
+        self.local.join("scheduler")
+    }
+
+    /// Mosty CLI: konfiguracja MCP mostu (0600) i kopie robocze (worktree) zadań.
+    pub fn bridges(&self) -> PathBuf {
+        self.local.join("bridges")
+    }
+
     /// Tworzy wszystkie katalogi.
     pub fn ensure(&self) -> Result<(), AppError> {
         for dir in [
@@ -102,6 +117,9 @@ impl AppPaths {
             self.workdirs(),
             self.sidecars(),
             self.snapshots(),
+            self.memory(),
+            self.scheduler(),
+            self.bridges(),
         ] {
             std::fs::create_dir_all(&dir)
                 .map_err(|e| AppError::storage(format!("{}: {e}", dir.display())))?;

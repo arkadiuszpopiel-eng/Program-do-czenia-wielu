@@ -148,12 +148,16 @@ pub(crate) async fn prepare(
     let messages = core
         .branch_messages(&req.session, req.history_leaf, req.continues.is_some())
         .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
+    let query = messages.last().map(|m| m.visible_text());
     let mut request = ChatRequest::new(router_contract::AUTO_MODEL, messages);
     if let Ok(system) = core
         .inner
         .personas
         .system_prompt(&req.session, &PersonaId::new(req.agent.as_str()))
     {
+        // Zestaw roboczy pamięci agentki (zakresy z obsady i projektu sesji) — jako dane.
+        let memory = &core.inner.memory;
+        let system = memory.system_prompt(system, &req.session, &req.agent, query);
         request = request.with_system(system);
     }
     request.meta.session = Some(req.session.to_string());

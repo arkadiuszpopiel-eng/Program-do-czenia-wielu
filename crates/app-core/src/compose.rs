@@ -20,7 +20,8 @@ use crate::options::{AppOptions, AppPaths};
 use crate::parts::{Built, Kernel};
 
 /// Manifesty modułów (identyfikator → `module.toml`); narzędzia i runtime agentek —
-/// `app_agents::MODULES`.
+/// `app_agents::MODULES`, scheduler/wyzwalacze/Marszałek — `app_tasks::MODULES`, mosty CLI
+/// i MCP — `app_bridges::MODULES`.
 const MODULES: &[(&str, &str)] = &[
     ("platform-windows", platform_windows_impl::MODULE_TOML),
     ("device-profile", device_profile_impl::MODULE_TOML),
@@ -31,9 +32,9 @@ const MODULES: &[(&str, &str)] = &[
     ("sessions", sessions_impl::MODULE_TOML),
     ("search", search_impl::MODULE_TOML),
     ("memory", memory_impl::MODULE_TOML),
+    ("memory-consolidation", app_memory::CONSOLIDATION_TOML),
     ("artifacts", artifacts_impl::MODULE_TOML),
     ("personas", personas_impl::MODULE_TOML),
-    ("scheduler-lite", scheduler_lite_impl::MODULE_TOML),
     ("model-residency", model_residency_impl::MODULE_TOML),
     ("providers-local", providers_local_impl::MODULE_TOML),
     ("router", router_impl::MODULE_TOML),
@@ -62,6 +63,10 @@ fn manifest_for_graph(id: &str, toml: &str) -> Result<ModuleManifest, AppError> 
         "sessions" => manifest.requires.retain(|c| c.name != "search-contract"),
         "providers-local" => manifest.provides.clear(),
         "safety-broker" => manifest.requires.retain(|c| c.name != "watchdog-contract"),
+        // Strażniczka używa lokalnego rdzenia Routera (budowany w kroku `router`), a eksport
+        // `.alfa` — dokumentów pamięci (`Category::Memory`).
+        "memory-consolidation" => manifest.requires.push(contract("router-contract")),
+        "transfer" => manifest.requires.push(contract("memory-contract")),
         // Narzędzia i runtime agentek: `tools-common-contract` to kontrakt bez modułu (manifest,
         // `Tool`, bramka Brokera), a rejestr Job Objects (`watchdog-contract`) dostarcza Broker
         // w procesie (kill-switch zabija drzewa procesów `shell_run`).
@@ -71,6 +76,13 @@ fn manifest_for_graph(id: &str, toml: &str) -> Result<ModuleManifest, AppError> 
         _ => {}
     }
     Ok(manifest)
+}
+
+fn contract(name: &str) -> ContractRef {
+    ContractRef {
+        name: name.to_owned(),
+        major: 1,
+    }
 }
 
 /// Gniazdo zdrowia modułu (wypełniane po starcie usługi).
@@ -89,7 +101,12 @@ async fn plan(
 > {
     let mut slots = BTreeMap::new();
     let mut lifecycles = BTreeMap::new();
-    for (id, toml) in MODULES.iter().chain(app_agents::MODULES) {
+    let all = MODULES
+        .iter()
+        .chain(app_agents::MODULES)
+        .chain(app_tasks::MODULES)
+        .chain(app_bridges::MODULES);
+    for (id, toml) in all {
         let manifest = manifest_for_graph(id, toml)?;
         lifecycles.insert((*id).to_owned(), manifest.lifecycle);
         let slot: HealthSlot = Arc::new(OnceLock::new());
@@ -165,7 +182,9 @@ impl AppCore {
                     .map_err(|e| internal("aktywacja modułu")(e.to_string()))?;
             }
         }
-        let core = built.into_core(paths, options, bus, registry, kernel)?;
+        let core = built
+            .into_core(paths, options, bus, registry, kernel)
+            .await?;
         core.after_start().await;
         Ok(core)
     }

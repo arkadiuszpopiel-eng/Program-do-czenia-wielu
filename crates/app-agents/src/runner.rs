@@ -85,6 +85,22 @@ pub struct RunFeed {
 }
 
 impl RunFeed {
+    /// Dziennik istniejącego przebiegu (np. zadania schedulera wykonywanego przez
+    /// `RuntimeExecutor`): zaległe zdarzenia od początku, potem na żywo.
+    pub fn attach(runtime: Arc<Runtime>, run: RunId) -> Result<Self, RunError> {
+        let rx = runtime.subscribe(&run)?;
+        let mut feed = Self {
+            runtime,
+            run,
+            rx,
+            seen: 0,
+            backlog: Vec::new(),
+            done: false,
+        };
+        feed.refill();
+        Ok(feed)
+    }
+
     fn refill(&mut self) {
         let mut log = self.runtime.events(&self.run).unwrap_or_default();
         log.retain(|e| e.seq > self.seen);

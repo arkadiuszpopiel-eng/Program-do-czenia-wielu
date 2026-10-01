@@ -7,15 +7,18 @@ zdarzeń `alfa://events` (paczki `AlfaEvent[]`, najwyżej jedna na klatkę ≈ 1
 
 Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, które mogą zależeć od
 `*-impl`; od `*-fake` tylko w `dev-dependencies`; `app-*` mogą zależeć od siebie nawzajem, ale od żadnego
-`app-*` nie zależy crate spoza tej kategorii. Ze względu na limit 8 000 linii korzeń jest rozcięty na pięć:
+`app-*` nie zależy crate spoza tej kategorii. Ze względu na limit 8 000 linii korzeń jest rozcięty:
 
 | Crate | Zawartość |
 |---|---|
 | `app-api` | kontrakt IPC: DTO (`dto/*`), `AppError`, identyfikatory DTO (`ids`), `EventHub`, porty (`ports/*`), `AppPaths`, protokół `alfa://`, powiadomienia; zależy tylko od `*-contract` |
-| `app-modules` | adaptery portów na modułach `-impl`: `TransferAdapter`, `InprocBroker`, `VoiceAdapter`, `tts::engines`, katalog dostawców (`catalog`), sonda kont (`probe`) |
+| `app-modules` | adaptery portów na modułach `-impl`: `TransferAdapter`, `InprocBroker`, `VoiceAdapter`, `tts::engines`, katalog dostawców (`catalog`), sonda kont (`probe`), Router (`route/*`), sejf kluczy (`secrets`), późne wiązanie `sessions ↔ search` (`late`), osadzacz leksykalny (`embedder`) |
+| `app-memory` | pamięć F7: `MemoryModule` (bazy zakresów w `%LOCALAPPDATA%\Alfa\memory`, klucze w sejfie), dostęp agentek z ról i projektu sesji (`RoleAccess`), narzędzia `memory_recall`/`memory_remember`, Strażniczka pamięci (`guardian`), `MemoryApp` (komendy Inspektora, kontekst czatu, zapomnienie sesji) |
+| `app-tasks` | `scheduler-impl` (zamiast `scheduler-lite-impl`), `triggers-impl`, `marshal-impl`; wykonawczyni zadań (agentka przez `RuntimeExecutor`, most CLI przez `agent-backends`), Replay zadań, mosty zdarzeń, `TasksApp` (komendy `tasks_*`/`triggers_*`/`marshal_*`), delegacja z czatu |
+| `app-bridges` | mosty CLI: karty zgodności (`compliance`), wykrywanie CLI, przypięcia wersji i zgody na harmonogram (`agent_backends.*`), „Zaloguj w terminalu", backend `agent-backends-impl`, serwer MCP Alfy na żądanie (`LazyMcpHost`), rozpoznanie delegacji |
 | `app-agents` | agentki z narzędziami: zestaw `tools-fs/shell/clipboard` (`AgentTools`), `RunSpec` z obsady i ustawień, `RunHandle` (przebieg `agent-runtime`), projekcja `agent.*` → Replay/karty UI (`RunProjector`), `TicketLog` (fakty kart zatwierdzenia), eval narzędzi F3 (`eval`) |
 | `app-voice` | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów) |
-| `app-core` | kompozycja (`AppOptions` → `parts`), komendy, czat, Router (`route/*`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
+| `app-core` | kompozycja (`AppOptions` → `parts`), komendy, czat (z delegacją do mostu), `TaskHost` rdzenia (`host.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
 
 ## Kompozycja (`AppCore::build(AppPaths, AppOptions)`) — jedno miejsce: `parts/`
 1. Jądro (`parts/kernel.rs`): magistrala (`core-bus-impl`), rejestr (`core-registry-impl`), sekrety
@@ -30,8 +33,10 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
    `providers-contract` (obaj są kandydatami Routera); Broker w procesie startuje bez `watchdog`.
 3. Moduły F1: platform (manifest), device-profile, compliance, accounts-hub (sonda kont = `list_models`
    adapterów), providers-api, cost-meter (kurs NBP przez `reqwest`/rustls), sessions (`KeyVault` na
-   `SecretStore`), search (osadzacz leksykalny `alfa-lexical-hash-v1` do czasu ONNX), memory, artifacts,
-   personas, scheduler-lite. Katalog dostawców wbudowany (`providers-catalog/*.toml`, `include_str!`).
+   `SecretStore`), search (osadzacz leksykalny `alfa-lexical-hash-v1` do czasu ONNX), memory (F7, z
+   `memory-consolidation` po Routerze), artifacts, personas, scheduler (`scheduler-impl`: ta sama tablica
+   blokad mowy dla głosu i zadań; stan w `%LOCALAPPDATA%\Alfa\scheduler`), triggers, marshal,
+   agent-backends i mcp (leniwie — przy pierwszym zadaniu mostu). Katalog dostawców wbudowany (`providers-catalog/*.toml`, `include_str!`).
 4. Moduły podpięte po F1 (`parts/extra.rs`; błąd budowy = moduł niezdrowy w rejestrze, nie błąd startu):
    model-residency (budżety z profilu urządzenia), providers-local (sidecar `llama-server` z
    `AppPaths::sidecar`), router, risk-classifier, safety-broker (w procesie, tryb deweloperski: audyt
@@ -56,6 +61,28 @@ odrzucane) i role agentki dają narzędzia; inaczej zwykły czat. Budżety z Ust
 (`broker_window`, `expires_at`). Komendy: `agents_runs`, `agents_steer` (wiadomość w trakcie zadania),
 `agents_open_terminal` (terminal w katalogu kroku, bez wykonania), `turns_undo_step` (dziennik albo
 schowek `"<sesja>:c<id>"`). Stop/Esc i kill-switch anulują przebieg i polecenia.
+
+## Pamięć, zadania, mosty CLI (`parts/memory.rs`, `parts/tasks.rs`, `host.rs`, `chat/delegate.rs`)
+- Pamięć: `turns_remember` → zakres sesji/projektu/agentki/globalny (z sesji prywatnej — tylko sesja);
+  kontekst czatu = zestaw roboczy agentki (dostęp z ról obsady i projektu sesji); narzędzia
+  `memory_recall`/`memory_remember` w zestawie agentek; `memory_*` — Inspektor; usunięcie sesji:
+  `forget_as(Session)` (kopie w zakresach szerszych też) przed crypto-shreddingiem. Strażniczka: model
+  lokalny przez lokalny rdzeń Routera, budżet tła, licznik bezczynności — port bez platformy
+  (`UnknownIdle`: „nigdy bezczynny", porządkowanie nocne startuje tylko ręcznie).
+- Zadania: `tasks_*` (DAG, sterowanie, pauza, anulowanie z poddrzewem, ponowienie), wykonawczyni wiązana
+  po złożeniu rdzenia (`TaskBinder`, rdzeń trzymany słabo); zadanie bez sesji → sesja „Zadania w tle"
+  (`tasks.background_session`, warstwa maszyny). Obsada schedulera z `Roster::from_cast` (obsada
+  domyślna) i `scheduler.max_parallel`; warunki okien: tryb gry z `model-residency`, bezczynność —
+  „nigdy". Kill-switch zatrzymuje też zadania (`SchedulerLite::kill_all`).
+- Wyzwalacze (`triggers_*`): czas/zdarzenie/ręczne; obserwacja katalogów — `NoFileWatch`
+  (`watch_unavailable`), DND z `voice-wake`. Marszałek (`marshal_*`): tłumacz przez Router
+  (`LlmTranslator`, wiązany po portach), reguły tylko zawężają, zatwierdza wyłącznie UI; polityka →
+  limit równoległości, zakaz mostów, budżety zadań użytkownika; raport dnia → `MarshalReportReady`.
+- Mosty (`bridges_*`): karty zgodności, zgoda na harmonogram (≤ 24/dobę), przypięcie wykrytej wersji,
+  „Zaloguj w terminalu" (polecenie do skopiowania; Alfa nie czyta tokenów CLI). Delegacja z czatu
+  („Delta, zleć to Claude Code") = zadanie mostu od użytkownika; prośby o uprawnienia mostu → Broker
+  (`BrokerSink`, kopie robocze pod `%USERPROFILE%\Alfa\Mosty`), Replay „niezweryfikowane przez Alfę".
+  `AppOptions::bridges` (fabryka nad kanałem zatwierdzeń) i `AppOptions::cli_probe` — testy.
 
 ## Tryb głosowy (`voice_chat.rs`, `app-voice`)
 `voice_set_mic_enabled/ptt/set_muted/stop_speech/status/preview`; wypowiedź → tura użytkownika w
@@ -102,7 +129,7 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
 `"<sesja>:u<krok>"` (`turns_undo_step` → `undo-journal` przez Brokera, wpis „Cofnięto: …" na osi czasu).
 
 ## Testy
-- `tests/dto_roundtrip.rs` — każdy ładunek atrapy UI (84 komendy, 25 typów zdarzeń) deserializuje się
+- `tests/dto_roundtrip.rs` (+ `tests/dto_spec/`) — każdy ładunek atrapy UI (123 komendy, 29 typów zdarzeń) deserializuje się
   do DTO i wraca bez strat; zbiór komend = COMMANDS.md = `app_core::COMMANDS`.
 - `tests/ipc_signatures.rs` — sygnatury z `with_commands!` istnieją w `AppCore`, przyszłości `Send + 'static`.
 - `tests/scenario.rs`, `tests/errors.rs`, `tests/commands.rs` — scenariusze na atrapach
@@ -114,6 +141,14 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
   (`voice-tts-fake` + `voice-audio-fake`), `mark_good` updatera.
 - `tests/transfer.rs` — eksport → import `.alfa` przez komendy (podgląd, tryby, rollback, szyfrowanie,
   eksport sekretów).
+- `tests/memory.rs` — pamięć projektu wraca w innej sesji projektu (nie w innym projekcie); sesja
+  prywatna nie wycieka; usunięcie sesji zapomina jej wpisy i kopie.
+- `tests/tasks.rs` — DAG dwóch agentek (kolejność, Replay z `task_id`), kill-switch zatrzymuje zadanie,
+  wyzwalacz ręczny → zadanie `trigger`.
+- `tests/bridges.rs` — delegacja z czatu na `agent-backends-fake` (pochodzenie `UserRequest`, dopisek
+  „niezweryfikowany"), 0 startów mostu z wyzwalacza, karty zgodności i „Zaloguj w terminalu".
+- `tests/spy_work.rs` — 3 sesje z pamięcią i zadaniami, zero przecieków (kontekst, Replay, zdarzenia,
+  Inspektor).
 - `tests/spy.rs` — ≥ 3 sesje równolegle, zero przecieków (żądania, historia, zdarzenia, wyszukiwanie,
   oś czasu, pliki baz na dysku).
 - `tests/agents.rs` — zadanie fs przez agentkę → krok w Replay → „Cofnij" przywraca stan; odmowa
@@ -135,7 +170,7 @@ ES=node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/bin/esbuild
 $ES crates/app-core/tests/fixtures/gen/generate.ts --bundle --platform=node --format=esm \
   --alias:@tauri-apps/api/core=./crates/app-core/tests/fixtures/gen/tauri-mock.ts \
   --alias:@tauri-apps/api/event=./crates/app-core/tests/fixtures/gen/tauri-mock.ts --outfile="$TMPDIR/gen.mjs"
-node "$TMPDIR/gen.mjs" crates/app-core/tests/fixtures
+node "$TMPDIR/gen.mjs" crates/app-core/tests/fixtures   # komendy F5–F7: gen/generate-work.ts
 ```
 `tests/fixtures/extra.json` — ręcznie: warianty, których atrapa nie emituje (np. `VoicePill`,
 `OpenSession`, `LocalModelProgress`, kody błędów). Regeneracja nadpisuje pozostałe pliki — dopisuj

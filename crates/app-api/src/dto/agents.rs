@@ -127,6 +127,12 @@ pub struct AgentRun {
     pub summary: Option<String>,
     pub usage: RunUsage,
     pub budget: RunBudgetView,
+    /// Most CLI (`claude_code`, `codex`) — zdarzenia niezweryfikowane przez Alfę.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bridge: Option<String>,
+    /// Zadanie schedulera, w ramach którego trwa przebieg.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
 }
 
 /// Przebieg z krokami (`agents_runs`).

@@ -11,6 +11,7 @@ use super::sessions::{
     TurnUsage,
 };
 use super::system::{SystemStatus, VoicePillState};
+use super::tasks::{MarshalReport, TaskInfo, TriggerRunInfo};
 
 /// Powód zakończenia strumienia.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -146,5 +147,21 @@ pub enum AlfaEvent {
         bytes: u64,
         total: Option<u64>,
         error: Option<String>,
+    },
+    /// Pamięć zmieniona (zapamiętanie, edycja, zapomnienie, porządkowanie) — odśwież Inspektor.
+    MemoryChanged {
+        scope_key: Option<String>,
+    },
+    /// Zadanie schedulera: zgłoszone, zmiana stanu, postęp, zakończenie.
+    TaskUpdated {
+        task: TaskInfo,
+    },
+    /// Uruchomienie wyzwalacza (dziennik).
+    TriggerFired {
+        run: TriggerRunInfo,
+    },
+    /// Raport dzienny Marszałka (relacjonuje Dyrygentka; powiadomienie natywne).
+    MarshalReportReady {
+        report: MarshalReport,
     },
 }

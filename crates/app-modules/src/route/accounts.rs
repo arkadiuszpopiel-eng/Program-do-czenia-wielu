@@ -13,7 +13,7 @@ use providers_contract::{ModelKind, ModelProvider, ProviderId};
 use router_contract::RouteKind;
 use router_impl::RouterCore;
 
-use crate::infra::secrets::HubKeySource;
+use crate::secrets::HubKeySource;
 
 /// Konto zarejestrowane jako trasa API.
 #[derive(Debug, Clone, PartialEq, Eq)]

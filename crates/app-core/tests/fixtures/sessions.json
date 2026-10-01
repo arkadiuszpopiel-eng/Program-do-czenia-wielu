@@ -283,5 +283,21 @@
         "turn_id": "q1"
       }
     ]
+  },
+  {
+    "command": "sessions_set_project",
+    "args": {
+      "sessionId": "s-trip",
+      "project": "Wakacje"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_set_project",
+    "args": {
+      "sessionId": "s-trip",
+      "project": null
+    },
+    "result": null
   }
 ]

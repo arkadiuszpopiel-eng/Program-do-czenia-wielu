@@ -42,6 +42,36 @@ import type {
   TestReport,
 } from './types-hub';
 import type {
+  ConsolidationReport,
+  MemoryEdit,
+  MemoryExplanation,
+  MemoryForgetPreview,
+  MemoryForgetReport,
+  MemoryForgetTarget,
+  MemoryItem,
+  MemoryJournalEntry,
+  MemoryPage,
+  MemoryQuery,
+  MemoryScopeInfo,
+  MemoryScopeRef,
+  MemoryStatus,
+  MemoryUndoResult,
+} from './types-memory';
+import type {
+  BridgeCard,
+  BridgeLogin,
+  CronPreview,
+  MarshalProposalInfo,
+  MarshalReport,
+  MarshalRuleInfo,
+  MarshalState,
+  NewTaskInput,
+  TaskInfo,
+  TriggerDraft,
+  TriggerInfo,
+  TriggerRunInfo,
+} from './types-tasks';
+import type {
   AlfaEvent,
   AppBootstrap,
   LayoutPrefs,
@@ -80,6 +110,8 @@ export interface SessionsApi {
   markRead(sessionId: string): Promise<void>;
   getDraft(sessionId: string): Promise<string>;
   saveDraft(sessionId: string, text: string): Promise<void>;
+  /** Projekt sesji (pamięć projektu dzielą sesje tego projektu); `null` — poza projektem. */
+  setProject(sessionId: string, project: string | null): Promise<void>;
   /** Katalog roboczy sesji = zakres narzędzi agentek (`path: null` — agentki bez narzędzi). */
   workdir(sessionId: string): Promise<SessionWorkdir>;
   /** Intencja: wybór katalogu (natywny dialog), katalog sesji albo wyłączenie narzędzi. */
@@ -221,6 +253,75 @@ export interface QuickApi {
   hide(): Promise<void>;
 }
 
+/** Inspektor pamięci (F7): operacje jako właściciel; edycja = nowa wersja. */
+export interface MemoryApi {
+  status(): Promise<MemoryStatus>;
+  scopes(): Promise<readonly MemoryScopeInfo[]>;
+  inspect(query: MemoryQuery): Promise<MemoryPage>;
+  /** „Dlaczego to pamiętam": powody, źródła, wersje, dziennik. */
+  explain(entryId: string): Promise<MemoryExplanation>;
+  edit(entryId: string, edit: MemoryEdit): Promise<MemoryItem>;
+  setPinned(entryId: string, pinned: boolean): Promise<MemoryItem>;
+  /** Zatwierdzenie propozycji (agentki, porządkowanie). */
+  approve(entryId: string): Promise<MemoryItem>;
+  /** Kopia w zakresie szerszym (awans za zgodą). */
+  promote(entryId: string, to: MemoryScopeRef): Promise<MemoryItem>;
+  forgetPreview(target: MemoryForgetTarget): Promise<MemoryForgetPreview>;
+  forget(target: MemoryForgetTarget): Promise<MemoryForgetReport>;
+  journal(scope: string): Promise<readonly MemoryJournalEntry[]>;
+  undo(scope: string, changeId: string): Promise<MemoryUndoResult>;
+  /** Porządkowanie teraz (ręcznie — bez wymogu bezczynności). */
+  consolidateNow(): Promise<ConsolidationReport>;
+}
+
+/** Panel Zadania: DAG schedulera (zadania agentek i mostów CLI). */
+export interface TasksApi {
+  list(): Promise<readonly TaskInfo[]>;
+  create(input: NewTaskInput): Promise<TaskInfo>;
+  /** Anuluje zadanie z poddrzewem; zwraca anulowane identyfikatory. */
+  cancel(taskId: string): Promise<readonly string[]>;
+  /** Nowe zadanie z tą samą specyfikacją i pochodzeniem. */
+  retry(taskId: string): Promise<TaskInfo>;
+  /** Wiadomość dla agentki w najbliższym punkcie atomowym. */
+  steer(taskId: string, text: string): Promise<void>;
+  pause(taskId: string): Promise<void>;
+  resume(taskId: string): Promise<void>;
+}
+
+export interface TriggersApi {
+  list(): Promise<readonly TriggerInfo[]>;
+  create(draft: TriggerDraft): Promise<TriggerInfo>;
+  remove(triggerId: string): Promise<void>;
+  setEnabled(triggerId: string, enabled: boolean): Promise<void>;
+  fireNow(triggerId: string): Promise<TriggerRunInfo>;
+  log(triggerId: string | null): Promise<readonly TriggerRunInfo[]>;
+  /** Najbliższe uruchomienia (Europe/Warsaw). */
+  previewCron(expr: string): Promise<CronPreview>;
+}
+
+/** Reguły Marszałka — tylko zawężają; zatwierdza wyłącznie użytkownik. */
+export interface MarshalApi {
+  state(): Promise<MarshalState>;
+  /** Polecenie → szkice (model albo `drafts` z edytora) → podgląd zawężenia. */
+  propose(text: string, drafts: readonly unknown[] | null): Promise<MarshalProposalInfo>;
+  approve(proposalId: number): Promise<readonly MarshalRuleInfo[]>;
+  reject(proposalId: number): Promise<void>;
+  revoke(ruleId: string): Promise<void>;
+  report(): Promise<MarshalReport>;
+}
+
+/** Karty zgodności mostów CLI; logowanie do CLI wykonuje wyłącznie użytkownik. */
+export interface BridgesApi {
+  list(refresh: boolean): Promise<readonly BridgeCard[]>;
+  setEnabled(routeId: string, enabled: boolean): Promise<BridgeCard>;
+  /** Jawna zgoda na uruchomienia z harmonogramu (0 = brak). */
+  setSchedule(bridge: string, perDay: number): Promise<BridgeCard>;
+  /** Przypięcie wykrytej wersji CLI (`null` — odpięcie). */
+  pin(bridge: string, version: string | null): Promise<BridgeCard>;
+  /** Intencja: terminal w katalogu domowym + polecenie logowania do skopiowania. */
+  openLogin(bridge: string): Promise<BridgeLogin>;
+}
+
 export interface AlfaClient {
   readonly kind: 'tauri' | 'fake';
   readonly app: AppApi;
@@ -239,6 +340,11 @@ export interface AlfaClient {
   readonly voice: VoiceApi;
   readonly system: SystemApi;
   readonly quick: QuickApi;
+  readonly memory: MemoryApi;
+  readonly tasks: TasksApi;
+  readonly triggers: TriggersApi;
+  readonly marshal: MarshalApi;
+  readonly bridges: BridgesApi;
   /** Jeden kanał zdarzeń; rdzeń wysyła je paczkami (batch co klatkę). */
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): Unsubscribe;
   dispose(): void;

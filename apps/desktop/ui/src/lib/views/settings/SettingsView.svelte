@@ -13,10 +13,13 @@
   import SettingRow from './SettingRow.svelte';
   import CostsPage from './pages/CostsPage.svelte';
   import DevicesPage from './pages/DevicesPage.svelte';
+  import MarshalPage from './pages/MarshalPage.svelte';
+  import MemoryPage from './pages/MemoryPage.svelte';
   import PermissionsPage from './pages/PermissionsPage.svelte';
   import ProvidersPage from './pages/ProvidersPage.svelte';
   import ShortcutsPage from './pages/ShortcutsPage.svelte';
   import TransferPage from './pages/TransferPage.svelte';
+  import TriggersPage from './pages/TriggersPage.svelte';
   import VoicePage from './pages/VoicePage.svelte';
 
   const app = useApp();
@@ -133,6 +136,9 @@
         {:else if page.custom === 'permissions'}<PermissionsPage />
         {:else if page.custom === 'devices'}<DevicesPage />
         {:else if page.custom === 'voice'}<VoicePage />
+        {:else if page.custom === 'memory'}<MemoryPage />
+        {:else if page.custom === 'triggers'}<TriggersPage />
+        {:else if page.custom === 'marshal'}<MarshalPage />
         {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />

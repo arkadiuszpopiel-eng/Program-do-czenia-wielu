@@ -33,6 +33,7 @@ impl Extra {
         options: &AppOptions,
         paths: &AppPaths,
         bus: &Arc<dyn EventBus>,
+        extra: Vec<Arc<dyn tools_common_contract::Tool>>,
     ) -> Option<AgentStack> {
         let engine = self.broker.clone()?;
         let journal = self.undo.clone()?;
@@ -56,6 +57,7 @@ impl Extra {
             bus: Some(bus.clone()),
             shell: ShellToolsConfig::default(),
             base_env: None,
+            extra,
         });
         Some(AgentStack {
             tools: Arc::new(tools),

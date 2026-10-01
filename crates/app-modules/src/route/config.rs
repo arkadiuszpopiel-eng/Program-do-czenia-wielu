@@ -89,7 +89,7 @@ fn set(routers: &Routers, text: Option<String>) {
 }
 
 /// Stosuje nadpisania i obserwuje zmiany `router.*`.
-pub(crate) async fn apply(config: &Arc<FileConfigStore>, routers: &Routers) {
+pub async fn apply(config: &Arc<FileConfigStore>, routers: &Routers) {
     set(routers, overrides(config).await);
     let mut watch = config.watch("router.");
     let config = config.clone();

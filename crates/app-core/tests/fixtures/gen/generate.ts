@@ -8,6 +8,7 @@ import {
   VirtualScheduler,
 } from '../../../../../apps/desktop/ui/src/lib/api/fake/fake-client';
 import type { AlfaEvent } from '../../../../../apps/desktop/ui/src/lib/api/types-system';
+import { runWork } from './generate-work';
 import { invocations } from './tauri-mock';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -244,6 +245,8 @@ async function run(): Promise<void> {
   await both('quick', 'expandToMain', quick.session_id);
   await both('quick', 'hide');
   await flush();
+
+  await runWork(both, scheduler, flush);
 }
 
 function sampleEvents(all: readonly AlfaEvent[]): AlfaEvent[] {

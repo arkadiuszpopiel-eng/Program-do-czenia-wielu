@@ -61,6 +61,7 @@ fn tool_names(env: &EvalEnv) -> Vec<String> {
         bus: None,
         shell: ShellToolsConfig::default(),
         base_env: None,
+        extra: Vec::new(),
     })
     .names()
 }

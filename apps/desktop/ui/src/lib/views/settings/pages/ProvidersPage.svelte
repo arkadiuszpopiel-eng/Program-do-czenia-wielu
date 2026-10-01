@@ -6,6 +6,7 @@
   import type { Account, ProviderInfo } from '../../../api/types-hub';
   import { useApp } from '../../../state/context';
   import AddProviderWizard from './AddProviderWizard.svelte';
+  import BridgesSection from './BridgesSection.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -118,6 +119,8 @@
     </ul>
   {/if}
 </section>
+
+<BridgesSection />
 
 <ConfirmDialog
   bind:open={confirmOpen}

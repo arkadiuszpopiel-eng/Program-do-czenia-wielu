@@ -476,8 +476,50 @@
             },
             "default": true,
             "scope": "global"
+          },
+          {
+            "key": "scheduler.max_parallel",
+            "label": {
+              "pl": "Zadania naraz",
+              "en": "Tasks at once"
+            },
+            "description": {
+              "pl": "Najwięcej zadań agentek wykonywanych równolegle (reguły Marszałka mogą tylko zmniejszyć). Zmiana działa od następnego uruchomienia.",
+              "en": "The most agent tasks running in parallel (Marshal rules can only lower it). Takes effect after the next start."
+            },
+            "default": 4,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 16,
+              "step": 1,
+              "unit": null
+            }
           }
         ],
+        "upcoming": []
+      },
+      {
+        "id": "triggers",
+        "label": {
+          "pl": "Zadania w tle i wyzwalacze",
+          "en": "Background tasks and triggers"
+        },
+        "wave": 1,
+        "custom": "triggers",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "marshal",
+        "label": {
+          "pl": "Reguły Marszałka",
+          "en": "Marshal rules"
+        },
+        "wave": 1,
+        "custom": "marshal",
+        "settings": [],
         "upcoming": []
       },
       {
@@ -517,19 +559,82 @@
           "pl": "Pamięć",
           "en": "Memory"
         },
-        "wave": 7,
-        "custom": null,
-        "settings": [],
-        "upcoming": [
+        "wave": 1,
+        "custom": "memory",
+        "settings": [
           {
-            "pl": "Zakresy i konsolidacja nocna",
-            "en": "Scopes and nightly consolidation"
+            "key": "memory.consolidation_enabled",
+            "label": {
+              "pl": "Porządkowanie nocne",
+              "en": "Nightly tidy-up"
+            },
+            "description": {
+              "pl": "Strażniczka pamięci łączy powtórzenia, wygasza nieaktualne wpisy i proponuje fakty — lokalnie, w oknie nocnym, tylko gdy komputer jest bezczynny. Zmiana działa od następnego uruchomienia.",
+              "en": "The memory keeper merges duplicates, expires stale entries and proposes facts — locally, in the night window, only when the computer is idle. Takes effect after the next start."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
           },
           {
-            "pl": "Inspektor pamięci",
-            "en": "Memory inspector"
+            "key": "memory.consolidation_window",
+            "label": {
+              "pl": "Okno porządkowania",
+              "en": "Tidy-up window"
+            },
+            "description": {
+              "pl": "Godziny w formacie GG:MM-GG:MM (czas lokalny).",
+              "en": "Hours as HH:MM-HH:MM (local time)."
+            },
+            "default": "02:00-05:00",
+            "scope": "machine",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "memory.auto_extract",
+            "label": {
+              "pl": "Fakty z rozmów",
+              "en": "Facts from conversations"
+            },
+            "description": {
+              "pl": "Czy Strażniczka może sama zapisywać fakty wyciągnięte z rozmów, czy tylko je proponuje do zatwierdzenia.",
+              "en": "Whether the keeper may store facts extracted from conversations on its own, or only propose them for approval."
+            },
+            "default": "ask",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "ask",
+                  "label": {
+                    "pl": "Proponuj do zatwierdzenia",
+                    "en": "Propose for approval"
+                  }
+                },
+                {
+                  "value": "on",
+                  "label": {
+                    "pl": "Zapisuj sama",
+                    "en": "Store automatically"
+                  }
+                },
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Wyłączone",
+                    "en": "Off"
+                  }
+                }
+              ]
+            }
           }
-        ]
+        ],
+        "upcoming": []
       },
       {
         "id": "sessions",
@@ -1272,6 +1377,10 @@
       "agents.max_cost_pln": 0,
       "agents.approval_timeout_s": 300,
       "agents.verify_before_done": true,
+      "scheduler.max_parallel": 4,
+      "memory.consolidation_enabled": true,
+      "memory.consolidation_window": "02:00-05:00",
+      "memory.auto_extract": "ask",
       "sessions.default_template": "empty",
       "sessions.auto_title": true,
       "sessions.delete_undo_seconds": 10,

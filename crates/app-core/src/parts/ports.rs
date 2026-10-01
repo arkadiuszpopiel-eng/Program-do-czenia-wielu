@@ -17,7 +17,7 @@ use crate::ports::{
     BrainPort, BrokerPort, BrokerUnavailable, NoApprovalWindow, ShellPort, TransferPort,
     TransferUnavailable, VoicePort,
 };
-use crate::route::{RouterBrain, RouterUnavailable};
+use app_modules::route::{RouterBrain, RouterUnavailable};
 
 /// Porty złożone z modułów.
 pub(crate) struct Ports {
@@ -37,6 +37,8 @@ pub(crate) struct PortDeps<'a> {
     pub paths: &'a crate::options::AppPaths,
     pub bus: &'a Arc<dyn core_bus_contract::EventBus>,
     pub scheduler: Arc<dyn scheduler_lite_contract::SchedulerLite>,
+    /// Narzędzia spoza `tools-*` (pamięć) dla agentek.
+    pub tools: Vec<Arc<dyn tools_common_contract::Tool>>,
 }
 
 impl Extra {
@@ -50,6 +52,7 @@ impl Extra {
             paths,
             bus,
             scheduler,
+            tools,
         } = deps;
         let brain: Arc<dyn BrainPort> = match (&options.brain, &self.routers) {
             (Some(brain), _) => brain.clone(),
@@ -96,7 +99,7 @@ impl Extra {
             transfer,
             voice,
             broker,
-            agents: self.agent_stack(options, paths, bus),
+            agents: self.agent_stack(options, paths, bus, tools),
         })
     }
 }

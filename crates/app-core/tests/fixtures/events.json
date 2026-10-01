@@ -1078,5 +1078,129 @@
       "retry_at": "2026-09-30T12:48:02.700Z",
       "provider": "Anthropic"
     }
+  },
+  {
+    "type": "MemoryChanged",
+    "scope_key": "global"
+  },
+  {
+    "type": "MemoryChanged",
+    "scope_key": "project:p-x"
+  },
+  {
+    "type": "MemoryChanged",
+    "scope_key": "agent:beta"
+  },
+  {
+    "type": "TaskUpdated",
+    "task": {
+      "id": "u-muoa0tf0-33",
+      "title": "Sprawdź pisownię raportu",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "ready",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "type": "TaskUpdated",
+    "task": {
+      "id": "u-muoa0tf0-34",
+      "title": "Wyślij raport",
+      "parent_id": null,
+      "deps": [
+        {
+          "task_id": "u-muoa0tf0-33",
+          "condition": "succeeded"
+        }
+      ],
+      "assignee": "any",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "pending",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "type": "TaskUpdated",
+    "task": {
+      "id": "u-muoa0tf0-33",
+      "title": "Sprawdź pisownię raportu",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": "alfa",
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "running",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 1,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "type": "TriggerFired",
+    "run": {
+      "at": "2026-09-30T16:45:03.200Z",
+      "trigger_id": "porzadki",
+      "cause": "ręcznie",
+      "outcome": "submitted",
+      "task_id": "tr-muoc5zkw-35",
+      "detail": null
+    }
   }
 ]

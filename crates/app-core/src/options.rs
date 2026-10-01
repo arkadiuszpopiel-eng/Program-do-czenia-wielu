@@ -4,7 +4,8 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use accounts_hub_contract::SecretStore;
+use accounts_hub_contract::{CliProbe, SecretStore};
+use agent_backends_contract::{AgentBackend, ApprovalSink};
 use app_voice::VoiceEngineFactory;
 use device_profile_contract::DeviceProfile as DeviceProfileService;
 use platform_contract::{ClipboardPort, ExecPort, FsPort};
@@ -17,6 +18,9 @@ pub use app_api::paths::AppPaths;
 
 use crate::events::DEFAULT_FRAME;
 use crate::ports::{ApprovalWindow, BrainPort, BrokerPort, ShellPort, TransferPort, VoicePort};
+
+/// Backend mostów CLI budowany nad kanałem zatwierdzeń aplikacji (testy: `agent-backends-fake`).
+pub type BridgeFactory = Arc<dyn Fn(Arc<dyn ApprovalSink>) -> Arc<dyn AgentBackend> + Send + Sync>;
 
 /// Opcje budowy. `None` w porcie = domyślna implementacja (produkcyjna albo „niepodłączony moduł").
 pub struct AppOptions {
@@ -61,6 +65,10 @@ pub struct AppOptions {
     pub approval_window: Option<Arc<dyn ApprovalWindow>>,
     /// Powłoka (`None` = bez okien).
     pub shell: Option<Arc<dyn ShellPort>>,
+    /// Mosty CLI (`None` = `agent-backends-impl` z wykrytymi CLI, przypięciami i zgodami).
+    pub bridges: Option<BridgeFactory>,
+    /// Wykrywanie CLI w PATH (`None` = `PATH`/`PATHEXT` procesu, `--version`).
+    pub cli_probe: Option<Arc<dyn CliProbe>>,
     /// Po jakim czasie bez awarii start uznać za zdrowy (`updater::mark_good`).
     pub healthy_after: Duration,
     /// Zapis logów NDJSON z magistrali (`core-log`).
@@ -90,6 +98,8 @@ impl Default for AppOptions {
             broker: None,
             approval_window: None,
             shell: None,
+            bridges: None,
+            cli_probe: None,
             healthy_after: Duration::from_secs(30),
             file_logs: true,
         }

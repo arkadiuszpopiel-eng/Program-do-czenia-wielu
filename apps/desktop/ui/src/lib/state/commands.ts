@@ -13,6 +13,7 @@ const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.memory': 'memory',
   'panel.screen': 'screen',
   'panel.voice': 'voice',
+  'panel.tasks': 'tasks',
 };
 
 /** Dodatkowe polecenia palety (bez domyślnego skrótu). */

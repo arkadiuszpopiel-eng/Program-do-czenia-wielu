@@ -44,6 +44,8 @@ pub struct ToolsDeps {
     pub shell: ShellToolsConfig,
     /// Środowisko bazowe procesów (`None` = środowisko Alfy, filtrowane allowlistą).
     pub base_env: Option<Vec<(String, String)>>,
+    /// Narzędzia spoza `tools-*` (np. pamięć: `memory_recall`, `memory_remember`).
+    pub extra: Vec<Arc<dyn Tool>>,
 }
 
 /// Narzędzia agentek (współdzielone przez wszystkie przebiegi).
@@ -99,6 +101,7 @@ impl AgentTools {
         if let Some(c) = &clipboard {
             tools.extend(c.tools());
         }
+        tools.extend(deps.extra);
         Self { tools, clipboard }
     }
 
