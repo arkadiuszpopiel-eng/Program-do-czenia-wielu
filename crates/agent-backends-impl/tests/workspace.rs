@@ -73,12 +73,20 @@ async fn worktree_and_copy_lifecycle() {
     assert!(matches!(again, Err(BackendError::Workspace(_))));
     ws.release(&wt, false).await.unwrap();
     assert!(!wt.path.exists());
+    assert!(
+        !wt.path.to_string_lossy().starts_with(r"\\?\"),
+        "ścieżka verbatim przekazana do git"
+    );
 
     let copy = ws
         .prepare(&TaskId("t2".into()), &spec(&repo, WorkdirMode::Copy))
         .await
         .unwrap();
     assert_eq!(copy.kind, WorkdirKind::Copy);
+    assert!(
+        !copy.path.join(".git").exists(),
+        "kopia nie może zawierać `.git`"
+    );
     assert!(copy.path.join("a.txt").exists());
     let session = SessionRef {
         bridge: BridgeKind::Codex,
@@ -96,7 +104,8 @@ async fn worktree_and_copy_lifecycle() {
     assert!(copy.path.exists());
     ws.release(&copy, false).await.unwrap();
     assert!(!copy.path.exists());
-    std::fs::remove_dir_all(&base).unwrap();
+    // Obiekty git są tylko do odczytu — sprzątanie najlepszym wysiłkiem (także na Windows).
+    let _ = std::fs::remove_dir_all(&base);
 }
 
 #[tokio::test]
@@ -138,5 +147,6 @@ async fn refusals() {
         ..outside
     };
     assert!(ws.reuse(&root).await.is_err());
-    std::fs::remove_dir_all(&base).unwrap();
+    // Obiekty git są tylko do odczytu — sprzątanie najlepszym wysiłkiem (także na Windows).
+    let _ = std::fs::remove_dir_all(&base);
 }

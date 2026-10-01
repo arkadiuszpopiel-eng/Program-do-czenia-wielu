@@ -24,6 +24,31 @@ pub struct GitWorkspace {
     max_copy_bytes: u64,
 }
 
+/// Zamienia ścieżkę „verbatim” Windows (`\\?\C:\..`, `\\?\UNC\serwer\..`) na zwykłą
+/// (`C:\..`, `\\serwer\..`). `canonicalize()` na Windows zwraca formę verbatim, której nie
+/// obsługuje m.in. git (`could not create leading directories of '//?/C:/..'`) ani część CLI.
+/// `None`, gdy tekst nie jest ścieżką verbatim z literą dysku lub UNC (wtedy zostaje bez zmian).
+pub fn strip_verbatim(path: &str) -> Option<String> {
+    if let Some(rest) = path.strip_prefix(r"\\?\UNC\") {
+        return Some(format!(r"\\{rest}"));
+    }
+    let rest = path.strip_prefix(r"\\?\")?;
+    let bytes = rest.as_bytes();
+    (bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\')
+        .then(|| rest.to_owned())
+}
+
+/// Kanoniczna ścieżka w zwykłej formie (na Windows bez prefiksu `\\?\`).
+fn canonical(path: &Path) -> std::io::Result<PathBuf> {
+    let canon = path.canonicalize()?;
+    if cfg!(windows)
+        && let Some(plain) = canon.to_str().and_then(strip_verbatim)
+    {
+        return Ok(PathBuf::from(plain));
+    }
+    Ok(canon)
+}
+
 fn ws_err(context: &str, e: impl std::fmt::Display) -> BackendError {
     BackendError::Workspace(format!("{context}: {e}"))
 }
@@ -76,9 +101,7 @@ impl GitWorkspace {
 
     fn root_canonical(&self) -> Result<PathBuf, BackendError> {
         std::fs::create_dir_all(&self.root).map_err(|e| ws_err("katalog roboczy", e))?;
-        self.root
-            .canonicalize()
-            .map_err(|e| ws_err("katalog roboczy", e))
+        canonical(&self.root).map_err(|e| ws_err("katalog roboczy", e))
     }
 }
 
@@ -87,7 +110,8 @@ fn copy_tree(from: &Path, to: &Path, skip: &Path, budget: &mut u64) -> Result<()
     for entry in std::fs::read_dir(from).map_err(|e| ws_err("kopia", e))? {
         let entry = entry.map_err(|e| ws_err("kopia", e))?;
         let path = entry.path();
-        if path == skip {
+        // `.git` (konfiguracja zdalnych z możliwymi poświadczeniami, haki) nie trafia do kopii.
+        if path == skip || entry.file_name() == ".git" {
             continue;
         }
         let kind = entry.file_type().map_err(|e| ws_err("kopia", e))?;
@@ -116,10 +140,7 @@ impl Workspace for GitWorkspace {
         task: &TaskId,
         spec: &WorkdirSpec,
     ) -> Result<PreparedWorkdir, BackendError> {
-        let source = spec
-            .source
-            .canonicalize()
-            .map_err(|e| ws_err("katalog źródłowy", e))?;
+        let source = canonical(&spec.source).map_err(|e| ws_err("katalog źródłowy", e))?;
         if !source.is_dir() {
             return Err(BackendError::Workspace("źródło nie jest katalogiem".into()));
         }
@@ -174,10 +195,7 @@ impl Workspace for GitWorkspace {
 
     async fn reuse(&self, session: &SessionRef) -> Result<PreparedWorkdir, BackendError> {
         let root = self.root_canonical()?;
-        let path = session
-            .workdir
-            .canonicalize()
-            .map_err(|e| ws_err("katalog sesji", e))?;
+        let path = canonical(&session.workdir).map_err(|e| ws_err("katalog sesji", e))?;
         if !path.starts_with(&root) || path == root {
             return Err(BackendError::Workspace(
                 "katalog wznawianej sesji leży poza katalogiem roboczym mostów".into(),
@@ -201,6 +219,58 @@ impl Workspace for GitWorkspace {
                 .await
                 .map(|_| ());
         }
+        clear_readonly(&prepared.path);
         std::fs::remove_dir_all(&prepared.path).map_err(|e| ws_err("usuwanie kopii", e))
+    }
+}
+
+/// Na Windows pliki z atrybutem „tylko do odczytu” blokują usuwanie — zdejmujemy go w kopii
+/// (najlepszy wysiłek; dotyczy wyłącznie katalogu roboczego mostu).
+#[cfg(windows)]
+#[allow(clippy::permissions_set_readonly_false)] // Windows: zdejmuje atrybut pliku, ACL bez zmian
+fn clear_readonly(dir: &Path) {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let Ok(kind) = entry.file_type() else {
+            continue;
+        };
+        if kind.is_dir() {
+            clear_readonly(&entry.path());
+        } else if let Ok(meta) = entry.metadata()
+            && meta.permissions().readonly()
+        {
+            let mut perms = meta.permissions();
+            perms.set_readonly(false);
+            let _ = std::fs::set_permissions(entry.path(), perms);
+        }
+    }
+}
+
+/// Poza Windows prawa katalogu wystarczają do usunięcia plików tylko do odczytu.
+#[cfg(not(windows))]
+fn clear_readonly(_dir: &Path) {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verbatim_paths_are_simplified() {
+        assert_eq!(
+            strip_verbatim(r"\\?\C:\Users\a\wt").as_deref(),
+            Some(r"C:\Users\a\wt")
+        );
+        assert_eq!(
+            strip_verbatim(r"\\?\UNC\srv\udz\x").as_deref(),
+            Some(r"\\srv\udz\x")
+        );
+        assert_eq!(strip_verbatim(r"\\?\Volume{abc}\x"), None);
+        assert_eq!(strip_verbatim(r"\\?\C:"), None);
+        assert_eq!(strip_verbatim(r"C:\Users"), None);
+        assert_eq!(strip_verbatim("/tmp/x"), None);
+        let here = canonical(Path::new(".")).unwrap();
+        assert!(!here.to_string_lossy().starts_with(r"\\?\"));
     }
 }

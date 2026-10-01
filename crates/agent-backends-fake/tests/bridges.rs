@@ -50,7 +50,13 @@ async fn ok_flow_runs_in_worktree_not_in_user_dir() {
         assert!(
             handle
                 .workdir
+                .canonicalize()
+                .unwrap()
                 .starts_with(h.worktrees.canonicalize().unwrap())
+        );
+        assert!(
+            !handle.workdir.to_string_lossy().starts_with(r"\\?\"),
+            "{bridge}: ścieżka verbatim przekazana do git/CLI"
         );
         assert!(
             handle.workdir.join("wynik.txt").exists(),
@@ -266,7 +272,11 @@ async fn cli_environment_has_no_alfa_secrets() {
             .unwrap();
         let events = collect(&h.backend, &handle.task, LIMIT).await;
         let names = outputs(&events).join(",");
-        assert!(names.contains("PATH"), "{bridge}: {names}");
+        // Na Windows zmienna nazywa się zwykle `Path` (nazwy bez rozróżniania wielkości liter).
+        assert!(
+            names.to_ascii_uppercase().contains("PATH"),
+            "{bridge}: {names}"
+        );
         // `cargo test` ustawia CARGO_* w procesie testu — CLI nie może ich dostać (lista dozwolona).
         assert!(std::env::var("CARGO_PKG_NAME").is_ok());
         for name in names.split(',').filter(|n| !n.is_empty()) {

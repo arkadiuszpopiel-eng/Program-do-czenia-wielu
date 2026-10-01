@@ -155,11 +155,23 @@ fn open(endpoint: &str) -> Result<Duplex, String> {
     let name = endpoint
         .strip_prefix("pipe:")
         .ok_or("nieobsługiwany kanał")?;
-    let file = std::fs::OpenOptions::new()
-        .read(true)
-        .write(true)
-        .open(name)
-        .map_err(|e| e.to_string())?;
+    // Host tworzy kolejną instancję potoku tuż po przyjęciu klienta — krótko ponawiamy
+    // (`ERROR_PIPE_BUSY` / brak instancji), jak robi to `alfa-mcp-proxy`.
+    let mut attempt = 0u32;
+    let file = loop {
+        match std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open(name)
+        {
+            Ok(f) => break f,
+            Err(_) if attempt < 100 => {
+                attempt += 1;
+                std::thread::sleep(std::time::Duration::from_millis(20));
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+    };
     let reader = file.try_clone().map_err(|e| e.to_string())?;
     Ok((Box::new(reader), Box::new(file)))
 }
