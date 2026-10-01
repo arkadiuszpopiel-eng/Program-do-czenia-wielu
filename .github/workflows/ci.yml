@@ -25,7 +25,18 @@ jobs:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
       - name: Format
+        if: runner.os == 'Linux'
         run: cargo fmt --all --check
+      - name: Format (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $metadata = cargo metadata --no-deps --format-version 1 | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($package in $metadata.packages) {
+            cargo fmt --package $package.name --check
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
