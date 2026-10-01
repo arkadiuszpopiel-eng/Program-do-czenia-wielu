@@ -1,0 +1,22 @@
+[package]
+name = "voice-stt-fake"
+description = "Atrapa voice-stt: transkrypty z adnotacji, partiale-prefiksy, deterministyczne znaczniki słów, symulacja awarii GPU i fallbacku CPU"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-stt-contract = { path = "../voice-stt-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+device-profile-contract = { path = "../device-profile-contract" }
+async-trait.workspace = true
+
+[dev-dependencies]
+voice-stt-contract = { path = "../voice-stt-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

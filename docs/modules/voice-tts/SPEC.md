@@ -1,4 +1,4 @@
-# voice-tts — SPEC (szkic v0)
+# voice-tts — SPEC (v0, zaimplementowany w F2)
 
 ## Cel
 Synteza mowy jako osobny proces: lokalnie na baseline Pocket TTS + model PL społeczności (CPU, RTF ≈ 0,21, ~200 ms do 1. fragmentu, klon z krótkiej referencji), Piper pl_PL jako zapas; poza baseline (profil D-CUDA) Chatterbox/XTTS-v2/F5; chmura (ElevenLabs, Cartesia, Google, Azure, Gemini, OpenAI, MiniMax) przez `ModelProvider`. Chunker, streaming zdanie-po-zdaniu, dostawca znaczników słów, cache fraz stałych, łańcuch fallback per agentka (PLAN §6.2, §6.3, §6.6–6.7).
@@ -6,22 +6,22 @@ Synteza mowy jako osobny proces: lokalnie na baseline Pocket TTS + model PL spo�
 ## Fala i priorytet
 F0: spike (e) tabela kandydatów; F2: moduł z głosami v0 (≥ 2 bazowe mówczynie + wysokość/tempo, bez kluczy); casting właściwy po kluczu. P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (Rust, `voice-tts-contract`)
 ```rust
-// voice-tts-contract — SZKIC
-pub struct VoiceRef { pub persona: PersonaId, pub engine: TtsEngine /* Pocket | Piper | Chatterbox | Xtts | Cloud(AccountId, VoiceId) */,
-                      pub preset: VoicePreset /* v0: base_speaker, pitch, rate */, pub reference: Option<PathBuf> /* klon po castingu */ }
-pub struct TtsChunk { pub audio: Frame, pub word_marks: Vec<WordMark { word_idx, t_start, t_end }>, pub marks_kind: MarksKind /* Native | ForcedAlign | Estimated */ }
-pub struct TtsRequest { pub text: String /* po normalizatorze PL, ze znacznikami stylu */, pub voice: VoiceRef, pub style: StyleTags, pub utterance: UtteranceId }
-pub trait Tts: Send + Sync {
+pub struct VoiceRef { pub persona: PersonaId, pub engine: TtsEngine /* Pocket | Piper | Chatterbox | Xtts | Cloud { provider, account, voice } */,
+                      pub preset: VoicePreset { base_speaker, pitch, rate }, pub reference: Option<PathBuf> }
+pub struct TtsRequest { pub utterance: u64, pub persona: PersonaId, pub text: String, pub style: SpeechStyle, pub cacheable: bool, pub privacy: PrivacyTag }
+pub struct TtsChunk { pub utterance: u64, pub seq: u32, pub audio: Frame /* 24 kHz */, pub marks: Vec<WordMark { word_idx, word, start_ms, end_ms }>,
+                      pub marks_kind: MarksKind /* Native | ForcedAlign | Estimated */, pub is_last: bool, pub engine: String }
+#[async_trait] pub trait Tts: Send + Sync {
     fn voices(&self) -> Vec<VoiceInfo>;
-    fn synth(&self, req: TtsRequest, cancel: CancelToken) -> BoxStream<TtsChunk>;      // streaming
-    fn stop(&self, utterance: UtteranceId);                                           // ≤ 20 ms
-    fn warm(&self, voice: &VoiceRef) -> Result<()>;                                    // preload + cache fraz
-    fn health(&self) -> Health;
+    async fn synth(&self, req: TtsRequest, cancel: CancelToken) -> Result<TtsStream /* mpsc::Receiver<Result<TtsChunk, TtsError>> */, TtsError>;
+    fn stop(&self, utterance: u64);  async fn warm(&self, persona: &PersonaId) -> Result<(), TtsError>;
+    fn health(&self) -> TtsHealth;  fn take_events(&self) -> Vec<TtsEvent>;
 }
+// Wspólne: split_sentences (chunker PL), estimate_marks, v0_chains, validate_chains (odrębność brzmień).
 ```
-Zdarzenia: `tts.started` (TTFB), `tts.chunk` (Diagnostics), `tts.finished`, `tts.stopped`, `tts.fallback` (silnik zapasowy, per agentka), `tts.cloud.sent`.
+Zdarzenia: `voice.tts.started` (TTFB), `voice.tts.chunk` (Diagnostyka), `voice.tts.finished`, `voice.tts.stopped`, `voice.tts.fallback` (silnik zapasowy, per agentka), `voice.tts.cloud.sent`.
 
 ## Zależności
 `core-bus/config/log-contract`, `voice-audio-contract` (odtwarzanie, referencja AEC), `voice-persona-contract` (biblia głosu, normalizator, styl→silnik), `model-residency-contract`, `providers-api-contract` (chmura), `device-profile-contract`. Zewnętrzne: Pocket TTS (CC-BY-4.0), Piper, whisper.cpp/aligner dla forced alignment (`docs/vendor/`).
@@ -38,7 +38,7 @@ Zdarzenia: `tts.started` (TTFB), `tts.chunk` (Diagnostics), `tts.finished`, `tts
 `net.egress(host)` dla silników chmurowych; brak dla lokalnych.
 
 ## Izolacja
-`process` (JSON-RPC po pipe), `on-demand` z `idle_unload`; 24–48 kHz wyjście.
+`process` (Pocket: JSON-lines po stdio; Piper: proces na zdanie), `on-demand` z `idle_unload`; 24–48 kHz wyjście.
 
 ## Budżet zasobów
 Baseline: Pocket-PL na CPU RTF ≈ 0,21 przy 6 rdzeniach (pomiar spike h), TTFB 200–500 ms lokalnie, 75–300 ms chmura (§6.4); RAM 0,5–1,5 GB; cache fraz ≤ 50 MB na dysku.
@@ -61,3 +61,9 @@ Napisy z podświetleniem wypowiedzianych słów, „przeczytaj na głos" (głose
 ## Otwarte pytania
 - Wybór modelu PL dla Pocket TTS i licencje głosów v0 (Pocket/Piper) — ADR (11).
 - Forced alignment: własny (whisper.cpp) czy aligner z silnika — do ustalenia w SPEC v1.
+
+## Decyzje v0 (F2)
+- Pocket TTS PL: trwały sidecar z protokołem JSON-lines po stdio (opis w `crates/voice-tts-impl/README.md`); Piper: proces na zdanie (`--output_raw`).
+- Głosy v0: mówczynie `pl-f1`/`pl-f2` (Pocket) × wysokość/tempo (Alfa 1,00/1,00, Beta 1,06/0,97, Gama 0,92/0,92, Delta 1,12/1,08); zapas Piper `pl_PL-gosia-medium` z odpowiadającą wysokością. Modyfikacja: WSOLA + resampling (błąd F0 i długości < 0,01% w testach, próg ±3%). Nazwy głosów i licencje — casting (ADR 11).
+- Fallback per zdanie (łańcuch idzie dalej, nie wraca w obrębie wypowiedzi); w sesji prywatnej ogniwa chmurowe pomijane.
+- Znaczniki: natywne z silnika (przeskalowane o tempo presetu) albo estymata z długości słów (`Estimated`); forced alignment — SPEC v1.

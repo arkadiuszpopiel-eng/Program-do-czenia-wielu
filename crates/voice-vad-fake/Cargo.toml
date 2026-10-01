@@ -1,0 +1,21 @@
+[package]
+name = "voice-vad-fake"
+description = "Atrapa voice-vad: deterministyczny VAD energetyczny albo zdarzenia ze skryptu adnotacji (wirtualny czas ramek)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-vad-contract = { path = "../voice-vad-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+
+[dev-dependencies]
+voice-vad-contract = { path = "../voice-vad-contract", features = ["contract-tests"] }
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-dsp-fake = { path = "../voice-dsp-fake" }
+
+[lints]
+workspace = true

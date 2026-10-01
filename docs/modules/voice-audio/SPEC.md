@@ -1,4 +1,4 @@
-# voice-audio — SPEC (szkic v0)
+# voice-audio — SPEC (v0, zaimplementowany w F2)
 
 ## Cel
 Wejście/wyjście audio na WASAPI (crate `wasapi`): wybór urządzeń, hot-plug, wątek RT, mikser wyjścia z duckingiem, normalizacja głośności, routing per agentka, loopback jako referencja awaryjna dla AEC, earcony; autokalibracja opóźnienia pętli (PLAN §6.2, §6.8, §1.2).
@@ -6,26 +6,26 @@ Wejście/wyjście audio na WASAPI (crate `wasapi`): wybór urządzeń, hot-plug,
 ## Fala i priorytet
 F0: spike (a) pętla głosowa; F2: moduł. P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (Rust, `voice-audio-contract`)
 ```rust
-// voice-audio-contract — SZKIC
-pub struct AudioDevice { pub id: DeviceId, pub name: String, pub kind: DeviceKind /* Input | Output */, pub default: bool, pub bluetooth: bool }
-pub struct Frame { pub pcm: Arc<[f32]>, pub sample_rate: u32, pub channels: u8, pub ts_device: Instant }   // 10–20 ms
+pub struct Frame { pub pcm: Arc<[f32]>, pub format: AudioFormat /* 8–48 kHz, 1–2 kan. */, pub ts: MediaTime /* ns zegara urządzenia */ }
+pub enum SourceId { Tts(PersonaId), Filler(PersonaId), Earcon }      // routing per agentka; tor głosu / efektów
 pub trait AudioIo: Send + Sync {
-    fn devices(&self) -> Vec<AudioDevice>;
-    fn open_input(&self, dev: Option<DeviceId>, cfg: StreamCfg) -> Result<InputStream>;    // SPSC bez alokacji w callbacku
-    fn open_output(&self, dev: Option<DeviceId>, cfg: StreamCfg) -> Result<OutputHandle>;
-    fn play(&self, src: SourceId /* Tts(PersonaId) | Earcon | Filler */, chunk: Frame) -> Result<()>;
-    fn duck(&self, db: f32, attack: Duration) -> Result<()>;      // −15 dB, < 50 ms
-    fn stop_all(&self) -> Result<()>;                              // twardy stop < 20 ms
-    fn latency(&self) -> LoopLatency;                              // GetStreamLatency + kalibracja
-    fn loopback(&self) -> Result<InputStream>;                     // referencja awaryjna AEC
+    fn devices(&self) -> Result<Vec<AudioDevice>, AudioError>;
+    fn poll_device_events(&self) -> Vec<DeviceEvent>;                   // hot-plug, domyślne
+    fn open_input(&self, dev: Option<&DeviceId>, cfg: &StreamConfig) -> Result<Box<dyn InputStream>, AudioError>;
+    fn open_output(&self, dev: Option<&DeviceId>, cfg: &StreamConfig) -> Result<Box<dyn OutputStream>, AudioError>;
+    fn open_loopback(&self, dev: Option<&DeviceId>, cfg: &StreamConfig) -> Result<Box<dyn InputStream>, AudioError>;
 }
+pub trait OutputStream: Send {   // play/end_utterance, duck/unduck, stop_all (wygaszenie 5 ms), position → PlaybackPosition,
+                                 // poll_events, drain_reference (referencja AEC z czasem odtworzenia), latency, duck_gain
+}
+// Wspólna logika RT w kontrakcie: mixer::mixer() → (MixerControl, MixerRender), capture_ring(), MixerOutput, Resampler.
 ```
-Zdarzenia: `audio.device.changed` (hot-plug, domyślne), `audio.stream.started/stopped`, `audio.underrun`, `audio.exclusive_conflict`, `audio.ducked`, `audio.latency.calibrated`.
+Zdarzenia: `voice.audio.device.changed` (hot-plug, domyślne), `voice.audio.stream.started/stopped`, `voice.audio.underrun`, `voice.audio.exclusive_conflict`, `voice.audio.ducked/unducked`, `voice.audio.latency.calibrated`, `voice.audio.playback.started/finished`, `voice.audio.bluetooth_warning`.
 
 ## Zależności
-`core-bus/config/log-contract`, `platform-windows-contract` (urządzenia, sesja), `device-profile-contract` (nakładka: urządzenia per maszyna), `scheduler-lite-contract` (zasób wyłączny `speaker`). Zewnętrzne: `wasapi` (`docs/vendor/wasapi.md`); `cpal` odrzucony (loopback).
+`core-bus/config/log-contract`, `platform-windows-contract` (urządzenia, sesja), `device-profile-contract` (nakładka: urządzenia per maszyna), `scheduler-lite-contract` (zasób wyłączny `speaker`). Zewnętrzne: `wasapi` 0.24 (`docs/vendor/wasapi.md`; `windows` 0.62 — ta sama wersja co `platform-windows-impl`), `rtrb` 0.4 (SPSC); `cpal` odrzucony (loopback).
 
 ## Niezmienniki
 - W callbacku RT: zero alokacji, zero blokad, zero IPC/Wasm, zero logowania; komunikacja przez kolejki SPSC; zdarzenia publikowane spoza wątku RT.
@@ -62,3 +62,10 @@ Wybór urządzenia audio jednym kliknięciem (tryb głosowy), wskaźniki głośn
 ## Otwarte pytania
 - Tryb Communications vs własna referencja AEC (spike a) — ADR (11).
 - Loopback per-proces (Win10 20348+) jako zapas — do potwierdzenia na baseline Win11.
+
+## Decyzje v0 (F2)
+- Logika RT (mikser, kolejki SPSC `rtrb`, seqlock postępu) jest w `-contract` — `-impl` (WASAPI) i `-fake` renderują tym samym kodem; test licznika alokacji w `-impl` (0 alokacji na ścieżce RT).
+- Tor głosu przyjmuje nową wypowiedź dopiero po `end_utterance` poprzedniej (`AudioError::VoiceBusy`) — sekwencyjne przekazania bez luki dozwolone.
+- Opóźnienie wyjścia z `IAudioClock` (pozycja + QPC), bo `wasapi` nie wystawia `GetStreamLatency`; „usłyszany prefiks” = próbki wyrenderowane − opóźnienie wyjścia.
+- Kolejka toru głosu domyślnie 30 s (≈ 5,8 MB) — budżet RAM ≤ 10 MB.
+- MMCSS „Pro Audio” wymaga `avrt` (windows-rs) — do dodania w `platform-windows-impl` (jeden crate windows-rs).

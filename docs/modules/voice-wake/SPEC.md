@@ -1,4 +1,4 @@
-# voice-wake — SPEC (szkic v0)
+# voice-wake — SPEC (v0, zaimplementowany w F2)
 
 ## Cel
 Aktywacja słuchania i adresowanie: v0 — push-to-talk / przełącznik (hook `WH_KEYBOARD_LL` przez `platform-windows`) + adresowanie po imieniu z transkryptu („Delta, …"); v1 — opcjonalne słowa wywoławcze „Hej Alfa/Beta/Gama/Delta" (własny trening; openWakeWord tylko EN), tryb „zawsze słucham" z bramką właściciela, „nie przeszkadzać" (PLAN §6.2, §7.3, §16.2).
@@ -6,19 +6,22 @@ Aktywacja słuchania i adresowanie: v0 — push-to-talk / przełącznik (hook `W
 ## Fala i priorytet
 F2: v0 (PTT/toggle, imię z transkryptu). F5: v1 (wake words po spełnieniu FAR/FRR, bramka `voice-speaker`). P0 (v0).
 
-## Kontrakt (szkic Rust)
+## Kontrakt (Rust, `voice-wake-contract`)
 ```rust
-// voice-wake-contract — SZKIC
-pub enum WakeMode { PushToTalk { key: Hotkey }, Toggle { key: Hotkey }, WakeWord { phrases: Vec<PersonaId> } /* v1 */, AlwaysOn { owner_gate: bool } /* v1 */ }
-pub enum WakeEvent { ListenStart { addressed: Option<PersonaId>, source: WakeSource /* Ptt | Toggle | WakeWord | Name | Ui */ }, ListenStop, AddressedTo(PersonaId), Dnd(bool) }
-pub trait Wake: Send + Sync {
-    fn set_mode(&self, m: WakeMode) -> Result<()>;
-    fn events(&self) -> Subscription<WakeEvent>;
-    fn addressed(&self, t: &Transcript) -> Option<PersonaId>;    // „Delta, …” / „Hej Gama”
-    fn push_audio(&self, frame: &Processed) -> Option<WakeEvent>; // v1 KWS
+pub struct WakeCfg { pub ptt_key: Option<Hotkey> /* Ctrl+Shift+Space */, pub toggle_key: Option<Hotkey> /* Ctrl+Shift+M */,
+                     pub name_addressing: bool, pub wake_words: Option<WakeWordCfg> /* v1 (F5) — w v0 odrzucane */ }
+pub enum WakeInput { Key { id, pressed }, UiPtt { pressed }, UiToggle, Vad { speech }, Processing { busy }, Transcript { text },
+                     SetMuted { muted }, SetDnd { on }, ElevatedForeground { elevated } }
+pub enum WakeEvent { ListenStart { addressed, source }, ListenStop { source }, Addressed { persona, by_name }, BlockedElevatedForeground,
+                     Dnd { on }, MicState { state: MicState /* Off | Listening | Hearing | Processing | Muted */ } }
+pub trait Wake: Send {
+    fn configure(&mut self, cfg: WakeCfg) -> Result<(), WakeError>;  fn pump(&mut self) -> Vec<WakeEvent>;   // skróty z HotkeyPort
+    fn handle(&mut self, input: WakeInput) -> Vec<WakeEvent>;  fn addressed(&self, text: &str) -> Option<PersonaId>;
+    fn mic_state(&self) -> MicState;  fn is_listening(&self) -> bool;
 }
+// Wspólne: WakeMachine (deterministyczny automat; adresowanie przez personas-contract::resolve_addressee).
 ```
-Zdarzenia: `wake.listen_start/stop`, `wake.addressed`, `wake.blocked_elevated_foreground` (okno admina — hook nie działa), `wake.false_alarm_suspected` (v1), `wake.dnd`.
+Zdarzenia: `voice.wake.listen_start/stop`, `voice.wake.addressed`, `voice.wake.blocked_elevated_foreground` (okno admina — hook nie działa), `voice.wake.false_alarm_suspected` (v1), `voice.wake.dnd`, `voice.wake.mic_state`.
 
 ## Zależności
 `core-bus/config/log-contract`, `platform-windows-contract` (hook PTT, skróty), `voice-stt-contract` (imiona z transkryptu), `personas-contract` (imiona, frazy), `voice-dialog-contract`, `voice-speaker-contract` (F5), `device-profile-contract`/`shell-integration-contract` (DND).
@@ -56,3 +59,8 @@ Przycisk mikrofonu i stany (wyłączony/słucha/…), przytrzymanie Spacji = mó
 
 ## Otwarte pytania
 - Trening KWS „Hej …" (dane syntetyczne + korpus) — spike (h); frazy 3–4-sylabowe (ryzyko krótkich imion).
+
+## Decyzje v0 (F2)
+- Globalny PTT domyślnie `Ctrl+Shift+Space` (reguła `Hotkey::validate` wymaga modyfikatora); Spacja bez modyfikatora — tylko w oknie aplikacji (`WakeInput::UiPtt`).
+- Mikrofon jako zasób wyłączny `scheduler-lite` na czas słuchania (`MicArbiter`: `Holder::User`, `Priority::UserSpeech`).
+- Wyciszenie blokuje PTT; DND nie (SPEC). Niepoprawna konfiguracja nie zmienia zarejestrowanych skrótów.

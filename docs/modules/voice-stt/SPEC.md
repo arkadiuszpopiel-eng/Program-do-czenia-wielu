@@ -1,4 +1,4 @@
-# voice-stt — SPEC (szkic v0)
+# voice-stt — SPEC (v0, zaimplementowany w F2)
 
 ## Cel
 Rozpoznawanie mowy jako osobny proces: whisper.cpp (large-v3-turbo Q5_0 z bramką VAD; Vulkan/CUDA/CPU; fallback small Q5 / CPU), Parakeet v3 (ONNX) jako opcja, chmura (ElevenLabs Scribe v2 RT, Soniox, gpt-4o-transcribe, Qwen3-ASR) przez `ModelProvider`; tryb dwuprzebiegowy (szybki partial + dokładny final), biasing/hotwords, auto PL/EN, pewność per słowo (PLAN §6.2, §6.3, §1.2).
@@ -6,25 +6,24 @@ Rozpoznawanie mowy jako osobny proces: whisper.cpp (large-v3-turbo Q5_0 z bramk�
 ## Fala i priorytet
 F0: spike (a)(h) pomiary; F2: moduł (lokalny + chmura po kluczu). P0.
 
-## Kontrakt (szkic Rust)
+## Kontrakt (Rust, `voice-stt-contract`)
 ```rust
-// voice-stt-contract — SZKIC
-pub struct SttCfg { pub engine: SttEngine /* WhisperCpp { model, backend } | Parakeet | Cloud(AccountId, ModelId) */, pub langs: Vec<Lang> /* pl, en, auto */,
-                    pub hotwords: Vec<String>, pub two_pass: bool, pub privacy: PrivacyTag }
-pub struct Transcript { pub text: String, pub words: Vec<Word { text, start, end, confidence }>, pub lang: Lang, pub is_final: bool, pub confidence: f32, pub latency: Duration }
-pub trait Stt: Send + Sync {
-    fn configure(&self, cfg: SttCfg) -> Result<()>;
-    fn start_utterance(&self, id: UtteranceId) -> Result<()>;
-    fn push(&self, id: UtteranceId, frame: &Frame) -> Result<()>;                    // 16 kHz mono po DSP, tylko gdy VAD = mowa
-    fn end_utterance(&self, id: UtteranceId) -> BoxStream<Transcript>;               // partial…final
-    fn cancel(&self, id: UtteranceId);
-    fn health(&self) -> Health;
+pub struct SttCfg { pub engine: SttEngine /* WhisperCpp { model, backend } | Parakeet | Cloud { provider, account, model } */,
+                    pub language: LangMode /* auto | pl | en */, pub hotwords: Vec<String>, pub two_pass: TwoPass, pub privacy: PrivacyTag, pub min_speech_ms: u32 }
+pub struct Transcript { pub utterance: UtteranceId, pub text: String, pub words: Vec<Word { text, start_ms, end_ms, confidence }>, pub lang: String,
+                        pub is_final: bool, pub confidence: f32, pub latency_ms: u32, pub backend: Option<Backend> }
+#[async_trait] pub trait Stt: Send + Sync {
+    async fn configure(&self, cfg: SttCfg) -> Result<(), SttError>;          // prywatność sprawdzana przed ruchem sieciowym
+    async fn start_utterance(&self, id: UtteranceId) -> Result<(), SttError>;
+    async fn push(&self, id: UtteranceId, frame: &Frame) -> Result<Option<Transcript>, SttError>;   // partial co partial_every_ms
+    async fn end_utterance(&self, id: UtteranceId) -> Result<Transcript, SttError>;                 // final (pusty, gdy bramka VAD)
+    async fn cancel(&self, id: UtteranceId);  fn health(&self) -> Health;  fn take_events(&self) -> Vec<SttEvent>;
 }
 ```
-Zdarzenia: `stt.partial`, `stt.final` (WER-metryki w strumieniu Voice), `stt.backend.fallback` (Vulkan → CPU), `stt.model.loaded/unloaded`, `stt.cloud.sent` (audio poszło do chmury — ekran „co poszło do chmury").
+Zdarzenia: `voice.stt.partial`, `voice.stt.final`, `voice.stt.backend.fallback` (Vulkan/CUDA → CPU), `voice.stt.model.loaded/unloaded`, `voice.stt.cloud.sent` (ekran „co poszło do chmury”), `voice.stt.gate_rejected`.
 
 ## Zależności
-`core-bus/config/log-contract`, `voice-dsp-contract`, `voice-vad-contract`, `model-residency-contract` (VRAM 1–2,5 GB), `providers-api-contract` (chmura), `device-profile-contract` (backend), `platform-windows-contract` (sidecar). Zewnętrzne: whisper.cpp ≥ 1.8.1 przypięte (`docs/vendor/whisper-cpp.md`), sherpa-onnx.
+`core-bus/config/log-contract`, `voice-dsp-contract`, `voice-vad-contract`, `model-residency-contract` (VRAM 1–2,5 GB), `providers-contract` (tag prywatności; chmura), `device-profile-contract` (backend), `platform-windows-contract` (sidecar). Zewnętrzne: whisper.cpp ≥ 1.8.1 przypięte (`whisper-server`, `docs/vendor/whisper-cpp.md`), `reqwest` 0.12 (HTTP 127.0.0.1); sherpa-onnx (Parakeet) — kandydat.
 
 ## Niezmienniki
 - Lokalny STT to osobny proces (crash nie zabija aplikacji; automatyczny fallback backendu, ograniczona liczba prób).
@@ -38,7 +37,7 @@ Zdarzenia: `stt.partial`, `stt.final` (WER-metryki w strumieniu Voice), `stt.bac
 `net.egress(host)` dla silników chmurowych (per konto); brak dla lokalnych.
 
 ## Izolacja
-`process` (JSON-RPC po pipe; Job Object), `on-demand` z `idle_unload`; rezydencja przez `model-residency`.
+`process` (HTTP na 127.0.0.1 — `whisper-server`; Job Object przez `ProcessPort` przy integracji), `on-demand` z `idle_unload`; rezydencja przez `model-residency`.
 
 ## Budżet zasobów
 Baseline: turbo Q5_0 (547 MiB) w VRAM 1–2,5 GB; finalizacja 150–300 ms lokalnie (§6.4); RAM sidecara ≤ 1,5 GB; CPU-fallback: small Q5 (czasy best effort).
@@ -61,3 +60,9 @@ Napisy na żywo (szary partial → pełny final), dyktowanie do czatu z podgląd
 ## Otwarte pytania
 - Parakeet v3 jako szybki partial (CPU) + whisper jako final — czy warto na baseline; Voice Lab F2.
 - Protokół sidecara wspólny z `providers-local` — do ustalenia w SPEC v1.
+
+## Decyzje v0 (F2)
+- Sidecar = `whisper-server` (HTTP na 127.0.0.1, losowy port; `/health`, `/inference` z `verbose_json`) zamiast JSON-RPC po pipe — gotowy protokół whisper.cpp; proces bez okna, zabijany przy porzuceniu.
+- Partiale z polityki dwóch przebiegów (`push` co 1 s audio, wiązka 1) zamiast strumienia z `end_utterance`; final z wiązką 5.
+- Fallback: awaria procesu GPU (wyjście, zerwane połączenie, `ErrorDeviceLost` w stderr) → backend oznaczony, restart na CPU (`-ng`), wypowiedź ponowiona z bufora.
+- Chmura: typy i konfiguracja; adapter w kolejnej fali (`NotAvailable`), sesja prywatna → `PrivacyBlocked`.

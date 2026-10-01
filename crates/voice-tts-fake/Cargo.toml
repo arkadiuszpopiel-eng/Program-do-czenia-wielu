@@ -1,0 +1,22 @@
+[package]
+name = "voice-tts-fake"
+description = "Atrapa voice-tts: mowa syntetyczna zdanie po zdaniu z deterministycznymi znacznikami słów, wirtualne TTFB, awarie silników i fallback"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-tts-contract = { path = "../voice-tts-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+personas-contract = { path = "../personas-contract" }
+async-trait.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+voice-tts-contract = { path = "../voice-tts-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

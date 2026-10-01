@@ -1,0 +1,28 @@
+[package]
+name = "voice-wake-impl"
+description = "Implementacja voice-wake v0: PTT/przełącznik przez HotkeyPort (WH_KEYBOARD_LL), okno administratora, mikrofon jako zasób scheduler-lite, zdarzenia voice.wake.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-wake-contract = { path = "../voice-wake-contract" }
+personas-contract = { path = "../personas-contract" }
+platform-contract.workspace = true
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+voice-wake-contract = { path = "../voice-wake-contract", features = ["contract-tests"] }
+platform-fake = { path = "../platform-fake" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio.workspace = true
+
+[lints]
+workspace = true
