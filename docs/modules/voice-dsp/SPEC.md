@@ -64,3 +64,6 @@ Ustawienia → Głos → Urządzenia (kalibracja, wskaźnik echa/szumu), diagnos
 - Przetwarzanie 48 kHz w blokach 10 ms (wymóg RNNoise), wyjście 16 kHz; opóźnienie dodane ≈ 9 ms (AEC3).
 - `process` może alokować (AEC3) — dlatego DSP działa w wątku przetwarzania tuż za kolejką SPSC, nie w callbacku urządzenia.
 - DeepFilterNet3 w v0: zastępczo RNNoise + `voice.dsp.mode.fallback`.
+
+## Zmiany F5 (addytywne)
+- `voice_dsp_contract::fbank` — log-mel Kaldi (okno Poveya 25/10 ms, preemfaza 0,97, skala int16, FFT 512, `n_mels` 8–128, CMN): `Fbank::compute`, strumieniowe `FbankStream`. Wejście modeli KWS (`voice-wake` v1, rodzaj `log_mel`) i embeddingu mówcy (`voice-speaker`). Parametry jak domyślne `kaldi-native-fbank` (sherpa-onnx/WeSpeaker); testy: FFT vs DFT naiwna, pik tonu we właściwym paśmie, strumień = wsad, CMN. Zgodność numeryczna z referencją Kaldi — do potwierdzenia testem z prawdziwym modelem (`#[ignore]`, README `voice-speaker-impl`).

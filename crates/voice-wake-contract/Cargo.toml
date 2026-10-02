@@ -1,6 +1,6 @@
 [package]
 name = "voice-wake-contract"
-description = "Aktywacja słuchania v0: kontrakt — PTT/przełącznik (HotkeyPort, WH_KEYBOARD_LL), adresowanie po imieniu, DND, stan mikrofonu; typy słów wywoławczych v1"
+description = "Aktywacja słuchania: kontrakt — PTT/przełącznik (HotkeyPort, WH_KEYBOARD_LL), adresowanie po imieniu, DND, stan mikrofonu; v1: słowa wywoławcze (nasłuch z buforem 2 s, detektor z histerezą, FAR/FRR)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -18,10 +18,14 @@ core-bus-contract.workspace = true
 platform-contract.workspace = true
 personas-contract = { path = "../personas-contract" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+voice-vad-contract = { path = "../voice-vad-contract" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 schemars.workspace = true
+
+[dev-dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
 
 [lints]
 workspace = true

@@ -21,9 +21,11 @@ impl Pipeline {
                 PipelineInput::Toggle => self.wake_input(WakeInput::UiToggle),
                 PipelineInput::SetMuted { muted } => {
                     self.wake_input(WakeInput::SetMuted { muted });
+                    self.wake_words_flags(Some(muted), None);
                 }
                 PipelineInput::SetDoNotDisturb { on } => {
                     self.wake_input(WakeInput::SetDnd { on });
+                    self.wake_words_flags(None, Some(on));
                     self.dialog_event(DialogEvent::SetDoNotDisturb { enabled: on });
                 }
                 PipelineInput::Typed { text } => self.dialog_event(DialogEvent::UserTyped { text }),
@@ -78,6 +80,9 @@ impl Pipeline {
                 _ => {}
             }
         }
+        if self.wake_words.is_some() {
+            self.sync_wake_suspension();
+        }
     }
 
     /// Zamyka słuchanie niezależnie od źródła (wyciszenie i odciszenie automatu aktywacji).
@@ -114,9 +119,12 @@ impl Pipeline {
         self.dialog_event(DialogEvent::Activate { source });
     }
 
-    /// Zamyka strumień mikrofonu; trwająca wypowiedź kończy się od razu (puszczenie PTT).
+    /// Zamyka strumień mikrofonu (przy uzbrojonych słowach wywoławczych zostaje otwarty dla
+    /// nasłuchu); trwająca wypowiedź kończy się od razu (puszczenie PTT).
     fn close_mic(&mut self) {
-        self.mic = None;
+        if self.wake_words.is_none() {
+            self.mic = None;
+        }
         self.vad.reset();
         let speaking = self
             .st

@@ -129,6 +129,7 @@ pub(crate) struct State {
     pub last_activity_ms: u64,
     pub step_commands: u32,
     pub step_frames: u32,
+    pub voice_meta: Option<crate::speakerlink::VoiceMeta>,
 }
 
 /// Potok głosu (implementacja `VoicePipeline`).
@@ -153,6 +154,8 @@ pub struct Pipeline {
     pub(crate) residency: ResidencyPin,
     pub(crate) outbox: Outbox,
     pub(crate) echo: EchoGate,
+    pub(crate) wake_words: Option<crate::wakeword::Armed>,
+    pub(crate) speaker_link: Option<crate::speakerlink::SpeakerLink>,
     pub(crate) st: State,
 }
 
@@ -207,6 +210,7 @@ impl Pipeline {
             last_activity_ms: now_ms,
             step_commands: 0,
             step_frames: 0,
+            voice_meta: None,
         };
         Ok(Self {
             echo: EchoGate::new(cfg.echo),
@@ -228,6 +232,8 @@ impl Pipeline {
             persona: parts.persona,
             tts: parts.tts,
             replies: parts.reply,
+            wake_words: None,
+            speaker_link: None,
             cfg,
             st,
         })

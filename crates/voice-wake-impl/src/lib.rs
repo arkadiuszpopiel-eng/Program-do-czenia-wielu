@@ -1,9 +1,15 @@
-//! Implementacja `voice-wake` v0 (docs/modules/voice-wake/SPEC.md): skróty przez `HotkeyPort`
+//! Implementacja `voice-wake` (docs/modules/voice-wake/SPEC.md). v0: skróty przez `HotkeyPort`
 //! (`platform-windows-impl`: `RegisterHotKey` + hook `WH_KEYBOARD_LL` zgłaszający puszczenie PTT),
 //! wykrywanie okna administratora na pierwszym planie (`ProcessPort::foreground_is_elevated`),
 //! mikrofon jako zasób wyłączny w `scheduler-lite` ([`MicArbiter`]), zdarzenia na magistralę.
+//! v1 (F5): modele słów wywoławczych przez `tract-onnx` ([`kws`]: manifest z SHA-256, klasyfikator
+//! log-mel albo potok openWakeWord) dla nasłuchu z kontraktu (`WakeWordListener`) i runner FAR/FRR
+//! ([`eval`], bin `alfa-wake-eval`).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
+
+pub mod eval;
+pub mod kws;
 
 use std::sync::Arc;
 
@@ -15,7 +21,9 @@ use core_registry_contract::{
 use personas_contract::{Cast, Persona, PersonaId};
 use platform_contract::{HotkeyId, HotkeyPort, ProcessPort};
 pub use voice_wake_contract::MicArbiter;
-use voice_wake_contract::{MicState, Wake, WakeCfg, WakeError, WakeEvent, WakeInput, WakeMachine};
+use voice_wake_contract::{
+    KwsParams, MicState, Wake, WakeCfg, WakeError, WakeEvent, WakeInput, WakeMachine,
+};
 
 /// Treść `module.toml`.
 pub const MODULE_TOML: &str = include_str!("../module.toml");
@@ -26,6 +34,7 @@ pub struct WakeService {
     processes: Option<Arc<dyn ProcessPort>>,
     machine: WakeMachine,
     registered: Vec<HotkeyId>,
+    wake_timeout_ms: u64,
 }
 
 impl std::fmt::Debug for WakeService {
@@ -44,7 +53,13 @@ impl WakeService {
             processes: None,
             machine: WakeMachine::new(personas, cast),
             registered: Vec::new(),
+            wake_timeout_ms: KwsParams::default().listen_timeout_ms,
         }
+    }
+
+    /// v1: po ilu ms ciszy zamknąć sesję słowa wywoławczego (`KwsParams::listen_timeout_ms`).
+    pub fn set_wake_timeout_ms(&mut self, ms: u64) {
+        self.wake_timeout_ms = ms;
     }
 
     /// Sprawdzanie okna podniesionego przy każdym `pump`.
@@ -99,6 +114,8 @@ impl Wake for WakeService {
             Ok((ptt, toggle)) => {
                 self.machine.set_keys(ptt, toggle);
                 self.machine.set_name_addressing(cfg.name_addressing);
+                self.machine
+                    .set_wake_words(cfg.wake_words.is_some(), self.wake_timeout_ms);
                 Ok(())
             }
             Err(e) => {

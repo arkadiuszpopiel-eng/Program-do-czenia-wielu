@@ -10,3 +10,7 @@ Kontrakt DSP mikrofonu (docs/modules/voice-dsp/SPEC.md): trait `Dsp` (instancja 
 `reference_margin_ms` (wyprzedzenie referencji — przyczynowość AEC przy niedokładnych znacznikach).
 Wspólne: `NoiseFloorTracker`, `calibration_signal()` (chirp 300→3500 Hz). Zdarzenia `voice.dsp.*`
 (`calibrated`, `echo_high`, `noise.changed`, `mode.fallback`, `headphones`). Testy kontraktowe pod `contract-tests`.
+
+`fbank` (F5): cechy log-mel w stylu Kaldi (`FbankCfg::kaldi(n_mels)` — okno Poveya 25 ms / przesunięcie 10 ms,
+preemfaza 0,97, skala int16, FFT 512, opcjonalne CMN), `Fbank::compute` i strumieniowe `FbankStream` — wspólne wejście
+modeli `voice-wake-impl` (KWS `log_mel`) i `voice-speaker-impl` (embedding mówcy).

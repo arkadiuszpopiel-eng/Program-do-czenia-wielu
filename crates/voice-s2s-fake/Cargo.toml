@@ -1,0 +1,22 @@
+[package]
+name = "voice-s2s-fake"
+description = "Atrapa voice-s2s: skryptowany klient speech-to-speech (odpowiedzi strumieniowane po jednej porcji audio na poll, natywne obcięcie historii, raport wysłanego audio), bez sieci"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-s2s-contract = { path = "../voice-s2s-contract", features = ["contract-tests"] }
+voice-audio-contract = { path = "../voice-audio-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+async-trait.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+
+[lints]
+workspace = true

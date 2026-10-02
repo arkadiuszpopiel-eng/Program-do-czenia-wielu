@@ -25,7 +25,12 @@ impl Pipeline {
         self.on_wake_events(wake);
         self.poll_async(cx);
         self.process_output();
-        self.process_mic();
+        if self.wake_words.is_some() {
+            self.process_wake_words();
+        }
+        if !self.wake_idle() {
+            self.process_mic();
+        }
         self.timers();
         self.poll_async(cx);
         self.forward_module_events();
@@ -43,6 +48,7 @@ impl Pipeline {
         for out in self.stt.poll(cx) {
             self.on_stt_out(out);
         }
+        self.poll_speaker();
         self.poll_reply(cx);
         self.poll_jobs(cx);
     }
@@ -136,8 +142,9 @@ impl Pipeline {
     fn housekeeping(&mut self) {
         self.publish_latency();
         let phase = self.dialog.state().phase;
-        let active =
-            self.mic.is_some() || !matches!(phase, DialogPhase::Idle | DialogPhase::Listening);
+        // Sam nasłuch słów wywoławczych nie trzyma modeli STT/TTS w pamięci.
+        let active = (self.mic.is_some() && !self.wake_idle())
+            || !matches!(phase, DialogPhase::Idle | DialogPhase::Listening);
         self.residency.update(active, self.st.now_ms);
         let speaker = self.speaker_now();
         let due = self

@@ -58,3 +58,7 @@ Pigułka (kto mówi, poziom, transkrypt częściowy), stany mikrofonu, „przerw
 ## Otwarte pytania
 - Silero VAD i prawdziwy AEC (WebRTC APM) w runnerze F2 — dziś energia + whisper.cpp; pełny potok na sprzęcie mierzy Voice Lab.
 - Kolejność persona/LLM przy zmianie agentki w trakcie generowania (dziś: następna tura).
+
+## Zmiany F5 (addytywne)
+- **Słowa wywoławcze** (`voice-wake` v1): `Pipeline::arm_wake_words(WakeWordListener)` / `disarm_wake_words` / `wake_listener_stats`. Po uzbrojeniu mikrofon jest otwarty, ale przed wykryciem ramki (po DSP/AEC) trafiają **tylko** do nasłuchu — 0 zdarzeń VAD/STT/transkrypcji i 0 audio na magistrali (test `e2e_wake`). Wykrycie → `WakeInput::WakeWord` → słuchanie z adresatką; koniec sesji → z powrotem nasłuch; wyciszenie/DND wstrzymują nasłuch i czyszczą bufor.
+- **Weryfikacja mówcy** (`voice-speaker`): `Pipeline::set_speaker_verifier(Arc<dyn SpeakerVerifier>)`. Audio finalnej wypowiedzi idzie do weryfikacji poza krokiem; `ReplyRequest.voice: Option<VoiceProvenance { stt_confidence_permille, speaker: SpeakerCheck }>` startuje z `Pending` (albo wynikiem), wynik dochodzi przez `ReplySource::speaker_checked` (domyślnie no-op). `VoiceProvenance::command_origin()` → `CommandOrigin::UserVoice { confidence, speaker_verified }` dla `risk-classifier`/Brokera; bez wyniku/przy błędzie tura jest niezweryfikowana (reguła `VoiceUnverifiedRisky` → potwierdzenie nie-głosem). Test `e2e_speaker`.

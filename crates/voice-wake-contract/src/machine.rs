@@ -5,7 +5,16 @@
 use personas_contract::{Cast, Persona, PersonaId, parse_addressee, resolve_addressee};
 use platform_contract::HotkeyId;
 
-use crate::{MicState, WakeEvent, WakeInput, WakeSource};
+use crate::{MicState, WakeEvent, WakeIgnoreReason, WakeInput, WakeSource};
+
+/// Sesja otwarta słowem wywoławczym (v1): kończy się po `timeout_ms` bez aktywności.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct WakeSession {
+    persona: PersonaId,
+    phrase: String,
+    heard: bool,
+    last_activity_ms: u64,
+}
 
 /// Automat aktywacji słuchania.
 #[derive(Debug, Clone)]
@@ -24,6 +33,10 @@ pub struct WakeMachine {
     elevated: bool,
     mic: MicState,
     addressed: Option<PersonaId>,
+    wake_words: bool,
+    wake_timeout_ms: u64,
+    session: Option<WakeSession>,
+    now_ms: u64,
 }
 
 impl WakeMachine {
@@ -44,7 +57,23 @@ impl WakeMachine {
             elevated: false,
             mic: MicState::Off,
             addressed: None,
+            wake_words: false,
+            wake_timeout_ms: 6_000,
+            session: None,
+            now_ms: 0,
         }
+    }
+
+    /// Słowa wywoławcze (v1): czy wykrycia otwierają słuchanie i po ilu ms bez aktywności
+    /// sesja się zamyka. Domyślnie wyłączone — wykrycia są wtedy ignorowane.
+    pub fn set_wake_words(&mut self, enabled: bool, timeout_ms: u64) {
+        self.wake_words = enabled;
+        self.wake_timeout_ms = timeout_ms.max(1_000);
+    }
+
+    /// Czy słowa wywoławcze są włączone.
+    pub fn wake_words_enabled(&self) -> bool {
+        self.wake_words
     }
 
     /// Ustawia identyfikatory zarejestrowanych skrótów (PTT, przełącznik).
@@ -129,7 +158,72 @@ impl WakeMachine {
     fn stop(&mut self, out: &mut Vec<WakeEvent>) {
         if let Some(source) = self.listening.take() {
             self.hearing = false;
+            self.session = None;
             out.push(WakeEvent::ListenStop { source });
+        }
+    }
+
+    fn wake_word(
+        &mut self,
+        persona: PersonaId,
+        phrase: String,
+        at_ms: u64,
+        out: &mut Vec<WakeEvent>,
+    ) {
+        self.now_ms = self.now_ms.max(at_ms);
+        let reason = if !self.wake_words {
+            Some(WakeIgnoreReason::Disabled)
+        } else if self.muted {
+            Some(WakeIgnoreReason::Muted)
+        } else if self.dnd {
+            Some(WakeIgnoreReason::DoNotDisturb)
+        } else if self.listening.is_some() {
+            Some(WakeIgnoreReason::AlreadyListening)
+        } else {
+            None
+        };
+        if let Some(reason) = reason {
+            out.push(WakeEvent::WakeWordIgnored { persona, reason });
+            return;
+        }
+        self.listening = Some(WakeSource::WakeWord);
+        self.addressed = Some(persona.clone());
+        self.session = Some(WakeSession {
+            persona: persona.clone(),
+            phrase,
+            heard: false,
+            last_activity_ms: self.now_ms,
+        });
+        out.push(WakeEvent::ListenStart {
+            addressed: Some(persona.clone()),
+            source: WakeSource::WakeWord,
+        });
+        out.push(WakeEvent::Addressed {
+            persona,
+            by_name: true,
+        });
+    }
+
+    fn tick(&mut self, now_ms: u64, out: &mut Vec<WakeEvent>) {
+        self.now_ms = self.now_ms.max(now_ms);
+        let Some(s) = &self.session else {
+            return;
+        };
+        let idle = self.now_ms.saturating_sub(s.last_activity_ms) >= self.wake_timeout_ms;
+        if idle && !self.hearing && !self.processing {
+            let (persona, phrase, heard) = (s.persona.clone(), s.phrase.clone(), s.heard);
+            self.stop(out);
+            if !heard {
+                out.push(WakeEvent::FalseAlarmSuspected { persona, phrase });
+            }
+        }
+    }
+
+    fn touch_session(&mut self, speech: bool) {
+        let now = self.now_ms;
+        if let Some(s) = self.session.as_mut() {
+            s.last_activity_ms = now;
+            s.heard |= speech;
         }
     }
 
@@ -148,8 +242,18 @@ impl WakeMachine {
             WakeInput::UiToggle => self.toggle(WakeSource::Ui, &mut out),
             WakeInput::Vad { speech } => {
                 self.hearing = speech && self.listening.is_some();
+                self.touch_session(speech);
             }
-            WakeInput::Processing { busy } => self.processing = busy,
+            WakeInput::Processing { busy } => {
+                self.processing = busy;
+                self.touch_session(false);
+            }
+            WakeInput::WakeWord {
+                persona,
+                phrase,
+                at_ms,
+            } => self.wake_word(persona, phrase, at_ms, &mut out),
+            WakeInput::Tick { now_ms } => self.tick(now_ms, &mut out),
             WakeInput::Transcript { text } => {
                 if self.name_addressing {
                     let explicit = parse_addressee(&text, &self.personas);

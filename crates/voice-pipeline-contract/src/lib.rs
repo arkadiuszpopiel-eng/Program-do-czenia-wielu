@@ -37,7 +37,9 @@ pub use events::{
     SwitchSource, event_kind, event_schema,
 };
 pub use input::PipelineInput;
-pub use reply::{ReplyChunk, ReplyOutcome, ReplyRequest, ReplySource, ReplyStream};
+pub use reply::{
+    ReplyChunk, ReplyOutcome, ReplyRequest, ReplySource, ReplyStream, VoiceProvenance,
+};
 pub use status::{PipelineStatus, Speaker, TurnLatency};
 
 /// Wynik jednego kroku wątku przetwarzania.

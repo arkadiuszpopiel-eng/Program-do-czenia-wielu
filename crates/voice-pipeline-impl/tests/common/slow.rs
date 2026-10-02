@@ -144,6 +144,9 @@ pub struct SlowReply {
     pub inner: Arc<dyn ReplySource>,
     pub clock: FakeAudio,
     pub ttft_ms: AtomicU64,
+    /// Żądania (pochodzenie tury głosowej) i wyniki weryfikacji mówcy — do asercji testów.
+    pub requests: std::sync::Mutex<Vec<ReplyRequest>>,
+    pub checks: std::sync::Mutex<Vec<(u64, voice_speaker_contract::SpeakerCheck)>>,
 }
 
 struct DelayedStream {
@@ -164,6 +167,7 @@ impl Stream for DelayedStream {
 
 impl ReplySource for SlowReply {
     fn start(&self, request: ReplyRequest, cancel: CancellationToken) -> ReplyStream {
+        self.requests.lock().unwrap().push(request.clone());
         let gate = delay(&self.clock, self.ttft_ms.load(Ordering::SeqCst));
         Box::pin(DelayedStream {
             inner: self.inner.start(request, cancel),
@@ -172,5 +176,8 @@ impl ReplySource for SlowReply {
     }
     fn finish(&self, turn: u64, outcome: ReplyOutcome) {
         self.inner.finish(turn, outcome);
+    }
+    fn speaker_checked(&self, turn: u64, check: voice_speaker_contract::SpeakerCheck) {
+        self.checks.lock().unwrap().push((turn, check));
     }
 }

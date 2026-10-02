@@ -10,6 +10,7 @@
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
+pub mod fbank;
 mod noise;
 mod types;
 
@@ -19,6 +20,7 @@ use serde::{Deserialize, Serialize};
 use voice_audio_contract::Frame;
 use voice_audio_contract::synth::chirp;
 
+pub use fbank::{Fbank, FbankCfg, FbankStream, FbankWindow};
 pub use noise::NoiseFloorTracker;
 pub use types::{AecMode, Calibration, DspCfg, DspError, DspStats, NsMode, Processed, SILENCE_DB};
 

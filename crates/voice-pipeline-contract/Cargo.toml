@@ -20,6 +20,8 @@ providers-contract = { path = "../providers-contract" }
 voice-dialog-contract = { path = "../voice-dialog-contract" }
 voice-persona-contract = { path = "../voice-persona-contract" }
 voice-wake-contract = { path = "../voice-wake-contract" }
+voice-speaker-contract = { path = "../voice-speaker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

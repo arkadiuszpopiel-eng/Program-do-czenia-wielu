@@ -60,3 +60,32 @@ fn scripted_ptt_and_addressing_on_virtual_clock() {
     );
     assert!(w.configured().is_none());
 }
+
+#[test]
+fn scorers_drive_the_listener() {
+    use personas_contract::builtin_personas;
+    use voice_wake_contract::{KeywordScorer, KwsParams, WakeWordCfg, WakeWordListener};
+    use voice_wake_fake::{ScriptedScorer, ToneScorer};
+
+    let cfg = WakeWordCfg::from_personas(&builtin_personas(), 0.8);
+    let mut tone = ToneScorer::builtin();
+    let s = tone.push(&vec![0.0; 2_560]).unwrap();
+    assert_eq!(s.len(), 2);
+    assert_eq!(s[1].at_ms, 160);
+    assert_eq!(tone.fed_samples(), 2_560);
+    tone.reset();
+    let params = KwsParams {
+        vad_gate: false,
+        ..KwsParams::default()
+    };
+    let script = ScriptedScorer::new(
+        &["hej alfa", "hej beta"],
+        80,
+        vec![(400, 1, 0.9), (480, 1, 0.95)],
+    );
+    let mut l = WakeWordListener::new(&cfg, params, Box::new(script)).unwrap();
+    let t = l.push(&vec![0.0; 16_000]).unwrap().unwrap();
+    assert_eq!(t.hit.persona, PersonaId::beta());
+    assert_eq!(t.hit.at_ms, 480);
+    assert!(l.push(&vec![0.0; 16_000]).unwrap().is_none());
+}

@@ -1,6 +1,6 @@
 [package]
 name = "voice-wake-impl"
-description = "Implementacja voice-wake v0: PTT/przełącznik przez HotkeyPort (WH_KEYBOARD_LL), okno administratora, mikrofon jako zasób scheduler-lite, zdarzenia voice.wake.*"
+description = "Implementacja voice-wake: v0 PTT/przełącznik przez HotkeyPort (WH_KEYBOARD_LL), okno administratora, mikrofon w scheduler-lite; v1 modele słów wywoławczych przez tract-onnx i runner FAR/FRR"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -16,6 +16,18 @@ scheduler-lite-contract = { path = "../scheduler-lite-contract" }
 core-bus-contract.workspace = true
 core-registry-contract.workspace = true
 async-trait.workspace = true
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+# Inferencja ONNX w czystym Rust (jak voice-vad-impl; ADR 0004 — bez binariów ONNX Runtime).
+tract-onnx = "0.23.8"
+sha2 = "0.10.9"
+
+[[bin]]
+name = "alfa-wake-eval"
+path = "src/bin/alfa-wake-eval.rs"
 
 [dev-dependencies]
 voice-wake-contract = { path = "../voice-wake-contract", features = ["contract-tests"] }
@@ -23,6 +35,10 @@ platform-fake = { path = "../platform-fake" }
 scheduler-lite-fake = { path = "../scheduler-lite-fake" }
 core-bus-fake = { path = "../core-bus-fake" }
 tokio.workspace = true
+voice-wake-fake = { path = "../voice-wake-fake" }
+# Budowa małych grafów ONNX w testach (ta sama wersja co w tract-onnx).
+prost = "0.14.4"
+tempfile = "3.27.0"
 
 [lints]
 workspace = true

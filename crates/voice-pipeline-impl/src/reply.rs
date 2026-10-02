@@ -75,6 +75,11 @@ impl Pipeline {
         self.st.parked = None;
         let persona = self.st.active_persona.clone();
         let cancel = CancellationToken::new();
+        let voice = if source == TurnSource::Voice {
+            self.take_voice_provenance(turn)
+        } else {
+            None
+        };
         let stream = self.replies.start(
             ReplyRequest {
                 turn,
@@ -82,6 +87,7 @@ impl Pipeline {
                 text,
                 source,
                 intent,
+                voice,
             },
             cancel.clone(),
         );

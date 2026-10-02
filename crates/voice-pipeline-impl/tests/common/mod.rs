@@ -116,17 +116,26 @@ pub fn prompt(p: &PersonaId) -> Option<String> {
 
 impl World {
     pub fn new(opts: Opts) -> Self {
-        Self::build(opts, None)
+        Self::build(opts, None, FakeWake::new())
+    }
+
+    /// Świat z własną atrapą aktywacji (np. skonfigurowanymi słowami wywoławczymi).
+    pub fn with_wake(opts: Opts, wake: FakeWake) -> Self {
+        Self::build(opts, None, wake)
     }
 
     pub fn with_residency(
         opts: Opts,
         residency: Arc<dyn model_residency_contract::Residency>,
     ) -> Self {
-        Self::build(opts, Some(residency))
+        Self::build(opts, Some(residency), FakeWake::new())
     }
 
-    fn build(opts: Opts, residency: Option<Arc<dyn model_residency_contract::Residency>>) -> Self {
+    fn build(
+        opts: Opts,
+        residency: Option<Arc<dyn model_residency_contract::Residency>>,
+        wake: FakeWake,
+    ) -> Self {
         let audio = FakeAudio::new();
         audio.set_echo(opts.echo.clone());
         let stt = Arc::new(FakeStt::new());
@@ -145,6 +154,8 @@ impl World {
             inner: reply.clone(),
             clock: audio.clone(),
             ttft_ms: std::sync::atomic::AtomicU64::new(opts.ttft_ms),
+            requests: Mutex::default(),
+            checks: Mutex::default(),
         });
         let sched = Arc::new(FakeScheduler::new());
         let bus = FakeBus::default();
@@ -164,7 +175,6 @@ impl World {
             })
             .unwrap();
         *turn.0.lock().unwrap() = detector;
-        let wake = FakeWake::new();
         let keys = wake.keys();
         let output = audio
             .open_output(None, &StreamConfig::output_default())
@@ -302,8 +312,10 @@ impl World {
     pub fn check_invariants(&self) {
         let s = self.p.status();
         let listening = matches!(s.mic, MicState::Listening | MicState::Hearing);
-        assert_eq!(
-            s.mic_open, listening,
+        // Uzbrojone słowa wywoławcze: strumień otwarty także bez słuchania (sam nasłuch).
+        let armed = self.p.wake_words_armed();
+        assert!(
+            s.mic_open == listening || (armed && s.mic_open),
             "strumień mikrofonu = stan słuchania: {s:?}"
         );
         assert_eq!(
@@ -314,8 +326,8 @@ impl World {
         let mic_holder = self.sched.holder(&Resource::Mic).map(|l| l.holder);
         assert_eq!(
             mic_holder.is_some(),
-            s.mic_open,
-            "dzierżawa mikrofonu = strumień"
+            listening,
+            "dzierżawa mikrofonu = słuchanie"
         );
         if let Some(h) = mic_holder {
             assert_eq!(h, Holder::User);

@@ -291,6 +291,12 @@ impl Pipeline {
             }
         }
         self.on_wake_events(events);
+        let audio: Vec<f32> = u
+            .frames
+            .iter()
+            .flat_map(|f| f.pcm.iter().copied())
+            .collect();
+        self.note_voice_final(audio, t.confidence);
         self.st.pending_latency = Some(voice_pipeline_contract::TurnLatency {
             speech_end_ms: u.speech_end_ms,
             end_of_turn_ms: u.eot_ms,

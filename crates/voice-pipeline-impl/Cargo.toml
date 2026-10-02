@@ -20,6 +20,7 @@ voice-dialog-contract = { path = "../voice-dialog-contract" }
 voice-persona-contract = { path = "../voice-persona-contract" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 voice-wake-contract = { path = "../voice-wake-contract" }
+voice-speaker-contract = { path = "../voice-speaker-contract" }
 personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
@@ -45,6 +46,8 @@ voice-cmd-fake = { path = "../voice-cmd-fake" }
 voice-persona-fake = { path = "../voice-persona-fake" }
 voice-tts-fake = { path = "../voice-tts-fake" }
 voice-wake-fake = { path = "../voice-wake-fake" }
+voice-speaker-fake = { path = "../voice-speaker-fake" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
 scheduler-lite-fake = { path = "../scheduler-lite-fake" }
 model-residency-fake = { path = "../model-residency-fake" }
 providers-fake = { path = "../providers-fake" }

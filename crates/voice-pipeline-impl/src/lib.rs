@@ -12,6 +12,10 @@
 //! `scheduler-lite`), [`EchoGate`] (reguła echa obok AEC), [`ProviderReply`] (odpowiedzi
 //! z `ModelProvider` + historia append-only), [`MonotonicClock`], [`eval`] (zestaw F2: manifest,
 //! WER PL, recall „stop/anuluj”, precision backchannelu, fałszywe przerwania/h, prefiks).
+//! Słowa wywoławcze (F5): [`Pipeline::arm_wake_words`] — przed wykryciem audio mikrofonu trafia
+//! wyłącznie do nasłuchu `voice-wake` (bufor ~2 s), nie do VAD/STT ani magistrali.
+//! Weryfikacja mówcy (F5): [`Pipeline::set_speaker_verifier`] — wynik w `ReplyRequest::voice`
+//! (pewność STT + `SpeakerCheck`) dla klasyfikatora ryzyka.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -28,10 +32,12 @@ mod provider_reply;
 mod reply;
 mod residency;
 mod speaker;
+mod speakerlink;
 mod speech;
 mod step;
 mod stt;
 mod user;
+mod wakeword;
 
 pub use clock::MonotonicClock;
 pub use echo::EchoGate;

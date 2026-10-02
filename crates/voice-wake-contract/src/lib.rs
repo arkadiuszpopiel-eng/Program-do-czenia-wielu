@@ -2,15 +2,24 @@
 //! push-to-talk (wciśnięcie i puszczenie z `HotkeyPort` — hook `WH_KEYBOARD_LL`), przełącznik,
 //! przycisk w UI, adresowanie po imieniu z transkryptu (`personas-contract::resolve_addressee`),
 //! „nie przeszkadzać”, stan mikrofonu jako zdarzenia, mikrofon jako zasób wyłączny `scheduler-lite`
-//! ([`MicArbiter`], [`lease_now`]). Słowa wywoławcze „Hej …” i „zawsze słucham”
-//! to v1 (F5) — tutaj tylko typy ([`WakeWordCfg`]), konfiguracja ich włączenia jest odrzucana.
+//! ([`MicArbiter`], [`lease_now`]).
+//!
+//! v1 (F5): słowa wywoławcze „Hej Alfa/Beta/Gama/Delta” i imiona z Kreatora — **domyślnie
+//! wyłączone**, tylko lokalnie: [`WakeWordListener`] (bufor pierścieniowy ~2 s, bramka energii,
+//! model KWS przez [`KeywordScorer`], detektor z histerezą i oknem odporności [`WakeWordDetector`],
+//! opcjonalna bramka właściciela [`OwnerCheck`]) → [`WakeInput::WakeWord`] → słuchanie
+//! z adresatką; metryki FAR/FRR w [`eval`]. Tryb „zawsze słucham” jest poza v1 (odrzucany).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
+mod detector;
+pub mod eval;
+mod listener;
 mod machine;
 mod mic;
+mod words;
 
 use core_bus_contract::{Event, EventKind, Level};
 use personas_contract::PersonaId;
@@ -18,8 +27,15 @@ use platform_contract::{Hotkey, HotkeyId, Key, Modifiers};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+pub use detector::{KwsScores, WakeWordDetector, WakeWordHit};
+pub use listener::{
+    KWS_RATE, KeywordScorer, ListenerStats, OwnerCheck, WakeWordListener, WakeWordTrigger,
+};
 pub use machine::WakeMachine;
 pub use mic::{MicArbiter, lease_now};
+pub use words::{
+    KwsParams, MAX_PHRASE_CHARS, MAX_PHRASES, MIN_PHRASE_SYLLABLES, normalize_phrase, syllables,
+};
 
 /// Początek słuchania.
 pub const EVENT_LISTEN_START: &str = "voice.wake.listen_start";
@@ -35,6 +51,8 @@ pub const EVENT_DND: &str = "voice.wake.dnd";
 pub const EVENT_MIC_STATE: &str = "voice.wake.mic_state";
 /// Podejrzenie fałszywego wybudzenia (v1).
 pub const EVENT_FALSE_ALARM: &str = "voice.wake.false_alarm_suspected";
+/// Wykrycie słowa wywoławczego zignorowane (v1: wyłączone, DND, wyciszenie, trwa słuchanie).
+pub const EVENT_WORD_IGNORED: &str = "voice.wake.word_ignored";
 
 /// Rodzaj zdarzenia magistrali.
 pub fn event_kind(name: &str) -> EventKind {
@@ -120,6 +138,34 @@ pub enum WakeInput {
         /// Podniesione.
         elevated: bool,
     },
+    /// v1: wykryto słowo wywoławcze ([`WakeWordListener`]) — otwiera słuchanie z adresatką.
+    WakeWord {
+        /// Adresatka z frazy.
+        persona: PersonaId,
+        /// Fraza („Hej Delta”).
+        phrase: String,
+        /// Czas wykrycia (ms, zegar potoku).
+        at_ms: u64,
+    },
+    /// v1: upływ czasu (ms, zegar potoku) — zamyka sesję słowa wywoławczego po ciszy.
+    Tick {
+        /// Teraz (ms).
+        now_ms: u64,
+    },
+}
+
+/// Dlaczego wykrycie słowa wywoławczego nie otworzyło słuchania.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum WakeIgnoreReason {
+    /// Słowa wywoławcze wyłączone (domyślnie).
+    Disabled,
+    /// Mikrofon wyciszony.
+    Muted,
+    /// „Nie przeszkadzać”.
+    DoNotDisturb,
+    /// Słuchanie już trwa.
+    AlreadyListening,
 }
 
 /// Zdarzenia modułu.
@@ -157,6 +203,20 @@ pub enum WakeEvent {
         /// Stan.
         state: MicState,
     },
+    /// `voice.wake.false_alarm_suspected` — po wybudzeniu nie padło ani słowo (licznik FAR w UI).
+    FalseAlarmSuspected {
+        /// Adresatka z frazy.
+        persona: PersonaId,
+        /// Fraza.
+        phrase: String,
+    },
+    /// `voice.wake.word_ignored`.
+    WakeWordIgnored {
+        /// Adresatka z frazy.
+        persona: PersonaId,
+        /// Powód.
+        reason: WakeIgnoreReason,
+    },
 }
 
 impl WakeEvent {
@@ -169,6 +229,8 @@ impl WakeEvent {
             WakeEvent::BlockedElevatedForeground => EVENT_BLOCKED_ELEVATED,
             WakeEvent::Dnd { .. } => EVENT_DND,
             WakeEvent::MicState { .. } => EVENT_MIC_STATE,
+            WakeEvent::FalseAlarmSuspected { .. } => EVENT_FALSE_ALARM,
+            WakeEvent::WakeWordIgnored { .. } => EVENT_WORD_IGNORED,
         }
     }
 
@@ -191,7 +253,8 @@ pub fn event_schema() -> serde_json::Value {
     serde_json::to_value(schemars::schema_for!(WakeEvent)).unwrap_or_default()
 }
 
-/// Słowa wywoławcze (v1, F5) — tylko typy; włączenie dopiero po FAR ≤ 1/dzień i FRR ≤ 5%.
+/// Słowa wywoławcze (v1, F5): frazy → persony, próg detektora, bramka właściciela. Walidacja:
+/// [`WakeWordCfg::validate`]; włączenie rekomendowane po FAR ≤ 1/dzień i FRR ≤ 5% (F5-05/06).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct WakeWordCfg {
     /// Frazy („Hej Alfa”…) przypisane do person.
@@ -213,7 +276,7 @@ pub struct WakeCfg {
     pub toggle_key: Option<Hotkey>,
     /// Adresowanie po imieniu z transkryptu.
     pub name_addressing: bool,
-    /// v1 (F5): słowa wywoławcze — w v0 musi być `None`.
+    /// v1 (F5): słowa wywoławcze — `None` = wyłączone (domyślnie).
     pub wake_words: Option<WakeWordCfg>,
 }
 
@@ -235,7 +298,8 @@ impl Default for WakeCfg {
 }
 
 impl WakeCfg {
-    /// Walidacja: reguła AltGr/kill-switch dla skrótów, różne klawisze, brak v1.
+    /// Walidacja: reguła AltGr/kill-switch dla skrótów, różne klawisze, słowa wywoławcze
+    /// ([`WakeWordCfg::validate`]: frazy ≥ 3 sylaby, próg w (0, 1), bez „zawsze słucham”).
     pub fn validate(&self) -> Result<(), WakeError> {
         for k in [self.ptt_key, self.toggle_key].into_iter().flatten() {
             k.validate().map_err(|e| WakeError::Hotkey(e.to_string()))?;
@@ -245,8 +309,8 @@ impl WakeCfg {
                 "PTT i przełącznik na tym samym skrócie".into(),
             ));
         }
-        if self.wake_words.is_some() {
-            return Err(WakeError::NotAvailable("słowa wywoławcze (v1, F5)".into()));
+        if let Some(w) = &self.wake_words {
+            w.validate()?;
         }
         Ok(())
     }
@@ -262,9 +326,12 @@ pub enum WakeError {
     /// Skrót odrzucony (AltGr, kill-switch, zajęty).
     #[error("skrót: {0}")]
     Hotkey(String),
-    /// Funkcja z kolejnej fali.
-    #[error("niedostępne w v0: {0}")]
+    /// Funkcja niedostępna (brak fraz, tryb poza v1).
+    #[error("niedostępne: {0}")]
     NotAvailable(String),
+    /// Model KWS (ładowanie, hash, inferencja).
+    #[error("model słów wywoławczych: {0}")]
+    Model(String),
 }
 
 /// Aktywacja słuchania i adresowanie.
@@ -285,3 +352,5 @@ pub trait Wake: Send {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod v1_tests;

@@ -1,7 +1,12 @@
 //! Atrapa `voice-wake`: wspólny automat z kontraktu + wejścia ze skryptu na wirtualnym zegarze
-//! (PTT, przełącznik, transkrypty, DND) i bezpośrednie „klawisze” do testów.
+//! (PTT, przełącznik, transkrypty, DND) i bezpośrednie „klawisze” do testów; v1: deterministyczne
+//! modele słów wywoławczych bez ONNX ([`ToneScorer`], [`ScriptedScorer`]).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
+
+mod scorer;
+
+pub use scorer::{BUILTIN_TONES, ScriptedScorer, ToneScorer, WINDOW};
 
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -9,7 +14,9 @@ use std::time::Duration;
 use personas_contract::{Catalog, PersonaId, builtin_personas};
 use platform_contract::HotkeyId;
 use voice_wake_contract::contract_tests::KeyDriver;
-use voice_wake_contract::{MicState, Wake, WakeCfg, WakeError, WakeEvent, WakeInput, WakeMachine};
+use voice_wake_contract::{
+    KwsParams, MicState, Wake, WakeCfg, WakeError, WakeEvent, WakeInput, WakeMachine,
+};
 
 /// Identyfikator PTT w atrapie.
 pub const PTT_ID: HotkeyId = HotkeyId(1);
@@ -115,6 +122,10 @@ impl Wake for FakeWake {
             cfg.toggle_key.map(|_| TOGGLE_ID),
         );
         self.machine.set_name_addressing(cfg.name_addressing);
+        self.machine.set_wake_words(
+            cfg.wake_words.is_some(),
+            KwsParams::default().listen_timeout_ms,
+        );
         self.configured = Some(cfg);
         Ok(())
     }

@@ -10,6 +10,7 @@ use providers_contract::CancellationToken;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use voice_dialog_contract::{InterruptIntent, TurnSource};
+use voice_speaker_contract::{SpeakerCheck, voice_origin};
 
 /// Żądanie odpowiedzi na turę użytkownika.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
@@ -24,6 +25,31 @@ pub struct ReplyRequest {
     pub source: TurnSource,
     /// Intencja, gdy tura przerwała mowę agentki (korekta, uzupełnienie…).
     pub intent: Option<InterruptIntent>,
+    /// Pochodzenie tury głosowej (pewność STT, weryfikacja mówcy) — źródło polecenia dla
+    /// klasyfikatora ryzyka ([`VoiceProvenance::command_origin`]); `None` dla tekstu.
+    #[serde(default)]
+    pub voice: Option<VoiceProvenance>,
+}
+
+/// Pochodzenie tury głosowej (F5): sygnał do `risk-classifier` przez istniejące pola
+/// `CommandOrigin::UserVoice { confidence, speaker_verified }`. Bez weryfikacji (`NotChecked`,
+/// `Pending`) — `speaker_verified = false`, więc akcje ryzykowne wymagają potwierdzenia nie-głosem.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct VoiceProvenance {
+    /// Pewność finalu STT (‰).
+    pub stt_confidence_permille: u16,
+    /// Weryfikacja mówcy (wynik może dojść później: [`ReplySource::speaker_checked`]).
+    pub speaker: SpeakerCheck,
+}
+
+impl VoiceProvenance {
+    /// Źródło polecenia dla klasyfikatora ryzyka / Brokera.
+    pub fn command_origin(&self) -> risk_classifier_contract::CommandOrigin {
+        voice_origin(
+            f32::from(self.stt_confidence_permille) / 1000.0,
+            &self.speaker,
+        )
+    }
 }
 
 /// Element strumienia odpowiedzi.
@@ -63,4 +89,10 @@ pub trait ReplySource: Send + Sync {
     fn start(&self, request: ReplyRequest, cancel: CancellationToken) -> ReplyStream;
     /// Zamyka turę asystentki z wynikiem (pełna treść + ewentualny usłyszany prefiks).
     fn finish(&self, turn: u64, outcome: ReplyOutcome);
+    /// Wynik weryfikacji mówcy dla tury głosowej, która wystartowała z `SpeakerCheck::Pending`
+    /// (weryfikacja biegnie równolegle z odpowiedzią). Domyślnie ignorowane — do czasu wyniku
+    /// tura jest niezweryfikowana.
+    fn speaker_checked(&self, turn: u64, check: SpeakerCheck) {
+        let _ = (turn, check);
+    }
 }
