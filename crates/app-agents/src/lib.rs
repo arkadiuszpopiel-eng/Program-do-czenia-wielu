@@ -10,11 +10,15 @@
 //!   na żywo bez luk (steering, anulowanie);
 //! - [`RunProjector`] — zdarzenia `agent.*` → Replay, linie kroków w wątku, karty „Cofnij",
 //!   „czeka na zatwierdzenie", „uruchom w terminalu", kapsuła aktywności, Oś czasu;
+//! - [`Launch`] / [`RunFamily`] / [`FamilyProjector`] — start v1 (`start_with` z obsadą: delegacja
+//!   i Krytyczka; zasoby wyłączne, autonomia z Brokera; koperta umiejętności) i Replay podprzebiegów;
 //! - [`eval`] — zestaw ewaluacyjny narzędzi F3 (`evals/F3/tools/`).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 pub mod eval;
+mod family;
+mod launch;
 mod map;
 mod project;
 mod runner;
@@ -22,6 +26,8 @@ mod spec;
 mod tickets;
 mod toolset;
 
+pub use family::{ChildInfo, FamilyProjector, RunFamily};
+pub use launch::{Launch, SkillCall};
 pub use map::{FinalText, final_text, short};
 pub use project::{Projection, RunContext, RunProjector};
 pub use runner::{RunFeed, RunHandle};

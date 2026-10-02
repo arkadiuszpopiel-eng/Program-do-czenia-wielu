@@ -31,6 +31,10 @@ pub(crate) struct Kernel {
     pub settings: SettingsCatalog,
     pub device_pending: Option<device_profile_impl::DeviceProfileService>,
     pub device: Option<Arc<dyn DeviceProfileService>>,
+    /// Sygnały systemowe (`parts/signals.rs`; `None` — brak monitora).
+    pub signals: Option<Arc<dyn platform_contract::SystemSignalsPort>>,
+    /// Obserwacja katalogów wyzwalaczy.
+    pub dir_watch: Option<Arc<dyn platform_contract::DirWatchPort>>,
 }
 
 fn detect_device(paths: &AppPaths) -> Result<device_profile_impl::DeviceProfileService, AppError> {
@@ -100,6 +104,8 @@ impl Kernel {
             settings,
             device_pending,
             device,
+            signals: super::signals::signals(options),
+            dir_watch: super::signals::dir_watch(options),
         })
     }
 }

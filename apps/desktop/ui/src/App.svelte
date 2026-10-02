@@ -18,6 +18,8 @@
   provideApp(app);
   const { t } = app.i18n;
   const loadOnboarding = () => import('./lib/views/onboarding/OnboardingView.svelte');
+  // Terminal (gest użytkownika): emulator ładowany leniwie, poza paczką startową.
+  const loadTerminal = () => import('./lib/components/overlays/TerminalDialog.svelte');
 
   $effect(() => {
     applyAppearance(document.documentElement, {
@@ -60,6 +62,9 @@
   <Lazy load={loadOnboarding} props={{}} label={t('app.loading')} />
 {:else}
   <AppShell />
+{/if}
+{#if app.work.terminal}
+  <Lazy load={loadTerminal} props={{ request: app.work.terminal }} label={t('app.loading')} />
 {/if}
 
 <style>

@@ -146,6 +146,34 @@ impl TasksApp {
         self.info(&id)
     }
 
+    /// Zadanie umiejętności od użytkownika (`skills_run`): agentka w sesji wykonuje przepis
+    /// z kopertą `prepare_run` (≤ jej roli) — ładunek `skill` rozwija wykonawczyni.
+    pub fn create_skill(
+        &self,
+        session: &str,
+        agent: Option<&str>,
+        title: &str,
+        call: &app_agents::SkillCall,
+    ) -> Result<TaskInfo, AppError> {
+        let assignee = match agent.filter(|a| !a.is_empty()) {
+            Some(a) => Assignee::Persona(PersonaId::new(a)),
+            None => Assignee::AnyAgent,
+        };
+        let id = TaskId::new(self.next_id("s"));
+        let mut spec = TaskSpec::new(
+            id.clone(),
+            format!("Umiejętność: {title}"),
+            assignee,
+            TaskClass::User,
+            TaskOrigin::User,
+        );
+        spec.session = Some(SessionId::new(session));
+        spec.payload =
+            serde_json::json!({ "goal": format!("Umiejętność „{title}”"), "skill": call });
+        self.p.scheduler.submit(vec![spec]).map_err(err)?;
+        self.info(&id)
+    }
+
     /// `tasks_cancel` (z poddrzewem delegacji).
     pub fn cancel(&self, task: &str) -> Result<Vec<String>, AppError> {
         let ids = self

@@ -16,6 +16,9 @@ export class RunsState {
   private readonly toasted: Record<string, true> = {};
 
   update(run: AgentRun): void {
+    // Podprzebiegi (delegacja, Krytyczka, umiejętność) widać w Replay; „ostatni przebieg sesji"
+    // (steering z composera) to zawsze przebieg główny.
+    if (run.parent_id) return;
     this.bySession[run.session_id] = run;
   }
 

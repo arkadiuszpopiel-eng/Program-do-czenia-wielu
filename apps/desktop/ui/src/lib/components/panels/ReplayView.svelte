@@ -4,7 +4,7 @@
   Odtwarzanie: Od początku / Poprzedni / Następny krok / Wszystkie.
 -->
 <script lang="ts">
-  import { Avatar, Button, agents } from '@alfa/ui-kit';
+  import { Avatar, Button } from '@alfa/ui-kit';
   import Brain from '@lucide/svelte/icons/brain';
   import ListChecks from '@lucide/svelte/icons/list-checks';
   import MessageSquare from '@lucide/svelte/icons/message-square';
@@ -21,6 +21,7 @@
     stepCursor,
     visibleSteps,
   } from '../../logic/replay';
+  import { agentName } from '../../logic/work';
   import { useApp } from '../../state/context';
 
   interface Props {
@@ -45,7 +46,7 @@
   $effect(() => {
     void app.client.agents.runs(sessionId).then((list) => {
       runs = [...list];
-      selected = list.at(-1)?.run.id ?? null;
+      selected = list.filter((r) => !r.run.parent_id).at(-1)?.run.id ?? list.at(-1)?.run.id ?? null;
       cursor = null;
     });
   });
@@ -55,7 +56,7 @@
       if (event.type === 'AgentRunUpdated' && event.session_id === sessionId) {
         const known = runs.some((r) => r.run.id === event.run.id);
         runs = applyRun(runs, event.run);
-        if (!known) selected = event.run.id;
+        if (!known && !event.run.parent_id) selected = event.run.id;
       } else if (event.type === 'AgentStep' && event.session_id === sessionId) {
         runs = applyStep(runs, event.run_id, event.step);
       }
@@ -63,6 +64,16 @@
   );
 
   const current = $derived(runs.find((r) => r.run.id === selected) ?? runs.at(-1) ?? null);
+  /** Podprzebiegi bieżącego przebiegu (delegacja, Krytyczka, umiejętność). */
+  const children = $derived(current ? runs.filter((r) => r.run.parent_id === current.run.id) : []);
+  const parent = $derived(
+    current?.run.parent_id ? (runs.find((r) => r.run.id === current.run.parent_id) ?? null) : null,
+  );
+
+  function runLabel(r: AgentRunDetail): string {
+    const who = agentName(r.run.agent);
+    return r.run.parent_id ? `↳ ${r.run.label ?? who} (${who})` : who;
+  }
   const steps = $derived(current ? visibleSteps(current.steps, cursor) : []);
   const total = $derived(current?.steps.length ?? 0);
 
@@ -98,9 +109,7 @@
         <select bind:value={selected} onchange={() => (cursor = null)}>
           {#each [...runs].reverse() as r (r.run.id)}
             <option value={r.run.id}
-              >{agents[r.run.agent].name}: {r.run.goal.slice(0, 48)} ({app.i18n.time(
-                r.run.started_at,
-              )})</option
+              >{runLabel(r)}: {r.run.goal.slice(0, 48)} ({app.i18n.time(r.run.started_at)})</option
             >
           {/each}
         </select>
@@ -119,8 +128,29 @@
             {#if run.usage.cost.minor > 0}· {app.i18n.money(run.usage.cost)}{/if}
           </p>
           {#if run.workdir}<p class="meta">{t('replay.workdir', { path: run.workdir })}</p>{/if}
+          {#if parent}
+            <p class="meta">
+              {t('replay.subrun', { label: run.label ?? agentName(run.agent) })}
+              <button type="button" class="link" onclick={() => (selected = parent.run.id)}
+                >{t('replay.toParent')}</button
+              >
+            </p>
+          {/if}
         </div>
       </header>
+      {#if children.length}
+        <ul class="subruns" aria-label={t('replay.subruns')}>
+          {#each children as c (c.run.id)}
+            <li>
+              <button type="button" class="link" onclick={() => (selected = c.run.id)}
+                >↳ {c.run.label ?? agentName(c.run.agent)}</button
+              >
+              <span class="meta">{agentName(c.run.agent)} · {t(`replay.state.${c.run.state}`)}</span
+              >
+            </li>
+          {/each}
+        </ul>
+      {/if}
       <div class="controls" role="group" aria-label={t('replay.controls')}>
         <Button size="sm" variant="ghost" onclick={() => (cursor = 0)} disabled={total === 0}
           >{t('replay.fromStart')}</Button
@@ -212,6 +242,24 @@
   .meta {
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-xs);
+  }
+  .subruns {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding-left: var(--alfa-space-6);
+    list-style: none;
+    font-size: var(--alfa-font-size-xs);
+  }
+  .link {
+    padding: 0 var(--alfa-space-1);
+    border: 0;
+    background: transparent;
+    color: var(--alfa-color-text);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
   }
   .pick {
     display: flex;

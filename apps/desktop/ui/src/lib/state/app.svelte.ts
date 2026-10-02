@@ -25,6 +25,7 @@ import { RunsState } from './runs.svelte';
 import { SessionsState } from './sessions.svelte';
 import { ToastState } from './toasts.svelte';
 import { VoiceUiState } from './voice.svelte';
+import { WorkState } from './work.svelte';
 
 export type View = 'loading' | 'chat' | 'settings' | 'onboarding' | 'error';
 
@@ -43,6 +44,7 @@ export class AppState {
   readonly sessions = new SessionsState();
   readonly runs = new RunsState();
   readonly voice = new VoiceUiState();
+  readonly work = new WorkState();
   readonly layout: LayoutState;
 
   view = $state<View>('loading');
@@ -120,6 +122,10 @@ export class AppState {
       this.sessions.list = [...list];
       this.system = status;
       void this.client.voice.status().then((v) => this.voice.applyStatus(v));
+      void this.client.gui.status().then(
+        (g) => this.work.applyGui(g),
+        () => undefined,
+      );
       const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;
       if (first) await this.openSession(first);
       else await this.refreshCosts();

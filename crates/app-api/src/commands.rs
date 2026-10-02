@@ -1,6 +1,8 @@
 //! Lista komend IPC (COMMANDS.md) — jedno źródło dla powłoki Tauri (`with_commands!` generuje
-//! handlery `#[tauri::command]`) i testów (`tests/ipc_signatures.rs` sprawdza sygnatury `AppCore`
-//! i to, że przyszłości są `Send + 'static`, czego wymaga Tauri).
+//! handlery `#[tauri::command]`, reeksport w `app-core`) i testów (`app-core/tests/ipc_signatures.rs`
+//! sprawdza sygnatury `AppCore` i to, że przyszłości są `Send + 'static`, czego wymaga Tauri).
+//! Komendy ze strumieniem w kanale `tauri::ipc::Channel` ([`CHANNEL_COMMANDS`]) nie mieszczą się
+//! w tej liście (argument kanału istnieje tylko w powłoce) — powłoka obsługuje je ręcznie.
 
 /// Wywołuje makro `$callback` z listą komend w postaci `nazwa(arg: Typ, …) -> Wynik;`.
 #[macro_export]
@@ -130,15 +132,69 @@ macro_rules! with_commands {
             bridges_set_schedule(bridge: String, per_day: u32) -> $crate::dto::BridgeCard;
             bridges_pin(bridge: String, version: Option<String>) -> $crate::dto::BridgeCard;
             bridges_open_login(bridge: String) -> $crate::dto::BridgeLogin;
+            gui_status() -> $crate::dto::GuiStatus;
+            gui_screenshot() -> Option<$crate::dto::GuiScreenshot>;
+            gui_stop() -> $crate::dto::GuiStatus;
+            gui_release() -> $crate::dto::GuiStatus;
+            gui_desktop_grant(session_id: String, agent: String) -> $crate::dto::BrokerIntentResult;
+            terminal_input(terminal: u64, data_b64: String) -> ();
+            terminal_resize(terminal: u64, cols: u16, rows: u16) -> ();
+            terminal_close(terminal: u64) -> ();
+            terminal_list() -> Vec<$crate::dto::TerminalSession>;
+            skills_list() -> Vec<$crate::dto::SkillInfo>;
+            skills_review(skill_id: String, version: String) -> $crate::dto::SkillReview;
+            skills_propose(skill: serde_json::Value) -> $crate::dto::SkillInfo;
+            skills_approve(skill_id: String, version: String, hash: String) -> $crate::dto::SkillInfo;
+            skills_release(skill_id: String, version: String, hash: String) -> $crate::dto::SkillInfo;
+            skills_reject(skill_id: String, version: String) -> $crate::dto::SkillInfo;
+            skills_disable(skill_id: String) -> $crate::dto::SkillInfo;
+            skills_run(skill_id: String, session_id: String, agent: Option<String>, params: serde_json::Value) -> $crate::dto::TaskInfo;
+            skills_export() -> $crate::dto::ExportResult;
+            skills_import() -> $crate::dto::SkillImportResult;
+            builder_policy() -> $crate::dto::BuilderPolicyView;
+            builder_propose(description: String) -> $crate::dto::BuilderProposal;
+            builder_preview(draft: $crate::dto::AgentDraft) -> $crate::dto::BuilderPreview;
+            builder_dry_run(draft: $crate::dto::AgentDraft) -> $crate::dto::BuilderDryRun;
+            builder_save(draft: $crate::dto::AgentDraft, hash: String) -> $crate::dto::BuilderSaved;
+            builder_voice_preview(draft: $crate::dto::AgentDraft) -> ();
+            builder_library() -> Vec<$crate::dto::BuilderAgentInfo>;
+            health_report() -> $crate::dto::HealthView;
+            health_scan() -> $crate::dto::HealthView;
+            health_approve(repair_id: u64) -> $crate::dto::HealthView;
+            health_reject(repair_id: u64) -> $crate::dto::HealthView;
+            health_undo(repair_id: u64) -> $crate::dto::HealthView;
+            improver_list() -> $crate::dto::ImproverView;
+            improver_cycle() -> $crate::dto::ImproverView;
+            improver_approve(proposal_id: u64, digest: String) -> $crate::dto::ImproverView;
+            improver_reject(proposal_id: u64) -> $crate::dto::ImproverView;
+            improver_rollback(proposal_id: u64) -> $crate::dto::ImproverView;
+            evals_list() -> $crate::dto::EvalsView;
+            evals_verify(suite_id: String) -> $crate::dto::EvalSuiteView;
         }
     };
 }
 
+/// Komendy ze strumieniem w `tauri::ipc::Channel` (handler w powłoce; metoda `AppCore` dostaje
+/// odbiorcę strumienia zamiast kanału): `terminal_open` — wyjście VT terminala.
+pub const CHANNEL_COMMANDS: &[&str] = &["terminal_open"];
+
 macro_rules! command_names {
     ($( $name:ident ( $( $arg:ident : $ty:ty ),* ) -> $ret:ty ; )*) => {
-        /// Wszystkie komendy wystawiane przez `AppCore` (nazwa = komenda Tauri = metoda).
-        pub const COMMANDS: &[&str] = &[$( stringify!($name) ),*];
+        /// Wszystkie komendy wystawiane przez `AppCore` (nazwa = komenda Tauri = metoda):
+        /// lista `with_commands!` + [`CHANNEL_COMMANDS`].
+        pub const COMMANDS: &[&str] = &[$( stringify!($name), )* "terminal_open"];
     };
 }
 
 with_commands!(command_names);
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn channel_commands_are_listed_once() {
+        for c in super::CHANNEL_COMMANDS {
+            assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
+        }
+        assert_eq!(super::COMMANDS.len(), 162);
+    }
+}

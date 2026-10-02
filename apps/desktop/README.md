@@ -55,6 +55,15 @@ go nie obejmuje). Licencje i źródła: `cargo deny --manifest-path apps/desktop
 licenses sources` (zielone); `bans` pada na samym Tauri (wry/tao/webview2-com ciągną `windows`, który
 `deny.toml` dopuszcza tylko w `platform-windows-impl`) — znany wyjątek powłoki, nie ruszać bez ADR.
 
+## Terminal i ochrona okien (F8)
+Wbudowany terminal: `terminal_open` ma handler ręczny (`app_core::CHANNEL_COMMANDS`) z argumentem
+`tauri::ipc::Channel<TerminalFrame>` — ramki VT (base64) idą tylko tym kanałem do okna, które otworzyło
+terminal (nigdy przez `alfa://events`, magistralę ani logi); `terminal_input`/`resize`/`close`/`list`
+— zwykłe komendy z `with_commands!`, tylko w `capabilities/main.json`. Emulator w UI: `@xterm/xterm`
+6.0.0 + `@xterm/addon-fit` 0.11.0 (MIT, bez zależności), ładowany leniwie z dialogiem terminala.
+Okna tworzone z `content_protected(true)` (`WDA_EXCLUDEFROMCAPTURE`) — niewidoczne na zrzutach ekranu,
+także dla narzędzi computer use agentek.
+
 ## Weryfikacja powłoki poza Windows
 Job CI „Powłoka Tauri (Windows)" (`.github/workflows/ci.yml`) robi `cargo fmt --check` i `cargo clippy
 --all-targets [--features e2e] -- -D warnings` z prawdziwym `app-core`. Na Linuksie `cargo fmt --check`

@@ -5,6 +5,8 @@ use app_core::dto::*;
 
 use super::{Check, roundtrip};
 
+mod computer;
+
 type Spec = (Vec<(&'static str, Check)>, Check);
 
 fn memory(command: &str) -> Option<Spec> {
@@ -97,7 +99,11 @@ pub fn spec(command: &str) -> Option<Spec> {
         "bridges_set_schedule" => (vec![("bridge", s), ("perDay", roundtrip::<u32>)], card),
         "bridges_pin" => (vec![("bridge", s), ("version", os)], card),
         "bridges_open_login" => (vec![("bridge", s)], roundtrip::<BridgeLogin>),
-        other => return memory(other).or_else(|| tasks(other)),
+        other => {
+            return memory(other)
+                .or_else(|| tasks(other))
+                .or_else(|| computer::spec(other));
+        }
     };
     Some(found)
 }

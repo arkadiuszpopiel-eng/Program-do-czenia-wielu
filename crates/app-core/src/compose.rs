@@ -62,19 +62,17 @@ fn manifest_for_graph(id: &str, toml: &str) -> Result<ModuleManifest, AppError> 
     match id {
         "sessions" => manifest.requires.retain(|c| c.name != "search-contract"),
         "providers-local" => manifest.provides.clear(),
-        "safety-broker" => manifest.requires.retain(|c| c.name != "watchdog-contract"),
         // Strażniczka używa lokalnego rdzenia Routera (budowany w kroku `router`), a eksport
         // `.alfa` — dokumentów pamięci (`Category::Memory`).
         "memory-consolidation" => manifest.requires.push(contract("router-contract")),
         "transfer" => manifest.requires.push(contract("memory-contract")),
-        // Narzędzia i runtime agentek: `tools-common-contract` to kontrakt bez modułu (manifest,
-        // `Tool`, bramka Brokera), a rejestr Job Objects (`watchdog-contract`) dostarcza Broker
-        // w procesie (kill-switch zabija drzewa procesów `shell_run`).
-        "tools-fs" | "tools-shell" | "tools-clipboard" | "agent-runtime" => manifest
-            .requires
-            .retain(|c| c.name != "tools-common-contract" && c.name != "watchdog-contract"),
         _ => {}
     }
+    // `tools-common-contract` to kontrakt bez modułu (manifest, `Tool`, bramka Brokera), a role
+    // `watchdog-contract` (Job Objects, historia konfiguracji) pełnią Broker w procesie i kompozycja.
+    manifest
+        .requires
+        .retain(|c| c.name != "tools-common-contract" && c.name != "watchdog-contract");
     Ok(manifest)
 }
 
@@ -105,7 +103,11 @@ async fn plan(
         .iter()
         .chain(app_agents::MODULES)
         .chain(app_tasks::MODULES)
-        .chain(app_bridges::MODULES);
+        .chain(app_bridges::MODULES)
+        .chain(app_gui::MODULES)
+        .chain(app_terminal::MODULES)
+        .chain(app_skills::MODULES)
+        .chain(app_health::MODULES);
     for (id, toml) in all {
         let manifest = manifest_for_graph(id, toml)?;
         lifecycles.insert((*id).to_owned(), manifest.lifecycle);

@@ -1,10 +1,11 @@
 // Cienki adapter IPC Tauri 2: każda metoda = jedna komenda `invoke`, zdarzenia = jeden kanał `listen`.
 // Nazwy komend i zdarzeń: COMMANDS.md (kontrakt dla sesji backendowej). Argumenty w camelCase —
 // Tauri 2 mapuje je na parametry snake_case komend Rust.
-import { invoke } from '@tauri-apps/api/core';
+import { Channel, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { AlfaClient } from './client';
 import type { AlfaEvent } from './types-system';
+import type { TerminalFrame } from './types-work';
 
 /** Nazwa jedynego kanału zdarzeń rdzeń → UI (paczki zdarzeń, najwyżej jedna na klatkę). */
 export const EVENTS_CHANNEL = 'alfa://events';
@@ -204,6 +205,66 @@ export class TauriAlfaClient implements AlfaClient {
     setSchedule: (bridge, perDay) => call('bridges_set_schedule', { bridge, perDay }),
     pin: (bridge, version) => call('bridges_pin', { bridge, version }),
     openLogin: (bridge) => call('bridges_open_login', { bridge }),
+  };
+
+  readonly gui: AlfaClient['gui'] = {
+    status: () => call('gui_status'),
+    screenshot: () => call('gui_screenshot'),
+    stop: () => call('gui_stop'),
+    release: () => call('gui_release'),
+    desktopGrant: (sessionId, agent) => call('gui_desktop_grant', { sessionId, agent }),
+  };
+
+  readonly terminal: AlfaClient['terminal'] = {
+    // Strumień VT wyłącznie kanałem IPC tego wywołania (nie `alfa://events`).
+    open: (profile, cols, rows, cwd, onFrame) => {
+      const channel = new Channel<TerminalFrame>();
+      channel.onmessage = onFrame;
+      return call('terminal_open', { profile, cols, rows, cwd, channel });
+    },
+    input: (terminal, dataB64) => call('terminal_input', { terminal, dataB64 }),
+    resize: (terminal, cols, rows) => call('terminal_resize', { terminal, cols, rows }),
+    close: (terminal) => call('terminal_close', { terminal }),
+    list: () => call('terminal_list'),
+  };
+
+  readonly skills: AlfaClient['skills'] = {
+    list: () => call('skills_list'),
+    review: (skillId, version) => call('skills_review', { skillId, version }),
+    propose: (skill) => call('skills_propose', { skill }),
+    approve: (skillId, version, hash) => call('skills_approve', { skillId, version, hash }),
+    release: (skillId, version, hash) => call('skills_release', { skillId, version, hash }),
+    reject: (skillId, version) => call('skills_reject', { skillId, version }),
+    disable: (skillId) => call('skills_disable', { skillId }),
+    run: (skillId, sessionId, agent, params) =>
+      call('skills_run', { skillId, sessionId, agent, params }),
+    exportBundle: () => call('skills_export'),
+    importBundle: () => call('skills_import'),
+  };
+
+  readonly builder: AlfaClient['builder'] = {
+    policy: () => call('builder_policy'),
+    propose: (description) => call('builder_propose', { description }),
+    preview: (draft) => call('builder_preview', { draft }),
+    dryRun: (draft) => call('builder_dry_run', { draft }),
+    save: (draft, hash) => call('builder_save', { draft, hash }),
+    voicePreview: (draft) => call('builder_voice_preview', { draft }),
+    library: () => call('builder_library'),
+  };
+
+  readonly health: AlfaClient['health'] = {
+    report: () => call('health_report'),
+    scan: () => call('health_scan'),
+    approve: (repairId) => call('health_approve', { repairId }),
+    reject: (repairId) => call('health_reject', { repairId }),
+    undo: (repairId) => call('health_undo', { repairId }),
+    improver: () => call('improver_list'),
+    improverCycle: () => call('improver_cycle'),
+    improverApprove: (proposalId, digest) => call('improver_approve', { proposalId, digest }),
+    improverReject: (proposalId) => call('improver_reject', { proposalId }),
+    improverRollback: (proposalId) => call('improver_rollback', { proposalId }),
+    evals: () => call('evals_list'),
+    evalsVerify: (suiteId) => call('evals_verify', { suiteId }),
   };
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

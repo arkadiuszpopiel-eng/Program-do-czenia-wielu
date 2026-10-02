@@ -28,7 +28,7 @@ use crate::events::{EventBatch, EventHub};
 use crate::options::AppPaths;
 use crate::ports::{BrainPort, BrokerPort, ShellPort, TransferPort, VoicePort};
 use crate::settings::{SettingsCatalog, keys};
-use crate::store::AppStore;
+use app_store::AppStore;
 
 /// Aktywna generacja odpowiedzi w sesji (najwyżej jedna na sesję).
 #[derive(Clone)]
@@ -98,6 +98,10 @@ pub(crate) struct Inner {
     /// Mosty CLI (karty zgodności, delegacja, logowanie w terminalu) i serwer MCP na żądanie.
     pub bridges: Arc<app_bridges::BridgesApp>,
     pub brain: Arc<dyn BrainPort>,
+    /// Computer use, terminal, umiejętności, Kreator, „Zdrowie systemu" (`parts/work.rs`).
+    pub work: crate::parts::WorkStack,
+    /// Sygnały systemowe (bezczynność, tryb gry, zasilanie, blokada); `None` — brak monitora.
+    pub signals: Option<Arc<dyn platform_contract::SystemSignalsPort>>,
     /// Moduły podpięte po F1 (rezydencja, model lokalny, Router, Broker, transfer, głos,
     /// aktualizacje) — trzymane przez cały czas życia rdzenia.
     pub extra: crate::parts::Extra,

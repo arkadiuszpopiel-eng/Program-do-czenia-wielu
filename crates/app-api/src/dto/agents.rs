@@ -133,6 +133,12 @@ pub struct AgentRun {
     /// Zadanie schedulera, w ramach którego trwa przebieg.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task_id: Option<String>,
+    /// Przebieg-rodzic (podprzebieg: delegacja, Krytyczka, umiejętność).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
+    /// Etykieta podprzebiegu („Krytyczka", „delegacja: …", „umiejętność: …").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 }
 
 /// Przebieg z krokami (`agents_runs`).

@@ -74,7 +74,10 @@ impl Built {
             memory,
             privacy,
             device,
-            idle: Arc::new(UnknownIdle),
+            idle: match &kernel.signals {
+                Some(port) => Arc::new(super::signals::PortIdle(port.clone())),
+                None => Arc::new(UnknownIdle),
+            },
             meter: need(&self.costs, "cost-meter")?,
             model,
             bus: bus.clone(),

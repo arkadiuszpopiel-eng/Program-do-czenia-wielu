@@ -45,8 +45,9 @@ impl AppCore {
     }
 
     /// Zadania: zdarzenia `scheduler.*`/`triggers.*`/`marshal.*` → UI, DND z `voice-wake` →
-    /// wyzwalacze, warunki okien zadań (tryb gry z `model-residency`; bezczynność — port
-    /// platformy jeszcze nie istnieje: „nigdy bezczynny") co 5 s.
+    /// wyzwalacze, warunki okien zadań co 5 s (bezczynność i blokada z monitora sygnałów, tryb
+    /// gry z monitora albo `model-residency`; bez monitora — „nigdy bezczynny") i cykl
+    /// Ulepszacza w bezczynności (tylko z monitorem; bez niego — „Przeanalizuj teraz").
     async fn spawn_task_bridges(&self) {
         let tasks = self.inner.tasks.clone();
         app_tasks::spawn_bus_bridge(
@@ -61,11 +62,28 @@ impl AppCore {
             .residency
             .as_ref()
             .map(|r| r.manager() as std::sync::Arc<dyn model_residency_contract::Residency>);
-        let probe = std::sync::Arc::new(move || scheduler_contract::SystemConditions {
-            user_idle: false,
-            game_mode: residency.as_ref().is_some_and(|r| r.snapshot().mode.gaming),
+        let signals = self.inner.signals.clone();
+        let probe = std::sync::Arc::new(move || {
+            let s = crate::parts::signals::snapshot(signals.as_ref());
+            scheduler_contract::SystemConditions {
+                user_idle: s.user_idle || s.locked(),
+                game_mode: s.game_mode()
+                    || residency.as_ref().is_some_and(|r| r.snapshot().mode.gaming),
+            }
         });
         app_tasks::spawn_conditions(tasks.scheduler(), probe, Duration::from_secs(5));
+        if let Some(port) = self.inner.signals.clone() {
+            let conditions = std::sync::Arc::new(move || {
+                let s = port.snapshot();
+                app_health::RunConditions {
+                    on_battery: s.on_battery(),
+                    game_mode: s.game_mode(),
+                    user_idle: s.user_idle || s.locked(),
+                }
+            });
+            let health = &self.inner.work.health;
+            health.spawn_idle_cycle(conditions, app_health::IDLE_CYCLE_EVERY);
+        }
     }
 
     /// Po `after` bez awarii: aktywna wersja (launcher, `current.json`) oznaczona jako dobra —

@@ -57,6 +57,22 @@ impl RunHandle {
         Ok((Self { runtime, run }, feed))
     }
 
+    /// Start v1 (`start_with`): runtime z zasobami wyłącznymi i poziomami autonomii, opcje z obsadą
+    /// (delegacja, Krytyczka); dziennik całej rodziny przebiegów (podprzebiegi w Replay).
+    pub async fn launch(
+        launch: &crate::Launch,
+        provider: Arc<dyn ModelProvider>,
+        tools: &AgentTools,
+        bus: Option<Arc<dyn EventBus>>,
+        spec: RunSpec,
+        options: agent_runtime_contract::RunOptions,
+    ) -> Result<(Self, crate::RunFamily), RunError> {
+        let (runtime, store) = launch.runtime(provider, tools.all(), bus);
+        let run = crate::Launch::start(&runtime, spec, options).await?;
+        let family = crate::RunFamily::attach(runtime.clone(), store, run.clone())?;
+        Ok((Self { runtime, run }, family))
+    }
+
     /// Identyfikator przebiegu.
     pub fn id(&self) -> &RunId {
         &self.run

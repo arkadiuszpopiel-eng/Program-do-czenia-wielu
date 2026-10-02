@@ -3,9 +3,11 @@
 import type { Message } from './core';
 import { enAgents } from './en-agents';
 import { enApp } from './en-app';
+import { enBuilder } from './en-builder';
 import { enMemory } from './en-memory';
 import { enSettings } from './en-settings';
 import { enTasks } from './en-tasks';
+import { enWork } from './en-work';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -14,4 +16,6 @@ export const en: Record<MessageKey, Message> = {
   ...enSettings,
   ...enMemory,
   ...enTasks,
+  ...enWork,
+  ...enBuilder,
 };

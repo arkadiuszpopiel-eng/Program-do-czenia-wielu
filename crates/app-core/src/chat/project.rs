@@ -5,7 +5,7 @@ use sessions_contract::{Author, Role, SessionId, Turn};
 
 use crate::dto::{self, BlockKind, RenderedBlock, ThinkingInfo, TurnStatus};
 use crate::ids;
-use crate::store::TurnMeta;
+use app_store::TurnMeta;
 
 /// Blok lib-markdown → DTO (blok kodu = jeden fenced block najwyższego poziomu).
 pub fn block_dto(block: &Block, closed: bool) -> RenderedBlock {

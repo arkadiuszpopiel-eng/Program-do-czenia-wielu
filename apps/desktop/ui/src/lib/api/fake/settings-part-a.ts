@@ -246,6 +246,8 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
       'machine',
     ),
   ]),
+  page('skills', L('Umiejętności', 'Skills'), 1, [], { custom: 'skills' }),
+  page('builder', L('Kreator agentek', 'Agent builder'), 1, [], { custom: 'builder' }),
   page('triggers', L('Zadania w tle i wyzwalacze', 'Background tasks and triggers'), 1, [], {
     custom: 'triggers',
   }),
@@ -253,10 +255,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
   page('permissions', L('Uprawnienia i bezpieczeństwo', 'Permissions and security'), 1, [], {
     custom: 'permissions',
   }),
-  later('computer', L('Komputer', 'Computer'), 6, [
-    L('Trasy: API › UIA › wizja › wejście', 'Routes: API › UIA › vision › input'),
-    L('Aplikacje i przeglądarka', 'Apps and browser'),
-  ]),
+  page('computer', L('Komputer', 'Computer'), 1, [], { custom: 'computer' }),
   page(
     'memory',
     L('Pamięć', 'Memory'),

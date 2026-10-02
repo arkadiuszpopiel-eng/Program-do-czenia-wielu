@@ -1,12 +1,14 @@
 <!--
   Modele i dostawcy → Mosty CLI: karty zgodności tras (stan zielona / szara / zabroniona, wpis
   nieświeży, wersja wykryta vs przypięta, regulamin i źródła, data weryfikacji), wyłącznik trasy,
-  jawna zgoda na uruchomienia z harmonogramu (z ostrzeżeniem) i „Zaloguj w terminalu" — Alfa
-  podaje polecenie do skopiowania, niczego nie wykonuje i nie czyta tokenów CLI.
+  jawna zgoda na uruchomienia z harmonogramu (z ostrzeżeniem) i „Zaloguj w terminalu" — wbudowany
+  terminal z profilem logowania CLI (gest użytkownika; logowanie wykonuje człowiek) albo polecenie
+  do skopiowania. Alfa nie czyta tokenów CLI.
 -->
 <script lang="ts">
   import { Button, Checkbox, Switch, TextField } from '@alfa/ui-kit';
   import type { BridgeCard, BridgeLogin } from '../../../api/types-tasks';
+  import { loginProfile } from '../../../logic/work';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -147,6 +149,12 @@
               >
             {/if}
             {#if card.login_command}
+              {@const profile = loginProfile(bridge)}
+              {#if profile}
+                <Button size="sm" variant="primary" onclick={() => app.work.openTerminal(profile)}
+                  >{t('bridges.loginTerminal')}</Button
+                >
+              {/if}
               <Button size="sm" variant="secondary" onclick={() => login(bridge)}
                 >{t('bridges.login')}</Button
               >

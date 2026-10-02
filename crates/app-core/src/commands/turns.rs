@@ -18,7 +18,7 @@ use crate::dto::{
 use crate::error::AppError;
 use crate::ids;
 use crate::settings::keys;
-use crate::store::TurnMeta;
+use app_store::TurnMeta;
 
 impl AppCore {
     /// `turns_list`: całe drzewo (append-only) + tura w trakcie strumienia + adnotacje.

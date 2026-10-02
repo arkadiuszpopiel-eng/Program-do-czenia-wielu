@@ -73,6 +73,11 @@ pub(crate) struct Extra {
     pub tts_module: Option<Arc<VoiceTtsModule>>,
     pub tts: Option<Arc<dyn Tts>>,
     pub updater: Option<Arc<FsUpdater>>,
+    /// Gotowość narzędzi i runtime agentek — ustalana po złożeniu stosu agentek (moduły
+    /// `agent-runtime`, `tools-*` startują w kolejności przed dziennikiem cofania).
+    pub agents_ready: Arc<std::sync::OnceLock<Result<(), String>>>,
+    /// Usługi modułów trzymane przez cały czas życia rdzenia (ich zdrowie czyta rejestr).
+    pub keep: Vec<Arc<dyn std::any::Any + Send + Sync>>,
 }
 
 /// System plików narzędzi i dziennika cofania (ten sam port — cofnięcie widzi te same pliki).
@@ -333,14 +338,17 @@ impl Extra {
         Ok(())
     }
 
+    /// Zdrowie narzędzi i runtime agentek: „nieuruchomione" do złożenia stosu agentek, potem
+    /// zdrowe albo niesprawne (brak Brokera lub dziennika cofania) — bez fałszywych awarii
+    /// zależnych od kolejności startu.
     fn agents_ready(&mut self, id: &str, deps: &Deps<'_>) -> Result<(), AppError> {
-        if self.broker.is_none() || self.undo.is_none() {
-            return Err(AppError::internal(format!(
-                "{id}: brak Brokera albo dziennika cofania"
-            )));
-        }
         if let Some(slot) = deps.slot {
-            let _ = slot.set(Arc::new(|| HealthStatus::Healthy));
+            let (ready, id) = (self.agents_ready.clone(), id.to_owned());
+            let _ = slot.set(Arc::new(move || match ready.get() {
+                None => HealthStatus::NotStarted,
+                Some(Ok(())) => HealthStatus::Healthy,
+                Some(Err(why)) => HealthStatus::Unhealthy(format!("{id}: {why}")),
+            }));
         }
         Ok(())
     }

@@ -38,6 +38,8 @@ pub struct AgentKit {
     pub tools: Arc<AgentTools>,
     /// Broker z rejestrem kart zatwierdzeń.
     pub tickets: Arc<TicketLog>,
+    /// Start v1: zasoby wyłączne, autonomia, obsada (delegacja, Krytyczka), umiejętności.
+    pub launch: app_agents::Launch,
 }
 
 /// Zależności wykonawczyni zadań.

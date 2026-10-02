@@ -78,10 +78,31 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
     L('Retencja i redakcja', 'Retention and redaction'),
     L('„Co poszło do chmury"', '"What went to the cloud"'),
   ]),
-  later('improve', L('Samonaprawa i ulepszanie', 'Self-repair and improvement'), 8, [
-    L('Pierścienie zmian R0–R2', 'Change rings R0–R2'),
-    L('Kolejka propozycji', 'Proposal queue'),
-  ]),
+  page(
+    'improve',
+    L('Zdrowie systemu', 'System health'),
+    1,
+    [
+      select(
+        'diagnostician.autonomy',
+        L('Samodzielność Diagnosty', 'Diagnostician autonomy'),
+        L(
+          'Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera. Zmiana działa od następnego uruchomienia.',
+          'What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window. Takes effect after the next start.',
+        ),
+        [
+          ['propose_only', L('Tylko proponuje', 'Propose only')],
+          ['auto_low_risk', L('Sam naprawia niskie ryzyko', 'Fixes low risk on its own')],
+          [
+            'auto_medium_risk',
+            L('Sam naprawia niskie i średnie ryzyko', 'Fixes low and medium risk on its own'),
+          ],
+        ],
+        'auto_low_risk',
+      ),
+    ],
+    { custom: 'health' },
+  ),
   later('modules', L('Moduły', 'Modules'), 2, [
     L('Lista modułów, włącz / wyłącz', 'Module list, enable / disable'),
     L('Budżety RAM i CPU', 'RAM and CPU budgets'),

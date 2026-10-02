@@ -17,7 +17,7 @@ use crate::dto::{
     TurnUsage,
 };
 use crate::ids;
-use crate::store::TurnMeta;
+use app_store::TurnMeta;
 
 /// Tekst tury-komunikatu, gdy odpowiedź nie powstała.
 const NO_ANSWER: &str = "Odpowiedź przerwana przed pierwszym słowem.";

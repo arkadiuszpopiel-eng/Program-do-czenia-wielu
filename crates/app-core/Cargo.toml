@@ -24,6 +24,13 @@ app-memory = { path = "../app-memory" }
 # Zadania, wyzwalacze, Marszałek (scheduler-impl zamiast scheduler-lite-impl) i mosty CLI + MCP.
 app-tasks = { path = "../app-tasks" }
 app-bridges = { path = "../app-bridges" }
+# Computer use (panel „Ekran"), terminal, umiejętności + Kreator, „Zdrowie systemu".
+app-gui = { path = "../app-gui" }
+app-terminal = { path = "../app-terminal" }
+app-skills = { path = "../app-skills" }
+app-health = { path = "../app-health" }
+# Tabele aplikacji w bazach sesji (fakty o turach, oś czasu, Replay) — wydzielone z app-core.
+app-store = { path = "../app-store" }
 agent-backends-contract = { path = "../agent-backends-contract" }
 mcp-impl = { path = "../mcp-impl" }
 agent-runtime-contract = { path = "../agent-runtime-contract" }
@@ -31,6 +38,7 @@ tools-common-contract = { path = "../tools-common-contract" }
 voice-pipeline-contract = { path = "../voice-pipeline-contract" }
 # Jądro
 core-bus-contract.workspace = true
+diagnostician-contract = { path = "../diagnostician-contract" }
 core-bus-impl = { path = "../core-bus-impl" }
 core-registry-contract.workspace = true
 core-registry-impl = { path = "../core-registry-impl" }
@@ -40,6 +48,7 @@ core-log-contract.workspace = true
 core-log-impl = { path = "../core-log-impl" }
 platform-contract.workspace = true
 platform-windows-impl = { path = "../platform-windows-impl" }
+platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
 # Dane
 lib-sqlstore = { path = "../lib-sqlstore" }
 lib-markdown = { path = "../lib-markdown" }

@@ -11,6 +11,7 @@ pub(crate) mod history;
 pub(crate) mod project;
 mod routing;
 pub(crate) mod stream;
+mod symptom;
 
 use std::sync::{Arc, Mutex};
 

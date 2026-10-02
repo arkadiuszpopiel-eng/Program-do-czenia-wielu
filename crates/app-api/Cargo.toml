@@ -13,6 +13,8 @@ repository.workspace = true
 # (i przez jego reeksport — powłoka Tauri).
 [dependencies]
 accounts-hub-contract = { path = "../accounts-hub-contract" }
+# Szkic Kreatora agentów (`AgentDraft`) jako DTO komend `builder_*` — ten sam kształt serde.
+agent-builder-contract = { path = "../agent-builder-contract" }
 artifacts-contract = { path = "../artifacts-contract" }
 core-config-contract.workspace = true
 cost-meter-contract = { path = "../cost-meter-contract" }

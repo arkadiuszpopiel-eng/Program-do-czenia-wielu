@@ -16,7 +16,11 @@ for (const theme of ['light', 'dark'] as const) {
         .getByRole('button', { name: 'Replay' })
         .click();
       await expect(
-        page.getByText('Przygotuj szkic raportu Q3 z arkuszy przychodów.'),
+        page.getByText('Przygotuj szkic raportu Q3 z arkuszy przychodów.', { exact: true }),
+      ).toBeVisible();
+      // Podprzebieg Krytyczki (oceny planu) pod przebiegiem głównym.
+      await expect(
+        page.getByRole('list', { name: 'Podprzebiegi' }).getByRole('button', { name: /Krytyczka/ }),
       ).toBeVisible();
       const steps = page.getByRole('list', { name: 'Kroki przebiegu' });
       await expect(steps.getByRole('listitem')).toHaveCount(4);

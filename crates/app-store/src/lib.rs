@@ -3,6 +3,13 @@
 //! adresatka, kontynuacja, zużycie w PLN), log stanów (kolejka offline), oceny i oś czasu v0.
 //! Wszystko **wyłącznie dopisywane** (wyzwalacze blokują UPDATE/DELETE); usunięcie sesji
 //! (crypto-shredding) usuwa je razem z bazą.
+//!
+//! Wydzielone z `app-core` (kategoria `app-*`, limit 8 000 linii na crate); przestrzeń migracji
+//! pozostaje `app-core` (zgodność baz sesji). Tabele agentek — moduł `agents` (migracja `0002`).
+
+#![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
+
+mod agents;
 
 use std::collections::{BTreeMap, HashSet};
 use std::sync::{Arc, Mutex, PoisonError};
@@ -12,10 +19,10 @@ use lib_sqlstore::{Db, migrate};
 use serde::{Deserialize, Serialize};
 use sessions_contract::{SessionDbProvider, SessionId, TurnId};
 
-use crate::dto::{
+use app_api::AppError;
+use app_api::dto::{
     ApprovalPending, Rating, TimelineEvent, ToolStep, TurnError, TurnStatus, TurnUsage,
 };
-use crate::error::AppError;
 
 const NAMESPACE: &str = "app-core";
 
@@ -39,7 +46,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
      CREATE TRIGGER app_timeline_ro_u BEFORE UPDATE ON app_timeline
          BEGIN SELECT RAISE(ABORT, 'app_timeline: append-only'); END;",
     ),
-    ("0002", crate::store_agents::MIGRATION_0002),
+    ("0002", crate::agents::MIGRATION_0002),
 ];
 
 /// Fakty o turze zapisywane raz, razem z turą.

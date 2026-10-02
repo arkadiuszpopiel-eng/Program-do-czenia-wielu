@@ -6,7 +6,9 @@ mod extra;
 mod kernel;
 mod memory;
 mod ports;
+pub(crate) mod signals;
 mod tasks;
+mod work;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -32,13 +34,14 @@ use crate::error::AppError;
 use crate::infra::probe::ProviderProbe;
 use crate::options::{AppOptions, AppPaths};
 use crate::ports::HeadlessShell;
-use crate::store::AppStore;
 pub(crate) use agents::AgentStack;
 use app_modules::embedder::LexicalEmbedder;
 use app_modules::late::{LateDbProvider, LateIndexer};
 use app_modules::secrets::StoreKeyVault;
+use app_store::AppStore;
 pub(crate) use extra::Extra;
 pub(crate) use kernel::Kernel;
+pub(crate) use work::WorkStack;
 
 /// Moduły zbudowane w kolejności rejestru.
 #[derive(Default)]
@@ -58,6 +61,8 @@ pub(crate) struct Built {
     personas: Option<Arc<PersonasModule>>,
     tasks: tasks::TaskParts,
     extra: Extra,
+    /// Gniazda zdrowia modułów `app-gui/terminal/skills/health` (wypełniane po złożeniu).
+    work_slots: Vec<(String, HealthSlot)>,
 }
 
 fn need<T: ?Sized>(value: &Option<Arc<T>>, what: &str) -> Result<Arc<T>, AppError> {
@@ -78,6 +83,11 @@ impl Built {
         slot: Option<&HealthSlot>,
     ) -> Result<(), AppError> {
         let healthy = || extra::healthy(slot);
+        if work::is_work(id) {
+            self.work_slots
+                .extend(slot.map(|s| (id.to_owned(), s.clone())));
+            return Ok(());
+        }
         if self.build_tasks(id, paths, kernel, bus, slot).await? {
             return Ok(());
         }
@@ -214,6 +224,8 @@ impl Built {
             .unwrap_or_else(|| Arc::new(HeadlessShell::default()));
         let scheduler = need(&self.tasks.scheduler, "scheduler")?;
         let memory = self.memory_app(&kernel).await?;
+        let personas = need(&self.personas, "personas")?;
+        let (gui, monitor) = work::gui(&options, &paths, &kernel);
         let ports = self.extra.ports(
             &options,
             ports::PortDeps {
@@ -225,6 +237,8 @@ impl Built {
                 bus: &bus,
                 scheduler,
                 tools: memory.tools(),
+                gui: (&gui, &monitor),
+                personas: personas.clone(),
             },
         )?;
         let stack = self.task_stack(tasks::StackDeps {
@@ -237,6 +251,37 @@ impl Built {
             agents: ports.agents.as_ref(),
             translator: options.brain.is_some() || self.extra.routers.is_some(),
         })?;
+        let work = self
+            .work_stack(work::WorkDepsIn {
+                options: &options,
+                paths: &paths,
+                kernel: &kernel,
+                registry: registry.clone(),
+                bus: &bus,
+                monitor,
+                broker: ports.broker.clone(),
+                shell: &shell,
+                voice: ports.voice.clone(),
+                tasks: stack.tasks.clone(),
+                personas: personas.clone(),
+                stack: ports.agents.as_ref(),
+            })
+            .await;
+        work.health.bind_brain(ports.brain.clone());
+        let mut extra = self.extra;
+        let ready = match ports.agents {
+            Some(_) => Ok(()),
+            None => Err("brak Brokera albo dziennika cofania".to_owned()),
+        };
+        let _ = extra.agents_ready.set(ready);
+        let keep = [self
+            .providers
+            .map(|p| p as Arc<dyn std::any::Any + Send + Sync>)];
+        extra.keep.extend(keep.into_iter().flatten());
+        extra.keep.extend(
+            self.memory
+                .map(|m| m as Arc<dyn std::any::Any + Send + Sync>),
+        );
         let provider: Arc<dyn SessionDbProvider> = sessions.clone();
         let inner = Inner {
             undo_window: options.undo_window,
@@ -252,14 +297,16 @@ impl Built {
             artifacts: need(&self.artifacts, "artifacts")?,
             costs: need(&self.costs, "cost-meter")?,
             _compliance: need(&self.compliance, "compliance")?,
-            personas: need(&self.personas, "personas")?,
+            personas,
+            work,
+            signals: kernel.signals,
             tasks: stack.tasks,
             bridges: stack.bridges,
             hub,
             sessions,
             device,
             brain: ports.brain,
-            extra: self.extra,
+            extra,
             transfer: ports.transfer,
             voice: ports.voice,
             broker: ports.broker,

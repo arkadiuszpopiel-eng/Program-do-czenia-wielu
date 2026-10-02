@@ -90,6 +90,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "agent-builder-contract"
+version = "0.0.1"
+dependencies = [
+ "agent-runtime-contract",
+ "async-trait",
+ "core-bus-contract",
+ "personas-contract",
+ "risk-classifier-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.21",
+ "tools-common-contract",
+ "voice-tts-contract",
+]
+
+[[package]]
+name = "agent-builder-impl"
+version = "0.0.1"
+dependencies = [
+ "agent-builder-contract",
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "personas-contract",
+ "risk-classifier-contract",
+ "serde_json",
+ "tools-common-contract",
+ "voice-tts-contract",
+]
+
+[[package]]
 name = "agent-runtime-contract"
 version = "0.0.1"
 dependencies = [
@@ -235,13 +268,16 @@ dependencies = [
  "chrono",
  "compliance-contract",
  "core-bus-contract",
+ "futures-util",
  "personas-contract",
  "platform-contract",
  "providers-contract",
  "risk-classifier-contract",
  "safety-broker-contract",
+ "scheduler-contract",
  "serde",
  "serde_json",
+ "skills-contract",
  "tokio",
  "tools-clipboard-contract",
  "tools-clipboard-impl",
@@ -259,6 +295,7 @@ name = "app-api"
 version = "0.0.1"
 dependencies = [
  "accounts-hub-contract",
+ "agent-builder-contract",
  "artifacts-contract",
  "async-trait",
  "chrono",
@@ -309,9 +346,14 @@ dependencies = [
  "app-agents",
  "app-api",
  "app-bridges",
+ "app-gui",
+ "app-health",
  "app-memory",
  "app-modules",
+ "app-skills",
+ "app-store",
  "app-tasks",
+ "app-terminal",
  "app-voice",
  "artifacts-contract",
  "artifacts-impl",
@@ -331,6 +373,7 @@ dependencies = [
  "cost-meter-impl",
  "device-profile-contract",
  "device-profile-impl",
+ "diagnostician-contract",
  "futures-util",
  "lib-markdown",
  "lib-sqlstore",
@@ -344,6 +387,7 @@ dependencies = [
  "personas-impl",
  "platform-contract",
  "platform-windows-impl",
+ "platform-windows-sys-impl",
  "providers-api-impl",
  "providers-contract",
  "providers-local-impl",
@@ -379,6 +423,58 @@ dependencies = [
  "voice-pipeline-contract",
  "voice-tts-contract",
  "voice-tts-impl",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "app-gui"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "platform-contract",
+ "platform-windows-gui-impl",
+ "platform-windows-impl",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "tools-common-contract",
+ "tools-input-contract",
+ "tools-input-impl",
+ "tools-screen-contract",
+ "tools-screen-impl",
+ "tools-uia-contract",
+ "tools-uia-impl",
+ "tools-window-contract",
+ "tools-window-impl",
+ "tracing",
+]
+
+[[package]]
+name = "app-health"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "core-config-contract",
+ "core-registry-contract",
+ "diagnostician-contract",
+ "diagnostician-impl",
+ "evals-contract",
+ "evals-impl",
+ "futures-util",
+ "improver-contract",
+ "improver-impl",
+ "providers-contract",
+ "serde_json",
+ "sessions-contract",
+ "tokio",
  "watchdog-contract",
 ]
 
@@ -437,6 +533,7 @@ dependencies = [
  "router-impl",
  "safety-broker-contract",
  "safety-broker-impl",
+ "search-contract",
  "serde_json",
  "sessions-contract",
  "tokio",
@@ -450,6 +547,42 @@ dependencies = [
  "voice-tts-contract",
  "voice-tts-impl",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-skills"
+version = "0.0.1"
+dependencies = [
+ "agent-builder-contract",
+ "agent-builder-impl",
+ "app-agents",
+ "app-api",
+ "app-tasks",
+ "chrono",
+ "core-bus-contract",
+ "core-registry-contract",
+ "futures-util",
+ "personas-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "semver",
+ "serde_json",
+ "skills-contract",
+ "skills-impl",
+ "tokio",
+ "tools-common-contract",
+ "voice-tts-contract",
+]
+
+[[package]]
+name = "app-store"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "lib-sqlstore",
+ "serde",
+ "serde_json",
+ "sessions-contract",
 ]
 
 [[package]]
@@ -470,6 +603,7 @@ dependencies = [
  "marshal-contract",
  "marshal-impl",
  "personas-contract",
+ "platform-contract",
  "providers-contract",
  "risk-classifier-contract",
  "safety-broker-contract",
@@ -485,6 +619,21 @@ dependencies = [
  "triggers-contract",
  "triggers-impl",
  "voice-wake-contract",
+]
+
+[[package]]
+name = "app-terminal"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "app-api",
+ "base64 0.22.1",
+ "core-bus-contract",
+ "platform-contract",
+ "platform-windows-pty-impl",
+ "tokio",
+ "ui-terminal-contract",
+ "ui-terminal-impl",
 ]
 
 [[package]]
@@ -1653,6 +1802,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "diagnostician-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "diagnostician-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-config-contract",
+ "core-registry-contract",
+ "diagnostician-contract",
+ "futures-util",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "watchdog-contract",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1893,6 +2071,31 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "evals-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evals-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "evals-contract",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -2862,6 +3065,36 @@ checksum = "cb68373c0d6620ef8105e855e7745e18b0d00d3bdb07fb532e434244cdb9a714"
 dependencies = [
  "icu_normalizer",
  "icu_properties",
+]
+
+[[package]]
+name = "improver-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-config-contract",
+ "core-log-contract",
+ "evals-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "improver-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-config-contract",
+ "core-registry-contract",
+ "evals-contract",
+ "improver-contract",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -4427,6 +4660,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "platform-windows-gui-impl"
+version = "0.0.1"
+dependencies = [
+ "flate2",
+ "platform-contract",
+ "windows",
+]
+
+[[package]]
 name = "platform-windows-impl"
 version = "0.0.1"
 dependencies = [
@@ -4434,6 +4676,22 @@ dependencies = [
  "serde",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "platform-windows-pty-impl"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "windows",
+]
+
+[[package]]
+name = "platform-windows-sys-impl"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "windows",
 ]
 
 [[package]]
@@ -5794,6 +6052,42 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33f4fe9184a62d842c9ef383018f3306d8ba224fd9d836f56d7288308847c256"
 
 [[package]]
+name = "skills-contract"
+version = "0.0.1"
+dependencies = [
+ "agent-runtime-contract",
+ "async-trait",
+ "core-bus-contract",
+ "memory-contract",
+ "personas-contract",
+ "risk-classifier-contract",
+ "schemars 1.2.2",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.21",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "skills-impl"
+version = "0.0.1"
+dependencies = [
+ "agent-runtime-contract",
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "personas-contract",
+ "semver",
+ "serde_json",
+ "skills-contract",
+ "tokio",
+ "tools-common-contract",
+ "transfer-contract",
+]
+
+[[package]]
 name = "slab"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6904,6 +7198,65 @@ dependencies = [
 ]
 
 [[package]]
+name = "tools-input-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-input-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "platform-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-input-contract",
+ "tools-window-contract",
+]
+
+[[package]]
+name = "tools-screen-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-screen-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "core-bus-contract",
+ "core-registry-contract",
+ "platform-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-screen-contract",
+ "tools-window-contract",
+]
+
+[[package]]
 name = "tools-shell-contract"
 version = "0.0.1"
 dependencies = [
@@ -6934,6 +7287,65 @@ dependencies = [
  "tools-shell-contract",
  "undo-journal-contract",
  "watchdog-contract",
+]
+
+[[package]]
+name = "tools-uia-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-uia-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "platform-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-uia-contract",
+ "tools-window-contract",
+]
+
+[[package]]
+name = "tools-window-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "platform-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-window-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "platform-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-window-contract",
 ]
 
 [[package]]
@@ -7321,6 +7733,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "ui-terminal-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "ui-terminal-impl"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "core-registry-contract",
+ "platform-contract",
+ "serde_json",
+ "tokio",
+ "ui-terminal-contract",
+]
+
+[[package]]
 name = "undo-journal-contract"
 version = "0.0.1"
 dependencies = [
@@ -7602,12 +8035,14 @@ dependencies = [
  "futures-core",
  "personas-contract",
  "providers-contract",
+ "risk-classifier-contract",
  "schemars 1.2.2",
  "serde",
  "serde_json",
  "thiserror 2.0.21",
  "voice-dialog-contract",
  "voice-persona-contract",
+ "voice-speaker-contract",
  "voice-wake-contract",
 ]
 
@@ -7634,11 +8069,24 @@ dependencies = [
  "voice-dsp-contract",
  "voice-persona-contract",
  "voice-pipeline-contract",
+ "voice-speaker-contract",
  "voice-stt-contract",
  "voice-tts-contract",
  "voice-turn-contract",
  "voice-vad-contract",
  "voice-wake-contract",
+]
+
+[[package]]
+name = "voice-speaker-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "risk-classifier-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -7767,6 +8215,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.21",
+ "voice-vad-contract",
 ]
 
 [[package]]
@@ -7779,6 +8228,13 @@ dependencies = [
  "personas-contract",
  "platform-contract",
  "scheduler-lite-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tract-onnx",
+ "voice-audio-contract",
+ "voice-dsp-contract",
  "voice-wake-contract",
 ]
 

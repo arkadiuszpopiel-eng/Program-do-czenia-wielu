@@ -11,8 +11,8 @@ use std::time::Instant;
 
 use agent_runtime_contract::{RunEvent, RunOutcome, UsageTotals};
 use app_agents::{
-    AgentSettings, Projection, RunContext, RunHandle, RunProjector, SpecInput, final_text, keys,
-    run_spec,
+    AgentSettings, FamilyProjector, Projection, RunContext, RunHandle, RunProjector, SpecInput,
+    final_text, keys, run_spec,
 };
 use cost_meter_contract::CostMeter;
 use personas_contract::{Persona, PersonaId, Personas, Role};
@@ -201,14 +201,18 @@ pub(crate) async fn run(
         window,
     );
     let approval_timeout_ms = spec.approval_timeout_ms;
-    let started_run = RunHandle::start(
+    // v1: obsada sesji → delegacja (`delegate_task`) i Krytyczka jako podprzebiegi w Replay.
+    let options = stack.launch.options(&req.session, None);
+    let started_run = RunHandle::launch(
+        &stack.launch,
         choice.provider.clone(),
         &stack.tools,
         Some(core.inner.bus.clone()),
         spec,
+        options,
     )
     .await;
-    let (run, mut feed) = match started_run {
+    let (run, mut family) = match started_run {
         Ok(x) => x,
         Err(e) => return failed(format!("Nie udało się uruchomić zadania agentki: {e}")),
     };
@@ -248,15 +252,20 @@ pub(crate) async fn run(
         started_at: chrono::Utc::now(),
         task_id: None,
     };
-    let mut projector = RunProjector::new(ctx, titles, Some(stack.tickets.clone()));
+    let mut family_view = FamilyProjector::new(ctx, titles, Some(stack.tickets.clone()));
     let mut totals = UsageTotals::default();
-    while let Some(env) = feed.next().await {
+    while let Some(env) = family.next().await {
+        let (head, projection, main) = family_view.apply(&family, &env);
+        if !main {
+            core.project_task(&req.session, &head, projection);
+            continue;
+        }
         if let RunEvent::Usage(u) = &env.event {
             totals = *u;
         }
-        let projection = projector.apply(&env);
-        core.apply_projection(&req.session, handle, &ctl, &projector, projection);
+        core.apply_projection(&req.session, handle, &ctl, family_view.main(), projection);
     }
+    let projector = family_view.main();
     linker.abort();
     {
         let mut rt = core.rt();

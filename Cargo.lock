@@ -313,6 +313,7 @@ dependencies = [
  "chrono",
  "compliance-contract",
  "core-bus-contract",
+ "futures-util",
  "personas-contract",
  "platform-contract",
  "platform-fake",
@@ -323,8 +324,10 @@ dependencies = [
  "risk-classifier-contract",
  "safety-broker-contract",
  "safety-broker-fake",
+ "scheduler-contract",
  "serde",
  "serde_json",
+ "skills-contract",
  "tempfile",
  "tokio",
  "tools-clipboard-contract",
@@ -344,6 +347,7 @@ name = "app-api"
 version = "0.0.1"
 dependencies = [
  "accounts-hub-contract",
+ "agent-builder-contract",
  "artifacts-contract",
  "async-trait",
  "chrono",
@@ -395,9 +399,14 @@ dependencies = [
  "app-agents",
  "app-api",
  "app-bridges",
+ "app-gui",
+ "app-health",
  "app-memory",
  "app-modules",
+ "app-skills",
+ "app-store",
  "app-tasks",
+ "app-terminal",
  "app-voice",
  "artifacts-contract",
  "artifacts-impl",
@@ -418,6 +427,7 @@ dependencies = [
  "device-profile-contract",
  "device-profile-fake",
  "device-profile-impl",
+ "diagnostician-contract",
  "futures-util",
  "lib-markdown",
  "lib-sqlstore",
@@ -432,6 +442,7 @@ dependencies = [
  "platform-contract",
  "platform-fake",
  "platform-windows-impl",
+ "platform-windows-sys-impl",
  "providers-api-impl",
  "providers-contract",
  "providers-fake",
@@ -482,6 +493,66 @@ dependencies = [
  "voice-turn-fake",
  "voice-vad-fake",
  "voice-wake-fake",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "app-gui"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "async-trait",
+ "chrono",
+ "compliance-contract",
+ "core-bus-contract",
+ "platform-contract",
+ "platform-fake",
+ "platform-windows-gui-impl",
+ "platform-windows-impl",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "tools-common-contract",
+ "tools-input-contract",
+ "tools-input-impl",
+ "tools-screen-contract",
+ "tools-screen-impl",
+ "tools-uia-contract",
+ "tools-uia-impl",
+ "tools-window-contract",
+ "tools-window-impl",
+ "tracing",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "app-health"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "core-bus-impl",
+ "core-config-contract",
+ "core-config-fake",
+ "core-registry-contract",
+ "core-registry-impl",
+ "diagnostician-contract",
+ "diagnostician-impl",
+ "evals-contract",
+ "evals-impl",
+ "futures-util",
+ "improver-contract",
+ "improver-impl",
+ "providers-contract",
+ "serde_json",
+ "sessions-contract",
+ "tempfile",
+ "tokio",
  "watchdog-contract",
 ]
 
@@ -579,6 +650,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-skills"
+version = "0.0.1"
+dependencies = [
+ "agent-builder-contract",
+ "agent-builder-impl",
+ "app-agents",
+ "app-api",
+ "app-tasks",
+ "chrono",
+ "core-bus-contract",
+ "core-registry-contract",
+ "futures-util",
+ "personas-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "semver",
+ "serde_json",
+ "skills-contract",
+ "skills-impl",
+ "tokio",
+ "tools-common-contract",
+ "voice-tts-contract",
+]
+
+[[package]]
+name = "app-store"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "lib-sqlstore",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+]
+
+[[package]]
 name = "app-tasks"
 version = "0.0.1"
 dependencies = [
@@ -598,6 +705,7 @@ dependencies = [
  "marshal-contract",
  "marshal-impl",
  "personas-contract",
+ "platform-contract",
  "providers-contract",
  "risk-classifier-contract",
  "safety-broker-contract",
@@ -614,6 +722,24 @@ dependencies = [
  "triggers-contract",
  "triggers-impl",
  "voice-wake-contract",
+]
+
+[[package]]
+name = "app-terminal"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "app-api",
+ "base64 0.22.1",
+ "core-bus-contract",
+ "core-bus-fake",
+ "platform-contract",
+ "platform-fake",
+ "platform-windows-pty-impl",
+ "serde_json",
+ "tokio",
+ "ui-terminal-contract",
+ "ui-terminal-impl",
 ]
 
 [[package]]
@@ -3344,6 +3470,16 @@ name = "platform-windows-pty-impl"
 version = "0.0.1"
 dependencies = [
  "platform-contract",
+ "windows",
+]
+
+[[package]]
+name = "platform-windows-sys-impl"
+version = "0.0.1"
+dependencies = [
+ "compliance-contract",
+ "platform-contract",
+ "tempfile",
  "windows",
 ]
 
@@ -6174,6 +6310,51 @@ dependencies = [
 ]
 
 [[package]]
+name = "voice-dictation-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "personas-contract",
+ "platform-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "voice-dictation-fake"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "voice-dictation-contract",
+]
+
+[[package]]
+name = "voice-dictation-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-contract",
+ "platform-fake",
+ "proptest",
+ "scheduler-lite-contract",
+ "scheduler-lite-fake",
+ "tokio",
+ "voice-audio-contract",
+ "voice-audio-fake",
+ "voice-dictation-contract",
+ "voice-stt-contract",
+ "voice-stt-fake",
+ "voice-vad-contract",
+ "voice-vad-fake",
+ "voice-wake-contract",
+]
+
+[[package]]
 name = "voice-dsp-contract"
 version = "0.0.1"
 dependencies = [
@@ -6247,12 +6428,14 @@ dependencies = [
  "futures-core",
  "personas-contract",
  "providers-contract",
+ "risk-classifier-contract",
  "schemars",
  "serde",
  "serde_json",
  "thiserror",
  "voice-dialog-contract",
  "voice-persona-contract",
+ "voice-speaker-contract",
  "voice-wake-contract",
 ]
 
@@ -6285,6 +6468,7 @@ dependencies = [
  "proptest",
  "providers-contract",
  "providers-fake",
+ "risk-classifier-contract",
  "scheduler-lite-contract",
  "scheduler-lite-fake",
  "schemars",
@@ -6302,6 +6486,8 @@ dependencies = [
  "voice-persona-contract",
  "voice-persona-fake",
  "voice-pipeline-contract",
+ "voice-speaker-contract",
+ "voice-speaker-fake",
  "voice-stt-contract",
  "voice-stt-fake",
  "voice-tts-contract",
@@ -6312,6 +6498,130 @@ dependencies = [
  "voice-vad-fake",
  "voice-wake-contract",
  "voice-wake-fake",
+]
+
+[[package]]
+name = "voice-readaloud-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "personas-contract",
+ "platform-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "voice-readaloud-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "personas-contract",
+ "platform-contract",
+ "tokio",
+ "voice-readaloud-contract",
+]
+
+[[package]]
+name = "voice-readaloud-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "personas-contract",
+ "platform-contract",
+ "platform-fake",
+ "providers-contract",
+ "scheduler-lite-contract",
+ "scheduler-lite-fake",
+ "tokio",
+ "voice-audio-contract",
+ "voice-audio-fake",
+ "voice-readaloud-contract",
+ "voice-tts-contract",
+ "voice-tts-fake",
+ "voice-wake-contract",
+]
+
+[[package]]
+name = "voice-s2s-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "personas-contract",
+ "providers-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "voice-audio-contract",
+]
+
+[[package]]
+name = "voice-s2s-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "personas-contract",
+ "providers-contract",
+ "tokio",
+ "voice-audio-contract",
+ "voice-s2s-contract",
+]
+
+[[package]]
+name = "voice-speaker-contract"
+version = "0.0.1"
+dependencies = [
+ "core-bus-contract",
+ "risk-classifier-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "voice-speaker-fake"
+version = "0.0.1"
+dependencies = [
+ "risk-classifier-contract",
+ "voice-audio-contract",
+ "voice-speaker-contract",
+]
+
+[[package]]
+name = "voice-speaker-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "chacha20poly1305",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "getrandom 0.4.3",
+ "prost",
+ "schemars",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+ "sessions-fake",
+ "sha2",
+ "tempfile",
+ "tokio",
+ "tract-onnx",
+ "voice-audio-contract",
+ "voice-dsp-contract",
+ "voice-speaker-contract",
+ "voice-speaker-fake",
+ "voice-wake-contract",
+ "zeroize",
 ]
 
 [[package]]
@@ -6489,6 +6799,8 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+ "voice-audio-contract",
+ "voice-vad-contract",
 ]
 
 [[package]]
@@ -6511,10 +6823,20 @@ dependencies = [
  "personas-contract",
  "platform-contract",
  "platform-fake",
+ "prost",
  "scheduler-lite-contract",
  "scheduler-lite-fake",
+ "schemars",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
  "tokio",
+ "tract-onnx",
+ "voice-audio-contract",
+ "voice-dsp-contract",
  "voice-wake-contract",
+ "voice-wake-fake",
 ]
 
 [[package]]

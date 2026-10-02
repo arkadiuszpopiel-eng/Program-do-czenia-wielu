@@ -71,6 +71,7 @@ import type {
   TriggerInfo,
   TriggerRunInfo,
 } from './types-tasks';
+import type { BuilderApi, GuiApi, HealthApi, SkillsApi, TerminalApi } from './client-work';
 import type {
   AlfaEvent,
   AppBootstrap,
@@ -345,6 +346,11 @@ export interface AlfaClient {
   readonly triggers: TriggersApi;
   readonly marshal: MarshalApi;
   readonly bridges: BridgesApi;
+  readonly gui: GuiApi;
+  readonly terminal: TerminalApi;
+  readonly skills: SkillsApi;
+  readonly builder: BuilderApi;
+  readonly health: HealthApi;
   /** Jeden kanał zdarzeń; rdzeń wysyła je paczkami (batch co klatkę). */
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): Unsubscribe;
   dispose(): void;

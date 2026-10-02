@@ -119,6 +119,8 @@ impl RunProjector {
             budget: ctx.budget.clone(),
             bridge: None,
             task_id: ctx.task_id.clone(),
+            parent_id: None,
+            label: None,
         };
         Self {
             ctx,
@@ -133,6 +135,20 @@ impl RunProjector {
             last_step: 0,
             outcome: None,
         }
+    }
+
+    /// Podprzebieg (delegacja, Krytyczka, umiejętność): rodzic i etykieta w nagłówku.
+    #[must_use]
+    pub fn with_parent(mut self, parent: String, label: Option<String>) -> Self {
+        self.run.parent_id = Some(parent);
+        self.run.label = label;
+        self
+    }
+
+    /// Agentka podprzebiegu ustalona po starcie (z checkpointu runtime).
+    pub fn set_agent(&mut self, agent: &str) {
+        agent.clone_into(&mut self.ctx.agent);
+        agent.clone_into(&mut self.run.agent);
     }
 
     /// Nagłówek przebiegu.

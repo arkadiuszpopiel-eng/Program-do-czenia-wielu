@@ -4,6 +4,8 @@
 import type { AlfaClient } from '../client';
 import type { AlfaEvent } from '../types-system';
 import { FakeChat } from './api-chat';
+import { FakeGui } from './api-gui';
+import { FakeHealth } from './api-health';
 import { accountsApi, transferApi } from './api-hub';
 import { sessionsApi } from './api-sessions';
 import {
@@ -21,6 +23,7 @@ import {
 import { bridgesApi, marshalApi } from './api-marshal';
 import { memoryApi } from './api-memory';
 import { modelsApi } from './api-models';
+import { FakeBuilder, FakeSkills } from './api-skills';
 import { FakeTasks } from './api-tasks';
 import { FakeCore, type FakeOptions } from './core';
 
@@ -54,6 +57,11 @@ export class FakeAlfaClient implements AlfaClient {
   readonly triggers: AlfaClient['triggers'];
   readonly marshal: AlfaClient['marshal'];
   readonly bridges: AlfaClient['bridges'];
+  readonly gui: AlfaClient['gui'];
+  readonly terminal: AlfaClient['terminal'];
+  readonly skills: AlfaClient['skills'];
+  readonly builder: AlfaClient['builder'];
+  readonly health: AlfaClient['health'];
 
   constructor(options: FakeOptions = {}) {
     this.core = new FakeCore(options);
@@ -81,6 +89,12 @@ export class FakeAlfaClient implements AlfaClient {
     this.triggers = tasks.triggersApi();
     this.marshal = marshalApi(core, tasks);
     this.bridges = bridgesApi(core);
+    const gui = new FakeGui(core);
+    this.gui = gui.api();
+    this.terminal = gui.terminalApi();
+    this.skills = new FakeSkills(core, this.tasks).api();
+    this.builder = new FakeBuilder(core).api();
+    this.health = new FakeHealth(core).api();
   }
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

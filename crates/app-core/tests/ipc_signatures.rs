@@ -25,8 +25,28 @@ macro_rules! check_signatures {
 
 app_core::with_commands!(check_signatures);
 
+/// Komenda ze strumieniem w kanale (handler ręczny w powłoce): odbiorca zamiast `Channel`.
+/// Jawny typ zwracany jest celem testu (`Send + 'static`), stąd bez `async fn`.
+#[allow(clippy::manual_async_fn)]
+fn terminal_open(
+    core: AppCore,
+    sink: std::sync::Arc<dyn app_core::FrameSink>,
+) -> impl Future<Output = Result<app_core::dto::TerminalSession, AppError>> + Send + 'static {
+    async move {
+        core.terminal_open(app_core::dto::TerminalProfileId::Shell, 80, 24, None, sink)
+            .await
+    }
+}
+
 #[test]
 fn every_command_has_a_send_future_with_matching_types() {
-    assert_eq!(CHECKED, app_core::COMMANDS);
-    assert_eq!(CHECKED.len(), 123);
+    let all: Vec<&str> = CHECKED
+        .iter()
+        .chain(app_core::CHANNEL_COMMANDS)
+        .copied()
+        .collect();
+    assert_eq!(all, app_core::COMMANDS);
+    assert_eq!(CHECKED.len(), 161);
+    assert_eq!(app_core::CHANNEL_COMMANDS, ["terminal_open"]);
+    let _ = terminal_open;
 }

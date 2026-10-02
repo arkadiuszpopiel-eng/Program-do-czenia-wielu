@@ -34,6 +34,7 @@ compliance-contract = { path = "../compliance-contract" }
 sessions-contract = { path = "../sessions-contract" }
 voice-wake-contract = { path = "../voice-wake-contract" }
 core-bus-contract.workspace = true
+platform-contract.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
 futures-util.workspace = true

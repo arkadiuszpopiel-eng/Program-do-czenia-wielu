@@ -1,0 +1,54 @@
+[
+  {
+    "command": "terminal_open",
+    "args": {
+      "profile": "claude_login",
+      "cols": 100,
+      "rows": 30,
+      "cwd": null,
+      "channel": "__CHANNEL__:1"
+    },
+    "result": {
+      "id": 1,
+      "profile": "claude_login",
+      "pid": 4001,
+      "alive": true
+    }
+  },
+  {
+    "command": "terminal_input",
+    "args": {
+      "terminal": 1,
+      "dataB64": "L2xvZ2luDQ=="
+    },
+    "result": null
+  },
+  {
+    "command": "terminal_resize",
+    "args": {
+      "terminal": 1,
+      "cols": 120,
+      "rows": 32
+    },
+    "result": null
+  },
+  {
+    "command": "terminal_list",
+    "args": {},
+    "result": [
+      {
+        "id": 1,
+        "profile": "claude_login",
+        "pid": 4001,
+        "alive": true
+      }
+    ]
+  },
+  {
+    "command": "terminal_close",
+    "args": {
+      "terminal": 1
+    },
+    "result": null
+  }
+]

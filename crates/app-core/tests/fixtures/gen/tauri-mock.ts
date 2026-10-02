@@ -17,3 +17,14 @@ export async function listen(): Promise<() => void> {
 }
 
 export type UnlistenFn = () => void;
+
+/** Kanał strumienia (`terminal_open`): w IPC serializuje się do identyfikatora `__CHANNEL__:<n>`. */
+export class Channel<T> {
+  private static next = 1;
+  readonly id = Channel.next++;
+  onmessage: (message: T) => void = () => undefined;
+
+  toJSON(): string {
+    return `__CHANNEL__:${this.id}`;
+  }
+}

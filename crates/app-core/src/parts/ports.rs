@@ -39,6 +39,10 @@ pub(crate) struct PortDeps<'a> {
     pub scheduler: Arc<dyn scheduler_lite_contract::SchedulerLite>,
     /// Narzędzia spoza `tools-*` (pamięć) dla agentek.
     pub tools: Vec<Arc<dyn tools_common_contract::Tool>>,
+    /// Porty GUI i panel „Ekran" (narzędzia computer use dla ról z `gui.control`).
+    pub gui: (&'a app_gui::GuiPorts, &'a Arc<app_gui::GuiMonitor>),
+    /// Persony (obsada przebiegów: delegacja, Krytyczka).
+    pub personas: Arc<personas_impl::PersonasModule>,
 }
 
 impl Extra {
@@ -53,6 +57,8 @@ impl Extra {
             bus,
             scheduler,
             tools,
+            gui,
+            personas,
         } = deps;
         let brain: Arc<dyn BrainPort> = match (&options.brain, &self.routers) {
             (Some(brain), _) => brain.clone(),
@@ -76,6 +82,10 @@ impl Extra {
             }
             (None, None) => Arc::new(TransferUnavailable),
         };
+        let launch = (
+            scheduler.clone(),
+            personas as Arc<dyn personas_contract::Personas>,
+        );
         let voice: Arc<dyn VoicePort> =
             self.voice_port(options, paths, &kernel.events, bus, scheduler);
         let broker: Arc<dyn BrokerPort> = match (&options.broker, &self.broker) {
@@ -99,7 +109,7 @@ impl Extra {
             transfer,
             voice,
             broker,
-            agents: self.agent_stack(options, paths, bus, tools),
+            agents: self.agent_stack(options, paths, bus, tools, gui, launch),
         })
     }
 }

@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use super::agents::{AgentRun, ReplayStep, VoiceStatus};
 use super::common::LocalizedText;
+use super::gui::GuiStatus;
+use super::health::HealthOverall;
 use super::hub::{Account, LocalDownloadState};
 use super::panels::{ActivityInfo, AgentState, CostSummary, TimelineEvent};
 use super::sessions::{
@@ -163,5 +165,18 @@ pub enum AlfaEvent {
     /// Raport dzienny Marszałka (relacjonuje Dyrygentka; powiadomienie natywne).
     MarshalReportReady {
         report: MarshalReport,
+    },
+    /// Computer use: kto steruje, ostatnie akcje, przejęcie (pasek tytułu, panel „Ekran") — bez pikseli.
+    GuiActivity {
+        status: GuiStatus,
+    },
+    /// Biblioteka umiejętności zmieniona (propozycja z pamięci, import, zatwierdzenie).
+    SkillsChanged {
+        skill_id: Option<String>,
+    },
+    /// „Zdrowie systemu" zmienione (incydent, naprawa, propozycja Ulepszacza, werdykt bramki).
+    HealthChanged {
+        overall: HealthOverall,
+        pending: u32,
     },
 }

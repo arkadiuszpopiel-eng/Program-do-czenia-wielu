@@ -19,11 +19,21 @@
   import type { AudioDevice, DeviceProfile, InspectResult } from '../../api/types-hub';
   import { useApp } from '../../state/context';
   import AddProviderWizard from '../settings/pages/AddProviderWizard.svelte';
+  import BridgesStep from './BridgesStep.svelte';
   import LocalModelCard from './LocalModelCard.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
-  const STEPS = ['mic', 'voice', 'hardware', 'keys', 'autonomy', 'corpus', 'import'] as const;
+  const STEPS = [
+    'mic',
+    'voice',
+    'hardware',
+    'keys',
+    'autonomy',
+    'corpus',
+    'bridges',
+    'import',
+  ] as const;
   const LEVELS: readonly AutonomyLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
 
   let step = $state(untrack(() => app.onboardingStep));
@@ -230,6 +240,8 @@
       {:else if current === 'corpus'}
         <h2>{t('ob.corpus.title')}</h2>
         <p class="muted">{t('ob.corpus.desc')}</p>
+      {:else if current === 'bridges'}
+        <BridgesStep />
       {:else}
         <h2>{t('ob.import.title')}</h2>
         <p class="muted">{t('ob.import.desc')}</p>

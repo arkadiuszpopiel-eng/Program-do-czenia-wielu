@@ -76,9 +76,9 @@ for (const theme of ['light', 'dark'] as const) {
     test('onboarding', async ({ page }) => {
       await openApp(page, { theme, scenario: 'first-run' });
       await expect(page.getByRole('heading', { name: 'Witaj w Alfie' })).toBeVisible();
-      for (let step = 0; step < 7; step++) {
+      for (let step = 0; step < 8; step++) {
         await expectAccessible(page, `onboarding krok ${step + 1} ${theme}`);
-        const next = page.getByRole('button', { name: step === 6 ? 'Zaczynamy' : 'Dalej' });
+        const next = page.getByRole('button', { name: step === 7 ? 'Zaczynamy' : 'Dalej' });
         if (step === 3) await page.getByRole('button', { name: 'Pomiń — dodam później' }).click();
         else await next.click();
       }

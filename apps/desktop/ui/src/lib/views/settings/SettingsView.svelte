@@ -11,13 +11,17 @@
   import { bestScore } from '../../logic/fuzzy';
   import { useApp } from '../../state/context';
   import SettingRow from './SettingRow.svelte';
+  import BuilderPage from './pages/BuilderPage.svelte';
+  import ComputerPage from './pages/ComputerPage.svelte';
   import CostsPage from './pages/CostsPage.svelte';
   import DevicesPage from './pages/DevicesPage.svelte';
+  import HealthPage from './pages/HealthPage.svelte';
   import MarshalPage from './pages/MarshalPage.svelte';
   import MemoryPage from './pages/MemoryPage.svelte';
   import PermissionsPage from './pages/PermissionsPage.svelte';
   import ProvidersPage from './pages/ProvidersPage.svelte';
   import ShortcutsPage from './pages/ShortcutsPage.svelte';
+  import SkillsPage from './pages/SkillsPage.svelte';
   import TransferPage from './pages/TransferPage.svelte';
   import TriggersPage from './pages/TriggersPage.svelte';
   import VoicePage from './pages/VoicePage.svelte';
@@ -139,6 +143,10 @@
         {:else if page.custom === 'memory'}<MemoryPage />
         {:else if page.custom === 'triggers'}<TriggersPage />
         {:else if page.custom === 'marshal'}<MarshalPage />
+        {:else if page.custom === 'skills'}<SkillsPage />
+        {:else if page.custom === 'builder'}<BuilderPage />
+        {:else if page.custom === 'computer'}<ComputerPage />
+        {:else if page.custom === 'health'}<HealthPage />
         {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />

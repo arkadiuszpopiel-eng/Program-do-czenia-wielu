@@ -97,6 +97,14 @@ pub enum SettingsCustomPage {
     Triggers,
     /// Reguły Marszałka: propozycja → podgląd zawężenia → zatwierdź / cofnij.
     Marshal,
+    /// Umiejętności: biblioteka, propozycje z diffem i hashem, kwarantanna, eksport/import.
+    Skills,
+    /// Kreator agentek: rozmowa/formularz → podgląd persony → test na sucho → zapis.
+    Builder,
+    /// Computer use: podgląd pulpitu „zawsze zezwalaj" (przez Brokera), strażnik okien.
+    Computer,
+    /// Zdrowie systemu: moduły, incydenty i naprawy Diagnosty, Ulepszacz, wyniki evali.
+    Health,
 }
 
 /// Strona ustawień (drzewo §15).

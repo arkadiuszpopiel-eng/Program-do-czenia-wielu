@@ -16,6 +16,12 @@ use super::extra::platform_fs;
 use crate::options::{AppOptions, AppPaths};
 use crate::ports::{VoicePort, VoiceUnavailable};
 
+/// Zasoby wyłączne i obsada dla startu przebiegów v1.
+pub(crate) type Launchers = (
+    Arc<dyn scheduler_lite_contract::SchedulerLite>,
+    Arc<dyn personas_contract::Personas>,
+);
+
 /// Narzędzia agentek i rejestr próśb o zatwierdzenie.
 #[derive(Clone)]
 pub(crate) struct AgentStack {
@@ -23,6 +29,8 @@ pub(crate) struct AgentStack {
     pub tools: Arc<AgentTools>,
     /// Fakty próśb o zatwierdzenie (karta w wątku).
     pub tickets: Arc<TicketLog>,
+    /// Start v1: zasoby wyłączne (scheduler), autonomia (Broker), obsada, umiejętności.
+    pub launch: app_agents::Launch,
 }
 
 impl Extra {
@@ -33,12 +41,23 @@ impl Extra {
         options: &AppOptions,
         paths: &AppPaths,
         bus: &Arc<dyn EventBus>,
-        extra: Vec<Arc<dyn tools_common_contract::Tool>>,
+        mut extra: Vec<Arc<dyn tools_common_contract::Tool>>,
+        (gui, monitor): (&app_gui::GuiPorts, &Arc<app_gui::GuiMonitor>),
+        (locks, personas): Launchers,
     ) -> Option<AgentStack> {
         let engine = self.broker.clone()?;
         let journal = self.undo.clone()?;
         let broker: Arc<dyn Broker> = engine.clone();
         let tickets = Arc::new(TicketLog::new(broker));
+        // Computer use: narzędzia GUI przez ten sam rejestr kart Brokera (role z `gui.control`).
+        let gate: Arc<dyn Broker> = tickets.clone();
+        extra.extend(app_gui::gui_tools(
+            gui,
+            gate.clone(),
+            Some(bus.clone()),
+            monitor,
+        ));
+        let launch = app_agents::Launch::new(Some(locks), Some(gate), Some(personas));
         // Ta sama instancja, którą Broker zabija procesy (kill-switch, Job Objects).
         let exec = self.exec.clone()?;
         let clipboard: Arc<dyn platform_contract::ClipboardPort> = match &options.clipboard {
@@ -62,6 +81,7 @@ impl Extra {
         Some(AgentStack {
             tools: Arc::new(tools),
             tickets,
+            launch,
         })
     }
 

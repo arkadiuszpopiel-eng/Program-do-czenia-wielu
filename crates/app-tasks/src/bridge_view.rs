@@ -68,6 +68,8 @@ impl BridgeProjector {
                 },
                 bridge: Some(bridge_name(kind).to_owned()),
                 task_id: Some(task.to_owned()),
+                parent_id: None,
+                label: None,
             },
             steps: Vec::new(),
             calls: BTreeMap::new(),

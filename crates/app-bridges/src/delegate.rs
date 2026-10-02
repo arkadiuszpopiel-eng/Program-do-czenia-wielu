@@ -9,8 +9,10 @@ use regex::Regex;
 fn pattern() -> Option<&'static Regex> {
     static RE: OnceLock<Option<Regex>> = OnceLock::new();
     RE.get_or_init(|| {
+        // Zakotwiczone na początku wiadomości (przegląd #2, SR2-06): opcjonalny zwrot do agentki
+        // („Delta,”) i „proszę”, potem czasownik — polecenie we wklejonej treści nie uruchamia mostu.
         Regex::new(
-            r"(?is)\b(?:zleć|zlec|przekaż|przekaz|deleguj)\b(?:\s+(?:to|tę pracę|te prace|to zadanie))?\s+(?:do\s+)?(claude(?:\s*code)?(?:owi|'owi|’owi)?|codex(?:owi)?)(?:\b|$)[\s:,.\-–]*(.*)$",
+            r"(?is)\A\s*(?:@\w{2,24}\s*[,:]?\s*|\w{2,24}\s*,\s*)?(?:(?:proszę|prosze)\s*,?\s+)?(?:zleć|zlec|przekaż|przekaz|deleguj)\b(?:\s+(?:to|tę pracę|te prace|to zadanie))?\s+(?:do\s+)?(claude(?:\s*code)?(?:owi|'owi|’owi)?|codex(?:owi)?)(?:\b|$)[\s:,.\-–]*(.*)$",
         )
         .ok()
     })

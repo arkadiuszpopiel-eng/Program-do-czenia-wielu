@@ -85,6 +85,19 @@ Ikona i menu zasobnika (z `ui-quick`), plakietki paska zadań, Ustawienia → Og
 - **Do F1+/launcher:** autostart, „Wyślij do", AUMID, pasek zadań; rejestracje mają wskazywać stały launcher
   (ADR 0007), którego jeszcze nie ma — dziś wskazują binarium instalatora.
 
+## Implementacja F8 (stan)
+- `terminal_open` — jedyna komenda z handlerem ręcznym (`app_core::CHANNEL_COMMANDS`): argument
+  `channel: tauri::ipc::Channel<TerminalFrame>` opakowany w `FrameSink` rdzenia; pozostałe komendy F8
+  (`gui_*`, `terminal_*`, `skills_*`, `builder_*`, `health_*`, `improver_*`, `evals_*`) generuje
+  `with_commands!`. Uprawnienia `allow-<komenda>` z COMMANDS.md tylko w `capabilities/main.json`
+  (okna `quick` i `pill` ich nie dostają).
+- Okna Alfy tworzone z `content_protected(true)` (`SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`):
+  niewidoczne na zrzutach — także dla narzędzi `tools-screen` agentek (warstwa obrony obok strażnika
+  okien i maskowania w porcie zrzutów).
+- Weryfikacja poza Windows: `cargo fmt --check` + `cargo clippy --target x86_64-pc-windows-msvc
+  --all-targets [--features e2e] -- -D warnings` na kopii powłoki z zaślepką `app-core` (DTO i lista
+  komend z `app-api`); zgodność z prawdziwym rdzeniem — job Windows w CI.
+
 ## Otwarte pytania
 - Single-instance: named pipe z ACL na SID vs mutex + WM_COPYDATA — do ustalenia w SPEC v1.
 - Menu kontekstowe Eksploratora w Win11 (klasyczne vs IExplorerCommand wymagające pakietu) — spike j.

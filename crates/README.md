@@ -60,7 +60,7 @@ od `*-impl`; od `*-fake` tylko w dev-dependencies; `app-*` mogą zależeć od in
 | `voice-vad` | `voice-vad-contract`, `-impl`, `-fake` | Silero VAD przez `tract-onnx` (bez ONNX Runtime), histereza, próg adaptacyjny, zapas energetyczny |
 | `voice-stt` | `voice-stt-contract`, `-impl`, `-fake` | sidecar `whisper-server` (whisper.cpp), bramka VAD, partial + final, hotwords, fallback GPU→CPU |
 | `voice-tts` | `voice-tts-contract`, `-impl`, `-fake` | Pocket TTS (sidecar JSON-lines) i Piper, głosy v0 (wysokość/tempo WSOLA), łańcuch fallback per agentka, cache fraz, TTFB |
-| `voice-wake` | `voice-wake-contract`, `-impl`, `-fake` | PTT, przełącznik, DND, stan mikrofonu, adresowanie po imieniu, mikrofon jako zasób wyłączny |
+| `voice-wake` | `voice-wake-contract`, `-impl` (+ bin `alfa-wake-eval`), `-fake` | PTT, przełącznik, DND, stan mikrofonu, adresowanie po imieniu, mikrofon jako zasób wyłączny; v1: słowa wywoławcze „Hej …" (KWS tract-onnx, domyślnie wyłączone, tylko lokalnie, bufor 2 s bez wycieku audio przed wykryciem) |
 | `risk-classifier` | `risk-classifier-contract`, `-impl`, `-fake` | deterministyczna tabela reguł ryzyka (odwracalność, zakres, źródło polecenia, pewność STT, taint) |
 | `safety-broker` | `safety-broker-contract`, `-impl`, `-fake` | tokeny zdolności z atenuacją i HMAC, L0–L4, twarde blokady Jądra (także na L4), plan do zatwierdzenia, `PhysicalInputProof`, audyt z łańcuchem i kotwicą, kill-switch, IPC bez TCP. **Wymaga przeglądu człowieka** |
 | `undo-journal` | `undo-journal-contract`, `-impl`, `-fake` | trwały dziennik cofania `fs.*` z pre-image, kroki, konflikty; 100% przywrócenia w testach losowych |
@@ -91,6 +91,12 @@ od `*-impl`; od `*-fake` tylko w dev-dependencies; `app-*` mogą zależeć od in
 | `diagnostician` | `diagnostician-contract`, `-impl`, `-fake` | Diagnosta: sygnały z rejestru/logów/watchdoga, katalog 24 awarii, naprawy cofalne z weryfikacją, Jądro tylko przez Brokera, raport „Zdrowie systemu" |
 | `improver` | `improver-contract`, `-impl`, `-fake` | Ulepszacz R0–R2: propozycje, piaskownica z holdoutem, wdrożenie po zatwierdzeniu z rollbackiem; nigdy Jądro, progi, deny-listy (0/137 prób obejścia) |
 | `app-memory`, `app-tasks`, `app-bridges` | (korzeń kompozycji `app-*`) | pamięć F7 + Inspektor w aplikacji; scheduler/wyzwalacze/Marszałek + panel Zadania; mosty CLI z kartami zgodności, delegacja z czatu, serwer MCP v0 |
+| `platform-windows-sys` | `platform-windows-sys-impl` (kontrakt: `platform-contract`) | sygnały systemowe (bezczynność z histerezą, zasilanie, tryb gry/pełny ekran, blokada sesji) i obserwacja katalogów `ReadDirectoryChangesW` (debounce, przeskanowanie po przepełnieniu, deny-lista surowa i kanoniczna) |
+| `voice-speaker` | `voice-speaker-contract`, `-impl` (+ bin `alfa-speaker-eval`), `-fake` | weryfikacja właściciela: rejestracja ≥ 3 wypowiedzi, embedding ECAPA (tract-onnx, model ze ścieżki), profil szyfrowany XChaCha20-Poly1305 z kluczem w sejfie, eksport tylko za zgodą; ryzyko głosem bez weryfikacji → potwierdzenie nie-głosem |
+| `voice-dictation` | `voice-dictation-contract`, `-impl`, `-fake` | dyktowanie do dowolnej aplikacji: normalizacja odwrotna PL (interpunkcja, liczby), wpisywanie tylko do okna docelowego, nigdy do okien Alfy/Brokera ani pól haseł (fail-closed), „cofnij to" |
+| `voice-readaloud` | `voice-readaloud-contract`, `-impl`, `-fake` | czytanie zaznaczenia/okna przez UIA TextPattern głosem agentki, TTS prywatny, treść niezaufana (do modelu tylko za zgodą) |
+| `voice-s2s` | `voice-s2s-contract`, `-fake` | kontrakt trybu speech-to-speech w chmurze (Realtime z natywnym obcięciem); sesja prywatna nigdy się nie łączy; adapter chmurowy później |
+| `app-gui`, `app-terminal`, `app-skills`, `app-health`, `app-store` | (korzeń kompozycji `app-*`) | computer use w aplikacji (strażnik celów z PID-ami Alfy, panel Ekran, „Zatrzymaj sterowanie", ochrona okien przed zrzutem); terminal ConPTY przez kanał IPC (bez zdarzeń/logów); umiejętności i Kreator agentek; Zdrowie systemu (Diagnosta, Ulepszacz, evale); magazyn aplikacji w bazie sesji |
 | `example-module` | `example-module-contract`, `-impl`, `-fake` | wzorzec dla wszystkich kolejnych modułów |
 
 

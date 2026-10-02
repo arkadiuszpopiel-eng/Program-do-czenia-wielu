@@ -23,10 +23,14 @@ fn load(name: &str) -> Value {
     serde_json::from_str(&text).unwrap()
 }
 
-/// Równość JSON z liczbami porównywanymi wartością (JS nie odróżnia `1` od `1.0`).
+/// Równość JSON z liczbami porównywanymi wartością (JS nie odróżnia `1` od `1.0`); pola `f32`
+/// (np. wysokość i tempo głosu w Kreatorze) — równość z dokładnością `f32`.
 fn same(a: &Value, b: &Value) -> bool {
     match (a, b) {
-        (Value::Number(x), Value::Number(y)) => x.as_f64() == y.as_f64(),
+        (Value::Number(x), Value::Number(y)) => {
+            x.as_f64() == y.as_f64()
+                || matches!((x.as_f64(), y.as_f64()), (Some(p), Some(q)) if p as f32 == q as f32)
+        }
         (Value::Array(x), Value::Array(y)) => {
             x.len() == y.len() && x.iter().zip(y).all(|(p, q)| same(p, q))
         }
@@ -302,8 +306,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 29 typów z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 29, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 32 typy z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 32, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

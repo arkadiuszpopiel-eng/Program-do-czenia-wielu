@@ -497,6 +497,28 @@
   "upcoming": []
  },
  {
+  "id": "skills",
+  "label": {
+   "pl": "Umiejętności",
+   "en": "Skills"
+  },
+  "wave": 1,
+  "custom": "skills",
+  "settings": [],
+  "upcoming": []
+ },
+ {
+  "id": "builder",
+  "label": {
+   "pl": "Kreator agentek",
+   "en": "Agent builder"
+  },
+  "wave": 1,
+  "custom": "builder",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "triggers",
   "label": {
    "pl": "Zadania w tle i wyzwalacze",
@@ -535,19 +557,10 @@
    "pl": "Komputer",
    "en": "Computer"
   },
-  "wave": 6,
-  "custom": null,
+  "wave": 1,
+  "custom": "computer",
   "settings": [],
-  "upcoming": [
-   {
-    "pl": "Trasy: API › UIA › wizja › wejście",
-    "en": "Routes: API › UIA › vision › input"
-   },
-   {
-    "pl": "Aplikacje i przeglądarka",
-    "en": "Apps and browser"
-   }
-  ]
+  "upcoming": []
  },
  {
   "id": "memory",
@@ -820,22 +833,53 @@
  {
   "id": "improve",
   "label": {
-   "pl": "Samonaprawa i ulepszanie",
-   "en": "Self-repair and improvement"
+   "pl": "Zdrowie systemu",
+   "en": "System health"
   },
-  "wave": 8,
-  "custom": null,
-  "settings": [],
-  "upcoming": [
+  "wave": 1,
+  "custom": "health",
+  "settings": [
    {
-    "pl": "Pierścienie zmian R0–R2",
-    "en": "Change rings R0–R2"
-   },
-   {
-    "pl": "Kolejka propozycji",
-    "en": "Proposal queue"
+    "key": "diagnostician.autonomy",
+    "label": {
+     "pl": "Samodzielność Diagnosty",
+     "en": "Diagnostician autonomy"
+    },
+    "description": {
+     "pl": "Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera. Zmiana działa od następnego uruchomienia.",
+     "en": "What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window. Takes effect after the next start."
+    },
+    "default": "auto_low_risk",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "propose_only",
+       "label": {
+        "pl": "Tylko proponuje",
+        "en": "Propose only"
+       }
+      },
+      {
+       "value": "auto_low_risk",
+       "label": {
+        "pl": "Sam naprawia niskie ryzyko",
+        "en": "Fixes low risk on its own"
+       }
+      },
+      {
+       "value": "auto_medium_risk",
+       "label": {
+        "pl": "Sam naprawia niskie i średnie ryzyko",
+        "en": "Fixes low and medium risk on its own"
+       }
+      }
+     ]
+    }
    }
-  ]
+  ],
+  "upcoming": []
  },
  {
   "id": "modules",

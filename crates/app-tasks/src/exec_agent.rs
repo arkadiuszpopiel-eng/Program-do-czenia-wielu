@@ -9,9 +9,9 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::Duration;
 
-use agent_runtime_contract::{AgentTaskPayload, MemCheckpointStore, RunId, RunOptions};
-use agent_runtime_impl::{Runtime, RuntimeConfig, RuntimeDeps, RuntimeExecutor, task_run_id};
-use app_agents::{RunContext, RunFeed, RunProjector, SpecInput, run_spec};
+use agent_runtime_contract::{AgentTaskPayload, MemCheckpointStore, RunId};
+use agent_runtime_impl::{Runtime, RuntimeExecutor, task_run_id};
+use app_agents::{FamilyProjector, RunContext, RunFamily, SkillCall, SpecInput, run_spec};
 use app_api::ports::{BrainError, BrainRequest};
 use core_bus_contract::SessionId;
 use personas_contract::{PersonaId, Role};
@@ -108,8 +108,13 @@ fn roles_of(deps: &ExecDeps, session: &SessionId, agent: &PersonaId) -> Vec<Role
         .collect()
 }
 
-/// Zadanie tokio: dziennik przebiegu → Replay w sesji (do zakończenia przebiegu).
-fn spawn_projection(deps: &ExecDeps, kit: &AgentKit, runtime: Arc<Runtime>, ctx: RunContext) {
+/// Zadanie tokio: dziennik przebiegu i podprzebiegów (delegacja, Krytyczka) → Replay w sesji.
+fn spawn_projection(
+    deps: &ExecDeps,
+    kit: &AgentKit,
+    (runtime, store): (Arc<Runtime>, MemCheckpointStore),
+    ctx: RunContext,
+) {
     let host = deps.host.clone();
     let titles: BTreeMap<String, String> = kit
         .tools
@@ -121,23 +126,23 @@ fn spawn_projection(deps: &ExecDeps, kit: &AgentKit, runtime: Arc<Runtime>, ctx:
     tokio::spawn(async move {
         let run = RunId::new(ctx.run.clone());
         // Przebieg startuje w `RuntimeExecutor` — czekamy, aż pojawi się w runtime.
-        let mut feed = None;
+        let mut family = None;
         for _ in 0..500 {
-            if let Ok(f) = RunFeed::attach(runtime.clone(), run.clone()) {
-                feed = Some(f);
+            if let Ok(f) = RunFamily::attach(runtime.clone(), store.clone(), run.clone()) {
+                family = Some(f);
                 break;
             }
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
-        let Some(mut feed) = feed else {
+        let Some(mut family) = family else {
             tracing::warn!(przebieg = %run, "brak dziennika przebiegu zadania — Replay pominięty");
             return;
         };
         let session = ctx.session.clone();
-        let mut projector = RunProjector::new(ctx, titles, Some(tickets));
-        while let Some(env) = feed.next().await {
-            let projection = projector.apply(&env);
-            host.project(&session, projector.run(), projection);
+        let mut projector = FamilyProjector::new(ctx, titles, Some(tickets));
+        while let Some(env) = family.next().await {
+            let (head, projection, _) = projector.apply(&family, &env);
+            host.project(&session, &head, projection);
         }
     });
 }
@@ -213,24 +218,23 @@ pub(crate) async fn run(
                 spec.workdir = None;
             }
             let approval_timeout_ms = spec.approval_timeout_ms;
-            let payload = AgentTaskPayload {
-                spec,
-                options: RunOptions {
-                    label: Some(d.spec.title.clone()),
-                    ..RunOptions::default()
-                },
-            };
+            let mut options = kit.launch.options(&session, Some(d.spec.title.clone()));
+            if let Ok(call) = serde_json::from_value::<SkillCall>(d.spec.payload["skill"].clone()) {
+                match kit.launch.skill_run(&call, &spec, &options) {
+                    Ok((s, o)) => (spec, options) = (s, o),
+                    Err(e) => return fail(format!("umiejętność „{}”: {e}", call.id), false),
+                }
+            }
+            let payload = AgentTaskPayload { spec, options };
             match serde_json::to_value(&payload) {
                 Ok(v) => d.spec.payload = v,
                 Err(e) => return fail(format!("ładunek zadania: {e}"), false),
             }
-            let runtime = Arc::new(Runtime::new(RuntimeDeps {
-                provider: choice.provider.clone(),
-                tools: kit.tools.all(),
-                checkpoints: Arc::new(MemCheckpointStore::default()),
-                bus: Some(deps.bus.clone()),
-                config: RuntimeConfig::default(),
-            }));
+            let (runtime, store) = kit.launch.runtime(
+                choice.provider.clone(),
+                kit.tools.all(),
+                Some(deps.bus.clone()),
+            );
             let ctx = RunContext {
                 session: session.clone(),
                 turn_id: None,
@@ -246,7 +250,7 @@ pub(crate) async fn run(
                 started_at: chrono::Utc::now(),
                 task_id: Some(d.task.to_string()),
             };
-            spawn_projection(deps, &kit, runtime.clone(), ctx);
+            spawn_projection(deps, &kit, (runtime.clone(), store), ctx);
             runtimes
                 .lock()
                 .insert(key.clone(), (runtime.clone(), d.spec.payload.clone()));

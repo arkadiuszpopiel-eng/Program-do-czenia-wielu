@@ -34,6 +34,18 @@ pub async fn agents() -> Agents {
     let core = AppCore::build(AppPaths::under(dir.path()), opts)
         .await
         .unwrap();
+    let mut a = agents_on(core, provider, shell, dir).await;
+    a.exec = exec;
+    a
+}
+
+/// Sesja z katalogiem roboczym i bez samoweryfikacji na gotowym rdzeniu (własne opcje testu).
+pub async fn agents_on(
+    core: AppCore,
+    provider: Arc<ScriptedProvider>,
+    shell: Arc<HeadlessShell>,
+    dir: tempfile::TempDir,
+) -> Agents {
     let rx = core.subscribe_events();
     core.settings_set(
         "agents.verify_before_done".into(),
@@ -59,7 +71,7 @@ pub async fn agents() -> Agents {
             rx,
             dir,
         },
-        exec,
+        exec: Arc::new(FakeExec::new()),
         sid,
         workdir,
     }

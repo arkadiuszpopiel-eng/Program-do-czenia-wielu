@@ -59,3 +59,30 @@ pub fn native_notice(event: &AlfaEvent) -> Option<NativeNotice> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::dto::{GuiStatus, HealthOverall};
+
+    #[test]
+    fn work_events_stay_in_panels_without_windows_toasts() {
+        let gui = GuiStatus {
+            available: true,
+            reason: None,
+            control: None,
+            taken_over: true,
+            actions: Vec::new(),
+            screenshot: None,
+        };
+        let events = [
+            AlfaEvent::GuiActivity { status: gui },
+            AlfaEvent::SkillsChanged { skill_id: None },
+            AlfaEvent::HealthChanged {
+                overall: HealthOverall::Failing,
+                pending: 2,
+            },
+        ];
+        assert!(events.iter().all(|e| native_notice(e).is_none()));
+    }
+}

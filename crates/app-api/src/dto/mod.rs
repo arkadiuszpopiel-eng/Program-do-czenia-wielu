@@ -10,10 +10,13 @@ mod agents;
 mod bridges;
 mod common;
 mod events;
+mod gui;
+mod health;
 mod hub;
 mod memory;
 mod panels;
 mod sessions;
+mod skills;
 mod system;
 mod tasks;
 mod transfer;
@@ -28,6 +31,15 @@ pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };
 pub use events::{AlfaEvent, StopReason, ToastKind};
+pub use gui::{
+    GuiAction, GuiActionStatus, GuiControl, GuiScreenshot, GuiShotInfo, GuiStatus, TerminalFrame,
+    TerminalProfileId, TerminalSession,
+};
+pub use health::{
+    EvalSuiteView, EvalVerdictView, EvalsView, HealthHumanAction, HealthIncident, HealthModule,
+    HealthOverall, HealthProposal, HealthRepair, HealthView, ImproverBlocked, ImproverChange,
+    ImproverIssue, ImproverProposalView, ImproverView, ModuleHealth, RiskView,
+};
 pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountState, AddAccountInput, AudioDevice,
     AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind, ComplianceStatus,
@@ -51,6 +63,11 @@ pub use sessions::{
     RiskLevel, SendOptions, SendResult, SessionSearchHit, SessionSummary, SessionTemplate,
     ThinkingInfo, ToolIcon, ToolStatus, ToolStep, Turn, TurnAnnotation, TurnError, TurnErrorCode,
     TurnStatus, TurnUsage, TurnsSnapshot, UndoTicket,
+};
+pub use skills::{
+    AgentDraft, BuilderAgentInfo, BuilderDryRun, BuilderDryStep, BuilderPolicyView, BuilderPreview,
+    BuilderProposal, BuilderSaved, DiffKind, DiffLine, DryOutcome, SkillImportResult, SkillInfo,
+    SkillOrigin, SkillReview, SkillStateView,
 };
 pub use system::{
     AppBootstrap, DiskInfo, LayoutPrefs, MicAvailability, MicState, PanelId, QuickAskResult,

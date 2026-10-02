@@ -29,10 +29,14 @@ compliance-contract = { path = "../compliance-contract" }
 personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }
 watchdog-contract = { path = "../watchdog-contract" }
+# v1: zasoby wyłączne (scheduler) dla `RuntimeExt`, umiejętności (koperta `prepare_run`).
+scheduler-contract = { path = "../scheduler-contract" }
+skills-contract = { path = "../skills-contract" }
 core-bus-contract.workspace = true
 platform-contract.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
+futures-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true

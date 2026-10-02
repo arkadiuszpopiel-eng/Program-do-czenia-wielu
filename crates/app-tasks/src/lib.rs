@@ -2,7 +2,7 @@
 //! limit rozmiaru crate'a):
 //! - [`modules`] — `scheduler-impl` (zastępuje `scheduler-lite-impl`: ta sama tablica blokad dla
 //!   mowy i zadań; stan w `%LOCALAPPDATA%\Alfa\scheduler`, budżet tła z `cost-meter`),
-//!   `triggers-impl` (obserwacja katalogów: port bez implementacji platformy — [`NoFileWatch`]),
+//!   `triggers-impl` (obserwacja katalogów: port platformy przez [`watch`], bez niego [`NoFileWatch`]),
 //!   `marshal-impl` (tłumacz [`LlmTranslator`] przez Router);
 //! - [`LateExecutor`] / [`AppExecutor`] — wykonawczyni zadań: agentka przez `RuntimeExecutor`
 //!   z hakiem `StepGate::boundary`, most CLI przez `agent-backends` (pochodzenie zadania →
@@ -26,6 +26,7 @@ mod rules;
 mod sink;
 pub mod text;
 mod translator;
+pub mod watch;
 
 use std::path::Path;
 use std::sync::Arc;
@@ -79,12 +80,21 @@ pub mod modules {
         .map_err(|e| AppError::internal(format!("scheduler: {e}")))
     }
 
-    /// Wyzwalacze: stan `<dir>/triggers.json`; obserwacja katalogów — port bez platformy.
-    pub fn triggers(dir: &Path, scheduler: Arc<dyn Scheduler>) -> Result<TriggersModule, AppError> {
+    /// Wyzwalacze: stan `<dir>/triggers.json`; obserwacja katalogów — port platformy
+    /// (`None` — bez obserwacji: wyzwalacze plikowe tylko przez `file_created`).
+    pub fn triggers(
+        dir: &Path,
+        scheduler: Arc<dyn Scheduler>,
+        watch: Option<Arc<dyn platform_contract::DirWatchPort>>,
+    ) -> Result<TriggersModule, AppError> {
+        let files: Arc<dyn triggers_impl::FileWatchPort> = match watch {
+            Some(port) => Arc::new(crate::watch::PlatformFileWatch::new(port)),
+            None => Arc::new(NoFileWatch),
+        };
         TriggersModule::new(
             scheduler,
             Arc::new(FileTriggerStore::new(dir.join("triggers.json"))),
-            Arc::new(NoFileWatch),
+            files,
         )
         .map_err(|e| AppError::internal(format!("triggers: {e}")))
     }

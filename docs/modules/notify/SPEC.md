@@ -69,6 +69,9 @@ Toasty w aplikacji (ui-kit `Toast`), karta „Cofnij", Ustawienia → Powiadomie
 - F5–F7: raport dnia Marszałka (`MarshalReportReady`) → toast Windows „Alfa — raport dnia” (okno ukryte)
   i toast w aplikacji; eskalacje Marszałka → `Toast` (ostrzeżenie). Zadania (`TaskUpdated`), wyzwalacze
   (`TriggerFired`) i pamięć (`MemoryChanged`) — bez toastu Windows (stan w panelach).
+- F8: `GuiActivity` (wskaźnik „agentka steruje” w pasku tytułu i panel Ekran), `SkillsChanged`
+  i `HealthChanged` (strony Umiejętności i Zdrowie systemu) — bez toastu Windows (test w `app-api`);
+  prośby o zgodę na sterowanie ekranem idą zwykłą ścieżką `ApprovalPending` → okno Brokera.
 
 ## Otwarte pytania
 - Zestaw earconów (własne vs systemowe) i ich licencja — do ustalenia w SPEC v1.

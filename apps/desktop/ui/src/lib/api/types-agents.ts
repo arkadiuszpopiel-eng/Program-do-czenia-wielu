@@ -87,6 +87,10 @@ export interface AgentRun {
   readonly bridge?: string;
   /** Zadanie schedulera, w ramach którego trwa przebieg. */
   readonly task_id?: string;
+  /** Przebieg-rodzic (podprzebieg: delegacja, Krytyczka, umiejętność). */
+  readonly parent_id?: string;
+  /** Etykieta podprzebiegu („Krytyczka", „delegacja: …"). */
+  readonly label?: string;
 }
 
 export interface AgentRunDetail {

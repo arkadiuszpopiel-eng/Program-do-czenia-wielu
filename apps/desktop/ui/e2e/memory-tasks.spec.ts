@@ -92,7 +92,7 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(cards).toContainText('Zabroniona');
       await expectAccessible(page, `mosty ${theme}`);
       const claude = cards.getByRole('listitem').filter({ hasText: 'Claude Code (CLI)' });
-      await claude.getByRole('button', { name: 'Zaloguj w terminalu' }).click();
+      await claude.getByRole('button', { name: 'Pokaż polecenie logowania' }).click();
       await expect(claude.getByText('claude /login')).toBeVisible();
       await claude.getByRole('button', { name: 'Przypnij wykrytą wersję' }).click();
       await expect(claude.getByText('Wersja zgodna z przypięciem.')).toBeVisible();

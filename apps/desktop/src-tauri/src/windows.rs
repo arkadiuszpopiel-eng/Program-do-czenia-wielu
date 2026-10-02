@@ -2,7 +2,8 @@
 //! (ukryte), `pill` 220×48 zawsze na wierzchu (ukryte). Wszystkie na wspólnym, stałym folderze
 //! danych WebView2 poza katalogiem wersji (ADR 0007) — jeden proces przeglądarki (§14.2).
 //! Zamknięcie okna głównego = ukrycie; po N minutach (`general.destroy_webview_after`) WebView
-//! jest niszczony, a ponowne otwarcie tworzy go od nowa.
+//! jest niszczony, a ponowne otwarcie tworzy go od nowa. Wszystkie okna są chronione przed
+//! przechwyceniem (`WDA_EXCLUDEFROMCAPTURE`).
 
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -51,8 +52,12 @@ fn builder<'a>(
     page: &str,
     data_dir: PathBuf,
 ) -> WebviewWindowBuilder<'a, tauri::Wry, AppHandle> {
+    // `content_protected` = `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`: okna Alfy nie trafiają
+    // do zrzutów ani nagrań innych aplikacji (także computer use agentek — obrona w głąb obok
+    // strażnika celów i maskowania w porcie zrzutów).
     let builder = WebviewWindowBuilder::new(app, label, WebviewUrl::App(PathBuf::from(page)))
-        .data_directory(data_dir);
+        .data_directory(data_dir)
+        .content_protected(true);
     // Port CDP tylko w buildzie testowym (Playwright); w produkcji zamknięty (PLAN §8.2).
     #[cfg(feature = "e2e")]
     let builder = builder.additional_browser_args(

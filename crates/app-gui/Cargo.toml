@@ -1,0 +1,47 @@
+[package]
+name = "app-gui"
+description = "Computer use w aplikacji (kategoria app-*): porty GUI Windows (WinGui) ze strażnikiem okien Alfy/WebView2/Brokera, zestawy narzędzi tools-window/uia/input/screen dla ról z grupą gui.control, panel „Ekran” (co agentka widzi i robi, ostatni zamaskowany zrzut tylko w pamięci), przejęcie sterowania, „zawsze zezwalaj na podgląd pulpitu” przez Brokera"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `platform-windows-gui-impl` i `tools-{window,uia,input,screen}-impl`
+# nad Brokerem; używa jej `app-core` (jedno miejsce kompozycji).
+[dependencies]
+app-api = { path = "../app-api" }
+platform-windows-gui-impl = { path = "../platform-windows-gui-impl" }
+platform-windows-impl = { path = "../platform-windows-impl" }
+tools-common-contract = { path = "../tools-common-contract" }
+tools-window-contract = { path = "../tools-window-contract" }
+tools-window-impl = { path = "../tools-window-impl" }
+tools-uia-contract = { path = "../tools-uia-contract" }
+tools-uia-impl = { path = "../tools-uia-impl" }
+tools-input-contract = { path = "../tools-input-contract" }
+tools-input-impl = { path = "../tools-input-impl" }
+tools-screen-contract = { path = "../tools-screen-contract" }
+tools-screen-impl = { path = "../tools-screen-impl" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+# Typ anulowania z `ToolCtx` (ta sama wersja co tools-common-contract; już w Cargo.lock).
+tokio-util = { version = "0.7.19", default-features = false }
+tracing.workspace = true
+
+[dev-dependencies]
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+compliance-contract = { path = "../compliance-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

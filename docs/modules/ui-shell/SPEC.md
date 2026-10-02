@@ -146,6 +146,42 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
 - **Testy:** vitest `api/__tests__/fake-work.test.ts`, Playwright `e2e/memory-tasks.spec.ts` + axe
   0 critical/serious w obu motywach.
 
+## Implementacja F8 — computer use, terminal, umiejętności, Kreator, zdrowie (stan)
+- **Panel Ekran (Alt+5)**: kto steruje (agentka + narzędzie), „Zatrzymaj sterowanie” (`gui_stop`:
+  anuluje akcje GUI i tury, narzędzia ekranu wstrzymane) / „Oddaj sterowanie” (`gui_release`), ostatni
+  zrzut agentki (`gui_screenshot`, maskowany w porcie: okna Alfy/Brokera, deny-lista, pola haseł; tylko
+  w pamięci, `<img alt>` z rozmiarem i liczbą masek), lista akcji **bez wpisywanej treści**, prośba
+  o „zawsze zezwalaj na podgląd pulpitu” (`gui_desktop_grant` → okno Brokera, ≤ 24 h).
+  **Pasek tytułu**: wskaźnik „Delta steruje ekranem” + „Zatrzymaj” albo „Sterujesz Ty” + „Oddaj”
+  (`GuiActivity`); okna Alfy niewidoczne na zrzutach (powłoka: `WDA_EXCLUDEFROMCAPTURE`).
+- **Terminal** (dialog modalny, ładowany leniwie z `@xterm/xterm` 6 + `@xterm/addon-fit`, MIT, poza paczką
+  startową; Cascadia Mono, kolory z tokenów): `terminal_open` z `Channel<TerminalFrame>` (strumień nie
+  idzie przez `alfa://events`), wejście z klawiatury `terminal_input` (base64, tylko gest w oknie),
+  `terminal_resize` z `ResizeObserver`, Escape trafia do programu — zamyka przycisk „Zamknij terminal”.
+  Otwierany z kart mostów („Zaloguj w terminalu” → profil `claude_login`/`codex_login`), z kroku
+  wprowadzenia **Mosty CLI** (nowy krok 7 z 8) i z Ustawień → Komputer (PowerShell / wiersz polecenia).
+- **Ustawienia → Umiejętności** (`custom: skills`): do przejrzenia (propozycje, kwarantanna z uwagami
+  skanera) → przegląd z diffem, hashem, wymaganymi narzędziami → Zainstaluj / Zwolnij z kwarantanny
+  (hash przejrzanej wersji) / Odrzuć; zainstalowane: Uruchom (parametry JSON z szablonu schematu,
+  agentka → zadanie w bieżącej sesji), Wyłącz; eksport/import paczki; własna propozycja z manifestu.
+- **Ustawienia → Kreator agentek** (`custom: builder`): opis → szkic + pytania; formularz (imię,
+  charakter, kolor z palety, głos v0 z wysokością/tempem i odsłuchem, rola, polityka modelu, grupy
+  narzędzi, tylko odczyt, autonomia ≤ sufit z Brokera, zakresy zapisu, retencja) → podgląd persony
+  (odmiana imienia w 7 przypadkach, instrukcja systemowa, ostrzeżenia, hash) → test na sucho (tabela
+  decyzji) → „Zapisz agentkę” aktywne tylko po zaliczonym teście tego samego hasha; biblioteka.
+- **Ustawienia → Komputer** (`custom: computer`): dostępność, strażnik okien, przejęcie, podgląd
+  pulpitu dla bieżącej sesji, terminal. **Zdrowie systemu** (`custom: health`, strona `improve`):
+  stan ogólny, „Sprawdź teraz”, propozycje napraw (Jądro — „Otwórz okno Brokera”), incydenty, naprawy
+  z „Cofnij”, sprawy dla człowieka, moduły; Ulepszacz (diff kluczy z digestem, Zatwierdź ten diff /
+  Odrzuć / Wycofaj, „Przeanalizuj teraz”, zablokowane próby); evale (integralność, Sprawdź, werdykty);
+  ustawienie `diagnostician.autonomy`.
+- **Replay**: podprzebiegi (delegacja, Krytyczka, umiejętność — `AgentRun.parent_id`/`label`) w liście
+  przebiegów („↳ Krytyczka”), lista podprzebiegów pod przebiegiem głównym i powrót do głównego;
+  podprzebieg nie zastępuje „ostatniego przebiegu sesji” (steering z composera).
+- **Testy:** vitest `api/__tests__/fake-computer.test.ts`, `logic/__tests__/work.test.ts`,
+  `state/__tests__/work.test.ts`; Playwright `e2e/computer.spec.ts` (Ekran, terminal, umiejętności,
+  Kreator, Zdrowie) + axe 0 critical/serious w obu motywach.
+
 ## Otwarte pytania
 - Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.
 - Pisownia PL w WebView2 (spike j) — composer ma `spellcheck` i `lang` z bieżącego języka.

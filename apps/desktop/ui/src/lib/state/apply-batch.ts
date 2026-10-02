@@ -58,6 +58,17 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
     case 'TriggerFired':
       app.notify(event);
       break;
+    case 'GuiActivity':
+      app.work.applyGui(event.status);
+      app.notify(event);
+      break;
+    case 'HealthChanged':
+      app.work.health = { overall: event.overall, pending: event.pending };
+      app.notify(event);
+      break;
+    case 'SkillsChanged':
+      app.notify(event);
+      break;
     case 'MarshalReportReady':
       app.toasts.show({
         kind: 'info',

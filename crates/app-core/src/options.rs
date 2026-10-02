@@ -69,6 +69,14 @@ pub struct AppOptions {
     pub bridges: Option<BridgeFactory>,
     /// Wykrywanie CLI w PATH (`None` = `PATH`/`PATHEXT` procesu, `--version`).
     pub cli_probe: Option<Arc<dyn CliProbe>>,
+    /// Porty GUI computer use (`None` = `WinGui` ze strażnikiem okien Alfy; testy: `platform-fake`).
+    pub gui: Option<app_gui::GuiPorts>,
+    /// Pseudokonsola terminala (`None` = ConPTY; testy: `platform-fake::FakePty`).
+    pub pty: Option<Arc<dyn platform_contract::PseudoConsolePort>>,
+    /// Sygnały systemowe: bezczynność, zasilanie, tryb gry, blokada (`None` = monitor Windows).
+    pub signals: Option<Arc<dyn platform_contract::SystemSignalsPort>>,
+    /// Obserwacja katalogów wyzwalaczy (`None` = `ReadDirectoryChangesW` na Windows).
+    pub dir_watch: Option<Arc<dyn platform_contract::DirWatchPort>>,
     /// Po jakim czasie bez awarii start uznać za zdrowy (`updater::mark_good`).
     pub healthy_after: Duration,
     /// Zapis logów NDJSON z magistrali (`core-log`).
@@ -100,6 +108,10 @@ impl Default for AppOptions {
             shell: None,
             bridges: None,
             cli_probe: None,
+            gui: None,
+            pty: None,
+            signals: None,
+            dir_watch: None,
             healthy_after: Duration::from_secs(30),
             file_logs: true,
         }

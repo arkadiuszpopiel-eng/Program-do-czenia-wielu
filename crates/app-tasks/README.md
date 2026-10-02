@@ -4,7 +4,9 @@ Zadania, wyzwalacze i Marszałek w aplikacji (kategoria `app-*`).
 
 - `modules::{scheduler, triggers, marshal}` — `scheduler-impl` (zastępuje `scheduler-lite-impl`; ta
   sama tablica blokad dla mowy i zadań, stan `scheduler.json`), `triggers-impl` (`triggers.json`,
-  obserwacja katalogów: `NoFileWatch` → `watch_unavailable` w UI), `marshal-impl` (`marshal.json`).
+  obserwacja katalogów: `watch::PlatformFileWatch` nad `DirWatchPort` z `platform-windows-sys-impl`
+  + `watch::spawn_pump` „nowy plik" → `file_created`; bez portu `NoFileWatch`), `marshal-impl`
+  (`marshal.json`).
 - `LateExecutor` / `AppExecutor` — wykonawczyni: agentka przez `agent-runtime-impl::RuntimeExecutor`
   (hak `StepGate::boundary` w runtime: steering ≤ 1 krok, oddanie, stop), most CLI przez
   `agent-backends` (`TaskOrigin::launch_origin` — wyzwalacz i Ulepszacz zawsze odmowa, harmonogram tylko
@@ -17,7 +19,8 @@ Zadania, wyzwalacze i Marszałek w aplikacji (kategoria `app-*`).
   (propozycja → podgląd zawężenia → zatwierdzenie w UI; polityka: limit równoległości `RosterCtl`, zakaz
   mostów, budżety zadań użytkownika), `delegate` (delegacja z czatu).
 - `spawn_bus_bridge` / `spawn_conditions` — zdarzenia → `TaskUpdated`, `TriggerFired`,
-  `MarshalReportReady`, eskalacje → toast; DND z `voice-wake`; tryb gry → warunki okien.
+  `MarshalReportReady`, eskalacje → toast; DND z `voice-wake`; bezczynność i tryb gry → warunki okien.
+- `TasksApp::create_skill` — uruchomienie umiejętności jako zadanie agentki (`app-skills`).
 
 Ograniczenia: propozycje Marszałka trzymane w pamięci procesu (kontrakt nie ma listy propozycji);
 zawężenie tokenów Brokera regułami Marszałka — poza `app-*`. Testy: `tests/clock.rs` (cron na

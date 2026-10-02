@@ -7,9 +7,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use lib_sqlstore::rusqlite::{OptionalExtension, params};
 use sessions_contract::SessionId;
 
-use crate::dto::{AgentRun, AgentRunDetail, ReplayStep};
-use crate::error::AppError;
-use crate::store::AppStore;
+use crate::AppStore;
+use app_api::AppError;
+use app_api::dto::{AgentRun, AgentRunDetail, ReplayStep};
 
 /// Migracja `0002`.
 pub(crate) const MIGRATION_0002: &str = "

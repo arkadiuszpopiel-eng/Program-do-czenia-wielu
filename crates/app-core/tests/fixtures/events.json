@@ -1202,5 +1202,144 @@
       "task_id": "tr-muoc5zkw-35",
       "detail": null
     }
+  },
+  {
+    "type": "GuiActivity",
+    "status": {
+      "available": true,
+      "reason": null,
+      "control": null,
+      "taken_over": true,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "cancelled",
+          "summary": "Wpisz tekst — anulowano",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "type": "GuiActivity",
+    "status": {
+      "available": true,
+      "reason": null,
+      "control": null,
+      "taken_over": false,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "cancelled",
+          "summary": "Wpisz tekst — anulowano",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "type": "SkillsChanged",
+    "skill_id": "porzadki-pobrane"
+  },
+  {
+    "type": "SkillsChanged",
+    "skill_id": "porzadki-pobrane"
+  },
+  {
+    "type": "SkillsChanged",
+    "skill_id": "notatki-dnia"
+  },
+  {
+    "type": "HealthChanged",
+    "overall": "degraded",
+    "pending": 2
+  },
+  {
+    "type": "HealthChanged",
+    "overall": "degraded",
+    "pending": 1
+  },
+  {
+    "type": "HealthChanged",
+    "overall": "degraded",
+    "pending": 1
   }
 ]

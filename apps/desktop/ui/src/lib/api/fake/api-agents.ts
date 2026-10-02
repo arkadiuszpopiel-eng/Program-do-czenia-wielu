@@ -115,6 +115,40 @@ function seedQ3Run(at: number): AgentRunDetail {
   };
 }
 
+function seedQ3(at: number): AgentRunDetail[] {
+  const main = seedQ3Run(at);
+  return [main, seedQ3Critic(main)];
+}
+
+/** Podprzebieg Krytyczki (ocena planu) — widoczny w Replay pod przebiegiem głównym. */
+function seedQ3Critic(parent: AgentRunDetail): AgentRunDetail {
+  const id = `${parent.run.id}-c1`;
+  return {
+    run: {
+      ...parent.run,
+      id,
+      turn_id: null,
+      agent: 'gama',
+      goal: 'Oceń plan: szkic raportu Q3 z arkuszy przychodów.',
+      state: 'completed',
+      finished_at: new Date(Date.parse(parent.run.started_at) + 1_400).toISOString(),
+      summary: 'Plan kompletny; dopisz źródła danych w stopce.',
+      usage: { ...parent.run.usage, steps: 1, tool_calls: 0, elapsed_ms: 500 },
+      parent_id: parent.run.id,
+      label: 'Krytyczka',
+    },
+    steps: [
+      replayStep(id, 1, {
+        kind: 'verify',
+        title: 'Ocena planu',
+        output: 'Plan kompletny; dopisz źródła danych w stopce.',
+        status: 'ok',
+        duration_ms: 500,
+      }),
+    ],
+  };
+}
+
 export class FakeRuns {
   private readonly bySession = new Map<string, AgentRunDetail[]>();
   private readonly workdirs = new Map<string, string | null>();
@@ -127,7 +161,7 @@ export class FakeRuns {
     if (!list) {
       list =
         sessionId === 's-q3' && this.core.scenario !== 'empty'
-          ? [seedQ3Run(this.core.scheduler.now() - 30 * 60_000)]
+          ? seedQ3(this.core.scheduler.now() - 30 * 60_000)
           : [];
       this.bySession.set(sessionId, list);
     }

@@ -1,7 +1,7 @@
 //! Zadania, wyzwalacze, Marszałek i mosty CLI w kompozycji: `scheduler-impl` zastępuje
 //! `scheduler-lite-impl` (ta sama tablica blokad dla głosu i zadań), wykonawczyni zadań wiązana
 //! po złożeniu rdzenia (Replay przez `TaskHost`), `triggers-impl` (obserwacja katalogów — port
-//! bez platformy), `marshal-impl` (tłumacz przez Router), mosty `agent-backends` (kanał
+//! platformy `DirWatchPort` + pompa nowych plików), `marshal-impl` (tłumacz przez Router), mosty `agent-backends` (kanał
 //! zatwierdzeń = Broker agentek) i serwer MCP Alfy startowany na żądanie mostu.
 
 use std::sync::Arc;
@@ -134,8 +134,14 @@ impl Built {
             }
             "triggers" => {
                 let scheduler = need(&t.scheduler, "scheduler")?;
-                let module = app_tasks::modules::triggers(&paths.scheduler(), scheduler)?;
-                t.triggers = Some(started(module, bus, slot).await?);
+                let watch = kernel.dir_watch.clone();
+                let module =
+                    app_tasks::modules::triggers(&paths.scheduler(), scheduler, watch.clone())?;
+                let module = started(module, bus, slot).await?;
+                if let Some(port) = watch {
+                    app_tasks::watch::spawn_pump(port, Arc::downgrade(&module));
+                }
+                t.triggers = Some(module);
             }
             "marshal" => {
                 let module = app_tasks::modules::marshal(&paths.scheduler(), t.translator.clone())?;
@@ -160,6 +166,7 @@ impl Built {
         let kit = d.agents.map(|a| AgentKit {
             tools: a.tools.clone(),
             tickets: a.tickets.clone(),
+            launch: a.launch.clone(),
         });
         let worktrees = d.paths.user_root.join("Mosty");
         let sink: Arc<dyn ApprovalSink> = match &kit {

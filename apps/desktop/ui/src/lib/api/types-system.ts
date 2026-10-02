@@ -21,6 +21,7 @@ import type {
 import type { AgentRun, ReplayStep, VoiceSpeaker, VoiceStatus } from './types-agents';
 import type { Account, LocalDownloadState } from './types-hub';
 import type { MarshalReport, TaskInfo, TriggerRunInfo } from './types-tasks';
+import type { GuiStatus, HealthOverall } from './types-work';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
 
@@ -62,7 +63,11 @@ export type SettingsCustomPage =
   | 'voice'
   | 'memory'
   | 'triggers'
-  | 'marshal';
+  | 'marshal'
+  | 'skills'
+  | 'builder'
+  | 'computer'
+  | 'health';
 
 export interface SettingsPageDef {
   readonly id: string;
@@ -248,7 +253,13 @@ export type AlfaEvent =
   /** Uruchomienie wyzwalacza (dziennik). */
   | { readonly type: 'TriggerFired'; readonly run: TriggerRunInfo }
   /** Raport dzienny Marszałka (powiadomienie). */
-  | { readonly type: 'MarshalReportReady'; readonly report: MarshalReport };
+  | { readonly type: 'MarshalReportReady'; readonly report: MarshalReport }
+  /** Computer use: kto steruje, ostatnie akcje, przejęcie — bez pikseli zrzutu. */
+  | { readonly type: 'GuiActivity'; readonly status: GuiStatus }
+  /** Biblioteka umiejętności zmieniona (propozycja, import, zatwierdzenie). */
+  | { readonly type: 'SkillsChanged'; readonly skill_id: string | null }
+  /** „Zdrowie systemu" zmienione (incydent, naprawa, propozycja Ulepszacza, werdykt bramki). */
+  | { readonly type: 'HealthChanged'; readonly overall: HealthOverall; readonly pending: number };
 
 export type AlfaEventType = AlfaEvent['type'];
 export type Unsubscribe = () => void;

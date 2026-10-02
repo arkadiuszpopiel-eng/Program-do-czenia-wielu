@@ -183,6 +183,7 @@ pub(crate) async fn prepare(
             BrainError::Budget(m) => turn_error(TurnErrorCode::BudgetBlocked, m, None),
         })?;
     request.model.clone_from(&choice.model);
+    let choice = super::symptom::tap(core, choice);
     if !choice.routed {
         budget_gate(core, &choice, &request).await?;
     }
