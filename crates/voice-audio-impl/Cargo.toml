@@ -28,3 +28,9 @@ stats_alloc = "0.1.10"
 
 [lints]
 workspace = true
+
+# Bez harnessu libtest: proces jednowątkowy, więc globalny licznik alokacji widzi wyłącznie
+# ścieżkę wątku RT (wątek główny libtest potrafi alokować w trakcie pomiaru pod obciążeniem CI).
+[[test]]
+name = "no_alloc"
+harness = false

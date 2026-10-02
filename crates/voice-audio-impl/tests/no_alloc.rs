@@ -1,6 +1,6 @@
 //! ACC-F2-voice-audio-04: ścieżka wątku RT (render miksera, konwersja do bajtów urządzenia,
-//! zapis przechwytywania) nie alokuje. Osobny plik testu = osobny proces z licznikiem alokacji
-//! (jeden test, bez równoległych wątków testowych).
+//! zapis przechwytywania) nie alokuje. Osobny plik testu = osobny proces z licznikiem alokacji,
+//! uruchamiany bez harnessu libtest (`harness = false`): jedyny wątek procesu to ten pomiar.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -15,7 +15,11 @@ use voice_audio_impl::convert::{f32_to_le_bytes, le_bytes_to_f32};
 #[global_allocator]
 static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
 
-#[test]
+/// Wynik: kod wyjścia 0 = brak alokacji; panika (asercja) = porażka testu.
+fn main() {
+    rt_path_does_not_allocate();
+}
+
 fn rt_path_does_not_allocate() {
     let (mut control, mut render) = mixer(MixerConfig::new(48_000));
     let (mut writer, _reader) = capture_ring(AudioFormat::mono(48_000), 10, 1_000);
