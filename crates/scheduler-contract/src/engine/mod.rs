@@ -21,6 +21,7 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use core_bus_contract::Event;
+use personas_contract::PersonaId;
 use scheduler_lite_contract::{Core, Lease};
 use serde::{Deserialize, Serialize};
 
@@ -78,6 +79,12 @@ pub(crate) struct TaskRec {
     pub(crate) last_dispatch: Option<DispatchId>,
     pub(crate) finished_at_ms: Option<u64>,
     pub(crate) interrupted: bool,
+    /// Pierwszy start wykonania (zostaje po zakończeniu; stan sprzed tej wersji: brak).
+    #[serde(default)]
+    pub(crate) first_started_at_ms: Option<u64>,
+    /// Agentka ostatniego wysłania (zostaje po zakończeniu).
+    #[serde(default)]
+    pub(crate) last_agent: Option<PersonaId>,
 }
 
 impl TaskRec {
@@ -104,6 +111,8 @@ impl TaskRec {
             last_dispatch: None,
             finished_at_ms: None,
             interrupted: false,
+            first_started_at_ms: None,
+            last_agent: None,
         }
     }
 

@@ -12,7 +12,7 @@ pub struct TaskSpec { id, title, parent, deps: Vec<Dependency{task, condition: S
   class: User|Agent|Background, origin: TaskOrigin /* User|Agent|Trigger{depth}|Schedule|Improver|System → LaunchOrigin */, executor: Agent|Bridge|Service,
   resources: Vec<Resource>, window: {not_before, deadline, only_when_idle, not_in_game_mode}, budget: {max_steps, max_wall_ms, max_cost, estimated_cost}, retry, taint, payload }
 #[async_trait] pub trait Scheduler: SchedulerLite { fn submit(Vec<TaskSpec>); fn cancel(&TaskId, reason) -> Vec<TaskId> /* poddrzewo */; fn steer(&TaskId, Steer) -> u64;
-  fn pause/resume; fn task/tasks -> TaskView; fn set_roster(Roster); fn set_conditions(SystemConditions); async fn wait(&TaskId) -> Termination; }
+  fn pause/resume; fn task/tasks -> TaskView /* + agent, started_at_ms także po zakończeniu */; fn set_roster(Roster); fn set_conditions(SystemConditions); async fn wait(&TaskId) -> Termination; }
 #[async_trait] pub trait TaskExecutor { async fn execute(&self, Dispatch, Arc<dyn StepGate>) -> WorkerResult; }
 pub trait StepGate { fn boundary(StepReport) -> StepDirective /* Continue{steering} | Yield | Stop */; fn spawn(Vec<TaskSpec>); }
 ```
@@ -28,6 +28,7 @@ Rdzeń `SchedCore<H: SchedHost>` w kontrakcie; `-impl`/`-fake` różnią się ot
 - Wywłaszczanie (mowa użytkownika, zadanie wyższej klasy na zasobie wywłaszczalnym, pauza, utrata okna) tylko w punkcie atomowym; po `STOP_GRACE_MS` = 2 s bez punktu atomowego — przerwanie siłą (`Abort` przed zwolnieniem zasobów).
 - Steering dostarczany w najbliższym punkcie atomowym (≤ 1 krok); nieodebrany po ostatnim kroku → `steer_unconsumed`.
 - Podzadania dziedziczą pochodzenie i taint (nie da się „wyprać” wyzwalacza); most tylko z `User`/`Schedule`.
+- `TaskView::agent` (agentka ostatniego wysłania) i `TaskView::started_at_ms` (pierwszy start) zostają po zakończeniu i po restarcie; zadanie, które nie wystartowało, ma oba `None`. Pola w stanie (`TaskRec`) z `#[serde(default)]` — stan sprzed zmiany wczytuje się bez migracji (`SNAPSHOT_VERSION` bez zmian).
 - Restart = wznowienie: zadania w toku wracają do kolejki (`interrupted`, `resume_from_step`); kill-switch anuluje wszystko i odbiera dzierżawy mowy.
 
 ## Zdolności / uprawnienia
@@ -43,13 +44,13 @@ RAM ≤ 8 MB (≤ 4096 aktywnych zadań, zakończone usuwane po 24 h); decyzja �
 `[scheduler] roster.max_parallel_total = 4`, `max_parallel_system = 2`, `default_deadline = "24h"`, `state_path`; budżet tła = `[cost] background` (`cost-meter`).
 
 ## Wkład do UI
-Panel Agentki (kto co robi, zasoby, kolejka, powód blokady), Oś czasu (`scheduler.task.*`), kapsuła aktywności, „Pauza/Wznów/Anuluj/Napisz do zadania”.
+Panel Agentki (kto co robi, zasoby, kolejka, powód blokady; zakończone — kto i kiedy zaczął), Oś czasu (`scheduler.task.*`), kapsuła aktywności, „Pauza/Wznów/Anuluj/Napisz do zadania”.
 
 ## Testy akceptacyjne
 - `ACC-F5-scheduler-01` (F5-03): 0 zakleszczeń w 1000 losowych scenariuszy — `scheduler-fake/tests/props.rs`, zestaw `evals/F5/scheduler-scenarios.json`.
 - `ACC-F5-scheduler-02` (F5-01): agentki równolegle z blokadą ekranu/głośnika, 0 konfliktów w 100 — `tests/parallel.rs`.
 - `ACC-F5-agent-runtime-04` (F5-02): steering ≤ 1 krok atomowy 20/20 — `tests/steering.rs`.
-- Kontrakt (fake + impl): DAG/warunki, anulowanie poddrzewa, wyłączność, priorytety, voice-first, okna, ponowienia, budżety, restart, kill-switch.
+- Kontrakt (fake + impl): DAG/warunki, anulowanie poddrzewa, wyłączność, priorytety, voice-first, okna, ponowienia, budżety, restart, kill-switch, widok zakończonego zadania (agentka, start); `scheduler-fake/tests/view.rs` (restart, stan bez nowych pól).
 
 ## Fake
 `scheduler-fake`: wirtualny zegar, skryptowane wykonawczynie, nagrane zdarzenia, restart ze stanu, decyzja budżetu tła.
@@ -57,3 +58,6 @@ Panel Agentki (kto co robi, zasoby, kolejka, powód blokady), Oś czasu (`schedu
 ## Otwarte pytania
 - Magazyn stanu szyfrowany (`lib-sqlstore`) zamiast pliku JSON — ładunki zadań mogą zawierać cele użytkownika.
 - Starzenie priorytetów tła (dziś: termin kończy oczekiwanie jawnym `Expired`).
+
+## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
+- **SR2-08:** `spawn` (podzadania z wykonania — decyzja agentki) nigdy nie celuje w most CLI (`BridgeNotAllowed`), także pod zadaniem użytkownika, którego pochodzenie `User` dziedziczy podzadanie (`scheduler-fake/tests/review.rs`).

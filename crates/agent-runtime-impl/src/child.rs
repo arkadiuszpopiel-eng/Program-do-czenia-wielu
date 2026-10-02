@@ -9,7 +9,7 @@ use providers_contract::ToolUse;
 use safety_broker_contract::TaintSource;
 use tools_common_contract::{DenialReason, ToolErrorKind, ToolOutcome};
 
-use crate::delegate::{ParentView, plan_delegation, remaining_budget};
+use crate::delegate::{ParentView, delegation_target, plan_delegation, remaining_budget};
 use crate::engine::Engine;
 use crate::prompt::summary;
 use crate::shared::{Exit, Hooks};
@@ -144,15 +144,14 @@ impl Engine {
         let plan = {
             let mut view = self.parent_view();
             if let (Some(oracle), Some(crew)) = (&self.shared.ext.autonomy, &self.cp.options.crew) {
-                let target = args.persona.clone().or_else(|| {
-                    crew.cast
-                        .holders(&personas_contract::RoleId::new(args.role.trim()))
-                        .into_iter()
-                        .find(|p| p.as_str() != self.cp.spec.agent.as_str())
-                        .map(|p| p.0)
-                });
+                // Ta sama wykonawczyni co w planie (SR2-01: wcześniej identyfikator bez
+                // przycięcia trafiał do Brokera jako nieznana agentka z poziomem domyślnym).
+                let target = delegation_target(crew, &args, self.cp.spec.agent.as_str());
                 view.autonomy.1 = target.map(|p| {
-                    oracle.level(&self.cp.spec.session, &core_bus_contract::AgentId::new(p))
+                    oracle.level(
+                        &self.cp.spec.session,
+                        &core_bus_contract::AgentId::new(p.as_str()),
+                    )
                 });
             }
             plan_delegation(&view, &args, self.shared.config.max_delegation_depth)

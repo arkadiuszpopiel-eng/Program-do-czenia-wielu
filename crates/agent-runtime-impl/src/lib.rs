@@ -46,8 +46,8 @@ use providers_contract::ModelProvider;
 use tools_common_contract::Tool;
 
 pub use delegate::{
-    ChildPlan, DelegationError, MAX_CHILD_GOAL, MIN_CHILD_STEPS, ParentView, parent_grant,
-    plan_delegation, remaining_budget,
+    ChildPlan, DelegationError, MAX_CHILD_GOAL, MIN_CHILD_STEPS, ParentView, delegation_target,
+    parent_grant, plan_delegation, remaining_budget,
 };
 pub use executor::{RuntimeExecutor, adapt_payload, task_run_id};
 pub use locks::resources_for;

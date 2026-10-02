@@ -16,6 +16,9 @@ use crate::flow::{append_capped, args_untrusted, fingerprint, repeats};
 use crate::handle::RunHandle;
 use crate::prompt::{skipped, summary, tool_result};
 
+/// Rodziny zdolności utrwalające treść poza przebiegiem (pamięć długoterminowa).
+const PERSISTENT_WRITE_CAPS: [&str; 1] = ["memory.write"];
+
 /// Obserwator wywołania: karta „czeka na zatwierdzenie” w UI.
 struct StepObserver {
     handle: Arc<RunHandle>,
@@ -156,7 +159,20 @@ impl Engine {
         let title = tool
             .as_ref()
             .map_or_else(|| tu.name.clone(), |t| t.manifest().title.clone());
-        let ctx = self.ctx(step, &tu.input, &title);
+        let mut ctx = self.ctx(step, &tu.input, &title);
+        // Przegląd #2 (SR2-07): treść utrwalana poza przebiegiem (pamięć) w przebiegu skażonym
+        // pochodzi z kontekstu z niezaufaną treścią — proweniencja „niezaufana” (S19: taki wpis
+        // zostaje w sesji i nigdy nie awansuje), niezależnie od heurystyki argumentów-celów.
+        if self.cp.tainted
+            && tool.as_ref().is_some_and(|t| {
+                t.manifest()
+                    .capabilities
+                    .iter()
+                    .any(|c| PERSISTENT_WRITE_CAPS.contains(&c.as_str()))
+            })
+        {
+            ctx.untrusted_args = true;
+        }
         Prepared {
             index,
             step,

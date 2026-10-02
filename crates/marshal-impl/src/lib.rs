@@ -150,6 +150,10 @@ impl Marshal for MarshalModule {
             .map(|s| s.core.daily_report(day))
             .unwrap_or_default()
     }
+
+    fn proposals(&self) -> Vec<Proposal> {
+        self.svc().map(|s| s.core.proposals()).unwrap_or_default()
+    }
 }
 
 #[async_trait]

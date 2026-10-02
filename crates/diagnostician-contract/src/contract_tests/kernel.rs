@@ -105,23 +105,35 @@ where
     let h = factory(s).await;
     h.diag.ingest(gpu_lost("diagnostician.autonomy")).await;
     let out = h.diag.scan().await;
-    assert_eq!(out.needs_human.len(), 1, "{out:?}");
     assert_eq!(
         world.snapshot().config["diagnostician.autonomy"],
         json!("auto_low_risk")
     );
+    // Klucz zakazany z sygnału jest ignorowany (SR2-03): naprawa — jeśli jest — dotyczy
+    // wyłącznie klucza domyślnego modułu, nigdy `diagnostician.*`.
+    assert!(
+        h.diag.repairs().iter().all(|r| r
+            .proposal
+            .steps
+            .iter()
+            .filter_map(crate::RepairStep::config_key)
+            .all(|k| !k.starts_with("diagnostician"))),
+        "{out:?}"
+    );
 
+    // Klucz `kernel.*` podsunięty sygnałem (niezaufanym) nie trafia ani do Diagnosty, ani do
+    // Brokera — zostaje klucz domyślny modułu (przegląd #2, SR2-03).
     let s = setup(&[], &[], RepairAutonomy::AutoMediumRisk);
-    let broker = s.broker.clone();
+    let (world, broker) = (s.world.clone(), s.broker.clone());
     broker.set_mode(BrokerMode::Pending);
     let h = factory(s).await;
     h.diag.ingest(gpu_lost("kernel.gpu.device")).await;
     let out = h.diag.scan().await;
-    assert_eq!(
-        out.kernel_pending.len(),
-        1,
-        "klucz kernel.* → Broker: {out:?}"
+    assert!(
+        out.kernel_pending.is_empty() && broker.seen().is_empty(),
+        "klucz kernel.* z sygnału ignorowany: {out:?}"
     );
+    assert!(!world.snapshot().config.contains_key("kernel.gpu.device"));
 
     let s = setup(
         &[("router.offline", json!(false))],

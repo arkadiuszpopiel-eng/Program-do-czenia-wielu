@@ -300,4 +300,11 @@ pub struct TaskView {
     pub pending_steers: usize,
     /// Przerwane restartem i wznowione.
     pub interrupted: bool,
+    /// Agentka ostatniego wysłania — także dla zadań zakończonych (`None` = usługa systemowa
+    /// albo zadanie nie wystartowało).
+    #[serde(default)]
+    pub agent: Option<PersonaId>,
+    /// Pierwszy start wykonania (ms) — także dla zadań zakończonych (`None` = nie wystartowało).
+    #[serde(default)]
+    pub started_at_ms: Option<u64>,
 }

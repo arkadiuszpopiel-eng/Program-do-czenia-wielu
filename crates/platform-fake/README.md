@@ -15,3 +15,6 @@ F6/F4: `FakeDesktop` — wirtualny pulpit (okna z kolejnością Z, drzewa elemen
 fizyczne wejście, skrypty „Broker-UI na wierzch po N paczkach”, zawieszenie UIA, render do zrzutów); każdy skutek
 w oknie trafia do `GuiRecord` z PID-em i obrazem (property w `tests/desktop.rs`: 0/200 w oknach chronionych).
 `FakePty` — pseudokonsola w pamięci (wyjście skryptowane, echo, `exit`, `tree_killed`; `Debug` bez treści).
+Sygnały i katalogi: `FakeSignals` (wirtualny zegar, `input`/`set_power`/`set_fullscreen`/`set_session`, próbki co
+`poll_ms`, `notify` = powiadomienie systemu) i `FakeDirWatch` (wirtualny FS, `lose_events` + `overflow` = przepełnienie
+bufora, `move_dir`, `link` = junction); testy: `signals.rs`, `dir_watch.rs`, `dir_watch_props.rs` (proptest).

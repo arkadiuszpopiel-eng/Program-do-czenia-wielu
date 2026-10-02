@@ -75,6 +75,8 @@ fn view(rec: &TaskRec) -> TaskView {
         children: rec.children.clone(),
         pending_steers: rec.steering.len(),
         interrupted: rec.interrupted,
+        agent: rec.last_agent.clone(),
+        started_at_ms: rec.first_started_at_ms,
     }
 }
 

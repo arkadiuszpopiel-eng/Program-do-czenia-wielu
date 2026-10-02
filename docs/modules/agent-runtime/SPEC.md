@@ -57,3 +57,8 @@ Brak własnych zdolności (tokeny per akcja). `inproc`, `on-demand`. RAM ≤ 10 
 ## Otwarte pytania
 - Szyfrowany magazyn checkpointów (wznowienie po restarcie w aplikacji).
 - Delegacja jako podzadania schedulera (`StepGate::spawn`) zamiast podprzebiegu — gdy podzadanie ma trwać dłużej niż krok rodzica.
+
+## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
+- **SR2-01:** wykonawczynię delegacji wybiera jedna funkcja `delegation_target` (identyfikator agentki przycięty) — ta sama agentka trafia do planu i do zapytania o poziom autonomii (`AutonomyOracle`). Wcześniej `" delta"` dawało poziom domyślny nieznanej agentki, a podzadanie wykonywała Delta z L4 (`tests/review.rs`).
+- **SR2-07:** w przebiegu skażonym wywołanie narzędzia utrwalającego treść (zdolność `memory.write`) ma `untrusted_args = true` — wpis pamięci dostaje proweniencję niezaufaną (S19: zostaje w sesji, nie awansuje), niezależnie od heurystyki argumentów-celów.
+- Propozycje (otwarte): taint per przebieg, nie per sesja — kolejna tura czatu nie dziedziczy skażenia poprzednich (Broker liczy taint sesji, runtime — nie); cel podzadania pisze model rodzica, a prompt potomka nazywa go „zadaniem od właściciela”.

@@ -55,3 +55,8 @@ Kroki w wątku/Replay; „Przejmij / Pauza / Stop” w panelu „Ekran” (F6-08
 ## Otwarte pytania
 - Helper `uiAccess` dla okien podniesionych (F6-07) — osobny moduł, objęty tym samym strażnikiem.
 - Dotyk/pióro (`InjectTouchInput`) — P2.
+
+## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`) — propozycje
+- `input_type_text` nie sprawdza, czy element z fokusem to pole hasła (UIA `SetValue` odmawia) — potrzebny odczyt elementu z fokusem (`UiaQuery.focused` albo `UiaPort::focused`; zmiana `platform-contract`/`platform-fake`).
+- Strażnik celów liczy obraz procesu okna `GA_ROOT`: wyskakujące okna WebView2 Alfy (lista `<select>`, menu kontekstowe — proces `msedgewebview2.exe`) i okna UWP (`ApplicationFrameHost.exe`) nie są przypisane do właściwego procesu — sprawdzać także `GA_ROOTOWNER` i PID-y procesów WebView2 Alfy (`BrowserProcessId`) w `TargetGuard` przy kompozycji.
+- Globalne skróty Alfy (`Ctrl+Alt+Space`) działają mimo strażnika — dodać konfigurowalne skróty Alfy do `system_scope`.

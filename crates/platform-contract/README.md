@@ -24,3 +24,12 @@ i procesów nieznanych nigdy nie są celem — fail-closed), `DesktopPort` (okna
 `InputPort` + `InputBackend` + `execute_input` (paczki atomowe, cel/strażnik/UIPI/fizyczne wejście przed każdą
 paczką, `KeyChord::system_scope` — zakaz skrótów systemowych), `ScreenCapturePort` + `mask_plan`/`finish_capture`
 (maskowanie, `RgbaImage`, PNG z wymiennym zlib), `PseudoConsolePort`/`PtySession` (ConPTY).
+
+Sygnały systemowe i obserwacja katalogów (poza `SystemPort`; Windows: `platform-windows-sys-impl`): `IdlePort` +
+`IdleTracker` (histereza: wejście po 5 min, wyjście po ≥ 1 s aktywności), `PowerPort` + `PowerSnapshot`
+(dekodowanie `SYSTEM_POWER_STATUS`, filtr zmian), `FullscreenPort` + `FullscreenProbe`/`GameModeTracker` (`QUNS_*`,
+okno pełnoekranowe; wyjście z trybu gry po 10 s), `SessionPort` + `SessionState` (blokada/rozłączenie), zbiorczo
+`SystemSignalsPort` + `SignalMonitor` (`SystemSignals`, `SignalEvent`, `platform.idle.*`/`power`/`fullscreen`/
+`session.*`); `DirWatchPort` + `WatchSet`/`WatchCore` (debounce z semantyką istnienia, pary przemianowań, pełne
+przeskanowanie po przepełnieniu) + `WatchPolicy` (deny-lista surowa i kanoniczna — `BASELINE_DENY_SEGMENTS` ⊇
+segmenty Jądra, limity, pliki tymczasowe, wzorce).

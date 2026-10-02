@@ -168,15 +168,84 @@ pub fn run_acceptance(skill: &Skill) -> Result<(), SkillError> {
     Ok(())
 }
 
+/// Znaki niewidoczne (formatujące), którymi można rozbić frazę: miękki dywiz, spacje zerowej
+/// szerokości, łączniki, znaczniki kierunku, BOM.
+fn invisible(c: char) -> bool {
+    matches!(
+        c,
+        '\u{00AD}'
+            | '\u{034F}'
+            | '\u{061C}'
+            | '\u{180E}'
+            | '\u{200B}'..='\u{200F}'
+            | '\u{202A}'..='\u{202E}'
+            | '\u{2060}'..='\u{2064}'
+            | '\u{2066}'..='\u{206F}'
+            | '\u{FE00}'..='\u{FE0F}'
+            | '\u{FEFF}'
+    )
+}
+
+/// Napisy z wartości JSON (klucze i wartości; bez ucieczek `\\n` w miejscu znaków).
+fn json_strings(v: &serde_json::Value, out: &mut String) {
+    match v {
+        serde_json::Value::String(s) => {
+            out.push(' ');
+            out.push_str(s);
+        }
+        serde_json::Value::Array(a) => a.iter().for_each(|x| json_strings(x, out)),
+        serde_json::Value::Object(m) => {
+            for (k, x) in m {
+                out.push(' ');
+                out.push_str(k);
+                json_strings(x, out);
+            }
+        }
+        _ => {}
+    }
+}
+
+/// Postać do skanowania: `fold`, bez znaków niewidocznych, białe znaki zwinięte do spacji.
+fn scan_form(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for c in fold(text).chars().filter(|c| !invisible(*c)) {
+        if c.is_whitespace() {
+            if !out.ends_with(' ') {
+                out.push(' ');
+            }
+        } else {
+            out.push(c);
+        }
+    }
+    out
+}
+
 /// Skaner treści: podejrzane fragmenty (powody dla właściciela; z niezaufanego źródła →
-/// kwarantanna).
+/// kwarantanna). Skanowane jest wszystko, co trafia do celu przebiegu albo do przeglądu:
+/// także schemat parametrów (wartości domyślne i `enum` są wstawiane do celu), przykłady
+/// i testy akceptacyjne (przegląd #2, SR2-02).
 pub fn scan(skill: &Skill) -> Vec<String> {
     let mut text = format!("{} {} {}", skill.name, skill.description, skill.prompt);
     for s in skill.steps.iter().chain(&skill.keywords) {
         text.push(' ');
         text.push_str(s);
     }
-    let folded = fold(&text);
+    json_strings(&skill.parameters, &mut text);
+    for e in &skill.examples {
+        text.push(' ');
+        text.push_str(&e.request);
+        json_strings(&e.params, &mut text);
+    }
+    for t in &skill.acceptance {
+        text.push(' ');
+        text.push_str(&t.name);
+        json_strings(&t.params, &mut text);
+        for x in &t.expect_in_goal {
+            text.push(' ');
+            text.push_str(x);
+        }
+    }
+    let folded = scan_form(&text);
     SUSPICIOUS
         .iter()
         .filter(|p| folded.contains(*p))

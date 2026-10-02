@@ -9,7 +9,7 @@ use crate::events::{EVENT_KILL_SWITCH, EVENT_PAUSED, EVENT_RESUMED, global_event
 use crate::host::SchedHost;
 use crate::ids::{DispatchId, TaskId};
 use crate::roster::{Roster, SystemConditions};
-use crate::spec::TaskSpec;
+use crate::spec::{ExecutorKind, TaskSpec};
 use crate::state::{BlockReason, CancelCause, TaskState, Termination};
 use crate::steer::{
     Steer, SteerEnvelope, StepDirective, StepReport, StopReason, WorkerResult, YieldReason,
@@ -192,6 +192,17 @@ impl<H: SchedHost> Ctx<'_, H> {
             return Err(TaskError::UnknownTask(parent_id));
         };
         let parent = parent.spec.clone();
+        // Przegląd #2 (SR2-08): podzadanie z wykonania to decyzja agentki — nigdy most CLI, także
+        // pod zadaniem użytkownika (most startuje tylko z jawnego polecenia właściciela).
+        if let Some(bridge) = specs
+            .iter()
+            .find(|s| matches!(s.executor, ExecutorKind::Bridge(_)))
+        {
+            return Err(TaskError::BridgeNotAllowed {
+                task: bridge.id.clone(),
+                origin: "delegacja agentki (StepGate::spawn)".into(),
+            });
+        }
         for spec in &mut specs {
             spec.parent = Some(parent_id.clone());
             spec.origin = parent.origin.clone();

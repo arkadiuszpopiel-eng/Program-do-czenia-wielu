@@ -9,7 +9,9 @@ use chrono::NaiveDate;
 use core_bus_contract::Event;
 use serde_json::{Value, json};
 
-use crate::book::{Approver, MarshalError, Proposal, RuleBook};
+use crate::book::{
+    Approver, MAX_DECIDED_PROPOSALS, MAX_PENDING_PROPOSALS, MarshalError, Proposal, RuleBook,
+};
 use crate::check::Ceiling;
 use crate::events::{
     EVENT_APPROVED, EVENT_PROPOSED, EVENT_REJECTED, EVENT_REPORT, EVENT_REVOKED, escalation_event,
@@ -61,6 +63,11 @@ pub trait Marshal: Send + Sync {
     fn check(&self) -> Vec<Escalation>;
     /// Raport dnia.
     fn daily_report(&self, day: NaiveDate) -> DailyReport;
+    /// Propozycje, najnowsze pierwsze: oczekujące (≤ [`MAX_PENDING_PROPOSALS`]) i ostatnie
+    /// rozstrzygnięte (≤ [`MAX_DECIDED_PROPOSALS`]); po restarcie — z trwałej księgi.
+    fn proposals(&self) -> Vec<Proposal> {
+        Vec::new()
+    }
 }
 
 struct State {
@@ -103,7 +110,17 @@ impl<H: MarshalHost> MarshalCore<H> {
         let now = self.host.now_ms();
         let (value, events, book) = {
             let mut st = self.lock();
-            let (value, events) = f(&mut st.book, now);
+            let (value, mut events) = f(&mut st.book, now);
+            for id in st
+                .book
+                .prune_proposals(MAX_PENDING_PROPOSALS, MAX_DECIDED_PROPOSALS)
+            {
+                events.push(marshal_event(
+                    EVENT_REJECTED,
+                    now,
+                    json!({ "proposal": id, "reason": "limit" }),
+                ));
+            }
             (value, events, st.book.clone())
         };
         if !events.is_empty() {
@@ -240,5 +257,9 @@ impl<H: MarshalHost> Marshal for MarshalCore<H> {
 
     fn daily_report(&self, day: NaiveDate) -> DailyReport {
         self.lock().watch.report(day)
+    }
+
+    fn proposals(&self) -> Vec<Proposal> {
+        self.lock().book.proposals()
     }
 }

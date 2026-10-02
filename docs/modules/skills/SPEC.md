@@ -51,3 +51,7 @@ Zdarzenia: `skills.proposed|quarantined|installed|released|rejected|disabled|sup
 ## Otwarte pytania
 - Podpis zatwierdzeń R1 kluczem w TPM (PLAN §12.1) — dziś hash przejrzanej treści + kanał UI.
 - Szyfrowanie `skills.json` (ścieżki użytkownika w parametrach przykładów).
+
+## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
+- **SR2-02:** skaner obejmuje wszystko, co trafia do celu przebiegu albo do przeglądu: napisy ze schematu parametrów (wartości domyślne, `enum`, opisy), przykłady i testy akceptacyjne; przed dopasowaniem usuwa znaki niewidoczne (U+00AD, U+200B–U+200F, U+202A–U+202E, U+2060–U+206F, U+FEFF…) i zwija białe znaki (`tests/review.rs`).
+- Propozycje (otwarte): `prepare_run` z rodzicem powinien brać kopertę `caller.tools` ∩ role oraz bieżący taint/proweniencję przebiegu-rodzica (dziś opcje startowe; `SkillRunner` jeszcze niepodpięty); paczka `.alfa` zaszyfrowana hasłem może pochodzić od kogoś innego — `OwnPackage` tylko dla kopii kluczem tej maszyny.

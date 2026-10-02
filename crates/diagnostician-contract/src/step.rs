@@ -21,8 +21,9 @@ pub const KERNEL_MODULES: [&str; 10] = [
 ];
 
 /// Prefiksy kluczy, których Diagnosta nie zmienia nigdy (własna autonomia, Ulepszacz,
-/// bezpieczeństwo, prywatność, budżety, evals). `kernel.*` — wyłącznie przez Brokera.
-pub const DIAGNOSTICIAN_FORBIDDEN_PREFIXES: [&str; 12] = [
+/// bezpieczeństwo, prywatność, budżety, evals, Jądro i jego procesy, egress, MCP, role, persony,
+/// umiejętności, agentki — przegląd #2, SR2-03). `kernel.*` — wyłącznie przez Brokera.
+pub const DIAGNOSTICIAN_FORBIDDEN_PREFIXES: [&str; 28] = [
     "diagnostician",
     "improver",
     "security",
@@ -31,10 +32,57 @@ pub const DIAGNOSTICIAN_FORBIDDEN_PREFIXES: [&str; 12] = [
     "privacy",
     "compliance",
     "budget",
+    "budgets",
     "cost",
+    "limits",
     "evals",
     "accounts",
     "secrets",
+    "core",
+    "broker",
+    "watchdog",
+    "updater",
+    "audit",
+    "egress",
+    "net",
+    "permissions",
+    "deny",
+    "mcp",
+    "roles",
+    "personas",
+    "skills",
+    "agents",
+];
+
+/// Segmenty klucza poza zasięgiem Diagnosty w dowolnym miejscu klucza (polityki, adresy,
+/// polecenia, prompty, sekrety) — przegląd #2, SR2-03. `kernel.*` nie jest tu zakazany, tylko
+/// kierowany do Brokera (`is_kernel_key`).
+pub const DIAGNOSTICIAN_FORBIDDEN_SEGMENTS: [&str; 25] = [
+    "privacy",
+    "egress",
+    "allowlist",
+    "allow_list",
+    "denylist",
+    "deny_list",
+    "autonomy",
+    "permission",
+    "permissions",
+    "capability",
+    "capabilities",
+    "threshold",
+    "thresholds",
+    "approval",
+    "approvals",
+    "audit",
+    "broker",
+    "trust",
+    "base_url",
+    "url",
+    "endpoint",
+    "command",
+    "prompt",
+    "api_key",
+    "token",
 ];
 
 /// Krok naprawy.
@@ -240,8 +288,12 @@ pub fn is_kernel_key(key: &str) -> bool {
 
 /// Czy klucz jest poza zasięgiem Diagnosty (także przez Brokera — to nie jest naprawa).
 pub fn is_forbidden_key(key: &str) -> bool {
-    let first = key.split('.').next().unwrap_or_default();
+    let lower = key.to_lowercase();
+    let first = lower.split('.').next().unwrap_or_default();
     DIAGNOSTICIAN_FORBIDDEN_PREFIXES.contains(&first)
+        || lower
+            .split('.')
+            .any(|s| DIAGNOSTICIAN_FORBIDDEN_SEGMENTS.contains(&s))
 }
 
 /// Czy moduł należy do Jądra.

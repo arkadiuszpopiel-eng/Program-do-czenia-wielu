@@ -7,10 +7,10 @@
 use std::collections::BTreeSet;
 
 use agent_runtime_contract::{
-    DELEGATE_GROUP, DELEGATE_TOOL, DelegateArgs, RunBudget, RunGrant, RunId, RunOptions, RunSpec,
-    min_budget,
+    Crew, DELEGATE_GROUP, DELEGATE_TOOL, DelegateArgs, RunBudget, RunGrant, RunId, RunOptions,
+    RunSpec, min_budget,
 };
-use personas_contract::RoleId;
+use personas_contract::{PersonaId, RoleId};
 use risk_classifier_contract::AutonomyLevel;
 use safety_broker_contract::TaintSource;
 use tools_common_contract::ToolManifest;
@@ -109,6 +109,25 @@ pub fn parent_grant(view: &ParentView<'_>) -> RunGrant {
     }
 }
 
+/// Wykonawczyni podzadania: wskazana agentka (identyfikator przycięty) albo pierwsza z obsady
+/// grająca rolę, inna niż zlecająca. Jedyne miejsce wyboru — ta sama agentka trafia do planu
+/// i do zapytania o jej poziom autonomii (przegląd #2, SR2-01).
+pub fn delegation_target(
+    crew: &Crew,
+    args: &DelegateArgs,
+    parent_agent: &str,
+) -> Option<PersonaId> {
+    let holders = crew.cast.holders(&RoleId::new(args.role.trim()));
+    match &args.persona {
+        Some(p) => holders.into_iter().find(|h| h.as_str() == p.trim()),
+        None => holders
+            .iter()
+            .find(|h| h.as_str() != parent_agent)
+            .or(holders.first())
+            .cloned(),
+    }
+}
+
 /// Plan potomka: walidacja argumentów, wybór agentki z obsady, atenuacja koperty.
 pub fn plan_delegation(
     view: &ParentView<'_>,
@@ -128,19 +147,8 @@ pub fn plan_delegation(
     let role = crew
         .role(&role_id)
         .ok_or_else(|| DelegationError::UnknownRole(args.role.clone()))?;
-    let holders = crew.cast.holders(&role_id);
-    let persona_id = match &args.persona {
-        Some(p) => holders
-            .into_iter()
-            .find(|h| h.as_str() == p.trim())
-            .ok_or_else(|| DelegationError::NotInCast(args.role.clone()))?,
-        None => holders
-            .iter()
-            .find(|h| h.as_str() != view.spec.agent.as_str())
-            .or(holders.first())
-            .cloned()
-            .ok_or_else(|| DelegationError::NotInCast(args.role.clone()))?,
-    };
+    let persona_id = delegation_target(crew, args, view.spec.agent.as_str())
+        .ok_or_else(|| DelegationError::NotInCast(args.role.clone()))?;
     let persona = crew
         .persona(&persona_id)
         .ok_or_else(|| DelegationError::NotInCast(args.role.clone()))?;

@@ -53,6 +53,6 @@ pub use signal::{
     role_module,
 };
 pub use step::{
-    DIAGNOSTICIAN_FORBIDDEN_PREFIXES, KERNEL_MODULES, RepairStep, is_forbidden_key, is_kernel_key,
-    is_kernel_module,
+    DIAGNOSTICIAN_FORBIDDEN_PREFIXES, DIAGNOSTICIAN_FORBIDDEN_SEGMENTS, KERNEL_MODULES, RepairStep,
+    is_forbidden_key, is_kernel_key, is_kernel_module,
 };

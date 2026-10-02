@@ -21,12 +21,14 @@ mod dag;
 mod resources;
 mod script;
 mod time;
+mod view;
 
 pub use control::{kill_switch_cancels_everything, restart_resumes, steering_within_one_step};
 pub use dag::{cancel_subtree, dag_with_conditions_and_inputs};
 pub use resources::{exclusive_resources_in_parallel, priorities_and_preemption, voice_first};
 pub use script::{Script, ScriptOutcome, ScriptRun, ScriptedExecutor};
 pub use time::{budgets, retry_with_backoff, time_windows};
+pub use view::finished_view_keeps_agent_and_start;
 
 /// Uprząż testu: scheduler, skrypty wykonawczyń, czas, restart.
 #[async_trait]
@@ -127,4 +129,5 @@ where
     steering_within_one_step(&factory().await).await;
     restart_resumes(&mut factory().await).await;
     kill_switch_cancels_everything(&factory().await).await;
+    finished_view_keeps_agent_and_start(&factory().await).await;
 }

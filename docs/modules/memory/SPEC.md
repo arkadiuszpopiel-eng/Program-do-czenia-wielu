@@ -138,3 +138,7 @@ Akcja „zapamiętaj" na wiadomości (z wyborem zakresu), `/pamięć`, panel Pam
   `memory.consolidation.{started,finished,skipped}` — bez treści.
 - Otwarte: produkcyjny embedder wielojęzyczny (ONNX lub `ModelProvider::embed`) i reranker modelowy; stemming PL
   w FTS5 (dziś: rdzenie po stronie pamięci); „dzielenie jawne” między projektami poza awansem.
+
+## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
+- **SR2-07** (w `agent-runtime`): zapis pamięci w przebiegu skażonym idzie z `untrusted_args` → `app-memory` nadaje `Provenance::UntrustedContent` (wcześniej `Agent` — zaufany, możliwy awans i konsolidacja).
+- Propozycja (otwarta): dostęp agentki (`app-memory::RoleAccess`) to suma uprawnień wszystkich ról persony w obsadzie, a nie roli bieżącego przebiegu — ograniczenie Badaczki „tylko sesja” nie działa, gdy persona gra też inne role (Gama: researcher + critic + thinker → odczyt projektu i własnej pamięci).

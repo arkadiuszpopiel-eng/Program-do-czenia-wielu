@@ -4,6 +4,7 @@
 
 mod clipboard;
 mod desktop;
+mod dirwatch;
 mod exec;
 mod fs;
 mod hotkeys;
@@ -11,6 +12,7 @@ mod kernel_host;
 mod misc;
 mod pipes;
 mod pty;
+mod signals;
 
 use std::path::{Path, PathBuf};
 
@@ -36,6 +38,9 @@ pub use desktop::{
     PASSWORD_COLOR, ScriptEvent,
 };
 pub use pty::FakePty;
+// Sygnały systemowe (bezczynność, zasilanie, tryb gry, sesja) i obserwacja katalogów — wirtualny zegar.
+pub use dirwatch::FakeDirWatch;
+pub use signals::FakeSignals;
 
 /// Pełna atrapa systemu: składa wszystkie fake'i w jeden `SystemPort`.
 #[derive(Debug, Default)]

@@ -30,6 +30,11 @@ impl Approver {
     }
 }
 
+/// Najwięcej oczekujących propozycji (nadmiar: najstarsze odrzucane — księga nie rośnie bez końca).
+pub const MAX_PENDING_PROPOSALS: usize = 50;
+/// Najwięcej pamiętanych propozycji rozstrzygniętych.
+pub const MAX_DECIDED_PROPOSALS: usize = 100;
+
 /// Stan propozycji.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
@@ -143,11 +148,22 @@ impl RuleBook {
             let errors = match parse_rule(&draft) {
                 Ok(rule) => {
                     let violations = check_rule(&rule, &self.ceiling);
-                    if violations.is_empty() && !rules.iter().any(|r: &Rule| r.id == rule.id) {
+                    // Przegląd #2 (SR2-05): identyfikator aktywnej reguły jest zajęty — zatwierdzenie
+                    // nie może po cichu zastąpić (usunąć) obowiązującego zawężenia.
+                    let taken = self.active.contains_key(&rule.id);
+                    if violations.is_empty()
+                        && !taken
+                        && !rules.iter().any(|r: &Rule| r.id == rule.id)
+                    {
                         rules.push(rule);
                         continue;
                     }
-                    if violations.is_empty() {
+                    if taken {
+                        vec![format!(
+                            "identyfikator `{}` ma aktywna reguła — najpierw ją cofnij",
+                            rule.id
+                        )]
+                    } else if violations.is_empty() {
                         vec!["powtórzony identyfikator reguły".to_owned()]
                     } else {
                         violations.iter().map(violation_text).collect()
@@ -178,7 +194,8 @@ impl RuleBook {
         proposal
     }
 
-    /// Zatwierdzenie (tylko użytkownik): reguły stają się aktywne (zastępują te o tym samym id).
+    /// Zatwierdzenie (tylko użytkownik): reguły stają się aktywne; nigdy nie zastępują aktywnej
+    /// reguły o tym samym identyfikatorze (zmiana reguły = cofnięcie + nowa propozycja).
     pub fn approve(&mut self, id: u64, approver: &Approver) -> Result<Vec<Rule>, MarshalError> {
         if !approver.is_user() {
             return Err(MarshalError::Forbidden);
@@ -193,11 +210,12 @@ impl RuleBook {
         if p.rules.is_empty() {
             return Err(MarshalError::Empty(id));
         }
-        // Ponowne sprawdzenie (sufit mógł zmaleć od propozycji).
+        // Ponowne sprawdzenie (sufit mógł zmaleć od propozycji); reguła o identyfikatorze, który
+        // od propozycji stał się aktywny, nie zastępuje obowiązującej (SR2-05).
         let ok: Vec<Rule> = p
             .rules
             .iter()
-            .filter(|r| check_rule(r, &self.ceiling).is_empty())
+            .filter(|r| check_rule(r, &self.ceiling).is_empty() && !self.active.contains_key(&r.id))
             .cloned()
             .collect();
         if ok.is_empty() {
@@ -241,6 +259,42 @@ impl RuleBook {
     /// Propozycja.
     pub fn proposal(&self, id: u64) -> Option<Proposal> {
         self.proposals.get(&id).cloned()
+    }
+
+    /// Propozycje, najnowsze pierwsze (oczekujące i ostatnie rozstrzygnięte) — przeżywają restart
+    /// razem z księgą (`MarshalHost::persist`).
+    pub fn proposals(&self) -> Vec<Proposal> {
+        self.proposals.values().rev().cloned().collect()
+    }
+
+    /// Limit historii: oczekujące ponad `max_pending` (najstarsze) → odrzucone (odrzucenie nigdy
+    /// nie rozszerza), rozstrzygnięte ponad `max_decided` (najstarsze) → usunięte. Zwraca numery
+    /// propozycji odrzuconych z powodu limitu.
+    pub fn prune_proposals(&mut self, max_pending: usize, max_decided: usize) -> Vec<u64> {
+        let pending: Vec<u64> = self
+            .proposals
+            .values()
+            .filter(|p| p.status == ProposalStatus::Pending)
+            .map(|p| p.id)
+            .collect();
+        let over = pending.len().saturating_sub(max_pending);
+        let rejected: Vec<u64> = pending.into_iter().take(over).collect();
+        for id in &rejected {
+            if let Some(p) = self.proposals.get_mut(id) {
+                p.status = ProposalStatus::Rejected;
+            }
+        }
+        let decided: Vec<u64> = self
+            .proposals
+            .values()
+            .filter(|p| p.status != ProposalStatus::Pending)
+            .map(|p| p.id)
+            .collect();
+        let excess = decided.len().saturating_sub(max_decided);
+        for id in decided.into_iter().take(excess) {
+            self.proposals.remove(&id);
+        }
+        rejected
     }
 
     /// Polityka efektywna (sufit ∩ aktywne reguły).

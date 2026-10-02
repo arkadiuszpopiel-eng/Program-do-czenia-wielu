@@ -25,7 +25,10 @@ mod watch;
 pub mod contract_tests;
 
 pub use crate::core::{Marshal, MarshalCore, MarshalHost, RuleTranslator};
-pub use book::{Approver, MarshalError, Proposal, ProposalStatus, RejectedDraft, RuleBook};
+pub use book::{
+    Approver, MAX_DECIDED_PROPOSALS, MAX_PENDING_PROPOSALS, MarshalError, Proposal, ProposalStatus,
+    RejectedDraft, RuleBook,
+};
 pub use check::{
     Ceiling, Conflict, FAMILIES, MAX_EFFECTS, MAX_WAIT_MS, Violation, check_rule, conflicts,
     resource_name,

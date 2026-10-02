@@ -155,16 +155,30 @@ impl<H: ImproverHost> ImproverCore<H> {
                 key: c.key.clone(),
                 value: c.new.clone(),
             };
-            if let Err(v) = assess(&target, current.as_ref()) {
-                self.block(&p.source, target.summary(), v.clone());
-                return self.update(
-                    id,
-                    Stage::Aborted {
-                        reason: v.to_string(),
-                    },
-                    "strażnik przy wdrożeniu",
-                    |_| {},
+            let assessment = match assess(&target, current.as_ref()) {
+                Ok(a) => a,
+                Err(v) => {
+                    self.block(&p.source, target.summary(), v.clone());
+                    return self.update(
+                        id,
+                        Stage::Aborted {
+                            reason: v.to_string(),
+                        },
+                        "strażnik przy wdrożeniu",
+                        |_| {},
+                    );
+                }
+            };
+            // Przegląd #2 (SR2-04): kwalifikacja do auto-wdrożenia liczona na nowo — pole
+            // `auto_eligible` z trwałej kolejki nie jest źródłem prawdy.
+            if auto && !(assessment.auto_eligible && assessment.ring == Ring::R0) {
+                let reason = format!(
+                    "`{}` wymaga zatwierdzenia właściciela (nie jest zmianą R0 zawężającą/bezpieczną)",
+                    c.key
                 );
+                return self.update(id, Stage::AwaitingApproval, &reason, |p| {
+                    p.auto_eligible = false;
+                });
             }
             if current != c.old {
                 let reason = format!("`{}` zmieniono od czasu propozycji", c.key);

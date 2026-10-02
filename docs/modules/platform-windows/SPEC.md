@@ -50,6 +50,20 @@ Implementacja Windows: `platform-windows-gui-impl` (`WinGui`) i `platform-window
 
 Testy: `platform-fake/tests/desktop.rs` (property 0/200 skutków w oknach chronionych, przerwanie, maskowanie, limit czasu UIA), `platform-contract` (wykonawca wejścia, skróty systemowe, PNG/CRC/Adler, maski), Windows CI: `platform-windows-gui-impl/tests/gui_windows.rs` (pulpit `#[ignore]`: Notatnik — UIA, pisanie, zrzut), `platform-windows-pty-impl/tests/conpty_windows.rs` (wyjście, kod, zabicie drzewa).
 
+### Sygnały systemowe i obserwacja katalogów (poza sumą `SystemPort`)
+Implementacja Windows: `platform-windows-sys-impl` (`WinSignals`, `WinDirWatch`; nowy crate kategorii `platform-windows-*-impl`, `deny.toml`: `wrappers` dla `windows`). Reguły (histereza, filtr zmian, debounce, przeskanowanie, deny-lista) są w kontrakcie — Windows i atrapa różnią się tylko źródłem próbek/zmian.
+| Port (kontrakt) | Windows | Atrapa |
+|---|---|---|
+| `IdlePort` + `IdleTracker` (wejście po `idle_after_ms` = 5 min; wyjście dopiero, gdy aktywność trwa ≥ `wake_confirm_ms` = 1 s w oknie 10 s — trącenie myszy nie przerywa zadań tła; błąd odczytu nie zmienia stanu) | `GetLastInputInfo` + `GetTickCount64` (różnica modulo 2³²); wejście syntetyczne Alfy też zeruje licznik (kierunek bezpieczny) | `FakeSignals::input`, wirtualny zegar |
+| `PowerPort` + `PowerSnapshot::from_system_power_status` (zasilacz/bateria, poziom, oszczędzanie, czas; zmiana zgłaszana przy źródle, oszczędzaniu, kroku ≥ 5 pp albo przekroczeniu 20%) | `GetSystemPowerStatus`; powiadomienia `RegisterPowerSettingNotification` (`GUID_ACDC_POWER_SOURCE`, `GUID_BATTERY_PERCENTAGE_REMAINING`, `GUID_POWER_SAVING_STATUS`) budzą próbkę | `set_power` + `notify` |
+| `FullscreenPort` + `FullscreenProbe::game_reason` + `GameModeTracker` (tryb gry od razu, wyjście po 10 s bez pełnego ekranu; brak odczytu = tryb trwa; `QUNS_NOT_PRESENT` to nie gra) | `SHQueryUserNotificationState` (`QUNS_BUSY`, `QUNS_RUNNING_D3D_FULL_SCREEN`, `QUNS_PRESENTATION_MODE`) + okno pierwszego planu bez ramki pokrywające monitor (`Progman`/`WorkerW`/pasek zadań i okna Alfy wykluczone) | `set_fullscreen` |
+| `SessionPort` + `SessionState::is_away` (zablokowana/rozłączona → głos wyciszony, computer use wstrzymany; `Unknown` nie zmienia stanu) | `WTSQuerySessionInformationW(WTSSessionInfoEx)` (`SessionFlags`, `SessionState`), powiadomienie `WM_WTSSESSION_CHANGE` | `set_session` |
+| `SystemSignalsPort` + `SignalMonitor` (`SystemSignals`, `SignalEvent`, kolejka ≤ 256) | wątek z oknem `HWND_MESSAGE`: powiadomienia + `SetTimer` 1 s (bezczynność i pełny ekran nie mają powiadomień — jedyny wyjątek od „bez pollingu”, koszt ~0) | `FakeSignals` (próbki co `poll_ms` wirtualnego zegara; `wait_events` przesuwa zegar) |
+| `DirWatchPort` + `WatchSet`/`WatchCore`/`WatchPolicy` (debounce 750 ms, najdłużej 30 s; semantyka istnienia: utworzony+usunięty = nic, usunięty+utworzony = zmieniony, tymczasowy→docelowy = utworzony, para nazw = `Renamed`; pliki tymczasowe i wzorce `*`/`?`; ≤ 16 obserwacji, ≤ 4096 plików pamiętanych na obserwację; deny-lista surowa i kanoniczna przed otwarciem katalogu, zmiany pod nią nigdy nie wychodzą; korzeń wolumenu z podkatalogami odrzucany) | `ReadDirectoryChangesW` z `OVERLAPPED` (wątek na obserwację, stop = zdarzenie + `CancelIoEx`), bufor 64 KiB; pierwsze żądanie przed skanem początkowym; 0 B / `ERROR_NOTIFY_ENUM_DIR` → `Rescanned{Overflow}`; dodany/przeniesiony podkatalog → `Rescanned{DirectoryMoved}`; skan bez dowiązań/junction | `FakeDirWatch` (wirtualny FS, `lose_events`, `overflow`, `move_dir`, `link`) |
+
+Zdarzenia (publikuje `app-*`): `platform.idle.entered|exited`, `platform.power.changed`, `platform.fullscreen.changed`, `platform.session.locked|unlocked`, `platform.fs.changed|rescanned|watch_stopped` (ścieżki bez treści). Podpięcie w `app-*`: `SystemConditions { user_idle, game_mode }` dla schedulera, `IdleSource`/`HostConditions` Strażniczki, `ModeSource` (`model-residency::refresh_mode`), `FileWatchPort` wyzwalaczy (`replace_all` + `WatchEvent::new_file` → `TriggersModule::file_created`), blokada sesji → `voice-wake` (wyciszenie) i computer use (pauza).
+Testy: `platform-fake/tests/signals.rs` (histereza, filtr zasilania, tryb gry, blokada, kolejka), `dir_watch.rs` (debounce, pobieranie, przemianowania, przepełnienie → dokładne różnice, deny-lista: 0 zdarzeń z `.ssh`/`.claude` także przez junction i przemianowanie, limity), `dir_watch_props.rs` (proptest 256 przypadków: strumień spójny i zbieżny ze stanem katalogu przy utracie zdarzeń); `platform-windows-sys-impl`: parser `FILE_NOTIFY_INFORMATION` i skan (Linux), spójność deny-listy z Jądrem, Windows CI (`tests/sys_windows.rs`: zapytania, monitor, katalog tymczasowy, junction, przepełnienie bufora 1 KiB; `#[ignore]`: `Win+L`, gra).
+
 ## Zależności
 `platform-contract` (F1 bez magistrali — zdarzenia publikuje jądro). Zewnętrzne: `windows`/`windows-core` 0.62.2 (jedna wersja, `docs/vendor/windows.md`).
 
@@ -70,10 +84,10 @@ Port sam nie decyduje: wykonuje operacje z tokenem zdolności przekazanym przez 
 `inproc`, `always` (część `process` — helper `uiAccess` w F6, osobny SPEC).
 
 ## Budżet zasobów
-RAM ≤ 4 MB; `spawn` ≤ 30 ms; reakcja hooka PTT ≤ 10 ms; watchery bez pollingu.
+RAM ≤ 4 MB (+ obserwacje: ≤ 4096 ścieżek na obserwację, bufor 64 KiB); `spawn` ≤ 30 ms; reakcja hooka PTT ≤ 10 ms; watchery bez pollingu (wyjątek: monitor sygnałów próbkuje bezczynność i pełny ekran co 1 s — brak powiadomień systemowych).
 
 ## Konfiguracja (klucze TOML)
-`[platform] recycle_bin = true`, `[platform.hotkeys] kill_switch = "Ctrl+Shift+F12"`, `quick_ask = "Ctrl+Alt+Space"`, `ptt = "Space"`; `[platform.denylist_paths] = [...]` (kernel_policy).
+`[platform] recycle_bin = true`, `[platform.signals] idle_after = "5m"`, `wake_confirm = "1s"`, `game_exit_after = "10s"`, `poll = "1s"`, `[platform.watch] max_watches = 16`, `debounce = "750ms"`, `buffer = "64KiB"`, `[platform.hotkeys] kill_switch = "Ctrl+Shift+F12"`, `quick_ask = "Ctrl+Alt+Space"`, `ptt = "Space"`; `[platform.denylist_paths] = [...]` (kernel_policy).
 
 ## Wkład do UI
 Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, stan „okno admina na wierzchu" dla paska stanu.
@@ -89,7 +103,7 @@ Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, st
 `platform-windows-fake`: wirtualny system plików, schowek i lista okien w pamięci, skrypty zdarzeń (hotkey/PTT/hot-plug) z wirtualnym zegarem — testy na Linux/CI bez Windows.
 
 ## Otwarte pytania
-- Kontrakt F0 nie ma `watch` (FS, schowek) ani subskrypcji zdarzeń skrótów — do dodania w SPEC v1 (zdarzenia na magistrali).
+- Obserwacja FS jest (`DirWatchPort`); schowek nadal bez `watch`, skróty bez subskrypcji zdarzeń — do SPEC v1 (zdarzenia na magistrali).
 - Rozszerzyć kontrakt: `WindowInfo` o PID/prostokąt/DPI, `WindowPort` o minimalizację, `ProcessSpec` o limity CPU/affinity i stdio (dziś metody impl).
 - Dziennik cofnięć FS jest w pamięci procesu — trwały dziennik to `undo-journal` (F3).
 - Podział `SystemPort` na osobne crate'y kontraktowe per pod-port (ładowanie leniwe) — do ustalenia w SPEC v1.

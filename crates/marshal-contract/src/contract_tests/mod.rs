@@ -2,6 +2,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, missing_docs)]
 
+mod proposals;
 mod rules;
 mod watch;
 
@@ -16,6 +17,7 @@ use serde_json::{Value, json};
 
 use crate::{Ceiling, Marshal, RuleTranslator, event_kind};
 
+pub use proposals::proposals_are_listed_and_bounded;
 pub use rules::{
     conflicts_are_reported, plan_examples_are_accepted, rules_only_narrow_and_need_user,
 };
@@ -99,4 +101,5 @@ where
     plan_examples_are_accepted(&factory(start).await).await;
     escalations_from_scheduler_events(&factory(start).await).await;
     daily_report(&factory(start).await).await;
+    proposals_are_listed_and_bounded(&factory(start).await).await;
 }

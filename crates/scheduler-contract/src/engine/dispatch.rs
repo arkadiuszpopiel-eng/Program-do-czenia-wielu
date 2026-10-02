@@ -279,6 +279,8 @@ impl<H: SchedHost> Ctx<'_, H> {
             agent: agent.clone(),
             since_ms: self.now,
         };
+        rec.first_started_at_ms.get_or_insert(self.now);
+        rec.last_agent.clone_from(&agent);
         rec.blocked = None;
         rec.yield_request = None;
         rec.last_dispatch = Some(dispatch);

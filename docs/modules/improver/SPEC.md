@@ -55,3 +55,7 @@ Panel „Zdrowie systemu” → kolejka propozycji (diff, uzasadnienie, wynik pi
 - Źródło propozycji z modelem lokalnym (Router) i retrospektywy z `core-log` — podpięcie w `app-*`.
 - Podpis zatwierdzeń kluczem TPM / Windows Hello (`ApprovalVerifier`) — `platform-windows` + przegląd człowieka.
 - Format schematów kluczy w `core-config` z metadaną „kierunek zawężania” zamiast tabeli `IMPROVABLE` — SPEC v2 razem z `core-config`.
+
+## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
+- **SR2-04:** kwalifikacja do auto-wdrożenia (R0 ∧ zawężająca/bezpieczna) liczona na nowo tuż przed zapisem z bieżącej oceny strażnika; pole `auto_eligible` z trwałej kolejki nie jest źródłem prawdy (zmieniona kolejka → `AwaitingApproval`, `tests/review.rs`).
+- Propozycje (otwarte): limity dobowe, wychładzanie po cofnięciu i budżet zapytań holdoutu są w pamięci (restart je zeruje) — utrwalić; konsument kluczy `agents.*.manifest` / `skills.*.playbook` musi przepuszczać wartość przez walidację Kreatora / umiejętności; wpis słownika wymowy (R0 „bezpieczny”, auto) może zmienić znaczenie słyszanych słów — auto tylko ze źródła `rule:pronunciation`.

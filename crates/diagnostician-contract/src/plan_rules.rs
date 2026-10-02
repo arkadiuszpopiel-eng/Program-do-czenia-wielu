@@ -5,7 +5,7 @@ use serde_json::{Value, json};
 
 use crate::catalog::FailureKind;
 use crate::classify::Detection;
-use crate::plan::{Risk, key_segment};
+use crate::plan::{Risk, key_segment, plain_token, signal_key};
 use crate::ports::RepairContext;
 use crate::step::{RepairStep, is_kernel_module};
 
@@ -23,8 +23,9 @@ impl Builder<'_> {
         self.d.details.get(key).cloned()
     }
 
+    /// Klucz z szczegółów sygnału — tylko w przestrzeni nazw modułu (SR2-03).
     fn key(&self, detail: &str, default: String) -> String {
-        self.detail(detail).unwrap_or(default)
+        signal_key(&self.d.module, self.detail(detail), default)
     }
 
     fn set(&mut self, key: &str, new: Value) {
@@ -152,10 +153,7 @@ pub(crate) fn build(b: &mut Builder<'_>) {
         }
         FailureKind::GpuLost => {
             let key = b.key("device_key", format!("{ms}.device"));
-            b.set(
-                &key,
-                json!(b.detail("fallback").unwrap_or_else(|| "cpu".into())),
-            );
+            b.set(&key, json!(plain_token(b.detail("fallback"), "cpu")));
             b.restart(&m);
             b.because(
                 Risk::Low,
@@ -324,10 +322,7 @@ pub(crate) fn build(b: &mut Builder<'_>) {
         }
         FailureKind::ResourceBudgetExceeded => {
             let key = b.key("limit_key", format!("modules.{ms}.lifecycle"));
-            b.set(
-                &key,
-                json!(b.detail("limit_value").unwrap_or_else(|| "lazy".into())),
-            );
+            b.set(&key, json!(plain_token(b.detail("limit_value"), "lazy")));
             b.restart(&m);
             b.because(
                 Risk::Low,

@@ -48,13 +48,19 @@ pub struct FakeMarshal {
 impl FakeMarshal {
     /// Nowa atrapa z zegarem `start_ms` i domyślnym sufitem.
     pub fn new(start_ms: u64) -> Self {
+        Self::with_book(start_ms, RuleBook::default())
+    }
+
+    /// Atrapa z zapisaną księgą (stan po restarcie: reguły, sufit, propozycje).
+    pub fn with_book(start_ms: u64, book: RuleBook) -> Self {
         let host = Arc::new(FakeMarshalHost::default());
         host.clock.store(start_ms, Ordering::SeqCst);
+        *lock(&host.book) = Some(book.clone());
         let translator = Arc::new(ScriptedTranslator::default());
         let core = MarshalCore::new(
             Arc::clone(&host),
             translator.clone(),
-            RuleBook::default(),
+            book,
             Watch::new(WatchConfig::default()),
         );
         Self {
@@ -92,5 +98,11 @@ impl FakeMarshal {
     /// Ostatnio zapisana księga reguł.
     pub fn stored(&self) -> Option<RuleBook> {
         lock(&self.host.book).clone()
+    }
+
+    /// Restart: nowa atrapa z ostatnio zapisanej księgi i tym samym zegarem (nadzór i nagrania
+    /// tłumacza nie są trwałe).
+    pub fn restarted(&self) -> Self {
+        Self::with_book(self.now_ms(), self.stored().unwrap_or_default())
     }
 }

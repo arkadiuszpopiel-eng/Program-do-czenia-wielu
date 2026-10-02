@@ -81,6 +81,58 @@ pub fn key_segment(text: &str) -> String {
     if s.is_empty() { "x".into() } else { s }
 }
 
+/// Klucz konfiguracji podsunięty w szczegółach sygnału (niezaufany — moduł nadawcy
+/// `diagnostics.symptom` nie jest uwierzytelniony): przyjmowany tylko w przestrzeni nazw modułu
+/// sygnału (`voice.stt.*`, `voice_stt.*`, `modules.voice_stt.*`, `sidecars.voice_stt.*`), dla tego
+/// samego rodzaju ustawienia co klucz domyślny (ostatni segment), poprawny składniowo i spoza
+/// obszarów zakazanych. Inaczej — klucz domyślny (przegląd #2, SR2-03).
+pub(crate) fn signal_key(module: &str, proposed: Option<String>, default: String) -> String {
+    let Some(key) = proposed else {
+        return default;
+    };
+    let ms = key_segment(module);
+    let dotted = module.to_lowercase().replace('-', ".");
+    let namespaces = [
+        dotted,
+        ms.clone(),
+        format!("modules.{ms}"),
+        format!("sidecars.{ms}"),
+    ];
+    let syntax = key.split('.').all(|s| {
+        !s.is_empty()
+            && s.chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-')
+    });
+    let same_kind = key.rsplit('.').next() == default.rsplit('.').next();
+    let in_namespace = namespaces.iter().any(|n| {
+        key.strip_prefix(n.as_str())
+            .is_some_and(|rest| rest.starts_with('.'))
+    });
+    if syntax
+        && same_kind
+        && in_namespace
+        && !is_kernel_module(module)
+        && !is_kernel_key(&key)
+        && !is_forbidden_key(&key)
+    {
+        key
+    } else {
+        default
+    }
+}
+
+/// Wartość z szczegółów sygnału jako zwykły token (`cpu`, `directml`, `lazy`): bez adresów,
+/// ścieżek i spacji; inaczej wartość domyślna (SR2-03).
+pub(crate) fn plain_token(proposed: Option<String>, default: &str) -> String {
+    proposed
+        .filter(|v| {
+            (1..=32).contains(&v.len())
+                && v.chars()
+                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-')
+        })
+        .unwrap_or_else(|| default.to_owned())
+}
+
 /// Planuje naprawę wykrycia.
 pub fn plan(d: &Detection, ctx: &dyn RepairContext) -> Proposal {
     let mut b = Builder {
