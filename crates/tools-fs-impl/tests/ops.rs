@@ -5,6 +5,8 @@
 
 mod common;
 
+use std::path::Path;
+
 use common::{HOME, ctx, harness};
 use safety_broker_contract::{ApprovalDecision, Broker, TaintSource};
 use safety_broker_fake::ScriptedDecision;
@@ -73,7 +75,14 @@ async fn binary_and_stat_and_list() {
         .iter()
         .map(|e| e["path"].as_str().unwrap().to_owned())
         .collect();
-    assert!(paths.iter().any(|p| p.ends_with("sub/b.txt")), "{paths:?}");
+    // Porównanie po składnikach ścieżki, nie po tekście: `FsPort` składa wpisy `Path::join`,
+    // więc na Windows separatorem jest `\` (`…\sub\b.txt`), a na Linuksie `/`.
+    assert!(
+        paths
+            .iter()
+            .any(|p| Path::new(p).ends_with(Path::new("sub").join("b.txt"))),
+        "{paths:?}"
+    );
     assert!(
         !paths.iter().any(|p| p.contains(".ssh")),
         "deny-lista ukryta: {paths:?}"

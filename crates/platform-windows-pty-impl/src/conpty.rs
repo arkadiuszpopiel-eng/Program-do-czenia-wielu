@@ -28,7 +28,8 @@ use windows::Win32::System::Threading::{
     CREATE_SUSPENDED, CREATE_UNICODE_ENVIRONMENT, CreateProcessW, DeleteProcThreadAttributeList,
     EXTENDED_STARTUPINFO_PRESENT, GetExitCodeProcess, InitializeProcThreadAttributeList,
     LPPROC_THREAD_ATTRIBUTE_LIST, PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, PROCESS_INFORMATION,
-    ResumeThread, STARTUPINFOEXW, TerminateProcess, UpdateProcThreadAttribute, WaitForSingleObject,
+    ResumeThread, STARTF_USESTDHANDLES, STARTUPINFOEXW, TerminateProcess,
+    UpdateProcThreadAttribute, WaitForSingleObject,
 };
 use windows::core::{PCWSTR, PWSTR};
 
@@ -105,6 +106,22 @@ fn job() -> Result<Owned, PlatformError> {
     }
 }
 
+/// `STARTUPINFOEXW` procesu w pseudokonsoli. `STARTF_USESTDHANDLES` z pustymi uchwytami jest
+/// konieczne: bez tej flagi Windows przekazuje dziecku standardowe uchwyty rodzica, gdy nie są
+/// uchwytami konsoli (przekierowane do potoku/pliku — `cargo test` w CI, `tauri dev`, usługa).
+/// Proces pisze wtedy do wyjścia rodzica i czyta jego wejście zamiast pseudokonsoli. Z pustymi
+/// uchwytami konsola dziecka podstawia uchwyty pseudokonsoli (tak samo Windows Terminal i node-pty).
+fn startup_info(list: LPPROC_THREAD_ATTRIBUTE_LIST) -> STARTUPINFOEXW {
+    let mut si = STARTUPINFOEXW::default();
+    si.StartupInfo.cb = size_of::<STARTUPINFOEXW>() as u32;
+    si.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    si.StartupInfo.hStdInput = HANDLE::default();
+    si.StartupInfo.hStdOutput = HANDLE::default();
+    si.StartupInfo.hStdError = HANDLE::default();
+    si.lpAttributeList = list;
+    si
+}
+
 /// Sesja ConPTY.
 pub(crate) struct ConPtySession {
     pid: u32,
@@ -158,9 +175,7 @@ pub(crate) fn spawn(spec: &PtySpec) -> Result<ConPtySession, PlatformError> {
         )
         .map_err(|e| err("UpdateProcThreadAttribute", &e))?;
     }
-    let mut si = STARTUPINFOEXW::default();
-    si.StartupInfo.cb = size_of::<STARTUPINFOEXW>() as u32;
-    si.lpAttributeList = list;
+    let si = startup_info(list);
     let program = wide(spec.program.as_os_str());
     let mut cmd: Vec<u16> = command_line(&spec.program.to_string_lossy(), &spec.args)
         .encode_utf16()
@@ -294,5 +309,26 @@ impl PtySession for ConPtySession {
 impl Drop for ConPtySession {
     fn drop(&mut self) {
         let _ = self.close();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Regresja (CI `windows-latest`, stdout testu = potok): bez `STARTF_USESTDHANDLES` dziecko
+    /// pisało do wyjścia rodzica, a pseudokonsola nie dostawała ani bajtu.
+    #[test]
+    fn child_never_inherits_parent_std_handles() {
+        let si = startup_info(LPPROC_THREAD_ATTRIBUTE_LIST(std::ptr::null_mut()));
+        assert_eq!(si.StartupInfo.cb as usize, size_of::<STARTUPINFOEXW>());
+        assert!(si.StartupInfo.dwFlags.contains(STARTF_USESTDHANDLES));
+        for h in [
+            si.StartupInfo.hStdInput,
+            si.StartupInfo.hStdOutput,
+            si.StartupInfo.hStdError,
+        ] {
+            assert!(h.0.is_null(), "uchwyt std musi być pusty (NULL): {h:?}");
+        }
     }
 }

@@ -2,7 +2,6 @@
 //! rodzaj nagrania (typy 1–12 protokołu nagrań), warunki, podział dev/test, etykiety.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -211,6 +210,19 @@ pub fn parse_manifest(text: &str) -> Result<Vec<ManifestEntry>, Vec<String>> {
     }
 }
 
+/// Czy `audio` to ścieżka `.wav` względna wobec katalogu korpusu — jednakowo na każdym systemie
+/// (manifest i lista zamrożenia są przenośne). `Path::is_absolute` tu nie wystarcza: na Windows
+/// `/abs/x.wav` i `\abs\x.wav` nie są „absolute” (brak dysku), a `root.join(…)` prowadzi z nimi
+/// do korzenia bieżącego dysku, poza korpus; `C:x.wav` (dysk bez korzenia) też zastępuje katalog
+/// korpusu. Stąd reguła tekstowa: bez separatora na początku (także UNC `\\serwer`), bez `:`
+/// (dysk, strumień ADS), bez `..`.
+fn is_corpus_relative_wav(audio: &str) -> bool {
+    !audio.starts_with(['/', '\\'])
+        && !audio.contains(':')
+        && !audio.contains("..")
+        && audio.ends_with(".wav")
+}
+
 /// Reguły formatu: unikalne id, ścieżki względne `.wav`, wymagane pola per rodzaj, brak
 /// przecieku pliku między dev i test. Zwraca wszystkie naruszenia.
 pub fn validate_manifest(entries: &[ManifestEntry]) -> Vec<String> {
@@ -229,8 +241,7 @@ pub fn validate_manifest(entries: &[ManifestEntry]) -> Vec<String> {
         if !ids.insert(id) {
             errors.push(format!("{id}: powtórzony identyfikator"));
         }
-        let path = Path::new(&e.audio);
-        if path.is_absolute() || e.audio.contains("..") || !e.audio.ends_with(".wav") {
+        if !is_corpus_relative_wav(&e.audio) {
             errors.push(format!("{id}: audio musi być względną ścieżką do .wav"));
         }
         if *splits.entry(e.audio.as_str()).or_insert(e.split) != e.split {

@@ -107,6 +107,39 @@ fn manifest_validation_finds_every_violation() {
     assert_eq!(errors.len(), expect.len(), "{errors:?}");
 }
 
+/// Regresja (CI `windows-latest`): `Path::is_absolute` na Windows nie uznaje `/abs/x.wav` za
+/// bezwzględną, a `root.join` wychodziła z nią poza katalog korpusu. Reguła jest jednakowa na
+/// każdym systemie — także dla postaci Windows sprawdzanych na Linuksie.
+#[test]
+fn audio_outside_corpus_is_rejected_on_every_os() {
+    for audio in [
+        "/abs/x.wav",
+        r"\abs\x.wav",
+        r"C:\korpus\x.wav",
+        "C:/korpus/x.wav",
+        "C:x.wav",
+        r"\\serwer\udzial\x.wav",
+        "//serwer/udzial/x.wav",
+        r"\\?\C:\korpus\x.wav",
+        "16k/../x.wav",
+        r"16k\..\x.wav",
+        "16k/x.wav:ukryty.wav",
+        "16k/x.mp3",
+    ] {
+        let mut e = entry("a1", ItemKind::FreeSpeech, Split::Dev);
+        e.audio = audio.into();
+        let errors = validate_manifest(&[e]);
+        assert_eq!(
+            errors,
+            ["a1: audio musi być względną ścieżką do .wav"],
+            "{audio}"
+        );
+    }
+    let mut ok = entry("a2", ItemKind::FreeSpeech, Split::Dev);
+    ok.audio = "16k/laptop/2026-10-06/t08-przerwania-01.wav".into();
+    assert!(validate_manifest(&[ok]).is_empty());
+}
+
 #[test]
 fn select_filters_split() {
     let all = [
