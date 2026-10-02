@@ -17,8 +17,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
+    env:
+      # ~300 crate'ów i >1000 binariów testowych: bez debuginfo w CI (backtrace i tak z nazwami funkcji).
+      CARGO_PROFILE_DEV_DEBUG: "0"
     steps:
       - uses: actions/checkout@v4
+      # Runner Ubuntu ma ~14 GB wolnego; build testów workspace się nie mieści (linker: Bus error).
+      - name: Zwolnij miejsce na dysku runnera
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "1.94"
