@@ -1,0 +1,44 @@
+[package]
+name = "plugin-runtime-impl"
+description = "Wtyczki Wasm (F8-05): piaskownica wasmtime 36 LTS (komponenty WIT, bez WASI), paliwo + epoch + limiter pamięci per wywołanie, nowa instancja na wywołanie, ładowanie tylko po weryfikacji SHA-256, operacje hosta przez Brokera dla agentki wywołującej, narzędzia w rejestrze agentek, magazyn w katalogu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+plugin-runtime-contract = { path = "../plugin-runtime-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+semver.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util = { version = "0.7.19", default-features = false }
+# Piaskownica Wasm (ADR 0012): linia LTS 36.x — MSRV 1.86 ≤ toolchain 1.94, bez otwartych
+# RUSTSEC (47.x ma niezałatane RUSTSEC-2026-0315/0316, 48+/49 wymagają Rust 1.95/1.96).
+# Minimalne cechy: bez cache, wat, profilowania, kompilacji równoległej, GC, wątków, async,
+# pooling, coredump (docs/vendor/wasmtime.md). Apache-2.0 WITH LLVM-exception.
+wasmtime = { version = "=36.0.16", default-features = false, features = ["runtime", "cranelift", "component-model", "std"] }
+
+[dev-dependencies]
+plugin-runtime-contract = { path = "../plugin-runtime-contract", features = ["contract-tests"] }
+safety-broker-fake = { path = "../safety-broker-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+providers-fake = { path = "../providers-fake" }
+providers-contract = { path = "../providers-contract" }
+futures-util.workspace = true
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["test-util"] }
+# Wtyczki testowe (napastniczki i licznik słów) kompilowane z WAT w testach — bez binariów w repo.
+# Ta sama linia wasm-tools co wasmparser 0.236 w wasmtime 36.
+wat = "=1.236.1"
+
+[lints]
+workspace = true
