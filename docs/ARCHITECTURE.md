@@ -292,3 +292,222 @@ Z tych samych zdarzeń powstają: drzewo postępów (Plan → kroki → status),
 | Progi pokrycia testami (wstępnie ≥ 85% linii, ≥ 70% gałęzi) | F0 |
 | Snap Layouts, Mica, pisownia PL w WebView2, toasty z AUMID przez launcher | spike (j) |
 | Limity dysku strumieni logów | F0 |
+
+## 13. Stan implementacji (październik 2026)
+
+Stan na HEAD `51cbe91` (2026-10-02). Sekcje 1–12 opisują plan i zostają bez zmian; tu jest to, co faktycznie
+zbudowano, i gdzie implementacja odeszła od planu. Macierz kryteriów akceptacji: `docs/STATUS.md`. Tabela crate'ów:
+`crates/README.md`. Indeks SPEC-ów: `docs/modules/README.md`.
+
+### 13.1 Skala
+
+| Co                                                              | Liczba                                                                              |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Crate'y w workspace                                             | 206: 62 `-contract`, 65 `-impl`, 61 `-fake`, 14 `app-*`, 3 `lib-*`, `spike-data`    |
+| SPEC-i modułów / manifesty `module.toml`                        | 67 / 60                                                                             |
+| Kontrakt UI ↔ rdzeń (`apps/desktop/ui/src/lib/api/COMMANDS.md`) | 162 komendy, 32 typy zdarzeń (wg opisu `51cbe91`), 3 okna (`main`, `quick`, `pill`) |
+| Testy (bramki lokalne `51cbe91`)                                | 1846 Rust, vitest 135, Playwright E2E 62 (z axe w obu motywach)                     |
+| Graf zależności (`scripts/check-deps.sh`)                       | 1265 krawędzi, 0 naruszeń                                                           |
+
+### 13.2 Warstwy i moduły
+
+| Warstwa                  | Moduły                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Uwagi                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Rdzeń                    | `core-bus`, `core-registry`, `core-config`, `core-log`; biblioteki `lib-sqlstore`, `lib-markdown`, `lib-openai-compat`; wzorzec `example-module`                                                                                                                                                                                                                                                                                                                                                                                       | `lib-*` — wspólny kod bez logiki modułu, zależy tylko od `lib-*` i `*-contract`                          |
+| Platforma                | `platform-contract`, `platform-fake`, `platform-windows-impl` (pliki, Kosz, procesy i Job Objects, schowek, okna, skróty, sprzęt), `platform-windows-kernel-impl` (potoki z DACL, tożsamość klienta, okno zatwierdzeń Win32, start z integralnością High, host usługi), `platform-windows-gui-impl` (UIA, `SendInput`, zrzuty z maskowaniem), `platform-windows-pty-impl` (ConPTY), `platform-windows-sys-impl` (bezczynność, zasilanie, tryb gry, blokada sesji, obserwacja katalogów); `device-profile`; `updater` (launcher `alfa`) | jedyne crate'y z windows-rs (jedna wersja, `deny.toml` → `wrappers`)                                     |
+| Dane                     | `sessions`, `search`, `memory`, `memory-consolidation`, `artifacts`, `transfer`                                                                                                                                                                                                                                                                                                                                                                                                                                                        | SQLCipher per sesja i per zakres pamięci, FTS5 + `sqlite-vec`, crypto-shredding                          |
+| Modele                   | `accounts-hub`, `providers` (`providers-contract`, `-fake`, `providers-api-impl`, `providers-local-impl`), `router`, `cost-meter`, `model-residency`, `agent-backends`, `mcp`                                                                                                                                                                                                                                                                                                                                                          | Router sam jest `ModelProvider`; mosty CLI za `AgentBackend`                                             |
+| Głos                     | `voice-audio`, `voice-dsp`, `voice-vad`, `voice-stt`, `voice-tts`, `voice-turn`, `voice-cmd`, `voice-dialog`, `voice-persona`, `voice-wake`, `voice-pipeline`, `voice-speaker`, `voice-dictation`, `voice-readaloud`, `voice-s2s` (tylko kontrakt i atrapa)                                                                                                                                                                                                                                                                            | `voice-pipeline` składa potok; w aplikacji podpięte F2 (rozmowa, barge-in, PTT, pigułka)                 |
+| Jądro bezpieczeństwa     | `safety-broker`, `broker-ui`, `watchdog`, `risk-classifier`, `undo-journal`, `compliance`; binaria `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` w `app-safety`                                                                                                                                                                                                                                                                                                                                                                     | zmiany tylko z przeglądem człowieka (AGENTS.md)                                                          |
+| Agentki                  | `agent-runtime`, `personas`, `scheduler-lite`, `scheduler`, `triggers`, `marshal`, `agent-builder`, `skills`; narzędzia `tools-common` (sam kontrakt), `tools-fs`, `tools-shell`, `tools-clipboard`, `tools-window`, `tools-uia`, `tools-input`, `tools-screen`; `ui-terminal`                                                                                                                                                                                                                                                         | każde narzędzie przez `BrokerGate`; terminal wyłącznie z gestu użytkownika                               |
+| Samonaprawa              | `diagnostician`, `improver`, `evals`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | holdout tylko przez bramkę Jądra                                                                         |
+| Aplikacja (`app-*`)      | `app-api` (DTO, porty, zdarzenia), `app-core` (komendy, czat, `EventHub`), `app-modules` (adaptery modułów), `app-store`, `app-agents`, `app-voice`, `app-memory`, `app-tasks`, `app-bridges`, `app-gui`, `app-terminal`, `app-skills`, `app-health`, `app-safety`                                                                                                                                                                                                                                                                     | jedyne crate'y, które mogą zależeć od `*-impl`                                                           |
+| UI i powłoka (TS, Tauri) | `apps/desktop/src-tauri` (okna, zasobnik, skróty globalne, pompa zdarzeń, dialogi, `ShellPort`), `apps/desktop/ui` (ui-shell; ui-quick: `quick.html`, `pill.html`), `packages/ui-kit` (tokeny, komponenty, Storybook)                                                                                                                                                                                                                                                                                                                  | `notify` i `shell-integration` żyją w `app-core` (`notify`, `protocol`) i powłoce, bez własnych crate'ów |
+
+### 13.3 Diagram warstw
+
+```mermaid
+flowchart TB
+  subgraph UI["UI — Svelte 5 w WebView2"]
+    MAIN["Okno główne<br/>rozmowa, panele, Ustawienia"]
+    QUICK["Szybkie pytanie"]
+    PILL["Pigułka głosowa"]
+  end
+  SHELL["Powłoka Tauri 2<br/>okna, zasobnik, skróty globalne,<br/>pompa zdarzeń, dialogi"]
+  subgraph APP["Korzeń kompozycji app-*"]
+    CORE["app-core<br/>komendy, czat, EventHub co klatkę"]
+    APPMOD["app-modules, app-agents, app-voice,<br/>app-memory, app-tasks, app-bridges,<br/>app-gui, app-terminal, app-skills, app-health"]
+  end
+  subgraph DOM["Moduły domenowe — tylko przez -contract"]
+    DATA["Dane<br/>sessions, search, memory, artifacts, transfer"]
+    MODELS["Modele<br/>router, providers, accounts-hub,<br/>cost-meter, model-residency"]
+    VOICE["Głos<br/>voice-pipeline i moduły voice-*"]
+    AGENTS["Agentki<br/>agent-runtime, scheduler, triggers,<br/>marshal, skills, agent-builder, personas"]
+    TOOLS["Narzędzia<br/>tools-fs, shell, clipboard,<br/>window, uia, input, screen"]
+    HEALTH["Samonaprawa<br/>diagnostician, improver, evals"]
+    BRIDGES["Mosty i MCP<br/>agent-backends, mcp"]
+  end
+  subgraph KERNEL["Jądro bezpieczeństwa"]
+    BROKER["safety-broker<br/>tokeny, L0–L4, Audyt, kill-switch"]
+    RISK["risk-classifier, compliance, undo-journal"]
+    BUI["broker-ui — Win32, High IL"]
+    WD["watchdog"]
+  end
+  subgraph BASE["Rdzeń i biblioteki"]
+    BUS["core-bus, core-config, core-log, core-registry"]
+    LIBS["lib-sqlstore, lib-markdown, lib-openai-compat"]
+  end
+  PLAT["platform-contract → platform-windows-*<br/>jedyne miejsce z windows-rs"]
+  EXT["Procesy zewnętrzne<br/>llama-server, whisper-server, Pocket TTS / Piper,<br/>CLI claude / codex, serwery MCP"]
+
+  UI <-->|"invoke i alfa://events"| SHELL
+  SHELL --> CORE
+  CORE --> APPMOD
+  APPMOD --> DOM
+  APPMOD --> BROKER
+  TOOLS -->|BrokerGate| BROKER
+  BROKER --> RISK
+  BROKER -.->|"okno zatwierdzeń — w aplikacji jeszcze niepodłączone"| BUI
+  WD -.->|kill-switch| BROKER
+  DOM --> BASE
+  DOM --> PLAT
+  KERNEL --> PLAT
+  MODELS --> EXT
+  VOICE --> EXT
+  BRIDGES --> EXT
+```
+
+### 13.4 Przepływy
+
+**Wiadomość tekstowa → Router → dostawca → markdown → UI.** Gdy sesja ma katalog roboczy, a adresatka rolę
+Wykonawczyni lub Koderki, zamiast bezpośredniego wywołania modelu startuje przebieg `agent-runtime` (przepływ C);
+strumień do UI wygląda tak samo.
+
+```mermaid
+sequenceDiagram
+  participant UI as UI (Svelte)
+  participant C as app-core
+  participant S as sessions + search
+  participant R as router
+  participant P as ModelProvider
+  participant M as lib-markdown
+  UI->>C: turns_send
+  C->>S: append_turn (append-only, indeks FTS w tej samej transakcji)
+  C->>R: zadanie (klasa, prywatność, budżet)
+  R->>R: compliance.route_allowed, cost-meter, możliwości modelu
+  R->>P: stream (providers-api albo llama-server)
+  P-->>R: delty tekstu
+  Note over R,P: błąd przed pierwszym tokenem → następna trasa w ≤ 2 s, bez utraty wiadomości
+  R-->>C: delty i router.decision
+  C->>M: IncrementalRenderer (pulldown-cmark + ammonia)
+  M-->>C: zamknięte i otwarty blok html_sanitized
+  C-->>UI: TextDelta w paczce co ok. 16 ms (alfa://events)
+  C->>S: zapis tury odpowiedzi
+  C->>C: koszt (cost-meter), wpis na Osi czasu
+```
+
+**Głos → potok → dialog → TTS.** Wyłączność głośnika i mikrofonu pilnuje `scheduler-lite` (w aplikacji wspólna
+tablica blokad `scheduler`), modele głosu przypina `model-residency`.
+
+```mermaid
+sequenceDiagram
+  participant A as voice-audio (WASAPI)
+  participant D as voice-dsp
+  participant V as voice-vad
+  participant T as voice-stt (whisper-server)
+  participant K as voice-cmd i voice-turn
+  participant G as voice-dialog
+  participant R as app-voice (ReplySource)
+  participant P as voice-persona
+  participant Y as voice-tts
+  A->>D: ramki 10 ms i referencja wyjścia TTS
+  D->>V: sygnał po AEC3, RNNoise, AGC
+  V->>T: mowa (bramka VAD)
+  T->>K: transkrypt częściowy i końcowy
+  K->>G: komenda szybka albo koniec tury
+  G->>R: tura użytkownika
+  R->>R: tura sesji → Router → odpowiedź (jak wyżej)
+  R-->>P: tekst odpowiedzi
+  P->>Y: normalizacja PL, porcje zdań, styl persony
+  Y->>A: próbki audio z licznikiem odtworzonych próbek
+  Note over A,G: mowa w stanie Speaking → ducking, twardy stop, usłyszany prefiks zapisany w sesji
+```
+
+**Akcja agentki → Broker → narzędzie → dziennik cofania.**
+
+```mermaid
+sequenceDiagram
+  participant R as agent-runtime
+  participant T as narzędzie tools-*
+  participant B as safety-broker
+  participant C as risk-classifier
+  participant U as broker-ui
+  participant J as undo-journal
+  participant P as platform (FsPort, ExecPort)
+  participant UI as UI
+  R->>R: StepGate (steering, budżety, kill-switch)
+  R->>T: wywołanie z argumentami od modelu
+  T->>B: decide (zdolność, fakty, pochodzenie, taint)
+  B->>C: ryzyko i reguły Jądra
+  B->>B: wpis Audytu przed odpowiedzią (łańcuch SHA-256)
+  alt dozwolone na bieżącym poziomie
+    B-->>T: token jednorazowy z TTL
+  else wymaga zgody
+    B->>U: karta zatwierdzenia
+    U-->>B: decyzja tylko z fizycznego wejścia
+    B-->>T: token albo odmowa
+  else blokada Jądra
+    B-->>T: odmowa z powodem
+  end
+  Note over B,U: w aplikacji dziś Broker w procesie bez okna — prośba kończy się odmową po ≤ 60 s
+  T->>B: verify(token)
+  T->>J: pre-image (fs) albo snapshot zakresu (shell)
+  T->>P: operacja (Kosz, Job Object)
+  T->>B: revoke(token)
+  T-->>R: wynik (treść z zewnątrz oznaczona taint) i undo_token
+  R-->>UI: AgentStep i ToolCall → Replay, toast „Cofnij”
+```
+
+### 13.5 Odchylenia od planu (z uzasadnieniem)
+
+| Odchylenie                                                                                                                                         | Uzasadnienie                                                                                                        | Źródło                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Korzeń kompozycji `app-*` (14 crate'ów) zamiast samego rejestru modułów                                                                            | komendy Tauri potrzebują jednego miejsca składającego `-impl`; reguła `check-deps`: tylko `app-*` zależą od `-impl` | `crates/README.md`, SPEC `ui-shell`                         |
+| Broker w procesie (`InprocBroker`) w aplikacji; usługa `alfa-broker` + `alfa-broker-ui` + `alfa-watchdog` zbudowane, ale powłoka ich nie uruchamia | etap przejściowy; bez okna zatwierdzeń — odmowa (fail-closed)                                                       | `app-modules/src/broker.rs`, SPEC `safety-broker` (część 2) |
+| `platform-windows` podzielony na 5 crate'ów `-impl`                                                                                                | limit 8000 linii na crate i oddzielenie portów Jądra                                                                | przegląd #1 (c), SPEC `platform-windows`                    |
+| Crate'y `lib-*` (SQLCipher, markdown, silnik HTTP/SSE)                                                                                             | wspólny kod bez logiki modułu, używany przez wiele `-impl`                                                          | `crates/README.md`                                          |
+| Nowy moduł `voice-pipeline` (spoza listy §6.2)                                                                                                     | runtime składający kontrakty `voice-*` w jeden potok i runner zestawu F2                                            | SPEC `voice-pipeline`                                       |
+| `memory-consolidation` osobnym modułem; silniki `memory` i `transfer` w kontrakcie                                                                 | atrapa zachowuje się jak implementacja (różni się tylko magazynem)                                                  | SPEC `memory`, `transfer`                                   |
+| `tools-screen` zamiast `tools-vision`; zrzuty BitBlt / PrintWindow zamiast Windows.Graphics.Capture                                                | zrzut synchroniczny, bez WinRT/D3D11 i żółtej ramki; OCR później                                                    | SPEC `platform-windows`, `tools-screen`                     |
+| `tools-common` — sam kontrakt (manifest, `Tool`, `BrokerGate`)                                                                                     | jeden protokół zgody dla wszystkich narzędzi; atrapa `ScriptedTool`                                                 | SPEC `tools-common`                                         |
+| Historia konfiguracji w `history.ndjson` zamiast repo git; `core-log` bez indeksu SQLite i szyfrowania payloadów (F0)                              | prostszy dziennik append-only; reszta odłożona                                                                      | SPEC `core-config`, `core-log`                              |
+| `core-registry`: `acquire(&ContractRef)` zamiast typowanego `resolve<C>()`                                                                         | trait obiektowo bezpieczny; typowany uchwyt odłożony                                                                | SPEC `core-registry`                                        |
+| Kontrakty danych synchroniczne; append-only wymuszone wyzwalaczami SQLite                                                                          | SQLite blokuje — w async przez `spawn_blocking`; UPDATE/DELETE odrzucane w bazie                                    | SPEC `sessions`, `search`                                   |
+| Osadzacz leksykalny (`LexicalEmbedder`) zamiast modelu ONNX                                                                                        | wyszukiwanie hybrydowe działa bez modelu ML; embedder semantyczny czeka (F7-02)                                     | `app-modules/src/embedder.rs`, SPEC `search`, `memory`      |
+| STT jako `whisper-server` (HTTP na 127.0.0.1), LLM jako `llama-server` (TCP 127.0.0.1 z losowym kluczem) zamiast JSON-RPC po potoku                | gotowe protokoły whisper.cpp i llama.cpp; ryzyko ograniczone do localhost                                           | SPEC `voice-stt`, `providers-local`                         |
+| VAD, KWS i ECAPA przez `tract-onnx` zamiast ONNX Runtime                                                                                           | `ort` pobiera binaria przy budowie; `tract` to czysty Rust                                                          | SPEC `voice-vad`, `voice-wake`, `voice-speaker`             |
+| Broker-UI w czystym Win32 zamiast WinUI 3                                                                                                          | brak WebView i ciężkich zależności; pełna kontrola nad wejściem (`Enter` nie zatwierdza)                            | SPEC `broker-ui`                                            |
+| Akcje na artefaktach jako intencje wykonywane przez platformę                                                                                      | UI nie wykonuje akcji; intencja niesie SHA-256 wersji                                                               | SPEC `artifacts`                                            |
+| Typy TS pisane ręcznie (COMMANDS.md + test round-trip DTO) zamiast generatora                                                                      | generator `tauri-specta`/`ts-rs` (ADR 0013) odłożony; nazwy pól już w `snake_case`                                  | `COMMANDS.md`                                               |
+| Natywne dekoracje okna zamiast własnego paska z Mica i Snap Layouts                                                                                | czeka na spike (j)                                                                                                  | SPEC `ui-shell`, `apps/desktop/README.md`                   |
+
+### 13.6 Czego z katalogu §4 jeszcze nie ma
+
+`plugin-runtime` (wtyczki Wasm, ADR 0012), `tools-vision` (OCR), `tools-browser`, `tools-office`, `tools-system`,
+`tools-net`, `tools-media`, `voice-lab` jako narzędzie w UI (są ewaluatory CLI: `alfa-voice-eval`, `alfa-wake-eval`,
+`alfa-speaker-eval`), `voice-transcribe`, adapter chmurowy `voice-s2s`, helper `uiAccess`. W aplikacji nie są jeszcze
+podpięte: okno Brokera, słowa wywoławcze, weryfikacja mówcy, dyktowanie, czytanie zaznaczenia, harmonogram kopii
+zapasowych, pobieranie modeli głosu i sidecarów.
+
+### 13.7 Otwarte punkty z §12 — stan
+
+| Punkt                                       | Stan                                                                                                            |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Schemat `module.toml`                       | ustalony w `core-registry-contract`; 60 manifestów, walidowanych w testach modułów (`module_manifest_is_valid`) |
+| Budżety §5 i RAM drzewa WebView2            | czeka na spike (f) — `docs/STATUS.md` F0-11                                                                     |
+| SQLCipher + sqlite-vec + FTS5               | rozstrzygnięte — działa (spike i, ADR 0008)                                                                     |
+| Broker-UI na High IL + odrzucenie SendInput | zaimplementowane; test sprzętowy `#[ignore]` czeka na self-hosted (F0-16)                                       |
+| Append-only a bloki myślenia Anthropic      | nadal ADR 0006 „Tymczasowy” (spike g wymaga klucza)                                                             |
+| Progi pokrycia testami                      | pokrycie nie jest jeszcze mierzone w CI                                                                         |
+| Snap Layouts, Mica, pisownia PL, AUMID      | czeka na spike (j)                                                                                              |
+| Limity dysku logów                          | `core-log`: segmenty 8 MiB, 512 MiB na strumień, retencja 7 dni dla Narzędzi/GUI                                |

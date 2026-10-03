@@ -55,54 +55,126 @@ Co udaje crate `-fake` i jak jest sterowany (fixture'y, wirtualny zegar, record/
 Punkty „do ustalenia w SPEC v1", odwołania do ADR i spike'ów.
 ```
 
-## Katalog modułów P0 (szkielety SPEC)
+## Indeks SPEC-ów (stan: październik 2026)
 
-| Moduł | Grupa | Fala | Status |
-|---|---|---|---|
-| `core-bus` | Jądro | F0 | szkic |
-| `core-registry` | Jądro | F0 | szkic |
-| `core-config` | Jądro | F0 | szkic |
-| `core-log` | Jądro | F0 (v1 w F1) | szkic |
-| `platform-windows` | System | F1 (v1), F5 (v1.5), F6 (v2) | szkic |
-| `sessions` | Dane | F1 | szkic |
-| `search` | Dane | F1 | szkic |
-| `artifacts` | Dane | F1 | szkic |
-| `memory` | Dane | F1 (v0), F7 (pełna) | szkic |
-| `accounts-hub` | Modele | F1 | szkic |
-| `providers-api` | Modele | F1 | szkic |
-| `providers-local` | Modele | F1 | szkic |
-| `router` | Modele | F1 (v1) | szkic |
-| `cost-meter` | Modele | F1 | szkic |
-| `compliance` | Bezpieczeństwo | F1 (v0), F4 (v1) | szkic |
-| `transfer` | Dane | F1 (P0-lite), F7 (pełny) | szkic |
-| `device-profile` | Sprzęt | F1 | szkic |
-| `ui-shell` | UI | F1 | szkic |
-| `ui-kit` | UI | F0 (v0), F1 | szkic |
-| `ui-quick` | UI | F1 (Szybkie pytanie, zasobnik), F5 (pigułka) | szkic |
-| `shell-integration` | System | F1 | szkic |
-| `notify` | System | F1 | szkic |
-| `voice-audio` | Głos | F2 | szkic |
-| `voice-dsp` | Głos | F2 | szkic |
-| `voice-vad` | Głos | F2 | szkic |
-| `voice-turn` | Głos | F2 | szkic |
-| `voice-stt` | Głos | F2 | szkic |
-| `voice-tts` | Głos | F2 | szkic |
-| `voice-dialog` | Głos | F2 | szkic |
-| `voice-persona` | Głos | F2 | szkic |
-| `voice-cmd` | Głos | F2 | szkic |
-| `voice-wake` | Głos | F2 (v0), F5 (v1) | szkic |
-| `model-residency` | Modele | F2 | szkic |
-| `scheduler-lite` | Agentki | F2 (pełny `scheduler` w F5) | szkic |
-| `personas` | Agentki | F2 | szkic |
-| `agent-runtime` | Agentki | F3 (v0), F5 (v1) | szkic |
-| `safety-broker` | Bezpieczeństwo | F3 | szkic |
-| `broker-ui` | Bezpieczeństwo | F3 (spike k w F0) | szkic |
-| `watchdog` | Bezpieczeństwo | F3 | szkic |
-| `updater` | Jądro | F1 (launcher), F3 (aktualizacje, rollback) | szkic |
-| `undo-journal` | Bezpieczeństwo | F3 | szkic |
-| `risk-classifier` | Bezpieczeństwo | F3 | szkic |
-| `tools-fs` | System | F3 | szkic |
-| `tools-shell` | System | F3 | szkic |
-| `tools-clipboard` | System | F3 | szkic |
+67 specyfikacji. Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
+implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja” na końcu pliku. Stan kryteriów akceptacji:
+`docs/STATUS.md`; crate'y: `crates/README.md`.
 
-Moduły P1/P2 (`agent-backends`, `mcp`, `scheduler`, `marshal`, `agent-builder`, `triggers`, `tools-uia/vision/input/window/system/net/media/browser/office`, `voice-speaker/dictation/readaloud/lab/s2s/transcribe`, `diagnostician`, `improver`, `evals`, `plugin-runtime`, `ui-terminal`) dostają SPEC przed falą, w której powstają.
+### Rdzeń
+
+| Moduł                                    | Fala  | Opis                                                                                                                                  |
+| ---------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [`core-bus`](core-bus/SPEC.md)           | F0    | Magistrala typowanych zdarzeń między modułami, UI i procesami potomnymi.                                                              |
+| [`core-registry`](core-registry/SPEC.md) | F0    | Rejestr manifestów `module.toml`, graf zależności, cykl życia i health-check modułów.                                                 |
+| [`core-config`](core-config/SPEC.md)     | F0    | Konfiguracja TOML warstwowa (wspólna, maszyna, sesja, agentka) z JSON Schema i przeładowaniem; klucze `kernel.*` tylko przez Brokera. |
+| [`core-log`](core-log/SPEC.md)           | F0–F1 | Trwały zapis strumieni zdarzeń (NDJSON, rotacja, retencja, redakcja) i audyt `pre-broker` z łańcuchem SHA-256.                        |
+
+### Platforma i system
+
+| Moduł                                            | Fala       | Opis                                                                                                                                 |
+| ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [`platform-windows`](platform-windows/SPEC.md)   | F1, F5, F6 | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| [`device-profile`](device-profile/SPEC.md)       | F1         | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry.                                  |
+| [`updater`](updater/SPEC.md)                     | F1, F3     | Stały launcher, wersje obok siebie, podpis minisign, rollback i ochrona przed pętlą awarii.                                          |
+| [`shell-integration`](shell-integration/SPEC.md) | F1         | Zasobnik, skróty globalne, protokół `alfa://`, jedna instancja, dialogi plików — w powłoce Tauri.                                    |
+| [`notify`](notify/SPEC.md)                       | F1         | Powiadomienia Windows i w aplikacji, tryb „nie przeszkadzać” — w `app-core`.                                                         |
+
+### Dane
+
+| Moduł                                                  | Fala   | Opis                                                                                                          |
+| ------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------- |
+| [`sessions`](sessions/SPEC.md)                         | F1     | Sesje z osobną szyfrowaną bazą, historia append-only jako drzewo gałęzi, usłyszany prefiks, crypto-shredding. |
+| [`search`](search/SPEC.md)                             | F1     | Wyszukiwanie FTS5 i wektorowe w bazie sesji, hybryda RRF; „szukaj wszędzie” tylko dla właściciela.            |
+| [`memory`](memory/SPEC.md)                             | F1, F7 | Pamięć w 4 warstwach i 4 zakresach z proweniencją, wersjami faktów, Inspektorem i kaskadowym `forget`.        |
+| [`memory-consolidation`](memory-consolidation/SPEC.md) | F7     | Strażniczka pamięci: nocna konsolidacja z budżetem, dziennikiem i cofaniem, nie na baterii ani w grze.        |
+| [`artifacts`](artifacts/SPEC.md)                       | F1     | Rejestr plików oddanych przez agentki: wersje, podgląd, diff, akcje jako intencje.                            |
+| [`transfer`](transfer/SPEC.md)                         | F1, F7 | Paczki `.alfa`: eksport i import z podglądem, trybami, szyfrowaniem hasłem, snapshotem i kopiami z rotacją.   |
+
+### Modele, mosty i zgodność
+
+| Moduł                                        | Fala   | Opis                                                                                                       |
+| -------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| [`accounts-hub`](accounts-hub/SPEC.md)       | F1     | Katalog dostawców, konta i klucze w Menedżerze poświadczeń, kreator, wykrywanie mostów CLI.                |
+| [`providers-api`](providers-api/SPEC.md)     | F1     | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem.              |
+| [`providers-local`](providers-local/SPEC.md) | F1     | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU.                    |
+| [`router`](router/SPEC.md)                   | F1     | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem.       |
+| [`cost-meter`](cost-meter/SPEC.md)           | F1     | Koszty w PLN po kursie NBP, limit miesięczny i budżet tła.                                                 |
+| [`model-residency`](model-residency/SPEC.md) | F2     | Zarządca RAM/VRAM: dzierżawy modeli, wymiana wg priorytetów, tryb gry i baterii.                           |
+| [`compliance`](compliance/SPEC.md)           | F1, F4 | Rejestr zgodności tras, tagi prywatności i jurysdykcji, deny-listy Jądra z normalizacją ścieżek Windows.   |
+| [`agent-backends`](agent-backends/SPEC.md)   | F4     | Mosty do oficjalnych CLI (Claude Code, Codex) jako „opaque worker” w worktree, bez dostępu do poświadczeń. |
+| [`mcp`](mcp/SPEC.md)                         | F4     | Klient MCP z odciskiem opisów narzędzi i serwer MCP Alfy v0 (schowek, okna, `approve`) bez TCP.            |
+
+### Głos
+
+| Moduł                                        | Fala   | Opis                                                                                                          |
+| -------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------- |
+| [`voice-audio`](voice-audio/SPEC.md)         | F2     | WASAPI: urządzenia, wątek RT bez alokacji, mikser z duckingiem, licznik próbek, referencja AEC.               |
+| [`voice-dsp`](voice-dsp/SPEC.md)             | F2     | AEC3 z własną referencją TTS, redukcja szumu, AGC; fbank log-mel dla słów wywoławczych i mówcy.               |
+| [`voice-vad`](voice-vad/SPEC.md)             | F2     | Silero VAD przez `tract-onnx` z progiem adaptacyjnym — bramka dla STT i sygnał przerwania.                    |
+| [`voice-stt`](voice-stt/SPEC.md)             | F2     | whisper.cpp jako sidecar `whisper-server`: transkrypt częściowy i końcowy, hotwords, fallback GPU → CPU.      |
+| [`voice-tts`](voice-tts/SPEC.md)             | F2     | Pocket TTS i Piper, głosy v0 (wysokość, tempo), łańcuch zapasowy per agentka, cache fraz.                     |
+| [`voice-turn`](voice-turn/SPEC.md)           | F2     | Wykrywanie końca tury z polityką cierpliwości wobec hezytacji.                                                |
+| [`voice-cmd`](voice-cmd/SPEC.md)             | F2     | Szybkie komendy głosowe PL/EN bez LLM („stop”, „czekaj”, „przełącz na Deltę”…).                               |
+| [`voice-dialog`](voice-dialog/SPEC.md)       | F2     | Automat rozmowy: ducking i twardy stop, backchannel, usłyszany prefiks, 6 klas intencji przerwania.           |
+| [`voice-persona`](voice-persona/SPEC.md)     | F2     | Normalizator PL do mowy, słownik wymowy, chunker i planista stylu per silnik.                                 |
+| [`voice-wake`](voice-wake/SPEC.md)           | F2, F5 | PTT, przełącznik, adresowanie po imieniu; v1 — słowa wywoławcze „Hej …” lokalnie, domyślnie wyłączone.        |
+| [`voice-pipeline`](voice-pipeline/SPEC.md)   | F2     | Runtime potoku: mikrofon → DSP → VAD → STT → dialog → TTS → wyjście, z przerywaniem i runnerem zestawu F2.    |
+| [`voice-speaker`](voice-speaker/SPEC.md)     | F5     | Weryfikacja właściciela (ECAPA), profil szyfrowany; ryzyko głosem bez weryfikacji → potwierdzenie nie-głosem. |
+| [`voice-dictation`](voice-dictation/SPEC.md) | F5     | Dyktowanie do okna docelowego z normalizacją odwrotną PL; nigdy do okien Alfy ani pól haseł.                  |
+| [`voice-readaloud`](voice-readaloud/SPEC.md) | F5     | Czytanie zaznaczenia lub okna przez UIA `TextPattern` głosem agentki; treść niezaufana.                       |
+| [`voice-s2s`](voice-s2s/SPEC.md)             | F5     | Kontrakt trybu speech-to-speech w chmurze z obcinaniem odpowiedzi po stronie dostawcy (adapter później).      |
+
+### Jądro bezpieczeństwa
+
+| Moduł                                        | Fala | Opis                                                                                                        |
+| -------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| [`safety-broker`](safety-broker/SPEC.md)     | F3   | Tokeny zdolności, poziomy L0–L4, twarde blokady Jądra, zatwierdzenia, Audyt z łańcuchem hashy, kill-switch. |
+| [`broker-ui`](broker-ui/SPEC.md)             | F3   | Natywne okno zatwierdzeń na wyższym poziomie integralności; decyzje tylko z fizycznego wejścia.             |
+| [`watchdog`](watchdog/SPEC.md)               | F3   | Heartbeat, restart z limitem, safe-mode, rollback, Job Objects i kill-switch poza UI.                       |
+| [`risk-classifier`](risk-classifier/SPEC.md) | F3   | Deterministyczna ocena ryzyka akcji: odwracalność, zakres, egress, głos, taint, trifecta.                   |
+| [`undo-journal`](undo-journal/SPEC.md)       | F3   | Dziennik cofania `fs.*` z pre-image i snapshotami zakresu; „Cofnij” jednym kliknięciem.                     |
+
+### Agentki i narzędzia
+
+| Moduł                                        | Fala   | Opis                                                                                                       |
+| -------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| [`agent-runtime`](agent-runtime/SPEC.md)     | F3, F5 | Pętla agentki z budżetami i checkpointami; v1 — równoległość, delegacja z atenuacją, Krytyczka, steering.  |
+| [`personas`](personas/SPEC.md)               | F2     | Cztery persony, katalog ról, obsady i szablony, adresowanie z polską odmianą imion.                        |
+| [`scheduler-lite`](scheduler-lite/SPEC.md)   | F2     | Zasoby wyłączne (mikrofon, głośnik), kolejka mowy, wykrywanie zakleszczeń.                                 |
+| [`scheduler`](scheduler/SPEC.md)             | F5     | DAG zadań, równoległe agentki z atomowym przydziałem zasobów, priorytety voice-first, trwałość.            |
+| [`triggers`](triggers/SPEC.md)               | F5     | Wyzwalacze czasowe (cron w strefie PL z DST), zdarzeniowe i ręczne; nigdy nie uruchamiają mostu CLI.       |
+| [`marshal`](marshal/SPEC.md)                 | F5     | Marszałek: polecenia → reguły, które tylko zawężają; nadzór postępu i raport dnia.                         |
+| [`agent-builder`](agent-builder/SPEC.md)     | F5     | Kreator agentek: szkic → podgląd → test na sucho → zapis po zatwierdzeniu; autonomia nigdy L4.             |
+| [`skills`](skills/SPEC.md)                   | F5     | Wersjonowane umiejętności, instalacja po przeglądzie z hashem, kwarantanna treści z zewnątrz.              |
+| [`tools-common`](tools-common/SPEC.md)       | F3     | Wspólny kontrakt narzędzi: manifest, `Tool`, `BrokerGate`, zasady ścieżek i treści niezaufanej.            |
+| [`tools-fs`](tools-fs/SPEC.md)               | F3     | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza.                                 |
+| [`tools-shell`](tools-shell/SPEC.md)         | F3     | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”.         |
+| [`tools-clipboard`](tools-clipboard/SPEC.md) | F3     | Odczyt (taint) i zapis schowka z cofaniem; historia schowka — szkic.                                       |
+| [`tools-window`](tools-window/SPEC.md)       | F6     | Okna i monitory dla agentek oraz wspólna bramka GUI (`gui.control`).                                       |
+| [`tools-uia`](tools-uia/SPEC.md)             | F5–F6  | Drzewo UIA, odczyt `TextPattern`, akcje tylko przez wzorce; wartości haseł nigdy nie wychodzą.             |
+| [`tools-input`](tools-input/SPEC.md)         | F5–F6  | `SendInput` ze strażnikiem celów i przerwaniem przy fizycznym wejściu użytkownika.                         |
+| [`tools-screen`](tools-screen/SPEC.md)       | F6     | Zrzuty na żądanie z maskowaniem okien Alfy/Brokera, deny-listy i pól haseł.                                |
+| [`ui-terminal`](ui-terminal/SPEC.md)         | F4     | Terminal ConPTY sterowany wyłącznie przez użytkownika (logowanie do CLI); treść poza logami i zdarzeniami. |
+
+### Samonaprawa i ulepszanie
+
+| Moduł                                    | Fala | Opis                                                                                                  |
+| ---------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------- |
+| [`diagnostician`](diagnostician/SPEC.md) | F8   | Diagnosta: katalog 24 awarii, naprawy cofalne z weryfikacją, raport „Zdrowie systemu”.                |
+| [`improver`](improver/SPEC.md)           | F8   | Ulepszacz R0–R2: propozycje zmian ustawień przez piaskownicę i holdout; nigdy Jądro ani progi.        |
+| [`evals`](evals/SPEC.md)                 | F8   | Harness zestawów: manifest z SHA-256, podziały dev/test/holdout, bootstrap, bramka holdoutu w Jądrze. |
+
+### UI (TypeScript)
+
+| Moduł                          | Fala   | Opis                                                                                        |
+| ------------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| [`ui-kit`](ui-kit/SPEC.md)     | F0–F1  | Tokeny designu i komponenty Svelte 5 ze Storybookiem, makietami i axe (`packages/ui-kit`).  |
+| [`ui-shell`](ui-shell/SPEC.md) | F1–F8  | Okno główne: pasek tytułu, rozmowa, panele, Ustawienia, paleta, skróty (`apps/desktop/ui`). |
+| [`ui-quick`](ui-quick/SPEC.md) | F1, F5 | Szybkie pytanie i pigułka głosowa jako lekkie okna; menu zasobnika natywne.                 |
+
+### Moduły z planu bez SPEC-a
+
+`plugin-runtime` (F8), `tools-vision`, `tools-browser`, `tools-office`, `tools-system`, `tools-net`, `tools-media`
+(F6), `voice-lab` i `voice-transcribe` — SPEC powstaje przed falą, w której moduł jest budowany. Korzeń kompozycji
+`app-*` i biblioteki `lib-*` nie mają SPEC-ów (opis w `crates/README.md` i `docs/ARCHITECTURE.md` §13).
