@@ -29,6 +29,8 @@ app-gui = { path = "../app-gui" }
 app-terminal = { path = "../app-terminal" }
 app-skills = { path = "../app-skills" }
 app-health = { path = "../app-health" }
+# Aktualizacje (updater-impl: pobieranie, weryfikacja, restart przez launcher), „O programie”.
+app-updates = { path = "../app-updates" }
 # Tabele aplikacji w bazach sesji (fakty o turach, oś czasu, Replay) — wydzielone z app-core.
 app-store = { path = "../app-store" }
 agent-backends-contract = { path = "../agent-backends-contract" }

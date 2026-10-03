@@ -12,7 +12,15 @@ Implementacja modułu `updater` (`FsUpdater`) + `module.toml` + **binarium `alfa
   (`alfa://…`, ścieżki „Otwórz w Alfie”/„Wyślij do”), obserwuje okno crash-loop i ponawia/wraca do poprzedniej wersji;
   błędy do `launcher.log` (brak konsoli: `windows_subsystem = "windows"`). Binarium jest w tym pakiecie, bo osobny
   pakiet nie może zależeć od `-impl` (scripts/check-deps.sh).
-- Pobieranie i rozpakowanie wydań (`download_and_stage`), aktualizacja samego launchera — F3.
+- **F3**: `HttpFeed` (manifest kanału i paczka przez HTTPS, wznawianie `Range`, przekierowania tylko na https, bez
+  telemetrii), `install` (rozpakowanie ZIP do `versions\.staging-<ver>` → `rename`; ochrona przed path traversal,
+  strumieniami NTFS, nazwami urządzeń, dowiązaniami, duplikatami i zip-bomb), `UpdateService` (sprawdź → pobierz →
+  SHA-256 + minisign → rozpakuj → `activate_staged` → sprzątanie, anulowanie i wznowienie, „Co nowego”, rollback
+  użytkownika), `selfupdate` (nowy `alfa.exe` obok, samotest, zamiana przy starcie), `instance` (blokada instancji dla
+  restartu), `entry` (tryby `--alfa-restart`, `--alfa-installed <ver>`, `--alfa-launcher-check`), `WatchdogSignal`
+  (rollback zlecony przez watchdoga). Launcher obserwuje nową wersję do `mark_good` (≤ 5 min) — awaria albo
+  zawieszenie = powrót do poprzedniej.
 
 **Moduł Jądra — zmiany wymagają przeglądu człowieka (AGENTS.md).** Testy: kontrakt (prawdziwe pary kluczy minisign
-generowane w teście), wektory z dokumentacji minisign, launcher na atrapach i na prawdziwych procesach (Unix).
+generowane w teście), wektory z dokumentacji minisign, launcher na atrapach i na prawdziwych procesach (Unix), pełny
+cykl na lokalnym serwerze HTTP (`tests/update_flow.rs`, `tests/update_safety.rs`, `tests/launcher_modes.rs`).

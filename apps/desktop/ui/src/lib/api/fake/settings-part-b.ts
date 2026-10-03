@@ -284,29 +284,50 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'pl',
     ),
   ]),
-  page('updates', L('Aktualizacje', 'Updates'), 1, [
-    select(
-      'updates.channel',
-      L('Kanał aktualizacji', 'Update channel'),
-      L(
-        'Stabilny dostaje sprawdzone wersje; testowy — wcześniej.',
-        'Stable gets tested versions; preview gets them earlier.',
+  page(
+    'updates',
+    L('Aktualizacje', 'Updates'),
+    1,
+    [
+      select(
+        'updates.channel',
+        L('Kanał aktualizacji', 'Update channel'),
+        L(
+          'Stabilny dostaje sprawdzone wersje; testowy (beta) — wcześniej, także wersje przedpremierowe.',
+          'Stable gets tested versions; preview (beta) gets them earlier, including pre-releases.',
+        ),
+        [
+          ['stable', L('Stabilny', 'Stable')],
+          ['preview', L('Testowy (beta)', 'Preview (beta)')],
+        ],
+        'stable',
       ),
-      [
-        ['stable', L('Stabilny', 'Stable')],
-        ['preview', L('Testowy', 'Preview')],
-      ],
-      'stable',
-    ),
-    toggle(
-      'updates.whats_new',
-      L('Pokaż „Co nowego"', 'Show "What’s new"'),
-      L('Krótka lista zmian po aktualizacji.', 'A short list of changes after updating.'),
-      true,
-    ),
-  ]),
+      select(
+        'updates.mode',
+        L('Instalowanie aktualizacji', 'Installing updates'),
+        L(
+          'Automatycznie: Alfa sprawdza raz dziennie, pobiera i przygotowuje nową wersję (działa od ponownego uruchomienia). Pytaj: sprawdza raz dziennie i pyta przed pobraniem. Ręcznie: tylko po „Sprawdź teraz”. Bez telemetrii — tylko pobranie listy wydań.',
+          'Automatic: Alfa checks daily, downloads and prepares the new version (active after restart). Ask: checks daily and asks before downloading. Manual: only on “Check now”. No telemetry — only the release list is fetched.',
+        ),
+        [
+          ['auto', L('Automatycznie', 'Automatically')],
+          ['ask', L('Pytaj przed pobraniem', 'Ask before downloading')],
+          ['manual', L('Ręcznie', 'Manually')],
+        ],
+        'ask',
+      ),
+      toggle(
+        'updates.whats_new',
+        L('Pokaż „Co nowego"', 'Show "What’s new"'),
+        L('Krótka lista zmian po aktualizacji.', 'A short list of changes after updating.'),
+        true,
+      ),
+    ],
+    { custom: 'updates' },
+  ),
   later('advanced', L('Zaawansowane', 'Advanced'), 8, [
     L('Edytor surowy TOML', 'Raw TOML editor'),
     L('Flagi eksperymentalne', 'Experimental flags'),
   ]),
+  page('about', L('O programie', 'About'), 1, [], { custom: 'about' }),
 ];

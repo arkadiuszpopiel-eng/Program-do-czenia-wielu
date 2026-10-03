@@ -68,3 +68,31 @@ fn scripted_failure_and_switch_history() {
         .is_err()
     );
 }
+
+#[tokio::test]
+async fn fake_feed_resumes_and_reports_requests() {
+    use updater_contract::{Channel, ReleaseFeed};
+    use updater_fake::FakeFeed;
+    let feed = FakeFeed::new();
+    let data = vec![5u8; 1000];
+    let release = FakeUpdater::signed_release(&v("1.1.0"), &data);
+    feed.publish(Channel::Stable, vec![(release.clone(), data.clone())]);
+    assert_eq!(
+        feed.manifest(Channel::Stable).await.unwrap().releases.len(),
+        1
+    );
+    assert!(feed.manifest(Channel::Beta).await.is_err());
+    let dir = tempfile::tempdir().unwrap();
+    let dest = dir.path().join("p.part");
+    feed.cut_next_after(300);
+    let err = feed.download(&release, &dest, &|_| {}).await.unwrap_err();
+    assert!(matches!(err, UpdaterError::Network { .. }));
+    feed.download(&release, &dest, &|_| {}).await.unwrap();
+    assert_eq!(std::fs::read(&dest).unwrap(), data);
+    assert_eq!(
+        feed.requests(),
+        vec![(release.url.clone(), 0), (release.url.clone(), 300)]
+    );
+    feed.set_offline(true);
+    assert!(feed.manifest(Channel::Stable).await.is_err());
+}

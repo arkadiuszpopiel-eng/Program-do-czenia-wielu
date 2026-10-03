@@ -2,16 +2,29 @@
 //!
 //! [`FsUpdater`] — układ `%LOCALAPPDATA%\Alfa\` na systemie plików: `versions\<ver>\`,
 //! `current.json` (zapis atomowy), stały `webview-data\`, wybór wersji, przełączenie, rollback,
-//! crash-loop, sprzątanie, weryfikacja minisign. Binarium **`alfa`** (`src/bin/alfa.rs`, w tym
+//! crash-loop, sprzątanie, weryfikacja minisign. F3: [`HttpFeed`] (manifest kanału i pobieranie
+//! z wznawianiem przez HTTPS), [`install`] (rozpakowanie paczki z ochroną przed path traversal
+//! i zip-bomb), [`UpdateService`] (pełny cykl: sprawdź → pobierz → zweryfikuj → rozpakuj →
+//! przełącz → posprzątaj), [`selfupdate`] (bezpieczna zamiana `alfa.exe`), [`WatchdogSignal`]
+//! (rollback wersji zlecony przez watchdoga). Binarium **`alfa`** (`src/bin/alfa.rs`, w tym
 //! samym pakiecie — reguła trójki crate'ów zabrania osobnemu pakietowi zależeć od `-impl`)
-//! to stały launcher; jego logika: [`launcher`].
+//! to stały launcher; jego logika: [`launcher`] i [`entry`].
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod download;
+pub mod entry;
 mod events;
+mod http;
+pub mod install;
+pub mod instance;
 pub mod launcher;
+mod ops;
+pub mod selfupdate;
+mod service;
 mod store;
 mod verify;
+mod watchdog;
 
 use std::path::{Path, PathBuf};
 
@@ -19,13 +32,26 @@ use chrono::Utc;
 use core_registry_contract::{ManifestError, ModuleManifest};
 use semver::Version;
 use updater_contract::{
-    AppExit, CrashPolicy, CurrentState, ExitDecision, LaunchChoice, Layout, Release,
+    AppExit, CrashPolicy, CurrentState, ExitDecision, LaunchChoice, Layout, PackageLimits, Release,
     ReleaseManifest, Updater, UpdaterError, choose_version, decide_exit, events as ev,
     prune_victims, select_update,
 };
 
+pub use download::STAGING_DIR;
 pub use events::Outbox;
+pub use http::HttpFeed;
+pub use service::{ServiceOptions, StatusListener, UpdateService};
+pub use store::{read_updates_file, write_updates_file};
 pub use verify::public_key;
+pub use watchdog::WatchdogSignal;
+
+/// Klucz publiczny minisign wbudowany przy kompilacji wydania (`ALFA_UPDATE_PUBKEY`, base64
+/// `RW…`); w buildzie deweloperskim brak — aktualizacje wyłączone.
+pub const BUILTIN_PUBLIC_KEY: Option<&str> = option_env!("ALFA_UPDATE_PUBKEY");
+/// Adres wydań wbudowany przy kompilacji wydania (`ALFA_UPDATE_FEED`, `https://…`).
+pub const BUILTIN_FEED_URL: Option<&str> = option_env!("ALFA_UPDATE_FEED");
+/// Ile wersji zostaje po sprzątaniu (aktywna + poprzednia).
+pub const KEEP_VERSIONS: usize = 2;
 
 /// Treść `module.toml` tego modułu.
 pub const MODULE_TOML: &str = include_str!("../module.toml");
@@ -41,17 +67,44 @@ pub struct UpdaterConfig {
     pub require_version_tag: bool,
     /// Polityka crash-loop launchera.
     pub crash: CrashPolicy,
+    /// Adres wydań (`<feed>/<kanał>.json`); bez adresu aktualizacje wyłączone.
+    pub feed_url: Option<String>,
+    /// Ile wersji zostaje po sprzątaniu.
+    pub keep_versions: usize,
+    /// Limity rozpakowania paczki.
+    pub limits: PackageLimits,
+    /// `http://` na pętli zwrotnej (wyłącznie testy z lokalnym serwerem).
+    pub allow_loopback_http: bool,
 }
 
 impl UpdaterConfig {
-    /// Konfiguracja domyślna dla korzenia instalacji.
+    /// Konfiguracja domyślna dla korzenia instalacji (klucz i adres wydań wbudowane w wydanie).
     pub fn new(root: &Path) -> Self {
         Self {
             root: root.to_path_buf(),
-            public_key: None,
+            public_key: BUILTIN_PUBLIC_KEY.map(str::to_owned),
             require_version_tag: true,
             crash: CrashPolicy::default(),
+            feed_url: BUILTIN_FEED_URL.map(str::to_owned),
+            keep_versions: KEEP_VERSIONS,
+            limits: PackageLimits::default(),
+            allow_loopback_http: false,
         }
+    }
+
+    /// Powód wyłączenia aktualizacji (brak adresu wydań albo klucza), `None` — skonfigurowane.
+    pub fn disabled_reason(&self) -> Option<String> {
+        if self.feed_url.as_deref().is_none_or(|u| u.trim().is_empty()) {
+            return Some("brak adresu wydań (build deweloperski)".to_owned());
+        }
+        if self
+            .public_key
+            .as_deref()
+            .is_none_or(|k| k.trim().is_empty())
+        {
+            return Some("brak klucza publicznego minisign (build deweloperski)".to_owned());
+        }
+        None
     }
 }
 
@@ -59,7 +112,7 @@ impl UpdaterConfig {
 pub struct FsUpdater {
     layout: Layout,
     config: UpdaterConfig,
-    outbox: Outbox,
+    pub(crate) outbox: Outbox,
     manifest: ModuleManifest,
 }
 
@@ -90,11 +143,11 @@ impl FsUpdater {
         Ok(())
     }
 
-    fn usable(&self, v: &Version) -> bool {
+    pub(crate) fn usable(&self, v: &Version) -> bool {
         store::is_usable(&self.layout, v)
     }
 
-    fn save(
+    pub(crate) fn save(
         &self,
         before: Option<&CurrentState>,
         after: &CurrentState,
@@ -171,6 +224,13 @@ impl Updater for FsUpdater {
     fn mark_good(&self, version: &Version) -> Result<(), UpdaterError> {
         if let Some(before) = store::read_state(&self.layout) {
             self.save(Some(&before), &before.marked_good(version, Utc::now()))?;
+            if before.active == *version && before.pending {
+                // Nowy launcher z paczki — dopiero po zdrowym starcie wersji (zamiana przy
+                // następnym starcie, po samoteście). Błąd nie cofa `mark_good`.
+                if let Err(e) = selfupdate::stage_launcher(&self.layout, version) {
+                    tracing::warn!(error = %e, "nie przygotowano nowego launchera");
+                }
+            }
         }
         Ok(())
     }

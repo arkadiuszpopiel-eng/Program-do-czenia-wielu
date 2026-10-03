@@ -21,6 +21,7 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
 | `app-terminal` | wbudowany terminal: `TerminalApp` (komendy `terminal_*`, gest tylko z UI), strumień do `FrameSink` (w powłoce `Channel`) |
 | `app-skills` | umiejętności (`SkillsApp`: przegląd z diffem i hashem, kwarantanna, uruchomienie = zadanie) i Kreator agentek (`BuilderApp`: podgląd, test na sucho, zapis) |
 | `app-health` | „Zdrowie systemu": Diagnosta, Ulepszacz, evale (`HealthApp`, `HealthChanged`) |
+| `app-updates` | aktualizacje i „O programie” (`UpdatesApp`, `updates_*`, `UpdateStatus`, `mark_good`, restart przez launcher) |
 | `app-store` | tabele aplikacji w bazach sesji (`AppStore`: fakty tur, oś czasu, katalog roboczy, przebiegi agentek) |
 | `app-voice` | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów) |
 | `app-core` | kompozycja (`AppOptions` → `parts`), komendy, czat (z delegacją do mostu), `TaskHost` rdzenia (`host.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
@@ -48,7 +49,8 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
    `local/broker-dev/audit.ndjson` + kotwica), undo-journal (`local/undo-store`), transfer
    (`DirDocumentStore` konfiguracji i logów, snapshoty w `local/snapshots`), voice-audio
    (`AppOptions::audio` albo WASAPI), voice-tts (sidecary Pocket TTS / Piper, jeśli zainstalowane),
-   updater (`FsUpdater`; `mark_good` po `healthy_after` ≈ 30 s zdrowego startu).
+   updater (`FsUpdater` w katalogu instalacji launchera; `mark_good` po `healthy_after` ≈ 30 s zdrowego startu —
+   `app-updates`).
 
 5. Agentki i głos (`parts/agents.rs`): `AgentTools` (+ narzędzia GUI z `app-gui` dla ról z `gui.control`)
    nad Brokerem (`TicketLog`), dziennikiem cofania,

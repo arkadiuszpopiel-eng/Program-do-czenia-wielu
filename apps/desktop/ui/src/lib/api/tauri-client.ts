@@ -267,6 +267,18 @@ export class TauriAlfaClient implements AlfaClient {
     evalsVerify: (suiteId) => call('evals_verify', { suiteId }),
   };
 
+  readonly updates: AlfaClient['updates'] = {
+    status: () => call('updates_status'),
+    check: () => call('updates_check'),
+    download: () => call('updates_download'),
+    cancel: () => call('updates_cancel'),
+    restart: () => call('updates_restart'),
+    rollback: () => call('updates_rollback'),
+    about: () => call('updates_about'),
+    whatsNew: () => call('updates_whats_new'),
+    dismissWhatsNew: () => call('updates_dismiss_whats_new'),
+  };
+
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {
     let active = true;
     let unlisten: UnlistenFn | null = null;

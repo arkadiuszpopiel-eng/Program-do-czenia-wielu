@@ -177,15 +177,51 @@ pub fn check_and_verify(h: &dyn Harness) {
     }
 }
 
+/// Wersja równa albo starsza od aktywnej nigdy nie jest proponowana jako aktualizacja (także
+/// z poprawnym podpisem); wersja wycofana po crash-loopie też nie.
+pub fn no_downgrade_offered(h: &dyn Harness) {
+    let u = h.updater();
+    h.install("1.0.0");
+    h.install("1.2.0");
+    ok(u.switch_to(&v("1.0.0")));
+    ok(u.switch_to(&v("1.2.0")));
+    let releases = ["0.9.0", "1.0.0", "1.2.0"]
+        .iter()
+        .map(|ver| h.release(ver, Fixture::Good).0)
+        .collect();
+    let manifest = ReleaseManifest {
+        schema: RELEASES_SCHEMA,
+        channel: "stable".into(),
+        releases,
+    };
+    assert_eq!(ok(u.check(&manifest)), None);
+    ok(u.rollback());
+    let quick = AppExit::Exited {
+        code: 1,
+        after_ms: 10,
+    };
+    ok(u.switch_to(&v("1.2.0")));
+    assert_eq!(
+        ok(u.record_exit(&v("1.2.0"), &quick)),
+        ExitDecision::FallBack { to: v("1.0.0") }
+    );
+    assert_eq!(
+        ok(u.check(&manifest)),
+        None,
+        "1.2.0 wycofana po crash-loopie"
+    );
+}
+
 /// Uruchamia cały zestaw na świeżych środowiskach.
 pub fn run_all<H: Harness>(factory: impl Fn() -> H) {
-    let cases: [fn(&dyn Harness); 6] = [
+    let cases: [fn(&dyn Harness); 7] = [
         empty_install,
         switch_and_rollback_cycle,
         corrupt_active_falls_back,
         crash_loop_rolls_back,
         prune_keeps_two,
         check_and_verify,
+        no_downgrade_offered,
     ];
     for case in cases {
         let h = factory();

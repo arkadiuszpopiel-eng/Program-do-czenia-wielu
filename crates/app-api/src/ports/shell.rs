@@ -43,6 +43,11 @@ pub trait ShellPort: Send + Sync {
     fn disk_free(&self, _path: &Path) -> Option<u64> {
         None
     }
+    /// Kończy aplikację (restart po aktualizacji: launcher `--alfa-restart` jest już uruchomiony
+    /// i czeka na zwolnienie blokady instancji).
+    fn exit_app(&self) -> Result<(), AppError> {
+        Err(AppError::unavailable("Zamknięcie aplikacji", SHELL))
+    }
 }
 
 /// Powłoka bez okien (testy, tryb bezgłowy): zapisuje wywołania; odpowiedzi dialogów wybiera
@@ -118,6 +123,10 @@ impl ShellPort for HeadlessShell {
     }
     fn open_terminal(&self, cwd: &Path, shell: &str) -> Result<(), AppError> {
         self.record(format!("open_terminal:{shell}:{}", cwd.display()));
+        Ok(())
+    }
+    fn exit_app(&self) -> Result<(), AppError> {
+        self.record("exit_app".into());
         Ok(())
     }
 }

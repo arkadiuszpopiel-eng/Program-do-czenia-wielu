@@ -354,8 +354,10 @@ impl Extra {
     }
 
     async fn updater(&mut self, deps: &Deps<'_>) -> Result<(), AppError> {
-        let module = FsUpdater::new(UpdaterConfig::new(&deps.paths.local))
-            .map_err(|e| err("updater")(e.to_string()))?;
+        let exe = std::env::current_exe().ok();
+        let root = updater_impl::launcher::app_install_root(exe.as_deref(), &deps.paths.local);
+        let module =
+            FsUpdater::new(UpdaterConfig::new(&root)).map_err(|e| err("updater")(e.to_string()))?;
         self.updater = Some(started(module, deps.bus, deps.slot).await?);
         Ok(())
     }

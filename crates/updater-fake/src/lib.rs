@@ -1,9 +1,13 @@
 //! Atrapa modułu `updater` (docs/modules/updater/SPEC.md, „Fake”): wersje jako wpisy w pamięci,
 //! `switch_to` bez restartu, repozytorium wydań z fixture'ami (dobre i złe podpisy), wirtualny
 //! zegar. Logika stanu (wybór, rollback, crash-loop, sprzątanie) — ta sama co w `-impl`
-//! (`updater-contract`).
+//! (`updater-contract`). [`FakeFeed`] — źródło wydań w pamięci (wznawianie, przerwania).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
+
+mod feed;
+
+pub use feed::FakeFeed;
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};

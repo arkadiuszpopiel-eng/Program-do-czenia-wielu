@@ -159,6 +159,14 @@ pub struct CrashPolicy {
     /// Liczba kolejnych szybkich awarii, po której launcher wraca do poprzedniej wersji
     /// (dla wersji czekającej na `mark_good` wystarcza jedna).
     pub max_quick_crashes: u32,
+    /// Ile czasu (ms od startu) nowa wersja ma na `mark_good`; po tym czasie launcher zamyka ją
+    /// i wraca do poprzedniej (zawieszenie przy starcie = awaria).
+    #[serde(default = "default_confirm_ms")]
+    pub confirm_ms: u64,
+}
+
+fn default_confirm_ms() -> u64 {
+    5 * 60 * 1000
 }
 
 impl Default for CrashPolicy {
@@ -166,6 +174,7 @@ impl Default for CrashPolicy {
         Self {
             window_ms: 15_000,
             max_quick_crashes: 2,
+            confirm_ms: default_confirm_ms(),
         }
     }
 }
@@ -187,6 +196,14 @@ pub enum AppExit {
     FailedToStart {
         /// Powód.
         reason: String,
+    },
+    /// Nowa wersja (przed `mark_good`) nie potwierdziła zdrowego startu: zakończyła się z błędem
+    /// albo nie wywołała `mark_good` w `confirm_ms` (launcher ją zamknął).
+    Unconfirmed {
+        /// Kod wyjścia (`None` — zamknięta przez launcher po czasie).
+        code: Option<i32>,
+        /// Po ilu ms od startu.
+        after_ms: u64,
     },
 }
 
@@ -224,7 +241,7 @@ pub fn decide_exit(
     let quick = match exit {
         AppExit::Running => false,
         AppExit::Exited { code, after_ms } => *code != 0 && *after_ms < policy.window_ms,
-        AppExit::FailedToStart { .. } => true,
+        AppExit::FailedToStart { .. } | AppExit::Unconfirmed { .. } => true,
     };
     let mut next = state.clone();
     if !quick {

@@ -1,5 +1,5 @@
-//! Manifest wydań z własnego repo (F3: pobieranie; teraz model danych i weryfikacja):
-//! wersja, SHA-256 paczki, podpis minisign, notatki „Co nowego”.
+//! Manifest wydań z własnego repo: wersja, SHA-256 paczki, podpis minisign (komentarz zaufany
+//! wiąże wersję), notatki „Co nowego”, `min_previous`.
 
 use schemars::JsonSchema;
 use semver::Version;
@@ -10,13 +10,16 @@ use crate::error::UpdaterError;
 /// Wersja schematu manifestu wydań.
 pub const RELEASES_SCHEMA: u32 = 1;
 
+/// Limit notatek „Co nowego” w manifeście.
+pub const MAX_NOTES_BYTES: usize = 64 * 1024;
+
 /// Jedno wydanie.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Release {
     /// Wersja.
     #[schemars(with = "String")]
     pub version: Version,
-    /// Adres paczki (`https://`).
+    /// Adres paczki: `https://…` albo względny wobec adresu manifestu (`alfa-1.2.0-x64.zip`).
     pub url: String,
     /// SHA-256 paczki (hex).
     pub sha256: String,
@@ -31,9 +34,15 @@ pub struct Release {
 }
 
 impl Release {
-    /// Walidacja pól (adres `https://`, skrót 64 hex, niepusty podpis).
+    /// Walidacja pól (adres `https://` albo bezpieczny względny, skrót 64 hex, niepusty podpis,
+    /// notatki ≤ 64 KiB).
     pub fn validate(&self) -> Result<(), UpdaterError> {
-        if !self.url.starts_with("https://") {
+        let url_ok = if self.url.contains("://") {
+            crate::feed::is_allowed_url(&self.url, false)
+        } else {
+            crate::feed::is_safe_relative(&self.url)
+        };
+        if !url_ok {
             return Err(UpdaterError::invalid(format!(
                 "adres wydania {} nie jest https",
                 self.version
@@ -42,6 +51,12 @@ impl Release {
         if self.sha256.len() != 64 || !self.sha256.bytes().all(|b| b.is_ascii_hexdigit()) {
             return Err(UpdaterError::invalid(format!(
                 "zły skrót wydania {}",
+                self.version
+            )));
+        }
+        if self.notes.len() > MAX_NOTES_BYTES {
+            return Err(UpdaterError::invalid(format!(
+                "za długie notatki wydania {}",
                 self.version
             )));
         }
@@ -132,6 +147,12 @@ mod tests {
         assert!(select_update(&m, &Version::new(2, 0, 0), &[]).is_none());
         let mut insecure = rel("5.0.0", None);
         insecure.url = "http://x".into();
+        assert!(insecure.validate().is_err());
+        insecure.url = "../alfa.zip".into();
+        assert!(insecure.validate().is_err());
+        insecure.url = "alfa-5.0.0-x64.zip".into();
+        assert!(insecure.validate().is_ok());
+        insecure.notes = "x".repeat(MAX_NOTES_BYTES + 1);
         assert!(insecure.validate().is_err());
     }
 

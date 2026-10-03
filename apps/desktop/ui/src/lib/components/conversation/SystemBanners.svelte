@@ -1,7 +1,9 @@
-<!-- Stany systemowe (PLAN §14.4, makieta 18): offline + kolejka, 429, brak kluczy, mikrofon, dysk. -->
+<!-- Stany systemowe (PLAN §14.4, makieta 18): offline + kolejka, 429, brak kluczy, mikrofon, dysk,
+     przygotowana aktualizacja („Uruchom ponownie, aby zaktualizować"). -->
 <script lang="ts">
   import { Banner, Button } from '@alfa/ui-kit';
   import { now } from '../../state/clock.svelte';
+  import UpdateBanner from '../shell/UpdateBanner.svelte';
   import { useApp } from '../../state/context';
 
   const app = useApp();
@@ -18,6 +20,11 @@
   );
 </script>
 
+{#if app.updates.showBanner}
+  <div class="banners" role="region" aria-label={t('updates.title')}>
+    <UpdateBanner />
+  </div>
+{/if}
 {#if status && any}
   <div class="banners" role="region" aria-label={t('banner.region')}>
     {#if !status.online}

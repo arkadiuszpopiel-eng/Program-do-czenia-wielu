@@ -20,6 +20,7 @@ mod skills;
 mod system;
 mod tasks;
 mod transfer;
+mod updates;
 
 pub use agents::{
     AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
@@ -82,4 +83,8 @@ pub use tasks::{
 pub use transfer::{
     CollisionResolution, DryRunItem, DryRunKind, ExportRequest, ExportResult, ExportScope,
     ImportMode, ImportRequest, ImportResult, InspectResult, ItemDiff, PackageManifestSummary,
+};
+pub use updates::{
+    AboutInfo, LicenseEntry, LicenseSource, UpdateChannel, UpdateMode, UpdatePhase, UpdateProgress,
+    UpdateRelease, UpdatesView, WhatsNew,
 };

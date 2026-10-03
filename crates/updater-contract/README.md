@@ -12,3 +12,7 @@ Kontrakt modułu `updater` (docs/modules/updater/SPEC.md, ADR 0007).
 - `Release`/`ReleaseManifest` (wersja, sha256, podpis minisign, „Co nowego”, `min_previous`), `select_update`,
   wiązanie podpisu z wersją (`version:<ver>` w komentarzu zaufanym).
 - Trait `Updater`; zdarzenia `updater.*`; feature `contract-tests` (6 przypadków, w tym dobre/złe podpisy).
+- F3: `Channel`/`UpdateMode`/`InstallIntent` (`check_install_allowed` — wersja ≤ bieżącej tylko jako jawny rollback),
+  port `ReleaseFeed` (manifest + pobieranie z wznawianiem), adresy tylko `https://` (względne wobec katalogu
+  manifestów), `validate_package_path` + `PackageLimits` (reguły ZIP), `UpdateStatus`/`UpdatePhase`, `UpdatesFile`
+  (`updates.json`), `AppExit::Unconfirmed` + `CrashPolicy::confirm_ms` (brak `mark_good` = awaria nowej wersji).

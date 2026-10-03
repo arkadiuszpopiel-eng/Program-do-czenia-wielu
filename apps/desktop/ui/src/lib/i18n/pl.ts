@@ -7,6 +7,7 @@ import { plBuilder } from './pl-builder';
 import { plMemory } from './pl-memory';
 import { plSettings } from './pl-settings';
 import { plTasks } from './pl-tasks';
+import { plUpdates } from './pl-updates';
 import { plWork } from './pl-work';
 
 export const pl = {
@@ -17,6 +18,7 @@ export const pl = {
   ...plTasks,
   ...plWork,
   ...plBuilder,
+  ...plUpdates,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

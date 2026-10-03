@@ -7,6 +7,7 @@ import { enBuilder } from './en-builder';
 import { enMemory } from './en-memory';
 import { enSettings } from './en-settings';
 import { enTasks } from './en-tasks';
+import { enUpdates } from './en-updates';
 import { enWork } from './en-work';
 import type { MessageKey } from './pl';
 
@@ -18,4 +19,5 @@ export const en: Record<MessageKey, Message> = {
   ...enTasks,
   ...enWork,
   ...enBuilder,
+  ...enUpdates,
 };

@@ -22,6 +22,7 @@ import type { AgentRun, ReplayStep, VoiceSpeaker, VoiceStatus } from './types-ag
 import type { Account, LocalDownloadState } from './types-hub';
 import type { MarshalReport, TaskInfo, TriggerRunInfo } from './types-tasks';
 import type { GuiStatus, HealthOverall } from './types-work';
+import type { UpdatesView } from './types-updates';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
 
@@ -67,7 +68,9 @@ export type SettingsCustomPage =
   | 'skills'
   | 'builder'
   | 'computer'
-  | 'health';
+  | 'health'
+  | 'updates'
+  | 'about';
 
 export interface SettingsPageDef {
   readonly id: string;
@@ -259,7 +262,8 @@ export type AlfaEvent =
   /** Biblioteka umiejętności zmieniona (propozycja, import, zatwierdzenie). */
   | { readonly type: 'SkillsChanged'; readonly skill_id: string | null }
   /** „Zdrowie systemu" zmienione (incydent, naprawa, propozycja Ulepszacza, werdykt bramki). */
-  | { readonly type: 'HealthChanged'; readonly overall: HealthOverall; readonly pending: number };
+  | { readonly type: 'HealthChanged'; readonly overall: HealthOverall; readonly pending: number }
+  | { readonly type: 'UpdateStatus'; readonly status: UpdatesView };
 
 export type AlfaEventType = AlfaEvent['type'];
 export type Unsubscribe = () => void;

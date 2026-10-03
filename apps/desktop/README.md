@@ -31,6 +31,19 @@ cd apps/desktop/src-tauri
 cargo tauri build                            # target/release/bundle/nsis/Alfa_*.exe
 ```
 
+## Instalator i aktualizacje (F3)
+`tauri.conf.json` — paczka NSIS **per-user bez UAC** (`installMode: currentUser` → `%LOCALAPPDATA%\Alfa`), PL/EN
+(`windows/Polish.nsh` — tłumaczenia komunikatów Tauri), WebView2 przez cichy bootstrapper (tylko gdy brak runtime’u),
+bez instalacji starszej wersji z instalatora, protokół `alfa://` (`plugins.deep-link`). Wydanie buduje się z nakładką
+**`tauri.bundle.conf.json`** (`tauri build --config …`): `mainBinaryName: "alfa"`, `externalBin` = launcher
+(`binaries/alfa-launcher-x86_64-pc-windows-msvc.exe` z `cargo build -p updater-impl --bin alfa`, poza gitem) i haki
+**`windows/hooks.nsh`** (UTF-8 z BOM): po kopiowaniu aplikacja → `versions\<ver>\alfa-desktop.exe`, launcher →
+stały `alfa.exe` (skrót Menu Start z AUMID, protokół, „Otwórz w Alfie” w HKCU wskazują launcher), `alfa.exe
+--alfa-installed <ver>` zapisuje `current.json`; deinstalacja usuwa dane tylko po zaznaczeniu „Usuń także dane Alfy”.
+Bez nakładki (`tauri dev`, CI) konfiguracja nie wymaga launchera. Workflow: `.github/workflows/release.yml`, procedura
+i klucze: `docs/RELEASE.md`. „O programie” — licencje z `scripts/gen-licenses.mjs` (`crates/app-updates/data/licenses.json`).
+Powłoka implementuje `ShellPort::exit_app` (restart po aktualizacji: launcher `--alfa-restart` czeka na koniec procesu).
+
 ## Workspace Cargo
 `src-tauri/Cargo.toml` ma **pustą sekcję `[workspace]`**, więc jest samodzielnym pakietem.
 Workspace Rust w katalogu głównym repo (crates `core-*`, moduły) ma go wykluczyć wpisem:

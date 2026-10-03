@@ -1,15 +1,16 @@
 //! Komendy computer use (`gui_*`), terminala (`terminal_*`), umiejętności (`skills_*`), Kreatora
-//! (`builder_*`) i „Zdrowia systemu" (`health_*`, `improver_*`, `evals_*`) — delegują do
-//! `app-gui`, `app-terminal`, `app-skills`, `app-health` (działania jako użytkownik w UI).
+//! (`builder_*`), „Zdrowia systemu" (`health_*`, `improver_*`, `evals_*`) i aktualizacji
+//! (`updates_*`) — delegują do `app-gui`, `app-terminal`, `app-skills`, `app-health`,
+//! `app-updates` (działania jako użytkownik w UI).
 
 use std::sync::Arc;
 
 use crate::core::AppCore;
 use crate::dto::{
-    AgentDraft, BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView,
+    AboutInfo, AgentDraft, BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView,
     BuilderPreview, BuilderProposal, BuilderSaved, EvalSuiteView, EvalsView, ExportResult,
     GuiScreenshot, GuiStatus, HealthView, ImproverView, SkillImportResult, SkillInfo, SkillReview,
-    TaskInfo, TerminalProfileId, TerminalSession,
+    TaskInfo, TerminalProfileId, TerminalSession, UpdatesView, WhatsNew,
 };
 use crate::error::AppError;
 
@@ -66,6 +67,15 @@ work_commands! {
     wait improver_rollback(proposal_id: u64) -> ImproverView = health.improver_rollback(proposal_id);
     ok evals_list() -> EvalsView = health.evals_view();
     res evals_verify(suite_id: String) -> EvalSuiteView = health.verify(&suite_id);
+    wait updates_status() -> UpdatesView = updates.status();
+    wait updates_check() -> UpdatesView = updates.check();
+    wait updates_download() -> UpdatesView = updates.download();
+    wait updates_cancel() -> UpdatesView = updates.cancel();
+    wait updates_restart() -> () = updates.restart();
+    wait updates_rollback() -> UpdatesView = updates.rollback();
+    wait updates_about() -> AboutInfo = updates.about();
+    wait updates_whats_new() -> Option<WhatsNew> = updates.whats_new();
+    wait updates_dismiss_whats_new() -> () = updates.dismiss_whats_new();
 }
 
 impl AppCore {

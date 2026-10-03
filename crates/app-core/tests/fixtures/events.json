@@ -1341,5 +1341,66 @@
     "type": "HealthChanged",
     "overall": "degraded",
     "pending": 1
+  },
+  {
+    "type": "UpdateStatus",
+    "status": {
+      "phase": "available",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "type": "UpdateStatus",
+    "status": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "type": "UpdateStatus",
+    "status": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": {
+        "downloaded": 0,
+        "total": 48234496,
+        "resumed": false
+      },
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
   }
 ]

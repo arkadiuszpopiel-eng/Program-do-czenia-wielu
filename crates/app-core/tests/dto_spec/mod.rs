@@ -6,6 +6,7 @@ use app_core::dto::*;
 use super::{Check, roundtrip};
 
 mod computer;
+mod updates;
 
 type Spec = (Vec<(&'static str, Check)>, Check);
 
@@ -102,7 +103,8 @@ pub fn spec(command: &str) -> Option<Spec> {
         other => {
             return memory(other)
                 .or_else(|| tasks(other))
-                .or_else(|| computer::spec(other));
+                .or_else(|| computer::spec(other))
+                .or_else(|| updates::spec(other));
         }
     };
     Some(found)

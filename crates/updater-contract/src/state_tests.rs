@@ -135,3 +135,20 @@ fn prune_keeps_active_previous_and_staged() {
     let victims = prune_victims(&[v("0.9.0"), v("1.0.0")], Some(&with_bad), 1);
     assert_eq!(victims, vec![v("0.9.0")]);
 }
+
+#[test]
+fn unconfirmed_pending_version_falls_back_at_once() {
+    let s = CurrentState::initial(v("1.0.0"), now()).switched(&v("1.1.0"), now());
+    let policy = CrashPolicy::default();
+    assert_eq!(policy.confirm_ms, 300_000);
+    let exit = AppExit::Unconfirmed {
+        code: None,
+        after_ms: policy.confirm_ms,
+    };
+    let (next, decision) = decide_exit(&s, &v("1.1.0"), &exit, &policy, true, now());
+    assert_eq!(decision, ExitDecision::FallBack { to: v("1.0.0") });
+    assert_eq!((next.active, next.bad), (v("1.0.0"), vec![v("1.1.0")]));
+    let legacy: CrashPolicy =
+        serde_json::from_str(r#"{"window_ms":1000,"max_quick_crashes":3}"#).unwrap();
+    assert_eq!(legacy.confirm_ms, 300_000, "starszy zapis bez confirm_ms");
+}

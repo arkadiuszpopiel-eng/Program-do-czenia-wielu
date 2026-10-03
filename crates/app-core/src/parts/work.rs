@@ -32,6 +32,8 @@ pub(crate) struct WorkStack {
     pub skills: Arc<SkillsApp>,
     pub builder: Arc<BuilderApp>,
     pub health: Arc<HealthApp>,
+    /// Aktualizacje, „O programie”, restart przez launcher (`app-updates`).
+    pub updates: Arc<app_updates::UpdatesApp>,
 }
 
 /// Porty GUI i panel „Ekran" (przed narzędziami agentek).
@@ -65,6 +67,7 @@ pub(crate) struct WorkDepsIn<'a> {
     pub tasks: Arc<app_tasks::TasksApp>,
     pub personas: Arc<dyn personas_contract::Personas>,
     pub stack: Option<&'a super::AgentStack>,
+    pub updater: Arc<updater_impl::FsUpdater>,
 }
 
 impl Built {
@@ -119,7 +122,18 @@ impl Built {
             scan_every_ms: None,
         })
         .await;
+        let updates = app_updates::UpdatesApp::open(app_updates::UpdatesDeps {
+            updater: d.updater,
+            feed: None,
+            config: d.kernel.config.clone(),
+            events: Some(d.kernel.events.clone()),
+            shell: d.shell.clone(),
+            version: d.options.app_version.clone(),
+            launcher: None,
+            options: updater_impl::ServiceOptions::default(),
+        });
         let stack = WorkStack {
+            updates,
             gui,
             terminal: Arc::new(terminal),
             skills: work.skills.clone(),

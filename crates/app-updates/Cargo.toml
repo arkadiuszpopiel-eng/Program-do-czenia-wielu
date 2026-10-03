@@ -1,0 +1,35 @@
+[package]
+name = "app-updates"
+description = "Aktualizacje w aplikacji (kategoria app-*): usługa updater-impl (sprawdź → pobierz z wznawianiem → zweryfikuj → rozpakuj → przełącz), komendy updates_*, zdarzenie UpdateStatus, harmonogram wg trybu (automatycznie/pytaj/ręcznie), restart przez launcher, „Przywróć poprzednią wersję”, „Co nowego” raz po aktualizacji, „O programie” z licencjami, mark_good po zdrowym starcie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `updater-impl`; używa jej `app-core`.
+[dependencies]
+app-api = { path = "../app-api" }
+updater-contract = { path = "../updater-contract" }
+updater-impl = { path = "../updater-impl" }
+core-config-contract.workspace = true
+chrono.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt", "time"] }
+tracing.workspace = true
+
+[dev-dependencies]
+updater-fake = { path = "../updater-fake" }
+core-config-fake = { path = "../core-config-fake" }
+tempfile = "3.27.0"
+sha2 = "0.10.9"
+minisign = "0.10.0"
+zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+
+[lints]
+workspace = true

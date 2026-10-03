@@ -1,6 +1,6 @@
 [package]
 name = "updater-contract"
-description = "Launcher i aktualizacje: kontrakt — układ katalogów (wersje side-by-side, stały launcher, current.json, webview-data), wybór wersji, crash-loop, rollback, manifest wydań, testy kontraktowe"
+description = "Launcher i aktualizacje: kontrakt — układ katalogów (wersje side-by-side, stały launcher, current.json, webview-data), wybór wersji, crash-loop, rollback, manifest wydań, kanał i tryb, port źródła wydań, reguły paczki ZIP, stan dla UI, testy kontraktowe"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -14,6 +14,7 @@ default = []
 contract-tests = []
 
 [dependencies]
+async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

@@ -168,6 +168,15 @@
     "allow-improver-reject",
     "allow-improver-rollback",
     "allow-evals-list",
-    "allow-evals-verify"
+    "allow-evals-verify",
+    "allow-updates-status",
+    "allow-updates-check",
+    "allow-updates-download",
+    "allow-updates-cancel",
+    "allow-updates-restart",
+    "allow-updates-rollback",
+    "allow-updates-about",
+    "allow-updates-whats-new",
+    "allow-updates-dismiss-whats-new"
   ]
 }

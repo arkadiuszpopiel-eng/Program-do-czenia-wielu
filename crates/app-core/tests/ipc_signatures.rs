@@ -46,7 +46,7 @@ fn every_command_has_a_send_future_with_matching_types() {
         .copied()
         .collect();
     assert_eq!(all, app_core::COMMANDS);
-    assert_eq!(CHECKED.len(), 161);
+    assert_eq!(CHECKED.len(), 170);
     assert_eq!(app_core::CHANNEL_COMMANDS, ["terminal_open"]);
     let _ = terminal_open;
 }

@@ -24,6 +24,8 @@
   import SkillsPage from './pages/SkillsPage.svelte';
   import TransferPage from './pages/TransferPage.svelte';
   import TriggersPage from './pages/TriggersPage.svelte';
+  import UpdatesPage from './pages/UpdatesPage.svelte';
+  import AboutPage from './pages/AboutPage.svelte';
   import VoicePage from './pages/VoicePage.svelte';
 
   const app = useApp();
@@ -147,6 +149,8 @@
         {:else if page.custom === 'builder'}<BuilderPage />
         {:else if page.custom === 'computer'}<ComputerPage />
         {:else if page.custom === 'health'}<HealthPage />
+        {:else if page.custom === 'updates'}<UpdatesPage />
+        {:else if page.custom === 'about'}<AboutPage />
         {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />

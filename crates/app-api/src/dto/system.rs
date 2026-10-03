@@ -105,6 +105,10 @@ pub enum SettingsCustomPage {
     Computer,
     /// Zdrowie systemu: moduły, incydenty i naprawy Diagnosty, Ulepszacz, wyniki evali.
     Health,
+    /// Aktualizacje: stan, pobieranie, „Uruchom ponownie”, „Przywróć poprzednią wersję”.
+    Updates,
+    /// O programie: wersja, kanał, data kompilacji, licencje zależności.
+    About,
 }
 
 /// Strona ustawień (drzewo §15).

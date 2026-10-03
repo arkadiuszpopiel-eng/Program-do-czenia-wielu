@@ -6,7 +6,10 @@ use std::io::Write;
 use std::path::Path;
 
 use semver::Version;
-use updater_contract::{CurrentState, Layout, STATE_SCHEMA, UpdaterError, VERSION_FILE};
+use updater_contract::{
+    CurrentState, Layout, STATE_SCHEMA, UPDATES_FILE, UPDATES_SCHEMA, UpdaterError, UpdatesFile,
+    VERSION_FILE,
+};
 
 /// Stan z `current.json`; brak pliku, zły JSON albo nieznany schemat → `None` (launcher wybierze
 /// wtedy najnowszą poprawną wersję).
@@ -19,20 +22,46 @@ pub fn read_state(layout: &Layout) -> Option<CurrentState> {
 
 /// Atomowy zapis `current.json`.
 pub fn write_state(layout: &Layout, state: &CurrentState) -> Result<(), UpdaterError> {
-    std::fs::create_dir_all(&layout.root)?;
     let json = serde_json::to_vec_pretty(state).map_err(UpdaterError::invalid)?;
-    let tmp = layout
-        .root
-        .join(format!(".{}.tmp", updater_contract::CURRENT_FILE));
+    write_atomic(&layout.current, &json)
+}
+
+/// Zapis atomowy: plik tymczasowy obok (`.<nazwa>.tmp`) + `fsync` + `rename`.
+pub fn write_atomic(path: &Path, bytes: &[u8]) -> Result<(), UpdaterError> {
+    let dir = path
+        .parent()
+        .ok_or_else(|| UpdaterError::invalid("ścieżka bez katalogu"))?;
+    std::fs::create_dir_all(dir)?;
+    let name = path
+        .file_name()
+        .ok_or_else(|| UpdaterError::invalid("ścieżka bez nazwy pliku"))?;
+    let tmp = dir.join(format!(".{}.tmp", name.to_string_lossy()));
     {
         let mut file = std::fs::File::create(&tmp)?;
-        file.write_all(&json)?;
+        file.write_all(bytes)?;
         file.sync_all()?;
     }
-    std::fs::rename(&tmp, &layout.current).inspect_err(|_| {
+    std::fs::rename(&tmp, path).inspect_err(|_| {
         let _ = std::fs::remove_file(&tmp);
     })?;
     Ok(())
+}
+
+/// `updates.json` (ostatnie sprawdzenie, pokazane „Co nowego”); brak/uszkodzony → domyślny.
+pub fn read_updates_file(layout: &Layout) -> UpdatesFile {
+    std::fs::read(layout.root.join(UPDATES_FILE))
+        .ok()
+        .and_then(|b| serde_json::from_slice::<UpdatesFile>(&b).ok())
+        .filter(|f| f.schema == UPDATES_SCHEMA)
+        .unwrap_or_default()
+}
+
+/// Atomowy zapis `updates.json`.
+pub fn write_updates_file(layout: &Layout, file: &UpdatesFile) -> Result<(), UpdaterError> {
+    let mut file = file.clone();
+    file.schema = UPDATES_SCHEMA;
+    let json = serde_json::to_vec_pretty(&file).map_err(UpdaterError::invalid)?;
+    write_atomic(&layout.root.join(UPDATES_FILE), &json)
 }
 
 /// Wszystkie katalogi o kanonicznej nazwie semver (także uszkodzone), rosnąco.

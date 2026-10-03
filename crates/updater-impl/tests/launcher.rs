@@ -1,5 +1,6 @@
 //! Launcher: przekazanie argumentów bez zmian, crash-loop → poprzednia wersja, ponowienie,
-//! poddanie się; prawdziwe procesy (Unix) i wybór katalogu instalacji.
+//! poddanie się, brak `mark_good` nowej wersji → zamknięcie i powrót; prawdziwe procesy (Unix)
+//! i wybór katalogu instalacji.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -10,11 +11,15 @@ use std::collections::VecDeque;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
+use std::sync::Arc;
 
 use semver::Version;
 use updater_contract::contract_tests::Harness;
 use updater_contract::{CrashPolicy, Updater, UpdaterError};
-use updater_impl::launcher::{LaunchClock, RunningApp, Spawner, locate_root, log_error, run};
+use updater_impl::FsUpdater;
+use updater_impl::launcher::{
+    LaunchClock, RunningApp, Spawner, app_install_root, locate_root, log_error, run,
+};
 
 fn v(s: &str) -> Version {
     Version::parse(s).unwrap()
@@ -33,27 +38,44 @@ impl LaunchClock for VClock {
     }
 }
 
-/// Zachowanie uruchomienia: błąd startu, wyjście `(kod, po_ms)` albo działanie bez końca.
+/// Zachowanie uruchomienia: błąd startu, wyjście `(kod, po_ms)`, działanie bez końca albo
+/// działanie z `mark_good` po `ms` (zdrowy start nowej wersji).
 #[derive(Clone)]
 enum Run {
     StartError,
     Exit(i32, u64),
     Forever,
+    ConfirmAfter(u64),
 }
+
+type Hook = Rc<dyn Fn()>;
 
 struct ScriptedApp {
     exit: Option<(i32, u64)>,
+    confirm: Option<(u64, Hook)>,
     started: u64,
     clock: VClock,
+    killed: Rc<Cell<u32>>,
 }
 
 impl RunningApp for ScriptedApp {
     fn try_wait(&mut self) -> std::io::Result<Option<i32>> {
-        let now = self.clock.now_ms();
+        let elapsed = self.clock.now_ms() - self.started;
+        if let Some((after, hook)) = &self.confirm
+            && elapsed >= *after
+        {
+            hook();
+            self.confirm = None;
+        }
         Ok(self
             .exit
-            .filter(|(_, after)| now - self.started >= *after)
+            .filter(|(_, after)| elapsed >= *after)
             .map(|(code, _)| code))
+    }
+    fn kill(&mut self) -> std::io::Result<()> {
+        self.killed.set(self.killed.get() + 1);
+        self.exit = Some((-1, 0));
+        Ok(())
     }
 }
 
@@ -61,6 +83,8 @@ struct Script {
     runs: RefCell<VecDeque<Run>>,
     calls: RefCell<Vec<(PathBuf, Vec<OsString>)>>,
     clock: VClock,
+    confirm: Option<Hook>,
+    killed: Rc<Cell<u32>>,
 }
 
 impl Script {
@@ -69,6 +93,8 @@ impl Script {
             runs: RefCell::new(runs.iter().cloned().collect()),
             calls: RefCell::new(Vec::new()),
             clock: clock.clone(),
+            confirm: None,
+            killed: Rc::default(),
         }
     }
 }
@@ -78,15 +104,18 @@ impl Spawner for Script {
         self.calls
             .borrow_mut()
             .push((exe.to_path_buf(), args.to_vec()));
-        let exit = match self.runs.borrow_mut().pop_front().unwrap_or(Run::Forever) {
+        let (exit, confirm) = match self.runs.borrow_mut().pop_front().unwrap_or(Run::Forever) {
             Run::StartError => return Err(std::io::Error::other("brak pliku")),
-            Run::Exit(code, after) => Some((code, after)),
-            Run::Forever => None,
+            Run::Exit(code, after) => (Some((code, after)), None),
+            Run::Forever => (None, None),
+            Run::ConfirmAfter(ms) => (None, self.confirm.clone().map(|h| (ms, h))),
         };
         Ok(Box::new(ScriptedApp {
             exit,
+            confirm,
             started: self.clock.now_ms(),
             clock: self.clock.clone(),
+            killed: self.killed.clone(),
         }))
     }
 }
@@ -203,6 +232,74 @@ fn root_is_launcher_dir_or_local_app_data() {
         lad.join("Alfa")
     );
     assert_eq!(locate_root(None, None), PathBuf::from("Alfa"));
+    let exe = alfa.join("versions").join("1.2.0").join("alfa-desktop.exe");
+    assert_eq!(app_install_root(Some(&exe), &lad), alfa);
+    let dev = dir.path().join("target").join("debug").join("alfa-desktop");
+    assert_eq!(app_install_root(Some(&dev), &lad), lad);
+    assert_eq!(app_install_root(None, &lad), lad);
+}
+
+/// Nowa wersja działa, ale nie woła `mark_good` (zawieszona) → po `confirm_ms` launcher ją
+/// zamyka, wycofuje i uruchamia poprzednią.
+#[test]
+fn missing_mark_good_rolls_back_after_confirm_window() {
+    let h = common::harness();
+    updated(&h);
+    let clock = VClock::default();
+    let script = Script::new(&clock, &[Run::Forever, Run::Forever]);
+    let policy = CrashPolicy::default();
+    let report = run(&h.updater, &[], &script, &clock, &policy).unwrap();
+    assert_eq!(
+        (report.version, report.attempts, report.fell_back),
+        (v("1.0.0"), 2, true)
+    );
+    assert_eq!(script.killed.get(), 1, "zawieszona wersja zamknięta");
+    assert!(clock.now_ms() >= policy.confirm_ms);
+    let s = h.updater.state().unwrap().unwrap();
+    assert_eq!((s.active, s.bad), (v("1.0.0"), vec![v("1.1.0")]));
+    assert_eq!(h.updater.select_launch().unwrap().version, v("1.0.0"));
+}
+
+/// Nowa wersja woła `mark_good` w oknie potwierdzenia → zostaje; launcher kończy obserwację
+/// zaraz po potwierdzeniu (nie czeka pełnego `confirm_ms`).
+#[test]
+fn mark_good_within_window_keeps_new_version() {
+    let h = common::harness();
+    updated(&h);
+    let clock = VClock::default();
+    let mut script = Script::new(&clock, &[Run::ConfirmAfter(30_000)]);
+    let updater = Arc::new(FsUpdater::new(h.updater.config().clone()).unwrap());
+    let hook_updater = updater.clone();
+    script.confirm = Some(Rc::new(move || {
+        hook_updater.mark_good(&Version::new(1, 1, 0)).unwrap();
+    }));
+    let report = run(&*updater, &[], &script, &clock, &CrashPolicy::default()).unwrap();
+    assert_eq!((report.version, report.fell_back), (v("1.1.0"), false));
+    assert_eq!(script.killed.get(), 0);
+    assert!(clock.now_ms() < 40_000, "{} ms", clock.now_ms());
+    let s = updater.state().unwrap().unwrap();
+    assert!(!s.pending && s.bad.is_empty());
+}
+
+/// Nowa wersja kończy się z błędem po oknie crash-loop, ale przed `mark_good` → powrót.
+#[test]
+fn late_crash_before_confirmation_rolls_back() {
+    let h = common::harness();
+    updated(&h);
+    let clock = VClock::default();
+    let script = Script::new(&clock, &[Run::Exit(5, 60_000), Run::Forever]);
+    let report = run(&h.updater, &[], &script, &clock, &CrashPolicy::default()).unwrap();
+    assert_eq!((report.version, report.fell_back), (v("1.0.0"), true));
+    // Zamknięcie przez użytkownika (kod 0) przed potwierdzeniem nie jest awarią.
+    let h = common::harness();
+    updated(&h);
+    let script = Script::new(&clock, &[Run::Exit(0, 60_000)]);
+    let report = run(&h.updater, &[], &script, &clock, &CrashPolicy::default()).unwrap();
+    assert_eq!((report.version, report.fell_back), (v("1.1.0"), false));
+    assert!(
+        h.updater.state().unwrap().unwrap().pending,
+        "nadal czeka na mark_good"
+    );
 }
 
 /// Prawdziwe procesy: nowa wersja kończy się kodem 3 → launcher uruchamia poprzednią.
@@ -227,6 +324,7 @@ fn real_processes_crash_loop() {
     let policy = CrashPolicy {
         window_ms: 2_000,
         max_quick_crashes: 2,
+        confirm_ms: 5_000,
     };
     let args = vec![
         OsString::from("alfa://nowa sesja"),

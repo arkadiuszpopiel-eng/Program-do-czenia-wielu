@@ -1,0 +1,198 @@
+[
+  {
+    "command": "updates_status",
+    "args": {},
+    "result": {
+      "phase": "idle",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": null,
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": null,
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_whats_new",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "updates_check",
+    "args": {},
+    "result": {
+      "phase": "available",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_download",
+    "args": {},
+    "result": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_cancel",
+    "args": {},
+    "result": {
+      "phase": "available",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": {
+        "downloaded": 12058624,
+        "total": 48234496,
+        "resumed": false
+      },
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_download",
+    "args": {},
+    "result": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": {
+        "downloaded": 12058624,
+        "total": 48234496,
+        "resumed": false
+      },
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_restart",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "updates_whats_new",
+    "args": {},
+    "result": {
+      "version": "0.2.0",
+      "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+    }
+  },
+  {
+    "command": "updates_dismiss_whats_new",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "updates_rollback",
+    "args": {},
+    "result": {
+      "phase": "ready",
+      "current": "0.2.0",
+      "channel": "stable",
+      "mode": "ask",
+      "available": null,
+      "progress": null,
+      "ready": "0.1.0-f1",
+      "previous": "0.2.0",
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_about",
+    "args": {},
+    "result": {
+      "version": "0.2.0",
+      "channel": "stable",
+      "build_date": null,
+      "commit": null,
+      "target": "windows-x86_64",
+      "updates_configured": true,
+      "licenses_generated_at": "2026-10-03",
+      "licenses": [
+        {
+          "name": "minisign-verify",
+          "version": "0.3.0",
+          "license": "MIT",
+          "source": "cargo"
+        },
+        {
+          "name": "reqwest",
+          "version": "0.12.28",
+          "license": "MIT OR Apache-2.0",
+          "source": "cargo"
+        },
+        {
+          "name": "tauri",
+          "version": "2.12.0",
+          "license": "Apache-2.0 OR MIT",
+          "source": "cargo"
+        },
+        {
+          "name": "zip",
+          "version": "8.6.0",
+          "license": "MIT",
+          "source": "cargo"
+        },
+        {
+          "name": "bits-ui",
+          "version": "2.19.3",
+          "license": "MIT",
+          "source": "npm"
+        },
+        {
+          "name": "svelte",
+          "version": "5.57.1",
+          "license": "MIT",
+          "source": "npm"
+        }
+      ]
+    }
+  }
+]

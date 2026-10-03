@@ -69,6 +69,10 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
     case 'SkillsChanged':
       app.notify(event);
       break;
+    case 'UpdateStatus':
+      app.updates.apply(event.status);
+      app.notify(event);
+      break;
     case 'MarshalReportReady':
       app.toasts.show({
         kind: 'info',

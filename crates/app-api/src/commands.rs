@@ -170,6 +170,15 @@ macro_rules! with_commands {
             improver_rollback(proposal_id: u64) -> $crate::dto::ImproverView;
             evals_list() -> $crate::dto::EvalsView;
             evals_verify(suite_id: String) -> $crate::dto::EvalSuiteView;
+            updates_status() -> $crate::dto::UpdatesView;
+            updates_check() -> $crate::dto::UpdatesView;
+            updates_download() -> $crate::dto::UpdatesView;
+            updates_cancel() -> $crate::dto::UpdatesView;
+            updates_restart() -> ();
+            updates_rollback() -> $crate::dto::UpdatesView;
+            updates_about() -> $crate::dto::AboutInfo;
+            updates_whats_new() -> Option<$crate::dto::WhatsNew>;
+            updates_dismiss_whats_new() -> ();
         }
     };
 }
@@ -195,6 +204,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 162);
+        assert_eq!(super::COMMANDS.len(), 171);
     }
 }

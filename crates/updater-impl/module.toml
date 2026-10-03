@@ -1,5 +1,6 @@
 # Manifest modułu `updater` (docs/modules/updater/SPEC.md, ADR 0007). Schemat: packages/schemas/module-manifest.v1.json
 # Moduł Jądra: zmiany wymagają przeglądu człowieka (AGENTS.md). Launcher `alfa.exe` to binarium tego pakietu.
+# `net.egress(update-feed)` = wyłącznie adres wydań wbudowany w wydanie (`ALFA_UPDATE_FEED`, https://); bez telemetrii.
 id = "updater"
 version = "0.0.1"
 kind = "service"
@@ -8,8 +9,13 @@ requires = ["core-bus-contract@1"]
 capabilities = [
     "fs.read(%LOCALAPPDATA%/Alfa/**)",
     "fs.write(%LOCALAPPDATA%/Alfa/versions/**)",
+    "fs.write(%LOCALAPPDATA%/Alfa/staging/**)",
     "fs.write(%LOCALAPPDATA%/Alfa/current.json)",
+    "fs.write(%LOCALAPPDATA%/Alfa/updates.json)",
+    "fs.write(%LOCALAPPDATA%/Alfa/alfa.exe.new)",
     "process.spawn(%LOCALAPPDATA%/Alfa/versions/*/alfa-desktop.exe)",
+    "process.spawn(%LOCALAPPDATA%/Alfa/alfa.exe)",
+    "net.egress(update-feed)",
 ]
 lifecycle = "on-demand"
 isolation = "inproc"

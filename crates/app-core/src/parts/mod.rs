@@ -265,6 +265,7 @@ impl Built {
                 tasks: stack.tasks.clone(),
                 personas: personas.clone(),
                 stack: ports.agents.as_ref(),
+                updater: need(&self.extra.updater, "updater")?,
             })
             .await;
         work.health.bind_brain(ports.brain.clone());

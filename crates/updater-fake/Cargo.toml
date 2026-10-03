@@ -1,6 +1,6 @@
 [package]
 name = "updater-fake"
-description = "Launcher i aktualizacje: deterministyczna atrapa — wersje w pamięci, switch_to bez restartu, wydania z dobrymi i złymi podpisami, wirtualny zegar"
+description = "Launcher i aktualizacje: deterministyczna atrapa — wersje w pamięci, switch_to bez restartu, wydania z dobrymi i złymi podpisami, wirtualny zegar, źródło wydań w pamięci z wznawianiem"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,6 +10,7 @@ repository.workspace = true
 
 [dependencies]
 updater-contract = { path = "../updater-contract" }
+async-trait.workspace = true
 chrono.workspace = true
 semver.workspace = true
 # Skróty paczek fixture'ów (ta sama wersja co w workspace; MIT OR Apache-2.0).
@@ -17,6 +18,8 @@ sha2 = "0.10.9"
 
 [dev-dependencies]
 updater-contract = { path = "../updater-contract", features = ["contract-tests"] }
+tokio = { workspace = true, features = ["rt", "macros"] }
+tempfile = "3.27.0"
 
 [lints]
 workspace = true

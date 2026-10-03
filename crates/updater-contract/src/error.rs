@@ -46,6 +46,35 @@ pub enum UpdaterError {
         /// Opis.
         reason: String,
     },
+    /// Błąd sieci (manifest albo pobieranie paczki); pobieranie można wznowić.
+    #[error("sieć: {reason}")]
+    Network {
+        /// Opis.
+        reason: String,
+    },
+    /// Operację anulowano (częściowo pobrana paczka zostaje do wznowienia).
+    #[error("anulowano")]
+    Cancelled,
+    /// Wersja nie jest nowsza od bieżącej — instalacja tylko jako jawny rollback użytkownika.
+    #[error("wersja {version} nie jest nowsza od bieżącej {current}")]
+    Downgrade {
+        /// Wersja wydania.
+        version: String,
+        /// Wersja bieżąca.
+        current: String,
+    },
+    /// Paczka narusza reguły archiwum (ścieżka poza katalogiem, zip-bomb, brak plików).
+    #[error("niebezpieczna paczka: {reason}")]
+    UnsafePackage {
+        /// Powód.
+        reason: String,
+    },
+    /// Aktualizacje nie są skonfigurowane (brak adresu wydań albo klucza publicznego).
+    #[error("aktualizacje nieskonfigurowane: {reason}")]
+    NotConfigured {
+        /// Powód.
+        reason: String,
+    },
 }
 
 impl UpdaterError {
@@ -53,6 +82,20 @@ impl UpdaterError {
     pub fn io(err: impl std::fmt::Display) -> Self {
         UpdaterError::Io {
             reason: err.to_string(),
+        }
+    }
+
+    /// Skrót: błąd sieci.
+    pub fn network(reason: impl std::fmt::Display) -> Self {
+        UpdaterError::Network {
+            reason: reason.to_string(),
+        }
+    }
+
+    /// Skrót: niebezpieczna paczka.
+    pub fn unsafe_package(reason: impl std::fmt::Display) -> Self {
+        UpdaterError::UnsafePackage {
+            reason: reason.to_string(),
         }
     }
 

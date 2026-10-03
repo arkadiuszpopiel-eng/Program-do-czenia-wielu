@@ -354,6 +354,7 @@ dependencies = [
  "app-store",
  "app-tasks",
  "app-terminal",
+ "app-updates",
  "app-voice",
  "artifacts-contract",
  "artifacts-impl",
@@ -634,6 +635,22 @@ dependencies = [
  "tokio",
  "ui-terminal-contract",
  "ui-terminal-impl",
+]
+
+[[package]]
+name = "app-updates"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "chrono",
+ "core-config-contract",
+ "semver",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "updater-contract",
+ "updater-impl",
 ]
 
 [[package]]
@@ -7836,6 +7853,7 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 name = "updater-contract"
 version = "0.0.1"
 dependencies = [
+ "async-trait",
  "chrono",
  "schemars 1.2.2",
  "semver",
@@ -7852,13 +7870,19 @@ dependencies = [
  "chrono",
  "core-bus-contract",
  "core-registry-contract",
+ "flate2",
+ "futures-util",
  "minisign-verify",
+ "reqwest 0.12.28",
  "semver",
  "serde",
  "serde_json",
  "sha2",
  "tokio",
+ "tracing",
  "updater-contract",
+ "watchdog-contract",
+ "zip",
 ]
 
 [[package]]

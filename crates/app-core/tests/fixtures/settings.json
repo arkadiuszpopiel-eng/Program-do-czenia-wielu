@@ -850,8 +850,8 @@
               "en": "Diagnostician autonomy"
             },
             "description": {
-              "pl": "Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera.",
-              "en": "What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window."
+              "pl": "Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera. Zmiana działa od następnego uruchomienia.",
+              "en": "What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window. Takes effect after the next start."
             },
             "default": "auto_low_risk",
             "scope": "global",
@@ -1325,7 +1325,7 @@
           "en": "Updates"
         },
         "wave": 1,
-        "custom": null,
+        "custom": "updates",
         "settings": [
           {
             "key": "updates.channel",
@@ -1334,8 +1334,8 @@
               "en": "Update channel"
             },
             "description": {
-              "pl": "Stabilny dostaje sprawdzone wersje; testowy — wcześniej.",
-              "en": "Stable gets tested versions; preview gets them earlier."
+              "pl": "Stabilny dostaje sprawdzone wersje; testowy (beta) — wcześniej, także wersje przedpremierowe.",
+              "en": "Stable gets tested versions; preview (beta) gets them earlier, including pre-releases."
             },
             "default": "stable",
             "scope": "global",
@@ -1352,8 +1352,47 @@
                 {
                   "value": "preview",
                   "label": {
-                    "pl": "Testowy",
-                    "en": "Preview"
+                    "pl": "Testowy (beta)",
+                    "en": "Preview (beta)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "updates.mode",
+            "label": {
+              "pl": "Instalowanie aktualizacji",
+              "en": "Installing updates"
+            },
+            "description": {
+              "pl": "Automatycznie: Alfa sprawdza raz dziennie, pobiera i przygotowuje nową wersję (działa od ponownego uruchomienia). Pytaj: sprawdza raz dziennie i pyta przed pobraniem. Ręcznie: tylko po „Sprawdź teraz”. Bez telemetrii — tylko pobranie listy wydań.",
+              "en": "Automatic: Alfa checks daily, downloads and prepares the new version (active after restart). Ask: checks daily and asks before downloading. Manual: only on “Check now”. No telemetry — only the release list is fetched."
+            },
+            "default": "ask",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie",
+                    "en": "Automatically"
+                  }
+                },
+                {
+                  "value": "ask",
+                  "label": {
+                    "pl": "Pytaj przed pobraniem",
+                    "en": "Ask before downloading"
+                  }
+                },
+                {
+                  "value": "manual",
+                  "label": {
+                    "pl": "Ręcznie",
+                    "en": "Manually"
                   }
                 }
               ]
@@ -1397,6 +1436,17 @@
             "en": "Experimental flags"
           }
         ]
+      },
+      {
+        "id": "about",
+        "label": {
+          "pl": "O programie",
+          "en": "About"
+        },
+        "wave": 1,
+        "custom": "about",
+        "settings": [],
+        "upcoming": []
       }
     ]
   },
@@ -1447,6 +1497,7 @@
       "notify.dnd_fullscreen": true,
       "ui.locale": "pl",
       "updates.channel": "stable",
+      "updates.mode": "ask",
       "updates.whats_new": true
     }
   },

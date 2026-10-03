@@ -20,6 +20,8 @@
   const loadOnboarding = () => import('./lib/views/onboarding/OnboardingView.svelte');
   // Terminal (gest użytkownika): emulator ładowany leniwie, poza paczką startową.
   const loadTerminal = () => import('./lib/components/overlays/TerminalDialog.svelte');
+  // „Co nowego" raz po aktualizacji — ładowane leniwie tylko wtedy.
+  const loadWhatsNew = () => import('./lib/components/overlays/WhatsNewDialog.svelte');
 
   $effect(() => {
     applyAppearance(document.documentElement, {
@@ -65,6 +67,9 @@
 {/if}
 {#if app.work.terminal}
   <Lazy load={loadTerminal} props={{ request: app.work.terminal }} label={t('app.loading')} />
+{/if}
+{#if app.updates.whatsNew && (app.view === 'chat' || app.view === 'settings')}
+  <Lazy load={loadWhatsNew} props={{ news: app.updates.whatsNew }} label={t('app.loading')} />
 {/if}
 
 <style>

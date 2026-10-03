@@ -175,6 +175,13 @@ impl ShellPort for TauriShell {
             _ => AppError::internal(format!("{exe}: {e}")),
         })
     }
+
+    /// Restart po aktualizacji: launcher (`alfa.exe --alfa-restart`) już czeka na zwolnienie
+    /// blokady instancji — kończymy aplikację (sprzątanie Tauri, zamknięcie okien i WebView2).
+    fn exit_app(&self) -> Result<(), AppError> {
+        self.app.exit(0);
+        Ok(())
+    }
 }
 
 fn toast(core: &AppCore, pl: &str, en: &str) {

@@ -9,6 +9,7 @@ import {
 } from '../../../../../apps/desktop/ui/src/lib/api/fake/fake-client';
 import type { AlfaEvent } from '../../../../../apps/desktop/ui/src/lib/api/types-system';
 import { runComputer } from './generate-computer';
+import { runUpdates } from './generate-updates';
 import { runWork } from './generate-work';
 import { invocations } from './tauri-mock';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -249,6 +250,7 @@ async function run(): Promise<void> {
 
   await runWork(both, scheduler, flush);
   await runComputer(both, scheduler, flush);
+  await runUpdates(both, scheduler, flush);
 }
 
 function sampleEvents(all: readonly AlfaEvent[]): AlfaEvent[] {

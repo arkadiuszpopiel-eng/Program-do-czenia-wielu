@@ -14,6 +14,7 @@ use super::sessions::{
 };
 use super::system::{SystemStatus, VoicePillState};
 use super::tasks::{MarshalReport, TaskInfo, TriggerRunInfo};
+use super::updates::UpdatesView;
 
 /// Powód zakończenia strumienia.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -178,5 +179,9 @@ pub enum AlfaEvent {
     HealthChanged {
         overall: HealthOverall,
         pending: u32,
+    },
+    /// Stan aktualizacji: sprawdzanie, pobieranie (postęp), gotowa do restartu, błąd.
+    UpdateStatus {
+        status: UpdatesView,
     },
 }

@@ -1,6 +1,6 @@
 //! Po starcie: dokończenie przerwanych usunięć (crypto-shredding sesji z kosza), kurs NBP w tle,
-//! przywrócenie zapisanego (niższego) poziomu autonomii w Brokerze, `updater::mark_good` po
-//! zdrowym starcie i mosty zdarzeń modułów → `alfa://events` (limit kosztów, postęp pobierania
+//! przywrócenie zapisanego (niższego) poziomu autonomii w Brokerze, aktualizacje w tle
+//! (`updater::mark_good` po zdrowym starcie, sprawdzanie wg trybu) i mosty zdarzeń modułów → `alfa://events` (limit kosztów, postęp pobierania
 //! modelu lokalnego).
 
 use std::time::Duration;
@@ -9,7 +9,6 @@ use core_bus_contract::{BusItem, EventFilter};
 use cost_meter_contract::{CostMeter, EVENT_LIMIT_BLOCKED, EVENT_LIMIT_WARNING};
 use futures_util::StreamExt;
 use sessions_contract::{SessionCatalog, SessionQuery};
-use updater_contract::Updater;
 
 use crate::core::AppCore;
 use crate::dto::{AlfaEvent, LocalDownloadState, LocalizedText, ToastKind};
@@ -41,7 +40,7 @@ impl AppCore {
         self.spawn_download_bridge().await;
         app_memory::spawn_bridge(self.inner.bus.clone(), self.inner.events.clone()).await;
         self.spawn_task_bridges().await;
-        self.spawn_mark_good(self.inner.healthy_after);
+        self.spawn_updates(self.inner.healthy_after);
     }
 
     /// Zadania: zdarzenia `scheduler.*`/`triggers.*`/`marshal.*` → UI, DND z `voice-wake` →
@@ -86,34 +85,36 @@ impl AppCore {
         }
     }
 
-    /// Po `after` bez awarii: aktywna wersja (launcher, `current.json`) oznaczona jako dobra —
-    /// poprzednia przestaje być celem automatycznego powrotu. Uruchomienie spoza launchera
-    /// (dev, testy bez `current.json`) — nic do zrobienia.
-    fn spawn_mark_good(&self, after: Duration) {
-        let Some(updater) = self.inner.extra.updater.clone() else {
-            return;
-        };
-        let Ok(version) = semver::Version::parse(&self.inner.app_version) else {
-            tracing::warn!(wersja = %self.inner.app_version, "wersja aplikacji nie jest semver — bez mark_good");
-            return;
-        };
-        tokio::spawn(async move {
-            tokio::time::sleep(after).await;
-            let result = tokio::task::spawn_blocking(move || match updater.state() {
-                Ok(Some(state)) if state.active == version && state.pending => {
-                    updater.mark_good(&version).map(|()| true)
-                }
-                Ok(_) => Ok(false),
-                Err(e) => Err(e),
+    /// Aktualizacje w tle (`app-updates`): `mark_good` po `after` bez awarii, sprawdzanie wg
+    /// trybu; restart blokuje trwające zadanie agentki albo rozmowa głosowa.
+    fn spawn_updates(&self, after: Duration) {
+        let weak = std::sync::Arc::downgrade(&self.inner);
+        let updates = &self.inner.work.updates;
+        updates.set_busy_probe(std::sync::Arc::new(move || {
+            let inner = weak.upgrade();
+            Box::pin(async move {
+                let inner = inner?;
+                let task = !inner.runtime.lock().ok()?.runs.is_empty();
+                let voice = inner.voice.status().await.state == crate::dto::VoiceState::Active;
+                let (pl, en) = match (task, voice) {
+                    (true, _) => (
+                        "Agentka wykonuje zadanie — dokończ je albo zatrzymaj.",
+                        "An agent is working — finish or stop the task first.",
+                    ),
+                    (_, true) => (
+                        "Trwa rozmowa głosowa — zakończ ją najpierw.",
+                        "A voice conversation is active — end it first.",
+                    ),
+                    _ => return None,
+                };
+                Some(crate::dto::LocalizedText::new(pl, en))
             })
-            .await;
-            match result {
-                Ok(Ok(true)) => tracing::info!("zdrowy start — wersja oznaczona jako dobra"),
-                Ok(Ok(false)) => tracing::debug!("mark_good: brak oczekującej wersji"),
-                Ok(Err(e)) => tracing::warn!(error = %e, "mark_good nie powiódł się"),
-                Err(e) => tracing::warn!(error = %e, "zadanie mark_good przerwane"),
-            }
-        });
+        }));
+        let schedule = app_updates::Schedule {
+            healthy_after: after,
+            ..Default::default()
+        };
+        updates.spawn_background(schedule);
     }
 
     /// `local.model.download.progress` → `LocalModelProgress { state: downloading }`.

@@ -51,6 +51,7 @@
         "notify.dnd_fullscreen": true,
         "ui.locale": "pl",
         "updates.channel": "stable",
+        "updates.mode": "ask",
         "updates.whats_new": true
       },
       "layout": null,

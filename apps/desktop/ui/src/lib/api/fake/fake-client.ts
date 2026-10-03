@@ -25,6 +25,7 @@ import { memoryApi } from './api-memory';
 import { modelsApi } from './api-models';
 import { FakeBuilder, FakeSkills } from './api-skills';
 import { FakeTasks } from './api-tasks';
+import { FakeUpdates } from './api-updates';
 import { FakeCore, type FakeOptions } from './core';
 
 export { FAKE_SCENARIOS, type FakeScenario, type FakeOptions } from './core';
@@ -62,6 +63,7 @@ export class FakeAlfaClient implements AlfaClient {
   readonly skills: AlfaClient['skills'];
   readonly builder: AlfaClient['builder'];
   readonly health: AlfaClient['health'];
+  readonly updates: AlfaClient['updates'];
 
   constructor(options: FakeOptions = {}) {
     this.core = new FakeCore(options);
@@ -95,6 +97,7 @@ export class FakeAlfaClient implements AlfaClient {
     this.skills = new FakeSkills(core, this.tasks).api();
     this.builder = new FakeBuilder(core).api();
     this.health = new FakeHealth(core).api();
+    this.updates = new FakeUpdates(core).api();
   }
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

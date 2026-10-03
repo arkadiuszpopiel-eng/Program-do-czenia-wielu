@@ -1,12 +1,13 @@
 //! Logika launchera `alfa.exe` (niezależna od Windows — testowana na katalogu tymczasowym):
 //! wybór wersji, uruchomienie `versions\<ver>\alfa-desktop.exe` z **niezmienionymi**
 //! argumentami (URI `alfa://`, ścieżki „Otwórz w Alfie”/„Wyślij do”), obserwacja przez okno
-//! crash-loop, ponowienie albo powrót do poprzedniej wersji.
+//! crash-loop, ponowienie albo powrót do poprzedniej wersji. Nowa wersja (przed `mark_good`)
+//! jest obserwowana dłużej: wyjście z błędem przed potwierdzeniem albo brak `mark_good`
+//! w `confirm_ms` (zawieszenie) = awaria → launcher ją zamyka i uruchamia poprzednią.
 
 use std::ffi::OsString;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::ExitCode;
 use std::time::{Duration, Instant};
 
 use semver::Version;
@@ -14,12 +15,12 @@ use updater_contract::{
     AppExit, CrashPolicy, ExitDecision, Layout, ROOT_DIR, Updater, UpdaterError, VERSIONS_DIR,
 };
 
-use crate::{FsUpdater, UpdaterConfig};
-
 /// Uruchomiony proces aplikacji.
 pub trait RunningApp {
     /// Kod wyjścia, jeśli proces się zakończył (zabity sygnałem → `-1`).
     fn try_wait(&mut self) -> std::io::Result<Option<i32>>;
+    /// Zamyka proces (zawieszona nowa wersja bez `mark_good`, samotest po czasie).
+    fn kill(&mut self) -> std::io::Result<()>;
 }
 
 /// Uruchamianie procesu (w testach — atrapa).
@@ -60,6 +61,10 @@ impl RunningApp for StdChild {
     fn try_wait(&mut self) -> std::io::Result<Option<i32>> {
         Ok(self.0.try_wait()?.map(|s| s.code().unwrap_or(-1)))
     }
+    fn kill(&mut self) -> std::io::Result<()> {
+        self.0.kill()?;
+        self.0.wait().map(|_| ())
+    }
 }
 
 /// Uruchamianie przez `std::process::Command` (argumenty jako `OsString`, bez powłoki).
@@ -84,18 +89,54 @@ pub struct LaunchReport {
 }
 
 const POLL_MS: u64 = 50;
+/// Co ile ms po oknie crash-loop sprawdzać `mark_good` nowej wersji.
+const CONFIRM_POLL_MS: u64 = 1_000;
 
-fn watch(child: &mut dyn RunningApp, clock: &dyn LaunchClock, window_ms: u64) -> AppExit {
+/// Czy `version` czeka na potwierdzenie zdrowego startu (`mark_good`).
+fn awaiting_confirmation(updater: &dyn Updater, version: &Version) -> bool {
+    matches!(updater.state(), Ok(Some(s)) if s.active == *version && s.pending)
+}
+
+fn watch(
+    updater: &dyn Updater,
+    version: &Version,
+    child: &mut dyn RunningApp,
+    clock: &dyn LaunchClock,
+    policy: &CrashPolicy,
+) -> AppExit {
     let start = clock.now_ms();
+    let mut pending = awaiting_confirmation(updater, version);
     loop {
         let after_ms = clock.now_ms().saturating_sub(start);
         match child.try_wait() {
+            Ok(Some(code)) if code != 0 && pending && awaiting_confirmation(updater, version) => {
+                return AppExit::Unconfirmed {
+                    code: Some(code),
+                    after_ms,
+                };
+            }
             Ok(Some(code)) => return AppExit::Exited { code, after_ms },
             // Stanu procesu nie da się odczytać — nie karzemy wersji.
             Err(_) => return AppExit::Running,
-            Ok(None) if after_ms >= window_ms => return AppExit::Running,
-            Ok(None) => clock.sleep_ms(POLL_MS),
+            Ok(None) => {}
         }
+        if after_ms < policy.window_ms {
+            clock.sleep_ms(POLL_MS);
+            continue;
+        }
+        pending = pending && awaiting_confirmation(updater, version);
+        if !pending {
+            return AppExit::Running;
+        }
+        if after_ms >= policy.confirm_ms.max(policy.window_ms) {
+            // Zawieszona nowa wersja: zamykamy ją i wracamy do poprzedniej.
+            let _ = child.kill();
+            return AppExit::Unconfirmed {
+                code: None,
+                after_ms,
+            };
+        }
+        clock.sleep_ms(CONFIRM_POLL_MS);
     }
 }
 
@@ -118,7 +159,7 @@ pub fn run(
         let choice = updater.select_launch()?;
         fell_back |= choice.fallback;
         let exit = match spawner.spawn(&choice.exe, args) {
-            Ok(mut child) => watch(child.as_mut(), clock, policy.window_ms),
+            Ok(mut child) => watch(updater, &choice.version, child.as_mut(), clock, policy),
             Err(e) => AppExit::FailedToStart {
                 reason: e.to_string(),
             },
@@ -159,11 +200,27 @@ pub fn locate_root(exe: Option<PathBuf>, local_app_data: Option<OsString>) -> Pa
     }
 }
 
+/// Katalog instalacji widziany z aplikacji: `<root>` dla `<root>\versions\<ver>\alfa-desktop.exe`
+/// (instalacja przez launcher); inaczej `fallback` (build deweloperski, testy).
+pub fn app_install_root(exe: Option<&Path>, fallback: &Path) -> PathBuf {
+    let root = exe
+        .and_then(Path::parent)
+        .and_then(Path::parent)
+        .filter(|versions| versions.file_name().is_some_and(|n| n == VERSIONS_DIR))
+        .and_then(Path::parent);
+    root.map_or_else(|| fallback.to_path_buf(), Path::to_path_buf)
+}
+
 /// Maksymalny rozmiar `launcher.log` (potem plik zaczyna się od nowa).
 const LOG_MAX: u64 = 64 * 1024;
 
 /// Dopisuje błąd do `<root>\launcher.log` (launcher nie ma konsoli ani okna).
 pub fn log_error(root: &Path, error: &UpdaterError) {
+    log_line(root, &error.to_string());
+}
+
+/// Dopisuje wiersz do `<root>\launcher.log` (≤ 64 KiB, potem od nowa).
+pub fn log_line(root: &Path, message: &str) {
     let path = root.join("launcher.log");
     if std::fs::metadata(&path).is_ok_and(|m| m.len() > LOG_MAX) {
         let _ = std::fs::remove_file(&path);
@@ -173,31 +230,6 @@ pub fn log_error(root: &Path, error: &UpdaterError) {
         .append(true)
         .open(&path)
     {
-        let _ = writeln!(f, "{} {error}", chrono::Utc::now().to_rfc3339());
-    }
-}
-
-/// Punkt wejścia binarium `alfa` (`src/bin/alfa.rs`).
-pub fn main_entry() -> ExitCode {
-    let root = locate_root(
-        std::env::current_exe().ok(),
-        std::env::var_os("LOCALAPPDATA"),
-    );
-    let updater = FsUpdater::new(UpdaterConfig::new(&root));
-    let args: Vec<OsString> = std::env::args_os().skip(1).collect();
-    match updater.and_then(|u| {
-        run(
-            &u,
-            &args,
-            &StdSpawner,
-            &SystemClock::default(),
-            &u.config().crash,
-        )
-    }) {
-        Ok(_) => ExitCode::SUCCESS,
-        Err(e) => {
-            log_error(&root, &e);
-            ExitCode::from(2)
-        }
+        let _ = writeln!(f, "{} {message}", chrono::Utc::now().to_rfc3339());
     }
 }
