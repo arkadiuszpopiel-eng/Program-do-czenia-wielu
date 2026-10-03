@@ -7,7 +7,7 @@ use crate::catalog::FailureKind;
 use crate::classify::Detection;
 use crate::plan::{Risk, key_segment, plain_token, signal_key};
 use crate::ports::RepairContext;
-use crate::step::{RepairStep, is_kernel_module};
+use crate::step::{RepairStep, is_forbidden_key, is_kernel_key, is_kernel_module};
 
 pub(crate) struct Builder<'a> {
     pub(crate) d: &'a Detection,
@@ -37,6 +37,27 @@ impl Builder<'_> {
                 new: Some(new),
             });
         }
+    }
+
+    /// Powrót do rewizji `good` wyłącznie kluczami dozwolonymi Diagnoście (porównaj-i-zamień
+    /// per klucz); klucze Jądra i zakazane zostają — zwraca ich listę (przegląd #2, P2-09).
+    /// `None` — różnicy rewizji nie da się ustalić albo nie ma czego przywrócić.
+    fn revert_allowed_keys(&mut self, cur: &str, good: &str) -> Option<Vec<String>> {
+        let diff = self.ctx.revision_diff(cur, good)?;
+        let (allowed, skipped): (Vec<_>, Vec<_>) = diff
+            .into_iter()
+            .partition(|c| !is_kernel_key(&c.key) && !is_forbidden_key(&c.key));
+        if allowed.is_empty() {
+            return None;
+        }
+        for c in allowed {
+            self.steps.push(RepairStep::SetConfig {
+                key: c.key,
+                old: c.current,
+                new: c.target,
+            });
+        }
+        Some(skipped.into_iter().map(|c| c.key).collect())
     }
 
     fn restart(&mut self, module: &str) {
@@ -89,15 +110,21 @@ pub(crate) fn build(b: &mut Builder<'_>) {
             ));
         }
         FailureKind::ModuleStartFailure => {
-            match (b.ctx.current_revision(), b.ctx.last_good_revision()) {
-                (Some(cur), Some(good)) if cur != good => {
-                    b.steps.push(RepairStep::RollbackConfig {
-                        from_revision: cur,
-                        to_revision: good,
-                    });
-                    b.because(Risk::Medium, format!("Moduł {m} nie startuje od zmiany konfiguracji — wracam do ostatniej dobrej rewizji."));
+            let reverted = match (b.ctx.current_revision(), b.ctx.last_good_revision()) {
+                (Some(cur), Some(good)) if cur != good => b.revert_allowed_keys(&cur, &good),
+                _ => None,
+            };
+            match reverted {
+                Some(skipped) => {
+                    b.because(Risk::Medium, format!("Moduł {m} nie startuje od zmiany konfiguracji — przywracam ustawienia z ostatniej dobrej rewizji (tylko klucze dozwolone Diagnoście)."));
+                    if !skipped.is_empty() {
+                        b.human(format!(
+                            "Nie przywróciłam ustawień poza zasięgiem Diagnosty ({}) — zmieniasz je tylko Ty (Ustawienia albo Broker-UI).",
+                            skipped.join(", ")
+                        ));
+                    }
                 }
-                _ => {
+                None => {
                     let key = b.key("enabled_key", format!("modules.{ms}.enabled"));
                     b.set(&key, json!(false));
                     b.because(Risk::Medium, format!("Moduł {m} nie startuje, a konfiguracja się nie zmieniła — wyłączam go do czasu diagnozy (reszta działa)."));

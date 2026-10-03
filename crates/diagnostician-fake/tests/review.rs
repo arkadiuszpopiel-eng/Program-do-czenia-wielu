@@ -107,3 +107,64 @@ async fn signal_fallback_value_is_a_plain_token() {
         "poprawny klucz modułu i zwykła wartość — naprawa działa"
     );
 }
+
+/// P2-09: „ostatnia dobra rewizja” przywracała **całą** konfigurację — także klucze zakazane
+/// Diagnoście (prywatność, autonomia, budżety), które właściciel zmienił po tej rewizji. Awaria
+/// modułu (tu: zły silnik TTS) cofała zaostrzenie prywatności i podniesiony próg budżetu.
+#[tokio::test]
+async fn rollback_never_restores_keys_forbidden_to_diagnostician() {
+    use diagnostician_contract::{ModuleCondition, RepairStep};
+    use diagnostician_fake::{ChaosSetup, ChaosWorld, chaos_diagnostician};
+
+    let clock = Arc::new(ManualClock::new(1_000));
+    let world = ChaosWorld::baseline(clock.clone());
+    world.mutate(|st| {
+        // Ostatnia dobra rewizja: luźniejsze ustawienia bezpieczeństwa.
+        st.config
+            .insert("privacy.cloud_allowed".into(), json!(true));
+        st.config.insert("autonomy.level".into(), json!("L4"));
+        st.config.insert("budgets.monthly_pln".into(), json!(500));
+        st.revisions.insert("r1".into(), st.config.clone());
+        // Właściciel zaostrza; równocześnie psuje się moduł TTS.
+        st.config
+            .insert("privacy.cloud_allowed".into(), json!(false));
+        st.config.insert("autonomy.level".into(), json!("L2"));
+        st.config.insert("budgets.monthly_pln".into(), json!(50));
+        st.config
+            .insert("voice.tts.engine".into(), json!("nieznany"));
+        st.revisions.insert("r2".into(), st.config.clone());
+        st.revision = "r2".into();
+    });
+    let policy = RepairPolicy {
+        autonomy: RepairAutonomy::AutoMediumRisk,
+        ..RepairPolicy::default()
+    };
+    let (_host, diag) = chaos_diagnostician(ChaosSetup {
+        world: world.clone(),
+        clock,
+        policy,
+    });
+    diag.ingest(Signal::ModuleState {
+        module: "voice-tts".into(),
+        condition: ModuleCondition::Failed { restarts: 3 },
+        detail: "nieznany silnik".into(),
+    })
+    .await;
+    diag.scan().await;
+    let config = world.snapshot().config;
+    assert_eq!(config["privacy.cloud_allowed"], json!(false), "prywatność");
+    assert_eq!(config["autonomy.level"], json!("L2"), "autonomia");
+    assert_eq!(config["budgets.monthly_pln"], json!(50), "budżet");
+    assert_ne!(
+        config.get("voice.tts.engine"),
+        Some(&json!("nieznany")),
+        "dozwolony klucz modułu naprawiony"
+    );
+    assert!(
+        world
+            .env_log()
+            .iter()
+            .all(|s| !matches!(s, RepairStep::RollbackConfig { .. })),
+        "bez przywracania całej rewizji"
+    );
+}

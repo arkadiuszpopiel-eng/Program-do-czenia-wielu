@@ -29,7 +29,8 @@ use windows::Win32::UI::Accessibility::{
 use windows::core::BSTR;
 
 use super::UiaCtx;
-use crate::win::{hwnd_of, process_image, rect_of, root_of, win_error, window_pid};
+use crate::links::{ProcessTree, check_pid, pid_protected, window_target};
+use crate::win::{hwnd_of, rect_of, win_error, window_pid};
 
 /// Limit węzłów przy wyszukiwaniu i rozwiązywaniu odwołań.
 const SEARCH_LIMIT: usize = 5_000;
@@ -183,12 +184,12 @@ pub(super) fn window_root(
     window: WindowId,
     op: &str,
 ) -> Result<IUIAutomationElement, GuiError> {
-    let hwnd = root_of(hwnd_of(window));
-    let pid = window_pid(hwnd);
-    if pid == 0 {
+    let target = window_target(hwnd_of(window), &ProcessTree::snapshot());
+    let hwnd = target.root;
+    if window_pid(hwnd) == 0 {
         return Err(GuiError::ElementNotFound(format!("okno {}", window.0)));
     }
-    guard.check(pid, &process_image(pid), op)?;
+    target.check(guard, op)?;
     // SAFETY: element okna z pamięcią podręczną (wątek MTA tego `automation`).
     unsafe {
         ctx.automation
@@ -214,6 +215,7 @@ fn walk(
     mut visit: impl FnMut(&UiaNode) -> bool,
 ) -> bool {
     let window_pid = window_pid(hwnd_of(window));
+    let processes = ProcessTree::snapshot();
     let mut images: BTreeMap<u32, bool> = BTreeMap::new();
     let mut stack = vec![(root, 0u16)];
     let mut seen = 0usize;
@@ -228,7 +230,7 @@ fn walk(
         let protected = node.pid != window_pid
             && *images
                 .entry(node.pid)
-                .or_insert_with(|| guard.is_protected(node.pid, &process_image(node.pid)));
+                .or_insert_with(|| pid_protected(guard, &processes, node.pid));
         if protected {
             continue;
         }
@@ -356,7 +358,7 @@ pub(crate) fn resolve(
     }
     let window_pid = window_pid(hwnd_of(element.window));
     if node.pid != window_pid {
-        guard.check(node.pid, &process_image(node.pid), "element UIA")?;
+        check_pid(guard, &ProcessTree::snapshot(), node.pid, "element UIA")?;
     }
     Ok((el, node))
 }

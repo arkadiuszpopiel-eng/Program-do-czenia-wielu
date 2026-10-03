@@ -80,14 +80,20 @@ impl<H: DiagHost> DiagnosticianCore<H> {
     /// Wykonanie poza obszarem Jądra: kroki przez `RepairEnv`, weryfikacja, cofnięcie przy porażce.
     pub(crate) async fn execute(&self, id: RepairId) -> Option<RepairRecord> {
         let r = self.get(id)?;
-        // Obrona w głąb: obszar Jądra i klucze zakazane nigdy nie idą przez własny port Diagnosty.
+        // Obrona w głąb: obszar Jądra i klucze zakazane nigdy nie idą przez własny port Diagnosty;
+        // przywrócenie całej rewizji konfiguracji też nie (objęłoby klucze zakazane — P2-09).
         let bad = r
             .proposal
             .steps
             .iter()
             .filter_map(RepairStep::config_key)
             .find(|k| is_kernel_key(k) || is_forbidden_key(k));
-        if r.proposal.kernel_area || bad.is_some() {
+        let whole_revision = r
+            .proposal
+            .steps
+            .iter()
+            .any(|s| matches!(s, RepairStep::RollbackConfig { .. }));
+        if r.proposal.kernel_area || bad.is_some() || whole_revision {
             self.needs_human(
                 id,
                 "naprawa poza zasięgiem Diagnosty — wymaga Brokera".into(),

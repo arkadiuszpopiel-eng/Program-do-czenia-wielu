@@ -3,14 +3,17 @@
 //! współrzędnych bezwzględnych pulpitu wirtualnego (proces musi być per-monitor DPI aware —
 //! powłoka Tauri jest), cel paczki = okno z fokusem / okno pod punktem tuż przed wysłaniem.
 //! UIPI po cichu odrzuca wejście do okien o wyższej integralności (Broker-UI) — dodatkowa
-//! ochrona poza strażnikiem.
+//! ochrona poza strażnikiem. Cel paczki ma procesy powiązane (WebView2 Alfy, właściciel, treść
+//! UWP — P2-01), a przed paczką wpisującą treść element z fokusem jest czytany przez UIA
+//! (`IsPassword`; błąd albo limit czasu = fokus nieznany → odmowa, P2-03).
 
 #![allow(unsafe_code)]
 
 use std::mem::size_of;
 
 use platform_contract::{
-    GuiError, InputBackend, MouseButton, PlatformError, RawInput, TargetWindow, is_extended_vk,
+    FocusedField, GuiError, InputBackend, MouseButton, PlatformError, RawInput, TargetWindow,
+    is_extended_vk,
 };
 use windows::Win32::Foundation::POINT;
 use windows::Win32::UI::Input::KeyboardAndMouse::{
@@ -27,7 +30,9 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 
 use crate::hook::ActivityMonitor;
-use crate::win::{last_error, now_ms, target_of};
+use crate::links::target_of;
+use crate::uia::{self, UiaHost};
+use crate::win::{last_error, now_ms};
 
 /// Znacznik w `dwExtraInfo` wejścia Alfy (diagnostyka).
 const ALFA_INPUT_MARK: usize = 0xA1FA_0001;
@@ -35,6 +40,10 @@ const ALFA_INPUT_MARK: usize = 0xA1FA_0001;
 /// Backend `SendInput` + hook aktywności.
 pub(crate) struct WinInputBackend<'a> {
     pub(crate) activity: &'a ActivityMonitor,
+    /// Wątek UIA (element z fokusem przed paczką wpisującą treść).
+    pub(crate) uia: &'a UiaHost,
+    /// Limit odczytu fokusu (ms).
+    pub(crate) uia_ms: u64,
 }
 
 fn keyboard(vk: u16, scan: u16, flags: KEYBD_EVENT_FLAGS) -> INPUT {
@@ -160,6 +169,14 @@ impl InputBackend for WinInputBackend<'_> {
     fn target_at(&self, x: i32, y: i32) -> Option<TargetWindow> {
         // SAFETY: zapytanie o okno pod punktem.
         target_of(unsafe { WindowFromPoint(POINT { x, y }) })
+    }
+
+    fn focused_field(&self) -> FocusedField {
+        self.uia
+            .call("element z fokusem", self.uia_ms, |ctx| {
+                Ok(uia::focused_field(ctx))
+            })
+            .unwrap_or(FocusedField::Unknown)
     }
 
     fn inject(&self, events: &[RawInput]) -> Result<(), GuiError> {

@@ -1,22 +1,67 @@
-//! Odczyt treści przez UIA: `TextPattern` tylko do odczytu (odmowa dla pola hasła) i prostokąty
-//! widocznych pól haseł (maskowanie zrzutów).
+//! Odczyt treści przez UIA: `TextPattern` tylko do odczytu (odmowa dla pola hasła), prostokąty
+//! widocznych pól haseł (maskowanie zrzutów) i element z fokusem klawiatury (`GetFocusedElement`
+//! + `IsPassword` — reguła „agentka nie wpisuje haseł”, przegląd #2, P2-03).
 
 #![allow(unsafe_code)]
 
 use std::time::Instant;
 
 use platform_contract::{
-    ElementRef, GuiError, ScreenRect, TargetGuard, UiaPattern, UiaText, WindowId,
+    ElementRef, FocusedField, GuiError, ScreenRect, TargetGuard, UiaNode, UiaPattern, UiaText,
+    WindowId,
 };
 use windows::Win32::System::Variant::VARIANT;
 use windows::Win32::UI::Accessibility::{
     IUIAutomationTextPattern, TreeScope_Descendants, UIA_IsOffscreenPropertyId,
     UIA_IsPasswordPropertyId, UIA_TextPatternId,
 };
+use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
 
 use super::UiaCtx;
-use super::read::{flag, resolve, window_root};
-use crate::win::{rect_of, win_error};
+use super::read::{flag, node_of, resolve, window_root};
+use crate::links::{ProcessTree, check_pid};
+use crate::win::{hwnd_of, rect_of, root_of, win_error, window_pid};
+
+/// Element z fokusem klawiatury w oknie (`None` — okno nie jest na pierwszym planie albo
+/// element bez `RuntimeId`); okno i proces elementu sprawdzane strażnikiem.
+pub(crate) fn focused(
+    ctx: &mut UiaCtx,
+    guard: &TargetGuard,
+    window: WindowId,
+) -> Result<Option<UiaNode>, GuiError> {
+    window_root(ctx, guard, window, "element z fokusem")?;
+    let root = root_of(hwnd_of(window));
+    // SAFETY: odczyt okna pierwszego planu.
+    let foreground = unsafe { GetForegroundWindow() };
+    if foreground.is_invalid() || root_of(foreground) != root {
+        return Ok(None);
+    }
+    // SAFETY: element z fokusem z pamięcią podręczną (wątek MTA tego `automation`).
+    let el = unsafe { ctx.automation.GetFocusedElementBuildCache(&ctx.request) }
+        .map_err(|e| win_error("GetFocusedElement", &e))?;
+    let Some(node) = node_of(&el, window, 0) else {
+        return Ok(None);
+    };
+    if node.pid != window_pid(root) {
+        check_pid(
+            guard,
+            &ProcessTree::snapshot(),
+            node.pid,
+            "element z fokusem",
+        )?;
+    }
+    Ok(Some(node))
+}
+
+/// Czy element z fokusem (globalnie — paczka i tak trafia do okna pierwszego planu, sprawdzonego
+/// osobno) jest polem hasła; błąd = nieznany.
+pub(crate) fn focused_field(ctx: &mut UiaCtx) -> FocusedField {
+    // SAFETY: element z fokusem z pamięcią podręczną (wątek MTA tego `automation`).
+    let found = unsafe { ctx.automation.GetFocusedElementBuildCache(&ctx.request) }
+        .ok()
+        .and_then(|el| node_of(&el, WindowId(0), 0));
+    FocusedField::from_lookup(&Ok(found))
+}
 
 /// Tekst z `TextPattern` (tylko odczyt; odmowa dla pola hasła).
 pub(crate) fn read_text(

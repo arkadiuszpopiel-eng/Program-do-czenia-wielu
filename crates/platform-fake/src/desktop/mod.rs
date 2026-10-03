@@ -4,57 +4,32 @@
 //! i `ScreenCapturePort` z tymi samymi regułami co implementacja Windows (logika z kontraktu).
 //!
 //! Każde zdarzenie, które **faktycznie** dotarło do okna (wejście, akcja UIA, zmiana okna), jest
-//! zapisywane w [`GuiRecord`] z PID-em i obrazem procesu okna — testy właściwościowe liczą
-//! akcje wobec okien chronionych na podstawie skutków, nie deklaracji.
+//! zapisywane w [`GuiRecord`] z PID-em i obrazem procesu okna oraz procesami powiązanymi — testy
+//! właściwościowe liczą akcje wobec okien chronionych na podstawie skutków, nie deklaracji.
+//! Procesy (rodzice, okna-własności, ramki UWP, element z fokusem) modeluje `procs` (przegląd #2).
 
 mod capture;
 mod input;
+mod procs;
 mod uia;
 mod windows;
 
+use std::collections::BTreeMap;
 use std::sync::{Mutex, MutexGuard};
 
 use platform_contract::{
-    DesktopWindow, ElementRef, GuiError, InputPacing, MonitorInfo, RgbaImage, ScreenRect,
-    TargetGuard, UiaNode, WindowId, WindowState,
+    DesktopWindow, ElementRef, GuiError, InputPacing, MonitorInfo, ProcessLink, RgbaImage,
+    ScreenRect, TargetGuard, UiaNode, WindowId, WindowState,
 };
 
 pub use capture::{DESKTOP_COLOR, PASSWORD_COLOR};
+pub use procs::{FAKE_FRAME_HOST, FakeWindow};
 pub use uia::FakeElement;
+
+use procs::FakeProc;
 
 /// Bazowy PID okien atrapy (poza zakresem PID-ów Linuksa i Windows w testach).
 pub const FAKE_PID_BASE: u32 = 3_000_000_000;
-
-/// Okno do dodania.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FakeWindow {
-    /// Tytuł.
-    pub title: String,
-    /// Obraz procesu.
-    pub image: String,
-    /// Prostokąt.
-    pub rect: ScreenRect,
-    /// Proces podniesiony.
-    pub elevated: bool,
-    /// Kolor wypełnienia na zrzucie.
-    pub color: [u8; 4],
-    /// Okno chronione przed przechwyceniem (czarna klatka).
-    pub capture_blocked: bool,
-}
-
-impl FakeWindow {
-    /// Okno o tytule, obrazie i prostokącie (kolor szary).
-    pub fn new(title: &str, image: &str, rect: ScreenRect) -> Self {
-        Self {
-            title: title.into(),
-            image: image.into(),
-            rect,
-            elevated: false,
-            color: [200, 200, 200, 255],
-            capture_blocked: false,
-        }
-    }
-}
 
 /// Rodzaj skutku zapisanego w dzienniku.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,6 +51,8 @@ pub struct GuiRecord {
     pub pid: u32,
     /// Obraz procesu okna.
     pub image: String,
+    /// Procesy powiązane z oknem w chwili skutku (przodkowie, właściciel, treść UWP).
+    pub links: Vec<ProcessLink>,
     /// Rodzaj.
     pub kind: GuiRecordKind,
 }
@@ -87,6 +64,8 @@ pub enum ScriptEvent {
     PhysicalInput,
     /// Okno wyskakuje na wierzch i przejmuje fokus (np. Broker-UI).
     Raise(WindowId),
+    /// Fokus klawiatury przechodzi do pierwszego pola hasła okna.
+    FocusPassword(WindowId),
 }
 
 #[derive(Debug)]
@@ -97,6 +76,8 @@ struct Win {
     restore: ScreenRect,
     elements: Vec<FakeElement>,
     typed: Vec<u16>,
+    owner: Option<WindowId>,
+    frame: Option<u32>,
 }
 
 #[derive(Debug)]
@@ -113,6 +94,9 @@ struct State {
     password_check_fails: Vec<WindowId>,
     last_capture: Option<RgbaImage>,
     next_id: u64,
+    procs: BTreeMap<u32, FakeProc>,
+    next_pid: u32,
+    during_capture: Vec<FakeWindow>,
 }
 
 impl State {
@@ -166,10 +150,25 @@ impl State {
                 window: id,
                 pid: w.info.pid,
                 image: w.info.image.clone(),
+                links: self.links(w),
                 kind,
             };
             self.records.push(r);
         }
+    }
+
+    /// Przenosi fokus klawiatury na element okna (pozostałe tracą fokus).
+    fn focus_element(&mut self, window: WindowId, pick: impl Fn(&FakeElement) -> bool) -> bool {
+        let Ok(w) = self.win_mut(window) else {
+            return false;
+        };
+        let Some(i) = w.elements.iter().position(pick) else {
+            return false;
+        };
+        for (j, e) in w.elements.iter_mut().enumerate() {
+            e.node.focused = j == i;
+        }
+        true
     }
 }
 
@@ -216,6 +215,9 @@ impl FakeDesktop {
                 password_check_fails: Vec::new(),
                 last_capture: None,
                 next_id: 1,
+                procs: BTreeMap::new(),
+                next_pid: FAKE_PID_BASE + 1,
+                during_capture: Vec::new(),
             }),
             guard,
             pacing: InputPacing::default(),
@@ -226,41 +228,38 @@ impl FakeDesktop {
         self.state.lock().unwrap_or_else(|p| p.into_inner())
     }
 
-    /// Dodaje okno na wierzch (z fokusem, jeśli `focus`).
+    /// Dodaje okno na wierzch (z fokusem, jeśli `focus`). Proces okna: istniejący (`process`)
+    /// albo nowy (z rodzicem `parent`); ramka UWP dostaje proces hosta i proces treści.
     pub fn add_window(&self, spec: FakeWindow, focus: bool) -> WindowId {
-        let mut s = self.lock();
-        let id = WindowId(s.next_id);
-        s.next_id += 1;
-        let pid = FAKE_PID_BASE + u32::try_from(id.0).unwrap_or(0);
-        let info = DesktopWindow {
-            id,
-            title: spec.title,
-            class_name: "FakeWindow".into(),
-            pid,
-            protected: self.guard.is_protected(pid, &spec.image),
-            image: spec.image,
-            rect: spec.rect,
-            monitor: 0,
-            dpi: 96,
-            state: WindowState::Normal,
-            focused: false,
-            z_order: 0,
-            elevated: spec.elevated,
-        };
-        let current = s.windows.iter().find(|w| w.info.focused).map(|w| w.info.id);
-        s.windows.insert(
-            0,
-            Win {
-                info,
-                color: spec.color,
-                capture_blocked: spec.capture_blocked,
-                restore: spec.rect,
-                elements: Vec::new(),
-                typed: Vec::new(),
-            },
-        );
-        s.renumber(if focus { Some(id) } else { current });
-        id
+        self.lock().add_window(spec, focus)
+    }
+
+    /// Okno pojawi się w trakcie najbliższego zrzutu — po wyliczeniu okien, przed klatką (każde
+    /// wywołanie = jedno okno przy jednej próbie przechwycenia; TOCTOU maskowania, P2-02).
+    pub fn show_during_capture(&self, spec: FakeWindow) {
+        self.lock().during_capture.push(spec);
+    }
+
+    /// Nowy proces (bez okna) — np. proces przeglądarki WebView2 jako dziecko Alfy; zwraca PID.
+    pub fn add_process(&self, image: &str, parent: Option<u32>) -> u32 {
+        self.lock().spawn(image, parent)
+    }
+
+    /// Przenosi fokus klawiatury na element (np. pole hasła); `false`, gdy nie istnieje.
+    pub fn focus_element(&self, element: &ElementRef) -> bool {
+        self.lock()
+            .focus_element(element.window, |e| e.node.element == *element)
+    }
+
+    /// Okno z ochroną policzoną teraz (procesy powiązane z przodkami).
+    fn described(&self, s: &State, w: &Win) -> DesktopWindow {
+        s.info(w, &self.guard)
+    }
+
+    /// Strażnik wobec okna: proces okna i wszystkie procesy powiązane (stan bieżący).
+    fn check_win(&self, s: &State, w: &Win, what: &str) -> Result<(), GuiError> {
+        self.guard
+            .check_window(w.info.pid, &w.info.image, &s.links(w), what)
     }
 
     /// Użytkownik dotyka myszy/klawiatury teraz (wejście fizyczne, niewstrzyknięte).

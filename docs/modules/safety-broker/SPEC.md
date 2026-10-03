@@ -64,3 +64,7 @@ RAM ≤ 15 MB; `verify` ≤ 0,2 ms; `issue` bez zatwierdzenia ≤ 5 ms; zapis Au
 - Weryfikacja PID-em ma okno wyścigu przy przekazaniu uchwytu potoku i ponownym użyciu PID — obrona: MAC dla Broker-UI, wysoka integralność; `ImpersonateNamedPipeClient` jako drugie źródło — SPEC v2.
 - Źródło polecenia (`CommandOrigin`) deklaruje jądro; Broker utwardza je własnym taintem — pełna niezależność po przeniesieniu `voice-cmd` → Broker (F5).
 - Strażnik poleceń powłoki jest leksykalny (obrona w głąb obok ograniczonego tokenu procesu); polecenia zakodowane (`-EncodedCommand`, `iex`) blokowane jako nieczytelne.
+
+## Przegląd bezpieczeństwa #2 (2026-10) — zależności od Brokera (**do potwierdzenia przez człowieka**)
+- **P2-07:** `agent-runtime` traktuje `SessionSecurity` Brokera jako źródło prawdy skażenia sesji (`BrokerSessionTaint`) — semantyka Brokera bez zmian (taint monotoniczny do końca sesji). Reset skażenia w runtime wymaga potwierdzenia właściciela nie-głosem, ale nie zdejmuje taintu Brokera; decyzja: czy Broker ma dostać jawny reset z dowodem fizycznego wejścia (Broker-UI), czy reset = nowa sesja (stan obecny, bezpieczniejszy).
+- **P-07 (przegląd #1):** Broker-UI startuje z jawną listą dziedziczonych uchwytów (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`) — `platform-windows-kernel-impl/src/win_launch.rs`.

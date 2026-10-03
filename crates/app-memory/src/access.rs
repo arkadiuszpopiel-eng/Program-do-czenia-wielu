@@ -2,12 +2,17 @@
 //! (PLAN §9.5: `memory: { scope, retain }` w manifeście roli). Do czasu pola `memory` w rolach
 //! `personas` zakresy wynikają z tabeli ról poniżej (wariant ostrożny: zapis poza sesją i własną
 //! pamięcią agentki tylko dla Strażniczki — i nawet wtedy jako wpis oczekujący na zgodę).
+//!
+//! Przegląd #2, P2-06 (wariant ściślejszy): narzędzia pamięci w przebiegu dostają zakresy **roli
+//! bieżącego przebiegu** (`ToolCtx::holder.role`) ∩ role persony w obsadzie — nie sumę wszystkich
+//! ról persony. Badaczka (treść niezaufana) zostaje w sesji, nawet gdy ta sama persona gra też
+//! Krytyczkę czy Myślicielkę. Rola spoza obsady albo jej brak = tylko sesja (fail-closed).
 
 use std::collections::BTreeSet;
 use std::sync::Arc;
 
 use memory_contract::{AgentAccess, AgentId, ScopeGrant, SessionId};
-use personas_contract::{PersonaId, Personas};
+use personas_contract::{PersonaId, Personas, RoleId};
 use sessions_contract::SessionCatalog;
 
 use crate::ids::project_slug;
@@ -48,27 +53,71 @@ impl RoleAccess {
         meta.project.as_ref().and_then(|p| project_slug(&p.0))
     }
 
-    /// Dostęp agentki: suma zakresów jej ról w obsadzie sesji (bez ról — tylko sesja).
+    /// Dostęp agentki w rozmowie (kontekst pamięci czatu): suma zakresów jej ról w obsadzie
+    /// sesji (bez ról — tylko sesja).
     pub fn access(&self, session: &SessionId, agent: &str) -> AgentAccess {
         let roles = self.personas.cast(session).roles_of(&PersonaId::new(agent));
-        let mut read = BTreeSet::new();
-        let mut write = BTreeSet::new();
-        read.insert(grant_key(ScopeGrant::Session));
-        for role in &roles {
-            let (r, w) = role_grants(role.as_str());
-            read.extend(r.into_iter().map(grant_key));
-            write.extend(w.into_iter().map(grant_key));
-        }
-        if roles.is_empty() {
-            write.insert(grant_key(ScopeGrant::Session));
-        }
+        self.build(session, agent, sum_grants(&roles))
+    }
+
+    /// Dostęp narzędzi pamięci w przebiegu: rola przebiegu ∩ role persony (P2-06).
+    pub fn access_for_run(
+        &self,
+        session: &SessionId,
+        agent: &str,
+        run_role: Option<&str>,
+    ) -> AgentAccess {
+        let roles = self.personas.cast(session).roles_of(&PersonaId::new(agent));
+        self.build(session, agent, run_grants(&roles, run_role))
+    }
+
+    fn build(
+        &self,
+        session: &SessionId,
+        agent: &str,
+        (read, write): (Vec<ScopeGrant>, Vec<ScopeGrant>),
+    ) -> AgentAccess {
         AgentAccess {
             agent: AgentId::new(agent),
             session: session.clone(),
             project: self.project_of(session),
-            read: read.into_iter().map(grant_of).collect(),
-            write: write.into_iter().map(grant_of).collect(),
+            read,
+            write,
         }
+    }
+}
+
+/// Suma zakresów ról (sesja zawsze do odczytu; bez ról — sesja także do zapisu).
+pub fn sum_grants(roles: &BTreeSet<RoleId>) -> (Vec<ScopeGrant>, Vec<ScopeGrant>) {
+    let mut read = BTreeSet::new();
+    let mut write = BTreeSet::new();
+    read.insert(grant_key(ScopeGrant::Session));
+    for role in roles {
+        let (r, w) = role_grants(role.as_str());
+        read.extend(r.into_iter().map(grant_key));
+        write.extend(w.into_iter().map(grant_key));
+    }
+    if roles.is_empty() {
+        write.insert(grant_key(ScopeGrant::Session));
+    }
+    (
+        read.into_iter().map(grant_of).collect(),
+        write.into_iter().map(grant_of).collect(),
+    )
+}
+
+/// Zakresy przebiegu: tylko rola bieżącego przebiegu, o ile persona ją gra w obsadzie; inaczej
+/// (rola nieznana, spoza obsady, brak roli) — wyłącznie sesja (P2-06, wariant ściślejszy).
+pub fn run_grants(
+    roles: &BTreeSet<RoleId>,
+    run_role: Option<&str>,
+) -> (Vec<ScopeGrant>, Vec<ScopeGrant>) {
+    match run_role.map(str::trim) {
+        Some(role) if roles.iter().any(|r| r.as_str() == role) => {
+            let one: BTreeSet<RoleId> = [RoleId::new(role)].into();
+            sum_grants(&one)
+        }
+        _ => (vec![ScopeGrant::Session], vec![ScopeGrant::Session]),
     }
 }
 
@@ -108,5 +157,24 @@ mod tests {
         for k in 0..4 {
             assert_eq!(grant_key(grant_of(k)), k);
         }
+    }
+
+    /// P2-06: Gama gra Badaczkę, Krytyczkę i Myślicielkę — w przebiegu Badaczki (treść
+    /// niezaufana) suma ról dawała odczyt projektu i własnej pamięci oraz zapis do niej.
+    #[test]
+    fn run_role_not_sum_of_persona_roles() {
+        let gama: BTreeSet<RoleId> = ["researcher", "critic", "thinker"]
+            .into_iter()
+            .map(RoleId::new)
+            .collect();
+        let (sum_read, sum_write) = sum_grants(&gama);
+        assert!(sum_read.contains(&ScopeGrant::Project) && sum_write.contains(&ScopeGrant::Agent));
+        let only_session = (vec![ScopeGrant::Session], vec![ScopeGrant::Session]);
+        assert_eq!(run_grants(&gama, Some("researcher")), only_session);
+        let (r, w) = run_grants(&gama, Some("critic"));
+        assert!(r.contains(&ScopeGrant::Project) && w.is_empty());
+        // Rola spoza obsady persony, brak roli — tylko sesja.
+        assert_eq!(run_grants(&gama, Some("keeper")), only_session);
+        assert_eq!(run_grants(&gama, None), only_session);
     }
 }

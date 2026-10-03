@@ -88,6 +88,13 @@ impl Backend {
     ) -> Result<UiaNode, GuiError> {
         unsupported("UIA")
     }
+    pub(crate) fn uia_focused(
+        &self,
+        _: &GuiConfig,
+        _: WindowId,
+    ) -> Result<Option<UiaNode>, GuiError> {
+        unsupported("UIA")
+    }
     pub(crate) fn uia_password_rects(
         &self,
         _: &GuiConfig,

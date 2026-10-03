@@ -102,6 +102,13 @@ impl FakeElement {
         self
     }
 
+    /// Element ma fokus klawiatury (w oknie z fokusem — `UiaPort::focused`, wpisywanie).
+    #[must_use]
+    pub fn focused(mut self) -> Self {
+        self.node.focused = true;
+        self
+    }
+
     /// Element dostarczany przez inny proces niż okno (np. osadzony WebView).
     #[must_use]
     pub fn foreign_pid(mut self, pid: u32) -> Self {
@@ -114,6 +121,40 @@ impl FakeElement {
         self.node.pid = self.foreign_pid.unwrap_or(window_pid);
         self
     }
+}
+
+/// Element z fokusem w oknie (UIA zwraca element samego okna, gdy fokus nie jest w żadnym
+/// elemencie potomnym); `None`, gdy okno nie ma fokusu klawiatury.
+pub(super) fn focused_in(w: &super::Win) -> Option<UiaNode> {
+    if !w.info.focused {
+        return None;
+    }
+    let node = w.elements.iter().rfind(|e| e.node.focused).map_or_else(
+        || UiaNode {
+            element: ElementRef {
+                window: w.info.id,
+                runtime_id: vec![42, 0],
+            },
+            depth: 0,
+            pid: w.info.pid,
+            role: "window".into(),
+            name: w.info.title.clone(),
+            automation_id: String::new(),
+            class_name: w.info.class_name.clone(),
+            value: None,
+            is_password: false,
+            enabled: true,
+            offscreen: false,
+            focused: true,
+            toggle: None,
+            expand: None,
+            selected: None,
+            rect: w.info.rect,
+            patterns: Vec::new(),
+        },
+        |e| e.node.clone(),
+    );
+    Some(node.redacted())
 }
 
 fn timeout(op: &str) -> GuiError {
@@ -135,7 +176,7 @@ impl FakeDesktop {
             return Err(timeout(op));
         }
         let w = s.win(window)?;
-        self.guard.check(w.info.pid, &w.info.image, op)?;
+        self.check_win(s, w, op)?;
         Ok(w)
     }
 
@@ -249,6 +290,12 @@ impl UiaPort for FakeDesktop {
         let after = n.clone().redacted();
         s.record(element.window, GuiRecordKind::Uia(action.name().into()));
         Ok(after)
+    }
+
+    fn focused(&self, window: WindowId) -> Result<Option<UiaNode>, GuiError> {
+        let s = self.lock();
+        let w = self.uia_window(&s, window, "element z fokusem")?;
+        Ok(focused_in(w))
     }
 
     fn password_rects(&self, window: WindowId) -> Result<Vec<ScreenRect>, GuiError> {

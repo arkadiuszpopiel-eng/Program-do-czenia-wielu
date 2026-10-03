@@ -13,6 +13,17 @@ use crate::report::HealthReport;
 use crate::signal::Signal;
 use crate::step::RepairStep;
 
+/// Różnica jednego klucza między rewizjami konfiguracji.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ConfigChange {
+    /// Klucz.
+    pub key: String,
+    /// Wartość w rewizji bieżącej (`None` — brak klucza).
+    pub current: Option<Value>,
+    /// Wartość w rewizji docelowej (`None` — brak klucza).
+    pub target: Option<Value>,
+}
+
 /// Fakty o systemie potrzebne planiście (tylko odczyt).
 pub trait RepairContext: Send + Sync {
     /// Bieżący czas (ms).
@@ -23,6 +34,13 @@ pub trait RepairContext: Send + Sync {
     fn current_revision(&self) -> Option<String>;
     /// Ostatnia dobra rewizja (oznaczona po zdrowym starcie).
     fn last_good_revision(&self) -> Option<String>;
+    /// Klucze różniące rewizję `from` od `to` (przegląd #2, P2-09: powrót do ostatniej dobrej
+    /// rewizji tylko kluczami dozwolonymi Diagnoście). Domyślnie `None` — różnicy nie da się
+    /// ustalić, więc rewizji się nie przywraca.
+    fn revision_diff(&self, from: &str, to: &str) -> Option<Vec<ConfigChange>> {
+        let _ = (from, to);
+        None
+    }
     /// Najnowsza kopia zapasowa pliku.
     fn latest_backup(&self, path: &str) -> Option<String>;
     /// Ścieżka kwarantanny dla pliku (unikalna, nieistniejąca).

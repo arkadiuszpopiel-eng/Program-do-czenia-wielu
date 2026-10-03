@@ -3,7 +3,9 @@
 use std::collections::BTreeMap;
 use std::sync::{Mutex, MutexGuard};
 
-use platform_contract::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, PlatformError};
+use platform_contract::{
+    Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, HotkeyPressOrigin, PlatformError,
+};
 
 #[derive(Debug, Default)]
 struct State {
@@ -61,6 +63,12 @@ impl FakeHotkeys {
             }
             None => false,
         }
+    }
+
+    /// Symuluje kombinację wysłaną wejściem wstrzykniętym (`SendInput`) — jak Windows (przegląd
+    /// #2, P2-04): skróty Alfy jej nie przyjmują; zdarzenie powstaje tylko dla kill-switcha.
+    pub fn press_injected(&self, hotkey: Hotkey) -> bool {
+        HotkeyPressOrigin::Injected.admits(&hotkey, false) && self.press_combo(hotkey)
     }
 
     fn push(&self, id: HotkeyId, pressed: bool) -> Result<(), PlatformError> {
@@ -133,6 +141,10 @@ mod tests {
         hk.release(id).unwrap();
         assert!(hk.press_combo(ctrl_alt(Key::Space)));
         assert!(!hk.press_combo(ctrl_alt(Key::Letter('B'))));
+        assert!(
+            !hk.press_injected(ctrl_alt(Key::Space)),
+            "wstrzyknięte — ignorowane"
+        );
         let events = hk.drain_events();
         assert_eq!(events.len(), 3);
         assert!(events[0].pressed && !events[1].pressed);

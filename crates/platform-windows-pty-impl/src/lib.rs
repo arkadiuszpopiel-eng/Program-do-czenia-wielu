@@ -10,6 +10,8 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 #![cfg_attr(not(windows), allow(dead_code))]
 
+#[cfg(windows)]
+mod attrs;
 mod cmdline;
 #[cfg(windows)]
 mod conpty;

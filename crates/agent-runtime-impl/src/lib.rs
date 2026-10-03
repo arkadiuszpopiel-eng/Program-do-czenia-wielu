@@ -14,6 +14,10 @@
 //! z obsady (podprzebieg, koperta potomka ≤ rodzica, ta sama sesja, taint dziedziczony),
 //! **Krytyczka** zamiast samoweryfikacji (osobna rola tylko do odczytu, ≠ autorka), raport
 //! końcowy ([`AgentRuntime::report`]) i adapter [`RuntimeExecutor`] (`TaskExecutor`).
+//!
+//! Przegląd #2, P2-07: skażenie **sesji** (monotoniczne) — kolejne tury czatu i przebiegi tej
+//! samej sesji startują skażone ([`BrokerSessionTaint`] / rejestr w pamięci); cel podprzebiegu
+//! jest w prompcie oznaczony jako zlecony przez agentkę, nie przez właściciela.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -36,8 +40,9 @@ mod turn;
 use std::sync::Arc;
 
 use agent_runtime_contract::{
-    AgentRuntime, Checkpoint, CheckpointStore, RunBudget, RunError, RunEventEnvelope, RunId,
-    RunOptions, RunOutcome, RunSpec, RunStatus, Steer,
+    AgentRuntime, Checkpoint, CheckpointStore, MemorySessionTaint, RunBudget, RunError,
+    RunEventEnvelope, RunId, RunOptions, RunOutcome, RunSpec, RunStatus, SessionTaint, Steer,
+    TaintReset, TaintResetError,
 };
 use async_trait::async_trait;
 use core_bus_contract::EventBus;
@@ -51,7 +56,7 @@ pub use delegate::{
 };
 pub use executor::{RuntimeExecutor, adapt_payload, task_run_id};
 pub use locks::resources_for;
-pub use shared::{AutonomyOracle, BrokerAutonomy, RuntimeExt};
+pub use shared::{AutonomyOracle, BrokerAutonomy, BrokerSessionTaint, RuntimeExt};
 pub use store::DirCheckpointStore;
 
 use shared::{Hooks, Shared};
@@ -141,8 +146,19 @@ impl Runtime {
         Self::with_ext(deps, RuntimeExt::default())
     }
 
-    /// Runtime z zależnościami v1 (zasoby wyłączne, poziomy autonomii).
+    /// Runtime z zależnościami v1 (zasoby wyłączne, poziomy autonomii); skażenie sesji
+    /// w rejestrze w pamięci procesu.
     pub fn with_ext(deps: RuntimeDeps, ext: RuntimeExt) -> Self {
+        Self::with_session_taint(deps, ext, Arc::new(MemorySessionTaint::default()))
+    }
+
+    /// Runtime z własnym rejestrem skażenia sesji (np. [`BrokerSessionTaint`] — taint sesji
+    /// z Brokera; przegląd #2, P2-07).
+    pub fn with_session_taint(
+        deps: RuntimeDeps,
+        ext: RuntimeExt,
+        taint: Arc<dyn SessionTaint>,
+    ) -> Self {
         let shared = Shared::new(
             deps.provider,
             deps.tools,
@@ -150,10 +166,20 @@ impl Runtime {
             deps.bus,
             deps.config,
         )
-        .with_ext(ext);
+        .with_ext(ext)
+        .with_taint(taint);
         Self {
             shared: Arc::new(shared),
         }
+    }
+
+    /// Reset skażenia sesji przez właściciela (potwierdzenie nie-głosem — [`TaintReset`]).
+    pub fn reset_session_taint(
+        &self,
+        session: &core_bus_contract::SessionId,
+        confirmation: &TaintReset,
+    ) -> Result<(), TaintResetError> {
+        self.shared.taint.reset(session, confirmation)
     }
 
     pub(crate) fn shared(&self) -> Arc<Shared> {

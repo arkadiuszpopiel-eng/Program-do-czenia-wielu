@@ -34,8 +34,8 @@ pub use kernel_host::{
 pub use pipes::{FakePipeConnection, FakePipeListener, FakePipes};
 // F6 (computer use) i F4 (terminal): wirtualny pulpit z drzewem UIA, wejściem i zrzutami; ConPTY.
 pub use desktop::{
-    DESKTOP_COLOR, FAKE_PID_BASE, FakeDesktop, FakeElement, FakeWindow, GuiRecord, GuiRecordKind,
-    PASSWORD_COLOR, ScriptEvent,
+    DESKTOP_COLOR, FAKE_FRAME_HOST, FAKE_PID_BASE, FakeDesktop, FakeElement, FakeWindow, GuiRecord,
+    GuiRecordKind, PASSWORD_COLOR, ScriptEvent,
 };
 pub use pty::FakePty;
 // Sygnały systemowe (bezczynność, zasilanie, tryb gry, sesja) i obserwacja katalogów — wirtualny zegar.

@@ -4,6 +4,10 @@
 //!
 //! Wątek nie robi nic poza obsługą komunikatów: callback hooka musi wracać natychmiast, inaczej
 //! system spowalnia całą klawiaturę (`LowLevelHooksTimeout`). Brak COM na tym wątku.
+//!
+//! Hook zapisuje też pochodzenie wciśnięć (`LLKHF_INJECTED`); `WM_HOTKEY` z kombinacji
+//! wstrzykniętej (np. agentka wysyła `Ctrl+Alt+Space` przez `SendInput`) jest ignorowany —
+//! zdarzenie nie trafia do kolejki. Kill-switch działa zawsze (przegląd #2, P2-04; `origin.rs`).
 
 #![allow(unsafe_code)]
 
@@ -14,7 +18,7 @@ use std::sync::mpsc::{self, Receiver, Sender, SyncSender};
 use std::thread::JoinHandle;
 use std::time::Duration;
 
-use platform_contract::{HotkeyEvent, HotkeyId, PlatformError};
+use platform_contract::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPressOrigin, PlatformError};
 use windows::Win32::Foundation::{HINSTANCE, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Threading::GetCurrentThreadId;
@@ -24,11 +28,13 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 use windows::Win32::UI::WindowsAndMessaging::{
     CallNextHookEx, GetMessageW, HC_ACTION, KBDLLHOOKSTRUCT, KillTimer, MSG, PM_NOREMOVE,
     PeekMessageW, PostThreadMessageW, SetTimer, SetWindowsHookExW, UnhookWindowsHookEx,
-    WH_KEYBOARD_LL, WM_APP, WM_HOTKEY, WM_KEYUP, WM_QUIT, WM_SYSKEYUP, WM_TIMER, WM_USER,
+    WH_KEYBOARD_LL, WM_APP, WM_HOTKEY, WM_KEYDOWN, WM_KEYUP, WM_QUIT, WM_SYSKEYDOWN, WM_SYSKEYUP,
+    WM_TIMER, WM_USER,
 };
 
 use super::EventQueue;
 use super::keys::{MOD_NOREPEAT, NativeHotkey, held_groups, releases_modifier};
+use super::origin::KeyOrigins;
 use crate::win::win_error;
 
 const WM_REQUEST: u32 = WM_APP + 1;
@@ -39,6 +45,7 @@ enum Request {
     Register {
         id: u32,
         native: NativeHotkey,
+        hotkey: Hotkey,
         reply: SyncSender<Result<(), PlatformError>>,
     },
     Unregister {
@@ -63,6 +70,8 @@ struct Held {
 struct ThreadState {
     events: Arc<EventQueue>,
     registered: BTreeMap<u32, NativeHotkey>,
+    hotkeys: BTreeMap<u32, Hotkey>,
+    origins: KeyOrigins,
     held: Vec<Held>,
     timer: usize,
 }
@@ -111,8 +120,18 @@ impl HotkeyThread {
     }
 
     /// Rejestruje skrót na wątku skrótów.
-    pub(crate) fn register(&self, id: u32, native: NativeHotkey) -> Result<(), PlatformError> {
-        self.call(|reply| Request::Register { id, native, reply })
+    pub(crate) fn register(
+        &self,
+        id: u32,
+        native: NativeHotkey,
+        hotkey: Hotkey,
+    ) -> Result<(), PlatformError> {
+        self.call(|reply| Request::Register {
+            id,
+            native,
+            hotkey,
+            reply,
+        })
     }
 
     /// Wyrejestrowuje skrót.
@@ -148,13 +167,26 @@ fn release(state: &mut ThreadState, index: usize) {
     }
 }
 
-/// Hook klawiatury niskiego poziomu: tylko puszczenia klawiszy, bez blokowania wejścia.
+/// Hook klawiatury niskiego poziomu: pochodzenie wciśnięć i puszczenia klawiszy, bez blokowania
+/// wejścia.
 unsafe extern "system" fn keyboard_hook(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
-    let is_up = matches!(u32::try_from(wparam.0), Ok(WM_KEYUP | WM_SYSKEYUP));
+    let message = u32::try_from(wparam.0);
+    let is_up = matches!(message, Ok(WM_KEYUP | WM_SYSKEYUP));
+    let is_down = matches!(message, Ok(WM_KEYDOWN | WM_SYSKEYDOWN));
+    if code == HC_ACTION as i32 && is_down && lparam.0 != 0 {
+        // SAFETY: dla `HC_ACTION` system przekazuje w `lparam` wskaźnik na `KBDLLHOOKSTRUCT`.
+        let info = unsafe { *(lparam.0 as *const KBDLLHOOKSTRUCT) };
+        with_state(|state| {
+            state
+                .origins
+                .record_down(info.vkCode, info.flags.0, info.time);
+        });
+    }
     if code == HC_ACTION as i32 && is_up && lparam.0 != 0 {
         // SAFETY: dla `HC_ACTION` system przekazuje w `lparam` wskaźnik na `KBDLLHOOKSTRUCT`.
         let vk = unsafe { (*(lparam.0 as *const KBDLLHOOKSTRUCT)).vkCode };
         with_state(|state| {
+            state.origins.record_up(vk);
             while let Some(index) = state
                 .held
                 .iter()
@@ -173,11 +205,21 @@ fn is_down(vk: u32) -> bool {
     i32::try_from(vk).is_ok_and(|vk| unsafe { GetAsyncKeyState(vk) } < 0)
 }
 
-fn on_hotkey(id: u32) {
+fn on_hotkey(id: u32, message_time: u32) {
     with_state(|state| {
         let Some(native) = state.registered.get(&id).copied() else {
             return;
         };
+        let Some(hotkey) = state.hotkeys.get(&id).copied() else {
+            return;
+        };
+        let origin = state.origins.origin(&native, message_time);
+        let elevated =
+            origin == HotkeyPressOrigin::Unknown && crate::process::foreground_is_elevated();
+        if !origin.admits(&hotkey, elevated) {
+            // Wejście wstrzyknięte (albo niepotwierdzone) — skrót Alfy nie reaguje (P2-04).
+            return;
+        }
         state.events.push(HotkeyEvent {
             id: HotkeyId(id),
             pressed: true,
@@ -206,13 +248,21 @@ fn on_timer() {
 
 fn on_request(request: Request) {
     match request {
-        Request::Register { id, native, reply } => {
+        Request::Register {
+            id,
+            native,
+            hotkey,
+            reply,
+        } => {
             let modifiers = HOT_KEY_MODIFIERS(native.modifiers | MOD_NOREPEAT);
             // SAFETY: skrót skojarzony z bieżącym wątkiem (brak okna); `id` < 0xC000.
             let result = unsafe { RegisterHotKey(None, id as i32, modifiers, native.vk) }
                 .map_err(|e| win_error("RegisterHotKey", &e));
             if result.is_ok() {
-                with_state(|state| state.registered.insert(id, native));
+                with_state(|state| {
+                    state.registered.insert(id, native);
+                    state.hotkeys.insert(id, hotkey);
+                });
             }
             let _ = reply.send(result);
         }
@@ -222,6 +272,7 @@ fn on_request(request: Request) {
                 .map_err(|e| win_error("UnregisterHotKey", &e));
             with_state(|state| {
                 state.registered.remove(&id);
+                state.hotkeys.remove(&id);
                 state.held.retain(|h| h.id != id);
             });
             let _ = reply.send(result);
@@ -237,6 +288,8 @@ fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &SyncSender<u3
         *cell.borrow_mut() = Some(ThreadState {
             events,
             registered: BTreeMap::new(),
+            hotkeys: BTreeMap::new(),
+            origins: KeyOrigins::default(),
             held: Vec::new(),
             timer: 0,
         });
@@ -259,7 +312,7 @@ fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &SyncSender<u3
                     on_request(request);
                 }
             }
-            WM_HOTKEY => on_hotkey(u32::try_from(msg.wParam.0).unwrap_or(u32::MAX)),
+            WM_HOTKEY => on_hotkey(u32::try_from(msg.wParam.0).unwrap_or(u32::MAX), msg.time),
             WM_TIMER => on_timer(),
             _ => {}
         }

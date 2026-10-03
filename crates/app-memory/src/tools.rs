@@ -153,9 +153,10 @@ pub fn memory_tools(
     vec![Arc::new(recall), Arc::new(remember)]
 }
 
+/// Dostęp narzędzia: rola bieżącego przebiegu ∩ role persony (przegląd #2, P2-06).
 fn access_of(access: &RoleAccess, ctx: &ToolCtx) -> AgentAccess {
     let agent = ctx.holder.agent.as_ref().map_or("alfa", |a| a.as_str());
-    access.access(&ctx.holder.session, agent)
+    access.access_for_run(&ctx.holder.session, agent, ctx.holder.role.as_deref())
 }
 
 #[derive(Deserialize)]

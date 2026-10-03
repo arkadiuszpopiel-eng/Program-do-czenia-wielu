@@ -1,10 +1,12 @@
 //! Zrzuty wirtualnego pulpitu: okna rysowane kolorami (od dołu kolejności Z), pola haseł na
 //! czerwono, okna chronione przed przechwyceniem na czarno; maskowanie i skalowanie wspólne
 //! z implementacją Windows (`mask_plan`, `mask_and_scale` z kontraktu), PNG bez kompresji.
+//! Kolejność jak w Windows: okna → klatka → okna ponownie (TOCTOU maskowania, przegląd #2 P2-02).
 
 use platform_contract::{
-    CaptureRequest, CaptureTarget, GuiError, MaskReason, MaskedArea, RgbaImage, ScreenCapturePort,
-    ScreenRect, Screenshot, WindowState, encode_png, mask_and_scale, mask_plan,
+    CAPTURE_ATTEMPTS, CaptureRequest, CaptureTarget, DesktopWindow, GuiError, MaskReason,
+    MaskedArea, RgbaImage, ScreenCapturePort, ScreenRect, Screenshot, WindowId, WindowState,
+    capture_set_stable, encode_png, mask_and_scale, mask_plan, union_for_mask, unstable_masks,
 };
 
 use super::{FakeDesktop, State, Win};
@@ -41,13 +43,13 @@ fn draw(img: &mut RgbaImage, source: &ScreenRect, w: &Win) {
     }
 }
 
-fn render(s: &State, source: &ScreenRect, only: Option<&Win>) -> Result<RgbaImage, GuiError> {
+fn render(s: &State, source: &ScreenRect, only: Option<WindowId>) -> Result<RgbaImage, GuiError> {
     let width = u32::try_from(source.width()).unwrap_or(0);
     let height = u32::try_from(source.height()).unwrap_or(0);
     let mut img = RgbaImage::filled(width, height, DESKTOP_COLOR)
         .ok_or_else(|| GuiError::Policy("pusty albo zbyt duży obszar zrzutu".into()))?;
     match only {
-        Some(w) => draw(&mut img, source, w),
+        Some(id) => draw(&mut img, source, s.win(id)?),
         None => {
             for w in s.windows.iter().rev() {
                 if w.info.state != WindowState::Minimized {
@@ -60,11 +62,11 @@ fn render(s: &State, source: &ScreenRect, only: Option<&Win>) -> Result<RgbaImag
 }
 
 impl FakeDesktop {
-    fn capture_source<'a>(
+    fn capture_source(
         &self,
-        s: &'a State,
+        s: &State,
         req: &CaptureRequest,
-    ) -> Result<(ScreenRect, Option<&'a Win>), GuiError> {
+    ) -> Result<(ScreenRect, Option<WindowId>), GuiError> {
         let screen = s.monitors.iter().fold(ScreenRect::default(), |acc, m| {
             if acc.is_empty() {
                 m.rect
@@ -80,7 +82,7 @@ impl FakeDesktop {
         match req.target {
             CaptureTarget::Window { window } => {
                 let w = s.win(window)?;
-                self.guard.check(w.info.pid, &w.info.image, "zrzut okna")?;
+                self.check_win(s, w, "zrzut okna")?;
                 if req.is_masked_app(&w.info.image) {
                     return Err(GuiError::Policy("aplikacja na deny-liście zrzutów".into()));
                 }
@@ -89,7 +91,7 @@ impl FakeDesktop {
                         "okno zminimalizowane — najpierw je przywróć".into(),
                     ));
                 }
-                Ok((w.info.rect, Some(w)))
+                Ok((w.info.rect, Some(window)))
             }
             CaptureTarget::Monitor { index } => s
                 .monitors
@@ -105,23 +107,26 @@ impl FakeDesktop {
     }
 }
 
-impl ScreenCapturePort for FakeDesktop {
-    fn capture(&self, request: &CaptureRequest) -> Result<Screenshot, GuiError> {
-        request.validate()?;
-        let mut s = self.lock();
-        let (source, only) = self.capture_source(&s, request)?;
-        let raw = render(&s, &source, only)?;
-        let windows: Vec<_> = s.windows.iter().map(|w| w.info.clone()).collect();
-        let candidates: Vec<&Win> = s
-            .windows
-            .iter()
-            .filter(|w| only.is_none_or(|o| o.info.id == w.info.id))
-            .filter(|w| !w.info.protected && w.info.state != WindowState::Minimized)
-            .filter(|w| w.info.rect.intersect(&source).is_some())
-            .collect();
+impl FakeDesktop {
+    /// Okna (z ochroną policzoną teraz) i pola haseł widocznych okien niechronionych; okno,
+    /// którego pól nie dało się sprawdzić, maskowane w całości.
+    fn mask_inputs(
+        &self,
+        s: &State,
+        source: &ScreenRect,
+        only: Option<WindowId>,
+    ) -> (Vec<DesktopWindow>, Vec<ScreenRect>, Vec<MaskedArea>) {
+        let windows: Vec<_> = s.windows.iter().map(|w| self.described(s, w)).collect();
         let mut passwords = Vec::new();
         let mut unverified = Vec::new();
-        for w in candidates {
+        for (w, d) in s.windows.iter().zip(&windows) {
+            if only.is_some_and(|o| o != w.info.id)
+                || d.protected
+                || w.info.state == WindowState::Minimized
+                || w.info.rect.intersect(source).is_none()
+            {
+                continue;
+            }
             if s.uia_hang || s.password_check_fails.contains(&w.info.id) {
                 if let Some(rect) = source.intersect(&w.info.rect) {
                     unverified.push(MaskedArea {
@@ -138,8 +143,44 @@ impl ScreenCapturePort for FakeDesktop {
                     .map(|e| e.node.rect),
             );
         }
-        let mut masked = mask_plan(&source, &windows, request, &passwords);
-        masked.extend(unverified);
+        (windows, passwords, unverified)
+    }
+}
+
+impl ScreenCapturePort for FakeDesktop {
+    fn capture(&self, request: &CaptureRequest) -> Result<Screenshot, GuiError> {
+        request.validate()?;
+        let mut s = self.lock();
+        let (source, only) = self.capture_source(&s, request)?;
+        // Jak w implementacji Windows: lista okien przed klatką, przechwycenie (okno może się
+        // pojawić w międzyczasie — `show_during_capture`) i ponowne wyliczenie po klatce; zmiana
+        // zbioru = klatka ponowiona, po wyczerpaniu prób maska z sumy wyliczeń (P2-02).
+        let mut attempt = 0;
+        let (raw, masked) = loop {
+            attempt += 1;
+            let (before, ..) = self.mask_inputs(&s, &source, only);
+            if !s.during_capture.is_empty() {
+                let spec = s.during_capture.remove(0);
+                s.add_window(spec, false);
+            }
+            let raw = render(&s, &source, only)?;
+            let (after, passwords, unverified) = self.mask_inputs(&s, &source, only);
+            let stable = capture_set_stable(&source, &before, &after);
+            if !stable && attempt < CAPTURE_ATTEMPTS {
+                continue;
+            }
+            let windows = if stable {
+                after.clone()
+            } else {
+                union_for_mask(&before, &after)
+            };
+            let mut masked = mask_plan(&source, &windows, request, &passwords);
+            masked.extend(unverified);
+            if !stable {
+                masked.extend(unstable_masks(&source, &before, &after));
+            }
+            break (raw, masked);
+        };
         let (image, black_frame) = mask_and_scale(raw, &source, &masked, request);
         let shot = Screenshot {
             png: encode_png(&image),

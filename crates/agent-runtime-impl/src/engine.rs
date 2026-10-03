@@ -119,7 +119,10 @@ impl Engine {
             self.cp.messages.extend(spec.history.iter().cloned());
             self.push(
                 Role::User,
-                vec![ContentBlock::text(goal_message(&spec.goal))],
+                vec![ContentBlock::text(goal_message(
+                    &spec.goal,
+                    self.cp.options.parent.is_some(),
+                ))],
             );
             if self.cp.options.parent.is_none() {
                 // Cel od właściciela jest zaufany; cel podprzebiegu napisał model rodzica.

@@ -8,6 +8,10 @@
 //!   niewstrzyknięte; użytkownik ma pierwszeństwo, §7.4), okno docelowe (fokus dla klawiatury,
 //!   okno pod punktem dla myszy) = okno z planu, proces okna nie jest chroniony
 //!   ([`TargetGuard`]: Alfa/Broker), proces nie jest podniesiony (UIPI);
+//! - przed każdą paczką wpisującą treść (tekst, litery, `Ctrl+V`…) element z fokusem nie jest
+//!   polem hasła, a fokus jest ustalony ([`FocusedField`], fail-closed; przegląd #2, P2-03);
+//! - strażnik sprawdza wszystkie procesy powiązane z oknem ([`ProcessLink`]: WebView2 Alfy,
+//!   okna-własności, aplikacja UWP, drzewo procesów Alfy odczytane w chwili paczki; P2-01);
 //! - limit tempa: odstęp między paczkami, limity długości tekstu i liczby kroków.
 
 use std::sync::Arc;
@@ -15,9 +19,11 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::{Deserialize, Serialize};
 
+use crate::focus::{FocusedField, batch_writes_text};
 use crate::gui::{GuiError, TargetGuard};
 use crate::keys::KeyChord;
 use crate::synth_plan::plan_batches;
+use crate::target::ProcessLink;
 use crate::window::WindowId;
 
 /// Przycisk myszy.
@@ -180,6 +186,10 @@ pub struct TargetWindow {
     pub image: String,
     /// Proces podniesiony.
     pub elevated: bool,
+    /// Procesy powiązane (proces okna z przodkami, właściciel, treść UWP) — strażnik sprawdza
+    /// wszystkie ([`TargetGuard::check_window`]).
+    #[serde(default)]
+    pub links: Vec<ProcessLink>,
 }
 
 /// Raport wysłania.
@@ -228,6 +238,11 @@ pub trait InputBackend: Send + Sync {
     fn target_at(&self, x: i32, y: i32) -> Option<TargetWindow>;
     /// Wstrzykuje paczkę atomowo (wszystkie zdarzenia albo błąd).
     fn inject(&self, events: &[RawInput]) -> Result<(), GuiError>;
+    /// Element z fokusem klawiatury tuż przed paczką wpisującą treść. Domyślnie nieznany —
+    /// backend bez odczytu fokusu nie wpisuje tekstu (fail-closed, P2-03).
+    fn focused_field(&self) -> FocusedField {
+        FocusedField::Unknown
+    }
 }
 
 /// Port wejścia syntetycznego.
@@ -280,7 +295,12 @@ pub fn execute(
                 actual: None,
             });
         };
-        guard.check(target.pid, &target.image, "wejście syntetyczne")?;
+        guard.check_window(
+            target.pid,
+            &target.image,
+            &target.links,
+            "wejście syntetyczne",
+        )?;
         if target.id != plan.window {
             return Err(GuiError::TargetChanged {
                 expected: plan.window.0,
@@ -289,6 +309,9 @@ pub fn execute(
         }
         if target.elevated {
             return Err(GuiError::Elevated);
+        }
+        if matches!(batch.aim, Aim::Focus) && batch_writes_text(&batch.events) {
+            backend.focused_field().check_typing()?;
         }
         backend.inject(&batch.events)?;
         report.batches += 1;

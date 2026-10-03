@@ -9,7 +9,7 @@ use std::ffi::c_void;
 use std::mem::size_of;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use platform_contract::{GuiError, PlatformError, ScreenRect, TargetWindow, WindowId};
+use platform_contract::{GuiError, PlatformError, ScreenRect, WindowId};
 use windows::Win32::Foundation::{CloseHandle, HANDLE, HWND, RECT};
 use windows::Win32::Graphics::Dwm::{DWMWA_EXTENDED_FRAME_BOUNDS, DwmGetWindowAttribute};
 use windows::Win32::Security::{GetTokenInformation, TOKEN_ELEVATION, TOKEN_QUERY, TokenElevation};
@@ -168,21 +168,6 @@ pub(crate) fn process_elevated(pid: u32) -> bool {
         )
     };
     ok.is_err() || elevation.TokenIsElevated != 0
-}
-
-/// Cel wejścia dla okna (właściciel, obraz, podniesienie).
-pub(crate) fn target_of(hwnd: HWND) -> Option<TargetWindow> {
-    if hwnd.is_invalid() {
-        return None;
-    }
-    let root = root_of(hwnd);
-    let pid = window_pid(root);
-    Some(TargetWindow {
-        id: id_of(root),
-        pid,
-        image: process_image(pid),
-        elevated: process_elevated(pid),
-    })
 }
 
 /// Prostokąt ramki okna (DWM, bez niewidocznych krawędzi) i prostokąt okna (`GetWindowRect`).

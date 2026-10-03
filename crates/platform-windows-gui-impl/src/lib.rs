@@ -10,7 +10,11 @@
 //!   wejście użytkownika (niewstrzyknięte) → przerwanie; tempo z `InputPacing`.
 //! - **Zrzuty**: BitBlt (`CAPTUREBLT`) / `PrintWindow(PW_RENDERFULLCONTENT)`, maskowanie okien
 //!   chronionych, aplikacji z deny-listy i pól haseł (UIA `IsPassword`), skalowanie, PNG (`flate2`).
-//! - **Strażnik**: okna procesów Alfy/Brokera/helpera i procesów nieznanych nigdy nie są celem.
+//! - **Strażnik**: okna procesów Alfy/Brokera/helpera i procesów nieznanych nigdy nie są celem;
+//!   liczą się wszystkie procesy powiązane z oknem (wyskakujące WebView2 Alfy, okna-własności,
+//!   treść UWP) i drzewo procesów Alfy odczytane przy każdej akcji (przegląd #2, P2-01).
+//! - **Fokus**: tekst i skróty edytujące nigdy do pola hasła (`GetFocusedElement` + `IsPassword`
+//!   przed każdą paczką; fokus nieznany = odmowa, P2-03).
 //!
 //! Wydzielone z `platform-windows-impl` (limit rozmiaru crate'a). Poza Windows porty zwracają
 //! `Unsupported` (logikę testuje się na `platform-fake`).
@@ -28,6 +32,8 @@ mod desktop;
 mod hook;
 #[cfg(windows)]
 mod input;
+#[cfg(windows)]
+mod links;
 #[cfg(not(windows))]
 mod portable;
 #[cfg(windows)]
@@ -148,6 +154,9 @@ impl UiaPort for WinGui {
     fn password_rects(&self, window: WindowId) -> Result<Vec<ScreenRect>, GuiError> {
         self.backend
             .uia_password_rects(&self.config, window, self.config.uia_call_timeout_ms)
+    }
+    fn focused(&self, window: WindowId) -> Result<Option<UiaNode>, GuiError> {
+        self.backend.uia_focused(&self.config, window)
     }
 }
 

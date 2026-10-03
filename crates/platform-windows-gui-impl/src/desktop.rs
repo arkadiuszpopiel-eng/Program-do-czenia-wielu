@@ -1,7 +1,9 @@
 //! Okna v2 (Win32): `EnumWindows` (kolejność Z), filtr widocznych i niezamaskowanych przez DWM,
 //! właściciel/obraz/podniesienie procesu, monitory z DPI, fokus, położenie i stan — każda zmiana
 //! po sprawdzeniu strażnikiem tuż przed wywołaniem; wywołania asynchroniczne (`ShowWindowAsync`,
-//! `SWP_ASYNCWINDOWPOS`) nie blokują na zawieszonym oknie.
+//! `SWP_ASYNCWINDOWPOS`) nie blokują na zawieszonym oknie. Ochrona okna z procesów powiązanych
+//! (WebView2 Alfy, okna-własności, treść UWP) i drzewa procesów z migawki przy każdym wyliczeniu
+//! i każdej zmianie (przegląd #2, P2-01).
 
 #![allow(unsafe_code)]
 
@@ -30,9 +32,10 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 use windows::core::BOOL;
 
+use crate::links::{ProcessTree, window_target};
 use crate::win::{
-    frame_and_window_rect, from_wide, hwnd_of, id_of, last_error, process_elevated, process_image,
-    rect_of, root_of, win_error, window_pid,
+    frame_and_window_rect, from_wide, hwnd_of, id_of, last_error, process_elevated, rect_of,
+    root_of, win_error,
 };
 
 unsafe extern "system" fn collect(hwnd: HWND, lparam: LPARAM) -> BOOL {
@@ -127,19 +130,24 @@ pub(crate) fn monitors() -> Vec<MonitorInfo> {
         .collect()
 }
 
-fn describe(
-    hwnd: HWND,
-    z: u32,
-    guard: &TargetGuard,
+/// Kontekst jednego wyliczenia okien (migawka procesów, okno pierwszego planu, monitory).
+struct Listing<'a> {
+    guard: &'a TargetGuard,
+    tree: ProcessTree,
     foreground: HWND,
-    monitors: &[HMONITOR],
-    cache: &mut BTreeMap<u32, (String, bool)>,
-) -> DesktopWindow {
-    let pid = window_pid(hwnd);
-    let (image, elevated) = cache
+    monitors: Vec<HMONITOR>,
+    elevated: BTreeMap<u32, bool>,
+}
+
+fn describe(hwnd: HWND, z: u32, l: &mut Listing<'_>) -> DesktopWindow {
+    let target = window_target(hwnd, &l.tree);
+    let protected = target.protected(l.guard);
+    let (pid, image) = (target.pid, target.image);
+    let elevated = *l
+        .elevated
         .entry(pid)
-        .or_insert_with(|| (process_image(pid), process_elevated(pid)))
-        .clone();
+        .or_insert_with(|| process_elevated(pid));
+    let (foreground, monitors) = (l.foreground, &l.monitors);
     let (title, class_name) = text_of(hwnd);
     // SAFETY: zapytania o stan okna, monitor i DPI.
     let (minimized, maximized, monitor, dpi) = unsafe {
@@ -162,7 +170,7 @@ fn describe(
         title,
         class_name,
         pid,
-        protected: guard.is_protected(pid, &image),
+        protected,
         image,
         rect: frame_and_window_rect(hwnd).0,
         monitor: monitors
@@ -180,24 +188,19 @@ fn describe(
 
 /// Widoczne okna najwyższego poziomu w kolejności Z (także chronione — do maskowania).
 pub(crate) fn windows(guard: &TargetGuard) -> Vec<DesktopWindow> {
-    // SAFETY: odczyt okna pierwszego planu.
-    let foreground = unsafe { GetForegroundWindow() };
-    let monitors = monitor_handles();
-    let mut cache = BTreeMap::new();
+    let mut listing = Listing {
+        guard,
+        tree: ProcessTree::snapshot(),
+        // SAFETY: odczyt okna pierwszego planu.
+        foreground: unsafe { GetForegroundWindow() },
+        monitors: monitor_handles(),
+        elevated: BTreeMap::new(),
+    };
     top_level()
         .into_iter()
         .filter(|&h| visible(h) && !frame_and_window_rect(h).0.is_empty())
         .enumerate()
-        .map(|(z, h)| {
-            describe(
-                h,
-                u32::try_from(z).unwrap_or(u32::MAX),
-                guard,
-                foreground,
-                &monitors,
-                &mut cache,
-            )
-        })
+        .map(|(z, h)| describe(h, u32::try_from(z).unwrap_or(u32::MAX), &mut listing))
         .collect()
 }
 
@@ -226,10 +229,9 @@ fn checked(guard: &TargetGuard, id: WindowId, what: &str) -> Result<HWND, GuiErr
     if hwnd.is_invalid() || !unsafe { IsWindow(Some(hwnd)) }.as_bool() {
         return Err(GuiError::ElementNotFound(format!("okno {}", id.0)));
     }
-    let root = root_of(hwnd);
-    let pid = window_pid(root);
-    guard.check(pid, &process_image(pid), what)?;
-    Ok(root)
+    let target = window_target(hwnd, &ProcessTree::snapshot());
+    target.check(guard, what)?;
+    Ok(target.root)
 }
 
 fn show(hwnd: HWND, cmd: SHOW_WINDOW_CMD) -> Result<(), GuiError> {

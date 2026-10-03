@@ -65,6 +65,16 @@ pub(crate) enum Request {
 }
 
 impl Request {
+    /// Czy żądanie wpisuje treść do pola z fokusem (tekst albo skrót edytujący — litera, cyfra,
+    /// spacja, Backspace/Delete/Insert, także `Ctrl+V`); takie nigdy do pola hasła (P2-03).
+    pub(crate) fn writes_text(&self) -> bool {
+        match self {
+            Self::Type { .. } => true,
+            Self::Keys { chords, .. } => chords.iter().any(|c| c.key.edits_field()),
+            Self::Click { .. } | Self::Scroll { .. } => false,
+        }
+    }
+
     pub(crate) fn window(&self) -> WindowId {
         match self {
             Self::Type { window, .. }

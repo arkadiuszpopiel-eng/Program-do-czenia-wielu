@@ -6,6 +6,10 @@
 //! `InputPort::send` na wątku blokującym (strażnik, cel i fizyczne wejście użytkownika sprawdzane
 //! przed każdą paczką; anulowanie przebiegu przerywa przed następną paczką) → weryfikacja
 //! (okno nadal z fokusem / pod punktem). Wpisywany tekst nie trafia do zdarzeń.
+//!
+//! Tekst i skróty edytujące nigdy do pola hasła (przegląd #2, P2-03): po ustawieniu fokusu
+//! element z fokusem odczytany przez UIA (`UiaPort::focused`) musi być ustalony i nie być polem
+//! hasła — inaczej odmowa (fail-closed); port wejścia sprawdza to ponownie przed każdą paczką.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -19,7 +23,8 @@ use async_trait::async_trait;
 use core_bus_contract::EventBus;
 use core_registry_contract::{ManifestError, ModuleManifest};
 use platform_contract::{
-    DesktopPort, GuiError, InputControl, InputPlan, InputPort, InputReport, UiaPort, WindowId,
+    DesktopPort, FocusedField, GuiError, InputControl, InputPlan, InputPort, InputReport, UiaPort,
+    WindowId,
 };
 use safety_broker_contract::Broker;
 use tools_common_contract::{
@@ -176,6 +181,7 @@ impl Core {
     ) -> Step<(InputReport, Option<(i32, i32)>)> {
         let uia = self.deps.uia.clone();
         let t = target.clone();
+        let writes_text = request.writes_text();
         let (plan, aim) = gui::blocking(move || plan::build(request, &t, &*uia))
             .await?
             .map_err(|e| Box::new(gui::gui_outcome(&e, action)))?;
@@ -183,6 +189,13 @@ impl Core {
             let (desktop, id) = (self.deps.desktop.clone(), target.id);
             gui::blocking(move || desktop.focus(id))
                 .await?
+                .map_err(|e| Box::new(gui::gui_outcome(&e, action)))?;
+        }
+        if writes_text {
+            let (uia, id) = (self.deps.uia.clone(), target.id);
+            let field = gui::blocking(move || FocusedField::from_lookup(&uia.focused(id))).await?;
+            field
+                .check_typing()
                 .map_err(|e| Box::new(gui::gui_outcome(&e, action)))?;
         }
         if ctx.cancel.is_cancelled() {

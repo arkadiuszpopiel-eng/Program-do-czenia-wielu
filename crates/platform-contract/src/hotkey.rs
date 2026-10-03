@@ -115,6 +115,36 @@ impl fmt::Display for Hotkey {
     }
 }
 
+/// Pochodzenie naciśnięcia skrótu globalnego według hooka `WH_KEYBOARD_LL` (flaga
+/// `LLKHF_INJECTED` przy wciśnięciu klawisza głównego i modyfikatorów; przegląd #2, P2-04).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HotkeyPressOrigin {
+    /// Wszystkie klawisze kombinacji z fizycznej klawiatury.
+    Physical,
+    /// Którykolwiek klawisz kombinacji wstrzyknięty (`SendInput`, UI Automation).
+    Injected,
+    /// Hook nie widział klawiszy (brak hooka, okno administratora na pierwszym planie — UIPI).
+    Unknown,
+}
+
+impl HotkeyPressOrigin {
+    /// Czy przyjąć naciśnięcie skrótu Alfy. Kill-switch zawsze (fałszywe przyjęcie jest
+    /// bezpieczne — zatrzymuje agentki). Pozostałe (szybkie pytanie, PTT) tylko z wejścia
+    /// fizycznego: wstrzyknięte = ignorowane (agentka nie otworzy okna Alfy ani mikrofonu, by
+    /// „usłyszeć” własny TTS jako polecenie). Nieznane = przyjęte tylko, gdy na pierwszym planie
+    /// jest okno podniesione (UIPI blokuje wtedy `SendInput` procesów zwykłej integralności, więc
+    /// naciśnięcie jest fizyczne); inaczej odrzucone (fail-closed).
+    pub fn admits(self, hotkey: &Hotkey, foreground_elevated: bool) -> bool {
+        *hotkey == KILL_SWITCH
+            || match self {
+                Self::Physical => true,
+                Self::Injected => false,
+                Self::Unknown => foreground_elevated,
+            }
+    }
+}
+
 /// Identyfikator zarejestrowanego skrótu.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct HotkeyId(pub u32);
@@ -171,6 +201,19 @@ mod tests {
         }
         assert!(hk(true, true, false, Key::Letter('B')).validate().is_ok());
         assert!(hk(true, false, false, Key::Letter('S')).validate().is_ok());
+    }
+
+    #[test]
+    fn injected_presses_are_ignored_except_kill_switch() {
+        let quick = hk(true, true, false, Key::Space);
+        for elevated in [false, true] {
+            assert!(HotkeyPressOrigin::Physical.admits(&quick, elevated));
+            assert!(!HotkeyPressOrigin::Injected.admits(&quick, elevated));
+            assert!(HotkeyPressOrigin::Injected.admits(&KILL_SWITCH, elevated));
+            assert!(HotkeyPressOrigin::Unknown.admits(&KILL_SWITCH, elevated));
+        }
+        assert!(!HotkeyPressOrigin::Unknown.admits(&quick, false));
+        assert!(HotkeyPressOrigin::Unknown.admits(&quick, true));
     }
 
     #[test]

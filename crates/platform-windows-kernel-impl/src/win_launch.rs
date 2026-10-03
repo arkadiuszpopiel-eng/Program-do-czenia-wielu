@@ -6,6 +6,11 @@
 //! i podnosi etykietę integralności do `High` (S-1-16-12288). Proces ma konto i grupy
 //! użytkownika (bez praw administratora), ale UIPI blokuje mu SendInput/komunikaty z procesów
 //! średniej i niskiej integralności (agentki). Bilet startowy idzie przez anonimowy potok stdin.
+//!
+//! Dziedziczenie uchwytów (przegląd #1, P-07): potok powstaje bez dziedziczenia, dziedziczny staje
+//! się tylko koniec do odczytu, a `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` w `STARTUPINFOEXW` ogranicza
+//! dziedziczenie do **jawnej listy** (ten jeden uchwyt) — dziecko nie dostaje żadnego innego
+//! dziedzicznego uchwytu usługi Brokera, nawet gdy inny wątek akurat utworzył dziedziczny uchwyt.
 
 #![allow(unsafe_code)]
 
@@ -19,10 +24,9 @@ use windows::Win32::Foundation::{
 };
 use windows::Win32::Security::Authorization::ConvertStringSidToSidW;
 use windows::Win32::Security::{
-    DuplicateTokenEx, GetLengthSid, PSID, SECURITY_ATTRIBUTES, SID_AND_ATTRIBUTES,
-    SecurityIdentification, SetTokenInformation, TOKEN_ADJUST_DEFAULT, TOKEN_ADJUST_SESSIONID,
-    TOKEN_ASSIGN_PRIMARY, TOKEN_DUPLICATE, TOKEN_MANDATORY_LABEL, TOKEN_QUERY, TokenIntegrityLevel,
-    TokenPrimary,
+    DuplicateTokenEx, GetLengthSid, PSID, SID_AND_ATTRIBUTES, SecurityIdentification,
+    SetTokenInformation, TOKEN_ADJUST_DEFAULT, TOKEN_ADJUST_SESSIONID, TOKEN_ASSIGN_PRIMARY,
+    TOKEN_DUPLICATE, TOKEN_MANDATORY_LABEL, TOKEN_QUERY, TokenIntegrityLevel, TokenPrimary,
 };
 use windows::Win32::Storage::FileSystem::WriteFile;
 use windows::Win32::System::Pipes::CreatePipe;
@@ -35,8 +39,10 @@ use windows::Win32::System::Services::{
     StartServiceCtrlDispatcherW,
 };
 use windows::Win32::System::Threading::{
-    CREATE_UNICODE_ENVIRONMENT, CreateProcessAsUserW, PROCESS_INFORMATION, STARTF_USESTDHANDLES,
-    STARTUPINFOW, WaitForSingleObject,
+    CREATE_UNICODE_ENVIRONMENT, CreateProcessAsUserW, DeleteProcThreadAttributeList,
+    EXTENDED_STARTUPINFO_PRESENT, InitializeProcThreadAttributeList, LPPROC_THREAD_ATTRIBUTE_LIST,
+    PROC_THREAD_ATTRIBUTE_HANDLE_LIST, PROCESS_INFORMATION, STARTF_USESTDHANDLES, STARTUPINFOEXW,
+    UpdateProcThreadAttribute, WaitForSingleObject,
 };
 use windows::core::{PCWSTR, PWSTR};
 
@@ -48,6 +54,54 @@ const SE_GROUP_INTEGRITY: u32 = 0x20;
 /// Uchwyt uruchomionego procesu.
 #[derive(Debug)]
 pub(crate) struct Proc(OwnedHandle);
+
+/// Lista atrybutów procesu w buforze wyrównanym do `usize` (API wymaga wyrównania wskaźnika;
+/// `Vec<u8>` ma wyrównanie 1). Zwalniana w `Drop` (także na ścieżkach błędu).
+struct AttrList(Vec<usize>);
+
+impl AttrList {
+    fn new(count: u32) -> Result<Self, PlatformError> {
+        let mut size = 0usize;
+        // SAFETY: pierwsze wywołanie tylko zwraca wymagany rozmiar listy (błąd jest oczekiwany).
+        let _ = unsafe { InitializeProcThreadAttributeList(None, count, None, &raw mut size) };
+        let words = size.div_ceil(size_of::<usize>()).max(1);
+        let mut buf = vec![0usize; words];
+        let mut size = words * size_of::<usize>();
+        let ptr = LPPROC_THREAD_ATTRIBUTE_LIST(buf.as_mut_ptr().cast());
+        // SAFETY: bufor wyrównany, o rozmiarze ≥ wymaganego; `AttrList` (i jego `Drop`) powstaje
+        // dopiero po udanej inicjalizacji.
+        unsafe { InitializeProcThreadAttributeList(Some(ptr), count, None, &raw mut size) }
+            .map_err(|e| win_error("InitializeProcThreadAttributeList", &e))?;
+        Ok(Self(buf))
+    }
+
+    fn as_ptr(&mut self) -> LPPROC_THREAD_ATTRIBUTE_LIST {
+        LPPROC_THREAD_ATTRIBUTE_LIST(self.0.as_mut_ptr().cast())
+    }
+}
+
+impl Drop for AttrList {
+    fn drop(&mut self) {
+        // SAFETY: lista zainicjalizowana w `new`, zwalniana raz.
+        unsafe { DeleteProcThreadAttributeList(self.as_ptr()) };
+    }
+}
+
+/// `STARTUPINFOEXW` Broker-UI: stdin = koniec potoku, pulpit interaktywny, lista atrybutów
+/// z jawną listą dziedziczonych uchwytów.
+fn startup_info(
+    desktop: &mut [u16],
+    stdin: HANDLE,
+    list: LPPROC_THREAD_ATTRIBUTE_LIST,
+) -> STARTUPINFOEXW {
+    let mut si = STARTUPINFOEXW::default();
+    si.StartupInfo.cb = u32::try_from(size_of::<STARTUPINFOEXW>()).unwrap_or(0);
+    si.StartupInfo.lpDesktop = PWSTR(desktop.as_mut_ptr());
+    si.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    si.StartupInfo.hStdInput = stdin;
+    si.lpAttributeList = list;
+    si
+}
 
 fn high_integrity_user_token() -> Result<OwnedHandle, PlatformError> {
     // SAFETY: zapytanie bez argumentów.
@@ -118,27 +172,38 @@ pub(crate) fn launch_high(spec: &SessionLaunch) -> Result<(u32, Proc), PlatformE
         ));
     }
     let token = high_integrity_user_token()?;
-    let inherit = SECURITY_ATTRIBUTES {
-        nLength: u32::try_from(size_of::<SECURITY_ATTRIBUTES>()).unwrap_or(0),
-        lpSecurityDescriptor: std::ptr::null_mut(),
-        bInheritHandle: true.into(),
-    };
     let (mut read, mut write) = (HANDLE::default(), HANDLE::default());
-    // SAFETY: anonimowy potok; koniec do odczytu dziedziczony przez dziecko.
-    unsafe {
-        CreatePipe(
-            &raw mut read,
-            &raw mut write,
-            Some(&raw const inherit),
-            64 * 1024,
-        )
-    }
-    .map_err(|e| win_error("CreatePipe", &e))?;
+    // SAFETY: anonimowy potok bez dziedziczenia (atrybuty bezpieczeństwa domyślne).
+    unsafe { CreatePipe(&raw mut read, &raw mut write, None, 64 * 1024) }
+        .map_err(|e| win_error("CreatePipe", &e))?;
     let read = OwnedHandle::new(read).ok_or_else(|| last_error("CreatePipe"))?;
     let write = OwnedHandle::new(write).ok_or_else(|| last_error("CreatePipe"))?;
-    // SAFETY: koniec do zapisu zostaje tylko u nas (bez dziedziczenia).
-    unsafe { SetHandleInformation(write.raw(), HANDLE_FLAG_INHERIT.0, HANDLE_FLAGS(0)) }
-        .map_err(|e| win_error("SetHandleInformation", &e))?;
+    // SAFETY: tylko koniec do odczytu staje się dziedziczny (wymóg listy uchwytów); koniec do
+    // zapisu zostaje niedziedziczny.
+    unsafe {
+        SetHandleInformation(
+            read.raw(),
+            HANDLE_FLAG_INHERIT.0,
+            HANDLE_FLAGS(HANDLE_FLAG_INHERIT.0),
+        )
+    }
+    .map_err(|e| win_error("SetHandleInformation", &e))?;
+    // Jawna lista dziedziczonych uchwytów — musi żyć do usunięcia listy atrybutów.
+    let inherited = [read.raw()];
+    let mut attrs = AttrList::new(1)?;
+    // SAFETY: lista zainicjalizowana; wartość = tablica uchwytów żyjąca dłużej niż lista.
+    unsafe {
+        UpdateProcThreadAttribute(
+            attrs.as_ptr(),
+            0,
+            PROC_THREAD_ATTRIBUTE_HANDLE_LIST as usize,
+            Some(inherited.as_ptr().cast::<c_void>()),
+            size_of_val(&inherited),
+            None,
+            None,
+        )
+    }
+    .map_err(|e| win_error("UpdateProcThreadAttribute(HANDLE_LIST)", &e))?;
     let image = spec.image.to_string_lossy().into_owned();
     let mut cmd = format!("\"{image}\"");
     for a in &spec.args {
@@ -146,17 +211,12 @@ pub(crate) fn launch_high(spec: &SessionLaunch) -> Result<(u32, Proc), PlatformE
     }
     let (image_w, mut cmd_w, mut desktop) = (wide(&image), wide(&cmd), wide(r"winsta0\default"));
     let dir_w = spec.image.parent().map(wide);
-    let si = STARTUPINFOW {
-        cb: u32::try_from(size_of::<STARTUPINFOW>()).unwrap_or(0),
-        lpDesktop: PWSTR(desktop.as_mut_ptr()),
-        dwFlags: STARTF_USESTDHANDLES,
-        hStdInput: read.raw(),
-        ..Default::default()
-    };
+    let si = startup_info(&mut desktop, read.raw(), attrs.as_ptr());
     let mut pi = PROCESS_INFORMATION::default();
     let dir = dir_w.as_deref().map_or(PCWSTR::null(), pcwstr);
-    // SAFETY: wszystkie bufory żyją przez wywołanie; dziedziczony jest tylko koniec potoku.
-    unsafe {
+    // SAFETY: wszystkie bufory żyją przez wywołanie; `bInheritHandles = TRUE` jest ograniczone
+    // listą `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` do końca potoku (P-07).
+    let created = unsafe {
         CreateProcessAsUserW(
             Some(token.raw()),
             pcwstr(&image_w),
@@ -164,14 +224,15 @@ pub(crate) fn launch_high(spec: &SessionLaunch) -> Result<(u32, Proc), PlatformE
             None,
             None,
             true,
-            CREATE_UNICODE_ENVIRONMENT,
+            CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT,
             None,
             dir,
-            &raw const si,
+            &raw const si.StartupInfo,
             &raw mut pi,
         )
-    }
-    .map_err(|e| win_error("CreateProcessAsUserW", &e))?;
+    };
+    drop(attrs);
+    created.map_err(|e| win_error("CreateProcessAsUserW", &e))?;
     drop(OwnedHandle::new(pi.hThread));
     let process =
         OwnedHandle::new(pi.hProcess).ok_or_else(|| last_error("CreateProcessAsUserW"))?;
@@ -290,4 +351,38 @@ pub(crate) fn run_service(name: &str, body: ServiceBody) -> Result<(), PlatformE
             &e,
         )
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// P-07: struktura startowa Broker-UI — rozszerzona (`STARTUPINFOEXW`) z listą atrybutów,
+    /// stdin = wskazany uchwyt; lista atrybutów w buforze wyrównanym.
+    #[test]
+    fn startup_info_is_extended_with_aligned_attribute_list() {
+        let mut attrs = AttrList::new(1).unwrap();
+        let list = attrs.as_ptr();
+        assert_eq!(list.0 as usize % std::mem::align_of::<usize>(), 0);
+        let mut desktop = wide(r"winsta0\default");
+        let si = startup_info(&mut desktop, HANDLE(std::ptr::dangling_mut()), list);
+        assert_eq!(si.StartupInfo.cb as usize, size_of::<STARTUPINFOEXW>());
+        assert_eq!(si.lpAttributeList.0, list.0);
+        assert!(si.StartupInfo.dwFlags.contains(STARTF_USESTDHANDLES));
+        assert!(si.StartupInfo.hStdOutput.0.is_null() && si.StartupInfo.hStdError.0.is_null());
+        let inherited = [HANDLE(std::ptr::dangling_mut())];
+        // SAFETY: test — lista zainicjalizowana, wartość żyje do końca testu.
+        let r = unsafe {
+            UpdateProcThreadAttribute(
+                list,
+                0,
+                PROC_THREAD_ATTRIBUTE_HANDLE_LIST as usize,
+                Some(inherited.as_ptr().cast::<c_void>()),
+                size_of_val(&inherited),
+                None,
+                None,
+            )
+        };
+        assert!(r.is_ok());
+    }
 }

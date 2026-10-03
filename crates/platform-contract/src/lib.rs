@@ -6,6 +6,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod capture;
+mod capture_check;
 mod clipboard;
 mod desktop;
 mod dirwatch;
@@ -14,6 +15,7 @@ mod dirwatch_policy;
 mod dirwatch_set;
 mod error;
 mod exec;
+mod focus;
 mod fs;
 mod gui;
 mod hardware;
@@ -34,6 +36,7 @@ mod signals;
 mod surface;
 mod synth;
 mod synth_plan;
+mod target;
 mod tray;
 mod uia;
 mod uia_action;
@@ -51,7 +54,9 @@ pub use fs::{
 pub use hardware::{
     AudioDirection, AudioEndpoint, CpuSummary, GpuAdapter, HardwarePort, OsSummary, PowerStatus,
 };
-pub use hotkey::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, KILL_SWITCH, Key, Modifiers};
+pub use hotkey::{
+    Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, HotkeyPressOrigin, KILL_SWITCH, Key, Modifiers,
+};
 pub use process::{Integrity, ProcessHandle, ProcessPort, ProcessSpec, ProcessStatus};
 pub use tray::{Notification, TrayMenuItem, TrayPort, TrayState};
 pub use window::{WindowId, WindowInfo, WindowPort};
@@ -87,6 +92,8 @@ pub use capture::{
     DEFAULT_MASKED_APPS, MaskReason, MaskedArea, ScreenCapturePort, Screenshot, finish_capture,
     mask_and_scale, mask_plan,
 };
+// Przegląd #2, P2-02: ponowne wyliczenie okien po klatce (TOCTOU maskowania).
+pub use capture_check::{CAPTURE_ATTEMPTS, capture_set_stable, union_for_mask, unstable_masks};
 pub use desktop::{
     DesktopPort, DesktopWindow, MIN_WINDOW_SIZE, MonitorInfo, WindowState, validate_bounds,
 };
@@ -101,6 +108,13 @@ pub use synth::{
     InputStep, MouseButton, RawInput, TargetWindow, execute as execute_input,
 };
 pub use synth_plan::plan_batches;
+// Przegląd bezpieczeństwa #2: element z fokusem przed wpisywaniem (P2-03) i procesy powiązane
+// z oknem-celem — WebView2 Alfy, okna-własności, UWP, drzewo procesów przy każdej akcji (P2-01).
+pub use focus::{FocusedField, batch_writes_text};
+pub use target::{
+    LinkRole, MAX_ANCESTORS, ProcessLink, UWP_CORE_CLASS, UWP_FRAME_CLASS, UWP_FRAME_HOST,
+    ancestors_of,
+};
 pub use uia::{
     ElementRef, ExpandState, MAX_SET_VALUE_CHARS, SPARSE_TREE_NODES, ScrollAmount, ScrollDirection,
     ToggleState, TreeOptions, UIA_CALL_TIMEOUT_MS, UIA_TREE_TIMEOUT_MS, UiaAction, UiaNode,

@@ -10,6 +10,8 @@ struct Mock {
     sent: Mutex<Vec<Vec<RawInput>>>,
     touch_after: Option<usize>,
     steal_after: Option<(usize, TargetWindow)>,
+    field: Mutex<FocusedField>,
+    password_after: Option<usize>,
 }
 
 fn win(id: u64, image: &str) -> TargetWindow {
@@ -18,6 +20,7 @@ fn win(id: u64, image: &str) -> TargetWindow {
         pid: 100 + u32::try_from(id).unwrap(),
         image: image.into(),
         elevated: false,
+        links: Vec::new(),
     }
 }
 
@@ -30,6 +33,8 @@ impl Mock {
             sent: Mutex::new(Vec::new()),
             touch_after: None,
             steal_after: None,
+            field: Mutex::new(FocusedField::Ordinary),
+            password_after: None,
         }
     }
 }
@@ -61,7 +66,13 @@ impl InputBackend for Mock {
         {
             *self.focus.lock().unwrap() = w.clone();
         }
+        if self.password_after == Some(sent.len()) {
+            *self.field.lock().unwrap() = FocusedField::Password;
+        }
         Ok(())
+    }
+    fn focused_field(&self) -> FocusedField {
+        *self.field.lock().unwrap()
     }
 }
 
@@ -264,4 +275,88 @@ fn physical_input_has_priority() {
     );
     assert_eq!(r, Err(GuiError::Cancelled));
     assert!(control.is_cancelled());
+}
+
+#[test]
+fn nothing_is_typed_into_password_fields_or_unknown_focus() {
+    let keys = |k: &str| InputPlan {
+        window: WindowId(1),
+        steps: vec![InputStep::Keys {
+            chord: KeyChord::parse(k).unwrap(),
+        }],
+    };
+    for field in [FocusedField::Password, FocusedField::Unknown] {
+        let m = Mock::new();
+        *m.field.lock().unwrap() = field;
+        for plan in [
+            text_plan("tajne"),
+            keys("Ctrl+V"),
+            keys("a"),
+            keys("Backspace"),
+        ] {
+            assert!(
+                matches!(run(&m, &plan), Err(GuiError::Policy(_))),
+                "{field:?} {plan:?}"
+            );
+        }
+        assert!(m.sent.lock().unwrap().is_empty());
+        // Nawigacja i zatwierdzenie formularza nie wpisują treści.
+        assert!(run(&m, &keys("Enter")).is_ok());
+        assert!(run(&m, &keys("Shift+Tab")).is_ok());
+    }
+    // Fokus przechodzi do pola hasła w trakcie pisania → kolejna paczka nie wychodzi.
+    let mut m = Mock::new();
+    m.password_after = Some(1);
+    assert!(matches!(
+        run(&m, &text_plan(&"z".repeat(100))),
+        Err(GuiError::Policy(_))
+    ));
+    assert_eq!(m.sent.lock().unwrap().len(), 1);
+    // Domyślny backend bez odczytu fokusu = fokus nieznany.
+    struct Bare;
+    impl InputBackend for Bare {
+        fn now_ms(&self) -> u64 {
+            10_000
+        }
+        fn pause_ms(&self, _: u64) {}
+        fn last_physical_input_ms(&self) -> Option<u64> {
+            None
+        }
+        fn foreground_target(&self) -> Option<TargetWindow> {
+            Some(win(1, "notepad.exe"))
+        }
+        fn target_at(&self, _: i32, _: i32) -> Option<TargetWindow> {
+            None
+        }
+        fn inject(&self, _: &[RawInput]) -> Result<(), GuiError> {
+            Ok(())
+        }
+    }
+    let r = execute(
+        &text_plan("x"),
+        &Bare,
+        &TargetGuard::baseline(),
+        &InputPacing::default(),
+        &InputControl::new(),
+    );
+    assert!(matches!(r, Err(GuiError::Policy(_))));
+}
+
+#[test]
+fn linked_alfa_processes_stop_input() {
+    use crate::target::{LinkRole, ProcessLink};
+    let m = Mock::new();
+    let mut popup = win(1, r"C:\EdgeWebView\msedgewebview2.exe");
+    popup.links = vec![ProcessLink {
+        role: LinkRole::Root,
+        pid: popup.pid,
+        image: popup.image.clone(),
+        ancestors: vec![std::process::id()],
+    }];
+    *m.focus.lock().unwrap() = popup;
+    assert!(matches!(
+        run(&m, &text_plan("x")),
+        Err(GuiError::ProtectedTarget(_))
+    ));
+    assert!(m.sent.lock().unwrap().is_empty());
 }

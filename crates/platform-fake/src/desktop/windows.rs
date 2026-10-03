@@ -13,7 +13,8 @@ impl DesktopPort for FakeDesktop {
     }
 
     fn windows(&self) -> Result<Vec<DesktopWindow>, GuiError> {
-        Ok(self.lock().windows.iter().map(|w| w.info.clone()).collect())
+        let s = self.lock();
+        Ok(s.windows.iter().map(|w| self.described(&s, w)).collect())
     }
 
     fn foreground(&self) -> Result<Option<DesktopWindow>, GuiError> {
@@ -21,7 +22,7 @@ impl DesktopPort for FakeDesktop {
         Ok(s.windows
             .iter()
             .find(|w| w.info.focused)
-            .map(|w| w.info.clone()))
+            .map(|w| self.described(&s, w)))
     }
 
     fn window_at(&self, x: i32, y: i32) -> Result<Option<WindowId>, GuiError> {
@@ -35,7 +36,7 @@ impl DesktopPort for FakeDesktop {
     fn focus(&self, id: WindowId) -> Result<(), GuiError> {
         let mut s = self.lock();
         let w = s.win(id)?;
-        self.guard.check(w.info.pid, &w.info.image, "fokus okna")?;
+        self.check_win(&s, w, "fokus okna")?;
         s.raise(id);
         s.record(id, GuiRecordKind::Window("focus".into()));
         Ok(())
@@ -44,8 +45,7 @@ impl DesktopPort for FakeDesktop {
     fn set_bounds(&self, id: WindowId, rect: ScreenRect) -> Result<(), GuiError> {
         let mut s = self.lock();
         let w = s.win(id)?;
-        self.guard
-            .check(w.info.pid, &w.info.image, "zmiana położenia okna")?;
+        self.check_win(&s, w, "zmiana położenia okna")?;
         validate_bounds(&rect, &s.monitors)?;
         let w = s.win_mut(id)?;
         w.info.state = WindowState::Normal;
@@ -58,7 +58,7 @@ impl DesktopPort for FakeDesktop {
     fn set_state(&self, id: WindowId, state: WindowState) -> Result<(), GuiError> {
         let mut s = self.lock();
         let w = s.win(id)?;
-        self.guard.check(w.info.pid, &w.info.image, "stan okna")?;
+        self.check_win(&s, w, "stan okna")?;
         let work = s.monitors.first().map(|m| m.work_area).unwrap_or_default();
         let focused = s.windows.iter().find(|w| w.info.focused).map(|w| w.info.id);
         let w = s.win_mut(id)?;

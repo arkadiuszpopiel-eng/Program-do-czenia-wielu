@@ -285,6 +285,16 @@ pub trait UiaPort: Send + Sync {
     fn act(&self, element: &ElementRef, action: &UiaAction) -> Result<UiaNode, GuiError>;
     /// Prostokąty pól haseł w oknie (maskowanie zrzutów).
     fn password_rects(&self, window: WindowId) -> Result<Vec<ScreenRect>, GuiError>;
+    /// Element z fokusem klawiatury w oknie (UIA `GetFocusedElement`; wartość pola hasła
+    /// usunięta); `Ok(None)` — fokus klawiatury poza tym oknem. Odmowa dla okna chronionego.
+    /// Domyślnie błąd: implementacja bez odczytu fokusu = fokus nieznany, więc wpisywanie tekstu
+    /// jest odrzucane ([`crate::FocusedField`], przegląd #2, P2-03).
+    fn focused(&self, window: WindowId) -> Result<Option<UiaNode>, GuiError> {
+        Err(GuiError::PatternUnsupported(format!(
+            "odczyt elementu z fokusem w oknie {} niedostępny",
+            window.0
+        )))
+    }
 }
 
 /// Nazwa roli dla `UIA_*ControlTypeId` (50000–50040); nieznane → `custom`.

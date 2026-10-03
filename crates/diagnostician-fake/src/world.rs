@@ -7,7 +7,8 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use async_trait::async_trait;
 use diagnostician_contract::{
-    Detection, KernelApprovals, KernelOutcome, Proposal, RepairContext, RepairEnv, RepairStep,
+    ConfigChange, Detection, KernelApprovals, KernelOutcome, Proposal, RepairContext, RepairEnv,
+    RepairStep,
 };
 use serde_json::Value;
 use watchdog_contract::{Clock, ManualClock};
@@ -145,6 +146,27 @@ impl RepairContext for ChaosWorld {
     }
     fn last_good_revision(&self) -> Option<String> {
         lock(&self.state).last_good.clone()
+    }
+    fn revision_diff(&self, from: &str, to: &str) -> Option<Vec<ConfigChange>> {
+        let st = lock(&self.state);
+        let current = if st.revision == from {
+            &st.config
+        } else {
+            st.revisions.get(from)?
+        };
+        let target = st.revisions.get(to)?;
+        let keys: std::collections::BTreeSet<&String> =
+            current.keys().chain(target.keys()).collect();
+        Some(
+            keys.into_iter()
+                .filter(|k| current.get(*k) != target.get(*k))
+                .map(|k| ConfigChange {
+                    key: k.clone(),
+                    current: current.get(k).cloned(),
+                    target: target.get(k).cloned(),
+                })
+                .collect(),
+        )
     }
     fn latest_backup(&self, path: &str) -> Option<String> {
         let backup = format!("kopie/{path}");

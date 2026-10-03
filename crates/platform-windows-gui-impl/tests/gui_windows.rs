@@ -1,11 +1,15 @@
 //! Testy Windows: wywołania bez pulpitu interaktywnego (CI `windows-latest`) oraz `#[ignore]`
 //! wymagające pulpitu (self-hosted): Notatnik — drzewo UIA, wpisanie tekstu, odczyt, zrzut,
-//! okno; odmowa wobec okna bieżącego procesu (chronionego).
+//! okno; odmowa wobec okna bieżącego procesu (chronionego) i jego potomków (drzewo procesów
+//! liczone przy każdej akcji — przegląd #2, P2-01). Notatnik do sterowania startuje przez
+//! `cmd /c start`, więc nie jest potomkiem procesu testu.
 
 #![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use std::process::{Child, Command};
+
+use platform_contract::FocusedField;
 use std::time::{Duration, Instant};
 
 use platform_contract::{
@@ -22,7 +26,8 @@ fn queries_do_not_fail_without_desktop() {
     assert!(
         windows
             .iter()
-            .all(|w| w.protected == gui.guard().is_protected(w.pid, &w.image))
+            .all(|w| w.protected || !gui.guard().is_protected(w.pid, &w.image)),
+        "okno procesu chronionego zawsze oznaczone (procesy powiązane mogą dodać ochronę)"
     );
     let _ = gui.monitors().unwrap();
     let _ = gui.foreground().unwrap();
@@ -44,26 +49,46 @@ fn queries_do_not_fail_without_desktop() {
     assert!(gui.password_rects(WindowId(0)).is_err());
 }
 
-struct Notepad(Child);
+/// Notatnik (zamykany po PID okna).
+struct Notepad(u32);
 
 impl Drop for Notepad {
     fn drop(&mut self) {
-        let _ = self.0.kill();
+        let _ = Command::new("taskkill")
+            .args(["/F", "/PID", &self.0.to_string()])
+            .status();
+    }
+}
+
+fn find_notepad(gui: &WinGui, protected: bool) -> (Notepad, WindowId) {
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let found = gui.windows().unwrap().into_iter().find(|w| {
+            w.image.to_lowercase().ends_with("notepad.exe")
+                && !w.title.is_empty()
+                && w.protected == protected
+        });
+        if let Some(w) = found {
+            return (Notepad(w.pid), w.id);
+        }
+        assert!(Instant::now() < deadline, "Notatnik nie wystartował");
+        std::thread::sleep(Duration::from_millis(200));
     }
 }
 
 fn notepad(gui: &WinGui) -> (Notepad, WindowId) {
-    let child = Command::new("notepad.exe").spawn().unwrap();
-    let guard = Notepad(child);
+    // `start` przez `cmd` (który od razu kończy pracę) — Notatnik nie jest potomkiem testu.
+    Command::new("cmd")
+        .args(["/C", "start", "", "notepad.exe"])
+        .status()
+        .unwrap();
     let deadline = Instant::now() + Duration::from_secs(10);
     loop {
-        let found = gui
-            .windows()
-            .unwrap()
-            .into_iter()
-            .find(|w| w.image.to_lowercase().ends_with("notepad.exe") && !w.title.is_empty());
+        let found = gui.windows().unwrap().into_iter().find(|w| {
+            w.image.to_lowercase().ends_with("notepad.exe") && !w.title.is_empty() && !w.protected
+        });
         if let Some(w) = found {
-            return (guard, w.id);
+            return (Notepad(w.pid), w.id);
         }
         assert!(Instant::now() < deadline, "Notatnik nie wystartował");
         std::thread::sleep(Duration::from_millis(200));
@@ -139,4 +164,22 @@ fn monitor_capture_masks_and_hook_detects_user() {
             "okno chronione bez maski: {p:?}"
         );
     }
+}
+
+#[test]
+#[ignore = "wymaga pulpitu interaktywnego (self-hosted runner)"]
+fn child_process_windows_of_alfa_are_protected_and_focus_is_read() {
+    let gui = WinGui::default();
+    // Potomek procesu „Alfy” (tu: procesu testu) uruchomiony po starcie portu — chroniony.
+    let child: Child = Command::new("notepad.exe").spawn().unwrap();
+    let (_np, w) = find_notepad(&gui, true);
+    assert!(matches!(gui.focus(w), Err(GuiError::ProtectedTarget(_))));
+    assert!(gui.tree(w, &TreeOptions::default()).is_err());
+    drop(child);
+    // Zwykły Notatnik: element z fokusem nie jest polem hasła → wpisywanie dozwolone.
+    let (_np2, w2) = notepad(&gui);
+    gui.focus(w2).unwrap();
+    std::thread::sleep(Duration::from_secs(1));
+    let field = FocusedField::from_lookup(&gui.focused(w2));
+    assert_eq!(field, FocusedField::Ordinary);
 }

@@ -2,6 +2,10 @@
 //! z `PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE` → Job Object (`KILL_ON_JOB_CLOSE`) → wznowienie.
 //! Zamknięcie: `TerminateJobObject` (całe drzewo), zamknięcie wejścia, `ClosePseudoConsole` na
 //! osobnym wątku (przed Windows 11 24H2 potrafi czekać na opróżnienie wyjścia).
+//!
+//! Przegląd #2, P2-05: lista atrybutów w buforze wyrównanym ([`crate::attrs`]); zapis wejścia
+//! nie trzyma zamka uchwytu — `close()` nigdy nie czeka na blokujący `WriteFile` (zapis działa na
+//! współdzielonym uchwycie, porcjami, i kończy się po zamknięciu sesji).
 
 #![allow(unsafe_code)]
 
@@ -10,7 +14,7 @@ use std::io::{self, Read};
 use std::mem::size_of;
 use std::os::windows::ffi::OsStrExt;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use platform_contract::{PlatformError, PtySession, PtySize, PtySpec};
 use windows::Win32::Foundation::{CloseHandle, ERROR_BROKEN_PIPE, HANDLE, WAIT_OBJECT_0};
@@ -25,15 +29,18 @@ use windows::Win32::System::JobObjects::{
 };
 use windows::Win32::System::Pipes::CreatePipe;
 use windows::Win32::System::Threading::{
-    CREATE_SUSPENDED, CREATE_UNICODE_ENVIRONMENT, CreateProcessW, DeleteProcThreadAttributeList,
-    EXTENDED_STARTUPINFO_PRESENT, GetExitCodeProcess, InitializeProcThreadAttributeList,
-    LPPROC_THREAD_ATTRIBUTE_LIST, PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, PROCESS_INFORMATION,
-    ResumeThread, STARTF_USESTDHANDLES, STARTUPINFOEXW, TerminateProcess,
+    CREATE_SUSPENDED, CREATE_UNICODE_ENVIRONMENT, CreateProcessW, EXTENDED_STARTUPINFO_PRESENT,
+    GetExitCodeProcess, LPPROC_THREAD_ATTRIBUTE_LIST, PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+    PROCESS_INFORMATION, ResumeThread, STARTF_USESTDHANDLES, STARTUPINFOEXW, TerminateProcess,
     UpdateProcThreadAttribute, WaitForSingleObject,
 };
 use windows::core::{PCWSTR, PWSTR};
 
+use crate::attrs::AttrList;
 use crate::cmdline::{command_line, environment_block};
+
+/// Największa porcja jednego `WriteFile` (między porcjami sprawdzane jest zamknięcie sesji).
+const WRITE_CHUNK: usize = 4_096;
 
 fn err(context: &str, e: &windows::core::Error) -> PlatformError {
     PlatformError::Io(format!("{context}: 0x{:08X} {}", e.code().0, e.message()))
@@ -127,7 +134,10 @@ pub(crate) struct ConPtySession {
     pid: u32,
     process: Owned,
     job: Owned,
-    input: Mutex<Option<Owned>>,
+    /// Uchwyt wejścia; zamek tylko na czas sklonowania/zdjęcia (nie na czas zapisu).
+    input: Mutex<Option<Arc<Owned>>>,
+    /// Kolejność zapisów (jeden piszący naraz); `close()` go nie bierze.
+    writing: Mutex<()>,
     output: Mutex<Option<Owned>>,
     console: Mutex<Option<Console>>,
     closed: AtomicBool,
@@ -155,15 +165,10 @@ pub(crate) fn spawn(spec: &PtySpec) -> Result<ConPtySession, PlatformError> {
     let console = Console(hpc);
     drop((in_read, out_write));
     let job = job()?;
-    let mut size = 0usize;
-    // SAFETY: pierwsze wywołanie zwraca wymagany rozmiar listy atrybutów (błąd jest oczekiwany).
-    let _ = unsafe { InitializeProcThreadAttributeList(None, 1, None, &raw mut size) };
-    let mut attrs = vec![0u8; size.max(1)];
-    let list = LPPROC_THREAD_ATTRIBUTE_LIST(attrs.as_mut_ptr().cast());
-    // SAFETY: lista atrybutów w buforze o wymaganym rozmiarze; atrybut = wartość uchwytu HPCON.
+    let mut attrs = AttrList::new(1)?;
+    let list = attrs.as_ptr();
+    // SAFETY: lista atrybutów zainicjalizowana w wyrównanym buforze; atrybut = wartość uchwytu HPCON.
     unsafe {
-        InitializeProcThreadAttributeList(Some(list), 1, None, &raw mut size)
-            .map_err(|e| err("InitializeProcThreadAttributeList", &e))?;
         UpdateProcThreadAttribute(
             list,
             0,
@@ -173,8 +178,8 @@ pub(crate) fn spawn(spec: &PtySpec) -> Result<ConPtySession, PlatformError> {
             None,
             None,
         )
-        .map_err(|e| err("UpdateProcThreadAttribute", &e))?;
     }
+    .map_err(|e| err("UpdateProcThreadAttribute", &e))?;
     let si = startup_info(list);
     let program = wide(spec.program.as_os_str());
     let mut cmd: Vec<u16> = command_line(&spec.program.to_string_lossy(), &spec.args)
@@ -199,8 +204,7 @@ pub(crate) fn spawn(spec: &PtySpec) -> Result<ConPtySession, PlatformError> {
             &raw mut pi,
         )
     };
-    // SAFETY: lista atrybutów zainicjalizowana wyżej; bufor `attrs` żyje do końca funkcji.
-    unsafe { DeleteProcThreadAttributeList(list) };
+    drop(attrs);
     if let Err(e) = created {
         return Err(err("CreateProcessW", &e));
     }
@@ -217,7 +221,8 @@ pub(crate) fn spawn(spec: &PtySpec) -> Result<ConPtySession, PlatformError> {
         pid: pi.dwProcessId,
         process,
         job,
-        input: Mutex::new(Some(in_write)),
+        input: Mutex::new(Some(Arc::new(in_write))),
+        writing: Mutex::new(()),
         output: Mutex::new(Some(out_read)),
         console: Mutex::new(Some(console)),
         closed: AtomicBool::new(false),
@@ -252,17 +257,23 @@ impl PtySession for ConPtySession {
     }
 
     fn write_input(&self, data: &[u8]) -> Result<(), PlatformError> {
-        let guard = lock(&self.input);
-        let Some(h) = guard.as_ref() else {
-            return Err(PlatformError::Io("sesja terminala zamknięta".into()));
-        };
-        let mut rest = data;
-        while !rest.is_empty() {
-            let mut n = 0u32;
-            // SAFETY: zapis z bufora wywołującego do potoku wejścia pseudokonsoli.
-            unsafe { WriteFile(h.0, Some(rest), Some(&raw mut n), None) }
-                .map_err(|e| err("WriteFile", &e))?;
-            rest = rest.get(n as usize..).unwrap_or_default();
+        let closed = || PlatformError::Io("sesja terminala zamknięta".into());
+        let _order = lock(&self.writing);
+        // Zamek uchwytu tylko na czas klonu: blokujący `WriteFile` nie wstrzymuje `close()`.
+        let handle = lock(&self.input).clone().ok_or_else(closed)?;
+        for chunk in data.chunks(WRITE_CHUNK) {
+            let mut rest = chunk;
+            while !rest.is_empty() {
+                if self.closed.load(Ordering::SeqCst) {
+                    return Err(closed());
+                }
+                let mut n = 0u32;
+                // SAFETY: zapis z bufora wywołującego do potoku wejścia pseudokonsoli; uchwyt
+                // żyje dzięki `Arc` do końca zapisu, nawet gdy `close()` zdjął go z sesji.
+                unsafe { WriteFile(handle.0, Some(rest), Some(&raw mut n), None) }
+                    .map_err(|e| err("WriteFile", &e))?;
+                rest = rest.get(n as usize..).unwrap_or_default();
+            }
         }
         Ok(())
     }
@@ -315,6 +326,34 @@ impl Drop for ConPtySession {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Przegląd #2, P2-05: zapis „zawieszony” (tu: trzymany zamek kolejności zapisów — tak jak
+    /// blokujący `WriteFile`) nie wstrzymuje `close()`; po zamknięciu zapis kończy się błędem.
+    #[test]
+    fn close_never_waits_for_a_blocked_writer() {
+        let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
+        let spec = PtySpec {
+            program: std::path::PathBuf::from(format!(r"{root}\System32\cmd.exe")),
+            args: vec!["/k".into()],
+            cwd: std::env::temp_dir(),
+            env: platform_contract::filter_env(
+                std::env::vars(),
+                &platform_contract::DEFAULT_ENV_ALLOWLIST,
+            ),
+            size: PtySize { cols: 80, rows: 25 },
+        };
+        let session = std::sync::Arc::new(spawn(&spec).unwrap());
+        let order = lock(&session.writing);
+        let (tx, rx) = std::sync::mpsc::channel();
+        let s2 = session.clone();
+        std::thread::spawn(move || {
+            let _ = tx.send(s2.close());
+        });
+        let closed = rx.recv_timeout(std::time::Duration::from_secs(5));
+        assert!(closed.is_ok(), "close() czekał na piszącego");
+        drop(order);
+        assert!(session.write_input(b"dir\r\n").is_err());
+    }
 
     /// Regresja (CI `windows-latest`, stdout testu = potok): bez `STARTF_USESTDHANDLES` dziecko
     /// pisało do wyjścia rodzica, a pseudokonsola nie dostawała ani bajtu.

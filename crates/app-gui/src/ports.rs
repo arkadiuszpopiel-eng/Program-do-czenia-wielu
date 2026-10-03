@@ -3,6 +3,8 @@
 //! PID-y całego drzewa procesów Alfy (WebView2, sidecary, terminal ConPTY, Broker i watchdog
 //! uruchomione przez Alfę) oraz katalogi instalacji (`%LOCALAPPDATA%\Alfa`, katalog programu).
 //! Obrazy Brokera, Broker-UI, watchdoga i helpera są chronione nazwą zawsze (lista bazowa).
+//! Port i tak liczy drzewo procesów przy każdej akcji (potomek bieżącego procesu albo PID-u
+//! z listy jest chroniony — np. proces WebView2 odtworzony po awarii; przegląd #2, P2-01).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -174,6 +176,9 @@ impl UiaPort for LazyWinGui {
     }
     fn password_rects(&self, window: WindowId) -> Result<Vec<ScreenRect>, GuiError> {
         self.get().password_rects(window)
+    }
+    fn focused(&self, window: WindowId) -> Result<Option<UiaNode>, GuiError> {
+        self.get().focused(window)
     }
 }
 

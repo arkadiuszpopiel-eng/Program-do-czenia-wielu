@@ -9,7 +9,10 @@ use std::sync::{Arc, OnceLock};
 use agent_runtime_contract::{
     AgentRuntime, Crew, MemCheckpointStore, RunError, RunId, RunOptions, RunSpec,
 };
-use agent_runtime_impl::{BrokerAutonomy, Runtime, RuntimeConfig, RuntimeDeps, RuntimeExt};
+use agent_runtime_contract::{MemorySessionTaint, SessionTaint};
+use agent_runtime_impl::{
+    BrokerAutonomy, BrokerSessionTaint, Runtime, RuntimeConfig, RuntimeDeps, RuntimeExt,
+};
 use core_bus_contract::{EventBus, SessionId};
 use personas_contract::Personas;
 use providers_contract::ModelProvider;
@@ -31,6 +34,9 @@ pub struct SkillCall {
 #[derive(Clone, Default)]
 pub struct Launch {
     ext: RuntimeExt,
+    /// Skażenie sesji (przegląd #2, P2-07): z Brokera, gdy jest — kolejne tury i przebiegi sesji
+    /// startują skażone.
+    taint: Option<Arc<dyn SessionTaint>>,
     personas: Option<Arc<dyn Personas>>,
     skills: Arc<OnceLock<Arc<dyn Skills>>>,
 }
@@ -53,10 +59,14 @@ impl Launch {
         broker: Option<Arc<dyn Broker>>,
         personas: Option<Arc<dyn Personas>>,
     ) -> Self {
+        let taint = broker
+            .clone()
+            .map(|b| Arc::new(BrokerSessionTaint::new(b)) as Arc<dyn SessionTaint>);
         let autonomy = broker
             .map(|b| Arc::new(BrokerAutonomy(b)) as Arc<dyn agent_runtime_impl::AutonomyOracle>);
         Self {
             ext: RuntimeExt { locks, autonomy },
+            taint,
             personas,
             skills: Arc::default(),
         }
@@ -95,7 +105,11 @@ impl Launch {
         bus: Option<Arc<dyn EventBus>>,
     ) -> (Arc<Runtime>, MemCheckpointStore) {
         let store = MemCheckpointStore::default();
-        let runtime = Runtime::with_ext(
+        let taint = self
+            .taint
+            .clone()
+            .unwrap_or_else(|| Arc::new(MemorySessionTaint::default()));
+        let runtime = Runtime::with_session_taint(
             RuntimeDeps {
                 provider,
                 tools,
@@ -104,6 +118,7 @@ impl Launch {
                 config: RuntimeConfig::default(),
             },
             self.ext.clone(),
+            taint,
         );
         (Arc::new(runtime), store)
     }

@@ -142,3 +142,13 @@ Akcja „zapamiętaj" na wiadomości (z wyborem zakresu), `/pamięć`, panel Pam
 ## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
 - **SR2-07** (w `agent-runtime`): zapis pamięci w przebiegu skażonym idzie z `untrusted_args` → `app-memory` nadaje `Provenance::UntrustedContent` (wcześniej `Agent` — zaufany, możliwy awans i konsolidacja).
 - Propozycja (otwarta): dostęp agentki (`app-memory::RoleAccess`) to suma uprawnień wszystkich ról persony w obsadzie, a nie roli bieżącego przebiegu — ograniczenie Badaczki „tylko sesja” nie działa, gdy persona gra też inne role (Gama: researcher + critic + thinker → odczyt projektu i własnej pamięci).
+
+## Utwardzenia po przeglądzie #2 (2026-10) — **semantyka do potwierdzenia przez człowieka**
+- **P2-06 (zrobione, wariant ściślejszy):** narzędzia pamięci w przebiegu dostają zakresy **roli bieżącego przebiegu** (`ToolCtx::holder.role`) ∩ role persony w obsadzie (`app-memory::RoleAccess::access_for_run`); rola spoza obsady albo jej brak = tylko sesja. Badaczka zostaje w sesji, także gdy persona gra inne role. Kontekst pamięci czatu (rozmowa z właścicielem, poza przebiegiem narzędzi) nadal używa sumy ról (`access`). Test: `app-memory/src/access.rs::run_role_not_sum_of_persona_roles`.
+
+## Eval F7-02 z embedderem ONNX (2026-10-03; tylko testy `memory-impl`)
+- `tests/f7_recall.rs`: `ALFA_F7_EMBEDDER=<embed.json>` → `lib_embed::OnnxEmbedder` w `FakeSearch::with_embedder`
+  (raport na zestawie syntetycznym i na korpusie użytkownika; `ALFA_F7_STRICT=1` tylko z prawdziwym embedderem); na
+  CI ścieżka „z atrapą” na zabawkowym modelu ONNX (`lib-embed` testkit) i test formatu raportu
+  (`<temp>/alfa-f7-recall-<etykieta>.report.json`). Zabawkowy enkoder: recall@5 0,944 (wynik kontrolny, nie jakość).
+- Pełna ścieżka produkcyjna (`SqliteSearch` + `vec0` + bm25 + ONNX) — w kompozycji `app-memory` (`crates/lib-embed/README.md`).

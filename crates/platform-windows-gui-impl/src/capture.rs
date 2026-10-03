@@ -3,6 +3,8 @@
 //! i asynchronicznej puli klatek; okna z `WDA_EXCLUDEFROMCAPTURE` i DRM wychodzą czarne, co
 //! wykrywamy). Maskowanie wspólne z atrapą: okna chronione i z deny-listy, pola haseł z UIA;
 //! okno, którego pól haseł nie dało się sprawdzić w budżecie czasu, maskowane w całości.
+//! Klatka jest ujęta między dwoma wyliczeniami okien (backend): zmiana zbioru = ponowienie,
+//! a po wyczerpaniu prób maska z sumy wyliczeń (przegląd #2, P2-02).
 
 #![allow(unsafe_code)]
 
@@ -182,14 +184,21 @@ fn grab_window(window: &DesktopWindow) -> Result<(RgbaImage, ScreenRect), GuiErr
     Ok((out, frame))
 }
 
-/// Zrzut: `windows` = lista okien (kolejność Z), `passwords(okno)` = pola haseł z UIA.
-pub(crate) fn capture(
+/// Surowa klatka: obraz, przechwycony obszar i okno (dla zrzutu jednego okna).
+pub(crate) struct Frame {
+    raw: RgbaImage,
+    /// Przechwycony obszar ekranu.
+    pub(crate) source: ScreenRect,
+    only: Option<platform_contract::WindowId>,
+}
+
+/// Przechwycenie klatki (`windows` = lista okien wzięta tuż przed; okno chronione albo
+/// z deny-listy jako cel = odmowa).
+pub(crate) fn grab(
     request: &CaptureRequest,
     windows: &[DesktopWindow],
     monitors: &[platform_contract::MonitorInfo],
-    budget_ms: u64,
-    mut passwords: impl FnMut(&DesktopWindow, u64) -> Result<Vec<ScreenRect>, GuiError>,
-) -> Result<Screenshot, GuiError> {
+) -> Result<Frame, GuiError> {
     request.validate()?;
     let (raw, source, only) = match request.target {
         CaptureTarget::Window { window } => {
@@ -228,6 +237,24 @@ pub(crate) fn capture(
             (grab_screen(&r)?, r, None)
         }
     };
+    if raw.width == 0 {
+        return Err(GuiError::Platform(PlatformError::Io("pusty obraz".into())));
+    }
+    Ok(Frame { raw, source, only })
+}
+
+/// Maskowanie klatki: `windows` = lista okien **po** klatce (albo suma wyliczeń, gdy zbiór się
+/// nie ustalił — P2-02), `extra` = dodatkowe maski (okna zmienione między wyliczeniami),
+/// `passwords(okno)` = pola haseł z UIA; okno niesprawdzone w budżecie — w całości.
+pub(crate) fn finish(
+    request: &CaptureRequest,
+    frame: Frame,
+    windows: &[DesktopWindow],
+    budget_ms: u64,
+    extra: Vec<MaskedArea>,
+    mut passwords: impl FnMut(&DesktopWindow, u64) -> Result<Vec<ScreenRect>, GuiError>,
+) -> Screenshot {
+    let Frame { raw, source, only } = frame;
     let deadline = Instant::now() + Duration::from_millis(budget_ms);
     let mut rects = Vec::new();
     let mut unverified = Vec::new();
@@ -254,8 +281,6 @@ pub(crate) fn capture(
     }
     let mut masked = mask_plan(&source, windows, request, &rects);
     masked.extend(unverified);
-    if raw.width == 0 {
-        return Err(GuiError::Platform(PlatformError::Io("pusty obraz".into())));
-    }
-    Ok(finish_capture(raw, source, masked, request, &zlib_best))
+    masked.extend(extra);
+    finish_capture(raw, source, masked, request, &zlib_best)
 }

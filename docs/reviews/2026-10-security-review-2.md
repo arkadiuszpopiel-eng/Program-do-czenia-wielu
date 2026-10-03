@@ -130,3 +130,104 @@ Nowe: `crates/agent-runtime-impl/tests/review.rs`, `crates/skills-contract/tests
 5. P2-07: taint sesji w runtime (wcześniejsze tury) — źródło prawdy: Broker (`SessionSecurity`) czy historia sesji.
 6. P2-10: izolacja `CandidateRunner` dla holdoutu i trwałość liczników Ulepszacza/bramki.
 7. Z przeglądu #1 nadal otwarte: P-01, P-03, P-05, P-08, P-09 (bez zmian).
+
+## 8. Utwardzenia po przeglądzie #2
+
+Data: 2026-10-03. Sesja utwardzająca (autonomiczna; przy wyborze wariantu — bezpieczniejszy, zgodnie z
+`docs/PLAN.md` i `docs/THREAT_MODEL.md`). Zakres: P2-03, P2-01, P2-02, P2-04, P2-05, P-07 (przegląd #1), P2-07,
+P2-09 i P2-06. Zmiany w kontraktach addytywne (nowe typy, metody z domyślną implementacją fail-closed, pola
+`#[serde(default)]`); `app-*` — tylko podpięcia (niżej).
+
+Metoda: test reprodukujący przed poprawką tam, gdzie lukę da się odtworzyć na atrapie (P2-02, P2-07, P2-09 —
+uruchomione, **nie przechodziły**, po poprawce przechodzą). P2-01 i P2-06 — test zawiera asercję, że stary
+warunek (strażnik po procesie okna, suma ról) nie chroni danego przypadku. P2-03 — test napisany po dodaniu
+atrapy fokusu; przebiegu „przed poprawką” nie uruchomiono (tymczasowe wyłączenie sprawdzenia w kodzie zablokowały
+zabezpieczenia środowiska) — luka wynika wprost z kodu (ani `execute_input`, ani `tools-input` nie czytały
+fokusu). P2-04, P2-05, P-07 — FFI Windows: test logiki na Linuksie + test Windows (CI `windows-latest` albo
+`#[ignore]` self-hosted), bez reprodukcji.
+
+### 8.1. Poprawki
+
+| Id | Poprawka | Test(y) | Reprodukcja |
+|---|---|---|---|
+| P2-03 | Tekst/dyktowanie/skróty edytujące nigdy do pola hasła. Kontrakt: `UiaPort::focused(window)` (UIA `GetFocusedElement` + `IsPassword`; domyślnie błąd = fokus nieznany), `InputBackend::focused_field()` (domyślnie `Unknown`), `FocusedField`, `batch_writes_text`, `ChordKey::edits_field` (`platform-contract/src/focus.rs`). `execute_input` odmawia **każdej** paczki wpisującej treść (Unicode, litery, cyfry, spacja, Backspace/Delete/Insert — także `Ctrl+V`, `Shift+Insert`), gdy fokus jest w polu hasła albo nieznany; Enter/Tab/strzałki dozwolone. `tools-input` sprawdza fokus po jego ustawieniu, przed wysłaniem (`Policy`). Atrapa: `FakeElement::focused()`, `FakeDesktop::focus_element`, `ScriptEvent::FocusPassword`, `UiaPort::focused` (element okna, gdy fokus nie jest w elemencie potomnym). Windows: `uia/fields.rs::{focused, focused_field}`, `WinInputBackend::focused_field` (wątek UIA z limitem; błąd = `Unknown`). Dyktowanie (`voice-dictation`) pisze przez `InputPort`, więc też jest objęte. | `tools-input-impl/tests/review.rs` (5: pole hasła, `Ctrl+V`/litery/`Shift+Insert` odrzucone a Enter dozwolony, zwykłe pole działa, fokus przechodzący do hasła w trakcie pisania — tylko 1. paczka, fokus nieznany — port bez odczytu i UIA zawieszone); `platform-contract/src/synth_tests.rs::nothing_is_typed_into_password_fields_or_unknown_focus`; `platform-fake/tests/review_contract.rs` (2); Windows `#[ignore]` `gui_windows.rs::child_process_windows_of_alfa_are_protected_and_focus_is_read` | analiza (jw.) |
+| P2-01 | Strażnik celów: `ProcessLink` (rola, PID, obraz, przodkowie) + `TargetGuard::{is_protected_link, is_protected_window, check_window, is_protected_root}` (`platform-contract/src/target.rs`). Okno chronione, gdy chroniony którykolwiek proces powiązany: okno, `GA_ROOT`, łańcuch `GW_OWNER`/`GA_ROOTOWNER`, treść UWP (proces `Windows.UI.Core.CoreWindow` w `ApplicationFrameWindow`; ramka bez treści = `UwpUnresolved`, chroniona), a przodek w drzewie bieżącego procesu albo PID-u z `pids` = chroniony. **Drzewo procesów z migawki Toolhelp32 przy każdym sprawdzeniu** (lista okien, fokus/położenie/stan, każda paczka wejścia, UIA: okno i proces każdego elementu) — nie tylko przy starcie `LazyWinGui` (`platform-windows-gui-impl/src/links.rs`). Okno UWP ma obraz aplikacji (zdolność `gui.control(<aplikacja>)`, deny-lista dostawców SR-09, „zawsze zezwalaj” nie obejmuje całego UWP). `TargetWindow.links` (`serde(default)`). Atrapa: tabela procesów, `FakeWindow::{in_process, child_of, owned_by, uwp}`, `FakeDesktop::add_process`, ochrona liczona przy każdym sprawdzeniu, `GuiRecord.links`. | `platform-fake/tests/review.rs::zero_effects_in_alfa_popups_uwp_and_respawned_webview` (proptest **500** przypadków: wejście, kliknięcia, fokus, położenie, stan, UIA, wyskakiwanie okien w trakcie, renderer WebView2 odtworzony w trakcie — 0 skutków w oknach Alfy, wszystkie oznaczone `protected`), `old_check_by_window_process_alone_missed_these_windows` (stary strażnik nie chronił ≥ 3 okien sceny; UWP z aplikacją — obraz aplikacji, sterowalne); `review_contract.rs` (2); `synth_tests.rs::linked_alfa_processes_stop_input`; Windows `#[ignore]` (dziecko procesu = chronione) | asercja starego warunku w teście |
+| P2-02 | Zrzut: okna → klatka → okna ponownie; zbiór okien istotny dla maskowania w obszarze zmieniony (`capture_set_stable`: id, prostokąt, stan, ochrona, obraz) → klatka odrzucona i ponowiona (`CAPTURE_ATTEMPTS = 3`); po wyczerpaniu prób maska z sumy wyliczeń (`union_for_mask` — stara i nowa pozycja okien chronionych/maskowanych) i okna zmienione maskowane w całości w obu położeniach (`unstable_masks`, `Unverified`) — `platform-contract/src/capture_check.rs`, `platform-windows-gui-impl/src/{backend,capture}.rs` (`grab` + `finish`). Atrapa w tej samej kolejności co Windows (`FakeDesktop::show_during_capture`). | `platform-fake/tests/review.rs::protected_window_appearing_during_capture_is_masked` (Broker-UI w trakcie zrzutu; okno zmieniane przy każdej próbie); `review_contract.rs::capture_set_detects_appearing_and_moving_windows` | **tak** — przed poprawką piksel Broker-UI niezamaskowany |
+| P2-04 | Skróty globalne z wejścia wstrzykniętego: hook `WH_KEYBOARD_LL` wątku skrótów zapisuje pochodzenie wciśnięć (`LLKHF_INJECTED`/`LLKHF_LOWER_IL_INJECTED`, czas) i puszczenia; `WM_HOTKEY` liczy pochodzenie kombinacji (klawisz główny w oknie `HOOK_WINDOW_MS` + modyfikatory; którykolwiek wstrzyknięty = wstrzyknięte) i odrzuca naciśnięcie, jeśli `HotkeyPressOrigin::admits` = `false`: **kill-switch zawsze**, pozostałe (szybkie pytanie `Ctrl+Alt+Space`, PTT — także łańcuch „wstrzyknięty PTT + własny TTS = polecenie głosowe”) tylko z wejścia fizycznego; nieznane pochodzenie przyjmowane tylko przy oknie podniesionym na pierwszym planie (hook go nie widzi, a UIPI blokuje wtedy `SendInput` procesów zwykłej integralności). **Gdzie wymuszone:** `platform-windows-impl/src/hotkey/thread.rs::on_hotkey` (zdarzenie nie trafia do kolejki `HotkeyPort`), logika `hotkey/origin.rs`, polityka `platform-contract/src/hotkey.rs::HotkeyPressOrigin::admits`; atrapa `FakeHotkeys::press_injected`. | `platform-windows-impl` `hotkey::origin::tests` (fizyczne/wstrzyknięte/nieznane, modyfikator z niższej integralności, puszczenie, zawinięcie zegara), `platform-contract` `hotkey::tests::injected_presses_are_ignored_except_kill_switch`, `platform-fake` `hotkeys::tests` | analiza (Windows) |
+| P2-05 | ConPTY: lista atrybutów w `Vec<usize>` (wyrównanie wskaźnika; `attrs.rs::AttrList`, `DeleteProcThreadAttributeList` w `Drop` — także gdy `UpdateProcThreadAttribute` zawiedzie); `write_input` klonuje uchwyt (`Arc`) pod zamkiem i pisze **bez** niego, porcjami 4 KiB, przerywa po `close()`; kolejność zapisów osobnym zamkiem, którego `close()` nie bierze. | `platform-windows-pty-impl` (Windows CI): `conpty::tests::close_never_waits_for_a_blocked_writer`, `attrs::tests::buffer_is_word_aligned_and_large_enough` | analiza |
+| P-07 (#1) | Start Broker-UI: potok bez dziedziczenia, dziedziczny tylko koniec do odczytu, `STARTUPINFOEXW` + `EXTENDED_STARTUPINFO_PRESENT` + `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` z jednym uchwytem (bufor wyrównany) — `bInheritHandles = TRUE` ograniczone do jawnej listy (`platform-windows-kernel-impl/src/win_launch.rs`). Reszta ryzyka: inny wątek usługi tworzący w tym czasie proces z dziedziczeniem bez listy mógłby odziedziczyć koniec potoku (usługa dziś takich nie tworzy). **Ścieżka Jądra — przegląd człowieka.** | `win_launch::tests::startup_info_is_extended_with_aligned_attribute_list` (Windows CI; start wymaga `SeTcbPrivilege`) | brak (FFI usługi) |
+| P2-07 | Skażenie **sesji**, monotoniczne: kontrakt `SessionTaint` + `MemorySessionTaint` + `TaintReset` (`agent-runtime-contract/src/taint.rs`); runtime dziedziczy taint sesji przy każdym starcie pętli (`Shared::launch`: kolejna tura czatu, delegacja, Krytyczka, zadanie schedulera, wznowienie), a każde `Tainted` skaża sesję (`RunHandle::record`). W aplikacji źródło prawdy = Broker: `BrokerSessionTaint` (`SessionSecurity` + rejestr procesu; podpięte w `app-agents::Launch`). Reset wyłącznie jawnie przez właściciela gestem nie-głosowym (`TaintReset::by_owner` przyjmuje tylko `UserText`; głos/agentka/treść niezaufana — odmowa; `Runtime::reset_session_taint`) — przy tainted Brokerze w praktyce dopiero nowa sesja. Cel podprzebiegu w prompcie: „zlecone przez inną agentkę”, nie „od właściciela”. **Decyzja do potwierdzenia przez człowieka** (SPEC `agent-runtime`, `safety-broker`). | `agent-runtime-impl/tests/review.rs::next_turn_in_tainted_session_inherits_taint` (+ inna sesja nie dziedziczy), `agent-runtime-contract` `taint::tests` | **tak** — przed poprawką zapis pamięci w kolejnej turze `untrusted_args = false` |
+| P2-09 | Diagnosta nie przywraca całej rewizji: „ostatnia dobra rewizja” = `SetConfig` (porównaj-i-zamień) tylko dla kluczy dozwolonych z różnicy rewizji (`RepairContext::revision_diff`, domyślnie brak → bez rollbacku, wyłączenie modułu), klucze Jądra/zakazane zostają + zadanie dla właściciela; wykonawca odrzuca propozycję z `RollbackConfig` (`needs_human`). | `diagnostician-fake/tests/review.rs::rollback_never_restores_keys_forbidden_to_diagnostician`; katalog 24 awarii i testy kontraktowe zielone | **tak** — przed poprawką `privacy.cloud_allowed` wracało do `true` |
+| P2-06 | Pamięć w przebiegu: zakresy **roli bieżącego przebiegu** (`holder.role`) ∩ role persony; rola spoza obsady/brak = tylko sesja (wariant ściślejszy; `app-memory::RoleAccess::access_for_run`, `run_grants`). Kontekst pamięci czatu (poza narzędziami) — bez zmian (suma ról). **Semantyka do potwierdzenia przez człowieka** (SPEC `memory`). | `app-memory/src/access.rs::run_role_not_sum_of_persona_roles` | asercja starego warunku (suma ról Gamy daje odczyt projektu) |
+
+Podpięcia w `app-*` (minimalne): `app-gui/src/ports.rs` — `LazyWinGui` przekazuje `UiaPort::focused` (bez tego
+domyślna metoda = fokus nieznany i wpisywanie byłoby odrzucane); `app-agents/src/launch.rs` — runtime z
+`BrokerSessionTaint`, gdy jest Broker; `app-memory/src/{access,tools}.rs` — P2-06.
+
+Skutek uboczny P2-01 (bezpieczny kierunek): okna procesów uruchomionych przez Alfę jako dzieci (także przez
+powłokę agentki) są chronione — tak jak dotąd procesy istniejące przy pierwszym użyciu `LazyWinGui`. Test Windows
+Notatnika uruchamia go przez `cmd /c start` (poza drzewem procesu testu).
+
+### 8.2. Statusy pozostałych propozycji
+
+| Id | Status |
+|---|---|
+| P2-08 (skills: koperta i taint przy podpinaniu, źródło `.alfa`) | otwarte, bez zmian (podpięcie w `app-agents::launch::skill_run` — przy kolejnej zmianie umiejętności; taint rodzica przy uruchomieniu w tej samej sesji obejmuje teraz P2-07) |
+| P2-10 (holdout `CandidateRunner`, trwałość liczników) | otwarte, bez zmian — decyzja (izolacja runnera w `app-*`) |
+| P-01 (kaskada obniżeń autonomii) | bez zmian — decyzja człowieka (semantyka ADR 15) |
+| P-03 (izolacja powłoki ≤ L3: Low IL / AppContainer) | bez zmian — decyzja architektoniczna (THREAT_MODEL §11) |
+| P-05 (asynchroniczny potok MCP) | bez zmian — wymaga zmiany kontraktu `platform-contract` (osobna sesja MCP) |
+| P-07 | **naprawione** (wyżej) |
+| P-08 (Authenticode, obrazy Jądra w Program Files) | bez zmian — bramka #10 (certyfikat) |
+| P-09 (egress do sieci lokalnej) | bez zmian — decyzja polityki egressu |
+| P-02, P-04, P-06, P-10…P-13 | bez zmian |
+
+### 8.3. Bramki
+
+| Bramka | Wynik |
+|---|---|
+| `cargo fmt --check` (crate'y tej sesji) | czysto |
+| `cargo clippy --workspace --all-targets -D warnings` | czysto (cały workspace, 2026-10-03); po ostatnich poprawkach ponownie per crate — czysto, także `diagnostician-contract --features contract-tests` |
+| clippy `--target x86_64-pc-windows-msvc --all-targets -D warnings` | czysto: `platform-contract`, `platform-windows-gui-impl`, `platform-windows-impl`, `platform-windows-kernel-impl`, `platform-windows-pty-impl` |
+| `cargo test` crate'ów zmienionych i zależnych | zielono: `platform-contract`, `platform-fake`, `platform-windows-{gui,kernel,pty}-impl`, `platform-windows-impl`, `tools-input-impl`, `tools-{window,uia,screen}-impl`, `voice-{dictation,readaloud}-impl`, `agent-runtime-{contract,impl}`, `diagnostician-{contract (contract-tests),fake,impl}`, `app-{gui,agents,memory,health}` — 89 binarek testów, 309 testów, 0 porażek. Pełny `cargo test --workspace` przerwany na polecenie koordynatora (kompilacja crate'ów równoległych sesji) — do uruchomienia przy commicie |
+| `cargo deny check` | advisories/bans/licenses/sources ok |
+| `scripts/check-deps.sh` | jedno naruszenie poza zakresem tej sesji: `lib-embed` → `model-residency-fake` (dev) — nowy crate równoległej sesji |
+| Limity rozmiaru | pliki ≤ 400 linii; `platform-contract` 7 8xx linii `.rs` (testy logiki P2-01/02/03 w `platform-fake/tests/review_contract.rs`, by zmieścić się w 8 000) |
+
+### 8.4. Zmienione i nowe ścieżki (do commita przez koordynatora)
+
+Zmienione: `crates/platform-contract/src/{hotkey.rs,lib.rs,synth.rs,synth_tests.rs,uia.rs}`,
+`crates/platform-fake/src/{hotkeys.rs,lib.rs}`, `crates/platform-fake/src/desktop/{capture.rs,input.rs,mod.rs,uia.rs,windows.rs}`,
+`crates/platform-windows-gui-impl/{Cargo.toml,tests/gui_windows.rs}`,
+`crates/platform-windows-gui-impl/src/{backend.rs,capture.rs,desktop.rs,input.rs,lib.rs,portable.rs,win.rs}`,
+`crates/platform-windows-gui-impl/src/uia/{fields.rs,mod.rs,read.rs}`,
+`crates/platform-windows-impl/src/hotkey/{mod.rs,thread.rs}`, `crates/platform-windows-impl/src/process/mod.rs`,
+`crates/platform-windows-kernel-impl/src/win_launch.rs`, `crates/platform-windows-pty-impl/src/{conpty.rs,lib.rs}`,
+`crates/tools-input-impl/src/{lib.rs,plan.rs}`, `crates/agent-runtime-contract/src/lib.rs`,
+`crates/agent-runtime-impl/src/{engine.rs,handle.rs,lib.rs,prompt.rs,shared.rs}`, `crates/agent-runtime-impl/tests/review.rs`,
+`crates/diagnostician-contract/src/{exec.rs,lib.rs,plan_rules.rs,ports.rs}`, `crates/diagnostician-fake/src/world.rs`,
+`crates/diagnostician-fake/tests/review.rs`, `crates/app-gui/src/ports.rs`, `crates/app-agents/src/launch.rs`,
+`crates/app-memory/src/{access.rs,tools.rs}`,
+`docs/modules/{tools-input,platform-windows,agent-runtime,safety-broker,diagnostician,memory,ui-terminal}/SPEC.md`,
+`docs/reviews/2026-10-security-review-2.md` (ta sekcja).
+
+Nowe: `crates/platform-contract/src/{focus.rs,target.rs,capture_check.rs}`, `crates/platform-fake/src/desktop/procs.rs`,
+`crates/platform-fake/tests/{review.rs,review_contract.rs}`, `crates/platform-windows-gui-impl/src/links.rs`,
+`crates/platform-windows-impl/src/hotkey/origin.rs`, `crates/platform-windows-pty-impl/src/attrs.rs`,
+`crates/tools-input-impl/tests/review.rs`, `crates/agent-runtime-contract/src/taint.rs`.
+
+Bez zmian w `Cargo.lock` (nowa cecha `Win32_System_Diagnostics_ToolHelp` tej samej wersji `windows` w
+`platform-windows-gui-impl`), `deny.toml`, root `Cargo.toml`, `crates/README.md`.
+
+### 8.5. Do decyzji człowieka
+
+1. P2-07: skażenie sesji w runtime (Broker jako źródło prawdy, reset tylko gestem nie-głosowym; przy taincie
+   Brokera — nowa sesja) i etykieta celu podprzebiegu.
+2. P2-06: uprawnienia pamięci wg roli bieżącego przebiegu (wariant ściślejszy) zamiast sumy ról persony.
+3. P-07 i P2-04: zmiany w ścieżkach Jądra (`platform-windows-kernel-impl` — start Broker-UI; kill-switch i skróty
+   globalne w `platform-windows-impl`) — przegląd człowieka zgodnie z AGENTS.md.
+4. P2-01: okna procesów potomnych Alfy (także uruchomionych przez powłokę agentki) poza zasięgiem `gui.control`;
+   minimalizowane okna UWP (ramka bez `CoreWindow`) — chronione do czasu przywrócenia przez właściciela.
+5. P2-04: przy oknie administratora na pierwszym planie skróty Alfy (poza kill-switchem) działają tylko, gdy
+   pochodzenie jest nieznane i okno jest podniesione — potwierdzić na self-hosted (UIPI a hook LL).
+6. Nadal otwarte z #1/#2: P-01, P-03, P-05, P-08, P-09, P2-08, P2-10.

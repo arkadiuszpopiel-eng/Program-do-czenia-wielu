@@ -6,7 +6,9 @@ use std::collections::VecDeque;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 
-use agent_runtime_contract::{RunEvent, RunEventEnvelope, RunId, RunOutcome, RunStatus, Steer};
+use agent_runtime_contract::{
+    RunEvent, RunEventEnvelope, RunId, RunOutcome, RunStatus, SessionTaint, Steer,
+};
 use core_bus_contract::{AgentId, EventBus, SessionId};
 use tokio::sync::{Notify, broadcast, watch};
 use tokio_util::sync::CancellationToken;
@@ -46,6 +48,8 @@ pub(crate) struct RunHandle {
     running: AtomicBool,
     children: Mutex<Vec<RunId>>,
     active_child: Mutex<Option<Arc<RunHandle>>>,
+    /// Rejestr skażenia sesji — `Tainted` skaża sesję (P2-07).
+    taint: Option<Arc<dyn SessionTaint>>,
 }
 
 impl RunHandle {
@@ -75,11 +79,21 @@ impl RunHandle {
             running: AtomicBool::new(true),
             children: Mutex::new(Vec::new()),
             active_child: Mutex::new(None),
+            taint: None,
         }
+    }
+
+    /// Rejestr skażenia sesji.
+    pub(crate) fn with_taint(mut self, taint: Arc<dyn SessionTaint>) -> Self {
+        self.taint = Some(taint);
+        self
     }
 
     /// Zapisuje zdarzenie (dziennik, subskrybenci, stan) — synchronicznie.
     pub(crate) fn record(&self, event: RunEvent) -> RunEventEnvelope {
+        if let (RunEvent::Tainted { source }, Some(taint)) = (&event, &self.taint) {
+            taint.mark(&self.session, source);
+        }
         let mut log = lock(&self.log);
         let env = RunEventEnvelope {
             run: self.run.clone(),

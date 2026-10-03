@@ -4,21 +4,23 @@
 //! (klawiatura → okno z fokusem, mysz → okno pod kursorem), i odpala skrypty zdarzeń.
 
 use platform_contract::{
-    GuiError, InputBackend, InputControl, InputPlan, InputPort, InputReport, RawInput,
-    TargetWindow, WindowId, execute_input,
+    FocusedField, GuiError, InputBackend, InputControl, InputPlan, InputPort, InputReport,
+    RawInput, TargetWindow, WindowId, execute_input,
 };
 
+use super::uia::focused_in;
 use super::{FakeDesktop, GuiRecordKind, ScriptEvent, State, Win};
 
 const VK_RETURN: u16 = 0x0D;
 const VK_TAB: u16 = 0x09;
 
-fn target(w: &Win) -> TargetWindow {
+fn target(s: &State, w: &Win) -> TargetWindow {
     TargetWindow {
         id: w.info.id,
         pid: w.info.pid,
         image: w.info.image.clone(),
         elevated: w.info.elevated,
+        links: s.links(w),
     }
 }
 
@@ -73,11 +75,28 @@ impl InputBackend for FakeDesktop {
 
     fn foreground_target(&self) -> Option<TargetWindow> {
         let s = self.lock();
-        s.windows.iter().find(|w| w.info.focused).map(target)
+        s.windows
+            .iter()
+            .find(|w| w.info.focused)
+            .map(|w| target(&s, w))
     }
 
     fn target_at(&self, x: i32, y: i32) -> Option<TargetWindow> {
-        self.lock().top_at(x, y).map(target)
+        let s = self.lock();
+        s.top_at(x, y).map(|w| target(&s, w))
+    }
+
+    fn focused_field(&self) -> FocusedField {
+        let s = self.lock();
+        if s.uia_hang {
+            return FocusedField::Unknown;
+        }
+        let found = s
+            .windows
+            .iter()
+            .find(|w| w.info.focused)
+            .and_then(focused_in);
+        FocusedField::from_lookup(&Ok(found))
     }
 
     fn inject(&self, events: &[RawInput]) -> Result<(), GuiError> {
@@ -96,6 +115,9 @@ impl InputBackend for FakeDesktop {
             match event {
                 ScriptEvent::PhysicalInput => s.physical = Some(s.clock),
                 ScriptEvent::Raise(id) => s.raise(id),
+                ScriptEvent::FocusPassword(id) => {
+                    s.focus_element(id, |e| e.node.is_password);
+                }
             }
         }
         Ok(())

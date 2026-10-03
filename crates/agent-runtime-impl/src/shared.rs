@@ -1,15 +1,20 @@
 //! Stan wspólny runtime: zależności, rejestr przebiegów (także podprzebiegów), start pętli
 //! z hakami (granica kroku schedulera, posiadaczka dzierżaw) i ponowne podjęcie przebiegu
 //! oddanego schedulerowi na tym samym uchwycie (ciągłość dziennika i kolejki sterowania).
+//! Skażenie sesji (przegląd #2, P2-07): każdy start pętli dziedziczy taint sesji z rejestru
+//! [`SessionTaint`], a zdarzenie `Tainted` dowolnego przebiegu skaża sesję (monotonicznie).
 
 use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 
-use agent_runtime_contract::{Checkpoint, CheckpointStore, RunError, RunId, RunOutcome};
+use agent_runtime_contract::{
+    Checkpoint, CheckpointStore, MemorySessionTaint, RunError, RunId, RunOutcome, SessionTaint,
+    TaintReset, TaintResetError,
+};
 use core_bus_contract::{AgentId, EventBus, SessionId};
 use providers_contract::ModelProvider;
 use risk_classifier_contract::AutonomyLevel;
-use safety_broker_contract::Broker;
+use safety_broker_contract::{Broker, TaintSource};
 use scheduler_contract::{Holder as LockHolder, SteerEnvelope, StepGate};
 use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
@@ -32,6 +37,45 @@ pub struct BrokerAutonomy(pub Arc<dyn Broker>);
 impl AutonomyOracle for BrokerAutonomy {
     fn level(&self, session: &SessionId, agent: &AgentId) -> AutonomyLevel {
         self.0.autonomy(session, Some(agent))
+    }
+}
+
+/// Skażenie sesji z Brokera (`SessionSecurity`, monotoniczne do końca sesji) połączone
+/// z rejestrem w pamięci procesu — źródło prawdy dla runtime (P2-07). Reset czyści tylko część
+/// lokalną; dopóki Broker trzyma taint sesji, kolejne przebiegi nadal startują skażone.
+pub struct BrokerSessionTaint {
+    broker: Arc<dyn Broker>,
+    local: MemorySessionTaint,
+}
+
+impl BrokerSessionTaint {
+    /// Rejestr nad Brokerem.
+    pub fn new(broker: Arc<dyn Broker>) -> Self {
+        Self {
+            broker,
+            local: MemorySessionTaint::default(),
+        }
+    }
+}
+
+impl SessionTaint for BrokerSessionTaint {
+    fn taint(&self, session: &SessionId) -> Option<TaintSource> {
+        self.local.taint(session).or_else(|| {
+            let security = self.broker.session_security(session);
+            security
+                .taint_sources
+                .first()
+                .cloned()
+                .or_else(|| security.tainted.then_some(TaintSource::File))
+        })
+    }
+
+    fn mark(&self, session: &SessionId, source: &TaintSource) {
+        self.local.mark(session, source);
+    }
+
+    fn reset(&self, session: &SessionId, confirmation: &TaintReset) -> Result<(), TaintResetError> {
+        self.local.reset(session, confirmation)
     }
 }
 
@@ -76,6 +120,8 @@ pub(crate) struct Shared {
     pub(crate) config: RuntimeConfig,
     pub(crate) bus: Option<Arc<dyn EventBus>>,
     pub(crate) ext: RuntimeExt,
+    /// Skażenie sesji (P2-07): domyślnie rejestr w pamięci procesu.
+    pub(crate) taint: Arc<dyn SessionTaint>,
     runs: Mutex<BTreeMap<RunId, Arc<RunHandle>>>,
 }
 
@@ -94,12 +140,18 @@ impl Shared {
             config,
             bus,
             ext: RuntimeExt::default(),
+            taint: Arc::new(MemorySessionTaint::default()),
             runs: Mutex::new(BTreeMap::new()),
         }
     }
 
     pub(crate) fn with_ext(mut self, ext: RuntimeExt) -> Self {
         self.ext = ext;
+        self
+    }
+
+    pub(crate) fn with_taint(mut self, taint: Arc<dyn SessionTaint>) -> Self {
+        self.taint = taint;
         self
     }
 
@@ -122,10 +174,17 @@ impl Shared {
     /// używany ponownie; `cancel` = token podprzebiegu (anulowanie rodzica obejmuje potomka).
     pub(crate) fn launch(
         self: &Arc<Self>,
-        cp: Checkpoint,
+        mut cp: Checkpoint,
         hooks: Hooks,
         cancel: Option<CancellationToken>,
     ) -> Result<(Arc<RunHandle>, JoinHandle<Exit>), RunError> {
+        // Taint sesji (wcześniejsze tury, inne przebiegi) — przebieg startuje skażony (P2-07).
+        if cp.taint_source.is_none()
+            && let Some(source) = self.taint.taint(&cp.spec.session)
+        {
+            cp.tainted = true;
+            cp.taint_source = Some(source);
+        }
         let registry = ToolRegistry::for_run(
             &self.tools,
             &cp.spec,
@@ -139,13 +198,16 @@ impl Shared {
             let handle = match runs.get(&run) {
                 Some(h) if h.is_running() => return Err(RunError::AlreadyRunning(run)),
                 Some(h) if h.is_active() => h.clone(),
-                _ => Arc::new(RunHandle::new(
-                    run.clone(),
-                    cp.spec.session.clone(),
-                    cp.spec.agent.clone(),
-                    self.bus.clone(),
-                    cancel.unwrap_or_default(),
-                )),
+                _ => Arc::new(
+                    RunHandle::new(
+                        run.clone(),
+                        cp.spec.session.clone(),
+                        cp.spec.agent.clone(),
+                        self.bus.clone(),
+                        cancel.unwrap_or_default(),
+                    )
+                    .with_taint(self.taint.clone()),
+                ),
             };
             handle.set_running(true);
             runs.insert(run.clone(), handle.clone());

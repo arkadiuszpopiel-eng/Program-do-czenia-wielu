@@ -41,8 +41,8 @@ pub use journal::{Consent, JournalEntry, JournalEvent, RepairId, RepairRecord, R
 pub use plan::{Proposal, Risk, key_segment, plan};
 pub use policy::{RepairAutonomy, RepairPolicy, consent_for};
 pub use ports::{
-    DiagError, DiagHost, Diagnostician, KernelApprovals, KernelOutcome, NoBroker, RepairContext,
-    RepairEnv, ScanOutcome, UserConsent,
+    ConfigChange, DiagError, DiagHost, Diagnostician, KernelApprovals, KernelOutcome, NoBroker,
+    RepairContext, RepairEnv, ScanOutcome, UserConsent,
 };
 pub use report::{
     HealthReport, HumanAction, IncidentRow, ModuleRow, Overall, ProposalCard, RepairRow, Usage,

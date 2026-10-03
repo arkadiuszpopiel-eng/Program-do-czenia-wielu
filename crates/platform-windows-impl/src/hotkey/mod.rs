@@ -1,9 +1,13 @@
 //! `HotkeyPort`: skróty globalne `RegisterHotKey` na dedykowanym wątku z pętlą komunikatów +
 //! hook `WH_KEYBOARD_LL` zgłaszający puszczenie klawisza (PTT, PLAN §7.3). Walidacja przez
 //! `Hotkey::validate()` z kontraktu (reguła AltGr, rezerwacja kill-switcha) przed dotknięciem systemu;
-//! skrót zajęty przez inną aplikację → `PlatformError::HotkeyConflict`.
+//! skrót zajęty przez inną aplikację → `PlatformError::HotkeyConflict`. Naciśnięcie z wejścia
+//! wstrzykniętego (hook: `LLKHF_INJECTED`) jest ignorowane; kill-switch działa zawsze
+//! (przegląd #2, P2-04 — `origin.rs`).
 
 mod keys;
+#[cfg_attr(not(windows), allow(dead_code))]
+mod origin;
 #[cfg(windows)]
 mod thread;
 
@@ -120,13 +124,13 @@ impl WinHotkeys {
         state: &mut State,
         id: u32,
         native: keys::NativeHotkey,
-        _hotkey: &Hotkey,
+        hotkey: &Hotkey,
     ) -> Result<(), PlatformError> {
         if state.thread.is_none() {
             state.thread = Some(thread::HotkeyThread::start(Arc::clone(&self.events))?);
         }
         match &state.thread {
-            Some(worker) => worker.register(id, native),
+            Some(worker) => worker.register(id, native, *hotkey),
             None => Err(PlatformError::Io("wątek skrótów nie wystartował".into())),
         }
     }

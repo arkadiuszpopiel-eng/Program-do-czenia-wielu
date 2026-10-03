@@ -30,7 +30,7 @@ use windows::Win32::UI::Accessibility::{
 use windows::core::Interface;
 
 pub(crate) use act::act;
-pub(crate) use fields::{password_rects, read_text};
+pub(crate) use fields::{focused, focused_field, password_rects, read_text};
 pub(crate) use read::{find, node_of_element, tree};
 
 use crate::win::win_error;

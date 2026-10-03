@@ -21,6 +21,7 @@ mod grant;
 mod options;
 mod report;
 mod spec;
+mod taint;
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
@@ -40,6 +41,8 @@ pub use options::{
 };
 pub use report::{RunReport, StepLine, VerificationLine, steps_before_delivery};
 pub use spec::{BudgetKind, RunBudget, RunSpec};
+// Przegląd #2, P2-07: skażenie na poziomie sesji (monotoniczne, reset tylko przez właściciela).
+pub use taint::{MemorySessionTaint, SessionTaint, TaintReset, TaintResetError};
 
 pub use core_bus_contract::RunId;
 

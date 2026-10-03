@@ -7,6 +7,11 @@ mod exec;
 #[cfg(windows)]
 mod win;
 
+/// Okno administratora na pierwszym planie (skróty globalne: naciśnięcie, którego hook nie
+/// widział, przy oknie podniesionym jest fizyczne — UIPI blokuje `SendInput`; P2-04).
+#[cfg(windows)]
+pub(crate) use win::foreground_is_elevated;
+
 use std::collections::BTreeMap;
 use std::sync::{Mutex, MutexGuard};
 

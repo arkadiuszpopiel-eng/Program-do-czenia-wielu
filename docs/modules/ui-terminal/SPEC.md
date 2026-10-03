@@ -63,3 +63,6 @@ Panel terminala (xterm.js) w kreatorze kont i kroku onboardingu „mosty CLI” 
 ## Otwarte pytania
 - Kopiowanie zaznaczenia ze schowka w terminalu — tylko UI (bez historii schowka dla tej treści).
 - WSL/SSH jako profile — P2.
+
+## Utwardzenia po przeglądzie #2 (2026-10)
+- **P2-05:** ConPTY (`platform-windows-pty-impl`) — lista atrybutów w buforze wyrównanym, zapis wejścia bez trzymania zamka uchwytu (zamknięcie terminala nie czeka na zawieszony `WriteFile`).

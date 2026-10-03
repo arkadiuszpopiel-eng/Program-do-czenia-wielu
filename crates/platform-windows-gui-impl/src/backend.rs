@@ -4,9 +4,10 @@
 use std::time::{Duration, Instant};
 
 use platform_contract::{
-    CaptureRequest, DesktopWindow, ElementRef, GuiError, InputControl, InputPlan, InputReport,
-    MonitorInfo, ScreenRect, Screenshot, TreeOptions, UiaAction, UiaNode, UiaQuery, UiaText,
-    UiaTree, WindowId, WindowState, execute_input,
+    CAPTURE_ATTEMPTS, CaptureRequest, DesktopWindow, ElementRef, GuiError, InputControl, InputPlan,
+    InputReport, MonitorInfo, ScreenRect, Screenshot, TreeOptions, UiaAction, UiaNode, UiaQuery,
+    UiaText, UiaTree, WindowId, WindowState, capture_set_stable, execute_input, union_for_mask,
+    unstable_masks,
 };
 
 use crate::GuiConfig;
@@ -137,6 +138,18 @@ impl Backend {
         })
     }
 
+    pub(crate) fn uia_focused(
+        &self,
+        c: &GuiConfig,
+        window: WindowId,
+    ) -> Result<Option<UiaNode>, GuiError> {
+        let guard = c.guard.clone();
+        self.uia
+            .call("element z fokusem", c.uia_call_timeout_ms, move |ctx| {
+                uia::focused(ctx, &guard, window)
+            })
+    }
+
     pub(crate) fn uia_password_rects(
         &self,
         c: &GuiConfig,
@@ -158,24 +171,46 @@ impl Backend {
         self.activity.ensure()?;
         let backend = WinInputBackend {
             activity: &self.activity,
+            uia: &self.uia,
+            uia_ms: c.uia_call_timeout_ms,
         };
         execute_input(plan, &backend, &c.guard, &c.pacing, control)
     }
 
+    /// Zrzut: okna → klatka → okna ponownie; zbiór okien istotny dla maskowania zmienił się
+    /// (np. Broker-UI wyskoczył w trakcie) → klatka ponowiona, po [`CAPTURE_ATTEMPTS`] próbach
+    /// maska z sumy wyliczeń i okien zmienionych (przegląd #2, P2-02).
     pub(crate) fn capture(
         &self,
         c: &GuiConfig,
         request: &CaptureRequest,
     ) -> Result<Screenshot, GuiError> {
-        let windows = desktop::windows(&c.guard);
         let monitors = desktop::monitors();
         let per_window = c.uia_call_timeout_ms;
-        capture::capture(
-            request,
-            &windows,
-            &monitors,
-            c.capture_password_budget_ms,
-            |w, left| self.uia_password_rects(c, w.id, left.min(per_window)),
-        )
+        let mut attempt = 0;
+        loop {
+            attempt += 1;
+            let before = desktop::windows(&c.guard);
+            let frame = capture::grab(request, &before, &monitors)?;
+            let after = desktop::windows(&c.guard);
+            let stable = capture_set_stable(&frame.source, &before, &after);
+            if !stable && attempt < CAPTURE_ATTEMPTS {
+                continue;
+            }
+            let (windows, extra) = if stable {
+                (after, Vec::new())
+            } else {
+                let extra = unstable_masks(&frame.source, &before, &after);
+                (union_for_mask(&before, &after), extra)
+            };
+            return Ok(capture::finish(
+                request,
+                frame,
+                &windows,
+                c.capture_password_budget_ms,
+                extra,
+                |w, left| self.uia_password_rects(c, w.id, left.min(per_window)),
+            ));
+        }
     }
 }
