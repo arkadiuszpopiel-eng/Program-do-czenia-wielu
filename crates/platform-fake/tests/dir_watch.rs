@@ -5,7 +5,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::time::Duration;
 
 use platform_contract::{
@@ -14,10 +14,28 @@ use platform_contract::{
 };
 use platform_fake::FakeDirWatch;
 
-const HOME: &str = "/home/ja";
+/// Katalog domowy wirtualnego systemu plików — ścieżka bezwzględna właściwa dla systemu: na
+/// Windows `/home/ja` nie ma litery dysku, więc nie jest bezwzględna i polityka zwraca
+/// `InvalidPath` (zanim dojdzie do deny-listy).
+fn home() -> PathBuf {
+    PathBuf::from(if cfg!(windows) {
+        r"C:\Users\ja"
+    } else {
+        "/home/ja"
+    })
+}
 
+/// Korzeń wolumenu (ścieżka bezwzględna bez rodzica).
+fn volume_root() -> PathBuf {
+    PathBuf::from(if cfg!(windows) { r"C:\" } else { "/" })
+}
+
+/// Ścieżka pod katalogiem domowym; `rel` — segmenty rozdzielone `/`, składane po składnikach
+/// (separator systemu, bez mieszania `/` i `\` w porównaniach).
 fn p(rel: &str) -> PathBuf {
-    Path::new(HOME).join(rel)
+    rel.split('/')
+        .filter(|s| !s.is_empty())
+        .fold(home(), |acc, seg| acc.join(seg))
 }
 
 fn changes(ev: &[WatchEvent]) -> Vec<(PathBuf, FsChangeKind)> {
@@ -208,7 +226,7 @@ fn denylisted_directories_are_never_watched_and_never_leak() {
         Err(PlatformError::Denylisted(_))
     ));
     // Cały katalog domowy z podkatalogami: zmiany w `.ssh`, `.claude`, `projekt/.aws` → 0 zdarzeń.
-    w.watch(WatchSpec::new(HOME).recursive()).unwrap();
+    w.watch(WatchSpec::new(home()).recursive()).unwrap();
     for f in [
         ".ssh/id_ed25519",
         ".ssh/known_hosts",
@@ -264,7 +282,7 @@ fn limits_scope_and_replace_all() {
     ));
     let w = FakeDirWatch::default();
     assert!(matches!(
-        w.watch(WatchSpec::new("/").recursive()),
+        w.watch(WatchSpec::new(volume_root()).recursive()),
         Err(PlatformError::PermissionDenied(_))
     ));
     assert!(

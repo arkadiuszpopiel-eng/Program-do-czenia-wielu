@@ -48,11 +48,20 @@ impl Collect {
     }
 }
 
+/// Program w ścieżce bezwzględnej właściwej dla systemu: port pseudokonsoli (`PtySpec::validate`)
+/// odrzuca ścieżkę względną, a na Windows `/usr/bin/…` nie ma litery dysku.
+fn program(windows: &str, unix: &str) -> PathBuf {
+    PathBuf::from(if cfg!(windows) { windows } else { unix })
+}
+
 fn programs(claude: bool) -> Programs {
     Programs::fixed(TerminalPrograms {
-        shell: Some(PathBuf::from("/usr/bin/pwsh")),
+        shell: Some(program(
+            r"C:\Program Files\PowerShell\7\pwsh.exe",
+            "/usr/bin/pwsh",
+        )),
         cmd: None,
-        claude: claude.then(|| PathBuf::from("/usr/bin/claude")),
+        claude: claude.then(|| program(r"C:\npm\claude.exe", "/usr/bin/claude")),
         codex: None,
     })
 }

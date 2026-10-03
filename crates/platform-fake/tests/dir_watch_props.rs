@@ -47,12 +47,15 @@ fn op() -> impl Strategy<Value = Op> {
     ]
 }
 
+/// Obserwowany katalog — ścieżka bezwzględna właściwa dla systemu (na Windows `/w` nie ma litery
+/// dysku, więc nie jest bezwzględna i polityka zwraca `InvalidPath`).
 fn root() -> PathBuf {
-    PathBuf::from("/w")
+    PathBuf::from(if cfg!(windows) { r"C:\w" } else { "/w" })
 }
 
+/// Plik `NAMES[i]` pod katalogiem — składany po segmentach (separator systemu).
 fn path(i: usize) -> PathBuf {
-    root().join(NAMES[i])
+    NAMES[i].split('/').fold(root(), |acc, seg| acc.join(seg))
 }
 
 fn relevant(p: &Path) -> bool {

@@ -7,6 +7,7 @@
 
 mod common;
 
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -14,6 +15,16 @@ use app_core::dto::{AlfaEvent, TriggerDraft, TriggerKindView};
 use app_core::{AppCore, AppPaths};
 use common::*;
 use platform_fake::{FakeDirWatch, FakeSignals};
+
+/// Katalog wyzwalacza — ścieżka bezwzględna dla systemu: na Windows `/home/…` nie ma litery dysku,
+/// więc obserwacja odrzuca ją jako `InvalidPath` i wyzwalacz nie dostaje zdarzeń.
+fn downloads() -> PathBuf {
+    PathBuf::from(if cfg!(windows) {
+        r"C:\Users\ala\Pobrane"
+    } else {
+        "/home/ala/Pobrane"
+    })
+}
 
 async fn core_with(
     signals: Option<Arc<FakeSignals>>,
@@ -34,10 +45,20 @@ async fn core_with(
 async fn idle_cycle_only_with_a_signals_monitor() {
     let (core, _dir) = core_with(Some(Arc::new(FakeSignals::default())), None).await;
     assert!(core.improver_list().await.unwrap().idle_cycle);
-    let (plain, _dir2) = core_with(None, None).await;
+    // Bez monitora w opcjach rdzeń bierze monitor systemu (`AppOptions::signals = None`): na Windows
+    // się uruchamia, poza Windows nie — wtedy cykl tylko ręcznie („Przeanalizuj teraz").
+    let native = platform_windows_sys_impl::WinSignals::default()
+        .start()
+        .is_ok();
     assert!(
-        !plain.improver_list().await.unwrap().idle_cycle,
-        "bez monitora (poza Windows) — tylko ręcznie"
+        cfg!(windows) || !native,
+        "poza Windows monitor systemu się nie uruchamia"
+    );
+    let (plain, _dir2) = core_with(None, None).await;
+    assert_eq!(
+        plain.improver_list().await.unwrap().idle_cycle,
+        native,
+        "cykl w bezczynności tylko z monitorem (poza Windows — tylko ręcznie)"
     );
 }
 
@@ -50,7 +71,7 @@ async fn new_file_in_watched_dir_fires_file_trigger() {
         .triggers_create(TriggerDraft {
             name: "Faktury".into(),
             kind: TriggerKindView::FileInDir {
-                dir: "/home/ala/Pobrane".into(),
+                dir: downloads().to_string_lossy().into_owned(),
                 pattern: Some("*.pdf".into()),
             },
             title: "Opisz fakturę".into(),
@@ -72,8 +93,8 @@ async fn new_file_in_watched_dir_fires_file_trigger() {
         1,
         "katalog wyzwalacza obserwowany"
     );
-    watch.write("/home/ala/Pobrane/notatka.txt", 10);
-    watch.write("/home/ala/Pobrane/faktura-04.pdf", 2_048);
+    watch.write(downloads().join("notatka.txt"), 10);
+    watch.write(downloads().join("faktura-04.pdf"), 2_048);
     let fired = until(
         &mut rx,
         |e| matches!(e, AlfaEvent::TriggerFired { run } if run.trigger_id == trigger.id),

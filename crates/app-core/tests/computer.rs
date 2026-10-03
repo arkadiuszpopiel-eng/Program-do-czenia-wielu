@@ -28,12 +28,17 @@ use providers_fake::{FAKE_MODEL, Script};
 use serde_json::json;
 
 const SECRET: &str = "Lista zakupow mleko 4417";
+/// PowerShell 7: ścieżka bezwzględna dla systemu (`PtySpec::validate`; `/usr/…` na Windows — nie).
+#[cfg(windows)]
+const PWSH: &str = r"C:\Program Files\PowerShell\7\pwsh.exe";
+#[cfg(not(windows))]
+const PWSH: &str = "/usr/bin/pwsh";
 
 struct Probe;
 
 impl CliProbe for Probe {
     fn locate(&self, program: &str) -> Option<PathBuf> {
-        (program == "pwsh").then(|| PathBuf::from("/usr/bin/pwsh"))
+        (program == "pwsh").then(|| PathBuf::from(PWSH))
     }
     fn version_output(&self, _path: &Path) -> Option<String> {
         None
