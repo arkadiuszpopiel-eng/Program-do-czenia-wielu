@@ -162,7 +162,12 @@ where
         })
         .unwrap_or_default();
     names.sort();
-    let mut expected: Vec<String> = AlfaTool::ALL.iter().map(|t| t.name().to_owned()).collect();
+    // Zakres v0 + router zatwierdzeń: narzędzia v1 (UIA, zrzut, rejestr) poza zakresem.
+    let mut expected: Vec<String> = AlfaTool::WINDOWS_V0
+        .iter()
+        .chain([AlfaTool::Approve].iter())
+        .map(|t| t.name().to_owned())
+        .collect();
     expected.sort();
     assert_eq!(names, expected);
     let call = side
@@ -209,6 +214,7 @@ where
     let scope = BridgeScope {
         label: "zadanie-2".into(),
         tools: [AlfaTool::WindowsList].into_iter().collect(),
+        session: None,
     };
     let reg2 = host
         .register(scope, None)

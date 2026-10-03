@@ -416,6 +416,7 @@ dependencies = [
  "app-store",
  "app-tasks",
  "app-terminal",
+ "app-updates",
  "app-voice",
  "artifacts-contract",
  "artifacts-impl",
@@ -749,6 +750,28 @@ dependencies = [
  "tokio",
  "ui-terminal-contract",
  "ui-terminal-impl",
+]
+
+[[package]]
+name = "app-updates"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "chrono",
+ "core-config-contract",
+ "core-config-fake",
+ "minisign",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "updater-contract",
+ "updater-fake",
+ "updater-impl",
+ "zip",
 ]
 
 [[package]]
@@ -3041,15 +3064,31 @@ name = "mcp-impl"
 version = "0.0.1"
 dependencies = [
  "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
  "core-registry-contract",
  "mcp-contract",
  "mcp-fake",
+ "platform-apps-contract",
+ "platform-apps-fake",
  "platform-contract",
  "platform-fake",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde",
  "serde_json",
  "tokio",
+ "tokio-util",
+ "tools-common-contract",
+ "tools-screen-contract",
+ "tools-screen-fake",
+ "tools-uia-contract",
+ "tools-uia-fake",
  "tracing",
  "uuid",
+ "watchdog-contract",
 ]
 
 [[package]]
@@ -3690,6 +3729,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 
 [[package]]
+name = "platform-apps-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "platform-apps-fake"
+version = "0.0.1"
+dependencies = [
+ "platform-apps-contract",
+ "proptest",
+]
+
+[[package]]
 name = "platform-contract"
 version = "0.0.1"
 dependencies = [
@@ -3736,6 +3794,18 @@ name = "platform-windows-kernel-impl"
 version = "0.0.1"
 dependencies = [
  "platform-contract",
+ "windows",
+]
+
+[[package]]
+name = "platform-windows-office-impl"
+version = "0.0.1"
+dependencies = [
+ "base64 0.22.1",
+ "platform-apps-contract",
+ "platform-contract",
+ "proptest",
+ "serde_json",
  "windows",
 ]
 
@@ -5639,6 +5709,52 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
+name = "tools-browser-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-apps-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-browser-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "serde_json",
+ "tokio",
+ "tools-browser-contract",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-browser-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-apps-contract",
+ "platform-apps-fake",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "tokio",
+ "tools-browser-contract",
+ "tools-common-contract",
+ "watchdog-contract",
+]
+
+[[package]]
 name = "tools-clipboard-contract"
 version = "0.0.1"
 dependencies = [
@@ -5801,6 +5917,54 @@ dependencies = [
  "tools-common-contract",
  "tools-input-contract",
  "tools-window-contract",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-office-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-apps-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-office-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-office-contract",
+]
+
+[[package]]
+name = "tools-office-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-apps-contract",
+ "platform-apps-fake",
+ "platform-contract",
+ "platform-fake",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-office-contract",
+ "undo-journal-contract",
  "watchdog-contract",
 ]
 
@@ -6532,6 +6696,7 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 name = "updater-contract"
 version = "0.0.1"
 dependencies = [
+ "async-trait",
  "chrono",
  "schemars",
  "semver",
@@ -6544,9 +6709,12 @@ dependencies = [
 name = "updater-fake"
 version = "0.0.1"
 dependencies = [
+ "async-trait",
  "chrono",
  "semver",
  "sha2",
+ "tempfile",
+ "tokio",
  "updater-contract",
 ]
 
@@ -6559,16 +6727,22 @@ dependencies = [
  "core-bus-contract",
  "core-bus-fake",
  "core-registry-contract",
+ "flate2",
+ "futures-util",
  "minisign",
  "minisign-verify",
  "proptest",
+ "reqwest",
  "semver",
  "serde",
  "serde_json",
  "sha2",
  "tempfile",
  "tokio",
+ "tracing",
  "updater-contract",
+ "watchdog-contract",
+ "zip",
 ]
 
 [[package]]

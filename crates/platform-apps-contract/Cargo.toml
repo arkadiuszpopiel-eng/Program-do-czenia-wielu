@@ -1,0 +1,23 @@
+[package]
+name = "platform-apps-contract"
+description = "Porty aplikacji i systemu dla computer use (F6): Office przez COM (OfficePort, makra zawsze wyłączone, formuły z listy dozwolonej), izolowana przeglądarka z CDP przez potok (BrowserPort, filtr egressu, deny-lista profili), rejestr tylko do odczytu (RegistryPort, deny-lista kluczy z sekretami)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Osobny crate kontraktu zamiast nowych plików w `platform-contract`: tamten ma ~7 800 linii przy
+# limicie 8 000 na crate (AGENTS.md). Implementacja Windows: `platform-windows-office-impl`.
+[dependencies]
+platform-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

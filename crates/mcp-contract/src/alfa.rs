@@ -1,5 +1,8 @@
-//! Serwer MCP Alfy v0 (PLAN §9.7, F4): narzędzia **tylko** schowek i okna + wewnętrzne `approve`
-//! dla mostu Claude Code. Żadnych narzędzi fs/shell (most ma je natywnie w worktree, §8.5).
+//! Serwer MCP Alfy (PLAN §9.7, §8.5): v0 (F4) — schowek i okna + wewnętrzne `approve` dla mostu
+//! Claude Code; v1 (F6) — UI Automation (drzewo, wyszukiwanie, tekst, akcje przez wzorce),
+//! zrzut ekranu z maskowaniem i rejestr **tylko do odczytu** (definicje: `alfa_v1`). Żadnych
+//! narzędzi fs/shell (most ma je natywnie w worktree, §8.5). Każde wywołanie v1 idzie przez
+//! Brokera z podmiotem „most CLI”, a wynik jest oznaczony `unverified_by_alfa`.
 //!
 //! Nazwy narzędzi na drucie używają `_` zamiast `.` (`clipboard_read`): API modeli (Anthropic,
 //! OpenAI) akceptują w nazwach narzędzi tylko `[a-zA-Z0-9_-]`. Zdolność Brokera zachowuje
@@ -36,7 +39,23 @@ pub enum AlfaTool {
     WindowsFocus,
     /// Wewnętrzne: prośba mostu o uprawnienie → kanał zatwierdzeń.
     Approve,
+    /// v1: drzewo UI Automation okna (bez okien chronionych, hasła bez wartości).
+    UiaTree,
+    /// v1: wyszukiwanie elementów UI.
+    UiaFind,
+    /// v1: tekst elementu (`TextPattern`, tylko odczyt).
+    UiaReadText,
+    /// v1: akcja przez wzorzec UI Automation.
+    UiaAct,
+    /// v1: zrzut ekranu/okna z maskowaniem.
+    ScreenCapture,
+    /// v1: rejestr `HKCU`/`HKLM` tylko do odczytu (deny-lista kluczy z sekretami).
+    RegistryRead,
 }
+
+/// Pole wyniku narzędzi v1: wynik pochodzi z narzędzia Alfy, ale użycie go przez most (opaque
+/// worker) nie jest weryfikowane przez Alfę (PLAN §8.5).
+pub const UNVERIFIED_FIELD: &str = "unverified_by_alfa";
 
 impl AlfaTool {
     /// Narzędzia Windows v0 (bez wewnętrznego `approve`).
@@ -47,14 +66,49 @@ impl AlfaTool {
         AlfaTool::WindowsFocus,
     ];
 
-    /// Wszystkie narzędzia v0.
-    pub const ALL: [AlfaTool; 5] = [
+    /// Narzędzia dodane w v1 (F6).
+    pub const V1_ONLY: [AlfaTool; 6] = [
+        AlfaTool::UiaTree,
+        AlfaTool::UiaFind,
+        AlfaTool::UiaReadText,
+        AlfaTool::UiaAct,
+        AlfaTool::ScreenCapture,
+        AlfaTool::RegistryRead,
+    ];
+
+    /// Narzędzia Windows v1 (v0 + UIA, zrzut, rejestr; bez wewnętrznego `approve`).
+    pub const WINDOWS_V1: [AlfaTool; 10] = [
+        AlfaTool::ClipboardRead,
+        AlfaTool::ClipboardWrite,
+        AlfaTool::WindowsList,
+        AlfaTool::WindowsFocus,
+        AlfaTool::UiaTree,
+        AlfaTool::UiaFind,
+        AlfaTool::UiaReadText,
+        AlfaTool::UiaAct,
+        AlfaTool::ScreenCapture,
+        AlfaTool::RegistryRead,
+    ];
+
+    /// Wszystkie narzędzia.
+    pub const ALL: [AlfaTool; 11] = [
         AlfaTool::ClipboardRead,
         AlfaTool::ClipboardWrite,
         AlfaTool::WindowsList,
         AlfaTool::WindowsFocus,
         AlfaTool::Approve,
+        AlfaTool::UiaTree,
+        AlfaTool::UiaFind,
+        AlfaTool::UiaReadText,
+        AlfaTool::UiaAct,
+        AlfaTool::ScreenCapture,
+        AlfaTool::RegistryRead,
     ];
+
+    /// Czy narzędzie należy do v1 (przez Brokera, wynik `unverified_by_alfa`).
+    pub fn is_v1(self) -> bool {
+        Self::V1_ONLY.contains(&self)
+    }
 
     /// Nazwa na drucie MCP.
     pub fn name(self) -> &'static str {
@@ -64,6 +118,12 @@ impl AlfaTool {
             AlfaTool::WindowsList => "windows_list",
             AlfaTool::WindowsFocus => "windows_focus",
             AlfaTool::Approve => "approve",
+            AlfaTool::UiaTree => "uia_tree",
+            AlfaTool::UiaFind => "uia_find",
+            AlfaTool::UiaReadText => "uia_read_text",
+            AlfaTool::UiaAct => "uia_act",
+            AlfaTool::ScreenCapture => "screen_capture",
+            AlfaTool::RegistryRead => "registry_read",
         }
     }
 
@@ -75,6 +135,14 @@ impl AlfaTool {
             AlfaTool::WindowsList => "windows.list",
             AlfaTool::WindowsFocus => "windows.focus",
             AlfaTool::Approve => "approvals.request",
+            AlfaTool::UiaTree
+            | AlfaTool::UiaFind
+            | AlfaTool::UiaReadText
+            | AlfaTool::UiaAct
+            | AlfaTool::ScreenCapture => "gui.control",
+            // Broker: `system.admin(other: reg query …)` — najostrzejsza klasa do czasu
+            // osobnej zdolności odczytu rejestru (SPEC mcp, otwarte pytania).
+            AlfaTool::RegistryRead => "registry.read",
         }
     }
 
@@ -110,6 +178,12 @@ impl AlfaTool {
                     "required": ["id"], "additionalProperties": false}),
                 json!({"readOnlyHint": false, "destructiveHint": false, "openWorldHint": false}),
             ),
+            AlfaTool::UiaTree
+            | AlfaTool::UiaFind
+            | AlfaTool::UiaReadText
+            | AlfaTool::UiaAct
+            | AlfaTool::ScreenCapture
+            | AlfaTool::RegistryRead => return crate::alfa_v1::definition(self),
             AlfaTool::Approve => (
                 "Wewnętrzne narzędzie zatwierdzeń mostu: przekazuje prośbę o uprawnienie do \
                  użytkownika i zwraca decyzję.",
@@ -189,10 +263,29 @@ mod tests {
     fn no_fs_or_shell_tools() {
         for tool in AlfaTool::ALL {
             let n = tool.name();
-            for banned in ["fs", "file", "shell", "exec", "cmd", "process", "registry"] {
+            for banned in [
+                "fs",
+                "file",
+                "shell",
+                "exec",
+                "cmd",
+                "process",
+                "write_reg",
+                "set_reg",
+            ] {
                 assert!(!n.contains(banned), "{n} zawiera {banned}");
             }
+            // Rejestr wyłącznie do odczytu (PLAN §8.5: F6 — UIA, zrzuty, rejestr).
+            if n.contains("registry") {
+                assert_eq!(n, "registry_read");
+                let def = tool.definition();
+                let ann = def.annotations.unwrap_or_default();
+                assert_eq!(ann["readOnlyHint"], true);
+            }
         }
+        assert!(AlfaTool::V1_ONLY.iter().all(|t| t.is_v1()));
+        assert!(AlfaTool::WINDOWS_V0.iter().all(|t| !t.is_v1()));
+        assert!(!AlfaTool::WINDOWS_V1.contains(&AlfaTool::Approve));
     }
 
     #[test]

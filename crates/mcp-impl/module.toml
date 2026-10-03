@@ -3,8 +3,8 @@ id = "mcp"
 version = "0.0.1"
 kind = "service"
 provides = ["mcp-contract@1"]
-requires = ["core-bus-contract@1", "platform-contract@1"]
-capabilities = ["clipboard.read", "clipboard.write", "windows.list", "windows.focus"]
+requires = ["core-bus-contract@1", "platform-contract@1", "platform-apps-contract@1", "safety-broker-contract@1", "tools-common-contract@1"]
+capabilities = ["clipboard.read", "clipboard.write", "windows.list", "windows.focus", "gui.control(aplikacja-okna)", "system.admin(reg query)"]
 lifecycle = "on-demand"
 isolation = "inproc"
 

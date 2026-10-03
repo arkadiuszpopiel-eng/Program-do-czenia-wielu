@@ -216,6 +216,10 @@ impl ToolHandler for Tools {
                 json!({"kind": "text", "text": "atrapa"}),
             )),
             (AlfaTool::WindowsList, _) => Ok(CallToolResult::structured(json!({"windows": []}))),
+            // v1 (UIA, zrzut, rejestr): dane stałe z oznaczeniem jak w `mcp-impl`.
+            (t, _) if t.is_v1() => Ok(CallToolResult::structured(
+                json!({"atrapa": t.name(), mcp_contract::UNVERIFIED_FIELD: true}),
+            )),
             _ => Ok(CallToolResult::text("ok (atrapa)")),
         }
     }

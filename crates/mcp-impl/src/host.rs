@@ -19,6 +19,7 @@ use tokio::sync::{Semaphore, watch};
 use crate::lines::{DEFAULT_MAX_LINE_BYTES, Line, read_line};
 use crate::listener::{BoxedStream, LocalListener};
 use crate::tools::{AlfaToolHandler, PlatformPorts};
+use crate::v1::{McpV1, V1Tools};
 
 /// Zegar hosta (ms, monotoniczny); atrapa w testach TTL.
 pub trait Clock: Send + Sync {
@@ -79,6 +80,7 @@ struct Shared {
     revokers: Mutex<BTreeMap<RegistrationId, watch::Sender<bool>>>,
     clock: Arc<dyn Clock>,
     ports: PlatformPorts,
+    v1: Option<Arc<V1Tools>>,
     config: HostConfig,
     rejected: Mutex<Vec<String>>,
 }
@@ -106,10 +108,20 @@ fn random_token() -> String {
 }
 
 impl LocalMcpHost {
-    /// Otwiera kanał lokalny i zaczyna przyjmować połączenia.
+    /// Otwiera kanał lokalny i zaczyna przyjmować połączenia (serwer v0: schowek, okna, `approve`).
     pub fn start(
         config: HostConfig,
         ports: PlatformPorts,
+        clock: Arc<dyn Clock>,
+    ) -> Result<Self, McpError> {
+        Self::start_with(config, ports, None, clock)
+    }
+
+    /// Jak [`LocalMcpHost::start`], z narzędziami v1 (UIA, zrzut, rejestr — przez Brokera).
+    pub fn start_with(
+        config: HostConfig,
+        ports: PlatformPorts,
+        v1: Option<McpV1>,
         clock: Arc<dyn Clock>,
     ) -> Result<Self, McpError> {
         let unique = uuid::Uuid::new_v4().simple().to_string();
@@ -121,6 +133,7 @@ impl LocalMcpHost {
             revokers: Mutex::new(BTreeMap::new()),
             clock,
             ports,
+            v1: v1.map(|v| Arc::new(V1Tools::new(v))),
             config,
             rejected: Mutex::new(Vec::new()),
         });
@@ -258,11 +271,14 @@ async fn serve_connection(shared: Arc<Shared>, stream: BoxedStream) {
             return;
         }
     };
+    let cancel = tokio_util::sync::CancellationToken::new();
+    let _cancel_on_exit = cancel.clone().drop_guard();
     let handler = AlfaToolHandler::new(
         &registration.scope.tools,
         shared.ports.clone(),
         registration.approvals.clone(),
-    );
+    )
+    .with_v1(&registration.scope, shared.v1.clone(), cancel);
     let session = Arc::new(ServerSession::new(handler, alfa_server_info()));
     let writer = Arc::new(tokio::sync::Mutex::new(w));
     let inflight = Arc::new(Semaphore::new(shared.config.max_inflight_calls.max(1)));

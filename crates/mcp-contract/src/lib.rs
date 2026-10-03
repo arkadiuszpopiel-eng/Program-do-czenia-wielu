@@ -5,13 +5,15 @@
 //! - [`fingerprint`], [`injection`], [`trust`] — odcisk definicji narzędzia, skaner prompt
 //!   injection, poziomy zaufania i zgody (zmiana opisu po zgodzie = blokada, S07/S08);
 //! - [`client`] — trait [`McpClient`] i konfiguracja serwerów stdio;
-//! - [`alfa`], [`bridge`], [`token`] — serwer MCP Alfy v0 (schowek, okna, `approve`), host dla
+//! - [`alfa`], [`bridge`], [`token`] — serwer MCP Alfy v0 (schowek, okna, `approve`) i v1 (UIA,
+//!   zrzuty, rejestr tylko do odczytu — przez Brokera, wyniki `unverified_by_alfa`), host dla
 //!   mostów: kanał lokalny (named pipe z ACL / gniazdo Unix 0600, **bez TCP**), token z TTL;
 //! - [`server_core`] — obsługa protokołu po stronie serwera, wspólna dla `-impl` i `-fake`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 pub mod alfa;
+pub mod alfa_v1;
 pub mod bridge;
 pub mod client;
 mod error;
@@ -26,7 +28,10 @@ pub mod trust;
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
 
-pub use alfa::{ALFA_SERVER_NAME, AlfaTool, PERMISSION_PROMPT_TOOL, is_protected_process};
+pub use alfa::{
+    ALFA_SERVER_NAME, AlfaTool, PERMISSION_PROMPT_TOOL, UNVERIFIED_FIELD, is_protected_process,
+};
+pub use alfa_v1::{ALFA_TOOLS_FINGERPRINT, alfa_tools_fingerprint};
 pub use bridge::{
     ApprovalRouter, BridgeMcpHost, BridgeRegistration, BridgeScope, LocalEndpoint, McpServerLaunch,
     PermissionPromptRequest, PermissionPromptResponse, ProxyHello, RegistrationId, SessionToken,

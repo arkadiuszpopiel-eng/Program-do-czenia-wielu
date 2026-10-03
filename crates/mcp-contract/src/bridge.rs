@@ -152,6 +152,10 @@ pub struct BridgeScope {
     pub label: String,
     /// Narzędzia Windows dostępne dla mostu (`approve` dochodzi, gdy podano router zatwierdzeń).
     pub tools: BTreeSet<AlfaTool>,
+    /// Sesja rozmowy, z której zlecono zadanie (podmiot Brokera dla narzędzi v1: taint i zgody
+    /// tej sesji); `None` → osobna sesja `most:<etykieta>`.
+    #[serde(default)]
+    pub session: Option<String>,
 }
 
 impl BridgeScope {
@@ -160,7 +164,24 @@ impl BridgeScope {
         Self {
             label: label.into(),
             tools: AlfaTool::WINDOWS_V0.into_iter().collect(),
+            session: None,
         }
+    }
+
+    /// Zakres z narzędziami Windows v1 (v0 + UIA, zrzut, rejestr tylko do odczytu).
+    pub fn windows_v1(label: impl Into<String>) -> Self {
+        Self {
+            label: label.into(),
+            tools: AlfaTool::WINDOWS_V1.into_iter().collect(),
+            session: None,
+        }
+    }
+
+    /// Sesja rozmowy zlecającej (builder).
+    #[must_use]
+    pub fn with_session(mut self, session: impl Into<String>) -> Self {
+        self.session = Some(session.into());
+        self
     }
 }
 
@@ -348,5 +369,8 @@ mod tests {
         assert_eq!(launch.token(), Some("t"));
         assert!(launch.endpoint().is_some());
         assert_eq!(BridgeScope::windows_v0("x").tools.len(), 4);
+        let v1 = BridgeScope::windows_v1("x").with_session("s1");
+        assert_eq!(v1.tools.len(), 10);
+        assert_eq!(v1.session.as_deref(), Some("s1"));
     }
 }

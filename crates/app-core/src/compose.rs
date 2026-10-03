@@ -68,11 +68,16 @@ fn manifest_for_graph(id: &str, toml: &str) -> Result<ModuleManifest, AppError> 
         "transfer" => manifest.requires.push(contract("memory-contract")),
         _ => {}
     }
-    // `tools-common-contract` to kontrakt bez modułu (manifest, `Tool`, bramka Brokera), a role
-    // `watchdog-contract` (Job Objects, historia konfiguracji) pełnią Broker w procesie i kompozycja.
-    manifest
-        .requires
-        .retain(|c| c.name != "tools-common-contract" && c.name != "watchdog-contract");
+    // `tools-common-contract` to kontrakt bez modułu (manifest, `Tool`, bramka Brokera),
+    // `platform-apps-contract` — porty Office/przeglądarki/rejestru wstrzykiwane przez kompozycję,
+    // a role `watchdog-contract` (Job Objects, historia konfiguracji) pełnią Broker w procesie
+    // i kompozycja.
+    manifest.requires.retain(|c| {
+        !matches!(
+            c.name.as_str(),
+            "tools-common-contract" | "platform-apps-contract" | "watchdog-contract"
+        )
+    });
     Ok(manifest)
 }
 

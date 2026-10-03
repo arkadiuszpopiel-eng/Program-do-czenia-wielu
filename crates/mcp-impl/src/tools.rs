@@ -1,5 +1,6 @@
-//! Narzędzia serwera MCP Alfy v0 przez porty `platform-contract` (schowek, okna) i router
-//! zatwierdzeń mostu. Bez fs/shell. Okna procesów chronionych (Alfa, Broker) są niewidoczne
+//! Narzędzia serwera MCP Alfy: v0 przez porty `platform-contract` (schowek, okna) i router
+//! zatwierdzeń mostu; v1 (UIA, zrzut, rejestr) przez [`crate::v1`] — zawsze przez Brokera, wynik
+//! `unverified_by_alfa`. Bez fs/shell. Okna procesów chronionych (Alfa, Broker) są niewidoczne
 //! i nie da się ich aktywować (zakaz `gui.control`, AGENTS.md).
 
 use std::collections::BTreeSet;
@@ -8,11 +9,14 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use mcp_contract::alfa::MAX_CLIPBOARD_WRITE_CHARS;
 use mcp_contract::{
-    AlfaTool, ApprovalRouter, CallToolResult, PermissionPromptRequest, Tool, ToolCallError,
-    ToolHandler, is_protected_process,
+    AlfaTool, ApprovalRouter, BridgeScope, CallToolResult, PermissionPromptRequest, Tool,
+    ToolCallError, ToolHandler, is_protected_process,
 };
 use platform_contract::{ClipboardContent, ClipboardPort, WindowId, WindowPort};
 use serde_json::{Value, json};
+use tokio_util::sync::CancellationToken;
+
+use crate::v1::{Bridge, V1Tools};
 
 /// Porty systemowe serwera.
 #[derive(Clone)]
@@ -28,6 +32,7 @@ pub struct AlfaToolHandler {
     visible: BTreeSet<AlfaTool>,
     ports: PlatformPorts,
     approvals: Option<Arc<dyn ApprovalRouter>>,
+    v1: Option<(Arc<V1Tools>, Bridge)>,
 }
 
 impl AlfaToolHandler {
@@ -40,7 +45,7 @@ impl AlfaToolHandler {
         let mut visible: BTreeSet<AlfaTool> = scope
             .iter()
             .copied()
-            .filter(|t| *t != AlfaTool::Approve)
+            .filter(|t| *t != AlfaTool::Approve && !t.is_v1())
             .collect();
         if approvals.is_some() {
             visible.insert(AlfaTool::Approve);
@@ -49,7 +54,35 @@ impl AlfaToolHandler {
             visible,
             ports,
             approvals,
+            v1: None,
         }
+    }
+
+    /// Narzędzia v1 z zakresu rejestracji (bez skonfigurowanych narzędzi v1 — niewidoczne).
+    /// `cancel` przerywa czekanie na zgodę Brokera (unieważnienie rejestracji, rozłączenie).
+    #[must_use]
+    pub fn with_v1(
+        mut self,
+        scope: &BridgeScope,
+        v1: Option<Arc<V1Tools>>,
+        cancel: CancellationToken,
+    ) -> Self {
+        if let Some(v1) = v1 {
+            self.visible.extend(
+                scope
+                    .tools
+                    .iter()
+                    .copied()
+                    .filter(|t| t.is_v1() && v1.available(*t)),
+            );
+            let bridge = Bridge {
+                label: scope.label.clone(),
+                session: scope.session.clone(),
+                cancel,
+            };
+            self.v1 = Some((v1, bridge));
+        }
+        self
     }
 
     fn clipboard_read(&self) -> CallToolResult {
@@ -152,6 +185,10 @@ impl ToolHandler for AlfaToolHandler {
             AlfaTool::WindowsList => Ok(self.windows_list()),
             AlfaTool::WindowsFocus => self.windows_focus(&arguments),
             AlfaTool::Approve => self.approve(arguments).await,
+            v1 => match &self.v1 {
+                Some((tools, bridge)) => tools.call(v1, arguments, bridge).await,
+                None => Err(ToolCallError::Unknown(name.to_owned())),
+            },
         }
     }
 }

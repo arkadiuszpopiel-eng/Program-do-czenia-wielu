@@ -247,6 +247,7 @@ async fn scope_without_windows_tools() {
     let scope = BridgeScope {
         label: "tylko-schowek".into(),
         tools: [AlfaTool::ClipboardRead].into_iter().collect(),
+        session: None,
     };
     let reg = f.host.register(scope, None).await.unwrap();
     let client = StdioMcpClient::spawn(

@@ -93,3 +93,20 @@ Sygnały i obserwacja (`platform-windows-sys-impl`): `Win32_System_Power` + `Win
 - ConPTY nie kończy strumienia wyjścia, gdy proces się zakończy — trzeba wykryć koniec (`WaitForSingleObject`) i
   wywołać `ClosePseudoConsole`; przed Windows 11 24H2 `ClosePseudoConsole` czeka na opróżnienie wyjścia (osobny wątek).
 - Współrzędne myszy i zrzutów w pikselach fizycznych wymagają procesu per-monitor DPI aware (powłoka Tauri jest).
+
+## F6: `platform-windows-office-impl` (Office COM, przeglądarka, rejestr)
+Feature'y: `Win32_Foundation`, `Win32_Security`, `Win32_System_Com`, `Win32_System_Com_StructuredStorage`,
+`Win32_System_JobObjects`, `Win32_System_Ole` (`SafeArray*`, `DISPID_PROPERTYPUT`), `Win32_System_Pipes`,
+`Win32_System_Registry`, `Win32_System_Threading`, `Win32_System_Variant`.
+
+| Moduł | Wywołania |
+|---|---|
+| `office/sta.rs`, `office/disp.rs` (STA) | `CoInitializeEx(COINIT_APARTMENTTHREADED \| COINIT_DISABLE_OLE1DDE)`, `CLSIDFromProgID(w"Word.Application")` → `CoCreateInstance::<_, IDispatch>(&clsid, None, CLSCTX_LOCAL_SERVER)`, `IDispatch::GetIDsOfNames(&GUID::zeroed(), names.as_ptr(), 1, 0x0400, &mut id)`, `Invoke(id, &GUID::zeroed(), lcid, DISPATCH_METHOD \| DISPATCH_PROPERTYGET \| DISPATCH_PROPERTYPUT, &DISPPARAMS{ rgvarg (odwrotna kolejność), rgdispidNamedArgs = &DISPID_PROPERTYPUT dla zapisu }, Some(&mut VARIANT), Some(&mut EXCEPINFO), None)` (pola `EXCEPINFO` to `ManuallyDrop<BSTR>` — zwalniać ręcznie), argument pominięty = `VARIANT{vt: VT_ERROR, scode: DISP_E_PARAMNOTFOUND}`, `VARIANT::from(BSTR/i32/bool/f64/IDispatch)`, `IDispatch::try_from(&VARIANT)`, zakres Excela: `vt == VT_ARRAY \| VT_VARIANT` → `SafeArrayGetDim/GetLBound/GetUBound/GetElement` (2D, od 1), błąd komórki `VT_ERROR` (`scode & 0xFFFF` = 2007 `#DIV/0!` …) |
+| `registry.rs` | `RegOpenKeyExW(HKEY_CURRENT_USER/LOCAL_MACHINE, sub, Some(0), KEY_READ \| KEY_WOW64_64KEY, &mut hkey) -> WIN32_ERROR`, `RegEnumKeyExW` / `RegEnumValueW` (`ERROR_NO_MORE_ITEMS` = koniec, `ERROR_MORE_DATA` = większy bufor), `RegQueryValueExW(.., Some(&mut REG_VALUE_TYPE), Some(buf), Some(&mut len))`, `RegCloseKey` |
+| `browser/launch_win.rs` | `CreatePipe(.., Some(&SECURITY_ATTRIBUTES{bInheritHandle: TRUE}), 0)` + `SetHandleInformation(nasza końcówka, HANDLE_FLAG_INHERIT.0, HANDLE_FLAGS(0))`, `InitializeProcThreadAttributeList` (dwa wywołania) + `UpdateProcThreadAttribute(PROC_THREAD_ATTRIBUTE_HANDLE_LIST, [fd3, fd4])`, `STARTUPINFOEXW{StartupInfo.cbReserved2/lpReserved2 = tablica CRT: u32 liczba, u8 flagi (FOPEN\|FPIPE = 0x09), HANDLE[] bez wyrównania}`, `CreateProcessW(.., bInheritHandles = true, EXTENDED_STARTUPINFO_PRESENT \| CREATE_SUSPENDED \| CREATE_NO_WINDOW, ..)` → `AssignProcessToJobObject` (`KILL_ON_JOB_CLOSE`) → `ResumeThread`; końcówki potoku → `File::from(OwnedHandle::from_raw_handle(h.0))` |
+
+Pułapki: Word `CreateObject` potrafi dołączyć do instancji użytkownika (widoczna albo z otwartymi dokumentami) — nie
+ukrywać jej, nie wywoływać `Quit`, przywrócić `AutomationSecurity`; Excel zawsze nowa instancja (wykryta „wspólna” →
+odmowa). `AutomationSecurity` domyślnie przy automatyzacji = `msoAutomationSecurityLow` (makra włączone!) — ustawiać
+przed każdym otwarciem. `Calculation` da się zmienić dopiero przy otwartym skoroszycie (`Workbooks.Add` wcześniej).
+Chromium na Windows czyta potok CDP z deskryptorów CRT 3/4 (`_get_osfhandle`) — tylko przez `lpReserved2`.

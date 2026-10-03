@@ -75,6 +75,7 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 | Moduł                                            | Fala       | Opis                                                                                                                                 |
 | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | [`platform-windows`](platform-windows/SPEC.md)   | F1, F5, F6 | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| [`platform-apps`](platform-apps/SPEC.md)         | F6         | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
 | [`device-profile`](device-profile/SPEC.md)       | F1         | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry.                                  |
 | [`updater`](updater/SPEC.md)                     | F1, F3     | Stały launcher, wersje obok siebie, podpis minisign, rollback i ochrona przed pętlą awarii.                                          |
 | [`shell-integration`](shell-integration/SPEC.md) | F1         | Zasobnik, skróty globalne, protokół `alfa://`, jedna instancja, dialogi plików — w powłoce Tauri.                                    |
@@ -103,7 +104,7 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 | [`model-residency`](model-residency/SPEC.md) | F2     | Zarządca RAM/VRAM: dzierżawy modeli, wymiana wg priorytetów, tryb gry i baterii.                           |
 | [`compliance`](compliance/SPEC.md)           | F1, F4 | Rejestr zgodności tras, tagi prywatności i jurysdykcji, deny-listy Jądra z normalizacją ścieżek Windows.   |
 | [`agent-backends`](agent-backends/SPEC.md)   | F4     | Mosty do oficjalnych CLI (Claude Code, Codex) jako „opaque worker” w worktree, bez dostępu do poświadczeń. |
-| [`mcp`](mcp/SPEC.md)                         | F4     | Klient MCP z odciskiem opisów narzędzi i serwer MCP Alfy v0 (schowek, okna, `approve`) bez TCP.            |
+| [`mcp`](mcp/SPEC.md)                         | F4, F6 | Klient MCP z odciskiem opisów narzędzi i serwer MCP Alfy (v0: schowek, okna; v1: UIA, zrzuty, rejestr) bez TCP. |
 
 ### Głos
 
@@ -155,6 +156,8 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 | [`tools-uia`](tools-uia/SPEC.md)             | F5–F6  | Drzewo UIA, odczyt `TextPattern`, akcje tylko przez wzorce; wartości haseł nigdy nie wychodzą.             |
 | [`tools-input`](tools-input/SPEC.md)         | F5–F6  | `SendInput` ze strażnikiem celów i przerwaniem przy fizycznym wejściu użytkownika.                         |
 | [`tools-screen`](tools-screen/SPEC.md)       | F6     | Zrzuty na żądanie z maskowaniem okien Alfy/Brokera, deny-listy i pól haseł.                                |
+| [`tools-office`](tools-office/SPEC.md)       | F6     | Word/Excel przez COM: odczyt (niezaufany) i edycja kopii jako nowa wersja z „Cofnij”; makra wyłączone.     |
+| [`tools-browser`](tools-browser/SPEC.md)     | F6     | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
 | [`ui-terminal`](ui-terminal/SPEC.md)         | F4     | Terminal ConPTY sterowany wyłącznie przez użytkownika (logowanie do CLI); treść poza logami i zdarzeniami. |
 
 ### Samonaprawa i ulepszanie
@@ -164,6 +167,7 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 | [`diagnostician`](diagnostician/SPEC.md) | F8   | Diagnosta: katalog 24 awarii, naprawy cofalne z weryfikacją, raport „Zdrowie systemu”.                |
 | [`improver`](improver/SPEC.md)           | F8   | Ulepszacz R0–R2: propozycje zmian ustawień przez piaskownicę i holdout; nigdy Jądro ani progi.        |
 | [`evals`](evals/SPEC.md)                 | F8   | Harness zestawów: manifest z SHA-256, podziały dev/test/holdout, bootstrap, bramka holdoutu w Jądrze. |
+| [`plugin-runtime`](plugin-runtime/SPEC.md) | F8 | Wtyczki Wasm (wasmtime, WIT bez WASI): jedyny import `host.call` przez Brokera, paliwo, epoki, limity; zatwierdzenie z hashem. |
 
 ### UI (TypeScript)
 
@@ -175,6 +179,6 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 
 ### Moduły z planu bez SPEC-a
 
-`plugin-runtime` (F8), `tools-vision`, `tools-browser`, `tools-office`, `tools-system`, `tools-net`, `tools-media`
+`tools-vision`, `tools-system`, `tools-net`, `tools-media`
 (F6), `voice-lab` i `voice-transcribe` — SPEC powstaje przed falą, w której moduł jest budowany. Korzeń kompozycji
 `app-*` i biblioteki `lib-*` nie mają SPEC-ów (opis w `crates/README.md` i `docs/ARCHITECTURE.md` §13).
