@@ -147,6 +147,9 @@ impl ReleaseFeed for HttpFeed {
                 }
             };
             file.write_all(&chunk).await?;
+            // `tokio::fs::File` pisze w tle: bez `flush` postęp (i offset wznowienia po
+            // anulowaniu) mógłby wyprzedzić dane faktycznie zapisane w pliku częściowym.
+            file.flush().await?;
             bytes = bytes.saturating_add(chunk.len() as u64);
             if bytes > total.unwrap_or(MAX_PACKAGE_BYTES) {
                 drop(file);

@@ -197,13 +197,23 @@ impl Launcher for ScriptLauncher {
     }
 }
 
+/// Ścieżka bezwzględna właściwa dla systemu, składana segment po segmencie (`rel` — segmenty
+/// rozdzielone `/`): na Windows `/alfa` nie ma litery dysku, więc nie jest bezwzględna i
+/// `BrowserSpec::validate` odrzuca ją, zanim dojdzie do uruchomienia.
+fn abs(rel: &str) -> PathBuf {
+    let root = PathBuf::from(if cfg!(windows) { r"C:\" } else { "/" });
+    rel.split('/')
+        .filter(|s| !s.is_empty())
+        .fold(root, |acc, seg| acc.join(seg))
+}
+
 fn spec() -> BrowserSpec {
     BrowserSpec {
         kind: BrowserKind::Edge,
         executable: None,
-        alfa_root: PathBuf::from("/alfa"),
-        profile_dir: PathBuf::from("/alfa/browser/profile"),
-        quarantine_dir: PathBuf::from("/alfa/browser/quarantine"),
+        alfa_root: abs("alfa"),
+        profile_dir: abs("alfa/browser/profile"),
+        quarantine_dir: abs("alfa/browser/quarantine"),
         headless: true,
     }
 }
@@ -244,12 +254,21 @@ fn cdp_session_end_to_end() {
         max_sessions: 1,
     };
     let browser = CdpBrowser::with_launcher(config, Box::new(launcher));
-    let mut user = spec();
-    user.profile_dir = PathBuf::from("/alfa/../home/u/.config/google-chrome");
-    assert!(
-        browser.open(&user, Arc::new(Hosts(vec![]))).is_err(),
-        "profil użytkownika"
-    );
+    for profile in [
+        "alfa/../home/u/.config/google-chrome",
+        "alfa/../Users/u/AppData/Local/Google/Chrome/User Data",
+    ] {
+        let mut user = spec();
+        user.profile_dir = abs(profile);
+        assert!(
+            matches!(
+                browser.open(&user, Arc::new(Hosts(vec![]))),
+                Err(BrowserError::Policy(_))
+            ),
+            "profil użytkownika: {profile}"
+        );
+    }
+    assert!(args.lock().unwrap().is_empty(), "bez uruchomienia");
     let id = browser
         .open(&spec(), Arc::new(Hosts(vec!["sklep.pl"])))
         .unwrap();
@@ -340,10 +359,7 @@ fn cdp_session_end_to_end() {
     if downloads.is_empty() {
         downloads = browser.snapshot(id, 1, 1).unwrap().page.downloads;
     }
-    assert_eq!(
-        downloads[0].path,
-        PathBuf::from("/alfa/browser/quarantine/g1")
-    );
+    assert_eq!(downloads[0].path, spec().quarantine_dir.join("g1"));
     assert!(downloads[0].complete && downloads[0].suggested_name == "f.pdf");
     assert_eq!(browser.screenshot(id, 1000).unwrap(), b"\x89PNGfake");
     let shot = log

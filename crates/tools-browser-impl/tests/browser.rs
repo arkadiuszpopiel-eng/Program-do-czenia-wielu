@@ -5,7 +5,7 @@
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use std::collections::BTreeSet;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -24,13 +24,23 @@ use watchdog_contract::ManualClock;
 
 const HOME: &str = "/Users/ala";
 
+/// Ścieżka bezwzględna właściwa dla systemu, składana segment po segmencie (`rel` — segmenty
+/// rozdzielone `/`): na Windows `/Users/ala/…` nie ma litery dysku, więc nie jest bezwzględna
+/// i port przeglądarki odrzuca specyfikację („katalog Alfy musi być bezwzględny…”).
+fn abs(rel: &str) -> PathBuf {
+    let root = PathBuf::from(if cfg!(windows) { r"C:\" } else { "/" });
+    rel.split('/')
+        .filter(|s| !s.is_empty())
+        .fold(root, |acc, seg| acc.join(seg))
+}
+
 fn spec() -> BrowserSpec {
     BrowserSpec {
         kind: BrowserKind::Edge,
         executable: None,
-        alfa_root: PathBuf::from("/Users/ala/AppData/Local/Alfa"),
-        profile_dir: PathBuf::from("/Users/ala/AppData/Local/Alfa/browser/profile"),
-        quarantine_dir: PathBuf::from("/Users/ala/AppData/Local/Alfa/browser/quarantine"),
+        alfa_root: abs("Users/ala/AppData/Local/Alfa"),
+        profile_dir: abs("Users/ala/AppData/Local/Alfa/browser/profile"),
+        quarantine_dir: abs("Users/ala/AppData/Local/Alfa/browser/quarantine"),
         headless: true,
     }
 }
@@ -201,7 +211,7 @@ async fn passwords_quarantine_and_close() {
         .await;
     let path = dl.data["downloads"][0]["path"].as_str().unwrap().to_owned();
     assert!(
-        path.starts_with("/Users/ala/AppData/Local/Alfa/browser/quarantine"),
+        Path::new(&path).starts_with(spec().quarantine_dir),
         "{path}"
     );
     let shot = h.tool("browser_screenshot").call(json!({}), &ctx()).await;

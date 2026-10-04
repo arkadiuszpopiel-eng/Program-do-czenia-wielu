@@ -298,12 +298,15 @@ impl SessionCatalog for SqliteSessions {
     }
 
     fn delete_session(&self, id: &SessionId) -> Result<DeleteReport, SessionError> {
+        // Blokada `open` przez całe usuwanie: `session_db` nie trafi w okno między zniszczeniem
+        // klucza a usunięciem wpisu katalogu (zwróciłby błąd sejfu zamiast `NotFound`).
+        // Kolejność blokad jak w `session_db`: `open` → `index`.
+        let mut open = lock(&self.open);
         self.exists(id)?;
         // 1. Klucz najpierw: od tej chwili plik jest nieczytelny (crypto-shredding).
         let key_deleted = self.vault.delete(&session_key_name(id))?;
         // 2. Zamknięcie połączenia i usunięcie plików (`-wal`/`-shm` też).
-        let db = lock(&self.open).remove(id);
-        if let Some(db) = db.and_then(|db| Arc::try_unwrap(db).ok()) {
+        if let Some(db) = open.remove(id).and_then(|db| Arc::try_unwrap(db).ok()) {
             let _ = db.close();
         }
         let files_removed = lib_sqlstore::remove_database(&self.session_path(id))
@@ -314,6 +317,7 @@ impl SessionCatalog for SqliteSessions {
         self.index
             .with(|c| c.execute("DELETE FROM sessions WHERE id = ?1", [id.as_str()]))
             .map_err(db_err)?;
+        drop(open);
         lock(&self.active).remove(id);
         self.outbox
             .emit(events::SESSION_DELETED, id, json!({ "session": id }));

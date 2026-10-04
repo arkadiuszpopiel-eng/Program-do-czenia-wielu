@@ -4,41 +4,80 @@ use std::path::{Path, PathBuf};
 
 use super::*;
 
-fn spec(root: &str, profile: &str, quarantine: &str) -> BrowserSpec {
+fn spec(
+    root: impl Into<PathBuf>,
+    profile: impl Into<PathBuf>,
+    quarantine: impl Into<PathBuf>,
+) -> BrowserSpec {
     BrowserSpec {
         kind: BrowserKind::Edge,
         executable: None,
-        alfa_root: PathBuf::from(root),
-        profile_dir: PathBuf::from(profile),
-        quarantine_dir: PathBuf::from(quarantine),
+        alfa_root: root.into(),
+        profile_dir: profile.into(),
+        quarantine_dir: quarantine.into(),
         headless: true,
     }
+}
+
+/// Ścieżka bezwzględna właściwa dla systemu, składana segment po segmencie (`rel` — segmenty
+/// rozdzielone `/`): na Windows `C:\a\Alfa`, gdzie indziej `/a/Alfa`. Samo `/a/Alfa` na Windows
+/// nie ma litery dysku, więc **nie** jest bezwzględne i `validate` słusznie je odrzuca.
+fn abs(rel: &str) -> PathBuf {
+    let root = PathBuf::from(if cfg!(windows) { r"C:\" } else { "/" });
+    rel.split('/')
+        .filter(|s| !s.is_empty())
+        .fold(root, |acc, seg| acc.join(seg))
 }
 
 #[test]
 fn browser_spec_never_uses_user_profiles() {
     let ok = spec(
-        "/a/Alfa",
-        "/a/Alfa/browser/profile",
-        "/a/Alfa/browser/quarantine",
+        abs("a/Alfa"),
+        abs("a/Alfa/browser/profile"),
+        abs("a/Alfa/browser/quarantine"),
     );
-    assert!(ok.validate().is_ok());
+    assert!(ok.validate().is_ok(), "{ok:?}");
+    let win_ok = spec(
+        abs("Users/ala/AppData/Local/Alfa"),
+        abs("Users/ala/AppData/Local/Alfa/browser/profile"),
+        abs("Users/ala/AppData/Local/Alfa/browser/quarantine"),
+    );
+    assert!(win_ok.validate().is_ok(), "{win_ok:?}");
+    // Ścieżka od korzenia bez litery dysku jest bezwzględna tylko poza Windows.
+    let rooted = spec("/a/Alfa", "/a/Alfa/p", "/a/Alfa/q");
+    assert_eq!(rooted.validate().is_ok(), !cfg!(windows), "{rooted:?}");
     for bad in [
-        spec("/a/Alfa", "/a/Google/Chrome/User Data", "/a/Alfa/q"),
         spec(
-            "/a/Alfa",
-            "/a/Alfa/../Microsoft/Edge/User Data",
-            "/a/Alfa/q",
+            abs("a/Alfa"),
+            abs("a/Google/Chrome/User Data"),
+            abs("a/Alfa/q"),
         ),
-        spec("/a/Alfa", "/a/Alfa/p", "/a/Alfa/p/q"),
-        spec("/a/Alfa", "/a/Alfa/p", "/a/Alfa/p"),
-        spec("/a/Alfa", "/a/Alfa", "/a/Alfa/q"),
         spec(
-            "/home/u/.config/google-chrome",
-            "/home/u/.config/google-chrome/x",
-            "/home/u/.config/google-chrome/q",
+            abs("a/Alfa"),
+            abs("a/Alfa/../Microsoft/Edge/User Data"),
+            abs("a/Alfa/q"),
+        ),
+        spec(abs("a/Alfa"), abs("a/Alfa/p"), abs("a/Alfa/p/q")),
+        spec(abs("a/Alfa"), abs("a/Alfa/p"), abs("a/Alfa/p")),
+        spec(abs("a/Alfa"), abs("a/Alfa"), abs("a/Alfa/q")),
+        spec(abs("a/Alfa"), abs("a/Inne/p"), abs("a/Alfa/q")),
+        spec(
+            abs("home/u/.config/google-chrome"),
+            abs("home/u/.config/google-chrome/x"),
+            abs("home/u/.config/google-chrome/q"),
+        ),
+        spec(
+            abs("Users/ala/AppData/Local/Alfa"),
+            abs("Users/ala/AppData/Local/Alfa/../Google/Chrome/User Data/Default"),
+            abs("Users/ala/AppData/Local/Alfa/q"),
+        ),
+        spec(
+            abs("Users/ala/AppData/Local/Microsoft/Edge/User Data"),
+            abs("Users/ala/AppData/Local/Microsoft/Edge/User Data/Profile 1"),
+            abs("Users/ala/AppData/Local/Microsoft/Edge/User Data/q"),
         ),
         spec("rel", "rel/p", "rel/q"),
+        spec(r"\a\Alfa", r"\a\Alfa\p", r"\a\Alfa\q"),
     ] {
         assert!(bad.validate().is_err(), "{bad:?}");
     }
@@ -46,13 +85,21 @@ fn browser_spec_never_uses_user_profiles() {
         r"C:\Users\ala\AppData\Local\Google\Chrome\User Data",
         r"C:\Users\ala\AppData\Local\Microsoft\Edge\User Data\Profile 1",
         r"C:\Users\ala\AppData\Roaming\Mozilla\Firefox\Profiles\x.default",
+        r"\\?\C:\Users\ala\AppData\Local\Google\Chrome\User Data\Default",
+        r"\\serwer\udzial\ala\AppData\Local\BraveSoftware\Brave-Browser\User Data",
+        "C:/Users/ala/AppData/Local/Microsoft/Edge/User Data",
+        r"c:\USERS\ALA\APPDATA\LOCAL\GOOGLE\CHROME",
         "/home/u/.mozilla/firefox",
     ] {
         assert!(is_user_browser_profile(Path::new(user)), "{user}");
     }
-    assert!(!is_user_browser_profile(Path::new(
-        r"C:\Users\ala\AppData\Local\Alfa\browser\profile"
-    )));
+    for alfa in [
+        r"C:\Users\ala\AppData\Local\Alfa\browser\profile",
+        r"\\?\C:\Users\ala\AppData\Local\Alfa\browser\quarantine",
+        "/home/u/.local/share/alfa/browser/profile",
+    ] {
+        assert!(!is_user_browser_profile(Path::new(alfa)), "{alfa}");
+    }
 }
 
 #[test]

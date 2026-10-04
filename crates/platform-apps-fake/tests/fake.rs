@@ -194,13 +194,23 @@ impl EgressFilter for Hosts {
     }
 }
 
+/// Ścieżka bezwzględna właściwa dla systemu, składana segment po segmencie (`rel` — segmenty
+/// rozdzielone `/`): na Windows `/alfa` nie ma litery dysku, więc nie jest bezwzględna i
+/// `BrowserSpec::validate` odrzuca ją, zanim dojdzie do profilu.
+fn abs(rel: &str) -> PathBuf {
+    let root = PathBuf::from(if cfg!(windows) { r"C:\" } else { "/" });
+    rel.split('/')
+        .filter(|s| !s.is_empty())
+        .fold(root, |acc, seg| acc.join(seg))
+}
+
 fn spec() -> BrowserSpec {
     BrowserSpec {
         kind: BrowserKind::Edge,
         executable: None,
-        alfa_root: PathBuf::from("/alfa"),
-        profile_dir: PathBuf::from("/alfa/browser/profile"),
-        quarantine_dir: PathBuf::from("/alfa/browser/quarantine"),
+        alfa_root: abs("alfa"),
+        profile_dir: abs("alfa/browser/profile"),
+        quarantine_dir: abs("alfa/browser/quarantine"),
         headless: true,
     }
 }
@@ -234,9 +244,23 @@ fn browser_egress_quarantine_and_passwords() {
             ],
         },
     );
-    let mut bad = spec();
-    bad.profile_dir = PathBuf::from("/home/u/.config/google-chrome/Default");
-    assert!(b.open(&bad, Arc::new(Hosts(vec![]))).is_err());
+    // Profil przeglądarki użytkownika (Linux i Windows) — odmowa, zanim cokolwiek się uruchomi.
+    for user in [
+        "home/u/.config/google-chrome/Default",
+        "Users/u/AppData/Local/Google/Chrome/User Data/Default",
+        "alfa/../Users/u/AppData/Local/Microsoft/Edge/User Data",
+    ] {
+        let mut bad = spec();
+        bad.profile_dir = abs(user);
+        assert!(
+            matches!(
+                b.open(&bad, Arc::new(Hosts(vec![]))),
+                Err(BrowserError::Policy(_))
+            ),
+            "{user}"
+        );
+    }
+    assert!(b.launches().is_empty());
     let id = b.open(&spec(), Arc::new(Hosts(vec!["sklep.pl"]))).unwrap();
     assert!(b.launches()[0].contains(&"--remote-debugging-pipe".to_owned()));
     assert!(matches!(
@@ -253,7 +277,7 @@ fn browser_egress_quarantine_and_passwords() {
         Err(BrowserError::PasswordField)
     );
     let dl = b.click(id, 2).unwrap();
-    assert!(dl.downloads[0].path.starts_with("/alfa/browser/quarantine"));
+    assert!(dl.downloads[0].path.starts_with(spec().quarantine_dir));
     let other = b.click(id, 1).unwrap();
     assert_eq!(other.url, "https://sklep.pl/");
     assert_eq!(other.blocked_hosts, vec!["inny.example".to_owned()]);

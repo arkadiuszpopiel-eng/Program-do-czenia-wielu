@@ -174,13 +174,17 @@ async fn cancel_keeps_part_for_resume() {
     let service = f.service.clone();
     let task = tokio::spawn(async move { service.download(InstallIntent::Update).await });
     let deadline = std::time::Instant::now() + Duration::from_secs(10);
+    // Rozmiar pliku częściowego z uchwytu (`fs::metadata` ścieżki), nie z wpisu katalogu:
+    // na Windows `DirEntry::metadata` zwraca dane z `FindNextFileW`, a NTFS aktualizuje rozmiar
+    // we wpisie katalogu dopiero po zamknięciu uchwytu — przy zawieszonym pobieraniu (plik wciąż
+    // otwarty) widać tam 0 B bez końca.
     let part_size = || {
         let dir = f.updater.layout().root.join("staging");
         std::fs::read_dir(dir)
             .ok()
             .and_then(|mut d| d.next())
             .and_then(|e| e.ok())
-            .and_then(|e| e.metadata().ok())
+            .and_then(|e| std::fs::metadata(e.path()).ok())
             .map_or(0, |m| m.len())
     };
     while part_size() < 2048 {

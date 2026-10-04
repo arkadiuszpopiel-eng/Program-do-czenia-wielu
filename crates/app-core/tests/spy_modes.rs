@@ -18,6 +18,7 @@ use common::*;
 use platform_fake::FakeExec;
 use providers_fake::{FAKE_MODEL, Script};
 use serde_json::json;
+use updater_impl::instance::RUNNING_LOCK;
 
 fn tokens_in(text: &str, tokens: &[String]) -> Vec<usize> {
     (0..tokens.len())
@@ -194,9 +195,19 @@ async fn agent_voice_and_chat_sessions_never_leak() {
     }
     // 5. Dane Alfy na dysku (bazy sesji, audyt Brokera, dziennik cofania, konfiguracja): żadnego
     //    sekretu jawnym tekstem.
+    //    Wyjątek: blokada instancji (`running.lock`), którą działający rdzeń trzyma przez
+    //    `File::try_lock` — na Windows to blokada zakresu bajtów (`LockFileEx`), więc odczyt innym
+    //    uchwytem kończy się `ERROR_LOCK_VIOLATION` (na Linuksie `flock` jest tylko doradczy).
+    //    Plik jest z założenia pusty: sprawdzamy rozmiar z metadanych, nie treść.
+    let instance_lock = core.paths().local.join(RUNNING_LOCK);
     for root in [&core.paths().local, &core.paths().config] {
         for path in files(root) {
-            let bytes = std::fs::read(&path).unwrap();
+            if path == instance_lock {
+                let len = std::fs::metadata(&path).unwrap().len();
+                assert_eq!(len, 0, "blokada instancji nie jest pusta");
+                continue;
+            }
+            let bytes = std::fs::read(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
             let text = String::from_utf8_lossy(&bytes);
             assert!(
                 tokens_in(&text, &tokens).is_empty(),
