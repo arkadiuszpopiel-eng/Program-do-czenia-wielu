@@ -6,6 +6,8 @@ import '@alfa/ui-kit/tokens.css';
 import './pill.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import type { AppBootstrap } from '../lib/api/types-system';
+import { applyBootDocument } from '../lib/window-boot';
 
 type Agent = 'alfa' | 'beta' | 'gama' | 'delta';
 type Mic = 'off' | 'listening' | 'hearing' | 'processing' | 'speaking' | 'muted' | 'dnd';
@@ -31,6 +33,8 @@ const TEXT = {
     stop: 'Zatrzymaj mowę',
     mute: 'Wycisz',
     unmute: 'Włącz mikrofon',
+    label: 'Pigułka głosowa',
+    title: 'Alfa — pigułka głosowa',
   },
   en: {
     off: 'Microphone off',
@@ -43,6 +47,8 @@ const TEXT = {
     stop: 'Stop speech',
     mute: 'Mute',
     unmute: 'Unmute',
+    label: 'Voice pill',
+    title: 'Alfa — voice pill',
   },
 } as const;
 const ICON: Record<Mic, string> = {
@@ -95,9 +101,15 @@ function icon(shapes: readonly Shape[]): SVGSVGElement {
   return svg;
 }
 
-const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'pl';
-const L = TEXT[lang];
 const tauri = '__TAURI_INTERNALS__' in window;
+// Język i motyw (`ui.theme`) z `app_bootstrap` przed pierwszym renderem; podgląd poza Tauri —
+// `?lang=`. Błąd odczytu nie blokuje pigułki: zostaje polski i motyw systemu.
+const boot = tauri ? await invoke<AppBootstrap>('app_bootstrap').catch(() => null) : null;
+const wanted = boot?.locale ?? new URLSearchParams(location.search).get('lang');
+const lang = wanted === 'en' ? 'en' : 'pl';
+const L = TEXT[lang];
+applyBootDocument(document.documentElement, { locale: lang, settings: boot?.settings ?? {} });
+document.title = L.title;
 const state = {
   agent: 'beta' as Agent,
   mic: 'speaking' as Mic,
@@ -120,6 +132,7 @@ if (!tauri) {
 
 const root = document.getElementById('pill');
 if (!root) throw new Error('Brak elementu #pill');
+root.setAttribute('aria-label', L.label);
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,

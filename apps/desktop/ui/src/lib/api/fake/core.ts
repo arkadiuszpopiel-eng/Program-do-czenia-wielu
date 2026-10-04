@@ -32,7 +32,9 @@ export type FakeScenario =
   | 'rate-limited'
   | 'no-keys'
   | 'no-mic'
-  | 'disk-low';
+  | 'disk-low'
+  /** Rdzeń odrzuca `turns_send` (np. błąd zapisu historii) — szkic nie może zginąć. */
+  | 'send-error';
 
 export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'default',
@@ -43,6 +45,7 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'no-keys',
   'no-mic',
   'disk-low',
+  'send-error',
 ];
 
 export interface FakeOptions {

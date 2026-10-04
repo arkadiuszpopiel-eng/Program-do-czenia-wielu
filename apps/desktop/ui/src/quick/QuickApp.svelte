@@ -7,10 +7,10 @@
   import Avatar from '@alfa/ui-kit/components/Avatar.svelte';
   import SanitizedHtml from '@alfa/ui-kit/components/SanitizedHtml.svelte';
   import type { AlfaClient } from '../lib/api/client';
-  import type { Locale, Turn } from '../lib/api/types';
+  import type { Locale } from '../lib/api/types';
   import type { AlfaEvent } from '../lib/api/types-system';
-  import { applyTurnEvent, isChatEvent } from '../lib/logic/apply-event';
   import { RafBatcher } from '../lib/logic/raf-batcher';
+  import { QuickSession } from './quick-session.svelte';
   import { quickText, type QuickKey } from './strings';
 
   interface Props {
@@ -23,20 +23,12 @@
   const locale = $derived(props.locale ?? 'pl');
   const t = (key: QuickKey, message?: string) => quickText(locale, key, message);
 
+  const quick = new QuickSession(client);
   let question = $state('');
-  let sessionId = $state<string | null>(null);
-  let answer = $state<Turn | null>(null);
-  let queued = $state(false);
+  let failure = $state<string | null>(null);
   let input = $state<HTMLInputElement | null>(null);
 
-  const batcher = new RafBatcher<AlfaEvent>((batch) => {
-    for (const event of batch) {
-      if (!isChatEvent(event) || event.session_id !== sessionId) continue;
-      if (event.type === 'TurnAppended') {
-        if (event.turn.author !== 'user') answer = event.turn;
-      } else if (answer && event.turn_id === answer.id) applyTurnEvent(answer, event);
-    }
-  });
+  const batcher = new RafBatcher<AlfaEvent>((batch) => quick.apply(batch));
 
   $effect(() => {
     const off = client.subscribe((batch) => batcher.push(...batch));
@@ -51,10 +43,14 @@
     const text = question.trim();
     if (!text) return;
     question = '';
-    answer = null;
-    const result = await client.quick.ask(text);
-    sessionId = result.session_id;
-    queued = result.assistant_turn_id === null;
+    failure = null;
+    try {
+      await quick.ask(text);
+    } catch (error) {
+      // Odrzucone pytanie nie ginie: wraca do pola, jeśli nie wpisano nic nowego.
+      if (!question) question = text;
+      failure = error instanceof Error ? error.message : String(error);
+    }
   }
 
   function onkeydown(event: KeyboardEvent) {
@@ -64,10 +60,12 @@
     } else if (event.key === 'Enter' && !event.isComposing) {
       event.preventDefault();
       if (question.trim()) void ask();
-      else if (sessionId) void client.quick.expandToMain(sessionId);
+      else if (quick.sessionId) void client.quick.expandToMain(quick.sessionId);
     }
   }
 
+  const answer = $derived(quick.answer);
+  const sessionId = $derived(quick.sessionId);
   const streaming = $derived(answer?.status === 'streaming');
 </script>
 
@@ -87,9 +85,11 @@
     />
     <kbd>Esc</kbd>
   </div>
-  {#if answer || queued}
+  {#if answer || quick.queued || failure}
     <section class="answer" aria-label={t('answer')} aria-live="polite" aria-busy={streaming}>
-      {#if queued}
+      {#if failure}
+        <p class="error" role="alert">{t('error', failure)}</p>
+      {:else if quick.queued}
         <p class="muted">{t('queued')}</p>
       {:else if answer}
         {#if answer.thinking?.active && answer.blocks.length === 0}<p class="muted">

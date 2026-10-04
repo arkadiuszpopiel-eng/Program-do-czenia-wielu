@@ -112,6 +112,9 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
   Brokera (`broker_window = false`, czas odmowy z `expires_at`).
 - **Steering:** wiadomość wysłana w trakcie przebiegu agentki trafia do `agents_steer` (podpowiedź w
   composerze); Esc/Stop = `turns_stop`.
+- **Nieudane wysłanie:** odrzucone `turns_send` nie kasuje szkicu — treść wraca do szkicu sesji, z której
+  wyszła (gdy pole jest puste), plus toast z błędem. Przełączanie sesji: spóźnione odpowiedzi
+  (`costs_summary`, ładowanie poprzedniej sesji) nie nadpisują kosztów ani aktywnej sesji w rdzeniu.
 - **Katalog roboczy:** karta w panelu Agentki (`sessions_workdir`, `sessions_choose_workdir`:
   dialog / katalog sesji / bez narzędzi).
 - **Głos:** wskaźnik mikrofonu w pasku tytułu (stan z `VoiceStatusChanged`/`VoicePill`), pigułka

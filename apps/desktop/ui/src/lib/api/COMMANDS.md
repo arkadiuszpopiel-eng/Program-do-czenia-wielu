@@ -33,7 +33,8 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 - **Role agentek** w DTO (`role_id`, `role_ids`) to identyfikatory `personas-contract`
   (`conductor`, `operator`, `coder`, …) — bez aliasów po stronie UI.
 - Uprawnienia okien (capabilities): okno główne — wszystkie komendy poniżej; okno `quick` —
-  `app_bootstrap`, `quick_*`; okno `pill` — `voice_stop_speech`, `voice_set_muted` + zdarzenia.
+  `app_bootstrap`, `quick_*`; okno `pill` — `app_bootstrap` (język i `ui.theme` przed pierwszym
+  renderem), `voice_stop_speech`, `voice_set_muted` + zdarzenia.
 
 ## Komendy
 

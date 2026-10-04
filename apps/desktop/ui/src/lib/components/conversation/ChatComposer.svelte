@@ -153,7 +153,22 @@
     }
   }
 
+  /** Odrzucone wysłanie nie kasuje szkicu: wraca do sesji, z której wyszło (gdy pole puste). */
   async function submit(text: string) {
+    const origin = app.activeId;
+    try {
+      await deliver(text);
+    } catch (error) {
+      const id = origin ?? app.activeId;
+      if (id && !app.sessions.drafts[id]) app.setDraft(text, id);
+      app.toasts.show({
+        kind: 'error',
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  async function deliver(text: string) {
     history.push(text);
     trigger = null;
     const command = /^\/(\S+)\s*$/u.exec(text);
@@ -247,7 +262,7 @@
     }}
     {onkeydown}
     oninput={refreshTrigger}
-    onsubmit={(text) => void submit(text)}
+    onsubmit={(text) => submit(text)}
     onstop={() => void conv?.stop()}
   >
     {#snippet above()}

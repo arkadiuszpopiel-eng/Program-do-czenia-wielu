@@ -5,6 +5,7 @@
   import Send from '@lucide/svelte/icons/send';
   import Square from '@lucide/svelte/icons/square';
   import IconButton from './IconButton.svelte';
+  import { submitDraft } from './draft';
 
   interface Labels {
     field: string;
@@ -32,7 +33,8 @@
     /** Wywoływane przed domyślną obsługą klawiszy; `preventDefault()` ją pomija. */
     onkeydown?: (event: KeyboardEvent) => void;
     oninput?: (event: Event) => void;
-    onsubmit?: (text: string) => void;
+    /** Wysłanie; odrzucona obietnica przywraca treść do pustego pola (błąd zgłasza wywołujący). */
+    onsubmit?: (text: string) => unknown;
     onstop?: () => void;
     onattach?: () => void;
     /** Chipy wyboru agentki / profilu (po lewej od mikrofonu). */
@@ -88,9 +90,7 @@
 
   function submit() {
     if (!canSend) return;
-    const message = value.trim();
-    onsubmit?.(message);
-    value = '';
+    submitDraft({ get: () => value, set: (text) => (value = text) }, onsubmit);
     textarea?.focus();
   }
 

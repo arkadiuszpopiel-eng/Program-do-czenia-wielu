@@ -9,6 +9,7 @@ export { default as Avatar } from './components/Avatar.svelte';
 export { default as Chip } from './components/Chip.svelte';
 export { default as Panel } from './components/Panel.svelte';
 export { default as Composer } from './components/Composer.svelte';
+export { submitDraft, type DraftField } from './components/draft';
 export { default as ActivityCapsule } from './components/ActivityCapsule.svelte';
 export { default as ApprovalCard } from './components/ApprovalCard.svelte';
 export { default as MicButton } from './components/MicButton.svelte';

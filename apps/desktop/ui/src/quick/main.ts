@@ -5,11 +5,15 @@ import '@alfa/ui-kit/base.css';
 import './quick.css';
 import QuickApp from './QuickApp.svelte';
 import { createClient } from '../lib/api';
+import { applyBootDocument } from '../lib/window-boot';
+import { quickText } from './strings';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Brak elementu #app');
 
 const client = await createClient();
 const boot = await client.app.bootstrap();
-document.documentElement.lang = boot.locale;
+// Język i motyw (`ui.theme`) z ustawień — przed montażem, żeby pierwsza klatka była już właściwa.
+applyBootDocument(document.documentElement, boot);
+document.title = `Alfa — ${quickText(boot.locale, 'title')}`;
 mount(QuickApp, { target, props: { client, locale: boot.locale } });

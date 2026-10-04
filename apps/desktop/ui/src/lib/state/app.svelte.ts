@@ -213,6 +213,8 @@ export class AppState {
       loads.push(this.client.sessions.getDraft(id).then((d) => (this.sessions.drafts[id] = d)));
     }
     await Promise.all(loads);
+    // Szybkie przełączanie: spóźnione A nie może nadpisać aktywnej B w rdzeniu.
+    if (this.activeId !== id) return;
     void this.client.app.setActiveSession(id);
     if (this.sessions.active?.unread) void this.client.sessions.markRead(id);
   }
@@ -231,7 +233,9 @@ export class AppState {
   }
 
   async refreshCosts(): Promise<void> {
-    this.costs = await this.client.costs.summary(this.activeId);
+    const id = this.activeId;
+    const costs = await this.client.costs.summary(id);
+    if (this.activeId === id) this.costs = costs;
   }
 
   async newSession(template?: SessionTemplate): Promise<void> {
@@ -291,8 +295,8 @@ export class AppState {
     }
   }
 
-  setDraft(text: string): void {
-    const id = this.activeId;
+  /** Szkic sesji (domyślnie aktywnej; inna — np. przywrócenie po nieudanym wysłaniu). */
+  setDraft(text: string, id: string | null = this.activeId): void {
     if (!id) return;
     this.sessions.drafts[id] = text;
     this.debounce(`draft:${id}`, () => void this.client.sessions.saveDraft(id, text));

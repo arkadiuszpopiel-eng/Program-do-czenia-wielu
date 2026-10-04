@@ -154,6 +154,11 @@ export class FakeChat {
       list: (sessionId) =>
         core.reply({ turns: core.turnsOf(sessionId), annotations: core.annotations }),
       send: (sessionId, options) => {
+        if (core.scenario === 'send-error') {
+          return Promise.reject(
+            new Error('Nie udało się zapisać wiadomości (atrapa: send-error).'),
+          );
+        }
         const user = this.appendUser(
           sessionId,
           options.parent_id,
