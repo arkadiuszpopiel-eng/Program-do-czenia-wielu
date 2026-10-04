@@ -25,7 +25,8 @@ pub enum SearchError {
         /// Opis.
         reason: String,
     },
-    /// Indeks w bazie zbudowano innym embedderem (wymaga reindeksacji).
+    /// Indeks w bazie zbudowano innym embedderem. Od F7-02 `search-impl` zamiast błędu przebudowuje
+    /// wektory w tle (`TxIndexer::reindex_step`); wariant zostaje dla zgodności kontraktu.
     #[error("indeks zbudowany embedderem `{indexed}`, bieżący to `{current}`")]
     EmbedderMismatch {
         /// Embedder zapisany w bazie.

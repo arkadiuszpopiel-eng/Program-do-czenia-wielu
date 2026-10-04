@@ -92,3 +92,37 @@ FTS zapytanie ≤ 30 ms na 100k tur; wyniki palety ≤ 16 ms/znak (z `ui-shell`)
   z segmentów indeksu (test: surowe tabele bez słowa po `remove_in` + `compact_in`); `vec0` zeruje wektor sam.
 - Atrapa: `FakeSearch` implementuje `TxSearcher` (indeks w pamięci po etykiecie). Kontrakt: `tx_search_suite`
   (AND/OR, osobny tekst embeddingu, rodzaje, etykieta, usunięcie, zatarcie) na `-fake` i `-impl`.
+
+## Zmiany F7-02 — embedder ONNX i przebudowa wektorów (2026-10-03; addytywne)
+- **`Embedder::embed_query`** (domyślnie = `embed`): zapytania przez stronę zapytań modeli asymetrycznych (E5:
+  `query: `), dokumenty przez `embed` (`passage: `). Produkcyjny embedder: `lib-embed::OnnxEmbedder` (ONNX przez
+  `tract-onnx`, własny tokenizer Unigram zgodny z HF, wątek tła, dzierżawa `model-residency`; `crates/lib-embed`).
+- **Generacje wektorów:** `search_meta.embedder` (+ `vec_gen`) = embedder aktywnych tabel `vec0`; inny embedder →
+  **przebudowa w tle zamiast `EmbedderMismatch`**: nowe tabele `search_vec_<rodzaj>_g<N>` z wymiarem bieżącego
+  embeddera, kursor `search_meta.cursor`; zapisy w trakcie trafiają do generacji docelowej; **zapytania `Vector`
+  i `Hybrid` działają jak `Fts`**, aż przebudowa się skończy (stare wektory nieużywane); koniec kursora → atomowe
+  przełączenie generacji i usunięcie starych tabel; powrót do poprzedniego embeddera → porzucenie generacji
+  docelowej. Migracja `0002`: `search_vec_missing(id, gen)` — uwaga dla `updater` (wersje obok siebie): starsza
+  wersja aplikacji po tej migracji zgłosi `UnknownMigration` w bazach sesji (ogólna kwestia migracji, F7-08).
+- **`TxIndexer::reindex_step(&Db, batch)`** (domyślnie „nic do zrobienia”): krok w trzech fazach — odczyt partii
+  w blokadzie, **embedding bez blokady bazy** (FTS i zapisy nie czekają na model), zapis w transakcji tylko przy
+  niezmienionym stanie, z pominięciem dokumentów zmienionych/usuniętych w międzyczasie; trwały kursor →
+  wznawianie. **`TxIndexer::vector_status_in`** → `VectorStatus::{Ready{embedder, missing}, Rebuilding{from, to,
+  done, total}}`; `ReindexProgress{embedded, done, total, finished}`.
+- **Embedder niedostępny** (brak RAM, błąd modelu) przy zapisie → dokument w FTS, brak wektora w
+  `search_vec_missing` (zdarzenie `search.vector.missing`), zapis danych się nie wycofuje; uzupełnia go krok
+  przebudowy. Błąd embeddera zapytania → zapytanie spada do FTS (bez błędu).
+- `-impl`: `SqliteSearch::{vector_status, reindex_db, reindex_all, spawn_reindex}` + `ReindexSource` (bazy spoza
+  `SessionDbProvider`, np. zakresy pamięci), `ReindexOptions{batch, pause}`, `ReindexHandle{cancel, snapshot,
+  join}` (`drop` = anuluj); zdarzenia `search.reindex.{started,progress,done}` — tylko liczniki i etykieta bazy.
+- `-fake`: `FakeSearch::with_embedder` (eval F7-02 z prawdziwym modelem w `memory-impl`); błąd embeddera →
+  dokument bez wektora, zapytanie bez wektora → FTS.
+- Testy (`search-impl/tests/reindex.rs`): `HashEmbedder` 64 → embedder 8 wym. (FTS w trakcie, zapisy/usunięcia
+  w trakcie, postęp monotoniczny, stare tabele usunięte), wznowienie po restarcie, porzucenie, awaria embeddera,
+  dokument zmieniony w trakcie embeddingu, wątek tła po sesjach + źródle dodatkowym ze zdarzeniami bez treści,
+  property-based: dowolny przeplot zapisów/usunięć/kroków/zmian embeddera/awarii zbiega do „1 wektor na dokument,
+  0 brakujących, tylko tabele aktywnej generacji”.
+- Budżet embeddera: `multilingual-e5-small` fp32 — pomiar na modelu o tym kształcie (losowe wagi, `--release`,
+  4 vCPU): RSS ~525 MB, ładowanie 2,5 s, zapytanie 29 ms, dokument ~57 ms, 512 tokenów 0,72 s (`ram_mb = 640`
+  w katalogu) — powyżej wstępnych 300 MB; wariant int8 (~118 MB) do sprawdzenia na prawdziwym pliku. Przebudowa:
+  domyślnie 4 dokumenty na krok (zapis tury czeka w kolejce modelu ≤ ~0,25 s).

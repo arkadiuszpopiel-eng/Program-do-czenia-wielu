@@ -16,6 +16,7 @@ mod error;
 mod rules;
 mod snippet;
 mod types;
+mod vectors;
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
@@ -28,6 +29,7 @@ pub use types::{
     Caller, ConnQuery, Doc, DocId, DocKind, Highlight, Hit, Mode, Query, RemoveReport, SessionSet,
     Snippet,
 };
+pub use vectors::{ReindexProgress, VectorStatus};
 
 pub use core_bus_contract::SessionId;
 
@@ -39,4 +41,12 @@ pub mod events {
     pub const REMOVED: &str = "search.removed";
     /// Embedder załadowany.
     pub const EMBEDDER_LOADED: &str = "search.embedder.loaded";
+    /// Zmiana embeddera wykryta w bazie — start przebudowy wektorów (ładunek: embeddery, liczniki).
+    pub const REINDEX_STARTED: &str = "search.reindex.started";
+    /// Postęp przebudowy wektorów (ładunek: `done`, `total`, `embedded`).
+    pub const REINDEX_PROGRESS: &str = "search.reindex.progress";
+    /// Przebudowa wektorów zakończona we wszystkich bazach (ładunek: liczniki).
+    pub const REINDEX_DONE: &str = "search.reindex.done";
+    /// Dokument zapisany bez wektora (embedder niedostępny; FTS działa, wektor uzupełni przebudowa).
+    pub const VECTOR_MISSING: &str = "search.vector.missing";
 }

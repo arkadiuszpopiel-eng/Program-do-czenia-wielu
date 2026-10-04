@@ -1,9 +1,11 @@
 //! Traity: usługa wyszukiwania, indeksowanie w transakcji właściciela bazy, embedder.
 
+use lib_sqlstore::Db;
 use lib_sqlstore::rusqlite::Connection;
 
 use crate::error::SearchError;
 use crate::types::{Caller, ConnQuery, Doc, DocId, Hit, Query, RemoveReport};
+use crate::vectors::{ReindexProgress, VectorStatus};
 use core_bus_contract::SessionId;
 
 /// Usługa wyszukiwania (UI, pamięć, narzędzia agentek w obrębie własnej sesji).
@@ -41,6 +43,22 @@ pub trait TxIndexer: Send + Sync {
         let _ = conn;
         Ok(())
     }
+
+    /// Stan wektorów w bazie (gotowe / przebudowa po zmianie embeddera / brakujące wektory).
+    /// Domyślnie: gotowe.
+    fn vector_status_in(&self, conn: &Connection) -> Result<VectorStatus, SearchError> {
+        let _ = conn;
+        Ok(VectorStatus::default())
+    }
+
+    /// Jeden krok przebudowy wektorów bazy (≤ `batch` dokumentów): odczyt i zapis w krótkich,
+    /// osobnych blokadach połączenia, embedding **poza blokadą** (FTS i zapisy nie czekają na model).
+    /// Postęp jest trwały (kursor w bazie) — przerwana przebudowa wznawia się od miejsca przerwania.
+    /// Wywołujący powtarza kroki do `finished`. Domyślnie: nic do zrobienia.
+    fn reindex_step(&self, db: &Db, batch: usize) -> Result<ReindexProgress, SearchError> {
+        let _ = (db, batch);
+        Ok(ReindexProgress::finished(0))
+    }
 }
 
 /// Zapytanie **w połączeniu modułu, który jest właścicielem bazy** (np. `memory` w bazie zakresu
@@ -56,12 +74,17 @@ pub trait TxSearcher: Send + Sync {
     ) -> Result<Vec<Hit>, SearchError>;
 }
 
-/// Lokalny embedder tekstu (ONNX w F7; w testach deterministyczna atrapa z `search-fake`).
+/// Lokalny embedder tekstu (ONNX w F7: `lib-embed`; w testach deterministyczna atrapa z `search-fake`).
 pub trait Embedder: Send + Sync {
-    /// Identyfikator modelu (zapisywany w bazie; zmiana wymaga reindeksacji).
+    /// Identyfikator modelu (zapisywany w bazie; zmiana → przebudowa wektorów w tle).
     fn model_id(&self) -> &str;
     /// Wymiar wektora.
     fn dims(&self) -> usize;
-    /// Embeddingi tekstów (po jednym wektorze `dims()` na tekst, znormalizowane L2).
+    /// Embeddingi **dokumentów** (po jednym wektorze `dims()` na tekst, znormalizowane L2).
     fn embed(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, SearchError>;
+    /// Embeddingi **zapytań** — modele asymetryczne (E5: prefiks `query: ` zamiast `passage: `).
+    /// Domyślnie jak [`Embedder::embed`].
+    fn embed_query(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, SearchError> {
+        self.embed(texts)
+    }
 }

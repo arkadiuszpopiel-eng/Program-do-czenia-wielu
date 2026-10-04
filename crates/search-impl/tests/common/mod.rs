@@ -2,6 +2,8 @@
 
 #![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
 
+pub mod reindex;
+
 use std::ops::Deref;
 use std::sync::Arc;
 

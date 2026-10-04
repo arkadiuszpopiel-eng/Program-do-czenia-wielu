@@ -31,6 +31,9 @@ memory-fake = { path = "../memory-fake" }
 proptest.workspace = true
 semver.workspace = true
 search-fake = { path = "../search-fake" }
+# Eval F7-02 z embedderem ONNX (`ALFA_F7_EMBEDDER`) i ścieżka z zabawkowym modelem (`testkit`) na CI.
+lib-embed = { path = "../lib-embed", features = ["testkit"] }
+tempfile = "3.27.0"
 sessions-fake = { path = "../sessions-fake" }
 core-bus-fake = { path = "../core-bus-fake" }
 

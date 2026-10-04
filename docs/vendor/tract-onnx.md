@@ -29,3 +29,20 @@ let state = out[1].clone().into_tensor();
   i typy wyjść grafu — `tract` wyprowadza kształty sam.
 - Błędy `tract` (`anyhow`) — `Debug` (`{e:?}`) pokazuje łańcuch przyczyn (który węzeł, która reguła).
 - `ort` odrzucony: pobiera binaria ONNX Runtime przy budowie (zablokowane w CI, łańcuch dostaw).
+
+## Enkodery tekstu (`lib-embed`, F7-02)
+- Wymiary symboliczne zamiast stałych: `let b = model.symbols.sym("B"); let s = model.symbols.sym("S");`
+  `model.with_input_fact(ix, InferenceFact::dt_shape(i64::datum_type(), tvec![b.to_dim(), s.to_dim()]))` — jeden plan
+  `into_optimized().into_runnable()` dla każdej długości wsadu i sekwencji (symbole rozwiązywane przy `run`).
+- Przed `model_for_proto_model` czyścimy `graph.value_info` i typy wyjść (eksporty `optimum`/`torch` mają
+  `batch_size`/`sequence_length` — konflikt z naszymi symbolami, jak w Silero).
+- Jedno wyjście: `model.select_outputs_by_name(["last_hidden_state"])` (etykiety wyjść ONNX) albo
+  `select_output_outlets(&[pierwsze])` — reszta grafu (np. `pooler_output`) nie jest liczona.
+- Sprawdzone vs onnxruntime 1.30 (≤ 1e-4, także wsad z wypełnieniem): graf o budowie eksportu HF `XLMRobertaModel`
+  opset 14 — `CumSum` pozycji po masce wypełnienia, `ConstantOfShape`, `Shape`→`Gather`→`Concat`→`Reshape` dla głowic,
+  `Softmax`, `Erf`, rozłożona `LayerNorm`; oraz `LayerNormalization` opset 17 i `Slice` pozycji. Prawdziwy
+  `multilingual-e5-small` — test `#[ignore]` (`ALFA_EMBED_MODEL`).
+- Eksporty `optimum` zoptymalizowane (`model_O2…O4.onnx`) mają operatory `com.microsoft` (`Attention`,
+  `SkipLayerNormalization`, `FastGelu`, `EmbedLayerNormalization`) — `tract` ich nie zna; używamy `onnx/model.onnx`.
+- `tract` ma `DynamicQuantizeLinear` i `MatMulInteger` (kwantyzacja dynamiczna int8) — nieprzetestowane na prawdziwym
+  modelu.

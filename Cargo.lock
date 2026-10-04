@@ -2856,6 +2856,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 
 [[package]]
+name = "lib-embed"
+version = "0.0.1"
+dependencies = [
+ "flate2",
+ "lib-embed",
+ "model-residency-contract",
+ "prost",
+ "regex",
+ "search-contract",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "tract-onnx",
+ "unicode-normalization",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "lib-markdown"
 version = "0.0.1"
 dependencies = [
@@ -3208,6 +3228,7 @@ dependencies = [
  "core-bus-contract",
  "core-bus-fake",
  "core-registry-contract",
+ "lib-embed",
  "lib-sqlstore",
  "memory-contract",
  "memory-fake",
@@ -3220,6 +3241,7 @@ dependencies = [
  "serde_json",
  "sessions-contract",
  "sessions-fake",
+ "tempfile",
  "thiserror",
  "tokio",
  "transfer-contract",
@@ -4968,6 +4990,7 @@ dependencies = [
  "proptest",
  "search-contract",
  "search-fake",
+ "serde",
  "serde_json",
  "sessions-contract",
  "sessions-fake",
@@ -6663,6 +6686,12 @@ checksum = "5fd4f6878c9cb28d874b009da9e8d183b5abc80117c40bbd187a1fde336be6e8"
 dependencies = [
  "tinyvec",
 ]
+
+[[package]]
+name = "unicode-segmentation"
+version = "1.13.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8"
 
 [[package]]
 name = "unicode-width"

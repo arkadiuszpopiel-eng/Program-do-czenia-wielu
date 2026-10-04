@@ -7,7 +7,8 @@ use search_contract::{
     make_snippet,
 };
 
-use crate::index::{embed_one, storage, vec_table};
+use crate::index::{embed_query_one, storage, vec_table_gen};
+use crate::state::VecState;
 
 /// Lista rankingowa: `(rowid, wynik)` malejąco po wyniku.
 type Ranked = Vec<(i64, f32)>;
@@ -94,18 +95,29 @@ fn fts_list(conn: &Connection, q: &Parts<'_>, n: usize) -> Result<Ranked, Search
     rows.collect::<Result<_, _>>().map_err(storage)
 }
 
+/// Lista kNN; `None`, gdy wektory są niedostępne (przebudowa po zmianie embeddera albo błąd
+/// embeddera zapytania) — wtedy zapytanie spada do FTS.
 fn vector_list(
     conn: &Connection,
     embedder: &dyn Embedder,
+    state: &VecState,
     q: &Parts<'_>,
     n: usize,
-) -> Result<Ranked, SearchError> {
-    let blob = vector_to_blob(&embed_one(embedder, q.vector_text)?);
+) -> Result<Option<Ranked>, SearchError> {
+    if !state.usable() {
+        return Ok(None);
+    }
+    let vector = match embed_query_one(embedder, q.vector_text) {
+        Ok(v) => v,
+        Err(SearchError::Embedder { .. }) => return Ok(None),
+        Err(other) => return Err(other),
+    };
+    let blob = vector_to_blob(&vector);
     let mut all: Vec<(i64, f64)> = Vec::new();
     for kind in q.kinds.iter().copied() {
         let sql = format!(
             "SELECT rowid, distance FROM {} WHERE embedding MATCH ?1 AND k = ?2",
-            vec_table(kind)
+            vec_table_gen(kind, state.active_gen)
         );
         let mut stmt = conn.prepare_cached(&sql).map_err(storage)?;
         let rows = stmt
@@ -119,10 +131,11 @@ fn vector_list(
     }
     all.sort_by(|a, b| a.1.total_cmp(&b.1).then(a.0.cmp(&b.0)));
     all.truncate(n);
-    Ok(all
-        .into_iter()
-        .map(|(id, d)| (id, 1.0 - d as f32))
-        .collect())
+    Ok(Some(
+        all.into_iter()
+            .map(|(id, d)| (id, 1.0 - d as f32))
+            .collect(),
+    ))
 }
 
 fn load_doc(conn: &Connection, rowid: i64) -> Result<Option<(DocId, String)>, SearchError> {
@@ -139,27 +152,32 @@ fn load_doc(conn: &Connection, rowid: i64) -> Result<Option<(DocId, String)>, Se
     Ok(DocKind::parse(&kind).map(|k| (DocId::new(k, key), text)))
 }
 
-/// Trafienia w jednej bazie (co najwyżej `limit`), deterministycznie posortowane.
+/// Trafienia w jednej bazie (co najwyżej `limit`), deterministycznie posortowane. Bez wektorów
+/// (przebudowa, embedder niedostępny) tryby `Vector` i `Hybrid` działają jak `Fts`.
 pub fn query_conn(
     conn: &Connection,
     embedder: &dyn Embedder,
+    state: &VecState,
     session: &SessionId,
     q: &Parts<'_>,
     limit: usize,
     snippet_chars: usize,
 ) -> Result<Vec<Hit>, SearchError> {
     let candidates = (limit * 4).max(20);
-    let ranked: Ranked = match q.mode {
-        Mode::Fts => fts_list(conn, q, candidates)?,
-        Mode::Vector => vector_list(conn, embedder, q, candidates)?,
-        Mode::Hybrid => {
+    let vectors = match q.mode {
+        Mode::Fts => None,
+        Mode::Vector | Mode::Hybrid => vector_list(conn, embedder, state, q, candidates)?,
+    };
+    let ranked: Ranked = match (q.mode, vectors) {
+        (Mode::Vector, Some(vec)) => vec,
+        (Mode::Hybrid, Some(vec)) => {
             let fts = fts_list(conn, q, candidates)?;
-            let vec = vector_list(conn, embedder, q, candidates)?;
             fuse_rrf(&[
                 fts.into_iter().map(|(id, _)| id).collect::<Vec<_>>(),
                 vec.into_iter().map(|(id, _)| id).collect::<Vec<_>>(),
             ])
         }
+        _ => fts_list(conn, q, candidates)?,
     };
     let mut hits = Vec::with_capacity(limit.min(ranked.len()));
     for (rowid, score) in ranked.into_iter().take(limit) {

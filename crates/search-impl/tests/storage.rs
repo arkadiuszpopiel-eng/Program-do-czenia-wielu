@@ -1,5 +1,5 @@
 //! Testy specyficzne dla SQLite: kaskada w surowych tabelach, szpiegowskie, transakcja wywołującego,
-//! zmiana embeddera, zdarzenia modułu.
+//! zdarzenia modułu (zmiana embeddera i przebudowa: `tests/reindex.rs`).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -13,10 +13,7 @@ use core_bus_fake::FakeBus;
 use core_registry_contract::{HealthStatus, Module, ModuleContext};
 use lib_sqlstore::rusqlite::Connection;
 use search_contract::contract_tests::doc;
-use search_contract::{
-    Caller, DocId, DocKind, Embedder, Mode, Query, Search, SearchError, SessionId, TxIndexer,
-    events,
-};
+use search_contract::{Caller, DocId, DocKind, Mode, Query, Search, SessionId, TxIndexer, events};
 use search_impl::SqliteSearch;
 use sessions_contract::SessionDbProvider;
 
@@ -112,31 +109,6 @@ fn tx_indexer_rolls_back_with_callers_transaction() {
         ..Query::in_session(SessionId::new("A"), "wycofane", 5)
     };
     assert!(h.query(&q, &Caller::Owner).unwrap().is_empty());
-}
-
-struct OtherEmbedder;
-
-impl Embedder for OtherEmbedder {
-    fn model_id(&self) -> &str {
-        "inny"
-    }
-    fn dims(&self) -> usize {
-        8
-    }
-    fn embed(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, SearchError> {
-        Ok(texts.iter().map(|_| vec![1.0; 8]).collect())
-    }
-}
-
-#[test]
-fn embedder_change_is_detected() {
-    let h = common::harness();
-    h.index(&doc("A", DocKind::Turn, "1", "tekst")).unwrap();
-    let other = SqliteSearch::new(h.provider.clone(), Arc::new(OtherEmbedder)).unwrap();
-    assert!(matches!(
-        other.index(&doc("A", DocKind::Turn, "2", "x")),
-        Err(SearchError::EmbedderMismatch { .. })
-    ));
 }
 
 #[tokio::test]

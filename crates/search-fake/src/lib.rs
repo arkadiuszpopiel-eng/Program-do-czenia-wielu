@@ -3,7 +3,10 @@
 //! - [`FakeSearch`] — indeks w pamięci: dopasowanie słów (bez diakrytyków, prefiksy, AND),
 //!   kosinus na wektorach [`HashEmbedder`], hybryda RRF; te same reguły autoryzacji i fragmentów
 //!   co `search-impl` (wspólne funkcje z `search-contract`).
-//! - [`HashEmbedder`] — deterministyczny embedder (hash n-gramów → 64 wym.).
+//! - [`HashEmbedder`] — deterministyczny embedder (hash n-gramów → 64 wym.); inny embedder przez
+//!   [`FakeSearch::with_embedder`] (np. eval F7-02 z prawdziwym modelem ONNX z `lib-embed`):
+//!   dokumenty przez `embed`, zapytania przez `embed_query`; błąd embeddera → dokument bez wektora,
+//!   zapytanie bez wektora spada do FTS (jak `search-impl`).
 //! - [`RecordingIndexer`] — `TxIndexer`, który tylko zapisuje wywołania (testy `sessions`/`memory`).
 //!
 //! `FakeSearch` implementuje też `TxIndexer` i `TxSearcher` (ignoruje połączenie, indeksuje i pyta
@@ -17,14 +20,14 @@ mod embedder;
 mod indexer;
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use lib_sqlstore::rusqlite::Connection;
 use lib_sqlstore::{search_tokens, tokenize};
 use search_contract::{
-    Caller, ConnQuery, DEFAULT_SNIPPET_CHARS, Doc, DocId, DocKind, Hit, MAX_LIMIT, Mode, Query,
-    RemoveReport, Search, SearchError, SessionId, SessionSet, TxIndexer, TxSearcher, authorize,
-    fuse_rrf, make_snippet, sort_hits,
+    Caller, ConnQuery, DEFAULT_SNIPPET_CHARS, Doc, DocId, DocKind, Embedder, Hit, MAX_LIMIT, Mode,
+    Query, RemoveReport, Search, SearchError, SessionId, SessionSet, TxIndexer, TxSearcher,
+    authorize, fuse_rrf, make_snippet, sort_hits,
 };
 
 pub use embedder::{HASH_DIMS, HashEmbedder, cosine};
@@ -34,19 +37,60 @@ pub use indexer::RecordingIndexer;
 struct Entry {
     text: String,
     terms: Vec<String>,
-    vector: Vec<f32>,
+    /// `None` = embedder niedostępny przy zapisie (dokument tylko w FTS).
+    vector: Option<Vec<f32>>,
 }
 
 /// Indeks w pamięci: `(sesja, dokument) → tekst + wektor`.
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct FakeSearch {
     docs: Mutex<BTreeMap<SessionId, BTreeMap<DocId, Entry>>>,
+    embedder: Option<Arc<dyn Embedder>>,
+}
+
+impl std::fmt::Debug for FakeSearch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FakeSearch")
+            .field(
+                "embedder",
+                &self.embedder.as_ref().map(|e| e.model_id().to_owned()),
+            )
+            .finish_non_exhaustive()
+    }
+}
+
+fn first_vector(out: Result<Vec<Vec<f32>>, SearchError>, dims: usize) -> Option<Vec<f32>> {
+    out.ok()
+        .and_then(|mut v| v.pop())
+        .filter(|v| v.len() == dims)
 }
 
 impl FakeSearch {
-    /// Pusty indeks.
+    /// Pusty indeks (wektory `HashEmbedder`).
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Pusty indeks z podanym embedderem.
+    pub fn with_embedder(embedder: Arc<dyn Embedder>) -> Self {
+        Self {
+            docs: Mutex::default(),
+            embedder: Some(embedder),
+        }
+    }
+
+    fn passage_vector(&self, text: &str) -> Option<Vec<f32>> {
+        match &self.embedder {
+            Some(e) => first_vector(e.embed(&[text]), e.dims()),
+            None => Some(HashEmbedder::vector(text)),
+        }
+    }
+
+    fn query_vector(&self, text: &str) -> Option<Vec<f32>> {
+        match &self.embedder {
+            Some(e) => first_vector(e.embed_query(&[text]), e.dims()),
+            None => Some(HashEmbedder::vector(text)),
+        }
     }
 
     /// Liczba dokumentów w sesji.
@@ -59,6 +103,7 @@ impl FakeSearch {
     }
 
     fn query_session(
+        &self,
         docs: &BTreeMap<DocId, Entry>,
         session: &SessionId,
         q: &Parts<'_>,
@@ -78,19 +123,31 @@ impl FakeSearch {
         };
         fts.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
         fts.truncate(candidates);
-        let query_vec = HashEmbedder::vector(q.vector_text);
-        let mut vec: Vec<(DocId, f32)> = accepted()
-            .map(|(id, e)| (id.clone(), cosine(&query_vec, &e.vector)))
-            .collect();
-        vec.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
-        vec.truncate(candidates);
-        let ranked: Vec<(DocId, f32)> = match q.mode {
-            Mode::Fts => fts,
-            Mode::Vector => vec,
-            Mode::Hybrid => fuse_rrf(&[
-                fts.into_iter().map(|(k, _)| k).collect(),
-                vec.into_iter().map(|(k, _)| k).collect(),
-            ]),
+        let query_vec = match q.mode {
+            Mode::Fts => None,
+            Mode::Vector | Mode::Hybrid => self.query_vector(q.vector_text),
+        };
+        let ranked: Vec<(DocId, f32)> = match (q.mode, query_vec) {
+            (Mode::Fts, _) | (_, None) => fts,
+            (mode, Some(query_vec)) => {
+                let mut vec: Vec<(DocId, f32)> = accepted()
+                    .filter_map(|(id, e)| {
+                        e.vector
+                            .as_ref()
+                            .map(|v| (id.clone(), cosine(&query_vec, v)))
+                    })
+                    .collect();
+                vec.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+                vec.truncate(candidates);
+                if mode == Mode::Vector {
+                    vec
+                } else {
+                    fuse_rrf(&[
+                        fts.into_iter().map(|(k, _)| k).collect(),
+                        vec.into_iter().map(|(k, _)| k).collect(),
+                    ])
+                }
+            }
         };
         ranked
             .into_iter()
@@ -156,7 +213,7 @@ impl Search for FakeSearch {
     fn index(&self, doc: &Doc) -> Result<(), SearchError> {
         let entry = Entry {
             terms: tokenize(&doc.text).into_iter().map(|t| t.term).collect(),
-            vector: HashEmbedder::vector(&doc.text),
+            vector: self.passage_vector(&doc.text),
             text: doc.text.clone(),
         };
         self.lock()
@@ -196,7 +253,7 @@ impl Search for FakeSearch {
             .iter()
             .filter_map(|s| {
                 docs.get(s)
-                    .map(|d| Self::query_session(d, s, &Parts::of_query(query), limit))
+                    .map(|d| self.query_session(d, s, &Parts::of_query(query), limit))
             })
             .flatten()
             .collect();
@@ -239,7 +296,7 @@ impl TxSearcher for FakeSearch {
         let docs = self.lock();
         let mut hits = docs
             .get(label)
-            .map(|d| Self::query_session(d, label, &Parts::of_conn(query), limit))
+            .map(|d| self.query_session(d, label, &Parts::of_conn(query), limit))
             .unwrap_or_default();
         sort_hits(&mut hits);
         Ok(hits)

@@ -176,7 +176,7 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
 | ID    | Kryterium                                             | Status | Dowód / co dalej                                                                                                                                                                                                                             |
 | ----- | ----------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | F7-01 | Izolacja pamięci: 0 przecieków                        | ✅     | `memory-contract` `contract_tests_f7::spy::spy_three_sessions` (4 sesje z prywatną, 4 agentki, 1000 zapytań) na `memory-impl/tests/f7_contract.rs` i `memory-fake`.                                                                          |
-| F7-02 | recall@5 ≥ 0,85 (≥ 200 zapytań PL)                    | ⛔     | 0,964 na `HashEmbedder` (nieblokujące, `memory-impl/tests/f7_recall.rs`). Aplikacja używa osadzacza leksykalnego (`app-modules/src/embedder.rs`) — brak semantycznego embeddera ONNX, na którym próg obowiązuje; 249 zapytań niezamrożonych. |
+| F7-02 | recall@5 ≥ 0,85 (≥ 200 zapytań PL)                    | 🟡     | Embedder ONNX gotowy (`lib-embed`: tract, własny tokenizer SentencePiece zgodny z HF, `multilingual-e5-small`, rezydencja i zwalnianie, przebudowa wektorów w tle w `search-impl`), runner `ALFA_F7_EMBEDDER`/`ALFA_F7_STRICT`; niepodpięty w `app-*`, próg niesprawdzony na prawdziwym modelu (HuggingFace niedostępny w chmurze; hashe katalogu do przypięcia). 0,964 na `HashEmbedder`; 249 zapytań niezamrożonych. |
 | F7-03 | Kaskada `forget`: 100 % usunięć zweryfikowanych       | ✅     | `contract_tests_f7::forget::forget_fifty_verified`, `forget_session_cascade`, `memory-impl/tests/forget_props.rs`.                                                                                                                           |
 | F7-04 | Niezaufane nie awansuje, brak auto-`remember`         | ✅     | `contract_tests_f7::access::untrusted_never_promotes`, `memory-consolidation-contract/tests/guardian.rs`, SR2-07 `agent-runtime-impl/tests/review.rs::memory_write_in_tainted_run_is_untrusted`.                                             |
 | F7-05 | Konsolidacja nie na baterii / w grze (20 scenariuszy) | ✅     | `memory-consolidation-impl/tests/adapters.rs::never_starts_on_battery_or_in_game_mode_f7_05`.                                                                                                                                                |
@@ -216,10 +216,10 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
    whisper i silnik TTS trzeba dziś skopiować ręcznie. Blokuje F3-12 i każdy pomiar głosu w aplikacji.
 3. **Funkcje głosu F5 niepodpięte w aplikacji**: słowa wywoławcze, weryfikacja mówcy, dyktowanie, czytanie
    zaznaczenia (moduły i ewaluatory gotowe). Panel Głos (`Alt+6`) i pełny tryb głosowy to zaślepki.
-4. **Brak semantycznego embeddera** (ONNX) — F7-02.
-5. **Aktualizator**: pobieranie i instalacja wydań (praca w toku) — F3-10.
+4. **Embedder semantyczny niepodpięty** (ONNX w `lib-embed` gotowy; brak menedżera modeli w UI i pomiaru progu na prawdziwym modelu) — F7-02.
+5. **Aktualizator**: pełny cykl (pobieranie ze wznawianiem, minisign, rollback, instalator NSIS) gotowy; brak klucza minisign i testu instalatora na Windows — F3-10.
 6. **Test zamkniętego portu CDP** w buildzie produkcyjnym — F3-13.
-7. **Brakujące moduły**: `plugin-runtime` (F8-05), helper `uiAccess` (F6-07), `tools-vision/browser/office/system/net/media` (F6).
+7. **Brakujące moduły**: helper `uiAccess` (F6-07), `tools-vision/system/net/media` (F6). `plugin-runtime`, `tools-office` i `tools-browser` są gotowe, podpinanie w aplikacji trwa.
 8. **Brakujące zestawy** (tworzy model-recenzent, akceptuje człowiek): `evals/F3/redteam/`, `evals/F3/mvp-scenario.md`,
    `evals/F4/bridge-fixtures/`, `evals/F6/tasks/`, `evals/F6/app-matrix.md`, `evals/F7/alfa-full/`,
    `evals/F7/migrations/`, `evals/F8/wasm-malicious/`, `evals/F9/pentest.md`, 20 promptów PL dla F1-03.
