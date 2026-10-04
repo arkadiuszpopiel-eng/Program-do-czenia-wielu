@@ -225,6 +225,17 @@
   "upcoming": []
  },
  {
+  "id": "models",
+  "label": {
+   "pl": "Modele i silniki",
+   "en": "Models and engines"
+  },
+  "wave": 1,
+  "custom": "models",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "costs",
   "label": {
    "pl": "Koszty i limity",

@@ -6,12 +6,14 @@ Bez żadnego klucza Alfa myśli modelem uruchomionym na Twoim komputerze: **Biel
 plik ok. 2,9 GB). Działa też bez internetu.
 
 1. W kroku **Konta i klucze** wprowadzenia kliknij na karcie **Model lokalny** przycisk „Pobierz”. Pobieranie można
-   anulować i wznowić później — nie zaczyna się od zera. Jeśli pominąłeś ten krok: `Ctrl+K` → „Uruchom ponownie
-   wprowadzenie”.
-2. **Wymaga plików:** program `llama-server.exe` z projektu llama.cpp nie jest jeszcze pobierany automatycznie.
-   Skopiuj go do `%LOCALAPPDATA%\Alfa\sidecars\llama\llama-server.exe`. Możesz trzymać osobne kompilacje dla karty
-   graficznej: `sidecars\llama-vulkan\`, `sidecars\llama-cuda\`, `sidecars\llama-cpu\` — Alfa wybierze właściwą.
-   Bez tego pliku pierwsza odpowiedź zakończy się czytelnym błędem.
+   anulować i wznowić później — nie zaczyna się od zera. Model nie ma jeszcze przypiętej sumy kontrolnej, więc po
+   pobraniu zobaczysz jego sumę SHA-256 i licencję — kliknij „Ufam temu plikowi — zainstaluj”. Jeśli pominąłeś ten
+   krok: **Ustawienia → Modele i silniki** (zobacz [Modele i silniki](10-modele-i-silniki.md)).
+2. Program `llama-server` (llama.cpp) pobierzesz tam samo: pozycja **llama-server (vulkan)** dla kart graficznych
+   AMD/Intel/NVIDIA albo **llama-server (cpu)**. Wersja programu jest jeszcze **do potwierdzenia** — jeśli pobranie
+   się nie uda, skopiuj `llama-server.exe` z bibliotekami do `%LOCALAPPDATA%\Alfa\sidecars\llama-vulkan\` (albo
+   `llama-cuda\`, `llama-cpu\`, wspólnie `llama\`) — Alfa wybierze właściwą kompilację. Bez tego programu pierwsza
+   odpowiedź zakończy się czytelnym błędem.
 
 Model startuje dopiero przy pierwszym pytaniu i zwalnia pamięć, gdy długo nie jest używany. Ustawienie **Urządzenia →
 Tryb gry / pełnego ekranu** pozwala Alfie oddawać pamięć karty graficznej, gdy grasz albo oglądasz coś na pełnym

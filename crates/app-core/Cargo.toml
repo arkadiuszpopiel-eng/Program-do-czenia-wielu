@@ -34,6 +34,8 @@ app-health = { path = "../app-health" }
 app-plugins = { path = "../app-plugins" }
 # Aktualizacje (updater-impl: pobieranie, weryfikacja, restart przez launcher), „O programie”.
 app-updates = { path = "../app-updates" }
+# Menedżer modeli i silników (pobieranie z wznawianiem, SHA-256/TOFU, sidecary) + embedder wyszukiwania.
+app-models = { path = "../app-models" }
 # Tabele aplikacji w bazach sesji (fakty o turach, oś czasu, Replay) — wydzielone z app-core.
 app-store = { path = "../app-store" }
 agent-backends-contract = { path = "../agent-backends-contract" }

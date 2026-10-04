@@ -17,6 +17,9 @@
 //! i hybrydowe działają jak FTS. Kroki przebudowy ([`TxIndexer::reindex_step`]) liczą embeddingi poza
 //! blokadą bazy; [`SqliteSearch::spawn_reindex`] przechodzi po bazach w tle (wznawialnie, z postępem).
 //! Embedder niedostępny przy zapisie → dokument w FTS, wektor uzupełni przebudowa.
+//! Embedder wymienia się w działającej usłudze ([`SqliteSearch::set_embedder`] — wybór modelu w UI);
+//! każda operacja bierze migawkę embeddera na początku, więc stan bazy i wektory jednej operacji
+//! zawsze pochodzą od tego samego modelu.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -27,7 +30,7 @@ mod reindex;
 mod state;
 mod worker;
 
-use std::sync::Arc;
+use std::sync::{Arc, PoisonError, RwLock};
 use std::time::Instant;
 
 use core_bus_contract::Level;
@@ -54,7 +57,7 @@ pub const MODULE_TOML: &str = include_str!("../module.toml");
 /// Wyszukiwanie na bazach sesji (SQLCipher + FTS5 + sqlite-vec).
 pub struct SqliteSearch {
     provider: Arc<dyn SessionDbProvider>,
-    embedder: Arc<dyn Embedder>,
+    embedder: RwLock<Arc<dyn Embedder>>,
     snippet_chars: usize,
     outbox: Outbox,
     manifest: ModuleManifest,
@@ -77,7 +80,7 @@ impl SqliteSearch {
     ) -> Result<Self, ManifestError> {
         Ok(Self {
             provider,
-            embedder,
+            embedder: RwLock::new(embedder),
             snippet_chars: DEFAULT_SNIPPET_CHARS,
             outbox: Outbox::default(),
             manifest: ModuleManifest::parse_toml(MODULE_TOML)?,
@@ -91,6 +94,24 @@ impl SqliteSearch {
         self
     }
 
+    /// Bieżący embedder (migawka — operacja w toku zostaje przy swoim).
+    pub fn embedder(&self) -> Arc<dyn Embedder> {
+        self.embedder
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
+    }
+
+    /// Wymienia embedder (np. model wybrany w UI). Kolejne operacje widzą nowy `model_id` → bazy
+    /// zaczynają przebudowę wektorów ([`SqliteSearch::spawn_reindex`]); do jej końca zapytania
+    /// wektorowe i hybrydowe działają jak FTS.
+    pub fn set_embedder(&self, embedder: Arc<dyn Embedder>) {
+        *self
+            .embedder
+            .write()
+            .unwrap_or_else(PoisonError::into_inner) = embedder;
+    }
+
     fn db(&self, session: &SessionId) -> Result<Arc<Db>, SearchError> {
         self.provider
             .session_db(session)
@@ -101,9 +122,10 @@ impl SqliteSearch {
     fn prepare_conn(
         &self,
         conn: &Connection,
+        embedder: &dyn Embedder,
         label: Option<&SessionId>,
     ) -> Result<VecState, SearchError> {
-        let state = state::prepare(conn, self.embedder.as_ref())?;
+        let state = state::prepare(conn, embedder)?;
         if state.just_started {
             let to = state.target.as_ref().map(|t| t.1.clone());
             let payload = json!({ "from": state.active, "to": to });
@@ -116,10 +138,11 @@ impl SqliteSearch {
     fn index_with(
         &self,
         conn: &Connection,
+        embedder: &dyn Embedder,
         state: &VecState,
         doc: &Doc,
     ) -> Result<(), SearchError> {
-        if !index::index_doc(conn, self.embedder.as_ref(), state, doc)? {
+        if !index::index_doc(conn, embedder, state, doc)? {
             let payload = json!({ "kind": doc.id.kind.as_str() });
             self.outbox.emit(
                 names::VECTOR_MISSING,
@@ -134,12 +157,13 @@ impl SqliteSearch {
     fn in_tx<R>(
         &self,
         session: &SessionId,
-        f: impl FnOnce(&Connection, &VecState) -> Result<R, SearchError>,
+        f: impl FnOnce(&Connection, &dyn Embedder, &VecState) -> Result<R, SearchError>,
     ) -> Result<R, SearchError> {
+        let embedder = self.embedder();
         self.db(session)?.with(|conn| {
             let tx = conn.transaction().map_err(index::storage)?;
-            let state = self.prepare_conn(&tx, Some(session))?;
-            let out = f(&tx, &state)?;
+            let state = self.prepare_conn(&tx, embedder.as_ref(), Some(session))?;
+            let out = f(&tx, embedder.as_ref(), &state)?;
             tx.commit().map_err(index::storage)?;
             Ok(out)
         })
@@ -147,8 +171,9 @@ impl SqliteSearch {
 
     /// Stan wektorów sesji (UI: „reindeksacja X/Y”, „brak wektorów”).
     pub fn vector_status(&self, session: &SessionId) -> Result<VectorStatus, SearchError> {
+        let embedder = self.embedder();
         self.db(session)?.with(|conn| {
-            let state = self.prepare_conn(conn, Some(session))?;
+            let state = self.prepare_conn(conn, embedder.as_ref(), Some(session))?;
             reindex::status(conn, &state)
         })
     }
@@ -167,11 +192,13 @@ impl SqliteSearch {
 
 impl Search for SqliteSearch {
     fn index(&self, doc: &Doc) -> Result<(), SearchError> {
-        self.in_tx(&doc.session, |c, state| self.index_with(c, state, doc))
+        self.in_tx(&doc.session, |c, e, state| {
+            self.index_with(c, e, state, doc)
+        })
     }
 
     fn remove(&self, session: &SessionId, id: &DocId) -> Result<RemoveReport, SearchError> {
-        let report = self.in_tx(session, |c, state| index::remove_doc(c, state, id))?;
+        let report = self.in_tx(session, |c, _, state| index::remove_doc(c, state, id))?;
         let payload =
             json!({ "docs": report.docs, "fts_rows": report.fts_rows, "vectors": report.vectors });
         self.outbox
@@ -187,13 +214,14 @@ impl Search for SqliteSearch {
         }
         let started = Instant::now();
         let sessions = self.sessions_of(&query.sessions)?;
+        let embedder = self.embedder();
         let mut hits = Vec::new();
         for session in &sessions {
             let found = self.db(session)?.with(|conn| {
-                let state = self.prepare_conn(conn, Some(session))?;
+                let state = self.prepare_conn(conn, embedder.as_ref(), Some(session))?;
                 query::query_conn(
                     conn,
-                    self.embedder.as_ref(),
+                    embedder.as_ref(),
                     &state,
                     session,
                     &query::Parts::of_query(query),
@@ -216,12 +244,14 @@ impl Search for SqliteSearch {
 
 impl TxIndexer for SqliteSearch {
     fn prepare(&self, conn: &Connection) -> Result<(), SearchError> {
-        self.prepare_conn(conn, None).map(|_| ())
+        self.prepare_conn(conn, self.embedder().as_ref(), None)
+            .map(|_| ())
     }
 
     fn index_in(&self, conn: &Connection, doc: &Doc) -> Result<(), SearchError> {
-        let state = self.prepare_conn(conn, Some(&doc.session))?;
-        self.index_with(conn, &state, doc)
+        let embedder = self.embedder();
+        let state = self.prepare_conn(conn, embedder.as_ref(), Some(&doc.session))?;
+        self.index_with(conn, embedder.as_ref(), &state, doc)
     }
 
     fn remove_in(
@@ -230,22 +260,22 @@ impl TxIndexer for SqliteSearch {
         session: &SessionId,
         id: &DocId,
     ) -> Result<RemoveReport, SearchError> {
-        let state = self.prepare_conn(conn, Some(session))?;
+        let state = self.prepare_conn(conn, self.embedder().as_ref(), Some(session))?;
         index::remove_doc(conn, &state, id)
     }
 
     fn compact_in(&self, conn: &Connection) -> Result<(), SearchError> {
-        self.prepare_conn(conn, None)?;
+        self.prepare_conn(conn, self.embedder().as_ref(), None)?;
         index::compact(conn)
     }
 
     fn vector_status_in(&self, conn: &Connection) -> Result<VectorStatus, SearchError> {
-        let state = self.prepare_conn(conn, None)?;
+        let state = self.prepare_conn(conn, self.embedder().as_ref(), None)?;
         reindex::status(conn, &state)
     }
 
     fn reindex_step(&self, db: &Db, batch: usize) -> Result<ReindexProgress, SearchError> {
-        reindex::step(db, self.embedder.as_ref(), batch)
+        reindex::step(db, self.embedder().as_ref(), batch)
     }
 }
 
@@ -260,10 +290,11 @@ impl TxSearcher for SqliteSearch {
         if limit == 0 {
             return Ok(Vec::new());
         }
-        let state = self.prepare_conn(conn, Some(label))?;
+        let embedder = self.embedder();
+        let state = self.prepare_conn(conn, embedder.as_ref(), Some(label))?;
         let mut hits = query::query_conn(
             conn,
-            self.embedder.as_ref(),
+            embedder.as_ref(),
             &state,
             label,
             &query::Parts::of_conn(query),

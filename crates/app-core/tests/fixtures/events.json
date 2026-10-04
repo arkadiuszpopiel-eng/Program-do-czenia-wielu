@@ -1660,5 +1660,174 @@
         }
       }
     }
+  },
+  {
+    "type": "ModelChanged",
+    "item": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "queued",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "type": "ModelChanged",
+    "item": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "downloading",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "type": "ModelProgress",
+    "item_id": "silero-vad",
+    "file": "silero_vad-6.2.3-py3-none-any.whl",
+    "done": 0,
+    "total": 11534336
+  },
+  {
+    "type": "ModelChanged",
+    "item": {
+      "id": "multilingual-e5-small",
+      "kind": "embed",
+      "name": "Multilingual E5 small (ONNX fp32)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 511705088,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+      "files": [
+        {
+          "name": "onnx/model.onnx",
+          "url": "https://example.invalid/onnx/model.onnx",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://example.invalid/tokenizer.json",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        }
+      ],
+      "state": "queued",
+      "pinned": false,
+      "confirmed": false,
+      "downloadable": true,
+      "note": {
+        "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+        "en": "Semantic search embedder (F7 memory)."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "type": "ModelProgress",
+    "item_id": "multilingual-e5-small",
+    "file": "onnx/model.onnx",
+    "done": 0,
+    "total": 511705088
+  },
+  {
+    "type": "ModelProgress",
+    "item_id": "silero-vad",
+    "file": "silero_vad-6.2.3-py3-none-any.whl",
+    "done": 2883584,
+    "total": 11534336
+  },
+  {
+    "type": "ReindexStatus",
+    "status": {
+      "running": true,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 0,
+      "done": 0,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": false,
+      "finished": false
+    }
+  },
+  {
+    "type": "ReindexStatus",
+    "status": {
+      "running": true,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 300,
+      "done": 300,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": false,
+      "finished": false
+    }
+  },
+  {
+    "type": "ReindexStatus",
+    "status": {
+      "running": false,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 300,
+      "done": 300,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": true,
+      "finished": true
+    }
   }
 ]

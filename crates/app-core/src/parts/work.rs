@@ -37,6 +37,8 @@ pub(crate) struct WorkStack {
     pub updates: Arc<app_updates::UpdatesApp>,
     /// Wtyczki Wasm (`app-plugins`; te same, które dają narzędzia agentkom).
     pub plugins: Arc<app_plugins::PluginsApp>,
+    /// Modele i silniki, embedder wyszukiwania (`app-models`).
+    pub models: Arc<app_models::ModelsApp>,
 }
 
 /// Porty GUI i panel „Ekran" (przed narzędziami agentek).
@@ -136,7 +138,26 @@ impl Built {
                 "brak Brokera albo dziennika cofania",
             ))
         });
+        let embed = self.search.clone().map(|search| app_models::EmbedDeps {
+            search,
+            lexical: Arc::new(app_modules::embedder::LexicalEmbedder),
+            residency: (self.extra.residency.as_ref())
+                .map(|r| r.manager() as Arc<dyn model_residency_contract::Residency>),
+            scopes: self
+                .memory
+                .as_ref()
+                .map(|m| m.service().backend().dbs().clone()),
+            config: d.kernel.config.clone(),
+        });
+        let models = app_models::ModelsApp::open(app_models::ModelsDeps {
+            paths: d.paths.clone(),
+            catalog: app_models::builtin(),
+            events: Some(d.kernel.events.clone()),
+            embed,
+            options: app_models::ModelsOptions::default(),
+        });
         let stack = WorkStack {
+            models,
             plugins,
             updates,
             gui,

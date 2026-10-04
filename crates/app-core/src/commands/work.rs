@@ -1,17 +1,19 @@
 //! Komendy computer use (`gui_*`), terminala (`terminal_*`), umiejętności (`skills_*`), Kreatora
 //! (`builder_*`), „Zdrowia systemu" (`health_*`, `improver_*`, `evals_*`), aktualizacji
-//! (`updates_*`) i wtyczek (`plugins_*`) — delegują do `app-gui`, `app-terminal`, `app-skills`,
-//! `app-health`, `app-updates`, `app-plugins` (działania jako użytkownik w UI).
+//! (`updates_*`), wtyczek (`plugins_*`) i modeli (`models_*`, `embed_model_activate`,
+//! `search_reindex_*`) — delegują do `app-gui`, `app-terminal`, `app-skills`, `app-health`,
+//! `app-updates`, `app-plugins`, `app-models` (działania jako użytkownik w UI).
 
 use std::sync::Arc;
 
 use crate::core::AppCore;
 use crate::dto::{
     AboutInfo, AgentDraft, BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView,
-    BuilderPreview, BuilderProposal, BuilderSaved, EvalSuiteView, EvalsView, ExportResult,
-    GuiScreenshot, GuiStatus, HealthView, ImproverView, PluginInfo, PluginInspection, PluginsView,
-    SkillImportResult, SkillInfo, SkillReview, TaskInfo, TerminalProfileId, TerminalSession,
-    UpdatesView, WhatsNew,
+    BuilderPreview, BuilderProposal, BuilderSaved, EmbedderView, EvalSuiteView, EvalsView,
+    ExportResult, GuiScreenshot, GuiStatus, HealthView, ImproverView, ModelItem, ModelsView,
+    PluginInfo, PluginInspection, PluginsView, ReindexView, SkillImportResult, SkillInfo,
+    SkillReview, TaskInfo, TerminalProfileId, TerminalSession, TrustedHashes, UpdatesView,
+    WhatsNew,
 };
 use crate::error::AppError;
 
@@ -85,6 +87,16 @@ work_commands! {
     wait plugins_disable(plugin_id: String) -> PluginInfo = plugins.disable(&plugin_id);
     wait plugins_enable(plugin_id: String, reviewed_hash: String) -> PluginInfo = plugins.enable(&plugin_id, &reviewed_hash);
     wait plugins_remove(plugin_id: String) -> PluginsView = plugins.remove(&plugin_id);
+    wait models_list() -> ModelsView = models.list();
+    wait models_download(item_id: String) -> ModelItem = models.download(&item_id);
+    wait models_cancel(item_id: String) -> ModelItem = models.cancel(&item_id);
+    wait models_verify(item_id: String) -> ModelItem = models.verify(&item_id);
+    wait models_remove(item_id: String) -> ModelItem = models.remove(&item_id);
+    wait models_trust_hash(item_id: String, hashes: TrustedHashes) -> ModelItem = models.trust_hash(&item_id, hashes);
+    wait embed_model_activate(model: String) -> EmbedderView = models.activate_embedder(&model);
+    wait search_reindex_start() -> ReindexView = models.reindex_start();
+    wait search_reindex_cancel() -> ReindexView = models.reindex_cancel();
+    wait search_reindex_status() -> ReindexView = models.reindex_status();
 }
 
 impl AppCore {

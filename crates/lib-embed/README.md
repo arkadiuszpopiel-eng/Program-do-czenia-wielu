@@ -76,6 +76,13 @@ z `onnx/model.onnx`, `tokenizer.json` i `embed.json`:
 
 ## Podpięcie w `app-*` (dla sesji kompozycji)
 
+**Stan (2026-10-04): podpięte w `app-models`** (SPEC `docs/modules/models/SPEC.md`) — pkt 1–6 zrealizowane z dwiema
+różnicami: pobieranie idzie wspólnym menedżerem pobrań aplikacji (HTTPS z `Range`, ten sam układ katalogu
+i `embed.json` przez `CatalogEntry::manifest`), a nie przez `install`/`Fetcher`; zmiana embeddera to
+`SqliteSearch::set_embedder` (migawka na operację) zamiast przebudowy obiektu `SqliteSearch`. Komendy:
+`models_*` (w tym `models_download {itemId: "multilingual-e5-small"}`), `embed_model_activate`,
+`search_reindex_*`. Pkt 7 (eval w kompozycji) — nadal otwarty.
+
 1. **Zależność:** `app-modules` (albo `app-core`) → `lib-embed = { path = "../lib-embed" }` (bez `testkit`).
 2. **Wybór embeddera przy budowie `search`** (`app-core/src/parts/mod.rs`, gałąź `"search"`): jeśli
    `installed(<models>/embed/<id>)` zwraca manifest → `OnnxEmbedder::from_manifest_file(&path)?.residency(residency

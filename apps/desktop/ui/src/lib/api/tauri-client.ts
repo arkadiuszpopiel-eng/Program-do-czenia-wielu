@@ -302,6 +302,19 @@ export class TauriAlfaClient implements AlfaClient {
     remove: (pluginId) => call('plugins_remove', { pluginId }),
   };
 
+  readonly engines: AlfaClient['engines'] = {
+    list: () => call('models_list'),
+    download: (itemId) => call('models_download', { itemId }),
+    cancel: (itemId) => call('models_cancel', { itemId }),
+    verify: (itemId) => call('models_verify', { itemId }),
+    remove: (itemId) => call('models_remove', { itemId }),
+    trustHash: (itemId, hashes) => call('models_trust_hash', { itemId, hashes }),
+    activateEmbedder: (model) => call('embed_model_activate', { model }),
+    reindexStart: () => call('search_reindex_start'),
+    reindexCancel: () => call('search_reindex_cancel'),
+    reindexStatus: () => call('search_reindex_status'),
+  };
+
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {
     let active = true;
     let unlisten: UnlistenFn | null = null;

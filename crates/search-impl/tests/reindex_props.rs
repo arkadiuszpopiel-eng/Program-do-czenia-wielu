@@ -1,5 +1,6 @@
 //! Property-based: dowolny przeplot zapisów, usunięć, kroków przebudowy, zmian embeddera i awarii
-//! embeddera zbiega do „1 wektor na dokument w aktywnej generacji, 0 brakujących”.
+//! embeddera zbiega do „1 wektor na dokument w aktywnej generacji, 0 brakujących”; wymiana embeddera
+//! w działającej usłudze (`set_embedder`, wybór modelu w UI) → przebudowa → wektory nowego modelu.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -8,9 +9,9 @@ mod common;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use common::reindex::{Other, count, other, tables};
+use common::reindex::{Other, count, other, q, seeded, tables};
 use search_contract::contract_tests::doc;
-use search_contract::{DocId, DocKind, Search, SessionId, TxIndexer, VectorStatus};
+use search_contract::{Caller, DocId, DocKind, Mode, Search, SessionId, TxIndexer, VectorStatus};
 use search_impl::{ReindexOptions, SqliteSearch};
 use sessions_contract::SessionDbProvider;
 
@@ -83,4 +84,51 @@ proptest::proptest! {
         })
         .unwrap();
     }
+}
+
+#[test]
+fn swapping_embedder_in_place_rebuilds_and_switches_queries() {
+    let (h, db) = seeded(6);
+    let a = SessionId::new("A");
+    h.search.set_embedder(Arc::new(Other::default()));
+    assert_eq!(h.search.embedder().model_id(), "inny");
+    let status = h.search.vector_status(&a).unwrap();
+    assert!(
+        matches!(
+            status,
+            VectorStatus::Rebuilding {
+                done: 0,
+                total: 7,
+                ..
+            }
+        ),
+        "{status:?}"
+    );
+    let opts = ReindexOptions {
+        batch: 4,
+        pause: std::time::Duration::ZERO,
+    };
+    let p = h
+        .search
+        .reindex_db(&db, opts, &AtomicBool::new(false), &mut |_| {})
+        .unwrap();
+    assert!(p.finished, "{p:?}");
+    let ready = VectorStatus::Ready {
+        embedder: "inny/8".into(),
+        missing: 0,
+    };
+    assert_eq!(h.search.vector_status(&a).unwrap(), ready);
+    let hits = h
+        .search
+        .query(&q("zielony kolor", Mode::Vector), &Caller::Owner)
+        .unwrap();
+    assert_eq!(
+        hits.first().map(|h| h.doc.clone()),
+        Some(DocId::new(DocKind::Memory, "m1"))
+    );
+    db.with(|c| {
+        assert_eq!(count(c, "SELECT count(*) FROM search_vec_turn_g1"), 6);
+        Ok::<(), ()>(())
+    })
+    .unwrap();
 }

@@ -8,6 +8,7 @@ use super::common::LocalizedText;
 use super::gui::GuiStatus;
 use super::health::HealthOverall;
 use super::hub::{Account, LocalDownloadState};
+use super::models::{ModelItem, ReindexView};
 use super::panels::{ActivityInfo, AgentState, CostSummary, TimelineEvent};
 use super::sessions::{
     ApprovalPending, RenderedBlock, SessionSummary, ToolStep, Turn, TurnError, TurnStatus,
@@ -194,5 +195,20 @@ pub enum AlfaEvent {
     /// zmiana stanu — panel Głos i Ustawienia → Głos (bez audio i bez czytanego tekstu).
     VoiceFeaturesChanged {
         features: Box<VoiceFeatures>,
+    },
+    /// Menedżer modeli: postęp pobierania pliku pozycji (co ≥ 200 ms albo 1 %).
+    ModelProgress {
+        item_id: String,
+        file: String,
+        done: u64,
+        total: Option<u64>,
+    },
+    /// Menedżer modeli: zmiana stanu pozycji (kolejka, pobieranie, zgoda TOFU, instalacja, błąd).
+    ModelChanged {
+        item: Box<ModelItem>,
+    },
+    /// Przebudowa wektorów w tle po zmianie embeddera (tylko liczniki, bez treści).
+    ReindexStatus {
+        status: ReindexView,
     },
 }

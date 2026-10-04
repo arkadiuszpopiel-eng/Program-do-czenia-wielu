@@ -190,6 +190,16 @@
     "allow-plugins-reject",
     "allow-plugins-disable",
     "allow-plugins-enable",
-    "allow-plugins-remove"
+    "allow-plugins-remove",
+    "allow-models-list",
+    "allow-models-download",
+    "allow-models-cancel",
+    "allow-models-verify",
+    "allow-models-remove",
+    "allow-models-trust-hash",
+    "allow-embed-model-activate",
+    "allow-search-reindex-start",
+    "allow-search-reindex-cancel",
+    "allow-search-reindex-status"
   ]
 }

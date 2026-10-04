@@ -15,6 +15,7 @@ mod gui;
 mod health;
 mod hub;
 mod memory;
+mod models;
 mod panels;
 mod plugins;
 mod sessions;
@@ -57,6 +58,10 @@ pub use memory::{
     MemoryForgetReport, MemoryForgetTarget, MemoryItem, MemoryJournalEntry, MemoryLayer,
     MemoryPage, MemoryQuery, MemoryScopeInfo, MemoryScopeKind, MemoryScopeRef, MemorySourceKind,
     MemorySourceLink, MemoryState, MemoryStatus, MemoryUndoResult,
+};
+pub use models::{
+    EmbedderView, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,
+    ModelsView, ReindexView, TrustedHashes,
 };
 pub use panels::{
     ActivityInfo, AgentState, AgentStatus, ArtifactAction, ArtifactInfo, ArtifactPreview,

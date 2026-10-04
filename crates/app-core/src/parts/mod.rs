@@ -153,7 +153,13 @@ impl Built {
                 self.sessions = Some(sessions);
             }
             "search" => {
-                let search = SqliteSearch::new(self.late_db.clone(), Arc::new(LexicalEmbedder))
+                let chosen = memory::setting(kernel, app_models::EMBEDDER_KEY).await;
+                let embedder = app_models::startup_embedder(
+                    &paths.models(),
+                    chosen.as_ref(),
+                    Arc::new(LexicalEmbedder),
+                );
+                let search = SqliteSearch::new(self.late_db.clone(), embedder)
                     .map_err(|e| internal("search")(e.to_string()))?;
                 let search = started(search, bus, slot).await?;
                 let indexer: Arc<dyn TxIndexer> = search.clone();

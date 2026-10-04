@@ -1,0 +1,1059 @@
+[
+  {
+    "command": "models_list",
+    "args": {},
+    "result": {
+      "items": [
+        {
+          "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+          "kind": "llm",
+          "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 3040870400,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q4_k_m",
+          "files": [
+            {
+              "name": "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
+              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
+              "size_bytes": 3040870400,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.",
+            "en": "Local chat model (llama.cpp). Requires the llama-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "multilingual-e5-small",
+          "kind": "embed",
+          "name": "Multilingual E5 small (ONNX fp32)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 511705088,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+          "files": [
+            {
+              "name": "onnx/model.onnx",
+              "url": "https://example.invalid/onnx/model.onnx",
+              "size_bytes": 255852544,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "tokenizer.json",
+              "url": "https://example.invalid/tokenizer.json",
+              "size_bytes": 255852544,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+            "en": "Semantic search embedder (F7 memory)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "whisper-large-v3-turbo-q5_0",
+          "kind": "stt",
+          "name": "Whisper large-v3-turbo-q5_0",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 573571072,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\whisper-large-v3-turbo-q5_0",
+          "files": [
+            {
+              "name": "ggml-large-v3-turbo-q5_0.bin",
+              "url": "https://example.invalid/ggml-large-v3-turbo-q5_0.bin",
+              "size_bytes": 573571072,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznawanie mowy. Wymaga sidecara whisper-server.",
+            "en": "Speech recognition. Requires the whisper-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "silero-vad",
+          "kind": "vad",
+          "name": "Silero VAD 6.2.3 (op18, bez If)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 11534336,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+          "files": [
+            {
+              "name": "silero_vad-6.2.3-py3-none-any.whl",
+              "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+              "size_bytes": 11534336,
+              "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+            "en": "Voice activity detection. From the PyPI package, pinned hash."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "openwakeword-features",
+          "kind": "wake",
+          "name": "openWakeWord 0.5.1: melspektrogram + embedding",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 16777216,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\openwakeword-features",
+          "files": [
+            {
+              "name": "openwakeword-0.5.1-py3-none-any.whl",
+              "url": "https://example.invalid/openwakeword-0.5.1-py3-none-any.whl",
+              "size_bytes": 16777216,
+              "pinned_sha256": "70a75f3ec27c98b15b241d9962b8b620b57e0d5cac243fb168db198aa43ffd28",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Cechy słów wywoławczych; klasyfikator PL — własny trening.",
+            "en": "Wake-word features; the PL classifier needs own training."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-vulkan",
+          "kind": "sidecar",
+          "name": "llama-server (vulkan)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 41943040,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-vulkan",
+          "files": [
+            {
+              "name": "llama-vulkan.zip",
+              "url": "https://example.invalid/llama-vulkan.zip",
+              "size_bytes": 41943040,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.",
+            "en": "Local model server (127.0.0.1). Version to be confirmed."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-pocket-tts",
+          "kind": "sidecar",
+          "name": "Pocket TTS PL (wrapper JSON-lines)",
+          "license": "CC-BY-4.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 0,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-pocket-tts",
+          "files": [],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": false,
+          "note": {
+            "pl": "Instalacja ręczna: wrapper budowany osobno.",
+            "en": "Manual install: the wrapper is built separately."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        }
+      ],
+      "embedder": {
+        "configured": "multilingual-e5-small",
+        "active": "lexical",
+        "index_id": "alfa-lexical-hash-v1/256",
+        "dims": 256,
+        "error": null
+      },
+      "reindex": {
+        "running": false,
+        "embedder": "alfa-lexical-hash-v1/256",
+        "databases": 0,
+        "rebuilt": 0,
+        "embedded": 0,
+        "done": 0,
+        "total": 0,
+        "failed": 0,
+        "cancelled": false,
+        "finished": true
+      },
+      "parallel": 2
+    }
+  },
+  {
+    "command": "models_download",
+    "args": {
+      "itemId": "silero-vad"
+    },
+    "result": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "downloading",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": {
+        "file": "silero_vad-6.2.3-py3-none-any.whl",
+        "done": 0,
+        "total": 11534336
+      },
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_download",
+    "args": {
+      "itemId": "multilingual-e5-small"
+    },
+    "result": {
+      "id": "multilingual-e5-small",
+      "kind": "embed",
+      "name": "Multilingual E5 small (ONNX fp32)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 511705088,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+      "files": [
+        {
+          "name": "onnx/model.onnx",
+          "url": "https://example.invalid/onnx/model.onnx",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://example.invalid/tokenizer.json",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        }
+      ],
+      "state": "downloading",
+      "pinned": false,
+      "confirmed": false,
+      "downloadable": true,
+      "note": {
+        "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+        "en": "Semantic search embedder (F7 memory)."
+      },
+      "progress": {
+        "file": "onnx/model.onnx",
+        "done": 0,
+        "total": 511705088
+      },
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_cancel",
+    "args": {
+      "itemId": "multilingual-e5-small"
+    },
+    "result": {
+      "id": "multilingual-e5-small",
+      "kind": "embed",
+      "name": "Multilingual E5 small (ONNX fp32)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 511705088,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+      "files": [
+        {
+          "name": "onnx/model.onnx",
+          "url": "https://example.invalid/onnx/model.onnx",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://example.invalid/tokenizer.json",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        }
+      ],
+      "state": "paused",
+      "pinned": false,
+      "confirmed": false,
+      "downloadable": true,
+      "note": {
+        "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+        "en": "Semantic search embedder (F7 memory)."
+      },
+      "progress": {
+        "file": "onnx/model.onnx",
+        "done": 127926272,
+        "total": 511705088
+      },
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_download",
+    "args": {
+      "itemId": "multilingual-e5-small"
+    },
+    "result": {
+      "id": "multilingual-e5-small",
+      "kind": "embed",
+      "name": "Multilingual E5 small (ONNX fp32)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 511705088,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+      "files": [
+        {
+          "name": "onnx/model.onnx",
+          "url": "https://example.invalid/onnx/model.onnx",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://example.invalid/tokenizer.json",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        }
+      ],
+      "state": "downloading",
+      "pinned": false,
+      "confirmed": false,
+      "downloadable": true,
+      "note": {
+        "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+        "en": "Semantic search embedder (F7 memory)."
+      },
+      "progress": {
+        "file": "onnx/model.onnx",
+        "done": 127926272,
+        "total": 511705088
+      },
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_list",
+    "args": {},
+    "result": {
+      "items": [
+        {
+          "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+          "kind": "llm",
+          "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 3040870400,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q4_k_m",
+          "files": [
+            {
+              "name": "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
+              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
+              "size_bytes": 3040870400,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.",
+            "en": "Local chat model (llama.cpp). Requires the llama-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "multilingual-e5-small",
+          "kind": "embed",
+          "name": "Multilingual E5 small (ONNX fp32)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 511705088,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+          "files": [
+            {
+              "name": "onnx/model.onnx",
+              "url": "https://example.invalid/onnx/model.onnx",
+              "size_bytes": 255852544,
+              "pinned_sha256": null,
+              "sha256": "0967b89b533f950d267c7912d3ceed6c2e7668555c9a3ea50d5998eda1c8187e"
+            },
+            {
+              "name": "tokenizer.json",
+              "url": "https://example.invalid/tokenizer.json",
+              "size_bytes": 255852544,
+              "pinned_sha256": null,
+              "sha256": "3519a006e2d0d5998ae73121621cc2689a89039014c451f1ab73b40ad1d0f830"
+            }
+          ],
+          "state": "needs_trust",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+            "en": "Semantic search embedder (F7 memory)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "whisper-large-v3-turbo-q5_0",
+          "kind": "stt",
+          "name": "Whisper large-v3-turbo-q5_0",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 573571072,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\whisper-large-v3-turbo-q5_0",
+          "files": [
+            {
+              "name": "ggml-large-v3-turbo-q5_0.bin",
+              "url": "https://example.invalid/ggml-large-v3-turbo-q5_0.bin",
+              "size_bytes": 573571072,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznawanie mowy. Wymaga sidecara whisper-server.",
+            "en": "Speech recognition. Requires the whisper-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "silero-vad",
+          "kind": "vad",
+          "name": "Silero VAD 6.2.3 (op18, bez If)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 11534336,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+          "files": [
+            {
+              "name": "silero_vad-6.2.3-py3-none-any.whl",
+              "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+              "size_bytes": 11534336,
+              "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+              "sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee"
+            }
+          ],
+          "state": "installed",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+            "en": "Voice activity detection. From the PyPI package, pinned hash."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "openwakeword-features",
+          "kind": "wake",
+          "name": "openWakeWord 0.5.1: melspektrogram + embedding",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 16777216,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\openwakeword-features",
+          "files": [
+            {
+              "name": "openwakeword-0.5.1-py3-none-any.whl",
+              "url": "https://example.invalid/openwakeword-0.5.1-py3-none-any.whl",
+              "size_bytes": 16777216,
+              "pinned_sha256": "70a75f3ec27c98b15b241d9962b8b620b57e0d5cac243fb168db198aa43ffd28",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Cechy słów wywoławczych; klasyfikator PL — własny trening.",
+            "en": "Wake-word features; the PL classifier needs own training."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-vulkan",
+          "kind": "sidecar",
+          "name": "llama-server (vulkan)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 41943040,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-vulkan",
+          "files": [
+            {
+              "name": "llama-vulkan.zip",
+              "url": "https://example.invalid/llama-vulkan.zip",
+              "size_bytes": 41943040,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.",
+            "en": "Local model server (127.0.0.1). Version to be confirmed."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-pocket-tts",
+          "kind": "sidecar",
+          "name": "Pocket TTS PL (wrapper JSON-lines)",
+          "license": "CC-BY-4.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 0,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-pocket-tts",
+          "files": [],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": false,
+          "note": {
+            "pl": "Instalacja ręczna: wrapper budowany osobno.",
+            "en": "Manual install: the wrapper is built separately."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        }
+      ],
+      "embedder": {
+        "configured": "multilingual-e5-small",
+        "active": "lexical",
+        "index_id": "alfa-lexical-hash-v1/256",
+        "dims": 256,
+        "error": null
+      },
+      "reindex": {
+        "running": false,
+        "embedder": "alfa-lexical-hash-v1/256",
+        "databases": 0,
+        "rebuilt": 0,
+        "embedded": 0,
+        "done": 0,
+        "total": 0,
+        "failed": 0,
+        "cancelled": false,
+        "finished": true
+      },
+      "parallel": 2
+    }
+  },
+  {
+    "command": "models_trust_hash",
+    "args": {
+      "itemId": "multilingual-e5-small",
+      "hashes": {
+        "onnx/model.onnx": "0967b89b533f950d267c7912d3ceed6c2e7668555c9a3ea50d5998eda1c8187e",
+        "tokenizer.json": "3519a006e2d0d5998ae73121621cc2689a89039014c451f1ab73b40ad1d0f830"
+      }
+    },
+    "result": {
+      "id": "multilingual-e5-small",
+      "kind": "embed",
+      "name": "Multilingual E5 small (ONNX fp32)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 511705088,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+      "files": [
+        {
+          "name": "onnx/model.onnx",
+          "url": "https://example.invalid/onnx/model.onnx",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": "0967b89b533f950d267c7912d3ceed6c2e7668555c9a3ea50d5998eda1c8187e"
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://example.invalid/tokenizer.json",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": "3519a006e2d0d5998ae73121621cc2689a89039014c451f1ab73b40ad1d0f830"
+        }
+      ],
+      "state": "installing",
+      "pinned": false,
+      "confirmed": false,
+      "downloadable": true,
+      "note": {
+        "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+        "en": "Semantic search embedder (F7 memory)."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_verify",
+    "args": {
+      "itemId": "silero-vad"
+    },
+    "result": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee"
+        }
+      ],
+      "state": "installed",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "embed_model_activate",
+    "args": {
+      "model": "multilingual-e5-small"
+    },
+    "result": {
+      "configured": "multilingual-e5-small",
+      "active": "multilingual-e5-small",
+      "index_id": "multilingual-e5-small@3f2a9c41d0be/384",
+      "dims": 384,
+      "error": null
+    }
+  },
+  {
+    "command": "search_reindex_status",
+    "args": {},
+    "result": {
+      "running": true,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 300,
+      "done": 300,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": false,
+      "finished": false
+    }
+  },
+  {
+    "command": "search_reindex_cancel",
+    "args": {},
+    "result": {
+      "running": false,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 300,
+      "done": 300,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": true,
+      "finished": true
+    }
+  },
+  {
+    "command": "search_reindex_start",
+    "args": {},
+    "result": {
+      "running": true,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 0,
+      "done": 0,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": false,
+      "finished": false
+    }
+  },
+  {
+    "command": "embed_model_activate",
+    "args": {
+      "model": "lexical"
+    },
+    "result": {
+      "configured": "lexical",
+      "active": "lexical",
+      "index_id": "alfa-lexical-hash-v1/256",
+      "dims": 256,
+      "error": null
+    }
+  },
+  {
+    "command": "models_remove",
+    "args": {
+      "itemId": "silero-vad"
+    },
+    "result": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "missing",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_list",
+    "args": {},
+    "result": {
+      "items": [
+        {
+          "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+          "kind": "llm",
+          "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 3040870400,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q4_k_m",
+          "files": [
+            {
+              "name": "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
+              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
+              "size_bytes": 3040870400,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.",
+            "en": "Local chat model (llama.cpp). Requires the llama-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "multilingual-e5-small",
+          "kind": "embed",
+          "name": "Multilingual E5 small (ONNX fp32)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 511705088,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+          "files": [
+            {
+              "name": "onnx/model.onnx",
+              "url": "https://example.invalid/onnx/model.onnx",
+              "size_bytes": 255852544,
+              "pinned_sha256": null,
+              "sha256": "0967b89b533f950d267c7912d3ceed6c2e7668555c9a3ea50d5998eda1c8187e"
+            },
+            {
+              "name": "tokenizer.json",
+              "url": "https://example.invalid/tokenizer.json",
+              "size_bytes": 255852544,
+              "pinned_sha256": null,
+              "sha256": "3519a006e2d0d5998ae73121621cc2689a89039014c451f1ab73b40ad1d0f830"
+            }
+          ],
+          "state": "installed",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+            "en": "Semantic search embedder (F7 memory)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "whisper-large-v3-turbo-q5_0",
+          "kind": "stt",
+          "name": "Whisper large-v3-turbo-q5_0",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 573571072,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\whisper-large-v3-turbo-q5_0",
+          "files": [
+            {
+              "name": "ggml-large-v3-turbo-q5_0.bin",
+              "url": "https://example.invalid/ggml-large-v3-turbo-q5_0.bin",
+              "size_bytes": 573571072,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznawanie mowy. Wymaga sidecara whisper-server.",
+            "en": "Speech recognition. Requires the whisper-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "silero-vad",
+          "kind": "vad",
+          "name": "Silero VAD 6.2.3 (op18, bez If)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 11534336,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+          "files": [
+            {
+              "name": "silero_vad-6.2.3-py3-none-any.whl",
+              "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+              "size_bytes": 11534336,
+              "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+            "en": "Voice activity detection. From the PyPI package, pinned hash."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "openwakeword-features",
+          "kind": "wake",
+          "name": "openWakeWord 0.5.1: melspektrogram + embedding",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 16777216,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\openwakeword-features",
+          "files": [
+            {
+              "name": "openwakeword-0.5.1-py3-none-any.whl",
+              "url": "https://example.invalid/openwakeword-0.5.1-py3-none-any.whl",
+              "size_bytes": 16777216,
+              "pinned_sha256": "70a75f3ec27c98b15b241d9962b8b620b57e0d5cac243fb168db198aa43ffd28",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Cechy słów wywoławczych; klasyfikator PL — własny trening.",
+            "en": "Wake-word features; the PL classifier needs own training."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-vulkan",
+          "kind": "sidecar",
+          "name": "llama-server (vulkan)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 41943040,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-vulkan",
+          "files": [
+            {
+              "name": "llama-vulkan.zip",
+              "url": "https://example.invalid/llama-vulkan.zip",
+              "size_bytes": 41943040,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.",
+            "en": "Local model server (127.0.0.1). Version to be confirmed."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-pocket-tts",
+          "kind": "sidecar",
+          "name": "Pocket TTS PL (wrapper JSON-lines)",
+          "license": "CC-BY-4.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 0,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-pocket-tts",
+          "files": [],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": false,
+          "note": {
+            "pl": "Instalacja ręczna: wrapper budowany osobno.",
+            "en": "Manual install: the wrapper is built separately."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        }
+      ],
+      "embedder": {
+        "configured": "lexical",
+        "active": "lexical",
+        "index_id": "alfa-lexical-hash-v1/256",
+        "dims": 256,
+        "error": null
+      },
+      "reindex": {
+        "running": false,
+        "embedder": "alfa-lexical-hash-v1/256",
+        "databases": 3,
+        "rebuilt": 3,
+        "embedded": 1200,
+        "done": 1200,
+        "total": 1200,
+        "failed": 0,
+        "cancelled": false,
+        "finished": true
+      },
+      "parallel": 2
+    }
+  }
+]

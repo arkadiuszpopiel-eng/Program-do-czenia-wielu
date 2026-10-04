@@ -68,3 +68,13 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 - SHA-256 i dokładny rozmiar GGUF Bielika — wpisać do `models.toml` po pierwszym pobraniu (pełna weryfikacja łańcucha dostaw).
 - Nasłuch TCP na `127.0.0.1` z kluczem zamiast named pipe (llama-server nie obsługuje pipe) — ryzyko ograniczone (localhost,
   losowy port i klucz per uruchomienie); Job Object bez sieci dla sidecara — F2 przez `platform-windows`.
+
+## Zmiany — menedżer modeli (2026-10-04)
+- Pobieranie GGUF i sidecara `llama-server` w aplikacji przejął menedżer `app-models` (SPEC `models`): ten sam
+  manifest `models.toml`, katalog `%LOCALAPPDATA%\Alfa\models`, plik + rekord `<plik>.sha256` (rozpoznawany przez
+  `providers_local_impl::installed`), ale plik bez przypiętego SHA-256 instaluje się **dopiero po jawnej zgodzie
+  w UI** (karta z policzonym hashem i licencją) — także w onboardingu. `llama-server` (Vulkan/CPU) z archiwum ZIP
+  wydania llama.cpp do `sidecars\llama-<backend>\` (bezpieczne rozpakowanie; wydanie i hash do przypięcia).
+- `Downloader` i komendy `models_local_*` zostają dla zgodności (zapisują hash przy pierwszym pobraniu bez karty
+  zgody) — UI już ich nie używa; wyłączenie — decyzja człowieka.
+

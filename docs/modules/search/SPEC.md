@@ -126,3 +126,16 @@ FTS zapytanie ≤ 30 ms na 100k tur; wyniki palety ≤ 16 ms/znak (z `ui-shell`)
   4 vCPU): RSS ~525 MB, ładowanie 2,5 s, zapytanie 29 ms, dokument ~57 ms, 512 tokenów 0,72 s (`ram_mb = 640`
   w katalogu) — powyżej wstępnych 300 MB; wariant int8 (~118 MB) do sprawdzenia na prawdziwym pliku. Przebudowa:
   domyślnie 4 dokumenty na krok (zapis tury czeka w kolejce modelu ≤ ~0,25 s).
+
+## Zmiany — embedder w aplikacji (2026-10-04; addytywne)
+- **`SqliteSearch::set_embedder` / `embedder()`**: wymiana embeddera w działającej usłudze (wybór modelu w UI) bez
+  przebudowy obiektu — każda operacja (zapis, usunięcie, zapytanie, krok przebudowy, `TxIndexer::*`) bierze
+  **migawkę** embeddera na początku, więc stan generacji i wektory jednej operacji pochodzą od tego samego modelu;
+  zmiana w trakcie kroku przebudowy kończy krok bez zapisu (`now.same(&state)`). Test:
+  `tests/reindex_props.rs::swapping_embedder_in_place_rebuilds_and_switches_queries`.
+- Konfiguracja: `[search.embedder] model = "multilingual-e5-small" | "lexical"` (brak = model domyślny, używany, gdy
+  jest zainstalowany). Kompozycja (`app-models`, SPEC `models`): `startup_embedder` przy budowie `search`
+  (`OnnxEmbedder` ładowany leniwie albo leksykalny), po starcie `preload` z dzierżawą `model-residency`
+  i `spawn_reindex` (pełny przebieg najwyżej raz na 7 dni dla tego samego embeddera) dla baz sesji + baz zakresów pamięci (`ScopeSource`: `ScopeDbs::known()` bez zakresów sesji,
+  etykieta `index_label`); komendy `embed_model_activate`, `search_reindex_start/cancel/status`, zdarzenie UI
+  `ReindexStatus` (liczniki). `app-modules::LateIndexer` przekazuje `compact_in`, `vector_status_in`, `reindex_step`.

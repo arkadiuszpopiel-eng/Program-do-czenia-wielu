@@ -5,7 +5,11 @@ lokalnie, bez kluczy.
 
 ## Co trzeba przygotować
 
-**Wymaga plików** — instalator modeli głosu jest **jeszcze niedostępny**. Skopiuj do `%LOCALAPPDATA%\Alfa`:
+Modele i programy głosu pobierzesz w **Ustawienia → Modele i silniki** (zobacz
+[Modele i silniki](10-modele-i-silniki.md)): `whisper-server (CPU)`, model **Whisper large-v3-turbo-q5_0** (albo
+lżejszy small-q5_1), **piper** z głosem **Piper pl_PL gosia** i **Silero VAD**. Większość z nich jest jeszcze
+**do potwierdzenia** (instalacja po zgodzie na pokazaną sumę SHA-256). Pocket TTS instalujesz ręcznie. Gdy wolisz
+skopiować pliki samodzielnie, trafiają do `%LOCALAPPDATA%\Alfa`:
 
 | Co                                                                                                | Gdzie                                                                                  |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |

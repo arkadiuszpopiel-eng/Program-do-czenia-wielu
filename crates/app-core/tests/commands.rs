@@ -1,5 +1,5 @@
 //! Komendy poza czatem: Hub kont (sekret nigdy nie wraca), start UI, ustawienia, skróty,
-//! obsada, Szybkie pytanie, urządzenie, rejestr modułów, trwałość po restarcie.
+//! obsada, Szybkie pytanie, urządzenie, rejestr modułów, trwałość po restarcie, menedżer modeli.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -10,8 +10,8 @@ use std::time::Duration;
 
 use accounts_hub_contract::SecretStore;
 use app_core::dto::{
-    AccountAssignment, AddAccountInput, CastTemplateId, LayoutPrefs, Money, PanelId, SessionPanels,
-    SessionTemplate, SettingValue, TurnErrorCode,
+    AccountAssignment, AddAccountInput, CastTemplateId, LayoutPrefs, ModelItemState, Money,
+    PanelId, SessionPanels, SessionTemplate, SettingValue, TurnErrorCode,
 };
 use app_core::ports::HeadlessShell;
 use app_core::{AppCore, AppPaths, MemorySecretStore};
@@ -210,7 +210,7 @@ async fn bootstrap_layout_settings_shortcuts_and_cast() {
         core.settings_reset("ui.theme".into()).await.unwrap(),
         SettingValue::Text("auto".into())
     );
-    assert_eq!(core.settings_schema().await.unwrap().len(), 28);
+    assert_eq!(core.settings_schema().await.unwrap().len(), 29);
 
     // Obsada: identyfikatory ról jak w `personas-contract` (`operator`), szablony.
     let agents = core.agents_list(sid.clone()).await.unwrap();
@@ -318,4 +318,54 @@ async fn quick_ask_device_registry_and_restart_persistence() {
         boot.active_session_id.as_deref(),
         Some(first.session_id.as_str())
     );
+}
+
+/// Menedżer modeli w kompozycji: katalog wbudowany (LLM z `providers-local`, embeddery
+/// `lib-embed`, pozycje głosu i sidecarów), embedder leksykalny bez modelu, przebudowa wektorów.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn model_manager_lists_catalog_and_switches_embedder() {
+    let dir = tempfile::tempdir().unwrap();
+    let opts = options(None, Arc::new(HeadlessShell::default()));
+    let core = AppCore::build(AppPaths::under(dir.path()), opts)
+        .await
+        .unwrap();
+    let view = core.models_list().await.unwrap();
+    let ids: Vec<&str> = view.items.iter().map(|i| i.id.as_str()).collect();
+    for id in [
+        "multilingual-e5-small",
+        "silero-vad",
+        "sidecar-llama-vulkan",
+    ] {
+        assert!(ids.contains(&id), "{id} w {ids:?}");
+    }
+    let vad = view.items.iter().find(|i| i.id == "silero-vad").unwrap();
+    assert!(vad.pinned && vad.confirmed);
+    assert!(
+        view.items
+            .iter()
+            .all(|i| i.state == ModelItemState::Missing)
+    );
+    assert_eq!(view.embedder.active, "lexical");
+    assert!(
+        core.models_download("sidecar-pocket-tts".into())
+            .await
+            .is_err()
+    );
+    assert!(core.models_download("nie-ma".into()).await.is_err());
+    let err = core
+        .embed_model_activate("multilingual-e5-small".into())
+        .await;
+    assert!(err.is_err(), "model niezainstalowany");
+    let embedder = core.embed_model_activate("lexical".into()).await.unwrap();
+    assert!(embedder.index_id.starts_with("alfa-lexical-hash-v1"));
+    let mut status = core.search_reindex_status().await.unwrap();
+    for _ in 0..500 {
+        if status.finished {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+        status = core.search_reindex_status().await.unwrap();
+    }
+    assert!(status.finished && status.failed == 0, "{status:?}");
+    assert!(core.search_reindex_cancel().await.unwrap().finished);
 }

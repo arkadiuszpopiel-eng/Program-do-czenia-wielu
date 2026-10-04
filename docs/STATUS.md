@@ -46,8 +46,8 @@ Bramki ludzkie (PLAN §4.6): #1 logowanie do CLI i klucze API · #2 UAC / Hello 
 
 Wniosek: logika i zabezpieczenia są w większości zweryfikowane na atrapach; żadna fala nie jest formalnie zamknięta,
 bo prawie wszystkie pozostałe kryteria czekają na sprzęt, korpus, klucze albo akceptację człowieka. MVP (F0–F3)
-blokują dodatkowo trzy luki techniczne: okno Brokera niepodłączone do aplikacji, brak instalatora modeli/sidecarów
-i brak testu zamkniętego portu CDP (szczegóły niżej).
+blokują dodatkowo: okno Brokera niezweryfikowane na sprzęcie, nieprzypięte adresy i SHA-256 modeli/sidecarów
+w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczegóły niżej).
 
 ## F0 — Fundament i spike'i
 
@@ -125,7 +125,7 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
 | F3-09 | Audyt: Broker jedynym writerem, łańcuch, ACL append-only    | 🟡     | `safety-broker-impl/tests/audit.rs::chain_of_10k_events_verifies_and_survives_reopen`, `tampering_is_detected`; `app-safety/tests/windows_ports.rs` (DACL potoku). Brak próby zapisu z procesu agentki do plików Audytu na Windows; SR-08 bez testu Windows.                                                                          |
 | F3-10 | Aktualizacja + rollback launchera (10 cykli)                | ⛔     | Rollback i crash-loop: `updater-impl/tests/launcher.rs::crash_of_new_version_falls_back_to_previous`, `good_version_is_retried_then_rolled_back`. Pobierania i instalacji wydań brak w HEAD (praca w toku w drzewie roboczym); brak klucza minisign — bramka #10.                                                                     |
 | F3-11 | Watchdog: safe-mode po N awariach, restart (20 scenariuszy) | ✅     | `watchdog-impl/tests/watchdog.rs::crash_loop_enters_safe_mode_and_rolls_back_once`, `restarts_outside_window_never_loop` (20 iteracji), `missed_heartbeats_and_failing_health`. Brak jednego zestawu 20 scenariuszy.                                                                                                                  |
-| F3-12 | Scenariusz MVP bez kluczy 6/6                               | ⛔     | Brak `evals/F3/mvp-scenario.md`. Blokery: okno zatwierdzeń podłączone przez Brokera poza procesem (`app-broker`) — niezweryfikowane na sprzęcie; brak instalatora modeli głosu i sidecarów (`whisper-server`, `llama-server`, Pocket TTS/Piper); pomiary F0/F2. |
+| F3-12 | Scenariusz MVP bez kluczy 6/6                               | ⛔     | Brak `evals/F3/mvp-scenario.md`. Instalator jest: menedżer modeli i sidecarów `app-models` (Ustawienia → „Modele i silniki”, onboarding) — `llama-server`, `whisper-server`, `piper`, GGUF, whisper, Piper, Silero, openWakeWord, model mówcy; HTTPS z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP (`app-models/tests/{download,unpack}.rs`). Blokery: okno zatwierdzeń przez Brokera poza procesem (`app-broker`) niezweryfikowane na sprzęcie; adresy/hashe sidecarów i modeli głosu do przypięcia przez człowieka (HF/GitHub zablokowane w sesji); pomiary F0/F2. |
 | F3-13 | Port CDP zamknięty w buildzie produkcyjnym (test CI)        | ⛔     | Port tylko z cechą `e2e` (`apps/desktop/src-tauri/src/windows.rs`); testu potwierdzającego brak portu w buildzie produkcyjnym nie ma (przegląd #1, S13).                                                                                                                                                                              |
 
 ## F4 — Mosty i MCP
@@ -176,7 +176,7 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
 | ID    | Kryterium                                             | Status | Dowód / co dalej                                                                                                                                                                                                                             |
 | ----- | ----------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | F7-01 | Izolacja pamięci: 0 przecieków                        | ✅     | `memory-contract` `contract_tests_f7::spy::spy_three_sessions` (4 sesje z prywatną, 4 agentki, 1000 zapytań) na `memory-impl/tests/f7_contract.rs` i `memory-fake`.                                                                          |
-| F7-02 | recall@5 ≥ 0,85 (≥ 200 zapytań PL)                    | 🟡     | Embedder ONNX gotowy (`lib-embed`: tract, własny tokenizer SentencePiece zgodny z HF, `multilingual-e5-small`, rezydencja i zwalnianie, przebudowa wektorów w tle w `search-impl`), runner `ALFA_F7_EMBEDDER`/`ALFA_F7_STRICT`; niepodpięty w `app-*`, próg niesprawdzony na prawdziwym modelu (HuggingFace niedostępny w chmurze; hashe katalogu do przypięcia). 0,964 na `HashEmbedder`; 249 zapytań niezamrożonych. |
+| F7-02 | recall@5 ≥ 0,85 (≥ 200 zapytań PL)                    | 🟡     | Embedder ONNX (`lib-embed`) podpięty w aplikacji (`app-models`): `[search.embedder] model`, pobranie e5-small z menedżera (zgoda TOFU), `preload` z dzierżawą RAM, wymiana embeddera w działającym `search` (`set_embedder`) i przebudowa wektorów baz sesji i zakresów pamięci w tle (`app-models/tests/embed.rs` na modelu zabawkowym: aktywacja → przebudowa → wyszukiwanie wektorowe). Próg niesprawdzony na prawdziwym modelu (HF niedostępny w chmurze; SHA-256 katalogu do przypięcia); runner `ALFA_F7_EMBEDDER`/`ALFA_F7_STRICT`, 0,964 na `HashEmbedder`; 249 zapytań niezamrożonych. |
 | F7-03 | Kaskada `forget`: 100 % usunięć zweryfikowanych       | ✅     | `contract_tests_f7::forget::forget_fifty_verified`, `forget_session_cascade`, `memory-impl/tests/forget_props.rs`.                                                                                                                           |
 | F7-04 | Niezaufane nie awansuje, brak auto-`remember`         | ✅     | `contract_tests_f7::access::untrusted_never_promotes`, `memory-consolidation-contract/tests/guardian.rs`, SR2-07 `agent-runtime-impl/tests/review.rs::memory_write_in_tainted_run_is_untrusted`.                                             |
 | F7-05 | Konsolidacja nie na baterii / w grze (20 scenariuszy) | ✅     | `memory-consolidation-impl/tests/adapters.rs::never_starts_on_battery_or_in_game_mode_f7_05`.                                                                                                                                                |
@@ -214,18 +214,23 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
    `Ctrl+Shift+F12`; release bez izolowanego Brokera = bezpieczny stan. Logika i protokół przetestowane na atrapach
    i gniazdach Unix (`app-broker/tests`); prawdziwe procesy, potoki i UIPI — self-hosted. Instalacja usługi (osobne
    konto, wiązanie roli jądra z obrazem z `versions\<ver>`) — bramka #10. F3-12 i F4-03 odblokowane po teście na sprzęcie.
-2. **Brak instalatora modeli i sidecarów.** Pobierany jest tylko model LLM; `llama-server`, `whisper-server`, model
-   whisper i silnik TTS trzeba dziś skopiować ręcznie. Blokuje F3-12 i każdy pomiar głosu w aplikacji.
-3. **Funkcje głosu F5 niepodpięte w aplikacji**: słowa wywoławcze, weryfikacja mówcy, dyktowanie, czytanie
-   zaznaczenia (moduły i ewaluatory gotowe). Panel Głos (`Alt+6`) i pełny tryb głosowy to zaślepki.
-4. **Embedder semantyczny niepodpięty** (ONNX w `lib-embed` gotowy; brak menedżera modeli w UI i pomiaru progu na prawdziwym modelu) — F7-02.
+2. **Instalator modeli i sidecarów — dane do przypięcia.** Menedżer `app-models` (Ustawienia → „Modele i silniki”,
+   onboarding) pobiera i instaluje modele (LLM, whisper, Piper, Silero, openWakeWord, mówca, embeddingi) i sidecary
+   (`llama-server`, `whisper-server`, `piper`; Pocket TTS — ręcznie). Potwierdzone i przypięte są tylko pozycje
+   z PyPI (Silero VAD, cechy openWakeWord); pozostałe są „do potwierdzenia przez człowieka” (adres, rozmiar,
+   licencja, SHA-256, numer wydania llama.cpp, układ archiwów) — do tego czasu instalacja wymaga zgody TOFU w UI.
+3. **Funkcje głosu F5 podpięte w aplikacji** (`app-voice`: słowa wywoławcze — domyślnie wyłączone, bez kalibracji
+   tylko z `accept_risk`; kreator weryfikacji właściciela; dyktowanie `Ctrl+Alt+D`; czytanie `Ctrl+Alt+R`; panel Głos).
+   Brakuje pomiarów FAR/FRR i EER na korpusie właściciela (bramka #3) oraz portu UIA do odczytu zaznaczenia (zapas: Ctrl+C).
+4. **Embedder semantyczny podpięty** (`app-models`: wybór `[search.embedder] model`, przebudowa wektorów w tle);
+   brakuje pomiaru progu F7-02 na prawdziwym modelu e5-small i przypiętych SHA-256 w `lib_embed::CATALOG`.
 5. **Aktualizator**: pełny cykl (pobieranie ze wznawianiem, minisign, rollback, instalator NSIS) gotowy; brak klucza minisign i testu instalatora na Windows — F3-10.
 6. **Test zamkniętego portu CDP** w buildzie produkcyjnym — F3-13.
-7. **Brakujące moduły**: helper `uiAccess` (F6-07), `tools-vision/system/net/media` (F6). `plugin-runtime`, `tools-office` i `tools-browser` są gotowe, podpinanie w aplikacji trwa.
+7. **Brakujące moduły**: helper `uiAccess` (F6-07), `tools-vision/system/net/media` (F6). `plugin-runtime`, `tools-office` i `tools-browser` są gotowe i podpięte w aplikacji (strona „Wtyczki”, narzędzia ról, MCP v1).
 8. **Brakujące zestawy** (tworzy model-recenzent, akceptuje człowiek): `evals/F3/redteam/`, `evals/F3/mvp-scenario.md`,
    `evals/F4/bridge-fixtures/`, `evals/F6/tasks/`, `evals/F6/app-matrix.md`, `evals/F7/alfa-full/`,
    `evals/F7/migrations/`, `evals/F8/wasm-malicious/`, `evals/F9/pentest.md`, 20 promptów PL dla F1-03.
-9. **Czerwony test Windows na HEAD** (`51cbe91`).
+9. **CI**: wszystkie joby zielone na `f7bd2df` (Linux, Windows, Powłoka Tauri, UI, cargo-deny, Dokumentacja); przy porażce testów log joba kończy się podsumowaniem paniki.
 10. Drobne: harmonogram kopii zapasowych i eksport artefaktów/logów/nakładki maszyny wyłączone w UI; załączniki
     w composerze; własny pasek tytułu z Mica i Snap Layouts (spike j); generator typów TS (ADR 13) — dziś typy
     ręczne z testem round-trip DTO.
@@ -259,3 +264,6 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
    `evals/F5/voice/MANIFEST.json`, `evals/F8/MANIFEST.json`, `evals/F7/recall/`, `evals/F3/tools/` (ujednolicić nazwę
    z `tools-local/` z ACCEPTANCE), zestaw F2 test.
 10. **UAC / Hello (bramka #2):** instalacja usługi Brokera, helper `uiAccess` (F6-07), opcjonalnie Windows Hello.
+11. **Katalog modeli i sidecarów** (`crates/app-models/src/data.rs`, `lib-embed/src/catalog.rs`,
+    `providers-local-impl/models.toml`): potwierdzić adresy, rozmiary i licencje (głos Piper, VoxCeleb), przypiąć
+    SHA-256 i numer wydania llama.cpp, sprawdzić układ archiwów `whisper-server`/`piper`; potem `confirmed: true`.

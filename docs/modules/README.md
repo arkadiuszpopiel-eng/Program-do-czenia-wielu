@@ -57,7 +57,7 @@ Punkty „do ustalenia w SPEC v1", odwołania do ADR i spike'ów.
 
 ## Indeks SPEC-ów (stan: październik 2026)
 
-67 specyfikacji. Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
+68 specyfikacji. Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
 implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja” na końcu pliku. Stan kryteriów akceptacji:
 `docs/STATUS.md`; crate'y: `crates/README.md`.
 
@@ -78,6 +78,7 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 | [`platform-apps`](platform-apps/SPEC.md)         | F6         | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
 | [`device-profile`](device-profile/SPEC.md)       | F1         | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry.                                  |
 | [`updater`](updater/SPEC.md)                     | F1, F3     | Stały launcher, wersje obok siebie, podpis minisign, rollback i ochrona przed pętlą awarii.                                          |
+| [`models`](models/SPEC.md)                       | F3, F7     | Menedżer modeli i sidecarów (`app-models`): HTTPS z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP, embedder wyszukiwania. |
 | [`shell-integration`](shell-integration/SPEC.md) | F1         | Zasobnik, skróty globalne, protokół `alfa://`, jedna instancja, dialogi plików — w powłoce Tauri.                                    |
 | [`notify`](notify/SPEC.md)                       | F1         | Powiadomienia Windows i w aplikacji, tryb „nie przeszkadzać” — w `app-core`.                                                         |
 

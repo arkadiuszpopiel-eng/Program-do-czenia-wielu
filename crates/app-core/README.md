@@ -22,6 +22,7 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
 | `app-skills` | umiejętności (`SkillsApp`: przegląd z diffem i hashem, kwarantanna, uruchomienie = zadanie) i Kreator agentek (`BuilderApp`: podgląd, test na sucho, zapis) |
 | `app-health` | „Zdrowie systemu": Diagnosta, Ulepszacz, evale (`HealthApp`, `HealthChanged`) |
 | `app-updates` | aktualizacje i „O programie” (`UpdatesApp`, `updates_*`, `UpdateStatus`, `mark_good`, restart przez launcher) |
+| `app-models` | menedżer modeli i silników (`ModelsApp`: katalog, pobieranie z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP; komendy `models_*`), embedder wyszukiwania (`startup_embedder` przy budowie `search`, `embed_model_activate`, przebudowa wektorów `search_reindex_*`, `ReindexStatus`) |
 | `app-store` | tabele aplikacji w bazach sesji (`AppStore`: fakty tur, oś czasu, katalog roboczy, przebiegi agentek) |
 | `app-voice` | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów) |
 | `app-core` | kompozycja (`AppOptions` → `parts`), komendy, czat (z delegacją do mostu), `TaskHost` rdzenia (`host.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |

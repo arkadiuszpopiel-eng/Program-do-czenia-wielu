@@ -171,7 +171,8 @@ impl SqliteSearch {
             }
             report.databases += 1;
             // Stan przed krokami: początek przebudowy → `search.reindex.started` z etykietą bazy.
-            if let Err(e) = db.with(|c| self.prepare_conn(c, Some(&label))) {
+            let embedder = self.embedder();
+            if let Err(e) = db.with(|c| self.prepare_conn(c, embedder.as_ref(), Some(&label))) {
                 report.failed.push((label.to_string(), e.to_string()));
                 continue;
             }

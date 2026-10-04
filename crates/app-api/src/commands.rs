@@ -192,6 +192,16 @@ macro_rules! with_commands {
             plugins_disable(plugin_id: String) -> $crate::dto::PluginInfo;
             plugins_enable(plugin_id: String, reviewed_hash: String) -> $crate::dto::PluginInfo;
             plugins_remove(plugin_id: String) -> $crate::dto::PluginsView;
+            models_list() -> $crate::dto::ModelsView;
+            models_download(item_id: String) -> $crate::dto::ModelItem;
+            models_cancel(item_id: String) -> $crate::dto::ModelItem;
+            models_verify(item_id: String) -> $crate::dto::ModelItem;
+            models_remove(item_id: String) -> $crate::dto::ModelItem;
+            models_trust_hash(item_id: String, hashes: $crate::dto::TrustedHashes) -> $crate::dto::ModelItem;
+            embed_model_activate(model: String) -> $crate::dto::EmbedderView;
+            search_reindex_start() -> $crate::dto::ReindexView;
+            search_reindex_cancel() -> $crate::dto::ReindexView;
+            search_reindex_status() -> $crate::dto::ReindexView;
         }
     };
 }
@@ -217,6 +227,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 184);
+        assert_eq!(super::COMMANDS.len(), 194);
     }
 }

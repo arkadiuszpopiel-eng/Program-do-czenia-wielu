@@ -32,7 +32,8 @@ aby zachować poprzednią wersję do przywrócenia. Deinstalacja usuwa pliki pro
 „Usuń także dane Alfy” (`%USERPROFILE%\Alfa` i klucze w Menedżerze poświadczeń zostają zawsze).
 Sidecary (`llama-server`, `whisper-server`, `piper`) **nie są w instalatorze ani w paczce aktualizacji** (rozmiar,
 warianty GPU: Vulkan/CUDA/CPU). Miejsca (`AppPaths::sidecar`): najpierw `%LOCALAPPDATA%\Alfa\sidecars\<silnik>\<plik>.exe`
-(pobrane przy pierwszym użyciu / w Ustawieniach — przeżywają aktualizacje i rollback), potem opcjonalnie
+(pobrane w Ustawieniach → „Modele i silniki” menedżerem `app-models`: HTTPS z wznawianiem, SHA-256 albo zgoda
+TOFU, bezpieczne rozpakowanie ZIP — przeżywają aktualizacje i rollback), potem opcjonalnie
 `versions\<ver>\sidecars\<silnik>\` (gdyby paczka je kiedyś zawierała). Brak sidecara = czytelny komunikat modułu
 ze ścieżką docelową; modele GGUF pobiera `providers-local` (wznawianie + SHA-256).
 

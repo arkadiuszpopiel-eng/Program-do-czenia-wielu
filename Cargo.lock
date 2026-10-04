@@ -463,6 +463,7 @@ dependencies = [
  "app-gui",
  "app-health",
  "app-memory",
+ "app-models",
  "app-modules",
  "app-plugins",
  "app-skills",
@@ -649,6 +650,38 @@ dependencies = [
  "tokio",
  "tools-common-contract",
  "tracing",
+]
+
+[[package]]
+name = "app-models"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "core-config-contract",
+ "core-config-fake",
+ "flate2",
+ "futures-util",
+ "lib-embed",
+ "lib-sqlstore",
+ "memory-contract",
+ "memory-impl",
+ "model-residency-contract",
+ "providers-local-impl",
+ "reqwest",
+ "search-contract",
+ "search-fake",
+ "search-impl",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+ "sessions-fake",
+ "sha2",
+ "tempfile",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "updater-contract",
+ "zip",
 ]
 
 [[package]]

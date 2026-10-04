@@ -31,6 +31,7 @@ tylko obniżyć. Szczegóły: [Bezpieczeństwo](07-bezpieczenstwo.md).
 7. [Bezpieczeństwo: poziomy, kill-switch, cofanie](07-bezpieczenstwo.md)
 8. [Mosty CLI (Claude Code, Codex)](08-mosty-cli.md)
 9. [Przenoszenie danych, kopie i Zdrowie systemu](09-dane-i-zdrowie.md)
+10. [Modele i silniki](10-modele-i-silniki.md)
 
 ## Skróty klawiszowe
 

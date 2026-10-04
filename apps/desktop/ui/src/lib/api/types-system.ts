@@ -25,6 +25,7 @@ import type { GuiStatus, HealthOverall } from './types-work';
 import type { UpdatesView } from './types-updates';
 import type { BrokerStatusView } from './types-broker';
 import type { VoiceFeatures } from './types-voice';
+import type { ModelItem, ReindexView } from './types-models';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
 
@@ -73,7 +74,8 @@ export type SettingsCustomPage =
   | 'health'
   | 'updates'
   | 'about'
-  | 'plugins';
+  | 'plugins'
+  | 'models';
 
 export interface SettingsPageDef {
   readonly id: string;
@@ -270,7 +272,19 @@ export type AlfaEvent =
   /** Stan Brokera zmieniony (połączono, tryb przenośny, zerwanie — bezpieczny stan, watchdog). */
   | { readonly type: 'BrokerStatus'; readonly status: BrokerStatusView }
   /** Głos rozszerzony F5 zmieniony (wykrycie, rejestracja, dyktowanie, czytanie) — bez treści. */
-  | { readonly type: 'VoiceFeaturesChanged'; readonly features: VoiceFeatures };
+  | { readonly type: 'VoiceFeaturesChanged'; readonly features: VoiceFeatures }
+  /** Menedżer modeli: postęp pobierania pliku pozycji (co ≥ 200 ms). */
+  | {
+      readonly type: 'ModelProgress';
+      readonly item_id: string;
+      readonly file: string;
+      readonly done: number;
+      readonly total: number | null;
+    }
+  /** Menedżer modeli: zmiana stanu pozycji (kolejka, pobieranie, zgoda TOFU, instalacja, błąd). */
+  | { readonly type: 'ModelChanged'; readonly item: ModelItem }
+  /** Przebudowa wektorów po zmianie embeddera (tylko liczniki). */
+  | { readonly type: 'ReindexStatus'; readonly status: ReindexView };
 
 export type AlfaEventType = AlfaEvent['type'];
 export type Unsubscribe = () => void;

@@ -99,6 +99,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     ],
     { custom: 'providers' },
   ),
+  page('models', L('Modele i silniki', 'Models and engines'), 1, [], { custom: 'models' }),
   page(
     'costs',
     L('Koszty i limity', 'Costs and limits'),

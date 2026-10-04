@@ -68,6 +68,11 @@ impl SqliteBackend {
         }
     }
 
+    /// Bazy zakresów (kompozycja: przebudowa wektorów po zmianie embeddera w bazach zakresów).
+    pub fn dbs(&self) -> &Arc<dyn ScopeDbs> {
+        &self.dbs
+    }
+
     fn read<R: Default>(
         &self,
         scope: &MemoryScope,

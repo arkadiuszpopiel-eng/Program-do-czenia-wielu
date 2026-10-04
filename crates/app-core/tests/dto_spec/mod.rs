@@ -6,6 +6,7 @@ use app_core::dto::*;
 use super::{Check, roundtrip};
 
 mod computer;
+mod models;
 mod plugins;
 mod updates;
 mod voice;
@@ -109,7 +110,8 @@ pub fn spec(command: &str) -> Option<Spec> {
                 .or_else(|| computer::spec(other))
                 .or_else(|| updates::spec(other))
                 .or_else(|| voice::spec(other))
-                .or_else(|| plugins::spec(other));
+                .or_else(|| plugins::spec(other))
+                .or_else(|| models::spec(other));
         }
     };
     Some(found)

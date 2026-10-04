@@ -6,6 +6,7 @@ import { enApp } from './en-app';
 import { enBuilder } from './en-builder';
 import { enMemory } from './en-memory';
 import { enPlugins } from './en-plugins';
+import { enModels } from './en-models';
 import { enSettings } from './en-settings';
 import { enTasks } from './en-tasks';
 import { enUpdates } from './en-updates';
@@ -26,4 +27,5 @@ export const en: Record<MessageKey, Message> = {
   ...enBroker,
   ...enVoice,
   ...enPlugins,
+  ...enModels,
 };

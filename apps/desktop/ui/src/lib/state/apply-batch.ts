@@ -79,6 +79,12 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
     case 'BrokerStatus':
       app.broker.apply(event.status);
       break;
+    case 'ModelProgress':
+    case 'ModelChanged':
+    case 'ReindexStatus':
+      // Menedżer modeli: strona „Modele i silniki" i onboarding słuchają przez `app.on`.
+      app.notify(event);
+      break;
     case 'MarshalReportReady':
       app.toasts.show({
         kind: 'info',

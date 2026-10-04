@@ -28,6 +28,7 @@
   import UpdatesPage from './pages/UpdatesPage.svelte';
   import AboutPage from './pages/AboutPage.svelte';
   import VoicePage from './pages/VoicePage.svelte';
+  import Lazy from '../../components/shell/Lazy.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -153,6 +154,11 @@
         {:else if page.custom === 'updates'}<UpdatesPage />
         {:else if page.custom === 'about'}<AboutPage />
         {:else if page.custom === 'plugins'}<PluginsPage />
+        {:else if page.custom === 'models'}<Lazy
+            load={() => import('./pages/ModelsPage.svelte')}
+            props={{}}
+            label={t('engines.loading')}
+          />
         {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />
