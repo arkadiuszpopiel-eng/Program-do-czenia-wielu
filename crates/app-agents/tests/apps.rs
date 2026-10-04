@@ -26,7 +26,16 @@ use watchdog_contract::ManualClock;
 
 const HOME: &str = "/Users/ala";
 const DOC: &str = "/Users/ala/Documents/Raport.docx";
-const ALFA: &str = "/Users/ala/AppData/Local/Alfa";
+const ALFA: &str = "Users/ala/AppData/Local/Alfa";
+
+/// Ścieżka bezwzględna na bieżącym systemie (na Windows `/Users/…` nie jest bezwzględna, a
+/// `BrowserSpec::validate` słusznie odrzuca katalog Alfy, który nie jest bezwzględny).
+fn abs(rel: &str) -> PathBuf {
+    let root = PathBuf::from(if cfg!(windows) { r"C:\" } else { "/" });
+    rel.split('/')
+        .filter(|s| !s.is_empty())
+        .fold(root, |acc, seg| acc.join(seg))
+}
 
 struct H {
     tools: AgentTools,
@@ -65,9 +74,9 @@ fn harness(extra: Vec<Arc<dyn Tool>>, apps: bool) -> H {
         browser_spec: BrowserSpec {
             kind: BrowserKind::Edge,
             executable: None,
-            alfa_root: PathBuf::from(ALFA),
-            profile_dir: PathBuf::from(ALFA).join("browser/profile"),
-            quarantine_dir: PathBuf::from(ALFA).join("browser/quarantine"),
+            alfa_root: abs(ALFA),
+            profile_dir: abs(ALFA).join("browser").join("profile"),
+            quarantine_dir: abs(ALFA).join("browser").join("quarantine"),
             headless: true,
         },
         plugins_dir: Some(dir.path().join("plugins")),

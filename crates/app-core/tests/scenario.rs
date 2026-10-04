@@ -210,9 +210,18 @@ async fn create_send_stream_persist_cost_search_rename_branch_delete() {
     let db = core.paths().sessions().join(format!("{sid}.db"));
     assert!(db.exists());
     let ticket = core.sessions_remove(sid.clone()).await.unwrap();
-    tokio::time::sleep(Duration::from_millis(800)).await;
+    // Usunięcie biegnie w tle po oknie cofnięcia (300 ms) — czekamy na skutek, nie na stały czas
+    // (wolny runner Windows nie mieścił się w 500 ms zapasu).
+    let mut gone = false;
+    for _ in 0..200 {
+        tokio::time::sleep(Duration::from_millis(50)).await;
+        if !db.exists() {
+            gone = true;
+            break;
+        }
+    }
+    assert!(gone, "baza sesji usunięta (crypto-shredding)");
     assert!(core.sessions_undo_remove(ticket.token).await.is_err());
-    assert!(!db.exists(), "baza sesji usunięta (crypto-shredding)");
     assert!(core.turns_list(sid).await.is_err());
 }
 
