@@ -1,4 +1,4 @@
-//! Właściciel i uprawnienia, zakaz mostów (wyjątek: harmonogram użytkownika z `allow_bridges`),
+//! Właściciel i uprawnienia, zakaz mostów bez wyjątków (także harmonogram z `allow_bridges`),
 //! sufit uprawnień bez tokenów, dziennik uruchomień.
 
 use safety_broker_contract::{Capability, HostPattern};
@@ -20,7 +20,7 @@ fn daily(spec: &mut TriggerSpec) {
     };
 }
 
-/// Właściciel = twórca; agentka zarządza tylko swoimi; mosty tylko w harmonogramie użytkownika.
+/// Właściciel = twórca; agentka zarządza tylko swoimi; mostów z wyzwalacza — nigdy.
 pub async fn ownership_bridges_and_scope<H: Harness>(h: &H) {
     let t = h.triggers();
     let delta = Actor::Agent("delta".into());
@@ -49,7 +49,8 @@ pub async fn ownership_bridges_and_scope<H: Harness>(h: &H) {
     user_edit.name = "zmieniony przez użytkownika".into();
     t.update(user_edit, Actor::User).unwrap();
 
-    // Most: bez allow_bridges — zakaz; allow_bridges przez agentkę — zakaz; na zdarzeniu — zakaz.
+    // Most: zakaz bez wyjątków — bez `allow_bridges`, z `allow_bridges` (agentka, zdarzenie,
+    // harmonogram użytkownika z limitem dziennym; CX-d / AGENTS.md).
     let mut b = user_trigger("most", cron());
     b.action.executor = bridge();
     assert!(matches!(b.action.executor, ExecutorKind::Bridge(_)));
@@ -61,10 +62,7 @@ pub async fn ownership_bridges_and_scope<H: Harness>(h: &H) {
     by_agent.owner = delta.clone();
     by_agent.allow_bridges = true;
     daily(&mut by_agent);
-    assert!(matches!(
-        t.create(by_agent, delta.clone()),
-        Err(TriggerError::Forbidden(_))
-    ));
+    assert!(t.create(by_agent, delta.clone()).is_err());
     let mut on_event = b.clone();
     on_event.kind = TriggerKind::FileInDir {
         dir: "C:\\x".into(),
@@ -73,25 +71,24 @@ pub async fn ownership_bridges_and_scope<H: Harness>(h: &H) {
     on_event.allow_bridges = true;
     daily(&mut on_event);
     assert!(t.create(on_event, Actor::User).is_err());
-    let mut no_limit = b.clone();
-    no_limit.allow_bridges = true;
-    assert!(matches!(
-        t.create(no_limit, Actor::User),
-        Err(TriggerError::Invalid { .. })
-    ));
-    let mut ok = b.clone();
-    ok.allow_bridges = true;
-    daily(&mut ok);
-    t.create(ok, Actor::User).unwrap();
+    let mut schedule = b.clone();
+    schedule.allow_bridges = true;
+    daily(&mut schedule);
+    assert_eq!(
+        t.create(schedule, Actor::User),
+        Err(TriggerError::BridgeForbidden("most".into()))
+    );
+    let mut flag_only = user_trigger("flaga", cron());
+    flag_only.allow_bridges = true;
+    daily(&mut flag_only);
+    assert!(t.create(flag_only, Actor::User).is_err());
+    assert!(t.get(&"most".into()).is_none());
+    t.create(user_trigger("most", cron()), Actor::User).unwrap();
     let r = t.fire_now(&"most".into(), Actor::User).unwrap();
     assert!(matches!(r.outcome, RunOutcome::Submitted { .. }));
     let task = h.submitted().pop().unwrap();
-    assert_eq!(
-        task.origin,
-        TaskOrigin::Schedule {
-            schedule_id: "most".into()
-        }
-    );
+    assert!(matches!(task.origin, TaskOrigin::Trigger { .. }));
+    assert_eq!(task.executor, ExecutorKind::Agent);
 
     // Klasa `User` z wyzwalacza — odrzucona.
     let mut user_class = user_trigger("klasa", cron());

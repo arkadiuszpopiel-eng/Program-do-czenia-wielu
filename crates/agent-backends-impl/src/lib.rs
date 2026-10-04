@@ -24,7 +24,7 @@ mod process;
 mod runner;
 mod workspace;
 
-pub use backend::{BackendDeps, BridgeBackend};
+pub use backend::{BackendDeps, BridgeBackend, mcp_scope};
 pub use config::{BridgeConfig, BridgeProgram};
 pub use process::{SystemTreeKiller, TreeKiller, cli_env};
 pub use workspace::{DEFAULT_MAX_COPY_BYTES, GitWorkspace};

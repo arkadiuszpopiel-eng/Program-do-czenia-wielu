@@ -17,8 +17,9 @@ Skrót procedury; szczegóły modułu: `docs/modules/updater/SPEC.md`, ADR 0007.
    od poprzedniego tagu).
 2. Tag `v<wersja>` (albo ręcznie: Actions → Release → kanał). Workflow `.github/workflows/release.yml`:
    licencje („O programie”) → launcher `alfa.exe` (`updater-impl`, klucz wbudowany) → `tauri build` z nakładką
-   `tauri.bundle.conf.json` (instalator NSIS) → paczka `alfa-<wersja>-x64.zip` (`alfa-desktop.exe`, `alfa.exe`,
-   `version.json`, `notes.md`) → podpis minisign z komentarzem zaufanym `file:… version:<wersja> channel:<kanał>` →
+   `tauri.bundle.conf.json` (instalator NSIS; procesy Jądra `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` z
+   `app-safety` jako `externalBin`, przenoszone hakami do `versions\<ver>\`) → paczka `alfa-<wersja>-x64.zip`
+   (`alfa-desktop.exe`, `alfa.exe`, `alfa-broker.exe`, `alfa-broker-ui.exe`, `alfa-watchdog.exe`, `version.json`, `notes.md`) → podpis minisign z komentarzem zaufanym `file:… version:<wersja> channel:<kanał>` →
    manifest `<kanał>.json` (SHA-256, podpis, notatki, adres względny) → **szkic** wydania z `SHA256SUMS.txt`.
 3. Sprawdź szkic (instalacja na czystym koncie Windows, aktualizacja z poprzedniej wersji) i opublikuj ręcznie.
 

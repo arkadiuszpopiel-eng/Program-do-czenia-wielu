@@ -27,6 +27,13 @@ Zdarzenia (Diagnostyka; safe-mode/rollback/kill także Audyt przez Brokera): `wa
 - `ThreadedPeer`: Broker jako peer wołany blokująco (IPC `KillAll`, rola `Watchdog` przyjmowana przez Brokera po tożsamości obrazu `alfa-watchdog.exe`, konto serwera sprawdzane) na osobnym wątku — limit 100 ms działa także przy zawieszonym Brokerze; kolejność: cisza audio → drzewa procesów (od razu) → Broker → Audyt.
 - `alfa-watchdog [--broker-pipe P] [--broker-user SID] [-- <jądro> …]`: jądro uruchamiane w Job Object watchdoga (potomkowie dziedziczą zadanie — `TerminateJobObject` zabija całe drzewo, także zagnieżdżone zadania narzędzi). Ikona zasobnika i heartbeat przez IPC — następna iteracja (kill-switch z zasobnika obsługuje dziś powłoka Tauri → Broker).
 
+## Watchdog uruchamiany przez aplikację (F3 część 3, `app-broker`; przegląd CX-c)
+- Aplikacja przy starcie uruchamia `alfa-watchdog` z katalogu wersji: usługa — `--broker-pipe P --broker-user SID --lifeline`, tryb przenośny — `--broker-pipe alfa-broker-dev --broker-pid PID --lifeline` (serwer potoku musi być procesem Brokera uruchomionym przez aplikację; po ponownym uruchomieniu Brokera PID się zmienia — wtedy `KillAll` wykonuje aplikacja po komunikacie, patrz niżej).
+- `--lifeline`: watchdog kończy się, gdy aplikacja zamknie jego stdin (także po awarii aplikacji — bez sierot).
+- **Komunikaty na stdout** (jedna linia JSON, anonimowy potok — czyta tylko aplikacja): `{"event":"ready"}` po zarejestrowaniu skrótu, `{"event":"kill_switch","reason":…,"tokens_revoked":…,"jobs_killed":…,"latency_us":…}` po kill-switchu (`app_safety::watchdog::notice_*`, parser `app_broker::notice`, test zgodności `app-safety/tests/app_launch.rs`).
+- **Własność skrótu**: `Ctrl+Shift+F12` rejestruje i obsługuje watchdog (cisza audio → drzewa → Broker `KillAll`); aplikacja **nie** rejestruje skrótu, gdy watchdog zgłosił gotowość, a po komunikacie `kill_switch` wykonuje „STOP WSZYSTKIEGO” w procesie (generacje, przebiegi, scheduler, mowa, drzewa narzędzi, `KillAll`).
+- **Zachowanie awaryjne**: brak `alfa-watchdog` obok aplikacji, brak gotowości w 2 s albo koniec procesu watchdoga → aplikacja rejestruje `Ctrl+Shift+F12` sama (dotychczasowa ścieżka `system_kill_all`), stan `watchdog: false` → baner „Watchdog nie działa — STOP WSZYSTKIEGO obsługuje awaryjnie aplikacja” i wpis w Ustawieniach → Uprawnienia. Watchdog nie jest uruchamiany ponownie automatycznie (skrót jest wtedy zajęty przez aplikację) — wraca po ponownym uruchomieniu aplikacji.
+
 ## Zależności
 `core-bus-contract`, `core-log-contract` (`AuditWriter` Brokera), `platform-contract` (`ProcessPort`). Brak zależności od `safety-broker-contract` — Broker jest peerem `KillSwitch` (działa, gdy Brokera brak).
 
@@ -51,6 +58,6 @@ Zdarzenia (Diagnostyka; safe-mode/rollback/kill także Audyt przez Brokera): `wa
 `watchdog-fake`: rejestruje heartbeaty, awarie i kill-switch jako zdarzenia (bez zabijania), safe-mode z testu, akcje `tick` ze skryptu.
 
 ## Otwarte pytania
-- Hook skrótu kill-switcha: w watchdogu (sesja użytkownika) — zrobione; usługa Brokera w sesji 0 nie ma hooka.
+- Hook skrótu kill-switcha: w watchdogu (sesja użytkownika) — zrobione; usługa Brokera w sesji 0 nie ma hooka. Watchdog uruchamia aplikacja (część 3); uruchamianie przez launcher `alfa.exe` z jądrem w Job Object watchdoga (`-- <jądro>`) — decyzja przy integracji launchera.
 - Własna ikona zasobnika watchdoga (`Shell_NotifyIconW`) i heartbeat jądra przez potok — SPEC v2 (limit rozmiaru `platform-windows-impl`).
 - Katalog awarii chaosowych (≥ 20) — `evals/` w F8.

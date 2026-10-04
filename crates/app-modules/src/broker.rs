@@ -1,9 +1,9 @@
-//! `BrokerPort` na Brokerze w procesie (tryb deweloperski — usługa Windows z Broker-UI to osobny
-//! proces, F3 część 2) i dzienniku cofania `undo-journal`. Zasady bez zmian: podniesienie poziomu
-//! i akcje wymagające zgody idą wyłącznie przez okno Brokera (`ApprovalWindow`; bez niego —
-//! odmowa), obniżenie działa od razu, każda decyzja trafia do Audytu z łańcuchem SHA-256.
+//! `BrokerPort` nad dowolnym `Broker` + `KillSwitch`: silnikiem w procesie (tryb deweloperski)
+//! albo klientem IPC Brokera poza procesem (`app-broker`: usługa / tryb przenośny), i dziennikiem
+//! cofania `undo-journal`. Zasady bez zmian: podniesienie poziomu i akcje wymagające zgody idą
+//! wyłącznie przez okno Brokera (`ApprovalWindow`; bez niego — odmowa), obniżenie działa od razu,
+//! każda decyzja trafia do Audytu z łańcuchem SHA-256.
 
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -21,16 +21,17 @@ use undo_journal_contract::{StepId, UndoError, UndoJournal};
 use undo_journal_impl::UndoService;
 use watchdog_contract::{KillReason, KillSwitch};
 
-use app_api::dto::{AutonomyLevel, BrokerIntentResult, BrokerIntentStatus};
+use app_api::dto::{AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView};
 use app_api::error::{AppError, ErrorCode};
 use app_api::ports::{ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
 
 /// Sesja-sonda poziomu globalnego (identyfikatory sesji to UUIDv7 — brak kolizji).
 const GLOBAL_PROBE: &str = "__alfa_global__";
 
-/// Broker w procesie + dziennik cofania.
+/// Broker (w procesie albo poza nim) + dziennik cofania.
 pub struct InprocBroker {
-    engine: Arc<BrokerEngine>,
+    engine: Arc<dyn Broker>,
+    kill: Arc<dyn KillSwitch>,
     undo: Option<Arc<UndoService>>,
     window: Arc<dyn ApprovalWindow>,
     env: PathEnv,
@@ -88,8 +89,20 @@ impl InprocBroker {
         window: Arc<dyn ApprovalWindow>,
         env: PathEnv,
     ) -> Self {
+        Self::over(engine.clone(), engine, undo, window, env)
+    }
+
+    /// `BrokerPort` nad dowolnym Brokerem i kill-switchem (Broker poza procesem: `app-broker`).
+    pub fn over(
+        engine: Arc<dyn Broker>,
+        kill: Arc<dyn KillSwitch>,
+        undo: Option<Arc<UndoService>>,
+        window: Arc<dyn ApprovalWindow>,
+        env: PathEnv,
+    ) -> Self {
         Self {
             engine,
+            kill,
             undo,
             window,
             env,
@@ -228,6 +241,12 @@ impl BrokerPort for InprocBroker {
         self.window.available()
     }
 
+    fn status(&self) -> BrokerStatusView {
+        self.window
+            .status()
+            .unwrap_or_else(|| BrokerStatusView::in_process(self.window.available()))
+    }
+
     async fn kill_all(&self, origin: KillOrigin) -> Result<(), AppError> {
         let reason = match origin {
             KillOrigin::Hotkey => KillReason::Hotkey,
@@ -235,7 +254,7 @@ impl BrokerPort for InprocBroker {
             KillOrigin::Ui => KillReason::CapsuleButton,
             KillOrigin::Voice => KillReason::VoiceStop,
         };
-        let report = self.engine.kill_all(reason).await;
+        let report = self.kill.kill_all(reason).await;
         tracing::warn!(
             tokeny = report.tokens_revoked,
             procesy = report.jobs_killed,
@@ -246,30 +265,6 @@ impl BrokerPort for InprocBroker {
     }
 }
 
-/// Środowisko ścieżek Brokera: profil Windows (`USERPROFILE`); poza Windows — profil syntetyczny
-/// (tryb deweloperski: decyzje i Audyt bez dostępu do plików systemu).
-pub fn path_env() -> (String, PathEnv) {
-    let profile = std::env::var("USERPROFILE")
-        .ok()
-        .filter(|p| cfg!(windows) && !p.is_empty())
-        .unwrap_or_else(|| r"C:\Users\alfa".to_owned());
-    let env = PathEnv::windows_profile(&profile);
-    (profile, env)
-}
-
-/// Środowisko ścieżek dla katalogów aplikacji: profil właściciela = katalog nadrzędny
-/// `user_root` (`%USERPROFILE%\Alfa` → `%USERPROFILE%`; w testach — katalog tymczasowy), żeby
-/// zakresy Brokera i narzędzi agentek dotyczyły tych samych ścieżek, na których działa `FsPort`.
-pub fn path_env_for(user_root: &std::path::Path) -> (String, PathEnv) {
-    match user_root.parent().and_then(|p| p.to_str()) {
-        Some(profile) if !profile.is_empty() => {
-            (profile.to_owned(), PathEnv::windows_profile(profile))
-        }
-        _ => path_env(),
-    }
-}
-
-/// Katalog danych Brokera w trybie deweloperskim.
-pub fn dev_dir(local: &std::path::Path) -> PathBuf {
-    local.join("broker-dev")
-}
+// Środowisko ścieżek i katalog Brokera w procesie żyją w `app-broker` (wybór Brokera dla
+// `AppOptions`); reeksport dla dotychczasowych użytkowników.
+pub use app_broker::inproc::{dev_dir, path_env, path_env_for};

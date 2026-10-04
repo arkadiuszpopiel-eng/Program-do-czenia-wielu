@@ -1,5 +1,6 @@
 //! `alfa-broker` — usługa Brokera (Safety Kernel). `alfa-broker --config <plik.json>` jako usługa
-//! Windows `AlfaBroker`; `alfa-broker --console [--config <plik.json>]` — tryb deweloperski.
+//! Windows `AlfaBroker`; `alfa-broker --console [--config <plik.json>] [--lifeline]` — tryb
+//! deweloperski / przenośny (proces potomny aplikacji, koniec po zamknięciu stdin).
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -27,7 +28,12 @@ fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let config = arg_value(&args, "--config");
     let result = if has_flag(&args, "--console") {
-        console_config(config).and_then(|c| run(c, &StopSignal::new()))
+        // `--lifeline`: uruchomiony przez aplikację (tryb przenośny) — koniec razem z nią.
+        let stop = StopSignal::new();
+        if has_flag(&args, "--lifeline") {
+            app_safety::spawn_lifeline(stop.clone());
+        }
+        console_config(config).and_then(|c| run(c, &stop))
     } else {
         match config.map(|p| load_config(Path::new(&p))) {
             Some(Ok(c)) => WinKernel

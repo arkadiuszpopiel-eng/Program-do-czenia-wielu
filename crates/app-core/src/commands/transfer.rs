@@ -7,18 +7,9 @@ use crate::dto::{
 use crate::error::AppError;
 
 impl AppCore {
-    /// `transfer_export` ⟶ natywny dialog; sekrety nigdy.
+    /// `transfer_export` ⟶ natywny dialog; sekrety nigdy (eksportu sekretów nie ma — CX-a).
     pub async fn transfer_export(&self, request: ExportRequest) -> Result<ExportResult, AppError> {
         self.inner.transfer.export(request).await
-    }
-
-    /// `transfer_export_secrets` ⟶ natywny dialog; osobna, jawna paczka sekretów — zawsze
-    /// szyfrowana hasłem (min. 8 znaków), nigdy w zwykłym eksporcie.
-    pub async fn transfer_export_secrets(
-        &self,
-        password: SecretInput,
-    ) -> Result<ExportResult, AppError> {
-        self.inner.transfer.export_secrets(password).await
     }
 
     /// `transfer_inspect` ⟶ dialog otwarcia (gdy `path = None`) + dry-run.

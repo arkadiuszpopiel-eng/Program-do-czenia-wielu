@@ -209,6 +209,30 @@ async fn policy_denials_never_start_a_process() {
     assert!(h.journal.steps(&"s1".into()).is_empty());
 }
 
+/// Regresja Q-8: cel usuwania poza katalogiem przez `..` albo nieustalony (zmienna, nieznana
+/// zmienna środowiskowa) — nieodwracalne, wymaga zgody; bez zgody proces nie startuje.
+#[tokio::test]
+async fn parent_or_unresolved_delete_targets_need_approval() {
+    let h = harness(&[("/Users/ala/Projekt/a.txt", "a")]);
+    for cmd in [
+        r"Remove-Item ..\..\x",
+        r"$p='C:\x'; Remove-Item $p",
+        r"Remove-Item -Recurse $env:NIEMA\x",
+    ] {
+        let out = h.sh(cmd).await;
+        assert!(
+            matches!(
+                out.status,
+                ToolStatus::Denied {
+                    reason: DenialReason::ApprovalTimeout { .. }
+                }
+            ),
+            "{cmd}: {out:?}"
+        );
+    }
+    assert!(h.exec.runs().is_empty());
+}
+
 #[tokio::test]
 async fn egress_needs_approval_and_is_not_run_without_it() {
     let h = harness(&[]);

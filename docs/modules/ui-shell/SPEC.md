@@ -95,7 +95,7 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
 - **Moduły za komendami (po F1):** `turns_send` idzie przez Router (kapsuła aktywności „Odpowiada X · model
   (lokalnie/przez API)" + wpis osi czasu „Router → …"); `models_local_list/download/cancel` + zdarzenie
   `LocalModelProgress` (karta modelu lokalnego w kroku kluczy wprowadzenia); `transfer_*` z natywnymi
-  dialogami i `transfer_export_secrets` (Ustawienia → Przenoszenie, tylko jawnie, z hasłem);
+  dialogami (bez eksportu sekretów — `transfer_export_secrets` usunięte, CX-a 2026-10-04);
   `permissions_request_level` zwraca `applied` (obniżenie — od razu) albo `opened_broker` (podniesienie —
   tylko przez okno Brokera; bez Broker-UI odmowa); `turns_undo_step` przyjmuje token `"<sesja>:u<krok>"`;
   `turns_read_aloud` czyta głosem agentki (bez silnika TTS — komunikat „pobierz w Ustawieniach → Głos").

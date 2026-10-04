@@ -4,6 +4,7 @@
 //! Logika aplikacji jest w `app-core`; tu tylko kleje systemowe.
 
 mod commands;
+mod kernel;
 mod pump;
 mod shell;
 mod shortcuts;
@@ -37,9 +38,13 @@ pub fn run() {
         .setup(|app| {
             let paths = AppPaths::from_env().map_err(|e| e.message)?;
             let handle = app.handle().clone();
+            // Procesy Jądra przed rdzeniem: Broker poza procesem (usługa / tryb przenośny),
+            // watchdog z kill-switchem; release bez izolowanego Brokera — bezpieczny stan.
+            let (broker, kernel_processes) = kernel::start();
             let options = AppOptions {
                 app_version: app.package_info().version.to_string(),
                 shell: Some(std::sync::Arc::new(shell::TauriShell::new(handle.clone()))),
+                kernel: broker,
                 ..AppOptions::default()
             };
             let core = tauri::async_runtime::block_on(AppCore::build(paths.clone(), options))
@@ -49,6 +54,8 @@ pub fn run() {
             windows::create_all(&handle)?;
             tray::build(&handle)?;
             shortcuts::register(&handle, &core);
+            kernel::watch(&handle, &core, &kernel_processes);
+            app.manage(kernel_processes);
             pump::spawn(handle.clone(), core);
             shell::handle_args(&handle, std::env::args().collect());
             Ok(())

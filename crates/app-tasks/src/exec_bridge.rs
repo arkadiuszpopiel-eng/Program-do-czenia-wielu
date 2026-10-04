@@ -1,6 +1,6 @@
 //! Zadanie dla mostu CLI („Delta, zleć to Claude Code"): `agent-backends` z pochodzeniem zadania
-//! (`TaskOrigin::launch_origin` — wyzwalacz i Ulepszacz zawsze odmowa, harmonogram tylko ze
-//! zgodą per trasa), praca w kopii katalogu roboczego sesji, zdarzenia → Replay oznaczony
+//! (`TaskOrigin::launch_origin` — tylko żądanie użytkownika; wyzwalacz, harmonogram i Ulepszacz
+//! zawsze odmowa), praca w kopii katalogu roboczego sesji, zdarzenia → Replay oznaczony
 //! „niezweryfikowane przez Alfę", granica kroku na końcu każdego narzędzia (steering → `steer`).
 //! Sesja „tylko lokalnie" nigdy nie trafia do mostu (dane opuściłyby maszynę).
 

@@ -34,7 +34,12 @@ export type FakeScenario =
   | 'no-mic'
   | 'disk-low'
   /** Rdzeń odrzuca `turns_send` (np. błąd zapisu historii) — szkic nie może zginąć. */
-  | 'send-error';
+  | 'send-error'
+  /** Broker: tryb przenośny, zerwanie łącza, kill-switch bez watchdoga, Broker w procesie. */
+  | 'broker-portable'
+  | 'broker-lost'
+  | 'broker-no-watchdog'
+  | 'broker-dev';
 
 export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'default',
@@ -46,6 +51,10 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'no-mic',
   'disk-low',
   'send-error',
+  'broker-portable',
+  'broker-lost',
+  'broker-no-watchdog',
+  'broker-dev',
 ];
 
 export interface FakeOptions {

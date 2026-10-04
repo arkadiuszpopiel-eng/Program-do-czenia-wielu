@@ -197,9 +197,11 @@ impl<'a, C: WireCodec> Run<'a, C> {
         }
     }
 
+    /// Błąd w trakcie strumienia (zdarzenie dostawcy, zerwanie, limit czasu) — przez tę samą
+    /// redakcję klucza i limit długości co błędy przed strumieniem (regresja Q-7).
     fn fail(&self, err: ProviderError) -> ProviderEvent {
         let after = self.emitted || err.after_output;
-        ProviderEvent::Error(err.after_output(after))
+        ProviderEvent::Error(self.engine.scrub(err).after_output(after))
     }
 
     async fn forward(&mut self, ev: ProviderEvent) -> Forward {

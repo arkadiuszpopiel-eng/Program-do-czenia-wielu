@@ -171,6 +171,9 @@ pub enum Warning {
     },
     /// Snapshot niezaszyfrowany (brak klucza maszyny).
     SnapshotUnencrypted,
+    /// Sekcja `secrets.json` (paczka starszej wersji) pominięta — sekretów nie importuje się
+    /// z `.alfa` (CX-a).
+    SecretsSkipped,
 }
 
 /// Krok migracji (upcaster) zastosowany przy odczycie.

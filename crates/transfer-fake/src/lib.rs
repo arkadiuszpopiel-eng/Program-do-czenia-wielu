@@ -218,31 +218,6 @@ impl Transfer for FakeTransfer {
         self.write(&request.dest, request.kind, request)
     }
 
-    fn export_secrets(
-        &self,
-        dest: &Path,
-        password: &SecretString,
-    ) -> Result<ExportReport, TransferError> {
-        self.take_failure()?;
-        validate_password(password)?;
-        let mut package = MemoryPackage::default();
-        let outcome = Engine::new(&self.ports).export_secrets(&mut package, &fake_encryption())?;
-        let stored = Stored {
-            manifest: outcome.manifest.clone(),
-            package,
-            password: Some(password_hash(password)),
-        };
-        lock(&self.state)
-            .packages
-            .insert(dest.to_path_buf(), stored);
-        Ok(ExportReport {
-            path: dest.to_path_buf(),
-            file_bytes: outcome.manifest.total_bytes(),
-            manifest: outcome.manifest,
-            warnings: outcome.warnings,
-        })
-    }
-
     fn inspect(
         &self,
         package: &Path,

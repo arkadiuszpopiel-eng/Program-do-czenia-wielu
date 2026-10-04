@@ -18,6 +18,10 @@ agent-backends-impl = { path = "../agent-backends-impl" }
 mcp-contract = { path = "../mcp-contract" }
 mcp-impl = { path = "../mcp-impl" }
 compliance-contract = { path = "../compliance-contract" }
+# Serwer MCP v1: rejestr tylko do odczytu (`WinRegistry`), narzędzia GUI agentek przez Brokera.
+platform-windows-office-impl = { path = "../platform-windows-office-impl" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
 accounts-hub-contract = { path = "../accounts-hub-contract" }
 core-config-contract.workspace = true
 core-bus-contract.workspace = true
@@ -30,6 +34,11 @@ tracing.workspace = true
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+tools-uia-fake = { path = "../tools-uia-fake" }
+tools-screen-fake = { path = "../tools-screen-fake" }
+tools-input-fake = { path = "../tools-input-fake" }
 
 [lints]
 workspace = true

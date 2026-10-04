@@ -1,10 +1,10 @@
 //! Katalog roboczy sesji — zakres narzędzi agentek (`tools-fs`, `tools-shell`). Wybór wyłącznie
 //! przez właściciela w UI (natywny dialog albo katalog sesji); bez katalogu agentki odpowiadają bez
-//! narzędzi. Katalogi danych Alfy i deny-listy poświadczeń są odrzucane.
+//! narzędzi. Katalogi danych Alfy i deny-listy poświadczeń są odrzucane — także przez dowiązania
+//! (`app_modules::workdir`).
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use compliance_contract::{DenyChecker, DenyLists};
 use sessions_contract::{SessionCatalog, SessionId};
 
 use crate::core::AppCore;
@@ -19,32 +19,6 @@ impl AppCore {
             path: self.inner.store.workdir(session)?,
             default_path: meta.workdir.to_string_lossy().into_owned(),
         })
-    }
-
-    /// Sprawdza katalog wybrany na zakres narzędzi.
-    fn check_workdir(&self, path: &Path) -> Result<String, AppError> {
-        if !path.is_absolute() || !path.is_dir() {
-            return Err(AppError::invalid(format!(
-                "„{}” nie jest istniejącym katalogiem.",
-                path.display()
-            )));
-        }
-        let paths = &self.inner.paths;
-        let internal = [&paths.local, &paths.config]
-            .iter()
-            .any(|dir| path.starts_with(dir) || dir.starts_with(path));
-        let text = path.to_string_lossy().into_owned();
-        let (_, env) = app_modules::broker::path_env_for(&paths.user_root);
-        let deny = DenyChecker::new(DenyLists::baseline(), &env);
-        if internal
-            || deny.is_denied_path(&text, &env)
-            || tools_common_contract::paths::has_credential_segment(&text)
-        {
-            return Err(AppError::forbidden(format!(
-                "„{text}” zawiera dane Alfy albo poświadczenia — wybierz inny katalog roboczy."
-            )));
-        }
-        Ok(text)
     }
 
     /// `sessions_workdir`.
@@ -84,7 +58,7 @@ impl AppCore {
             }
         };
         let path = match &picked {
-            Some(dir) => Some(self.check_workdir(dir)?),
+            Some(dir) => Some(app_modules::workdir::check_workdir(dir, &self.inner.paths)?),
             None => None,
         };
         self.inner.store.set_workdir(&id, path.as_deref())?;

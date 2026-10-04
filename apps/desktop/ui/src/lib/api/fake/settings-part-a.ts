@@ -247,6 +247,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     ),
   ]),
   page('skills', L('Umiejętności', 'Skills'), 1, [], { custom: 'skills' }),
+  page('plugins', L('Wtyczki', 'Plugins'), 1, [], { custom: 'plugins' }),
   page('builder', L('Kreator agentek', 'Agent builder'), 1, [], { custom: 'builder' }),
   page('triggers', L('Zadania w tle i wyzwalacze', 'Background tasks and triggers'), 1, [], {
     custom: 'triggers',

@@ -44,10 +44,13 @@ impl AccountsHubService {
             .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))
     }
 
-    /// Zapisuje zmienione konto, utrwala metadane i publikuje zmianę stanu.
+    /// Utrwala zmienione konto (pamięć zmieniana dopiero po udanym zapisie) i publikuje zmianę
+    /// stanu.
     async fn commit(&self, acc: Account, from: &AccountState) -> Result<(), AccountsError> {
-        self.accounts_write().insert(acc.id.clone(), acc.clone());
-        self.persist()?;
+        self.update_accounts(|accounts| {
+            accounts.insert(acc.id.clone(), acc.clone());
+            Ok(())
+        })?;
         self.publish_state(&acc, from).await;
         Ok(())
     }
@@ -127,7 +130,14 @@ impl AccountsHub for AccountsHubService {
         let payload = serde_json::json!({
             "account": acc.id, "provider": acc.provider, "label": acc.label, "source": acc.source,
         });
-        self.commit(acc, &AccountState::Unconfigured).await?;
+        let secret = acc.secret.clone();
+        if let Err(e) = self.commit(acc, &AccountState::Unconfigured).await {
+            // Konto nie powstało — klucz nie może zostać osierocony w magazynie.
+            if entry.auth == AuthKind::ApiKey {
+                let _ = self.secrets.delete(&secret);
+            }
+            return Err(e);
+        }
         self.publish(EVENT_KEY_ADDED, Level::Info, payload).await;
         Ok(id)
     }
@@ -190,12 +200,16 @@ impl AccountsHub for AccountsHubService {
     }
 
     async fn remove(&self, id: &AccountId) -> Result<(), AccountsError> {
-        let acc = self
-            .accounts_write()
-            .remove(id)
-            .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))?;
+        // Najpierw klucz (błąd → nic się nie zmieniło), potem metadane; pamięć zmienia się dopiero
+        // po udanym zapisie (błąd zapisu → konto zostaje w pamięci i na dysku, bez klucza).
+        let acc = self.account_or_err(id)?;
         self.secrets.delete(&acc.secret)?;
-        self.persist()?;
+        self.update_accounts(|accounts| {
+            accounts
+                .remove(id)
+                .map(drop)
+                .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))
+        })?;
         let payload = serde_json::json!({ "account": acc.id, "provider": acc.provider });
         self.publish(EVENT_KEY_REMOVED, Level::Info, payload).await;
         Ok(())

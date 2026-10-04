@@ -22,6 +22,7 @@ pub(crate) fn is_work(id: &str) -> bool {
         .chain(app_terminal::MODULES)
         .chain(app_skills::MODULES)
         .chain(app_health::MODULES)
+        .chain(app_plugins::MODULES)
         .any(|(m, _)| *m == id)
 }
 
@@ -34,6 +35,8 @@ pub(crate) struct WorkStack {
     pub health: Arc<HealthApp>,
     /// Aktualizacje, „O programie”, restart przez launcher (`app-updates`).
     pub updates: Arc<app_updates::UpdatesApp>,
+    /// Wtyczki Wasm (`app-plugins`; te same, które dają narzędzia agentkom).
+    pub plugins: Arc<app_plugins::PluginsApp>,
 }
 
 /// Porty GUI i panel „Ekran" (przed narzędziami agentek).
@@ -73,11 +76,7 @@ pub(crate) struct WorkDepsIn<'a> {
 impl Built {
     /// Składa część i wypełnia gniazda zdrowia jej modułów.
     pub(crate) async fn work_stack(&self, d: WorkDepsIn<'_>) -> WorkStack {
-        let engine = self
-            .extra
-            .broker
-            .clone()
-            .map(|b| b as Arc<dyn safety_broker_contract::Broker>);
+        let engine = self.extra.broker.clone().map(|k| k.broker);
         let gui = Arc::new(GuiApp::new(d.monitor, engine.clone(), d.broker));
         let probe = d.options.cli_probe.clone().unwrap_or_else(|| {
             Arc::new(accounts_hub_impl::SystemCliProbe::from_env())
@@ -132,7 +131,13 @@ impl Built {
             launcher: None,
             options: updater_impl::ServiceOptions::default(),
         });
+        let plugins = d.stack.map(|s| s.tools.plugins()).unwrap_or_else(|| {
+            Arc::new(app_plugins::PluginsApp::unavailable(
+                "brak Brokera albo dziennika cofania",
+            ))
+        });
         let stack = WorkStack {
+            plugins,
             updates,
             gui,
             terminal: Arc::new(terminal),
@@ -159,6 +164,10 @@ fn fill(id: &str, slot: &HealthSlot, stack: &WorkStack, work: &app_skills::Work)
                 h.upgrade()
                     .map_or(HealthStatus::NotStarted, |h| h.health(&id))
             })
+        }
+        "plugin-runtime" => {
+            let p = stack.plugins.clone();
+            Arc::new(move || p.health())
         }
         _ => Arc::new(|| HealthStatus::Healthy),
     };

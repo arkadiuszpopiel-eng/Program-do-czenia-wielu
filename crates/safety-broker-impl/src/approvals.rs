@@ -208,7 +208,15 @@ impl BrokerEngine {
             return Err(BrokerError::ProofRejected(reason));
         }
         let payload = json!({ "approval": id, "decision": decision, "source": proof.source() });
-        self.audit(EVENT_APPROVAL_DECIDED, Some(&holder), payload)?;
+        if let Err(e) = self.audit(EVENT_APPROVAL_DECIDED, Some(&holder), payload) {
+            // Fail-closed (przegląd Q-9): odmowa właściciela obowiązuje także bez zapisu w Audycie
+            // (odmowa nigdy nie wymaga Audytu — jak kill-switch), a błąd Audytu wraca do Broker-UI.
+            // Zgoda bez zapisu nie przechodzi: prośba czeka dalej (bez tokenu).
+            if decision == ApprovalDecision::Deny {
+                self.apply_decision(&mut st, id, decision, now)?;
+            }
+            return Err(e);
+        }
         self.apply_decision(&mut st, id, decision, now)
     }
 }

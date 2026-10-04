@@ -11,6 +11,7 @@
 mod app;
 mod diag;
 mod improve;
+mod symptom;
 mod view;
 
 pub use app::{HealthApp, HealthDeps, IDLE_CYCLE_EVERY};
@@ -19,6 +20,7 @@ pub use improve::{
     LocalProposer, NoReplayRunner, SURFACE, UiDigestVerifier, evals_root, parse_candidates,
 };
 pub use improver_contract::RunConditions;
+pub use symptom::symptom_tap;
 
 /// Manifesty modułów składanych przez ten crate (identyfikator → `module.toml`).
 pub const MODULES: &[(&str, &str)] = &[

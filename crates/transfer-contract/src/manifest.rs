@@ -27,7 +27,8 @@ pub enum PackageKind {
     Export,
     /// Kopia zapasowa (zaplanowany eksport, ten sam kod).
     Backup,
-    /// Eksport sekretów — zawsze szyfrowany hasłem.
+    /// Paczka sekretów ze starszej wersji (tylko odczyt manifestu — import odmawia; nowych nie
+    /// ma, CX-a).
     Secrets,
     /// Snapshot przed importem (lokalny, do rollbacku; szyfrowany kluczem maszyny).
     Snapshot,
@@ -73,7 +74,7 @@ pub struct Counts {
     pub memory_entries: u64,
     /// Artefakty.
     pub artifacts: u64,
-    /// Sekrety (tylko paczka `secrets`).
+    /// Sekrety — zawsze 0 w nowych paczkach (pole zgodności ze starszymi; CX-a).
     pub secrets: u64,
 }
 

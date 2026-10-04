@@ -7,9 +7,9 @@ use sessions_contract::{PortableSession, SessionError, SessionId, SessionQuery, 
 use crate::docmerge::{DocFormat, format_of, merge_documents, strip_kernel_keys};
 use crate::engine::plan::Step;
 use crate::engine::sessions::merge_turns;
-use crate::engine::{Engine, ImportPlan, RollbackData, decode_secrets, read_package_session};
+use crate::engine::{Engine, ImportPlan, RollbackData, read_package_session};
 use crate::error::TransferError;
-use crate::paths::{EntryKind, ROLLBACK_PATH, SECRETS_PATH, SESSION_FILE, classify, document_path};
+use crate::paths::{EntryKind, ROLLBACK_PATH, SESSION_FILE, classify, document_path};
 use crate::ports::PackageSource;
 use crate::report::{ImportReport, ItemOutcome, ItemRef, Outcome, PlannedAction, RollbackReport};
 use crate::scope::{CancelToken, Category};
@@ -39,7 +39,8 @@ impl Engine<'_> {
                     self.apply_document(source, step, *category, name)
                 }
                 ItemRef::Session { id } => self.apply_session(source, step, id),
-                ItemRef::Secret { name } => self.apply_secret(source, name),
+                // Plan nie zawiera sekretów (CX-a); gdyby jednak — odmowa, nic nie zapisujemy.
+                ItemRef::Secret { .. } => Err(TransferError::SecretsNotAllowed),
             };
             let outcome = match result {
                 Ok(()) => {
@@ -214,29 +215,9 @@ impl Engine<'_> {
         Ok(pkg)
     }
 
-    fn apply_secret(
-        &self,
-        source: &mut dyn PackageSource,
-        name: &str,
-    ) -> Result<(), TransferError> {
-        let store = self
-            .ports()
-            .secrets
-            .as_ref()
-            .ok_or_else(|| TransferError::Unsupported {
-                category: Category::Secrets.key().to_owned(),
-            })?;
-        let bytes = zeroize::Zeroizing::new(source.read(SECRETS_PATH)?.unwrap_or_default());
-        let secrets = decode_secrets(&bytes)?;
-        let value = secrets.get(name).ok_or_else(|| TransferError::NotFound {
-            what: format!("sekret {name}"),
-        })?;
-        let name = SecretName::new(name).map_err(|e| TransferError::invalid(SECRETS_PATH, e))?;
-        store.put(&name, value)?;
-        Ok(())
-    }
-
     /// Rollback: przywraca elementy ze snapshotu (w całości) i usuwa elementy utworzone przez import.
+    /// Sekcja sekretów ze snapshotów starszej wersji jest pomijana (sekretów nie zapisuje się
+    /// z plików `.alfa` — CX-a).
     pub fn rollback(
         &self,
         snapshot: &mut dyn PackageSource,
@@ -262,15 +243,6 @@ impl Engine<'_> {
                 EntryKind::SessionFile { id, file } if file == SESSION_FILE => {
                     let r = self.restore_session(snapshot, &id);
                     (ItemRef::Session { id }, r)
-                }
-                EntryKind::Secrets => {
-                    let r = self.restore_secrets(snapshot);
-                    (
-                        ItemRef::Secret {
-                            name: "*".to_owned(),
-                        },
-                        r,
-                    )
                 }
                 _ => continue,
             };
@@ -316,23 +288,6 @@ impl Engine<'_> {
             sessions.delete_session(id)?;
         }
         sessions.adopt_session(session)?;
-        Ok(())
-    }
-
-    fn restore_secrets(&self, snapshot: &mut dyn PackageSource) -> Result<(), TransferError> {
-        let store = self
-            .ports()
-            .secrets
-            .as_ref()
-            .ok_or_else(|| TransferError::Unsupported {
-                category: Category::Secrets.key().to_owned(),
-            })?;
-        let bytes = zeroize::Zeroizing::new(snapshot.read(SECRETS_PATH)?.unwrap_or_default());
-        for (name, value) in decode_secrets(&bytes)? {
-            let name =
-                SecretName::new(name).map_err(|e| TransferError::invalid(SECRETS_PATH, e))?;
-            store.put(&name, &value)?;
-        }
         Ok(())
     }
 }

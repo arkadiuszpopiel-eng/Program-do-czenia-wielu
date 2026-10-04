@@ -17,8 +17,8 @@ dziennika Audytu, którego nie da się po cichu poprawić.
 | L4 Maks                     | Nie pyta o nic poza twardymi blokadami i potwierdzeniem destrukcji zleconej głosem.                                                                                             |
 
 **Ustawienia → Uprawnienia i bezpieczeństwo**: wybierz poziom i zakres zmiany (globalnie albo tylko ta sesja).
-**Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie Brokera — w tej wersji okno Brokera
-jest **jeszcze niedostępne**, więc podniesienie kończy się odmową. Agentka nigdy nie podniesie poziomu sama.
+**Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie Brokera (gdy okna nie ma — patrz
+niżej — kończy się odmową). Agentka nigdy nie podniesie poziomu sama.
 
 ## Czego nie da się zrobić na żadnym poziomie (także L4)
 
@@ -39,13 +39,21 @@ którego programy (także agentki) nie potrafią „kliknąć” za Ciebie: `Ent
 albo kliknięcie), `Esc` oznacza odmowę. W rozmowie widzisz kartę „czeka na zatwierdzenie” z opisem: co, dlaczego,
 czy da się cofnąć, poziom ryzyka.
 
-**Stan tej wersji:** okno Brokera jest gotowe jako osobny program, ale aplikacja jeszcze go nie uruchamia. Karta
-w rozmowie wyjaśnia to wprost, a prośba po czasie (najwyżej 60 s) kończy się odmową — agentka szuka wtedy innej drogi.
+Przycisk na karcie tylko przenosi Cię do okna Brokera — zatwierdzasz zawsze tam. Okno Brokera uruchamia sam Broker.
+Stan Brokera widzisz w **Ustawienia → Uprawnienia i bezpieczeństwo**:
+
+- **Usługa Brokera** (osobne konto Windows) — pełna izolacja: okna Brokera nie „kliknie” żaden zwykły program.
+  Usługę instaluje raz administrator komputera (jednorazowe potwierdzenie UAC) wg instrukcji wydania.
+- **Tryb przenośny** — Broker działa jako proces Alfy na Twoim koncie. Wszystko działa tak samo, ale izolacja jest
+  słabsza (Audyt i okno Brokera bez ochrony osobnego konta) — Alfa oznacza to wprost.
+- **Połączenie zerwane / brak Brokera** — czerwony baner w rozmowie. To **bezpieczny stan**: wszystko, co wymaga zgody,
+  jest odrzucane, a karta w rozmowie mówi, że prośba zostanie odrzucona. Alfa sama ponawia połączenie.
 
 ## STOP WSZYSTKIEGO (kill-switch)
 
-`Ctrl+Shift+F12` — działa w całym systemie, także gdy okno Alfy jest ukryte. To samo robi „STOP WSZYSTKIEGO”
-w zasobniku i komenda głosowa „stop wszystko”. W ułamku sekundy:
+`Ctrl+Shift+F12` — działa w całym systemie, także gdy okno Alfy jest ukryte albo nie odpowiada: skrót obsługuje
+osobny proces **watchdog**, nie okno aplikacji. Gdy watchdog nie działa, skrót przejmuje awaryjnie Alfa i pokazuje
+to na banerze. To samo robi „STOP WSZYSTKIEGO” w zasobniku i komenda głosowa „stop wszystko”. W ułamku sekundy:
 
 - milknie mowa, zatrzymują się odpowiedzi i pobieranie modeli,
 - zatrzymują się zadania agentek, a uruchomione przez nie programy zostają zamknięte,

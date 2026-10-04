@@ -164,7 +164,7 @@ pub struct TriggerAction {
     /// Klasa (najwyżej `Agent` — wyzwalacz nie jest żądaniem użytkownika).
     #[serde(default = "background")]
     pub class: TaskClass,
-    /// Wykonawca (most CLI tylko w harmonogramie z `allow_bridges`).
+    /// Wykonawca (most CLI — nigdy z wyzwalacza).
     #[serde(default)]
     pub executor: ExecutorKind,
     /// Zasoby wyłączne.
@@ -289,8 +289,9 @@ pub struct TriggerSpec {
     /// Zaległe uruchomienia.
     #[serde(default)]
     pub misfire: MisfirePolicy,
-    /// Harmonogram dopuszczony do mostów CLI — tylko użytkownik, tylko czasowy, z limitem
-    /// dziennym (zgodę per trasa i limit sprawdza jeszcze `agent-backends`).
+    /// Dawna zgoda harmonogramu na mosty CLI — tylko dla zgodności odczytu zapisanych wyzwalaczy;
+    /// `true` jest odrzucane przy tworzeniu/zmianie (AGENTS.md: mostów nie uruchamia się
+    /// z harmonogramu; CX-d).
     #[serde(default)]
     pub allow_bridges: bool,
     /// Włączony.

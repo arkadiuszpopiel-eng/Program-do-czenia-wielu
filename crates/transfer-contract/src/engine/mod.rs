@@ -8,8 +8,6 @@ mod export;
 mod plan;
 pub mod sessions;
 
-use std::collections::BTreeMap;
-
 use accounts_hub_contract::{SecretName, SecretString};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -38,20 +36,6 @@ pub struct RollbackData {
     pub created: Vec<ItemRef>,
     /// Elementy zapisane w snapshocie (rollback je przywraca).
     pub saved: Vec<ItemRef>,
-}
-
-/// Wpis `secrets.json` (wartość zerowana przy zwolnieniu).
-#[derive(Serialize, Deserialize)]
-pub(crate) struct SecretRecord {
-    pub name: String,
-    pub value: String,
-}
-
-impl Drop for SecretRecord {
-    fn drop(&mut self) {
-        use zeroize::Zeroize;
-        self.value.zeroize();
-    }
 }
 
 /// Silnik nad portami.
@@ -86,7 +70,8 @@ impl<'a> Engine<'a> {
         }))
     }
 
-    /// Wszystkie sekrety magazynu poza własnymi (`transfer/…`).
+    /// Wszystkie sekrety magazynu poza własnymi (`transfer/…`) — tylko jako wzorce dla strażnika
+    /// zwykłych paczek (wartości nigdy nie trafiają do paczki).
     pub(crate) fn read_secrets(&self) -> Result<Vec<(SecretName, SecretString)>, TransferError> {
         let Some(store) = &self.ports.secrets else {
             return Ok(Vec::new());
@@ -102,24 +87,6 @@ impl<'a> Engine<'a> {
         }
         Ok(out)
     }
-}
-
-/// Dekoduje `secrets.json` (wartości opakowane w `SecretString`).
-pub(crate) fn decode_secrets(
-    bytes: &[u8],
-) -> Result<BTreeMap<String, SecretString>, TransferError> {
-    let mut records: Vec<SecretRecord> = serde_json::from_slice(bytes)
-        .map_err(|_| TransferError::invalid(crate::paths::SECRETS_PATH, "zły format"))?;
-    let mut out = BTreeMap::new();
-    for r in &mut records {
-        SecretName::new(r.name.clone())
-            .map_err(|e| TransferError::invalid(crate::paths::SECRETS_PATH, e))?;
-        out.insert(
-            r.name.clone(),
-            SecretString::new(std::mem::take(&mut r.value)),
-        );
-    }
-    Ok(out)
 }
 
 /// Odczytuje sesję z paczki (nagłówek + tury, z migracją).

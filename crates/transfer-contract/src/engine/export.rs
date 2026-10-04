@@ -1,12 +1,12 @@
-//! Eksport: dokumenty kategorii, sesje (format przenośny), sekrety (tylko paczka `secrets`),
-//! snapshot przed importem. Strażnik sekretów dla zwykłych paczek (`export`, `backup`).
+//! Eksport: dokumenty kategorii, sesje (format przenośny), snapshot przed importem. Strażnik
+//! sekretów dla zwykłych paczek (`export`, `backup`). Sekretów nie eksportuje się nigdy (CX-a).
 
 use std::collections::BTreeSet;
 
 use accounts_hub_contract::SecretString;
 use sessions_contract::{PrivacyTag, SessionId, SessionQuery};
 
-use crate::engine::{Engine, ImportPlan, RollbackData, SecretRecord};
+use crate::engine::{Engine, ImportPlan, RollbackData};
 use crate::error::TransferError;
 use crate::guard::SecretGuard;
 use crate::manifest::{
@@ -14,8 +14,7 @@ use crate::manifest::{
     schema_version,
 };
 use crate::paths::{
-    ROLLBACK_PATH, SECRETS_PATH, SESSION_FILE, TURNS_FILE, document_path, session_path,
-    validate_entry_path,
+    ROLLBACK_PATH, SESSION_FILE, TURNS_FILE, document_path, session_path, validate_entry_path,
 };
 use crate::portable::encode_session;
 use crate::ports::PackageSink;
@@ -29,7 +28,7 @@ pub struct ExportSpec<'a> {
     pub kind: PackageKind,
     /// Zakres.
     pub scope: &'a ExportScope,
-    /// Szyfrowanie paczki (wymagane dla sesji prywatnych i sekretów).
+    /// Szyfrowanie paczki (wymagane dla sesji prywatnych).
     pub encryption: Option<&'a EncryptionInfo>,
     /// Opis.
     pub notes: Option<&'a str>,
@@ -55,7 +54,7 @@ struct Writer<'s> {
     keys: BTreeSet<&'static str>,
     warnings: Vec<Warning>,
     redactions: u64,
-    /// Zerowanie buforów po zapisie (paczki z sekretami: `secrets`, `snapshot`).
+    /// Zerowanie buforów po zapisie (snapshot — może zawierać sesje prywatne).
     zeroize: bool,
 }
 
@@ -289,32 +288,8 @@ impl Engine<'_> {
         Ok(out)
     }
 
-    /// Eksport sekretów (paczka `secrets`; kontener wymusza szyfrowanie hasłem).
-    pub fn export_secrets(
-        &self,
-        sink: &mut dyn PackageSink,
-        encryption: &EncryptionInfo,
-    ) -> Result<ExportOutcome, TransferError> {
-        let mut w = self.writer(sink, PackageKind::Secrets);
-        let secrets = self.read_secrets()?;
-        let records: Vec<SecretRecord> = secrets
-            .iter()
-            .map(|(n, v)| SecretRecord {
-                name: n.as_str().to_owned(),
-                value: v.expose_secret().to_owned(),
-            })
-            .collect();
-        let bytes =
-            serde_json::to_vec(&records).map_err(|e| TransferError::invalid(SECRETS_PATH, e))?;
-        drop(records);
-        w.add(SECRETS_PATH, bytes)?;
-        w.scope.counts.secrets = secrets.len() as u64;
-        w.keys.insert(Category::Secrets.key());
-        Ok(self.finish(w, PackageKind::Secrets, None, Some(encryption)))
-    }
-
     /// Snapshot elementów, które import zmieni (stan sprzed importu) + `rollback.json`.
-    /// Sekrety trafiają do snapshotu tylko, gdy `secrets_allowed` (snapshot szyfrowany).
+    /// Sekretów import nie zmienia, więc snapshot ich nie zawiera (CX-a).
     pub fn snapshot(
         &self,
         plan: &ImportPlan,
@@ -326,7 +301,6 @@ impl Engine<'_> {
             v: 1,
             ..RollbackData::default()
         };
-        let mut secrets = Vec::new();
         for step in plan.steps() {
             if !step.action.writes() {
                 continue;
@@ -352,34 +326,9 @@ impl Engine<'_> {
                     }
                     None => data.created.push(step.target.clone()),
                 },
-                ItemRef::Secret { name } => {
-                    let current = self
-                        .read_secrets()?
-                        .into_iter()
-                        .find(|(n, _)| n.as_str() == name);
-                    match current {
-                        Some((n, v)) => {
-                            secrets.push(SecretRecord {
-                                name: n.as_str().to_owned(),
-                                value: v.expose_secret().to_owned(),
-                            });
-                            data.saved.push(step.target.clone());
-                        }
-                        None => data.created.push(step.target.clone()),
-                    }
-                }
+                // Plan nigdy nie zawiera sekretów (CX-a) — nic do zapisania.
+                ItemRef::Secret { .. } => {}
             }
-        }
-        if !secrets.is_empty() {
-            if encryption.is_none() {
-                return Err(TransferError::EncryptionRequired {
-                    what: "snapshot sekretów".to_owned(),
-                });
-            }
-            let bytes = serde_json::to_vec(&secrets)
-                .map_err(|e| TransferError::invalid(SECRETS_PATH, e))?;
-            drop(secrets);
-            w.add(SECRETS_PATH, bytes)?;
         }
         let rollback = serde_json::to_vec_pretty(&data)
             .map_err(|e| TransferError::invalid(ROLLBACK_PATH, e))?;

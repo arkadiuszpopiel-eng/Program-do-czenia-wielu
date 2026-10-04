@@ -5,6 +5,8 @@
 //!
 //! Skróty globalne (PTT `WH_KEYBOARD_LL`, przełącznik) obsługuje powłoka i przekazuje komendami
 //! `voice_ptt` / `voice_set_mic_enabled` — `voice-wake` dostaje port skrótów bez rejestracji.
+//! Automat aktywacji ma zawsze skonfigurowane słowa wywoławcze (z person); czy nasłuch działa,
+//! decyduje uzbrojenie (`features::wake` — tylko po jawnym włączeniu). Składniki F5: `system_f5.rs`.
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -17,6 +19,7 @@ use model_residency_contract::Residency;
 use personas_contract::builtin_personas;
 use platform_contract::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, PlatformError};
 use scheduler_lite_contract::SchedulerLite;
+use sessions_contract::KeyVault;
 use voice_audio_contract::{AudioIo, StreamConfig};
 use voice_cmd_contract::{Grammar, GrammarRecognizer};
 use voice_dsp_contract::DspCfg;
@@ -28,9 +31,11 @@ use voice_tts_contract::Tts;
 use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector};
 use voice_vad_contract::VadCfg;
 use voice_vad_impl::{HashPolicy, SileroModel, SileroVad};
+use voice_wake_contract::{Wake, WakeCfg, WakeWordCfg};
 use voice_wake_impl::WakeService;
 
 use crate::engine::{IntervalPacer, VoiceEngine, VoiceEngineFactory};
+use crate::features::FeatureFactory;
 
 /// Brak sidecara STT.
 pub const MISSING_STT_SIDECAR: &str = "whisper-server";
@@ -56,34 +61,53 @@ impl HotkeyPort for ShellHotkeys {
 
 /// Fabryka produkcyjna.
 pub struct SystemVoice {
-    paths: AppPaths,
-    audio: Arc<dyn AudioIo>,
-    tts: Option<Arc<dyn Tts>>,
-    scheduler: Arc<dyn SchedulerLite>,
+    pub(crate) paths: AppPaths,
+    pub(crate) audio: Arc<dyn AudioIo>,
+    pub(crate) tts: Option<Arc<dyn Tts>>,
+    pub(crate) scheduler: Arc<dyn SchedulerLite>,
     residency: Option<Arc<dyn Residency>>,
+    pub(crate) vault: Option<Arc<dyn KeyVault>>,
+    pub(crate) clock: MonotonicClock,
 }
 
-fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
+pub(crate) fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
     PipelineError::Component {
         component: component.to_owned(),
         reason: e.to_string(),
     }
 }
 
-/// Pierwszy model GGML w katalogu (nazwy rosnąco — deterministycznie).
-fn ggml_model(dir: &Path) -> Option<PathBuf> {
+/// Pierwszy plik w katalogu spełniający warunek (nazwy rosnąco — deterministycznie).
+pub(crate) fn first_file(dir: &Path, pick: impl Fn(&str) -> bool) -> Option<PathBuf> {
     let mut found: Vec<PathBuf> = std::fs::read_dir(dir)
         .ok()?
         .filter_map(|e| e.ok().map(|e| e.path()))
-        .filter(|p| {
-            p.extension().is_some_and(|x| x == "bin")
-                && p.file_name()
-                    .and_then(|n| n.to_str())
-                    .is_some_and(|n| n.starts_with("ggml-"))
-        })
+        .filter(|p| p.is_file() && p.file_name().and_then(|n| n.to_str()).is_some_and(&pick))
         .collect();
     found.sort();
     found.into_iter().next()
+}
+
+/// Pierwszy model GGML w katalogu.
+fn ggml_model(dir: &Path) -> Option<PathBuf> {
+    first_file(dir, |n| n.starts_with("ggml-") && n.ends_with(".bin"))
+}
+
+/// Automat aktywacji: bez skrótów (obsługuje je powłoka), ze słowami wywoławczymi z person
+/// (wykrycia przychodzą tylko z uzbrojonego nasłuchu).
+fn wake_service() -> Result<WakeService, PipelineError> {
+    let mut wake = WakeService::new(Arc::new(ShellHotkeys), builtin_personas(), None);
+    wake.configure(WakeCfg {
+        ptt_key: None,
+        toggle_key: None,
+        name_addressing: true,
+        wake_words: Some(WakeWordCfg::from_personas(
+            &builtin_personas(),
+            crate::features::wake::DEFAULT_THRESHOLD,
+        )),
+    })
+    .map_err(|e| component("wake", e))?;
+    Ok(wake)
 }
 
 impl SystemVoice {
@@ -101,7 +125,17 @@ impl SystemVoice {
             tts,
             scheduler,
             residency,
+            vault: None,
+            clock: MonotonicClock::new(),
         }
+    }
+
+    /// Sejf kluczy (Credential Manager) — klucz profilu głosu właściciela (bez sejfu
+    /// rozpoznawanie głosu jest niedostępne).
+    #[must_use]
+    pub fn with_vault(mut self, vault: Arc<dyn KeyVault>) -> Self {
+        self.vault = Some(vault);
+        self
     }
 
     fn whisper_server(&self) -> PathBuf {
@@ -112,7 +146,30 @@ impl SystemVoice {
         ggml_model(&self.paths.models().join("whisper"))
     }
 
-    fn vad(&self) -> Result<SileroVad, PipelineError> {
+    /// STT z sidecara `whisper-server` (rozmowa i dyktowanie).
+    pub(crate) fn whisper(&self) -> Result<WhisperStt, PipelineError> {
+        let model = self
+            .whisper_model()
+            .ok_or_else(|| component("stt", MISSING_STT_MODEL))?;
+        let binaries = SidecarBinaries {
+            vulkan: None,
+            cuda: None,
+            cpu: self.whisper_server(),
+        };
+        let mut stt = WhisperStt::new(
+            WhisperServerConfig::new(binaries, model),
+            Arc::new(ProcessLauncher),
+            Backend::Cpu,
+        )
+        .map_err(|e| component("stt", e))?;
+        if let Some(r) = &self.residency {
+            stt = stt.with_residency(r.clone());
+        }
+        Ok(stt)
+    }
+
+    /// VAD Silero (bez modelu — detektor energii).
+    pub(crate) fn vad(&self) -> Result<SileroVad, PipelineError> {
         let path = self.paths.models().join("silero").join("silero_vad.onnx");
         let model = if path.is_file() {
             match SileroModel::load(&path, HashPolicy::KnownOnly) {
@@ -154,23 +211,7 @@ impl VoiceEngineFactory for SystemVoice {
             .tts
             .clone()
             .ok_or_else(|| component("tts", MISSING_TTS))?;
-        let model = self
-            .whisper_model()
-            .ok_or_else(|| component("stt", MISSING_STT_MODEL))?;
-        let binaries = SidecarBinaries {
-            vulkan: None,
-            cuda: None,
-            cpu: self.whisper_server(),
-        };
-        let mut stt = WhisperStt::new(
-            WhisperServerConfig::new(binaries, model),
-            Arc::new(ProcessLauncher),
-            Backend::Cpu,
-        )
-        .map_err(|e| component("stt", e))?;
-        if let Some(r) = &self.residency {
-            stt = stt.with_residency(r.clone());
-        }
+        let stt = self.whisper()?;
         let output = self
             .audio
             .open_output(None, &StreamConfig::output_default())
@@ -186,11 +227,7 @@ impl VoiceEngineFactory for SystemVoice {
             turn: Box::new(PatienceTurnDetector::new(HeuristicTurnModel)),
             commands: Arc::new(GrammarRecognizer::new(Grammar::default_pl_en())),
             dialog: Box::new(voice_dialog_contract::default_machine()),
-            wake: Box::new(WakeService::new(
-                Arc::new(ShellHotkeys),
-                builtin_personas(),
-                None,
-            )),
+            wake: Box::new(wake_service()?),
             persona: Arc::new(voice_persona_impl::PersonaService::new()),
             tts,
             reply,
@@ -204,5 +241,9 @@ impl VoiceEngineFactory for SystemVoice {
             pipeline: Box::new(pipeline),
             pacer: Box::new(IntervalPacer::new(tick)),
         })
+    }
+
+    fn features(&self) -> Option<&dyn FeatureFactory> {
+        Some(self)
     }
 }

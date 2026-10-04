@@ -1402,5 +1402,263 @@
       "error": null,
       "restart_blocked": null
     }
+  },
+  {
+    "type": "VoiceFeaturesChanged",
+    "features": {
+      "wake": {
+        "state": "armed",
+        "reason": null,
+        "enabled": false,
+        "risk_accepted": false,
+        "owner_gate": true,
+        "dnd": false,
+        "phrases": [
+          "Hej Alfa",
+          "Hej Beta",
+          "Hej Gama",
+          "Hej Delta"
+        ],
+        "calibration": {
+          "measured": false,
+          "sufficient": false,
+          "passes": false,
+          "far_per_day": null,
+          "frr": null,
+          "threshold": 0.8
+        },
+        "test": {
+          "active": true,
+          "detections": 0,
+          "last_agent": null,
+          "owner_rejected": 0
+        }
+      },
+      "speaker": {
+        "state": "not_enrolled",
+        "reason": null,
+        "done": 0,
+        "needed": 3,
+        "recording": false,
+        "prompts": [
+          {
+            "pl": "Hej Alfa, sprawdź proszę, jaka jutro będzie pogoda w Krakowie.",
+            "en": "Hey Alfa, please check what the weather will be like in Kraków tomorrow."
+          },
+          {
+            "pl": "Przypomnij mi w czwartek o spotkaniu z zespołem o dziewiątej.",
+            "en": "Remind me on Thursday about the team meeting at nine."
+          },
+          {
+            "pl": "Otwórz ostatni raport i przeczytaj mi pierwszy akapit.",
+            "en": "Open the latest report and read me the first paragraph."
+          }
+        ],
+        "last_sample": null,
+        "required_for_risky": true,
+        "last_check": null
+      },
+      "dictation": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "typed_chars": 0,
+        "pending_chars": 0,
+        "can_undo": false,
+        "preview": null,
+        "shortcut": "Ctrl+Alt+D",
+        "profiles": []
+      },
+      "read": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "index": 0,
+        "segments": 0,
+        "rate": 1,
+        "queued": 0,
+        "agent": "alfa",
+        "shortcut": "Ctrl+Alt+R"
+      },
+      "s2s": {
+        "available": false,
+        "reason": {
+          "pl": "Szybka rozmowa w chmurze wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu.",
+          "en": "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation."
+        }
+      }
+    }
+  },
+  {
+    "type": "VoiceFeaturesChanged",
+    "features": {
+      "wake": {
+        "state": "armed",
+        "reason": null,
+        "enabled": false,
+        "risk_accepted": false,
+        "owner_gate": true,
+        "dnd": false,
+        "phrases": [
+          "Hej Alfa",
+          "Hej Beta",
+          "Hej Gama",
+          "Hej Delta"
+        ],
+        "calibration": {
+          "measured": false,
+          "sufficient": false,
+          "passes": false,
+          "far_per_day": null,
+          "frr": null,
+          "threshold": 0.8
+        },
+        "test": {
+          "active": true,
+          "detections": 0,
+          "last_agent": null,
+          "owner_rejected": 1
+        }
+      },
+      "speaker": {
+        "state": "not_enrolled",
+        "reason": null,
+        "done": 0,
+        "needed": 3,
+        "recording": false,
+        "prompts": [
+          {
+            "pl": "Hej Alfa, sprawdź proszę, jaka jutro będzie pogoda w Krakowie.",
+            "en": "Hey Alfa, please check what the weather will be like in Kraków tomorrow."
+          },
+          {
+            "pl": "Przypomnij mi w czwartek o spotkaniu z zespołem o dziewiątej.",
+            "en": "Remind me on Thursday about the team meeting at nine."
+          },
+          {
+            "pl": "Otwórz ostatni raport i przeczytaj mi pierwszy akapit.",
+            "en": "Open the latest report and read me the first paragraph."
+          }
+        ],
+        "last_sample": null,
+        "required_for_risky": true,
+        "last_check": null
+      },
+      "dictation": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "typed_chars": 0,
+        "pending_chars": 0,
+        "can_undo": false,
+        "preview": null,
+        "shortcut": "Ctrl+Alt+D",
+        "profiles": []
+      },
+      "read": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "index": 0,
+        "segments": 0,
+        "rate": 1,
+        "queued": 0,
+        "agent": "alfa",
+        "shortcut": "Ctrl+Alt+R"
+      },
+      "s2s": {
+        "available": false,
+        "reason": {
+          "pl": "Szybka rozmowa w chmurze wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu.",
+          "en": "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation."
+        }
+      }
+    }
+  },
+  {
+    "type": "VoiceFeaturesChanged",
+    "features": {
+      "wake": {
+        "state": "off",
+        "reason": null,
+        "enabled": false,
+        "risk_accepted": false,
+        "owner_gate": true,
+        "dnd": false,
+        "phrases": [
+          "Hej Alfa",
+          "Hej Beta",
+          "Hej Gama",
+          "Hej Delta"
+        ],
+        "calibration": {
+          "measured": false,
+          "sufficient": false,
+          "passes": false,
+          "far_per_day": null,
+          "frr": null,
+          "threshold": 0.8
+        },
+        "test": {
+          "active": false,
+          "detections": 0,
+          "last_agent": null,
+          "owner_rejected": 1
+        }
+      },
+      "speaker": {
+        "state": "not_enrolled",
+        "reason": null,
+        "done": 0,
+        "needed": 3,
+        "recording": false,
+        "prompts": [
+          {
+            "pl": "Hej Alfa, sprawdź proszę, jaka jutro będzie pogoda w Krakowie.",
+            "en": "Hey Alfa, please check what the weather will be like in Kraków tomorrow."
+          },
+          {
+            "pl": "Przypomnij mi w czwartek o spotkaniu z zespołem o dziewiątej.",
+            "en": "Remind me on Thursday about the team meeting at nine."
+          },
+          {
+            "pl": "Otwórz ostatni raport i przeczytaj mi pierwszy akapit.",
+            "en": "Open the latest report and read me the first paragraph."
+          }
+        ],
+        "last_sample": null,
+        "required_for_risky": true,
+        "last_check": null
+      },
+      "dictation": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "typed_chars": 0,
+        "pending_chars": 0,
+        "can_undo": false,
+        "preview": null,
+        "shortcut": "Ctrl+Alt+D",
+        "profiles": []
+      },
+      "read": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "index": 0,
+        "segments": 0,
+        "rate": 1,
+        "queued": 0,
+        "agent": "alfa",
+        "shortcut": "Ctrl+Alt+R"
+      },
+      "s2s": {
+        "available": false,
+        "reason": {
+          "pl": "Szybka rozmowa w chmurze wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu.",
+          "en": "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation."
+        }
+      }
+    }
   }
 ]

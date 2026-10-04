@@ -2,7 +2,12 @@
   "$schema": "https://schema.tauri.app/config/2",
   "mainBinaryName": "alfa",
   "bundle": {
-    "externalBin": ["binaries/alfa-launcher"],
+    "externalBin": [
+      "binaries/alfa-launcher",
+      "binaries/alfa-broker",
+      "binaries/alfa-broker-ui",
+      "binaries/alfa-watchdog"
+    ],
     "windows": {
       "nsis": {
         "installerHooks": "windows/hooks.nsh"

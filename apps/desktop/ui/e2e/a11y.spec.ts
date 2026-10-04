@@ -41,6 +41,8 @@ for (const theme of ['light', 'dark'] as const) {
     test('ustawienia: ogólne, dostawcy + kreator, import/eksport, uprawnienia, skróty', async ({
       page,
     }) => {
+      // 9 przebiegów axe (~27 s bez obciążenia) — limit ×3, żeby nie flakował przy równoległych testach.
+      test.slow();
       await openApp(page, { theme });
       await waitForChat(page);
       await page.keyboard.press('Control+,');

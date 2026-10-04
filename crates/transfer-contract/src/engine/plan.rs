@@ -6,10 +6,10 @@ use sessions_contract::{PrivacyTag, SessionId};
 
 use crate::docmerge::{DocFormat, format_of, strip_kernel_keys};
 use crate::engine::sessions::diff_sessions;
-use crate::engine::{Engine, decode_secrets, read_package_session};
+use crate::engine::{Engine, read_package_session};
 use crate::error::TransferError;
 use crate::manifest::{PackageKind, sha256_hex};
-use crate::paths::{EntryKind, SECRETS_PATH, SESSION_FILE, TURNS_FILE, classify};
+use crate::paths::{EntryKind, SESSION_FILE, TURNS_FILE, classify};
 use crate::ports::PackageSource;
 use crate::report::{DryRunReport, ItemDiff, ItemRef, ItemState, PlannedAction, Warning};
 use crate::scope::{CancelToken, Category, CollisionResolution, ImportMode, ImportOptions};
@@ -77,7 +77,8 @@ impl Engine<'_> {
         options: &ImportOptions,
     ) -> Result<ImportPlan, TransferError> {
         let manifest = source.manifest().clone();
-        if manifest.kind == PackageKind::Secrets && !options.allow_secrets {
+        // Paczka sekretów ze starszej wersji — czytelna odmowa (sekrety tylko w Credential Manager).
+        if manifest.kind == PackageKind::Secrets {
             return Err(TransferError::SecretsNotAllowed);
         }
         let mut plan = ImportPlan {
@@ -99,7 +100,12 @@ impl Engine<'_> {
                     self.plan_session(source, options, &mut plan, &id, entry.bytes + bytes)?;
                 }
                 EntryKind::SessionFile { file, .. } if file == TURNS_FILE => {}
-                EntryKind::Secrets => self.plan_secrets(source, options, &mut plan)?,
+                // Sekcja sekretów w zwykłej paczce (starsza wersja / spreparowana) — pominięta.
+                EntryKind::Secrets => {
+                    if !plan.report.warnings.contains(&Warning::SecretsSkipped) {
+                        plan.report.warnings.push(Warning::SecretsSkipped);
+                    }
+                }
                 EntryKind::Rollback if manifest.kind == PackageKind::Snapshot => {}
                 _ => plan.report.warnings.push(Warning::UnknownEntry {
                     path: entry.path.clone(),
@@ -348,44 +354,6 @@ impl Engine<'_> {
         );
         if let Some(last) = plan.steps.last_mut() {
             last.fast_forward = diff.fast_forward;
-        }
-        Ok(())
-    }
-
-    fn plan_secrets(
-        &self,
-        source: &mut dyn PackageSource,
-        options: &ImportOptions,
-        plan: &mut ImportPlan,
-    ) -> Result<(), TransferError> {
-        let bytes = zeroize::Zeroizing::new(source.read(SECRETS_PATH)?.unwrap_or_default());
-        let secrets = decode_secrets(&bytes)?;
-        let local = self.read_secrets()?;
-        let mode = options.modes.mode_for(Category::Secrets);
-        for (name, value) in secrets {
-            let item = ItemRef::Secret { name: name.clone() };
-            let (state, action) = match local.iter().find(|(n, _)| n.as_str() == name) {
-                None => (ItemState::New, PlannedAction::Add),
-                Some((_, v)) if v.ct_eq(&value) => (ItemState::Same, PlannedAction::Keep),
-                Some(_) => (
-                    ItemState::Changed,
-                    match mode {
-                        ImportMode::Add => skip("istnieje lokalnie (tryb „dodaj”)"),
-                        ImportMode::Merge | ImportMode::Replace => PlannedAction::Replace,
-                    },
-                ),
-            };
-            push(
-                plan,
-                item.clone(),
-                ItemDiff {
-                    item,
-                    state,
-                    action,
-                    bytes: 0,
-                    detail: None,
-                },
-            );
         }
         Ok(())
     }

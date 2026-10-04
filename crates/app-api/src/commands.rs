@@ -68,13 +68,13 @@ macro_rules! with_commands {
             accounts_set_limit(account_id: String, enabled: bool, monthly: $crate::dto::Money) -> ();
             accounts_remove(account_id: String) -> ();
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
-            transfer_export_secrets(password: $crate::dto::SecretInput) -> $crate::dto::ExportResult;
             transfer_inspect(password: Option<$crate::dto::SecretInput>, path: Option<String>) -> $crate::dto::InspectResult;
             transfer_import(request: $crate::dto::ImportRequest) -> $crate::dto::ImportResult;
             transfer_rollback(snapshot_id: String) -> ();
             permissions_get(session_id: Option<String>) -> $crate::dto::PermissionsState;
             permissions_request_level(level: $crate::dto::AutonomyLevel, session_id: Option<String>) -> $crate::dto::BrokerIntentResult;
             permissions_open_approval(approval_id: String) -> $crate::dto::BrokerIntentResult;
+            broker_status() -> $crate::dto::BrokerStatusView;
             models_local_list() -> Vec<$crate::dto::LocalModelInfo>;
             models_local_download(model_id: Option<String>) -> ();
             models_local_cancel(model_id: Option<String>) -> ();
@@ -89,6 +89,11 @@ macro_rules! with_commands {
             voice_status() -> $crate::dto::VoiceStatus;
             voice_ptt(pressed: bool) -> ();
             voice_preview(agent: String) -> ();
+            voice_features() -> $crate::dto::VoiceFeatures;
+            voice_wake(action: $crate::dto::WakeAction) -> $crate::dto::VoiceFeatures;
+            voice_speaker(action: $crate::dto::SpeakerAction) -> $crate::dto::VoiceFeatures;
+            voice_dictation(action: $crate::dto::DictationAction) -> $crate::dto::VoiceFeatures;
+            voice_read(action: $crate::dto::ReadAction) -> $crate::dto::VoiceFeatures;
             system_status() -> $crate::dto::SystemStatus;
             system_retry_queue() -> ();
             quick_ask(text: String) -> $crate::dto::QuickAskResult;
@@ -179,6 +184,14 @@ macro_rules! with_commands {
             updates_about() -> $crate::dto::AboutInfo;
             updates_whats_new() -> Option<$crate::dto::WhatsNew>;
             updates_dismiss_whats_new() -> ();
+            plugins_list() -> $crate::dto::PluginsView;
+            plugins_inspect(wasm_b64: String) -> $crate::dto::PluginInspection;
+            plugins_propose(manifest: serde_json::Value, wasm_b64: String) -> $crate::dto::PluginInfo;
+            plugins_approve(plugin_id: String, version: String, reviewed_hash: String) -> $crate::dto::PluginInfo;
+            plugins_reject(plugin_id: String, version: String) -> $crate::dto::PluginInfo;
+            plugins_disable(plugin_id: String) -> $crate::dto::PluginInfo;
+            plugins_enable(plugin_id: String, reviewed_hash: String) -> $crate::dto::PluginInfo;
+            plugins_remove(plugin_id: String) -> $crate::dto::PluginsView;
         }
     };
 }
@@ -204,6 +217,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 171);
+        assert_eq!(super::COMMANDS.len(), 184);
     }
 }

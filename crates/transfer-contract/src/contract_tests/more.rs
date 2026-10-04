@@ -1,4 +1,4 @@
-//! Przypadki: test szpiegowski sekretów, szyfrowanie, eksport sekretów, sesje prywatne,
+//! Przypadki: test szpiegowski sekretów, szyfrowanie, brak eksportu sekretów, sesje prywatne,
 //! polityki Jądra i nakładka maszyny, kopie z rotacją, błędy zakresu, anulowanie.
 
 use std::borrow::Cow;
@@ -85,33 +85,28 @@ pub fn encrypted_package(h: &dyn Harness) {
     assert_eq!(inspection.report.writes(), 0);
 }
 
-/// Eksport sekretów: osobny, zawsze szyfrowany; import tylko za jawną zgodą.
-pub fn secrets_export(h: &dyn Harness) {
+/// CX-a: sekrety nigdy nie opuszczają magazynu — paczki rodzaju `secrets` nie da się utworzyć
+/// (także z hasłem), a pełny eksport szyfrowany nie ma sekcji ani licznika sekretów.
+pub fn secrets_never_leave_the_store(h: &dyn Harness) {
     seed(h, false);
     let pkg = h.path("sekrety.alfa");
-    assert!(matches!(
-        h.transfer()
-            .export_secrets(&pkg, &SecretString::from("krótkie")),
-        Err(TransferError::WeakPassword { .. })
-    ));
-    let report = ok(h.transfer().export_secrets(&pkg, &pwd()));
-    assert_eq!(report.manifest.kind, PackageKind::Secrets);
-    assert_eq!(report.manifest.scope.counts.secrets, 2);
-    let name = ok(SecretName::new("accounts/acc-2"));
-    ok(h.secrets().delete(&name));
-    let mut opts = ImportOptions {
-        password: Some(pwd()),
-        ..ImportOptions::default()
-    };
-    assert_eq!(
-        h.transfer().import(&pkg, &opts).err(),
-        Some(TransferError::SecretsNotAllowed)
+    let mut req = ExportRequest::new(full_scope(), &pkg);
+    req.kind = PackageKind::Secrets;
+    req.password = Some(pwd());
+    assert!(h.transfer().export(&req).is_err(), "paczka sekretów");
+    req.kind = PackageKind::Export;
+    let report = ok(h.transfer().export(&req));
+    assert_eq!(report.manifest.scope.counts.secrets, 0);
+    assert!(!report.manifest.scope.keys.iter().any(|k| k == "secrets"));
+    assert!(
+        report
+            .manifest
+            .content
+            .iter()
+            .all(|e| e.path != crate::paths::SECRETS_PATH)
     );
-    opts.allow_secrets = true;
-    let imported = ok(h.transfer().import(&pkg, &opts));
-    assert_eq!((imported.added, imported.failed), (1, 0));
-    let back = ok(h.secrets().get(&name)).map(|v| v.expose_secret().to_owned());
-    assert_eq!(back.as_deref(), Some(SECRET_PLAIN));
+    let name = ok(SecretName::new("accounts/acc-2"));
+    assert!(ok(h.secrets().get(&name)).is_some(), "magazyn nietknięty");
 }
 
 /// Sesje prywatne: pomijane bez jawnego wyboru; z wyborem — tylko w paczce szyfrowanej.

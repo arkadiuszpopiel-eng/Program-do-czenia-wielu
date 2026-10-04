@@ -34,7 +34,7 @@ impl<A: ApprovalChannel + ?Sized> BrokerLink for ChannelLink<A> {
     fn resolve(&mut self, d: UiDecision) -> Result<(), UiError> {
         self.runtime
             .block_on(self.channel.resolve(d.id, d.decision, d.proof))
-            .map_err(|e| UiError::Link(e.to_string()))
+            .map_err(|e| UiError::Rejected(e.to_string()))
     }
 }
 
@@ -80,7 +80,7 @@ impl PipeLink {
 
     fn call(&mut self, req: Request) -> Result<Response, UiError> {
         match self.client.call(req) {
-            Ok(Response::Error(e)) => Err(UiError::Link(e.to_string())),
+            Ok(Response::Error(e)) => Err(UiError::Rejected(e.to_string())),
             Ok(r) => Ok(r),
             Err(e) => Err(UiError::Link(e.to_string())),
         }

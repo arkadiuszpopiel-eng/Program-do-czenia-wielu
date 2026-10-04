@@ -20,6 +20,7 @@ mod voice_chat;
 // Kontrakt IPC (DTO, błędy, zdarzenia, porty) — crate `app-api`, pod dawnymi ścieżkami.
 use app_api::error;
 pub use app_api::{dto, events, ids, notify, ports, protocol};
+pub use app_broker;
 
 pub use crate::core::AppCore;
 pub use app_agents::eval;

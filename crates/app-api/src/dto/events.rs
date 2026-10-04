@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::agents::{AgentRun, ReplayStep, VoiceStatus};
+use super::broker::BrokerStatusView;
 use super::common::LocalizedText;
 use super::gui::GuiStatus;
 use super::health::HealthOverall;
@@ -15,6 +16,7 @@ use super::sessions::{
 use super::system::{SystemStatus, VoicePillState};
 use super::tasks::{MarshalReport, TaskInfo, TriggerRunInfo};
 use super::updates::UpdatesView;
+use super::voice_features::VoiceFeatures;
 
 /// Powód zakończenia strumienia.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -183,5 +185,14 @@ pub enum AlfaEvent {
     /// Stan aktualizacji: sprawdzanie, pobieranie (postęp), gotowa do restartu, błąd.
     UpdateStatus {
         status: UpdatesView,
+    },
+    /// Stan Brokera zmieniony (połączono, tryb przenośny, zerwanie — bezpieczny stan, watchdog).
+    BrokerStatus {
+        status: BrokerStatusView,
+    },
+    /// Głos rozszerzony F5 (słowa wywoławcze, weryfikacja właściciela, dyktowanie, czytanie):
+    /// zmiana stanu — panel Głos i Ustawienia → Głos (bez audio i bez czytanego tekstu).
+    VoiceFeaturesChanged {
+        features: Box<VoiceFeatures>,
     },
 }

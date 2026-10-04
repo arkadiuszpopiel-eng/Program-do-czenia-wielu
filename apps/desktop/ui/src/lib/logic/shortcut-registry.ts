@@ -72,6 +72,9 @@ export const SHORTCUTS: readonly ShortcutDef[] = [
   }),
   global('system.quickAsk', ['Ctrl+Alt+Space'], true),
   global('system.killSwitch', ['Ctrl+Shift+F12'], false),
+  // F5: rejestruje powłoka (shortcuts.rs) — D i R nie są literami polskimi (reguła AltGr).
+  global('voice.dictation', ['Ctrl+Alt+D'], false),
+  global('voice.readSelection', ['Ctrl+Alt+R'], false),
 ];
 
 /** Akcje obsługiwane przez composer lokalnie — nie trafiają do globalnej mapy klawiszy okna. */

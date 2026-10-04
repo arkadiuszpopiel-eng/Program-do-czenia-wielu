@@ -32,6 +32,18 @@ fn fail(kind: ToolErrorKind, text: String) -> Box<ToolOutcome> {
     Box::new(ToolOutcome::failed(kind, text))
 }
 
+/// Cel ścieżki z polecenia względem `cwd`: zmienne rozwinięte, `..` zwinięte, wieloznacznik
+/// w ostatnim segmencie → jego katalog. `None` = celu nie da się ustalić (nieznana zmienna,
+/// wieloznacznik wyżej, `..` ponad korzeń) — wtedy usuwanie jest nieodwracalne (Q-8).
+fn target_path(raw: &str, cwd: &str, env: &compliance_contract::PathEnv) -> Option<String> {
+    let trimmed = raw.trim_end_matches(['/', '\\']);
+    let dir = match trimmed.rsplit_once(['/', '\\']) {
+        Some((parent, last)) if last.contains(['*', '?']) => parent,
+        _ => trimmed,
+    };
+    paths::resolve_path_dots(dir, Some(cwd), env).ok()
+}
+
 impl Core {
     async fn deny(
         &self,
@@ -91,8 +103,10 @@ impl Core {
             )
         })?;
         let mut outside = Vec::new();
+        let mut unresolved = false;
         for raw in &a.paths {
-            let Ok(resolved) = paths::resolve_path(raw, Some(cwd), &self.env) else {
+            let Some(resolved) = target_path(raw, cwd, &self.env) else {
+                unresolved = true;
                 continue;
             };
             if self.denied(&resolved) {
@@ -112,7 +126,12 @@ impl Core {
             }
         }
         let mut facts = base_facts(m, ctx);
-        facts.destructive = a.destructiveness(outside.is_empty());
+        facts.destructive = a.destructiveness(outside.is_empty() && !unresolved);
+        if a.deletes && (a.opaque_targets || unresolved) {
+            // Cel usuwania nieustalony: najgorszy przypadek — trwałe i masowe (zgoda do L3).
+            facts.reversible = Reversibility::No;
+            facts.bulk = u32::MAX;
+        }
         facts.install = a.install;
         facts.command = Some(command.to_owned());
         let mut caps = vec![(Capability::ShellExec(cwd_scope), facts.clone())];

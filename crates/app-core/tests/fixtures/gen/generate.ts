@@ -9,7 +9,10 @@ import {
 } from '../../../../../apps/desktop/ui/src/lib/api/fake/fake-client';
 import type { AlfaEvent } from '../../../../../apps/desktop/ui/src/lib/api/types-system';
 import { runComputer } from './generate-computer';
+import { runPlugins } from './generate-plugins';
+import { runBroker } from './generate-broker';
 import { runUpdates } from './generate-updates';
+import { runVoice } from './generate-voice';
 import { runWork } from './generate-work';
 import { invocations } from './tauri-mock';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -172,7 +175,6 @@ async function run(): Promise<void> {
     },
     password: null,
   });
-  await both('transfer', 'exportSecrets', 'długie hasło sekretów');
   await both('transfer', 'inspect', null, 'C:\\Users\\Ty\\Pobrane\\laptop-encrypted.alfa');
   await both('transfer', 'inspect', 'hasło', null);
   await both('transfer', 'importPackage', {
@@ -251,6 +253,9 @@ async function run(): Promise<void> {
   await runWork(both, scheduler, flush);
   await runComputer(both, scheduler, flush);
   await runUpdates(both, scheduler, flush);
+  await runBroker(both);
+  await runPlugins(both);
+  await runVoice(both, scheduler, flush);
 }
 
 function sampleEvents(all: readonly AlfaEvent[]): AlfaEvent[] {

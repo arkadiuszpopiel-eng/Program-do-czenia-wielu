@@ -1,9 +1,11 @@
 <!-- Stany systemowe (PLAN §14.4, makieta 18): offline + kolejka, 429, brak kluczy, mikrofon, dysk,
-     przygotowana aktualizacja („Uruchom ponownie, aby zaktualizować"). -->
+     przygotowana aktualizacja („Uruchom ponownie, aby zaktualizować"), stan Brokera (bezpieczny
+     stan po zerwaniu, kill-switch bez watchdoga). -->
 <script lang="ts">
   import { Banner, Button } from '@alfa/ui-kit';
   import { now } from '../../state/clock.svelte';
   import UpdateBanner from '../shell/UpdateBanner.svelte';
+  import BrokerBanner from '../shell/BrokerBanner.svelte';
   import { useApp } from '../../state/context';
 
   const app = useApp();
@@ -20,6 +22,11 @@
   );
 </script>
 
+{#if app.broker.banner}
+  <div class="banners" role="region" aria-label={t('broker.region')}>
+    <BrokerBanner />
+  </div>
+{/if}
 {#if app.updates.showBanner}
   <div class="banners" role="region" aria-label={t('updates.title')}>
     <UpdateBanner />

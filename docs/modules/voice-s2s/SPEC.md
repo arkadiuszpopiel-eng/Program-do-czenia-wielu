@@ -65,3 +65,6 @@ Przełącznik „Szybka rozmowa (chmura)” w panelu Głos z ostrzeżeniem o wys
 - Transport: WebSocket (serwer) vs WebRTC (niższe opóźnienie, AEC przeglądarki niedostępne w Tauri) — spike w adapterze.
 - Narzędzia (function calling) w sesji S2S — wymagają tej samej ścieżki Brokera co czat; poza v0.
 - Gemini Live: zachowanie przy przerwaniu (czy usuwa nieusłyszany tekst) — do sprawdzenia; dziś `AppendNote`.
+
+## Implementacja w aplikacji (F5, `app-voice`)
+- Bez adaptera chmurowego: `voice_features` zwraca `s2s.available = false` z powodem „wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu”; panel Głos pokazuje kartę „Szybka rozmowa (chmura) — Wymaga klucza” (w sesji prywatnej nigdy się nie łączy).

@@ -73,9 +73,12 @@ impl Core {
         }
     }
 
-    /// Czy ścieżka jest na deny-liście (Jądra albo poświadczeń platformy).
+    /// Czy ścieżka jest na deny-liście (Jądra albo poświadczeń platformy) — także po rozwiązaniu
+    /// dowiązań, przy każdym wywołaniu (symlink/junction w katalogu roboczym; Q-1).
     pub(crate) fn denied(&self, path: &str) -> bool {
-        self.deny.is_denied_path(path, &self.env) || paths::has_credential_segment(path)
+        paths::protected_with_links(path, |p| {
+            self.deny.is_denied_path(p, &self.env) || paths::has_credential_segment(p)
+        })
     }
 
     /// Ścieżka od modelu → ścieżka sprawdzona (postać, deny-lista — bez pytania Brokera).

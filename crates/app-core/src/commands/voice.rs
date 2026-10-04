@@ -5,7 +5,9 @@ use device_profile_contract::AudioDirection;
 use personas_contract::Personas;
 
 use crate::core::AppCore;
-use crate::dto::{AudioDevice, VoiceStatus};
+use crate::dto::{
+    AudioDevice, DictationAction, ReadAction, SpeakerAction, VoiceFeatures, VoiceStatus, WakeAction,
+};
 use crate::error::AppError;
 
 impl AppCore {
@@ -88,4 +90,30 @@ impl AppCore {
         }
         self.inner.voice.preview(&agent).await
     }
+}
+
+/// Komendy głosu rozszerzonego F5 ⟶ `VoicePort` (`app-voice`): akcja → stan funkcji.
+macro_rules! voice_f5 {
+    ($( $name:ident ( $ty:ty ) = $method:ident ; )*) => {
+        impl AppCore {
+            $(
+                #[doc = concat!("`", stringify!($name), "` (COMMANDS.md) — głos rozszerzony F5.")]
+                pub async fn $name(&self, action: $ty) -> Result<VoiceFeatures, AppError> {
+                    self.inner.voice.$method(action).await
+                }
+            )*
+
+            /// `voice_features`: słowa wywoławcze, weryfikacja głosu, dyktowanie, czytanie, S2S.
+            pub async fn voice_features(&self) -> Result<VoiceFeatures, AppError> {
+                Ok(self.inner.voice.features().await)
+            }
+        }
+    };
+}
+
+voice_f5! {
+    voice_wake(WakeAction) = wake;
+    voice_speaker(SpeakerAction) = speaker;
+    voice_dictation(DictationAction) = dictation;
+    voice_read(ReadAction) = read;
 }

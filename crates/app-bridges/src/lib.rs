@@ -5,7 +5,8 @@
 //!   harmonogram per trasa, „Zaloguj w terminalu" (logowanie wyłącznie przez użytkownika);
 //! - [`BridgeHandle`] — `AgentBackend` nad `agent-backends-impl` przebudowywanym po zmianie
 //!   ustawień (zadania trafiają do instancji, która je przyjęła);
-//! - [`LazyMcpHost`] — serwer MCP Alfy v0 uruchamiany na żądanie mostu;
+//! - [`LazyMcpHost`] — serwer MCP Alfy v0 + v1 ([`mcp_v1`]: UIA, zrzuty, rejestr przez Brokera)
+//!   uruchamiany na żądanie mostu;
 //! - [`parse_delegation`] — „Delta, zleć to Claude Code" w czacie.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -26,7 +27,7 @@ use async_trait::async_trait;
 
 pub use app::{BridgesApp, BridgesParts, DETECT_TTL, MAX_SCHEDULE_PER_DAY};
 pub use delegate::parse_delegation;
-pub use mcp::{LazyMcpHost, proxy_program};
+pub use mcp::{LazyMcpHost, mcp_v1, proxy_program};
 
 /// Manifesty modułów składanych przez ten crate (rejestr `core-registry` w `app-core`).
 pub const MODULES: &[(&str, &str)] = &[

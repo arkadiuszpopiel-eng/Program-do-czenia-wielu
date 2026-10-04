@@ -26,6 +26,9 @@ import { modelsApi } from './api-models';
 import { FakeBuilder, FakeSkills } from './api-skills';
 import { FakeTasks } from './api-tasks';
 import { FakeUpdates } from './api-updates';
+import { FakeBrokerStatus } from './api-broker';
+import { FakeVoiceFeatures } from './api-voice-features';
+import { FakePlugins } from './api-plugins';
 import { FakeCore, type FakeOptions } from './core';
 
 export { FAKE_SCENARIOS, type FakeScenario, type FakeOptions } from './core';
@@ -64,6 +67,9 @@ export class FakeAlfaClient implements AlfaClient {
   readonly builder: AlfaClient['builder'];
   readonly health: AlfaClient['health'];
   readonly updates: AlfaClient['updates'];
+  readonly broker: AlfaClient['broker'];
+  readonly voiceFeatures: AlfaClient['voiceFeatures'];
+  readonly plugins: AlfaClient['plugins'];
 
   constructor(options: FakeOptions = {}) {
     this.core = new FakeCore(options);
@@ -80,7 +86,9 @@ export class FakeAlfaClient implements AlfaClient {
     this.files = filesApi(core);
     this.accounts = accountsApi(core);
     this.transfer = transferApi(core);
-    this.permissions = permissionsApi(core);
+    const broker = new FakeBrokerStatus(core);
+    this.broker = broker.api();
+    this.permissions = broker.guard(permissionsApi(core));
     this.models = modelsApi(core);
     this.device = deviceApi(core);
     this.voice = voiceApi(core);
@@ -98,6 +106,8 @@ export class FakeAlfaClient implements AlfaClient {
     this.builder = new FakeBuilder(core).api();
     this.health = new FakeHealth(core).api();
     this.updates = new FakeUpdates(core).api();
+    this.voiceFeatures = new FakeVoiceFeatures(core).api();
+    this.plugins = new FakePlugins(core).api();
   }
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

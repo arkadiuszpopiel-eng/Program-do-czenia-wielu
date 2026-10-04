@@ -1,7 +1,7 @@
 //! Błędy i walidacja wyzwalaczy. Twarda reguła zgodności (PLAN §1.3 pkt 4, subscription-routes
-//! §2.4): wyzwalacz nigdy nie celuje w most CLI; jedyny wyjątek to **harmonogram czasowy
-//! użytkownika** z jawnym `allow_bridges` i limitem dziennym (zgodę per trasa i limit sprawdza
-//! jeszcze `agent-backends`).
+//! §2.4, AGENTS.md „Czego nie wolno”): wyzwalacz — także harmonogram czasowy użytkownika — nigdy
+//! nie celuje w most CLI; `allow_bridges` jest odrzucane (pole zostaje tylko dla zgodności odczytu
+//! zapisanych wyzwalaczy; CX-d).
 
 use scheduler_contract::{Assignee, ExecutorKind, Resource, TaskClass};
 use schemars::JsonSchema;
@@ -27,8 +27,6 @@ pub const LOG_PER_TRIGGER: usize = 100;
 pub const LOG_TOTAL: usize = 1_000;
 /// Doba (ms).
 pub const DAY_MS: u64 = 86_400_000;
-/// Najwięcej uruchomień mostu na dobę w harmonogramie z `allow_bridges`.
-pub const MAX_BRIDGE_FIRES_PER_DAY: u32 = 24;
 
 /// Błąd operacji na wyzwalaczach.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, Serialize, Deserialize, JsonSchema)]
@@ -45,7 +43,7 @@ pub enum TriggerError {
     /// Most CLI z wyzwalacza — zabronione.
     #[error("wyzwalacz {0} nie może uruchamiać mostu CLI")]
     BridgeForbidden(TriggerId),
-    /// Brak uprawnień do operacji (właściciel, `allow_bridges`).
+    /// Brak uprawnień do operacji (właściciel).
     #[error("brak uprawnień: {0}")]
     Forbidden(String),
     /// Identyfikator zajęty.
@@ -92,7 +90,7 @@ pub fn validate(spec: &TriggerSpec, actor: &Actor, now_ms: u64) -> Result<(), Tr
     }
     validate_kind(spec, now_ms)?;
     validate_action(spec)?;
-    validate_bridges(spec, actor)?;
+    validate_bridges(spec)?;
     let r = &spec.rate;
     if r.max_fires == 0 || r.max_fires > 1_000 || r.per_ms < 60_000 || r.per_ms > 7 * DAY_MS {
         return Err(invalid(spec, "limit częstości poza zakresem"));
@@ -160,28 +158,10 @@ fn validate_action(spec: &TriggerSpec) -> Result<(), TriggerError> {
     Ok(())
 }
 
-fn validate_bridges(spec: &TriggerSpec, actor: &Actor) -> Result<(), TriggerError> {
-    let bridge = matches!(spec.action.executor, ExecutorKind::Bridge(_));
-    if !spec.allow_bridges {
-        return if bridge {
-            Err(TriggerError::BridgeForbidden(spec.id.clone()))
-        } else {
-            Ok(())
-        };
-    }
-    if actor != &Actor::User || spec.owner != Actor::User {
-        return Err(TriggerError::Forbidden(
-            "mosty w harmonogramie może dopuścić tylko użytkownik".into(),
-        ));
-    }
-    if !spec.kind.is_time() {
+/// Most CLI z wyzwalacza — zawsze odmowa, bez wyjątku dla harmonogramu (CX-d).
+fn validate_bridges(spec: &TriggerSpec) -> Result<(), TriggerError> {
+    if spec.allow_bridges || matches!(spec.action.executor, ExecutorKind::Bridge(_)) {
         return Err(TriggerError::BridgeForbidden(spec.id.clone()));
-    }
-    if spec.rate.per_ms < DAY_MS || spec.rate.max_fires > MAX_BRIDGE_FIRES_PER_DAY {
-        return Err(invalid(
-            spec,
-            "harmonogram mostu wymaga limitu dziennego (≤ 24 na dobę)",
-        ));
     }
     Ok(())
 }

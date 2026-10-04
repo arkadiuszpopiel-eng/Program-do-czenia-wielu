@@ -44,6 +44,13 @@ struct Entry {
     steer: mpsc::UnboundedSender<String>,
 }
 
+/// Zakres serwera MCP Alfy dla zadania mostu: narzędzia Windows v1 (v0 + UIA, zrzut, rejestr
+/// tylko do odczytu — przez Brokera) w imieniu sesji rozmowy, z której zlecono zadanie (taint
+/// i zgody tej sesji).
+pub fn mcp_scope(task: &TaskId, spec: &TaskSpec) -> BridgeScope {
+    BridgeScope::windows_v1(task.0.clone()).with_session(spec.alfa_session.as_str())
+}
+
 /// Backend mostów CLI.
 pub struct BridgeBackend {
     config: Arc<BridgeConfig>,
@@ -206,7 +213,7 @@ impl AgentBackend for BridgeBackend {
             let reg = match self
                 .deps
                 .mcp
-                .register(BridgeScope::windows_v0(task.0.clone()), Some(router))
+                .register(mcp_scope(&task, &spec), Some(router))
                 .await
             {
                 Ok(r) => r,

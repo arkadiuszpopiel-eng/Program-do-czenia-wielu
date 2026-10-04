@@ -57,3 +57,9 @@ Karta delegowanego zadania (plan, kroki, wyjście, koszt), karta „czeka na zat
 - Claude: `--include-partial-messages`, `--strict-mcp-config`, kolejkowanie wiadomości stream-json w trakcie tury; czy `mcp__alfa__approve` dodać do `--disallowedTools` (model nie powinien wołać go sam).
 - Codex: nazwy metod/pól app-servera v2, `sandbox`/`approvalPolicy` w `thread/start`, natywne `turn/steer`; MCP Alfy dla Codex (`-c mcp_servers…`).
 - Przypięte wersje i hashe (`cli_pinned_version` w rejestrze) — wynik spike'u.
+
+## Uwaga po recenzji PR #1 (2026-10-04, CX-d — zmiana w `scheduler`/`triggers`, nie w tym module)
+- Scheduler nie wytwarza już `LaunchOrigin::Scheduled` (`TaskOrigin::Schedule` → `Trigger`), a wyzwalacze nie mogą
+  celować w most — ścieżka „harmonogram ze zgodą dzienną” jest martwa w aplikacji. `check_origin` dla `Scheduled`
+  zostaje (kontrakt), ale propozycja do decyzji człowieka/właścicielki mostów: odrzucać `Scheduled` zawsze i usunąć
+  `[agent_backends.launch.scheduled]` oraz przełącznik „Zgoda na uruchamianie z harmonogramu” w kartach mostów (UI).

@@ -105,17 +105,12 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'tr.scope.config_machine': 'This machine’s overlay',
   'tr.f7': 'from wave 7',
   'tr.secrets':
-    'API keys and secrets never go into a regular export. A separate, encrypted secrets export will come later.',
+    'API keys and secrets never go into a package — they stay in this machine’s Windows Credential Manager. On a new machine add the keys again in Settings → Accounts.',
   'tr.encrypt': 'Encrypt the package with a password',
   'tr.password': 'Password',
   'tr.passwordRepeat': 'Repeat password',
   'tr.passwordMismatch': 'Passwords do not match.',
   'tr.exportButton': 'Export…',
-  'tr.secrets.title': 'Export secrets',
-  'tr.secrets.desc':
-    'API keys never go into a regular export. Here you can explicitly save them to a separate package — always encrypted with a password.',
-  'tr.secrets.button': 'Export secrets',
-  'tr.secrets.saved': 'Secrets saved (encrypted): {path}',
   'tr.exported': 'Saved {path} · {files} · {size}',
   'tr.files': { one: '{n} file', other: '{n} files' },
   'tr.importIntro':

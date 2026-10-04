@@ -19,6 +19,7 @@
   import MarshalPage from './pages/MarshalPage.svelte';
   import MemoryPage from './pages/MemoryPage.svelte';
   import PermissionsPage from './pages/PermissionsPage.svelte';
+  import PluginsPage from './pages/PluginsPage.svelte';
   import ProvidersPage from './pages/ProvidersPage.svelte';
   import ShortcutsPage from './pages/ShortcutsPage.svelte';
   import SkillsPage from './pages/SkillsPage.svelte';
@@ -151,6 +152,7 @@
         {:else if page.custom === 'health'}<HealthPage />
         {:else if page.custom === 'updates'}<UpdatesPage />
         {:else if page.custom === 'about'}<AboutPage />
+        {:else if page.custom === 'plugins'}<PluginsPage />
         {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />

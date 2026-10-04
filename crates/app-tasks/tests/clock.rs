@@ -133,10 +133,7 @@ async fn cron_trigger_fires_at_eight_warsaw_on_virtual_clock() {
     assert_eq!(seen.len(), 1, "{seen:?}");
     assert_eq!(seen[0].0, "Poranek");
     assert!(
-        matches!(
-            seen[0].1,
-            TaskOrigin::Trigger { .. } | TaskOrigin::Schedule { .. }
-        ),
+        matches!(seen[0].1, TaskOrigin::Trigger { .. }),
         "{:?}",
         seen[0].1
     );
@@ -160,7 +157,7 @@ async fn cron_trigger_fires_at_eight_warsaw_on_virtual_clock() {
     let next_ms = u64::try_from(next_ms).unwrap();
     assert_eq!(after.next_fire_at, Some(map::iso_ms(next_ms)));
 
-    // Most CLI: tylko harmonogram użytkownika — zdarzenie i ręczny wyzwalacz są odrzucane.
+    // Most CLI: nigdy z wyzwalacza — zdarzenie, ręczny i harmonogram użytkownika (CX-d).
     let file = TriggerKindView::FileInDir {
         dir: "C:\\Pobrane".into(),
         pattern: None,
@@ -178,6 +175,6 @@ async fn cron_trigger_fires_at_eight_warsaw_on_virtual_clock() {
     };
     assert!(
         app.trigger_create(&draft("Noc", nightly, Some("claude_code")))
-            .is_ok()
+            .is_err()
     );
 }

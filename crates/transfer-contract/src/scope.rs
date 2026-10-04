@@ -39,7 +39,7 @@ pub enum Category {
     Artifacts,
     /// Logi — domyślnie nie eksportowane.
     Logs,
-    /// Sekrety (wyłącznie paczka `secrets`).
+    /// Sekrety — nigdy w paczce (kategoria zostaje dla odczytu starszych rekordów; CX-a).
     Secrets,
 }
 
@@ -273,8 +273,6 @@ pub struct ImportOptions {
     pub resolutions: BTreeMap<SessionId, CollisionResolution>,
     /// Import nakładki maszyny (domyślnie nie; ostrzeżenie przy innej klasie sprzętu).
     pub include_machine_overlay: bool,
-    /// Jawna zgoda na import paczki sekretów.
-    pub allow_secrets: bool,
     /// Anulowanie.
     pub cancel: Option<CancelToken>,
 }
@@ -286,7 +284,7 @@ pub struct ExportRequest {
     pub scope: ExportScope,
     /// Plik docelowy `.alfa`.
     pub dest: PathBuf,
-    /// Rodzaj (`Export` albo `Backup`; `Secrets` — [`crate::Transfer::export_secrets`]).
+    /// Rodzaj (`Export` albo `Backup`).
     pub kind: PackageKind,
     /// Hasło — szyfruje całą paczkę.
     pub password: Option<SecretString>,

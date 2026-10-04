@@ -116,6 +116,33 @@ fn dir_store_filters_and_refuses_escapes() {
     }
 }
 
+/// Regresja Q-6: odczyt i usuwanie nie podążają za dowiązaniem (wpis ani katalog nadrzędny)
+/// poza korzeń magazynu.
+#[cfg(unix)]
+#[test]
+fn dir_store_refuses_links_on_read_and_remove() {
+    let dir = tempfile::tempdir().unwrap();
+    let outside = dir.path().join("poza");
+    std::fs::create_dir_all(&outside).unwrap();
+    std::fs::write(outside.join("tajne.toml"), b"klucz = 1\n").unwrap();
+    let root = dir.path().join("config");
+    let flat = DirDocumentStore::new(&root, DirFilter::flat(&["toml"]));
+    flat.write("shared.toml", b"a = 1\n").unwrap();
+    std::os::unix::fs::symlink(outside.join("tajne.toml"), root.join("agents.toml")).unwrap();
+    assert!(flat.read("agents.toml").is_err(), "plik-dowiązanie");
+    let tree = DirDocumentStore::new(dir.path().join("artefakty"), DirFilter::tree());
+    tree.write("s1/raport.md", b"# r").unwrap();
+    std::os::unix::fs::symlink(&outside, dir.path().join("artefakty").join("link")).unwrap();
+    assert!(tree.read("link/tajne.toml").is_err(), "katalog-dowiązanie");
+    assert!(tree.remove("link/tajne.toml").is_err());
+    assert!(
+        outside.join("tajne.toml").exists(),
+        "plik poza magazynem nietknięty"
+    );
+    assert_eq!(flat.read("shared.toml").unwrap(), Some(b"a = 1\n".to_vec()));
+    assert_eq!(tree.list().unwrap(), vec!["s1/raport.md".to_owned()]);
+}
+
 /// Test migracji v0 → v1 na syntetycznej paczce (manifest v0, nagłówek i tury v0 bez gałęzi).
 #[test]
 fn v0_package_is_migrated_on_import() {

@@ -196,6 +196,41 @@ async fn autonomy_changes_go_through_broker() {
         .unwrap();
 }
 
+/// Build produkcyjny bez izolowanego Brokera (przegląd CX-b): `AppOptions::kernel` =
+/// bezpieczny stan „brak” zamiast Brokera w procesie — każda zgoda odrzucona, stan dla UI.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn missing_isolated_broker_is_fail_closed() {
+    use app_core::app_broker::RemoteKernel;
+    use app_core::dto::{BrokerLinkState, BrokerMode};
+    let dir = tempfile::tempdir().unwrap();
+    let mut opts = options(None, Arc::new(HeadlessShell::default()));
+    opts.kernel = Some(RemoteKernel::unavailable("brak binarek Jądra"));
+    let core = AppCore::build(AppPaths::under(dir.path()), opts)
+        .await
+        .unwrap();
+    let status = core.broker_status().await.unwrap();
+    assert_eq!(status.mode, BrokerMode::Unavailable);
+    assert_eq!(status.state, BrokerLinkState::Lost);
+    assert!(!status.approval_window && !status.isolated);
+    assert!(
+        core.permissions_request_level(AutonomyLevel::L4, None)
+            .await
+            .is_err()
+    );
+    assert!(core.permissions_open_approval("1".into()).await.is_err());
+    // Bez Brokera także „bezpieczne” obniżenie nie przechodzi (Broker niedostępny).
+    assert!(
+        core.permissions_request_level(AutonomyLevel::L1, None)
+            .await
+            .is_err()
+    );
+    // W procesie (testy, build deweloperski): jawnie oznaczony tryb deweloperski.
+    let h = harness().await;
+    let dev = h.core.broker_status().await.unwrap();
+    assert_eq!(dev.mode, BrokerMode::InProcess);
+    assert!(dev.detail.unwrap().pl.contains("deweloperski"));
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn read_aloud_uses_tts_and_audio_on_fakes() {
     let dir = tempfile::tempdir().unwrap();

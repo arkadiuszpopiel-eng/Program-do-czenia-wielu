@@ -132,7 +132,6 @@ impl<B: MemoryBackend> MemoryEngine<B> {
             revived: plan.revive.iter().cloned().collect(),
             ..CascadeReport::default()
         };
-        let removed_ids: BTreeSet<&MemoryId> = plan.remove.iter().map(|r| &r.id).collect();
         let oldest: BTreeMap<&MemoryScope, DateTime<Utc>> =
             plan.remove.iter().fold(BTreeMap::new(), |mut m, r| {
                 if let Some(e) = all.iter().find(|e| e.scope == r.scope && e.id == r.id) {
@@ -179,8 +178,9 @@ impl<B: MemoryBackend> MemoryEngine<B> {
                     ops.push(StoreOp::Put(Box::new(e)));
                 }
             }
+            let removed = removed_for(plan, all, scope);
             for record in self.backend.journal(scope)? {
-                if record.refs.iter().any(|id| removed_ids.contains(id)) {
+                if record.refs.iter().any(|id| removed.contains(id)) {
                     ops.push(StoreOp::DeleteJournal(record.id));
                 }
             }
@@ -201,6 +201,27 @@ impl<B: MemoryBackend> MemoryEngine<B> {
         report.stale_exports.dedup();
         Ok(report)
     }
+}
+
+/// Identyfikatory zapomniane z punktu widzenia dziennika zakresu `scope`: usunięte w tym zakresie
+/// oraz usunięte w innych zakresach, o ile `scope` nie ma własnego wpisu o tym samym
+/// identyfikatorze (odwołania między zakresami, np. awans). Ten sam identyfikator w dwóch
+/// zakresach nie kasuje cudzych rekordów dziennika (regresja Q-3).
+fn removed_for<'a>(
+    plan: &'a CascadePlan,
+    all: &[MemoryEntry],
+    scope: &MemoryScope,
+) -> BTreeSet<&'a MemoryId> {
+    let local: BTreeSet<&MemoryId> = all
+        .iter()
+        .filter(|e| &e.scope == scope)
+        .map(|e| &e.id)
+        .collect();
+    plan.remove
+        .iter()
+        .filter(|r| &r.scope == scope || !local.contains(&r.id))
+        .map(|r| &r.id)
+        .collect()
 }
 
 fn refs<'a>(entries: impl Iterator<Item = &'a MemoryEntry>) -> BTreeSet<EntryRef> {

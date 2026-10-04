@@ -85,8 +85,13 @@ pub struct CommandAnalysis {
     pub network: bool,
     /// Hosty docelowe (z URL, UNC, `user@host`, nazw domenowych po poleceniu sieciowym).
     pub hosts: Vec<String>,
-    /// Ścieżki bezwzględne w poleceniu (po rozwinięciu nie są tu rozwijane).
+    /// Ścieżki bezwzględne i względne wychodzące w górę (`..`) — bez rozwijania zmiennych; cel
+    /// względem katalogu roboczego ustala wykonawca.
     pub paths: Vec<String>,
+    /// Polecenie usuwające z celem, którego nie da się ustalić statycznie (zmienna, splat `@x`,
+    /// potok do czasownika usuwania) — zawsze nieodwracalne (wymaga zgody).
+    #[serde(default)]
+    pub opaque_targets: bool,
     /// Któraś ścieżka wskazuje na poświadczenia (`.ssh`, `.claude`, profile przeglądarek…).
     pub credential_path: bool,
     /// Polecenie wymaga interakcji (hasło, potwierdzenie) — niedozwolone bez terminala.
@@ -94,9 +99,10 @@ pub struct CommandAnalysis {
 }
 
 impl CommandAnalysis {
-    /// Destrukcyjność dla faktów: usunięcie w zakresie snapshotu jest odzyskiwalne.
+    /// Destrukcyjność dla faktów: usunięcie w zakresie snapshotu jest odzyskiwalne; cel
+    /// nieustalony (`opaque_targets`) albo poza snapshotem — nieodwracalne.
     pub fn destructiveness(&self, all_paths_in_snapshot: bool) -> Destructiveness {
-        match (self.deletes, all_paths_in_snapshot) {
+        match (self.deletes, all_paths_in_snapshot && !self.opaque_targets) {
             (false, _) => Destructiveness::None,
             (true, true) => Destructiveness::Recoverable,
             (true, false) => Destructiveness::Permanent,
@@ -177,11 +183,31 @@ fn looks_like_domain(t: &str) -> bool {
 fn is_abs_path(t: &str) -> bool {
     let b = t.as_bytes();
     (b.len() >= 3 && b[0].is_ascii_alphabetic() && b[1] == b':' && matches!(b[2], b'\\' | b'/'))
-        || t.starts_with("\\\\")
+        || t.starts_with('\\')
         || t.starts_with('/')
         || t.starts_with('~')
         || t.starts_with('%')
         || t.to_lowercase().starts_with("$env:")
+}
+
+/// Ścieżka względna z segmentem `..` (cel może leżeć poza katalogiem roboczym).
+fn climbs_up(t: &str) -> bool {
+    t.split(['\\', '/']).any(|seg| seg == "..")
+}
+
+/// Cel usuwania nieustalony statycznie: zmienna (poza `$env:NAZWA` — tę rozwija wykonawca),
+/// splat `@x` albo czasownik usuwania za potokiem (cele z wyjścia poprzedniego polecenia).
+fn opaque_delete_targets(command: &str, toks: &[String]) -> bool {
+    let variable = toks.iter().any(|t| {
+        let lower = t.to_lowercase();
+        (t.contains('$') && !lower.starts_with("$env:")) || (t.starts_with('@') && t.len() > 1)
+    });
+    let piped = command.split('|').skip(1).any(|segment| {
+        tokens(segment)
+            .iter()
+            .any(|t| DELETE_VERBS.contains(&verb(t).as_str()))
+    });
+    variable || piped
 }
 
 /// Analizuje polecenie.
@@ -199,6 +225,7 @@ pub fn analyze(command: &str) -> CommandAnalysis {
         interactive: INTERACTIVE.iter().any(|v| has(v)),
         ..CommandAnalysis::default()
     };
+    a.opaque_targets = a.deletes && opaque_delete_targets(command, &toks);
     let net_verb = NETWORK_VERBS.iter().any(|v| {
         has(v)
             && match *v {
@@ -229,7 +256,7 @@ pub fn analyze(command: &str) -> CommandAnalysis {
             push_unique(&mut a.hosts, t.trim_end_matches('.').to_lowercase());
         }
         let path_like = t.trim_start_matches('@');
-        if is_abs_path(path_like) && host_of_url(t).is_none() {
+        if (is_abs_path(path_like) || climbs_up(path_like)) && host_of_url(t).is_none() {
             push_unique(&mut a.paths, path_like.to_owned());
         }
         if tools_common_contract::paths::has_credential_segment(t) {
@@ -297,6 +324,32 @@ mod tests {
         assert!(!analyze("type notes.txt").network);
         assert!(analyze("ping example.com").hosts == vec!["example.com"]);
         assert!(analyze("ping example.com").network);
+    }
+
+    /// Regresja Q-8: cele usuwania przez `..`, zmienne, potok i ścieżki od korzenia dysku.
+    #[test]
+    fn delete_targets_parent_variables_and_pipeline() {
+        let a = analyze(r"Remove-Item ..\..\x");
+        assert!(a.deletes && !a.opaque_targets);
+        assert_eq!(a.paths, vec![r"..\..\x"]);
+        let b = analyze(r"$p='C:\x'; Remove-Item $p");
+        assert!(b.deletes && b.opaque_targets);
+        assert_eq!(b.destructiveness(true), Destructiveness::Permanent);
+        assert!(analyze("Get-ChildItem *.tmp | Remove-Item").opaque_targets);
+        assert!(analyze("Remove-Item @cele").opaque_targets);
+        assert!(!analyze(r"Remove-Item .\build").opaque_targets);
+        assert!(!analyze(r"Remove-Item $env:TEMP\x").opaque_targets);
+        assert!(analyze(r"ri ${env:TEMP}\x").opaque_targets);
+        assert!(!analyze("Write-Output $x").opaque_targets);
+        assert_eq!(
+            analyze(r"del \Windows\Temp\x").paths,
+            vec![r"\Windows\Temp\x"]
+        );
+        assert!(
+            analyze(r"type sub\..\a.txt")
+                .paths
+                .contains(&r"sub\..\a.txt".to_owned())
+        );
     }
 
     #[test]

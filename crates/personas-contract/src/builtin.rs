@@ -171,7 +171,7 @@ const ROLES: [RoleSpec; 9] = [
         "działa w systemie i GUI (computer use)",
         "Jako Wykonawczyni działasz w systemie i w interfejsie graficznym. Każdą akcję wykonujesz przez Brokera, zatrzymujesz się tylko w punktach atomowych i raportujesz wynik.",
         "gui-vision",
-        &["fs", "shell", "gui.control"],
+        &["fs", "shell", "gui.control", "office", "browser", "plugin"],
         [false, false, true, false],
     ),
     (
@@ -189,7 +189,7 @@ const ROLES: [RoleSpec; 9] = [
         "sprawdza wyniki; „gotowe” dopiero po jej weryfikacji",
         "Jako Krytyczka sprawdzasz wyniki innych agentek: szukasz błędów i luk, a „gotowe” ogłaszasz dopiero po weryfikacji. Masz wyłącznie odczyt.",
         "review",
-        &["fs.read"],
+        &["fs.read", "office.read"],
         [true, false, false, false],
     ),
     (
@@ -216,7 +216,7 @@ const ROLES: [RoleSpec; 9] = [
         "dokumenty, poczta, tłumaczenia",
         "Jako Pisarka tworzysz dokumenty, wiadomości i tłumaczenia w stylu i języku, o które prosi użytkownik.",
         "conversation",
-        &["fs.session"],
+        &["fs.session", "office"],
         [false, false, true, false],
     ),
 ];

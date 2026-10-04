@@ -19,7 +19,7 @@ pub use modules::{
 };
 pub use shell::{HeadlessShell, ShellPort};
 pub use voice::{
-    VOICE_PREVIEW_TEXT, VoiceChat, VoiceChunk, VoicePort, VoiceTurn, VoiceTurnRef,
+    VOICE_PREVIEW_TEXT, VoiceChat, VoiceChunk, VoicePort, VoiceTurn, VoiceTurnOrigin, VoiceTurnRef,
     VoiceUnavailable, voice_unavailable_reason,
 };
 

@@ -1,0 +1,17 @@
+[
+  {
+    "command": "broker_status",
+    "args": {},
+    "result": {
+      "mode": "service",
+      "state": "connected",
+      "approval_window": true,
+      "watchdog": true,
+      "isolated": true,
+      "detail": {
+        "pl": "Połączono z usługą Brokera: osobne konto Windows, okno zatwierdzeń z wysoką integralnością (UIPI).",
+        "en": "Connected to the Broker service: separate Windows account, approval window with high integrity (UIPI)."
+      }
+    }
+  }
+]

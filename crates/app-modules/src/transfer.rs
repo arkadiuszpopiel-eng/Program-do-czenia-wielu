@@ -1,7 +1,8 @@
 //! `TransferPort` na module `transfer` (`ZipTransfer`): natywne dialogi powłoki, zakres z DTO,
 //! podgląd (dry-run) z różnicami, tryby dodaj/scal/zastąp, snapshot przed importem i rollback.
-//! Sekrety nigdy w zwykłym eksporcie; osobny eksport sekretów wyłącznie z hasłem. Sesje prywatne
-//! nie wchodzą do zwykłego eksportu (moduł pomija je z ostrzeżeniem).
+//! Sekrety nigdy w paczce — eksportu sekretów nie ma (AGENTS.md; CX-a), paczka sekretów ze starszej
+//! wersji jest odrzucana, sekcja sekretów pomijana. Sesje prywatne nie wchodzą do zwykłego eksportu
+//! (moduł pomija je z ostrzeżeniem).
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -121,6 +122,9 @@ fn warning_text(w: &Warning) -> String {
         Warning::SnapshotUnencrypted => {
             "Snapshot przed importem nie jest zaszyfrowany (brak klucza maszyny).".into()
         }
+        Warning::SecretsSkipped => "Pominięto sekcję sekretów ze starszej wersji — sekretów nie \
+            importuje się z paczek; dodaj klucze w Ustawienia → Konta."
+            .into(),
     }
 }
 
@@ -222,27 +226,6 @@ impl TransferPort for TransferAdapter {
             ..TScope::default()
         };
         self.run_export(TExportRequest::new(scope, dest)).await
-    }
-
-    async fn export_secrets(&self, password: SecretInput) -> Result<ExportResult, AppError> {
-        let password = secret(&password);
-        transfer_contract::validate_password(&password).map_err(transfer_error)?;
-        let suggested = format!("alfa-sekrety-{}.alfa", stamp());
-        let Some(dest) = self.save_path(suggested).await? else {
-            return Ok(ExportResult::Cancelled);
-        };
-        let transfer = self.transfer.clone();
-        let report = blocking(move || {
-            transfer
-                .export_secrets(&dest, &password)
-                .map_err(transfer_error)
-        })
-        .await?;
-        Ok(ExportResult::Saved {
-            path: report.path.to_string_lossy().into_owned(),
-            files: report.manifest.content.len() as u64,
-            bytes: report.file_bytes,
-        })
     }
 
     async fn inspect(

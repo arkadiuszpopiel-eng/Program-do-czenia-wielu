@@ -1,7 +1,10 @@
 //! Agentki z narzędziami w aplikacji (kategoria `app-*`, wydzielona z `app-core` — limit
 //! rozmiaru crate'a):
-//! - [`AgentTools`] — zestawy `tools-fs` / `tools-shell` / `tools-clipboard` nad jednym Brokerem
-//!   (zwykle [`TicketLog`]) i dziennikiem cofania, filtr narzędzi rolami obsady;
+//! - [`AgentTools`] — zestawy `tools-fs` / `tools-shell` / `tools-clipboard`, F6 `tools-office`
+//!   i `tools-browser` ([`AppsDeps`]: Word/Excel przez COM, przeglądarka Alfy z profilem
+//!   i kwarantanną w `%LOCALAPPDATA%\Alfa\browser`) oraz narzędzia wtyczek Wasm (`app-plugins`)
+//!   nad jednym Brokerem (zwykle [`TicketLog`]) i dziennikiem cofania, filtr narzędzi rolami obsady,
+//!   kill-switch zamykający przeglądarki;
 //! - [`TicketLog`] — przezroczysty dekorator Brokera zapamiętujący fakty próśb o zatwierdzenie
 //!   (karta „czeka na zatwierdzenie");
 //! - [`run_spec`] / [`AgentSettings`] — `RunSpec` z obsady i Ustawień → Agentki (budżety kroków,
@@ -16,6 +19,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod apps;
 pub mod eval;
 mod family;
 mod launch;
@@ -26,6 +30,7 @@ mod spec;
 mod tickets;
 mod toolset;
 
+pub use apps::{AppsDeps, browser_spec};
 pub use family::{ChildInfo, FamilyProjector, RunFamily};
 pub use launch::{Launch, SkillCall};
 pub use map::{FinalText, final_text, short};
@@ -43,5 +48,7 @@ pub const MODULES: &[(&str, &str)] = &[
     ("tools-fs", tools_fs_impl::MODULE_TOML),
     ("tools-shell", tools_shell_impl::MODULE_TOML),
     ("tools-clipboard", tools_clipboard_impl::MODULE_TOML),
+    ("tools-office", tools_office_impl::MODULE_TOML),
+    ("tools-browser", tools_browser_impl::MODULE_TOML),
     ("agent-runtime", agent_runtime_impl::MODULE_TOML),
 ];

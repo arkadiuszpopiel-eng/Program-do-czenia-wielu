@@ -125,7 +125,7 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
 | F3-09 | Audyt: Broker jedynym writerem, łańcuch, ACL append-only    | 🟡     | `safety-broker-impl/tests/audit.rs::chain_of_10k_events_verifies_and_survives_reopen`, `tampering_is_detected`; `app-safety/tests/windows_ports.rs` (DACL potoku). Brak próby zapisu z procesu agentki do plików Audytu na Windows; SR-08 bez testu Windows.                                                                          |
 | F3-10 | Aktualizacja + rollback launchera (10 cykli)                | ⛔     | Rollback i crash-loop: `updater-impl/tests/launcher.rs::crash_of_new_version_falls_back_to_previous`, `good_version_is_retried_then_rolled_back`. Pobierania i instalacji wydań brak w HEAD (praca w toku w drzewie roboczym); brak klucza minisign — bramka #10.                                                                     |
 | F3-11 | Watchdog: safe-mode po N awariach, restart (20 scenariuszy) | ✅     | `watchdog-impl/tests/watchdog.rs::crash_loop_enters_safe_mode_and_rolls_back_once`, `restarts_outside_window_never_loop` (20 iteracji), `missed_heartbeats_and_failing_health`. Brak jednego zestawu 20 scenariuszy.                                                                                                                  |
-| F3-12 | Scenariusz MVP bez kluczy 6/6                               | ⛔     | Brak `evals/F3/mvp-scenario.md`. Blokery: aplikacja używa Brokera w procesie bez okna zatwierdzeń (`apps/desktop/src-tauri/src/lib.rs` → `AppOptions::default()` → `NoApprovalWindow`), więc krok 4 jest niewykonalny; brak instalatora modeli głosu i sidecarów (`whisper-server`, `llama-server`, Pocket TTS/Piper); pomiary F0/F2. |
+| F3-12 | Scenariusz MVP bez kluczy 6/6                               | ⛔     | Brak `evals/F3/mvp-scenario.md`. Blokery: okno zatwierdzeń podłączone przez Brokera poza procesem (`app-broker`) — niezweryfikowane na sprzęcie; brak instalatora modeli głosu i sidecarów (`whisper-server`, `llama-server`, Pocket TTS/Piper); pomiary F0/F2. |
 | F3-13 | Port CDP zamknięty w buildzie produkcyjnym (test CI)        | ⛔     | Port tylko z cechą `e2e` (`apps/desktop/src-tauri/src/windows.rs`); testu potwierdzającego brak portu w buildzie produkcyjnym nie ma (przegląd #1, S13).                                                                                                                                                                              |
 
 ## F4 — Mosty i MCP
@@ -209,9 +209,11 @@ i brak testu zamkniętego portu CDP (szczegóły niżej).
 
 ## Najważniejsze luki techniczne (dla sesji AI)
 
-1. **Okno Brokera niepodłączone do aplikacji.** Powłoka buduje rdzeń z `AppOptions::default()`, więc działa Broker
-   w procesie z `NoApprovalWindow`: prośby o zgodę wygasają odmową (≤ 60 s), podniesienie poziomu autonomii jest
-   niemożliwe. Binaria `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog` (`app-safety`) istnieją. Blokuje F3-12, F4-03.
+1. **Broker poza procesem — do weryfikacji na Windows.** Powłoka uruchamia procesy Jądra (`app-broker`): usługa
+   `AlfaBroker` albo tryb przenośny (`alfa-broker --console`, okno Broker-UI uruchamia Broker), `alfa-watchdog` z
+   `Ctrl+Shift+F12`; release bez izolowanego Brokera = bezpieczny stan. Logika i protokół przetestowane na atrapach
+   i gniazdach Unix (`app-broker/tests`); prawdziwe procesy, potoki i UIPI — self-hosted. Instalacja usługi (osobne
+   konto, wiązanie roli jądra z obrazem z `versions\<ver>`) — bramka #10. F3-12 i F4-03 odblokowane po teście na sprzęcie.
 2. **Brak instalatora modeli i sidecarów.** Pobierany jest tylko model LLM; `llama-server`, `whisper-server`, model
    whisper i silnik TTS trzeba dziś skopiować ręcznie. Blokuje F3-12 i każdy pomiar głosu w aplikacji.
 3. **Funkcje głosu F5 niepodpięte w aplikacji**: słowa wywoławcze, weryfikacja mówcy, dyktowanie, czytanie

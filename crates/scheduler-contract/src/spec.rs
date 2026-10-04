@@ -70,7 +70,7 @@ pub enum TaskOrigin {
         /// Głębokość łańcucha (1 = wyzwalacz uruchomiony zdarzeniem spoza wyzwalaczy).
         depth: u32,
     },
-    /// Harmonogram jawnie dopuszczony przez użytkownika do mostów (`allow_bridges`).
+    /// Harmonogram użytkownika (zapis zgodny wstecz; od CX-d mostów nie uruchamia — AGENTS.md).
     Schedule {
         /// Harmonogram.
         schedule_id: String,
@@ -86,13 +86,13 @@ pub enum TaskOrigin {
 
 impl TaskOrigin {
     /// Pochodzenie dla mostów CLI (`agent-backends`). Wszystko, co nie jest żądaniem użytkownika
-    /// ani jawnie dopuszczonym harmonogramem, idzie jako uruchomienie automatyczne
-    /// (`Trigger`) — most je odrzuca.
+    /// — także harmonogram (AGENTS.md: mostów CLI nie uruchamia się z harmonogramu; CX-d) — idzie
+    /// jako uruchomienie automatyczne (`Trigger`), które most odrzuca niezależnie od zgód.
     pub fn launch_origin(&self) -> LaunchOrigin {
         match self {
             Self::User => LaunchOrigin::UserRequest,
-            Self::Schedule { schedule_id } => LaunchOrigin::Scheduled {
-                schedule_id: schedule_id.clone(),
+            Self::Schedule { schedule_id } => LaunchOrigin::Trigger {
+                trigger_id: format!("auto:schedule:{schedule_id}"),
             },
             Self::Improver => LaunchOrigin::Improver,
             Self::Trigger { trigger_id, .. } => LaunchOrigin::Trigger {
@@ -107,10 +107,9 @@ impl TaskOrigin {
         }
     }
 
-    /// Czy zadanie z tym pochodzeniem w ogóle może celować w most (`User` albo `Schedule`;
-    /// zgodę i dzienny limit harmonogramu sprawdza dalej `agent-backends`).
+    /// Czy zadanie z tym pochodzeniem w ogóle może celować w most — **tylko** `User` (CX-d).
     pub fn may_target_bridge(&self) -> bool {
-        matches!(self, Self::User | Self::Schedule { .. })
+        matches!(self, Self::User)
     }
 
     /// Głębokość łańcucha wyzwalaczy (0 = nie z wyzwalacza).
@@ -129,7 +128,7 @@ pub enum ExecutorKind {
     /// Pętla agentki (`agent-runtime`).
     #[default]
     Agent,
-    /// Most CLI (`agent-backends`) — tylko z pochodzenia `User` albo `Schedule`.
+    /// Most CLI (`agent-backends`) — tylko z pochodzenia `User`.
     Bridge(BridgeKind),
     /// Usługa systemowa (np. konsolidacja pamięci).
     Service(String),

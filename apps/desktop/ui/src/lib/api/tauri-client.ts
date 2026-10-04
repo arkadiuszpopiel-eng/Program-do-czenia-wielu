@@ -108,7 +108,6 @@ export class TauriAlfaClient implements AlfaClient {
 
   readonly transfer: AlfaClient['transfer'] = {
     exportPackage: (request) => call('transfer_export', { request }),
-    exportSecrets: (password) => call('transfer_export_secrets', { password }),
     inspect: (password, path) => call('transfer_inspect', { password, path }),
     importPackage: (request) => call('transfer_import', { request }),
     rollback: (snapshotId) => call('transfer_rollback', { snapshotId }),
@@ -277,6 +276,30 @@ export class TauriAlfaClient implements AlfaClient {
     about: () => call('updates_about'),
     whatsNew: () => call('updates_whats_new'),
     dismissWhatsNew: () => call('updates_dismiss_whats_new'),
+  };
+
+  readonly broker: AlfaClient['broker'] = {
+    status: () => call('broker_status'),
+  };
+
+  readonly voiceFeatures: AlfaClient['voiceFeatures'] = {
+    features: () => call('voice_features'),
+    wake: (action) => call('voice_wake', { action }),
+    speaker: (action) => call('voice_speaker', { action }),
+    dictation: (action) => call('voice_dictation', { action }),
+    read: (action) => call('voice_read', { action }),
+  };
+
+  readonly plugins: AlfaClient['plugins'] = {
+    list: () => call('plugins_list'),
+    inspect: (wasmB64) => call('plugins_inspect', { wasmB64 }),
+    propose: (manifest, wasmB64) => call('plugins_propose', { manifest, wasmB64 }),
+    approve: (pluginId, version, reviewedHash) =>
+      call('plugins_approve', { pluginId, version, reviewedHash }),
+    reject: (pluginId, version) => call('plugins_reject', { pluginId, version }),
+    disable: (pluginId) => call('plugins_disable', { pluginId }),
+    enable: (pluginId, reviewedHash) => call('plugins_enable', { pluginId, reviewedHash }),
+    remove: (pluginId) => call('plugins_remove', { pluginId }),
   };
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

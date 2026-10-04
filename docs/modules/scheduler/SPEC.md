@@ -27,7 +27,7 @@ Rdzeń `SchedCore<H: SchedHost>` w kontrakcie; `-impl`/`-fake` różnią się ot
 - Każde zadanie ma skończony termin (domyślnie +24 h), budżet czasu/kroków i liczbę prób → kończy się w skończonym czasie z jawnym `Termination`.
 - Wywłaszczanie (mowa użytkownika, zadanie wyższej klasy na zasobie wywłaszczalnym, pauza, utrata okna) tylko w punkcie atomowym; po `STOP_GRACE_MS` = 2 s bez punktu atomowego — przerwanie siłą (`Abort` przed zwolnieniem zasobów).
 - Steering dostarczany w najbliższym punkcie atomowym (≤ 1 krok); nieodebrany po ostatnim kroku → `steer_unconsumed`.
-- Podzadania dziedziczą pochodzenie i taint (nie da się „wyprać” wyzwalacza); most tylko z `User`/`Schedule`.
+- Podzadania dziedziczą pochodzenie i taint (nie da się „wyprać” wyzwalacza); most tylko z `User` (CX-d: `Schedule` nie celuje w most, a `launch_origin` mapuje go na `Trigger`).
 - `TaskView::agent` (agentka ostatniego wysłania) i `TaskView::started_at_ms` (pierwszy start) zostają po zakończeniu i po restarcie; zadanie, które nie wystartowało, ma oba `None`. Pola w stanie (`TaskRec`) z `#[serde(default)]` — stan sprzed zmiany wczytuje się bez migracji (`SNAPSHOT_VERSION` bez zmian).
 - Restart = wznowienie: zadania w toku wracają do kolejki (`interrupted`, `resume_from_step`); kill-switch anuluje wszystko i odbiera dzierżawy mowy.
 
@@ -61,3 +61,8 @@ Panel Agentki (kto co robi, zasoby, kolejka, powód blokady; zakończone — kto
 
 ## Przegląd bezpieczeństwa #2 (2026-10, `docs/reviews/2026-10-security-review-2.md`)
 - **SR2-08:** `spawn` (podzadania z wykonania — decyzja agentki) nigdy nie celuje w most CLI (`BridgeNotAllowed`), także pod zadaniem użytkownika, którego pochodzenie `User` dziedziczy podzadanie (`scheduler-fake/tests/review.rs`).
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **CX-d (zrobione):** `TaskOrigin::may_target_bridge` = tylko `User`; `TaskOrigin::Schedule` → `LaunchOrigin::Trigger
+  { "auto:schedule:<id>" }` (most odmawia niezależnie od zgód `ScheduleConsent`). Obrona w głąb w `app-tasks`:
+  wykonawczyni odmawia mostu dla pochodzenia innego niż `User`. Test: `validate::tests::bridges_only_from_user`.

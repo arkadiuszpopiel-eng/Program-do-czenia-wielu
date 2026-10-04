@@ -62,14 +62,18 @@ pub enum TransferError {
         /// Minimalna długość.
         min: usize,
     },
-    /// Operacja wymaga szyfrowania (eksport sekretów, sesje prywatne).
+    /// Operacja wymaga szyfrowania (sesje prywatne).
     #[error("{what} wymaga paczki zaszyfrowanej hasłem")]
     EncryptionRequired {
         /// Czego dotyczy wymóg.
         what: String,
     },
-    /// Import paczki sekretów bez jawnej zgody.
-    #[error("paczka zawiera sekrety — import wymaga jawnej zgody")]
+    /// Paczka sekretów (eksport ze starszej wersji Alfy) — sekretów nie importuje się z `.alfa`
+    /// (AGENTS.md: tylko Credential Manager; CX-a).
+    #[error(
+        "to paczka sekretów ze starszej wersji Alfy — sekretów nie importuje się z plików .alfa; \
+         dodaj klucze ponownie w Ustawienia → Konta"
+    )]
     SecretsNotAllowed,
     /// W treści przeznaczonej do zwykłej paczki wykryto sekret (ostatnia linia obrony).
     #[error("wpis `{path}` zawiera sekret — eksport przerwany")]

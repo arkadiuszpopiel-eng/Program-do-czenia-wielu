@@ -1,6 +1,7 @@
 //! [`DocumentStore`] na katalogu (konfiguracja, agentki, pamięć…): nazwy wg reguły ścieżek
 //! paczki, filtr rozszerzeń (np. konfiguracja przyjmuje tylko `*.toml`), zapis atomowy
-//! (plik tymczasowy + `rename`), żadnego zapisu poza korzeniem (także przez dowiązania).
+//! (plik tymczasowy + `rename`), żadnego odczytu, zapisu ani usunięcia poza korzeniem (dowiązania
+//! — symlinki i junction — w magazynie są odrzucane).
 
 use std::path::{Component, Path, PathBuf};
 
@@ -95,6 +96,25 @@ impl DirDocumentStore {
         Ok(path)
     }
 
+    /// Żaden istniejący komponent między korzeniem (wyłącznie) a `path` (włącznie) nie jest
+    /// dowiązaniem — symlinkiem ani punktem montowania/junction (na Windows `is_symlink` obejmuje
+    /// oba). Odczyt, zapis i usuwanie nie wychodzą przez nie poza magazyn (regresja Q-6).
+    fn ensure_no_links(&self, path: &Path) -> Result<(), TransferError> {
+        let link = || TransferError::invalid(path.display().to_string(), "dowiązanie w magazynie");
+        let rel = path.strip_prefix(&self.root).map_err(|_| link())?;
+        let mut cur = self.root.clone();
+        for comp in rel.components() {
+            cur.push(comp);
+            match std::fs::symlink_metadata(&cur) {
+                Ok(meta) if meta.file_type().is_symlink() => return Err(link()),
+                Ok(_) => {}
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+                Err(e) => return Err(e.into()),
+            }
+        }
+        Ok(())
+    }
+
     /// Katalog nadrzędny istnieje i (po rozwinięciu dowiązań) leży w korzeniu.
     fn ensure_parent(&self, path: &Path) -> Result<(), TransferError> {
         let parent = path.parent().unwrap_or(&self.root);
@@ -150,6 +170,7 @@ impl DocumentStore for DirDocumentStore {
 
     fn read(&self, name: &str) -> Result<Option<Vec<u8>>, TransferError> {
         let path = self.resolve(name)?;
+        self.ensure_no_links(&path)?;
         match std::fs::read(&path) {
             Ok(bytes) => Ok(Some(bytes)),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
@@ -159,6 +180,7 @@ impl DocumentStore for DirDocumentStore {
 
     fn write(&self, name: &str, bytes: &[u8]) -> Result<(), TransferError> {
         let path = self.resolve(name)?;
+        self.ensure_no_links(&path)?;
         self.ensure_parent(&path)?;
         let dir = path.parent().unwrap_or(&self.root);
         let tmp = TempFile::new(dir, &path)?;
@@ -174,6 +196,7 @@ impl DocumentStore for DirDocumentStore {
 
     fn remove(&self, name: &str) -> Result<bool, TransferError> {
         let path = self.resolve(name)?;
+        self.ensure_no_links(&path)?;
         match std::fs::remove_file(&path) {
             Ok(()) => Ok(true),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),

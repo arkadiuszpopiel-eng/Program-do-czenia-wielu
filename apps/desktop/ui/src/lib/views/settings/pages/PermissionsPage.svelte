@@ -8,6 +8,7 @@
   import type { AutonomyLevel } from '../../../api/types';
   import type { PermissionsState } from '../../../api/types-hub';
   import { useApp } from '../../../state/context';
+  import BrokerStatusCard from './BrokerStatusCard.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -49,6 +50,7 @@
   }
 </script>
 
+<BrokerStatusCard />
 {#if perms}
   <section class="card" aria-labelledby="perm-title">
     <h3 id="perm-title">{t('perm.title')}</h3>

@@ -17,7 +17,7 @@ use crate::scope::Category;
 pub const MANIFEST_PATH: &str = "manifest.json";
 /// Wpis z danymi rollbacku w snapshocie (lista elementów utworzonych przez import).
 pub const ROLLBACK_PATH: &str = "rollback.json";
-/// Wpis z sekretami (tylko paczka `secrets`, zawsze szyfrowana w całości).
+/// Wpis z sekretami ze starszych paczek — rozpoznawany wyłącznie po to, by go pominąć (CX-a).
 pub const SECRETS_PATH: &str = "secrets.json";
 /// Metadane sesji w paczce.
 pub const SESSION_FILE: &str = "session.json";
@@ -136,7 +136,7 @@ pub enum EntryKind {
     Manifest,
     /// `rollback.json` (snapshot).
     Rollback,
-    /// `secrets.json` (paczka sekretów).
+    /// `secrets.json` (starsza paczka sekretów — pomijany).
     Secrets,
     /// Dokument kategorii.
     Document {

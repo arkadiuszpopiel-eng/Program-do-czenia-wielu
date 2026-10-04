@@ -29,7 +29,7 @@ sessions/<session-id>/
 memory/<scope>/<id>.ndjson          wpisy pamięci z proweniencją (P1; zakresy: sesja/projekt/globalna/agentka)
 artifacts/<session-id>/             pliki oddane przez agentki (opcjonalnie)
 logs/                               logi (domyślnie NIE eksportowane)
-secrets.json                        TYLKO w paczce `secrets` (cała szyfrowana hasłem, §5) i w snapshocie (szyfrowany kluczem maszyny)
+secrets.json                        NIE POWSTAJE (CX-a, §5); w paczkach starszych wersji — przy imporcie pomijany/odrzucany
 rollback.json                       TYLKO w snapshocie: { v, created[], saved[] } — elementy utworzone/zapisane przez import
 ```
 
@@ -51,11 +51,11 @@ Pola (v1 schematu):
 | `content` | lista wpisów `{ path, sha256, bytes }` dla **każdego** pliku poza manifestem |
 | `content_sha256` | skrót nad posortowaną listą `content` (szybka weryfikacja integralności całości) |
 | `encryption` | `null` albo `{ scheme, kdf, salt, nonce }` (§5) |
-| `kind` | `export` \| `backup` \| `secrets` \| `snapshot` |
+| `kind` | `export` \| `backup` \| `snapshot` (`secrets` — tylko w paczkach starszych wersji; import odmawia, §5) |
 | `notes` | opcjonalny opis od użytkownika |
 | `redactions` | liczba zredagowanych ciągów wyglądających na sekrety (strażnik eksportu, §4) |
 
-`content_sha256` = SHA-256 nad liniami `ścieżka\tsha256\tbajty\n` posortowanymi po ścieżce. `scope.counts`: `sessions`, `turns`, `documents`, `memory_entries`, `artifacts`, `secrets`. `source_machine.name` to etykieta nadana przez użytkownika (nie nazwa hosta ani konta).
+`content_sha256` = SHA-256 nad liniami `ścieżka\tsha256\tbajty\n` posortowanymi po ścieżce. `scope.counts`: `sessions`, `turns`, `documents`, `memory_entries`, `artifacts`, `secrets` (zawsze 0 — pole zgodności). `source_machine.name` to etykieta nadana przez użytkownika (nie nazwa hosta ani konta).
 
 Sumy kontrolne to **integralność**, nie uwierzytelnienie: paczka niezaszyfrowana nie jest podpisana (paczki są tworzone i importowane przez tego samego właściciela). Podpis minisign dla kopii zapasowych — do ustalenia w SPEC v1.
 
@@ -86,7 +86,7 @@ Zakres P0-lite (F1): `config.common`, `personas`, `casts`, `sessions[]`. Reszta 
 
 - **Paczka:** opcjonalne szyfrowanie całości hasłem. **Rozstrzygnięte (F1):** `ALFAENC1` (8 B) ‖ długość nagłówka (u32 LE) ‖ nagłówek JSON `{ format: 1, kind, schema_version, scheme: "xchacha20poly1305-stream-be32", chunk: 65536, kdf: { alg: "argon2id", m_kib, t, p, salt } | { alg: "machine-key", key }, nonce_prefix }` ‖ szyfrogram. Szyfrowanie: **XChaCha20-Poly1305 w konstrukcji STREAM** — fragmenty 64 KiB jawnego tekstu, nonce = prefiks 19 B ‖ licznik u32 BE ‖ flaga ostatniego fragmentu; cały nagłówek (od `ALFAENC1`) jest AAD każdego fragmentu (zmiana nagłówka lub obcięcie = błąd). Klucz: **Argon2id** (m = 46 MiB, t = 2, p = 1, sól 16 B; przy odczycie m ≤ 256 MiB, t ≤ 16, p ≤ 8). Odczyt losowy (fragment po fragmencie) — ZIP czytany wprost z szyfrogramu. Manifest paczki zaszyfrowanej jest wewnątrz szyfrogramu; na zewnątrz tylko `kind` i `schema_version` w nagłówku. Hasło ≥ 8 znaków.
 - **Snapshot** przed importem: szyfrowany losowym kluczem maszyny z Credential Managera (`Alfa/transfer/snapshot-key`, `kdf.alg = "machine-key"`).
-- **Eksport sekretów** (`kind = "secrets"`): osobna, jawna operacja; **zawsze** szyfrowana hasłem, tym samym schematem; zawiera `secrets.json` z wpisami `{ name, value }` (nazwa w magazynie, np. `accounts/acc-1`; sekrety `transfer/*` pomijane). Import wymaga jawnej zgody (`allow_secrets`). Import sekretów zapisuje je do Credential Managera maszyny docelowej i nie zostawia jawnych kopii na dysku ani w logach.
+- **Sekrety nigdy w paczce** (AGENTS.md: sekrety tylko w Windows Credential Manager — decyzja CX-a z 2026-10-04, AGENTS.md wygrywa z wcześniejszym PLAN §15.1). Eksportu sekretów nie ma. Zgodność odczytu: paczka `kind = "secrets"` ze starszej wersji → odmowa podglądu i importu z komunikatem „dodaj klucze ponownie w Ustawienia → Konta”; wpis `secrets.json` w innej paczce → pominięty z ostrzeżeniem (nic nie trafia do Credential Managera). Klucze na nowej maszynie dodaje się ręcznie (kreator kont) albo importem ze zmiennych środowiskowych.
 - Hasło nie jest zapisywane; utrata = brak dostępu. Kopie zapasowe mogą mieć hasło zapisane w Credential Managerze maszyny (opcja w harmonogramie).
 
 ## 6. Import

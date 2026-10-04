@@ -112,7 +112,8 @@ async fn plan(
         .chain(app_gui::MODULES)
         .chain(app_terminal::MODULES)
         .chain(app_skills::MODULES)
-        .chain(app_health::MODULES);
+        .chain(app_health::MODULES)
+        .chain(app_plugins::MODULES);
     for (id, toml) in all {
         let manifest = manifest_for_graph(id, toml)?;
         lifecycles.insert((*id).to_owned(), manifest.lifecycle);

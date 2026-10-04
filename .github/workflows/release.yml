@@ -110,6 +110,15 @@ jobs:
           mkdir -p apps/desktop/src-tauri/binaries
           cp target/release/alfa.exe apps/desktop/src-tauri/binaries/alfa-launcher-x86_64-pc-windows-msvc.exe
 
+      - name: Procesy Jądra (app-safety — alfa-broker, alfa-broker-ui, alfa-watchdog; ADR 0003)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --release --locked -p app-safety --bins
+          for bin in alfa-broker alfa-broker-ui alfa-watchdog; do
+            cp "target/release/$bin.exe" "apps/desktop/src-tauri/binaries/$bin-x86_64-pc-windows-msvc.exe"
+          done
+
       - name: Instalator NSIS (Tauri, nakładka tauri.bundle.conf.json)
         shell: bash
         env:
@@ -126,6 +135,10 @@ jobs:
           # mainBinaryName przemianował aplikację na alfa.exe — w paczce to alfa-desktop.exe.
           Copy-Item apps/desktop/src-tauri/target/release/alfa.exe "$stage/alfa-desktop.exe"
           Copy-Item target/release/alfa.exe "$stage/alfa.exe"
+          # Procesy Jądra tej wersji (tryb przenośny i watchdog) — obok alfa-desktop.exe.
+          foreach ($bin in 'alfa-broker', 'alfa-broker-ui', 'alfa-watchdog') {
+            Copy-Item "target/release/$bin.exe" "$stage/$bin.exe"
+          }
           Copy-Item dist/notes.md "$stage/notes.md"
           [IO.File]::WriteAllText("$PWD/$stage/version.json", "{`"version`":`"$v`"}")
           Compress-Archive -Path "$stage/*" -DestinationPath "dist/alfa-$v-x64.zip"

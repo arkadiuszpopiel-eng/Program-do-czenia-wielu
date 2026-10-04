@@ -2,7 +2,9 @@
 //! Brokera (⟶ `BrokerPort`) — obniżenie od razu, podniesienie tylko w oknie Brokera (PLAN §8.2).
 
 use crate::core::AppCore;
-use crate::dto::{AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, PermissionsState};
+use crate::dto::{
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, PermissionsState,
+};
 use crate::error::AppError;
 use crate::ids;
 use crate::settings::keys;
@@ -56,6 +58,11 @@ impl AppCore {
             }
         }
         Ok(result)
+    }
+
+    /// `broker_status` — tryb Brokera, łącze, okno zatwierdzeń, watchdog (`app-broker`).
+    pub async fn broker_status(&self) -> Result<BrokerStatusView, AppError> {
+        Ok(self.inner.broker.status())
     }
 
     /// `permissions_open_approval` ⟶ karta w oknie Brokera.

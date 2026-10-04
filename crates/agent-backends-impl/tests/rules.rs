@@ -16,6 +16,26 @@ fn module_manifest_is_valid() {
     assert_eq!(m.id.to_string(), "agent-backends");
 }
 
+/// Most Claude Code dostaje serwer MCP Alfy v1 (UIA, zrzut, rejestr przez Brokera) w imieniu
+/// sesji rozmowy, z której zlecono zadanie — nie osobnej sesji `most:<zadanie>`.
+#[test]
+fn mcp_scope_is_v1_bound_to_the_chat_session() {
+    let spec = TaskSpec::user_request(
+        BridgeKind::ClaudeCode,
+        "zrób",
+        "/x",
+        SessionId::new("czat-7"),
+    );
+    let scope =
+        agent_backends_impl::mcp_scope(&agent_backends_contract::TaskId("task-1".into()), &spec);
+    assert_eq!(scope.label, "task-1");
+    assert_eq!(scope.session.as_deref(), Some("czat-7"));
+    for t in mcp_contract::AlfaTool::WINDOWS_V1 {
+        assert!(scope.tools.contains(&t), "{t:?}");
+    }
+    assert!(scope.tools.contains(&mcp_contract::AlfaTool::RegistryRead));
+}
+
 #[test]
 fn spec_validation() {
     let ok = TaskSpec::user_request(BridgeKind::ClaudeCode, "zrób", "/x", SessionId::new("s"));

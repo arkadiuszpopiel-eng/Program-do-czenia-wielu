@@ -8,6 +8,7 @@
 
 mod agents;
 mod bridges;
+mod broker;
 mod common;
 mod events;
 mod gui;
@@ -15,12 +16,14 @@ mod health;
 mod hub;
 mod memory;
 mod panels;
+mod plugins;
 mod sessions;
 mod skills;
 mod system;
 mod tasks;
 mod transfer;
 mod updates;
+mod voice_features;
 
 pub use agents::{
     AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
@@ -28,6 +31,7 @@ pub use agents::{
     VoiceStatus, WorkdirChoice,
 };
 pub use bridges::{BridgeCard, BridgeLogin, BridgeSource};
+pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView};
 pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };
@@ -59,6 +63,10 @@ pub use panels::{
     CastTemplateId, ContextUsage, CostLimitView, CostSummary, EventLevel, FxView, TimelineEvent,
     TimelineFilter, TimelineKind,
 };
+pub use plugins::{
+    PluginCapabilityView, PluginInfo, PluginInspection, PluginLimitsView, PluginOrigin,
+    PluginProblem, PluginProblemKind, PluginR2View, PluginStateView, PluginToolView, PluginsView,
+};
 pub use sessions::{
     ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,
     RiskLevel, SendOptions, SendResult, SessionSearchHit, SessionSummary, SessionTemplate,
@@ -87,4 +95,10 @@ pub use transfer::{
 pub use updates::{
     AboutInfo, LicenseEntry, LicenseSource, UpdateChannel, UpdateMode, UpdatePhase, UpdateProgress,
     UpdateRelease, UpdatesView, WhatsNew,
+};
+pub use voice_features::{
+    DictationAction, DictationProfile, DictationStateView, DictationView, EnrollSampleView,
+    ReadAction, ReadAloudView, ReadControlAction, ReadSource, ReadStateView, S2sView,
+    SampleQuality, SpeakerAction, SpeakerCheckView, SpeakerDecisionView, SpeakerState, SpeakerView,
+    VoiceFeatures, WakeAction, WakeCalibrationView, WakeTestView, WakeWordsState, WakeWordsView,
 };

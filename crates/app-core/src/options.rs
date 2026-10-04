@@ -61,6 +61,9 @@ pub struct AppOptions {
     pub clipboard: Option<Arc<dyn ClipboardPort>>,
     /// Broker (`None` = `safety-broker` w procesie, tryb deweloperski).
     pub broker: Option<Arc<dyn BrokerPort>>,
+    /// Broker poza procesem dla narzędzi agentek i UI (`app-broker`: usługa, tryb przenośny albo
+    /// bezpieczny stan „brak”); `None` = Broker w procesie (tylko testy i build deweloperski).
+    pub kernel: Option<app_broker::RemoteKernel>,
     /// Okno zatwierdzeń Brokera (`None` = brak Broker-UI: prośby o zgodę są odrzucane).
     pub approval_window: Option<Arc<dyn ApprovalWindow>>,
     /// Powłoka (`None` = bez okien).
@@ -104,6 +107,7 @@ impl Default for AppOptions {
             exec: None,
             clipboard: None,
             broker: None,
+            kernel: None,
             approval_window: None,
             shell: None,
             bridges: None,

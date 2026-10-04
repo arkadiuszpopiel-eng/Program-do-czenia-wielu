@@ -2,9 +2,11 @@
 //! Fabryka dostaje politykę i wirtualny zegar; dowody fizycznego wejścia buduje test w roli
 //! Broker-UI (z nonce wyzwania z `ApprovalChannel::pending`).
 
-mod flows;
-mod grants;
-mod tokens;
+// Publiczne, żeby implementacje z udokumentowanym odstępstwem (Broker poza procesem w roli
+// `Core`, `app-broker`) mogły uruchomić zestaw bez jednego scenariusza i opisać różnicę.
+pub mod flows;
+pub mod grants;
+pub mod tokens;
 
 use std::sync::Arc;
 

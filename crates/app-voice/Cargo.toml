@@ -1,6 +1,6 @@
 [package]
 name = "app-voice"
-description = "Tryb głosowy w aplikacji (kategoria app-*): potok voice-pipeline złożony z modułów voice-*-impl (albo z fabryki testowej), odpowiedzi z czatu sesji z usłyszanym prefiksem, port głosu z PTT, wyciszeniem i pigułką"
+description = "Tryb głosowy w aplikacji (kategoria app-*): potok voice-pipeline złożony z modułów voice-*-impl (albo z fabryki testowej), odpowiedzi z czatu sesji z usłyszanym prefiksem, port głosu z PTT, wyciszeniem i pigułką; F5: słowa wywoławcze, weryfikacja właściciela, dyktowanie, czytanie na głos"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -27,6 +27,13 @@ voice-cmd-contract = { path = "../voice-cmd-contract" }
 voice-dialog-contract = { path = "../voice-dialog-contract" }
 voice-wake-contract = { path = "../voice-wake-contract" }
 voice-wake-impl = { path = "../voice-wake-impl" }
+# F5: weryfikacja właściciela, dyktowanie, czytanie na głos (impl — korzeń kompozycji).
+voice-speaker-contract = { path = "../voice-speaker-contract" }
+voice-speaker-impl = { path = "../voice-speaker-impl" }
+voice-dictation-contract = { path = "../voice-dictation-contract" }
+voice-dictation-impl = { path = "../voice-dictation-impl" }
+voice-readaloud-contract = { path = "../voice-readaloud-contract" }
+voice-readaloud-impl = { path = "../voice-readaloud-impl" }
 voice-persona-impl = { path = "../voice-persona-impl" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
@@ -35,12 +42,32 @@ device-profile-contract = { path = "../device-profile-contract" }
 personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }
 core-bus-contract.workspace = true
+core-config-contract.workspace = true
+sessions-contract = { path = "../sessions-contract" }
 platform-contract.workspace = true
 async-trait.workspace = true
 futures-core.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 tracing.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+platform-fake = { path = "../platform-fake" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+voice-audio-fake = { path = "../voice-audio-fake" }
+voice-stt-fake = { path = "../voice-stt-fake" }
+voice-tts-fake = { path = "../voice-tts-fake" }
+voice-vad-fake = { path = "../voice-vad-fake" }
+voice-dsp-fake = { path = "../voice-dsp-fake" }
+voice-cmd-fake = { path = "../voice-cmd-fake" }
+voice-persona-fake = { path = "../voice-persona-fake" }
+voice-turn-contract = { path = "../voice-turn-contract" }
+voice-turn-fake = { path = "../voice-turn-fake" }
+voice-wake-fake = { path = "../voice-wake-fake" }
+voice-speaker-fake = { path = "../voice-speaker-fake" }
+core-config-fake = { path = "../core-config-fake" }
 
 [lints]
 workspace = true

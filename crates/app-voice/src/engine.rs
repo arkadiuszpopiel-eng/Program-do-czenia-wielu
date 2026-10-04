@@ -1,6 +1,6 @@
 //! Fabryka potoku głosu: produkcja składa `voice-*-impl` (z modelami i sidecarami), testy —
-//! atrapy na wirtualnym zegarze. Potok jest budowany przy włączeniu mikrofonu i zwalniany po
-//! wyłączeniu (mikrofon i głośnik nie są trzymane bez potrzeby).
+//! atrapy na wirtualnym zegarze. Potok jest budowany przy włączeniu mikrofonu (albo uzbrojeniu
+//! słów wywoławczych) i zwalniany po wyłączeniu (mikrofon i głośnik nie są trzymane bez potrzeby).
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -8,6 +8,10 @@ use std::time::Duration;
 use async_trait::async_trait;
 use core_bus_contract::EventBus;
 use voice_pipeline_contract::{PipelineCfg, PipelineError, ReplySource, VoicePipeline};
+use voice_speaker_contract::SpeakerVerifier;
+use voice_wake_contract::{ListenerStats, WakeWordListener};
+
+use crate::features::FeatureFactory;
 
 /// Rytm kroków potoku (produkcja: interwał `tick_ms`; testy: przesunięcie zegara wirtualnego).
 #[async_trait]
@@ -37,10 +41,53 @@ impl Pacer for IntervalPacer {
     }
 }
 
+/// Potok z dodatkami F5 (słowa wywoławcze, weryfikacja mówcy). Domyślnie — niedostępne
+/// (potok bez tych funkcji, np. atrapa skryptowana).
+pub trait VoiceRuntime: VoicePipeline {
+    /// Uzbraja nasłuch słów wywoławczych (otwiera mikrofon; audio przed wykryciem nie wychodzi).
+    fn arm_wake_words(&mut self, _listener: WakeWordListener) -> Result<(), PipelineError> {
+        Err(PipelineError::Component {
+            component: "wake".into(),
+            reason: "potok bez słów wywoławczych".into(),
+        })
+    }
+    /// Rozbraja nasłuch.
+    fn disarm_wake_words(&mut self) {}
+    /// Liczniki nasłuchu (bez treści).
+    fn wake_stats(&self) -> Option<ListenerStats> {
+        None
+    }
+    /// Weryfikacja mówcy tur głosowych.
+    fn set_speaker_verifier(
+        &mut self,
+        _verifier: Arc<dyn SpeakerVerifier>,
+    ) -> Result<(), PipelineError> {
+        Ok(())
+    }
+}
+
+impl VoiceRuntime for voice_pipeline_impl::Pipeline {
+    fn arm_wake_words(&mut self, listener: WakeWordListener) -> Result<(), PipelineError> {
+        voice_pipeline_impl::Pipeline::arm_wake_words(self, listener)
+    }
+    fn disarm_wake_words(&mut self) {
+        voice_pipeline_impl::Pipeline::disarm_wake_words(self);
+    }
+    fn wake_stats(&self) -> Option<ListenerStats> {
+        self.wake_listener_stats()
+    }
+    fn set_speaker_verifier(
+        &mut self,
+        verifier: Arc<dyn SpeakerVerifier>,
+    ) -> Result<(), PipelineError> {
+        voice_pipeline_impl::Pipeline::set_speaker_verifier(self, verifier)
+    }
+}
+
 /// Zbudowany potok z rytmem kroków.
 pub struct VoiceEngine {
     /// Potok.
-    pub pipeline: Box<dyn VoicePipeline>,
+    pub pipeline: Box<dyn VoiceRuntime>,
     /// Rytm.
     pub pacer: Box<dyn Pacer>,
 }
@@ -56,4 +103,9 @@ pub trait VoiceEngineFactory: Send + Sync {
         bus: Arc<dyn EventBus>,
         cfg: PipelineCfg,
     ) -> Result<VoiceEngine, PipelineError>;
+    /// Składniki głosu rozszerzonego F5 (`None` — słowa wywoławcze, rozpoznawanie głosu,
+    /// dyktowanie i czytanie niedostępne).
+    fn features(&self) -> Option<&dyn FeatureFactory> {
+        None
+    }
 }

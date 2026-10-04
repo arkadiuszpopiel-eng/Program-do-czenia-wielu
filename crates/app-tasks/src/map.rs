@@ -273,23 +273,13 @@ pub fn spec(id: &str, d: &TriggerDraft) -> Result<TriggerSpec, AppError> {
     if let Some(agent) = d.agent.as_deref().filter(|a| !a.is_empty()) {
         action.assignee = Assignee::Persona(PersonaId::new(agent));
     }
-    let bridge = match d.bridge.as_deref() {
-        None | Some("") => None,
-        Some("claude_code") => Some(agent_backends_contract::BridgeKind::ClaudeCode),
-        Some("codex") => Some(agent_backends_contract::BridgeKind::Codex),
-        Some(other) => return Err(AppError::invalid(format!("Nieznany most „{other}”."))),
-    };
-    let mut spec = TriggerSpec::new(id, d.name.trim(), Actor::User, kind, action);
-    if let Some(b) = bridge {
-        spec.action.executor = ExecutorKind::Bridge(b);
-        spec.action.class = TaskClass::Agent;
-        spec.allow_bridges = true;
-        spec.rate.max_fires = spec
-            .rate
-            .max_fires
-            .min(triggers_contract::MAX_BRIDGE_FIRES_PER_DAY);
-        spec.rate.per_ms = triggers_contract::DAY_MS;
+    if d.bridge.as_deref().is_some_and(|b| !b.is_empty()) {
+        // AGENTS.md: mostów CLI nie uruchamia się z harmonogramu ani wyzwalacza (CX-d).
+        return Err(AppError::forbidden(
+            "Wyzwalacz nie może uruchamiać mostu CLI — most startuje tylko na Twoją prośbę.",
+        ));
     }
+    let mut spec = TriggerSpec::new(id, d.name.trim(), Actor::User, kind, action);
     spec.respect_dnd = d.respect_dnd;
     Ok(spec)
 }
@@ -347,7 +337,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn drafts_become_user_specs_and_bridges_need_time_triggers() {
+    fn drafts_become_user_specs_and_never_bridges() {
         let draft = TriggerDraft {
             name: "Poranny raport".into(),
             kind: TriggerKindView::Cron {
@@ -359,9 +349,17 @@ mod tests {
             bridge: Some("claude_code".into()),
             respect_dnd: true,
         };
+        assert!(
+            spec("poranny-raport", &draft).is_err(),
+            "most z harmonogramu"
+        );
+        let draft = TriggerDraft {
+            bridge: None,
+            ..draft
+        };
         let s = spec("poranny-raport", &draft).unwrap();
-        assert!(s.allow_bridges && s.owner == Actor::User);
-        assert!(s.rate.max_fires <= triggers_contract::MAX_BRIDGE_FIRES_PER_DAY);
+        assert!(!s.allow_bridges && s.owner == Actor::User);
+        assert_eq!(s.action.executor, ExecutorKind::Agent);
         let bad = TriggerDraft {
             kind: TriggerKindView::Cron {
                 expr: "nie cron".into(),

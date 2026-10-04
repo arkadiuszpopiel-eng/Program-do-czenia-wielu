@@ -19,7 +19,7 @@ Rdzeń `TriggerEngine` + `TriggersCore<H: TriggerHost>` w kontrakcie. Zdarzenia:
 `scheduler` (zadania, `Scheduler::submit`), `safety-broker` (`Capability`, `TaintSource`), `personas`, `core-bus`, `core-registry` (`-contract`).
 
 ## Niezmienniki
-- Zadanie z wyzwalacza ma pochodzenie `Trigger{depth}` → most odmawia (`LaunchOrigin::Trigger`); akcja z mostem bez `allow_bridges` odrzucana przy tworzeniu. Wyjątek: harmonogram **czasowy** utworzony i posiadany przez **użytkownika** z `allow_bridges` i limitem ≤ 24/dobę → `Schedule` (zgodę per trasa i limit sprawdza jeszcze `agent-backends`).
+- Zadanie z wyzwalacza ma pochodzenie `Trigger{depth}` → most odmawia (`LaunchOrigin::Trigger`); akcja z mostem odrzucana przy tworzeniu (`BridgeForbidden`) **bez wyjątków** — także harmonogram czasowy użytkownika (AGENTS.md: mostów CLI nie uruchamia się z harmonogramu; CX-d). `allow_bridges = true` odrzucane; pole zostaje tylko dla odczytu zapisanych wyzwalaczy.
 - Właściciel = twórca; agentka zarządza tylko swoimi; klasa zadania najwyżej `Agent`.
 - `scope` to sufit — tokeny wydaje Broker przy wykonaniu, nigdy przy tworzeniu.
 - Treść wyzwalająca (plik, wiadomość, wynik skażonego zadania) jest niezaufana: `taint` + osobne `payload.untrusted`.
@@ -51,3 +51,12 @@ Ustawienia → Wyzwalacze (lista, następne uruchomienie, dziennik, „Uruchom t
 ## Otwarte pytania
 - Obserwator plików w `platform-windows` (`ReadDirectoryChangesW`) — port gotowy, podpięcie w `app-*`.
 - `TaintSource` nie ma wariantu „wiadomość czatu” — używany `Email` (do decyzji z właścicielem Brokera).
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **CX-d (zrobione):** usunięty wyjątek „harmonogram użytkownika z `allow_bridges`”. `validate` odrzuca każdy
+  wykonawcę-most i `allow_bridges = true`; `task_for` daje zawsze `TaskOrigin::Trigger`; `MAX_BRIDGE_FIRES_PER_DAY`
+  usunięte. `app-tasks` odrzuca szkic wyzwalacza z mostem (`Forbidden`). Testy: `contract_tests::policy`,
+  `triggers-impl/tests/compliance.rs::controls_user_request_starts_schedule_never` (harmonogram czasowy z niezerową
+  zgodą dzienną trasy nie startuje mostu), `app-core/tests/bridges.rs::triggers_never_start_a_bridge`.
+- Do decyzji człowieka: opis `controls` w zamrożonym zestawie `evals/F5/bridge-trigger-cases.json` wspomina jeszcze
+  „harmonogram użytkownika z allow_bridges … startuje” (próg 0/100 i przypadki bez zmian; plik zamrożony — nie edytowano).

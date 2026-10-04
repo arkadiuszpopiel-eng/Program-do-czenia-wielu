@@ -2,13 +2,18 @@
 //! → kill-switch: cisza audio → zabicie zarejestrowanych drzew procesów (Job Objects; jądro
 //! uruchomione przez watchdoga z `--` jest w jego Job Object razem z potomkami) → Broker przez
 //! IPC (`KillAll`, rola `Watchdog`, zapis po tożsamości obrazu) z limitem 100 ms.
+//!
+//! Uruchomiony przez aplikację (`app-broker`): `--lifeline` — kończy się, gdy aplikacja zamknie
+//! stdin; komunikaty dla aplikacji jako linie JSON na stdout ([`notice_ready`], [`notice_kill`]):
+//! aplikacja nie rejestruje skrótu drugi raz i po kill-switchu zatrzymuje generacje i narzędzia.
 
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
 use platform_contract::{
-    Integrity, ProcessIdentityPort, ProcessPort, ProcessSpec, SecurePipePort, Sid,
+    Integrity, ProcessIdentityPort, ProcessPort, ProcessSpec, SecurePipePort, Sid, StopSignal,
 };
 use platform_windows_impl::{JobLimits, WinHotkeys, WinProcesses};
 use platform_windows_kernel_impl::WinKernel;
@@ -17,7 +22,8 @@ use safety_broker_contract::ipc::{
 };
 use safety_broker_contract::ipc_blocking::BlockingClient;
 use watchdog_contract::{
-    Clock, JobRegistry, KillReason, KillReport, ProcessRole, Supervisor, SystemClock, WatchPolicy,
+    Clock, JobRegistry, KillReason, KillReport, ProcessRole, Supervisor, SystemClock,
+    UpdaterSignal, WatchPolicy,
 };
 use watchdog_impl::daemon::{KillSwitchDaemon, ThreadedPeer};
 use watchdog_impl::{WatchdogPorts, WatchdogService};
@@ -33,10 +39,29 @@ pub fn broker_peer(
     pipe: String,
     broker_user: Option<Sid>,
 ) -> ThreadedPeer {
+    broker_peer_checked(pipes, identity, pipe, broker_user, None)
+}
+
+/// Jak [`broker_peer`], a dodatkowo serwer potoku musi być procesem `broker_pid` (tryb
+/// przenośny: Broker to proces potomny aplikacji na tym samym koncie — inny proces tego konta
+/// mógłby utworzyć kolejną instancję potoku).
+pub fn broker_peer_checked(
+    pipes: Arc<dyn SecurePipePort>,
+    identity: Arc<dyn ProcessIdentityPort>,
+    pipe: String,
+    broker_user: Option<Sid>,
+    broker_pid: Option<u32>,
+) -> ThreadedPeer {
     ThreadedPeer::new(move |reason: KillReason| -> Result<KillReport, String> {
         let conn = pipes
             .connect(&pipe, CONNECT_MS)
             .map_err(|e| e.to_string())?;
+        if let Some(pid) = broker_pid.filter(|p| *p != conn.peer_pid()) {
+            return Err(format!(
+                "serwer potoku to proces {}, a nie Broker {pid} — podstawiony?",
+                conn.peer_pid()
+            ));
+        }
         if let Some(expected) = &broker_user {
             let server = identity
                 .identify(conn.peer_pid())
@@ -85,13 +110,18 @@ impl Supervisor for NoRestart {
     }
 }
 
-/// Argumenty: `--broker-pipe NAZWA`, `--broker-user SID`, `-- <jądro> [argumenty…]`.
+/// Argumenty: `--broker-pipe NAZWA`, `--broker-user SID`, `--broker-pid PID`, `--lifeline`,
+/// `-- <jądro> [argumenty…]`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WatchdogArgs {
     /// Potok Brokera.
     pub broker_pipe: String,
     /// Konto usługi Brokera (sprawdzane po stronie klienta).
     pub broker_user: Option<Sid>,
+    /// PID procesu Brokera (tryb przenośny — sprawdzany po stronie klienta).
+    pub broker_pid: Option<u32>,
+    /// Zakończ, gdy proces nadrzędny (aplikacja) zamknie stdin.
+    pub lifeline: bool,
     /// Polecenie jądra uruchamianego w Job Object watchdoga.
     pub core: Option<(PathBuf, Vec<String>)>,
 }
@@ -111,12 +141,37 @@ impl WatchdogArgs {
             .map(|(cmd, rest)| (PathBuf::from(cmd), rest.to_vec()));
         let broker_pipe = crate::arg_value(own, "--broker-pipe")
             .unwrap_or_else(|| crate::broker::DEV_PIPE.to_owned());
+        let broker_pid = crate::arg_value(own, "--broker-pid")
+            .map(|p| p.parse::<u32>().map_err(|e| format!("--broker-pid: {e}")))
+            .transpose()?;
         Ok(Self {
             broker_pipe,
             broker_user,
+            broker_pid,
+            lifeline: crate::has_flag(own, "--lifeline"),
             core,
         })
     }
+}
+
+/// Sygnał rollbacku dla launchera (`updater-impl`): katalog instalacji z obrazu jądra
+/// (`<root>\versions\<ver>\alfa-desktop.exe`), inaczej `%LOCALAPPDATA%\Alfa`; wersja
+/// uruchomiona = wersja tego pakietu. Błąd odczytu instalacji — bez sygnału (watchdog działa dalej).
+pub fn updater_signal(core: Option<&std::path::Path>) -> Option<Arc<dyn UpdaterSignal>> {
+    let local = std::env::var_os("LOCALAPPDATA").map(|d| PathBuf::from(d).join("Alfa"))?;
+    updater_signal_in(core, &local)
+}
+
+/// Jak [`updater_signal`], z jawnym katalogiem danych Alfy (testy, tryb przenośny).
+pub fn updater_signal_in(
+    core: Option<&std::path::Path>,
+    local: &std::path::Path,
+) -> Option<Arc<dyn UpdaterSignal>> {
+    let root = updater_impl::launcher::app_install_root(core, local);
+    let updater = updater_impl::FsUpdater::new(updater_impl::UpdaterConfig::new(&root)).ok()?;
+    let running = semver::Version::parse(env!("CARGO_PKG_VERSION")).ok()?;
+    let signal = updater_impl::WatchdogSignal::new(Arc::new(updater), running);
+    Some(Arc::new(signal))
 }
 
 /// Uruchamia watchdoga na Windows (blokuje).
@@ -124,13 +179,23 @@ pub fn run(args: WatchdogArgs) -> Result<(), String> {
     let processes = Arc::new(WinProcesses::new(JobLimits::default()));
     let clock: Arc<dyn Clock> = Arc::new(SystemClock);
     let kernel = Arc::new(WinKernel);
-    let peer = broker_peer(kernel.clone(), kernel, args.broker_pipe, args.broker_user);
+    let peer = broker_peer_checked(
+        kernel.clone(),
+        kernel,
+        args.broker_pipe,
+        args.broker_user,
+        args.broker_pid,
+    );
+    let stop = StopSignal::new();
+    if args.lifeline {
+        crate::spawn_lifeline(stop.clone());
+    }
     let ports = WatchdogPorts {
         clock: clock.clone(),
         processes: processes.clone(),
         supervisor: Arc::new(NoRestart),
         config: None,
-        updater: None,
+        updater: updater_signal(args.core.as_ref().map(|(cmd, _)| cmd.as_path())),
         bus: None,
         audit: None,
         peers: vec![Arc::new(peer)],
@@ -156,10 +221,38 @@ pub fn run(args: WatchdogArgs) -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
     eprintln!("[alfa-watchdog] kill-switch Ctrl+Shift+F12 aktywny");
-    loop {
+    notify(&notice_ready());
+    while !stop.is_stopped() {
         let events = hotkeys.wait_events(Duration::from_secs(1));
         if let Some(report) = runtime.block_on(daemon.on_events(&events)) {
             eprintln!("[alfa-watchdog] kill-switch: {report:?}");
+            notify(&notice_kill(&report));
         }
+    }
+    Ok(())
+}
+
+/// Komunikat „skrót zarejestrowany” (aplikacja nie rejestruje `Ctrl+Shift+F12` drugi raz).
+pub fn notice_ready() -> String {
+    serde_json::json!({ "event": "ready", "hotkey": "Ctrl+Shift+F12" }).to_string()
+}
+
+/// Komunikat „kill-switch wykonany” (aplikacja zatrzymuje generacje, przebiegi i narzędzia).
+pub fn notice_kill(report: &KillReport) -> String {
+    serde_json::json!({
+        "event": "kill_switch",
+        "reason": report.reason,
+        "tokens_revoked": report.tokens_revoked,
+        "jobs_killed": report.jobs_killed,
+        "latency_us": report.latency_us,
+    })
+    .to_string()
+}
+
+/// Jedna linia komunikatu na stdout (odczytuje ją wyłącznie aplikacja — anonimowy potok).
+fn notify(line: &str) {
+    let mut out = std::io::stdout().lock();
+    if writeln!(out, "{line}").and_then(|()| out.flush()).is_err() {
+        eprintln!("[alfa-watchdog] stdout zamknięty — aplikacja nie dostanie komunikatu");
     }
 }

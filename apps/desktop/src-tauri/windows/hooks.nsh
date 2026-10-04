@@ -2,7 +2,10 @@
 ; Plik w UTF-8 z BOM (NSIS bez BOM czyta !include w stronie kodowej ANSI — polskie napisy).
 ; Instalacja per-user bez UAC do $LOCALAPPDATA\Alfa (ADR 0007, PLAN §1.2):
 ;   alfa.exe            — stały launcher (skrót w Menu Start z AUMID, protokół alfa://, „Otwórz w Alfie”)
-;   versions\<ver>\     — wersje obok siebie (alfa-desktop.exe, version.json, notes.md)
+;   versions\<ver>\     — wersje obok siebie (alfa-desktop.exe, version.json, notes.md) i procesy Jądra
+;                         tej wersji: alfa-broker.exe (tryb przenośny `--console`), alfa-broker-ui.exe,
+;                         alfa-watchdog.exe (Ctrl+Shift+F12 poza UI) — ADR 0003; usługę AlfaBroker
+;                         (osobne konto, Program Files, jednorazowy UAC) instaluje człowiek (bramka #10)
 ;   current.json        — wersja aktywna i poprzednia (zapis atomowy: alfa.exe --alfa-installed <ver>)
 ;   webview-data\       — stały folder danych WebView2 poza katalogami wersji
 ; Tauri kopiuje aplikację jako $INSTDIR\alfa.exe (mainBinaryName) i launcher jako alfa-launcher.exe
@@ -19,6 +22,14 @@
     ${If} ${FileExists} "$INSTDIR\versions\$R9\alfa-desktop.exe"
       !insertmacro CheckIfAppIsRunning "$INSTDIR\versions\$R9\alfa-desktop.exe" "${PRODUCTNAME}"
     ${EndIf}
+    ; Procesy Jądra trybu przenośnego kończą się z aplikacją (linia życia na stdin) — tu tylko
+    ; pewność, że pliki wersji nie są zablokowane przed ponowną instalacją.
+    ${If} ${FileExists} "$INSTDIR\versions\$R9\alfa-watchdog.exe"
+      !insertmacro CheckIfAppIsRunning "$INSTDIR\versions\$R9\alfa-watchdog.exe" "${PRODUCTNAME}"
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\versions\$R9\alfa-broker.exe"
+      !insertmacro CheckIfAppIsRunning "$INSTDIR\versions\$R9\alfa-broker.exe" "${PRODUCTNAME}"
+    ${EndIf}
     FindNext $R8 $R9
   ${Loop}
   FindClose $R8
@@ -34,6 +45,11 @@
     RMDir /r "$INSTDIR\versions\${VERSION}"
     CreateDirectory "$INSTDIR\versions\${VERSION}"
     Rename "$INSTDIR\${MAINBINARYNAME}.exe" "$INSTDIR\versions\${VERSION}\alfa-desktop.exe"
+    ; Procesy Jądra (externalBin) obok aplikacji tej wersji: app-broker szuka ich w katalogu
+    ; alfa-desktop.exe (tryb przenośny), a Broker wiąże rolę jądra z obrazem z tego katalogu.
+    Rename "$INSTDIR\alfa-broker.exe" "$INSTDIR\versions\${VERSION}\alfa-broker.exe"
+    Rename "$INSTDIR\alfa-broker-ui.exe" "$INSTDIR\versions\${VERSION}\alfa-broker-ui.exe"
+    Rename "$INSTDIR\alfa-watchdog.exe" "$INSTDIR\versions\${VERSION}\alfa-watchdog.exe"
     Rename "$INSTDIR\alfa-launcher.exe" "$INSTDIR\${MAINBINARYNAME}.exe"
     ; Launcher z instalatora jest aktualny — przygotowana wcześniej zamiana jest nieaktualna.
     Delete "$INSTDIR\alfa.exe.new"

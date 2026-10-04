@@ -1,5 +1,6 @@
 //! Budowa modułów podpiętych po F1: rezydencja modeli, model lokalny, Router, klasyfikator ryzyka,
-//! Broker w procesie (tryb deweloperski), dziennik cofania, transfer, audio, TTS, aktualizacje.
+//! Broker (poza procesem z `AppOptions::kernel` albo w procesie — tryb deweloperski), dziennik
+//! cofania, transfer, audio, TTS, aktualizacje.
 //! Awaria budowy takiego modułu nie zatrzymuje aplikacji: moduł zostaje „niepodłączony"
 //! (port zwraca czytelny błąd, Broker — bezpieczną odmowę), a rejestr pokazuje go jako
 //! niezdrowy.
@@ -21,9 +22,6 @@ use providers_local_impl::LocalModule;
 use risk_classifier_contract::RiskPolicy;
 use risk_classifier_impl::TableClassifier;
 use router_impl::{CostMeterGate, RouterCore, RouterModule};
-use safety_broker_contract::KernelPolicy;
-use safety_broker_impl::audit::{BrokerAuditWriter, FileAnchorStore};
-use safety_broker_impl::{BrokerConfig, BrokerEngine, KeyMode};
 use sessions_contract::Sessions;
 use sessions_impl::SqliteSessions;
 use transfer_contract::{Category, DocumentStore, Limits, MachineInfo, SystemClock, TransferPorts};
@@ -39,7 +37,6 @@ use crate::compose::{HealthSlot, started};
 use crate::error::AppError;
 use crate::options::{AppOptions, AppPaths};
 use crate::parts::Kernel;
-use app_modules::broker::{dev_dir, path_env_for};
 use app_modules::route::{Routers, local};
 
 /// Zależności z modułów podstawowych.
@@ -64,7 +61,7 @@ pub(crate) struct Extra {
     pub routers: Option<Routers>,
     pub router: Option<Arc<RouterModule>>,
     pub classifier: Option<Arc<TableClassifier>>,
-    pub broker: Option<Arc<BrokerEngine>>,
+    pub broker: Option<app_broker::KernelBroker>,
     /// Wykonanie poleceń narzędzi i zabijanie ich przez Brokera (jedna instancja).
     pub exec: Option<Arc<dyn platform_contract::ExecPort>>,
     pub undo: Option<Arc<UndoService>>,
@@ -123,9 +120,7 @@ impl Extra {
             "updater" => self.updater(&deps).await,
             // Narzędzia i runtime agentek składa `Extra::agents` po zbudowaniu Brokera
             // i dziennika cofania (wymagane przez manifesty — są wcześniej w kolejności).
-            "tools-fs" | "tools-shell" | "tools-clipboard" | "agent-runtime" => {
-                self.agents_ready(id, &deps)
-            }
+            m if app_agents::MODULES.iter().any(|(x, _)| *x == m) => self.agents_ready(m, &deps),
             _ => return false,
         };
         if let Err(e) = result {
@@ -200,28 +195,9 @@ impl Extra {
         Ok(())
     }
 
-    /// Broker w procesie: polityka bazowa profilu, Audyt w pliku z łańcuchem i kotwicą.
+    /// Broker poza procesem (`AppOptions::kernel`) albo w procesie (polityka bazowa profilu,
+    /// Audyt w pliku z łańcuchem i kotwicą — `app_broker::inproc`).
     fn broker(&mut self, deps: &Deps<'_>) -> Result<(), AppError> {
-        let (profile, env) = path_env_for(&deps.paths.user_root);
-        let dir = dev_dir(&deps.paths.local);
-        let policy = KernelPolicy::baseline(&profile, &dir.to_string_lossy())
-            .or_else(|_| KernelPolicy::baseline(&profile, r"C:\ProgramData\AlfaBroker"))
-            .map_err(|e| err("safety-broker")(e.to_string()))?;
-        let clock = Arc::new(watchdog_contract::SystemClock);
-        let audit = BrokerAuditWriter::open(
-            dir.join("audit.ndjson"),
-            Arc::new(FileAnchorStore::new(dir.join("anchor.json"))),
-            Arc::new(core_log_contract::RegexRedactor::default()),
-            clock.clone(),
-            "broker-dev",
-            None,
-        )
-        .map_err(|e| err("safety-broker: Audyt")(e.to_string()))?;
-        let config = BrokerConfig {
-            policy,
-            env,
-            key_mode: KeyMode::Random,
-        };
         // Procesy narzędzi (`shell_run`) zabija ten sam port (ta sama tablica uchwytów Job
         // Objects), który je uruchomił — jedna instancja dla Brokera i narzędzi agentek.
         let exec: Arc<dyn platform_contract::ExecPort> = match &deps.options.exec {
@@ -229,17 +205,21 @@ impl Extra {
             None => Arc::new(platform_windows_impl::WindowsPlatform::default()),
         };
         self.exec = Some(exec.clone());
-        let processes: Arc<dyn platform_contract::ProcessPort> = exec;
-        let mut engine = BrokerEngine::new(config, clock, Arc::new(audit), processes)
-            .map_err(|e| err("safety-broker")(e.to_string()))?
-            .with_bus(deps.bus.clone());
-        if let Some(c) = &self.classifier {
-            engine = engine.with_classifier(c.clone());
-        }
-        self.broker = Some(Arc::new(engine));
+        let kernel = match &deps.options.kernel {
+            Some(remote) => remote.bind(exec, Some(deps.bus.clone())),
+            None => app_broker::inproc::kernel(app_broker::inproc::InprocDeps {
+                user_root: &deps.paths.user_root,
+                local: &deps.paths.local,
+                processes: exec,
+                bus: deps.bus.clone(),
+                classifier: self.classifier.clone().map(|c| c as _),
+            })
+            .map_err(err("safety-broker"))?,
+        };
         if let Some(slot) = deps.slot {
-            let _ = slot.set(Arc::new(|| HealthStatus::Healthy));
+            let _ = slot.set(kernel.health_probe());
         }
+        self.broker = Some(kernel);
         Ok(())
     }
 

@@ -47,3 +47,13 @@ Zdarzenia: `tool.<narzędzie>.*` na magistrali (`tool_event`, kontekst sesji/age
 ## Otwarte pytania
 - Rodzina zdolności `clipboard.*` w Brokerze (dziś `gui.control(clipboard.exe)`) — SPEC v1 `safety-broker`.
 - Narzędzia MCP w tym samym formacie (mapowanie schematów, taint) — F4.
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **Q-1:** `paths::resolve_links` (dowiązania — symlink, junction, inne punkty ponownej analizy — najdłuższego
+  istniejącego prefiksu rozwiązywane przez `canonicalize`, prefiks `\\?\`/`\\?\UNC\` zdejmowany, nieistniejąca reszta
+  dołączana) i `paths::protected_with_links(path, is_protected)` — sprawdzenie w postaci podanej **albo** rozwiązanej;
+  istniejący komponent nierozwiązywalny (zerwane dowiązanie, brak dostępu) = chroniona (fail-closed). Używają jej
+  `tools-fs`, `tools-shell` (przy każdym wywołaniu) i `app-modules::workdir` (przy wyborze katalogu). Nowy wariant
+  `PathError::Unresolvable`. Test: `paths::tests::links_are_resolved_before_checks`.
+- **Q-8:** `paths::resolve_path_dots` — jak `resolve_path`, ale `.`/`..` zwijane leksykalnie (cel polecenia powłoki
+  względem katalogu roboczego); `..` ponad korzeń dysku/udziału UNC → błąd. `resolve_path` dalej odrzuca `..`.

@@ -22,6 +22,15 @@ tools-shell-contract = { path = "../tools-shell-contract" }
 tools-shell-impl = { path = "../tools-shell-impl" }
 tools-clipboard-contract = { path = "../tools-clipboard-contract" }
 tools-clipboard-impl = { path = "../tools-clipboard-impl" }
+# F6: Word/Excel i przeglądarka agentek nad portami `platform-apps` (Windows: COM / CDP przez potok).
+tools-office-contract = { path = "../tools-office-contract" }
+tools-office-impl = { path = "../tools-office-impl" }
+tools-browser-contract = { path = "../tools-browser-contract" }
+tools-browser-impl = { path = "../tools-browser-impl" }
+platform-apps-contract = { path = "../platform-apps-contract" }
+platform-windows-office-impl = { path = "../platform-windows-office-impl" }
+# F8: wtyczki Wasm (narzędzia do rejestru agentek, komendy strony „Wtyczki”).
+app-plugins = { path = "../app-plugins" }
 safety-broker-contract = { path = "../safety-broker-contract" }
 risk-classifier-contract = { path = "../risk-classifier-contract" }
 undo-journal-contract = { path = "../undo-journal-contract" }
@@ -48,6 +57,13 @@ platform-fake = { path = "../platform-fake" }
 platform-windows-impl = { path = "../platform-windows-impl" }
 safety-broker-fake = { path = "../safety-broker-fake" }
 undo-journal-fake = { path = "../undo-journal-fake" }
+platform-apps-fake = { path = "../platform-apps-fake" }
+tools-office-fake = { path = "../tools-office-fake" }
+tools-browser-fake = { path = "../tools-browser-fake" }
+plugin-runtime-contract = { path = "../plugin-runtime-contract" }
+base64 = "0.22.1"
+# Wtyczka testowa z WAT (ta sama linia co w plugin-runtime-impl).
+wat = "=1.236.1"
 tempfile = "3.27.0"
 tokio = { workspace = true, features = ["test-util"] }
 

@@ -38,6 +38,7 @@ Decyzje v1: `SessionId` z `core-bus-contract`; „Krytyczka ≠ autorka, gdy mo�
 - Persona stała (imię, głos, charakter); rola zmienna. **Głos idzie za personą, uprawnienia za rolą** pod sufitem sesji (§8.3).
 - Zmiana obsady natychmiastowa, bez restartu sesji, zapisana w dzienniku; przy zmianie Broker wydaje nowe tokeny (F3).
 - Krytyczka tylko odczyt; Badaczka na niezaufanych źródłach w izolacji; Wykonawczyni ma narzędzia systemowe.
+- Grupy narzędzi ról (F6/F8, najmniejsze uprawnienia): Wykonawczyni `fs`, `shell`, `gui.control`, `office`, `browser`, `plugin`; Badaczka `web`, `browser`, `mcp`; Pisarka `fs.session`, `office`; Krytyczka `fs.read`, `office.read` (narzędzia zmieniające stan i tak odcięte flagą tylko-odczyt).
 - Zwrot po imieniu zawsze wygrywa; bez imienia odpowiada Dyrygentka; mówi jedna naraz.
 - Prompty w języku żeńskim; usługi systemowe (Scheduler, Marszałek, Diagnosta, Ulepszacz, Watchdog, Router) bez persony i głosu.
 - Persona nie może zmienić własnej roli ani obsady bez polecenia użytkownika (Marszałek działa na Twoje polecenie).

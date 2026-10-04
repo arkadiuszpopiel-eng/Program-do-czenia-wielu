@@ -1,12 +1,14 @@
 <!--
   Ustawienia → Głos: dostępność trybu głosowego (bez modeli/sidecarów — powód i lista braków),
   rozmowa wł./wył., mikrofon z testem poziomu, głosy agentek v0 z próbką. Tryb PTT/przełącznik
-  i pigułka — wiersze ustawień pod spodem (z manifestu strony).
+  i pigułka — wiersze ustawień pod spodem (z manifestu strony). F5 (słowa wywoławcze, weryfikacja
+  głosu, dyktowanie, czytanie) — sekcje ładowane leniwie (`VoiceSettings`).
 -->
 <script lang="ts">
   import { Avatar, Button, Select, agentIds, agents } from '@alfa/ui-kit';
   import type { AudioDevice } from '../../../api/types-hub';
   import { useApp } from '../../../state/context';
+  import Lazy from '../../../components/shell/Lazy.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -120,6 +122,12 @@
     </div>
   {/if}
 </section>
+
+<Lazy
+  load={() => import('../../../components/voice/VoiceSettings.svelte')}
+  props={{}}
+  label={t('vf.loading')}
+/>
 
 <section class="card" aria-labelledby="voice-voices">
   <h3 id="voice-voices">{t('voice.voices')}</h3>

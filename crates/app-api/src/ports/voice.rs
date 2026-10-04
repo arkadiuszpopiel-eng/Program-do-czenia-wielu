@@ -9,7 +9,10 @@ use providers_contract::CancellationToken;
 use sessions_contract::{SessionId, TurnId};
 use tokio::sync::mpsc;
 
-use crate::dto::{AudioDevice, LocalizedText, VoiceStatus};
+use crate::dto::{
+    AudioDevice, DictationAction, LocalizedText, ReadAction, SpeakerAction, VoiceFeatures,
+    VoiceStatus, WakeAction,
+};
 use crate::error::AppError;
 
 /// Tekst próbki głosu agentki (Ustawienia → Głos → „Odsłuchaj").
@@ -52,15 +55,28 @@ pub struct VoiceTurn {
     pub chunks: mpsc::UnboundedReceiver<VoiceChunk>,
 }
 
+/// Pochodzenie tury głosowej dla klasyfikatora ryzyka i Brokera (F5): pewność STT wypowiedzi
+/// i wynik weryfikacji właściciela (`voice-speaker`). Domyślnie — pewność nieznana
+/// (rdzeń przyjmuje wartość ostrożną) i głos **niezweryfikowany** (fail-closed).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct VoiceTurnOrigin {
+    /// Pewność finalu STT (‰); `None` — nieznana.
+    pub stt_confidence_permille: Option<u16>,
+    /// Głos właściciela zweryfikowany progiem ścisłym.
+    pub speaker_verified: bool,
+}
+
 /// Czat dla rozmowy głosowej (implementuje `app-core`).
 #[async_trait]
 pub trait VoiceChat: Send + Sync {
     /// Tura użytkownika z mowy (aktywna sesja; bez niej — nowa sesja głosowa) i odpowiedź
     /// agentki `persona`; anulowanie `cancel` (barge-in, „stop") przerywa generowanie.
+    /// `origin` trafia do faktów Brokera (`CommandOrigin::UserVoice`).
     async fn voice_turn(
         &self,
         persona: &str,
         text: &str,
+        origin: VoiceTurnOrigin,
         cancel: CancellationToken,
     ) -> Result<VoiceTurn, AppError>;
     /// Zamyka turę: `heard = Some((prefiks, przybliżony))` — odpowiedź przerwana, w historii
@@ -106,6 +122,29 @@ pub trait VoicePort: Send + Sync {
     }
     /// Podpina czat (rdzeń po zbudowaniu) — odpowiedzi rozmowy głosowej idą do tej samej sesji.
     fn attach(&self, _chat: Arc<dyn VoiceChat>) {}
+    /// Głos rozszerzony F5: stan słów wywoławczych, weryfikacji właściciela, dyktowania, czytania.
+    async fn features(&self) -> VoiceFeatures {
+        VoiceFeatures::unavailable(voice_unavailable_reason())
+    }
+    /// Słowa wywoławcze: konfiguracja (jawne włączenie), test, „nie przeszkadzać”.
+    async fn wake(&self, _action: WakeAction) -> Result<VoiceFeatures, AppError> {
+        Err(AppError::unavailable("Słowa wywoławcze", "voice-wake"))
+    }
+    /// Kreator rejestracji głosu i weryfikacja właściciela.
+    async fn speaker(&self, _action: SpeakerAction) -> Result<VoiceFeatures, AppError> {
+        Err(AppError::unavailable(
+            "Rozpoznawanie głosu",
+            "voice-speaker",
+        ))
+    }
+    /// Dyktowanie do aplikacji na pierwszym planie.
+    async fn dictation(&self, _action: DictationAction) -> Result<VoiceFeatures, AppError> {
+        Err(AppError::unavailable("Dyktowanie", "voice-dictation"))
+    }
+    /// Czytanie na głos zaznaczenia, dokumentu albo schowka.
+    async fn read(&self, _action: ReadAction) -> Result<VoiceFeatures, AppError> {
+        Err(AppError::unavailable("Czytanie na głos", "voice-readaloud"))
+    }
 }
 
 /// Port: głos niepodłączony. Operacje „wyłączające" (stop, wycisz, mikrofon wył.) są bezpiecznym

@@ -51,4 +51,13 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
 
 ## Otwarte pytania
 - Credential Manager przez `keyring-core` + `windows-native-keyring-store` w tym crate'cie vs przez `platform-windows-impl` (`SystemPort`) — do decyzji przy F1 platformy (ADR).
-- Egzekwowanie `resolve_secret` tokenem zdolności Brokera (F3); aktualizacja katalogu z repo aktualizacji; import z `secrets.enc` (`transfer` v1).
+- Egzekwowanie `resolve_secret` tokenem zdolności Brokera (F3); aktualizacja katalogu z repo aktualizacji; ~~import z `secrets.enc` (`transfer` v1)~~ — odrzucone (CX-a: sekrety nigdy w `.alfa`).
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **Q-5 (zrobione):** zmiany kont (`add_account`, `update_settings`, `rotate`, `test_account`, `set_disabled`, kreator,
+  import z env, `remove`) trafiają do pamięci **dopiero po udanym zapisie** `accounts.json`
+  (`AccountsHubService::update_accounts`, blokada zapisu na czas zapisu). Błąd zapisu → pamięć zgodna z plikiem;
+  nieudane dodanie usuwa świeżo zapisany klucz (bez osieroconych wpisów w Credential Manager); `remove` najpierw usuwa
+  klucz (błąd → nic się nie zmienia), potem metadane. Test: `accounts-hub-impl/tests/persist_failure.rs`.
+- Znane ograniczenie: `rotate` zapisuje nowy klucz przed metadanymi — przy błędzie zapisu klucz jest już nowy, a stan
+  konta (ostatni test) stary; ponowna rotacja/test wyrównuje.

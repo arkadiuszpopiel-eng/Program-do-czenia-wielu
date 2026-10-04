@@ -29,6 +29,9 @@ pub enum PathError {
     /// Zakres tokenu nie powstał.
     #[error("zakres: {0}")]
     Scope(String),
+    /// Istniejącego komponentu nie da się rozwiązać (np. zerwane dowiązanie) — cel nieustalony.
+    #[error("nie da się ustalić celu ścieżki „{0}” (dowiązanie?)")]
+    Unresolvable(String),
 }
 
 impl From<ScopeError> for PathError {
@@ -96,6 +99,57 @@ pub fn is_absolute(path: &str) -> bool {
 
 /// Rozwija zmienne, dołącza katalog roboczy do ścieżki względnej i sprawdza postać.
 pub fn resolve_path(raw: &str, workdir: Option<&str>, env: &PathEnv) -> Result<String, PathError> {
+    resolve(raw, workdir, env, false)
+}
+
+/// Jak [`resolve_path`], ale segmenty `.`/`..` są rozwijane leksykalnie (cel polecenia powłoki
+/// uruchomionego w `workdir`, np. `..\..\x`); `..` ponad korzeń dysku/udziału → błąd.
+pub fn resolve_path_dots(
+    raw: &str,
+    workdir: Option<&str>,
+    env: &PathEnv,
+) -> Result<String, PathError> {
+    resolve(raw, workdir, env, true)
+}
+
+/// Zwija `.`/`..` (separator jak pierwszy w ścieżce); `None`, gdy `..` wychodzi ponad korzeń.
+fn collapse_dots(full: &str) -> Option<String> {
+    let sep = full
+        .chars()
+        .find(|c| matches!(c, '/' | '\\'))
+        .unwrap_or('\\');
+    let body = full.trim_start_matches(['/', '\\']);
+    let lead = full.len() - body.len();
+    let mut root: String = std::iter::repeat_n(sep, lead).collect();
+    let mut segs = body.split(['/', '\\']).peekable();
+    if lead == 0
+        && let Some(drive) = segs.next_if(|s| is_drive_prefix(s))
+    {
+        root.push_str(drive);
+        root.push(sep);
+    }
+    // Udział UNC (`\\serwer\udział`) należy do korzenia — `..` go nie zdejmuje.
+    let keep = if lead >= 2 { 2 } else { 0 };
+    let mut parts: Vec<&str> = Vec::new();
+    for seg in segs {
+        match seg {
+            "" | "." => {}
+            ".." if parts.len() > keep => {
+                parts.pop();
+            }
+            ".." => return None,
+            s => parts.push(s),
+        }
+    }
+    Some(root + &parts.join(&sep.to_string()))
+}
+
+fn resolve(
+    raw: &str,
+    workdir: Option<&str>,
+    env: &PathEnv,
+    dots: bool,
+) -> Result<String, PathError> {
     let trimmed = raw.trim();
     if trimmed.is_empty() || trimmed.chars().any(char::is_control) {
         return Err(PathError::Empty);
@@ -113,6 +167,11 @@ pub fn resolve_path(raw: &str, workdir: Option<&str>, env: &PathEnv) -> Result<S
         let base = workdir.ok_or_else(|| PathError::Relative(trimmed.to_owned()))?;
         let sep = if base.contains('\\') { '\\' } else { '/' };
         format!("{}{sep}{expanded}", base.trim_end_matches(['/', '\\']))
+    };
+    let full = if dots {
+        collapse_dots(&full).ok_or_else(|| PathError::ParentSegment(trimmed.to_owned()))?
+    } else {
+        full
     };
     for (i, seg) in full.split(['/', '\\']).enumerate() {
         if seg == ".." {
@@ -135,6 +194,58 @@ pub fn has_credential_segment(path: &str) -> bool {
     path.split(['/', '\\'])
         .filter(|s| !s.is_empty())
         .any(|s| platform_contract::is_credential_path(std::path::Path::new(s)))
+}
+
+/// Zdejmuje prefiks `\\?\` (`\\?\UNC\serwer` → `\\serwer`) z wyniku `canonicalize` na Windows —
+/// postać jak z [`resolve_path`] i dla normalizacji deny-list `compliance`.
+fn strip_verbatim(p: &str) -> String {
+    if let Some(rest) = p.strip_prefix(r"\\?\UNC\") {
+        return format!(r"\\{rest}");
+    }
+    p.strip_prefix(r"\\?\").unwrap_or(p).to_owned()
+}
+
+/// Ścieżka po rozwiązaniu dowiązań (symlink, junction i inne punkty ponownej analizy)
+/// najdłuższego istniejącego prefiksu; nieistniejąca reszta dołączana bez zmian. `Ok(None)` —
+/// ścieżka nie jest bezwzględna w systemie procesu (nic do rozwiązania); `Err` — istniejący
+/// komponent nierozwiązywalny (zerwane dowiązanie, brak dostępu): wywołujący odmawia.
+pub fn resolve_links(path: &str) -> Result<Option<String>, PathError> {
+    let unresolvable = || PathError::Unresolvable(path.to_owned());
+    let full = std::path::Path::new(path);
+    if !full.is_absolute() {
+        return Ok(None);
+    }
+    let mut existing = full;
+    let mut tail = Vec::new();
+    loop {
+        match std::fs::symlink_metadata(existing) {
+            Ok(_) => break,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                tail.push(existing.file_name().ok_or_else(unresolvable)?);
+                existing = existing.parent().ok_or_else(unresolvable)?;
+            }
+            Err(_) => return Err(unresolvable()),
+        }
+    }
+    let mut real = std::fs::canonicalize(existing).map_err(|_| unresolvable())?;
+    for name in tail.iter().rev() {
+        real.push(name);
+    }
+    Ok(Some(strip_verbatim(&real.to_string_lossy())))
+}
+
+/// Ścieżka chroniona (`is_protected`: deny-lista, poświadczenia, dane Alfy) w postaci podanej
+/// **albo** po rozwiązaniu dowiązań — symlink/junction nie omija sprawdzenia; sprawdzane przy
+/// każdym użyciu (dowiązanie podmienione po wyborze katalogu). Cel nieustalony → `true`.
+pub fn protected_with_links(path: &str, is_protected: impl Fn(&str) -> bool) -> bool {
+    if is_protected(path) {
+        return true;
+    }
+    match resolve_links(path) {
+        Ok(Some(real)) => is_protected(&real),
+        Ok(None) => false,
+        Err(_) => true,
+    }
 }
 
 /// Zakres dokładnie jednej ścieżki (do tokenu).
@@ -209,6 +320,60 @@ mod tests {
         ));
         assert!(resolve_path("~x", Some("/w"), &e).is_ok());
         assert!(resolve_path("$żółw/x", Some("/w"), &e).is_ok());
+    }
+
+    /// Q-8: cel polecenia powłoki z `..` względem katalogu roboczego.
+    #[test]
+    fn resolves_parent_segments_lexically() {
+        let e = env();
+        let ok = |raw, wd| resolve_path_dots(raw, Some(wd), &e).unwrap();
+        assert_eq!(ok(r"..\..\x", "/Users/ala/Projekt"), "/Users/x");
+        assert_eq!(ok(r"sub\..\a.txt", r"C:\w"), r"C:\w\a.txt");
+        assert_eq!(ok(r"%USERPROFILE%\..\bob", "/w"), r"C:\Users\bob");
+        assert_eq!(ok(r"\\srv\d\a\..\b", "/w"), r"\\srv\d\b");
+        for bad in [r"C:\..\x", r"\\srv\d\..\..\x", "/../x", r"C:\x\*.txt"] {
+            assert!(resolve_path_dots(bad, Some("/w"), &e).is_err(), "{bad:?}");
+        }
+        assert!(
+            resolve_path(r"..\x", Some("/w"), &e).is_err(),
+            "bez `..` jak dotąd"
+        );
+    }
+
+    /// Q-1: dowiązania rozwiązywane przed sprawdzeniem; `\\?\` zdejmowany.
+    #[test]
+    fn links_are_resolved_before_checks() {
+        assert_eq!(strip_verbatim(r"\\?\C:\Users\ala"), r"C:\Users\ala");
+        assert_eq!(strip_verbatim(r"\\?\UNC\srv\d\x"), r"\\srv\d\x");
+        assert_eq!(resolve_links("wzgledna/x").unwrap(), None);
+        let dir = std::env::temp_dir().join(format!("alfa-links-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let real = std::fs::canonicalize(&dir).unwrap();
+        let missing = dir.join("nowy").join("plik.txt");
+        let resolved = resolve_links(missing.to_str().unwrap()).unwrap().unwrap();
+        assert_eq!(
+            resolved,
+            strip_verbatim(&real.join("nowy").join("plik.txt").to_string_lossy())
+        );
+        #[cfg(unix)]
+        {
+            std::fs::create_dir_all(dir.join(".ssh")).unwrap();
+            std::os::unix::fs::symlink(dir.join(".ssh"), dir.join("link")).unwrap();
+            let via = dir.join("link").join("id_rsa");
+            assert!(protected_with_links(
+                via.to_str().unwrap(),
+                has_credential_segment
+            ));
+            std::os::unix::fs::symlink(dir.join("brak"), dir.join("zerwane")).unwrap();
+            let broken = dir.join("zerwane").join("x");
+            assert!(resolve_links(broken.to_str().unwrap()).is_err());
+            assert!(protected_with_links(broken.to_str().unwrap(), |_| false));
+        }
+        assert!(!protected_with_links(
+            missing.to_str().unwrap(),
+            has_credential_segment
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

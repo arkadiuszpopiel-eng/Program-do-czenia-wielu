@@ -125,7 +125,7 @@ Kolejność: nadpisanie z `AppOptions` → adapter na module → „moduł niepo
 | Port | Adapter | Bez modułu / czego brakuje |
 |---|---|---|
 | `BrainPort` | `RouterBrain` (Router + konta hubu + dostawcy lokalni; `AppOptions::providers` dokłada dostawców testowych) | `RouterUnavailable` |
-| `TransferPort` | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; eksport sekretów tylko jawnie, z hasłem; sesji prywatnej nie eksportuje) | `TransferUnavailable` |
+| `TransferPort` | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; sekretów nie eksportuje nigdy — CX-a; sesji prywatnej nie eksportuje) | `TransferUnavailable` |
 | `VoicePort` | `PipelineVoice` (`app-voice`): rozmowa, PTT, wyciszenie, pigułka — `voice-pipeline`; lista wejść, test mikrofonu (`MicLevel` ≤ 30/s) i czytanie na głos — `VoiceAdapter` (`voice-audio`, `voice-tts`; bez silnika — `NO_TTS`) | bez modeli/sidecarów: `VoiceStatus::Unavailable` z listą braków |
 | `BrokerPort` | `InprocBroker` (poziomy autonomii, `request_level`, `run_code`, `undo_step`, `kill_all`) | podniesienie poziomu wymaga `ApprovalWindow`; bez Broker-UI — `NEEDS_BROKER_WINDOW` (odmowa); dozwolone `run_code` — brak wykonawcy `tools-shell` |
 | `ShellPort` | powłoka Tauri (dialogi `tauri-plugin-dialog` w tym wybór katalogu, terminal w katalogu bez wykonania, okna, zasobnik) | `HeadlessShell` (testy; kolejka odpowiedzi dialogów) |
@@ -167,7 +167,7 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
   odmowa podniesienia autonomii bez Broker-UI i zgoda przez atrapę okna, czytanie na głos
   (`voice-tts-fake` + `voice-audio-fake`), `mark_good` updatera.
 - `tests/transfer.rs` — eksport → import `.alfa` przez komendy (podgląd, tryby, rollback, szyfrowanie,
-  eksport sekretów).
+  brak komendy eksportu sekretów).
 - `tests/memory.rs` — pamięć projektu wraca w innej sesji projektu (nie w innym projekcie); sesja
   prywatna nie wycieka; usunięcie sesji zapomina jej wpisy i kopie.
 - `tests/tasks.rs` — DAG dwóch agentek (kolejność, Replay z `task_id`), kill-switch zatrzymuje zadanie,

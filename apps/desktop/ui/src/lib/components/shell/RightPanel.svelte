@@ -1,6 +1,7 @@
 <!--
   Panel prawy — jedna karta naraz: Agentki · Oś czasu · Pliki · Pamięć · Ekran · Głos · Zadania
-  (Alt+1…7). Zawartość kart ładowana leniwie; Głos — pusty stan kolejnej fali.
+  (Alt+1…7). Zawartość kart ładowana leniwie (Głos — panel F5: słowa wywoławcze, rejestracja
+  głosu, dyktowanie, czytanie).
 -->
 <script lang="ts">
   import { Panel } from '@alfa/ui-kit';
@@ -21,7 +22,6 @@
   ];
   const tabs = $derived(TABS.map((id) => ({ id, label: t(`panel.${id}`) })));
   const current = $derived(app.layout.current(app.activeId).right_tab);
-  const WAVES: Readonly<Record<string, number>> = { voice: 2 };
 
   const loaders = {
     agents: () => import('../panels/AgentsPanel.svelte'),
@@ -30,6 +30,7 @@
     memory: () => import('../panels/MemoryPanel.svelte'),
     tasks: () => import('../panels/TasksPanel.svelte'),
     screen: () => import('../panels/ScreenPanel.svelte'),
+    voice: () => import('../panels/VoicePanel.svelte'),
   };
 </script>
 
@@ -57,23 +58,11 @@
   {:else if current === 'screen'}
     <Lazy load={loaders.screen} props={{ sessionId: app.activeId }} label={t('common.loading')} />
   {:else if current === 'voice'}
-    <div class="later">
-      <h3>{t(`panel.${current}`)}</h3>
-      <p>{app.i18n.tk(`panel.later.${current}`)}</p>
-      <p class="muted">{t('panel.laterWave', { wave: WAVES[current] ?? 2 })}</p>
-    </div>
+    <Lazy load={loaders.voice} props={{ sessionId: app.activeId }} label={t('common.loading')} />
   {/if}
 </Panel>
 
 <style>
-  .later {
-    display: flex;
-    flex-direction: column;
-    gap: var(--alfa-space-2);
-    padding: var(--alfa-space-6) var(--alfa-space-2);
-    text-align: center;
-    font-size: var(--alfa-font-size-sm);
-  }
   .muted {
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-sm);

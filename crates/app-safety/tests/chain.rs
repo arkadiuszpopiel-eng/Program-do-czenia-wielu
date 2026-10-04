@@ -203,16 +203,27 @@ fn approval_crosses_all_processes_and_injection_never_succeeds() {
         Response::Status(ApprovalStatus::Approved { token: Some(_) })
     ));
 
-    let peer = broker_peer(
-        Arc::new(c.sys.process(15)),
-        Arc::new(c.sys.process(15)),
-        "alfa-broker".into(),
-        Some(Sid::parse(BROKER).unwrap()),
-    );
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_time()
         .build()
         .unwrap();
+    // Tryb przenośny: serwer potoku musi być procesem Brokera uruchomionym przez aplikację.
+    let squatter = app_safety::watchdog::broker_peer_checked(
+        Arc::new(c.sys.process(15)),
+        Arc::new(c.sys.process(15)),
+        "alfa-broker".into(),
+        None,
+        Some(999),
+    );
+    let report = rt.block_on(squatter.kill_all(KillReason::Hotkey));
+    assert_eq!(report.tokens_revoked, 0, "zły PID serwera — bez wywołania");
+    let peer = app_safety::watchdog::broker_peer_checked(
+        Arc::new(c.sys.process(15)),
+        Arc::new(c.sys.process(15)),
+        "alfa-broker".into(),
+        Some(Sid::parse(BROKER).unwrap()),
+        Some(1),
+    );
     let report = rt.block_on(peer.kill_all(KillReason::Hotkey));
     assert!(report.tokens_revoked >= 1, "{report:?}");
     let impostor = broker_peer(

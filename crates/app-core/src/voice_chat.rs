@@ -16,11 +16,11 @@ use crate::core::{AppCore, Inner};
 use crate::dto::{EventLevel, SessionTemplate, TimelineKind};
 use crate::error::AppError;
 use crate::ids;
-use crate::ports::{KillOrigin, VoiceChat, VoiceTurn, VoiceTurnRef};
+use crate::ports::{KillOrigin, VoiceChat, VoiceTurn, VoiceTurnOrigin, VoiceTurnRef};
 use crate::settings::keys;
 
-/// Pewność STT przyjmowana dla tur głosowych, dopóki potok nie przekazuje jej per wypowiedź —
-/// destrukcyjne akcje zlecone głosem i tak wymagają potwierdzenia nie-głosem (PLAN §6.10).
+/// Pewność STT tur głosowych bez pomiaru z potoku (< 800‰ — każda zmiana stanu zlecona głosem
+/// pyta nie-głosem); destrukcja głosem zawsze wymaga potwierdzenia nie-głosem (PLAN §6.10).
 const VOICE_STT_CONFIDENCE_PERMILLE: u16 = 700;
 
 /// Czat rdzenia dla potoku (słaba referencja — port głosu żyje w rdzeniu).
@@ -67,6 +67,7 @@ impl VoiceChat for CoreVoiceChat {
         &self,
         persona: &str,
         text: &str,
+        origin: VoiceTurnOrigin,
         cancel: CancellationToken,
     ) -> Result<VoiceTurn, AppError> {
         let core = self.core()?;
@@ -86,9 +87,13 @@ impl VoiceChat for CoreVoiceChat {
             None,
             None,
         );
+        // Pochodzenie z potoku (`app-voice`: weryfikacja właściciela F5) — fakty dla Brokera.
+        let permille = origin.stt_confidence_permille;
         req.origin = CommandOrigin::UserVoice {
-            confidence: SttConfidence::from_permille(VOICE_STT_CONFIDENCE_PERMILLE),
-            speaker_verified: false,
+            confidence: SttConfidence::from_permille(
+                permille.unwrap_or(VOICE_STT_CONFIDENCE_PERMILLE),
+            ),
+            speaker_verified: origin.speaker_verified,
         };
         req.tap = Some(tx);
         let id = core.start_generation(req).await?;

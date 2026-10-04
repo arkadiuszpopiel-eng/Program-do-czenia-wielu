@@ -100,6 +100,7 @@ fn tools(env: &EvalEnv) -> AgentTools {
         shell: ShellToolsConfig::default(),
         base_env: None,
         extra: Vec::new(),
+        apps: None,
     })
 }
 

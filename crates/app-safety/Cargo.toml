@@ -34,10 +34,15 @@ compliance-contract = { path = "../compliance-contract" }
 platform-contract.workspace = true
 platform-windows-impl = { path = "../platform-windows-impl" }
 platform-windows-kernel-impl = { path = "../platform-windows-kernel-impl" }
+# Watchdog → launcher: rollback wersji po pętli awarii (`WatchdogSignal`).
+updater-impl = { path = "../updater-impl" }
+semver.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]
+# Format komunikatów watchdoga = parser aplikacji (`app_broker::notice`).
+app-broker = { path = "../app-broker" }
 platform-fake = { path = "../platform-fake" }
 risk-classifier-contract = { path = "../risk-classifier-contract" }
 safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }

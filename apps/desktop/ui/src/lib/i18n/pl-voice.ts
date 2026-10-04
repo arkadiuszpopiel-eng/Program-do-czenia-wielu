@@ -1,0 +1,147 @@
+// Słownik PL: głos rozszerzony F5 (panel Głos, Ustawienia → Głos): słowa wywoławcze, rozpoznawanie
+// głosu właściciela, dyktowanie, czytanie na głos, szybka rozmowa w chmurze. Agentki — rodzaj żeński.
+import type { Message } from './core';
+
+export const plVoice = {
+  'vf.title': 'Głos',
+  'vf.loading': 'Wczytuję stan głosu…',
+  'vf.settingsLink': 'Ustawienia głosu',
+  'vf.conversation': 'Rozmowa głosowa',
+
+  'vf.wake.title': 'Słowa wywoławcze',
+  'vf.wake.desc':
+    '„Hej Alfa”, „Hej Beta”, „Hej Gama”, „Hej Delta” — rozpoznawane tylko na tym komputerze. Do wykrycia dźwięk nie opuszcza krótkiego bufora w pamięci. Mówienie z przytrzymaniem i przełącznik działają zawsze.',
+  'vf.wake.state.unavailable': 'Słowa wywoławcze niedostępne.',
+  'vf.wake.state.off': 'Słowa wywoławcze wyłączone.',
+  'vf.wake.state.armed': 'Nasłuchuję słów wywoławczych.',
+  'vf.wake.state.listening': 'Wybudzona — słucham polecenia.',
+  'vf.wake.state.suspended': 'Nasłuch wstrzymany.',
+  'vf.wake.enable': 'Włącz słowa wywoławcze',
+  'vf.wake.ownerGate': 'Tylko mój głos budzi Alfę (bramka właściciela)',
+  'vf.wake.ownerGateHint':
+    'Wymaga zarejestrowanego głosu. Bez bramki Alfę może obudzić każdy głos, także telewizor.',
+  'vf.wake.dnd': 'Nie przeszkadzać',
+  'vf.wake.dndHint': 'Wycisza słowa wywoławcze i mowę z inicjatywy agentek; PTT działa dalej.',
+  'vf.wake.phrases': 'Frazy: {list}',
+  'vf.wake.uncalibrated':
+    'Nieskalibrowane — brak pomiaru FAR/FRR na korpusie. Włączasz na własne ryzyko.',
+  'vf.wake.measuredOk':
+    'Skalibrowane: {far} fałszywych wybudzeń na dobę, {frr}% pominiętych — progi spełnione.',
+  'vf.wake.measuredFail':
+    'Pomiar: {far} fałszywych wybudzeń na dobę, {frr}% pominiętych — progi niespełnione (włączasz na własne ryzyko).',
+  'vf.wake.measuredSmall':
+    'Pomiar na za małym korpusie ({far}/dobę, {frr}% pominiętych) — wynik niepewny, włączasz na własne ryzyko.',
+  'vf.wake.riskTitle': 'Włączyć nieskalibrowane słowa wywoławcze?',
+  'vf.wake.riskBody':
+    'Model nie został zmierzony na pełnym korpusie (FAR ≤ 1 na dobę, FRR ≤ 5%). Alfa może budzić się sama (telewizor, rozmowy) albo nie reagować. Włączasz je na własne ryzyko — możesz je wyłączyć w każdej chwili.',
+  'vf.wake.riskConfirm': 'Włącz na własne ryzyko',
+  'vf.wake.test': 'Testuj słowo wywoławcze',
+  'vf.wake.testStop': 'Zakończ test',
+  'vf.wake.testHint': 'Powiedz „Hej Alfa” albo inne imię — rozmowa się nie otworzy.',
+  'vf.wake.testResult': 'Wykrycia: {n}, ostatnio: {agent}',
+  'vf.wake.testNone': 'Wykrycia: 0',
+  'vf.wake.testRejected': 'Odrzucone przez bramkę właściciela: {n}',
+
+  'vf.speaker.title': 'Rozpoznawanie mojego głosu',
+  'vf.speaker.desc':
+    'Profil głosu jest zaszyfrowany i zostaje na tym komputerze — nie trafia do eksportu ani do chmury. Usuwanie głosem zawsze wymaga potwierdzenia kliknięciem.',
+  'vf.speaker.state.unavailable': 'Rozpoznawanie głosu niedostępne.',
+  'vf.speaker.state.not_enrolled': 'Głos nie jest zarejestrowany.',
+  'vf.speaker.state.enrolling': 'Rejestracja: {done} z {needed} fraz.',
+  'vf.speaker.state.enrolled': 'Głos zarejestrowany (fraz: {done}).',
+  'vf.speaker.start': 'Zarejestruj mój głos',
+  'vf.speaker.again': 'Zarejestruj ponownie',
+  'vf.speaker.read': 'Przeczytaj na głos:',
+  'vf.speaker.record': 'Nagraj frazę',
+  'vf.speaker.recordStop': 'Zakończ nagranie',
+  'vf.speaker.recording': 'Nagrywam — przeczytaj zdanie w zwykłym tempie.',
+  'vf.speaker.finish': 'Zakończ rejestrację',
+  'vf.speaker.cancel': 'Anuluj',
+  'vf.speaker.delete': 'Usuń profil głosu',
+  'vf.speaker.deleteTitle': 'Usunąć profil głosu?',
+  'vf.speaker.deleteBody':
+    'Profil i klucz zostaną trwale usunięte. Słowa wywoławcze z bramką właściciela zostaną wyłączone.',
+  'vf.speaker.required': 'Wymagaj weryfikacji głosu dla akcji ryzykownych',
+  'vf.speaker.requiredHint':
+    'Włączone: akcję ryzykowną zleconą głosem wykona bez kliknięcia tylko zweryfikowany głos właściciela (zgodnie z poziomem autonomii). Wyłączone: każda ryzykowna akcja zlecona głosem wymaga potwierdzenia kliknięciem.',
+  'vf.speaker.level': 'Poziom nagrania',
+  'vf.speaker.sample': 'Ostatnia fraza: {quality}, {secs} s, {db} dB',
+  'vf.speaker.lastCheck': 'Ostatnia tura głosowa: {decision}',
+  'vf.speaker.lastCheckScore': 'Ostatnia tura głosowa: {decision} (wynik {score}‰)',
+  'vf.decision.verified': 'zweryfikowany głos właściciela',
+  'vf.decision.likely': 'prawdopodobnie właściciel (za mało do akcji ryzykownych)',
+  'vf.decision.rejected': 'obcy głos',
+  'vf.decision.not_checked': 'niezweryfikowana',
+  'vf.quality.good': 'dobra',
+  'vf.quality.too_short': 'za krótka — przeczytaj całe zdanie',
+  'vf.quality.too_quiet': 'za cicha — mów bliżej mikrofonu',
+  'vf.quality.inconsistent': 'nie pasuje do pozostałych — nagraj ponownie',
+  'vf.quality.failed': 'nie do użycia — spróbuj ponownie',
+
+  'vf.dict.title': 'Dyktowanie',
+  'vf.dict.desc':
+    'Tekst trafia do okna, które było na pierwszym planie w chwili startu. Nigdy do okien Alfy ani pól haseł. Dyktowany tekst nie trafia do agentek, logów ani pamięci.',
+  'vf.dict.state.unavailable': 'Dyktowanie niedostępne.',
+  'vf.dict.state.idle': 'Dyktowanie wyłączone.',
+  'vf.dict.state.active': 'Dyktuję do: {app}',
+  'vf.dict.state.paused': 'Wstrzymane ({app}).',
+  'vf.dict.typed': 'Wpisano znaków: {n}',
+  'vf.dict.preview': 'Ostatnia fraza',
+  'vf.dict.start': 'Dyktuj za {s} s',
+  'vf.dict.countdown': 'Przejdź do okna docelowego… {s}',
+  'vf.dict.stop': 'Zakończ dyktowanie',
+  'vf.dict.undo': 'Cofnij ostatnią frazę',
+  'vf.dict.shortcut': 'Skrót globalny w oknie docelowym: {key}',
+  'vf.dict.commands':
+    'Komendy: „kropka”, „przecinek”, „znak zapytania”, „nowa linia”, „cofnij to”, „koniec dyktowania”.',
+  'vf.dict.profiles': 'Profile aplikacji',
+  'vf.dict.profilesHint':
+    'Program po nazwie pliku, np. notepad.exe. Bez profilu — ustawienia domyślne.',
+  'vf.dict.noProfiles': 'Brak profili — wszędzie ustawienia domyślne.',
+  'vf.dict.app': 'Program',
+  'vf.dict.capitalize': 'Wielka litera na początku',
+  'vf.dict.blockEnter': '„Nowa linia” bez Entera (terminale)',
+  'vf.dict.add': 'Zapisz profil',
+  'vf.dict.remove': 'Usuń profil {app}',
+  'vf.dict.badApp': 'Podaj nazwę programu, np. notepad.exe.',
+
+  'vf.read.title': 'Czytanie na głos',
+  'vf.read.desc':
+    'Czyta zaznaczenie, dokument albo schowek głosem bieżącej agentki. Treść jest niezaufana: nie trafia do agentek ani pamięci. Esc albo „stop” przerywa.',
+  'vf.read.state.unavailable': 'Czytanie niedostępne.',
+  'vf.read.state.idle': 'Nic nie jest czytane.',
+  'vf.read.state.speaking': 'Czytam zdanie {n} z {of} ({app}) — {agent}.',
+  'vf.read.state.paused': 'Pauza: zdanie {n} z {of}.',
+  'vf.read.queued': 'W kolejce: {n}',
+  'vf.read.clipboard': 'Czytaj schowek',
+  'vf.read.selection': 'Czytaj zaznaczenie za {s} s',
+  'vf.read.shortcut': 'Skrót globalny „czytaj zaznaczenie”: {key}',
+  'vf.read.previous': 'Poprzednie zdanie',
+  'vf.read.pause': 'Pauza',
+  'vf.read.resume': 'Wznów',
+  'vf.read.next': 'Następne zdanie',
+  'vf.read.stop': 'Zatrzymaj (Esc)',
+  'vf.read.slower': 'Wolniej',
+  'vf.read.faster': 'Szybciej',
+  'vf.read.rate': 'Tempo: {rate}×',
+  'vf.read.rateLabel': 'Tempo czytania',
+
+  'vf.s2s.title': 'Szybka rozmowa (chmura)',
+  'vf.s2s.needsKey': 'Wymaga klucza',
+  'vf.s2s.private':
+    'W sesji prywatnej nigdy się nie łączy; audio wysyłane do dostawcy jest liczone.',
+
+  'vf.ann.detected': 'Wykryto słowo wywoławcze: {agent}.',
+  'vf.ann.ownerRejected': 'Wykrycie odrzucone — to nie był głos właściciela.',
+  'vf.ann.sampleOk': 'Fraza przyjęta: {done} z {needed}.',
+  'vf.ann.enrolled': 'Głos zarejestrowany.',
+  'vf.ann.dictating': 'Dyktowanie włączone: {app}.',
+  'vf.ann.dictationPaused': 'Dyktowanie wstrzymane.',
+  'vf.ann.dictationStopped': 'Dyktowanie zakończone.',
+  'vf.ann.reading': 'Czytam: zdanie {n} z {of}.',
+  'vf.ann.readPaused': 'Czytanie wstrzymane.',
+  'vf.ann.readStopped': 'Czytanie zakończone.',
+
+  'shortcut.voice.dictation': 'Dyktowanie wł./wył. (do okna na pierwszym planie)',
+  'shortcut.voice.readSelection': 'Czytaj zaznaczenie na głos',
+} as const satisfies Record<string, Message>;

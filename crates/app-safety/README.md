@@ -7,9 +7,9 @@ na `platform-fake`); tu tylko złożenie z `platform-windows-impl` i trzy binark
 
 | Binarka | Uruchamia | Co robi |
 |---|---|---|
-| `alfa-broker` | menedżer usług (`AlfaBroker`, `--config <plik.json>`) albo `--console` (dev) | Audyt w katalogu z chronionym DACL (kotwica obok), silnik Brokera, serwer IPC na `\\.\pipe\alfa-broker` (DACL: konto usługi + konto użytkownika, `PIPE_REJECT_REMOTE_CLIENTS`, pierwsza instancja, etykieta ME), rola klienta wiązana z tożsamością procesu (SID, integralność, obraz, podpis — dev: „niezweryfikowane”), nadzór Broker-UI |
+| `alfa-broker` | menedżer usług (`AlfaBroker`, `--config <plik.json>`) albo `--console [--lifeline]` (dev / tryb przenośny: proces potomny aplikacji, koniec po zamknięciu stdin) | Audyt w katalogu z chronionym DACL (kotwica obok), silnik Brokera, serwer IPC na `\\.\pipe\alfa-broker` (DACL: konto usługi + konto użytkownika, `PIPE_REJECT_REMOTE_CLIENTS`, pierwsza instancja, etykieta ME), rola klienta wiązana z tożsamością procesu (SID, integralność, obraz, podpis — dev: „niezweryfikowane”), nadzór Broker-UI |
 | `alfa-broker-ui` | usługa Brokera (bilet startowy na stdin) | sprawdza konto serwera potoku, natywne okno zatwierdzeń (`WinApprovalSurface`) z dowodem fizycznego wejścia |
-| `alfa-watchdog` | launcher (`alfa-watchdog [--broker-pipe P] [--broker-user SID] [-- <jądro> …]`) | `Ctrl+Shift+F12` → zabija drzewa procesów (Job Objects; jądro w jego Job Object), Broker `KillAll` przez potok z limitem 100 ms |
+| `alfa-watchdog` | aplikacja (`app-broker`: `--broker-pipe P [--broker-user SID] [--broker-pid PID] --lifeline`) albo launcher (`-- <jądro> …`) | `Ctrl+Shift+F12` → zabija drzewa procesów (Job Objects; jądro w jego Job Object), Broker `KillAll` przez potok z limitem 100 ms; komunikaty dla aplikacji na stdout (`{"event":"ready"}`, `{"event":"kill_switch",…}`) |
 
 Instalacja usługi (bramka ludzka #10, jednorazowy UAC):
 `sc.exe create AlfaBroker binPath= "\"C:\Program Files\Alfa\alfa-broker.exe\" --config C:\ProgramData\Alfa\broker\broker.json" start= auto obj= LocalSystem`

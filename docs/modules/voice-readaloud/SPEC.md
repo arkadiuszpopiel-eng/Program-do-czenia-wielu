@@ -64,3 +64,9 @@ Pasek czytania (zdanie n/m, podświetlenie, ⏯, ⏭, ⏮, tempo), skrót „czy
 ## Decyzje v1 (F5)
 - Domyślnie lokalny TTS (prywatność), tempo 0,5–2,0 krokiem 0,1, zdania > 300 znaków dzielone na przecinkach/spacjach.
 - Bez UIA zaznaczenia: zapas Ctrl+C (włączony domyślnie) z czyszczeniem i przywróceniem schowka.
+
+## Implementacja w aplikacji (F5, `app-voice`)
+- Komenda `voice_read` (`start { selection | document | clipboard }`, `control`, `set_rate`) i skrót globalny `Ctrl+Alt+R` („czytaj zaznaczenie”). Zaznaczenie: `UiaTextSource` z zapasem Ctrl+C (port `SelectionReader` UIA nadal poza `platform-contract`); schowek — źródło aplikacji (tylko tekst).
+- Tekst przechwytywany przy zleceniu (odmowy jak w module), **kolejka** do 16 zleceń w pamięci zadania czytania; głos bieżącej agentki rozmowy; tempo z `voice.read_rate` (w trakcie — kroki `Faster`/`Slower`).
+- Stop: `Esc` (`voice_stop_speech` i łańcuch Esc w UI), komenda „stop/pauza/dalej” z potoku (`voice.cmd.detected/ignored`) albo z tekstu tury, kill-switch. W trakcie czytania tury głosowe nie idą do czatu — czytana treść (niezaufana) nie może stać się poleceniem ani trafić do modelu.
+- Testy: `crates/app-voice/tests/f5_read.rs` (schowek → czytanie → „stop” w rozmowie bez tury czatu; kolejka, pauza, tempo, Esc; pole hasła i pusty schowek → odmowa).

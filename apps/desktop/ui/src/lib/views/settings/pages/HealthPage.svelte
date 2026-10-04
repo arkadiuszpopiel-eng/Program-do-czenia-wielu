@@ -8,6 +8,7 @@
   import type { HealthView } from '../../../api/types-work';
   import { useApp } from '../../../state/context';
   import ImproverSection from './ImproverSection.svelte';
+  import PluginR2Section from './PluginR2Section.svelte';
   import './work.css';
 
   const app = useApp();
@@ -184,3 +185,4 @@
 {/if}
 
 <ImproverSection />
+<PluginR2Section />

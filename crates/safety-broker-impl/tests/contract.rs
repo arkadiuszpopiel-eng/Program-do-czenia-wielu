@@ -140,3 +140,62 @@ async fn key_rotation_keeps_live_tokens_until_grace() {
     clock.advance(contract_tests::test_policy().token_ttl_default_ms);
     assert!(b.verify(&t, &file, &delta()).is_err());
 }
+
+/// Przegląd Q-9: odmowa właściciela obowiązuje także przy awarii Audytu (błąd zgłoszony
+/// Broker-UI); zgoda bez zapisu w Audycie nie przechodzi — prośba czeka dalej, bez tokenu.
+#[tokio::test]
+async fn owner_denial_applies_even_when_audit_fails() {
+    use safety_broker_contract::{ApprovalChannel, ApprovalDecision, ApprovalStatus, BrokerError};
+    let (b, audit, clock) = common::engine();
+    let egress = || {
+        request(
+            &delta(),
+            Capability::NetEgress(contract_tests::host("x.example.org")),
+            CommandOrigin::UserText,
+        )
+    };
+    let denied = contract_tests::needs_approval(b.decide(egress()).await).id;
+    let allowed = contract_tests::needs_approval(b.decide(egress()).await).id;
+    clock.advance(10);
+    audit.set_failing(true);
+    let ch = contract_tests::challenge(&b, denied);
+    let r = b
+        .resolve(
+            denied,
+            ApprovalDecision::Deny,
+            contract_tests::proof(&ch, &clock, false),
+        )
+        .await;
+    assert!(matches!(r, Err(BrokerError::AuditUnavailable(_))), "{r:?}");
+    assert_eq!(
+        b.approval_status(denied, &delta()),
+        Ok(ApprovalStatus::Denied)
+    );
+    let ch = contract_tests::challenge(&b, allowed);
+    let r = b
+        .resolve(
+            allowed,
+            ApprovalDecision::Allow,
+            contract_tests::proof(&ch, &clock, false),
+        )
+        .await;
+    assert!(matches!(r, Err(BrokerError::AuditUnavailable(_))), "{r:?}");
+    assert_eq!(
+        b.approval_status(allowed, &delta()),
+        Ok(ApprovalStatus::Pending)
+    );
+    assert_eq!(b.metrics().active_tokens, 0);
+    audit.set_failing(false);
+    let ch = contract_tests::challenge(&b, allowed);
+    b.resolve(
+        allowed,
+        ApprovalDecision::Allow,
+        contract_tests::proof(&ch, &clock, false),
+    )
+    .await
+    .unwrap();
+    assert!(matches!(
+        b.approval_status(allowed, &delta()),
+        Ok(ApprovalStatus::Approved { token: Some(_) })
+    ));
+}

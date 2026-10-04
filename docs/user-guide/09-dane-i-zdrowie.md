@@ -18,8 +18,9 @@ Pojedynczą sesję wyeksportujesz z jej menu („Eksportuj do .alfa”) albo kom
 eksport na stronie **Umiejętności**.
 
 **Klucze API nigdy nie trafiają do zwykłej paczki** — Alfa sprawdza każdy plik przed zapisem i przerywa eksport, gdy
-znajdzie sekret. Jeśli chcesz przenieść klucze, użyj osobnej opcji **Eksport sekretów**: tworzy oddzielną paczkę,
-zawsze zaszyfrowaną hasłem. Sesje prywatne nie są eksportowane.
+znajdzie sekret. Klucze zostają w Menedżerze poświadczeń Windows tej maszyny — na nowym komputerze dodaj je ponownie
+w **Ustawienia → Konta** (paczka sekretów ze starszej wersji Alfy nie jest importowana). Sesje prywatne nie są
+eksportowane.
 
 ### Import
 

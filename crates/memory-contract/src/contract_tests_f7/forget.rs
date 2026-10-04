@@ -9,8 +9,8 @@ use crate::error::MemoryError;
 use crate::inspect::{EntryEdit, InspectorQuery};
 use crate::journal::{ChangeOp, ChangeSet};
 use crate::model::{Derivation, EntryRef, Origin};
-use crate::service::{ForgetTarget, MemoryService, RecallRequest};
-use crate::types::{Layer, MemoryScope, NewMemory, Provenance};
+use crate::service::{ForgetTarget, ImportPolicy, MemoryService, RecallRequest};
+use crate::types::{Layer, MemoryEntry, MemoryScope, NewMemory, Provenance};
 
 /// Każda droga odczytu: `recall` (każdy zakres, właściciel), Inspektor (lista i wyszukiwanie),
 /// `get`, `explain`, dziennik — żadna nie zwraca treści z `marker`.
@@ -310,4 +310,44 @@ pub fn forget_fifty_verified(m: &dyn MemoryService, _ctx: &Ctx) {
         verified += 1;
     }
     assert_eq!(verified, 50);
+}
+
+/// Regresja Q-3: ten sam identyfikator w dwóch zakresach (np. kopia z paczki innej maszyny).
+/// Zapomnienie wpisu w sesji nie usuwa rekordów dziennika zakresu globalnego, które dotyczą
+/// lokalnego wpisu o tym samym identyfikatorze.
+pub fn forget_same_id_in_other_scope(m: &dyn MemoryService, _ctx: &Ctx) {
+    let g = MemoryScope::Global;
+    let set = ChangeSet {
+        scope: g.clone(),
+        run: "r-q3".into(),
+        ops: vec![ChangeOp::Create {
+            entry: fact(g.clone(), "Ulubiony kolor roweru to zieleń"),
+            approved: true,
+            note: "fakt".into(),
+        }],
+    };
+    let created = ok(m.apply_changes(&Accessor::Guardian, &set)).created[0].clone();
+    let journal = ok(m.journal(&owner(), &g));
+    assert!(journal.iter().any(|j| j.touches(&created.id)));
+    let a = sess("A");
+    let copies: Vec<MemoryEntry> = ok(m.export_scope(&owner(), &g, "global.ndjson"))
+        .into_iter()
+        .map(|mut e| {
+            e.scope = a.clone();
+            e
+        })
+        .collect();
+    ok(m.import_scope(&owner(), &a, copies, ImportPolicy::Upsert));
+    let twin = EntryRef {
+        scope: a,
+        id: created.id.clone(),
+    };
+    let report = ok(m.forget_as(&owner(), &ForgetTarget::Entry(twin.clone())));
+    assert_eq!(report.removed, vec![twin]);
+    assert_eq!(
+        ok(m.journal(&owner(), &g)),
+        journal,
+        "dziennik zakresu globalnego nietknięty"
+    );
+    assert!(m.get_as(&owner(), &created).is_ok());
 }

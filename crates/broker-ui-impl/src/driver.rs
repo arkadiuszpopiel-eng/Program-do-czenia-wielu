@@ -20,8 +20,11 @@ pub struct CycleReport {
 
 /// Jeden krok: opcjonalnie synchronizacja z Brokerem, potem obsługa wejścia do `wait_ms`.
 ///
-/// Odmowa, której Broker nie przyjął (np. dowód bez Windows Hello przy `hello_required`), i tak
-/// kończy prośbę jako odrzuconą po stronie Brokera — błąd łącza zwracany jest tylko dla zgód.
+/// Odmowa, na którą Broker jawnie odpowiedział błędem (`UiError::Rejected`: np. dowód bez Windows
+/// Hello przy `hello_required`, prośba już wygasła, Audyt niedostępny), i tak kończy prośbę po
+/// stronie Brokera (odmowa fail-closed). Każdy inny błąd — także przy odmowie — wraca do
+/// wołającego: stan prośby jest nieznany, więc karta nie jest uznana za rozstrzygniętą i wraca
+/// przy następnej synchronizacji (po ponownym połączeniu), zamiast zniknąć (przegląd Q-9).
 pub fn cycle(
     ui: &mut dyn BrokerUi,
     link: &mut dyn BrokerLink,
@@ -46,7 +49,7 @@ pub fn cycle(
         let deny = decision.decision == ApprovalDecision::Deny;
         match link.resolve(decision) {
             Ok(()) => report.resolved = Some(id),
-            Err(_) if deny => report.resolved = Some(id),
+            Err(UiError::Rejected(_)) if deny => report.resolved = Some(id),
             Err(e) => {
                 report.events = ui.drain_events();
                 return Err(e);

@@ -37,6 +37,7 @@ WIT (`wit/alfa-plugin.wit`, pakiet `alfa:plugin@0.1.0`): import `host.call: func
 Moduł `inproc`, `lazy`; RAM ≤ 96 MB (silnik + skompilowane moduły) + ≤ 4 × limit pamięci wtyczki; kod wtyczek wyłącznie w piaskownicy, nigdy na wątku RT ani w callbacku audio.
 
 ## Integracja (`app-*`, opis)
+Zrealizowana w `app-plugins` (komendy, host, problemy dla Diagnosty) + `app-agents` (rejestr narzędzi) + strona Ustawienia → „Wtyczki”; karta R2 pokazuje `r2_proposal` na stronie wtyczek (wdrożenie R2 przez Ulepszacza czeka na weryfikator podpisu TPM — patrz „Otwarte pytania”).
 `PluginRuntime::new(PluginDeps { broker, host: <PluginHost: fs przez tools-fs/undo-journal, net przez klient z egress-allowlistą — obie z własnym Broker::verify>, store: DirPluginStore::open(%LOCALAPPDATA%\Alfa\plugins), bus, config })` w rejestrze; `Toolset::tools()` do `RuntimeDeps.tools` agent-runtime (odświeżane po zmianie stanu); rolom, które mają używać wtyczek, dodać grupę `plugin` (personas); komendy UI strony „Wtyczki”: `plugins_list`, `plugins_inspect(bytes)`, `plugins_propose(manifest, bytes)`, `plugins_approve(id, wersja, reviewed_hash)` (tylko z okna, z kartą: zdolności, limity, hash), `plugins_reject`, `plugins_disable`, `plugins_enable(reviewed_hash)`, `plugins_remove`; panel „Zdrowie systemu”: `plugin.trapped`/`load_failed` dla Diagnosty, karta R2 z `r2_proposal`.
 
 ## Testy akceptacyjne

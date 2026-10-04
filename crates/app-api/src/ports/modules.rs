@@ -5,8 +5,8 @@ use async_trait::async_trait;
 use sessions_contract::SessionId;
 
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, ExportRequest, ExportResult, ImportRequest, ImportResult,
-    InspectResult, SecretInput,
+    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ExportRequest, ExportResult,
+    ImportRequest, ImportResult, InspectResult, SecretInput,
 };
 use crate::error::AppError;
 
@@ -17,10 +17,6 @@ pub trait TransferPort: Send + Sync {
     async fn export(&self, request: ExportRequest) -> Result<ExportResult, AppError>;
     /// Eksport jednej sesji.
     async fn export_session(&self, session: &SessionId) -> Result<ExportResult, AppError>;
-    /// Jawny eksport sekretów — zawsze szyfrowany hasłem (PLAN §15.1).
-    async fn export_secrets(&self, _password: SecretInput) -> Result<ExportResult, AppError> {
-        Err(AppError::unavailable("Eksport sekretów", TRANSFER))
-    }
     /// Podgląd paczki (dry-run).
     async fn inspect(
         &self,
@@ -116,6 +112,10 @@ pub trait BrokerPort: Send + Sync {
     fn approval_window(&self) -> bool {
         false
     }
+    /// Stan Brokera dla UI: tryb (usługa / przenośny / w procesie), łącze, okno, watchdog.
+    fn status(&self) -> BrokerStatusView {
+        BrokerStatusView::in_process(self.approval_window())
+    }
 }
 
 /// Port: Broker niepodłączony.
@@ -150,6 +150,9 @@ impl BrokerPort for BrokerUnavailable {
     async fn undo_step(&self, _session: &SessionId, _step: u64) -> Result<String, AppError> {
         Err(AppError::unavailable("Cofnięcie kroku", "undo-journal"))
     }
+    fn status(&self) -> BrokerStatusView {
+        BrokerStatusView::unavailable()
+    }
 }
 
 /// Okno Brokera (Broker-UI, osobny proces) — jedyny kanał zatwierdzeń (PLAN §8.2). WebView nigdy
@@ -160,6 +163,10 @@ pub trait ApprovalWindow: Send + Sync {
     /// Czy okno Brokera jest dostępne (tryb deweloperski bez Broker-UI — `false`).
     fn available(&self) -> bool {
         true
+    }
+    /// Stan Brokera poza procesem (łącze IPC, tryb, watchdog); `None` = Broker w procesie.
+    fn status(&self) -> Option<BrokerStatusView> {
+        None
     }
 }
 

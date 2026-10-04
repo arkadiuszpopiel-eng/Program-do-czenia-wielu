@@ -158,6 +158,31 @@
     {
       "type": "MemoryChanged",
       "scope_key": null
+    },
+    {
+      "type": "BrokerStatus",
+      "status": {
+        "mode": "portable",
+        "state": "lost",
+        "approval_window": false,
+        "watchdog": true,
+        "isolated": false,
+        "detail": {
+          "pl": "Połączenie z Brokerem zerwane (proces Brokera zakończył działanie). Bezpieczny stan: wszystko, co wymaga zgody, jest odrzucane; Alfa ponawia połączenie.",
+          "en": "Connection to the Broker lost (the Broker process exited). Safe state: everything that needs approval is denied; Alfa keeps reconnecting."
+        }
+      }
+    },
+    {
+      "type": "BrokerStatus",
+      "status": {
+        "mode": "unavailable",
+        "state": "lost",
+        "approval_window": false,
+        "watchdog": false,
+        "isolated": false,
+        "detail": null
+      }
     }
   ],
   "results": {

@@ -13,6 +13,8 @@ repository.workspace = true
 # `app-core` (jedno miejsce kompozycji: `AppOptions` → `parts`).
 [dependencies]
 app-api = { path = "../app-api" }
+# Broker poza procesem / w procesie (`BrokerPort` nad `KernelBroker`, ścieżki Brokera).
+app-broker = { path = "../app-broker" }
 accounts-hub-contract = { path = "../accounts-hub-contract" }
 accounts-hub-impl = { path = "../accounts-hub-impl" }
 compliance-contract = { path = "../compliance-contract" }
@@ -34,6 +36,7 @@ safety-broker-contract = { path = "../safety-broker-contract" }
 safety-broker-impl = { path = "../safety-broker-impl" }
 search-contract = { path = "../search-contract" }
 sessions-contract = { path = "../sessions-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
 transfer-contract = { path = "../transfer-contract" }
 transfer-impl = { path = "../transfer-impl" }
 undo-journal-contract = { path = "../undo-journal-contract" }

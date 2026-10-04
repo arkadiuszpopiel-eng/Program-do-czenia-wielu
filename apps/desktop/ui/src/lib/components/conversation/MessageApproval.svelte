@@ -1,4 +1,6 @@
-<!-- Karta „czeka na zatwierdzenie" w wątku: tylko przenosi do okna Brokera (PLAN §8.2). -->
+<!-- Karta „czeka na zatwierdzenie" w wątku: tylko przenosi do okna Brokera (PLAN §8.2) —
+     zatwierdzanie nigdy w WebView; przy zerwanym łączu z Brokerem (bezpieczny stan) wyjaśnia,
+     że prośba zostanie odrzucona. -->
 <script lang="ts">
   import { ApprovalCard, agents, type AgentId } from '@alfa/ui-kit';
   import type { ApprovalPending } from '../../api/types';
@@ -43,7 +45,11 @@
     reversible: t('approval.reversible'),
     reversibleYes: t('approval.reversibleYes'),
     reversibleNo: t('approval.reversibleNo'),
-    hint: approval.broker_window ? t('approval.hint') : t('approval.noWindow'),
+    hint: app.broker.safeState
+      ? t('broker.approval.lost')
+      : approval.broker_window
+        ? t('approval.hint')
+        : t('approval.noWindow'),
     open: t('approval.open'),
     risk: {
       low: t('approval.risk.low'),

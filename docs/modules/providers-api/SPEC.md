@@ -63,3 +63,9 @@ Chip profilu modelu, szczegóły wiadomości (model, tokeny, koszt, TTFT), stany
 ## Otwarte pytania
 - Spike (g) (ADR 0006): czy model respektuje notkę o usłyszanym prefiksie; czy włączyć jawne `block_binding` (`PrefixMismatch::Error`) domyślnie — po uzyskaniu klucza.
 - Realtime (S2S, natywne `truncate`) — osobny adapter F2 (`InterruptionRendering::NativeTruncate` już w kontrakcie).
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **Q-7 (zrobione, `lib-openai-compat`):** błędy powstałe w trakcie strumienia (zdarzenie `error` w SSE, zerwanie
+  połączenia, limit czasu po pierwszym tokenie) przechodzą przez `Engine::scrub` — redakcja klucza API i limit
+  500 znaków — jak błędy HTTP przed strumieniem (`run.rs::Run::fail`). Dotyczy wszystkich adapterów na wspólnym
+  silniku (OpenAI Chat/Responses, Anthropic, `providers-local-impl`). Test: `providers-api-impl/tests/stream_error_scrub.rs`.

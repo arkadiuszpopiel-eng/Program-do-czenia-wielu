@@ -26,10 +26,10 @@ pub trait Transfer: Send + Sync {
 Zdarzenia: `transfer.export.started/completed`, `transfer.import.dry_run`, `transfer.import.snapshot_created`, `transfer.import.completed` (Audyt), `transfer.rolled_back`, `transfer.backup.scheduled/completed`.
 
 ## Zależności
-`core-bus/config/log-contract`, `sessions-contract`, `memory-contract` (F7), `artifacts-contract`, `personas-contract`, `accounts-hub-contract` (eksport sekretów — osobna operacja), `device-profile-contract` (id maszyny, `hw_class`), `platform-windows-contract` (pliki, Credential Manager).
+`core-bus/config/log-contract`, `sessions-contract`, `memory-contract` (F7), `artifacts-contract`, `personas-contract`, `accounts-hub-contract` (`SecretStore`: wzorce strażnika i klucz snapshotów — sekretów się nie eksportuje), `device-profile-contract` (id maszyny, `hw_class`), `platform-windows-contract` (pliki, Credential Manager).
 
 ## Niezmienniki
-- Klucze i sekrety nigdy w zwykłej paczce (test szpiegowski na pełnym zakresie); eksport sekretów tylko jako `PackageKind::Secrets`, zawsze szyfrowany.
+- Klucze i sekrety **nigdy** w paczce `.alfa` (test szpiegowski na pełnym zakresie); eksportu sekretów nie ma (AGENTS.md — decyzja CX-a, 2026-10-04); paczka `secrets` starszej wersji → odmowa importu, sekcja `secrets.json` → pominięta.
 - Import zawsze poprzedzony dry-run i automatycznym snapshotem dotkniętych elementów; rollback jednym kliknięciem.
 - Zapis transakcyjny per element: element nietknięty albo w całości zaimportowany.
 - Ścieżki w paczce względne, bez `..` (odrzucenie zip-slip); sumy kontrolne weryfikowane przed zapisem.
@@ -65,8 +65,8 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
 - Podpis kopii zapasowych minisign; polityka sesji „prywatne"/`tainted` przy eksporcie — do ustalenia w SPEC v1.
 
 ## Zmiany po implementacji (F1, `transfer-contract/-impl/-fake`, 2026-10-01)
-- **Kontrakt synchroniczny** (pliki, SQLite): `Transfer { export, export_secrets, inspect, import, snapshots, rollback,
-  backup }`; `inspect(pkg, &ImportOptions)` = dry-run (tryby i rozstrzygnięcia wpływają na plan). Hasło = `SecretString`
+- **Kontrakt synchroniczny** (pliki, SQLite): `Transfer { export, inspect, import, snapshots, rollback, backup }`
+  (`export_secrets` usunięte — CX-a); `inspect(pkg, &ImportOptions)` = dry-run (tryby i rozstrzygnięcia wpływają na plan). Hasło = `SecretString`
   (`accounts-hub-contract`), min. 8 znaków. Anulowanie: `CancelToken` sprawdzany między elementami (postęp — później).
 - **Silnik w kontrakcie** (`engine`): eksport z portów, plan (dry-run), snapshot, zapis per element, rollback — wspólny dla
   `-impl` i `-fake` (jak logika deterministyczna w `personas-contract`). Porty: `sessions-contract::Sessions`,
@@ -84,8 +84,7 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
 - **Sekrety**: zwykła paczka przechodzi przez `SecretGuard` (dokładne wartości z `SecretStore` ≥ 8 znaków, wzorce
   `RegexRedactor`, wartości pod kluczami `api_key`/`token`/`secret`/`password`…; redakcja na poziomie wartości
   TOML/JSON/NDJSON), a każdy wpis jest skanowany przed zapisem — trafienie przerywa eksport (`SecretDetected`). Liczba
-  redakcji w manifeście (`redactions`) i ostrzeżeniach. Eksport sekretów: paczka `secrets` (cała szyfrowana hasłem,
-  `secrets.json` w środku); import wymaga `allow_secrets`. Sekrety `transfer/*` (klucz snapshotów) nie są eksportowane.
+  redakcji w manifeście (`redactions`) i ostrzeżeniach. ~~Eksport sekretów: paczka `secrets`~~ — usunięty (CX-a).
 - **Sesje prywatne/`local_only`**: pomijane bez `include_private`; z nim — wyłącznie w paczce szyfrowanej. `tainted`
   przenoszony (tylko rośnie przy scalaniu).
 - **Import**: stany `new/same/changed/collision` (kolizja = ta sama sesja z rozbieżną historią); tryby per kategoria;
@@ -93,8 +92,7 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
   nowe tury dostają kolejne `id` i gałęzie jak przy `fork_from`; kopia = nowe `id` (`id_map`), tytuł „(import z …)”,
   unikalny katalog roboczy. Konfiguracja: klucze `kernel.*` usuwane (ostrzeżenie), nakładka maszyny tylko przy
   `include_machine_overlay` (ostrzeżenie przy innej `hw_class`; nazwa mapowana na `<id tej maszyny>.toml`).
-- **Snapshot** = paczka `snapshot` (szyfrowana kluczem maszyny z Credential Managera; bez klucza — ostrzeżenie, a import
-  sekretów przerwany) z wersjami sprzed importu i `rollback.json` (elementy utworzone przez import). Zastąpienie sesji
+- **Snapshot** = paczka `snapshot` (szyfrowana kluczem maszyny z Credential Managera; bez klucza — ostrzeżenie) z wersjami sprzed importu i `rollback.json` (elementy utworzone przez import). Zastąpienie sesji
   przy błędzie przywraca wersję sprzed zapisu. Rotacja 5 snapshotów.
 - **Kopie zapasowe**: `backup` = ten sam eksport (`kind = backup`) do `alfa-backup-<RRRRMMDD-GGMMSS-mmm>.alfa` + rotacja
   N ostatnich (obce pliki nietknięte). Harmonogram: `BackupSchedule::is_due` (interwał, nie na baterii, nie przy pełnym
@@ -102,3 +100,16 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
 - Zdarzenia: także `transfer.export.started`; ładunki bez pełnych ścieżek (nazwa pliku), bez treści i sekretów.
 - **Do zrobienia**: postęp operacji (zdarzenia z procentem), strumieniowy `DocumentStore::read` dla dużych artefaktów,
   załączniki sesji (`attachments/`), podpis minisign kopii zapasowych, harmonogram kopii (F7), MIME `.alfa`.
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **CX-a (zrobione; decyzja: AGENTS.md wygrywa z PLAN §15.1):** sekrety nigdy w `.alfa`. Usunięte: `Transfer::export_secrets`
+  (kontrakt, silnik, `-impl`, `-fake`), `ImportOptions::allow_secrets`, import i snapshot sekretów, komenda
+  `transfer_export_secrets` (`app-api`, `app-core`, `app-modules`, COMMANDS.md, uprawnienie Tauri) i karta „Eksport
+  sekretów” w UI. Zgodność odczytu: paczka `kind = "secrets"` ze starszej wersji → `SecretsNotAllowed` z czytelnym
+  komunikatem („… dodaj klucze ponownie w Ustawienia → Konta”); wpis `secrets.json` w zwykłej paczce → pominięty
+  z ostrzeżeniem `Warning::SecretsSkipped` (wcześniej był importowany do Credential Managera bez zgody — luka);
+  sekcja sekretów w starym snapshocie — pomijana przy rollbacku. `PackageKind::Secrets`, `Category::Secrets`,
+  `Counts::secrets` zostają tylko dla odczytu starszych manifestów. Testy: `transfer-impl/tests/secrets.rs`,
+  kontraktowy `secrets_never_leave_the_store`, `app-core/tests/transfer.rs` (brak komendy).
+- **Q-6 (zrobione):** `DirDocumentStore` odrzuca dowiązania (symlink, junction) w ścieżce wpisu i jego katalogach
+  nadrzędnych przy odczycie, zapisie i usuwaniu (`ensure_no_links`). Test: `transfer-impl/tests/module.rs::dir_store_refuses_links_on_read_and_remove`.

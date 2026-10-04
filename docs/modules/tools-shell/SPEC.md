@@ -60,3 +60,15 @@ Krok w wątku i Replay (polecenie, skrócone wyjście, kod wyjścia), karta „c
 ## Otwarte pytania
 - Heurystyki destrukcyjności poleceń (lista wzorców) — `THREAT_MODEL.md`; do ustalenia w SPEC v1.
 - Interaktywne polecenia (pytania o hasło) — polityka: przerwanie i `Ask` czy zakaz; do ustalenia w SPEC v1.
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **Q-1:** katalog roboczy polecenia i ścieżki z polecenia sprawdzane na deny-liście także po rozwiązaniu dowiązań
+  (`paths::protected_with_links`). Test: `tools-shell-impl/tests/links.rs`.
+- **Q-8:** analiza (`CommandAnalysis`) zbiera też ścieżki względne z `..` i ścieżki od korzenia dysku (`\x`); nowe pole
+  `opaque_targets` — polecenie usuwające z celem nieustalonym statycznie (zmienna `$x`, splat `@x`, czasownik usuwania
+  za potokiem). Wykonawca ustala cel każdej ścieżki względem `cwd` (`paths::resolve_path_dots`, wieloznacznik
+  w ostatnim segmencie → jego katalog); cel poza `cwd` → osobna zdolność `shell.exec` (nieodwracalna). Cel
+  nieustalony (zmienna, nieznana zmienna środowiskowa, `..` ponad korzeń, wieloznacznik wyżej) przy poleceniu
+  usuwającym → `Destructiveness::Permanent`, `reversible = no`, `bulk = u32::MAX` (najgorszy przypadek: zgoda
+  właściciela do L3) — nigdy „cofalne”. Testy: `analysis::tests::delete_targets_parent_variables_and_pipeline`,
+  `tools-shell-impl/tests/run.rs::parent_or_unresolved_delete_targets_need_approval`.

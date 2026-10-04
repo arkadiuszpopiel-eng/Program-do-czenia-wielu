@@ -210,7 +210,7 @@ async fn bootstrap_layout_settings_shortcuts_and_cast() {
         core.settings_reset("ui.theme".into()).await.unwrap(),
         SettingValue::Text("auto".into())
     );
-    assert_eq!(core.settings_schema().await.unwrap().len(), 27);
+    assert_eq!(core.settings_schema().await.unwrap().len(), 28);
 
     // Obsada: identyfikatory ról jak w `personas-contract` (`operator`), szablony.
     let agents = core.agents_list(sid.clone()).await.unwrap();

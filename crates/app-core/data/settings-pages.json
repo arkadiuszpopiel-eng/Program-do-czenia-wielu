@@ -508,6 +508,17 @@
   "upcoming": []
  },
  {
+  "id": "plugins",
+  "label": {
+   "pl": "Wtyczki",
+   "en": "Plugins"
+  },
+  "wave": 1,
+  "custom": "plugins",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "builder",
   "label": {
    "pl": "Kreator agentek",

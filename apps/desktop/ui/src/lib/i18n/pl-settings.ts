@@ -111,17 +111,12 @@ export const plSettings = {
   'tr.scope.config_machine': 'Nakładka tej maszyny',
   'tr.f7': 'od fali 7',
   'tr.secrets':
-    'Klucze API i sekrety nigdy nie wchodzą do zwykłego eksportu. Osobny, szyfrowany eksport sekretów pojawi się później.',
+    'Klucze API i sekrety nigdy nie wchodzą do paczki — zostają w Menedżerze poświadczeń Windows tej maszyny. Na nowej maszynie dodaj klucze ponownie w Ustawienia → Konta.',
   'tr.encrypt': 'Zaszyfruj paczkę hasłem',
   'tr.password': 'Hasło',
   'tr.passwordRepeat': 'Powtórz hasło',
   'tr.passwordMismatch': 'Hasła się różnią.',
   'tr.exportButton': 'Eksportuj…',
-  'tr.secrets.title': 'Eksport sekretów',
-  'tr.secrets.desc':
-    'Klucze API nie wchodzą do zwykłego eksportu. Tutaj możesz jawnie zapisać je do osobnej paczki — zawsze zaszyfrowanej hasłem.',
-  'tr.secrets.button': 'Eksportuj sekrety',
-  'tr.secrets.saved': 'Zapisano sekrety (zaszyfrowane): {path}',
   'tr.exported': 'Zapisano {path} · {files} · {size}',
   'tr.files': { one: '{n} plik', few: '{n} pliki', many: '{n} plików', other: '{n} pliku' },
   'tr.importIntro':

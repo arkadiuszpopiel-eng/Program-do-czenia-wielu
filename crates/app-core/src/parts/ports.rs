@@ -86,17 +86,15 @@ impl Extra {
             scheduler.clone(),
             personas as Arc<dyn personas_contract::Personas>,
         );
-        let voice: Arc<dyn VoicePort> =
-            self.voice_port(options, paths, &kernel.events, bus, scheduler);
+        let voice = self.voice_port(options, paths, kernel, bus, scheduler, gui.0);
         let broker: Arc<dyn BrokerPort> = match (&options.broker, &self.broker) {
             (Some(port), _) => port.clone(),
-            (None, Some(engine)) => {
-                let window = options
-                    .approval_window
-                    .clone()
+            (None, Some(k)) => {
+                let window = (options.approval_window.clone().or_else(|| k.window.clone()))
                     .unwrap_or_else(|| Arc::new(NoApprovalWindow));
-                Arc::new(InprocBroker::new(
-                    engine.clone(),
+                Arc::new(InprocBroker::over(
+                    k.broker.clone(),
+                    k.kill.clone(),
                     self.undo.clone(),
                     window,
                     path_env_for(&paths.user_root).1,

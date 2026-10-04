@@ -230,6 +230,8 @@ impl AppCore {
             zadania = tasks,
             "kill-switch: zatrzymano zadania schedulera"
         );
+        // Przeglądarki agentek (F6): drzewa procesów zamknięte, zgody hostów wygasają.
+        let _ = self.inner.agents.as_ref().map(|a| a.tools.kill_switch());
         if let Err(e) = self.inner.broker.kill_all(origin).await {
             tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
         }

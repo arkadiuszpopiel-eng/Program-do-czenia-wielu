@@ -73,6 +73,9 @@ import type {
 } from './types-tasks';
 import type { BuilderApi, GuiApi, HealthApi, SkillsApi, TerminalApi } from './client-work';
 import type { UpdatesApi } from './client-updates';
+import type { BrokerApi } from './client-broker';
+import type { VoiceFeaturesApi } from './client-voice';
+import type { PluginsApi } from './client-plugins';
 import type {
   AlfaEvent,
   AppBootstrap,
@@ -196,8 +199,6 @@ export interface AccountsApi {
 export interface TransferApi {
   /** Intencja: natywny dialog zapisu + eksport. */
   exportPackage(request: ExportRequest): Promise<ExportResult>;
-  /** Intencja: osobna, jawna paczka sekretów — zawsze szyfrowana hasłem (min. 8 znaków). */
-  exportSecrets(password: string): Promise<ExportResult>;
   /** Intencja: natywny dialog otwarcia + podgląd (dry-run). */
   inspect(password: string | null, path: string | null): Promise<InspectResult>;
   importPackage(request: ImportRequest): Promise<ImportResult>;
@@ -353,6 +354,11 @@ export interface AlfaClient {
   readonly builder: BuilderApi;
   readonly health: HealthApi;
   readonly updates: UpdatesApi;
+  /** Stan Brokera (tryb, łącze, okno zatwierdzeń, watchdog) — tylko odczyt. */
+  readonly broker: BrokerApi;
+  /** Głos rozszerzony F5: słowa wywoławcze, weryfikacja głosu, dyktowanie, czytanie. */
+  readonly voiceFeatures: VoiceFeaturesApi;
+  readonly plugins: PluginsApi;
   /** Jeden kanał zdarzeń; rdzeń wysyła je paczkami (batch co klatkę). */
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): Unsubscribe;
   dispose(): void;

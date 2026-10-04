@@ -176,6 +176,10 @@ pub fn cases() -> Vec<(&'static str, Case)> {
         ("forget_session_cascade", forget::forget_session_cascade),
         ("forget_source_turn_scope", forget::forget_source_turn_scope),
         ("forget_fifty_verified", forget::forget_fifty_verified),
+        (
+            "forget_same_id_in_other_scope",
+            forget::forget_same_id_in_other_scope,
+        ),
         ("changes_and_undo", changes::changes_and_undo),
         ("changes_are_atomic", changes::changes_are_atomic),
         ("resolve_and_undo", changes::resolve_and_undo),

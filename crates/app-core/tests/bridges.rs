@@ -126,12 +126,24 @@ async fn triggers_never_start_a_bridge() {
     assert!(h.core.triggers_create(event).await.is_err());
     let manual = draft(TriggerKindView::Manual);
     assert!(h.core.triggers_create(manual).await.is_err());
-    // Harmonogram z mostem da się zapisać, ale bez zgody na trasie most odmawia startu.
+    // Regresja CX-d (AGENTS.md): harmonogram czasowy z mostem — odrzucony także przy niezerowej
+    // zgodzie dziennej na trasie; most nie startuje.
+    h.core
+        .bridges_set_schedule("claude_code".into(), 24)
+        .await
+        .unwrap();
     let cron = draft(TriggerKindView::Cron {
         expr: "0 3 * * *".into(),
     });
-    let created = h.core.triggers_create(cron).await.unwrap();
-    assert_eq!(created.bridge.as_deref(), Some("claude_code"));
+    assert!(h.core.triggers_create(cron).await.is_err());
+    let plain = TriggerDraft {
+        bridge: None,
+        ..draft(TriggerKindView::Cron {
+            expr: "0 3 * * *".into(),
+        })
+    };
+    let created = h.core.triggers_create(plain).await.unwrap();
+    assert_eq!(created.bridge, None);
     let run = h.core.triggers_fire_now(created.id).await.unwrap();
     if let Some(task) = run.task_id {
         until(&mut h.rx, |e| {

@@ -62,6 +62,7 @@ fn tool_names(env: &EvalEnv) -> Vec<String> {
         shell: ShellToolsConfig::default(),
         base_env: None,
         extra: Vec::new(),
+        apps: None,
     })
     .names()
 }

@@ -21,7 +21,6 @@
     InspectResult,
   } from '../../../api/types-hub';
   import { useApp } from '../../../state/context';
-  import SecretsExport from './SecretsExport.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -178,8 +177,6 @@
   </div>
   {#if exported}<p class="ok" role="status">{exported}</p>{/if}
 </section>
-
-<SecretsExport />
 
 <section class="card" aria-labelledby="tr-import">
   <h3 id="tr-import">{t('tr.import')}</h3>

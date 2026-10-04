@@ -125,9 +125,13 @@ pub enum UiError {
     /// Błąd okna.
     #[error("okno Brokera: {0}")]
     Surface(String),
-    /// Błąd połączenia z Brokerem.
+    /// Błąd połączenia z Brokerem (stan prośby nieznany — karta nie znika, przegląd Q-9).
     #[error("połączenie z Brokerem: {0}")]
     Link(String),
+    /// Broker jawnie odpowiedział błędem na decyzję (prośba wygasła, rozstrzygnięta, dowód
+    /// odrzucony, Audyt niedostępny) — przy odmowie prośba po stronie Brokera już nie czeka.
+    #[error("Broker odrzucił decyzję: {0}")]
+    Rejected(String),
 }
 
 /// Broker-UI: kolejka kart i decyzje z dowodem. Implementacje: natywne okno (`-impl`),

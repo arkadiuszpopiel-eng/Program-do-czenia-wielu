@@ -207,13 +207,22 @@ impl AccountsHubService {
         Ok(())
     }
 
-    /// Zapisuje metadane (jeśli jest repozytorium).
-    pub(crate) fn persist(&self) -> Result<(), AccountsError> {
+    /// Zmiana kont zatwierdzana w pamięci **dopiero po udanym zapisie** metadanych (jeśli jest
+    /// repozytorium): błąd zapisu zostawia pamięć zgodną z plikiem (regresja Q-5). Blokada zapisu
+    /// trwa przez zapis, więc równoległe zmiany nie nadpisują się nawzajem na dysku.
+    pub(crate) fn update_accounts<T>(
+        &self,
+        change: impl FnOnce(&mut BTreeMap<AccountId, Account>) -> Result<T, AccountsError>,
+    ) -> Result<T, AccountsError> {
+        let mut accounts = self.accounts_write();
+        let mut next = accounts.clone();
+        let out = change(&mut next)?;
         if let Some(repo) = &self.repo {
-            let snapshot: Vec<Account> = self.accounts_read().values().cloned().collect();
+            let snapshot: Vec<Account> = next.values().cloned().collect();
             repo.save(&snapshot)?;
         }
-        Ok(())
+        *accounts = next;
+        Ok(out)
     }
 
     pub(crate) async fn publish(&self, name: &str, level: Level, payload: serde_json::Value) {

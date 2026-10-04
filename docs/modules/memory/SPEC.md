@@ -152,3 +152,10 @@ Akcja „zapamiętaj" na wiadomości (z wyborem zakresu), `/pamięć`, panel Pam
   CI ścieżka „z atrapą” na zabawkowym modelu ONNX (`lib-embed` testkit) i test formatu raportu
   (`<temp>/alfa-f7-recall-<etykieta>.report.json`). Zabawkowy enkoder: recall@5 0,944 (wynik kontrolny, nie jakość).
 - Pełna ścieżka produkcyjna (`SqliteSearch` + `vec0` + bm25 + ONNX) — w kompozycji `app-memory` (`crates/lib-embed/README.md`).
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **Q-3 (zrobione):** kaskada `forget` czyści dziennik **w obrębie zakresu**: rekord zakresu `S` znika, gdy odwołuje
+  się do wpisu usuniętego w `S` albo do wpisu usuniętego w innym zakresie, którego identyfikatora `S` nie ma u siebie
+  (odwołania między zakresami, np. awans). Ten sam `MemoryId` w dwóch zakresach (kopia z paczki innej maszyny) nie kasuje
+  już cudzych rekordów dziennika (`engine/forget.rs::removed_for`). Test kontraktowy (fake i SQLite):
+  `contract_tests_f7::forget::forget_same_id_in_other_scope`.

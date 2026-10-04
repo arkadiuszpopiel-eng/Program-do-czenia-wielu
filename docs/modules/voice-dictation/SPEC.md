@@ -68,3 +68,10 @@ Pigułka dyktowania (aplikacja docelowa, aktywne/wstrzymane i dlaczego, liczba z
 - Liczby → cyfry tylko gdy jednoznaczne: złożenie ≥ 2 słów albo jedno słowo 11–99; zostają słowami 0–10, samotne „sto/tysiąc/milion”, formy odmienione i porządkowe; przecinek z STT między liczebnikami rozdziela liczby („dwadzieścia, trzy” → „20, trzy”).
 - Interpunkcja dodana przez STT zostaje, komenda ją zastępuje (bez podwójnych znaków).
 - `DictationRunner` (impl): resampling do 16 kHz, PTT = jedna wypowiedź na przytrzymanie, przełącznik = VAD + pre-roll 300 ms; „koniec dyktowania” zamyka mikrofon.
+
+## Implementacja w aplikacji (F5, `app-voice`)
+- Komenda `voice_dictation` (`start`/`stop`/`toggle`/`undo`, `save_profile`/`remove_profile`) i skrót globalny `Ctrl+Alt+D` (powłoka, przełącznik; D nie jest literą polską — reguła AltGr; rejestr skrótów UI wykrywa konflikty, zajęty skrót → toast). PTT dyktowania z UI pominięte: okno Alfy na pierwszym planie jest chronione (przycisk ma odliczanie 3 s).
+- `DictationRunner` (STT `whisper-server` i VAD jak rozmowa) + `DictationService` na portach computer use (`GuiPorts`: strażnik okien Alfy/Brokera). Odmowa (pole hasła, okno chronione/admina) → komunikat PL/EN, nic nie jest wpisywane.
+- Profile per aplikacja (`voice.dictation_profiles`, nazwa pliku procesu): wielka litera na początku, „nowa linia” bez Entera w terminalach — dobierane po oknie na pierwszym planie w chwili startu.
+- Podgląd = ostatnia fraza STT tylko w widoku okna Alfy (czyszczony po sesji); zdarzenia na magistrali bez treści. Na czas dyktowania rozmowa głosowa i nasłuch słów są wstrzymane, a tury głosowe nie idą do modelu.
+- Testy: `crates/app-voice/tests/f5_dictation.rs` (pole hasła = odmowa i 0 paczek wejścia, wpisanie do Notatnika i stop, profil aplikacji).

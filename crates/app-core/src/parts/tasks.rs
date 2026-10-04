@@ -187,13 +187,27 @@ impl Built {
             Some(c) => c.clone(),
             None => platform.clone(),
         };
+        // Serwer MCP v1 (UIA, zrzut, rejestr) przez te same narzędzia GUI i rejestr kart Brokera.
+        let v1 = kit.as_ref().map(|k| {
+            let timeout = d
+                .options
+                .approval_timeout
+                .unwrap_or(Duration::from_secs(300));
+            app_bridges::mcp_v1(
+                k.tools.all(),
+                k.tickets.clone(),
+                Some(d.bus.clone()),
+                timeout,
+            )
+        });
         let mcp = LazyMcpHost::new(
             proxy_program(),
             mcp_impl::PlatformPorts {
                 clipboard,
                 windows: platform,
             },
-        );
+        )
+        .with_v1(v1);
         let probe = d.options.cli_probe.clone().unwrap_or_else(|| {
             Arc::new(accounts_hub_impl::SystemCliProbe::from_env())
                 as Arc<dyn accounts_hub_contract::CliProbe>

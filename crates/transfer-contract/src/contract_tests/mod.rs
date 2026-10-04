@@ -23,7 +23,7 @@ pub use cases::{
 pub use fixtures::{SECRET_PATTERN, SECRET_PLAIN, seed};
 pub use more::{
     backup_rotation, encrypted_package, kernel_keys_and_machine_overlay,
-    no_secrets_in_plain_export, private_sessions, secrets_export,
+    no_secrets_in_plain_export, private_sessions, secrets_never_leave_the_store,
 };
 
 /// Środowisko testu: moduł + porty, na których działa.
@@ -126,7 +126,7 @@ pub fn run_all<H: Harness>(factory: impl Fn() -> H) {
         snapshot_and_rollback,
         no_secrets_in_plain_export,
         encrypted_package,
-        secrets_export,
+        secrets_never_leave_the_store,
         private_sessions,
         kernel_keys_and_machine_overlay,
         backup_rotation,

@@ -43,10 +43,8 @@ describe('Zdarzenia rdzenia → stan UI', () => {
     expect((await client.permissions.get(null)).global).toBe('L1');
   });
 
-  it('eksport sekretów wymaga hasła ≥ 8 znaków', async () => {
+  it('sekrety nigdy w paczce: brak eksportu sekretów (CX-a)', () => {
     const { client } = setupApp();
-    await expect(client.transfer.exportSecrets('krótkie')).rejects.toThrow();
-    const saved = await client.transfer.exportSecrets('długie hasło sekretów');
-    expect(saved.status).toBe('saved');
+    expect('exportSecrets' in client.transfer).toBe(false);
   });
 });

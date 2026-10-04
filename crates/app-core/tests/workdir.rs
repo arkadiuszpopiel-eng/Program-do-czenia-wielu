@@ -119,3 +119,56 @@ async fn terminal_intent_opens_terminal_without_running_the_command() {
     let bad = a.h.core.agents_open_terminal("x".into()).await.unwrap_err();
     assert_eq!(bad.code, ErrorCode::InvalidInput);
 }
+
+/// Regresja Q-1: katalog z dialogu będący dowiązaniem (symlink/junction) do danych Alfy albo
+/// katalogu poświadczeń — odrzucony po rozwiązaniu dowiązań.
+#[cfg(unix)]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn workdir_links_to_protected_dirs_are_rejected() {
+    let a = agents().await;
+    let root = a.h.dir.path();
+    std::fs::create_dir_all(root.join("local")).unwrap();
+    std::fs::create_dir_all(root.join("user/.ssh")).unwrap();
+    let to_data = root.join("user/dane-alfy");
+    std::os::unix::fs::symlink(root.join("local"), &to_data).unwrap();
+    let to_keys = root.join("user/klucze");
+    std::os::unix::fs::symlink(root.join("user/.ssh"), &to_keys).unwrap();
+    for dir in [to_data, to_keys] {
+        a.h.shell.answer_dialog(Some(dir.clone()));
+        let err =
+            a.h.core
+                .sessions_choose_workdir(a.sid.clone(), WorkdirChoice::Dialog)
+                .await
+                .unwrap_err();
+        assert_eq!(err.code, ErrorCode::Forbidden, "{}: {err:?}", dir.display());
+    }
+}
+
+/// Regresja Q-1 (TOCTOU): dowiązanie do danych Alfy utworzone w katalogu roboczym **po** jego
+/// wyborze — narzędzie odmawia przy wykonaniu (deny-lista z katalogami danych Alfy, po
+/// rozwiązaniu dowiązań).
+#[cfg(unix)]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn link_created_after_choice_is_denied_at_tool_call() {
+    let mut a = agents().await;
+    let local = a.h.dir.path().join("local");
+    std::fs::write(local.join("tajne.txt"), "dane Alfy").unwrap();
+    std::os::unix::fs::symlink(&local, a.workdir.join("dane")).unwrap();
+    a.h.provider.push(Script::tool_call(
+        FAKE_MODEL,
+        "c1",
+        "fs_read",
+        &json!({ "path": "dane/tajne.txt" }),
+    ));
+    a.h.provider.push(Script::text(FAKE_MODEL, &["Nie mogę."]));
+    let _ = run_turn(&mut a, "Delta, przeczytaj dane/tajne.txt.").await;
+    let run = last_run(&a).await;
+    let step = run
+        .steps
+        .iter()
+        .find(|s| s.tool.as_deref() == Some("fs_read"))
+        .expect("krok fs_read");
+    assert_eq!(step.status, ReplayStatus::Denied, "{step:#?}");
+    let seen = tool_results(a.h.provider.requests().last().unwrap());
+    assert!(!seen.contains("dane Alfy"), "{seen}");
+}

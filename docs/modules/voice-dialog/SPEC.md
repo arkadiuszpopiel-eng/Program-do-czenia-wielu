@@ -72,3 +72,6 @@ Twardy stop od początku mowy: p50 220 ms, p95/max 350 ms (120 scenariuszy; duck
 ## Otwarte pytania
 - Model klasyfikacji intencji przerwania (mały lokalny vs LLM) — pomiar F2; do ustalenia w SPEC v1.
 - Współpraca z natywnym truncate (OpenAI Realtime) — F5 (`voice-s2s`).
+
+## Implementacja w aplikacji (F5, `app-voice`)
+- „Nie przeszkadzać” z panelu Głos (`voice_wake { set_dnd }`) → `PipelineInput::SetDoNotDisturb` (automat dialogu: brak mowy proaktywnej, nasłuch słów wstrzymany); stan DND wraca do UI z `voice.wake.dnd`.

@@ -16,6 +16,8 @@ repository.workspace = true
 app-api = { path = "../app-api" }
 # Adaptery portów na modułach -impl (transfer, Broker w procesie, głos) — część korzenia.
 app-modules = { path = "../app-modules" }
+# Broker poza procesem (usługa / tryb przenośny), procesy Jądra, Broker w procesie (dev).
+app-broker = { path = "../app-broker" }
 # Agentki z narzędziami (tools-*, agent-runtime, Replay) i tryb głosowy (voice-pipeline) — część korzenia.
 app-agents = { path = "../app-agents" }
 app-voice = { path = "../app-voice" }
@@ -29,6 +31,7 @@ app-gui = { path = "../app-gui" }
 app-terminal = { path = "../app-terminal" }
 app-skills = { path = "../app-skills" }
 app-health = { path = "../app-health" }
+app-plugins = { path = "../app-plugins" }
 # Aktualizacje (updater-impl: pobieranie, weryfikacja, restart przez launcher), „O programie”.
 app-updates = { path = "../app-updates" }
 # Tabele aplikacji w bazach sesji (fakty o turach, oś czasu, Replay) — wydzielone z app-core.
@@ -135,6 +138,10 @@ agent-backends-fake = { path = "../agent-backends-fake" }
 device-profile-fake = { path = "../device-profile-fake" }
 voice-audio-fake = { path = "../voice-audio-fake" }
 voice-tts-fake = { path = "../voice-tts-fake" }
+# Wtyczka testowa (WAT → komponent) dla `tests/plugins.rs`.
+plugin-runtime-contract = { path = "../plugin-runtime-contract" }
+base64 = "0.22.1"
+wat = "=1.236.1"
 tempfile = "3.27.0"
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
 

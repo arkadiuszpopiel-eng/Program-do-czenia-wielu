@@ -1,56 +1,64 @@
 //! `VoicePort` z rozmową głosową: test mikrofonu, lista urządzeń i czytanie na głos — z adaptera
 //! `voice-audio`/`voice-tts`; mikrofon wł./wył., PTT, wyciszenie i stop mowy — wejścia potoku
-//! `voice-pipeline` działającego w osobnym zadaniu (krok co `tick_ms`). Pętla wysyła pigułkę
-//! (kto mówi, poziom, transkrypt częściowy) i stan trybu głosowego; „stop wszystko" i „anuluj"
-//! z komend głosowych przekazuje czatowi (kill-switch, anulowanie zadania agentki).
+//! `voice-pipeline` działającego w osobnym zadaniu (pętla w `runloop.rs`). Głos rozszerzony F5
+//! (słowa wywoławcze, weryfikacja właściciela, dyktowanie, czytanie) — `features/*`.
 
 use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 
 use app_api::dto::{
-    AlfaEvent, AudioDevice, LocalizedText, ToastKind, VoiceMode, VoiceState, VoiceStatus,
+    AlfaEvent, AudioDevice, DictationAction, ReadAction, SpeakerAction, VoiceFeatures, VoiceMode,
+    VoiceState, VoiceStatus, WakeAction,
 };
 use app_api::error::{AppError, ErrorCode};
 use app_api::events::EventHub;
 use app_api::ports::{VoiceChat, VoicePort, voice_unavailable_reason};
 use async_trait::async_trait;
-use core_bus_contract::{Event, EventBus};
+use core_bus_contract::EventBus;
 use tokio::sync::mpsc;
-use voice_pipeline_contract::{
-    EVENT_CANCEL_TASK, EVENT_DEGRADED, EVENT_KILL_SWITCH, EVENT_PERSONA_SWITCHED, PipelineCfg,
-    PipelineInput,
-};
+use voice_pipeline_contract::{PipelineCfg, PipelineInput};
+use voice_wake_contract::WakeWordListener;
 
-use crate::engine::{VoiceEngine, VoiceEngineFactory};
-use crate::pill;
+use crate::engine::VoiceEngineFactory;
+use crate::features::speaker::GatedVerifier;
+use crate::features::{F5, FeatureDeps};
 use crate::reply::ChatReply;
+use crate::runloop::Loop;
 use crate::tap::TapBus;
 
 /// Sterowanie pętlą potoku.
-enum Ctl {
+pub(crate) enum Ctl {
     Input(PipelineInput),
     Stop,
+    ArmWake(Box<WakeWordListener>),
+    DisarmWake,
 }
 
-struct Shared {
-    ctl: Option<mpsc::UnboundedSender<Ctl>>,
-    conversation: bool,
-    muted: bool,
-    mode: VoiceMode,
-    agent: String,
+pub(crate) struct Shared {
+    pub ctl: Option<mpsc::UnboundedSender<Ctl>>,
+    pub conversation: bool,
+    pub muted: bool,
+    pub mode: VoiceMode,
+    pub agent: String,
 }
 
-/// Głos z potokiem rozmowy.
-pub struct PipelineVoice {
+/// Głos z potokiem rozmowy (uchwyt; stan we współdzielonym [`Voice`] — zadania w tle).
+pub struct PipelineVoice(Arc<Voice>);
+
+/// Stan głosu współdzielony z zadaniami (autostart słów wywoławczych, dyktowanie, czytanie).
+pub(crate) struct Voice {
     base: Arc<dyn VoicePort>,
     factory: Option<Arc<dyn VoiceEngineFactory>>,
     events: EventHub,
     bus: Option<Arc<dyn EventBus>>,
     cfg: PipelineCfg,
     chat: OnceLock<Arc<dyn VoiceChat>>,
-    shared: Arc<Mutex<Shared>>,
+    pub(crate) shared: Arc<Mutex<Shared>>,
+    pub(crate) f5: Arc<F5>,
+    /// Start potoku jest atomowy (dwa równoczesne starty = dwie pętle na jednym mikrofonie).
+    starting: Mutex<()>,
 }
 
-fn lock(m: &Mutex<Shared>) -> MutexGuard<'_, Shared> {
+pub(crate) fn lock(m: &Mutex<Shared>) -> MutexGuard<'_, Shared> {
     m.lock().unwrap_or_else(|p| p.into_inner())
 }
 
@@ -64,7 +72,12 @@ impl PipelineVoice {
         bus: Option<Arc<dyn EventBus>>,
         cfg: PipelineCfg,
     ) -> Self {
-        Self {
+        let f5 = Arc::new(F5::new(
+            factory.clone(),
+            FeatureDeps::default(),
+            events.clone(),
+        ));
+        Self(Arc::new(Voice {
             base,
             factory,
             events,
@@ -78,9 +91,32 @@ impl PipelineVoice {
                 mode: VoiceMode::Toggle,
                 agent: "alfa".into(),
             })),
-        }
+            f5,
+            starting: Mutex::new(()),
+        }))
     }
 
+    /// Głos rozszerzony F5: ustawienia (`core-config`) i porty pulpitu (dyktowanie, czytanie).
+    /// Wywoływane przy kompozycji, przed pierwszym użyciem.
+    #[must_use]
+    pub fn with_features(self, deps: FeatureDeps) -> Self {
+        let v = &self.0;
+        let f5 = Arc::new(F5::new(v.factory.clone(), deps, v.events.clone()));
+        Self(Arc::new(Voice {
+            base: v.base.clone(),
+            factory: v.factory.clone(),
+            events: v.events.clone(),
+            bus: v.bus.clone(),
+            cfg: v.cfg.clone(),
+            chat: OnceLock::new(),
+            shared: v.shared.clone(),
+            f5,
+            starting: Mutex::new(()),
+        }))
+    }
+}
+
+impl Voice {
     fn missing(&self) -> Vec<String> {
         match &self.factory {
             Some(f) => f.missing(),
@@ -113,14 +149,15 @@ impl PipelineVoice {
         self.events.emit(AlfaEvent::VoiceStatusChanged { status });
     }
 
-    fn unavailable(&self) -> AppError {
+    pub(crate) fn unavailable(&self) -> AppError {
         self.announce();
         AppError::new(ErrorCode::Unavailable, voice_unavailable_reason().pl)
     }
 
     /// Kanał sterowania działającej pętli (startuje potok, gdy trzeba).
-    fn ensure_running(&self) -> Result<mpsc::UnboundedSender<Ctl>, AppError> {
-        if let Some(tx) = lock(&self.shared).ctl.clone().filter(|t| !t.is_closed()) {
+    pub(crate) fn ensure_running(&self) -> Result<mpsc::UnboundedSender<Ctl>, AppError> {
+        let _start = self.starting.lock().unwrap_or_else(|p| p.into_inner());
+        if let Some(tx) = self.running() {
             return Ok(tx);
         }
         let factory = self.factory.clone().ok_or_else(|| self.unavailable())?;
@@ -133,14 +170,34 @@ impl PipelineVoice {
             .cloned()
             .ok_or_else(|| AppError::internal("czat trybu głosowego niepodpięty"))?;
         let (tap, bus_rx) = TapBus::new(self.bus.clone());
-        let engine = factory
+        let mut engine = factory
             .build(
-                Arc::new(ChatReply::new(chat.clone())),
+                Arc::new(ChatReply::with_features(
+                    chat.clone(),
+                    Some(self.f5.clone()),
+                )),
                 Arc::new(tap),
                 self.cfg.clone(),
             )
             .map_err(|e| AppError::new(ErrorCode::Unavailable, format!("Głos: {e}")))?;
+        if self.f5.parts().is_some() {
+            // Model mówcy ładuje się dopiero przy pierwszej weryfikacji (wrapper leniwy).
+            let gated = Arc::new(GatedVerifier::new(self.f5.clone()));
+            if let Err(e) = engine.pipeline.set_speaker_verifier(gated) {
+                tracing::warn!(error = %e, "weryfikacja mówcy w potoku niedostępna");
+            }
+        }
         let (tx, rx) = mpsc::unbounded_channel();
+        let (dnd, muted) = {
+            let st = self.f5.lock();
+            (st.wake.dnd, lock(&self.shared).muted)
+        };
+        if dnd {
+            let _ = tx.send(Ctl::Input(PipelineInput::SetDoNotDisturb { on: true }));
+        }
+        if muted {
+            let _ = tx.send(Ctl::Input(PipelineInput::SetMuted { muted: true }));
+        }
         lock(&self.shared).ctl = Some(tx.clone());
         let looped = Loop {
             engine,
@@ -149,6 +206,7 @@ impl PipelineVoice {
             events: self.events.clone(),
             chat,
             shared: self.shared.clone(),
+            f5: self.f5.clone(),
         };
         tokio::spawn(looped.run());
         Ok(tx)
@@ -160,184 +218,136 @@ impl PipelineVoice {
             .map_err(|_| AppError::internal("pętla potoku głosu zakończona"))
     }
 
-    fn running(&self) -> Option<mpsc::UnboundedSender<Ctl>> {
+    pub(crate) fn running(&self) -> Option<mpsc::UnboundedSender<Ctl>> {
         lock(&self.shared).ctl.clone().filter(|t| !t.is_closed())
+    }
+
+    /// Zdarzenia modułów F5 na magistralę aplikacji (bez treści — tylko liczby i decyzje).
+    pub(crate) async fn publish_bus(&self, events: Vec<core_bus_contract::Event>) {
+        if let Some(bus) = &self.bus {
+            for e in events {
+                // Magistrala jest best effort — stan funkcji i tak idzie do UI widokiem.
+                let _ = bus.publish(e).await;
+            }
+        }
+    }
+
+    /// Bieżąca agentka głosu (czytanie na głos).
+    pub(crate) fn agent(&self) -> String {
+        lock(&self.shared).agent.clone()
+    }
+
+    /// Wysyła sterowanie do działającej pętli (bez startu potoku).
+    pub(crate) fn ctl(&self, ctl: Ctl) -> bool {
+        self.running().is_some_and(|tx| tx.send(ctl).is_ok())
+    }
+
+    /// Kończy rozmowę (tryb przełącznika) — potok zostaje, gdy słucha słów wywoławczych.
+    pub(crate) fn end_conversation(&self) {
+        let muted = {
+            let mut s = lock(&self.shared);
+            s.conversation = false;
+            s.muted
+        };
+        let Some(tx) = self.running() else {
+            return;
+        };
+        let _ = tx.send(Ctl::Input(PipelineInput::Deactivate));
+        if self.f5.lock().wake.armed {
+            // Zamknięcie słuchania bez zatrzymania nasłuchu słów wywoławczych.
+            let _ = tx.send(Ctl::Input(PipelineInput::SetMuted { muted: true }));
+            let _ = tx.send(Ctl::Input(PipelineInput::SetMuted { muted }));
+        } else {
+            let _ = tx.send(Ctl::Stop);
+        }
     }
 }
 
 #[async_trait]
 impl VoicePort for PipelineVoice {
     async fn devices(&self) -> Result<Option<Vec<AudioDevice>>, AppError> {
-        self.base.devices().await
+        self.0.base.devices().await
     }
     async fn start_mic_test(&self, device: Option<String>) -> Result<(), AppError> {
-        self.base.start_mic_test(device).await
+        self.0.base.start_mic_test(device).await
     }
     async fn stop_mic_test(&self) -> Result<(), AppError> {
-        self.base.stop_mic_test().await
+        self.0.base.stop_mic_test().await
     }
     async fn set_mic_enabled(&self, enabled: bool) -> Result<(), AppError> {
+        let v = &self.0;
         if enabled {
-            if lock(&self.shared).conversation && self.running().is_some() {
+            if lock(&v.shared).conversation && v.running().is_some() {
                 return Ok(());
             }
-            self.send(PipelineInput::Toggle)?;
+            v.send(PipelineInput::Toggle)?;
             {
-                let mut s = lock(&self.shared);
+                let mut s = lock(&v.shared);
                 s.conversation = true;
                 s.mode = VoiceMode::Toggle;
             }
-            self.announce();
+            v.announce();
             return Ok(());
         }
-        lock(&self.shared).conversation = false;
-        if let Some(tx) = self.running() {
-            let _ = tx.send(Ctl::Input(PipelineInput::Deactivate));
-            let _ = tx.send(Ctl::Stop);
-        }
-        self.announce();
+        v.end_conversation();
+        v.announce();
         Ok(())
     }
     async fn set_muted(&self, muted: bool) -> Result<(), AppError> {
-        lock(&self.shared).muted = muted;
-        if let Some(tx) = self.running() {
-            let _ = tx.send(Ctl::Input(PipelineInput::SetMuted { muted }));
-        }
-        self.announce();
+        let v = &self.0;
+        lock(&v.shared).muted = muted;
+        v.f5.lock().wake.muted = muted;
+        v.ctl(Ctl::Input(PipelineInput::SetMuted { muted }));
+        v.announce();
+        v.f5.publish();
         Ok(())
     }
     async fn stop_speech(&self) -> Result<(), AppError> {
-        if let Some(tx) = self.running() {
-            let _ = tx.send(Ctl::Input(PipelineInput::StopSpeech));
-        }
-        self.base.stop_speech().await
+        // Esc: mowa agentki i czytanie na głos (z kolejką).
+        self.0.ctl(Ctl::Input(PipelineInput::StopSpeech));
+        self.0.f5.stop_reading();
+        self.0.base.stop_speech().await
     }
     async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError> {
-        self.base.read_aloud(agent, text).await
+        self.0.base.read_aloud(agent, text).await
     }
     async fn ptt(&self, pressed: bool) -> Result<(), AppError> {
-        if !pressed && self.running().is_none() {
+        let v = &self.0;
+        if !pressed && v.running().is_none() {
             return Ok(());
         }
-        self.send(PipelineInput::Ptt { pressed })?;
+        v.send(PipelineInput::Ptt { pressed })?;
         if pressed {
-            let mut s = lock(&self.shared);
+            let mut s = lock(&v.shared);
             s.conversation = true;
             s.mode = VoiceMode::Ptt;
         }
         Ok(())
     }
     async fn status(&self) -> VoiceStatus {
-        self.snapshot()
+        self.0.snapshot()
     }
     fn attach(&self, chat: Arc<dyn VoiceChat>) {
-        let _ = self.chat.set(chat);
+        if self.0.chat.set(chat).is_ok() {
+            let v = self.0.clone();
+            tokio::spawn(async move { v.wake_autostart().await });
+        }
     }
-}
-
-/// Pętla potoku (jedno zadanie — potok nie jest `Sync`).
-struct Loop {
-    engine: VoiceEngine,
-    ctl: mpsc::UnboundedReceiver<Ctl>,
-    bus: mpsc::UnboundedReceiver<Event>,
-    events: EventHub,
-    chat: Arc<dyn VoiceChat>,
-    shared: Arc<Mutex<Shared>>,
-}
-
-/// Co ile ms pigułka bez zmian (sam poziom), co ile `MicLevel` (≤ 30/s).
-const PILL_EVERY_MS: u64 = 100;
-const LEVEL_EVERY_MS: u64 = 34;
-/// Najdłuższe czekanie na wygaszenie potoku po wyłączeniu mikrofonu.
-const STOP_GRACE_MS: u64 = 2_000;
-
-impl Loop {
-    async fn run(mut self) {
-        let mut stopping: Option<u64> = None;
-        let mut last_pill: Option<(u64, app_api::dto::VoicePillState)> = None;
-        let mut last_level = 0u64;
-        loop {
-            self.engine.pacer.tick().await;
-            while let Ok(ctl) = self.ctl.try_recv() {
-                match ctl {
-                    Ctl::Input(input) => self.engine.pipeline.input(input),
-                    Ctl::Stop => stopping = stopping.or(Some(self.engine.pipeline.status().now_ms)),
-                }
-            }
-            self.engine.pipeline.step().await;
-            while let Ok(event) = self.bus.try_recv() {
-                self.on_event(&event);
-            }
-            let status = self.engine.pipeline.status();
-            let now = status.now_ms;
-            let pill = pill::pill(&status);
-            let due = last_pill
-                .as_ref()
-                .is_none_or(|(at, prev)| pill::changed(prev, &pill) || now >= at + PILL_EVERY_MS);
-            if due {
-                self.events.emit(AlfaEvent::VoicePill {
-                    state: pill.clone(),
-                });
-                last_pill = Some((now, pill));
-            }
-            if status.mic_open && now >= last_level + LEVEL_EVERY_MS {
-                last_level = now;
-                self.events.emit(AlfaEvent::MicLevel {
-                    level: pill::level(status.level_db),
-                });
-            }
-            let idle = status.phase == voice_dialog_contract::DialogPhase::Idle && !status.mic_open;
-            if let Some(since) = stopping
-                && (idle || now >= since + STOP_GRACE_MS)
-            {
-                break;
-            }
-        }
-        {
-            let mut s = lock(&self.shared);
-            s.ctl = None;
-            s.conversation = false;
-        }
-        self.events.emit(AlfaEvent::VoicePill {
-            state: app_api::dto::VoicePillState {
-                agent: lock(&self.shared).agent.clone(),
-                mic: app_api::dto::MicState::Off,
-                level: 0.0,
-                speaker: app_api::dto::VoiceSpeaker::Nobody,
-                partial: None,
-            },
-        });
+    async fn features(&self) -> VoiceFeatures {
+        self.0.f5.ensure_loaded().await;
+        self.0.f5.refresh();
+        self.0.f5.view()
     }
-
-    fn on_event(&self, event: &Event) {
-        let chat = self.chat.clone();
-        match event.kind.as_str() {
-            EVENT_KILL_SWITCH => {
-                tokio::spawn(async move { chat.kill_switch().await });
-            }
-            EVENT_CANCEL_TASK => {
-                tokio::spawn(async move { chat.cancel_task().await });
-            }
-            EVENT_PERSONA_SWITCHED => {
-                if let Some(to) = event.payload.get("to").and_then(|v| v.as_str()) {
-                    lock(&self.shared).agent = to.to_owned();
-                }
-            }
-            EVENT_DEGRADED => {
-                let reason = event
-                    .payload
-                    .get("reason")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("składnik głosu niedostępny");
-                self.events.emit(AlfaEvent::Toast {
-                    kind: ToastKind::Warning,
-                    message: LocalizedText::new(
-                        format!("Głos: {reason}"),
-                        "Voice: a component is degraded.",
-                    ),
-                });
-            }
-            _ => {}
-        }
+    async fn wake(&self, action: WakeAction) -> Result<VoiceFeatures, AppError> {
+        self.0.wake_action(action).await
+    }
+    async fn speaker(&self, action: SpeakerAction) -> Result<VoiceFeatures, AppError> {
+        self.0.speaker_action(action).await
+    }
+    async fn dictation(&self, action: DictationAction) -> Result<VoiceFeatures, AppError> {
+        Voice::dictation_action(&self.0, action).await
+    }
+    async fn read(&self, action: ReadAction) -> Result<VoiceFeatures, AppError> {
+        Voice::read_action(&self.0, action).await
     }
 }

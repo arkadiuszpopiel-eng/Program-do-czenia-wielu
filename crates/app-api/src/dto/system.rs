@@ -109,6 +109,8 @@ pub enum SettingsCustomPage {
     Updates,
     /// O programie: wersja, kanał, data kompilacji, licencje zależności.
     About,
+    /// Wtyczki Wasm: propozycje, karta zatwierdzenia (zdolności, limity, hash), stany, problemy.
+    Plugins,
 }
 
 /// Strona ustawień (drzewo §15).

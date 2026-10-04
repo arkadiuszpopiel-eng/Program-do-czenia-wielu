@@ -107,17 +107,6 @@ export function transferApi(core: FakeCore): AlfaClient['transfer'] {
         bytes: 12_000 + files * 4_096,
       });
     },
-    exportSecrets: (password) => {
-      if (password.trim().length < 8) {
-        return Promise.reject(new Error('Import/eksport: hasło musi mieć co najmniej 8 znaków'));
-      }
-      return core.reply({
-        status: 'saved' as const,
-        path: 'C:\\Users\\Ty\\Documents\\alfa-sekrety-2026-09-30.alfa',
-        files: 2,
-        bytes: 4_096,
-      });
-    },
     inspect: (password, path) => {
       const target = path ?? 'C:\\Users\\Ty\\Pobrane\\laptop.alfa';
       if (target.endsWith('-encrypted.alfa') && !password) {

@@ -215,7 +215,7 @@ impl Transfer for ZipTransfer {
         if !matches!(request.kind, PackageKind::Export | PackageKind::Backup) {
             return Err(TransferError::invalid(
                 "kind",
-                "eksport obsługuje tylko export/backup (sekrety: export_secrets)",
+                "eksport obsługuje tylko export/backup (sekretów nie eksportuje się — CX-a)",
             ));
         }
         CancelToken::check(request.cancel.as_ref())?;
@@ -244,32 +244,6 @@ impl Transfer for ZipTransfer {
         );
         Ok(ExportReport {
             path: request.dest.clone(),
-            file_bytes: size,
-            manifest,
-            warnings,
-        })
-    }
-
-    fn export_secrets(
-        &self,
-        dest: &Path,
-        password: &SecretString,
-    ) -> Result<ExportReport, TransferError> {
-        let sealer = self
-            .sealer(PackageKind::Secrets, Some(password))?
-            .ok_or_else(|| TransferError::EncryptionRequired {
-                what: "eksport sekretów".to_owned(),
-            })?;
-        let engine = Engine::new(&self.ports);
-        let mut warnings = Vec::new();
-        let (manifest, size) = write_package(dest, Some(&sealer), |sink| {
-            let outcome = engine.export_secrets(sink, sealer.info())?;
-            warnings = outcome.warnings;
-            Ok(outcome.manifest)
-        })?;
-        self.outbox.emit(ev::EXPORT_COMPLETED, serde_json::json!({ "kind": "secrets", "file": file_name(dest), "secrets": manifest.scope.counts.secrets }));
-        Ok(ExportReport {
-            path: dest.to_path_buf(),
             file_bytes: size,
             manifest,
             warnings,

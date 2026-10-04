@@ -203,10 +203,6 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             vec![("request", parse_only::<ExportRequest>)],
             roundtrip::<ExportResult>,
         ),
-        "transfer_export_secrets" => (
-            vec![("password", parse_only::<SecretInput>)],
-            roundtrip::<ExportResult>,
-        ),
         "transfer_inspect" => (
             vec![("password", os), ("path", os)],
             roundtrip::<InspectResult>,
@@ -306,8 +302,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 33 typy z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 33, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 35 typów z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 35, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

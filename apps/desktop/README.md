@@ -57,7 +57,7 @@ są placeholderami — docelowe wygeneruj: `cargo tauri icon sciezka/do/logo.png
 
 ## Wtyczki Tauri i ich rola
 `tauri-plugin-single-instance` (pierwsza: druga instancja przekazuje URI `alfa://`), `tauri-plugin-global-shortcut`
-(`Ctrl+Alt+Space`, kill-switch `Ctrl+Shift+F12` → `system_kill_all(KillOrigin::Hotkey)` → Broker),
+(`Ctrl+Alt+Space`; kill-switch `Ctrl+Shift+F12` — tylko awaryjnie, gdy `alfa-watchdog` nie działa, patrz niżej),
 `tauri-plugin-notification` (toasty Windows z `app_core::notify`), `tauri-plugin-dialog` (=2.8.1: natywne
 dialogi „Zapisz jako", wyboru paczki `.alfa` i katalogu roboczego agentek dla portu `ShellPort`; wołane
 z `spawn_blocking`). „Uruchom w terminalu" (`ShellPort::open_terminal`): nowe okno konsoli (Windows 11 —
@@ -67,6 +67,25 @@ Każda nowa wtyczka/zależność powłoki trafia do `src-tauri/Cargo.lock` (osob
 go nie obejmuje). Licencje i źródła: `cargo deny --manifest-path apps/desktop/src-tauri/Cargo.toml check
 licenses sources` (zielone); `bans` pada na samym Tauri (wry/tao/webview2-com ciągną `windows`, który
 `deny.toml` dopuszcza tylko w `platform-windows-impl`) — znany wyjątek powłoki, nie ruszać bez ADR.
+
+## Broker, Broker-UI i watchdog (ADR 0003; `src/kernel.rs`, `crates/app-broker`)
+Przed budową rdzenia powłoka wybiera Brokera (`app_broker::kernel::KernelProcesses::start`) i przekazuje go w
+`AppOptions::kernel`:
+- **usługa `AlfaBroker`** (jest `%ProgramData%\Alfa\broker\broker.json`) — połączenie z jej potokiem, sprawdzenie
+  serwera (sesja 0, konto usługi); usługa niedostępna = bezpieczny stan, **bez** przejścia na tryb przenośny;
+- **tryb przenośny** (obok aplikacji `alfa-broker.exe`) — `alfa-broker --console --lifeline` jako proces potomny,
+  okno zatwierdzeń `alfa-broker-ui.exe` uruchamia sam Broker; UI oznacza **słabszą izolację** (bez osobnego konta
+  i UIPI). Instalacji usługi (osobne konto, jednorazowy UAC) nie ma w Ustawieniach — to bramka ludzka #10;
+  Ustawienia → Uprawnienia i bezpieczeństwo tylko pokazują stan i wyjaśnienie;
+- **brak binarek Jądra**: build `release` → bezpieczny stan „brak” (każda zgoda odrzucona, baner); build debug
+  (`cargo tauri dev`) i Linux → Broker w procesie, jawnie oznaczony (do testu trybu przenośnego skopiuj
+  `alfa-broker(-ui)`/`alfa-watchdog` z `target/` workspace'u obok `alfa-desktop.exe`).
+`alfa-watchdog --lifeline` startuje razem z aplikacją i **sam** rejestruje `Ctrl+Shift+F12`; aplikacja nie rejestruje
+skrótu drugi raz, a po komunikacie watchdoga (`kill_switch` na stdout) wykonuje „STOP WSZYSTKIEGO” w procesie.
+Gdy watchdoga brak albo się zakończył — skrót rejestruje aplikacja (awaryjnie) i pokazuje baner. Stan Brokera:
+komenda `broker_status`, zdarzenie `BrokerStatus` (baner bezpiecznego stanu w rozmowie). Zatwierdzanie **nigdy**
+w WebView — karta w wątku tylko przenosi do okna Brokera. Instalator (`tauri.bundle.conf.json` → `externalBin`)
+dołącza trzy binarki `app-safety`, a haki NSIS przenoszą je do `versions\<ver>\` obok `alfa-desktop.exe`.
 
 ## Terminal i ochrona okien (F8)
 Wbudowany terminal: `terminal_open` ma handler ręczny (`app_core::CHANNEL_COMMANDS`) z argumentem

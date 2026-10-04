@@ -9,9 +9,8 @@
 //! Każdy wyzwalacz ma właściciela, sufit uprawnień (`scope` — tokeny wydaje Broker przy
 //! wykonaniu, nie przy tworzeniu), limit częstości, okno ciszy i DND oraz dziennik uruchomień.
 //! **Twarda reguła zgodności:** wyzwalacz nigdy nie uruchamia mostu CLI — zadania mają
-//! pochodzenie `Trigger` (most odmawia, `LaunchOrigin::Trigger`); jedyny wyjątek to harmonogram
-//! czasowy utworzony przez użytkownika z jawnym `allow_bridges` i limitem dziennym (pochodzenie
-//! `Schedule`; zgodę per trasa sprawdza `agent-backends`). Treść, która wyzwoliła (plik,
+//! pochodzenie `Trigger` (most odmawia, `LaunchOrigin::Trigger`), bez wyjątków: harmonogram
+//! czasowy użytkownika też nie (AGENTS.md; `allow_bridges` odrzucane — CX-d). Treść, która wyzwoliła (plik,
 //! wiadomość), jest **niezaufana** — zadanie dostaje taint i treść osobno od celu.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -45,7 +44,6 @@ pub use spec::{
 };
 pub use tz::{LocalTime, Tz, eu_dst_bounds};
 pub use validate::{
-    DAY_MS, DEFAULT_TASK_DEADLINE_MS, GLOBAL_MAX_FIRES_PER_HOUR, MAX_BRIDGE_FIRES_PER_DAY,
-    MAX_CHAIN_DEPTH, MAX_INTERVAL_MS, MAX_TRIGGERS, MIN_INTERVAL_MS, TriggerError, may_manage,
-    validate,
+    DAY_MS, DEFAULT_TASK_DEADLINE_MS, GLOBAL_MAX_FIRES_PER_HOUR, MAX_CHAIN_DEPTH, MAX_INTERVAL_MS,
+    MAX_TRIGGERS, MIN_INTERVAL_MS, TriggerError, may_manage, validate,
 };

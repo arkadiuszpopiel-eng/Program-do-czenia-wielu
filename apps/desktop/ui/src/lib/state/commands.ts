@@ -208,6 +208,10 @@ export function escapeChain(app: AppState): boolean {
     void app.client.voice.stopSpeech();
     return true;
   }
+  if (app.voice.reading) {
+    app.voice.stopReading(app.client);
+    return true;
+  }
   if (app.conversation?.streaming) {
     void app.stopGeneration();
     return true;

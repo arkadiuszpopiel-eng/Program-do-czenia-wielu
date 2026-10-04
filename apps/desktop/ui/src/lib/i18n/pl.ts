@@ -5,9 +5,12 @@ import { plAgents } from './pl-agents';
 import { plApp } from './pl-app';
 import { plBuilder } from './pl-builder';
 import { plMemory } from './pl-memory';
+import { plPlugins } from './pl-plugins';
 import { plSettings } from './pl-settings';
 import { plTasks } from './pl-tasks';
 import { plUpdates } from './pl-updates';
+import { plBroker } from './pl-broker';
+import { plVoice } from './pl-voice';
 import { plWork } from './pl-work';
 
 export const pl = {
@@ -19,6 +22,9 @@ export const pl = {
   ...plWork,
   ...plBuilder,
   ...plUpdates,
+  ...plBroker,
+  ...plVoice,
+  ...plPlugins,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

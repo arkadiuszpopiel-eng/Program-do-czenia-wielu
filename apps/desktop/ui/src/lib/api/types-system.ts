@@ -23,6 +23,8 @@ import type { Account, LocalDownloadState } from './types-hub';
 import type { MarshalReport, TaskInfo, TriggerRunInfo } from './types-tasks';
 import type { GuiStatus, HealthOverall } from './types-work';
 import type { UpdatesView } from './types-updates';
+import type { BrokerStatusView } from './types-broker';
+import type { VoiceFeatures } from './types-voice';
 
 // ── Ustawienia ──────────────────────────────────────────────────────────────────────────────────
 
@@ -70,7 +72,8 @@ export type SettingsCustomPage =
   | 'computer'
   | 'health'
   | 'updates'
-  | 'about';
+  | 'about'
+  | 'plugins';
 
 export interface SettingsPageDef {
   readonly id: string;
@@ -263,7 +266,11 @@ export type AlfaEvent =
   | { readonly type: 'SkillsChanged'; readonly skill_id: string | null }
   /** „Zdrowie systemu" zmienione (incydent, naprawa, propozycja Ulepszacza, werdykt bramki). */
   | { readonly type: 'HealthChanged'; readonly overall: HealthOverall; readonly pending: number }
-  | { readonly type: 'UpdateStatus'; readonly status: UpdatesView };
+  | { readonly type: 'UpdateStatus'; readonly status: UpdatesView }
+  /** Stan Brokera zmieniony (połączono, tryb przenośny, zerwanie — bezpieczny stan, watchdog). */
+  | { readonly type: 'BrokerStatus'; readonly status: BrokerStatusView }
+  /** Głos rozszerzony F5 zmieniony (wykrycie, rejestracja, dyktowanie, czytanie) — bez treści. */
+  | { readonly type: 'VoiceFeaturesChanged'; readonly features: VoiceFeatures };
 
 export type AlfaEventType = AlfaEvent['type'];
 export type Unsubscribe = () => void;

@@ -210,16 +210,16 @@ mod tests {
         assert!(validate_spec(&s, 0).is_err());
     }
 
+    /// Regresja CX-d: harmonogram nie celuje w most (AGENTS.md) — tylko `User`.
     #[test]
-    fn bridges_only_from_user_or_schedule() {
+    fn bridges_only_from_user() {
         let mut s = spec();
         s.executor = ExecutorKind::Bridge(BridgeKind::ClaudeCode);
         assert!(validate_spec(&s, 0).is_ok());
-        s.origin = TaskOrigin::Schedule {
-            schedule_id: "s".into(),
-        };
-        assert!(validate_spec(&s, 0).is_ok());
         for origin in [
+            TaskOrigin::Schedule {
+                schedule_id: "s".into(),
+            },
             TaskOrigin::Trigger {
                 trigger_id: "t".into(),
                 depth: 1,

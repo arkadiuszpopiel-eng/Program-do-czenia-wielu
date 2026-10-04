@@ -357,7 +357,7 @@ Moduł `transfer`: F1 = P0-lite (konfiguracja + sesje), F7 = pełny (pamięć, u
 |---|---|
 | Format | jeden plik `.alfa` (archiwum + manifest z wersją schematu i sumami kontrolnymi) |
 | Wybór zakresu (lista z przełącznikami) | konfiguracja wspólna · agentki i biblie głosów · obsady ról · reguły · umiejętności / agenci z Kreatora · **wybrane sesje** · **wybrane zakresy pamięci** · artefakty (opcjonalnie) · logi (domyślnie nie) · nakładka maszyny (domyślnie nie) |
-| Sekrety | **klucze API i sekrety nie wchodzą do eksportu**; osobna, jawna opcja „eksport sekretów" szyfrowany hasłem |
+| Sekrety | **klucze API i sekrety nigdy nie wchodzą do paczki** (AGENTS.md; brak „eksportu sekretów” — decyzja CX-a 2026-10-04); na nowej maszynie klucze dodaje się w Ustawienia → Konta |
 | Szyfrowanie | opcjonalne, całej paczki, hasłem |
 | Dostęp | Ustawienia → Import i eksport, paleta poleceń, `/eksport`, panel Sesje (pojedyncza sesja), głosem („Beta, wyeksportuj sesję X") |
 

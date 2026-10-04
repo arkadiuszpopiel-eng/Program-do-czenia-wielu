@@ -1,11 +1,10 @@
 //! Eksport → import `.alfa` przez komendy (moduł `transfer`): dialogi powłoki, podgląd
-//! (dry-run), tryb, snapshot i rollback, paczka szyfrowana hasłem, sekrety tylko jawnie z hasłem.
+//! (dry-run), tryb, snapshot i rollback, paczka szyfrowana hasłem; sekretów nie eksportuje się nigdy.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 mod common;
 
-use app_core::ErrorCode;
 use app_core::dto::{ExportResult, ImportMode, InspectResult, SessionTemplate};
 use common::*;
 
@@ -121,18 +120,9 @@ async fn export_import_roundtrip_through_commands() {
         .await;
     assert!(matches!(ok.unwrap(), InspectResult::Inspected { manifest, .. } if manifest.encrypted));
 
-    // Sekrety: tylko jawnie i z hasłem ≥ 8 znaków.
-    let weak = h
-        .core
-        .transfer_export_secrets("krótkie".into())
-        .await
-        .unwrap_err();
-    assert_eq!(weak.code, ErrorCode::InvalidInput, "{weak:?}");
-    h.shell
-        .answer_dialog(Some(h.dir.path().join("sekrety.alfa")));
-    let secrets = h
-        .core
-        .transfer_export_secrets("długie hasło sekretów".into())
-        .await;
-    assert!(matches!(secrets.unwrap(), ExportResult::Saved { .. }));
+    // Regresja CX-a (AGENTS.md): sekrety nigdy w `.alfa` — komendy eksportu sekretów nie ma.
+    assert!(
+        !app_core::COMMANDS.contains(&"transfer_export_secrets"),
+        "eksport sekretów do paczki"
+    );
 }

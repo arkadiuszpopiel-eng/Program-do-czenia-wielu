@@ -1,7 +1,7 @@
 //! Komendy computer use (`gui_*`), terminala (`terminal_*`), umiejętności (`skills_*`), Kreatora
-//! (`builder_*`), „Zdrowia systemu" (`health_*`, `improver_*`, `evals_*`) i aktualizacji
-//! (`updates_*`) — delegują do `app-gui`, `app-terminal`, `app-skills`, `app-health`,
-//! `app-updates` (działania jako użytkownik w UI).
+//! (`builder_*`), „Zdrowia systemu" (`health_*`, `improver_*`, `evals_*`), aktualizacji
+//! (`updates_*`) i wtyczek (`plugins_*`) — delegują do `app-gui`, `app-terminal`, `app-skills`,
+//! `app-health`, `app-updates`, `app-plugins` (działania jako użytkownik w UI).
 
 use std::sync::Arc;
 
@@ -9,8 +9,9 @@ use crate::core::AppCore;
 use crate::dto::{
     AboutInfo, AgentDraft, BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView,
     BuilderPreview, BuilderProposal, BuilderSaved, EvalSuiteView, EvalsView, ExportResult,
-    GuiScreenshot, GuiStatus, HealthView, ImproverView, SkillImportResult, SkillInfo, SkillReview,
-    TaskInfo, TerminalProfileId, TerminalSession, UpdatesView, WhatsNew,
+    GuiScreenshot, GuiStatus, HealthView, ImproverView, PluginInfo, PluginInspection, PluginsView,
+    SkillImportResult, SkillInfo, SkillReview, TaskInfo, TerminalProfileId, TerminalSession,
+    UpdatesView, WhatsNew,
 };
 use crate::error::AppError;
 
@@ -76,6 +77,14 @@ work_commands! {
     wait updates_about() -> AboutInfo = updates.about();
     wait updates_whats_new() -> Option<WhatsNew> = updates.whats_new();
     wait updates_dismiss_whats_new() -> () = updates.dismiss_whats_new();
+    res plugins_list() -> PluginsView = plugins.list();
+    wait plugins_inspect(wasm_b64: String) -> PluginInspection = plugins.inspect(&wasm_b64);
+    wait plugins_propose(manifest: serde_json::Value, wasm_b64: String) -> PluginInfo = plugins.propose(manifest, &wasm_b64);
+    wait plugins_approve(plugin_id: String, version: String, reviewed_hash: String) -> PluginInfo = plugins.approve(&plugin_id, &version, &reviewed_hash);
+    wait plugins_reject(plugin_id: String, version: String) -> PluginInfo = plugins.reject(&plugin_id, &version);
+    wait plugins_disable(plugin_id: String) -> PluginInfo = plugins.disable(&plugin_id);
+    wait plugins_enable(plugin_id: String, reviewed_hash: String) -> PluginInfo = plugins.enable(&plugin_id, &reviewed_hash);
+    wait plugins_remove(plugin_id: String) -> PluginsView = plugins.remove(&plugin_id);
 }
 
 impl AppCore {

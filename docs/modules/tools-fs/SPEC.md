@@ -59,3 +59,11 @@ Kroki narzędzi w wątku (jedna linia + „Cofnij”), Replay krok po kroku, toa
 ## Otwarte pytania
 - Wyszukiwanie: Windows Search (indeks) vs własne przeszukiwanie (v0: własne, z limitami) — SPEC v1.
 - Hashe, archiwa, obserwatory zmian — F6 (`tools-fs` v1).
+
+## Poprawki po recenzji PR #1 (2026-10-04)
+- **Q-1:** deny-lista (Jądra + poświadczenia) sprawdzana także po rozwiązaniu dowiązań przy **każdym** wywołaniu
+  (`Core::denied` → `paths::protected_with_links`): symlink/junction w katalogu roboczym, katalog roboczy będący
+  dowiązaniem (także podmienionym po wyborze) i zerwane dowiązanie → `Denied(DenyList)` przed Brokerem i `FsPort`.
+  W aplikacji deny-lista narzędzi zawiera też katalogi danych Alfy (`app_modules::workdir::tool_deny_lists`).
+  Testy: `tools-fs-impl/tests/links.rs`, `app-core/tests/workdir.rs` (`workdir_links_to_protected_dirs_are_rejected`,
+  `link_created_after_choice_is_denied_at_tool_call`).

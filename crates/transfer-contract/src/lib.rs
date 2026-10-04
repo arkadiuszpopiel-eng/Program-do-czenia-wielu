@@ -30,8 +30,6 @@ pub mod contract_tests;
 
 use std::path::Path;
 
-use accounts_hub_contract::SecretString;
-
 pub use backup::{BackgroundState, BackupRequest, BackupSchedule};
 pub use error::TransferError;
 pub use guard::SecretGuard;
@@ -78,15 +76,10 @@ pub mod events {
 /// Kontrakt modułu `transfer`.
 pub trait Transfer: Send + Sync {
     /// Eksport zakresu do pliku `.alfa` (`kind` = `Export` albo `Backup`). **Sekrety nigdy** nie
-    /// trafiają do paczki (strażnik + skan końcowy). Hasło → szyfrowanie całej paczki.
+    /// trafiają do paczki (strażnik + skan końcowy). Hasło → szyfrowanie całej paczki. Eksportu
+    /// sekretów nie ma (AGENTS.md: sekrety tylko w Credential Manager — CX-a); paczka sekretów
+    /// ze starszej wersji jest przy imporcie odrzucana, sekcja `secrets.json` pomijana.
     fn export(&self, request: &ExportRequest) -> Result<ExportReport, TransferError>;
-
-    /// Osobny, jawny eksport sekretów — zawsze szyfrowany hasłem.
-    fn export_secrets(
-        &self,
-        dest: &Path,
-        password: &SecretString,
-    ) -> Result<ExportReport, TransferError>;
 
     /// Podgląd: manifest + dry-run (nic nie zapisuje).
     fn inspect(&self, package: &Path, options: &ImportOptions)

@@ -85,8 +85,11 @@ impl Core {
         }
     }
 
+    /// Deny-lista (Jądra, poświadczenia) w postaci podanej i po rozwiązaniu dowiązań (Q-1).
     pub(crate) fn denied(&self, path: &str) -> bool {
-        self.deny.is_denied_path(path, &self.env) || paths::has_credential_segment(path)
+        paths::protected_with_links(path, |p| {
+            self.deny.is_denied_path(p, &self.env) || paths::has_credential_segment(p)
+        })
     }
 
     /// Katalog roboczy: z argumentu albo z kontekstu; bezwzględny, poza deny-listą.

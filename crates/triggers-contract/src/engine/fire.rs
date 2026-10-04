@@ -58,23 +58,17 @@ fn untrusted(cause: &FireCause) -> (Vec<TaintSource>, Value) {
     }
 }
 
-/// Zadanie dla wyzwolenia: pochodzenie `Trigger` (albo `Schedule` dla harmonogramu użytkownika
-/// z `allow_bridges`), klasa najwyżej `Agent`, taint z przyczyny, `scope` jako sufit.
+/// Zadanie dla wyzwolenia: pochodzenie zawsze `Trigger` (także harmonogram — most odmawia; CX-d),
+/// klasa najwyżej `Agent`, taint z przyczyny, `scope` jako sufit.
 pub fn task_for(spec: &TriggerSpec, seq: u64, cause: &FireCause, now: u64) -> TaskSpec {
     let a = &spec.action;
     let depth = match base_cause(cause) {
         FireCause::TaskFinished { depth, .. } => depth.saturating_add(1),
         _ => 1,
     };
-    let origin = if spec.allow_bridges && spec.kind.is_time() {
-        TaskOrigin::Schedule {
-            schedule_id: spec.id.to_string(),
-        }
-    } else {
-        TaskOrigin::Trigger {
-            trigger_id: spec.id.to_string(),
-            depth,
-        }
+    let origin = TaskOrigin::Trigger {
+        trigger_id: spec.id.to_string(),
+        depth,
     };
     let (taint, content) = untrusted(cause);
     let session = match base_cause(cause) {

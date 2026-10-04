@@ -298,10 +298,12 @@ async fn bridge_never_starts_from_trigger_0_of_100() {
     assert!(stats.launch_refused >= 50, "zestaw nie może być pusty");
 }
 
-/// Kontrole pozytywne (poza zestawem): użytkownik — most startuje; harmonogram użytkownika
-/// z `allow_bridges` — tylko ze zgodą trasy.
+/// Kontrole (poza zestawem): żądanie użytkownika — most startuje. Regresja CX-d (AGENTS.md:
+/// mostów CLI nie uruchamia się z harmonogramu): harmonogram czasowy użytkownika z `allow_bridges`
+/// i niezerową zgodą dzienną trasy **nie** startuje mostu — odrzucony przy tworzeniu, a zadanie
+/// z pochodzeniem `Schedule` nie przechodzi ani przez scheduler, ani przez most.
 #[tokio::test(start_paused = true)]
-async fn controls_user_request_and_consented_schedule() {
+async fn controls_user_request_starts_schedule_never() {
     let mut env = make_env(consent()).await;
     let mut user = TaskSpec::new(
         "prosba",
@@ -320,7 +322,6 @@ async fn controls_user_request_and_consented_schedule() {
         .unwrap();
     assert_eq!(env.backend.submitted().len(), 1);
 
-    let now = env.module.now_ms().unwrap();
     let mut schedule = TriggerSpec::new(
         "nocny-przeglad",
         "nocny przegląd",
@@ -336,24 +337,38 @@ async fn controls_user_request_and_consented_schedule() {
         max_fires: 1,
         per_ms: 86_400_000,
     };
-    env.module.create(schedule.clone(), Actor::User).unwrap();
-    env.module
-        .fire_now(&"nocny-przeglad".into(), Actor::User)
-        .unwrap();
-    let d = env.scheduler.dispatches().pop().unwrap();
-    assert!(matches!(d.spec.origin, TaskOrigin::Schedule { .. }));
-    env.backend
-        .submit_task(bridge_task(&d, BridgeKind::Codex))
-        .await
-        .unwrap();
-    assert_eq!(env.backend.submitted().len(), 2);
+    let created = env.module.create(schedule, Actor::User);
+    assert!(created.is_err(), "harmonogram z mostem: {created:?}");
+    assert!(
+        env.module
+            .fire_now(&"nocny-przeglad".into(), Actor::User)
+            .is_err()
+    );
+    settle().await;
+    assert_eq!(env.scheduler.dispatches().len(), env.seen, "brak zadania");
 
-    let without = make_env(LaunchPolicy::default()).await;
-    let err = without
-        .backend
-        .submit_task(bridge_task(&d, BridgeKind::Codex))
-        .await
-        .unwrap_err();
+    let origin = TaskOrigin::Schedule {
+        schedule_id: "nocny-przeglad".into(),
+    };
+    let mut scheduled = TaskSpec::new(
+        "z-harmonogramu",
+        "z harmonogramu",
+        Assignee::AnyAgent,
+        TaskClass::Agent,
+        origin.clone(),
+    );
+    scheduled.executor = ExecutorKind::Bridge(BridgeKind::Codex);
+    assert!(matches!(
+        env.scheduler.submit(vec![scheduled]),
+        Err(TaskError::BridgeNotAllowed { .. })
+    ));
+    let mut task = bridge_task(&d, BridgeKind::Codex);
+    task.origin = origin.launch_origin();
+    let err = env.backend.submit_task(task).await.unwrap_err();
     assert!(matches!(err, BackendError::LaunchRefused { .. }), "{err:?}");
-    let _ = now;
+    assert_eq!(
+        env.backend.submitted().len(),
+        1,
+        "tylko żądanie użytkownika"
+    );
 }
