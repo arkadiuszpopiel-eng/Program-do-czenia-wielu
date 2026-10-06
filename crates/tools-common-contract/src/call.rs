@@ -201,6 +201,8 @@ pub enum UndoService {
     Journal,
     /// `tools-clipboard` (poprzednia zawartość schowka).
     Clipboard,
+    /// `tools-system` (poprzednia wartość zmiennej użytkownika po `system_env_set`).
+    System,
 }
 
 /// Krok „Cofnij” (karta/toast w UI, Replay).

@@ -89,6 +89,8 @@ scheduler-lite-fake = { path = "../scheduler-lite-fake" }
 core-bus-fake = { path = "../core-bus-fake" }
 tools-office-fake = { path = "../tools-office-fake" }
 tools-browser-fake = { path = "../tools-browser-fake" }
+# Odtwarzacz-atrapa dla testu kill-switcha (`MediaTools::stop_all`).
+tools-media-fake = { path = "../tools-media-fake" }
 plugin-runtime-contract = { path = "../plugin-runtime-contract" }
 base64 = "0.22.1"
 # Wtyczka testowa z WAT (ta sama linia co w plugin-runtime-impl).

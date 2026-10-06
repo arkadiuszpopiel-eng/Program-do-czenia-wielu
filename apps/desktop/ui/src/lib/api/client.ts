@@ -201,8 +201,11 @@ export interface AccountsApi {
 export interface TransferApi {
   /** Intencja: natywny dialog zapisu + eksport. */
   exportPackage(request: ExportRequest): Promise<ExportResult>;
-  /** Intencja: natywny dialog otwarcia + podgląd (dry-run). */
-  inspect(password: string | null, path: string | null): Promise<InspectResult>;
+  /**
+   * Podgląd (dry-run). `handle: null` — intencja: natywny dialog otwarcia; inaczej jednorazowy
+   * uchwyt z poprzedniego `InspectResult` albo z `backups.restore` (ścieżek UI nie podaje).
+   */
+  inspect(password: string | null, handle: string | null): Promise<InspectResult>;
   importPackage(request: ImportRequest): Promise<ImportResult>;
   rollback(snapshotId: string): Promise<void>;
 }

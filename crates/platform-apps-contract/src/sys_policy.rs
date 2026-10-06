@@ -83,8 +83,9 @@ const SECRET_NAME_PARTS: [&str; 12] = [
 ];
 
 /// Zmienne, których agentka nie zapisuje: przekierowują dane i ścieżki Alfy, interpreter
-/// poleceń, ładowanie modułów, ruch sieciowy i zaufanie TLS albo wstrzykują kod do procesów.
-const ENV_WRITE_DENIED: [&str; 26] = [
+/// poleceń, ładowanie modułów, ruch sieciowy i zaufanie TLS albo wstrzykują kod do procesów
+/// (przegląd fali 3, W3-02: JVM, OpenSSL, PowerShell, Python, Perl, Ruby).
+const ENV_WRITE_DENIED: &[&str] = &[
     "APPDATA",
     "LOCALAPPDATA",
     "USERPROFILE",
@@ -111,10 +112,23 @@ const ENV_WRITE_DENIED: [&str; 26] = [
     "__COMPAT_LAYER",
     "ONEDRIVE",
     "PUBLIC",
+    "JAVA_TOOL_OPTIONS",
+    "_JAVA_OPTIONS",
+    "JDK_JAVA_OPTIONS",
+    "OPENSSL_CONF",
+    "OPENSSL_MODULES",
+    "OPENSSL_ENGINES",
+    "PSEXECUTIONPOLICYPREFERENCE",
+    "PYTHONHOME",
+    "PERL5LIB",
+    "PERLLIB",
+    "RUBYOPT",
+    "RUBYLIB",
 ];
 
-/// Prefiksy zmiennych zabronionych do zapisu.
-const ENV_WRITE_DENIED_PREFIXES: [&str; 13] = [
+/// Prefiksy zmiennych zabronionych do zapisu (`CARGO_`, `NPM_CONFIG_` — wrapper kompilatora,
+/// `runner` celu, powłoka skryptów: kod przy budowaniu na tej maszynie; W3-02).
+const ENV_WRITE_DENIED_PREFIXES: &[&str] = &[
     "ALFA",
     "WEBVIEW2_",
     "COR_",
@@ -128,6 +142,8 @@ const ENV_WRITE_DENIED_PREFIXES: [&str; 13] = [
     "LD_",
     "DYLD_",
     "RUST",
+    "CARGO_",
+    "NPM_CONFIG_",
 ];
 
 /// Najdłuższa nazwa zmiennej.
@@ -214,11 +230,14 @@ pub fn env_write_denied(name: &str) -> Option<&'static str> {
     None
 }
 
-/// Wartość zmiennej: ≤ 32 767 znaków, bez NUL.
+/// Wartość zmiennej: ≤ 32 767 znaków, bez NUL i znaków sterujących poza tabulatorem (W3-05:
+/// karta Brokera `setx NAZWA "wartość"` nie może rozpaść się na wiele linii).
 pub fn check_env_value(value: &str) -> Result<(), SysError> {
-    let ok = value.chars().count() <= MAX_ENV_VALUE && !value.contains('\0');
-    ok.then_some(())
-        .ok_or_else(|| SysError::Invalid("wartość zmiennej za długa albo zawiera NUL".into()))
+    let ok = value.chars().count() <= MAX_ENV_VALUE
+        && !value.chars().any(|c| c.is_control() && c != '\t');
+    ok.then_some(()).ok_or_else(|| {
+        SysError::Invalid("wartość zmiennej za długa albo zawiera znaki sterujące".into())
+    })
 }
 
 /// Ukrywa wartości zmiennych o nazwach sekretów (port stosuje przed zwróceniem listy).

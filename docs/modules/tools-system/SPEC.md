@@ -57,4 +57,9 @@ RAM ≤ 8 MB; ≤ 500 procesów/usług w wyniku, ≤ 200 zdarzeń, komunikat ≤
 ## Otwarte pytania
 - Zdolność `system.read(obszar)` w Brokerze zamiast pseudo-aplikacji (zmiana Jądra — przegląd człowieka).
 - Start/stop usług wymagających administratora — UAC na żądanie przez Brokera (PLAN §8.4); dziś `PermissionDenied` z wyjaśnieniem.
-- Karta „Cofnij” dla zapisu zmiennej w UI (`UndoService` dla `tools-system` w `app-api`/`app-core`) — dziś `undo_env` w API zestawu.
+- ~~Karta „Cofnij” dla zapisu zmiennej w UI~~ — zrobione (fala 4): wynik `system_env_set` niesie `UndoRef { service: UndoService::System, id: undo_id }` (`tests/undo_card.rs`), token UI `"<sesja>:v<id>"`, `turns_undo_step` → `AgentTools::undo_env` tylko dla kroku przebiegu tej sesji (`app-chat/src/undo.rs`).
+
+## Przegląd fali 3 (2026-10, `docs/reviews/2026-10-wave3-review.md`) — polityka do przeglądu człowieka
+- **W3-02 (zrobione):** deny-lista zapisu zmiennych uzupełniona o zmienne ładujące kod w innych ekosystemach: `JAVA_TOOL_OPTIONS`, `_JAVA_OPTIONS`, `JDK_JAVA_OPTIONS`, `OPENSSL_CONF`, `OPENSSL_MODULES`, `OPENSSL_ENGINES`, `PSExecutionPolicyPreference`, `PYTHONHOME`, `PERL5LIB`, `PERLLIB`, `RUBYOPT`, `RUBYLIB`, prefiksy `CARGO_`, `NPM_CONFIG_` (`platform-apps-contract/tests/review.rs`).
+- **W3-05 (zrobione):** wartość zmiennej bez znaków sterujących (poza tabulatorem) — karta Brokera `setx NAZWA "wartość"` nie rozpada się na wiele linii.
+- **W3-08 (decyzja człowieka):** `PATH` użytkownika pozostaje zapisywalny (świadomie, test `tests_sys::env_secrets_hidden_and_writes_denied`); propozycje: osobne potwierdzenie z pokazaniem dodanych/usuniętych katalogów albo tylko dopisywanie istniejących katalogów spoza obszarów zapisywalnych przez agentki.

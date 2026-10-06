@@ -46,6 +46,7 @@ pub use spec::{AgentSettings, NO_WINDOW_APPROVAL_CAP_S, SpecInput, keys, run_spe
 pub use sysnet::{SysNetDeps, sysnet_guard};
 pub use tickets::{TicketLog, TicketNote};
 pub use tools_clipboard_contract::ClipboardUndoError;
+pub use tools_media_impl::MediaTools;
 pub use tools_shell_contract::ShellToolsConfig;
 pub use tools_system_impl::EnvUndoError;
 pub use toolset::{AgentTools, ToolsDeps};

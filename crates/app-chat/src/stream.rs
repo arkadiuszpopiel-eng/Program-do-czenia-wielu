@@ -3,118 +3,20 @@
 
 use std::time::{Duration, Instant};
 
-use cost_meter_contract::{BudgetDecision, CostMeter, usd_to_pln};
+use cost_meter_contract::{BudgetDecision, usd_to_pln};
 use futures_util::StreamExt;
 use lib_markdown::{IncrementalRenderer, RenderOptions, StreamUpdate};
-use personas_contract::{PersonaId, Personas};
-use providers_contract::{
-    ChatRequest, ProviderError, ProviderErrorKind, ProviderEvent, StopReason as PStop,
-    TurnAccumulator, Usage,
-};
+use personas_contract::PersonaId;
+use providers_contract::{ChatRequest, ProviderEvent, TurnAccumulator, Usage};
 use sessions_contract::{Block as SBlock, PrivacyTag, SessionCatalog};
 
-use super::GenRequest;
-use super::project::block_dto;
-use crate::core::{AppCore, GenHandle};
-use crate::dto::{
-    self, AlfaEvent, RenderedBlock, StopReason, TurnError, TurnErrorCode, TurnStatus,
-};
-use crate::ports::{BrainError, BrainRequest};
+use app_api::dto::{self, AlfaEvent, RenderedBlock, TurnError, TurnErrorCode};
+use app_api::ports::{BrainChoice, BrainError, BrainRequest, VoiceChunk};
 
-/// Co dostawca wybrał.
-#[derive(Debug, Clone, Default)]
-pub(crate) struct Chosen {
-    pub provider_id: String,
-    pub provider_name: String,
-    pub account: Option<String>,
-    pub model: String,
-}
-
-/// Wynik generacji (do zapisu w historii i zdarzeń końcowych).
-#[derive(Debug, Clone)]
-pub(crate) struct Outcome {
-    pub text: String,
-    pub thinking: Vec<SBlock>,
-    pub status: TurnStatus,
-    pub stop: Option<StopReason>,
-    pub error: Option<TurnError>,
-    pub usage: Option<Usage>,
-    pub cost_nano_usd: Option<u64>,
-    pub chosen: Option<Chosen>,
-    pub latency_ms: u64,
-    pub thinking_ms: Option<u64>,
-    /// Kroki narzędzi (przebieg agentki).
-    pub tools: Vec<crate::dto::ToolStep>,
-    /// Karta „czeka na zatwierdzenie" (przebieg agentki).
-    pub approval: Option<crate::dto::ApprovalPending>,
-}
-
-impl Outcome {
-    pub(crate) fn failed(error: TurnError) -> Self {
-        Self {
-            text: String::new(),
-            thinking: Vec::new(),
-            status: TurnStatus::Error,
-            stop: None,
-            error: Some(error),
-            usage: None,
-            cost_nano_usd: None,
-            chosen: None,
-            latency_ms: 0,
-            thinking_ms: None,
-            tools: Vec::new(),
-            approval: None,
-        }
-    }
-}
-
-fn turn_error(
-    code: TurnErrorCode,
-    message: impl Into<String>,
-    provider: Option<&str>,
-) -> TurnError {
-    TurnError {
-        code,
-        message: message.into(),
-        retry_at: None,
-        provider: provider.map(str::to_owned),
-    }
-}
-
-/// Błąd dostawcy → błąd tury (komunikat PL bez sekretów).
-pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
-    let now = chrono::Utc::now();
-    match &e.kind {
-        ProviderErrorKind::RateLimited { retry_after_ms } => {
-            let wait = retry_after_ms.unwrap_or(60_000);
-            let at = now + chrono::Duration::milliseconds(i64::try_from(wait).unwrap_or(60_000));
-            TurnError {
-                code: TurnErrorCode::RateLimited,
-                message: format!("Limit zapytań u dostawcy {provider}. Spróbuj ponownie później."),
-                retry_at: Some(dto::iso(at)),
-                provider: Some(provider.to_owned()),
-            }
-        }
-        ProviderErrorKind::Network
-        | ProviderErrorKind::Timeout {
-            phase: providers_contract::TimeoutPhase::Connect,
-        } => turn_error(
-            TurnErrorCode::Offline,
-            format!("Brak połączenia z dostawcą {provider}. Wiadomość możesz ponowić."),
-            Some(provider),
-        ),
-        ProviderErrorKind::Auth => turn_error(
-            TurnErrorCode::Provider,
-            format!("Dostawca {provider} odrzucił klucz API — sprawdź konto w Ustawieniach."),
-            Some(provider),
-        ),
-        _ => turn_error(
-            TurnErrorCode::Provider,
-            format!("Błąd dostawcy {provider}: {e}"),
-            Some(provider),
-        ),
-    }
-}
+use crate::engine::{ChatEngine, GenHandle};
+use crate::generate::GenRequest;
+use crate::outcome::{Chosen, Outcome, classify, millis, turn_error};
+use crate::project::block_dto;
 
 fn update_blocks(update: StreamUpdate) -> Vec<RenderedBlock> {
     let mut blocks: Vec<RenderedBlock> = update.closed.iter().map(|b| block_dto(b, true)).collect();
@@ -136,9 +38,9 @@ fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
 
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
 pub(crate) async fn prepare(
-    core: &AppCore,
+    core: &ChatEngine,
     req: &GenRequest,
-) -> Result<(crate::ports::BrainChoice, ChatRequest), TurnError> {
+) -> Result<(BrainChoice, ChatRequest), TurnError> {
     let privacy = core
         .inner
         .sessions
@@ -183,7 +85,8 @@ pub(crate) async fn prepare(
             BrainError::Budget(m) => turn_error(TurnErrorCode::BudgetBlocked, m, None),
         })?;
     request.model.clone_from(&choice.model);
-    let choice = super::symptom::tap(core, choice);
+    // Symptomy dostawcy dla Diagnosty (błąd HTTP → `diagnostics.symptom` bez treści rozmowy).
+    let choice = app_health::symptom_tap(choice, &core.inner.bus);
     if !choice.routed {
         budget_gate(core, &choice, &request).await?;
     }
@@ -192,8 +95,8 @@ pub(crate) async fn prepare(
 
 /// Budżet dla dostawcy wybranego poza Routerem (Router sprawdza go sam, per kandydat).
 async fn budget_gate(
-    core: &AppCore,
-    choice: &crate::ports::BrainChoice,
+    core: &ChatEngine,
+    choice: &BrainChoice,
     request: &ChatRequest,
 ) -> Result<(), TurnError> {
     let estimate = choice
@@ -221,7 +124,7 @@ async fn budget_gate(
 }
 
 /// Pełny przebieg generacji.
-pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandle) -> Outcome {
+pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHandle) -> Outcome {
     let (choice, request) = match prepare(core, req).await {
         Ok(x) => x,
         Err(e) => return Outcome::failed(e),
@@ -256,8 +159,8 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
             ProviderEvent::Started { model, .. } if choice.routed && !announced => {
                 announced = true;
                 if let Some(target) = core.inner.brain.target(model) {
-                    super::routing::announce(core, req, &tid, &choice, &target);
-                    chosen = super::routing::chosen_of(&target);
+                    crate::routing::announce(core, req, &tid, &choice, &target);
+                    chosen = crate::routing::chosen_of(&target);
                 }
             }
             ProviderEvent::ThinkingDelta { .. } => {
@@ -285,7 +188,7 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
                     });
                 }
                 if let Some(tap) = &req.tap {
-                    let _ = tap.send(crate::ports::VoiceChunk::Text(text.clone()));
+                    let _ = tap.send(VoiceChunk::Text(text.clone()));
                 }
                 let blocks = update_blocks(renderer.push(text));
                 if let Ok(mut live) = handle.live.lock() {
@@ -352,49 +255,5 @@ pub(crate) async fn generate(core: &AppCore, req: &GenRequest, handle: &GenHandl
         thinking_ms: thinking_ms.or_else(|| thinking.map(|(s, _)| millis(s.elapsed()))),
         tools: Vec::new(),
         approval: None,
-    }
-}
-
-fn millis(d: Duration) -> u64 {
-    u64::try_from(d.as_millis()).unwrap_or(u64::MAX)
-}
-
-fn classify(
-    cancelled: bool,
-    turn: &providers_contract::AssistantTurn,
-    provider: &str,
-) -> (TurnStatus, Option<StopReason>, Option<TurnError>) {
-    if cancelled || turn.stop == Some(PStop::Cancelled) {
-        return (TurnStatus::Cancelled, Some(StopReason::Cancelled), None);
-    }
-    if let Some(e) = &turn.error {
-        return (TurnStatus::Error, None, Some(provider_error(e, provider)));
-    }
-    match turn.stop {
-        Some(PStop::EndTurn | PStop::StopSequence | PStop::PauseTurn) => {
-            (TurnStatus::Complete, Some(StopReason::End), None)
-        }
-        Some(PStop::MaxTokens) => (TurnStatus::Complete, Some(StopReason::MaxTokens), None),
-        Some(PStop::ToolUse) => (TurnStatus::Complete, Some(StopReason::ToolUse), None),
-        Some(PStop::Refusal) => (TurnStatus::Complete, Some(StopReason::Refusal), None),
-        Some(PStop::ContextWindowExceeded) => (
-            TurnStatus::Error,
-            None,
-            Some(turn_error(
-                TurnErrorCode::ContextOverflow,
-                "Rozmowa przekroczyła okno kontekstu modelu — zacznij nową gałąź lub sesję.",
-                Some(provider),
-            )),
-        ),
-        Some(PStop::Cancelled) => (TurnStatus::Cancelled, Some(StopReason::Cancelled), None),
-        None => (
-            TurnStatus::Error,
-            None,
-            Some(turn_error(
-                TurnErrorCode::Provider,
-                format!("Strumień dostawcy {provider} urwał się bez zakończenia."),
-                Some(provider),
-            )),
-        ),
     }
 }

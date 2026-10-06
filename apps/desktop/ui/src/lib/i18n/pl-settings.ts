@@ -153,6 +153,7 @@ export const plSettings = {
   'tr.warnings': 'Uwagi',
   'tr.needsPassword': 'Paczka jest zaszyfrowana — podaj hasło.',
   'tr.unlock': 'Odszyfruj',
+  'tr.wrongPassword': 'Nieprawidłowe hasło — spróbuj ponownie.',
 
   'perm.title': 'Poziom autonomii',
   'perm.intro':

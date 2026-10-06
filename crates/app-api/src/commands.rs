@@ -68,7 +68,7 @@ macro_rules! with_commands {
             accounts_set_limit(account_id: String, enabled: bool, monthly: $crate::dto::Money) -> ();
             accounts_remove(account_id: String) -> ();
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
-            transfer_inspect(password: Option<$crate::dto::SecretInput>, path: Option<String>) -> $crate::dto::InspectResult;
+            transfer_inspect(password: Option<$crate::dto::SecretInput>, handle: Option<String>) -> $crate::dto::InspectResult;
             transfer_import(request: $crate::dto::ImportRequest) -> $crate::dto::ImportResult;
             transfer_rollback(snapshot_id: String) -> ();
             permissions_get(session_id: Option<String>) -> $crate::dto::PermissionsState;
@@ -214,6 +214,7 @@ macro_rules! with_commands {
             backups_set_password(password: Option<$crate::dto::SecretInput>) -> $crate::dto::BackupView;
             backups_run_now() -> $crate::dto::BackupView;
             backups_verify(file: String) -> $crate::dto::BackupCheck;
+            backups_restore(file: String) -> String;
         }
     };
 }
@@ -239,6 +240,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 206);
+        assert_eq!(super::COMMANDS.len(), 207);
     }
 }

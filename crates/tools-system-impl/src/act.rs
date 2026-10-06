@@ -9,7 +9,8 @@ use platform_contract::image_file_name;
 use risk_classifier_contract::{Destructiveness, KernelRule};
 use safety_broker_contract::{AdminOp, AppSelector, Capability, ServiceAction};
 use tools_common_contract::{
-    DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, base_facts, parse_args, text,
+    DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, UndoRef, UndoService,
+    base_facts, parse_args, text,
 };
 use tools_system_contract::{
     EVENT_ENV_SET, EVENT_PROCESS_KILLED, EVENT_SERVICE, EnvSetArgs, EnvSetOut, KillOut,
@@ -253,6 +254,14 @@ impl Core {
             ),
             serde_json::to_value(&out).unwrap_or_default(),
         );
+        // Karta „Cofnij” (`turns_undo_step` → `SystemTools::undo_env`); 0 = dziennik niedostępny.
+        if undo_id > 0 {
+            o.undo = Some(UndoRef {
+                service: UndoService::System,
+                id: undo_id,
+                text: format!("Przywróć poprzednią wartość zmiennej {}", out.name),
+            });
+        }
         o.approval = auth.approval;
         Ok(o)
     }

@@ -9,8 +9,6 @@ use sessions_contract::{
     Author, Block, NewTurn, Role, SessionCatalog, SessionHistory, SessionId, SessionPatch, TurnId,
 };
 
-use crate::chat::project::{author_of, turn_dto};
-use crate::chat::{GenRequest, Placement};
 use crate::core::AppCore;
 use crate::dto::{
     AlfaEvent, ModelProfile, SendOptions, SendResult, TurnAnnotation, TurnStatus, TurnsSnapshot,
@@ -18,6 +16,7 @@ use crate::dto::{
 use crate::error::AppError;
 use crate::ids;
 use crate::settings::keys;
+use app_chat::{GenRequest, Placement, author_of, turn_dto};
 use app_store::TurnMeta;
 
 impl AppCore {
@@ -50,7 +49,7 @@ impl AppCore {
             }
             out.push(dto);
         }
-        if let Some(handle) = self.generation(&id)
+        if let Some(handle) = self.chat().generation(&id)
             && let Ok(live) = handle.live.lock()
             && !out.iter().any(|t| t.id == live.id)
         {
@@ -85,7 +84,7 @@ impl AppCore {
         user.content.blocks = blocks;
         let turn = match sibling_of {
             Some(of) => self.inner.sessions.fork_from(id, of, user)?,
-            None => self.append_child(id, parent, user)?,
+            None => self.chat().append_child(id, parent, user)?,
         };
         let meta = TurnMeta {
             status: Some(TurnStatus::Complete),
@@ -167,7 +166,7 @@ impl AppCore {
             None => None,
         };
         let _guard = self.lock_session(&id).await;
-        self.finalize_generation(&id).await;
+        self.chat().finalize_generation(&id).await;
         let agent = self.addressee(&id, &options.text, options.addressed_to.as_deref());
         let blocks = self.inner.work.files.prepare(&id, &options.attachments)?;
         let (user, queued) = self
@@ -185,17 +184,18 @@ impl AppCore {
             None
         } else {
             Some(
-                self.start_generation(GenRequest {
-                    session: id.clone(),
-                    placement: Placement::Child(user),
-                    history_leaf: user,
-                    agent,
-                    profile: options.profile,
-                    continues: None,
-                    origin: risk_classifier_contract::CommandOrigin::UserText,
-                    tap: None,
-                })
-                .await?,
+                self.chat()
+                    .start_generation(GenRequest {
+                        session: id.clone(),
+                        placement: Placement::Child(user),
+                        history_leaf: user,
+                        agent,
+                        profile: options.profile,
+                        continues: None,
+                        origin: risk_classifier_contract::CommandOrigin::UserText,
+                        tap: None,
+                    })
+                    .await?,
             )
         };
         Ok(SendResult {
@@ -227,7 +227,7 @@ impl AppCore {
         let id = ids::session(&session_id)?;
         let target = ids::parse_turn_in(&id, &turn_id)?;
         let _guard = self.lock_session(&id).await;
-        self.finalize_generation(&id).await;
+        self.chat().finalize_generation(&id).await;
         let turn = self.inner.sessions.turn(&id, target)?;
         let (placement, leaf) = match (turn.role, turn.parent) {
             (Role::User, _) => (Placement::Child(target), target),
@@ -235,17 +235,18 @@ impl AppCore {
             (_, None) => return Err(AppError::invalid("Tura bez wiadomości użytkownika.")),
         };
         let agent = self.agent_of(&id, &turn);
-        self.start_generation(GenRequest {
-            session: id,
-            placement,
-            history_leaf: leaf,
-            agent,
-            profile: profile.as_deref().and_then(ModelProfile::parse),
-            continues: None,
-            origin: risk_classifier_contract::CommandOrigin::UserText,
-            tap: None,
-        })
-        .await
+        self.chat()
+            .start_generation(GenRequest {
+                session: id,
+                placement,
+                history_leaf: leaf,
+                agent,
+                profile: profile.as_deref().and_then(ModelProfile::parse),
+                continues: None,
+                origin: risk_classifier_contract::CommandOrigin::UserText,
+                tap: None,
+            })
+            .await
     }
 
     /// `turns_edit_and_resend`: nowa gałąź (rodzeństwo tury użytkownika) + odpowiedź.
@@ -258,7 +259,7 @@ impl AppCore {
         let id = ids::session(&session_id)?;
         let target = ids::parse_turn_in(&id, &turn_id)?;
         let _guard = self.lock_session(&id).await;
-        self.finalize_generation(&id).await;
+        self.chat().finalize_generation(&id).await;
         let old = self.inner.sessions.turn(&id, target)?;
         if old.role != Role::User {
             return Err(AppError::invalid(
@@ -278,17 +279,18 @@ impl AppCore {
             None
         } else {
             Some(
-                self.start_generation(GenRequest {
-                    session: id.clone(),
-                    placement: Placement::Child(user),
-                    history_leaf: user,
-                    agent,
-                    profile: None,
-                    continues: None,
-                    origin: risk_classifier_contract::CommandOrigin::UserText,
-                    tap: None,
-                })
-                .await?,
+                self.chat()
+                    .start_generation(GenRequest {
+                        session: id.clone(),
+                        placement: Placement::Child(user),
+                        history_leaf: user,
+                        agent,
+                        profile: None,
+                        continues: None,
+                        origin: risk_classifier_contract::CommandOrigin::UserText,
+                        tap: None,
+                    })
+                    .await?,
             )
         };
         Ok(SendResult {
@@ -306,26 +308,27 @@ impl AppCore {
         let id = ids::session(&session_id)?;
         let target = ids::parse_turn_in(&id, &turn_id)?;
         let _guard = self.lock_session(&id).await;
-        self.finalize_generation(&id).await;
+        self.chat().finalize_generation(&id).await;
         let turn = self.inner.sessions.turn(&id, target)?;
         let agent = self.agent_of(&id, &turn);
-        self.start_generation(GenRequest {
-            session: id,
-            placement: Placement::Child(target),
-            history_leaf: target,
-            agent,
-            profile: None,
-            continues: Some(target),
-            origin: risk_classifier_contract::CommandOrigin::UserText,
-            tap: None,
-        })
-        .await
+        self.chat()
+            .start_generation(GenRequest {
+                session: id,
+                placement: Placement::Child(target),
+                history_leaf: target,
+                agent,
+                profile: None,
+                continues: Some(target),
+                origin: risk_classifier_contract::CommandOrigin::UserText,
+                tap: None,
+            })
+            .await
     }
 
     /// `turns_stop`: anulowanie ≤ 100 ms → `Stop { reason: cancelled }`.
     pub async fn turns_stop(&self, session_id: String) -> Result<(), AppError> {
         let id = ids::session(&session_id)?;
-        if let Some(handle) = self.generation(&id) {
+        if let Some(handle) = self.chat().generation(&id) {
             handle.cancel.cancel();
             handle.wait(Duration::from_secs(5)).await;
         }

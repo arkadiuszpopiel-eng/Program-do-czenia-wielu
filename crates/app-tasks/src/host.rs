@@ -29,6 +29,11 @@ pub trait TaskHost: Send + Sync {
     fn broker_window(&self) -> bool;
     /// Zapis i emisja projekcji przebiegu (Replay, Oś czasu, zdarzenia UI).
     fn project(&self, session: &SessionId, run: &AgentRun, projection: Projection);
+    /// Przed startem przebiegu: skażenie sesji z katalogu → Broker (W3-04; trwałe po restarcie).
+    /// Błąd = przebieg nie startuje (fail-closed). Domyślnie nic (host bez Brokera).
+    async fn sync_taint(&self, _session: &SessionId) -> Result<(), String> {
+        Ok(())
+    }
 }
 
 /// Narzędzia agentek (z Brokerem i dziennikiem cofania).

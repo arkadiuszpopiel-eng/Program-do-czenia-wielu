@@ -115,12 +115,17 @@ export interface PackageManifestSummary {
   readonly encrypted: boolean;
 }
 
+/**
+ * Podgląd paczki. `handle` — jednorazowy uchwyt pliku wydany przez rdzeń (natywny dialog albo
+ * kopia z listy kopii zapasowych); UI nigdy nie podaje ścieżki. Następny krok (hasło, import)
+ * zużywa uchwyt, a odpowiedź niesie nowy.
+ */
 export type InspectResult =
   | { readonly status: 'cancelled' }
-  | { readonly status: 'needs_password'; readonly path: string }
+  | { readonly status: 'needs_password'; readonly handle: string }
   | {
       readonly status: 'inspected';
-      readonly path: string;
+      readonly handle: string;
       readonly manifest: PackageManifestSummary;
       readonly items: readonly DryRunItem[];
       readonly warnings: readonly string[];
@@ -131,7 +136,8 @@ export type ImportMode = 'add' | 'merge' | 'replace';
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
 export interface ImportRequest {
-  readonly path: string;
+  /** Uchwyt z ostatniego `InspectResult` (jednorazowy). */
+  readonly handle: string;
   readonly mode: ImportMode;
   readonly resolutions: Readonly<Record<string, CollisionResolution>>;
   readonly password: string | null;

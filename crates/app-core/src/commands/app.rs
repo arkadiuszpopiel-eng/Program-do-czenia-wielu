@@ -80,7 +80,15 @@ impl AppCore {
     /// `app_set_active_session` → nakładka maszyny.
     pub async fn app_set_active_session(&self, session_id: Option<String>) -> Result<(), AppError> {
         let value = match session_id {
-            Some(id) => Some(crate::ids::session(&id)?.to_string().into()),
+            Some(id) => {
+                let id = crate::ids::session(&id)?;
+                // Otwarcie skażonej sesji (np. po restarcie) — stan dla Brokera od razu; tura i tak
+                // sprawdza to ponownie (fail-closed), więc tu tylko ostrzeżenie.
+                if let Err(e) = self.chat().sync_taint(&id).await {
+                    tracing::warn!(error = %e, "zgłoszenie skażenia sesji Brokerowi nie powiodło się");
+                }
+                Some(id.to_string().into())
+            }
             None => None,
         };
         self.config_set(keys::ACTIVE_SESSION, value, true).await

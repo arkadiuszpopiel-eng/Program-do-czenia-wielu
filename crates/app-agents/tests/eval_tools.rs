@@ -63,6 +63,7 @@ fn tool_names(env: &EvalEnv) -> Vec<String> {
         base_env: None,
         extra: Vec::new(),
         apps: None,
+        media: None,
     })
     .names()
 }

@@ -96,6 +96,7 @@ fn harness(extra: Vec<Arc<dyn Tool>>, apps: bool) -> H {
         base_env: None,
         extra,
         apps,
+        media: None,
     });
     H {
         tools,

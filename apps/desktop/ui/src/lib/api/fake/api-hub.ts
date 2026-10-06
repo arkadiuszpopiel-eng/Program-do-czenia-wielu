@@ -4,6 +4,13 @@ import type { AlfaClient } from '../client';
 import type { Account, DryRunItem, ModelInfo } from '../types-hub';
 import { FAKE_CATALOG } from './catalog';
 import type { FakeCore } from './core';
+import {
+  HANDLE_EXPIRED,
+  REVIEW_HANDLE_TTL_MS,
+  issueHandle,
+  takeHandle,
+  type HandleTarget,
+} from './transfer-handles';
 
 const MODELS: Readonly<Record<string, readonly ModelInfo[]>> = {
   anthropic: [
@@ -107,14 +114,21 @@ export function transferApi(core: FakeCore): AlfaClient['transfer'] {
         bytes: 12_000 + files * 4_096,
       });
     },
-    inspect: (password, path) => {
-      const target = path ?? 'C:\\Users\\Ty\\Pobrane\\laptop.alfa';
-      if (target.endsWith('-encrypted.alfa') && !password) {
-        return core.reply({ status: 'needs_password' as const, path: target });
+    inspect: (password, handle) => {
+      // Bez uchwytu — „natywny dialog” (atrapa: paczka z laptopa); inaczej uchwyt zużywany.
+      const dialog: HandleTarget = {
+        path: 'C:\\Users\\Ty\\Pobrane\\laptop.alfa',
+        encrypted: false,
+      };
+      const target = handle === null ? dialog : takeHandle(core, handle);
+      if (!target) return Promise.reject(new Error(HANDLE_EXPIRED));
+      const next = issueHandle(core, target, REVIEW_HANDLE_TTL_MS);
+      if (target.encrypted && !password) {
+        return core.reply({ status: 'needs_password' as const, handle: next });
       }
       return core.reply({
         status: 'inspected' as const,
-        path: target,
+        handle: next,
         manifest: {
           schema_version: '1.0.0',
           app_version: '0.1.0-f1',
@@ -127,12 +141,14 @@ export function transferApi(core: FakeCore): AlfaClient['transfer'] {
         migrations: [],
       });
     },
-    importPackage: (request) =>
-      core.reply({
+    importPackage: (request) => {
+      if (!takeHandle(core, request.handle)) return Promise.reject(new Error(HANDLE_EXPIRED));
+      return core.reply({
         snapshot_id: core.nextId('snap'),
         imported: DRY_RUN.filter((i) => i.diff !== 'same').length,
         skipped: request.mode === 'add' ? 1 : 0,
-      }),
+      });
+    },
     rollback: () => core.reply(undefined),
   };
 }

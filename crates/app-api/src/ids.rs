@@ -83,22 +83,31 @@ pub fn undo_clip_dto(session: &SessionId, id: u64) -> String {
     format!("{session}:c{id}")
 }
 
+/// Token cofnięcia zapisu zmiennej użytkownika (`tools-system`, `system_env_set`) w DTO:
+/// `"<sesja>:v<krok>"`.
+pub fn undo_env_dto(session: &SessionId, id: u64) -> String {
+    format!("{session}:v{id}")
+}
+
 /// Rodzaj tokenu cofnięcia.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum UndoKind {
     /// Krok dziennika `undo-journal` (`fs.*`, snapshot shella).
     Journal,
     /// Zapis schowka.
     Clipboard,
+    /// Zapis zmiennej użytkownika (`tools-system`).
+    System,
 }
 
-/// Parsuje token cofnięcia dowolnej usługi (`u` — dziennik, `c` — schowek).
+/// Parsuje token cofnięcia dowolnej usługi (`u` — dziennik, `c` — schowek, `v` — zmienna).
 pub fn parse_any_undo(token: &str) -> Result<(SessionId, UndoKind, u64), AppError> {
     let bad = || AppError::invalid(format!("Nieprawidłowy token cofnięcia „{token}”."));
     let (session_id, rest) = token.split_once(':').ok_or_else(bad)?;
     let (kind, number) = match rest.split_at_checked(1) {
         Some(("u", n)) => (UndoKind::Journal, n),
         Some(("c", n)) => (UndoKind::Clipboard, n),
+        Some(("v", n)) => (UndoKind::System, n),
         _ => return Err(bad()),
     };
     let id = number.parse::<u64>().map_err(|_| bad())?;
@@ -189,6 +198,12 @@ mod tests {
             (SessionId::new("s-1"), UndoKind::Clipboard, 7)
         );
         assert_eq!(parse_any_undo("s-1:u3").unwrap().1, UndoKind::Journal);
+        let env = undo_env_dto(&SessionId::new("s-1"), 4);
+        assert_eq!(
+            parse_any_undo(&env).unwrap(),
+            (SessionId::new("s-1"), UndoKind::System, 4)
+        );
+        assert!(parse_any_undo("s-1:x4").is_err());
     }
 
     #[test]

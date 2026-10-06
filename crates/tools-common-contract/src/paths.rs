@@ -32,6 +32,12 @@ pub enum PathError {
     /// Istniejącego komponentu nie da się rozwiązać (np. zerwane dowiązanie) — cel nieustalony.
     #[error("nie da się ustalić celu ścieżki „{0}” (dowiązanie?)")]
     Unresolvable(String),
+    /// Ścieżka sieciowa (udział UNC, WebDAV) spoza katalogu roboczego sesji — sam dostęp łączy
+    /// się z innym komputerem (SMB/WebDAV z uwierzytelnieniem konta właściciela).
+    #[error(
+        "ścieżka sieciowa „{0}” (udział UNC/WebDAV) — narzędzia plikowe nie łączą się z innymi komputerami; skopiuj plik na dysk lokalny"
+    )]
+    Network(String),
 }
 
 impl From<ScopeError> for PathError {
@@ -173,6 +179,9 @@ fn resolve(
     } else {
         full
     };
+    if crate::netpath::is_network_path(&full) && !crate::netpath::allowed(&full, workdir) {
+        return Err(PathError::Network(trimmed.to_owned()));
+    }
     for (i, seg) in full.split(['/', '\\']).enumerate() {
         if seg == ".." {
             return Err(PathError::ParentSegment(trimmed.to_owned()));
@@ -330,7 +339,7 @@ mod tests {
         assert_eq!(ok(r"..\..\x", "/Users/ala/Projekt"), "/Users/x");
         assert_eq!(ok(r"sub\..\a.txt", r"C:\w"), r"C:\w\a.txt");
         assert_eq!(ok(r"%USERPROFILE%\..\bob", "/w"), r"C:\Users\bob");
-        assert_eq!(ok(r"\\srv\d\a\..\b", "/w"), r"\\srv\d\b");
+        assert_eq!(ok(r"\\srv\d\a\..\b", r"\\srv\d"), r"\\srv\d\b"); // W3-03: udział = workdir
         for bad in [r"C:\..\x", r"\\srv\d\..\..\x", "/../x", r"C:\x\*.txt"] {
             assert!(resolve_path_dots(bad, Some("/w"), &e).is_err(), "{bad:?}");
         }

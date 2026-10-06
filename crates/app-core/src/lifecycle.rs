@@ -95,7 +95,7 @@ impl AppCore {
             let inner = weak.upgrade();
             Box::pin(async move {
                 let inner = inner?;
-                let task = !inner.runtime.lock().ok()?.runs.is_empty();
+                let task = inner.chat.has_runs();
                 let voice = inner.voice.status().await.state == crate::dto::VoiceState::Active;
                 let (pl, en) = match (task, voice) {
                     (true, _) => (

@@ -177,10 +177,11 @@ async function run(): Promise<void> {
     },
     password: null,
   });
-  await both('transfer', 'inspect', null, 'C:\\Users\\Ty\\Pobrane\\laptop-encrypted.alfa');
-  await both('transfer', 'inspect', 'hasło', null);
+  // Uchwyty plików: dialog (bez uchwytu) → wynik z jednorazowym uchwytem → import.
+  await both('transfer', 'inspect', null, null);
+  const inspected = (await both('transfer', 'inspect', 'hasło', null)) as { handle: string };
   await both('transfer', 'importPackage', {
-    path: 'C:\\Users\\Ty\\Pobrane\\laptop.alfa',
+    handle: inspected.handle,
     mode: 'merge',
     resolutions: { 'session:s-q3': 'keep_both' },
     password: null,

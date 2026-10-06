@@ -101,6 +101,7 @@ fn harness() -> H {
         base_env: None,
         extra: Vec::new(),
         apps: Some(apps),
+        media: None,
     });
     H { tools, sys, net }
 }

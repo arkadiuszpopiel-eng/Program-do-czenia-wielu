@@ -179,6 +179,18 @@ impl MediaPorts {
         fs: Arc<dyn FsPort>,
         bus: &Arc<dyn EventBus>,
     ) -> Vec<Arc<dyn Tool>> {
+        self.toolsets(broker, journal, fs, bus).0
+    }
+
+    /// Jak [`Self::tools`], plus zestaw multimediów dla kill-switcha (`ToolsDeps::media` —
+    /// `MediaTools::stop_all` zatrzymuje odtwarzanie tych samych narzędzi).
+    pub fn toolsets(
+        &self,
+        broker: Arc<dyn Broker>,
+        journal: Arc<dyn UndoJournal>,
+        fs: Arc<dyn FsPort>,
+        bus: &Arc<dyn EventBus>,
+    ) -> (Vec<Arc<dyn Tool>>, MediaTools) {
         let config = VisionToolsConfig::default();
         let (normal, local) = self.vision.clone();
         let mut tools = VisionTools::new(VisionToolsDeps {
@@ -211,22 +223,20 @@ impl MediaPorts {
             Some(exec) => Arc::new(FfmpegTranscoder::new(exec.clone(), self.ffmpeg.clone())),
             None => Arc::new(NoExec),
         };
-        tools.extend(
-            MediaTools::new(MediaToolsDeps {
-                fs,
-                files: Arc::new(lib_media::StdFiles),
-                journal,
-                transcoder,
-                player,
-                broker,
-                env: self.env.clone(),
-                deny: self.deny.clone(),
-                config: MediaToolsConfig::default(),
-                bus: Some(bus.clone()),
-            })
-            .tools(),
-        );
-        tools
+        let media = MediaTools::new(MediaToolsDeps {
+            fs,
+            files: Arc::new(lib_media::StdFiles),
+            journal,
+            transcoder,
+            player,
+            broker,
+            env: self.env.clone(),
+            deny: self.deny.clone(),
+            config: MediaToolsConfig::default(),
+            bus: Some(bus.clone()),
+        });
+        tools.extend(media.tools());
+        (tools, media)
     }
 }
 

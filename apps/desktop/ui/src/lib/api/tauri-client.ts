@@ -108,7 +108,7 @@ export class TauriAlfaClient implements AlfaClient {
 
   readonly transfer: AlfaClient['transfer'] = {
     exportPackage: (request) => call('transfer_export', { request }),
-    inspect: (password, path) => call('transfer_inspect', { password, path }),
+    inspect: (password, handle) => call('transfer_inspect', { password, handle }),
     importPackage: (request) => call('transfer_import', { request }),
     rollback: (snapshotId) => call('transfer_rollback', { snapshotId }),
   };
@@ -355,6 +355,7 @@ export class TauriAlfaClient implements AlfaClient {
     setPassword: (password) => call('backups_set_password', { password }),
     runNow: () => call('backups_run_now'),
     verify: (file) => call('backups_verify', { file }),
+    restore: (file) => call('backups_restore', { file }),
   };
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

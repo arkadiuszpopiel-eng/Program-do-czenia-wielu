@@ -1,12 +1,13 @@
 //! Decyzja Routera w rozmowie: który model faktycznie odpowiada (`Started` z `dostawca:model`)
 //! → kapsuła aktywności i wpis osi czasu z uzasadnieniem (wybrany, zapasowe, odrzucone, fallback).
 
-use super::GenRequest;
-use super::stream::Chosen;
-use crate::core::AppCore;
-use crate::dto::{self, ActivityInfo, AlfaEvent, EventLevel, TimelineEvent, TimelineKind};
-use crate::ids;
-use crate::ports::{BrainChoice, BrainTarget};
+use app_api::dto::{self, ActivityInfo, AlfaEvent, EventLevel, TimelineEvent, TimelineKind};
+use app_api::ids;
+use app_api::ports::{BrainChoice, BrainTarget};
+
+use crate::engine::ChatEngine;
+use crate::generate::GenRequest;
+use crate::outcome::Chosen;
 
 /// Wybór dostawcy do kosztów i statystyk.
 pub(crate) fn chosen_of(target: &BrainTarget) -> Chosen {
@@ -36,7 +37,7 @@ fn detail(choice: &BrainChoice, actual: &str) -> Option<String> {
 
 /// Kapsuła aktywności („odpowiada: …") i oś czasu (`router.decision`).
 pub(crate) fn announce(
-    core: &AppCore,
+    core: &ChatEngine,
     req: &GenRequest,
     turn: &str,
     choice: &BrainChoice,

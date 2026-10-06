@@ -5,7 +5,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
-mod chat;
+mod chat_host;
 mod commands;
 mod compose;
 mod core;

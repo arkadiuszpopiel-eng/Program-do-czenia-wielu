@@ -52,5 +52,9 @@ export async function runFiles(
   const newest = view.entries[0];
   if (!newest) throw new Error('brak kopii');
   await both('backups', 'verify', newest.file);
+  // „Przywróć…”: uchwyt kopii z listy → podgląd (kopia szyfrowana → prośba o hasło) → hasło.
+  const handle = (await both('backups', 'restore', newest.file)) as string;
+  const locked = (await both('transfer', 'inspect', null, handle)) as { handle: string };
+  await both('transfer', 'inspect', 'długie hasło kopii', locked.handle);
   await both('backups', 'setPassword', null);
 }

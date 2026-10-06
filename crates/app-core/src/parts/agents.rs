@@ -23,16 +23,8 @@ pub(crate) type Launchers = (
     Arc<sessions_impl::SqliteSessions>,
 );
 
-/// Narzędzia agentek i rejestr próśb o zatwierdzenie.
-#[derive(Clone)]
-pub(crate) struct AgentStack {
-    /// Narzędzia (wszystkie przebiegi).
-    pub tools: Arc<AgentTools>,
-    /// Fakty próśb o zatwierdzenie (karta w wątku).
-    pub tickets: Arc<TicketLog>,
-    /// Start v1: zasoby wyłączne (scheduler), autonomia (Broker), obsada, umiejętności.
-    pub launch: app_agents::Launch,
-}
+/// Narzędzia agentek i rejestr próśb o zatwierdzenie (typ silnika czatu).
+pub(crate) use app_chat::AgentStack;
 
 impl Extra {
     /// Narzędzia agentek — tylko z Brokerem i dziennikiem cofania (bez nich agentki odpowiadają
@@ -61,7 +53,10 @@ impl Extra {
         let media = app_agents::MediaPorts::new(gui, sessions, locks.clone(), paths);
         let media = media.with(self.routers.as_ref(), self.audio.as_ref());
         let media = media.exec(self.exec.clone());
-        extra.extend(media.tools(gate.clone(), journal.clone(), platform_fs(options), bus));
+        // Zestaw multimediów trafia też do kill-switcha (zatrzymanie odtwarzania `media_play`).
+        let (media_tools, media) =
+            media.toolsets(gate.clone(), journal.clone(), platform_fs(options), bus);
+        extra.extend(media_tools);
         let launch = app_agents::Launch::new(Some(locks), Some(gate), Some(personas));
         // Ta sama instancja, którą Broker zabija procesy (kill-switch, Job Objects).
         let exec = self.exec.clone()?;
@@ -83,6 +78,7 @@ impl Extra {
             base_env: None,
             extra,
             apps: Some(app_agents::AppsDeps::system(&paths.local)),
+            media: Some(media),
         });
         Some(AgentStack {
             tools: Arc::new(tools),

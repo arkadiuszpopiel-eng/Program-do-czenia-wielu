@@ -1,6 +1,7 @@
 <!--
   Import `.alfa` (PLAN §15.1, makieta 13): dry-run (podgląd różnic) → tryb dodaj / scal / zastąp →
-  kolizje → snapshot i rollback. Plik z natywnego dialogu albo wskazany (przywracanie z kopii).
+  kolizje → snapshot i rollback. Plik z natywnego dialogu albo z listy kopii („Przywróć…”) —
+  zawsze jako jednorazowy uchwyt wydany przez rdzeń (UI nigdy nie podaje ścieżki).
 -->
 <script lang="ts">
   import { Button, ConfirmDialog, SegmentedControl, Select, TextField } from '@alfa/ui-kit';
@@ -16,7 +17,7 @@
   const { t } = app.i18n;
 
   let inspected = $state<Extract<InspectResult, { status: 'inspected' }> | null>(null);
-  let lockedPath = $state<string | null>(null);
+  let lockedHandle = $state<string | null>(null);
   let importPassword = $state('');
   let mode = $state<string>('merge');
   let resolutions = $state<Record<string, CollisionResolution>>({});
@@ -24,29 +25,70 @@
   let confirmOpen = $state(false);
   let section = $state<HTMLElement | null>(null);
 
-  /** Podgląd paczki (`path: null` — natywny dialog). Wywoływane także z „Kopii zapasowych”. */
-  export async function inspect(path: string | null = null) {
-    const res = await app.client.transfer.inspect(importPassword || null, path);
+  function fail(error: unknown) {
+    app.toasts.show({
+      kind: 'error',
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  /** Podgląd paczki (`handle: null` — natywny dialog; inaczej jednorazowy uchwyt z rdzenia). */
+  async function inspect(handle: string | null = null) {
+    let res: InspectResult;
+    try {
+      res = await app.client.transfer.inspect(importPassword || null, handle);
+    } catch (error) {
+      lockedHandle = null;
+      fail(error);
+      return;
+    }
     result = null;
-    if (res.status === 'needs_password') lockedPath = res.path;
-    else if (res.status === 'inspected') {
-      lockedPath = null;
+    if (res.status === 'needs_password') {
+      // Hasło podane, a paczka nadal zamknięta — złe hasło (rdzeń wydał nowy uchwyt).
+      if (importPassword) app.toasts.show({ kind: 'error', message: t('tr.wrongPassword') });
+      lockedHandle = res.handle;
+      inspected = null;
+    } else if (res.status === 'inspected') {
+      lockedHandle = null;
       inspected = res;
       resolutions = Object.fromEntries(
         res.items.filter((i) => i.diff === 'collision').map((i) => [i.key, 'keep_both' as const]),
       );
     }
-    if (path) section?.scrollIntoView({ block: 'start' });
+    if (handle) section?.scrollIntoView({ block: 'start' });
+  }
+
+  /** „Wybierz plik…”: natywny dialog (nowy plik — hasło od nowa). */
+  function choose() {
+    importPassword = '';
+    void inspect();
+  }
+
+  /** „Przywróć…” z kopii zapasowych: uchwyt kopii z listy (ważny 15 s) → podgląd od razu. */
+  export async function restore(file: string) {
+    importPassword = '';
+    try {
+      await inspect(await app.client.backups.restore(file));
+    } catch (error) {
+      fail(error);
+    }
   }
 
   async function doImport() {
     if (!inspected) return;
-    result = await app.client.transfer.importPackage({
-      path: inspected.path,
-      mode: mode as ImportMode,
-      resolutions,
-      password: importPassword || null,
-    });
+    const handle = inspected.handle;
+    // Uchwyt jest jednorazowy — po próbie importu podgląd trzeba otworzyć ponownie.
+    inspected = null;
+    try {
+      result = await app.client.transfer.importPackage({
+        handle,
+        mode: mode as ImportMode,
+        resolutions,
+        password: importPassword || null,
+      });
+    } catch (error) {
+      fail(error);
+    }
     importPassword = '';
   }
 
@@ -62,12 +104,12 @@
   <h3 id="tr-import">{t('tr.import')}</h3>
   <p class="desc">{t('tr.importIntro')}</p>
   <div class="actions start">
-    <Button variant="secondary" onclick={() => inspect()}>{t('tr.choose')}</Button>
+    <Button variant="secondary" onclick={choose}>{t('tr.choose')}</Button>
   </div>
-  {#if lockedPath}
+  {#if lockedHandle}
     <div class="pw">
       <TextField label={t('tr.needsPassword')} type="password" bind:value={importPassword} />
-      <Button variant="secondary" onclick={() => inspect(lockedPath)}>{t('tr.unlock')}</Button>
+      <Button variant="secondary" onclick={() => inspect(lockedHandle)}>{t('tr.unlock')}</Button>
     </div>
   {/if}
   {#if inspected}

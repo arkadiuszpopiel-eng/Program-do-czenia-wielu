@@ -90,6 +90,23 @@ for (const theme of ['light', 'dark'] as const) {
         .first()
         .click();
       await expect(page.getByText(/^Paczka z /)).toBeVisible();
+      // Uchwyt z podglądu (UI nie zna ścieżki) → import; podgląd znika (uchwyt jednorazowy).
+      await page.getByRole('button', { name: 'Importuj', exact: true }).click();
+      await expect(page.getByText(/^Zaimportowano \d+ element/)).toBeVisible();
+      await expect(page.getByText(/^Paczka z /)).toBeHidden();
+      // Kopia szyfrowana: „Przywróć…” → prośba o hasło → „Odszyfruj” → podgląd.
+      await backups.getByLabel('Hasło kopii (Credential Manager)').fill('długie hasło kopii');
+      await backups.getByRole('button', { name: 'Ustaw hasło' }).click();
+      await backups.getByRole('button', { name: 'Utwórz kopię teraz' }).click();
+      await backups
+        .getByRole('button', { name: /^Przywróć z kopii/ })
+        .first()
+        .click();
+      const unlock = page.getByLabel('Paczka jest zaszyfrowana — podaj hasło.');
+      await unlock.fill('długie hasło kopii');
+      await page.getByRole('button', { name: 'Odszyfruj' }).click();
+      await expect(page.getByText(/^Paczka z /)).toBeVisible();
+      await expectAccessible(page, `przywracanie kopii ${theme}`);
     });
   });
 }

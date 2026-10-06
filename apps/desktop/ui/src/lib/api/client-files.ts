@@ -55,4 +55,6 @@ export interface BackupsApi {
   runNow(): Promise<BackupView>;
   /** Test przywracania wybranej kopii z katalogu (bez zapisu). */
   verify(file: string): Promise<BackupCheck>;
+  /** „Przywróć…”: kopia z listy → jednorazowy uchwyt (15 s) dla `transfer.inspect`. */
+  restore(file: string): Promise<string>;
 }

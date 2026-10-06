@@ -17,6 +17,7 @@
 mod call;
 mod gate;
 mod manifest;
+pub mod netpath;
 pub mod paths;
 mod scripted;
 pub mod text;

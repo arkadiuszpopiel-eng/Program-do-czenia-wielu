@@ -20,6 +20,8 @@ historii dla modelu.
   najnowszych, odstęp w godzinach, nie na baterii ani przy pełnym ekranie, ponowienie po błędzie najwcześniej po
   godzinie (toast). Hasło w Credential Managerze → kopie szyfrowane i z sesjami prywatnymi. „Sprawdź” = test
   przywracania (otwarcie, sumy, odszyfrowanie, dry-run). Stan per maszyna w `state\backup.json`.
+  „Przywróć…” (fala 4): `backups_restore(file)` w `app-core` — tylko nazwa z listy kopii → jednorazowy uchwyt
+  `TransferPort` (15 s) dla podglądu importu; UI nie podaje ścieżki.
 - **Artefakty w `.alfa`** (`docs`): magazyn dokumentów kategorii `artifacts` (`<sesja>/<artefakt>/<plik>`); import do
   `…\Sesje\Import\…` i rejestracja, gdy sesja już istnieje (inaczej uzgodnienie przy kolejnym otwarciu sesji).
 

@@ -18,7 +18,7 @@ impl AppCore {
     pub async fn agents_list(&self, session_id: String) -> Result<Vec<AgentState>, AppError> {
         let id = ids::session(&session_id)?;
         self.ensure_session(&id)?;
-        Ok(self.agents_of(&id))
+        Ok(self.chat().agents_of(&id))
     }
 
     /// `agents_set_roles`: role agentki w sesji (zastępują dotychczasowe).
@@ -48,7 +48,7 @@ impl AppCore {
             .personas
             .set_cast(&id, cast, ChangeOrigin::Ui)
             .await?;
-        self.announce_agents(&id);
+        self.chat().announce_agents(&id);
         Ok(())
     }
 
@@ -80,7 +80,7 @@ impl AppCore {
             Cast::new(Some(TemplateId::new(template.as_str())), voice, assignments)
         };
         personas.set_cast(&id, cast, ChangeOrigin::Ui).await?;
-        self.announce_agents(&id);
+        self.chat().announce_agents(&id);
         Ok(())
     }
 }
@@ -105,10 +105,8 @@ impl AppCore {
             )));
         }
         let run = self
-            .rt()
-            .runs
-            .get(&id)
-            .map(|r| r.handle.clone())
+            .chat()
+            .run_handle(&id)
             .ok_or_else(|| AppError::invalid("Agentka nie wykonuje teraz zadania w tej sesji."))?;
         run.steer(text)
             .map_err(|e| AppError::invalid(format!("Zadanie już się zakończyło: {e}")))

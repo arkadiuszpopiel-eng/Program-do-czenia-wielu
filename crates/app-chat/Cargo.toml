@@ -1,0 +1,47 @@
+[package]
+name = "app-chat"
+description = "Silnik tury czatu w aplikacji (kategoria app-*): generacja odpowiedzi (strumień dostawcy z renderowaniem przyrostowym, przebieg agentki z narzędziami, delegacja do mostu CLI), zapis tury append-only, koszt, oś czasu, stan agentek; wydzielony z app-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa sesje (`sessions-impl`), magazyn faktów tur (`app-store`),
+# obsadę, pamięć, Router (port mózgu), koszty, narzędzia agentek (`app-agents`), zadania i mosty
+# (`app-tasks`, `app-bridges`), załączniki (`app-files`); `app-core` wiąże go z rdzeniem (`ChatHost`).
+[dependencies]
+app-api = { path = "../app-api" }
+app-agents = { path = "../app-agents" }
+app-bridges = { path = "../app-bridges" }
+app-files = { path = "../app-files" }
+app-health = { path = "../app-health" }
+app-memory = { path = "../app-memory" }
+app-store = { path = "../app-store" }
+app-tasks = { path = "../app-tasks" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+cost-meter-contract = { path = "../cost-meter-contract" }
+lib-markdown = { path = "../lib-markdown" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+router-contract = { path = "../router-contract" }
+# Skażenie sesji z załączników → Broker (`report_untrusted_input`) przed startem tury.
+safety-broker-contract = { path = "../safety-broker-contract" }
+sessions-contract = { path = "../sessions-contract" }
+sessions-impl = { path = "../sessions-impl" }
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt", "sync", "time", "macros"] }
+tracing.workspace = true
+
+[lints]
+workspace = true

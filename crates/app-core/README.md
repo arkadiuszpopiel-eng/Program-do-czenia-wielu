@@ -25,7 +25,8 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
 | `app-models` | menedżer modeli i silników (`ModelsApp`: katalog, pobieranie z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP; komendy `models_*`), embedder wyszukiwania (`startup_embedder` przy budowie `search`, `embed_model_activate`, przebudowa wektorów `search_reindex_*`, `ReindexStatus`) |
 | `app-store` | tabele aplikacji w bazach sesji (`AppStore`: fakty tur, oś czasu, katalog roboczy, przebiegi agentek) |
 | `app-voice` | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów) |
-| `app-core` | kompozycja (`AppOptions` → `parts`), komendy, czat (z delegacją do mostu), `TaskHost` rdzenia (`host.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
+| `app-chat` | silnik tury czatu (`ChatEngine`): generacja (strumień, przebieg agentki, delegacja do mostu — `generate.rs`, `stream.rs`, `agent.rs`, `delegate.rs`), zapis tury i koszt (`finish.rs`), historia gałęzi (`history.rs`), projekcja tur do DTO (`project.rs`), aktywne generacje i przebiegi per sesja (`engine.rs`), cofanie kroków schowka/zmiennych tej sesji (`undo.rs`), skażenie sesji z katalogu (`meta.tainted`) → Broker przed każdą turą i przy otwarciu sesji (`taint.rs`, fail-closed); rdzeń przez `ChatHost` (`app-core/src/chat_host.rs`) |
+| `app-core` | kompozycja (`AppOptions` → `parts`), komendy, `ChatHost` i `TaskHost` rdzenia (`chat_host.rs`, `host.rs`), STOP WSZYSTKIEGO (`commands/system.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
 
 ## Kompozycja (`AppCore::build(AppPaths, AppOptions)`) — jedno miejsce: `parts/`
 1. Jądro (`parts/kernel.rs`): magistrala (`core-bus-impl`), rejestr (`core-registry-impl`), sekrety
@@ -68,7 +69,7 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
    stosu agentek (bez fałszywych awarii z kolejności startu); usługi `providers-api` i `memory`
    trzymane przez cały czas życia rdzenia. Błędy HTTP dostawcy tury (bez Routera) → `diagnostics.symptom`.
 
-## Agentki z narzędziami (`chat/agent.rs`, `app-store`, `commands/workdir.rs`)
+## Agentki z narzędziami (`app-chat/src/agent.rs`, `app-store`, `commands/workdir.rs`)
 Wiadomość do agentki idzie przez `agent-runtime`, gdy sesja ma katalog roboczy (`sessions_choose_workdir`:
 dialog powłoki / katalog sesji / brak; katalogi danych Alfy, deny-lista i segmenty poświadczeń
 odrzucane) i role agentki dają narzędzia; inaczej zwykły czat. Budżety z Ustawień → Agentki
@@ -76,10 +77,11 @@ odrzucane) i role agentki dają narzędzia; inaczej zwykły czat. Budżety z Ust
 (`AppOptions::approval_timeout` — testy). Zdarzenia: `AgentRunUpdated`, `AgentStep` (Replay, trwały w
 `app_agent_runs/steps`, append-only), `ToolCall` z „Cofnij" i intencją, `ApprovalPending`
 (`broker_window`, `expires_at`). Komendy: `agents_runs`, `agents_steer` (wiadomość w trakcie zadania),
-`agents_open_terminal` (terminal w katalogu kroku, bez wykonania), `turns_undo_step` (dziennik albo
-schowek `"<sesja>:c<id>"`). Stop/Esc i kill-switch anulują przebieg i polecenia.
+`agents_open_terminal` (terminal w katalogu kroku, bez wykonania), `turns_undo_step` (dziennik, schowek
+`"<sesja>:c<id>"` albo zmienna użytkownika z `system_env_set` `"<sesja>:v<id>"` — schowek i zmienne tylko
+z przebiegu tej sesji). Stop/Esc i kill-switch anulują przebieg i polecenia.
 
-## Pamięć, zadania, mosty CLI (`parts/memory.rs`, `parts/tasks.rs`, `host.rs`, `chat/delegate.rs`)
+## Pamięć, zadania, mosty CLI (`parts/memory.rs`, `parts/tasks.rs`, `host.rs`, `app-chat/src/delegate.rs`)
 - Pamięć: `turns_remember` → zakres sesji/projektu/agentki/globalny (z sesji prywatnej — tylko sesja);
   kontekst czatu = zestaw roboczy agentki (dostęp z ról obsady i projektu sesji); narzędzia
   `memory_recall`/`memory_remember` w zestawie agentek; `memory_*` — Inspektor; usunięcie sesji:
@@ -126,7 +128,7 @@ Kolejność: nadpisanie z `AppOptions` → adapter na module → „moduł niepo
 | Port | Adapter | Bez modułu / czego brakuje |
 |---|---|---|
 | `BrainPort` | `RouterBrain` (Router + konta hubu + dostawcy lokalni; `AppOptions::providers` dokłada dostawców testowych) | `RouterUnavailable` |
-| `TransferPort` | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; sekretów nie eksportuje nigdy — CX-a; sesji prywatnej nie eksportuje) | `TransferUnavailable` |
+| `TransferPort` | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; plik importu tylko jednorazowym uchwytem — `app_modules::handles`: z dialogu/podglądu 10 min, z listy kopii `backups_restore` 15 s; sekretów nie eksportuje nigdy — CX-a; sesji prywatnej nie eksportuje) | `TransferUnavailable` |
 | `VoicePort` | `PipelineVoice` (`app-voice`): rozmowa, PTT, wyciszenie, pigułka — `voice-pipeline`; lista wejść, test mikrofonu (`MicLevel` ≤ 30/s) i czytanie na głos — `VoiceAdapter` (`voice-audio`, `voice-tts`; bez silnika — `NO_TTS`) | bez modeli/sidecarów: `VoiceStatus::Unavailable` z listą braków |
 | `BrokerPort` | `InprocBroker` (poziomy autonomii, `request_level`, `run_code`, `undo_step`, `kill_all`) | podniesienie poziomu wymaga `ApprovalWindow`; bez Broker-UI — `NEEDS_BROKER_WINDOW` (odmowa); dozwolone `run_code` — brak wykonawcy `tools-shell` |
 | `ShellPort` | powłoka Tauri (dialogi `tauri-plugin-dialog` w tym wybór katalogu, terminal w katalogu bez wykonania, okna, zasobnik) | `HeadlessShell` (testy; kolejka odpowiedzi dialogów) |
@@ -134,10 +136,11 @@ Kolejność: nadpisanie z `AppOptions` → adapter na module → „moduł niepo
 | `PseudoConsolePort` (`AppOptions::pty`) | ConPTY (`platform-windows-pty-impl`) | terminal: „niedostępny na tej platformie" |
 | `SystemSignalsPort` / `DirWatchPort` (`AppOptions::signals`, `dir_watch`) | `WinSignals` / `WinDirWatch` (`platform-windows-sys-impl`) | „nigdy bezczynny", wyzwalacze plikowe tylko przez `file_created` |
 
-Kill-switch (`system_kill_all`, `Ctrl+Shift+F12`, zasobnik): anulowanie generacji i pobierań →
+Kill-switch (`system_kill_all`, `Ctrl+Shift+F12`, zasobnik): anulowanie generacji i przebiegów (`ChatEngine::cancel_all`)
+i pobierań → zadania schedulera → przeglądarki agentek i odtwarzanie `media_play` (`AgentTools::kill_switch`) →
 `BrokerPort::kill_all` (audyt `broker.kill_switch`) → zatrzymanie mowy → toast.
 
-## Czat (append-only)
+## Czat (append-only; silnik w `app-chat`)
 `turns_send` → tura użytkownika → rezerwacja numeru tury agentki (numery są kolejne; wszystkie zapisy
 historii sesji idą przez blokadę sesji i czekają na zapis aktywnej generacji) → `ModelProvider::stream`
 z `CancellationToken` → `TextDelta` z blokami HTML z `lib-markdown::IncrementalRenderer` → zapis tury

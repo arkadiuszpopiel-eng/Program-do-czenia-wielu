@@ -398,17 +398,51 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-chat"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "agent-backends-contract",
+ "agent-runtime-contract",
+ "app-agents",
+ "app-api",
+ "app-bridges",
+ "app-files",
+ "app-health",
+ "app-memory",
+ "app-store",
+ "app-tasks",
+ "async-trait",
+ "chrono",
+ "core-bus-contract",
+ "core-config-contract",
+ "cost-meter-contract",
+ "futures-util",
+ "lib-markdown",
+ "personas-contract",
+ "providers-contract",
+ "risk-classifier-contract",
+ "router-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "sessions-contract",
+ "sessions-impl",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "app-core"
 version = "0.0.1"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-impl",
  "agent-backends-contract",
- "agent-runtime-contract",
  "app-agents",
  "app-api",
  "app-bridges",
  "app-broker",
+ "app-chat",
  "app-files",
  "app-gui",
  "app-health",
@@ -663,6 +697,7 @@ dependencies = [
  "transfer-impl",
  "undo-journal-contract",
  "undo-journal-impl",
+ "uuid",
  "voice-audio-contract",
  "voice-tts-contract",
  "voice-tts-impl",

@@ -140,7 +140,7 @@
 
 <TransferImport bind:this={importer} />
 
-<BackupSection onrestore={(path) => void importer?.inspect(path)} />
+<BackupSection onrestore={(file) => void importer?.restore(file)} />
 
 <style>
   .card {

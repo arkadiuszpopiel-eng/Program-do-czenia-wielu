@@ -62,4 +62,41 @@ impl AppCore {
         self.emit(AlfaEvent::SystemStatusChanged { status });
         Ok(())
     }
+
+    /// STOP WSZYSTKIEGO (`Ctrl+Shift+F12`, zasobnik): anuluje generacje we wszystkich sesjach
+    /// (natychmiast), potem kill-switch Brokera (tokeny, drzewa procesów, cisza audio) i stop mowy;
+    /// czeka na zapis przerwanych tur. Zwraca liczbę zatrzymanych generacji.
+    pub async fn system_kill_all(&self, origin: crate::ports::KillOrigin) -> usize {
+        // Generacje i przebiegi agentek (silnik czatu) — anulowane od razu.
+        let handles = self.chat().cancel_all();
+        for cancel in self.rt().downloads.values() {
+            cancel.cancel();
+        }
+        // Zadania schedulera (agentki i mosty) — wykonawczynie przerwane od razu.
+        let tasks =
+            scheduler_lite_contract::SchedulerLite::kill_all(&*self.inner.tasks.scheduler());
+        tracing::info!(
+            zadania = tasks,
+            "kill-switch: zatrzymano zadania schedulera"
+        );
+        // Przeglądarki agentek (F6): drzewa procesów zamknięte, zgody hostów wygasają.
+        let _ = self.inner.agents.as_ref().map(|a| a.tools.kill_switch());
+        if let Err(e) = self.inner.broker.kill_all(origin).await {
+            tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
+        }
+        if let Err(e) = self.inner.voice.stop_speech().await {
+            tracing::warn!(error = %e, "stop mowy przy kill-switchu nie powiódł się");
+        }
+        for h in &handles {
+            h.wait(std::time::Duration::from_secs(5)).await;
+        }
+        self.emit(AlfaEvent::Toast {
+            kind: ToastKind::Warning,
+            message: LocalizedText::new(
+                "STOP WSZYSTKIEGO: zatrzymano pracę agentek.",
+                "STOP EVERYTHING: agents stopped.",
+            ),
+        });
+        handles.len()
+    }
 }

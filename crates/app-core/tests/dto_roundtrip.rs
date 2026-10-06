@@ -204,7 +204,7 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             roundtrip::<ExportResult>,
         ),
         "transfer_inspect" => (
-            vec![("password", os), ("path", os)],
+            vec![("password", os), ("handle", os)],
             roundtrip::<InspectResult>,
         ),
         "transfer_import" => (

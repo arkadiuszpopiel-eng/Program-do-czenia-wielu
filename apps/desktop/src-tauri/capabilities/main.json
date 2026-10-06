@@ -212,6 +212,7 @@
     "allow-backups-choose-dir",
     "allow-backups-set-password",
     "allow-backups-run-now",
-    "allow-backups-verify"
+    "allow-backups-verify",
+    "allow-backups-restore"
   ]
 }

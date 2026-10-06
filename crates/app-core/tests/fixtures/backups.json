@@ -205,6 +205,13 @@
     }
   },
   {
+    "command": "backups_restore",
+    "args": {
+      "file": "alfa-backup-20260930-194515-850.alfa"
+    },
+    "result": "fh-muoilpwi-3"
+  },
+  {
     "command": "backups_set_password",
     "args": {
       "password": null

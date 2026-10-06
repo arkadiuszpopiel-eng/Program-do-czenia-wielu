@@ -20,7 +20,7 @@ pub struct ToolOutcome { status: ToolStatus, text /* dla modelu */, data, images
 pub enum ToolStatus { Ok, Denied { reason: DenialReason }, NeedsConfirmation, Failed { error: ToolErrorKind }, Cancelled }
 pub enum DenialReason { KernelBlock { rule }, DenyList, OwnerDenied { approval }, ApprovalExpired { approval }, ApprovalTimeout { approval },
                         TokenRejected, AuditUnavailable, Policy }          // describe() → zdanie PL dla modelu i UI
-pub struct UndoRef { service: UndoService /* Journal | Clipboard */, id: u64, text: String }
+pub struct UndoRef { service: UndoService /* Journal | Clipboard | System (zmienna użytkownika) */, id: u64, text: String }
 pub struct ToolIntent { kind /* shell.open_in_terminal | fs.confirm_delete_permanent */, title, details: Value }
 #[async_trait] pub trait Tool: Send + Sync { fn manifest(&self) -> &ToolManifest; async fn call(&self, args: Value, ctx: &ToolCtx) -> ToolOutcome; }
 pub trait ToolObserver { fn approval_requested(&self, &ApprovalTicket); fn approval_resolved(&self, ApprovalId, bool); }
@@ -57,3 +57,8 @@ Zdarzenia: `tool.<narzędzie>.*` na magistrali (`tool_event`, kontekst sesji/age
   `PathError::Unresolvable`. Test: `paths::tests::links_are_resolved_before_checks`.
 - **Q-8:** `paths::resolve_path_dots` — jak `resolve_path`, ale `.`/`..` zwijane leksykalnie (cel polecenia powłoki
   względem katalogu roboczego); `..` ponad korzeń dysku/udziału UNC → błąd. `resolve_path` dalej odrzuca `..`.
+- **Przegląd fali 3, W3-03 (`docs/reviews/2026-10-wave3-review.md`):** `resolve_path`/`resolve_path_dots` odrzucają ścieżki
+  sieciowe (UNC `\\serwer\udział`, `//serwer/udział`, WebDAV `\\host@SSL\…`) — nowy wariant `PathError::Network` —
+  chyba że leżą w sieciowym katalogu roboczym sesji (wybór właściciela). Wcześniej sprawdzenie dowiązań
+  (`symlink_metadata`/`canonicalize`) łączyło się z serwerem jeszcze przed Brokerem (SMB/WebDAV, NTLM konta
+  właściciela). Moduł `netpath` (`is_network_path`); test Q-8 przepięty na katalog roboczy na udziale.

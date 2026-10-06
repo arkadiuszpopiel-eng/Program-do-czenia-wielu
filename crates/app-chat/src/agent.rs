@@ -6,7 +6,7 @@
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::Ordering;
 use std::time::Instant;
 
 use agent_runtime_contract::{RunEvent, RunOutcome, UsageTotals};
@@ -14,35 +14,17 @@ use app_agents::{
     AgentSettings, FamilyProjector, Projection, RunContext, RunHandle, RunProjector, SpecInput,
     final_text, keys, run_spec,
 };
-use cost_meter_contract::CostMeter;
-use personas_contract::{Persona, PersonaId, Personas, Role};
+use personas_contract::{Persona, PersonaId, Role};
 use providers_contract::Usage;
 use sessions_contract::SessionId;
 
-use super::GenRequest;
-use super::project::render_closed;
-use super::stream::{Chosen, Outcome};
-use crate::core::{AppCore, GenHandle};
-use crate::dto::{AlfaEvent, TurnError, TurnErrorCode};
-use crate::ids;
+use app_api::dto::{AgentRun, AlfaEvent, TurnError, TurnErrorCode};
+use app_api::ids::{self, UndoKind};
 
-/// Sterowanie trwającym przebiegiem (steering, anulowanie, stan „czeka").
-#[derive(Clone)]
-pub(crate) struct RunCtl {
-    /// Przebieg.
-    pub handle: Arc<RunHandle>,
-    /// Agentka.
-    pub agent: String,
-    /// Czy czeka na zatwierdzenie.
-    waiting: Arc<AtomicBool>,
-}
-
-impl RunCtl {
-    /// Czy agentka czeka na zatwierdzenie.
-    pub fn waiting(&self) -> bool {
-        self.waiting.load(Ordering::SeqCst)
-    }
-}
+use crate::engine::{ChatEngine, GenHandle, RunCtl};
+use crate::generate::GenRequest;
+use crate::outcome::{Chosen, Outcome};
+use crate::project::render_closed;
 
 /// Agentka z narzędziami w sesji.
 pub(crate) struct AgentSetup {
@@ -51,7 +33,7 @@ pub(crate) struct AgentSetup {
     roles: Vec<Role>,
 }
 
-impl AppCore {
+impl ChatEngine {
     /// Przebieg agentki zamiast czatu, gdy sesja ma katalog roboczy, a role agentki w obsadzie
     /// dają narzędzia (rola bez narzędzi albo sesja bez katalogu — zwykła odpowiedź).
     pub(crate) fn agent_setup(&self, session: &SessionId, agent: &str) -> Option<AgentSetup> {
@@ -77,7 +59,7 @@ impl AppCore {
     }
 
     /// Ustawienia agentek (Ustawienia → Agentki).
-    pub(crate) async fn agent_settings(&self) -> AgentSettings {
+    pub async fn agent_settings(&self) -> AgentSettings {
         let d = AgentSettings::default();
         let num = |v: Option<serde_json::Value>, default: u64| {
             v.and_then(|v| v.as_f64())
@@ -125,14 +107,15 @@ impl AppCore {
             if let Err(e) = store.push_step(session, &run_id, step) {
                 tracing::warn!(error = %e, "zapis kroku przebiegu nie powiódł się");
             }
-            if let Some(Ok((_, ids::UndoKind::Clipboard, id))) =
+            // Kroki cofane poza dziennikiem (schowek, zmienne) należą do sesji przebiegu.
+            if let Some(Ok((_, kind @ (UndoKind::Clipboard | UndoKind::System), id))) =
                 step.undo_token.as_deref().map(ids::parse_any_undo)
             {
                 self.rt()
-                    .clip_undo
+                    .owned_undo
                     .entry(session.clone())
                     .or_default()
-                    .insert(id);
+                    .insert((kind, id));
             }
         }
         if p.run_changed
@@ -152,6 +135,29 @@ impl AppCore {
             self.announce_agents(session);
         }
     }
+
+    /// Projekcja przebiegu zadania (wykonawczyni zadań): kroki i nagłówek do Replay, zdarzenia
+    /// UI, Oś czasu.
+    pub fn project_task(&self, session: &SessionId, run: &AgentRun, p: Projection) {
+        let store = &self.inner.store;
+        for step in &p.steps {
+            if let Err(e) = store.push_step(session, &run.id, step) {
+                tracing::warn!(error = %e, "zapis kroku zadania nie powiódł się");
+            }
+        }
+        if p.run_changed
+            && let Err(e) = store.push_run(session, run)
+        {
+            tracing::warn!(error = %e, "zapis przebiegu zadania nie powiódł się");
+        }
+        self.inner.events.emit_all(p.events);
+        for event in p.timeline {
+            if let Err(e) = store.push_timeline(session, &event) {
+                tracing::warn!(error = %e, "zapis osi czasu nie powiódł się");
+            }
+            self.emit(AlfaEvent::TimelineAppended { event });
+        }
+    }
 }
 
 fn failed(message: String) -> Outcome {
@@ -165,7 +171,7 @@ fn failed(message: String) -> Outcome {
 
 /// Przebieg agentki jako odpowiedź na turę.
 pub(crate) async fn run(
-    core: &AppCore,
+    core: &ChatEngine,
     req: &GenRequest,
     handle: &GenHandle,
     setup: AgentSetup,
@@ -174,7 +180,7 @@ pub(crate) async fn run(
     let Some(stack) = core.inner.agents.clone() else {
         return failed("Narzędzia agentek niepodłączone (Broker albo dziennik cofania).".into());
     };
-    let (choice, request) = match super::stream::prepare(core, req).await {
+    let (choice, request) = match crate::stream::prepare(core, req).await {
         Ok(x) => x,
         Err(e) => return Outcome::failed(e),
     };
@@ -289,7 +295,7 @@ pub(crate) async fn run(
             live.blocks.clone_from(&blocks);
         }
         if let Some(tap) = &req.tap {
-            let _ = tap.send(crate::ports::VoiceChunk::Text(fin.text.clone()));
+            let _ = tap.send(app_api::ports::VoiceChunk::Text(fin.text.clone()));
         }
         core.emit(AlfaEvent::TextDelta {
             session_id: req.session.to_string(),

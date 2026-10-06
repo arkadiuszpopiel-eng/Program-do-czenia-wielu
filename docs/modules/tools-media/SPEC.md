@@ -25,7 +25,7 @@ Zdarzenia: `tool.media.info` (rodzaj, format), `tool.media.convert` (format, kro
 - Ścieżki: postać i deny-lista (także po dowiązaniach) **przed** Brokerem; nagłówki czytane fragmentami z budżetem 8 MiB i limitem kroków/zagnieżdżeń — złośliwy plik nie wymusi pętli, przepełnienia ani odczytu gigabajtów (proptest + przypadki złośliwe).
 - Konwersja: bez ffmpeg — błąd **bez** pytania właściciela o zgodę; formaty z listy zamkniętej (żadnych argumentów od modelu), wejście z rozpoznanym nagłówkiem i **wymuszonym demuxerem** (bez list odtwarzania HLS/concat i wzorców), `-protocol_whitelist file`, ścieżki jako `file:`, metadane usunięte, `-n`; proces w Job Object (pamięć 2 GiB, 10 min, środowisko bez dziedziczenia, kill-switch); wynik ≤ 512 MiB.
 - Nowy plik nigdy nie nadpisuje: domyślnie `<nazwa> (Alfa).<ext>`, potem `(Alfa 2)`…; istniejący `output` albo równy źródłu → odmowa; zapis tylko przez dziennik cofania („Cofnij” usuwa plik).
-- Odtwarzanie: klip mono (inne częstotliwości → 48 kHz), ≤ 10 min; czeka na dzierżawę `speaker` (priorytet narracji — po wypowiedzi agentki); wywłaszczenie → ducking −15 dB natychmiast, twardy stop ≤ 100 ms i zwolnienie głośnika; kill-switch schedulera, anulowanie przebiegu, `stop_all` → stop od razu. Tor głosu jako `Filler` (poza „usłyszanym prefiksem”).
+- Odtwarzanie: klip mono (inne częstotliwości → 48 kHz), ≤ 10 min; czeka na dzierżawę `speaker` (priorytet narracji — po wypowiedzi agentki); wywłaszczenie → ducking −15 dB natychmiast, twardy stop ≤ 100 ms i zwolnienie głośnika; kill-switch schedulera, anulowanie przebiegu, `stop_all` → stop od razu (STOP WSZYSTKIEGO aplikacji woła `stop_all` przez `AgentTools::kill_switch` — `ToolsDeps::media`). Tor głosu jako `Filler` (poza „usłyszanym prefiksem”).
 - Wyniki to metadane z parsera (liczby i nazwy z listy) — bez taintu sesji; sekretów brak.
 
 ## Zdolności / uprawnienia
@@ -56,3 +56,7 @@ Pozycja ffmpeg na stronie „Modele i silniki” (stan, licencja, instrukcja ins
 - Kamera i mikrofon jako narzędzia (PLAN §7.2 „Multimedia”) — po decyzji o prywatności nagrań.
 - Pełny parser EBML (Matroska/WebM: ścieżki, czas) — dziś tylko rozpoznanie formatu.
 - Wersja i źródło buildu ffmpeg (licencja LGPL/GPL) — do potwierdzenia przez człowieka przed wydaniem.
+
+## Przegląd fali 3 (2026-10, `docs/reviews/2026-10-wave3-review.md`)
+- **W3-01 (zrobione):** `media_play` nie ufa nagłówkowi WAV — częstotliwość 8–384 kHz i czas trwania liczone z faktycznie zdekodowanych próbek **przed** resamplingiem (wcześniej `byte_rate = 0` albo zawyżone omijało limit czasu, a „1 Hz” dawało wzmocnienie ×1000 do 48 kHz: pamięć, CPU, przerwanie procesu przy braku pamięci); dekodowanie i resampling na wątku blokującym. Test: `tests/review.rs`.
+- **W3-03 (zrobione w `tools-common`):** ścieżki sieciowe (UNC/WebDAV) od modelu odrzucane przed jakimkolwiek dostępem — także w `media_info`/`media_convert`/`media_play`.

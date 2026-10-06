@@ -10,12 +10,13 @@ use agent_backends_contract::BridgeKind;
 use risk_classifier_contract::CommandOrigin;
 use sessions_contract::{Role, SessionHistory};
 
-use super::GenRequest;
-use super::project::render_closed;
-use super::stream::Outcome;
-use crate::core::{AppCore, GenHandle};
-use crate::dto::{AlfaEvent, StopReason, TurnError, TurnErrorCode, TurnStatus};
-use crate::ids;
+use app_api::dto::{AlfaEvent, StopReason, TurnError, TurnErrorCode, TurnStatus};
+use app_api::ids;
+
+use crate::engine::{ChatEngine, GenHandle};
+use crate::generate::GenRequest;
+use crate::outcome::Outcome;
+use crate::project::render_closed;
 
 /// Rozpoznana delegacja.
 pub(crate) struct Delegation {
@@ -23,7 +24,7 @@ pub(crate) struct Delegation {
     goal: String,
 }
 
-impl AppCore {
+impl ChatEngine {
     /// Delegacja w ostatniej wiadomości użytkownika („to" = poprzednia wiadomość użytkownika).
     pub(crate) fn delegation(&self, req: &GenRequest) -> Option<Delegation> {
         let from_user = matches!(
@@ -70,7 +71,7 @@ fn outcome(text: String, status: TurnStatus, stop: StopReason, error: Option<Str
 
 /// Zadanie mostu jako odpowiedź na turę.
 pub(crate) async fn run(
-    core: &AppCore,
+    core: &ChatEngine,
     req: &GenRequest,
     handle: &GenHandle,
     d: Delegation,
@@ -110,7 +111,7 @@ pub(crate) async fn run(
         live.blocks.clone_from(&blocks);
     }
     if let Some(tap) = &req.tap {
-        let _ = tap.send(crate::ports::VoiceChunk::Text(text.clone()));
+        let _ = tap.send(app_api::ports::VoiceChunk::Text(text.clone()));
     }
     core.emit(AlfaEvent::TextDelta {
         session_id: req.session.to_string(),

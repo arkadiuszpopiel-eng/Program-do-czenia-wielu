@@ -2,10 +2,12 @@
 //! podgląd (dry-run) z różnicami, tryby dodaj/scal/zastąp, snapshot przed importem i rollback.
 //! Sekrety nigdy w paczce — eksportu sekretów nie ma (AGENTS.md; CX-a), paczka sekretów ze starszej
 //! wersji jest odrzucana, sekcja sekretów pomijana. Sesje prywatne nie wchodzą do zwykłego eksportu
-//! (moduł pomija je z ostrzeżeniem).
+//! (moduł pomija je z ostrzeżeniem). Plik importu UI wskazuje wyłącznie jednorazowym uchwytem
+//! (natywny dialog albo lista kopii zapasowych) — nigdy ścieżką.
 
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 use accounts_hub_contract::SecretString;
 use async_trait::async_trait;
@@ -25,12 +27,27 @@ use app_api::dto::{
 use app_api::error::{AppError, ErrorCode};
 use app_api::ports::{ShellPort, TransferPort};
 
+use crate::handles::PathHandles;
+
+/// Uchwyt kopii z listy — UI woła podgląd od razu (jak ścieżki upuszczenia w `app-files`).
+pub const RESTORE_HANDLE_TTL: Duration = Duration::from_secs(15);
+/// Uchwyt z wyniku podglądu — właściciel podaje hasło albo przegląda różnice przed importem.
+pub const REVIEW_HANDLE_TTL: Duration = Duration::from_secs(600);
+
 /// Adapter modułu `transfer`.
 pub struct TransferAdapter {
     transfer: Arc<ZipTransfer>,
     shell: Arc<dyn ShellPort>,
     sessions: Arc<dyn SessionCatalog>,
     config: Arc<FileConfigStore>,
+    handles: PathHandles,
+}
+
+fn expired() -> AppError {
+    AppError::new(
+        ErrorCode::NotFound,
+        "Uchwyt pliku wygasł albo został już użyty — wybierz plik ponownie.",
+    )
 }
 
 /// Błąd modułu → błąd komendy (komunikat PL z modułu).
@@ -141,6 +158,7 @@ impl TransferAdapter {
             shell,
             sessions,
             config,
+            handles: PathHandles::default(),
         }
     }
 
@@ -231,10 +249,10 @@ impl TransferPort for TransferAdapter {
     async fn inspect(
         &self,
         password: Option<SecretInput>,
-        path: Option<String>,
+        handle: Option<String>,
     ) -> Result<InspectResult, AppError> {
-        let path = match path {
-            Some(p) => PathBuf::from(p),
+        let path = match handle {
+            Some(h) => self.handles.take(&h).ok_or_else(expired)?,
             None => {
                 let shell = self.shell.clone();
                 match blocking(move || shell.pick_open_path()).await? {
@@ -250,17 +268,18 @@ impl TransferPort for TransferAdapter {
         let transfer = self.transfer.clone();
         let target = path.clone();
         let inspected = blocking(move || Ok(transfer.inspect(&target, &options))).await?;
-        let shown = path.to_string_lossy().into_owned();
         let inspection = match inspected {
             Ok(i) => i,
-            Err(TransferError::PasswordRequired) => {
-                return Ok(InspectResult::NeedsPassword { path: shown });
+            // Brak albo złe hasło — nowy uchwyt do ponownej próby (UI wie, czy podało hasło).
+            Err(TransferError::PasswordRequired | TransferError::WrongPassword) => {
+                let handle = self.handles.issue(path, REVIEW_HANDLE_TTL);
+                return Ok(InspectResult::NeedsPassword { handle });
             }
             Err(e) => return Err(transfer_error(e)),
         };
         let manifest = &inspection.manifest;
         Ok(InspectResult::Inspected {
-            path: shown,
+            handle: self.handles.issue(path, REVIEW_HANDLE_TTL),
             manifest: PackageManifestSummary {
                 schema_version: manifest.schema_version.to_string(),
                 app_version: manifest.app_version.to_string(),
@@ -309,7 +328,7 @@ impl TransferPort for TransferAdapter {
             ..ImportOptions::default()
         };
         let transfer = self.transfer.clone();
-        let path = PathBuf::from(&request.path);
+        let path = self.handles.take(&request.handle).ok_or_else(expired)?;
         let report =
             blocking(move || transfer.import(&path, &options).map_err(transfer_error)).await?;
         self.reload_config().await;
@@ -318,6 +337,10 @@ impl TransferPort for TransferAdapter {
             imported: report.added + report.merged + report.replaced + report.copied,
             skipped: report.skipped + report.failed,
         })
+    }
+
+    fn restore_handle(&self, path: PathBuf) -> Result<String, AppError> {
+        Ok(self.handles.issue(path, RESTORE_HANDLE_TTL))
     }
 
     async fn rollback(&self, snapshot: &str) -> Result<(), AppError> {

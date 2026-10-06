@@ -4,18 +4,19 @@
 use providers_contract::{ContentBlock, Message, Role as MsgRole};
 use sessions_contract::{NewTurn, Role, SessionHistory, SessionId, Turn, TurnId};
 
-use crate::core::AppCore;
-use crate::dto::TurnStatus;
-use crate::error::AppError;
+use app_api::AppError;
+use app_api::dto::TurnStatus;
+
+use crate::engine::ChatEngine;
 
 /// Instrukcja dla „Kontynuuj" (bez prefill — dopisana jako wiadomość użytkownika).
 pub const CONTINUE_HINT: &str =
     "Kontynuuj dokładnie od miejsca, w którym przerwałaś. Nie powtarzaj wcześniejszego tekstu.";
 
-impl AppCore {
+impl ChatEngine {
     /// Dopisuje turę jako dziecko `parent` (`None` = aktywny liść albo pierwsza tura).
     /// Rodzic z dziećmi → nowa gałąź (`fork_from` rodzeństwa) — historia się nie zmienia.
-    pub(crate) fn append_child(
+    pub fn append_child(
         &self,
         session: &SessionId,
         parent: Option<TurnId>,
@@ -63,7 +64,10 @@ impl AppCore {
                 _ => continue,
             };
             let text = turn.content.text.trim();
-            let mut blocks = (self.inner.work.files).provider_blocks(session, &turn.content.blocks);
+            let mut blocks = self
+                .inner
+                .files
+                .provider_blocks(session, &turn.content.blocks);
             if !text.is_empty() {
                 blocks.insert(0, ContentBlock::text(text));
             }

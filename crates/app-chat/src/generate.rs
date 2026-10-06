@@ -4,30 +4,23 @@
 //! Identyfikator tury agentki jest rezerwowany przy starcie (numery tur są kolejne, a wszystkie
 //! zapisy historii sesji przechodzą przez blokadę sesji i czekają na zapis aktywnej generacji).
 
-pub(crate) mod agent;
-mod delegate;
-mod finish;
-pub(crate) mod history;
-pub(crate) mod project;
-mod routing;
-pub(crate) mod stream;
-mod symptom;
-
 use std::sync::{Arc, Mutex};
 
-use personas_contract::{PersonaId, Personas};
+use personas_contract::PersonaId;
 use providers_contract::CancellationToken;
 use sessions_contract::{SessionHistory, SessionId, TurnId};
 use tokio::sync::watch;
 
-use crate::core::{AppCore, GenHandle};
-use crate::dto::{self, AgentState, AgentStatus, AlfaEvent, ModelProfile, TurnStatus};
-use crate::error::AppError;
-use crate::ids;
+use app_api::AppError;
+use app_api::dto::{self, AgentState, AgentStatus, AlfaEvent, ModelProfile, TurnStatus};
+use app_api::ids;
+
+use crate::engine::{ChatEngine, GenHandle};
+use crate::{agent, delegate, stream};
 
 /// Gdzie zapisać turę agentki.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Placement {
+pub enum Placement {
     /// Dziecko tury (zwykła odpowiedź, „kontynuuj").
     Child(TurnId),
     /// Rodzeństwo tury (wariant „ponów").
@@ -36,23 +29,28 @@ pub(crate) enum Placement {
 
 /// Żądanie generacji.
 #[derive(Debug, Clone)]
-pub(crate) struct GenRequest {
+pub struct GenRequest {
+    /// Sesja.
     pub session: SessionId,
+    /// Miejsce tury agentki w drzewie.
     pub placement: Placement,
     /// Ostatnia tura historii przekazywanej modelowi.
     pub history_leaf: TurnId,
+    /// Agentka odpowiadająca.
     pub agent: String,
+    /// Profil modelu (`None` = domyślny sesji).
     pub profile: Option<ModelProfile>,
+    /// Tura kontynuowana („Kontynuuj").
     pub continues: Option<TurnId>,
     /// Źródło polecenia (tekst / głos — fakty dla Brokera w przebiegu agentki).
     pub origin: risk_classifier_contract::CommandOrigin,
     /// Odbiorca tekstu odpowiedzi (rozmowa głosowa) — obok zdarzeń UI.
-    pub tap: Option<tokio::sync::mpsc::UnboundedSender<crate::ports::VoiceChunk>>,
+    pub tap: Option<tokio::sync::mpsc::UnboundedSender<app_api::ports::VoiceChunk>>,
 }
 
 impl GenRequest {
     /// Żądanie tekstowe (bez odbiorcy głosowego).
-    pub(crate) fn text(
+    pub fn text(
         session: SessionId,
         placement: Placement,
         history_leaf: TurnId,
@@ -86,9 +84,9 @@ const ROLE_PRIORITY: [&str; 9] = [
     "speaker",
 ];
 
-impl AppCore {
+impl ChatEngine {
     /// Główna rola agentki w obsadzie sesji (identyfikator UI).
-    pub(crate) fn role_of(&self, session: &SessionId, agent: &str) -> Option<String> {
+    pub fn role_of(&self, session: &SessionId, agent: &str) -> Option<String> {
         let roles = self
             .inner
             .personas
@@ -102,7 +100,7 @@ impl AppCore {
     }
 
     /// Agentki sesji ze stanem (mówi = aktywna generacja).
-    pub(crate) fn agents_of(&self, session: &SessionId) -> Vec<AgentState> {
+    pub fn agents_of(&self, session: &SessionId) -> Vec<AgentState> {
         let cast = self.inner.personas.cast(session);
         let speaking = self.generation(session).map(|g| g.agent);
         let working = self
@@ -132,7 +130,8 @@ impl AppCore {
             .collect()
     }
 
-    pub(crate) fn announce_agents(&self, session: &SessionId) {
+    /// `AgentsChanged` dla sesji.
+    pub fn announce_agents(&self, session: &SessionId) {
         self.emit(AlfaEvent::AgentsChanged {
             session_id: session.to_string(),
             agents: self.agents_of(session),
@@ -140,7 +139,10 @@ impl AppCore {
     }
 
     /// Startuje generację. Wywołujący trzyma blokadę sesji i zakończył poprzednią generację.
-    pub(crate) async fn start_generation(&self, req: GenRequest) -> Result<String, AppError> {
+    /// Skażona sesja (załączniki, wcześniejsze uruchomienia) najpierw trafia do Brokera — błąd
+    /// Brokera = tura nie startuje (fail-closed).
+    pub async fn start_generation(&self, req: GenRequest) -> Result<String, AppError> {
+        self.sync_taint(&req.session).await?;
         let sessions = &self.inner.sessions;
         let reserved = TurnId(sessions.turn_count(&req.session)? + 1);
         let parent = match req.placement {
@@ -198,8 +200,8 @@ impl AppCore {
             };
             if let Some(tap) = &req.tap {
                 let last = match &outcome.error {
-                    Some(e) => crate::ports::VoiceChunk::Failed(e.message.clone()),
-                    None => crate::ports::VoiceChunk::Done,
+                    Some(e) => app_api::ports::VoiceChunk::Failed(e.message.clone()),
+                    None => app_api::ports::VoiceChunk::Done,
                 };
                 let _ = tap.send(last);
             }
@@ -207,48 +209,5 @@ impl AppCore {
             let _ = done_tx.send(true);
         });
         Ok(id)
-    }
-
-    /// STOP WSZYSTKIEGO (`Ctrl+Shift+F12`, zasobnik): anuluje generacje we wszystkich sesjach
-    /// (natychmiast), potem kill-switch Brokera (tokeny, drzewa procesów, cisza audio) i stop mowy;
-    /// czeka na zapis przerwanych tur. Zwraca liczbę zatrzymanych generacji.
-    pub async fn system_kill_all(&self, origin: crate::ports::KillOrigin) -> usize {
-        let handles: Vec<GenHandle> = self.rt().gens.values().cloned().collect();
-        for h in &handles {
-            h.cancel.cancel();
-        }
-        let runs: Vec<_> = self.rt().runs.values().map(|r| r.handle.clone()).collect();
-        for run in &runs {
-            run.cancel();
-        }
-        for cancel in self.rt().downloads.values() {
-            cancel.cancel();
-        }
-        // Zadania schedulera (agentki i mosty) — wykonawczynie przerwane od razu.
-        let tasks =
-            scheduler_lite_contract::SchedulerLite::kill_all(&*self.inner.tasks.scheduler());
-        tracing::info!(
-            zadania = tasks,
-            "kill-switch: zatrzymano zadania schedulera"
-        );
-        // Przeglądarki agentek (F6): drzewa procesów zamknięte, zgody hostów wygasają.
-        let _ = self.inner.agents.as_ref().map(|a| a.tools.kill_switch());
-        if let Err(e) = self.inner.broker.kill_all(origin).await {
-            tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
-        }
-        if let Err(e) = self.inner.voice.stop_speech().await {
-            tracing::warn!(error = %e, "stop mowy przy kill-switchu nie powiódł się");
-        }
-        for h in &handles {
-            h.wait(std::time::Duration::from_secs(5)).await;
-        }
-        self.emit(AlfaEvent::Toast {
-            kind: crate::dto::ToastKind::Warning,
-            message: crate::dto::LocalizedText::new(
-                "STOP WSZYSTKIEGO: zatrzymano pracę agentek.",
-                "STOP EVERYTHING: agents stopped.",
-            ),
-        });
-        handles.len()
     }
 }

@@ -79,6 +79,19 @@ async fn file_task_shows_in_replay_and_undo_restores_state() {
     assert_ne!(again.code, ErrorCode::Internal, "{again:?}");
 }
 
+/// Karta „Cofnij” zapisu zmiennej (`system_env_set`, token `"<sesja>:v<krok>"`): cofa tylko krok
+/// przebiegu tej sesji (cudzy albo nieznany — odmowa bez skutku), błędny rodzaj tokenu — błąd
+/// danych. Pełna ścieżka zapis → cofnięcie wymaga zgody w oknie Brokera (test w `app-agents`).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn env_undo_token_only_for_steps_of_this_session() {
+    let a = agents().await;
+    let token = app_core::ids::undo_env_dto(&a.sid.as_str().into(), 1);
+    let err = a.h.core.turns_undo_step(token).await.unwrap_err();
+    assert_eq!(err.code, ErrorCode::NotFound, "{err:?}");
+    let bad = a.h.core.turns_undo_step(format!("{}:x1", a.sid)).await;
+    assert_eq!(bad.unwrap_err().code, ErrorCode::InvalidInput);
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn broker_denial_reason_reaches_the_agent() {
     let mut a = agents().await;

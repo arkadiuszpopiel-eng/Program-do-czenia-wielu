@@ -2,7 +2,8 @@
   Kopie zapasowe (PLAN §15.1, docs/UI.md §13.3): zaplanowany eksport `.alfa` do katalogu wybranego
   natywnym dialogiem, rotacja N najnowszych, zakres (artefakty, logi), nie na baterii, hasło kopii
   w Credential Managerze (szyfrowanie, sesje prywatne). „Sprawdź” = test przywracania (bez zapisu),
-  „Przywróć…” = podgląd importu tej kopii. Sekrety nigdy nie trafiają do kopii.
+  „Przywróć…” = podgląd importu tej kopii (rdzeń wydaje jednorazowy uchwyt pliku — UI nie podaje
+  ścieżki). Sekrety nigdy nie trafiają do kopii.
 -->
 <script lang="ts">
   import { Button, Checkbox, Select, Switch, TextField } from '@alfa/ui-kit';
@@ -11,7 +12,8 @@
   import './work.css';
 
   interface Props {
-    onrestore: (path: string) => void;
+    /** „Przywróć…”: nazwa pliku kopii z listy (uchwyt wydaje rdzeń). */
+    onrestore: (file: string) => void;
   }
 
   let { onrestore }: Props = $props();
@@ -187,7 +189,7 @@
               <Button
                 size="sm"
                 aria-label={t('bk.restoreLabel', { file: e.file })}
-                onclick={() => onrestore(e.path)}>{t('bk.restore')}</Button
+                onclick={() => onrestore(e.file)}>{t('bk.restore')}</Button
               >
             </span>
           </div>

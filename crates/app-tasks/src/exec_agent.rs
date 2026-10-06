@@ -64,14 +64,20 @@ pub fn origin_of(d: &Dispatch) -> CommandOrigin {
 
 /// Sesja zadania (bez sesji — „Zadania w tle").
 pub(crate) async fn session_of(deps: &ExecDeps, d: &Dispatch) -> Result<SessionId, WorkerResult> {
-    match &d.spec.session {
-        Some(s) => Ok(s.clone()),
+    let session = match &d.spec.session {
+        Some(s) => s.clone(),
         None => deps
             .host
             .background_session()
             .await
-            .map_err(|e| fail(format!("sesja zadań w tle: {e}"), true)),
-    }
+            .map_err(|e| fail(format!("sesja zadań w tle: {e}"), true))?,
+    };
+    // Skażona sesja — Broker wie o tym przed pierwszym krokiem (fail-closed).
+    deps.host
+        .sync_taint(&session)
+        .await
+        .map_err(|e| fail(format!("skażenie sesji dla Brokera: {e}"), true))?;
+    Ok(session)
 }
 
 /// Runtime zadania i jego ładunek (próba zadania → przebieg).

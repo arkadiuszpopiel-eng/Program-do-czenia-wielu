@@ -115,7 +115,7 @@
   async function runImport() {
     if (!imported) return;
     await app.client.transfer.importPackage({
-      path: imported.path,
+      handle: imported.handle,
       mode: 'merge',
       resolutions: {},
       password: null,

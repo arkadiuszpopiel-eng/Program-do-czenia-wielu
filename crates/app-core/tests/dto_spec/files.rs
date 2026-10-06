@@ -33,6 +33,7 @@ pub fn spec(command: &str) -> Option<Spec> {
         "backups_configure" => (vec![("config", roundtrip::<BackupConfig>)], view),
         "backups_set_password" => (vec![("password", parse_only::<Option<SecretInput>>)], view),
         "backups_verify" => (vec![("file", s)], roundtrip::<BackupCheck>),
+        "backups_restore" => (vec![("file", s)], s),
         _ => return None,
     })
 }

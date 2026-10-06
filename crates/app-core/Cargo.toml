@@ -40,9 +40,10 @@ app-models = { path = "../app-models" }
 app-store = { path = "../app-store" }
 # Załączniki composera, eksport rozmowy MD/HTML, kopie zapasowe z harmonogramem, artefakty w `.alfa`.
 app-files = { path = "../app-files" }
+# Silnik tury czatu (generacja, przebieg agentki, delegacja, zapis tury, koszt) — wydzielony z app-core.
+app-chat = { path = "../app-chat" }
 agent-backends-contract = { path = "../agent-backends-contract" }
 mcp-impl = { path = "../mcp-impl" }
-agent-runtime-contract = { path = "../agent-runtime-contract" }
 tools-common-contract = { path = "../tools-common-contract" }
 voice-pipeline-contract = { path = "../voice-pipeline-contract" }
 # Jądro

@@ -17,6 +17,7 @@ import type {
   TurnAttachment,
 } from '../types-files';
 import type { FakeCore } from './core';
+import { RESTORE_HANDLE_TTL_MS, issueHandle } from './transfer-handles';
 
 const MB = 1024 * 1024;
 export const ATTACHMENT_LIMITS = {
@@ -262,6 +263,12 @@ export class FakeFiles {
           sessions: this.core.sessions.length,
           message: null,
         });
+      },
+      restore: (file) => {
+        const entry = this.backup.entries.find((e) => e.file === file);
+        if (!entry) return Promise.reject(new Error(`Brak kopii „${file}” w katalogu kopii.`));
+        const target = { path: entry.path, encrypted: this.backup.password_set };
+        return this.core.reply(issueHandle(this.core, target, RESTORE_HANDLE_TTL_MS));
       },
     };
   }

@@ -20,7 +20,7 @@ use providers_contract::CancellationToken;
 use search_impl::SqliteSearch;
 use sessions_contract::{SessionCatalog, SessionId, TurnId};
 use sessions_impl::SqliteSessions;
-use tokio::sync::{OwnedMutexGuard, watch};
+use tokio::sync::OwnedMutexGuard;
 
 use crate::dto::{self, AlfaEvent, AutonomyLevel, ModelProfile, SessionSummary};
 use crate::error::AppError;
@@ -30,44 +30,15 @@ use crate::ports::{BrainPort, BrokerPort, ShellPort, TransferPort, VoicePort};
 use crate::settings::{SettingsCatalog, keys};
 use app_store::AppStore;
 
-/// Aktywna generacja odpowiedzi w sesji (najwyżej jedna na sesję).
-#[derive(Clone)]
-pub(crate) struct GenHandle {
-    /// Zarezerwowany identyfikator tury agentki.
-    pub turn: TurnId,
-    /// Agentka.
-    pub agent: String,
-    /// Anulowanie (Esc / STOP / nowa wiadomość).
-    pub cancel: CancellationToken,
-    /// `true` po zapisie tury.
-    pub done: watch::Receiver<bool>,
-    /// Bieżąca postać tury (dla `turns_list` w trakcie strumienia).
-    pub live: Arc<Mutex<dto::Turn>>,
-}
-
-impl GenHandle {
-    /// Czeka na zakończenie (z limitem czasu).
-    pub async fn wait(&self, limit: Duration) {
-        let mut done = self.done.clone();
-        let _ = tokio::time::timeout(limit, done.wait_for(|d| *d)).await;
-    }
-}
-
 /// Ulotny stan rdzenia.
 #[derive(Default)]
 pub(crate) struct Runtime {
     pub online: bool,
     pub rate_limit: Option<(String, DateTime<Utc>)>,
     pub queued: BTreeMap<SessionId, Vec<TurnId>>,
-    pub gens: HashMap<SessionId, GenHandle>,
     pub trash: HashMap<String, (SessionId, tokio::task::AbortHandle)>,
-    pub context_window: HashMap<SessionId, u64>,
     /// Trwające pobierania modeli lokalnych (model → anulowanie).
     pub downloads: HashMap<String, CancellationToken>,
-    /// Trwające przebiegi agentek (sesja → sterowanie).
-    pub runs: HashMap<SessionId, crate::chat::agent::RunCtl>,
-    /// Zapisy schowka cofalne w sesji (token schowka należy do sesji, która go utworzyła).
-    pub clip_undo: HashMap<SessionId, std::collections::BTreeSet<u64>>,
 }
 
 /// Współdzielony stan kompozycji.
@@ -77,7 +48,6 @@ pub(crate) struct Inner {
     /// Po jakim czasie bez awarii start jest zdrowy (`updater::mark_good`).
     pub healthy_after: Duration,
     pub undo_window: Option<Duration>,
-    pub approval_timeout: Option<Duration>,
     pub bus: Arc<dyn EventBus>,
     pub registry: Arc<ModuleRegistry>,
     pub config: Arc<FileConfigStore>,
@@ -110,9 +80,11 @@ pub(crate) struct Inner {
     pub broker: Arc<dyn BrokerPort>,
     /// Narzędzia agentek (`None` — Broker albo dziennik cofania niepodłączony: bez narzędzi).
     pub agents: Option<crate::parts::AgentStack>,
+    /// Silnik tury czatu (generacje, przebiegi agentek — `app-chat`).
+    pub chat: app_chat::ChatEngine,
     pub shell: Arc<dyn ShellPort>,
     pub events: EventHub,
-    pub store: AppStore,
+    pub store: Arc<AppStore>,
     pub settings: SettingsCatalog,
     pub runtime: Mutex<Runtime>,
     pub locks: Mutex<HashMap<SessionId, Arc<tokio::sync::Mutex<()>>>>,
@@ -150,6 +122,17 @@ impl AppCore {
             .map(|u| u as Arc<dyn undo_journal_contract::UndoJournal>)
     }
 
+    /// Silnik tury czatu.
+    pub(crate) fn chat(&self) -> &app_chat::ChatEngine {
+        &self.inner.chat
+    }
+
+    /// Broker Jądra narzędzi agentek (w procesie albo poza nim; `None` = niepodłączony) — stan
+    /// bezpieczeństwa sesji (skażenie) i decyzje; dla powłoki i testów.
+    pub fn kernel_broker(&self) -> Option<Arc<dyn safety_broker_contract::Broker>> {
+        self.inner.extra.broker.as_ref().map(|k| k.broker.clone())
+    }
+
     pub(crate) fn rt(&self) -> MutexGuard<'_, Runtime> {
         self.inner
             .runtime
@@ -183,19 +166,6 @@ impl AppCore {
             locks.entry(session.clone()).or_default().clone()
         };
         lock.lock_owned().await
-    }
-
-    /// Aktywna generacja w sesji.
-    pub(crate) fn generation(&self, session: &SessionId) -> Option<GenHandle> {
-        self.rt().gens.get(session).cloned()
-    }
-
-    /// Anuluje aktywną generację sesji i czeka na zapis jej tury.
-    pub(crate) async fn finalize_generation(&self, session: &SessionId) {
-        if let Some(handle) = self.generation(session) {
-            handle.cancel.cancel();
-            handle.wait(Duration::from_secs(10)).await;
-        }
     }
 
     /// Wartość konfiguracji (globalnie).
@@ -299,7 +269,7 @@ impl AppCore {
         &self,
         s: &sessions_contract::SessionSummary,
     ) -> SessionSummary {
-        let working = s.active || self.generation(&s.meta.id).is_some();
+        let working = s.active || self.chat().generation(&s.meta.id).is_some();
         let profile = match ModelProfile::parse(&s.meta.model_policy) {
             Some(p) => p,
             None => self.default_profile().await,

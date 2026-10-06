@@ -12,7 +12,7 @@ use cost_meter_contract::CostMeter;
 use sessions_contract::{PrivacyTag, SessionCatalog, SessionId};
 
 use crate::core::{AppCore, Inner};
-use crate::dto::{AgentRun, AlfaEvent, SessionTemplate};
+use crate::dto::{AgentRun, SessionTemplate};
 use crate::ids;
 
 /// Klucz konfiguracji (warstwa maszyny): sesja zadań w tle.
@@ -35,30 +35,6 @@ impl CoreHost {
 
     fn core(&self) -> Option<AppCore> {
         self.inner.upgrade().map(|inner| AppCore { inner })
-    }
-}
-
-impl AppCore {
-    /// Projekcja przebiegu zadania: kroki i nagłówek do Replay, zdarzenia UI, Oś czasu.
-    pub(crate) fn project_task(&self, session: &SessionId, run: &AgentRun, p: Projection) {
-        let store = &self.inner.store;
-        for step in &p.steps {
-            if let Err(e) = store.push_step(session, &run.id, step) {
-                tracing::warn!(error = %e, "zapis kroku zadania nie powiódł się");
-            }
-        }
-        if p.run_changed
-            && let Err(e) = store.push_run(session, run)
-        {
-            tracing::warn!(error = %e, "zapis przebiegu zadania nie powiódł się");
-        }
-        self.inner.events.emit_all(p.events);
-        for event in p.timeline {
-            if let Err(e) = store.push_timeline(session, &event) {
-                tracing::warn!(error = %e, "zapis osi czasu nie powiódł się");
-            }
-            self.emit(AlfaEvent::TimelineAppended { event });
-        }
     }
 }
 
@@ -107,7 +83,7 @@ impl TaskHost for CoreHost {
 
     async fn agent_settings(&self) -> AgentSettings {
         match self.core() {
-            Some(core) => core.agent_settings().await,
+            Some(core) => core.chat().agent_settings().await,
             None => AgentSettings::default(),
         }
     }
@@ -122,9 +98,16 @@ impl TaskHost for CoreHost {
             .is_some_and(|c| c.inner.broker.approval_window())
     }
 
+    async fn sync_taint(&self, session: &SessionId) -> Result<(), String> {
+        match self.core() {
+            Some(core) => core.chat().sync_taint(session).await.map_err(|e| e.message),
+            None => Err("aplikacja zamknięta".into()),
+        }
+    }
+
     fn project(&self, session: &SessionId, run: &AgentRun, projection: Projection) {
         if let Some(core) = self.core() {
-            core.project_task(session, run, projection);
+            core.chat().project_task(session, run, projection);
         }
     }
 }

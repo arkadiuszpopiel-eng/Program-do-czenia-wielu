@@ -80,3 +80,45 @@ fn killing_the_desktop_app_or_updater_is_blocked_in_the_shell() {
     assert_eq!(check("taskkill /im notepad.exe"), None);
     assert_eq!(check("Stop-Process -Name alfabet"), None);
 }
+
+/// Przegląd fali 3 (`docs/reviews/2026-10-wave3-review.md`, W3-09 — propozycja dla Jądra, decyzja
+/// człowieka): dostęp `fs.*` do udziału sieciowego (UNC/WebDAV) to kanał wyjścia (THREAT_MODEL
+/// §5 „zapis do udziału”; samo otwarcie uwierzytelnia konto właściciela przez NTLM). Dziś Broker
+/// klasyfikuje `fs.read(\\napastnik\udział\x)` jak zwykły odczyt poza zakresem — na L4 bez pytania,
+/// także z sesji skażonej. Narzędzia odrzucają już takie ścieżki (`tools-common::netpath`, W3-03);
+/// Broker powinien to wymuszać niezależnie (obrona w głąb): fakty `egress(serwer)`, reguły
+/// `TaintedEgress`/`EgressNotAllowlisted`, udziały z listy dozwolonej właściciela.
+#[test]
+#[ignore = "W3-09: propozycja dla Jądra — wymaga decyzji i przeglądu człowieka"]
+fn file_access_on_a_network_share_is_egress() {
+    use safety_broker_contract::{ActionRequest, CommandOrigin, Holder, SessionSecurity};
+    let env = PathEnv::windows_profile(r"C:\Users\ala");
+    let guard = KernelGuard::new(policy(), env.clone());
+    for raw in [
+        r"\\napastnik.example\udzial\x.txt",
+        r"\\napastnik.example@SSL\DavWWWRoot\x.txt",
+    ] {
+        let scope = PathScope::exact(raw, &env).unwrap();
+        for cap in [
+            Capability::FsRead(scope.clone()),
+            Capability::FsWrite(scope),
+        ] {
+            let req = ActionRequest {
+                holder: Holder::agent("s1", "delta"),
+                capability: cap,
+                facts: DeclaredFacts::new("fs"),
+                origin: CommandOrigin::UserText,
+                ttl_ms: None,
+            };
+            let session = SessionSecurity {
+                tainted: true,
+                ..SessionSecurity::default()
+            };
+            let facts = guard.derive_facts(&req, &session);
+            assert!(
+                facts.is_egress(),
+                "{raw}: dostęp do udziału sieciowego nie jest traktowany jak wysyłka"
+            );
+        }
+    }
+}

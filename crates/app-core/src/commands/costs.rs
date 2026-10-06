@@ -42,11 +42,7 @@ impl AppCore {
         let (used, max) = match session {
             Some(s) => (
                 self.context_used(s),
-                self.rt()
-                    .context_window
-                    .get(s)
-                    .copied()
-                    .unwrap_or(DEFAULT_CONTEXT),
+                self.chat().context_window(s).unwrap_or(DEFAULT_CONTEXT),
             ),
             None => (0, DEFAULT_CONTEXT),
         };

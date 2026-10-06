@@ -3,8 +3,8 @@
 use lib_markdown::{Block, RenderOptions, render_blocks};
 use sessions_contract::{Author, Role, SessionId, Turn};
 
-use crate::dto::{self, BlockKind, RenderedBlock, ThinkingInfo, TurnStatus};
-use crate::ids;
+use app_api::dto::{self, BlockKind, RenderedBlock, ThinkingInfo, TurnStatus};
+use app_api::ids;
 use app_store::TurnMeta;
 
 /// Blok lib-markdown → DTO (blok kodu = jeden fenced block najwyższego poziomu).

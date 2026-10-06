@@ -114,3 +114,10 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
   kontraktowy `secrets_never_leave_the_store`, `app-core/tests/transfer.rs` (brak komendy).
 - **Q-6 (zrobione):** `DirDocumentStore` odrzuca dowiązania (symlink, junction) w ścieżce wpisu i jego katalogach
   nadrzędnych przy odczycie, zapisie i usuwaniu (`ensure_no_links`). Test: `transfer-impl/tests/module.rs::dir_store_refuses_links_on_read_and_remove`.
+- **Fala 4 (aplikacja, `app-modules::transfer` + `app-modules::handles`):** UI nie wskazuje pliku importu ścieżką.
+  `transfer_inspect(password, handle)`: `handle = null` → natywny dialog; inaczej jednorazowy uchwyt (losowy, rejestr
+  ≤ 16 wpisów) wydany przez rdzeń — z wyniku podglądu (`InspectResult.handle`, 10 min: hasło, przegląd różnic) albo
+  z listy kopii (`backups_restore(file)` — tylko nazwa z katalogu kopii, 15 s, wzór: ścieżki upuszczenia w `app-files`).
+  Każde użycie zużywa uchwyt; złe hasło → `needs_password` z nowym uchwytem; `transfer_import(request.handle)`.
+  Testy: `app-core/tests/transfer.rs` (ścieżka z UI odrzucona, uchwyt jednorazowy, „Przywróć…”), `app-modules`
+  `handles::tests`, UI `fake-transfer.test.ts`, E2E `files.spec.ts`.

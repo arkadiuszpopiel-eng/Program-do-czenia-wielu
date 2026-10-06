@@ -142,6 +142,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'tr.warnings': 'Notes',
   'tr.needsPassword': 'The package is encrypted — enter the password.',
   'tr.unlock': 'Decrypt',
+  'tr.wrongPassword': 'Wrong password — try again.',
 
   'perm.title': 'Autonomy level',
   'perm.intro':

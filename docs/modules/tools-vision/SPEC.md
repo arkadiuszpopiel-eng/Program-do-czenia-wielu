@@ -56,3 +56,7 @@ Brak nowych widoków; wynik w wątku jak każde narzędzie (tekst). Pakiety jęz
 ## Otwarte pytania
 - Tesseract/PaddleOCR jako zapas poza Windows (PLAN §7.2) — po decyzji o modelach OCR.
 - Opis obrazu jako osobny token Brokera (`net.egress(dostawca)`) dla tras chmurowych — do decyzji człowieka.
+
+## Przegląd fali 3 (2026-10, `docs/reviews/2026-10-wave3-review.md`)
+- **W3-06 (zrobione):** tekst wyniku `vision_ocr` (jedyna część widoczna dla modelu) zawiera każdą linię ze współrzędnymi `[x y w h]` — wcześniej współrzędne były tylko w `data.lines`, więc agentka nie mogła kliknąć znalezionego tekstu (`tests/review.rs`).
+- **W3-03 (zrobione w `tools-common`):** plik obrazu na udziale sieciowym (UNC/WebDAV) — odmowa przed dostępem.

@@ -1,4 +1,5 @@
 //! Komendy `transfer_*` ⟶ port `TransferPort` (moduł `transfer`; hasła tylko w argumentach).
+//! Plik importu UI wskazuje jednorazowym uchwytem (dialog, wynik podglądu, `backups_restore`).
 
 use crate::core::AppCore;
 use crate::dto::{
@@ -12,13 +13,26 @@ impl AppCore {
         self.inner.transfer.export(request).await
     }
 
-    /// `transfer_inspect` ⟶ dialog otwarcia (gdy `path = None`) + dry-run.
+    /// `transfer_inspect` ⟶ dialog otwarcia (gdy `handle = None`) albo jednorazowy uchwyt + dry-run.
     pub async fn transfer_inspect(
         &self,
         password: Option<SecretInput>,
-        path: Option<String>,
+        handle: Option<String>,
     ) -> Result<InspectResult, AppError> {
-        self.inner.transfer.inspect(password, path).await
+        self.inner.transfer.inspect(password, handle).await
+    }
+
+    /// `backups_restore` („Przywróć…”): kopia z katalogu kopii (nazwa z listy) → jednorazowy
+    /// uchwyt dla `transfer_inspect` (ważny 15 s).
+    pub async fn backups_restore(&self, file: String) -> Result<String, AppError> {
+        let view = self.inner.work.files.backups().view();
+        let entry = view
+            .entries
+            .into_iter()
+            .find(|e| e.file == file)
+            .ok_or_else(|| AppError::not_found(format!("Brak kopii „{file}” w katalogu kopii.")))?;
+        let path = std::path::PathBuf::from(entry.path);
+        self.inner.transfer.restore_handle(path)
     }
 
     /// `transfer_import` (snapshot przed importem).

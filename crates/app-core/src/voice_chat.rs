@@ -11,13 +11,13 @@ use risk_classifier_contract::{CommandOrigin, SttConfidence};
 use sessions_contract::{HeardPrefix, SessionHistory, SessionId};
 use tokio::sync::mpsc;
 
-use crate::chat::{GenRequest, Placement};
 use crate::core::{AppCore, Inner};
 use crate::dto::{EventLevel, SessionTemplate, TimelineKind};
 use crate::error::AppError;
 use crate::ids;
 use crate::ports::{KillOrigin, VoiceChat, VoiceTurn, VoiceTurnOrigin, VoiceTurnRef};
 use crate::settings::keys;
+use app_chat::{GenRequest, Placement};
 
 /// Pewność STT tur głosowych bez pomiaru z potoku (< 800‰ — każda zmiana stanu zlecona głosem
 /// pyta nie-głosem); destrukcja głosem zawsze wymaga potwierdzenia nie-głosem (PLAN §6.10).
@@ -73,7 +73,7 @@ impl VoiceChat for CoreVoiceChat {
         let core = self.core()?;
         let session = core.voice_session().await?;
         let _guard = core.lock_session(&session).await;
-        core.finalize_generation(&session).await;
+        core.chat().finalize_generation(&session).await;
         let agent = core.addressee(&session, text, Some(persona));
         let (user, _) = core
             .append_user(&session, None, None, text, Some(agent.clone()), Vec::new())
@@ -96,9 +96,9 @@ impl VoiceChat for CoreVoiceChat {
             speaker_verified: origin.speaker_verified,
         };
         req.tap = Some(tx);
-        let id = core.start_generation(req).await?;
+        let id = core.chat().start_generation(req).await?;
         let turn = ids::parse_turn_in(&session, &id)?;
-        if let Some(handle) = core.generation(&session).filter(|g| g.turn == turn) {
+        if let Some(handle) = core.chat().generation(&session).filter(|g| g.turn == turn) {
             tokio::spawn(async move {
                 cancel.cancelled().await;
                 handle.cancel.cancel();
@@ -115,6 +115,7 @@ impl VoiceChat for CoreVoiceChat {
             return;
         };
         if let Some(handle) = core
+            .chat()
             .generation(&turn.session)
             .filter(|g| g.turn == turn.turn)
         {

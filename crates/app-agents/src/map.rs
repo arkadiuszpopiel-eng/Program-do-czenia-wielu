@@ -71,11 +71,12 @@ pub fn risk(level: risk_classifier_contract::RiskLevel) -> RiskLevel {
     }
 }
 
-/// Token „Cofnij" kroku w DTO (dziennik albo schowek).
+/// Token „Cofnij" kroku w DTO (dziennik, schowek albo zmienna użytkownika).
 pub fn undo_token(session: &SessionId, undo: &UndoRef) -> String {
     match undo.service {
         UndoService::Journal => ids::undo_dto(session, undo.id),
         UndoService::Clipboard => ids::undo_clip_dto(session, undo.id),
+        UndoService::System => ids::undo_env_dto(session, undo.id),
     }
 }
 
@@ -227,6 +228,12 @@ mod tests {
             text: String::new(),
         };
         assert_eq!(undo_token(&s, &clip), "s1:c3");
+        let env = UndoRef {
+            service: UndoService::System,
+            id: 4,
+            text: String::new(),
+        };
+        assert_eq!(undo_token(&s, &env), "s1:v4");
     }
 
     #[test]

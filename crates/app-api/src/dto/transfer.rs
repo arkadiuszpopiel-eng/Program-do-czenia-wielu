@@ -91,16 +91,17 @@ pub struct PackageManifestSummary {
     pub encrypted: bool,
 }
 
-/// Wynik podglądu paczki.
+/// Wynik podglądu paczki. `handle` — jednorazowy uchwyt pliku dla następnego kroku (hasło,
+/// import); UI nigdy nie podaje ścieżki paczki.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum InspectResult {
     Cancelled,
     NeedsPassword {
-        path: String,
+        handle: String,
     },
     Inspected {
-        path: String,
+        handle: String,
         manifest: PackageManifestSummary,
         items: Vec<DryRunItem>,
         warnings: Vec<String>,
@@ -129,7 +130,8 @@ pub enum CollisionResolution {
 /// Żądanie importu.
 #[derive(Clone, Deserialize)]
 pub struct ImportRequest {
-    pub path: String,
+    /// Jednorazowy uchwyt z ostatniego `InspectResult`.
+    pub handle: String,
     pub mode: ImportMode,
     pub resolutions: BTreeMap<String, CollisionResolution>,
     pub password: Option<SecretInput>,
@@ -138,7 +140,7 @@ pub struct ImportRequest {
 impl fmt::Debug for ImportRequest {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ImportRequest")
-            .field("path", &self.path)
+            .field("handle", &self.handle)
             .field("mode", &self.mode)
             .field("resolutions", &self.resolutions)
             .field("password", &self.password.as_ref().map(|_| "***"))

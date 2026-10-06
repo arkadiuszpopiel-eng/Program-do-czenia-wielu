@@ -17,14 +17,19 @@ pub trait TransferPort: Send + Sync {
     async fn export(&self, request: ExportRequest) -> Result<ExportResult, AppError>;
     /// Eksport jednej sesji.
     async fn export_session(&self, session: &SessionId) -> Result<ExportResult, AppError>;
-    /// Podgląd paczki (dry-run).
+    /// Podgląd paczki (dry-run): `handle = None` — natywny dialog; inaczej jednorazowy uchwyt
+    /// (z poprzedniego wyniku albo z [`Self::restore_handle`]). Wynik niesie nowy uchwyt.
     async fn inspect(
         &self,
         password: Option<SecretInput>,
-        path: Option<String>,
+        handle: Option<String>,
     ) -> Result<InspectResult, AppError>;
-    /// Import.
+    /// Import (zużywa uchwyt z `request.handle`).
     async fn import(&self, request: ImportRequest) -> Result<ImportResult, AppError>;
+    /// Uchwyt pliku kopii zapasowej wskazanego przez rdzeń (lista kopii) — ważny krótko, jednorazowy.
+    fn restore_handle(&self, _path: std::path::PathBuf) -> Result<String, AppError> {
+        Err(AppError::unavailable("Przywracanie kopii", TRANSFER))
+    }
     /// Cofnięcie importu.
     async fn rollback(&self, snapshot: &str) -> Result<(), AppError>;
 }
@@ -45,7 +50,7 @@ impl TransferPort for TransferUnavailable {
     async fn inspect(
         &self,
         _password: Option<SecretInput>,
-        _path: Option<String>,
+        _handle: Option<String>,
     ) -> Result<InspectResult, AppError> {
         Err(AppError::unavailable("Podgląd paczki .alfa", TRANSFER))
     }

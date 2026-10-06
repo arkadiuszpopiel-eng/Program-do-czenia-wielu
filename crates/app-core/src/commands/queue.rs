@@ -2,11 +2,11 @@
 
 use sessions_contract::{SessionHistory, SessionId, TurnId};
 
-use crate::chat::{GenRequest, Placement};
 use crate::core::AppCore;
 use crate::dto::{AlfaEvent, SystemStatus, TurnStatus};
 use crate::error::AppError;
 use crate::ids;
+use app_chat::{GenRequest, Placement};
 
 impl AppCore {
     /// Wysyła wiadomości z kolejki offline (po jednej odpowiedzi na sesję — na ostatnią).
@@ -28,20 +28,21 @@ impl AppCore {
             let Some(last) = turns.last().copied() else {
                 continue;
             };
-            self.finalize_generation(&id).await;
+            self.chat().finalize_generation(&id).await;
             let turn = self.inner.sessions.turn(&id, last)?;
             let agent = self.agent_of(&id, &turn);
-            self.start_generation(GenRequest {
-                session: id.clone(),
-                placement: Placement::Child(last),
-                history_leaf: last,
-                agent,
-                profile: None,
-                continues: None,
-                origin: risk_classifier_contract::CommandOrigin::UserText,
-                tap: None,
-            })
-            .await?;
+            self.chat()
+                .start_generation(GenRequest {
+                    session: id.clone(),
+                    placement: Placement::Child(last),
+                    history_leaf: last,
+                    agent,
+                    profile: None,
+                    continues: None,
+                    origin: risk_classifier_contract::CommandOrigin::UserText,
+                    tap: None,
+                })
+                .await?;
         }
         Ok(())
     }

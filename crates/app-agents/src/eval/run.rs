@@ -101,6 +101,7 @@ fn tools(env: &EvalEnv) -> AgentTools {
         base_env: None,
         extra: Vec::new(),
         apps: None,
+        media: None,
     })
 }
 

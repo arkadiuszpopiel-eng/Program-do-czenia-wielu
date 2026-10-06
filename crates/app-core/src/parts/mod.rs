@@ -302,9 +302,27 @@ impl Built {
                 .map(|m| m as Arc<dyn std::any::Any + Send + Sync>),
         );
         let provider: Arc<dyn SessionDbProvider> = sessions.clone();
+        let store = Arc::new(AppStore::new(provider));
+        let costs = need(&self.costs, "cost-meter")?;
+        let chat = app_chat::ChatEngine::new(app_chat::ChatDeps {
+            sessions: sessions.clone(),
+            store: store.clone(),
+            personas: personas.clone(),
+            memory: memory.clone(),
+            brain: ports.brain.clone(),
+            costs: costs.clone(),
+            agents: ports.agents.clone(),
+            broker: ports.broker.clone(),
+            kernel: extra.broker.as_ref().map(|k| k.broker.clone()),
+            tasks: stack.tasks.clone(),
+            bus: bus.clone(),
+            events: kernel.events.clone(),
+            files: work.files.clone(),
+            config: kernel.config.clone(),
+            approval_timeout: options.approval_timeout,
+        });
         let inner = Inner {
             undo_window: options.undo_window,
-            approval_timeout: options.approval_timeout,
             healthy_after: options.healthy_after,
             app_version: options.app_version,
             bus,
@@ -314,7 +332,8 @@ impl Built {
             search: need(&self.search, "search")?,
             memory,
             artifacts: need(&self.artifacts, "artifacts")?,
-            costs: need(&self.costs, "cost-meter")?,
+            costs,
+            chat,
             _compliance: need(&self.compliance, "compliance")?,
             personas,
             work,
@@ -332,7 +351,7 @@ impl Built {
             agents: ports.agents,
             shell,
             events: kernel.events,
-            store: AppStore::new(provider),
+            store,
             settings: kernel.settings,
             runtime: Mutex::new(Runtime {
                 online: true,
@@ -344,6 +363,8 @@ impl Built {
         let core = AppCore {
             inner: Arc::new(inner),
         };
+        let host = crate::chat_host::CoreChatHost::new(&core);
+        core.inner.chat.bind_host(Arc::new(host));
         stack.binder.bind(&core);
         Ok(core)
     }

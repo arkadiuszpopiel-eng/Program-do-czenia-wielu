@@ -58,6 +58,8 @@ pub struct ToolsDeps {
     pub extra: Vec<Arc<dyn Tool>>,
     /// Word/Excel, przeglądarka i wtyczki (`None` — bez tych narzędzi).
     pub apps: Option<AppsDeps>,
+    /// Zestaw multimediów (te same narzędzia co w `extra`) — kill-switch zatrzymuje odtwarzanie.
+    pub media: Option<tools_media_impl::MediaTools>,
 }
 
 /// Narzędzia agentek (współdzielone przez wszystkie przebiegi).
@@ -68,6 +70,7 @@ pub struct AgentTools {
     browser: Option<BrowserTools>,
     plugins: Option<Arc<PluginsApp>>,
     system: Option<tools_system_impl::SystemTools>,
+    media: Option<tools_media_impl::MediaTools>,
 }
 
 impl std::fmt::Debug for AgentTools {
@@ -136,6 +139,7 @@ impl AgentTools {
             browser,
             plugins,
             system,
+            media: deps.media,
         }
     }
 
@@ -174,10 +178,16 @@ impl AgentTools {
         })
     }
 
-    /// Kill-switch: zamyka wszystkie przeglądarki agentek (zgody hostów wygasają). Zwraca liczbę
-    /// zamkniętych sesji przeglądarki.
+    /// Kill-switch: zamyka wszystkie przeglądarki agentek (zgody hostów wygasają) i zatrzymuje
+    /// odtwarzanie multimediów (`media_play`). Zwraca liczbę zamkniętych sesji przeglądarki
+    /// i zatrzymanych odtworzeń.
     pub fn kill_switch(&self) -> usize {
-        self.browser.as_ref().map_or(0, BrowserTools::close_all)
+        let browsers = self.browser.as_ref().map_or(0, BrowserTools::close_all);
+        let playing = self
+            .media
+            .as_ref()
+            .map_or(0, tools_media_impl::MediaTools::stop_all);
+        browsers + playing
     }
 
     /// Narzędzia, które przysługują agentce o tych rolach (grupy narzędzi ról; rola tylko do

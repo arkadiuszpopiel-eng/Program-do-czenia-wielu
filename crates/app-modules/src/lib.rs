@@ -20,6 +20,7 @@
 pub mod broker;
 pub mod catalog;
 pub mod embedder;
+pub mod handles;
 pub mod late;
 pub mod probe;
 pub mod route;

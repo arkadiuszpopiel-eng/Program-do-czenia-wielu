@@ -156,7 +156,7 @@ impl AppCore {
     pub async fn sessions_remove(&self, session_id: String) -> Result<UndoTicket, AppError> {
         let id = ids::session(&session_id)?;
         let _guard = self.lock_session(&id).await;
-        self.finalize_generation(&id).await;
+        self.chat().finalize_generation(&id).await;
         self.inner.sessions.trash_session(&id)?;
         self.emit(AlfaEvent::SessionRemoved {
             session_id: id.to_string(),

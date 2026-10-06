@@ -12,6 +12,18 @@ use voice_audio_contract::{Resampler, SUPPORTED_RATES, downmix};
 
 use crate::core::{Core, Step, blocking, invalid, platform_failure};
 
+/// Najniższa częstotliwość próbkowania przyjmowana do odtwarzania (Hz) — niższe to nagłówek
+/// zmyślony: resampling do 48 kHz mnożyłby liczbę próbek do ×1000 (pamięć, CPU).
+pub(crate) const MIN_PLAY_RATE: u32 = 8_000;
+/// Najwyższa częstotliwość próbkowania przyjmowana do odtwarzania (Hz).
+pub(crate) const MAX_PLAY_RATE: u32 = 384_000;
+
+/// Czas trwania z faktycznie zdekodowanych próbek (ms) — nie z pól nagłówka (`byte_rate`).
+pub(crate) fn decoded_ms(samples: usize, channels: u16, rate: u32) -> u64 {
+    let frames = samples as u64 / u64::from(channels.max(1));
+    frames.saturating_mul(1_000) / u64::from(rate.max(1))
+}
+
 /// Klip mono w częstotliwości z listy miksera (inne → 48 kHz).
 pub(crate) fn to_clip(
     pcm: &[f32],
@@ -102,17 +114,33 @@ impl Core {
         let wav = self.wav_bytes(&path, ctx, action).await;
         self.gate.release(&auths).await;
         let (bytes, converted) = wav?;
-        let (pcm, format) =
-            decode_wav(&bytes).map_err(|e| invalid(format!("nieczytelny WAV ({e})")))?;
         let agent = ctx.holder.agent.as_ref().map_or("alfa", |a| a.as_str());
         let label = Path::new(&path)
             .file_name()
             .map(|n| n.to_string_lossy().into_owned())
             .unwrap_or_default();
-        let clip = to_clip(&pcm, format.channels, format.sample_rate, agent, &label);
-        if clip.duration_ms() > self.config.max_play_ms {
-            return Err(invalid("nagranie dłuższe niż limit odtwarzania"));
-        }
+        // Dekodowanie i resampling poza wątkiem asynchronicznym; częstotliwość i czas trwania
+        // sprawdzane na zdekodowanych próbkach PRZED resamplingiem (nagłówek WAV jest niezaufany).
+        let (max_ms, owner, name) = (self.config.max_play_ms, agent.to_owned(), label.clone());
+        let clip = blocking(move || {
+            let (pcm, format) =
+                decode_wav(&bytes).map_err(|e| invalid(format!("nieczytelny WAV ({e})")))?;
+            if !(MIN_PLAY_RATE..=MAX_PLAY_RATE).contains(&format.sample_rate) {
+                return Err(invalid(format!(
+                    "częstotliwość próbkowania {} Hz poza zakresem {MIN_PLAY_RATE}–{MAX_PLAY_RATE} Hz",
+                    format.sample_rate
+                )));
+            }
+            if decoded_ms(pcm.len(), format.channels, format.sample_rate) > max_ms {
+                return Err(invalid("nagranie dłuższe niż limit odtwarzania"));
+            }
+            let clip = to_clip(&pcm, format.channels, format.sample_rate, &owner, &name);
+            if clip.duration_ms() > max_ms {
+                return Err(invalid("nagranie dłuższe niż limit odtwarzania"));
+            }
+            Ok(clip)
+        })
+        .await??;
         if ctx.cancel.is_cancelled() {
             return Ok(ToolOutcome::cancelled(action));
         }

@@ -1,23 +1,24 @@
 //! Zakończenie generacji: zapis tury agentki (append-only; odpowiedź, która nie powstała, jest
-//! zapisywana jako komunikat systemowy), koszt w `cost-meter`, fakty `app-core`, oś czasu,
-//! zdarzenia końcowe i stan systemu (offline / 429).
+//! zapisywana jako komunikat systemowy), koszt w `cost-meter`, fakty tury, oś czasu,
+//! zdarzenia końcowe i stan systemu (offline / 429 — przez rdzeń).
 
 use accounts_hub_contract::{AccountId, ModelId, ProviderId};
 use core_bus_contract::Cost;
-use cost_meter_contract::{CostInput, CostMeter, Pricing, Usage as CostUsage};
+use cost_meter_contract::{CostInput, Pricing, Usage as CostUsage};
 use sessions_contract::{
     AgentId, Author, ModelUsage, NewTurn, Role, SessionHistory, Turn, TurnContent,
 };
 
-use super::stream::Outcome;
-use super::{GenRequest, Placement};
-use crate::core::{AppCore, GenHandle};
-use crate::dto::{
-    self, AlfaEvent, EventLevel, Money, TimelineEvent, TimelineKind, TurnErrorCode, TurnStatus,
-    TurnUsage,
+use app_api::AppError;
+use app_api::dto::{
+    self, AlfaEvent, EventLevel, Money, TimelineEvent, TimelineKind, TurnStatus, TurnUsage,
 };
-use crate::ids;
+use app_api::ids;
 use app_store::TurnMeta;
+
+use crate::engine::{ChatEngine, GenHandle};
+use crate::generate::{GenRequest, Placement};
+use crate::outcome::Outcome;
 
 /// Tekst tury-komunikatu, gdy odpowiedź nie powstała.
 const NO_ANSWER: &str = "Odpowiedź przerwana przed pierwszym słowem.";
@@ -63,8 +64,8 @@ fn new_turn(req: &GenRequest, outcome: &Outcome) -> NewTurn {
     }
 }
 
-impl AppCore {
-    fn persist_turn(&self, req: &GenRequest, outcome: &Outcome) -> Result<Turn, crate::AppError> {
+impl ChatEngine {
+    fn persist_turn(&self, req: &GenRequest, outcome: &Outcome) -> Result<Turn, AppError> {
         let turn = new_turn(req, outcome);
         match req.placement {
             Placement::Child(parent) => self.append_child(&req.session, Some(parent), turn),
@@ -220,47 +221,18 @@ impl AppCore {
                 rt.gens.remove(&req.session);
             }
         }
-        self.update_connectivity(&outcome).await;
+        if let Some(host) = self.host() {
+            let answered = outcome.chosen.is_some() && outcome.status != TurnStatus::Error;
+            host.connectivity(outcome.error.as_ref(), answered).await;
+        }
         self.emit(AlfaEvent::ActivityChanged {
-            session_id: sid.clone(),
+            session_id: sid,
             activity: None,
         });
         self.announce_agents(&req.session);
         self.announce_session(&req.session).await;
-        let costs = self.cost_summary(Some(&req.session)).await;
-        self.emit(AlfaEvent::CostsChanged {
-            session_id: sid,
-            costs,
-        });
-    }
-
-    /// Offline / 429 z wyniku → stan systemu (zdarzenie tylko przy zmianie).
-    async fn update_connectivity(&self, outcome: &Outcome) {
-        let changed = {
-            let mut rt = self.rt();
-            let before = (rt.online, rt.rate_limit.clone());
-            match outcome.error.as_ref().map(|e| e.code) {
-                Some(TurnErrorCode::Offline) => rt.online = false,
-                Some(TurnErrorCode::RateLimited) => {
-                    let e = outcome.error.as_ref();
-                    let at = e
-                        .and_then(|e| e.retry_at.as_deref())
-                        .and_then(|t| chrono::DateTime::parse_from_rfc3339(t).ok())
-                        .map(|t| t.with_timezone(&chrono::Utc));
-                    let provider = e.and_then(|e| e.provider.clone()).unwrap_or_default();
-                    rt.rate_limit = at.map(|at| (provider, at));
-                }
-                _ if outcome.chosen.is_some() && outcome.status != TurnStatus::Error => {
-                    rt.online = true;
-                    rt.rate_limit = None;
-                }
-                _ => {}
-            }
-            before != (rt.online, rt.rate_limit.clone())
-        };
-        if changed {
-            let status = self.status_snapshot().await;
-            self.emit(AlfaEvent::SystemStatusChanged { status });
+        if let Some(host) = self.host() {
+            host.costs_changed(&req.session).await;
         }
     }
 }
