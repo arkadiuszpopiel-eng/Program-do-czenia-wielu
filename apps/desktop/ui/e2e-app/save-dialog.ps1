@@ -72,6 +72,27 @@ function Invoke-Button($Dialog, [string]$Id) {
     return $false
 }
 
+function Write-Tree($Root) {
+    # Diagnostyka: pierwsze elementy drzewa okna (typ, AutomationId, nazwa, klasa).
+    $all = $Root.FindAll($Scope::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
+    $n = 0
+    foreach ($el in $all) {
+        if ($n -ge 60) { break }
+        Write-Output ("  el: {0} id={1} nazwa={2} klasa={3}" -f $el.Current.ControlType.ProgrammaticName, $el.Current.AutomationId, $el.Current.Name, $el.Current.ClassName)
+        $n++
+    }
+}
+
+function Find-NameEdit($Dialog) {
+    # Pole edycji „Nazwa pliku” / „File name” (także w ComboBox), inaczej jedyne pole edycji okna.
+    $edits = @($Dialog.FindAll($Scope::Descendants, (New-Property $AE::ControlTypeProperty $ControlType::Edit)))
+    foreach ($e in $edits) {
+        if ($e.Current.Name -match '^(File name|Nazwa pliku)') { return $e }
+    }
+    if ($edits.Count -eq 1) { return $edits[0] }
+    return $null
+}
+
 function Wait-Until([scriptblock]$Probe, [int]$Seconds) {
     $deadline = (Get-Date).AddSeconds($Seconds)
     do {
@@ -109,11 +130,32 @@ try {
             (New-Property $AE::AutomationIdProperty '1001'),
             (New-Property $AE::ControlTypeProperty $ControlType::Edit)))
     $edit = Wait-Until { $dialog.FindFirst($Scope::Descendants, $nameField) } 10
-    if ($null -eq $edit) { throw 'Brak pola nazwy pliku (AutomationId 1001).' }
-    $edit.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($Path)
-    Write-Output "Wpisano ścieżkę: $Path"
-    if (-not (Invoke-Button $dialog '1')) { throw 'Brak przycisku „Zapisz” (AutomationId 1).' }
-    Write-Output 'Naciśnięto „Zapisz”.'
+    if ($null -eq $edit) {
+        # Okno zapisu w innych wydaniach Windows (np. Server na runnerze) ma inne drzewo UIA:
+        # pole po nazwie albo jedyne pole edycji; diagnostyka — drzewo okna w logu.
+        Write-Output 'Brak pola o AutomationId 1001 — szukam pola edycji po nazwie.'
+        Write-Tree $dialog
+        $edit = Find-NameEdit $dialog
+    }
+    if ($null -ne $edit) {
+        $edit.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($Path)
+        Write-Output "Wpisano ścieżkę: $Path"
+        if (-not (Invoke-Button $dialog '1')) { throw 'Brak przycisku „Zapisz” (AutomationId 1).' }
+        Write-Output 'Naciśnięto „Zapisz”.'
+    } else {
+        # Ostatnia deska: klawiatura (sesja interaktywna runnera) — Alt+N to pole „Nazwa pliku”.
+        Write-Output 'Brak pola edycji w UIA — wpisuję z klawiatury (Alt+N, ścieżka, Enter).'
+        Add-Type -AssemblyName System.Windows.Forms
+        $dialog.SetFocus()
+        Start-Sleep -Milliseconds 300
+        $escaped = $Path -replace '([+^%~(){}\[\]])', '{$1}'
+        [System.Windows.Forms.SendKeys]::SendWait('%n')
+        Start-Sleep -Milliseconds 200
+        [System.Windows.Forms.SendKeys]::SendWait($escaped)
+        Start-Sleep -Milliseconds 200
+        [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+        Write-Output "Wpisano ścieżkę z klawiatury: $Path"
+    }
 
     $closed = Wait-Until { if ($null -eq (Find-Dialog)) { $true } else { $null } } 15
     if ($null -eq $closed) {

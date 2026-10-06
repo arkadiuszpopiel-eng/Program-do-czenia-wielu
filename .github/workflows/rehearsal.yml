@@ -19,6 +19,10 @@ on:
       - "crates/app-modules/src/tts.rs"
       - "scripts/setup-dev.ps1"
       - ".github/workflows/rehearsal.yml"
+      # Job `app-e2e` (prawdziwa aplikacja przez CDP) pilnuje też zmian aplikacji i UI.
+      - "apps/desktop/**"
+      - "packages/ui-kit/**"
+      - "crates/app-*/**"
 
 permissions:
   contents: read
