@@ -112,7 +112,8 @@ impl TargetGuard {
             };
             return Err(GuiError::ProtectedTarget(format!(
                 "{what}: okno powiązane z procesem {shown} (PID {}) — okno Alfy (np. wyskakujące \
-                 WebView2), Brokera albo proces nieznany; agentka nie steruje nim ani go nie odczytuje",
+                 WebView2), Brokera, menedżera haseł albo proces nieznany; agentka nie steruje nim \
+                 ani go nie odczytuje",
                 l.pid
             )));
         }

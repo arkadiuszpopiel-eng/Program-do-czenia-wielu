@@ -68,3 +68,11 @@ Kroki w wątku/Replay; „Przejmij / Pauza / Stop” w panelu „Ekran” (F6-08
 
 ## Przegląd bezpieczeństwa #3 (2026-10, `docs/reviews/2026-10-security-review-3.md`)
 - **SR3-04 (zrobione):** powłoka Tauri rejestruje skróty Alfy przez `tauri-plugin-global-shortcut` (`RegisterHotKey` bez filtra pochodzenia z P2-04), więc `input_keys` agentki uruchamiał `Ctrl+Alt+D` (dyktowanie z mikrofonu do okna, które agentka potem czyta), `Ctrl+Alt+R` i `Ctrl+Alt+Space`. `KeyChord::system_scope` odmawia tych skrótów (stała lista skrótów powłoki). **P3-03:** skróty powłoki przez `HotkeyPort` z hookiem LL (pochodzenie wejścia) — wtedy także `SendKeys` z powłoki; lista w `system_scope` musi iść za konfiguracją skrótów.
+
+## Fala 5 (2026-10)
+- **PT-25 (zrobione w strażniku celów `platform-contract`):** wpisywanie, skróty i kliknięcia w oknach menedżerów haseł
+  (KeePass, KeePassXC, 1Password, Bitwarden, Dashlane, Enpass) i okna poświadczeń Windows (`CredentialUIBroker.exe`)
+  → `KernelBlock`, zero zdarzeń wejścia; kliknięcie w punkt okna zwykłego zasłonięty takim oknem — odmowa. Dotąd te
+  aplikacje były tylko maskowane na zrzutach. Test: `tests/wave5.rs::input_never_reaches_password_managers`.
+  Druga warstwa w Brokerze (`gui.control` → `CredentialDenylist`) — propozycja dla Jądra, test `#[ignore]`
+  w `safety-broker-contract/tests/wave5_proposals.rs`.

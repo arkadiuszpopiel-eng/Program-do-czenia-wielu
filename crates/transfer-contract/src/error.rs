@@ -50,6 +50,18 @@ pub enum TransferError {
         /// Najwyższa obsługiwana wersja.
         supported: String,
     },
+    /// Paczka ze starszym „major” schematu, dla którego ta wersja nie ma upcastera (fala 5, m-06)
+    /// — to **nie** jest paczka z nowszej Alfy, więc komunikat nie radzi aktualizacji.
+    #[error(
+        "paczka ma schemat {found}, starszy niż najstarszy obsługiwany ({oldest}) — ta wersja Alfy \
+         nie ma dla niego migracji (to nie jest paczka z nowszej wersji)"
+    )]
+    OlderSchema {
+        /// Wersja schematu paczki.
+        found: String,
+        /// Najstarsza wersja przyjmowana (bezpośrednio albo łańcuchem upcasterów).
+        oldest: String,
+    },
     /// Paczka zaszyfrowana, a nie podano hasła.
     #[error("paczka jest zaszyfrowana — podaj hasło")]
     PasswordRequired,

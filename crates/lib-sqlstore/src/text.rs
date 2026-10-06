@@ -33,6 +33,9 @@ pub fn fold_char(c: char) -> char {
         }
     });
     match base {
+        // Litera bazowa przechodzi jeszcze przez wyjątki (`Ǿ` → `Ø` → `O`); rozkład jest krótszy
+        // od znaku, więc rekursja kończy się po jednym kroku.
+        Some(b) if only_marks_after_base && !is_combining_mark(b) && b != c => fold_char(b),
         Some(b) if only_marks_after_base && !is_combining_mark(b) => b,
         _ => c,
     }
@@ -130,6 +133,14 @@ mod tests {
         assert_eq!(fold_pl("éèüñçšžő"), "eeuncszo");
         assert_eq!(fold_pl("Ωμέγα"), "Ωμεγα");
         assert_eq!(fold_pl("日本"), "日本");
+    }
+
+    #[test]
+    fn decomposed_base_goes_through_special_cases() {
+        // Fala 5 (regresja z `tests/fold_props.rs`): `Ǿ` = `Ø` + akcent → `O`, nie `Ø` — inaczej
+        // składanie nie jest idempotentne (`fold(fold(x)) ≠ fold(x)`).
+        assert_eq!(fold_pl("Ǿǿ"), "Oo");
+        assert_eq!(fold_pl(&fold_pl("Ǿǿ")), fold_pl("Ǿǿ"));
     }
 
     #[test]

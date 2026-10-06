@@ -4,7 +4,9 @@
 //! - [`DbKey`] — klucz surowy 32 B (zerowany przy `drop`), podawany SQLCipher jako `x'…'` bez KDF;
 //! - [`Db`] / [`open_connection`] — otwarcie szyfrowanej bazy (`cipher_log_level = NONE`, WAL,
 //!   `foreign_keys`), z rejestracją sqlite-vec przez `sqlite3_auto_extension` (jedno `unsafe`);
-//! - [`migrate`] — prosty runner migracji (tabela `schema_migrations`, przestrzenie nazw modułów);
+//! - [`migrate`] / [`migrate_with`] — prosty runner migracji (tabela `schema_migrations`, przestrzenie
+//!   nazw modułów; baza z nowszej wersji programu → tylko odczyt albo praca normalna, gdy nowsze
+//!   migracje są addytywne — `schema_compat`, fala 5);
 //! - [`remove_database`] — usunięcie pliku bazy razem z `-wal`/`-shm`/`-journal` (crypto-shredding);
 //! - [`fold_pl`], [`search_tokens`], [`fts5_match`] — normalizacja tekstu PL do FTS5
 //!   („zolc” znajduje „żółć”);
@@ -23,7 +25,7 @@ mod vector;
 pub use error::StoreError;
 pub use files::{database_files, remove_database};
 pub use key::DbKey;
-pub use migrate::{MigrationReport, migrate};
+pub use migrate::{MigrationReport, migrate, migrate_with};
 pub use open::{Db, open_connection, register_sqlite_vec};
 pub use text::{Token, fold_char, fold_pl, fts5_match, search_tokens, tokenize};
 pub use vector::{blob_to_vector, vector_to_blob};

@@ -19,8 +19,13 @@ use crate::window::WindowId;
 pub const UIA_CALL_TIMEOUT_MS: u64 = 5_000;
 /// Domyślny limit odczytu całego drzewa (ms).
 pub const UIA_TREE_TIMEOUT_MS: u64 = 15_000;
-/// Drzewo o tylu węzłach albo mniej uznajemy za „ubogie” (Electron/DirectX/Java) → trasa wizji (§7.1).
+/// Drzewo o tylu węzłach **obszaru klienta** albo mniej uznajemy za „ubogie” (Electron/DirectX/
+/// Java, płótno) → trasa wizji (§7.1). Rama okna się nie liczy ([`UiaTree::client_nodes`]).
 pub const SPARSE_TREE_NODES: usize = 5;
+/// Rola paska tytułu (`UIA_TitleBarControlTypeId`) — poddrzewo to rama okna.
+const TITLE_BAR_ROLE: &str = "title_bar";
+/// `AutomationId` systemowego paska menu okna (ikona/menu okna Win32) — rama okna.
+const SYSTEM_MENU_BAR_ID: &str = "SystemMenuBar";
 /// Maksymalna długość wartości w `SetValue` (znaki).
 pub const MAX_SET_VALUE_CHARS: usize = 10_000;
 /// Maksymalna długość identyfikatora wykonania elementu.
@@ -211,9 +216,35 @@ pub struct UiaTree {
 }
 
 impl UiaTree {
-    /// Drzewo „ubogie” — trasa UIA nie wystarczy, przełącz na wizję (§7.1, F6-03).
+    /// Liczba węzłów obszaru klienta: bez węzła samego okna (`depth` 0), bez paska tytułu
+    /// (`title_bar`) i systemowego paska menu (`SystemMenuBar`) wraz z ich potomkami (fala 5,
+    /// F6-03: rama z przyciskami ma zwykle ≥ 6 węzłów i maskowała puste okna).
+    pub fn client_nodes(&self) -> usize {
+        let mut frame_depth: Option<u16> = None;
+        let mut count = 0;
+        for n in &self.nodes {
+            if frame_depth.is_some_and(|d| n.depth > d) {
+                continue;
+            }
+            frame_depth = None;
+            let frame = n.depth == 0
+                || n.role == TITLE_BAR_ROLE
+                || n.automation_id.eq_ignore_ascii_case(SYSTEM_MENU_BAR_ID);
+            if frame {
+                if n.depth > 0 {
+                    frame_depth = Some(n.depth);
+                }
+            } else {
+                count += 1;
+            }
+        }
+        count
+    }
+
+    /// Drzewo „ubogie” — trasa UIA nie wystarczy, przełącz na wizję (§7.1, F6-03): co najwyżej
+    /// [`SPARSE_TREE_NODES`] węzłów obszaru klienta ([`UiaTree::client_nodes`]).
     pub fn is_sparse(&self) -> bool {
-        self.nodes.len() <= SPARSE_TREE_NODES
+        self.client_nodes() <= SPARSE_TREE_NODES
     }
 }
 

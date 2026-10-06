@@ -24,7 +24,15 @@ pub const TURN_COLUMNS: &str = "t.id, t.parent_id, t.branch_id, t.body, h.chars,
 /// Złączenia potrzebne dla [`TURN_COLUMNS`].
 pub const TURN_JOINS: &str = "LEFT JOIN turn_heard h ON h.turn_id = t.id";
 
+/// Błąd SQLite → błąd magazynu. Zapis do bazy tylko do odczytu (baza z nowszej wersji Alfy po
+/// powrocie do starszej — `lib_sqlstore::migrate`, fala 5, ADR 0007) → czytelny komunikat.
 pub fn db_err(e: rusqlite::Error) -> SessionError {
+    if e.sqlite_error_code() == Some(rusqlite::ErrorCode::ReadOnly) {
+        return SessionError::storage(
+            "baza sesji pochodzi z nowszej wersji Alfy i jest tylko do odczytu — zaktualizuj Alfę, \
+             żeby pisać dalej",
+        );
+    }
     SessionError::storage(e)
 }
 

@@ -10,8 +10,12 @@ spike'u (i) i ADR 0008 w jednym miejscu:
   `journal_mode = WAL`, `synchronous = NORMAL`, `foreign_keys = ON`, `busy_timeout = 5 s`. `Db` = jedno
   połączenie za muteksem (współdzielone przez moduły przez `Arc<Db>`).
 - `migrate(conn, namespace, &[(wersja, sql)])` — tabela `schema_migrations(namespace, version)`, każda
-  migracja w SAVEPOINT (działa także w otwartej transakcji), wykrywa bazę nowszą od kodu i migracje
-  wstawione „w środek”.
+  migracja w SAVEPOINT (działa także w otwartej transakcji), wykrywa migracje wstawione „w środek” i luki
+  w historii. **Baza z nowszej wersji programu** (rollback, ADR 0007; fala 5, m-23): nieznane migracje nowsze od
+  każdej znanej → `Ok` bez zmian (`MigrationReport::newer`), połączenie w `PRAGMA query_only`
+  (`read_only`), chyba że nowsza wersja oznaczyła je jako addytywne — `migrate_with(.., additive)` zapisuje je
+  w `schema_compat`. Oczekująca migracja na połączeniu tylko do odczytu → `StoreError::ReadOnly`. Zasady
+  migracji addytywnych: `docs/modules/sessions/SPEC.md` („Fala 5”).
 - `remove_database` — plik + `-wal`/`-shm`/`-journal`, idempotentnie (crypto-shredding = plik + klucz).
 - `fold_pl` / `tokenize` / `search_tokens` / `fts5_match` — normalizacja PL do FTS5: `ł→l`, `Ł→L`,
   diakrytyki przez NFD (`unicode-normalization`), znak→znak (pozycje podświetleń zachowane);
@@ -22,4 +26,4 @@ spike'u (i) i ADR 0008 w jednym miejscu:
 na funkcji rejestrującej sqlite-vec (`src/open.rs`, transmute wskaźnika `sqlite3_vec_init` jak w spike'u i).
 
 Testy: `tests/sqlstore.rs` (szyfrowanie, zły klucz, WAL/FK, sqlite-vec + FTS5 z `fold_pl`, migracje, usuwanie
-plików), `tests/fold_props.rs` (property-based: długość, idempotencja, ASCII dla PL, zakresy słów).
+plików), `tests/rollback.rs` (baza z nowszej wersji: tylko odczyt / addytywne / luka), `tests/fold_props.rs` (property-based: długość, idempotencja, ASCII dla PL, zakresy słów).

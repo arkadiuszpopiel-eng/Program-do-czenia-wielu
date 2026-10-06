@@ -108,7 +108,10 @@ Import nakładki maszyny (`config.machine`) tylko na wyraźne życzenie i tylko 
 ## 7. Wersjonowanie i zgodność
 
 - `schema_version` paczki jest niezależna od wersji aplikacji; zmiana łamiąca = major.
-- Alfa importuje paczki o wersji ≤ własnej (upcastery) i odmawia nowszych (bez downcastu).
+- Alfa importuje paczki o wersji ≤ własnej (upcastery) i odmawia nowszych (bez downcastu). Starsze „major” bez
+  upcastera (np. `0.x` — nigdy niewydane; v0 to `format: 0`) → czytelna odmowa `older_schema` („starszy niż
+  najstarszy obsługiwany”), nie „zaktualizuj Alfę”; wersja jest sprawdzana przed odczytem struktury manifestu
+  (`transfer_contract::check_schema_version`, `OLDEST_SCHEMA_VERSION`; fala 5, m-06).
 - Każdy rekord w `turns.ndjson` (i nagłówek `session.json`) niesie własną wersję (`v`) — paczka może mieszać wersje; upcastery v0 → v1 (`transfer_contract::migrate`: manifest `{ format: 0, files[] }`, nagłówek `{ v: 0, id, title, created }`, tura `{ v: 0, id, parent, role, text, ts }` bez gałęzi — gałęzie liczone regułami `TreeCursor`).
 - Zestaw fixture'ów `evals/transfer/` po jednej paczce na każdą wydaną wersję schematu; CI: import każdej z nich + round-trip eksport → import → porównanie.
 

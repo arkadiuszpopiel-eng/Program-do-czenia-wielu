@@ -71,12 +71,12 @@ odrzucane).
 | 39  | Total Commander (`TOTALCMD64.EXE`)                                           | Delphi VCL                | parametry CLI                                                            | Częściowe        | wizja + wejście                     | UIA (menu)                          | listy plików to kontrolki własne                                                               | —                   |
 | 40  | Gry i aplikacje pełnoekranowe (DirectX, Steam)                               | DirectX, CEF              | —                                                                        | Puste            | — (poza zakresem)                   | —                                   | wyłączny pełny ekran → czarne klatki; tryb gry wstrzymuje tło                                  | —                   |
 | 41  | Pulpit zdalny, Citrix (`mstsc.exe`, `wfica32.exe`)                           | bitmapa sesji zdalnej     | —                                                                        | Puste            | wizja + wejście tylko za zgodą      | —                                   | wejście trafia do **innego** systemu — proponowana odmowa domyślna (do decyzji)                | —                   |
-| 42  | Menedżery haseł (KeePass, KeePassXC, 1Password, Bitwarden, Dashlane, Enpass) | różne                     | —                                                                        | Zablokowane¹     | —                                   | —                                   | maskowane w zrzutach i OCR (`DEFAULT_MASKED_APPS`); **UIA i wejście nieblokowane** — zob. §4.3 | —                   |
+| 42  | Menedżery haseł (KeePass, KeePassXC, 1Password, Bitwarden, Dashlane, Enpass) | różne                     | —                                                                        | Zablokowane¹     | —                                   | —                                   | maskowane w zrzutach i OCR; UIA, wejście i okna chronione (`SENSITIVE_APPS`, fala 5), §4.3     | —                   |
 | 43  | Aplikacje dostawców planów (`claude.exe`, `chatgpt.exe`, `codex.exe`…)       | Electron                  | —                                                                        | Zablokowane      | —                                   | —                                   | `PROVIDER_APPS` → `KernelRule::ProviderWebUi` (SR-09), maskowanie zrzutów (S16)                | pr-11 (domeny)      |
 | 44  | Okna Alfy, Broker-UI, watchdog, helper                                       | WebView2, Win32           | —                                                                        | Zablokowane      | —                                   | —                                   | strażnik celów (drzewo procesów, `GA_ROOT`/`GA_ROOTOWNER`, UWP — P2-01), F6-06                 | ap-12, us-12        |
 | 45  | UAC (`consent.exe`), ekran blokady, Windows Hello                            | bezpieczny pulpit         | —                                                                        | Zablokowane      | —                                   | —                                   | nieautomatyzowalne z założenia (PLAN §7.3); `CredentialUIBroker` maskowany                     | —                   |
 
-¹ Zablokowane tylko dla zrzutów i OCR; patrz §4.3.
+¹ (Fala 5: przypis nieaktualny — blokada obejmuje też UIA, wejście i operacje na oknach; patrz §4.3.)
 
 ## 3. Arkusz pomiaru (spike c) — wypełnia wykonawczyni pomiaru
 
@@ -101,6 +101,10 @@ nie gdy model przełączył się z własnej inicjatywy.
 
 ### 4.1 Próg „ubogiego” drzewa łapie tylko okna bez ramy
 
+**Fala 5 — zrobione:** `UiaTree::client_nodes()` pomija węzeł okna, poddrzewo `TitleBar` i `SystemMenuBar`;
+`sparse` = co najwyżej `SPARSE_TREE_NODES` (5) węzłów klienta (próg bez zmian — rozstrzygnie pomiar §3). Testy:
+`platform-fake/tests/wave5.rs`, `tools-uia-impl/tests/wave5.rs`. Opis pierwotny:
+
 `platform-contract::UiaTree::is_sparse` = `nodes.len() <= SPARSE_TREE_NODES` (5), a drzewo z
 `platform-windows-gui-impl` (`ControlViewWalker`) zawiera węzeł okna i pasek tytułu z przyciskami (zwykle ≥ 6
 węzłów). Okno, którego obszar klienta jest jedną nieprzezroczystą płaszczyzną (płótno, GTK, Java bez Access
@@ -117,6 +121,11 @@ kolejne pełne. Runner F6 i agentka powinni ponowić odczyt raz po ~500 ms przed
 podpowiedź narzędzia po pomiarze).
 
 ### 4.3 Menedżery haseł: maskowane w zrzutach, ale nie chronione przed UIA i wejściem
+
+**Fala 5 — zrobione:** `platform_contract::SENSITIVE_APPS` (te same aplikacje co `DEFAULT_MASKED_APPS`) w
+`TargetGuard::is_protected` — UIA, wejście i operacje na oknach odmawiają (`platform-fake/tests/wave5.rs`,
+`tools-uia-impl/tests/wave5.rs`, `tools-input-impl/tests/wave5.rs`); reguła Brokera — propozycja `#[ignore]`.
+Opis pierwotny:
 
 `DEFAULT_MASKED_APPS` działa w `ScreenCapturePort` (zrzuty, OCR, opis obrazu), a strażnik celów aplikacji
 (`app-gui::alfa_guard` = `TargetGuard::baseline()` + drzewo Alfy) ich nie obejmuje. `uia_tree`/`uia_read_text` na

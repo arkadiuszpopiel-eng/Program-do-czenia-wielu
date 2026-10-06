@@ -129,9 +129,9 @@ fn migration_errors() {
     let dir = tempfile::tempdir().unwrap();
     let conn = open_connection(&dir.path().join("e.db"), &DbKey::generate().unwrap()).unwrap();
     migrate(&conn, "m", STEPS_V1).unwrap();
-    // Baza nowsza niż kod.
+    // Wersja nieznana kodowi „w środku” historii (baza nowsza niż kod → `tests/rollback.rs`).
     assert!(matches!(
-        migrate(&conn, "m", &STEPS_V1[..1]),
+        migrate(&conn, "m", &[("0000", "SELECT 1;"), STEPS_V1[1]]),
         Err(StoreError::UnknownMigration { .. })
     ));
     // Kolejność i duplikaty.

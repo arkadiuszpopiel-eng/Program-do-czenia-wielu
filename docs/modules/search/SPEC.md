@@ -139,3 +139,9 @@ FTS zapytanie ≤ 30 ms na 100k tur; wyniki palety ≤ 16 ms/znak (z `ui-shell`)
   i `spawn_reindex` (pełny przebieg najwyżej raz na 7 dni dla tego samego embeddera) dla baz sesji + baz zakresów pamięci (`ScopeSource`: `ScopeDbs::known()` bez zakresów sesji,
   etykieta `index_label`); komendy `embed_model_activate`, `search_reindex_start/cancel/status`, zdarzenie UI
   `ReindexStatus` (liczniki). `app-modules::LateIndexer` przekazuje `compact_in`, `vector_status_in`, `reindex_step`.
+
+## Fala 5
+- Uwaga o `search` 0002 i wersjach obok siebie (powyżej) — rozwiązana w `lib_sqlstore::migrate` (m-23): starsza wersja
+  otwiera bazę z nieznaną nowszą migracją bez zmian, w trybie tylko do odczytu (albo normalnie, gdy migracja jest
+  oznaczona jako addytywna przez `migrate_with`). Zasady migracji addytywnych: `docs/modules/sessions/SPEC.md`
+  („Fala 5”). `search-impl` bez zmian; `sessions-impl` toleruje błąd `prepare` indeksu na bazie tylko do odczytu.

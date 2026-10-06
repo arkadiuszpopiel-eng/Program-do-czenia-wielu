@@ -29,8 +29,9 @@ pub enum StoreError {
         /// Opis problemu.
         reason: String,
     },
-    /// Baza zawiera migrację nieznaną kodowi (baza nowsza niż program).
-    #[error("baza ma nieznaną migrację `{namespace}/{version}` (nowsza wersja programu?)")]
+    /// Baza zawiera migrację nieznaną kodowi, a nie nowszą od znanych (luka albo rozwidlenie
+    /// historii migracji). Bazę z nowszej wersji programu `migrate` przyjmuje bez zmian.
+    #[error("baza ma nieznaną migrację `{namespace}/{version}` spoza historii tej wersji programu")]
     UnknownMigration {
         /// Przestrzeń nazw.
         namespace: String,
@@ -46,6 +47,18 @@ pub enum StoreError {
         version: String,
         /// Najnowsza zastosowana wersja.
         applied: String,
+    },
+    /// Połączenie jest tylko do odczytu (baza z nowszej wersji programu), a przestrzeń nazw
+    /// wymaga migracji — nic nie zapisano.
+    #[error(
+        "baza z nowszej wersji Alfy jest tylko do odczytu — nie można zastosować migracji \
+         `{namespace}/{version}` (zaktualizuj Alfę)"
+    )]
+    ReadOnly {
+        /// Przestrzeń nazw.
+        namespace: String,
+        /// Wersja, której nie zastosowano.
+        version: String,
     },
     /// Migracja nie powiodła się (wycofana w całości).
     #[error("migracja `{namespace}/{version}` nie powiodła się: {source}")]

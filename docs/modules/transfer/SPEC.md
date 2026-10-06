@@ -121,3 +121,16 @@ Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różni
   Każde użycie zużywa uchwyt; złe hasło → `needs_password` z nowym uchwytem; `transfer_import(request.handle)`.
   Testy: `app-core/tests/transfer.rs` (ścieżka z UI odrzucona, uchwyt jednorazowy, „Przywróć…”), `app-modules`
   `handles::tests`, UI `fake-transfer.test.ts`, E2E `files.spec.ts`.
+
+## Fala 5 — starsze „major” schematu paczki (m-06)
+- Manifest `schema_version` 0.x był odrzucany jako „nowszy” z radą „zaktualizuj Alfę” (warunek `major !=`). Teraz
+  `check_schema_version` (wołane w `upcast_manifest` **przed** odczytem struktury i w `Manifest::validate`): nowsza niż
+  `SCHEMA_VERSION` albo wyższe major → `NewerSchema` (jak dotąd); major niższe niż `OLDEST_SCHEMA_VERSION` (1.0.0) →
+  nowy błąd `TransferError::OlderSchema { found, oldest }` („starszy niż najstarszy obsługiwany … to nie jest paczka
+  z nowszej wersji”), bez zapisu. Manifest innego major o nieznanej strukturze daje błąd wersji, nie `Invalid`.
+  Wydania przedpremierowe 1.0.0 (`1.0.0-rc.1`) przechodzą jak dotąd; format v0 (`format: 0`) ma własny upcaster.
+- Przy pierwszej zmianie major: upcaster vN → vN+1 w `migrate::upcast_manifest`, `OLDEST_SCHEMA_VERSION` zostaje na
+  najstarszej wersji z łańcuchem. Adapter `app-modules::transfer_error` mapuje nowy błąd na `InvalidInput` (gałąź `_`).
+- Testy: `transfer-contract/tests/f7_manifest.rs` (runner scenariuszy `alfa.manifest` z `evals/F7/migrations`: m-04,
+  m-05, m-06, m-10; `older_major_is_rejected_as_older_not_newer`), `src/migrate_tests.rs`
+  (`schema_version_is_gated_before_structure`).

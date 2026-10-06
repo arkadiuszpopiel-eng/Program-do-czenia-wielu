@@ -365,9 +365,10 @@ fn capture_masks_protected_windows_passwords_and_unverified() {
     );
     keepass.color = [1, 2, 3, 255];
     let k = d.add_window(keepass, false);
+    // Fala 5 (PT-25): menedżer haseł jest celem chronionym (nie tylko deny-listą zrzutów).
     assert!(matches!(
         d.capture(&CaptureRequest::new(CaptureTarget::Window { window: k })),
-        Err(GuiError::Policy(_))
+        Err(GuiError::ProtectedTarget(m)) if m.contains("menedżer haseł")
     ));
 }
 

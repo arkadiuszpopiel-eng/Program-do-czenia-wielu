@@ -19,6 +19,37 @@ pub fn schema_version() -> semver::Version {
     semver::Version::new(1, 0, 0)
 }
 
+/// Najstarsza wersja schematu (semver) przyjmowana bezpośrednio albo łańcuchem upcasterów
+/// (`migrate`). Format v0 (`format: 0`, bez `schema_version`) ma osobny upcaster. Przy pierwszej
+/// zmianie major: upcaster vN → vN+1 w `migrate::upcast_manifest`, ta stała zostaje na najstarszej
+/// wersji z łańcuchem (fala 5, m-06).
+pub const OLDEST_SCHEMA_VERSION: &str = "1.0.0";
+
+/// [`OLDEST_SCHEMA_VERSION`] jako `semver::Version`.
+pub fn oldest_schema_version() -> semver::Version {
+    semver::Version::new(1, 0, 0)
+}
+
+/// Bramka wersji paczki: nowsza niż obsługiwana → [`TransferError::NewerSchema`] („zaktualizuj
+/// Alfę”); starsze major niż [`OLDEST_SCHEMA_VERSION`] → [`TransferError::OlderSchema`]
+/// (brak migracji — nie „nowsza”). Wydania przedpremierowe obsługiwanej wersji przechodzą.
+pub fn check_schema_version(found: &semver::Version) -> Result<(), TransferError> {
+    let supported = schema_version();
+    if found.major > supported.major || *found > supported {
+        return Err(TransferError::NewerSchema {
+            found: found.to_string(),
+            supported: supported.to_string(),
+        });
+    }
+    if found.major < oldest_schema_version().major {
+        return Err(TransferError::OlderSchema {
+            found: found.to_string(),
+            oldest: OLDEST_SCHEMA_VERSION.to_owned(),
+        });
+    }
+    Ok(())
+}
+
 /// Rodzaj paczki.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
@@ -217,15 +248,10 @@ impl Manifest {
         self.content.iter().map(|e| e.bytes).sum()
     }
 
-    /// Walidacja: obsługiwana wersja, bezpieczne i unikalne ścieżki, zgodny skrót listy, limity.
+    /// Walidacja: obsługiwana wersja ([`check_schema_version`]), bezpieczne i unikalne ścieżki,
+    /// zgodny skrót listy, limity.
     pub fn validate(&self, limits: &Limits) -> Result<(), TransferError> {
-        let supported = schema_version();
-        if self.schema_version.major != supported.major || self.schema_version > supported {
-            return Err(TransferError::NewerSchema {
-                found: self.schema_version.to_string(),
-                supported: supported.to_string(),
-            });
-        }
+        check_schema_version(&self.schema_version)?;
         let count = self.content.len() as u64 + 1;
         if count > limits.max_entries {
             return Err(limit("liczba wpisów", count, limits.max_entries));

@@ -53,7 +53,10 @@ Oczekiwane wyniki sprawdziłam jednorazowym programem poza repozytorium na kodzi
 `transfer-impl/tests/secrets.rs`. Fixture'y `alfa-v1` i stany SQL wygenerowałam z tych samych typów i stałych co
 aplikacja, więc sumy w manifeście i SQL migracji są zgodne z kodem.
 
-## Runner (do zbudowania)
+## Runner (częściowo zbudowany)
+
+Fala 5: scenariusze `alfa.manifest` (m-04, m-05, m-06, m-10) — `transfer-contract/tests/f7_manifest.rs`;
+`sqlite.sessions` (m-20, m-23) — `sessions-impl/tests/f7_migrations.rs`. Reszta do zbudowania.
 
 Proponowane miejsce: testy czytające `scenarios.json` przez `include_str!` (wzór `evals/F8`) — paczki i
 dokumenty pamięci w `transfer-impl/tests/migrations.rs` (silnik importu z `MemoryDocuments`, dry-run + import +
@@ -68,10 +71,16 @@ istniejących fixture'ów się nie zmienia (zamrożone hashem).
 
 ## Do decyzji człowieka
 
-1. **m-23 — powrót do starszej wersji po migracji.** Starsza wersja aplikacji (aktualizator, wersje obok siebie)
+1. **m-23 — powrót do starszej wersji po migracji.** *Fala 5: wdrożone w `lib_sqlstore::migrate` — baza z nowszej
+   wersji otwiera się bez zmian w trybie tylko do odczytu, a migracje oznaczone jako addytywne (`schema_compat`)
+   pozwalają pracować normalnie; scenariusz m-23 zmieniony na `outcome: ok` (`read_only`, `write_blocked`,
+   `schema_unchanged`). Uzasadnienie i propozycja dla aktualizatora: `docs/modules/sessions/SPEC.md` („Fala 5”) —
+   do akceptacji człowieka razem z zestawem.* Opis pierwotny: Starsza wersja aplikacji (aktualizator, wersje obok siebie)
    dostaje `UnknownMigration` na bazie zmigrowanej przez nowszą (dziś realne: `search` 0002, uwaga w SPEC
    `search`). Fail-closed, ale sesje są nieczytelne do ponownej aktualizacji, a ADR 0007 wymaga, by rollback nie
    niszczył danych. Opcje: migracje wyłącznie addytywne + lista wersji zgodnych wstecz w `schema_migrations`, kopia
    bazy przed migracją, albo blokada rollbacku przez aktualizator przy niezgodnym schemacie.
 2. **m-06** — upcaster dla starszego „major” i komunikat (dziś „nowsza wersja”) — przy pierwszej zmianie major.
+   *Fala 5: bramka wersji `check_schema_version` przed odczytem struktury; starsze major bez upcastera →
+   `older_schema` (`found`, `oldest`), bez rady „zaktualizuj”; scenariusz m-06 zmieniony na `older_schema`.*
 3. Zamrożenie: `evals/F7/migrations/MANIFEST.json` z SHA-256 wszystkich plików tego katalogu.

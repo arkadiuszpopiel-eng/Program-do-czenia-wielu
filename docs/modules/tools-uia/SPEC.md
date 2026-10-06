@@ -56,3 +56,11 @@ Kroki w wątku/Replay; ramki elementów w panelu „Ekran” (F6, inna sesja) ze
 ## Otwarte pytania
 - `LegacyIAccessiblePattern`/`Window`/`RangeValue` — po macierzy aplikacji (F6-03).
 - Zdarzenia UIA (zmiana fokusu/struktury) zamiast odpytywania — SPEC v2.
+
+## Fala 5 (2026-10)
+- **F6-03:** `sparse` liczy tylko obszar klienta (`UiaTree::client_nodes`, bez ramy okna, paska tytułu i menu
+  systemowego); okno z samą ramą i płótnem → `sparse = true` i podpowiedź `screen_capture`. Test:
+  `tests/wave5.rs::frame_only_window_is_reported_sparse_with_vision_hint`.
+- **PT-25:** okna menedżerów haseł i okna poświadczeń Windows są celami chronionymi (`platform_contract::SENSITIVE_APPS`
+  w strażniku celów) — `uia_tree`/`uia_find`/`uia_read_text`/`uia_act` kończą się `KernelBlock` bez treści w wyniku.
+  Test: `tests/wave5.rs::password_manager_windows_are_refused_for_reads_and_actions`.

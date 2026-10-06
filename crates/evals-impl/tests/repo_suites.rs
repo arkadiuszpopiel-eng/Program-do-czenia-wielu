@@ -103,3 +103,37 @@ async fn existing_waves_are_format_examples() {
     assert!(report.to_markdown().contains("`f3-tools`"));
     assert_eq!(report.aggregate.n_cases, f3.len());
 }
+
+/// Fala 5 (pkt 3): `alfa-evals verify evals` na katalogu z repozytorium kończy się kodem 0 —
+/// żaden manifest nie jest powtórzony ani niepoprawny (np. `F5/voice` nie może udawać zestawu
+/// `f5`), a zamrożone zestawy są zgodne z hashami. Pilnuje CI przed cichym rozjazdem katalogu.
+#[test]
+fn alfa_evals_verify_passes_on_repo_catalog() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../evals");
+    let catalog = DirCatalog::open(&root).unwrap();
+    assert!(
+        catalog.problems().is_empty(),
+        "problemy katalogu: {:?}",
+        catalog.problems()
+    );
+    let listed: Vec<String> = catalog
+        .suites()
+        .iter()
+        .map(|s| s.suite.to_string())
+        .collect();
+    assert!(
+        listed.iter().any(|l| l == "f5") && listed.iter().any(|l| l == "f5-voice"),
+        "{listed:?}"
+    );
+    let out = std::process::Command::new(env!("CARGO_BIN_EXE_alfa-evals"))
+        .arg("verify")
+        .arg(&root)
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "alfa-evals verify: {}\n{}",
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr)
+    );
+}

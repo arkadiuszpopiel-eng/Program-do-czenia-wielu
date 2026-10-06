@@ -34,8 +34,9 @@ pub use backup::{BackgroundState, BackupRequest, BackupSchedule};
 pub use error::TransferError;
 pub use guard::SecretGuard;
 pub use manifest::{
-    ContentEntry, Counts, EncryptionInfo, Limits, MachineInfo, Manifest, PackageKind,
-    SCHEMA_VERSION, ScopeSummary, content_sha256, hex, limit, schema_version, sha256_hex,
+    ContentEntry, Counts, EncryptionInfo, Limits, MachineInfo, Manifest, OLDEST_SCHEMA_VERSION,
+    PackageKind, SCHEMA_VERSION, ScopeSummary, check_schema_version, content_sha256, hex, limit,
+    oldest_schema_version, schema_version, sha256_hex,
 };
 pub use paths::{
     EntryKind, MANIFEST_PATH, MAX_DEPTH, MAX_PATH_BYTES, PathError, ROLLBACK_PATH, SECRETS_PATH,

@@ -18,8 +18,8 @@ use sessions_contract::{
 
 use crate::error::TransferError;
 use crate::manifest::{
-    ContentEntry, MachineInfo, Manifest, PackageKind, ScopeSummary, content_sha256, schema_version,
-    sha256_hex,
+    ContentEntry, MachineInfo, Manifest, PackageKind, ScopeSummary, check_schema_version,
+    content_sha256, schema_version, sha256_hex,
 };
 use crate::paths::{EntryKind, MANIFEST_PATH, SESSION_FILE, classify};
 use crate::portable::{SESSION_RECORD_VERSION, SessionHeader, decode_turn_v1};
@@ -52,14 +52,23 @@ fn step(entity: &str, from: &str, to: &str, count: u64) -> UpcastStep {
     }
 }
 
-/// Manifest w dowolnej obsługiwanej wersji → manifest v1 (+ zastosowane kroki). Wersji nowszej
-/// nie zmienia — odrzuci ją [`Manifest::validate`].
+/// Manifest w dowolnej obsługiwanej wersji → manifest v1 (+ zastosowane kroki). Wersję
+/// `schema_version` sprawdza **przed** odczytem struktury ([`check_schema_version`]): manifest
+/// innego major ma inną strukturę, więc odmowa „nowsza”/„za stara” zamiast „nieprawidłowe dane”
+/// (fala 5, m-06). Pełną walidację robi potem [`Manifest::validate`].
 pub fn upcast_manifest(
     value: serde_json::Value,
 ) -> Result<(Manifest, Vec<UpcastStep>), TransferError> {
     let is_v0 = value.get("schema_version").is_none()
         && value.get("format").and_then(serde_json::Value::as_u64) == Some(0);
     if !is_v0 {
+        if let Some(found) = value
+            .get("schema_version")
+            .and_then(serde_json::Value::as_str)
+            .and_then(|v| semver::Version::parse(v).ok())
+        {
+            check_schema_version(&found)?;
+        }
         let manifest = serde_json::from_value::<Manifest>(value)
             .map_err(|e| TransferError::invalid(MANIFEST_PATH, e))?;
         return Ok((manifest, Vec::new()));

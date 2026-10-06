@@ -97,7 +97,9 @@ pub use capture_check::{CAPTURE_ATTEMPTS, capture_set_stable, union_for_mask, un
 pub use desktop::{
     DesktopPort, DesktopWindow, MIN_WINDOW_SIZE, MonitorInfo, WindowState, validate_bounds,
 };
-pub use gui::{GuiError, PROTECTED_IMAGES, ScreenRect, TargetGuard, image_file_name};
+pub use gui::{
+    GuiError, PROTECTED_IMAGES, SENSITIVE_APPS, ScreenRect, TargetGuard, image_file_name,
+};
 pub use image::{
     MASK_COLOR, MAX_IMAGE_PIXELS, RgbaImage, encode_png, encode_png_with, zlib_stored,
 };

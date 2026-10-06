@@ -107,3 +107,35 @@ Panel Sesje (lista, wyszukiwanie, projekty, tagi, przypięte, kropka aktywności
   samej transakcji, zdarzenie `session.turns.imported`; tury importowane nie zwiększają licznika nieprzeczytanych.
 - Domyślne implementacje `adopt_session`/`import_turns` zwracają `Invalid` („nieobsługiwane”) — istniejące
   implementacje traitów się kompilują. Testy kontraktowe: +3 przypadki (round-trip, odrzucenia, atomowość).
+
+## Fala 5 — powrót do starszej wersji po migracji (m-23, ADR 0007)
+- **Problem:** po aktualizacji z migracją bazy (np. `search` 0002) powrót do starszej wersji (aktualizator, wersje obok
+  siebie) dawał `UnknownMigration` — sesja nie otwierała się wcale, choć ADR 0007 wymaga, by rollback nie niszczył danych.
+- **Zachowanie (`lib_sqlstore::migrate`):** migracje zapisane w bazie, nieznane kodowi i **nowsze od każdej znanej** =
+  baza z nowszej wersji. `migrate` nic nie zapisuje (schemat bez zmian) i zwraca `Ok` z `MigrationReport { newer,
+  read_only }`. Gdy nowsza wersja oznaczyła wszystkie te migracje jako **addytywne** (`migrate_with(.., additive)` →
+  tabela `schema_compat(namespace, version)`), starsza pracuje normalnie; inaczej połączenie przechodzi w `PRAGMA
+  query_only` — historia czytelna, każdy zapis odrzucany przez SQLite. Luka/rozwidlenie historii (nieznana wersja nie
+  nowsza od znanych) nadal `UnknownMigration`; znana oczekująca + nieznana nowsza → `MigrationOutOfOrder`; migracja
+  innej przestrzeni nazw na połączeniu tylko do odczytu → `StoreError::ReadOnly` (nic nie zapisano).
+- **`sessions-impl`:** zapis do bazy tylko do odczytu → `Storage` z komunikatem „baza sesji pochodzi z nowszej wersji
+  Alfy i jest tylko do odczytu — zaktualizuj Alfę…” (`rows::db_err`); `open_db` toleruje błąd `TxIndexer::prepare`
+  na połączeniu tylko do odczytu (np. `search` w trakcie przebudowy wektorów chce pisać) — historia ma się otworzyć,
+  wyszukiwanie w tej sesji wraca po aktualizacji.
+- **Zasada dla nowych migracji (dla autorek modułów):** migracja jest addytywna tylko, gdy dokłada tabele, indeksy albo
+  kolumny z wartością domyślną — bez nowych wyzwalaczy, ograniczeń na starych tabelach i niezmienników łączących stare
+  tabele z nowymi (starsza wersja dopisuje wiersze bez wiedzy o nowych tabelach, a nowsza po ponownej aktualizacji musi
+  je przyjąć). Wszystko inne → bez oznaczenia (starsza wersja: tylko odczyt). Każda nowa migracja dokłada fixture
+  i scenariusz w `evals/F7/migrations` (zasada utrzymania F7-08).
+- **Dlaczego nie kopia bazy przed migracją:** przywrócenie kopii po rollbacku gubi tury dopisane w nowszej wersji
+  (sprzeczne z append-only i ADR 0007), a kopie per sesja mnożą zaszyfrowane pliki do sprzątania. Tryb tylko do odczytu
+  nie traci niczego; dane wracają do pełnej pracy po ponownej aktualizacji.
+- **Propozycja dla Jądra (`updater`, decyzja człowieka — niewdrożona):** przed `rollback_by` aktualizator ostrzega
+  „sesje zmigrowane przez nowszą wersję będą tylko do odczytu, dopóki nie wrócisz do nowszej” (lista przestrzeni
+  nazw z nieaddytywnymi migracjami — moduł mógłby ją publikować w `module.toml` albo w pliku obok bazy); UI aplikacji
+  pokazuje baner przy sesji tylko do odczytu (`MigrationReport::read_only` → zdarzenie/stan sesji — osobne zadanie dla
+  `app-*`). Bez tej zmiany zachowanie jest już bezpieczne (fail-closed dla zapisu, odczyt działa).
+- Testy: `lib-sqlstore/tests/rollback.rs` (tylko odczyt bez zmian schematu, addytywna → zapis, mieszane → tylko
+  odczyt, luka, `ReadOnly` innej przestrzeni), `sessions-impl/tests/rollback.rs` (historia czytelna po rollbacku,
+  czytelny błąd zapisu, indeks bez `prepare`, addytywna → dopisywanie), `sessions-impl/tests/f7_migrations.rs` (runner
+  scenariuszy `sqlite.sessions`: m-20, m-23).

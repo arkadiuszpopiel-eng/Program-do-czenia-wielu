@@ -8,21 +8,13 @@
 use serde::{Deserialize, Serialize};
 
 use crate::desktop::{DesktopWindow, WindowState};
-use crate::gui::{GuiError, ScreenRect, image_file_name};
+use crate::gui::{GuiError, SENSITIVE_APPS, ScreenRect, image_file_name};
 use crate::image::{MASK_COLOR, RgbaImage, encode_png_with};
 use crate::window::WindowId;
 
-/// Aplikacje zawsze maskowane na zrzutach (menedżery haseł, okna poświadczeń Windows).
-pub const DEFAULT_MASKED_APPS: [&str; 8] = [
-    "keepass.exe",
-    "keepassxc.exe",
-    "1password.exe",
-    "bitwarden.exe",
-    "dashlane.exe",
-    "enpass.exe",
-    "credentialuibroker.exe",
-    "consent.exe",
-];
+/// Aplikacje zawsze maskowane na zrzutach (menedżery haseł, okna poświadczeń Windows) — ta
+/// sama lista co cele chronione przed UIA i wejściem ([`SENSITIVE_APPS`], fala 5, PT-25).
+pub const DEFAULT_MASKED_APPS: [&str; 8] = SENSITIVE_APPS;
 /// Domyślny limit dłuższego boku zrzutu (px) — wygodny dla modeli wizyjnych.
 pub const DEFAULT_CAPTURE_MAX_SIDE: u32 = 1_568;
 /// Zakres limitu boku.
@@ -165,10 +157,12 @@ pub fn mask_plan(
         .iter()
         .filter(|w| w.state != WindowState::Minimized && only.is_none_or(|id| id == w.id))
         .filter_map(|w| {
-            let reason = if w.protected {
-                MaskReason::ProtectedWindow
-            } else if request.is_masked_app(&w.image) {
+            // Aplikacja z deny-listy zrzutów (menedżer haseł jest też chroniony) — powód
+            // dokładniejszy niż „okno chronione”.
+            let reason = if request.is_masked_app(&w.image) {
                 MaskReason::MaskedApp
+            } else if w.protected {
+                MaskReason::ProtectedWindow
             } else {
                 return None;
             };

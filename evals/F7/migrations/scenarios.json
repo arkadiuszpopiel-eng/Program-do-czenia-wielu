@@ -242,7 +242,7 @@
       "entity": "alfa.manifest",
       "from": "0.9.0",
       "to": "—",
-      "title": "Manifest ze `schema_version` 0.x — dziś odrzucany jako „nowszy”",
+      "title": "Manifest ze `schema_version` 0.x (starsze major bez upcastera) — czytelna odmowa „za stara”, nie „nowsza”",
       "input": {
         "manifest_from": "fixtures/alfa-v1/manifest.alfa.json",
         "set": {"schema_version": "0.9.0"}
@@ -250,13 +250,16 @@
       "expected": {
         "outcome": "error",
         "error": {
-          "error": "newer_schema",
+          "error": "older_schema",
           "found": "0.9.0",
-          "supported": "1.0.0"
+          "oldest": "1.0.0"
         }
       },
-      "covered_by": [],
-      "notes": "Zachowanie bieżące (wersji 0.x nie wydano — v0 to `format: 0`). Przy pierwszej zmianie major upcaster musi przyjmować starsze major, a komunikat nie może mówić o „nowszej” wersji — do decyzji człowieka."
+      "covered_by": [
+        "transfer-contract/tests/f7_manifest.rs::f7_manifest_scenarios",
+        "transfer-contract/tests/f7_manifest.rs::older_major_is_rejected_as_older_not_newer"
+      ],
+      "notes": "Fala 5: wersji 0.x nie wydano (v0 to `format: 0`), więc nie ma dla niej upcastera — odmowa `older_schema` bez sugestii aktualizacji. Przy pierwszej zmianie major: upcaster vN → vN+1 w `transfer_contract::migrate`, a `OLDEST_SCHEMA_VERSION` zostaje na najstarszej wersji z łańcuchem."
     },
     {
       "id": "m-07-rekordy-nowsze",
@@ -634,18 +637,25 @@
       "entity": "sqlite.sessions",
       "from": "0001+0002",
       "to": "—",
-      "title": "Powrót do starszej wersji aplikacji po migracji nowszej (aktualizator, wersje obok siebie)",
+      "title": "Powrót do starszej wersji aplikacji po migracji nowszej (aktualizator, wersje obok siebie) — baza tylko do odczytu, bez zmian",
       "input": {
         "sql": "fixtures/sqlite/sessions-unknown-0002.sql",
         "namespace": "sessions"
       },
       "expected": {
-        "outcome": "error",
-        "error": "UnknownMigration",
+        "outcome": "ok",
+        "applied": [],
+        "newer": ["0002"],
+        "read_only": true,
+        "write_blocked": true,
         "schema_unchanged": true
       },
-      "covered_by": [],
-      "notes": "Fail-closed (nic nie zmieniono), ale sesja jest nieczytelna w starszej wersji. ADR 0007 wymaga, by rollback nie niszczył danych — dziś nie ma ścieżki odczytu; do decyzji (np. migracje tylko addytywne + lista wersji zgodnych wstecz albo kopia bazy przed migracją)."
+      "covered_by": [
+        "sessions-impl/tests/f7_migrations.rs::f7_sessions_sql_scenarios",
+        "sessions-impl/tests/rollback.rs",
+        "lib-sqlstore/tests/rollback.rs"
+      ],
+      "notes": "Fala 5 (ADR 0007): migracje nieznane kodowi, ale nowsze od każdej znanej = baza z nowszej wersji. `lib_sqlstore::migrate` nic nie zapisuje i przełącza połączenie w `query_only` (dane czytelne, zapis odrzucony czytelnym błędem); migracje oznaczone przez nowszą wersję jako addytywne (`schema_compat`) — praca normalna. Luka/rozwidlenie historii nadal `UnknownMigration` (m-24 i testy `lib-sqlstore`)."
     },
     {
       "id": "m-24-dziennik-migracji-uszkodzony",

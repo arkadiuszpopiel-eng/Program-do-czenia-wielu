@@ -54,3 +54,11 @@ Panel „Zdrowie systemu” → wyniki bramki (werdykty zbiorcze), lista zestaw�
 ## Otwarte pytania
 - Replay offline na własnych logach jako `CandidateRunner` (PLAN §12.4) — podpięcie w `app-*` z `core-log` i `providers` (record/replay).
 - Kopiowanie zestawów do `evals/acceptance/` + `HASHES` przy zamrożeniu — decyzja człowieka (dziś zamrożenie przez `status: frozen` w manifeście).
+
+## Fala 5
+- `alfa-evals verify evals` kończył się błędem „powtórzony zestaw `f5`”: stary format manifestu (`LegacyManifest`)
+  brał identyfikator tylko z `wave`, a `evals/F5/voice/MANIFEST.json` ma `set: "voice"`. Teraz identyfikator =
+  `<fala>-<set>` (`f5-voice`); zestaw `f5` i jego skrót manifestu bez zmian, żaden plik zestawu nie zmieniony.
+  Test pilnujący całego katalogu: `evals-impl/tests/repo_suites.rs::alfa_evals_verify_passes_on_repo_catalog`
+  (brak problemów katalogu + kod 0 binarki `alfa-evals verify`), jednostkowy: `legacy.rs`
+  `legacy_manifest_with_set_gets_its_own_suite_id`.

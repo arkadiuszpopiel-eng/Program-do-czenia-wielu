@@ -148,8 +148,15 @@ impl SqliteSessions {
             .map_err(SessionError::storage)?;
             migrate(c, schema::SESSION_NAMESPACE, schema::SESSION_MIGRATIONS)
                 .map_err(SessionError::storage)?;
-            if let Some(indexer) = &self.indexer {
-                indexer.prepare(c).map_err(SessionError::storage)?;
+            if let Some(indexer) = &self.indexer
+                && let Err(e) = indexer.prepare(c)
+            {
+                // Baza z nowszej wersji Alfy (tylko odczyt, `lib_sqlstore::migrate`): indeks się nie
+                // przygotuje, ale historia ma zostać czytelna (ADR 0007, fala 5); zapis tury i tak
+                // odmówi z czytelnym komunikatem (`rows::db_err`).
+                if !read_only(c) {
+                    return Err(SessionError::storage(e));
+                }
             }
             Ok::<(), SessionError>(())
         })?;
@@ -179,6 +186,12 @@ impl SqliteSessions {
         }
         Ok(removed)
     }
+}
+
+/// Czy połączenie jest tylko do odczytu (`PRAGMA query_only`; błąd odczytu = nie).
+fn read_only(c: &lib_sqlstore::rusqlite::Connection) -> bool {
+    c.query_row("PRAGMA query_only", [], |r| r.get::<_, i64>(0))
+        .is_ok_and(|v| v != 0)
 }
 
 fn manifest_err(e: ManifestError) -> SessionError {

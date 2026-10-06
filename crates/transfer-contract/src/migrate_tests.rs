@@ -77,3 +77,23 @@ fn newer_or_broken_records_are_rejected() {
     let (empty, steps) = decode_turns(b"", "s").unwrap();
     assert!(empty.is_empty() && steps.is_empty());
 }
+
+#[test]
+fn schema_version_is_gated_before_structure() {
+    // Fala 5: manifest innego major o nieznanej strukturze → błąd wersji, nie „nieprawidłowe dane”.
+    let newer = serde_json::json!({"schema_version": "2.0.0", "pakiet": {"pliki": []}});
+    assert!(matches!(
+        upcast_manifest(newer),
+        Err(TransferError::NewerSchema { found, .. }) if found == "2.0.0"
+    ));
+    let older = serde_json::json!({"schema_version": "0.3.0", "lista": []});
+    assert!(matches!(
+        upcast_manifest(older),
+        Err(TransferError::OlderSchema { found, .. }) if found == "0.3.0"
+    ));
+    // Wersja nieczytelna jako semver — jak dotąd błąd danych manifestu.
+    assert!(matches!(
+        upcast_manifest(serde_json::json!({"schema_version": "jeden"})),
+        Err(TransferError::Invalid { .. })
+    ));
+}

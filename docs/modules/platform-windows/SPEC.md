@@ -118,3 +118,23 @@ Brak własnego; dostarcza zasobnik/okna dla `shell-integration` i `ui-quick`, st
 - **P2-04 — skróty globalne:** wątek skrótów zapisuje pochodzenie wciśnięć (`LLKHF_INJECTED`/`LLKHF_LOWER_IL_INJECTED`, `hotkey/origin.rs`); `WM_HOTKEY` z kombinacji wstrzykniętej jest ignorowany (`HotkeyPressOrigin::admits`), nieznane pochodzenie przyjmowane tylko przy oknie podniesionym na pierwszym planie (UIPI blokuje wtedy `SendInput`), kill-switch zawsze. Atrapa: `FakeHotkeys::press_injected`.
 - **P2-05 — ConPTY:** lista atrybutów w buforze `Vec<usize>` (`attrs.rs`, zwalniana w `Drop` także na ścieżkach błędu); `write_input` nie trzyma zamka uchwytu podczas `WriteFile` (uchwyt `Arc`, porcje 4 KiB, przerwanie po zamknięciu) — `close()` nie czeka na zawieszony zapis.
 - **P-07 (przegląd #1) — start Broker-UI:** potok bez dziedziczenia, dziedziczny tylko koniec do odczytu, `STARTUPINFOEXW` + `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (jawna lista jednego uchwytu) — dziecko nie dziedziczy innych uchwytów usługi Brokera. Pozostaje okno, w którym inny wątek usługi tworzący proces z `bInheritHandles = TRUE` bez listy mógłby odziedziczyć ten koniec (dziś usługa takich nie tworzy). **Wymaga przeglądu człowieka** (`platform-windows-kernel-impl`, ścieżka Jądra).
+
+## Fala 5 (2026-10)
+- **PT-25 — menedżery haseł jako cele chronione:** `SENSITIVE_APPS` (KeePass, KeePassXC, 1Password, Bitwarden, Dashlane,
+  Enpass, `CredentialUIBroker.exe` — okno „Zabezpieczenia Windows”, `consent.exe`) w `TargetGuard::is_protected`
+  zawsze (jak `PROTECTED_IMAGES`, także alias 8.3; konfiguracją nie da się skrócić). Dotąd były tylko maskowane na
+  zrzutach (`DEFAULT_MASKED_APPS`, teraz ta sama stała), a UIA (`tree`/`find`/`element`/`read_text`/`act`), wejście
+  i operacje na oknach działały. `TargetGuard::check` zwraca dla nich własny komunikat („menedżer haseł albo okno
+  poświadczeń Windows … (PT-25)”); `mask_plan` podaje dla nich powód `masked_app` (nie `protected_window`). Skutki
+  uboczne (bezpieczny kierunek): okno menedżera haseł jest ukryte na liście okien narzędzi (`hidden_protected`),
+  dyktowanie i czytanie zaznaczenia odmawiają w tych oknach, kliknięcie w punkt zasłonięty takim oknem — odmowa.
+  `platform-windows-impl::WindowPort` (stara ścieżka fokus/minimalizacja z `DEFAULT_PROTECTED_PROCESSES`) bez zmian —
+  nie czyta treści. Propozycja dla Brokera (Jądro, decyzja człowieka): `gui.control(<menedżer haseł>)` →
+  `KernelRule::CredentialDenylist` — test `#[ignore]` `safety-broker-contract/tests/wave5_proposals.rs`.
+- **F6-03 — próg „ubogiego” drzewa:** `UiaTree::client_nodes()` liczy węzły obszaru klienta — bez węzła okna
+  (`depth` 0), poddrzewa `title_bar` i systemowego paska menu (`AutomationId = SystemMenuBar`); `is_sparse()` =
+  `client_nodes() ≤ SPARSE_TREE_NODES` (5, próg bez zmian — rozstrzygnie pomiar spike'u c, `evals/F6/app-matrix.md`).
+  Dotąd rama z przyciskami (≥ 6 węzłów) maskowała okna z pustym klientem (płótno, GTK, Java bez Access Bridge, RDP).
+- Testy: `platform-fake/tests/wave5.rs` (rama + płótno, rama sama, klient po pasku tytułu; menedżery haseł: drzewo,
+  wyszukiwanie, element, tekst, akcja, wejście, fokus, przesunięcie — 0 skutków; maska `masked_app`),
+  `platform-fake/tests/desktop.rs` (zrzut okna KeePass → `ProtectedTarget`).

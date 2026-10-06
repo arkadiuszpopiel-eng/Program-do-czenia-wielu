@@ -146,6 +146,20 @@ pub const PROTECTED_IMAGES: [&str; 9] = [
     "alfa-mcp-proxy.exe",
 ];
 
+/// Aplikacje wrażliwe: menedżery haseł i okna poświadczeń Windows (THREAT_MODEL S26, PT-25).
+/// Maskowane na zrzutach (`DEFAULT_MASKED_APPS`) **i** chronione jak procesy Alfy przed
+/// odczytem UIA, wejściem i operacjami na oknach ([`TargetGuard::is_protected`]).
+pub const SENSITIVE_APPS: [&str; 8] = [
+    "keepass.exe",
+    "keepassxc.exe",
+    "1password.exe",
+    "bitwarden.exe",
+    "dashlane.exe",
+    "enpass.exe",
+    "credentialuibroker.exe",
+    "consent.exe",
+];
+
 /// Nazwa pliku z pełnej ścieżki (`C:\a\b.EXE` → `b.exe`), małymi literami, bez końcowych kropek i spacji.
 pub fn image_file_name(image: &str) -> String {
     image
@@ -229,7 +243,8 @@ impl TargetGuard {
         self
     }
 
-    /// Czy proces jest chroniony. Pusty/nieznany obraz = chroniony (fail-closed).
+    /// Czy proces jest chroniony. Pusty/nieznany obraz = chroniony (fail-closed). Aplikacje
+    /// wrażliwe ([`SENSITIVE_APPS`]) są chronione zawsze — listy nie da się skrócić konfiguracją.
     pub fn is_protected(&self, pid: u32, image: &str) -> bool {
         let name = image_file_name(image);
         let path = image.replace('/', "\\").to_lowercase();
@@ -239,13 +254,30 @@ impl TargetGuard {
             || PROTECTED_IMAGES
                 .iter()
                 .copied()
+                .chain(SENSITIVE_APPS)
                 .chain(self.images.iter().map(String::as_str))
                 .any(|p| p == name || short_name_matches(&name, p))
             || self.image_dirs.iter().any(|d| path.starts_with(d.as_str()))
     }
 
+    /// Czy obraz to aplikacja wrażliwa ([`SENSITIVE_APPS`]; także alias 8.3).
+    pub fn is_sensitive_app(image: &str) -> bool {
+        let name = image_file_name(image);
+        !name.is_empty()
+            && SENSITIVE_APPS
+                .iter()
+                .any(|p| *p == name || short_name_matches(&name, p))
+    }
+
     /// Sprawdzenie przed akcją: `Err(ProtectedTarget)` dla procesu chronionego.
     pub fn check(&self, pid: u32, image: &str, what: &str) -> Result<(), GuiError> {
+        if Self::is_sensitive_app(image) {
+            return Err(GuiError::ProtectedTarget(format!(
+                "{what}: okno procesu {} (PID {pid}) — menedżer haseł albo okno poświadczeń \
+                 Windows; agentka nie steruje nim ani go nie odczytuje (PT-25)",
+                image_file_name(image)
+            )));
+        }
         if self.is_protected(pid, image) {
             let shown = if image.is_empty() {
                 "nieznany proces".to_owned()
