@@ -37,6 +37,37 @@ jobs:
   # setup-dev.ps1 w trybie `-Ci` (nigdy nie pyta, nic nie instaluje, działa z konta administratora
   # runnera): kod 0 = komplet narzędzi, 1 = czegoś brakuje na runnerze (to NIE jest błąd skryptu),
   # 2 / brak linii ALFA_SETUP_RESULT / cokolwiek na stderr = błąd skryptu → job czerwony.
+  # Szybka diagnostyka (≈ 1 min): czy pliki z katalogów modeli istnieją na Hugging Face (ta sesja
+  # deweloperska nie ma dostępu do HF; runner ma). Wypisuje pliki modeli w repozytoriach i odpowiedź
+  # HEAD na każdy adres katalogowy — 404/401/403 oznacza błędny adres albo repozytorium z bramką.
+  hf-catalog:
+    name: Hugging Face — adresy z katalogów modeli
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repozytoria i adresy
+        shell: bash
+        run: |
+          set -u
+          out="$GITHUB_STEP_SUMMARY"
+          echo "## Adresy z katalogów (HEAD, z przekierowaniami)" >> "$out"
+          grep -rhoE 'https://huggingface\.co/[^"[:space:]]+' crates/app-models/src/data.rs \
+            crates/providers-local-impl/models.toml crates/lib-embed/src/*.rs | sort -u | while read -r url; do
+            case "$url" in *"{"*|*"/resolve/main"|*"/resolve/main/") continue;; esac
+            code=$(curl -s -o /dev/null -I -L --max-time 30 -w '%{http_code}' "$url" || echo ERR)
+            echo "- \`$code\` $url" | tee -a "$out"
+          done
+          for repo in speakleash/Bielik-4.5B-v3.0-Instruct-GGUF ggerganov/whisper.cpp; do
+            echo "## $repo — pliki modeli" | tee -a "$out"
+            curl -s --max-time 30 "https://huggingface.co/api/models/$repo" \
+              | jq -r '"- gated: \(.gated // false)", (.siblings[]?.rfilename | select(test("\\.(gguf|bin)$")) | "- \(.)")' \
+              | head -80 | tee -a "$out"
+          done
+          echo "## speakleash — repozytoria GGUF" | tee -a "$out"
+          curl -s --max-time 30 "https://huggingface.co/api/models?author=speakleash&search=GGUF&limit=50" \
+            | jq -r '.[].id | "- \(.)"' | tee -a "$out"
+
   setup-dev:
     name: setup-dev.ps1 (PowerShell 5.1 i 7)
     runs-on: windows-latest
