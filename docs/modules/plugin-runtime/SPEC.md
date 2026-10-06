@@ -51,3 +51,6 @@ Zrealizowana w `app-plugins` (komendy, host, problemy dla Diagnosty) + `app-agen
 - `TaintSource::Plugin` w kontrakcie Brokera (przegląd człowieka); podpis zatwierdzeń R2 kluczem TPM (pole `signature`).
 - `plugin-sdk` (makra wit-bindgen dla `wasm32-unknown-unknown`) i katalog `plugins/` z WIT — po decyzji o toolchainie autorów; zestaw `evals/F8/wasm-malicious/` do zamrożenia przez człowieka.
 - Kompilacja przy każdym starcie (brak bezpiecznej pamięci podręcznej `deserialize`) — zmierzyć na baseline.
+
+## Przegląd bezpieczeństwa #3 (2026-10, `docs/reviews/2026-10-security-review-3.md`)
+- **SR3-02 (zrobione w `app-plugins::net`):** host `net.get` sprawdzany parserem WHATWG tego samego klienta (`reqwest::Url`) — nieskanoniczne literały IP (`2130706433`, `0x7f000001`, `0177.0.0.1`, `127.1`, IPv4 zgodny/NAT64 w IPv6) są adresami niepublicznymi; klient łączy się z literałem IP bez resolvera, więc to jedyna kontrola. Docelowo wspólny `lib-netguard` (F6, `tools-net`).

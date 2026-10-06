@@ -8,15 +8,10 @@ mod win;
 use platform_contract::{PlatformError, WindowId, WindowInfo, WindowPort};
 use serde::{Deserialize, Serialize};
 
-/// Domyślne nazwy procesów chronionych (porównanie bez wielkości liter).
-pub const DEFAULT_PROTECTED_PROCESSES: [&str; 6] = [
-    "alfa.exe",
-    "alfa-desktop.exe",
-    "alfa-broker.exe",
-    "alfa-broker-ui.exe",
-    "alfa-watchdog.exe",
-    "alfa-updater.exe",
-];
+/// Domyślne nazwy procesów chronionych (porównanie bez wielkości liter) — ta sama lista co
+/// strażnik celów platformy (przegląd #3: osobna kopia pomijała `alfa-core.exe`, helper
+/// `uiAccess` i `alfa-mcp-proxy.exe`).
+pub const DEFAULT_PROTECTED_PROCESSES: [&str; 9] = platform_contract::PROTECTED_IMAGES;
 
 /// Prostokąt w pikselach ekranu.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]

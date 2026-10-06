@@ -32,7 +32,8 @@ pub trait HttpsGet: Send + Sync {
 }
 
 /// Czy adres IP jest publiczny (nie: pętla, prywatne, link-local, CGNAT, multicast, dokumentacja,
-/// nieokreślony, IPv4 w IPv6 z takim adresem, unikalne lokalne IPv6).
+/// nieokreślony, unikalne lokalne IPv6, IPv4 osadzony w IPv6 — zmapowany, zgodny, NAT64 `64:ff9b::/96`
+/// — z takim adresem, lokalny NAT64 `64:ff9b:1::/48`).
 pub fn is_public_ip(ip: IpAddr) -> bool {
     match ip {
         IpAddr::V4(v4) => {
@@ -50,33 +51,49 @@ pub fn is_public_ip(ip: IpAddr) -> bool {
                 || o[0] >= 240)
         }
         IpAddr::V6(v6) => {
-            if let Some(v4) = v6.to_ipv4_mapped() {
+            let s = v6.segments();
+            // `::a.b.c.d` (zgodny, przestarzały — także `::1`) i `::ffff:a.b.c.d` (zmapowany).
+            if let Some(v4) = v6.to_ipv4() {
                 return is_public_ip(IpAddr::V4(v4));
             }
-            let s = v6.segments();
+            // NAT64 (RFC 6052): adres IPv4 w ostatnich 32 bitach.
+            if s[..6] == [0x64, 0xff9b, 0, 0, 0, 0] {
+                let v4 = std::net::Ipv4Addr::from((u32::from(s[6]) << 16) | u32::from(s[7]));
+                return is_public_ip(IpAddr::V4(v4));
+            }
             !(v6.is_loopback()
                 || v6.is_unspecified()
                 || v6.is_multicast()
                 || (s[0] & 0xfe00) == 0xfc00
                 || (s[0] & 0xffc0) == 0xfe80
-                || (s[0] == 0x2001 && s[1] == 0x0db8))
+                || (s[0] == 0x2001 && s[1] == 0x0db8)
+                || (s[0] == 0x64 && s[1] == 0xff9b && s[2] == 1))
         }
     }
 }
 
-/// Host z adresu `https://host[:port]/…` (małe litery) — `None` dla innych schematów,
-/// poświadczeń w adresie i hostów lokalnych.
+/// Host z adresu `https://host[:port]/…` w postaci **kanonicznej**, z jaką połączy się klient
+/// (małe litery, IDNA, adres IP po parserze WHATWG) — `None` dla innych schematów, poświadczeń
+/// w adresie, hostów lokalnych i adresów niepublicznych w każdym zapisie (`2130706433`,
+/// `0x7f000001`, `0177.0.0.1`, `127.1` = `127.0.0.1`; przegląd #3, SR3-02). Klient łączy się
+/// z literałem IP bez resolvera [`PublicOnly`], więc to jest jedyna kontrola takich adresów.
 pub fn https_host(url: &str) -> Option<String> {
     let rest = url.strip_prefix("https://")?;
-    let authority = rest.split(['/', '?', '#']).next()?;
+    let authority = rest.split(['/', '\\', '?', '#']).next()?;
     if authority.is_empty() || authority.contains('@') {
         return None;
     }
-    let host = match authority.strip_prefix('[') {
-        Some(v6) => v6.split(']').next()?.to_owned(),
-        None => authority.split(':').next()?.to_owned(),
-    };
-    let host = host.trim_end_matches('.').to_ascii_lowercase();
+    let parsed = reqwest::Url::parse(url).ok()?;
+    if parsed.scheme() != "https" || !parsed.username().is_empty() || parsed.password().is_some() {
+        return None;
+    }
+    let raw = parsed.host_str()?;
+    let host = raw
+        .strip_prefix('[')
+        .and_then(|h| h.strip_suffix(']'))
+        .unwrap_or(raw)
+        .trim_end_matches('.')
+        .to_ascii_lowercase();
     if host.is_empty() || host == "localhost" || host.ends_with(".localhost") {
         return None;
     }

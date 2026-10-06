@@ -55,3 +55,6 @@ F4-07: `host_passes_contract` (impl i fake), `proxy_binary_end_to_end_with_platf
 - Limit częstości `approve` (zmęczenie zatwierdzeniami) — z Brokerem w F3/F4.
 - Zdolność odczytu rejestru w Brokerze (np. `system.read(registry:<klucz>)`, wymaga przeglądu człowieka) zamiast `system.admin(reg query)` — dziś każdy odczyt pyta właściciela.
 - Narzędzia v0 (schowek, okna) nie przechodzą przez Brokera — do ujednolicenia z v1.
+
+## Przegląd bezpieczeństwa #3 (2026-10, `docs/reviews/2026-10-security-review-3.md`)
+- **SR3-05 (zrobione):** `clipboard_read` dla mostu redaguje sekrety (`redact_secrets`) i pomija ścieżki poświadczeń — jak narzędzie schowka agentek. Nadal otwarte (P3-07): narzędzia v0 bez Brokera (`gui.control(schowek)` i zgłoszenie taintu jak w `tools-clipboard`) oraz `windows_list`/`windows_focus` po nazwie procesu zamiast `TargetGuard` z `platform-contract` (okna WebView2/UWP Alfy).

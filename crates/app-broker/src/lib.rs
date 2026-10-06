@@ -9,7 +9,7 @@
 //! - [`kernel::KernelProcesses`]: start procesów Jądra przez powłokę (tryb, `alfa-watchdog`,
 //!   nadzór łącza); [`inproc`]: Broker w procesie (tryb deweloperski, Linux/CI).
 //! - [`link::BrokerLink`]: klient IPC roli `Core` (sprawdzenie serwera potoku, limity czasu,
-//!   fail-closed po zerwaniu).
+//!   fail-closed po zerwaniu, odtwarzanie stanu zawężającego w nowym Brokerze — [`replay`]).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
@@ -20,6 +20,7 @@ pub mod link;
 pub mod mode;
 pub mod notice;
 mod remote;
+pub mod replay;
 mod status;
 pub mod supervise;
 mod window;

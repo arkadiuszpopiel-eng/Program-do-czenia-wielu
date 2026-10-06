@@ -8,6 +8,7 @@
 //!   czekają z limitem czasu. Przekroczenie limitu, błąd strumienia albo zamknięcie potoku =
 //!   łącze zerwane ([`LinkState::Lost`]) — od tej chwili każde wywołanie kończy się błędem, a
 //!   [`crate::RemoteBroker`] zamienia go w odmowę (fail-closed). Ponowne połączenie — nadzór.
+//! - Nowe połączenie najpierw odtwarza stan zawężający z [`Journal`] (SR3-03).
 
 use std::sync::mpsc::{self, RecvTimeoutError};
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
@@ -20,6 +21,7 @@ use safety_broker_contract::ipc::{
 use safety_broker_contract::ipc_blocking::{BlockingClient, BlockingError};
 use tokio::sync::oneshot;
 
+use crate::replay::Journal;
 use crate::status::{KernelStatus, LinkState};
 
 /// Kim musi być serwer potoku (ochrona przed podstawionym serwerem).
@@ -149,6 +151,7 @@ pub struct BrokerLink {
     config: LinkConfig,
     status: Arc<KernelStatus>,
     current: Mutex<Current>,
+    journal: Arc<Journal>,
     me: Weak<BrokerLink>,
 }
 
@@ -199,6 +202,7 @@ impl BrokerLink {
                 generation: 0,
                 jobs: None,
             }),
+            journal: Arc::default(),
             me: me.clone(),
         })
     }
@@ -217,20 +221,42 @@ impl BrokerLink {
         &self.config
     }
 
+    /// Dziennik stanu zawężającego odtwarzanego na każdym nowym połączeniu.
+    pub fn journal(&self) -> &Arc<Journal> {
+        &self.journal
+    }
+
     fn open(
         pipes: &dyn SecurePipePort,
         identity: &dyn ProcessIdentityPort,
         config: &LinkConfig,
         check: &ServerCheck,
+        replay: Vec<Request>,
     ) -> Result<BlockingClient<Box<dyn PipeConnection>>, LinkError> {
         let conn = pipes
             .connect(&config.pipe, config.connect_timeout_ms)
             .map_err(|e| LinkError::Lost(format!("potok {}: {e}", config.pipe)))?;
         verify_server(identity, conn.peer_pid(), check).map_err(LinkError::Rejected)?;
-        BlockingClient::connect(conn, &hello()).map_err(|e| match e {
+        let mut client = BlockingClient::connect(conn, &hello()).map_err(|e| match e {
             BlockingError::Rejected(why) => LinkError::Rejected(why),
             other => LinkError::Lost(other.to_string()),
-        })
+        })?;
+        // Przed udostępnieniem połączenia: błąd strumienia = połączenie nieudane, odmowa Brokera
+        // (np. obniżenie „na czas” już wygasłe) — tylko wpis w dzienniku.
+        for request in replay {
+            match client.call(request) {
+                Ok(Response::Error(e)) => {
+                    tracing::warn!(error = %e, "odtworzenie stanu w Brokerze odrzucone");
+                }
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(LinkError::Lost(format!(
+                        "odtwarzanie stanu w nowym połączeniu: {e}"
+                    )));
+                }
+            }
+        }
+        Ok(client)
     }
 
     /// Łączy się (sprawdzenie serwera, powitanie) z limitem czasu; sukces podmienia połączenie.
@@ -239,10 +265,11 @@ impl BrokerLink {
         let (tx, rx) = mpsc::sync_channel(1);
         let (pipes, identity) = (self.pipes.clone(), self.identity.clone());
         let (config, check) = (self.config.clone(), check.clone());
+        let replay = self.journal.requests();
         std::thread::Builder::new()
             .name("alfa-broker-connect".into())
             .spawn(move || {
-                let _ = tx.send(Self::open(&*pipes, &*identity, &config, &check));
+                let _ = tx.send(Self::open(&*pipes, &*identity, &config, &check, replay));
             })
             .map_err(|e| LinkError::Lost(format!("wątek łączenia: {e}")))?;
         let client = match rx.recv_timeout(self.config.call_timeout) {

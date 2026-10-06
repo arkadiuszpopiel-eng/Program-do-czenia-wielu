@@ -9,14 +9,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::scope::{AppSelector, HostPattern, PathScope};
 
-/// Procesy Jądra — zawsze chronione przed `gui.control` (THREAT_MODEL §7).
-pub const PROTECTED_PROCESSES: [&str; 6] = [
+/// Procesy Jądra — zawsze chronione przed `gui.control` (THREAT_MODEL §7) i przed zakończeniem
+/// poleceniem powłoki. Nadzbiór `platform_contract::PROTECTED_IMAGES` (przegląd #3, SR3-01:
+/// właściwy plik aplikacji to `alfa-desktop.exe`; test `tests/review.rs` pilnuje zgodności).
+pub const PROTECTED_PROCESSES: [&str; 9] = [
     "alfa.exe",
     "alfa-core.exe",
+    "alfa-desktop.exe",
     "alfa-broker.exe",
     "alfa-broker-ui.exe",
     "alfa-watchdog.exe",
+    "alfa-updater.exe",
     "alfa-uiaccess-helper.exe",
+    "alfa-mcp-proxy.exe",
 ];
 
 /// Aplikacje desktopowe (i CLI) dostawców planów — `gui.control` = „używanie UI dostawcy”

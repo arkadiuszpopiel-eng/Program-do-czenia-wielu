@@ -184,3 +184,31 @@ async fn unknown_focus_refuses_typing() {
     assert_ne!(out.status, ToolStatus::Ok, "{out:?}");
     assert!(d.typed_text(w).is_empty());
 }
+
+/// Przegląd #3, SR3-04: globalne skróty Alfy rejestruje powłoka Tauri (`RegisterHotKey` bez
+/// filtra pochodzenia z P2-04), więc paczka `SendInput` agentki do **dowolnego** okna uruchamia
+/// je w Alfie: `Ctrl+Alt+D` — dyktowanie z mikrofonu do okna na pierwszym planie (agentka czyta
+/// potem transkrypcję rozmowy w pokoju), `Ctrl+Alt+R` — czytanie na głos, `Ctrl+Alt+Space` —
+/// okno Alfy na wierzch. Skrót globalny i tak nie dociera do aplikacji docelowej, więc odmowa
+/// niczego nie zabiera.
+#[tokio::test]
+async fn alfa_global_shortcuts_are_never_sent_by_agents() {
+    let d = Arc::new(FakeDesktop::new());
+    let rect = ScreenRect::from_xywh(0, 0, 800, 600);
+    let w = d.add_window(FakeWindow::new("Notatki", "notepad.exe", rect), true);
+    let edit = FakeElement::new("Tekst", "edit", rect).focused();
+    d.add_element(w, edit).unwrap();
+    let t = tools(&d, d.clone());
+    for chord in ["Ctrl+Alt+D", "ctrl+alt+r", "Ctrl+Alt+Space", "Alt+Ctrl+d"] {
+        let out = tool(&t, "input_keys")
+            .call(json!({"window": w.0, "keys": [chord]}), &ctx())
+            .await;
+        assert_eq!(out.status, denied(), "{chord}: {out:?}");
+    }
+    assert_eq!(inputs(&d), 0, "żadne naciśnięcie nie wyszło do systemu");
+    // Inne skróty z Ctrl+Alt (np. AltGr na układzie polskim) nadal działają w aplikacji.
+    let out = tool(&t, "input_keys")
+        .call(json!({"window": w.0, "keys": ["Ctrl+Alt+Shift+D"]}), &ctx())
+        .await;
+    assert!(out.is_ok(), "{out:?}");
+}

@@ -90,3 +90,6 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   podręczna `sessions` ich nie zamyka) — przy setkach sesji RAM rośnie; do rozważenia zamykanie baz po kroku.
 - `models_local_download` (`providers-local`) zostaje dla zgodności, ale zapisuje hash bez zgody w UI — do decyzji,
   czy wyłączyć (onboarding korzysta już z menedżera).
+
+## Przegląd bezpieczeństwa #3 (2026-10, `docs/reviews/2026-10-security-review-3.md`) — decyzja człowieka
+- **P3-04:** sidecary wykonywalne (`llama-server`, `whisper-server`, `piper`) pobierane bez przypiętego SHA-256 (tylko TOFU) — przypiąć skróty potwierdzonych wydań albo zablokować pobieranie nieprzypiętych plików wykonywalnych (THREAT_MODEL S23). Test `tests/review.rs` (`#[ignore]`).

@@ -15,6 +15,7 @@ use mcp_contract::{
 use platform_contract::{ClipboardContent, ClipboardPort, WindowId, WindowPort};
 use serde_json::{Value, json};
 use tokio_util::sync::CancellationToken;
+use tools_common_contract::{paths, text};
 
 use crate::v1::{Bridge, V1Tools};
 
@@ -85,15 +86,21 @@ impl AlfaToolHandler {
         self
     }
 
+    /// Schowek dla mostu: jak narzędzie schowka agentek — sekrety zredagowane, ścieżki
+    /// poświadczeń (`is_credential_path` platformy) pominięte (przegląd #3, SR3-05).
     fn clipboard_read(&self) -> CallToolResult {
         match self.ports.clipboard.get() {
             Ok(ClipboardContent::Empty) => CallToolResult::structured(json!({"kind": "empty"})),
-            Ok(ClipboardContent::Text(text)) => {
-                CallToolResult::structured(json!({"kind": "text", "text": text}))
-            }
-            Ok(ClipboardContent::Files(paths)) => CallToolResult::structured(json!({
+            Ok(ClipboardContent::Text(t)) => CallToolResult::structured(
+                json!({"kind": "text", "text": text::redact_secrets(&t)}),
+            ),
+            Ok(ClipboardContent::Files(list)) => CallToolResult::structured(json!({
                 "kind": "files",
-                "paths": paths.iter().map(|p| p.to_string_lossy()).collect::<Vec<_>>(),
+                "paths": list
+                    .iter()
+                    .map(|p| p.to_string_lossy())
+                    .filter(|p| !paths::has_credential_segment(p))
+                    .collect::<Vec<_>>(),
             })),
             Ok(ClipboardContent::ImagePng(bytes)) => {
                 CallToolResult::structured(json!({"kind": "image_png", "bytes": bytes.len()}))

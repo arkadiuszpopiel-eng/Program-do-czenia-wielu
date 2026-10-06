@@ -200,6 +200,10 @@ impl KeyChord {
             }
             Delete if self.ctrl && self.alt => Some("bezpieczna sekwencja (Ctrl+Alt+Del)"),
             Function(12) if only(true, false, true) => Some("kill-switch Jądra (Ctrl+Shift+F12)"),
+            // Skróty globalne Alfy (powłoka): dyktowanie, czytanie, Szybkie pytanie (SR3-04).
+            ChordKey::Space | ChordKey::Letter('D' | 'R') if only(true, true, false) => {
+                Some("skrót globalny Alfy (dyktowanie, czytanie, Szybkie pytanie)")
+            }
             _ => None,
         }
     }
@@ -274,6 +278,8 @@ mod tests {
             "Ctrl+Alt+Del",
             "Ctrl+Shift+F12",
             "Win+L",
+            "Ctrl+Alt+D",
+            "Ctrl+Alt+Space",
         ] {
             assert!(KeyChord::parse(s).unwrap().system_scope().is_some(), "{s}");
         }
@@ -283,6 +289,7 @@ mod tests {
             "Enter",
             "Ctrl+Shift+F11",
             "Ctrl+Alt+Shift+F12",
+            "Ctrl+Alt+Shift+D",
             "Tab",
         ] {
             assert!(KeyChord::parse(s).unwrap().system_scope().is_none(), "{s}");

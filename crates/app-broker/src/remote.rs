@@ -5,6 +5,10 @@
 //! kończy się `BrokerError::AuditUnavailable` (narzędzia: odmowa „Audyt niedostępny”), weryfikacja
 //! tokenu — odrzuceniem, stan sesji — „skażona, z danymi prywatnymi”, poziom autonomii — L0.
 //! Kill-switch zawsze zabija lokalne drzewa procesów narzędzi i wycisza audio, nawet bez Brokera.
+//!
+//! Stan zawężający, który Broker przyjął (skażenie sesji, obniżenia poziomu przez właściciela),
+//! trafia do dziennika łącza ([`crate::replay::Journal`]) i jest odtwarzany w nowym procesie
+//! Brokera po ponownym połączeniu (przegląd bezpieczeństwa #3, SR3-03).
 
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -12,7 +16,7 @@ use std::time::{Duration, Instant};
 use async_trait::async_trait;
 use core_bus_contract::{AgentId, Event, EventBus, Level, SessionId};
 use platform_contract::{ProcessHandle, ProcessPort};
-use risk_classifier_contract::{AutonomyLevel, KernelRule};
+use risk_classifier_contract::{AutonomyLevel, CommandOrigin, KernelRule};
 use safety_broker_contract::ipc::{Request, Response, UserChannel};
 use safety_broker_contract::{
     ActionRequest, ApprovalId, ApprovalStatus, AttenuateRequest, AutonomyChangeRequest, Broker,
@@ -86,13 +90,18 @@ impl RemoteBroker {
 #[async_trait]
 impl Broker for RemoteBroker {
     async fn decide(&self, action: ActionRequest) -> Result<Decision, BrokerError> {
-        answer(
-            self.link.call_async(Request::Decide(action)).await,
-            |r| match r {
-                Response::Decision(d) => Some(d),
-                _ => None,
-            },
-        )
+        // Broker skaża sesję żądaniem z treści niezaufanej (jak `decide_sync`) — także po odmowie.
+        let taints = action.origin == CommandOrigin::UntrustedContent
+            || action.facts.untrusted_input_in_args;
+        let session = action.holder.session.clone();
+        let result = self.link.call_async(Request::Decide(action)).await;
+        if taints && result.is_ok() {
+            self.link.journal().taint(&session, &TaintSource::File);
+        }
+        answer(result, |r| match r {
+            Response::Decision(d) => Some(d),
+            _ => None,
+        })
     }
 
     fn verify(
@@ -144,9 +153,11 @@ impl Broker for RemoteBroker {
     ) -> Result<(), BrokerError> {
         let req = Request::ReportUntrusted {
             session: session.clone(),
-            source,
+            source: source.clone(),
         };
-        answer(self.link.call_async(req).await, ok)
+        answer(self.link.call_async(req).await, ok)?;
+        self.link.journal().taint(session, &source);
+        Ok(())
     }
 
     fn session_security(&self, session: &SessionId) -> SessionSecurity {
@@ -154,7 +165,18 @@ impl Broker for RemoteBroker {
             session: session.clone(),
         };
         match self.link.call(req) {
-            Ok(Response::Security(s)) => s,
+            Ok(Response::Security(s)) => {
+                if s.tainted {
+                    let journal = self.link.journal();
+                    for t in &s.taint_sources {
+                        journal.taint(session, t);
+                    }
+                    if s.taint_sources.is_empty() {
+                        journal.taint(session, &TaintSource::File);
+                    }
+                }
+                s
+            }
             _ => fail_closed_security(),
         }
     }
@@ -198,16 +220,22 @@ impl Broker for RemoteBroker {
                 return Err(BrokerError::KernelBlock(KernelRule::SelfEscalation));
             }
         };
+        let (target, level, until_ms) = (request.target, request.level, request.until_ms);
         let req = Request::RequestAutonomy {
-            target: request.target,
-            level: request.level,
-            until_ms: request.until_ms,
+            target: target.clone(),
+            level,
+            until_ms,
             via,
         };
-        answer(self.link.call_async(req).await, |r| match r {
+        let applied = answer(self.link.call_async(req).await, |r| match r {
             Response::Approval(id) => Some(id),
             _ => None,
-        })
+        })?;
+        // Zastosowane bez zgody = obniżenie właściciela (dziennik pamięta tylko poniżej L3).
+        if applied.is_none() {
+            self.link.journal().lowered(&target, level, until_ms, via);
+        }
+        Ok(applied)
     }
 
     fn autonomy(&self, session: &SessionId, agent: Option<&AgentId>) -> AutonomyLevel {
