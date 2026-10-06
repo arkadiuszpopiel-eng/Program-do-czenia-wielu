@@ -204,6 +204,7 @@ impl SidecarLauncher for ProcessLauncher {
             tokio::spawn(async move {
                 let mut lines = BufReader::new(err).lines();
                 while let Ok(Some(line)) = lines.next_line().await {
+                    log_server_line(&line);
                     let mut t = lock(&tail);
                     if t.len() >= 64 {
                         t.pop_front();
@@ -255,5 +256,82 @@ mod tests {
             backend: Backend::Cpu,
         };
         assert!(ProcessLauncher.launch(&spec).await.is_err());
+    }
+}
+
+/// Poziom wiersza stderr `whisper-server` w dzienniku Alfy: błędy i utrata urządzenia — `warn`,
+/// model i backend (CUDA/Vulkan/CPU) — `info` (oba widoczne domyślnie), reszta — `debug` pod osobnym
+/// celem `whisper_server` (tylko po jawnym włączeniu). Wiersze z transkrypcją (`[… --> …]`) nigdy
+/// nie idą wyżej niż `debug` — treść rozmowy nie trafia do dziennika.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LineLevel {
+    Warn,
+    Info,
+    Debug,
+}
+
+const ERROR_MARKERS: [&str; 5] = ["error", "failed", "out of memory", "abort", "fatal"];
+
+const INFO_MARKERS: [&str; 7] = [
+    "whisper_init_from_file",
+    "whisper_model_load: type",
+    "model size",
+    "whisper_backend_init",
+    "ggml_cuda_init",
+    "using device",
+    "listening",
+];
+
+pub(crate) fn classify_line(line: &str) -> LineLevel {
+    let trimmed = line.trim_start();
+    if trimmed.starts_with('[') && trimmed.contains("-->") {
+        return LineLevel::Debug;
+    }
+    let lower = line.to_ascii_lowercase();
+    if ERROR_MARKERS.iter().any(|m| lower.contains(m))
+        || DEVICE_LOST_MARKERS.iter().any(|m| line.contains(m))
+    {
+        LineLevel::Warn
+    } else if INFO_MARKERS.iter().any(|m| line.contains(m)) {
+        LineLevel::Info
+    } else {
+        LineLevel::Debug
+    }
+}
+
+fn log_server_line(line: &str) {
+    match classify_line(line) {
+        LineLevel::Warn => tracing::warn!(target: "voice_stt_impl::whisper_server", "{line}"),
+        LineLevel::Info => tracing::info!(target: "voice_stt_impl::whisper_server", "{line}"),
+        LineLevel::Debug => tracing::debug!(target: "whisper_server", "{line}"),
+    }
+}
+
+#[cfg(test)]
+mod line_tests {
+    use super::{LineLevel, classify_line};
+
+    #[test]
+    fn whisper_lines_are_classified_without_transcripts() {
+        for (line, level) in [
+            ("ggml_cuda_init: found 1 CUDA devices:", LineLevel::Info),
+            (
+                "whisper_backend_init_gpu: using CUDA0 backend",
+                LineLevel::Info,
+            ),
+            (
+                "whisper_model_load: model size    =  547.37 MB",
+                LineLevel::Info,
+            ),
+            ("ggml_vulkan: Device lost: ErrorDeviceLost", LineLevel::Warn),
+            ("CUDA error: out of memory", LineLevel::Warn),
+            (
+                "[00:00:00.000 --> 00:00:02.000]  To jest error w moim pliku",
+                LineLevel::Debug,
+            ),
+            ("Received request: /inference", LineLevel::Debug),
+        ] {
+            assert_eq!(classify_line(line), level, "{line}");
+        }
     }
 }

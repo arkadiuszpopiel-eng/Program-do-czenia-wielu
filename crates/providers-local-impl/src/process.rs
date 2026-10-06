@@ -100,10 +100,109 @@ impl SidecarLauncher for TokioLauncher {
                     } else {
                         line.replace(&secret, "[REDACTED]")
                     };
-                    tracing::debug!(target: "llama_server", "{line}");
+                    log_server_line(&line);
                 }
             });
         }
         Ok(Box::new(TokioProcess(child)))
+    }
+}
+
+/// Poziom wiersza stderr `llama-server` w dzienniku Alfy.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LineLevel {
+    /// Błąd serwera (np. brak pamięci karty) — `warn`, widoczny domyślnie.
+    Warn,
+    /// Architektura modelu, KV cache, odciążenie warstw, urządzenie — `info`, widoczny domyślnie
+    /// (potwierdzenie szacunków VRAM z `models.toml`).
+    Info,
+    /// Reszta — `debug` pod osobnym celem `llama_server` (tylko po jawnym włączeniu:
+    /// `ALFA_LOG=info,llama_server=debug`; wiersze żądań mogą nieść treść).
+    Debug,
+}
+
+const ERROR_MARKERS: [&str; 6] = [
+    "error",
+    "failed",
+    "out of memory",
+    "exception",
+    "abort",
+    "fatal",
+];
+
+const INFO_MARKERS: [&str; 13] = [
+    "n_layer",
+    "n_head_kv",
+    "n_embd ",
+    "n_ctx_train",
+    "n_vocab",
+    "file type",
+    "model params",
+    "kv_cache",
+    "offloaded",
+    "ggml_cuda_init",
+    "using device",
+    "model buffer size",
+    "server is listening",
+];
+
+pub(crate) fn classify_line(line: &str) -> LineLevel {
+    let lower = line.to_ascii_lowercase();
+    if ERROR_MARKERS.iter().any(|m| lower.contains(m)) {
+        LineLevel::Warn
+    } else if INFO_MARKERS.iter().any(|m| line.contains(m)) {
+        LineLevel::Info
+    } else {
+        LineLevel::Debug
+    }
+}
+
+fn log_server_line(line: &str) {
+    match classify_line(line) {
+        LineLevel::Warn => tracing::warn!(target: "providers_local_impl::llama_server", "{line}"),
+        LineLevel::Info => tracing::info!(target: "providers_local_impl::llama_server", "{line}"),
+        LineLevel::Debug => tracing::debug!(target: "llama_server", "{line}"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{LineLevel, classify_line};
+
+    #[test]
+    fn server_lines_are_classified_for_the_log() {
+        for (line, level) in [
+            (
+                "ggml_backend_cuda_buffer_type_alloc_buffer: allocating 5120.00 MiB on device 0: cudaMalloc failed: out of memory",
+                LineLevel::Warn,
+            ),
+            (
+                "llama_model_load: error loading model: tensor data is not within file bounds",
+                LineLevel::Warn,
+            ),
+            ("print_info: n_layer          = 60", LineLevel::Info),
+            (
+                "llama_kv_cache:      CUDA0 KV buffer size =   272.00 MiB",
+                LineLevel::Info,
+            ),
+            (
+                "load_tensors: offloaded 34/61 layers to GPU",
+                LineLevel::Info,
+            ),
+            (
+                "main: server is listening on http://127.0.0.1:52011",
+                LineLevel::Info,
+            ),
+            (
+                "srv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200",
+                LineLevel::Debug,
+            ),
+            (
+                "slot launch_slot_: id  0 | task 12 | processing task",
+                LineLevel::Debug,
+            ),
+        ] {
+            assert_eq!(classify_line(line), level, "{line}");
+        }
     }
 }

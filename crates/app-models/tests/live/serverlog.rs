@@ -1,4 +1,4 @@
-//! Przechwycenie logu `llama-server` (stderr → `tracing` z celem `llama_server` w `providers-local`).
+//! Przechwycenie logu `llama-server` (stderr → `tracing` z celami `*llama_server` w `providers-local`).
 //! Do raportu trafiają wiersze z architekturą modelu, KV cache i odciążeniem warstw — potwierdzenie
 //! wartości `layers` i `kv_mb_per_1k_ctx` z `models.toml` oznaczonych „do potwierdzenia”.
 
@@ -28,7 +28,8 @@ struct ServerLog;
 
 impl Subscriber for ServerLog {
     fn enabled(&self, meta: &Metadata<'_>) -> bool {
-        meta.target() == "llama_server"
+        // `providers_local_impl::llama_server` (info/warn) i `llama_server` (debug).
+        meta.target().ends_with("llama_server")
     }
 
     fn new_span(&self, _: &Attributes<'_>) -> Id {

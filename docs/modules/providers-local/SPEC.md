@@ -138,3 +138,8 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   jest rozrywana; gdy w budżecie nie ma takiej tury (długa seria narzędzi), okno sięga do najbliższej wcześniejszej.
   Ostatnia wiadomość zostaje zawsze; historia w sesji nietknięta; log `info` z liczbą pominiętych wiadomości (bez treści).
   Testy: `tests/window.rs`.
+- **Wyjście `llama-server` w dzienniku Alfy:** wiersze stderr klasyfikowane (`process::classify_line`) — błędy i brak
+  pamięci (`error`, `failed`, `out of memory`…) jako `warn`, architektura modelu, KV cache, odciążenie warstw i urządzenie
+  jako `info` (cel `providers_local_impl::llama_server`, zapisywane domyślnie — potwierdzenie szacunków VRAM i diagnoza
+  OOM na sprzęcie); reszta `debug` pod celem `llama_server` (poza Alfą — tylko po jawnym `ALFA_LOG=…,llama_server=debug`,
+  bo wiersze żądań mogą nieść treść). Wcześniej całe wyjście szło na `debug` pod celem obcym, obcinanym do `warn`.

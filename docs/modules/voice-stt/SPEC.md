@@ -81,3 +81,10 @@ Napisy na żywo (szary partial → pełny final), dyktowanie do czatu z podgląd
   się na CPU w tej samej rozmowie). Przy domyślnym kontekście LLM dobranym przez `providers-local` (laptop: 4096) oba
   mieszczą się na karcie. Test `stt_never_evicts_the_conversation_model_on_a_6_gb_laptop`.
 
+
+## Zmiany — wyjście `whisper-server` w dzienniku (2026-10-06)
+- Wiersze stderr `whisper-server` trafiają do dziennika Alfy (`sidecar::classify_line`): błędy i utrata urządzenia
+  (`DEVICE_LOST_MARKERS`, `out of memory`) jako `warn`, model i backend (`using CUDA0 backend`, `model size`) jako `info`
+  (cel `voice_stt_impl::whisper_server`, domyślnie zapisywane); reszta `debug` pod celem `whisper_server` (tylko po jawnym
+  włączeniu). Wiersze z transkrypcją (`[… --> …]`) nigdy wyżej niż `debug` — treść rozmowy nie trafia do dziennika.
+  Wcześniej stderr służył tylko do wykrywania utraty urządzenia (ostatnie 64 wiersze w pamięci).

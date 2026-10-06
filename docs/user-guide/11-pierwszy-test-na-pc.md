@@ -79,12 +79,14 @@ tych części (kolumna „Laptop”).
 | Bielik 1.5B Q8_0 + rozmowa głosowa             | cały model (32 warstwy) + whisper             | 2456 + 1500   | 3,4–4,2 GB          |
 | Na baterii                                     | tylko whisper (model rozmowy liczy procesor)  | 1500 MB       | 1,0–1,6 GB          |
 
-W logu (`%LOCALAPPDATA%\Alfa\logs`) zapisz linię `llama-server gotowy` (liczba warstw `gpu_layers=34`) i — jeśli
-jest — `llama_kv_cache … size = … MiB` (Alfa zakłada 480 MiB dla 4.5B i 256 MiB dla 1.5B przy `-c 8192`; inna
-liczba = do poprawki w manifeście).
+W logu (`%LOCALAPPDATA%\Alfa\logs`) zapisz linię `llama-server gotowy` (liczba warstw `gpu_layers=34`) oraz linie
+celu `providers_local_impl::llama_server` (zapisywane domyślnie): `offloaded 34/61 layers to GPU`, `n_layer`,
+`n_head_kv` i `llama_kv_cache … size = … MiB` (Alfa zakłada 480 MiB dla 4.5B i 256 MiB dla 1.5B przy `-c 8192`;
+inna liczba = do poprawki w manifeście). Rozpoznawanie mowy pisze podobnie pod `voice_stt_impl::whisper_server`
+(`using CUDA0 backend` = whisper na karcie).
 
-**Jak rozpoznać brak pamięci karty (OOM).** (1) W logu: `out of memory`, `cudaMalloc failed`, `failed to allocate
-CUDA0 buffer` albo zdarzenia `local.backend.fallback` (karta → procesor) i `local.sidecar.crashed`; odpowiedź się
+**Jak rozpoznać brak pamięci karty (OOM).** (1) W logu — ostrzeżenia (`WARN`) celów `…::llama_server`
+i `…::whisper_server`: `out of memory`, `cudaMalloc failed`, `failed to allocate CUDA0 buffer` albo zdarzenia `local.backend.fallback` (karta → procesor) i `local.sidecar.crashed`; odpowiedź się
 urywa albo przychodzi wyraźnie wolniej niż poprzednie. (2) W `nvidia-smi` `memory.used` dobija do ok. 6100 MiB
 i tam stoi. (3) Sterownik NVIDIA na Windows potrafi zamiast błędu przenieść nadmiar do pamięci RAM („Udostępniona
 pamięć GPU” w Menedżerze zadań → Wydajność → GPU 1 rośnie powyżej ~0,5 GB) — wtedy błędu nie ma, ale tokeny na
@@ -486,7 +488,10 @@ przepisz komunikat.
 - W trybie deweloperskim (część 4) te same linie widać na bieżąco w Terminalu.
 - Przed powtórzeniem błędu włącz więcej szczegółów: `$env:ALFA_LOG = "debug"` w tym samym oknie PowerShell
   przed `setup-dev.ps1 -Run` albo `[logs]` / `level = "debug"` w `%APPDATA%\Alfa\config\shared.toml`
-  (od następnego uruchomienia; szczegóły: `09-dane-i-zdrowie.md` → „Gdzie są logi”).
+  (od następnego uruchomienia; szczegóły: `09-dane-i-zdrowie.md` → „Gdzie są logi”). Pełne wyjście serwerów modeli
+  (każdy wiersz `llama-server` i `whisper-server`) — tylko na prośbę:
+  `$env:ALFA_LOG = "debug,llama_server=debug,whisper_server=debug"`; te wiersze mogą zawierać fragmenty rozmowy,
+  więc przed wysłaniem logu je przejrzyj.
 - Gdy Alfa (wersja z instalatora) w ogóle się nie otwiera — najpierw zajrzyj do najnowszego `alfa.….log`
   (np. wpis o zmiennej `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS`: Alfa odmawia startu, gdy zmienna włącza
   zdalne debugowanie WebView2 — usuń ją w „Zmiennych środowiskowych” i uruchom ponownie).
