@@ -3,15 +3,16 @@
 //! jobie: `ALFA_LIVE_CATALOG=1 cargo test -p app-models --test live_catalog -- --ignored --nocapture`.
 //!
 //! Przez **prawdziwy** `ModelsApp` (katalog `builtin()`, HTTPS, zgoda TOFU jak kliknięcie w UI)
-//! pobiera i rozpakowuje: `llama-server` (CPU) + najmniejszy model GGUF z katalogu (Bielik 4.5B
-//! Q4_K_M, ~2,9 GB — poniżej progu 3 GiB, więc bez osobnego modelu testowego), `whisper-server`
-//! (CPU) + najmniejszy model whisper, `piper` + głos `pl_PL`; dodatkowo — tylko pobranie
+//! pobiera i rozpakowuje: `llama-server` (CPU) + modele GGUF z katalogu (oficjalne Bielik v3.0 Q8_0:
+//! 1.5B ~1,6 GB i domyślny 4.5B ~4,8 GB — ten, który pobierze właściciel; `ALFA_LIVE_LLM=<id>` zawęża
+//! do jednego), `whisper-server` (CPU) + najmniejszy model whisper, `piper` + głos `pl_PL`; dodatkowo — tylko pobranie
 //! i rozpakowanie (bez GPU na runnerze) — `llama-server` Vulkan i CUDA (+ `cudart`) oraz
 //! `whisper-server` CUDA, jeśli są w katalogu. Silniki uruchamia kodem aplikacji:
 //! `app_modules::route::local` (`llama-server`, ta sama kompozycja co `app-core`),
 //! `app_modules::tts::engines` (Piper) i `app_modules::stt::whisper` (to samo co `app-voice`).
-//! Sprawdza: generację ≥ 16 tokenów po polsku; „Dzień dobry, jestem Alfa.” → Piper → WAV →
-//! whisper → WER. Raport JSON (`ALFA_LIVE_REPORT`, domyślnie `<katalog>/live-report.json`):
+//! Sprawdza: generację ≥ 16 tokenów po polsku (każdy model; z narzędziem, gdy `tools = true`) i wiersze
+//! logu `llama-server` z architekturą i KV cache; „Dzień dobry, jestem Alfa.” → Piper → WAV →
+//! whisper → WER. Brak pozycji nie przerywa testu — dalsze etapy idą z tym, co się zainstalowało. Raport JSON (`ALFA_LIVE_REPORT`, domyślnie `<katalog>/live-report.json`):
 //! adres, rozmiar i **SHA-256** każdego pobranego pliku, układ drzewa, wersje i flagi CLI, czasy
 //! (pobieranie, start sidecara, tok/s, RTF). Raport służy człowiekowi do przypięcia hashy —
 //! test niczego nie przypina w katalogu.
@@ -32,7 +33,7 @@ use app_models::{ModelsApp, ModelsDeps, ModelsOptions};
 use device_profile_contract::DeviceProfile;
 use device_profile_fake::FakeDeviceProfile;
 use futures_util::StreamExt;
-use live::setup::{mirrored, root, runner_profile, smallest};
+use live::setup::{llms, mirrored, root, runner_profile, smallest};
 use live::{Report, ms};
 use model_residency_contract::Residency;
 use providers_contract::{
@@ -50,8 +51,8 @@ use voice_tts_contract::{CancelToken, SpeechStyle, TtsRequest};
 const PHRASE: &str = "Dzień dobry, jestem Alfa.";
 /// Próg WER dla małego modelu whisper na mowie syntetycznej (4 słowa: dopuszczalne 2 błędy).
 const MAX_WER: f64 = 0.5;
-/// Próg rozmiaru modelu GGUF dla runnera CPU.
-const MAX_LLM_BYTES: u64 = 3 << 30;
+/// Głos Piper sprawdzany w teście (polski, z katalogu `app-models`).
+const PIPER_VOICE: &str = "piper-pl_PL-gosia-medium";
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "pobiera ~4 GB z GitHub/Hugging Face i uruchamia silniki; ALFA_LIVE_CATALOG=1"]
@@ -67,21 +68,17 @@ async fn live_catalog_cpu_engines() {
         .map_or_else(|| root.join("live-report.json"), PathBuf::from);
     let mut report = Report::new(report_path.clone());
     let (catalog, mirror) = mirrored(app_models::builtin());
-    let llm = smallest(&catalog, ModelItemKind::Llm);
-    assert!(
-        llm.size() <= MAX_LLM_BYTES,
-        "{}: potrzebny mały model testowy",
-        llm.id
-    );
+    let llms = llms(&catalog);
     let stt_model = smallest(&catalog, ModelItemKind::Stt);
-    let core = [
-        "sidecar-llama-cpu",
-        llm.id.as_str(),
+    let voice = [
         "sidecar-whisper-cpu",
         stt_model.id.as_str(),
         "sidecar-piper",
-        "piper-pl_PL-gosia-medium",
+        PIPER_VOICE,
     ];
+    let mut core = vec!["sidecar-llama-cpu"];
+    core.extend(llms.iter().map(|l| l.id.as_str()));
+    core.extend(voice);
     let layout_only = [
         "sidecar-llama-vulkan",
         "sidecar-llama-cuda",
@@ -119,18 +116,20 @@ async fn live_catalog_cpu_engines() {
             installed.push(spec.id.clone());
         }
     }
-    let missing: Vec<&&str> = core
-        .iter()
-        .filter(|id| !installed.iter().any(|i| i == *id))
-        .collect();
-    assert!(
-        missing.is_empty(),
-        "nie zainstalowano: {missing:?} — raport: {}",
-        report_path.display()
-    );
+    let has = |id: &str| installed.iter().any(|i| i == id);
+    for id in core.iter().filter(|id| !has(id)) {
+        report.problem(format!("nie zainstalowano: {id}"));
+    }
     live::probe::probe_programs(&paths, &mut report).await;
-    llm_generation(&paths, &llm.id, &mut report).await;
-    voice_round_trip(&paths, &root, &mut report).await;
+    if has("sidecar-llama-cpu") {
+        live::serverlog::install();
+        for llm in llms.iter().filter(|l| has(&l.id)) {
+            llm_generation(&paths, &llm.id, &mut report).await;
+        }
+    }
+    if voice.iter().all(|id| has(id)) {
+        voice_round_trip(&paths, &root, &mut report).await;
+    }
     let problems = report.problems();
     assert!(
         problems.is_empty(),
@@ -186,9 +185,7 @@ async fn llm_generation(paths: &AppPaths, model: &str, report: &mut Report) {
         }
     }
     let pl = text.chars().any(|c| "ąćęłńóśźż".contains(c));
-    report.set(
-        "llm",
-        json!({
+    let mut entry = json!({
             "model": model,
             "server": plan.as_ref().map(|(_, p, _)| p.program.display().to_string()),
             "backend": plan.as_ref().map(|(_, p, _)| p.backend.as_str()),
@@ -203,20 +200,30 @@ async fn llm_generation(paths: &AppPaths, model: &str, report: &mut Report) {
             "polish_letters": pl,
             "text": text,
             "error": error,
-        }),
-    );
+    });
     if error.is_some() || tokens < 16 || !pl {
         report.problem(format!(
-            "LLM: {tokens} tokenów, polskie litery: {pl}, błąd: {error:?}"
+            "LLM {model}: {tokens} tokenów, polskie litery: {pl}, błąd: {error:?}"
         ));
     }
-    tool_request(provider.as_ref(), model, report).await;
+    entry["tools"] = if provider.entry(model).is_some_and(|e| e.tools) {
+        tool_request(provider.as_ref(), model, report).await
+    } else {
+        // Lekki model bez narzędzi (`tools = false` w manifeście) — serwer bez `--jinja`.
+        json!({ "skipped": "model bez narzędzi" })
+    };
     provider.sidecar().stop("koniec testu").await;
+    entry["server_log"] = json!(live::serverlog::drain());
+    report.push("llm", entry);
 }
 
 /// Żądanie z narzędziem (jak tura agentki): szablon czatu modelu z `--jinja` musi przyjąć
 /// `tools` — błąd serwera to problem; to, czy mały model wywoła narzędzie, trafia tylko do raportu.
-async fn tool_request(provider: &dyn ModelProvider, model: &str, report: &mut Report) {
+async fn tool_request(
+    provider: &dyn ModelProvider,
+    model: &str,
+    report: &mut Report,
+) -> serde_json::Value {
     let mut req = ChatRequest::new(
         model,
         vec![Message::user_text(
@@ -243,13 +250,10 @@ async fn tool_request(provider: &dyn ModelProvider, model: &str, report: &mut Re
         ProviderEvent::Error(err) => Some(err.to_string()),
         _ => None,
     });
-    report.set(
-        "llm_tools",
-        json!({ "tool_called": called, "total_ms": ms(t0.elapsed()), "error": error }),
-    );
-    if let Some(e) = error {
-        report.problem(format!("LLM z narzędziami: {e}"));
+    if let Some(e) = &error {
+        report.problem(format!("LLM {model} z narzędziami: {e}"));
     }
+    json!({ "tool_called": called, "total_ms": ms(t0.elapsed()), "error": error })
 }
 
 /// Zdarzenia STT w skrócie (fallback z powodem — na runnerze bez GPU wersja CUDA nie startuje).
@@ -268,9 +272,7 @@ fn stt_events(stt: &WhisperStt) -> Vec<String> {
 
 /// TTS Piper (`app_modules::tts::engines`) → WAV → STT `whisper-server` → porównanie tekstu.
 async fn voice_round_trip(paths: &AppPaths, root: &Path, report: &mut Report) {
-    let tts = app_modules::tts::engines(paths)
-        .unwrap()
-        .expect("silnik TTS (Piper) zainstalowany");
+    let tts = app_modules::tts::engines(paths);
     let request = TtsRequest {
         utterance: 1,
         persona: personas_contract::PersonaId::alfa(),

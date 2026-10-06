@@ -6,8 +6,10 @@
     Skrypt czeka na okno dialogowe (klasa #32770) tego procesu, wpisuje pełną ścieżkę w pole nazwy
     pliku (identyfikator kontrolki 1001, klasa Edit) i naciska „Zapisz” (IDOK = 1). Z -Cancel zamyka
     otwarte okno przyciskiem „Anuluj” (IDCANCEL = 2) — sprzątanie po nieudanym kroku testu.
-    Bez fokusu i klawiatury: wzorce UIA (Value, Invoke), a gdy ich brak (Windows Server na runnerze
-    podaje kontrolki Win32 okna jako Pane) — komunikaty okna WM_SETTEXT i WM_COMMAND.
+    Bez fokusu i klawiatury: ścieżka „wpisywana” komunikatami WM_CHAR wprost do pola (okno zapisu
+    pamięta nazwę z wpisywania — sam WM_SETTEXT zmienia tylko tekst pola i zapis szedł pod nazwą
+    domyślną), zatwierdzenie wzorcem Invoke albo WM_COMMAND (Windows Server na runnerze podaje
+    kontrolki Win32 okna jako Pane, bez wzorców).
     Kod wyjścia: 0 — zapisano / anulowano / nie było czego anulować, 1 — okna brak albo błąd.
     Plik w UTF-8 z BOM: bez BOM Windows PowerShell 5.1 psuje polskie znaki w napisach. Cudzysłowy „ ” tylko
     w napisach w apostrofach — PowerShell traktuje je w napisach w cudzysłowie jak znak końca napisu.
@@ -28,7 +30,7 @@ Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
 Add-Type -Namespace AlfaE2E -Name Win32 -MemberDefinition @'
 [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, string lParam);
+public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 [DllImport("user32.dll")]
 public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 '@
@@ -97,16 +99,22 @@ function Invoke-Button($Dialog, [int]$Id) {
 }
 
 function Set-NameText($Edit, [string]$Text) {
-    # Wzorzec Value, a bez niego WM_SETTEXT na uchwyt pola (system przenosi tekst między procesami).
+    # Zaznaczenie całego pola (EM_SETSEL 0..-1) i znaki WM_CHAR jak z klawiatury — pierwszy zastępuje
+    # zaznaczenie. Bez uchwytu okna (kontrolka bez HWND) — wzorzec Value.
+    $hwnd = [IntPtr]$Edit.Current.NativeWindowHandle
+    if ($hwnd -ne [IntPtr]::Zero) {
+        [void][AlfaE2E.Win32]::SendMessage($hwnd, 0x00B1, [IntPtr]::Zero, [IntPtr](-1))
+        foreach ($ch in $Text.ToCharArray()) {
+            [void][AlfaE2E.Win32]::SendMessage($hwnd, 0x0102, [IntPtr][int]$ch, [IntPtr]1)
+        }
+        return 'WM_CHAR'
+    }
     $pattern = $null
     if ($Edit.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern, [ref]$pattern)) {
         $pattern.SetValue($Text)
         return 'UIA Value'
     }
-    $hwnd = [IntPtr]$Edit.Current.NativeWindowHandle
-    if ($hwnd -eq [IntPtr]::Zero) { throw 'Pole nazwy pliku bez wzorca Value i bez uchwytu okna.' }
-    [void][AlfaE2E.Win32]::SendMessage($hwnd, 0x000C, [IntPtr]::Zero, $Text)
-    return 'WM_SETTEXT'
+    throw 'Pole nazwy pliku bez uchwytu okna i bez wzorca Value.'
 }
 
 function Write-Tree($Root) {

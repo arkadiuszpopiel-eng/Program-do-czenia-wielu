@@ -13,6 +13,8 @@ use providers_local_impl::{
     LocalConfig, LocalProvider, ModelEntry, Sidecar, TokioLauncher, hash_path,
 };
 
+pub mod laptop;
+
 pub const MODEL: &str = "test-4b-q4_k_m";
 
 /// Ścieżka fałszywego serwera zbudowanego przez Cargo.
@@ -34,6 +36,7 @@ pub fn entry(url: &str) -> ModelEntry {
         ctx: 8_192,
         vram_mb: 3_000,
         ram_mb: 3_500,
+        kv_mb_per_1k_ctx: 64,
         tools: true,
         license: "test".into(),
     }

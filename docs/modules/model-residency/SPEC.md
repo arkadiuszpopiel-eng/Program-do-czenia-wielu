@@ -10,7 +10,7 @@ F2. P0. (W F1 `providers-local` używa prostego limitu; migracja do lease w F2.)
 ```rust
 pub struct Budget { pub vram_mb: u32 /* po rezerwie pulpitu */, pub ram_mb: u32, pub desktop_reserve_mb: u32, pub stt_tts_exclusive: bool }
 pub struct LeaseRequest { pub owner: String, pub model: String, pub role: ModelRole /* Stt|Tts|Llm|Embedder|Vad */,
-                          pub priority: Priority /* VoiceRt > Conversation > Background */, pub placement: Placement /* GpuOnly|GpuPreferred|CpuOnly */,
+                          pub priority: Priority /* VoiceRt > Conversation > Background */, pub placement: Placement /* GpuOnly|GpuPreferred|GpuIfFree|CpuOnly */,
                           pub vram_mb: u32, pub ram_mb: u32 /* na GPU */, pub cpu_ram_mb: u32 /* na CPU */, pub idle_unload_ms: u64 }
 pub struct Grant { pub lease: Lease /* id, device Gpu|Cpu, in_use, last_used */, pub evicted: Vec<Revocation> }
 pub trait Residency: Send + Sync {
@@ -29,7 +29,9 @@ pub trait Residency: Send + Sync {
 ```
 Reguły (czysta maszyna stanów `LeaseTable`, wspólna dla `-impl`/`-fake`): najpierw wolne miejsce, potem eksmisja
 ustępujących — **LRU z priorytetami**: dzierżawa ustępuje, gdy ma niższy priorytet albo równy i nie jest w użyciu
-(`in_use`); `GpuPreferred`: GPU bez eksmisji → GPU z eksmisją → CPU; `Wait` tylko na blokery o priorytecie ≥ żądania.
+(`in_use`); `GpuPreferred`: GPU bez eksmisji → GPU z eksmisją → CPU; `GpuIfFree`: GPU bez wypierania (dozwolona
+tylko wymiana STT ↔ ciężki TTS) → CPU (bez eksmisji, potem z eksmisją) → GPU z wypieraniem (ostatnia możliwość — głos
+nie czeka na niższy priorytet); `Wait` tylko na blokery o priorytecie ≥ żądania.
 Tryb (flagi łączą się): gra → nowe `GpuOnly` odrzucane, `GpuPreferred` na CPU, istniejące dzierżawy GPU przenoszone na CPU
 (`moved`) albo eksmitowane; bateria → tło eksmitowane i odrzucane; emulacja → budżet = min(rzeczywisty, emulowany).
 
@@ -71,3 +73,17 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
 
 ## Otwarte pytania
 - Pomiar realnego użycia VRAM na AMD (DXGI/ADLX) vs estymaty z manifestów modeli — do ustalenia w SPEC v1 po spike (h).
+
+## Zmiany — fala 6, laptop 6 GB (2026-10-06)
+- `Placement::GpuIfFree` — dla modeli z użyteczną wersją CPU, których załadowanie nie powinno wyrzucać z karty modelu
+  potrzebnego w tej samej rozmowie. Używa jej STT (`voice-stt-impl`): na laptopie RTX 4050, gdy whisper CUDA nie mieści
+  się obok lokalnego LLM, STT idzie na CPU zamiast wypierać LLM (wcześniej `GpuPreferred` + `VoiceRt` wypierało LLM,
+  który przeładowywał się na CPU — najgorszy wariant: wolny LLM i przeładowanie w trakcie rozmowy). Właściwości
+  (`tests/props.rs`): wypieranie z GPU przy `GpuIfFree` tylko, gdy żądanie nie mieści się na CPU.
+- Dzierżawa LLM liczy KV cache dla kontekstu uruchomienia i tylko warstwy na karcie (częściowe odciążenie — SPEC
+  `providers-local`), więc suma dzierżaw odpowiada realnej pamięci karty; `providers-local` oznacza dzierżawę
+  `in_use` w trakcie żądania i odświeża ją po nim. Laptop 6 GB (5153 MB): Bielik 4.5B Q8_0 3570 MB + STT 1500 MB.
+- Testy: kontraktowy `gpu_if_free_does_not_preempt` (na `-impl` i `-fake`), tabelaryczny
+  `gpu_if_free_swaps_tts_and_preempts_only_when_cpu_is_impossible`, scenariusz laptopa w
+  `providers-local-impl/tests/laptop_voice.rs` i `voice-stt-impl/tests/stt.rs`.
+

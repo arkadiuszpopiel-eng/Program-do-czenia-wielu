@@ -5,6 +5,7 @@
 #![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
 
 pub mod probe;
+pub mod serverlog;
 pub mod setup;
 
 use std::path::{Path, PathBuf};
@@ -41,6 +42,17 @@ impl Report {
 
     pub fn set(&mut self, key: &str, v: Value) {
         self.value[key] = v;
+        self.save();
+    }
+
+    /// Dopisuje wpis do tablicy `key` (np. `llm` — po jednym na model).
+    pub fn push(&mut self, key: &str, v: Value) {
+        if !self.value[key].is_array() {
+            self.value[key] = json!([]);
+        }
+        if let Some(list) = self.value[key].as_array_mut() {
+            list.push(v);
+        }
         self.save();
     }
 

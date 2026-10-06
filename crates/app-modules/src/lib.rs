@@ -4,7 +4,7 @@
 //! - [`broker::InprocBroker`] — Broker w procesie (tryb deweloperski, `safety-broker-impl`)
 //!   z oknem zatwierdzeń (`ApprovalWindow`) i dziennikiem cofania (`undo-journal-impl`);
 //! - [`voice::VoiceAdapter`] — audio (`voice-audio`) i czytanie na głos (`voice-tts`);
-//! - [`tts::engines`] — silniki TTS z zainstalowanych sidecarów (Pocket TTS, Piper);
+//! - [`tts::engines`] — silniki TTS z sidecarów (Pocket TTS, Piper) wykrywane przy każdym użyciu;
 //! - [`stt::whisper`] — sidecar STT `whisper-server` (CPU, CUDA z pierwszeństwem, gdy zainstalowany);
 //! - [`catalog::ProviderCatalog`] — wbudowany katalog dostawców (`providers-catalog/*.toml`);
 //! - [`probe::ProviderProbe`] — test połączenia i wykrywanie modeli kont (`providers-api-impl`);

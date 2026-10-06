@@ -6,7 +6,7 @@
 
 use model_residency_contract::{
     Budget, Device, LeaseId, LeaseRequest, LeaseTable, Mode, ModelRole, Placement, Priority,
-    ResidencyError, fits,
+    ResidencyError, RevokeReason, fits,
 };
 use proptest::prelude::*;
 
@@ -34,6 +34,7 @@ fn placement() -> impl Strategy<Value = Placement> {
     prop_oneof![
         Just(Placement::GpuOnly),
         Just(Placement::GpuPreferred),
+        Just(Placement::GpuIfFree),
         Just(Placement::CpuOnly)
     ]
 }
@@ -127,6 +128,15 @@ proptest! {
                                 prop_assert!(p < req.priority
                                     || (p == req.priority && !r.lease.in_use),
                                     "wyparto dzierżawę, która nie ustępuje: {:?}", r);
+                            }
+                            let preempted = g.evicted.iter()
+                                .any(|r| matches!(r.reason, RevokeReason::Preempted { .. }));
+                            let gpu = g.lease.device == Device::Gpu;
+                            if req.placement == Placement::GpuIfFree && gpu && preempted {
+                                // Wypieranie z GPU tylko wtedy, gdy CPU się nie da.
+                                let mut cpu = req.clone();
+                                cpu.placement = Placement::CpuOnly;
+                                prop_assert!(before.clone().acquire(&cpu, now).is_err());
                             }
                         }
                         Err(ResidencyError::Wait { blockers }) => {

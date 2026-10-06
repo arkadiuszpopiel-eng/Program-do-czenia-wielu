@@ -46,6 +46,11 @@ pub enum Placement {
     GpuOnly,
     /// GPU, a gdy się nie da — CPU.
     GpuPreferred,
+    /// GPU tylko z wolnego miejsca: bez wypierania innych dzierżaw z budżetu (wymiana STT ↔ ciężki
+    /// TTS dozwolona), inaczej CPU; GPU z wypieraniem dopiero, gdy CPU też się nie da. Dla modeli
+    /// z użyteczną wersją CPU, których załadowanie nie powinno wyrzucać z karty modelu potrzebnego
+    /// w tej samej rozmowie (STT obok lokalnego LLM na laptopie 6 GB: bez przeładowań LLM).
+    GpuIfFree,
     /// Tylko CPU.
     CpuOnly,
 }
@@ -123,7 +128,7 @@ impl fmt::Display for LeaseId {
 pub struct LeaseRequest {
     /// Moduł właściciela (np. `providers-local`).
     pub owner: String,
-    /// Model (np. `bielik-4.5b-q4_k_m`).
+    /// Model (np. `bielik-4.5b-v3.0-instruct-q8_0`).
     pub model: String,
     /// Rodzaj.
     pub role: ModelRole,

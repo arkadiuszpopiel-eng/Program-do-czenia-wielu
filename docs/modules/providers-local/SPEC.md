@@ -1,7 +1,7 @@
 # providers-local — SPEC (v1, F1)
 
 ## Cel
-Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie modelu 3–4,5B Q4_K_M w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
+Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie modelu 1,5–4,5B (oficjalny GGUF autorów; Bielik v3 — Q8_0, fala 6) w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
 
 ## Fala i priorytet
 F1 (chat + embeddings lokalne, pobieranie modelu, Vulkan/CUDA/CPU). P0 — wymagany w MVP.
@@ -20,7 +20,7 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
   → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie warstwy, CPU → 0) albo proporcjonalnie do budżetu VRAM,
   `-c`, `--threads` (rdzenie fizyczne), `--alias`, `-np 1`, `--jinja` (narzędzia).
 - **Modele:** `models.toml` (GGUF, URL HF, rozmiar, SHA-256, kwant, warstwy, kontekst, szacunki VRAM/RAM, licencja);
-  walidacja: `.gguf`, bez kwantów IQ, https. Domyślny: Bielik 4.5B v3.0 Instruct Q4_K_M.
+  walidacja: `.gguf`, bez kwantów IQ, https. Domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
 - **Pobieranie:** wznawianie HTTP Range z pliku `.part` (≤ 3 automatyczne wznowienia), SHA-256; zły hash → błąd
   i usunięcie `.part`. Hash nieznany w manifeście (`sha256 = ""`) → zapis przy pierwszym pobraniu (`<plik>.sha256`,
   zaufanie przy pierwszym użyciu) + ostrzeżenie w logach; model bez zapisanego hasha = niezainstalowany.
@@ -49,7 +49,7 @@ Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/
 Baseline: model 3–4,5B Q4 ≈ 2,5–3,5 GB VRAM (Vulkan) obok STT 1–2,5 GB; RAM sidecara ≤ 1 GB poza wagami; tok/s i TTFT mierzone w spike (h) — cele do ustalenia po F0 (korekta GPU ×2,2 dla baseline).
 
 ## Konfiguracja (klucze TOML)
-Wspólne: `[providers.local] default_model = "bielik-4.5b-q4_k_m"` (do potwierdzenia), `ctx = 8192`. Per maszyna: `[providers.local.machine] backend = "auto" | "vulkan" | "cuda" | "cpu"`, `gpu_layers = "auto"`, `idle_unload = "10m"`, `max_vram_mb`.
+Wspólne: `[providers.local] default_model = "bielik-4.5b-v3.0-instruct-q8_0"`, `ctx = 8192`, `min_ctx = 4096`, `stt_reserve_mb = 1500`. Per maszyna: `[providers.local.machine] backend = "auto" | "vulkan" | "cuda" | "cpu"`, `gpu_layers = "auto"`, `idle_unload = "10m"`, `max_vram_mb`.
 
 ## Wkład do UI
 Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dostawcy → Lokalne (modele, backend, benchmark); stany GPU OOM / przerwane pobieranie (§14.4).
@@ -87,3 +87,54 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 - Próba profilu laptopa właściciela na atrapach (`tests/laptop.rs`): Bielik 4.5B z manifestu na kompilacji CUDA z
   `-ngl` = wszystkie warstwy i `--threads 14`, STT obok w budżecie 6 GB VRAM, ciężki TTS wyklucza STT, na baterii —
   kompilacja CPU bez warstw GPU, bez kompilacji CUDA — Vulkan na GPU.
+
+## Zmiany — fala 6, laptop 6 GB: modele Q8_0, KV cache i STT obok LLM (2026-10-06)
+- **Modele tylko z oficjalnych repozytoriów** (`speakleash/*-GGUF`, apache-2.0, bez bramki): wpis Q4_K_M wskazywał
+  nieistniejący plik (HTTP 404 na runnerze) — Q4_K_M Bielika v3 jest wyłącznie u osób trzecich (decyzja zaufania dla
+  człowieka). Manifest: **Bielik 4.5B v3.0 Instruct Q8_0** (`bielik-4.5b-v3.0-instruct-q8_0`, 4826 MiB, domyślny,
+  narzędzia) i **Bielik 1.5B v3.0 Instruct Q8_0** (`bielik-1.5b-v3.0-instruct-q8_0`, 1620 MiB, `tools = false` —
+  model 1,5B zbyt zawodnie wywołuje narzędzia; Router nie wybierze go do zadań agentek, rozmowa i głos działają).
+- **KV cache w rozliczeniu VRAM/RAM.** `vram_mb`/`ram_mb` = wagi + stały narzut, **bez** KV; nowe wymagane pole
+  `kv_mb_per_1k_ctx` (KV f16 na 1024 tokeny, > 0). `vram_mb` = plik GGUF + 550 MB (`GPU_OVERHEAD_MB`: kontekst
+  CUDA/Vulkan ≈ 300 + bufory obliczeń ≈ 250), `ram_mb` = plik + ≈ 750. KV: warstwy × głowice KV × wymiar głowy × 2
+  (K, V) × 2 B. Architektura z raportu technicznego Bielik v3 (bez sieci w sesji nie dało się odczytać GGUF —
+  **do potwierdzenia** z metadanych `qwen2.*` albo z wpisu `llama_kv_cache … MiB` w logu `llama-server`):
+  4.5B = Qwen2.5-3B (GQA 16/2, głowa 128) pogłębiony do 60 warstw → 60 MiB/1k; 1.5B = Qwen2.5-1.5B (GQA 12/2) do
+  prawdopodobnie 32 warstw → 32 MiB/1k.
+
+  | Model | `vram_mb` | `ram_mb` | KV/1k | `-c 8192`: VRAM całości | RAM na CPU |
+  | --- | --- | --- | --- | --- | --- |
+  | 4.5B Q8_0 | 5400 | 5600 | 60 | 5880 | 6080 |
+  | 1.5B Q8_0 | 2200 | 2400 | 32 | 2456 | 2656 |
+- **Częściowe odciążenie z dzierżawą.** `-ngl` = `layers_for(budżet VRAM − rezerwa STT, ctx)`: całość, gdy się mieści,
+  inaczej (budżet − 550) / (VRAM całości − 550) × warstwy. Dzierżawa `model-residency` zgłasza VRAM dla tych warstw
+  (`ModelEntry::vram_for`) i RAM procesu z wagami/KV warstw na CPU (`ram_for`); dzierżawa na CPU → `-ngl 0`. Rezerwa
+  STT (`stt_reserve_mb` = 1500, tyle co dzierżawa `voice-stt`) — gdy profil urządzenia przewiduje STT na GPU.
+- **Kontekst** (`LocalConfig::ctx_for`, `min_ctx` = 4096): na GPU zmniejszany (połowienie do `min_ctx`) **tylko
+  wtedy, gdy pozwala to zmieścić model w całości** obok rezerwy STT; gdy i tak będzie częściowe odciążenie — pełny
+  `ctx` (KV warstwy to ułamek jej wag: 4096 zamiast 8192 dałoby 4.5B Q8_0 na laptopie 1–2 warstwy). Na CPU — pełny.
+  Silnik i `max_tokens` (połowa) z kontekstu uruchomienia.
+- **Laptop RTX 4050 6 GB (budżet zarządcy 5153 MB), zasilacz:** 4.5B Q8_0 nie mieści się w całości nawet przy 4096
+  (5640 + 1500 > 5153) → `-c 8192`, **34 z 60 warstw na karcie: 3570 MB VRAM**, 26 warstw (wagi + KV) w RAM —
+  dzierżawa 3146 MB RAM; whisper CUDA obok: 3570 + 1500 = 5070 MB ≤ 5153. Rozmowa tekstowa i głosowa — ten sam
+  układ (rezerwa na STT od początku, bez przeładowań). Bez rezerwy byłoby 51 warstw (5080 MB) i STT na CPU.
+  1.5B Q8_0: w całości (2456 MB) + STT (1500 MB). Bateria: LLM na CPU (6080 MB RAM), STT CUDA. Baseline 8 GB
+  (7408 MB): 4.5B Q8_0 w całości obok STT (5880 + 1500 = 7380). *Kompromis:* rezerwa na STT spowalnia rozmowę
+  tekstową 4.5B na laptopie (34 zamiast 51 warstw na GPU), ale whisper turbo na CPU byłby za wolny do rozmowy.
+  *Do decyzji człowieka:* rekomendacja 1.5B w onboardingu dla kart ≤ 6 GB (szybciej, całość na GPU, ale słabsza
+  jakość po polsku i bez narzędzi) — logika onboardingu bez zmian.
+- **Dzierżawa odświeżana przy użyciu:** w trakcie żądania oznaczona `in_use` (nie zwalnia jej zadanie tła zarządcy
+  ani równy priorytet), koniec ostatniego żądania odświeża licznik bezczynności. Wcześniej dzierżawa LLM nie była
+  odświeżana i zarządca odbierał ją co `idle_unload` (10 min) **od załadowania** — przeładowanie modelu w trakcie
+  rozmowy.
+- Testy: `tests/config.rs` (KV, narzut, `layers_for`/`vram_for`/`ram_for`, `ctx_for`, układ na laptopie),
+  `tests/laptop.rs` (34/60 warstw, dzierżawa 3570 MB, STT obok, 1.5B w całości, bateria, Vulkan),
+  `tests/laptop_voice.rs` (kolejne tury głosowe przez 36 min czasu zarządcy: jedno uruchomienie `llama-server`,
+  LLM nie wypierany, STT na CPU, gdy się nie mieści), `tests/download.rs` (oficjalne repozytoria, Q8_0).
+- **Okno rozmowy w kontekście uruchomienia** (`window::fit`, kodek `LlamaCodec`): czat wysyła całą gałąź historii
+  (append-only), a `llama-server` odrzuca prompt dłuższy niż `-c`. Do serwera idzie prompt systemowy, narzędzia i najnowsze
+  tury mieszczące się w `ctx − rezerwa na odpowiedź (min(max_tokens, ctx/4)) − 256`; szacunek tokenów zawyżony (bajty
+  UTF-8 / 3 + 8 na wiadomość). Okno zaczyna się od tury użytkownika bez wyników narzędzi — para „wywołanie → wynik” nie
+  jest rozrywana; gdy w budżecie nie ma takiej tury (długa seria narzędzi), okno sięga do najbliższej wcześniejszej.
+  Ostatnia wiadomość zostaje zawsze; historia w sesji nietknięta; log `info` z liczbą pominiętych wiadomości (bez treści).
+  Testy: `tests/window.rs`.

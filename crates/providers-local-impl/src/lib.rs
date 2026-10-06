@@ -8,7 +8,9 @@
 //! - argumenty z profilu urządzenia ([`LocalConfig`], [`LaunchPlan`]): backend Vulkan/CUDA/CPU,
 //!   `-ngl` wg budżetu VRAM, `-c`, `--threads`;
 //! - [`Downloader`] — pobieranie GGUF z wznawianiem (HTTP Range) i SHA-256; manifest
-//!   [`MODELS_TOML`] (Bielik 4.5B Q4_K_M), bez kwantów IQ;
+//!   [`MODELS_TOML`] (Bielik 4.5B i 1.5B v3.0 Q8_0 z oficjalnych repozytoriów), bez kwantów IQ;
+//! - rozliczenie pamięci z KV cache i częściowym odciążeniem ([`ModelEntry::vram_for`]);
+//! - okno rozmowy ([`fit`]) — do serwera najnowsze tury mieszczące się w kontekście uruchomienia;
 //! - [`LocalModule`] — moduł rejestru, zdarzenia `local.*`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -23,9 +25,13 @@ mod placement;
 mod process;
 mod provider;
 mod sidecar;
+mod window;
 
 pub use codec::LlamaCodec;
-pub use config::{BackendChoice, BackendKey, GpuLayers, LaunchPlan, LocalConfig, layers_for};
+pub use config::{
+    BackendChoice, BackendKey, GpuLayers, LaunchPlan, LocalConfig, MIN_CTX, STT_VRAM_RESERVE_MB,
+    layers_for,
+};
 pub use download::{Downloaded, Downloader, MAX_RESUMES, hash_path, installed, part_path};
 pub use error::{
     DownloadProgress, EVENT_BACKEND_FALLBACK, EVENT_DOWNLOAD_FAILED, EVENT_DOWNLOAD_FINISHED,
@@ -33,10 +39,11 @@ pub use error::{
     LocalEvent,
 };
 pub use manifest::{
-    MANIFEST_VERSION, MODELS_TOML, ModelEntry, builtin_models, is_iq_quant, parse_manifest,
-    valid_sha256,
+    GPU_OVERHEAD_MB, MANIFEST_VERSION, MODELS_TOML, ModelEntry, PROCESS_RAM_MB, builtin_models,
+    is_iq_quant, parse_manifest, valid_sha256,
 };
 pub use module::{LocalModule, MODULE_TOML};
 pub use process::{LaunchSpec, SidecarLauncher, SidecarProcess, TokioLauncher};
 pub use provider::LocalProvider;
 pub use sidecar::{RESIDENCY_OWNER, Sidecar};
+pub use window::{Fitted, WINDOW_MARGIN, estimate_tokens, fit, reply_reserve};

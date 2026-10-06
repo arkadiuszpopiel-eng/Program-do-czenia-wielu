@@ -2,8 +2,8 @@
 
 **Status: szkic — wymaga akceptacji człowieka, potem zamrożenie hashem.** Autorka: model-recenzentka (fala 4).
 
-Kryterium **F1-03**: lokalny `llama-server` (llama.cpp, model 3–4,5B Q4_K_M — domyślnie Bielik 4.5B v3.0
-Instruct z menedżera modeli) odpowiada na 20 promptów PL **20/20 bez błędu**, a szybkość generowania
+Kryterium **F1-03**: lokalny `llama-server` (llama.cpp, model 3–4,5B — domyślnie Bielik 4.5B v3.0 Instruct
+z menedżera modeli; oficjalne GGUF Bielika ma tylko `Q8_0`, nie `Q4_K_M` z ACCEPTANCE — ADR 0014) odpowiada na 20 promptów PL **20/20 bez błędu**, a szybkość generowania
 **tok/s ≥ wartość z F0-13** (`evals/spikes/h-sprzet`, `bench-llama.ps1`, `tg128`). Maszyny: desktop z emulacją
 baseline i laptop (CUDA). Weryfikuje CI na runnerze self-hosted.
 

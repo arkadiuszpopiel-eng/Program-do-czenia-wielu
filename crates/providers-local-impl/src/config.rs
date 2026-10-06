@@ -8,7 +8,14 @@ use device_profile_contract::{Backend, LocalLlm, Recommendation};
 use lib_openai_compat::Timeouts;
 use providers_contract::ProviderPrivacy;
 
-use crate::manifest::ModelEntry;
+use crate::manifest::{GPU_OVERHEAD_MB, ModelEntry};
+
+/// Najmniejszy kontekst przy automatycznym zmniejszaniu (rozmowa z promptem systemowym i kilkoma
+/// turami mieści się z zapasem; mniej — ryzyko „za długiej rozmowy" po kilku wymianach).
+pub const MIN_CTX: u32 = 4_096;
+
+/// VRAM dzierżawy STT na GPU (`voice-stt-impl`: whisper large-v3-turbo Q5 z kontekstem CUDA).
+pub const STT_VRAM_RESERVE_MB: u32 = 1_500;
 
 /// Wybór backendu (`[providers.local.machine] backend`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,8 +50,13 @@ pub struct LocalConfig {
     pub server_candidates: BTreeMap<BackendKey, Vec<PathBuf>>,
     /// Model domyślny.
     pub default_model: String,
-    /// Kontekst (`-c`).
+    /// Kontekst (`-c`) — największy; na GPU zmniejszany do `min_ctx` ([`LocalConfig::ctx_for`]).
     pub ctx: u32,
+    /// Najmniejszy kontekst przy zmniejszaniu na małej karcie (`min_ctx = ctx` — stały kontekst).
+    pub min_ctx: u32,
+    /// VRAM zostawiany obok LLM dla STT na GPU, gdy profil urządzenia przewiduje STT na karcie
+    /// (whisper large-v3-turbo Q5 — tyle zgłasza dzierżawa `voice-stt`).
+    pub stt_reserve_mb: u32,
     /// Backend.
     pub backend: BackendChoice,
     /// Warstwy GPU.
@@ -110,8 +122,10 @@ impl LocalConfig {
                 .map(|k| (k, server.clone()))
                 .collect(),
             server_candidates: BTreeMap::new(),
-            default_model: "bielik-4.5b-v3.0-instruct-q4_k_m".into(),
+            default_model: "bielik-4.5b-v3.0-instruct-q8_0".into(),
             ctx: 8_192,
+            min_ctx: MIN_CTX,
+            stt_reserve_mb: STT_VRAM_RESERVE_MB,
             backend: BackendChoice::Auto,
             gpu_layers: GpuLayers::Auto,
             threads: None,
@@ -150,6 +164,25 @@ impl LocalConfig {
         }
     }
 
+    /// Kontekst modelu na GPU z budżetem `budget_mb`, obok rezerwy `reserve_mb` (STT na karcie):
+    /// `ctx` (≤ kontekst modelu), a gdy model z KV cache i rezerwą się nie mieści — największy
+    /// kontekst połowiony do `min_ctx`, przy którym **całość** się mieści (pełne odciążenie obok
+    /// whisper CUDA). Gdy nie mieści się nawet przy `min_ctx` — pełny `ctx`: i tak będzie częściowe
+    /// odciążenie, a KV jednej warstwy to ułamek jej wag (mniejszy kontekst dałby 1–2 warstwy).
+    pub fn ctx_for(&self, entry: &ModelEntry, budget_mb: u32, reserve_mb: u32) -> u32 {
+        let max = self.ctx.min(entry.ctx);
+        let floor = self.min_ctx.min(max);
+        let fits = |ctx: u32| entry.vram_need(ctx).saturating_add(reserve_mb) <= budget_mb;
+        let mut ctx = max;
+        while !fits(ctx) {
+            if ctx <= floor {
+                return max;
+            }
+            ctx = (ctx / 2).max(floor);
+        }
+        ctx
+    }
+
     /// Backend dla rekomendacji: wybór jawny, a przy `Auto` — CPU, gdy rekomendacja wyłącza
     /// lokalny LLM (bateria, słaby sprzęt), inaczej backend LLM z rekomendacji.
     pub fn backend_for(&self, rec: &Recommendation) -> BackendKey {
@@ -176,14 +209,21 @@ pub struct LaunchPlan {
     pub threads: u32,
 }
 
-/// Warstwy GPU wg budżetu VRAM: pełne odciążenie, gdy model się mieści; inaczej proporcjonalnie.
-pub fn layers_for(entry: &ModelEntry, vram_budget_mb: u32) -> u32 {
-    if vram_budget_mb >= entry.vram_mb {
+/// Warstwy GPU wg budżetu VRAM dla kontekstu `ctx` (wagi + narzut + KV cache): pełne
+/// odciążenie, gdy model się mieści; inaczej tyle warstw, ile mieści budżet po stałym narzucie
+/// ([`GPU_OVERHEAD_MB`]) — `ModelEntry::vram_for(warstwy, ctx)` ≤ budżet.
+pub fn layers_for(entry: &ModelEntry, vram_budget_mb: u32, ctx: u32) -> u32 {
+    let need = entry.vram_need(ctx);
+    if vram_budget_mb >= need {
         return entry.layers;
     }
-    let share =
-        u64::from(entry.layers) * u64::from(vram_budget_mb) / u64::from(entry.vram_mb.max(1));
-    u32::try_from(share).unwrap_or(0)
+    let per_layers = need.saturating_sub(GPU_OVERHEAD_MB);
+    let free = vram_budget_mb.saturating_sub(GPU_OVERHEAD_MB);
+    if per_layers == 0 || free == 0 {
+        return 0;
+    }
+    let share = u64::from(entry.layers) * u64::from(free) / u64::from(per_layers);
+    u32::try_from(share).unwrap_or(0).min(entry.layers)
 }
 
 impl LaunchPlan {

@@ -258,11 +258,24 @@ async fn module_download_publishes_progress_events() {
 #[test]
 fn manifest_validation_rejects_iq_quants_and_bad_entries() {
     let models = builtin_models().unwrap();
+    assert_eq!(models.len(), 2);
     let bielik = &models[0];
     assert!(bielik.id.starts_with("bielik-4.5b"));
-    assert_eq!(bielik.quant, "Q4_K_M");
-    assert!(bielik.url.starts_with("https://huggingface.co/"));
+    assert_eq!(bielik.quant, "Q8_0");
     assert!(bielik.params_b >= 3.0 && bielik.params_b <= 4.8);
+    assert_eq!(models[1].quant, "Q8_0");
+    assert!(models[1].params_b < 2.0 && models[1].size_mb < bielik.size_mb);
+    for m in &models {
+        // Tylko oficjalne repozytorium autorów (speakleash), plik z nazwy wpisu.
+        let repo = "https://huggingface.co/speakleash/Bielik-";
+        assert!(m.url.starts_with(repo), "{}", m.url);
+        assert!(
+            m.url.ends_with(&format!("/resolve/main/{}", m.file)),
+            "{}",
+            m.url
+        );
+        assert!(m.id.ends_with("-q8_0") && m.file.ends_with(".Q8_0.gguf"));
+    }
     for q in ["IQ4_XS", "iq3_m", "model.IQ2_XXS.gguf"] {
         assert!(is_iq_quant(q), "{q}");
     }
@@ -271,7 +284,7 @@ fn manifest_validation_rejects_iq_quants_and_bad_entries() {
     }
     let base = |extra: &str| {
         format!(
-            "schema_version = 1\n[[model]]\nid = \"m\"\nname = \"M\"\nurl = \"https://x/m.gguf\"\nfile = \"m.Q4_K_M.gguf\"\nsize_mb = 1\nparams_b = 4.0\nquant = \"Q4_K_M\"\nlayers = 32\nctx = 4096\nvram_mb = 1\nram_mb = 1\nlicense = \"x\"\n{extra}"
+            "schema_version = 1\n[[model]]\nid = \"m\"\nname = \"M\"\nurl = \"https://x/m.gguf\"\nfile = \"m.Q4_K_M.gguf\"\nsize_mb = 1\nparams_b = 4.0\nquant = \"Q4_K_M\"\nlayers = 32\nctx = 4096\nvram_mb = 1\nram_mb = 1\nkv_mb_per_1k_ctx = 1\nlicense = \"x\"\n{extra}"
         )
     };
     assert!(parse_manifest(&base("")).is_ok());
@@ -289,6 +302,8 @@ fn manifest_validation_rejects_iq_quants_and_bad_entries() {
             base("").replace("schema_version = 1\n", "")
         ),
         base("").replace("layers = 32", "layers = 0"),
+        base("").replace("kv_mb_per_1k_ctx = 1", "kv_mb_per_1k_ctx = 0"),
+        base("").replace("kv_mb_per_1k_ctx = 1\n", ""),
         base("nieznane = 1"),
     ];
     for (i, text) in bad.iter().enumerate() {

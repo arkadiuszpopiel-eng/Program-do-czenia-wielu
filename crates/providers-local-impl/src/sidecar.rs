@@ -39,6 +39,8 @@ pub struct Sidecar {
     pub(crate) device: Option<Arc<dyn DeviceProfile>>,
     pub(crate) residency: Option<Arc<dyn Residency>>,
     state: tokio::sync::Mutex<Option<Running>>,
+    /// Dzierżawa działającego sidecara (odczyt synchroniczny przy końcu żądania).
+    pub(crate) lease: Mutex<Option<LeaseId>>,
     in_flight: AtomicUsize,
     revoked: AtomicBool,
     suspect: AtomicBool,
@@ -48,7 +50,7 @@ pub struct Sidecar {
     health: reqwest::Client,
 }
 
-fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
+pub(crate) fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
     m.lock().unwrap_or_else(|p| p.into_inner())
 }
 
@@ -112,6 +114,7 @@ impl Sidecar {
             device,
             residency,
             state: tokio::sync::Mutex::new(None),
+            lease: Mutex::new(None),
             in_flight: AtomicUsize::new(0),
             revoked: AtomicBool::new(false),
             suspect: AtomicBool::new(false),
@@ -165,9 +168,11 @@ impl Sidecar {
         *lock(&self.last_used) = Instant::now();
     }
 
-    /// Koniec żądania.
+    /// Koniec żądania (ostatnie w toku zwalnia oznaczenie użycia dzierżawy).
     pub(crate) fn end(&self) {
-        self.in_flight.fetch_sub(1, Ordering::SeqCst);
+        if self.in_flight.fetch_sub(1, Ordering::SeqCst) == 1 {
+            self.mark_in_use(false);
+        }
         *lock(&self.last_used) = Instant::now();
     }
 
@@ -195,7 +200,10 @@ impl Sidecar {
                 exited = Some(r.process.exited().flatten());
             }
             match exited {
-                None if r.model == entry.id && !revoked => return Ok(Arc::clone(&r.engine)),
+                None if r.model == entry.id && !revoked => {
+                    self.mark_in_use(true);
+                    return Ok(Arc::clone(&r.engine));
+                }
                 None => {}
                 Some(code) => {
                     tracing::warn!(model = %r.model, ?code, "awaria llama-server");
@@ -223,7 +231,7 @@ impl Sidecar {
                     reason: e.to_string(),
                 });
                 self.release_lease(plan.1);
-                let lease = self.acquire(entry, Placement::CpuOnly)?;
+                let lease = self.acquire(entry, Placement::CpuOnly, cpu.ctx, 0)?;
                 self.start(entry, model_path, cpu, lease.map(|l| l.id))
                     .await?
             }
@@ -233,7 +241,9 @@ impl Sidecar {
             }
         };
         let engine = Arc::clone(&running.engine);
+        *lock(&self.lease) = running.lease;
         *st = Some(running);
+        self.mark_in_use(true);
         Ok(engine)
     }
 
@@ -288,10 +298,10 @@ impl Sidecar {
             tokio::time::sleep(Duration::from_millis(25)).await;
         }
         let engine = Engine::new(
-            self.profile(entry),
+            self.profile(entry, plan.ctx),
             self.http(port),
             Arc::new(StaticKey::new(key)),
-            LlamaCodec::new(entry, self.config.ctx),
+            LlamaCodec::new(entry, plan.ctx),
         )
         .map_err(|e| LocalError::Spawn(e.to_string()))?;
         let startup_ms = ms(t0.elapsed());
@@ -312,13 +322,13 @@ impl Sidecar {
         })
     }
 
-    fn profile(&self, entry: &ModelEntry) -> ProviderProfile {
+    /// Profil silnika dla kontekstu uruchomienia (`max_tokens` domyślnie połowa `-c`).
+    fn profile(&self, entry: &ModelEntry, ctx: u32) -> ProviderProfile {
         let mut p = ProviderProfile::new(self.config.provider_id.as_str());
         p.privacy = self.config.privacy.clone();
         p.default_model = Some(entry.id.clone());
-        p.models
-            .insert(entry.id.clone(), entry.capabilities(self.config.ctx));
-        p.default_max_tokens = self.config.ctx.min(entry.ctx) / 2;
+        p.models.insert(entry.id.clone(), entry.capabilities(ctx));
+        p.default_max_tokens = ctx.min(entry.ctx) / 2;
         p
     }
 
@@ -335,6 +345,7 @@ impl Sidecar {
 
     fn shutdown(&self, mut running: Running, reason: &str) {
         running.process.kill();
+        lock(&self.lease).take_if(|id| Some(*id) == running.lease);
         self.release_lease(running.lease);
         self.emit(LocalEvent::Unloaded {
             model: running.model,

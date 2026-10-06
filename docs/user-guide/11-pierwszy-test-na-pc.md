@@ -36,7 +36,8 @@ tych części (kolumna „Laptop”).
 3. **Narzędzia i budowa** (części 0–2; 30–60 min, głównie czekanie): `setup-dev.ps1`, przy `[BRAK]` — `-Install`,
    potem `-Build`. W czasie budowy przeczytaj punkty 4–9.
 4. **Pierwszy start** (część 4, `-Run`) i **wprowadzenie** (część 5): w kroku **Sprzęt** ma być GeForce RTX 4050
-   i profil **D** (CUDA); pozostałe kroki pomiń. Na karcie **Model lokalny** kliknij **Pobierz** (Bielik, 2,9 GB).
+   i profil **D** (CUDA); pozostałe kroki pomiń. Na karcie **Model lokalny** kliknij **Pobierz** (Bielik 4.5B Q8_0,
+   ok. 4,8 GB — oficjalny plik autorów).
 5. **Model lokalny na karcie** (część 6, ok. 15 min). Ustawienia → **Modele i silniki** → **llama-server (cuda, …)**
    (dwa archiwa: serwer i biblioteki cudart, razem ok. 550 MB), na zapas **llama-server (cpu, …)** (14 MB — gdy
    wersja CUDA nie wystartuje, Alfa przejdzie na nią) oraz Bielik, jeśli nie pobrał się we wprowadzeniu.
@@ -48,18 +49,46 @@ tych części (kolumna „Laptop”).
    nvidia-smi --query-gpu=timestamp,name,memory.used,memory.total,utilization.gpu,temperature.gpu,power.draw --format=csv -l 2 | Tee-Object "$env:USERPROFILE\Desktop\alfa-nvidia-smi.csv"
    ```
 
-   Wyślij trzy pytania z części 6. Przy odpowiedzi `memory.used` rośnie o ok. 3,5–4,5 GB, a `utilization.gpu` jest
-   wyraźnie powyżej zera; w zwykłym `nvidia-smi` (trzecie okno) na liście procesów jest `llama-server.exe`. Gdy karta
-   stoi na 0 %, a odpowiedź i tak przychodzi — model liczy procesor: wpisz ❌ i dołącz log (punkt 9).
+   Wyślij trzy pytania z części 6. Bielik 4.5B Q8_0 nie mieści się w 6 GB w całości: Alfa kładzie na kartę **34 z 60
+   warstw** i zostawia ok. 1,5 GB na rozpoznawanie mowy (liczby — w ramce „Pamięć karty” niżej). Przy pierwszej
+   odpowiedzi `memory.used` rośnie o ok. **3,3–4,0 GB**, a `utilization.gpu` jest wyraźnie powyżej zera (przy części
+   warstw na procesorze karta nie pracuje na 100 % — to normalne); w zwykłym `nvidia-smi` (trzecie okno) na liście
+   procesów jest `llama-server.exe`. Gdy karta stoi na 0 %, a odpowiedź i tak przychodzi — model liczy procesor:
+   wpisz ❌ i dołącz log (punkt 9).
 6. **Głos** (część 9, ok. 15 min): pobierz **whisper-server (CPU)**, **whisper-server (CUDA 12.4)** (ok. 430 MB),
-   model **Whisper large-v3-turbo-q5_0**, **piper**, głos **Piper pl_PL gosia** i **Silero VAD**. Potem **zamknij
-   Alfę** (zasobnik → **Wyjście**) i uruchom ją ponownie (`-Run`) — silnik mowy (Piper) jest wykrywany przy starcie.
-   W trakcie rozmowy głosowej w `nvidia-smi` widać też `whisper-server.exe` (rozpoznawanie mowy na karcie).
+   model **Whisper large-v3-turbo-q5_0**, **piper**, głos **Piper pl_PL gosia** i **Silero VAD**. Ponowne
+   uruchomienie Alfy **nie** jest potrzebne — wejdź jeszcze raz w Ustawienia → **Głos**: komunikat „Głos niedostępny”
+   znika. W trakcie rozmowy głosowej w `nvidia-smi` widać też `whisper-server.exe` (rozpoznawanie mowy na karcie),
+   a `memory.used` rośnie o kolejne ok. **1,0–1,5 GB** — razem ok. 4,6–5,4 GB z 6141 MiB. Model rozmowy **nie**
+   przeładowuje się między wypowiedziami (w logu jedno „llama-server gotowy” na całą rozmowę).
 7. **STOP WSZYSTKIEGO** (część 8): `Ctrl+Shift+F12` w trakcie długiej odpowiedzi i w trakcie czytania na głos.
-8. Jeśli zostanie czas: część 12 (pomiary; bateria — punkt 12.5), potem część 10 (instalator).
+8. Jeśli zostanie czas: część 12 (pomiary; bateria — punkt 12.5), potem część 10 (instalator). Dla porównania
+   szybkości pobierz też **Bielik 1.5B** (1,6 GB) i wybierz go w rozmowie — mieści się na karcie w całości.
 9. **Co zapisać i przekazać:** wypełnione tabele części 4–9; plik `alfa-nvidia-smi.csv` z Pulpitu (zapis zatrzymasz
    `Ctrl+C`); logi z dnia testu z `%LOCALAPPDATA%\Alfa\logs` (`alfa.<data>.000.log` — szczegóły w części 13); wynik
    `setup-dev.ps1` (część 13). Przed wysłaniem przejrzyj pliki (część 13: czego nie wysyłać).
+
+**Pamięć karty (`nvidia-smi`, laptop RTX 4050 6 GB).** Alfa rozlicza pamięć karty z zapasem: z 5921 MB odejmuje
+768 MB na pulpit, zostaje **5153 MB** na modele. Szacunki (do sprawdzenia Twoimi pomiarami — wpisz je w część 12):
+
+| Sytuacja                                       | Co na karcie                                  | Szacunek Alfy | `memory.used` (ok.) |
+| ---------------------------------------------- | --------------------------------------------- | ------------- | ------------------- |
+| Alfa włączona, bez rozmowy                     | nic (pulpit liczy zintegrowana Iris Xe)       | 0 MB          | 0–0,4 GB            |
+| Rozmowa tekstowa, Bielik 4.5B Q8_0 (`-c 8192`) | 34 z 60 warstw + pamięć kontekstu tych warstw | 3570 MB       | 3,3–4,0 GB          |
+| … i rozmowa głosowa (whisper turbo CUDA)       | jw. + `whisper-server.exe`                    | 3570 + 1500   | 4,6–5,4 GB          |
+| Bielik 1.5B Q8_0 + rozmowa głosowa             | cały model (32 warstwy) + whisper             | 2456 + 1500   | 3,4–4,2 GB          |
+| Na baterii                                     | tylko whisper (model rozmowy liczy procesor)  | 1500 MB       | 1,0–1,6 GB          |
+
+W logu (`%LOCALAPPDATA%\Alfa\logs`) zapisz linię `llama-server gotowy` (liczba warstw `gpu_layers=34`) i — jeśli
+jest — `llama_kv_cache … size = … MiB` (Alfa zakłada 480 MiB dla 4.5B i 256 MiB dla 1.5B przy `-c 8192`; inna
+liczba = do poprawki w manifeście).
+
+**Jak rozpoznać brak pamięci karty (OOM).** (1) W logu: `out of memory`, `cudaMalloc failed`, `failed to allocate
+CUDA0 buffer` albo zdarzenia `local.backend.fallback` (karta → procesor) i `local.sidecar.crashed`; odpowiedź się
+urywa albo przychodzi wyraźnie wolniej niż poprzednie. (2) W `nvidia-smi` `memory.used` dobija do ok. 6100 MiB
+i tam stoi. (3) Sterownik NVIDIA na Windows potrafi zamiast błędu przenieść nadmiar do pamięci RAM („Udostępniona
+pamięć GPU” w Menedżerze zadań → Wydajność → GPU 1 rośnie powyżej ~0,5 GB) — wtedy błędu nie ma, ale tokeny na
+sekundę spadają kilkukrotnie. W każdym z tych przypadków wpisz ❌, godzinę i dołącz `alfa-nvidia-smi.csv` oraz log.
 
 **Sumy SHA-256 do kart zgody.** Pełny raport robi automat CI na Windows: GitHub → zakładka **Actions** → **Próba
 generalna (Windows)** → najnowszy przebieg → **Summary** → tabela „Silniki na żywo (CPU) — raport do przypięcia
@@ -231,7 +260,7 @@ Przy pierwszym starcie Alfa prowadzi przez 8 kroków ([Pierwsze uruchomienie](01
 ## 6. Model lokalny i pierwsza rozmowa (F1-03)
 
 1. **Ustawienia** (`Ctrl+,`) → **Modele i silniki** ([opis](10-modele-i-silniki.md)). Pobierz model **Bielik 4.5B
-   v3.0 Instruct** (ok. 2,9 GB), jeśli nie pobrał się we wprowadzeniu, oraz program do jego uruchamiania:
+   v3.0 Instruct** (Q8_0, ok. 4,8 GB), jeśli nie pobrał się we wprowadzeniu, oraz program do jego uruchamiania:
    - **Desktop:** **llama-server (vulkan)**.
    - **Laptop:** **llama-server (cuda, …)** — dwa archiwa (serwer i biblioteki cudart). Bez niej Alfa użyje wersji
      Vulkan albo CPU z ostrzeżeniem w logu. Gdyby pobieranie w menedżerze się nie udało — ręcznie, punkt 6a.
@@ -319,8 +348,7 @@ mniej więcej trwało.
      whisper-server nie ma w wydaniach), a model turbo jest na procesorze za wolny do rozmowy. Nie pobieraj obu
      modeli: Alfa bierze pierwszy alfabetycznie (turbo).
 
-   Potem zamknij Alfę (zasobnik → **Wyjście**) i uruchom ją ponownie — silnik mowy (Piper) jest wykrywany przy
-   starcie ([Głos](04-glos.md)).
+   Ponowne uruchomienie Alfy nie jest potrzebne — silniki są wykrywane przy użyciu ([Głos](04-glos.md)).
 2. **Ustawienia → Głos**: znika komunikat „Głos niedostępny”. **Test mikrofonu** — pasek reaguje. Odsłuchaj próbki
    czterech głosów.
 3. **Włącz rozmowę** (albo `Ctrl+Shift+M`) i powiedz „Jaka jest stolica Francji?”. Wypowiedź pojawia się jako
@@ -470,17 +498,18 @@ rozmowy). Skrypt `setup-dev.ps1` niczego z tych miejsc nie czyta.
 
 Typowe problemy:
 
-| Objaw                                                    | Co zrobić                                                                                                            |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| „uruchamianie skryptów jest wyłączone w tym systemie”    | wklej polecenie w całości, razem z `-ExecutionPolicy Bypass`                                                         |
-| `winget` nie jest rozpoznawany                           | Microsoft Store → wyszukaj „Instalator aplikacji” → **Aktualizuj**                                                   |
-| po instalacji dalej `[BRAK]`                             | nowe okno Terminala; po Visual Studio — restart komputera                                                            |
-| skrypt: „Uruchom skrypt w zwykłym oknie Terminala”       | zamknij Terminal otwarty jako administrator i otwórz zwykły                                                          |
-| `link.exe` not found, błędy `LNK…`                       | `-Install` jeszcze raz albo Visual Studio Installer → Modyfikuj → „Programowanie aplikacji klasycznych w języku C++” |
-| błąd przy `openssl-sys` / `openssl-src` ze słowem `perl` | `-Install` (Strawberry Perl), potem nowe okno Terminala                                                              |
-| `os error 112` albo brak miejsca                         | zwolnij miejsce; `cargo clean` w `C:\alfa` usuwa wyniki kompilacji (następna budowa potrwa dłużej)                   |
-| `the lock file … needs to be updated`                    | zgłoś sesji AI (nieaktualny `Cargo.lock` w repozytorium)                                                             |
-| model nie odpowiada, komunikat o braku `llama-server`    | część 6 (pobierz właściwy llama-server; na laptopie w razie kłopotów punkt 6a)                                       |
-| „Głos niedostępny” mimo pobranych silników               | zamknij Alfę (zasobnik → **Wyjście**) i uruchom ponownie — silnik mowy jest wykrywany przy starcie                   |
-| test na żywo: skrót zajęty                               | wyłącz Alfę (także w zasobniku) i powtórz                                                                            |
-| instalator: „System Windows ochronił ten komputer”       | **Więcej informacji → Uruchom mimo to**                                                                              |
+| Objaw                                                      | Co zrobić                                                                                                            |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| „uruchamianie skryptów jest wyłączone w tym systemie”      | wklej polecenie w całości, razem z `-ExecutionPolicy Bypass`                                                         |
+| `winget` nie jest rozpoznawany                             | Microsoft Store → wyszukaj „Instalator aplikacji” → **Aktualizuj**                                                   |
+| po instalacji dalej `[BRAK]`                               | nowe okno Terminala; po Visual Studio — restart komputera                                                            |
+| skrypt: „Uruchom skrypt w zwykłym oknie Terminala”         | zamknij Terminal otwarty jako administrator i otwórz zwykły                                                          |
+| `link.exe` not found, błędy `LNK…`                         | `-Install` jeszcze raz albo Visual Studio Installer → Modyfikuj → „Programowanie aplikacji klasycznych w języku C++” |
+| błąd przy `openssl-sys` / `openssl-src` ze słowem `perl`   | `-Install` (Strawberry Perl), potem nowe okno Terminala                                                              |
+| `os error 112` albo brak miejsca                           | zwolnij miejsce; `cargo clean` w `C:\alfa` usuwa wyniki kompilacji (następna budowa potrwa dłużej)                   |
+| `the lock file … needs to be updated`                      | zgłoś sesji AI (nieaktualny `Cargo.lock` w repozytorium)                                                             |
+| model nie odpowiada, komunikat o braku `llama-server`      | część 6 (pobierz właściwy llama-server; na laptopie w razie kłopotów punkt 6a)                                       |
+| „Głos niedostępny” mimo pobranych silników                 | wejdź ponownie w Ustawienia → Głos; dalej — w Modele i silniki sprawdź stan „Zainstalowano” przy każdej pozycji      |
+| odpowiedź się urywa, w logu `out of memory` / `cudaMalloc` | brak pamięci karty — ramka „Pamięć karty” w skróconej ścieżce laptopa; zapisz `nvidia-smi` i log                     |
+| test na żywo: skrót zajęty                                 | wyłącz Alfę (także w zasobniku) i powtórz                                                                            |
+| instalator: „System Windows ochronił ten komputer”         | **Więcej informacji → Uruchom mimo to**                                                                              |

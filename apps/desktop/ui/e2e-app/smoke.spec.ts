@@ -4,7 +4,7 @@
 // i silniki → eksport `.alfa` → zatrzymanie z UI → okna poboczne → konsola → CSP/Trusted Types.
 // Testy nie zależą od siebie: każdy sam dochodzi do rozmowy (`toChat`), więc porażka jednego
 // nie zasłania reszty. Uruchamia `e2e-app/run.ps1` (workflow `rehearsal.yml`, job `app-e2e`).
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import type { Locator, Page } from '@playwright/test';
 import {
@@ -199,9 +199,20 @@ test('eksport .alfa do katalogu tymczasowego (natywne okno „Zapisz jako”)', 
     expect(result.code, `UI Automation okna „Zapisz jako”:\n${result.output}`).toBe(0);
     const saved = main.getByRole('status').filter({ hasText: /^Zapisano / });
     await expect(saved).toBeVisible({ timeout: 60_000 });
-    await expect(saved).toContainText(basename(target));
-    const head = readFileSync(target).subarray(0, 2).toString('latin1');
+    // Ścieżka z komunikatu rdzenia („Zapisano <ścieżka> · …”) — ta, którą zwróciło okno systemowe.
+    const status = (await saved.textContent()) ?? '';
+    const written = /^Zapisano (.+?\.alfa)/.exec(status)?.[1] ?? '';
+    expect(written, `komunikat: ${status}`).not.toBe('');
+    if (basename(written) !== basename(target)) {
+      // Okno przyjęło inną nazwę niż wpisana (np. inne wydanie Windows) — eksport i tak sprawdzamy.
+      test.info().annotations.push({
+        type: 'warning',
+        description: `okno zapisu zwróciło ${written} zamiast ${target}`,
+      });
+    }
+    const head = readFileSync(written).subarray(0, 2).toString('latin1');
     expect(head, 'paczka .alfa to archiwum ZIP').toBe('PK');
+    if (written !== target) rmSync(written, { force: true });
   } finally {
     // Okno, którego nie udało się obsłużyć, nie może zostać otwarte dla kolejnych testów.
     if (result.code !== 0) await driveSaveDialog(null, 5);

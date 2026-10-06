@@ -39,7 +39,7 @@ Pomiar na modelu lokalnym (Windows, `llama-server` z llama.cpp i model pobrany p
 ```powershell
 $env:ALFA_EVAL_LLAMA_SERVER = "$env:LOCALAPPDATA\Alfa\sidecars\llama\llama-server.exe"
 $env:ALFA_EVAL_MODELS_DIR   = "$env:LOCALAPPDATA\Alfa\models"
-$env:ALFA_EVAL_MODEL        = "bielik-4.5b-v3.0-instruct-q4_k_m"   # opcjonalnie
+$env:ALFA_EVAL_MODEL        = "bielik-4.5b-v3.0-instruct-q8_0"     # opcjonalnie
 $env:ALFA_EVAL_REPORT       = "wynik-F3-tools.md"                   # opcjonalnie
 cargo test -p app-agents --test eval_tools --release -- --ignored --nocapture
 ```

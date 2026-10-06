@@ -94,8 +94,9 @@ Potrzebny plik: `llama-bench.exe` (oraz `llama-cli.exe` / `llama-server.exe` do 
 
 ### F. Modele LLM (GGUF, Q4_K_M — bez kwantów IQ, VOICE.md §16)
 
-Dobór: **4–4,5B** — model z dobrym polskim, np. **Bielik-4.5B-v3.0-Instruct** (SpeakLeash; szukaj oficjalnego
-repozytorium `speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` na Hugging Face, plik z `Q4_K_M` w nazwie).
+Dobór: **4–4,5B** — model z dobrym polskim, np. **Bielik-4.5B-v3.0-Instruct** (SpeakLeash). Oficjalne repozytorium
+`speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` ma tylko `Q8_0` (≈ 4,8 GB — model domyślny Alfy) i `fp16`; zmierz `Q8_0`,
+a dla porównania z progiem planu także `Q4_K_M` z repozytorium innego autora (zapisz, czyje).
 **8B** — np. **Qwen3-8B** (`Qwen/Qwen3-8B-GGUF`, plik `*Q4_K_M*.gguf`) albo **Llama-3.1-8B-Instruct** w Q4_K_M
 z repozytorium o dobrej reputacji (bartowski/unsloth). Zasady: pobieraj z oficjalnego lub znanego repozytorium,
 zapisz **pełną nazwę pliku i SHA-256** w wynikach; jeśli plik nie ma licencji pozwalającej na redystrybucję,
@@ -106,7 +107,7 @@ Invoke-WebRequest -Uri '<link do pliku Q4_K_M z zakladki Files and versions>' -O
 Get-FileHash "$S\models\<nazwa>.gguf" -Algorithm SHA256
 ```
 
-Orientacyjne rozmiary: 4,5B Q4_K_M ≈ 2,8 GB, 8B Q4_K_M ≈ 4,9 GB. Na laptopie (6 GB VRAM) 8B Q4_K_M w całości
+Orientacyjne rozmiary: 4,5B Q8_0 ≈ 4,8 GB, 4,5B Q4_K_M ≈ 2,8 GB, 8B Q4_K_M ≈ 4,9 GB. Na laptopie (6 GB VRAM) 8B Q4_K_M w całości
 na GPU się **nie zmieści** obok STT — to oczekiwany wynik, zapisz, ile warstw (`-ngl`) weszło.
 
 ## Pomiar 1 — whisper.cpp (`bench-whisper.ps1`)

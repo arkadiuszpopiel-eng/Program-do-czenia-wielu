@@ -13,6 +13,9 @@ use super::{OWNER, Server, WhisperStt};
 use crate::sidecar::{LaunchSpec, build_args, free_port};
 
 impl WhisperStt {
+    /// Dzierżawa modelu. Na GPU tylko z wolnego miejsca (`GpuIfFree`): STT ma dobrą wersję CPU,
+    /// a wyparcie lokalnego LLM z karty (laptop 6 GB) oznaczałoby jego przeładowanie na CPU
+    /// w tej samej rozmowie — STT idzie wtedy na CPU, LLM zostaje na karcie.
     pub(super) fn lease_request(&self, model: &str, backend: Backend) -> LeaseRequest {
         LeaseRequest {
             owner: OWNER.into(),
@@ -22,7 +25,7 @@ impl WhisperStt {
             placement: if backend == Backend::Cpu {
                 Placement::CpuOnly
             } else {
-                Placement::GpuPreferred
+                Placement::GpuIfFree
             },
             vram_mb: 1_500,
             ram_mb: 600,

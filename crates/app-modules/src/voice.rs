@@ -63,7 +63,8 @@ fn level(pcm: &[f32]) -> f64 {
 }
 
 impl VoiceAdapter {
-    /// Głos na `AudioIo` i opcjonalnym TTS (`None` — brak sidecara); zdarzenia do UI.
+    /// Głos na `AudioIo` i opcjonalnym TTS (`None` albo stan `Failed` — brak silnika, wykrywany
+    /// przy każdym czytaniu: [`crate::tts::ready`]); zdarzenia do UI.
     pub fn new(io: Arc<dyn AudioIo>, tts: Option<Arc<dyn Tts>>, events: EventHub) -> Self {
         Self {
             io,
@@ -159,9 +160,7 @@ impl VoicePort for VoiceAdapter {
     }
 
     async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError> {
-        let tts = self
-            .tts
-            .clone()
+        let tts = crate::tts::ready(self.tts.as_ref())
             .ok_or_else(|| AppError::new(ErrorCode::Unavailable, NO_TTS))?;
         if text.trim().is_empty() {
             return Err(AppError::invalid(

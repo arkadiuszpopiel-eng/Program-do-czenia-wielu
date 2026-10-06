@@ -6,11 +6,13 @@ use providers_contract::{ChatRequest, ModelCapabilities, ProviderError};
 use reqwest::header::HeaderMap;
 
 use crate::manifest::ModelEntry;
+use crate::window;
 
 /// Kodek jednego modelu lokalnego.
 pub struct LlamaCodec {
     caps: ModelCapabilities,
     profile: ProviderProfile,
+    ctx: u32,
 }
 
 impl LlamaCodec {
@@ -21,6 +23,7 @@ impl LlamaCodec {
         Self {
             caps: entry.capabilities(ctx),
             profile,
+            ctx: ctx.min(entry.ctx),
         }
     }
 }
@@ -33,9 +36,23 @@ impl WireCodec for LlamaCodec {
             max_tokens_field: MaxTokensField::MaxTokens,
             stream_usage: true,
         };
+        // Okno rozmowy w kontekście uruchomienia (`-c`): starsze tury nie idą do serwera.
+        let max_out = req
+            .params
+            .max_tokens
+            .unwrap_or(self.profile.default_max_tokens);
+        let fitted = window::fit(req, self.ctx, window::reply_reserve(self.ctx, max_out));
+        if fitted.dropped > 0 {
+            tracing::info!(
+                dropped = fitted.dropped,
+                kept = fitted.request.messages.len(),
+                ctx = self.ctx,
+                "okno rozmowy: najstarsze wiadomości pominięte w żądaniu do llama-server"
+            );
+        }
         Ok(WireRequest {
             path: "/chat/completions",
-            body: chat::build_body(req, &self.caps, &self.profile, &options)?,
+            body: chat::build_body(&fitted.request, &self.caps, &self.profile, &options)?,
             headers: Vec::new(),
         })
     }

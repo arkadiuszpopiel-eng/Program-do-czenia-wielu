@@ -1,7 +1,8 @@
 //! Produkcyjna fabryka potoku: `voice-*-impl` na urządzeniu audio aplikacji (WASAPI), STT
 //! z sidecara `whisper-server` i modelu GGML z `AppPaths::models()/whisper`, VAD Silero (bez modelu
 //! — detektor energii), synteza z silników aplikacji (Pocket TTS / Piper). Gdy brakuje STT albo
-//! TTS — potok się nie składa, a UI pokazuje „głos niedostępny: pobierz modele…".
+//! TTS — potok się nie składa, a UI pokazuje „głos niedostępny: pobierz modele…". Braki są
+//! sprawdzane przy każdym zapytaniu (`missing`) — pliki pobrane w Ustawieniach działają bez restartu.
 //!
 //! Skróty globalne (PTT `WH_KEYBOARD_LL`, przełącznik) obsługuje powłoka i przekazuje komendami
 //! `voice_ptt` / `voice_set_mic_enabled` — `voice-wake` dostaje port skrótów bez rejestracji.
@@ -153,6 +154,12 @@ impl SystemVoice {
         Ok(stt)
     }
 
+    /// Silnik TTS gotowy teraz: produkcyjny (`app_modules::tts::engines`) wykrywa Pipera i Pocket
+    /// TTS przy każdym sprawdzeniu, więc silnik pobrany w Ustawieniach działa bez restartu Alfy.
+    pub(crate) fn tts_ready(&self) -> Option<Arc<dyn Tts>> {
+        app_modules::tts::ready(self.tts.as_ref())
+    }
+
     /// VAD Silero (bez modelu — detektor energii).
     pub(crate) fn vad(&self) -> Result<SileroVad, PipelineError> {
         let path = self.paths.models().join("silero").join("silero_vad.onnx");
@@ -180,7 +187,7 @@ impl VoiceEngineFactory for SystemVoice {
         if self.whisper_model().is_none() {
             out.push(MISSING_STT_MODEL.to_owned());
         }
-        if self.tts.is_none() {
+        if self.tts_ready().is_none() {
             out.push(MISSING_TTS.to_owned());
         }
         out
@@ -193,8 +200,7 @@ impl VoiceEngineFactory for SystemVoice {
         cfg: PipelineCfg,
     ) -> Result<VoiceEngine, PipelineError> {
         let tts = self
-            .tts
-            .clone()
+            .tts_ready()
             .ok_or_else(|| component("tts", MISSING_TTS))?;
         let stt = self.whisper()?;
         let output = self

@@ -134,8 +134,9 @@ jobs:
           exit 0
 
   # Prawdziwe silniki z katalogu `app-models` na CPU (test `crates/app-models/tests/live_catalog.rs`):
-  # pobranie ~3 GB (llama-server CPU/Vulkan/CUDA, najmniejszy model GGUF z katalogu — oficjalny Bielik
-  # 1.5B Q8_0, whisper-server + model, piper + głos PL), rozpakowanie, generacja po polsku, TTS → STT. Raport JSON z SHA-256 każdego pobranego
+  # pobranie ~8 GB (llama-server CPU/Vulkan/CUDA, modele GGUF z katalogu — oficjalne Bielik 1.5B i 4.5B
+  # Q8_0, whisper-server + model, piper + głos PL), rozpakowanie, generacja po polsku każdym modelem
+  # (z narzędziem, gdy model je obsługuje; architektura i KV cache z logu llama-server), TTS → STT. Raport JSON z SHA-256 każdego pobranego
   # pliku → artefakt `alfa-live-report` + podsumowanie joba (do przypięcia hashy przez człowieka).
   live-engines:
     name: Silniki na żywo (CPU)
@@ -194,16 +195,19 @@ jobs:
               $md.Add("| $($i.id) | $($i.state) | $([math]::Round($i.download_ms / 1000, 1)) | [$($f.name)]($($f.url)) | $(& $cell $f.bytes) | ``$(& $cell $f.sha256)`` | $(& $cell $layout) |")
             }
           }
-          if ($r.llm) {
-            $l = $r.llm
-            $md.Add(''); $md.Add('### LLM (llama-server, CPU)')
-            $md.Add("- model ``$($l.model)``, backend **$($l.backend)**, wątki $($l.threads), serwer ``$($l.server)``")
+          foreach ($l in @($r.llm)) {
+            if ($null -eq $l) { continue }
+            $md.Add(''); $md.Add("### LLM ``$($l.model)`` (llama-server, CPU)")
+            $md.Add("- backend **$($l.backend)**, wątki $($l.threads), serwer ``$($l.server)``")
             $md.Add("- start sidecara (ładowanie modelu): $(& $cell $l.sidecar_startup_ms) ms; zdarzenia: $(& $cell ($l.sidecar_events -join '; '))")
             $md.Add("- pierwszy token: $($l.first_token_ms) ms, całość: $($l.total_ms) ms, tokeny wyjścia: $($l.output_tokens), **$([math]::Round([double]$l.tok_per_s, 2)) tok/s**")
             $md.Add("- odpowiedź: $(& $cell $l.text)")
             if ($l.error) { $md.Add("- **błąd:** $(& $cell $l.error)") }
+            if ($l.tools.skipped) { $md.Add("- żądanie z narzędziem: pominięte ($($l.tools.skipped))") }
+            elseif ($l.tools) { $md.Add("- żądanie z narzędziem (tura agentki): wywołanie narzędzia: $($l.tools.tool_called), błąd: $(& $cell $l.tools.error), $($l.tools.total_ms) ms") }
+            # Architektura i KV cache z logu llama-server — potwierdzenie `layers`/`kv_mb_per_1k_ctx` z models.toml.
+            foreach ($line in @($l.server_log)) { if ($line) { $md.Add("  - ``$(& $cell $line)``") } }
           }
-          if ($r.llm_tools) { $md.Add("- żądanie z narzędziem (tura agentki): wywołanie narzędzia: $($r.llm_tools.tool_called), błąd: $(& $cell $r.llm_tools.error), $($r.llm_tools.total_ms) ms") }
           if ($r.tts) { $md.Add(''); $md.Add("### TTS: $($r.tts.engine) — TTFB $($r.tts.ttfb_ms) ms, audio $($r.tts.audio_ms) ms, RTF $([math]::Round([double]$r.tts.rtf, 3))") }
           if ($r.stt) {
             $s = $r.stt

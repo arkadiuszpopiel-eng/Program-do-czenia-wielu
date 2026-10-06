@@ -26,3 +26,6 @@ Thumbs.db
 # Holdout ewaluacji jest poza gitem (ACCEPTANCE §13)
 /evals/holdout/
 /test.log
+
+# Python (skrypty CI)
+__pycache__/

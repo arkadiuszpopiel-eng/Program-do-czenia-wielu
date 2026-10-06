@@ -169,7 +169,11 @@ async fn device_profile_and_residency_drive_arguments() {
         "dzierżawa GPU: pełne odciążenie"
     );
     assert_eq!(arg(&first, "--threads"), Some(threads));
-    assert_eq!(residency.snapshot().used.vram_mb, 3_000);
+    assert_eq!(
+        residency.snapshot().used.vram_mb,
+        3_000 + 512,
+        "wagi + KV cache dla -c 8192"
+    );
     // Głos (wyższy priorytet) potrzebuje VRAM → dzierżawa LLM odebrana, sidecar zatrzymany.
     let stt = LeaseRequest {
         owner: "voice-stt".into(),

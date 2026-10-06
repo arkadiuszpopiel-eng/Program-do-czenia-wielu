@@ -21,6 +21,22 @@ pub fn runner_profile() -> Profile {
     }
 }
 
+/// Modele GGUF do sprawdzenia na żywo: wszystkie z katalogu (od najmniejszego) — domyślny to ten,
+/// który pobierze właściciel; `ALFA_LIVE_LLM=<id>` zawęża do jednego (szybszy przebieg lokalny).
+pub fn llms(catalog: &[ItemSpec]) -> Vec<ItemSpec> {
+    let mut all: Vec<ItemSpec> = catalog
+        .iter()
+        .filter(|i| i.kind == ModelItemKind::Llm && i.downloadable())
+        .cloned()
+        .collect();
+    all.sort_by_key(ItemSpec::size);
+    if let Ok(only) = std::env::var("ALFA_LIVE_LLM") {
+        all.retain(|i| i.id == only);
+    }
+    assert!(!all.is_empty(), "brak modeli GGUF do sprawdzenia");
+    all
+}
+
 pub fn smallest(catalog: &[ItemSpec], kind: ModelItemKind) -> ItemSpec {
     catalog
         .iter()

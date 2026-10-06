@@ -94,7 +94,7 @@ impl FeatureFactory for SystemVoice {
     }
 
     fn read_audio(&self) -> Result<ReadAudio, String> {
-        let tts = self.tts.clone().ok_or_else(|| MISSING_TTS.to_owned())?;
+        let tts = self.tts_ready().ok_or_else(|| MISSING_TTS.to_owned())?;
         let output = self
             .audio
             .open_output(None, &StreamConfig::output_default())

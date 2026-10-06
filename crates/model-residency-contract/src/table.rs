@@ -94,13 +94,38 @@ impl LeaseTable {
         Ok(match (request.placement, self.mode.gaming) {
             (Placement::GpuOnly, true) => return Err(ResidencyError::Gaming),
             (Placement::GpuOnly, false) => vec![Device::Gpu],
-            (Placement::GpuPreferred, false) => vec![Device::Gpu, Device::Cpu],
-            (Placement::GpuPreferred, true) | (Placement::CpuOnly, _) => vec![Device::Cpu],
+            (Placement::GpuPreferred | Placement::GpuIfFree, false) => {
+                vec![Device::Gpu, Device::Cpu]
+            }
+            (Placement::GpuPreferred | Placement::GpuIfFree, true) | (Placement::CpuOnly, _) => {
+                vec![Device::Cpu]
+            }
         })
     }
 
+    /// Kolejne próby umiejscowienia: (urządzenie, eksmisja, wypieranie z budżetu). Zwykle każde
+    /// urządzenie najpierw bez eksmisji, potem z eksmisją; `GpuIfFree`: GPU bez wypierania
+    /// (wymiana STT ↔ TTS dozwolona) → CPU → GPU z wypieraniem (ostatnia możliwość).
+    fn attempts(feasible: &[Device], placement: Placement) -> Vec<(Device, bool, bool)> {
+        let both = |d: &Device| [(*d, false, true), (*d, true, true)];
+        let gpu = feasible.contains(&Device::Gpu);
+        if placement != Placement::GpuIfFree || !gpu {
+            return feasible.iter().flat_map(both).collect();
+        }
+        let mut out = vec![(Device::Gpu, false, false), (Device::Gpu, true, false)];
+        out.extend(
+            feasible
+                .iter()
+                .filter(|d| **d == Device::Cpu)
+                .flat_map(both),
+        );
+        out.push((Device::Gpu, true, true));
+        out
+    }
+
     /// Przydziela dzierżawę: najpierw wolne miejsce, potem eksmisja ustępujących (niższy priorytet
-    /// albo równy i nieużywany, LRU); GPU przed CPU dla `GpuPreferred`.
+    /// albo równy i nieużywany, LRU); GPU przed CPU dla `GpuPreferred`; `GpuIfFree` — GPU tylko
+    /// bez wypierania, inaczej CPU ([`Placement::GpuIfFree`]).
     pub fn acquire(
         &mut self,
         request: &LeaseRequest,
@@ -121,15 +146,16 @@ impl LeaseTable {
             });
         }
         let mut blockers = Vec::new();
-        for device in &feasible {
-            for allow_evict in [false, true] {
-                match plan(&self.leases, request, *device, budget, allow_evict) {
-                    Plan::Fits {
-                        exclusive,
-                        preempted,
-                    } => return Ok(self.grant(request, *device, &exclusive, &preempted, now_ms)),
-                    Plan::Blocked(b) => blockers.extend(b),
+        for (device, allow_evict, preempt) in Self::attempts(&feasible, request.placement) {
+            match plan(&self.leases, request, device, budget, allow_evict) {
+                Plan::Fits {
+                    exclusive,
+                    preempted,
+                } if preempt || preempted.is_empty() => {
+                    return Ok(self.grant(request, device, &exclusive, &preempted, now_ms));
                 }
+                Plan::Fits { .. } => {}
+                Plan::Blocked(b) => blockers.extend(b),
             }
         }
         blockers.sort_unstable();

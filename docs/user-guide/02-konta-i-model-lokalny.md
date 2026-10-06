@@ -3,7 +3,9 @@
 ## Alfa bez kluczy — model lokalny
 
 Bez żadnego klucza Alfa myśli modelem uruchomionym na Twoim komputerze: **Bielik 4.5B v3.0 Instruct** (polski model,
-plik ok. 2,9 GB). Działa też bez internetu.
+plik Q8_0 ok. 4,8 GB z oficjalnego repozytorium autorów). W **Ustawienia → Modele i silniki** jest też lżejszy
+**Bielik 1.5B v3.0 Instruct** (ok. 1,6 GB) — szybszy na słabszych kartach (np. 6 GB), ale prostszy w rozmowie i bez
+zadań na plikach. Działa też bez internetu.
 
 1. W kroku **Konta i klucze** wprowadzenia kliknij na karcie **Model lokalny** przycisk „Pobierz”. Pobieranie można
    anulować i wznowić później — nie zaczyna się od zera. Model nie ma jeszcze przypiętej sumy kontrolnej, więc po

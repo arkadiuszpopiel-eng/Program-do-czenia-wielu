@@ -160,6 +160,40 @@ pub fn idle_reaping_follows_clock<H: Harness>(h: &H) {
     assert_eq!(reaped[0].reason, RevokeReason::Idle);
 }
 
+/// `GpuIfFree` (STT obok lokalnego LLM na laptopie 6 GB): na GPU tylko z wolnego miejsca — model
+/// rozmowy na karcie nie jest wypierany ani przeładowywany, STT dostaje CPU; gdy miejsce jest
+/// (LLM zostawił rezerwę na STT) — GPU, nadal bez eksmisji.
+pub fn gpu_if_free_does_not_preempt<H: Harness>(h: &H) {
+    let r = h.residency(Budget {
+        vram_mb: 5_153,
+        ..budget()
+    });
+    let rec = Arc::new(Recorder::default());
+    r.listen("llm", rec.clone());
+    let llm = ok(r.acquire(request("llm", Priority::Conversation, 5_080)));
+    let mut stt = request("stt", Priority::VoiceRt, 1_500);
+    stt.role = ModelRole::Stt;
+    stt.placement = Placement::GpuIfFree;
+    let g = ok(r.acquire(stt.clone()));
+    assert_eq!(g.lease.device, Device::Cpu, "brak miejsca obok LLM → CPU");
+    assert!(g.evicted.is_empty(), "{:?}", g.evicted);
+    assert!(
+        rec.revoked
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .is_empty()
+    );
+    assert_eq!(r.lease(llm.lease.id).map(|l| l.device), Some(Device::Gpu));
+    ok(r.release(g.lease.id));
+    ok(r.release(llm.lease.id));
+    let llm = ok(r.acquire(request("llm", Priority::Conversation, 3_570)));
+    let g = ok(r.acquire(stt));
+    assert_eq!(g.lease.device, Device::Gpu, "jest miejsce → GPU");
+    assert!(g.evicted.is_empty());
+    assert!(r.lease(llm.lease.id).is_some());
+    assert!(r.snapshot().used.vram_mb <= 5_153);
+}
+
 /// Deterministyczna seria 300 operacji: budżet nigdy nieprzekroczony, `Wait` tylko na wyższy/równy.
 pub fn never_exceeds_budget<H: Harness>(h: &H) {
     let r = h.residency(budget());
@@ -210,5 +244,6 @@ pub fn run_all<H: Harness>(h: &H) {
     preemption_notifies_owner(h);
     fullscreen_moves_models_to_cpu(h);
     idle_reaping_follows_clock(h);
+    gpu_if_free_does_not_preempt(h);
     never_exceeds_budget(h);
 }

@@ -76,3 +76,8 @@ Napisy na żywo (szary partial → pełny final), dyktowanie do czatu z podgląd
   CUDA (`sidecars/whisper-cuda/`, pozycja menedżera `sidecar-whisper-cuda`) ma pierwszeństwo, gdy jest zainstalowany
   (PLAN §6.3 D-CUDA), CPU (`sidecars/whisper/`) wymagany jako zapas; wątki CPU: połowa wątków logicznych, 4–8
   (wcześniej stałe 4). Build Vulkan whisper.cpp nie istnieje w wydaniach — desktop AMD rozpoznaje na CPU.
+- **STT obok lokalnego LLM na karcie 6 GB:** dzierżawa `whisper-server` na GPU ma umiejscowienie `GpuIfFree`
+  (`model-residency`): karta tylko z wolnego miejsca, inaczej CPU — STT nie wypiera lokalnego LLM (który przeładowałby
+  się na CPU w tej samej rozmowie). Przy domyślnym kontekście LLM dobranym przez `providers-local` (laptop: 4096) oba
+  mieszczą się na karcie. Test `stt_never_evicts_the_conversation_model_on_a_6_gb_laptop`.
+

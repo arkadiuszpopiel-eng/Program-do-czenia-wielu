@@ -136,3 +136,8 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   `tts::engines`, `stt::whisper`), generacja ≥ 16 tokenów po polsku, Piper → WAV → whisper (WER ≤ 0,5). Raport JSON
   (artefakt `alfa-live-report`): adres, rozmiar, SHA-256, surowy układ archiwów, wersje i flagi CLI, czasy (tok/s,
   RTF). `ALFA_LIVE_MIRROR=http://127.0.0.1:<port>` — próba na sucho z lokalnego lustra (atrapy silników).
+- **Modele rozmowy z oficjalnych repozytoriów** (manifest `providers-local`, 2026-10-06): Bielik 4.5B v3.0 Instruct
+  **Q8_0** (4826 MiB, pierwsza pozycja LLM — tę pobiera wprowadzenie) i Bielik 1.5B v3.0 Instruct Q8_0 (1620 MiB, bez
+  narzędzi). Wpis Q4_K_M wskazywał plik nieobecny w `speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` (HTTP 404). Próba na
+  żywo pobiera teraz najmniejszy — 1.5B (żądanie z narzędziem pomijane: `tools = false`).
+

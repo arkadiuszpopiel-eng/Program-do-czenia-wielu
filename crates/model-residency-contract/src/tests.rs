@@ -46,7 +46,7 @@ fn stt() -> LeaseRequest {
 
 fn llm(vram: u32) -> LeaseRequest {
     req(
-        "bielik-4.5b-q4_k_m",
+        "bielik-4.5b-v3.0-instruct-q8_0",
         ModelRole::Llm,
         Priority::Conversation,
         Placement::GpuPreferred,
@@ -321,4 +321,53 @@ fn events_describe_grants_and_changes() {
     assert!(state_schema().get("title").is_some());
     assert!(event_schema().to_string().contains("budget_exceeded"));
     assert_eq!(LeaseId(3).to_string(), "lease-3");
+}
+
+#[test]
+fn gpu_if_free_swaps_tts_and_preempts_only_when_cpu_is_impossible() {
+    let laptop = Budget {
+        vram_mb: 5_153,
+        ram_mb: 2_000,
+        desktop_reserve_mb: 768,
+        stt_tts_exclusive: true,
+    };
+    let mut t = LeaseTable::new(laptop);
+    let tts = req(
+        "chatterbox",
+        ModelRole::Tts,
+        Priority::VoiceRt,
+        Placement::GpuPreferred,
+        1_200,
+        1_000,
+    );
+    let tts = t.acquire(&tts, 0).unwrap().lease.id;
+    let mut stt = stt();
+    stt.placement = Placement::GpuIfFree;
+    let g = t.acquire(&stt, 1).unwrap();
+    assert_eq!(g.lease.device, Device::Gpu, "wymiana STT ↔ TTS dozwolona");
+    assert_eq!(g.evicted.len(), 1);
+    assert_eq!(g.evicted[0].lease.id, tts);
+    assert_eq!(
+        g.evicted[0].reason,
+        RevokeReason::Exclusive { by: g.lease.id }
+    );
+    t.release(g.lease.id).unwrap();
+    // RAM zajęty przez głos w użyciu → CPU niemożliwe → GPU z wypieraniem rozmowy (głos nie czeka
+    // na niższy priorytet).
+    let conv = t.acquire(&llm(4_000), 2).unwrap().lease.id;
+    let vad = req(
+        "silero",
+        ModelRole::Vad,
+        Priority::VoiceRt,
+        Placement::CpuOnly,
+        0,
+        1_700,
+    );
+    let vad = t.acquire(&vad, 3).unwrap().lease.id;
+    t.set_in_use(vad, true, 3).unwrap();
+    let g = t.acquire(&stt, 4).unwrap();
+    assert_eq!(g.lease.device, Device::Gpu);
+    assert_eq!(g.evicted.len(), 1);
+    assert_eq!(g.evicted[0].lease.id, conv);
+    assert!(t.within_budget());
 }

@@ -12,7 +12,9 @@ use common::FakeLauncher;
 use core_bus_fake::FakeBus;
 use core_registry_contract::{HealthStatus, Module, ModuleContext};
 use device_profile_contract::Backend;
-use model_residency_contract::{Budget, Residency};
+use model_residency_contract::{
+    Budget, Device, LeaseRequest, ModelRole, Placement, Priority, Residency,
+};
 use voice_audio_contract::synth::{SpeechParams, synthetic_speech};
 use voice_audio_contract::{Frame, MediaTime};
 use voice_stt_contract::{Health, Stt, SttEvent, UtteranceId, contract_tests, event_kind};
@@ -198,6 +200,56 @@ async fn residency_lease_and_cpu_placement() {
     assert_eq!(snap.leases[0].request.owner, "voice-stt");
     drop(stt);
     assert!(residency.snapshot().leases.is_empty());
+}
+
+/// Fala 6, laptop RTX 4050 6 GB (budżet 5153 MB): dzierżawa LLM `providers-local` jak dla
+/// Bielika 4.5B Q8_0 (wagi + KV cache części warstw na karcie). STT nie wypiera modelu rozmowy
+/// z karty: gdy whisper CUDA się nie mieści (51 warstw LLM, bez rezerwy) — CPU przez całą rozmowę
+/// (bez przeładowań LLM przy każdej wypowiedzi); gdy LLM zostawia rezerwę (34 warstwy) — CUDA obok.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn stt_never_evicts_the_conversation_model_on_a_6_gb_laptop() {
+    for (llm_vram, expected) in [(5_080, Backend::Cpu), (3_570, Backend::Cuda)] {
+        let residency = Arc::new(model_residency_fake::FakeResidency::new(Budget {
+            vram_mb: 5_921 - 768,
+            ram_mb: 8_000,
+            desktop_reserve_mb: 768,
+            stt_tts_exclusive: true,
+        }));
+        let llm = residency
+            .acquire(LeaseRequest {
+                owner: "providers-local".into(),
+                model: "bielik-4.5b-v3.0-instruct-q8_0".into(),
+                role: ModelRole::Llm,
+                priority: Priority::Conversation,
+                placement: Placement::GpuPreferred,
+                vram_mb: llm_vram,
+                ram_mb: 3_146,
+                cpu_ram_mb: 6_080,
+                idle_unload_ms: 600_000,
+            })
+            .unwrap()
+            .lease;
+        let mut cfg = config();
+        cfg.binaries.cuda = Some("whisper-server-cuda".into());
+        let launcher = Arc::new(FakeLauncher::default());
+        let stt = WhisperStt::new(cfg, launcher.clone(), Backend::Cuda)
+            .unwrap()
+            .with_residency(residency.clone());
+        for id in 1..=3 {
+            speak(&stt, UtteranceId(id), 1.0).await;
+            let t = stt.end_utterance(UtteranceId(id)).await.unwrap();
+            assert_eq!(
+                t.backend,
+                Some(expected),
+                "LLM {llm_vram} MB, wypowiedź {id}"
+            );
+        }
+        assert_eq!(launcher.launches.lock().unwrap().len(), 1, "sidecar raz");
+        let snap = residency.snapshot();
+        let lease = snap.leases.iter().find(|l| l.id == llm.id);
+        assert_eq!(lease.map(|l| l.device), Some(Device::Gpu), "LLM na karcie");
+        assert!(snap.used.vram_mb <= snap.budget.vram_mb);
+    }
 }
 
 #[tokio::test]

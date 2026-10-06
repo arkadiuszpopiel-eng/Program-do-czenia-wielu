@@ -67,3 +67,11 @@ Napisy z podświetleniem wypowiedzianych słów, „przeczytaj na głos" (głose
 - Głosy v0: mówczynie `pl-f1`/`pl-f2` (Pocket) × wysokość/tempo (Alfa 1,00/1,00, Beta 1,06/0,97, Gama 0,92/0,92, Delta 1,12/1,08); zapas Piper `pl_PL-gosia-medium` z odpowiadającą wysokością. Modyfikacja: WSOLA + resampling (błąd F0 i długości < 0,01% w testach, próg ±3%). Nazwy głosów i licencje — casting (ADR 11).
 - Fallback per zdanie (łańcuch idzie dalej, nie wraca w obrębie wypowiedzi); w sesji prywatnej ogniwa chmurowe pomijane.
 - Znaczniki: natywne z silnika (przeskalowane o tempo presetu) albo estymata z długości słów (`Estimated`); forced alignment — SPEC v1.
+
+## Fala 6 (2026-10-06)
+- Kompozycja w aplikacji (`app_modules::tts::engines` → `InstalledTts`): silniki (Piper, Pocket TTS) są wykrywane
+  **przy użyciu** — każde wywołanie sprawdza pliki sidecarów i składa `TtsService` od nowa, gdy zestaw się zmienił.
+  Piper pobrany w Ustawieniach działa od następnego czytania na głos / włączenia rozmowy, bez ponownego uruchomienia
+  Alfy. Brak silników = `TtsHealth::Failed` → „brak silnika TTS” (czytanie) i „głos niedostępny” (rozmowa,
+  `SystemVoice::missing`). Testy: `app-modules` `tts::tests`, `app-voice/tests/tts_after_start.rs`.
+
