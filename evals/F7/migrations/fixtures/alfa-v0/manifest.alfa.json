@@ -1,0 +1,25 @@
+{
+  "format": 0,
+  "app": "0.0.9",
+  "created": "2026-05-01T12:00:00Z",
+  "machine": "0123456789abcdef0123456789abcdef",
+  "kind": "export",
+  "files": [
+    {
+      "name": "config/common/shared.toml",
+      "sha256": "4f8c29733bfab5238b779b6387471645119e258209efbcd51c437110a11a7555",
+      "size": 30
+    },
+    {
+      "name": "sessions/s-stara/session.json",
+      "sha256": "da969cfdfd823235f23b017cb048363cff678a9c1129528978d0dedfdb23a0e9",
+      "size": 92
+    },
+    {
+      "name": "sessions/s-stara/turns.ndjson",
+      "sha256": "ab4c9204d3a992c59eb27a4a7446d614d0d8528d2ca30bc0af5d90201637481b",
+      "size": 860
+    }
+  ],
+  "notes": "Paczka sprzed SPEC v1 (szkic formatu v0)"
+}

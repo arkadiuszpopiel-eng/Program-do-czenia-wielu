@@ -8,6 +8,7 @@ progi w `docs/ACCEPTANCE.md`). Harness: moduł `evals` (`crates/evals-{contract,
 |---|---|---|
 | `F2/`, `F3/`, `F5/`, `F7/`, `F8/` | zestawy akceptacyjne per fala (dane + `MANIFEST.json` z SHA-256 i progami) | tak |
 | `F8/harness-examples/` | manifesty w formacie natywnym dla istniejących zestawów F2/F3/F7 (bez zmiany ich treści) | tak |
+| `F1/prompts-pl/`, `F6/`, `F7/migrations/`, `F9/` | **szkice** model-recenzentki (fala 4) do akceptacji człowieka, jeszcze bez `MANIFEST.json`: 20 promptów PL (F1-03), 60 zadań computer use i macierz aplikacji (F6-01, F6-03), 24 scenariusze migracji (F7-08), lista kontrolna pentestu (F9-01) | tak |
 | `acceptance/` | zamrożone kopie zestawów + `HASHES` (`sha256sum --check` w CI) | tak |
 | `spikes/` | protokoły i skrypty spike'ów F0 (wyniki jako artefakty) | tak |
 | `corpus/` | korpus własny: nagrania głosu, transkrypcje, dane osobiste | **nie** (`.gitignore`) |

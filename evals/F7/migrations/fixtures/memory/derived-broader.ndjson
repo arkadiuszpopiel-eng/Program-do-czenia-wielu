@@ -1,0 +1,1 @@
+{"id":"m-013","scope":{"scope":"session","id":"s-f1"},"layer":"semantic","text":"Wniosek z faktu globalnego.","entities":[],"provenance":{"kind":"agent","agent":"alfa"},"trusted":true,"confidence":1.0,"ttl_secs":null,"created_at":"2026-06-10T09:00:00Z","approved":true,"origin":{"derived_from":[{"scope":{"scope":"global"},"id":"m-001"}],"derivation":"summary"}}

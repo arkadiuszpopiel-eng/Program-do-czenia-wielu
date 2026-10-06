@@ -8,3 +8,4 @@
 | F7-04 proweniencja (0 awansów w 50) | `contract_tests_f7::access::untrusted_never_promotes`, `memory-consolidation-contract/tests/guardian.rs` | `cargo test -p memory-consolidation-contract` |
 | F7-05 konsolidacja nie na baterii / w grze | `memory-consolidation-impl/tests/adapters.rs` (atrapa `device-profile`, 20 scenariuszy) | `cargo test -p memory-consolidation-impl` |
 | F7-06 round-trip `.alfa` | `memory-impl/tests/documents.rs` (silnik `transfer`, desktop → laptop); `alfa-full/` — sesja `transfer` | — |
+| F7-08 migracje schematu (szkic) | `migrations/` — 24 scenariusze (paczki `.alfa` v0/v1, dokumenty pamięci, bazy SQLite), status: szkic do akceptacji | runner do zbudowania (`migrations/README.md`); dziś pokrywają je częściowo `transfer-contract` `migrate_tests`, `transfer-impl/tests/secrets.rs`, `lib-sqlstore/tests/sqlstore.rs` |

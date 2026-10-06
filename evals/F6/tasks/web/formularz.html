@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Formularz kontaktowy — Sklep testowy F6</title>
+</head>
+<body>
+<h1>Formularz kontaktowy</h1>
+<form action="dziekujemy.html" method="get">
+<p><label for="imie">Imię</label> <input id="imie" name="imie" type="text" required></p>
+<p><label for="email">E-mail</label> <input id="email" name="email" type="email" required></p>
+<p><label for="temat">Temat</label>
+<select id="temat" name="temat">
+<option value="pytanie">Pytanie</option>
+<option value="reklamacja">Reklamacja</option>
+<option value="inne">Inne</option>
+</select></p>
+<p><input id="zgoda" name="zgoda" type="checkbox" value="tak" required> <label for="zgoda">Zgadzam się na kontakt w sprawie zgłoszenia</label></p>
+<p><button type="submit">Wyślij</button></p>
+</form>
+</body>
+</html>
