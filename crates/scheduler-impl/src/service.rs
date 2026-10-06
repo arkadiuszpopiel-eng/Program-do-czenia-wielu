@@ -74,6 +74,9 @@ pub(crate) struct Service {
     workers: Mutex<BTreeMap<DispatchId, AbortHandle>>,
     pub(crate) finished: Notify,
     background: Mutex<Vec<JoinHandle<()>>>,
+    /// Zapisy magazynu po kolei; `true` = moduł zatrzymany (zapis w tle po zapisie końcowym
+    /// nadpisałby nowszy stan starszym — zapis z `spawn_blocking` nie da się przerwać).
+    saves: Arc<Mutex<bool>>,
     me: Weak<Service>,
 }
 
@@ -111,6 +114,7 @@ impl Service {
             workers: Mutex::new(BTreeMap::new()),
             finished: Notify::new(),
             background: Mutex::new(Vec::new()),
+            saves: Arc::default(),
             me: me.clone(),
         });
         let tasks = vec![
@@ -132,6 +136,8 @@ impl Service {
         for (_, worker) in std::mem::take(&mut *lock(&self.workers)) {
             worker.abort();
         }
+        let mut stopped = lock(&self.saves);
+        *stopped = true;
         self.store.save(&self.core.snapshot())
     }
 
@@ -266,9 +272,17 @@ async fn persister(svc: Weak<Service>, wake: Arc<Notify>) {
         let Some(snapshot) = lock(&s.core.host().pending).take() else {
             continue;
         };
-        let store = Arc::clone(&s.store);
+        let (store, saves) = (Arc::clone(&s.store), Arc::clone(&s.saves));
         drop(s);
-        let saved = tokio::task::spawn_blocking(move || store.save(&snapshot)).await;
+        let saved = tokio::task::spawn_blocking(move || {
+            let stopped = lock(&saves);
+            if *stopped {
+                Ok(())
+            } else {
+                store.save(&snapshot)
+            }
+        })
+        .await;
         let error = match saved {
             Ok(Ok(())) => continue,
             Ok(Err(e)) => e,
