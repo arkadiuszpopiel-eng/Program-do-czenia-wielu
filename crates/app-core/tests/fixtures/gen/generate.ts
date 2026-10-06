@@ -198,7 +198,7 @@ async function run(): Promise<void> {
   scheduler.advance(600);
   await flush();
   await both('models', 'localCancel', null);
-  await both('models', 'localDownload', 'bielik-4.5b-v3.0-instruct-q4_k_m');
+  await both('models', 'localDownload', 'bielik-4.5b-v3.0-instruct-q8_0');
   scheduler.runAll();
   await flush();
   await both('models', 'localList');

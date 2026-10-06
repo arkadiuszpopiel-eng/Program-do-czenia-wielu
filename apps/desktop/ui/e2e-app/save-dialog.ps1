@@ -4,8 +4,10 @@
 .DESCRIPTION
     Rdzeń otwiera okno zapisu przez tauri-plugin-dialog (IFileSaveDialog w procesie alfa-desktop).
     Skrypt czeka na okno dialogowe (klasa #32770) tego procesu, wpisuje pełną ścieżkę w pole nazwy
-    pliku (AutomationId 1001) i naciska „Zapisz” (AutomationId 1). Z -Cancel zamyka otwarte okno
-    przyciskiem „Anuluj” (AutomationId 2) — sprzątanie po nieudanym kroku testu.
+    pliku (identyfikator kontrolki 1001, klasa Edit) i naciska „Zapisz” (IDOK = 1). Z -Cancel zamyka
+    otwarte okno przyciskiem „Anuluj” (IDCANCEL = 2) — sprzątanie po nieudanym kroku testu.
+    Bez fokusu i klawiatury: wzorce UIA (Value, Invoke), a gdy ich brak (Windows Server na runnerze
+    podaje kontrolki Win32 okna jako Pane) — komunikaty okna WM_SETTEXT i WM_COMMAND.
     Kod wyjścia: 0 — zapisano / anulowano / nie było czego anulować, 1 — okna brak albo błąd.
     Plik w UTF-8 z BOM: bez BOM Windows PowerShell 5.1 psuje polskie znaki w napisach. Cudzysłowy „ ” tylko
     w napisach w apostrofach — PowerShell traktuje je w napisach w cudzysłowie jak znak końca napisu.
@@ -24,6 +26,12 @@ $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
+Add-Type -Namespace AlfaE2E -Name Win32 -MemberDefinition @'
+[DllImport("user32.dll", CharSet = CharSet.Unicode)]
+public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, string lParam);
+[DllImport("user32.dll")]
+public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+'@
 
 $AE = [System.Windows.Automation.AutomationElement]
 $Scope = [System.Windows.Automation.TreeScope]
@@ -61,15 +69,44 @@ function Write-Windows {
     }
 }
 
-function Invoke-Button($Dialog, [string]$Id) {
-    $buttons = $Dialog.FindAll($Scope::Descendants, (New-Property $AE::AutomationIdProperty $Id))
-    foreach ($button in $buttons) {
-        if ($button.Current.ControlType -eq $ControlType::Button) {
-            $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
-            return $true
-        }
+function Find-ByIdClass($Root, [string]$Id, [string]$Class) {
+    # Kontrolka Win32 okna po identyfikatorze (AutomationId) i klasie okna — typ UIA bywa różny
+    # (Windows 11: Edit/Button, Windows Server: Pane), a ten sam identyfikator ma np. pasek adresu.
+    $condition = [System.Windows.Automation.AndCondition]::new(
+        [System.Windows.Automation.Condition[]]@(
+            (New-Property $AE::AutomationIdProperty $Id),
+            (New-Property $AE::ClassNameProperty $Class)))
+    return $Root.FindFirst($Scope::Descendants, $condition)
+}
+
+function Invoke-Button($Dialog, [int]$Id) {
+    # Wzorzec Invoke, a bez niego WM_COMMAND z identyfikatorem przycisku do okna dialogowego
+    # (PostMessage — nie czeka, gdy okno otworzy np. pytanie o nadpisanie). Zwraca użytą metodę.
+    $button = Find-ByIdClass $Dialog "$Id" 'Button'
+    $pattern = $null
+    if ($null -ne $button -and $button.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref]$pattern)) {
+        $pattern.Invoke()
+        return 'UIA Invoke'
     }
-    return $false
+    $hwnd = [IntPtr]$Dialog.Current.NativeWindowHandle
+    if ($hwnd -eq [IntPtr]::Zero) { return $null }
+    $source = [IntPtr]::Zero
+    if ($null -ne $button) { $source = [IntPtr]$button.Current.NativeWindowHandle }
+    if (-not [AlfaE2E.Win32]::PostMessage($hwnd, 0x0111, [IntPtr]$Id, $source)) { return $null }
+    return 'WM_COMMAND'
+}
+
+function Set-NameText($Edit, [string]$Text) {
+    # Wzorzec Value, a bez niego WM_SETTEXT na uchwyt pola (system przenosi tekst między procesami).
+    $pattern = $null
+    if ($Edit.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern, [ref]$pattern)) {
+        $pattern.SetValue($Text)
+        return 'UIA Value'
+    }
+    $hwnd = [IntPtr]$Edit.Current.NativeWindowHandle
+    if ($hwnd -eq [IntPtr]::Zero) { throw 'Pole nazwy pliku bez wzorca Value i bez uchwytu okna.' }
+    [void][AlfaE2E.Win32]::SendMessage($hwnd, 0x000C, [IntPtr]::Zero, $Text)
+    return 'WM_SETTEXT'
 }
 
 function Write-Tree($Root) {
@@ -118,44 +155,28 @@ try {
     Write-Output ('Okno dialogowe: „{0}” (pid {1})' -f $dialog.Current.Name, $dialog.Current.ProcessId)
 
     if ($Cancel) {
-        if (-not (Invoke-Button $dialog '2')) {
+        $how = Invoke-Button $dialog 2
+        if ($null -eq $how) {
             $dialog.GetCurrentPattern([System.Windows.Automation.WindowPattern]::Pattern).Close()
+            $how = 'UIA Window.Close'
         }
-        Write-Output 'Anulowano okno dialogowe.'
+        Write-Output "Anulowano okno dialogowe ($how)."
         exit 0
     }
 
-    $nameField = [System.Windows.Automation.AndCondition]::new(
-        [System.Windows.Automation.Condition[]]@(
-            (New-Property $AE::AutomationIdProperty '1001'),
-            (New-Property $AE::ControlTypeProperty $ControlType::Edit)))
-    $edit = Wait-Until { $dialog.FindFirst($Scope::Descendants, $nameField) } 10
+    $edit = Wait-Until { Find-ByIdClass $dialog '1001' 'Edit' } 10
     if ($null -eq $edit) {
-        # Okno zapisu w innych wydaniach Windows (np. Server na runnerze) ma inne drzewo UIA:
-        # pole po nazwie albo jedyne pole edycji; diagnostyka — drzewo okna w logu.
-        Write-Output 'Brak pola o AutomationId 1001 — szukam pola edycji po nazwie.'
+        # Inne drzewo UIA niż znane: pole po nazwie albo jedyne pole edycji; drzewo okna w logu.
+        Write-Output 'Brak pola 1001 (klasa Edit) — szukam pola edycji po nazwie.'
         Write-Tree $dialog
         $edit = Find-NameEdit $dialog
     }
-    if ($null -ne $edit) {
-        $edit.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($Path)
-        Write-Output "Wpisano ścieżkę: $Path"
-        if (-not (Invoke-Button $dialog '1')) { throw 'Brak przycisku „Zapisz” (AutomationId 1).' }
-        Write-Output 'Naciśnięto „Zapisz”.'
-    } else {
-        # Ostatnia deska: klawiatura (sesja interaktywna runnera) — Alt+N to pole „Nazwa pliku”.
-        Write-Output 'Brak pola edycji w UIA — wpisuję z klawiatury (Alt+N, ścieżka, Enter).'
-        Add-Type -AssemblyName System.Windows.Forms
-        $dialog.SetFocus()
-        Start-Sleep -Milliseconds 300
-        $escaped = $Path -replace '([+^%~(){}\[\]])', '{$1}'
-        [System.Windows.Forms.SendKeys]::SendWait('%n')
-        Start-Sleep -Milliseconds 200
-        [System.Windows.Forms.SendKeys]::SendWait($escaped)
-        Start-Sleep -Milliseconds 200
-        [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
-        Write-Output "Wpisano ścieżkę z klawiatury: $Path"
-    }
+    if ($null -eq $edit) { throw 'Brak pola „Nazwa pliku” w oknie zapisu.' }
+    $how = Set-NameText $edit $Path
+    Write-Output ('Wpisano ścieżkę ({0}): {1} — pole: „{2}”' -f $how, $Path, $edit.Current.Name)
+    $how = Invoke-Button $dialog 1
+    if ($null -eq $how) { throw 'Nie udało się nacisnąć „Zapisz” (IDOK).' }
+    Write-Output "Naciśnięto „Zapisz” ($how)."
 
     $closed = Wait-Until { if ($null -eq (Find-Dialog)) { $true } else { $null } } 15
     if ($null -eq $closed) {

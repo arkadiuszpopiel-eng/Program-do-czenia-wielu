@@ -166,7 +166,7 @@ fn plan_window_estimates() {
 
 #[test]
 fn default_policy_follows_plan() {
-    let local = c("local:bielik-4.5b-q4_k_m");
+    let local = c("local:bielik-4.5b-q8_0");
     let a = RoutePolicy::defaults(Some(&local), &[]);
     for class in ALL_CLASSES {
         assert_eq!(

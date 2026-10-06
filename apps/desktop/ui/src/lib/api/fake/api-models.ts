@@ -5,8 +5,8 @@ import type { LocalModelInfo } from '../types-hub';
 import type { FakeCore } from './core';
 
 const MIB = 1024 * 1024;
-const DEFAULT_MODEL = 'bielik-4.5b-v3.0-instruct-q4_k_m';
-const SIZE = 2900 * MIB;
+const DEFAULT_MODEL = 'bielik-4.5b-v3.0-instruct-q8_0';
+const SIZE = 4826 * MIB;
 const STEP_MS = 200;
 const STEPS = 10;
 
@@ -17,7 +17,7 @@ export function modelsApi(core: FakeCore): AlfaClient['models'] {
 
   const info = (): LocalModelInfo => ({
     id: DEFAULT_MODEL,
-    name: 'Bielik 4.5B v3.0 Instruct (Q4_K_M)',
+    name: 'Bielik 4.5B v3.0 Instruct (Q8_0)',
     size_bytes: SIZE,
     installed,
     default: true,

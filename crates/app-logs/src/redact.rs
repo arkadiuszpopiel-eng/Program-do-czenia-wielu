@@ -298,7 +298,7 @@ mod tests {
             "7b7f5436cfcb02fae583a05b512ea96467fd449fe54cb49a5e4f06c51a1e43b8",
             "0b6c1f4e-3a5d-4f7e-9b2a-1c3d5e7f9a0b",
             "C:\\Users\\Ala\\AppData\\Local\\Alfa\\sidecars\\llama-vulkan\\llama-server.exe",
-            "bielik-4.5b-v3.0-instruct-q4_k_m",
+            "bielik-4.5b-v3.0-instruct-q8_0",
         ] {
             assert_eq!(r.redact(keep), keep);
         }

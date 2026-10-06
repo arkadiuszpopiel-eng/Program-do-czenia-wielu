@@ -66,7 +66,7 @@ Brak własnych.
 Decyzja ≤ 1 ms; RAM ≤ 2 MB; brak I/O w ścieżce decyzji.
 
 ## Konfiguracja (klucze TOML)
-`[router.class.<klasa>] prefer = ["anthropic:claude-opus-5-5", "local:bielik-4.5b-v3.0-instruct-q4_k_m"]`, `[router] speaker = "alfa"`, `thinker = "gama"`, `[router.breaker] failures = 3`, `window = "60s"`, `cooldown = "60s"`, `[router.deadline] voice_fast = "1200ms"` (`"off"` wyłącza). Polityka prywatności sesji (CN, „może trenować", `unknown`) — `compliance` (`PrivacyPolicy`, kernel_policy).
+`[router.class.<klasa>] prefer = ["anthropic:claude-opus-5-5", "local:bielik-4.5b-v3.0-instruct-q8_0"]`, `[router] speaker = "alfa"`, `thinker = "gama"`, `[router.breaker] failures = 3`, `window = "60s"`, `cooldown = "60s"`, `[router.deadline] voice_fast = "1200ms"` (`"off"` wyłącza). Polityka prywatności sesji (CN, „może trenować", `unknown`) — `compliance` (`PrivacyPolicy`, kernel_policy).
 
 ## Wkład do UI
 Chip profilu modelu/„Hybryda" w pasku i composerze, `/model`, Ustawienia → Router i reguły, powód decyzji w szczegółach wiadomości, komunikat „brakuje: klucz X".

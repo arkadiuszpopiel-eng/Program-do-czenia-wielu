@@ -47,12 +47,12 @@ type Seed = [
 
 const SEEDS: readonly Seed[] = [
   [
-    'bielik-4.5b-v3.0-instruct-q4_k_m',
+    'bielik-4.5b-v3.0-instruct-q8_0',
     'llm',
-    'Bielik 4.5B v3.0 Instruct (Q4_K_M)',
+    'Bielik 4.5B v3.0 Instruct (Q8_0)',
     'Apache-2.0',
-    2900,
-    ['Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf'],
+    4826,
+    ['Bielik-4.5B-v3.0-Instruct.Q8_0.gguf'],
     false,
     false,
     [

@@ -4,9 +4,9 @@
     "args": {},
     "result": [
       {
-        "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
-        "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
-        "size_bytes": 3040870400,
+        "id": "bielik-4.5b-v3.0-instruct-q8_0",
+        "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+        "size_bytes": 5060427776,
         "installed": false,
         "default": true,
         "downloading": false
@@ -30,7 +30,7 @@
   {
     "command": "models_local_download",
     "args": {
-      "modelId": "bielik-4.5b-v3.0-instruct-q4_k_m"
+      "modelId": "bielik-4.5b-v3.0-instruct-q8_0"
     },
     "result": null
   },
@@ -39,9 +39,9 @@
     "args": {},
     "result": [
       {
-        "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
-        "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
-        "size_bytes": 3040870400,
+        "id": "bielik-4.5b-v3.0-instruct-q8_0",
+        "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+        "size_bytes": 5060427776,
         "installed": true,
         "default": true,
         "downloading": false

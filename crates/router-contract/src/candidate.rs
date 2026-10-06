@@ -7,7 +7,7 @@ use providers_contract::ProviderId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// Kandydat trasy. Tekstowo `dostawca:model` (np. `anthropic:claude-opus-5-5`, `local:bielik-4.5b-q4_k_m`)
+/// Kandydat trasy. Tekstowo `dostawca:model` (np. `anthropic:claude-opus-5-5`, `local:bielik-4.5b-q8_0`)
 /// — ten sam zapis w konfiguracji (`prefer = [...]`), w `ChatRequest::model` (przypięcie) i w
 /// `ProviderEvent::Started::model` zwracanym przez Router (pochodzenie bloków myślenia).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]

@@ -127,10 +127,10 @@
     { "type": "OpenSession", "session_id": "s-q3" },
     {
       "type": "LocalModelProgress",
-      "model_id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+      "model_id": "bielik-4.5b-v3.0-instruct-q8_0",
       "state": "failed",
       "bytes": 0,
-      "total": 3040870400,
+      "total": 5060427776,
       "error": "Pobieranie modelu nie powiodło się: pobieranie: HTTP 503"
     },
     {

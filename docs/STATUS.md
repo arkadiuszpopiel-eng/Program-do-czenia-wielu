@@ -1,6 +1,6 @@
 # STATUS.md — macierz akceptacji fal F0–F9
 
-Stan na **2026-10-06**, gałąź `ccr-af4b63c6-3fyzaj` (po `0d31755` + fala 3: `tools-system/net/vision/media`, załączniki, kopie zapasowe, eksport rozmowy). Kryteria i progi:
+Stan na **2026-10-06**, gałąź `ccr-af4b63c6-3fyzaj` (fale 3–6: narzędzia systemowe, podział `app-core`, dziennik diagnostyczny, próba generalna na runnerze Windows). Kryteria i progi:
 `docs/ACCEPTANCE.md` (ten plik ich nie zmienia). Dowody sprawdzone w repo (`grep` po nazwach testów i plików);
 liczby z opisów commitów i README zestawów `evals/`.
 
@@ -19,41 +19,22 @@ Bramki ludzkie (PLAN §4.6): #1 logowanie do CLI i klucze API · #2 UAC / Hello 
 
 ## Stan CI i bramek lokalnych
 
-- Workflow `.github/workflows/ci.yml`: Rust (ubuntu, windows), Powłoka Tauri (Windows), cargo-deny, UI (Svelte 5),
-  Dokumentacja. Na HEAD `51cbe91`: 5/6 jobów zielonych, **„Rust (windows-latest)” — krok Test czerwony** (szczegóły
-  w logu przebiegu 37011906360). Ostatni w pełni zielony przebieg: `b88b3a9`.
-- Bramki lokalne z opisu `51cbe91`: fmt, clippy `-D warnings`, **1846 testów Rust**, cargo deny, check-deps
-  (1265 krawędzi, 0 naruszeń); UI: lint, svelte-check, build, budżet JS 90/150 KB, Storybook, prettier,
-  vitest 135/135, E2E 62/62 z axe.
-- W drzewie roboczym trwa praca innych sesji (nieskomitowana, nieuwzględniona poniżej): pobieranie i instalacja
-  wydań w `updater` (F3-10) oraz poprawki strażnika celów GUI (P2-01, P2-03 z przeglądu #2).
-
-## Podsumowanie liczbowe
-
-| Fala                               | Kryteriów |     ✅ |     🟡 |     ⛔ |    ⚖️ |
-| ---------------------------------- | --------: | -----: | -----: | -----: | ----: |
-| F0 Fundament i spike'i             |        19 |      4 |     13 |      0 |     2 |
-| F1 Rdzeń czatu                     |        13 |      7 |      6 |      0 |     0 |
-| F2 Głos rdzeniowy + agentki        |        14 |      2 |     12 |      0 |     0 |
-| F3 Safety Kernel (koniec MVP)      |        13 |      6 |      5 |      2 |     0 |
-| F4 Mosty i MCP                     |         8 |      3 |      5 |      0 |     0 |
-| F5 Orkiestracja + głos rozszerzony |        12 |      5 |      7 |      0 |     0 |
-| F6 Computer use                    |         8 |      1 |      3 |      4 |     0 |
-| F7 Pamięć i transfer pełne         |         8 |      5 |      1 |      2 |     0 |
-| F8 Samonaprawa i ulepszanie        |         6 |      5 |      0 |      1 |     0 |
-| F9 Dopieszczenie                   |         7 |      0 |      4 |      3 |     0 |
-| **Razem**                          |   **108** | **38** | **56** | **12** | **2** |
-
-Wniosek: logika i zabezpieczenia są w większości zweryfikowane na atrapach; żadna fala nie jest formalnie zamknięta,
-bo prawie wszystkie pozostałe kryteria czekają na sprzęt, korpus, klucze albo akceptację człowieka. MVP (F0–F3)
-blokują dodatkowo: okno Brokera niezweryfikowane na sprzęcie, nieprzypięte adresy i SHA-256 modeli/sidecarów
-w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczegóły niżej).
+- Workflow `.github/workflows/ci.yml`: Rust (ubuntu-24.04, windows-latest), Powłoka Tauri (Windows; testy z cechą
+  `e2e` i bez), cargo-deny, UI (Svelte 5), Dokumentacja — wszystkie zielone na `a5c642d` i kolejnych commitach fali 6.
+- Workflow `.github/workflows/rehearsal.yml` („Próba generalna (Windows)”, fala 6 — przed testem na laptopie
+  właściciela): `hf-catalog` (adresy, rozmiary i SHA-256 plików z katalogów modeli w API Hugging Face — bramka),
+  `setup-dev` (`scripts/setup-dev.ps1 -Ci` pod PowerShell 5.1 i 7 — zielony), `live-engines` (prawdziwe pobranie,
+  rozpakowanie i uruchomienie `llama-server`, `whisper-server`, `piper` przez `ModelsApp` na CPU, raport SHA-256)
+  i `app-e2e` (prawdziwa aplikacja: build z cechą `e2e`, Playwright przez CDP do WebView2). Wyniki — punkt 12 luk.
+- Bramki lokalne (sesja w chmurze, Linux): fmt, clippy `-D warnings` (+ cross-clippy `x86_64-pc-windows-msvc`),
+  `cargo test --workspace`, cargo deny, check-deps; UI: lint, svelte-check, build, budżet JS, Storybook, prettier,
+  vitest, Playwright E2E na atrapie z axe.
 
 ## F0 — Fundament i spike'i
 
 | ID    | Kryterium                                                                   | Status | Dowód / co dalej                                                                                                                                                                                                                                                                |
 | ----- | --------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F0-01 | CI zielone (fmt, clippy, test, svelte-check, cargo-deny, diff generowanych) | ✅     | `.github/workflows/ci.yml`; pełna zieleń m.in. na `b88b3a9`. Na HEAD czerwony krok Test na Windows — do naprawy przez sesję kodu.                                                                                                                                               |
+| F0-01 | CI zielone (fmt, clippy, test, svelte-check, cargo-deny, diff generowanych) | ✅     | `.github/workflows/ci.yml`; pełna zieleń m.in. na `a5c642d` (Linux i Windows); próba generalna na runnerze Windows — `rehearsal.yml`.                                                                                                                                           |
 | F0-02 | Trójka crate'ów + test kontraktowy na fake i impl                           | ✅     | `example-module-impl/tests/module.rs::contract_suite`, `example-module-fake/tests/fake.rs::contract_suite`; `scripts/check-deps.sh` — 0 naruszeń.                                                                                                                               |
 | F0-03 | Spike (a): profil A p50 ≤ 2000 / p95 ≤ 3000 ms                              | 🟡     | Atrapy: p50 1380 / p95 1610 ms (`voice-pipeline-impl/tests/e2e_turn.rs::time_to_first_audio_profile_a_budget_100_scenarios`). Pomiar ≥ 50 tur loopbackiem na desktopie z emulacją i laptopie wg `evals/spikes/a-petla-glosowa/` (`results/` pusty). Bramki #6, #8.              |
 | F0-04 | Spike (a): AEC bez fałszywych przerwań przy własnym TTS                     | 🟡     | Atrapy: `e2e_barge.rs::own_tts_echo_through_room_does_not_interrupt`; AEC3 w `voice-dsp` (ERLE 49 dB). 30 min TTS przez głośniki + odsłuch, wynik do ADR 11. Bramki #6, #8.                                                                                                     |
@@ -254,6 +235,19 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
     turą, przy otwarciu sesji i przed przebiegiem zadania — także po restarcie (`app-core/tests/files.rs::
     attachment_taint_reaches_broker_and_survives_restart`); trwały stan bezpieczeństwa w samym Brokerze — nadal P3-01.
 
+12. **Próba generalna w chmurze (fala 6, `rehearsal.yml`) — przed testem na laptopie (RTX 4050 6 GB).**
+    - `setup-dev.ps1 -Ci` pod PowerShell 5.1 i 7 — bez błędów składni i wykonania.
+    - Prawdziwa aplikacja na runnerze Windows (WebView2, Playwright przez CDP): start okna, onboarding, rozmowa bez
+      modelu → czytelny błąd „brak modelu”, Ustawienia → Modele i silniki (lista z katalogu), kill-switch z UI,
+      axe na 3 widokach, **CSP z Trusted Types: 0 naruszeń, konsola bez błędów** — 9/10. Okno „Zapisz jako”
+      (eksport `.alfa`) na Windows Server ma kontrolki Win32 widoczne w UIA jako `Pane` — skrypt testu wpisuje ścieżkę
+      i zatwierdza komunikatami okna (WM_SETTEXT, WM_COMMAND IDOK), bez fokusu.
+    - Silniki na żywo: `llama-server`, `whisper-server` i `piper` pobrane i rozpakowane z prawdziwych wydań; **adres
+      modelu Bielik w katalogu był błędny (404)** — oficjalne repozytorium `speakleash` ma tylko `Q8_0` (4826 MiB)
+      i `fp16`. Katalog wskazuje teraz oficjalne `Q8_0` (4.5B domyślny, 1.5B lekki); `Q4_K_M` istnieje tylko
+      u osób trzecich — decyzja człowieka (ADR 0014, aktualizacja). Bramka `hf-catalog` sprawdza odtąd każdy adres
+      i rozmiar GGUF w API Hugging Face, zanim ruszą długie joby.
+
 ## Co musi zrobić człowiek (w kolejności priorytetu)
 
 1. **Przegląd i akceptacja zmian Jądra i zabezpieczeń (bramka #7).** Moduły `safety-broker`, `broker-ui`, `watchdog`,
@@ -287,3 +281,5 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
     `providers-local-impl/models.toml`): potwierdzić adresy, rozmiary i licencje (głos Piper, VoxCeleb), przypiąć
     SHA-256 i numer wydania llama.cpp, sprawdzić układ archiwów `whisper-server`/`piper` oraz `sidecar-llama-cuda`
     (wariant CUDA 12.4, archiwum `cudart`, licencja redystrybucji bibliotek NVIDIA); potem `confirmed: true`.
+    Wybrać źródło modelu lokalnego: oficjalny Bielik `Q8_0` (domyślnie, 4,8 GB; na 6 GB VRAM częściowe odciążenie)
+    albo kwantyzacja `Q4_K_M` osoby trzeciej (2,9 GB; zaufanie do autora kwantyzacji) — tabela SHA-256 w jobie `hf-catalog`.

@@ -5,18 +5,18 @@
     "result": {
       "items": [
         {
-          "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+          "id": "bielik-4.5b-v3.0-instruct-q8_0",
           "kind": "llm",
-          "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
+          "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
           "license": "Apache-2.0",
           "source": "https://huggingface.co/",
-          "size_bytes": 3040870400,
-          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q4_k_m",
+          "size_bytes": 5060427776,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q8_0",
           "files": [
             {
-              "name": "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
-              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
-              "size_bytes": 3040870400,
+              "name": "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+              "size_bytes": 5060427776,
               "pinned_sha256": null,
               "sha256": null
             }
@@ -412,18 +412,18 @@
     "result": {
       "items": [
         {
-          "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+          "id": "bielik-4.5b-v3.0-instruct-q8_0",
           "kind": "llm",
-          "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
+          "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
           "license": "Apache-2.0",
           "source": "https://huggingface.co/",
-          "size_bytes": 3040870400,
-          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q4_k_m",
+          "size_bytes": 5060427776,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q8_0",
           "files": [
             {
-              "name": "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
-              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
-              "size_bytes": 3040870400,
+              "name": "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+              "size_bytes": 5060427776,
               "pinned_sha256": null,
               "sha256": null
             }
@@ -832,18 +832,18 @@
     "result": {
       "items": [
         {
-          "id": "bielik-4.5b-v3.0-instruct-q4_k_m",
+          "id": "bielik-4.5b-v3.0-instruct-q8_0",
           "kind": "llm",
-          "name": "Bielik 4.5B v3.0 Instruct (Q4_K_M)",
+          "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
           "license": "Apache-2.0",
           "source": "https://huggingface.co/",
-          "size_bytes": 3040870400,
-          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q4_k_m",
+          "size_bytes": 5060427776,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-4.5b-v3.0-instruct-q8_0",
           "files": [
             {
-              "name": "Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
-              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q4_K_M.gguf",
-              "size_bytes": 3040870400,
+              "name": "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+              "url": "https://example.invalid/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+              "size_bytes": 5060427776,
               "pinned_sha256": null,
               "sha256": null
             }

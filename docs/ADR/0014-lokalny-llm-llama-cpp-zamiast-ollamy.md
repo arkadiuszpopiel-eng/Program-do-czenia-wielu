@@ -47,3 +47,14 @@ Na starcie nie ma kluczy API ani kont. Program musi działać bez nich: potrzebn
 - Ollama/LM Studio już działają przez adapter generyczny; uczynienie ich domyślnymi to zmiana konfiguracji `device-profile`, nie kodu.
 - Wymiana silnika (np. na inny runtime GGUF) to nowy `-impl` za `providers-local-contract`.
 - Usunięcie lokalnego LLM z MVP wymagałoby zmiany decyzji właściciela o działaniu bez kluczy.
+
+## Aktualizacja (2026-10-06): dostępne warianty Bielika
+
+Próba generalna na runnerze (`rehearsal.yml`, job „Hugging Face — adresy z katalogów modeli”) wykazała, że
+oficjalne repozytorium `speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` zawiera **tylko** `Q8_0` (4826 MiB)
+i `fp16` (9078 MiB) — wariantu `Q4_K_M` nie ma (adres z katalogu zwracał 404). Do czasu decyzji
+właściciela katalog wskazuje **wyłącznie źródło autora modelu**: domyślnie Bielik 4.5B v3.0 `Q8_0`
+(na laptopie 6 GB częściowe odciążenie warstw — liczone z KV cache w `providers-local`), a jako lekki
+wariant oficjalny Bielik 1.5B v3.0 `Q8_0` (1620 MiB). Kwantyzacje `Q4_K_M` publikują osoby trzecie
+(np. second-state, gaianet, DevQuasar) — ich dodanie to decyzja zaufania człowieka (lista decyzji w PR #1).
+Zasada „3–4,5B, bez kwantów IQ” pozostaje bez zmian.

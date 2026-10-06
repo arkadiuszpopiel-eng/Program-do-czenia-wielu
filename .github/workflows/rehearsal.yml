@@ -37,43 +37,39 @@ jobs:
   # setup-dev.ps1 w trybie `-Ci` (nigdy nie pyta, nic nie instaluje, działa z konta administratora
   # runnera): kod 0 = komplet narzędzi, 1 = czegoś brakuje na runnerze (to NIE jest błąd skryptu),
   # 2 / brak linii ALFA_SETUP_RESULT / cokolwiek na stderr = błąd skryptu → job czerwony.
-  # Szybka diagnostyka (≈ 1 min): czy pliki z katalogów modeli istnieją na Hugging Face (ta sesja
-  # deweloperska nie ma dostępu do HF; runner ma). Wypisuje pliki modeli w repozytoriach i odpowiedź
-  # HEAD na każdy adres katalogowy — 404/401/403 oznacza błędny adres albo repozytorium z bramką.
+  # Szybka bramka (≈ 1 min): czy pliki z katalogów modeli istnieją na Hugging Face (ta sesja
+  # deweloperska nie ma dostępu do HF; runner ma). HEAD na każdy adres pliku z katalogów — inny kod
+  # niż 200 (404 = błędny adres, 401/403 = repozytorium z bramką) → job czerwony. Dla modeli GGUF
+  # z `models.toml`: rozmiar i SHA-256 z API Hugging Face (bez pobierania) — rozmiar musi zgadzać się
+  # z `size_mb` (±1 MiB), przypięty `sha256` (jeśli jest) — z hashem LFS; tabela trafia do
+  # podsumowania joba jako materiał do przypięcia hashy przez człowieka.
   hf-catalog:
     name: Hugging Face — adresy z katalogów modeli
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Repozytoria i adresy
+      - name: Adresy plików z katalogów (HEAD)
         shell: bash
         run: |
           set -u
           out="$GITHUB_STEP_SUMMARY"
+          bad=0
           echo "## Adresy z katalogów (HEAD, z przekierowaniami)" >> "$out"
-          grep -rhoE 'https://huggingface\.co/[^"[:space:]]+' crates/app-models/src/data.rs \
-            crates/providers-local-impl/models.toml crates/lib-embed/src/*.rs | sort -u | while read -r url; do
-            case "$url" in *"{"*|*"/resolve/main"|*"/resolve/main/") continue;; esac
+          while read -r url; do
+            case "$url" in *"{"*) continue;; esac
+            # Prefiksy (np. katalog głosu Piper, do którego kod dokleja nazwę pliku) — bez rozszerzenia.
+            case "${url##*/}" in *.*) ;; *) continue;; esac
             code=$(curl -s -o /dev/null -I -L --max-time 30 -w '%{http_code}' "$url" || echo ERR)
             echo "- \`$code\` $url" | tee -a "$out"
-          done
-          # Repozytoria modelu lokalnego: oficjalne (speakleash) i kwantyzacje GGUF innych autorów;
-          # rozmiary plików (`blobs=true`) — do wyboru wariantu pod 6 GB VRAM.
-          for repo in speakleash/Bielik-4.5B-v3.0-Instruct-GGUF speakleash/Bielik-1.5B-v3.0-Instruct-GGUF \
-            mradermacher/Bielik-4.5B-v3.0-Instruct-GGUF mradermacher/Bielik-4.5B-v3.0-Instruct-i1-GGUF \
-            bartowski/speakleash_Bielik-4.5B-v3.0-Instruct-GGUF; do
-            echo "## $repo — pliki GGUF (MiB)" | tee -a "$out"
-            curl -s --max-time 30 "https://huggingface.co/api/models/$repo?blobs=true" \
-              | jq -r 'if .error then "- brak: \(.error)" else ("- gated: \(.gated // false), licencja: \(.cardData.license // "?")", (.siblings[]? | select(.rfilename | test("\\.gguf$")) | "- \(.rfilename) — \((.size // 0) / 1048576 | floor) MiB")) end' \
-              | head -60 | tee -a "$out"
-          done
-          echo "## Wyszukiwanie: Bielik-4.5B-v3.0 GGUF" | tee -a "$out"
-          curl -s --max-time 30 "https://huggingface.co/api/models?search=Bielik-4.5B-v3.0&limit=40" \
-            | jq -r '.[].id | "- \(.)"' | tee -a "$out"
-          echo "## speakleash — repozytoria GGUF" | tee -a "$out"
-          curl -s --max-time 30 "https://huggingface.co/api/models?author=speakleash&search=GGUF&limit=50" \
-            | jq -r '.[].id | "- \(.)"' | tee -a "$out"
+            [ "$code" = 200 ] || bad=1
+          done < <(grep -rhoE 'https://huggingface\.co/[^"[:space:]]+' crates/app-models/src/data.rs \
+            crates/providers-local-impl/models.toml crates/lib-embed/src/*.rs | sort -u)
+          exit "$bad"
+      - name: Modele GGUF — rozmiar i SHA-256 (API Hugging Face)
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: python3 scripts/ci/hf-gguf-check.py crates/providers-local-impl/models.toml
 
   setup-dev:
     name: setup-dev.ps1 (PowerShell 5.1 i 7)
@@ -138,8 +134,8 @@ jobs:
           exit 0
 
   # Prawdziwe silniki z katalogu `app-models` na CPU (test `crates/app-models/tests/live_catalog.rs`):
-  # pobranie ~4 GB (llama-server CPU/Vulkan/CUDA, Bielik 4.5B Q4_K_M, whisper-server + model, piper +
-  # głos PL), rozpakowanie, generacja po polsku, TTS → STT. Raport JSON z SHA-256 każdego pobranego
+  # pobranie ~3 GB (llama-server CPU/Vulkan/CUDA, najmniejszy model GGUF z katalogu — oficjalny Bielik
+  # 1.5B Q8_0, whisper-server + model, piper + głos PL), rozpakowanie, generacja po polsku, TTS → STT. Raport JSON z SHA-256 każdego pobranego
   # pliku → artefakt `alfa-live-report` + podsumowanie joba (do przypięcia hashy przez człowieka).
   live-engines:
     name: Silniki na żywo (CPU)
