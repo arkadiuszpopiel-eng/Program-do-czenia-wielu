@@ -15,8 +15,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      # Obraz przypięty: `ubuntu-latest` przechodzi na Ubuntu 26 od 19.10.2026 — zmiana obrazu
+      # runnera ma być świadoma (osobny commit), nie przypadkowa w środku fali.
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-24.04]
     env:
       # ~300 crate'ów i >1000 binariów testowych: bez debuginfo w CI (backtrace i tak z nazwami funkcji).
       CARGO_PROFILE_DEV_DEBUG: "0"
@@ -89,7 +91,7 @@ jobs:
 
   cargo-deny:
     name: cargo-deny
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: EmbarkStudios/cargo-deny-action@v2
@@ -98,7 +100,7 @@ jobs:
 
   ui:
     name: UI (Svelte 5)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -127,7 +129,7 @@ jobs:
 
   docs:
     name: Dokumentacja
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: JSON i TOML są poprawne
