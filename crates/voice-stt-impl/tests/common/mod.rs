@@ -139,6 +139,8 @@ impl Sidecar for FakeSidecar {
 #[derive(Default)]
 pub struct FakeLauncher {
     pub crash: Vec<Backend>,
+    /// Proces kończy się od razu po starcie (np. wersja CUDA bez sterownika / `cudart`).
+    pub dead_on_start: Vec<Backend>,
     pub health_503: usize,
     pub launches: Mutex<Vec<LaunchSpec>>,
     pub shared: Arc<Shared>,
@@ -151,7 +153,7 @@ impl SidecarLauncher for FakeLauncher {
         let listener = TcpListener::bind(("127.0.0.1", spec.port))
             .await
             .map_err(|e| SttError::Sidecar(e.to_string()))?;
-        let exited = Arc::new(AtomicBool::new(false));
+        let exited = Arc::new(AtomicBool::new(self.dead_on_start.contains(&spec.backend)));
         let task = tokio::spawn(serve(
             listener,
             self.shared.clone(),

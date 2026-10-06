@@ -20,6 +20,12 @@ Twojego głosu, wyszukiwania w pamięci) i programy pomocnicze — „silniki”
 5. Programy pomocnicze przychodzą jako archiwa ZIP. Alfa rozpakowuje je bezpiecznie: odrzuca archiwum ze
    ścieżkami wychodzącymi poza katalog, dowiązaniami, powtórzonymi nazwami albo podejrzanie dużą kompresją;
    poprzednia wersja zostaje nietknięta, jeśli coś pójdzie nie tak.
+6. Silnik pobrany tutaj działa bez ponownego uruchamiania Alfy: `llama-server` — od następnej wiadomości,
+   `whisper-server` — od następnego włączenia rozmowy głosowej. Wyjątek: **piper** (i Pocket TTS) — silnik mowy
+   jest wykrywany przy starcie, więc po jego pobraniu uruchom Alfę ponownie (zasobnik → **Wyjście**).
+7. Na komputerze z kartą NVIDIA pobierz wersje **CUDA** (`llama-server (cuda, …)`, `whisper-server (CUDA 12.4)`) —
+   zawierają biblioteki CUDA, wystarczy sterownik karty. Gdy wersja CUDA nie wystartuje, Alfa przejdzie na
+   procesor — dlatego pobierz też wersję CPU (dla `whisper-server` jest wymagana).
 
 Pobieranie korzysta wyłącznie z HTTPS i niczego nie wysyła poza samym żądaniem pliku (bez telemetrii).
 

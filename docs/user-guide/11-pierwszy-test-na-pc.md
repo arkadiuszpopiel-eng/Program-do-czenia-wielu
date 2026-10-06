@@ -19,6 +19,68 @@ niezależne: możesz przerwać i wrócić. Oznaczenia F0-11, F3-01 itd. to numer
 [ACCEPTANCE.md](../ACCEPTANCE.md). Ta lista to pierwszy, ręczny przegląd; dokładne, powtarzalne pomiary zrobi później
 automatyczny runner.
 
+## Jutro na laptopie (RTX 4050) — skrócona ścieżka (60–90 min)
+
+Kolejność według wartości: najpierw to, co najbardziej może zepsuć pierwszy start i pierwszy model lokalny. Pełne
+opisy kroków są w częściach 0–13 — tu tylko kolejność i to, na co patrzeć na tym laptopie. Wyniki wpisuj w tabelach
+tych części (kolumna „Laptop”).
+
+1. **Zasilacz podłączony przez cały test** i tryb zasilania **Najlepsza wydajność** (Ustawienia → System → Zasilanie
+   i bateria). Na baterii Alfa celowo przenosi model lokalny na procesor (wolniej, bez karty) — pomiary bez zasilacza
+   nic nie mówią o karcie. Baterię sprawdzisz osobno na końcu (punkt 12.5).
+2. **Sterownik NVIDIA** (5 min). W Terminalu wpisz `nvidia-smi`. W ramce u góry ma być `Driver Version: …` i
+   `CUDA Version: 12.4` **lub wyższa**, a niżej `NVIDIA GeForce RTX 4050 Laptop GPU`. Niższa wersja albo
+   „nie rozpoznano polecenia” → zainstaluj aktualny sterownik Game Ready albo Studio ze strony NVIDIA i uruchom
+   komputer ponownie. **CUDA Toolkit nie jest potrzebny** — biblioteki CUDA (cudart, cuBLAS) są w paczkach, które
+   pobiera menedżer Alfy.
+3. **Narzędzia i budowa** (części 0–2; 30–60 min, głównie czekanie): `setup-dev.ps1`, przy `[BRAK]` — `-Install`,
+   potem `-Build`. W czasie budowy przeczytaj punkty 4–9.
+4. **Pierwszy start** (część 4, `-Run`) i **wprowadzenie** (część 5): w kroku **Sprzęt** ma być GeForce RTX 4050
+   i profil **D** (CUDA); pozostałe kroki pomiń. Na karcie **Model lokalny** kliknij **Pobierz** (Bielik, 2,9 GB).
+5. **Model lokalny na karcie** (część 6, ok. 15 min). Ustawienia → **Modele i silniki** → **llama-server (cuda, …)**
+   (dwa archiwa: serwer i biblioteki cudart, razem ok. 550 MB), na zapas **llama-server (cpu, …)** (14 MB — gdy
+   wersja CUDA nie wystartuje, Alfa przejdzie na nią) oraz Bielik, jeśli nie pobrał się we wprowadzeniu.
+   Sumy SHA-256 na kartach zgody porównaj z tabelą niżej (pliki z GitHuba) albo z raportem CI. Ponowne uruchomienie
+   Alfy **nie** jest potrzebne — serwer pobrany w Ustawieniach działa od następnej wiadomości. W drugim oknie
+   Terminala włącz zapis pracy karty (zostaw go do końca testu):
+
+   ```powershell
+   nvidia-smi --query-gpu=timestamp,name,memory.used,memory.total,utilization.gpu,temperature.gpu,power.draw --format=csv -l 2 | Tee-Object "$env:USERPROFILE\Desktop\alfa-nvidia-smi.csv"
+   ```
+
+   Wyślij trzy pytania z części 6. Przy odpowiedzi `memory.used` rośnie o ok. 3,5–4,5 GB, a `utilization.gpu` jest
+   wyraźnie powyżej zera; w zwykłym `nvidia-smi` (trzecie okno) na liście procesów jest `llama-server.exe`. Gdy karta
+   stoi na 0 %, a odpowiedź i tak przychodzi — model liczy procesor: wpisz ❌ i dołącz log (punkt 9).
+6. **Głos** (część 9, ok. 15 min): pobierz **whisper-server (CPU)**, **whisper-server (CUDA 12.4)** (ok. 430 MB),
+   model **Whisper large-v3-turbo-q5_0**, **piper**, głos **Piper pl_PL gosia** i **Silero VAD**. Potem **zamknij
+   Alfę** (zasobnik → **Wyjście**) i uruchom ją ponownie (`-Run`) — silnik mowy (Piper) jest wykrywany przy starcie.
+   W trakcie rozmowy głosowej w `nvidia-smi` widać też `whisper-server.exe` (rozpoznawanie mowy na karcie).
+7. **STOP WSZYSTKIEGO** (część 8): `Ctrl+Shift+F12` w trakcie długiej odpowiedzi i w trakcie czytania na głos.
+8. Jeśli zostanie czas: część 12 (pomiary; bateria — punkt 12.5), potem część 10 (instalator).
+9. **Co zapisać i przekazać:** wypełnione tabele części 4–9; plik `alfa-nvidia-smi.csv` z Pulpitu (zapis zatrzymasz
+   `Ctrl+C`); logi z dnia testu z `%LOCALAPPDATA%\Alfa\logs` (`alfa.<data>.000.log` — szczegóły w części 13); wynik
+   `setup-dev.ps1` (część 13). Przed wysłaniem przejrzyj pliki (część 13: czego nie wysyłać).
+
+**Sumy SHA-256 do kart zgody.** Pełny raport robi automat CI na Windows: GitHub → zakładka **Actions** → **Próba
+generalna (Windows)** → najnowszy przebieg → **Summary** → tabela „Silniki na żywo (CPU) — raport do przypięcia
+SHA-256” (adres, rozmiar i suma każdego pobranego pliku, także modeli z Hugging Face) oraz plik **alfa-live-report**
+w sekcji **Artifacts** (JSON z sumami, układem archiwów i czasami). Archiwa z GitHuba sprawdziła też sesja AI
+(2026-10-06: pobranie, `sha256sum`, lista plików w archiwum zgodna z katalogiem):
+
+| Pozycja w menedżerze          | Plik na karcie zgody                  | Rozmiar (B) | SHA-256                                                            |
+| ----------------------------- | ------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| llama-server (cuda, b6710)    | `llama-b6710-cuda-12.4.zip`           | 155967638   | `7c8e461cfa5f8c28d40c0f66bd1a551d421edbde7a411029ae4761fe7953615b` |
+| llama-server (cuda, b6710)    | `cudart-cuda-12.4.zip`                | 391443627   | `8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6` |
+| llama-server (vulkan, b6710)  | `llama-b6710-vulkan.zip`              | 27456102    | `3fe05bec64f07c0134cbdb6d14bb136f32b44296704e29eb3a095d4e758ba3d8` |
+| llama-server (cpu, b6710)     | `llama-b6710-cpu.zip`                 | 14265804    | `fe53ba46d2c8d3d785e3b4ba27ba0aa1eb1b2aeaf23394ef0ff7c2517a2cb45d` |
+| whisper-server (CUDA 12.4)    | `whisper-cublas-12.4.0-bin-x64.zip`   | 450211367   | `66638830959008de552de41223e718351abcf4e1b5c59188d1ae04ec20047c6b` |
+| whisper-server (CPU)          | `whisper-bin-x64.zip`                 | 3831744     | `cc5d6126e025ef463524ed74c94d4b6a40bb67c2d1c3cb5aca02c773c388bdad` |
+| piper (2023.11.14-2)          | `piper_windows_amd64.zip`             | 22477236    | `f3c58906402b24f3a96d92145f58acba6d86c9b5db896d207f78dc80811efcea` |
+| WeSpeaker ResNet34 (VoxCeleb) | `wespeaker_en_voxceleb_resnet34.onnx` | 26534365    | `5ef208a9da1453335308a6b6f4e6dfbd7e183a38b604de0a57664f45d257fe94` |
+
+Modele z Hugging Face (Bielik, Whisper, głos Piper) porównaj z raportem CI albo z opisem pliku na Hugging Face
+(„SHA256”). Inna suma niż w tabeli → **nie** klikaj „Ufam temu plikowi”, zapisz obie sumy i zgłoś.
+
 ## 0. Przygotowanie (raz na każdym komputerze)
 
 1. Zaktualizuj Windows (**Ustawienia → Windows Update**) i sterownik karty graficznej: na desktopie **AMD Software:
@@ -171,8 +233,10 @@ Przy pierwszym starcie Alfa prowadzi przez 8 kroków ([Pierwsze uruchomienie](01
 1. **Ustawienia** (`Ctrl+,`) → **Modele i silniki** ([opis](10-modele-i-silniki.md)). Pobierz model **Bielik 4.5B
    v3.0 Instruct** (ok. 2,9 GB), jeśli nie pobrał się we wprowadzeniu, oraz program do jego uruchamiania:
    - **Desktop:** **llama-server (vulkan)**.
-   - **Laptop:** wersję CUDA — punkt 6a niżej. Na karcie NVIDIA Alfa szuka kompilacji CUDA, więc samo
-     „llama-server (vulkan)” z menedżera tu nie wystarczy.
+   - **Laptop:** **llama-server (cuda, …)** — dwa archiwa (serwer i biblioteki cudart). Bez niej Alfa użyje wersji
+     Vulkan albo CPU z ostrzeżeniem w logu. Gdyby pobieranie w menedżerze się nie udało — ręcznie, punkt 6a.
+
+   Serwer pobrany w Ustawieniach działa od następnej wiadomości — bez ponownego uruchamiania Alfy.
 2. Plik bez przypiętej sumy zatrzyma się na karcie **„Plik bez przypiętej sumy kontrolnej”** (zgoda TOFU — „zaufaj
    przy pierwszym użyciu”). Porównaj sumę SHA-256 z karty ze stroną źródła (link na karcie; na GitHubie suma jest
    przy pliku w sekcji _Assets_, na Hugging Face — w opisie pliku jako „SHA256”). Gdy się zgadza, kliknij **„Ufam temu
@@ -182,7 +246,7 @@ Przy pierwszym starcie Alfa prowadzi przez 8 kroków ([Pierwsze uruchomienie](01
    słów odpowiedzi. Pierwsza trwa dłużej (model ładuje się do pamięci). Kapsuła „Odpowiada … · model” przy odpowiedzi
    powinna wskazywać model lokalny. Pełny zestaw 20 promptów do F1-03 przygotowuje sesja AI w `evals/F1/prompts-pl/`.
 
-**6a. Laptop — llama-server w wersji CUDA (ręcznie).** Na stronie
+**6a. Laptop — llama-server w wersji CUDA ręcznie (tylko gdy menedżer zawiedzie).** Na stronie
 <https://github.com/ggml-org/llama.cpp/releases/tag/b6710>, w sekcji _Assets_, pobierz dwa pliki:
 `llama-b6710-bin-win-cuda-<wersja>-x64.zip` i `cudart-llama-bin-win-cuda-<ta sama wersja>-x64.zip`. Potem w Terminalu:
 
@@ -247,10 +311,16 @@ mniej więcej trwało.
 
 ## 9. Mikrofon i rozmowa głosowa (F2-01, F2-04, F2-06)
 
-1. **Ustawienia → Modele i silniki** — pobierz **whisper-server (CPU)**, model **Whisper large-v3-turbo-q5_0**,
-   **piper**, głos **Piper pl_PL gosia** i **Silero VAD** (każdy przez kartę zgody jak w części 6). Na obu
-   komputerach rozpoznawanie mowy działa na razie na procesorze — wersji GPU programu whisper-server nie ma jeszcze w
-   menedżerze ([Głos](04-glos.md)).
+1. **Ustawienia → Modele i silniki** — pobierz **whisper-server (CPU)**, **piper**, głos **Piper pl_PL gosia**
+   i **Silero VAD** (każdy przez kartę zgody jak w części 6) oraz model rozpoznawania mowy:
+   - **Laptop:** **whisper-server (CUDA 12.4)** i model **Whisper large-v3-turbo-q5_0** — rozpoznawanie na karcie
+     (gdy wersja CUDA nie wystartuje, Alfa sama przejdzie na procesor).
+   - **Desktop:** tylko model **Whisper small-q5_1** — rozpoznawanie działa tu na procesorze (wersji Vulkan
+     whisper-server nie ma w wydaniach), a model turbo jest na procesorze za wolny do rozmowy. Nie pobieraj obu
+     modeli: Alfa bierze pierwszy alfabetycznie (turbo).
+
+   Potem zamknij Alfę (zasobnik → **Wyjście**) i uruchom ją ponownie — silnik mowy (Piper) jest wykrywany przy
+   starcie ([Głos](04-glos.md)).
 2. **Ustawienia → Głos**: znika komunikat „Głos niedostępny”. **Test mikrofonu** — pasek reaguje. Odsłuchaj próbki
    czterech głosów.
 3. **Włącz rozmowę** (albo `Ctrl+Shift+M`) i powiedz „Jaka jest stolica Francji?”. Wypowiedź pojawia się jako
@@ -410,6 +480,7 @@ Typowe problemy:
 | błąd przy `openssl-sys` / `openssl-src` ze słowem `perl` | `-Install` (Strawberry Perl), potem nowe okno Terminala                                                              |
 | `os error 112` albo brak miejsca                         | zwolnij miejsce; `cargo clean` w `C:\alfa` usuwa wyniki kompilacji (następna budowa potrwa dłużej)                   |
 | `the lock file … needs to be updated`                    | zgłoś sesji AI (nieaktualny `Cargo.lock` w repozytorium)                                                             |
-| model nie odpowiada, komunikat o braku `llama-server`    | część 6 (na laptopie punkt 6a)                                                                                       |
+| model nie odpowiada, komunikat o braku `llama-server`    | część 6 (pobierz właściwy llama-server; na laptopie w razie kłopotów punkt 6a)                                       |
+| „Głos niedostępny” mimo pobranych silników               | zamknij Alfę (zasobnik → **Wyjście**) i uruchom ponownie — silnik mowy jest wykrywany przy starcie                   |
 | test na żywo: skrót zajęty                               | wyłącz Alfę (także w zasobniku) i powtórz                                                                            |
 | instalator: „System Windows ochronił ten komputer”       | **Więcej informacji → Uruchom mimo to**                                                                              |

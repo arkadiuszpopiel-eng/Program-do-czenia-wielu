@@ -38,7 +38,6 @@ voice-persona-impl = { path = "../voice-persona-impl" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
 model-residency-contract = { path = "../model-residency-contract" }
-device-profile-contract = { path = "../device-profile-contract" }
 personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }
 core-bus-contract.workspace = true

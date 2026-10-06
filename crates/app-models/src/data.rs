@@ -255,6 +255,37 @@ fn llama_cuda() -> ItemSpec {
     )
 }
 
+/// `whisper-server` CUDA 12.4 (karta NVIDIA; PLAN §6.3 D-CUDA): archiwum wydania zawiera też
+/// `cudart`/cuBLAS (układ `Release/…` sprawdzony 2026-10-06 listą wpisów archiwum: 28 plików,
+/// ~0,7 GB po rozpakowaniu). Zainstalowana — ma pierwszeństwo przed CPU (`app_modules::stt`).
+fn whisper_cuda() -> ItemSpec {
+    item(
+        "sidecar-whisper-cuda",
+        ModelItemKind::Sidecar,
+        &format!("whisper-server (CUDA 12.4, whisper.cpp {WHISPER_TAG})"),
+        "MIT; cudart/cuBLAS — NVIDIA CUDA EULA (redystrybucja do potwierdzenia)",
+        "https://github.com/ggml-org/whisper.cpp/releases",
+        (Root::Sidecars, "whisper-cuda"),
+        vec![FileSpec::new(
+            "whisper-cublas-12.4.0-bin-x64.zip",
+            &format!(
+                "https://github.com/ggml-org/whisper.cpp/releases/download/{WHISPER_TAG}/whisper-cublas-12.4.0-bin-x64.zip"
+            ),
+            430,
+            None,
+        )],
+        Install::Tree {
+            strip: "Release/".into(),
+            require: vec![exe("whisper-server"), "cudart64_12.dll".into()],
+        },
+        false,
+        (
+            "Rozpoznawanie mowy na karcie NVIDIA (CUDA 12.4, z bibliotekami cudart). Wymaga sterownika NVIDIA; bez niego Alfa używa wersji CPU.",
+            "Speech recognition on NVIDIA GPUs (CUDA 12.4, with cudart libraries). Needs the NVIDIA driver; without it Alfa uses the CPU build.",
+        ),
+    )
+}
+
 fn sidecars() -> Vec<ItemSpec> {
     vec![
         llama("vulkan", "vulkan"),
@@ -281,10 +312,11 @@ fn sidecars() -> Vec<ItemSpec> {
             },
             false,
             (
-                "Serwer STT (127.0.0.1). Buildy Vulkan/CUDA — osobno (do potwierdzenia).",
-                "STT server (127.0.0.1). Vulkan/CUDA builds — separately (to be confirmed).",
+                "Serwer STT (127.0.0.1), wymagany także przy wersji CUDA (zapas). Wersja Vulkan — brak w wydaniach.",
+                "STT server (127.0.0.1), required also with the CUDA build (fallback). No Vulkan build in releases.",
             ),
         ),
+        whisper_cuda(),
         item(
             "sidecar-piper",
             ModelItemKind::Sidecar,

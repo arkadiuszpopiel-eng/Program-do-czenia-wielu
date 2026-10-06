@@ -4,6 +4,9 @@
 //! wielkością liter — NTFS), limity liczby wpisów, rozmiaru wpisu i całości oraz stopnia kompresji
 //! (zip-bomb); rzeczywista liczba bajtów nie może przekroczyć zadeklarowanej. Całe drzewo trafia
 //! najpierw do katalogu roboczego obok celu, potem — atomowo przez `rename` — na miejsce.
+//!
+//! Archiwa z Windows (`Compress-Archive` w PowerShell 5.1) mogą zapisywać `\` jako separator —
+//! nazwy są normalizowane do `/` **przed** walidacją (`..\x` to nadal `../x` → odrzucone).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
@@ -66,10 +69,21 @@ impl Reader {
         })
     }
 
+    /// Nazwy wpisów (znormalizowane, bez walidacji — tę robi [`Self::check`]).
+    fn names(&mut self) -> Result<Vec<String>, Unsafe> {
+        (0..self.archive.len())
+            .map(|i| {
+                Ok(normalized(
+                    self.archive.by_index_raw(i).map_err(bad)?.name(),
+                ))
+            })
+            .collect()
+    }
+
     /// Sprawdza nagłówek wpisu `i`; zwraca jego nazwę, czy to katalog i rozmiar.
     fn check(&mut self, i: usize) -> Result<(String, bool, u64), Unsafe> {
         let entry = self.archive.by_index_raw(i).map_err(bad)?;
-        let name = entry.name().to_owned();
+        let name = normalized(entry.name());
         validate_package_path(&name).map_err(bad)?;
         if !self.seen.insert(name.trim_end_matches('/').to_lowercase()) {
             return Err(bad(format!("powtórzony wpis „{name}”")));
@@ -77,7 +91,7 @@ impl Reader {
         if entry.unix_mode().is_some_and(|m| m & S_IFMT == S_IFLNK) {
             return Err(bad(format!("dowiązanie „{name}”")));
         }
-        let (dir, size) = (entry.is_dir(), entry.size());
+        let (dir, size) = (entry.is_dir() || name.ends_with('/'), entry.size());
         if !dir {
             self.total = self
                 .limits
@@ -90,6 +104,9 @@ impl Reader {
     /// Kopiuje wpis `i` (rozmiar `size` z nagłówka) do nowego pliku `out`; zwraca SHA-256.
     fn copy(&mut self, i: usize, size: u64, out: &Path) -> Result<String, Unsafe> {
         let entry = self.archive.by_index(i).map_err(bad)?;
+        // Poza Windows (programistki, CI): bit wykonywania z archiwum — zawsze 0o755, bez setuid.
+        #[cfg(unix)]
+        let executable = entry.unix_mode().is_some_and(|m| m & 0o111 != 0);
         if let Some(parent) = out.parent() {
             std::fs::create_dir_all(parent)
                 .map_err(|e| bad(format!("{}: {e}", parent.display())))?;
@@ -115,8 +132,44 @@ impl Reader {
             return Err(bad(format!("wpis: {copied} B zamiast {size} B")));
         }
         file.flush().map_err(bad)?;
+        #[cfg(unix)]
+        if executable {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(out, std::fs::Permissions::from_mode(0o755)).map_err(bad)?;
+        }
         Ok(hex(&hasher.finalize()))
     }
+}
+
+/// Nazwa wpisu z separatorem `/` (archiwa z Windows bywają zapisane z `\\`).
+fn normalized(name: &str) -> String {
+    name.replace('\\', "/")
+}
+
+/// Prefiks usuwany z wpisów: `strip` z katalogu, gdy występuje w archiwum; inaczej pusty (wydanie
+/// bez katalogu najwyższego poziomu — układ archiwów sidecarów jest „do potwierdzenia”, więc inny
+/// układ nie psuje instalacji; brak wymaganych plików i tak zgłasza błąd z listą wpisów).
+fn effective_strip(names: &[String], strip: &str, archive: &Path) -> String {
+    if strip.is_empty() || names.iter().any(|n| n.starts_with(strip)) {
+        return strip.to_owned();
+    }
+    tracing::warn!(archive = %archive.display(), strip, "archiwum bez prefiksu z katalogu — rozpakowuję od korzenia");
+    String::new()
+}
+
+/// Do 12 wpisów najwyższego poziomu rozpakowanego drzewa (komunikat błędu układu archiwum).
+fn top_level(hashes: &Hashes) -> String {
+    let mut top: Vec<String> = hashes
+        .keys()
+        .map(|k| match k.split_once('/') {
+            Some((dir, _)) => format!("{dir}/"),
+            None => k.clone(),
+        })
+        .collect();
+    top.dedup();
+    let more = if top.len() > 12 { ", …" } else { "" };
+    top.truncate(12);
+    format!("{}{more}", top.join(", "))
 }
 
 /// Wybrane wpisy archiwum → `dir/<dest>` (każdy przez plik `.part`, hash sprawdzany z przypiętym).
@@ -260,7 +313,9 @@ fn trees_into(
     for file in require {
         if !work.join(file).is_file() {
             return Err(bad(format!(
-                "po rozpakowaniu brak „{file}” (inny układ archiwum — do potwierdzenia w katalogu)"
+                "po rozpakowaniu brak „{file}” (inny układ archiwum — do potwierdzenia w katalogu); \
+                 w archiwum: {}",
+                top_level(&hashes)
             )));
         }
     }
@@ -275,9 +330,10 @@ fn tree_into(
     (hashes, seen): (&mut Hashes, &mut BTreeSet<String>),
 ) -> Result<(), Unsafe> {
     let mut reader = Reader::open(archive, limits)?;
+    let strip = effective_strip(&reader.names()?, strip, archive);
     for i in 0..reader.archive.len() {
         let (name, dir, size) = reader.check(i)?;
-        let Some(rel) = name.strip_prefix(strip) else {
+        let Some(rel) = name.strip_prefix(strip.as_str()) else {
             continue;
         };
         let rel = rel.trim_end_matches('/');

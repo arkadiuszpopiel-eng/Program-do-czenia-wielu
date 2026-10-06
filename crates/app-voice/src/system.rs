@@ -14,7 +14,6 @@ use std::time::Duration;
 
 use app_api::paths::AppPaths;
 use core_bus_contract::EventBus;
-use device_profile_contract::Backend;
 use model_residency_contract::Residency;
 use personas_contract::builtin_personas;
 use platform_contract::{Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, PlatformError};
@@ -26,7 +25,7 @@ use voice_dsp_contract::DspCfg;
 use voice_dsp_impl::DspPipeline;
 use voice_pipeline_contract::{PipelineCfg, PipelineError, ReplySource};
 use voice_pipeline_impl::{MonotonicClock, Pipeline, PipelineParts};
-use voice_stt_impl::{ProcessLauncher, SidecarBinaries, WhisperServerConfig, WhisperStt};
+use voice_stt_impl::{ProcessLauncher, WhisperStt};
 use voice_tts_contract::Tts;
 use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector};
 use voice_vad_contract::VadCfg;
@@ -88,11 +87,6 @@ pub(crate) fn first_file(dir: &Path, pick: impl Fn(&str) -> bool) -> Option<Path
     found.into_iter().next()
 }
 
-/// Pierwszy model GGML w katalogu.
-fn ggml_model(dir: &Path) -> Option<PathBuf> {
-    first_file(dir, |n| n.starts_with("ggml-") && n.ends_with(".bin"))
-}
-
 /// Automat aktywacji: bez skrótów (obsługuje je powłoka), ze słowami wywoławczymi z person
 /// (wykrycia przychodzą tylko z uzbrojonego nasłuchu).
 fn wake_service() -> Result<WakeService, PipelineError> {
@@ -139,29 +133,20 @@ impl SystemVoice {
     }
 
     fn whisper_server(&self) -> PathBuf {
-        self.paths.sidecar("whisper", "whisper-server")
+        app_modules::stt::server_cpu(&self.paths)
     }
 
     fn whisper_model(&self) -> Option<PathBuf> {
-        ggml_model(&self.paths.models().join("whisper"))
+        app_modules::stt::model(&self.paths)
     }
 
-    /// STT z sidecara `whisper-server` (rozmowa i dyktowanie).
+    /// STT z sidecara `whisper-server` (rozmowa i dyktowanie): kompilacja CUDA ma pierwszeństwo,
+    /// gdy jest zainstalowana (laptop z kartą NVIDIA), nieudany start → CPU.
     pub(crate) fn whisper(&self) -> Result<WhisperStt, PipelineError> {
-        let model = self
-            .whisper_model()
+        let (config, preferred) = app_modules::stt::whisper(&self.paths)
             .ok_or_else(|| component("stt", MISSING_STT_MODEL))?;
-        let binaries = SidecarBinaries {
-            vulkan: None,
-            cuda: None,
-            cpu: self.whisper_server(),
-        };
-        let mut stt = WhisperStt::new(
-            WhisperServerConfig::new(binaries, model),
-            Arc::new(ProcessLauncher),
-            Backend::Cpu,
-        )
-        .map_err(|e| component("stt", e))?;
+        let mut stt = WhisperStt::new(config, Arc::new(ProcessLauncher), preferred)
+            .map_err(|e| component("stt", e))?;
         if let Some(r) = &self.residency {
             stt = stt.with_residency(r.clone());
         }

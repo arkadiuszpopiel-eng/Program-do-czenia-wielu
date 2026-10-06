@@ -6,6 +6,8 @@
     -Install: doinstalowuje braki (winget, rustup, npm), o każdy krok pyta osobno; -WithGpuSdk: także Vulkan SDK/CUDA.
     -Build: pnpm install, interfejs, procesy Jądra, powłoka. -Test: vitest, testy crate'ów Windows, testy na żywo.
     -Run: tauri dev (jak cargo tauri dev). -Installer: instalator NSIS jak workflow wydania (bez podpisu, bez aktualizacji).
+    -Ci: tylko sprawdzenie dla CI (.github/workflows/rehearsal.yml): nigdy nie pyta i nic nie instaluje ani nie buduje,
+    działa też z konta administratora; kod wyjścia 0 = komplet, 1 = brak narzędzi, 2 = błąd skryptu (linia ALFA_SETUP_RESULT).
     Nie czyta ~/.claude, ~/.codex, ciasteczek ani Menedżera poświadczeń; bez telemetrii, bez skryptów z internetu.
     Sam nie podnosi uprawnień (okno UAC pokazuje tylko instalator, który go wymaga). Można uruchamiać wiele razy.
     Plik w UTF-8 z BOM: bez BOM Windows PowerShell 5.1 psuje polskie znaki w napisach.
@@ -13,7 +15,7 @@
     powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-dev.ps1 -Install
 #>
 [CmdletBinding()]
-param([switch]$Install, [switch]$WithGpuSdk, [switch]$Build, [switch]$Test, [switch]$Run, [switch]$Installer)
+param([switch]$Install, [switch]$WithGpuSdk, [switch]$Build, [switch]$Test, [switch]$Run, [switch]$Installer, [switch]$Ci)
 
 Set-StrictMode -Version 1.0
 # Kody wyjścia programów sprawdzamy sami ($LASTEXITCODE). Przy 'Stop' Windows PowerShell 5.1 przerywałby
@@ -44,7 +46,8 @@ function Get-Output([string]$Exe, [string[]]$ArgList = @()) {
 }
 
 function Confirm-Step([string]$Question) {
-    # Domyślnie NIE: krok uruchamia tylko odpowiedź t / tak (albo y / yes).
+    # Domyślnie NIE: krok uruchamia tylko odpowiedź t / tak (albo y / yes). W trybie -Ci nigdy nie pyta.
+    if ($Ci) { return $false }
     return ((Read-Host "$Question [t/N]") -match '^\s*(t|tak|y|yes)\s*$')
 }
 
@@ -88,7 +91,6 @@ function Test-System {
     $win11 = ($os.Major -eq 10) -and ($os.Build -ge 22000) -and [Environment]::Is64BitOperatingSystem
     Add-Check 'Windows 11 (64-bit)' $win11 "kompilacja $($os.Build)" 'Alfa działa tylko na Windows 11 x64.'
     Add-Check 'PowerShell' $true "$($PSVersionTable.PSVersion) $($PSVersionTable.PSEdition)" -Info
-    $freeGb = -1
     try { $freeGb = [math]::Floor((New-Object System.IO.DriveInfo ([System.IO.Path]::GetPathRoot($Root))).AvailableFreeSpace / 1GB) } catch { $freeGb = -1 }
     $freeDetail = if ($freeGb -ge 0) { "$freeGb GB, zalecane co najmniej $MinFreeGb GB" } else { 'nie udało się odczytać' }
     Add-Check 'Wolne miejsce na dysku' ($freeGb -ge $MinFreeGb) $freeDetail -Missing 'UWAGA' `
@@ -197,8 +199,7 @@ function Test-Gpu {
 function Test-Requirements { $script:Checks = @(); Test-System; Test-NativeToolchain; Test-WebToolchain; Test-Gpu }
 
 function Show-Checks {
-    Write-Host ''
-    Write-Host "Wymagania do budowy Alfy ($Root)" -ForegroundColor Cyan
+    Write-Host "`nWymagania do budowy Alfy ($Root)" -ForegroundColor Cyan
     foreach ($c in $script:Checks) {
         $color = switch ($c.State) { 'OK' { 'Green' } 'BRAK' { 'Red' } 'UWAGA' { 'Yellow' } default { 'Gray' } }
         Write-Host ('  {0,-8}' -f "[$($c.State)]") -ForegroundColor $color -NoNewline
@@ -219,8 +220,7 @@ function Invoke-Install {
     foreach ($c in $todo) {
         if ($done.ContainsKey($c.Setup.Text)) { continue }
         $done[$c.Setup.Text] = $true
-        Write-Host ''
-        Write-Host "Brakuje: $($c.Name)" -ForegroundColor Yellow
+        Write-Host "`nBrakuje: $($c.Name)" -ForegroundColor Yellow
         Write-Host "  polecenie: $($c.Setup.Text)"
         if ($c.Setup.Text -like 'winget *' -and -not (Get-Command 'winget' -ErrorAction SilentlyContinue)) {
             Write-Host '  Brak winget: najpierw zaktualizuj Instalator aplikacji (App Installer) w Sklepie Microsoft.' -ForegroundColor Red
@@ -238,8 +238,7 @@ function Invoke-Install {
 # --- Budowa, testy, instalator, uruchomienie ----------------------------------------------------------------
 function Invoke-Step([string]$Title, [scriptblock]$Action) {
     # Uruchamia krok; wynik trafia do podsumowania, a $script:StepOk mówi, czy krok się udał.
-    Write-Host ''
-    Write-Host "==> $Title" -ForegroundColor Cyan
+    Write-Host "`n==> $Title" -ForegroundColor Cyan
     $started = Get-Date
     $global:LASTEXITCODE = 0
     try { & $Action } catch { Write-Host "Błąd: $($_.Exception.Message)" -ForegroundColor Red; $global:LASTEXITCODE = 1 }
@@ -283,11 +282,9 @@ function Invoke-Tests {
         (New-LiveTest 'blokada ekranu (Win+L)' 'platform-windows-sys-impl' 'sys_windows' 'manual_lock_is_reported' 'Po napisie running 1 test masz 20 s: naciśnij Win+L, potem odblokuj komputer.'),
         (New-LiveTest 'tryb gry (pełny ekran)' 'platform-windows-sys-impl' 'sys_windows' 'manual_fullscreen_is_game_mode' 'Po napisie running 1 test masz 30 s: włącz film na pełnym ekranie (np. wideo w przeglądarce i F11).')
     )
-    Write-Host ''
-    Write-Host 'Testy na żywym systemie: każdy uruchamiasz osobno. Zamknij wcześniej Alfę (także ikonę w zasobniku).' -ForegroundColor Cyan
+    Write-Host "`nTesty na żywym systemie: każdy uruchamiasz osobno. Zamknij wcześniej Alfę (także ikonę w zasobniku)." -ForegroundColor Cyan
     foreach ($liveTest in $live) {
-        Write-Host ''
-        Write-Host "Test na żywo: $($liveTest.Name)" -ForegroundColor Cyan
+        Write-Host "`nTest na żywo: $($liveTest.Name)" -ForegroundColor Cyan
         Write-Host "  $($liveTest.Note)" -ForegroundColor Yellow
         if (Confirm-Step '  Uruchomić?') {
             $testArgs = $liveTest.Args
@@ -324,18 +321,24 @@ function Invoke-InstallerBuild {
 }
 
 function Invoke-Run {
-    Write-Host ''
-    Write-Host 'Uruchamiam Alfę w trybie deweloperskim (tauri dev). Pierwszy start kompiluje powłokę: kilka minut.' -ForegroundColor Cyan
+    Write-Host "`nUruchamiam Alfę w trybie deweloperskim (tauri dev). Pierwszy start kompiluje powłokę: kilka minut." -ForegroundColor Cyan
     Write-Host 'Zamknięcie okna chowa Alfę do zasobnika. Całkiem wyłączysz ją: ikona w zasobniku, Wyjście (albo Ctrl+C tutaj).'
     # Tauri CLI szuka src-tauri tylko w głąb katalogu bieżącego (tu: apps\desktop\ui), stąd TAURI_APP_PATH.
     $env:TAURI_APP_PATH = $ShellDir
     pnpm --dir $UiDir exec tauri dev
 }
 
+function Write-CiReport([string]$Result) {
+    # -Ci: wynik maszynowy (ostatnia linia) i tabela w podsumowaniu joba GitHub Actions (UTF-8 bez BOM).
+    Write-Host "ALFA_SETUP_RESULT=$Result"; if (-not $env:GITHUB_STEP_SUMMARY) { return }
+    $rows = @("### setup-dev.ps1 -Ci: PowerShell $($PSVersionTable.PSVersion) $($PSVersionTable.PSEdition), wynik: $Result", '', '| Stan | Sprawdzenie | Szczegóły |', '| --- | --- | --- |')
+    foreach ($c in $script:Checks) { $rows += "| $($c.State) | $($c.Name) | $($c.Detail -replace '\|', '/') |" }
+    [System.IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, (($rows + '') -join "`n") + "`n", (New-Object System.Text.UTF8Encoding $false))
+}
+
 function Show-Summary {
     if ($script:Summary.Count -eq 0) { return }
-    Write-Host ''
-    Write-Host 'Podsumowanie' -ForegroundColor Cyan
+    Write-Host "`nPodsumowanie" -ForegroundColor Cyan
     foreach ($row in $script:Summary) {
         $color = if ($row.Wynik -eq 'OK') { 'Green' } elseif ($row.Wynik -like 'BŁĄD*') { 'Red' } else { 'Gray' }
         Write-Host ('  {0,-16} {1,6} min  {2}' -f $row.Wynik, $row.Minuty, $row.Krok) -ForegroundColor $color
@@ -345,11 +348,12 @@ function Show-Summary {
 # --- Start ------------------------------------------------------------------------------------------------
 if ($env:OS -ne 'Windows_NT') { Write-Host 'Ten skrypt jest przeznaczony dla Windows 11.' -ForegroundColor Red; exit 1 }
 $principal = New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())
-if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -and -not $Ci) {
     Write-Host 'Uruchom skrypt w zwykłym oknie Terminala (bez Uruchom jako administrator); instalatory same poproszą o zgodę.' -ForegroundColor Red; exit 1
 }
 if (-not (Test-Path -LiteralPath (Join-Path $Root 'Cargo.toml'))) { Write-Host "Nie znaleziono repozytorium Alfy w $Root." -ForegroundColor Red; exit 1 }
 
+if ($Ci) { $Install = $false; $Build = $false; $Test = $false; $Run = $false; $Installer = $false } # -Ci: tylko sprawdzenie
 $mode = if ($Install) { 'sprawdzenie i instalacja (każdy krok po Twojej zgodzie)' } else { 'tylko sprawdzenie (niczego nie zmieniam)' }
 Write-Host "Alfa: przygotowanie komputera. Tryb: $mode." -ForegroundColor Cyan
 $previousAutoInstall = $env:RUSTUP_AUTO_INSTALL
@@ -385,11 +389,12 @@ try {
         if ($ready -and $Run) { Invoke-Run }
     }
 } catch {
-    $exitCode = 1
+    $exitCode = 2
     Write-Host "Nieoczekiwany błąd skryptu (linia $($_.InvocationInfo.ScriptLineNumber)): $($_.Exception.Message)" -ForegroundColor Red
     Write-Host 'Skopiuj ten komunikat i zgłoś go (docs/user-guide/11-pierwszy-test-na-pc.md, część 13).'
 } finally {
     Pop-Location
     $env:RUSTUP_AUTO_INSTALL = $previousAutoInstall
 }
+if ($Ci) { Write-CiReport (@('ok', 'missing', 'error')[$exitCode]) }
 exit $exitCode

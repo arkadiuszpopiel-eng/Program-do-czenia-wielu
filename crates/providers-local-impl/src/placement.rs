@@ -46,9 +46,7 @@ impl Sidecar {
         LaunchPlan {
             program: self
                 .config
-                .server_bin
-                .get(&backend)
-                .cloned()
+                .server(backend)
                 .unwrap_or_else(|| gpu.program.clone()),
             backend,
             gpu_layers: 0,
@@ -95,9 +93,7 @@ impl Sidecar {
         }
         let program = self
             .config
-            .server_bin
-            .get(&backend)
-            .cloned()
+            .server(backend)
             .ok_or_else(|| LocalError::NoServerBinary(backend.as_str().into()))?;
         let plan = LaunchPlan {
             program,

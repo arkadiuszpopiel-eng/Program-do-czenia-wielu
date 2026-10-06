@@ -45,7 +45,18 @@ sessions-contract = { path = "../sessions-contract" }
 search-fake = { path = "../search-fake" }
 core-config-fake = { path = "../core-config-fake" }
 tempfile = "3.27.0"
-tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "time"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "time", "process"] }
+# Próba generalna (`tests/live_catalog.rs`, tylko z `ALFA_LIVE_CATALOG=1`): silniki uruchamiane tą samą
+# kompozycją co aplikacja — `app-modules` (llama-server, Piper) i `voice-stt-impl` (whisper-server).
+app-modules = { path = "../app-modules" }
+providers-contract = { path = "../providers-contract" }
+device-profile-contract = { path = "../device-profile-contract" }
+device-profile-fake = { path = "../device-profile-fake" }
+personas-contract = { path = "../personas-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-stt-contract = { path = "../voice-stt-contract" }
+voice-stt-impl = { path = "../voice-stt-impl" }
+voice-tts-contract = { path = "../voice-tts-contract" }
 
 [lints]
 workspace = true

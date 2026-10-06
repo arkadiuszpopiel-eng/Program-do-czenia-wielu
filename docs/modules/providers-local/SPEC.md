@@ -78,3 +78,12 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 - `Downloader` i komendy `models_local_*` zostają dla zgodności (zapisują hash przy pierwszym pobraniu bez karty
   zgody) — UI już ich nie używa; wyłączenie — decyzja człowieka.
 
+
+## Zmiany — fala 6 (2026-10-06)
+- `LocalConfig::server_candidates`: kandydaci na plik `llama-server` per backend, sprawdzani przy **każdym** starcie
+  sidecara (`LocalConfig::server`; pierwszy istniejący wygrywa, kandydat zastępczy — ostrzeżenie w dzienniku). Kompozycja
+  (`app_modules::route::local::candidates`): własna kompilacja → `sidecars/llama/` → zastępcze. Serwer pobrany w
+  Ustawieniach po starcie aplikacji działa od następnej wiadomości (test `tests/install_after_start.rs`).
+- Próba profilu laptopa właściciela na atrapach (`tests/laptop.rs`): Bielik 4.5B z manifestu na kompilacji CUDA z
+  `-ngl` = wszystkie warstwy i `--threads 14`, STT obok w budżecie 6 GB VRAM, ciężki TTS wyklucza STT, na baterii —
+  kompilacja CPU bez warstw GPU, bez kompilacji CUDA — Vulkan na GPU.

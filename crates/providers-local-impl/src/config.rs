@@ -37,6 +37,10 @@ pub struct LocalConfig {
     pub models_dir: PathBuf,
     /// Pliki `llama-server` per backend (osobne kompilacje llama.cpp).
     pub server_bin: BTreeMap<BackendKey, PathBuf>,
+    /// Kandydaci na plik serwera per backend, w kolejności: pierwszy istniejący wygrywa przy
+    /// każdym starcie sidecara ([`LocalConfig::server`]) — silnik pobrany w Ustawieniach działa
+    /// bez ponownego uruchomienia aplikacji. Brak istniejącego kandydata → `server_bin`.
+    pub server_candidates: BTreeMap<BackendKey, Vec<PathBuf>>,
     /// Model domyślny.
     pub default_model: String,
     /// Kontekst (`-c`).
@@ -105,6 +109,7 @@ impl LocalConfig {
                 .into_iter()
                 .map(|k| (k, server.clone()))
                 .collect(),
+            server_candidates: BTreeMap::new(),
             default_model: "bielik-4.5b-v3.0-instruct-q4_k_m".into(),
             ctx: 8_192,
             backend: BackendChoice::Auto,
@@ -121,6 +126,27 @@ impl LocalConfig {
                 idle: Duration::from_secs(30),
             },
             privacy: ProviderPrivacy::new("local", "local"),
+        }
+    }
+
+    /// Plik serwera dla backendu w chwili startu: pierwszy istniejący kandydat
+    /// (`server_candidates`), inaczej `server_bin`. Kandydat inny niż pierwszy (kompilacja
+    /// zastępcza) — ostrzeżenie w dzienniku.
+    pub fn server(&self, backend: BackendKey) -> Option<PathBuf> {
+        let candidates = self.server_candidates.get(&backend);
+        let found = candidates.and_then(|c| c.iter().position(|p| p.is_file()));
+        match (candidates, found) {
+            (Some(c), Some(i)) => {
+                if i > 0 {
+                    tracing::warn!(
+                        backend = backend.as_str(),
+                        server = %c[i].display(),
+                        "brak llama-server dla backendu — używam kompilacji zastępczej"
+                    );
+                }
+                Some(c[i].clone())
+            }
+            _ => self.server_bin.get(&backend).cloned(),
         }
     }
 

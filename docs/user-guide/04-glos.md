@@ -6,14 +6,17 @@ lokalnie, bez kluczy.
 ## Co trzeba przygotować
 
 Modele i programy głosu pobierzesz w **Ustawienia → Modele i silniki** (zobacz
-[Modele i silniki](10-modele-i-silniki.md)): `whisper-server (CPU)`, model **Whisper large-v3-turbo-q5_0** (albo
-lżejszy small-q5_1), **piper** z głosem **Piper pl_PL gosia** i **Silero VAD**. Większość z nich jest jeszcze
+[Modele i silniki](10-modele-i-silniki.md)): `whisper-server (CPU)`, na komputerze z kartą NVIDIA także
+`whisper-server (CUDA 12.4)` (rozpoznawanie na karcie; gdy nie wystartuje, Alfa sama wraca do procesora), model
+**Whisper large-v3-turbo-q5_0** (z kartą NVIDIA) albo lżejszy **small-q5_1** (na procesorze), **piper** z głosem
+**Piper pl_PL gosia** i **Silero VAD**. Po pobraniu silników mowy uruchom Alfę ponownie (zasobnik → **Wyjście**) —
+silnik mowy jest wykrywany przy starcie. Większość z nich jest jeszcze
 **do potwierdzenia** (instalacja po zgodzie na pokazaną sumę SHA-256). Pocket TTS instalujesz ręcznie. Gdy wolisz
 skopiować pliki samodzielnie, trafiają do `%LOCALAPPDATA%\Alfa`:
 
 | Co                                                                                                | Gdzie                                                                                  |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Program rozpoznawania mowy `whisper-server.exe` (whisper.cpp)                                     | `sidecars\whisper\`                                                                    |
+| Program rozpoznawania mowy `whisper-server.exe` (whisper.cpp)                                     | `sidecars\whisper\` (wersja CUDA: `sidecars\whisper-cuda\`)                            |
 | Model rozpoznawania mowy, plik `ggml-….bin` (np. `ggml-large-v3-turbo-q5_0.bin`)                  | `models\whisper\`                                                                      |
 | Synteza mowy: Pocket TTS (`pocket-tts.exe` + modele) **albo** Piper (`piper.exe` + głosy `pl_PL`) | `sidecars\pocket-tts\` i `models\pocket-tts\` albo `sidecars\piper\` i `models\piper\` |
 | (opcjonalnie) detektor mowy Silero `silero_vad.onnx`                                              | `models\silero\`                                                                       |

@@ -140,6 +140,40 @@ async fn gpu_crash_falls_back_to_cpu_without_losing_utterance() {
     assert_eq!(launcher.launches.lock().unwrap().len(), 2);
 }
 
+/// Fala 6 (laptop z RTX 4050): kompilacja CUDA, która nie startuje (brak sterownika albo
+/// bibliotek `cudart`), nie psuje rozpoznawania — ta sama wypowiedź idzie na CPU.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn gpu_start_failure_falls_back_to_cpu() {
+    let launcher = Arc::new(FakeLauncher {
+        dead_on_start: vec![Backend::Vulkan],
+        ..FakeLauncher::default()
+    });
+    let stt = WhisperStt::new(config(), launcher.clone(), Backend::Vulkan).unwrap();
+    let mut cfg = voice_stt_contract::SttCfg::default();
+    cfg.two_pass.enabled = false;
+    stt.configure(cfg).await.unwrap();
+    speak(&stt, UtteranceId(3), 1.5).await;
+    let t = stt.end_utterance(UtteranceId(3)).await.unwrap();
+    assert_eq!(t.text, "Delta, otwórz plik.");
+    assert_eq!(t.backend, Some(Backend::Cpu));
+    assert!(stt.take_events().iter().any(|e| matches!(e, SttEvent::BackendFallback { from: Backend::Vulkan, to: Backend::Cpu, reason } if reason.contains("nie wystartował"))));
+    assert!(matches!(stt.health(), Health::Degraded(_)));
+    speak(&stt, UtteranceId(4), 1.0).await;
+    stt.end_utterance(UtteranceId(4)).await.unwrap();
+    let backends: Vec<_> = launcher
+        .launches
+        .lock()
+        .unwrap()
+        .iter()
+        .map(|l| l.backend)
+        .collect();
+    assert_eq!(
+        backends,
+        [Backend::Vulkan, Backend::Cpu],
+        "GPU nie jest ponawiane"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn residency_lease_and_cpu_placement() {
     let residency = Arc::new(model_residency_fake::FakeResidency::new(Budget {

@@ -56,6 +56,21 @@ pub fn server_for(paths: &AppPaths, key: BackendKey) -> (PathBuf, Option<Backend
         .unwrap_or((common, None))
 }
 
+/// Kandydaci na `llama-server` dla backendu w kolejności [`server_for`]: własna kompilacja,
+/// wspólna, zastępcze. Sprawdzani przy każdym starcie sidecara (`LocalConfig::server`), więc
+/// serwer pobrany w Ustawieniach po starcie aplikacji działa bez jej ponownego uruchomienia.
+pub fn candidates(paths: &AppPaths, key: BackendKey) -> Vec<PathBuf> {
+    let own = format!("llama-{}", key.as_str());
+    let substitutes = fallbacks(key)
+        .iter()
+        .map(|k| format!("llama-{}", k.as_str()));
+    [own, "llama".to_owned()]
+        .into_iter()
+        .chain(substitutes)
+        .map(|dir| paths.sidecar(&dir, "llama-server"))
+        .collect()
+}
+
 /// Konfiguracja `[providers.local]`: katalog modeli, osobne kompilacje `llama-server` per backend
 /// (`sidecars/llama-<backend>/`, zapasowo wspólna `sidecars/llama/`, potem zastępstwo).
 pub fn local_config(paths: &AppPaths) -> LocalConfig {
@@ -64,6 +79,7 @@ pub fn local_config(paths: &AppPaths) -> LocalConfig {
     config.provider_id = LOCAL_PROVIDER.into();
     for key in [BackendKey::Vulkan, BackendKey::Cuda, BackendKey::Cpu] {
         config.server_bin.insert(key, server_for(paths, key).0);
+        config.server_candidates.insert(key, candidates(paths, key));
     }
     config
 }
@@ -177,6 +193,23 @@ mod tests {
         assert_eq!(config.server_bin[&BackendKey::Cuda], cuda);
         assert_eq!(config.server_bin[&BackendKey::Vulkan], vulkan);
         assert_eq!(config.server_bin[&BackendKey::Cpu], cpu);
+    }
+
+    /// Fala 6: serwer pobrany w Ustawieniach po złożeniu aplikacji jest używany od razu.
+    #[test]
+    fn server_installed_after_composition_is_used_without_restart() {
+        let tmp = Temp::new();
+        let paths = AppPaths::under(&tmp.0);
+        let config = local_config(&paths);
+        let common = paths.sidecar("llama", "llama-server");
+        assert_eq!(config.server(BackendKey::Cuda), Some(common));
+        let vulkan = install(&paths, "llama-vulkan");
+        assert_eq!(config.server(BackendKey::Cuda), Some(vulkan.clone()));
+        assert_eq!(config.server(BackendKey::Cpu), Some(vulkan));
+        let cuda = install(&paths, "llama-cuda");
+        assert_eq!(config.server(BackendKey::Cuda), Some(cuda));
+        let cpu = install(&paths, "llama-cpu");
+        assert_eq!(config.server(BackendKey::Cpu), Some(cpu));
     }
 
     #[test]

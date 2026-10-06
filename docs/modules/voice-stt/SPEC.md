@@ -67,3 +67,12 @@ Napisy na żywo (szary partial → pełny final), dyktowanie do czatu z podgląd
 - Partiale z polityki dwóch przebiegów (`push` co 1 s audio, wiązka 1) zamiast strumienia z `end_utterance`; final z wiązką 5.
 - Fallback: awaria procesu GPU (wyjście, zerwane połączenie, `ErrorDeviceLost` w stderr) → backend oznaczony, restart na CPU (`-ng`), wypowiedź ponowiona z bufora.
 - Chmura: typy i konfiguracja; adapter w kolejnej fali (`NotAvailable`), sesja prywatna → `PrivacyBlocked`.
+
+## Fala 6 (próba generalna, laptop z RTX 4050)
+- Nieudany **start** kompilacji GPU (proces kończy się od razu — np. wersja CUDA bez sterownika NVIDIA albo bez
+  `cudart`) → backend oznaczony jako niesprawny, `voice.stt.backend.fallback` i start na CPU w tej samej wypowiedzi
+  (`engine_start.rs`); wcześniej rozpoznawanie zwracało błąd aż do restartu. Test `gpu_start_failure_falls_back_to_cpu`.
+- Kompozycja w aplikacji (`app_modules::stt::whisper`, używa jej `app-voice` i test na żywo `app-models`): `whisper-server`
+  CUDA (`sidecars/whisper-cuda/`, pozycja menedżera `sidecar-whisper-cuda`) ma pierwszeństwo, gdy jest zainstalowany
+  (PLAN §6.3 D-CUDA), CPU (`sidecars/whisper/`) wymagany jako zapas; wątki CPU: połowa wątków logicznych, 4–8
+  (wcześniej stałe 4). Build Vulkan whisper.cpp nie istnieje w wydaniach — desktop AMD rozpoznaje na CPU.

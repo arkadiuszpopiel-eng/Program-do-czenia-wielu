@@ -84,7 +84,7 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 
 ## Otwarte pytania
 - Przypięcie SHA-256 i potwierdzenie adresów/licencji pozycji „do potwierdzenia” (bramka ludzka; zmiana `confirmed`).
-- Buildy Vulkan/CUDA `whisper-server` (wiele archiwów na pozycję działa od fali 5 — `Install::Tree` z kilkoma plikami).
+- Build Vulkan `whisper-server` — brak w wydaniach whisper.cpp (desktop AMD: STT na CPU); CUDA — od fali 6.
 - Podpisy Authenticode binariów sidecarów (P-08) — dziś tylko SHA-256/TOFU.
 - Przebudowa (`search-impl::reindex_all`) otwiera naraz wszystkie bazy sesji przez `SessionDbProvider` (pamięć
   podręczna `sessions` ich nie zamyka) — przy setkach sesji RAM rośnie; do rozważenia zamykanie baz po kroku.
@@ -111,3 +111,28 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   pozycji CUDA w UI mówi, co się stanie bez niej.
 - **Testy:** `crates/app-models/tests/cuda.rs` (pozycja w katalogu, instalacja serwera i `cudart` do jednego drzewa,
   odrzucenie powtórzonego pliku), `crates/app-modules/src/route/local.rs` (testy zastępstwa).
+
+## Fala 6: próba generalna przed testem na laptopie (2026-10-06)
+- **Układ archiwów z GitHuba sprawdzony** (pobranie / lista wpisów przez HTTP Range, `sha256sum`): `llama-server` b6710
+  cpu/vulkan/cuda — pliki w korzeniu (`llama-server.exe`, `ggml-*.dll`, `LICENSE-*`), `cudart-llama-bin-…` — 3 biblioteki
+  w korzeniu (bez powtórzeń z archiwum serwera), `whisper-bin-x64.zip` — `Release/` (21 plików, w tym
+  `whisper-server.exe`), `piper_windows_amd64.zip` — `piper/` (363 wpisy, katalogi z `/`). Flagi CLI używane przez Alfę
+  są w binariach (`--api-key`, `--alias`, `--jinja`, `-np`, `-ngl`; `-nlp`, `-sns`, `-ng`, `-fa`; `--output_raw`,
+  `--quiet`). Sumy i rozmiary: `docs/user-guide/11-pierwszy-test-na-pc.md` („Jutro na laptopie”) — do przypięcia przez
+  człowieka (bramka P3-04); `confirmed` bez zmian.
+- **Pozycja `sidecar-whisper-cuda`**: `whisper-cublas-12.4.0-bin-x64.zip` (430 MiB; `Release/` z `cudart`/cuBLAS,
+  ~0,7 GB po rozpakowaniu) → `sidecars/whisper-cuda/`, wymagane `whisper-server.exe` i `cudart64_12.dll`. Zainstalowana
+  ma pierwszeństwo przed CPU (`app_modules::stt`), nieudany start → CPU (`voice-stt-impl`).
+- **Rozpakowanie odporne na inne wydanie:** separator `\` (Compress-Archive w PowerShell 5.1) normalizowany do `/`
+  **przed** walidacją ścieżki; `strip` z katalogu nieobecny w archiwum → rozpakowanie od korzenia (ostrzeżenie w
+  dzienniku); brak wymaganego pliku → błąd z listą wpisów najwyższego poziomu (widać go w UI). Poza Windows bit
+  wykonywania z archiwum (0o755). Testy: `tests/layout.rs` (pozycje z `builtin()` z archiwami o układzie wydań).
+- **Serwer pobrany po starcie działa bez restartu:** `LocalConfig::server_candidates` (providers-local) sprawdzane
+  przy każdym starcie sidecara; wcześniej ścieżka `llama-server` była ustalana raz przy starcie aplikacji i pierwsza
+  rozmowa po pobraniu serwera w Ustawieniach kończyła się błędem do ponownego uruchomienia.
+- **Próba na żywo** (`tests/live_catalog.rs`, `#[ignore]`, `ALFA_LIVE_CATALOG=1`; job „Silniki na żywo (CPU)” w
+  `.github/workflows/rehearsal.yml`): prawdziwy `ModelsApp` pobiera i rozpakowuje pozycje CPU + najmniejsze modele
+  (oraz CUDA/Vulkan tylko do sprawdzenia układu), uruchamia je kompozycją aplikacji (`app_modules::route::local`,
+  `tts::engines`, `stt::whisper`), generacja ≥ 16 tokenów po polsku, Piper → WAV → whisper (WER ≤ 0,5). Raport JSON
+  (artefakt `alfa-live-report`): adres, rozmiar, SHA-256, surowy układ archiwów, wersje i flagi CLI, czasy (tok/s,
+  RTF). `ALFA_LIVE_MIRROR=http://127.0.0.1:<port>` — próba na sucho z lokalnego lustra (atrapy silników).

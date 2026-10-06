@@ -5,14 +5,10 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
-use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
 use device_profile_contract::Backend;
-use model_residency_contract::{
-    Device, Lease, LeaseId, LeaseListener, LeaseRequest, ModelRole, Placement, Priority, Residency,
-    Revocation,
-};
+use model_residency_contract::{Lease, LeaseId, LeaseListener, Residency, Revocation};
 use voice_audio_contract::Frame;
 use voice_stt_contract::{
     Health, Stt, SttCfg, SttEngine, SttError, SttEvent, Transcript, UtteranceAudio, UtteranceId,
@@ -20,9 +16,10 @@ use voice_stt_contract::{
 };
 
 use crate::client::{InferenceParams, WhisperClient};
-use crate::sidecar::{
-    LaunchSpec, Sidecar, SidecarLauncher, WhisperServerConfig, build_args, free_port,
-};
+use crate::sidecar::{Sidecar, SidecarLauncher, WhisperServerConfig};
+
+#[path = "engine_start.rs"]
+mod start;
 
 /// Właściciel dzierżaw w `model-residency`.
 pub const OWNER: &str = "voice-stt";
@@ -102,31 +99,6 @@ impl WhisperStt {
         self.lock().events.push(e);
     }
 
-    fn lease_request(&self, model: &str, backend: Backend) -> LeaseRequest {
-        LeaseRequest {
-            owner: OWNER.into(),
-            model: model.into(),
-            role: ModelRole::Stt,
-            priority: Priority::VoiceRt,
-            placement: if backend == Backend::Cpu {
-                Placement::CpuOnly
-            } else {
-                Placement::GpuPreferred
-            },
-            vram_mb: 1_500,
-            ram_mb: 600,
-            cpu_ram_mb: 1_500,
-            idle_unload_ms: self.config.idle_unload_ms,
-        }
-    }
-
-    fn release(&self, server: Server) {
-        server.sidecar.kill();
-        if let (Some(r), Some(id)) = (&self.residency, server.lease) {
-            let _ = r.release(id);
-        }
-    }
-
     /// Zapewnia działający serwer; zwraca (adres, backend).
     async fn ensure_server(
         &self,
@@ -155,63 +127,21 @@ impl WhisperStt {
         if failed.contains(&backend) || self.config.binaries.for_backend(backend).is_none() {
             backend = Backend::Cpu;
         }
-        let mut lease = None;
-        if let Some(r) = &self.residency {
-            let grant = r
-                .acquire(self.lease_request(model, backend))
-                .map_err(|e| SttError::Sidecar(format!("rezydencja: {e}")))?;
-            if grant.lease.device == Device::Cpu {
-                backend = Backend::Cpu;
-            }
-            lease = Some(grant.lease.id);
-        }
-        self.lock().health = Some(Health::Starting);
-        let port = free_port()?;
-        let program = self
-            .config
-            .binaries
-            .for_backend(backend)
-            .cloned()
-            .unwrap_or_else(|| self.config.binaries.cpu.clone());
-        let spec = LaunchSpec {
-            program,
-            args: build_args(&self.config, backend, port),
-            port,
-            backend,
-        };
-        let sidecar = self.launcher.launch(&spec).await?;
-        let base = sidecar.base_url();
-        let deadline = Instant::now() + self.config.startup_timeout;
-        while !self.client.healthy(&base).await {
-            if sidecar.exited().is_some() || Instant::now() > deadline {
-                sidecar.kill();
-                if let (Some(r), Some(id)) = (&self.residency, lease) {
-                    let _ = r.release(id);
-                }
-                let msg = format!("whisper-server ({backend:?}) nie wystartował");
-                self.lock().health = Some(Health::Failed(msg.clone()));
-                return Err(SttError::Sidecar(msg));
-            }
-            tokio::time::sleep(Duration::from_millis(50)).await;
-        }
-        let health = if failed.is_empty() {
-            Health::Ready(backend)
-        } else {
-            Health::Degraded(format!("{backend:?} po awarii GPU"))
-        };
+        let server = self.start_with_fallback(model, backend).await?;
+        let (base, backend) = (server.sidecar.base_url(), server.backend);
         {
             let mut st = self.lock();
-            st.health = Some(health);
+            st.health = Some(if st.failed.is_empty() {
+                Health::Ready(backend)
+            } else {
+                Health::Degraded(format!("{backend:?} po awarii GPU"))
+            });
             st.events.push(SttEvent::ModelLoaded {
                 model: model.into(),
                 backend,
             });
         }
-        *slot = Some(Server {
-            sidecar,
-            backend,
-            lease,
-        });
+        *slot = Some(server);
         Ok((base, backend))
     }
 

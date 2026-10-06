@@ -5,6 +5,7 @@
 //!   z oknem zatwierdzeń (`ApprovalWindow`) i dziennikiem cofania (`undo-journal-impl`);
 //! - [`voice::VoiceAdapter`] — audio (`voice-audio`) i czytanie na głos (`voice-tts`);
 //! - [`tts::engines`] — silniki TTS z zainstalowanych sidecarów (Pocket TTS, Piper);
+//! - [`stt::whisper`] — sidecar STT `whisper-server` (CPU, CUDA z pierwszeństwem, gdy zainstalowany);
 //! - [`catalog::ProviderCatalog`] — wbudowany katalog dostawców (`providers-catalog/*.toml`);
 //! - [`probe::ProviderProbe`] — test połączenia i wykrywanie modeli kont (`providers-api-impl`);
 //! - [`route::RouterBrain`] — „mózg" na trzech rdzeniach Routera (`router-impl`), konta hubu i
@@ -25,6 +26,7 @@ pub mod late;
 pub mod probe;
 pub mod route;
 pub mod secrets;
+pub mod stt;
 pub mod transfer;
 pub mod tts;
 pub mod voice;

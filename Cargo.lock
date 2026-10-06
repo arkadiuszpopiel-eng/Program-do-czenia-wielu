@@ -758,8 +758,11 @@ name = "app-models"
 version = "0.0.1"
 dependencies = [
  "app-api",
+ "app-modules",
  "core-config-contract",
  "core-config-fake",
+ "device-profile-contract",
+ "device-profile-fake",
  "flate2",
  "futures-util",
  "lib-embed",
@@ -767,6 +770,8 @@ dependencies = [
  "memory-contract",
  "memory-impl",
  "model-residency-contract",
+ "personas-contract",
+ "providers-contract",
  "providers-local-impl",
  "reqwest",
  "search-contract",
@@ -782,6 +787,10 @@ dependencies = [
  "tokio-util",
  "tracing",
  "updater-contract",
+ "voice-audio-contract",
+ "voice-stt-contract",
+ "voice-stt-impl",
+ "voice-tts-contract",
  "zip",
 ]
 
@@ -826,6 +835,7 @@ dependencies = [
  "undo-journal-impl",
  "uuid",
  "voice-audio-contract",
+ "voice-stt-impl",
  "voice-tts-contract",
  "voice-tts-impl",
  "watchdog-contract",
@@ -1013,7 +1023,6 @@ dependencies = [
  "core-bus-contract",
  "core-config-contract",
  "core-config-fake",
- "device-profile-contract",
  "futures-core",
  "model-residency-contract",
  "personas-contract",

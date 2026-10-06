@@ -44,6 +44,8 @@ undo-journal-impl = { path = "../undo-journal-impl" }
 voice-audio-contract = { path = "../voice-audio-contract" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 voice-tts-impl = { path = "../voice-tts-impl" }
+# Sidecar STT whisper-server (CPU/CUDA) — wspólna kompozycja dla app-voice i próby generalnej.
+voice-stt-impl = { path = "../voice-stt-impl" }
 watchdog-contract = { path = "../watchdog-contract" }
 async-trait.workspace = true
 chrono.workspace = true
