@@ -1,0 +1,19 @@
+# Manifest narzędzi tools-media (docs/modules/tools-media/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Zdolności z tokenu Brokera per wywołanie: `fs.read(plik)`, przy konwersji także `fs.write(nowy plik)`.
+# Sidecar `ffmpeg` (opcjonalny, instalacja ręczna) w Job Object; głośnik przez kolejkę mówienia `scheduler-lite`.
+id = "tools-media"
+version = "0.0.1"
+kind = "tool"
+provides = ["tools-media-contract@1"]
+requires = ["tools-common-contract@1", "safety-broker-contract@1", "undo-journal-contract@1", "voice-audio-contract@1", "scheduler-lite-contract@1", "platform-contract@1", "core-bus-contract@1"]
+capabilities = ["fs.read(plik-multimediów)", "fs.write(nowy-plik)"]
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+ram_mb = 64
+cpu_pct = 10
+
+[health]
+check = "ping"
+interval_s = 60

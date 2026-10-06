@@ -110,6 +110,7 @@ async fn agent_voice_and_chat_sessions_never_leak() {
         text,
         addressed_to: to.map(str::to_owned),
         profile: None,
+        attachments: Vec::new(),
     };
     let (a, c) = tokio::join!(
         core.turns_send(

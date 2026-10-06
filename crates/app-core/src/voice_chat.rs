@@ -76,7 +76,7 @@ impl VoiceChat for CoreVoiceChat {
         core.finalize_generation(&session).await;
         let agent = core.addressee(&session, text, Some(persona));
         let (user, _) = core
-            .append_user(&session, None, None, text, Some(agent.clone()))
+            .append_user(&session, None, None, text, Some(agent.clone()), Vec::new())
             .await?;
         let (tx, rx) = mpsc::unbounded_channel();
         let mut req = GenRequest::text(

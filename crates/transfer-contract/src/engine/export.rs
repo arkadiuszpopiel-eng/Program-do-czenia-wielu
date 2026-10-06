@@ -59,31 +59,33 @@ struct Writer<'s> {
 }
 
 impl Writer<'_> {
+    /// Strażnik sekretów: redakcja (zliczana) i odmowa przy wycieku dokładnej wartości.
+    fn clean(&mut self, path: &str, bytes: Vec<u8>) -> Result<Vec<u8>, TransferError> {
+        let Some(guard) = &self.guard else {
+            return Ok(bytes);
+        };
+        let (clean, n) = guard.clean_document(path, bytes)?;
+        if n > 0 {
+            self.redactions += n;
+            self.warnings.push(Warning::Redacted {
+                path: path.to_owned(),
+                count: n,
+            });
+        }
+        if guard.find_leak(&clean) {
+            return Err(TransferError::SecretDetected {
+                path: path.to_owned(),
+            });
+        }
+        Ok(clean)
+    }
+
     fn add(&mut self, path: &str, bytes: Vec<u8>) -> Result<(), TransferError> {
         validate_entry_path(path).map_err(|reason| TransferError::UnsafePath {
             path: path.to_owned(),
             reason,
         })?;
-        let bytes = match &self.guard {
-            Some(guard) => {
-                let (clean, n) = guard.clean_document(path, bytes)?;
-                if n > 0 {
-                    self.redactions += n;
-                    self.warnings.push(Warning::Redacted {
-                        path: path.to_owned(),
-                        count: n,
-                    });
-                }
-                if guard.find_leak(&clean) {
-                    return Err(TransferError::SecretDetected {
-                        path: path.to_owned(),
-                    });
-                }
-                clean
-            }
-            None => bytes,
-        };
-        let mut bytes = bytes;
+        let mut bytes = self.clean(path, bytes)?;
         let added = self.sink.add(path, &bytes);
         if added.is_ok() {
             self.content.push(ContentEntry::of(path, &bytes));
@@ -94,6 +96,19 @@ impl Writer<'_> {
         }
         added
     }
+}
+
+/// Nagłówek sesji z sumą `turns_sha256` policzoną z zapisywanych (po redakcji) tur.
+fn with_turns_sha(header: Vec<u8>, turns: &[u8]) -> Result<Vec<u8>, TransferError> {
+    let mut value: serde_json::Value =
+        serde_json::from_slice(&header).map_err(|e| TransferError::invalid("session", e))?;
+    if let Some(obj) = value.as_object_mut() {
+        obj.insert(
+            "turns_sha256".into(),
+            serde_json::Value::String(crate::manifest::sha256_hex(turns)),
+        );
+    }
+    serde_json::to_vec_pretty(&value).map_err(|e| TransferError::invalid("session", e))
 }
 
 impl Engine<'_> {
@@ -207,7 +222,17 @@ impl Engine<'_> {
                 what: format!("sesja {id}"),
             })?;
         let (header, turns) = encode_session(&session, self.ports().workdir_root.as_deref())?;
-        w.add(&session_path(id, TURNS_FILE), turns)?;
+        // Redakcja tur PRZED sumą w nagłówku — inaczej sesja z ciągiem podobnym do sekretu byłaby
+        // nie do odczytania (`turns_sha256` z treści sprzed redakcji; regresja z testu przywracania).
+        let turns_path = session_path(id, TURNS_FILE);
+        let before = crate::manifest::sha256_hex(&turns);
+        let turns = w.clean(&turns_path, turns)?;
+        let header = if crate::manifest::sha256_hex(&turns) == before {
+            header
+        } else {
+            with_turns_sha(header, &turns)?
+        };
+        w.add(&turns_path, turns)?;
         w.add(&session_path(id, SESSION_FILE), header)?;
         w.scope.sessions.push(id.clone());
         w.scope.counts.sessions += 1;

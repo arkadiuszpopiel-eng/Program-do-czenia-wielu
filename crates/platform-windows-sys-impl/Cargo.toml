@@ -1,6 +1,6 @@
 [package]
 name = "platform-windows-sys-impl"
-description = "Sygnały systemowe i obserwacja katalogów dla Windows (windows-rs): bezczynność (GetLastInputInfo), zasilanie (GetSystemPowerStatus + powiadomienia), tryb gry (SHQueryUserNotificationState + okno pełnoekranowe), blokada sesji (WTS), ReadDirectoryChangesW z debounce, przeskanowaniem po przepełnieniu i deny-listą"
+description = "Sygnały systemowe i obserwacja katalogów dla Windows (windows-rs): bezczynność (GetLastInputInfo), zasilanie (GetSystemPowerStatus + powiadomienia), tryb gry (SHQueryUserNotificationState + okno pełnoekranowe), blokada sesji (WTS), ReadDirectoryChangesW z debounce, przeskanowaniem po przepełnieniu i deny-listą; F6: port systemu dla tools-system (procesy Toolhelp32 z zakończeniem przez uchwyt po sprawdzeniu tożsamości, usługi SCM, Dziennik zdarzeń EvtQuery, zmienne HKCU\\Environment) i kwarantanna pobrań tools-net (bez dowiązań, MOTW)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -13,6 +13,8 @@ repository.workspace = true
 # `wrappers` dla `windows`). Bez zależności od innych `-impl` (zakaz `-impl` → cudzy `-impl`).
 [dependencies]
 platform-contract.workspace = true
+# F6: `SysPort` (tools-system) i `DownloadStore` (tools-net) z kontraktu portów aplikacji.
+platform-apps-contract = { path = "../platform-apps-contract" }
 
 # Ta sama wersja windows-rs co w `platform-windows-impl` (AGENTS.md: jeden crate, jedna wersja).
 [target.'cfg(windows)'.dependencies]
@@ -21,10 +23,15 @@ windows = { version = "0.62.2", features = [
     "Win32_Graphics_Gdi",
     "Win32_Security",
     "Win32_Storage_FileSystem",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_EventLog",
     "Win32_System_IO",
     "Win32_System_LibraryLoader",
     "Win32_System_Power",
+    "Win32_System_ProcessStatus",
+    "Win32_System_Registry",
     "Win32_System_RemoteDesktop",
+    "Win32_System_Services",
     "Win32_System_SystemInformation",
     "Win32_System_SystemServices",
     "Win32_System_Threading",

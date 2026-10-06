@@ -80,6 +80,7 @@ fn harness(extra: Vec<Arc<dyn Tool>>, apps: bool) -> H {
             headless: true,
         },
         plugins_dir: Some(dir.path().join("plugins")),
+        sysnet: None,
     });
     let tools = AgentTools::new(ToolsDeps {
         broker,

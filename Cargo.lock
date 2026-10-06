@@ -318,30 +318,43 @@ dependencies = [
  "agent-runtime-contract",
  "agent-runtime-impl",
  "app-api",
+ "app-gui",
+ "app-modules",
  "app-plugins",
  "async-trait",
  "base64 0.22.1",
  "chrono",
  "compliance-contract",
  "core-bus-contract",
+ "core-bus-fake",
  "futures-util",
+ "lib-media",
  "personas-contract",
  "platform-apps-contract",
  "platform-apps-fake",
  "platform-contract",
  "platform-fake",
+ "platform-windows-gui-impl",
  "platform-windows-impl",
+ "platform-windows-ocr-impl",
  "platform-windows-office-impl",
+ "platform-windows-sys-impl",
  "plugin-runtime-contract",
  "providers-contract",
  "providers-fake",
  "providers-local-impl",
  "risk-classifier-contract",
+ "router-contract",
+ "router-impl",
  "safety-broker-contract",
  "safety-broker-fake",
  "scheduler-contract",
+ "scheduler-lite-contract",
+ "scheduler-lite-fake",
  "serde",
  "serde_json",
+ "sessions-contract",
+ "sessions-fake",
  "skills-contract",
  "tempfile",
  "tokio",
@@ -353,13 +366,24 @@ dependencies = [
  "tools-common-contract",
  "tools-fs-contract",
  "tools-fs-impl",
+ "tools-media-contract",
+ "tools-media-impl",
+ "tools-net-contract",
+ "tools-net-fake",
+ "tools-net-impl",
  "tools-office-contract",
  "tools-office-fake",
  "tools-office-impl",
  "tools-shell-contract",
  "tools-shell-impl",
+ "tools-system-contract",
+ "tools-system-impl",
+ "tools-vision-contract",
+ "tools-vision-impl",
  "undo-journal-contract",
  "undo-journal-fake",
+ "voice-audio-contract",
+ "voice-audio-impl",
  "wat",
  "watchdog-contract",
 ]
@@ -460,6 +484,7 @@ dependencies = [
  "app-api",
  "app-bridges",
  "app-broker",
+ "app-files",
  "app-gui",
  "app-health",
  "app-memory",
@@ -561,6 +586,36 @@ dependencies = [
  "voice-wake-fake",
  "wat",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-files"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "accounts-hub-fake",
+ "app-api",
+ "app-modules",
+ "artifacts-contract",
+ "artifacts-fake",
+ "base64 0.22.1",
+ "chrono",
+ "compliance-contract",
+ "lib-markdown",
+ "platform-contract",
+ "platform-windows-impl",
+ "providers-contract",
+ "semver",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+ "sessions-fake",
+ "tempfile",
+ "tokio",
+ "tools-common-contract",
+ "tracing",
+ "transfer-contract",
+ "transfer-impl",
 ]
 
 [[package]]
@@ -741,6 +796,7 @@ dependencies = [
  "core-bus-contract",
  "core-bus-fake",
  "core-registry-contract",
+ "lib-netguard",
  "platform-contract",
  "platform-fake",
  "plugin-runtime-contract",
@@ -3034,6 +3090,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "lib-media"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "proptest",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "lib-netguard"
+version = "0.0.1"
+dependencies = [
+ "proptest",
+ "reqwest",
+ "thiserror",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "lib-openai-compat"
 version = "0.0.1"
 dependencies = [
@@ -3913,6 +3992,7 @@ name = "platform-apps-fake"
 version = "0.0.1"
 dependencies = [
  "platform-apps-contract",
+ "platform-contract",
  "proptest",
 ]
 
@@ -3967,6 +4047,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "platform-windows-ocr-impl"
+version = "0.0.1"
+dependencies = [
+ "tools-vision-contract",
+ "windows",
+]
+
+[[package]]
 name = "platform-windows-office-impl"
 version = "0.0.1"
 dependencies = [
@@ -3991,6 +4079,7 @@ name = "platform-windows-sys-impl"
 version = "0.0.1"
 dependencies = [
  "compliance-contract",
+ "platform-apps-contract",
  "platform-contract",
  "tempfile",
  "windows",
@@ -6091,6 +6180,116 @@ dependencies = [
 ]
 
 [[package]]
+name = "tools-media-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "lib-media",
+ "risk-classifier-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio-util",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-media-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "lib-media",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-media-contract",
+]
+
+[[package]]
+name = "tools-media-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "lib-media",
+ "personas-contract",
+ "platform-contract",
+ "platform-fake",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "scheduler-lite-contract",
+ "scheduler-lite-fake",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-media-contract",
+ "tools-media-fake",
+ "tracing",
+ "undo-journal-contract",
+ "uuid",
+ "voice-audio-contract",
+ "voice-audio-fake",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-net-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "lib-netguard",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-net-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "lib-netguard",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-net-contract",
+]
+
+[[package]]
+name = "tools-net-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "lib-netguard",
+ "platform-apps-contract",
+ "platform-apps-fake",
+ "reqwest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "tools-common-contract",
+ "tools-net-contract",
+ "tools-net-fake",
+ "watchdog-contract",
+]
+
+[[package]]
 name = "tools-office-contract"
 version = "0.0.1"
 dependencies = [
@@ -6238,6 +6437,56 @@ dependencies = [
 ]
 
 [[package]]
+name = "tools-system-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-apps-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-system-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-system-contract",
+]
+
+[[package]]
+name = "tools-system-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "platform-apps-contract",
+ "platform-apps-fake",
+ "platform-contract",
+ "platform-fake",
+ "proptest",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tools-common-contract",
+ "tools-system-contract",
+ "watchdog-contract",
+]
+
+[[package]]
 name = "tools-uia-contract"
 version = "0.0.1"
 dependencies = [
@@ -6281,6 +6530,63 @@ dependencies = [
  "tokio",
  "tools-common-contract",
  "tools-uia-contract",
+ "tools-window-contract",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-vision-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "providers-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tools-common-contract",
+ "tools-screen-contract",
+]
+
+[[package]]
+name = "tools-vision-fake"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "providers-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-vision-contract",
+]
+
+[[package]]
+name = "tools-vision-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-bus-fake",
+ "core-registry-contract",
+ "futures-util",
+ "lib-media",
+ "platform-contract",
+ "platform-fake",
+ "providers-contract",
+ "providers-fake",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-screen-contract",
+ "tools-vision-contract",
+ "tools-vision-fake",
  "tools-window-contract",
  "watchdog-contract",
 ]

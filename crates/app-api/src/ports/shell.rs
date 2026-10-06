@@ -34,6 +34,20 @@ pub trait ShellPort: Send + Sync {
     fn pick_folder(&self) -> Result<Option<PathBuf>, AppError> {
         Err(AppError::unavailable("Okno wyboru katalogu", SHELL))
     }
+    /// Natywny dialog „Otwórz" z wyborem wielu plików (załączniki composera); pusto = anulowano.
+    fn pick_files(&self) -> Result<Vec<PathBuf>, AppError> {
+        Err(AppError::unavailable("Okno wyboru plików", SHELL))
+    }
+    /// Natywny dialog „Zapisz jako" z filtrem (`filter` — nazwa, `extensions` — bez kropki,
+    /// np. eksport rozmowy `.md`/`.html`); `None` = anulowano.
+    fn pick_save_file(
+        &self,
+        _suggested_name: &str,
+        _filter: &str,
+        _extensions: &[&str],
+    ) -> Result<Option<PathBuf>, AppError> {
+        Err(AppError::unavailable("Okno zapisu pliku", SHELL))
+    }
     /// „Uruchom w terminalu": otwiera terminal (`shell`: `pwsh`, `powershell`, `cmd`) w katalogu
     /// `cwd` **bez wykonywania** polecenia — właściciel wkleja je i uruchamia sam.
     fn open_terminal(&self, _cwd: &Path, _shell: &str) -> Result<(), AppError> {
@@ -120,6 +134,17 @@ impl ShellPort for HeadlessShell {
     }
     fn pick_folder(&self) -> Result<Option<PathBuf>, AppError> {
         self.dialog("pick_folder".into())
+    }
+    fn pick_files(&self) -> Result<Vec<PathBuf>, AppError> {
+        Ok(self.dialog("pick_files".into())?.into_iter().collect())
+    }
+    fn pick_save_file(
+        &self,
+        suggested_name: &str,
+        _filter: &str,
+        _extensions: &[&str],
+    ) -> Result<Option<PathBuf>, AppError> {
+        self.dialog(format!("pick_save_file:{suggested_name}"))
     }
     fn open_terminal(&self, cwd: &Path, shell: &str) -> Result<(), AppError> {
         self.record(format!("open_terminal:{shell}:{}", cwd.display()));

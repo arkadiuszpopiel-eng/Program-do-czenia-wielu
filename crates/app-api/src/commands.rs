@@ -202,6 +202,18 @@ macro_rules! with_commands {
             search_reindex_start() -> $crate::dto::ReindexView;
             search_reindex_cancel() -> $crate::dto::ReindexView;
             search_reindex_status() -> $crate::dto::ReindexView;
+            attachments_pick(session_id: String) -> $crate::dto::AttachmentsAdded;
+            attachments_add_dropped(session_id: String) -> $crate::dto::AttachmentsAdded;
+            attachments_paste(session_id: String) -> $crate::dto::AttachmentsAdded;
+            attachments_list(session_id: String) -> Vec<$crate::dto::AttachmentInfo>;
+            attachments_remove(session_id: String, attachment_id: String) -> Vec<$crate::dto::AttachmentInfo>;
+            sessions_export_conversation(session_id: String, format: $crate::dto::ConversationFormat, turn_id: Option<String>) -> $crate::dto::ExportResult;
+            backups_status() -> $crate::dto::BackupView;
+            backups_configure(config: $crate::dto::BackupConfig) -> $crate::dto::BackupView;
+            backups_choose_dir() -> $crate::dto::BackupView;
+            backups_set_password(password: Option<$crate::dto::SecretInput>) -> $crate::dto::BackupView;
+            backups_run_now() -> $crate::dto::BackupView;
+            backups_verify(file: String) -> $crate::dto::BackupCheck;
         }
     };
 }
@@ -227,6 +239,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 194);
+        assert_eq!(super::COMMANDS.len(), 206);
     }
 }

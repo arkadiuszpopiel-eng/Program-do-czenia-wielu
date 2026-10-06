@@ -5,6 +5,7 @@
   import Pin from '@lucide/svelte/icons/pin';
   import type { SessionSummary } from '../../api/types';
   import { useApp } from '../../state/context';
+  import { exportConversation } from '../../state/exports';
 
   interface Props {
     session: SessionSummary;
@@ -47,6 +48,16 @@
       id: 'export',
       label: t('sessions.export'),
       onSelect: () => void app.exportSession(session.id),
+    },
+    {
+      id: 'export-md',
+      label: t('exp.markdown'),
+      onSelect: () => void exportConversation(app, session.id, 'markdown'),
+    },
+    {
+      id: 'export-html',
+      label: t('exp.html'),
+      onSelect: () => void exportConversation(app, session.id, 'html'),
     },
     {
       id: 'delete',

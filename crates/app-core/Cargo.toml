@@ -38,6 +38,8 @@ app-updates = { path = "../app-updates" }
 app-models = { path = "../app-models" }
 # Tabele aplikacji w bazach sesji (fakty o turach, oś czasu, Replay) — wydzielone z app-core.
 app-store = { path = "../app-store" }
+# Załączniki composera, eksport rozmowy MD/HTML, kopie zapasowe z harmonogramem, artefakty w `.alfa`.
+app-files = { path = "../app-files" }
 agent-backends-contract = { path = "../agent-backends-contract" }
 mcp-impl = { path = "../mcp-impl" }
 agent-runtime-contract = { path = "../agent-runtime-contract" }

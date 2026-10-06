@@ -24,6 +24,8 @@
     maxLines?: number;
     /** Trwa generowanie: zamiast „Wyślij" pokazuje „Stop". */
     busy?: boolean;
+    /** Wysłanie dozwolone przy pustym polu (np. same załączniki). */
+    allowEmpty?: boolean;
     lang?: string;
     labels?: Partial<Labels>;
     /** Element pola (bindable) — np. do ustawienia kursora po podpowiedzi. */
@@ -52,6 +54,7 @@
     disabled = false,
     maxLines = 12,
     busy = false,
+    allowEmpty = false,
     lang = 'pl',
     labels = {},
     textarea = $bindable(null),
@@ -75,7 +78,7 @@
   });
   const LINE_PX = 21; // 14 px × 1,5
   const PAD_PX = 16;
-  const canSend = $derived(value.trim().length > 0 && !disabled);
+  const canSend = $derived((value.trim().length > 0 || allowEmpty) && !disabled);
 
   /** Auto-wzrost 1–maxLines linii, najwyżej ~40% wysokości okna (§14.8). */
   $effect(() => {

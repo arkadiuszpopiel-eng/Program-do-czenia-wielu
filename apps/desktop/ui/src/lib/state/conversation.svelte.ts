@@ -79,12 +79,18 @@ export class ConversationState {
     if (result.stopped) this.hooks.onStop?.(turn.id);
   }
 
-  async send(text: string, addressed: AgentId | null, profile: ModelProfile | null): Promise<void> {
+  async send(
+    text: string,
+    addressed: AgentId | null,
+    profile: ModelProfile | null,
+    attachments: readonly string[] = [],
+  ): Promise<void> {
     await this.client.turns.send(this.sessionId, {
       parent_id: leafId(this.tree),
       text,
       addressed_to: addressed,
       profile,
+      ...(attachments.length > 0 ? { attachments } : {}),
     });
   }
 

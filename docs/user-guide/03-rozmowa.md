@@ -12,7 +12,14 @@
   `/ustawienia`, `/skupienie`, `/nowa`.
 - Chipy przy polu pokazują adresatkę i profil modelu — kliknij, żeby zmienić.
 - `Esc` albo „Stop” zatrzymuje odpowiedź w trakcie.
-- Dołączanie plików i zrzutów ekranu — **jeszcze niedostępne**.
+- **Załączniki**: spinacz przy polu (okno wyboru plików), wklejenie pliku albo obrazu (`Ctrl+V`) albo przeciągnięcie
+  plików na okno. Alfa kopiuje je do katalogu sesji (`…\Alfa\Sesje\<nazwa>\in`) i pokazuje jako chipy z rozmiarem
+  i szacunkiem tokenów; przy dużych załącznikach — także udziałem w oknie kontekstu i szacunkiem kosztu. Limity:
+  10 plików w wiadomości, 25 MB na plik, 100 MB razem. Obraz do 5 MB model widzi w całości, tekst (do 100 000 znaków)
+  jako dane, nie polecenia; z innych plików (PDF, archiwa) model dostaje tylko nazwę, typ i rozmiar. Pliki z danych
+  Alfy i katalogów z poświadczeniami (np. `.claude`, `.codex`, profile przeglądarek) są odrzucane. Po wysłaniu
+  załączniki są w panelu **Pliki**. Wiadomość może składać się z samych załączników.
+- Zrzut ekranu prosto z pola wiadomości — **jeszcze niedostępny**.
 
 ## Odpowiedź
 
@@ -33,7 +40,12 @@ Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
 - **Edytuj i wyślij ponownie** (Twoje wiadomości),
 - **Kontynuuj** — dokończ odpowiedź uciętą limitem długości,
 - **Zapamiętaj** — w tej sesji, w projekcie, globalnie albo u agentki (zobacz [Pamięć](06-pamiec.md)),
-- ocena „Dobra odpowiedź” / „Słaba odpowiedź”, **Szczegóły → Oś czasu**, **Ukryj z widoku**.
+- ocena „Dobra odpowiedź” / „Słaba odpowiedź”, **Szczegóły → Oś czasu**, **Ukryj z widoku**,
+- **Eksportuj wiadomość do Markdown / HTML** (menu „Więcej akcji”).
+
+Całą rozmowę (widoczną gałąź, bez wiadomości ukrytych) wyeksportujesz z menu sesji albo z palety `Ctrl+K`:
+**Eksportuj rozmowę do Markdown** / **do HTML**. Plik HTML jest samodzielny: bez skryptów i zasobów z sieci, z fontami
+systemowymi — można go otworzyć w przeglądarce i wydrukować do PDF.
 
 ## Gałęzie: nic nie jest nadpisywane
 

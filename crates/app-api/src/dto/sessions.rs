@@ -232,6 +232,9 @@ pub struct Turn {
     /// Usłyszany prefiks przerwanej odpowiedzi głosowej (tekst; `None` = wysłuchana w całości).
     #[serde(default)]
     pub heard_prefix: Option<String>,
+    /// Załączniki tury (artefakty sesji; pole pomijane, gdy brak).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub attachments: Vec<super::TurnAttachment>,
 }
 
 /// Ocena tury.
@@ -263,6 +266,9 @@ pub struct SendOptions {
     pub text: String,
     pub addressed_to: Option<String>,
     pub profile: Option<ModelProfile>,
+    /// Identyfikatory załączników przygotowanych w composerze (`attachments_*`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub attachments: Vec<String>,
 }
 
 /// Wynik wysłania.

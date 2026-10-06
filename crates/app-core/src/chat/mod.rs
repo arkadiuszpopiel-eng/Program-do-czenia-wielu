@@ -167,6 +167,7 @@ impl AppCore {
             addressed_to: None,
             truncated: false,
             heard_prefix: None,
+            attachments: Vec::new(),
         };
         let (done_tx, done_rx) = watch::channel(false);
         let handle = GenHandle {

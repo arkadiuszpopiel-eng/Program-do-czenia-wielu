@@ -23,6 +23,7 @@
   import MessageApproval from './MessageApproval.svelte';
   import MessageError from './MessageError.svelte';
   import MessageActions from './MessageActions.svelte';
+  import MessageAttachments from './MessageAttachments.svelte';
   import AgentCards from './AgentCards.svelte';
   import ToolSteps from './ToolSteps.svelte';
 
@@ -203,6 +204,7 @@
           />{/if}
       </div>
     {/if}
+    {#if turn.attachments?.length}<MessageAttachments attachments={turn.attachments} />{/if}
 
     {#if turn.status === 'queued'}
       <p class="note">

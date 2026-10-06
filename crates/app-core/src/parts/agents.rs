@@ -16,10 +16,11 @@ use super::extra::platform_fs;
 use crate::options::{AppOptions, AppPaths};
 use crate::ports::{VoicePort, VoiceUnavailable};
 
-/// Zasoby wyłączne i obsada dla startu przebiegów v1.
+/// Zasoby wyłączne i obsada dla startu przebiegów v1; katalog sesji (prywatność opisu obrazu).
 pub(crate) type Launchers = (
     Arc<dyn scheduler_lite_contract::SchedulerLite>,
     Arc<dyn personas_contract::Personas>,
+    Arc<sessions_impl::SqliteSessions>,
 );
 
 /// Narzędzia agentek i rejestr próśb o zatwierdzenie.
@@ -43,7 +44,7 @@ impl Extra {
         bus: &Arc<dyn EventBus>,
         mut extra: Vec<Arc<dyn tools_common_contract::Tool>>,
         (gui, monitor): (&app_gui::GuiPorts, &Arc<app_gui::GuiMonitor>),
-        (locks, personas): Launchers,
+        (locks, personas, sessions): Launchers,
     ) -> Option<AgentStack> {
         let kernel = self.broker.clone()?;
         let journal = self.undo.clone()?;
@@ -57,6 +58,10 @@ impl Extra {
             Some(bus.clone()),
             monitor,
         ));
+        let media = app_agents::MediaPorts::new(gui, sessions, locks.clone(), paths);
+        let media = media.with(self.routers.as_ref(), self.audio.as_ref());
+        let media = media.exec(self.exec.clone());
+        extra.extend(media.tools(gate.clone(), journal.clone(), platform_fs(options), bus));
         let launch = app_agents::Launch::new(Some(locks), Some(gate), Some(personas));
         // Ta sama instancja, którą Broker zabija procesy (kill-switch, Job Objects).
         let exec = self.exec.clone()?;

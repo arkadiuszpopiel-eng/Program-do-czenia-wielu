@@ -108,3 +108,39 @@ fn secrets_section_in_regular_package_is_skipped() {
         Some(config)
     );
 }
+
+/// Regresja (test przywracania kopii, fala 3): tura z ciągiem podobnym do sekretu jest redagowana,
+/// a nagłówek sesji ma sumę tur **po** redakcji — paczka daje się otworzyć i zaimportować.
+#[test]
+fn session_with_redacted_secret_stays_importable() {
+    use sessions_contract::{NewSession, NewTurn, SessionCatalog, SessionHistory};
+    use transfer_contract::contract_tests::Harness;
+    use transfer_contract::{ExportRequest, ExportScope, Selection};
+
+    let src = common::harness();
+    let meta = src.sessions.create_session(NewSession::default()).unwrap();
+    let leaked = "sk-ant-api03-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    src.sessions
+        .append_turn(&meta.id, None, NewTurn::user(format!("klucz: {leaked}")))
+        .unwrap();
+    let dest = src.path("z-sekretem.alfa");
+    std::fs::create_dir_all(dest.parent().unwrap()).unwrap();
+    let scope = ExportScope {
+        sessions: Selection::Only(vec![meta.id.clone()]),
+        ..ExportScope::default()
+    };
+    let report = src
+        .transfer
+        .export(&ExportRequest::new(scope, dest.clone()))
+        .unwrap();
+    assert!(report.manifest.redactions > 0);
+    let dst = common::harness();
+    let imported = dst
+        .transfer
+        .import(&dest, &ImportOptions::default())
+        .unwrap();
+    assert_eq!(imported.failed, 0, "{imported:?}");
+    let leaf = dst.sessions.active_leaf(&meta.id).unwrap().unwrap();
+    let text = dst.sessions.turn(&meta.id, leaf).unwrap().content.text;
+    assert!(!text.contains(leaked), "{text}");
+}

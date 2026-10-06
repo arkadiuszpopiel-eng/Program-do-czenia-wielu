@@ -11,6 +11,7 @@
   import type { RememberScope, Turn } from '../../api/types';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
+  import { exportConversation } from '../../state/exports';
 
   interface Props {
     turn: Turn;
@@ -74,6 +75,17 @@
         onSelect: () => app.showTimelineFor(turn.id),
       },
       { id: 'hide', label: t('msg.hide'), onSelect: () => void conv.setHidden(turn, true) },
+      {
+        id: 'export-md',
+        label: t('exp.messageMarkdown'),
+        separatorBefore: true,
+        onSelect: () => void exportConversation(app, conv.sessionId, 'markdown', turn.id),
+      },
+      {
+        id: 'export-html',
+        label: t('exp.messageHtml'),
+        onSelect: () => void exportConversation(app, conv.sessionId, 'html', turn.id),
+      },
     );
     return items;
   });

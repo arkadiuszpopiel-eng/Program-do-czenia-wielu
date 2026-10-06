@@ -28,3 +28,8 @@ export class Channel<T> {
     return `__CHANNEL__:${this.id}`;
   }
 }
+
+/** Adres protokołu zasobów (`asset:`) — w generatorze tylko kształt, bez IPC. */
+export function convertFileSrc(path: string): string {
+  return `http://asset.localhost/${encodeURIComponent(path)}`;
+}

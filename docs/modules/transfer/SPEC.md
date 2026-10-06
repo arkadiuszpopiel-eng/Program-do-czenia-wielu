@@ -47,6 +47,7 @@ Eksport 100 MB ≤ 30 s na baseline; RAM ≤ 50 MB (strumieniowo, bez ładowania
 
 ## Konfiguracja (klucze TOML)
 `[transfer] snapshots_keep = 5`, `snapshots_dir = "%LOCALAPPDATA%\\Alfa\\snapshots"`, `[transfer.backup] enabled = false`, `dir`, `schedule = "0 3 * * *"`, `scope = [...]`, `rotation = { daily = 7, weekly = 4 }`, `password_in_credential_manager = false` (F7).
+Realizacja harmonogramu w aplikacji (`app-files`, fala 3): ustawienia kopii per maszyna w `%LOCALAPPDATA%\\Alfa\\state\\backup.json` (`enabled`, `dir` — tylko z natywnego dialogu, `interval_hours` 1–720, `keep` 1–100, `include_artifacts`, `include_logs`, `skip_on_battery`; pełny ekran zawsze pomijany), hasło kopii w Credential Managerze (`transfer/backup-password`); cron i rotacja dzienna/tygodniowa — do decyzji (dziś odstęp w godzinach i jedna rotacja N najnowszych).
 
 ## Wkład do UI
 Ustawienia → Import i eksport (makieta 13): kreator zakresu, dry-run z różnicami, tryby, kolizje, rollback; „eksport sesji do `.alfa`" w panelu Sesje; `/eksport`; krok onboardingu „import paczki z innej maszyny"; głos („Beta, wyeksportuj sesję X").

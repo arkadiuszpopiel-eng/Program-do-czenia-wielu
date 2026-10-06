@@ -85,6 +85,7 @@ impl Extra {
         let launch = (
             scheduler.clone(),
             personas as Arc<dyn personas_contract::Personas>,
+            sessions.clone(),
         );
         let voice = self.voice_port(options, paths, kernel, bus, scheduler, gui.0);
         let broker: Arc<dyn BrokerPort> = match (&options.broker, &self.broker) {

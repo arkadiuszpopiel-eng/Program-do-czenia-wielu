@@ -1,0 +1,22 @@
+[package]
+name = "tools-system-fake"
+description = "tools-system: atrapa narzędzi systemowych — prawdziwe manifesty, walidacja argumentów i odmowy polityki z kontraktu, wyniki skryptowane w pamięci (odczyty oznaczone jako niezaufane), zapis wywołań; bez Brokera i bez systemu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-system-contract = { path = "../tools-system-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-system-contract = { path = "../tools-system-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

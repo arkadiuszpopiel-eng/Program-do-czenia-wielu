@@ -31,6 +31,8 @@ tokio.workspace = true
 # Klient sieci wtyczek: rustls + ring, bez proxy systemowego (docs/vendor/reqwest.md); wersja jak
 # w app-core / providers-api-impl.
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
+# Reguły adresów, resolver bez adresów niepublicznych i budowa klienta — wspólne z tools-net.
+lib-netguard = { path = "../lib-netguard", features = ["client"] }
 
 [dev-dependencies]
 safety-broker-fake = { path = "../safety-broker-fake" }

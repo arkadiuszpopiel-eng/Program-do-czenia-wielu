@@ -493,11 +493,10 @@ sequenceDiagram
 
 ### 13.6 Czego z katalogu §4 jeszcze nie ma
 
-`plugin-runtime` (wtyczki Wasm, ADR 0012), `tools-vision` (OCR), `tools-browser`, `tools-office`, `tools-system`,
-`tools-net`, `tools-media`, `voice-lab` jako narzędzie w UI (są ewaluatory CLI: `alfa-voice-eval`, `alfa-wake-eval`,
-`alfa-speaker-eval`), `voice-transcribe`, adapter chmurowy `voice-s2s`, helper `uiAccess`. W aplikacji nie są jeszcze
-podpięte: okno Brokera, słowa wywoławcze, weryfikacja mówcy, dyktowanie, czytanie zaznaczenia, harmonogram kopii
-zapasowych, pobieranie modeli głosu i sidecarów.
+`voice-lab` jako narzędzie w UI (są ewaluatory CLI: `alfa-voice-eval`, `alfa-wake-eval`, `alfa-speaker-eval`),
+`voice-transcribe`, adapter chmurowy `voice-s2s`, helper `uiAccess`, kamera i mikrofon w `tools-media`, dostawca
+`net_search`. Wszystkie pozostałe moduły katalogu (w tym `plugin-runtime`, `tools-vision/browser/office/system/net/media`)
+istnieją i są podpięte w aplikacji; stan akceptacji fal — `docs/STATUS.md`.
 
 ### 13.7 Otwarte punkty z §12 — stan
 

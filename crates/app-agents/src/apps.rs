@@ -22,6 +22,8 @@ pub struct AppsDeps {
     pub browser_spec: BrowserSpec,
     /// Katalog magazynu wtyczek (`None` — bez wtyczek).
     pub plugins_dir: Option<PathBuf>,
+    /// F6: porty `tools-system` i `tools-net` (`None` — bez narzędzi systemowych i sieciowych).
+    pub sysnet: Option<crate::sysnet::SysNetDeps>,
 }
 
 impl std::fmt::Debug for AppsDeps {
@@ -29,6 +31,7 @@ impl std::fmt::Debug for AppsDeps {
         f.debug_struct("AppsDeps")
             .field("browser_spec", &self.browser_spec)
             .field("plugins_dir", &self.plugins_dir)
+            .field("sysnet", &self.sysnet)
             .finish_non_exhaustive()
     }
 }
@@ -41,6 +44,7 @@ impl AppsDeps {
             browser: Arc::new(CdpBrowser::system(BrowserConfig::default())),
             browser_spec: browser_spec(local),
             plugins_dir: Some(local.join("plugins")),
+            sysnet: Some(crate::sysnet::SysNetDeps::system(local)),
         }
     }
 }

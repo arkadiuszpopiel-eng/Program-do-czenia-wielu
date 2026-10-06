@@ -1,5 +1,6 @@
 //! Rejestr narzędzi agentek w aplikacji: `tools-fs` (11), `tools-shell` (2), `tools-clipboard`
-//! (2, gdy jest schowek), F6: `tools-office` (2) i `tools-browser` (6), F8: narzędzia aktywnych
+//! (2, gdy jest schowek), F6: `tools-office` (2), `tools-browser` (6), `tools-system` (9)
+//! i `tools-net` (2, `net_search` po podpięciu dostawcy), F8: narzędzia aktywnych
 //! wtyczek Wasm (`plugin_*`, liczone przy każdym odczycie — po instalacji/wyłączeniu od razu
 //! aktualne) nad jednym Brokerem i jednym dziennikiem cofania. Narzędzia same proszą Brokera
 //! o tokeny przy każdym wywołaniu; ten moduł tylko je składa i filtruje rolami.
@@ -66,6 +67,7 @@ pub struct AgentTools {
     clipboard: Option<ClipboardTools>,
     browser: Option<BrowserTools>,
     plugins: Option<Arc<PluginsApp>>,
+    system: Option<tools_system_impl::SystemTools>,
 }
 
 impl std::fmt::Debug for AgentTools {
@@ -82,6 +84,14 @@ impl AgentTools {
         let (mut tools, browser, plugins) = match &deps.apps {
             Some(apps) => apps_tools(&deps, apps),
             None => (Vec::new(), None, None),
+        };
+        let system = match deps.apps.as_ref().and_then(|a| a.sysnet.as_ref()) {
+            Some(s) => {
+                let (more, system) = crate::sysnet::sysnet_tools(&deps, s);
+                tools.extend(more);
+                Some(system)
+            }
+            None => None,
         };
         let fs = FsTools::new(FsToolsDeps {
             fs: deps.fs.clone(),
@@ -125,6 +135,7 @@ impl AgentTools {
             clipboard,
             browser,
             plugins,
+            system,
         }
     }
 
@@ -180,6 +191,15 @@ impl AgentTools {
             .filter(|m| m.allowed_for(&groups, read_only))
             .map(|m| m.name.clone())
             .collect()
+    }
+
+    /// Cofa zapis zmiennej użytkownika przez `system_env_set` (krok `undo_id`); bez narzędzi
+    /// systemowych — nieznany krok. Zwraca opis dla UI.
+    pub fn undo_env(&self, id: u64) -> Result<String, tools_system_impl::EnvUndoError> {
+        match &self.system {
+            Some(s) => s.undo_env(id),
+            None => Err(tools_system_impl::EnvUndoError::Unknown(id)),
+        }
     }
 
     /// Cofa zapis schowka (karta „Cofnij"); bez narzędzi schowka — nieznany krok.

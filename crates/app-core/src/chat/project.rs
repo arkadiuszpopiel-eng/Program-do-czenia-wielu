@@ -90,6 +90,7 @@ pub fn turn_dto(
         heard_prefix: turn
             .heard_prefix
             .map(|h| turn.content.text.chars().take(h.chars).collect()),
+        attachments: app_files::attach::turn_attachments(&turn.content.blocks),
     }
 }
 

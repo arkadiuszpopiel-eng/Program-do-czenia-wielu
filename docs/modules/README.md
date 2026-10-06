@@ -159,6 +159,10 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 | [`tools-screen`](tools-screen/SPEC.md)       | F6     | Zrzuty na żądanie z maskowaniem okien Alfy/Brokera, deny-listy i pól haseł.                                |
 | [`tools-office`](tools-office/SPEC.md)       | F6     | Word/Excel przez COM: odczyt (niezaufany) i edycja kopii jako nowa wersja z „Cofnij”; makra wyłączone.     |
 | [`tools-browser`](tools-browser/SPEC.md)     | F6     | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
+| [`tools-system`](tools-system/SPEC.md)       | F6     | Procesy (zakończenie ze strażnikiem celów i tożsamością), usługi przez `system.admin`, Dziennik zdarzeń, zmienne z cofaniem, stan systemu. |
+| [`tools-net`](tools-net/SPEC.md)             | F6     | `net_fetch`/`net_download` tylko https do hostów publicznych, każdy host i przekierowanie przez Brokera, rebinding odrzucany, kwarantanna z SHA-256 i MOTW. |
+| [`tools-vision`](tools-vision/SPEC.md)       | F6     | OCR zrzutu/pliku (`Windows.Media.Ocr`) i opis obrazu przez Router „GUI/wizja”; maskowanie przed OCR i modelem; sesja prywatna tylko lokalnie. |
+| [`tools-media`](tools-media/SPEC.md)         | F6     | Nagłówki multimediów bez ffmpeg, konwersje przez sidecar ffmpeg jako nowy plik z „Cofnij”, odtwarzanie w kolejce mówienia z duckingiem. |
 | [`ui-terminal`](ui-terminal/SPEC.md)         | F4     | Terminal ConPTY sterowany wyłącznie przez użytkownika (logowanie do CLI); treść poza logami i zdarzeniami. |
 
 ### Samonaprawa i ulepszanie
@@ -180,6 +184,5 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 
 ### Moduły z planu bez SPEC-a
 
-`tools-vision`, `tools-system`, `tools-net`, `tools-media`
-(F6), `voice-lab` i `voice-transcribe` — SPEC powstaje przed falą, w której moduł jest budowany. Korzeń kompozycji
+`voice-lab` i `voice-transcribe` — SPEC powstaje przed falą, w której moduł jest budowany. Korzeń kompozycji
 `app-*` i biblioteki `lib-*` nie mają SPEC-ów (opis w `crates/README.md` i `docs/ARCHITECTURE.md` §13).

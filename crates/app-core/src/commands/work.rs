@@ -2,18 +2,19 @@
 //! (`builder_*`), „Zdrowia systemu" (`health_*`, `improver_*`, `evals_*`), aktualizacji
 //! (`updates_*`), wtyczek (`plugins_*`) i modeli (`models_*`, `embed_model_activate`,
 //! `search_reindex_*`) — delegują do `app-gui`, `app-terminal`, `app-skills`, `app-health`,
-//! `app-updates`, `app-plugins`, `app-models` (działania jako użytkownik w UI).
+//! `app-updates`, `app-plugins`, `app-models`, `app-files` (działania jako użytkownik w UI).
 
 use std::sync::Arc;
 
 use crate::core::AppCore;
 use crate::dto::{
-    AboutInfo, AgentDraft, BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView,
-    BuilderPreview, BuilderProposal, BuilderSaved, EmbedderView, EvalSuiteView, EvalsView,
+    AboutInfo, AgentDraft, AttachmentInfo, AttachmentsAdded, BackupCheck, BackupConfig, BackupView,
+    BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView, BuilderPreview,
+    BuilderProposal, BuilderSaved, ConversationFormat, EmbedderView, EvalSuiteView, EvalsView,
     ExportResult, GuiScreenshot, GuiStatus, HealthView, ImproverView, ModelItem, ModelsView,
-    PluginInfo, PluginInspection, PluginsView, ReindexView, SkillImportResult, SkillInfo,
-    SkillReview, TaskInfo, TerminalProfileId, TerminalSession, TrustedHashes, UpdatesView,
-    WhatsNew,
+    PluginInfo, PluginInspection, PluginsView, ReindexView, SecretInput, SkillImportResult,
+    SkillInfo, SkillReview, TaskInfo, TerminalProfileId, TerminalSession, TrustedHashes,
+    UpdatesView, WhatsNew,
 };
 use crate::error::AppError;
 
@@ -97,9 +98,27 @@ work_commands! {
     wait search_reindex_start() -> ReindexView = models.reindex_start();
     wait search_reindex_cancel() -> ReindexView = models.reindex_cancel();
     wait search_reindex_status() -> ReindexView = models.reindex_status();
+    wait attachments_pick(session_id: String) -> AttachmentsAdded = files.attachments_pick(&session_id);
+    wait attachments_add_dropped(session_id: String) -> AttachmentsAdded = files.attachments_add_dropped(&session_id);
+    wait attachments_paste(session_id: String) -> AttachmentsAdded = files.attachments_paste(&session_id);
+    res attachments_list(session_id: String) -> Vec<AttachmentInfo> = files.attachments_list(&session_id);
+    res attachments_remove(session_id: String, attachment_id: String) -> Vec<AttachmentInfo> = files.attachments_remove(&session_id, &attachment_id);
+    wait sessions_export_conversation(session_id: String, format: ConversationFormat, turn_id: Option<String>) -> ExportResult = files.export_conversation(&session_id, format, turn_id);
+    ok backups_status() -> BackupView = files.backups_status();
+    res backups_configure(config: BackupConfig) -> BackupView = files.backups_configure(config);
+    wait backups_choose_dir() -> BackupView = files.backups_choose_dir();
+    res backups_set_password(password: Option<SecretInput>) -> BackupView = files.backups_set_password(password);
+    wait backups_run_now() -> BackupView = files.backups_run_now();
+    wait backups_verify(file: String) -> BackupCheck = files.backups_verify(&file);
 }
 
 impl AppCore {
+    /// Powłoka: pliki upuszczone na okno główne (ścieżki z systemu — pobiera je
+    /// `attachments_add_dropped`; UI nie podaje ścieżek).
+    pub fn attachments_dropped(&self, paths: Vec<std::path::PathBuf>) {
+        self.inner.work.files.dropped(paths);
+    }
+
     /// `gui_stop`: „Zatrzymaj sterowanie" — anuluje trwające akcje GUI i przebiegi sterujących
     /// agentek, narzędzia GUI wstrzymane do `gui_release` (właściciel przejmuje mysz i klawiaturę).
     pub async fn gui_stop(&self) -> Result<GuiStatus, AppError> {

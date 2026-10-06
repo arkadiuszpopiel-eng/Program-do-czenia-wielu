@@ -273,22 +273,33 @@ dependencies = [
  "agent-runtime-contract",
  "agent-runtime-impl",
  "app-api",
+ "app-gui",
+ "app-modules",
  "app-plugins",
  "async-trait",
  "chrono",
  "compliance-contract",
  "core-bus-contract",
  "futures-util",
+ "lib-media",
  "personas-contract",
  "platform-apps-contract",
  "platform-contract",
+ "platform-windows-gui-impl",
+ "platform-windows-impl",
+ "platform-windows-ocr-impl",
  "platform-windows-office-impl",
+ "platform-windows-sys-impl",
  "providers-contract",
  "risk-classifier-contract",
+ "router-contract",
+ "router-impl",
  "safety-broker-contract",
  "scheduler-contract",
+ "scheduler-lite-contract",
  "serde",
  "serde_json",
+ "sessions-contract",
  "skills-contract",
  "tokio",
  "tools-browser-contract",
@@ -298,11 +309,21 @@ dependencies = [
  "tools-common-contract",
  "tools-fs-contract",
  "tools-fs-impl",
+ "tools-media-contract",
+ "tools-media-impl",
+ "tools-net-contract",
+ "tools-net-impl",
  "tools-office-contract",
  "tools-office-impl",
  "tools-shell-contract",
  "tools-shell-impl",
+ "tools-system-contract",
+ "tools-system-impl",
+ "tools-vision-contract",
+ "tools-vision-impl",
  "undo-journal-contract",
+ "voice-audio-contract",
+ "voice-audio-impl",
  "watchdog-contract",
 ]
 
@@ -388,9 +409,11 @@ dependencies = [
  "app-api",
  "app-bridges",
  "app-broker",
+ "app-files",
  "app-gui",
  "app-health",
  "app-memory",
+ "app-models",
  "app-modules",
  "app-plugins",
  "app-skills",
@@ -468,6 +491,30 @@ dependencies = [
  "voice-tts-contract",
  "voice-tts-impl",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-files"
+version = "0.0.1"
+dependencies = [
+ "accounts-hub-contract",
+ "app-api",
+ "app-modules",
+ "artifacts-contract",
+ "base64 0.22.1",
+ "chrono",
+ "compliance-contract",
+ "lib-markdown",
+ "platform-contract",
+ "platform-windows-impl",
+ "providers-contract",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+ "tokio",
+ "tools-common-contract",
+ "tracing",
+ "transfer-contract",
 ]
 
 [[package]]
@@ -551,6 +598,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-models"
+version = "0.0.1"
+dependencies = [
+ "app-api",
+ "core-config-contract",
+ "flate2",
+ "futures-util",
+ "lib-embed",
+ "lib-sqlstore",
+ "memory-contract",
+ "memory-impl",
+ "model-residency-contract",
+ "providers-local-impl",
+ "reqwest 0.12.28",
+ "search-contract",
+ "search-impl",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "updater-contract",
+ "zip",
+]
+
+[[package]]
 name = "app-modules"
 version = "0.0.1"
 dependencies = [
@@ -606,6 +680,7 @@ dependencies = [
  "compliance-contract",
  "core-bus-contract",
  "core-registry-contract",
+ "lib-netguard",
  "platform-contract",
  "plugin-runtime-contract",
  "plugin-runtime-impl",
@@ -3781,12 +3856,48 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 
 [[package]]
+name = "lib-embed"
+version = "0.0.1"
+dependencies = [
+ "model-residency-contract",
+ "regex",
+ "search-contract",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.21",
+ "tract-onnx",
+ "unicode-normalization",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "lib-markdown"
 version = "0.0.1"
 dependencies = [
  "ammonia",
  "pulldown-cmark",
  "serde",
+]
+
+[[package]]
+name = "lib-media"
+version = "0.0.1"
+dependencies = [
+ "platform-contract",
+ "schemars 1.2.2",
+ "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "lib-netguard"
+version = "0.0.1"
+dependencies = [
+ "reqwest 0.12.28",
+ "thiserror 2.0.21",
+ "tokio",
+ "url",
 ]
 
 [[package]]
@@ -5060,6 +5171,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "platform-windows-ocr-impl"
+version = "0.0.1"
+dependencies = [
+ "tools-vision-contract",
+ "windows",
+]
+
+[[package]]
 name = "platform-windows-office-impl"
 version = "0.0.1"
 dependencies = [
@@ -5082,6 +5201,7 @@ dependencies = [
 name = "platform-windows-sys-impl"
 version = "0.0.1"
 dependencies = [
+ "platform-apps-contract",
  "platform-contract",
  "windows",
 ]
@@ -7760,6 +7880,79 @@ dependencies = [
 ]
 
 [[package]]
+name = "tools-media-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "lib-media",
+ "risk-classifier-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tokio-util",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-media-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-registry-contract",
+ "lib-media",
+ "personas-contract",
+ "platform-contract",
+ "safety-broker-contract",
+ "scheduler-lite-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-media-contract",
+ "tracing",
+ "undo-journal-contract",
+ "uuid",
+ "voice-audio-contract",
+]
+
+[[package]]
+name = "tools-net-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "lib-netguard",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-net-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-registry-contract",
+ "lib-netguard",
+ "platform-apps-contract",
+ "reqwest 0.12.28",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "tools-common-contract",
+ "tools-net-contract",
+]
+
+[[package]]
 name = "tools-office-contract"
 version = "0.0.1"
 dependencies = [
@@ -7855,6 +8048,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "tools-system-contract"
+version = "0.0.1"
+dependencies = [
+ "platform-apps-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-system-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "platform-apps-contract",
+ "platform-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tokio",
+ "tools-common-contract",
+ "tools-system-contract",
+]
+
+[[package]]
 name = "tools-uia-contract"
 version = "0.0.1"
 dependencies = [
@@ -7880,6 +8105,44 @@ dependencies = [
  "tokio",
  "tools-common-contract",
  "tools-uia-contract",
+ "tools-window-contract",
+]
+
+[[package]]
+name = "tools-vision-contract"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "providers-contract",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tools-common-contract",
+ "tools-screen-contract",
+]
+
+[[package]]
+name = "tools-vision-impl"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "compliance-contract",
+ "core-bus-contract",
+ "core-registry-contract",
+ "futures-util",
+ "lib-media",
+ "platform-contract",
+ "providers-contract",
+ "safety-broker-contract",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-screen-contract",
+ "tools-vision-contract",
  "tools-window-contract",
 ]
 

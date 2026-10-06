@@ -7,6 +7,8 @@ import { STANDARD_CAST, type FakeCore } from './core';
 import { session as makeSession, turn as makeTurn } from './fixtures';
 import { pickResponse, quickResponse, type ResponseScript } from './responses';
 import { FakeStreamer } from './stream';
+import { takeStaged } from './api-files';
+import type { TurnAttachment } from '../types-files';
 
 export class FakeChat {
   readonly streamer: FakeStreamer;
@@ -119,6 +121,7 @@ export class FakeChat {
     parentId: string | null,
     text: string,
     addressed: AgentId | null,
+    attachments: readonly TurnAttachment[] = [],
   ): Turn {
     const { core } = this;
     const queued = !core.status.online;
@@ -132,6 +135,7 @@ export class FakeChat {
       {
         addressed_to: addressed,
         status: queued ? 'queued' : 'complete',
+        ...(attachments.length ? { attachments } : {}),
       },
     );
     core.turnsOf(sessionId).push(turn);
@@ -159,11 +163,18 @@ export class FakeChat {
             new Error('Nie udało się zapisać wiadomości (atrapa: send-error).'),
           );
         }
+        let attachments;
+        try {
+          attachments = takeStaged(core, sessionId, options.attachments);
+        } catch (error) {
+          return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+        }
         const user = this.appendUser(
           sessionId,
           options.parent_id,
           options.text,
           options.addressed_to,
+          attachments,
         );
         const assistant =
           user.status === 'queued'

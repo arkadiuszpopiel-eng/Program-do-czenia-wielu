@@ -1,0 +1,19 @@
+# Manifest narzędzi tools-net (docs/modules/tools-net/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Zdolności z tokenów Brokera: `net.egress(host)` dla każdego hosta (także po przekierowaniu na inny
+# host), `fs.write(kwarantanna sesji)` przy pobieraniu.
+id = "tools-net"
+version = "0.0.1"
+kind = "tool"
+provides = ["tools-net-contract@1"]
+requires = ["tools-common-contract@1", "platform-apps-contract@1", "safety-broker-contract@1", "core-bus-contract@1"]
+capabilities = ["net.egress(host)", "fs.write(kwarantanna-sesji)"]
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+ram_mb = 8
+cpu_pct = 5
+
+[health]
+check = "ping"
+interval_s = 60

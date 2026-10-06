@@ -39,6 +39,8 @@ pub(crate) struct WorkStack {
     pub plugins: Arc<app_plugins::PluginsApp>,
     /// Modele i silniki, embedder wyszukiwania (`app-models`).
     pub models: Arc<app_models::ModelsApp>,
+    /// Załączniki, eksport rozmowy, kopie zapasowe (`app-files`).
+    pub files: Arc<app_files::FilesApp>,
 }
 
 /// Porty GUI i panel „Ekran" (przed narzędziami agentek).
@@ -73,6 +75,7 @@ pub(crate) struct WorkDepsIn<'a> {
     pub personas: Arc<dyn personas_contract::Personas>,
     pub stack: Option<&'a super::AgentStack>,
     pub updater: Arc<updater_impl::FsUpdater>,
+    pub files: app_files::FilesDeps,
 }
 
 impl Built {
@@ -156,7 +159,11 @@ impl Built {
             embed,
             options: app_models::ModelsOptions::default(),
         });
+        if let (Some(docs), Some(a)) = (&self.extra.artifact_docs, &self.artifacts) {
+            docs.bind(a.clone(), d.files.sessions.clone());
+        }
         let stack = WorkStack {
+            files: app_files::FilesApp::open(d.files),
             models,
             plugins,
             updates,

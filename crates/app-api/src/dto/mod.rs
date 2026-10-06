@@ -11,6 +11,7 @@ mod bridges;
 mod broker;
 mod common;
 mod events;
+mod files;
 mod gui;
 mod health;
 mod hub;
@@ -37,6 +38,11 @@ pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };
 pub use events::{AlfaEvent, StopReason, ToastKind};
+pub use files::{
+    AttachmentDelivery, AttachmentInfo, AttachmentKind, AttachmentRejectReason,
+    AttachmentRejection, AttachmentsAdded, BackupCheck, BackupConfig, BackupEntry, BackupView,
+    ConversationFormat, TurnAttachment,
+};
 pub use gui::{
     GuiAction, GuiActionStatus, GuiControl, GuiScreenshot, GuiShotInfo, GuiStatus, TerminalFrame,
     TerminalProfileId, TerminalSession,

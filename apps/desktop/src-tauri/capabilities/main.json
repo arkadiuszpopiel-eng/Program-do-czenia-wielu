@@ -200,6 +200,18 @@
     "allow-embed-model-activate",
     "allow-search-reindex-start",
     "allow-search-reindex-cancel",
-    "allow-search-reindex-status"
+    "allow-search-reindex-status",
+    "allow-attachments-pick",
+    "allow-attachments-add-dropped",
+    "allow-attachments-paste",
+    "allow-attachments-list",
+    "allow-attachments-remove",
+    "allow-sessions-export-conversation",
+    "allow-backups-status",
+    "allow-backups-configure",
+    "allow-backups-choose-dir",
+    "allow-backups-set-password",
+    "allow-backups-run-now",
+    "allow-backups-verify"
   ]
 }

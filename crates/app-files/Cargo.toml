@@ -1,0 +1,47 @@
+[package]
+name = "app-files"
+description = "Pliki w aplikacji (kategoria app-*): załączniki composera (wybór, przeciągnięcie, wklejenie; kopia w katalogu sesji, limity, szacunek tokenów, artefakty tury, projekcja dla modelu jako treść niezaufana), eksport rozmowy do Markdown/HTML, kopie zapasowe .alfa z harmonogramem i rotacją, artefakty sesji w paczkach .alfa"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `transfer-contract` (kopie zapasowe), `artifacts-contract`
+# (załączniki jako artefakty sesji), `sessions-contract` (eksport rozmowy) i `lib-markdown`
+# (HTML eksportu renderowany w Rust); używa jej `app-core` (komendy, wysyłanie tury, projekcja historii).
+[dependencies]
+app-api = { path = "../app-api" }
+# Deny-listy ścieżek i katalogi danych Alfy (te same co dla katalogu roboczego agentek).
+app-modules = { path = "../app-modules" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+artifacts-contract = { path = "../artifacts-contract" }
+compliance-contract = { path = "../compliance-contract" }
+lib-markdown = { path = "../lib-markdown" }
+providers-contract = { path = "../providers-contract" }
+sessions-contract = { path = "../sessions-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+transfer-contract = { path = "../transfer-contract" }
+platform-contract.workspace = true
+# Schowek systemowy (wklejanie plików i obrazów), gdy kompozycja nie podała własnego portu.
+platform-windows-impl = { path = "../platform-windows-impl" }
+base64 = "0.22.1"
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt", "time", "sync"] }
+tracing.workspace = true
+
+[dev-dependencies]
+accounts-hub-fake = { path = "../accounts-hub-fake" }
+artifacts-fake = { path = "../artifacts-fake" }
+sessions-fake = { path = "../sessions-fake" }
+transfer-impl = { path = "../transfer-impl" }
+semver.workspace = true
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true

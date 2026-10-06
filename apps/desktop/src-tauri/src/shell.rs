@@ -153,6 +153,38 @@ impl ShellPort for TauriShell {
         picked(dialog.blocking_pick_folder())
     }
 
+    fn pick_files(&self) -> Result<Vec<PathBuf>, AppError> {
+        let dialog = self
+            .app
+            .dialog()
+            .file()
+            .set_title("Dołącz pliki do wiadomości");
+        dialog
+            .blocking_pick_files()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|p| {
+                p.into_path()
+                    .map_err(|e| AppError::internal(format!("okno wyboru pliku: {e}")))
+            })
+            .collect()
+    }
+
+    fn pick_save_file(
+        &self,
+        suggested_name: &str,
+        filter: &str,
+        extensions: &[&str],
+    ) -> Result<Option<PathBuf>, AppError> {
+        let dialog = self
+            .app
+            .dialog()
+            .file()
+            .add_filter(filter, extensions)
+            .set_file_name(suggested_name);
+        picked(dialog.blocking_save_file())
+    }
+
     fn open_terminal(&self, cwd: &Path, shell: &str) -> Result<(), AppError> {
         let exe = shell_exe(shell)?;
         if !cwd.is_dir() {

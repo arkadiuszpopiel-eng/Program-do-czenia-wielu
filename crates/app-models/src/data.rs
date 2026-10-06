@@ -280,6 +280,23 @@ fn sidecars() -> Vec<ItemSpec> {
                 "Manual install: the wrapper is built separately (ADR 11), models in models/pocket-tts.",
             ),
         ),
+        // `tools-media`: konwersje (`media_convert`, odtwarzanie innych formatów niż WAV) — bez
+        // pobierania automatycznego; build i licencja do potwierdzenia przez człowieka.
+        item(
+            "sidecar-ffmpeg",
+            ModelItemKind::Sidecar,
+            "ffmpeg (konwersje multimediów)",
+            "LGPL-2.1+ albo GPL-2.0+ (zależnie od buildu)",
+            "https://ffmpeg.org/download.html",
+            (Root::Sidecars, "ffmpeg"),
+            Vec::new(),
+            Install::Manual(vec![exe("ffmpeg")]),
+            false,
+            (
+                "Instalacja ręczna: skopiuj ffmpeg.exe (build do potwierdzenia) do sidecars/ffmpeg.",
+                "Manual install: copy ffmpeg.exe (build to be confirmed) into sidecars/ffmpeg.",
+            ),
+        ),
     ]
 }
 

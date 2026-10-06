@@ -4,6 +4,7 @@
 // generowanymi 1:1; do tego czasu jest jedynym miejscem definicji kształtu danych w UI.
 import type { AgentId, RiskLevel } from '@alfa/ui-kit';
 import type { ToolIntent } from './types-agents';
+import type { TurnAttachment } from './types-files';
 
 export type Locale = 'pl' | 'en';
 /** Data i czas w RFC 3339 (UTC). */
@@ -152,6 +153,8 @@ export interface Turn {
   truncated: boolean;
   /** Odpowiedź głosowa przerwana: tekst, który usłyszał użytkownik (`null` = cała). */
   heard_prefix: string | null;
+  /** Załączniki tury (artefakty sesji); pole pomijane, gdy brak. */
+  readonly attachments?: readonly TurnAttachment[];
 }
 
 /** Adnotacje widoku — osobne rekordy dziennika, nie zmieniają tury. */
@@ -170,6 +173,8 @@ export interface SendOptions {
   readonly text: string;
   readonly addressed_to: AgentId | null;
   readonly profile: ModelProfile | null;
+  /** Identyfikatory załączników przygotowanych w composerze (`attachments_*`); pomijane, gdy brak. */
+  readonly attachments?: readonly string[];
 }
 
 export interface SendResult {

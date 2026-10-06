@@ -5,6 +5,7 @@ import { stepZoom } from '../logic/layout';
 import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
 import { RESERVED, allowedInInput, chordFromEvent } from '../logic/shortcuts';
 import type { AppState } from './app.svelte';
+import { exportConversation } from './exports';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.agents': 'agents',
@@ -27,6 +28,8 @@ export const EXTRA_COMMANDS = [
   'action.cast',
   'action.stopGeneration',
   'action.onboarding',
+  'action.exportMarkdown',
+  'action.exportHtml',
 ] as const;
 
 const ONBOARDING_ALLOWED = new Set([
@@ -167,6 +170,10 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.onboarding':
       app.view = 'onboarding';
+      break;
+    case 'action.exportMarkdown':
+    case 'action.exportHtml':
+      void exportConversation(app, sid, id === 'action.exportHtml' ? 'html' : 'markdown');
       break;
   }
 }

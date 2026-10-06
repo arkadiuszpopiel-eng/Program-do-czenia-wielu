@@ -41,6 +41,7 @@ impl AppCore {
         app_memory::spawn_bridge(self.inner.bus.clone(), self.inner.events.clone()).await;
         self.spawn_task_bridges().await;
         self.spawn_updates(self.inner.healthy_after);
+        self.inner.work.files.start();
     }
 
     /// Zadania: zdarzenia `scheduler.*`/`triggers.*`/`marshal.*` → UI, DND z `voice-wake` →

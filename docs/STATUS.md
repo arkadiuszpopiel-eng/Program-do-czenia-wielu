@@ -1,6 +1,6 @@
 # STATUS.md — macierz akceptacji fal F0–F9
 
-Stan na **2026-10-03**, gałąź `ccr-af4b63c6-3fyzaj`, HEAD `51cbe91` (2026-10-02). Kryteria i progi:
+Stan na **2026-10-06**, gałąź `ccr-af4b63c6-3fyzaj` (po `0d31755` + fala 3: `tools-system/net/vision/media`, załączniki, kopie zapasowe, eksport rozmowy). Kryteria i progi:
 `docs/ACCEPTANCE.md` (ten plik ich nie zmienia). Dowody sprawdzone w repo (`grep` po nazwach testów i plików);
 liczby z opisów commitów i README zestawów `evals/`.
 
@@ -162,7 +162,7 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
 
 | ID    | Kryterium                                               | Status | Dowód / co dalej                                                                                                                                                                                                                                                                                                                                                         |
 | ----- | ------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| F6-01 | Własny zestaw ≥ 50 zadań: ≥ 85 % w każdej z 5 kategorii | ⛔     | Brak `evals/F6/tasks/`, VM i „mózgu” (klucz albo most); brak modułów `tools-browser`, `tools-office`, `tools-vision` (OCR), `tools-system/net/media`. Bramki #1, #8.                                                                                                                                                                                                     |
+| F6-01 | Własny zestaw ≥ 50 zadań: ≥ 85 % w każdej z 5 kategorii | ⛔     | Brak `evals/F6/tasks/`, VM i „mózgu” (klucz albo most). Moduły gotowe i podpięte w `app-agents`: `tools-browser`, `tools-office`, `tools-vision` (OCR, opis obrazu), `tools-system`, `tools-net`, `tools-media`. Bramki #1, #8.                                                                                                                                                                                                     |
 | F6-02 | Benchmark zewnętrzny ≥ wynik modelu − 5 pp              | ⛔     | Nieprzygotowany (dostępność OSWorld / Windows Agent Arena do weryfikacji).                                                                                                                                                                                                                                                                                               |
 | F6-03 | Macierz aplikacja × trasa                               | ⛔     | Spike (c) i `evals/F6/app-matrix.md` niewykonane.                                                                                                                                                                                                                                                                                                                        |
 | F6-04 | Weryfikacja po każdej akcji GUI                         | ✅     | `tools-uia-impl/tests/uia.rs::actions_are_verified_and_passwords_never_set`, `tools-window-impl/tests/window.rs::move_and_state_are_verified`, `tools-input-impl/tests/input.rs`.                                                                                                                                                                                        |
@@ -226,14 +226,17 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
    brakuje pomiaru progu F7-02 na prawdziwym modelu e5-small i przypiętych SHA-256 w `lib_embed::CATALOG`.
 5. **Aktualizator**: pełny cykl (pobieranie ze wznawianiem, minisign, rollback, instalator NSIS) gotowy; brak klucza minisign i testu instalatora na Windows — F3-10.
 6. **Test zamkniętego portu CDP** w buildzie produkcyjnym — F3-13.
-7. **Brakujące moduły**: helper `uiAccess` (F6-07), `tools-vision/system/net/media` (F6). `plugin-runtime`, `tools-office` i `tools-browser` są gotowe i podpięte w aplikacji (strona „Wtyczki”, narzędzia ról, MCP v1).
+7. **Brakujące moduły**: helper `uiAccess` (F6-07). `plugin-runtime`, `tools-office`, `tools-browser`, `tools-vision`, `tools-system`,
+   `tools-net` i `tools-media` są gotowe i podpięte w aplikacji; prawdziwy `Windows.Media.Ocr`, ffmpeg (do potwierdzenia: build i licencja)
+   i odtwarzanie WASAPI sprawdzone tylko na atrapach — test na self-hosted Windows; `net_search` czeka na wybór dostawcy.
 8. **Brakujące zestawy** (tworzy model-recenzent, akceptuje człowiek): `evals/F3/redteam/`, `evals/F3/mvp-scenario.md`,
    `evals/F4/bridge-fixtures/`, `evals/F6/tasks/`, `evals/F6/app-matrix.md`, `evals/F7/alfa-full/`,
    `evals/F7/migrations/`, `evals/F8/wasm-malicious/`, `evals/F9/pentest.md`, 20 promptów PL dla F1-03.
 9. **CI**: wszystkie joby zielone na `f7bd2df` (Linux, Windows, Powłoka Tauri, UI, cargo-deny, Dokumentacja); przy porażce testów log joba kończy się podsumowaniem paniki.
-10. Drobne: harmonogram kopii zapasowych i eksport artefaktów/logów/nakładki maszyny wyłączone w UI; załączniki
-    w composerze; własny pasek tytułu z Mica i Snap Layouts (spike j); generator typów TS (ADR 13) — dziś typy
-    ręczne z testem round-trip DTO.
+10. Drobne: własny pasek tytułu z Mica i Snap Layouts (spike j); generator typów TS (ADR 13) — dziś typy ręczne
+    z testem round-trip DTO; eksport rozmowy do PDF (dziś MD/HTML — HTML drukowalny do PDF); zrzut ekranu z composera.
+    Załączniki w composerze, eksport rozmowy MD/HTML, kopie zapasowe z harmonogramem i eksport artefaktów/logów/
+    nakładki maszyny są w `app-files` (fala 3) — przeciąganie plików i dialogi powłoki do sprawdzenia na Windows.
 
 ## Co musi zrobić człowiek (w kolejności priorytetu)
 

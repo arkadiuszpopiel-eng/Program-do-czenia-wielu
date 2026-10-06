@@ -211,6 +211,7 @@ async fn local_profile_with_api_keys_needs_local_model() {
             sid.clone(),
             SendOptions {
                 profile: Some(ModelProfile::Local),
+                attachments: Vec::new(),
                 ..send("Lokalnie", None)
             },
         )

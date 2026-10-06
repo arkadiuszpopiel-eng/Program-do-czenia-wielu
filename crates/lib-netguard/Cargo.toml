@@ -1,0 +1,32 @@
+[package]
+name = "lib-netguard"
+description = "Wspólna biblioteka (bez logiki modułu): ochrona ruchu sieciowego agentek i wtyczek — klasyfikacja adresów publicznych (IPv4/IPv6, mapowane, NAT64, 6to4), walidacja URL parserem WHATWG (tylko https, bez danych logowania i hostów lokalnych), przekierowania bez obniżenia schematu, resolver DNS odrzucający adresy niepubliczne (rebinding) i klient reqwest bez proxy i przekierowań"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Klient HTTPS (`reqwest` + resolver); część czysta (adresy, URL) działa bez tej cechy, więc
+# kontrakty mogą z niej korzystać bez ciągnięcia stosu sieciowego.
+client = ["dep:reqwest", "dep:tokio"]
+
+[dependencies]
+thiserror.workspace = true
+# Ten sam parser URL co klient (`reqwest::Url` = `url::Url`) — brak rozjazdu interpretacji adresu
+# między walidacją a połączeniem (SSRF przez różnice parserów). Wersja z Cargo.lock.
+url = "2.5.8"
+# Klient sieci: rustls + certyfikaty systemu, bez proxy systemowego (docs/vendor/reqwest.md); wersja
+# jak w app-plugins / providers-api-impl.
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"], optional = true }
+tokio = { workspace = true, features = ["net"], optional = true }
+
+[dev-dependencies]
+proptest.workspace = true
+tokio = { workspace = true, features = ["net", "macros", "rt-multi-thread"] }
+
+[lints]
+workspace = true

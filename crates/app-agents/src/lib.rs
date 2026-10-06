@@ -4,7 +4,10 @@
 //!   i `tools-browser` ([`AppsDeps`]: Word/Excel przez COM, przeglądarka Alfy z profilem
 //!   i kwarantanną w `%LOCALAPPDATA%\Alfa\browser`) oraz narzędzia wtyczek Wasm (`app-plugins`)
 //!   nad jednym Brokerem (zwykle [`TicketLog`]) i dziennikiem cofania, filtr narzędzi rolami obsady,
-//!   kill-switch zamykający przeglądarki;
+//!   kill-switch zamykający przeglądarki; F6 `tools-system` i `tools-net` ([`SysNetDeps`]: procesy,
+//!   usługi, Dziennik zdarzeń, zmienne, stan systemu, `net_fetch`/`net_download` z kwarantanną);
+//!   F6 `tools-vision` i `tools-media` ([`MediaPorts`]: OCR, opis obrazu przez Router z tagiem
+//!   prywatności sesji, nagłówki multimediów, ffmpeg jako sidecar, odtwarzanie w kolejce mówienia);
 //! - [`TicketLog`] — przezroczysty dekorator Brokera zapamiętujący fakty próśb o zatwierdzenie
 //!   (karta „czeka na zatwierdzenie");
 //! - [`run_spec`] / [`AgentSettings`] — `RunSpec` z obsady i Ustawień → Agentki (budżety kroków,
@@ -24,9 +27,11 @@ pub mod eval;
 mod family;
 mod launch;
 mod map;
+mod media;
 mod project;
 mod runner;
 mod spec;
+mod sysnet;
 mod tickets;
 mod toolset;
 
@@ -34,12 +39,15 @@ pub use apps::{AppsDeps, browser_spec};
 pub use family::{ChildInfo, FamilyProjector, RunFamily};
 pub use launch::{Launch, SkillCall};
 pub use map::{FinalText, final_text, short};
+pub use media::{MediaPorts, ffmpeg_path};
 pub use project::{Projection, RunContext, RunProjector};
 pub use runner::{RunFeed, RunHandle};
 pub use spec::{AgentSettings, NO_WINDOW_APPROVAL_CAP_S, SpecInput, keys, run_spec};
+pub use sysnet::{SysNetDeps, sysnet_guard};
 pub use tickets::{TicketLog, TicketNote};
 pub use tools_clipboard_contract::ClipboardUndoError;
 pub use tools_shell_contract::ShellToolsConfig;
+pub use tools_system_impl::EnvUndoError;
 pub use toolset::{AgentTools, ToolsDeps};
 
 /// Manifesty modułów składanych przez ten crate (identyfikator → `module.toml`) — rejestr
@@ -50,5 +58,9 @@ pub const MODULES: &[(&str, &str)] = &[
     ("tools-clipboard", tools_clipboard_impl::MODULE_TOML),
     ("tools-office", tools_office_impl::MODULE_TOML),
     ("tools-browser", tools_browser_impl::MODULE_TOML),
+    ("tools-system", tools_system_impl::MODULE_TOML),
+    ("tools-net", tools_net_impl::MODULE_TOML),
+    ("tools-vision", tools_vision_impl::MODULE_TOML),
+    ("tools-media", tools_media_impl::MODULE_TOML),
     ("agent-runtime", agent_runtime_impl::MODULE_TOML),
 ];

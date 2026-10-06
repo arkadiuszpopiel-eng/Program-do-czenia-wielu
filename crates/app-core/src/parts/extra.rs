@@ -66,6 +66,8 @@ pub(crate) struct Extra {
     pub exec: Option<Arc<dyn platform_contract::ExecPort>>,
     pub undo: Option<Arc<UndoService>>,
     pub transfer: Option<Arc<ZipTransfer>>,
+    /// Artefakty sesji w paczkach `.alfa` (rejestr wiązany później — `parts/work.rs`).
+    pub artifact_docs: Option<Arc<app_files::ArtifactDocuments>>,
     pub audio: Option<Arc<VoiceAudioModule>>,
     pub tts_module: Option<Arc<VoiceTtsModule>>,
     pub tts: Option<Arc<dyn Tts>>,
@@ -267,6 +269,9 @@ impl Extra {
             Category::Logs,
             store(deps.paths.logs(), DirFilter::flat(&["ndjson"])),
         );
+        let docs = app_files::ArtifactDocuments::new(deps.paths.workdirs().join("Import"), 1 << 28);
+        documents.insert(Category::Artifacts, docs.clone() as Arc<dyn DocumentStore>);
+        self.artifact_docs = Some(docs);
         if let Some((memory, privacy)) = &deps.memory {
             let docs = app_memory::MemoryDocuments::new(memory.clone(), privacy.clone());
             documents.insert(Category::Memory, Arc::new(docs) as Arc<dyn DocumentStore>);

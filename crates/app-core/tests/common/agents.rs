@@ -84,6 +84,7 @@ pub fn to_delta(text: &str) -> SendOptions {
         text: text.into(),
         addressed_to: Some("delta".into()),
         profile: None,
+        attachments: Vec::new(),
     }
 }
 

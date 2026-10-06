@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use personas_contract::Personas;
 use sessions_contract::{
-    Author, NewTurn, Role, SessionCatalog, SessionHistory, SessionId, SessionPatch, TurnId,
+    Author, Block, NewTurn, Role, SessionCatalog, SessionHistory, SessionId, SessionPatch, TurnId,
 };
 
 use crate::chat::project::{author_of, turn_dto};
@@ -74,15 +74,18 @@ impl AppCore {
         sibling_of: Option<TurnId>,
         text: &str,
         addressed: Option<String>,
+        blocks: Vec<Block>,
     ) -> Result<(TurnId, bool), AppError> {
         let text = text.trim();
-        if text.is_empty() {
+        if text.is_empty() && blocks.is_empty() {
             return Err(AppError::invalid("Wiadomość jest pusta."));
         }
         let first = self.inner.sessions.turn_count(id)? == 0;
+        let mut user = NewTurn::user(text);
+        user.content.blocks = blocks;
         let turn = match sibling_of {
-            Some(of) => self.inner.sessions.fork_from(id, of, NewTurn::user(text))?,
-            None => self.append_child(id, parent, NewTurn::user(text))?,
+            Some(of) => self.inner.sessions.fork_from(id, of, user)?,
+            None => self.append_child(id, parent, user)?,
         };
         let meta = TurnMeta {
             status: Some(TurnStatus::Complete),
@@ -106,7 +109,7 @@ impl AppCore {
             session_id: id.to_string(),
             turn: Box::new(dto),
         });
-        if first {
+        if first && !text.is_empty() {
             self.auto_title(id, text).await;
         }
         if queued {
@@ -166,6 +169,7 @@ impl AppCore {
         let _guard = self.lock_session(&id).await;
         self.finalize_generation(&id).await;
         let agent = self.addressee(&id, &options.text, options.addressed_to.as_deref());
+        let blocks = self.inner.work.files.prepare(&id, &options.attachments)?;
         let (user, queued) = self
             .append_user(
                 &id,
@@ -173,8 +177,10 @@ impl AppCore {
                 None,
                 &options.text,
                 options.addressed_to.clone(),
+                blocks,
             )
             .await?;
+        self.inner.work.files.commit(&id, &options.attachments);
         let assistant = if queued {
             None
         } else {
@@ -266,7 +272,7 @@ impl AppCore {
             .and_then(|m| m.addressed_to);
         let agent = self.addressee(&id, &text, addressed.as_deref());
         let (user, queued) = self
-            .append_user(&id, None, Some(target), &text, addressed)
+            .append_user(&id, None, Some(target), &text, addressed, Vec::new())
             .await?;
         let assistant = if queued {
             None

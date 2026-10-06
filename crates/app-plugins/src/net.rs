@@ -1,14 +1,18 @@
 //! Sieć wtyczek (`net.get`): wyłącznie `https://`, host z adresu musi mieścić się w tokenie
 //! Brokera `net.egress(host)` (egress-allowlista = zgoda na ten host) i nie może być na deny-liście
-//! domen Jądra. Klient bez proxy i bez przekierowań (nowy host = nowa operacja przez Brokera),
-//! z własnym resolverem odrzucającym adresy niepubliczne (pętla zwrotna, sieci prywatne,
-//! link-local — także po DNS), z limitem czasu i rozmiaru odpowiedzi.
+//! domen Jądra. Reguły adresów i klient pochodzą z `lib-netguard` (wspólne z `tools-net`): host
+//! liczony parserem WHATWG klienta (adresy IP w każdym zapisie — `2130706433`, `0x7f000001`,
+//! `127.1` — sprowadzone do postaci kanonicznej i sprawdzone; SR3-02), bez hostów lokalnych,
+//! klient bez proxy i bez przekierowań (nowy host = nowa operacja przez Brokera), resolver
+//! odrzucający host, gdy którykolwiek adres z DNS jest niepubliczny (DNS rebinding), limit czasu
+//! i rozmiaru odpowiedzi.
 
-use std::net::{IpAddr, SocketAddr};
-use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
+use lib_netguard::client::{ClientConfig, SystemLookup, guarded_client, is_guard_rejection};
+
+pub use lib_netguard::is_public_ip;
 
 /// Limit czasu całego żądania.
 pub const NET_TIMEOUT: Duration = Duration::from_secs(15);
@@ -31,97 +35,15 @@ pub trait HttpsGet: Send + Sync {
     async fn get(&self, url: &str, max_bytes: usize) -> Result<HttpsResponse, String>;
 }
 
-/// Czy adres IP jest publiczny (nie: pętla, prywatne, link-local, CGNAT, multicast, dokumentacja,
-/// nieokreślony, unikalne lokalne IPv6, IPv4 osadzony w IPv6 — zmapowany, zgodny, NAT64 `64:ff9b::/96`
-/// — z takim adresem, lokalny NAT64 `64:ff9b:1::/48`).
-pub fn is_public_ip(ip: IpAddr) -> bool {
-    match ip {
-        IpAddr::V4(v4) => {
-            let o = v4.octets();
-            !(v4.is_loopback()
-                || v4.is_private()
-                || v4.is_link_local()
-                || v4.is_unspecified()
-                || v4.is_broadcast()
-                || v4.is_multicast()
-                || v4.is_documentation()
-                || o[0] == 0
-                || (o[0] == 100 && (64..128).contains(&o[1]))
-                || (o[0] == 198 && (o[1] == 18 || o[1] == 19))
-                || o[0] >= 240)
-        }
-        IpAddr::V6(v6) => {
-            let s = v6.segments();
-            // `::a.b.c.d` (zgodny, przestarzały — także `::1`) i `::ffff:a.b.c.d` (zmapowany).
-            if let Some(v4) = v6.to_ipv4() {
-                return is_public_ip(IpAddr::V4(v4));
-            }
-            // NAT64 (RFC 6052): adres IPv4 w ostatnich 32 bitach.
-            if s[..6] == [0x64, 0xff9b, 0, 0, 0, 0] {
-                let v4 = std::net::Ipv4Addr::from((u32::from(s[6]) << 16) | u32::from(s[7]));
-                return is_public_ip(IpAddr::V4(v4));
-            }
-            !(v6.is_loopback()
-                || v6.is_unspecified()
-                || v6.is_multicast()
-                || (s[0] & 0xfe00) == 0xfc00
-                || (s[0] & 0xffc0) == 0xfe80
-                || (s[0] == 0x2001 && s[1] == 0x0db8)
-                || (s[0] == 0x64 && s[1] == 0xff9b && s[2] == 1))
-        }
-    }
-}
-
 /// Host z adresu `https://host[:port]/…` w postaci **kanonicznej**, z jaką połączy się klient
-/// (małe litery, IDNA, adres IP po parserze WHATWG) — `None` dla innych schematów, poświadczeń
-/// w adresie, hostów lokalnych i adresów niepublicznych w każdym zapisie (`2130706433`,
-/// `0x7f000001`, `0177.0.0.1`, `127.1` = `127.0.0.1`; przegląd #3, SR3-02). Klient łączy się
-/// z literałem IP bez resolvera [`PublicOnly`], więc to jest jedyna kontrola takich adresów.
+/// (`lib_netguard::check_url`: małe litery, IDNA, adres IP po parserze WHATWG) — `None` dla
+/// innych schematów, poświadczeń w adresie, hostów lokalnych i adresów niepublicznych w każdym
+/// zapisie (przegląd #3, SR3-02). Klient łączy się z literałem IP bez resolvera, więc to jest
+/// jedyna kontrola takich adresów.
 pub fn https_host(url: &str) -> Option<String> {
-    let rest = url.strip_prefix("https://")?;
-    let authority = rest.split(['/', '\\', '?', '#']).next()?;
-    if authority.is_empty() || authority.contains('@') {
-        return None;
-    }
-    let parsed = reqwest::Url::parse(url).ok()?;
-    if parsed.scheme() != "https" || !parsed.username().is_empty() || parsed.password().is_some() {
-        return None;
-    }
-    let raw = parsed.host_str()?;
-    let host = raw
-        .strip_prefix('[')
-        .and_then(|h| h.strip_suffix(']'))
-        .unwrap_or(raw)
-        .trim_end_matches('.')
-        .to_ascii_lowercase();
-    if host.is_empty() || host == "localhost" || host.ends_with(".localhost") {
-        return None;
-    }
-    match host.parse::<IpAddr>() {
-        Ok(ip) if !is_public_ip(ip) => None,
-        _ => Some(host),
-    }
-}
-
-/// Resolver odrzucający adresy niepubliczne (DNS rebinding na sieć lokalną).
-struct PublicOnly;
-
-impl reqwest::dns::Resolve for PublicOnly {
-    fn resolve(&self, name: reqwest::dns::Name) -> reqwest::dns::Resolving {
-        let host = name.as_str().to_owned();
-        Box::pin(async move {
-            let found: Vec<SocketAddr> = tokio::net::lookup_host((host.as_str(), 443))
-                .await?
-                .filter(|a| is_public_ip(a.ip()))
-                .collect();
-            if found.is_empty() {
-                let e: Box<dyn std::error::Error + Send + Sync> =
-                    format!("host {host} nie ma publicznego adresu").into();
-                return Err(e);
-            }
-            Ok(Box::new(found.into_iter()) as reqwest::dns::Addrs)
-        })
-    }
+    lib_netguard::check_url(url)
+        .ok()
+        .map(|t| t.host().to_owned())
 }
 
 /// Klient HTTPS wtyczek.
@@ -130,19 +52,24 @@ pub struct EgressClient {
 }
 
 impl EgressClient {
-    /// Klient: tylko HTTPS, bez proxy, bez przekierowań, resolver tylko z adresami publicznymi.
+    /// Klient `lib-netguard`: tylko HTTPS, bez proxy, bez przekierowań, resolver tylko z adresami
+    /// publicznymi, limit całego żądania [`NET_TIMEOUT`].
     pub fn new() -> Result<Self, String> {
-        reqwest::Client::builder()
-            .https_only(true)
-            .no_proxy()
-            .redirect(reqwest::redirect::Policy::none())
-            .dns_resolver(Arc::new(PublicOnly))
-            .timeout(NET_TIMEOUT)
-            .connect_timeout(Duration::from_secs(5))
-            .user_agent("Alfa-plugin/1")
-            .build()
-            .map(|client| Self { client })
-            .map_err(|e| e.to_string())
+        let config = ClientConfig {
+            connect_timeout: Duration::from_secs(5),
+            read_timeout: NET_TIMEOUT,
+            total_timeout: Some(NET_TIMEOUT),
+            user_agent: "Alfa-plugin/1".into(),
+        };
+        guarded_client(&config, SystemLookup).map(|client| Self { client })
+    }
+}
+
+fn request_error(e: reqwest::Error, what: &str) -> String {
+    if is_guard_rejection(&e) {
+        format!("{what}: host wskazuje adres niepubliczny (sieć lokalna, DNS rebinding)")
+    } else {
+        format!("{what}: {}", e.without_url())
     }
 }
 
@@ -157,7 +84,7 @@ impl HttpsGet for EgressClient {
             .get(url)
             .send()
             .await
-            .map_err(|e| format!("żądanie nie powiodło się: {}", e.without_url()))?;
+            .map_err(|e| request_error(e, "żądanie nie powiodło się"))?;
         let status = response.status().as_u16();
         let content_type = response
             .headers()
@@ -168,7 +95,7 @@ impl HttpsGet for EgressClient {
         while let Some(chunk) = response
             .chunk()
             .await
-            .map_err(|e| format!("odczyt odpowiedzi: {}", e.without_url()))?
+            .map_err(|e| request_error(e, "odczyt odpowiedzi"))?
         {
             if body.len().saturating_add(chunk.len()) > max_bytes {
                 return Err(format!("odpowiedź większa niż {max_bytes} B"));

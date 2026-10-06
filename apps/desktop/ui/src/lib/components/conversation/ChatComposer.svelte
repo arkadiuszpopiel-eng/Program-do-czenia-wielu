@@ -1,6 +1,8 @@
 <!--
   Composer rozmowy: szkic per sesja, @agentka i /komendy z podpowiedziami (listbox), chipy agentki
   i profilu modelu, historia Ctrl+↑/↓, ↑ w pustym polu = edytuj ostatnią, Stop w trakcie strumienia.
+  Załączniki: spinacz (natywny dialog), wklejenie plików/obrazu (czyta rdzeń ze schowka systemowego),
+  przeciągnięcie (w Tauri ścieżki zna tylko powłoka) — wysyłane z turą jako artefakty sesji.
 -->
 <script lang="ts">
   import {
@@ -26,6 +28,10 @@
   import { useApp } from '../../state/context';
   import { runCommand } from '../../state/commands';
   import type { ConversationState } from '../../state/conversation.svelte';
+  import { AttachmentsState } from '../../state/attachments.svelte';
+  import { carriesFiles, hintsFrom } from '../../logic/attachments';
+  import ComposerAttachments from './ComposerAttachments.svelte';
+  import ComposerSuggest, { type Suggestion } from './ComposerSuggest.svelte';
 
   interface Props {
     conv: ConversationState | null;
@@ -34,14 +40,6 @@
   let { conv }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
-
-  interface Suggestion {
-    readonly id: string;
-    readonly label: string;
-    readonly hint: string;
-    readonly insert: string;
-    readonly agent?: AgentId;
-  }
 
   const COMMANDS: readonly { id: string; run: () => void }[] = [
     { id: 'obsada', run: () => runCommand(app, 'action.cast') },
@@ -62,6 +60,17 @@
   let chosenAgent = $state<AgentId | null>(null);
   let profile = $state<ModelProfile | null>(null);
   let profileMenuOpen = $state(false);
+
+  const att = new AttachmentsState(app);
+  $effect(() => {
+    void att.load(app.activeId);
+  });
+  $effect(() =>
+    app.client.attachments.watchDrag((phase) => {
+      att.dragging = phase === 'enter';
+      if (phase === 'drop') void att.drop([]);
+    }),
+  );
 
   const draft = $derived(app.activeId ? (app.sessions.drafts[app.activeId] ?? '') : '');
   const setDraft = (text: string): void => app.setDraft(text);
@@ -169,8 +178,9 @@
   }
 
   async function deliver(text: string) {
-    history.push(text);
+    if (text) history.push(text);
     trigger = null;
+    const files = att.ids;
     const command = /^\/(\S+)\s*$/u.exec(text);
     if (command?.[1]) {
       const word = command[1].toLowerCase();
@@ -181,7 +191,7 @@
       }
     }
     const run = app.runs.active(app.activeId);
-    if (run && app.activeId) {
+    if (run && app.activeId && files.length === 0) {
       try {
         await app.client.agents.steer(app.activeId, text);
         app.toasts.show({
@@ -193,13 +203,34 @@
         // Zadanie właśnie się skończyło — wiadomość idzie zwykłą drogą.
       }
     }
-    if (!conv) {
-      await app.newSession();
-      if (app.conversation)
-        await app.conversation.send(text, chosenAgent ?? addressedAgent(text, agentList), profile);
-      return;
+    if (!conv) await app.newSession();
+    const target = conv ?? app.conversation;
+    if (!target) return;
+    await target.send(text, chosenAgent ?? addressedAgent(text, agentList), profile, files);
+    att.sent(files);
+  }
+
+  /** Pliki/obraz bez tekstu → rdzeń czyta schowek systemowy; tekst wkleja pole jak zwykle. */
+  function onpaste(event: ClipboardEvent) {
+    const data = event.clipboardData;
+    if (!data || data.types.includes('text/plain')) return;
+    if (data.files.length > 0 || [...data.items].some((i) => i.kind === 'file')) {
+      event.preventDefault();
+      void att.paste();
     }
-    await conv.send(text, chosenAgent ?? addressedAgent(text, agentList), profile);
+  }
+
+  function dragOver(event: DragEvent) {
+    if (!carriesFiles(event.dataTransfer?.types ? [...event.dataTransfer.types] : null)) return;
+    event.preventDefault();
+    att.dragging = true;
+  }
+
+  function dropFiles(event: DragEvent) {
+    const files = event.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    event.preventDefault();
+    void att.drop(hintsFrom(files));
   }
 
   function toggleMic() {
@@ -243,22 +274,42 @@
   const steering = $derived(app.runs.active(app.activeId));
 </script>
 
-<div class="composer-area">
+<div
+  class="composer-area"
+  class:dragging={att.dragging}
+  role="group"
+  aria-label={t('att.zone')}
+  ondragenter={dragOver}
+  ondragover={dragOver}
+  ondragleave={(e) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) att.dragging = false;
+  }}
+  ondrop={dropFiles}
+>
+  {#if att.dragging}<p class="drop-hint" aria-hidden="true">{t('att.dropHere')}</p>{/if}
   <Composer
     bind:value={() => draft, setDraft}
     bind:textarea
     {sendOnEnter}
     busy={Boolean(conv?.streaming)}
+    allowEmpty={att.items.length > 0}
+    onattach={() => void att.pick()}
     lang={app.i18n.locale}
     placeholder={steering
       ? t('composer.steerPlaceholder', { name: agents[steering.agent].name })
       : t('composer.placeholder')}
-    labels={{ field: t('composer.label'), send: t('composer.send'), stop: t('composer.stop') }}
+    labels={{
+      field: t('composer.label'),
+      send: t('composer.send'),
+      stop: t('composer.stop'),
+      attach: t('att.attach'),
+    }}
     fieldAttrs={{
       'aria-autocomplete': 'list',
       'aria-controls': open ? listId : undefined,
       'aria-activedescendant': open ? `${listId}-${active}` : undefined,
       id: 'alfa-composer',
+      onpaste,
     }}
     {onkeydown}
     oninput={refreshTrigger}
@@ -266,32 +317,15 @@
     onstop={() => void conv?.stop()}
   >
     {#snippet above()}
+      <ComposerAttachments {att} profile={effectiveProfile} turns={conv?.path ?? []} />
       {#if open}
-        <ul
-          class="suggest"
-          role="listbox"
-          id={listId}
-          aria-label={t(trigger?.kind === '@' ? 'composer.mentions' : 'composer.commands')}
-        >
-          {#each suggestions as s, i (s.id)}
-            <li
-              id="{listId}-{i}"
-              role="option"
-              aria-selected={i === active}
-              class:active={i === active}
-              onpointerdown={(e) => {
-                e.preventDefault();
-                accept(s);
-              }}
-            >
-              <span
-                class="s-label"
-                style:color={s.agent ? `var(--alfa-agent-${s.agent})` : undefined}>{s.label}</span
-              >
-              <span class="s-hint">{s.hint}</span>
-            </li>
-          {/each}
-        </ul>
+        <ComposerSuggest
+          {suggestions}
+          {active}
+          {listId}
+          label={t(trigger?.kind === '@' ? 'composer.mentions' : 'composer.commands')}
+          onaccept={accept}
+        />
       {/if}
     {/snippet}
     {#snippet chips()}
@@ -342,6 +376,7 @@
 
 <style>
   .composer-area {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-1);
@@ -351,39 +386,13 @@
     font-size: var(--alfa-font-size-xs);
     text-align: center;
   }
-  .suggest {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: calc(100% + 4px);
-    z-index: 20;
-    max-height: 260px;
-    margin: 0;
-    padding: var(--alfa-space-1);
-    overflow: auto;
-    list-style: none;
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-card);
-    background: var(--alfa-color-surface);
-    box-shadow: var(--alfa-shadow-3);
+  .dragging :global(.composer) {
+    outline: var(--alfa-size-focus-ring) dashed var(--alfa-color-focus);
+    outline-offset: 2px;
   }
-  .suggest li {
-    display: flex;
-    align-items: baseline;
-    gap: var(--alfa-space-3);
-    min-height: 32px;
-    padding: var(--alfa-space-1) var(--alfa-space-3);
-    border-radius: var(--alfa-radius-control);
-    font-size: var(--alfa-font-size-sm);
-  }
-  .suggest li.active {
-    background: var(--alfa-color-surface3);
-  }
-  .s-label {
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .s-hint {
+  .drop-hint {
     color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-xs);
+    font-size: var(--alfa-font-size-sm);
+    text-align: center;
   }
 </style>

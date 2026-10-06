@@ -49,6 +49,7 @@ impl AppCore {
                     text,
                     addressed_to: None,
                     profile: None,
+                    attachments: Vec::new(),
                 },
             )
             .await?;

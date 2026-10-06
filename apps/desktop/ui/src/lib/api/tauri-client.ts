@@ -1,7 +1,7 @@
 // Cienki adapter IPC Tauri 2: każda metoda = jedna komenda `invoke`, zdarzenia = jeden kanał `listen`.
 // Nazwy komend i zdarzeń: COMMANDS.md (kontrakt dla sesji backendowej). Argumenty w camelCase —
 // Tauri 2 mapuje je na parametry snake_case komend Rust.
-import { Channel, invoke } from '@tauri-apps/api/core';
+import { Channel, convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { AlfaClient } from './client';
 import type { AlfaEvent } from './types-system';
@@ -313,6 +313,48 @@ export class TauriAlfaClient implements AlfaClient {
     reindexStart: () => call('search_reindex_start'),
     reindexCancel: () => call('search_reindex_cancel'),
     reindexStatus: () => call('search_reindex_status'),
+  };
+
+  readonly attachments: AlfaClient['attachments'] = {
+    pick: (sessionId) => call('attachments_pick', { sessionId }),
+    // Ścieżki upuszczenia zna wyłącznie powłoka (zdarzenie systemowe) — wskazówek z UI nie wysyłamy.
+    addDropped: (sessionId) => call('attachments_add_dropped', { sessionId }),
+    paste: (sessionId) => call('attachments_paste', { sessionId }),
+    list: (sessionId) => call('attachments_list', { sessionId }),
+    remove: (sessionId, attachmentId) => call('attachments_remove', { sessionId, attachmentId }),
+    watchDrag: (handler) => {
+      let active = true;
+      const offs: UnlistenFn[] = [];
+      const phases = [
+        ['tauri://drag-enter', 'enter'],
+        ['tauri://drag-leave', 'leave'],
+        ['tauri://drag-drop', 'drop'],
+      ] as const;
+      for (const [event, phase] of phases) {
+        void listen(event, () => {
+          if (active) handler(phase);
+        }).then((off) => (active ? offs.push(off) : off()));
+      }
+      return () => {
+        active = false;
+        for (const off of offs.splice(0)) off();
+      };
+    },
+    previewUrl: (path) => convertFileSrc(path),
+  };
+
+  readonly conversation: AlfaClient['conversation'] = {
+    exportConversation: (sessionId, format, turnId) =>
+      call('sessions_export_conversation', { sessionId, format, turnId }),
+  };
+
+  readonly backups: AlfaClient['backups'] = {
+    status: () => call('backups_status'),
+    configure: (config) => call('backups_configure', { config }),
+    chooseDir: () => call('backups_choose_dir'),
+    setPassword: (password) => call('backups_set_password', { password }),
+    runNow: () => call('backups_run_now'),
+    verify: (file) => call('backups_verify', { file }),
   };
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

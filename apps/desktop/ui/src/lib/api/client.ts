@@ -77,6 +77,7 @@ import type { BrokerApi } from './client-broker';
 import type { VoiceFeaturesApi } from './client-voice';
 import type { PluginsApi } from './client-plugins';
 import type { EnginesApi } from './client-models';
+import type { AttachmentsApi, BackupsApi, ConversationExportApi } from './client-files';
 import type {
   AlfaEvent,
   AppBootstrap,
@@ -362,6 +363,12 @@ export interface AlfaClient {
   readonly plugins: PluginsApi;
   /** Modele i silniki: pobieranie, zgoda TOFU, weryfikacja, embedder wyszukiwania. */
   readonly engines: EnginesApi;
+  /** Załączniki composera (kopie w katalogu sesji; podgląd przez protokół zasobów). */
+  readonly attachments: AttachmentsApi;
+  /** Eksport rozmowy do Markdown / HTML (natywny dialog zapisu). */
+  readonly conversation: ConversationExportApi;
+  /** Kopie zapasowe `.alfa` z harmonogramem, rotacją i testem przywracania. */
+  readonly backups: BackupsApi;
   /** Jeden kanał zdarzeń; rdzeń wysyła je paczkami (batch co klatkę). */
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): Unsubscribe;
   dispose(): void;

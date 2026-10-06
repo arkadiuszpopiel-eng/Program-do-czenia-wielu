@@ -272,6 +272,18 @@ impl Built {
                 personas: personas.clone(),
                 stack: ports.agents.as_ref(),
                 updater: need(&self.extra.updater, "updater")?,
+                files: app_files::FilesDeps {
+                    paths: paths.clone(),
+                    sessions: sessions.clone(),
+                    artifacts: need(&self.artifacts, "artifacts")?,
+                    shell: shell.clone(),
+                    clipboard: options.clipboard.clone(),
+                    transfer: self.extra.transfer.clone().map(|t| t as _),
+                    secrets: Some(kernel.secrets.clone()),
+                    signals: kernel.signals.clone(),
+                    events: Some(kernel.events.clone()),
+                    docs: self.extra.artifact_docs.clone(),
+                },
             })
             .await;
         work.health.bind_brain(ports.brain.clone());

@@ -63,14 +63,16 @@ impl AppCore {
                 _ => continue,
             };
             let text = turn.content.text.trim();
-            if text.is_empty() || (out.is_empty() && role == MsgRole::Assistant) {
+            let mut blocks = (self.inner.work.files).provider_blocks(session, &turn.content.blocks);
+            if !text.is_empty() {
+                blocks.insert(0, ContentBlock::text(text));
+            }
+            if blocks.is_empty() || (out.is_empty() && role == MsgRole::Assistant) {
                 continue;
             }
             match out.last_mut() {
-                Some(last) if last.role == role => {
-                    last.content.push(ContentBlock::text(text));
-                }
-                _ => out.push(Message::new(role, vec![ContentBlock::text(text)])),
+                Some(last) if last.role == role => last.content.extend(blocks),
+                _ => out.push(Message::new(role, blocks)),
             }
         }
         if continue_hint {

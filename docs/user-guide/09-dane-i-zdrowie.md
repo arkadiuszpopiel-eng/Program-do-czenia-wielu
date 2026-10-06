@@ -9,8 +9,10 @@ jednego pliku `.alfa` i import na drugim komputerze.
 
 **Ustawienia → Import i eksport → Eksport** (albo paleta `Ctrl+K` → „Import i eksport .alfa”):
 
-1. Zaznacz zakres: konfiguracja wspólna, agentki i biblie głosów, obsady ról, wybrane zakresy pamięci, wybrane sesje.
-   Artefakty, logi i ustawienia tej konkretnej maszyny są **jeszcze niedostępne** w eksporcie.
+1. Zaznacz zakres: konfiguracja wspólna, agentki i biblie głosów, obsady ról, wybrane zakresy pamięci, wybrane sesje,
+   a opcjonalnie także **artefakty** wybranych sesji (pliki z panelu Pliki), **logi** (sekrety redagowane) i **nakładkę
+   tej maszyny** (urządzenia, profil głosu, limity). Artefakty przywrócone z paczki trafiają do
+   `…\Alfa\Sesje\Import`.
 2. Opcjonalnie **Zaszyfruj paczkę hasłem** (hasło dwa razy, co najmniej 8 znaków).
 3. **Eksportuj…** — wybierz miejsce zapisu.
 
@@ -34,8 +36,21 @@ Przed każdym importem Alfa robi automatyczną migawkę. Przycisk **Cofnij impor
 
 ## Kopie zapasowe
 
-Automatyczne kopie według harmonogramu są **jeszcze niedostępne** w aplikacji. Do tego czasu rób kopię ręcznie:
-eksport pełnego zakresu, najlepiej zaszyfrowany hasłem, na inny dysk. Przywrócenie = import tej paczki.
+**Ustawienia → Import i eksport → Kopie zapasowe** — zaplanowany eksport `.alfa` (ten sam format co eksport ręczny):
+
+1. **Wybierz katalog…** — np. inny dysk albo folder w OneDrive (nie katalog z danymi Alfy).
+2. Włącz **Twórz kopie automatycznie**, wybierz odstęp (co 6 h … co tydzień) i liczbę zachowanych kopii — najstarsze
+   są usuwane. Opcjonalnie dołącz artefakty i logi; domyślnie kopie nie powstają na baterii ani przy pełnym ekranie.
+3. Opcjonalnie **hasło kopii** (co najmniej 8 znaków; trzymane w Menedżerze poświadczeń Windows) — wtedy kopie są
+   zaszyfrowane i obejmują także sesje prywatne. Bez hasła sesje prywatne są pomijane.
+
+Kopia obejmuje konfigurację wspólną i nakładkę tej maszyny, agentki, obsady, reguły, umiejętności, wszystkie sesje
+i zakresy pamięci. **Klucze API i sekrety nigdy nie trafiają do kopii.** **Utwórz kopię teraz** robi kopię od razu;
+nieudana kopia z harmonogramu pokazuje powiadomienie i ponawia się po godzinie.
+
+Przy każdej kopii na liście: **Sprawdź** — test przywracania bez zmian (otwarcie, sumy kontrolne, odszyfrowanie,
+podgląd), **Przywróć…** — podgląd importu tej kopii (dalej jak przy imporcie: tryb, kolizje, migawka i „Cofnij
+import”).
 
 ## Zdrowie systemu
 

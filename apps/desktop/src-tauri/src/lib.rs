@@ -34,6 +34,14 @@ pub fn run() {
             {
                 let _ = window.hide();
             }
+            // Pliki upuszczone na okno główne: ścieżki z systemu trafiają do rdzenia, UI pobiera je
+            // komendą `attachments_add_dropped` (WebView nie podaje ścieżek — `app-files`).
+            if let WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) = event
+                && window.label() == windows::MAIN
+                && let Some(core) = window.try_state::<AppCore>()
+            {
+                core.attachments_dropped(paths.clone());
+            }
         })
         .setup(|app| {
             let paths = AppPaths::from_env().map_err(|e| e.message)?;

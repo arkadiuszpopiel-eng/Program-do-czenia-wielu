@@ -30,6 +30,7 @@ import { FakeBrokerStatus } from './api-broker';
 import { FakeVoiceFeatures } from './api-voice-features';
 import { FakePlugins } from './api-plugins';
 import { FakeEngines } from './api-engines';
+import { FakeFiles } from './api-files';
 import { FakeCore, type FakeOptions } from './core';
 
 export { FAKE_SCENARIOS, type FakeScenario, type FakeOptions } from './core';
@@ -72,6 +73,9 @@ export class FakeAlfaClient implements AlfaClient {
   readonly voiceFeatures: AlfaClient['voiceFeatures'];
   readonly plugins: AlfaClient['plugins'];
   readonly engines: AlfaClient['engines'];
+  readonly attachments: AlfaClient['attachments'];
+  readonly conversation: AlfaClient['conversation'];
+  readonly backups: AlfaClient['backups'];
 
   constructor(options: FakeOptions = {}) {
     this.core = new FakeCore(options);
@@ -111,6 +115,10 @@ export class FakeAlfaClient implements AlfaClient {
     this.voiceFeatures = new FakeVoiceFeatures(core).api();
     this.plugins = new FakePlugins(core).api();
     this.engines = new FakeEngines(core).api();
+    const files = new FakeFiles(core);
+    this.attachments = files.attachmentsApi();
+    this.conversation = files.conversationApi();
+    this.backups = files.backupsApi();
   }
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

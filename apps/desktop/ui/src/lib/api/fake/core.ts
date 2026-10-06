@@ -10,6 +10,7 @@ import type {
   TurnAnnotation,
 } from '../types';
 import type { Account } from '../types-hub';
+import type { AttachmentInfo } from '../types-files';
 import type { AlfaEvent, LayoutPrefs, SettingValue, SystemStatus } from '../types-system';
 import {
   seedAccounts,
@@ -113,6 +114,8 @@ export class FakeCore {
   readonly runs: FakeRuns;
   /** Tryb głosowy: rozmowa włączona, wyciszenie. */
   voice = { active: false, muted: false, mode: 'toggle' as 'toggle' | 'ptt' };
+  /** Załączniki przygotowane w composerach (per sesja; `api-files.ts`). */
+  readonly staged = new Map<string, AttachmentInfo[]>();
 
   constructor(options: FakeOptions = {}) {
     this.scheduler = options.scheduler ?? realScheduler;

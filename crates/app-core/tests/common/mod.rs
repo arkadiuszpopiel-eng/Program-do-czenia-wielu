@@ -264,6 +264,7 @@ pub fn send(text: &str, parent: Option<String>) -> SendOptions {
         text: text.into(),
         addressed_to: None,
         profile: None,
+        attachments: Vec::new(),
     }
 }
 

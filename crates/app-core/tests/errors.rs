@@ -61,6 +61,7 @@ async fn no_keys_gives_no_brain_error_and_local_profile_explains_missing_module(
             sid.clone(),
             SendOptions {
                 profile: Some(ModelProfile::Local),
+                attachments: Vec::new(),
                 ..send("Jeszcze raz", Some(turn.clone()))
             },
         )

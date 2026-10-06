@@ -11,6 +11,7 @@ import type { AlfaEvent } from '../../../../../apps/desktop/ui/src/lib/api/types
 import { runComputer } from './generate-computer';
 import { runPlugins } from './generate-plugins';
 import { runModels } from './generate-models';
+import { runFiles } from './generate-files';
 import { runBroker } from './generate-broker';
 import { runUpdates } from './generate-updates';
 import { runVoice } from './generate-voice';
@@ -258,6 +259,7 @@ async function run(): Promise<void> {
   await runPlugins(both);
   await runVoice(both, scheduler, flush);
   await runModels(both, scheduler, flush);
+  await runFiles(both, scheduler, flush);
 }
 
 function sampleEvents(all: readonly AlfaEvent[]): AlfaEvent[] {
