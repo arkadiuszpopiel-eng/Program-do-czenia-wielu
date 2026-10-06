@@ -91,4 +91,6 @@ Napisy na żywo (szary partial → pełny final), dyktowanie do czatu z podgląd
 - **Partiale adaptacyjne:** kolejny partial najwcześniej po `max(partial_every_ms, 2 × czas poprzedniego partiala)`
   mowy. Na runnerze CI (CPU 4 vCPU, `ggml-small-q5_1`, partial co 1 s) rozpoznanie 2,1 s mowy trwało 71 s — każdy
   przebieg whispera na CPU to kilka sekund, a partiale szły jeden za drugim przed finalem. Na karcie (partial ≪ 1 s)
-  odstęp bez zmian. Test: `tests/stt.rs::slow_partials_back_off_so_they_never_hog_the_engine`.
+  odstęp bez zmian. Test: `tests/stt.rs::slow_partials_back_off_so_they_never_hog_the_engine`. Po zmianie na runnerze
+  CI: 53 s — reszta to sam whisper `small` na CPU (okno 30 s na przebieg, final z wiązką 5). Otwarte (F0/F2): na
+  maszynach bez karty mniejszy model STT, `--audio-ctx` dla krótkich wypowiedzi albo final zachłanny na CPU.

@@ -247,7 +247,10 @@ Bramki ludzkie (PLAN §4.6): #1 logowanie do CLI i klucze API · #2 UAC / Hello 
       z logu serwera zgodna z manifestem (60/32 warstwy, 2 głowice KV, KV 480/256 MiB przy `-c 8192`;
       `n_ctx_train` 4.5B = 8192 → poprawiony `ctx` w manifeście); Piper RTF 0,34; whisper `small-q5_1` WER 0
       („Dzień dobry. Jestem Alfa.”), po nieudanym starcie wersji CUDA (runner bez sterownika NVIDIA) przejście na CPU.
-      Rozpoznanie trwało 71 s z powodu partiali na CPU — poprawione (partiale adaptacyjne, SPEC `voice-stt`).
+      Rozpoznanie 2,1 s mowy na CPU trwało 71 s; po partialach adaptacyjnych (`d60660b`) — 53 s. Reszta to koszt
+      samego whispera `small` na 4 vCPU (każdy przebieg liczy okno 30 s, final z wiązką 5): bez karty graficznej
+      rozmowa głosowa potrzebuje mniejszego modelu STT albo innego silnika — decyzja przy pomiarach F0/F2; laptop
+      i desktop liczą STT na karcie (CUDA/Vulkan).
     - **Adres modelu Bielik w katalogu był błędny (404)** — oficjalne repozytorium `speakleash` ma tylko `Q8_0`
       i `fp16`; katalog wskazuje oficjalne `Q8_0` (4.5B domyślny, 1.5B lekki), `Q4_K_M` tylko u osób trzecich —
       decyzja człowieka (ADR 0014, aktualizacja). Bramka `hf-catalog` sprawdza każdy adres i rozmiar GGUF w API
