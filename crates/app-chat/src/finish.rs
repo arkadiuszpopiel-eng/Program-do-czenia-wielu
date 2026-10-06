@@ -195,6 +195,12 @@ impl ChatEngine {
                 usage: usage.clone(),
             });
         }
+        // Stan łączności (offline / 429) przed zdarzeniem końca tury — kto po `Error` pyta
+        // o `system_status`, widzi już limit dostawcy (wcześniej wyścig).
+        if let Some(host) = self.host() {
+            let answered = outcome.chosen.is_some() && outcome.status != TurnStatus::Error;
+            host.connectivity(outcome.error.as_ref(), answered).await;
+        }
         match (&outcome.error, outcome.stop) {
             (Some(error), _) => self.emit(AlfaEvent::Error {
                 session_id: sid.clone(),
@@ -220,10 +226,6 @@ impl ChatEngine {
             {
                 rt.gens.remove(&req.session);
             }
-        }
-        if let Some(host) = self.host() {
-            let answered = outcome.chosen.is_some() && outcome.status != TurnStatus::Error;
-            host.connectivity(outcome.error.as_ref(), answered).await;
         }
         self.emit(AlfaEvent::ActivityChanged {
             session_id: sid,
