@@ -192,7 +192,8 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'conv.addressed': 'to: {name}',
   'conv.error.rate_limited': 'Rate limit at {provider}. Resets at {time} ({relative}).',
   'conv.error.offline': 'Offline — the message is queued.',
-  'conv.error.no_keys': 'No provider key for this model.',
+  'conv.error.no_keys':
+    'No model available: add an API key (Settings → Models and providers) or download a local model (Settings → Models and engines).',
   'conv.error.provider': 'Provider error: {message}',
   'conv.error.context_overflow': 'The conversation exceeded the context window.',
   'conv.error.budget_blocked': 'Cost limit exceeded.',

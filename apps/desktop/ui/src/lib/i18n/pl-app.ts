@@ -209,7 +209,8 @@ export const plApp = {
   'conv.addressed': 'do: {name}',
   'conv.error.rate_limited': 'Limit zapytań u {provider}. Odnowi się o {time} ({relative}).',
   'conv.error.offline': 'Brak połączenia — wiadomość czeka w kolejce.',
-  'conv.error.no_keys': 'Brak klucza dostawcy dla tego modelu.',
+  'conv.error.no_keys':
+    'Brak dostępnego modelu: dodaj klucz API (Ustawienia → Modele i dostawcy) albo pobierz model lokalny (Ustawienia → Modele i silniki).',
   'conv.error.provider': 'Błąd dostawcy: {message}',
   'conv.error.context_overflow': 'Rozmowa przekroczyła okno kontekstu.',
   'conv.error.budget_blocked': 'Przekroczono limit kosztów.',

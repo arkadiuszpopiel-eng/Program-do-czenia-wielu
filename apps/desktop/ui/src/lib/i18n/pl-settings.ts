@@ -287,6 +287,8 @@ export const plSettings = {
   'ob.mic.level': 'Poziom głośności',
   'ob.mic.ok': 'Słyszę Cię.',
   'ob.mic.silent': 'Jeszcze nic nie słychać…',
+  'ob.mic.failed':
+    'Nie udało się uruchomić testu mikrofonu — sprawdź urządzenie albo przejdź dalej.',
   'ob.voice.title': 'Profil głosu',
   'ob.voice.desc': 'Dobrałyśmy profil do Twojego sprzętu. Zmienisz go później w Voice Lab.',
   'ob.voice.A': 'A — najlżejszy, działa na samym procesorze',

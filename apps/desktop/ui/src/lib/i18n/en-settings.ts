@@ -271,6 +271,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'ob.mic.level': 'Volume level',
   'ob.mic.ok': 'I can hear you.',
   'ob.mic.silent': 'Nothing heard yet…',
+  'ob.mic.failed': 'The microphone test could not start — check the device or continue.',
   'ob.voice.title': 'Voice profile',
   'ob.voice.desc': 'We picked a profile for your hardware. You can change it later in Voice Lab.',
   'ob.voice.A': 'A — lightest, runs on the CPU only',

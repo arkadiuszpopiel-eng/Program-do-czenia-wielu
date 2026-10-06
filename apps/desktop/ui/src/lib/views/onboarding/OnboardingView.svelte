@@ -40,6 +40,7 @@
   let devices = $state<readonly AudioDevice[]>([]);
   let device = $state('');
   let heard = $state(false);
+  let micFailed = $state(false);
   let profile = $state<DeviceProfile | null>(null);
   let measuring = $state(false);
   let measured = false;
@@ -66,8 +67,11 @@
   // Test mikrofonu działa tylko na pierwszym kroku.
   $effect(() => {
     if (current !== 'mic') return;
-    void app.client.voice.startMicTest(device || null);
-    return () => void app.client.voice.stopMicTest();
+    app.client.voice
+      .startMicTest(device || null)
+      .then(() => (micFailed = false))
+      .catch(() => (micFailed = true));
+    return () => void app.client.voice.stopMicTest().catch(() => undefined);
   });
 
   $effect(() => {
@@ -164,7 +168,11 @@
             />
           </label>
           <LevelMeter level={app.micLevel} label={t('ob.mic.level')} />
-          <p class:ok={heard} class="muted">{heard ? t('ob.mic.ok') : t('ob.mic.silent')}</p>
+          {#if micFailed}
+            <p class="warn">{t('ob.mic.failed')}</p>
+          {:else}
+            <p class:ok={heard} class="muted">{heard ? t('ob.mic.ok') : t('ob.mic.silent')}</p>
+          {/if}
         {/if}
       {:else if current === 'voice'}
         <h2>{t('ob.voice.title')}</h2>
