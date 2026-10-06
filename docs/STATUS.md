@@ -235,18 +235,23 @@ Bramki ludzkie (PLAN §4.6): #1 logowanie do CLI i klucze API · #2 UAC / Hello 
     turą, przy otwarciu sesji i przed przebiegiem zadania — także po restarcie (`app-core/tests/files.rs::
     attachment_taint_reaches_broker_and_survives_restart`); trwały stan bezpieczeństwa w samym Brokerze — nadal P3-01.
 
-12. **Próba generalna w chmurze (fala 6, `rehearsal.yml`) — przed testem na laptopie (RTX 4050 6 GB).**
+12. **Próba generalna w chmurze (fala 6, `rehearsal.yml`) — przed testem na laptopie (RTX 4050 6 GB).** Wszystkie
+    joby zielone na `cb28daa` (2026-10-06):
     - `setup-dev.ps1 -Ci` pod PowerShell 5.1 i 7 — bez błędów składni i wykonania.
-    - Prawdziwa aplikacja na runnerze Windows (WebView2, Playwright przez CDP): start okna, onboarding, rozmowa bez
-      modelu → czytelny błąd „brak modelu”, Ustawienia → Modele i silniki (lista z katalogu), kill-switch z UI,
-      axe na 3 widokach, **CSP z Trusted Types: 0 naruszeń, konsola bez błędów** — 9/10. Okno „Zapisz jako”
-      (eksport `.alfa`) na Windows Server ma kontrolki Win32 widoczne w UIA jako `Pane` — skrypt testu wpisuje ścieżkę
-      i zatwierdza komunikatami okna (WM_SETTEXT, WM_COMMAND IDOK), bez fokusu.
-    - Silniki na żywo: `llama-server`, `whisper-server` i `piper` pobrane i rozpakowane z prawdziwych wydań; **adres
-      modelu Bielik w katalogu był błędny (404)** — oficjalne repozytorium `speakleash` ma tylko `Q8_0` (4826 MiB)
-      i `fp16`. Katalog wskazuje teraz oficjalne `Q8_0` (4.5B domyślny, 1.5B lekki); `Q4_K_M` istnieje tylko
-      u osób trzecich — decyzja człowieka (ADR 0014, aktualizacja). Bramka `hf-catalog` sprawdza odtąd każdy adres
-      i rozmiar GGUF w API Hugging Face, zanim ruszą długie joby.
+    - Prawdziwa aplikacja na runnerze Windows (WebView2, Playwright przez CDP) — **10/10**: start okna, onboarding,
+      rozmowa bez modelu → czytelny błąd „brak modelu”, Ustawienia → Modele i silniki (lista z katalogu), eksport
+      `.alfa` przez natywne okno „Zapisz jako” (UIA + WM_CHAR/WM_COMMAND, bez fokusu), kill-switch z UI, axe na
+      3 widokach, **CSP z Trusted Types: 0 naruszeń, konsola bez błędów**.
+    - Silniki na żywo (CPU 4 vCPU): `llama-server` b6710, `whisper-server` 1.8.1, `piper` z prawdziwych wydań;
+      Bielik 4.5B Q8_0 — 6,8 tok/s, wywołanie narzędzia z `--jinja`; Bielik 1.5B Q8_0 — 21 tok/s; architektura
+      z logu serwera zgodna z manifestem (60/32 warstwy, 2 głowice KV, KV 480/256 MiB przy `-c 8192`;
+      `n_ctx_train` 4.5B = 8192 → poprawiony `ctx` w manifeście); Piper RTF 0,34; whisper `small-q5_1` WER 0
+      („Dzień dobry. Jestem Alfa.”), po nieudanym starcie wersji CUDA (runner bez sterownika NVIDIA) przejście na CPU.
+      Rozpoznanie trwało 71 s z powodu partiali na CPU — poprawione (partiale adaptacyjne, SPEC `voice-stt`).
+    - **Adres modelu Bielik w katalogu był błędny (404)** — oficjalne repozytorium `speakleash` ma tylko `Q8_0`
+      i `fp16`; katalog wskazuje oficjalne `Q8_0` (4.5B domyślny, 1.5B lekki), `Q4_K_M` tylko u osób trzecich —
+      decyzja człowieka (ADR 0014, aktualizacja). Bramka `hf-catalog` sprawdza każdy adres i rozmiar GGUF w API
+      Hugging Face. Sumy SHA-256 pobranych plików: przewodnik 11 (tabele) i log joba „Silniki na żywo”.
 
 ## Co musi zrobić człowiek (w kolejności priorytetu)
 

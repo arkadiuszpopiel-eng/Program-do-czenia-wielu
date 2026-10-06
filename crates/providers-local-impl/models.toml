@@ -17,8 +17,9 @@ schema_version = 1
 # Bielik v3 4.5B: Qwen2.5-3B (GQA 16/2, wymiar głowy 128, hidden 2048) pogłębiony do 60 warstw,
 # słownik APT4 32 000 (raport techniczny Bielik v3). KV: 60 × 2 × 128 × 2 × 2 B = 61 440 B/token
 # → 60 MiB na 1024 tokeny (-c 8192: 480 MB). Wagi Q8_0 = plik 4826 MiB → vram_mb 4826 + 550 ≈ 5400,
-# ram_mb 4826 + 750 ≈ 5600. Do potwierdzenia z metadanych GGUF (`qwen2.block_count`,
-# `qwen2.attention.head_count_kv`) albo z wpisu `llama_kv_cache … size = … MiB` w logu llama-server.
+# ram_mb 4826 + 750 ≈ 5600. Potwierdzone w próbie generalnej (rehearsal.yml, 2026-10-06, log llama-server
+# b6710): n_layer = 60, n_head_kv = 2, n_embd = 2048, n_vocab = 32 000, model params = 4.76 B,
+# n_ctx_train = 8192, `llama_kv_cache: size = 480.00 MiB (8192 cells, 60 layers)`; plik 5 061 215 424 B.
 [[model]]
 id = "bielik-4.5b-v3.0-instruct-q8_0"
 name = "Bielik 4.5B v3.0 Instruct (Q8_0)"
@@ -26,10 +27,11 @@ url = "https://huggingface.co/speakleash/Bielik-4.5B-v3.0-Instruct-GGUF/resolve/
 file = "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf"
 size_mb = 4826
 sha256 = ""
-params_b = 4.6
+params_b = 4.8
 quant = "Q8_0"
 layers = 60
-ctx = 32768
+# Kontekst treningowy z GGUF (`n_ctx_train`) — dłuższy `-c` pogarsza odpowiedzi.
+ctx = 8192
 vram_mb = 5400
 ram_mb = 5600
 kv_mb_per_1k_ctx = 60
@@ -37,10 +39,10 @@ tools = true
 license = "Apache-2.0"
 
 # Bielik v3 1.5B (lekki — karty ≤ 6 GB obok STT na GPU, słabszy sprzęt): Qwen2.5-1.5B (GQA 12/2,
-# wymiar głowy 128, hidden 1536) pogłębiony prawdopodobnie do 32 warstw (≈ 1,55 mld parametrów
-# przy słowniku 32 000 — zgodne z rozmiarem pliku). KV: 32 × 2 × 128 × 2 × 2 B = 32 768 B/token
-# → 32 MiB na 1024 tokeny (-c 8192: 256 MB). Warstwy i KV DO POTWIERDZENIA z metadanych GGUF
-# albo logu llama-server. Wagi Q8_0 = plik 1620 MiB → vram_mb 1620 + 550 ≈ 2200, ram_mb ≈ 2400.
+# wymiar głowy 128, hidden 1536) pogłębiony do 32 warstw. KV: 32 × 2 × 128 × 2 × 2 B = 32 768 B/token
+# → 32 MiB na 1024 tokeny (-c 8192: 256 MB). Potwierdzone w próbie generalnej (2026-10-06): n_layer = 32,
+# n_head_kv = 2, n_embd = 1536, model params = 1.60 B, n_ctx_train = 8192, `llama_kv_cache: size =
+# 256.00 MiB`; plik 1 699 568 288 B. Wagi Q8_0 = plik 1620 MiB → vram_mb 1620 + 550 ≈ 2200, ram_mb ≈ 2400.
 # `tools = false`: model 1,5B zbyt zawodnie wywołuje narzędzia (zła ścieżka/argumenty w akcjach
 # na plikach) — Router nie wybiera go do zadań agentek; rozmowa i głos działają bez zmian.
 [[model]]
@@ -53,7 +55,7 @@ sha256 = ""
 params_b = 1.6
 quant = "Q8_0"
 layers = 32
-# Kontekst treningowy ostrożnie 8192 (do potwierdzenia: `qwen2.context_length` w GGUF).
+# Kontekst treningowy z GGUF (`n_ctx_train`).
 ctx = 8192
 vram_mb = 2200
 ram_mb = 2400

@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
+use std::time::Instant;
 
 use async_trait::async_trait;
 use device_profile_contract::Backend;
@@ -37,6 +38,9 @@ struct State {
     events: Vec<SttEvent>,
     failed: Vec<Backend>,
     health: Option<Health>,
+    /// Czas ostatniego partiala (ms, zegar ścienny) — odstęp kolejnych to co najmniej jego
+    /// dwukrotność: na CPU (kilka sekund na przebieg) partiale nie blokują mowy.
+    partial_ms: u32,
 }
 
 /// Odebranie dzierżawy → sidecar do zamknięcia przy najbliższym użyciu.
@@ -152,7 +156,9 @@ impl WhisperStt {
         samples: &[f32],
         beam: u8,
     ) -> Result<Option<Transcript>, SttError> {
+        let started = Instant::now();
         let t = self.transcribe(id, samples, beam, false).await?;
+        self.lock().partial_ms = u32::try_from(started.elapsed().as_millis()).unwrap_or(u32::MAX);
         self.emit(SttEvent::Partial {
             transcript: t.clone(),
         });
@@ -253,13 +259,16 @@ impl Stt for WhisperStt {
             let mut st = self.lock();
             let two_pass = st.cfg.two_pass;
             let min_speech = st.cfg.min_speech_ms;
+            let every = two_pass
+                .partial_every_ms
+                .max(st.partial_ms.saturating_mul(2));
             let audio = st
                 .utterances
                 .get_mut(&id)
                 .ok_or(SttError::UnknownUtterance(id))?;
             audio.push(frame)?;
             let due = two_pass.enabled
-                && audio.take_partial_due(two_pass.partial_every_ms)
+                && audio.take_partial_due(every)
                 && audio.speech_ms() >= min_speech;
             (due.then(|| audio.samples().to_vec()), two_pass.partial_beam)
         };

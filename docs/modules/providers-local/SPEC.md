@@ -143,3 +143,7 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   jako `info` (cel `providers_local_impl::llama_server`, zapisywane domyślnie — potwierdzenie szacunków VRAM i diagnoza
   OOM na sprzęcie); reszta `debug` pod celem `llama_server` (poza Alfą — tylko po jawnym `ALFA_LOG=…,llama_server=debug`,
   bo wiersze żądań mogą nieść treść). Wcześniej całe wyjście szło na `debug` pod celem obcym, obcinanym do `warn`.
+- **Architektura potwierdzona na runnerze CI** (`rehearsal.yml`, log `llama-server` b6710): 4.5B — 60 warstw, 2 głowice KV,
+  `n_ctx_train` 8192 (manifest miał `ctx = 32768` — poprawione; dłuższe `-c` niż trening pogarsza odpowiedzi), 4,76 mld
+  parametrów, KV 480 MiB przy `-c 8192`; 1.5B — 32 warstwy, 2 głowice KV, `n_ctx_train` 8192, KV 256 MiB. CPU 4 vCPU:
+  4.5B 6,8 tok/s, 1.5B 21 tok/s; żądanie z narzędziem (4.5B, `--jinja`) — wywołanie narzędzia.

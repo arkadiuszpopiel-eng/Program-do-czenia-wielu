@@ -81,8 +81,9 @@ tych części (kolumna „Laptop”).
 
 W logu (`%LOCALAPPDATA%\Alfa\logs`) zapisz linię `llama-server gotowy` (liczba warstw `gpu_layers=34`) oraz linie
 celu `providers_local_impl::llama_server` (zapisywane domyślnie): `offloaded 34/61 layers to GPU`, `n_layer`,
-`n_head_kv` i `llama_kv_cache … size = … MiB` (Alfa zakłada 480 MiB dla 4.5B i 256 MiB dla 1.5B przy `-c 8192`;
-inna liczba = do poprawki w manifeście). Rozpoznawanie mowy pisze podobnie pod `voice_stt_impl::whisper_server`
+`n_head_kv` i `llama_kv_cache … size = … MiB` (480 MiB dla 4.5B i 256 MiB dla 1.5B przy `-c 8192` — potwierdzone
+na runnerze CI; inna liczba = do poprawki w manifeście). Dla porównania szybkości: na 4 rdzeniach runnera CI (bez
+karty) 4.5B Q8_0 dał 6,8 tok/s, a 1.5B — 21 tok/s; laptop z kartą ma być wyraźnie szybszy. Rozpoznawanie mowy pisze podobnie pod `voice_stt_impl::whisper_server`
 (`using CUDA0 backend` = whisper na karcie).
 
 **Jak rozpoznać brak pamięci karty (OOM).** (1) W logu — ostrzeżenia (`WARN`) celów `…::llama_server`
@@ -109,8 +110,18 @@ w sekcji **Artifacts** (JSON z sumami, układem archiwów i czasami). Archiwa z 
 | piper (2023.11.14-2)          | `piper_windows_amd64.zip`             | 22477236    | `f3c58906402b24f3a96d92145f58acba6d86c9b5db896d207f78dc80811efcea` |
 | WeSpeaker ResNet34 (VoxCeleb) | `wespeaker_en_voxceleb_resnet34.onnx` | 26534365    | `5ef208a9da1453335308a6b6f4e6dfbd7e183a38b604de0a57664f45d257fe94` |
 
-Modele z Hugging Face (Bielik, Whisper, głos Piper) porównaj z raportem CI albo z opisem pliku na Hugging Face
-(„SHA256”). Inna suma niż w tabeli → **nie** klikaj „Ufam temu plikowi”, zapisz obie sumy i zgłoś.
+Modele z Hugging Face pobrane i sprawdzone przez automat CI (próba generalna, 2026-10-06):
+
+| Pozycja w menedżerze          | Plik na karcie zgody                  | Rozmiar (B) | SHA-256                                                            |
+| ----------------------------- | ------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| Bielik 4.5B v3.0 (Q8_0)       | `Bielik-4.5B-v3.0-Instruct.Q8_0.gguf` | 5061215424  | `562f2291de257890adf2b4a914da8b194affe6a7a838a6b7ef3d342f306c1b7f` |
+| Bielik 1.5B v3.0 (Q8_0)       | `Bielik-1.5B-v3.0-Instruct.Q8_0.gguf` | 1699568288  | `e206ebbd9ee00cc8f14af5a096ad3f193a59608c63905316e8dc680c96655a60` |
+| Whisper small (q5_1)          | `ggml-small-q5_1.bin`                 | 190085487   | `ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb` |
+| Piper pl_PL gosia (medium)    | `pl_PL-gosia-medium.onnx`             | 63201294    | `38f66464240ed74f186e6b7dc13c6e3b22e023426299f25c2b3cc9dfa9373fbc` |
+| Piper pl_PL gosia (medium)    | `pl_PL-gosia-medium.onnx.json`        | 4814        | `1aefb31a9d53ffe44a8163ff73ec833acb7a6253848f6bb0403d8a66f9c7510d` |
+
+Pozostałe modele (np. Whisper large-v3-turbo) porównaj z opisem pliku na Hugging Face („SHA256”). Inna suma niż
+w tabeli → **nie** klikaj „Ufam temu plikowi”, zapisz obie sumy i zgłoś.
 
 ## 0. Przygotowanie (raz na każdym komputerze)
 

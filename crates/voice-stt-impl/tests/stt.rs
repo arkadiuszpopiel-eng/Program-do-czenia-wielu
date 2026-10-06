@@ -277,3 +277,21 @@ async fn module_publishes_events() {
     m.stop().await.unwrap();
     assert_eq!(m.health(), HealthStatus::NotStarted);
 }
+
+/// Wolny backend (CPU: kilka sekund na przebieg whispera): kolejny partial dopiero po co najmniej
+/// dwukrotności czasu poprzedniego — rozpoznawanie nie zajmuje całego czasu mowy, a final nie czeka
+/// za kolejką partiali. Szybki backend (karta) — odstęp bez zmian (`requests_carry_…`: co 1 s).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn slow_partials_back_off_so_they_never_hog_the_engine() {
+    let launcher = Arc::new(FakeLauncher::default());
+    launcher
+        .shared
+        .inference_delay_ms
+        .store(1_200, std::sync::atomic::Ordering::SeqCst);
+    let stt = WhisperStt::new(config(), launcher.clone(), Backend::Vulkan).unwrap();
+    // 4,2 s mowy: co 1 s byłyby 4 partiale; po partialu 1,2 s odstęp ≥ 2,4 s → 2 (przy 1,0 i 3,4 s).
+    let partials = speak(&stt, UtteranceId(1), 4.2).await;
+    assert_eq!(partials.len(), 2);
+    let t = stt.end_utterance(UtteranceId(1)).await.unwrap();
+    assert_eq!(t.text, "Delta, otwórz plik.");
+}

@@ -114,9 +114,11 @@ fn bielik_q8_kv_cache_and_layout_on_the_6_gb_laptop() {
 
 #[test]
 fn context_shrinks_only_when_it_allows_full_offload() {
-    // Model ~4,5B Q4_K_M (3400 MB bez KV) na laptopie: 3880 + 1500 > 5153 → -c 4096 (5140 MB).
+    // Model ~4,5B Q4_K_M (3400 MB bez KV, kontekst treningowy 32k) na laptopie: 3880 + 1500 > 5153
+    // → -c 4096 (5140 MB).
     let q4 = ModelEntry {
         vram_mb: 3_400,
+        ctx: 32_768,
         ..builtin_models().unwrap().remove(0)
     };
     let config = LocalConfig::new("/m", "/bin/llama-server");
@@ -213,4 +215,19 @@ fn errors_map_to_provider_errors_and_events_have_names() {
     ] {
         assert_eq!(ev.name(), name);
     }
+}
+
+#[test]
+fn launch_context_never_exceeds_the_training_context() {
+    // Bielik 4.5B v3: n_ctx_train = 8192 (GGUF) — większe `ctx` w konfiguracji nie podnosi `-c`.
+    let bielik = builtin_models().unwrap().remove(0);
+    assert_eq!(bielik.ctx, 8_192);
+    let big = LocalConfig {
+        ctx: 32_768,
+        ..LocalConfig::new("/m", "/bin/llama-server")
+    };
+    assert_eq!(
+        big.ctx_for(&bielik, 16_304 - 768, STT_VRAM_RESERVE_MB),
+        8_192
+    );
 }

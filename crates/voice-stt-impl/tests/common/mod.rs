@@ -3,7 +3,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, dead_code)]
 
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 
 use async_trait::async_trait;
@@ -20,6 +20,8 @@ pub const RESPONSE: &str = r#"{"task":"transcribe","language":"polish","duration
 pub struct Shared {
     pub requests: Mutex<Vec<String>>,
     pub health_polls: AtomicUsize,
+    /// Opóźnienie odpowiedzi `/inference` (ms) — wolny backend (CPU).
+    pub inference_delay_ms: AtomicU64,
 }
 
 async fn read_request(stream: &mut BufReader<TcpStream>) -> Option<(String, Vec<u8>)> {
@@ -106,6 +108,8 @@ pub async fn serve(
                     .lock()
                     .unwrap()
                     .push(String::from_utf8_lossy(&body).into_owned());
+                let delay = shared.inference_delay_ms.load(Ordering::SeqCst);
+                tokio::time::sleep(std::time::Duration::from_millis(delay)).await;
                 respond(&mut s, 200, RESPONSE).await;
             } else {
                 respond(&mut s, 404, "{}").await;

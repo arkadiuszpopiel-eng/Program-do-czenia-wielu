@@ -40,7 +40,7 @@ async fn on_ac_power_bielik_q8_is_split_on_cuda_and_stt_fits_in_6_gb() {
         "STT i ciężki TTS nie naraz"
     );
     assert_eq!(rec.residency.vram_mb, VRAM_BUDGET);
-    assert!(l.model.quant == "Q8_0" && l.model.params_b <= 4.6);
+    assert!(l.model.quant == "Q8_0" && l.model.params_b <= 4.8);
     // Q8_0 z KV nie mieści się w całości obok STT nawet przy -c 4096 (5640 + 1500 > 5153 MB).
     assert!(l.model.vram_need(4_096) + STT_VRAM_RESERVE_MB > VRAM_BUDGET);
 
