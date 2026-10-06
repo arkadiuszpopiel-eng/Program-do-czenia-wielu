@@ -71,12 +71,28 @@ to, co Alfa właśnie usłyszała, oraz przyciski **Stop** i **Wycisz**.
 
 Akcja **Przeczytaj na głos** przy każdej wiadomości czyta ją głosem agentki, która ją napisała.
 
+## Panel Głos (`Alt+6`): słowa wywoławcze, Twój głos, dyktowanie, czytanie
+
+Te funkcje są w aplikacji, ale każdą włączasz sam — w panelu Głos albo w **Ustawienia → Głos**. Potrzebują modeli
+z menedżera (**Ustawienia → Modele i silniki**, zobacz [Modele i silniki](10-modele-i-silniki.md)); bez modelu
+panel pokazuje „niedostępne” i mówi, czego brakuje (**Wymaga plików**).
+
+- **Słowa wywoławcze** „Hej Alfa / Beta / Gama / Delta” — tryb „zawsze słucham”. Dopóki model nie jest
+  skalibrowany na Twoim głosie, włączenie wymaga potwierdzenia ryzyka. Przycisk **Testuj słowo wywoławcze** pokazuje,
+  czy wykrycie działa. Opcja **Tylko mój głos budzi Alfę** odrzuca wykrycia z telewizora czy rozmowy obok.
+- **Rozpoznawanie mojego głosu** — kreator rejestracji (kilka fraz). Profil jest zaszyfrowany, zostaje na tym
+  komputerze i nie trafia do eksportu. Akcja ryzykowna zlecona głosem bez kliknięcia przechodzi tylko po
+  zweryfikowaniu Twojego głosu (i zgodnie z poziomem autonomii); usuwanie plików głosem zawsze wymaga kliknięcia.
+- **Dyktowanie** (`Ctrl+Alt+D`) — tekst trafia do okna, które było na pierwszym planie w chwili startu, nigdy do okien
+  Alfy ani pól haseł. Komendy: „kropka”, „przecinek”, „znak zapytania”, „nowa linia”, „cofnij to”,
+  „koniec dyktowania”. Dyktowany tekst nie trafia do agentek, logów ani pamięci.
+- **Czytanie zaznaczenia** (`Ctrl+Alt+R`) — czyta zaznaczony tekst, dokument albo schowek głosem bieżącej agentki;
+  `Esc` albo „stop” przerywa. Czytana treść jest traktowana jako niezaufana.
+
+Skróty zmienisz w **Ustawienia → Skróty**. Okna programów uruchomionych jako administrator nie przyjmą dyktowania
+(wymagają osobnego pomocnika — **jeszcze niedostępne**).
+
 ## Jeszcze niedostępne
 
-Moduły są gotowe, ale aplikacja jeszcze ich nie pokazuje:
-
-- słowa wywoławcze „Hej Alfa / Beta / Gama / Delta” (tryb „zawsze słucham”),
-- weryfikacja Twojego głosu (rozpoznanie właściciela),
-- dyktowanie do dowolnego programu (Notatnik, Word, przeglądarka…),
-- czytanie zaznaczonego tekstu z innego programu,
-- panel Głos (`Alt+6`) z pełnym trybem głosowym, nagrywanie korpusu głosu, głosy i rozpoznawanie mowy w chmurze.
+- **Szybka rozmowa w chmurze** (mowa-na-mowę u dostawcy) — **wymaga klucza** i adaptera dostawcy, którego jeszcze nie ma.
+- Nagrywanie korpusu głosu w aplikacji (do lepszego rozpoznawania mowy) i głosy agentek wybrane w castingu.

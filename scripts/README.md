@@ -6,5 +6,6 @@
 | `pre-commit.sh`     | prettier, eslint, svelte-check, reguły Svelte 5, zakaz web fontów/backdrop-filter, aktualność tokenów                   | hook lokalny         |
 | `check-svelte5.mjs` | wykrywa składnię Svelte 4 (`export let`, `$:`, `on:`)                                                                   | `pnpm lint`          |
 | `check-css.mjs`     | wykrywa `@import url(` i `backdrop-filter` poza paletą poleceń                                                          | `pnpm lint`          |
+| `setup-dev.ps1`     | Windows: sprawdza narzędzia do budowy Alfy; `-Install` (każdy krok za zgodą), `-Build`, `-Test` (także testy na żywym systemie, każdy za zgodą), `-Run`, `-Installer` — opis w `docs/user-guide/11-pierwszy-test-na-pc.md` | PC właściciela       |
 
 Skrypty są częścią bramek jakości z §4.4 planu (`docs/PLAN.md`).

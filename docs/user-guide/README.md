@@ -16,9 +16,10 @@ przygotować samodzielnie, w tekście są oznaczenia:
 | **Wymaga plików**       | Program lub model trzeba na razie skopiować ręcznie do katalogu Alfy.                               |
 | **Jeszcze niedostępne** | Funkcja jest zaplanowana albo gotowa „pod spodem”, ale aplikacja jej jeszcze nie pokazuje.          |
 
-Najważniejsze ograniczenie: **okno Brokera (okno zatwierdzeń) nie jest jeszcze podłączone**. Działania agentek,
-które wymagają Twojej zgody, kończą się odmową po upływie czasu, a poziomu autonomii nie da się podnieść — można go
-tylko obniżyć. Szczegóły: [Bezpieczeństwo](07-bezpieczenstwo.md).
+Najważniejsze ograniczenie: Alfa nie była jeszcze testowana na prawdziwym sprzęcie (mikrofon, karta graficzna,
+okno Brokera jako usługa Windows). Zanim zaczniesz codziennie z niej korzystać, przejdź
+[Pierwszy test na Twoim PC](11-pierwszy-test-na-pc.md). Okno zatwierdzeń prowadzi osobny proces Brokera — szczegóły:
+[Bezpieczeństwo](07-bezpieczenstwo.md).
 
 ## Spis treści
 
@@ -32,6 +33,8 @@ tylko obniżyć. Szczegóły: [Bezpieczeństwo](07-bezpieczenstwo.md).
 8. [Mosty CLI (Claude Code, Codex)](08-mosty-cli.md)
 9. [Przenoszenie danych, kopie i Zdrowie systemu](09-dane-i-zdrowie.md)
 10. [Modele i silniki](10-modele-i-silniki.md)
+11. [Pierwszy test na PC — lista kontrolna](11-pierwszy-test-na-pc.md) (budowa ze źródeł skryptem
+    `scripts/setup-dev.ps1` i sprawdzenie krok po kroku na desktopie i laptopie)
 
 ## Skróty klawiszowe
 

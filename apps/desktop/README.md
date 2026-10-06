@@ -9,6 +9,13 @@ UI używa pakietu `@alfa/ui-kit` (`packages/ui-kit`) — tokeny designu i kompon
 - WebView2 Runtime (wbudowany w Windows 11; instalator NSIS dociąga bootstrapper)
 - Node 22 + pnpm 10 (`corepack enable` albo `npm i -g pnpm@10`)
 - (opcjonalnie) NSIS do paczki instalacyjnej — `tauri build` pobierze go sam
+- Strawberry Perl (`perl` zgłaszający `MSWin32`) — `rusqlite` z `bundled-sqlcipher-vendored-openssl` buduje OpenSSL
+  skryptami Perla (`openssl-src`); Perl z Git Bash (msys) nie działa. Obraz `windows-latest` w CI ma go wbudowanego.
+
+Sprawdzenie i doinstalowanie wymagań: `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-dev.ps1`
+(domyślnie tylko sprawdza; `-Install` instaluje braki przez winget/rustup/npm po potwierdzeniu każdego kroku;
+`-Build`, `-Test` z testami `#[ignore]` na żywym systemie, `-Run` = `tauri dev`, `-Installer` = NSIS jak w
+`release.yml`). Lista kontrolna pierwszego testu na PC: `docs/user-guide/11-pierwszy-test-na-pc.md`.
 
 Na Linuksie/macOS frontend buduje się i przechodzi wszystkie bramki bez Tauri; sama powłoka wymaga
 WebKitGTK (Linux) / WKWebView (macOS) i **nie jest tu celem** — CI kompiluje Rust na `windows-latest`.
@@ -22,6 +29,8 @@ cargo tauri dev                    # okno Tauri (wymaga: cargo install tauri-cli
 # albo bez globalnego CLI:
 pnpm --filter @alfa/desktop-ui exec tauri dev
 ```
+`pnpm … exec tauri` działa w katalogu `apps/desktop/ui`, a Tauri CLI szuka `src-tauri` tylko w głąb katalogu
+bieżącego — ustaw `TAURI_APP_PATH` na `apps/desktop/src-tauri` (jak `release.yml`; `setup-dev.ps1 -Run` robi to sam).
 
 ## Build produkcyjny
 ```powershell

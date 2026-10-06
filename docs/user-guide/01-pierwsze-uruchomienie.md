@@ -9,8 +9,10 @@
 
 ## Instalacja
 
-Alfa nie ma jeszcze publicznego instalatora ani automatycznych aktualizacji (**jeszcze niedostępne**). Program buduje
-się ze źródeł według `apps/desktop/README.md` — polecenie `cargo tauri build` tworzy instalator `Alfa_*.exe`.
+Alfa nie ma jeszcze publicznego wydania: instalator `Alfa_*.exe` (z aktualizacjami i powrotem do poprzedniej wersji)
+budujesz ze źródeł. Najprościej skryptem `scripts\setup-dev.ps1` — krok po kroku w
+[Pierwszy test na Twoim PC](11-pierwszy-test-na-pc.md). Automatyczne aktualizacje działają dopiero z wydania
+podpisanego Twoim kluczem (`docs/RELEASE.md`).
 
 ## Wprowadzenie (8 kroków)
 
