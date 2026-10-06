@@ -200,6 +200,7 @@ name = "alfa-desktop"
 version = "0.0.1"
 dependencies = [
  "app-core",
+ "app-logs",
  "serde",
  "serde_json",
  "tauri",
@@ -601,6 +602,16 @@ dependencies = [
  "sessions-contract",
  "tokio",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-logs"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "core-log-contract",
+ "tracing",
+ "tracing-core",
 ]
 
 [[package]]

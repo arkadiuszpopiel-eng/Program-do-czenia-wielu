@@ -714,6 +714,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-logs"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "core-log-contract",
+ "tempfile",
+ "tracing",
+ "tracing-core",
+]
+
+[[package]]
 name = "app-memory"
 version = "0.0.1"
 dependencies = [
@@ -856,6 +867,7 @@ name = "app-safety"
 version = "0.0.1"
 dependencies = [
  "app-broker",
+ "app-logs",
  "broker-ui-contract",
  "broker-ui-impl",
  "compliance-contract",
@@ -870,6 +882,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "tokio",
+ "tracing",
  "updater-impl",
  "watchdog-contract",
  "watchdog-impl",

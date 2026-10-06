@@ -58,12 +58,11 @@ fn builder<'a>(
     let builder = WebviewWindowBuilder::new(app, label, WebviewUrl::App(PathBuf::from(page)))
         .data_directory(data_dir)
         .content_protected(true);
-    // Port CDP tylko w buildzie testowym (Playwright); w produkcji zamknięty (PLAN §8.2).
-    #[cfg(feature = "e2e")]
-    let builder = builder.additional_browser_args(
-        "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9222",
-    );
-    builder
+    // Port CDP tylko w buildzie testowym (Playwright); w produkcji zamknięty (PLAN §8.2, `cdp`).
+    match crate::cdp::browser_args() {
+        Some(args) => builder.additional_browser_args(args),
+        None => builder,
+    }
 }
 
 fn data_dir(app: &AppHandle) -> PathBuf {

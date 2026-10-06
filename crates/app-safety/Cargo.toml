@@ -39,6 +39,9 @@ updater-impl = { path = "../updater-impl" }
 semver.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
+# Dziennik diagnostyczny procesów Jądra (plik rotowany, redakcja sekretów; `start_logs`).
+app-logs = { path = "../app-logs" }
+tracing.workspace = true
 
 [dev-dependencies]
 # Format komunikatów watchdoga = parser aplikacji (`app_broker::notice`).

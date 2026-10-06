@@ -17,3 +17,10 @@ Instalacja usługi (bramka ludzka #10, jednorazowy UAC):
 (SID konta usługi i użytkownika, katalog danych, wiązania ról z pełnymi ścieżkami obrazów w `Program Files`,
 `broker_ui.integrity = "user_session_high"`). Testy: `tests/chain.rs` (pełny łańcuch na atrapach, każdy system),
 `tests/windows_ports.rs` (porty Windows na CI; wysoka integralność — `#[ignore]`, self-hosted).
+
+Dziennik diagnostyczny (fala 5, `app-logs` przez `start_logs`): każdy z trzech procesów pisze
+`<proces>.<RRRR-MM-DD>.<NNN>.log` w `%LOCALAPPDATA%\Alfa\logs` swojego konta (usługa `LocalSystem` —
+`C:\Windows\System32\config\systemprofile\AppData\Local\Alfa\logs`), poziom z `ALFA_LOG` (domyślnie `info`),
+redakcja sekretów, panika przed `abort`. Bez kopii na stderr — stderr zostaje kanałem do aplikacji (komunikaty
+`eprintln!` bez zmian). Watchdog zapisuje wykonanie kill-switcha z `latency_us`, `jobs_killed`, `jobs_failed`,
+`tokens_revoked`, `audited`.

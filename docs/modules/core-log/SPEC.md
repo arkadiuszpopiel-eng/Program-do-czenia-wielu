@@ -77,3 +77,31 @@ Dane dla Osi czasu/Replay, pulpitu kosztów/opóźnień, ekranu „co poszło do
 - **Magistrala:** `spawn_bus_writer` — rodzaje wbudowane wg `LogStream::for_kind`, `audit` → łańcuch, zdarzenia modułów → Diagnostyka, `ui` pominięte.
 - **Nie w F0:** indeks SQLite, szyfrowanie payloadów i `shred_session`, upcastery, deny-lista, kolejka + wątek zapisu (zapis synchroniczny
   pod zamkiem, bez fsync per rekord), `diagnostics_bundle`, zdarzenia `log.rotated`/`log.disk_limit_reached`, fsync Audytu.
+
+## Fala 5: dziennik diagnostyczny procesów (`app-logs`)
+- **Problem (raport H):** żaden proces nie instalował subskrybenta `tracing` — wszystkie `tracing::…` (błędy startu,
+  ostrzeżenia modułów, `latency_us` kill-switcha) przepadały. Strumienie NDJSON `core-log` zapisują tylko zdarzenia
+  magistrali.
+- **Rozwiązanie:** crate `app-logs` (korzeń kompozycji) — własny `Subscriber` na `tracing-core` (bez nowych crate'ów:
+  `tracing-subscriber`/`tracing-appender` nie ma w `Cargo.lock`), instalowany w `main`: powłoka Tauri (`alfa`),
+  `alfa-broker`, `alfa-broker-ui`, `alfa-watchdog`. Plik tekstowy `%LOCALAPPDATA%\Alfa\logs\<proces>.<RRRR-MM-DD>.<NNN>.log`
+  (UTC), linia `czas POZIOM cel: komunikat pole=wartość`; rotacja po dniu i po 10 MiB, ≤ 14 plików na proces
+  (≤ 140 MiB), retencja 7 dni (PLAN §13; `[logs] file_days`, 1–90). Segmenty `*.ndjson` i pliki innych procesów
+  nie są dotykane; `.log` nie wchodzi do eksportu `.alfa`.
+- **Poziom:** `ALFA_LOG` (pierwszeństwo) → `[logs] level` (powłoka, po zbudowaniu rdzenia) → `info`. Składnia
+  `poziom[,cel=poziom…]`, najdłuższy cel wygrywa; cele spoza Alfy najwyżej `warn` bez jawnego wpisu (biblioteki HTTP
+  na `debug` logują nagłówki). Agentki nie mogą ustawić `ALFA*` ani `WEBVIEW2_*` (`env_write_denied`).
+- **Redakcja (zawsze, przed zapisem):** nazwy pól sekretów → `[REDACTED]`; nazwy pól treści (tekst rozmowy,
+  transkrypcja, prompt, obraz/piksele, schowek, audio) → `[pominięto: N znaków]`; wartości przez `RegexRedactor`
+  (`core-log-contract`) + wzorce dodatkowe (GitHub PAT, AWS, JWT, PEM, `hf_`, `gsk_`, `pplx-`) + nieprzezroczyste
+  tokeny (≥ 32 znaki, wielkie i małe litery oraz cyfry; hashe hex i UUID zostają); wartość > 64 KiB pominięta
+  w całości, potem obcięcie (komunikat 4096, pole 1024 znaki, ≤ 32 pola) i ucieczka znaków sterujących/kierunku
+  tekstu. Do pliku trafia więc tylko to, co już dziś niosą zdarzenia diagnostyczne — bez sekretów, treści i pikseli.
+- **Procesy Jądra:** bez kopii na stderr (stderr to kanał do aplikacji — `app-broker` dopisuje jego linie do dziennika
+  aplikacji i pokazuje ostatnią przy awarii); usługa Brokera pisze do `%LOCALAPPDATA%` konta usługi (katalogu danych
+  Brokera nie dotyka — tworzy go `PrivateDirPort` z ACL). Powłoka w buildzie debug — także stderr.
+- **Panika:** hook zapisuje `ERROR alfa_panic: panika: … miejsce=plik:linia` przed `abort` (release).
+- **Testy:** `crates/app-logs/tests/secrets.rs` (test szpiegowski ACC-F1-core-log-04 dla dziennika procesu),
+  `rotation.rs`, `install.rs`; jednostkowe filtra i redakcji.
+- **Nie w fali 5:** ustawienie poziomu w UI (strona „Logi i prywatność” — dziś klucz w `shared.toml`), zmiana poziomu
+  bez restartu z UI, paczka diagnostyczna z plikami `.log`.

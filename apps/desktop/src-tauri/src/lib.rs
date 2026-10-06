@@ -3,8 +3,10 @@
 //! zasobnik, skróty globalne, powiadomienia, jedną instancję i protokół `alfa://`.
 //! Logika aplikacji jest w `app-core`; tu tylko kleje systemowe.
 
+mod cdp;
 mod commands;
 mod kernel;
+mod logs;
 mod pump;
 mod shell;
 mod shortcuts;
@@ -16,6 +18,13 @@ use tauri::{Manager, WindowEvent};
 
 /// Uruchamia aplikację. Błąd startu jest fatalny — nie ma sensownego stanu bez rdzenia i okna.
 pub fn run() {
+    // Dziennik przed wszystkim innym — błędy startu Brokera i rdzenia też trafiają do pliku.
+    let log_handle = logs::start();
+    if let Some(why) = cdp::environment_violation(|name| std::env::var(name).ok()) {
+        tracing::error!(powod = %why, "start wstrzymany: środowisko WebView2 (F3-13)");
+        eprintln!("alfa-desktop: {why}");
+        std::process::exit(1);
+    }
     let result = tauri::Builder::default()
         // Single-instance musi być pierwszą wtyczką: druga instancja przekazuje argumenty/URI.
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
@@ -43,7 +52,8 @@ pub fn run() {
                 core.attachments_dropped(paths.clone());
             }
         })
-        .setup(|app| {
+        .setup(move |app| {
+            tracing::info!(wersja = %app.package_info().version, "start powłoki Alfy");
             let paths = AppPaths::from_env().map_err(|e| e.message)?;
             let handle = app.handle().clone();
             // Procesy Jądra przed rdzeniem: Broker poza procesem (usługa / tryb przenośny),
@@ -57,6 +67,9 @@ pub fn run() {
             };
             let core = tauri::async_runtime::block_on(AppCore::build(paths.clone(), options))
                 .map_err(|e| e.message)?;
+            if let Some(log_handle) = &log_handle {
+                logs::apply_settings(log_handle, &core);
+            }
             app.manage(core.clone());
             app.manage(windows::WindowState::new(paths.webview_data()));
             windows::create_all(&handle)?;
@@ -70,6 +83,7 @@ pub fn run() {
         })
         .run(tauri::generate_context!());
     if let Err(error) = result {
+        tracing::error!(error = %error, "błąd uruchomienia Tauri");
         eprintln!("alfa-desktop: błąd uruchomienia Tauri: {error}");
         std::process::exit(1);
     }

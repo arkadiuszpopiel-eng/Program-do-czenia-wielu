@@ -76,3 +76,30 @@ Przechodzi ukryty test jakości i czeka na Twoje **Zatwierdź ten diff**; wdroż
 
 Lista zamrożonych zestawów testowych z kontrolą integralności („zgodna z hashem” / „naruszona”, przycisk
 **Sprawdź**) i werdykty bramki jakości.
+
+## Gdzie są logi
+
+`Win+R` → wpisz `%LOCALAPPDATA%\Alfa\logs` → `Enter`.
+
+- **Dziennik diagnostyczny** — zwykły tekst (otworzysz Notatnikiem): błędy, ostrzeżenia, start modułów,
+  STOP WSZYSTKIEGO. Pliki `alfa.<data>.000.log` (aplikacja), `alfa-broker.…`, `alfa-watchdog.…`,
+  `alfa-broker-ui.…`. Jedna linia = jedno zdarzenie; czas w UTC (w Polsce +1 h zimą, +2 h latem). Nowy plik
+  codziennie i po 10 MB, najwyżej 14 plików na proces; pliki starsze niż 7 dni Alfa usuwa sama.
+- **Zdarzenia** (wywołania modeli, narzędzia, głos, diagnostyka) — podkatalogi `model_calls`, `tools_gui`, `voice`,
+  `diagnostics` z plikami `.ndjson`. Tylko te trafiają do eksportu `.alfa`, gdy zaznaczysz **Logi**.
+- **Usługa Brokera** z instalatora pisze swój dziennik w `%LOCALAPPDATA%` konta usługi, nie w Twoim profilu.
+
+Więcej szczegółów (np. do zgłoszenia błędu): w pliku `%APPDATA%\Alfa\config\shared.toml` dopisz
+
+```toml
+[logs]
+level = "debug"   # error, warn, info (domyślnie), debug, trace
+file_days = 7     # ile dni trzymać dziennik (1–90)
+```
+
+i uruchom Alfę ponownie (albo jednorazowo: zmienna środowiskowa `ALFA_LOG=debug` — ma pierwszeństwo). Wróć do
+`info`, gdy skończysz — `debug` szybciej zapełnia pliki.
+
+W dzienniku **nie ma** kluczy API, haseł, treści rozmów, transkrypcji ani zrzutów ekranu: pola z sekretami są
+zamazywane (`[REDACTED]`), a treść pomijana (`[pominięto: N znaków]`). Mogą być nazwy plików i ścieżki — przejrzyj
+plik, zanim go komuś wyślesz.

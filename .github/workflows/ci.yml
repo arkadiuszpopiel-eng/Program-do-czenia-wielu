@@ -88,6 +88,18 @@ jobs:
       - name: Clippy (build testowy z portem CDP, feature e2e)
         working-directory: apps/desktop/src-tauri
         run: cargo clippy --all-targets --features e2e -- -D warnings
+      # F3-13 / PT-34: build produkcyjny bez argumentów przeglądarki (bez portu CDP) i odmowa startu
+      # przy `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` ze zdalnym debugowaniem (`src/cdp.rs`).
+      - name: Testy powłoki (build produkcyjny bez portu CDP)
+        working-directory: apps/desktop/src-tauri
+        env:
+          CARGO_PROFILE_DEV_DEBUG: "0"
+        run: cargo test --lib
+      - name: Testy powłoki (build testowy e2e)
+        working-directory: apps/desktop/src-tauri
+        env:
+          CARGO_PROFILE_DEV_DEBUG: "0"
+        run: cargo test --lib --features e2e
 
   cargo-deny:
     name: cargo-deny

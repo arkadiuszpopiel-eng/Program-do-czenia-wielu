@@ -25,6 +25,8 @@ tauri-build = { version = "=2.7.0", features = [] }
 
 [dependencies]
 app-core = { path = "../../../crates/app-core" }
+# Dziennik diagnostyczny procesu (subskrybent `tracing`, plik rotowany w %LOCALAPPDATA%\Alfa\logs).
+app-logs = { path = "../../../crates/app-logs" }
 # `tray-icon` — zasobnik (§14.8); `protocol-asset` — podgląd obrazów artefaktów przez `asset:`.
 tauri = { version = "=2.12.0", features = ["tray-icon", "protocol-asset"] }
 # Wtyczki zgodne z tauri ^2.12 (MIT OR Apache-2.0); wersje przypięte (docs/vendor/tauri.md).

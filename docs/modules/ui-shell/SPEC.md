@@ -87,8 +87,8 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
   niszczony i odtwarzany przy pokazaniu (`general.close_to_tray = false` → wyjście).
 - **Bezpieczeństwo:** capabilities per okno (`capabilities/{main,quick,pill}.json`, bez `core:default`,
   uprawnienia `allow-<komenda>` z manifestu aplikacji w `build.rs`); CSP mapą dyrektyw bez `unsafe-inline`
-  dla skryptów; DevTools tylko w debug; port CDP wyłącznie z cechą `e2e`. Trusted Types — jeszcze nie
-  wymuszane w CSP (wymaga polityki dla `SanitizedHtml.svelte`).
+  dla skryptów; DevTools tylko w debug; port CDP wyłącznie z cechą `e2e`. Trusted Types wymuszane od fali 5
+  (sekcja „Fala 5: CSP, Trusted Types i port CDP”).
 - **Przejście do sesji:** zdarzenie `OpenSession { sessionId }` (rdzeń → UI) — „Nowa rozmowa" z zasobnika,
   `alfa://session/<id>` i `quick_expand_to_main` ustawiają aktywną sesję, a działające UI przełącza widok
   (`focusSession`).
@@ -184,6 +184,37 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
 - **Testy:** vitest `api/__tests__/fake-computer.test.ts`, `logic/__tests__/work.test.ts`,
   `state/__tests__/work.test.ts`; Playwright `e2e/computer.spec.ts` (Ekran, terminal, umiejętności,
   Kreator, Zdrowie) + axe 0 critical/serious w obu motywach.
+
+## Fala 5: CSP, Trusted Types i port CDP (PT-33, PT-34, F3-13)
+- **Trusted Types — wdrożone.** CSP wydania (`tauri.conf.json` → `app.security.csp`) ma
+  `require-trusted-types-for 'script'` i `trusted-types svelte-trusted-html alfa-sanitized-html default`.
+  Polityki (`packages/ui-kit/src/trusted-types.ts`): `svelte-trusted-html` (szablony Svelte), `alfa-sanitized-html`
+  (wyłącznie `SanitizedHtml.svelte` — HTML zsanitowany w Rust), `default` tylko z `createScriptURL` dla adresów
+  z tego samego pochodzenia (worker podświetlania `new Worker(new URL(…))` — wzorzec Vite bez zmian). Każde inne
+  `innerHTML`, `eval`, `setTimeout(tekst)` i obcy adres skryptu rzuca wyjątek. `devCsp` bez zmian (nakładka
+  błędów i HMR Vite). Pomiar: E2E z wymuszoną polityką i polityką `default` liczącą użycia — jedyne surowe sinki
+  to `{@html}` w `SanitizedHtml` (918 użyć) i konstruktor workera (86); bez `eval`.
+- **Regresja w CI:** `vite preview` wysyła nagłówek CSP zbudowany z `tauri.conf.json` (`vite.config.ts`), więc całe
+  E2E (Playwright) działa pod polityką wydania: 100/100 zielone, 0 raportów naruszeń. Vitest
+  `logic/__tests__/trusted-types.test.ts`.
+- **Do sprawdzenia na Windows:** skrypty wstrzykiwane przez Tauri/wtyczki w WebView2 nie są pokryte E2E
+  (przeglądarka z atrapą) — pierwszy test na PC: rozmowa z odpowiedzią modelu i blokiem kodu (podświetlenie) bez
+  błędu `TrustedHTML`/`TrustedScriptURL` w konsoli DevTools (build debug).
+- **`style-src 'self'` (bez `'unsafe-inline'`) — nie wdrożone**, E2E: 4/100 czerwone, 106 naruszeń. Miejsca do zmiany:
+  1. `bits-ui` — blokada przewijania dialogów przywraca `body.setAttribute('style', …)` po zamknięciu; zablokowane
+     przywrócenie zostawia stronę bez interakcji (czerwone `updates.spec.ts:14`, `voice-features.spec.ts:66`) —
+     łatka/aktualizacja `bits-ui` albo `preventScroll={false}` i własna blokada przez CSSOM;
+  2. `bits-ui` `Command` (paleta `Ctrl+K`) — szablony z `style="display: contents;"` (87 naruszeń `style-src-attr`);
+  3. `@xterm/xterm` (renderer DOM terminala) — elementy `<style>` z motywem, wymiarami i paskiem przewijania
+     (14 naruszeń `style-src-elem`) — nonce dla stylów albo inny renderer.
+  Ryzyko resztkowe niskie (PT-33, CVSS 3,1): HTML z LLM przechodzi przez `ammonia` (bez atrybutów `style`).
+- **Port CDP (F3-13, PT-34):** `apps/desktop/src-tauri/src/cdp.rs` — `browser_args()` zwraca argumenty z
+  `--remote-debugging-port` wyłącznie z cechą `e2e`, w produkcji `None`; test źródła: jedyne wystąpienie flagi
+  w powłoce i jej konfiguracji jest za `#[cfg(feature = "e2e")]`. Build produkcyjny nie startuje, gdy
+  `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` zawiera zdalne debugowanie albo ustawiono
+  `WEBVIEW2_BROWSER_EXECUTABLE_FOLDER` (wpis `ERROR` w dzienniku). Testy uruchamia job CI „Powłoka Tauri
+  (Windows)” (`cargo test --lib` z cechą `e2e` i bez). Nie sprawdzane: polityka rejestru
+  `HKCU|HKLM\Software\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments`.
 
 ## Otwarte pytania
 - Snap Layouts i Mica z własnym paskiem tytułu w Tauri (spike j): UI ma region `data-tauri-drag-region` i rezerwuje miejsce na natywne przyciski (`--alfa-titlebar-controls`); Playwright przez CDP vs `tauri-driver` — do ustalenia po F0.

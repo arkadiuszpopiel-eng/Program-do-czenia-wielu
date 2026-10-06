@@ -375,8 +375,23 @@ przepisz komunikat.
 | Wynik sprawdzenia narzędzi              | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-dev.ps1 *> "$env:USERPROFILE\Desktop\alfa-sprawdzenie.txt"` — plik na Pulpicie |
 | Komunikaty z Terminala                  | zaznacz myszą ostatnie ok. 50 linii (przy błędzie testu — od `failures:`), `Ctrl+C`, wklej                                                          |
 | Stan Alfy                               | **Ustawienia → Zdrowie systemu → Sprawdź teraz** — przepisz stan i listę incydentów                                                                 |
-| Logi Alfy                               | `Win+R` → `%LOCALAPPDATA%\Alfa\logs` → `Enter`: pliki `.ndjson` z dnia testu; albo **Eksport** `.alfa` z zaznaczonymi tylko **Logami**              |
+| Logi Alfy                               | `Win+R` → `%LOCALAPPDATA%\Alfa\logs` → `Enter`: pliki `alfa.<data>.000.log` (i `alfa-broker…`, `alfa-watchdog…`) z dnia testu — patrz niżej         |
+| Zdarzenia Alfy                          | podkatalogi `diagnostics`, `model_calls` w tym samym folderze (pliki `.ndjson`); albo **Eksport** `.alfa` z zaznaczonymi tylko **Logami**           |
 | Log uruchamiania (wersja z instalatora) | `%LOCALAPPDATA%\Alfa\launcher.log`                                                                                                                  |
+
+### Gdzie są logi
+
+- **Dziennik diagnostyczny** — `%LOCALAPPDATA%\Alfa\logs\alfa.<RRRR-MM-DD>.000.log` (aplikacja), obok
+  `alfa-broker.…`, `alfa-broker-ui.…`, `alfa-watchdog.…`. Zwykły tekst; czas w UTC (latem w Polsce +2 h).
+  Nowy plik codziennie i po 10 MB, najwyżej 14 plików na proces, 7 dni. Przy STOP WSZYSTKIEGO szukaj linii
+  `kill-switch` z polem `latency_us` (czas w mikrosekundach).
+- W trybie deweloperskim (część 4) te same linie widać na bieżąco w Terminalu.
+- Przed powtórzeniem błędu włącz więcej szczegółów: `$env:ALFA_LOG = "debug"` w tym samym oknie PowerShell
+  przed `setup-dev.ps1 -Run` albo `[logs]` / `level = "debug"` w `%APPDATA%\Alfa\config\shared.toml`
+  (od następnego uruchomienia; szczegóły: `09-dane-i-zdrowie.md` → „Gdzie są logi”).
+- Gdy Alfa (wersja z instalatora) w ogóle się nie otwiera — najpierw zajrzyj do najnowszego `alfa.….log`
+  (np. wpis o zmiennej `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS`: Alfa odmawia startu, gdy zmienna włącza
+  zdalne debugowanie WebView2 — usuń ją w „Zmiennych środowiskowych” i uruchom ponownie).
 
 Klucze API i hasła są w logach zawsze zamazywane, treść wiadomości — domyślnie też; mogą zostać nazwy plików
 i ścieżki, więc przejrzyj pliki przed wysłaniem. **Nie wysyłaj** kluczy API, haseł, zawartości folderów `.claude`,

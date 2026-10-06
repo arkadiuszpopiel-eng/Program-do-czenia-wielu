@@ -28,6 +28,7 @@ export { default as Menu, type MenuItem, type MenuTriggerProps } from './compone
 export { default as Popover, type PopoverTriggerProps } from './components/Popover.svelte';
 export { default as ResizeHandle } from './components/ResizeHandle.svelte';
 export { default as SanitizedHtml } from './components/SanitizedHtml.svelte';
+export { installDefaultPolicy, sanitizedHtml, sameOriginScriptUrl } from './trusted-types';
 export { default as VariantSwitcher } from './components/VariantSwitcher.svelte';
 export { default as ConfirmDialog } from './components/ConfirmDialog.svelte';
 export { default as Stepper } from './components/Stepper.svelte';

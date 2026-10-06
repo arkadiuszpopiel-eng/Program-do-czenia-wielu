@@ -84,7 +84,7 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 
 ## Otwarte pytania
 - Przypięcie SHA-256 i potwierdzenie adresów/licencji pozycji „do potwierdzenia” (bramka ludzka; zmiana `confirmed`).
-- Buildy CUDA `llama-server` (osobne archiwum `cudart`) i Vulkan/CUDA `whisper-server` — wiele archiwów na pozycję.
+- Buildy Vulkan/CUDA `whisper-server` (wiele archiwów na pozycję działa od fali 5 — `Install::Tree` z kilkoma plikami).
 - Podpisy Authenticode binariów sidecarów (P-08) — dziś tylko SHA-256/TOFU.
 - Przebudowa (`search-impl::reindex_all`) otwiera naraz wszystkie bazy sesji przez `SessionDbProvider` (pamięć
   podręczna `sessions` ich nie zamyka) — przy setkach sesji RAM rośnie; do rozważenia zamykanie baz po kroku.
@@ -93,3 +93,21 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 
 ## Przegląd bezpieczeństwa #3 (2026-10, `docs/reviews/2026-10-security-review-3.md`) — decyzja człowieka
 - **P3-04:** sidecary wykonywalne (`llama-server`, `whisper-server`, `piper`) pobierane bez przypiętego SHA-256 (tylko TOFU) — przypiąć skróty potwierdzonych wydań albo zablokować pobieranie nieprzypiętych plików wykonywalnych (THREAT_MODEL S23). Test `tests/review.rs` (`#[ignore]`).
+
+## Fala 5: `llama-server` CUDA i zastępstwo backendu
+- **Pozycja `sidecar-llama-cuda`** (`data.rs`, „do potwierdzenia przez człowieka”, bez SHA-256 — wzór pozycji Vulkan/CPU):
+  dwa archiwa wydania `b6710` — `llama-b6710-bin-win-cuda-12.4-x64.zip` i `cudart-llama-bin-win-cuda-12.4-x64.zip`
+  (biblioteki `cudart`/cuBLAS) — rozpakowywane do jednego drzewa `sidecars/llama-cuda/`; wymagane `llama-server.exe`
+  i `cudart64_12.dll` (bez niego serwer po cichu liczyłby na CPU). Wariant CUDA (12.4), rozmiary (200 + 400 MiB —
+  limit pobierania 2×), układ archiwów i licencja redystrybucji bibliotek NVIDIA — do potwierdzenia.
+- **Wiele archiwów na pozycję:** `unpack::extract_trees` — wszystkie pliki pozycji do jednego katalogu roboczego,
+  potem atomowa podmiana; plik powtórzony w dwóch archiwach (także inną wielkością liter) odrzuca całość. Limity
+  rozpakowania sidecarów: wpis ≤ 1 GiB, całość ≤ 2 GiB (cuBLAS przekracza domyślne 512 MiB); stopień kompresji
+  (zip-bomb) i limit pobierania bez zmian.
+- **Zastępstwo** (`app-modules::route::local::server_for`): kompilacja własna backendu → wspólna `sidecars/llama/` →
+  zastępcza: CUDA → Vulkan → CPU, Vulkan → CPU → CUDA, CPU → Vulkan → CUDA (każda kompilacja llama.cpp dla Windows
+  ma backend CPU). Gdy backend z profilu urządzenia nie ma własnej kompilacji — ostrzeżenie w dzienniku
+  (`brak llama-server dla backendu z profilu — używam kompilacji zastępczej`, pola `profil`, `uzyty`); notatka
+  pozycji CUDA w UI mówi, co się stanie bez niej.
+- **Testy:** `crates/app-models/tests/cuda.rs` (pozycja w katalogu, instalacja serwera i `cudart` do jednego drzewa,
+  odrzucenie powtórzonego pliku), `crates/app-modules/src/route/local.rs` (testy zastępstwa).

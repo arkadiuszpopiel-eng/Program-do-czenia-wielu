@@ -35,14 +35,14 @@ Bramki ludzkie (PLAN §4.6): #1 logowanie do CLI i klucze API · #2 UAC / Hello 
 | F0 Fundament i spike'i             |        19 |      4 |     13 |      0 |     2 |
 | F1 Rdzeń czatu                     |        13 |      7 |      6 |      0 |     0 |
 | F2 Głos rdzeniowy + agentki        |        14 |      2 |     12 |      0 |     0 |
-| F3 Safety Kernel (koniec MVP)      |        13 |      5 |      4 |      4 |     0 |
+| F3 Safety Kernel (koniec MVP)      |        13 |      6 |      5 |      2 |     0 |
 | F4 Mosty i MCP                     |         8 |      3 |      5 |      0 |     0 |
 | F5 Orkiestracja + głos rozszerzony |        12 |      5 |      7 |      0 |     0 |
 | F6 Computer use                    |         8 |      1 |      3 |      4 |     0 |
 | F7 Pamięć i transfer pełne         |         8 |      5 |      1 |      2 |     0 |
 | F8 Samonaprawa i ulepszanie        |         6 |      5 |      0 |      1 |     0 |
 | F9 Dopieszczenie                   |         7 |      0 |      4 |      3 |     0 |
-| **Razem**                          |   **108** | **37** | **55** | **14** | **2** |
+| **Razem**                          |   **108** | **38** | **56** | **12** | **2** |
 
 Wniosek: logika i zabezpieczenia są w większości zweryfikowane na atrapach; żadna fala nie jest formalnie zamknięta,
 bo prawie wszystkie pozostałe kryteria czekają na sprzęt, korpus, klucze albo akceptację człowieka. MVP (F0–F3)
@@ -123,10 +123,10 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
 | F3-07 | Eval narzędzi fs/shell na lokalnym 3–4,5B ≥ próg            | 🟡     | 35 zadań `evals/F3/tools/tasks.json`, CI na atrapie: `cargo test -p app-agents --test eval_tools`; pomiar `measure_on_local_model` (`#[ignore]`, Windows + `llama-server`). Próg ustala właściciel (ADR 14).                                                                                                                          |
 | F3-08 | Destrukcja głosem → potwierdzenie nie-głosem, także na L4   | ✅     | `risk-classifier-contract/tests/props.rs::voice_destruction_never_proceeds`, `safety-broker-contract` `flows::voice_destruction_asks_on_l4`. E2E z prawdziwym głosem — w F3-12.                                                                                                                                                       |
 | F3-09 | Audyt: Broker jedynym writerem, łańcuch, ACL append-only    | 🟡     | `safety-broker-impl/tests/audit.rs::chain_of_10k_events_verifies_and_survives_reopen`, `tampering_is_detected`; `app-safety/tests/windows_ports.rs` (DACL potoku). Brak próby zapisu z procesu agentki do plików Audytu na Windows; SR-08 bez testu Windows.                                                                          |
-| F3-10 | Aktualizacja + rollback launchera (10 cykli)                | ⛔     | Rollback i crash-loop: `updater-impl/tests/launcher.rs::crash_of_new_version_falls_back_to_previous`, `good_version_is_retried_then_rolled_back`. Pobierania i instalacji wydań brak w HEAD (praca w toku w drzewie roboczym); brak klucza minisign — bramka #10.                                                                     |
+| F3-10 | Aktualizacja + rollback launchera (10 cykli)                | 🟡     | Pełny cykl gotowy: pobieranie ze wznawianiem, minisign + SHA-256, instalacja obok, rollback i crash-loop — `updater-impl/tests/update_flow.rs::good_update_full_cycle`, `user_rollback_and_watchdog_rollback`, `update_safety.rs::downgrade_needs_explicit_user_rollback`, `launcher.rs::crash_of_new_version_falls_back_to_previous`; `app-updates/tests/updates.rs`. Zostały: klucz minisign (bramka #10), test instalatora NSIS i 10 cykli na desktopie i laptopie (self-hosted). |
 | F3-11 | Watchdog: safe-mode po N awariach, restart (20 scenariuszy) | ✅     | `watchdog-impl/tests/watchdog.rs::crash_loop_enters_safe_mode_and_rolls_back_once`, `restarts_outside_window_never_loop` (20 iteracji), `missed_heartbeats_and_failing_health`. Brak jednego zestawu 20 scenariuszy.                                                                                                                  |
 | F3-12 | Scenariusz MVP bez kluczy 6/6                               | ⛔     | Brak `evals/F3/mvp-scenario.md`. Instalator jest: menedżer modeli i sidecarów `app-models` (Ustawienia → „Modele i silniki”, onboarding) — `llama-server`, `whisper-server`, `piper`, GGUF, whisper, Piper, Silero, openWakeWord, model mówcy; HTTPS z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP (`app-models/tests/{download,unpack}.rs`). Blokery: okno zatwierdzeń przez Brokera poza procesem (`app-broker`) niezweryfikowane na sprzęcie; adresy/hashe sidecarów i modeli głosu do przypięcia przez człowieka (HF/GitHub zablokowane w sesji); pomiary F0/F2. |
-| F3-13 | Port CDP zamknięty w buildzie produkcyjnym (test CI)        | ⛔     | Port tylko z cechą `e2e` (`apps/desktop/src-tauri/src/windows.rs`); testu potwierdzającego brak portu w buildzie produkcyjnym nie ma (przegląd #1, S13).                                                                                                                                                                              |
+| F3-13 | Port CDP zamknięty w buildzie produkcyjnym (test CI)        | ✅     | `apps/desktop/src-tauri/src/cdp.rs`: `production_build_adds_no_browser_args` (bez cechy `e2e` — `None`), `cdp_flag_exists_only_behind_e2e_feature` (jedyne wystąpienie flagi w powłoce i `tauri*.conf.json` za `#[cfg(feature = "e2e")]`), `production_refuses_environment_that_opens_cdp` (odmowa startu przy `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` ze zdalnym debugowaniem). CI: job „Powłoka Tauri (Windows)” — `cargo test --lib` z cechą `e2e` i bez (fala 5; pierwszy przebieg po commicie). |
 
 ## F4 — Mosty i MCP
 
@@ -225,7 +225,12 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
 4. **Embedder semantyczny podpięty** (`app-models`: wybór `[search.embedder] model`, przebudowa wektorów w tle);
    brakuje pomiaru progu F7-02 na prawdziwym modelu e5-small i przypiętych SHA-256 w `lib_embed::CATALOG`.
 5. **Aktualizator**: pełny cykl (pobieranie ze wznawianiem, minisign, rollback, instalator NSIS) gotowy; brak klucza minisign i testu instalatora na Windows — F3-10.
-6. **Test zamkniętego portu CDP** w buildzie produkcyjnym — F3-13.
+6. **Powłoka i diagnostyka (fala 5):** dziennik diagnostyczny wszystkich procesów (`app-logs`: `%LOCALAPPDATA%\Alfa\logs\<proces>.<data>.<NNN>.log`,
+   rotacja, 7 dni, `ALFA_LOG` / `[logs] level`, redakcja sekretów i pominięcie treści — test szpiegowski); `llama-server`
+   CUDA z `cudart` („do potwierdzenia”) i zastępstwo CUDA → Vulkan → CPU z ostrzeżeniem; port CDP — test CI (F3-13) i odmowa
+   startu przy `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` ze zdalnym debugowaniem; CSP z Trusted Types (PT-33; E2E pod CSP
+   wydania). Do sprawdzenia na Windows: Trusted Types ze skryptami Tauri w WebView2, `style-src` nadal z `'unsafe-inline'`
+   (bits-ui, xterm — lista w `docs/modules/ui-shell/SPEC.md`), kompilacja powłoki (job „Powłoka Tauri (Windows)”).
 7. **Brakujące moduły**: helper `uiAccess` (F6-07). `plugin-runtime`, `tools-office`, `tools-browser`, `tools-vision`, `tools-system`,
    `tools-net` i `tools-media` są gotowe i podpięte w aplikacji; prawdziwy `Windows.Media.Ocr`, ffmpeg (do potwierdzenia: build i licencja)
    i odtwarzanie WASAPI sprawdzone tylko na atrapach — test na self-hosted Windows; `net_search` czeka na wybór dostawcy.
@@ -280,4 +285,5 @@ w katalogu menedżera (`app-models`) i brak testu zamkniętego portu CDP (szczeg
 10. **UAC / Hello (bramka #2):** instalacja usługi Brokera, helper `uiAccess` (F6-07), opcjonalnie Windows Hello.
 11. **Katalog modeli i sidecarów** (`crates/app-models/src/data.rs`, `lib-embed/src/catalog.rs`,
     `providers-local-impl/models.toml`): potwierdzić adresy, rozmiary i licencje (głos Piper, VoxCeleb), przypiąć
-    SHA-256 i numer wydania llama.cpp, sprawdzić układ archiwów `whisper-server`/`piper`; potem `confirmed: true`.
+    SHA-256 i numer wydania llama.cpp, sprawdzić układ archiwów `whisper-server`/`piper` oraz `sidecar-llama-cuda`
+    (wariant CUDA 12.4, archiwum `cudart`, licencja redystrybucji bibliotek NVIDIA); potem `confirmed: true`.

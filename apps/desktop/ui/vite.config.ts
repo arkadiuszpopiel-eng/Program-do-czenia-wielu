@@ -1,8 +1,21 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const host = process.env['TAURI_DEV_HOST'];
+
+// CSP wydania (`app.security.csp` z tauri.conf.json) jako nagłówek `vite preview` — E2E
+// (Playwright) działa pod tą samą polityką co okno Tauri, więc regresja Trusted Types albo
+// stylów inline wychodzi w CI, a nie dopiero na Windows (PT-33).
+function releaseCsp(): string {
+  const conf = JSON.parse(
+    readFileSync(new URL('../src-tauri/tauri.conf.json', import.meta.url), 'utf8'),
+  ) as { app: { security: { csp: Record<string, string> } } };
+  return Object.entries(conf.app.security.csp)
+    .map(([directive, value]) => `${directive} ${value}`)
+    .join('; ');
+}
 
 // Czysty CSR pod Tauri 2: brak SSR, stały port, bez czyszczenia ekranu (logi Rust w tej samej konsoli).
 export default defineConfig({
@@ -19,6 +32,9 @@ export default defineConfig({
     host: host ?? false,
     hmr: host ? { protocol: 'ws', host, port: 1421 } : undefined,
     watch: { ignored: ['**/src-tauri/**'] },
+  },
+  preview: {
+    headers: { 'Content-Security-Policy': releaseCsp() },
   },
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
   build: {

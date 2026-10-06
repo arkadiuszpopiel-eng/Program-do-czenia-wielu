@@ -9,6 +9,7 @@ use platform_windows_kernel_impl::{WinApprovalSurface, WinKernel};
 use watchdog_contract::SystemClock;
 
 fn main() -> ExitCode {
+    let _logs = app_safety::start_logs(app_logs::process::BROKER_UI);
     let ticket = read_ticket(std::io::stdin().lock());
     let result = ticket.and_then(|t| {
         let surface = Arc::new(WinApprovalSurface::new());
@@ -24,6 +25,7 @@ fn main() -> ExitCode {
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
+            tracing::error!(error = %e, "alfa-broker-ui zakończony błędem");
             eprintln!("[alfa-broker-ui] {e}");
             ExitCode::FAILURE
         }

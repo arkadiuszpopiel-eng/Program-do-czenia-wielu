@@ -25,6 +25,7 @@ fn console_config(config: Option<String>) -> Result<ServiceConfig, String> {
 }
 
 fn main() -> ExitCode {
+    let _logs = app_safety::start_logs(app_logs::process::BROKER);
     let args: Vec<String> = std::env::args().skip(1).collect();
     let config = arg_value(&args, "--config");
     let result = if has_flag(&args, "--console") {
@@ -46,6 +47,7 @@ fn main() -> ExitCode {
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
+            tracing::error!(error = %e, "alfa-broker zakończony błędem");
             eprintln!("[alfa-broker] {e}");
             ExitCode::FAILURE
         }

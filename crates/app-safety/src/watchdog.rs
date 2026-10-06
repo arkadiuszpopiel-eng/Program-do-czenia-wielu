@@ -221,11 +221,20 @@ pub fn run(args: WatchdogArgs) -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
     eprintln!("[alfa-watchdog] kill-switch Ctrl+Shift+F12 aktywny");
+    tracing::info!("kill-switch Ctrl+Shift+F12 aktywny");
     notify(&notice_ready());
     while !stop.is_stopped() {
         let events = hotkeys.wait_events(Duration::from_secs(1));
         if let Some(report) = runtime.block_on(daemon.on_events(&events)) {
             eprintln!("[alfa-watchdog] kill-switch: {report:?}");
+            tracing::warn!(
+                latency_us = report.latency_us,
+                jobs_killed = report.jobs_killed,
+                jobs_failed = report.jobs_failed.len(),
+                tokens_revoked = report.tokens_revoked,
+                audited = report.audited,
+                "kill-switch wykonany (Ctrl+Shift+F12)"
+            );
             notify(&notice_kill(&report));
         }
     }

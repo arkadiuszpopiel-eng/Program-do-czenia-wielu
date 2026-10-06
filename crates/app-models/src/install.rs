@@ -27,6 +27,16 @@ fn hash_of<'a>(downloads: &'a Hashes, name: &str) -> Result<&'a str, String> {
         .ok_or_else(|| format!("brak hasha pliku „{name}”"))
 }
 
+/// Limity rozpakowania sidecarów: biblioteki CUDA (`cublasLt64_12.dll`) przekraczają domyślne
+/// 512 MiB na wpis; stopień kompresji (zip-bomb) i limit pobierania pliku zostają.
+fn sidecar_limits() -> PackageLimits {
+    PackageLimits {
+        max_entry_bytes: 1 << 30,
+        max_total_bytes: 2 << 30,
+        ..PackageLimits::default()
+    }
+}
+
 /// Przenosi pobrane pliki do katalogu pozycji (zastępuje istniejące).
 fn move_files(spec: &ItemSpec, staging: &Path, target: &Path) -> Result<(), String> {
     for f in &spec.files {
@@ -92,10 +102,9 @@ pub fn finish(
                 .map_err(|e| e.to_string())?;
         }
         Install::Tree { strip, require } => {
-            let archive = staging.join(&spec.files.first().ok_or("pozycja bez pliku")?.name);
-            files =
-                unpack::extract_tree(&archive, &target, strip, require, PackageLimits::default())
-                    .map_err(|e| e.to_string())?;
+            let archives: Vec<_> = spec.files.iter().map(|f| staging.join(&f.name)).collect();
+            files = unpack::extract_trees(&archives, &target, strip, require, sidecar_limits())
+                .map_err(|e| e.to_string())?;
         }
         Install::Manual(_) => return Err("pozycja instalowana ręcznie".into()),
     }

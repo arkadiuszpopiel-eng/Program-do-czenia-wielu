@@ -213,9 +213,52 @@ fn llama(backend: &str, asset: &str) -> ItemSpec {
     )
 }
 
+/// Wariant CUDA wydań llama.cpp dla Windows (laptop z RTX 4050; do potwierdzenia przez człowieka).
+const LLAMA_CUDA: &str = "cuda-12.4";
+
+/// `llama-server` CUDA: archiwum serwera i osobne archiwum bibliotek `cudart`/cuBLAS z tego
+/// samego wydania, oba rozpakowywane do `sidecars/llama-cuda/` (wymagany też `cudart64_12.dll`
+/// — bez niego serwer po cichu liczyłby na CPU). Bez tej pozycji profil CUDA używa kompilacji
+/// Vulkan albo CPU (`app-modules::route::local::server_for`, ostrzeżenie w dzienniku).
+fn llama_cuda() -> ItemSpec {
+    let base = format!("https://github.com/ggml-org/llama.cpp/releases/download/{LLAMA_TAG}");
+    item(
+        "sidecar-llama-cuda",
+        ModelItemKind::Sidecar,
+        &format!("llama-server (cuda, llama.cpp {LLAMA_TAG})"),
+        "MIT; cudart/cuBLAS — NVIDIA CUDA EULA (redystrybucja do potwierdzenia)",
+        "https://github.com/ggml-org/llama.cpp/releases",
+        (Root::Sidecars, "llama-cuda"),
+        vec![
+            FileSpec::new(
+                &format!("llama-{LLAMA_TAG}-{LLAMA_CUDA}.zip"),
+                &format!("{base}/llama-{LLAMA_TAG}-bin-win-{LLAMA_CUDA}-x64.zip"),
+                200,
+                None,
+            ),
+            FileSpec::new(
+                &format!("cudart-{LLAMA_CUDA}.zip"),
+                &format!("{base}/cudart-llama-bin-win-{LLAMA_CUDA}-x64.zip"),
+                400,
+                None,
+            ),
+        ],
+        Install::Tree {
+            strip: String::new(),
+            require: vec![exe("llama-server"), "cudart64_12.dll".into()],
+        },
+        false,
+        (
+            "Serwer modeli lokalnych na kartach NVIDIA (CUDA 12.4, z bibliotekami cudart). Bez niego profil CUDA używa kompilacji Vulkan albo CPU (ostrzeżenie w dzienniku). Wersja, rozmiary, układ archiwów i licencja do potwierdzenia.",
+            "Local model server for NVIDIA GPUs (CUDA 12.4, with cudart libraries). Without it the CUDA profile uses the Vulkan or CPU build (warning in the log). Version, sizes, archive layout and licence to be confirmed.",
+        ),
+    )
+}
+
 fn sidecars() -> Vec<ItemSpec> {
     vec![
         llama("vulkan", "vulkan"),
+        llama_cuda(),
         llama("cpu", "cpu"),
         item(
             "sidecar-whisper-cpu",

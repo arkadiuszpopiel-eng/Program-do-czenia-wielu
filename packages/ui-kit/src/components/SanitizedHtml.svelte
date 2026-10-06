@@ -4,17 +4,21 @@
   ani nie sanitizuje. Nie przekazuj tu treści z innych źródeł.
 -->
 <script lang="ts">
+  import { sanitizedHtml } from '../trusted-types';
+
   interface Props {
     /** Gotowy, zsanitowany HTML z rdzenia (`RenderedBlock.html_sanitized`). */
     html_sanitized: string;
   }
 
   let { html_sanitized }: Props = $props();
+  // Pod CSP z Trusted Types `{@html}` przyjmuje tylko `TrustedHTML` z polityki `alfa-sanitized-html`.
+  const trusted = $derived(sanitizedHtml(html_sanitized));
 </script>
 
 <div class="alfa-prose" data-selectable>
   <!-- eslint-disable-next-line svelte/no-at-html-tags -- HTML zsanitowany w Rust (ammonia), ADR 0009 -->
-  {@html html_sanitized}
+  {@html trusted}
 </div>
 
 <style>

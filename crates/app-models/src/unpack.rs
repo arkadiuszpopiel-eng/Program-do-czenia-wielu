@@ -180,12 +180,28 @@ pub fn extract_tree(
     require: &[String],
     limits: PackageLimits,
 ) -> Result<Hashes, Unsafe> {
+    extract_trees(&[archive.to_path_buf()], target, strip, require, limits)
+}
+
+/// Jak [`extract_tree`] dla kilku archiwów rozpakowywanych do jednego drzewa (np. `llama-server`
+/// CUDA + biblioteki `cudart` z osobnego archiwum wydania). Ten sam plik w dwóch archiwach
+/// (także różniący się wielkością liter) odrzuca całość — nic nie jest nadpisywane po cichu.
+pub fn extract_trees(
+    archives: &[PathBuf],
+    target: &Path,
+    strip: &str,
+    require: &[String],
+    limits: PackageLimits,
+) -> Result<Hashes, Unsafe> {
+    if archives.is_empty() {
+        return Err(bad("pozycja bez archiwum"));
+    }
     let work = staging_dir(target);
     if work.exists() {
         std::fs::remove_dir_all(&work).map_err(bad)?;
     }
     std::fs::create_dir_all(&work).map_err(bad)?;
-    let result = tree_into(archive, &work, strip, require, limits);
+    let result = trees_into(archives, &work, strip, require, limits);
     let hashes = match result {
         Ok(h) => h,
         Err(e) => {
@@ -229,15 +245,36 @@ fn swap_in(work: &Path, target: &Path) -> Result<(), Unsafe> {
     Ok(())
 }
 
-fn tree_into(
-    archive: &Path,
+fn trees_into(
+    archives: &[PathBuf],
     work: &Path,
     strip: &str,
     require: &[String],
     limits: PackageLimits,
 ) -> Result<Hashes, Unsafe> {
-    let mut reader = Reader::open(archive, limits)?;
     let mut hashes = Hashes::new();
+    let mut seen = BTreeSet::new();
+    for archive in archives {
+        tree_into(archive, work, strip, limits, (&mut hashes, &mut seen))?;
+    }
+    for file in require {
+        if !work.join(file).is_file() {
+            return Err(bad(format!(
+                "po rozpakowaniu brak „{file}” (inny układ archiwum — do potwierdzenia w katalogu)"
+            )));
+        }
+    }
+    Ok(hashes)
+}
+
+fn tree_into(
+    archive: &Path,
+    work: &Path,
+    strip: &str,
+    limits: PackageLimits,
+    (hashes, seen): (&mut Hashes, &mut BTreeSet<String>),
+) -> Result<(), Unsafe> {
+    let mut reader = Reader::open(archive, limits)?;
     for i in 0..reader.archive.len() {
         let (name, dir, size) = reader.check(i)?;
         let Some(rel) = name.strip_prefix(strip) else {
@@ -253,15 +290,11 @@ fn tree_into(
             std::fs::create_dir_all(&path).map_err(bad)?;
             continue;
         }
+        if !seen.insert(rel.to_lowercase()) {
+            return Err(bad(format!("„{rel}” w więcej niż jednym archiwum")));
+        }
         let sha = reader.copy(i, size, &path)?;
         hashes.insert(rel.to_owned(), sha);
     }
-    for file in require {
-        if !work.join(file).is_file() {
-            return Err(bad(format!(
-                "po rozpakowaniu brak „{file}” (inny układ archiwum — do potwierdzenia w katalogu)"
-            )));
-        }
-    }
-    Ok(hashes)
+    Ok(())
 }

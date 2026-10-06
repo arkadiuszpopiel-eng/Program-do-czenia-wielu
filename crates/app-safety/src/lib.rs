@@ -19,6 +19,23 @@ pub mod watchdog;
 
 pub use child::ChildLauncher;
 
+/// Dziennik diagnostyczny procesu Jądra (`app-logs`): plik `<proces>.<RRRR-MM-DD>.<NNN>.log`
+/// w `%LOCALAPPDATA%\Alfa\logs` konta procesu (usługa Brokera — konta usługi), poziom z
+/// `ALFA_LOG` (domyślnie `info`), panika zapisywana przed `abort`. Bez kopii na stderr: stderr
+/// procesów Jądra to kanał do aplikacji (`app-broker` dopisuje jego linie do dziennika aplikacji
+/// i pokazuje ostatnią przy awarii) — kopia dublowałaby wpisy.
+pub fn start_logs(process: &str) -> Option<app_logs::LogHandle> {
+    let mut config = app_logs::LogConfig::for_process(process, app_logs::default_dir());
+    config.stderr = false;
+    match app_logs::install(config) {
+        Ok(handle) => Some(handle),
+        Err(e) => {
+            eprintln!("[{process}] {e}");
+            None
+        }
+    }
+}
+
 /// Wartość argumentu `--nazwa wartość`.
 pub fn arg_value(args: &[String], name: &str) -> Option<String> {
     args.iter()

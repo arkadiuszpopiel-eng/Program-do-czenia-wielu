@@ -136,6 +136,7 @@ pub fn launcher_for(config: &ServiceConfig) -> Arc<dyn SessionLauncherPort> {
 pub fn run(config: ServiceConfig, stop: &StopSignal) -> Result<(), String> {
     if config.dev_mode {
         eprintln!("[alfa-broker] TRYB DEWELOPERSKI — bez osobnego konta i bez UIPI dla Broker-UI");
+        tracing::warn!("tryb deweloperski Brokera — bez osobnego konta i bez UIPI dla Broker-UI");
     }
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)

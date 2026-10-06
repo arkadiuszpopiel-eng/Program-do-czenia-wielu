@@ -23,7 +23,9 @@
         "worker-src": "'self'",
         "object-src": "'none'",
         "base-uri": "'none'",
-        "form-action": "'none'"
+        "form-action": "'none'",
+        "require-trusted-types-for": "'script'",
+        "trusted-types": "svelte-trusted-html alfa-sanitized-html default"
       },
       "devCsp": {
         "default-src": "'self'",
