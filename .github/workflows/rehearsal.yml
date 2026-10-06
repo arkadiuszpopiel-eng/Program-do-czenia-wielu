@@ -58,12 +58,19 @@ jobs:
             code=$(curl -s -o /dev/null -I -L --max-time 30 -w '%{http_code}' "$url" || echo ERR)
             echo "- \`$code\` $url" | tee -a "$out"
           done
-          for repo in speakleash/Bielik-4.5B-v3.0-Instruct-GGUF ggerganov/whisper.cpp; do
-            echo "## $repo — pliki modeli" | tee -a "$out"
-            curl -s --max-time 30 "https://huggingface.co/api/models/$repo" \
-              | jq -r '"- gated: \(.gated // false)", (.siblings[]?.rfilename | select(test("\\.(gguf|bin)$")) | "- \(.)")' \
-              | head -80 | tee -a "$out"
+          # Repozytoria modelu lokalnego: oficjalne (speakleash) i kwantyzacje GGUF innych autorów;
+          # rozmiary plików (`blobs=true`) — do wyboru wariantu pod 6 GB VRAM.
+          for repo in speakleash/Bielik-4.5B-v3.0-Instruct-GGUF speakleash/Bielik-1.5B-v3.0-Instruct-GGUF \
+            mradermacher/Bielik-4.5B-v3.0-Instruct-GGUF mradermacher/Bielik-4.5B-v3.0-Instruct-i1-GGUF \
+            bartowski/speakleash_Bielik-4.5B-v3.0-Instruct-GGUF; do
+            echo "## $repo — pliki GGUF (MiB)" | tee -a "$out"
+            curl -s --max-time 30 "https://huggingface.co/api/models/$repo?blobs=true" \
+              | jq -r 'if .error then "- brak: \(.error)" else ("- gated: \(.gated // false), licencja: \(.cardData.license // "?")", (.siblings[]? | select(.rfilename | test("\\.gguf$")) | "- \(.rfilename) — \((.size // 0) / 1048576 | floor) MiB")) end' \
+              | head -60 | tee -a "$out"
           done
+          echo "## Wyszukiwanie: Bielik-4.5B-v3.0 GGUF" | tee -a "$out"
+          curl -s --max-time 30 "https://huggingface.co/api/models?search=Bielik-4.5B-v3.0&limit=40" \
+            | jq -r '.[].id | "- \(.)"' | tee -a "$out"
           echo "## speakleash — repozytoria GGUF" | tee -a "$out"
           curl -s --max-time 30 "https://huggingface.co/api/models?author=speakleash&search=GGUF&limit=50" \
             | jq -r '.[].id | "- \(.)"' | tee -a "$out"
