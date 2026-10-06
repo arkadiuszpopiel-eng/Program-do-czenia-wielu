@@ -239,6 +239,15 @@ async fn parallel_limit_queues_the_second_item() {
     server.with(|s| s.stall_next_after = Some(1000));
     h.app.download("one").await.unwrap();
     h.wait("one", S::Downloading).await;
+    // Zawieszenie dostaje pierwsze żądanie, które dotrze do serwera — „two” startuje dopiero, gdy
+    // „one” już je zajęło (inaczej na wolnym runnerze zawieszone było „two”, CI Windows).
+    for _ in 0..1000 {
+        if server.with(|s| s.stall_next_after.is_none()) {
+            break;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+    }
+    assert!(server.requests().iter().any(|(path, _)| path == "/a.bin"));
     h.app.download("two").await.unwrap();
     tokio::time::sleep(std::time::Duration::from_millis(100)).await;
     assert_eq!(h.item("two").await.state, S::Queued);

@@ -180,11 +180,19 @@ async fn activation_rebuilds_vectors_and_vector_search_uses_the_model() {
     }
     let removed = h.app.remove("toy-encoder").await;
     assert!(removed.is_err(), "aktywnego modelu nie wolno usunąć");
-    assert!(
+    // Zdarzenie idzie przez magistralę asynchronicznie — może dojść chwilę po zmianie stanu.
+    let finished_event = || {
         h.events()
             .iter()
             .any(|e| matches!(e, AlfaEvent::ReindexStatus { status } if status.finished))
-    );
+    };
+    for _ in 0..1000 {
+        if finished_event() {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    assert!(finished_event());
     // Powrót do leksykalnego: przebudowa do embeddera leksykalnego, model można usunąć.
     let back = h.app.activate_embedder(LEXICAL).await.unwrap();
     assert_eq!(back.active, LEXICAL);
