@@ -97,8 +97,13 @@ for (const theme of ['light', 'dark'] as const) {
 test('eksport rozmowy z palety i z menu wiadomości', async ({ page }) => {
   await openApp(page);
   await waitForChat(page);
+  // Paleta ładuje się leniwie: pisanie przed jej otwarciem trafiłoby do composera (CI).
   await page.keyboard.press('Control+k');
+  await expect(page.locator('dialog[open] input')).toBeFocused();
   await page.keyboard.type('Eksportuj rozmowę do Markdown');
+  await expect(page.locator('dialog [role=option][data-selected]')).toContainText(
+    'Eksportuj rozmowę do Markdown',
+  );
   await page.keyboard.press('Enter');
   await expect(page.getByText(/^Zapisano rozmowę: .*\.md$/)).toBeVisible();
   const message = page.getByRole('article', { name: /^Twoja wiadomość/ }).last();
