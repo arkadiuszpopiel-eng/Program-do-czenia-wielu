@@ -226,6 +226,8 @@ jobs:
           $md.Add(''); $md.Add('### Problemy')
           if (@($r.problems).Count -eq 0) { $md.Add('Brak.') } else { foreach ($p in $r.problems) { $md.Add("- $(& $cell $p)") } }
           $md -join "`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          # Ten sam raport w logu joba — czytelny także przez API (podsumowanie joba nie jest dostępne w REST).
+          Write-Output ($md -join "`n")
       - name: Artefakt z raportem
         if: always()
         uses: actions/upload-artifact@v4
