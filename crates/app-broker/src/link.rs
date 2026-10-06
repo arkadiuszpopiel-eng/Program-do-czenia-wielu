@@ -377,7 +377,7 @@ impl BrokerLink {
     }
 }
 
-/// Wątek połączenia: żądania po kolei; pierwszy błąd strumienia kończy połączenie.
+/// Wątek połączenia: żądania po kolei; błąd strumienia — najpierw `mark_lost`, potem odpowiedź.
 fn worker(
     mut client: BlockingClient<Box<dyn PipeConnection>>,
     jobs: &mpsc::Receiver<Job>,
@@ -389,11 +389,11 @@ fn worker(
             .call(job.request)
             .map_err(|e| LinkError::Lost(e.to_string()));
         let failed = answer.as_ref().err().map(ToString::to_string);
+        if let (Some(why), Some(link)) = (&failed, link.upgrade()) {
+            link.mark_lost(generation, why);
+        }
         job.reply.send(answer);
-        if let Some(why) = failed {
-            if let Some(link) = link.upgrade() {
-                link.mark_lost(generation, &why);
-            }
+        if failed.is_some() {
             return;
         }
     }
