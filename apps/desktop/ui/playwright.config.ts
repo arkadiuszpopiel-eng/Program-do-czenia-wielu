@@ -15,7 +15,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
+      // PW_CHANNEL=msedge: systemowy Edge (silnik WebView2) zamiast pobranej przeglądarki Playwrighta.
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        ...(process.env['PW_CHANNEL'] ? { channel: process.env['PW_CHANNEL'] } : {}),
+      },
     },
   ],
   webServer: {

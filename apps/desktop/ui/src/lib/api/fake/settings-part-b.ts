@@ -191,6 +191,16 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'machine',
     ),
     toggle(
+      'ui.zoom_fit',
+      L('Dopasuj skalę do okna', 'Fit scale to window'),
+      L(
+        'Na szerokich oknach (ponad 1600 px) interfejs rośnie razem z oknem — do 125 % przy 2560 px i 150 % przy 3840 px. Powiększenie wyżej działa dodatkowo.',
+        'On wide windows (over 1600 px) the interface grows with the window — up to 125% at 2560 px and 150% at 3840 px. The zoom above applies on top.',
+      ),
+      true,
+      'machine',
+    ),
+    toggle(
       'ui.animations',
       L('Animacje', 'Animations'),
       L(
@@ -203,14 +213,15 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'ui.column',
       L('Szerokość kolumny rozmowy', 'Conversation column width'),
       L(
-        'Wąska (~72 znaki) czyta się najwygodniej; szeroka mieści tabele.',
-        'Narrow (~72 characters) reads best; wide fits tables.',
+        'Dopasowana rośnie z oknem (do ok. 110 znaków); wąska (~72 znaki) czyta się najwygodniej; szeroka mieści tabele.',
+        'Fitted grows with the window (up to about 110 characters); narrow (~72 characters) reads best; wide fits tables.',
       ),
       [
+        ['auto', L('Dopasowana do okna', 'Fitted to window')],
         ['narrow', L('Wąska', 'Narrow')],
         ['wide', L('Szeroka', 'Wide')],
       ],
-      'narrow',
+      'auto',
     ),
   ]),
   page(

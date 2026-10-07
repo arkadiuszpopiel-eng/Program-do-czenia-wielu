@@ -72,3 +72,11 @@ export function stepZoom(zoom: number, direction: 1 | -1 | 0): number {
   if (direction === 0) return 100;
   return clampZoom(Math.round(zoom / ZOOM_STEP) * ZOOM_STEP + direction * ZOOM_STEP);
 }
+
+/** Szerokości kolumny rozmowy (`ui.column`) w kolejności przełączania z palety. */
+export const COLUMN_MODES = ['auto', 'narrow', 'wide'] as const;
+
+export function nextColumn(current: string): string {
+  const i = COLUMN_MODES.indexOf(current as (typeof COLUMN_MODES)[number]);
+  return COLUMN_MODES[(i + 1) % COLUMN_MODES.length] ?? 'auto';
+}

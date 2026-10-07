@@ -24,18 +24,27 @@
   // „Co nowego" raz po aktualizacji — ładowane leniwie tylko wtedy.
   const loadWhatsNew = () => import('./lib/components/overlays/WhatsNewDialog.svelte');
 
+  // Szerokość okna steruje skalą dopasowania (`ui.zoom_fit`) i trybem układu.
+  let windowWidth = $state(window.innerWidth);
+
   $effect(() => {
     applyAppearance(document.documentElement, {
       theme: app.str('ui.theme', 'auto'),
       density: app.str('ui.density', 'comfortable'),
       animations: app.bool('ui.animations', true),
       zoom: app.num('ui.zoom', 100),
+      fit: app.bool('ui.zoom_fit', true),
+      width: windowWidth,
     });
   });
 
   $effect(() => {
     const zoom = app.num('ui.zoom', 100);
-    const update = () => (app.layout.width = effectiveWidth(window, zoom));
+    const fit = app.bool('ui.zoom_fit', true);
+    const update = () => {
+      windowWidth = window.innerWidth;
+      app.layout.width = effectiveWidth(window, zoom, fit);
+    };
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);

@@ -24,11 +24,13 @@
   const left = $derived(inSettings ? 'hidden' : place.left);
   const right = $derived(inSettings ? 'hidden' : place.right);
   const rail = $derived(left === 'docked' && app.layout.leftCollapsed);
-  const column = $derived(
-    app.str('ui.column', 'narrow') === 'wide'
-      ? 'var(--alfa-size-reading-column-wide)'
-      : 'var(--alfa-size-reading-column)',
-  );
+  // „Dopasowana”: kolumna rośnie z oknem — od wąskiej (72 znaki) do ok. 110 znaków, potem margines.
+  const COLUMNS: Record<string, string> = {
+    auto: 'clamp(var(--alfa-size-reading-column), 68%, 1000px)',
+    narrow: 'var(--alfa-size-reading-column)',
+    wide: 'var(--alfa-size-reading-column-wide)',
+  };
+  const column = $derived(COLUMNS[app.str('ui.column', 'auto')] ?? COLUMNS['auto']);
 
   const loadPalette = () => import('../overlays/PaletteHost.svelte');
   const loadCheatsheet = () => import('../overlays/Cheatsheet.svelte');

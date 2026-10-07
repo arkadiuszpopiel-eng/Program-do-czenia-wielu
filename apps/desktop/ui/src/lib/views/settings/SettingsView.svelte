@@ -115,71 +115,73 @@
     </nav>
   </aside>
   <section class="content" aria-labelledby="settings-page-title">
-    {#if loaded.status === 'failed'}
-      <h2 class="h2" id="settings-page-title" tabindex="-1">{t('settings.title')}</h2>
-      <LoadFailed error={loaded.error} onretry={() => void loadSchema()} />
-    {:else if query.trim()}
-      <h2 class="h2" id="settings-page-title" tabindex="-1" aria-live="polite">
-        {results.length
-          ? t('settings.results', { n: results.length })
-          : t('settings.noResults', { query: query.trim() })}
-      </h2>
-      {#if pageMatches.length}
-        <div class="page-hits">
-          {#each pageMatches as p (p.id)}
-            <Button size="sm" variant="secondary" onclick={() => open(p.id)}
-              >{app.i18n.text(p.label)}</Button
-            >
-          {/each}
-        </div>
-      {/if}
-      {#each results as r (r.def.key)}
-        <SettingRow def={r.def} page={app.i18n.text(r.page.label)} />
-      {/each}
-    {:else if page}
-      <h2 class="h2" id="settings-page-title" tabindex="-1">{app.i18n.text(page.label)}</h2>
-      {#if page.wave > 1}
-        <EmptyState
-          title={t('settings.later', { wave: page.wave })}
-          description={t('settings.laterList')}
-        >
-          {#snippet icon()}<Hourglass size={20} strokeWidth={1.5} />{/snippet}
-          <ul class="upcoming">
-            {#each page.upcoming as item (item.pl)}<li>{app.i18n.text(item)}</li>{/each}
-          </ul>
-        </EmptyState>
-      {:else}
-        {#if page.custom === 'providers'}<ProvidersPage />
-        {:else if page.custom === 'costs'}<CostsPage />
-        {:else if page.custom === 'shortcuts'}<ShortcutsPage />
-        {:else if page.custom === 'transfer'}<TransferPage />
-        {:else if page.custom === 'permissions'}<PermissionsPage />
-        {:else if page.custom === 'devices'}<DevicesPage />
-        {:else if page.custom === 'voice'}<VoicePage />
-        {:else if page.custom === 'memory'}<MemoryPage />
-        {:else if page.custom === 'triggers'}<TriggersPage />
-        {:else if page.custom === 'marshal'}<MarshalPage />
-        {:else if page.custom === 'skills'}<SkillsPage />
-        {:else if page.custom === 'builder'}<BuilderPage />
-        {:else if page.custom === 'computer'}<ComputerPage />
-        {:else if page.custom === 'health'}<HealthPage />
-        {:else if page.custom === 'updates'}<UpdatesPage />
-        {:else if page.custom === 'about'}<AboutPage />
-        {:else if page.custom === 'plugins'}<PluginsPage />
-        {:else if page.custom === 'models'}<Lazy
-            load={() => import('./pages/ModelsPage.svelte')}
-            props={{}}
-            label={t('engines.loading')}
-          />
+    <div class="page">
+      {#if loaded.status === 'failed'}
+        <h2 class="h2" id="settings-page-title" tabindex="-1">{t('settings.title')}</h2>
+        <LoadFailed error={loaded.error} onretry={() => void loadSchema()} />
+      {:else if query.trim()}
+        <h2 class="h2" id="settings-page-title" tabindex="-1" aria-live="polite">
+          {results.length
+            ? t('settings.results', { n: results.length })
+            : t('settings.noResults', { query: query.trim() })}
+        </h2>
+        {#if pageMatches.length}
+          <div class="page-hits">
+            {#each pageMatches as p (p.id)}
+              <Button size="sm" variant="secondary" onclick={() => open(p.id)}
+                >{app.i18n.text(p.label)}</Button
+              >
+            {/each}
+          </div>
         {/if}
-        {#if page.custom && page.settings.length > 0}
-          <h3 class="h3">{t('settings.pageSettings')}</h3>
-        {/if}
-        {#each page.settings as def (def.key)}
-          <SettingRow {def} />
+        {#each results as r (r.def.key)}
+          <SettingRow def={r.def} page={app.i18n.text(r.page.label)} />
         {/each}
+      {:else if page}
+        <h2 class="h2" id="settings-page-title" tabindex="-1">{app.i18n.text(page.label)}</h2>
+        {#if page.wave > 1}
+          <EmptyState
+            title={t('settings.later', { wave: page.wave })}
+            description={t('settings.laterList')}
+          >
+            {#snippet icon()}<Hourglass size={20} strokeWidth={1.5} />{/snippet}
+            <ul class="upcoming">
+              {#each page.upcoming as item (item.pl)}<li>{app.i18n.text(item)}</li>{/each}
+            </ul>
+          </EmptyState>
+        {:else}
+          {#if page.custom === 'providers'}<ProvidersPage />
+          {:else if page.custom === 'costs'}<CostsPage />
+          {:else if page.custom === 'shortcuts'}<ShortcutsPage />
+          {:else if page.custom === 'transfer'}<TransferPage />
+          {:else if page.custom === 'permissions'}<PermissionsPage />
+          {:else if page.custom === 'devices'}<DevicesPage />
+          {:else if page.custom === 'voice'}<VoicePage />
+          {:else if page.custom === 'memory'}<MemoryPage />
+          {:else if page.custom === 'triggers'}<TriggersPage />
+          {:else if page.custom === 'marshal'}<MarshalPage />
+          {:else if page.custom === 'skills'}<SkillsPage />
+          {:else if page.custom === 'builder'}<BuilderPage />
+          {:else if page.custom === 'computer'}<ComputerPage />
+          {:else if page.custom === 'health'}<HealthPage />
+          {:else if page.custom === 'updates'}<UpdatesPage />
+          {:else if page.custom === 'about'}<AboutPage />
+          {:else if page.custom === 'plugins'}<PluginsPage />
+          {:else if page.custom === 'models'}<Lazy
+              load={() => import('./pages/ModelsPage.svelte')}
+              props={{}}
+              label={t('engines.loading')}
+            />
+          {/if}
+          {#if page.custom && page.settings.length > 0}
+            <h3 class="h3">{t('settings.pageSettings')}</h3>
+          {/if}
+          {#each page.settings as def (def.key)}
+            <SettingRow {def} />
+          {/each}
+        {/if}
       {/if}
-    {/if}
+    </div>
   </section>
 </div>
 
@@ -273,8 +275,11 @@
     overflow: auto;
     padding: var(--alfa-space-6) var(--alfa-space-8) var(--alfa-space-12);
   }
-  .content > :global(*) {
-    max-width: 760px;
+  /* Strona ustawień: wyśrodkowana kolumna, która rośnie z oknem (do 1040 px), zamiast wąskiego
+     paska przy lewej krawędzi. */
+  .page {
+    width: min(1040px, 100%);
+    margin: 0 auto;
   }
   .h2 {
     margin-bottom: var(--alfa-space-4);

@@ -2,7 +2,7 @@
 // Skróty globalne (Szybkie pytanie, STOP WSZYSTKIEGO) obsługuje rdzeń — nie ma ich tutaj.
 import { errorText } from '../api/command-error';
 import type { PanelId } from '../api/types-system';
-import { stepZoom } from '../logic/layout';
+import { nextColumn, stepZoom } from '../logic/layout';
 import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
 import { RESERVED, allowedInInput, chordFromEvent } from '../logic/shortcuts';
 import type { AppState } from './app.svelte';
@@ -147,10 +147,7 @@ export function runCommand(app: AppState, id: string): void {
       void app.setSetting('ui.locale', app.i18n.locale === 'pl' ? 'en' : 'pl');
       break;
     case 'action.column':
-      void app.setSetting(
-        'ui.column',
-        app.str('ui.column', 'narrow') === 'wide' ? 'narrow' : 'wide',
-      );
+      void app.setSetting('ui.column', nextColumn(app.str('ui.column', 'auto')));
       break;
     case 'action.transfer':
       app.openSettings('transfer');

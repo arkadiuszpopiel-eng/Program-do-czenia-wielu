@@ -178,7 +178,7 @@ describe('AppState — ustawienia i skróty', () => {
     await app.start();
     vi.spyOn(client.settings, 'set').mockRejectedValue(coreError('Wartość spoza zakresu'));
     expect(await app.setSetting('ui.column', 'wide')).toBe(false);
-    expect(app.str('ui.column', 'narrow')).toBe('narrow');
+    expect(app.str('ui.column', 'narrow')).toBe('auto');
     expect(lastToast(app)).toMatchObject({ kind: 'error', message: 'Wartość spoza zakresu' });
     runCommand(app, 'view.zoomIn');
     expect(app.num('ui.zoom', 100)).toBe(110);
