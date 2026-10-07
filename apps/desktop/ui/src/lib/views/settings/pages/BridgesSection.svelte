@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
   import { Button, Checkbox, Switch, TextField } from '@alfa/ui-kit';
+  import { errorText } from '../../../api/command-error';
   import type { BridgeCard, BridgeLogin } from '../../../api/types-tasks';
   import { loginProfile } from '../../../logic/work';
   import { useApp } from '../../../state/context';
@@ -21,6 +22,8 @@
     refreshing = refresh;
     try {
       cards = await app.client.bridges.list(refresh);
+    } catch (error) {
+      showError(error);
     } finally {
       refreshing = false;
     }
@@ -34,20 +37,25 @@
     cards = cards.map((c) => (c.route_id === card.route_id ? card : c));
   }
 
+  function showError(error: unknown) {
+    app.toasts.show({ kind: 'error', message: errorText(error) });
+  }
+
   async function run(action: () => Promise<BridgeCard>) {
     try {
       replace(await action());
     } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(error);
     }
   }
 
   async function login(bridge: string) {
-    const result = await app.client.bridges.openLogin(bridge);
-    logins = { ...logins, [bridge]: result };
+    try {
+      const result = await app.client.bridges.openLogin(bridge);
+      logins = { ...logins, [bridge]: result };
+    } catch (error) {
+      showError(error);
+    }
   }
 
   async function copy(text: string) {

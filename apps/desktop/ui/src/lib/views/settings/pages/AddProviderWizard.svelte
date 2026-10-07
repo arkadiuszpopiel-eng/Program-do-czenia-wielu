@@ -1,6 +1,7 @@
 <!--
   Kreator „Dodaj dostawcę" (PLAN §5.6, makieta 12): dostawca → klucz → test → modele → przypisanie → limit.
-  Klucz trafia jednorazowo do rdzenia (Credential Manager); pole jest czyszczone od razu po wysłaniu.
+  Klucz trafia jednorazowo do rdzenia (Credential Manager); pole jest czyszczone po zapisaniu konta.
+  Gdy rdzeń odmówi (np. brak adresu endpointu), komunikat jest widoczny, a klucz zostaje w polu.
 -->
 <script lang="ts">
   import {
@@ -13,6 +14,7 @@
     agents,
     type AgentId,
   } from '@alfa/ui-kit';
+  import { errorText } from '../../../api/command-error';
   import type { Account, ProviderInfo, TestReport } from '../../../api/types-hub';
   import { fuzzyRank } from '../../../logic/fuzzy';
   import { useApp } from '../../../state/context';
@@ -37,6 +39,8 @@
   let account = $state<Account | null>(null);
   let report = $state<TestReport | null>(null);
   let testing = $state(false);
+  let saving = $state(false);
+  let keyError = $state('');
   let tasks = $state<string[]>(['chat']);
   let assigned = $state<AgentId[]>([...agentIds]);
   let stt = $state(false);
@@ -59,19 +63,28 @@
   function choose(p: ProviderInfo) {
     provider = p;
     label = p.display_name;
+    keyError = '';
     step = 1;
   }
 
   async function saveKey() {
-    if (!provider || !secret.trim()) return;
-    const input = {
-      provider_id: provider.id,
-      label: label.trim() || provider.display_name,
-      secret,
-      base_url: baseUrl.trim() || null,
-    };
+    if (!provider || !secret.trim() || saving) return;
+    saving = true;
+    keyError = '';
+    try {
+      account = await app.client.accounts.add({
+        provider_id: provider.id,
+        label: label.trim() || provider.display_name,
+        secret,
+        base_url: baseUrl.trim() || null,
+      });
+    } catch (error) {
+      keyError = errorText(error);
+      return;
+    } finally {
+      saving = false;
+    }
     secret = '';
-    account = await app.client.accounts.add(input);
     step = 2;
     await runTest();
   }
@@ -79,22 +92,32 @@
   async function runTest() {
     if (!account) return;
     testing = true;
-    report = await app.client.accounts.test(account.id);
-    testing = false;
+    try {
+      report = await app.client.accounts.test(account.id);
+    } catch (error) {
+      report = { ok: false, latency_ms: null, models: [], error: errorText(error) };
+    } finally {
+      testing = false;
+    }
   }
 
   async function finish() {
     if (!account) return;
-    await app.client.accounts.assign(account.id, {
-      task_classes: tasks,
-      agents: assigned,
-      voice_stt: stt,
-      voice_tts: tts,
-    });
-    await app.client.accounts.setLimit(account.id, limitOn, {
-      minor: Math.round(limitZl * 100),
-      currency: 'PLN',
-    });
+    try {
+      await app.client.accounts.assign(account.id, {
+        task_classes: tasks,
+        agents: assigned,
+        voice_stt: stt,
+        voice_tts: tts,
+      });
+      await app.client.accounts.setLimit(account.id, limitOn, {
+        minor: Math.round(limitZl * 100),
+        currency: 'PLN',
+      });
+    } catch (error) {
+      app.toasts.show({ kind: 'error', message: errorText(error) });
+      return;
+    }
     app.toasts.show({ kind: 'success', message: t('wiz.added', { label: account.label }) });
     onfinish(account);
   }
@@ -149,11 +172,18 @@
           type="url"
           bind:value={baseUrl}
           placeholder="https://"
+          hint={t('wiz.baseUrlHint')}
         />
       {/if}
+      {#if keyError}
+        <p class="fail" role="alert">{t('wiz.keyFail', { error: keyError })}</p>
+      {/if}
       <div class="actions">
-        <Button variant="primary" disabled={!secret.trim()} onclick={saveKey}
-          >{t('common.next')}</Button
+        <Button
+          variant="primary"
+          disabled={!secret.trim() || saving}
+          loading={saving}
+          onclick={saveKey}>{t('common.next')}</Button
         >
       </div>
     {:else if step === 2}

@@ -4,14 +4,18 @@
 import { Channel, convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { AlfaClient } from './client';
+import { toError } from './command-error';
 import type { AlfaEvent } from './types-system';
 import type { TerminalFrame } from './types-work';
 
 /** Nazwa jedynego kanału zdarzeń rdzeń → UI (paczki zdarzeń, najwyżej jedna na klatkę). */
 export const EVENTS_CHANNEL = 'alfa://events';
 
+// Odrzucenie zawsze jako `Error` (rdzeń odsyła `AppError` jako zwykły obiekt).
 const call = <T>(command: string, args?: Record<string, unknown>): Promise<T> =>
-  invoke<T>(command, args);
+  invoke<T>(command, args).catch((reason: unknown) => {
+    throw toError(reason);
+  });
 
 export class TauriAlfaClient implements AlfaClient {
   readonly kind = 'tauri' as const;

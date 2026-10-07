@@ -73,6 +73,9 @@ export const plSettings = {
   'wiz.keyHint':
     'Wklej klucz. Nie zapisujemy go w plikach — trafia do Menedżera poświadczeń Windows.',
   'wiz.baseUrl': 'Adres endpointu (base URL)',
+  'wiz.baseUrlHint':
+    'Adres API tego dostawcy z jego dokumentacji (np. https://api.deepseek.com). Katalog Alfy go nie zna, więc jest wymagany.',
+  'wiz.keyFail': 'Nie zapisano klucza: {error}',
   'wiz.testing': 'Testuję połączenie…',
   'wiz.testOk': 'Połączono · {latency}',
   'wiz.testFail': 'Nie udało się: {error}',

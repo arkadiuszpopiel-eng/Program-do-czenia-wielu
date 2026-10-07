@@ -72,6 +72,9 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'wiz.keyHint':
     'Paste the key. It is never written to files — it goes to Windows Credential Manager.',
   'wiz.baseUrl': 'Endpoint address (base URL)',
+  'wiz.baseUrlHint':
+    "This provider's API address from its documentation (e.g. https://api.deepseek.com). Alfa's catalog does not know it, so it is required.",
+  'wiz.keyFail': 'Key not saved: {error}',
   'wiz.testing': 'Testing the connection…',
   'wiz.testOk': 'Connected · {latency}',
   'wiz.testFail': 'Failed: {error}',
