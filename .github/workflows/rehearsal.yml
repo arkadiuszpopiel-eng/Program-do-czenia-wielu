@@ -18,6 +18,7 @@ on:
       - "crates/app-modules/src/route/local.rs"
       - "crates/app-modules/src/tts.rs"
       - "scripts/setup-dev.ps1"
+      - "scripts/install-on-drive.ps1"
       - ".github/workflows/rehearsal.yml"
       # Job `app-e2e` (prawdziwa aplikacja przez CDP) pilnuje też zmian aplikacji i UI.
       - "apps/desktop/**"
@@ -130,6 +131,28 @@ jobs:
             '0/ok' { "::notice::setup-dev.ps1 (7): komplet wymaganych narzędzi" }
             '1/missing' { "::notice::setup-dev.ps1 (7): na runnerze brakuje narzędzi (to nie błąd skryptu) — tabela w podsumowaniu" }
             default { "::error::setup-dev.ps1 (7): błąd skryptu (kod $code, wynik $result)"; exit 1 }
+          }
+          exit 0
+      # Instalacja na dysku D: (laptop właściciela) — tylko plan (-Ci): runner ma dysk D:, nic nie jest zmieniane.
+      - name: install-on-drive.ps1 -Drive D -Ci (PowerShell 5.1 i 7)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\install-on-drive.ps1'
+          $tokens = $null; $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($script, [ref]$tokens, [ref]$errors)
+          if ($errors) { foreach ($e in $errors) { "::error file=scripts/install-on-drive.ps1,line=$($e.Extent.StartLineNumber)::$($e.Message)" }; exit 1 }
+          foreach ($engine in 'powershell.exe', 'pwsh') {
+            $out = @(& $engine -NoProfile -ExecutionPolicy Bypass -File $script -Drive D -Ci 2>&1)
+            $code = $LASTEXITCODE
+            $stderr = @($out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+            $text = @($out | ForEach-Object { "$_" })
+            $text
+            $line = $text | Select-String -Pattern '^ALFA_INSTALL_RESULT=(\w+)' | Select-Object -Last 1
+            $result = if ($line) { $line.Matches[0].Groups[1].Value } else { 'none' }
+            if ($stderr.Count -gt 0) { "::error::install-on-drive.ps1 ($engine) pisze na stderr ($($stderr.Count) linii) — błąd skryptu"; exit 1 }
+            if ("$code/$result" -ne '0/ok') { "::error::install-on-drive.ps1 ($engine): kod $code, wynik $result"; exit 1 }
+            "::notice::install-on-drive.ps1 ($engine): plan gotowy (kod $code)"
           }
           exit 0
 

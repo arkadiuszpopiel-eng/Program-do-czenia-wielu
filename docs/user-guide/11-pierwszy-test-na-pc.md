@@ -33,8 +33,8 @@ tych części (kolumna „Laptop”).
    „nie rozpoznano polecenia” → zainstaluj aktualny sterownik Game Ready albo Studio ze strony NVIDIA i uruchom
    komputer ponownie. **CUDA Toolkit nie jest potrzebny** — biblioteki CUDA (cudart, cuBLAS) są w paczkach, które
    pobiera menedżer Alfy.
-3. **Narzędzia i budowa** (części 0–2; 30–60 min, głównie czekanie): `setup-dev.ps1`, przy `[BRAK]` — `-Install`,
-   potem `-Build`. W czasie budowy przeczytaj punkty 4–9.
+3. **Narzędzia i budowa — na dysku D: jednym poleceniem** (część „Instalacja na dysku D:” niżej, zamiast części 0–2;
+   40–90 min, głównie czekanie). W czasie budowy przeczytaj punkty 4–9. Dalej wszędzie zamiast `C:\alfa` jest `D:\alfa`.
 4. **Pierwszy start** (część 4, `-Run`) i **wprowadzenie** (część 5): w kroku **Sprzęt** ma być GeForce RTX 4050
    i profil **D** (CUDA); pozostałe kroki pomiń. Na karcie **Model lokalny** kliknij **Pobierz** (Bielik 4.5B Q8_0,
    ok. 4,8 GB — oficjalny plik autorów).
@@ -122,6 +122,43 @@ Modele z Hugging Face pobrane i sprawdzone przez automat CI (próba generalna, 2
 
 Pozostałe modele (np. Whisper large-v3-turbo) porównaj z opisem pliku na Hugging Face („SHA256”). Inna suma niż
 w tabeli → **nie** klikaj „Ufam temu plikowi”, zapisz obie sumy i zgłoś.
+
+## Instalacja na dysku D: jednym poleceniem (zamiast części 0–2)
+
+Skrypt `scripts/install-on-drive.ps1` instaluje i konfiguruje wszystko na dysku `D:` (inną literę podasz w `-Drive`):
+
+| Gdzie                  | Co                                                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `D:\alfa`              | kod Alfy i wyniki kompilacji (największa część — kilkadziesiąt GB)                                                 |
+| `D:\alfa-narzedzia`    | Rust (`RUSTUP_HOME`, `CARGO_HOME`), Visual Studio Build Tools, Git, Node.js 22, Strawberry Perl, cache npm i pnpm |
+| `C:` (nie da się/nie wolno przenieść) | Windows SDK i Instalator Visual Studio, WebView2, dane Alfy `%LOCALAPPDATA%\Alfa` (modele ok. 8 GB) |
+
+Oba katalogi na `D:` dostają uprawnienia tylko dla Ciebie, systemu i administratorów (na drugim dysku Windows domyślnie
+pozwala zmieniać pliki każdemu zalogowanemu użytkownikowi). **Dane Alfy zostają na `C:` celowo:** Broker chroni pliki
+Alfy (wersje, sidecary, konfigurację) według ich ścieżki; przeniesione dowiązaniem na `D:` byłyby dla agentek osiągalne
+drugą ścieżką, spoza tej ochrony. Na `C:` potrzeba ok. **15 GB** wolnego miejsca, na `D:` — ok. **60 GB**.
+
+1. Zaktualizuj Windows i sterownik NVIDIA (część 0, punkt 1), podłącz zasilacz.
+2. Otwórz **Terminal** — zwykły, **nie** „Uruchom jako administrator” — i wklej trzy linie:
+
+   ```powershell
+   $f = "$env:TEMP\alfa-install-on-drive.ps1"
+   Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/arkadiuszpopiel-eng/program-do-czenia-wielu/HEAD/scripts/install-on-drive.ps1 -OutFile $f
+   powershell -NoProfile -ExecutionPolicy Bypass -File $f -Drive D -Yes
+   ```
+
+   `-Yes` oznacza zgodę na wszystkie kroki naraz (bez `-Yes` skrypt pyta o każdy). Okna **Kontroli konta użytkownika**
+   instalatorów Gita, Visual Studio, Perla i Node.js zatwierdzasz **Tak** — instalator Visual Studio pracuje 10–30 min.
+3. Na końcu skrypt uruchamia `setup-dev.ps1 -Build` (kompilacja 20–40 min) i zakłada na Pulpicie skrót
+   **Alfa (tryb deweloperski)**. Gdy napisze, że Windows wymaga ponownego uruchomienia — uruchom komputer ponownie
+   i wklej **te same** trzy linie: kroki już wykonane zostaną pominięte.
+4. Dalej: część 3 (w nowym Terminalu najpierw `cd D:\alfa`) albo od razu część 4 — skrót na Pulpicie zamiast `-Run`.
+   We wszystkich poleceniach tego przewodnika zamiast `C:\alfa` wpisuj `D:\alfa`.
+
+| Punkt                                                                  | Laptop (CUDA) |
+| ---------------------------------------------------------------------- | ------------- |
+| D.1 Skrypt zakończony (czas; ostatnie linie podsumowania, gdy błąd)     |               |
+| D.2 Skrót „Alfa (tryb deweloperski)” uruchamia Alfę                     |               |
 
 ## 0. Przygotowanie (raz na każdym komputerze)
 
