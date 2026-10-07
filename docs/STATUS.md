@@ -25,6 +25,25 @@ crate'ów rdzenia — 122 testy zielone. Nie uruchomiono: clippy, pełnego `carg
 na dysku) i `cargo-deny` (brak narzędzia). Poprawione przy okazji: `check-deps.sh` zgłaszał na Windows fałszywe
 naruszenia (CRLF z `jq`), a `check-css.mjs` i `check-svelte5.mjs` nie działały w ścieżce Windows ze spacjami.
 
+Poprawki z nocy 7/8.10 (gałąź robocza, commity `020a9d4`, `a1c803c`, `e594e61` i następny):
+
+| Obszar | Co się zmieniło | Dowód |
+| --- | --- | --- |
+| Skalowanie interfejsu | kolumna rozmowy „Dopasowana do okna” (domyślna), `ui.zoom_fit` — skala rośnie z oknem powyżej 1600 px, strony ustawień wyśrodkowane do 1040 px | `src/lib/logic/__tests__/appearance.test.ts`; zrzuty `apps/desktop/ui/scripts/shots.mjs` (1280, 1920, 2560 px) |
+| Laptop 1280 px | prawy panel zadokowany obok rozmowy, Sesje jako pasek ikon (wcześniej szuflada zasłaniała rozmowę) | `logic/__tests__/layout.test.ts`, `state/__tests__/stores.test.ts` |
+| Ustawienia | 29 stron w 7 grupach; „fala N” → „wkrótce” | `logic/__tests__/settings-groups.test.ts` |
+| Model bez silnika (ustalenie 1 i 2 wyżej) | czytelny błąd z przyciskiem „Modele i silniki”, bez fałszywego „fallbacku na CPU” | `providers-local-impl/tests/lifecycle.rs::missing_engine_gives_actionable_error_and_no_fallback`, `missing_gpu_engine_uses_cpu_build`; `app-chat` `outcome::tests`; `e2e/composer.spec.ts` |
+| Zdrowie systemu | statusy incydentów po polsku | — |
+
+Nadal otwarte z testu na laptopie: zajęty skrót `Ctrl+Alt+Space` — powłoka wysyła toast przy konflikcie, ale przy
+starcie może on trafić do interfejsu, zanim ten zacznie słuchać (do sprawdzenia na działającej aplikacji; trwały
+wskaźnik na stronie Skróty byłby pewniejszy). Poprawki rdzenia nie były jeszcze uruchomione w prawdziwej aplikacji —
+budowa powłoki na dysku E: czeka na zwolnienie miejsca.
+
+Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): 121 z 122 zielone. Test „paleta: otwarcie ≤ 50 ms” ma
+medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy;
+do zbadania (F1-09). Testy `slow-core` miały za krótki limit na start aplikacji przy wolnym rdzeniu — poprawione.
+
 Zmiana procesu: recenzję robi osobna sesja Claude w świeżym kontekście, nie drugi model (ADR 0016). Wszędzie
 niżej „model-recenzent” ma to znaczenie.
 

@@ -16,3 +16,8 @@
 | `catalog.mjs`       | generuje `docs/CATALOG.md`: wszystkie crate'y i moduły z grupą, falą, rodzajem, rozmiarem, liczbą testów i SPEC oraz lista niespójności (brak README, SPEC, `module.toml`, przekroczone limity rozmiaru) | lokalnie, `gates.ps1` |
 
 Skrypty są częścią bramek jakości z §4.4 planu (`docs/PLAN.md`).
+
+Narzędzia interfejsu (`apps/desktop/ui/scripts/`): `bundle-size.mjs` — budżet paczki JS/CSS (CI);
+`shots.mjs` — zrzuty ekranu wszystkich widoków (rozmowa, panele, każda strona ustawień) w kilku rozmiarach okna,
+do przeglądu układu i skalowania (`pnpm dev` w tle, potem `node scripts/shots.mjs <katalog> --sizes 1280x720,1920x1080`).
+Testy E2E bez pobierania przeglądarki Playwrighta: `PW_CHANNEL=msedge pnpm test:e2e`.

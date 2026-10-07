@@ -11,8 +11,8 @@ export async function openApp(
   await page.goto(`${opts.path ?? '/'}${query}`);
 }
 
-export async function waitForChat(page: Page) {
-  await expect(page.locator('#alfa-composer')).toBeVisible();
+export async function waitForChat(page: Page, timeout?: number) {
+  await expect(page.locator('#alfa-composer')).toBeVisible(timeout ? { timeout } : undefined);
 }
 
 /** 0 naruszeń critical/serious (kryterium F1, ACC-F1-ui-shell-02). */

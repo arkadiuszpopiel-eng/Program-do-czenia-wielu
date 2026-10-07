@@ -168,6 +168,9 @@ STATUS i README zgodne z rzeczywistością, katalog bez niespójności.
 
 ### Etap 1 — Pierwsza prawdziwa rozmowa na laptopie (2–3 sesje)
 
+Stan na 2026-10-08: zadania 1.1 i 1.2 zrobione w kodzie i w testach (commit `e594e61`), niesprawdzone jeszcze
+w działającej aplikacji. Poza planem doszły poprawki skalowania interfejsu — opis w `docs/STATUS.md` (dopisek).
+
 | #   | Zadanie                                                                                                                                                                                                      | Kryteria                      |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | 1.1 | Model bez silnika: pobranie modelu ma prowadzić do pobrania pasującego `llama-server` (pakiet albo wyraźny krok), a wiadomość bez silnika ma dawać konkretny błąd w rozmowie z przyciskiem „Pobierz silnik". | F1-03                         |
