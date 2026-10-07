@@ -1,0 +1,24 @@
+# providers-catalog/kimi.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "kimi"
+display_name = "Kimi (Moonshot)"
+kind = "chat"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "cn-may-train"
+jurisdiction = "CN"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Open Platform przez adapter generyczny. CN [W]. Kimi Code CLI (plan abonamentowy) — trasa kimi-code-cli w rejestrze (szary, [W])."
+env_vars = ["MOONSHOT_API_KEY"]
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

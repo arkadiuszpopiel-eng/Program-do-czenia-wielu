@@ -1,0 +1,26 @@
+[package]
+name = "tools-screen-contract"
+description = "tools-screen: kontrakt narzędzia zrzutów ekranu agentek — tylko na żądanie, maskowanie okien Alfy/Brokera, aplikacji z deny-listy i pól haseł, skalowanie, PNG (treść niezaufana)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+platform-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

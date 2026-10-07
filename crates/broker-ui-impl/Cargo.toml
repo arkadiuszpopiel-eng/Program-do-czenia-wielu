@@ -1,0 +1,30 @@
+[package]
+name = "broker-ui-impl"
+description = "Broker-UI: karta zatwierdzenia w natywnym oknie (port ApprovalSurfacePort), decyzja wyłącznie z wejścia fizycznego (bez wstrzyknięć, ≥ 500 ms na pierwszym planie, bez nakładek) z jednorazowym nonce, opcjonalnie Windows Hello; łącze z Brokerem w procesie i przez named pipe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+broker-ui-contract = { path = "../broker-ui-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+platform-contract.workspace = true
+# `rt`: jednowątkowy runtime do `ApprovalChannel::resolve` (async) w łączu wewnątrzprocesowym.
+tokio = { workspace = true, features = ["rt"] }
+
+[dev-dependencies]
+broker-ui-contract = { path = "../broker-ui-contract", features = ["contract-tests"] }
+safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
+safety-broker-fake = { path = "../safety-broker-fake" }
+platform-fake = { path = "../platform-fake" }
+core-registry-contract.workspace = true
+compliance-contract = { path = "../compliance-contract" }
+proptest.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,26 @@
+[package]
+name = "tools-browser-contract"
+description = "tools-browser: kontrakt narzędzi przeglądarki agentek — izolowany profil, otwarcie adresu po zgodzie Brokera net.egress(host), migawka dostępności i tekst (treść niezaufana), kliknięcie i wpisywanie (bez haseł), zrzut, pobrania w kwarantannie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+platform-apps-contract = { path = "../platform-apps-contract" }
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

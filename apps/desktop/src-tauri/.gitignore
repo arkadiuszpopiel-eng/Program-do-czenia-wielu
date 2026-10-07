@@ -1,0 +1,4 @@
+/target/
+/gen/schemas/
+# Launcher budowany w workflow wydania (externalBin z tauri.bundle.conf.json).
+/binaries/

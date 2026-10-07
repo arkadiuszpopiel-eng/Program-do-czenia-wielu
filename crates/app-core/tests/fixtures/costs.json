@@ -1,0 +1,87 @@
+[
+  {
+    "command": "costs_summary",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "session": {
+        "minor": 114,
+        "currency": "PLN"
+      },
+      "day": {
+        "minor": 220,
+        "currency": "PLN"
+      },
+      "month": {
+        "minor": 4876,
+        "currency": "PLN"
+      },
+      "limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 30000,
+          "currency": "PLN"
+        }
+      },
+      "context": {
+        "used_tokens": 2794,
+        "max_tokens": 200000,
+        "compacted": false
+      },
+      "fx": {
+        "usd_pln": 3.64,
+        "date": "2026-09-30",
+        "stale": false
+      }
+    }
+  },
+  {
+    "command": "costs_summary",
+    "args": {
+      "sessionId": null
+    },
+    "result": {
+      "session": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "day": {
+        "minor": 220,
+        "currency": "PLN"
+      },
+      "month": {
+        "minor": 4876,
+        "currency": "PLN"
+      },
+      "limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 30000,
+          "currency": "PLN"
+        }
+      },
+      "context": {
+        "used_tokens": 2400,
+        "max_tokens": 200000,
+        "compacted": false
+      },
+      "fx": {
+        "usd_pln": 3.64,
+        "date": "2026-09-30",
+        "stale": false
+      }
+    }
+  },
+  {
+    "command": "costs_set_monthly_limit",
+    "args": {
+      "enabled": true,
+      "monthly": {
+        "minor": 25000,
+        "currency": "PLN"
+      }
+    },
+    "result": null
+  }
+]

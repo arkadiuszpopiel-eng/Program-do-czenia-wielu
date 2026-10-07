@@ -1,0 +1,153 @@
+<!-- Koszty (PLAN §14.6): limit miesięczny w PLN z przełącznikiem całkowitego wyłączenia. -->
+<script lang="ts">
+  import { LevelMeter, Switch } from '@alfa/ui-kit';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
+  import { attempt, load } from '../../../state/attempt';
+  import { useApp } from '../../../state/context';
+
+  const app = useApp();
+  const { t } = app.i18n;
+  const costs = $derived(app.costs);
+  const uid = $props.id();
+  let loadError = $state<string | null>(null);
+  let refreshing = $state(true);
+
+  // Strona pokazuje świeże koszty; bez nich (błąd rdzenia) — komunikat z „Ponów", nie pusta strona.
+  // W trakcie odświeżania: szkielet (brak danych) albo `aria-busy` na karcie z ostatnimi danymi.
+  async function reload() {
+    refreshing = true;
+    const result = await load(() => app.refreshCosts());
+    loadError = result.status === 'failed' ? result.error : null;
+    refreshing = false;
+  }
+
+  $effect(() => {
+    void reload();
+  });
+
+  /** Zapis limitu; `false` po błędzie (toast) — wołający przywraca w kontrolce prawdziwą wartość. */
+  async function setLimit(enabled: boolean, zloty: number): Promise<boolean> {
+    const minor = Math.max(0, Math.round(zloty * 100));
+    const ok = await attempt(app.toasts, () =>
+      app.client.costs.setMonthlyLimit(enabled, { minor, currency: 'PLN' }),
+    );
+    if (!ok) {
+      // Przełącznik sam zmienia swoje `checked`; nowy obiekt kosztów przywraca w nim stan rdzenia.
+      if (app.costs) app.costs = { ...app.costs };
+      return false;
+    }
+    await reload();
+    return true;
+  }
+</script>
+
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void reload()} />
+{:else if !costs && refreshing}
+  <Loading />
+{/if}
+{#if costs}
+  <section class="card" aria-busy={refreshing}>
+    <div class="row">
+      <div>
+        <h3 id="{uid}-l">{t('costsPage.limitToggle')}</h3>
+        <p class="desc" id="{uid}-d">{t('costsPage.limitDesc')}</p>
+      </div>
+      <Switch
+        checked={costs.limit.enabled}
+        labelledby="{uid}-l"
+        describedby="{uid}-d"
+        onchange={(on) => void setLimit(on, costs.limit.monthly.minor / 100)}
+      />
+    </div>
+    {#if costs.limit.enabled}
+      <label class="amount">
+        <span>{t('costsPage.amount')}</span>
+        <input
+          type="number"
+          min="0"
+          step="10"
+          value={costs.limit.monthly.minor / 100}
+          onchange={async (e) => {
+            const input = e.currentTarget;
+            const previous = costs.limit.monthly.minor / 100;
+            if (!(await setLimit(true, Number(input.value)))) input.value = String(previous);
+          }}
+        />
+      </label>
+      <div class="usage">
+        <span
+          >{t('costsPage.usage')}: {t('costs.limitUsage', {
+            used: app.i18n.money(costs.month),
+            limit: app.i18n.money(costs.limit.monthly),
+          })}</span
+        >
+        <LevelMeter
+          level={costs.month.minor / Math.max(1, costs.limit.monthly.minor)}
+          label={t('costsPage.usage')}
+          accent={costs.month.minor / Math.max(1, costs.limit.monthly.minor) >= 0.8
+            ? 'var(--alfa-color-warning)'
+            : 'var(--alfa-color-info)'}
+        />
+      </div>
+    {:else}
+      <p class="desc">
+        {t('costs.limitOff')}
+        {t('costsPage.usage')}: {app.i18n.money(costs.month)}
+      </p>
+    {/if}
+    <p class="desc">
+      {t('costs.fx', { date: costs.fx.date, rate: costs.fx.usd_pln })}
+      {#if costs.fx.stale}· {t('costs.fxStale')}{/if}
+    </p>
+    <p class="desc">{t('costsPage.perProvider')}</p>
+  </section>
+{/if}
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-3);
+    margin-bottom: var(--alfa-space-4);
+    padding: var(--alfa-space-4);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface);
+  }
+  .row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--alfa-space-4);
+  }
+  h3 {
+    font-size: var(--alfa-font-size-md);
+  }
+  .desc {
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
+  }
+  .amount {
+    display: flex;
+    align-items: center;
+    gap: var(--alfa-space-3);
+    font-size: var(--alfa-font-size-sm);
+  }
+  .amount input {
+    width: 120px;
+    height: var(--alfa-size-control);
+    padding: 0 var(--alfa-space-2);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-control);
+    background: var(--alfa-color-surface);
+    text-align: right;
+  }
+  .usage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-1);
+    font-size: var(--alfa-font-size-sm);
+  }
+</style>

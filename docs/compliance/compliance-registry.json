@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "max_age_days": 30,
+  "generated_at": "2026-09-30",
+  "notes": "Szkic rejestru zgodności (PLAN.md §1.3, §5.5). Statusy: green | gray | forbidden. Pewność: V = potwierdzone na stronie źródłowej, W = źródło wtórne, ? = brak jednoznacznego zapisu. url 'TODO' = źródło nie było dostępne dla badania; do pobrania i archiwizacji przed włączeniem trasy. Nieświeży wpis (today - verified_at > max_age_days) jest degradowany do gray.",
+  "routes": [
+    {
+      "id": "claude-code-cli",
+      "provider": "anthropic",
+      "mode": "cli-p",
+      "status": "green",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "https://code.claude.com/docs/en/legal-and-compliance",
+          "quote": "Third-party nie mogą oferować logowania Claude.ai, kierować ruchu przez dane logowania planów ani przechowywać tokenów; dozwolone jest logowanie użytkownika własnym planem do niezmodyfikowanego binarnego Claude Code (parafraza z PLAN.md §1.3; dosłowny cytat do uzupełnienia przy archiwizacji).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "V"
+        }
+      ],
+      "privacy_tags": ["unknown"],
+      "allowed": [
+        "logowanie użytkownika własnym planem do niezmodyfikowanego binarnego Claude Code",
+        "sterowanie oficjalnym trybem nieinteraktywnym (claude -p, stream-json, --permission-prompt-tool)",
+        "zwykłe, indywidualne użycie w limitach Pro/Max"
+      ],
+      "forbidden": [
+        "oferowanie logowania Claude.ai przez oprogramowanie trzecie",
+        "kierowanie ruchu przez dane logowania planu",
+        "czytanie lub przechowywanie tokenów (~/.claude)",
+        "harmonogramy masowe poza zwykłym indywidualnym użyciem"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": true
+    },
+    {
+      "id": "claude-agent-sdk",
+      "provider": "anthropic",
+      "mode": "sdk",
+      "status": "gray",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+          "quote": "Zasady Agent SDK są w ruchu: kredyt SDK ogłoszony i wstrzymany 15.06.2026 (parafraza z PLAN.md §1.3; dosłowny cytat do uzupełnienia przy archiwizacji).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "V"
+        }
+      ],
+      "privacy_tags": ["unknown"],
+      "allowed": [],
+      "forbidden": [
+        "użycie Agent SDK na planie Claude do czasu wyjaśnienia zasad"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "codex-cli",
+      "provider": "openai",
+      "mode": "cli-p",
+      "status": "gray",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "https://github.com/openai/codex/discussions/8338",
+          "quote": "Codex CLI oficjalnie działa z planami ChatGPT; 'bring your own plan' dla aplikacji trzecich bez oficjalnej odpowiedzi (parafraza z PLAN.md §1.3; dosłowny cytat do uzupełnienia przy archiwizacji).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "V"
+        }
+      ],
+      "privacy_tags": ["unknown"],
+      "allowed": [
+        "logowanie użytkownika własnym planem ChatGPT w niezmodyfikowanym Codex CLI",
+        "tryb nieinteraktywny / app-server (approvals do potwierdzenia w spike (b))"
+      ],
+      "forbidden": [
+        "czytanie lub przechowywanie tokenów (~/.codex)",
+        "forkowanie lub modyfikowanie CLI",
+        "traktowanie trasy jako zielonej bez oficjalnej odpowiedzi OpenAI"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "grok-build-subscription",
+      "provider": "xai",
+      "mode": "cli-p",
+      "status": "gray",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "TODO",
+          "quote": "Regulamin subskrypcji nie mówi wprost o sterowaniu z własnej aplikacji; AUP zakazuje scrapingu/destylacji (PLAN.md §5.5).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "?"
+        }
+      ],
+      "privacy_tags": ["unknown"],
+      "allowed": [],
+      "forbidden": [
+        "użycie subskrypcji xAI z Alfy do czasu weryfikacji regulaminu",
+        "scraping, destylacja"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "grok-build-api",
+      "provider": "xai",
+      "mode": "api",
+      "status": "green",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "TODO",
+          "quote": "Domyślnie klucz API; grok -p --output-format streaming-json, wznawianie sesji, ACP; licencja Apache-2.0 (PLAN.md §5.5).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "W"
+        }
+      ],
+      "privacy_tags": ["xai-retention-30d"],
+      "allowed": [
+        "Grok Build z kluczem API xAI (grok -p, streaming-json, ACP)",
+        "xAI przez adapter generyczny (api.x.ai/v1)"
+      ],
+      "forbidden": [
+        "scraping, destylacja"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "kimi-code-cli",
+      "provider": "kimi",
+      "mode": "cli-p",
+      "status": "gray",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "TODO",
+          "quote": "Osobisty użytek, nie modyfikować User-Agenta, jedna wspólna kwota (cytat wtórny, PLAN.md §5.5).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "W"
+        }
+      ],
+      "privacy_tags": ["cn-may-train"],
+      "allowed": [
+        "osobisty użytek na własnym planie (kimi -p --output-format stream-json, kimi acp) — po weryfikacji na stronie źródłowej"
+      ],
+      "forbidden": [
+        "modyfikowanie User-Agenta",
+        "ruch z sesji oznaczonych 'prywatne' (tag cn-may-train)"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "agy-antigravity",
+      "provider": "google",
+      "mode": "cli-p",
+      "status": "gray",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "https://geminicli.com/docs/resources/tos-privacy/",
+          "quote": "Bezpośredni dostęp do usług Gemini CLI przez oprogramowanie trzecie = naruszenie; od 18.06.2026 osobiste logowanie do Gemini CLI dla planów konsumenckich wygaszono (parafraza z PLAN.md §1.3).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "V"
+        },
+        {
+          "url": "https://github.com/google-gemini/gemini-cli/discussions/22970",
+          "quote": "Wg cytatu z forum uruchamianie oficjalnego agy jako procesu potomnego jest 'supported workflow' (PLAN.md §5.5) — sprzeczne z ToS.",
+          "retrieved_at": "2026-09-29",
+          "confidence": "W"
+        }
+      ],
+      "privacy_tags": ["google-personal-may-train"],
+      "allowed": [],
+      "forbidden": [
+        "użycie agy z Alfy do czasu wyjaśnienia sprzeczności (Gemini przez klucz API w adapterze generycznym)",
+        "przechwytywanie OAuth"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "qwen-coding-plan",
+      "provider": "qwen",
+      "mode": "cli-p",
+      "status": "forbidden",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "TODO",
+          "quote": "Regulamin planu: 'nie używać do skryptów i scenariuszy nieinteraktywnych' (cytat wtórny, PLAN.md §5.5).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "W"
+        }
+      ],
+      "privacy_tags": ["sg", "eu"],
+      "allowed": [
+        "modele Qwen wyłącznie przez API (DashScope, klucz przypisany do regionu)"
+      ],
+      "forbidden": [
+        "most CLI na planie Qwen Coding / Token Plan"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    },
+    {
+      "id": "glm-zcode-plan",
+      "provider": "zai",
+      "mode": "cli-p",
+      "status": "forbidden",
+      "verified_at": "2026-09-29",
+      "sources": [
+        {
+          "url": "TODO",
+          "quote": "Plan tylko w 'oficjalnie wspieranych narzędziach'; zgłaszane bany (cytat wtórny, PLAN.md §5.5).",
+          "retrieved_at": "2026-09-29",
+          "confidence": "W"
+        }
+      ],
+      "privacy_tags": ["sg"],
+      "allowed": [
+        "modele GLM wyłącznie przez API (Z.ai, endpoint OpenAI + Anthropic)"
+      ],
+      "forbidden": [
+        "most CLI na planie GLM / ZCode"
+      ],
+      "cli_pinned_version": null,
+      "enabled_by_default": false
+    }
+  ],
+  "providers": [
+    { "id": "anthropic", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie potwierdza tagu prywatności API; do weryfikacji." },
+    { "id": "openai", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie potwierdza tagu prywatności API; do weryfikacji." },
+    { "id": "google", "jurisdiction": "unknown", "privacy_tags": ["google-personal-may-train", "google-paid-eea-no-train"], "confidence": "V", "notes": "Konto osobiste może trenować; klucz płatny / EOG nie trenuje (PLAN.md §5.5). Tag zależy od typu konta/klucza." },
+    { "id": "xai", "jurisdiction": "unknown", "privacy_tags": ["xai-retention-30d"], "confidence": "W", "notes": "API: retencja 30 dni (PLAN.md §5.5)." },
+    { "id": "deepseek", "jurisdiction": "CN", "privacy_tags": ["cn-may-train"], "confidence": "W", "notes": "Dane w Chinach/Singapurze, może trenować (PLAN.md §5.5)." },
+    { "id": "kimi", "jurisdiction": "CN", "privacy_tags": ["cn-may-train"], "confidence": "W", "notes": "Moonshot; dane w Chinach/Singapurze, może trenować (PLAN.md §5.5)." },
+    { "id": "qwen", "jurisdiction": "SG|EU", "privacy_tags": ["sg", "eu"], "confidence": "W", "notes": "Alibaba/DashScope: Singapur lub Frankfurt; klucz przypisany do regionu (PLAN.md §5.5)." },
+    { "id": "zai", "jurisdiction": "SG", "privacy_tags": ["sg"], "confidence": "W", "notes": "Z.ai (GLM), Singapur (PLAN.md §5.5)." },
+    { "id": "minimax", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie podaje jurysdykcji; do weryfikacji." },
+    { "id": "byteplus", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie podaje jurysdykcji; do weryfikacji." },
+    { "id": "openrouter", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Agregator; jurysdykcja zależy od modelu docelowego — do weryfikacji per model." },
+    { "id": "mistral", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie podaje jurysdykcji; do weryfikacji." },
+    { "id": "elevenlabs", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Audio w chmurze (STT Scribe v2 RT, TTS, Voice Design — ToS użycia wyjścia jako referencji do sprawdzenia)." },
+    { "id": "cartesia", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Audio w chmurze (TTS); do weryfikacji." },
+    { "id": "azure-speech", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Azure Speech pl-PL; region wybierany w konfiguracji — do weryfikacji." },
+    { "id": "soniox", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "STT w chmurze; do weryfikacji." },
+    { "id": "deepgram", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Aura-2 bez polskiego; STT do weryfikacji." }
+  ]
+}

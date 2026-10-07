@@ -1,0 +1,98 @@
+/* Wspólne style głosu rozszerzonego F5 (panel Głos, Ustawienia → Głos) — klasy `vf-*`, ładowane
+   leniwie razem z panelem i sekcjami ustawień. Bez `backdrop-filter`, fonty systemowe. */
+.vf-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-2);
+  margin-bottom: var(--alfa-space-3);
+  padding: var(--alfa-space-3);
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-card);
+  background: var(--alfa-color-surface);
+  font-size: var(--alfa-font-size-sm);
+}
+.vf-card h3 {
+  font-size: var(--alfa-font-size-md);
+}
+.vf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--alfa-space-2);
+}
+.vf-state {
+  font-weight: 600;
+}
+.vf-muted {
+  color: var(--alfa-color-text-muted);
+  font-size: var(--alfa-font-size-xs);
+}
+.vf-warn {
+  color: var(--alfa-color-text);
+  border-left: 3px solid var(--alfa-color-warning);
+  padding-left: var(--alfa-space-2);
+}
+.vf-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--alfa-space-2);
+}
+.vf-toggle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--alfa-space-3);
+}
+.vf-toggle > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.vf-prompt {
+  margin: 0;
+  padding: var(--alfa-space-2) var(--alfa-space-3);
+  border-radius: var(--alfa-radius-control);
+  background: var(--alfa-color-surface2);
+  font-size: var(--alfa-font-size-md);
+}
+.vf-preview {
+  margin: 0;
+  padding: var(--alfa-space-2);
+  border: 1px dashed var(--alfa-color-border);
+  border-radius: var(--alfa-radius-control);
+  font-family: 'Cascadia Mono', ui-monospace, monospace;
+}
+.vf-badge {
+  padding: 1px var(--alfa-space-2);
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-full);
+  font-size: var(--alfa-font-size-xs);
+  white-space: nowrap;
+}
+.vf-badge.on {
+  border-color: var(--alfa-color-success);
+}
+.vf-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vf-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--alfa-space-2);
+}
+.vf-range {
+  display: flex;
+  align-items: center;
+  gap: var(--alfa-space-2);
+}
+.vf-range input {
+  flex: 1;
+  accent-color: var(--alfa-color-info);
+}

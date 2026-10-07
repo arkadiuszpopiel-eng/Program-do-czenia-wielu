@@ -1,0 +1,33 @@
+[package]
+name = "compliance-contract"
+description = "Kontrakt rejestru zgodności tras (v0): statusy zielona/szara/zabroniona, świeżość, wyłączniki, tagi prywatności/jurysdykcji, deny-listy Jądra"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
+# Mapowanie hostów UTS 46 (ta sama wersja co w `url`, już w Cargo.lock) — deny-lista domen musi
+# porównywać postać, do której łączy się klient HTTP/WebView2 (przegląd 2026-10, SR-04).
+idna = "1.1.0"
+
+[dev-dependencies]
+proptest.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

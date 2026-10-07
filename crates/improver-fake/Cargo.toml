@@ -1,0 +1,24 @@
+[package]
+name = "improver-fake"
+description = "Ulepszacz (F8): atrapa — ten sam rdzeń co -impl (ImproverCore) z wirtualnym zegarem, nagrywaniem zdarzeń i stanu w pamięci"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+improver-contract = { path = "../improver-contract" }
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+evals-contract = { path = "../evals-contract" }
+
+[dev-dependencies]
+improver-contract = { path = "../improver-contract", features = ["contract-tests"] }
+core-config-fake = { path = "../core-config-fake" }
+serde_json.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

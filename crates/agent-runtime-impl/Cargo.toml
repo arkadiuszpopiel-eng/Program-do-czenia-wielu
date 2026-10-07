@@ -1,0 +1,42 @@
+[package]
+name = "agent-runtime-impl"
+description = "agent-runtime v1: pętla agentki plan → akcja → obserwacja → weryfikacja na ModelProvider z narzędziami przez Brokera; wiele przebiegów równolegle z zasobami wyłącznymi, granica kroku schedulera (steering ≤ 1 krok), równoległe odczyty, delegacja z atenuacją, Krytyczka, raport końcowy, adapter TaskExecutor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+providers-contract = { path = "../providers-contract" }
+personas-contract = { path = "../personas-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+scheduler-contract = { path = "../scheduler-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util = { version = "0.7.19", default-features = false }
+uuid.workspace = true
+
+[dev-dependencies]
+agent-runtime-contract = { path = "../agent-runtime-contract", features = ["contract-tests"] }
+providers-fake = { path = "../providers-fake" }
+tools-fs-fake = { path = "../tools-fs-fake" }
+tools-fs-contract = { path = "../tools-fs-contract" }
+core-bus-fake = { path = "../core-bus-fake" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+tempfile = "3.27.0"
+proptest.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

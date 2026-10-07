@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "suite": "f3-tools",
+  "wave": "F3",
+  "version": 1,
+  "status": "proposed",
+  "created": "2026-10-01",
+  "description": "Przykład formatu: eval narzędzi F3 (evals/F3/tools/tasks.json) czytany adapterem `f3_tool_tasks`; wszystkie zadania w podziale `test`, klasa = `kind` (fs/shell).",
+  "files": {
+    "F3/tools/tasks.json": "46c46f1dad363e237df1caee1e63f945355bd23940629d5ce1f17017ed1ee828"
+  },
+  "cases": [
+    {
+      "path": "F3/tools/tasks.json",
+      "format": "f3_tool_tasks",
+      "split": "test"
+    }
+  ],
+  "thresholds": [
+    {
+      "id": "F3-07",
+      "rule": "text",
+      "text": "próg zaliczenia na modelu lokalnym ustala człowiek (ADR 14)",
+      "description": "ACCEPTANCE F3"
+    }
+  ]
+}

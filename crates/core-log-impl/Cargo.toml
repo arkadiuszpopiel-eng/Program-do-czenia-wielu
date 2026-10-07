@@ -1,0 +1,33 @@
+[package]
+name = "core-log-impl"
+description = "Log-writer jądra: append-only NDJSON per strumień (rotacja, limit dysku, retencja), redakcja przed zapisem, audyt pre-broker z łańcuchem SHA-256"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+core-log-contract.workspace = true
+core-bus-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+# float_roundtrip: kanoniczny JSON audytu musi po ponownym parsowaniu dać identyczne bajty.
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+sha2 = "0.10.9"
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+core-log-contract = { workspace = true, features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+core-registry-contract.workspace = true
+proptest.workspace = true
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

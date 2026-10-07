@@ -1,0 +1,25 @@
+# Manifest środowiska wtyczek Wasm (docs/modules/plugin-runtime/SPEC.md, ADR 0012).
+# Sam moduł działa w procesie jądra (inproc); kod wtyczek wykonuje w piaskownicy wasmtime
+# (komponenty WIT, bez WASI). Moduł nie żąda zdolności: operacje hosta dostają tokeny
+# Brokera wydane dla agentki, która wywołała narzędzie wtyczki.
+id = "plugin-runtime"
+version = "0.0.1"
+kind = "service"
+provides = ["plugin-runtime-contract@1", "tools-common-contract@1"]
+requires = ["core-bus-contract@1", "safety-broker-contract@1"]
+capabilities = []
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+# Silnik + skompilowane moduły; pamięć liniowa wtyczek ≤ max_concurrent × limit z manifestu.
+ram_mb = 96
+cpu_pct = 25
+
+[ui]
+settings_page = "ui/settings/plugins"
+panel = "plugins"
+
+[health]
+check = "ping"
+interval_s = 60

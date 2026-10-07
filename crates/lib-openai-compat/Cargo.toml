@@ -1,0 +1,26 @@
+[package]
+name = "lib-openai-compat"
+description = "Wspólny silnik HTTP/SSE dla endpointów zgodnych z OpenAI (Chat Completions): ponawianie przed 1. tokenem, limity czasu, anulowanie, klasyfikacja błędów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+providers-contract = { path = "../providers-contract" }
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+tokio-stream.workspace = true
+futures-util.workspace = true
+# rustls z dostawcą `ring` i certyfikatami systemu (bez OpenSSL, bez aws-lc; docs/vendor/reqwest.md).
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots", "stream", "http2"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true

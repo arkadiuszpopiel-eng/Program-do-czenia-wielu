@@ -1,0 +1,33 @@
+[package]
+name = "tools-clipboard-impl"
+description = "tools-clipboard: odczyt/zapis schowka (tekst, obraz PNG) przez Brokera i ClipboardPort, odczyt jako niezaufana treść (taint), cofanie zapisu z wykrywaniem konfliktu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-clipboard-contract = { path = "../tools-clipboard-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+compliance-contract = { path = "../compliance-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+# Kodowanie obrazów schowka dla modelu (ta sama wersja co voice-tts-impl, już w Cargo.lock).
+base64 = "0.22.1"
+
+[dev-dependencies]
+tools-clipboard-contract = { path = "../tools-clipboard-contract", features = ["contract-tests"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

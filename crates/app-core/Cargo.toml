@@ -1,0 +1,154 @@
+[package]
+name = "app-core"
+description = "Korzeń kompozycji aplikacji: składa moduły -impl, komendy i zdarzenia dla powłoki Tauri (COMMANDS.md)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` = korzeń kompozycji (crates/README.md, scripts/check-deps.sh): jako jedyny zależy od `*-impl`;
+# od `*-fake` wyłącznie w dev-dependencies; od app-core nie zależy żaden crate workspace
+# (powłoka `apps/desktop/src-tauri` jest poza workspace).
+[dependencies]
+# Kontrakt IPC wydzielony z app-core (DTO, błędy, zdarzenia, porty) — reeksportowany.
+app-api = { path = "../app-api" }
+# Adaptery portów na modułach -impl (transfer, Broker w procesie, głos) — część korzenia.
+app-modules = { path = "../app-modules" }
+# Broker poza procesem (usługa / tryb przenośny), procesy Jądra, Broker w procesie (dev).
+app-broker = { path = "../app-broker" }
+# Agentki z narzędziami (tools-*, agent-runtime, Replay) i tryb głosowy (voice-pipeline) — część korzenia.
+app-agents = { path = "../app-agents" }
+app-voice = { path = "../app-voice" }
+# Pamięć F7 (Inspektor, narzędzia pamięci, Strażniczka) — część korzenia.
+app-memory = { path = "../app-memory" }
+# Zadania, wyzwalacze, Marszałek (scheduler-impl zamiast scheduler-lite-impl) i mosty CLI + MCP.
+app-tasks = { path = "../app-tasks" }
+app-bridges = { path = "../app-bridges" }
+# Computer use (panel „Ekran"), terminal, umiejętności + Kreator, „Zdrowie systemu".
+app-gui = { path = "../app-gui" }
+app-terminal = { path = "../app-terminal" }
+app-skills = { path = "../app-skills" }
+app-health = { path = "../app-health" }
+app-plugins = { path = "../app-plugins" }
+# Aktualizacje (updater-impl: pobieranie, weryfikacja, restart przez launcher), „O programie”.
+app-updates = { path = "../app-updates" }
+# Menedżer modeli i silników (pobieranie z wznawianiem, SHA-256/TOFU, sidecary) + embedder wyszukiwania.
+app-models = { path = "../app-models" }
+# Tabele aplikacji w bazach sesji (fakty o turach, oś czasu, Replay) — wydzielone z app-core.
+app-store = { path = "../app-store" }
+# Załączniki composera, eksport rozmowy MD/HTML, kopie zapasowe z harmonogramem, artefakty w `.alfa`.
+app-files = { path = "../app-files" }
+# Silnik tury czatu (generacja, przebieg agentki, delegacja, zapis tury, koszt) — wydzielony z app-core.
+app-chat = { path = "../app-chat" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+mcp-impl = { path = "../mcp-impl" }
+tools-common-contract = { path = "../tools-common-contract" }
+voice-pipeline-contract = { path = "../voice-pipeline-contract" }
+# Jądro
+core-bus-contract.workspace = true
+diagnostician-contract = { path = "../diagnostician-contract" }
+core-bus-impl = { path = "../core-bus-impl" }
+core-registry-contract.workspace = true
+core-registry-impl = { path = "../core-registry-impl" }
+core-config-contract.workspace = true
+core-config-impl = { path = "../core-config-impl" }
+core-log-contract.workspace = true
+core-log-impl = { path = "../core-log-impl" }
+platform-contract.workspace = true
+platform-windows-impl = { path = "../platform-windows-impl" }
+platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
+# Dane
+lib-sqlstore = { path = "../lib-sqlstore" }
+lib-markdown = { path = "../lib-markdown" }
+sessions-contract = { path = "../sessions-contract" }
+sessions-impl = { path = "../sessions-impl" }
+search-contract = { path = "../search-contract" }
+search-impl = { path = "../search-impl" }
+memory-contract = { path = "../memory-contract" }
+memory-impl = { path = "../memory-impl" }
+memory-consolidation-impl = { path = "../memory-consolidation-impl" }
+artifacts-contract = { path = "../artifacts-contract" }
+artifacts-impl = { path = "../artifacts-impl" }
+# Modele, konta, koszty, zgodność
+providers-contract = { path = "../providers-contract" }
+providers-api-impl = { path = "../providers-api-impl" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+accounts-hub-impl = { path = "../accounts-hub-impl" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+cost-meter-impl = { path = "../cost-meter-impl" }
+compliance-contract = { path = "../compliance-contract" }
+compliance-impl = { path = "../compliance-impl" }
+# Sprzęt, agentki, zasoby
+device-profile-contract = { path = "../device-profile-contract" }
+device-profile-impl = { path = "../device-profile-impl" }
+personas-contract = { path = "../personas-contract" }
+personas-impl = { path = "../personas-impl" }
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+scheduler-contract = { path = "../scheduler-contract" }
+# Router, model lokalny, rezydencja modeli
+router-contract = { path = "../router-contract" }
+router-impl = { path = "../router-impl" }
+providers-local-impl = { path = "../providers-local-impl" }
+model-residency-contract = { path = "../model-residency-contract" }
+model-residency-impl = { path = "../model-residency-impl" }
+# Bezpieczeństwo: Broker w procesie (tryb deweloperski), klasyfikator ryzyka, dziennik cofania
+safety-broker-contract = { path = "../safety-broker-contract" }
+safety-broker-impl = { path = "../safety-broker-impl" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+risk-classifier-impl = { path = "../risk-classifier-impl" }
+undo-journal-contract = { path = "../undo-journal-contract" }
+undo-journal-impl = { path = "../undo-journal-impl" }
+watchdog-contract = { path = "../watchdog-contract" }
+# Paczki .alfa, aktualizacje
+transfer-contract = { path = "../transfer-contract" }
+transfer-impl = { path = "../transfer-impl" }
+updater-contract = { path = "../updater-contract" }
+updater-impl = { path = "../updater-impl" }
+# Głos: audio (WASAPI) i TTS
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-audio-impl = { path = "../voice-audio-impl" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+voice-tts-impl = { path = "../voice-tts-impl" }
+# Zewnętrzne (wersje z [workspace.dependencies] albo już obecne w Cargo.lock)
+async-trait.workspace = true
+chrono.workspace = true
+semver.workspace = true
+toml.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+uuid.workspace = true
+# Klient HTTP kursu NBP dla cost-meter (ta sama wersja i cechy co providers-api-impl: rustls, bez OpenSSL).
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
+
+[dev-dependencies]
+providers-fake = { path = "../providers-fake" }
+platform-fake = { path = "../platform-fake" }
+voice-pipeline-impl = { path = "../voice-pipeline-impl" }
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-turn-contract = { path = "../voice-turn-contract" }
+voice-dsp-fake = { path = "../voice-dsp-fake" }
+voice-vad-fake = { path = "../voice-vad-fake" }
+voice-stt-fake = { path = "../voice-stt-fake" }
+voice-turn-fake = { path = "../voice-turn-fake" }
+voice-cmd-fake = { path = "../voice-cmd-fake" }
+voice-wake-fake = { path = "../voice-wake-fake" }
+voice-persona-fake = { path = "../voice-persona-fake" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+agent-backends-fake = { path = "../agent-backends-fake" }
+device-profile-fake = { path = "../device-profile-fake" }
+voice-audio-fake = { path = "../voice-audio-fake" }
+voice-tts-fake = { path = "../voice-tts-fake" }
+# Wtyczka testowa (WAT → komponent) dla `tests/plugins.rs`.
+plugin-runtime-contract = { path = "../plugin-runtime-contract" }
+base64 = "0.22.1"
+wat = "=1.236.1"
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+
+[lints]
+workspace = true

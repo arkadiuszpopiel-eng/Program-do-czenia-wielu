@@ -1,0 +1,24 @@
+# providers-catalog/deepseek.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "deepseek"
+display_name = "DeepSeek"
+kind = "chat"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "cn-may-train"
+jurisdiction = "CN"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Adapter generyczny. CN: dane w Chinach/Singapurze, może trenować [W] — sesje 'prywatne' nie kierują tu ruchu. Cena orientacyjna w planie (DeepSeek Flash) tylko jako przykład; cennik w konfiguracji."
+env_vars = ["DEEPSEEK_API_KEY"]
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

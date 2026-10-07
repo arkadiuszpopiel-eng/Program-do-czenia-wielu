@@ -1,0 +1,34 @@
+[package]
+name = "agent-runtime-contract"
+description = "agent-runtime: kontrakt pętli agentki (plan → akcja → obserwacja → weryfikacja) — RunSpec z budżetami, zdarzenia agent.* dla UI/Replay, steering, checkpointy, trait AgentRuntime, testy kontraktowe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na -impl i -fake.
+contract-tests = []
+
+[dependencies]
+providers-contract = { path = "../providers-contract" }
+personas-contract = { path = "../personas-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

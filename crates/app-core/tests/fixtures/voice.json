@@ -1,0 +1,82 @@
+[
+  {
+    "command": "voice_devices",
+    "args": {},
+    "result": [
+      {
+        "id": "mic-1",
+        "name": "Mikrofon (Realtek Audio)",
+        "default": true
+      },
+      {
+        "id": "mic-2",
+        "name": "Zestaw słuchawkowy USB",
+        "default": false
+      }
+    ]
+  },
+  {
+    "command": "voice_start_mic_test",
+    "args": {
+      "deviceId": "mic-1"
+    },
+    "result": null
+  },
+  {
+    "command": "voice_stop_mic_test",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "voice_set_mic_enabled",
+    "args": {
+      "enabled": true
+    },
+    "result": null
+  },
+  {
+    "command": "voice_set_muted",
+    "args": {
+      "muted": false
+    },
+    "result": null
+  },
+  {
+    "command": "voice_stop_speech",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "voice_status",
+    "args": {},
+    "result": {
+      "state": "active",
+      "reason": null,
+      "missing": [],
+      "mode": "toggle",
+      "muted": false,
+      "agent": "alfa"
+    }
+  },
+  {
+    "command": "voice_ptt",
+    "args": {
+      "pressed": true
+    },
+    "result": null
+  },
+  {
+    "command": "voice_ptt",
+    "args": {
+      "pressed": false
+    },
+    "result": null
+  },
+  {
+    "command": "voice_preview",
+    "args": {
+      "agent": "beta"
+    },
+    "result": null
+  }
+]

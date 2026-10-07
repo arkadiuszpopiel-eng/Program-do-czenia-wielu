@@ -1,0 +1,232 @@
+{
+  "_comment": "Warianty typów z types*.ts, których atrapa UI nie emituje (pisane ręcznie, zgodne z typami TS).",
+  "events": [
+    {
+      "type": "VoicePill",
+      "state": { "agent": "gama", "mic": "hearing", "level": 0.42, "speaker": "user", "partial": "Co mam" }
+    },
+    {
+      "type": "Stop",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "reason": "refusal"
+    },
+    {
+      "type": "Stop",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "reason": "tool_use"
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": { "code": "no_keys", "message": "Brak mózgu.", "retry_at": null, "provider": null }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": {
+        "code": "context_overflow",
+        "message": "Za długa rozmowa.",
+        "retry_at": null,
+        "provider": "anthropic"
+      }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": {
+        "code": "budget_blocked",
+        "message": "Limit miesięczny.",
+        "retry_at": null,
+        "provider": null
+      }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": { "code": "offline", "message": "Brak sieci.", "retry_at": null, "provider": null }
+    },
+    {
+      "type": "Error",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "error": { "code": "provider", "message": "Błąd 500.", "retry_at": null, "provider": "openai" }
+    },
+    {
+      "type": "ActivityChanged",
+      "session_id": "s-q3",
+      "activity": null
+    },
+    {
+      "type": "ToolCall",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "step": {
+        "id": "st-9",
+        "icon": "web",
+        "label": "Pobrano stronę",
+        "status": "error",
+        "duration_ms": 120,
+        "undo_token": null,
+        "undone": false,
+        "intent": {
+          "kind": "confirm_delete_permanent",
+          "title": "Usuń trwale",
+          "command": "Remove-Item -LiteralPath 'stare.log'",
+          "cwd": "C:\\Users\\Ty\\Projekt",
+          "shell": "pwsh",
+          "paths": ["C:\\Users\\Ty\\Projekt\\stare.log"]
+        }
+      }
+    },
+    {
+      "type": "ToolCall",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "step": {
+        "id": "st-10",
+        "icon": "memory",
+        "label": "Zapisano w pamięci",
+        "status": "done",
+        "duration_ms": 3,
+        "undo_token": "undo-10",
+        "undone": true,
+        "intent": null
+      }
+    },
+    {
+      "type": "ApprovalPending",
+      "session_id": "s-q3",
+      "turn_id": "s-q3:t9",
+      "approval": {
+        "id": "ap-9",
+        "what": "Wysłanie maila",
+        "why": "Prośba użytkownika.",
+        "reversible": false,
+        "risk": "low",
+        "status": "expired",
+        "broker_window": false,
+        "expires_at": "2026-10-01T12:05:00Z"
+      }
+    },
+    {
+      "type": "Toast",
+      "kind": "error",
+      "message": { "pl": "Skrót zajęty przez inny program.", "en": "Shortcut taken by another app." }
+    },
+    {
+      "type": "Toast",
+      "kind": "success",
+      "message": { "pl": "Zapisano.", "en": "Saved." }
+    },
+    { "type": "OpenSession", "session_id": "s-q3" },
+    {
+      "type": "LocalModelProgress",
+      "model_id": "bielik-4.5b-v3.0-instruct-q8_0",
+      "state": "failed",
+      "bytes": 0,
+      "total": 5060427776,
+      "error": "Pobieranie modelu nie powiodło się: pobieranie: HTTP 503"
+    },
+    {
+      "type": "MarshalReportReady",
+      "report": {
+        "day": "2026-09-30",
+        "submitted": 4,
+        "succeeded": 2,
+        "failed": 1,
+        "escalations": 0,
+        "text": "Dziś: 4 zadania, 2 udane, 1 nieudane."
+      }
+    },
+    {
+      "type": "TriggerFired",
+      "run": {
+        "at": "2026-09-30T06:00:00.000Z",
+        "trigger_id": "pobrane",
+        "cause": "nowy plik: faktura.pdf",
+        "outcome": "suppressed",
+        "task_id": null,
+        "detail": "nie przeszkadzać"
+      }
+    },
+    {
+      "type": "MemoryChanged",
+      "scope_key": null
+    },
+    {
+      "type": "BrokerStatus",
+      "status": {
+        "mode": "portable",
+        "state": "lost",
+        "approval_window": false,
+        "watchdog": true,
+        "isolated": false,
+        "detail": {
+          "pl": "Połączenie z Brokerem zerwane (proces Brokera zakończył działanie). Bezpieczny stan: wszystko, co wymaga zgody, jest odrzucane; Alfa ponawia połączenie.",
+          "en": "Connection to the Broker lost (the Broker process exited). Safe state: everything that needs approval is denied; Alfa keeps reconnecting."
+        }
+      }
+    },
+    {
+      "type": "BrokerStatus",
+      "status": {
+        "mode": "unavailable",
+        "state": "lost",
+        "approval_window": false,
+        "watchdog": false,
+        "isolated": false,
+        "detail": null
+      }
+    }
+  ],
+  "results": {
+    "ExportResult": [{ "status": "cancelled" }],
+    "InspectResult": [{ "status": "cancelled" }],
+    "ArtifactPreview": [
+      { "kind": "image", "src": "asset://localhost/C%3A%5CUsers%5CTy%5Cobraz.png" },
+      { "kind": "none" }
+    ],
+    "SystemStatus": [
+      {
+        "online": true,
+        "queued_messages": 0,
+        "rate_limit": null,
+        "keys_configured": false,
+        "profile": "local",
+        "mic": "missing",
+        "disk": { "free_bytes": 1800000000, "low": true }
+      }
+    ],
+    "PermissionsState": [{ "global": "L0", "session": "L2", "hello_enabled": true }],
+    "TestReport": [
+      { "ok": false, "latency_ms": null, "models": [], "error": "Klucz odrzucony (401)." }
+    ],
+    "DeviceProfile": [
+      {
+        "machine": {
+          "id": "m-1",
+          "name": "LAPTOP",
+          "os": "Windows 11",
+          "cpu": { "model": "Intel i7-13700H", "cores": 14, "threads": 20 },
+          "ram_mb": 16384,
+          "gpus": [],
+          "npu": null,
+          "battery": null
+        },
+        "recommendation": {
+          "hw_class": "laptop_cuda",
+          "voice_profile": "D",
+          "llm_backend": "CUDA",
+          "tradeoffs": []
+        },
+        "measured_at": "2026-09-30T08:45:00.000Z"
+      }
+    ]
+  }
+}

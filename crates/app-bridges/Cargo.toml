@@ -1,0 +1,44 @@
+[package]
+name = "app-bridges"
+description = "Mosty CLI i MCP w aplikacji (kategoria app-*): karty zgodności tras (compliance), wykrywanie CLI, przypięcie wersji i zgoda na harmonogram per trasa, logowanie wyłącznie przez użytkownika w terminalu, backend agent-backends z kanałem zatwierdzeń agentek, serwer MCP Alfy v0 startowany na żądanie mostu, rozpoznanie delegacji z czatu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `agent-backends-impl` i `mcp-impl` nad `compliance-contract`
+# i portami platformy; używa jej `app-core`.
+[dependencies]
+app-api = { path = "../app-api" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+agent-backends-impl = { path = "../agent-backends-impl" }
+mcp-contract = { path = "../mcp-contract" }
+mcp-impl = { path = "../mcp-impl" }
+compliance-contract = { path = "../compliance-contract" }
+# Serwer MCP v1: rejestr tylko do odczytu (`WinRegistry`), narzędzia GUI agentek przez Brokera.
+platform-windows-office-impl = { path = "../platform-windows-office-impl" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+core-config-contract.workspace = true
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+regex.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+tools-uia-fake = { path = "../tools-uia-fake" }
+tools-screen-fake = { path = "../tools-screen-fake" }
+tools-input-fake = { path = "../tools-input-fake" }
+
+[lints]
+workspace = true

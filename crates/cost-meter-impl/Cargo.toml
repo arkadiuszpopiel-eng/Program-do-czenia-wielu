@@ -1,0 +1,28 @@
+[package]
+name = "cost-meter-impl"
+description = "Licznik kosztów: dziennik NDJSON, agregaty z rekordów, kurs NBP z cache i kursem zapasowym, limity wyłączalne, alerty"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+cost-meter-contract = { path = "../cost-meter-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+cost-meter-contract = { path = "../cost-meter-contract", features = ["contract-tests"] }
+cost-meter-fake = { path = "../cost-meter-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+proptest.workspace = true
+
+[lints]
+workspace = true

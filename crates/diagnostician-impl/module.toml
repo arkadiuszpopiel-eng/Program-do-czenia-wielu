@@ -1,0 +1,20 @@
+# Manifest Diagnosty (docs/modules/diagnostician/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "diagnostician"
+version = "0.0.1"
+kind = "service"
+provides = ["diagnostician-contract@1"]
+requires = ["core-bus-contract@1", "core-config-contract@1", "watchdog-contract@1"]
+# Zapis wyłącznie w dozwolonych korzeniach danych Alfy (kwarantanna, kopie, archiwum) i przez
+# `core-config` z origin = diagnostician. Obszar Jądra — tylko prośbą do Brokera (bez zdolności).
+capabilities = ["fs.write(%LOCALAPPDATA%/Alfa/diagnostyka/**)"]
+lifecycle = "always"
+isolation = "inproc"
+
+[budget]
+# Okno sygnałów ≤ 10 000 wpisów, skan co 30 s.
+ram_mb = 6
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 60

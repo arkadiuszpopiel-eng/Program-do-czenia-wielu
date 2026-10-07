@@ -1,0 +1,1318 @@
+[
+  {
+    "command": "turns_list",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "turns": [
+        {
+          "id": "q1",
+          "session_id": "s-q3",
+          "parent_id": null,
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "status": "complete",
+          "text": "Zbierz dane do raportu Q3 z folderu Finanse/2026-Q3.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zbierz dane do raportu Q3 z folderu Finanse/2026-Q3.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q2",
+          "session_id": "s-q3",
+          "parent_id": "q1",
+          "author": "gama",
+          "role_id": "researcher",
+          "created_at": "2026-09-29T08:46:00.000Z",
+          "status": "complete",
+          "text": "Zebrałam 14 plików. Przychody są w trzech arkuszach, koszty w jednym. Mam gotowe sumy cząstkowe.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zebrałam 14 plików. Przychody są w trzech arkuszach, koszty w jednym. Mam gotowe sumy cząstkowe.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [
+            {
+              "id": "st1",
+              "icon": "search",
+              "label": "Przeszukano Finanse/2026-Q3 (14 plików)",
+              "status": "done",
+              "duration_ms": 820,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": null,
+          "usage": {
+            "input_tokens": 3200,
+            "output_tokens": 410,
+            "cost": {
+              "minor": 21,
+              "currency": "PLN"
+            },
+            "latency_ms": 1900,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q3",
+          "session_id": "s-q3",
+          "parent_id": "q2",
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T08:39:00.000Z",
+          "status": "complete",
+          "text": "Przygotujcie raport Q3 dla zarządu: przychody, koszty i trzy rekomendacje.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Przygotujcie raport Q3 dla zarządu: przychody, koszty i trzy rekomendacje.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q4a",
+          "session_id": "s-q3",
+          "parent_id": "q3",
+          "author": "gama",
+          "role_id": "researcher",
+          "created_at": "2026-09-30T08:40:00.000Z",
+          "status": "complete",
+          "text": "Przychody: 4 812 300 zł (+11% r/r). Koszty operacyjne: 3 106 900 zł. Marża wzrosła o 2,4 p.p.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Przychody: 4 812 300 zł (+11% r/r). Koszty operacyjne: 3 106 900 zł. Marża wzrosła o 2,4 p.p.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 4200,
+            "active": false
+          },
+          "tools": [
+            {
+              "id": "st2",
+              "icon": "file",
+              "label": "Odczytano przychody-Q3.xlsx, koszty-Q3.xlsx",
+              "status": "done",
+              "duration_ms": 1400,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            },
+            {
+              "id": "st3",
+              "icon": "terminal",
+              "label": "Policzono sumy kontrolne",
+              "status": "done",
+              "duration_ms": 610,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": null,
+          "usage": {
+            "input_tokens": 5400,
+            "output_tokens": 380,
+            "cost": {
+              "minor": 34,
+              "currency": "PLN"
+            },
+            "latency_ms": 2300,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q4b",
+          "session_id": "s-q3",
+          "parent_id": "q3",
+          "author": "gama",
+          "role_id": "researcher",
+          "created_at": "2026-09-30T08:41:00.000Z",
+          "status": "complete",
+          "text": "Zsumowałam przychody z trzech arkuszy: 4 812 300 zł (+11% r/r). Koszty operacyjne wyniosły 3 106 900 zł, a marża wzrosła o 2,4 p.p.\n\nRekomendacje:\n- utrzymać tempo sprzedaży B2B,\n- renegocjować dwie największe umowy dostawców,\n- przesunąć 5% budżetu marketingu do kanałów cyfrowych.\n\n```sql\nSELECT kwartal, SUM(przychod) AS przychod\nFROM finanse\nWHERE rok = 2026\nGROUP BY kwartal;\n```",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zsumowałam przychody z trzech arkuszy: 4 812 300 zł (+11% r/r). Koszty operacyjne wyniosły 3 106 900 zł, a marża wzrosła o 2,4 p.p.</p>",
+              "closed": true
+            },
+            {
+              "index": 1,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Rekomendacje:</p><ul><li>utrzymać tempo sprzedaży B2B,</li><li>renegocjować dwie największe umowy dostawców,</li><li>przesunąć 5% budżetu marketingu do kanałów cyfrowych.</li></ul>",
+              "closed": true
+            },
+            {
+              "index": 2,
+              "kind": "code",
+              "lang": "sql",
+              "html_sanitized": "<pre><code class=\"language-sql\">SELECT kwartal, SUM(przychod) AS przychod\nFROM finanse\nWHERE rok = 2026\nGROUP BY kwartal;</code></pre>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 6100,
+            "active": false
+          },
+          "tools": [
+            {
+              "id": "st4",
+              "icon": "file",
+              "label": "Odczytano 3 arkusze przychodów",
+              "status": "done",
+              "duration_ms": 1200,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": null,
+          "usage": {
+            "input_tokens": 5600,
+            "output_tokens": 620,
+            "cost": {
+              "minor": 41,
+              "currency": "PLN"
+            },
+            "latency_ms": 2800,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q5",
+          "session_id": "s-q3",
+          "parent_id": "q4b",
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T08:42:00.000Z",
+          "status": "complete",
+          "text": "Delta, wstaw to do dokumentu dla zarządu.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Delta, wstaw to do dokumentu dla zarządu.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": "delta",
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q6",
+          "session_id": "s-q3",
+          "parent_id": "q5",
+          "author": "delta",
+          "role_id": "operator",
+          "created_at": "2026-09-30T08:43:00.000Z",
+          "status": "complete",
+          "text": "Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [
+            {
+              "id": "st5",
+              "icon": "edit",
+              "label": "Utworzono szkic raport-Q3.docx",
+              "status": "done",
+              "duration_ms": 2100,
+              "undo_token": "s-q3:u5",
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": {
+            "id": "ap-1",
+            "what": "Nadpisanie szablonu Raporty/zarząd.dotx",
+            "why": "Zarząd używa tego szablonu; stopka musi mieć bieżący kwartał.",
+            "reversible": true,
+            "risk": "medium",
+            "status": "pending",
+            "broker_window": true,
+            "expires_at": null
+          },
+          "usage": {
+            "input_tokens": 2100,
+            "output_tokens": 190,
+            "cost": {
+              "minor": 12,
+              "currency": "PLN"
+            },
+            "latency_ms": 1500,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        }
+      ],
+      "annotations": {}
+    }
+  },
+  {
+    "command": "turns_send",
+    "args": {
+      "sessionId": "s-q3",
+      "options": {
+        "parent_id": "q6",
+        "text": "Delta, uporządkuj pliki w folderze Pobrane.",
+        "addressed_to": "delta",
+        "profile": "cloud"
+      }
+    },
+    "result": {
+      "user_turn_id": "t-munv0mw0-4",
+      "assistant_turn_id": "t-munv0mw0-5"
+    }
+  },
+  {
+    "command": "turns_regenerate",
+    "args": {
+      "sessionId": "s-q3",
+      "turnId": "q4b",
+      "profile": "local"
+    },
+    "result": "t-munx5so0-7"
+  },
+  {
+    "command": "turns_edit_and_resend",
+    "args": {
+      "sessionId": "s-q3",
+      "turnId": "q3",
+      "text": "Raport Q3 tylko dla zarządu, krótko."
+    },
+    "result": {
+      "user_turn_id": "t-munzayg0-9",
+      "assistant_turn_id": "t-munzayg0-10"
+    }
+  },
+  {
+    "command": "turns_continue",
+    "args": {
+      "sessionId": "s-q3",
+      "turnId": "t-munv0mw0-5"
+    },
+    "result": "t-muo1g480-12"
+  },
+  {
+    "command": "turns_stop",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": null
+  },
+  {
+    "command": "turns_rate",
+    "args": {
+      "turnId": "q4b",
+      "rating": "up"
+    },
+    "result": null
+  },
+  {
+    "command": "turns_rate",
+    "args": {
+      "turnId": "q4a",
+      "rating": null
+    },
+    "result": null
+  },
+  {
+    "command": "turns_set_hidden",
+    "args": {
+      "turnId": "q4a",
+      "hidden": true
+    },
+    "result": null
+  },
+  {
+    "command": "turns_remember",
+    "args": {
+      "turnId": "q4b",
+      "scope": "session"
+    },
+    "result": null
+  },
+  {
+    "command": "turns_read_aloud",
+    "args": {
+      "turnId": "q4b"
+    },
+    "result": null
+  },
+  {
+    "command": "turns_save_code",
+    "args": {
+      "turnId": "q4b",
+      "blockIndex": 2
+    },
+    "result": null
+  },
+  {
+    "command": "turns_run_code",
+    "args": {
+      "turnId": "q4b",
+      "blockIndex": 2
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-muo1g480-14"
+    }
+  },
+  {
+    "command": "turns_undo_step",
+    "args": {
+      "undoToken": "s-q3:u5"
+    },
+    "result": null
+  },
+  {
+    "command": "turns_list",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "turns": [
+        {
+          "id": "q1",
+          "session_id": "s-q3",
+          "parent_id": null,
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "status": "complete",
+          "text": "Zbierz dane do raportu Q3 z folderu Finanse/2026-Q3.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zbierz dane do raportu Q3 z folderu Finanse/2026-Q3.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q2",
+          "session_id": "s-q3",
+          "parent_id": "q1",
+          "author": "gama",
+          "role_id": "researcher",
+          "created_at": "2026-09-29T08:46:00.000Z",
+          "status": "complete",
+          "text": "Zebrałam 14 plików. Przychody są w trzech arkuszach, koszty w jednym. Mam gotowe sumy cząstkowe.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zebrałam 14 plików. Przychody są w trzech arkuszach, koszty w jednym. Mam gotowe sumy cząstkowe.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [
+            {
+              "id": "st1",
+              "icon": "search",
+              "label": "Przeszukano Finanse/2026-Q3 (14 plików)",
+              "status": "done",
+              "duration_ms": 820,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": null,
+          "usage": {
+            "input_tokens": 3200,
+            "output_tokens": 410,
+            "cost": {
+              "minor": 21,
+              "currency": "PLN"
+            },
+            "latency_ms": 1900,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q3",
+          "session_id": "s-q3",
+          "parent_id": "q2",
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T08:39:00.000Z",
+          "status": "complete",
+          "text": "Przygotujcie raport Q3 dla zarządu: przychody, koszty i trzy rekomendacje.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Przygotujcie raport Q3 dla zarządu: przychody, koszty i trzy rekomendacje.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q4a",
+          "session_id": "s-q3",
+          "parent_id": "q3",
+          "author": "gama",
+          "role_id": "researcher",
+          "created_at": "2026-09-30T08:40:00.000Z",
+          "status": "complete",
+          "text": "Przychody: 4 812 300 zł (+11% r/r). Koszty operacyjne: 3 106 900 zł. Marża wzrosła o 2,4 p.p.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Przychody: 4 812 300 zł (+11% r/r). Koszty operacyjne: 3 106 900 zł. Marża wzrosła o 2,4 p.p.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 4200,
+            "active": false
+          },
+          "tools": [
+            {
+              "id": "st2",
+              "icon": "file",
+              "label": "Odczytano przychody-Q3.xlsx, koszty-Q3.xlsx",
+              "status": "done",
+              "duration_ms": 1400,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            },
+            {
+              "id": "st3",
+              "icon": "terminal",
+              "label": "Policzono sumy kontrolne",
+              "status": "done",
+              "duration_ms": 610,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": null,
+          "usage": {
+            "input_tokens": 5400,
+            "output_tokens": 380,
+            "cost": {
+              "minor": 34,
+              "currency": "PLN"
+            },
+            "latency_ms": 2300,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q4b",
+          "session_id": "s-q3",
+          "parent_id": "q3",
+          "author": "gama",
+          "role_id": "researcher",
+          "created_at": "2026-09-30T08:41:00.000Z",
+          "status": "complete",
+          "text": "Zsumowałam przychody z trzech arkuszy: 4 812 300 zł (+11% r/r). Koszty operacyjne wyniosły 3 106 900 zł, a marża wzrosła o 2,4 p.p.\n\nRekomendacje:\n- utrzymać tempo sprzedaży B2B,\n- renegocjować dwie największe umowy dostawców,\n- przesunąć 5% budżetu marketingu do kanałów cyfrowych.\n\n```sql\nSELECT kwartal, SUM(przychod) AS przychod\nFROM finanse\nWHERE rok = 2026\nGROUP BY kwartal;\n```",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zsumowałam przychody z trzech arkuszy: 4 812 300 zł (+11% r/r). Koszty operacyjne wyniosły 3 106 900 zł, a marża wzrosła o 2,4 p.p.</p>",
+              "closed": true
+            },
+            {
+              "index": 1,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Rekomendacje:</p><ul><li>utrzymać tempo sprzedaży B2B,</li><li>renegocjować dwie największe umowy dostawców,</li><li>przesunąć 5% budżetu marketingu do kanałów cyfrowych.</li></ul>",
+              "closed": true
+            },
+            {
+              "index": 2,
+              "kind": "code",
+              "lang": "sql",
+              "html_sanitized": "<pre><code class=\"language-sql\">SELECT kwartal, SUM(przychod) AS przychod\nFROM finanse\nWHERE rok = 2026\nGROUP BY kwartal;</code></pre>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 6100,
+            "active": false
+          },
+          "tools": [
+            {
+              "id": "st4",
+              "icon": "file",
+              "label": "Odczytano 3 arkusze przychodów",
+              "status": "done",
+              "duration_ms": 1200,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": null,
+          "usage": {
+            "input_tokens": 5600,
+            "output_tokens": 620,
+            "cost": {
+              "minor": 41,
+              "currency": "PLN"
+            },
+            "latency_ms": 2800,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q5",
+          "session_id": "s-q3",
+          "parent_id": "q4b",
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T08:42:00.000Z",
+          "status": "complete",
+          "text": "Delta, wstaw to do dokumentu dla zarządu.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Delta, wstaw to do dokumentu dla zarządu.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": "delta",
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "q6",
+          "session_id": "s-q3",
+          "parent_id": "q5",
+          "author": "delta",
+          "role_id": "operator",
+          "created_at": "2026-09-30T08:43:00.000Z",
+          "status": "complete",
+          "text": "Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Utworzyłam szkic raport-Q3.docx. Chcę jeszcze nadpisać szablon zarząd.dotx, żeby stopka miała właściwy kwartał — to wymaga Twojej zgody.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [
+            {
+              "id": "st5",
+              "icon": "edit",
+              "label": "Utworzono szkic raport-Q3.docx",
+              "status": "done",
+              "duration_ms": 2100,
+              "undo_token": "s-q3:u5",
+              "undone": false,
+              "intent": null
+            }
+          ],
+          "approval": {
+            "id": "ap-1",
+            "what": "Nadpisanie szablonu Raporty/zarząd.dotx",
+            "why": "Zarząd używa tego szablonu; stopka musi mieć bieżący kwartał.",
+            "reversible": true,
+            "risk": "medium",
+            "status": "pending",
+            "broker_window": true,
+            "expires_at": null
+          },
+          "usage": {
+            "input_tokens": 2100,
+            "output_tokens": 190,
+            "cost": {
+              "minor": 12,
+              "currency": "PLN"
+            },
+            "latency_ms": 1500,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-munv0mw0-4",
+          "session_id": "s-q3",
+          "parent_id": "q6",
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T08:45:00.000Z",
+          "status": "complete",
+          "text": "Delta, uporządkuj pliki w folderze Pobrane.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Delta, uporządkuj pliki w folderze Pobrane.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": "delta",
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-munv0mw0-5",
+          "session_id": "s-q3",
+          "parent_id": "t-munv0mw0-4",
+          "author": "delta",
+          "role_id": "operator",
+          "created_at": "2026-09-30T08:45:00.000Z",
+          "status": "complete",
+          "text": "Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym kliknięciem.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym kliknięciem.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [
+            {
+              "id": "s-q3:r2:s1",
+              "icon": "search",
+              "label": "Przeszukano Pobrane (31 plików)",
+              "status": "done",
+              "duration_ms": 500,
+              "undo_token": null,
+              "undone": false,
+              "intent": null
+            },
+            {
+              "id": "s-q3:r2:s2",
+              "icon": "edit",
+              "label": "Delta: przeniesiono 14 plików",
+              "status": "done",
+              "duration_ms": 1200,
+              "undo_token": "s-q3:u2",
+              "undone": false,
+              "intent": null
+            },
+            {
+              "id": "s-q3:r2:s3",
+              "icon": "terminal",
+              "label": "Uruchom w terminalu",
+              "status": "done",
+              "duration_ms": 300,
+              "undo_token": null,
+              "undone": false,
+              "intent": {
+                "kind": "open_in_terminal",
+                "title": "Uruchom w terminalu",
+                "command": "Get-ChildItem -Recurse Archiwum/2026 | Measure-Object",
+                "cwd": "C:\\Users\\Ty\\Pobrane",
+                "shell": "pwsh",
+                "paths": []
+              }
+            }
+          ],
+          "approval": {
+            "what": "Usunięcie 6 duplikatów z folderu Pobrane",
+            "why": "Pliki są identyczne z kopiami w Archiwum/2026.",
+            "reversible": true,
+            "risk": "high",
+            "id": "ap-t-munv0mw0-5",
+            "status": "pending",
+            "broker_window": true,
+            "expires_at": null
+          },
+          "usage": {
+            "input_tokens": 1291,
+            "output_tokens": 26,
+            "cost": {
+              "minor": 1,
+              "currency": "PLN"
+            },
+            "latency_ms": 2250,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-munx5so0-7",
+          "session_id": "s-q3",
+          "parent_id": "q3",
+          "author": "gama",
+          "role_id": "conductor",
+          "created_at": "2026-09-30T09:45:00.000Z",
+          "status": "complete",
+          "text": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 600,
+            "active": false
+          },
+          "tools": [],
+          "approval": null,
+          "usage": {
+            "input_tokens": 1365,
+            "output_tokens": 47,
+            "cost": {
+              "minor": 2,
+              "currency": "PLN"
+            },
+            "latency_ms": 1210,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-munzayg0-9",
+          "session_id": "s-q3",
+          "parent_id": "q2",
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T10:45:00.000Z",
+          "status": "complete",
+          "text": "Raport Q3 tylko dla zarządu, krótko.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Raport Q3 tylko dla zarządu, krótko.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-munzayg0-10",
+          "session_id": "s-q3",
+          "parent_id": "t-munzayg0-9",
+          "author": "alfa",
+          "role_id": "conductor",
+          "created_at": "2026-09-30T10:45:00.000Z",
+          "status": "complete",
+          "text": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 600,
+            "active": false
+          },
+          "tools": [],
+          "approval": null,
+          "usage": {
+            "input_tokens": 1365,
+            "output_tokens": 47,
+            "cost": {
+              "minor": 2,
+              "currency": "PLN"
+            },
+            "latency_ms": 1210,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-muo1g480-12",
+          "session_id": "s-q3",
+          "parent_id": "t-munv0mw0-5",
+          "author": "delta",
+          "role_id": "operator",
+          "created_at": "2026-09-30T11:45:00.000Z",
+          "status": "cancelled",
+          "text": "…co",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>…co</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": {
+            "input_tokens": 1203,
+            "output_tokens": 1,
+            "cost": {
+              "minor": 1,
+              "currency": "PLN"
+            },
+            "latency_ms": 0,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": "t-munv0mw0-5",
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        }
+      ],
+      "annotations": {
+        "q4b": {
+          "hidden": false,
+          "rating": "up"
+        },
+        "q4a": {
+          "rating": null,
+          "hidden": true
+        }
+      }
+    }
+  },
+  {
+    "command": "turns_send",
+    "args": {
+      "sessionId": "s-api",
+      "options": {
+        "parent_id": "s-api-2",
+        "text": "Dodaj testy.",
+        "addressed_to": null,
+        "profile": null
+      }
+    },
+    "result": {
+      "user_turn_id": "t-muo3lc30-19",
+      "assistant_turn_id": null
+    }
+  },
+  {
+    "command": "turns_send",
+    "args": {
+      "sessionId": "s-trip",
+      "options": {
+        "parent_id": null,
+        "text": "Sprawdź pociągi do Gdańska.",
+        "addressed_to": null,
+        "profile": "hybrid"
+      }
+    },
+    "result": {
+      "user_turn_id": "t-muo5qhv0-22",
+      "assistant_turn_id": "t-muo5qhv0-23"
+    }
+  },
+  {
+    "command": "turns_send",
+    "args": {
+      "sessionId": "s-trip",
+      "options": {
+        "parent_id": null,
+        "text": "Podsumuj załączniki",
+        "addressed_to": null,
+        "profile": "local",
+        "attachments": [
+          "att-muoggk4i-38",
+          "att-muoggk4i-39"
+        ]
+      }
+    },
+    "result": {
+      "user_turn_id": "t-muoggk4i-40",
+      "assistant_turn_id": "t-muoggk4i-41"
+    }
+  },
+  {
+    "command": "turns_list",
+    "args": {
+      "sessionId": "s-trip"
+    },
+    "result": {
+      "turns": [
+        {
+          "id": "s-trip-1",
+          "session_id": "s-trip",
+          "parent_id": null,
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T12:55:02.700Z",
+          "status": "complete",
+          "text": "Zaplanuj trzy dni w Gdańsku w październiku.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Zaplanuj trzy dni w Gdańsku w październiku.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "s-trip-2",
+          "session_id": "s-trip",
+          "parent_id": "s-trip-1",
+          "author": "alfa",
+          "role_id": "conductor",
+          "created_at": "2026-09-30T12:56:02.700Z",
+          "status": "complete",
+          "text": "Jasne — zaczęłam od listy kroków. Daj znać, czy mam od razu działać.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Jasne — zaczęłam od listy kroków. Daj znać, czy mam od razu działać.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-muo5qhv0-22",
+          "session_id": "s-trip",
+          "parent_id": null,
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T13:45:02.700Z",
+          "status": "complete",
+          "text": "Sprawdź pociągi do Gdańska.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Sprawdź pociągi do Gdańska.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-muo5qhv0-23",
+          "session_id": "s-trip",
+          "parent_id": "t-muo5qhv0-22",
+          "author": "alfa",
+          "role_id": "conductor",
+          "created_at": "2026-09-30T13:45:02.700Z",
+          "status": "error",
+          "text": "",
+          "blocks": [],
+          "thinking": {
+            "duration_ms": 600,
+            "active": false
+          },
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": {
+            "code": "rate_limited",
+            "message": "Limit zapytań u dostawcy Anthropic.",
+            "retry_at": "2026-09-30T12:48:02.700Z",
+            "provider": "Anthropic"
+          },
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        },
+        {
+          "id": "t-muoggk4i-40",
+          "session_id": "s-trip",
+          "parent_id": null,
+          "author": "user",
+          "role_id": null,
+          "created_at": "2026-09-30T18:45:14.850Z",
+          "status": "complete",
+          "text": "Podsumuj załączniki",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Podsumuj załączniki</p>",
+              "closed": true
+            }
+          ],
+          "thinking": null,
+          "tools": [],
+          "approval": null,
+          "usage": null,
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null,
+          "attachments": [
+            {
+              "name": "wklejony-obraz-20260930-184514.png",
+              "mime": "image/png",
+              "kind": "image",
+              "bytes": 182000,
+              "artifact_id": "art-s-trip-muoggk4i-0"
+            },
+            {
+              "name": "notatki.md",
+              "mime": "text/markdown",
+              "kind": "text",
+              "bytes": 400000,
+              "artifact_id": "art-s-trip-muoggk4i-1"
+            }
+          ]
+        },
+        {
+          "id": "t-muoggk4i-41",
+          "session_id": "s-trip",
+          "parent_id": "t-muoggk4i-40",
+          "author": "alfa",
+          "role_id": "conductor",
+          "created_at": "2026-09-30T18:45:14.850Z",
+          "status": "complete",
+          "text": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.",
+          "blocks": [
+            {
+              "index": 0,
+              "kind": "text",
+              "lang": null,
+              "html_sanitized": "<p>Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.</p>",
+              "closed": true
+            }
+          ],
+          "thinking": {
+            "duration_ms": 600,
+            "active": false
+          },
+          "tools": [],
+          "approval": null,
+          "usage": {
+            "input_tokens": 1365,
+            "output_tokens": 47,
+            "cost": {
+              "minor": 2,
+              "currency": "PLN"
+            },
+            "latency_ms": 1210,
+            "provider": "Anthropic",
+            "model": "claude-opus-5-5"
+          },
+          "error": null,
+          "continues": null,
+          "addressed_to": null,
+          "truncated": false,
+          "heard_prefix": null
+        }
+      ],
+      "annotations": {
+        "q4b": {
+          "hidden": false,
+          "rating": "up"
+        },
+        "q4a": {
+          "rating": null,
+          "hidden": true
+        }
+      }
+    }
+  }
+]

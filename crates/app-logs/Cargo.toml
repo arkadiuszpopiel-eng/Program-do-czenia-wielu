@@ -1,0 +1,25 @@
+[package]
+name = "app-logs"
+description = "Dziennik diagnostyczny procesów Alfy (kategoria app-*): subskrybent `tracing` z plikiem rotowanym w %LOCALAPPDATA%\\Alfa\\logs (rozmiar, liczba plików, retencja w dniach), poziom z ALFA_LOG / [logs] level, redakcja sekretów mechanizmem core-log, w buildzie debug także stderr"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): instaluje go wyłącznie korzeń kompozycji
+# procesu (`main`): powłoka Tauri (`alfa-desktop`) i procesy Jądra z `app-safety`
+# (`alfa-broker`, `alfa-broker-ui`, `alfa-watchdog`). Bez nowych crate'ów spoza Cargo.lock:
+# własny `Subscriber` na `tracing-core` zamiast `tracing-subscriber`/`tracing-appender`.
+[dependencies]
+core-log-contract.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+tracing-core = { version = "0.1.36", default-features = false, features = ["std"] }
+
+[dev-dependencies]
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

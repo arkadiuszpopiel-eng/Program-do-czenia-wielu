@@ -1,0 +1,20 @@
+# Manifest modułu providers-local (docs/modules/providers-local/SPEC.md, ADR 0014).
+# Schemat: packages/schemas/module-manifest.v1.json
+id = "providers-local"
+version = "0.0.1"
+kind = "provider"
+provides = ["providers-contract@1"]
+requires = ["core-bus-contract@1", "device-profile-contract@1", "model-residency-contract@1"]
+# Modele w katalogu danych; sieć tylko do pobrania modeli z hostów manifestu (na czas pobierania).
+capabilities = ["fs.read(%LOCALAPPDATA%/Alfa/models/**)", "fs.write(%LOCALAPPDATA%/Alfa/models/**)", "net.egress(models-manifest)"]
+lifecycle = "on-demand"
+isolation = "process"
+
+[budget]
+# SPEC: RAM sidecara ≤ 1 GB poza wagami (wagi rozlicza model-residency).
+ram_mb = 1024
+cpu_pct = 100
+
+[health]
+check = "ping"
+interval_s = 60

@@ -1,0 +1,24 @@
+# providers-catalog/mistral.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "mistral"
+display_name = "Mistral"
+kind = "chat"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Wymieniony w klasie B (adapter generyczny). Voxtral Realtime bez polskiego (wg badania [W]). Jurysdykcja nie potwierdzona w planie [?]."
+env_vars = ["MISTRAL_API_KEY"]
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

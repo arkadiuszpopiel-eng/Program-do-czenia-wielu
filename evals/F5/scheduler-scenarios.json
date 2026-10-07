@@ -1,0 +1,18 @@
+{
+  "id": "F5-03",
+  "criterion": "Scheduler: brak zakleszczeń",
+  "threshold": { "deadlocks": 0, "unfinished_tasks": 0, "unresolved_voice_requests": 0, "exclusivity_violations": 0 },
+  "cases": 1000,
+  "master_seed": 6202001395405316099,
+  "generator": "crates/scheduler-fake/tests/common/scenario_gen.rs::scenario (SplitMix64, wersja 1)",
+  "scenario": "2–12 zadań (DAG z warunkami, delegacja, 5 zasobów wyłącznych, 3 klasy, przydział persona/rola/dowolna/usługa, okna, budżety, ponowienia, zawieszenia) + 0–14 zdarzeń: steering tekst/głos, anulowanie poddrzewa, pauza/wznowienie, mowa użytkownika (scheduler-lite, UserSpeech), bezczynność/tryb gry, okrojona obsada, blokada budżetu tła, kill-switch, restart, próba cyklu",
+  "invariants": [
+    "w każdej chwili każdy zasób ma najwyżej jedną posiadaczkę (zadania + mowa)",
+    "zasoby trzyma tylko zadanie w toku (brak czekania z zasobem → brak cykli oczekiwania)",
+    "zadanie startuje dopiero po zakończeniu wszystkich zależności",
+    "na horyzoncie każde zadanie jest zakończone z jawnym powodem, dokładnie raz",
+    "każde żądanie mowy rozstrzygnięte (przyznane albo błąd z powodem)",
+    "steering dostarczony w ≤ 1 kroku atomowym",
+    "zgłoszenie z cyklem odrzucone w całości"
+  ]
+}

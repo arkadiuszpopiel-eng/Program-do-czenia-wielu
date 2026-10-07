@@ -1,0 +1,21 @@
+[package]
+name = "personas-fake"
+description = "Persony i obsada ról: deterministyczna atrapa (fixture'y, zapis wywołań set_cast, nagrane zdarzenia)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+personas-contract = { path = "../personas-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+personas-contract = { path = "../personas-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

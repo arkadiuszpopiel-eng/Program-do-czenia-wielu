@@ -1,0 +1,33 @@
+[package]
+name = "app-terminal"
+description = "Wbudowany terminal w aplikacji (kategoria app-*): komendy terminal_* nad ui-terminal-impl i ConPTY (platform-windows-pty-impl), gest użytkownika tworzony wyłącznie w obsłudze komendy UI, strumień VT tylko do odbiorcy kanału UI (tauri::ipc::Channel) — nigdy do zdarzeń, magistrali ani logów; programy profili z wykrycia CLI mostów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Celowo bez `tracing` (strumień terminala logowania nie trafia do logów);
+# od `ui-terminal-*` zależy tylko `app-*` (test izolacji w `ui-terminal-impl`).
+[dependencies]
+app-api = { path = "../app-api" }
+ui-terminal-contract = { path = "../ui-terminal-contract" }
+ui-terminal-impl = { path = "../ui-terminal-impl" }
+platform-windows-pty-impl = { path = "../platform-windows-pty-impl" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+tokio.workspace = true
+# Ramki kanału UI (`data_b64`) — ta sama wersja co tools-screen-impl (już w Cargo.lock).
+base64 = "0.22.1"
+
+[dev-dependencies]
+platform-fake = { path = "../platform-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio = { workspace = true, features = ["test-util"] }
+serde_json.workspace = true
+
+[lints]
+workspace = true

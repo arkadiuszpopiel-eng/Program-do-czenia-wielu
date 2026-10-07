@@ -1,0 +1,102 @@
+[package]
+name = "app-agents"
+description = "Agentki z narzędziami w aplikacji (kategoria app-*): zestawy tools-fs/shell/clipboard (F6: także office/browser/system/net) przez Brokera i dziennik cofania, specyfikacja przebiegu agent-runtime z obsady i budżetów, projekcja zdarzeń agent.* na Replay i karty UI, zestaw ewaluacyjny narzędzi F3"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `tools-*-impl` i `agent-runtime-impl` nad kontraktami
+# Brokera, dziennika cofania i platformy; używa jej `app-core` (jedno miejsce kompozycji).
+[dependencies]
+app-api = { path = "../app-api" }
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+agent-runtime-impl = { path = "../agent-runtime-impl" }
+tools-common-contract = { path = "../tools-common-contract" }
+tools-fs-contract = { path = "../tools-fs-contract" }
+tools-fs-impl = { path = "../tools-fs-impl" }
+tools-shell-contract = { path = "../tools-shell-contract" }
+tools-shell-impl = { path = "../tools-shell-impl" }
+tools-clipboard-contract = { path = "../tools-clipboard-contract" }
+tools-clipboard-impl = { path = "../tools-clipboard-impl" }
+# F6: Word/Excel i przeglądarka agentek nad portami `platform-apps` (Windows: COM / CDP przez potok).
+tools-office-contract = { path = "../tools-office-contract" }
+tools-office-impl = { path = "../tools-office-impl" }
+tools-browser-contract = { path = "../tools-browser-contract" }
+tools-browser-impl = { path = "../tools-browser-impl" }
+platform-apps-contract = { path = "../platform-apps-contract" }
+platform-windows-office-impl = { path = "../platform-windows-office-impl" }
+# F6: narzędzia systemowe i sieciowe agentek (porty Windows: SysPort, kwarantanna, zasilanie,
+# monitory, audio; klient HTTPS z lib-netguard w tools-net-impl).
+tools-system-contract = { path = "../tools-system-contract" }
+tools-system-impl = { path = "../tools-system-impl" }
+tools-net-contract = { path = "../tools-net-contract" }
+tools-net-impl = { path = "../tools-net-impl" }
+platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
+platform-windows-gui-impl = { path = "../platform-windows-gui-impl" }
+platform-windows-impl = { path = "../platform-windows-impl" }
+# F8: wtyczki Wasm (narzędzia do rejestru agentek, komendy strony „Wtyczki”).
+app-plugins = { path = "../app-plugins" }
+# F6: wizja (OCR Windows.Media.Ocr, opis obrazu przez Router „GUI/wizja”) i multimedia (nagłówki,
+# ffmpeg jako sidecar, odtwarzanie przez voice-audio w kolejce mówienia) — `media.rs`.
+tools-vision-contract = { path = "../tools-vision-contract" }
+tools-vision-impl = { path = "../tools-vision-impl" }
+tools-media-contract = { path = "../tools-media-contract" }
+tools-media-impl = { path = "../tools-media-impl" }
+platform-windows-ocr-impl = { path = "../platform-windows-ocr-impl" }
+lib-media = { path = "../lib-media" }
+app-gui = { path = "../app-gui" }
+app-modules = { path = "../app-modules" }
+router-contract = { path = "../router-contract" }
+router-impl = { path = "../router-impl" }
+sessions-contract = { path = "../sessions-contract" }
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-audio-impl = { path = "../voice-audio-impl" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+undo-journal-contract = { path = "../undo-journal-contract" }
+compliance-contract = { path = "../compliance-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+# v1: zasoby wyłączne (scheduler) dla `RuntimeExt`, umiejętności (koperta `prepare_run`).
+scheduler-contract = { path = "../scheduler-contract" }
+skills-contract = { path = "../skills-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+providers-fake = { path = "../providers-fake" }
+providers-local-impl = { path = "../providers-local-impl" }
+platform-fake = { path = "../platform-fake" }
+platform-windows-impl = { path = "../platform-windows-impl" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+undo-journal-fake = { path = "../undo-journal-fake" }
+platform-apps-fake = { path = "../platform-apps-fake" }
+tools-net-fake = { path = "../tools-net-fake" }
+sessions-fake = { path = "../sessions-fake" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tools-office-fake = { path = "../tools-office-fake" }
+tools-browser-fake = { path = "../tools-browser-fake" }
+# Odtwarzacz-atrapa dla testu kill-switcha (`MediaTools::stop_all`).
+tools-media-fake = { path = "../tools-media-fake" }
+plugin-runtime-contract = { path = "../plugin-runtime-contract" }
+base64 = "0.22.1"
+# Wtyczka testowa z WAT (ta sama linia co w plugin-runtime-impl).
+wat = "=1.236.1"
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

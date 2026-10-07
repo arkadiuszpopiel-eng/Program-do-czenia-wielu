@@ -1,0 +1,18 @@
+# Manifest Brokera (docs/modules/safety-broker/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+# Usługa Windows na osobnym koncie (część 2: binarka usługi, named pipe z ACL na SID, Broker-UI).
+id = "safety-broker"
+version = "0.0.1"
+kind = "service"
+provides = ["safety-broker-contract@1"]
+requires = ["core-bus-contract@1", "core-log-contract@1", "risk-classifier-contract@1", "compliance-contract@1", "watchdog-contract@1", "platform-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "process"
+
+[budget]
+ram_mb = 15
+cpu_pct = 2
+
+[health]
+check = "ping"
+interval_s = 5

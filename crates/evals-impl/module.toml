@@ -1,0 +1,19 @@
+# Manifest modułu evals (docs/modules/evals/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "evals"
+version = "0.0.1"
+kind = "service"
+provides = ["evals-contract@1"]
+requires = ["core-bus-contract@1"]
+# Zestawy publiczne (w instalacji) i holdout w katalogu Jądra (poza gitem, poza zasięgiem agentek).
+capabilities = ["fs.read(evals/**)", "fs.read(%LOCALAPPDATA%/Alfa/evals/holdout/**)"]
+lifecycle = "on-demand"
+isolation = "inproc"
+
+[budget]
+# Sam harness (bez uruchamianego wariantu): bootstrap 2000 × 1000 przypadków ≈ 2 mln dodawań.
+ram_mb = 8
+cpu_pct = 5
+
+[health]
+check = "ping"
+interval_s = 300

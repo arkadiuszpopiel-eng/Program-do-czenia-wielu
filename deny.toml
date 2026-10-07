@@ -1,0 +1,49 @@
+# Konfiguracja cargo-deny (bramka CI z docs/PLAN.md §4.4): podatności, licencje,
+# duplikaty wersji i źródła crate'ów. Uruchomienie: `cargo deny check`.
+
+[graph]
+all-features = true
+
+[advisories]
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+version = 2
+yanked = "deny"
+ignore = []
+
+[licenses]
+version = 2
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "MPL-2.0",
+    "Zlib",
+    "CC0-1.0",
+    "MIT-0", # borrow-or-share (przez jsonschema → referencing → fluent-uri); MIT bez wymogu atrybucji
+]
+confidence-threshold = 0.8
+# Crate'y własne workspace mają `license = "UNLICENSED"` (do ustalenia) — nie są publikowane.
+private = { ignore = true }
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true # zależności path w workspace bez wersji
+highlight = "all"
+deny = [
+    # Tylko jeden crate windows-rs w jednej wersji (AGENTS.md); dozwolony wyłącznie w platform-impl.
+    { crate = "cpal", reason = "audio przez crate `wasapi` (AGENTS.md)" },
+    { crate = "windows", wrappers = ["platform-windows-impl", "platform-windows-kernel-impl", "platform-windows-gui-impl", "platform-windows-pty-impl", "platform-windows-sys-impl", "platform-windows-office-impl", "platform-windows-ocr-impl", "sysinfo", "wasapi"], reason = "windows-rs tylko w platform-windows-*-impl (AGENTS.md; office-impl: Office COM, przeglądarka, rejestr; ocr-impl: Windows.Media.Ocr); sysinfo używany wyłącznie poza Windows; wasapi = audio (ADR 0011), ta sama wersja windows" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

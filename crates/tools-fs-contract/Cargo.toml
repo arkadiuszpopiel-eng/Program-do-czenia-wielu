@@ -1,0 +1,28 @@
+[package]
+name = "tools-fs-contract"
+description = "tools-fs: kontrakt narzędzi plikowych agentek — argumenty i wyniki (JSON Schema), manifesty z odwracalnością i zdolnościami, glob, limity, zdarzenia"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

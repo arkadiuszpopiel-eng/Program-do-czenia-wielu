@@ -1,0 +1,367 @@
+[
+  {
+    "command": "accounts_catalog",
+    "args": {},
+    "result": [
+      {
+        "id": "anthropic",
+        "display_name": "Anthropic (Claude)",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": false
+      },
+      {
+        "id": "openai",
+        "display_name": "OpenAI",
+        "kind": "multi",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": false
+      },
+      {
+        "id": "google",
+        "display_name": "Google (Gemini)",
+        "kind": "multi",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "google-paid-eea-no-train",
+        "jurisdiction": "unknown",
+        "compliance_status": "gray",
+        "terms_url": "https://geminicli.com/docs/resources/tos-privacy/",
+        "needs_base_url": true
+      },
+      {
+        "id": "xai",
+        "display_name": "xAI (Grok)",
+        "kind": "multi",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "xai-retention-30d",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": false
+      },
+      {
+        "id": "deepseek",
+        "display_name": "DeepSeek",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "cn-may-train",
+        "jurisdiction": "CN",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "kimi",
+        "display_name": "Kimi (Moonshot)",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "cn-may-train",
+        "jurisdiction": "CN",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "qwen",
+        "display_name": "Qwen (Alibaba DashScope)",
+        "kind": "multi",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "sg",
+        "jurisdiction": "SG|EU",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "zai",
+        "display_name": "Z.ai (GLM)",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "sg",
+        "jurisdiction": "SG",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "minimax",
+        "display_name": "MiniMax",
+        "kind": "multi",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "openrouter",
+        "display_name": "OpenRouter",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "mistral",
+        "display_name": "Mistral",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "elevenlabs",
+        "display_name": "ElevenLabs",
+        "kind": "multi",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "cartesia",
+        "display_name": "Cartesia",
+        "kind": "tts",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "azure-speech",
+        "display_name": "Azure Speech",
+        "kind": "tts",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "soniox",
+        "display_name": "Soniox",
+        "kind": "stt",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "custom-openai-compatible",
+        "display_name": "Własny endpoint (zgodny z OpenAI)",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "openai",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
+        "id": "custom-anthropic-compatible",
+        "display_name": "Własny endpoint (zgodny z Anthropic)",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "anthropic",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      }
+    ]
+  },
+  {
+    "command": "accounts_list",
+    "args": {},
+    "result": [
+      {
+        "id": "acc-anthropic",
+        "provider_id": "anthropic",
+        "label": "Anthropic — prywatne",
+        "state": "ok",
+        "key_stored": true,
+        "models": [
+          {
+            "id": "claude-opus-5-5",
+            "name": "Claude Opus 5.5",
+            "kinds": [
+              "chat",
+              "vision"
+            ],
+            "context_tokens": 1000000
+          },
+          {
+            "id": "claude-haiku-5",
+            "name": "Claude Haiku 5",
+            "kinds": [
+              "chat"
+            ],
+            "context_tokens": 200000
+          }
+        ],
+        "assignments": {
+          "task_classes": [
+            "chat",
+            "code"
+          ],
+          "agents": [
+            "alfa",
+            "gama",
+            "delta"
+          ],
+          "voice_stt": false,
+          "voice_tts": false
+        },
+        "cost_limit": {
+          "enabled": true,
+          "monthly": {
+            "minor": 20000,
+            "currency": "PLN"
+          }
+        },
+        "last_tested_at": "2026-09-30T05:45:00.000Z"
+      }
+    ]
+  },
+  {
+    "command": "accounts_add",
+    "args": {
+      "input": {
+        "provider_id": "openai",
+        "label": "OpenAI — praca",
+        "secret": "sk-test-0000000000000000",
+        "base_url": null
+      }
+    },
+    "result": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "unconfigured",
+      "key_stored": true,
+      "models": [],
+      "assignments": {
+        "task_classes": [
+          "chat"
+        ],
+        "agents": [],
+        "voice_stt": false,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 10000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": null
+    }
+  },
+  {
+    "command": "accounts_test",
+    "args": {
+      "accountId": "acc-muo1g480-15"
+    },
+    "result": {
+      "ok": true,
+      "latency_ms": 312,
+      "models": [
+        {
+          "id": "gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "kinds": [
+            "chat",
+            "vision"
+          ],
+          "context_tokens": 400000
+        },
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000
+        }
+      ],
+      "error": null
+    }
+  },
+  {
+    "command": "accounts_assign",
+    "args": {
+      "accountId": "acc-muo1g480-15",
+      "assignment": {
+        "task_classes": [
+          "chat",
+          "code"
+        ],
+        "agents": [
+          "beta"
+        ],
+        "voice_stt": true,
+        "voice_tts": false
+      }
+    },
+    "result": null
+  },
+  {
+    "command": "accounts_set_limit",
+    "args": {
+      "accountId": "acc-muo1g480-15",
+      "enabled": true,
+      "monthly": {
+        "minor": 5000,
+        "currency": "PLN"
+      }
+    },
+    "result": null
+  },
+  {
+    "command": "accounts_remove",
+    "args": {
+      "accountId": "acc-muo1g480-15"
+    },
+    "result": null
+  }
+]

@@ -1,0 +1,19 @@
+# Manifest modułu model-residency (docs/modules/model-residency/SPEC.md, PLAN §3.4).
+# Schemat: packages/schemas/module-manifest.v1.json
+id = "model-residency"
+version = "0.0.1"
+kind = "service"
+provides = ["model-residency-contract@1"]
+requires = ["core-bus-contract@1", "device-profile-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "inproc"
+
+[budget]
+# SPEC: RAM ≤ 1 MB; acquire ≤ 1 ms (bez ładowania modeli).
+ram_mb = 1
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 60

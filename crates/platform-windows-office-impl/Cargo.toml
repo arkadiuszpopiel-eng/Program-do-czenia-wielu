@@ -1,0 +1,52 @@
+[package]
+name = "platform-windows-office-impl"
+description = "Porty aplikacji F6 dla Windows: Office przez COM (IDispatch, wątek STA z limitem czasu, makra wyłączone, Protected View, kopia robocza), izolowana przeglądarka Edge/Chrome z CDP przez potok (filtr egressu per żądanie, kwarantanna pobrań, Job Object), rejestr HKCU/HKLM tylko do odczytu z deny-listą sekretów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Implementacja portów `platform-apps-contract`; jedno z miejsc z windows-rs (`deny.toml`: `wrappers`).
+# Bez zależności od innych `-impl`.
+[dependencies]
+platform-apps-contract = { path = "../platform-apps-contract" }
+platform-contract.workspace = true
+serde_json.workspace = true
+# Dekodowanie zrzutów CDP (base64; ta sama wersja co tools-screen-impl, już w Cargo.lock).
+base64 = "0.22.1"
+
+# Ta sama wersja windows-rs co w `platform-windows-impl` (AGENTS.md: jeden crate, jedna wersja).
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Com",
+    "Win32_System_Com_StructuredStorage",
+    "Win32_System_JobObjects",
+    "Win32_System_Ole",
+    "Win32_System_Pipes",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_System_Variant",
+] }
+
+[dev-dependencies]
+proptest.workspace = true
+
+# Kopia [workspace.lints] z jedną różnicą: `unsafe_code = "deny"` zamiast `forbid`, żeby moduły FFI
+# mogły mieć `#[allow(unsafe_code)]` (tylko one; każdy blok `unsafe` z komentarzem `// SAFETY:`).
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+too_many_lines = "warn"
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "warn"
+undocumented_unsafe_blocks = "deny"

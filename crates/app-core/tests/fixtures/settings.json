@@ -1,0 +1,1750 @@
+[
+  {
+    "command": "settings_schema",
+    "args": {},
+    "result": [
+      {
+        "id": "general",
+        "label": {
+          "pl": "Ogólne",
+          "en": "General"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "general.start_with_system",
+            "label": {
+              "pl": "Uruchamiaj z systemem",
+              "en": "Start with Windows"
+            },
+            "description": {
+              "pl": "Alfa startuje do zasobnika po zalogowaniu.",
+              "en": "Alfa starts in the tray after you sign in."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "general.close_to_tray",
+            "label": {
+              "pl": "Zamknięcie okna chowa do zasobnika",
+              "en": "Closing the window hides it to the tray"
+            },
+            "description": {
+              "pl": "Okno znika, ale Alfa dalej słucha i pracuje w tle.",
+              "en": "The window disappears, but Alfa keeps listening and working."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "general.destroy_webview_after",
+            "label": {
+              "pl": "Zwolnij pamięć okna po",
+              "en": "Free window memory after"
+            },
+            "description": {
+              "pl": "Po tylu minutach ukrycia widok okna jest zamykany, żeby oszczędzać RAM.",
+              "en": "After this many minutes hidden, the window view is closed to save RAM."
+            },
+            "default": 10,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 120,
+              "step": 1,
+              "unit": "min"
+            }
+          },
+          {
+            "key": "general.view_profile",
+            "label": {
+              "pl": "Profil widoku ustawień",
+              "en": "Settings view profile"
+            },
+            "description": {
+              "pl": "Ile opcji pokazujemy: Prosty, Zaawansowany albo Ekspert.",
+              "en": "How many options to show: Simple, Advanced or Expert."
+            },
+            "default": "simple",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "simple",
+                  "label": {
+                    "pl": "Prosty",
+                    "en": "Simple"
+                  }
+                },
+                {
+                  "value": "advanced",
+                  "label": {
+                    "pl": "Zaawansowany",
+                    "en": "Advanced"
+                  }
+                },
+                {
+                  "value": "expert",
+                  "label": {
+                    "pl": "Ekspert",
+                    "en": "Expert"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "quick.session_mode",
+            "label": {
+              "pl": "Szybkie pytanie: sesja",
+              "en": "Quick ask: session"
+            },
+            "description": {
+              "pl": "Czy pytania trafiają do jednej sesji „Szybkie pytania\", czy każde tworzy nową.",
+              "en": "Whether questions go to a single \"Quick questions\" session or each creates a new one."
+            },
+            "default": "single",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "single",
+                  "label": {
+                    "pl": "Jedna wspólna sesja",
+                    "en": "One shared session"
+                  }
+                },
+                {
+                  "value": "new_each",
+                  "label": {
+                    "pl": "Nowa sesja za każdym razem",
+                    "en": "New session each time"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "providers",
+        "label": {
+          "pl": "Modele i dostawcy",
+          "en": "Models and providers"
+        },
+        "wave": 1,
+        "custom": "providers",
+        "settings": [
+          {
+            "key": "models.default_profile",
+            "label": {
+              "pl": "Domyślny profil modelu",
+              "en": "Default model profile"
+            },
+            "description": {
+              "pl": "Lokalny działa bez kluczy; Hybryda łączy lokalny model z chmurą.",
+              "en": "Local works without keys; Hybrid combines the local model with the cloud."
+            },
+            "default": "hybrid",
+            "scope": "session",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "local",
+                  "label": {
+                    "pl": "Lokalny",
+                    "en": "Local"
+                  }
+                },
+                {
+                  "value": "hybrid",
+                  "label": {
+                    "pl": "Hybryda",
+                    "en": "Hybrid"
+                  }
+                },
+                {
+                  "value": "cloud",
+                  "label": {
+                    "pl": "Chmura",
+                    "en": "Cloud"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "models.effort",
+            "label": {
+              "pl": "Wysiłek rozumowania",
+              "en": "Reasoning effort"
+            },
+            "description": {
+              "pl": "Wyższy daje staranniejsze odpowiedzi, ale trwa dłużej i kosztuje więcej.",
+              "en": "Higher gives more careful answers but takes longer and costs more."
+            },
+            "default": "medium",
+            "scope": "agent",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "low",
+                  "label": {
+                    "pl": "Niski",
+                    "en": "Low"
+                  }
+                },
+                {
+                  "value": "medium",
+                  "label": {
+                    "pl": "Średni",
+                    "en": "Medium"
+                  }
+                },
+                {
+                  "value": "high",
+                  "label": {
+                    "pl": "Wysoki",
+                    "en": "High"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "models",
+        "label": {
+          "pl": "Modele i silniki",
+          "en": "Models and engines"
+        },
+        "wave": 1,
+        "custom": "models",
+        "settings": [
+          {
+            "key": "engines.llm.backend",
+            "label": {
+              "pl": "Silnik modelu rozmowy",
+              "en": "Chat model engine"
+            },
+            "description": {
+              "pl": "Na czym liczy lokalny model rozmowy. Automatycznie: karta NVIDIA — CUDA, karta AMD lub Intel — Vulkan, bez karty albo na baterii — procesor. Zalecenie: Automatycznie; „Procesor” wybierz, gdy sterownik karty sprawia problemy. Brak zainstalowanej wersji silnika → Alfa użyje zastępczej i zapisze ostrzeżenie w dzienniku. Zmiana działa po ponownym uruchomieniu Alfy.",
+              "en": "What the local chat model runs on. Automatic: NVIDIA GPU — CUDA, AMD or Intel GPU — Vulkan, no GPU or on battery — CPU. Recommended: Automatic; choose “CPU” when the GPU driver causes problems. If that engine build is not installed, Alfa uses a substitute and logs a warning. Takes effect after restarting Alfa."
+            },
+            "default": "auto",
+            "scope": "machine",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie (zalecane)",
+                    "en": "Automatic (recommended)"
+                  }
+                },
+                {
+                  "value": "cuda",
+                  "label": {
+                    "pl": "Karta NVIDIA (CUDA)",
+                    "en": "NVIDIA GPU (CUDA)"
+                  }
+                },
+                {
+                  "value": "vulkan",
+                  "label": {
+                    "pl": "Karta graficzna (Vulkan)",
+                    "en": "GPU (Vulkan)"
+                  }
+                },
+                {
+                  "value": "cpu",
+                  "label": {
+                    "pl": "Procesor",
+                    "en": "CPU"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "engines.llm.context",
+            "label": {
+              "pl": "Długość kontekstu",
+              "en": "Context length"
+            },
+            "description": {
+              "pl": "Ile ostatnich tokenów rozmowy model ma przed oczami. Dłuższy kontekst pamięta więcej, ale zajmuje więcej pamięci (Bielik 4.5B: ok. 60 MB na 1000 tokenów). Automatycznie: do 8192, a na małej karcie mniej, żeby model zmieścił się w całości. Zalecenie: Automatycznie; 2048 tylko przy braku pamięci — to oszczędność zasobów kosztem pamięci rozmowy (ISO/IEC 25010: wykorzystanie zasobów). Zmiana po ponownym uruchomieniu.",
+              "en": "How many recent conversation tokens the model can see. A longer context remembers more but uses more memory (Bielik 4.5B: about 60 MB per 1000 tokens). Automatic: up to 8192, less on a small GPU so the model fits entirely. Recommended: Automatic; 2048 only when memory is short — saving resources at the cost of conversation memory (ISO/IEC 25010: resource utilisation). Takes effect after a restart."
+            },
+            "default": "auto",
+            "scope": "machine",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie (zalecane)",
+                    "en": "Automatic (recommended)"
+                  }
+                },
+                {
+                  "value": "4096",
+                  "label": {
+                    "pl": "4096 tokenów",
+                    "en": "4096 tokens"
+                  }
+                },
+                {
+                  "value": "2048",
+                  "label": {
+                    "pl": "2048 tokenów (oszczędnie)",
+                    "en": "2048 tokens (saving)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "engines.llm.threads",
+            "label": {
+              "pl": "Wątki procesora",
+              "en": "CPU threads"
+            },
+            "description": {
+              "pl": "Ile wątków procesora liczy model, gdy pracuje na procesorze (w całości albo częściowo). 0 — automatycznie: tyle, ile rdzeni fizycznych. Zalecenie: 0; zmniejsz, gdy równocześnie grasz albo pracujesz w ciężkich programach — Alfa odpowie wolniej, a system będzie płynniejszy. Więcej wątków niż rdzeni fizycznych zwykle spowalnia. Zmiana po ponownym uruchomieniu.",
+              "en": "How many CPU threads the model uses when it runs on the CPU (fully or partly). 0 — automatic: as many as physical cores. Recommended: 0; lower it when you game or run heavy programs at the same time — Alfa replies slower and the system stays smoother. More threads than physical cores usually slows things down. Takes effect after a restart."
+            },
+            "default": 0,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 0,
+              "max": 64,
+              "step": 1,
+              "unit": null
+            }
+          },
+          {
+            "key": "engines.llm.idle_unload_min",
+            "label": {
+              "pl": "Zwolnij model po bezczynności",
+              "en": "Unload the model when idle"
+            },
+            "description": {
+              "pl": "Po tylu minutach bez rozmowy model zwalnia pamięć RAM i karty graficznej. Krócej — więcej wolnej pamięci dla innych programów i gier, ale pierwsza odpowiedź po przerwie czeka na ponowne wczytanie modelu (od kilku do kilkunastu sekund). Zalecenie: 5 min na laptopie, 10–15 min na komputerze stacjonarnym. Zmiana po ponownym uruchomieniu.",
+              "en": "After this many minutes without conversation the model frees RAM and GPU memory. Shorter — more free memory for other programs and games, but the first reply after a break waits for the model to load again (a few to over ten seconds). Recommended: 5 min on a laptop, 10–15 min on a desktop. Takes effect after a restart."
+            },
+            "default": 10,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 120,
+              "step": 1,
+              "unit": "min"
+            }
+          },
+          {
+            "key": "models.parallel_downloads",
+            "label": {
+              "pl": "Pobierania naraz",
+              "en": "Downloads at once"
+            },
+            "description": {
+              "pl": "Ile plików modeli i silników pobiera się równocześnie; reszta czeka w kolejce. Zalecenie: 2 dla łącza domowego; 1 przy łączu komórkowym albo z limitem danych; 3–4 tylko przy szybkim łączu światłowodowym. Każdy plik i tak jest sprawdzany sumą SHA-256. Zmiana po ponownym uruchomieniu.",
+              "en": "How many model and engine files download at the same time; the rest wait in a queue. Recommended: 2 on a home connection; 1 on mobile or metered connections; 3–4 only on fast fibre. Every file is checked with SHA-256 anyway. Takes effect after a restart."
+            },
+            "default": 2,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 4,
+              "step": 1,
+              "unit": null
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "costs",
+        "label": {
+          "pl": "Koszty i limity",
+          "en": "Costs and limits"
+        },
+        "wave": 1,
+        "custom": "costs",
+        "settings": [
+          {
+            "key": "costs.warn_at",
+            "label": {
+              "pl": "Ostrzegaj przy zużyciu limitu",
+              "en": "Warn at limit usage"
+            },
+            "description": {
+              "pl": "Procent limitu miesięcznego, przy którym pokażemy ostrzeżenie.",
+              "en": "Share of the monthly limit at which a warning is shown."
+            },
+            "default": 80,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 50,
+              "max": 100,
+              "step": 5,
+              "unit": "%"
+            }
+          },
+          {
+            "key": "costs.background_local_only",
+            "label": {
+              "pl": "Zadania w tle tylko lokalnie",
+              "en": "Background tasks local only"
+            },
+            "description": {
+              "pl": "Osobny budżet tła: domyślnie tylko modele lokalne, bez kosztów.",
+              "en": "Separate background budget: local models only by default, no cost."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "costs.estimate_before_long",
+            "label": {
+              "pl": "Szacuj koszt przed długim zadaniem",
+              "en": "Estimate cost before long tasks"
+            },
+            "description": {
+              "pl": "Przed dużym zadaniem pokażemy szacunek i poprosimy o zgodę.",
+              "en": "Before a large task, an estimate is shown and you are asked to confirm."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "router",
+        "label": {
+          "pl": "Router i reguły",
+          "en": "Router and rules"
+        },
+        "wave": 2,
+        "custom": null,
+        "settings": [],
+        "upcoming": [
+          {
+            "pl": "Klasy zadań i fallbacki",
+            "en": "Task classes and fallbacks"
+          },
+          {
+            "pl": "Tagi prywatności i jurysdykcji",
+            "en": "Privacy and jurisdiction tags"
+          }
+        ]
+      },
+      {
+        "id": "voice",
+        "label": {
+          "pl": "Głos",
+          "en": "Voice"
+        },
+        "wave": 1,
+        "custom": "voice",
+        "settings": [
+          {
+            "key": "voice.mode",
+            "label": {
+              "pl": "Włączanie mikrofonu",
+              "en": "Microphone activation"
+            },
+            "description": {
+              "pl": "Przełącznik (Ctrl+Shift+M) albo mówienie z przytrzymaniem Spacji (PTT).",
+              "en": "Toggle (Ctrl+Shift+M) or push-to-talk with the Space key."
+            },
+            "default": "toggle",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "toggle",
+                  "label": {
+                    "pl": "Przełącznik",
+                    "en": "Toggle"
+                  }
+                },
+                {
+                  "value": "ptt",
+                  "label": {
+                    "pl": "Przytrzymaj, aby mówić (PTT)",
+                    "en": "Push to talk"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "voice.show_pill",
+            "label": {
+              "pl": "Pigułka głosowa",
+              "en": "Voice pill"
+            },
+            "description": {
+              "pl": "Małe okno z mówiącą agentką i stanem mikrofonu, gdy okno główne jest ukryte.",
+              "en": "A small window with the speaking agent and microphone state when the main window is hidden."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "agents",
+        "label": {
+          "pl": "Agentki",
+          "en": "Agents"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "agents.max_steps",
+            "label": {
+              "pl": "Limit kroków zadania",
+              "en": "Task step limit"
+            },
+            "description": {
+              "pl": "Agentka zatrzyma się po tylu krokach (tura modelu albo narzędzie) i pokaże raport.",
+              "en": "The agent stops after this many steps (model turn or tool) and shows a report."
+            },
+            "default": 40,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 5,
+              "max": 200,
+              "step": 1,
+              "unit": null
+            }
+          },
+          {
+            "key": "agents.max_minutes",
+            "label": {
+              "pl": "Limit czasu zadania",
+              "en": "Task time limit"
+            },
+            "description": {
+              "pl": "Najdłuższy czas jednego zadania agentki.",
+              "en": "The longest time of a single agent task."
+            },
+            "default": 15,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 120,
+              "step": 1,
+              "unit": "min"
+            }
+          },
+          {
+            "key": "agents.max_cost_pln",
+            "label": {
+              "pl": "Limit kosztu zadania",
+              "en": "Task cost limit"
+            },
+            "description": {
+              "pl": "Najwyższy koszt modeli w jednym zadaniu (0 = bez limitu; limit miesięczny obowiązuje zawsze).",
+              "en": "Highest model cost of a single task (0 = no limit; the monthly limit always applies)."
+            },
+            "default": 0,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 0,
+              "max": 500,
+              "step": 1,
+              "unit": "zł"
+            }
+          },
+          {
+            "key": "agents.approval_timeout_s",
+            "label": {
+              "pl": "Czekanie na zatwierdzenie",
+              "en": "Waiting for approval"
+            },
+            "description": {
+              "pl": "Po tym czasie bez decyzji w oknie Brokera agentka dostaje odmowę.",
+              "en": "Without a decision in the Broker window after this time, the agent is denied."
+            },
+            "default": 300,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 30,
+              "max": 1800,
+              "step": 30,
+              "unit": "s"
+            }
+          },
+          {
+            "key": "agents.verify_before_done",
+            "label": {
+              "pl": "„Gotowe\" po samoweryfikacji",
+              "en": "\"Done\" after self-check"
+            },
+            "description": {
+              "pl": "Agentka sprawdza wynik narzędziami tylko do odczytu, zanim ogłosi koniec zadania.",
+              "en": "The agent checks the result with read-only tools before declaring the task done."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "scheduler.max_parallel",
+            "label": {
+              "pl": "Zadania naraz",
+              "en": "Tasks at once"
+            },
+            "description": {
+              "pl": "Najwięcej zadań agentek wykonywanych równolegle (reguły Marszałka mogą tylko zmniejszyć). Zmiana działa od następnego uruchomienia.",
+              "en": "The most agent tasks running in parallel (Marshal rules can only lower it). Takes effect after the next start."
+            },
+            "default": 4,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 16,
+              "step": 1,
+              "unit": null
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "skills",
+        "label": {
+          "pl": "Umiejętności",
+          "en": "Skills"
+        },
+        "wave": 1,
+        "custom": "skills",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "plugins",
+        "label": {
+          "pl": "Wtyczki",
+          "en": "Plugins"
+        },
+        "wave": 1,
+        "custom": "plugins",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "builder",
+        "label": {
+          "pl": "Kreator agentek",
+          "en": "Agent builder"
+        },
+        "wave": 1,
+        "custom": "builder",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "triggers",
+        "label": {
+          "pl": "Zadania w tle i wyzwalacze",
+          "en": "Background tasks and triggers"
+        },
+        "wave": 1,
+        "custom": "triggers",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "marshal",
+        "label": {
+          "pl": "Reguły Marszałka",
+          "en": "Marshal rules"
+        },
+        "wave": 1,
+        "custom": "marshal",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "permissions",
+        "label": {
+          "pl": "Uprawnienia i bezpieczeństwo",
+          "en": "Permissions and security"
+        },
+        "wave": 1,
+        "custom": "permissions",
+        "settings": [
+          {
+            "key": "ui.hide_from_capture",
+            "label": {
+              "pl": "Ukrywaj okna Alfy na zrzutach i nagraniach ekranu",
+              "en": "Hide Alfa windows from screenshots and screen recordings"
+            },
+            "description": {
+              "pl": "Włączone: Windows wycina okna Alfy ze zrzutów (Wycinek, PrintScreen) i nagrań innych programów — w ich miejscu jest czarne pole albo pulpit. Wyłączone (domyślnie): zrzuty działają normalnie, możesz pokazać ekran przy zgłaszaniu błędu. Agentki i tak nie widzą okien Alfy ani okna zatwierdzeń — ich zrzuty maskują procesy Alfy niezależnie od tego ustawienia. Zalecenie: wyłączone; włącz przy udostępnianiu ekranu, gdy w rozmowie są dane prywatne. Zmiana działa po ponownym uruchomieniu Alfy.",
+              "en": "On: Windows cuts Alfa windows out of screenshots (Snipping Tool, PrintScreen) and other programs' recordings — a black area or the desktop shows instead. Off (default): screenshots work normally, so you can show the screen when reporting a problem. Agents still cannot see Alfa windows or the approval window — their screenshots mask Alfa processes regardless of this setting. Recommended: off; turn on when sharing your screen while the conversation holds private data. Takes effect after restarting Alfa."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": false,
+            "scope": "machine"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "computer",
+        "label": {
+          "pl": "Komputer",
+          "en": "Computer"
+        },
+        "wave": 1,
+        "custom": "computer",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "memory",
+        "label": {
+          "pl": "Pamięć",
+          "en": "Memory"
+        },
+        "wave": 1,
+        "custom": "memory",
+        "settings": [
+          {
+            "key": "memory.consolidation_enabled",
+            "label": {
+              "pl": "Porządkowanie nocne",
+              "en": "Nightly tidy-up"
+            },
+            "description": {
+              "pl": "Strażniczka pamięci łączy powtórzenia, wygasza nieaktualne wpisy i proponuje fakty — lokalnie, w oknie nocnym, tylko gdy komputer jest bezczynny. Zmiana działa od następnego uruchomienia.",
+              "en": "The memory keeper merges duplicates, expires stale entries and proposes facts — locally, in the night window, only when the computer is idle. Takes effect after the next start."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "memory.consolidation_window",
+            "label": {
+              "pl": "Okno porządkowania",
+              "en": "Tidy-up window"
+            },
+            "description": {
+              "pl": "Godziny w formacie GG:MM-GG:MM (czas lokalny).",
+              "en": "Hours as HH:MM-HH:MM (local time)."
+            },
+            "default": "02:00-05:00",
+            "scope": "machine",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "memory.auto_extract",
+            "label": {
+              "pl": "Fakty z rozmów",
+              "en": "Facts from conversations"
+            },
+            "description": {
+              "pl": "Czy Strażniczka może sama zapisywać fakty wyciągnięte z rozmów, czy tylko je proponuje do zatwierdzenia.",
+              "en": "Whether the keeper may store facts extracted from conversations on its own, or only propose them for approval."
+            },
+            "default": "ask",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "ask",
+                  "label": {
+                    "pl": "Proponuj do zatwierdzenia",
+                    "en": "Propose for approval"
+                  }
+                },
+                {
+                  "value": "on",
+                  "label": {
+                    "pl": "Zapisuj sama",
+                    "en": "Store automatically"
+                  }
+                },
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Wyłączone",
+                    "en": "Off"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "sessions",
+        "label": {
+          "pl": "Sesje i okna",
+          "en": "Sessions and windows"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "sessions.default_template",
+            "label": {
+              "pl": "Szablon nowej sesji",
+              "en": "New session template"
+            },
+            "description": {
+              "pl": "Od czego zaczyna się nowa rozmowa.",
+              "en": "What a new conversation starts from."
+            },
+            "default": "empty",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "empty",
+                  "label": {
+                    "pl": "Pusty",
+                    "en": "Empty"
+                  }
+                },
+                {
+                  "value": "coding",
+                  "label": {
+                    "pl": "Kodowanie",
+                    "en": "Coding"
+                  }
+                },
+                {
+                  "value": "research",
+                  "label": {
+                    "pl": "Research",
+                    "en": "Research"
+                  }
+                },
+                {
+                  "value": "voice",
+                  "label": {
+                    "pl": "Asystent głosowy",
+                    "en": "Voice assistant"
+                  }
+                },
+                {
+                  "value": "admin",
+                  "label": {
+                    "pl": "Administracja PC",
+                    "en": "PC administration"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "sessions.auto_title",
+            "label": {
+              "pl": "Automatyczny tytuł",
+              "en": "Automatic title"
+            },
+            "description": {
+              "pl": "Tytuł sesji powstaje z pierwszych wiadomości.",
+              "en": "The session title is created from the first messages."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "sessions.delete_undo_seconds",
+            "label": {
+              "pl": "Czas na cofnięcie usunięcia",
+              "en": "Time to undo deletion"
+            },
+            "description": {
+              "pl": "Ile sekund możesz cofnąć usunięcie sesji.",
+              "en": "How many seconds you can undo deleting a session."
+            },
+            "default": 10,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 5,
+              "max": 30,
+              "step": 1,
+              "unit": "s"
+            }
+          },
+          {
+            "key": "ui.max_detached_windows",
+            "label": {
+              "pl": "Limit odłączonych okien",
+              "en": "Detached window limit"
+            },
+            "description": {
+              "pl": "Każde okno zużywa pamięć; powyżej limitu pokażemy ostrzeżenie.",
+              "en": "Each window uses memory; above the limit you will see a warning."
+            },
+            "default": 4,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 1,
+              "max": 8,
+              "step": 1,
+              "unit": null
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "files",
+        "label": {
+          "pl": "Pliki",
+          "en": "Files"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "files.workdir_root",
+            "label": {
+              "pl": "Katalog wyjściowy",
+              "en": "Output folder"
+            },
+            "description": {
+              "pl": "Tu agentki zapisują pliki, które Ci oddają.",
+              "en": "Where agents save the files they hand over to you."
+            },
+            "default": "%USERPROFILE%\\Alfa\\Sesje",
+            "scope": "global",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "files.image_thumbnails",
+            "label": {
+              "pl": "Miniatury obrazów",
+              "en": "Image thumbnails"
+            },
+            "description": {
+              "pl": "Obrazy w rozmowie jako leniwe miniatury.",
+              "en": "Images in the conversation as lazy thumbnails."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "logs",
+        "label": {
+          "pl": "Logi i prywatność",
+          "en": "Logs and privacy"
+        },
+        "wave": 3,
+        "custom": null,
+        "settings": [],
+        "upcoming": [
+          {
+            "pl": "Retencja i redakcja",
+            "en": "Retention and redaction"
+          },
+          {
+            "pl": "„Co poszło do chmury\"",
+            "en": "\"What went to the cloud\""
+          }
+        ]
+      },
+      {
+        "id": "improve",
+        "label": {
+          "pl": "Zdrowie systemu",
+          "en": "System health"
+        },
+        "wave": 1,
+        "custom": "health",
+        "settings": [
+          {
+            "key": "diagnostician.autonomy",
+            "label": {
+              "pl": "Samodzielność Diagnosty",
+              "en": "Diagnostician autonomy"
+            },
+            "description": {
+              "pl": "Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera. Zmiana działa od następnego uruchomienia.",
+              "en": "What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window. Takes effect after the next start."
+            },
+            "default": "auto_low_risk",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "propose_only",
+                  "label": {
+                    "pl": "Tylko proponuje",
+                    "en": "Propose only"
+                  }
+                },
+                {
+                  "value": "auto_low_risk",
+                  "label": {
+                    "pl": "Sam naprawia niskie ryzyko",
+                    "en": "Fixes low risk on its own"
+                  }
+                },
+                {
+                  "value": "auto_medium_risk",
+                  "label": {
+                    "pl": "Sam naprawia niskie i średnie ryzyko",
+                    "en": "Fixes low and medium risk on its own"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "modules",
+        "label": {
+          "pl": "Moduły",
+          "en": "Modules"
+        },
+        "wave": 2,
+        "custom": null,
+        "settings": [],
+        "upcoming": [
+          {
+            "pl": "Lista modułów, włącz / wyłącz",
+            "en": "Module list, enable / disable"
+          },
+          {
+            "pl": "Budżety RAM i CPU",
+            "en": "RAM and CPU budgets"
+          }
+        ]
+      },
+      {
+        "id": "devices",
+        "label": {
+          "pl": "Urządzenia",
+          "en": "Devices"
+        },
+        "wave": 1,
+        "custom": "devices",
+        "settings": [
+          {
+            "key": "device.battery_mode",
+            "label": {
+              "pl": "Tryb baterii",
+              "en": "Battery mode"
+            },
+            "description": {
+              "pl": "Na baterii Alfa używa lżejszych modeli i rzadziej odświeża wskaźniki.",
+              "en": "On battery, Alfa uses lighter models and refreshes indicators less often."
+            },
+            "default": "auto",
+            "scope": "machine",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie",
+                    "en": "Automatic"
+                  }
+                },
+                {
+                  "value": "always",
+                  "label": {
+                    "pl": "Zawsze oszczędny",
+                    "en": "Always saving"
+                  }
+                },
+                {
+                  "value": "never",
+                  "label": {
+                    "pl": "Nigdy",
+                    "en": "Never"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "device.game_mode",
+            "label": {
+              "pl": "Tryb gry / pełnego ekranu",
+              "en": "Game / full-screen mode"
+            },
+            "description": {
+              "pl": "Przy grze lub filmie na pełnym ekranie włącza „nie przeszkadzać\".",
+              "en": "Turns on \"do not disturb\" during full-screen games or videos."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "machine"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "transfer",
+        "label": {
+          "pl": "Import i eksport",
+          "en": "Import and export"
+        },
+        "wave": 1,
+        "custom": "transfer",
+        "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "appearance",
+        "label": {
+          "pl": "Wygląd",
+          "en": "Appearance"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "ui.theme",
+            "label": {
+              "pl": "Motyw",
+              "en": "Theme"
+            },
+            "description": {
+              "pl": "Jasny, ciemny albo za ustawieniem Windows.",
+              "en": "Light, dark, or following Windows."
+            },
+            "default": "auto",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Auto (jak Windows)",
+                    "en": "Auto (like Windows)"
+                  }
+                },
+                {
+                  "value": "light",
+                  "label": {
+                    "pl": "Jasny",
+                    "en": "Light"
+                  }
+                },
+                {
+                  "value": "dark",
+                  "label": {
+                    "pl": "Ciemny",
+                    "en": "Dark"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "ui.accent",
+            "label": {
+              "pl": "Akcent",
+              "en": "Accent"
+            },
+            "description": {
+              "pl": "Kolor mówiącej agentki albo kolor akcentu Windows.",
+              "en": "The speaking agent’s colour or the Windows accent colour."
+            },
+            "default": "agent",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "agent",
+                  "label": {
+                    "pl": "Kolor agentki",
+                    "en": "Agent colour"
+                  }
+                },
+                {
+                  "value": "windows",
+                  "label": {
+                    "pl": "Akcent Windows",
+                    "en": "Windows accent"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "ui.density",
+            "label": {
+              "pl": "Gęstość",
+              "en": "Density"
+            },
+            "description": {
+              "pl": "Kompaktowa mieści więcej na ekranie.",
+              "en": "Compact fits more on screen."
+            },
+            "default": "comfortable",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "comfortable",
+                  "label": {
+                    "pl": "Komfortowa",
+                    "en": "Comfortable"
+                  }
+                },
+                {
+                  "value": "compact",
+                  "label": {
+                    "pl": "Kompaktowa",
+                    "en": "Compact"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "ui.zoom",
+            "label": {
+              "pl": "Powiększenie",
+              "en": "Zoom"
+            },
+            "description": {
+              "pl": "Skala całego interfejsu (Ctrl+= / Ctrl+- / Ctrl+0).",
+              "en": "Scale of the whole interface (Ctrl+= / Ctrl+- / Ctrl+0)."
+            },
+            "default": 100,
+            "scope": "machine",
+            "control": {
+              "kind": "number",
+              "min": 80,
+              "max": 200,
+              "step": 10,
+              "unit": "%"
+            }
+          },
+          {
+            "key": "ui.animations",
+            "label": {
+              "pl": "Animacje",
+              "en": "Animations"
+            },
+            "description": {
+              "pl": "Wyłącz, jeśli ruch Ci przeszkadza. Ustawienie systemowe „ogranicz ruch\" też je wyłącza.",
+              "en": "Turn off if motion bothers you. The system \"reduce motion\" setting also disables them."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "ui.column",
+            "label": {
+              "pl": "Szerokość kolumny rozmowy",
+              "en": "Conversation column width"
+            },
+            "description": {
+              "pl": "Wąska (~72 znaki) czyta się najwygodniej; szeroka mieści tabele.",
+              "en": "Narrow (~72 characters) reads best; wide fits tables."
+            },
+            "default": "narrow",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "narrow",
+                  "label": {
+                    "pl": "Wąska",
+                    "en": "Narrow"
+                  }
+                },
+                {
+                  "value": "wide",
+                  "label": {
+                    "pl": "Szeroka",
+                    "en": "Wide"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "shortcuts",
+        "label": {
+          "pl": "Skróty",
+          "en": "Shortcuts"
+        },
+        "wave": 1,
+        "custom": "shortcuts",
+        "settings": [
+          {
+            "key": "composer.enter_sends",
+            "label": {
+              "pl": "Enter wysyła wiadomość",
+              "en": "Enter sends the message"
+            },
+            "description": {
+              "pl": "Wyłączone: Enter to nowa linia, a Ctrl+Enter wysyła.",
+              "en": "When off: Enter adds a new line and Ctrl+Enter sends."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "notifications",
+        "label": {
+          "pl": "Powiadomienia",
+          "en": "Notifications"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "notify.toasts",
+            "label": {
+              "pl": "Powiadomienia Windows",
+              "en": "Windows notifications"
+            },
+            "description": {
+              "pl": "Gdy okno jest ukryte: koniec zadania, prośba o zatwierdzenie, błąd.",
+              "en": "When the window is hidden: task finished, approval request, error."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "notify.earcons",
+            "label": {
+              "pl": "Dźwięki (earcony)",
+              "en": "Sounds (earcons)"
+            },
+            "description": {
+              "pl": "Krótkie, ciche dźwięki startu i końca słuchania, błędu i ukończenia.",
+              "en": "Short, quiet sounds for listening start/stop, errors and completion."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          },
+          {
+            "key": "notify.earcon_volume",
+            "label": {
+              "pl": "Głośność dźwięków",
+              "en": "Sound volume"
+            },
+            "description": {
+              "pl": "Osobna głośność earconów.",
+              "en": "Separate volume for earcons."
+            },
+            "default": 40,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 0,
+              "max": 100,
+              "step": 5,
+              "unit": "%"
+            }
+          },
+          {
+            "key": "notify.dnd_fullscreen",
+            "label": {
+              "pl": "Nie przeszkadzać na pełnym ekranie",
+              "en": "Do not disturb in full screen"
+            },
+            "description": {
+              "pl": "Automatycznie przy grach i prezentacjach.",
+              "en": "Automatically during games and presentations."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "language",
+        "label": {
+          "pl": "Język",
+          "en": "Language"
+        },
+        "wave": 1,
+        "custom": null,
+        "settings": [
+          {
+            "key": "ui.locale",
+            "label": {
+              "pl": "Język interfejsu",
+              "en": "Interface language"
+            },
+            "description": {
+              "pl": "Polski albo angielski. Agentki zawsze mówią w rodzaju żeńskim.",
+              "en": "Polish or English. Agents always use feminine forms in Polish."
+            },
+            "default": "pl",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "pl",
+                  "label": {
+                    "pl": "Polski",
+                    "en": "Polish"
+                  }
+                },
+                {
+                  "value": "en",
+                  "label": {
+                    "pl": "English",
+                    "en": "English"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "updates",
+        "label": {
+          "pl": "Aktualizacje",
+          "en": "Updates"
+        },
+        "wave": 1,
+        "custom": "updates",
+        "settings": [
+          {
+            "key": "updates.channel",
+            "label": {
+              "pl": "Kanał aktualizacji",
+              "en": "Update channel"
+            },
+            "description": {
+              "pl": "Stabilny dostaje sprawdzone wersje; testowy (beta) — wcześniej, także wersje przedpremierowe.",
+              "en": "Stable gets tested versions; preview (beta) gets them earlier, including pre-releases."
+            },
+            "default": "stable",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "stable",
+                  "label": {
+                    "pl": "Stabilny",
+                    "en": "Stable"
+                  }
+                },
+                {
+                  "value": "preview",
+                  "label": {
+                    "pl": "Testowy (beta)",
+                    "en": "Preview (beta)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "updates.mode",
+            "label": {
+              "pl": "Instalowanie aktualizacji",
+              "en": "Installing updates"
+            },
+            "description": {
+              "pl": "Automatycznie: Alfa sprawdza raz dziennie, pobiera i przygotowuje nową wersję (działa od ponownego uruchomienia). Pytaj: sprawdza raz dziennie i pyta przed pobraniem. Ręcznie: tylko po „Sprawdź teraz”. Bez telemetrii — tylko pobranie listy wydań.",
+              "en": "Automatic: Alfa checks daily, downloads and prepares the new version (active after restart). Ask: checks daily and asks before downloading. Manual: only on “Check now”. No telemetry — only the release list is fetched."
+            },
+            "default": "ask",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie",
+                    "en": "Automatically"
+                  }
+                },
+                {
+                  "value": "ask",
+                  "label": {
+                    "pl": "Pytaj przed pobraniem",
+                    "en": "Ask before downloading"
+                  }
+                },
+                {
+                  "value": "manual",
+                  "label": {
+                    "pl": "Ręcznie",
+                    "en": "Manually"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "updates.whats_new",
+            "label": {
+              "pl": "Pokaż „Co nowego\"",
+              "en": "Show \"What’s new\""
+            },
+            "description": {
+              "pl": "Krótka lista zmian po aktualizacji.",
+              "en": "A short list of changes after updating."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
+          }
+        ],
+        "upcoming": []
+      },
+      {
+        "id": "advanced",
+        "label": {
+          "pl": "Zaawansowane",
+          "en": "Advanced"
+        },
+        "wave": 8,
+        "custom": null,
+        "settings": [],
+        "upcoming": [
+          {
+            "pl": "Edytor surowy TOML",
+            "en": "Raw TOML editor"
+          },
+          {
+            "pl": "Flagi eksperymentalne",
+            "en": "Experimental flags"
+          }
+        ]
+      },
+      {
+        "id": "about",
+        "label": {
+          "pl": "O programie",
+          "en": "About"
+        },
+        "wave": 1,
+        "custom": "about",
+        "settings": [],
+        "upcoming": []
+      }
+    ]
+  },
+  {
+    "command": "settings_values",
+    "args": {},
+    "result": {
+      "general.start_with_system": true,
+      "general.close_to_tray": true,
+      "general.destroy_webview_after": 10,
+      "general.view_profile": "simple",
+      "quick.session_mode": "single",
+      "models.default_profile": "hybrid",
+      "models.effort": "medium",
+      "engines.llm.backend": "auto",
+      "engines.llm.context": "auto",
+      "engines.llm.threads": 0,
+      "engines.llm.idle_unload_min": 10,
+      "models.parallel_downloads": 2,
+      "costs.warn_at": 80,
+      "costs.background_local_only": true,
+      "costs.estimate_before_long": true,
+      "voice.mode": "toggle",
+      "voice.show_pill": true,
+      "agents.max_steps": 40,
+      "agents.max_minutes": 15,
+      "agents.max_cost_pln": 0,
+      "agents.approval_timeout_s": 300,
+      "agents.verify_before_done": true,
+      "scheduler.max_parallel": 4,
+      "ui.hide_from_capture": false,
+      "memory.consolidation_enabled": true,
+      "memory.consolidation_window": "02:00-05:00",
+      "memory.auto_extract": "ask",
+      "sessions.default_template": "empty",
+      "sessions.auto_title": true,
+      "sessions.delete_undo_seconds": 10,
+      "ui.max_detached_windows": 4,
+      "files.workdir_root": "%USERPROFILE%\\Alfa\\Sesje",
+      "files.image_thumbnails": true,
+      "diagnostician.autonomy": "auto_low_risk",
+      "device.battery_mode": "auto",
+      "device.game_mode": true,
+      "ui.theme": "auto",
+      "ui.accent": "agent",
+      "ui.density": "comfortable",
+      "ui.zoom": 100,
+      "ui.animations": true,
+      "ui.column": "narrow",
+      "composer.enter_sends": true,
+      "notify.toasts": true,
+      "notify.earcons": true,
+      "notify.earcon_volume": 40,
+      "notify.dnd_fullscreen": true,
+      "ui.locale": "pl",
+      "updates.channel": "stable",
+      "updates.mode": "ask",
+      "updates.whats_new": true
+    }
+  },
+  {
+    "command": "settings_set",
+    "args": {
+      "key": "ui.theme",
+      "value": "dark"
+    },
+    "result": null
+  },
+  {
+    "command": "settings_set",
+    "args": {
+      "key": "general.destroy_webview_after",
+      "value": 15
+    },
+    "result": null
+  },
+  {
+    "command": "settings_set",
+    "args": {
+      "key": "composer.enter_sends",
+      "value": false
+    },
+    "result": null
+  },
+  {
+    "command": "settings_reset",
+    "args": {
+      "key": "ui.theme"
+    },
+    "result": "auto"
+  },
+  {
+    "command": "settings_set_shortcut",
+    "args": {
+      "actionId": "palette.open",
+      "chord": "Ctrl+Shift+P"
+    },
+    "result": null
+  },
+  {
+    "command": "settings_set_shortcut",
+    "args": {
+      "actionId": "focus.toggle",
+      "chord": ""
+    },
+    "result": null
+  },
+  {
+    "command": "settings_set_shortcut",
+    "args": {
+      "actionId": "palette.open",
+      "chord": null
+    },
+    "result": null
+  }
+]

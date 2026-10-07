@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Zapytanie (linia `queries.ndjson`).",
+  "properties": {
+    "expected": {
+      "description": "Oczekiwane wpisy korpusu (co najmniej jeden).",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "description": "Identyfikator (unikalny).",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Rodzaj: `pytanie`, `slowa_kluczowe`, `bez_znakow` albo własny.",
+      "type": "string"
+    },
+    "query": {
+      "description": "Tekst zapytania (PL).",
+      "type": "string"
+    },
+    "scopes": {
+      "description": "Przeszukiwane zakresy (co najmniej jeden).",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "query",
+    "expected",
+    "scopes",
+    "kind"
+  ],
+  "title": "RecallQuery",
+  "type": "object"
+}

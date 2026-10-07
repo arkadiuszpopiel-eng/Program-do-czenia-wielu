@@ -1,0 +1,45 @@
+[
+  {
+    "command": "permissions_get",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "global": "L3",
+      "session": "L3",
+      "hello_enabled": false
+    }
+  },
+  {
+    "command": "permissions_request_level",
+    "args": {
+      "level": "L4",
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-muo1g480-17"
+    }
+  },
+  {
+    "command": "permissions_request_level",
+    "args": {
+      "level": "L1",
+      "sessionId": null
+    },
+    "result": {
+      "status": "applied",
+      "request_id": ""
+    }
+  },
+  {
+    "command": "permissions_open_approval",
+    "args": {
+      "approvalId": "ap-1"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-muo1g480-18"
+    }
+  }
+]

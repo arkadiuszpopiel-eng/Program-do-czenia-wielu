@@ -1,0 +1,674 @@
+[
+  {
+    "command": "memory_status",
+    "args": {},
+    "result": {
+      "consolidation_enabled": true,
+      "idle_available": false,
+      "model_available": true,
+      "window": "02:00-05:00",
+      "pending": 1,
+      "last": null
+    }
+  },
+  {
+    "command": "memory_scopes",
+    "args": {},
+    "result": [
+      {
+        "key": "session:s-q3",
+        "scope": {
+          "kind": "session",
+          "id": "s-q3"
+        },
+        "label": "Raport Q3",
+        "entries": 2,
+        "active": 1,
+        "pending": 0,
+        "document": "memory/session-s-q3"
+      },
+      {
+        "key": "project:p-x",
+        "scope": {
+          "kind": "project",
+          "id": "p-x"
+        },
+        "label": "Projekt X",
+        "entries": 1,
+        "active": 1,
+        "pending": 0,
+        "document": "memory/project-p-x"
+      },
+      {
+        "key": "agent:beta",
+        "scope": {
+          "kind": "agent",
+          "id": "beta"
+        },
+        "label": "Agentka beta",
+        "entries": 1,
+        "active": 0,
+        "pending": 1,
+        "document": "memory/agent-beta"
+      },
+      {
+        "key": "global",
+        "scope": {
+          "kind": "global",
+          "id": null
+        },
+        "label": "Globalna",
+        "entries": 2,
+        "active": 2,
+        "pending": 0,
+        "document": "memory/global"
+      }
+    ]
+  },
+  {
+    "command": "memory_inspect",
+    "args": {
+      "query": {
+        "scopes": [],
+        "text": null,
+        "layers": [],
+        "states": [],
+        "trusted": null,
+        "pinned": null,
+        "offset": 0,
+        "limit": 50
+      }
+    },
+    "result": {
+      "items": [
+        {
+          "id": "session:s-q3#m1",
+          "scope": {
+            "kind": "session",
+            "id": "s-q3"
+          },
+          "scope_key": "session:s-q3",
+          "layer": "episodic",
+          "state": "superseded",
+          "text": "Raport Q3 ma trafić do zarządu do czwartku.",
+          "subject": null,
+          "entities": [],
+          "source": "user",
+          "source_detail": null,
+          "trusted": true,
+          "confidence": 0.9,
+          "pinned": false,
+          "version": 1,
+          "created_at": "2026-09-29T02:45:00.000Z",
+          "expires_at": null,
+          "session_id": "s-q3",
+          "turn": 3,
+          "derivation": null,
+          "score": null
+        },
+        {
+          "id": "session:s-q3#m2",
+          "scope": {
+            "kind": "session",
+            "id": "s-q3"
+          },
+          "scope_key": "session:s-q3",
+          "layer": "episodic",
+          "state": "active",
+          "text": "Raport Q3 ma trafić do zarządu do piątku.",
+          "subject": "termin raportu",
+          "entities": [],
+          "source": "user",
+          "source_detail": null,
+          "trusted": true,
+          "confidence": 0.9,
+          "pinned": false,
+          "version": 2,
+          "created_at": "2026-09-29T12:45:00.000Z",
+          "expires_at": null,
+          "session_id": "s-q3",
+          "turn": 5,
+          "derivation": "edited",
+          "score": null
+        },
+        {
+          "id": "project:p-x#m3",
+          "scope": {
+            "kind": "project",
+            "id": "p-x"
+          },
+          "scope_key": "project:p-x",
+          "layer": "semantic",
+          "state": "active",
+          "text": "Waluta raportów: PLN, kwoty bez groszy w tabelach.",
+          "subject": "format raportów",
+          "entities": [
+            "PLN"
+          ],
+          "source": "user",
+          "source_detail": null,
+          "trusted": true,
+          "confidence": 0.9,
+          "pinned": false,
+          "version": 1,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "expires_at": null,
+          "session_id": null,
+          "turn": null,
+          "derivation": "extracted",
+          "score": null
+        },
+        {
+          "id": "agent:beta#m4",
+          "scope": {
+            "kind": "agent",
+            "id": "beta"
+          },
+          "scope_key": "agent:beta",
+          "layer": "procedural",
+          "state": "pending",
+          "text": "Użytkownik woli krótkie podsumowanie na początku odpowiedzi.",
+          "subject": null,
+          "entities": [],
+          "source": "agent",
+          "source_detail": "beta",
+          "trusted": true,
+          "confidence": 0.7,
+          "pinned": false,
+          "version": 1,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "expires_at": null,
+          "session_id": null,
+          "turn": null,
+          "derivation": "summary",
+          "score": null
+        },
+        {
+          "id": "global#m5",
+          "scope": {
+            "kind": "global",
+            "id": null
+          },
+          "scope_key": "global",
+          "layer": "working",
+          "state": "active",
+          "text": "Komentarze w kodzie piszę po polsku.",
+          "subject": null,
+          "entities": [],
+          "source": "user",
+          "source_detail": null,
+          "trusted": true,
+          "confidence": 0.9,
+          "pinned": true,
+          "version": 1,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "expires_at": null,
+          "session_id": null,
+          "turn": null,
+          "derivation": null,
+          "score": null
+        },
+        {
+          "id": "global#m6",
+          "scope": {
+            "kind": "global",
+            "id": null
+          },
+          "scope_key": "global",
+          "layer": "semantic",
+          "state": "active",
+          "text": "Strona dostawcy podaje czas dostawy 14 dni.",
+          "subject": null,
+          "entities": [],
+          "source": "untrusted",
+          "source_detail": "https://dostawca.example/warunki",
+          "trusted": false,
+          "confidence": 0.5,
+          "pinned": false,
+          "version": 1,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "expires_at": "2026-10-30T08:45:00.000Z",
+          "session_id": null,
+          "turn": null,
+          "derivation": null,
+          "score": null
+        }
+      ],
+      "total": 6
+    }
+  },
+  {
+    "command": "memory_inspect",
+    "args": {
+      "query": {
+        "scopes": [
+          "global"
+        ],
+        "text": "dostaw",
+        "layers": [
+          "semantic"
+        ],
+        "states": [
+          "active"
+        ],
+        "trusted": false,
+        "pinned": null,
+        "offset": 0,
+        "limit": 50
+      }
+    },
+    "result": {
+      "items": [
+        {
+          "id": "global#m6",
+          "scope": {
+            "kind": "global",
+            "id": null
+          },
+          "scope_key": "global",
+          "layer": "semantic",
+          "state": "active",
+          "text": "Strona dostawcy podaje czas dostawy 14 dni.",
+          "subject": null,
+          "entities": [],
+          "source": "untrusted",
+          "source_detail": "https://dostawca.example/warunki",
+          "trusted": false,
+          "confidence": 0.5,
+          "pinned": false,
+          "version": 1,
+          "created_at": "2026-09-29T08:45:00.000Z",
+          "expires_at": "2026-10-30T08:45:00.000Z",
+          "session_id": null,
+          "turn": null,
+          "derivation": null,
+          "score": null
+        }
+      ],
+      "total": 1
+    }
+  },
+  {
+    "command": "memory_explain",
+    "args": {
+      "entryId": "session:s-q3#m2"
+    },
+    "result": {
+      "item": {
+        "id": "session:s-q3#m2",
+        "scope": {
+          "kind": "session",
+          "id": "s-q3"
+        },
+        "scope_key": "session:s-q3",
+        "layer": "episodic",
+        "state": "active",
+        "text": "Raport Q3 ma trafić do zarządu do piątku.",
+        "subject": "termin raportu",
+        "entities": [],
+        "source": "user",
+        "source_detail": null,
+        "trusted": true,
+        "confidence": 0.9,
+        "pinned": false,
+        "version": 2,
+        "created_at": "2026-09-29T12:45:00.000Z",
+        "expires_at": null,
+        "session_id": "s-q3",
+        "turn": 5,
+        "derivation": "edited",
+        "score": null
+      },
+      "reasons": [
+        "Zapisane na Twoje polecenie.",
+        "Z rozmowy s-q3, tura 5."
+      ],
+      "sources": [],
+      "versions": [
+        {
+          "id": "session:s-q3#m1",
+          "scope": {
+            "kind": "session",
+            "id": "s-q3"
+          },
+          "scope_key": "session:s-q3",
+          "layer": "episodic",
+          "state": "superseded",
+          "text": "Raport Q3 ma trafić do zarządu do czwartku.",
+          "subject": null,
+          "entities": [],
+          "source": "user",
+          "source_detail": null,
+          "trusted": true,
+          "confidence": 0.9,
+          "pinned": false,
+          "version": 1,
+          "created_at": "2026-09-29T02:45:00.000Z",
+          "expires_at": null,
+          "session_id": "s-q3",
+          "turn": 3,
+          "derivation": null,
+          "score": null
+        },
+        {
+          "id": "session:s-q3#m2",
+          "scope": {
+            "kind": "session",
+            "id": "s-q3"
+          },
+          "scope_key": "session:s-q3",
+          "layer": "episodic",
+          "state": "active",
+          "text": "Raport Q3 ma trafić do zarządu do piątku.",
+          "subject": "termin raportu",
+          "entities": [],
+          "source": "user",
+          "source_detail": null,
+          "trusted": true,
+          "confidence": 0.9,
+          "pinned": false,
+          "version": 2,
+          "created_at": "2026-09-29T12:45:00.000Z",
+          "expires_at": null,
+          "session_id": "s-q3",
+          "turn": 5,
+          "derivation": "edited",
+          "score": null
+        }
+      ],
+      "merged": [],
+      "derived": [
+        "project:p-x#m3"
+      ],
+      "journal": []
+    }
+  },
+  {
+    "command": "memory_edit",
+    "args": {
+      "entryId": "global#m5",
+      "edit": {
+        "text": "Komentarze w kodzie piszę po polsku, identyfikatory po angielsku.",
+        "subject": "styl kodu",
+        "confidence": 0.95
+      }
+    },
+    "result": {
+      "id": "global#m-muoa0tf0-27",
+      "scope": {
+        "kind": "global",
+        "id": null
+      },
+      "scope_key": "global",
+      "layer": "working",
+      "state": "active",
+      "text": "Komentarze w kodzie piszę po polsku, identyfikatory po angielsku.",
+      "subject": "styl kodu",
+      "entities": [],
+      "source": "user",
+      "source_detail": null,
+      "trusted": true,
+      "confidence": 0.95,
+      "pinned": true,
+      "version": 2,
+      "created_at": "2026-09-30T15:45:02.700Z",
+      "expires_at": null,
+      "session_id": null,
+      "turn": null,
+      "derivation": "edited",
+      "score": null
+    }
+  },
+  {
+    "command": "memory_set_pinned",
+    "args": {
+      "entryId": "project:p-x#m3",
+      "pinned": true
+    },
+    "result": {
+      "id": "project:p-x#m3",
+      "scope": {
+        "kind": "project",
+        "id": "p-x"
+      },
+      "scope_key": "project:p-x",
+      "layer": "semantic",
+      "state": "active",
+      "text": "Waluta raportów: PLN, kwoty bez groszy w tabelach.",
+      "subject": "format raportów",
+      "entities": [
+        "PLN"
+      ],
+      "source": "user",
+      "source_detail": null,
+      "trusted": true,
+      "confidence": 0.9,
+      "pinned": true,
+      "version": 1,
+      "created_at": "2026-09-29T08:45:00.000Z",
+      "expires_at": null,
+      "session_id": null,
+      "turn": null,
+      "derivation": "extracted",
+      "score": null
+    }
+  },
+  {
+    "command": "memory_approve",
+    "args": {
+      "entryId": "agent:beta#m4"
+    },
+    "result": {
+      "id": "agent:beta#m4",
+      "scope": {
+        "kind": "agent",
+        "id": "beta"
+      },
+      "scope_key": "agent:beta",
+      "layer": "procedural",
+      "state": "active",
+      "text": "Użytkownik woli krótkie podsumowanie na początku odpowiedzi.",
+      "subject": null,
+      "entities": [],
+      "source": "agent",
+      "source_detail": "beta",
+      "trusted": true,
+      "confidence": 0.7,
+      "pinned": false,
+      "version": 1,
+      "created_at": "2026-09-29T08:45:00.000Z",
+      "expires_at": null,
+      "session_id": null,
+      "turn": null,
+      "derivation": "summary",
+      "score": null
+    }
+  },
+  {
+    "command": "memory_promote",
+    "args": {
+      "entryId": "project:p-x#m3",
+      "to": {
+        "kind": "global",
+        "id": null
+      }
+    },
+    "result": {
+      "id": "global#m-muoa0tf0-30",
+      "scope": {
+        "kind": "global",
+        "id": null
+      },
+      "scope_key": "global",
+      "layer": "semantic",
+      "state": "active",
+      "text": "Waluta raportów: PLN, kwoty bez groszy w tabelach.",
+      "subject": "format raportów",
+      "entities": [
+        "PLN"
+      ],
+      "source": "user",
+      "source_detail": null,
+      "trusted": true,
+      "confidence": 0.9,
+      "pinned": false,
+      "version": 1,
+      "created_at": "2026-09-30T15:45:02.700Z",
+      "expires_at": null,
+      "session_id": null,
+      "turn": null,
+      "derivation": "promoted",
+      "score": null
+    }
+  },
+  {
+    "command": "memory_forget_preview",
+    "args": {
+      "target": {
+        "target": "entry",
+        "id": "session:s-q3#m2"
+      }
+    },
+    "result": {
+      "target": {
+        "target": "entry",
+        "id": "session:s-q3#m2"
+      },
+      "remove": [
+        {
+          "id": "session:s-q3#m2",
+          "scope_key": "session:s-q3",
+          "text": "Raport Q3 ma trafić do zarządu do piątku.",
+          "reason": "target"
+        },
+        {
+          "id": "session:s-q3#m1",
+          "scope_key": "session:s-q3",
+          "text": "Raport Q3 ma trafić do zarządu do czwartku.",
+          "reason": "version"
+        },
+        {
+          "id": "project:p-x#m3",
+          "scope_key": "project:p-x",
+          "text": "Waluta raportów: PLN, kwoty bez groszy w tabelach.",
+          "reason": "derived"
+        }
+      ],
+      "revive": [],
+      "shred": false
+    }
+  },
+  {
+    "command": "memory_forget_preview",
+    "args": {
+      "target": {
+        "target": "scope",
+        "scope": "agent:beta"
+      }
+    },
+    "result": {
+      "target": {
+        "target": "scope",
+        "scope": "agent:beta"
+      },
+      "remove": [
+        {
+          "id": "agent:beta#m4",
+          "scope_key": "agent:beta",
+          "text": "Użytkownik woli krótkie podsumowanie na początku odpowiedzi.",
+          "reason": "target"
+        }
+      ],
+      "revive": [],
+      "shred": true
+    }
+  },
+  {
+    "command": "memory_forget",
+    "args": {
+      "target": {
+        "target": "entry",
+        "id": "session:s-q3#m2"
+      }
+    },
+    "result": {
+      "removed": 1,
+      "derived": 1,
+      "versions": 1,
+      "revived": 0,
+      "fts_rows": 3,
+      "vectors": 3,
+      "journal_records": 0,
+      "shredded": [],
+      "stale_exports": []
+    }
+  },
+  {
+    "command": "memory_journal",
+    "args": {
+      "scope": "global"
+    },
+    "result": [
+      {
+        "id": "chg-muoa0tf0-31",
+        "scope_key": "global",
+        "run": null,
+        "at": "2026-09-30T15:45:02.700Z",
+        "kind": "promote",
+        "note": "Awans z zakresu project:p-x.",
+        "entries": [
+          "global#m-muoa0tf0-30"
+        ],
+        "undone": false,
+        "undoable": true
+      },
+      {
+        "id": "chg-muoa0tf0-28",
+        "scope_key": "global",
+        "run": null,
+        "at": "2026-09-30T15:45:02.700Z",
+        "kind": "edit",
+        "note": "Edycja przez użytkownika (nowa wersja).",
+        "entries": [
+          "global#m5",
+          "global#m-muoa0tf0-27"
+        ],
+        "undone": false,
+        "undoable": true
+      }
+    ]
+  },
+  {
+    "command": "memory_undo",
+    "args": {
+      "scope": "global",
+      "changeId": "chg-muoa0tf0-28"
+    },
+    "result": {
+      "removed": 1,
+      "restored": 1,
+      "skipped": 0
+    }
+  },
+  {
+    "command": "memory_consolidate_now",
+    "args": {},
+    "result": {
+      "run": "run-muoa0tf0-32",
+      "manual": true,
+      "started_at": "2026-09-30T15:45:02.700Z",
+      "skipped": null,
+      "interrupted": null,
+      "scopes": 2,
+      "created": 0,
+      "merged": 0,
+      "resolved": 0,
+      "expired": 0,
+      "conflicts": 0,
+      "proposals": 0,
+      "llm_calls": 0,
+      "budget_denied": false,
+      "errors": []
+    }
+  }
+]

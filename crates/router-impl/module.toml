@@ -1,0 +1,19 @@
+# Manifest modułu router (docs/modules/router/SPEC.md, PLAN §5.4).
+# Schemat: packages/schemas/module-manifest.v1.json
+id = "router"
+version = "0.0.1"
+kind = "service"
+provides = ["router-contract@1"]
+requires = ["core-bus-contract@1", "providers-contract@1", "compliance-contract@1", "cost-meter-contract@1"]
+capabilities = []
+lifecycle = "always"
+isolation = "inproc"
+
+[budget]
+# SPEC: decyzja ≤ 1 ms; RAM ≤ 2 MB; brak I/O w ścieżce decyzji.
+ram_mb = 2
+cpu_pct = 1
+
+[health]
+check = "ping"
+interval_s = 60

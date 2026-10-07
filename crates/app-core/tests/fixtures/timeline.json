@@ -1,0 +1,299 @@
+[
+  {
+    "command": "timeline_list",
+    "args": {
+      "sessionId": "s-q3",
+      "filter": {
+        "kinds": [],
+        "min_level": "trace"
+      }
+    },
+    "result": [
+      {
+        "id": "e1",
+        "ts": "2026-09-30T08:40:00.000Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "gama",
+        "title": "claude-opus-5-5 · 5 600 → 620 tokenów",
+        "detail": null,
+        "cost": {
+          "minor": 41,
+          "currency": "PLN"
+        },
+        "latency_ms": 2800,
+        "turn_id": "q4b"
+      },
+      {
+        "id": "e2",
+        "ts": "2026-09-30T08:40:00.000Z",
+        "session_id": "s-q3",
+        "kind": "tool",
+        "level": "info",
+        "agent": "gama",
+        "title": "fs.read · 3 arkusze przychodów",
+        "detail": null,
+        "cost": null,
+        "latency_ms": 1200,
+        "turn_id": "q4b"
+      },
+      {
+        "id": "e3",
+        "ts": "2026-09-30T08:42:00.000Z",
+        "session_id": "s-q3",
+        "kind": "tool",
+        "level": "info",
+        "agent": "delta",
+        "title": "fs.write · raport-Q3.docx (cofalne)",
+        "detail": null,
+        "cost": null,
+        "latency_ms": 2100,
+        "turn_id": "q6"
+      },
+      {
+        "id": "e4",
+        "ts": "2026-09-30T08:43:00.000Z",
+        "session_id": "s-q3",
+        "kind": "audit",
+        "level": "audit",
+        "agent": "delta",
+        "title": "Prośba o zatwierdzenie: nadpisanie zarząd.dotx",
+        "detail": "Ryzyko średnie · cofalne",
+        "cost": null,
+        "latency_ms": null,
+        "turn_id": "q6"
+      },
+      {
+        "id": "e5",
+        "ts": "2026-09-30T08:43:00.000Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "delta",
+        "title": "claude-opus-5-5 · 2 100 → 190 tokenów",
+        "detail": null,
+        "cost": {
+          "minor": 12,
+          "currency": "PLN"
+        },
+        "latency_ms": 1500,
+        "turn_id": "q6"
+      },
+      {
+        "id": "e6",
+        "ts": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "kind": "diagnostics",
+        "level": "warn",
+        "agent": null,
+        "title": "Kurs NBP z wczoraj — użyto kursu zapasowego",
+        "detail": null,
+        "cost": null,
+        "latency_ms": null,
+        "turn_id": null
+      },
+      {
+        "id": "ev-munv0omi-6",
+        "ts": "2026-09-30T08:45:02.250Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "delta",
+        "title": "claude-opus-5-5 · 1291 → 26",
+        "detail": null,
+        "cost": {
+          "minor": 1,
+          "currency": "PLN"
+        },
+        "latency_ms": 2250,
+        "turn_id": "t-munv0mw0-5"
+      },
+      {
+        "id": "ev-munx5tlm-8",
+        "ts": "2026-09-30T09:45:01.210Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "gama",
+        "title": "claude-opus-5-5 · 1365 → 47",
+        "detail": null,
+        "cost": {
+          "minor": 2,
+          "currency": "PLN"
+        },
+        "latency_ms": 1210,
+        "turn_id": "t-munx5so0-7"
+      },
+      {
+        "id": "ev-munzazdm-11",
+        "ts": "2026-09-30T10:45:01.210Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "alfa",
+        "title": "claude-opus-5-5 · 1365 → 47",
+        "detail": null,
+        "cost": {
+          "minor": 2,
+          "currency": "PLN"
+        },
+        "latency_ms": 1210,
+        "turn_id": "t-munzayg0-10"
+      },
+      {
+        "id": "ev-muo1g480-13",
+        "ts": "2026-09-30T11:45:00.000Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "delta",
+        "title": "claude-opus-5-5 · 1203 → 1",
+        "detail": null,
+        "cost": {
+          "minor": 1,
+          "currency": "PLN"
+        },
+        "latency_ms": 0,
+        "turn_id": "t-muo1g480-12"
+      }
+    ]
+  },
+  {
+    "command": "timeline_list",
+    "args": {
+      "sessionId": "s-q3",
+      "filter": {
+        "kinds": [
+          "model_call",
+          "tool"
+        ],
+        "min_level": "info"
+      }
+    },
+    "result": [
+      {
+        "id": "e1",
+        "ts": "2026-09-30T08:40:00.000Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "gama",
+        "title": "claude-opus-5-5 · 5 600 → 620 tokenów",
+        "detail": null,
+        "cost": {
+          "minor": 41,
+          "currency": "PLN"
+        },
+        "latency_ms": 2800,
+        "turn_id": "q4b"
+      },
+      {
+        "id": "e2",
+        "ts": "2026-09-30T08:40:00.000Z",
+        "session_id": "s-q3",
+        "kind": "tool",
+        "level": "info",
+        "agent": "gama",
+        "title": "fs.read · 3 arkusze przychodów",
+        "detail": null,
+        "cost": null,
+        "latency_ms": 1200,
+        "turn_id": "q4b"
+      },
+      {
+        "id": "e3",
+        "ts": "2026-09-30T08:42:00.000Z",
+        "session_id": "s-q3",
+        "kind": "tool",
+        "level": "info",
+        "agent": "delta",
+        "title": "fs.write · raport-Q3.docx (cofalne)",
+        "detail": null,
+        "cost": null,
+        "latency_ms": 2100,
+        "turn_id": "q6"
+      },
+      {
+        "id": "e5",
+        "ts": "2026-09-30T08:43:00.000Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "delta",
+        "title": "claude-opus-5-5 · 2 100 → 190 tokenów",
+        "detail": null,
+        "cost": {
+          "minor": 12,
+          "currency": "PLN"
+        },
+        "latency_ms": 1500,
+        "turn_id": "q6"
+      },
+      {
+        "id": "ev-munv0omi-6",
+        "ts": "2026-09-30T08:45:02.250Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "delta",
+        "title": "claude-opus-5-5 · 1291 → 26",
+        "detail": null,
+        "cost": {
+          "minor": 1,
+          "currency": "PLN"
+        },
+        "latency_ms": 2250,
+        "turn_id": "t-munv0mw0-5"
+      },
+      {
+        "id": "ev-munx5tlm-8",
+        "ts": "2026-09-30T09:45:01.210Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "gama",
+        "title": "claude-opus-5-5 · 1365 → 47",
+        "detail": null,
+        "cost": {
+          "minor": 2,
+          "currency": "PLN"
+        },
+        "latency_ms": 1210,
+        "turn_id": "t-munx5so0-7"
+      },
+      {
+        "id": "ev-munzazdm-11",
+        "ts": "2026-09-30T10:45:01.210Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "alfa",
+        "title": "claude-opus-5-5 · 1365 → 47",
+        "detail": null,
+        "cost": {
+          "minor": 2,
+          "currency": "PLN"
+        },
+        "latency_ms": 1210,
+        "turn_id": "t-munzayg0-10"
+      },
+      {
+        "id": "ev-muo1g480-13",
+        "ts": "2026-09-30T11:45:00.000Z",
+        "session_id": "s-q3",
+        "kind": "model_call",
+        "level": "info",
+        "agent": "delta",
+        "title": "claude-opus-5-5 · 1203 → 1",
+        "detail": null,
+        "cost": {
+          "minor": 1,
+          "currency": "PLN"
+        },
+        "latency_ms": 0,
+        "turn_id": "t-muo1g480-12"
+      }
+    ]
+  }
+]

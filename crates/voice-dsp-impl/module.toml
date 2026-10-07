@@ -1,0 +1,18 @@
+# Manifest modułu voice-dsp (docs/modules/voice-dsp/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "voice-dsp"
+version = "0.0.1"
+kind = "voice-engine"
+provides = ["voice-dsp-contract@1"]
+requires = ["core-bus-contract@1", "voice-audio-contract@1"]
+capabilities = []
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+# SPEC: CPU ≤ 5% rdzenia baseline (AEC3 + RNNoise), RAM ≤ 20 MB, opóźnienie dodane ≤ 10 ms.
+ram_mb = 20
+cpu_pct = 5
+
+[health]
+check = "ping"
+interval_s = 60

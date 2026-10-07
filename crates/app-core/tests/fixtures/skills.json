@@ -1,0 +1,529 @@
+[
+  {
+    "command": "skills_list",
+    "args": {},
+    "result": [
+      {
+        "name": "Porządki w Pobranych",
+        "description": "Sortuje pliki w folderze według typu i usuwa puste podfoldery.",
+        "state": "proposed",
+        "origin": "user",
+        "trusted": true,
+        "hash": "da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59",
+        "findings": [],
+        "keywords": [
+          "porządki",
+          "pobrane",
+          "pliki"
+        ],
+        "required_tools": [
+          "fs_list",
+          "fs_move",
+          "fs_mkdir",
+          "fs_delete"
+        ],
+        "required_capabilities": [
+          "fs.read",
+          "fs.write"
+        ],
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "folder"
+          ],
+          "additionalProperties": false
+        },
+        "proposed_at": "2026-09-30T07:45:00.000Z",
+        "decided_at": null,
+        "id": "porzadki-pobrane",
+        "version": "1.1.0"
+      },
+      {
+        "name": "Porządki w Pobranych",
+        "description": "Sortuje pliki w folderze według typu (PDF, obrazy, archiwa).",
+        "state": "installed",
+        "origin": "user",
+        "trusted": true,
+        "hash": "17a5c5a217a5c5a217a5c5a217a5c5a217a5c5a217a5c5a217a5c5a217a5c5a2",
+        "findings": [],
+        "keywords": [
+          "porządki",
+          "pobrane",
+          "pliki"
+        ],
+        "required_tools": [
+          "fs_list",
+          "fs_move",
+          "fs_mkdir"
+        ],
+        "required_capabilities": [
+          "fs.read",
+          "fs.write"
+        ],
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "folder"
+          ],
+          "additionalProperties": false
+        },
+        "proposed_at": "2026-09-28T08:45:00.000Z",
+        "decided_at": "2026-09-28T09:45:00.000Z",
+        "id": "porzadki-pobrane",
+        "version": "1.0.0"
+      },
+      {
+        "name": "Import z sieci",
+        "description": "Pobiera plik i rozpakowuje go w katalogu sesji.",
+        "state": "quarantined",
+        "origin": "external",
+        "trusted": false,
+        "hash": "40eab73940eab73940eab73940eab73940eab73940eab73940eab73940eab739",
+        "findings": [
+          "polecenie sieciowe w kroku 2 (Invoke-WebRequest)"
+        ],
+        "keywords": [
+          "porządki",
+          "pobrane",
+          "pliki"
+        ],
+        "required_tools": [
+          "shell_run"
+        ],
+        "required_capabilities": [
+          "shell.exec"
+        ],
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "folder"
+          ],
+          "additionalProperties": false
+        },
+        "proposed_at": "2026-09-30T05:45:00.000Z",
+        "decided_at": null,
+        "id": "import-z-sieci",
+        "version": "0.1.0"
+      },
+      {
+        "name": "Raport tygodniowy",
+        "description": "Zbiera notatki z tygodnia w jeden dokument.",
+        "state": "proposed",
+        "origin": "memory",
+        "trusted": true,
+        "hash": "66965a9e66965a9e66965a9e66965a9e66965a9e66965a9e66965a9e66965a9e",
+        "findings": [],
+        "keywords": [
+          "raport",
+          "notatki"
+        ],
+        "required_tools": [
+          "fs_read",
+          "fs_write"
+        ],
+        "required_capabilities": [
+          "fs.read",
+          "fs.write"
+        ],
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "folder"
+          ],
+          "additionalProperties": false
+        },
+        "proposed_at": "2026-09-30T03:45:00.000Z",
+        "decided_at": null,
+        "id": "raport-tygodniowy",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  {
+    "command": "skills_review",
+    "args": {
+      "skillId": "porzadki-pobrane",
+      "version": "1.1.0"
+    },
+    "result": {
+      "skill": {
+        "name": "Porządki w Pobranych",
+        "description": "Sortuje pliki w folderze według typu i usuwa puste podfoldery.",
+        "state": "proposed",
+        "origin": "user",
+        "trusted": true,
+        "hash": "da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59",
+        "findings": [],
+        "keywords": [
+          "porządki",
+          "pobrane",
+          "pliki"
+        ],
+        "required_tools": [
+          "fs_list",
+          "fs_move",
+          "fs_mkdir",
+          "fs_delete"
+        ],
+        "required_capabilities": [
+          "fs.read",
+          "fs.write"
+        ],
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "folder"
+          ],
+          "additionalProperties": false
+        },
+        "proposed_at": "2026-09-30T07:45:00.000Z",
+        "decided_at": null,
+        "id": "porzadki-pobrane",
+        "version": "1.1.0"
+      },
+      "previous_version": "1.0.0",
+      "diff": [
+        {
+          "kind": "same",
+          "text": "{"
+        },
+        {
+          "kind": "added",
+          "text": "  \"description\": \"Sortuje pliki w folderze według typu i usuwa puste podfoldery.\","
+        },
+        {
+          "kind": "same",
+          "text": "  \"tools\": ["
+        },
+        {
+          "kind": "same",
+          "text": "    \"fs_list\","
+        },
+        {
+          "kind": "same",
+          "text": "    \"fs_move\","
+        },
+        {
+          "kind": "added",
+          "text": "    \"fs_mkdir\","
+        },
+        {
+          "kind": "added",
+          "text": "    \"fs_delete\""
+        },
+        {
+          "kind": "same",
+          "text": "  ]"
+        },
+        {
+          "kind": "same",
+          "text": "}"
+        },
+        {
+          "kind": "removed",
+          "text": "  \"description\": \"Sortuje pliki w folderze według typu (PDF, obrazy, archiwa).\","
+        },
+        {
+          "kind": "removed",
+          "text": "    \"fs_mkdir\""
+        }
+      ]
+    }
+  },
+  {
+    "command": "skills_approve",
+    "args": {
+      "skillId": "porzadki-pobrane",
+      "version": "1.1.0",
+      "hash": "da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59"
+    },
+    "result": {
+      "name": "Porządki w Pobranych",
+      "description": "Sortuje pliki w folderze według typu i usuwa puste podfoldery.",
+      "state": "installed",
+      "origin": "user",
+      "trusted": true,
+      "hash": "da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59da9b9f59",
+      "findings": [],
+      "keywords": [
+        "porządki",
+        "pobrane",
+        "pliki"
+      ],
+      "required_tools": [
+        "fs_list",
+        "fs_move",
+        "fs_mkdir",
+        "fs_delete"
+      ],
+      "required_capabilities": [
+        "fs.read",
+        "fs.write"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder"
+        ],
+        "additionalProperties": false
+      },
+      "proposed_at": "2026-09-30T07:45:00.000Z",
+      "decided_at": "2026-09-30T17:45:03.200Z",
+      "id": "porzadki-pobrane",
+      "version": "1.1.0"
+    }
+  },
+  {
+    "command": "skills_propose",
+    "args": {
+      "skill": {
+        "id": "notatki-dnia",
+        "version": "1.0.0",
+        "name": "Notatki dnia",
+        "description": "Zbiera notatki dnia w jeden plik.",
+        "prompt": "Zbierz notatki z folderu {{folder}}.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "id": "notatki-dnia",
+      "version": "1.0.0",
+      "name": "Notatki dnia",
+      "description": "Zbiera notatki dnia w jeden plik.",
+      "state": "proposed",
+      "origin": "user",
+      "trusted": true,
+      "hash": "85b6914585b6914585b6914585b6914585b6914585b6914585b6914585b69145",
+      "findings": [],
+      "keywords": [],
+      "required_tools": [],
+      "required_capabilities": [],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        }
+      },
+      "proposed_at": "2026-09-30T17:45:03.200Z",
+      "decided_at": null
+    }
+  },
+  {
+    "command": "skills_reject",
+    "args": {
+      "skillId": "notatki-dnia",
+      "version": "1.0.0"
+    },
+    "result": {
+      "id": "notatki-dnia",
+      "version": "1.0.0",
+      "name": "Notatki dnia",
+      "description": "Zbiera notatki dnia w jeden plik.",
+      "state": "rejected",
+      "origin": "user",
+      "trusted": true,
+      "hash": "85b6914585b6914585b6914585b6914585b6914585b6914585b6914585b69145",
+      "findings": [],
+      "keywords": [],
+      "required_tools": [],
+      "required_capabilities": [],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        }
+      },
+      "proposed_at": "2026-09-30T17:45:03.200Z",
+      "decided_at": "2026-09-30T17:45:03.200Z"
+    }
+  },
+  {
+    "command": "skills_release",
+    "args": {
+      "skillId": "import-z-sieci",
+      "version": "0.1.0",
+      "hash": "40eab73940eab73940eab73940eab73940eab73940eab73940eab73940eab739"
+    },
+    "result": {
+      "name": "Import z sieci",
+      "description": "Pobiera plik i rozpakowuje go w katalogu sesji.",
+      "state": "installed",
+      "origin": "external",
+      "trusted": false,
+      "hash": "40eab73940eab73940eab73940eab73940eab73940eab73940eab73940eab739",
+      "findings": [
+        "polecenie sieciowe w kroku 2 (Invoke-WebRequest)"
+      ],
+      "keywords": [
+        "porządki",
+        "pobrane",
+        "pliki"
+      ],
+      "required_tools": [
+        "shell_run"
+      ],
+      "required_capabilities": [
+        "shell.exec"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder"
+        ],
+        "additionalProperties": false
+      },
+      "proposed_at": "2026-09-30T05:45:00.000Z",
+      "decided_at": "2026-09-30T17:45:03.200Z",
+      "id": "import-z-sieci",
+      "version": "0.1.0"
+    }
+  },
+  {
+    "command": "skills_run",
+    "args": {
+      "skillId": "porzadki-pobrane",
+      "sessionId": "s-q3",
+      "agent": "beta",
+      "params": {
+        "folder": "C:\\Users\\ala\\Downloads"
+      }
+    },
+    "result": {
+      "id": "u-muoeb5cw-36",
+      "title": "Umiejętność: Porządki w Pobranych",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "ready",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T17:45:03.200Z",
+      "deadline_at": "2026-09-30T18:45:03.200Z"
+    }
+  },
+  {
+    "command": "skills_disable",
+    "args": {
+      "skillId": "import-z-sieci"
+    },
+    "result": {
+      "name": "Import z sieci",
+      "description": "Pobiera plik i rozpakowuje go w katalogu sesji.",
+      "state": "disabled",
+      "origin": "external",
+      "trusted": false,
+      "hash": "40eab73940eab73940eab73940eab73940eab73940eab73940eab73940eab739",
+      "findings": [
+        "polecenie sieciowe w kroku 2 (Invoke-WebRequest)"
+      ],
+      "keywords": [
+        "porządki",
+        "pobrane",
+        "pliki"
+      ],
+      "required_tools": [
+        "shell_run"
+      ],
+      "required_capabilities": [
+        "shell.exec"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder"
+        ],
+        "additionalProperties": false
+      },
+      "proposed_at": "2026-09-30T05:45:00.000Z",
+      "decided_at": "2026-09-30T17:45:03.200Z",
+      "id": "import-z-sieci",
+      "version": "0.1.0"
+    }
+  },
+  {
+    "command": "skills_export",
+    "args": {},
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\ala\\Documents\\umiejetnosci-alfa.skills.json",
+      "files": 1,
+      "bytes": 2048
+    }
+  },
+  {
+    "command": "skills_import",
+    "args": {},
+    "result": {
+      "proposed": [],
+      "skipped": []
+    }
+  }
+]

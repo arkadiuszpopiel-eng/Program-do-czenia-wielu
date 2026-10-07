@@ -1,0 +1,21 @@
+[package]
+name = "voice-readaloud-fake"
+description = "Atrapa voice-readaloud: wspólny automat z kontraktu, wirtualne okna i zegar odtwarzania (czas zdania z długości tekstu i tempa), bez platformy i TTS"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-readaloud-contract = { path = "../voice-readaloud-contract", features = ["contract-tests"] }
+platform-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+async-trait.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+
+[lints]
+workspace = true

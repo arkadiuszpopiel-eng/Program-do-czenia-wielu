@@ -1,0 +1,40 @@
+[package]
+name = "safety-broker-impl"
+description = "Broker (Safety Kernel, logika): tokeny HMAC-SHA256 z atenuacją i TTL, decyzje L0–L4, zatwierdzenia z dowodem fizycznego wejścia, Audyt z łańcuchem SHA-256 i kotwicą, kill-switch, serwer IPC"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+compliance-contract = { path = "../compliance-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+core-bus-contract.workspace = true
+core-log-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+serde.workspace = true
+# float_roundtrip: kanoniczny JSON Audytu musi po ponownym parsowaniu dać identyczne bajty.
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+thiserror.workspace = true
+tokio = { workspace = true, features = ["io-util"] }
+# Kryptografia (RustCrypto): HMAC-SHA256 tokenów, SHA-256 łańcucha Audytu, klucze z CSPRNG systemu.
+hmac = "0.12.1"
+sha2 = "0.10.9"
+getrandom = "0.4.3"
+
+[dev-dependencies]
+core-registry-contract.workspace = true
+safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+platform-fake = { path = "../platform-fake" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["io-util"] }
+
+[lints]
+workspace = true

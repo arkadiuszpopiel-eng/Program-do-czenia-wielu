@@ -1,0 +1,19 @@
+[package]
+name = "voice-audio-fake"
+description = "Atrapa voice-audio: wirtualne urządzenia z wirtualnym zegarem, mikrofon z WAV/próbek, echo wyjścia (pętla zwrotna AEC), hot-plug i konflikty"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
+
+[dev-dependencies]
+voice-audio-contract = { path = "../voice-audio-contract", features = ["contract-tests"] }
+personas-contract = { path = "../personas-contract" }
+
+[lints]
+workspace = true

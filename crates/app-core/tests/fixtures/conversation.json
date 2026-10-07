@@ -1,0 +1,30 @@
+[
+  {
+    "command": "sessions_export_conversation",
+    "args": {
+      "sessionId": "s-trip",
+      "format": "markdown",
+      "turnId": null
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\Plan wyjazdu do Gdańska 2026-09-30.md",
+      "files": 1,
+      "bytes": 402
+    }
+  },
+  {
+    "command": "sessions_export_conversation",
+    "args": {
+      "sessionId": "s-q3",
+      "format": "html",
+      "turnId": "q3"
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\Raport Q3 2026-09-30.html",
+      "files": 1,
+      "bytes": 1474
+    }
+  }
+]

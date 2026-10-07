@@ -1,0 +1,112 @@
+[
+  {
+    "command": "app_bootstrap",
+    "args": {},
+    "result": {
+      "app_version": "0.1.0-f1",
+      "locale": "pl",
+      "onboarding_done": true,
+      "machine_name": "DESKTOP-ALFA",
+      "settings": {
+        "general.start_with_system": true,
+        "general.close_to_tray": true,
+        "general.destroy_webview_after": 10,
+        "general.view_profile": "simple",
+        "quick.session_mode": "single",
+        "models.default_profile": "hybrid",
+        "models.effort": "medium",
+        "engines.llm.backend": "auto",
+        "engines.llm.context": "auto",
+        "engines.llm.threads": 0,
+        "engines.llm.idle_unload_min": 10,
+        "models.parallel_downloads": 2,
+        "costs.warn_at": 80,
+        "costs.background_local_only": true,
+        "costs.estimate_before_long": true,
+        "voice.mode": "toggle",
+        "voice.show_pill": true,
+        "agents.max_steps": 40,
+        "agents.max_minutes": 15,
+        "agents.max_cost_pln": 0,
+        "agents.approval_timeout_s": 300,
+        "agents.verify_before_done": true,
+        "scheduler.max_parallel": 4,
+        "ui.hide_from_capture": false,
+        "memory.consolidation_enabled": true,
+        "memory.consolidation_window": "02:00-05:00",
+        "memory.auto_extract": "ask",
+        "sessions.default_template": "empty",
+        "sessions.auto_title": true,
+        "sessions.delete_undo_seconds": 10,
+        "ui.max_detached_windows": 4,
+        "files.workdir_root": "%USERPROFILE%\\Alfa\\Sesje",
+        "files.image_thumbnails": true,
+        "diagnostician.autonomy": "auto_low_risk",
+        "device.battery_mode": "auto",
+        "device.game_mode": true,
+        "ui.theme": "auto",
+        "ui.accent": "agent",
+        "ui.density": "comfortable",
+        "ui.zoom": 100,
+        "ui.animations": true,
+        "ui.column": "narrow",
+        "composer.enter_sends": true,
+        "notify.toasts": true,
+        "notify.earcons": true,
+        "notify.earcon_volume": 40,
+        "notify.dnd_fullscreen": true,
+        "ui.locale": "pl",
+        "updates.channel": "stable",
+        "updates.mode": "ask",
+        "updates.whats_new": true
+      },
+      "layout": null,
+      "active_session_id": "s-q3",
+      "shortcut_overrides": {}
+    }
+  },
+  {
+    "command": "app_complete_onboarding",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "app_open_system_settings",
+    "args": {
+      "uri": "ms-settings:privacy-microphone"
+    },
+    "result": null
+  },
+  {
+    "command": "app_save_layout",
+    "args": {
+      "layout": {
+        "left_width": 260,
+        "right_width": 380,
+        "left_collapsed": false,
+        "sessions": {
+          "s-q3": {
+            "left_open": true,
+            "right_open": true,
+            "right_tab": "timeline"
+          }
+        }
+      }
+    },
+    "result": null
+  },
+  {
+    "command": "app_set_active_session",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": null
+  },
+  {
+    "command": "app_set_active_session",
+    "args": {
+      "sessionId": null
+    },
+    "result": null
+  }
+]

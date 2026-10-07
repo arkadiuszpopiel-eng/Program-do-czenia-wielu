@@ -1,0 +1,24 @@
+# providers-catalog/elevenlabs.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "elevenlabs"
+display_name = "ElevenLabs"
+kind = "multi"
+auth = "api_key"
+base_url = "TODO"
+compat = "native"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "STT: Scribe v2 Realtime (profil C). TTS: streaming, znaczniki słów (źródło 'usłyszanego prefiksu', §6.5). Voice Design do castingu — ToS użycia wyjścia jako referencji do klonu do sprawdzenia [?]. Audio w chmurze — tag prywatności obowiązkowy przed użyciem."
+env_vars = ["ELEVENLABS_API_KEY"]
+
+[capabilities]
+vision = false
+tools = false
+streaming = true
+long_context = false
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

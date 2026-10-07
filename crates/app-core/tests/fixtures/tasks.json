@@ -1,0 +1,291 @@
+[
+  {
+    "command": "tasks_list",
+    "args": {},
+    "result": [
+      {
+        "id": "t-dane",
+        "title": "Zbierz dane sprzedaży Q3",
+        "parent_id": null,
+        "deps": [],
+        "assignee": "beta",
+        "agent": "beta",
+        "class": "user",
+        "origin": "user",
+        "origin_detail": null,
+        "executor": "agent",
+        "state": "done",
+        "result": "succeeded",
+        "blocked": null,
+        "error": null,
+        "summary": "Zebrano 3 arkusze (lipiec–wrzesień).",
+        "attempt": 1,
+        "max_attempts": 3,
+        "steps": 6,
+        "max_steps": 40,
+        "cost": {
+          "minor": 12,
+          "currency": "PLN"
+        },
+        "session_id": "s-q3",
+        "tainted": false,
+        "submitted_at": "2026-09-30T08:25:00.000Z",
+        "deadline_at": "2026-09-30T09:45:00.000Z"
+      },
+      {
+        "id": "t-marze",
+        "title": "Policz marże i trendy",
+        "parent_id": null,
+        "deps": [
+          {
+            "task_id": "t-dane",
+            "condition": "succeeded"
+          }
+        ],
+        "assignee": "gama",
+        "agent": "gama",
+        "class": "user",
+        "origin": "user",
+        "origin_detail": null,
+        "executor": "agent",
+        "state": "running",
+        "result": null,
+        "blocked": null,
+        "error": null,
+        "summary": null,
+        "attempt": 1,
+        "max_attempts": 3,
+        "steps": 3,
+        "max_steps": 40,
+        "cost": {
+          "minor": 8,
+          "currency": "PLN"
+        },
+        "session_id": "s-q3",
+        "tainted": false,
+        "submitted_at": "2026-09-30T08:25:00.000Z",
+        "deadline_at": "2026-09-30T09:45:00.000Z"
+      },
+      {
+        "id": "t-raport",
+        "title": "Złóż raport dla zarządu",
+        "parent_id": null,
+        "deps": [
+          {
+            "task_id": "t-marze",
+            "condition": "succeeded"
+          }
+        ],
+        "assignee": "alfa",
+        "agent": null,
+        "class": "user",
+        "origin": "user",
+        "origin_detail": null,
+        "executor": "agent",
+        "state": "pending",
+        "result": null,
+        "blocked": "czeka na zadanie „Policz marże i trendy”",
+        "error": null,
+        "summary": null,
+        "attempt": 1,
+        "max_attempts": 3,
+        "steps": 0,
+        "max_steps": 40,
+        "cost": {
+          "minor": 0,
+          "currency": "PLN"
+        },
+        "session_id": "s-q3",
+        "tainted": false,
+        "submitted_at": "2026-09-30T08:25:00.000Z",
+        "deadline_at": "2026-09-30T09:45:00.000Z"
+      },
+      {
+        "id": "t-testy",
+        "title": "Popraw testy modułu płatności",
+        "parent_id": null,
+        "deps": [],
+        "assignee": "any",
+        "agent": "delta",
+        "class": "user",
+        "origin": "user",
+        "origin_detail": null,
+        "executor": "bridge:claude_code",
+        "state": "done",
+        "result": "failed",
+        "blocked": null,
+        "error": "Most odmówił: wersja CLI nie jest przypięta.",
+        "summary": null,
+        "attempt": 1,
+        "max_attempts": 1,
+        "steps": 0,
+        "max_steps": 40,
+        "cost": {
+          "minor": 0,
+          "currency": "PLN"
+        },
+        "session_id": "s-api",
+        "tainted": false,
+        "submitted_at": "2026-09-30T08:25:00.000Z",
+        "deadline_at": "2026-09-30T09:45:00.000Z"
+      }
+    ]
+  },
+  {
+    "command": "tasks_create",
+    "args": {
+      "input": {
+        "session_id": "s-q3",
+        "title": "",
+        "goal": "Sprawdź pisownię raportu",
+        "agent": "beta",
+        "after": [],
+        "parent_id": null
+      }
+    },
+    "result": {
+      "id": "u-muoa0tf0-33",
+      "title": "Sprawdź pisownię raportu",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "ready",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "command": "tasks_create",
+    "args": {
+      "input": {
+        "session_id": "s-q3",
+        "title": "Wyślij raport",
+        "goal": "Wyślij raport do zarządu",
+        "agent": null,
+        "after": [
+          "u-muoa0tf0-33"
+        ],
+        "parent_id": null
+      }
+    },
+    "result": {
+      "id": "u-muoa0tf0-34",
+      "title": "Wyślij raport",
+      "parent_id": null,
+      "deps": [
+        {
+          "task_id": "u-muoa0tf0-33",
+          "condition": "succeeded"
+        }
+      ],
+      "assignee": "any",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "pending",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "command": "tasks_steer",
+    "args": {
+      "taskId": "u-muoa0tf0-33",
+      "text": "Pomiń tabele"
+    },
+    "result": null
+  },
+  {
+    "command": "tasks_pause",
+    "args": {
+      "taskId": "u-muoa0tf0-33"
+    },
+    "result": null
+  },
+  {
+    "command": "tasks_resume",
+    "args": {
+      "taskId": "u-muoa0tf0-33"
+    },
+    "result": null
+  },
+  {
+    "command": "tasks_retry",
+    "args": {
+      "taskId": "u-muoa0tf0-33"
+    },
+    "result": {
+      "id": "u-muoa0tf0-33.retry1",
+      "title": "Sprawdź pisownię raportu",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": "alfa",
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "ready",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T16:45:03.200Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "command": "tasks_cancel",
+    "args": {
+      "taskId": "t-raport"
+    },
+    "result": [
+      "t-raport"
+    ]
+  }
+]

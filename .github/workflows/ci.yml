@@ -1,0 +1,177 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: Rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      # Obraz przypięty: `ubuntu-latest` przechodzi na Ubuntu 26 od 19.10.2026 — zmiana obrazu
+      # runnera ma być świadoma (osobny commit), nie przypadkowa w środku fali.
+      matrix:
+        os: [windows-latest, ubuntu-24.04]
+    env:
+      # ~300 crate'ów i >1000 binariów testowych: bez debuginfo w CI (backtrace i tak z nazwami funkcji).
+      CARGO_PROFILE_DEV_DEBUG: "0"
+    steps:
+      - uses: actions/checkout@v4
+      # Runner Ubuntu ma ~14 GB wolnego; build testów workspace się nie mieści (linker: Bus error).
+      - name: Zwolnij miejsce na dysku runnera
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      # Formatowanie nie zależy od systemu; na Windows `cargo fmt --all` przekracza limit
+      # długości wiersza poleceń (os error 206) przy ~230 crate'ach — sprawdzamy na Linuksie.
+      - name: Format
+        if: runner.os == 'Linux'
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Test
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --workspace --all-features --no-fail-fast 2>&1 | tee test.log
+      - name: Podsumowanie porażek testów
+        if: failure()
+        shell: bash
+        # Log joba bywa ucinany do ogona — tu tylko sekcje porażek (panika + kontekst).
+        run: grep -n -B2 -A30 -E '^---- .* stdout ----' test.log | head -600 || true
+      - name: Schematy generowane są aktualne
+        run: git diff --exit-code -- packages/schemas
+      - name: Graf zależności modułów (tylko -contract)
+        if: runner.os == 'Linux'
+        run: bash scripts/check-deps.sh
+
+  tauri:
+    name: Powłoka Tauri (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # `tauri::generate_context!` wczytuje `frontendDist` (../ui/dist) w czasie kompilacji.
+      - name: Build UI (frontendDist)
+        run: pnpm --filter @alfa/desktop-ui build
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+      # Niezgodny Cargo.lock powłoki przepisuje lokalna kompilacja (setup-dev.ps1), a zmieniony plik
+      # blokował potem `git pull` w update-dev.ps1 na laptopie — wykryj to tutaj, nie u właściciela.
+      - name: Cargo.lock powłoki zgodny z Cargo.toml
+        working-directory: apps/desktop/src-tauri
+        run: cargo metadata --locked --format-version 1 > $null
+      - name: Format
+        working-directory: apps/desktop/src-tauri
+        run: cargo fmt --check
+      - name: Clippy
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Clippy (build testowy z portem CDP, feature e2e)
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets --features e2e -- -D warnings
+      # F3-13 / PT-34: build produkcyjny bez argumentów przeglądarki (bez portu CDP) i odmowa startu
+      # przy `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` ze zdalnym debugowaniem (`src/cdp.rs`).
+      - name: Testy powłoki (build produkcyjny bez portu CDP)
+        working-directory: apps/desktop/src-tauri
+        env:
+          CARGO_PROFILE_DEV_DEBUG: "0"
+        run: cargo test --lib
+      - name: Testy powłoki (build testowy e2e)
+        working-directory: apps/desktop/src-tauri
+        env:
+          CARGO_PROFILE_DEV_DEBUG: "0"
+        run: cargo test --lib --features e2e
+
+  cargo-deny:
+    name: cargo-deny
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories bans licenses sources
+
+  ui:
+    name: UI (Svelte 5)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Tokeny designu są aktualne
+        run: pnpm --filter @alfa/ui-kit build:tokens && git diff --exit-code -- packages/ui-kit/src/tokens.css packages/ui-kit/src/tokens.ts
+      - name: Kontrast WCAG
+        run: pnpm --filter @alfa/ui-kit check:contrast
+      - run: pnpm lint
+      - run: pnpm check
+      - run: pnpm -r build
+      - name: Budżet bundla
+        run: node apps/desktop/ui/scripts/bundle-size.mjs
+      - name: Storybook build
+        run: pnpm --filter @alfa/ui-kit build-storybook
+      - name: Testy jednostkowe UI (vitest)
+        run: pnpm --filter @alfa/desktop-ui test
+      # Instalacja przeglądarki potrafi zawisnąć na pobieraniu (f406ae4: 50 min bez postępu) —
+      # limit czasu i jedna ponowna próba zamiast czekania na 6-godzinny limit joba.
+      - name: Przeglądarka dla E2E
+        timeout-minutes: 15
+        run: |
+          for attempt in 1 2; do
+            timeout 360 pnpm --filter @alfa/desktop-ui exec playwright install --with-deps chromium && exit 0
+            echo "::warning::instalacja przeglądarki nieudana (próba $attempt)"
+          done
+          exit 1
+      - name: E2E + axe (Playwright)
+        timeout-minutes: 30
+        run: pnpm --filter @alfa/desktop-ui test:e2e
+
+  docs:
+    name: Dokumentacja
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: JSON i TOML są poprawne
+        run: |
+          python3 - <<'PY'
+          import json, glob, sys, tomllib
+          bad = 0
+          for f in glob.glob("**/*.json", recursive=True):
+              if "node_modules" in f or "storybook-static" in f: continue
+              try: json.load(open(f, encoding="utf-8"))
+              except Exception as e: print(f, e); bad += 1
+          for f in glob.glob("**/*.toml", recursive=True):
+              if "node_modules" in f or "target" in f: continue
+              try: tomllib.load(open(f, "rb"))
+              except Exception as e: print(f, e); bad += 1
+          sys.exit(1 if bad else 0)
+          PY
+      - name: AGENTS.md ma ≤ 120 linii
+        run: test "$(wc -l < AGENTS.md)" -le 120

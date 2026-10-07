@@ -1,0 +1,28 @@
+[package]
+name = "voice-readaloud-contract"
+description = "Czytanie na głos zaznaczenia / tekstu okna: kontrakt — źródło tekstu (UIA TextPattern, zapas Ctrl+C), segmentacja na zdania z offsetami, automat sterowania (pauza, dalej, wstecz, tempo), treść niezaufana (do modelu tylko za zgodą)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+
+[lints]
+workspace = true

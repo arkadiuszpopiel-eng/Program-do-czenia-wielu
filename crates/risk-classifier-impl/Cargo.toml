@@ -1,0 +1,26 @@
+[package]
+name = "risk-classifier-impl"
+description = "Klasyfikator ryzyka: tabela reguł z progami polityki Jądra, zdarzenia risk.* na magistrali, moduł rejestru"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+compliance-contract = { path = "../compliance-contract" }
+thiserror.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract", features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio.workspace = true
+
+[lints]
+workspace = true

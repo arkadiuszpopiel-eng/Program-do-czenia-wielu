@@ -1,0 +1,225 @@
+[
+  {
+    "command": "transfer_export",
+    "args": {
+      "request": {
+        "scope": {
+          "config_common": true,
+          "personas": true,
+          "casts": true,
+          "sessions": [
+            "s-q3"
+          ],
+          "artifacts": false,
+          "logs": false,
+          "config_machine": false
+        },
+        "password": null
+      }
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\alfa-eksport-2026-09-30.alfa",
+      "files": 6,
+      "bytes": 36576
+    }
+  },
+  {
+    "command": "transfer_inspect",
+    "args": {
+      "password": null,
+      "handle": null
+    },
+    "result": {
+      "status": "inspected",
+      "handle": "fh-muo1g480-1",
+      "manifest": {
+        "schema_version": "1.0.0",
+        "app_version": "0.1.0-f1",
+        "created_at": "2026-09-29T11:45:00.000Z",
+        "source_machine": "LAPTOP-ALFA (laptop-cuda)",
+        "encrypted": false
+      },
+      "items": [
+        {
+          "key": "config.common",
+          "kind": "config",
+          "label": "Konfiguracja wspólna",
+          "diff": "changed"
+        },
+        {
+          "key": "personas",
+          "kind": "persona",
+          "label": "Agentki i biblie głosów",
+          "diff": "same"
+        },
+        {
+          "key": "casts",
+          "kind": "cast",
+          "label": "Obsady ról (4)",
+          "diff": "new"
+        },
+        {
+          "key": "session:s-q3",
+          "kind": "session",
+          "label": "Raport Q3",
+          "diff": "collision"
+        },
+        {
+          "key": "session:s-laptop-1",
+          "kind": "session",
+          "label": "Notatki z laptopa",
+          "diff": "new"
+        }
+      ],
+      "warnings": [
+        "Nakładka maszyny z laptopa nie zostanie zaimportowana."
+      ],
+      "migrations": []
+    }
+  },
+  {
+    "command": "transfer_inspect",
+    "args": {
+      "password": "hasło",
+      "handle": null
+    },
+    "result": {
+      "status": "inspected",
+      "handle": "fh-muo1g480-2",
+      "manifest": {
+        "schema_version": "1.0.0",
+        "app_version": "0.1.0-f1",
+        "created_at": "2026-09-29T11:45:00.000Z",
+        "source_machine": "LAPTOP-ALFA (laptop-cuda)",
+        "encrypted": true
+      },
+      "items": [
+        {
+          "key": "config.common",
+          "kind": "config",
+          "label": "Konfiguracja wspólna",
+          "diff": "changed"
+        },
+        {
+          "key": "personas",
+          "kind": "persona",
+          "label": "Agentki i biblie głosów",
+          "diff": "same"
+        },
+        {
+          "key": "casts",
+          "kind": "cast",
+          "label": "Obsady ról (4)",
+          "diff": "new"
+        },
+        {
+          "key": "session:s-q3",
+          "kind": "session",
+          "label": "Raport Q3",
+          "diff": "collision"
+        },
+        {
+          "key": "session:s-laptop-1",
+          "kind": "session",
+          "label": "Notatki z laptopa",
+          "diff": "new"
+        }
+      ],
+      "warnings": [
+        "Nakładka maszyny z laptopa nie zostanie zaimportowana."
+      ],
+      "migrations": []
+    }
+  },
+  {
+    "command": "transfer_import",
+    "args": {
+      "request": {
+        "handle": "fh-muo1g480-2",
+        "mode": "merge",
+        "resolutions": {
+          "session:s-q3": "keep_both"
+        },
+        "password": null
+      }
+    },
+    "result": {
+      "snapshot_id": "snap-muo1g480-16",
+      "imported": 4,
+      "skipped": 0
+    }
+  },
+  {
+    "command": "transfer_rollback",
+    "args": {
+      "snapshotId": "snap-1"
+    },
+    "result": null
+  },
+  {
+    "command": "transfer_inspect",
+    "args": {
+      "password": null,
+      "handle": "fh-muoilpwi-3"
+    },
+    "result": {
+      "status": "needs_password",
+      "handle": "fh-muoilpwi-4"
+    }
+  },
+  {
+    "command": "transfer_inspect",
+    "args": {
+      "password": "długie hasło kopii",
+      "handle": "fh-muoilpwi-4"
+    },
+    "result": {
+      "status": "inspected",
+      "handle": "fh-muoilpwi-5",
+      "manifest": {
+        "schema_version": "1.0.0",
+        "app_version": "0.1.0-f1",
+        "created_at": "2026-09-29T19:45:14.850Z",
+        "source_machine": "LAPTOP-ALFA (laptop-cuda)",
+        "encrypted": true
+      },
+      "items": [
+        {
+          "key": "config.common",
+          "kind": "config",
+          "label": "Konfiguracja wspólna",
+          "diff": "changed"
+        },
+        {
+          "key": "personas",
+          "kind": "persona",
+          "label": "Agentki i biblie głosów",
+          "diff": "same"
+        },
+        {
+          "key": "casts",
+          "kind": "cast",
+          "label": "Obsady ról (4)",
+          "diff": "new"
+        },
+        {
+          "key": "session:s-q3",
+          "kind": "session",
+          "label": "Raport Q3",
+          "diff": "collision"
+        },
+        {
+          "key": "session:s-laptop-1",
+          "kind": "session",
+          "label": "Notatki z laptopa",
+          "diff": "new"
+        }
+      ],
+      "warnings": [
+        "Nakładka maszyny z laptopa nie zostanie zaimportowana."
+      ],
+      "migrations": []
+    }
+  }
+]

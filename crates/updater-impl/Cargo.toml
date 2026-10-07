@@ -1,0 +1,54 @@
+[package]
+name = "updater-impl"
+description = "Launcher i aktualizacje: implementacja na systemie plików (versions/<ver>, current.json zapisywany atomowo, webview-data), crash-loop i rollback, sprzątanie, weryfikacja minisign, pobieranie przez HTTPS z wznawianiem, rozpakowanie z ochroną przed path traversal/zip-bomb, zamiana launchera; binarium `alfa` = stały launcher"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Stały launcher `%LOCALAPPDATA%\Alfa\alfa.exe` (ADR 0007). Osobny pakiet nie mógłby zależeć od
+# `updater-impl` (scripts/check-deps.sh), więc binarium jest częścią modułu.
+[[bin]]
+name = "alfa"
+path = "src/bin/alfa.rs"
+test = false
+doc = false
+
+[dependencies]
+updater-contract = { path = "../updater-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["fs", "io-util"] }
+tracing.workspace = true
+futures-util.workspace = true
+chrono.workspace = true
+semver.workspace = true
+# Skrót paczki wydania (ta sama wersja co w workspace; MIT OR Apache-2.0).
+sha2 = "0.10.9"
+# Weryfikacja podpisów minisign, bez zależności zewnętrznych (MIT).
+minisign-verify = "0.3.0"
+# Manifest i paczki przez HTTPS z wznawianiem — ta sama wersja i cechy co providers-local-impl
+# (rustls + główne certyfikaty systemu, bez OpenSSL; MIT OR Apache-2.0).
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots", "stream", "http2"] }
+# Paczka aktualizacji (ZIP) — ta sama wersja i cechy co transfer-impl (MIT).
+zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+# Backend deflate dla `zip` (czysty Rust, jak w transfer-impl; MIT OR Apache-2.0).
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
+
+[dev-dependencies]
+updater-contract = { path = "../updater-contract", features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+# Generowanie par kluczy i podpisów w testach (MIT).
+minisign = "0.10.0"
+tempfile = "3.27.0"
+proptest.workspace = true
+
+[lints]
+workspace = true

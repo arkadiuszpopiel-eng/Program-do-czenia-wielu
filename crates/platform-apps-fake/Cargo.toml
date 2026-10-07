@@ -1,0 +1,20 @@
+[package]
+name = "platform-apps-fake"
+description = "Atrapa portów aplikacji (F6): Office z dokumentem w pamięci (makra liczone, Protected View, formuły z listy dozwolonej), przeglądarka z wirtualną siecią i filtrem egressu, rejestr z deny-listą sekretów, system (procesy z drzewem i strażnikiem celów, usługi, zdarzenia, zmienne) i kwarantanna pobrań w pamięci"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+platform-apps-contract = { path = "../platform-apps-contract" }
+# Strażnik celów (`TargetGuard`) atrapy portu systemu.
+platform-contract.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

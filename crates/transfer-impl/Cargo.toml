@@ -1,0 +1,47 @@
+[package]
+name = "transfer-impl"
+description = "Import/eksport paczek .alfa: implementacja — kontener ZIP (manifest pierwszy, limity, ochrona przed zip-slip/zip-bomb), szyfrowanie hasłem (Argon2id + XChaCha20-Poly1305, strumieniowo), snapshoty i rollback, kopie z rotacją, magazyn dokumentów na katalogu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+transfer-contract = { path = "../transfer-contract" }
+sessions-contract = { path = "../sessions-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+chrono.workspace = true
+# UUIDv7 dla kopii sesji (ta sama wersja co w workspace, dodatkowy feature).
+uuid = { workspace = true, features = ["v7"] }
+# Kontener ZIP: tylko deflate (miniz_oxide, czysty Rust), bez AES/bzip2/zstd/lzma (MIT).
+zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+# Backend deflate dla `zip`: miniz_oxide (czysty Rust) — `zip` bierze flate2 bez domyślnych funkcji.
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
+# Szyfrowanie paczki: XChaCha20-Poly1305 w konstrukcji STREAM (nonce BE32) (Apache-2.0 OR MIT).
+chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["alloc"] }
+# Klucz z hasła: Argon2id (MIT OR Apache-2.0); bez `password-hash`.
+argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
+# Losowa sól i prefiks nonce (ta sama wersja co w lib-sqlstore; MIT OR Apache-2.0).
+getrandom = "0.4.3"
+# Zerowanie kluczy i buforów (MIT OR Apache-2.0).
+zeroize = "1.9.0"
+
+[dev-dependencies]
+transfer-contract = { path = "../transfer-contract", features = ["contract-tests"] }
+sessions-fake = { path = "../sessions-fake" }
+accounts-hub-fake = { path = "../accounts-hub-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+proptest.workspace = true
+semver.workspace = true
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

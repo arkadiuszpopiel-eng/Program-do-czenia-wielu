@@ -1,0 +1,587 @@
+[
+  {
+    "command": "plugins_list",
+    "args": {},
+    "result": {
+      "available": true,
+      "unavailable_reason": null,
+      "plugins": [
+        {
+          "id": "kurs-walut",
+          "version": "0.2.0",
+          "author": "Ulepszacz (propozycja P-12)",
+          "description": "Pobiera średni kurs walut z tabeli A NBP i przelicza kwoty.",
+          "state": "proposed",
+          "origin": "improver",
+          "wasm_sha256": "b4c6604a7cdd599540b5e83079fbea7b71bd7dae25378da9b4b5eb24198cceff",
+          "review_hash": "596b8b04b1bd669531ac4c3affdc68b39bf177b0d66ea68160ad9306b593802f",
+          "capabilities": [
+            {
+              "family": "net.egress",
+              "scope": "api.nbp.pl"
+            }
+          ],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 4
+          },
+          "tools": [
+            {
+              "name": "plugin_fx_rate",
+              "title": "Kurs waluty",
+              "description": "Zwraca średni kurs waluty z tabeli A NBP na wskazany dzień.",
+              "mutating": true
+            }
+          ],
+          "side_effects": true,
+          "proposed_at": "2026-09-30T08:45:00.000Z",
+          "decided_at": null,
+          "r2": {
+            "key": "plugins.kurs_walut.version",
+            "value": "596b8b04b1bd669531ac4c3affdc68b39bf177b0d66ea68160ad9306b593802f",
+            "from_version": null,
+            "added_capabilities": [
+              "net.egress"
+            ]
+          }
+        },
+        {
+          "id": "licznik-slow",
+          "version": "1.0.0",
+          "author": "Właściciel",
+          "description": "Liczy słowa w tekście — w piaskownicy Wasm, bez dostępu do plików i sieci.",
+          "state": "installed",
+          "origin": "user",
+          "wasm_sha256": "d18269fa43d3bca9df5c75d8ce692cc7a3acff8e2ec2d13d9deac87c7889693b",
+          "review_hash": "2a9cc4f4296dcb81fe966372c6403727a52efe10228e57ede616b7ce8378eaf3",
+          "capabilities": [],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 16
+          },
+          "tools": [
+            {
+              "name": "plugin_word_count",
+              "title": "Licznik słów",
+              "description": "Liczy słowa w podanym tekście (także polskie znaki).",
+              "mutating": false
+            }
+          ],
+          "side_effects": false,
+          "proposed_at": "2026-09-30T08:45:00.000Z",
+          "decided_at": "2026-09-30T08:45:00.000Z",
+          "r2": null
+        }
+      ],
+      "problems": [
+        {
+          "plugin": "licznik-slow",
+          "version": "1.0.0",
+          "kind": "trapped",
+          "detail": "word_count: out_of_fuel",
+          "at": "2026-09-30T08:45:00.000Z"
+        }
+      ]
+    }
+  },
+  {
+    "command": "plugins_inspect",
+    "args": {
+      "wasmB64": "AGFzbQ0AAQA="
+    },
+    "result": {
+      "ok": true,
+      "wasm_sha256": "204ce25f08c0d4aa7dbbac6986d98be4bf062de3044a0d3e8bf5b1dd9b241888",
+      "bytes": 8,
+      "error": null
+    }
+  },
+  {
+    "command": "plugins_inspect",
+    "args": {
+      "wasmB64": "AGFzbQEAAAA="
+    },
+    "result": {
+      "ok": false,
+      "wasm_sha256": "2b46777ec339339349bc2b90fb90e165b6e1d1da2814317feb84919c7b6a6dc1",
+      "bytes": 8,
+      "error": "to nie jest komponent Wasm (wymagany komponent świata `alfa:plugin/plugin`)"
+    }
+  },
+  {
+    "command": "plugins_propose",
+    "args": {
+      "manifest": {
+        "id": "notatnik",
+        "version": "1.0.0",
+        "author": "Właściciel",
+        "description": "Dopisuje notatki do pliku w katalogu Dokumenty\\Notatki.",
+        "wasm_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "capabilities": [
+          {
+            "cap": "fs.write",
+            "scope": {
+              "path": "C:\\Users\\Ty\\Documents\\Notatki",
+              "subtree": true
+            }
+          }
+        ],
+        "tools": [
+          {
+            "name": "append_note",
+            "title": "Dopisz notatkę",
+            "description": "Dopisuje tekst na końcu pliku notatek.",
+            "input_schema": {
+              "type": "object",
+              "additionalProperties": false
+            },
+            "output_schema": {
+              "type": "object"
+            }
+          }
+        ]
+      },
+      "wasmB64": "AGFzbQ0AAQA="
+    },
+    "result": {
+      "id": "notatnik",
+      "version": "1.0.0",
+      "author": "Właściciel",
+      "description": "Dopisuje notatki do pliku w katalogu Dokumenty\\Notatki.",
+      "state": "proposed",
+      "origin": "user",
+      "wasm_sha256": "204ce25f08c0d4aa7dbbac6986d98be4bf062de3044a0d3e8bf5b1dd9b241888",
+      "review_hash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec",
+      "capabilities": [
+        {
+          "family": "fs.write",
+          "scope": "C:\\Users\\Ty\\Documents\\Notatki"
+        }
+      ],
+      "limits": {
+        "memory_mib": 16,
+        "fuel_per_call": 50000000,
+        "wall_ms": 2000,
+        "max_input_bytes": 65536,
+        "max_output_bytes": 65536,
+        "max_host_calls": 16
+      },
+      "tools": [
+        {
+          "name": "plugin_append_note",
+          "title": "Dopisz notatkę",
+          "description": "Dopisuje tekst na końcu pliku notatek.",
+          "mutating": true
+        }
+      ],
+      "side_effects": true,
+      "proposed_at": "2026-09-30T18:45:05.950Z",
+      "decided_at": null,
+      "r2": {
+        "key": "plugins.notatnik.version",
+        "value": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec",
+        "from_version": null,
+        "added_capabilities": [
+          "fs.write"
+        ]
+      }
+    }
+  },
+  {
+    "command": "plugins_approve",
+    "args": {
+      "pluginId": "notatnik",
+      "version": "1.0.0",
+      "reviewedHash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec"
+    },
+    "result": {
+      "id": "notatnik",
+      "version": "1.0.0",
+      "author": "Właściciel",
+      "description": "Dopisuje notatki do pliku w katalogu Dokumenty\\Notatki.",
+      "state": "installed",
+      "origin": "user",
+      "wasm_sha256": "204ce25f08c0d4aa7dbbac6986d98be4bf062de3044a0d3e8bf5b1dd9b241888",
+      "review_hash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec",
+      "capabilities": [
+        {
+          "family": "fs.write",
+          "scope": "C:\\Users\\Ty\\Documents\\Notatki"
+        }
+      ],
+      "limits": {
+        "memory_mib": 16,
+        "fuel_per_call": 50000000,
+        "wall_ms": 2000,
+        "max_input_bytes": 65536,
+        "max_output_bytes": 65536,
+        "max_host_calls": 16
+      },
+      "tools": [
+        {
+          "name": "plugin_append_note",
+          "title": "Dopisz notatkę",
+          "description": "Dopisuje tekst na końcu pliku notatek.",
+          "mutating": true
+        }
+      ],
+      "side_effects": true,
+      "proposed_at": "2026-09-30T18:45:05.950Z",
+      "decided_at": "2026-09-30T18:45:05.950Z",
+      "r2": null
+    }
+  },
+  {
+    "command": "plugins_list",
+    "args": {},
+    "result": {
+      "available": true,
+      "unavailable_reason": null,
+      "plugins": [
+        {
+          "id": "notatnik",
+          "version": "1.0.0",
+          "author": "Właściciel",
+          "description": "Dopisuje notatki do pliku w katalogu Dokumenty\\Notatki.",
+          "state": "installed",
+          "origin": "user",
+          "wasm_sha256": "204ce25f08c0d4aa7dbbac6986d98be4bf062de3044a0d3e8bf5b1dd9b241888",
+          "review_hash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec",
+          "capabilities": [
+            {
+              "family": "fs.write",
+              "scope": "C:\\Users\\Ty\\Documents\\Notatki"
+            }
+          ],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 16
+          },
+          "tools": [
+            {
+              "name": "plugin_append_note",
+              "title": "Dopisz notatkę",
+              "description": "Dopisuje tekst na końcu pliku notatek.",
+              "mutating": true
+            }
+          ],
+          "side_effects": true,
+          "proposed_at": "2026-09-30T18:45:05.950Z",
+          "decided_at": "2026-09-30T18:45:05.950Z",
+          "r2": null
+        },
+        {
+          "id": "kurs-walut",
+          "version": "0.2.0",
+          "author": "Ulepszacz (propozycja P-12)",
+          "description": "Pobiera średni kurs walut z tabeli A NBP i przelicza kwoty.",
+          "state": "proposed",
+          "origin": "improver",
+          "wasm_sha256": "b4c6604a7cdd599540b5e83079fbea7b71bd7dae25378da9b4b5eb24198cceff",
+          "review_hash": "596b8b04b1bd669531ac4c3affdc68b39bf177b0d66ea68160ad9306b593802f",
+          "capabilities": [
+            {
+              "family": "net.egress",
+              "scope": "api.nbp.pl"
+            }
+          ],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 4
+          },
+          "tools": [
+            {
+              "name": "plugin_fx_rate",
+              "title": "Kurs waluty",
+              "description": "Zwraca średni kurs waluty z tabeli A NBP na wskazany dzień.",
+              "mutating": true
+            }
+          ],
+          "side_effects": true,
+          "proposed_at": "2026-09-30T08:45:00.000Z",
+          "decided_at": null,
+          "r2": {
+            "key": "plugins.kurs_walut.version",
+            "value": "596b8b04b1bd669531ac4c3affdc68b39bf177b0d66ea68160ad9306b593802f",
+            "from_version": null,
+            "added_capabilities": [
+              "net.egress"
+            ]
+          }
+        },
+        {
+          "id": "licznik-slow",
+          "version": "1.0.0",
+          "author": "Właściciel",
+          "description": "Liczy słowa w tekście — w piaskownicy Wasm, bez dostępu do plików i sieci.",
+          "state": "installed",
+          "origin": "user",
+          "wasm_sha256": "d18269fa43d3bca9df5c75d8ce692cc7a3acff8e2ec2d13d9deac87c7889693b",
+          "review_hash": "2a9cc4f4296dcb81fe966372c6403727a52efe10228e57ede616b7ce8378eaf3",
+          "capabilities": [],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 16
+          },
+          "tools": [
+            {
+              "name": "plugin_word_count",
+              "title": "Licznik słów",
+              "description": "Liczy słowa w podanym tekście (także polskie znaki).",
+              "mutating": false
+            }
+          ],
+          "side_effects": false,
+          "proposed_at": "2026-09-30T08:45:00.000Z",
+          "decided_at": "2026-09-30T08:45:00.000Z",
+          "r2": null
+        }
+      ],
+      "problems": [
+        {
+          "plugin": "licznik-slow",
+          "version": "1.0.0",
+          "kind": "trapped",
+          "detail": "word_count: out_of_fuel",
+          "at": "2026-09-30T08:45:00.000Z"
+        }
+      ]
+    }
+  },
+  {
+    "command": "plugins_reject",
+    "args": {
+      "pluginId": "kurs-walut",
+      "version": "0.2.0"
+    },
+    "result": {
+      "id": "kurs-walut",
+      "version": "0.2.0",
+      "author": "Ulepszacz (propozycja P-12)",
+      "description": "Pobiera średni kurs walut z tabeli A NBP i przelicza kwoty.",
+      "state": "rejected",
+      "origin": "improver",
+      "wasm_sha256": "b4c6604a7cdd599540b5e83079fbea7b71bd7dae25378da9b4b5eb24198cceff",
+      "review_hash": "596b8b04b1bd669531ac4c3affdc68b39bf177b0d66ea68160ad9306b593802f",
+      "capabilities": [
+        {
+          "family": "net.egress",
+          "scope": "api.nbp.pl"
+        }
+      ],
+      "limits": {
+        "memory_mib": 16,
+        "fuel_per_call": 50000000,
+        "wall_ms": 2000,
+        "max_input_bytes": 65536,
+        "max_output_bytes": 65536,
+        "max_host_calls": 4
+      },
+      "tools": [
+        {
+          "name": "plugin_fx_rate",
+          "title": "Kurs waluty",
+          "description": "Zwraca średni kurs waluty z tabeli A NBP na wskazany dzień.",
+          "mutating": true
+        }
+      ],
+      "side_effects": true,
+      "proposed_at": "2026-09-30T08:45:00.000Z",
+      "decided_at": "2026-09-30T18:45:05.950Z",
+      "r2": null
+    }
+  },
+  {
+    "command": "plugins_disable",
+    "args": {
+      "pluginId": "notatnik"
+    },
+    "result": {
+      "id": "notatnik",
+      "version": "1.0.0",
+      "author": "Właściciel",
+      "description": "Dopisuje notatki do pliku w katalogu Dokumenty\\Notatki.",
+      "state": "disabled",
+      "origin": "user",
+      "wasm_sha256": "204ce25f08c0d4aa7dbbac6986d98be4bf062de3044a0d3e8bf5b1dd9b241888",
+      "review_hash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec",
+      "capabilities": [
+        {
+          "family": "fs.write",
+          "scope": "C:\\Users\\Ty\\Documents\\Notatki"
+        }
+      ],
+      "limits": {
+        "memory_mib": 16,
+        "fuel_per_call": 50000000,
+        "wall_ms": 2000,
+        "max_input_bytes": 65536,
+        "max_output_bytes": 65536,
+        "max_host_calls": 16
+      },
+      "tools": [
+        {
+          "name": "plugin_append_note",
+          "title": "Dopisz notatkę",
+          "description": "Dopisuje tekst na końcu pliku notatek.",
+          "mutating": true
+        }
+      ],
+      "side_effects": true,
+      "proposed_at": "2026-09-30T18:45:05.950Z",
+      "decided_at": "2026-09-30T18:45:05.950Z",
+      "r2": null
+    }
+  },
+  {
+    "command": "plugins_enable",
+    "args": {
+      "pluginId": "notatnik",
+      "reviewedHash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec"
+    },
+    "result": {
+      "id": "notatnik",
+      "version": "1.0.0",
+      "author": "Właściciel",
+      "description": "Dopisuje notatki do pliku w katalogu Dokumenty\\Notatki.",
+      "state": "installed",
+      "origin": "user",
+      "wasm_sha256": "204ce25f08c0d4aa7dbbac6986d98be4bf062de3044a0d3e8bf5b1dd9b241888",
+      "review_hash": "6603bf11d34fa9b2244547ef163a9a1089e925cd0270e89e55489e7ba30e8aec",
+      "capabilities": [
+        {
+          "family": "fs.write",
+          "scope": "C:\\Users\\Ty\\Documents\\Notatki"
+        }
+      ],
+      "limits": {
+        "memory_mib": 16,
+        "fuel_per_call": 50000000,
+        "wall_ms": 2000,
+        "max_input_bytes": 65536,
+        "max_output_bytes": 65536,
+        "max_host_calls": 16
+      },
+      "tools": [
+        {
+          "name": "plugin_append_note",
+          "title": "Dopisz notatkę",
+          "description": "Dopisuje tekst na końcu pliku notatek.",
+          "mutating": true
+        }
+      ],
+      "side_effects": true,
+      "proposed_at": "2026-09-30T18:45:05.950Z",
+      "decided_at": "2026-09-30T18:45:05.950Z",
+      "r2": null
+    }
+  },
+  {
+    "command": "plugins_remove",
+    "args": {
+      "pluginId": "notatnik"
+    },
+    "result": {
+      "available": true,
+      "unavailable_reason": null,
+      "plugins": [
+        {
+          "id": "kurs-walut",
+          "version": "0.2.0",
+          "author": "Ulepszacz (propozycja P-12)",
+          "description": "Pobiera średni kurs walut z tabeli A NBP i przelicza kwoty.",
+          "state": "rejected",
+          "origin": "improver",
+          "wasm_sha256": "b4c6604a7cdd599540b5e83079fbea7b71bd7dae25378da9b4b5eb24198cceff",
+          "review_hash": "596b8b04b1bd669531ac4c3affdc68b39bf177b0d66ea68160ad9306b593802f",
+          "capabilities": [
+            {
+              "family": "net.egress",
+              "scope": "api.nbp.pl"
+            }
+          ],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 4
+          },
+          "tools": [
+            {
+              "name": "plugin_fx_rate",
+              "title": "Kurs waluty",
+              "description": "Zwraca średni kurs waluty z tabeli A NBP na wskazany dzień.",
+              "mutating": true
+            }
+          ],
+          "side_effects": true,
+          "proposed_at": "2026-09-30T08:45:00.000Z",
+          "decided_at": "2026-09-30T18:45:05.950Z",
+          "r2": null
+        },
+        {
+          "id": "licznik-slow",
+          "version": "1.0.0",
+          "author": "Właściciel",
+          "description": "Liczy słowa w tekście — w piaskownicy Wasm, bez dostępu do plików i sieci.",
+          "state": "installed",
+          "origin": "user",
+          "wasm_sha256": "d18269fa43d3bca9df5c75d8ce692cc7a3acff8e2ec2d13d9deac87c7889693b",
+          "review_hash": "2a9cc4f4296dcb81fe966372c6403727a52efe10228e57ede616b7ce8378eaf3",
+          "capabilities": [],
+          "limits": {
+            "memory_mib": 16,
+            "fuel_per_call": 50000000,
+            "wall_ms": 2000,
+            "max_input_bytes": 65536,
+            "max_output_bytes": 65536,
+            "max_host_calls": 16
+          },
+          "tools": [
+            {
+              "name": "plugin_word_count",
+              "title": "Licznik słów",
+              "description": "Liczy słowa w podanym tekście (także polskie znaki).",
+              "mutating": false
+            }
+          ],
+          "side_effects": false,
+          "proposed_at": "2026-09-30T08:45:00.000Z",
+          "decided_at": "2026-09-30T08:45:00.000Z",
+          "r2": null
+        }
+      ],
+      "problems": [
+        {
+          "plugin": "licznik-slow",
+          "version": "1.0.0",
+          "kind": "trapped",
+          "detail": "word_count: out_of_fuel",
+          "at": "2026-09-30T08:45:00.000Z"
+        }
+      ]
+    }
+  }
+]

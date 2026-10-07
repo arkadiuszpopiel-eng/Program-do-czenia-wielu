@@ -1,0 +1,23 @@
+# providers-catalog/custom-openai-compatible.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "custom-openai-compatible"
+display_name = "Własny endpoint (zgodny z OpenAI)"
+kind = "chat"
+auth = "api_key"
+base_url = "TODO"
+compat = "openai"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Szablon adaptera generycznego (§5.5 krok 0): baseURL, klucz, model ID, flagi możliwości, tag prywatności — wszystko wpisuje użytkownik w kreatorze. Obejmuje Ollama/LM Studio jako zewnętrzne endpointy (auth może być none) i BytePlus."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = "unknown"
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

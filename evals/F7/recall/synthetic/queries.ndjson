@@ -1,0 +1,249 @@
+{"id":"q001","query":"Jaki kolor lubi Karolina?","expected":["f001"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q002","query":"ulubiony kolor Karoliny","expected":["f001"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q003","query":"Jaki kolor najbardziej lubi Bartosz?","expected":["f002"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q004","query":"kolor Bartosza","expected":["f002"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q005","query":"Kiedy Karolina obchodzi urodziny?","expected":["f003"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q006","query":"kiedy karolina obchodzi urodziny?","expected":["f003"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q007","query":"data urodzin Karoliny","expected":["f003"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q008","query":"Kiedy są urodziny Piotra?","expected":["f004"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q009","query":"urodziny Piotr","expected":["f004"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q010","query":"Którego Zuzanna ma urodziny?","expected":["f005"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q011","query":"ktorego zuzanna ma urodziny?","expected":["f005"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q012","query":"urodziny Zuzanny data","expected":["f005"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q013","query":"Na co uczulenie ma Bartosz?","expected":["f006"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q014","query":"alergia Bartosza","expected":["f006"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q015","query":"Czy Magda jest na coś uczulona?","expected":["f007"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q016","query":"czy magda jest na cos uczulona?","expected":["f007"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q017","query":"alergia Magdy","expected":["f007"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q018","query":"Jak zadzwonić do Agnieszki?","expected":["f008"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q019","query":"telefon Agnieszka","expected":["f008"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q020","query":"Podaj numer do hydraulika","expected":["f009"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q021","query":"podaj numer do hydraulika","expected":["f009"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q022","query":"hydraulik telefon","expected":["f009"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q023","query":"Gdzie mieszka Karolina?","expected":["f010"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q024","query":"adres Karoliny","expected":["f010"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q025","query":"Pod jakim adresem mieszka babcia?","expected":["f011"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q026","query":"pod jakim adresem mieszka babcia?","expected":["f011"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q027","query":"adres babci Heleny","expected":["f011"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q028","query":"Czym zawodowo zajmuje się Piotr?","expected":["f012"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q029","query":"zawód Piotra","expected":["f012"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q030","query":"Gdzie pracuje Zuzanna?","expected":["f013"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q031","query":"gdzie pracuje zuzanna?","expected":["f013"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q032","query":"praca Zuzanny","expected":["f013"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q033","query":"Na jakim instrumencie gra Tomasz?","expected":["f014"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q034","query":"instrument Tomasza","expected":["f014"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q035","query":"Komu kibicuje Jan?","expected":["f015"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q036","query":"komu kibicuje jan?","expected":["f015"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q037","query":"ulubiony klub Jana","expected":["f015"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q038","query":"Czy Agnieszka je mięso?","expected":["f016"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q039","query":"dieta Agnieszki","expected":["f016"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q040","query":"Kiedy Magda ma imieniny?","expected":["f017"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q041","query":"kiedy magda ma imieniny?","expected":["f017"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q042","query":"imieniny Magdy","expected":["f017"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q043","query":"Jak pisać maile do szefa?","expected":["f018"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q044","query":"styl maili dla Marcina","expected":["f018"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q045","query":"Jak ma na imię pies Karoliny?","expected":["f019"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q046","query":"jak ma na imie pies karoliny?","expected":["f019"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q047","query":"pies Fafik","expected":["f019"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q048","query":"Jak nazywa się mój kot?","expected":["f020"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q049","query":"imię kota","expected":["f020"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q050","query":"Co piję rano do śniadania?","expected":["f021"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q051","query":"co pije rano do sniadania?","expected":["f021"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q052","query":"kawa do śniadania","expected":["f021"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q053","query":"Jaką herbatę piję wieczorem?","expected":["f022"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q054","query":"napój wieczorny","expected":["f022"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q055","query":"Jakie miejsce wybieram w samolocie?","expected":["f023"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q056","query":"jakie miejsce wybieram w samolocie?","expected":["f023"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q057","query":"miejsce w samolocie","expected":["f023"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q058","query":"Który wagon wybieram w pociągu?","expected":["f024"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q059","query":"pociąg wagon preferencja","expected":["f024"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q060","query":"O jaki pokój proszę w hotelu?","expected":["f025"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q061","query":"o jaki pokoj prosze w hotelu?","expected":["f025"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q062","query":"preferencje hotelowe","expected":["f025"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q063","query":"Jakiej muzyki lubię słuchać?","expected":["f026"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q064","query":"ulubiona muzyka","expected":["f026"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q065","query":"Jakie filmy lubię oglądać?","expected":["f027"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q066","query":"jakie filmy lubie ogladac?","expected":["f027"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q067","query":"ulubione filmy","expected":["f027"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q068","query":"Jakie książki czytam?","expected":["f028"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q069","query":"ulubione książki","expected":["f028"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q070","query":"Kiedy brać witaminę D?","expected":["f029"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q071","query":"kiedy brac witamine d?","expected":["f029"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q072","query":"dawkowanie witaminy D","expected":["f029"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q073","query":"O której godzinie biorę lek na ciśnienie?","expected":["f030"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q074","query":"lek na ciśnienie pora","expected":["f030"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q075","query":"Kiedy mam wizytę u dentysty?","expected":["f031"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q076","query":"kiedy mam wizyte u dentysty?","expected":["f031"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q077","query":"dentysta termin","expected":["f031"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q078","query":"Kiedy idę do okulisty?","expected":["f032"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q079","query":"okulista wizyta","expected":["f032"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q080","query":"W które dni biegam?","expected":["f033"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q081","query":"w ktore dni biegam?","expected":["f033"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q082","query":"plan treningów biegowych","expected":["f033"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q083","query":"Kiedy chodzę na basen?","expected":["f034"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q084","query":"pływanie sobota","expected":["f034"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q085","query":"Jaki noszę rozmiar buta?","expected":["f035"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q086","query":"jaki nosze rozmiar buta?","expected":["f035"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q087","query":"rozmiar obuwia","expected":["f035"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q088","query":"Jaką mam grupę krwi?","expected":["f036"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q089","query":"grupa krwi","expected":["f036"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q090","query":"Kiedy mamy rocznicę ślubu?","expected":["f037"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q091","query":"kiedy mamy rocznice slubu?","expected":["f037"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q092","query":"rocznica ślubu","expected":["f037"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q093","query":"Jakiej przyprawy nie lubię?","expected":["f038"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q094","query":"kolendra","expected":["f038"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q095","query":"Jakie języki znam?","expected":["f039"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q096","query":"jakie jezyki znam?","expected":["f039"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q097","query":"znajomość języków","expected":["f039"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q098","query":"Do której kawiarni lubię chodzić?","expected":["f040"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q099","query":"ulubiona kawiarnia","expected":["f040"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q100","query":"Jaka jest rejestracja mojego auta?","expected":["f041"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q101","query":"jaka jest rejestracja mojego auta?","expected":["f041"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q102","query":"tablice rejestracyjne samochodu","expected":["f041"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q103","query":"Jakie paliwo tankuję do samochodu?","expected":["f042"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q104","query":"rodzaj paliwa","expected":["f042"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q105","query":"Gdzie są moje opony zimowe?","expected":["f043"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q106","query":"gdzie sa moje opony zimowe?","expected":["f043"],"scopes":["global"],"kind":"bez_znakow"}
+{"id":"q107","query":"przechowalnia opon","expected":["f043"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q108","query":"Kiedy odnowić ubezpieczenie auta?","expected":["f044"],"scopes":["global"],"kind":"pytanie"}
+{"id":"q109","query":"termin ubezpieczenia samochodu","expected":["f044"],"scopes":["global"],"kind":"slowa_kluczowe"}
+{"id":"q110","query":"Gdzie jest paszport?","expected":["f045"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q111","query":"gdzie jest paszport?","expected":["f045"],"scopes":["project:dom","global"],"kind":"bez_znakow"}
+{"id":"q112","query":"miejsce paszportu","expected":["f045"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q113","query":"Kto ma zapasowy klucz?","expected":["f046"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q114","query":"zapasowy klucz do mieszkania","expected":["f046"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q115","query":"Gdzie znajdę instrukcję pralki?","expected":["f047"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q116","query":"gdzie znajde instrukcje pralki?","expected":["f047"],"scopes":["project:dom","global"],"kind":"bez_znakow"}
+{"id":"q117","query":"instrukcja obsługi pralki","expected":["f047"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q118","query":"Jakie jest hasło do domowego Wi-Fi?","expected":["f048"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q119","query":"wifi dom hasło","expected":["f048"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q120","query":"Kiedy wywożą plastik?","expected":["f049"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q121","query":"kiedy wywoza plastik?","expected":["f049"],"scopes":["project:dom","global"],"kind":"bez_znakow"}
+{"id":"q122","query":"odbiór plastiku","expected":["f049"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q123","query":"Kiedy odbierają szkło?","expected":["f050"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q124","query":"wywóz szkła","expected":["f050"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q125","query":"Do kiedy ważny jest przegląd kotła?","expected":["f051"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q126","query":"do kiedy wazny jest przeglad kotla?","expected":["f051"],"scopes":["project:dom","global"],"kind":"bez_znakow"}
+{"id":"q127","query":"kocioł gazowy przegląd","expected":["f051"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q128","query":"Do kiedy zapłacić za prąd?","expected":["f052"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q129","query":"termin płatności za prąd","expected":["f052"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q130","query":"Jak płacę za internet?","expected":["f053"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q131","query":"jak place za internet?","expected":["f053"],"scopes":["project:dom","global"],"kind":"bez_znakow"}
+{"id":"q132","query":"płatność internet","expected":["f053"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q133","query":"Jak często podlewać monsterę?","expected":["f054"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q134","query":"podlewanie monstery","expected":["f054"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q135","query":"Jak podlewać storczyki?","expected":["f055"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q136","query":"jak podlewac storczyki?","expected":["f055"],"scopes":["project:dom","global"],"kind":"bez_znakow"}
+{"id":"q137","query":"storczyk woda","expected":["f055"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q138","query":"Gdzie są bezpieczniki?","expected":["f056"],"scopes":["project:dom","global"],"kind":"pytanie"}
+{"id":"q139","query":"skrzynka z bezpiecznikami","expected":["f056"],"scopes":["project:dom","global"],"kind":"slowa_kluczowe"}
+{"id":"q140","query":"Kiedy jest spotkanie marketingu?","expected":["f057"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q141","query":"kiedy jest spotkanie marketingu?","expected":["f057"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q142","query":"termin spotkania marketingu","expected":["f057"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q143","query":"O której jest spotkanie projektu Alfa?","expected":["f058"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q144","query":"projekt Alfa spotkanie","expected":["f058"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q145","query":"Kiedy wysłać raport kwartalny?","expected":["f059"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q146","query":"kiedy wyslac raport kwartalny?","expected":["f059"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q147","query":"termin raportu kwartalnego","expected":["f059"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q148","query":"Kiedy wysyłam raport sprzedaży?","expected":["f060"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q149","query":"raport sprzedaży piątek","expected":["f060"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q150","query":"Kto odpowiada za budżet?","expected":["f061"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q151","query":"kto odpowiada za budzet?","expected":["f061"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q152","query":"osoba od budżetu","expected":["f061"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q153","query":"Do kogo zgłosić awarię serwera?","expected":["f062"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q154","query":"kto od serwerów","expected":["f062"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q155","query":"Kto prowadzi rekrutację?","expected":["f063"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q156","query":"kto prowadzi rekrutacje?","expected":["f063"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q157","query":"rekrutacja osoba kontaktowa","expected":["f063"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q158","query":"Kto nadaje dostęp do repozytorium?","expected":["f064"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q159","query":"uprawnienia do repozytorium","expected":["f064"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q160","query":"Jak kontaktować się z firmą Nowak i Syn?","expected":["f065"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q161","query":"jak kontaktowac sie z firma nowak i syn?","expected":["f065"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q162","query":"Nowak i Syn preferencje","expected":["f065"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q163","query":"Jak umawiać się z Polmarem?","expected":["f066"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q164","query":"spotkania z klientem Polmar","expected":["f066"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q165","query":"Jaki termin ma projekt Orzeł?","expected":["f067"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q166","query":"jaki termin ma projekt orzel?","expected":["f067"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q167","query":"deadline Orzeł","expected":["f067"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q168","query":"Kiedy kończy się projekt Wega?","expected":["f068"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q169","query":"termin projektu Wega","expected":["f068"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q170","query":"Do kiedy wysłać faktury księgowej?","expected":["f069"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q171","query":"do kiedy wyslac faktury ksiegowej?","expected":["f069"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q172","query":"faktury termin księgowa","expected":["f069"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q173","query":"Gdzie rozliczyć delegację?","expected":["f070"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q174","query":"rozliczenie delegacji","expected":["f070"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q175","query":"Jak zgłosić urlop?","expected":["f071"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q176","query":"jak zglosic urlop?","expected":["f071"],"scopes":["project:praca","global"],"kind":"bez_znakow"}
+{"id":"q177","query":"wniosek urlopowy","expected":["f071"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q178","query":"Gdzie znajdę hasło do Wi-Fi w biurze?","expected":["f072"],"scopes":["project:praca","global"],"kind":"pytanie"}
+{"id":"q179","query":"biuro wifi","expected":["f072"],"scopes":["project:praca","global"],"kind":"slowa_kluczowe"}
+{"id":"q180","query":"O której Beta robi plan dnia?","expected":["f073"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q181","query":"o ktorej beta robi plan dnia?","expected":["f073"],"scopes":["agent:beta","global"],"kind":"bez_znakow"}
+{"id":"q182","query":"plan dnia Beta","expected":["f073"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q183","query":"Kto przypomina mi o lekach?","expected":["f074"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q184","query":"przypomnienie o lekach","expected":["f074"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q185","query":"Gdzie jest lista zakupów?","expected":["f075"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q186","query":"gdzie jest lista zakupow?","expected":["f075"],"scopes":["agent:beta","global"],"kind":"bez_znakow"}
+{"id":"q187","query":"lista zakupów","expected":["f075"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q188","query":"Jak Beta robi przegląd tygodnia?","expected":["f076"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q189","query":"przegląd tygodniowy procedura","expected":["f076"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q190","query":"Jak odpisywać klientom na maile?","expected":["f077"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q191","query":"jak odpisywac klientom na maile?","expected":["f077"],"scopes":["agent:beta","global"],"kind":"bez_znakow"}
+{"id":"q192","query":"szablon odpowiedzi do klienta","expected":["f077"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q193","query":"W jakim stylu Beta tłumaczy dokumenty?","expected":["f078"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q194","query":"tłumaczenia styl","expected":["f078"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q195","query":"Gdzie są zarchiwizowane paragony?","expected":["f079"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q196","query":"gdzie sa zarchiwizowane paragony?","expected":["f079"],"scopes":["agent:beta","global"],"kind":"bez_znakow"}
+{"id":"q197","query":"folder z paragonami","expected":["f079"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q198","query":"Jak zrobić kopię zapasową?","expected":["f080"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q199","query":"kopia zapasowa kroki","expected":["f080"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q200","query":"Kiedy dostaję ostrzeżenie o płatności?","expected":["f081"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q201","query":"kiedy dostaje ostrzezenie o platnosci?","expected":["f081"],"scopes":["agent:beta","global"],"kind":"bez_znakow"}
+{"id":"q202","query":"przypomnienie o płatnościach","expected":["f081"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q203","query":"Gdzie są notatki ze spotkań?","expected":["f082"],"scopes":["agent:beta","global"],"kind":"pytanie"}
+{"id":"q204","query":"notatki spotkania folder","expected":["f082"],"scopes":["agent:beta","global"],"kind":"slowa_kluczowe"}
+{"id":"q205","query":"Gdzie jedziemy na urlop?","expected":["f083"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q206","query":"gdzie jedziemy na urlop?","expected":["f083"],"scopes":["session:urlop","global"],"kind":"bez_znakow"}
+{"id":"q207","query":"cel urlopu","expected":["f083"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q208","query":"Kiedy jest lot do Splitu?","expected":["f084"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q209","query":"godzina wylotu","expected":["f084"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q210","query":"Gdzie nocujemy w Chorwacji?","expected":["f085"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q211","query":"gdzie nocujemy w chorwacji?","expected":["f085"],"scopes":["session:urlop","global"],"kind":"bez_znakow"}
+{"id":"q212","query":"nocleg Trogir","expected":["f085"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q213","query":"Co zabrać na urlop?","expected":["f086"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q214","query":"lista rzeczy na wyjazd","expected":["f086"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q215","query":"Ile kosztuje wynajem auta w Chorwacji?","expected":["f087"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q216","query":"ile kosztuje wynajem auta w chorwacji?","expected":["f087"],"scopes":["session:urlop","global"],"kind":"bez_znakow"}
+{"id":"q217","query":"cena wynajmu samochodu","expected":["f087"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q218","query":"Czy mamy ubezpieczenie na wyjazd?","expected":["f088"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q219","query":"polisa podróżna","expected":["f088"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q220","query":"Kiedy jedziemy do parku Krka?","expected":["f089"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q221","query":"kiedy jedziemy do parku krka?","expected":["f089"],"scopes":["session:urlop","global"],"kind":"bez_znakow"}
+{"id":"q222","query":"wycieczka Krka","expected":["f089"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q223","query":"Kto zajmie się kotem podczas wyjazdu?","expected":["f090"],"scopes":["session:urlop","global"],"kind":"pytanie"}
+{"id":"q224","query":"opieka nad kotem","expected":["f090"],"scopes":["session:urlop","global"],"kind":"slowa_kluczowe"}
+{"id":"q225","query":"Kiedy zaczyna się remont kuchni?","expected":["f091"],"scopes":["session:remont","global"],"kind":"pytanie"}
+{"id":"q226","query":"kiedy zaczyna sie remont kuchni?","expected":["f091"],"scopes":["session:remont","global"],"kind":"bez_znakow"}
+{"id":"q227","query":"start remontu","expected":["f091"],"scopes":["session:remont","global"],"kind":"slowa_kluczowe"}
+{"id":"q228","query":"Jaki jest numer do fachowca od kuchni?","expected":["f092"],"scopes":["session:remont","global"],"kind":"pytanie"}
+{"id":"q229","query":"remont telefon wykonawcy","expected":["f092"],"scopes":["session:remont","global"],"kind":"slowa_kluczowe"}
+{"id":"q230","query":"Jakie płytki wybraliśmy do kuchni?","expected":["f093"],"scopes":["session:remont","global"],"kind":"pytanie"}
+{"id":"q231","query":"jakie plytki wybralismy do kuchni?","expected":["f093"],"scopes":["session:remont","global"],"kind":"bez_znakow"}
+{"id":"q232","query":"płytki kuchnia","expected":["f093"],"scopes":["session:remont","global"],"kind":"slowa_kluczowe"}
+{"id":"q233","query":"Ile mamy pieniędzy na remont kuchni?","expected":["f094"],"scopes":["session:remont","global"],"kind":"pytanie"}
+{"id":"q234","query":"koszt remontu","expected":["f094"],"scopes":["session:remont","global"],"kind":"slowa_kluczowe"}
+{"id":"q235","query":"Jaką zmywarkę kupić?","expected":["f095"],"scopes":["session:remont","global"],"kind":"pytanie"}
+{"id":"q236","query":"jaka zmywarke kupic?","expected":["f095"],"scopes":["session:remont","global"],"kind":"bez_znakow"}
+{"id":"q237","query":"zmywarka wymiary","expected":["f095"],"scopes":["session:remont","global"],"kind":"slowa_kluczowe"}
+{"id":"q238","query":"Kiedy przyjdzie blat?","expected":["f096"],"scopes":["session:remont","global"],"kind":"pytanie"}
+{"id":"q239","query":"dostawa blatu","expected":["f096"],"scopes":["session:remont","global"],"kind":"slowa_kluczowe"}
+{"id":"q240","query":"Ile czasu dziennie uczę się hiszpańskiego?","expected":["f097"],"scopes":["session:hiszpanski","global"],"kind":"pytanie"}
+{"id":"q241","query":"ile czasu dziennie ucze sie hiszpanskiego?","expected":["f097"],"scopes":["session:hiszpanski","global"],"kind":"bez_znakow"}
+{"id":"q242","query":"plan nauki języka","expected":["f097"],"scopes":["session:hiszpanski","global"],"kind":"slowa_kluczowe"}
+{"id":"q243","query":"Kiedy mam lekcję z Lucią?","expected":["f098"],"scopes":["session:hiszpanski","global"],"kind":"pytanie"}
+{"id":"q244","query":"lektorka hiszpański termin","expected":["f098"],"scopes":["session:hiszpanski","global"],"kind":"slowa_kluczowe"}
+{"id":"q245","query":"Na jakim poziomie znam hiszpański?","expected":["f099"],"scopes":["session:hiszpanski","global"],"kind":"pytanie"}
+{"id":"q246","query":"na jakim poziomie znam hiszpanski?","expected":["f099"],"scopes":["session:hiszpanski","global"],"kind":"bez_znakow"}
+{"id":"q247","query":"poziom języka hiszpańskiego","expected":["f099"],"scopes":["session:hiszpanski","global"],"kind":"slowa_kluczowe"}
+{"id":"q248","query":"Gdzie mam fiszki do hiszpańskiego?","expected":["f100"],"scopes":["session:hiszpanski","global"],"kind":"pytanie"}
+{"id":"q249","query":"talia fiszek","expected":["f100"],"scopes":["session:hiszpanski","global"],"kind":"slowa_kluczowe"}

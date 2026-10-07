@@ -1,0 +1,20 @@
+# Manifest Ulepszacza (docs/modules/improver/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "improver"
+version = "0.0.1"
+kind = "service"
+provides = ["improver-contract@1"]
+requires = ["core-bus-contract@1", "core-config-contract@1", "evals-contract@1"]
+# Brak zdolności: jedyny zapis to `core-config` z `Origin::Improver` (klucze z listy dozwolonych).
+# Bez sieci, bez plików, bez mostów CLI (THREAT_MODEL S17, S20).
+capabilities = []
+lifecycle = "on-demand"
+isolation = "inproc"
+
+[budget]
+# Sam potok (bez modelu lokalnego, który liczy `providers-local`) — idle/noc, nie na baterii.
+ram_mb = 6
+cpu_pct = 2
+
+[health]
+check = "ping"
+interval_s = 300

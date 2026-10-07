@@ -1,0 +1,248 @@
+# Wydanie Alfy (docs/RELEASE.md): instalator NSIS per-user + paczka aktualizacji (ZIP) + manifest
+# kanału z SHA-256 i podpisem minisign (komentarz zaufany wiąże wersję). Wynik trafia do SZKICU
+# wydania na GitHubie — publikuje człowiek. Klucz prywatny minisign wyłącznie jako sekret
+# `MINISIGN_KEY` (opcjonalnie `MINISIGN_PASSWORD`); bez niego podpis jest pomijany z ostrzeżeniem,
+# a klienci odrzucą niepodpisaną paczkę. Zmienne repozytorium (Settings → Variables):
+# `ALFA_UPDATE_PUBKEY` (klucz publiczny `RW…`, wbudowywany w launcher i aplikację) i
+# `ALFA_UPDATE_FEED` (adres https:// katalogu z manifestami `<kanał>.json`); bez nich wydanie
+# ma wyłączone aktualizacje.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Kanał aktualizacji"
+        type: choice
+        options: [stable, beta]
+        default: stable
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build (Windows x64)
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      channel: ${{ steps.version.outputs.channel }}
+    env:
+      ALFA_UPDATE_PUBKEY: ${{ vars.ALFA_UPDATE_PUBKEY }}
+      ALFA_UPDATE_FEED: ${{ vars.ALFA_UPDATE_FEED }}
+      ALFA_BUILD_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+            apps/desktop/src-tauri -> target
+
+      - name: Wersja i kanał (tag v<wersja> = wersja w tauri.conf.json i Cargo.toml powłoki)
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          conf=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          cargo_ver=$(grep -m1 '^version' apps/desktop/src-tauri/Cargo.toml | cut -d'"' -f2)
+          if [ "$conf" != "$cargo_ver" ]; then
+            echo "::error::tauri.conf.json ($conf) ≠ src-tauri/Cargo.toml ($cargo_ver)"; exit 1
+          fi
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$conf" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} ≠ wersja $conf — podbij wersję przed tagiem"; exit 1
+          fi
+          channel="${{ inputs.channel }}"
+          if [ -z "$channel" ]; then
+            case "$conf" in *-*) channel=beta ;; *) channel=stable ;; esac
+          fi
+          if [ "$channel" = "stable" ] && [[ "$conf" == *-* ]]; then
+            echo "::error::wersja przedpremierowa $conf nie trafia do kanału stabilnego"; exit 1
+          fi
+          echo "version=$conf" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "ALFA_BUILD_DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
+          if [ -z "${ALFA_UPDATE_PUBKEY}" ] || [ -z "${ALFA_UPDATE_FEED}" ]; then
+            echo "::warning::brak ALFA_UPDATE_PUBKEY/ALFA_UPDATE_FEED — wydanie bez aktualizacji"
+          fi
+
+      - name: „Co nowego" (release-notes/<wersja>.md albo commity od poprzedniego tagu)
+        shell: bash
+        run: |
+          set -euo pipefail
+          v="${{ steps.version.outputs.version }}"
+          mkdir -p dist
+          if [ -f "apps/desktop/release-notes/$v.md" ]; then
+            cp "apps/desktop/release-notes/$v.md" dist/notes.md
+          else
+            prev=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true)
+            range="${prev:+$prev..}HEAD"
+            git log --no-merges --pretty='- %s' "$range" | head -n 40 > dist/notes.md
+          fi
+          # Limit manifestu: 64 KiB.
+          head -c 60000 dist/notes.md > dist/notes.trim && mv dist/notes.trim dist/notes.md
+
+      - name: Licencje zależności („O programie")
+        run: node apps/desktop/scripts/gen-licenses.mjs
+
+      - name: Launcher alfa.exe (updater-impl, klucz publiczny wbudowany)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --release --locked -p updater-impl --bin alfa
+          mkdir -p apps/desktop/src-tauri/binaries
+          cp target/release/alfa.exe apps/desktop/src-tauri/binaries/alfa-launcher-x86_64-pc-windows-msvc.exe
+
+      - name: Procesy Jądra (app-safety — alfa-broker, alfa-broker-ui, alfa-watchdog; ADR 0003)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --release --locked -p app-safety --bins
+          for bin in alfa-broker alfa-broker-ui alfa-watchdog; do
+            cp "target/release/$bin.exe" "apps/desktop/src-tauri/binaries/$bin-x86_64-pc-windows-msvc.exe"
+          done
+
+      - name: Instalator NSIS (Tauri, nakładka tauri.bundle.conf.json)
+        shell: bash
+        env:
+          TAURI_APP_PATH: ${{ github.workspace }}/apps/desktop/src-tauri
+        run: pnpm --dir apps/desktop/ui exec tauri build --config ../src-tauri/tauri.bundle.conf.json
+
+      - name: Paczka aktualizacji (ZIP — układ katalogu versions\<wersja>\)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $v = '${{ steps.version.outputs.version }}'
+          $stage = 'dist/pkg'
+          New-Item -ItemType Directory -Force $stage | Out-Null
+          # mainBinaryName przemianował aplikację na alfa.exe — w paczce to alfa-desktop.exe.
+          Copy-Item apps/desktop/src-tauri/target/release/alfa.exe "$stage/alfa-desktop.exe"
+          Copy-Item target/release/alfa.exe "$stage/alfa.exe"
+          # Procesy Jądra tej wersji (tryb przenośny i watchdog) — obok alfa-desktop.exe.
+          foreach ($bin in 'alfa-broker', 'alfa-broker-ui', 'alfa-watchdog') {
+            Copy-Item "target/release/$bin.exe" "$stage/$bin.exe"
+          }
+          Copy-Item dist/notes.md "$stage/notes.md"
+          [IO.File]::WriteAllText("$PWD/$stage/version.json", "{`"version`":`"$v`"}")
+          Compress-Archive -Path "$stage/*" -DestinationPath "dist/alfa-$v-x64.zip"
+          Copy-Item (Get-ChildItem apps/desktop/src-tauri/target/release/bundle/nsis/*-setup.exe | Select-Object -First 1).FullName "dist/Alfa_$($v)_x64-setup.exe"
+          Get-ChildItem dist -File | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name
+          } | Set-Content dist/SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alfa-${{ steps.version.outputs.version }}
+          path: |
+            dist/alfa-*-x64.zip
+            dist/Alfa_*_x64-setup.exe
+            dist/notes.md
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+  sign-and-draft:
+    name: Podpis minisign, manifest, szkic wydania
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+      CHANNEL: ${{ needs.build.outputs.channel }}
+      MINISIGN_KEY: ${{ secrets.MINISIGN_KEY }}
+      MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
+      ALFA_UPDATE_PUBKEY: ${{ vars.ALFA_UPDATE_PUBKEY }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: alfa-${{ needs.build.outputs.version }}
+          path: dist
+
+      - name: Brak klucza — bez podpisu
+        if: env.MINISIGN_KEY == ''
+        run: echo "::warning::brak sekretu MINISIGN_KEY — paczki NIE są podpisane; klienci odrzucą aktualizację"
+
+      - name: Podpis minisign (prehashed; komentarz zaufany z wersją)
+        if: env.MINISIGN_KEY != ''
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq minisign
+          umask 077
+          key="$RUNNER_TEMP/alfa.key"
+          printf '%s\n' "$MINISIGN_KEY" > "$key"
+          trap 'rm -f "$key"' EXIT
+          cd dist
+          for f in "alfa-$VERSION-x64.zip" "Alfa_${VERSION}_x64-setup.exe"; do
+            comment="file:$f version:$VERSION channel:$CHANNEL"
+            if [ -n "$MINISIGN_PASSWORD" ]; then
+              printf '%s\n' "$MINISIGN_PASSWORD" | minisign -S -s "$key" -m "$f" -t "$comment" -x "$f.minisig"
+            else
+              minisign -S -s "$key" -m "$f" -t "$comment" -x "$f.minisig" < /dev/null
+            fi
+            # Alfa (minisign-verify) przyjmuje tylko podpisy „prehashed” (algorytm `ED`).
+            alg=$(sed -n 2p "$f.minisig" | base64 -d 2>/dev/null | head -c 2 || true)
+            if [ "$alg" != "ED" ]; then
+              echo "::error::$f: podpis nie jest prehashed (wymagany minisign ≥ 0.11)"; exit 1
+            fi
+            if [ -n "$ALFA_UPDATE_PUBKEY" ]; then
+              minisign -V -P "$ALFA_UPDATE_PUBKEY" -m "$f" -x "$f.minisig"
+            fi
+          done
+
+      - name: Manifest kanału (<kanał>.json)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          v, ch = os.environ["VERSION"], os.environ["CHANNEL"]
+          d = pathlib.Path("dist")
+          pkg = d / f"alfa-{v}-x64.zip"
+          sig = d / f"{pkg.name}.minisig"
+          release = {
+              "version": v,
+              # Względny adres = ten sam katalog co manifest (np. releases/latest/download/).
+              "url": pkg.name,
+              "sha256": hashlib.sha256(pkg.read_bytes()).hexdigest(),
+              "minisign": sig.read_text() if sig.exists() else "",
+              "notes": (d / "notes.md").read_text()[:60000],
+              "min_previous": None,
+          }
+          manifest = {"schema": 1, "channel": ch, "releases": [release]}
+          (d / f"{ch}.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n")
+          print(json.dumps({k: release[k] for k in ("version", "url", "sha256")}))
+          PY
+
+      - name: Szkic wydania (bez publikacji — publikuje człowiek)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          files=(dist/alfa-*-x64.zip dist/Alfa_*_x64-setup.exe dist/SHA256SUMS.txt "dist/$CHANNEL.json")
+          files+=($(ls dist/*.minisig 2>/dev/null || true))
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --clobber
+          else
+            extra=()
+            if [ "$CHANNEL" = "beta" ]; then extra+=(--prerelease); fi
+            gh release create "$tag" --draft --target "$GITHUB_SHA" --title "Alfa $VERSION" \
+              --notes-file dist/notes.md "${extra[@]}" "${files[@]}"
+          fi

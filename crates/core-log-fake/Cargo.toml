@@ -1,0 +1,22 @@
+[package]
+name = "core-log-fake"
+description = "Atrapa logów jądra: LogSink i AuditWriter w pamięci, deterministyczne numery, redakcja, liczniki per strumień, wstrzykiwanie błędów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+core-log-contract.workspace = true
+core-bus-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+core-log-contract = { workspace = true, features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

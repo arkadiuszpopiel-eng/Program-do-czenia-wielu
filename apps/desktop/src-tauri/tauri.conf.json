@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Alfa",
+  "version": "0.0.1",
+  "identifier": "pl.alfa.desktop",
+  "build": {
+    "frontendDist": "../ui/dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "pnpm --filter @alfa/desktop-ui dev",
+    "beforeBuildCommand": "pnpm --filter @alfa/desktop-ui build"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' asset: http://asset.localhost data:",
+        "font-src": "'self'",
+        "connect-src": "ipc: http://ipc.localhost",
+        "worker-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'",
+        "require-trusted-types-for": "'script'",
+        "trusted-types": "svelte-trusted-html alfa-sanitized-html default"
+      },
+      "devCsp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' asset: http://asset.localhost data:",
+        "font-src": "'self'",
+        "connect-src": "ipc: http://ipc.localhost ws://localhost:1421 http://localhost:1420",
+        "worker-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'"
+      },
+      "capabilities": ["main", "quick", "pill"],
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$HOME/Alfa/**"]
+      }
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["alfa"]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Alfa",
+    "shortDescription": "Alfa — asystentka z agentkami i głosem",
+    "longDescription": "Alfa: rozmowa tekstowa i głosowa z agentkami, narzędzia z Brokerem i cofaniem, pamięć, aktualizacje z podpisem minisign i powrotem do poprzedniej wersji.",
+    "category": "Productivity",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.png", "icons/icon.ico"],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "allowDowngrades": false,
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Polish", "English"],
+        "customLanguageFiles": {
+          "Polish": "windows/Polish.nsh"
+        },
+        "displayLanguageSelector": false,
+        "compression": "lzma"
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+[package]
+name = "app-modules"
+description = "Adaptery portów aplikacji na modułach -impl (kategoria app-*): transfer .alfa z dialogami powłoki, Broker w procesie z dziennikiem cofania, głos (audio + TTS), silniki TTS z sidecarów, katalog i sonda dostawców, Router jako „mózg”, sejf kluczy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Implementuje porty `app-api` na modułach `-impl`; używa jej tylko
+# `app-core` (jedno miejsce kompozycji: `AppOptions` → `parts`).
+[dependencies]
+app-api = { path = "../app-api" }
+# Broker poza procesem / w procesie (`BrokerPort` nad `KernelBroker`, ścieżki Brokera).
+app-broker = { path = "../app-broker" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+accounts-hub-impl = { path = "../accounts-hub-impl" }
+compliance-contract = { path = "../compliance-contract" }
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+core-config-impl = { path = "../core-config-impl" }
+device-profile-contract = { path = "../device-profile-contract" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+model-residency-contract = { path = "../model-residency-contract" }
+model-residency-impl = { path = "../model-residency-impl" }
+providers-local-impl = { path = "../providers-local-impl" }
+router-contract = { path = "../router-contract" }
+router-impl = { path = "../router-impl" }
+personas-contract = { path = "../personas-contract" }
+providers-api-impl = { path = "../providers-api-impl" }
+providers-contract = { path = "../providers-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+safety-broker-impl = { path = "../safety-broker-impl" }
+search-contract = { path = "../search-contract" }
+sessions-contract = { path = "../sessions-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+transfer-contract = { path = "../transfer-contract" }
+transfer-impl = { path = "../transfer-impl" }
+undo-journal-contract = { path = "../undo-journal-contract" }
+undo-journal-impl = { path = "../undo-journal-impl" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+voice-tts-impl = { path = "../voice-tts-impl" }
+# Sidecar STT whisper-server (CPU/CUDA) — wspólna kompozycja dla app-voice i próby generalnej.
+voice-stt-impl = { path = "../voice-stt-impl" }
+watchdog-contract = { path = "../watchdog-contract" }
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+# Jednorazowe uchwyty plików `.alfa` (losowe identyfikatory).
+uuid.workspace = true
+
+[lints]
+workspace = true

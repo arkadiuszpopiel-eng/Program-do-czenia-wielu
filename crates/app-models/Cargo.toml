@@ -1,0 +1,63 @@
+[package]
+name = "app-models"
+description = "Menedżer modeli i silników (kategoria app-*): katalog (LLM, STT, TTS, VAD, KWS, ECAPA, embeddingi, sidecary) z licencją, źródłem i SHA-256, pobieranie HTTPS z Range i wznawianiem, limit równoległości, anulowanie, zgoda TOFU, bezpieczne rozpakowanie ZIP; embedder wyszukiwania (lib-embed / leksykalny) z przebudową wektorów; komendy models_*, embed_model_activate, search_reindex_*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `search-impl`, `memory-impl` (bazy zakresów), `providers-local-impl`
+# (manifest GGUF) i `lib-embed`; używa jej `app-core` (komendy, wybór embeddera przy starcie).
+[dependencies]
+app-api = { path = "../app-api" }
+lib-embed = { path = "../lib-embed" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+search-contract = { path = "../search-contract" }
+search-impl = { path = "../search-impl" }
+memory-contract = { path = "../memory-contract" }
+memory-impl = { path = "../memory-impl" }
+providers-local-impl = { path = "../providers-local-impl" }
+model-residency-contract = { path = "../model-residency-contract" }
+# Profil sprzętu (karta, RAM, rdzenie) — dobór i dopasowanie pakietów 1–6 (`bundles`).
+device-profile-contract = { path = "../device-profile-contract" }
+# Reguły ścieżek wpisów ZIP i limity (zip-bomb) — te same co dla paczek aktualizacji.
+updater-contract = { path = "../updater-contract" }
+core-config-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+futures-util.workspace = true
+tokio = { workspace = true, features = ["rt", "fs", "io-util", "sync", "time"] }
+# Ta sama wersja co w providers-contract (Cargo.lock).
+tokio-util = { version = "0.7.19", default-features = false }
+# Ta sama wersja i cechy co providers-local-impl / updater-impl (rustls, bez OpenSSL; MIT OR Apache-2.0).
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots", "stream", "http2"] }
+sha2 = "0.10.9"
+# Archiwa sidecarów i paczek PyPI (ZIP) — ta sama wersja i cechy co updater-impl / transfer-impl.
+zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
+
+[dev-dependencies]
+lib-embed = { path = "../lib-embed", features = ["testkit"] }
+sessions-fake = { path = "../sessions-fake" }
+sessions-contract = { path = "../sessions-contract" }
+search-fake = { path = "../search-fake" }
+core-config-fake = { path = "../core-config-fake" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "time", "process"] }
+# Próba generalna (`tests/live_catalog.rs`, tylko z `ALFA_LIVE_CATALOG=1`): silniki uruchamiane tą samą
+# kompozycją co aplikacja — `app-modules` (llama-server, Piper) i `voice-stt-impl` (whisper-server).
+app-modules = { path = "../app-modules" }
+providers-contract = { path = "../providers-contract" }
+device-profile-fake = { path = "../device-profile-fake" }
+personas-contract = { path = "../personas-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-stt-contract = { path = "../voice-stt-contract" }
+voice-stt-impl = { path = "../voice-stt-impl" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+
+[lints]
+workspace = true

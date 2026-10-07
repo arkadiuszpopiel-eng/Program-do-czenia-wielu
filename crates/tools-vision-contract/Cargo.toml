@@ -1,0 +1,29 @@
+[package]
+name = "tools-vision-contract"
+description = "tools-vision: kontrakt narzędzi wizji agentek — OCR zrzutu/obszaru/pliku (port OcrPort) i opis obrazu modelem z wizją przez Router z tagiem prywatności sesji (DescribePort); maskowanie jak w tools-screen przed OCR i przed modelem, treść niezaufana"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+tools-screen-contract = { path = "../tools-screen-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+providers-contract = { path = "../providers-contract" }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

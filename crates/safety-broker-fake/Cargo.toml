@@ -1,0 +1,28 @@
+[package]
+name = "safety-broker-fake"
+description = "Atrapa Brokera: deterministyczny silnik (klucze z ziarna, Audyt w pamięci, cisza audio jako zdarzenie), skryptowane decyzje bez możliwości zdjęcia blokad Jądra, auto-zatwierdzanie jak broker-ui-fake"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+safety-broker-contract = { path = "../safety-broker-contract" }
+# Ten sam moduł (dozwolone przez scripts/check-deps.sh): atrapa używa prawdziwego silnika,
+# żeby nie mogła „kłamać” w regułach Jądra.
+safety-broker-impl = { path = "../safety-broker-impl" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+compliance-contract = { path = "../compliance-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

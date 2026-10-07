@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "alfa://providers-catalog/entry",
+  "title": "Wpis katalogu dostawców (providers-catalog/<provider>.toml)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "display_name", "kind", "auth", "base_url", "compat", "capabilities",
+    "privacy_tag", "jurisdiction", "pricing", "terms_url", "compliance_status", "notes"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Identyfikator = nazwa pliku bez rozszerzenia." },
+    "display_name": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["chat", "stt", "tts", "multi"] },
+    "auth": { "enum": ["api_key", "oauth_cli", "none"] },
+    "base_url": {
+      "type": "string",
+      "description": "Adres endpointu, tylko jeśli publicznie znany i wymieniony w planie; inaczej \"TODO\".",
+      "anyOf": [ { "const": "TODO" }, { "format": "uri", "pattern": "^https://" } ]
+    },
+    "compat": { "enum": ["openai", "anthropic", "native"] },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vision", "tools", "streaming", "long_context"],
+      "properties": {
+        "vision": { "$ref": "#/$defs/tribool" },
+        "tools": { "$ref": "#/$defs/tribool" },
+        "streaming": { "$ref": "#/$defs/tribool" },
+        "long_context": { "$ref": "#/$defs/tribool" }
+      }
+    },
+    "privacy_tag": {
+      "enum": [
+        "google-personal-may-train", "google-paid-eea-no-train", "xai-retention-30d",
+        "cn-may-train", "sg", "eu", "unknown"
+      ]
+    },
+    "jurisdiction": { "type": "string", "pattern": "^([A-Z]{2}(\\|[A-Z]{2})*|unknown)$" },
+    "pricing": {
+      "type": "object",
+      "description": "W katalogu zawsze pusta; cennik uzupełniany w konfiguracji użytkownika, nie w kodzie.",
+      "maxProperties": 0
+    },
+    "terms_url": {
+      "type": "string",
+      "anyOf": [ { "const": "TODO" }, { "format": "uri", "pattern": "^https://" } ]
+    },
+    "compliance_status": { "enum": ["green", "gray", "forbidden", "unverified"] },
+    "notes": { "type": "string" },
+    "env_vars": {
+      "type": "array",
+      "description": "Opcjonalne: nazwy zmiennych środowiskowych, z których kreator importuje klucz na życzenie użytkownika (nigdy automatycznie).",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "tribool": { "anyOf": [ { "type": "boolean" }, { "const": "unknown" } ] }
+  }
+}

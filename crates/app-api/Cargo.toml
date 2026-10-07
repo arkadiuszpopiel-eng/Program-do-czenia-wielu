@@ -1,0 +1,40 @@
+[package]
+name = "app-api"
+description = "Kontrakt IPC aplikacji (kategoria app-*): DTO komend i zdarzeń (COMMANDS.md), błąd komend, identyfikatory DTO, paczki zdarzeń co klatkę, porty powłoki i modułów, protokół alfa://, powiadomienia natywne"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Zależy wyłącznie od `*-contract`; używa go tylko `app-core`
+# (i przez jego reeksport — powłoka Tauri).
+[dependencies]
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+# Szkic Kreatora agentów (`AgentDraft`) jako DTO komend `builder_*` — ten sam kształt serde.
+agent-builder-contract = { path = "../agent-builder-contract" }
+artifacts-contract = { path = "../artifacts-contract" }
+core-config-contract.workspace = true
+cost-meter-contract = { path = "../cost-meter-contract" }
+memory-contract = { path = "../memory-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+search-contract = { path = "../search-contract" }
+sessions-contract = { path = "../sessions-contract" }
+async-trait.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+# Zerowanie sekretów z kreatora kont (ta sama wersja co w app-core/accounts-hub/lib-sqlstore).
+zeroize = "1.9.0"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+
+[lints]
+workspace = true

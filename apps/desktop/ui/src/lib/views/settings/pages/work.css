@@ -1,0 +1,127 @@
+/* Wspólne style stron F8 (Komputer, Umiejętności, Kreator agentek, Zdrowie systemu) — klasy `wk-*`,
+   ładowane leniwie razem ze stronami ustawień. */
+.wk-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-3);
+  margin-bottom: var(--alfa-space-4);
+  padding: var(--alfa-space-4);
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-card);
+  background: var(--alfa-color-surface);
+  font-size: var(--alfa-font-size-sm);
+}
+.wk-card h3 {
+  font-size: var(--alfa-font-size-md);
+}
+.wk-card h4 {
+  font-size: var(--alfa-font-size-sm);
+}
+.wk-accent {
+  border-color: var(--alfa-color-info);
+}
+.wk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--alfa-space-2);
+}
+.wk-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wk-list > li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-1);
+  padding-bottom: var(--alfa-space-2);
+  border-bottom: 1px solid var(--alfa-color-border);
+}
+.wk-list > li:last-child {
+  border-bottom: 0;
+}
+.wk-plain {
+  margin: 0;
+  padding-left: var(--alfa-space-4);
+}
+.wk-meta {
+  color: var(--alfa-color-text-muted);
+  font-size: var(--alfa-font-size-xs);
+}
+.wk-note {
+  font-size: var(--alfa-font-size-xs);
+  font-style: italic;
+}
+.wk-error {
+  color: var(--alfa-color-error);
+  font-size: var(--alfa-font-size-xs);
+}
+.wk-ok {
+  color: var(--alfa-color-success);
+}
+.wk-warn {
+  color: var(--alfa-color-warning);
+}
+.wk-code {
+  font-family: var(--alfa-font-mono);
+  font-size: var(--alfa-font-size-xs);
+  word-break: break-all;
+}
+.wk-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-1);
+}
+.wk-field textarea,
+.wk-field input[type='range'] {
+  width: 100%;
+}
+.wk-field textarea {
+  padding: var(--alfa-space-2);
+  border: 1px solid var(--alfa-color-border-strong);
+  border-radius: var(--alfa-radius-control);
+  background: var(--alfa-color-bg);
+  color: var(--alfa-color-text);
+  font-family: var(--alfa-font-mono);
+  font-size: var(--alfa-font-size-xs);
+  resize: vertical;
+}
+.wk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--alfa-space-3);
+}
+.wk-diff {
+  max-height: 320px;
+  margin: 0;
+  padding: var(--alfa-space-2);
+  overflow: auto;
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-control);
+  background: var(--alfa-color-bg);
+  font-family: var(--alfa-font-mono);
+  font-size: var(--alfa-font-size-xs);
+  white-space: pre-wrap;
+}
+.wk-diff .added {
+  color: var(--alfa-color-success);
+}
+.wk-diff .removed {
+  color: var(--alfa-color-error);
+}
+.wk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--alfa-font-size-xs);
+}
+.wk-table th,
+.wk-table td {
+  padding: var(--alfa-space-1) var(--alfa-space-2);
+  border-bottom: 1px solid var(--alfa-color-border);
+  text-align: left;
+  vertical-align: top;
+}

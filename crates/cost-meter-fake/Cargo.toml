@@ -1,0 +1,22 @@
+[package]
+name = "cost-meter-fake"
+description = "Atrapa licznika kosztów: rekordy w pamięci, stały kurs, sterowany werdykt check_budget; atrapy FxSource, LedgerStore i zegara"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+cost-meter-contract = { path = "../cost-meter-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+async-trait.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+cost-meter-contract = { path = "../cost-meter-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

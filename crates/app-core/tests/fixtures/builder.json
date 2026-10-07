@@ -1,0 +1,383 @@
+[
+  {
+    "command": "builder_policy",
+    "args": {},
+    "result": {
+      "groups": [
+        "fs",
+        "fs.read",
+        "shell",
+        "memory",
+        "gui.control",
+        "web",
+        "delegate"
+      ],
+      "ceiling": "L3",
+      "palette": [
+        "color.agent.custom-1",
+        "color.agent.custom-2",
+        "color.agent.custom-3",
+        "color.agent.custom-4",
+        "color.agent.custom-5",
+        "color.agent.custom-6",
+        "color.agent.custom-7",
+        "color.agent.custom-8"
+      ],
+      "voices": [
+        "pl-f1",
+        "pl-f2",
+        "pl_PL-gosia-medium"
+      ],
+      "model_policies": [
+        "conversation",
+        "planning",
+        "code",
+        "research",
+        "summarize"
+      ],
+      "max_steps": 200
+    }
+  },
+  {
+    "command": "builder_propose",
+    "args": {
+      "description": "Agentka o imieniu Zofia, która porządkuje pobrane pliki."
+    },
+    "result": {
+      "draft": {
+        "id": null,
+        "name": "Zofia",
+        "forms": null,
+        "glyph": null,
+        "color": null,
+        "character": null,
+        "voice": {
+          "base": "pl-f2",
+          "pitch": 1.05,
+          "rate": 1,
+          "perceived_age": 22,
+          "timbre": "ciepła",
+          "design_prompt": ""
+        },
+        "role": {
+          "id": "",
+          "name": "Porządkowa",
+          "description": "Agentka o imieniu Zofia, która porządkuje pobrane pliki.",
+          "prompt": "Pomagam porządkować pliki i zawsze mówię, co zrobiłam.",
+          "model_policy": "conversation",
+          "tools": [
+            "fs"
+          ],
+          "read_only": false,
+          "untrusted_isolated": false,
+          "author": false
+        },
+        "limits": {
+          "autonomy": "L2",
+          "budget": null,
+          "fs_write": [
+            "%USERPROFILE%\\Downloads\\**"
+          ],
+          "memory_scope": "agent",
+          "retain_days": 30,
+          "triggers": []
+        },
+        "skills": []
+      },
+      "questions": []
+    }
+  },
+  {
+    "command": "builder_preview",
+    "args": {
+      "draft": {
+        "id": null,
+        "name": "Zofia",
+        "forms": null,
+        "glyph": "Z",
+        "color": "color.agent.custom-2",
+        "character": "Spokojna, konkretna.",
+        "voice": {
+          "base": "pl-f2",
+          "pitch": 1.05,
+          "rate": 1,
+          "perceived_age": 22,
+          "timbre": "ciepła",
+          "design_prompt": ""
+        },
+        "role": {
+          "id": "porzadkowa",
+          "name": "Porządkowa",
+          "description": "Porządkuje Pobrane.",
+          "prompt": "Porządkuję pliki i mówię, co zrobiłam.",
+          "model_policy": "conversation",
+          "tools": [
+            "fs"
+          ],
+          "read_only": false,
+          "untrusted_isolated": false,
+          "author": false
+        },
+        "limits": {
+          "autonomy": "L2",
+          "budget": {
+            "max_steps": 40,
+            "max_tokens": 200000,
+            "max_wall_ms": 600000,
+            "max_cost_micro_usd": null,
+            "max_tool_calls_per_turn": 8
+          },
+          "fs_write": [
+            "%USERPROFILE%\\Downloads\\**"
+          ],
+          "memory_scope": "agent",
+          "retain_days": 30,
+          "triggers": []
+        },
+        "skills": []
+      }
+    },
+    "result": {
+      "persona_id": "zofia",
+      "name": "Zofia",
+      "forms": [
+        "Zofia",
+        "Zofii",
+        "Zofii",
+        "Zofię",
+        "Zofią",
+        "Zofii",
+        "Zofio"
+      ],
+      "glyph": "Z",
+      "color": "color.agent.custom-2",
+      "character": "Spokojna, konkretna.",
+      "role_id": "porzadkowa",
+      "role_name": "Porządkowa",
+      "groups": [
+        "fs"
+      ],
+      "read_only": false,
+      "tools": [
+        "fs_list",
+        "fs_read",
+        "fs_move"
+      ],
+      "voice": "pl-f2 · wysokość 1.05 · tempo 1.00",
+      "autonomy": "L2",
+      "system_prompt": "Jesteś Zofia. Porządkuję pliki i mówię, co zrobiłam.",
+      "fs_write": [
+        "%USERPROFILE%\\Downloads\\**"
+      ],
+      "memory_scope": "agent",
+      "retain_days": 30,
+      "max_steps": 40,
+      "warnings": [],
+      "hash": "68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f"
+    }
+  },
+  {
+    "command": "builder_dry_run",
+    "args": {
+      "draft": {
+        "id": null,
+        "name": "Zofia",
+        "forms": null,
+        "glyph": "Z",
+        "color": "color.agent.custom-2",
+        "character": "Spokojna, konkretna.",
+        "voice": {
+          "base": "pl-f2",
+          "pitch": 1.05,
+          "rate": 1,
+          "perceived_age": 22,
+          "timbre": "ciepła",
+          "design_prompt": ""
+        },
+        "role": {
+          "id": "porzadkowa",
+          "name": "Porządkowa",
+          "description": "Porządkuje Pobrane.",
+          "prompt": "Porządkuję pliki i mówię, co zrobiłam.",
+          "model_policy": "conversation",
+          "tools": [
+            "fs"
+          ],
+          "read_only": false,
+          "untrusted_isolated": false,
+          "author": false
+        },
+        "limits": {
+          "autonomy": "L2",
+          "budget": {
+            "max_steps": 40,
+            "max_tokens": 200000,
+            "max_wall_ms": 600000,
+            "max_cost_micro_usd": null,
+            "max_tool_calls_per_turn": 8
+          },
+          "fs_write": [
+            "%USERPROFILE%\\Downloads\\**"
+          ],
+          "memory_scope": "agent",
+          "retain_days": 30,
+          "triggers": []
+        },
+        "skills": []
+      }
+    },
+    "result": {
+      "hash": "68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f",
+      "passed": true,
+      "steps": [
+        {
+          "tool": "fs_list",
+          "expected": "allowed",
+          "outcome": "allowed",
+          "why": "odczyt"
+        },
+        {
+          "tool": "fs_move",
+          "expected": "allowed",
+          "outcome": "allowed",
+          "why": "w zakresie i poziomie autonomii"
+        },
+        {
+          "tool": "fs_move",
+          "expected": "denied",
+          "outcome": "denied",
+          "why": "zapis poza zakresem agentki"
+        },
+        {
+          "tool": "shell_run",
+          "expected": "denied",
+          "outcome": "denied",
+          "why": "rola nie ma tego narzędzia"
+        }
+      ]
+    }
+  },
+  {
+    "command": "builder_voice_preview",
+    "args": {
+      "draft": {
+        "id": null,
+        "name": "Zofia",
+        "forms": null,
+        "glyph": "Z",
+        "color": "color.agent.custom-2",
+        "character": "Spokojna, konkretna.",
+        "voice": {
+          "base": "pl-f2",
+          "pitch": 1.05,
+          "rate": 1,
+          "perceived_age": 22,
+          "timbre": "ciepła",
+          "design_prompt": ""
+        },
+        "role": {
+          "id": "porzadkowa",
+          "name": "Porządkowa",
+          "description": "Porządkuje Pobrane.",
+          "prompt": "Porządkuję pliki i mówię, co zrobiłam.",
+          "model_policy": "conversation",
+          "tools": [
+            "fs"
+          ],
+          "read_only": false,
+          "untrusted_isolated": false,
+          "author": false
+        },
+        "limits": {
+          "autonomy": "L2",
+          "budget": {
+            "max_steps": 40,
+            "max_tokens": 200000,
+            "max_wall_ms": 600000,
+            "max_cost_micro_usd": null,
+            "max_tool_calls_per_turn": 8
+          },
+          "fs_write": [
+            "%USERPROFILE%\\Downloads\\**"
+          ],
+          "memory_scope": "agent",
+          "retain_days": 30,
+          "triggers": []
+        },
+        "skills": []
+      }
+    },
+    "result": null
+  },
+  {
+    "command": "builder_save",
+    "args": {
+      "draft": {
+        "id": null,
+        "name": "Zofia",
+        "forms": null,
+        "glyph": "Z",
+        "color": "color.agent.custom-2",
+        "character": "Spokojna, konkretna.",
+        "voice": {
+          "base": "pl-f2",
+          "pitch": 1.05,
+          "rate": 1,
+          "perceived_age": 22,
+          "timbre": "ciepła",
+          "design_prompt": ""
+        },
+        "role": {
+          "id": "porzadkowa",
+          "name": "Porządkowa",
+          "description": "Porządkuje Pobrane.",
+          "prompt": "Porządkuję pliki i mówię, co zrobiłam.",
+          "model_policy": "conversation",
+          "tools": [
+            "fs"
+          ],
+          "read_only": false,
+          "untrusted_isolated": false,
+          "author": false
+        },
+        "limits": {
+          "autonomy": "L2",
+          "budget": {
+            "max_steps": 40,
+            "max_tokens": 200000,
+            "max_wall_ms": 600000,
+            "max_cost_micro_usd": null,
+            "max_tool_calls_per_turn": 8
+          },
+          "fs_write": [
+            "%USERPROFILE%\\Downloads\\**"
+          ],
+          "memory_scope": "agent",
+          "retain_days": 30,
+          "triggers": []
+        },
+        "skills": []
+      },
+      "hash": "68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f"
+    },
+    "result": {
+      "persona": "zofia",
+      "role": "porzadkowa",
+      "hash": "68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f"
+    }
+  },
+  {
+    "command": "builder_library",
+    "args": {},
+    "result": [
+      {
+        "persona": "zofia",
+        "name": "Zofia",
+        "color": "color.agent.custom-2",
+        "role": "Porządkowa",
+        "autonomy": "L2",
+        "hash": "68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f68f84e1f"
+      }
+    ]
+  }
+]

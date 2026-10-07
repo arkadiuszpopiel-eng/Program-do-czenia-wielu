@@ -1,0 +1,187 @@
+[
+  {
+    "command": "marshal_state",
+    "args": {},
+    "result": {
+      "rules": [
+        {
+          "id": "glos-pierwszy",
+          "description": "Głos ma pierwszeństwo",
+          "when": [
+            "gdy mówisz"
+          ],
+          "effects": [
+            "pauza agentek GUI/audio"
+          ],
+          "rule": {
+            "id": "glos-pierwszy",
+            "description": "Głos ma pierwszeństwo",
+            "when": {},
+            "then": [
+              {
+                "effect": "pauza agentek GUI/audio"
+              }
+            ]
+          }
+        }
+      ],
+      "proposals": [],
+      "effective": [
+        "autonomia najwyżej L2",
+        "najwyżej 4 zadania naraz",
+        "mosty CLI dozwolone"
+      ],
+      "translator": true
+    }
+  },
+  {
+    "command": "marshal_propose",
+    "args": {
+      "text": "Nie używaj mostów CLI w nocy",
+      "drafts": null
+    },
+    "result": {
+      "id": 1,
+      "text": "Nie używaj mostów CLI w nocy",
+      "rules": [
+        {
+          "id": "bez-mostow",
+          "description": "Bez mostów CLI",
+          "when": [
+            "zawsze"
+          ],
+          "effects": [
+            "mosty CLI zabronione"
+          ],
+          "rule": {
+            "id": "bez-mostow",
+            "description": "Bez mostów CLI",
+            "when": {},
+            "then": [
+              {
+                "effect": "mosty CLI zabronione"
+              }
+            ]
+          }
+        }
+      ],
+      "rejected": [],
+      "conflicts": [],
+      "status": "pending",
+      "created_at": "2026-09-30T17:45:03.200Z"
+    }
+  },
+  {
+    "command": "marshal_approve",
+    "args": {
+      "proposalId": 1
+    },
+    "result": [
+      {
+        "id": "bez-mostow",
+        "description": "Bez mostów CLI",
+        "when": [
+          "zawsze"
+        ],
+        "effects": [
+          "mosty CLI zabronione"
+        ],
+        "rule": {
+          "id": "bez-mostow",
+          "description": "Bez mostów CLI",
+          "when": {},
+          "then": [
+            {
+              "effect": "mosty CLI zabronione"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "command": "marshal_propose",
+    "args": {
+      "text": "Reguły z edytora",
+      "drafts": [
+        {
+          "id": "jedno-naraz",
+          "then": [
+            {
+              "effect": "max_parallel",
+              "n": 1
+            }
+          ]
+        },
+        {
+          "description": "bez id"
+        }
+      ]
+    },
+    "result": {
+      "id": 2,
+      "text": "Reguły z edytora",
+      "rules": [
+        {
+          "id": "jedno-naraz",
+          "description": "jedno-naraz",
+          "when": [
+            "zawsze"
+          ],
+          "effects": [
+            "{\"effect\":\"max_parallel\",\"n\":1}"
+          ],
+          "rule": {
+            "id": "jedno-naraz",
+            "description": "jedno-naraz",
+            "when": {},
+            "then": [
+              {
+                "effect": "{\"effect\":\"max_parallel\",\"n\":1}"
+              }
+            ]
+          }
+        }
+      ],
+      "rejected": [
+        {
+          "draft": {
+            "description": "bez id"
+          },
+          "errors": [
+            "brak `id` albo `then`"
+          ]
+        }
+      ],
+      "conflicts": [],
+      "status": "pending",
+      "created_at": "2026-09-30T17:45:03.200Z"
+    }
+  },
+  {
+    "command": "marshal_reject",
+    "args": {
+      "proposalId": 2
+    },
+    "result": null
+  },
+  {
+    "command": "marshal_revoke",
+    "args": {
+      "ruleId": "glos-pierwszy"
+    },
+    "result": null
+  },
+  {
+    "command": "marshal_report",
+    "args": {},
+    "result": {
+      "day": "2026-09-30",
+      "submitted": 8,
+      "succeeded": 4,
+      "failed": 1,
+      "escalations": 0,
+      "text": "Dziś: 8 zadań, 4 udanych, 1 nieudanych."
+    }
+  }
+]

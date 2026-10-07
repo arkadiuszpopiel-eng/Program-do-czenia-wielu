@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "suite": "f2-voice-samples",
+  "wave": "F2",
+  "version": 1,
+  "status": "proposed",
+  "created": "2026-10-01",
+  "description": "Przykład formatu: próbki syntetyczne F2 (evals/F2/samples) czytane adapterem `f2_voice_manifest` bez zmiany treści; podział z pola `split` każdej linii, klasa = `kind`. Zestaw właściwy (korpus) leży poza gitem.",
+  "files": {
+    "F2/samples/manifest.ndjson": "cb1e89afa4004767593ccf093f50f4234e34cee92bfb854552fdea2c395284db",
+    "F2/manifest.schema.json": "6b58093c6aa74acfdf453ce37322acaf956a1ac614fdcbcefa6f294c2625dee6"
+  },
+  "cases": [
+    {
+      "path": "F2/samples/manifest.ndjson",
+      "format": "f2_voice_manifest"
+    }
+  ],
+  "thresholds": [
+    {
+      "id": "F2-03",
+      "rule": "text",
+      "text": "WER PL ≤ 12% (korpus własny, test) — runner alfa-voice-eval",
+      "description": "ACCEPTANCE F2"
+    }
+  ]
+}

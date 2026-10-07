@@ -1,0 +1,334 @@
+# Próba generalna przed testem na laptopie właściciela (fala 6, docs/user-guide/11-pierwszy-test-na-pc.md):
+# na `windows-latest` (CPU, bez GPU) sprawdzamy to, czego zwykłe CI nie widzi — skrypt `setup-dev.ps1` pod
+# PowerShell 5.1 i 7 oraz prawdziwe silniki z katalogu `app-models` (pobranie, rozpakowanie, uruchomienie).
+# Bez sekretów; sieć tylko do github.com i huggingface.co (adresy z katalogu modeli).
+name: Próba generalna (Windows)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Raz na dobę (UTC); minuta inna niż :00, żeby nie trafiać w szczyt obciążenia harmonogramu GitHuba.
+    - cron: "17 3 * * *"
+  pull_request:
+    paths:
+      - "crates/app-models/**"
+      - "crates/providers-local*/**"
+      - "crates/voice-stt*/**"
+      - "crates/voice-tts*/**"
+      - "crates/app-modules/src/route/local.rs"
+      - "crates/app-modules/src/tts.rs"
+      - "scripts/setup-dev.ps1"
+      - "scripts/install-on-drive.ps1"
+      - "scripts/update-dev.ps1"
+      - "scripts/code-session.ps1"
+      - ".github/workflows/rehearsal.yml"
+      # Job `app-e2e` (prawdziwa aplikacja przez CDP) pilnuje też zmian aplikacji i UI.
+      - "apps/desktop/**"
+      - "packages/ui-kit/**"
+      - "crates/app-*/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rehearsal-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # (zadanie L) Joby `setup-dev` i `live-engines`; kolejne joby dopisuj PONIŻEJ nich.
+  #
+  # setup-dev.ps1 w trybie `-Ci` (nigdy nie pyta, nic nie instaluje, działa z konta administratora
+  # runnera): kod 0 = komplet narzędzi, 1 = czegoś brakuje na runnerze (to NIE jest błąd skryptu),
+  # 2 / brak linii ALFA_SETUP_RESULT / cokolwiek na stderr = błąd skryptu → job czerwony.
+  # Szybka bramka (≈ 1 min): czy pliki z katalogów modeli istnieją na Hugging Face (ta sesja
+  # deweloperska nie ma dostępu do HF; runner ma). HEAD na każdy adres pliku z katalogów — inny kod
+  # niż 200 (404 = błędny adres, 401/403 = repozytorium z bramką) → job czerwony. Dla modeli GGUF
+  # z `models.toml`: rozmiar i SHA-256 z API Hugging Face (bez pobierania) — rozmiar musi zgadzać się
+  # z `size_mb` (±1 MiB), przypięty `sha256` (jeśli jest) — z hashem LFS; tabela trafia do
+  # podsumowania joba jako materiał do przypięcia hashy przez człowieka.
+  hf-catalog:
+    name: Hugging Face — adresy z katalogów modeli
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adresy plików z katalogów (HEAD)
+        shell: bash
+        run: |
+          set -u
+          out="$GITHUB_STEP_SUMMARY"
+          bad=0
+          echo "## Adresy z katalogów (HEAD, z przekierowaniami)" >> "$out"
+          while read -r url; do
+            case "$url" in *"{"*) continue;; esac
+            # Prefiksy (np. katalog głosu Piper, do którego kod dokleja nazwę pliku) — bez rozszerzenia.
+            case "${url##*/}" in *.*) ;; *) continue;; esac
+            code=$(curl -s -o /dev/null -I -L --max-time 30 -w '%{http_code}' "$url" || echo ERR)
+            echo "- \`$code\` $url" | tee -a "$out"
+            [ "$code" = 200 ] || bad=1
+          done < <(grep -rhoE 'https://huggingface\.co/[^"[:space:]]+' crates/app-models/src/data.rs \
+            crates/providers-local-impl/models.toml crates/lib-embed/src/*.rs | sort -u)
+          exit "$bad"
+      - name: Modele GGUF — rozmiar i SHA-256 (API Hugging Face)
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: python3 scripts/ci/hf-gguf-check.py crates/providers-local-impl/models.toml
+
+  setup-dev:
+    name: setup-dev.ps1 (PowerShell 5.1 i 7)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      # Narzędzia jak u programistki — więcej ścieżek skryptu kończy się „OK” zamiast „BRAK”.
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+          components: rustfmt, clippy
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Windows PowerShell 5.1 (powershell -File … -Ci)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          "Engine: $($PSVersionTable.PSVersion) $($PSVersionTable.PSEdition)"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\setup-dev.ps1'
+          $tokens = $null; $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($script, [ref]$tokens, [ref]$errors)
+          if ($errors) { foreach ($e in $errors) { "::error file=scripts/setup-dev.ps1,line=$($e.Extent.StartLineNumber)::$($e.Message)" }; exit 1 }
+          $out = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -Ci 2>&1)
+          $code = $LASTEXITCODE
+          $stderr = @($out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+          $text = @($out | ForEach-Object { "$_" })
+          $text
+          $line = $text | Select-String -Pattern '^ALFA_SETUP_RESULT=(\w+)' | Select-Object -Last 1
+          $result = if ($line) { $line.Matches[0].Groups[1].Value } else { 'none' }
+          if ($stderr.Count -gt 0) { "::error::setup-dev.ps1 (5.1) wrote $($stderr.Count) line(s) to stderr - script error"; $stderr | ForEach-Object { "  $_" }; exit 1 }
+          switch ("$code/$result") {
+            '0/ok' { "::notice::setup-dev.ps1 (5.1): all required tools present" }
+            '1/missing' { "::notice::setup-dev.ps1 (5.1): tools missing on the runner (not a script error) - see job summary" }
+            default { "::error::setup-dev.ps1 (5.1): script error (exit $code, result $result)"; exit 1 }
+          }
+          exit 0
+      - name: PowerShell 7 (pwsh -File … -Ci)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          "Silnik: $($PSVersionTable.PSVersion) $($PSVersionTable.PSEdition)"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\setup-dev.ps1'
+          $tokens = $null; $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($script, [ref]$tokens, [ref]$errors)
+          if ($errors) { foreach ($e in $errors) { "::error file=scripts/setup-dev.ps1,line=$($e.Extent.StartLineNumber)::$($e.Message)" }; exit 1 }
+          $out = @(& pwsh -NoProfile -ExecutionPolicy Bypass -File $script -Ci 2>&1)
+          $code = $LASTEXITCODE
+          $stderr = @($out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+          $text = @($out | ForEach-Object { "$_" })
+          $text
+          $line = $text | Select-String -Pattern '^ALFA_SETUP_RESULT=(\w+)' | Select-Object -Last 1
+          $result = if ($line) { $line.Matches[0].Groups[1].Value } else { 'none' }
+          if ($stderr.Count -gt 0) { "::error::setup-dev.ps1 (7) pisze na stderr ($($stderr.Count) linii) — błąd skryptu"; $stderr | ForEach-Object { "  $_" }; exit 1 }
+          switch ("$code/$result") {
+            '0/ok' { "::notice::setup-dev.ps1 (7): komplet wymaganych narzędzi" }
+            '1/missing' { "::notice::setup-dev.ps1 (7): na runnerze brakuje narzędzi (to nie błąd skryptu) — tabela w podsumowaniu" }
+            default { "::error::setup-dev.ps1 (7): błąd skryptu (kod $code, wynik $result)"; exit 1 }
+          }
+          exit 0
+      # Instalacja na dysku D: (laptop właściciela) — tylko plan (-Ci): runner ma dysk D:, nic nie jest zmieniane.
+      - name: install-on-drive.ps1 -Drive D -Ci (PowerShell 5.1 i 7)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\install-on-drive.ps1'
+          # Składnia wszystkich skryptów właściciela (skróty na Pulpicie: update-dev, code-session).
+          foreach ($name in 'install-on-drive.ps1', 'update-dev.ps1', 'code-session.ps1') {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $env:GITHUB_WORKSPACE "scripts\$name"), [ref]$tokens, [ref]$errors)
+            if ($errors) { foreach ($e in $errors) { "::error file=scripts/$name,line=$($e.Extent.StartLineNumber)::$($e.Message)" }; exit 1 }
+          }
+          foreach ($engine in 'powershell.exe', 'pwsh') {
+            $out = @(& $engine -NoProfile -ExecutionPolicy Bypass -File $script -Drive D -Ci 2>&1)
+            $code = $LASTEXITCODE
+            $stderr = @($out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+            $text = @($out | ForEach-Object { "$_" })
+            $text
+            $line = $text | Select-String -Pattern '^ALFA_INSTALL_RESULT=(\w+)' | Select-Object -Last 1
+            $result = if ($line) { $line.Matches[0].Groups[1].Value } else { 'none' }
+            if ($stderr.Count -gt 0) { "::error::install-on-drive.ps1 ($engine) pisze na stderr ($($stderr.Count) linii) — błąd skryptu"; exit 1 }
+            if ("$code/$result" -ne '0/ok') { "::error::install-on-drive.ps1 ($engine): kod $code, wynik $result"; exit 1 }
+            "::notice::install-on-drive.ps1 ($engine): plan gotowy (kod $code)"
+          }
+          exit 0
+
+  # Prawdziwe silniki z katalogu `app-models` na CPU (test `crates/app-models/tests/live_catalog.rs`):
+  # pobranie ~8 GB (llama-server CPU/Vulkan/CUDA, modele GGUF z katalogu — oficjalne Bielik 1.5B i 4.5B
+  # Q8_0, whisper-server + model, piper + głos PL), rozpakowanie, generacja po polsku każdym modelem
+  # (z narzędziem, gdy model je obsługuje; architektura i KV cache z logu llama-server), TTS → STT. Raport JSON z SHA-256 każdego pobranego
+  # pliku → artefakt `alfa-live-report` + podsumowanie joba (do przypięcia hashy przez człowieka).
+  live-engines:
+    name: Silniki na żywo (CPU)
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_INCREMENTAL: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: live-engines
+          # Pierwsze przebiegi mogą kończyć się porażką testu — build i tak ma trafić do cache.
+          cache-on-failure: true
+      # Pobrania i rozpakowane silniki to ~7 GB: katalog testu na dysku z największym zapasem.
+      - name: Wolne miejsce na dyskach i katalog testu
+        shell: pwsh
+        run: |
+          $drives = @(Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Free -gt 0 })
+          $drives | Format-Table Name, Root, @{ n = 'WolneGB'; e = { [math]::Round($_.Free / 1GB, 1) } }
+          $best = $drives | Sort-Object Free -Descending | Select-Object -First 1
+          $dir = Join-Path $best.Root 'alfa-live'
+          "ALFA_LIVE_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "ALFA_LIVE_REPORT=$(Join-Path $dir 'live-report.json')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "Katalog testu: $dir ($([math]::Round($best.Free / 1GB, 1)) GB wolnego)"
+      - name: Build testu na żywo
+        run: cargo test -p app-models --test live_catalog --no-run
+      - name: Pobranie, rozpakowanie i uruchomienie silników
+        env:
+          ALFA_LIVE_CATALOG: "1"
+        run: cargo test -p app-models --test live_catalog -- --ignored --nocapture
+      - name: Podsumowanie (SHA-256, układ archiwów, czasy)
+        if: always()
+        shell: pwsh
+        run: |
+          $path = $env:ALFA_LIVE_REPORT
+          $md = [System.Collections.Generic.List[string]]::new()
+          $md.Add('## Silniki na żywo (CPU) — raport do przypięcia SHA-256')
+          if (-not $path -or -not (Test-Path -LiteralPath $path)) {
+            $md.Add(''); $md.Add('Brak raportu — test nie doszedł do pierwszego zapisu (zobacz log kroku „Pobranie…”).')
+            $md -join "`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            exit 0
+          }
+          $r = Get-Content -LiteralPath $path -Raw -Encoding utf8 | ConvertFrom-Json
+          $cell = { param($v) if ($null -eq $v) { '—' } else { ("$v" -replace '\|', '/' -replace "`r?`n", ' ') } }
+          $md.Add(''); $md.Add('Pełny raport JSON i nagranie TTS: artefakt **alfa-live-report** (ten przebieg → Summary → Artifacts).')
+          $md.Add(''); $md.Add('| Pozycja | Stan | Czas od startu pobrań (s) | Plik | Bajty | SHA-256 | Układ archiwum (katalogi najwyższego poziomu) |')
+          $md.Add('| --- | --- | --- | --- | --- | --- | --- |')
+          foreach ($i in $r.items) {
+            foreach ($f in $i.files) {
+              $layout = if ($f.archive) { "$($f.archive.entries) wpisów: " + (($f.archive.top_level | Select-Object -First 8) -join ', ') + $(if ($f.archive.backslash_separators) { ' (separator \)' } else { '' }) } else { '' }
+              $md.Add("| $($i.id) | $($i.state) | $([math]::Round($i.download_ms / 1000, 1)) | [$($f.name)]($($f.url)) | $(& $cell $f.bytes) | ``$(& $cell $f.sha256)`` | $(& $cell $layout) |")
+            }
+          }
+          foreach ($l in @($r.llm)) {
+            if ($null -eq $l) { continue }
+            $md.Add(''); $md.Add("### LLM ``$($l.model)`` (llama-server, CPU)")
+            $md.Add("- backend **$($l.backend)**, wątki $($l.threads), serwer ``$($l.server)``")
+            $md.Add("- start sidecara (ładowanie modelu): $(& $cell $l.sidecar_startup_ms) ms; zdarzenia: $(& $cell ($l.sidecar_events -join '; '))")
+            $md.Add("- pierwszy token: $($l.first_token_ms) ms, całość: $($l.total_ms) ms, tokeny wyjścia: $($l.output_tokens), **$([math]::Round([double]$l.tok_per_s, 2)) tok/s**")
+            $md.Add("- odpowiedź: $(& $cell $l.text)")
+            if ($l.error) { $md.Add("- **błąd:** $(& $cell $l.error)") }
+            if ($l.tools.skipped) { $md.Add("- żądanie z narzędziem: pominięte ($($l.tools.skipped))") }
+            elseif ($l.tools) { $md.Add("- żądanie z narzędziem (tura agentki): wywołanie narzędzia: $($l.tools.tool_called), błąd: $(& $cell $l.tools.error), $($l.tools.total_ms) ms") }
+            # Architektura i KV cache z logu llama-server — potwierdzenie `layers`/`kv_mb_per_1k_ctx` z models.toml.
+            foreach ($line in @($l.server_log)) { if ($line) { $md.Add("  - ``$(& $cell $line)``") } }
+          }
+          if ($r.tts) { $md.Add(''); $md.Add("### TTS: $($r.tts.engine) — TTFB $($r.tts.ttfb_ms) ms, audio $($r.tts.audio_ms) ms, RTF $([math]::Round([double]$r.tts.rtf, 3))") }
+          if ($r.stt) {
+            $s = $r.stt
+            $md.Add(''); $md.Add("### STT: ``$(Split-Path -Leaf $s.model)`` — WER **$([math]::Round([double]$s.wer, 2))**, podobieństwo $([math]::Round([double]$s.similarity, 2)), RTF $([math]::Round([double]$s.rtf, 2)) ($($s.total_ms) ms)")
+            $md.Add("- zdarzenia STT: $(& $cell (($s.events | Where-Object { $_ -notlike 'voice.stt.partial*' }) -join '; '))")
+            $md.Add("- wzorzec: $($s.expected) → rozpoznano: $(& $cell $s.text) (język: $(& $cell $s.lang); backend: $(& $cell $s.backend), preferowany $(& $cell $s.preferred))")
+          }
+          if ($r.programs) {
+            $md.Add(''); $md.Add('### Programy (wersja, flagi CLI używane przez Alfę)'); $md.Add('')
+            $md.Add('| Katalog | Kod `--version` | Wersja | Kod `--help` | Brak flag w `--help` |'); $md.Add('| --- | --- | --- | --- | --- |')
+            foreach ($p in $r.programs.PSObject.Properties) {
+              $v = $p.Value
+              $md.Add("| $($p.Name) | $(& $cell $v.version_exit) | $(& $cell (($v.version | Select-Object -First 2) -join ' / ')) | $(& $cell $v.help_exit) | $(& $cell ($v.flags_missing_in_help -join ' ')) |")
+            }
+          }
+          $md.Add(''); $md.Add('### Problemy')
+          if (@($r.problems).Count -eq 0) { $md.Add('Brak.') } else { foreach ($p in $r.problems) { $md.Add("- $(& $cell $p)") } }
+          $md -join "`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          # Ten sam raport w logu joba — czytelny także przez API (podsumowanie joba nie jest dostępne w REST).
+          Write-Output ($md -join "`n")
+      - name: Artefakt z raportem
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alfa-live-report
+          path: |
+            ${{ env.ALFA_LIVE_DIR }}/live-report.json
+            ${{ env.ALFA_LIVE_DIR }}/tts-alfa.wav
+          if-no-files-found: warn
+          retention-days: 30
+
+  # (zadanie K) Prawdziwa aplikacja na runnerze — PLAN §4.4 „E2E (Playwright przez CDP do WebView2)”.
+  # Powłoka Tauri w buildzie debug (Broker w procesie, oznaczony banerem) z cechą `e2e` (port CDP 9222
+  # istnieje TYLKO w tym buildzie — src-tauri/src/cdp.rs) i `tauri/custom-protocol` (zasoby wbudowane
+  # i CSP wydania z Trusted Types — jak w instalatorze; bez niej exe ładuje devUrl i devCsp).
+  # `apps/desktop/ui/e2e-app/run.ps1`: start exe, czekanie na port CDP z limitem, Playwright
+  # `connectOverCDP` + test dymny `e2e-app/smoke.spec.ts`, zrzut pulpitu, zakończenie drzewa procesów,
+  # kopia logów %LOCALAPPDATA%\Alfa\logs, podsumowanie joba. Bez sekretów, bez sieci poza GitHubem.
+  # Wyniki: Summary joba + artefakt `alfa-app-e2e` (screens/*.png, report/index.html, console.jsonl,
+  # results.json, logs/, alfa-desktop.stdout.log / .stderr.log, desktop.png, cdp-*.json).
+  app-e2e:
+    name: Prawdziwa aplikacja — E2E przez CDP (WebView2)
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_INCREMENTAL: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # `tauri::generate_context!` wbudowuje `frontendDist` (../ui/dist) w czasie kompilacji.
+      - name: Build UI (frontendDist)
+        run: pnpm --filter @alfa/desktop-ui build
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.94"
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+          key: app-e2e
+          cache-on-failure: true
+      - name: Runner — miejsce, WebView2 Runtime, sesja, ekran
+        shell: pwsh
+        run: |
+          Get-PSDrive -PSProvider FileSystem | Format-Table Name, Root, @{ n = 'WolneGB'; e = { [math]::Round($_.Free / 1GB, 1) } }
+          $id = '{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          $pv = @("HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\$id", "HKLM:\SOFTWARE\Microsoft\EdgeUpdate\Clients\$id",
+                  "HKCU:\SOFTWARE\Microsoft\EdgeUpdate\Clients\$id") |
+            ForEach-Object { (Get-ItemProperty -Path $_ -Name pv -ErrorAction SilentlyContinue).pv } |
+            Where-Object { $_ } | Select-Object -First 1
+          if ($pv) { "WebView2 Runtime: $pv" } else { '::warning::Brak wpisu WebView2 Runtime w rejestrze — okna Alfy mogą nie wystartować.' }
+          Add-Type -AssemblyName System.Windows.Forms
+          "Sesja interaktywna: $([Environment]::UserInteractive) · użytkownik: $env:USERNAME · ekran: $([System.Windows.Forms.Screen]::PrimaryScreen.Bounds)"
+      - name: Build powłoki (debug, cechy e2e + tauri/custom-protocol)
+        working-directory: apps/desktop/src-tauri
+        run: cargo build --features "e2e tauri/custom-protocol"
+      - name: E2E prawdziwej aplikacji (Playwright przez CDP do WebView2)
+        shell: pwsh
+        env:
+          ALFA_LOG: debug
+          ALFA_E2E_EXPORT_DIR: ${{ runner.temp }}\alfa-e2e-export
+        run: ./apps/desktop/ui/e2e-app/run.ps1
+      - name: Artefakt (zrzuty, raport Playwright, konsola, logi)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alfa-app-e2e
+          path: apps/desktop/ui/e2e-app/out/
+          if-no-files-found: warn
+          retention-days: 14

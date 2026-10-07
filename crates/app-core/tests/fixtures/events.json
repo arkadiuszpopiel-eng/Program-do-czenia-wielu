@@ -1,0 +1,1833 @@
+[
+  {
+    "type": "SessionUpdated",
+    "session": {
+      "id": "s-munv0mw0-1",
+      "title": "Kodowanie",
+      "project": null,
+      "pinned": false,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid"
+    }
+  },
+  {
+    "type": "SessionUpdated",
+    "session": {
+      "id": "s-munv0mw0-1",
+      "title": "API płatności — refaktor",
+      "project": null,
+      "pinned": false,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid"
+    }
+  },
+  {
+    "type": "SessionUpdated",
+    "session": {
+      "id": "s-munv0mw0-1",
+      "title": "API płatności — refaktor",
+      "project": null,
+      "pinned": true,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid"
+    }
+  },
+  {
+    "type": "SessionRemoved",
+    "session_id": "s-munv0mw0-1"
+  },
+  {
+    "type": "TurnAppended",
+    "session_id": "s-q3",
+    "turn": {
+      "id": "t-munv0mw0-4",
+      "session_id": "s-q3",
+      "parent_id": "q6",
+      "author": "user",
+      "role_id": null,
+      "created_at": "2026-09-30T08:45:00.000Z",
+      "status": "complete",
+      "text": "Delta, uporządkuj pliki w folderze Pobrane.",
+      "blocks": [
+        {
+          "index": 0,
+          "kind": "text",
+          "lang": null,
+          "html_sanitized": "<p>Delta, uporządkuj pliki w folderze Pobrane.</p>",
+          "closed": true
+        }
+      ],
+      "thinking": null,
+      "tools": [],
+      "approval": null,
+      "usage": null,
+      "error": null,
+      "continues": null,
+      "addressed_to": "delta",
+      "truncated": false,
+      "heard_prefix": null
+    }
+  },
+  {
+    "type": "TurnAppended",
+    "session_id": "s-q3",
+    "turn": {
+      "id": "t-munv0mw0-5",
+      "session_id": "s-q3",
+      "parent_id": "t-munv0mw0-4",
+      "author": "delta",
+      "role_id": "operator",
+      "created_at": "2026-09-30T08:45:00.000Z",
+      "status": "streaming",
+      "text": "",
+      "blocks": [],
+      "thinking": null,
+      "tools": [],
+      "approval": null,
+      "usage": null,
+      "error": null,
+      "continues": null,
+      "addressed_to": null,
+      "truncated": false,
+      "heard_prefix": null
+    }
+  },
+  {
+    "type": "AgentsChanged",
+    "session_id": "s-q3",
+    "agents": [
+      {
+        "id": "alfa",
+        "role_ids": [
+          "conductor",
+          "speaker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "beta",
+        "role_ids": [
+          "keeper",
+          "writer"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "gama",
+        "role_ids": [
+          "researcher",
+          "critic",
+          "thinker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "delta",
+        "role_ids": [
+          "operator",
+          "coder"
+        ],
+        "status": "speaking",
+        "activity": null
+      }
+    ]
+  },
+  {
+    "type": "AgentRunUpdated",
+    "session_id": "s-q3",
+    "run": {
+      "id": "s-q3:r2",
+      "session_id": "s-q3",
+      "turn_id": "t-munv0mw0-5",
+      "agent": "delta",
+      "goal": "Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym k",
+      "workdir": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3",
+      "state": "running",
+      "started_at": "2026-09-30T08:45:00.000Z",
+      "finished_at": null,
+      "summary": null,
+      "usage": {
+        "steps": 0,
+        "tool_calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost": {
+          "minor": 0,
+          "currency": "PLN"
+        },
+        "elapsed_ms": 0
+      },
+      "budget": {
+        "max_steps": 40,
+        "max_minutes": 15,
+        "max_cost": null
+      }
+    }
+  },
+  {
+    "type": "AgentStep",
+    "session_id": "s-q3",
+    "run_id": "s-q3:r2",
+    "step": {
+      "id": "s-q3:r2:s1",
+      "n": 1,
+      "kind": "tool",
+      "tool": "fs_search",
+      "input": "",
+      "output": "",
+      "status": "running",
+      "at_ms": 0,
+      "duration_ms": null,
+      "undo_token": null,
+      "undone": false,
+      "untrusted": false,
+      "intent": null,
+      "approval_id": null,
+      "title": "Przeszukano Pobrane (31 plików)"
+    }
+  },
+  {
+    "type": "ToolCall",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "step": {
+      "id": "s-q3:r2:s1",
+      "icon": "search",
+      "label": "Przeszukano Pobrane (31 plików)",
+      "status": "running",
+      "duration_ms": null,
+      "undo_token": null,
+      "undone": false,
+      "intent": null
+    }
+  },
+  {
+    "type": "ActivityChanged",
+    "session_id": "s-q3",
+    "activity": {
+      "session_id": "s-q3",
+      "agent": "delta",
+      "description": "Przeszukano Pobrane (31 plików)",
+      "step": 1,
+      "total_steps": 3,
+      "started_at": "2026-09-30T08:45:00.000Z"
+    }
+  },
+  {
+    "type": "AgentStep",
+    "session_id": "s-q3",
+    "run_id": "s-q3:r2",
+    "step": {
+      "id": "s-q3:r2:s1",
+      "n": 1,
+      "kind": "tool",
+      "tool": "fs_search",
+      "input": "",
+      "output": "Przeszukano Pobrane (31 plików)",
+      "status": "ok",
+      "at_ms": 0,
+      "duration_ms": 500,
+      "undo_token": null,
+      "undone": false,
+      "untrusted": false,
+      "intent": null,
+      "approval_id": null,
+      "title": "Przeszukano Pobrane (31 plików)"
+    }
+  },
+  {
+    "type": "ToolCall",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "step": {
+      "id": "s-q3:r2:s1",
+      "icon": "search",
+      "label": "Przeszukano Pobrane (31 plików)",
+      "status": "done",
+      "duration_ms": 500,
+      "undo_token": null,
+      "undone": false,
+      "intent": null
+    }
+  },
+  {
+    "type": "AgentStep",
+    "session_id": "s-q3",
+    "run_id": "s-q3:r2",
+    "step": {
+      "id": "s-q3:r2:s2",
+      "n": 2,
+      "kind": "tool",
+      "tool": "fs_move",
+      "input": "",
+      "output": "",
+      "status": "running",
+      "at_ms": 500,
+      "duration_ms": null,
+      "undo_token": null,
+      "undone": false,
+      "untrusted": false,
+      "intent": null,
+      "approval_id": null,
+      "title": "Delta: przeniesiono 14 plików"
+    }
+  },
+  {
+    "type": "ToolCall",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "step": {
+      "id": "s-q3:r2:s2",
+      "icon": "edit",
+      "label": "Delta: przeniesiono 14 plików",
+      "status": "running",
+      "duration_ms": null,
+      "undo_token": null,
+      "undone": false,
+      "intent": null
+    }
+  },
+  {
+    "type": "ActivityChanged",
+    "session_id": "s-q3",
+    "activity": {
+      "session_id": "s-q3",
+      "agent": "delta",
+      "description": "Delta: przeniesiono 14 plików",
+      "step": 2,
+      "total_steps": 3,
+      "started_at": "2026-09-30T08:45:00.000Z"
+    }
+  },
+  {
+    "type": "ActivityChanged",
+    "session_id": "s-q3",
+    "activity": {
+      "session_id": "s-q3",
+      "agent": "delta",
+      "description": "Uruchom w terminalu",
+      "step": 3,
+      "total_steps": 3,
+      "started_at": "2026-09-30T08:45:00.000Z"
+    }
+  },
+  {
+    "type": "ApprovalPending",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "approval": {
+      "what": "Usunięcie 6 duplikatów z folderu Pobrane",
+      "why": "Pliki są identyczne z kopiami w Archiwum/2026.",
+      "reversible": true,
+      "risk": "high",
+      "id": "ap-t-munv0mw0-5",
+      "status": "pending",
+      "broker_window": true,
+      "expires_at": null
+    }
+  },
+  {
+    "type": "TextDelta",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "text": "Prze",
+    "blocks": [
+      {
+        "index": 0,
+        "kind": "text",
+        "lang": null,
+        "html_sanitized": "<p>Prze</p>",
+        "closed": false
+      }
+    ]
+  },
+  {
+    "type": "TextDelta",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "text": "nios",
+    "blocks": [
+      {
+        "index": 0,
+        "kind": "text",
+        "lang": null,
+        "html_sanitized": "<p>Przenios</p>",
+        "closed": false
+      }
+    ]
+  },
+  {
+    "type": "TextDelta",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "text": "łam",
+    "blocks": [
+      {
+        "index": 0,
+        "kind": "text",
+        "lang": null,
+        "html_sanitized": "<p>Przeniosłam</p>",
+        "closed": false
+      }
+    ]
+  },
+  {
+    "type": "AgentRunUpdated",
+    "session_id": "s-q3",
+    "run": {
+      "id": "s-q3:r2",
+      "session_id": "s-q3",
+      "turn_id": "t-munv0mw0-5",
+      "agent": "delta",
+      "goal": "Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym k",
+      "workdir": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3",
+      "state": "completed",
+      "started_at": "2026-09-30T08:45:00.000Z",
+      "finished_at": "2026-09-30T08:45:02.250Z",
+      "summary": "Przeniosłam 14 plików do folderu Archiwum/2026. Każdy krok można cofnąć jednym kliknięciem.",
+      "usage": {
+        "steps": 3,
+        "tool_calls": 3,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost": {
+          "minor": 0,
+          "currency": "PLN"
+        },
+        "elapsed_ms": 0
+      },
+      "budget": {
+        "max_steps": 40,
+        "max_minutes": 15,
+        "max_cost": null
+      }
+    }
+  },
+  {
+    "type": "Usage",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "usage": {
+      "input_tokens": 1291,
+      "output_tokens": 26,
+      "cost": {
+        "minor": 1,
+        "currency": "PLN"
+      },
+      "latency_ms": 2250,
+      "provider": "Anthropic",
+      "model": "claude-opus-5-5"
+    }
+  },
+  {
+    "type": "Stop",
+    "session_id": "s-q3",
+    "turn_id": "t-munv0mw0-5",
+    "reason": "end"
+  },
+  {
+    "type": "AgentsChanged",
+    "session_id": "s-q3",
+    "agents": [
+      {
+        "id": "alfa",
+        "role_ids": [
+          "conductor",
+          "speaker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "beta",
+        "role_ids": [
+          "keeper",
+          "writer"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "gama",
+        "role_ids": [
+          "researcher",
+          "critic",
+          "thinker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "delta",
+        "role_ids": [
+          "operator",
+          "coder"
+        ],
+        "status": "idle",
+        "activity": null
+      }
+    ]
+  },
+  {
+    "type": "TimelineAppended",
+    "event": {
+      "id": "ev-munv0omi-6",
+      "ts": "2026-09-30T08:45:02.250Z",
+      "session_id": "s-q3",
+      "kind": "model_call",
+      "level": "info",
+      "agent": "delta",
+      "title": "claude-opus-5-5 · 1291 → 26",
+      "detail": null,
+      "cost": {
+        "minor": 1,
+        "currency": "PLN"
+      },
+      "latency_ms": 2250,
+      "turn_id": "t-munv0mw0-5"
+    }
+  },
+  {
+    "type": "CostsChanged",
+    "session_id": "s-q3",
+    "costs": {
+      "session": {
+        "minor": 109,
+        "currency": "PLN"
+      },
+      "day": {
+        "minor": 215,
+        "currency": "PLN"
+      },
+      "month": {
+        "minor": 4871,
+        "currency": "PLN"
+      },
+      "limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 30000,
+          "currency": "PLN"
+        }
+      },
+      "context": {
+        "used_tokens": 2689,
+        "max_tokens": 200000,
+        "compacted": false
+      },
+      "fx": {
+        "usd_pln": 3.64,
+        "date": "2026-09-30",
+        "stale": false
+      }
+    }
+  },
+  {
+    "type": "TurnAppended",
+    "session_id": "s-q3",
+    "turn": {
+      "id": "t-munx5so0-7",
+      "session_id": "s-q3",
+      "parent_id": "q3",
+      "author": "gama",
+      "role_id": "conductor",
+      "created_at": "2026-09-30T09:45:00.000Z",
+      "status": "streaming",
+      "text": "",
+      "blocks": [],
+      "thinking": null,
+      "tools": [],
+      "approval": null,
+      "usage": null,
+      "error": null,
+      "continues": null,
+      "addressed_to": null,
+      "truncated": false,
+      "heard_prefix": null
+    }
+  },
+  {
+    "type": "AgentsChanged",
+    "session_id": "s-q3",
+    "agents": [
+      {
+        "id": "alfa",
+        "role_ids": [
+          "conductor",
+          "speaker"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "beta",
+        "role_ids": [
+          "keeper",
+          "writer"
+        ],
+        "status": "idle",
+        "activity": null
+      },
+      {
+        "id": "gama",
+        "role_ids": [
+          "researcher",
+          "critic",
+          "thinker"
+        ],
+        "status": "speaking",
+        "activity": null
+      },
+      {
+        "id": "delta",
+        "role_ids": [
+          "operator",
+          "coder"
+        ],
+        "status": "idle",
+        "activity": null
+      }
+    ]
+  },
+  {
+    "type": "ThinkingDelta",
+    "session_id": "s-q3",
+    "turn_id": "t-munx5so0-7",
+    "elapsed_ms": 0,
+    "done": false
+  },
+  {
+    "type": "ThinkingDelta",
+    "session_id": "s-q3",
+    "turn_id": "t-munx5so0-7",
+    "elapsed_ms": 250,
+    "done": false
+  },
+  {
+    "type": "ThinkingDelta",
+    "session_id": "s-q3",
+    "turn_id": "t-munx5so0-7",
+    "elapsed_ms": 500,
+    "done": false
+  },
+  {
+    "type": "Usage",
+    "session_id": "s-q3",
+    "turn_id": "t-munx5so0-7",
+    "usage": {
+      "input_tokens": 1365,
+      "output_tokens": 47,
+      "cost": {
+        "minor": 2,
+        "currency": "PLN"
+      },
+      "latency_ms": 1210,
+      "provider": "Anthropic",
+      "model": "claude-opus-5-5"
+    }
+  },
+  {
+    "type": "Stop",
+    "session_id": "s-q3",
+    "turn_id": "t-munx5so0-7",
+    "reason": "end"
+  },
+  {
+    "type": "TimelineAppended",
+    "event": {
+      "id": "ev-munx5tlm-8",
+      "ts": "2026-09-30T09:45:01.210Z",
+      "session_id": "s-q3",
+      "kind": "model_call",
+      "level": "info",
+      "agent": "gama",
+      "title": "claude-opus-5-5 · 1365 → 47",
+      "detail": null,
+      "cost": {
+        "minor": 2,
+        "currency": "PLN"
+      },
+      "latency_ms": 1210,
+      "turn_id": "t-munx5so0-7"
+    }
+  },
+  {
+    "type": "CostsChanged",
+    "session_id": "s-q3",
+    "costs": {
+      "session": {
+        "minor": 111,
+        "currency": "PLN"
+      },
+      "day": {
+        "minor": 217,
+        "currency": "PLN"
+      },
+      "month": {
+        "minor": 4873,
+        "currency": "PLN"
+      },
+      "limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 30000,
+          "currency": "PLN"
+        }
+      },
+      "context": {
+        "used_tokens": 2736,
+        "max_tokens": 200000,
+        "compacted": false
+      },
+      "fx": {
+        "usd_pln": 3.64,
+        "date": "2026-09-30",
+        "stale": false
+      }
+    }
+  },
+  {
+    "type": "Usage",
+    "session_id": "s-q3",
+    "turn_id": "t-munzayg0-10",
+    "usage": {
+      "input_tokens": 1365,
+      "output_tokens": 47,
+      "cost": {
+        "minor": 2,
+        "currency": "PLN"
+      },
+      "latency_ms": 1210,
+      "provider": "Anthropic",
+      "model": "claude-opus-5-5"
+    }
+  },
+  {
+    "type": "Stop",
+    "session_id": "s-q3",
+    "turn_id": "t-munzayg0-10",
+    "reason": "end"
+  },
+  {
+    "type": "TimelineAppended",
+    "event": {
+      "id": "ev-munzazdm-11",
+      "ts": "2026-09-30T10:45:01.210Z",
+      "session_id": "s-q3",
+      "kind": "model_call",
+      "level": "info",
+      "agent": "alfa",
+      "title": "claude-opus-5-5 · 1365 → 47",
+      "detail": null,
+      "cost": {
+        "minor": 2,
+        "currency": "PLN"
+      },
+      "latency_ms": 1210,
+      "turn_id": "t-munzayg0-10"
+    }
+  },
+  {
+    "type": "CostsChanged",
+    "session_id": "s-q3",
+    "costs": {
+      "session": {
+        "minor": 113,
+        "currency": "PLN"
+      },
+      "day": {
+        "minor": 219,
+        "currency": "PLN"
+      },
+      "month": {
+        "minor": 4875,
+        "currency": "PLN"
+      },
+      "limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 30000,
+          "currency": "PLN"
+        }
+      },
+      "context": {
+        "used_tokens": 2793,
+        "max_tokens": 200000,
+        "compacted": false
+      },
+      "fx": {
+        "usd_pln": 3.64,
+        "date": "2026-09-30",
+        "stale": false
+      }
+    }
+  },
+  {
+    "type": "AccountChanged",
+    "account": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "ok",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "kinds": [
+            "chat",
+            "vision"
+          ],
+          "context_tokens": 400000
+        },
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000
+        }
+      ],
+      "assignments": {
+        "task_classes": [
+          "chat"
+        ],
+        "agents": [],
+        "voice_stt": false,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 10000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T11:45:00.000Z"
+    }
+  },
+  {
+    "type": "AccountChanged",
+    "account": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "ok",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "kinds": [
+            "chat",
+            "vision"
+          ],
+          "context_tokens": 400000
+        },
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000
+        }
+      ],
+      "assignments": {
+        "task_classes": [
+          "chat",
+          "code"
+        ],
+        "agents": [
+          "beta"
+        ],
+        "voice_stt": true,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 10000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T11:45:00.000Z"
+    }
+  },
+  {
+    "type": "AccountChanged",
+    "account": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "ok",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "kinds": [
+            "chat",
+            "vision"
+          ],
+          "context_tokens": 400000
+        },
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000
+        }
+      ],
+      "assignments": {
+        "task_classes": [
+          "chat",
+          "code"
+        ],
+        "agents": [
+          "beta"
+        ],
+        "voice_stt": true,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 5000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T11:45:00.000Z"
+    }
+  },
+  {
+    "type": "LocalModelProgress",
+    "model_id": "bielik-4.5b-v3.0-instruct-q8_0",
+    "state": "downloading",
+    "bytes": 0,
+    "total": 5060427776,
+    "error": null
+  },
+  {
+    "type": "LocalModelProgress",
+    "model_id": "bielik-4.5b-v3.0-instruct-q8_0",
+    "state": "downloading",
+    "bytes": 506042778,
+    "total": 5060427776,
+    "error": null
+  },
+  {
+    "type": "LocalModelProgress",
+    "model_id": "bielik-4.5b-v3.0-instruct-q8_0",
+    "state": "downloading",
+    "bytes": 1012085555,
+    "total": 5060427776,
+    "error": null
+  },
+  {
+    "type": "MicLevel",
+    "level": 0.28716582341864194
+  },
+  {
+    "type": "MicLevel",
+    "level": 0.518469277126737
+  },
+  {
+    "type": "MicLevel",
+    "level": 0.6542978504845313
+  },
+  {
+    "type": "VoicePill",
+    "state": {
+      "agent": "alfa",
+      "mic": "listening",
+      "level": 0,
+      "speaker": "nobody",
+      "partial": null
+    }
+  },
+  {
+    "type": "VoicePill",
+    "state": {
+      "agent": "alfa",
+      "mic": "hearing",
+      "level": 0.6,
+      "speaker": "user",
+      "partial": "Co"
+    }
+  },
+  {
+    "type": "VoiceStatusChanged",
+    "status": {
+      "state": "active",
+      "reason": null,
+      "missing": [],
+      "mode": "toggle",
+      "muted": false,
+      "agent": "alfa"
+    }
+  },
+  {
+    "type": "VoicePill",
+    "state": {
+      "agent": "alfa",
+      "mic": "listening",
+      "level": 0,
+      "speaker": "nobody",
+      "partial": null
+    }
+  },
+  {
+    "type": "VoiceStatusChanged",
+    "status": {
+      "state": "active",
+      "reason": null,
+      "missing": [],
+      "mode": "toggle",
+      "muted": false,
+      "agent": "alfa"
+    }
+  },
+  {
+    "type": "SystemStatusChanged",
+    "status": {
+      "online": false,
+      "queued_messages": 0,
+      "rate_limit": null,
+      "keys_configured": true,
+      "profile": "hybrid",
+      "mic": "ok",
+      "disk": {
+        "free_bytes": 212000000000,
+        "low": false
+      }
+    }
+  },
+  {
+    "type": "SystemStatusChanged",
+    "status": {
+      "online": false,
+      "queued_messages": 1,
+      "rate_limit": null,
+      "keys_configured": true,
+      "profile": "hybrid",
+      "mic": "ok",
+      "disk": {
+        "free_bytes": 212000000000,
+        "low": false
+      }
+    }
+  },
+  {
+    "type": "Toast",
+    "kind": "warning",
+    "message": {
+      "pl": "Nadal brak połączenia.",
+      "en": "Still offline."
+    }
+  },
+  {
+    "type": "SystemStatusChanged",
+    "status": {
+      "online": true,
+      "queued_messages": 1,
+      "rate_limit": null,
+      "keys_configured": true,
+      "profile": "hybrid",
+      "mic": "ok",
+      "disk": {
+        "free_bytes": 212000000000,
+        "low": false
+      }
+    }
+  },
+  {
+    "type": "TurnStatus",
+    "session_id": "s-api",
+    "turn_id": "t-muo3lc30-19",
+    "status": "complete"
+  },
+  {
+    "type": "Error",
+    "session_id": "s-trip",
+    "turn_id": "t-muo5qhv0-23",
+    "error": {
+      "code": "rate_limited",
+      "message": "Limit zapytań u dostawcy Anthropic.",
+      "retry_at": "2026-09-30T12:48:02.700Z",
+      "provider": "Anthropic"
+    }
+  },
+  {
+    "type": "MemoryChanged",
+    "scope_key": "global"
+  },
+  {
+    "type": "MemoryChanged",
+    "scope_key": "project:p-x"
+  },
+  {
+    "type": "MemoryChanged",
+    "scope_key": "agent:beta"
+  },
+  {
+    "type": "TaskUpdated",
+    "task": {
+      "id": "u-muoa0tf0-33",
+      "title": "Sprawdź pisownię raportu",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "ready",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "type": "TaskUpdated",
+    "task": {
+      "id": "u-muoa0tf0-34",
+      "title": "Wyślij raport",
+      "parent_id": null,
+      "deps": [
+        {
+          "task_id": "u-muoa0tf0-33",
+          "condition": "succeeded"
+        }
+      ],
+      "assignee": "any",
+      "agent": null,
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "pending",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 0,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "type": "TaskUpdated",
+    "task": {
+      "id": "u-muoa0tf0-33",
+      "title": "Sprawdź pisownię raportu",
+      "parent_id": null,
+      "deps": [],
+      "assignee": "beta",
+      "agent": "alfa",
+      "class": "user",
+      "origin": "user",
+      "origin_detail": null,
+      "executor": "agent",
+      "state": "running",
+      "result": null,
+      "blocked": null,
+      "error": null,
+      "summary": null,
+      "attempt": 1,
+      "max_attempts": 3,
+      "steps": 1,
+      "max_steps": 40,
+      "cost": {
+        "minor": 0,
+        "currency": "PLN"
+      },
+      "session_id": "s-q3",
+      "tainted": false,
+      "submitted_at": "2026-09-30T15:45:02.700Z",
+      "deadline_at": "2026-09-30T16:45:02.700Z"
+    }
+  },
+  {
+    "type": "TriggerFired",
+    "run": {
+      "at": "2026-09-30T16:45:03.200Z",
+      "trigger_id": "porzadki",
+      "cause": "ręcznie",
+      "outcome": "submitted",
+      "task_id": "tr-muoc5zkw-35",
+      "detail": null
+    }
+  },
+  {
+    "type": "GuiActivity",
+    "status": {
+      "available": true,
+      "reason": null,
+      "control": null,
+      "taken_over": true,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "cancelled",
+          "summary": "Wpisz tekst — anulowano",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "type": "GuiActivity",
+    "status": {
+      "available": true,
+      "reason": null,
+      "control": null,
+      "taken_over": false,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "cancelled",
+          "summary": "Wpisz tekst — anulowano",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "type": "SkillsChanged",
+    "skill_id": "porzadki-pobrane"
+  },
+  {
+    "type": "SkillsChanged",
+    "skill_id": "porzadki-pobrane"
+  },
+  {
+    "type": "SkillsChanged",
+    "skill_id": "notatki-dnia"
+  },
+  {
+    "type": "HealthChanged",
+    "overall": "degraded",
+    "pending": 2
+  },
+  {
+    "type": "HealthChanged",
+    "overall": "degraded",
+    "pending": 1
+  },
+  {
+    "type": "HealthChanged",
+    "overall": "degraded",
+    "pending": 1
+  },
+  {
+    "type": "UpdateStatus",
+    "status": {
+      "phase": "available",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "type": "UpdateStatus",
+    "status": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "type": "UpdateStatus",
+    "status": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": {
+        "downloaded": 0,
+        "total": 48234496,
+        "resumed": false
+      },
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T18:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "type": "VoiceFeaturesChanged",
+    "features": {
+      "wake": {
+        "state": "armed",
+        "reason": null,
+        "enabled": false,
+        "risk_accepted": false,
+        "owner_gate": true,
+        "dnd": false,
+        "phrases": [
+          "Hej Alfa",
+          "Hej Beta",
+          "Hej Gama",
+          "Hej Delta"
+        ],
+        "calibration": {
+          "measured": false,
+          "sufficient": false,
+          "passes": false,
+          "far_per_day": null,
+          "frr": null,
+          "threshold": 0.8
+        },
+        "test": {
+          "active": true,
+          "detections": 0,
+          "last_agent": null,
+          "owner_rejected": 0
+        }
+      },
+      "speaker": {
+        "state": "not_enrolled",
+        "reason": null,
+        "done": 0,
+        "needed": 3,
+        "recording": false,
+        "prompts": [
+          {
+            "pl": "Hej Alfa, sprawdź proszę, jaka jutro będzie pogoda w Krakowie.",
+            "en": "Hey Alfa, please check what the weather will be like in Kraków tomorrow."
+          },
+          {
+            "pl": "Przypomnij mi w czwartek o spotkaniu z zespołem o dziewiątej.",
+            "en": "Remind me on Thursday about the team meeting at nine."
+          },
+          {
+            "pl": "Otwórz ostatni raport i przeczytaj mi pierwszy akapit.",
+            "en": "Open the latest report and read me the first paragraph."
+          }
+        ],
+        "last_sample": null,
+        "required_for_risky": true,
+        "last_check": null
+      },
+      "dictation": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "typed_chars": 0,
+        "pending_chars": 0,
+        "can_undo": false,
+        "preview": null,
+        "shortcut": "Ctrl+Alt+D",
+        "profiles": []
+      },
+      "read": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "index": 0,
+        "segments": 0,
+        "rate": 1,
+        "queued": 0,
+        "agent": "alfa",
+        "shortcut": "Ctrl+Alt+R"
+      },
+      "s2s": {
+        "available": false,
+        "reason": {
+          "pl": "Szybka rozmowa w chmurze wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu.",
+          "en": "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation."
+        }
+      }
+    }
+  },
+  {
+    "type": "VoiceFeaturesChanged",
+    "features": {
+      "wake": {
+        "state": "armed",
+        "reason": null,
+        "enabled": false,
+        "risk_accepted": false,
+        "owner_gate": true,
+        "dnd": false,
+        "phrases": [
+          "Hej Alfa",
+          "Hej Beta",
+          "Hej Gama",
+          "Hej Delta"
+        ],
+        "calibration": {
+          "measured": false,
+          "sufficient": false,
+          "passes": false,
+          "far_per_day": null,
+          "frr": null,
+          "threshold": 0.8
+        },
+        "test": {
+          "active": true,
+          "detections": 0,
+          "last_agent": null,
+          "owner_rejected": 1
+        }
+      },
+      "speaker": {
+        "state": "not_enrolled",
+        "reason": null,
+        "done": 0,
+        "needed": 3,
+        "recording": false,
+        "prompts": [
+          {
+            "pl": "Hej Alfa, sprawdź proszę, jaka jutro będzie pogoda w Krakowie.",
+            "en": "Hey Alfa, please check what the weather will be like in Kraków tomorrow."
+          },
+          {
+            "pl": "Przypomnij mi w czwartek o spotkaniu z zespołem o dziewiątej.",
+            "en": "Remind me on Thursday about the team meeting at nine."
+          },
+          {
+            "pl": "Otwórz ostatni raport i przeczytaj mi pierwszy akapit.",
+            "en": "Open the latest report and read me the first paragraph."
+          }
+        ],
+        "last_sample": null,
+        "required_for_risky": true,
+        "last_check": null
+      },
+      "dictation": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "typed_chars": 0,
+        "pending_chars": 0,
+        "can_undo": false,
+        "preview": null,
+        "shortcut": "Ctrl+Alt+D",
+        "profiles": []
+      },
+      "read": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "index": 0,
+        "segments": 0,
+        "rate": 1,
+        "queued": 0,
+        "agent": "alfa",
+        "shortcut": "Ctrl+Alt+R"
+      },
+      "s2s": {
+        "available": false,
+        "reason": {
+          "pl": "Szybka rozmowa w chmurze wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu.",
+          "en": "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation."
+        }
+      }
+    }
+  },
+  {
+    "type": "VoiceFeaturesChanged",
+    "features": {
+      "wake": {
+        "state": "off",
+        "reason": null,
+        "enabled": false,
+        "risk_accepted": false,
+        "owner_gate": true,
+        "dnd": false,
+        "phrases": [
+          "Hej Alfa",
+          "Hej Beta",
+          "Hej Gama",
+          "Hej Delta"
+        ],
+        "calibration": {
+          "measured": false,
+          "sufficient": false,
+          "passes": false,
+          "far_per_day": null,
+          "frr": null,
+          "threshold": 0.8
+        },
+        "test": {
+          "active": false,
+          "detections": 0,
+          "last_agent": null,
+          "owner_rejected": 1
+        }
+      },
+      "speaker": {
+        "state": "not_enrolled",
+        "reason": null,
+        "done": 0,
+        "needed": 3,
+        "recording": false,
+        "prompts": [
+          {
+            "pl": "Hej Alfa, sprawdź proszę, jaka jutro będzie pogoda w Krakowie.",
+            "en": "Hey Alfa, please check what the weather will be like in Kraków tomorrow."
+          },
+          {
+            "pl": "Przypomnij mi w czwartek o spotkaniu z zespołem o dziewiątej.",
+            "en": "Remind me on Thursday about the team meeting at nine."
+          },
+          {
+            "pl": "Otwórz ostatni raport i przeczytaj mi pierwszy akapit.",
+            "en": "Open the latest report and read me the first paragraph."
+          }
+        ],
+        "last_sample": null,
+        "required_for_risky": true,
+        "last_check": null
+      },
+      "dictation": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "typed_chars": 0,
+        "pending_chars": 0,
+        "can_undo": false,
+        "preview": null,
+        "shortcut": "Ctrl+Alt+D",
+        "profiles": []
+      },
+      "read": {
+        "state": "idle",
+        "reason": null,
+        "app": null,
+        "index": 0,
+        "segments": 0,
+        "rate": 1,
+        "queued": 0,
+        "agent": "alfa",
+        "shortcut": "Ctrl+Alt+R"
+      },
+      "s2s": {
+        "available": false,
+        "reason": {
+          "pl": "Szybka rozmowa w chmurze wymaga klucza API dostawcy (OpenAI Realtime) — adapter w przygotowaniu.",
+          "en": "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation."
+        }
+      }
+    }
+  },
+  {
+    "type": "ModelChanged",
+    "item": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "queued",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "type": "ModelChanged",
+    "item": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "downloading",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "type": "ModelProgress",
+    "item_id": "silero-vad",
+    "file": "silero_vad-6.2.3-py3-none-any.whl",
+    "done": 0,
+    "total": 11534336
+  },
+  {
+    "type": "ModelChanged",
+    "item": {
+      "id": "multilingual-e5-small",
+      "kind": "embed",
+      "name": "Multilingual E5 small (ONNX fp32)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 511705088,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\multilingual-e5-small",
+      "files": [
+        {
+          "name": "onnx/model.onnx",
+          "url": "https://example.invalid/onnx/model.onnx",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://example.invalid/tokenizer.json",
+          "size_bytes": 255852544,
+          "pinned_sha256": null,
+          "sha256": null
+        }
+      ],
+      "state": "queued",
+      "pinned": false,
+      "confirmed": false,
+      "downloadable": true,
+      "note": {
+        "pl": "Embedder wyszukiwania semantycznego (pamięć F7).",
+        "en": "Semantic search embedder (F7 memory)."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "type": "ModelProgress",
+    "item_id": "multilingual-e5-small",
+    "file": "onnx/model.onnx",
+    "done": 0,
+    "total": 511705088
+  },
+  {
+    "type": "ModelProgress",
+    "item_id": "silero-vad",
+    "file": "silero_vad-6.2.3-py3-none-any.whl",
+    "done": 2883584,
+    "total": 11534336
+  },
+  {
+    "type": "ReindexStatus",
+    "status": {
+      "running": true,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 0,
+      "done": 0,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": false,
+      "finished": false
+    }
+  },
+  {
+    "type": "ReindexStatus",
+    "status": {
+      "running": true,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 300,
+      "done": 300,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": false,
+      "finished": false
+    }
+  },
+  {
+    "type": "ReindexStatus",
+    "status": {
+      "running": false,
+      "embedder": "multilingual-e5-small@3f2a9c41d0be/384",
+      "databases": 3,
+      "rebuilt": 1,
+      "embedded": 300,
+      "done": 300,
+      "total": 1200,
+      "failed": 0,
+      "cancelled": true,
+      "finished": true
+    }
+  }
+]

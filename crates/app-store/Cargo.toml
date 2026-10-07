@@ -1,0 +1,21 @@
+[package]
+name = "app-store"
+description = "Tabele aplikacji w szyfrowanych bazach sesji (kategoria app-*): fakty o turach spoza kontraktu sessions, log stanów, oceny, oś czasu v0, katalog roboczy, nagłówki i kroki przebiegów agentek (Replay) — wyłącznie dopisywane"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate); używa jej `app-core`.
+[dependencies]
+app-api = { path = "../app-api" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+sessions-contract = { path = "../sessions-contract" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

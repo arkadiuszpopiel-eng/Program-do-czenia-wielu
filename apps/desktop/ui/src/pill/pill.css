@@ -1,0 +1,89 @@
+/* Pigułka 220 × 48 px, zawsze na wierzchu (okno Tauri bez ramki). Ruch tylko transform. */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  font-family: var(--alfa-font-sans);
+  color: var(--alfa-color-text);
+  user-select: none;
+}
+.pill {
+  --accent: var(--alfa-agent-beta);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 220px;
+  height: 48px;
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-overlay);
+  background: var(--alfa-color-surface);
+  box-shadow: var(--alfa-shadow-2);
+  font-size: var(--alfa-font-size-xs);
+}
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+}
+.wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+}
+.bar {
+  width: 3px;
+  height: 24px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: scaleY(0.15);
+}
+.status {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--alfa-color-text-muted);
+}
+.btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin-left: -2px;
+  border: 0;
+  border-radius: var(--alfa-radius-control);
+  background: transparent;
+  color: var(--alfa-color-text);
+  font: inherit;
+}
+.btn:hover {
+  background: var(--alfa-color-surface2);
+}
+.btn[aria-pressed='true'] {
+  background: var(--alfa-color-surface3);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--alfa-color-focus);
+  outline-offset: 1px;
+}
+@media (forced-colors: active) {
+  .bar {
+    background: CanvasText;
+  }
+}

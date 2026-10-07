@@ -1,0 +1,25 @@
+[package]
+name = "agent-builder-fake"
+description = "Kreator agentów (F5): deterministyczna atrapa — ten sam rdzeń co -impl, katalog person i biblioteka w pamięci, nagrane zdarzenia"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+agent-builder-contract = { path = "../agent-builder-contract" }
+personas-contract = { path = "../personas-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+agent-builder-contract = { path = "../agent-builder-contract", features = ["contract-tests"] }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true
