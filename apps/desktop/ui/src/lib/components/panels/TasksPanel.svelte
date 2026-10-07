@@ -10,6 +10,7 @@
   import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
   import TaskNode from './TaskNode.svelte';
 
   interface Props {
@@ -93,7 +94,9 @@
   </div>
   {#if loadError}
     <LoadFailed error={loadError} onretry={() => void loadTasks()} />
-  {:else if loaded && roots.length === 0}
+  {:else if !loaded}
+    <Loading />
+  {:else if roots.length === 0}
     <EmptyState title={t('panel.tasks')} description={t('tasks.empty')}>
       {#snippet icon()}<ListTodo size={20} strokeWidth={1.5} />{/snippet}
     </EmptyState>

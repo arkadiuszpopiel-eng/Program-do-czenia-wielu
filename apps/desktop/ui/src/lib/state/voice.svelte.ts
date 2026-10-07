@@ -40,11 +40,13 @@ export class VoiceUiState {
     this.features = features;
   }
 
-  /** Esc: stop czytania z kolejką (rdzeń czyści też czytany tekst z pamięci). */
-  stopReading(client: AlfaClient): void {
+  /**
+   * Esc: stop czytania z kolejką (rdzeń czyści też czytany tekst z pamięci). Błąd trafia do
+   * `onError` (toast) — Esc, który po cichu nie zatrzymał czytania, wyglądałby na działający.
+   */
+  stopReading(client: AlfaClient, onError: (error: unknown) => void): void {
     void client.voiceFeatures
       .read({ kind: 'control', control: 'stop' })
-      .then((f) => this.applyFeatures(f))
-      .catch(() => undefined);
+      .then((f) => this.applyFeatures(f), onError);
   }
 }

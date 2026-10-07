@@ -40,7 +40,14 @@ export type FakeScenario =
   | 'broker-portable'
   | 'broker-lost'
   | 'broker-no-watchdog'
-  | 'broker-dev';
+  | 'broker-dev'
+  /** Każda komenda poza startem odrzuca błąd rdzenia — audyt obsługi błędów w widokach. */
+  | 'core-errors'
+  /** Rdzeń odpowiada po 1,5 s — audyt stanów ładowania (rejestr wywołań w `fault.ts`). */
+  | 'slow-core';
+
+/** Opóźnienie odpowiedzi w scenariuszu „slow-core”. */
+export const SLOW_CORE_MS = 1_500;
 
 export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'default',
@@ -56,6 +63,8 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'broker-lost',
   'broker-no-watchdog',
   'broker-dev',
+  'core-errors',
+  'slow-core',
 ];
 
 export interface FakeOptions {
@@ -121,7 +130,7 @@ export class FakeCore {
     this.scheduler = options.scheduler ?? realScheduler;
     this.scenario = options.scenario ?? 'default';
     this.tokensPerSecond = options.tokensPerSecond ?? 100;
-    this.latencyMs = options.latencyMs ?? 0;
+    this.latencyMs = options.latencyMs ?? (this.scenario === 'slow-core' ? SLOW_CORE_MS : 0);
     const now = this.scheduler.now();
     const empty = this.scenario === 'empty' || this.scenario === 'first-run';
     this.sessions = empty ? [] : seedSessions(now);

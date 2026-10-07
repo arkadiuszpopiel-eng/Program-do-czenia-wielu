@@ -9,6 +9,7 @@
   import type { ExportResult } from '../../../api/types-hub';
   import type { MemoryScopeInfo } from '../../../api/types-memory';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError, type Loadable } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BackupSection from './BackupSection.svelte';
@@ -109,6 +110,8 @@
     <p class="note">{t('tr.memoryHint')}</p>
     {#if scopes.status === 'failed'}
       <LoadFailed error={scopes.error} onretry={() => void loadScopes()} />
+    {:else if scopes.status === 'loading'}
+      <Loading lines={2} />
     {:else if scopes.status === 'ready'}
       {#each memoryScopes as s (s.key)}
         <Checkbox

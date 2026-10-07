@@ -8,6 +8,7 @@
   import { Button, TextField } from '@alfa/ui-kit';
   import type { MarshalProposalInfo, MarshalState } from '../../../api/types-tasks';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
@@ -143,6 +144,8 @@
 
 {#if loadError}
   <LoadFailed error={loadError} onretry={() => void reload()} />
+{:else if !info}
+  <Loading />
 {/if}
 {#if info}
   <section class="card" aria-labelledby="ms-rules">

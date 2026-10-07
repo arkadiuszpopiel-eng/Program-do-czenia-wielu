@@ -6,7 +6,7 @@ import { stepZoom } from '../logic/layout';
 import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
 import { RESERVED, allowedInInput, chordFromEvent } from '../logic/shortcuts';
 import type { AppState } from './app.svelte';
-import { attempt } from './attempt';
+import { attempt, showError } from './attempt';
 import { exportConversation } from './exports';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
@@ -215,7 +215,7 @@ export function escapeChain(app: AppState): boolean {
     return true;
   }
   if (app.voice.reading) {
-    app.voice.stopReading(app.client);
+    app.voice.stopReading(app.client, (error) => showError(app.toasts, error));
     return true;
   }
   if (app.conversation?.streaming) {

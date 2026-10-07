@@ -15,6 +15,7 @@
   } from '../../../api/types-work';
   import { errorText } from '../../../api/command-error';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { emptyDraft } from '../../../logic/work';
   import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
@@ -134,6 +135,8 @@
 
 {#if loadError}
   <LoadFailed error={loadError} onretry={() => void reload()} />
+{:else if !loaded}
+  <Loading />
 {/if}
 
 {#if policy}

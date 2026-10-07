@@ -3,6 +3,7 @@
   import { Button } from '@alfa/ui-kit';
   import type { DeviceProfile } from '../../../api/types-hub';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
@@ -38,6 +39,8 @@
 
 {#if loadError && !profile}
   <LoadFailed error={loadError} onretry={() => void reload()} />
+{:else if !profile}
+  <Loading />
 {/if}
 
 {#if profile}

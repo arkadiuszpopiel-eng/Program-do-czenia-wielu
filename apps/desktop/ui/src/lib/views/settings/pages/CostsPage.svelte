@@ -2,6 +2,7 @@
 <script lang="ts">
   import { LevelMeter, Switch } from '@alfa/ui-kit';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
@@ -10,11 +11,15 @@
   const costs = $derived(app.costs);
   const uid = $props.id();
   let loadError = $state<string | null>(null);
+  let refreshing = $state(true);
 
   // Strona pokazuje świeże koszty; bez nich (błąd rdzenia) — komunikat z „Ponów", nie pusta strona.
+  // W trakcie odświeżania: szkielet (brak danych) albo `aria-busy` na karcie z ostatnimi danymi.
   async function reload() {
+    refreshing = true;
     const result = await load(() => app.refreshCosts());
     loadError = result.status === 'failed' ? result.error : null;
+    refreshing = false;
   }
 
   $effect(() => {
@@ -39,9 +44,11 @@
 
 {#if loadError}
   <LoadFailed error={loadError} onretry={() => void reload()} />
+{:else if !costs && refreshing}
+  <Loading />
 {/if}
 {#if costs}
-  <section class="card">
+  <section class="card" aria-busy={refreshing}>
     <div class="row">
       <div>
         <h3 id="{uid}-l">{t('costsPage.limitToggle')}</h3>

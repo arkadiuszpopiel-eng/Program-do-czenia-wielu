@@ -21,6 +21,8 @@ const app = new AppState(client);
 window.addEventListener('unhandledrejection', (event) => {
   const reason: unknown = event.reason;
   if (reason instanceof DOMException && reason.name === 'AbortError') return;
+  // Znacznik dla audytu E2E (`e2e/core-errors.spec.ts`): widok nie obsłużył błędu u siebie.
+  console.warn('[alfa] nieobsłużone odrzucenie:', errorText(reason));
   app.toasts.show({ kind: 'error', message: errorText(reason) });
 });
 mount(App, { target, props: { app } });

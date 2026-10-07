@@ -9,6 +9,7 @@
   import { Button, Checkbox, Select, Switch, TextField } from '@alfa/ui-kit';
   import type { BackupCheck, BackupConfig, BackupView } from '../../../api/types-files';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import './work.css';
@@ -94,6 +95,8 @@
   <p class="wk-meta">{t('bk.intro')}</p>
   {#if loadError && !view}
     <LoadFailed error={loadError} onretry={() => void loadStatus()} />
+  {:else if !view || !config}
+    <Loading lines={2} />
   {:else if view && config}
     <div class="wk-actions">
       <span>{t('bk.dir')}:</span>

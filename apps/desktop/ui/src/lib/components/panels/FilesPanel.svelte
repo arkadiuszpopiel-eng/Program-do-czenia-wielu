@@ -7,6 +7,7 @@
   import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
 
   interface Props {
     sessionId: string;
@@ -78,7 +79,9 @@
 
 {#if loadError}
   <LoadFailed error={loadError} onretry={() => void loadFiles()} />
-{:else if loaded && files.length === 0}
+{:else if !loaded}
+  <Loading />
+{:else if files.length === 0}
   <EmptyState title={t('panel.files')} description={t('files.empty')}>
     {#snippet icon()}<FolderOpen size={20} strokeWidth={1.5} />{/snippet}
   </EmptyState>

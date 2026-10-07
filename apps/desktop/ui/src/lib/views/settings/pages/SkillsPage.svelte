@@ -8,6 +8,7 @@
   import { Button } from '@alfa/ui-kit';
   import type { SkillInfo } from '../../../api/types-work';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import SkillReview from './SkillReview.svelte';
@@ -103,7 +104,8 @@
     <Button size="sm" variant="secondary" onclick={exportBundle}>{t('skills.export')}</Button>
     <Button size="sm" variant="secondary" onclick={importBundle}>{t('skills.import')}</Button>
   </div>
-  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />
+  {:else if !loaded}<Loading />{/if}
 </section>
 
 {#if reviewing}

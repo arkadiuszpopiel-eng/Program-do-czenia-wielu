@@ -11,6 +11,7 @@
   import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
   import DesktopGrant from './DesktopGrant.svelte';
 
   interface Props {
@@ -74,7 +75,7 @@
     <LoadFailed error={statusError} onretry={() => void loadStatus()} />
   {/if}
   {#if !gui}
-    {#if !statusError}<p class="muted">{t('common.loading')}</p>{/if}
+    {#if !statusError}<Loading />{/if}
   {:else}
     {#if !gui.available}
       <p class="note" role="status">

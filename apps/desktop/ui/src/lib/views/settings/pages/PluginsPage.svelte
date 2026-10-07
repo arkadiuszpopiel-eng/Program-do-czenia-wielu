@@ -10,6 +10,7 @@
   import { errorText } from '../../../api/command-error';
   import type { PluginInfo, PluginInspection, PluginsView } from '../../../api/types-plugins';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { useApp } from '../../../state/context';
   import PluginReview from './PluginReview.svelte';
   import './work.css';
@@ -111,7 +112,8 @@
       {t('plugins.unavailable', { reason: view.unavailable_reason ?? '' })}
     </p>
   {/if}
-  {#if loadError}<LoadFailed error={loadError} onretry={() => void load()} />{/if}
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void load()} />
+  {:else if !view}<Loading />{/if}
 </section>
 
 {#if reviewing}

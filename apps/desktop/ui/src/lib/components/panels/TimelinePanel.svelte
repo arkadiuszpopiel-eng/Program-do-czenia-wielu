@@ -14,6 +14,7 @@
   import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
   import ReplayView from './ReplayView.svelte';
 
   interface Props {
@@ -46,6 +47,7 @@
   let minLevel = $state<string>('info');
   let events = $state<TimelineEvent[]>([]);
   let loadError = $state<string | null>(null);
+  let loaded = $state(false);
   /** Numer ostatniego zapytania — po zmianie filtrów starsze odpowiedzi odpadają. */
   let requestSeq = 0;
 
@@ -57,6 +59,7 @@
     if (seq !== requestSeq) return;
     if (result.status === 'ready') {
       events = [...result.value];
+      loaded = true;
       loadError = null;
     } else if (result.status === 'failed') {
       loadError = result.error;
@@ -130,6 +133,8 @@
     </p>
     {#if loadError}
       <LoadFailed error={loadError} onretry={() => void loadEvents()} />
+    {:else if !loaded}
+      <Loading />
     {:else if shown.length === 0}
       <p class="empty">{t('timeline.empty')}</p>
     {:else}

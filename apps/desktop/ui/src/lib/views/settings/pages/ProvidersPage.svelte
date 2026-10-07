@@ -5,6 +5,7 @@
   import Plus from '@lucide/svelte/icons/plus';
   import type { Account, ProviderInfo } from '../../../api/types-hub';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import AddProviderWizard from './AddProviderWizard.svelte';
@@ -102,6 +103,8 @@
   {/if}
   {#if loadError}
     <LoadFailed error={loadError} onretry={() => void reload()} />
+  {:else if !loaded}
+    <Loading />
   {/if}
   {#if loaded && !loadError && accounts.length === 0 && !wizard}
     <EmptyState title={t('hub.accounts')} description={t('hub.empty')}>

@@ -10,6 +10,7 @@
   import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
   import DictationCard from '../voice/DictationCard.svelte';
   import ReadCard from '../voice/ReadCard.svelte';
   import SpeakerEnroll from '../voice/SpeakerEnroll.svelte';
@@ -106,7 +107,7 @@
     <LoadFailed error={featuresError} onretry={() => void loadFeatures()} />
   {/if}
   {#if !features}
-    {#if !featuresError}<p class="vf-muted">{t('vf.loading')}</p>{/if}
+    {#if !featuresError}<Loading label={t('vf.loading')} />{/if}
   {:else}
     <WakeCard {features} />
     <SpeakerEnroll {features} />

@@ -7,6 +7,7 @@
   import { Button } from '@alfa/ui-kit';
   import type { HealthView } from '../../../api/types-work';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import ImproverSection from './ImproverSection.svelte';
@@ -50,7 +51,8 @@
 <section class="wk-card" aria-labelledby="hl-title">
   <h3 id="hl-title">{t('health.title')}</h3>
   <p>{t('health.intro')}</p>
-  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />
+  {:else if !view}<Loading />{/if}
   {#if view}
     <p role="status" class:wk-ok={view.overall === 'ok'} class:wk-warn={view.overall !== 'ok'}>
       {tk(`health.overall.${view.overall}`)} · {t('health.generated', {

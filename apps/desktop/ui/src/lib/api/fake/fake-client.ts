@@ -32,6 +32,7 @@ import { FakePlugins } from './api-plugins';
 import { FakeEngines } from './api-engines';
 import { FakeFiles } from './api-files';
 import { FakeCore, type FakeOptions } from './core';
+import { injectCoreErrors, recordCalls } from './fault';
 
 export { FAKE_SCENARIOS, type FakeScenario, type FakeOptions } from './core';
 export { VirtualScheduler } from './scheduler';
@@ -119,6 +120,8 @@ export class FakeAlfaClient implements AlfaClient {
     this.attachments = files.attachmentsApi();
     this.conversation = files.conversationApi();
     this.backups = files.backupsApi();
+    if (core.scenario === 'core-errors') injectCoreErrors(this);
+    if (core.scenario === 'slow-core') recordCalls(this);
   }
 
   subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {

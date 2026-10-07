@@ -11,6 +11,7 @@
     MemoryStatus,
   } from '../../../api/types-memory';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
@@ -95,6 +96,8 @@
 
 {#if loadError}
   <LoadFailed error={loadError} onretry={() => void reload()} />
+{:else if !loaded}
+  <Loading />
 {/if}
 {#if status}
   {@const last = status.last}

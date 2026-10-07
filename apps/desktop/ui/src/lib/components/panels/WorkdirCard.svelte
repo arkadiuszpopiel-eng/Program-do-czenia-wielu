@@ -9,6 +9,7 @@
   import { load, showError } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
 
   interface Props {
     sessionId: string;
@@ -59,7 +60,9 @@
   </h3>
   {#if loadError}
     <LoadFailed error={loadError} onretry={() => void loadWorkdir()} />
-  {:else if workdir}
+  {:else if !workdir}
+    <Loading lines={2} />
+  {:else}
     {#if workdir.path}
       <p class="path"><code>{workdir.path}</code></p>
       <p class="hint">{t('workdir.on')}</p>

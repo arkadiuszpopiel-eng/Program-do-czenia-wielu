@@ -16,6 +16,7 @@
   import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import Loading from '../shell/Loading.svelte';
   import MemoryDetail from './MemoryDetail.svelte';
 
   interface Props {
@@ -136,7 +137,9 @@
 
   {#if loadError}
     <LoadFailed error={loadError} onretry={() => void refresh()} />
-  {:else if loaded && items.length === 0}
+  {:else if !loaded}
+    <Loading />
+  {:else if items.length === 0}
     <EmptyState title={t('panel.memory')} description={t('memory.empty')}>
       {#snippet icon()}<Brain size={20} strokeWidth={1.5} />{/snippet}
     </EmptyState>

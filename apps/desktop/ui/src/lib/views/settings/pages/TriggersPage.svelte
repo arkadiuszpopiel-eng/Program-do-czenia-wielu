@@ -7,6 +7,7 @@
   import Timer from '@lucide/svelte/icons/timer';
   import type { TriggerInfo, TriggerKindView, TriggerRunInfo } from '../../../api/types-tasks';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import TriggerForm from './TriggerForm.svelte';
@@ -68,6 +69,8 @@
   <p class="desc">{t('triggers.intro')}</p>
   {#if loadError}
     <LoadFailed error={loadError} onretry={() => void reload()} />
+  {:else if !loaded}
+    <Loading />
   {/if}
   {#if loaded && triggers.length === 0}
     <EmptyState title={t('triggers.title')} description={t('triggers.empty')}>

@@ -27,7 +27,7 @@
 {#if gui?.taken_over}
   <div class="gui taken" role="status">
     <button type="button" class="label" onclick={() => app.openPanel('screen')}
-      >{t('gui.takenOver')}</button
+      ><span class="text">{t('gui.takenOver')}</span></button
     >
     <button type="button" class="act" onclick={() => act(() => app.client.gui.release())}
       >{t('gui.release')}</button
@@ -43,7 +43,7 @@
       onclick={() => app.openPanel('screen')}
     >
       <MousePointer size={14} strokeWidth={1.5} aria-hidden="true" />
-      {t('gui.controlling', { name })}
+      <span class="text">{t('gui.controlling', { name })}</span>
     </button>
     <button type="button" class="act stop" onclick={() => act(() => app.client.gui.stop())}
       >{t('gui.stopShort')}</button
@@ -52,9 +52,13 @@
 {/if}
 
 <style>
+  /* Wąskie okno: kapsuła się zwęża (tekst z wielokropkiem), nigdy nie łamie się na kilka linii
+     w pasku tytułu; poniżej 720 px zostaje ikona (etykieta dla czytników w aria-label). */
   .gui {
     display: flex;
+    flex: 0 1 auto;
     align-items: center;
+    min-width: 0;
     gap: 2px;
     height: 26px;
     padding: 0 2px 0 var(--alfa-space-2);
@@ -79,8 +83,23 @@
     font: inherit;
     cursor: pointer;
   }
+  .label {
+    min-width: 0;
+  }
+  .text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .act {
+    flex: none;
     border: 1px solid var(--alfa-color-border-strong);
+    white-space: nowrap;
+  }
+  @media (max-width: 720px) {
+    .live .text {
+      display: none;
+    }
   }
   .stop {
     border-color: var(--alfa-color-error);
