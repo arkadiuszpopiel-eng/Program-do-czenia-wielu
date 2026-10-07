@@ -13,7 +13,11 @@ describe('responsywność §14.2', () => {
 
   it('rozmieszczenie paneli', () => {
     expect(resolvePanels('wide', true, true, false)).toEqual({ left: 'docked', right: 'docked' });
-    expect(resolvePanels('medium', true, true, false)).toEqual({ left: 'docked', right: 'drawer' });
+    expect(resolvePanels('medium', true, true, false)).toEqual({ left: 'rail', right: 'docked' });
+    expect(resolvePanels('medium', true, false, false)).toEqual({
+      left: 'docked',
+      right: 'hidden',
+    });
     expect(resolvePanels('medium', false, true, false)).toEqual({
       left: 'hidden',
       right: 'docked',

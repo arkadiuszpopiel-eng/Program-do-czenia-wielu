@@ -80,6 +80,23 @@ describe('LayoutState', () => {
     expect(l.placement('s1')).toEqual({ left: 'hidden', right: 'hidden' });
   });
 
+  it('laptop (1280 px): prawy panel dokuje się obok rozmowy, Sesje zwijają się do paska ikon', () => {
+    const l = new LayoutState();
+    l.width = 1280;
+    l.update('s1', { left_open: true, right_open: true });
+    expect(l.placement('s1')).toEqual({ left: 'rail', right: 'docked' });
+    // Rozwinięcie paska nie może być martwym przyciskiem: zamyka prawy panel.
+    l.expandLeft('s1');
+    expect(l.placement('s1')).toEqual({ left: 'docked', right: 'hidden' });
+    // Pasek zwinięty ręcznie rozwija się bez ruszania prawego panelu (szerokie okno).
+    l.width = 1600;
+    l.update('s1', { right_open: true });
+    l.setLeftCollapsed(true);
+    l.expandLeft('s1');
+    expect(l.leftCollapsed).toBe(false);
+    expect(l.placement('s1')).toEqual({ left: 'docked', right: 'docked' });
+  });
+
   it('odczyt i zapis preferencji', () => {
     const l = new LayoutState();
     l.load({

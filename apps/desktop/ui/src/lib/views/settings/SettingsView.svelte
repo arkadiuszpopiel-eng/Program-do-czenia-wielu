@@ -10,6 +10,7 @@
   import type { SettingsPageDef } from '../../api/types-system';
   import LoadFailed from '../../components/shell/LoadFailed.svelte';
   import { bestScore } from '../../logic/fuzzy';
+  import { groupSettingsPages } from '../../logic/settings-groups';
   import { load, type Loadable } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import SettingRow from './SettingRow.svelte';
@@ -36,6 +37,7 @@
   const { t } = app.i18n;
   let loaded = $state<Loadable<readonly SettingsPageDef[]>>({ status: 'loading' });
   const schema = $derived(loaded.status === 'ready' ? loaded.value : []);
+  const groups = $derived(groupSettingsPages(schema));
   let query = $state('');
 
   // Bez schematu nie ma żadnej sekcji — błąd rdzenia pokazujemy z „Ponów" zamiast pustego widoku.
@@ -96,22 +98,25 @@
       />
     </div>
     <nav aria-label={t('settings.tree')}>
-      <ul class="tree">
-        {#each schema as p (p.id)}
-          <li>
-            <button
-              type="button"
-              class="node"
-              class:later={p.wave > 1}
-              aria-current={p.id === page?.id && !query ? 'page' : undefined}
-              onclick={() => open(p.id)}
-            >
-              <span>{app.i18n.text(p.label)}</span>
-              {#if p.wave > 1}<span class="wave">{t('settings.wave', { n: p.wave })}</span>{/if}
-            </button>
-          </li>
-        {/each}
-      </ul>
+      {#each groups as group (group.id)}
+        <p class="group" id="settings-group-{group.id}">{t(`settings.group.${group.id}`)}</p>
+        <ul class="tree" aria-labelledby="settings-group-{group.id}">
+          {#each group.pages as p (p.id)}
+            <li>
+              <button
+                type="button"
+                class="node"
+                class:later={p.wave > 1}
+                aria-current={p.id === page?.id && !query ? 'page' : undefined}
+                onclick={() => open(p.id)}
+              >
+                <span>{app.i18n.text(p.label)}</span>
+                {#if p.wave > 1}<span class="wave">{t('settings.soon')}</span>{/if}
+              </button>
+            </li>
+          {/each}
+        </ul>
+      {/each}
     </nav>
   </aside>
   <section class="content" aria-labelledby="settings-page-title">
@@ -140,10 +145,7 @@
       {:else if page}
         <h2 class="h2" id="settings-page-title" tabindex="-1">{app.i18n.text(page.label)}</h2>
         {#if page.wave > 1}
-          <EmptyState
-            title={t('settings.later', { wave: page.wave })}
-            description={t('settings.laterList')}
-          >
+          <EmptyState title={t('settings.later')} description={t('settings.laterList')}>
             {#snippet icon()}<Hourglass size={20} strokeWidth={1.5} />{/snippet}
             <ul class="upcoming">
               {#each page.upcoming as item (item.pl)}<li>{app.i18n.text(item)}</li>{/each}
@@ -232,6 +234,15 @@
   .search:focus-within {
     outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
     outline-offset: 1px;
+  }
+  .group {
+    margin: var(--alfa-space-3) 0 var(--alfa-space-1);
+    padding: 0 var(--alfa-space-2);
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-xs);
+    font-weight: var(--alfa-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .tree {
     display: flex;

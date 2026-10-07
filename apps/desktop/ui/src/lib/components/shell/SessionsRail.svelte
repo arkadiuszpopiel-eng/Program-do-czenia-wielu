@@ -12,7 +12,7 @@
 </script>
 
 <nav class="rail" aria-label={t('sessions.title')}>
-  <IconButton label={t('sessions.expand')} onclick={() => app.layout.setLeftCollapsed(false)}>
+  <IconButton label={t('sessions.expand')} onclick={() => app.layout.expandLeft(app.activeId)}>
     <PanelLeftOpen size={18} strokeWidth={1.5} />
   </IconButton>
   <IconButton label={t('sessions.new')} onclick={() => void app.newSession()}>

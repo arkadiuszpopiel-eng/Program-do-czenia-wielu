@@ -71,6 +71,15 @@ export class LayoutState {
     this.save();
   }
 
+  /**
+   * Rozwija pasek ikon do pełnego panelu Sesje. W trybie „medium” pasek jest wymuszony otwartym
+   * prawym panelem (oba się nie mieszczą) — wtedy rozwinięcie zamyka prawy panel.
+   */
+  expandLeft(sessionId: string | null): void {
+    if (this.leftCollapsed) this.setLeftCollapsed(false);
+    if (this.placement(sessionId).left === 'rail') this.update(sessionId, { right_open: false });
+  }
+
   setLeftCollapsed(collapsed: boolean): void {
     this.leftCollapsed = collapsed;
     this.save();

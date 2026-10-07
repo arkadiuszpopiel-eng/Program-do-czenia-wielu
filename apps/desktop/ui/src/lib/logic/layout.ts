@@ -1,7 +1,7 @@
 // Responsywność okna (PLAN §14.2) i ograniczenia szerokości paneli.
 
 export type LayoutMode = 'wide' | 'medium' | 'narrow' | 'compact';
-export type PanelPlacement = 'docked' | 'drawer' | 'sheet' | 'hidden';
+export type PanelPlacement = 'docked' | 'rail' | 'drawer' | 'sheet' | 'hidden';
 
 export const LEFT_MIN = 240;
 export const LEFT_MAX = 320;
@@ -27,7 +27,8 @@ export interface PanelLayout {
 
 /**
  * - ≥ 1440: oba panele zadokowane;
- * - 1100–1440: jeden zadokowany (lewy ma pierwszeństwo), drugi jako szuflada;
+ * - 1100–1440: prawy zadokowany; lewy zadokowany, a gdy otwarte są oba — zwinięty do paska ikon,
+ *   żeby prawy panel nie zasłaniał rozmowy (laptop 1080p przy 150 % to 1280 px);
  * - 720–1100: oba jako szuflady nad treścią;
  * - < 720: arkusze pełnoekranowe (najwyżej jeden naraz — prawy wygrywa jako ostatnio otwarty).
  */
@@ -45,8 +46,8 @@ export function resolvePanels(
       return { left: hide(leftOpen, 'docked'), right: hide(rightOpen, 'docked') };
     case 'medium':
       return {
-        left: hide(leftOpen, 'docked'),
-        right: hide(rightOpen, leftOpen ? 'drawer' : 'docked'),
+        left: hide(leftOpen, rightOpen ? 'rail' : 'docked'),
+        right: hide(rightOpen, 'docked'),
       };
     case 'narrow':
       return {
