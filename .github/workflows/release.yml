@@ -38,7 +38,7 @@ jobs:
       ALFA_UPDATE_FEED: ${{ vars.ALFA_UPDATE_FEED }}
       ALFA_BUILD_COMMIT: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: pnpm/action-setup@v4
