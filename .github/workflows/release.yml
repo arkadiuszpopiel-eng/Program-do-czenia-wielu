@@ -170,7 +170,7 @@ jobs:
       MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
       ALFA_UPDATE_PUBKEY: ${{ vars.ALFA_UPDATE_PUBKEY }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: alfa-${{ needs.build.outputs.version }}
           path: dist
