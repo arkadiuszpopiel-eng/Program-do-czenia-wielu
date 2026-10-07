@@ -50,3 +50,32 @@ fn every_command_has_a_send_future_with_matching_types() {
     assert_eq!(app_core::CHANNEL_COMMANDS, ["terminal_open"]);
     let _ = terminal_open;
 }
+
+/// Każda komenda ma uprawnienie `allow-<komenda>` w co najmniej jednym oknie powłoki
+/// (`apps/desktop/src-tauri/capabilities/*.json`). Brak wpisu = Tauri odrzuca wywołanie
+/// („… not allowed”) tylko w prawdziwej aplikacji — atrapa UI tego nie widzi (pakiety 1–6,
+/// 2026-10-07: `models_bundles not allowed` na laptopie, zielone testy UI).
+#[test]
+fn every_command_is_granted_to_some_window() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../apps/desktop/src-tauri/capabilities");
+    let mut granted = std::collections::BTreeSet::new();
+    for window in ["main", "quick", "pill"] {
+        let text = std::fs::read_to_string(dir.join(format!("{window}.json"))).unwrap();
+        let json: serde_json::Value = serde_json::from_str(&text).unwrap();
+        for p in json["permissions"].as_array().unwrap() {
+            if let Some(name) = p.as_str().and_then(|p| p.strip_prefix("allow-")) {
+                granted.insert(name.replace('-', "_"));
+            }
+        }
+    }
+    let missing: Vec<&str> = app_core::COMMANDS
+        .iter()
+        .copied()
+        .filter(|c| !granted.contains(*c))
+        .collect();
+    assert!(
+        missing.is_empty(),
+        "komendy bez uprawnienia w capabilities/*.json: {missing:?}"
+    );
+}
