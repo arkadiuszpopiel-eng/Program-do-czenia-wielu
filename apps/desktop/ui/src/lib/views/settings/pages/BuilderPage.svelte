@@ -113,7 +113,7 @@
 </script>
 
 <section class="wk-card" aria-labelledby="bd-title">
-  <h3 id="bd-title">{t('builder.title')}</h3>
+  <h3 id="bd-title" class="alfa-visually-hidden">{t('builder.title')}</h3>
   <p>{t('builder.intro')}</p>
   <label class="wk-field">
     <span>{t('builder.describe')}</span>

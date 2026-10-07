@@ -14,6 +14,7 @@
     MemoryState,
   } from '../../api/types-memory';
   import { load } from '../../state/attempt';
+  import { scopeTitle } from '../../logic/memory-scope';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import Loading from '../shell/Loading.svelte';
@@ -92,7 +93,7 @@
     { value: 'all', label: t('memory.scope.all') },
     ...scopes.map((s) => ({
       value: s.key,
-      label: `${t(`memory.scopeKind.${s.scope.kind}`)}: ${s.label}`,
+      label: scopeTitle(t(`memory.scopeKind.${s.scope.kind}`), s.label),
     })),
   ]);
 </script>

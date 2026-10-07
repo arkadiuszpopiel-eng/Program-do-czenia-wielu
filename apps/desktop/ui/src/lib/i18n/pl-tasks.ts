@@ -142,7 +142,7 @@ export const plTasks = {
   'bridges.copyUrl': 'Kopiuj adres',
   'bridges.allowed': 'Dozwolone',
   'bridges.forbidden': 'Zabronione',
-  'bridges.enabled': 'Trasa włączona',
+  'bridges.enabled': 'Włącz trasę',
   'bridges.schedule': 'Zgoda na uruchamianie z harmonogramu',
   'bridges.scheduleWarn':
     'Most uruchomiony z harmonogramu działa bez Ciebie przy komputerze — na Twoim koncie i według regulaminu dostawcy. Wyzwalacze zdarzeniowe nigdy nie uruchamiają mostów.',

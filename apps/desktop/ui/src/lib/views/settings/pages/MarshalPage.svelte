@@ -81,7 +81,7 @@
 </script>
 
 <section class="card" aria-labelledby="ms-title">
-  <h3 id="ms-title">{t('marshal.title')}</h3>
+  <h3 id="ms-title" class="alfa-visually-hidden">{t('marshal.title')}</h3>
   <p class="desc">{t('marshal.intro')}</p>
   {#if info && !info.translator}<p class="note">{t('marshal.noTranslator')}</p>{/if}
   <form

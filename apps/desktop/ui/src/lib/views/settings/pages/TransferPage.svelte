@@ -11,6 +11,7 @@
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError, type Loadable } from '../../../state/attempt';
+  import { scopeTitle } from '../../../logic/memory-scope';
   import { useApp } from '../../../state/context';
   import BackupSection from './BackupSection.svelte';
   import TransferImport from './TransferImport.svelte';
@@ -115,7 +116,7 @@
     {:else if scopes.status === 'ready'}
       {#each memoryScopes as s (s.key)}
         <Checkbox
-          label={`${app.i18n.tk(`memory.scopeKind.${s.scope.kind}`)}: ${s.label}`}
+          label={scopeTitle(app.i18n.tk(`memory.scopeKind.${s.scope.kind}`), s.label)}
           checked={memory.includes(s.key)}
           onchange={(on) => (memory = on ? [...memory, s.key] : memory.filter((x) => x !== s.key))}
         />

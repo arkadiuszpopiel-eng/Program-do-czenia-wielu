@@ -85,3 +85,30 @@ for (const width of [1280, 720, 480, 400]) {
     expect(outside, `pasek tytułu ${width} px`).toEqual([]);
   });
 }
+
+// Panel prawy ma 7 kart; w wąskim panelu dwie ostatnie („Ekran”, „Głos”) wypadały poza krawędź
+// bez paska przewijania — nie dało się do nich dojść myszą.
+for (const width of [1280, 1600]) {
+  test(`panel prawy w oknie ${width} px: wszystkie karty widoczne i klikalne`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await openApp(page);
+    await waitForChat(page);
+    await page.keyboard.press('Alt+1');
+    const tablist = page.getByRole('tablist', { name: 'Panel boczny' });
+    await expect(tablist).toBeVisible();
+    const tabs = tablist.getByRole('tab');
+    await expect(tabs).toHaveCount(7);
+    const box = await tablist.boundingBox();
+    expect(box).not.toBeNull();
+    for (const tab of await tabs.all()) {
+      const r = await tab.boundingBox();
+      const name = await tab.innerText();
+      expect(r, name).not.toBeNull();
+      if (!r || !box) continue;
+      expect(r.x, `${name}: lewa krawędź`).toBeGreaterThanOrEqual(box.x - 1);
+      expect(r.x + r.width, `${name}: prawa krawędź`).toBeLessThanOrEqual(box.x + box.width + 1);
+    }
+    await tabs.filter({ hasText: 'Głos' }).click();
+    await expect(tabs.filter({ hasText: 'Głos' })).toHaveAttribute('aria-selected', 'true');
+  });
+}

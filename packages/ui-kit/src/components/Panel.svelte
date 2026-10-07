@@ -155,7 +155,7 @@
   }
   .tabs-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     border-bottom: 1px solid var(--alfa-color-border);
   }
   .tabs-row > .actions {
@@ -167,8 +167,9 @@
     min-width: 0;
     gap: var(--alfa-space-1);
     padding: 0 var(--alfa-space-2);
-    overflow-x: auto;
-    scrollbar-width: none;
+    /* Karty, które nie mieszczą się w wąskim panelu, zawijają się do drugiego wiersza. Wcześniej
+       wypadały poza krawędź bez paska przewijania i nie dało się do nich dojść myszą. */
+    flex-wrap: wrap;
   }
   .tab {
     position: relative;

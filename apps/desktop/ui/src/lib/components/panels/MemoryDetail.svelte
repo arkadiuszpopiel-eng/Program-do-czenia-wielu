@@ -12,6 +12,7 @@
     MemoryScopeRef,
   } from '../../api/types-memory';
   import { attempt, load } from '../../state/attempt';
+  import { scopeTitle } from '../../logic/memory-scope';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import MemoryJournal from './MemoryJournal.svelte';
@@ -70,7 +71,7 @@
         .filter((s) => RANK[s.scope.kind] > mine)
         .map((s) => ({
           value: s.key,
-          label: `${t(`memory.scopeKind.${s.scope.kind}`)}: ${s.label}`,
+          label: scopeTitle(t(`memory.scopeKind.${s.scope.kind}`), s.label),
           ref: s.scope,
         }));
       if (mine < 2 && !out.some((o) => o.value === 'global')) {

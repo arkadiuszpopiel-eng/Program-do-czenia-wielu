@@ -22,6 +22,23 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   const gui = $derived(app.work.gui);
+  // Identyfikator narzędzia (`input_type_text`) po ludzku; nieznany zostaje dosłownie.
+  const GUI_TOOLS = new Set([
+    'input_click',
+    'input_keys',
+    'input_scroll',
+    'input_type_text',
+    'screen_capture',
+    'uia_act',
+    'uia_find',
+    'uia_read_text',
+    'uia_tree',
+    'window_focus',
+    'window_list',
+    'window_move',
+    'window_state',
+  ]);
+  const toolName = (tool: string) => (GUI_TOOLS.has(tool) ? tk(`gui.tool.${tool}`) : tool);
   const shotAt = $derived(gui?.screenshot?.at ?? null);
   let shot = $state<GuiScreenshot | null>(null);
   let statusError = $state<string | null>(null);
@@ -94,7 +111,7 @@
           {gui.control
             ? t('gui.controllingTool', {
                 name: agentName(gui.control.agent),
-                tool: gui.control.tool,
+                tool: toolName(gui.control.tool),
               })
             : t('gui.idle')}
         </p>

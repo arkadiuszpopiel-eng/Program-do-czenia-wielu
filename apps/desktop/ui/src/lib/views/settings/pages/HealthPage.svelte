@@ -66,7 +66,7 @@
 </script>
 
 <section class="wk-card" aria-labelledby="hl-title">
-  <h3 id="hl-title">{t('health.title')}</h3>
+  <h3 id="hl-title" class="alfa-visually-hidden">{t('health.title')}</h3>
   <p>{t('health.intro')}</p>
   {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />
   {:else if !view}<Loading />{/if}

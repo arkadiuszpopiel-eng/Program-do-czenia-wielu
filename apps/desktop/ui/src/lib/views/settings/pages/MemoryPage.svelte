@@ -13,6 +13,7 @@
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load, showError } from '../../../state/attempt';
+  import { scopeTitle } from '../../../logic/memory-scope';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -141,7 +142,7 @@
     <ul class="scopes">
       {#each scopes as s (s.key)}
         <li>
-          <span class="name">{t(`memory.scopeKind.${s.scope.kind}`)}: {s.label}</span>
+          <span class="name">{scopeTitle(t(`memory.scopeKind.${s.scope.kind}`), s.label)}</span>
           <span class="muted"
             >{t('memory.count', { n: s.entries })} · {t('memory.scopeEntries', {
               active: s.active,
@@ -149,7 +150,8 @@
             })}{#if !s.document}
               · {t('memory.privateScope')}{/if}</span
           >
-          <Button size="sm" variant="danger" onclick={() => showForgetPreview(s.key)}
+          <!-- Zwykły przycisk: to dopiero podgląd; czerwone jest potwierdzenie niżej. -->
+          <Button size="sm" variant="secondary" onclick={() => showForgetPreview(s.key)}
             >{t('memory.forgetScope')}</Button
           >
         </li>
@@ -217,6 +219,9 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--alfa-space-2);
+  }
+  .scopes li > :global(button) {
+    margin-left: auto;
   }
   .name {
     font-weight: var(--alfa-weight-semibold);

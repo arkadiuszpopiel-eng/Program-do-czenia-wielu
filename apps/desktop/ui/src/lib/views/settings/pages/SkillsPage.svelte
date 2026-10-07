@@ -98,7 +98,7 @@
 </script>
 
 <section class="wk-card" aria-labelledby="sk-title">
-  <h3 id="sk-title">{t('skills.title')}</h3>
+  <h3 id="sk-title" class="alfa-visually-hidden">{t('skills.title')}</h3>
   <p>{t('skills.intro')}</p>
   <div class="wk-actions">
     <Button size="sm" variant="secondary" onclick={exportBundle}>{t('skills.export')}</Button>
