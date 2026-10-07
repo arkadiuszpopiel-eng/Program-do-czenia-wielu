@@ -200,9 +200,16 @@
     width: 260px;
     flex: none;
     padding: var(--alfa-space-3);
-    overflow: auto;
     border-right: 1px solid var(--alfa-color-border);
     background: var(--alfa-color-surface);
+  }
+  /* Przewija się tylko lista stron — „Wróć do rozmowy” i wyszukiwarka zostają na miejscu. */
+  .nav > nav {
+    flex: 1;
+    min-height: 0;
+    margin: 0 calc(-1 * var(--alfa-space-3));
+    padding: 0 var(--alfa-space-3);
+    overflow: auto;
   }
   .nav > :global(button:first-child) {
     align-self: flex-start;
