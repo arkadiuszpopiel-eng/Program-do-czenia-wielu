@@ -50,3 +50,15 @@ Zatrzymanie dwustopniowe: ducking −15 dB < 50 ms → twardy stop po ≥ 150–
 - Każdy silnik jest `-impl` za kontraktem (`voice-tts-contract`, `voice-stt-contract`); wymiana kandydata po Voice Lab nie dotyka `voice-dialog`.
 - Gdyby `wasapi` okazał się niewystarczający, alternatywą jest własna warstwa na windows-rs (IAudioClient3) w `platform-windows` — ten sam kontrakt `voice-audio`.
 - No-go castingu (średnia ocen TTS < 4,0) nie blokuje F1 — zostają głosy v0.
+
+## Aktualizacja 2026-10-07 — `wasapi` 0.24.0 → 0.25.0 (RUSTSEC-2026-0332)
+
+- **Powód:** ostrzeżenie [RUSTSEC-2026-0332](https://rustsec.org/advisories/RUSTSEC-2026-0332) (`unsound`):
+  w 0.24.0 bezpieczna funkcja `WaveFormat::parse(&WAVEFORMATEX)` czyta poza nagłówkiem, gdy
+  `wFormatTag = WAVE_FORMAT_EXTENSIBLE`. `cargo deny` (CI) odrzuca 0.24.0.
+- **Zmiana:** 0.25.0 (poprawka `2562db7`): `parse` jest teraz `unsafe fn` na wskaźniku; bezpieczna
+  alternatywa to `WaveFormat::parse_from_blob_bytes`. `voice-audio-impl` nie woła `parse` — reszta
+  używanego API (`DeviceEnumerator`, `AudioClient`, `WaveFormat::new`, `get_device_format`, strumień
+  zdarzeniowy) bez zmian; 0.25.0 nadal zależy od `windows` 0.62 (jedna wersja windows-rs w workspace).
+- **Sprawdzenie:** `cargo clippy -p voice-audio-impl --target x86_64-pc-windows-msvc -D warnings`,
+  `cargo deny check`, testy `voice-audio-impl` (Linux) i job „Rust (windows-latest)” w CI.

@@ -16,7 +16,7 @@ async-trait.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 # ADR 0011: audio przez `wasapi` (MIT); zależy od `windows` 0.62 — tej samej wersji co platform-windows-impl.
-wasapi = "0.24.0"
+wasapi = "0.25.0"
 
 [dev-dependencies]
 voice-audio-contract = { path = "../voice-audio-contract", features = ["contract-tests"] }
