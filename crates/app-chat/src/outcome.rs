@@ -67,6 +67,22 @@ pub(crate) fn turn_error(
     }
 }
 
+/// Identyfikator dostawcy modeli lokalnych (`providers-local`).
+const LOCAL_PROVIDER: &str = "local";
+
+/// Komunikat jako zdanie: wielka litera na początku i kropka na końcu.
+fn sentence(text: &str) -> String {
+    let mut chars = text.trim().chars();
+    let Some(first) = chars.next() else {
+        return String::new();
+    };
+    let mut out: String = first.to_uppercase().chain(chars).collect();
+    if !out.ends_with(['.', '!', '?']) {
+        out.push('.');
+    }
+    out
+}
+
 /// Błąd dostawcy → błąd tury (komunikat PL bez sekretów).
 pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
     let now = chrono::Utc::now();
@@ -92,6 +108,13 @@ pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
         ProviderErrorKind::Auth => turn_error(
             TurnErrorCode::Provider,
             format!("Dostawca {provider} odrzucił klucz API — sprawdź konto w Ustawieniach."),
+            Some(provider),
+        ),
+        // Model lokalny to nie „dostawca": jego komunikaty (brak modelu, brak silnika, za mało
+        // pamięci) są już pełnymi zdaniami z podpowiedzią — bez przedrostka.
+        _ if provider == LOCAL_PROVIDER => turn_error(
+            TurnErrorCode::Provider,
+            sentence(&e.message),
             Some(provider),
         ),
         _ => turn_error(
@@ -143,5 +166,43 @@ pub(crate) fn classify(
                 Some(provider),
             )),
         ),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn local_model_errors_are_plain_sentences_without_provider_prefix() {
+        let e = ProviderError::new(
+            ProviderErrorKind::Unsupported,
+            "brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele i silniki",
+        );
+        let turn = provider_error(&e, "local");
+        assert_eq!(turn.code, TurnErrorCode::Provider);
+        assert_eq!(turn.provider.as_deref(), Some("local"));
+        assert_eq!(
+            turn.message,
+            "Brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele i silniki."
+        );
+    }
+
+    #[test]
+    fn cloud_provider_errors_keep_the_provider_name() {
+        let e = ProviderError::new(ProviderErrorKind::Unsupported, "nieobsługiwane");
+        let turn = provider_error(&e, "anthropic");
+        assert!(
+            turn.message.starts_with("Błąd dostawcy anthropic:"),
+            "{}",
+            turn.message
+        );
+    }
+
+    #[test]
+    fn sentence_capitalises_and_terminates() {
+        assert_eq!(sentence("  już zdanie.  "), "Już zdanie.");
+        assert_eq!(sentence("łódź"), "Łódź.");
+        assert_eq!(sentence(""), "");
     }
 }

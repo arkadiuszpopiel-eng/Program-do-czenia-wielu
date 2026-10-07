@@ -224,7 +224,21 @@ impl Sidecar {
             Ok(r) => r,
             Err(e) if plan.0.gpu_layers > 0 => {
                 let cpu = self.cpu_plan(&plan.0);
-                tracing::warn!(error = %e, "start na GPU nieudany — fallback na CPU");
+                // Brak pliku silnika to nie awaria karty: gdy nie ma też kompilacji na procesor,
+                // nie ma czego próbować — zwracamy błąd z podpowiedzią zamiast „fallbacku na CPU".
+                let missing = matches!(e, LocalError::NoServerBinary(_));
+                if missing && !cpu.program.is_file() {
+                    self.release_lease(plan.1);
+                    return Err(e);
+                }
+                if missing {
+                    tracing::info!(
+                        backend = plan.0.backend.as_str(),
+                        "brak llama-server dla backendu — używam kompilacji na procesor"
+                    );
+                } else {
+                    tracing::warn!(error = %e, "start na GPU nieudany — fallback na CPU");
+                }
                 self.emit(LocalEvent::BackendFallback {
                     from: plan.0.backend.as_str().into(),
                     to: cpu.backend.as_str().into(),
@@ -271,6 +285,10 @@ impl Sidecar {
         plan: LaunchPlan,
         lease: Option<LeaseId>,
     ) -> Result<Running, LocalError> {
+        // Silnik niepobrany (albo usunięty): czytelny błąd zamiast „os error 3" z uruchamiania procesu.
+        if !plan.program.is_file() {
+            return Err(LocalError::NoServerBinary(plan.backend.as_str().into()));
+        }
         let port = free_port()?;
         let key = random_key()?;
         let spec = LaunchSpec {

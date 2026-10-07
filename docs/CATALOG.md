@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 107 |
 | Specyfikacje w indeksie | 76 |
 | Manifesty `module.toml` | 67 |
-| Linie Rust (z testami) | 371 541 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2484 |
+| Linie Rust (z testami) | 371 681 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2489 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -66,7 +66,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `model-residency` | F2 | service | inproc | C · I · F | 2957 | 21 | [model-residency](modules/model-residency/SPEC.md) | Zarządca RAM/VRAM: dzierżawy modeli, wymiana wg priorytetów, tryb gry i baterii. |
 | `providers` | — | — | — | C · F | 4733 | 44 | kontrakt wspólny: providers-api, providers-local |  |
 | `providers-api` | F1 | provider | inproc | I | 4970 | 38 | [providers-api](modules/providers-api/SPEC.md) | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem. |
-| `providers-local` | F1 | provider | process | I | 4507 | 38 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
+| `providers-local` | F1 | provider | process | I | 4586 | 40 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
 | `router` | F1 | service | inproc | C · I · F | 4301 | 26 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
 
 ## Głos
@@ -144,7 +144,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-api` | — | — | — | pojedynczy | 5747 | 12 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4287 | 23 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 2003 | 2 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 2064 | 5 | — |  |
 | `app-core` | — | — | — | pojedynczy | 12 418 | 73 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3123 | 25 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
@@ -188,5 +188,5 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł z trójką crate’ów bez SPEC | 1 | `example-module` |
 | Crate `-impl` bez `module.toml` | 7 | `core-bus-impl`, `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
 | Crate bez `README.md` | 62 | `agent-builder-fake`, `agent-runtime-contract`, `agent-runtime-fake`, `app-agents`, `app-api`, `app-chat`, `app-models`, `app-modules`, `app-plugins`, `lib-media`, `lib-netguard`, `platform-apps-contract`, `platform-apps-fake`, `platform-windows-ocr-impl`, `plugin-runtime-contract`, `plugin-runtime-fake`, `plugin-runtime-impl`, `skills-fake`, `tools-browser-contract`, `tools-browser-fake`, `tools-browser-impl`, `tools-clipboard-contract`, `tools-clipboard-fake`, `tools-clipboard-impl`, `tools-common-contract`, `tools-fs-contract`, `tools-fs-fake`, `tools-fs-impl`, `tools-input-contract`, `tools-input-fake`, `tools-input-impl`, `tools-media-contract`, `tools-media-fake`, `tools-media-impl`, `tools-net-contract`, `tools-net-fake`, `tools-net-impl`, `tools-office-contract`, `tools-office-fake`, `tools-office-impl`, `tools-screen-contract`, `tools-screen-fake`, `tools-screen-impl`, `tools-shell-contract`, `tools-shell-fake`, `tools-shell-impl`, `tools-system-contract`, `tools-system-fake`, `tools-system-impl`, `tools-uia-contract`, `tools-uia-fake`, `tools-uia-impl`, `tools-vision-contract`, `tools-vision-fake`, `tools-vision-impl`, `tools-window-contract`, `tools-window-fake`, `tools-window-impl`, `ui-terminal-contract`, `ui-terminal-fake`, `ui-terminal-impl`, `voice-dialog-impl` |
-| Plik Rust powyżej 400 linii | 3 | `crates/tools-common-contract/src/call.rs` (436), `crates/tools-fs-impl/src/write.rs` (424), `crates/tools-fs-contract/src/lib.rs` (406) |
+| Plik Rust powyżej 400 linii | 4 | `crates/tools-common-contract/src/call.rs` (436), `crates/tools-fs-impl/src/write.rs` (424), `crates/tools-fs-contract/src/lib.rs` (406), `crates/providers-local-impl/src/sidecar.rs` (402) |
 | Crate powyżej 8000 linii w `src/` | 0 | brak |

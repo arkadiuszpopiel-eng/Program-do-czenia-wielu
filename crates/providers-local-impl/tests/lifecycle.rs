@@ -149,6 +149,65 @@ async fn gpu_start_failure_falls_back_to_cpu_within_5s() {
     assert!(pid.is_some());
 }
 
+/// Regresja z testu na laptopie (2026-10-07): model pobrany, `llama-server` niepobrany. Wcześniej
+/// odpowiedź kończyła się „uruchomienie llama-server: …: os error 3", a dziennik ostrzegał
+/// o „fallbacku na CPU", choć nie było żadnej kompilacji do uruchomienia.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn missing_engine_gives_actionable_error_and_no_fallback() {
+    let env = Env::new();
+    let device: Arc<dyn DeviceProfile> = Arc::new(FakeDeviceProfile::desktop());
+    let mut config = env.config();
+    let missing = env.dir.path().join("sidecars").join("llama-server.exe");
+    for path in config.server_bin.values_mut() {
+        path.clone_from(&missing);
+    }
+    let p = env.provider_with(config, env.launcher("ok", None), Some(device), None);
+    let events = run(&p, req("jest model, nie ma silnika")).await;
+    let error = events
+        .iter()
+        .find_map(|e| match e {
+            ProviderEvent::Error(e) => Some(e.to_string()),
+            _ => None,
+        })
+        .expect("błąd dostawcy");
+    assert!(
+        error.contains("brak silnika modeli lokalnych") && error.contains("Modele i silniki"),
+        "komunikat ma mówić, czego brakuje i gdzie to pobrać: {error}"
+    );
+    assert!(
+        !error.contains("os error"),
+        "bez surowego błędu systemu: {error}"
+    );
+    assert!(env.launches().is_empty(), "nie ma czego uruchamiać");
+    assert!(p.sidecar().running_plan().await.is_none());
+}
+
+/// Brak kompilacji na kartę przy zainstalowanej kompilacji na procesor: rozmowa działa na procesorze.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn missing_gpu_engine_uses_cpu_build() {
+    let env = Env::new();
+    let device: Arc<dyn DeviceProfile> = Arc::new(FakeDeviceProfile::desktop());
+    let mut config = env.config();
+    let missing = env.dir.path().join("sidecars").join("llama-server.exe");
+    for (backend, path) in &mut config.server_bin {
+        if backend.as_str() != "cpu" {
+            path.clone_from(&missing);
+        }
+    }
+    let p = env.provider_with(config, env.launcher("ok", None), Some(device), None);
+    let events = run(&p, req("tylko procesor")).await;
+    assert_eq!(text(&events), "Echo: tylko procesor");
+    let launches = env.launches();
+    assert_eq!(
+        launches.len(),
+        1,
+        "jedno uruchomienie — od razu kompilacja na procesor"
+    );
+    assert_eq!(arg(&launches[0], "-ngl").as_deref(), Some("0"));
+    let (_, plan, _) = p.sidecar().running_plan().await.unwrap();
+    assert_eq!(plan.backend.as_str(), "cpu");
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn device_profile_and_residency_drive_arguments() {
     let env = Env::new();

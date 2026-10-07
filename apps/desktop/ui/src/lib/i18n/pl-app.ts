@@ -213,11 +213,12 @@ export const plApp = {
   'conv.error.offline': 'Brak połączenia — wiadomość czeka w kolejce.',
   'conv.error.no_keys':
     'Brak dostępnego modelu: dodaj klucz API (Ustawienia → Modele i dostawcy) albo pobierz model lokalny (Ustawienia → Modele i silniki).',
-  'conv.error.provider': 'Błąd dostawcy: {message}',
+  'conv.error.provider': '{message}',
   'conv.error.context_overflow': 'Rozmowa przekroczyła okno kontekstu.',
   'conv.error.budget_blocked': 'Przekroczono limit kosztów.',
   'conv.retry': 'Ponów',
   'conv.otherModel': 'Inny model',
+  'conv.openModels': 'Modele i silniki',
   'conv.loadingAnswer': 'Ładowanie odpowiedzi',
   'conv.start.title': 'Od czego zaczynamy?',
   'conv.start.subtitle': 'Napisz, powiedz albo wybierz podpowiedź.',

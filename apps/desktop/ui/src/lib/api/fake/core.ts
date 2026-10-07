@@ -36,6 +36,8 @@ export type FakeScenario =
   | 'disk-low'
   /** Rdzeń odrzuca `turns_send` (np. błąd zapisu historii) — szkic nie może zginąć. */
   | 'send-error'
+  /** Model lokalny pobrany, ale bez silnika `llama-server` — błąd tury z drogą do „Modele i silniki”. */
+  | 'no-engine'
   /** Broker: tryb przenośny, zerwanie łącza, kill-switch bez watchdoga, Broker w procesie. */
   | 'broker-portable'
   | 'broker-lost'
@@ -59,6 +61,7 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'no-mic',
   'disk-low',
   'send-error',
+  'no-engine',
   'broker-portable',
   'broker-lost',
   'broker-no-watchdog',

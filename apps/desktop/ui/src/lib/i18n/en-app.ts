@@ -196,11 +196,12 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'conv.error.offline': 'Offline — the message is queued.',
   'conv.error.no_keys':
     'No model available: add an API key (Settings → Models and providers) or download a local model (Settings → Models and engines).',
-  'conv.error.provider': 'Provider error: {message}',
+  'conv.error.provider': '{message}',
   'conv.error.context_overflow': 'The conversation exceeded the context window.',
   'conv.error.budget_blocked': 'Cost limit exceeded.',
   'conv.retry': 'Retry',
   'conv.otherModel': 'Other model',
+  'conv.openModels': 'Models and engines',
   'conv.loadingAnswer': 'Loading answer',
   'conv.start.title': 'Where do we start?',
   'conv.start.subtitle': 'Type, speak, or pick a suggestion.',

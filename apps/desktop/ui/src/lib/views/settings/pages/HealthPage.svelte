@@ -17,6 +17,23 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   let view = $state<HealthView | null>(null);
+
+  // Statusy z dziennika Diagnosty i Ulepszacza po ludzku; nieznany (nowy) status zostaje dosłownie.
+  const INCIDENT_STATUSES = new Set([
+    'proposed',
+    'applied',
+    'verified',
+    'failed',
+    'undone',
+    'rejected',
+    'needs_human',
+    'kernel_pending',
+    'awaiting_approval',
+    'resolved',
+    'frozen',
+  ]);
+  const incidentStatus = (status: string) =>
+    INCIDENT_STATUSES.has(status) ? tk(`health.incident.${status}`) : status;
   let loadError = $state<string | null>(null);
 
   async function reload() {
@@ -119,7 +136,9 @@
           <li>
             <strong>{i.title}</strong>
             <span class="wk-meta"
-              >{i.target} · {t('health.count', { n: i.count })} · {app.i18n.dateTime(i.last_at)} · {i.status}</span
+              >{i.target} · {t('health.count', { n: i.count })} · {app.i18n.dateTime(i.last_at)} · {incidentStatus(
+                i.status,
+              )}</span
             >
           </li>
         {/each}

@@ -19,6 +19,7 @@
   const { t } = app.i18n;
 
   let busy = $state(false);
+  const local = $derived(error.code === 'provider' && error.provider === 'local');
 
   // Ponowienie, które samo się nie uda, daje toast — przycisk nie „nic nie robi".
   async function retry(profile: string | null) {
@@ -47,9 +48,17 @@
   <Button size="sm" variant="secondary" disabled={busy} onclick={() => void retry(null)}>
     {t('conv.retry')}
   </Button>
-  <Button size="sm" variant="ghost" disabled={busy} onclick={() => void retry('local')}>
-    {t('conv.otherModel')}
-  </Button>
+  {#if local}
+    <!-- Model lokalny zawiódł (brak modelu, silnika albo pamięci): droga do naprawy zamiast
+         „Inny model", który ponawiałby na tym samym modelu lokalnym. -->
+    <Button size="sm" variant="ghost" onclick={() => app.openSettings('models')}>
+      {t('conv.openModels')}
+    </Button>
+  {:else}
+    <Button size="sm" variant="ghost" disabled={busy} onclick={() => void retry('local')}>
+      {t('conv.otherModel')}
+    </Button>
+  {/if}
 </div>
 
 <style>

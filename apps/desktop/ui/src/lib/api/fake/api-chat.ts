@@ -83,6 +83,15 @@ export class FakeChat {
         provider: status.rate_limit.provider,
       };
     }
+    if (this.core.scenario === 'no-engine') {
+      return {
+        code: 'provider',
+        message:
+          'Brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele i silniki.',
+        retry_at: null,
+        provider: 'local',
+      };
+    }
     return null;
   }
 
