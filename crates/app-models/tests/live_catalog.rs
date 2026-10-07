@@ -143,7 +143,10 @@ async fn llm_generation(paths: &AppPaths, model: &str, report: &mut Report) {
     let device: Arc<dyn DeviceProfile> = Arc::new(FakeDeviceProfile::new(runner_profile()));
     let residency = app_modules::route::local::residency(&device).unwrap();
     let manager = residency.manager() as Arc<dyn Residency>;
-    let module = app_modules::route::local::provider_module(paths, &device, Some(manager)).unwrap();
+    let settings = app_modules::route::engine_settings::LlmSettings::default();
+    let module =
+        app_modules::route::local::provider_module(paths, &device, Some(manager), &settings)
+            .unwrap();
     let provider = module.provider();
     let (sink, mut local_events) = tokio::sync::mpsc::unbounded_channel();
     provider.sidecar().set_event_sink(Some(sink));

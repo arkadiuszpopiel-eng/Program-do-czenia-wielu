@@ -90,3 +90,17 @@ test('„Napraw” elementu — po potwierdzeniu usuwa pliki i pobiera od nowa',
   await expect(page.getByText(/Naprawiam „Silero VAD/)).toBeVisible();
   await expect(vad.getByText('Zainstalowano i sprawdzono')).toBeVisible({ timeout: 10_000 });
 });
+
+test('ustawienia szczegółowe silników — opis z zaleceniem i zapis wartości', async ({ page }) => {
+  await openApp(page);
+  await waitForChat(page);
+  await openModels(page);
+  await expect(page.getByRole('heading', { name: 'Ustawienia szczegółowe' })).toBeVisible();
+  const backend = page.locator('[id="setting-engines.llm.backend"]');
+  await expect(backend.getByText(/Zalecenie: Automatycznie/)).toBeVisible();
+  await backend.getByRole('combobox').selectOption('cpu');
+  await expect(backend.getByRole('combobox')).toHaveValue('cpu');
+  const downloads = page.locator('[id="setting-models.parallel_downloads"]');
+  await expect(downloads.getByText(/1 przy łączu komórkowym/)).toBeVisible();
+  await expectAccessible(page, 'ustawienia silników');
+});

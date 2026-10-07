@@ -37,7 +37,7 @@ use crate::compose::{HealthSlot, started};
 use crate::error::AppError;
 use crate::options::{AppOptions, AppPaths};
 use crate::parts::Kernel;
-use app_modules::route::{Routers, local};
+use app_modules::route::{Routers, engine_settings, local};
 
 /// Zależności z modułów podstawowych.
 pub(crate) struct Deps<'a> {
@@ -149,7 +149,15 @@ impl Extra {
             .residency
             .as_ref()
             .map(|r| r.manager() as Arc<dyn Residency>);
-        let module = local::provider_module(deps.paths, &Self::device(deps)?, residency)?;
+        let mut values = BTreeMap::new();
+        for key in engine_settings::keys::ALL {
+            if let Some(value) = super::memory::setting(deps.kernel, key).await {
+                values.insert(key, value);
+            }
+        }
+        let settings = engine_settings::LlmSettings::from_values(|k| values.get(k).cloned());
+        let module =
+            local::provider_module(deps.paths, &Self::device(deps)?, residency, &settings)?;
         self.local = Some(started(module, deps.bus, deps.slot).await?);
         Ok(())
     }

@@ -19,6 +19,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'settings.scope.agent': 'per agent',
   'settings.scope.machine': 'this machine',
   'settings.later': 'This page arrives in wave {wave}.',
+  'settings.pageSettings': 'Detailed settings',
   'settings.wave': 'wave {n}',
   'settings.laterList': 'What will be here:',
   'settings.saved': 'Saved: {label}',

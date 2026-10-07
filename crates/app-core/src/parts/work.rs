@@ -152,12 +152,22 @@ impl Built {
                 .map(|m| m.service().backend().dbs().clone()),
             config: d.kernel.config.clone(),
         });
+        let (low, high) = app_models::PARALLEL_RANGE;
+        let parallel = super::memory::setting(d.kernel, app_models::PARALLEL_KEY)
+            .await
+            .and_then(|v| v.as_u64())
+            .and_then(|n| usize::try_from(n).ok())
+            .filter(|n| (low..=high).contains(n));
+        let defaults = app_models::ModelsOptions::default();
         let models = app_models::ModelsApp::open(app_models::ModelsDeps {
             paths: d.paths.clone(),
             catalog: app_models::builtin(),
             events: Some(d.kernel.events.clone()),
             embed,
-            options: app_models::ModelsOptions::default(),
+            options: app_models::ModelsOptions {
+                parallel: parallel.unwrap_or(defaults.parallel),
+                ..defaults
+            },
         });
         if let (Some(docs), Some(a)) = (&self.extra.artifact_docs, &self.artifacts) {
             docs.bind(a.clone(), d.files.sessions.clone());

@@ -172,6 +172,9 @@
             label={t('engines.loading')}
           />
         {/if}
+        {#if page.custom && page.settings.length > 0}
+          <h3 class="h3">{t('settings.pageSettings')}</h3>
+        {/if}
         {#each page.settings as def (def.key)}
           <SettingRow {def} />
         {/each}
@@ -279,6 +282,10 @@
   }
   .h2:focus {
     outline: none;
+  }
+  .h3 {
+    margin: var(--alfa-space-4) 0 var(--alfa-space-2);
+    font-size: var(--alfa-font-size-lg);
   }
   .page-hits {
     display: flex;

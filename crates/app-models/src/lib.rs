@@ -48,6 +48,11 @@ use crate::install::Verdict;
 use crate::jobs::{JobHandle, Work};
 use crate::store::Store;
 
+/// Ustawienie „Pobierania naraz” (Ustawienia → Modele i silniki; 1–4, domyślnie 2).
+pub const PARALLEL_KEY: &str = "models.parallel_downloads";
+/// Zakres ustawienia „Pobierania naraz”.
+pub const PARALLEL_RANGE: (usize, usize) = (1, 4);
+
 /// Ustawienia menedżera.
 #[derive(Debug, Clone)]
 pub struct ModelsOptions {

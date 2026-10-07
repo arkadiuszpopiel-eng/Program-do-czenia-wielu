@@ -37,7 +37,7 @@ AMD lub Intel: Vulkan (z zapasem na procesor), bez karty: procesor.
 ## Pobieranie
 
 1. Wybierz pozycję (filtry **Rodzaj** i **Stan** zawężają listę) i kliknij **Pobierz**. Naraz pobierają się
-   najwyżej dwie pozycje — kolejne czekają w kolejce.
+   najwyżej dwie pozycje (ustawienie **Pobierania naraz**) — kolejne czekają w kolejce.
 2. **Przerwij** zatrzymuje pobieranie, a **Wznów** zaczyna od miejsca przerwania (także po ponownym uruchomieniu
    Alfy albo zerwaniu połączenia).
 3. Każdy plik jest sprawdzany sumą **SHA-256**. Pozycje oznaczone **SHA-256 przypięty** mają sumę zapisaną
@@ -61,6 +61,18 @@ Pobieranie korzysta wyłącznie z HTTPS i niczego nie wysyła poza samym żądan
 **Do potwierdzenia przez człowieka** — tak oznaczone są pozycje, których adresu, rozmiaru i licencji nie
 sprawdzono jeszcze przy wydaniu (dziś: większość modeli z HuggingFace i programy z GitHuba). Działają, ale zawsze
 przez kartę zgody. **Instalacja ręczna** (np. Pocket TTS) — opis pozycji mówi, co i gdzie skopiować.
+
+## Ustawienia szczegółowe
+
+Pod katalogiem są ustawienia silników (każde z opisem i zaleceniem; działają po ponownym uruchomieniu Alfy):
+
+| Ustawienie                     | Domyślnie       | Zalecenie                                                                     |
+| ------------------------------ | --------------- | ----------------------------------------------------------------------------- |
+| Silnik modelu rozmowy          | Automatycznie   | Automatycznie; „Procesor”, gdy sterownik karty sprawia problemy               |
+| Długość kontekstu              | Automatycznie   | Automatycznie (do 8192 tokenów); 2048 tylko przy braku pamięci                |
+| Wątki procesora                | 0 (rdzenie fizyczne) | 0; mniej, gdy równocześnie grasz albo pracujesz w ciężkich programach     |
+| Zwolnij model po bezczynności  | 10 min          | 5 min na laptopie, 10–15 min na komputerze stacjonarnym                       |
+| Pobierania naraz               | 2               | 2 w domu; 1 na łączu komórkowym lub z limitem danych; 3–4 tylko na światłowodzie |
 
 ## Sprawdzanie i usuwanie
 

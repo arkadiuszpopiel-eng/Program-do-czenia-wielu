@@ -21,6 +21,7 @@ export const plSettings = {
   'settings.scope.agent': 'per agentka',
   'settings.scope.machine': 'ta maszyna',
   'settings.later': 'Ta strona pojawi się w fali {wave}.',
+  'settings.pageSettings': 'Ustawienia szczegółowe',
   'settings.wave': 'fala {n}',
   'settings.laterList': 'Co tu będzie:',
   'settings.saved': 'Zapisano: {label}',

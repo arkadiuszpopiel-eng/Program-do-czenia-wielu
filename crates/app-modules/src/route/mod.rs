@@ -7,6 +7,7 @@
 
 mod accounts;
 pub mod config;
+pub mod engine_settings;
 pub mod local;
 
 use std::collections::BTreeMap;

@@ -232,7 +232,153 @@
   },
   "wave": 1,
   "custom": "models",
-  "settings": [],
+  "settings": [
+   {
+    "key": "engines.llm.backend",
+    "label": {
+     "pl": "Silnik modelu rozmowy",
+     "en": "Chat model engine"
+    },
+    "description": {
+     "pl": "Na czym liczy lokalny model rozmowy. Automatycznie: karta NVIDIA — CUDA, karta AMD lub Intel — Vulkan, bez karty albo na baterii — procesor. Zalecenie: Automatycznie; „Procesor” wybierz, gdy sterownik karty sprawia problemy. Brak zainstalowanej wersji silnika → Alfa użyje zastępczej i zapisze ostrzeżenie w dzienniku. Zmiana działa po ponownym uruchomieniu Alfy.",
+     "en": "What the local chat model runs on. Automatic: NVIDIA GPU — CUDA, AMD or Intel GPU — Vulkan, no GPU or on battery — CPU. Recommended: Automatic; choose “CPU” when the GPU driver causes problems. If that engine build is not installed, Alfa uses a substitute and logs a warning. Takes effect after restarting Alfa."
+    },
+    "default": "auto",
+    "scope": "machine",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "auto",
+       "label": {
+        "pl": "Automatycznie (zalecane)",
+        "en": "Automatic (recommended)"
+       }
+      },
+      {
+       "value": "cuda",
+       "label": {
+        "pl": "Karta NVIDIA (CUDA)",
+        "en": "NVIDIA GPU (CUDA)"
+       }
+      },
+      {
+       "value": "vulkan",
+       "label": {
+        "pl": "Karta graficzna (Vulkan)",
+        "en": "GPU (Vulkan)"
+       }
+      },
+      {
+       "value": "cpu",
+       "label": {
+        "pl": "Procesor",
+        "en": "CPU"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "key": "engines.llm.context",
+    "label": {
+     "pl": "Długość kontekstu",
+     "en": "Context length"
+    },
+    "description": {
+     "pl": "Ile ostatnich tokenów rozmowy model ma przed oczami. Dłuższy kontekst pamięta więcej, ale zajmuje więcej pamięci (Bielik 4.5B: ok. 60 MB na 1000 tokenów). Automatycznie: do 8192, a na małej karcie mniej, żeby model zmieścił się w całości. Zalecenie: Automatycznie; 2048 tylko przy braku pamięci — to oszczędność zasobów kosztem pamięci rozmowy (ISO/IEC 25010: wykorzystanie zasobów). Zmiana po ponownym uruchomieniu.",
+     "en": "How many recent conversation tokens the model can see. A longer context remembers more but uses more memory (Bielik 4.5B: about 60 MB per 1000 tokens). Automatic: up to 8192, less on a small GPU so the model fits entirely. Recommended: Automatic; 2048 only when memory is short — saving resources at the cost of conversation memory (ISO/IEC 25010: resource utilisation). Takes effect after a restart."
+    },
+    "default": "auto",
+    "scope": "machine",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "auto",
+       "label": {
+        "pl": "Automatycznie (zalecane)",
+        "en": "Automatic (recommended)"
+       }
+      },
+      {
+       "value": "4096",
+       "label": {
+        "pl": "4096 tokenów",
+        "en": "4096 tokens"
+       }
+      },
+      {
+       "value": "2048",
+       "label": {
+        "pl": "2048 tokenów (oszczędnie)",
+        "en": "2048 tokens (saving)"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "key": "engines.llm.threads",
+    "label": {
+     "pl": "Wątki procesora",
+     "en": "CPU threads"
+    },
+    "description": {
+     "pl": "Ile wątków procesora liczy model, gdy pracuje na procesorze (w całości albo częściowo). 0 — automatycznie: tyle, ile rdzeni fizycznych. Zalecenie: 0; zmniejsz, gdy równocześnie grasz albo pracujesz w ciężkich programach — Alfa odpowie wolniej, a system będzie płynniejszy. Więcej wątków niż rdzeni fizycznych zwykle spowalnia. Zmiana po ponownym uruchomieniu.",
+     "en": "How many CPU threads the model uses when it runs on the CPU (fully or partly). 0 — automatic: as many as physical cores. Recommended: 0; lower it when you game or run heavy programs at the same time — Alfa replies slower and the system stays smoother. More threads than physical cores usually slows things down. Takes effect after a restart."
+    },
+    "default": 0,
+    "scope": "machine",
+    "control": {
+     "kind": "number",
+     "min": 0,
+     "max": 64,
+     "step": 1,
+     "unit": null
+    }
+   },
+   {
+    "key": "engines.llm.idle_unload_min",
+    "label": {
+     "pl": "Zwolnij model po bezczynności",
+     "en": "Unload the model when idle"
+    },
+    "description": {
+     "pl": "Po tylu minutach bez rozmowy model zwalnia pamięć RAM i karty graficznej. Krócej — więcej wolnej pamięci dla innych programów i gier, ale pierwsza odpowiedź po przerwie czeka na ponowne wczytanie modelu (od kilku do kilkunastu sekund). Zalecenie: 5 min na laptopie, 10–15 min na komputerze stacjonarnym. Zmiana po ponownym uruchomieniu.",
+     "en": "After this many minutes without conversation the model frees RAM and GPU memory. Shorter — more free memory for other programs and games, but the first reply after a break waits for the model to load again (a few to over ten seconds). Recommended: 5 min on a laptop, 10–15 min on a desktop. Takes effect after a restart."
+    },
+    "default": 10,
+    "scope": "machine",
+    "control": {
+     "kind": "number",
+     "min": 1,
+     "max": 120,
+     "step": 1,
+     "unit": "min"
+    }
+   },
+   {
+    "key": "models.parallel_downloads",
+    "label": {
+     "pl": "Pobierania naraz",
+     "en": "Downloads at once"
+    },
+    "description": {
+     "pl": "Ile plików modeli i silników pobiera się równocześnie; reszta czeka w kolejce. Zalecenie: 2 dla łącza domowego; 1 przy łączu komórkowym albo z limitem danych; 3–4 tylko przy szybkim łączu światłowodowym. Każdy plik i tak jest sprawdzany sumą SHA-256. Zmiana po ponownym uruchomieniu.",
+     "en": "How many model and engine files download at the same time; the rest wait in a queue. Recommended: 2 on a home connection; 1 on mobile or metered connections; 3–4 only on fast fibre. Every file is checked with SHA-256 anyway. Takes effect after a restart."
+    },
+    "default": 2,
+    "scope": "machine",
+    "control": {
+     "kind": "number",
+     "min": 1,
+     "max": 4,
+     "step": 1,
+     "unit": null
+    }
+   }
+  ],
   "upcoming": []
  },
  {

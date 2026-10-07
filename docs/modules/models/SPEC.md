@@ -61,7 +61,8 @@ Zewnętrzne (już w `Cargo.lock`): `reqwest` (rustls), `zip`, `flate2`, `sha2`, 
 ## Konfiguracja
 `[search.embedder] model = "multilingual-e5-small" | "lexical"` (warstwa wspólna; brak = model domyślny, używany,
 gdy jest zainstalowany). Katalogi: `%LOCALAPPDATA%\Alfa\{models,sidecars,downloads,state\models}`. Opcje kompozycji
-(`ModelsOptions`): `parallel = 2`, wybór embeddera 20 s po uruchomieniu; pełny przebieg przebudowy na starcie tylko,
+(`ModelsOptions`): `parallel = 2` (ustawienie `models.parallel_downloads` 1–4, nakładka maszyny, od następnego
+uruchomienia), wybór embeddera 20 s po uruchomieniu; pełny przebieg przebudowy na starcie tylko,
 gdy ostatni bezbłędny był dla innego embeddera albo ponad 7 dni temu (`state\models\reindex.json`: identyfikator
 embeddera i czas — przebieg otwiera wszystkie bazy sesji, które zostają w pamięci podręcznej `sessions`).
 

@@ -18,6 +18,7 @@ use providers_local_impl::{
 };
 
 use crate::route::LOCAL_PROVIDER;
+use crate::route::engine_settings::LlmSettings;
 use app_api::error::AppError;
 use app_api::paths::AppPaths;
 
@@ -113,16 +114,19 @@ pub fn residency(device: &Arc<dyn DeviceProfile>) -> Result<ResidencyModule, App
         .map_err(|e| AppError::internal(format!("model-residency: {e}")))
 }
 
-/// Moduł dostawcy lokalnego (sidecar uruchamiany dopiero przy pierwszym żądaniu).
+/// Moduł dostawcy lokalnego (sidecar uruchamiany dopiero przy pierwszym żądaniu) z ustawieniami
+/// silnika z Ustawień → Modele i silniki.
 pub fn provider_module(
     paths: &AppPaths,
     device: &Arc<dyn DeviceProfile>,
     residency: Option<Arc<dyn Residency>>,
+    settings: &LlmSettings,
 ) -> Result<LocalModule, AppError> {
     let internal =
         |what: &str, e: String| AppError::internal(format!("providers-local: {what}: {e}"));
     let models = builtin_models().map_err(|e| internal("manifest", e.to_string()))?;
-    let config = local_config(paths);
+    let mut config = local_config(paths);
+    settings.apply(&mut config);
     warn_substitute(paths, &config, device);
     let sidecar = Sidecar::new(
         config,

@@ -50,6 +50,9 @@ Baseline: model 3–4,5B Q4 ≈ 2,5–3,5 GB VRAM (Vulkan) obok STT 1–2,5 GB; 
 
 ## Konfiguracja (klucze TOML)
 Wspólne: `[providers.local] default_model = "bielik-4.5b-v3.0-instruct-q8_0"`, `ctx = 8192`, `min_ctx = 4096`, `stt_reserve_mb = 1500`. Per maszyna: `[providers.local.machine] backend = "auto" | "vulkan" | "cuda" | "cpu"`, `gpu_layers = "auto"`, `idle_unload = "10m"`, `max_vram_mb`.
+W aplikacji (Ustawienia → Modele i silniki, nakładka maszyny, od następnego uruchomienia; `app_modules::route::engine_settings`):
+`engines.llm.backend` (`auto` | `cuda` | `vulkan` | `cpu` → `BackendChoice`), `engines.llm.context` (`auto` | `4096` | `2048` → `ctx`),
+`engines.llm.threads` (0 = rdzenie fizyczne), `engines.llm.idle_unload_min` (1–120 min); wartość spoza zakresu = domyślna.
 
 ## Wkład do UI
 Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dostawcy → Lokalne (modele, backend, benchmark); stany GPU OOM / przerwane pobieranie (§14.4).

@@ -1,6 +1,7 @@
 // Drzewo ustawień (PLAN §15), część 1: Ogólne … Pamięć.
 import type { SettingsPageDef } from '../types-system';
 import { L, later, number, page, select, text, toggle } from './settings-helpers';
+import { ENGINE_SETTINGS } from './settings-engines';
 
 export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
   page('general', L('Ogólne', 'General'), 1, [
@@ -99,7 +100,9 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     ],
     { custom: 'providers' },
   ),
-  page('models', L('Modele i silniki', 'Models and engines'), 1, [], { custom: 'models' }),
+  page('models', L('Modele i silniki', 'Models and engines'), 1, ENGINE_SETTINGS, {
+    custom: 'models',
+  }),
   page(
     'costs',
     L('Koszty i limity', 'Costs and limits'),
