@@ -17,7 +17,7 @@ serde.workspace = true
 # `windows-core` (ta sama rodzina i wersja 0.62, już w Cargo.lock) jest potrzebny wprost, bo makro
 # `#[implement]` (sink `IFileOperationProgressSink`) generuje ścieżki `::windows_core::…`.
 [target.'cfg(windows)'.dependencies]
-windows-core = "0.62.2"
+windows-core = "0.100.0"
 windows = { version = "0.62.2", features = [
     "Win32_Devices_FunctionDiscovery",
     "Win32_Foundation",
