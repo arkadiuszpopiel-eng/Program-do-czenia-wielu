@@ -4,7 +4,9 @@
   import FileText from '@lucide/svelte/icons/file-text';
   import FolderOpen from '@lucide/svelte/icons/folder-open';
   import type { ArtifactAction, ArtifactInfo, ArtifactPreview } from '../../api/types';
+  import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
 
   interface Props {
     sessionId: string;
@@ -15,21 +17,51 @@
   const { t } = app.i18n;
   let files = $state<ArtifactInfo[]>([]);
   let loaded = $state(false);
+  let loadError = $state<string | null>(null);
   let selected = $state<string | null>(null);
   let preview = $state<ArtifactPreview | null>(null);
+  let previewError = $state<string | null>(null);
+
+  // Błąd listy = „Nie udało się wczytać" z „Ponów", nie mylący pusty stan „brak plików".
+  async function loadFiles() {
+    const id = sessionId;
+    loadError = null;
+    const result = await load(() => app.client.files.list(id));
+    if (id !== sessionId) return;
+    if (result.status === 'ready') {
+      files = [...result.value];
+      selected = result.value[0]?.id ?? null;
+    } else if (result.status === 'failed') {
+      files = [];
+      loadError = result.error;
+    }
+    loaded = true;
+  }
+
+  async function loadPreview(id: string) {
+    preview = null;
+    previewError = null;
+    const result = await load(() => app.client.files.preview(id));
+    if (selected !== id) return;
+    if (result.status === 'ready') preview = result.value;
+    else if (result.status === 'failed') previewError = result.error;
+  }
+
+  async function act(id: string, action: ArtifactAction) {
+    const ok = await attempt(app.toasts, () => app.client.files.act(id, action));
+    if (ok && action === 'copy') {
+      app.toasts.show({ kind: 'success', message: t('common.copied'), timeoutMs: 2500 });
+    }
+  }
 
   $effect(() => {
-    void app.client.files.list(sessionId).then((list) => {
-      files = [...list];
-      loaded = true;
-      selected = list[0]?.id ?? null;
-    });
+    void loadFiles();
   });
 
   $effect(() => {
     const id = selected;
-    preview = null;
-    if (id) void app.client.files.preview(id).then((p) => (preview = p));
+    if (id) void loadPreview(id);
+    else preview = null;
   });
 
   const current = $derived(files.find((f) => f.id === selected) ?? null);
@@ -44,7 +76,9 @@
   ];
 </script>
 
-{#if loaded && files.length === 0}
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void loadFiles()} />
+{:else if loaded && files.length === 0}
   <EmptyState title={t('panel.files')} description={t('files.empty')}>
     {#snippet icon()}<FolderOpen size={20} strokeWidth={1.5} />{/snippet}
   </EmptyState>
@@ -79,10 +113,8 @@
         <p class="path" data-selectable>{current.path}</p>
         <div class="actions">
           {#each ACTIONS as a (a.action)}
-            <Button
-              size="sm"
-              variant="secondary"
-              onclick={() => void app.client.files.act(current.id, a.action)}>{t(a.key)}</Button
+            <Button size="sm" variant="secondary" onclick={() => void act(current.id, a.action)}
+              >{t(a.key)}</Button
             >
           {/each}
         </div>
@@ -93,6 +125,8 @@
           <img class="image" src={preview.src} alt={current.name} loading="lazy" />
         {:else if preview}
           <p class="meta">{t('files.noPreview')}</p>
+        {:else if previewError}
+          <LoadFailed error={previewError} onretry={() => void loadPreview(current.id)} />
         {/if}
       </section>
     {/if}

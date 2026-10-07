@@ -48,6 +48,10 @@ const ROWS: readonly Row[] = [
   ],
 ];
 
+// Jak w rdzeniu: adresu wymaga każdy wpis bez znanego `base_url` w katalogu — dziś wszystkie
+// poza tymi trzema (test na laptopie 2026-10-07: rozjazd atrapy z rdzeniem ukrył błąd kreatora).
+const KNOWN_ENDPOINTS: ReadonlySet<string> = new Set(['anthropic', 'openai', 'xai']);
+
 export const FAKE_CATALOG: readonly ProviderInfo[] = ROWS.map(
   ([id, display_name, kind, compat, privacy_tag, jurisdiction, compliance_status]) => ({
     id,
@@ -59,6 +63,6 @@ export const FAKE_CATALOG: readonly ProviderInfo[] = ROWS.map(
     jurisdiction,
     compliance_status,
     terms_url: id === 'google' ? 'https://geminicli.com/docs/resources/tos-privacy/' : null,
-    needs_base_url: id.startsWith('custom-'),
+    needs_base_url: !KNOWN_ENDPOINTS.has(id),
   }),
 );

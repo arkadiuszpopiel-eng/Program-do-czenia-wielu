@@ -11,6 +11,7 @@
     type AgentId,
   } from '@alfa/ui-kit';
   import type { CastTemplateId } from '../../api/types';
+  import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import WorkdirCard from './WorkdirCard.svelte';
 
@@ -35,19 +36,25 @@
   const TEMPLATES: readonly CastTemplateId[] = ['standard', 'solo', 'coding', 'research'];
   let template = $state<string>('standard');
   let editing = $state<AgentId | null>(null);
+  /** Po odrzuconej zmianie ról pola wyboru odtwarzają stan z rdzenia (same przełączyły się już). */
+  let rolesRev = $state(0);
 
   const states = $derived(app.agents[sessionId] ?? []);
   const stateOf = (id: AgentId) => states.find((a) => a.id === id);
 
   async function applyTemplate() {
-    await app.client.agents.applyCast(sessionId, template as CastTemplateId);
-    app.toasts.show({ kind: 'success', message: t('agents.applied') });
+    const ok = await attempt(app.toasts, () =>
+      app.client.agents.applyCast(sessionId, template as CastTemplateId),
+    );
+    if (ok) app.toasts.show({ kind: 'success', message: t('agents.applied') });
   }
 
   async function toggleRole(agent: AgentId, role: string, on: boolean) {
     const current = stateOf(agent)?.role_ids ?? [];
     const next = on ? [...current, role] : current.filter((r) => r !== role);
-    await app.client.agents.setRoles(sessionId, agent, next);
+    if (!(await attempt(app.toasts, () => app.client.agents.setRoles(sessionId, agent, next)))) {
+      rolesRev += 1;
+    }
   }
 </script>
 
@@ -109,13 +116,15 @@
             <legend class="alfa-visually-hidden"
               >{t('agents.editRoles', { name: agents[id].name })}</legend
             >
-            {#each ROLES as role (role)}
-              <Checkbox
-                label={app.i18n.tk(`role.${role}`)}
-                checked={(st?.role_ids ?? []).includes(role)}
-                onchange={(on) => void toggleRole(id, role, on)}
-              />
-            {/each}
+            {#key rolesRev}
+              {#each ROLES as role (role)}
+                <Checkbox
+                  label={app.i18n.tk(`role.${role}`)}
+                  checked={(st?.role_ids ?? []).includes(role)}
+                  onchange={(on) => void toggleRole(id, role, on)}
+                />
+              {/each}
+            {/key}
           </fieldset>
         {/if}
         <p class="hint">{t('agents.hint', { name: agents[id].name })}</p>

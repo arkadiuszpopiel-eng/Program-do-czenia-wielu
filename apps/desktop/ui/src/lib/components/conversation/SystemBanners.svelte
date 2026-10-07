@@ -3,6 +3,7 @@
      stan po zerwaniu, kill-switch bez watchdoga). -->
 <script lang="ts">
   import { Banner, Button } from '@alfa/ui-kit';
+  import { attempt } from '../../state/attempt';
   import { now } from '../../state/clock.svelte';
   import UpdateBanner from '../shell/UpdateBanner.svelte';
   import BrokerBanner from '../shell/BrokerBanner.svelte';
@@ -12,6 +13,10 @@
   const { t } = app.i18n;
   const status = $derived(app.system);
   const dismiss = (id: string) => () => (app.dismissed[id] = true);
+  // Przyciski banerów: odrzucona komenda (kolejka, ustawienia Windows) = toast z powodem.
+  const retryQueue = () => void attempt(app.toasts, () => app.client.system.retryQueue());
+  const openSettings = (uri: 'ms-settings:privacy-microphone' | 'ms-settings:storagesense') => () =>
+    void attempt(app.toasts, () => app.client.app.openSystemSettings(uri));
   const any = $derived(
     status !== null &&
       (!status.online ||
@@ -41,7 +46,7 @@
             {t('banner.queue', { n: status.queued_messages })}.</strong
           >{/if}
         {#snippet actions()}
-          <Button size="sm" variant="secondary" onclick={() => void app.client.system.retryQueue()}>
+          <Button size="sm" variant="secondary" onclick={retryQueue}>
             {t('banner.retry')}
           </Button>
         {/snippet}
@@ -84,8 +89,7 @@
             <Button
               size="sm"
               variant="secondary"
-              onclick={() =>
-                void app.client.app.openSystemSettings('ms-settings:privacy-microphone')}
+              onclick={openSettings('ms-settings:privacy-microphone')}
             >
               {t('banner.micSettings')}
             </Button>
@@ -102,11 +106,7 @@
       >
         {t('banner.disk', { free: app.i18n.bytes(status.disk.free_bytes) })}
         {#snippet actions()}
-          <Button
-            size="sm"
-            variant="secondary"
-            onclick={() => void app.client.app.openSystemSettings('ms-settings:storagesense')}
-          >
+          <Button size="sm" variant="secondary" onclick={openSettings('ms-settings:storagesense')}>
             {t('banner.diskSettings')}
           </Button>
         {/snippet}

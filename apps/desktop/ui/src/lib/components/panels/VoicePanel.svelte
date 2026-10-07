@@ -7,11 +7,14 @@
   import { Button } from '@alfa/ui-kit';
   import type { VoiceFeatures } from '../../api/types-voice';
   import { ThrottledAnnouncer, announcement } from '../../logic/voice-features';
+  import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import DictationCard from '../voice/DictationCard.svelte';
   import ReadCard from '../voice/ReadCard.svelte';
   import SpeakerEnroll from '../voice/SpeakerEnroll.svelte';
   import WakeCard from '../voice/WakeCard.svelte';
+  import { loadVoiceFeatures } from '../voice/voice-act';
   import '../voice/voice.css';
 
   interface Props {
@@ -27,11 +30,26 @@
   let spoken = $state('');
   let prev: VoiceFeatures | null = null;
   const announcer = new ThrottledAnnouncer((text) => (spoken = text));
+  let featuresError = $state<string | null>(null);
+  let statusError = $state<string | null>(null);
+
+  // Błędy wczytania = „Nie udało się wczytać" z „Ponów" zamiast „Ładowanie…" na zawsze.
+  async function loadFeatures() {
+    featuresError = null;
+    featuresError = await loadVoiceFeatures(app);
+  }
+
+  async function loadStatus() {
+    statusError = null;
+    const result = await load(() => app.client.voice.status());
+    if (result.status === 'ready') app.voice.applyStatus(result.value);
+    else if (result.status === 'failed') statusError = result.error;
+  }
 
   $effect(() => {
     void sessionId;
-    void app.client.voiceFeatures.features().then((f) => app.voice.applyFeatures(f));
-    void app.client.voice.status().then((s) => app.voice.applyStatus(s));
+    void loadFeatures();
+    void loadStatus();
     return () => announcer.dispose();
   });
 
@@ -66,7 +84,9 @@
         >{t('vf.settingsLink')}</Button
       >
     </div>
-    {#if status?.state === 'unavailable'}
+    {#if statusError}
+      <LoadFailed error={statusError} onretry={() => void loadStatus()} />
+    {:else if status?.state === 'unavailable'}
       <p class="vf-warn" role="status">
         {status.reason ? app.i18n.text(status.reason) : t('voice.unavailable')}
       </p>
@@ -82,8 +102,11 @@
       </div>
     {/if}
   </section>
+  {#if featuresError}
+    <LoadFailed error={featuresError} onretry={() => void loadFeatures()} />
+  {/if}
   {#if !features}
-    <p class="vf-muted">{t('vf.loading')}</p>
+    {#if !featuresError}<p class="vf-muted">{t('vf.loading')}</p>{/if}
   {:else}
     <WakeCard {features} />
     <SpeakerEnroll {features} />

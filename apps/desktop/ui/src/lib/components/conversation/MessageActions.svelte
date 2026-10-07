@@ -9,6 +9,7 @@
   import ThumbsDown from '@lucide/svelte/icons/thumbs-down';
   import Ellipsis from '@lucide/svelte/icons/ellipsis';
   import type { RememberScope, Turn } from '../../api/types';
+  import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { exportConversation } from '../../state/exports';
@@ -29,13 +30,22 @@
 
   async function copy(plain: boolean) {
     const text = plain ? (bodyEl?.innerText ?? turn.text) : turn.text;
-    await navigator.clipboard.writeText(text);
-    app.toasts.show({ kind: 'success', message: t('common.copied'), timeoutMs: 2500 });
+    try {
+      await navigator.clipboard.writeText(text);
+      app.toasts.show({ kind: 'success', message: t('common.copied'), timeoutMs: 2500 });
+    } catch {
+      app.toasts.show({ kind: 'warning', message: t('msg.copyFailed') });
+    }
   }
 
   async function remember(scope: RememberScope) {
-    await app.client.turns.remember(turn.id, scope);
-    app.toasts.show({ kind: 'success', message: t('msg.remembered') });
+    const ok = await attempt(app.toasts, () => app.client.turns.remember(turn.id, scope));
+    if (ok) app.toasts.show({ kind: 'success', message: t('msg.remembered') });
+  }
+
+  /** Akcja na wiadomości: błąd rdzenia → toast (nie ginie po cichu). */
+  function run(action: () => Promise<unknown>): void {
+    void attempt(app.toasts, action);
   }
 
   const more = $derived.by((): MenuItem[] => {
@@ -48,13 +58,13 @@
           id: 'regen-local',
           label: t('msg.regenerateLocal'),
           disabled: !done,
-          onSelect: () => void conv.regenerate(turn, 'local'),
+          onSelect: () => run(() => conv.regenerate(turn, 'local')),
         },
         {
           id: 'regen-cloud',
           label: t('msg.regenerateCloud'),
           disabled: !done,
-          onSelect: () => void conv.regenerate(turn, 'cloud'),
+          onSelect: () => run(() => conv.regenerate(turn, 'cloud')),
         },
       );
     }
@@ -74,7 +84,7 @@
         separatorBefore: true,
         onSelect: () => app.showTimelineFor(turn.id),
       },
-      { id: 'hide', label: t('msg.hide'), onSelect: () => void conv.setHidden(turn, true) },
+      { id: 'hide', label: t('msg.hide'), onSelect: () => run(() => conv.setHidden(turn, true)) },
       {
         id: 'export-md',
         label: t('exp.messageMarkdown'),
@@ -92,7 +102,7 @@
 </script>
 
 <div class="actions" role="toolbar" aria-label={t('msg.actions')}>
-  <IconButton label={t('msg.copy')} size="sm" onclick={() => copy(false)}>
+  <IconButton label={t('msg.copy')} size="sm" onclick={() => void copy(false)}>
     <Copy size={14} strokeWidth={1.5} />
   </IconButton>
   {#if isUser}
@@ -103,7 +113,7 @@
     <IconButton
       label={t('msg.readAloud')}
       size="sm"
-      onclick={() => void app.client.turns.readAloud(turn.id)}
+      onclick={() => run(() => app.client.turns.readAloud(turn.id))}
     >
       <Volume2 size={14} strokeWidth={1.5} />
     </IconButton>
@@ -111,7 +121,7 @@
       label={t('msg.regenerate')}
       size="sm"
       disabled={!done}
-      onclick={() => void conv.regenerate(turn)}
+      onclick={() => run(() => conv.regenerate(turn))}
     >
       <RotateCcw size={14} strokeWidth={1.5} />
     </IconButton>
@@ -119,7 +129,7 @@
       label={t('msg.rateUp')}
       size="sm"
       pressed={rating === 'up'}
-      onclick={() => void conv.rate(turn, 'up')}
+      onclick={() => run(() => conv.rate(turn, 'up'))}
     >
       <ThumbsUp size={14} strokeWidth={1.5} />
     </IconButton>
@@ -127,7 +137,7 @@
       label={t('msg.rateDown')}
       size="sm"
       pressed={rating === 'down'}
-      onclick={() => void conv.rate(turn, 'down')}
+      onclick={() => run(() => conv.rate(turn, 'down'))}
     >
       <ThumbsDown size={14} strokeWidth={1.5} />
     </IconButton>

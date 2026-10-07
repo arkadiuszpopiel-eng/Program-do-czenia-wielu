@@ -2,6 +2,7 @@
 <script lang="ts">
   import { Avatar, Button, TextField, type AgentId } from '@alfa/ui-kit';
   import type { TaskInfo } from '../../api/types-tasks';
+  import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import TaskNode from './TaskNode.svelte';
 
@@ -22,23 +23,17 @@
     done && task.result ? tk(`tasks.result.${task.result}`) : tk(`tasks.state.${task.state}`),
   );
 
-  async function run(action: () => Promise<unknown>, success?: string) {
-    try {
-      await action();
-      if (success) app.toasts.show({ kind: 'success', message: success });
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+  async function run(action: () => Promise<unknown>, success?: string): Promise<boolean> {
+    const ok = await attempt(app.toasts, action);
+    if (ok && success) app.toasts.show({ kind: 'success', message: success });
+    return ok;
   }
 
+  // Wiadomość czyszczona tylko po udanym sterowaniu — po błędzie zostaje do ponowienia.
   async function steer() {
     const text = message.trim();
     if (!text) return;
-    await run(() => app.client.tasks.steer(task.id, text), t('tasks.steered'));
-    message = '';
+    if (await run(() => app.client.tasks.steer(task.id, text), t('tasks.steered'))) message = '';
   }
 </script>
 

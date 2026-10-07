@@ -4,6 +4,7 @@ import type { AgentId } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
 import type { ModelProfile, Turn, TurnAnnotation } from '../api/types';
 import type { ChatStreamEvent } from '../api/types-system';
+import { errorText } from '../api/command-error';
 import { applyTurnEvent } from '../logic/apply-event';
 import {
   addTurn,
@@ -23,6 +24,8 @@ export interface StreamHooks {
   /** Delta tekstu tury agentki w tej rozmowie (dla aria-live). */
   onText?(turnId: string, text: string): void;
   onStop?(turnId: string): void;
+  /** Błąd akcji bez pola do zachowania (ponów, kontynuuj, stop, ocena, ukrycie) — toast okna. */
+  onError?(error: unknown): void;
 }
 
 export class ConversationState {
@@ -46,7 +49,7 @@ export class ConversationState {
       this.annotations = { ...snapshot.annotations };
       this.loadError = null;
     } catch (error) {
-      this.loadError = error instanceof Error ? error.message : String(error);
+      this.loadError = errorText(error);
     } finally {
       this.loaded = true;
     }
@@ -79,6 +82,7 @@ export class ConversationState {
     if (result.stopped) this.hooks.onStop?.(turn.id);
   }
 
+  /** Odrzuca przy błędzie: composer przywraca szkic (tekst użytkownika nie ginie). */
   async send(
     text: string,
     addressed: AgentId | null,
@@ -94,31 +98,65 @@ export class ConversationState {
     });
   }
 
-  async regenerate(turn: Turn, profile: string | null = null): Promise<void> {
-    await this.client.turns.regenerate(this.sessionId, turn.id, profile);
+  regenerate(turn: Turn, profile: string | null = null): Promise<boolean> {
+    return this.guard(() => this.client.turns.regenerate(this.sessionId, turn.id, profile));
   }
 
+  /** Odrzuca przy błędzie: edytor tury zostaje otwarty z tekstem (MessageItem). */
   async editAndResend(turn: Turn, text: string): Promise<void> {
     await this.client.turns.editAndResend(this.sessionId, turn.id, text);
   }
 
-  async continueTurn(turn: Turn): Promise<void> {
-    await this.client.turns.continueTurn(this.sessionId, turn.id);
+  continueTurn(turn: Turn): Promise<boolean> {
+    return this.guard(() => this.client.turns.continueTurn(this.sessionId, turn.id));
   }
 
-  async stop(): Promise<void> {
-    await this.client.turns.stop(this.sessionId);
+  stop(): Promise<boolean> {
+    return this.guard(() => this.client.turns.stop(this.sessionId));
   }
 
-  async rate(turn: Turn, rating: 'up' | 'down'): Promise<void> {
+  /** Ocena działa od razu; odrzucona przez rdzeń wraca do poprzedniej. */
+  rate(turn: Turn, rating: 'up' | 'down'): Promise<boolean> {
     const current = this.annotations[turn.id];
-    const next = current?.rating === rating ? null : rating;
+    const before = current?.rating ?? null;
+    const next = before === rating ? null : rating;
     this.annotations[turn.id] = { hidden: current?.hidden ?? false, rating: next };
-    await this.client.turns.rate(turn.id, next);
+    return this.guard(
+      () => this.client.turns.rate(turn.id, next),
+      () => this.revert(turn.id, (a) => a.rating === next && { ...a, rating: before }),
+    );
   }
 
-  async setHidden(turn: Turn, hidden: boolean): Promise<void> {
+  /** Ukrycie z widoku działa od razu; odrzucone przez rdzeń wraca. */
+  setHidden(turn: Turn, hidden: boolean): Promise<boolean> {
+    const before = this.annotations[turn.id]?.hidden ?? false;
     this.annotations[turn.id] = { rating: this.annotations[turn.id]?.rating ?? null, hidden };
-    await this.client.turns.setHidden(turn.id, hidden);
+    return this.guard(
+      () => this.client.turns.setHidden(turn.id, hidden),
+      () => this.revert(turn.id, (a) => a.hidden === hidden && { ...a, hidden: before }),
+    );
+  }
+
+  /** Cofa adnotację, jeśli nie zmieniła jej w międzyczasie nowsza akcja (`false` — zostaw). */
+  private revert(turnId: string, undo: (a: TurnAnnotation) => TurnAnnotation | false): void {
+    const now = this.annotations[turnId];
+    const restored = now && undo(now);
+    if (restored) this.annotations[turnId] = restored;
+  }
+
+  /**
+   * Akcja z własną obsługą błędu: cofnięcie zmiany optymistycznej, `onError` (toast okna) i wynik
+   * `false` — przycisk z `void conv.stop()` nie gubi błędu. Bez `onError` błąd idzie dalej.
+   */
+  private async guard(action: () => Promise<unknown>, revert?: () => void): Promise<boolean> {
+    try {
+      await action();
+      return true;
+    } catch (error) {
+      revert?.();
+      if (!this.hooks.onError) throw error;
+      this.hooks.onError(error);
+      return false;
+    }
   }
 }

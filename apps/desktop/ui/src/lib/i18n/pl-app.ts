@@ -17,6 +17,8 @@ export const plApp = {
   'common.off': 'wyłączone',
   'common.none': 'brak',
   'common.loading': 'Ładowanie',
+  'common.loadFailed': 'Nie udało się wczytać: {error}',
+  'common.actionFailed': 'Nie udało się: {error}',
 
   'profile.local': 'Lokalny',
   'profile.hybrid': 'Hybryda',
@@ -287,6 +289,7 @@ export const plApp = {
   'composer.agentAutoHint': 'Auto — odpowie Dyrygentka',
   'composer.profile': 'Profil modelu: {profile}',
   'composer.stop': 'Zatrzymaj generowanie (Esc)',
+  'composer.draftFailed': 'Nie udało się zapisać szkicu (tekst zostaje w polu): {error}',
   'composer.mentions': 'Agentki',
   'composer.commands': 'Komendy',
   'composer.cmd.obsada': 'Zmień obsadę agentek',

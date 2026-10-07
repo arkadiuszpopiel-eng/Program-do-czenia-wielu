@@ -7,6 +7,7 @@
   import Avatar from '@alfa/ui-kit/components/Avatar.svelte';
   import SanitizedHtml from '@alfa/ui-kit/components/SanitizedHtml.svelte';
   import type { AlfaClient } from '../lib/api/client';
+  import { errorText } from '../lib/api/command-error';
   import type { Locale } from '../lib/api/types';
   import type { AlfaEvent } from '../lib/api/types-system';
   import { RafBatcher } from '../lib/logic/raf-batcher';
@@ -49,18 +50,29 @@
     } catch (error) {
       // Odrzucone pytanie nie ginie: wraca do pola, jeśli nie wpisano nic nowego.
       if (!question) question = text;
-      failure = error instanceof Error ? error.message : String(error);
+      failure = errorText(error);
     }
   }
+
+  /** Komenda okna (zamknij, otwórz w pełnym oknie); odrzucona — komunikat pod polem. */
+  async function windowAction(action: () => Promise<unknown>) {
+    try {
+      await action();
+    } catch (error) {
+      failure = errorText(error);
+    }
+  }
+
+  const expand = (id: string) => windowAction(() => client.quick.expandToMain(id));
 
   function onkeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       event.preventDefault();
-      void client.quick.hide();
+      void windowAction(() => client.quick.hide());
     } else if (event.key === 'Enter' && !event.isComposing) {
       event.preventDefault();
       if (question.trim()) void ask();
-      else if (quick.sessionId) void client.quick.expandToMain(quick.sessionId);
+      else if (quick.sessionId) void expand(quick.sessionId);
     }
   }
 
@@ -105,10 +117,8 @@
   <footer class="foot">
     <span>{sessionId && !streaming ? t('hintExpand') : t('hintAsk')}</span>
     {#if sessionId && !streaming}
-      <button
-        type="button"
-        class="open"
-        onclick={() => sessionId && void client.quick.expandToMain(sessionId)}>{t('open')}</button
+      <button type="button" class="open" onclick={() => sessionId && void expand(sessionId)}
+        >{t('open')}</button
       >
     {/if}
   </footer>

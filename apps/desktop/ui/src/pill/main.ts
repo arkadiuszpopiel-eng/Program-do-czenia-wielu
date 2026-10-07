@@ -1,11 +1,13 @@
 // Pigułka głosowa (ui-quick, makieta 4): minimalna strona BEZ frameworka (≤ 8 KB gzip).
 // Awatar mówiącej agentki, fala głośności (≤ 30 kl./s, pauza gdy okno ukryte), stan mikrofonu
 // (ikona + tekst, nigdy sam kolor), kto mówi i transkrypt częściowy użytkownika, przyciski Stop
-// i Wycisz. Dane: zdarzenia `VoicePill`/`MicLevel`.
+// i Wycisz. Dane: zdarzenia `VoicePill`/`MicLevel`. Odrzucona komenda (Wycisz, Stop) jest widoczna
+// w pigułce; „Wyciszony" dopiero po potwierdzeniu rdzenia (prywatność: nie przy żywym mikrofonie).
 import '@alfa/ui-kit/tokens.css';
 import './pill.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import { errorText } from '../lib/api/command-error';
 import type { AppBootstrap } from '../lib/api/types-system';
 import { applyBootDocument } from '../lib/window-boot';
 
@@ -35,6 +37,7 @@ const TEXT = {
     unmute: 'Włącz mikrofon',
     label: 'Pigułka głosowa',
     title: 'Alfa — pigułka głosowa',
+    failed: 'Nie udało się',
   },
   en: {
     off: 'Microphone off',
@@ -49,6 +52,7 @@ const TEXT = {
     unmute: 'Unmute',
     label: 'Voice pill',
     title: 'Alfa — voice pill',
+    failed: 'Failed',
   },
 } as const;
 const ICON: Record<Mic, string> = {
@@ -158,13 +162,30 @@ stop.append(icon(SQUARE));
 for (const b of [stop, mute]) b.type = 'button';
 root.append(avatar, wave, status, stop, mute);
 
+/** Błąd komendy pokazywany w miejscu stanu (pigułka nie ma toastów); `null` — brak. */
+let failure: string | null = null;
+let failureTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Pokazuje błąd w pigułce na `ms` (0 — do odwołania, np. brak zdarzeń stanu). */
+function fail(error: unknown, ms = 5000): void {
+  failure = `⚠ ${L.failed}: ${errorText(error)}`;
+  clearTimeout(failureTimer);
+  if (ms > 0) {
+    failureTimer = setTimeout(() => {
+      failure = null;
+      render();
+    }, ms);
+  }
+  render();
+}
+
 function render(): void {
   root?.style.setProperty('--accent', `var(--alfa-agent-${state.agent})`);
   avatar.textContent = GLYPH[state.agent];
   const label = state.mic === 'speaking' ? `${NAME[state.agent]} ${L.speaking}` : L[state.mic];
   // Transkrypt częściowy (szary w pełnym trybie) — w pigułce w cudzysłowie po stanie.
   const partial = state.speaker === 'user' && state.partial ? ` „${state.partial}”` : '';
-  status.textContent = `${ICON[state.mic]} ${label}${partial}`;
+  status.textContent = failure ?? `${ICON[state.mic]} ${label}${partial}`;
   status.title = status.textContent;
   stop.setAttribute('aria-label', L.stop);
   stop.title = L.stop;
@@ -195,16 +216,29 @@ function animate(on: boolean): void {
 }
 
 document.addEventListener('visibilitychange', () => animate(!document.hidden));
-stop.addEventListener(
-  'click',
-  () => void (tauri ? invoke('voice_stop_speech') : Promise.resolve()),
-);
-mute.addEventListener('click', () => {
-  const muted = state.mic !== 'muted';
-  state.mic = muted ? 'muted' : 'listening';
-  render();
-  if (tauri) void invoke('voice_set_muted', { muted });
+stop.addEventListener('click', () => {
+  if (tauri) void invoke('voice_stop_speech').catch((error: unknown) => fail(error));
 });
+
+let muting = false;
+/** Wycisz / włącz: stan zmienia się dopiero po potwierdzeniu rdzenia; błąd — w pigułce. */
+async function toggleMute(): Promise<void> {
+  if (muting) return;
+  const muted = state.mic !== 'muted';
+  muting = true;
+  mute.setAttribute('aria-busy', 'true');
+  try {
+    if (tauri) await invoke('voice_set_muted', { muted });
+    state.mic = muted ? 'muted' : 'listening';
+  } catch (error) {
+    fail(error);
+  } finally {
+    muting = false;
+    mute.removeAttribute('aria-busy');
+    render();
+  }
+}
+mute.addEventListener('click', () => void toggleMute());
 
 if (tauri) {
   void listen<readonly PillEvent[]>('alfa://events', (event) => {
@@ -213,7 +247,7 @@ if (tauri) {
       else if (e.type === 'MicLevel') state.level = e.level;
     }
     render();
-  });
+  }).catch((error: unknown) => fail(error, 0));
 }
 
 render();

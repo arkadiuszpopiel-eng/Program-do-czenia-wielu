@@ -37,7 +37,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "gray",
         "terms_url": "https://geminicli.com/docs/resources/tos-privacy/",
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "xai",
@@ -61,7 +61,7 @@
         "jurisdiction": "CN",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "kimi",
@@ -73,7 +73,7 @@
         "jurisdiction": "CN",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "qwen",
@@ -85,7 +85,7 @@
         "jurisdiction": "SG|EU",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "zai",
@@ -97,7 +97,7 @@
         "jurisdiction": "SG",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "minimax",
@@ -109,7 +109,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "openrouter",
@@ -121,7 +121,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "mistral",
@@ -133,7 +133,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "elevenlabs",
@@ -145,7 +145,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "cartesia",
@@ -157,7 +157,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "azure-speech",
@@ -169,7 +169,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "soniox",
@@ -181,7 +181,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": false
+        "needs_base_url": true
       },
       {
         "id": "custom-openai-compatible",

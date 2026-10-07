@@ -8,7 +8,9 @@
   import { Button } from '@alfa/ui-kit';
   import type { GuiScreenshot } from '../../api/types-work';
   import { agentName } from '../../logic/work';
+  import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import DesktopGrant from './DesktopGrant.svelte';
 
   interface Props {
@@ -21,34 +23,58 @@
   const gui = $derived(app.work.gui);
   const shotAt = $derived(gui?.screenshot?.at ?? null);
   let shot = $state<GuiScreenshot | null>(null);
+  let statusError = $state<string | null>(null);
+  let shotError = $state<string | null>(null);
+
+  // Błąd stanu = „Nie udało się wczytać" z „Ponów" zamiast „Ładowanie…" na zawsze.
+  async function loadStatus() {
+    statusError = null;
+    const result = await load(() => app.client.gui.status());
+    if (result.status === 'ready') app.work.applyGui(result.value);
+    else if (result.status === 'failed') statusError = result.error;
+  }
+
+  async function loadShot(at: string) {
+    shotError = null;
+    const result = await load(() => app.client.gui.screenshot());
+    if (at !== shotAt) return;
+    if (result.status === 'ready') {
+      shot = result.value;
+    } else if (result.status === 'failed') {
+      shot = null;
+      shotError = result.error;
+    }
+  }
+
+  function retryShot() {
+    if (shotAt) void loadShot(shotAt);
+  }
 
   $effect(() => {
-    void app.client.gui.status().then((s) => app.work.applyGui(s));
+    void loadStatus();
   });
 
   $effect(() => {
-    if (!shotAt) {
-      shot = null;
+    const at = shotAt;
+    if (at) {
+      void loadShot(at);
       return;
     }
-    void app.client.gui.screenshot().then((s) => (shot = s));
+    shot = null;
+    shotError = null;
   });
 
   async function act(action: () => Promise<unknown>) {
-    try {
-      await action();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    await attempt(app.toasts, action);
   }
 </script>
 
 <div class="screen">
+  {#if statusError}
+    <LoadFailed error={statusError} onretry={() => void loadStatus()} />
+  {/if}
   {#if !gui}
-    <p class="muted">{t('common.loading')}</p>
+    {#if !statusError}<p class="muted">{t('common.loading')}</p>{/if}
   {:else}
     {#if !gui.available}
       <p class="note" role="status">
@@ -98,6 +124,8 @@
           {t('gui.shotMeta', { time: app.i18n.time(info.at), n: info.masked })}
         </p>
         {#if info.black_frame}<p class="note">{t('gui.blackFrame')}</p>{/if}
+      {:else if gui.screenshot && shotError}
+        <LoadFailed error={shotError} onretry={retryShot} />
       {:else}
         <p class="muted">{t('gui.noShot')}</p>
       {/if}

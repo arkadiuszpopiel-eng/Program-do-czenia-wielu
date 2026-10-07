@@ -6,6 +6,7 @@
   import type { SessionSummary } from '../../api/types';
   import { useApp } from '../../state/context';
   import { exportConversation } from '../../state/exports';
+  import { duplicateSession } from '../../state/session-actions';
 
   interface Props {
     session: SessionSummary;
@@ -42,7 +43,7 @@
     {
       id: 'duplicate',
       label: t('sessions.duplicate'),
-      onSelect: () => void app.client.sessions.duplicateAsTemplate(session.id),
+      onSelect: () => void duplicateSession(app, session.id),
     },
     {
       id: 'export',

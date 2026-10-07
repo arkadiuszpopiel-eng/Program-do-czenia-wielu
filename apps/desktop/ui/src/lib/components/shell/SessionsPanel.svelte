@@ -5,7 +5,9 @@
   import Search from '@lucide/svelte/icons/search';
   import PanelLeftClose from '@lucide/svelte/icons/panel-left-close';
   import Archive from '@lucide/svelte/icons/archive';
+  import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from './LoadFailed.svelte';
   import SessionRow from './SessionRow.svelte';
 
   interface Props {
@@ -18,18 +20,32 @@
   const { t } = app.i18n;
   const sessions = app.sessions;
   let searching = $state(false);
+  let searchError = $state<string | null>(null);
+  /** Numer ostatniego wyszukiwania — spóźniona odpowiedź na stare zapytanie jest pomijana. */
+  let latest = 0;
+
+  /** Błąd wyszukiwania = komunikat z „Ponów", nigdy wieczne „szukam" ani „nic nie znaleziono". */
+  async function search(query: string) {
+    const token = ++latest;
+    searching = true;
+    const result = await load(() => app.client.sessions.search(query));
+    if (token !== latest) return;
+    searching = false;
+    searchError = result.status === 'failed' ? result.error : null;
+    sessions.hits = result.status === 'ready' ? [...result.value] : [];
+  }
 
   $effect(() => {
     const query = sessions.query.trim();
+    latest++;
+    searchError = null;
     if (!query) {
       sessions.hits = [];
+      searching = false;
       return;
     }
     searching = true;
-    const handle = setTimeout(async () => {
-      sessions.hits = [...(await app.client.sessions.search(query))];
-      searching = false;
-    }, 150);
+    const handle = setTimeout(() => void search(query), 150);
     return () => clearTimeout(handle);
   });
 
@@ -75,13 +91,17 @@
   </div>
   <div class="scroll">
     {#if sessions.query.trim()}
-      <p class="meta" aria-live="polite">
-        {#if !searching}
-          {sessions.hits.length
-            ? t('sessions.results', { n: sessions.hits.length })
-            : t('sessions.noResults', { query: sessions.query.trim() })}
-        {/if}
-      </p>
+      {#if searchError}
+        <LoadFailed error={searchError} onretry={() => void search(sessions.query.trim())} />
+      {:else}
+        <p class="meta" aria-live="polite">
+          {#if !searching}
+            {sessions.hits.length
+              ? t('sessions.results', { n: sessions.hits.length })
+              : t('sessions.noResults', { query: sessions.query.trim() })}
+          {/if}
+        </p>
+      {/if}
       <ul class="hits">
         {#each sessions.hits as hit (hit.session_id + (hit.turn_id ?? ''))}
           <li>

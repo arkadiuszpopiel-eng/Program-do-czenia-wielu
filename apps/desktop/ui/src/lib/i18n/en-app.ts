@@ -20,6 +20,8 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'common.off': 'off',
   'common.none': 'none',
   'common.loading': 'Loading',
+  'common.loadFailed': 'Could not load: {error}',
+  'common.actionFailed': 'Failed: {error}',
 
   'profile.local': 'Local',
   'profile.hybrid': 'Hybrid',
@@ -270,6 +272,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'composer.agentAutoHint': 'Auto — the Conductor answers',
   'composer.profile': 'Model profile: {profile}',
   'composer.stop': 'Stop generating (Esc)',
+  'composer.draftFailed': 'Could not save the draft (the text stays in the field): {error}',
   'composer.mentions': 'Agents',
   'composer.commands': 'Commands',
   'composer.cmd.obsada': 'Change the agent cast',

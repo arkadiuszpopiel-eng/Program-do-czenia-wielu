@@ -1,7 +1,9 @@
 // Załączniki composera aktywnej sesji: lista przygotowanych (kopie w katalogu sesji w rdzeniu),
 // wybór / wklejenie / upuszczenie, odrzucenia jako toasty z powodem, komunikat dla czytnika ekranu.
+import { errorText } from '../api/command-error';
 import type { AttachmentInfo, AttachmentsAdded, DroppedFileHint } from '../api/types-files';
 import type { AppState } from './app.svelte';
+import { showError } from './attempt';
 
 export class AttachmentsState {
   items = $state<readonly AttachmentInfo[]>([]);
@@ -17,19 +19,29 @@ export class AttachmentsState {
     return this.items.map((a) => a.id);
   }
 
-  /** Lista przygotowanych w sesji (po przełączeniu sesji). */
+  /**
+   * Lista przygotowanych w sesji (po przełączeniu sesji). Załączniki poprzedniej sesji znikają od
+   * razu — nie mogą pójść z wiadomością do innej; błąd wczytania = toast i pusta lista.
+   */
   async load(sessionId: string | null): Promise<void> {
+    if (this.session !== sessionId) this.items = [];
     this.session = sessionId;
-    if (!sessionId) {
-      this.items = [];
-      return;
+    if (!sessionId) return;
+    try {
+      const list = await this.app.client.attachments.list(sessionId);
+      if (this.session === sessionId) this.items = list;
+    } catch (error) {
+      if (this.session !== sessionId) return;
+      this.app.toasts.show({
+        kind: 'error',
+        message: this.app.i18n.t('common.loadFailed', { error: errorText(error) }),
+      });
     }
-    const list = await this.app.client.attachments.list(sessionId);
-    if (this.session === sessionId) this.items = list;
   }
 
+  /** Sesja docelowa; bez aktywnej — nowa (błąd utworzenia pokazuje już `newSession`). */
   private async target(): Promise<string | null> {
-    if (!this.app.activeId) await this.app.newSession();
+    if (!this.app.activeId && !(await this.app.newSession())) return null;
     return this.app.activeId;
   }
 
@@ -54,10 +66,7 @@ export class AttachmentsState {
       if (!sessionId) return;
       this.apply(sessionId, await action(sessionId));
     } catch (error) {
-      this.app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(this.app.toasts, error);
     }
   }
 
@@ -74,10 +83,15 @@ export class AttachmentsState {
     return this.run((id) => this.app.client.attachments.addDropped(id, hints));
   }
 
+  /** Usunięcie z przygotowanych; błąd = toast, załącznik zostaje na liście. */
   async remove(attachment: AttachmentInfo): Promise<void> {
-    const left = await this.app.client.attachments.remove(attachment.session_id, attachment.id);
-    if (this.session === attachment.session_id) this.items = left;
-    this.status = this.app.i18n.t('att.removed', { name: attachment.name });
+    try {
+      const left = await this.app.client.attachments.remove(attachment.session_id, attachment.id);
+      if (this.session === attachment.session_id) this.items = left;
+      this.status = this.app.i18n.t('att.removed', { name: attachment.name });
+    } catch (error) {
+      showError(this.app.toasts, error);
+    }
   }
 
   /** Po wysłaniu tury: rdzeń zdjął wysłane z przygotowanych. */

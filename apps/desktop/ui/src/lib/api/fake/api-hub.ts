@@ -1,6 +1,7 @@
 // Atrapa: Hub kont i kluczy oraz import/eksport `.alfa`. Sekret z kreatora jest tylko sprawdzany
 // (kształt) i odrzucany — atrapa, tak jak rdzeń, nigdy nie oddaje go z powrotem do UI.
 import type { AlfaClient } from '../client';
+import { CommandError } from '../command-error';
 import type { Account, DryRunItem, ModelInfo } from '../types-hub';
 import { FAKE_CATALOG } from './catalog';
 import type { FakeCore } from './core';
@@ -38,6 +39,27 @@ const genericModels = (providerId: string): readonly ModelInfo[] =>
     },
   ];
 
+/** Odmowa zapisu konta jak w rdzeniu albo `null`. */
+function checkNewAccount(
+  providerId: string,
+  secret: string,
+  baseUrl: string | null,
+): string | null {
+  const provider = FAKE_CATALOG.find((p) => p.id === providerId);
+  if (!provider) return `nieznany dostawca \`${providerId}\``;
+  if (!secret.trim()) return 'niepoprawne dane: klucz jest pusty albo zawiera niedozwolone znaki';
+  const url = baseUrl?.trim() ?? '';
+  if (!url) {
+    return provider.needs_base_url
+      ? 'niepoprawne dane: katalog nie zna endpointu tego dostawcy — podaj go'
+      : null;
+  }
+  const lower = url.toLowerCase();
+  const local = /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])([:/]|$)/.test(lower);
+  if ((lower.startsWith('https://') && lower.length > 'https://'.length) || local) return null;
+  return `niepoprawne dane: endpoint \`${url}\` musi zaczynać się od https:// (http:// tylko dla localhost)`;
+}
+
 export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
   const update = (id: string, patch: Partial<Account>): Account | undefined => {
     const index = core.accounts.findIndex((a) => a.id === id);
@@ -52,6 +74,9 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     catalog: () => core.reply(FAKE_CATALOG),
     list: () => core.reply(core.accounts),
     add: (input) => {
+      // Te same reguły co rdzeń (accounts-hub `check_new`), z tymi samymi komunikatami.
+      const rejected = checkNewAccount(input.provider_id, input.secret, input.base_url);
+      if (rejected) return Promise.reject(new CommandError('invalid_input', rejected));
       const account: Account = {
         id: core.nextId('acc'),
         provider_id: input.provider_id,

@@ -22,7 +22,9 @@
     visibleSteps,
   } from '../../logic/replay';
   import { agentName } from '../../logic/work';
+  import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
 
   interface Props {
     sessionId: string;
@@ -42,13 +44,24 @@
   let runs = $state<AgentRunDetail[]>([]);
   let selected = $state<string | null>(null);
   let cursor = $state<number | null>(null);
+  let loadError = $state<string | null>(null);
+
+  // Błąd = „Nie udało się wczytać" z „Ponów", nie mylące „brak przebiegów".
+  async function loadRuns() {
+    const id = sessionId;
+    const result = await load(() => app.client.agents.runs(id));
+    if (id !== sessionId) return;
+    if (result.status === 'failed') loadError = result.error;
+    if (result.status !== 'ready') return;
+    const list = result.value;
+    loadError = null;
+    runs = [...list];
+    selected = list.filter((r) => !r.run.parent_id).at(-1)?.run.id ?? list.at(-1)?.run.id ?? null;
+    cursor = null;
+  }
 
   $effect(() => {
-    void app.client.agents.runs(sessionId).then((list) => {
-      runs = [...list];
-      selected = list.filter((r) => !r.run.parent_id).at(-1)?.run.id ?? list.at(-1)?.run.id ?? null;
-      cursor = null;
-    });
+    void loadRuns();
   });
 
   $effect(() =>
@@ -81,26 +94,23 @@
     return app.runs.isUndone(step.undo_token, step.undone);
   }
 
+  // Krok oznaczamy jako cofnięty tylko wtedy, gdy rdzeń potwierdził cofnięcie (stan `app.runs`).
   async function undo(step: ReplayStep) {
-    if (!step.undo_token) return;
-    await app.undoStep(step.undo_token, step.output || step.title);
-    runs = markUndone(runs, step.undo_token);
+    const token = step.undo_token;
+    if (!token) return;
+    await attempt(app.toasts, () => app.undoStep(token, step.output || step.title));
+    if (app.runs.isUndone(token)) runs = markUndone(runs, token);
   }
 
   async function terminal(step: ReplayStep) {
-    try {
-      await app.client.agents.openTerminal(step.id);
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    await attempt(app.toasts, () => app.client.agents.openTerminal(step.id));
   }
 </script>
 
 <div class="replay">
-  {#if runs.length === 0}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void loadRuns()} />
+  {:else if runs.length === 0}
     <p class="empty">{t('replay.empty')}</p>
   {:else}
     {#if runs.length > 1}

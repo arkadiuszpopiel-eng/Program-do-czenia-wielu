@@ -2,9 +2,16 @@
 // ustawienia, stan systemu, koszty, agentki. Komponenty czytają pola, akcje wołają metody.
 import type { MicState } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
-import type { ActivityInfo, AgentState, CostSummary, SessionTemplate } from '../api/types';
+import type {
+  ActivityInfo,
+  AgentState,
+  CostSummary,
+  SessionSummary,
+  SessionTemplate,
+} from '../api/types';
 import type {
   AlfaEvent,
+  AppBootstrap,
   ChatStreamEvent,
   PanelId,
   SettingValue,
@@ -13,16 +20,21 @@ import type {
 
 /** Zdarzenie postępu pobierania modelu lokalnego. */
 export type LocalModelProgress = Extract<AlfaEvent, { type: 'LocalModelProgress' }>;
+import { errorText } from '../api/command-error';
 import { i18n, type I18n } from '../i18n/i18n.svelte';
 import { RafBatcher, type FrameScheduler } from '../logic/raf-batcher';
 import { SentenceAnnouncer, type Timers } from '../logic/sentence-announcer';
 import { SHORTCUTS } from '../logic/shortcut-registry';
 import { buildKeymap, effectiveBindings } from '../logic/shortcuts';
 import { applyEvent } from './apply-batch';
+import { attempt, showError } from './attempt';
+import { Debouncer, DraftSaver, logFailure } from './background';
 import { ConversationState } from './conversation.svelte';
 import { LayoutState } from './layout.svelte';
 import { RunsState } from './runs.svelte';
+import * as sessionActions from './session-actions';
 import { SessionsState } from './sessions.svelte';
+import * as settingsActions from './settings-actions';
 import { ToastState } from './toasts.svelte';
 import { VoiceUiState } from './voice.svelte';
 import { UpdatesState } from './updates.svelte';
@@ -88,16 +100,27 @@ export class AppState {
   private cacheOrder: string[] = [];
   private unsubscribe: (() => void) | null = null;
   private listeners: ((event: AlfaEvent) => void)[] = [];
-  private readonly debounceMs: number;
-  private readonly pending: Record<string, ReturnType<typeof setTimeout>> = {};
+  private readonly debouncer: Debouncer;
+  private readonly drafts: DraftSaver;
 
   constructor(
     readonly client: AlfaClient,
     options: AppOptions = {},
   ) {
-    this.debounceMs = options.debounceMs ?? 400;
+    this.debouncer = new Debouncer(options.debounceMs ?? 400);
+    // Układ zapisze się przy następnej zmianie — błąd bez toastu, ale nie po cichu.
     this.layout = new LayoutState((prefs) =>
-      this.debounce('layout', () => void this.client.app.saveLayout(prefs)),
+      this.debouncer.run('layout', () => {
+        this.client.app.saveLayout(prefs).catch(logFailure('saveLayout'));
+      }),
+    );
+    this.drafts = new DraftSaver(
+      (id, text) => this.client.sessions.saveDraft(id, text),
+      (error) =>
+        this.toasts.show({
+          kind: 'error',
+          message: this.i18n.t('composer.draftFailed', { error: errorText(error) }),
+        }),
     );
     this.batcher = new RafBatcher((batch) => this.applyBatch(batch), { frames: options.frames });
     this.announcer = new SentenceAnnouncer((text) => (this.announcement = text), {
@@ -110,43 +133,52 @@ export class AppState {
     return this.sessions.activeId;
   }
 
+  /**
+   * Start okna. Krytyczne (widok błędu z „Ponów"): ustawienia startowe, słownik, lista sesji.
+   * Reszta (stan systemu, głos, koszty, agentki, szkic) — toast albo dziennik, okno działa dalej.
+   */
   async start(): Promise<void> {
+    this.view = 'loading';
+    this.fatal = null;
+    let boot: AppBootstrap;
+    let list: readonly SessionSummary[];
+    let status: Promise<unknown> = Promise.resolve();
     try {
-      const boot = await this.client.app.bootstrap();
+      boot = await this.client.app.bootstrap();
       this.appVersion = boot.app_version;
       this.settings = { ...boot.settings };
       this.shortcutOverrides = { ...boot.shortcut_overrides };
       this.layout.load(boot.layout);
       await this.i18n.setLocale(boot.locale);
+      this.unsubscribe?.();
       this.unsubscribe = this.client.subscribe((batch) => this.batcher.push(...batch));
-      const [list, status] = await Promise.all([
-        this.client.sessions.list(),
-        this.client.system.status(),
-      ]);
-      this.sessions.list = [...list];
-      this.system = status;
-      void this.client.voice.status().then((v) => this.voice.applyStatus(v));
-      void this.client.gui.status().then(
-        (g) => this.work.applyGui(g),
-        () => undefined,
+      status = this.client.system.status().then(
+        (value) => (this.system = value),
+        (error: unknown) => this.loadFailed(error),
       );
-      void this.updates.load(this.client.updates);
-      void this.broker.load(this.client.broker);
-      const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;
-      if (first) await this.openSession(first);
-      else await this.refreshCosts();
-      this.view = boot.onboarding_done ? 'chat' : 'onboarding';
+      list = await this.client.sessions.list();
     } catch (error) {
-      this.fatal = error instanceof Error ? error.message : String(error);
+      this.fatal = errorText(error);
       this.view = 'error';
+      return;
     }
+    this.sessions.list = [...list];
+    void this.client.voice.status().then((v) => this.voice.applyStatus(v), logFailure('voice'));
+    void this.client.gui.status().then((g) => this.work.applyGui(g), logFailure('gui'));
+    void this.updates.load(this.client.updates);
+    void this.broker.load(this.client.broker);
+    const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;
+    if (first) await this.openSession(first);
+    else await this.refreshCosts().catch((error: unknown) => this.loadFailed(error));
+    await status;
+    this.view = boot.onboarding_done ? 'chat' : 'onboarding';
   }
 
   dispose(): void {
     this.unsubscribe?.();
     this.batcher.dispose();
     this.announcer.reset();
-    for (const handle of Object.values(this.pending)) clearTimeout(handle);
+    this.debouncer.dispose();
   }
 
   /** Stosuje paczkę zdarzeń (najwyżej raz na klatkę). */
@@ -164,11 +196,14 @@ export class AppState {
     for (const listener of this.listeners) listener(event);
   }
 
-  /** Cofa krok agentki (karta, toast, Replay) — przez dziennik cofania w rdzeniu. */
-  async undoStep(token: string, label: string): Promise<void> {
-    await this.client.turns.undoStep(token);
-    this.runs.markUndone(token);
-    this.toasts.show({ kind: 'success', message: this.i18n.t('conv.undone', { label }) });
+  /** Cofa krok agentki (karta, toast, Replay) — przez dziennik cofania; `false` — nie cofnięto. */
+  async undoStep(token: string, label: string): Promise<boolean> {
+    const ok = await attempt(this.toasts, () => this.client.turns.undoStep(token));
+    if (ok) {
+      this.runs.markUndone(token);
+      this.toasts.show({ kind: 'success', message: this.i18n.t('conv.undone', { label }) });
+    }
+    return ok;
   }
 
   /** Subskrypcje paneli ładowanych leniwie (oś czasu, Hub kont). */
@@ -191,6 +226,7 @@ export class AppState {
         onStop: () => {
           if (this.activeId === id) this.announcer.finish();
         },
+        onError: (error) => showError(this.toasts, error),
       });
       this.cache[id] = conv;
     }
@@ -201,6 +237,7 @@ export class AppState {
     return conv;
   }
 
+  /** Nie odrzuca: błąd rozmowy pokazuje widok („Ponów"), reszty (koszty, agentki, szkic) — toast. */
   async openSession(id: string): Promise<void> {
     this.batcher.flushNow();
     this.announcer.reset();
@@ -211,98 +248,85 @@ export class AppState {
     this.findOpen = false;
     this.timelineTurn = null;
     const loads: Promise<unknown>[] = [this.refreshCosts(), this.loadAgents(id)];
-    if (!conv.loaded) loads.push(conv.load());
+    if (!conv.loaded || conv.loadError) loads.push(conv.load());
     if (this.sessions.drafts[id] === undefined) {
       loads.push(this.client.sessions.getDraft(id).then((d) => (this.sessions.drafts[id] = d)));
     }
-    await Promise.all(loads);
+    const failed = (await Promise.allSettled(loads)).find((r) => r.status === 'rejected');
     // Szybkie przełączanie: spóźnione A nie może nadpisać aktywnej B w rdzeniu.
     if (this.activeId !== id) return;
-    void this.client.app.setActiveSession(id);
-    if (this.sessions.active?.unread) void this.client.sessions.markRead(id);
+    if (failed) this.loadFailed(failed.reason);
+    this.client.app.setActiveSession(id).catch(logFailure('setActiveSession'));
+    if (this.sessions.active?.unread)
+      this.client.sessions.markRead(id).catch(logFailure('markRead'));
   }
 
   /** „Przejdź do sesji" spoza okna (zasobnik, `alfa://session/…`, Szybkie pytanie). */
   async focusSession(id: string): Promise<void> {
     if (!this.sessions.list.some((s) => s.id === id)) {
-      this.sessions.list = [...(await this.client.sessions.list())];
+      try {
+        this.sessions.list = [...(await this.client.sessions.list())];
+      } catch (error) {
+        this.loadFailed(error);
+        return;
+      }
     }
     if (this.view === 'settings') this.view = 'chat';
     await this.openSession(id);
+  }
+
+  /** Toast „Nie udało się wczytać: …" dla danych dociąganych w tle. */
+  private loadFailed(error: unknown): void {
+    this.toasts.show({
+      kind: 'error',
+      message: this.i18n.t('common.loadFailed', { error: errorText(error) }),
+    });
   }
 
   private async loadAgents(id: string): Promise<void> {
     if (!this.agents[id]) this.agents[id] = [...(await this.client.agents.list(id))];
   }
 
+  /** Koszty aktywnej sesji; odrzuca przy błędzie — wołający pokazuje go (start, otwarcie sesji). */
   async refreshCosts(): Promise<void> {
     const id = this.activeId;
     const costs = await this.client.costs.summary(id);
     if (this.activeId === id) this.costs = costs;
   }
 
-  async newSession(template?: SessionTemplate): Promise<void> {
-    const chosen = template ?? (this.str('sessions.default_template', 'empty') as SessionTemplate);
-    const created = await this.client.sessions.create(chosen);
-    this.sessions.upsert(created);
-    this.view = 'chat';
-    await this.openSession(created.id);
+  // Akcje na sesjach i ustawieniach same pokazują błąd i cofają zmiany (session-actions.ts,
+  // settings-actions.ts); wynik `true` — sukces.
+
+  newSession(template?: SessionTemplate): Promise<boolean> {
+    return sessionActions.createSession(this, template);
   }
 
-  async renameSession(id: string, title: string): Promise<void> {
-    const trimmed = title.trim();
-    this.sessions.renamingId = null;
-    const current = this.sessions.list.find((s) => s.id === id);
-    if (!trimmed || !current || current.title === trimmed) return;
-    this.sessions.upsert({ ...current, title: trimmed });
-    await this.client.sessions.rename(id, trimmed);
+  renameSession(id: string, title: string): Promise<boolean> {
+    return sessionActions.renameSession(this, id, title);
   }
 
-  async setPinned(id: string, pinned: boolean): Promise<void> {
-    await this.client.sessions.setPinned(id, pinned);
+  setPinned(id: string, pinned: boolean): Promise<boolean> {
+    return sessionActions.setPinned(this, id, pinned);
   }
 
-  async setArchived(id: string, archived: boolean): Promise<void> {
-    await this.client.sessions.setArchived(id, archived);
+  setArchived(id: string, archived: boolean): Promise<boolean> {
+    return sessionActions.setArchived(this, id, archived);
   }
 
   /** Usunięcie z cofnięciem przez 10 s (toast „Cofnij"). */
-  async deleteSession(id: string): Promise<void> {
-    const session = this.sessions.list.find((s) => s.id === id);
-    const ticket = await this.client.sessions.remove(id);
-    this.sessions.remove(id);
-    if (this.activeId === id) {
-      const next = this.sessions.list.find((s) => !s.archived);
-      if (next) await this.openSession(next.id);
-      else {
-        this.sessions.activeId = null;
-        this.conversation = null;
-      }
-    }
-    this.toasts.show({
-      kind: 'info',
-      message: this.i18n.t('sessions.deleted', { title: session?.title ?? '' }),
-      actionLabel: this.i18n.t('common.undo'),
-      timeoutMs: 10_000,
-      onAction: () => void this.client.sessions.undoRemove(ticket.token),
-    });
+  deleteSession(id: string): Promise<boolean> {
+    return sessionActions.deleteSession(this, id);
   }
 
-  async exportSession(id: string): Promise<void> {
-    const result = await this.client.sessions.exportSession(id);
-    if (result.status === 'saved') {
-      this.toasts.show({
-        kind: 'success',
-        message: this.i18n.t('sessions.exported', { path: result.path }),
-      });
-    }
+  exportSession(id: string): Promise<boolean> {
+    return sessionActions.exportSession(this, id);
   }
 
   /** Szkic sesji (domyślnie aktywnej; inna — np. przywrócenie po nieudanym wysłaniu). */
   setDraft(text: string, id: string | null = this.activeId): void {
     if (!id) return;
     this.sessions.drafts[id] = text;
-    this.debounce(`draft:${id}`, () => void this.client.sessions.saveDraft(id, text));
+    this.debouncer.run(`draft:${id}`, () => void this.drafts.run(id, text));
   }
 
   // ── Ustawienia i wygląd ───────────────────────────────────────────────────────────────────────
@@ -322,22 +346,16 @@ export class AppState {
     return typeof value === 'boolean' ? value : fallback;
   }
 
-  async setSetting(key: string, value: SettingValue): Promise<void> {
-    this.settings[key] = value;
-    if (key === 'ui.locale' && (value === 'pl' || value === 'en')) await this.i18n.setLocale(value);
-    await this.client.settings.set(key, value);
+  setSetting(key: string, value: SettingValue): Promise<boolean> {
+    return settingsActions.setSetting(this, key, value);
   }
 
-  async resetSetting(key: string): Promise<void> {
-    const value = await this.client.settings.reset(key);
-    this.settings[key] = value;
-    if (key === 'ui.locale' && (value === 'pl' || value === 'en')) await this.i18n.setLocale(value);
+  resetSetting(key: string): Promise<boolean> {
+    return settingsActions.resetSetting(this, key);
   }
 
-  async setShortcut(actionId: string, chord: string | null): Promise<void> {
-    if (chord === null) delete this.shortcutOverrides[actionId];
-    else this.shortcutOverrides[actionId] = chord;
-    await this.client.settings.setShortcut(actionId, chord);
+  setShortcut(actionId: string, chord: string | null): Promise<boolean> {
+    return settingsActions.setShortcut(this, actionId, chord);
   }
 
   // ── Widok i panele ────────────────────────────────────────────────────────────────────────────
@@ -367,20 +385,8 @@ export class AppState {
     this.openPanel('timeline');
   }
 
-  async stopGeneration(): Promise<void> {
-    await this.conversation?.stop();
-  }
-
-  private debounce(key: string, run: () => void): void {
-    const existing = this.pending[key];
-    if (existing) clearTimeout(existing);
-    if (this.debounceMs <= 0) {
-      run();
-      return;
-    }
-    this.pending[key] = setTimeout(() => {
-      delete this.pending[key];
-      run();
-    }, this.debounceMs);
+  /** Stop strumienia aktywnej rozmowy; błąd pokazuje toast (ConversationState, `onError`). */
+  async stopGeneration(): Promise<boolean> {
+    return (await this.conversation?.stop()) ?? true;
   }
 }

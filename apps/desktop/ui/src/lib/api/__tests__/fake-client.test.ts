@@ -140,6 +140,21 @@ describe('FakeAlfaClient — scenariusze', () => {
     expect((await client.system.status()).keys_configured).toBe(true);
   });
 
+  it('dodanie konta: te same odmowy co rdzeń (endpoint, klucz) jako Error z komunikatem', async () => {
+    const { client } = setup({ scenario: 'no-keys' });
+    const add = (provider_id: string, secret: string, base_url: string | null) =>
+      client.accounts.add({ provider_id, label: 'x', secret, base_url });
+    await expect(add('deepseek', 'sk-test', null)).rejects.toThrow(/nie zna endpointu/);
+    await expect(add('deepseek', 'sk-test', 'http://example.com')).rejects.toThrow(/https:\/\//);
+    await expect(add('anthropic', '   ', null)).rejects.toThrow(/klucz jest pusty/);
+    await expect(add('deepseek', 'sk-test', 'https://api.deepseek.com')).resolves.toMatchObject({
+      provider_id: 'deepseek',
+    });
+    await expect(
+      add('custom-openai-compatible', 'k', 'http://127.0.0.1:8080/v1'),
+    ).resolves.toBeTruthy();
+  });
+
   it('usunięcie sesji cofalne przez 10 s', async () => {
     const { client, scheduler } = setup();
     const ticket = await client.sessions.remove('s-trip');

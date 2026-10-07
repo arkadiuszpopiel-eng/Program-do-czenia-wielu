@@ -2,6 +2,7 @@
 <script lang="ts">
   import { ActivityCapsule, agents } from '@alfa/ui-kit';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import ChatComposer from './ChatComposer.svelte';
   import FindBar from './FindBar.svelte';
   import MessageList from './MessageList.svelte';
@@ -35,6 +36,11 @@
     {#key conv.sessionId}
       <MessageList {conv} focusTurn={app.findOpen ? focusTurn : null} />
     {/key}
+  {:else if conv?.loadError}
+    <!-- Nieudane wczytanie rozmowy to nie pusta rozmowa: komunikat i „Ponów". -->
+    <div class="empty failed">
+      <LoadFailed error={conv.loadError} onretry={() => void conv.load()} />
+    </div>
   {:else if !conv || conv.loaded}
     <div class="empty"><StartState /></div>
   {:else}
@@ -102,5 +108,9 @@
     min-height: 0;
     display: flex;
     overflow: auto;
+  }
+  .failed {
+    align-items: flex-start;
+    padding: var(--alfa-space-4);
   }
 </style>

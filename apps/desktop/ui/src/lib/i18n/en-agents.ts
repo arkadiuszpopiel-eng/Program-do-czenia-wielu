@@ -51,6 +51,7 @@ export const enAgents: Record<keyof typeof plAgents, Message> = {
   'intent.open': 'Open terminal',
   'intent.copied': 'Command copied.',
   'intent.copyFailed': 'Could not copy — select the command manually.',
+  'msg.copyFailed': 'Could not copy to the clipboard — select the text manually.',
   'intent.deleteHint': 'Permanent deletion is confirmed only in the Broker window.',
   'approval.noWindow':
     'The Broker window is not running (developer mode) — this request cannot be approved.',

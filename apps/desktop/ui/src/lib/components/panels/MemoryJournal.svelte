@@ -2,7 +2,9 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { MemoryJournalEntry } from '../../api/types-memory';
+  import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
 
   interface Props {
     scope: string;
@@ -13,37 +15,45 @@
   const app = useApp();
   const { t } = app.i18n;
   let entries = $state<readonly MemoryJournalEntry[]>([]);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    entries = await app.client.memory.journal(scope);
+  // Błąd = „Nie udało się wczytać" z „Ponów", nie mylące „dziennik jest pusty".
+  async function loadEntries() {
+    const key = scope;
+    const result = await load(() => app.client.memory.journal(key));
+    if (key !== scope) return;
+    if (result.status === 'ready') {
+      entries = result.value;
+      loadError = null;
+    } else if (result.status === 'failed') {
+      loadError = result.error;
+    }
   }
 
   $effect(() => {
     void scope;
-    void load();
+    void loadEntries();
   });
 
   async function undo(entry: MemoryJournalEntry) {
-    try {
+    const ok = await attempt(app.toasts, async () => {
       const result = await app.client.memory.undo(scope, entry.id);
       app.toasts.show({
         kind: 'success',
         message: t('memory.undoDone', { restored: result.restored, removed: result.removed }),
       });
-      await load();
-      onchange?.();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    });
+    if (!ok) return;
+    await loadEntries();
+    onchange?.();
   }
 </script>
 
 <details class="journal">
   <summary>{t('memory.journal')}</summary>
-  {#if entries.length === 0}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void loadEntries()} />
+  {:else if entries.length === 0}
     <p class="meta">{t('memory.journalEmpty')}</p>
   {:else}
     <ul aria-label={t('memory.journalScope', { scope })}>

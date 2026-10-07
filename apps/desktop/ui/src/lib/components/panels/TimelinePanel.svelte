@@ -11,7 +11,9 @@
   import Mic from '@lucide/svelte/icons/mic';
   import Activity from '@lucide/svelte/icons/activity';
   import type { EventLevel, TimelineEvent, TimelineKind } from '../../api/types';
+  import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import ReplayView from './ReplayView.svelte';
 
   interface Props {
@@ -43,10 +45,26 @@
   let kinds = $state<TimelineKind[]>([]);
   let minLevel = $state<string>('info');
   let events = $state<TimelineEvent[]>([]);
+  let loadError = $state<string | null>(null);
+  /** Numer ostatniego zapytania — po zmianie filtrów starsze odpowiedzi odpadają. */
+  let requestSeq = 0;
+
+  // Błąd = „Nie udało się wczytać" z „Ponów", nie mylące „brak zdarzeń".
+  async function loadEvents() {
+    const seq = ++requestSeq;
+    const filter = { kinds: [...kinds], min_level: minLevel as EventLevel };
+    const result = await load(() => app.client.timeline.list(sessionId, filter));
+    if (seq !== requestSeq) return;
+    if (result.status === 'ready') {
+      events = [...result.value];
+      loadError = null;
+    } else if (result.status === 'failed') {
+      loadError = result.error;
+    }
+  }
 
   $effect(() => {
-    const filter = { kinds: [...kinds], min_level: minLevel as EventLevel };
-    void app.client.timeline.list(sessionId, filter).then((list) => (events = [...list]));
+    void loadEvents();
   });
 
   $effect(() =>
@@ -110,7 +128,9 @@
       {t('timeline.count', { n: shown.length })}{#if total > 0}
         · {t('timeline.total', { cost: app.i18n.money({ minor: total, currency: 'PLN' }) })}{/if}
     </p>
-    {#if shown.length === 0}
+    {#if loadError}
+      <LoadFailed error={loadError} onretry={() => void loadEvents()} />
+    {:else if shown.length === 0}
       <p class="empty">{t('timeline.empty')}</p>
     {:else}
       <ol class="list" aria-label={t('timeline.list')}>

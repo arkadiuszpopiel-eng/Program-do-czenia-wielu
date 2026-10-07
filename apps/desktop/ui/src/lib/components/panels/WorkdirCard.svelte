@@ -6,7 +6,9 @@
   import { Button } from '@alfa/ui-kit';
   import FolderOpen from '@lucide/svelte/icons/folder-open';
   import type { SessionWorkdir, WorkdirChoice } from '../../api/types';
+  import { load, showError } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
 
   interface Props {
     sessionId: string;
@@ -18,9 +20,20 @@
   const titleId = $props.id();
   let workdir = $state<SessionWorkdir | null>(null);
   let busy = $state(false);
+  let loadError = $state<string | null>(null);
+
+  // Błąd = „Nie udało się wczytać" z „Ponów" zamiast samego nagłówka bez przycisków.
+  async function loadWorkdir() {
+    const id = sessionId;
+    loadError = null;
+    const result = await load(() => app.client.sessions.workdir(id));
+    if (id !== sessionId) return;
+    if (result.status === 'ready') workdir = result.value;
+    else if (result.status === 'failed') loadError = result.error;
+  }
 
   $effect(() => {
-    void app.client.sessions.workdir(sessionId).then((w) => (workdir = w));
+    void loadWorkdir();
   });
 
   async function choose(choice: WorkdirChoice) {
@@ -32,10 +45,7 @@
         message: workdir.path ? t('workdir.set', { path: workdir.path }) : t('workdir.cleared'),
       });
     } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(app.toasts, error);
     } finally {
       busy = false;
     }
@@ -47,7 +57,9 @@
     <FolderOpen size={14} strokeWidth={1.5} aria-hidden="true" />
     {t('workdir.title')}
   </h3>
-  {#if workdir}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void loadWorkdir()} />
+  {:else if workdir}
     {#if workdir.path}
       <p class="path"><code>{workdir.path}</code></p>
       <p class="hint">{t('workdir.on')}</p>

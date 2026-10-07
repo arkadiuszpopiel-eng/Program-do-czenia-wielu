@@ -39,6 +39,11 @@
   });
 
   const control = (c: ReadControlAction) => void act.read({ kind: 'control', control: c });
+
+  // Po odmowie suwak wraca do tempa z rdzenia (toast pokazuje `voiceActions`).
+  async function setRate() {
+    if (!(await act.read({ kind: 'set_rate', rate: Number(rate) }))) rate = r.rate;
+  }
 </script>
 
 <section class="vf-card" aria-labelledby="{uid}-title">
@@ -113,7 +118,7 @@
         max="2"
         step="0.1"
         bind:value={rate}
-        onchange={() => void act.read({ kind: 'set_rate', rate: Number(rate) })}
+        onchange={() => void setRate()}
       />
       <span>{t('vf.read.rate', { rate: Number(rate).toFixed(1) })}</span>
     </label>

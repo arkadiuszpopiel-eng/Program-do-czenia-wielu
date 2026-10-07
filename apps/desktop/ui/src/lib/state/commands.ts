@@ -1,10 +1,12 @@
 // Komendy okna głównego: jedno miejsce dla skrótów klawiszowych i palety poleceń.
 // Skróty globalne (Szybkie pytanie, STOP WSZYSTKIEGO) obsługuje rdzeń — nie ma ich tutaj.
+import { errorText } from '../api/command-error';
 import type { PanelId } from '../api/types-system';
 import { stepZoom } from '../logic/layout';
 import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
 import { RESERVED, allowedInInput, chordFromEvent } from '../logic/shortcuts';
 import type { AppState } from './app.svelte';
+import { attempt } from './attempt';
 import { exportConversation } from './exports';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
@@ -129,10 +131,7 @@ export function runCommand(app: AppState, id: string): void {
       app.micState = on ? 'listening' : 'off';
       app.client.voice.setMicEnabled(on).catch((error: unknown) => {
         app.micState = before;
-        app.toasts.show({
-          kind: 'warning',
-          message: error instanceof Error ? error.message : String(error),
-        });
+        app.toasts.show({ kind: 'warning', message: errorText(error) });
       });
       break;
     }
@@ -212,7 +211,7 @@ export function escapeChain(app: AppState): boolean {
     return true;
   }
   if (app.micState === 'speaking') {
-    void app.client.voice.stopSpeech();
+    void attempt(app.toasts, () => app.client.voice.stopSpeech());
     return true;
   }
   if (app.voice.reading) {

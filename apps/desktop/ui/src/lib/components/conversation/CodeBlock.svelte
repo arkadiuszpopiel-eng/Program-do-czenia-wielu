@@ -6,6 +6,7 @@
   import SquareTerminal from '@lucide/svelte/icons/square-terminal';
   import WrapText from '@lucide/svelte/icons/wrap-text';
   import type { RenderedBlock } from '../../api/types';
+  import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
 
   interface Props {
@@ -30,13 +31,21 @@
 
   async function copy() {
     const text = host?.querySelector('pre')?.textContent ?? '';
-    await navigator.clipboard.writeText(text);
-    app.toasts.show({ kind: 'success', message: t('common.copied'), timeoutMs: 2500 });
+    try {
+      await navigator.clipboard.writeText(text);
+      app.toasts.show({ kind: 'success', message: t('common.copied'), timeoutMs: 2500 });
+    } catch {
+      app.toasts.show({ kind: 'warning', message: t('msg.copyFailed') });
+    }
   }
 
   async function run() {
-    await app.client.turns.runCode(turnId, block.index);
-    app.toasts.show({ kind: 'info', message: t('msg.brokerOpened') });
+    const ok = await attempt(app.toasts, () => app.client.turns.runCode(turnId, block.index));
+    if (ok) app.toasts.show({ kind: 'info', message: t('msg.brokerOpened') });
+  }
+
+  async function save() {
+    await attempt(app.toasts, () => app.client.turns.saveCode(turnId, block.index));
   }
 </script>
 
@@ -50,11 +59,7 @@
       <IconButton label={t('msg.codeCopy')} size="sm" onclick={copy}>
         <Copy size={14} strokeWidth={1.5} />
       </IconButton>
-      <IconButton
-        label={t('msg.codeSave')}
-        size="sm"
-        onclick={() => void app.client.turns.saveCode(turnId, block.index)}
-      >
+      <IconButton label={t('msg.codeSave')} size="sm" onclick={() => void save()}>
         <Download size={14} strokeWidth={1.5} />
       </IconButton>
       <IconButton label={t('msg.codeRun')} size="sm" onclick={run}>

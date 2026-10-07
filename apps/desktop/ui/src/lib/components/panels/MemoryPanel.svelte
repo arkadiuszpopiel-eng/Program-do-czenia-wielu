@@ -13,7 +13,9 @@
     MemoryScopeInfo,
     MemoryState,
   } from '../../api/types-memory';
+  import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import MemoryDetail from './MemoryDetail.svelte';
 
   interface Props {
@@ -30,6 +32,7 @@
   let items = $state<readonly MemoryItem[]>([]);
   let total = $state(0);
   let loaded = $state(false);
+  let loadError = $state<string | null>(null);
   let text = $state('');
   let layer = $state('all');
   let scope = $state('all');
@@ -37,34 +40,48 @@
   let stateFilter = $state('all');
   let selected = $state<string | null>(null);
 
-  async function load() {
-    const [list, page] = await Promise.all([
-      app.client.memory.scopes(),
-      app.client.memory.inspect({
-        scopes: scope === 'all' ? [] : [scope],
-        text: text.trim() || null,
-        layers: layer === 'all' ? [] : [layer as MemoryLayer],
-        states: stateFilter === 'all' ? [] : [stateFilter as MemoryState],
-        trusted: trust === 'all' ? null : trust === 'trusted',
-        pinned: null,
-        offset: 0,
-        limit: 100,
-      }),
-    ]);
-    scopes = list;
-    items = page.items;
-    total = page.total;
+  /** Numer ostatniego zapytania: wyszukiwanie idzie przy każdym klawiszu, starsze odpowiedzi odpadają. */
+  let requestSeq = 0;
+
+  // Błąd pokazujemy w miejscu listy (z „Ponów"), nie toastem — zapytanie leci przy każdym klawiszu.
+  async function refresh() {
+    const seq = ++requestSeq;
+    const result = await load(() =>
+      Promise.all([
+        app.client.memory.scopes(),
+        app.client.memory.inspect({
+          scopes: scope === 'all' ? [] : [scope],
+          text: text.trim() || null,
+          layers: layer === 'all' ? [] : [layer as MemoryLayer],
+          states: stateFilter === 'all' ? [] : [stateFilter as MemoryState],
+          trusted: trust === 'all' ? null : trust === 'trusted',
+          pinned: null,
+          offset: 0,
+          limit: 100,
+        }),
+      ]),
+    );
+    if (seq !== requestSeq) return;
+    if (result.status === 'ready') {
+      const [list, page] = result.value;
+      scopes = list;
+      items = page.items;
+      total = page.total;
+      loadError = null;
+    } else if (result.status === 'failed') {
+      loadError = result.error;
+    }
     loaded = true;
   }
 
   $effect(() => {
     void [sessionId, text, layer, scope, trust, stateFilter];
-    void load();
+    void refresh();
   });
 
   $effect(() =>
     app.on((event) => {
-      if (event.type === 'MemoryChanged') void load();
+      if (event.type === 'MemoryChanged') void refresh();
     }),
   );
 
@@ -117,7 +134,9 @@
       · {t('memory.pendingCount', { n: pending })}{/if}
   </p>
 
-  {#if loaded && items.length === 0}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void refresh()} />
+  {:else if loaded && items.length === 0}
     <EmptyState title={t('panel.memory')} description={t('memory.empty')}>
       {#snippet icon()}<Brain size={20} strokeWidth={1.5} />{/snippet}
     </EmptyState>

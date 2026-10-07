@@ -3,6 +3,7 @@
   import { Button } from '@alfa/ui-kit';
   import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
   import type { Turn, TurnError } from '../../api/types';
+  import { attempt } from '../../state/attempt';
   import { now } from '../../state/clock.svelte';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
@@ -16,6 +17,15 @@
   let { turn, error, conv }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
+
+  let busy = $state(false);
+
+  // Ponowienie, które samo się nie uda, daje toast — przycisk nie „nic nie robi".
+  async function retry(profile: string | null) {
+    busy = true;
+    await attempt(app.toasts, () => conv.regenerate(turn, profile));
+    busy = false;
+  }
 
   const text = $derived.by(() => {
     if (error.code === 'rate_limited' && error.retry_at) {
@@ -34,10 +44,10 @@
 <div class="error" role="alert">
   <TriangleAlert size={16} strokeWidth={1.5} aria-hidden="true" />
   <span class="text">{text}</span>
-  <Button size="sm" variant="secondary" onclick={() => void conv.regenerate(turn)}>
+  <Button size="sm" variant="secondary" disabled={busy} onclick={() => void retry(null)}>
     {t('conv.retry')}
   </Button>
-  <Button size="sm" variant="ghost" onclick={() => void conv.regenerate(turn, 'local')}>
+  <Button size="sm" variant="ghost" disabled={busy} onclick={() => void retry('local')}>
     {t('conv.otherModel')}
   </Button>
 </div>

@@ -16,6 +16,7 @@
   import Brain from '@lucide/svelte/icons/brain';
   import Clock from '@lucide/svelte/icons/clock';
   import type { Turn } from '../../api/types';
+  import { attempt } from '../../state/attempt';
   import { now } from '../../state/clock.svelte';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
@@ -48,6 +49,7 @@
   let bodyEl = $state<HTMLElement | null>(null);
   let pinned = $state(false);
   let draft = $state('');
+  let sending = false; // edycja w drodze do rdzenia — blokada podwójnego Enter
   let slow = $state(false);
 
   // Szkielet dopiero po 300 ms bez treści (PLAN §14.8: bez migających spinnerów).
@@ -68,10 +70,16 @@
     app.editingTurnId = turn.id;
   }
 
+  const act = (action: () => Promise<unknown>) => void attempt(app.toasts, action);
+  // Edytor zamyka się dopiero po udanym wysłaniu — po błędzie zostaje otwarty z tekstem (toast).
   async function submitEdit() {
     const text = draft.trim();
-    app.editingTurnId = null;
-    if (text && text !== turn.text) await conv.editAndResend(turn, text);
+    if (sending) return;
+    sending = true;
+    const unchanged = !text || text === turn.text;
+    const ok = unchanged || (await attempt(app.toasts, () => conv.editAndResend(turn, text)));
+    sending = false;
+    if (ok && app.editingTurnId === turn.id) app.editingTurnId = null;
   }
 
   function editKey(event: KeyboardEvent) {
@@ -99,7 +107,7 @@
     aria-label={t('conv.hidden')}
   >
     <span>{t('conv.hidden')}</span>
-    <Button size="sm" variant="ghost" onclick={() => void conv.setHidden(turn, false)}
+    <Button size="sm" variant="ghost" onclick={() => act(() => conv.setHidden(turn, false))}
       >{t('conv.unhide')}</Button
     >
   </article>
@@ -244,7 +252,7 @@
     {#if turn.truncated && turn.status === 'complete'}
       <div class="continue">
         <span>{t('conv.truncated')}</span>
-        <Button size="sm" variant="secondary" onclick={() => void conv.continueTurn(turn)}
+        <Button size="sm" variant="secondary" onclick={() => act(() => conv.continueTurn(turn))}
           >{t('conv.continue')}</Button
         >
       </div>

@@ -7,7 +7,9 @@
   import { Button, EmptyState, Select, Switch, TextField } from '@alfa/ui-kit';
   import ListTodo from '@lucide/svelte/icons/list-todo';
   import type { TaskInfo } from '../../api/types-tasks';
+  import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import TaskNode from './TaskNode.svelte';
 
   interface Props {
@@ -19,15 +21,22 @@
   const { t } = app.i18n;
   let tasks = $state<TaskInfo[]>([]);
   let loaded = $state(false);
+  let loadError = $state<string | null>(null);
   let showDone = $state(true);
   let goal = $state('');
   let after = $state('');
 
+  // Błąd listy = „Nie udało się wczytać" z „Ponów", nie mylący pusty stan „brak zadań".
+  async function loadTasks() {
+    loadError = null;
+    const result = await load(() => app.client.tasks.list());
+    if (result.status === 'ready') tasks = [...result.value];
+    else if (result.status === 'failed') loadError = result.error;
+    loaded = true;
+  }
+
   $effect(() => {
-    void app.client.tasks.list().then((list) => {
-      tasks = [...list];
-      loaded = true;
-    });
+    void loadTasks();
     return app.on((event) => {
       if (event.type !== 'TaskUpdated') return;
       const i = tasks.findIndex((x) => x.id === event.task.id);
@@ -48,7 +57,8 @@
   async function add() {
     const text = goal.trim();
     if (!text) return;
-    try {
+    // Pola czyszczone tylko po sukcesie — po błędzie cel zostaje do ponowienia.
+    await attempt(app.toasts, async () => {
       const created = await app.client.tasks.create({
         session_id: sessionId,
         title: '',
@@ -60,12 +70,7 @@
       goal = '';
       after = '';
       app.toasts.show({ kind: 'success', message: t('tasks.added', { title: created.title }) });
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    });
   }
 </script>
 
@@ -86,7 +91,9 @@
     <span id="tasks-done">{t('tasks.showDone')}</span>
     <Switch bind:checked={showDone} labelledby="tasks-done" />
   </div>
-  {#if loaded && roots.length === 0}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void loadTasks()} />
+  {:else if loaded && roots.length === 0}
     <EmptyState title={t('panel.tasks')} description={t('tasks.empty')}>
       {#snippet icon()}<ListTodo size={20} strokeWidth={1.5} />{/snippet}
     </EmptyState>

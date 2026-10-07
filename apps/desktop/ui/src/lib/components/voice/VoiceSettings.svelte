@@ -5,23 +5,34 @@
 -->
 <script lang="ts">
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import DictationCard from './DictationCard.svelte';
   import ReadCard from './ReadCard.svelte';
   import SpeakerEnroll from './SpeakerEnroll.svelte';
   import WakeCard from './WakeCard.svelte';
+  import { loadVoiceFeatures } from './voice-act';
   import './voice.css';
 
   const app = useApp();
   const { t } = app.i18n;
   const features = $derived(app.voice.features);
+  let loadError = $state<string | null>(null);
+
+  async function loadFeatures() {
+    loadError = null;
+    loadError = await loadVoiceFeatures(app);
+  }
 
   $effect(() => {
-    void app.client.voiceFeatures.features().then((f) => app.voice.applyFeatures(f));
+    void loadFeatures();
   });
 </script>
 
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void loadFeatures()} />
+{/if}
 {#if !features}
-  <p class="vf-muted">{t('vf.loading')}</p>
+  {#if !loadError}<p class="vf-muted">{t('vf.loading')}</p>{/if}
 {:else}
   <WakeCard {features} settings />
   <SpeakerEnroll {features} settings />

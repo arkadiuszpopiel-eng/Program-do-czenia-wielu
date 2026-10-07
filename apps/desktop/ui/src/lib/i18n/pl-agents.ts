@@ -60,6 +60,7 @@ export const plAgents = {
   'intent.open': 'Otwórz terminal',
   'intent.copied': 'Skopiowano polecenie.',
   'intent.copyFailed': 'Nie udało się skopiować — zaznacz polecenie ręcznie.',
+  'msg.copyFailed': 'Nie udało się skopiować do schowka — zaznacz tekst ręcznie.',
   'intent.deleteHint': 'Trwałe usunięcie potwierdzasz wyłącznie w oknie Brokera.',
   'approval.noWindow':
     'Okno Brokera nie działa (tryb deweloperski) — tej prośby nie da się zatwierdzić.',

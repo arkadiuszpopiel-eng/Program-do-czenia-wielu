@@ -1,6 +1,7 @@
 <!-- Korzeń okna głównego: kontekst stanu, wygląd, skróty, widok (start / wprowadzenie / powłoka). -->
 <script lang="ts">
   import { untrack } from 'svelte';
+  import { Button } from '@alfa/ui-kit';
   import { applyAppearance, effectiveWidth } from './lib/appearance';
   import AppShell from './lib/components/shell/AppShell.svelte';
   import Lazy from './lib/components/shell/Lazy.svelte';
@@ -59,7 +60,11 @@
 {#if app.view === 'loading'}
   <div class="boot" role="status" aria-label={t('app.loading')}></div>
 {:else if app.view === 'error'}
-  <p class="fatal" role="alert">{t('app.failed', { error: app.fatal ?? '' })}</p>
+  <!-- Start nieudany (np. rdzeń nie odpowiedział): komunikat i „Ponów" zamiast martwego okna. -->
+  <div class="fatal">
+    <p role="alert">{t('app.failed', { error: app.fatal ?? '' })}</p>
+    <Button variant="secondary" onclick={() => void app.start()}>{t('common.retry')}</Button>
+  </div>
 {:else if app.view === 'onboarding'}
   <Lazy load={loadOnboarding} props={{}} label={t('app.loading')} />
 {:else}
@@ -78,7 +83,14 @@
     background: var(--alfa-color-bg);
   }
   .fatal {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--alfa-space-3);
     margin: var(--alfa-space-8);
+  }
+  .fatal p {
+    margin: 0;
     color: var(--alfa-color-error);
   }
 </style>

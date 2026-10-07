@@ -11,7 +11,9 @@
     MemoryScopeInfo,
     MemoryScopeRef,
   } from '../../api/types-memory';
+  import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import LoadFailed from '../shell/LoadFailed.svelte';
   import MemoryJournal from './MemoryJournal.svelte';
 
   interface Props {
@@ -33,20 +35,30 @@
     t(REASONS[r as keyof typeof REASONS] ?? REASONS.target);
 
   let info = $state<MemoryExplanation | null>(null);
+  let loadError = $state<string | null>(null);
   let editing = $state(false);
   let draft = $state('');
   let target = $state('global');
   let preview = $state<MemoryForgetPreview | null>(null);
 
-  async function load() {
-    info = await app.client.memory.explain(entryId);
+  // Błąd wczytania = „Nie udało się wczytać" z „Ponów" zamiast pustego miejsca pod wpisem.
+  async function loadInfo() {
+    const id = entryId;
+    const result = await load(() => app.client.memory.explain(id));
+    if (id !== entryId) return;
+    if (result.status === 'ready') {
+      info = result.value;
+      loadError = null;
+    } else if (result.status === 'failed') {
+      loadError = result.error;
+    }
   }
 
   $effect(() => {
     void entryId;
     preview = null;
     editing = false;
-    void load();
+    void loadInfo();
   });
 
   const item = $derived(info?.item ?? null);
@@ -72,27 +84,23 @@
     },
   );
 
-  async function act(run: () => Promise<unknown>, message: string) {
-    try {
-      await run();
-      app.toasts.show({ kind: 'success', message });
-      await load();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: String(error instanceof Error ? error.message : error),
-      });
-    }
+  /** Akcja na wpisie: toast sukcesu i odświeżenie albo toast błędu; `true` po sukcesie. */
+  async function act(run: () => Promise<unknown>, message: string): Promise<boolean> {
+    if (!(await attempt(app.toasts, run))) return false;
+    app.toasts.show({ kind: 'success', message });
+    await loadInfo();
+    return true;
   }
 
+  // Edycja zamyka się tylko po zapisie — po błędzie zostaje otwarta z wpisanym tekstem.
   async function save() {
     const text = draft.trim();
     if (!text) return;
-    await act(
+    const ok = await act(
       () => app.client.memory.edit(entryId, { text, subject: null, confidence: null }),
       t('memory.saved'),
     );
-    editing = false;
+    if (ok) editing = false;
   }
 
   async function promote() {
@@ -106,16 +114,24 @@
   }
 
   async function forget() {
-    const report = await app.client.memory.forget({ target: 'entry', id: entryId });
-    app.toasts.show({
-      kind: 'success',
-      message: t('memory.forgotten', {
-        removed: report.removed,
-        versions: report.versions,
-        derived: report.derived,
-      }),
+    const ok = await attempt(app.toasts, async () => {
+      const report = await app.client.memory.forget({ target: 'entry', id: entryId });
+      app.toasts.show({
+        kind: 'success',
+        message: t('memory.forgotten', {
+          removed: report.removed,
+          versions: report.versions,
+          derived: report.derived,
+        }),
+      });
     });
-    onclose();
+    if (ok) onclose();
+  }
+
+  async function showForgetPreview() {
+    await attempt(app.toasts, async () => {
+      preview = await app.client.memory.forgetPreview({ target: 'entry', id: entryId });
+    });
   }
 
   function source(): string {
@@ -128,7 +144,9 @@
   }
 </script>
 
-{#if info && item}
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void loadInfo()} />
+{:else if info && item}
   <section class="detail" aria-label={t('memory.details')}>
     <h4>{t('memory.why')}</h4>
     <ul class="reasons">
@@ -220,13 +238,7 @@
               t(item.pinned ? 'memory.unpin' : 'memory.pin'),
             )}>{t(item.pinned ? 'memory.unpin' : 'memory.pin')}</Button
         >
-        <Button
-          size="sm"
-          variant="danger"
-          onclick={async () =>
-            (preview = await app.client.memory.forgetPreview({ target: 'entry', id: entryId }))}
-          >{t('memory.forget')}</Button
-        >
+        <Button size="sm" variant="danger" onclick={showForgetPreview}>{t('memory.forget')}</Button>
       </div>
       {#if promoteTargets.length}
         <div class="promote">
@@ -240,7 +252,7 @@
         </div>
       {/if}
     {/if}
-    <MemoryJournal scope={item.scope_key} onchange={load} />
+    <MemoryJournal scope={item.scope_key} onchange={() => void loadInfo()} />
   </section>
 {/if}
 
