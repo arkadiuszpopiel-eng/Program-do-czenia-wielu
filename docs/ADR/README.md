@@ -19,5 +19,6 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0013](0013-kontrakty-i-codegen-ts.md) | Kontrakty i codegen TS (`tauri-specta`/`ts-rs`), JSON Schema, WIT | Zaakceptowany |
 | [0014](0014-lokalny-llm-llama-cpp-zamiast-ollamy.md) | Lokalny LLM: llama.cpp (Vulkan/CUDA) zamiast Ollamy | Zaakceptowany |
 | [0015](0015-model-uprawnien-tokeny-zdolnosci-l0-l4.md) | Model uprawnień: tokeny zdolności i poziomy L0–L4 | Zaakceptowany |
+| [0016](0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.md) | Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu | Zaakceptowany |
 
 Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u.

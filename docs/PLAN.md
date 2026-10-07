@@ -200,6 +200,8 @@ AGENTS.md  CLAUDE.md  README.md
 
 ## 4. Budowa w 100% przez AI (Opus 5.5 / GPT-6 Sol)
 
+> **Zmiana po zatwierdzeniu planu (ADR 0016, 2026-10-08):** jedynym wykonawcą jest Claude Code; Codex CLI / GPT-6 Sol nie pisze ani nie recenzuje kodu. „Drugi model” i „model-recenzent” w tej sekcji oznaczają osobną sesję Claude w świeżym kontekście. Mosty CLI jako funkcja programu (§5) — bez zmian.
+
 ### 4.1 Wykonawcy i podział pracy
 - **Claude Code + `claude-opus-5-5`** i **Codex CLI + GPT-6 Sol**, oba przez Twoje własne logowanie (zgodne z §1.3).
 - **Domyślny podział:** Opus 5.5 (Claude Code) — Rust: jądro, Broker, głos, narzędzia systemowe; GPT-6 Sol (Codex) — UI/Svelte, testy E2E, dokumentacja. Podział można odwrócić per moduł; liczy się zasada niżej.

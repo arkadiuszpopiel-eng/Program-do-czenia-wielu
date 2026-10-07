@@ -8,19 +8,20 @@ Cały kod, testy, dokumentacja i infrastruktura CI powstają w sesjach modeli AI
 
 ## 2. Wykonawcy i podział pracy
 
+> **Zmiana (ADR 0016, 2026-10-08):** jedynym wykonawcą jest Claude Code. Codex CLI / GPT-6 Sol nie pisze ani nie recenzuje kodu Alfy. „Recenzent”, „model-recenzent” i „drugi model” w tym dokumencie oznaczają osobną sesję Claude w świeżym kontekście. Tabela sesji F0 w §9 zostaje jako zapis historyczny.
+
 | Wykonawca | Model | Domyślny zakres | Uwagi |
 |---|---|---|---|
-| Claude Code | `claude-opus-5-5` | Rust: jądro (`core-*`), Broker, Voice Suite, `platform-windows`, narzędzia systemowe | Logowanie własnym planem właściciela (zgodne z §1.3 planu) |
-| Codex CLI | GPT-6 Sol | UI/Svelte 5, `ui-kit`, testy E2E (Playwright), dokumentacja, Storybook | Zgłaszano przycinanie kontekstu → moduł musi mieścić się w małym oknie |
+| Claude Code | `claude-opus-5-5` | Całość: Rust (jądro, Broker, Voice Suite, `platform-windows`, narzędzia), UI/Svelte 5, testy E2E, dokumentacja | Logowanie własnym planem właściciela (zgodne z §1.3 planu) |
 
-- Podział można odwrócić per moduł. Nadrzędna jest zasada niżej: **kto napisał, ten nie recenzuje**.
-- Oba narzędzia działają przez własne logowanie właściciela; Alfa (program) nie ma z tym nic wspólnego — to sesje deweloperskie, uruchamiane przez człowieka, na jego zasadach uprawnień (domyślnie bez dostępu poza katalog repo/worktree).
+- Nadrzędna jest zasada niżej: **sesja, która napisała, nie recenzuje**.
+- Claude Code działa przez własne logowanie właściciela; Alfa (program) nie ma z tym nic wspólnego — to sesje deweloperskie, uruchamiane przez człowieka, na jego zasadach uprawnień (domyślnie bez dostępu poza katalog repo/worktree).
 
 ### 2.1 Przegląd krzyżowy
 
 | Zasada | Szczegół |
 |---|---|
-| Recenzent = drugi model | Moduł napisany przez Opus recenzuje GPT-6 Sol i odwrotnie. Inna rodzina modeli łapie skorelowane ślepe punkty. |
+| Recenzent = osobna sesja | Moduł recenzuje sesja Claude, która go nie pisała. Ta sama rodzina modeli nie łapie skorelowanych ślepych punktów — wyrównują to: pomiar na sprzęcie, testy prawdziwej aplikacji i przegląd człowieka nad Jądrem (ADR 0016). |
 | Świeży kontekst | Recenzja odbywa się w nowej sesji, bez historii sesji autora. Wejście: diff PR, SPEC, kontrakt, wyniki CI. |
 | Zakres recenzji | Wyłącznie: poprawność, bezpieczeństwo, zgodność ze SPEC i kontraktem, spełnienie DoD. Nie „znajdź cokolwiek", nie styl. |
 | SPEC | **Pisze autor, akceptuje recenzent.** SPEC-i Jądra i Brokera akceptuje dodatkowo człowiek. |
@@ -171,7 +172,7 @@ Równolegle: prace UI ∥ spike'i głosu. Spike'i (c) UIA i (d) współdzielenie
 ```markdown
 # [F<fala>] <moduł> — <jednozdaniowy cel>
 
-**Fala:** F<n> · **Moduł:** `<m>` · **Autor:** Opus 5.5 | GPT-6 Sol · **Recenzent:** drugi model · **Jądro/Broker:** tak | nie
+**Fala:** F<n> · **Moduł:** `<m>` · **Autor:** sesja Claude · **Recenzent:** osobna sesja Claude · **Jądro/Broker:** tak | nie
 
 ## Cel
 <Co ma działać po zamknięciu karty, jednym akapitem.>
@@ -212,7 +213,7 @@ Zdolności żądane: … · Wejście niezaufane: … · Sekrety: … · Odwracal
 
 ```markdown
 ## Moduł i karta
-Zamyka #<issue> · moduł `<m>` · fala F<n> · autor: <model> · recenzent: <model>
+Zamyka #<issue> · moduł `<m>` · fala F<n> · autor: <sesja> · recenzent: <osobna sesja>
 
 ## Co się zmienia
 <3–6 punktów; co dodano, co zmieniono w kontrakcie (jeśli cokolwiek — wersja kontraktu podbita).>
@@ -234,7 +235,8 @@ Zamyka #<issue> · moduł `<m>` · fala F<n> · autor: <model> · recenzent: <mo
 - [ ] zero TODO/FIXME/unimplemented!/unwrap(), zero ostrzeżeń
 - [ ] budżety zmierzone na baseline emulowanym
 - [ ] stany brzegowe i błędy pokryte; zdarzenia zgodne ze schematem
-- [ ] przegląd drugiego modelu — uwagi zamknięte
+- [ ] przegląd w świeżym kontekście — uwagi zamknięte
+- [ ] kryteria akceptacji sprawdzone na sprzęcie (albo wskazane, kto i kiedy je zmierzy)
 - [ ] lista bezpieczeństwa + dokumentacja ustawień
 - [ ] CI zielone (w tym self-hosted, jeśli wymagany)
 

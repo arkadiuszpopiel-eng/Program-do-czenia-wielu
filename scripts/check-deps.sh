@@ -105,7 +105,7 @@ cargo metadata --format-version 1 --no-deps --manifest-path "$ROOT/Cargo.toml" \
       | .dependencies[]
       | select(.name as $n | $members | index($n))
       | "\($pkg) \(.name) \(.kind // "normal")"
-    ' >"$edges"
+    ' | tr -d '\r' >"$edges" # jq dla Windows kończy linie CRLF; bez tego rodzaj „dev” nie pasuje
 
 if check_edges "$edges"; then
   echo "check-deps OK: $(wc -l <"$edges") krawędzi między crate'ami workspace, zero naruszeń"

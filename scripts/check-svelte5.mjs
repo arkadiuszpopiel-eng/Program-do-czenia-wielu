@@ -3,8 +3,10 @@
 // parsera, więc łapie także pliki, których ESLint nie sparsował).
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+// fileURLToPath: `.pathname` psuje ścieżki Windows (`/E:/…`) i ze spacjami (`%20`).
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKIP = new Set(['node_modules', 'dist', 'storybook-static', 'target', '.git']);
 
 const RULES = [

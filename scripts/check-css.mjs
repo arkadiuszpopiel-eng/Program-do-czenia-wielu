@@ -3,8 +3,10 @@
 // Reguła twarda z AGENTS.md; PLAN.md §14.3 / §14.7.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+// fileURLToPath: `.pathname` psuje ścieżki Windows (`/E:/…`) i ze spacjami (`%20`).
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKIP = new Set(['node_modules', 'dist', 'storybook-static', 'target', '.git']);
 const EXT = /\.(css|svelte|html)$/;
 const BACKDROP_ALLOWED = new Set(['CommandPalette.svelte']);

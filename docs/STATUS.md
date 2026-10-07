@@ -4,6 +4,30 @@ Stan na **2026-10-06**, gałąź `ccr-af4b63c6-3fyzaj` (fale 3–6: narzędzia s
 `docs/ACCEPTANCE.md` (ten plik ich nie zmienia). Dowody sprawdzone w repo (`grep` po nazwach testów i plików);
 liczby z opisów commitów i README zestawów `evals/`.
 
+## Dopisek 2026-10-08 — pierwszy test na laptopie i porządki
+
+Macierz niżej ma stan z 2026-10-06 i opisuje wyniki z CI i atrap. Żadne kryterium nie jest jeszcze potwierdzone
+na prawdziwej maszynie. Kolejność dalszych prac: [`KONTYNUACJA.md`](KONTYNUACJA.md).
+
+Ustalenia z testu na laptopie (i7-13620H, RTX 4050 6 GB; logi z `%LOCALAPPDATA%\Alfa\logs`, 2026-10-07):
+
+| Ustalenie | Kryterium | Stan |
+| --- | --- | --- |
+| Model lokalny ani razu nie odpowiedział: pobrany Bielik 1.5B, brak `llama-server.exe` (pusty `sidecars`), router 5 razy wybrał model lokalny, `model_calls` puste; rozmowa nie pokazuje, że brakuje silnika | F1-03, F3-12 | do naprawy (KONTYNUACJA 1.1) |
+| Log „start na GPU nieudany — fallback na CPU” co 15 min, gdy przyczyną jest brak pliku wykonywalnego (`providers-local-impl/src/sidecar.rs`) | — | do naprawy (1.2) |
+| Skrót `Ctrl+Alt+Space` zajęty przez inny program — rejestracja pada przy każdym starcie bez komunikatu w interfejsie | F1-12 | do naprawy (1.3) |
+| Czytanie na głos odmawia (`unsupported`) — brak silnika TTS | F2-01 | po instalacji silników (1.4) |
+| Start aplikacji, kolejność modułów, wykrycie sprzętu (`laptop-cuda`, profil głosu D), pobranie modeli ze zgodą TOFU, przebudowa wektorów embedderem e5-small | F7-02 (częściowo) | działa |
+
+Bramki lokalne na Windows (2026-10-08, kopia na dysku przenośnym, `scripts/gates.ps1`): format Rust, graf
+zależności (1645 krawędzi, 0 naruszeń), lint, svelte-check i vitest (219/219) — zielone; `cargo test` siedmiu
+crate'ów rdzenia — 122 testy zielone. Nie uruchomiono: clippy, pełnego `cargo test --workspace` (za mało miejsca
+na dysku) i `cargo-deny` (brak narzędzia). Poprawione przy okazji: `check-deps.sh` zgłaszał na Windows fałszywe
+naruszenia (CRLF z `jq`), a `check-css.mjs` i `check-svelte5.mjs` nie działały w ścieżce Windows ze spacjami.
+
+Zmiana procesu: recenzję robi osobna sesja Claude w świeżym kontekście, nie drugi model (ADR 0016). Wszędzie
+niżej „model-recenzent” ma to znaczenie.
+
 ## Legenda
 
 | Znak | Znaczenie                                                                                                    |

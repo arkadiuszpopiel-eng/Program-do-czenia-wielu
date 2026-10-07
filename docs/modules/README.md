@@ -1,6 +1,6 @@
 # Specyfikacje modułów (`docs/modules/<moduł>/SPEC.md`)
 
-Każdy moduł programu Alfa ma jedną, jednostronicową specyfikację (SPEC). SPEC pisze autor modułu (model AI), akceptuje recenzent (drugi model); SPEC-i Jądra i Brokera akceptuje właściciel (PLAN §4.1). Kolejność pracy nad modułem: **SPEC → kontrakt → fake → testy → implementacja → przegląd → CI → merge** (PLAN §4.3).
+Każdy moduł programu Alfa ma jedną, jednostronicową specyfikację (SPEC). SPEC pisze sesja autorska, akceptuje sesja-recenzentka (osobna sesja Claude w świeżym kontekście, ADR 0016); SPEC-i Jądra i Brokera akceptuje właściciel (PLAN §4.1). Kolejność pracy nad modułem: **SPEC → kontrakt → fake → testy → implementacja → przegląd → CI → merge** (PLAN §4.3).
 
 Zasady:
 - Moduł = trójka crate'ów `<m>-contract`, `<m>-impl`, `<m>-fake` + manifest `module.toml` (PLAN §3.2). Inne moduły zależą **tylko od `-contract`**.

@@ -11,5 +11,8 @@
 | `update-dev.ps1`    | Windows: `git pull --ff-only` (bez nadpisywania lokalnych zmian) + `setup-dev.ps1 -Build`; skrót „Alfa — aktualizuj kod” | PC właściciela, CI (składnia) |
 | `code-session.ps1`  | Windows: Claude Code (`claude`) w katalogu repozytorium — praca nad kodem przy działającej Alfie w trybie deweloperskim; skrót „Alfa — praca nad kodem (Claude Code)” | PC właściciela, CI (składnia) |
 | `ci/hf-gguf-check.py` | modele GGUF z `providers-local-impl/models.toml` w API Hugging Face (bez pobierania): plik istnieje, rozmiar = `size_mb` (±1 MiB), przypięty `sha256` = hash LFS; tabela SHA-256 do przypięcia przez człowieka; `HF_ENDPOINT` — atrapa API w testach | CI (`rehearsal.yml`, job „Hugging Face”) |
+| `gates.ps1`         | Windows: bramki jakości jednym poleceniem — format Rust partiami (`cargo fmt --all` przekracza limit długości linii poleceń), `check-deps.sh`, lint, svelte-check, vitest, odświeżenie `docs/CATALOG.md`; `-Test a,b` testy wskazanych crate'ów, `-Full` clippy, testy całego workspace'u i cargo-deny | PC właściciela, sesje AI |
+| `portable-env.ps1` / `portable-env.sh` | Windows: środowisko z dysku przenośnego — w bieżącym oknie (PowerShell: `. .\scripts\portable-env.ps1`, Git Bash: `source scripts/portable-env.sh`) ustawia Rust, Node.js z pnpm, Strawberry Perl, cache npm i magazyn pnpm z katalogu `..\alfa-narzedzia`; niezależne od litery dysku, niczego nie zapisuje w systemie | PC właściciela, sesje AI |
+| `catalog.mjs`       | generuje `docs/CATALOG.md`: wszystkie crate'y i moduły z grupą, falą, rodzajem, rozmiarem, liczbą testów i SPEC oraz lista niespójności (brak README, SPEC, `module.toml`, przekroczone limity rozmiaru) | lokalnie, `gates.ps1` |
 
 Skrypty są częścią bramek jakości z §4.4 planu (`docs/PLAN.md`).

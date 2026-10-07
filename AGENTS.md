@@ -32,19 +32,20 @@ Egzekucja reguł: hooki i CI (nie proza). Zmiany tego pliku zatwierdza człowiek
 
 ## Kolejność pracy nad modułem
 
-1. `SPEC.md` (pisze autor, akceptuje model-recenzent; Jądro/Broker — człowiek).
+1. `SPEC.md` (pisze sesja autorska, akceptuje sesja-recenzentka; Jądro/Broker — człowiek).
 2. `-contract` (trait, typy, zdarzenia, schema).
 3. `-fake` (deterministyczna atrapa; fake audio z wirtualnym zegarem, fake LLM record/replay, fake `SystemPort`).
 4. Testy najpierw: kontraktowe (uruchamiane na `-fake` i `-impl`), jednostkowe, property-based.
 5. Implementacja `-impl`.
-6. Przegląd drugiego modelu w świeżym kontekście (ograniczony do poprawności, bezpieczeństwa, zgodności ze SPEC).
+6. Przegląd w osobnej sesji Claude ze świeżym kontekstem (ADR 0016; tylko poprawność, bezpieczeństwo, zgodność ze SPEC).
 7. CI zielone → merge (automerge; Jądro/Broker/polityki bezpieczeństwa dodatkowo przez człowieka).
 
 ## Definition of Done (skrót; pełna w `docs/AI_WORKFLOW.md`)
 
 SPEC aktualny · kontrakt + fake + testy kontraktowe zielone · pokrycie ≥ 85% linii / ≥ 70% gałęzi (nie-UI) · regresja dla każdego błędu ·
 zero TODO/unwrap/ostrzeżeń · budżety RAM/CPU/opóźnień zmierzone na baseline emulowanym · stany brzegowe i błędy pokryte ·
-przegląd drugiego modelu zamknięty · lista bezpieczeństwa + dokumentacja ustawień · merge tylko na zielono.
+przegląd w świeżym kontekście zamknięty · lista bezpieczeństwa + dokumentacja ustawień · merge tylko na zielono ·
+kryterium akceptacji zaliczone dopiero po przebiegu na sprzęcie · błąd ze sprzętu → test prawdziwej aplikacji.
 
 ## Limity rozmiaru (egzekwowane lintem)
 
@@ -76,6 +77,8 @@ Testy sprzętowe (audio, GPU, UIA) uruchamia self-hosted runner na maszynach uż
 | Kontrakt i testy konkretnego modułu                | `docs/modules/<m>/SPEC.md`                         |
 | Jak używać zależności po cutoffie wiedzy           | `docs/vendor/<crate>.md`, docs.rs                  |
 | Decyzje architektoniczne                           | `docs/ADR/`                                        |
+| Który crate do czego, grupy, rozmiary              | `docs/CATALOG.md` (generuje `scripts/catalog.mjs`) |
+| Mapa całej dokumentacji                            | `docs/README.md`                                   |
 
 ## Język
 
