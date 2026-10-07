@@ -84,7 +84,7 @@ jobs:
           toolchain: "1.94"
           components: rustfmt, clippy
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Windows PowerShell 5.1 (powershell -File … -Ci)
@@ -281,7 +281,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
