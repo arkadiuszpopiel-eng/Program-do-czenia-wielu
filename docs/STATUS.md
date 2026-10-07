@@ -40,9 +40,19 @@ starcie może on trafić do interfejsu, zanim ten zacznie słuchać (do sprawdze
 wskaźnik na stronie Skróty byłby pewniejszy). Poprawki rdzenia nie były jeszcze uruchomione w prawdziwej aplikacji —
 budowa powłoki na dysku E: czeka na zwolnienie miejsca.
 
-Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): 121 z 122 zielone. Test „paleta: otwarcie ≤ 50 ms” ma
-medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy;
-do zbadania (F1-09). Testy `slow-core` miały za krótki limit na start aplikacji przy wolnym rdzeniu — poprawione.
+Przegląd interfejsu strona po stronie (29 stron ustawień, 7 paneli; commity `e358807`, `8d64fa2`): karty panelu
+prawego zawijają się — „Ekran” i „Głos” były poza krawędzią wąskiego panelu i niedostępne myszą; powtórzone nagłówki
+stron; nazwy zakresów pamięci bez powtórzeń i spokojniejsze przyciski „Zapomnij cały zakres”; nazwy narzędzi GUI po
+polsku; nawigacja ustawień ze stałym nagłówkiem. Zauważone, niepoprawione: surowe identyfikatory na stronie Wtyczki
+(`plugin_word_count`, `out_of_fuel`), harmonogram wyzwalacza jako wyrażenie cron, edytor reguł Marszałka w JSON
+widoczny dla każdego.
+
+Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): 123 z 124 zielone. Test „paleta: otwarcie ≤ 50 ms” ma
+medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy.
+Pomiar rozdzielony: samo otwarcie zawsze trwa ok. 7 ms; opóźnia się pojedyncza klatka obrazu (ok. 250–450 ms)
+mniej więcej 2 s po starcie, bez długiego zadania JavaScript i niezależnie od rozmycia tła palety — wygląda na
+harmonogram klatek przeglądarki bez okna, nie na kod Alfy. Do potwierdzenia w prawdziwej aplikacji (F1-09).
+Testy `slow-core` miały za krótki limit na start aplikacji przy wolnym rdzeniu — poprawione.
 
 Zmiana procesu: recenzję robi osobna sesja Claude w świeżym kontekście, nie drugi model (ADR 0016). Wszędzie
 niżej „model-recenzent” ma to znaczenie.
