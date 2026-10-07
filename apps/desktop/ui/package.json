@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@alfa/ui-kit": "workspace:*",
-    "@lucide/svelte": "1.49.0",
+    "@lucide/svelte": "1.51.0",
     "@tauri-apps/api": "2.12.0",
     "@xterm/addon-fit": "0.11.0",
     "@xterm/xterm": "6.0.0",
