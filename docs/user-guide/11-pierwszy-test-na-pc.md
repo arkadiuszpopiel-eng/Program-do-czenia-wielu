@@ -160,6 +160,21 @@ drugą ścieżką, spoza tej ochrony. Na `C:` potrzeba ok. **15 GB** wolnego mie
 | D.1 Skrypt zakończony (czas; ostatnie linie podsumowania, gdy błąd)     |               |
 | D.2 Skrót „Alfa (tryb deweloperski)” uruchamia Alfę                     |               |
 
+## Praca nad kodem na laptopie — na żywo
+
+Cały kod Alfy jest już na laptopie (`D:\alfa`, repozytorium git). Skrypt instalacyjny zakłada na Pulpicie trzy skróty:
+
+| Skrót                                   | Co robi                                                                                                   |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Alfa (tryb deweloperski)**            | uruchamia Alfę z kodu (`setup-dev.ps1 -Run`); zmiany interfejsu widać od razu, zmiany w Rust przebudowują i restartują Alfę same |
+| **Alfa — aktualizuj kod**               | pobiera najnowszy kod z GitHuba (`git pull --ff-only` — nigdy nie nadpisuje Twoich zmian) i przebudowuje   |
+| **Alfa — praca nad kodem (Claude Code)** | otwiera Claude Code w `D:\alfa`; logujesz się sam, Alfa nie czyta tokenów                                 |
+
+Jak pracować: uruchom **Alfa (tryb deweloperski)**, obok **Alfa — praca nad kodem (Claude Code)** i opisz, co poprawić
+(pierwsze polecenie, np. „przeczytaj AGENTS.md i docs/STATUS.md”). Claude Code zmienia pliki w `D:\alfa`, a działająca
+Alfa przeładowuje się sama. Skróty dochodzą przy ponownym uruchomieniu skryptu instalacyjnego (te same trzy linie co
+wyżej) — wykonane kroki są pomijane, a kod się aktualizuje.
+
 ## 0. Przygotowanie (raz na każdym komputerze)
 
 1. Zaktualizuj Windows (**Ustawienia → Windows Update**) i sterownik karty graficznej: na desktopie **AMD Software:

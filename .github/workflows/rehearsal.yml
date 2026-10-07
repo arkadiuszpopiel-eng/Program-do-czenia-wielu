@@ -19,6 +19,8 @@ on:
       - "crates/app-modules/src/tts.rs"
       - "scripts/setup-dev.ps1"
       - "scripts/install-on-drive.ps1"
+      - "scripts/update-dev.ps1"
+      - "scripts/code-session.ps1"
       - ".github/workflows/rehearsal.yml"
       # Job `app-e2e` (prawdziwa aplikacja przez CDP) pilnuje też zmian aplikacji i UI.
       - "apps/desktop/**"
@@ -139,9 +141,12 @@ jobs:
         run: |
           $ErrorActionPreference = 'Continue'
           $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\install-on-drive.ps1'
-          $tokens = $null; $errors = $null
-          [void][System.Management.Automation.Language.Parser]::ParseFile($script, [ref]$tokens, [ref]$errors)
-          if ($errors) { foreach ($e in $errors) { "::error file=scripts/install-on-drive.ps1,line=$($e.Extent.StartLineNumber)::$($e.Message)" }; exit 1 }
+          # Składnia wszystkich skryptów właściciela (skróty na Pulpicie: update-dev, code-session).
+          foreach ($name in 'install-on-drive.ps1', 'update-dev.ps1', 'code-session.ps1') {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $env:GITHUB_WORKSPACE "scripts\$name"), [ref]$tokens, [ref]$errors)
+            if ($errors) { foreach ($e in $errors) { "::error file=scripts/$name,line=$($e.Extent.StartLineNumber)::$($e.Message)" }; exit 1 }
+          }
           foreach ($engine in 'powershell.exe', 'pwsh') {
             $out = @(& $engine -NoProfile -ExecutionPolicy Bypass -File $script -Drive D -Ci 2>&1)
             $code = $LASTEXITCODE

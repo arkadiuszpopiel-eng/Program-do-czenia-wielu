@@ -258,17 +258,27 @@ function Invoke-SetupDev([string[]]$Switches, [string]$Title) {
     if ($LASTEXITCODE -eq 0) { Add-Result $Title 'OK' } else { Add-Result $Title "BŁĄD (kod $LASTEXITCODE)" 'szczegóły w podsumowaniu setup-dev.ps1 powyżej' }
 }
 
-function New-DesktopShortcut {
-    $path = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Alfa (tryb deweloperski).lnk'
-    if ($Ci) { Add-Result 'Skrót na Pulpicie' 'PLAN' $path; return }
-    if (Test-Path -LiteralPath $path) { Add-Result 'Skrót na Pulpicie' 'OK' 'już jest'; return }
-    if (-not (Confirm-Step 'Założyć na Pulpicie skrót „Alfa (tryb deweloperski)”?')) { Add-Result 'Skrót na Pulpicie' 'pominięty'; return }
+function New-DesktopShortcut([string]$Name, [string]$Script, [string]$ScriptArgs = '', [switch]$KeepOpen) {
+    # Skróty na Pulpicie: uruchomienie Alfy, aktualizacja kodu, praca nad kodem z Claude Code (na żywo).
+    $path = Join-Path ([Environment]::GetFolderPath('Desktop')) "$Name.lnk"
+    # Typograficzne cudzysłowy tylko w napisach w apostrofach: PowerShell traktuje „ ” jak `"`.
+    $title = 'Skrót „' + $Name + '”'
+    if ($Ci) { Add-Result $title 'PLAN' $path; return }
+    if (Test-Path -LiteralPath $path) { Add-Result $title 'OK' 'już jest'; return }
+    if (-not (Confirm-Step ('Założyć na Pulpicie skrót „' + $Name + '”?'))) { Add-Result $title 'pominięty'; return }
+    $noExit = if ($KeepOpen) { '-NoExit ' } else { '' }
     $link = (New-Object -ComObject WScript.Shell).CreateShortcut($path)
     $link.TargetPath = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-    $link.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$RepoDir\scripts\setup-dev.ps1`" -Run"
+    $link.Arguments = ("-NoProfile -ExecutionPolicy Bypass $noExit-File `"$RepoDir\scripts\$Script`" $ScriptArgs").Trim()
     $link.WorkingDirectory = $RepoDir
     $link.Save()
-    Add-Result 'Skrót na Pulpicie' 'OK' $path
+    Add-Result $title 'OK' $path
+}
+
+function New-DesktopShortcuts {
+    New-DesktopShortcut 'Alfa (tryb deweloperski)' 'setup-dev.ps1' '-Run'
+    New-DesktopShortcut 'Alfa — aktualizuj kod' 'update-dev.ps1'
+    New-DesktopShortcut 'Alfa — praca nad kodem (Claude Code)' 'code-session.ps1' -KeepOpen
 }
 
 # --- Start ------------------------------------------------------------------------------------------------
@@ -297,7 +307,7 @@ try {
                 Write-Host "`nSprawdzenie i budowa (setup-dev.ps1)" -ForegroundColor Cyan
                 $switches = @(); if (-not $NoBuild) { $switches += '-Build' }
                 Invoke-SetupDev $switches 'setup-dev.ps1 — sprawdzenie i budowa'
-                New-DesktopShortcut
+                New-DesktopShortcuts
             }
         }
         if ($script:Failed -gt 0) { $exitCode = 1 }
@@ -307,6 +317,7 @@ try {
     Write-Host "`nNa ${Letter}: — kod i kompilacja: $RepoDir; narzędzia: $ToolsDir."
     Write-Host "Na $($env:SystemDrive) zostają: Windows SDK, Instalator Visual Studio, WebView2 i dane Alfy (%LOCALAPPDATA%\Alfa)."
     Write-Host "Uruchomienie Alfy: skrót na Pulpicie albo: powershell -NoProfile -ExecutionPolicy Bypass -File $RepoDir\scripts\setup-dev.ps1 -Run"
+    Write-Host 'Praca nad kodem na żywo: skrót „Alfa — praca nad kodem (Claude Code)” przy działającej Alfie; aktualizacja: „Alfa — aktualizuj kod”.'
     if ($Run -and $exitCode -eq 0 -and -not $Ci) { Invoke-SetupDev @('-Run') 'Alfa (tryb deweloperski)' }
 } catch {
     $exitCode = 2
