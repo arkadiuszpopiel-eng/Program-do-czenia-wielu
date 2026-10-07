@@ -1,7 +1,7 @@
 <!--
   Pozycja katalogu „Modele i silniki": nazwa, rodzaj, rozmiar, licencja, stan (aria-live), uwagi
   („do potwierdzenia przez człowieka”, SHA-256 przypięty, instalacja ręczna), postęp pobierania,
-  akcje (pobierz / wznów / przerwij / sprawdź / usuń / używaj do wyszukiwania) i karta zgody TOFU
+  akcje (pobierz / wznów / przerwij / sprawdź / napraw / usuń / używaj do wyszukiwania) i karta zgody TOFU
   z policzonym SHA-256 każdego pliku bez przypiętej sumy.
 -->
 <script lang="ts">
@@ -19,10 +19,20 @@
     onremove: () => void;
     ontrust: () => void;
     onactivate: () => void;
+    onrepair: () => void;
   }
 
-  let { item, busy, ondownload, oncancel, onverify, onremove, ontrust, onactivate }: Props =
-    $props();
+  let {
+    item,
+    busy,
+    ondownload,
+    oncancel,
+    onverify,
+    onremove,
+    ontrust,
+    onactivate,
+    onrepair,
+  }: Props = $props();
   const app = useApp();
   const { t, tk } = app.i18n;
   const actions = $derived(itemActions(item));
@@ -128,6 +138,11 @@
     {#if actions.verify}
       <Button size="sm" variant="ghost" disabled={busy} onclick={onverify}
         >{t('engines.verify')}</Button
+      >
+    {/if}
+    {#if actions.repair}
+      <Button size="sm" variant="ghost" disabled={busy} onclick={onrepair}
+        >{t('engines.repair')}</Button
       >
     {/if}
     {#if actions.remove && !actions.trust}

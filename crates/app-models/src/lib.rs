@@ -6,12 +6,17 @@
 //! - [`unpack`] — bezpieczne rozpakowanie ZIP (path traversal, dowiązania, duplikaty, zip-bomb);
 //! - zadania: limit równoległości, postęp `{file, done, total}`, zgoda TOFU z policzonym hashem
 //!   (pozycje bez przypiętego hasha), weryfikacja, usuwanie;
-//! - [`embed`] — embedder wyszukiwania (`[search.embedder] model`) i przebudowa wektorów.
+//! - [`embed`] — embedder wyszukiwania (`[search.embedder] model`) i przebudowa wektorów;
+//! - [`bundles`] — pakiety 1–6 (komplety pozycji dobrane do sprzętu) i naprawa pojedynczej pozycji.
 //!
 //! Bez sekretów w plikach i bez telemetrii (stały `User-Agent`, bez ciasteczek).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+pub mod bundle_data;
+mod bundle_ops;
+mod bundle_quality;
+pub mod bundles;
 pub mod catalog;
 pub mod data;
 pub mod embed;
@@ -34,6 +39,7 @@ use app_api::{AppError, AppPaths, EventHub};
 use search_impl::ReindexOptions;
 use tokio::sync::Semaphore;
 
+pub use bundles::Machine;
 pub use catalog::{ItemSpec, builtin};
 pub use embed::{EMBEDDER_KEY, EmbedDeps, Embedding, LEXICAL, startup_embedder};
 pub use view::Live;

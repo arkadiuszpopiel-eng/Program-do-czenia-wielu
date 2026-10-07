@@ -17,3 +17,5 @@ README.md
 AGENTS.md
 CLAUDE.md
 Cargo.lock
+# Generowany przez Rust (`crates/app-models/tests/bundles_ui.rs`, ALFA_UPDATE_FIXTURES=1).
+apps/desktop/ui/src/lib/api/fake/bundles.json

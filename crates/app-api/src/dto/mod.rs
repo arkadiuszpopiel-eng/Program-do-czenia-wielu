@@ -66,8 +66,9 @@ pub use memory::{
     MemorySourceLink, MemoryState, MemoryStatus, MemoryUndoResult,
 };
 pub use models::{
-    EmbedderView, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,
-    ModelsView, ReindexView, TrustedHashes,
+    BundleFit, BundleFitKind, BundleItemView, BundleRequirements, BundleState, EmbedderView,
+    ModelBundle, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,
+    ModelsView, QualityNote, ReindexView, TrustedHashes,
 };
 pub use panels::{
     ActivityInfo, AgentState, AgentStatus, ArtifactAction, ArtifactInfo, ArtifactPreview,

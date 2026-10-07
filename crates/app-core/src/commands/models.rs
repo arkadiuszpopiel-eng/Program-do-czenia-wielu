@@ -1,14 +1,17 @@
 //! Komendy `models_local_*`: modele lokalne z manifestu `providers-local` (onboarding, Ustawienia →
 //! Modele i dostawcy → Lokalne) i ich pobieranie z wznawianiem i SHA-256; postęp jako zdarzenia
-//! `LocalModelProgress` (most z `local.model.download.progress` w `lifecycle`).
+//! `LocalModelProgress` (most z `local.model.download.progress` w `lifecycle`). Pakiety 1–6
+//! menedżera modeli (`models_bundles`, `models_bundle_download`, `models_bundle_verify`) — dobór
+//! do bieżącego profilu urządzenia (`device-profile`), działania w `app-models`.
 
 use std::sync::Arc;
 
+use app_models::Machine;
 use providers_contract::CancellationToken;
 use providers_local_impl::{LocalError, LocalModule};
 
 use crate::core::AppCore;
-use crate::dto::{AlfaEvent, LocalDownloadState, LocalModelInfo};
+use crate::dto::{AlfaEvent, LocalDownloadState, LocalModelInfo, ModelBundle};
 use crate::error::AppError;
 
 const MB: u64 = 1024 * 1024;
@@ -124,5 +127,36 @@ impl AppCore {
             }
         }
         Ok(())
+    }
+
+    /// Sprzęt dla pakietów: bieżący profil urządzenia (z emulacją i limitami nakładki).
+    fn bundle_machine(&self) -> Machine {
+        Machine::from_profile(&self.inner.device.current())
+    }
+
+    /// `models_bundles`.
+    pub async fn models_bundles(&self) -> Result<Vec<ModelBundle>, AppError> {
+        let machine = self.bundle_machine();
+        self.inner.work.models.bundles(&machine).await
+    }
+
+    /// `models_bundle_download`.
+    pub async fn models_bundle_download(&self, bundle_id: String) -> Result<ModelBundle, AppError> {
+        let machine = self.bundle_machine();
+        self.inner
+            .work
+            .models
+            .bundle_download(&bundle_id, &machine)
+            .await
+    }
+
+    /// `models_bundle_verify`.
+    pub async fn models_bundle_verify(&self, bundle_id: String) -> Result<ModelBundle, AppError> {
+        let machine = self.bundle_machine();
+        self.inner
+            .work
+            .models
+            .bundle_verify(&bundle_id, &machine)
+            .await
     }
 }

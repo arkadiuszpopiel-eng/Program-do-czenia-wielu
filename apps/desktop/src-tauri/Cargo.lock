@@ -648,6 +648,7 @@ version = "0.0.1"
 dependencies = [
  "app-api",
  "core-config-contract",
+ "device-profile-contract",
  "flate2",
  "futures-util",
  "lib-embed",

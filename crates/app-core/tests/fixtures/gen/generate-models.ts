@@ -1,7 +1,8 @@
 // Fixture'y menedżera modeli (`models_*`, `embed_model_activate`, `search_reindex_*`, zdarzenia
 // `ModelProgress`, `ModelChanged`, `ReindexStatus`) — część generatora `generate.ts` (atrapa +
 // `TauriAlfaClient` z atrapą `invoke`): pobranie z przypiętym hashem, przerwanie i wznowienie,
-// zgoda TOFU, weryfikacja, embedder wyszukiwania, przebudowa wektorów, usunięcie.
+// zgoda TOFU, weryfikacja, embedder wyszukiwania, przebudowa wektorów, usunięcie, „Napraw” i pakiety
+// 1–6 (lista, pobranie pakietu, weryfikacja pakietu).
 import { ENGINE_STEP_MS } from '../../../../../apps/desktop/ui/src/lib/api/fake/api-engines';
 import type { VirtualScheduler } from '../../../../../apps/desktop/ui/src/lib/api/fake/fake-client';
 import type { ModelsView } from '../../../../../apps/desktop/ui/src/lib/api/types-models';
@@ -45,4 +46,13 @@ export async function runModels(
   await step(6);
   await both('engines', 'remove', 'silero-vad');
   await both('engines', 'list');
+  await both('engines', 'bundles');
+  await both('engines', 'bundleDownload', 'bundle-minimal');
+  await step(1);
+  await both('engines', 'bundleVerify', 'bundle-minimal');
+  await both('engines', 'download', 'silero-vad');
+  await step(4);
+  await both('engines', 'repair', 'silero-vad');
+  await step(8);
+  await both('engines', 'bundles');
 }

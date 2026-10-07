@@ -34,6 +34,35 @@
           "active": false
         },
         {
+          "id": "bielik-1.5b-v3.0-instruct-q8_0",
+          "kind": "llm",
+          "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 1698693120,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-1.5b-v3.0-instruct-q8_0",
+          "files": [
+            {
+              "name": "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf",
+              "url": "https://example.invalid/Bielik-1.5B-v3.0-Instruct.Q8_0.gguf",
+              "size_bytes": 1698693120,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lżejszy lokalny model rozmowy (bez narzędzi agentek). Wymaga sidecara llama-server.",
+            "en": "Lighter local chat model (no agent tools). Requires the llama-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "multilingual-e5-small",
           "kind": "embed",
           "name": "Multilingual E5 small (ONNX fp32)",
@@ -99,6 +128,71 @@
           "active": false
         },
         {
+          "id": "whisper-small-q5_1",
+          "kind": "stt",
+          "name": "Whisper small-q5_1",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 189792256,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\whisper-small-q5_1",
+          "files": [
+            {
+              "name": "ggml-small-q5_1.bin",
+              "url": "https://example.invalid/ggml-small-q5_1.bin",
+              "size_bytes": 189792256,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lżejszy model rozpoznawania mowy na CPU (zapas).",
+            "en": "Lighter CPU speech model (fallback)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "piper-pl_PL-gosia-medium",
+          "kind": "tts",
+          "name": "Piper pl_PL gosia (medium)",
+          "license": "MIT (głos: do potwierdzenia — MODEL_CARD)",
+          "source": "https://huggingface.co/",
+          "size_bytes": 63963136,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\piper-pl_PL-gosia-medium",
+          "files": [
+            {
+              "name": "pl_PL-gosia-medium.onnx",
+              "url": "https://example.invalid/pl_PL-gosia-medium.onnx",
+              "size_bytes": 31981568,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "pl_PL-gosia-medium.onnx.json",
+              "url": "https://example.invalid/pl_PL-gosia-medium.onnx.json",
+              "size_bytes": 31981568,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Głos TTS Piper. Wymaga sidecara piper.",
+            "en": "Piper TTS voice. Requires the piper sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "silero-vad",
           "kind": "vad",
           "name": "Silero VAD 6.2.3 (op18, bez If)",
@@ -157,6 +251,35 @@
           "active": false
         },
         {
+          "id": "wespeaker-resnet34",
+          "kind": "speaker",
+          "name": "WeSpeaker ResNet34 (VoxCeleb)",
+          "license": "Apache-2.0 (dane VoxCeleb — sprawdzić warunki)",
+          "source": "https://huggingface.co/",
+          "size_bytes": 27262976,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\wespeaker-resnet34",
+          "files": [
+            {
+              "name": "wespeaker_en_voxceleb_resnet34.onnx",
+              "url": "https://example.invalid/wespeaker_en_voxceleb_resnet34.onnx",
+              "size_bytes": 27262976,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Weryfikacja właściciela (embedding mówcy).",
+            "en": "Owner verification (speaker embedding)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "sidecar-llama-vulkan",
           "kind": "sidecar",
           "name": "llama-server (vulkan)",
@@ -180,6 +303,158 @@
           "note": {
             "pl": "Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.",
             "en": "Local model server (127.0.0.1). Version to be confirmed."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-cuda",
+          "kind": "sidecar",
+          "name": "llama-server (cuda)",
+          "license": "MIT; cudart/cuBLAS — NVIDIA CUDA EULA",
+          "source": "https://huggingface.co/",
+          "size_bytes": 629145600,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-cuda",
+          "files": [
+            {
+              "name": "llama-cuda-12.4.zip",
+              "url": "https://example.invalid/llama-cuda-12.4.zip",
+              "size_bytes": 314572800,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "cudart-cuda-12.4.zip",
+              "url": "https://example.invalid/cudart-cuda-12.4.zip",
+              "size_bytes": 314572800,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych na kartach NVIDIA (CUDA 12.4).",
+            "en": "Local model server for NVIDIA GPUs (CUDA 12.4)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-cpu",
+          "kind": "sidecar",
+          "name": "llama-server (cpu)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 41943040,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-cpu",
+          "files": [
+            {
+              "name": "llama-cpu.zip",
+              "url": "https://example.invalid/llama-cpu.zip",
+              "size_bytes": 41943040,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych na procesorze (zapas).",
+            "en": "Local model server on the CPU (fallback)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-whisper-cpu",
+          "kind": "sidecar",
+          "name": "whisper-server (CPU)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 8388608,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-whisper-cpu",
+          "files": [
+            {
+              "name": "whisper-bin-x64.zip",
+              "url": "https://example.invalid/whisper-bin-x64.zip",
+              "size_bytes": 8388608,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer rozpoznawania mowy na procesorze.",
+            "en": "Speech recognition server on the CPU."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-whisper-cuda",
+          "kind": "sidecar",
+          "name": "whisper-server (CUDA 12.4)",
+          "license": "MIT; cudart/cuBLAS — NVIDIA CUDA EULA",
+          "source": "https://huggingface.co/",
+          "size_bytes": 450887680,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-whisper-cuda",
+          "files": [
+            {
+              "name": "whisper-cublas-12.4.0-bin-x64.zip",
+              "url": "https://example.invalid/whisper-cublas-12.4.0-bin-x64.zip",
+              "size_bytes": 450887680,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznawanie mowy na karcie NVIDIA.",
+            "en": "Speech recognition on NVIDIA GPUs."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-piper",
+          "kind": "sidecar",
+          "name": "piper (2023.11.14-2)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 23068672,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-piper",
+          "files": [
+            {
+              "name": "piper_windows_amd64.zip",
+              "url": "https://example.invalid/piper_windows_amd64.zip",
+              "size_bytes": 23068672,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Silnik TTS Piper (z espeak-ng-data).",
+            "en": "Piper TTS engine (with espeak-ng-data)."
           },
           "progress": null,
           "error": null,
@@ -441,6 +716,35 @@
           "active": false
         },
         {
+          "id": "bielik-1.5b-v3.0-instruct-q8_0",
+          "kind": "llm",
+          "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 1698693120,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-1.5b-v3.0-instruct-q8_0",
+          "files": [
+            {
+              "name": "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf",
+              "url": "https://example.invalid/Bielik-1.5B-v3.0-Instruct.Q8_0.gguf",
+              "size_bytes": 1698693120,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lżejszy lokalny model rozmowy (bez narzędzi agentek). Wymaga sidecara llama-server.",
+            "en": "Lighter local chat model (no agent tools). Requires the llama-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "multilingual-e5-small",
           "kind": "embed",
           "name": "Multilingual E5 small (ONNX fp32)",
@@ -506,6 +810,71 @@
           "active": false
         },
         {
+          "id": "whisper-small-q5_1",
+          "kind": "stt",
+          "name": "Whisper small-q5_1",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 189792256,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\whisper-small-q5_1",
+          "files": [
+            {
+              "name": "ggml-small-q5_1.bin",
+              "url": "https://example.invalid/ggml-small-q5_1.bin",
+              "size_bytes": 189792256,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lżejszy model rozpoznawania mowy na CPU (zapas).",
+            "en": "Lighter CPU speech model (fallback)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "piper-pl_PL-gosia-medium",
+          "kind": "tts",
+          "name": "Piper pl_PL gosia (medium)",
+          "license": "MIT (głos: do potwierdzenia — MODEL_CARD)",
+          "source": "https://huggingface.co/",
+          "size_bytes": 63963136,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\piper-pl_PL-gosia-medium",
+          "files": [
+            {
+              "name": "pl_PL-gosia-medium.onnx",
+              "url": "https://example.invalid/pl_PL-gosia-medium.onnx",
+              "size_bytes": 31981568,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "pl_PL-gosia-medium.onnx.json",
+              "url": "https://example.invalid/pl_PL-gosia-medium.onnx.json",
+              "size_bytes": 31981568,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Głos TTS Piper. Wymaga sidecara piper.",
+            "en": "Piper TTS voice. Requires the piper sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "silero-vad",
           "kind": "vad",
           "name": "Silero VAD 6.2.3 (op18, bez If)",
@@ -564,6 +933,35 @@
           "active": false
         },
         {
+          "id": "wespeaker-resnet34",
+          "kind": "speaker",
+          "name": "WeSpeaker ResNet34 (VoxCeleb)",
+          "license": "Apache-2.0 (dane VoxCeleb — sprawdzić warunki)",
+          "source": "https://huggingface.co/",
+          "size_bytes": 27262976,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\wespeaker-resnet34",
+          "files": [
+            {
+              "name": "wespeaker_en_voxceleb_resnet34.onnx",
+              "url": "https://example.invalid/wespeaker_en_voxceleb_resnet34.onnx",
+              "size_bytes": 27262976,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Weryfikacja właściciela (embedding mówcy).",
+            "en": "Owner verification (speaker embedding)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "sidecar-llama-vulkan",
           "kind": "sidecar",
           "name": "llama-server (vulkan)",
@@ -587,6 +985,158 @@
           "note": {
             "pl": "Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.",
             "en": "Local model server (127.0.0.1). Version to be confirmed."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-cuda",
+          "kind": "sidecar",
+          "name": "llama-server (cuda)",
+          "license": "MIT; cudart/cuBLAS — NVIDIA CUDA EULA",
+          "source": "https://huggingface.co/",
+          "size_bytes": 629145600,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-cuda",
+          "files": [
+            {
+              "name": "llama-cuda-12.4.zip",
+              "url": "https://example.invalid/llama-cuda-12.4.zip",
+              "size_bytes": 314572800,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "cudart-cuda-12.4.zip",
+              "url": "https://example.invalid/cudart-cuda-12.4.zip",
+              "size_bytes": 314572800,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych na kartach NVIDIA (CUDA 12.4).",
+            "en": "Local model server for NVIDIA GPUs (CUDA 12.4)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-cpu",
+          "kind": "sidecar",
+          "name": "llama-server (cpu)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 41943040,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-cpu",
+          "files": [
+            {
+              "name": "llama-cpu.zip",
+              "url": "https://example.invalid/llama-cpu.zip",
+              "size_bytes": 41943040,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych na procesorze (zapas).",
+            "en": "Local model server on the CPU (fallback)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-whisper-cpu",
+          "kind": "sidecar",
+          "name": "whisper-server (CPU)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 8388608,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-whisper-cpu",
+          "files": [
+            {
+              "name": "whisper-bin-x64.zip",
+              "url": "https://example.invalid/whisper-bin-x64.zip",
+              "size_bytes": 8388608,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer rozpoznawania mowy na procesorze.",
+            "en": "Speech recognition server on the CPU."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-whisper-cuda",
+          "kind": "sidecar",
+          "name": "whisper-server (CUDA 12.4)",
+          "license": "MIT; cudart/cuBLAS — NVIDIA CUDA EULA",
+          "source": "https://huggingface.co/",
+          "size_bytes": 450887680,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-whisper-cuda",
+          "files": [
+            {
+              "name": "whisper-cublas-12.4.0-bin-x64.zip",
+              "url": "https://example.invalid/whisper-cublas-12.4.0-bin-x64.zip",
+              "size_bytes": 450887680,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznawanie mowy na karcie NVIDIA.",
+            "en": "Speech recognition on NVIDIA GPUs."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-piper",
+          "kind": "sidecar",
+          "name": "piper (2023.11.14-2)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 23068672,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-piper",
+          "files": [
+            {
+              "name": "piper_windows_amd64.zip",
+              "url": "https://example.invalid/piper_windows_amd64.zip",
+              "size_bytes": 23068672,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Silnik TTS Piper (z espeak-ng-data).",
+            "en": "Piper TTS engine (with espeak-ng-data)."
           },
           "progress": null,
           "error": null,
@@ -861,6 +1411,35 @@
           "active": false
         },
         {
+          "id": "bielik-1.5b-v3.0-instruct-q8_0",
+          "kind": "llm",
+          "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 1698693120,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\bielik-1.5b-v3.0-instruct-q8_0",
+          "files": [
+            {
+              "name": "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf",
+              "url": "https://example.invalid/Bielik-1.5B-v3.0-Instruct.Q8_0.gguf",
+              "size_bytes": 1698693120,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lżejszy lokalny model rozmowy (bez narzędzi agentek). Wymaga sidecara llama-server.",
+            "en": "Lighter local chat model (no agent tools). Requires the llama-server sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "multilingual-e5-small",
           "kind": "embed",
           "name": "Multilingual E5 small (ONNX fp32)",
@@ -926,6 +1505,71 @@
           "active": false
         },
         {
+          "id": "whisper-small-q5_1",
+          "kind": "stt",
+          "name": "Whisper small-q5_1",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 189792256,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\whisper-small-q5_1",
+          "files": [
+            {
+              "name": "ggml-small-q5_1.bin",
+              "url": "https://example.invalid/ggml-small-q5_1.bin",
+              "size_bytes": 189792256,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Lżejszy model rozpoznawania mowy na CPU (zapas).",
+            "en": "Lighter CPU speech model (fallback)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "piper-pl_PL-gosia-medium",
+          "kind": "tts",
+          "name": "Piper pl_PL gosia (medium)",
+          "license": "MIT (głos: do potwierdzenia — MODEL_CARD)",
+          "source": "https://huggingface.co/",
+          "size_bytes": 63963136,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\piper-pl_PL-gosia-medium",
+          "files": [
+            {
+              "name": "pl_PL-gosia-medium.onnx",
+              "url": "https://example.invalid/pl_PL-gosia-medium.onnx",
+              "size_bytes": 31981568,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "pl_PL-gosia-medium.onnx.json",
+              "url": "https://example.invalid/pl_PL-gosia-medium.onnx.json",
+              "size_bytes": 31981568,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Głos TTS Piper. Wymaga sidecara piper.",
+            "en": "Piper TTS voice. Requires the piper sidecar."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "silero-vad",
           "kind": "vad",
           "name": "Silero VAD 6.2.3 (op18, bez If)",
@@ -984,6 +1628,35 @@
           "active": false
         },
         {
+          "id": "wespeaker-resnet34",
+          "kind": "speaker",
+          "name": "WeSpeaker ResNet34 (VoxCeleb)",
+          "license": "Apache-2.0 (dane VoxCeleb — sprawdzić warunki)",
+          "source": "https://huggingface.co/",
+          "size_bytes": 27262976,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\wespeaker-resnet34",
+          "files": [
+            {
+              "name": "wespeaker_en_voxceleb_resnet34.onnx",
+              "url": "https://example.invalid/wespeaker_en_voxceleb_resnet34.onnx",
+              "size_bytes": 27262976,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Weryfikacja właściciela (embedding mówcy).",
+            "en": "Owner verification (speaker embedding)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "sidecar-llama-vulkan",
           "kind": "sidecar",
           "name": "llama-server (vulkan)",
@@ -1007,6 +1680,158 @@
           "note": {
             "pl": "Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.",
             "en": "Local model server (127.0.0.1). Version to be confirmed."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-cuda",
+          "kind": "sidecar",
+          "name": "llama-server (cuda)",
+          "license": "MIT; cudart/cuBLAS — NVIDIA CUDA EULA",
+          "source": "https://huggingface.co/",
+          "size_bytes": 629145600,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-cuda",
+          "files": [
+            {
+              "name": "llama-cuda-12.4.zip",
+              "url": "https://example.invalid/llama-cuda-12.4.zip",
+              "size_bytes": 314572800,
+              "pinned_sha256": null,
+              "sha256": null
+            },
+            {
+              "name": "cudart-cuda-12.4.zip",
+              "url": "https://example.invalid/cudart-cuda-12.4.zip",
+              "size_bytes": 314572800,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych na kartach NVIDIA (CUDA 12.4).",
+            "en": "Local model server for NVIDIA GPUs (CUDA 12.4)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-llama-cpu",
+          "kind": "sidecar",
+          "name": "llama-server (cpu)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 41943040,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-llama-cpu",
+          "files": [
+            {
+              "name": "llama-cpu.zip",
+              "url": "https://example.invalid/llama-cpu.zip",
+              "size_bytes": 41943040,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer modeli lokalnych na procesorze (zapas).",
+            "en": "Local model server on the CPU (fallback)."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-whisper-cpu",
+          "kind": "sidecar",
+          "name": "whisper-server (CPU)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 8388608,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-whisper-cpu",
+          "files": [
+            {
+              "name": "whisper-bin-x64.zip",
+              "url": "https://example.invalid/whisper-bin-x64.zip",
+              "size_bytes": 8388608,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Serwer rozpoznawania mowy na procesorze.",
+            "en": "Speech recognition server on the CPU."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-whisper-cuda",
+          "kind": "sidecar",
+          "name": "whisper-server (CUDA 12.4)",
+          "license": "MIT; cudart/cuBLAS — NVIDIA CUDA EULA",
+          "source": "https://huggingface.co/",
+          "size_bytes": 450887680,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-whisper-cuda",
+          "files": [
+            {
+              "name": "whisper-cublas-12.4.0-bin-x64.zip",
+              "url": "https://example.invalid/whisper-cublas-12.4.0-bin-x64.zip",
+              "size_bytes": 450887680,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznawanie mowy na karcie NVIDIA.",
+            "en": "Speech recognition on NVIDIA GPUs."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "sidecar-piper",
+          "kind": "sidecar",
+          "name": "piper (2023.11.14-2)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 23068672,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\sidecar-piper",
+          "files": [
+            {
+              "name": "piper_windows_amd64.zip",
+              "url": "https://example.invalid/piper_windows_amd64.zip",
+              "size_bytes": 23068672,
+              "pinned_sha256": null,
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": false,
+          "confirmed": false,
+          "downloadable": true,
+          "note": {
+            "pl": "Silnik TTS Piper (z espeak-ng-data).",
+            "en": "Piper TTS engine (with espeak-ng-data)."
           },
           "progress": null,
           "error": null,
@@ -1055,5 +1880,2271 @@
       },
       "parallel": 2
     }
+  },
+  {
+    "command": "models_bundles",
+    "args": {},
+    "result": [
+      {
+        "id": "bundle-reference",
+        "rating": 6,
+        "name": {
+          "pl": "Wzorcowy",
+          "en": "Reference"
+        },
+        "summary": {
+          "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Whisper turbo, głos Piper, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
+          "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Whisper turbo speech recognition, the Piper voice, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
+        },
+        "requirements": {
+          "min_ram_mb": 15000,
+          "min_vram_mb": 7500,
+          "min_cpu_cores": null,
+          "gpu_required": true,
+          "text": {
+            "pl": "RAM ≥ 16 GB, karta graficzna ≥ 8 GB (CUDA albo Vulkan)",
+            "en": "RAM ≥ 16 GB, GPU ≥ 8 GB (CUDA or Vulkan)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-4.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 5060427776,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-large-v3-turbo-q5_0",
+            "name": "Whisper large-v3-turbo-q5_0",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 573571072,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "openwakeword-features",
+            "name": "openWakeWord 0.5.1: melspektrogram + embedding",
+            "kind": "wake",
+            "state": "missing",
+            "size_bytes": 16777216,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "wespeaker-resnet34",
+            "name": "WeSpeaker ResNet34 (VoxCeleb)",
+            "kind": "speaker",
+            "state": "missing",
+            "size_bytes": 27262976,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "multilingual-e5-small",
+            "name": "Multilingual E5 small (ONNX fp32)",
+            "kind": "embed",
+            "state": "installed",
+            "size_bytes": 511705088,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 6380584960,
+        "missing_bytes": 5868879872,
+        "installed": 1,
+        "total": 11,
+        "state": "partial",
+        "fit": {
+          "kind": "too_weak",
+          "reason": {
+            "pl": "Potrzebna karta graficzna ≥ 8 GB (CUDA albo Vulkan) — karta ma 4,0 GB.",
+            "en": "A GPU ≥ 8 GB (CUDA or Vulkan) is needed — the GPU has 4.0 GB."
+          }
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 4.5B v3.0 (Q8_0 — 8 bitów, jakość bliska pełnej precyzji) obsługuje narzędzia agentek. Zalecenie według modelu jakości systemów AI (ISO/IEC 25059: poprawność funkcjonalna, odporność): poprawność sprawdza zamrożony zestaw ewaluacyjny Alfy — to metoda pomiaru, nie certyfikat.",
+              "en": "Bielik 4.5B v3.0 (Q8_0 — 8-bit, quality close to full precision) supports the agents' tools. Recommendation per the AI system quality model (ISO/IEC 25059: functional correctness, robustness): correctness is checked with Alfa's frozen evaluation set — a measurement method, not a certification."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): na karcie 8 GB Bielik 4.5B mieści się w całości obok rozpoznawania mowy (plan rozmieszczenia providers-local: 5880 + 1500 MB ≤ 7408 MB). Tempo odpowiedzi na tej maszynie — do zmierzenia.",
+              "en": "Performance efficiency (time behaviour, resource utilisation): on an 8 GB GPU Bielik 4.5B fits entirely next to speech recognition (providers-local placement plan: 5880 + 1500 MB ≤ 7408 MB). Reply speed on this machine — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper large-v3-turbo (q5_0). Jakość mierzy wskaźnik WER (odsetek błędnie rozpoznanych słów, metodyka NIST SCLITE); próg Alfy: WER po polsku ≤ 12 % na zamrożonym zestawie testowym (ACCEPTANCE F2-03) — do zmierzenia na tej maszynie.",
+              "en": "Whisper large-v3-turbo (q5_0). Quality is measured by WER (word error rate, NIST SCLITE methodology); Alfa's threshold: Polish WER ≤ 12% on the frozen test set (ACCEPTANCE F2-03) — to be measured on this machine."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Weryfikacja głosu",
+              "en": "Voice verification"
+            },
+            "standard": "ISO/IEC 19795-1:2021",
+            "text": {
+              "pl": "WeSpeaker ResNet34: skuteczność biometrii mierzy się wskaźnikami FAR/FRR i EER według ISO/IEC 19795-1 — dla tego modelu do zmierzenia (okno 200 ramek do potwierdzenia). Cechy słowa wywoławczego (openWakeWord) potrzebują jeszcze własnego klasyfikatora „Hej Alfa”.",
+              "en": "WeSpeaker ResNet34: biometric performance is measured with FAR/FRR and EER per ISO/IEC 19795-1 — to be measured for this model (200-frame window to be confirmed). The wake-word features (openWakeWord) still need an own “Hej Alfa” classifier."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-very-good",
+        "rating": 5,
+        "name": {
+          "pl": "Bardzo dobry",
+          "en": "Very good"
+        },
+        "summary": {
+          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego i weryfikacji głosu. Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
+          "en": "Like Reference, but without the wake word and voice verification. On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+        },
+        "requirements": {
+          "min_ram_mb": 15000,
+          "min_vram_mb": 5500,
+          "min_cpu_cores": null,
+          "gpu_required": true,
+          "text": {
+            "pl": "RAM ≥ 16 GB, karta graficzna ≥ 6 GB (CUDA albo Vulkan)",
+            "en": "RAM ≥ 16 GB, GPU ≥ 6 GB (CUDA or Vulkan)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-4.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 5060427776,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-large-v3-turbo-q5_0",
+            "name": "Whisper large-v3-turbo-q5_0",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 573571072,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "multilingual-e5-small",
+            "name": "Multilingual E5 small (ONNX fp32)",
+            "kind": "embed",
+            "state": "installed",
+            "size_bytes": 511705088,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 6336544768,
+        "missing_bytes": 5824839680,
+        "installed": 1,
+        "total": 9,
+        "state": "partial",
+        "fit": {
+          "kind": "tight",
+          "reason": {
+            "pl": "Karta ma mniej niż 6 GB pamięci: większa część Bielika 4.5B liczy się na procesorze — odpowiedzi wyraźnie wolniejsze.",
+            "en": "The GPU has less than 6 GB of memory: most of Bielik 4.5B runs on the CPU — noticeably slower replies."
+          }
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 4.5B v3.0 (Q8_0 — 8 bitów, jakość bliska pełnej precyzji) obsługuje narzędzia agentek. Zalecenie według modelu jakości systemów AI (ISO/IEC 25059: poprawność funkcjonalna, odporność): poprawność sprawdza zamrożony zestaw ewaluacyjny Alfy — to metoda pomiaru, nie certyfikat.",
+              "en": "Bielik 4.5B v3.0 (Q8_0 — 8-bit, quality close to full precision) supports the agents' tools. Recommendation per the AI system quality model (ISO/IEC 25059: functional correctness, robustness): correctness is checked with Alfa's frozen evaluation set — a measurement method, not a certification."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): na karcie 6 GB (RTX 4050) plan rozmieszczenia kładzie 34 z 60 warstw Bielika 4.5B na kartę, resztę w RAM — wolniej niż w całości na karcie. Dla porównania: na samym procesorze (4 vCPU) zmierzyliśmy 6,8 tok/s (próba generalna 2026-10-06).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): on a 6 GB GPU (RTX 4050) the placement plan puts 34 of Bielik 4.5B's 60 layers on the GPU and the rest in RAM — slower than fully on the GPU. For comparison: on the CPU alone (4 vCPU) we measured 6.8 tok/s (dress rehearsal 2026-10-06)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper large-v3-turbo (q5_0). Jakość mierzy wskaźnik WER (odsetek błędnie rozpoznanych słów, metodyka NIST SCLITE); próg Alfy: WER po polsku ≤ 12 % na zamrożonym zestawie testowym (ACCEPTANCE F2-03) — do zmierzenia na tej maszynie.",
+              "en": "Whisper large-v3-turbo (q5_0). Quality is measured by WER (word error rate, NIST SCLITE methodology); Alfa's threshold: Polish WER ≤ 12% on the frozen test set (ACCEPTANCE F2-03) — to be measured on this machine."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-good",
+        "rating": 4,
+        "name": {
+          "pl": "Dobry",
+          "en": "Good"
+        },
+        "summary": {
+          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, głosem Piper i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
+          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the Piper voice and semantic search. Runs on a 4 GB GPU or a strong CPU."
+        },
+        "requirements": {
+          "min_ram_mb": 11000,
+          "min_vram_mb": 3500,
+          "min_cpu_cores": 8,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 12 GB, procesor ≥ 8 rdzeni albo karta graficzna ≥ 4 GB",
+            "en": "RAM ≥ 12 GB, CPU ≥ 8 cores or GPU ≥ 4 GB"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-large-v3-turbo-q5_0",
+            "name": "Whisper large-v3-turbo-q5_0",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 573571072,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "multilingual-e5-small",
+            "name": "Multilingual E5 small (ONNX fp32)",
+            "kind": "embed",
+            "state": "installed",
+            "size_bytes": 511705088,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 2974810112,
+        "missing_bytes": 2463105024,
+        "installed": 1,
+        "total": 9,
+        "state": "partial",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": true,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper large-v3-turbo (q5_0). Jakość mierzy wskaźnik WER (odsetek błędnie rozpoznanych słów, metodyka NIST SCLITE); próg Alfy: WER po polsku ≤ 12 % na zamrożonym zestawie testowym (ACCEPTANCE F2-03) — do zmierzenia na tej maszynie.",
+              "en": "Whisper large-v3-turbo (q5_0). Quality is measured by WER (word error rate, NIST SCLITE methodology); Alfa's threshold: Polish WER ≤ 12% on the frozen test set (ACCEPTANCE F2-03) — to be measured on this machine."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-balanced",
+        "rating": 3,
+        "name": {
+          "pl": "Zrównoważony",
+          "en": "Balanced"
+        },
+        "summary": {
+          "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small i głos Piper — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
+          "en": "Bielik 1.5B, the smaller Whisper small speech model and the Piper voice — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
+        },
+        "requirements": {
+          "min_ram_mb": 7000,
+          "min_vram_mb": 3500,
+          "min_cpu_cores": 6,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 8 GB, procesor ≥ 6 rdzeni albo karta graficzna ≥ 4 GB",
+            "en": "RAM ≥ 8 GB, CPU ≥ 6 cores or GPU ≥ 4 GB"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 2079326208,
+        "missing_bytes": 2079326208,
+        "installed": 0,
+        "total": 8,
+        "state": "not_installed",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper small (q5_1) — mniejszy i mniej dokładny od turbo. Miara: WER (metodyka NIST SCLITE), próg Alfy ≤ 12 % (ACCEPTANCE F2-03) — do zmierzenia. W próbie generalnej na 4 vCPU bez karty 2,1 s mowy rozpoznawało się 53 s: bez karty to raczej dyktowanie niż płynna rozmowa.",
+              "en": "Whisper small (q5_1) — smaller and less accurate than turbo. Metric: WER (NIST SCLITE methodology), Alfa's threshold ≤ 12% (ACCEPTANCE F2-03) — to be measured. In the dress rehearsal on 4 vCPU without a GPU, 2.1 s of speech took 53 s to recognise: without a GPU this is dictation rather than fluent conversation."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-light",
+        "rating": 2,
+        "name": {
+          "pl": "Lekki",
+          "en": "Light"
+        },
+        "summary": {
+          "pl": "Bielik 1.5B i rozpoznawanie mowy Whisper small: mówisz do Alfy, a ona odpowiada tekstem (bez syntezy mowy).",
+          "en": "Bielik 1.5B and Whisper small speech recognition: you speak to Alfa and she replies in text (no speech synthesis)."
+        },
+        "requirements": {
+          "min_ram_mb": 7000,
+          "min_vram_mb": null,
+          "min_cpu_cores": null,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 8 GB (karta graficzna niepotrzebna)",
+            "en": "RAM ≥ 8 GB (no GPU needed)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 1992294400,
+        "missing_bytes": 1992294400,
+        "installed": 0,
+        "total": 6,
+        "state": "not_installed",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper small (q5_1) — mniejszy i mniej dokładny od turbo. Miara: WER (metodyka NIST SCLITE), próg Alfy ≤ 12 % (ACCEPTANCE F2-03) — do zmierzenia. W próbie generalnej na 4 vCPU bez karty 2,1 s mowy rozpoznawało się 53 s: bez karty to raczej dyktowanie niż płynna rozmowa.",
+              "en": "Whisper small (q5_1) — smaller and less accurate than turbo. Metric: WER (NIST SCLITE methodology), Alfa's threshold ≤ 12% (ACCEPTANCE F2-03) — to be measured. In the dress rehearsal on 4 vCPU without a GPU, 2.1 s of speech took 53 s to recognise: without a GPU this is dictation rather than fluent conversation."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-minimal",
+        "rating": 1,
+        "name": {
+          "pl": "Minimalny",
+          "en": "Minimal"
+        },
+        "summary": {
+          "pl": "Tylko rozmowa tekstowa z Bielikiem 1.5B — najmniej miejsca na dysku i pamięci.",
+          "en": "Text chat with Bielik 1.5B only — the least disk space and memory."
+        },
+        "requirements": {
+          "min_ram_mb": 5500,
+          "min_vram_mb": null,
+          "min_cpu_cores": null,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 6 GB (karta graficzna niepotrzebna)",
+            "en": "RAM ≥ 6 GB (no GPU needed)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          }
+        ],
+        "size_bytes": 1782579200,
+        "missing_bytes": 1782579200,
+        "installed": 0,
+        "total": 3,
+        "state": "not_installed",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "command": "models_bundle_download",
+    "args": {
+      "bundleId": "bundle-minimal"
+    },
+    "result": {
+      "id": "bundle-minimal",
+      "rating": 1,
+      "name": {
+        "pl": "Minimalny",
+        "en": "Minimal"
+      },
+      "summary": {
+        "pl": "Tylko rozmowa tekstowa z Bielikiem 1.5B — najmniej miejsca na dysku i pamięci.",
+        "en": "Text chat with Bielik 1.5B only — the least disk space and memory."
+      },
+      "requirements": {
+        "min_ram_mb": 5500,
+        "min_vram_mb": null,
+        "min_cpu_cores": null,
+        "gpu_required": false,
+        "text": {
+          "pl": "RAM ≥ 6 GB (karta graficzna niepotrzebna)",
+          "en": "RAM ≥ 6 GB (no GPU needed)"
+        }
+      },
+      "items": [
+        {
+          "id": "bielik-1.5b-v3.0-instruct-q8_0",
+          "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+          "kind": "llm",
+          "state": "downloading",
+          "size_bytes": 1698693120,
+          "downloadable": true,
+          "fallback": false
+        },
+        {
+          "id": "sidecar-llama-vulkan",
+          "name": "llama-server (vulkan)",
+          "kind": "sidecar",
+          "state": "downloading",
+          "size_bytes": 41943040,
+          "downloadable": true,
+          "fallback": false
+        },
+        {
+          "id": "sidecar-llama-cpu",
+          "name": "llama-server (cpu)",
+          "kind": "sidecar",
+          "state": "queued",
+          "size_bytes": 41943040,
+          "downloadable": true,
+          "fallback": true
+        }
+      ],
+      "size_bytes": 1782579200,
+      "missing_bytes": 1782579200,
+      "installed": 0,
+      "total": 3,
+      "state": "downloading",
+      "fit": {
+        "kind": "fits",
+        "reason": null
+      },
+      "recommended": false,
+      "quality": [
+        {
+          "aspect": {
+            "pl": "Model rozmowy",
+            "en": "Chat model"
+          },
+          "standard": "ISO/IEC 25059:2023",
+          "text": {
+            "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+            "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+          }
+        },
+        {
+          "aspect": {
+            "pl": "Wydajność",
+            "en": "Performance efficiency"
+          },
+          "standard": "ISO/IEC 25010:2023",
+          "text": {
+            "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+            "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+          }
+        },
+        {
+          "aspect": {
+            "pl": "Niezawodność",
+            "en": "Reliability"
+          },
+          "standard": "ISO/IEC 25010:2023",
+          "text": {
+            "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+            "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+          }
+        }
+      ]
+    }
+  },
+  {
+    "command": "models_bundle_verify",
+    "args": {
+      "bundleId": "bundle-minimal"
+    },
+    "result": {
+      "id": "bundle-minimal",
+      "rating": 1,
+      "name": {
+        "pl": "Minimalny",
+        "en": "Minimal"
+      },
+      "summary": {
+        "pl": "Tylko rozmowa tekstowa z Bielikiem 1.5B — najmniej miejsca na dysku i pamięci.",
+        "en": "Text chat with Bielik 1.5B only — the least disk space and memory."
+      },
+      "requirements": {
+        "min_ram_mb": 5500,
+        "min_vram_mb": null,
+        "min_cpu_cores": null,
+        "gpu_required": false,
+        "text": {
+          "pl": "RAM ≥ 6 GB (karta graficzna niepotrzebna)",
+          "en": "RAM ≥ 6 GB (no GPU needed)"
+        }
+      },
+      "items": [
+        {
+          "id": "bielik-1.5b-v3.0-instruct-q8_0",
+          "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+          "kind": "llm",
+          "state": "downloading",
+          "size_bytes": 1698693120,
+          "downloadable": true,
+          "fallback": false
+        },
+        {
+          "id": "sidecar-llama-vulkan",
+          "name": "llama-server (vulkan)",
+          "kind": "sidecar",
+          "state": "downloading",
+          "size_bytes": 41943040,
+          "downloadable": true,
+          "fallback": false
+        },
+        {
+          "id": "sidecar-llama-cpu",
+          "name": "llama-server (cpu)",
+          "kind": "sidecar",
+          "state": "queued",
+          "size_bytes": 41943040,
+          "downloadable": true,
+          "fallback": true
+        }
+      ],
+      "size_bytes": 1782579200,
+      "missing_bytes": 1347420160,
+      "installed": 0,
+      "total": 3,
+      "state": "downloading",
+      "fit": {
+        "kind": "fits",
+        "reason": null
+      },
+      "recommended": false,
+      "quality": [
+        {
+          "aspect": {
+            "pl": "Model rozmowy",
+            "en": "Chat model"
+          },
+          "standard": "ISO/IEC 25059:2023",
+          "text": {
+            "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+            "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+          }
+        },
+        {
+          "aspect": {
+            "pl": "Wydajność",
+            "en": "Performance efficiency"
+          },
+          "standard": "ISO/IEC 25010:2023",
+          "text": {
+            "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+            "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+          }
+        },
+        {
+          "aspect": {
+            "pl": "Niezawodność",
+            "en": "Reliability"
+          },
+          "standard": "ISO/IEC 25010:2023",
+          "text": {
+            "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+            "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+          }
+        }
+      ]
+    }
+  },
+  {
+    "command": "models_download",
+    "args": {
+      "itemId": "silero-vad"
+    },
+    "result": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "queued",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": null,
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_repair",
+    "args": {
+      "itemId": "silero-vad"
+    },
+    "result": {
+      "id": "silero-vad",
+      "kind": "vad",
+      "name": "Silero VAD 6.2.3 (op18, bez If)",
+      "license": "MIT",
+      "source": "https://huggingface.co/",
+      "size_bytes": 11534336,
+      "target": "%LOCALAPPDATA%\\Alfa\\models\\silero-vad",
+      "files": [
+        {
+          "name": "silero_vad-6.2.3-py3-none-any.whl",
+          "url": "https://example.invalid/silero_vad-6.2.3-py3-none-any.whl",
+          "size_bytes": 11534336,
+          "pinned_sha256": "9643cd2f5c75bba55f95253eb60f33a236508da98c304525a5676561cdb602ee",
+          "sha256": null
+        }
+      ],
+      "state": "downloading",
+      "pinned": true,
+      "confirmed": true,
+      "downloadable": true,
+      "note": {
+        "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
+        "en": "Voice activity detection. From the PyPI package, pinned hash."
+      },
+      "progress": {
+        "file": "silero_vad-6.2.3-py3-none-any.whl",
+        "done": 0,
+        "total": 11534336
+      },
+      "error": null,
+      "active": false
+    }
+  },
+  {
+    "command": "models_bundles",
+    "args": {},
+    "result": [
+      {
+        "id": "bundle-reference",
+        "rating": 6,
+        "name": {
+          "pl": "Wzorcowy",
+          "en": "Reference"
+        },
+        "summary": {
+          "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Whisper turbo, głos Piper, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
+          "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Whisper turbo speech recognition, the Piper voice, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
+        },
+        "requirements": {
+          "min_ram_mb": 15000,
+          "min_vram_mb": 7500,
+          "min_cpu_cores": null,
+          "gpu_required": true,
+          "text": {
+            "pl": "RAM ≥ 16 GB, karta graficzna ≥ 8 GB (CUDA albo Vulkan)",
+            "en": "RAM ≥ 16 GB, GPU ≥ 8 GB (CUDA or Vulkan)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-4.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 5060427776,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-large-v3-turbo-q5_0",
+            "name": "Whisper large-v3-turbo-q5_0",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 573571072,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "installed",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "openwakeword-features",
+            "name": "openWakeWord 0.5.1: melspektrogram + embedding",
+            "kind": "wake",
+            "state": "missing",
+            "size_bytes": 16777216,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "wespeaker-resnet34",
+            "name": "WeSpeaker ResNet34 (VoxCeleb)",
+            "kind": "speaker",
+            "state": "missing",
+            "size_bytes": 27262976,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "multilingual-e5-small",
+            "name": "Multilingual E5 small (ONNX fp32)",
+            "kind": "embed",
+            "state": "installed",
+            "size_bytes": 511705088,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 6380584960,
+        "missing_bytes": 5773459456,
+        "installed": 2,
+        "total": 11,
+        "state": "needs_trust",
+        "fit": {
+          "kind": "too_weak",
+          "reason": {
+            "pl": "Potrzebna karta graficzna ≥ 8 GB (CUDA albo Vulkan) — karta ma 4,0 GB.",
+            "en": "A GPU ≥ 8 GB (CUDA or Vulkan) is needed — the GPU has 4.0 GB."
+          }
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 4.5B v3.0 (Q8_0 — 8 bitów, jakość bliska pełnej precyzji) obsługuje narzędzia agentek. Zalecenie według modelu jakości systemów AI (ISO/IEC 25059: poprawność funkcjonalna, odporność): poprawność sprawdza zamrożony zestaw ewaluacyjny Alfy — to metoda pomiaru, nie certyfikat.",
+              "en": "Bielik 4.5B v3.0 (Q8_0 — 8-bit, quality close to full precision) supports the agents' tools. Recommendation per the AI system quality model (ISO/IEC 25059: functional correctness, robustness): correctness is checked with Alfa's frozen evaluation set — a measurement method, not a certification."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): na karcie 8 GB Bielik 4.5B mieści się w całości obok rozpoznawania mowy (plan rozmieszczenia providers-local: 5880 + 1500 MB ≤ 7408 MB). Tempo odpowiedzi na tej maszynie — do zmierzenia.",
+              "en": "Performance efficiency (time behaviour, resource utilisation): on an 8 GB GPU Bielik 4.5B fits entirely next to speech recognition (providers-local placement plan: 5880 + 1500 MB ≤ 7408 MB). Reply speed on this machine — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper large-v3-turbo (q5_0). Jakość mierzy wskaźnik WER (odsetek błędnie rozpoznanych słów, metodyka NIST SCLITE); próg Alfy: WER po polsku ≤ 12 % na zamrożonym zestawie testowym (ACCEPTANCE F2-03) — do zmierzenia na tej maszynie.",
+              "en": "Whisper large-v3-turbo (q5_0). Quality is measured by WER (word error rate, NIST SCLITE methodology); Alfa's threshold: Polish WER ≤ 12% on the frozen test set (ACCEPTANCE F2-03) — to be measured on this machine."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Weryfikacja głosu",
+              "en": "Voice verification"
+            },
+            "standard": "ISO/IEC 19795-1:2021",
+            "text": {
+              "pl": "WeSpeaker ResNet34: skuteczność biometrii mierzy się wskaźnikami FAR/FRR i EER według ISO/IEC 19795-1 — dla tego modelu do zmierzenia (okno 200 ramek do potwierdzenia). Cechy słowa wywoławczego (openWakeWord) potrzebują jeszcze własnego klasyfikatora „Hej Alfa”.",
+              "en": "WeSpeaker ResNet34: biometric performance is measured with FAR/FRR and EER per ISO/IEC 19795-1 — to be measured for this model (200-frame window to be confirmed). The wake-word features (openWakeWord) still need an own “Hej Alfa” classifier."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-very-good",
+        "rating": 5,
+        "name": {
+          "pl": "Bardzo dobry",
+          "en": "Very good"
+        },
+        "summary": {
+          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego i weryfikacji głosu. Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
+          "en": "Like Reference, but without the wake word and voice verification. On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+        },
+        "requirements": {
+          "min_ram_mb": 15000,
+          "min_vram_mb": 5500,
+          "min_cpu_cores": null,
+          "gpu_required": true,
+          "text": {
+            "pl": "RAM ≥ 16 GB, karta graficzna ≥ 6 GB (CUDA albo Vulkan)",
+            "en": "RAM ≥ 16 GB, GPU ≥ 6 GB (CUDA or Vulkan)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-4.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "missing",
+            "size_bytes": 5060427776,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-large-v3-turbo-q5_0",
+            "name": "Whisper large-v3-turbo-q5_0",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 573571072,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "installed",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "multilingual-e5-small",
+            "name": "Multilingual E5 small (ONNX fp32)",
+            "kind": "embed",
+            "state": "installed",
+            "size_bytes": 511705088,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 6336544768,
+        "missing_bytes": 5729419264,
+        "installed": 2,
+        "total": 9,
+        "state": "needs_trust",
+        "fit": {
+          "kind": "tight",
+          "reason": {
+            "pl": "Karta ma mniej niż 6 GB pamięci: większa część Bielika 4.5B liczy się na procesorze — odpowiedzi wyraźnie wolniejsze.",
+            "en": "The GPU has less than 6 GB of memory: most of Bielik 4.5B runs on the CPU — noticeably slower replies."
+          }
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 4.5B v3.0 (Q8_0 — 8 bitów, jakość bliska pełnej precyzji) obsługuje narzędzia agentek. Zalecenie według modelu jakości systemów AI (ISO/IEC 25059: poprawność funkcjonalna, odporność): poprawność sprawdza zamrożony zestaw ewaluacyjny Alfy — to metoda pomiaru, nie certyfikat.",
+              "en": "Bielik 4.5B v3.0 (Q8_0 — 8-bit, quality close to full precision) supports the agents' tools. Recommendation per the AI system quality model (ISO/IEC 25059: functional correctness, robustness): correctness is checked with Alfa's frozen evaluation set — a measurement method, not a certification."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): na karcie 6 GB (RTX 4050) plan rozmieszczenia kładzie 34 z 60 warstw Bielika 4.5B na kartę, resztę w RAM — wolniej niż w całości na karcie. Dla porównania: na samym procesorze (4 vCPU) zmierzyliśmy 6,8 tok/s (próba generalna 2026-10-06).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): on a 6 GB GPU (RTX 4050) the placement plan puts 34 of Bielik 4.5B's 60 layers on the GPU and the rest in RAM — slower than fully on the GPU. For comparison: on the CPU alone (4 vCPU) we measured 6.8 tok/s (dress rehearsal 2026-10-06)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper large-v3-turbo (q5_0). Jakość mierzy wskaźnik WER (odsetek błędnie rozpoznanych słów, metodyka NIST SCLITE); próg Alfy: WER po polsku ≤ 12 % na zamrożonym zestawie testowym (ACCEPTANCE F2-03) — do zmierzenia na tej maszynie.",
+              "en": "Whisper large-v3-turbo (q5_0). Quality is measured by WER (word error rate, NIST SCLITE methodology); Alfa's threshold: Polish WER ≤ 12% on the frozen test set (ACCEPTANCE F2-03) — to be measured on this machine."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-good",
+        "rating": 4,
+        "name": {
+          "pl": "Dobry",
+          "en": "Good"
+        },
+        "summary": {
+          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, głosem Piper i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
+          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the Piper voice and semantic search. Runs on a 4 GB GPU or a strong CPU."
+        },
+        "requirements": {
+          "min_ram_mb": 11000,
+          "min_vram_mb": 3500,
+          "min_cpu_cores": 8,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 12 GB, procesor ≥ 8 rdzeni albo karta graficzna ≥ 4 GB",
+            "en": "RAM ≥ 12 GB, CPU ≥ 8 cores or GPU ≥ 4 GB"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "needs_trust",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-large-v3-turbo-q5_0",
+            "name": "Whisper large-v3-turbo-q5_0",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 573571072,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "installed",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "multilingual-e5-small",
+            "name": "Multilingual E5 small (ONNX fp32)",
+            "kind": "embed",
+            "state": "installed",
+            "size_bytes": 511705088,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 2974810112,
+        "missing_bytes": 668991488,
+        "installed": 2,
+        "total": 9,
+        "state": "needs_trust",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": true,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper large-v3-turbo (q5_0). Jakość mierzy wskaźnik WER (odsetek błędnie rozpoznanych słów, metodyka NIST SCLITE); próg Alfy: WER po polsku ≤ 12 % na zamrożonym zestawie testowym (ACCEPTANCE F2-03) — do zmierzenia na tej maszynie.",
+              "en": "Whisper large-v3-turbo (q5_0). Quality is measured by WER (word error rate, NIST SCLITE methodology); Alfa's threshold: Polish WER ≤ 12% on the frozen test set (ACCEPTANCE F2-03) — to be measured on this machine."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-balanced",
+        "rating": 3,
+        "name": {
+          "pl": "Zrównoważony",
+          "en": "Balanced"
+        },
+        "summary": {
+          "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small i głos Piper — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
+          "en": "Bielik 1.5B, the smaller Whisper small speech model and the Piper voice — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
+        },
+        "requirements": {
+          "min_ram_mb": 7000,
+          "min_vram_mb": 3500,
+          "min_cpu_cores": 6,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 8 GB, procesor ≥ 6 rdzeni albo karta graficzna ≥ 4 GB",
+            "en": "RAM ≥ 8 GB, CPU ≥ 6 cores or GPU ≥ 4 GB"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "needs_trust",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "piper-pl_PL-gosia-medium",
+            "name": "Piper pl_PL gosia (medium)",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "installed",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-piper",
+            "name": "piper (2023.11.14-2)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 23068672,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 2079326208,
+        "missing_bytes": 285212672,
+        "installed": 1,
+        "total": 8,
+        "state": "needs_trust",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper small (q5_1) — mniejszy i mniej dokładny od turbo. Miara: WER (metodyka NIST SCLITE), próg Alfy ≤ 12 % (ACCEPTANCE F2-03) — do zmierzenia. W próbie generalnej na 4 vCPU bez karty 2,1 s mowy rozpoznawało się 53 s: bez karty to raczej dyktowanie niż płynna rozmowa.",
+              "en": "Whisper small (q5_1) — smaller and less accurate than turbo. Metric: WER (NIST SCLITE methodology), Alfa's threshold ≤ 12% (ACCEPTANCE F2-03) — to be measured. In the dress rehearsal on 4 vCPU without a GPU, 2.1 s of speech took 53 s to recognise: without a GPU this is dictation rather than fluent conversation."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Głos",
+              "en": "Voice"
+            },
+            "standard": "ITU-T P.800 / P.808",
+            "text": {
+              "pl": "Piper pl_PL gosia (medium). Naturalność mowy ocenia się średnią ocen słuchaczy MOS w skali 1–5 (ITU-T P.800; wariant z oceną przez internautów — P.808); wynik dla tego głosu — do zmierzenia w Voice Lab. Zmierzona szybkość: RTF 0,34 na 4 vCPU (synteza ok. 3 razy szybsza od czasu mowy).",
+              "en": "Piper pl_PL gosia (medium). Speech naturalness is rated with the listeners' mean opinion score (MOS) on a 1–5 scale (ITU-T P.800; crowdsourced variant — P.808); the score for this voice — to be measured in Voice Lab. Measured speed: RTF 0.34 on 4 vCPU (synthesis about 3 times faster than real time)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Opóźnienie rozmowy",
+              "en": "Conversation delay"
+            },
+            "standard": "ITU-T G.114",
+            "text": {
+              "pl": "Zalecenie ITU-T G.114 (do 150 ms w jedną stronę) dotyczy połączeń telefonicznych — asystent z modelem lokalnym go nie osiąga. Alfa ma własne cele (PLAN §6.4), od końca Twojej wypowiedzi do pierwszego dźwięku odpowiedzi: lokalnie p50 ≤ 2,0 s i p95 ≤ 3,0 s (profil A), hybrydowo p50 ≤ 1,3 s (profil B) — do zmierzenia.",
+              "en": "ITU-T G.114 (up to 150 ms one way) applies to telephone calls — an assistant with a local model does not reach it. Alfa has its own targets (PLAN §6.4), from the end of your utterance to the first sound of the reply: local p50 ≤ 2.0 s and p95 ≤ 3.0 s (profile A), hybrid p50 ≤ 1.3 s (profile B) — to be measured."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-light",
+        "rating": 2,
+        "name": {
+          "pl": "Lekki",
+          "en": "Light"
+        },
+        "summary": {
+          "pl": "Bielik 1.5B i rozpoznawanie mowy Whisper small: mówisz do Alfy, a ona odpowiada tekstem (bez syntezy mowy).",
+          "en": "Bielik 1.5B and Whisper small speech recognition: you speak to Alfa and she replies in text (no speech synthesis)."
+        },
+        "requirements": {
+          "min_ram_mb": 7000,
+          "min_vram_mb": null,
+          "min_cpu_cores": null,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 8 GB (karta graficzna niepotrzebna)",
+            "en": "RAM ≥ 8 GB (no GPU needed)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "needs_trust",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "silero-vad",
+            "name": "Silero VAD 6.2.3 (op18, bez If)",
+            "kind": "vad",
+            "state": "installed",
+            "size_bytes": 11534336,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          },
+          {
+            "id": "sidecar-whisper-cpu",
+            "name": "whisper-server (CPU)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          }
+        ],
+        "size_bytes": 1992294400,
+        "missing_bytes": 198180864,
+        "installed": 1,
+        "total": 6,
+        "state": "needs_trust",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Rozpoznawanie mowy",
+              "en": "Speech recognition"
+            },
+            "standard": "WER (NIST SCLITE)",
+            "text": {
+              "pl": "Whisper small (q5_1) — mniejszy i mniej dokładny od turbo. Miara: WER (metodyka NIST SCLITE), próg Alfy ≤ 12 % (ACCEPTANCE F2-03) — do zmierzenia. W próbie generalnej na 4 vCPU bez karty 2,1 s mowy rozpoznawało się 53 s: bez karty to raczej dyktowanie niż płynna rozmowa.",
+              "en": "Whisper small (q5_1) — smaller and less accurate than turbo. Metric: WER (NIST SCLITE methodology), Alfa's threshold ≤ 12% (ACCEPTANCE F2-03) — to be measured. In the dress rehearsal on 4 vCPU without a GPU, 2.1 s of speech took 53 s to recognise: without a GPU this is dictation rather than fluent conversation."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      },
+      {
+        "id": "bundle-minimal",
+        "rating": 1,
+        "name": {
+          "pl": "Minimalny",
+          "en": "Minimal"
+        },
+        "summary": {
+          "pl": "Tylko rozmowa tekstowa z Bielikiem 1.5B — najmniej miejsca na dysku i pamięci.",
+          "en": "Text chat with Bielik 1.5B only — the least disk space and memory."
+        },
+        "requirements": {
+          "min_ram_mb": 5500,
+          "min_vram_mb": null,
+          "min_cpu_cores": null,
+          "gpu_required": false,
+          "text": {
+            "pl": "RAM ≥ 6 GB (karta graficzna niepotrzebna)",
+            "en": "RAM ≥ 6 GB (no GPU needed)"
+          }
+        },
+        "items": [
+          {
+            "id": "bielik-1.5b-v3.0-instruct-q8_0",
+            "name": "Bielik 1.5B v3.0 Instruct (Q8_0)",
+            "kind": "llm",
+            "state": "needs_trust",
+            "size_bytes": 1698693120,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-vulkan",
+            "name": "llama-server (vulkan)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "sidecar-llama-cpu",
+            "name": "llama-server (cpu)",
+            "kind": "sidecar",
+            "state": "needs_trust",
+            "size_bytes": 41943040,
+            "downloadable": true,
+            "fallback": true
+          }
+        ],
+        "size_bytes": 1782579200,
+        "missing_bytes": 0,
+        "installed": 0,
+        "total": 3,
+        "state": "needs_trust",
+        "fit": {
+          "kind": "fits",
+          "reason": null
+        },
+        "recommended": false,
+        "quality": [
+          {
+            "aspect": {
+              "pl": "Model rozmowy",
+              "en": "Chat model"
+            },
+            "standard": "ISO/IEC 25059:2023",
+            "text": {
+              "pl": "Bielik 1.5B v3.0 (Q8_0) prowadzi rozmowę, ale nie wywołuje narzędzi agentek (robi to zbyt zawodnie). Według ISO/IEC 25059 to ograniczenie poprawności funkcjonalnej: do zadań agentek potrzebny pakiet 5–6 albo model w chmurze.",
+              "en": "Bielik 1.5B v3.0 (Q8_0) holds a conversation but does not call the agents' tools (it does so too unreliably). Per ISO/IEC 25059 this limits functional correctness: agent tasks need bundle 5–6 or a cloud model."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Wydajność",
+              "en": "Performance efficiency"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Wydajność (zachowanie w czasie, wykorzystanie zasobów): Bielik 1.5B Q8_0 — 21 tok/s na samym procesorze (4 vCPU, próba generalna 2026-10-06); według manifestu ok. 2,4 GB RAM na procesorze albo ok. 2,2 GB na karcie (mieści się w całości).",
+              "en": "Performance efficiency (time behaviour, resource utilisation): Bielik 1.5B Q8_0 — 21 tok/s on the CPU alone (4 vCPU, dress rehearsal 2026-10-06); per the manifest about 2.4 GB of RAM on the CPU or about 2.2 GB on a GPU (fits entirely)."
+            }
+          },
+          {
+            "aspect": {
+              "pl": "Niezawodność",
+              "en": "Reliability"
+            },
+            "standard": "ISO/IEC 25010:2023",
+            "text": {
+              "pl": "Niezawodność (odporność na błędy, odtwarzalność): każdy plik jest sprawdzany sumą SHA-256; gdy silnik na kartę graficzną nie wystartuje, Alfa przechodzi na wersję CPU; uszkodzony albo źle zainstalowany element naprawisz osobno („Napraw”).",
+              "en": "Reliability (fault tolerance, recoverability): every file is checked with SHA-256; when a GPU engine fails to start, Alfa falls back to the CPU build; a damaged or badly installed element can be repaired on its own (“Repair”)."
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

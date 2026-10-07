@@ -6,6 +6,7 @@ import { plApp } from './pl-app';
 import { plBuilder } from './pl-builder';
 import { plMemory } from './pl-memory';
 import { plPlugins } from './pl-plugins';
+import { plBundles } from './pl-bundles';
 import { plModels } from './pl-models';
 import { plSettings } from './pl-settings';
 import { plTasks } from './pl-tasks';
@@ -28,6 +29,7 @@ export const pl = {
   ...plVoice,
   ...plPlugins,
   ...plModels,
+  ...plBundles,
   ...plFiles,
 } as const satisfies Record<string, Message>;
 

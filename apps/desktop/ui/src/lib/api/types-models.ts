@@ -96,3 +96,75 @@ export interface ModelsView {
 
 /** Zgoda TOFU: nazwa pliku → SHA-256 pokazany na karcie. */
 export type TrustedHashes = Readonly<Record<string, string>>;
+
+/** Stan pakietu na tej maszynie (ze stanów jego pozycji). */
+export type BundleState =
+  | 'not_installed'
+  /** Część pozycji zainstalowana albo pobieranie wstrzymane. */
+  | 'partial'
+  | 'installed'
+  /** Pozycja uszkodzona albo z błędem — do naprawy. */
+  | 'corrupt'
+  | 'downloading'
+  /** Pobrane pozycje bez przypiętego SHA-256 czekają na zgodę (karta TOFU). */
+  | 'needs_trust';
+
+/** Dopasowanie do sprzętu: pasuje / na styk (zadziała z kompromisem) / za słaby. */
+export type BundleFitKind = 'fits' | 'tight' | 'too_weak';
+
+export interface BundleFit {
+  readonly kind: BundleFitKind;
+  /** Uzasadnienie (`tight`, `too_weak`). */
+  readonly reason: LocalizedText | null;
+}
+
+/** Progi w MB z tolerancją raportowania systemu; `text` — wartości nominalne do pokazania. */
+export interface BundleRequirements {
+  readonly min_ram_mb: number;
+  /** Pamięć karty (CUDA albo Vulkan); `null` — karta niepotrzebna. */
+  readonly min_vram_mb: number | null;
+  readonly min_cpu_cores: number | null;
+  /** Karta konieczna; inaczej karta i procesor to alternatywy. */
+  readonly gpu_required: boolean;
+  readonly text: LocalizedText;
+}
+
+/** Pozycja pakietu (wariant silnika dobrany dla tej maszyny). */
+export interface BundleItemView {
+  readonly id: string;
+  readonly name: string;
+  readonly kind: ModelItemKind;
+  readonly state: ModelItemState;
+  readonly size_bytes: number;
+  readonly downloadable: boolean;
+  /** Silnik zapasowy (CPU), gdy wersja na kartę nie wystartuje. */
+  readonly fallback: boolean;
+}
+
+/** Uwaga o jakości: zalecenie albo metoda pomiaru według normy (bez deklaracji certyfikacji). */
+export interface QualityNote {
+  readonly aspect: LocalizedText;
+  /** Norma albo metoda, np. `ITU-T P.800 / P.808`. */
+  readonly standard: string;
+  readonly text: LocalizedText;
+}
+
+/** Pakiet w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny) dla tej maszyny. */
+export interface ModelBundle {
+  readonly id: string;
+  readonly rating: number;
+  readonly name: LocalizedText;
+  readonly summary: LocalizedText;
+  readonly requirements: BundleRequirements;
+  readonly items: readonly BundleItemView[];
+  readonly size_bytes: number;
+  /** Co najwyżej tyle zostało do pobrania. */
+  readonly missing_bytes: number;
+  readonly installed: number;
+  readonly total: number;
+  readonly state: BundleState;
+  readonly fit: BundleFit;
+  /** Najwyższy pakiet pasujący do tej maszyny bez kompromisów. */
+  readonly recommended: boolean;
+  readonly quality: readonly QualityNote[];
+}

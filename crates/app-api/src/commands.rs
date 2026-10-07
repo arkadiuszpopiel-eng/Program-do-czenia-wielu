@@ -198,6 +198,10 @@ macro_rules! with_commands {
             models_verify(item_id: String) -> $crate::dto::ModelItem;
             models_remove(item_id: String) -> $crate::dto::ModelItem;
             models_trust_hash(item_id: String, hashes: $crate::dto::TrustedHashes) -> $crate::dto::ModelItem;
+            models_repair(item_id: String) -> $crate::dto::ModelItem;
+            models_bundles() -> Vec<$crate::dto::ModelBundle>;
+            models_bundle_download(bundle_id: String) -> $crate::dto::ModelBundle;
+            models_bundle_verify(bundle_id: String) -> $crate::dto::ModelBundle;
             embed_model_activate(model: String) -> $crate::dto::EmbedderView;
             search_reindex_start() -> $crate::dto::ReindexView;
             search_reindex_cancel() -> $crate::dto::ReindexView;
@@ -240,6 +244,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 207);
+        assert_eq!(super::COMMANDS.len(), 211);
     }
 }

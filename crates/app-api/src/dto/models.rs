@@ -1,5 +1,6 @@
-//! Menedżer modeli i silników (`models_*`, `embed_model_activate`, `search_reindex_*`, zdarzenia
-//! `ModelProgress`, `ModelChanged`, `ReindexStatus`) — odpowiednik `types-models.ts`.
+//! Menedżer modeli i silników (`models_*`, pakiety `models_bundle*`, `embed_model_activate`,
+//! `search_reindex_*`, zdarzenia `ModelProgress`, `ModelChanged`, `ReindexStatus`) — odpowiednik
+//! `types-models.ts`.
 
 use std::collections::BTreeMap;
 
@@ -131,3 +132,98 @@ pub struct ModelsView {
 
 /// Zgoda TOFU: SHA-256 plików pokazane na karcie (nazwa pliku → hash).
 pub type TrustedHashes = BTreeMap<String, String>;
+
+/// Stan pakietu na tej maszynie (wyliczany ze stanów jego pozycji).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BundleState {
+    /// Żadna pozycja nie jest zainstalowana.
+    NotInstalled,
+    /// Część pozycji zainstalowana (albo pobieranie wstrzymane).
+    Partial,
+    /// Wszystkie pozycje zainstalowane (także skopiowane ręcznie).
+    Installed,
+    /// Pozycja uszkodzona (weryfikacja) albo z błędem pobierania lub instalacji — do naprawy.
+    Corrupt,
+    /// Pozycja w kolejce, pobierana albo instalowana.
+    Downloading,
+    /// Pobrane pozycje bez przypiętego SHA-256 czekają na zgodę (karta TOFU).
+    NeedsTrust,
+}
+
+/// Dopasowanie pakietu do sprzętu tej maszyny.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BundleFitKind {
+    Fits,
+    /// Zadziała z kompromisem (np. część modelu na procesorze — wolniej).
+    Tight,
+    TooWeak,
+}
+
+/// Dopasowanie z uzasadnieniem (`reason` — dla `tight` i `too_weak`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BundleFit {
+    pub kind: BundleFitKind,
+    pub reason: Option<LocalizedText>,
+}
+
+/// Wymagania pakietu. Progi w MB z tolerancją raportowania systemu (np. 16 GB RAM ≈ ≥ 15 000 MB,
+/// karta 8 GB ≈ ≥ 7 500 MB); `text` — opis do pokazania z wartościami nominalnymi.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BundleRequirements {
+    pub min_ram_mb: u64,
+    /// Pamięć karty graficznej (CUDA albo Vulkan); `null` — karta niepotrzebna.
+    pub min_vram_mb: Option<u64>,
+    /// Rdzenie fizyczne procesora; `null` — bez wymagania.
+    pub min_cpu_cores: Option<u32>,
+    /// Karta konieczna; inaczej `min_vram_mb` i `min_cpu_cores` to alternatywy („karta albo procesor”).
+    pub gpu_required: bool,
+    pub text: LocalizedText,
+}
+
+/// Pozycja pakietu (wariant silnika dobrany dla tej maszyny) z jej stanem.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BundleItemView {
+    pub id: String,
+    pub name: String,
+    pub kind: ModelItemKind,
+    pub state: ModelItemState,
+    pub size_bytes: u64,
+    /// Do pobrania w aplikacji (inaczej — instalacja ręczna; pakiet jej nie pobiera).
+    pub downloadable: bool,
+    /// Silnik zapasowy (CPU) — używany, gdy wersja na kartę graficzną nie wystartuje.
+    pub fallback: bool,
+}
+
+/// Uwaga o jakości: zalecenie albo metoda pomiaru według normy (bez deklaracji certyfikacji).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct QualityNote {
+    pub aspect: LocalizedText,
+    /// Norma albo metoda (np. `ITU-T P.800 / P.808`).
+    pub standard: String,
+    pub text: LocalizedText,
+}
+
+/// Pakiet „Modele i silniki” w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny) dla tej maszyny.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ModelBundle {
+    pub id: String,
+    /// Ocena 1–6.
+    pub rating: u8,
+    pub name: LocalizedText,
+    pub summary: LocalizedText,
+    pub requirements: BundleRequirements,
+    pub items: Vec<BundleItemView>,
+    /// Łączny rozmiar pobrań pozycji.
+    pub size_bytes: u64,
+    /// Co najwyżej tyle zostało do pobrania (pozycje brakujące, wstrzymane, uszkodzone).
+    pub missing_bytes: u64,
+    pub installed: u32,
+    pub total: u32,
+    pub state: BundleState,
+    pub fit: BundleFit,
+    /// Najwyższy pakiet, który pasuje do tej maszyny bez kompromisów.
+    pub recommended: bool,
+    pub quality: Vec<QualityNote>,
+}

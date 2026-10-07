@@ -6,6 +6,7 @@ import { enApp } from './en-app';
 import { enBuilder } from './en-builder';
 import { enMemory } from './en-memory';
 import { enPlugins } from './en-plugins';
+import { enBundles } from './en-bundles';
 import { enModels } from './en-models';
 import { enSettings } from './en-settings';
 import { enTasks } from './en-tasks';
@@ -29,5 +30,6 @@ export const en: Record<MessageKey, Message> = {
   ...enVoice,
   ...enPlugins,
   ...enModels,
+  ...enBundles,
   ...enFiles,
 };

@@ -2,174 +2,26 @@
 // 250 ms (zdarzenia `ModelProgress` + `ModelChanged`), limit 2 równoległych (reszta w kolejce),
 // anulowanie → „wstrzymane” z plikiem częściowym, pozycje bez przypiętego hasha → karta zgody
 // z policzonym SHA-256, weryfikacja, usuwanie (nie aktywnego embeddera), embedder wyszukiwania
-// i przebudowa wektorów (zdarzenia `ReindexStatus`). Scenariusz „offline”: pobieranie zawodzi.
+// i przebudowa wektorów (zdarzenia `ReindexStatus`), „Napraw” (usunięcie + pobranie od nowa)
+// i pakiety 1–6 (`api-bundles.ts`). Scenariusz „offline”: pobieranie zawodzi.
 import type { EnginesApi } from '../client-models';
 import type {
   EmbedderView,
   ModelItem,
-  ModelItemKind,
   ModelItemState,
   ModelsView,
   ReindexView,
   TrustedHashes,
 } from '../types-models';
 import type { FakeCore } from './core';
+import { bundleView, bundleViews } from './api-bundles';
+import { SEEDS, fakeSha, seedItem } from './engine-seeds';
 
 export const ENGINE_STEP_MS = 250;
 const STEPS = 4;
 const PARALLEL = 2;
-const MIB = 1024 * 1024;
 const LEXICAL = 'lexical';
 const LEXICAL_INDEX = 'alfa-lexical-hash-v1/256';
-
-/** Deterministyczny „SHA-256” atrapy (64 znaki hex z identyfikatora pliku). */
-export function fakeSha(seed: string): string {
-  let h = 2166136261;
-  let out = '';
-  while (out.length < 64) {
-    for (const c of seed + out.length) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
-    out += h.toString(16).padStart(8, '0');
-  }
-  return out.slice(0, 64);
-}
-
-type Seed = [
-  id: string,
-  kind: ModelItemKind,
-  name: string,
-  license: string,
-  mib: number,
-  files: readonly string[],
-  pinned: boolean,
-  confirmed: boolean,
-  note: readonly [string, string],
-];
-
-const SEEDS: readonly Seed[] = [
-  [
-    'bielik-4.5b-v3.0-instruct-q8_0',
-    'llm',
-    'Bielik 4.5B v3.0 Instruct (Q8_0)',
-    'Apache-2.0',
-    4826,
-    ['Bielik-4.5B-v3.0-Instruct.Q8_0.gguf'],
-    false,
-    false,
-    [
-      'Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.',
-      'Local chat model (llama.cpp). Requires the llama-server sidecar.',
-    ],
-  ],
-  [
-    'multilingual-e5-small',
-    'embed',
-    'Multilingual E5 small (ONNX fp32)',
-    'MIT',
-    488,
-    ['onnx/model.onnx', 'tokenizer.json'],
-    false,
-    false,
-    ['Embedder wyszukiwania semantycznego (pamięć F7).', 'Semantic search embedder (F7 memory).'],
-  ],
-  [
-    'whisper-large-v3-turbo-q5_0',
-    'stt',
-    'Whisper large-v3-turbo-q5_0',
-    'MIT',
-    547,
-    ['ggml-large-v3-turbo-q5_0.bin'],
-    false,
-    false,
-    [
-      'Rozpoznawanie mowy. Wymaga sidecara whisper-server.',
-      'Speech recognition. Requires the whisper-server sidecar.',
-    ],
-  ],
-  [
-    'silero-vad',
-    'vad',
-    'Silero VAD 6.2.3 (op18, bez If)',
-    'MIT',
-    11,
-    ['silero_vad-6.2.3-py3-none-any.whl'],
-    true,
-    true,
-    [
-      'Wykrywanie mowy. Z paczki PyPI, hash przypięty.',
-      'Voice activity detection. From the PyPI package, pinned hash.',
-    ],
-  ],
-  [
-    'openwakeword-features',
-    'wake',
-    'openWakeWord 0.5.1: melspektrogram + embedding',
-    'Apache-2.0',
-    16,
-    ['openwakeword-0.5.1-py3-none-any.whl'],
-    true,
-    true,
-    [
-      'Cechy słów wywoławczych; klasyfikator PL — własny trening.',
-      'Wake-word features; the PL classifier needs own training.',
-    ],
-  ],
-  [
-    'sidecar-llama-vulkan',
-    'sidecar',
-    'llama-server (vulkan)',
-    'MIT',
-    40,
-    ['llama-vulkan.zip'],
-    false,
-    false,
-    [
-      'Serwer modeli lokalnych (127.0.0.1). Wersja do potwierdzenia.',
-      'Local model server (127.0.0.1). Version to be confirmed.',
-    ],
-  ],
-  [
-    'sidecar-pocket-tts',
-    'sidecar',
-    'Pocket TTS PL (wrapper JSON-lines)',
-    'CC-BY-4.0',
-    0,
-    [],
-    false,
-    false,
-    [
-      'Instalacja ręczna: wrapper budowany osobno.',
-      'Manual install: the wrapper is built separately.',
-    ],
-  ],
-];
-
-function seedItem([id, kind, name, license, mib, files, pinned, confirmed, note]: Seed): ModelItem {
-  const size = mib * MIB;
-  return {
-    id,
-    kind,
-    name,
-    license,
-    source: 'https://huggingface.co/',
-    size_bytes: size,
-    target: `%LOCALAPPDATA%\\Alfa\\${kind === 'sidecar' ? 'sidecars' : 'models'}\\${id}`,
-    files: files.map((f) => ({
-      name: f,
-      url: `https://example.invalid/${f}`,
-      size_bytes: Math.round(size / files.length),
-      pinned_sha256: pinned ? fakeSha(f) : null,
-      sha256: null,
-    })),
-    state: 'missing',
-    pinned,
-    confirmed,
-    downloadable: files.length > 0,
-    note: { pl: note[0], en: note[1] },
-    progress: null,
-    error: null,
-    active: false,
-  };
-}
 
 export class FakeEngines {
   private items = new Map<string, ModelItem>(SEEDS.map((s) => [s[0], seedItem(s)]));
@@ -263,6 +115,34 @@ export class FakeEngines {
     this.core.scheduler.setTimeout(() => this.set(id, { state: 'installed' }), ENGINE_STEP_MS);
   }
 
+  /** Do kolejki (pobranie albo wznowienie); pozycja ręczna — błąd jak w rdzeniu. */
+  private queue(itemId: string): void {
+    const item = this.get(itemId);
+    if (!item.downloadable) {
+      throw new Error(`„${item.name}” instaluje się ręcznie — zobacz opis pozycji.`);
+    }
+    const idle: readonly ModelItemState[] = ['missing', 'paused', 'failed', 'corrupt', 'external'];
+    if (idle.includes(item.state)) {
+      this.set(itemId, { state: 'queued', error: null });
+      this.pump();
+    }
+  }
+
+  /** Usunięcie plików i częściowych pobrań (nie aktywnego embeddera) — stan „nie pobrano”. */
+  private reset(itemId: string): void {
+    if (this.get(itemId).active) {
+      throw new Error('To aktywny model wyszukiwania — najpierw przełącz wyszukiwanie na inny.');
+    }
+    const seed = SEEDS.find((s) => s[0] === itemId);
+    if (!seed) throw new Error(`Nie znaleziono: pozycja katalogu „${itemId}”.`);
+    const timer = this.timers.get(itemId);
+    if (timer !== undefined) this.core.scheduler.clearTimeout(timer);
+    this.timers.delete(itemId);
+    const fresh = seedItem(seed);
+    this.items.set(itemId, fresh);
+    this.core.emit([{ type: 'ModelChanged', item: fresh }]);
+  }
+
   private view(): ModelsView {
     return {
       items: [...this.items.values()],
@@ -300,28 +180,21 @@ export class FakeEngines {
 
   api(): EnginesApi {
     const core = this.core;
+    /** Błąd atrapy jako odrzucona obietnica (jak błąd komendy), nie wyjątek synchroniczny. */
+    const run = <T>(f: () => T): Promise<T> => {
+      try {
+        return core.reply(f());
+      } catch (e) {
+        return Promise.reject(e instanceof Error ? e : new Error(String(e)));
+      }
+    };
     return {
       list: () => core.reply(this.view()),
-      download: (itemId) => {
-        const item = this.get(itemId);
-        if (!item.downloadable) {
-          return Promise.reject(
-            new Error(`„${item.name}” instaluje się ręcznie — zobacz opis pozycji.`),
-          );
-        }
-        const idle: readonly ModelItemState[] = [
-          'missing',
-          'paused',
-          'failed',
-          'corrupt',
-          'external',
-        ];
-        if (idle.includes(item.state)) {
-          this.set(itemId, { state: 'queued', error: null });
-          this.pump();
-        }
-        return core.reply(this.get(itemId));
-      },
+      download: (itemId) =>
+        run(() => {
+          this.queue(itemId);
+          return this.get(itemId);
+        }),
       cancel: (itemId) => {
         const timer = this.timers.get(itemId);
         if (timer !== undefined) core.scheduler.clearTimeout(timer);
@@ -334,20 +207,40 @@ export class FakeEngines {
         return core.reply(this.get(itemId));
       },
       verify: (itemId) => core.reply(this.get(itemId)),
-      remove: (itemId) => {
-        if (this.get(itemId).active) {
-          return Promise.reject(
-            new Error('To aktywny model wyszukiwania — najpierw przełącz wyszukiwanie na inny.'),
-          );
-        }
-        const seed = SEEDS.find((s) => s[0] === itemId);
-        if (!seed)
-          return Promise.reject(new Error(`Nie znaleziono: pozycja katalogu „${itemId}”.`));
-        const fresh = seedItem(seed);
-        this.items.set(itemId, fresh);
-        core.emit([{ type: 'ModelChanged', item: fresh }]);
-        return core.reply(fresh);
-      },
+      remove: (itemId) =>
+        run(() => {
+          this.reset(itemId);
+          return this.get(itemId);
+        }),
+      repair: (itemId) =>
+        run(() => {
+          const item = this.get(itemId);
+          if (!item.downloadable) {
+            throw new Error(
+              `„${item.name}” instaluje się ręcznie — napraw ją według opisu pozycji (skopiuj pliki jeszcze raz).`,
+            );
+          }
+          this.reset(itemId);
+          this.queue(itemId);
+          return this.get(itemId);
+        }),
+      bundles: () => core.reply(bundleViews(this.items)),
+      bundleDownload: (bundleId) =>
+        run(() => {
+          for (const row of bundleView(bundleId, this.items).items) {
+            if (!row.downloadable) continue;
+            // Jak w rdzeniu: pozycja, która nie ruszyła, dostaje błąd, reszta pakietu idzie dalej.
+            try {
+              if (row.state === 'corrupt') this.reset(row.id);
+              if (['missing', 'paused', 'failed', 'corrupt'].includes(row.state))
+                this.queue(row.id);
+            } catch (e) {
+              this.set(row.id, { error: e instanceof Error ? e.message : String(e) });
+            }
+          }
+          return bundleView(bundleId, this.items);
+        }),
+      bundleVerify: (bundleId) => run(() => bundleView(bundleId, this.items)),
       trustHash: (itemId, hashes: TrustedHashes) => {
         const item = this.get(itemId);
         if (item.state !== 'needs_trust')

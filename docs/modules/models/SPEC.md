@@ -141,3 +141,29 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   narzędzi). Wpis Q4_K_M wskazywał plik nieobecny w `speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` (HTTP 404). Próba na
   żywo pobiera teraz najmniejszy — 1.5B (żądanie z narzędziem pomijane: `tools = false`).
 
+
+## Pakiety 1–6 i „Napraw” (2026-10-07)
+- **Skala ocen 6 → 1** (`bundle_data.rs`): 6 Wzorcowy (Bielik 4.5B, Whisper turbo, Piper, Silero VAD, openWakeWord,
+  WeSpeaker, e5; karta ≥ 8 GB), 5 Bardzo dobry (bez słowa wywoławczego i mówcy; karta ≥ 6 GB), 4 Dobry (Bielik 1.5B +
+  turbo + Piper + VAD + e5; RAM ≥ 12 GB i karta ≥ 4 GB albo procesor ≥ 8 rdzeni), 3 Zrównoważony (1.5B + small + Piper
+  + VAD), 2 Lekki (1.5B + small + VAD), 1 Minimalny (1.5B). Progi w MB z tolerancją raportowania systemu (16 GB RAM →
+  ≥ 15 000 MB, karta 8 GB → ≥ 7 500 MB); próg „na styk” z opisem kompromisu (np. 4.5B częściowo na karcie 6 GB).
+- **Dobór silników do maszyny** (`bundles.rs`, `Machine::from_profile` — główna karta ≥ 3 500 MB): NVIDIA → `llama-server`
+  i `whisper-server` CUDA + CPU w zapasie; AMD/Intel → `llama-server` Vulkan + CPU w zapasie, `whisper-server` CPU;
+  bez karty → CPU. Dopasowanie `fits` / `tight` / `too_weak` z uzasadnieniem (PL/EN), zalecany = najwyższy `fits`.
+- **Stan pakietu** ze stanów pozycji (pierwszeństwo: pobieranie → uszkodzony → zgoda TOFU → zainstalowany → częściowo);
+  `missing_bytes` — górne oszacowanie (bez pobranej części bieżącego pliku).
+- **Działania** (`bundle_ops.rs`, z istniejących prymitywów): `models_bundle_download` — brakujące, wstrzymane
+  i nieudane do kolejki, uszkodzone naprawia; ręcznych, trwających i czekających na zgodę nie rusza; pozycja, która
+  nie ruszyła, dostaje błąd w swoim stanie, reszta idzie dalej. `models_bundle_verify` — ponowne SHA-256.
+  `models_repair` — usunięcie plików, częściowych pobrań i rekordu, pobranie od nowa (odmowa: pozycja ręczna,
+  aktywny embedder, instalacja w toku).
+- **Uwagi o jakości** (`bundle_quality.rs`): normy wyłącznie jako zalecenie albo metoda pomiaru, bez deklaracji
+  certyfikacji i bez wymyślonych wyników — ISO/IEC 25010:2023 (wydajność, niezawodność), ISO/IEC 25059:2023 (jakość
+  systemów AI), WER (metodyka NIST SCLITE, próg ACCEPTANCE F2-03), ITU-T P.800/P.808 (MOS), ITU-T G.114 (opóźnienie —
+  telefoniczne, Alfa ma własne cele PLAN §6.4), ISO/IEC 19795-1:2021 (FAR/FRR/EER). Liczby tylko z pomiarów repozytorium
+  (próba generalna 2026-10-06) i planu rozmieszczenia `providers-local`.
+- **Atrapa UI:** `apps/desktop/ui/src/lib/api/fake/bundles.json` generuje `tests/bundles_ui.rs`
+  (`ALFA_UPDATE_FIXTURES=1`) dla maszyny atrapy (Radeon 780M 4 GB, 32 GB, 8 rdzeni: 6 za słaby, 5 na styk, 4 zalecany);
+  stan liczy atrapa ze swoich pozycji. Testy: `tests/bundles.rs` (maszyny referencyjne, warianty silników, stan,
+  normy), `tests/bundle_ops.rs` (lokalny serwer HTTP: pobranie, weryfikacja, naprawa, TOFU, pozycje ręczne).

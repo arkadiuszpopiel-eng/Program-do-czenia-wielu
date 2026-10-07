@@ -1,8 +1,9 @@
 <!--
-  Ustawienia → Modele i silniki (ładowana leniwie): wyszukiwanie w pamięci (embedder leksykalny albo
+  Ustawienia → Modele i silniki (ładowana leniwie): pakiety 1–6 dobrane do sprzętu (BundlesSection),
+  wyszukiwanie w pamięci (embedder leksykalny albo
   zainstalowany model, przebudowa wektorów w tle z postępem, „Przebuduj teraz” / „Przerwij”) i katalog
   pozycji (modele rozmowy, STT, głosy, VAD, słowa wywoławcze, głos właściciela, embeddingi, sidecary)
-  z filtrami rodzaju i stanu. Stan na żywo ze zdarzeń `ModelChanged`, `ModelProgress`, `ReindexStatus`.
+  z filtrami rodzaju i stanu; „Napraw” (usuń i pobierz od nowa) po potwierdzeniu. Stan na żywo ze zdarzeń `ModelChanged`, `ModelProgress`, `ReindexStatus`.
 -->
 <script lang="ts">
   import { Button, ConfirmDialog, Select } from '@alfa/ui-kit';
@@ -23,6 +24,7 @@
     type StateFilter,
   } from '../../../logic/models';
   import { useApp } from '../../../state/context';
+  import BundlesSection from './BundlesSection.svelte';
   import ModelRow from './ModelRow.svelte';
   import './work.css';
 
@@ -36,6 +38,14 @@
   let busy = $state<string | null>(null);
   let removing = $state<ModelItem | null>(null);
   let confirmOpen = $state(false);
+  let repairing = $state<{ id: string; name: string; size_bytes: number } | null>(null);
+  let repairOpen = $state(false);
+
+  /** „Napraw” z katalogu albo z pakietu — zawsze po potwierdzeniu (pliki są usuwane). */
+  function askRepair(item: { id: string; name: string; size_bytes: number }) {
+    repairing = item;
+    repairOpen = true;
+  }
 
   const items = $derived(
     view ? filterItems(view.items, kind as KindFilter, stateFilter as StateFilter) : [],
@@ -123,6 +133,8 @@
 
 <p class="intro">{t('engines.intro')}</p>
 {#if loadError}<LoadFailed error={loadError} onretry={() => void load()} />{/if}
+
+<BundlesSection onrepair={askRepair} />
 
 <section class="wk-card" aria-labelledby="mm-search">
   <h3 id="mm-search">{t('engines.search.title')}</h3>
@@ -251,6 +263,7 @@
         ontrust={() =>
           void act(item.id, () => app.client.engines.trustHash(item.id, trustHashes(item)))}
         onactivate={() => void activate(item.id)}
+        onrepair={() => askRepair(item)}
       />
     {/each}
   </ul>
@@ -271,6 +284,28 @@
         target.id,
         () => app.client.engines.remove(target.id),
         t('engines.removed', { name: target.name }),
+      );
+    }
+  }}
+/>
+
+<ConfirmDialog
+  bind:open={repairOpen}
+  title={t('engines.repairConfirm.title', { name: repairing?.name ?? '' })}
+  description={t('engines.repairConfirm.body', {
+    size: app.i18n.bytes(repairing?.size_bytes ?? 0),
+  })}
+  confirmLabel={t('engines.repair')}
+  cancelLabel={t('common.cancel')}
+  danger
+  onconfirm={() => {
+    repairOpen = false;
+    const target = repairing;
+    if (target) {
+      void act(
+        target.id,
+        () => app.client.engines.repair(target.id),
+        t('engines.repairing', { name: target.name }),
       );
     }
   }}

@@ -94,6 +94,7 @@ work_commands! {
     wait models_verify(item_id: String) -> ModelItem = models.verify(&item_id);
     wait models_remove(item_id: String) -> ModelItem = models.remove(&item_id);
     wait models_trust_hash(item_id: String, hashes: TrustedHashes) -> ModelItem = models.trust_hash(&item_id, hashes);
+    wait models_repair(item_id: String) -> ModelItem = models.repair(&item_id);
     wait embed_model_activate(model: String) -> EmbedderView = models.activate_embedder(&model);
     wait search_reindex_start() -> ReindexView = models.reindex_start();
     wait search_reindex_cancel() -> ReindexView = models.reindex_cancel();

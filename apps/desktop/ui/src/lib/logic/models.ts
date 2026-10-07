@@ -58,6 +58,8 @@ export interface ItemActions {
   readonly trust: boolean;
   /** „Używaj do wyszukiwania" (zainstalowany, nieaktywny embedder). */
   readonly activate: boolean;
+  /** „Napraw": usunięcie plików (z częściowymi) i pobranie od nowa. */
+  readonly repair: boolean;
 }
 
 export function itemActions(item: ModelItem): ItemActions {
@@ -74,6 +76,7 @@ export function itemActions(item: ModelItem): ItemActions {
     remove: item.downloadable && !busy && !item.active && s !== 'missing',
     trust: s === 'needs_trust',
     activate: item.kind === 'embed' && s === 'installed' && !item.active,
+    repair: item.downloadable && !item.active && (present || s === 'failed' || partial),
   };
 }
 

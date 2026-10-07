@@ -21,6 +21,8 @@ memory-contract = { path = "../memory-contract" }
 memory-impl = { path = "../memory-impl" }
 providers-local-impl = { path = "../providers-local-impl" }
 model-residency-contract = { path = "../model-residency-contract" }
+# Profil sprzętu (karta, RAM, rdzenie) — dobór i dopasowanie pakietów 1–6 (`bundles`).
+device-profile-contract = { path = "../device-profile-contract" }
 # Reguły ścieżek wpisów ZIP i limity (zip-bomb) — te same co dla paczek aktualizacji.
 updater-contract = { path = "../updater-contract" }
 core-config-contract.workspace = true
@@ -50,7 +52,6 @@ tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "tim
 # kompozycją co aplikacja — `app-modules` (llama-server, Piper) i `voice-stt-impl` (whisper-server).
 app-modules = { path = "../app-modules" }
 providers-contract = { path = "../providers-contract" }
-device-profile-contract = { path = "../device-profile-contract" }
 device-profile-fake = { path = "../device-profile-fake" }
 personas-contract = { path = "../personas-contract" }
 voice-audio-contract = { path = "../voice-audio-contract" }

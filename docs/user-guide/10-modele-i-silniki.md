@@ -5,6 +5,35 @@ Wszystko, czego Alfa potrzebuje do pracy bez internetu i bez kluczy, pobierzesz 
 Twojego głosu, wyszukiwania w pamięci) i programy pomocnicze — „silniki” uruchamiane obok Alfy: `llama-server`
 (model rozmowy), `whisper-server` (rozpoznawanie mowy) i `piper` (głos zapasowy).
 
+## Pakiety 1–6 — wszystko naraz, dobrane do komputera
+
+Na górze strony są **pakiety**: komplety modeli i silników w skali ocen od **6 (Wzorcowy)** do **1 (Minimalny)**.
+Alfa sama dobiera do Twojego sprzętu wersje silników — karta NVIDIA: CUDA (z wersją na procesor w zapasie), karta
+AMD lub Intel: Vulkan (z zapasem na procesor), bez karty: procesor.
+
+| Ocena | Pakiet       | Co zawiera                                                                 | Wymagania (nominalnie)                         |
+| ----- | ------------ | -------------------------------------------------------------------------- | ---------------------------------------------- |
+| 6     | Wzorcowy     | Bielik 4.5B (z narzędziami agentek), Whisper turbo, Piper, wykrywanie mowy, słowo wywoławcze, weryfikacja głosu, wyszukiwanie znaczeniowe | RAM ≥ 16 GB, karta ≥ 8 GB                      |
+| 5     | Bardzo dobry | jak 6, bez słowa wywoławczego i weryfikacji głosu                          | RAM ≥ 16 GB, karta ≥ 6 GB                      |
+| 4     | Dobry        | Bielik 1.5B (bez narzędzi), Whisper turbo, Piper, wykrywanie mowy, wyszukiwanie znaczeniowe | RAM ≥ 12 GB, karta ≥ 4 GB albo procesor ≥ 8 rdzeni |
+| 3     | Zrównoważony | Bielik 1.5B, Whisper small, Piper, wykrywanie mowy                         | RAM ≥ 8 GB, karta ≥ 4 GB albo procesor ≥ 6 rdzeni |
+| 2     | Lekki        | Bielik 1.5B, Whisper small, wykrywanie mowy (odpowiedzi tekstem)           | RAM ≥ 8 GB                                     |
+| 1     | Minimalny    | sam Bielik 1.5B — rozmowa tekstowa                                        | RAM ≥ 6 GB                                     |
+
+- **Zalecany dla tego komputera** (zielona ramka) — najwyższa ocena, która działa bez kompromisów. **Na styk** —
+  zadziała wolniej (np. część modelu na procesorze); powód jest napisany pod opisem. **Za słaby sprzęt** — pakiet
+  pobierzesz dopiero po potwierdzeniu.
+- **Pobierz pakiet** pobiera w tle wszystko, czego brakuje; **Dokończ pobieranie** — resztę; **Napraw pakiet** —
+  uszkodzone elementy. **Sprawdź pliki (SHA-256)** liczy sumy zainstalowanych plików jeszcze raz.
+- **Elementy pakietu** — lista z działaniami dla każdego elementu osobno: **Pobierz**, **Wznów**, **Sprawdź**
+  i **Napraw** (usuwa pliki elementu i pobiera go od nowa — po potwierdzeniu; reszta pakietu zostaje). Element bez
+  przypiętej sumy zatwierdzasz na karcie zgody w katalogu niżej.
+- **Jakość i normy** — uwagi z odwołaniem do norm: ISO/IEC 25010 (wydajność, niezawodność), ISO/IEC 25059 (jakość
+  systemów AI), WER (metodyka NIST SCLITE), ITU-T P.800/P.808 (ocena naturalności mowy MOS), ITU-T G.114
+  (opóźnienie), ISO/IEC 19795-1 (biometria: FAR/FRR/EER). To zalecenia i metody pomiaru, nie certyfikaty; wartości
+  „do zmierzenia” poznasz po pomiarze na swoim komputerze.
+- Pakiety się nie wykluczają: wspólne elementy pobierają się raz.
+
 ## Pobieranie
 
 1. Wybierz pozycję (filtry **Rodzaj** i **Stan** zawężają listę) i kliknij **Pobierz**. Naraz pobierają się
@@ -37,6 +66,8 @@ przez kartę zgody. **Instalacja ręczna** (np. Pocket TTS) — opis pozycji mó
 
 - **Sprawdź pliki** liczy SHA-256 zainstalowanych plików jeszcze raz. Niezgodny albo brakujący plik zmienia stan
   na „Uszkodzone — pobierz ponownie”. Pliki skopiowane ręcznie mają stan „Zainstalowano ręcznie (bez weryfikacji)”.
+- **Napraw** usuwa pliki pozycji (z częściowymi pobraniami) i pobiera ją od nowa — gdy plik się uszkodził albo
+  źle zainstalował, a wznowienie nie pomaga (z potwierdzeniem).
 - **Usuń** kasuje pliki pozycji razem z częściowymi pobraniami (z potwierdzeniem). Modelu, którego używa
   wyszukiwanie, nie da się usunąć — najpierw przełącz wyszukiwanie na inny.
 
