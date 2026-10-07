@@ -5,7 +5,9 @@ id = "anthropic"
 display_name = "Anthropic (Claude)"
 kind = "chat"
 auth = "api_key"
-base_url = "TODO"
+# Ten sam adres co `providers_api_impl::ANTHROPIC_BASE_URL` (adapter natywny); bez niego kreator kluczy wymagał
+# wpisania endpointu ręcznie, a klucz był odrzucany (test na laptopie, 2026-10-07).
+base_url = "https://api.anthropic.com"
 compat = "native"
 privacy_tag = "unknown"
 jurisdiction = "unknown"
