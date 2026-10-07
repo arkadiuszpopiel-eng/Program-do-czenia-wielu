@@ -43,6 +43,9 @@ export function applyTurnEvent(
     case 'Error':
       turn.status = 'error';
       turn.error = event.error;
+      // Jak przy `Stop`: błąd w trakcie „Myślę…” (zerwane połączenie, limit) kończy też myślenie —
+      // inaczej obok karty błędu zostawał pulsujący wskaźnik.
+      if (turn.thinking?.active) turn.thinking = { ...turn.thinking, active: false };
       return { text: null, stopped: true };
   }
 }

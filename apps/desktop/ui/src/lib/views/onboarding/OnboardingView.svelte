@@ -17,7 +17,7 @@
   import AddProviderWizard from '../settings/pages/AddProviderWizard.svelte';
   import BridgesStep from './BridgesStep.svelte';
   import ImportStep from './ImportStep.svelte';
-  import LocalModelCard from './LocalModelCard.svelte';
+  import LocalBundleCard from './LocalBundleCard.svelte';
   import MicStep from './MicStep.svelte';
 
   const app = useApp();
@@ -182,7 +182,7 @@
             <Button variant="primary" onclick={() => (wizard = true)}>{t('ob.keys.addNow')}</Button>
             <Button variant="secondary" onclick={next}>{t('ob.keys.skip')}</Button>
           </div>
-          <LocalModelCard />
+          <LocalBundleCard />
         {/if}
       {:else if current === 'autonomy'}
         <h2>{t('ob.autonomy.title')}</h2>
@@ -241,7 +241,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-4);
-    width: min(720px, 100%);
+    width: min(820px, 100%);
+    /* `margin: auto` w kontenerze flex: karta na środku okna, a gdy jest wyższa niż okno — od góry
+       (bez ucinania). Wcześniej wisiała pod górną krawędzią z pustą połową ekranu pod spodem. */
+    margin: auto;
     padding: var(--alfa-space-6);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-overlay);

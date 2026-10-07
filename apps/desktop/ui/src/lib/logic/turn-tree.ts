@@ -106,6 +106,18 @@ export function lastUserTurn(path: readonly Turn[]): Turn | undefined {
 }
 
 /** Czy w drzewie coś się jeszcze strumieniuje. */
-export function streamingTurn(path: readonly Turn[]): Turn | undefined {
-  return path.find((turn) => turn.status === 'streaming');
+/**
+ * Tura w trakcie generowania — w całym drzewie, nie tylko na widocznej ścieżce: po przełączeniu
+ * wariantu ‹ › generacja innej gałęzi trwa dalej i przycisk Stop / Esc muszą ją nadal zatrzymywać.
+ * Pierwszeństwo ma tura na widocznej ścieżce.
+ */
+export function streamingTurn(path: readonly Turn[], tree?: TurnTree): Turn | undefined {
+  const visible = path.find((turn) => turn.status === 'streaming');
+  if (visible || !tree) return visible;
+  return Object.values(tree.turns).find((turn) => turn.status === 'streaming');
+}
+
+/** Czy ucięta tura ma już kontynuację („Kontynuuj” nie może tworzyć kolejnych duplikatów). */
+export function isContinued(tree: TurnTree, turn: Pick<Turn, 'id'>): boolean {
+  return (tree.children[turn.id] ?? []).some((id) => tree.turns[id]?.continues === turn.id);
 }

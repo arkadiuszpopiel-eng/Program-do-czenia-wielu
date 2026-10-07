@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Turn } from '../../api/types';
 import { turn } from '../../api/fake/fixtures';
+import { applyTurnEvent } from '../apply-event';
 import {
   addTurn,
   buildTree,
@@ -10,6 +11,8 @@ import {
   selectSibling,
   selectTurn,
   siblingInfo,
+  streamingTurn,
+  isContinued,
 } from '../turn-tree';
 
 const T0 = Date.UTC(2026, 8, 30, 10);
@@ -84,5 +87,49 @@ describe('drzewo gałęzi (append-only)', () => {
       const leaf = path[path.length - 1];
       expect(leaf && (tree.children[leaf.id] ?? []).length).toBe(0);
     }
+  });
+});
+
+describe('generacja poza widoczną ścieżką i kontynuacje (przegląd 2026-10-08)', () => {
+  it('Stop/Esc widzą turę generowaną w innym wariancie niż oglądany', () => {
+    const tree = buildTree([
+      t('u1', null, 'user', 0),
+      t('a1', 'u1', 'alfa', 1),
+      turn('a2', 's', 'u1', 'alfa', '', T0 + 2000, { status: 'streaming' }),
+    ]);
+    expect(streamingTurn(projectPath(tree), tree)?.id).toBe('a2');
+    // Użytkownik przełącza ‹ na starszy wariant: generacja a2 trwa i nadal da się ją zatrzymać.
+    const a2 = tree.turns['a2'];
+    if (!a2) throw new Error('brak');
+    selectSibling(tree, a2, -1);
+    expect(projectPath(tree).map((x) => x.id)).toEqual(['u1', 'a1']);
+    expect(streamingTurn(projectPath(tree))).toBeUndefined();
+    expect(streamingTurn(projectPath(tree), tree)?.id).toBe('a2');
+  });
+
+  it('„Kontynuuj” znika, gdy ucięta tura ma już kontynuację', () => {
+    const cut = turn('a1', 's', 'u1', 'alfa', 'ucięta', T0 + 1000, { truncated: true });
+    const tree = buildTree([t('u1', null, 'user', 0), cut]);
+    expect(isContinued(tree, cut)).toBe(false);
+    addTurn(tree, turn('a1c', 's', 'a1', 'alfa', 'dalej', T0 + 2000, { continues: 'a1' }));
+    expect(isContinued(tree, cut)).toBe(true);
+    // Zwykła odpowiedź pod turą (nie kontynuacja) nie chowa przycisku.
+    const other = buildTree([t('u1', null, 'user', 0), cut, t('u2', 'a1', 'user', 2)]);
+    expect(isContinued(other, cut)).toBe(false);
+  });
+
+  it('błąd w trakcie myślenia kończy „Myślę…”', () => {
+    const live = turn('a1', 's', 'u1', 'alfa', '', T0, {
+      status: 'streaming',
+      thinking: { active: true, duration_ms: 0 },
+    });
+    applyTurnEvent(live, {
+      type: 'Error',
+      session_id: 's',
+      turn_id: 'a1',
+      error: { code: 'offline', message: 'Brak połączenia', retry_at: null, provider: 'x' },
+    });
+    expect(live.status).toBe('error');
+    expect(live.thinking?.active).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Zrzuty ekranu wszystkich widoków (rozmowa, panele Alt+1…7, każda strona ustawień) w kilku rozmiarach
 // okna — do przeglądu układu i skalowania. Wymaga działającego `pnpm dev` (atrapa backendu).
-// Użycie: node scripts/shots.mjs <katalog-wyjściowy> [--sizes 1280x720,1920x1080] [--only chat,panels,settings]
+// Użycie: node scripts/shots.mjs <katalog-wyjściowy> [--sizes 1280x720,1920x1080] [--only chat,panels,settings,onboarding,windows]
 //         [--scenario default] [--theme dark] [--url http://localhost:5173]
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -60,6 +60,36 @@ for (const [width, height] of sizes) {
     }
   }
   await page.close();
+
+  // Wprowadzenie (scenariusz `first-run`): każdy krok po kolei przyciskiem „Dalej”.
+  if (only.has('onboarding')) {
+    const ob = await browser.newPage({ viewport: { width, height }, locale: 'pl-PL' });
+    await ob.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
+    await ob.goto(`${base}/?scenario=first-run`);
+    await ob.locator('#ob-title').waitFor();
+    for (let i = 1; i <= 12; i++) {
+      await ob.waitForTimeout(500);
+      await ob.screenshot({ path: join(outDir, `${width}-ob${String(i).padStart(2, '0')}.png`) });
+      const next = ob.getByRole('button', { name: 'Dalej', exact: true });
+      if (!(await next.count()) || !(await next.isEnabled())) break;
+      await next.click();
+    }
+    await ob.close();
+  }
+  // Okna poboczne: Szybkie pytanie i pigułka głosowa (małe okna o stałym rozmiarze).
+  if (only.has('windows')) {
+    for (const [name, w, h] of [
+      ['quick', 640, 420],
+      ['pill', 360, 96],
+    ]) {
+      const win = await browser.newPage({ viewport: { width: w, height: h }, locale: 'pl-PL' });
+      await win.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
+      await win.goto(`${base}/${name}.html`);
+      await win.waitForTimeout(700);
+      await win.screenshot({ path: join(outDir, `okno-${name}.png`) });
+      await win.close();
+    }
+  }
   console.log(`shots: ${width}x${height} gotowe`);
 }
 await browser.close();

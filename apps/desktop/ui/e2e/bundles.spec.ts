@@ -104,3 +104,21 @@ test('ustawienia szczegółowe silników — opis z zaleceniem i zapis wartości
   await expect(downloads.getByText(/1 przy łączu komórkowym/)).toBeVisible();
   await expectAccessible(page, 'ustawienia silników');
 });
+
+// Onboarding (regresja z testu na laptopie 2026-10-07): krok „Konta i klucze” proponował sam model,
+// bez silnika, który go uruchamia. Teraz proponuje pakiet zalecany dla tego komputera.
+test('onboarding: model lokalny jako pakiet z silnikiem, nie sam model', async ({ page }) => {
+  await openApp(page, { scenario: 'first-run' });
+  await expect(page.locator('#ob-title')).toBeVisible();
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Dalej', exact: true }).click();
+  const card = page.getByRole('region', { name: 'Model lokalny i silnik' });
+  await expect(card).toBeVisible();
+  await expect(card).toContainText(/Pakiet \d\/6/);
+  await expect(card).toContainText('sam model nie wystarczy');
+  const download = card.getByRole('button', { name: /Pobierz pakiet/ });
+  await expect(download).toBeVisible();
+  await download.click();
+  // Po kliknięciu pakiet zmienia stan (pobieranie, zgoda na sumy albo gotowy) — przycisk startu znika.
+  await expect(download).toHaveCount(0);
+});

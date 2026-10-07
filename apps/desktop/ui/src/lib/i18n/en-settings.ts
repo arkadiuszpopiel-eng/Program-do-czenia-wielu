@@ -311,6 +311,17 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'ob.local.done': 'The local model is ready.',
   'ob.local.failed': 'Download failed: {error}',
   'ob.local.cancelled': 'Download cancelled — you can resume later.',
+  'ob.bundle.title': 'Local model and engine',
+  'ob.bundle.desc':
+    'Works without keys and without internet. The bundle picked for this computer contains the conversation model together with the engine that runs it — the model alone is not enough.',
+  'ob.bundle.name': 'Bundle {rating}/6 — {name}',
+  'ob.bundle.contents': { one: '{n} item · {size}', other: '{n} items · {size}' },
+  'ob.bundle.download': 'Download bundle ({size})',
+  'ob.bundle.progress': 'Downloading the model and engine bundle',
+  'ob.bundle.installed': 'Installed {done} of {total}',
+  'ob.bundle.trust': 'Downloaded files are waiting for your consent — compare the checksums below.',
+  'ob.bundle.done': 'The bundle is ready — local conversation works.',
+  'ob.bundle.later': 'You can pick another bundle later in Settings → Models and engines.',
   'ob.autonomy.title': 'How much should the agents act on their own?',
   'ob.autonomy.desc':
     'We start at L3. You change it with one switch in Settings and confirm each change in the Broker window.',

@@ -92,15 +92,19 @@
     }}
   >
     <TextField label={t('marshal.command')} bind:value={text} />
-    <label class="editor">
-      <span>{t('marshal.editor')}</span>
-      <textarea
-        rows="4"
-        spellcheck="false"
-        bind:value={editor}
-        aria-invalid={editorError ? 'true' : undefined}></textarea>
-      {#if editorError}<span class="error" role="alert">{editorError}</span>{/if}
-    </label>
+    <!-- Edytor JSON jest dla zaawansowanych: zwinięty, dopóki nie ma w nim treści albo błędu. -->
+    <details class="advanced" open={editor.trim() !== '' || editorError !== null}>
+      <summary>{t('marshal.advanced')}</summary>
+      <label class="editor">
+        <span>{t('marshal.editor')}</span>
+        <textarea
+          rows="4"
+          spellcheck="false"
+          bind:value={editor}
+          aria-invalid={editorError ? 'true' : undefined}></textarea>
+        {#if editorError}<span class="error" role="alert">{editorError}</span>{/if}
+      </label>
+    </details>
     <div>
       <Button type="submit" disabled={!text.trim() && !editor.trim()}>{t('marshal.propose')}</Button
       >
@@ -218,6 +222,17 @@
     font-size: var(--alfa-font-size-sm);
   }
   .form,
+  .advanced > summary {
+    /* Cel kliknięcia ≥ 24 px (WCAG 2.2 — target-size). */
+    min-height: var(--alfa-size-hit-target);
+    line-height: var(--alfa-size-hit-target);
+    cursor: pointer;
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
+  }
+  .advanced[open] > summary {
+    margin-bottom: var(--alfa-space-2);
+  }
   .editor {
     display: flex;
     flex-direction: column;

@@ -9,6 +9,7 @@
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
+  import { describeCron } from '../../../logic/cron-text';
   import { useApp } from '../../../state/context';
   import TriggerForm from './TriggerForm.svelte';
 
@@ -38,10 +39,16 @@
     });
   });
 
+  // Harmonogram słowami; wyrażenie cron zostaje w nawiasie dla tych, którzy je znają.
+  function cronText(expr: string): string {
+    const words = describeCron(expr, app.i18n.locale);
+    return words ? `${words} (${expr})` : expr;
+  }
+
   function describe(kind: TriggerKindView): string {
     switch (kind.kind) {
       case 'cron':
-        return `${t('triggers.kind.cron')}: ${kind.expr}`;
+        return `${t('triggers.kind.cron')}: ${cronText(kind.expr)}`;
       case 'interval':
         return t('triggers.every', { n: kind.every_minutes });
       case 'file_in_dir':

@@ -25,6 +25,32 @@
   let wasm = $state<{ name: string; b64: string } | null>(null);
   let inspection = $state<PluginInspection | null>(null);
   const plugins = $derived(view?.plugins ?? []);
+  // Szczegół problemu z rdzenia ma postać „narzędzie: kod” (np. `word_count: out_of_fuel`) — kod
+  // przerwania piaskownicy pokazujemy słowami; nieznany zostaje dosłownie.
+  const TRAPS = new Set([
+    'out_of_fuel',
+    'timeout',
+    'cancelled',
+    'memory_limit',
+    'stack_overflow',
+    'trap',
+    'input_too_large',
+    'output_too_large',
+    'invalid_output',
+    'plugin_failed',
+    'host_call_limit',
+    'unavailable',
+    'load',
+    'internal',
+  ]);
+  function problemDetail(detail: string): string {
+    const at = detail.lastIndexOf(': ');
+    const code = at >= 0 ? detail.slice(at + 2) : detail;
+    if (!TRAPS.has(code)) return detail;
+    const words = tk(`plugins.trap.${code}`);
+    return at >= 0 ? `${detail.slice(0, at)}: ${words}` : words;
+  }
+
   const pending = $derived(plugins.filter((p) => p.state === 'proposed'));
   const active = $derived(plugins.filter((p) => p.state === 'installed' || p.state === 'disabled'));
   const other = $derived(plugins.filter((p) => !pending.includes(p) && !active.includes(p)));
@@ -166,7 +192,9 @@
         <li>
           <strong>{label(p)}</strong>
           <span class="wk-meta"
-            >{tk(`plugins.state.${p.state}`)} · {p.tools.map((x) => x.name).join(', ')}</span
+            >{tk(`plugins.state.${p.state}`)} · {t('plugins.toolsList', {
+              names: p.tools.map((x) => x.name).join(', '),
+            })}</span
           >
           <span>{p.description}</span>
           <div class="wk-actions">
@@ -220,7 +248,7 @@
         <li>
           <span class="wk-error">{tk(`plugins.problem.${pr.kind}`)}</span>
           <strong>{pr.plugin} {pr.version}</strong>
-          <span class="wk-meta">{pr.detail} · {app.i18n.dateTime(pr.at)}</span>
+          <span class="wk-meta">{problemDetail(pr.detail)} · {app.i18n.dateTime(pr.at)}</span>
         </li>
       {/each}
     </ul>

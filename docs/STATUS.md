@@ -43,11 +43,37 @@ budowa powłoki na dysku E: czeka na zwolnienie miejsca.
 Przegląd interfejsu strona po stronie (29 stron ustawień, 7 paneli; commity `e358807`, `8d64fa2`): karty panelu
 prawego zawijają się — „Ekran” i „Głos” były poza krawędzią wąskiego panelu i niedostępne myszą; powtórzone nagłówki
 stron; nazwy zakresów pamięci bez powtórzeń i spokojniejsze przyciski „Zapomnij cały zakres”; nazwy narzędzi GUI po
-polsku; nawigacja ustawień ze stałym nagłówkiem. Zauważone, niepoprawione: surowe identyfikatory na stronie Wtyczki
-(`plugin_word_count`, `out_of_fuel`), harmonogram wyzwalacza jako wyrażenie cron, edytor reguł Marszałka w JSON
-widoczny dla każdego.
+polsku; nawigacja ustawień ze stałym nagłówkiem. W drugim przejściu poprawione też: powody zatrzymania wtyczki po polsku, harmonogram
+wyzwalacza słowami (`logic/cron-text.ts`), edytor JSON Marszałka zwinięty pod „Zaawansowane”, onboarding na
+środku okna.
 
-Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): 123 z 124 zielone. Test „paleta: otwarcie ≤ 50 ms” ma
+Przeglądy kodu rdzenia w osobnych sesjach (2026-10-08; tylko odczyt) — instalacja modeli i silników oraz przebieg
+rozmowy. Naprawione od razu, z testami:
+
+| Ustalenie | Gdzie | Test |
+| --- | --- | --- |
+| Model bez silnika był zgłaszany jako zdrowy — Router i zadania w tle próbowały trasy lokalnej w kółko (wpis w logu co 15 min) | `providers-local-impl` `config.rs::engine_present`, `provider.rs`, `module.rs` | `lifecycle.rs::missing_engine_gives_actionable_error_and_no_fallback` |
+| Nieudany start na procesorze po nieudanym starcie na karcie zostawiał dzierżawę pamięci | `providers-local-impl/src/sidecar.rs` | przegląd kodu (brak testu) |
+| Onboarding proponował sam model, bez silnika | `views/onboarding/LocalBundleCard.svelte` — pakiet zalecany z silnikiem i zgodą na sumy | `e2e/bundles.spec.ts` |
+| Błąd w trakcie „Myślę…” zostawiał pulsujący wskaźnik | `logic/apply-event.ts` | `logic/__tests__/turn-tree.test.ts` |
+| „Kontynuuj” zostawało po kontynuacji (kolejne kliknięcie tworzyło duplikat) | `logic/turn-tree.ts::isContinued` | jw. |
+| Po przełączeniu wariantu ‹ › znikał Stop, a Esc nie zatrzymywał trwającej generacji | `logic/turn-tree.ts::streamingTurn` | jw. |
+
+Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają budowy `app-core`):
+
+| # | Ustalenie | Gdzie | Pewność |
+| --- | --- | --- | --- |
+| R-01 | `flush_queue` opróżnia kolejkę offline na początku — błąd jednej sesji gubi wiadomości pozostałych (zostają „w kolejce” na zawsze) | `app-core/src/commands/queue.rs` | potwierdzone odczytem |
+| R-02 | Wysłanie zapisuje turę użytkownika, a potem `start_generation` może zawieść — wiadomość wisi bez odpowiedzi i bez błędu, a ponowny Enter ją dubluje | `app-core/src/commands/turns.rs::turns_send` | potwierdzone odczytem |
+| R-03 | „Edytuj i wyślij ponownie” gubi załączniki pierwotnej wiadomości | `app-core/src/commands/turns.rs` (`append_user(…, Vec::new())`) | potwierdzone odczytem |
+| R-04 | Pobranie pojedynczego modelu nie podpowiada silnika; brak pola „brakujące silniki” w DTO | `app-models/src/lib.rs`, `view.rs` | potwierdzone odczytem |
+| R-05 | Wszystkie silniki mają `sha256: None` — po pobraniu czekają na zgodę i `sidecars` zostaje puste, choć model jest „zainstalowany”; sumy wydań b6710 i whisper są w przewodniku 11 i można je przypiąć (decyzja właściciela) | `app-models/src/data.rs` | mechanizm potwierdzony |
+| R-06 | Uszkodzone archiwum w `staging` jest używane ponownie przy każdej próbie (pozycje bez przypiętej sumy); odpowiedź 416 uznaje dowolny plik `.part` za kompletny | `app-models/src/jobs.rs`, `install.rs`, `fetch.rs` | potwierdzone odczytem |
+| R-07 | Interfejs może pokazać „Zainstalowano”, gdy dostawca lokalny uzna model za niezainstalowany (brak rekordu `.sha256`) | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
+| R-08 | Limit startu modelu 60 s może nie wystarczyć dla Bielika 4.5B z zimnego dysku | `providers-local-impl/src/config.rs` | podejrzenie |
+| R-09 | Panika w zadaniu generacji zostawia turę „w toku”; nieudany zapis tury jest tylko logowany | `app-chat/src/generate.rs`, `finish.rs` | podejrzenie |
+
+Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet zielony poza testem palety. Test „paleta: otwarcie ≤ 50 ms” ma
 medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy.
 Pomiar rozdzielony: samo otwarcie zawsze trwa ok. 7 ms; opóźnia się pojedyncza klatka obrazu (ok. 250–450 ms)
 mniej więcej 2 s po starcie, bez długiego zadania JavaScript i niezależnie od rozmycia tła palety — wygląda na

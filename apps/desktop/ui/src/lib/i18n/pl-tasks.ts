@@ -97,6 +97,7 @@ export const plTasks = {
   'marshal.noTranslator': 'Model Marszałka jest niedostępny — użyj edytora reguł (JSON).',
   'marshal.editor': 'Edytor reguł (JSON: tablica szkiców)',
   'marshal.editorInvalid': 'To nie jest tablica JSON.',
+  'marshal.advanced': 'Zaawansowane: edytor reguł (JSON)',
   'marshal.proposal': 'Propozycja: „{text}"',
   'marshal.narrowing': 'Podgląd zawężenia',
   'marshal.when': 'Kiedy',

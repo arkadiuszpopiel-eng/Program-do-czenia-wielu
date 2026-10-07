@@ -34,7 +34,7 @@ export class ConversationState {
   loaded = $state(false);
   loadError = $state<string | null>(null);
   readonly path: Turn[] = $derived(projectPath(this.tree));
-  readonly streaming: Turn | undefined = $derived(streamingTurn(this.path));
+  readonly streaming: Turn | undefined = $derived(streamingTurn(this.path, this.tree));
 
   constructor(
     private readonly client: AlfaClient,

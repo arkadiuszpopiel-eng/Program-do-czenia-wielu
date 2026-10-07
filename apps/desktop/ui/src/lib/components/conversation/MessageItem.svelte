@@ -23,6 +23,7 @@
   import CodeBlock from './CodeBlock.svelte';
   import MessageApproval from './MessageApproval.svelte';
   import MessageError from './MessageError.svelte';
+  import { isContinued } from '../../logic/turn-tree';
   import MessageActions from './MessageActions.svelte';
   import MessageAttachments from './MessageAttachments.svelte';
   import AgentCards from './AgentCards.svelte';
@@ -249,7 +250,7 @@
       </p>
     {/if}
 
-    {#if turn.truncated && turn.status === 'complete'}
+    {#if turn.truncated && turn.status === 'complete' && !isContinued(conv.tree, turn)}
       <div class="continue">
         <span>{t('conv.truncated')}</span>
         <Button size="sm" variant="secondary" onclick={() => act(() => conv.continueTurn(turn))}

@@ -199,10 +199,11 @@ impl ModelProvider for LocalProvider {
         )
     }
 
-    /// `Unconfigured` bez pobranego modelu (Router go pomija); inaczej zdrowy — awarie sidecara
-    /// obsługuje restart, a trwałe problemy Router widzi jako błędy wywołań.
+    /// `Unconfigured` bez pobranego modelu albo bez silnika `llama-server` (Router go pomija);
+    /// inaczej zdrowy — awarie sidecara obsługuje restart, a trwałe problemy Router widzi jako
+    /// błędy wywołań.
     fn health(&self) -> ProviderHealth {
-        if self.installed().is_empty() {
+        if self.installed().is_empty() || !self.sidecar.config().engine_present() {
             return ProviderHealth {
                 state: HealthState::Unconfigured,
                 ..ProviderHealth::healthy()

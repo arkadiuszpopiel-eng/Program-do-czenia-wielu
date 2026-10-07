@@ -99,6 +99,7 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'marshal.noTranslator': 'The Marshal model is unavailable — use the rule editor (JSON).',
   'marshal.editor': 'Rule editor (JSON: array of drafts)',
   'marshal.editorInvalid': 'This is not a JSON array.',
+  'marshal.advanced': 'Advanced: rule editor (JSON)',
   'marshal.proposal': 'Proposal: “{text}”',
   'marshal.narrowing': 'Narrowing preview',
   'marshal.when': 'When',

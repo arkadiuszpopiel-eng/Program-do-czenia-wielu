@@ -162,6 +162,9 @@ async fn missing_engine_gives_actionable_error_and_no_fallback() {
         path.clone_from(&missing);
     }
     let p = env.provider_with(config, env.launcher("ok", None), Some(device), None);
+    // Model bez silnika nie jest „zdrowy": Router i zadania w tle mają pomijać trasę lokalną
+    // (w logu z laptopa próba wracała co 15 minut).
+    assert_eq!(p.health().state, HealthState::Unconfigured);
     let events = run(&p, req("jest model, nie ma silnika")).await;
     let error = events
         .iter()

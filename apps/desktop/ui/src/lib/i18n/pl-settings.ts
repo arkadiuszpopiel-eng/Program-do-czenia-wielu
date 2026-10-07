@@ -333,6 +333,22 @@ export const plSettings = {
   'ob.local.done': 'Model lokalny jest gotowy.',
   'ob.local.failed': 'Pobieranie nie powiodło się: {error}',
   'ob.local.cancelled': 'Pobieranie anulowane — możesz wznowić później.',
+  'ob.bundle.title': 'Model lokalny i silnik',
+  'ob.bundle.desc':
+    'Działa bez kluczy i bez internetu. Pakiet dobrany do tego komputera zawiera model rozmowy razem z silnikiem, który go uruchamia — sam model nie wystarczy.',
+  'ob.bundle.name': 'Pakiet {rating}/6 — {name}',
+  'ob.bundle.contents': {
+    one: '{n} element · {size}',
+    few: '{n} elementy · {size}',
+    many: '{n} elementów · {size}',
+    other: '{n} elementu · {size}',
+  },
+  'ob.bundle.download': 'Pobierz pakiet ({size})',
+  'ob.bundle.progress': 'Pobieranie pakietu modeli i silników',
+  'ob.bundle.installed': 'Zainstalowano {done} z {total}',
+  'ob.bundle.trust': 'Pobrane pliki czekają na Twoją zgodę — porównaj sumy poniżej.',
+  'ob.bundle.done': 'Pakiet jest gotowy — rozmowa lokalna działa.',
+  'ob.bundle.later': 'Inny pakiet wybierzesz później w Ustawieniach → Modele i silniki.',
   'ob.autonomy.title': 'Jak bardzo agentki działają same?',
   'ob.autonomy.desc':
     'Zaczynamy od L3. Zmienisz to jednym przełącznikiem w Ustawieniach, a każdą zmianę potwierdzisz w oknie Brokera.',

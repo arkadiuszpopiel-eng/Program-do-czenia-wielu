@@ -146,6 +146,17 @@ impl LocalConfig {
     /// Plik serwera dla backendu w chwili startu: pierwszy istniejący kandydat
     /// (`server_candidates`), inaczej `server_bin`. Kandydat inny niż pierwszy (kompilacja
     /// zastępcza) — ostrzeżenie w dzienniku.
+    /// Czy na dysku jest jakikolwiek `llama-server` (dowolny backend). Bez silnika pobrany model
+    /// jest bezużyteczny — dostawca zgłasza wtedy `Unconfigured`, żeby Router i zadania w tle
+    /// nie próbowały trasy lokalnej w kółko.
+    pub fn engine_present(&self) -> bool {
+        self.server_candidates
+            .values()
+            .flatten()
+            .chain(self.server_bin.values())
+            .any(|p| p.is_file())
+    }
+
     pub fn server(&self, backend: BackendKey) -> Option<PathBuf> {
         let candidates = self.server_candidates.get(&backend);
         let found = candidates.and_then(|c| c.iter().position(|p| p.is_file()));
