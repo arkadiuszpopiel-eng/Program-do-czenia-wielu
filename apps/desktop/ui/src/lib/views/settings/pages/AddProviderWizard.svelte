@@ -2,6 +2,8 @@
   Kreator „Dodaj dostawcę" (PLAN §5.6, makieta 12): dostawca → klucz → test → modele → przypisanie → limit.
   Klucz trafia jednorazowo do rdzenia (Credential Manager); pole jest czyszczone po zapisaniu konta.
   Gdy rdzeń odmówi (np. brak adresu endpointu), komunikat jest widoczny, a klucz zostaje w polu.
+  Po zapisaniu konta nie wracamy do kroku klucza (drugie „Dalej" utworzyłoby drugie konto) —
+  „Popraw klucz" usuwa świeżo dodane konto i dopiero wtedy wraca do pola klucza.
 -->
 <script lang="ts">
   import {
@@ -16,8 +18,9 @@
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { Account, ProviderInfo, TestReport } from '../../../api/types-hub';
-  import { fuzzyRank } from '../../../logic/fuzzy';
+  import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import ProviderPicker from './ProviderPicker.svelte';
 
   interface Props {
     onfinish: (account: Account | null) => void;
@@ -27,11 +30,11 @@
   const app = useApp();
   const { t } = app.i18n;
   const STEPS = ['provider', 'key', 'test', 'models', 'assign', 'limit'] as const;
-  const TASKS = ['chat', 'code', 'background'] as const;
+  // Klasy zadań znane rdzeniowi (crates/app-core/src/commands/accounts.rs, TASKS) — nieznaną
+  // rdzeń po cichu pomija, więc oferujemy tylko te.
+  const TASKS = ['chat', 'code', 'planning', 'summarize'] as const;
 
   let step = $state(0);
-  let catalog = $state<readonly ProviderInfo[]>([]);
-  let filter = $state('');
   let provider = $state<ProviderInfo | null>(null);
   let label = $state('');
   let secret = $state('');
@@ -40,6 +43,7 @@
   let report = $state<TestReport | null>(null);
   let testing = $state(false);
   let saving = $state(false);
+  let finishing = $state(false);
   let keyError = $state('');
   let tasks = $state<string[]>(['chat']);
   let assigned = $state<AgentId[]>([...agentIds]);
@@ -47,18 +51,6 @@
   let tts = $state(false);
   let limitOn = $state(true);
   let limitZl = $state(100);
-
-  $effect(() => {
-    void app.client.accounts.catalog().then((c) => (catalog = c));
-  });
-
-  const shown = $derived(
-    filter.trim()
-      ? fuzzyRank(catalog, filter, (p) => ({ label: p.display_name, keywords: [p.id] })).map(
-          (r) => r.item,
-        )
-      : catalog,
-  );
 
   function choose(p: ProviderInfo) {
     provider = p;
@@ -101,25 +93,47 @@
     }
   }
 
+  /** „Popraw klucz" po nieudanym teście: konto z błędnym kluczem usuwamy, zanim wrócimy do pola. */
+  async function editKey() {
+    const created = account;
+    if (!created || saving) return;
+    saving = true;
+    const removed = await attempt(app.toasts, () => app.client.accounts.remove(created.id));
+    saving = false;
+    if (!removed) return;
+    account = null;
+    report = null;
+    step = 1;
+  }
+
+  /** Stepper: przed zapisem konta tylko kroki 1–2, po zapisie tylko kroki od testu wzwyż. */
+  function select(index: number) {
+    if (account ? index >= 2 : index < 2) step = index;
+  }
+
   async function finish() {
-    if (!account) return;
+    const created = account;
+    if (!created || finishing) return;
+    finishing = true;
     try {
-      await app.client.accounts.assign(account.id, {
+      await app.client.accounts.assign(created.id, {
         task_classes: tasks,
         agents: assigned,
         voice_stt: stt,
         voice_tts: tts,
       });
-      await app.client.accounts.setLimit(account.id, limitOn, {
+      await app.client.accounts.setLimit(created.id, limitOn, {
         minor: Math.round(limitZl * 100),
         currency: 'PLN',
       });
     } catch (error) {
-      app.toasts.show({ kind: 'error', message: errorText(error) });
+      showError(app.toasts, error);
       return;
+    } finally {
+      finishing = false;
     }
-    app.toasts.show({ kind: 'success', message: t('wiz.added', { label: account.label }) });
-    onfinish(account);
+    app.toasts.show({ kind: 'success', message: t('wiz.added', { label: created.label }) });
+    onfinish(created);
   }
 
   function toggleIn<T>(list: T[], item: T, on: boolean): T[] {
@@ -137,25 +151,11 @@
       total: STEPS.length,
       name: t(`wiz.step.${STEPS[step] ?? 'provider'}`),
     })}
-    onselect={(i) => (step = i < 2 ? i : step)}
+    onselect={select}
   />
   <div class="body" aria-live="polite">
     {#if step === 0}
-      <TextField label={t('wiz.filter')} type="search" bind:value={filter} />
-      <ul class="providers">
-        {#each shown as p (p.id)}
-          <li>
-            <button type="button" class="provider" onclick={() => choose(p)}>
-              <span class="p-name">{p.display_name}</span>
-              <span class="p-meta"
-                >{t('hub.privacy', { tag: p.privacy_tag, jurisdiction: p.jurisdiction })} · {t(
-                  `hub.compliance.${p.compliance_status}`,
-                )}</span
-              >
-            </button>
-          </li>
-        {/each}
-      </ul>
+      <ProviderPicker onchoose={choose} />
     {:else if step === 1 && provider}
       <TextField label={t('wiz.label')} bind:value={label} autocomplete="off" />
       <TextField
@@ -199,7 +199,9 @@
       {:else if report}
         <p class="fail" role="alert">{t('wiz.testFail', { error: report.error ?? '' })}</p>
         <div class="actions">
-          <Button variant="secondary" onclick={() => (step = 1)}>{t('common.back')}</Button>
+          <Button variant="secondary" disabled={saving} loading={saving} onclick={editKey}
+            >{t('wiz.fixKey')}</Button
+          >
           <Button variant="primary" onclick={runTest}>{t('common.retry')}</Button>
         </div>
       {/if}
@@ -260,12 +262,15 @@
           bind:value={limitZl}
         />{/if}
       <div class="actions">
-        <Button variant="primary" onclick={finish}>{t('wiz.finish')}</Button>
+        <Button variant="primary" disabled={finishing} loading={finishing} onclick={finish}
+          >{t('wiz.finish')}</Button
+        >
       </div>
     {/if}
   </div>
   <div class="foot">
-    <Button variant="ghost" onclick={() => onfinish(null)}>{t('wiz.skip')}</Button>
+    <!-- Konto zapisane w kroku 2 istnieje — „Pomiń" przekazuje je dalej, a nie `null`. -->
+    <Button variant="ghost" onclick={() => onfinish(account)}>{t('wiz.skip')}</Button>
   </div>
 </section>
 
@@ -286,36 +291,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-3);
-  }
-  .providers {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--alfa-space-2);
-    max-height: 320px;
-    margin: 0;
-    padding: 0;
-    overflow: auto;
-    list-style: none;
-  }
-  .provider {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    width: 100%;
-    padding: var(--alfa-space-2) var(--alfa-space-3);
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-control);
-    background: var(--alfa-color-bg);
-    color: var(--alfa-color-text);
-    text-align: left;
-  }
-  .provider:hover {
-    border-color: var(--alfa-color-border-strong);
-  }
-  .p-name {
-    font-weight: var(--alfa-weight-semibold);
-    font-size: var(--alfa-font-size-sm);
   }
   .p-meta {
     color: var(--alfa-color-text-muted);

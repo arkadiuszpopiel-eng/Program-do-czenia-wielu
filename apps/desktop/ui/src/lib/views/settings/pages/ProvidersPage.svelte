@@ -4,6 +4,8 @@
   import KeyRound from '@lucide/svelte/icons/key-round';
   import Plus from '@lucide/svelte/icons/plus';
   import type { Account, ProviderInfo } from '../../../api/types-hub';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import AddProviderWizard from './AddProviderWizard.svelte';
   import BridgesSection from './BridgesSection.svelte';
@@ -12,6 +14,8 @@
   const { t } = app.i18n;
   let accounts = $state<Account[]>([]);
   let catalog = $state<readonly ProviderInfo[]>([]);
+  let loaded = $state(false);
+  let loadError = $state<string | null>(null);
   let wizard = $state(false);
   let removing = $state<Account | null>(null);
   let confirmOpen = $state(false);
@@ -20,17 +24,31 @@
     if (app.hubWizard) wizard = true;
   });
 
-  async function load() {
-    const [list, cat] = await Promise.all([
-      app.client.accounts.list(),
-      app.client.accounts.catalog(),
-    ]);
+  /** Lista kont i katalog; błąd → „Nie udało się wczytać" z „Ponów" (nie mylący pusty stan). */
+  async function reload(): Promise<boolean> {
+    const result = await load(() =>
+      Promise.all([app.client.accounts.list(), app.client.accounts.catalog()]),
+    );
+    loaded = true;
+    if (result.status !== 'ready') {
+      loadError = result.status === 'failed' ? result.error : null;
+      return false;
+    }
+    const [list, cat] = result.value;
     accounts = [...list];
     catalog = cat;
+    loadError = null;
+    return true;
+  }
+
+  async function refreshSystem() {
+    await attempt(app.toasts, async () => {
+      app.system = await app.client.system.status();
+    });
   }
 
   $effect(() => {
-    void load();
+    void reload();
     return app.on((event) => {
       if (event.type !== 'AccountChanged') return;
       accounts = accounts.map((a) => (a.id === event.account.id ? event.account : a));
@@ -41,16 +59,21 @@
 
   async function test(account: Account) {
     accounts = accounts.map((a) => (a.id === account.id ? { ...a, state: 'testing' } : a));
-    await app.client.accounts.test(account.id);
-    await load();
+    await attempt(app.toasts, () => app.client.accounts.test(account.id));
+    // Bez świeżej listy cofamy „testowanie" ręcznie — inaczej spinner zostałby na zawsze.
+    if (!(await reload())) accounts = accounts.map((a) => (a.id === account.id ? account : a));
   }
 
   async function remove() {
-    if (!removing) return;
-    await app.client.accounts.remove(removing.id);
+    // AlertDialog.Action (bits-ui) nie zamyka okna sam — zamykamy je przed wywołaniem rdzenia.
+    confirmOpen = false;
+    const target = removing;
+    if (!target) return;
+    const ok = await attempt(app.toasts, () => app.client.accounts.remove(target.id));
     removing = null;
-    await load();
-    app.system = await app.client.system.status();
+    if (!ok) return;
+    await reload();
+    await refreshSystem();
   }
 </script>
 
@@ -72,12 +95,15 @@
       onfinish={async () => {
         wizard = false;
         app.hubWizard = false;
-        await load();
-        app.system = await app.client.system.status();
+        await reload();
+        await refreshSystem();
       }}
     />
   {/if}
-  {#if accounts.length === 0 && !wizard}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void reload()} />
+  {/if}
+  {#if loaded && !loadError && accounts.length === 0 && !wizard}
     <EmptyState title={t('hub.accounts')} description={t('hub.empty')}>
       {#snippet icon()}<KeyRound size={20} strokeWidth={1.5} />{/snippet}
     </EmptyState>

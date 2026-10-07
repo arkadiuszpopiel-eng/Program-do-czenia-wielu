@@ -5,7 +5,10 @@
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
+  import { errorText } from '../../../api/command-error';
   import type { SkillInfo, SkillReview } from '../../../api/types-work';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   interface Props {
@@ -20,13 +23,17 @@
   let error = $state<string | null>(null);
   const quarantined = $derived(skill.state === 'quarantined');
 
-  $effect(() => {
+  function fetchReview() {
     review = null;
     error = null;
     app.client.skills.review(skill.id, skill.version).then(
       (r) => (review = r),
-      (e: unknown) => (error = e instanceof Error ? e.message : String(e)),
+      (e: unknown) => (error = errorText(e)),
     );
+  }
+
+  $effect(() => {
+    fetchReview();
   });
 
   async function decide(kind: 'install' | 'reject') {
@@ -45,14 +52,19 @@
       }
       ondone();
     } catch (e) {
-      app.toasts.show({ kind: 'error', message: e instanceof Error ? e.message : String(e) });
+      showError(app.toasts, e);
     }
   }
 </script>
 
 <section class="wk-card wk-accent" aria-labelledby="sk-review">
   <h3 id="sk-review">{t('skills.reviewTitle', { name: skill.name, version: skill.version })}</h3>
-  {#if error}<p class="wk-error" role="alert">{error}</p>{/if}
+  {#if error}
+    <LoadFailed {error} onretry={fetchReview} />
+    <div class="wk-actions">
+      <Button size="sm" variant="ghost" onclick={ondone}>{t('common.cancel')}</Button>
+    </div>
+  {/if}
   {#if review}
     {@const s = review.skill}
     <p>{s.description}</p>

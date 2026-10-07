@@ -79,6 +79,7 @@ export const plSettings = {
   'wiz.testing': 'Testuję połączenie…',
   'wiz.testOk': 'Połączono · {latency}',
   'wiz.testFail': 'Nie udało się: {error}',
+  'wiz.fixKey': 'Popraw klucz',
   'wiz.modelsFound': {
     one: 'Wykryto {n} model',
     few: 'Wykryto {n} modele',
@@ -88,7 +89,8 @@ export const plSettings = {
   'wiz.tasks': 'Klasy zadań',
   'wiz.task.chat': 'Rozmowa',
   'wiz.task.code': 'Kod',
-  'wiz.task.background': 'Zadania w tle',
+  'wiz.task.planning': 'Planowanie',
+  'wiz.task.summarize': 'Streszczanie',
   'wiz.agents': 'Agentki',
   'wiz.voice': 'Głos',
   'wiz.stt': 'Rozpoznawanie mowy (STT)',

@@ -13,7 +13,10 @@
     BuilderPolicyView,
     BuilderPreview as Preview,
   } from '../../../api/types-work';
+  import { errorText } from '../../../api/command-error';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { emptyDraft } from '../../../logic/work';
+  import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BuilderForm from './BuilderForm.svelte';
   import BuilderPreview from './BuilderPreview.svelte';
@@ -32,15 +35,25 @@
   let dry = $state<BuilderDryRun | null>(null);
   let error = $state<string | null>(null);
   let busy = $state(false);
+  let loaded = $state(false);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    const [p, l] = await Promise.all([app.client.builder.policy(), app.client.builder.library()]);
-    policy = p;
-    library = [...l];
+  /** Polityka (bez niej nie ma formularza) i biblioteka; błąd → komunikat z „Ponów". */
+  async function reload() {
+    const result = await load(() =>
+      Promise.all([app.client.builder.policy(), app.client.builder.library()]),
+    );
+    if (result.status === 'ready') {
+      const [p, l] = result.value;
+      policy = p;
+      library = [...l];
+      loaded = true;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
   });
 
   async function step<T>(action: () => Promise<T>): Promise<T | null> {
@@ -49,7 +62,7 @@
     try {
       return await action();
     } catch (e) {
-      error = e instanceof Error ? e.message : String(e);
+      error = errorText(e);
       return null;
     } finally {
       busy = false;
@@ -90,7 +103,7 @@
     dry = null;
     description = '';
     questions = [];
-    await load();
+    await reload();
   }
 
   async function voice() {
@@ -115,7 +128,13 @@
       {#each questions as q (q)}<li>{q}</li>{/each}
     </ul>
   {/if}
+  <!-- Bez polityki nie ma formularza niżej — błąd „Zaproponuj" musi być widoczny tutaj. -->
+  {#if error && !policy}<p class="wk-error" role="alert">{error}</p>{/if}
 </section>
+
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void reload()} />
+{/if}
 
 {#if policy}
   <section class="wk-card" aria-labelledby="bd-form">
@@ -145,9 +164,9 @@
 
 <section class="wk-card" aria-labelledby="bd-library">
   <h3 id="bd-library">{t('builder.library')}</h3>
-  {#if library.length === 0}
+  {#if loaded && library.length === 0}
     <p class="wk-meta">{t('builder.libraryEmpty')}</p>
-  {:else}
+  {:else if library.length}
     <ul class="wk-list">
       {#each library as a (a.persona)}
         <li>

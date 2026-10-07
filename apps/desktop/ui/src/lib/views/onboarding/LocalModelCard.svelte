@@ -6,8 +6,11 @@
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
+  import { errorText } from '../../api/command-error';
   import type { ModelItem } from '../../api/types-models';
+  import LoadFailed from '../../components/shell/LoadFailed.svelte';
   import { groupedHash, progressPercent, trustHashes } from '../../logic/models';
+  import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
 
   const app = useApp();
@@ -15,12 +18,18 @@
   let model = $state<ModelItem | null>(null);
   let failure = $state<string | null>(null);
   let cancelled = $state(false);
+  let loadError = $state<string | null>(null);
+
+  async function reload() {
+    const result = await load(() => app.client.engines.list());
+    if (result.status === 'ready') {
+      model = result.value.items.find((i) => i.kind === 'llm') ?? null;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
+  }
 
   $effect(() => {
-    void app.client.engines.list().then(
-      (view) => (model = view.items.find((i) => i.kind === 'llm') ?? null),
-      () => undefined,
-    );
+    void reload();
     return app.on((event) => {
       if (!model) return;
       if (event.type === 'ModelChanged' && event.item.id === model.id) model = event.item;
@@ -40,12 +49,17 @@
     try {
       model = await action(model.id);
     } catch (error) {
-      failure = error instanceof Error ? error.message : String(error);
+      failure = errorText(error);
     }
   }
 </script>
 
-{#if model}
+{#if loadError && !model}
+  <section class="local" aria-labelledby="ob-local-title">
+    <h3 id="ob-local-title">{t('ob.local.title')}</h3>
+    <LoadFailed error={loadError} onretry={() => void reload()} />
+  </section>
+{:else if model}
   <section class="local" aria-labelledby="ob-local-title">
     <h3 id="ob-local-title">{t('ob.local.title')}</h3>
     <p class="muted">{t('ob.local.desc')}</p>
@@ -85,10 +99,8 @@
         >
       </div>
     {:else}
-      {#if model.error || failure}
-        <p class="warn" role="alert">
-          {t('ob.local.failed', { error: model.error ?? failure ?? '' })}
-        </p>
+      {#if model.error}
+        <p class="warn" role="alert">{t('ob.local.failed', { error: model.error })}</p>
       {:else if cancelled || model.state === 'paused'}
         <p class="muted" role="status">{t('ob.local.cancelled')}</p>
       {/if}
@@ -98,6 +110,10 @@
           size: app.i18n.bytes(model.size_bytes),
         })}</Button
       >
+    {/if}
+    <!-- Błąd zaufania / anulowania / pobrania — widoczny w każdym stanie modelu, nie tylko w ostatnim. -->
+    {#if failure}
+      <p class="warn" role="alert">{t('ob.local.failed', { error: failure })}</p>
     {/if}
   </section>
 {/if}

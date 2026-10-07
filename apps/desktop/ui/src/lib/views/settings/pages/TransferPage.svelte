@@ -6,7 +6,10 @@
 -->
 <script lang="ts">
   import { Button, Checkbox, Switch, TextField } from '@alfa/ui-kit';
+  import type { ExportResult } from '../../../api/types-hub';
   import type { MemoryScopeInfo } from '../../../api/types-memory';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { load, showError, type Loadable } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BackupSection from './BackupSection.svelte';
   import TransferImport from './TransferImport.svelte';
@@ -24,37 +27,55 @@
     config_machine: false,
   });
   let chosen = $state<string[]>(app.activeId ? [app.activeId] : []);
-  let memoryScopes = $state<readonly MemoryScopeInfo[]>([]);
+  let scopes = $state<Loadable<readonly MemoryScopeInfo[]>>({ status: 'loading' });
+  const memoryScopes = $derived(
+    scopes.status === 'ready' ? scopes.value.filter((s) => s.document !== null) : [],
+  );
   let memory = $state<string[]>([]);
   let importer = $state<ReturnType<typeof TransferImport> | null>(null);
 
+  async function loadScopes() {
+    scopes = { status: 'loading' };
+    scopes = await load(() => app.client.memory.scopes());
+  }
+
   $effect(() => {
-    void app.client.memory.scopes().then((list) => {
-      memoryScopes = list.filter((s) => s.document !== null);
-    });
+    void loadScopes();
   });
   let encrypt = $state(false);
   let password = $state('');
   let repeat = $state('');
   let exported = $state<string | null>(null);
+  let exporting = $state(false);
 
   const mismatch = $derived(encrypt && repeat.length > 0 && password !== repeat);
   const canExport = $derived(!encrypt || (password.length >= 8 && password === repeat));
 
   async function doExport() {
-    const res = await app.client.transfer.exportPackage({
-      scope: {
-        config_common: common,
-        personas,
-        casts,
-        sessions: chosen,
-        artifacts: extra.artifacts,
-        logs: extra.logs,
-        config_machine: extra.config_machine,
-        memory,
-      },
-      password: encrypt ? password : null,
-    });
+    if (exporting) return;
+    exporting = true;
+    let res: ExportResult;
+    try {
+      res = await app.client.transfer.exportPackage({
+        scope: {
+          config_common: common,
+          personas,
+          casts,
+          sessions: chosen,
+          artifacts: extra.artifacts,
+          logs: extra.logs,
+          config_machine: extra.config_machine,
+          memory,
+        },
+        password: encrypt ? password : null,
+      });
+    } catch (error) {
+      // Hasła zostają w polach — użytkownik ponawia bez przepisywania.
+      showError(app.toasts, error);
+      return;
+    } finally {
+      exporting = false;
+    }
     password = '';
     repeat = '';
     if (res.status === 'saved') {
@@ -86,15 +107,19 @@
   <fieldset>
     <legend>{t('tr.scope.memory')}</legend>
     <p class="note">{t('tr.memoryHint')}</p>
-    {#each memoryScopes as s (s.key)}
-      <Checkbox
-        label={`${app.i18n.tk(`memory.scopeKind.${s.scope.kind}`)}: ${s.label}`}
-        checked={memory.includes(s.key)}
-        onchange={(on) => (memory = on ? [...memory, s.key] : memory.filter((x) => x !== s.key))}
-      />
-    {:else}
-      <p class="note">{t('tr.memoryEmpty')}</p>
-    {/each}
+    {#if scopes.status === 'failed'}
+      <LoadFailed error={scopes.error} onretry={() => void loadScopes()} />
+    {:else if scopes.status === 'ready'}
+      {#each memoryScopes as s (s.key)}
+        <Checkbox
+          label={`${app.i18n.tk(`memory.scopeKind.${s.scope.kind}`)}: ${s.label}`}
+          checked={memory.includes(s.key)}
+          onchange={(on) => (memory = on ? [...memory, s.key] : memory.filter((x) => x !== s.key))}
+        />
+      {:else}
+        <p class="note">{t('tr.memoryEmpty')}</p>
+      {/each}
+    {/if}
   </fieldset>
   <fieldset>
     <legend>{t('tr.scope.sessions')}</legend>
@@ -131,8 +156,11 @@
     </div>
   {/if}
   <div class="actions">
-    <Button variant="primary" disabled={!canExport} onclick={doExport}
-      >{t('tr.exportButton')}</Button
+    <Button
+      variant="primary"
+      disabled={!canExport || exporting}
+      loading={exporting}
+      onclick={doExport}>{t('tr.exportButton')}</Button
     >
   </div>
   {#if exported}<p class="ok" role="status">{exported}</p>{/if}

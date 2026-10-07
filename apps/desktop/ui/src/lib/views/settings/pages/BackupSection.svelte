@@ -8,6 +8,8 @@
 <script lang="ts">
   import { Button, Checkbox, Select, Switch, TextField } from '@alfa/ui-kit';
   import type { BackupCheck, BackupConfig, BackupView } from '../../../api/types-files';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import './work.css';
 
@@ -27,26 +29,30 @@
   let password = $state('');
   let busy = $state(false);
   let check = $state<BackupCheck | null>(null);
+  let loadError = $state<string | null>(null);
 
   function show(next: BackupView) {
     view = next;
     config = { ...next.config };
   }
 
-  async function act(action: () => Promise<BackupView>, done?: string) {
-    try {
-      show(await action());
-      if (done) app.toasts.show({ kind: 'success', message: done });
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+  /** Akcja na kopiach; `true` po sukcesie (pola czyści się tylko wtedy), błąd → toast. */
+  async function act(action: () => Promise<BackupView>, done?: string): Promise<boolean> {
+    const ok = await attempt(app.toasts, async () => show(await action()));
+    if (ok && done) app.toasts.show({ kind: 'success', message: done });
+    return ok;
+  }
+
+  async function loadStatus() {
+    const result = await load(() => app.client.backups.status());
+    if (result.status === 'ready') {
+      show(result.value);
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void act(() => app.client.backups.status());
+    void loadStatus();
   });
 
   function options(values: readonly number[], current: number, label: (n: number) => string) {
@@ -70,18 +76,15 @@
   }
 
   async function setPassword(next: string | null) {
-    await act(() => app.client.backups.setPassword(next));
-    password = '';
+    // Po błędzie hasło zostaje w polu — użytkownik ponawia bez przepisywania.
+    if (await act(() => app.client.backups.setPassword(next))) password = '';
   }
 
   async function verify(file: string) {
     try {
       check = await app.client.backups.verify(file);
     } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(app.toasts, error);
     }
   }
 </script>
@@ -89,7 +92,9 @@
 <section class="wk-card" aria-labelledby="bk-title">
   <h3 id="bk-title">{t('bk.title')}</h3>
   <p class="wk-meta">{t('bk.intro')}</p>
-  {#if view && config}
+  {#if loadError && !view}
+    <LoadFailed error={loadError} onretry={() => void loadStatus()} />
+  {:else if view && config}
     <div class="wk-actions">
       <span>{t('bk.dir')}:</span>
       <span class="wk-code">{view.config.dir ?? t('bk.noDir')}</span>

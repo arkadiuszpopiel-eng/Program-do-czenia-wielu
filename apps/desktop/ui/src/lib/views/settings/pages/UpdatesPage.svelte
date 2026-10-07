@@ -7,7 +7,9 @@
 <script lang="ts">
   import { Button, ConfirmDialog } from '@alfa/ui-kit';
   import type { UpdatesView } from '../../../api/types-updates';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { phaseMessage, progressPercent, updateActions, isRollback } from '../../../logic/updates';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import './work.css';
 
@@ -16,16 +18,22 @@
   let confirmRollback = $state(false);
   let rollbackTarget = $state<string | null>(null);
   let working = $state(false);
+  let loadError = $state<string | null>(null);
 
   const view = $derived(app.updates.view);
   const actions = $derived(view ? updateActions(view) : null);
   const percent = $derived(view ? progressPercent(view) : null);
 
+  async function reload() {
+    const result = await load(() => app.client.updates.status());
+    if (result.status === 'ready') {
+      app.updates.apply(result.value);
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
+  }
+
   $effect(() => {
-    void app.client.updates.status().then(
-      (v) => app.updates.apply(v),
-      () => undefined,
-    );
+    void reload();
   });
 
   async function run(action: () => Promise<UpdatesView | void>, message?: string) {
@@ -47,7 +55,7 @@
   async function restart() {
     await run(() => app.client.updates.restart());
     // Atrapa „uruchamia ponownie" bez zamykania okna — „Co nowego" pokaże się od razu.
-    await app.updates.load(app.client.updates);
+    await attempt(app.toasts, () => app.updates.load(app.client.updates));
   }
 
   function progressLabel(v: UpdatesView): string {
@@ -63,6 +71,7 @@
 
 <section class="wk-card" aria-labelledby="up-title">
   <h3 id="up-title">{t('updates.title')}</h3>
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
   {#if view && actions}
     {@const message = phaseMessage(view)}
     <p>

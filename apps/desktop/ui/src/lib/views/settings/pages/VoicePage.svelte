@@ -7,12 +7,17 @@
 <script lang="ts">
   import { Avatar, Button, Select, agentIds, agents } from '@alfa/ui-kit';
   import type { AudioDevice } from '../../../api/types-hub';
+  import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Lazy from '../../../components/shell/Lazy.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
   let devices = $state<AudioDevice[]>([]);
+  let devicesLoaded = $state(false);
+  let devicesError = $state<string | null>(null);
+  let statusError = $state<string | null>(null);
   let device = $state('');
   let testing = $state(false);
 
@@ -21,14 +26,30 @@
   const active = $derived(status?.state === 'active');
   const level = $derived(Math.round(app.micLevel * 100));
 
+  async function loadStatus() {
+    const result = await load(() => app.client.voice.status());
+    if (result.status === 'ready') {
+      app.voice.applyStatus(result.value);
+      statusError = null;
+    } else if (result.status === 'failed') statusError = result.error;
+  }
+
+  // Błąd IPC to nie „brak mikrofonu" — pokazujemy go z „Ponów".
+  async function loadDevices() {
+    const result = await load(() => app.client.voice.devices());
+    if (result.status === 'ready') {
+      devices = [...result.value];
+      device = result.value.find((d) => d.default)?.id ?? result.value[0]?.id ?? '';
+      devicesLoaded = true;
+      devicesError = null;
+    } else if (result.status === 'failed') devicesError = result.error;
+  }
+
   $effect(() => {
-    void app.client.voice.status().then((s) => app.voice.applyStatus(s));
-    void app.client.voice.devices().then((list) => {
-      devices = [...list];
-      device = list.find((d) => d.default)?.id ?? list[0]?.id ?? '';
-    });
+    void loadStatus();
+    void loadDevices();
     return () => {
-      if (testing) void app.client.voice.stopMicTest();
+      if (testing) void app.client.voice.stopMicTest().catch(() => undefined);
     };
   });
 
@@ -38,10 +59,7 @@
       else await app.client.voice.startMicTest(device || null);
       testing = !testing;
     } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(app.toasts, error);
     }
   }
 
@@ -70,6 +88,7 @@
 
 <section class="card" aria-labelledby="voice-state">
   <h3 id="voice-state">{t('voice.state')}</h3>
+  {#if statusError}<LoadFailed error={statusError} onretry={() => void loadStatus()} />{/if}
   {#if unavailable}
     <p class="warn" role="status">
       {status?.reason ? app.i18n.text(status.reason) : t('voice.unavailable')}
@@ -81,7 +100,7 @@
       </ul>
       <p class="muted">{t('voice.modelsHint')}</p>
     {/if}
-  {:else}
+  {:else if status}
     <p role="status">{t(active ? 'voice.active' : 'voice.off')}</p>
     <div class="row">
       <Button size="sm" variant={active ? 'secondary' : 'primary'} onclick={toggleConversation}
@@ -93,7 +112,11 @@
 
 <section class="card" aria-labelledby="voice-mic">
   <h3 id="voice-mic">{t('voice.mic')}</h3>
-  {#if devices.length === 0}
+  {#if devicesError}
+    <LoadFailed error={devicesError} onretry={() => void loadDevices()} />
+  {:else if !devicesLoaded}
+    <p class="muted" role="status">{t('common.loading')}</p>
+  {:else if devices.length === 0}
     <p class="muted">{t('voice.noDevices')}</p>
   {:else}
     <label class="field">

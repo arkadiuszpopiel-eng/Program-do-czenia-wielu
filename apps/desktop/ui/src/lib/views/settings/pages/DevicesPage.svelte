@@ -2,23 +2,43 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { DeviceProfile } from '../../../api/types-hub';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
   const { t } = app.i18n;
   let profile = $state<DeviceProfile | null>(null);
+  let loadError = $state<string | null>(null);
   let measuring = $state(false);
 
+  async function reload() {
+    const result = await load(() => app.client.device.profile());
+    if (result.status === 'ready') {
+      profile = result.value;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
+  }
+
   $effect(() => {
-    void app.client.device.profile().then((p) => (profile = p));
+    void reload();
   });
 
   async function measure() {
     measuring = true;
-    profile = await app.client.device.measure();
-    measuring = false;
+    try {
+      profile = await app.client.device.measure();
+    } catch (error) {
+      showError(app.toasts, error);
+    } finally {
+      measuring = false;
+    }
   }
 </script>
+
+{#if loadError && !profile}
+  <LoadFailed error={loadError} onretry={() => void reload()} />
+{/if}
 
 {#if profile}
   {@const m = profile.machine}

@@ -6,6 +6,8 @@
   import { Button, EmptyState, Switch } from '@alfa/ui-kit';
   import Timer from '@lucide/svelte/icons/timer';
   import type { TriggerInfo, TriggerKindView, TriggerRunInfo } from '../../../api/types-tasks';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import TriggerForm from './TriggerForm.svelte';
 
@@ -14,19 +16,24 @@
   let triggers = $state<readonly TriggerInfo[]>([]);
   let log = $state<readonly TriggerRunInfo[]>([]);
   let loaded = $state(false);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    [triggers, log] = await Promise.all([
-      app.client.triggers.list(),
-      app.client.triggers.log(null),
-    ]);
-    loaded = true;
+  /** Lista i dziennik; błąd → komunikat z „Ponów" zamiast pustej listy. */
+  async function reload() {
+    const result = await load(() =>
+      Promise.all([app.client.triggers.list(), app.client.triggers.log(null)]),
+    );
+    if (result.status === 'ready') {
+      [triggers, log] = result.value;
+      loaded = true;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
     return app.on((event) => {
-      if (event.type === 'TriggerFired') void load();
+      if (event.type === 'TriggerFired') void reload();
     });
   });
 
@@ -44,16 +51,13 @@
   }
 
   async function run(action: () => Promise<unknown>, message?: string) {
-    try {
-      await action();
-      if (message) app.toasts.show({ kind: 'success', message });
-      await load();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+    if (!(await attempt(app.toasts, action))) {
+      // Przełącznik sam zmienia swoje `checked`; nowe obiekty przywracają w nim stan rdzenia.
+      triggers = triggers.map((x) => ({ ...x }));
+      return;
     }
+    if (message) app.toasts.show({ kind: 'success', message });
+    await reload();
   }
 
   const nameOf = (id: string): string => triggers.find((x) => x.id === id)?.name ?? id;
@@ -62,6 +66,9 @@
 <section class="card" aria-labelledby="trg-title">
   <h3 id="trg-title">{t('triggers.title')}</h3>
   <p class="desc">{t('triggers.intro')}</p>
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void reload()} />
+  {/if}
   {#if loaded && triggers.length === 0}
     <EmptyState title={t('triggers.title')} description={t('triggers.empty')}>
       {#snippet icon()}<Timer size={20} strokeWidth={1.5} />{/snippet}
@@ -114,14 +121,14 @@
 </section>
 
 <section class="card">
-  <TriggerForm oncreated={load} />
+  <TriggerForm oncreated={reload} />
 </section>
 
 <section class="card" aria-labelledby="trg-log">
   <h3 id="trg-log">{t('triggers.log')}</h3>
-  {#if log.length === 0}
+  {#if loaded && log.length === 0}
     <p class="meta">{t('triggers.logEmpty')}</p>
-  {:else}
+  {:else if log.length}
     <ul class="log">
       {#each [...log].reverse().slice(0, 30) as r, i (`${r.at}-${r.trigger_id}-${i}`)}
         <li>

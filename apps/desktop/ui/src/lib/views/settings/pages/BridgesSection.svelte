@@ -9,21 +9,27 @@
   import { Button, Checkbox, Switch, TextField } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { BridgeCard, BridgeLogin } from '../../../api/types-tasks';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { loginProfile } from '../../../logic/work';
+  import { showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
   const { t, tk } = app.i18n;
   let cards = $state<readonly BridgeCard[]>([]);
   let refreshing = $state(false);
+  let loaded = $state(false);
+  let loadError = $state<string | null>(null);
   let logins = $state<Record<string, BridgeLogin>>({});
 
   async function load(refresh = false) {
     refreshing = refresh;
     try {
       cards = await app.client.bridges.list(refresh);
+      loaded = true;
+      loadError = null;
     } catch (error) {
-      showError(error);
+      loadError = errorText(error);
     } finally {
       refreshing = false;
     }
@@ -37,15 +43,13 @@
     cards = cards.map((c) => (c.route_id === card.route_id ? card : c));
   }
 
-  function showError(error: unknown) {
-    app.toasts.show({ kind: 'error', message: errorText(error) });
-  }
-
   async function run(action: () => Promise<BridgeCard>) {
     try {
       replace(await action());
     } catch (error) {
-      showError(error);
+      showError(app.toasts, error);
+      // Przełącznik / pole wyboru same zmieniają swój stan; nowe obiekty przywracają stan rdzenia.
+      cards = cards.map((c) => ({ ...c }));
     }
   }
 
@@ -54,13 +58,17 @@
       const result = await app.client.bridges.openLogin(bridge);
       logins = { ...logins, [bridge]: result };
     } catch (error) {
-      showError(error);
+      showError(app.toasts, error);
     }
   }
 
   async function copy(text: string) {
-    await navigator.clipboard.writeText(text);
-    app.toasts.show({ kind: 'success', message: t('bridges.copied') });
+    try {
+      await navigator.clipboard.writeText(text);
+      app.toasts.show({ kind: 'success', message: t('bridges.copied') });
+    } catch (error) {
+      showError(app.toasts, error);
+    }
   }
 </script>
 
@@ -74,7 +82,9 @@
       >{t('bridges.refresh')}</Button
     >
   </div>
-  {#if cards.length === 0}
+  {#if loadError}
+    <LoadFailed error={loadError} onretry={() => void load()} />
+  {:else if loaded && cards.length === 0}
     <p class="meta">{t('bridges.empty')}</p>
   {/if}
   <ul class="cards" aria-label={t('bridges.list')}>

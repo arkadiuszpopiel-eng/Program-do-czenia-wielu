@@ -5,6 +5,8 @@
 <script lang="ts">
   import type { AboutInfo } from '../../../api/types-updates';
   import { filterLicenses } from '../../../logic/updates';
+  import { errorText } from '../../../api/command-error';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { useApp } from '../../../state/context';
   import './work.css';
 
@@ -14,11 +16,16 @@
   let error = $state<string | null>(null);
   let query = $state('');
 
-  $effect(() => {
-    void app.client.updates.about().then(
+  function fetchAbout() {
+    error = null;
+    app.client.updates.about().then(
       (a) => (about = a),
-      (e: unknown) => (error = e instanceof Error ? e.message : String(e)),
+      (e: unknown) => (error = errorText(e)),
     );
+  }
+
+  $effect(() => {
+    fetchAbout();
   });
 
   const shown = $derived(about ? filterLicenses(about.licenses, query) : []);
@@ -26,7 +33,7 @@
 
 <section class="wk-card" aria-labelledby="ab-title">
   <h3 id="ab-title">{t('about.title')}</h3>
-  {#if error}<p class="wk-error" role="alert">{error}</p>{/if}
+  {#if error}<LoadFailed {error} onretry={fetchAbout} />{/if}
   {#if about}
     <dl class="facts">
       <dt>{t('about.version')}</dt>

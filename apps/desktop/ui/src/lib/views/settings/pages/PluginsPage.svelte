@@ -7,7 +7,9 @@
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
+  import { errorText } from '../../../api/command-error';
   import type { PluginInfo, PluginInspection, PluginsView } from '../../../api/types-plugins';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { useApp } from '../../../state/context';
   import PluginReview from './PluginReview.svelte';
   import './work.css';
@@ -15,6 +17,7 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   let view = $state<PluginsView | null>(null);
+  let loadError = $state<string | null>(null);
   let reviewing = $state<{ plugin: PluginInfo; mode: 'install' | 'enable' } | null>(null);
   let manifest = $state('');
   let manifestError = $state<string | null>(null);
@@ -25,11 +28,13 @@
   const active = $derived(plugins.filter((p) => p.state === 'installed' || p.state === 'disabled'));
   const other = $derived(plugins.filter((p) => !pending.includes(p) && !active.includes(p)));
 
+  /** Lista wtyczek; błąd → „Nie udało się wczytać" z „Ponów" (nie mylące „brak wtyczek"). */
   async function load() {
     try {
       view = await app.client.plugins.list();
+      loadError = null;
     } catch (e) {
-      app.toasts.show({ kind: 'error', message: e instanceof Error ? e.message : String(e) });
+      loadError = errorText(e);
     }
   }
 
@@ -106,6 +111,7 @@
       {t('plugins.unavailable', { reason: view.unavailable_reason ?? '' })}
     </p>
   {/if}
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void load()} />{/if}
 </section>
 
 {#if reviewing}
@@ -121,9 +127,9 @@
 
 <section class="wk-card" aria-labelledby="pl-pending">
   <h3 id="pl-pending">{t('plugins.pending')}</h3>
-  {#if pending.length === 0}
+  {#if view && pending.length === 0}
     <p class="wk-meta">{t('plugins.pendingEmpty')}</p>
-  {:else}
+  {:else if pending.length}
     <ul class="wk-list">
       {#each pending as p (`${p.id}@${p.version}`)}
         <li>
@@ -150,9 +156,9 @@
 
 <section class="wk-card" aria-labelledby="pl-active">
   <h3 id="pl-active">{t('plugins.installed')}</h3>
-  {#if active.length === 0}
+  {#if view && active.length === 0}
     <p class="wk-meta">{t('plugins.installedEmpty')}</p>
-  {:else}
+  {:else if active.length}
     <ul class="wk-list">
       {#each active as p (`${p.id}@${p.version}`)}
         <li>

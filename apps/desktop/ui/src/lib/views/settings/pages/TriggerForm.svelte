@@ -12,6 +12,7 @@
     TextField,
     agents as AGENTS,
   } from '@alfa/ui-kit';
+  import { errorText } from '../../../api/command-error';
   import type { CronPreview, TriggerKindView } from '../../../api/types-tasks';
   import { useApp } from '../../../state/context';
 
@@ -36,9 +37,15 @@
   $effect(() => {
     if (kind !== 'cron') return;
     const current = expr;
-    void app.client.triggers.previewCron(current).then((p) => {
-      if (current === expr) preview = p;
-    });
+    // Błąd komendy (nie samego wyrażenia) też trafia pod pole — nie jako nieobsłużone odrzucenie.
+    void app.client.triggers.previewCron(current).then(
+      (p) => {
+        if (current === expr) preview = p;
+      },
+      (error: unknown) => {
+        if (current === expr) preview = { valid: false, error: errorText(error), next: [] };
+      },
+    );
   });
 
   function view(): TriggerKindView {

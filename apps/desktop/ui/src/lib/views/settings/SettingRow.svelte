@@ -3,6 +3,7 @@
   import { Chip, IconButton, Select, Switch } from '@alfa/ui-kit';
   import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
   import type { SettingDef, SettingValue } from '../../api/types-system';
+  import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
 
   interface Props {
@@ -30,12 +31,24 @@
     return String(v);
   }
 
+  /**
+   * Zapis z cofnięciem: `setSetting` ustawia wartość optymistycznie, więc po odmowie rdzenia
+   * przywracamy poprzednią (kontrolka pokazuje prawdziwy stan) i pokazujemy toast.
+   */
+  async function save(next: SettingValue) {
+    const key = def.key;
+    const previous = app.settings[key];
+    if (await attempt(app.toasts, () => app.setSetting(key, next))) return;
+    if (previous === undefined) delete app.settings[key];
+    else app.settings[key] = previous;
+  }
+
   function setNumber(raw: string) {
     if (def.control.kind !== 'number') return;
     const n = Number(raw);
     if (!Number.isFinite(n)) return;
     const { min, max } = def.control;
-    void app.setSetting(def.key, Math.min(max, Math.max(min, n)));
+    void save(Math.min(max, Math.max(min, n)));
   }
 </script>
 
@@ -61,7 +74,7 @@
         checked={value === true}
         labelledby="{uid}-label"
         describedby="{uid}-desc"
-        onchange={(on) => void app.setSetting(def.key, on)}
+        onchange={(on) => void save(on)}
       />
     {:else if def.control.kind === 'select'}
       <Select
@@ -72,7 +85,7 @@
           value: o.value,
           label: app.i18n.text(o.label),
         }))}
-        onchange={(v) => void app.setSetting(def.key, v)}
+        onchange={(v) => void save(v)}
       />
     {:else if def.control.kind === 'number'}
       <span class="number">
@@ -95,14 +108,14 @@
         value={String(value)}
         aria-labelledby="{uid}-label"
         aria-describedby="{uid}-desc"
-        onchange={(e) => void app.setSetting(def.key, e.currentTarget.value)}
+        onchange={(e) => void save(e.currentTarget.value)}
       />
     {/if}
     <IconButton
       label={t('settings.resetLabel', { label })}
       size="sm"
       disabled={isDefault}
-      onclick={() => void app.resetSetting(def.key)}
+      onclick={() => void attempt(app.toasts, () => app.resetSetting(def.key))}
     >
       <RotateCcw size={14} strokeWidth={1.5} />
     </IconButton>

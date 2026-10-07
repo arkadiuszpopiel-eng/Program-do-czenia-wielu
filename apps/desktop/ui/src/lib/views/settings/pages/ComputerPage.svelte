@@ -7,27 +7,31 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import DesktopGrant from '../../../components/panels/DesktopGrant.svelte';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { agentName } from '../../../logic/work';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import './work.css';
 
   const app = useApp();
   const { t } = app.i18n;
   const gui = $derived(app.work.gui);
+  let loadError = $state<string | null>(null);
+
+  async function reload() {
+    const result = await load(() => app.client.gui.status());
+    if (result.status === 'ready') {
+      app.work.applyGui(result.value);
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
+  }
 
   $effect(() => {
-    void app.client.gui.status().then((s) => app.work.applyGui(s));
+    void reload();
   });
 
   async function act(action: () => Promise<unknown>) {
-    try {
-      await action();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    await attempt(app.toasts, action);
   }
 
   function openScreen() {
@@ -39,6 +43,7 @@
 <section class="wk-card" aria-labelledby="pc-title">
   <h3 id="pc-title">{t('pc.title')}</h3>
   <p>{t('pc.intro')}</p>
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
   {#if gui && !gui.available}
     <p class="wk-note" role="status">
       {gui.reason ? app.i18n.text(gui.reason) : t('gui.unavailable')}

@@ -7,6 +7,8 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { SkillInfo } from '../../../api/types-work';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import SkillReview from './SkillReview.svelte';
   import SkillRun from './SkillRun.svelte';
@@ -19,37 +21,37 @@
   let running = $state<SkillInfo | null>(null);
   let manifest = $state('');
   let manifestError = $state<string | null>(null);
+  let loaded = $state(false);
+  let loadError = $state<string | null>(null);
   const pending = $derived(
     skills.filter((s) => s.state === 'proposed' || s.state === 'quarantined'),
   );
   const installed = $derived(skills.filter((s) => s.state === 'installed'));
   const other = $derived(skills.filter((s) => !pending.includes(s) && !installed.includes(s)));
 
-  async function load() {
-    skills = [...(await app.client.skills.list())];
+  async function reload() {
+    const result = await load(() => app.client.skills.list());
+    if (result.status === 'ready') {
+      skills = [...result.value];
+      loaded = true;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
   });
 
   $effect(() =>
     app.on((event) => {
-      if (event.type === 'SkillsChanged') void load();
+      if (event.type === 'SkillsChanged') void reload();
     }),
   );
 
   async function run(action: () => Promise<unknown>, message?: string) {
-    try {
-      await action();
-      if (message) app.toasts.show({ kind: 'success', message });
-      await load();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    if (!(await attempt(app.toasts, action))) return;
+    if (message) app.toasts.show({ kind: 'success', message });
+    await reload();
   }
 
   async function exportBundle() {
@@ -101,6 +103,7 @@
     <Button size="sm" variant="secondary" onclick={exportBundle}>{t('skills.export')}</Button>
     <Button size="sm" variant="secondary" onclick={importBundle}>{t('skills.import')}</Button>
   </div>
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
 </section>
 
 {#if reviewing}
@@ -108,7 +111,7 @@
     skill={reviewing}
     ondone={() => {
       reviewing = null;
-      void load();
+      void reload();
     }}
   />
 {/if}
@@ -119,9 +122,9 @@
 
 <section class="wk-card" aria-labelledby="sk-pending">
   <h3 id="sk-pending">{t('skills.pending')}</h3>
-  {#if pending.length === 0}
+  {#if loaded && pending.length === 0}
     <p class="wk-meta">{t('skills.pendingEmpty')}</p>
-  {:else}
+  {:else if pending.length}
     <ul class="wk-list">
       {#each pending as s (`${s.id}@${s.version}`)}
         <li>
@@ -149,9 +152,9 @@
 
 <section class="wk-card" aria-labelledby="sk-installed">
   <h3 id="sk-installed">{t('skills.installed')}</h3>
-  {#if installed.length === 0}
+  {#if loaded && installed.length === 0}
     <p class="wk-meta">{t('skills.installedEmpty')}</p>
-  {:else}
+  {:else if installed.length}
     <ul class="wk-list">
       {#each installed as s (`${s.id}@${s.version}`)}
         <li>

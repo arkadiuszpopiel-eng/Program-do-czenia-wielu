@@ -7,6 +7,8 @@
 <script lang="ts">
   import { Button, TextField } from '@alfa/ui-kit';
   import type { MarshalProposalInfo, MarshalState } from '../../../api/types-tasks';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -17,26 +19,33 @@
   let editorError = $state<string | undefined>(undefined);
   let current = $state<MarshalProposalInfo | null>(null);
   let report = $state<string | null>(null);
+  let reporting = $state(false);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    info = await app.client.marshal.state();
+  async function reload() {
+    const result = await load(() => app.client.marshal.state());
+    if (result.status === 'ready') {
+      info = result.value;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
   });
 
   async function run(action: () => Promise<unknown>, message?: string) {
-    try {
-      await action();
-      if (message) app.toasts.show({ kind: 'success', message });
-      await load();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    if (!(await attempt(app.toasts, action))) return;
+    if (message) app.toasts.show({ kind: 'success', message });
+    await reload();
+  }
+
+  async function showReport() {
+    reporting = true;
+    await attempt(app.toasts, async () => {
+      report = (await app.client.marshal.report()).text;
+    });
+    reporting = false;
   }
 
   async function propose() {
@@ -132,6 +141,9 @@
   </section>
 {/if}
 
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void reload()} />
+{/if}
 {#if info}
   <section class="card" aria-labelledby="ms-rules">
     <h3 id="ms-rules">{t('marshal.rules')}</h3>
@@ -172,8 +184,9 @@
       <Button
         size="sm"
         variant="secondary"
-        onclick={async () => (report = (await app.client.marshal.report()).text)}
-        >{t('marshal.report')}</Button
+        loading={reporting}
+        disabled={reporting}
+        onclick={showReport}>{t('marshal.report')}</Button
       >
     </div>
     {#if report}<p class="report" role="status">{report}</p>{/if}

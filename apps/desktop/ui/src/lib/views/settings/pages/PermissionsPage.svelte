@@ -7,6 +7,8 @@
   import ShieldCheck from '@lucide/svelte/icons/shield-check';
   import type { AutonomyLevel } from '../../../api/types';
   import type { PermissionsState } from '../../../api/types-hub';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BrokerStatusCard from './BrokerStatusCard.svelte';
 
@@ -16,16 +18,24 @@
   let perms = $state<PermissionsState | null>(null);
   let wanted = $state<string>('L3');
   let scope = $state<string>('global');
+  let loadError = $state<string | null>(null);
+
+  async function reload(sessionId: string | null) {
+    const result = await load(() => app.client.permissions.get(sessionId));
+    if (result.status === 'ready') {
+      perms = result.value;
+      wanted = result.value.session ?? result.value.global;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
+  }
 
   $effect(() => {
-    void app.client.permissions.get(app.activeId).then((s) => {
-      perms = s;
-      wanted = s.session ?? s.global;
-    });
+    void reload(app.activeId);
   });
 
+  // Bez stanu z rdzenia nie udajemy żadnego poziomu (wcześniej: „L3" na ślepo).
   const current = $derived(
-    perms ? (scope === 'session' && perms.session ? perms.session : perms.global) : 'L3',
+    perms ? (scope === 'session' && perms.session ? perms.session : perms.global) : null,
   );
 
   async function request() {
@@ -42,15 +52,15 @@
         app.toasts.show({ kind: 'info', message: t('perm.requested', { level }) });
       }
     } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(app.toasts, error);
     }
   }
 </script>
 
 <BrokerStatusCard />
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void reload(app.activeId)} />
+{/if}
 {#if perms}
   <section class="card" aria-labelledby="perm-title">
     <h3 id="perm-title">{t('perm.title')}</h3>

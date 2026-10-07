@@ -6,6 +6,7 @@
   import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
   import { SHORTCUTS, SHORTCUT_GROUPS } from '../../../logic/shortcut-registry';
   import { chordFromEvent, findConflicts, type ShortcutConflict } from '../../../logic/shortcuts';
+  import { attempt } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -38,6 +39,14 @@
     return t(c.reason === 'altgr' ? 'sc.conflict.altgr' : 'sc.conflict.reserved');
   }
 
+  /** `setShortcut` zmienia mapę optymistycznie — po odmowie rdzenia przywracamy poprzedni skrót. */
+  async function save(id: string, chord: string | null) {
+    const previous = app.shortcutOverrides[id];
+    if (await attempt(app.toasts, () => app.setShortcut(id, chord))) return;
+    if (previous === undefined) delete app.shortcutOverrides[id];
+    else app.shortcutOverrides[id] = previous;
+  }
+
   function record(event: KeyboardEvent, id: string) {
     event.preventDefault();
     event.stopPropagation();
@@ -48,7 +57,7 @@
     const chord = chordFromEvent(event);
     if (!chord) return;
     recording = null;
-    void app.setShortcut(id, chord);
+    void save(id, chord);
   }
 </script>
 
@@ -101,18 +110,14 @@
               >
                 {t('sc.recordShort')}
               </Button>
-              <IconButton
-                label={t('sc.disable')}
-                size="sm"
-                onclick={() => void app.setShortcut(def.id, '')}
-              >
+              <IconButton label={t('sc.disable')} size="sm" onclick={() => void save(def.id, '')}>
                 <Ban size={14} strokeWidth={1.5} />
               </IconButton>
               <IconButton
                 label={t('sc.reset')}
                 size="sm"
                 disabled={app.shortcutOverrides[def.id] === undefined}
-                onclick={() => void app.setShortcut(def.id, null)}
+                onclick={() => void save(def.id, null)}
               >
                 <RotateCcw size={14} strokeWidth={1.5} />
               </IconButton>

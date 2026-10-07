@@ -6,7 +6,9 @@
 -->
 <script lang="ts">
   import { Button, ConfirmDialog, Select } from '@alfa/ui-kit';
+  import { errorText } from '../../../api/command-error';
   import type { ModelItem, ModelsView } from '../../../api/types-models';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import {
     KIND_FILTERS,
     LEXICAL,
@@ -27,6 +29,7 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   let view = $state<ModelsView | null>(null);
+  let loadError = $state<string | null>(null);
   let kind = $state<string>('all');
   let stateFilter = $state<string>('all');
   let choice = $state('');
@@ -46,12 +49,14 @@
     return view?.items.find((i) => i.id === id)?.name ?? id;
   }
 
+  /** Katalog modeli; błąd → „Nie udało się wczytać" z „Ponów" (nie pusta strona). */
   async function load() {
     try {
       view = await app.client.engines.list();
       choice = view.embedder.active;
+      loadError = null;
     } catch (e) {
-      app.toasts.show({ kind: 'error', message: e instanceof Error ? e.message : String(e) });
+      loadError = errorText(e);
     }
   }
 
@@ -117,6 +122,7 @@
 </script>
 
 <p class="intro">{t('engines.intro')}</p>
+{#if loadError}<LoadFailed error={loadError} onretry={() => void load()} />{/if}
 
 <section class="wk-card" aria-labelledby="mm-search">
   <h3 id="mm-search">{t('engines.search.title')}</h3>

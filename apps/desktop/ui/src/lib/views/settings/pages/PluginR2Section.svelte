@@ -6,6 +6,8 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { PluginsView } from '../../../api/types-plugins';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import './work.css';
 
@@ -16,13 +18,25 @@
     (view?.plugins ?? []).filter((p) => p.state === 'proposed' && p.r2 !== null),
   );
 
+  let loadError = $state<string | null>(null);
+
+  async function reload() {
+    const result = await load(() => app.client.plugins.list());
+    view = result.status === 'ready' ? result.value : null;
+    loadError = result.status === 'failed' ? result.error : null;
+  }
+
   $effect(() => {
-    app.client.plugins.list().then(
-      (v) => (view = v),
-      () => (view = null),
-    );
+    void reload();
   });
 </script>
+
+{#if loadError}
+  <section class="wk-card" aria-labelledby="hl-plugins-failed">
+    <h3 id="hl-plugins-failed">{t('plugins.healthTitle')}</h3>
+    <LoadFailed error={loadError} onretry={() => void reload()} />
+  </section>
+{/if}
 
 {#if proposals.length || view?.problems.length}
   <section class="wk-card" aria-labelledby="hl-plugins">

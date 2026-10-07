@@ -7,28 +7,37 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { BridgeCard } from '../../api/types-tasks';
+  import LoadFailed from '../../components/shell/LoadFailed.svelte';
   import { loginProfile } from '../../logic/work';
+  import { load, type Loadable } from '../../state/attempt';
   import { useApp } from '../../state/context';
 
   const app = useApp();
   const { t } = app.i18n;
-  let cards = $state<readonly BridgeCard[] | null>(null);
+  let cards = $state<Loadable<readonly BridgeCard[]>>({ status: 'loading' });
   const bridges = $derived(
-    (cards ?? []).filter((c) => c.bridge && c.login_command && loginProfile(c.bridge)),
+    (cards.status === 'ready' ? cards.value : []).filter(
+      (c) => c.bridge && c.login_command && loginProfile(c.bridge),
+    ),
   );
 
+  // Błąd rdzenia to nie „nie wykryto narzędzi" — pokazujemy go z „Ponów".
+  async function loadCards() {
+    cards = { status: 'loading' };
+    cards = await load(() => app.client.bridges.list(false));
+  }
+
   $effect(() => {
-    app.client.bridges.list(false).then(
-      (list) => (cards = list),
-      () => (cards = []),
-    );
+    void loadCards();
   });
 </script>
 
 <h2>{t('ob.bridges.title')}</h2>
 <p class="muted">{t('ob.bridges.desc')}</p>
-{#if cards === null}
+{#if cards.status === 'loading'}
   <p role="status">{t('common.loading')}</p>
+{:else if cards.status === 'failed'}
+  <LoadFailed error={cards.error} onretry={() => void loadCards()} />
 {:else if bridges.length === 0}
   <p class="muted">{t('ob.bridges.none')}</p>
 {:else}

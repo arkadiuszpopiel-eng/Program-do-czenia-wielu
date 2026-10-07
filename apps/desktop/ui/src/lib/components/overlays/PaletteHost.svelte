@@ -3,6 +3,7 @@
   polecenia (ze skrótami), sesje i ustawienia; dopasowanie rozmyte bez polskich znaków.
 -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { CommandPalette, type CommandItem } from '@alfa/ui-kit';
   import type { SettingsPageDef } from '../../api/types-system';
   import { bestScore } from '../../logic/fuzzy';
@@ -13,11 +14,27 @@
   const app = useApp();
   const { t } = app.i18n;
   let schema = $state<readonly SettingsPageDef[]>([]);
+  let fetching = false;
 
   // Schemat ustawień pobierany od razu (moduł palety ładuje się w bezczynności), żeby lista
   // pozycji była gotowa przed pierwszym otwarciem — otwarcie to wtedy tylko `show()`.
+  // Błąd nie wycieka jako nieobsłużone odrzucenie: paleta działa bez pozycji ustawień (błąd
+  // z „Ponów" pokazuje widok Ustawień), a przy kolejnym otwarciu próbujemy ponownie.
+  async function fetchSchema() {
+    if (fetching) return;
+    fetching = true;
+    try {
+      schema = await app.client.settings.schema();
+    } catch {
+      // Paleta zostaje bez pozycji ustawień — patrz komentarz wyżej.
+    } finally {
+      fetching = false;
+    }
+  }
+
   $effect(() => {
-    void app.client.settings.schema().then((s) => (schema = s));
+    void app.palette.open;
+    if (untrack(() => schema.length === 0)) void fetchSchema();
   });
 
   function label(id: string): string {

@@ -10,6 +10,8 @@
     MemoryScopeInfo,
     MemoryStatus,
   } from '../../../api/types-memory';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -18,15 +20,25 @@
   let scopes = $state<readonly MemoryScopeInfo[]>([]);
   let running = $state(false);
   let preview = $state<MemoryForgetPreview | null>(null);
+  let forgetting = $state(false);
+  let loaded = $state(false);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    [status, scopes] = await Promise.all([app.client.memory.status(), app.client.memory.scopes()]);
+  async function reload() {
+    const result = await load(() =>
+      Promise.all([app.client.memory.status(), app.client.memory.scopes()]),
+    );
+    if (result.status === 'ready') {
+      [status, scopes] = result.value;
+      loaded = true;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
     return app.on((event) => {
-      if (event.type === 'MemoryChanged') void load();
+      if (event.type === 'MemoryChanged') void reload();
     });
   });
 
@@ -35,25 +47,44 @@
     try {
       await app.client.memory.consolidateNow();
       app.toasts.show({ kind: 'success', message: t('memory.consolidated') });
-      await load();
+    } catch (error) {
+      showError(app.toasts, error);
+      return;
     } finally {
       running = false;
     }
+    await reload();
+  }
+
+  async function showForgetPreview(scope: string) {
+    await attempt(app.toasts, async () => {
+      preview = await app.client.memory.forgetPreview({ target: 'scope', scope });
+    });
   }
 
   async function forgetScope() {
-    if (!preview || preview.target.target !== 'scope') return;
-    const report = await app.client.memory.forget(preview.target);
-    preview = null;
-    app.toasts.show({
-      kind: 'success',
-      message: t('memory.forgotten', {
-        removed: report.removed,
-        versions: report.versions,
-        derived: report.derived,
-      }),
-    });
-    await load();
+    const target = preview?.target;
+    if (!target || target.target !== 'scope' || forgetting) return;
+    forgetting = true;
+    try {
+      const report = await app.client.memory.forget(target);
+      preview = null;
+      app.toasts.show({
+        kind: 'success',
+        message: t('memory.forgotten', {
+          removed: report.removed,
+          versions: report.versions,
+          derived: report.derived,
+        }),
+      });
+    } catch (error) {
+      // Podgląd zostaje otwarty — użytkownik może ponowić albo anulować.
+      showError(app.toasts, error);
+      return;
+    } finally {
+      forgetting = false;
+    }
+    await reload();
   }
 
   function openInspector() {
@@ -62,6 +93,9 @@
   }
 </script>
 
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void reload()} />
+{/if}
 {#if status}
   {@const last = status.last}
   <section class="card" aria-labelledby="mem-status">
@@ -98,9 +132,9 @@
 
 <section class="card" aria-labelledby="mem-scopes">
   <h3 id="mem-scopes">{t('memory.scopes')}</h3>
-  {#if scopes.length === 0}
+  {#if loaded && scopes.length === 0}
     <p class="muted">{t('memory.scopesEmpty')}</p>
-  {:else}
+  {:else if scopes.length}
     <ul class="scopes">
       {#each scopes as s (s.key)}
         <li>
@@ -112,11 +146,7 @@
             })}{#if !s.document}
               · {t('memory.privateScope')}{/if}</span
           >
-          <Button
-            size="sm"
-            variant="danger"
-            onclick={async () =>
-              (preview = await app.client.memory.forgetPreview({ target: 'scope', scope: s.key }))}
+          <Button size="sm" variant="danger" onclick={() => showForgetPreview(s.key)}
             >{t('memory.forgetScope')}</Button
           >
         </li>
@@ -128,7 +158,12 @@
       <p>{t('memory.forgetCount', { n: preview.remove.length })}</p>
       {#if preview.shred}<p class="note">{t('memory.shred')}</p>{/if}
       <div class="row">
-        <Button size="sm" variant="danger" onclick={forgetScope}>{t('memory.forgetConfirm')}</Button
+        <Button
+          size="sm"
+          variant="danger"
+          loading={forgetting}
+          disabled={forgetting}
+          onclick={forgetScope}>{t('memory.forgetConfirm')}</Button
         >
         <Button size="sm" variant="ghost" onclick={() => (preview = null)}
           >{t('memory.cancel')}</Button

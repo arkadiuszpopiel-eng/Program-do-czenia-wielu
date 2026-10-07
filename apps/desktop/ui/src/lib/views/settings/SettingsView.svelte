@@ -8,7 +8,9 @@
   import Search from '@lucide/svelte/icons/search';
   import Hourglass from '@lucide/svelte/icons/hourglass';
   import type { SettingsPageDef } from '../../api/types-system';
+  import LoadFailed from '../../components/shell/LoadFailed.svelte';
   import { bestScore } from '../../logic/fuzzy';
+  import { load, type Loadable } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import SettingRow from './SettingRow.svelte';
   import BuilderPage from './pages/BuilderPage.svelte';
@@ -32,11 +34,18 @@
 
   const app = useApp();
   const { t } = app.i18n;
-  let schema = $state<readonly SettingsPageDef[]>([]);
+  let loaded = $state<Loadable<readonly SettingsPageDef[]>>({ status: 'loading' });
+  const schema = $derived(loaded.status === 'ready' ? loaded.value : []);
   let query = $state('');
 
+  // Bez schematu nie ma żadnej sekcji — błąd rdzenia pokazujemy z „Ponów" zamiast pustego widoku.
+  async function loadSchema() {
+    loaded = { status: 'loading' };
+    loaded = await load(() => app.client.settings.schema());
+  }
+
   $effect(() => {
-    void app.client.settings.schema().then((s) => (schema = s));
+    void loadSchema();
   });
 
   const page = $derived(schema.find((p) => p.id === app.settingsPage) ?? schema[0]);
@@ -106,7 +115,10 @@
     </nav>
   </aside>
   <section class="content" aria-labelledby="settings-page-title">
-    {#if query.trim()}
+    {#if loaded.status === 'failed'}
+      <h2 class="h2" id="settings-page-title" tabindex="-1">{t('settings.title')}</h2>
+      <LoadFailed error={loaded.error} onretry={() => void loadSchema()} />
+    {:else if query.trim()}
       <h2 class="h2" id="settings-page-title" tabindex="-1" aria-live="polite">
         {results.length
           ? t('settings.results', { n: results.length })

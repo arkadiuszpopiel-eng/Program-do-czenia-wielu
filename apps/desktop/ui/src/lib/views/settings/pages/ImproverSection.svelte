@@ -7,40 +7,40 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { EvalsView, ImproverView } from '../../../api/types-work';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
   const { t, tk } = app.i18n;
   let improver = $state<ImproverView | null>(null);
   let evals = $state<EvalsView | null>(null);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    const [i, e] = await Promise.all([app.client.health.improver(), app.client.health.evals()]);
-    improver = i;
-    evals = e;
+  async function reload() {
+    const result = await load(() =>
+      Promise.all([app.client.health.improver(), app.client.health.evals()]),
+    );
+    if (result.status === 'ready') {
+      [improver, evals] = result.value;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
   });
 
   $effect(() =>
     app.on((event) => {
-      if (event.type === 'HealthChanged') void load();
+      if (event.type === 'HealthChanged') void reload();
     }),
   );
 
   async function run(action: () => Promise<unknown>, message?: string) {
-    try {
-      await action();
-      if (message) app.toasts.show({ kind: 'success', message });
-      await load();
-    } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+    if (!(await attempt(app.toasts, action))) return;
+    if (message) app.toasts.show({ kind: 'success', message });
+    await reload();
   }
 
   const show = (v: unknown) => JSON.stringify(v);
@@ -49,6 +49,7 @@
 <section class="wk-card" aria-labelledby="im-title">
   <h3 id="im-title">{t('improver.title')}</h3>
   <p>{t('improver.intro')}</p>
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
   {#if improver}
     <p class="wk-meta">
       {improver.idle_cycle ? t('improver.idle') : t('improver.manual')}

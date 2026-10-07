@@ -6,6 +6,8 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { HealthView } from '../../../api/types-work';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import ImproverSection from './ImproverSection.svelte';
   import PluginR2Section from './PluginR2Section.svelte';
@@ -14,30 +16,33 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   let view = $state<HealthView | null>(null);
+  let loadError = $state<string | null>(null);
 
-  async function load() {
-    view = await app.client.health.report();
+  async function reload() {
+    const result = await load(() => app.client.health.report());
+    if (result.status === 'ready') {
+      view = result.value;
+      loadError = null;
+    } else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void load();
+    void reload();
   });
 
   $effect(() =>
     app.on((event) => {
-      if (event.type === 'HealthChanged') void load();
+      if (event.type === 'HealthChanged') void reload();
     }),
   );
 
   async function run(action: () => Promise<HealthView>, message?: string) {
     try {
       view = await action();
+      loadError = null;
       if (message) app.toasts.show({ kind: 'success', message });
     } catch (error) {
-      app.toasts.show({
-        kind: 'error',
-        message: error instanceof Error ? error.message : String(error),
-      });
+      showError(app.toasts, error);
     }
   }
 </script>
@@ -45,6 +50,7 @@
 <section class="wk-card" aria-labelledby="hl-title">
   <h3 id="hl-title">{t('health.title')}</h3>
   <p>{t('health.intro')}</p>
+  {#if loadError}<LoadFailed error={loadError} onretry={() => void reload()} />{/if}
   {#if view}
     <p role="status" class:wk-ok={view.overall === 'ok'} class:wk-warn={view.overall !== 'ok'}>
       {tk(`health.overall.${view.overall}`)} · {t('health.generated', {

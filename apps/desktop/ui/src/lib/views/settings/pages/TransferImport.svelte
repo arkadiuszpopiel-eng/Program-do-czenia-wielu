@@ -11,6 +11,7 @@
     ImportResult,
     InspectResult,
   } from '../../../api/types-hub';
+  import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -23,14 +24,10 @@
   let resolutions = $state<Record<string, CollisionResolution>>({});
   let result = $state<ImportResult | null>(null);
   let confirmOpen = $state(false);
+  let rollingBack = $state(false);
   let section = $state<HTMLElement | null>(null);
 
-  function fail(error: unknown) {
-    app.toasts.show({
-      kind: 'error',
-      message: error instanceof Error ? error.message : String(error),
-    });
-  }
+  const fail = (error: unknown) => showError(app.toasts, error);
 
   /** Podgląd paczki (`handle: null` — natywny dialog; inaczej jednorazowy uchwyt z rdzenia). */
   async function inspect(handle: string | null = null) {
@@ -75,6 +72,8 @@
   }
 
   async function doImport() {
+    // AlertDialog.Action (bits-ui) nie zamyka okna sam — zamykamy je przed wywołaniem rdzenia.
+    confirmOpen = false;
     if (!inspected) return;
     const handle = inspected.handle;
     // Uchwyt jest jednorazowy — po próbie importu podgląd trzeba otworzyć ponownie.
@@ -93,8 +92,12 @@
   }
 
   async function rollback() {
-    if (!result) return;
-    await app.client.transfer.rollback(result.snapshot_id);
+    const snapshot = result?.snapshot_id;
+    if (!snapshot || rollingBack) return;
+    rollingBack = true;
+    const ok = await attempt(app.toasts, () => app.client.transfer.rollback(snapshot));
+    rollingBack = false;
+    if (!ok) return;
     result = null;
     app.toasts.show({ kind: 'success', message: t('tr.rolledBack') });
   }
@@ -171,7 +174,9 @@
       {t('tr.imported', { n: result.imported })} Snapshot: {result.snapshot_id}
     </p>
     <div class="actions start">
-      <Button variant="secondary" onclick={rollback}>{t('tr.rollback')}</Button>
+      <Button variant="secondary" loading={rollingBack} disabled={rollingBack} onclick={rollback}
+        >{t('tr.rollback')}</Button
+      >
     </div>
   {/if}
 </section>

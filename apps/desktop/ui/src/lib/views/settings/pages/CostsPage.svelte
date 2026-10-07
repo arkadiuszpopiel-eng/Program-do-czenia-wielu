@@ -1,20 +1,45 @@
 <!-- Koszty (PLAN §14.6): limit miesięczny w PLN z przełącznikiem całkowitego wyłączenia. -->
 <script lang="ts">
   import { LevelMeter, Switch } from '@alfa/ui-kit';
+  import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
   const { t } = app.i18n;
   const costs = $derived(app.costs);
   const uid = $props.id();
+  let loadError = $state<string | null>(null);
 
-  async function setLimit(enabled: boolean, zloty: number) {
+  // Strona pokazuje świeże koszty; bez nich (błąd rdzenia) — komunikat z „Ponów", nie pusta strona.
+  async function reload() {
+    const result = await load(() => app.refreshCosts());
+    loadError = result.status === 'failed' ? result.error : null;
+  }
+
+  $effect(() => {
+    void reload();
+  });
+
+  /** Zapis limitu; `false` po błędzie (toast) — wołający przywraca w kontrolce prawdziwą wartość. */
+  async function setLimit(enabled: boolean, zloty: number): Promise<boolean> {
     const minor = Math.max(0, Math.round(zloty * 100));
-    await app.client.costs.setMonthlyLimit(enabled, { minor, currency: 'PLN' });
-    await app.refreshCosts();
+    const ok = await attempt(app.toasts, () =>
+      app.client.costs.setMonthlyLimit(enabled, { minor, currency: 'PLN' }),
+    );
+    if (!ok) {
+      // Przełącznik sam zmienia swoje `checked`; nowy obiekt kosztów przywraca w nim stan rdzenia.
+      if (app.costs) app.costs = { ...app.costs };
+      return false;
+    }
+    await reload();
+    return true;
   }
 </script>
 
+{#if loadError}
+  <LoadFailed error={loadError} onretry={() => void reload()} />
+{/if}
 {#if costs}
   <section class="card">
     <div class="row">
@@ -37,7 +62,11 @@
           min="0"
           step="10"
           value={costs.limit.monthly.minor / 100}
-          onchange={(e) => void setLimit(true, Number(e.currentTarget.value))}
+          onchange={async (e) => {
+            const input = e.currentTarget;
+            const previous = costs.limit.monthly.minor / 100;
+            if (!(await setLimit(true, Number(input.value)))) input.value = String(previous);
+          }}
         />
       </label>
       <div class="usage">

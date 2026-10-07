@@ -2,25 +2,23 @@
   Wprowadzenie (PLAN §14.5, makieta 14): mikrofon → profil głosu → pomiar sprzętu → konta i klucze
   („dodaj teraz" / „pomiń — dodam później") + pobranie modelu lokalnego → poziomy autonomii (start
   L3) → korpus (opcjonalnie)
-  → import `.alfa` (opcjonalnie). Krok „mosty CLI" pojawi się od fali 4.
+  → import `.alfa` (opcjonalnie). Krok „mosty CLI" pojawi się od fali 4. Kroki mikrofonu i importu:
+  `MicStep`, `ImportStep`. Każdy błąd rdzenia jest widoczny (toast albo „Ponów"), nigdy cichy.
 -->
 <script lang="ts">
   import { untrack } from 'svelte';
-  import {
-    Avatar,
-    Button,
-    LevelMeter,
-    SegmentedControl,
-    Select,
-    Stepper,
-    agentIds,
-  } from '@alfa/ui-kit';
+  import { Avatar, Button, SegmentedControl, Stepper, agentIds } from '@alfa/ui-kit';
   import type { AutonomyLevel } from '../../api/types';
-  import type { AudioDevice, DeviceProfile, InspectResult } from '../../api/types-hub';
+  import { errorText } from '../../api/command-error';
+  import type { DeviceProfile } from '../../api/types-hub';
+  import LoadFailed from '../../components/shell/LoadFailed.svelte';
+  import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import AddProviderWizard from '../settings/pages/AddProviderWizard.svelte';
   import BridgesStep from './BridgesStep.svelte';
+  import ImportStep from './ImportStep.svelte';
   import LocalModelCard from './LocalModelCard.svelte';
+  import MicStep from './MicStep.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -37,55 +35,46 @@
   const LEVELS: readonly AutonomyLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
 
   let step = $state(untrack(() => app.onboardingStep));
-  let devices = $state<readonly AudioDevice[]>([]);
-  let device = $state('');
-  let heard = $state(false);
-  let micFailed = $state(false);
   let profile = $state<DeviceProfile | null>(null);
   let measuring = $state(false);
   let measured = false;
+  let measureError = $state<string | null>(null);
   let voice = $state<string>('B');
   let wizard = $state(false);
   let added = $state(0);
   let level = $state<string>('L3');
-  let imported = $state<Extract<InspectResult, { status: 'inspected' }> | null>(null);
-  let importDone = $state(false);
+  let finishing = $state(false);
 
   const current = $derived(STEPS[step] ?? 'mic');
 
   $effect(() => {
-    void app.client.voice.devices().then((list) => {
-      devices = list;
-      device = list.find((d) => d.default)?.id ?? list[0]?.id ?? '';
-    });
-    void app.client.device.profile().then((p) => {
-      profile = p;
-      voice = p.recommendation.voice_profile;
-    });
+    // Tylko rekomendacja głosu; bez niej krok „głos" działa, a pomiar (z „Ponów") jest w kroku „sprzęt".
+    app.client.device.profile().then(
+      (p) => {
+        profile = p;
+        voice = p.recommendation.voice_profile;
+      },
+      () => undefined,
+    );
   });
 
-  // Test mikrofonu działa tylko na pierwszym kroku.
-  $effect(() => {
-    if (current !== 'mic') return;
-    app.client.voice
-      .startMicTest(device || null)
-      .then(() => (micFailed = false))
-      .catch(() => (micFailed = true));
-    return () => void app.client.voice.stopMicTest().catch(() => undefined);
-  });
-
-  $effect(() => {
-    if (app.micLevel > 0.2) heard = true;
-  });
-
-  $effect(() => {
-    if (current !== 'hardware' || measured) return;
-    measured = true;
+  /** Pomiar sprzętu: `measuring` zawsze wraca do `false`, a błąd daje „Ponów" (nie wieczne „Mierzę…"). */
+  async function measure() {
     measuring = true;
-    void app.client.device.measure().then((p) => {
-      profile = p;
+    measureError = null;
+    try {
+      profile = await app.client.device.measure();
+      measured = true;
+    } catch (error) {
+      measureError = errorText(error);
+    } finally {
       measuring = false;
-    });
+    }
+  }
+
+  $effect(() => {
+    if (current !== 'hardware' || measured || untrack(() => measuring)) return;
+    void measure();
   });
 
   function next() {
@@ -94,38 +83,26 @@
   }
 
   async function finish() {
-    if (level !== 'L3') {
-      // Podniesienie potwierdza tylko okno Brokera — odmowa nie blokuje końca wprowadzenia.
-      try {
-        await app.client.permissions.requestLevel(level as AutonomyLevel, null);
-      } catch (error) {
-        app.toasts.show({
-          kind: 'warning',
-          message: error instanceof Error ? error.message : String(error),
-        });
+    if (finishing) return;
+    finishing = true;
+    try {
+      if (level !== 'L3') {
+        // Podniesienie potwierdza tylko okno Brokera — odmowa nie blokuje końca wprowadzenia.
+        try {
+          await app.client.permissions.requestLevel(level as AutonomyLevel, null);
+        } catch (error) {
+          app.toasts.show({ kind: 'warning', message: errorText(error) });
+        }
       }
+      if (!(await attempt(app.toasts, () => app.client.app.completeOnboarding()))) return;
+      await attempt(app.toasts, async () => {
+        app.system = await app.client.system.status();
+      });
+      app.view = 'chat';
+      if (!app.activeId) await attempt(app.toasts, () => app.newSession());
+    } finally {
+      finishing = false;
     }
-    await app.client.app.completeOnboarding();
-    app.system = await app.client.system.status();
-    app.view = 'chat';
-    if (!app.activeId) await app.newSession();
-  }
-
-  async function chooseImport() {
-    const res = await app.client.transfer.inspect(null, null);
-    if (res.status === 'inspected') imported = res;
-  }
-
-  async function runImport() {
-    if (!imported) return;
-    await app.client.transfer.importPackage({
-      handle: imported.handle,
-      mode: 'merge',
-      resolutions: {},
-      password: null,
-    });
-    importDone = true;
-    app.sessions.list = [...(await app.client.sessions.list())];
   }
 </script>
 
@@ -147,33 +124,7 @@
 
     <section class="body" aria-live="polite">
       {#if current === 'mic'}
-        <h2>{t('ob.mic.title')}</h2>
-        <p class="muted">{t('ob.mic.desc')}</p>
-        {#if app.system?.mic === 'denied'}
-          <p class="warn">{t('banner.micDenied')}</p>
-          <Button
-            variant="secondary"
-            onclick={() => void app.client.app.openSystemSettings('ms-settings:privacy-microphone')}
-            >{t('banner.micSettings')}</Button
-          >
-        {:else if devices.length === 0}
-          <p class="warn">{t('banner.micMissing')}</p>
-        {:else}
-          <label class="field">
-            <span>{t('ob.mic.device')}</span>
-            <Select
-              bind:value={device}
-              options={devices.map((d) => ({ value: d.id, label: d.name }))}
-              label={t('ob.mic.device')}
-            />
-          </label>
-          <LevelMeter level={app.micLevel} label={t('ob.mic.level')} />
-          {#if micFailed}
-            <p class="warn">{t('ob.mic.failed')}</p>
-          {:else}
-            <p class:ok={heard} class="muted">{heard ? t('ob.mic.ok') : t('ob.mic.silent')}</p>
-          {/if}
-        {/if}
+        <MicStep />
       {:else if current === 'voice'}
         <h2>{t('ob.voice.title')}</h2>
         <p class="muted">{t('ob.voice.desc')}</p>
@@ -189,7 +140,9 @@
       {:else if current === 'hardware'}
         <h2>{t('ob.hw.title')}</h2>
         <p class="muted">{t('ob.hw.desc')}</p>
-        {#if measuring || !profile}
+        {#if measureError && !measuring}
+          <LoadFailed error={measureError} onretry={() => void measure()} />
+        {:else if measuring || !profile}
           <p role="status">{t('ob.hw.measuring')}</p>
         {:else}
           <dl class="grid">
@@ -251,31 +204,7 @@
       {:else if current === 'bridges'}
         <BridgesStep />
       {:else}
-        <h2>{t('ob.import.title')}</h2>
-        <p class="muted">{t('ob.import.desc')}</p>
-        {#if imported}
-          <p class="muted small">
-            {t('tr.manifest', {
-              machine: imported.manifest.source_machine,
-              date: app.i18n.dateTime(imported.manifest.created_at),
-              schema: imported.manifest.schema_version,
-            })}
-          </p>
-          <ul class="list">
-            {#each imported.items as item (item.key)}<li>
-                {item.label} — {t(`tr.diff.${item.diff}`)}
-              </li>{/each}
-          </ul>
-          {#if importDone}
-            <p class="ok" role="status">{t('tr.imported', { n: imported.items.length })}</p>
-          {:else}
-            <Button variant="primary" onclick={runImport}
-              >{t('tr.importButton')} ({t('tr.mode.merge')})</Button
-            >
-          {/if}
-        {:else}
-          <Button variant="secondary" onclick={chooseImport}>{t('tr.choose')}</Button>
-        {/if}
+        <ImportStep />
       {/if}
     </section>
 
@@ -290,7 +219,7 @@
         >
       {/if}
       {#if current !== 'keys' || wizard === false}
-        <Button variant="primary" onclick={next}
+        <Button variant="primary" loading={finishing} disabled={finishing} onclick={next}
           >{step === STEPS.length - 1 ? t('ob.finish') : t('common.next')}</Button
         >
       {/if}
@@ -348,18 +277,6 @@
   }
   .ok {
     color: var(--alfa-color-success);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .warn {
-    color: var(--alfa-color-warning);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .field {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--alfa-space-1);
-    font-size: var(--alfa-font-size-sm);
     font-weight: var(--alfa-weight-semibold);
   }
   .grid {
