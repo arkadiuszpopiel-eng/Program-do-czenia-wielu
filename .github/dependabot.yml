@@ -4,6 +4,12 @@ updates:
     directory: /
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    ignore:
+      # reqwest 0.13 zmienił nazwy cech TLS (`rustls-tls-native-roots` nie istnieje) — Dependabot nie umie
+      # rozwiązać tej aktualizacji (zadanie kończyło się błędem). Podniesienie: zmiana cech w crate'ach
+      # i ADR (AGENTS.md: wersje przypięte, bez podnoszenia bez ADR); `docs/vendor/reqwest.md`.
+      - dependency-name: reqwest
+        versions: [">= 0.13"]
   - package-ecosystem: npm
     directory: /
     schedule: { interval: weekly }
