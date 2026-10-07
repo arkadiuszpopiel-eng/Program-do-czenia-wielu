@@ -3,8 +3,9 @@
     Alfa: aktualizacja kodu (git pull) i przebudowa — skrót „Alfa — aktualizuj kod" na Pulpicie.
 .DESCRIPTION
     Pobiera najnowszy kod z GitHuba (tylko szybkie przewinięcie, bez nadpisywania Twoich zmian),
-    potem uruchamia scripts\setup-dev.ps1 -Build. Gdy w katalogu są lokalne zmiany (np. z pracy
-    z Claude Code), git pull może odmówić — skrypt wtedy mówi, co zrobić, i niczego nie kasuje.
+    potem uruchamia scripts\setup-dev.ps1 -Build. Zmiany Cargo.lock zrobione przez kompilację
+    odkłada na bok (git stash). Gdy w katalogu są inne lokalne zmiany (np. z pracy z Claude Code),
+    git pull może odmówić — skrypt wtedy mówi, co zrobić, i niczego nie kasuje.
     Plik w UTF-8 z BOM (Windows PowerShell 5.1 i polskie znaki).
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File D:\alfa\scripts\update-dev.ps1
@@ -19,6 +20,14 @@ $exitCode = 0
 Push-Location $Root
 try {
     Write-Host "Alfa: aktualizacja kodu w $Root" -ForegroundColor Cyan
+    # Pliki Cargo.lock zmienia sama kompilacja (lista wersji bibliotek), nie człowiek. Taka zmiana
+    # blokowała `git pull` — odkładamy ją na bok (`git stash`, do odzyskania), nie kasujemy.
+    $locks = @(& git status --porcelain -- 'Cargo.lock' 'apps/desktop/src-tauri/Cargo.lock' 2>$null |
+        Where-Object { $_ -match '^ M ' } | ForEach-Object { $_.Substring(3) })
+    if ($locks.Count -gt 0) {
+        Write-Host "Odkładam na bok zmiany z kompilacji: $($locks -join ', ') (git stash)." -ForegroundColor Yellow
+        & git stash push -m 'update-dev: Cargo.lock z kompilacji' -- @locks
+    }
     $changes = @(& git status --porcelain 2>$null)
     if ($changes.Count -gt 0) {
         Write-Host "Lokalne zmiany w kodzie: $($changes.Count) plików (np. z pracy z Claude Code)." -ForegroundColor Yellow

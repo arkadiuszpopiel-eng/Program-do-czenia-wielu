@@ -2,11 +2,13 @@
 //! (ukryte), `pill` 220×48 zawsze na wierzchu (ukryte). Wszystkie na wspólnym, stałym folderze
 //! danych WebView2 poza katalogiem wersji (ADR 0007) — jeden proces przeglądarki (§14.2).
 //! Zamknięcie okna głównego = ukrycie; po N minutach (`general.destroy_webview_after`) WebView
-//! jest niszczony, a ponowne otwarcie tworzy go od nowa. Wszystkie okna są chronione przed
-//! przechwyceniem (`WDA_EXCLUDEFROMCAPTURE`).
+//! jest niszczony, a ponowne otwarcie tworzy go od nowa. Ochrona przed przechwyceniem
+//! (`WDA_EXCLUDEFROMCAPTURE`) tylko po włączeniu `ui.hide_from_capture` — domyślnie zrzuty ekranu
+//! działają (zgłaszanie błędów); agentki i tak nie widzą okien Alfy (maskowanie w porcie zrzutów).
 
 use std::path::PathBuf;
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use app_core::AppCore;
@@ -22,17 +24,22 @@ pub const QUICK: &str = "quick";
 /// Pigułka głosowa.
 pub const PILL: &str = "pill";
 
+/// Ustawienie: okna Alfy wycinane ze zrzutów i nagrań innych programów.
+pub const HIDE_FROM_CAPTURE: &str = "ui.hide_from_capture";
+
 /// Stan okien zarządzany przez Tauri.
 pub struct WindowState {
     data_dir: PathBuf,
+    hide_from_capture: AtomicBool,
     destroy_timer: Mutex<Option<tauri::async_runtime::JoinHandle<()>>>,
 }
 
 impl WindowState {
-    /// Stan z folderem danych WebView2.
-    pub fn new(data_dir: PathBuf) -> Self {
+    /// Stan z folderem danych WebView2 i ochroną przed przechwyceniem z ustawień.
+    pub fn new(data_dir: PathBuf, hide_from_capture: bool) -> Self {
         Self {
             data_dir,
+            hide_from_capture: AtomicBool::new(hide_from_capture),
             destroy_timer: Mutex::new(None),
         }
     }
@@ -46,18 +53,28 @@ impl WindowState {
     }
 }
 
+/// Wartość `ui.hide_from_capture` (brak albo inny typ — wyłączone).
+pub fn hide_from_capture(value: Option<&SettingValue>) -> bool {
+    matches!(value, Some(SettingValue::Bool(true)))
+}
+
 fn builder<'a>(
     app: &'a AppHandle,
     label: &str,
     page: &str,
     data_dir: PathBuf,
 ) -> WebviewWindowBuilder<'a, tauri::Wry, AppHandle> {
-    // `content_protected` = `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`: okna Alfy nie trafiają
-    // do zrzutów ani nagrań innych aplikacji (także computer use agentek — obrona w głąb obok
-    // strażnika celów i maskowania w porcie zrzutów).
+    // `content_protected` = `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`: po włączeniu
+    // `ui.hide_from_capture` okna Alfy nie trafiają do zrzutów ani nagrań innych aplikacji.
+    // Wyłączone (domyślnie) nie odsłania okien agentkom: strażnik celów i port zrzutów chronią
+    // procesy Alfy (`PROTECTED_IMAGES`) niezależnie od tej flagi.
+    let protect = app
+        .state::<WindowState>()
+        .hide_from_capture
+        .load(Ordering::Relaxed);
     let builder = WebviewWindowBuilder::new(app, label, WebviewUrl::App(PathBuf::from(page)))
         .data_directory(data_dir)
-        .content_protected(true);
+        .content_protected(protect);
     // Port CDP tylko w buildzie testowym (Playwright); w produkcji zamknięty (PLAN §8.2, `cdp`).
     match crate::cdp::browser_args() {
         Some(args) => builder.additional_browser_args(args),
@@ -200,5 +217,25 @@ pub fn on_close_requested(window: &Window, api: &CloseRequestApi) {
     });
     if let Ok(mut timer) = state.destroy_timer.lock() {
         *timer = Some(task);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn capture_protection_only_when_explicitly_enabled() {
+        assert!(hide_from_capture(Some(&SettingValue::Bool(true))));
+        assert!(!hide_from_capture(Some(&SettingValue::Bool(false))));
+        assert!(!hide_from_capture(None));
+        assert!(!hide_from_capture(Some(&SettingValue::Text("true".into()))));
+    }
+
+    #[test]
+    fn webview_destroy_delay_is_clamped() {
+        assert_eq!(setting_minutes(None), 10);
+        assert_eq!(setting_minutes(Some(SettingValue::Number(0.into()))), 1);
+        assert_eq!(setting_minutes(Some(SettingValue::Number(5.into()))), 5);
     }
 }

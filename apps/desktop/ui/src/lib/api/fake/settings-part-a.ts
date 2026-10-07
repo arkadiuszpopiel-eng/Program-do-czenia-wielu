@@ -257,9 +257,29 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     custom: 'triggers',
   }),
   page('marshal', L('Reguły Marszałka', 'Marshal rules'), 1, [], { custom: 'marshal' }),
-  page('permissions', L('Uprawnienia i bezpieczeństwo', 'Permissions and security'), 1, [], {
-    custom: 'permissions',
-  }),
+  page(
+    'permissions',
+    L('Uprawnienia i bezpieczeństwo', 'Permissions and security'),
+    1,
+    [
+      toggle(
+        'ui.hide_from_capture',
+        L(
+          'Ukrywaj okna Alfy na zrzutach i nagraniach ekranu',
+          'Hide Alfa windows from screenshots and screen recordings',
+        ),
+        L(
+          'Włączone: Windows wycina okna Alfy ze zrzutów (Wycinek, PrintScreen) i nagrań innych programów — w ich miejscu jest czarne pole albo pulpit. Wyłączone (domyślnie): zrzuty działają normalnie, możesz pokazać ekran przy zgłaszaniu błędu. Agentki i tak nie widzą okien Alfy ani okna zatwierdzeń — ich zrzuty maskują procesy Alfy niezależnie od tego ustawienia. Zalecenie: wyłączone; włącz przy udostępnianiu ekranu, gdy w rozmowie są dane prywatne. Zmiana działa po ponownym uruchomieniu Alfy.',
+          "On: Windows cuts Alfa windows out of screenshots (Snipping Tool, PrintScreen) and other programs' recordings — a black area or the desktop shows instead. Off (default): screenshots work normally, so you can show the screen when reporting a problem. Agents still cannot see Alfa windows or the approval window — their screenshots mask Alfa processes regardless of this setting. Recommended: off; turn on when sharing your screen while the conversation holds private data. Takes effect after restarting Alfa.",
+        ),
+        false,
+        'machine',
+      ),
+    ],
+    {
+      custom: 'permissions',
+    },
+  ),
   page('computer', L('Komputer', 'Computer'), 1, [], { custom: 'computer' }),
   page(
     'memory',

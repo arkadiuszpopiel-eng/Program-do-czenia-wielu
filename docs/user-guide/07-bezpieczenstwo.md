@@ -79,7 +79,10 @@ Agentka z rolą **Wykonawczyni** może obsługiwać okna aplikacji: czytać ich 
 - **Zatrzymaj sterowanie** przerywa akcje agentek; **Oddaj sterowanie** pozwala im wrócić. Ruch myszy lub klawiatura
   w trakcie działania agentki też ją przerywa — Twoje wejście ma pierwszeństwo.
 - W pasku tytułu widać „Delta steruje ekranem” z przyciskiem „Zatrzymaj”.
-- Okna Alfy są niewidoczne na zrzutach ekranu.
+- Agentki nie widzą okien Alfy ani okna Brokera — na ich zrzutach te okna są zawsze zamaskowane. Twoje zrzuty
+  (Wycinek, `PrintScreen`) obejmują okna Alfy normalnie; jeśli chcesz je ukrywać (np. przy udostępnianiu ekranu),
+  włącz **Ustawienia → Uprawnienia i bezpieczeństwo → Ukrywaj okna Alfy na zrzutach i nagraniach ekranu**
+  (działa po ponownym uruchomieniu Alfy).
 - **Ustawienia → Komputer**: zasady, przejście do panelu Ekran, prośba „Zezwól na podgląd pulpitu” (24 h, przez okno
   Brokera — w tej wersji niedostępna).
 - Okna programów uruchomionych jako administrator — **jeszcze niedostępne** (wymagają osobnego pomocnika).

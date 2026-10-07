@@ -79,6 +79,11 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: apps/desktop/src-tauri -> target
+      # Niezgodny Cargo.lock powłoki przepisuje lokalna kompilacja (setup-dev.ps1), a zmieniony plik
+      # blokował potem `git pull` w update-dev.ps1 na laptopie — wykryj to tutaj, nie u właściciela.
+      - name: Cargo.lock powłoki zgodny z Cargo.toml
+        working-directory: apps/desktop/src-tauri
+        run: cargo metadata --locked --format-version 1 > $null
       - name: Format
         working-directory: apps/desktop/src-tauri
         run: cargo fmt --check
@@ -134,9 +139,18 @@ jobs:
         run: pnpm --filter @alfa/ui-kit build-storybook
       - name: Testy jednostkowe UI (vitest)
         run: pnpm --filter @alfa/desktop-ui test
+      # Instalacja przeglądarki potrafi zawisnąć na pobieraniu (f406ae4: 50 min bez postępu) —
+      # limit czasu i jedna ponowna próba zamiast czekania na 6-godzinny limit joba.
       - name: Przeglądarka dla E2E
-        run: pnpm --filter @alfa/desktop-ui exec playwright install --with-deps chromium
+        timeout-minutes: 15
+        run: |
+          for attempt in 1 2; do
+            timeout 360 pnpm --filter @alfa/desktop-ui exec playwright install --with-deps chromium && exit 0
+            echo "::warning::instalacja przeglądarki nieudana (próba $attempt)"
+          done
+          exit 1
       - name: E2E + axe (Playwright)
+        timeout-minutes: 30
         run: pnpm --filter @alfa/desktop-ui test:e2e
 
   docs:

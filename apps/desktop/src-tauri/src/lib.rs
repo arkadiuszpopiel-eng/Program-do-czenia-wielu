@@ -71,7 +71,11 @@ pub fn run() {
                 logs::apply_settings(log_handle, &core);
             }
             app.manage(core.clone());
-            app.manage(windows::WindowState::new(paths.webview_data()));
+            let hide = tauri::async_runtime::block_on(core.setting(windows::HIDE_FROM_CAPTURE));
+            app.manage(windows::WindowState::new(
+                paths.webview_data(),
+                windows::hide_from_capture(hide.as_ref()),
+            ));
             windows::create_all(&handle)?;
             tray::build(&handle)?;
             shortcuts::register(&handle, &core);

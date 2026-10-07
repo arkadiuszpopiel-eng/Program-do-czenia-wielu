@@ -172,11 +172,30 @@ test('Ustawienia → Modele i silniki: lista z katalogu', async ({ alfa }) => {
   await expect(counter).toBeVisible();
   const count = Number.parseInt((await counter.textContent()) ?? '0', 10);
   expect(count, 'pozycje katalogu app-models').toBeGreaterThanOrEqual(3);
-  const rows = main.getByRole('listitem').filter({ has: main.getByRole('heading', { level: 4 }) });
+  const catalog = main.locator('section[aria-labelledby="mm-list"]');
+  const rows = catalog
+    .getByRole('listitem')
+    .filter({ has: main.getByRole('heading', { level: 4 }) });
   await expect.soft(rows).toHaveCount(count);
   await expect(main.getByRole('heading', { level: 4, name: /llama-server/ }).first()).toBeVisible();
   await expect(main.getByRole('heading', { level: 4, name: /Silero VAD/ }).first()).toBeVisible();
   test.info().annotations.push({ type: 'katalog', description: `${count} pozycji` });
+  // Pakiety 1–6 na prawdziwym rdzeniu (profil urządzenia runnera, stan z katalogu): sześć kart
+  // od „Wzorcowy” do „Minimalny”, bez komunikatu „Nie udało się wczytać”.
+  const bundles = main.locator('section[aria-labelledby="mm-bundles"]');
+  const failed = bundles.getByRole('alert');
+  const loaded = bundles.getByRole('img', { name: /^Ocena \d z 6$/ });
+  await expect(loaded.or(failed).first()).toBeVisible({ timeout: 30_000 });
+  if (await failed.count()) {
+    throw new Error(`pakiety nie wczytały się: ${await failed.first().innerText()}`);
+  }
+  await expect(loaded).toHaveCount(6);
+  await expect(bundles.getByText('Zalecany dla tego komputera', { exact: true })).toHaveCount(1);
+  const machine = bundles.getByText(/^Ten komputer:/);
+  await expect.soft(machine, 'profil urządzenia w opisie pakietów').toBeVisible();
+  if (await machine.count()) {
+    test.info().annotations.push({ type: 'pakiety', description: await machine.innerText() });
+  }
   await shot(alfa, '06-modele-i-silniki');
   await expectAccessible(alfa, 'Ustawienia → Modele i silniki');
 });
