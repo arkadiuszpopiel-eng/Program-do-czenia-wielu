@@ -173,7 +173,24 @@ impl Fetcher {
         let append = match resp.status() {
             StatusCode::PARTIAL_CONTENT if offset > 0 => true,
             StatusCode::RANGE_NOT_SATISFIABLE if offset > 0 => {
-                return Ok(Step::Done(hex(&hasher.finalize()), offset));
+                // 416 znaczy „nie ma nic dalej" tylko wtedy, gdy plik częściowy ma dokładnie rozmiar
+                // zasobu (`Content-Range: bytes */N`). Inny rozmiar (stary albo za długi `.part`)
+                // to nie jest kompletny plik — usuwamy go i zaczynamy od zera.
+                let total = resp
+                    .headers()
+                    .get(reqwest::header::CONTENT_RANGE)
+                    .and_then(|v| v.to_str().ok())
+                    .and_then(|v| v.rsplit('/').next())
+                    .and_then(|n| n.trim().parse::<u64>().ok());
+                if total.is_none_or(|n| n == offset) {
+                    return Ok(Step::Done(hex(&hasher.finalize()), offset));
+                }
+                tokio::fs::remove_file(part)
+                    .await
+                    .map_err(|e| io(part, e))?;
+                return Ok(Step::Interrupted(
+                    "plik częściowy ma inny rozmiar niż zasób — pobieranie od początku".into(),
+                ));
             }
             s if s.is_success() => false,
             s if s.is_server_error() || s == StatusCode::TOO_MANY_REQUESTS => {

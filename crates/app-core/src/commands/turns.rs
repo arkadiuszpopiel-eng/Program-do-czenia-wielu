@@ -11,7 +11,8 @@ use sessions_contract::{
 
 use crate::core::AppCore;
 use crate::dto::{
-    AlfaEvent, ModelProfile, SendOptions, SendResult, TurnAnnotation, TurnStatus, TurnsSnapshot,
+    AlfaEvent, LocalizedText, ModelProfile, SendOptions, SendResult, ToastKind, TurnAnnotation,
+    TurnStatus, TurnsSnapshot,
 };
 use crate::error::AppError;
 use crate::ids;
@@ -183,25 +184,48 @@ impl AppCore {
         let assistant = if queued {
             None
         } else {
-            Some(
-                self.chat()
-                    .start_generation(GenRequest {
-                        session: id.clone(),
-                        placement: Placement::Child(user),
-                        history_leaf: user,
-                        agent,
-                        profile: options.profile,
-                        continues: None,
-                        origin: risk_classifier_contract::CommandOrigin::UserText,
-                        tap: None,
-                    })
-                    .await?,
-            )
+            self.start_after_user(GenRequest {
+                session: id.clone(),
+                placement: Placement::Child(user),
+                history_leaf: user,
+                agent,
+                profile: options.profile,
+                continues: None,
+                origin: risk_classifier_contract::CommandOrigin::UserText,
+                tap: None,
+            })
+            .await
         };
         Ok(SendResult {
             user_turn_id: ids::turn_dto(&id, user),
             assistant_turn_id: assistant,
         })
+    }
+
+    /// Odpowiedź na już zapisaną wiadomość użytkownika. Błąd startu nie wraca jako błąd komendy:
+    /// wiadomość jest w historii, więc interfejs przywróciłby jej tekst do pola, a ponowny Enter
+    /// by ją zdublował. Zamiast tego komunikat i „Ponów" przy wiadomości (`turns_regenerate`).
+    async fn start_after_user(&self, request: GenRequest) -> Option<String> {
+        match self.chat().start_generation(request).await {
+            Ok(turn) => Some(turn),
+            Err(e) => {
+                tracing::warn!(error = %e.message, "wiadomość zapisana, odpowiedź nie wystartowała");
+                self.emit(AlfaEvent::Toast {
+                    kind: ToastKind::Error,
+                    message: LocalizedText::new(
+                        format!(
+                            "Wiadomość zapisana, ale odpowiedź nie wystartowała: {} Użyj „Ponów” przy wiadomości.",
+                            e.message
+                        ),
+                        format!(
+                            "Message saved, but the reply did not start: {} Use “Retry” on the message.",
+                            e.message
+                        ),
+                    ),
+                });
+                None
+            }
+        }
     }
 
     /// Agentka tury (autor albo fakty tury-komunikatu).
@@ -281,20 +305,17 @@ impl AppCore {
         let assistant = if queued {
             None
         } else {
-            Some(
-                self.chat()
-                    .start_generation(GenRequest {
-                        session: id.clone(),
-                        placement: Placement::Child(user),
-                        history_leaf: user,
-                        agent,
-                        profile: None,
-                        continues: None,
-                        origin: risk_classifier_contract::CommandOrigin::UserText,
-                        tap: None,
-                    })
-                    .await?,
-            )
+            self.start_after_user(GenRequest {
+                session: id.clone(),
+                placement: Placement::Child(user),
+                history_leaf: user,
+                agent,
+                profile: None,
+                continues: None,
+                origin: risk_classifier_contract::CommandOrigin::UserText,
+                tap: None,
+            })
+            .await
         };
         Ok(SendResult {
             user_turn_id: ids::turn_dto(&id, user),

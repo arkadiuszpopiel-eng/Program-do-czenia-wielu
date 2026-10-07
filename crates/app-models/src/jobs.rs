@@ -8,7 +8,7 @@ use app_api::dto::{AlfaEvent, ModelProgressView};
 use tokio_util::sync::CancellationToken;
 
 use crate::ModelsApp;
-use crate::catalog::ItemSpec;
+use crate::catalog::{Install, ItemSpec};
 use crate::fetch::{FetchError, sha256_file};
 use crate::install;
 use crate::store::{Hashes, Pending};
@@ -142,7 +142,17 @@ impl ModelsApp {
         .await;
         match result {
             Ok(Ok(_)) => Outcome::Installed,
-            Ok(Err(e)) => Outcome::Failed(format!("Instalacja nie powiodła się: {e}")),
+            Ok(Err(e)) => {
+                // Archiwum, którego nie dało się rozpakować (uszkodzone, zły układ), nie może
+                // zostać w katalogu roboczym: kolejna próba użyłaby go ponownie i kończyła się
+                // tym samym błędem. Usuwamy je — następne „Pobierz" zaczyna od nowa.
+                if matches!(spec.install, Install::Pick(_) | Install::Tree { .. })
+                    && let Err(io) = self.store.clear_staging(&spec.id)
+                {
+                    tracing::warn!(item = %spec.id, error = %io, "nie udało się wyczyścić katalogu roboczego");
+                }
+                Outcome::Failed(format!("Instalacja nie powiodła się: {e}"))
+            }
             Err(e) => Outcome::Failed(e.to_string()),
         }
     }
