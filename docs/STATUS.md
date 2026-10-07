@@ -63,9 +63,9 @@ Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają
 
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
-| R-01 | `flush_queue` opróżnia kolejkę offline na początku — błąd jednej sesji gubi wiadomości pozostałych (zostają „w kolejce” na zawsze) | `app-core/src/commands/queue.rs` | potwierdzone odczytem |
+| R-01 | **naprawione 2026-10-08**: `flush_queue` gubił kolejkę offline przy błędzie jednej sesji — nieobsłużone sesje wracają teraz do kolejki | `app-core/src/commands/queue.rs` | testy `errors.rs` zielone; brak osobnego testu błędu w środku kolejki |
 | R-02 | Wysłanie zapisuje turę użytkownika, a potem `start_generation` może zawieść — wiadomość wisi bez odpowiedzi i bez błędu, a ponowny Enter ją dubluje | `app-core/src/commands/turns.rs::turns_send` | potwierdzone odczytem |
-| R-03 | „Edytuj i wyślij ponownie” gubi załączniki pierwotnej wiadomości | `app-core/src/commands/turns.rs` (`append_user(…, Vec::new())`) | potwierdzone odczytem |
+| R-03 | **naprawione 2026-10-08**: „Edytuj i wyślij ponownie” przenosi bloki (załączniki) pierwotnej wiadomości do nowej gałęzi | `app-core/src/commands/turns.rs` | testy `commands.rs`, `files.rs` zielone; brak osobnego testu regresji |
 | R-04 | Pobranie pojedynczego modelu nie podpowiada silnika; brak pola „brakujące silniki” w DTO | `app-models/src/lib.rs`, `view.rs` | potwierdzone odczytem |
 | R-05 | Wszystkie silniki mają `sha256: None` — po pobraniu czekają na zgodę i `sidecars` zostaje puste, choć model jest „zainstalowany”; sumy wydań b6710 i whisper są w przewodniku 11 i można je przypiąć (decyzja właściciela) | `app-models/src/data.rs` | mechanizm potwierdzony |
 | R-06 | Uszkodzone archiwum w `staging` jest używane ponownie przy każdej próbie (pozycje bez przypiętej sumy); odpowiedź 416 uznaje dowolny plik `.part` za kompletny | `app-models/src/jobs.rs`, `install.rs`, `fetch.rs` | potwierdzone odczytem |

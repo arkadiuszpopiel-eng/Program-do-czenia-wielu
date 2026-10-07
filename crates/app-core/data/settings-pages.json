@@ -1426,8 +1426,8 @@
    {
     "key": "notify.earcons",
     "label": {
-     "pl": "Dźwięki (earcony)",
-     "en": "Sounds (earcons)"
+     "pl": "Dźwięki sygnałowe",
+     "en": "Signal sounds"
     },
     "description": {
      "pl": "Krótkie, ciche dźwięki startu i końca słuchania, błędu i ukończenia.",
@@ -1446,8 +1446,8 @@
      "en": "Sound volume"
     },
     "description": {
-     "pl": "Osobna głośność earconów.",
-     "en": "Separate volume for earcons."
+     "pl": "Głośność dźwięków sygnałowych, niezależna od głosu agentek.",
+     "en": "Volume of signal sounds, independent of the agents’ voices."
     },
     "default": 40,
     "scope": "global",

@@ -11,11 +11,30 @@ use app_chat::{GenRequest, Placement};
 impl AppCore {
     /// Wysyła wiadomości z kolejki offline (po jednej odpowiedzi na sesję — na ostatnią).
     pub(crate) async fn flush_queue(&self) -> Result<(), AppError> {
-        let queued: Vec<(SessionId, Vec<TurnId>)> =
+        let mut queued: std::collections::VecDeque<(SessionId, Vec<TurnId>)> =
             std::mem::take(&mut self.rt().queued).into_iter().collect();
-        for (id, turns) in queued {
+        while let Some((id, turns)) = queued.pop_front() {
+            if let Err(e) = self.flush_session(&id, &turns).await {
+                // Błąd jednej sesji nie może zgubić kolejki: ta sesja i wszystkie nieobsłużone
+                // wracają do kolejki (nowe wpisy, które doszły w międzyczasie, zostają na końcu).
+                let mut rt = self.rt();
+                for (sid, mut rest) in std::iter::once((id, turns)).chain(queued) {
+                    let entry = rt.queued.entry(sid).or_default();
+                    rest.append(entry);
+                    *entry = rest;
+                }
+                return Err(e);
+            }
+        }
+        Ok(())
+    }
+
+    /// Jedna sesja z kolejki offline: statusy tur i odpowiedź na ostatnią wiadomość.
+    async fn flush_session(&self, id: &SessionId, turns: &[TurnId]) -> Result<(), AppError> {
+        {
+            let id = id.clone();
             let _guard = self.lock_session(&id).await;
-            for turn in &turns {
+            for turn in turns {
                 self.inner
                     .store
                     .push_status(&id, *turn, TurnStatus::Complete)?;
@@ -26,7 +45,7 @@ impl AppCore {
                 });
             }
             let Some(last) = turns.last().copied() else {
-                continue;
+                return Ok(());
             };
             self.chat().finalize_generation(&id).await;
             let turn = self.inner.sessions.turn(&id, last)?;

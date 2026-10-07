@@ -272,8 +272,11 @@ impl AppCore {
             .meta(&id, target)?
             .and_then(|m| m.addressed_to);
         let agent = self.addressee(&id, &text, addressed.as_deref());
+        // Edycja zmienia tekst, nie załączniki: nowa gałąź dostaje bloki pierwotnej wiadomości
+        // (wcześniej plik lub obraz znikał z kontekstu modelu po poprawieniu literówki).
+        let blocks = old.content.blocks.clone();
         let (user, queued) = self
-            .append_user(&id, None, Some(target), &text, addressed, Vec::new())
+            .append_user(&id, None, Some(target), &text, addressed, blocks)
             .await?;
         let assistant = if queued {
             None

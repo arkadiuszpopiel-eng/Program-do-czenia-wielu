@@ -253,7 +253,7 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
     ),
     toggle(
       'notify.earcons',
-      L('Dźwięki (earcony)', 'Sounds (earcons)'),
+      L('Dźwięki sygnałowe', 'Signal sounds'),
       L(
         'Krótkie, ciche dźwięki startu i końca słuchania, błędu i ukończenia.',
         'Short, quiet sounds for listening start/stop, errors and completion.',
@@ -263,7 +263,10 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
     number(
       'notify.earcon_volume',
       L('Głośność dźwięków', 'Sound volume'),
-      L('Osobna głośność earconów.', 'Separate volume for earcons.'),
+      L(
+        'Głośność dźwięków sygnałowych, niezależna od głosu agentek.',
+        'Volume of signal sounds, independent of the agents’ voices.',
+      ),
       40,
       0,
       100,
