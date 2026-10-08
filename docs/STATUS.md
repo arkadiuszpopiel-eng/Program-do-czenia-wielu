@@ -133,7 +133,8 @@ Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, ak
 | R-25 | Włączenie wtyczki przekazuje tylko identyfikator — przy dwóch wyłączonych wersjach suma może nie pasować do wybranej; „Usuń” wtyczki bez potwierdzenia | `app-plugins/src/app.rs`, `PluginsPage.svelte` | podejrzenie |
 
 Czwarta tura — narzędzia plikowe i powłoka agentek (`tools-fs-impl`, `tools-shell-impl`, `tools-common-contract`,
-`tools-net-impl`; `tools-clipboard-impl` nieprzejrzane):
+`tools-net-impl`; `tools-clipboard-impl` tylko pobieżnie — redakcja sekretów, limity tekstu i obrazu, skażenie sesji
+i głębokość cofania są w kodzie, bez pełnego przeglądu):
 
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
@@ -150,8 +151,9 @@ Czwarta tura — narzędzia plikowe i powłoka agentek (`tools-fs-impl`, `tools-
 - *Czekają na decyzję właściciela:* R-05 (przypięcie sum kontrolnych silników), R-10 (częściowe „Cofnij” — adapter
   Brokera), R-20 (edycja oczekującej propozycji pamięci i zaufanie do „zapamiętaj”), R-21 (licznik limitu mostów —
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
-- *Do zrobienia bez decyzji, nietknięte:* R-07, R-09, R-13, R-22, R-23, rdzeniowa część R-25 oraz pola w DTO dla
-  R-04, R-12 i R-16.
+- *Do zrobienia bez decyzji, nietknięte:* R-13, strażnik paniki (reszta R-09), zadania mostów przy „Zatrzymaj
+  sterowanie” (reszta R-22), rdzeniowa część R-25, pola w DTO dla R-04, R-12 i R-16, T-02 (odczyt zakresowy w
+  porcie plików).
 - *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-01, R-02, R-03, R-06, R-08, R-14, schowek dla
   głosu, dyktowanie przy STOP, wyciek dzierżawy pamięci.
 
