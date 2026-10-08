@@ -88,7 +88,7 @@
     position: absolute;
     top: calc(100% + 6px);
     z-index: 60;
-    max-width: calc(100vw - 16px);
+    max-width: calc(var(--alfa-vw, 100vw) - 16px);
     padding: var(--alfa-space-3) var(--alfa-space-4);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-card);

@@ -126,3 +126,33 @@ test('panel prawy na szerokim oknie: wszystkie karty w jednym wierszu', async ({
   }
   expect([...tops], 'karty na jednej wysokości').toHaveLength(1);
 });
+
+// Skala interfejsu (CSS `zoom`) mnoży jednostki okna: `min-height: 100vh` robiło stronę wyższą niż
+// okno i pole pisania znikało pod dolną krawędzią przy każdej skali powyżej 100 %.
+for (const [width, height] of [
+  [1920, 1080],
+  [2560, 1440],
+  [3840, 2160],
+] as const) {
+  test(`skala dopasowana do okna ${width}×${height}: strona ma wysokość okna, pole pisania widoczne`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await openApp(page);
+    await waitForChat(page);
+    const m = await page.evaluate(() => {
+      const composer = document.querySelector('#alfa-composer');
+      return {
+        zoom: Number(document.documentElement.style.zoom),
+        scroll: document.documentElement.scrollHeight,
+        body: document.body.getBoundingClientRect().height,
+        bottom: composer ? composer.getBoundingClientRect().bottom : -1,
+      };
+    });
+    expect(m.zoom, 'skala').toBeGreaterThan(1);
+    expect(Math.round(m.body), 'wysokość strony').toBeLessThanOrEqual(height);
+    expect(m.scroll, 'brak przewijania całej strony').toBeLessThanOrEqual(height);
+    expect(m.bottom, 'dół pola pisania').toBeGreaterThan(0);
+    expect(m.bottom, 'dół pola pisania').toBeLessThanOrEqual(height);
+  });
+}

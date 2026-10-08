@@ -58,7 +58,7 @@
     z-index: 111;
     top: 50%;
     left: 50%;
-    width: min(440px, calc(100vw - 32px));
+    width: min(440px, calc(var(--alfa-vw, 100vw) - 32px));
     padding: var(--alfa-space-6);
     transform: translate(-50%, -50%);
     border: 1px solid var(--alfa-color-border);

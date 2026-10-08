@@ -5,6 +5,19 @@ body,
   height: 100%;
   overflow: hidden;
 }
+/*
+ * Skala interfejsu to CSS `zoom` na <html> (appearance.ts). Jednostki okna (`vh`, `vw`) są przy tym
+ * mnożone przez skalę, więc `min-height: 100vh` z ui-kit robiło stronę wyższą niż okno — pole
+ * pisania lądowało pod dolną krawędzią. Wysokość bierze się z łańcucha `height: 100%`, a rozmiary
+ * liczone od okna używają `--alfa-vh` / `--alfa-vw` (okno w jednostkach po skalowaniu).
+ */
+:root {
+  --alfa-vh: calc(100vh / var(--alfa-zoom, 1));
+  --alfa-vw: calc(100vw / var(--alfa-zoom, 1));
+}
+body {
+  min-height: 0;
+}
 
 /* Przeładowanie strony (F5/Ctrl+R) i menu kontekstowe WebView wyłączane w JS — §14.8. */
 body {

@@ -69,8 +69,8 @@
     z-index: 101;
     display: flex;
     flex-direction: column;
-    width: min(880px, calc(100vw - 32px));
-    max-height: calc(100vh - 64px);
+    width: min(880px, calc(var(--alfa-vw, 100vw) - 32px));
+    max-height: calc(var(--alfa-vh, 100vh) - 64px);
     padding: var(--alfa-space-6);
     transform: translate(-50%, -50%);
     border: 1px solid var(--alfa-color-border);

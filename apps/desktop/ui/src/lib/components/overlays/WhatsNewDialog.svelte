@@ -59,8 +59,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-3);
-    width: min(560px, calc(100vw - 32px));
-    max-height: min(80vh, 640px);
+    width: min(560px, calc(var(--alfa-vw, 100vw) - 32px));
+    max-height: min(calc(var(--alfa-vh, 100vh) * 0.8), 640px);
     padding: var(--alfa-space-6);
     transform: translate(-50%, -50%);
     border: 1px solid var(--alfa-color-border);

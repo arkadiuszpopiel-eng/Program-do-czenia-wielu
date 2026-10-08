@@ -11,7 +11,7 @@
   }
 
   let { value, min, max, label, side, onchange }: Props = $props();
-  let start: { x: number; width: number } | null = null;
+  let start: { x: number; width: number; zoom: number } | null = null;
   let dragging = $state(false);
 
   const sign = $derived(side === 'left' ? 1 : -1);
@@ -20,13 +20,18 @@
   function down(event: PointerEvent) {
     if (event.button !== 0) return;
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-    start = { x: event.clientX, width: value };
+    // Ruch wskaźnika jest w pikselach okna, szerokość panelu — w jednostkach po skalowaniu
+    // interfejsu (`zoom` na <html>): bez przeliczenia uchwyt „uciekał" spod kursora.
+    const zoom = Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--alfa-zoom'),
+    );
+    start = { x: event.clientX, width: value, zoom: zoom > 0 ? zoom : 1 };
     dragging = true;
   }
 
   function move(event: PointerEvent) {
     if (!start) return;
-    onchange(clamp(start.width + sign * (event.clientX - start.x)));
+    onchange(clamp(start.width + (sign * (event.clientX - start.x)) / start.zoom));
   }
 
   function up() {

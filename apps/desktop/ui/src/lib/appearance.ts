@@ -54,7 +54,10 @@ export function applyAppearance(root: HTMLElement, a: Appearance): void {
   root.dataset['density'] = a.density === 'compact' ? 'compact' : 'comfortable';
   if (a.animations) delete root.dataset['motion'];
   else root.dataset['motion'] = 'off';
-  root.style.setProperty('zoom', String(effectiveScale(a.zoom, a.fit, a.width)));
+  const scale = String(effectiveScale(a.zoom, a.fit, a.width));
+  root.style.setProperty('zoom', scale);
+  // Dla rozmiarów liczonych od okna (`--alfa-vh`, `--alfa-vw` w app.css).
+  root.style.setProperty('--alfa-zoom', scale);
 }
 
 export function effectiveWidth(win: Window, zoom: number, fit = false): number {

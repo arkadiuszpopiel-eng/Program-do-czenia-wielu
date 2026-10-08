@@ -134,8 +134,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-2);
-    width: min(1000px, calc(100vw - 32px));
-    max-height: calc(100vh - 32px);
+    width: min(1000px, calc(var(--alfa-vw, 100vw) - 32px));
+    max-height: calc(var(--alfa-vh, 100vh) - 32px);
     padding: var(--alfa-space-4);
     transform: translate(-50%, -50%);
     border: 1px solid var(--alfa-color-border);
@@ -161,7 +161,7 @@
   }
   .screen {
     flex: 1 1 auto;
-    height: min(60vh, 520px);
+    height: min(calc(var(--alfa-vh, 100vh) * 0.6), 520px);
     min-height: 120px;
     padding: var(--alfa-space-2);
     overflow: hidden;

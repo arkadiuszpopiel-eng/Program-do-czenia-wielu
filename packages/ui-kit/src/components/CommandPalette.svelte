@@ -214,10 +214,10 @@
   .alfa-palette {
     position: fixed;
     z-index: 101;
-    inset: 15vh 0 auto 0;
-    width: min(640px, calc(100vw - 32px));
+    inset: calc(var(--alfa-vh, 100vh) * 0.15) 0 auto 0;
+    width: min(640px, calc(var(--alfa-vw, 100vw) - 32px));
     max-width: none;
-    max-height: 60vh;
+    max-height: calc(var(--alfa-vh, 100vh) * 0.6);
     margin: 0 auto;
     padding: 0;
     color: var(--alfa-color-text);
