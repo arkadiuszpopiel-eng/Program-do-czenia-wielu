@@ -121,6 +121,22 @@ pub trait FsPort: Send + Sync {
     /// Odczyt całego pliku.
     fn read(&self, path: &Path) -> Result<Vec<u8>, PlatformError>;
 
+    /// Odczyt najwyżej `max` bajtów od `offset`; zwraca fragment i rozmiar całego pliku.
+    /// Domyślnie przez [`FsPort::read`]; implementacja dyskowa czyta tylko żądany zakres,
+    /// żeby odczyt początku dużego pliku nie wczytywał go w całości do pamięci.
+    fn read_range(
+        &self,
+        path: &Path,
+        offset: u64,
+        max: u64,
+    ) -> Result<(Vec<u8>, u64), PlatformError> {
+        let data = self.read(path)?;
+        let total = data.len() as u64;
+        let start = usize::try_from(offset.min(total)).unwrap_or(data.len());
+        let end = usize::try_from(offset.saturating_add(max).min(total)).unwrap_or(data.len());
+        Ok((data.get(start..end).unwrap_or_default().to_vec(), total))
+    }
+
     /// Zapis atomowy (tmp + rename); nadpisuje istniejący plik, zachowując poprzednią wersję do cofnięcia.
     fn write_atomic(&self, path: &Path, data: &[u8]) -> Result<OpReceipt, PlatformError>;
 
@@ -161,6 +177,54 @@ mod tests {
         assert!(!FsOperation::Read.is_mutating());
         let r = OpReceipt::irreversible(FsOperation::DeletePermanent);
         assert!(!r.reversible && r.undo.is_none());
+    }
+
+    struct OneFile(Vec<u8>);
+
+    impl FsPort for OneFile {
+        fn read(&self, _: &Path) -> Result<Vec<u8>, PlatformError> {
+            Ok(self.0.clone())
+        }
+        fn write_atomic(&self, p: &Path, _: &[u8]) -> Result<OpReceipt, PlatformError> {
+            Err(PlatformError::InvalidPath(p.to_path_buf()))
+        }
+        fn copy(&self, p: &Path, _: &Path) -> Result<OpReceipt, PlatformError> {
+            Err(PlatformError::InvalidPath(p.to_path_buf()))
+        }
+        fn move_path(&self, p: &Path, _: &Path) -> Result<OpReceipt, PlatformError> {
+            Err(PlatformError::InvalidPath(p.to_path_buf()))
+        }
+        fn delete_to_recycle_bin(&self, p: &Path) -> Result<OpReceipt, PlatformError> {
+            Err(PlatformError::InvalidPath(p.to_path_buf()))
+        }
+        fn delete_permanent(&self, p: &Path) -> Result<OpReceipt, PlatformError> {
+            Err(PlatformError::InvalidPath(p.to_path_buf()))
+        }
+        fn exists(&self, _: &Path) -> bool {
+            true
+        }
+        fn list_dir(&self, _: &Path) -> Result<Vec<DirEntry>, PlatformError> {
+            Ok(Vec::new())
+        }
+        fn undo(&self, _: UndoToken) -> Result<(), PlatformError> {
+            Ok(())
+        }
+        fn known_folder(&self, _: KnownFolder) -> PathBuf {
+            PathBuf::new()
+        }
+    }
+
+    #[test]
+    fn default_read_range_slices_and_reports_total() {
+        let fs = OneFile(b"0123456789".to_vec());
+        let p = Path::new("plik");
+        assert_eq!(fs.read_range(p, 0, 4).ok(), Some((b"0123".to_vec(), 10)));
+        assert_eq!(fs.read_range(p, 8, 100).ok(), Some((b"89".to_vec(), 10)));
+        assert_eq!(fs.read_range(p, 50, 4).ok(), Some((Vec::new(), 10)));
+        assert_eq!(
+            fs.read_range(p, 3, u64::MAX).map(|r| r.0.len()).ok(),
+            Some(7)
+        );
     }
 
     #[test]

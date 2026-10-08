@@ -16,6 +16,7 @@ use app_api::dto::{self, AgentState, AgentStatus, AlfaEvent, ModelProfile, TurnS
 use app_api::ids;
 
 use crate::engine::{ChatEngine, GenHandle};
+use crate::outcome::guarded;
 use crate::{agent, delegate, stream};
 
 /// Gdzie zapisać turę agentki.
@@ -193,11 +194,14 @@ impl ChatEngine {
             _ => None,
         };
         tokio::spawn(async move {
-            let outcome = match (delegation, setup) {
-                (Some(d), _) => delegate::run(&core, &req, &handle, d).await,
-                (None, Some(setup)) => agent::run(&core, &req, &handle, setup).await,
-                (None, None) => stream::generate(&core, &req, &handle).await,
-            };
+            let outcome = guarded(async {
+                match (delegation, setup) {
+                    (Some(d), _) => delegate::run(&core, &req, &handle, d).await,
+                    (None, Some(setup)) => agent::run(&core, &req, &handle, setup).await,
+                    (None, None) => stream::generate(&core, &req, &handle).await,
+                }
+            })
+            .await;
             if let Some(tap) = &req.tap {
                 let last = match &outcome.error {
                     Some(e) => app_api::ports::VoiceChunk::Failed(e.message.clone()),

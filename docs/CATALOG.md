@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 107 |
 | Specyfikacje w indeksie | 76 |
 | Manifesty `module.toml` | 67 |
-| Linie Rust (z testami) | 372 178 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2494 |
+| Linie Rust (z testami) | 372 405 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2498 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -32,9 +32,9 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `device-profile` | F1 | service | inproc | C · I · F | 2561 | 21 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
-| `platform` | — | — | — | C · F | 13 907 | 108 | kontrakt wspólny: platform-windows, platform-apps |  |
+| `platform` | — | — | — | C · F | 13 971 | 109 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 4837 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
-| `platform-windows` | F1, F5, F6 | service | inproc | I | 6607 | 55 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| `platform-windows` | F1, F5, F6 | service | inproc | I | 6656 | 56 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2161 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-ocr` | F1, F5, F6 | — | — | I | 266 | 2 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -113,7 +113,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `tools-browser` | F6 | tool | inproc | C · I · F | 1572 | 8 | [tools-browser](modules/tools-browser/SPEC.md) | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
 | `tools-clipboard` | F3 | tool | inproc | C · I · F | 995 | 9 | [tools-clipboard](modules/tools-clipboard/SPEC.md) | Odczyt (taint) i zapis schowka z cofaniem; historia schowka — szkic. |
 | `tools-common` | F3 | — | — | C | 2062 | 22 | [tools-common](modules/tools-common/SPEC.md) | Wspólny kontrakt narzędzi: manifest, `Tool`, `BrokerGate`, zasady ścieżek i treści niezaufanej. |
-| `tools-fs` | F3 | tool | inproc | C · I · F | 2645 | 22 | [tools-fs](modules/tools-fs/SPEC.md) | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza. |
+| `tools-fs` | F3 | tool | inproc | C · I · F | 2711 | 23 | [tools-fs](modules/tools-fs/SPEC.md) | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza. |
 | `tools-input` | F5–F6 | tool | inproc | C · I · F | 1694 | 16 | [tools-input](modules/tools-input/SPEC.md) | `SendInput` ze strażnikiem celów i przerwaniem przy fizycznym wejściu użytkownika. |
 | `tools-media` | F6 | tool | inproc | C · I · F | 3271 | 25 | [tools-media](modules/tools-media/SPEC.md) | Nagłówki multimediów bez ffmpeg, konwersje przez sidecar ffmpeg jako nowy plik z „Cofnij”, odtwarzanie w kolejce mówienia z duckingiem. |
 | `tools-net` | F6 | tool | inproc | C · I · F | 2951 | 26 | [tools-net](modules/tools-net/SPEC.md) | `net_fetch`/`net_download` tylko https do hostów publicznych, każdy host i przekierowanie przez Brokera, rebinding odrzucany, kwarantanna z SHA-256 i MOTW. |
@@ -144,7 +144,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-api` | — | — | — | pojedynczy | 5747 | 12 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4287 | 23 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 2075 | 5 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 2123 | 6 | — |  |
 | `app-core` | — | — | — | pojedynczy | 12 488 | 73 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3143 | 25 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
@@ -188,5 +188,5 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł z trójką crate’ów bez SPEC | 1 | `example-module` |
 | Crate `-impl` bez `module.toml` | 7 | `core-bus-impl`, `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
 | Crate bez `README.md` | 62 | `agent-builder-fake`, `agent-runtime-contract`, `agent-runtime-fake`, `app-agents`, `app-api`, `app-chat`, `app-models`, `app-modules`, `app-plugins`, `lib-media`, `lib-netguard`, `platform-apps-contract`, `platform-apps-fake`, `platform-windows-ocr-impl`, `plugin-runtime-contract`, `plugin-runtime-fake`, `plugin-runtime-impl`, `skills-fake`, `tools-browser-contract`, `tools-browser-fake`, `tools-browser-impl`, `tools-clipboard-contract`, `tools-clipboard-fake`, `tools-clipboard-impl`, `tools-common-contract`, `tools-fs-contract`, `tools-fs-fake`, `tools-fs-impl`, `tools-input-contract`, `tools-input-fake`, `tools-input-impl`, `tools-media-contract`, `tools-media-fake`, `tools-media-impl`, `tools-net-contract`, `tools-net-fake`, `tools-net-impl`, `tools-office-contract`, `tools-office-fake`, `tools-office-impl`, `tools-screen-contract`, `tools-screen-fake`, `tools-screen-impl`, `tools-shell-contract`, `tools-shell-fake`, `tools-shell-impl`, `tools-system-contract`, `tools-system-fake`, `tools-system-impl`, `tools-uia-contract`, `tools-uia-fake`, `tools-uia-impl`, `tools-vision-contract`, `tools-vision-fake`, `tools-vision-impl`, `tools-window-contract`, `tools-window-fake`, `tools-window-impl`, `ui-terminal-contract`, `ui-terminal-fake`, `ui-terminal-impl`, `voice-dialog-impl` |
-| Plik Rust powyżej 400 linii | 4 | `crates/tools-common-contract/src/call.rs` (436), `crates/tools-fs-impl/src/write.rs` (433), `crates/providers-local-impl/src/sidecar.rs` (414), `crates/tools-fs-contract/src/lib.rs` (406) |
+| Plik Rust powyżej 400 linii | 3 | `crates/tools-common-contract/src/call.rs` (436), `crates/providers-local-impl/src/sidecar.rs` (414), `crates/tools-fs-contract/src/lib.rs` (406) |
 | Crate powyżej 8000 linii w `src/` | 0 | brak |

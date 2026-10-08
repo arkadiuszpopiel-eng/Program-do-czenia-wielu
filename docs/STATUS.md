@@ -71,7 +71,7 @@ Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają
 | R-06 | **naprawione 2026-10-08**: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze | `app-models/src/jobs.rs`, `fetch.rs` | testy `download.rs`, `unpack.rs` zielone; brak testu regresji |
 | R-07 | **naprawione 2026-10-08**: model GGUF jest „zainstalowany” dopiero z rekordem `.sha256`, tak jak ocenia go dostawca lokalny (`app-models/src/view.rs`); testy `download.rs`, `bundles.rs` zielone | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
 | R-08 | **naprawione 2026-10-08**: limit startu modelu rośnie o 20 s na każdy gigabajt pliku (Bielik 4.5B: 140 s) — `providers-local-impl/src/sidecar.rs`; bez pomiaru na żywo | `providers-local-impl/src/config.rs` | podejrzenie |
-| R-09 | **częściowo naprawione 2026-10-08**: nieudany zapis odpowiedzi daje widoczny komunikat (`app-chat/src/finish.rs`). Otwarte: strażnik na wypadek paniki w zadaniu generacji | `app-chat/src/generate.rs`, `finish.rs` | podejrzenie |
+| R-09 | **naprawione 2026-10-08**: nieudany zapis odpowiedzi daje widoczny komunikat (`app-chat/src/finish.rs`); panika w przebiegu generacji kończy turę błędem zamiast zostawić ją na zawsze w stanie „pisze” (`outcome.rs::guarded`, test `panicking_generation_ends_as_failed_turn`). Uwaga: build wydaniowy powłoki ma `panic = "abort"` — tam strażnik nie działa, proces kończy się po zapisie paniki do dziennika; zmiana strategii paniki to decyzja właściciela | `app-chat/src/generate.rs`, `outcome.rs`, `finish.rs` | podejrzenie |
 
 Druga tura przeglądów (głos, pamięć, narzędzia agentek i transfer; 2026-10-08). Naprawione od razu:
 
@@ -139,8 +139,8 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
 | T-01 | **naprawione 2026-10-08**: segmenty będące nazwami urządzeń Windows (`CON`, `NUL`, `COM1`, `nul.txt`…) są odrzucane przy rozwiązywaniu ścieżki — `tools-common-contract/src/device.rs` (testy), `paths.rs::resolve` | `tools-common-contract/src/paths.rs::resolve` | potwierdzone |
-| T-02 | `fs_read` i `fs_write` wczytują cały plik do pamięci (limit dotyczy tylko tego, co pokazane) — plik 20 GB może zabić proces | `tools-fs-impl/src/read.rs`, `write.rs`, `FsPort` | potwierdzone |
-| T-03 | **naprawione 2026-10-08**: limit zapisu obejmuje plik po dopisaniu — `tools-fs-impl/src/write.rs`; brak testu regresji | `tools-fs-impl/src/write.rs` | potwierdzone |
+| T-02 | **naprawione 2026-10-08**: `FsPort::read_range` (domyślnie przez `read`, w `WinFs` otwarcie + przesunięcie + odczyt najwyżej `max` bajtów, deny-lista jak przy `read`); `fs_read` czyta tylko żądany zakres, `fs_write` czyta starą treść wyłącznie przy dopisywaniu i najwyżej do limitu zapisu. Testy: `platform-contract` (domyślna implementacja), `platform-windows-impl/tests/fs_port.rs::read_range_returns_slice_and_total_size`, `tools-fs-impl/tests/review.rs`. Przeszukiwanie treści nadal czyta cały plik, ale tylko do `search_file_max_bytes` | `tools-fs-impl/src/read.rs`, `write.rs`, `platform-contract/src/fs.rs`, `platform-windows-impl/src/fs` | potwierdzone |
+| T-03 | **naprawione 2026-10-08**: limit zapisu obejmuje plik po dopisaniu — `tools-fs-impl/src/write.rs`; test `tools-fs-impl/tests/review.rs::append_respects_limit_and_other_modes_ignore_old_content` | `tools-fs-impl/src/write.rs` | potwierdzone |
 | T-04 | **naprawione 2026-10-08**: wpis katalogu dopasowywany bez rozróżniania wielkości liter na Windows; zapas nie czyta całego pliku i nie uznaje nieczytelnego pliku za katalog — `tools-fs-impl/src/core.rs` | `tools-fs-impl/src/core.rs` | potwierdzone |
 | T-05 | **naprawione 2026-10-08**: `fs_search` podaje, ilu plików nie przeszukał (za duże albo nietekstowe) — `tools-fs-impl/src/read.rs` | `tools-fs-impl/src/read.rs` | potwierdzone |
 | T-06 | Zakres zgody Brokera jest liczony z nierozwiązanej ścieżki — dowiązanie w katalogu roboczym może wyprowadzić poza zakres (lista zakazów nadal działa) | `tools-fs-impl/src/core.rs` | podejrzenie — do przeglądu z Brokerem |
@@ -151,9 +151,8 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
 - *Czekają na decyzję właściciela:* R-05 (przypięcie sum kontrolnych silników), R-10 (częściowe „Cofnij” — adapter
   Brokera), R-20 (edycja oczekującej propozycji pamięci i zaufanie do „zapamiętaj”), R-21 (licznik limitu mostów —
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
-- *Do zrobienia bez decyzji, nietknięte:* R-13, strażnik paniki (reszta R-09), zadania mostów przy „Zatrzymaj
-  sterowanie” (reszta R-22), rdzeniowa część R-25, pola w DTO dla R-04, R-12 i R-16, T-02 (odczyt zakresowy w
-  porcie plików).
+- *Do zrobienia bez decyzji, nietknięte:* R-13, zadania mostów przy „Zatrzymaj sterowanie” (reszta R-22),
+  rdzeniowa część R-25, pola w DTO dla R-04, R-12 i R-16.
 - *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-01, R-02, R-03, R-06, R-08, R-14, schowek dla
   głosu, dyktowanie przy STOP, wyciek dzierżawy pamięci.
 

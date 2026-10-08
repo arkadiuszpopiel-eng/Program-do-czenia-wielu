@@ -137,6 +137,16 @@ impl FsPort for WinFs {
         fs::read(&op).map_err(|e| from_io(&e, path))
     }
 
+    fn read_range(
+        &self,
+        path: &Path,
+        offset: u64,
+        max: u64,
+    ) -> Result<(Vec<u8>, u64), PlatformError> {
+        let op = self.policy.resolve(path, Follow::Final)?;
+        ops::read_range_file(&op, offset, max).map_err(|e| from_io(&e, path))
+    }
+
     fn write_atomic(&self, path: &Path, data: &[u8]) -> Result<OpReceipt, PlatformError> {
         let op = self.policy.resolve(path, Follow::Final)?;
         // Zapis przez dowiązanie trafia do celu (sprawdzonego przez deny-listę w `resolve`).

@@ -130,28 +130,25 @@ impl Core {
     ) -> Step<ToolOutcome> {
         let a: ReadArgs = parse_args(args)?;
         let (path, auths) = self.read_access(ctx, m, &a.path, false).await?;
-        let data = match self.fs.read(Path::new(&path)) {
+        let max = u64::from(
+            a.max_bytes
+                .unwrap_or(self.config.read_max_bytes)
+                .min(self.config.read_max_bytes),
+        );
+        // Tylko żądany zakres: początek pliku o rozmiarze gigabajtów nie trafia w całości do pamięci.
+        let wanted = a.offset.unwrap_or(0);
+        let (data, total) = match self.fs.read_range(Path::new(&path), wanted, max) {
             Ok(d) => d,
             Err(e) => {
                 let out = platform_failure(&e, &format!("odczyt „{path}”"));
                 return Ok(self.done(ctx, m, &auths, out).await);
             }
         };
-        let total = data.len() as u64;
-        let offset = a.offset.unwrap_or(0).min(total);
-        let max = u64::from(
-            a.max_bytes
-                .unwrap_or(self.config.read_max_bytes)
-                .min(self.config.read_max_bytes),
-        );
-        let start = usize::try_from(offset)
-            .unwrap_or(usize::MAX)
-            .min(data.len());
-        let end = usize::try_from(offset.saturating_add(max))
-            .unwrap_or(usize::MAX)
-            .min(data.len());
-        let slice = &data[start..end];
-        let truncated = (end as u64) < total;
+        let offset = wanted.min(total);
+        let start = offset;
+        let end = offset.saturating_add(data.len() as u64);
+        let slice = data.as_slice();
+        let truncated = end < total;
         report_untrusted(&self.gate, ctx, TaintSource::File).await;
         let (content, binary) = match text::decode_text(slice) {
             Some(t) => (text::redact_secrets(&t), false),

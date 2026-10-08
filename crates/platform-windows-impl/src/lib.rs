@@ -95,6 +95,14 @@ impl FsPort for WindowsPlatform {
     fn read(&self, path: &Path) -> Result<Vec<u8>, PlatformError> {
         self.fs.read(path)
     }
+    fn read_range(
+        &self,
+        path: &Path,
+        offset: u64,
+        max: u64,
+    ) -> Result<(Vec<u8>, u64), PlatformError> {
+        self.fs.read_range(path, offset, max)
+    }
     fn write_atomic(&self, path: &Path, data: &[u8]) -> Result<OpReceipt, PlatformError> {
         self.fs.write_atomic(path, data)
     }

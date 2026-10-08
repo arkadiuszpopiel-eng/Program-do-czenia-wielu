@@ -1,9 +1,12 @@
 //! Wynik generacji (do zapisu w historii i zdarzeń końcowych) i klasyfikacja zakończenia strumienia
 //! dostawcy: status tury, powód zatrzymania, błąd z komunikatem PL bez sekretów.
 
+use std::future::Future;
+use std::panic::AssertUnwindSafe;
 use std::time::Duration;
 
 use app_api::dto::{self, StopReason, TurnError, TurnErrorCode, TurnStatus};
+use futures_util::FutureExt;
 use providers_contract::{ProviderError, ProviderErrorKind, StopReason as PStop, Usage};
 use sessions_contract::Block as SBlock;
 
@@ -64,6 +67,23 @@ pub(crate) fn turn_error(
         message: message.into(),
         retry_at: None,
         provider: provider.map(str::to_owned),
+    }
+}
+
+/// Generacja ze strażnikiem: panika w przebiegu kończy turę błędem zamiast zostawić ją na zawsze
+/// w stanie „pisze" z zajętą sesją. Działa w buildach z odwijaniem stosu; build wydaniowy powłoki
+/// ma `panic = "abort"` — tam proces kończy się po zapisie paniki do dziennika (`app-logs`).
+pub(crate) async fn guarded(run: impl Future<Output = Outcome>) -> Outcome {
+    match AssertUnwindSafe(run).catch_unwind().await {
+        Ok(outcome) => outcome,
+        Err(_) => {
+            tracing::error!("generacja przerwana paniką — tura zakończona błędem");
+            Outcome::failed(turn_error(
+                TurnErrorCode::Provider,
+                "Odpowiedź przerwana przez błąd wewnętrzny Alfy. Szczegóły są w dzienniku; spróbuj ponownie.",
+                None,
+            ))
+        }
     }
 }
 
@@ -172,6 +192,30 @@ pub(crate) fn classify(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// R-09: panika w przebiegu daje turę z błędem, a zwykły wynik przechodzi bez zmian.
+    #[tokio::test]
+    async fn panicking_generation_ends_as_failed_turn() {
+        let failed = guarded(async {
+            if std::hint::black_box(true) {
+                std::panic::panic_any("awaria testowa");
+            }
+            Outcome::failed(turn_error(TurnErrorCode::Offline, "inny", None))
+        })
+        .await;
+        assert_eq!(failed.status, TurnStatus::Error);
+        let error = failed.error.expect("błąd tury");
+        assert_eq!(error.code, TurnErrorCode::Provider);
+        assert!(
+            error.message.contains("błąd wewnętrzny"),
+            "{}",
+            error.message
+        );
+        let kept =
+            guarded(async { Outcome::failed(turn_error(TurnErrorCode::Offline, "sieć", None)) })
+                .await;
+        assert_eq!(kept.error.map(|e| e.code), Some(TurnErrorCode::Offline));
+    }
 
     #[test]
     fn local_model_errors_are_plain_sentences_without_provider_prefix() {

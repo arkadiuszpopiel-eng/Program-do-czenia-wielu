@@ -2,7 +2,7 @@
 //! Część specyficzna dla Windows (przeniesienie bez nadpisania, Kosz) jest w `native`/`recycle`.
 
 use std::fs;
-use std::io::{self, Write};
+use std::io::{self, Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::SystemTime;
@@ -84,6 +84,17 @@ pub(crate) fn write_atomic_file(path: &Path, data: &[u8]) -> io::Result<()> {
 }
 
 /// Przywraca kopię zapasową nad `path` (kopiowanie do pliku tymczasowego + `rename`).
+/// Najwyżej `max` bajtów od `offset` oraz rozmiar całego pliku; czyta tylko żądany zakres.
+pub(crate) fn read_range_file(path: &Path, offset: u64, max: u64) -> io::Result<(Vec<u8>, u64)> {
+    let mut file = fs::File::open(path)?;
+    let total = file.metadata()?.len();
+    let start = offset.min(total);
+    file.seek(SeekFrom::Start(start))?;
+    let mut data = Vec::new();
+    file.take(max).read_to_end(&mut data)?;
+    Ok((data, total))
+}
+
 pub(crate) fn restore_backup(backup: &Path, path: &Path) -> io::Result<()> {
     let tmp = sibling_tmp(path);
     let result = fs::copy(backup, &tmp).and_then(|_| fs::rename(&tmp, path));

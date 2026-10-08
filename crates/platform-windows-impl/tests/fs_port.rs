@@ -186,7 +186,27 @@ fn denylist_is_enforced_for_every_operation() {
     assert!(fs.is_denied(&secret));
     let upper = dir.path().join(".CODEX.").join("auth.json");
     assert!(matches!(fs.read(&upper), Err(PlatformError::Denylisted(_))));
+    assert!(matches!(
+        fs.read_range(&secret, 0, 2),
+        Err(PlatformError::Denylisted(_))
+    ));
     assert_eq!(fs::read(&secret).unwrap(), b"token");
+}
+
+/// T-02: odczyt zakresu zwraca fragment i rozmiar pliku, bez wczytywania reszty.
+#[test]
+fn read_range_returns_slice_and_total_size() {
+    let (dir, fs) = setup();
+    let file = dir.path().join("dane.bin");
+    fs::write(&file, b"0123456789").unwrap();
+    assert_eq!(fs.read_range(&file, 0, 4).unwrap(), (b"0123".to_vec(), 10));
+    assert_eq!(fs.read_range(&file, 8, 100).unwrap(), (b"89".to_vec(), 10));
+    assert_eq!(fs.read_range(&file, 50, 4).unwrap(), (Vec::new(), 10));
+    assert_eq!(fs.read_range(&file, 0, 0).unwrap(), (Vec::new(), 10));
+    assert!(matches!(
+        fs.read_range(&dir.path().join("brak.bin"), 0, 4),
+        Err(PlatformError::NotFound(_))
+    ));
 }
 
 #[test]

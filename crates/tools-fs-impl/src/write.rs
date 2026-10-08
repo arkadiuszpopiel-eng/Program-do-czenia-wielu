@@ -5,13 +5,9 @@
 use risk_classifier_contract::Destructiveness;
 use safety_broker_contract::Capability;
 use tools_common_contract::{
-    Authorization, ToolCtx, ToolErrorKind, ToolIntent, ToolManifest, ToolOutcome, ToolStatus,
-    parse_args,
+    Authorization, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, parse_args,
 };
-use tools_fs_contract::{
-    FromToArgs, INTENT_CONFIRM_DELETE_PERMANENT, MutationOutput, PathArgs, RenameArgs, WriteArgs,
-    WriteMode,
-};
+use tools_fs_contract::{FromToArgs, MutationOutput, PathArgs, RenameArgs, WriteArgs, WriteMode};
 use undo_journal_contract::UndoError;
 
 use crate::core::{Core, Step, platform_failure};
@@ -20,7 +16,7 @@ use crate::core::{Core, Step, platform_failure};
 /// katalogi, cofnięcie je usuwa); znacznik jest usuwany w tym samym kroku dziennika.
 pub const MKDIR_MARKER: &str = ".alfa-mkdir.tmp";
 
-fn out_value(
+pub(crate) fn out_value(
     paths: Vec<String>,
     bytes: u64,
     undo_step: Option<u64>,
@@ -36,7 +32,7 @@ fn out_value(
 }
 
 impl Core {
-    async fn mutate_access(
+    pub(crate) async fn mutate_access(
         &self,
         ctx: &ToolCtx,
         m: &ToolManifest,
@@ -59,7 +55,7 @@ impl Core {
         self.authorize(ctx, m, caps, action).await
     }
 
-    async fn journaled(
+    pub(crate) async fn journaled(
         &self,
         ctx: &ToolCtx,
         m: &ToolManifest,
@@ -115,7 +111,14 @@ impl Core {
             )
             .await?;
         let p = Core::path_buf(&path);
-        let existing = match self.fs.read(&p) {
+        // Stara treść jest potrzebna tylko przy dopisywaniu — i tylko gdy wynik zmieści się
+        // w limicie; w pozostałych trybach wystarczy wiedzieć, czy plik istnieje (zakres pusty).
+        let limit = self.config.write_max_bytes;
+        let wanted = match a.mode {
+            WriteMode::Append => limit,
+            _ => 0,
+        };
+        let existing = match self.fs.read_range(&p, 0, wanted) {
             Ok(d) => Some(d),
             Err(platform_contract::PlatformError::NotFound(_)) => None,
             Err(e) => {
@@ -134,21 +137,25 @@ impl Core {
                 );
                 return Ok(self.done(ctx, m, &auths, out).await);
             }
-            (WriteMode::Append, Some(mut old)) => {
+            // Limit dotyczy pliku po zapisie, nie tylko dopisywanej treści — inaczej `append`
+            // pozwalał rosnąć plikowi bez końca (każde dopisanie zapisuje całość z kopią w dzienniku).
+            (WriteMode::Append, Some((_, total)))
+                if total.saturating_add(a.content.len() as u64) > limit =>
+            {
+                let out = ToolOutcome::failed(
+                    ToolErrorKind::InvalidArgs,
+                    format!(
+                        "Nie wykonano: {action} — plik po dopisaniu przekroczyłby limit zapisu."
+                    ),
+                );
+                return Ok(self.done(ctx, m, &auths, out).await);
+            }
+            (WriteMode::Append, Some((mut old, _))) => {
                 old.extend_from_slice(a.content.as_bytes());
                 old
             }
             _ => a.content.into_bytes(),
         };
-        // Limit dotyczy pliku po zapisie, nie tylko dopisywanej treści — inaczej `append` pozwalał
-        // rosnąć plikowi bez końca (każde dopisanie czyta i zapisuje całość z kopią w dzienniku).
-        if data.len() as u64 > self.config.write_max_bytes {
-            let out = ToolOutcome::failed(
-                ToolErrorKind::InvalidArgs,
-                format!("Nie wykonano: {action} — plik po dopisaniu przekroczyłby limit zapisu."),
-            );
-            return Ok(self.done(ctx, m, &auths, out).await);
-        }
         let bytes = data.len() as u64;
         let journal = self.journal.clone();
         let out = self
@@ -283,92 +290,6 @@ impl Core {
                     (
                         format!("Skopiowano „{from}” → „{to}”. Krok można cofnąć."),
                         out_value(vec![from.clone(), to.clone()], 0, Some(id), true),
-                    )
-                },
-            )
-            .await)
-    }
-
-    /// `fs_delete` (do Kosza).
-    pub(crate) async fn delete(
-        &self,
-        args: serde_json::Value,
-        ctx: &ToolCtx,
-        m: &ToolManifest,
-    ) -> Step<ToolOutcome> {
-        let a: PathArgs = parse_args(args)?;
-        let path = self.resolve(&a.path, ctx, m).await?;
-        let action = format!("usunięcie do Kosza „{path}”");
-        let caps = vec![(
-            Capability::FsWrite(self.scope(&path, false)?),
-            m.reversible,
-            Destructiveness::Recoverable,
-        )];
-        let auths = self.mutate_access(ctx, m, caps, &action).await?;
-        let p = Core::path_buf(&path);
-        let journal = self.journal.clone();
-        Ok(self
-            .journaled(
-                ctx,
-                m,
-                &auths,
-                false,
-                |step| journal.delete(step, &p),
-                |id| {
-                    (
-                        format!("Przeniesiono „{path}” do Kosza. Krok można cofnąć."),
-                        out_value(vec![path.clone()], 0, Some(id), false),
-                    )
-                },
-            )
-            .await)
-    }
-
-    /// `fs_delete_permanent`: wykonane wyłącznie po zatwierdzeniu w Broker-UI; gdy poziom
-    /// autonomii pozwoliłby bez pytania — intencja potwierdzenia dla UI (nic nie usunięto).
-    pub(crate) async fn delete_permanent(
-        &self,
-        args: serde_json::Value,
-        ctx: &ToolCtx,
-        m: &ToolManifest,
-    ) -> Step<ToolOutcome> {
-        let a: PathArgs = parse_args(args)?;
-        let path = self.resolve(&a.path, ctx, m).await?;
-        let action = format!("trwałe usunięcie „{path}”");
-        let caps = vec![(
-            Capability::FsWrite(self.scope(&path, false)?),
-            m.reversible,
-            Destructiveness::Permanent,
-        )];
-        let auths = self.mutate_access(ctx, m, caps, &action).await?;
-        if auths.iter().all(|a| a.approval.is_none()) {
-            let mut out = ToolOutcome::ok(
-                format!(
-                    "Nie usunięto: {action} wymaga potwierdzenia właściciela. Pokazałam kartę potwierdzenia; rozważ usunięcie do Kosza (`fs_delete`)."
-                ),
-                out_value(vec![path.clone()], 0, None, true),
-            );
-            out.status = ToolStatus::NeedsConfirmation;
-            out.intent = Some(ToolIntent {
-                kind: INTENT_CONFIRM_DELETE_PERMANENT.to_owned(),
-                title: format!("Usunąć trwale „{path}”?"),
-                details: serde_json::json!({ "paths": [path] }),
-            });
-            return Ok(self.done(ctx, m, &auths, out).await);
-        }
-        let p = Core::path_buf(&path);
-        let journal = self.journal.clone();
-        Ok(self
-            .journaled(
-                ctx,
-                m,
-                &auths,
-                true,
-                |step| journal.delete_permanent(step, &p),
-                |id| {
-                    (
-                        format!("Usunięto trwale „{path}” (po zatwierdzeniu właściciela)."),
-                        out_value(vec![path.clone()], 0, Some(id), false),
                     )
                 },
             )

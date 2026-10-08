@@ -79,3 +79,50 @@ async fn search_reports_files_whose_content_was_not_searched() {
         .await;
     assert!(!out.text.contains("Nie przeszukano"), "{}", out.text);
 }
+
+/// T-02 i T-03: dopisywanie liczy limit dla pliku po zapisie (bez wczytywania ponad limit),
+/// a `overwrite` i `create` nie potrzebują starej treści — tylko wiedzy, czy plik istnieje.
+#[tokio::test]
+async fn append_respects_limit_and_other_modes_ignore_old_content() {
+    const DOC: &str = "/Users/ala/Documents/dziennik.txt";
+    let big = "a".repeat(6 * 1024 * 1024);
+    let h = harness(&[(DOC, big.as_str())]);
+    let over = h
+        .call(
+            K::Write,
+            json!({ "path": DOC, "content": big, "mode": "append" }),
+        )
+        .await;
+    assert!(!over.is_ok(), "dopisanie ponad limit: {:?}", over.status);
+    assert!(over.text.contains("limit zapisu"), "{}", over.text);
+    assert_eq!(h.file(DOC).map(|f| f.len()), Some(big.len()));
+
+    let small = h
+        .call(
+            K::Write,
+            json!({ "path": DOC, "content": "-koniec", "mode": "append" }),
+        )
+        .await;
+    assert!(small.is_ok(), "{:?}", small.status);
+    let after = h.file(DOC).unwrap();
+    assert_eq!(after.len(), big.len() + 7);
+    assert!(after.ends_with("a-koniec"));
+
+    let exists = h
+        .call(
+            K::Write,
+            json!({ "path": DOC, "content": "x", "mode": "create" }),
+        )
+        .await;
+    assert!(!exists.is_ok(), "create na istniejącym pliku ma odmówić");
+    assert_eq!(h.file(DOC).map(|f| f.len()), Some(big.len() + 7));
+
+    let replaced = h
+        .call(
+            K::Write,
+            json!({ "path": DOC, "content": "nowa", "mode": "overwrite" }),
+        )
+        .await;
+    assert!(replaced.is_ok(), "{:?}", replaced.status);
+    assert_eq!(h.file(DOC).as_deref(), Some("nowa"));
+}
