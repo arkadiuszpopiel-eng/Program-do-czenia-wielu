@@ -89,7 +89,9 @@
   <footer class="foot">
     {#if status === 'pending'}
       <span class="hint">{text.hint}</span>
-      <Button variant="primary" size="sm" onclick={onopenbroker}>{text.open}</Button>
+      {#if onopenbroker}
+        <Button variant="primary" size="sm" onclick={onopenbroker}>{text.open}</Button>
+      {/if}
     {:else}
       <span class="done" role="status">{text.status[status]}</span>
     {/if}

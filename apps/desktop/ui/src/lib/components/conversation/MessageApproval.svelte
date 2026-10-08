@@ -37,7 +37,7 @@
   reversible={approval.reversible}
   risk={approval.risk}
   status={approval.status}
-  onopenbroker={openBroker}
+  onopenbroker={app.broker.safeState ? undefined : openBroker}
   labels={{
     title: t('approval.title', { name: agents[agent].name }),
     what: t('approval.what'),

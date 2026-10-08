@@ -55,8 +55,11 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(alert).toContainText('wszystko, co wymaga zgody, jest odrzucane');
       await expect(region.getByRole('button', { name: 'Ukryj komunikat' })).toHaveCount(0);
       await expect(page.getByText(/Broker jest niedostępny — tej prośby nie da się/)).toBeVisible();
-      await page.getByRole('button', { name: /Otwórz w oknie Brokera/ }).click();
-      await expect(page.getByText(/okno jest niedostępne — bezpieczny stan/)).toBeVisible();
+      // Opis z przyczyną pada raz (wcześniej baner powtarzał to samo zdanie), a karta nie udaje,
+      // że okno Brokera da się otworzyć.
+      await expect(alert.getByText(/Bezpieczny stan/)).toHaveCount(1);
+      await expect(alert).toContainText('proces Brokera zakończył działanie');
+      await expect(page.getByRole('button', { name: /Otwórz w oknie Brokera/ })).toHaveCount(0);
       await expectAccessible(page, `Broker zerwany ${theme}`);
       await region.getByRole('button', { name: 'Szczegóły' }).click();
       await expect(page.getByText('· Połączenie zerwane — bezpieczny stan')).toBeVisible();

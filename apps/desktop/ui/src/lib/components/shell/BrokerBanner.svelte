@@ -22,10 +22,9 @@
     ondismiss={sticky || banner === 'connecting' ? undefined : () => app.broker.dismiss(banner)}
     dismissLabel={t('banner.dismiss')}
   >
-    {t(`broker.banner.${banner}`)}
-    {#if sticky && detail}
-      <span class="detail">{app.i18n.text(detail)}</span>
-    {/if}
+    <!-- Opis z rdzenia to to samo zdanie z dopisaną przyczyną — pokazujemy je zamiast ogólnego,
+         nie obok (wcześniej baner mówił dwa razy to samo). -->
+    {sticky && detail ? app.i18n.text(detail) : t(`broker.banner.${banner}`)}
     {#snippet actions()}
       <Button size="sm" variant="secondary" onclick={() => app.openSettings('permissions')}>
         {t('broker.banner.details')}
@@ -33,12 +32,3 @@
     {/snippet}
   </Banner>
 {/if}
-
-<style>
-  .detail {
-    display: block;
-    margin-top: var(--alfa-space-1);
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-xs);
-  }
-</style>
