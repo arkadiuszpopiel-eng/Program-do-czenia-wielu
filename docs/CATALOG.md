@@ -186,7 +186,8 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | --- | ---: | --- |
 | SPEC w indeksie bez crate’a w `crates/` (moduły UI i powłoki są poza `crates/`) | 6 | `models`, `shell-integration`, `notify`, `ui-kit`, `ui-shell`, `ui-quick` |
 | Moduł z trójką crate’ów bez SPEC | 1 | `example-module` |
-| Crate `-impl` bez `module.toml` | 7 | `core-bus-impl`, `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
+| Crate `-impl` bez `module.toml` | 1 | `core-bus-impl` |
+| Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | 6 | `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
 | Crate bez `README.md` | 0 | brak |
 | Plik Rust powyżej 400 linii | 0 | brak |
 | Crate powyżej 8000 linii w `src/` | 0 | brak |

@@ -188,8 +188,17 @@ const specWithoutCrate = [...specs.keys()].filter(
 const moduleWithoutSpec = [...modules.values()]
   .filter((m) => !m.spec && !m.sharedBy.length && m.crates.some((c) => c.role !== 'single'))
   .map((m) => m.base);
+// Części modułu wielocrate'owego (np. `platform-windows-gui-impl` obok `platform-windows-impl`)
+// dzielą manifest crate'a głównego — to nie jest brak manifestu.
+const manifestBases = crates
+  .filter((c) => c.role === 'impl' && c.manifest)
+  .map((c) => c.name.replace(/-impl$/, ''));
+const partOfModule = (c) => manifestBases.some((base) => c.name.startsWith(`${base}-`));
+const implParts = crates
+  .filter((c) => c.role === 'impl' && !c.manifest && partOfModule(c))
+  .map((c) => c.name);
 const implWithoutManifest = crates
-  .filter((c) => c.role === 'impl' && !c.manifest)
+  .filter((c) => c.role === 'impl' && !c.manifest && !partOfModule(c))
   .map((c) => c.name);
 const withoutReadme = crates.filter((c) => !c.readme).map((c) => c.name);
 const longFiles = crates.flatMap((c) => c.long).sort((a, b) => b.lines - a.lines);
@@ -204,6 +213,7 @@ out.push(
   `| SPEC w indeksie bez crate’a w \`crates/\` (moduły UI i powłoki są poza \`crates/\`) | ${specWithoutCrate.length} | ${list(specWithoutCrate)} |`,
   `| Moduł z trójką crate’ów bez SPEC | ${moduleWithoutSpec.length} | ${list(moduleWithoutSpec)} |`,
   `| Crate \`-impl\` bez \`module.toml\` | ${implWithoutManifest.length} | ${list(implWithoutManifest)} |`,
+  `| Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | ${implParts.length} | ${list(implParts)} |`,
   `| Crate bez \`README.md\` | ${withoutReadme.length} | ${list(withoutReadme)} |`,
   `| Plik Rust powyżej ${FILE_LIMIT} linii | ${longFiles.length} | ${longFiles.map((f) => `\`${f.file}\` (${f.lines})`).join(', ') || 'brak'} |`,
   `| Crate powyżej ${num(CRATE_LIMIT)} linii w \`src/\` | ${bigCrates.length} | ${bigCrates.map((c) => `\`${c.name}\` (${num(c.srcLines)})`).join(', ') || 'brak'} |`,
