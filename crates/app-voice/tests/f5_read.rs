@@ -177,3 +177,34 @@ async fn password_field_and_empty_clipboard_are_refused() {
         "nic nie zostało przeczytane"
     );
 }
+
+/// R-16 (docs/STATUS.md): bez silników mowy czytanie i dyktowanie są „niedostępne” z powodem,
+/// który mówi, czego brakuje — a po ich doinstalowaniu wracają bez restartu.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn missing_speech_engines_make_read_and_dictation_unavailable() {
+    use app_api::dto::DictationStateView;
+
+    let world = World::new();
+    let a = app(world.clone());
+    let ready = a.view().await;
+    assert_eq!(ready.read.state, ReadStateView::Idle);
+    assert_eq!(ready.dictation.state, DictationStateView::Idle);
+
+    *world.missing.lock().unwrap() = (
+        vec!["whisper-server".into(), "model STT".into()],
+        vec!["silnik TTS".into()],
+    );
+    let v = a.view().await;
+    assert_eq!(v.read.state, ReadStateView::Unavailable);
+    assert_eq!(v.dictation.state, DictationStateView::Unavailable);
+    let read = v.read.reason.expect("powód czytania");
+    assert!(read.pl.contains("silnik TTS"), "{}", read.pl);
+    assert!(read.pl.contains("Modele i silniki"), "{}", read.pl);
+    let dict = v.dictation.reason.expect("powód dyktowania");
+    assert!(dict.pl.contains("whisper-server, model STT"), "{}", dict.pl);
+
+    *world.missing.lock().unwrap() = (Vec::new(), Vec::new());
+    let back = a.view().await;
+    assert_eq!(back.read.state, ReadStateView::Idle);
+    assert_eq!(back.dictation.state, DictationStateView::Idle);
+}

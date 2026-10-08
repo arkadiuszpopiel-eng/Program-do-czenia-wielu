@@ -79,6 +79,24 @@ impl FeatureFactory for SystemVoice {
         Some(self.audio.clone())
     }
 
+    fn dictation_missing(&self) -> Vec<String> {
+        let mut out = Vec::new();
+        if !app_modules::stt::server_cpu(&self.paths).is_file() {
+            out.push(MISSING_STT_SIDECAR.to_owned());
+        }
+        if app_modules::stt::model(&self.paths).is_none() {
+            out.push(crate::system::MISSING_STT_MODEL.to_owned());
+        }
+        out
+    }
+
+    fn read_missing(&self) -> Vec<String> {
+        match self.tts_ready() {
+            Some(_) => Vec::new(),
+            None => vec![MISSING_TTS.to_owned()],
+        }
+    }
+
     fn dictation_audio(&self) -> Result<DictationAudio, String> {
         if !self.paths.sidecar("whisper", "whisper-server").is_file() {
             return Err(format!("brak {MISSING_STT_SIDECAR}"));

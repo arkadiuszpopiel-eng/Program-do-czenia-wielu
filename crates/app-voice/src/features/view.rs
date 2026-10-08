@@ -87,6 +87,15 @@ fn unavailable(pl: &str, en: &str) -> Option<LocalizedText> {
     Some(text(pl, en))
 }
 
+/// „Czego brakuje” funkcji głosu — z miejscem, gdzie to pobrać.
+fn missing_text(pl: &str, en: &str, missing: &[String]) -> LocalizedText {
+    let list = missing.join(", ");
+    text(
+        format!("{pl}: brakuje — {list}. Pobierz w Ustawieniach → Modele i silniki."),
+        format!("{en}: missing — {list}. Download it in Settings → Models and engines."),
+    )
+}
+
 fn wake_view(st: &F5State) -> WakeWordsView {
     let cal = st.calibration;
     let calibration = WakeCalibrationView {
@@ -183,7 +192,11 @@ fn speaker_view(status: Result<EnrollmentStatus, String>, st: &F5State) -> Speak
 
 fn dictation_view(f5: &F5, st: &F5State) -> DictationView {
     let d = &st.dictation;
-    let available = f5.deps.desktop.is_some() && f5.parts().is_some();
+    // Bez silnika albo modelu STT dyktowanie nie ruszy — widok ma to mówić od razu, a nie
+    // dopiero po naciśnięciu skrótu.
+    let missing = f5.parts().map(|p| p.dictation_missing());
+    let composed = f5.deps.desktop.is_some() && missing.is_some();
+    let available = composed && missing.as_ref().is_some_and(Vec::is_empty);
     let status = d.status.as_ref().filter(|_| d.active());
     let state = match (available, status.map(|s| s.phase)) {
         (false, _) => DictationStateView::Unavailable,
@@ -192,10 +205,15 @@ fn dictation_view(f5: &F5, st: &F5State) -> DictationView {
         (true, _) => DictationStateView::Idle,
     };
     let reason = match status.map(|s| s.phase) {
-        _ if !available => unavailable(
+        _ if !composed => unavailable(
             "Dyktowanie wymaga modułów pulpitu (Windows) i modelu STT.",
             "Dictation needs the desktop modules (Windows) and an STT model.",
         ),
+        _ if !available => Some(missing_text(
+            "Dyktowanie",
+            "Dictation",
+            missing.as_deref().unwrap_or_default(),
+        )),
         Some(DictationPhase::Paused(r)) => Some(pause_text(r)),
         _ => d.refused.clone(),
     };
@@ -214,7 +232,8 @@ fn dictation_view(f5: &F5, st: &F5State) -> DictationView {
 
 fn read_view(f5: &F5, st: &F5State) -> ReadAloudView {
     let r = &st.read;
-    let available = f5.parts().is_some();
+    let missing = f5.parts().map(|p| p.read_missing());
+    let available = missing.as_ref().is_some_and(Vec::is_empty);
     let status = r.status.as_ref().filter(|_| r.active());
     let state = match (available, status.map(|s| s.phase)) {
         (false, _) => ReadStateView::Unavailable,
@@ -224,13 +243,13 @@ fn read_view(f5: &F5, st: &F5State) -> ReadAloudView {
     };
     ReadAloudView {
         state,
-        reason: if available {
-            r.refused.clone()
-        } else {
-            unavailable(
+        reason: match &missing {
+            _ if available => r.refused.clone(),
+            Some(list) => Some(missing_text("Czytanie na głos", "Read aloud", list)),
+            None => unavailable(
                 "Czytanie wymaga syntezy mowy (Pocket TTS / Piper).",
                 "Reading needs speech synthesis (Pocket TTS / Piper).",
-            )
+            ),
         },
         app: status.and_then(|s| s.app.clone()),
         index: status.map_or(0, |s| u32::try_from(s.index).unwrap_or(u32::MAX)),

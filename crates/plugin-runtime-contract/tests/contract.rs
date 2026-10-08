@@ -216,6 +216,34 @@ fn library_rejects_tampering_and_wrong_state() {
     assert_eq!(lib.active().count(), 1);
 }
 
+/// R-25 (docs/STATUS.md): `enable` dostaje tylko identyfikator, więc dwie wyłączone wersje tej
+/// samej wtyczki nie mogą współistnieć — zatwierdzenie nowszej zastępuje starszą wyłączoną.
+#[test]
+fn at_most_one_disabled_version_per_plugin() {
+    let mut lib = PluginLibrary::default();
+    let v1 = samples::manifest("licznik", "1.0.0", &WASM);
+    let (r1, _) = lib.propose(v1.clone(), PluginSource::User, 1).unwrap();
+    lib.approve(&v1.id, &v1.version, PluginApproval::ui(&r1.review_hash), 2)
+        .unwrap();
+    lib.disable(&v1.id, 3).unwrap();
+    let v2 = samples::manifest("licznik", "2.0.0", &WASM);
+    let (r2, _) = lib.propose(v2.clone(), PluginSource::User, 4).unwrap();
+    lib.approve(&v2.id, &v2.version, PluginApproval::ui(&r2.review_hash), 5)
+        .unwrap();
+    lib.disable(&v2.id, 6).unwrap();
+    assert_ne!(r1.review_hash, r2.review_hash);
+
+    // Hash starszej wersji nie włącza niczego: jedyną wyłączoną jest 2.0.0.
+    let old = lib.enable(&v1.id, PluginApproval::ui(&r1.review_hash), 7);
+    assert!(matches!(old, Err(PluginError::HashMismatch)), "{old:?}");
+    let (on, _) = lib
+        .enable(&v2.id, PluginApproval::ui(&r2.review_hash), 8)
+        .unwrap();
+    assert_eq!(on.manifest.version, v2.version);
+    assert_eq!(on.state, PluginState::Installed);
+    assert_eq!(lib.active().count(), 1);
+}
+
 #[test]
 fn store_keys_only_by_hash() {
     let s = MemPluginStore::default();

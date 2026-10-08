@@ -95,7 +95,7 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-13 | **naprawione 2026-10-08**: wpis dziennika zapamiętuje katalogi utworzone przy zapisie, kopii i przeniesieniu (`JournalEntry::created_dirs`, pole opcjonalne — stare dzienniki czytają się bez zmian); cofnięcie z pre-image po restarcie usuwa je do Kosza od najgłębszego, o ile są puste. Naprawia też cofnięcie `fs_mkdir` po restarcie. Testy: `undo-journal-impl/tests/created_dirs.rs` (system plików z jawnymi katalogami). Niesprawdzone na prawdziwym dysku (wymaga Kosza Windows) | `undo-journal-contract/src/engine.rs`, `restore.rs`, `types.rs` | odczyt kodu |
 | R-14 | **naprawione 2026-10-08**: błąd odczytu hasła kopii zatrzymuje kopię z komunikatem zamiast robić wersję nieszyfrowaną (`app-files/src/backup/mod.rs::password_for_run`); testy `backup.rs` zielone, brak testu regresji | `app-files/src/backup/mod.rs` | podejrzenie |
 | R-15 | **naprawione 2026-10-08**: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
-| R-16 | **częściowo naprawione 2026-10-08**: Piper bez modelu głosu (`*.onnx`) nie jest już zgłaszany jako gotowy głos (`app-modules/src/tts.rs`, test w tym pliku). Otwarte: czytanie i dyktowanie nadal wyglądają na dostępne bez silników | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
+| R-16 | **naprawione 2026-10-08**: Piper bez modelu głosu (`*.onnx`) nie jest już zgłaszany jako gotowy głos (`app-modules/src/tts.rs`); czytanie i dyktowanie bez silnika lub modelu mowy mają stan „niedostępne” z powodem wymieniającym, czego brakuje i gdzie to pobrać (`FeatureFactory::dictation_missing` / `read_missing`, `features/view.rs`), i wracają bez restartu po doinstalowaniu. Test `app-voice/tests/f5_read.rs::missing_speech_engines_make_read_and_dictation_unavailable`. Niesprawdzone w prawdziwej aplikacji | `app-voice/src/features/view.rs`, `system_f5.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
 | R-17 | **naprawione 2026-10-08**: w pamięci zostaje tylko udane wczytanie modelu mówcy — model pobrany po starcie jest wykrywany bez restartu | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
 | R-18 | **naprawione 2026-10-08**: model rozpoznawania mowy dobierany do backendu (z kartą duży, bez karty mały; modele tylko angielskie na końcu) — `app-modules/src/stt.rs`, test w tym pliku | `app-modules/src/stt.rs` | potwierdzone odczytem |
 | R-19 | **naprawione 2026-10-08** (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
@@ -127,10 +127,10 @@ Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, ak
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
 | R-21 | Dzienny limit uruchomień mostu z harmonogramu zeruje się przy każdej zmianie przypięcia albo harmonogramu i po restarcie (licznik tylko w pamięci) | `app-bridges/src/app.rs`, `agent-backends-impl/src/gate.rs` | potwierdzone odczytem |
-| R-22 | **częściowo naprawione 2026-10-08**: błąd zatrzymania przebiegu przy „Zatrzymaj sterowanie” jest logowany i pokazywany (`app-core/src/commands/work.rs`). Otwarte: zatrzymywanie zadań mostów CLI i schedulera tych sesji | `app-core/src/commands/work.rs` | podejrzenie |
+| R-22 | **naprawione 2026-10-08**: błąd zatrzymania przebiegu przy „Zatrzymaj sterowanie” jest logowany i pokazywany (`app-core/src/commands/work.rs`). Podejrzenie o zadaniach mostów CLI i schedulera sprawdzone i niepotwierdzone: każde narzędzie GUI przechodzi przez `GuiMonitor::begin`, które po przejęciu odmawia niezależnie od źródła wywołania (test `app-gui/tests/screen.rs::take_over_pauses_gui_tools_until_released`) | `app-core/src/commands/work.rs`, `app-gui/src/monitor.rs` | wyjaśnione |
 | R-23 | **wyjaśnione w interfejsie 2026-10-08**: przy wyłączonych umiejętnościach jest informacja, że wyłączenie jest jednokierunkowe. Otwarte (decyzja): czy dodać operację „włącz” jak we wtyczkach | `app-skills`, `SkillsPage.svelte` | potwierdzone — może zamierzone |
 | R-24 | Podwójne wywołanie pobierania aktualizacji może zamienić stan „gotowa” na „nieudana” | `app-updates/src/lib.rs`, `updater-impl/src/download.rs` | podejrzenie |
-| R-25 | Włączenie wtyczki przekazuje tylko identyfikator — przy dwóch wyłączonych wersjach suma może nie pasować do wybranej; „Usuń” wtyczki bez potwierdzenia | `app-plugins/src/app.rs`, `PluginsPage.svelte` | podejrzenie |
+| R-25 | **wyjaśnione 2026-10-08**: dwie wyłączone wersje tej samej wtyczki nie mogą współistnieć — zatwierdzenie nowszej oznacza starszą wyłączoną jako zastąpioną (`plugin-runtime-contract/src/library.rs::approve`), więc włączanie po identyfikatorze jest jednoznaczne; test `tests/contract.rs::at_most_one_disabled_version_per_plugin`. „Usuń” wtyczki ma potwierdzenie (`PluginsPage.svelte`) | `plugin-runtime-contract/src/library.rs`, `PluginsPage.svelte` | niepotwierdzone |
 
 Czwarta tura — narzędzia plikowe i powłoka agentek (`tools-fs-impl`, `tools-shell-impl`, `tools-common-contract`,
 `tools-net-impl`; `tools-clipboard-impl` tylko pobieżnie — redakcja sekretów, limity tekstu i obrazu, skażenie sesji
@@ -151,8 +151,7 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
 - *Czekają na decyzję właściciela:* R-05 (przypięcie sum kontrolnych silników), R-10 (częściowe „Cofnij” — adapter
   Brokera), R-20 (edycja oczekującej propozycji pamięci i zaufanie do „zapamiętaj”), R-21 (licznik limitu mostów —
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
-- *Do zrobienia bez decyzji, nietknięte:* zadania mostów przy „Zatrzymaj sterowanie” (reszta R-22),
-  rdzeniowa część R-25, pola w DTO dla R-04, R-12 i R-16.
+- *Do zrobienia bez decyzji, nietknięte:* pola w DTO dla R-04 i R-12.
 - *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-01, R-02, R-03, R-06, R-08, R-14, schowek dla
   głosu, dyktowanie przy STOP, wyciek dzierżawy pamięci.
 

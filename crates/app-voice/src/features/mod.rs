@@ -78,6 +78,15 @@ pub trait FeatureFactory: Send + Sync {
     fn speaker(&self) -> Option<Result<Arc<dyn SpeakerVerifier>, SpeakerError>>;
     /// Wejście audio (nagrania kreatora rejestracji).
     fn audio(&self) -> Option<Arc<dyn AudioIo>>;
+    /// Czego brakuje dyktowaniu (silnik i model STT) — tanie sprawdzenie plików dla widoku;
+    /// pusta lista = gotowe.
+    fn dictation_missing(&self) -> Vec<String> {
+        Vec::new()
+    }
+    /// Czego brakuje czytaniu na głos (silnik TTS); pusta lista = gotowe.
+    fn read_missing(&self) -> Vec<String> {
+        Vec::new()
+    }
     /// Mikrofon, VAD, STT i scheduler dyktowania.
     fn dictation_audio(&self) -> Result<DictationAudio, String>;
     /// Synteza i wyjście audio czytania.

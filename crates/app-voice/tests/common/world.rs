@@ -48,6 +48,8 @@ pub struct World {
     pub clipboard: Arc<FakeClipboard>,
     pub calibration: Mutex<Option<WakeCalibration>>,
     pub kws: bool,
+    /// Brakujące silniki mowy zgłaszane widokowi (dyktowanie, czytanie).
+    pub missing: Mutex<(Vec<String>, Vec<String>)>,
 }
 
 impl World {
@@ -63,6 +65,7 @@ impl World {
             clipboard: Arc::new(FakeClipboard::new()),
             calibration: Mutex::new(None),
             kws: true,
+            missing: Mutex::default(),
         })
     }
 
@@ -175,6 +178,12 @@ impl FeatureFactory for World {
     }
     fn audio(&self) -> Option<Arc<dyn AudioIo>> {
         Some(Arc::new(self.audio.clone()))
+    }
+    fn dictation_missing(&self) -> Vec<String> {
+        self.missing.lock().unwrap().0.clone()
+    }
+    fn read_missing(&self) -> Vec<String> {
+        self.missing.lock().unwrap().1.clone()
     }
     fn dictation_audio(&self) -> Result<DictationAudio, String> {
         Ok(DictationAudio {
