@@ -15,6 +15,7 @@
     LEXICAL,
     STATE_FILTERS,
     embedderChoices,
+    missingEngines,
     embedderFallback,
     filterItems,
     reindexPercent,
@@ -51,6 +52,7 @@
     view ? filterItems(view.items, kind as KindFilter, stateFilter as StateFilter) : [],
   );
   const choices = $derived(view ? embedderChoices(view.items) : []);
+  const withoutEngine = $derived(view ? missingEngines(view.items) : []);
   const reindex = $derived(view?.reindex ?? null);
   const percent = $derived(reindex ? reindexPercent(reindex) : null);
 
@@ -133,6 +135,30 @@
 
 <p class="intro">{t('engines.intro')}</p>
 {#if loadError}<LoadFailed error={loadError} onretry={() => void load()} />{/if}
+
+{#if withoutEngine.length}
+  <!-- Model pobrany bez silnika: mówimy to wprost i prowadzimy do silników na liście. -->
+  <section class="wk-card" aria-labelledby="mm-noengine">
+    <h3 id="mm-noengine">{t('engines.noEngine.title')}</h3>
+    <ul class="wk-plain">
+      {#each withoutEngine as missing (missing)}
+        <li class="wk-warn">{tk(`engines.noEngine.${missing}`)}</li>
+      {/each}
+    </ul>
+    <p class="wk-meta">{t('engines.noEngine.hint')}</p>
+    <div>
+      <Button
+        size="sm"
+        variant="secondary"
+        onclick={() => {
+          kind = 'sidecar';
+          stateFilter = 'all';
+          document.getElementById('mm-list')?.scrollIntoView({ block: 'start' });
+        }}>{t('engines.noEngine.show')}</Button
+      >
+    </div>
+  </section>
+{/if}
 
 <BundlesSection onrepair={askRepair} />
 

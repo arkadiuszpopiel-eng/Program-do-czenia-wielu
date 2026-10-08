@@ -10,6 +10,16 @@ export const enModels: Record<keyof typeof plModels, Message> = {
   'engines.search.title': 'Memory search',
   'engines.search.active': 'Model in use: {name}',
   'engines.search.lexical': 'Lexical (no model)',
+  'engines.noEngine.title': 'A downloaded model has no engine',
+  'engines.noEngine.llm':
+    'The conversation model is on disk, but the llama-server engine is missing — the local model cannot answer without it.',
+  'engines.noEngine.stt':
+    'The speech recognition model is on disk, but the whisper-server engine is missing — voice conversation will not start.',
+  'engines.noEngine.tts':
+    'The voice model is on disk, but the speech engine (piper) is missing — Alfa will not speak.',
+  'engines.noEngine.hint':
+    'The simplest fix is the bundle recommended for this computer (below) — it includes matching engines. You can also download just the engine from the list.',
+  'engines.noEngine.show': 'Show engines in the list',
   'engines.search.fallback': 'The chosen model “{name}” is not ready — search runs lexically.',
   'engines.search.notInstalled':
     'The model “{name}” is not downloaded yet — search runs lexically. Download it below to enable semantic search.',

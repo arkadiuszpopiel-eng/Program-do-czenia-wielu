@@ -144,6 +144,26 @@ impl BackupService {
         store.get(&secret_name().ok()?).ok().flatten()
     }
 
+    /// Hasło do wykonania kopii. Błąd magazynu sekretów to nie „brak hasła": kopia bez hasła byłaby
+    /// nieszyfrowana i bez sesji prywatnych, a kolejne takie kopie wyparłyby przy rotacji ostatnią
+    /// szyfrowaną — dlatego przy błędzie odczytu kopii nie robimy wcale.
+    fn password_for_run(&self) -> Result<Option<SecretString>, AppError> {
+        let Some(store) = self.deps.secrets.as_ref() else {
+            return Ok(None);
+        };
+        let Ok(name) = secret_name() else {
+            return Ok(None);
+        };
+        store.get(&name).map_err(|e| {
+            AppError::new(
+                app_api::ErrorCode::Secrets,
+                format!(
+                    "Nie udało się odczytać hasła kopii zapasowej z Menedżera poświadczeń ({e}) —                      kopia nie została wykonana, żeby nie powstała wersja nieszyfrowana."
+                ),
+            )
+        })
+    }
+
     fn update(&self, f: impl FnOnce(&mut BackupState)) -> Result<(), AppError> {
         let mut state = lock(&self.state);
         f(&mut state);
@@ -238,10 +258,10 @@ impl BackupService {
             .dir
             .clone()
             .ok_or_else(|| AppError::invalid("Najpierw wybierz katalog kopii zapasowych."))?;
+        let password = self.password_for_run()?;
         if self.running.swap(true, Ordering::SeqCst) {
             return Err(AppError::invalid("Kopia zapasowa już trwa."));
         }
-        let password = self.password();
         let request = BackupRequest {
             dir: PathBuf::from(&dir),
             scope: backup_scope(&config, password.is_some()),

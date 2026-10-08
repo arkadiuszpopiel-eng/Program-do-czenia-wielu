@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ModelItem, ReindexView } from '../../api/types-models';
 import {
   embedderChoices,
+  missingEngines,
   filterItems,
   groupedHash,
   itemActions,
@@ -104,5 +105,48 @@ describe('logika: modele i silniki', () => {
     };
     expect(reindexPercent(view)).toBe(25);
     expect(reindexPercent({ ...view, running: false })).toBeNull();
+  });
+});
+
+describe('model bez silnika (R-04, test na laptopie 2026-10-07)', () => {
+  const item = (id: string, kind: ModelItem['kind'], state: ModelItem['state']): ModelItem => ({
+    ...base,
+    id,
+    kind,
+    state,
+  });
+
+  it('pobrany model rozmowy bez llama-server jest zgłaszany', () => {
+    expect(
+      missingEngines([
+        item('bielik', 'llm', 'installed'),
+        item('sidecar-llama-cuda', 'sidecar', 'missing'),
+        item('sidecar-llama-cpu', 'sidecar', 'needs_trust'),
+      ]),
+    ).toEqual(['llm']);
+  });
+
+  it('dowolna kompilacja silnika wystarcza; pliki skopiowane ręcznie też się liczą', () => {
+    expect(
+      missingEngines([
+        item('bielik', 'llm', 'installed'),
+        item('sidecar-llama-cpu', 'sidecar', 'external'),
+      ]),
+    ).toEqual([]);
+  });
+
+  it('każdy rodzaj osobno: mowa i głos', () => {
+    expect(
+      missingEngines([
+        item('whisper', 'stt', 'installed'),
+        item('gosia', 'tts', 'installed'),
+        item('sidecar-llama-cpu', 'sidecar', 'installed'),
+        item('sidecar-piper', 'sidecar', 'installed'),
+      ]),
+    ).toEqual(['stt']);
+  });
+
+  it('bez pobranych modeli nie ma ostrzeżenia', () => {
+    expect(missingEngines([item('bielik', 'llm', 'missing')])).toEqual([]);
   });
 });

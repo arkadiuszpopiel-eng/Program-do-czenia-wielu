@@ -9,6 +9,16 @@ export const plModels = {
   'engines.search.title': 'Wyszukiwanie w pamięci',
   'engines.search.active': 'Używany model: {name}',
   'engines.search.lexical': 'Leksykalne (bez modelu)',
+  'engines.noEngine.title': 'Pobrany model nie ma silnika',
+  'engines.noEngine.llm':
+    'Model rozmowy jest na dysku, ale brakuje silnika llama-server — bez niego model lokalny nie odpowie.',
+  'engines.noEngine.stt':
+    'Model rozpoznawania mowy jest na dysku, ale brakuje silnika whisper-server — rozmowa głosowa nie ruszy.',
+  'engines.noEngine.tts':
+    'Model głosu jest na dysku, ale brakuje silnika mowy (piper) — Alfa nie będzie mówić.',
+  'engines.noEngine.hint':
+    'Najprościej pobrać pakiet zalecany dla tego komputera (niżej) — zawiera pasujące silniki. Możesz też pobrać sam silnik z listy.',
+  'engines.noEngine.show': 'Pokaż silniki na liście',
   'engines.search.fallback':
     'Wybrany model „{name}” nie jest gotowy — wyszukiwanie działa leksykalnie.',
   'engines.search.notInstalled':

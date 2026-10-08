@@ -123,3 +123,28 @@ export function upsertItem(items: readonly ModelItem[], item: ModelItem): readon
     ? items.map((i) => (i.id === item.id ? item : i))
     : [...items, item];
 }
+
+/** Rodzaje modeli, które mają pliki na dysku, ale nie mają silnika, który by je uruchomił. */
+export type MissingEngine = 'llm' | 'stt' | 'tts';
+
+const ENGINE_PREFIX: Record<MissingEngine, readonly string[]> = {
+  llm: ['sidecar-llama'],
+  stt: ['sidecar-whisper'],
+  tts: ['sidecar-piper', 'sidecar-pocket'],
+};
+
+const onDisk = (item: ModelItem): boolean =>
+  item.state === 'installed' || item.state === 'external';
+
+/**
+ * Model bez silnika jest bezużyteczny (test na laptopie 2026-10-07: pobrany Bielik bez
+ * `llama-server`). Zwraca rodzaje, dla których jest model, a nie ma żadnego pasującego silnika.
+ */
+export function missingEngines(items: readonly ModelItem[]): MissingEngine[] {
+  const engines = items.filter((i) => i.kind === 'sidecar' && onDisk(i)).map((i) => i.id);
+  return (Object.keys(ENGINE_PREFIX) as MissingEngine[]).filter(
+    (kind) =>
+      items.some((i) => i.kind === kind && onDisk(i)) &&
+      !engines.some((id) => ENGINE_PREFIX[kind].some((prefix) => id.startsWith(prefix))),
+  );
+}
