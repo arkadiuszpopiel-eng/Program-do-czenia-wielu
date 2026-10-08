@@ -207,18 +207,18 @@ impl Core {
         Ok(self.done(ctx, m, &auths, ToolOutcome::ok(body, data)).await)
     }
 
-    fn content_line(&self, path: &Path, size: u64, needle: &str) -> Option<String> {
+    /// Pierwsza linia z frazą; `Err(())` — pliku nie przeszukano (za duży, nieczytelny, nietekstowy).
+    fn content_line(&self, path: &Path, size: u64, needle: &str) -> Result<Option<String>, ()> {
         if size > self.config.search_file_max_bytes {
-            return None;
+            return Err(());
         }
-        let data = self.fs.read(path).ok()?;
-        let content = text::decode_text(&data)?;
+        let data = self.fs.read(path).map_err(|_| ())?;
+        let content = text::decode_text(&data).ok_or(())?;
         let lower = needle.to_lowercase();
-        let line = content
+        Ok(content
             .lines()
-            .find(|l| l.to_lowercase().contains(&lower))?;
-        let (short, _) = text::truncate_chars(line.trim(), 200);
-        Some(text::redact_secrets(&short))
+            .find(|l| l.to_lowercase().contains(&lower))
+            .map(|line| text::redact_secrets(&text::truncate_chars(line.trim(), 200).0)))
     }
 
     /// `fs_search`.
@@ -246,6 +246,7 @@ impl Core {
             .unwrap_or(self.config.search_max_depth)
             .min(self.config.search_max_depth);
         let (mut hits, mut visited, mut truncated) = (Vec::new(), 0u32, false);
+        let mut skipped = 0_u32;
         let mut queue = VecDeque::from([(Core::path_buf(&root), 0u8)]);
         'walk: while let Some((dir, d)) = queue.pop_front() {
             let Ok(listed) = self.fs.list_dir(&dir) else {
@@ -282,14 +283,14 @@ impl Core {
                         path: p,
                         line: None,
                     }),
-                    Some(needle) => {
-                        if let Some(line) = self.content_line(&e.path, e.size, needle) {
-                            hits.push(SearchHit {
-                                path: p,
-                                line: Some(line),
-                            });
-                        }
-                    }
+                    Some(needle) => match self.content_line(&e.path, e.size, needle) {
+                        Ok(Some(line)) => hits.push(SearchHit {
+                            path: p,
+                            line: Some(line),
+                        }),
+                        Ok(None) => {}
+                        Err(()) => skipped += 1,
+                    },
                 }
             }
         }
@@ -301,8 +302,13 @@ impl Core {
                 None => h.path.clone(),
             })
             .collect();
+        // Pliki nieprzeszukane (za duże, binarne) nie mogą wyglądać jak „brak trafień".
+        let note = match skipped {
+            0 => String::new(),
+            n => format!("\nNie przeszukano treści {n} plików (za duże albo nietekstowe)."),
+        };
         let body = format!(
-            "Wyniki w „{root}” ({}{}):\n{}",
+            "Wyniki w „{root}” ({}{}):\n{}{note}",
             hits.len(),
             if truncated { ", obcięte limitem" } else { "" },
             lines.join("\n")

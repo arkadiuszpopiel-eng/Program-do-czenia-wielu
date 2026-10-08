@@ -229,15 +229,22 @@ impl Core {
         let listed = path
             .parent()
             .and_then(|parent| self.fs.list_dir(parent).ok())
-            .and_then(|entries| entries.into_iter().find(|e| e.path == path));
+            .and_then(|entries| entries.into_iter().find(|e| same_entry(&e.path, path)));
         Some(match listed {
             Some(e) => (e.is_dir, e.size),
-            None => match self.fs.read(path) {
-                Ok(d) => (false, d.len() as u64),
-                Err(_) => (true, 0),
-            },
+            // Zapas bez czytania całego pliku: katalog da się wylistować, plik — nie. Wcześniej
+            // plik, którego nie udało się odczytać (zablokowany, brak dostępu), był „katalogiem".
+            None => (self.fs.list_dir(path).is_ok(), 0),
         })
     }
+}
+
+/// Ten sam wpis katalogu: na Windows bez rozróżniania wielkości liter (model podaje ścieżkę
+/// wielkimi literami, system zwraca małymi).
+fn same_entry(a: &Path, b: &Path) -> bool {
+    a == b
+        || (cfg!(windows)
+            && a.to_string_lossy().to_lowercase() == b.to_string_lossy().to_lowercase())
 }
 
 /// Błąd platformy → wynik dla modelu.

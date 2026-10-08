@@ -293,14 +293,8 @@ impl Core {
         let result = self.execute(spec, ctx, command).await;
         let approval = auths.iter().find_map(|a| a.approval);
         self.release(&auths).await;
-        let undo = match self.journal.commit_step(step) {
-            Ok(summary) => Some(UndoRef {
-                service: UndoService::Journal,
-                id: step.0,
-                text: summary.text,
-            }),
-            Err(_) => None,
-        };
+        // Krok trafia do dziennika dopiero po uruchomieniu polecenia: nieudany start zostawiał
+        // wcześniej pusty, zatwierdzony krok „do cofnięcia".
         let out = match result {
             Ok(out) => out,
             Err(e) => {
@@ -310,6 +304,14 @@ impl Core {
                     format!("Nie uruchomiono polecenia: {e}."),
                 ));
             }
+        };
+        let undo = match self.journal.commit_step(step) {
+            Ok(summary) => Some(UndoRef {
+                service: UndoService::Journal,
+                id: step.0,
+                text: summary.text,
+            }),
+            Err(_) => None,
         };
         let mut result = self.outcome(out, undo, ctx).await;
         result.approval = approval;

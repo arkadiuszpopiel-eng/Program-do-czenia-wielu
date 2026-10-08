@@ -140,10 +140,10 @@ Czwarta tura — narzędzia plikowe i powłoka agentek (`tools-fs-impl`, `tools-
 | T-01 | **naprawione 2026-10-08**: segmenty będące nazwami urządzeń Windows (`CON`, `NUL`, `COM1`, `nul.txt`…) są odrzucane przy rozwiązywaniu ścieżki — `tools-common-contract/src/device.rs` (testy), `paths.rs::resolve` | `tools-common-contract/src/paths.rs::resolve` | potwierdzone |
 | T-02 | `fs_read` i `fs_write` wczytują cały plik do pamięci (limit dotyczy tylko tego, co pokazane) — plik 20 GB może zabić proces | `tools-fs-impl/src/read.rs`, `write.rs`, `FsPort` | potwierdzone |
 | T-03 | **naprawione 2026-10-08**: limit zapisu obejmuje plik po dopisaniu — `tools-fs-impl/src/write.rs`; brak testu regresji | `tools-fs-impl/src/write.rs` | potwierdzone |
-| T-04 | `kind_of` porównuje ścieżki z rozróżnieniem wielkości liter i przy błędzie odczytu uznaje plik za katalog | `tools-fs-impl/src/core.rs` | potwierdzone |
-| T-05 | `fs_search` po cichu pomija pliki za duże lub nietekstowe — model widzi „0 wyników” | `tools-fs-impl/src/read.rs` | potwierdzone |
+| T-04 | **naprawione 2026-10-08**: wpis katalogu dopasowywany bez rozróżniania wielkości liter na Windows; zapas nie czyta całego pliku i nie uznaje nieczytelnego pliku za katalog — `tools-fs-impl/src/core.rs` | `tools-fs-impl/src/core.rs` | potwierdzone |
+| T-05 | **naprawione 2026-10-08**: `fs_search` podaje, ilu plików nie przeszukał (za duże albo nietekstowe) — `tools-fs-impl/src/read.rs` | `tools-fs-impl/src/read.rs` | potwierdzone |
 | T-06 | Zakres zgody Brokera jest liczony z nierozwiązanej ścieżki — dowiązanie w katalogu roboczym może wyprowadzić poza zakres (lista zakazów nadal działa) | `tools-fs-impl/src/core.rs` | podejrzenie — do przeglądu z Brokerem |
-| T-07 | Krok powłoki jest zatwierdzany w dzienniku przed sprawdzeniem wyniku — nieudane uruchomienie zostawia pusty krok „do cofnięcia” | `tools-shell-impl/src/run.rs` | podejrzenie |
+| T-07 | **naprawione 2026-10-08**: krok powłoki jest zatwierdzany w dzienniku dopiero po uruchomieniu polecenia — `tools-shell-impl/src/run.rs` | `tools-shell-impl/src/run.rs` | podejrzenie |
 
 **Podział pozostałych otwartych ustaleń (stan na koniec nocy 7/8.10):**
 
