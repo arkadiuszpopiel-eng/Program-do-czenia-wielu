@@ -153,5 +153,8 @@ impl fmt::Debug for ImportRequest {
 pub struct ImportResult {
     pub snapshot_id: String,
     pub imported: u64,
+    /// Pominięte w planie albo identyczne (bez nieudanych).
     pub skipped: u64,
+    /// Elementy, których nie udało się zapisać.
+    pub failed: u64,
 }

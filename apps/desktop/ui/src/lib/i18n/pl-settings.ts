@@ -156,7 +156,9 @@ export const plSettings = {
   'tr.replaceTitle': 'Zastąpić lokalne dane?',
   'tr.replaceConfirm':
     'Tryb „Zastąp" nadpisze lokalne elementy danymi z paczki. Automatyczny snapshot pozwoli to cofnąć.',
-  'tr.importSkipped': 'pominięto albo nie udało się zapisać: {n}',
+  'tr.importSkipped': 'pominięto: {n}',
+  'tr.importFailed':
+    'Nie udało się zapisać elementów: {n}. Reszta paczki została zaimportowana; szczegóły są w dzienniku.',
   'tr.nothingChanged': 'Nic nie zostało zmienione — nie ma czego cofać.',
   'tr.imported': {
     one: 'Zaimportowano {n} element.',

@@ -335,7 +335,8 @@ impl TransferPort for TransferAdapter {
         Ok(ImportResult {
             snapshot_id: report.snapshot.unwrap_or_default(),
             imported: report.added + report.merged + report.replaced + report.copied,
-            skipped: report.skipped + report.failed,
+            skipped: report.skipped,
+            failed: report.failed,
         })
     }
 

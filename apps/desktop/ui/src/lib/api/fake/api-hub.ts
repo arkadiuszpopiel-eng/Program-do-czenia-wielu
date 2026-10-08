@@ -172,6 +172,7 @@ export function transferApi(core: FakeCore): AlfaClient['transfer'] {
         snapshot_id: core.nextId('snap'),
         imported: DRY_RUN.filter((i) => i.diff !== 'same').length,
         skipped: request.mode === 'add' ? 1 : 0,
+        failed: 0,
       });
     },
     rollback: () => core.reply(undefined),

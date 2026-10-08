@@ -147,7 +147,8 @@
     "result": {
       "snapshot_id": "snap-muo1g480-16",
       "imported": 4,
-      "skipped": 0
+      "skipped": 0,
+      "failed": 0
     }
   },
   {

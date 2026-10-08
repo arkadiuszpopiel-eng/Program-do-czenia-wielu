@@ -147,7 +147,10 @@ export interface ImportResult {
   /** Automatyczny snapshot przed importem → jednoklikowy rollback. */
   readonly snapshot_id: string;
   readonly imported: number;
+  /** Pominięte w planie albo identyczne (bez nieudanych). */
   readonly skipped: number;
+  /** Elementy, których nie udało się zapisać. */
+  readonly failed: number;
 }
 
 // ── Uprawnienia (PLAN §8.3) ──────────────────────────────────────────────────────────────────────

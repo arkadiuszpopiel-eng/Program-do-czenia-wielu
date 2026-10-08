@@ -176,6 +176,9 @@
       {t('tr.imported', { n: result.imported })}{#if result.skipped}
         · {t('tr.importSkipped', { n: result.skipped })}{/if}
     </p>
+    {#if result.failed}
+      <p class="failed" role="alert">{t('tr.importFailed', { n: result.failed })}</p>
+    {/if}
     <!-- Bez zmian nie powstaje migawka — nie ma czego cofać, więc nie ma martwego przycisku. -->
     {#if result.snapshot_id}
       <div class="actions start">
@@ -231,6 +234,10 @@
   }
   .actions.start {
     justify-content: flex-start;
+  }
+  .failed {
+    color: var(--alfa-color-error);
+    font-size: var(--alfa-font-size-sm);
   }
   .ok {
     color: var(--alfa-color-success);
