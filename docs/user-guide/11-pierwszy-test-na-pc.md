@@ -410,8 +410,8 @@ mniej więcej trwało.
    - **Laptop:** **whisper-server (CUDA 12.4)** i model **Whisper large-v3-turbo-q5_0** — rozpoznawanie na karcie
      (gdy wersja CUDA nie wystartuje, Alfa sama przejdzie na procesor).
    - **Desktop:** tylko model **Whisper small-q5_1** — rozpoznawanie działa tu na procesorze (wersji Vulkan
-     whisper-server nie ma w wydaniach), a model turbo jest na procesorze za wolny do rozmowy. Nie pobieraj obu
-     modeli: Alfa bierze pierwszy alfabetycznie (turbo).
+     whisper-server nie ma w wydaniach), a model turbo jest na procesorze za wolny do rozmowy. Gdy pobrane
+     są oba modele, Alfa sama wybiera: z kartą CUDA duży (turbo), bez niej mały.
 
    Ponowne uruchomienie Alfy nie jest potrzebne — silniki są wykrywane przy użyciu ([Głos](04-glos.md)).
 2. **Ustawienia → Głos**: znika komunikat „Głos niedostępny”. **Test mikrofonu** — pasek reaguje. Odsłuchaj próbki

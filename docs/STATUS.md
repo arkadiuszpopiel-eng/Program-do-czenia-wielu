@@ -94,11 +94,11 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-12 | Import i cofnięcie importu ukrywają niepowodzenia i ostrzeżenia (`failed` doliczane do `skipped`, ostrzeżenie o nieszyfrowanej migawce pomijane, `RollbackReport.failed` ignorowane) | `app-modules/src/transfer.rs`, DTO `ImportResult` | potwierdzone odczytem |
 | R-13 | Cofnięcie po restarcie aplikacji zostawia utworzone katalogi | `undo-journal-contract/src/restore.rs` | odczyt kodu |
 | R-14 | Nieudany odczyt hasła kopii zapasowej po cichu robi kopię nieszyfrowaną bez sesji prywatnych; rotacja może wtedy wyprzeć ostatnią szyfrowaną | `app-files/src/backup/mod.rs` | podejrzenie |
-| R-15 | Niezapisane ustawienia kopii zapasowej są nadpisywane przez „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
+| R-15 | **naprawione 2026-10-08**: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
 | R-16 | Czytanie i dyktowanie wyglądają na dostępne bez silników TTS/STT; TTS „gotowy” przy samym pliku Piper bez modelu głosu | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
 | R-17 | Model mówcy pobrany po starcie nie jest wykrywany do restartu (`OnceLock` pamięta błąd) | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
-| R-18 | Model rozpoznawania mowy wybierany alfabetycznie, bez względu na kartę (turbo wygrywa z małym także na samym procesorze) | `app-modules/src/stt.rs` | potwierdzone odczytem |
-| R-19 | Wskaźnik mikrofonu w pasku tytułu zostaje „niedostępny” po doinstalowaniu silników, dopóki nie otworzy się strony Głos | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
+| R-18 | **naprawione 2026-10-08**: model rozpoznawania mowy dobierany do backendu (z kartą duży, bez karty mały; modele tylko angielskie na końcu) — `app-modules/src/stt.rs`, test w tym pliku | `app-modules/src/stt.rs` | potwierdzone odczytem |
+| R-19 | **naprawione 2026-10-08** (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
 | R-20 | Edycja oczekującej propozycji pamięci po cichu ją zatwierdza; „zapamiętaj” zapisuje treść odpowiedzi jako zaufaną | `memory-contract/src/engine/write.rs`, `app-memory/src/app.rs` | podejrzenie — do decyzji właściciela |
 
 Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet 125 zielony w ostatnim przebiegu; test palety bywa

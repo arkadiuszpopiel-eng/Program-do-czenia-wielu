@@ -79,8 +79,18 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
     case 'BrokerStatus':
       app.broker.apply(event.status);
       break;
-    case 'ModelProgress':
     case 'ModelChanged':
+      // Doinstalowany silnik albo model głosu zmienia dostępność głosu — odświeżamy stan (wskaźnik
+      // mikrofonu w pasku tytułu zostawał „niedostępny" do otwarcia strony Głos).
+      if (event.item.state === 'installed') {
+        void app.client.voice.status().then(
+          (status) => app.voice.applyStatus(status),
+          () => undefined,
+        );
+      }
+      app.notify(event);
+      break;
+    case 'ModelProgress':
     case 'ReindexStatus':
       // Menedżer modeli: strona „Modele i silniki" i onboarding słuchają przez `app.on`.
       app.notify(event);

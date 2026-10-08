@@ -32,9 +32,13 @@
   let check = $state<BackupCheck | null>(null);
   let loadError = $state<string | null>(null);
 
+  // Niezapisane zmiany w formularzu zostają po akcjach niezwiązanych z ustawieniami („Wybierz
+  // katalog", „Wykonaj teraz", hasło) — z rdzenia bierzemy wtedy tylko katalog, który mogła zmienić akcja.
   function show(next: BackupView) {
+    const dirty =
+      view !== null && config !== null && JSON.stringify(config) !== JSON.stringify(view.config);
+    config = dirty && config ? { ...config, dir: next.config.dir } : { ...next.config };
     view = next;
-    config = { ...next.config };
   }
 
   /** Akcja na kopiach; `true` po sukcesie (pola czyści się tylko wtedy), błąd → toast. */
