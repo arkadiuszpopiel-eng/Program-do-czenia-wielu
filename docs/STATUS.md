@@ -158,6 +158,9 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
   Wyciek dzierżawy pamięci ma test `providers-local-impl/tests/lifecycle.rs::failed_start_on_gpu_and_cpu_leaves_no_lease`
   (sprawdzone, że bez poprawki nie przechodzi).
 
+Stan końcowy 2026-10-08 ok. 11:40 (39 commitów lokalnych): prawdziwa aplikacja zbudowana z końca gałęzi i uruchomiona na
+tymczasowym profilu — `e2e-app` 10/10; `scripts/gates.ps1` zielone; vitest 243/243; E2E 124/125 (test czasowy palety).
+
 Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet 125 zielony w ostatnim przebiegu; test palety bywa
 czerwony pod obciążeniem. Test „paleta: otwarcie ≤ 50 ms” ma
 medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy.
