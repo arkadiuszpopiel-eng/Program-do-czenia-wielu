@@ -128,8 +128,10 @@
   .quick {
     display: flex;
     flex-direction: column;
-    width: min(640px, 100vw);
-    max-height: 100vh;
+    /* Okno ma odstęp (`body` w quick.css) — karta mieści się w nim cała, z cieniem i zaokrągleniem. */
+    width: 100%;
+    max-width: 640px;
+    max-height: calc(100vh - 2 * var(--alfa-space-2));
     margin: 0 auto;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-overlay);

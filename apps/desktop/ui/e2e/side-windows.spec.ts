@@ -50,3 +50,25 @@ test('pigułka (podgląd poza Tauri): ?lang=en ustawia język dokumentu', async 
   await expect(page.getByRole('button', { name: 'Stop speech' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
+
+// Okno ma 640×420 px i przezroczyste tło: karta szersza niż okno traciła prawą krawędź z zaokrągleniem.
+test('Szybkie pytanie: karta mieści się w oknie 640×420 także z odpowiedzią', async ({ page }) => {
+  await page.setViewportSize({ width: 640, height: 420 });
+  await mockTauri(page, { locale: 'pl', theme: 'dark' });
+  await page.goto('/quick.html');
+  const card = page.getByRole('main');
+  const fits = async (label: string) => {
+    const box = await card.boundingBox();
+    expect(box, label).not.toBeNull();
+    if (!box) return;
+    expect(box.x, `${label}: lewa`).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width, `${label}: prawa`).toBeLessThanOrEqual(640);
+    expect(box.y + box.height, `${label}: dół`).toBeLessThanOrEqual(420);
+  };
+  await fits('pusta');
+  const input = page.getByLabel('Pytanie', { exact: true });
+  await input.fill('Ile to 2+2?');
+  await input.press('Enter');
+  await expect(page.getByRole('region', { name: 'Odpowiedź' })).toContainText('Cztery.');
+  await fits('z odpowiedzią');
+});
