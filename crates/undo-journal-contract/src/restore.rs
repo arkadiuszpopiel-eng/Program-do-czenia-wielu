@@ -20,7 +20,12 @@ impl Journal {
                     out.insert(to.clone(), after.clone());
                 }
                 UndoOp::Move { from, to, after } => {
-                    out.insert(from.clone(), FileState::Absent);
+                    // Zmiana samej wielkości liter (`readme.md` → `README.md`) na systemie plików
+                    // Windows to ten sam wpis: stara nazwa nadal „istnieje", więc oczekiwanie
+                    // „źródło nieobecne" dawało konflikt przy każdej próbie cofnięcia.
+                    if !case_only_rename(from, to) {
+                        out.insert(from.clone(), FileState::Absent);
+                    }
                     out.insert(to.clone(), after.clone());
                 }
                 UndoOp::Delete { path, .. } | UndoOp::DeletePermanent { path, .. } => {
@@ -222,5 +227,37 @@ impl Journal {
         } else {
             Ok(report)
         }
+    }
+}
+
+/// Czy przeniesienie zmienia wyłącznie wielkość liter w ścieżce (na Windows — ten sam wpis katalogu).
+fn case_only_rename(from: &std::path::Path, to: &std::path::Path) -> bool {
+    cfg!(windows)
+        && from != to
+        && from.to_string_lossy().to_lowercase() == to.to_string_lossy().to_lowercase()
+}
+
+#[cfg(test)]
+mod case_tests {
+    use super::case_only_rename;
+    use std::path::Path;
+
+    #[test]
+    fn case_only_rename_is_recognised_on_windows_only() {
+        let same = case_only_rename(Path::new("C:/a/readme.md"), Path::new("C:/a/README.md"));
+        assert_eq!(same, cfg!(windows));
+        assert!(!case_only_rename(
+            Path::new("C:/a/x.md"),
+            Path::new("C:/a/y.md")
+        ));
+        assert!(!case_only_rename(
+            Path::new("C:/a/x.md"),
+            Path::new("C:/a/x.md")
+        ));
+        // Polskie znaki: „Żółw.txt" → „żółw.txt" to też zmiana samej wielkości liter.
+        assert_eq!(
+            case_only_rename(Path::new("C:/a/Żółw.txt"), Path::new("C:/a/żółw.txt")),
+            cfg!(windows)
+        );
     }
 }
