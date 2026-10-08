@@ -11,6 +11,11 @@
   background: var(--alfa-color-surface);
   font-size: var(--alfa-font-size-sm);
 }
+/* Na stronie ustawień karty mają te same odstępy co pozostałe karty strony (panel boczny — ciaśniej). */
+.vf-settings .vf-card {
+  margin-bottom: var(--alfa-space-4);
+  padding: var(--alfa-space-4);
+}
 .vf-card h3 {
   font-size: var(--alfa-font-size-md);
 }

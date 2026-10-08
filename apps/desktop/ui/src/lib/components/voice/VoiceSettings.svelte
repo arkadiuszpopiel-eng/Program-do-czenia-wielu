@@ -34,8 +34,10 @@
 {#if !features}
   {#if !loadError}<p class="vf-muted">{t('vf.loading')}</p>{/if}
 {:else}
-  <WakeCard {features} settings />
-  <SpeakerEnroll {features} settings />
-  <DictationCard {features} settings />
-  <ReadCard {features} settings />
+  <div class="vf-settings">
+    <WakeCard {features} settings />
+    <SpeakerEnroll {features} settings />
+    <DictationCard {features} settings />
+    <ReadCard {features} settings />
+  </div>
 {/if}
