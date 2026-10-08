@@ -101,6 +101,16 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-19 | **naprawione 2026-10-08** (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
 | R-20 | Edycja oczekującej propozycji pamięci po cichu ją zatwierdza; „zapamiętaj” zapisuje treść odpowiedzi jako zaufaną | `memory-contract/src/engine/write.rs`, `app-memory/src/app.rs` | podejrzenie — do decyzji właściciela |
 
+**Sprawdzenie na prawdziwej aplikacji (2026-10-08, ten laptop).** Powłoka z cechą `e2e` zbudowana z bieżącej
+gałęzi (`cargo build --features "e2e tauri/custom-protocol"`, osobny katalog wyników `target/shell`) i uruchomiona
+na tymczasowym profilu (`APPDATA` / `LOCALAPPDATA` wskazane na katalog roboczy — dane właściciela nietknięte):
+`apps/desktop/ui/e2e-app/run.ps1` — **10/10** (start okna na prawdziwym rdzeniu, wprowadzenie, rozmowa bez modelu,
+Broker w procesie, Modele i silniki z wykrytą kartą RTX 4050 i pakietem zalecanym 5, eksport `.alfa` przez natywne
+okno, zatrzymanie z interfejsu, okna poboczne, konsola bez błędów, CSP z Trusted Types bez naruszeń). Potwierdzone na
+zrzutach z działającej aplikacji: wyśrodkowany onboarding, ustawienia w grupach na szerokiej stronie, błąd „brak
+modelu” z przyciskami „Modele i silniki” i „Dodaj klucz”. **Niesprawdzone na żywo:** odpowiedź modelu lokalnego
+(wymaga pobrania modelu i silnika), głos, skalowanie w oknie szerszym niż 1200 px, poprawki bez własnych testów.
+
 Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, aktualizacje; użycie Brokera):
 
 - Naprawione w interfejsie: przycisk „Uruchom ponownie” przy aktualizacji odblokowywał się po każdym zdarzeniu
