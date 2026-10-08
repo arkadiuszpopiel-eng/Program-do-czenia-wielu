@@ -346,8 +346,21 @@ impl TransferPort for TransferAdapter {
     async fn rollback(&self, snapshot: &str) -> Result<(), AppError> {
         let transfer = self.transfer.clone();
         let id = snapshot.to_owned();
-        blocking(move || transfer.rollback(&id).map(|_| ()).map_err(transfer_error)).await?;
+        let report = blocking(move || transfer.rollback(&id).map_err(transfer_error)).await?;
         self.reload_config().await;
+        // Częściowe cofnięcie to nie sukces: interfejs ma pokazać, ile elementów nie wróciło,
+        // zamiast „Przywrócono stan sprzed importu".
+        if !report.failed.is_empty() {
+            return Err(AppError::new(
+                ErrorCode::Storage,
+                format!(
+                    "Cofnięcie importu niepełne: przywrócono {}, usunięto {}, nie udało się: {}.",
+                    report.restored,
+                    report.removed,
+                    report.failed.len()
+                ),
+            ));
+        }
         Ok(())
     }
 }

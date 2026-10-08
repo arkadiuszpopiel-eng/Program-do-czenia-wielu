@@ -35,10 +35,10 @@ Poprawki z nocy 7/8.10 (gałąź robocza, commity `020a9d4`, `a1c803c`, `e594e61
 | Model bez silnika (ustalenie 1 i 2 wyżej) | czytelny błąd z przyciskiem „Modele i silniki”, bez fałszywego „fallbacku na CPU” | `providers-local-impl/tests/lifecycle.rs::missing_engine_gives_actionable_error_and_no_fallback`, `missing_gpu_engine_uses_cpu_build`; `app-chat` `outcome::tests`; `e2e/composer.spec.ts` |
 | Zdrowie systemu | statusy incydentów po polsku | — |
 
-Nadal otwarte z testu na laptopie: zajęty skrót `Ctrl+Alt+Space` — powłoka wysyła toast przy konflikcie, ale przy
-starcie może on trafić do interfejsu, zanim ten zacznie słuchać (do sprawdzenia na działającej aplikacji; trwały
-wskaźnik na stronie Skróty byłby pewniejszy). Poprawki rdzenia nie były jeszcze uruchomione w prawdziwej aplikacji —
-budowa powłoki na dysku E: czeka na zwolnienie miejsca.
+Skrót `Ctrl+Alt+Space`: na tym laptopie jest zajęty przez inny program. Sprawdzone 2026-10-08 na działającej
+aplikacji — komunikat „Skrót Ctrl+Alt+Space jest zajęty przez inny program” **pojawia się** w oknie (wcześniejsze
+podejrzenie, że ginie przy starcie, było błędne). Zostaje wybór innego skrótu na stronie Skróty albo zwolnienie go
+w drugim programie; trwały wskaźnik na stronie Skróty byłby ulepszeniem, nie naprawą błędu.
 
 Przegląd interfejsu strona po stronie (29 stron ustawień, 7 paneli; commity `e358807`, `8d64fa2`): karty panelu
 prawego zawijają się — „Ekran” i „Głos” były poza krawędzią wąskiego panelu i niedostępne myszą; powtórzone nagłówki
@@ -91,12 +91,12 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | --- | --- | --- | --- |
 | R-10 | Częściowo nieudane „Cofnij” jest w dzienniku oznaczane jako wykonane, a interfejs dalej je oferuje — pozostałych plików nie da się już przywrócić; wygasłe kroki wyglądają na cofalne | `undo-journal-contract/src/restore.rs`, `app-core/src/commands/turn_intents.rs`, `UndoCard.svelte` | potwierdzone odczytem |
 | R-11 | Cofnięcie zmiany wielkości liter w nazwie (`readme.md` → `README.md`) zawsze kończy się konfliktem na Windows | `undo-journal-contract/src/restore.rs`, `engine.rs` | potwierdzone odczytem |
-| R-12 | Import i cofnięcie importu ukrywają niepowodzenia i ostrzeżenia (`failed` doliczane do `skipped`, ostrzeżenie o nieszyfrowanej migawce pomijane, `RollbackReport.failed` ignorowane) | `app-modules/src/transfer.rs`, DTO `ImportResult` | potwierdzone odczytem |
+| R-12 | **częściowo naprawione 2026-10-08**: niepełne cofnięcie importu zwraca błąd z liczbami zamiast sukcesu; interfejs pokazuje liczbę pominiętych przy imporcie. Otwarte: osobne pole `failed` i ostrzeżenia w DTO | `app-modules/src/transfer.rs`, DTO `ImportResult` | potwierdzone odczytem |
 | R-13 | Cofnięcie po restarcie aplikacji zostawia utworzone katalogi | `undo-journal-contract/src/restore.rs` | odczyt kodu |
 | R-14 | Nieudany odczyt hasła kopii zapasowej po cichu robi kopię nieszyfrowaną bez sesji prywatnych; rotacja może wtedy wyprzeć ostatnią szyfrowaną | `app-files/src/backup/mod.rs` | podejrzenie |
 | R-15 | **naprawione 2026-10-08**: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
 | R-16 | Czytanie i dyktowanie wyglądają na dostępne bez silników TTS/STT; TTS „gotowy” przy samym pliku Piper bez modelu głosu | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
-| R-17 | Model mówcy pobrany po starcie nie jest wykrywany do restartu (`OnceLock` pamięta błąd) | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
+| R-17 | **naprawione 2026-10-08**: w pamięci zostaje tylko udane wczytanie modelu mówcy — model pobrany po starcie jest wykrywany bez restartu | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
 | R-18 | **naprawione 2026-10-08**: model rozpoznawania mowy dobierany do backendu (z kartą duży, bez karty mały; modele tylko angielskie na końcu) — `app-modules/src/stt.rs`, test w tym pliku | `app-modules/src/stt.rs` | potwierdzone odczytem |
 | R-19 | **naprawione 2026-10-08** (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
 | R-20 | Edycja oczekującej propozycji pamięci po cichu ją zatwierdza; „zapamiętaj” zapisuje treść odpowiedzi jako zaufaną | `memory-contract/src/engine/write.rs`, `app-memory/src/app.rs` | podejrzenie — do decyzji właściciela |
@@ -109,7 +109,9 @@ Broker w procesie, Modele i silniki z wykrytą kartą RTX 4050 i pakietem zaleca
 okno, zatrzymanie z interfejsu, okna poboczne, konsola bez błędów, CSP z Trusted Types bez naruszeń). Potwierdzone na
 zrzutach z działającej aplikacji: wyśrodkowany onboarding, ustawienia w grupach na szerokiej stronie, błąd „brak
 modelu” z przyciskami „Modele i silniki” i „Dodaj klucz”. **Niesprawdzone na żywo:** odpowiedź modelu lokalnego
-(wymaga pobrania modelu i silnika), głos, skalowanie w oknie szerszym niż 1200 px, poprawki bez własnych testów.
+(wymaga pobrania modelu i silnika), głos, poprawki bez własnych testów. Skalowanie sprawdzone na żywo przez CDP
+w czterech rozmiarach okna: skala 1,00 / 1,08 / 1,25 / 1,50 przy 1280 / 1920 / 2560 / 3840 px, kolumna rozmowy
+691 / 847 / 1210 / 1500 px.
 
 Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, aktualizacje; użycie Brokera):
 

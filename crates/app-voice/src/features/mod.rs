@@ -181,13 +181,16 @@ impl F5 {
         let Some(parts) = self.parts() else {
             return Err(view::NO_SPEAKER_MODEL.into());
         };
-        self.speaker
-            .get_or_init(|| match parts.speaker() {
-                Some(Ok(v)) => Ok(v),
-                Some(Err(e)) => Err(e.to_string()),
-                None => Err(view::NO_SPEAKER_MODEL.into()),
-            })
-            .clone()
+        // W pamięci zostaje tylko udane wczytanie: model pobrany po starcie aplikacji ma zostać
+        // wykryty przy następnym użyciu (wcześniej zapamiętany błąd wymagał restartu Alfy).
+        if let Some(Ok(v)) = self.speaker.get() {
+            return Ok(v.clone());
+        }
+        match parts.speaker() {
+            Some(Ok(v)) => Ok(self.speaker.get_or_init(|| Ok(v)).clone()?),
+            Some(Err(e)) => Err(e.to_string()),
+            None => Err(view::NO_SPEAKER_MODEL.into()),
+        }
     }
 
     /// Odświeża dostępność modelu słów wywoławczych i pomiar FAR/FRR (pliki modeli).
