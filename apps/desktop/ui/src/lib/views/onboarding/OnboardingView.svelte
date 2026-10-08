@@ -241,7 +241,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-4);
-    width: min(820px, 100%);
+    width: min(940px, 100%);
     /* `margin: auto` w kontenerze flex: karta na środku okna, a gdy jest wyższa niż okno — od góry
        (bez ucinania). Wcześniej wisiała pod górną krawędzią z pustą połową ekranu pod spodem. */
     margin: auto;

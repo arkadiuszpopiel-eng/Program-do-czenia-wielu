@@ -164,6 +164,8 @@
   .local {
     display: flex;
     flex-direction: column;
+    /* Przyciski mają naturalną szerokość — rozciągnięte na całą kartę wyglądały jak pole. */
+    align-items: flex-start;
     gap: var(--alfa-space-2);
     margin-top: var(--alfa-space-4);
   }
@@ -195,6 +197,7 @@
     color: var(--alfa-color-warning);
   }
   .trust {
+    align-self: stretch;
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-1);
