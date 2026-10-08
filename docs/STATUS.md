@@ -128,7 +128,7 @@ Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, ak
 | --- | --- | --- | --- |
 | R-21 | Dzienny limit uruchomień mostu z harmonogramu zeruje się przy każdej zmianie przypięcia albo harmonogramu i po restarcie (licznik tylko w pamięci) | `app-bridges/src/app.rs`, `agent-backends-impl/src/gate.rs` | potwierdzone odczytem |
 | R-22 | „Zatrzymaj sterowanie” zatrzymuje tury rozmowy, ale prawdopodobnie nie zadania mostów CLI ani schedulera; błędy `turns_stop` są pomijane | `app-core/src/commands/work.rs` | podejrzenie |
-| R-23 | Wyłączonej umiejętności nie da się włączyć ponownie (brak operacji; wtyczki ją mają) | `app-skills`, `SkillsPage.svelte` | potwierdzone — może zamierzone |
+| R-23 | **wyjaśnione w interfejsie 2026-10-08**: przy wyłączonych umiejętnościach jest informacja, że wyłączenie jest jednokierunkowe. Otwarte (decyzja): czy dodać operację „włącz” jak we wtyczkach | `app-skills`, `SkillsPage.svelte` | potwierdzone — może zamierzone |
 | R-24 | Podwójne wywołanie pobierania aktualizacji może zamienić stan „gotowa” na „nieudana” | `app-updates/src/lib.rs`, `updater-impl/src/download.rs` | podejrzenie |
 | R-25 | Włączenie wtyczki przekazuje tylko identyfikator — przy dwóch wyłączonych wersjach suma może nie pasować do wybranej; „Usuń” wtyczki bez potwierdzenia | `app-plugins/src/app.rs`, `PluginsPage.svelte` | podejrzenie |
 

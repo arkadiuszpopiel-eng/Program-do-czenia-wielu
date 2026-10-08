@@ -195,6 +195,10 @@
         <li>{label(s)} — {tk(`skills.state.${s.state}`)}</li>
       {/each}
     </ul>
+    <!-- Wyłączenie jest jednokierunkowe (rdzeń nie ma operacji „włącz”) — mówimy to wprost. -->
+    {#if other.some((s) => s.state === 'disabled')}
+      <p class="wk-meta">{t('skills.disabledNote')}</p>
+    {/if}
   </section>
 {/if}
 

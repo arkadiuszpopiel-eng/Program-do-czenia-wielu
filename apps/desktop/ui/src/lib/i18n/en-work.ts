@@ -132,6 +132,8 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'skills.started': 'Task "{title}" delegated.',
   'skills.disable': 'Disable',
   'skills.disabled': 'Skill disabled.',
+  'skills.disabledNote':
+    'A disabled skill cannot be re-enabled with one click — propose it again and it will be reviewed anew.',
   'skills.state.proposed': 'proposal',
   'skills.state.quarantined': 'quarantine',
   'skills.state.installed': 'installed',

@@ -132,6 +132,8 @@ export const plWork = {
   'skills.started': 'Zlecono zadanie „{title}".',
   'skills.disable': 'Wyłącz',
   'skills.disabled': 'Wyłączono umiejętność.',
+  'skills.disabledNote':
+    'Wyłączonej umiejętności nie da się włączyć jednym kliknięciem — zgłoś ją ponownie, a przejdzie przegląd od nowa.',
   'skills.state.proposed': 'propozycja',
   'skills.state.quarantined': 'kwarantanna',
   'skills.state.installed': 'zainstalowana',
