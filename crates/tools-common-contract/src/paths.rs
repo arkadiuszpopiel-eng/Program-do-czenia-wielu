@@ -187,7 +187,7 @@ fn resolve(
             return Err(PathError::ParentSegment(trimmed.to_owned()));
         }
         let drive = i == 0 && is_drive_prefix(seg);
-        let ads = seg.contains(':') && !drive;
+        let ads = (seg.contains(':') && !drive) || crate::device::is_device_segment(seg);
         let trailing = seg != "." && !seg.is_empty() && seg.ends_with(['.', ' ']);
         if ads || trailing || seg.contains(['*', '?', '"', '<', '>', '|']) {
             return Err(PathError::Ambiguous(trimmed.to_owned()));

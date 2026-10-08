@@ -140,6 +140,15 @@ impl Core {
             }
             _ => a.content.into_bytes(),
         };
+        // Limit dotyczy pliku po zapisie, nie tylko dopisywanej treści — inaczej `append` pozwalał
+        // rosnąć plikowi bez końca (każde dopisanie czyta i zapisuje całość z kopią w dzienniku).
+        if data.len() as u64 > self.config.write_max_bytes {
+            let out = ToolOutcome::failed(
+                ToolErrorKind::InvalidArgs,
+                format!("Nie wykonano: {action} — plik po dopisaniu przekroczyłby limit zapisu."),
+            );
+            return Ok(self.done(ctx, m, &auths, out).await);
+        }
         let bytes = data.len() as u64;
         let journal = self.journal.clone();
         let out = self

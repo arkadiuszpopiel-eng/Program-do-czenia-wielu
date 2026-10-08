@@ -15,6 +15,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod call;
+mod device;
 mod gate;
 mod manifest;
 pub mod netpath;
