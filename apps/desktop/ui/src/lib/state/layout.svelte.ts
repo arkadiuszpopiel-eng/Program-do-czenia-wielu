@@ -8,13 +8,14 @@ import {
   resolvePanels,
   type LayoutMode,
   type PanelLayout,
+  RIGHT_DEFAULT,
 } from '../logic/layout';
 
 export class LayoutState {
   /** Szerokość okna w px CSS po uwzględnieniu zoomu. */
   width = $state(1280);
   leftWidth = $state(264);
-  rightWidth = $state(360);
+  rightWidth = $state(RIGHT_DEFAULT);
   leftCollapsed = $state(false);
   focus = $state(false);
   panels = $state<Record<string, SessionPanels>>({});

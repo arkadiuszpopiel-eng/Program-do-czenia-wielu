@@ -8,6 +8,9 @@ export const LEFT_MAX = 320;
 export const LEFT_RAIL = 48;
 export const RIGHT_MIN = 300;
 export const RIGHT_MAX = 520;
+/** Domyślna szerokość prawego panelu i szerokość na dużym oknie (mieści wszystkie karty w jednym wierszu). */
+export const RIGHT_DEFAULT = 360;
+export const RIGHT_WIDE = 460;
 export const ZOOM_MIN = 80;
 export const ZOOM_MAX = 200;
 export const ZOOM_STEP = 10;
@@ -67,6 +70,12 @@ export const clamp = (value: number, min: number, max: number): number =>
 
 export const clampLeft = (width: number): number => clamp(width, LEFT_MIN, LEFT_MAX);
 export const clampRight = (width: number): number => clamp(width, RIGHT_MIN, RIGHT_MAX);
+/**
+ * Szerokość zadokowanego prawego panelu: na szerokim oknie panel o domyślnej szerokości rośnie,
+ * żeby karty nie łamały się na dwa wiersze; szerokość ustawiona przez użytkownika zostaje.
+ */
+export const dockedRightWidth = (stored: number, mode: LayoutMode): number =>
+  mode === 'wide' && stored === RIGHT_DEFAULT ? RIGHT_WIDE : stored;
 export const clampZoom = (zoom: number): number => clamp(zoom, ZOOM_MIN, ZOOM_MAX);
 
 export function stepZoom(zoom: number, direction: 1 | -1 | 0): number {

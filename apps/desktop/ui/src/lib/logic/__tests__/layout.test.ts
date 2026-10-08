@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { clampLeft, clampRight, layoutMode, resolvePanels, stepZoom } from '../layout';
+import {
+  RIGHT_DEFAULT,
+  RIGHT_WIDE,
+  clampLeft,
+  clampRight,
+  dockedRightWidth,
+  layoutMode,
+  resolvePanels,
+  stepZoom,
+} from '../layout';
 
 describe('responsywność §14.2', () => {
   it('progi szerokości', () => {
@@ -42,5 +51,14 @@ describe('responsywność §14.2', () => {
     expect(stepZoom(200, 1)).toBe(200);
     expect(stepZoom(80, -1)).toBe(80);
     expect(stepZoom(150, 0)).toBe(100);
+  });
+});
+
+describe('szerokość prawego panelu', () => {
+  it('na szerokim oknie domyślny panel rośnie, a ustawiony przez użytkownika zostaje', () => {
+    expect(dockedRightWidth(RIGHT_DEFAULT, 'wide')).toBe(RIGHT_WIDE);
+    expect(dockedRightWidth(RIGHT_DEFAULT, 'medium')).toBe(RIGHT_DEFAULT);
+    expect(dockedRightWidth(320, 'wide')).toBe(320);
+    expect(dockedRightWidth(500, 'wide')).toBe(500);
   });
 });

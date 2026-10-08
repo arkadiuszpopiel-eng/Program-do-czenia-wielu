@@ -112,3 +112,17 @@ for (const width of [1280, 1600]) {
     await expect(tabs.filter({ hasText: 'Głos' })).toHaveAttribute('aria-selected', 'true');
   });
 }
+
+test('panel prawy na szerokim oknie: wszystkie karty w jednym wierszu', async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await openApp(page);
+  await page.keyboard.press('Alt+1');
+  const tabs = page.getByRole('tablist').first().getByRole('tab');
+  await expect(tabs).toHaveCount(7);
+  const tops = new Set<number>();
+  for (const tab of await tabs.all()) {
+    const r = await tab.boundingBox();
+    if (r) tops.add(Math.round(r.y));
+  }
+  expect([...tops], 'karty na jednej wysokości').toHaveLength(1);
+});

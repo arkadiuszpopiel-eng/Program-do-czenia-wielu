@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
   import { ResizeHandle } from '@alfa/ui-kit';
-  import { LEFT_MAX, LEFT_MIN, RIGHT_MAX, RIGHT_MIN } from '../../logic/layout';
+  import { LEFT_MAX, LEFT_MIN, RIGHT_MAX, RIGHT_MIN, dockedRightWidth } from '../../logic/layout';
   import { useApp } from '../../state/context';
   import ConversationView from '../conversation/ConversationView.svelte';
   import { focusTrap } from './focus-trap';
@@ -23,6 +23,7 @@
   const place = $derived(app.layout.placement(sid));
   const left = $derived(inSettings ? 'hidden' : place.left);
   const right = $derived(inSettings ? 'hidden' : place.right);
+  const rightWidth = $derived(dockedRightWidth(app.layout.rightWidth, app.layout.mode));
   const rail = $derived(left === 'rail' || (left === 'docked' && app.layout.leftCollapsed));
   // „Dopasowana”: kolumna rośnie z oknem — od wąskiej (72 znaki) do ok. 110 znaków, potem margines.
   const COLUMNS: Record<string, string> = {
@@ -85,9 +86,9 @@
       {/if}
     </main>
     {#if right === 'docked'}
-      <aside class="right" style:width="{app.layout.rightWidth}px">
+      <aside class="right" style:width="{rightWidth}px">
         <ResizeHandle
-          value={app.layout.rightWidth}
+          value={rightWidth}
           min={RIGHT_MIN}
           max={RIGHT_MAX}
           side="right"
