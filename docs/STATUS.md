@@ -63,14 +63,14 @@ Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają
 
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
-| R-01 | **naprawione 2026-10-08**: `flush_queue` gubił kolejkę offline przy błędzie jednej sesji — nieobsłużone sesje wracają teraz do kolejki | `app-core/src/commands/queue.rs` | testy `errors.rs` zielone; brak osobnego testu błędu w środku kolejki |
+| R-01 | **naprawione 2026-10-08**: `flush_queue` gubił kolejkę offline przy błędzie jednej sesji — nieobsłużone sesje wracają teraz do kolejki | `app-core/src/commands/queue.rs` | testy `errors.rs` zielone; kolejność po błędzie — test `queue.rs::requeued_entries_keep_every_turn_in_sending_order` |
 | R-02 | **naprawione 2026-10-08**: nieudany start odpowiedzi po zapisanej wiadomości daje komunikat i „Ponów” zamiast błędu wysyłki (koniec duplikatów) | `app-core/src/commands/turns.rs::start_after_user` | testy `commands.rs`, `errors.rs` zielone; brak testu regresji |
-| R-03 | **naprawione 2026-10-08**: „Edytuj i wyślij ponownie” przenosi bloki (załączniki) pierwotnej wiadomości do nowej gałęzi | `app-core/src/commands/turns.rs` | testy `commands.rs`, `files.rs` zielone; brak osobnego testu regresji |
+| R-03 | **naprawione 2026-10-08**: „Edytuj i wyślij ponownie” przenosi bloki (załączniki) pierwotnej wiadomości do nowej gałęzi | `app-core/src/commands/turns.rs` | test `app-core/tests/review.rs::edit_and_resend_keeps_the_attachments_of_the_original_message` |
 | R-04 | **naprawione w interfejsie 2026-10-08**: strona Modele i silniki ostrzega, gdy model jest na dysku bez pasującego silnika, i prowadzi do silników (`logic/models.ts::missingEngines`, testy); onboarding proponuje pakiet z silnikiem. Otwarte: pole „brakujące silniki” w DTO rdzenia | `app-models/src/lib.rs`, `view.rs` | potwierdzone odczytem |
 | R-05 | Wszystkie silniki mają `sha256: None` — po pobraniu czekają na zgodę i `sidecars` zostaje puste, choć model jest „zainstalowany”; sumy wydań b6710 i whisper są w przewodniku 11 i można je przypiąć (decyzja właściciela) | `app-models/src/data.rs` | mechanizm potwierdzony |
-| R-06 | **naprawione 2026-10-08**: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze | `app-models/src/jobs.rs`, `fetch.rs` | testy `download.rs`, `unpack.rs` zielone; brak testu regresji |
+| R-06 | **naprawione 2026-10-08**: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze | `app-models/src/jobs.rs`, `fetch.rs` | testy `download.rs`, `unpack.rs` zielone; test `fetch.rs::range_not_satisfiable_means_complete_only_for_matching_size` |
 | R-07 | **naprawione 2026-10-08**: model GGUF jest „zainstalowany” dopiero z rekordem `.sha256`, tak jak ocenia go dostawca lokalny (`app-models/src/view.rs`); testy `download.rs`, `bundles.rs` zielone | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
-| R-08 | **naprawione 2026-10-08**: limit startu modelu rośnie o 20 s na każdy gigabajt pliku (Bielik 4.5B: 140 s) — `providers-local-impl/src/sidecar.rs`; bez pomiaru na żywo | `providers-local-impl/src/config.rs` | podejrzenie |
+| R-08 | **naprawione 2026-10-08**: limit startu modelu rośnie o 20 s na każdy gigabajt pliku (Bielik 4.5B: 140 s) — `providers-local-impl/src/sidecar.rs`; test `sidecar/lease.rs::startup_limit_grows_with_model_size`; bez pomiaru na żywo | `providers-local-impl/src/config.rs` | podejrzenie |
 | R-09 | **naprawione 2026-10-08**: nieudany zapis odpowiedzi daje widoczny komunikat (`app-chat/src/finish.rs`); panika w przebiegu generacji kończy turę błędem zamiast zostawić ją na zawsze w stanie „pisze” (`outcome.rs::guarded`, test `panicking_generation_ends_as_failed_turn`). Uwaga: build wydaniowy powłoki ma `panic = "abort"` — tam strażnik nie działa, proces kończy się po zapisie paniki do dziennika; zmiana strategii paniki to decyzja właściciela | `app-chat/src/generate.rs`, `outcome.rs`, `finish.rs` | podejrzenie |
 
 Druga tura przeglądów (głos, pamięć, narzędzia agentek i transfer; 2026-10-08). Naprawione od razu:
@@ -131,6 +131,7 @@ Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, ak
 | R-23 | **wyjaśnione w interfejsie 2026-10-08**: przy wyłączonych umiejętnościach jest informacja, że wyłączenie jest jednokierunkowe. Otwarte (decyzja): czy dodać operację „włącz” jak we wtyczkach | `app-skills`, `SkillsPage.svelte` | potwierdzone — może zamierzone |
 | R-24 | Podwójne wywołanie pobierania aktualizacji może zamienić stan „gotowa” na „nieudana” | `app-updates/src/lib.rs`, `updater-impl/src/download.rs` | podejrzenie |
 | R-25 | **wyjaśnione 2026-10-08**: dwie wyłączone wersje tej samej wtyczki nie mogą współistnieć — zatwierdzenie nowszej oznacza starszą wyłączoną jako zastąpioną (`plugin-runtime-contract/src/library.rs::approve`), więc włączanie po identyfikatorze jest jednoznaczne; test `tests/contract.rs::at_most_one_disabled_version_per_plugin`. „Usuń” wtyczki ma potwierdzenie (`PluginsPage.svelte`) | `plugin-runtime-contract/src/library.rs`, `PluginsPage.svelte` | niepotwierdzone |
+| R-26 | **znalezione i naprawione 2026-10-08**: wiadomość z kolejki offline należąca do sesji usuniętej (w oknie cofnięcia) po powrocie sieci szła do modelu — odpowiedź do sesji w koszu, w chmurze zbędny koszt. Teraz wpis czeka w kolejce na „Cofnij”, a ostateczne usunięcie sesji go czyści. Test `app-core/tests/review.rs::queued_message_of_a_trashed_session_waits_for_undo` | `app-core/src/commands/queue.rs`, `sessions.rs` | potwierdzone testem |
 
 Czwarta tura — narzędzia plikowe i powłoka agentek (`tools-fs-impl`, `tools-shell-impl`, `tools-common-contract`,
 `tools-net-impl`; `tools-clipboard-impl` tylko pobieżnie — redakcja sekretów, limity tekstu i obrazu, skażenie sesji
@@ -153,8 +154,8 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
 - *Do zrobienia bez decyzji, nietknięte:* pole „brakujące silniki” w DTO rdzenia (R-04) — interfejs liczy je sam
   z listy modeli i silników, więc to porządek, nie błąd.
-- *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-01, R-02, R-03, R-06, R-08, R-14, schowek dla
-  głosu, dyktowanie przy STOP, wyciek dzierżawy pamięci.
+- *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-02, R-14, schowek dla głosu, dyktowanie przy
+  STOP, wyciek dzierżawy pamięci.
 
 Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet 125 zielony w ostatnim przebiegu; test palety bywa
 czerwony pod obciążeniem. Test „paleta: otwarcie ≤ 50 ms” ma

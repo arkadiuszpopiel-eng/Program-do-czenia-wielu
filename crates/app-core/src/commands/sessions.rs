@@ -195,6 +195,7 @@ impl AppCore {
             Err(e) => tracing::error!(sesja = %id, error = %e, "usuwanie sesji nie powiodło się"),
         }
         self.inner.store.forget(id);
+        self.drop_queued(id);
     }
 
     /// `sessions_undo_remove`.

@@ -1,5 +1,7 @@
 //! Kolejka offline: wiadomości wysłane bez sieci czekają na `system_retry_queue`.
 
+use std::collections::{BTreeMap, VecDeque};
+
 use sessions_contract::{SessionHistory, SessionId, TurnId};
 
 use crate::core::AppCore;
@@ -8,25 +10,52 @@ use crate::error::AppError;
 use crate::ids;
 use app_chat::{GenRequest, Placement};
 
+/// Wpis kolejki offline: sesja i jej czekające tury użytkownika.
+type Entry = (SessionId, Vec<TurnId>);
+
+/// Zwraca wpisy do kolejki: przed wpisami, które doszły w międzyczasie (kolejność wysyłki).
+fn requeue(queue: &mut BTreeMap<SessionId, Vec<TurnId>>, entries: impl IntoIterator<Item = Entry>) {
+    for (id, mut turns) in entries {
+        let entry = queue.entry(id).or_default();
+        turns.append(entry);
+        *entry = turns;
+    }
+}
+
 impl AppCore {
     /// Wysyła wiadomości z kolejki offline (po jednej odpowiedzi na sesję — na ostatnią).
     pub(crate) async fn flush_queue(&self) -> Result<(), AppError> {
-        let mut queued: std::collections::VecDeque<(SessionId, Vec<TurnId>)> =
-            std::mem::take(&mut self.rt().queued).into_iter().collect();
+        let (mut queued, trashed): (VecDeque<Entry>, Vec<SessionId>) = {
+            let mut rt = self.rt();
+            let trashed = rt.trash.values().map(|(id, _)| id.clone()).collect();
+            (
+                std::mem::take(&mut rt.queued).into_iter().collect(),
+                trashed,
+            )
+        };
         while let Some((id, turns)) = queued.pop_front() {
+            // Sesja w koszu (trwa okno cofnięcia usunięcia): bez odpowiedzi modelu — wpis czeka
+            // na „Cofnij" albo znika razem z sesją (`shred_session`).
+            if trashed.contains(&id) {
+                requeue(&mut self.rt().queued, [(id, turns)]);
+                continue;
+            }
             if let Err(e) = self.flush_session(&id, &turns).await {
                 // Błąd jednej sesji nie może zgubić kolejki: ta sesja i wszystkie nieobsłużone
                 // wracają do kolejki (nowe wpisy, które doszły w międzyczasie, zostają na końcu).
-                let mut rt = self.rt();
-                for (sid, mut rest) in std::iter::once((id, turns)).chain(queued) {
-                    let entry = rt.queued.entry(sid).or_default();
-                    rest.append(entry);
-                    *entry = rest;
-                }
+                requeue(
+                    &mut self.rt().queued,
+                    std::iter::once((id, turns)).chain(queued),
+                );
                 return Err(e);
             }
         }
         Ok(())
+    }
+
+    /// Usuwa wpisy kolejki offline ostatecznie usuwanej sesji.
+    pub(crate) fn drop_queued(&self, id: &SessionId) {
+        self.rt().queued.remove(id);
     }
 
     /// Jedna sesja z kolejki offline: statusy tur i odpowiedź na ostatnią wiadomość.
@@ -79,5 +108,34 @@ impl AppCore {
             status: status.clone(),
         });
         status
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// R-01 (docs/STATUS.md): wpisy wracające po błędzie stoją przed tymi, które doszły później,
+    /// i żadna tura nie ginie.
+    #[test]
+    fn requeued_entries_keep_every_turn_in_sending_order() {
+        let (a, b, c) = (
+            SessionId::new("a"),
+            SessionId::new("b"),
+            SessionId::new("c"),
+        );
+        let mut queue = BTreeMap::new();
+        queue.insert(a.clone(), vec![TurnId(9)]);
+        requeue(
+            &mut queue,
+            [
+                (a.clone(), vec![TurnId(1), TurnId(3)]),
+                (b.clone(), vec![TurnId(1)]),
+            ],
+        );
+        assert_eq!(queue[&a], [TurnId(1), TurnId(3), TurnId(9)]);
+        assert_eq!(queue[&b], [TurnId(1)]);
+        assert!(!queue.contains_key(&c));
+        assert_eq!(queue.values().map(Vec::len).sum::<usize>(), 4);
     }
 }
