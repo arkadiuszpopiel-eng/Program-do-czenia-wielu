@@ -140,6 +140,8 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'bridges.versionBad': 'The detected version is not pinned — the bridge will refuse to start.',
   'bridges.pin': 'Pin detected version',
   'bridges.unpin': 'Unpin',
+  'bridges.registryMismatch':
+    'The compliance registry allows version {required}, but {found} was detected — the bridge will not start until they match.',
   'bridges.verified': 'Verified {date}',
   'bridges.sources': 'Terms and sources',
   'bridges.copyUrl': 'Copy address',

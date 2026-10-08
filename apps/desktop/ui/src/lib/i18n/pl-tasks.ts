@@ -138,6 +138,8 @@ export const plTasks = {
   'bridges.versionBad': 'Wykryta wersja nie jest przypięta — most odmówi startu.',
   'bridges.pin': 'Przypnij wykrytą wersję',
   'bridges.unpin': 'Odepnij',
+  'bridges.registryMismatch':
+    'Rejestr zgodności dopuszcza wersję {required}, a wykryto {found} — most nie wystartuje, dopóki wersje się nie zgodzą.',
   'bridges.verified': 'Zweryfikowano {date}',
   'bridges.sources': 'Regulamin i źródła',
   'bridges.copyUrl': 'Kopiuj adres',

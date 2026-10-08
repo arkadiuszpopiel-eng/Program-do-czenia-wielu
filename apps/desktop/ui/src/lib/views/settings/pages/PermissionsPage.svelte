@@ -29,7 +29,10 @@
     } else if (result.status === 'failed') loadError = result.error;
   }
 
+  // Poziomy wczytujemy też przy każdej zmianie stanu Brokera (restart, zerwanie i powrót łącza):
+  // wcześniej strona pokazywała poziom sprzed zmiany jako „obecny".
   $effect(() => {
+    void app.broker.view;
     void reload(app.activeId);
   });
 

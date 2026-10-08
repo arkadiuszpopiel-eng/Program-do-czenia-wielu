@@ -73,7 +73,7 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       app.voice.applyFeatures(event.features);
       break;
     case 'UpdateStatus':
-      app.updates.apply(event.status);
+      app.updates.applyEvent(event.status);
       app.notify(event);
       break;
     case 'BrokerStatus':

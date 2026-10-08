@@ -23,6 +23,16 @@ export class UpdatesState {
     this.view = view;
   }
 
+  /**
+   * Stan ze zdarzenia rdzenia. Zdarzenia nie niosą powodu blokady ponownego uruchomienia (rdzeń
+   * liczy go tylko na żądanie), więc zachowujemy ostatni znany — inaczej przycisk „Uruchom ponownie"
+   * odblokowywał się po każdym zdarzeniu, a kliknięcie kończyło się błędem.
+   */
+  applyEvent(view: UpdatesView): void {
+    const blocked = view.restart_blocked ?? this.view?.restart_blocked ?? null;
+    this.view = { ...view, restart_blocked: view.phase === 'ready' ? blocked : null };
+  }
+
   hideBanner(): void {
     this.bannerHiddenFor = this.readyVersion;
   }

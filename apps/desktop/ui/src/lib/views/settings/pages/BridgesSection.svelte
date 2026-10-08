@@ -151,7 +151,9 @@
         {#if card.bridge}
           {@const bridge = card.bridge}
           <div class="actions">
-            {#if card.detected && card.version && !card.version_ok}
+            <!-- „Przypnij" tylko dla wersji jeszcze nieprzypiętej; gdy rejestr zgodności wymaga innej
+                 wersji, przypięcie nic nie zmienia — mówimy to wprost i zostawiamy „Odepnij". -->
+            {#if card.detected && card.version && !card.version_ok && !card.pinned.includes(card.version)}
               <Button
                 size="sm"
                 variant="secondary"
@@ -165,6 +167,14 @@
                 onclick={() => run(() => app.client.bridges.pin(bridge, null))}
                 >{t('bridges.unpin')}</Button
               >
+            {/if}
+            {#if card.version && !card.version_ok && card.registry_pin && card.registry_pin !== card.version}
+              <p class="wk-meta" role="status">
+                {t('bridges.registryMismatch', {
+                  required: card.registry_pin,
+                  found: card.version,
+                })}
+              </p>
             {/if}
             {#if card.login_command}
               {@const profile = loginProfile(bridge)}

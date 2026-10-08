@@ -101,6 +101,25 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-19 | **naprawione 2026-10-08** (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
 | R-20 | Edycja oczekującej propozycji pamięci po cichu ją zatwierdza; „zapamiętaj” zapisuje treść odpowiedzi jako zaufaną | `memory-contract/src/engine/write.rs`, `app-memory/src/app.rs` | podejrzenie — do decyzji właściciela |
 
+Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, aktualizacje; użycie Brokera):
+
+- Naprawione w interfejsie: przycisk „Uruchom ponownie” przy aktualizacji odblokowywał się po każdym zdarzeniu
+  stanu (`state/updates.svelte.ts::applyEvent`); przy niezgodności z rejestrem zgodności „Przypnij” nie robiło nic
+  widocznego, a „Odepnij” znikało (`BridgesSection.svelte`); strona uprawnień pokazywała nieaktualny poziom
+  autonomii (`PermissionsPage.svelte`).
+- Użycie Brokera: osiem ustaleń B-01…B-08 w [`reviews/2026-10-08-broker-usage-review.md`](reviews/2026-10-08-broker-usage-review.md)
+  — obszar Jądra, **bez zmian w kodzie**, do decyzji właściciela (bramka #7). Najważniejsze: STOP WSZYSTKIEGO
+  zgłasza sukces także wtedy, gdy Broker nie został osiągnięty (B-03); obniżony poziom autonomii nie wraca po
+  starcie, gdy łącze z Brokerem jeszcze nie działa (B-01).
+
+| # | Ustalenie | Gdzie | Pewność |
+| --- | --- | --- | --- |
+| R-21 | Dzienny limit uruchomień mostu z harmonogramu zeruje się przy każdej zmianie przypięcia albo harmonogramu i po restarcie (licznik tylko w pamięci) | `app-bridges/src/app.rs`, `agent-backends-impl/src/gate.rs` | potwierdzone odczytem |
+| R-22 | „Zatrzymaj sterowanie” zatrzymuje tury rozmowy, ale prawdopodobnie nie zadania mostów CLI ani schedulera; błędy `turns_stop` są pomijane | `app-core/src/commands/work.rs` | podejrzenie |
+| R-23 | Wyłączonej umiejętności nie da się włączyć ponownie (brak operacji; wtyczki ją mają) | `app-skills`, `SkillsPage.svelte` | potwierdzone — może zamierzone |
+| R-24 | Podwójne wywołanie pobierania aktualizacji może zamienić stan „gotowa” na „nieudana” | `app-updates/src/lib.rs`, `updater-impl/src/download.rs` | podejrzenie |
+| R-25 | Włączenie wtyczki przekazuje tylko identyfikator — przy dwóch wyłączonych wersjach suma może nie pasować do wybranej; „Usuń” wtyczki bez potwierdzenia | `app-plugins/src/app.rs`, `PluginsPage.svelte` | podejrzenie |
+
 Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet 125 zielony w ostatnim przebiegu; test palety bywa
 czerwony pod obciążeniem. Test „paleta: otwarcie ≤ 50 ms” ma
 medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy.
