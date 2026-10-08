@@ -170,7 +170,9 @@ próbie; 4 razy następna klatka obrazu spóźniła się o 215–435 ms. Wpisy `
 `blockingDuration` 0, pustą listę skryptów i ok. 0 ms pracy nad stylem i układem — opóźnia się wyświetlenie klatki
 po stronie silnika i karty graficznej, nie kod Alfy (okno widoczne i z fokusem; rozmycie tła palety wykluczone
 wcześniej). Test E2E „paleta: otwarcie ≤ 50 ms” mierzy czas do klatki, więc na tym laptopie bywa czerwony
-(mediana zawsze ok. 9 ms, maksimum ponad próg 150 ms). **Próg zostaje bez zmian** — to budżet F1-09; do decyzji
+(mediana zawsze ok. 9 ms, maksimum ponad próg 150 ms). Tak samo zachowuje się drugi test czasowy („strumień 100 tok/s: aktualizacje DOM najwyżej raz na klatkę”):
+nad ranem 2026-10-08 padał w 3 z 5 prób na bieżącym kodzie i w 6 z 6 na kodzie sprzed zmian tej nocy — to stan
+maszyny (opóźnione klatki), nie regresja. **Próg zostaje bez zmian** — to budżet F1-09; do decyzji
 właściciela: mierzyć maksimum do gotowego okna palety zamiast do klatki albo zostawić i zbadać sterownik/zasilanie.
 
 Zmiana procesu: recenzję robi osobna sesja Claude w świeżym kontekście, nie drugi model (ADR 0016). Wszędzie
