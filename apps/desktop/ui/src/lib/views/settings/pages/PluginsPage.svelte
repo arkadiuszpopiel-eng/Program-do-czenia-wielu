@@ -6,7 +6,7 @@
   usuwanie i ostatnie problemy (przerwania piaskownicy, odrzucone moduły — też w „Zdrowiu systemu”).
 -->
 <script lang="ts">
-  import { Button } from '@alfa/ui-kit';
+  import { Button, ConfirmDialog } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { PluginInfo, PluginInspection, PluginsView } from '../../../api/types-plugins';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
@@ -50,6 +50,9 @@
     const words = tk(`plugins.trap.${code}`);
     return at >= 0 ? `${detail.slice(0, at)}: ${words}` : words;
   }
+
+  let removing = $state<{ id: string; name: string } | null>(null);
+  let removeOpen = $state(false);
 
   const pending = $derived(plugins.filter((p) => p.state === 'proposed'));
   const active = $derived(plugins.filter((p) => p.state === 'installed' || p.state === 'disabled'));
@@ -219,8 +222,10 @@
               size="sm"
               variant="ghost"
               aria-label={`${t('plugins.remove')}: ${label(p)}`}
-              onclick={() => run(() => app.client.plugins.remove(p.id), t('plugins.removedOk'))}
-              >{t('plugins.remove')}</Button
+              onclick={() => {
+                removing = { id: p.id, name: label(p) };
+                removeOpen = true;
+              }}>{t('plugins.remove')}</Button
             >
           </div>
         </li>
@@ -239,6 +244,20 @@
     </ul>
   </section>
 {/if}
+
+<!-- Usunięcie wtyczki kasuje jej pliki — wymaga potwierdzenia (wcześniej jedno kliknięcie). -->
+<ConfirmDialog
+  bind:open={removeOpen}
+  title={t('plugins.removeTitle', { name: removing?.name ?? '' })}
+  description={t('plugins.removeBody')}
+  confirmLabel={t('plugins.remove')}
+  cancelLabel={t('common.cancel')}
+  onconfirm={() => {
+    removeOpen = false;
+    const target = removing;
+    if (target) void run(() => app.client.plugins.remove(target.id), t('plugins.removedOk'));
+  }}
+/>
 
 {#if view?.problems.length}
   <section class="wk-card" aria-labelledby="pl-problems">

@@ -89,6 +89,9 @@ export const enPlugins: Record<keyof typeof plPlugins, Message> = {
   'plugins.reject': 'Reject',
   'plugins.disable': 'Disable',
   'plugins.remove': 'Remove',
+  'plugins.removeTitle': 'Remove the plugin {name}?',
+  'plugins.removeBody':
+    'The plugin files will be deleted from this computer. Agents lose its tools; reinstalling requires a new review.',
   'plugins.installedOk': 'Plugin installed — agents can see its tools.',
   'plugins.enabledOk': 'Plugin enabled again.',
   'plugins.rejectedOk': 'Proposal rejected.',

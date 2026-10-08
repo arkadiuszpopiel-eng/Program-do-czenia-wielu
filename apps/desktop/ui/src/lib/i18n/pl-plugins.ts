@@ -88,6 +88,9 @@ export const plPlugins = {
   'plugins.reject': 'Odrzuć',
   'plugins.disable': 'Wyłącz',
   'plugins.remove': 'Usuń',
+  'plugins.removeTitle': 'Usunąć wtyczkę {name}?',
+  'plugins.removeBody':
+    'Pliki wtyczki zostaną usunięte z tego komputera. Agentki stracą jej narzędzia; ponowna instalacja wymaga nowego przeglądu.',
   'plugins.installedOk': 'Wtyczka zainstalowana — agentki widzą jej narzędzia.',
   'plugins.enabledOk': 'Wtyczka znów włączona.',
   'plugins.rejectedOk': 'Propozycja odrzucona.',
