@@ -148,6 +148,34 @@ test('rozmowa bez modelu: czytelny błąd „brak mózgu”', async ({ alfa }) =
   await expectAccessible(alfa, 'rozmowa z błędem „brak mózgu”');
 });
 
+// Skala interfejsu to CSS `zoom`: strona nie może być wyższa niż okno (pole pisania znikało pod
+// dolną krawędzią przy każdej skali powyżej 100 % — docs/STATUS.md, przegląd 2026-10-08).
+test('powiększenie Ctrl+=: strona ma wysokość okna, pole pisania zostaje widoczne', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await toChat(main);
+  const zoom = () => main.evaluate(() => Number(document.documentElement.style.zoom || 1));
+  await main.locator('#alfa-composer').focus();
+  await main.keyboard.press('Control+=');
+  await main.keyboard.press('Control+=');
+  await expect.poll(zoom, { message: 'skala po Ctrl+=' }).toBeGreaterThan(1);
+  const m = await main.evaluate(() => {
+    const composer = document.querySelector('#alfa-composer');
+    return {
+      inner: window.innerHeight,
+      scroll: document.documentElement.scrollHeight,
+      bottom: composer ? composer.getBoundingClientRect().bottom : -1,
+    };
+  });
+  await shot(alfa, '04a-powiekszenie');
+  await main.keyboard.press('Control+0');
+  await expect.poll(zoom, { message: 'skala po Ctrl+0' }).toBe(1);
+  expect(m.scroll, 'brak przewijania całej strony').toBeLessThanOrEqual(m.inner);
+  expect(m.bottom, 'dół pola pisania').toBeGreaterThan(0);
+  expect(m.bottom, 'dół pola pisania').toBeLessThanOrEqual(m.inner);
+});
+
 test('Broker w procesie (build debug): baner i stan w Ustawieniach', async ({ alfa }) => {
   const { main } = alfa;
   await toChat(main);
