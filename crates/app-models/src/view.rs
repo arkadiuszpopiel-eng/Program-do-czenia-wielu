@@ -40,8 +40,18 @@ fn state_of(spec: &ItemSpec, store: &Store, live: &Live) -> (ModelItemState, Opt
     }
     let target = spec.target(store.paths());
     if let Some(receipt) = store.receipt(&spec.id) {
-        let ok =
-            receipt.corrupt.is_none() && receipt.files.keys().all(|rel| target.join(rel).is_file());
+        // Model GGUF jest „zainstalowany" dopiero z rekordem `<plik>.sha256` — tak ocenia go dostawca
+        // lokalny. Bez tej zgodności interfejs pokazywał „Zainstalowano", a rozmowa kończyła się
+        // błędem „model nie jest pobrany".
+        let recorded = |rel: &String| {
+            !matches!(spec.install, Install::Gguf)
+                || providers_local_impl::hash_path(&target.join(rel)).is_file()
+        };
+        let ok = receipt.corrupt.is_none()
+            && receipt
+                .files
+                .keys()
+                .all(|rel| target.join(rel).is_file() && recorded(rel));
         let state = if ok {
             ModelItemState::Installed
         } else {

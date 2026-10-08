@@ -69,9 +69,9 @@ Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają
 | R-04 | **naprawione w interfejsie 2026-10-08**: strona Modele i silniki ostrzega, gdy model jest na dysku bez pasującego silnika, i prowadzi do silników (`logic/models.ts::missingEngines`, testy); onboarding proponuje pakiet z silnikiem. Otwarte: pole „brakujące silniki” w DTO rdzenia | `app-models/src/lib.rs`, `view.rs` | potwierdzone odczytem |
 | R-05 | Wszystkie silniki mają `sha256: None` — po pobraniu czekają na zgodę i `sidecars` zostaje puste, choć model jest „zainstalowany”; sumy wydań b6710 i whisper są w przewodniku 11 i można je przypiąć (decyzja właściciela) | `app-models/src/data.rs` | mechanizm potwierdzony |
 | R-06 | **naprawione 2026-10-08**: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze | `app-models/src/jobs.rs`, `fetch.rs` | testy `download.rs`, `unpack.rs` zielone; brak testu regresji |
-| R-07 | Interfejs może pokazać „Zainstalowano”, gdy dostawca lokalny uzna model za niezainstalowany (brak rekordu `.sha256`) | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
+| R-07 | **naprawione 2026-10-08**: model GGUF jest „zainstalowany” dopiero z rekordem `.sha256`, tak jak ocenia go dostawca lokalny (`app-models/src/view.rs`); testy `download.rs`, `bundles.rs` zielone | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
 | R-08 | **naprawione 2026-10-08**: limit startu modelu rośnie o 20 s na każdy gigabajt pliku (Bielik 4.5B: 140 s) — `providers-local-impl/src/sidecar.rs`; bez pomiaru na żywo | `providers-local-impl/src/config.rs` | podejrzenie |
-| R-09 | Panika w zadaniu generacji zostawia turę „w toku”; nieudany zapis tury jest tylko logowany | `app-chat/src/generate.rs`, `finish.rs` | podejrzenie |
+| R-09 | **częściowo naprawione 2026-10-08**: nieudany zapis odpowiedzi daje widoczny komunikat (`app-chat/src/finish.rs`). Otwarte: strażnik na wypadek paniki w zadaniu generacji | `app-chat/src/generate.rs`, `finish.rs` | podejrzenie |
 
 Druga tura przeglądów (głos, pamięć, narzędzia agentek i transfer; 2026-10-08). Naprawione od razu:
 
@@ -127,10 +127,23 @@ Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, ak
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
 | R-21 | Dzienny limit uruchomień mostu z harmonogramu zeruje się przy każdej zmianie przypięcia albo harmonogramu i po restarcie (licznik tylko w pamięci) | `app-bridges/src/app.rs`, `agent-backends-impl/src/gate.rs` | potwierdzone odczytem |
-| R-22 | „Zatrzymaj sterowanie” zatrzymuje tury rozmowy, ale prawdopodobnie nie zadania mostów CLI ani schedulera; błędy `turns_stop` są pomijane | `app-core/src/commands/work.rs` | podejrzenie |
+| R-22 | **częściowo naprawione 2026-10-08**: błąd zatrzymania przebiegu przy „Zatrzymaj sterowanie” jest logowany i pokazywany (`app-core/src/commands/work.rs`). Otwarte: zatrzymywanie zadań mostów CLI i schedulera tych sesji | `app-core/src/commands/work.rs` | podejrzenie |
 | R-23 | **wyjaśnione w interfejsie 2026-10-08**: przy wyłączonych umiejętnościach jest informacja, że wyłączenie jest jednokierunkowe. Otwarte (decyzja): czy dodać operację „włącz” jak we wtyczkach | `app-skills`, `SkillsPage.svelte` | potwierdzone — może zamierzone |
 | R-24 | Podwójne wywołanie pobierania aktualizacji może zamienić stan „gotowa” na „nieudana” | `app-updates/src/lib.rs`, `updater-impl/src/download.rs` | podejrzenie |
 | R-25 | Włączenie wtyczki przekazuje tylko identyfikator — przy dwóch wyłączonych wersjach suma może nie pasować do wybranej; „Usuń” wtyczki bez potwierdzenia | `app-plugins/src/app.rs`, `PluginsPage.svelte` | podejrzenie |
+
+Czwarta tura — narzędzia plikowe i powłoka agentek (`tools-fs-impl`, `tools-shell-impl`, `tools-common-contract`,
+`tools-net-impl`; `tools-clipboard-impl` nieprzejrzane):
+
+| # | Ustalenie | Gdzie | Pewność |
+| --- | --- | --- | --- |
+| T-01 | Nazwy urządzeń Windows (`CON`, `NUL`, `COM1`…) nie są odrzucane: `fs_read` może zawisnąć na konsoli, `fs_write` do `nul` zgłasza sukces | `tools-common-contract/src/paths.rs::resolve` | potwierdzone |
+| T-02 | `fs_read` i `fs_write` wczytują cały plik do pamięci (limit dotyczy tylko tego, co pokazane) — plik 20 GB może zabić proces | `tools-fs-impl/src/read.rs`, `write.rs`, `FsPort` | potwierdzone |
+| T-03 | `mode=append` omija `write_max_bytes` — plik może rosnąć bez końca | `tools-fs-impl/src/write.rs` | potwierdzone |
+| T-04 | `kind_of` porównuje ścieżki z rozróżnieniem wielkości liter i przy błędzie odczytu uznaje plik za katalog | `tools-fs-impl/src/core.rs` | potwierdzone |
+| T-05 | `fs_search` po cichu pomija pliki za duże lub nietekstowe — model widzi „0 wyników” | `tools-fs-impl/src/read.rs` | potwierdzone |
+| T-06 | Zakres zgody Brokera jest liczony z nierozwiązanej ścieżki — dowiązanie w katalogu roboczym może wyprowadzić poza zakres (lista zakazów nadal działa) | `tools-fs-impl/src/core.rs` | podejrzenie — do przeglądu z Brokerem |
+| T-07 | Krok powłoki jest zatwierdzany w dzienniku przed sprawdzeniem wyniku — nieudane uruchomienie zostawia pusty krok „do cofnięcia” | `tools-shell-impl/src/run.rs` | podejrzenie |
 
 **Podział pozostałych otwartych ustaleń (stan na koniec nocy 7/8.10):**
 

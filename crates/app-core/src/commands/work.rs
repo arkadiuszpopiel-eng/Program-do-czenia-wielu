@@ -124,7 +124,18 @@ impl AppCore {
     /// agentek, narzędzia GUI wstrzymane do `gui_release` (właściciel przejmuje mysz i klawiaturę).
     pub async fn gui_stop(&self) -> Result<GuiStatus, AppError> {
         for session in self.inner.work.gui.take_over() {
-            let _ = self.turns_stop(session.to_string()).await;
+            // Błąd zatrzymania tury nie może zniknąć: sterowanie jest już odebrane narzędziom GUI,
+            // ale przebieg mógł nie zostać anulowany.
+            if let Err(e) = self.turns_stop(session.to_string()).await {
+                tracing::warn!(session = %session, error = %e.message, "zatrzymanie sterowania: przebieg nie został anulowany");
+                self.emit(crate::dto::AlfaEvent::Toast {
+                    kind: crate::dto::ToastKind::Warning,
+                    message: crate::dto::LocalizedText::new(
+                        format!("Sterowanie odebrane, ale przebiegu agentki nie udało się zatrzymać: {}", e.message),
+                        format!("Control taken over, but the agent run could not be stopped: {}", e.message),
+                    ),
+                });
+            }
         }
         Ok(self.inner.work.gui.status())
     }

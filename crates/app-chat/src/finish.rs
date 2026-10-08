@@ -186,7 +186,18 @@ impl ChatEngine {
                     tracing::error!(error = %e, "zapis faktów tury nie powiódł się");
                 }
             }
-            Err(e) => tracing::error!(error = %e, "zapis tury agentki nie powiódł się"),
+            Err(e) => {
+                tracing::error!(error = %e, "zapis tury agentki nie powiódł się");
+                // Odpowiedź jest na ekranie, ale nie ma jej w historii — użytkownik musi to wiedzieć,
+                // zanim zamknie okno (wcześniej tylko wpis w dzienniku).
+                self.emit(AlfaEvent::Toast {
+                    kind: dto::ToastKind::Error,
+                    message: dto::LocalizedText::new(
+                        "Odpowiedź nie została zapisana w historii — po ponownym uruchomieniu jej nie będzie. Skopiuj ją, jeśli jest potrzebna.",
+                        "The reply was not saved to history — it will be gone after a restart. Copy it if you need it.",
+                    ),
+                });
+            }
         }
         if let Some(usage) = &usage {
             self.emit(AlfaEvent::Usage {
