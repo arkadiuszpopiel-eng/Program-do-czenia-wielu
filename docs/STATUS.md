@@ -172,6 +172,17 @@ Przegląd interfejsu, runda z 2026-10-08 przed południem (zrzuty 1280–3840 px
 - Okno „Szybkie pytanie”: karta była o 16 px szersza niż okno (ucięta prawa krawędź) — naprawione, test e2e.
 - Broker w bezpiecznym stanie: opis w banerze raz zamiast dwa razy; karta zatwierdzenia bez martwego przycisku.
 
+Przegląd narzędzi powłoki, schowka i sieci (osobna sesja, tylko odczyt): 12 ustaleń, **niezweryfikowanych i
+niewdrożonych** — [`reviews/2026-10-08-tools-shell-clipboard-net-review.md`](reviews/2026-10-08-tools-shell-clipboard-net-review.md).
+Najpoważniejsze: tekst w cudzysłowie ukrywa przed analizatorem poleceń polecenia niszczące i sieciowe (S-01), a
+nierozwiązywalna ścieżka omija deny-listę (S-03). Analizator to polityka bezpieczeństwa — decyzja właściciela.
+
+Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
+po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
+i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie
+(TOFU pada tak samo na kodzie sprzed dzisiejszych zmian). Do zbadania: limity czasu tych testów albo mniej procesów
+równoległych.
+
 Stan końcowy 2026-10-08 ok. 11:40 (39 commitów lokalnych): prawdziwa aplikacja zbudowana z końca gałęzi i uruchomiona na
 tymczasowym profilu — `e2e-app` 10/10; `scripts/gates.ps1` zielone; vitest 243/243; E2E 124/125 (test czasowy palety).
 
