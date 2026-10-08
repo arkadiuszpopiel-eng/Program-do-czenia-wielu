@@ -163,6 +163,14 @@ mniej więcej 2 s po starcie, bez długiego zadania JavaScript i niezależnie od
 harmonogram klatek przeglądarki bez okna, nie na kod Alfy. Do potwierdzenia w prawdziwej aplikacji (F1-09).
 Testy `slow-core` miały za krótki limit na start aplikacji przy wolnym rdzeniu — poprawione.
 
+Pomiar w prawdziwej aplikacji (WebView2, 2026-10-08, 66 otwarć palety przez CDP): samo otwarcie 2–13 ms w każdej
+próbie; 4 razy następna klatka obrazu spóźniła się o 215–435 ms. Wpisy `long-animation-frame` dla tych klatek mają
+`blockingDuration` 0, pustą listę skryptów i ok. 0 ms pracy nad stylem i układem — opóźnia się wyświetlenie klatki
+po stronie silnika i karty graficznej, nie kod Alfy (okno widoczne i z fokusem; rozmycie tła palety wykluczone
+wcześniej). Test E2E „paleta: otwarcie ≤ 50 ms” mierzy czas do klatki, więc na tym laptopie bywa czerwony
+(mediana zawsze ok. 9 ms, maksimum ponad próg 150 ms). **Próg zostaje bez zmian** — to budżet F1-09; do decyzji
+właściciela: mierzyć maksimum do gotowego okna palety zamiast do klatki albo zostawić i zbadać sterownik/zasilanie.
+
 Zmiana procesu: recenzję robi osobna sesja Claude w świeżym kontekście, nie drugi model (ADR 0016). Wszędzie
 niżej „model-recenzent” ma to znaczenie.
 
