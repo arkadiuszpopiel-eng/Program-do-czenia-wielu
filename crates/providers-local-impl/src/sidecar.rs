@@ -304,6 +304,10 @@ impl Sidecar {
             args: plan.args(entry, model_path, port, &key),
             secret: key.clone(),
         };
+        // Duży model ładuje się dłużej (zimny dysk, skaner antywirusowy): do limitu z konfiguracji
+        // dochodzi 20 s na każdy pełny gigabajt pliku modelu (Bielik 4.5B Q8: 60 s + 80 s).
+        let startup_limit =
+            self.config.startup_timeout + Duration::from_secs(u64::from(entry.size_mb) / 1024 * 20);
         let t0 = Instant::now();
         let mut process = self.launcher.spawn(&spec)?;
         loop {
@@ -312,7 +316,7 @@ impl Sidecar {
                     "proces zakończony (kod {code:?})"
                 )));
             }
-            if t0.elapsed() > self.config.startup_timeout {
+            if t0.elapsed() > startup_limit {
                 process.kill();
                 return Err(LocalError::Startup(
                     "przekroczony czas ładowania modelu".into(),

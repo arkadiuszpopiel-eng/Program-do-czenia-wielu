@@ -30,9 +30,26 @@ impl Installed {
     fn detect(paths: &AppPaths) -> Self {
         Self {
             pocket: paths.sidecar("pocket-tts", "pocket-tts").is_file(),
-            piper: paths.sidecar("piper", "piper").is_file(),
+            // Piper bez modelu głosu (`*.onnx`) nie potrafi nic powiedzieć: sam plik silnika to
+            // jeszcze nie „głos gotowy" (wcześniej rozmowa startowała i każde zdanie kończyło się
+            // surowym błędem Pipera).
+            piper: paths.sidecar("piper", "piper").is_file()
+                && has_piper_voice(&paths.models().join("piper")),
         }
     }
+}
+
+/// Czy w katalogu jest co najmniej jeden model głosu Pipera (`*.onnx`).
+fn has_piper_voice(dir: &std::path::Path) -> bool {
+    std::fs::read_dir(dir).is_ok_and(|entries| {
+        entries.filter_map(Result::ok).any(|e| {
+            let path = e.path();
+            path.is_file()
+                && path
+                    .extension()
+                    .is_some_and(|x| x.eq_ignore_ascii_case("onnx"))
+        })
+    })
 }
 
 /// Serwis TTS dla zainstalowanych silników (`None` — żaden nie jest zainstalowany).
@@ -176,6 +193,13 @@ mod tests {
         let piper = paths.sidecar("piper", "piper");
         std::fs::create_dir_all(piper.parent().unwrap()).unwrap();
         std::fs::write(&piper, b"exe").unwrap();
+        assert!(
+            matches!(tts.health(), TtsHealth::Failed(_)),
+            "sam silnik bez modelu głosu to jeszcze nie gotowy głos"
+        );
+        let voices = paths.models().join("piper");
+        std::fs::create_dir_all(&voices).unwrap();
+        std::fs::write(voices.join("pl_PL-gosia-medium.onnx"), b"m").unwrap();
         assert_eq!(tts.health(), TtsHealth::Ready, "bez ponownego uruchomienia");
         assert!(ready(Some(&tts)).is_some());
         assert_eq!(tts.voices().len(), v0_chains().len());

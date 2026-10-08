@@ -70,7 +70,7 @@ Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają
 | R-05 | Wszystkie silniki mają `sha256: None` — po pobraniu czekają na zgodę i `sidecars` zostaje puste, choć model jest „zainstalowany”; sumy wydań b6710 i whisper są w przewodniku 11 i można je przypiąć (decyzja właściciela) | `app-models/src/data.rs` | mechanizm potwierdzony |
 | R-06 | **naprawione 2026-10-08**: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze | `app-models/src/jobs.rs`, `fetch.rs` | testy `download.rs`, `unpack.rs` zielone; brak testu regresji |
 | R-07 | Interfejs może pokazać „Zainstalowano”, gdy dostawca lokalny uzna model za niezainstalowany (brak rekordu `.sha256`) | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
-| R-08 | Limit startu modelu 60 s może nie wystarczyć dla Bielika 4.5B z zimnego dysku | `providers-local-impl/src/config.rs` | podejrzenie |
+| R-08 | **naprawione 2026-10-08**: limit startu modelu rośnie o 20 s na każdy gigabajt pliku (Bielik 4.5B: 140 s) — `providers-local-impl/src/sidecar.rs`; bez pomiaru na żywo | `providers-local-impl/src/config.rs` | podejrzenie |
 | R-09 | Panika w zadaniu generacji zostawia turę „w toku”; nieudany zapis tury jest tylko logowany | `app-chat/src/generate.rs`, `finish.rs` | podejrzenie |
 
 Druga tura przeglądów (głos, pamięć, narzędzia agentek i transfer; 2026-10-08). Naprawione od razu:
@@ -95,7 +95,7 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-13 | Cofnięcie po restarcie aplikacji zostawia utworzone katalogi | `undo-journal-contract/src/restore.rs` | odczyt kodu |
 | R-14 | Nieudany odczyt hasła kopii zapasowej po cichu robi kopię nieszyfrowaną bez sesji prywatnych; rotacja może wtedy wyprzeć ostatnią szyfrowaną | `app-files/src/backup/mod.rs` | podejrzenie |
 | R-15 | **naprawione 2026-10-08**: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
-| R-16 | Czytanie i dyktowanie wyglądają na dostępne bez silników TTS/STT; TTS „gotowy” przy samym pliku Piper bez modelu głosu | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
+| R-16 | **częściowo naprawione 2026-10-08**: Piper bez modelu głosu (`*.onnx`) nie jest już zgłaszany jako gotowy głos (`app-modules/src/tts.rs`, test w tym pliku). Otwarte: czytanie i dyktowanie nadal wyglądają na dostępne bez silników | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
 | R-17 | **naprawione 2026-10-08**: w pamięci zostaje tylko udane wczytanie modelu mówcy — model pobrany po starcie jest wykrywany bez restartu | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
 | R-18 | **naprawione 2026-10-08**: model rozpoznawania mowy dobierany do backendu (z kartą duży, bez karty mały; modele tylko angielskie na końcu) — `app-modules/src/stt.rs`, test w tym pliku | `app-modules/src/stt.rs` | potwierdzone odczytem |
 | R-19 | **naprawione 2026-10-08** (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
