@@ -22,7 +22,7 @@ use crate::process::{LaunchSpec, SidecarLauncher, SidecarProcess};
 
 mod lease;
 
-use lease::{Listener, free_port, random_key};
+use lease::{Listener, free_port, random_key, startup_limit};
 
 /// Właściciel dzierżaw w `model-residency`.
 pub const RESIDENCY_OWNER: &str = "providers-local";
@@ -270,10 +270,7 @@ impl Sidecar {
             args: plan.args(entry, model_path, port, &key),
             secret: key.clone(),
         };
-        // Duży model ładuje się dłużej (zimny dysk, skaner antywirusowy): do limitu z konfiguracji
-        // dochodzi 20 s na każdy pełny gigabajt pliku modelu (Bielik 4.5B Q8: 60 s + 80 s).
-        let startup_limit =
-            self.config.startup_timeout + Duration::from_secs(u64::from(entry.size_mb) / 1024 * 20);
+        let startup_limit = startup_limit(self.config.startup_timeout, entry.size_mb);
         let t0 = Instant::now();
         let mut process = self.launcher.spawn(&spec)?;
         loop {

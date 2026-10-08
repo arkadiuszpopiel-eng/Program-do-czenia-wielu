@@ -179,10 +179,8 @@ impl Fetcher {
                 let total = resp
                     .headers()
                     .get(reqwest::header::CONTENT_RANGE)
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(|v| v.rsplit('/').next())
-                    .and_then(|n| n.trim().parse::<u64>().ok());
-                if total.is_none_or(|n| n == offset) {
+                    .and_then(|v| v.to_str().ok());
+                if partial_is_complete(total, offset) {
                     return Ok(Step::Done(hex(&hasher.finalize()), offset));
                 }
                 tokio::fs::remove_file(part)
@@ -289,6 +287,16 @@ pub fn sha256_file(path: &Path) -> Result<String, FetchError> {
     Ok(hex(&hasher.finalize()))
 }
 
+/// Czy odpowiedź `416` potwierdza, że plik częściowy o rozmiarze `offset` jest kompletny:
+/// `Content-Range: bytes */N` z `N == offset`. Brak nagłówka albo nieczytelna liczba — serwer
+/// nie podał rozmiaru, więc zostaje dotychczasowe zachowanie (rozstrzyga SHA-256 po pobraniu).
+fn partial_is_complete(content_range: Option<&str>, offset: u64) -> bool {
+    content_range
+        .and_then(|v| v.rsplit('/').next())
+        .and_then(|n| n.trim().parse::<u64>().ok())
+        .is_none_or(|total| total == offset)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -302,5 +310,25 @@ mod tests {
         assert!(!allowed_url("http://10.0.0.1/x", true));
         assert!(!allowed_url("file:///etc/passwd", true));
         assert_eq!(part_path(Path::new("a/b.bin")), Path::new("a/b.bin.part"));
+    }
+
+    /// R-06 (docs/STATUS.md): `416` kończy pobieranie tylko przy zgodnym rozmiarze.
+    #[test]
+    fn range_not_satisfiable_means_complete_only_for_matching_size() {
+        assert!(partial_is_complete(Some("bytes */1000"), 1000));
+        assert!(partial_is_complete(Some("bytes */ 1000 "), 1000));
+        assert!(
+            !partial_is_complete(Some("bytes */1000"), 1200),
+            "za długi plik częściowy"
+        );
+        assert!(
+            !partial_is_complete(Some("bytes */1000"), 400),
+            "stary, krótszy plik"
+        );
+        assert!(partial_is_complete(None, 400), "serwer bez nagłówka");
+        assert!(
+            partial_is_complete(Some("bytes */*"), 400),
+            "rozmiar nieznany"
+        );
     }
 }
