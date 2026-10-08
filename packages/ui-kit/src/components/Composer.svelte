@@ -5,6 +5,7 @@
   import Send from '@lucide/svelte/icons/send';
   import Square from '@lucide/svelte/icons/square';
   import IconButton from './IconButton.svelte';
+  import { uiZoom } from '../zoom';
   import { submitDraft } from './draft';
 
   interface Labels {
@@ -86,7 +87,9 @@
     const el = textarea;
     if (!el) return;
     el.style.height = 'auto';
-    const max = Math.min(LINE_PX * maxLines + PAD_PX, Math.max(80, window.innerHeight * 0.4));
+    // Wysokość okna jest w pikselach okna, `scrollHeight` — w jednostkach po skalowaniu interfejsu.
+    const windowHeight = window.innerHeight / uiZoom();
+    const max = Math.min(LINE_PX * maxLines + PAD_PX, Math.max(80, windowHeight * 0.4));
     el.style.height = `${Math.min(el.scrollHeight, max)}px`;
     el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden';
   });

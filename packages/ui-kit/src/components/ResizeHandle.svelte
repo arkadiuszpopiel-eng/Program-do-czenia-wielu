@@ -1,5 +1,7 @@
 <!-- Przeciągana krawędź panelu (separator ARIA): mysz/pióro/dotyk + klawiatura ←/→, Home/End. -->
 <script lang="ts">
+  import { uiZoom } from '../zoom';
+
   interface Props {
     value: number;
     min: number;
@@ -22,10 +24,7 @@
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     // Ruch wskaźnika jest w pikselach okna, szerokość panelu — w jednostkach po skalowaniu
     // interfejsu (`zoom` na <html>): bez przeliczenia uchwyt „uciekał" spod kursora.
-    const zoom = Number.parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue('--alfa-zoom'),
-    );
-    start = { x: event.clientX, width: value, zoom: zoom > 0 ? zoom : 1 };
+    start = { x: event.clientX, width: value, zoom: uiZoom() };
     dragging = true;
   }
 
