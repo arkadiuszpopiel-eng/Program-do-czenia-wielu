@@ -89,6 +89,8 @@
     flex-direction: column;
     gap: var(--alfa-space-2);
     padding-top: var(--alfa-space-3);
+    /* Odstęp od listy: przewinięta wiadomość nie „wystaje" spod dolnej krawędzi banera. */
+    padding-bottom: var(--alfa-space-2);
   }
   .top:empty {
     display: none;

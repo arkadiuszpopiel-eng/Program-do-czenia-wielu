@@ -158,6 +158,17 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
   Wyciek dzierżawy pamięci ma test `providers-local-impl/tests/lifecycle.rs::failed_start_on_gpu_and_cpu_leaves_no_lease`
   (sprawdzone, że bez poprawki nie przechodzi).
 
+Przegląd interfejsu, runda z 2026-10-08 przed południem (zrzuty 1280–3840 px, osiem scenariuszy atrapy):
+
+- **Skalowanie — błąd poważny, naprawiony:** przy skali powyżej 100 % (czyli po włączeniu „Dopasuj skalę do okna” w każdym
+  oknie od 1920 px) strona była wyższa niż okno o współczynnik skali (1920×1080: 1166 px) i pole pisania lądowało pod
+  dolną krawędzią. Przyczyna: `min-height: 100vh` mnożone przez CSS `zoom`. Poprawka w `app.css` (`--alfa-vh`, `--alfa-vw`),
+  `appearance.ts`, oknach dialogowych, palecie i uchwycie zmiany szerokości; test e2e przy 1920, 2560 i 3840 px.
+  Wcześniejszy „pomiar skalowania na żywo” obejmował tylko szerokości i tego nie wykrył.
+- Prawy panel na szerokim oknie ma 460 px (karty w jednym wierszu); kreator powitalny mieści 8 kroków w wierszu.
+- Okno „Szybkie pytanie”: karta była o 16 px szersza niż okno (ucięta prawa krawędź) — naprawione, test e2e.
+- Broker w bezpiecznym stanie: opis w banerze raz zamiast dwa razy; karta zatwierdzenia bez martwego przycisku.
+
 Stan końcowy 2026-10-08 ok. 11:40 (39 commitów lokalnych): prawdziwa aplikacja zbudowana z końca gałęzi i uruchomiona na
 tymczasowym profilu — `e2e-app` 10/10; `scripts/gates.ps1` zielone; vitest 243/243; E2E 124/125 (test czasowy palety).
 
