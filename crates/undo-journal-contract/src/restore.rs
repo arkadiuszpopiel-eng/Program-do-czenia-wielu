@@ -98,6 +98,21 @@ impl Journal {
         self.store.get_blob(id)
     }
 
+    /// Usuwa (do Kosza) katalogi utworzone przez cofaną operację, od najgłębszego; katalog
+    /// z jakąkolwiek zawartością zostaje — mógł w nim coś zostawić właściciel albo inna operacja.
+    fn remove_created_dirs(&self, dirs: &[PathBuf]) {
+        for dir in dirs.iter().rev() {
+            match self.fs.list_dir(dir) {
+                Ok(entries) if entries.is_empty() => {
+                    if self.fs.delete_to_recycle_bin(dir).is_err() {
+                        return;
+                    }
+                }
+                _ => return,
+            }
+        }
+    }
+
     /// Odtwarza jedną operację.
     fn restore(&self, e: &JournalEntry, failed: &mut Vec<(PathBuf, String)>) -> u32 {
         if let UndoOp::ScopeSnapshot { root, files } = &e.op {
@@ -155,7 +170,10 @@ impl Journal {
             UndoOp::ScopeSnapshot { root, .. } => (root.clone(), Ok(())),
         };
         match res {
-            Ok(()) => 1,
+            Ok(()) => {
+                self.remove_created_dirs(&e.created_dirs);
+                1
+            }
             Err(why) => {
                 failed.push((path, why));
                 0

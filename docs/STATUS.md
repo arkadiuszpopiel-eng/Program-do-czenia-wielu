@@ -92,7 +92,7 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-10 | Częściowo nieudane „Cofnij” jest w dzienniku oznaczane jako wykonane, a interfejs dalej je oferuje — pozostałych plików nie da się już przywrócić; wygasłe kroki wyglądają na cofalne | `undo-journal-contract/src/restore.rs`, `app-core/src/commands/turn_intents.rs`, `UndoCard.svelte` | potwierdzone odczytem |
 | R-11 | **naprawione w logice 2026-10-08**: przy zmianie samej wielkości liter kontrola konfliktów nie wymaga już nieobecności starej nazwy (`undo-journal-contract/src/restore.rs::case_only_rename`, test jednostkowy). Niesprawdzone na prawdziwym NTFS | `undo-journal-contract/src/restore.rs`, `engine.rs` | potwierdzone odczytem |
 | R-12 | **częściowo naprawione 2026-10-08**: niepełne cofnięcie importu zwraca błąd z liczbami zamiast sukcesu; interfejs pokazuje liczbę pominiętych przy imporcie. Otwarte: osobne pole `failed` i ostrzeżenia w DTO | `app-modules/src/transfer.rs`, DTO `ImportResult` | potwierdzone odczytem |
-| R-13 | Cofnięcie po restarcie aplikacji zostawia utworzone katalogi | `undo-journal-contract/src/restore.rs` | odczyt kodu |
+| R-13 | **naprawione 2026-10-08**: wpis dziennika zapamiętuje katalogi utworzone przy zapisie, kopii i przeniesieniu (`JournalEntry::created_dirs`, pole opcjonalne — stare dzienniki czytają się bez zmian); cofnięcie z pre-image po restarcie usuwa je do Kosza od najgłębszego, o ile są puste. Naprawia też cofnięcie `fs_mkdir` po restarcie. Testy: `undo-journal-impl/tests/created_dirs.rs` (system plików z jawnymi katalogami). Niesprawdzone na prawdziwym dysku (wymaga Kosza Windows) | `undo-journal-contract/src/engine.rs`, `restore.rs`, `types.rs` | odczyt kodu |
 | R-14 | **naprawione 2026-10-08**: błąd odczytu hasła kopii zatrzymuje kopię z komunikatem zamiast robić wersję nieszyfrowaną (`app-files/src/backup/mod.rs::password_for_run`); testy `backup.rs` zielone, brak testu regresji | `app-files/src/backup/mod.rs` | podejrzenie |
 | R-15 | **naprawione 2026-10-08**: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
 | R-16 | **częściowo naprawione 2026-10-08**: Piper bez modelu głosu (`*.onnx`) nie jest już zgłaszany jako gotowy głos (`app-modules/src/tts.rs`, test w tym pliku). Otwarte: czytanie i dyktowanie nadal wyglądają na dostępne bez silników | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
@@ -151,7 +151,7 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
 - *Czekają na decyzję właściciela:* R-05 (przypięcie sum kontrolnych silników), R-10 (częściowe „Cofnij” — adapter
   Brokera), R-20 (edycja oczekującej propozycji pamięci i zaufanie do „zapamiętaj”), R-21 (licznik limitu mostów —
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
-- *Do zrobienia bez decyzji, nietknięte:* R-13, zadania mostów przy „Zatrzymaj sterowanie” (reszta R-22),
+- *Do zrobienia bez decyzji, nietknięte:* zadania mostów przy „Zatrzymaj sterowanie” (reszta R-22),
   rdzeniowa część R-25, pola w DTO dla R-04, R-12 i R-16.
 - *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-01, R-02, R-03, R-06, R-08, R-14, schowek dla
   głosu, dyktowanie przy STOP, wyciek dzierżawy pamięci.

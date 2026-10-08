@@ -137,6 +137,10 @@ pub struct JournalEntry {
     pub platform_undo: Option<UndoToken>,
     /// Uruchomienie dziennika, w którym wydano token.
     pub boot: u64,
+    /// Katalogi, które powstały przy tej operacji (od najpłytszego). Po restarcie token platformy
+    /// przepada, więc cofnięcie z pre-image samo usuwa te katalogi — o ile są puste.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub created_dirs: Vec<PathBuf>,
 }
 
 /// Rekord trwałego dziennika (append-only).

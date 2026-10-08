@@ -204,6 +204,28 @@ impl Journal {
         op: UndoOp,
         receipt: &OpReceipt,
     ) -> Result<(), UndoError> {
+        self.record_with(step, op, receipt, Vec::new())
+    }
+
+    /// Katalogi nadrzędne `path`, których jeszcze nie ma (od najpłytszego) — operacja je utworzy.
+    fn missing_dirs(&self, path: &Path) -> Vec<PathBuf> {
+        let mut dirs: Vec<PathBuf> = path
+            .ancestors()
+            .skip(1)
+            .take_while(|dir| !dir.as_os_str().is_empty() && !self.fs.exists(dir))
+            .map(Path::to_path_buf)
+            .collect();
+        dirs.reverse();
+        dirs
+    }
+
+    fn record_with(
+        &self,
+        step: StepId,
+        op: UndoOp,
+        receipt: &OpReceipt,
+        created_dirs: Vec<PathBuf>,
+    ) -> Result<(), UndoError> {
         let mut st = self.lock();
         let seq = st
             .steps
@@ -215,6 +237,7 @@ impl Journal {
             op,
             platform_undo: receipt.undo,
             boot: self.boot,
+            created_dirs,
         };
         if let Err(e) = self.store.append(&JournalRecord::Op(entry.clone())) {
             if let Some(token) = receipt.undo {
@@ -236,6 +259,7 @@ impl Journal {
             Some(bytes) => self.keep_pre_image(&ctx, path, bytes)?,
             None => None,
         };
+        let created = self.missing_dirs(path);
         let receipt = self
             .fs
             .write_atomic(path, data)
@@ -246,13 +270,14 @@ impl Journal {
             pre_image,
             after: state_of(data),
         };
-        self.record(step, op, &receipt)
+        self.record_with(step, op, &receipt, created)
     }
 
     /// Kopia przez dziennik.
     pub fn copy(&self, step: StepId, from: &Path, to: &Path) -> Result<(), UndoError> {
         self.open_ctx(step)?;
         let (_, data) = self.current(from)?;
+        let created = self.missing_dirs(to);
         let receipt = self.fs.copy(from, to).map_err(UndoError::Platform)?;
         let after = data.as_deref().map_or(FileState::Absent, state_of);
         let op = UndoOp::Copy {
@@ -260,13 +285,14 @@ impl Journal {
             to: to.to_path_buf(),
             after,
         };
-        self.record(step, op, &receipt)
+        self.record_with(step, op, &receipt, created)
     }
 
     /// Przeniesienie przez dziennik.
     pub fn move_path(&self, step: StepId, from: &Path, to: &Path) -> Result<(), UndoError> {
         self.open_ctx(step)?;
         let (_, data) = self.current(from)?;
+        let created = self.missing_dirs(to);
         let receipt = self.fs.move_path(from, to).map_err(UndoError::Platform)?;
         let after = data.as_deref().map_or(FileState::Absent, state_of);
         let op = UndoOp::Move {
@@ -274,7 +300,7 @@ impl Journal {
             to: to.to_path_buf(),
             after,
         };
-        self.record(step, op, &receipt)
+        self.record_with(step, op, &receipt, created)
     }
 
     /// Usunięcie do Kosza przez dziennik (pre-image jako zapas po restarcie, jeśli się mieści).
