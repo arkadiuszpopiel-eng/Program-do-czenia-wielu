@@ -158,7 +158,7 @@ impl BackupService {
             AppError::new(
                 app_api::ErrorCode::Secrets,
                 format!(
-                    "Nie udało się odczytać hasła kopii zapasowej z Menedżera poświadczeń ({e}) —                      kopia nie została wykonana, żeby nie powstała wersja nieszyfrowana."
+                    "Nie udało się odczytać hasła kopii zapasowej z Menedżera poświadczeń ({e}) — kopia nie została wykonana, żeby nie powstała wersja nieszyfrowana."
                 ),
             )
         })

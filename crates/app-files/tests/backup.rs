@@ -8,7 +8,7 @@ mod common;
 
 use std::sync::Arc;
 
-use accounts_hub_contract::{SecretName, SecretStore, SecretString};
+use accounts_hub_contract::{SecretName, SecretStore, SecretStoreError, SecretString};
 use accounts_hub_fake::MemorySecretStore;
 use app_api::dto::BackupConfig;
 use app_files::ArtifactDocuments;
@@ -229,4 +229,40 @@ async fn restore_test_backup_imports_into_fresh_installation() {
         config.read("ui.toml").unwrap().is_none(),
         "rollback cofa import"
     );
+}
+
+/// Magazyn sekretów, którego nie da się odczytać (np. zablokowany Menedżer poświadczeń).
+struct BrokenSecrets;
+
+impl SecretStore for BrokenSecrets {
+    fn put(&self, _: &SecretName, _: &SecretString) -> Result<(), SecretStoreError> {
+        Err(SecretStoreError::Unavailable("test".into()))
+    }
+    fn get(&self, _: &SecretName) -> Result<Option<SecretString>, SecretStoreError> {
+        Err(SecretStoreError::Unavailable("test".into()))
+    }
+    fn delete(&self, _: &SecretName) -> Result<bool, SecretStoreError> {
+        Err(SecretStoreError::Unavailable("test".into()))
+    }
+    fn list(&self) -> Result<Vec<SecretName>, SecretStoreError> {
+        Err(SecretStoreError::Unavailable("test".into()))
+    }
+}
+
+/// R-14 (docs/STATUS.md): błąd odczytu hasła to nie „brak hasła” — kopia nie powstaje wcale,
+/// zamiast powstać w wersji nieszyfrowanej.
+#[tokio::test]
+async fn unreadable_password_stops_the_backup_instead_of_writing_it_unencrypted() {
+    let env = Env::with_app_secrets(Some(Arc::new(BrokenSecrets)));
+    env.session("Prywatne");
+    configured(&env, 5).await;
+    let err = env.app.backups_run_now().await.unwrap_err();
+    assert_eq!(err.code, app_api::ErrorCode::Secrets);
+    assert!(
+        err.message.contains("kopia nie została wykonana"),
+        "{}",
+        err.message
+    );
+    assert!(!err.message.contains("  "), "komunikat bez ciągów spacji");
+    assert!(env.app.backups_status().entries.is_empty());
 }

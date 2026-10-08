@@ -263,6 +263,32 @@ async fn device_profile_and_residency_drive_arguments() {
     assert_eq!(arg(&env.launches()[1], "-ngl").as_deref(), Some("0"));
 }
 
+/// Regresja z przeglądu (2026-10-08): nieudany start — także zapasowy na procesorze — nie może
+/// zostawić dzierżawy pamięci; inaczej każda kolejna próba „zajmowała" RAM i VRAM bez modelu.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn failed_start_on_gpu_and_cpu_leaves_no_lease() {
+    let env = Env::new();
+    let device: Arc<dyn DeviceProfile> = Arc::new(FakeDeviceProfile::baseline());
+    let residency = Arc::new(FakeResidency::baseline());
+    let p = env.provider_with(
+        env.config(),
+        env.launcher("crash-on-start", None),
+        Some(device),
+        Some(residency.clone() as Arc<dyn Residency>),
+    );
+    let events = run(&p, req("nie ruszy")).await;
+    assert!(
+        events
+            .iter()
+            .any(|e| matches!(e, ProviderEvent::Error { .. })),
+        "start ma się nie udać: {events:?}"
+    );
+    assert_eq!(env.launches().len(), 2, "próba na GPU i zapasowa na CPU");
+    assert!(p.sidecar().running_plan().await.is_none());
+    let used = residency.snapshot().used;
+    assert_eq!((used.vram_mb, used.ram_mb), (0, 0), "dzierżawy zwolnione");
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn idle_unload_module_events_and_health() {
     let env = Env::new();

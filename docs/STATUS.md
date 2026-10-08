@@ -93,7 +93,7 @@ Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
 | R-11 | **naprawione w logice 2026-10-08**: przy zmianie samej wielkości liter kontrola konfliktów nie wymaga już nieobecności starej nazwy (`undo-journal-contract/src/restore.rs::case_only_rename`, test jednostkowy). Niesprawdzone na prawdziwym NTFS | `undo-journal-contract/src/restore.rs`, `engine.rs` | potwierdzone odczytem |
 | R-12 | **naprawione 2026-10-08**: niepełne cofnięcie importu zwraca błąd z liczbami zamiast sukcesu; wynik importu ma osobne pole `failed` (wcześniej nieudane elementy były wliczane do pominiętych), a interfejs pokazuje je jako osobny komunikat błędu. Fixture `app-core/tests/fixtures/transfer.json` uzupełniony ręcznie; `dto_roundtrip` i `transfer` zielone | `app-modules/src/transfer.rs`, `app-api/src/dto/transfer.rs`, `TransferImport.svelte` | potwierdzone odczytem |
 | R-13 | **naprawione 2026-10-08**: wpis dziennika zapamiętuje katalogi utworzone przy zapisie, kopii i przeniesieniu (`JournalEntry::created_dirs`, pole opcjonalne — stare dzienniki czytają się bez zmian); cofnięcie z pre-image po restarcie usuwa je do Kosza od najgłębszego, o ile są puste. Naprawia też cofnięcie `fs_mkdir` po restarcie. Testy: `undo-journal-impl/tests/created_dirs.rs` (system plików z jawnymi katalogami). Niesprawdzone na prawdziwym dysku (wymaga Kosza Windows) | `undo-journal-contract/src/engine.rs`, `restore.rs`, `types.rs` | odczyt kodu |
-| R-14 | **naprawione 2026-10-08**: błąd odczytu hasła kopii zatrzymuje kopię z komunikatem zamiast robić wersję nieszyfrowaną (`app-files/src/backup/mod.rs::password_for_run`); testy `backup.rs` zielone, brak testu regresji | `app-files/src/backup/mod.rs` | podejrzenie |
+| R-14 | **naprawione 2026-10-08**: błąd odczytu hasła kopii zatrzymuje kopię z komunikatem zamiast robić wersję nieszyfrowaną (`app-files/src/backup/mod.rs::password_for_run`); test `app-files/tests/backup.rs::unreadable_password_stops_the_backup_instead_of_writing_it_unencrypted`; poprawiony też komunikat (ciąg spacji w środku zdania) | `app-files/src/backup/mod.rs` | podejrzenie |
 | R-15 | **naprawione 2026-10-08**: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
 | R-16 | **naprawione 2026-10-08**: Piper bez modelu głosu (`*.onnx`) nie jest już zgłaszany jako gotowy głos (`app-modules/src/tts.rs`); czytanie i dyktowanie bez silnika lub modelu mowy mają stan „niedostępne” z powodem wymieniającym, czego brakuje i gdzie to pobrać (`FeatureFactory::dictation_missing` / `read_missing`, `features/view.rs`), i wracają bez restartu po doinstalowaniu. Test `app-voice/tests/f5_read.rs::missing_speech_engines_make_read_and_dictation_unavailable`. Niesprawdzone w prawdziwej aplikacji | `app-voice/src/features/view.rs`, `system_f5.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
 | R-17 | **naprawione 2026-10-08**: w pamięci zostaje tylko udane wczytanie modelu mówcy — model pobrany po starcie jest wykrywany bez restartu | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
@@ -154,8 +154,9 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
 - *Do zrobienia bez decyzji, nietknięte:* pole „brakujące silniki” w DTO rdzenia (R-04) — interfejs liczy je sam
   z listy modeli i silników, więc to porządek, nie błąd.
-- *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-02, R-14, schowek dla głosu, dyktowanie przy
-  STOP, wyciek dzierżawy pamięci.
+- *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-02, schowek dla głosu, dyktowanie przy STOP.
+  Wyciek dzierżawy pamięci ma test `providers-local-impl/tests/lifecycle.rs::failed_start_on_gpu_and_cpu_leaves_no_lease`
+  (sprawdzone, że bez poprawki nie przechodzi).
 
 Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet 125 zielony w ostatnim przebiegu; test palety bywa
 czerwony pod obciążeniem. Test „paleta: otwarcie ≤ 50 ms” ma

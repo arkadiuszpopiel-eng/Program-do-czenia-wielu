@@ -106,6 +106,11 @@ pub struct Env {
 
 impl Env {
     pub fn new() -> Self {
+        Self::with_app_secrets(None)
+    }
+
+    /// Jak [`Env::new`], ale aplikacja plików dostaje podany magazyn sekretów (np. wadliwy).
+    pub fn with_app_secrets(app_secrets: Option<Arc<dyn SecretStore>>) -> Self {
         let dir = tempfile::tempdir().unwrap();
         let paths = AppPaths::under(dir.path());
         let sessions = Arc::new(FakeSessions::new());
@@ -138,7 +143,7 @@ impl Env {
             shell: shell.clone() as Arc<dyn ShellPort>,
             clipboard: Some(clipboard.clone()),
             transfer: Some(transfer.clone() as Arc<dyn Transfer>),
-            secrets: Some(secrets.clone() as Arc<dyn SecretStore>),
+            secrets: Some(app_secrets.unwrap_or_else(|| secrets.clone() as Arc<dyn SecretStore>)),
             signals: Some(signals.clone()),
             events: None,
             docs: Some(docs.clone()),
