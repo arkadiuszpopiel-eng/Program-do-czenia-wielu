@@ -40,7 +40,9 @@
       const result = await app.client.memory.undo(scope, entry.id);
       app.toasts.show({
         kind: 'success',
-        message: t('memory.undoDone', { restored: result.restored, removed: result.removed }),
+        message:
+          t('memory.undoDone', { restored: result.restored, removed: result.removed }) +
+          (result.skipped ? ` ${t('memory.undoSkipped', { n: result.skipped })}` : ''),
       });
     });
     if (!ok) return;

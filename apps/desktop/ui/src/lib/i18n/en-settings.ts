@@ -151,6 +151,8 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'tr.replaceConfirm':
     'Replace mode overwrites local items with the package data. The automatic snapshot lets you undo it.',
   'tr.imported': { one: '{n} item imported.', other: '{n} items imported.' },
+  'tr.importSkipped': 'skipped or failed to write: {n}',
+  'tr.nothingChanged': 'Nothing was changed — there is nothing to undo.',
   'tr.rollback': 'Undo import',
   'tr.rolledBack': 'State from before the import restored.',
   'tr.warnings': 'Notes',

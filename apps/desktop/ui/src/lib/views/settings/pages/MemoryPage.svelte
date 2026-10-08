@@ -47,8 +47,20 @@
   async function consolidate() {
     running = true;
     try {
-      await app.client.memory.consolidateNow();
-      app.toasts.show({ kind: 'success', message: t('memory.consolidated') });
+      // Raport mówi, czy porządkowanie faktycznie się wykonało: pominięte (bateria, tryb gry,
+      // wyłączone) albo przerwane nie może kończyć się komunikatem „zakończone".
+      const report = await app.client.memory.consolidateNow();
+      const why = report.skipped ?? report.interrupted;
+      app.toasts.show(
+        why
+          ? {
+              kind: 'warning',
+              message: t(report.skipped ? 'memory.runSkipped' : 'memory.runInterrupted', {
+                reason: why,
+              }),
+            }
+          : { kind: 'success', message: t('memory.consolidated') },
+      );
     } catch (error) {
       showError(app.toasts, error);
       return;

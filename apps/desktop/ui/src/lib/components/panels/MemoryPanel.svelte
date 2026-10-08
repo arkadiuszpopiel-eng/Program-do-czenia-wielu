@@ -87,7 +87,11 @@
     }),
   );
 
-  const pending = $derived(items.filter((i) => i.state === 'pending').length);
+  // Liczba „do zatwierdzenia" z rdzenia (dla wybranego zakresu), nie z wczytanej strony 100 wpisów —
+  // inaczej propozycje spoza pierwszej strony znikały z licznika.
+  const pending = $derived(
+    scopes.filter((s) => scope === 'all' || s.key === scope).reduce((n, s) => n + s.pending, 0),
+  );
   const scopeLabel = (key: string): string => scopes.find((s) => s.key === key)?.label ?? key;
   const scopeOptions = $derived([
     { value: 'all', label: t('memory.scope.all') },
@@ -133,7 +137,8 @@
   </div>
   <p class="meta" aria-live="polite">
     {t('memory.count', { n: total })}{#if pending}
-      · {t('memory.pendingCount', { n: pending })}{/if}
+      · {t('memory.pendingCount', { n: pending })}{/if}{#if total > items.length}
+      · {t('memory.shownOf', { shown: items.length, total })}{/if}
   </p>
 
   {#if loadError}
@@ -167,7 +172,12 @@
             </span>
           </button>
           {#if item.id === selected}
-            <MemoryDetail entryId={item.id} {scopes} onclose={() => (selected = null)} />
+            <MemoryDetail
+              entryId={item.id}
+              {scopes}
+              onclose={() => (selected = null)}
+              onreplaced={(id) => (selected = id)}
+            />
           {/if}
         </li>
       {/each}

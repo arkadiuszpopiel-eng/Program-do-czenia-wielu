@@ -48,6 +48,8 @@ pub struct MemoryAppParts {
     pub model_available: Arc<dyn Fn() -> bool + Send + Sync>,
     /// Porządkowanie włączone (Ustawienia).
     pub enabled: bool,
+    /// Czy platforma dostarcza licznik bezczynności (bez niego porządkowanie nocne nie wystartuje).
+    pub idle_available: bool,
     /// Okno nocne (`HH:MM-HH:MM`).
     pub window: String,
 }
@@ -98,7 +100,7 @@ impl MemoryApp {
             .sum();
         Ok(MemoryStatus {
             consolidation_enabled: self.p.enabled && self.p.guardian.is_some(),
-            idle_available: false,
+            idle_available: self.p.idle_available,
             model_available: (self.p.model_available)(),
             window: self.p.window.clone(),
             pending,

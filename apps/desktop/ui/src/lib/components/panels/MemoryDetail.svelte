@@ -13,6 +13,7 @@
   } from '../../api/types-memory';
   import { attempt, load } from '../../state/attempt';
   import { scopeTitle } from '../../logic/memory-scope';
+  import { CommandError } from '../../api/command-error';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import MemoryJournal from './MemoryJournal.svelte';
@@ -21,9 +22,11 @@
     entryId: string;
     scopes: readonly MemoryScopeInfo[];
     onclose: () => void;
+    /** Edycja tworzy nową wersję wpisu (nowy identyfikator) — panel ma przejść na nią. */
+    onreplaced?: (id: string) => void;
   }
 
-  let { entryId, scopes, onclose }: Props = $props();
+  let { entryId, scopes, onclose, onreplaced }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
   const RANK = { session: 0, agent: 1, project: 1, global: 2 } as const;
@@ -45,13 +48,24 @@
   // Błąd wczytania = „Nie udało się wczytać" z „Ponów" zamiast pustego miejsca pod wpisem.
   async function loadInfo() {
     const id = entryId;
-    const result = await load(() => app.client.memory.explain(id));
+    let gone = false;
+    const result = await load(async () => {
+      try {
+        return await app.client.memory.explain(id);
+      } catch (error) {
+        gone = error instanceof CommandError && error.code === 'not_found';
+        throw error;
+      }
+    });
     if (id !== entryId) return;
     if (result.status === 'ready') {
       info = result.value;
       loadError = null;
     } else if (result.status === 'failed') {
-      loadError = result.error;
+      // Wpis zniknął (np. cofnięto jego utworzenie w dzienniku): zamykamy szczegóły zamiast
+      // zostawiać „Nie udało się wczytać" w miejscu wpisu, którego już nie ma.
+      if (gone) onclose();
+      else loadError = result.error;
     }
   }
 
@@ -97,11 +111,13 @@
   async function save() {
     const text = draft.trim();
     if (!text) return;
-    const ok = await act(
-      () => app.client.memory.edit(entryId, { text, subject: null, confidence: null }),
-      t('memory.saved'),
-    );
-    if (ok) editing = false;
+    let next: string | null = null;
+    const ok = await act(async () => {
+      next = (await app.client.memory.edit(entryId, { text, subject: null, confidence: null })).id;
+    }, t('memory.saved'));
+    if (!ok) return;
+    editing = false;
+    if (next && next !== entryId) onreplaced?.(next);
   }
 
   async function promote() {

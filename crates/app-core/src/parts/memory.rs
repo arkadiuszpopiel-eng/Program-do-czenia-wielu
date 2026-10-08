@@ -119,6 +119,7 @@ impl Built {
                 })
             }),
             enabled: enabled.and_then(|v| v.as_bool()).unwrap_or(true),
+            idle_available: kernel.signals.is_some(),
             window: window
                 .and_then(|v| v.as_str().map(str::to_owned))
                 .unwrap_or_else(|| guardian::DEFAULT_WINDOW.to_owned()),

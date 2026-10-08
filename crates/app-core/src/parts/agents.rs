@@ -131,7 +131,14 @@ impl Extra {
             desktop: gui.desktop.clone(),
             uia: gui.uia.clone(),
             input: gui.input.clone(),
-            clipboard: options.clipboard.clone(),
+            // Jak w narzędziach agentek: bez wstrzykniętego portu (powłoka go nie ustawia) schowek
+            // systemowy. Wcześniej zostawało `None` i „Przeczytaj na głos" zawsze odmawiało
+            // („unsupported"), niezależnie od zainstalowanych silników.
+            clipboard: Some(match &options.clipboard {
+                Some(c) => c.clone(),
+                None => Arc::new(platform_windows_impl::WindowsPlatform::default())
+                    as Arc<dyn platform_contract::ClipboardPort>,
+            }),
         });
         let config = Some(kernel.config.clone() as Arc<dyn core_config_contract::ConfigStore>);
         let voice = PipelineVoice::new(

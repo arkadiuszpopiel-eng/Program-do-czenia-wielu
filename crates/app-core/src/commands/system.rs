@@ -87,6 +87,14 @@ impl AppCore {
         if let Err(e) = self.inner.voice.stop_speech().await {
             tracing::warn!(error = %e, "stop mowy przy kill-switchu nie powiódł się");
         }
+        // Dyktowanie wpisuje tekst do cudzych okien — STOP WSZYSTKIEGO musi je też zakończyć
+        // (wcześniej zatrzymywała je tylko komenda głosowa). Brak aktywnego dyktowania to nie błąd.
+        if let Err(e) = self
+            .voice_dictation(crate::dto::DictationAction::Stop)
+            .await
+        {
+            tracing::debug!(error = %e.message, "kill-switch: dyktowanie nie było aktywne");
+        }
         for h in &handles {
             h.wait(std::time::Duration::from_secs(5)).await;
         }

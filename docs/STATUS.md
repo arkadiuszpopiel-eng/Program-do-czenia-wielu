@@ -64,16 +64,45 @@ Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają
 | # | Ustalenie | Gdzie | Pewność |
 | --- | --- | --- | --- |
 | R-01 | **naprawione 2026-10-08**: `flush_queue` gubił kolejkę offline przy błędzie jednej sesji — nieobsłużone sesje wracają teraz do kolejki | `app-core/src/commands/queue.rs` | testy `errors.rs` zielone; brak osobnego testu błędu w środku kolejki |
-| R-02 | Wysłanie zapisuje turę użytkownika, a potem `start_generation` może zawieść — wiadomość wisi bez odpowiedzi i bez błędu, a ponowny Enter ją dubluje | `app-core/src/commands/turns.rs::turns_send` | potwierdzone odczytem |
+| R-02 | **naprawione 2026-10-08**: nieudany start odpowiedzi po zapisanej wiadomości daje komunikat i „Ponów” zamiast błędu wysyłki (koniec duplikatów) | `app-core/src/commands/turns.rs::start_after_user` | testy `commands.rs`, `errors.rs` zielone; brak testu regresji |
 | R-03 | **naprawione 2026-10-08**: „Edytuj i wyślij ponownie” przenosi bloki (załączniki) pierwotnej wiadomości do nowej gałęzi | `app-core/src/commands/turns.rs` | testy `commands.rs`, `files.rs` zielone; brak osobnego testu regresji |
 | R-04 | Pobranie pojedynczego modelu nie podpowiada silnika; brak pola „brakujące silniki” w DTO | `app-models/src/lib.rs`, `view.rs` | potwierdzone odczytem |
 | R-05 | Wszystkie silniki mają `sha256: None` — po pobraniu czekają na zgodę i `sidecars` zostaje puste, choć model jest „zainstalowany”; sumy wydań b6710 i whisper są w przewodniku 11 i można je przypiąć (decyzja właściciela) | `app-models/src/data.rs` | mechanizm potwierdzony |
-| R-06 | Uszkodzone archiwum w `staging` jest używane ponownie przy każdej próbie (pozycje bez przypiętej sumy); odpowiedź 416 uznaje dowolny plik `.part` za kompletny | `app-models/src/jobs.rs`, `install.rs`, `fetch.rs` | potwierdzone odczytem |
+| R-06 | **naprawione 2026-10-08**: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze | `app-models/src/jobs.rs`, `fetch.rs` | testy `download.rs`, `unpack.rs` zielone; brak testu regresji |
 | R-07 | Interfejs może pokazać „Zainstalowano”, gdy dostawca lokalny uzna model za niezainstalowany (brak rekordu `.sha256`) | `app-models/src/view.rs` vs `providers-local-impl/src/download.rs` | utajone |
 | R-08 | Limit startu modelu 60 s może nie wystarczyć dla Bielika 4.5B z zimnego dysku | `providers-local-impl/src/config.rs` | podejrzenie |
 | R-09 | Panika w zadaniu generacji zostawia turę „w toku”; nieudany zapis tury jest tylko logowany | `app-chat/src/generate.rs`, `finish.rs` | podejrzenie |
 
-Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet zielony poza testem palety. Test „paleta: otwarcie ≤ 50 ms” ma
+Druga tura przeglądów (głos, pamięć, narzędzia agentek i transfer; 2026-10-08). Naprawione od razu:
+
+| Ustalenie | Gdzie |
+| --- | --- |
+| „Przeczytaj na głos” zawsze odmawiało (`unsupported`): powłoka nie przekazywała schowka funkcjom głosowym — objaw z testu na laptopie | `app-core/src/parts/agents.rs` (schowek systemowy jak w narzędziach agentek) |
+| STOP WSZYSTKIEGO nie kończył dyktowania do cudzych okien | `app-core/src/commands/system.rs` |
+| Strona Pamięć zawsze pisała „licznik bezczynności jest niedostępny” (`idle_available` na sztywno `false`) | `app-memory/src/app.rs`, `app-core/src/parts/memory.rs` |
+| „Porządkuj teraz” pokazywało „zakończone” także przy pominięciu (bateria, tryb gry) | `views/settings/pages/MemoryPage.svelte` |
+| Po edycji wpisu pamięci szczegóły zostawały na starej, zastąpionej wersji | `components/panels/MemoryDetail.svelte`, `MemoryPanel.svelte` |
+| Cofnięcie utworzenia wpisu zostawiało „Nie udało się wczytać”; licznik „do zatwierdzenia” liczony z pierwszych 100 wpisów | `MemoryDetail.svelte`, `MemoryPanel.svelte`, `MemoryJournal.svelte` |
+| Anulowanie okna wyboru pliku odbierało „Cofnij import”; martwy przycisk cofania, gdy import nic nie zmienił | `views/settings/pages/TransferImport.svelte` |
+
+Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):
+
+| # | Ustalenie | Gdzie | Pewność |
+| --- | --- | --- | --- |
+| R-10 | Częściowo nieudane „Cofnij” jest w dzienniku oznaczane jako wykonane, a interfejs dalej je oferuje — pozostałych plików nie da się już przywrócić; wygasłe kroki wyglądają na cofalne | `undo-journal-contract/src/restore.rs`, `app-core/src/commands/turn_intents.rs`, `UndoCard.svelte` | potwierdzone odczytem |
+| R-11 | Cofnięcie zmiany wielkości liter w nazwie (`readme.md` → `README.md`) zawsze kończy się konfliktem na Windows | `undo-journal-contract/src/restore.rs`, `engine.rs` | potwierdzone odczytem |
+| R-12 | Import i cofnięcie importu ukrywają niepowodzenia i ostrzeżenia (`failed` doliczane do `skipped`, ostrzeżenie o nieszyfrowanej migawce pomijane, `RollbackReport.failed` ignorowane) | `app-modules/src/transfer.rs`, DTO `ImportResult` | potwierdzone odczytem |
+| R-13 | Cofnięcie po restarcie aplikacji zostawia utworzone katalogi | `undo-journal-contract/src/restore.rs` | odczyt kodu |
+| R-14 | Nieudany odczyt hasła kopii zapasowej po cichu robi kopię nieszyfrowaną bez sesji prywatnych; rotacja może wtedy wyprzeć ostatnią szyfrowaną | `app-files/src/backup/mod.rs` | podejrzenie |
+| R-15 | Niezapisane ustawienia kopii zapasowej są nadpisywane przez „Wybierz katalog” / „Wykonaj teraz” | `BackupSection.svelte` | potwierdzone odczytem |
+| R-16 | Czytanie i dyktowanie wyglądają na dostępne bez silników TTS/STT; TTS „gotowy” przy samym pliku Piper bez modelu głosu | `app-voice/src/features/view.rs`, `app-modules/src/tts.rs` | potwierdzone w Rust |
+| R-17 | Model mówcy pobrany po starcie nie jest wykrywany do restartu (`OnceLock` pamięta błąd) | `app-voice/src/features/mod.rs` | potwierdzone odczytem |
+| R-18 | Model rozpoznawania mowy wybierany alfabetycznie, bez względu na kartę (turbo wygrywa z małym także na samym procesorze) | `app-modules/src/stt.rs` | potwierdzone odczytem |
+| R-19 | Wskaźnik mikrofonu w pasku tytułu zostaje „niedostępny” po doinstalowaniu silników, dopóki nie otworzy się strony Głos | `app-voice/src/port.rs`, `MicIndicator.svelte` | częściowo potwierdzone |
+| R-20 | Edycja oczekującej propozycji pamięci po cichu ją zatwierdza; „zapamiętaj” zapisuje treść odpowiedzi jako zaufaną | `memory-contract/src/engine/write.rs`, `app-memory/src/app.rs` | podejrzenie — do decyzji właściciela |
+
+Testy E2E na tym laptopie (Edge, `PW_CHANNEL=msedge`): komplet 125 zielony w ostatnim przebiegu; test palety bywa
+czerwony pod obciążeniem. Test „paleta: otwarcie ≤ 50 ms” ma
 medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy.
 Pomiar rozdzielony: samo otwarcie zawsze trwa ok. 7 ms; opóźnia się pojedyncza klatka obrazu (ok. 250–450 ms)
 mniej więcej 2 s po starcie, bez długiego zadania JavaScript i niezależnie od rozmycia tła palety — wygląda na

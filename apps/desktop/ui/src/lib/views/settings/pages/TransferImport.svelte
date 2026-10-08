@@ -39,7 +39,9 @@
       fail(error);
       return;
     }
-    result = null;
+    // Wynik poprzedniego importu (z „Cofnij import") znika dopiero, gdy wybrano nową paczkę —
+    // anulowanie okna wyboru pliku nie może odebrać możliwości cofnięcia.
+    if (res.status === 'needs_password' || res.status === 'inspected') result = null;
     if (res.status === 'needs_password') {
       // Hasło podane, a paczka nadal zamknięta — złe hasło (rdzeń wydał nowy uchwyt).
       if (importPassword) app.toasts.show({ kind: 'error', message: t('tr.wrongPassword') });
@@ -171,13 +173,19 @@
   {/if}
   {#if result}
     <p class="ok" role="status">
-      {t('tr.imported', { n: result.imported })} Snapshot: {result.snapshot_id}
+      {t('tr.imported', { n: result.imported })}{#if result.skipped}
+        · {t('tr.importSkipped', { n: result.skipped })}{/if}
     </p>
-    <div class="actions start">
-      <Button variant="secondary" loading={rollingBack} disabled={rollingBack} onclick={rollback}
-        >{t('tr.rollback')}</Button
-      >
-    </div>
+    <!-- Bez zmian nie powstaje migawka — nie ma czego cofać, więc nie ma martwego przycisku. -->
+    {#if result.snapshot_id}
+      <div class="actions start">
+        <Button variant="secondary" loading={rollingBack} disabled={rollingBack} onclick={rollback}
+          >{t('tr.rollback')}</Button
+        >
+      </div>
+    {:else}
+      <p class="muted" role="status">{t('tr.nothingChanged')}</p>
+    {/if}
   {/if}
 </section>
 
