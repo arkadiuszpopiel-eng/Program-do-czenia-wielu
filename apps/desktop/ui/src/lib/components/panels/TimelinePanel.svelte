@@ -129,7 +129,9 @@
     {/if}
     <p class="summary" aria-live="polite">
       {t('timeline.count', { n: shown.length })}{#if total > 0}
-        · {t('timeline.total', { cost: app.i18n.money({ minor: total, currency: 'PLN' }) })}{/if}
+        {' '}· {t('timeline.total', {
+          cost: app.i18n.money({ minor: total, currency: 'PLN' }),
+        })}{/if}
     </p>
     {#if loadError}
       <LoadFailed error={loadError} onretry={() => void loadEvents()} />

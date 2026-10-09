@@ -137,8 +137,8 @@
   </div>
   <p class="meta" aria-live="polite">
     {t('memory.count', { n: total })}{#if pending}
-      · {t('memory.pendingCount', { n: pending })}{/if}{#if total > items.length}
-      · {t('memory.shownOf', { shown: items.length, total })}{/if}
+      {' '}· {t('memory.pendingCount', { n: pending })}{/if}{#if total > items.length}
+      {' '}· {t('memory.shownOf', { shown: items.length, total })}{/if}
   </p>
 
   {#if loadError}

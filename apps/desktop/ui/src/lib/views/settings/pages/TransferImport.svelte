@@ -174,7 +174,7 @@
   {#if result}
     <p class="ok" role="status">
       {t('tr.imported', { n: result.imported })}{#if result.skipped}
-        · {t('tr.importSkipped', { n: result.skipped })}{/if}
+        {' '}· {t('tr.importSkipped', { n: result.skipped })}{/if}
     </p>
     {#if result.failed}
       <p class="failed" role="alert">{t('tr.importFailed', { n: result.failed })}</p>

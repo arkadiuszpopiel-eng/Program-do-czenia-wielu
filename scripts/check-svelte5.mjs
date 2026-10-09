@@ -17,6 +17,12 @@ const RULES = [
   { re: /<slot\b/, msg: '`<slot>` (użyj {@render children()})' },
   { re: /\$\$props|\$\$restProps|\$\$slots/, msg: '`$$props/$$restProps/$$slots`' },
   { re: /^\s*import\s+.*\bfrom\s+['"]svelte\/internal/m, msg: 'import z svelte/internal' },
+  // Svelte obcina biały znak na początku bloku: `tekst{#if x}⏎ · reszta` renderuje „tekst· reszta”.
+  {
+    re: /\S\{#if [^{}\n]*\}[ \t]*\r?\n[ \t]*· /,
+    msg: "separator „·” przyklejony do tekstu przed `{#if}` (wstaw `{' '}` przed „·”)",
+    label: 'układ',
+  },
 ];
 
 function* walk(dir) {
@@ -33,11 +39,11 @@ let files = 0;
 for (const file of walk(ROOT)) {
   files++;
   const src = readFileSync(file, 'utf8');
-  for (const { re, msg } of RULES) {
+  for (const { re, msg, label } of RULES) {
     const m = re.exec(src);
     if (m) {
       const line = src.slice(0, m.index).split('\n').length;
-      console.error(`${relative(ROOT, file)}:${line}: Svelte 4: ${msg}`);
+      console.error(`${relative(ROOT, file)}:${line}: ${label ?? 'Svelte 4'}: ${msg}`);
       errors++;
     }
   }

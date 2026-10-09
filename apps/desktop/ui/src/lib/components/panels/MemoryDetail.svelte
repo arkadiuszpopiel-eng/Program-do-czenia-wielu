@@ -174,7 +174,7 @@
         'memory.created',
         { when: app.i18n.relative(item.created_at) },
       )}{#if item.expires_at}
-        · {t('memory.expires', { when: app.i18n.relative(item.expires_at) })}{/if}
+        {' '}· {t('memory.expires', { when: app.i18n.relative(item.expires_at) })}{/if}
     </p>
     {#if info.sources.length}
       <h4>{t('memory.sources')}</h4>

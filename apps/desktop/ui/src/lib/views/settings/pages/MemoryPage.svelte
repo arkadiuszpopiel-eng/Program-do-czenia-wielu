@@ -160,7 +160,7 @@
               active: s.active,
               pending: s.pending,
             })}{#if !s.document}
-              · {t('memory.privateScope')}{/if}</span
+              {' '}· {t('memory.privateScope')}{/if}</span
           >
           <!-- Zwykły przycisk: to dopiero podgląd; czerwone jest potwierdzenie niżej. -->
           <Button size="sm" variant="secondary" onclick={() => showForgetPreview(s.key)}

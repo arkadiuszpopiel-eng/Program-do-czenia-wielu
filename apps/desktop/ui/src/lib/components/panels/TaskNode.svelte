@@ -54,13 +54,13 @@
   {/if}
   <p class="meta">
     {tk(`tasks.origin.${task.origin}`)}{#if task.deps.length}
-      · {t('tasks.depsOn', { list: task.deps.map((d) => titleOf(d.task_id)).join(', ') })}{/if}
+      {' '}· {t('tasks.depsOn', { list: task.deps.map((d) => titleOf(d.task_id)).join(', ') })}{/if}
     · {t('tasks.progress', { steps: task.steps, max: task.max_steps })}{#if task.attempt > 1}
-      · {t('tasks.attempt', {
+      {' '}· {t('tasks.attempt', {
         n: task.attempt,
         max: task.max_attempts,
       })}{/if}{#if task.cost.minor > 0}
-      · {t('tasks.cost', { cost: app.i18n.money(task.cost) })}{/if}
+      {' '}· {t('tasks.cost', { cost: app.i18n.money(task.cost) })}{/if}
   </p>
   {#if task.executor.startsWith('bridge:')}<p class="note">{t('tasks.bridge')}</p>{/if}
   {#if task.tainted}<p class="note">{t('tasks.tainted')}</p>{/if}

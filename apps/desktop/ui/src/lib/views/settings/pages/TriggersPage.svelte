@@ -97,7 +97,7 @@
           </div>
           <p class="meta">
             {describe(trg.kind)}{#if trg.next_fire_at}
-              · {t('triggers.next', { when: app.i18n.dateTime(trg.next_fire_at) })}{/if}
+              {' '}· {t('triggers.next', { when: app.i18n.dateTime(trg.next_fire_at) })}{/if}
             · {t('triggers.stats', { fired: trg.fired, suppressed: trg.suppressed })}
           </p>
           <p class="goal">{trg.goal}</p>
