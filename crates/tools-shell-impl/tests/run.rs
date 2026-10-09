@@ -71,7 +71,7 @@ async fn cmd_uses_raw_args_and_nonzero_exit_is_reported() {
     let run = &h.exec.runs()[0];
     assert_eq!(
         run.raw_args.as_deref(),
-        Some("/D /S /C \"dir & echo \"x\"\"")
+        Some("/D /S /C \"chcp 65001>nul & dir & echo \"x\"\"")
     );
 }
 

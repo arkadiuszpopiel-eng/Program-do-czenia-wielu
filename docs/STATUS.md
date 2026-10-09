@@ -177,6 +177,9 @@ niewdrożonych** — [`reviews/2026-10-08-tools-shell-clipboard-net-review.md`](
 Najpoważniejsze: tekst w cudzysłowie ukrywa przed analizatorem poleceń polecenia niszczące i sieciowe (S-01), a
 nierozwiązywalna ścieżka omija deny-listę (S-03). Analizator to polityka bezpieczeństwa — decyzja właściciela.
 
+2026-10-09: z tego raportu wdrożone z testami S-05, S-07, C-01, N-01, N-02 (zwykłe błędy). Pozostają do decyzji
+właściciela: S-01…S-04, S-06, C-02, C-03.
+
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
 i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie

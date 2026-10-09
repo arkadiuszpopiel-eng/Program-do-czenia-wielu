@@ -168,6 +168,13 @@ impl Default for ShellToolsConfig {
     }
 }
 
+/// Wyjście PowerShella w UTF-8. Do potoku powłoki piszą w stronie kodowej OEM (CP852 na polskim
+/// Windows), a narzędzie czyta UTF-8 — bez tego „ą ę ł" trafiały do modelu jako znaki zastępcze
+/// (sprawdzone na Windows 11: `Write-Output 'zażółć'` → bajty CP852).
+pub const PWSH_UTF8_PREFIX: &str = "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); ";
+/// To samo dla `cmd.exe`: strona kodowa 65001 na czas polecenia.
+pub const CMD_UTF8_PREFIX: &str = "chcp 65001>nul & ";
+
 impl ShellToolsConfig {
     /// Program i argumenty dla powłoki (`raw_args` dla `cmd.exe`, którego cudzysłowy różnią się
     /// od MSVCRT).
@@ -183,12 +190,13 @@ impl ShellToolsConfig {
                 } else {
                     &self.powershell_path
                 };
+                let script = format!("{PWSH_UTF8_PREFIX}{command}");
                 let args = [
                     "-NoLogo",
                     "-NoProfile",
                     "-NonInteractive",
                     "-Command",
-                    command,
+                    script.as_str(),
                 ];
                 (
                     program.clone(),
@@ -199,7 +207,7 @@ impl ShellToolsConfig {
             ShellKind::Cmd => (
                 self.cmd_path.clone(),
                 Vec::new(),
-                Some(format!("/D /S /C \"{command}\"")),
+                Some(format!("/D /S /C \"{CMD_UTF8_PREFIX}{command}\"")),
             ),
         }
     }
@@ -310,13 +318,17 @@ mod tests {
         let (p, a, raw) = c.invocation(ShellKind::Pwsh, "Get-Date");
         assert!(
             p.ends_with("pwsh.exe")
-                && a.last().map(String::as_str) == Some("Get-Date")
+                && a.last().map(String::as_str)
+                    == Some(format!("{PWSH_UTF8_PREFIX}Get-Date").as_str())
                 && raw.is_none()
         );
         assert!(a.contains(&"-NonInteractive".to_owned()) && a.contains(&"-NoProfile".to_owned()));
         let (p, a, raw) = c.invocation(ShellKind::Cmd, "dir & echo \"x\"");
         assert!(p.ends_with("cmd.exe") && a.is_empty());
-        assert_eq!(raw.as_deref(), Some("/D /S /C \"dir & echo \"x\"\""));
+        assert_eq!(
+            raw.as_deref(),
+            Some("/D /S /C \"chcp 65001>nul & dir & echo \"x\"\"")
+        );
         let (p, _, _) = c.invocation(ShellKind::Powershell, "x");
         assert!(p.ends_with("powershell.exe"));
         assert!(c.env_allowlist.iter().any(|v| v == "PATH"));

@@ -47,6 +47,18 @@ prywatnych i DNS rebinding jest w `lib-netguard` — nieprzejrzane.
 Niezweryfikowane (nie liczone jako ustalenie): różna interpretacja ukośnika wstecznego w `http://evil.com\@good.com/`
 przez analizator i .NET.
 
+## Wdrożone 2026-10-09 (z testami)
+
+| Nr   | Co zrobiono                                                                                                                                                                                                                          | Test                                                                         |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| S-07 | Środowisko procesu czytane przez `vars_os`, zmienne niebędące Unicode pomijane                                                                                                                                                       | `tools-shell-impl/src/lib.rs::process_env_lists_text_variables`              |
+| S-05 | Potwierdzone sondą na tym laptopie (`Write-Output 'zażółć'` i `echo` dają bajty CP852). Polecenie dostaje stały przedrostek ustawiający wyjście na UTF-8 (`PWSH_UTF8_PREFIX`, `CMD_UTF8_PREFIX`); analizator nadal ocenia samo polecenie | `tools-shell-contract` (`invocations`), `tools-shell-impl/tests/run.rs`      |
+| C-01 | Wpis cofania znika dopiero po udanym przywróceniu schowka                                                                                                                                                                            | `tools-clipboard-impl/tests/clipboard.rs::failed_undo_keeps_the_entry_for_a_retry` |
+| N-01 | Treść dekodowana według `charset` z nagłówka i znacznika BOM (`encoding_rs`, już obecny w `Cargo.lock`)                                                                                                                              | `tools-net-impl/src/charset.rs`                                              |
+| N-02 | Cel przekierowania dłuższy niż 2048 znaków to odmowa                                                                                                                                                                                 | `tools-net-impl/src/http.rs::overlong_redirect_target_is_refused_not_truncated` |
+
+S-05 nie było jeszcze sprawdzone w działającej aplikacji (tylko sondą z tym samym przedrostkiem i testami jednostkowymi).
+
 ## Proponowany podział
 
 - **Bez decyzji właściciela (zwykłe błędy):** S-07, C-01, N-02; N-01 po sprawdzeniu, czy `encoding_rs` jest już w
