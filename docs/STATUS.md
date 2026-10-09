@@ -202,6 +202,8 @@ nad ostatnią wiadomością z widocznym przyciskiem „Przewiń do najnowszych�
 ponad 100 %). Teraz odkleja tylko gest użytkownika: kółko, dotyk, klawisz, przeciąganie
 (`logic/virtual.ts::stickAfterScroll`, `VirtualList.svelte`). Testy: jednostkowy oraz dwa e2e w `responsive.spec.ts`.
 Przegląd `lib-netguard` (blokowanie adresów lokalnych i prywatnych, osobna sesja, tylko odczyt): bez defektów.
+Modele i silniki: licznik pozycji pokazywał „0 pozycji” w trakcie wczytywania katalogu (przez to test dymny prawdziwej
+aplikacji bywał czerwony) — licznik pojawia się teraz po wczytaniu; `e2e-app` 11/11 w trzech kolejnych przebiegach.
 
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
