@@ -274,7 +274,10 @@ test('Ustawienia → Wygląd: lista wyboru Alfy otwarta w każdym stylu', async 
     }
   } finally {
     // Jedna aplikacja obsługuje wszystkie testy — styl nie może zostać po nieudanej asercji.
-    await main.keyboard.press('Escape');
+    // Escape tylko przy otwartej liście: przy zamkniętej zamyka Ustawienia i pole stylu znika
+    // (wcześniej test przechodził dzięki wyścigowi z zamykaniem widoku).
+    if ((await main.getByRole('listbox', { name: 'Styl' }).count()) > 0)
+      await main.keyboard.press('Escape');
     if ((await style.getAttribute('data-value')) !== 'classic') {
       await style.click();
       await main.locator('[role="option"][data-value="classic"]').click();
