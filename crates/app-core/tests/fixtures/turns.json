@@ -1088,14 +1088,14 @@
         "addressed_to": null,
         "profile": "local",
         "attachments": [
-          "att-muoggk4i-38",
-          "att-muoggk4i-39"
+          "att-muoggmms-38",
+          "att-muoggmms-39"
         ]
       }
     },
     "result": {
-      "user_turn_id": "t-muoggk4i-40",
-      "assistant_turn_id": "t-muoggk4i-41"
+      "user_turn_id": "t-muoggmms-40",
+      "assistant_turn_id": "t-muoggmms-41"
     }
   },
   {
@@ -1218,12 +1218,12 @@
           "heard_prefix": null
         },
         {
-          "id": "t-muoggk4i-40",
+          "id": "t-muoggmms-40",
           "session_id": "s-trip",
           "parent_id": null,
           "author": "user",
           "role_id": null,
-          "created_at": "2026-09-30T18:45:14.850Z",
+          "created_at": "2026-09-30T18:45:18.100Z",
           "status": "complete",
           "text": "Podsumuj załączniki",
           "blocks": [
@@ -1246,28 +1246,28 @@
           "heard_prefix": null,
           "attachments": [
             {
-              "name": "wklejony-obraz-20260930-184514.png",
+              "name": "wklejony-obraz-20260930-184518.png",
               "mime": "image/png",
               "kind": "image",
               "bytes": 182000,
-              "artifact_id": "art-s-trip-muoggk4i-0"
+              "artifact_id": "art-s-trip-muoggmms-0"
             },
             {
               "name": "notatki.md",
               "mime": "text/markdown",
               "kind": "text",
               "bytes": 400000,
-              "artifact_id": "art-s-trip-muoggk4i-1"
+              "artifact_id": "art-s-trip-muoggmms-1"
             }
           ]
         },
         {
-          "id": "t-muoggk4i-41",
+          "id": "t-muoggmms-41",
           "session_id": "s-trip",
-          "parent_id": "t-muoggk4i-40",
+          "parent_id": "t-muoggmms-40",
           "author": "alfa",
           "role_id": "conductor",
-          "created_at": "2026-09-30T18:45:14.850Z",
+          "created_at": "2026-09-30T18:45:18.100Z",
           "status": "complete",
           "text": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.",
           "blocks": [

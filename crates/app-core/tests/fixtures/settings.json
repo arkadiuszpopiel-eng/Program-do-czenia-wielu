@@ -1217,6 +1217,45 @@
             }
           },
           {
+            "key": "ui.style",
+            "label": {
+              "pl": "Styl",
+              "en": "Style"
+            },
+            "description": {
+              "pl": "Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”.",
+              "en": "The look of the whole interface. Every style has a light and a dark version — picked by “Theme”."
+            },
+            "default": "classic",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "classic",
+                  "label": {
+                    "pl": "Klasyczny",
+                    "en": "Classic"
+                  }
+                },
+                {
+                  "value": "glass",
+                  "label": {
+                    "pl": "Szkło",
+                    "en": "Glass"
+                  }
+                },
+                {
+                  "value": "next",
+                  "label": {
+                    "pl": "Next",
+                    "en": "Next"
+                  }
+                }
+              ]
+            }
+          },
+          {
             "key": "ui.accent",
             "label": {
               "pl": "Akcent",
@@ -1301,6 +1340,22 @@
             }
           },
           {
+            "key": "ui.zoom_fit",
+            "label": {
+              "pl": "Dopasuj skalę do okna",
+              "en": "Fit scale to window"
+            },
+            "description": {
+              "pl": "Na szerokich oknach (ponad 1600 px) interfejs rośnie razem z oknem — do 125 % przy 2560 px i 150 % przy 3840 px. Powiększenie wyżej działa dodatkowo.",
+              "en": "On wide windows (over 1600 px) the interface grows with the window — up to 125% at 2560 px and 150% at 3840 px. The zoom above applies on top."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "machine"
+          },
+          {
             "key": "ui.animations",
             "label": {
               "pl": "Animacje",
@@ -1323,14 +1378,21 @@
               "en": "Conversation column width"
             },
             "description": {
-              "pl": "Wąska (~72 znaki) czyta się najwygodniej; szeroka mieści tabele.",
-              "en": "Narrow (~72 characters) reads best; wide fits tables."
+              "pl": "Dopasowana rośnie z oknem (do ok. 110 znaków); wąska (~72 znaki) czyta się najwygodniej; szeroka mieści tabele.",
+              "en": "Fitted grows with the window (up to about 110 characters); narrow (~72 characters) reads best; wide fits tables."
             },
-            "default": "narrow",
+            "default": "auto",
             "scope": "global",
             "control": {
               "kind": "select",
               "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Dopasowana do okna",
+                    "en": "Fitted to window"
+                  }
+                },
                 {
                   "value": "narrow",
                   "label": {
@@ -1407,8 +1469,8 @@
           {
             "key": "notify.earcons",
             "label": {
-              "pl": "Dźwięki (earcony)",
-              "en": "Sounds (earcons)"
+              "pl": "Dźwięki sygnałowe",
+              "en": "Signal sounds"
             },
             "description": {
               "pl": "Krótkie, ciche dźwięki startu i końca słuchania, błędu i ukończenia.",
@@ -1427,8 +1489,8 @@
               "en": "Sound volume"
             },
             "description": {
-              "pl": "Osobna głośność earconów.",
-              "en": "Separate volume for earcons."
+              "pl": "Głośność dźwięków sygnałowych, niezależna od głosu agentek.",
+              "en": "Volume of signal sounds, independent of the agents’ voices."
             },
             "default": 40,
             "scope": "global",
@@ -1676,11 +1738,13 @@
       "device.battery_mode": "auto",
       "device.game_mode": true,
       "ui.theme": "auto",
+      "ui.style": "classic",
       "ui.accent": "agent",
       "ui.density": "comfortable",
       "ui.zoom": 100,
+      "ui.zoom_fit": true,
       "ui.animations": true,
-      "ui.column": "narrow",
+      "ui.column": "auto",
       "composer.enter_sends": true,
       "notify.toasts": true,
       "notify.earcons": true,

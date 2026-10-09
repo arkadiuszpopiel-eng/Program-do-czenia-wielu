@@ -285,15 +285,26 @@ pub fn is_env_var_name(name: &str) -> bool {
 /// Endpoint podany przez użytkownika: `https://…`, a `http://` tylko dla hosta lokalnego.
 pub fn validate_base_url(url: &str) -> Result<(), String> {
     let lower = url.trim().to_ascii_lowercase();
-    if lower.starts_with("https://") && lower.len() > "https://".len() {
-        return Ok(());
+    let (secure, rest) = match (
+        lower.strip_prefix("https://"),
+        lower.strip_prefix("http://"),
+    ) {
+        (Some(rest), _) => (true, rest),
+        (None, Some(rest)) => (false, rest),
+        (None, None) => (false, ""),
+    };
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or_default();
+    // `http://localhost:80@inny.host/` — część przed `@` to dane logowania, a nie host.
+    let plain = !authority.is_empty()
+        && !authority.contains(['@', '\\'])
+        && !authority.contains(char::is_whitespace);
+    let host = if authority.starts_with('[') {
+        authority.split_inclusive(']').next()
+    } else {
+        authority.split(':').next()
     }
-    let local = ["http://localhost", "http://127.0.0.1", "http://[::1]"];
-    if local.iter().any(|p| {
-        lower
-            .strip_prefix(p)
-            .is_some_and(|rest| rest.is_empty() || rest.starts_with([':', '/']))
-    }) {
+    .unwrap_or_default();
+    if plain && (secure || matches!(host, "localhost" | "127.0.0.1" | "[::1]")) {
         return Ok(());
     }
     Err(format!(

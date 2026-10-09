@@ -82,6 +82,7 @@ pub fn error_from_value(
     let code = err["code"]
         .as_str()
         .or_else(|| err["type"].as_str())
+        .or_else(|| err["status"].as_str())
         .unwrap_or_default()
         .to_owned();
     // Kwota/klucz wygrywają (429 `insufficient_quota` nie jest chwilowy); potem kod HTTP;
@@ -120,18 +121,66 @@ pub fn classify(status: u16, headers: &HeaderMap, body: &str) -> ProviderError {
         .get("x-request-id")
         .and_then(|h| h.to_str().ok())
         .map(str::to_owned);
-    let err = match serde_json::from_str::<Value>(body) {
-        Ok(v) if v["error"].is_object() => error_from_value(Some(status), ra, &v["error"]),
-        _ => ProviderError::new(classify_http_status(status, ra), format!("HTTP {status}"))
+    let parsed = serde_json::from_str::<Value>(body).ok();
+    let err = match parsed.as_ref().and_then(error_body) {
+        Some(e) => error_from_value(Some(status), ra, &e),
+        None => ProviderError::new(classify_http_status(status, ra), format!("HTTP {status}"))
             .with_status(status),
     };
     err.with_request_id(request_id)
+}
+
+/// Obiekt błędu z ciała odpowiedzi. Poza `{"error": {…}}` (OpenAI, Anthropic) dostawcy odsyłają
+/// tablicę z jednym takim obiektem (Google), `error` jako tekst (xAI) albo sam `message` lub
+/// `detail` (Mistral) — bez tego powód odmowy ginął i zostawało samo „HTTP 400”.
+fn error_body(body: &Value) -> Option<Value> {
+    let v = body.as_array().and_then(|a| a.first()).unwrap_or(body);
+    if v["error"].is_object() {
+        return Some(v["error"].clone());
+    }
+    let text = v["error"]
+        .as_str()
+        .or_else(|| v["message"].as_str())
+        .or_else(|| v["detail"].as_str())?;
+    let mut out = serde_json::json!({ "message": text });
+    if let Some(code) = v["code"].as_str().or_else(|| v["type"].as_str()) {
+        out["code"] = Value::from(code);
+    }
+    Some(out)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use reqwest::header::HeaderValue;
+
+    #[test]
+    fn other_providers_error_shapes_keep_their_message() {
+        let h = HeaderMap::new();
+        let google = classify(
+            400,
+            &h,
+            r#"[{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT"}}]"#,
+        );
+        assert!(
+            google.message.starts_with("API key not valid"),
+            "{google:?}"
+        );
+        assert_eq!(google.provider_code.as_deref(), Some("INVALID_ARGUMENT"));
+        let xai = classify(
+            400,
+            &h,
+            r#"{"code":"Some requested entity was not found","error":"Incorrect API key provided: xa***zz."}"#,
+        );
+        assert!(xai.message.starts_with("Incorrect API key"), "{xai:?}");
+        let mistral = classify(401, &h, r#"{"message":"Unauthorized","request_id":"1"}"#);
+        assert_eq!(mistral.message, "Unauthorized");
+        assert_eq!(mistral.kind, ProviderErrorKind::Auth);
+        let detail = classify(401, &h, r#"{"detail":"Invalid token"}"#);
+        assert_eq!(detail.message, "Invalid token");
+        let html = classify(403, &h, "<html>blocked</html>");
+        assert_eq!(html.message, "HTTP 403");
+    }
 
     #[test]
     fn quota_is_auth_and_retry_after_ms_wins() {

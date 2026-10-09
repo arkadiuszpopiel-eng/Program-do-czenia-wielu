@@ -49,8 +49,16 @@ const ROWS: readonly Row[] = [
 ];
 
 // Jak w rdzeniu: adresu wymaga każdy wpis bez znanego `base_url` w katalogu — dziś wszystkie
-// poza tymi trzema (test na laptopie 2026-10-07: rozjazd atrapy z rdzeniem ukrył błąd kreatora).
-const KNOWN_ENDPOINTS: ReadonlySet<string> = new Set(['anthropic', 'openai', 'xai']);
+// poza wymienionymi (test na laptopie 2026-10-07: rozjazd atrapy z rdzeniem ukrył błąd kreatora).
+const KNOWN_ENDPOINTS: ReadonlySet<string> = new Set([
+  'anthropic',
+  'deepseek',
+  'google',
+  'mistral',
+  'openai',
+  'openrouter',
+  'xai',
+]);
 
 export const FAKE_CATALOG: readonly ProviderInfo[] = ROWS.map(
   ([id, display_name, kind, compat, privacy_tag, jurisdiction, compliance_status]) => ({

@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.6). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.7). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -27,6 +27,7 @@ Szczegółowe zadania: [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §6, etapy 0–3
 | A.3a | Własne listy wyboru i pozostałe kontrolki w stylu Alfy (bez kontrolek systemowych) | zrobione | 2026-10-09 | wersja 0.0.4; błąd zgłoszony przez właściciela; testy listy otwartej w 6 kombinacjach + prawdziwa aplikacja |
 | A.3b | Okno „Co nowego” ze skrótem poprawek z dziennika zmian | zrobione | 2026-10-09 | wersja 0.0.5; zgłoszenie właściciela; test pilnuje wpisu dla każdej wersji |
 | A.3c | Przegląd zmian 0.0.1–0.0.5 w świeżym kontekście i naprawa ustaleń | zrobione | 2026-10-09 | wersja 0.0.6; 3 przeglądy (interfejs, Rust, skrypty i testy), 0 krytycznych; raport: `docs/reviews/2026-10-09-przeglad-0.0.1-0.0.5.md` |
+| A.3d | Dodawanie klucza API: diagnoza przyczyny, sprzątanie wklejonego klucza, wymiana i wyłączanie konta | zrobione | 2026-10-09 | wersja 0.0.7; zgłoszenie właściciela („401 Klucz odrzucony”); 3 przeglądy w świeżym kontekście; bez próby z prawdziwym kluczem; raport: `docs/reviews/2026-10-09-przeglad-kluczy-api.md` |
 | A.4 | Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1) | czeka | — | zgoda właściciela na pobranie pakietu ok. 6 GB |
 | A.5 | Głos na żywo: dyktowanie i czytanie | czeka | — | po A.4 (te same silniki w pakiecie) |
 | A.6 | Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2) | czeka | — | po A.4 |
@@ -82,6 +83,13 @@ Bez nowych funkcji dla użytkownika; każde zadanie kończy się tym, że wszyst
 | C2.9 | Oznaczanie treści wygenerowanych przez AI (art. 50 AI Act) | planowane | — | termin prawny: 2026-12-02 — patrz [`10`](10-zgodnosc-prawna.md) |
 | C2.10 | SBOM, polityka zgłaszania podatności, kontakt bezpieczeństwa (CRA) | planowane | — | przed pierwszym wydaniem publicznym |
 | C2.11 | Dokumenty: wyciąganie tekstu z PDF i DOCX w Rust; skany — opcjonalny dodatek | planowane | — | |
+| C2.11a | OpenRouter: uwierzytelnione sprawdzenie klucza (`GET /api/v1/key`) zamiast „nie da się sprawdzić z góry” | planowane | — | ustalenie 1 przeglądu kluczy; wymaga nowej metody adaptera |
+| C2.12 | Klucze dla firm: nagłówki organizacji i projektu (OpenAI), Azure OpenAI (adres zasobu, wdrożenie, wersja API) | planowane | — | opis: [`04`](04-nowe-funkcje.md#klucze-i-konta-dla-firm) |
+| C2.13 | Sieć firmowa: serwer pośredniczący i własny urząd certyfikacji dla połączeń z dostawcami | czeka | — | dotyka `lib-netguard` i polityk sieci — decyzja właściciela |
+| C2.14 | Okresowe sprawdzanie kluczy w tle, wiek klucza i przypomnienie o wymianie | planowane | — | moduł `scheduler` już jest; bez zużycia tokenów (lista modeli) |
+| C2.15 | Konto zapasowe: przełączenie na inne konto tego samego dostawcy, gdy pierwsze nie ma środków albo jest ograniczane | planowane | — | reguły routera; widoczne w osi czasu |
+| C2.16 | Dziennik operacji na kluczach (dodanie, wymiana, wyłączenie, usunięcie, wynik testu) bez treści klucza | czeka | — | audyt jest w Jądrze — decyzja właściciela |
+| C2.17 | Import kluczy ze zmiennych środowiskowych: przycisk w interfejsie i polecenie rdzenia | planowane | — | hub już to umie (`import_from_env`, tylko nazwy z `env_vars` katalogu); brakuje polecenia i widoku |
 
 **Wyjście:** każda funkcja ma kryterium w `ACCEPTANCE.md` (progi ustala właściciel) i wynik ze sprzętu.
 
@@ -178,6 +186,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data | Zmiana |
 | --- | --- |
+| 2026-10-09 | Wersja 0.0.7: dodawanie klucza API od nowa (A.3d); zadania C2.12–C2.17 (klucze dla firm) dopisane do planu. |
 | 2026-10-09 | Wersja 0.0.6: naprawy po przeglądzie zmian 0.0.1–0.0.5 (A.3c); numer wersji zmienia skrypt. |
 | 2026-10-09 | Wersja 0.0.4: listy wyboru i inne kontrolki rysowane przez Alfę (A.3a). |
 | 2026-10-09 | Powstanie planu v6. Etapy A.1–A.3 wpisane jako zrobione (wersje 0.0.2 i 0.0.3). Cztery decyzje właściciela o dostępie zdalnym. |

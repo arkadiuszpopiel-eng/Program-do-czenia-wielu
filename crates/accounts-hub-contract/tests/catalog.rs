@@ -110,6 +110,17 @@ fn price_table_fallback_and_urls() {
     assert!(validate_base_url("https://x.example").is_ok());
     assert!(validate_base_url("http://127.0.0.1:1234/v1").is_ok());
     assert!(validate_base_url("http://localhost").is_ok());
+    assert!(validate_base_url("http://[::1]:8080/v1").is_ok());
+    // Dane logowania przed `@` udają host lokalny albo znanego dostawcę.
+    for spoofed in [
+        "http://localhost:80@evil.example/v1",
+        "http://localhost@evil.example",
+        "https://api.openai.com@evil.example/v1",
+        "http://localhost.evil.example/v1",
+        "https://",
+    ] {
+        assert!(validate_base_url(spoofed).is_err(), "{spoofed}");
+    }
     for bad in [
         "http://localhost.evil.com",
         "https://",

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::account::{Account, AccountState, Assignments, CostLimit, NewAccount, TestSummary};
 use crate::catalog::{CatalogError, PriceTable, ProviderCatalogEntry};
-use crate::ids::{AccountId, ProviderId};
+use crate::ids::{AccountId, ModelId, ProviderId};
 use crate::probe::EnvSource;
 use crate::secret::{SecretStoreError, SecretString};
 use crate::wizard::{Wizard, WizardError};
@@ -154,6 +154,27 @@ pub trait AccountsHub: Send + Sync {
 
     /// Importuje klucze ze zmiennych wymienionych w katalogu (`env_vars`); tylko na życzenie.
     async fn import_from_env(&self, env: &dyn EnvSource) -> Result<Vec<EnvImport>, AccountsError>;
+
+    /// Konto tego dostawcy, które ma już dokładnie ten klucz (porównanie w stałym czasie, wewnątrz
+    /// huba — klucz nie opuszcza magazynu). Chroni przed dodaniem tego samego klucza drugi raz.
+    fn find_by_secret(
+        &self,
+        provider: &ProviderId,
+        base_url: Option<&str>,
+        secret: &SecretString,
+    ) -> Option<AccountId>;
+
+    /// Wymiana klucza z testem kandydata: nowy klucz trafia do magazynu tylko wtedy, gdy działa
+    /// (`outcome.key_works()`); inaczej konto i stary klucz zostają bez zmian.
+    async fn try_rotate(
+        &self,
+        id: &AccountId,
+        secret: SecretString,
+    ) -> Result<TestSummary, AccountsError>;
+
+    /// Model podany ręcznie (klucz bez prawa do listy modeli) — bez modelu Router nie ma czego
+    /// wywołać. Następny udany odczyt listy modeli go zastępuje.
+    async fn set_manual_model(&self, id: &AccountId, model: ModelId) -> Result<(), AccountsError>;
 
     /// Wartość klucza dla adaptera dostawcy (`caller` = id modułu `providers-*`).
     fn resolve_secret(&self, id: &AccountId, caller: &str) -> Result<SecretString, AccountsError>;

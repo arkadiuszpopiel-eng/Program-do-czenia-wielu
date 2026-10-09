@@ -12,6 +12,7 @@ mod catalog_loader;
 #[cfg(windows)]
 mod credman;
 mod hub;
+mod keys;
 mod ops;
 mod repo;
 mod system;

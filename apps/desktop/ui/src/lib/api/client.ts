@@ -196,6 +196,15 @@ export interface AccountsApi {
   assign(accountId: string, assignment: AccountAssignment): Promise<void>;
   setLimit(accountId: string, enabled: boolean, monthly: Money): Promise<void>;
   remove(accountId: string): Promise<void>;
+  /**
+   * Wymiana klucza istniejącego konta. Nowy klucz jest najpierw sprawdzany; przy `ok: false`
+   * konto i stary klucz zostają bez zmian.
+   */
+  rotate(accountId: string, secret: string): Promise<TestReport>;
+  /** Wyłączone konto zostaje na liście z kluczem, ale router go nie używa. */
+  setDisabled(accountId: string, disabled: boolean): Promise<Account>;
+  /** Model wpisany ręcznie — dla klucza, który nie ma prawa do listy modeli. */
+  setModel(accountId: string, model: string): Promise<Account>;
 }
 
 export interface TransferApi {

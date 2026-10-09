@@ -72,7 +72,7 @@ proptest! {
                 Op::Test(i) => {
                     let o = outcome(i);
                     let works = o.key_works();
-                    if w.record_test(ConnectionReport { outcome: o, latency_ms: Some(5) }).is_ok() {
+                    if w.record_test(ConnectionReport { outcome: o, latency_ms: Some(5), detail: None }).is_ok() {
                         tested_ok = works;
                     }
                 }

@@ -17,10 +17,13 @@
     type AgentId,
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
+  import { cleanKey } from '../../../logic/api-key';
   import type { Account, ProviderInfo, TestReport } from '../../../api/types-hub';
   import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import ProviderPicker from './ProviderPicker.svelte';
+  import WizardKeyStep from './WizardKeyStep.svelte';
+  import WizardTestResult from './WizardTestResult.svelte';
 
   interface Props {
     onfinish: (account: Account | null) => void;
@@ -53,6 +56,12 @@
   let limitZl = $state(100);
 
   function choose(p: ProviderInfo) {
+    // Zmiana dostawcy czyści wszystko, co dotyczyło poprzedniego. Adres endpointu wpisany dla
+    // innego dostawcy wysłałby ten klucz na cudzy serwer.
+    if (provider?.id !== p.id) {
+      baseUrl = '';
+      secret = '';
+    }
     provider = p;
     label = p.display_name;
     keyError = '';
@@ -60,15 +69,18 @@
   }
 
   async function saveKey() {
-    if (!provider || !secret.trim() || saving) return;
+    // Do rdzenia idzie sam klucz — bez cudzysłowów, `NAZWA=` i znaków nowej linii ze schowka.
+    const key = cleanKey(secret);
+    if (!provider || !key || saving) return;
     saving = true;
     keyError = '';
     try {
       account = await app.client.accounts.add({
         provider_id: provider.id,
         label: label.trim() || provider.display_name,
-        secret,
-        base_url: baseUrl.trim() || null,
+        secret: key,
+        // Adres tylko wtedy, gdy kreator o niego pytał (dostawca bez adresu w katalogu).
+        base_url: provider.needs_base_url ? baseUrl.trim() || null : null,
       });
     } catch (error) {
       keyError = errorText(error);
@@ -87,7 +99,13 @@
     try {
       report = await app.client.accounts.test(account.id);
     } catch (error) {
-      report = { ok: false, latency_ms: null, models: [], error: errorText(error) };
+      report = {
+        ok: false,
+        latency_ms: null,
+        models: [],
+        error: errorText(error),
+        reason: 'network',
+      };
     } finally {
       testing = false;
     }
@@ -104,6 +122,19 @@
     account = null;
     report = null;
     step = 1;
+  }
+
+  /** Model wpisany ręcznie (klucz bez prawa do listy modeli) — bez niego Alfa nie ma czego wywołać. */
+  async function setModel(model: string) {
+    const created = account;
+    if (!created || !report) return;
+    try {
+      const updated = await app.client.accounts.setModel(created.id, model);
+      account = updated;
+      report = { ...report, models: updated.models };
+    } catch (error) {
+      showError(app.toasts, error);
+    }
   }
 
   /** Stepper: przed zapisem konta tylko kroki 1–2, po zapisie tylko kroki od testu wzwyż. */
@@ -153,58 +184,32 @@
     })}
     onselect={select}
   />
-  <div class="body" aria-live="polite">
+  <div class="body">
     {#if step === 0}
       <ProviderPicker onchoose={choose} />
     {:else if step === 1 && provider}
-      <TextField label={t('wiz.label')} bind:value={label} autocomplete="off" />
-      <TextField
-        label={t('wiz.key')}
-        type="password"
-        bind:value={secret}
-        hint={t('wiz.keyHint')}
-        autocomplete="off"
-        spellcheck={false}
+      <WizardKeyStep
+        {provider}
+        bind:secret
+        bind:label
+        bind:baseUrl
+        {saving}
+        error={keyError}
+        onsubmit={saveKey}
       />
-      {#if provider.needs_base_url}
-        <TextField
-          label={t('wiz.baseUrl')}
-          type="url"
-          bind:value={baseUrl}
-          placeholder="https://"
-          hint={t('wiz.baseUrlHint')}
-        />
-      {/if}
-      {#if keyError}
-        <p class="fail" role="alert">{t('wiz.keyFail', { error: keyError })}</p>
-      {/if}
-      <div class="actions">
-        <Button
-          variant="primary"
-          disabled={!secret.trim() || saving}
-          loading={saving}
-          onclick={saveKey}>{t('common.next')}</Button
-        >
-      </div>
     {:else if step === 2}
-      {#if testing}
-        <p role="status">{t('wiz.testing')}</p>
-      {:else if report?.ok}
-        <p class="ok" role="status">
-          {t('wiz.testOk', { latency: app.i18n.duration(report.latency_ms ?? 0) })}
-        </p>
-        <div class="actions">
-          <Button variant="primary" onclick={() => (step = 3)}>{t('common.next')}</Button>
-        </div>
-      {:else if report}
-        <p class="fail" role="alert">{t('wiz.testFail', { error: report.error ?? '' })}</p>
-        <div class="actions">
-          <Button variant="secondary" disabled={saving} loading={saving} onclick={editKey}
-            >{t('wiz.fixKey')}</Button
-          >
-          <Button variant="primary" onclick={runTest}>{t('common.retry')}</Button>
-        </div>
-      {/if}
+      <WizardTestResult
+        {report}
+        {testing}
+        providerId={provider?.id ?? ''}
+        providerName={provider?.display_name ?? ''}
+        busy={saving}
+        onnext={() => (step = 3)}
+        onretry={runTest}
+        onfix={editKey}
+        onkeep={() => onfinish(account)}
+        onmodel={setModel}
+      />
     {:else if step === 3 && report}
       <p>{t('wiz.modelsFound', { n: report.models.length })}</p>
       <ul class="models">
@@ -262,15 +267,20 @@
           bind:value={limitZl}
         />{/if}
       <div class="actions">
-        <Button variant="primary" disabled={finishing} loading={finishing} onclick={finish}
-          >{t('wiz.finish')}</Button
+        <Button
+          variant="primary"
+          disabled={finishing || (limitOn && !(Number(limitZl) > 0))}
+          loading={finishing}
+          onclick={finish}>{t('wiz.finish')}</Button
         >
       </div>
     {/if}
   </div>
   <div class="foot">
     <!-- Konto zapisane w kroku 2 istnieje — „Pomiń" przekazuje je dalej, a nie `null`. -->
-    <Button variant="ghost" onclick={() => onfinish(account)}>{t('wiz.skip')}</Button>
+    <Button variant="ghost" onclick={() => onfinish(account)}
+      >{account ? t('wiz.finishLater') : t('wiz.skip')}</Button
+    >
   </div>
 </section>
 
@@ -331,12 +341,5 @@
     justify-content: flex-start;
     border-top: 1px solid var(--alfa-color-border);
     padding-top: var(--alfa-space-2);
-  }
-  .ok {
-    color: var(--alfa-color-success);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .fail {
-    color: var(--alfa-color-error);
   }
 </style>

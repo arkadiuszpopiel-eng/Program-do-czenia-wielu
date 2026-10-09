@@ -1,0 +1,166 @@
+//! Atrapa: operacje na kluczu istniejącego konta — te same reguły co implementacja
+//! (`accounts-hub-impl/src/keys.rs`): wynik testu trafia do bieżącego wpisu, wymiana klucza zapisuje
+//! nowy dopiero po udanym teście, a włączenie przywraca stan z ostatniego testu.
+
+use accounts_hub_contract::{
+    Account, AccountId, AccountState, AccountsError, AuthKind, ModelId, ModelInfo, ProviderId,
+    SecretStore, SecretString, TestSummary,
+};
+
+use crate::hub::FakeAccountsHub;
+
+fn invalid(message: &str) -> AccountsError {
+    AccountsError::InvalidInput(message.to_owned())
+}
+
+impl FakeAccountsHub {
+    async fn probe(
+        &self,
+        acc: &Account,
+        secret: Option<&SecretString>,
+    ) -> Result<(TestSummary, Option<Vec<ModelInfo>>), AccountsError> {
+        let entry = self.entry(&acc.provider)?;
+        let base = acc.base_url.clone().or_else(|| entry.base_url.clone());
+        let (report, models) = self.test_and_list(&entry, base.as_deref(), secret).await;
+        let summary = TestSummary {
+            at: self.now(),
+            outcome: report.outcome,
+            latency_ms: report.latency_ms,
+            models_found: models.as_ref().map(Vec::len),
+            detail: report.detail,
+        };
+        Ok((summary, models))
+    }
+
+    /// Zapis wyniku w bieżącym wpisie; `false`, gdy konto zniknęło albo ma już inny klucz.
+    fn store_test(
+        &self,
+        id: &AccountId,
+        tested: Option<&SecretString>,
+        summary: &TestSummary,
+        models: Option<Vec<ModelInfo>>,
+    ) -> Result<bool, AccountsError> {
+        let Ok(mut current) = self.get(id) else {
+            return Ok(false);
+        };
+        let stored = self.secrets.get(&current.secret)?;
+        let same_key = match (&stored, tested) {
+            (Some(a), Some(b)) => a.ct_eq(b),
+            (None, None) => true,
+            _ => false,
+        };
+        if !same_key {
+            return Ok(false);
+        }
+        current.state = summary.outcome.next_state(&current.state);
+        current.last_test = Some(summary.clone());
+        if let Some(models) = models {
+            current.models = models;
+        }
+        self.put(current);
+        Ok(true)
+    }
+
+    pub(crate) async fn test_account_now(
+        &self,
+        id: &AccountId,
+    ) -> Result<TestSummary, AccountsError> {
+        let acc = self.get(id)?;
+        let secret = self.secrets.get(&acc.secret)?;
+        let (summary, models) = self.probe(&acc, secret.as_ref()).await?;
+        self.store_test(id, secret.as_ref(), &summary, models)?;
+        Ok(summary)
+    }
+
+    pub(crate) async fn try_rotate_now(
+        &self,
+        id: &AccountId,
+        secret: SecretString,
+    ) -> Result<TestSummary, AccountsError> {
+        let acc = self.get(id)?;
+        if self.entry(&acc.provider)?.auth != AuthKind::ApiKey {
+            return Err(invalid("to konto nie używa klucza API"));
+        }
+        if !secret.is_plausible_key() {
+            return Err(invalid("klucz jest pusty albo zawiera niedozwolone znaki"));
+        }
+        let (summary, models) = self.probe(&acc, Some(&secret)).await?;
+        if !summary.outcome.accepts_new_key() {
+            return Ok(summary);
+        }
+        self.secrets.put(&acc.secret, &secret)?;
+        self.store_test(id, Some(&secret), &summary, models)?;
+        Ok(summary)
+    }
+
+    pub(crate) fn set_disabled_now(
+        &self,
+        id: &AccountId,
+        disabled: bool,
+    ) -> Result<(), AccountsError> {
+        let mut acc = self.get(id)?;
+        let has_key = self.secrets.get(&acc.secret)?.is_some()
+            || self.entry(&acc.provider)?.auth == AuthKind::None;
+        if disabled {
+            acc.state = AccountState::Disabled;
+        } else if acc.state == AccountState::Disabled {
+            acc.state = match (&acc.last_test, has_key) {
+                (_, false) => AccountState::Unconfigured,
+                (Some(test), true) => test.outcome.next_state(&AccountState::Active),
+                (None, true) => AccountState::Active,
+            };
+        }
+        self.put(acc);
+        Ok(())
+    }
+
+    pub(crate) fn set_manual_model_now(
+        &self,
+        id: &AccountId,
+        model: ModelId,
+    ) -> Result<(), AccountsError> {
+        let mut acc = self.get(id)?;
+        if acc.models.len() > 1 {
+            return if acc.models.iter().any(|m| m.id == model) {
+                Ok(())
+            } else {
+                Err(invalid(
+                    "to konto ma listę modeli od dostawcy — wybierz model z listy",
+                ))
+            };
+        }
+        acc.models = vec![ModelInfo {
+            id: model,
+            display_name: None,
+            capabilities: None,
+            context_window: None,
+        }];
+        self.put(acc);
+        Ok(())
+    }
+
+    pub(crate) fn find_same_key(
+        &self,
+        provider: &ProviderId,
+        base_url: Option<&str>,
+        secret: &SecretString,
+    ) -> Option<AccountId> {
+        if secret.is_empty() {
+            return None;
+        }
+        let default_url = self.entry(provider).ok()?.base_url;
+        let effective = |url: Option<&str>| {
+            url.map(str::to_owned)
+                .or_else(|| default_url.clone())
+                .map(|u| u.trim_end_matches('/').to_ascii_lowercase())
+        };
+        let wanted = effective(base_url);
+        self.accounts_snapshot()
+            .into_iter()
+            .filter(|acc| &acc.provider == provider && effective(acc.base_url.as_deref()) == wanted)
+            .find(|acc| {
+                matches!(self.secrets.get(&acc.secret), Ok(Some(stored)) if stored.ct_eq(secret))
+            })
+            .map(|acc| acc.id)
+    }
+}

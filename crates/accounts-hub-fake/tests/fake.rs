@@ -39,6 +39,7 @@ async fn controls_and_spy() {
     hub.tester().push(ConnectionReport {
         outcome: TestOutcome::Timeout,
         latency_ms: None,
+        detail: None,
     });
     assert_eq!(
         hub.test_account(&id).await.unwrap().outcome,

@@ -51,6 +51,19 @@ export interface Account {
   readonly assignments: AccountAssignment;
   readonly cost_limit: { readonly enabled: boolean; readonly monthly: Money };
   readonly last_tested_at: Iso8601 | null;
+  /** Wynik ostatniego testu — lista kont pokazuje powód, nie tylko „klucz odrzucony”. */
+  readonly last_test?: AccountLastTest | null;
+}
+
+/** Ostatni test konta w skrócie (te same pola co w `TestReport`, bez listy modeli). */
+export interface AccountLastTest {
+  readonly ok: boolean;
+  /** `ok`, `invalid_key`, `restricted`, `no_credit`, `rate_limited`, `timeout`, `network`, `unsupported`. */
+  readonly reason: string;
+  readonly latency_ms: number | null;
+  readonly status?: number | null;
+  readonly provider_code?: string | null;
+  readonly detail?: string | null;
 }
 
 /** Dane kreatora. `secret` trafia jednorazowo do backendu (Credential Manager); UI go nie przechowuje. */
@@ -66,6 +79,17 @@ export interface TestReport {
   readonly latency_ms: number | null;
   readonly models: readonly ModelInfo[];
   readonly error: string | null;
+  /**
+   * Rodzaj wyniku, gdy nie jest zwykłym sukcesem: `invalid_key`, `restricted` (klucz działa, ale
+   * bez prawa do listy modeli), `no_credit`, `rate_limited`, `timeout`, `network`, `unsupported`.
+   */
+  readonly reason?: string | null;
+  /** Kod HTTP odpowiedzi dostawcy. */
+  readonly status?: number | null;
+  /** Kod błędu dostawcy (np. `invalid_api_key`). */
+  readonly provider_code?: string | null;
+  /** Komunikat dostawcy w oryginale (bez sekretów). */
+  readonly detail?: string | null;
 }
 
 // ── Import / eksport `.alfa` (PLAN §15.1, docs/formats/alfa-package.md) ─────────────────────────

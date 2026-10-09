@@ -8,6 +8,7 @@
   import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import AccountRow from './AccountRow.svelte';
   import AddProviderWizard from './AddProviderWizard.svelte';
   import BridgesSection from './BridgesSection.svelte';
 
@@ -55,15 +56,6 @@
       accounts = accounts.map((a) => (a.id === event.account.id ? event.account : a));
     });
   });
-
-  const providerName = (id: string) => catalog.find((p) => p.id === id)?.display_name ?? id;
-
-  async function test(account: Account) {
-    accounts = accounts.map((a) => (a.id === account.id ? { ...a, state: 'testing' } : a));
-    await attempt(app.toasts, () => app.client.accounts.test(account.id));
-    // Bez świeżej listy cofamy „testowanie" ręcznie — inaczej spinner zostałby na zawsze.
-    if (!(await reload())) accounts = accounts.map((a) => (a.id === account.id ? account : a));
-  }
 
   async function remove() {
     // AlertDialog.Action (bits-ui) nie zamyka okna sam — zamykamy je przed wywołaniem rdzenia.
@@ -113,37 +105,15 @@
   {:else if accounts.length}
     <ul class="accounts" aria-label={t('hub.accounts')}>
       {#each accounts as account (account.id)}
-        <li class="account">
-          <div class="info">
-            <span class="name">{account.label}</span>
-            <span class="meta">
-              {providerName(account.provider_id)} · {t('hub.models', { n: account.models.length })} ·
-              {account.cost_limit.enabled
-                ? t('hub.limit', { amount: app.i18n.money(account.cost_limit.monthly) })
-                : t('hub.noLimit')}
-              {#if account.last_tested_at}· {t('hub.tested', {
-                  when: app.i18n.relative(account.last_tested_at),
-                })}{/if}
-            </span>
-          </div>
-          <span class="state state-{account.state}">{t(`hub.state.${account.state}`)}</span>
-          <Button
-            size="sm"
-            variant="secondary"
-            loading={account.state === 'testing'}
-            onclick={() => test(account)}>{t('hub.test')}</Button
-          >
-          <Button
-            size="sm"
-            variant="ghost"
-            onclick={() => {
-              removing = account;
-              confirmOpen = true;
-            }}
-          >
-            {t('hub.remove')}
-          </Button>
-        </li>
+        <AccountRow
+          {account}
+          provider={catalog.find((p) => p.id === account.provider_id)}
+          onchange={reload}
+          onremove={(target) => {
+            removing = target;
+            confirmOpen = true;
+          }}
+        />
       {/each}
     </ul>
   {/if}
@@ -177,13 +147,9 @@
   h3 {
     font-size: var(--alfa-font-size-md);
   }
-  .desc,
-  .meta {
+  .desc {
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-sm);
-  }
-  .meta {
-    font-size: var(--alfa-font-size-xs);
   }
   .accounts {
     display: flex;
@@ -192,39 +158,5 @@
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-  .account {
-    display: flex;
-    align-items: center;
-    gap: var(--alfa-space-3);
-    padding: var(--alfa-space-3);
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-card);
-    background: var(--alfa-color-surface);
-  }
-  .info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-width: 0;
-  }
-  .name {
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .state {
-    font-size: var(--alfa-font-size-xs);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .state-ok {
-    color: var(--alfa-color-success);
-  }
-  .state-invalid,
-  .state-rate_limited {
-    color: var(--alfa-color-error);
-  }
-  .state-unconfigured,
-  .state-testing,
-  .state-disabled {
-    color: var(--alfa-color-text-muted);
   }
 </style>

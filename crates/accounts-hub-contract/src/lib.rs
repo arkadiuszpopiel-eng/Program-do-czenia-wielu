@@ -20,7 +20,8 @@ pub mod contract_tests;
 
 pub use account::{
     Account, AccountErrorKind, AccountSource, AccountState, Assignments, ConnectionReport,
-    CostLimit, NewAccount, TaskClass, TestOutcome, TestSummary, VoiceRole, provider_state,
+    CostLimit, NewAccount, ProbeDetail, TaskClass, TestOutcome, TestSummary, VoiceRole,
+    provider_state,
 };
 pub use api::{
     AccountsError, AccountsHub, AccountsRepository, EVENT_KEY_ADDED, EVENT_KEY_REMOVED,

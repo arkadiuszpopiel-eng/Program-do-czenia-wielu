@@ -325,7 +325,7 @@ o crate&#39;ach: <a href="../CATALOG.md"><code>../CATALOG.md</code></a>. Obecna 
 <pre><code>                 ┌──────────────────────────── KOMPUTER (host) ─────────────────────────────┐
   okno Tauri ───▶│  transport: IPC ─┐                                                       │
                  │                  ├─▶ BRAMA KLIENTÓW ─▶ AppCore ─▶ moduły ─▶ BROKER ─▶ system
-  telefon  ──┐   │  transport:      │   (kto, co wolno,   (210 poleceń,        (zgody,      │
+  telefon  ──┐   │  transport:      │   (kto, co wolno,   (214 poleceń,        (zgody,      │
   przeglądarka├─▶ PRZEKAŹNIK ─▶ kanał E2E ─┘ numery zdarzeń) zdarzenia)        dziennik)    │
              │   │  (szyfrogram)                                │                            │
              │   │                                              └─▶ modele lokalne, głos     │
@@ -380,7 +380,7 @@ wpisana w kontrakty, a nie odgrodzona <code>cfg</code>:</p>
 <p>Uwaga: otwarte ustalenia analizatora powłoki (S-01…S-04, S-06) trzeba rozstrzygnąć <strong>przed</strong> tą przebudową,
 żeby nie przenosić znanych dziur do nowej struktury.</p>
 <h2 id="szew-3-protokol-niezalezny-od-transportu">Szew 3 — protokół niezależny od transportu</h2>
-<p><strong>Dziś.</strong> 210 poleceń w jednej liście (<code>app-api/src/commands.rs</code>, makro <code>with_commands!</code>), ok. 38 zdarzeń
+<p><strong>Dziś.</strong> 214 poleceń w jednej liście (<code>app-api/src/commands.rs</code>, makro <code>with_commands!</code>), ok. 38 zdarzeń
 (<code>AlfaEvent</code> w <code>app-api/src/dto/events.rs</code>), DTO w <code>app-api/src/dto/</code>. Interfejs zna tylko <code>AlfaClient</code>
 (<code>apps/desktop/ui/src/lib/api/client.ts</code>) — ma dwie implementacje: <code>TauriAlfaClient</code> i <code>FakeAlfaClient</code>.
 To bardzo dobry punkt wyjścia. Brakuje pięciu rzeczy:</p>

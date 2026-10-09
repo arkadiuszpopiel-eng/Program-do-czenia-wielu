@@ -8,6 +8,61 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.7 — 2026-10-09
+
+Dodawanie klucza API zrobione od nowa po zgłoszeniu właściciela („401 Klucz odrzucony” bez wyjaśnienia) i po dwóch
+przeglądach całego systemu kluczy w świeżym kontekście; trzeci przegląd (19 ustaleń) naprawiony przed wydaniem —
+raport: `docs/reviews/2026-10-09-przeglad-kluczy-api.md`.
+
+### Klucze API i konta dostawców
+
+- Wynik sprawdzenia klucza mówi, co się stało i co zrobić — osobno dla klucza odrzuconego, braku środków na koncie,
+  ograniczonych uprawnień, kraju nieobsługiwanego przez dostawcę, odmowy z innego powodu, braku odpowiedzi i braku
+  połączenia. Pod spodem można rozwinąć dokładną odpowiedź dostawcy (kod HTTP, kod błędu, komunikat).
+- Kreator pokazuje, skąd wziąć klucz (adres strony z przyciskiem kopiowania) i uprzedza, że API jest płatne osobno od
+  abonamentu czatu.
+- Wklejony klucz jest sprzątany z tego, co dokleja schowek: cudzysłowów, `OPENAI_API_KEY=`, `export`, `set`, `Bearer`,
+  przecinka, znaków nowej linii i znaków niewidocznych.
+- Zdanie zamiast klucza, klucz innego dostawcy albo token logowania Claude Code są rozpoznawane, zanim cokolwiek
+  zostanie wysłane.
+- Klucz bez prawa do listy modeli działa po wpisaniu nazwy modelu — wcześniej takie konto było bezużyteczne.
+- „Zmień klucz” przy koncie: nowy klucz jest najpierw sprawdzany, a poprzedni zostaje, dopóki dostawca nie rozpozna
+  nowego. Limit zapytań, błąd sieci ani odmowa nie zastępują działającego klucza. Ustawienia konta (przypisania,
+  limit) nie giną.
+- Zły klucz u Google i xAI (zgłaszany kodem 400) jest pokazywany jako zły klucz, a nie „błąd połączenia”.
+- OpenRouter i własne adresy bez listy modeli: Alfa mówi wprost, że klucza nie da się sprawdzić z góry, i prosi
+  o nazwę modelu — zamiast udawać, że test się udał.
+- Dwie linie pliku `.env` wklejone naraz nie są już sklejane w jeden „klucz”.
+- Konto można wyłączyć i włączyć bez usuwania klucza; włączenie przywraca stan z ostatniego testu.
+- Lista kont pokazuje powód ostatniego testu („brak środków na koncie”, „dostęp odmówiony”) i przycisk „Co zrobić”.
+- Ten sam klucz dodany drugi raz daje czytelną odmowę z nazwą istniejącego konta.
+- Mistral, DeepSeek, OpenRouter i Google nie pytają już o adres API — jest w katalogu.
+- Zmiana dostawcy w kreatorze czyści wpisany klucz i adres, żeby klucz nie poszedł na serwer innego dostawcy.
+- Gdy klucz może być dobry (brak środków, sieć, odmowa), konto można zostawić i sprawdzić ponownie później.
+
+### Bezpieczeństwo
+
+- Odpowiedź dostawcy pokazywana w interfejsie ma zamaskowane wszystko, co wygląda jak klucz, i usunięte znaki
+  sterujące; jest obcinana do 400 znaków.
+- Rdzeń odrzuca tekst, który po sprzątaniu ma spacje albo znaki spoza ASCII — nie trafia on do Menedżera poświadczeń.
+- Adres własnego endpointu z danymi logowania przed `@` (np. `http://localhost:80@inny.host`) jest odrzucany.
+- Połączenia z dostawcami nie podążają za przekierowaniami, żeby klucz nie trafił pod inny adres.
+- Test i wymiana klucza nie wysyłają go do dostawcy, który został oznaczony jako zabroniony.
+
+### Testy
+
+- Rdzeń: sześć testów całej ścieżki z lokalnym serwerem udającym dostawcę (`app-core/tests/accounts_keys.rs`,
+  `accounts_rotate.rs`), klasyfikacja odpowiedzi (`app-modules/src/probe.rs`), wspólna tabela wklejanych kluczy dla
+  Rust i TypeScript (`accounts-hub-contract/tests/fixtures/key-inputs.json`).
+- Interfejs: 24 testy E2E kreatora i listy kont (każdy wynik, sześć kombinacji stylu i motywu z kontrolą kontrastu,
+  wersja angielska, brak zdublowanych identyfikatorów), 17 testów logiki klucza.
+- Zrzuty wszystkich stanów w sześciu kombinacjach stylu i motywu obejrzane ręcznie (`scripts/shots-wizard.mjs`).
+
+### Przyczyna błędu
+
+- Polecenie `accounts_test` zamieniało każdą odmowę uwierzytelnienia na stały tekst „Klucz odrzucony (401)” i gubiło
+  odpowiedź dostawcy, więc brak środków, ograniczone uprawnienia i blokada regionu wyglądały jak zły klucz.
+
 ## 0.0.6 — 2026-10-09
 
 Poprawki po przeglądzie wszystkich zmian od 0.0.1 (trzy niezależne przeglądy w świeżym kontekście).

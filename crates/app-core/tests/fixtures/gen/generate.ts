@@ -163,6 +163,13 @@ async function run(): Promise<void> {
     voice_tts: false,
   });
   await both('accounts', 'setLimit', account.id, true, { minor: 5_000, currency: 'PLN' });
+  // Wymiana klucza na taki z ograniczonymi uprawnieniami (raport z powodem i odpowiedzią dostawcy),
+  // wyłączenie i włączenie konta.
+  await both('accounts', 'rotate', account.id, 'test-restricted-XXXXXXXXXXXXXXXX');
+  await both('accounts', 'setModel', account.id, 'gpt-4o-mini');
+  await both('accounts', 'list');
+  await both('accounts', 'setDisabled', account.id, true);
+  await both('accounts', 'setDisabled', account.id, false);
   await both('accounts', 'remove', account.id);
 
   await both('transfer', 'exportPackage', {

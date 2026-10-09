@@ -1,6 +1,7 @@
 //! Komendy IPC (COMMANDS.md) jako metody `AppCore::<przestrzeń>_<nazwa>`, po pliku na przestrzeń.
 
-pub(crate) mod accounts;
+pub(crate) mod account_keys;
+mod accounts;
 mod agents;
 pub(crate) mod app;
 mod bridges;

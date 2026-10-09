@@ -816,13 +816,18 @@
         "voice_tts": false
       },
       "cost_limit": {
-        "enabled": true,
+        "enabled": false,
         "monthly": {
-          "minor": 10000,
+          "minor": 0,
           "currency": "PLN"
         }
       },
-      "last_tested_at": "2026-09-30T11:45:00.000Z"
+      "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "ok",
+        "latency_ms": 312
+      }
     }
   },
   {
@@ -864,13 +869,18 @@
         "voice_tts": false
       },
       "cost_limit": {
-        "enabled": true,
+        "enabled": false,
         "monthly": {
-          "minor": 10000,
+          "minor": 0,
           "currency": "PLN"
         }
       },
-      "last_tested_at": "2026-09-30T11:45:00.000Z"
+      "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "ok",
+        "latency_ms": 312
+      }
     }
   },
   {
@@ -918,7 +928,12 @@
           "currency": "PLN"
         }
       },
-      "last_tested_at": "2026-09-30T11:45:00.000Z"
+      "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "ok",
+        "latency_ms": 312
+      }
     }
   },
   {

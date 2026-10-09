@@ -58,6 +58,23 @@ pub enum TestOutcome {
     Ok,
     /// Klucz odrzucony.
     InvalidKey,
+    /// Klucz poprawny, ale z ograniczonymi uprawnieniami (np. bez prawa do listy modeli) —
+    /// dostawca odpowiada wtedy 401/403, choć sam klucz jest ważny.
+    Restricted {
+        /// Komunikat dostawcy (bez sekretów).
+        message: String,
+    },
+    /// Dostawca rozpoznał żądanie, ale odmawia dostępu z innego powodu niż sam klucz
+    /// (kraj lub region, wyłączone API, zapora po drodze). Klucz może być poprawny.
+    Refused {
+        /// Komunikat dostawcy (bez sekretów).
+        message: String,
+    },
+    /// Klucz poprawny, ale konto u dostawcy nie ma środków albo aktywnych płatności.
+    NoCredit {
+        /// Komunikat dostawcy (bez sekretów).
+        message: String,
+    },
     /// Limit zapytań (klucz poprawny).
     RateLimited,
     /// Błąd sieci (komunikat bez sekretów).
@@ -77,7 +94,31 @@ pub enum TestOutcome {
 impl TestOutcome {
     /// Czy klucz można uznać za działający (także przy limicie zapytań).
     pub fn key_works(&self) -> bool {
-        matches!(self, TestOutcome::Ok | TestOutcome::RateLimited)
+        matches!(
+            self,
+            TestOutcome::Ok | TestOutcome::RateLimited | TestOutcome::Restricted { .. }
+        )
+    }
+
+    /// Czy wynik testu **kandydata** pozwala zapisać go w miejsce dotychczasowego klucza: dostawca
+    /// go rozpoznał (także „brak środków”) albo klucza nie da się sprawdzić z góry. Limit zapytań,
+    /// błąd sieci i odmowa z innego powodu nic o kluczu nie mówią — działający klucz zostaje.
+    pub fn accepts_new_key(&self) -> bool {
+        matches!(
+            self,
+            TestOutcome::Ok
+                | TestOutcome::Restricted { .. }
+                | TestOutcome::NoCredit { .. }
+                | TestOutcome::Unsupported { .. }
+        )
+    }
+
+    /// Czy po tym wyniku warto pytać o listę modeli (klucz z ograniczeniem dostałby tę samą odmowę).
+    pub fn may_list_models(&self) -> bool {
+        matches!(
+            self,
+            TestOutcome::Ok | TestOutcome::RateLimited | TestOutcome::Unsupported { .. }
+        )
     }
 
     /// Stan konta po teście (wyłączone konto zostaje wyłączone; `Unsupported` nie zmienia stanu).
@@ -87,8 +128,12 @@ impl TestOutcome {
         }
         let error = |kind| AccountState::Error { kind };
         match self {
-            TestOutcome::Ok | TestOutcome::RateLimited => AccountState::Active,
-            TestOutcome::InvalidKey => error(AccountErrorKind::InvalidKey),
+            TestOutcome::Ok | TestOutcome::RateLimited | TestOutcome::Restricted { .. } => {
+                AccountState::Active
+            }
+            TestOutcome::InvalidKey
+            | TestOutcome::NoCredit { .. }
+            | TestOutcome::Refused { .. } => error(AccountErrorKind::InvalidKey),
             TestOutcome::Network { .. } => error(AccountErrorKind::Network),
             TestOutcome::Timeout => error(AccountErrorKind::Timeout),
             TestOutcome::Unsupported { .. } => current.clone(),
@@ -100,12 +145,27 @@ impl TestOutcome {
         match self {
             TestOutcome::Ok => "ok",
             TestOutcome::InvalidKey => "invalid_key",
+            TestOutcome::Restricted { .. } => "restricted",
+            TestOutcome::NoCredit { .. } => "no_credit",
+            TestOutcome::Refused { .. } => "refused",
             TestOutcome::RateLimited => "rate_limited",
             TestOutcome::Network { .. } => "network",
             TestOutcome::Timeout => "timeout",
             TestOutcome::Unsupported { .. } => "unsupported",
         }
     }
+}
+
+/// Co dokładnie odpowiedział dostawca przy teście — do pokazania użytkownikowi obok naszego
+/// opisu (sam kod „401” nie mówi, czy klucz jest zły, ograniczony, czy konto nie ma środków).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct ProbeDetail {
+    /// Kod HTTP odpowiedzi.
+    pub status: Option<u16>,
+    /// Kod błędu dostawcy (np. `invalid_api_key`).
+    pub code: Option<String>,
+    /// Komunikat dostawcy, skrócony i bez sekretów.
+    pub message: String,
 }
 
 /// Raport testera połączenia.
@@ -115,6 +175,9 @@ pub struct ConnectionReport {
     pub outcome: TestOutcome,
     /// Opóźnienie w ms, jeśli zmierzone.
     pub latency_ms: Option<u64>,
+    /// Odpowiedź dostawcy przy niepowodzeniu.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<ProbeDetail>,
 }
 
 /// Podsumowanie ostatniego testu konta.
@@ -128,6 +191,9 @@ pub struct TestSummary {
     pub latency_ms: Option<u64>,
     /// Liczba wykrytych modeli (jeśli wykrywanie się udało).
     pub models_found: Option<usize>,
+    /// Odpowiedź dostawcy przy niepowodzeniu.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<ProbeDetail>,
 }
 
 /// Klasy zadań Routera (PLAN §5.4).

@@ -199,6 +199,15 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             unit,
         ),
         "accounts_remove" => (vec![("accountId", s)], unit),
+        "accounts_rotate" => (
+            vec![("accountId", s), ("secret", parse_only::<SecretInput>)],
+            roundtrip::<TestReport>,
+        ),
+        "accounts_set_model" => (vec![("accountId", s), ("model", s)], roundtrip::<Account>),
+        "accounts_set_disabled" => (
+            vec![("accountId", s), ("disabled", b)],
+            roundtrip::<Account>,
+        ),
         "transfer_export" => (
             vec![("request", parse_only::<ExportRequest>)],
             roundtrip::<ExportResult>,

@@ -263,6 +263,7 @@ impl AccountsHubService {
             Err(_) => ConnectionReport {
                 outcome: TestOutcome::Timeout,
                 latency_ms: Some(u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX)),
+                detail: None,
             },
         };
         redact_report(report, secret)
@@ -302,7 +303,19 @@ fn redact_report(mut report: ConnectionReport, secret: Option<&SecretString>) ->
         TestOutcome::Unsupported { message } => TestOutcome::Unsupported {
             message: redact(&message, secret),
         },
+        TestOutcome::Restricted { message } => TestOutcome::Restricted {
+            message: redact(&message, secret),
+        },
+        TestOutcome::NoCredit { message } => TestOutcome::NoCredit {
+            message: redact(&message, secret),
+        },
+        TestOutcome::Refused { message } => TestOutcome::Refused {
+            message: redact(&message, secret),
+        },
         other => other,
     };
+    if let Some(detail) = report.detail.as_mut() {
+        detail.message = redact(&detail.message, secret);
+    }
     report
 }

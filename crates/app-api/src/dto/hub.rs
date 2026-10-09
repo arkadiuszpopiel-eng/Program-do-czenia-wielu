@@ -120,6 +120,24 @@ pub struct Account {
     pub assignments: AccountAssignment,
     pub cost_limit: AccountCostLimit,
     pub last_tested_at: Option<Iso8601>,
+    /// Wynik ostatniego testu — lista kont pokazuje powód, nie tylko „klucz odrzucony”.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_test: Option<AccountLastTest>,
+}
+
+/// Ostatni test konta w skrócie (te same pola co w [`TestReport`], bez listy modeli).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AccountLastTest {
+    pub ok: bool,
+    /// `ok`, `invalid_key`, `restricted`, `no_credit`, `rate_limited`, `timeout`, `network`, `unsupported`.
+    pub reason: String,
+    pub latency_ms: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider_code: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
 }
 
 /// Sekret z kreatora: zerowany w pamięci, `Debug` nie ujawnia wartości, brak `Serialize`.
@@ -166,6 +184,20 @@ pub struct TestReport {
     pub latency_ms: Option<u64>,
     pub models: Vec<ModelInfo>,
     pub error: Option<String>,
+    /// Rodzaj wyniku, gdy nie jest zwykłym sukcesem: `invalid_key`, `restricted` (klucz działa,
+    /// ale bez prawa do listy modeli), `no_credit`, `rate_limited`, `timeout`, `network`,
+    /// `unsupported`. Interfejs dobiera do niego wyjaśnienie i dalszy krok.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+    /// Kod HTTP odpowiedzi dostawcy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<u16>,
+    /// Kod błędu dostawcy (np. `invalid_api_key`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider_code: Option<String>,
+    /// Komunikat dostawcy w oryginale (bez sekretów).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
 }
 
 /// Uprawnienia (PLAN §8.3).

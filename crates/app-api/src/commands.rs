@@ -67,6 +67,9 @@ macro_rules! with_commands {
             accounts_assign(account_id: String, assignment: $crate::dto::AccountAssignment) -> ();
             accounts_set_limit(account_id: String, enabled: bool, monthly: $crate::dto::Money) -> ();
             accounts_remove(account_id: String) -> ();
+            accounts_rotate(account_id: String, secret: $crate::dto::SecretInput) -> $crate::dto::TestReport;
+            accounts_set_disabled(account_id: String, disabled: bool) -> $crate::dto::Account;
+            accounts_set_model(account_id: String, model: String) -> $crate::dto::Account;
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
             transfer_inspect(password: Option<$crate::dto::SecretInput>, handle: Option<String>) -> $crate::dto::InspectResult;
             transfer_import(request: $crate::dto::ImportRequest) -> $crate::dto::ImportResult;
@@ -244,6 +247,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 211);
+        assert_eq!(super::COMMANDS.len(), 214);
     }
 }

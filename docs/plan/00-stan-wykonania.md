@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-09**, wersja programu **0.0.6**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-09**, wersja programu **0.0.7**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -39,6 +39,7 @@ funkcjami.
 | 0.0.4 | 2026-10-09 | własne listy wyboru i pozostałe kontrolki w stylu Alfy (zgłoszenie właściciela: nieczytelna lista systemowa w stylu „Szkło”) | E2E: lista otwarta w 6 kombinacjach stylu i motywu; test w prawdziwej aplikacji; zrzuty stanu otwartego |
 | 0.0.5 | 2026-10-09 | okno „Co nowego” pokazuje skrót poprawek z dziennika zmian | testy `app-updates` (skrót wpisu; wpis istnieje dla uruchamianej wersji) |
 | 0.0.6 | 2026-10-09 | naprawy po przeglądzie zmian 0.0.1–0.0.5: dekodowanie wyjścia powłoki, kolejka offline, fokus w rozmowie, lista wyboru, „Co nowego”, spójność numeru wersji, świeżość HTML | testy regresji dla każdej poprawki; pełny zestaw testów interfejsu; testy crate'ów; test prawdziwej aplikacji |
+| 0.0.7 | 2026-10-09 | dodawanie klucza API od nowa: diagnoza przyczyny odmowy, sprzątanie wklejonego klucza, wymiana klucza bez utraty działającego, wyłączanie konta, adresy API czterech dostawców w katalogu | Rust: 6 testów całej ścieżki z lokalnym serwerem dostawcy, klasyfikacja odpowiedzi, wspólna tabela kluczy; E2E: 24 testy kreatora (6 kombinacji stylu i motywu, EN); zrzuty wszystkich stanów. Nie sprawdzono z prawdziwym kluczem — robi to właściciel |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 

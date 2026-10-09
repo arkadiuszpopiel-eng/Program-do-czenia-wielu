@@ -59,5 +59,26 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
   (`AccountsHubService::update_accounts`, blokada zapisu na czas zapisu). Błąd zapisu → pamięć zgodna z plikiem;
   nieudane dodanie usuwa świeżo zapisany klucz (bez osieroconych wpisów w Credential Manager); `remove` najpierw usuwa
   klucz (błąd → nic się nie zmienia), potem metadane. Test: `accounts-hub-impl/tests/persist_failure.rs`.
-- Znane ograniczenie: `rotate` zapisuje nowy klucz przed metadanymi — przy błędzie zapisu klucz jest już nowy, a stan
+- Znane ograniczenie (usunięte w 0.0.7 — patrz niżej): `rotate` zapisuje nowy klucz przed metadanymi — przy błędzie zapisu klucz jest już nowy, a stan
   konta (ostatni test) stary; ponowna rotacja/test wyrównuje.
+
+## Diagnoza i wymiana klucza (wersja 0.0.7, 2026-10-09)
+- `TestOutcome` = `Ok | InvalidKey | Restricted | NoCredit | Refused | RateLimited | Network | Timeout | Unsupported`;
+  klucz „działa” przy `Ok`, `Restricted`, `RateLimited`. Raport niesie `ProbeDetail { status, code, message }` — odpowiedź
+  dostawcy po maskowaniu wszystkiego, co wygląda jak klucz (`app-modules/src/probe.rs::scrub`), do 400 znaków.
+- `SecretString::from_input` zdejmuje to, co dokleja schowek (cudzysłowy, `NAZWA_KEY=`, `export`/`set`/`$env:`,
+  `Authorization: Bearer`, `,;`, znaki niewidoczne, znaki nowej linii) i odrzuca tekst, który potem nie jest ciągiem
+  drukowalnych znaków ASCII bez spacji. Te same przypadki sprawdza interfejs (`tests/fixtures/key-inputs.json`).
+- `try_rotate(id, secret)`: najpierw test kandydata; do magazynu trafia tylko klucz, który dostawca rozpoznał
+  (`Ok`, `Restricted`, `NoCredit`) albo którego nie da się sprawdzić (`Unsupported`) — `TestOutcome::accepts_new_key`.
+  Limit zapytań, sieć i odmowa zostawiają poprzedni klucz. Przy błędzie zapisu metadanych wraca poprzedni klucz
+  (zastępuje „znane ograniczenie” z sekcji wyżej).
+- Dostawca z publiczną listą modeli (OpenRouter) daje `Unsupported`, nie `Ok` — udany odczyt nic nie mówi o kluczu.
+- `validate_base_url`: host wyłuskany z adresu; dane logowania (`@`) odrzucane; `http://` tylko dla hosta lokalnego.
+- `set_disabled(id, false)` przywraca stan z ostatniego testu (konto z odrzuconym kluczem nie staje się aktywne).
+- `set_manual_model(id, model)`: model podany ręcznie dla konta bez listy modeli od dostawcy; udany, niepusty odczyt
+  listy go zastępuje, pusta lista niczego nie kasuje.
+- `find_by_secret(provider, base_url, secret)`: ten sam klucz u tego samego dostawcy pod tym samym adresem = odmowa
+  z nazwą istniejącego konta.
+- Wynik testu jest scalany z bieżącym wpisem konta (zmiany przypisań i limitu z czasu testu nie giną).
+- Testy całej ścieżki: `app-core/tests/accounts_keys.rs`, `accounts_rotate.rs` (lokalny serwer udający dostawcę).

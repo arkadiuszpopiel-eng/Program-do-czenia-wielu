@@ -109,6 +109,9 @@ impl<C: WireCodec> Engine<C> {
         let client = reqwest::Client::builder()
             .connect_timeout(http.timeouts.connect)
             .pool_idle_timeout(Duration::from_secs(90))
+            // API dostawców nie przekierowują; przekierowanie na inny host wyniosłoby tam klucz
+            // z nagłówka `x-api-key` (reqwest zdejmuje przy zmianie hosta tylko `Authorization`).
+            .redirect(reqwest::redirect::Policy::none())
             .build()
             .map_err(|e| ConfigError::Http(e.to_string()))?;
         Ok(Self {

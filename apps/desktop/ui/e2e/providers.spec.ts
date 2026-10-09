@@ -23,22 +23,39 @@ test('dostawca ze znanym endpointem: bez pola adresu, klucz zapisany, test poł�
   await page.getByRole('button', { name: /Anthropic \(Claude\)/ }).click();
   await expect(page.getByLabel('Adres endpointu (base URL)')).toHaveCount(0);
   await page.getByLabel('Klucz API').fill('sk-ant-test-0000');
-  await page.getByRole('button', { name: 'Dalej' }).click();
+  await page.getByRole('button', { name: 'Sprawdź klucz' }).click();
   await expect(page.getByText(/^Połączono/)).toBeVisible();
 });
 
-test('brak endpointu: komunikat zamiast cichej porażki, klucz zostaje, poprawka przechodzi', async ({
+test('dostawca z adresem w katalogu (DeepSeek) nie pyta o endpoint', async ({ page }) => {
+  await openWizard(page);
+  await page.getByRole('button', { name: /DeepSeek/ }).click();
+  await expect(page.getByLabel('Adres endpointu (base URL)')).toHaveCount(0);
+  await page.getByLabel('Klucz API').fill('sk-test-0000-0000-0000');
+  await page.getByRole('button', { name: 'Sprawdź klucz' }).click();
+  await expect(page.getByText(/^Połączono/)).toBeVisible();
+});
+
+test('własny endpoint: bez adresu nie da się wysłać klucza; zły adres daje komunikat, klucz zostaje', async ({
   page,
 }) => {
   await openWizard(page);
-  await page.getByRole('button', { name: /DeepSeek/ }).click();
+  await page.getByRole('button', { name: /Kimi/ }).click();
   const key = page.getByLabel('Klucz API');
-  await key.fill('sk-test-0000');
-  await page.getByRole('button', { name: 'Dalej' }).click();
+  const submit = page.getByRole('button', { name: 'Sprawdź klucz' });
+  await key.fill('sk-test-0000-0000-0000');
+  await expect(submit).toBeDisabled();
+  // Adres bez szyfrowania przechodzi przez pole, ale rdzeń go odrzuca — komunikat, nie cisza.
+  await page.getByLabel('Adres endpointu (base URL)').fill('http://api.example.com');
+  await submit.click();
   await expect(page.getByRole('alert')).toContainText('Nie zapisano klucza');
-  await expect(page.getByRole('alert')).toContainText('endpointu');
-  await expect(key).toHaveValue('sk-test-0000');
-  await page.getByLabel('Adres endpointu (base URL)').fill('https://api.deepseek.com');
-  await page.getByRole('button', { name: 'Dalej' }).click();
+  await expect(page.getByRole('alert')).toContainText('https://');
+  await expect(key).toHaveValue('sk-test-0000-0000-0000');
+  // Dane logowania przed `@` udają host lokalny — rdzeń tego nie przepuszcza.
+  await page.getByLabel('Adres endpointu (base URL)').fill('http://localhost:80@evil.example/v1');
+  await submit.click();
+  await expect(page.getByRole('alert')).toContainText('https://');
+  await page.getByLabel('Adres endpointu (base URL)').fill('https://api.example.com/v1');
+  await submit.click();
   await expect(page.getByText(/^Połączono/)).toBeVisible();
 });

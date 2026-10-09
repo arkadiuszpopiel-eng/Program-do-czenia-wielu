@@ -129,6 +129,7 @@ impl ConnectionTester for ScriptedConnectionTester {
         ConnectionReport {
             outcome,
             latency_ms: Some(12),
+            detail: None,
         }
     }
 }

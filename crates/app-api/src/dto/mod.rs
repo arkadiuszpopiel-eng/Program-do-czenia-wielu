@@ -53,11 +53,11 @@ pub use health::{
     ImproverIssue, ImproverProposalView, ImproverView, ModuleHealth, RiskView,
 };
 pub use hub::{
-    Account, AccountAssignment, AccountCostLimit, AccountState, AddAccountInput, AudioDevice,
-    AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind, ComplianceStatus,
-    CpuView, DeviceProfile, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView,
-    ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView,
-    SecretInput, TestReport, VoiceProfileId,
+    Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
+    AudioDevice, AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind,
+    ComplianceStatus, CpuView, DeviceProfile, GpuView, HwClass, LocalDownloadState, LocalModelInfo,
+    MachineView, ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind,
+    RecommendationView, SecretInput, TestReport, VoiceProfileId,
 };
 pub use memory::{
     ConsolidationReport, MemoryCascadeItem, MemoryEdit, MemoryExplanation, MemoryForgetPreview,

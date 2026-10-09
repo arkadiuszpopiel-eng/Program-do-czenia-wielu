@@ -45,6 +45,26 @@ własna obsługa MCP) pozostają wyłączone — ominęłyby zgody i dziennik.
 | D | Lista urządzeń i odwołanie | zgubiony telefon traci dostęp jednym kliknięciem | `device-pairing` | — |
 | D | STOP z każdego klienta | kill-switch działa także zdalnie | istniejący kill-switch + polecenie zdalne o najwyższym priorytecie | — |
 
+## Klucze i konta dla firm
+
+Stan po wersji 0.0.7 (zrobione): diagnoza każdej przyczyny odmowy z odpowiedzią dostawcy, sprzątanie wklejonego klucza,
+wymiana klucza bez utraty działającego, wyłączanie konta, wykrywanie tego samego klucza, limit kosztów na konto,
+klucz wyłącznie w Menedżerze poświadczeń Windows. Poniżej to, czego jeszcze brakuje do pracy w firmie.
+
+| ID | Funkcja | Co daje | Technologia | Pewność |
+| --- | --- | --- | --- | --- |
+| C2.12 | Organizacja i projekt | klucz konta firmowego trafia do właściwego projektu i budżetu | nagłówki `OpenAI-Organization` i `OpenAI-Project`; pola opcjonalne w koncie | P |
+| C2.12 | Azure OpenAI | firmy z umową Microsoft używają własnego zasobu | adres zasobu, nazwa wdrożenia, wersja API, nagłówek `api-key` | P |
+| C2.13 | Serwer pośredniczący i własny certyfikat | Alfa działa w sieci firmowej z inspekcją TLS | ustawienia sieci w `lib-netguard`; certyfikaty z magazynu Windows | W |
+| C2.14 | Sprawdzanie kluczy w tle | o wygasłym kluczu lub braku środków wiesz przed rozmową, nie w jej trakcie | `scheduler` + lista modeli (bez kosztu tokenów) | — |
+| C2.14 | Wiek klucza | przypomnienie o wymianie po ustalonym czasie | data zapisu klucza przy koncie | — |
+| C2.15 | Konto zapasowe | rozmowa nie staje, gdy jedno konto nie ma środków albo jest ograniczane | reguła routera; decyzja widoczna w osi czasu | — |
+| C2.16 | Dziennik operacji na kluczach | wiadomo, kto i kiedy dodał, wymienił albo wyłączył klucz | audyt Jądra; nigdy treść klucza | — |
+| C2.17 | Import ze zmiennych środowiskowych | administrator rozdaje klucze bez wklejania ich w okno | hub już to umie (`import_from_env`); brakuje polecenia rdzenia i przycisku; zawsze za zgodą użytkownika | — |
+
+Poza zakresem: wspólny magazyn kluczy dla zespołu i logowanie jednokrotne — wymagają serwera, którego Alfa nie ma
+(decyzja „lokalnie najpierw”); wrócą razem z hostem bez okna (etap D).
+
 ## Zgodność i zaufanie
 
 | ID | Funkcja | Co daje | Podstawa | Pewność |

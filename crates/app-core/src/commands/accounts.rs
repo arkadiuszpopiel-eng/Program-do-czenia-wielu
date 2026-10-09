@@ -13,11 +13,15 @@ use compliance_contract::ProviderApiStatus;
 
 use crate::core::AppCore;
 use crate::dto::{
-    Account, AccountAssignment, AccountCostLimit, AccountState, AddAccountInput, AlfaEvent,
-    AuthKind, CompatKind, ComplianceStatus, ModelInfo, ModelKind, Money, ProviderInfo,
+    Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
+    AlfaEvent, AuthKind, CompatKind, ComplianceStatus, ModelInfo, ModelKind, Money, ProviderInfo,
     ProviderKind, TestReport,
 };
 use crate::error::AppError;
+
+/// Wklejony tekst nie jest kluczem (po zdjęciu cudzysłowów, `NAZWA=` i podobnych dodatków).
+pub(super) const NOT_A_KEY: &str = "To nie wygląda na klucz API: po kluczu zostały spacje albo znaki spoza alfabetu \
+                         łacińskiego. Wklej sam klucz, bez opisu i dodatkowego tekstu.";
 
 const TASKS: [(TaskClass, &str); 7] = [
     (TaskClass::Conversation, "chat"),
@@ -127,6 +131,14 @@ pub fn account_dto(a: &CoreAccount) -> Account {
         },
         cost_limit: limit,
         last_tested_at: a.last_test.as_ref().map(|t| crate::dto::iso(t.at)),
+        last_test: a.last_test.as_ref().map(|t| AccountLastTest {
+            ok: t.outcome.key_works(),
+            reason: t.outcome.code().to_owned(),
+            latency_ms: t.latency_ms,
+            status: t.detail.as_ref().and_then(|d| d.status),
+            provider_code: t.detail.as_ref().and_then(|d| d.code.clone()),
+            detail: t.detail.as_ref().map(|d| d.message.clone()),
+        }),
     }
 }
 
@@ -153,19 +165,19 @@ fn assignments(a: &AccountAssignment) -> Assignments {
     }
 }
 
-fn account_id(id: &str) -> Result<AccountId, AppError> {
+pub(super) fn account_id(id: &str) -> Result<AccountId, AppError> {
     AccountId::new(id).map_err(AppError::from)
 }
 
 impl AppCore {
-    fn account(&self, id: &AccountId) -> Result<CoreAccount, AppError> {
+    pub(super) fn account(&self, id: &AccountId) -> Result<CoreAccount, AppError> {
         self.inner
             .hub
             .account(id)
             .ok_or_else(|| AppError::not_found(format!("Konto „{id}” nie istnieje.")))
     }
 
-    async fn announce_account(&self, id: &AccountId) {
+    pub(super) async fn announce_account(&self, id: &AccountId) {
         if let Some(a) = self.inner.hub.account(id) {
             self.emit(AlfaEvent::AccountChanged {
                 account: account_dto(&a),
@@ -195,9 +207,22 @@ impl AppCore {
             .ok_or_else(|| AppError::not_found(format!("Nieznany dostawca „{provider}”.")))?;
         let secret = SecretString::from_input(input.secret.expose());
         if entry.auth == CoreAuth::ApiKey && !secret.is_plausible_key() {
-            return Err(AppError::invalid(
-                "Klucz API jest pusty albo zawiera spacje lub znaki sterujące.",
-            ));
+            return Err(AppError::invalid(NOT_A_KEY));
+        }
+        let base = input
+            .base_url
+            .as_deref()
+            .map(str::trim)
+            .filter(|u| !u.is_empty());
+        if let Some(existing) = self.inner.hub.find_by_secret(&provider, base, &secret) {
+            let label = self
+                .inner
+                .hub
+                .account(&existing)
+                .map_or_else(|| existing.to_string(), |a| a.label);
+            return Err(AppError::invalid(format!(
+                "Ten klucz jest już dodany jako konto „{label}”. Jeśli chcesz go sprawdzić, użyj „Testuj połączenie” przy tym koncie."
+            )));
         }
         let label = match input.label.trim() {
             "" => entry.display_name.clone(),
@@ -210,7 +235,10 @@ impl AppCore {
                 provider,
                 label,
                 secret,
-                base_url: input.base_url.filter(|u| !u.trim().is_empty()),
+                base_url: input
+                    .base_url
+                    .map(|u| u.trim().to_owned())
+                    .filter(|u| !u.is_empty()),
                 assignments: Assignments {
                     task_classes: [TaskClass::Conversation].into(),
                     ..Assignments::default()
@@ -226,25 +254,11 @@ impl AppCore {
     /// `accounts_test`: połączenie + wykrycie modeli.
     pub async fn accounts_test(&self, account_id: String) -> Result<TestReport, AppError> {
         let id = self::account_id(&account_id)?;
-        let summary = self.inner.hub.test_account(&id).await?;
+        let tested = self.inner.hub.test_account(&id).await;
+        // Także po odmowie huba (np. brak klucza w magazynie) stan konta mógł się zmienić.
         self.announce_account(&id).await;
-        let account = account_dto(&self.account(&id)?);
-        let ok = summary.outcome.key_works();
-        let error = (!ok).then(|| match &summary.outcome {
-            accounts_hub_contract::TestOutcome::InvalidKey => "Klucz odrzucony (401).".to_owned(),
-            accounts_hub_contract::TestOutcome::Timeout => {
-                "Przekroczony czas połączenia.".to_owned()
-            }
-            accounts_hub_contract::TestOutcome::Network { message }
-            | accounts_hub_contract::TestOutcome::Unsupported { message } => message.clone(),
-            other => other.code().to_owned(),
-        });
-        Ok(TestReport {
-            ok,
-            latency_ms: summary.latency_ms,
-            models: account.models,
-            error,
-        })
+        let summary = tested?;
+        Ok(self.report(&id, &summary))
     }
 
     /// `accounts_assign`.

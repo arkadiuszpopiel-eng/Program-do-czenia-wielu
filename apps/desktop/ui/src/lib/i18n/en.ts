@@ -9,6 +9,7 @@ import { enPlugins } from './en-plugins';
 import { enBundles } from './en-bundles';
 import { enModels } from './en-models';
 import { enSettings } from './en-settings';
+import { enHub } from './en-hub';
 import { enTasks } from './en-tasks';
 import { enUpdates } from './en-updates';
 import { enBroker } from './en-broker';
@@ -21,6 +22,7 @@ export const en: Record<MessageKey, Message> = {
   ...enApp,
   ...enAgents,
   ...enSettings,
+  ...enHub,
   ...enMemory,
   ...enTasks,
   ...enWork,

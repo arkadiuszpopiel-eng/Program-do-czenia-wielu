@@ -144,12 +144,19 @@ describe('FakeAlfaClient — scenariusze', () => {
     const { client } = setup({ scenario: 'no-keys' });
     const add = (provider_id: string, secret: string, base_url: string | null) =>
       client.accounts.add({ provider_id, label: 'x', secret, base_url });
-    await expect(add('deepseek', 'sk-test', null)).rejects.toThrow(/nie zna endpointu/);
-    await expect(add('deepseek', 'sk-test', 'http://example.com')).rejects.toThrow(/https:\/\//);
+    await expect(add('kimi', 'sk-test', null)).rejects.toThrow(/nie zna endpointu/);
+    await expect(add('kimi', 'sk-test', 'http://example.com')).rejects.toThrow(/https:\/\//);
     await expect(add('anthropic', '   ', null)).rejects.toThrow(/klucz jest pusty/);
-    await expect(add('deepseek', 'sk-test', 'https://api.deepseek.com')).resolves.toMatchObject({
+    await expect(add('anthropic', 'to nie jest klucz', null)).rejects.toThrow(
+      /nie wygląda na klucz API/,
+    );
+    // Adres z katalogu (DeepSeek) — kreator o niego nie pyta.
+    await expect(add('deepseek', 'sk-test', null)).resolves.toMatchObject({
       provider_id: 'deepseek',
     });
+    await expect(add('kimi', 'sk-test', 'https://api.moonshot.ai/v1')).resolves.toBeTruthy();
+    // Ten sam klucz u tego samego dostawcy drugi raz — odmowa z nazwą konta.
+    await expect(add('deepseek', '"sk-test"', null)).rejects.toThrow(/jest już dodany/);
     await expect(
       add('custom-openai-compatible', 'k', 'http://127.0.0.1:8080/v1'),
     ).resolves.toBeTruthy();

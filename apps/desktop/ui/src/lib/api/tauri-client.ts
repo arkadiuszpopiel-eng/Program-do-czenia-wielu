@@ -108,6 +108,9 @@ export class TauriAlfaClient implements AlfaClient {
     setLimit: (accountId, enabled, monthly) =>
       call('accounts_set_limit', { accountId, enabled, monthly }),
     remove: (accountId) => call('accounts_remove', { accountId }),
+    rotate: (accountId, secret) => call('accounts_rotate', { accountId, secret }),
+    setDisabled: (accountId, disabled) => call('accounts_set_disabled', { accountId, disabled }),
+    setModel: (accountId, model) => call('accounts_set_model', { accountId, model }),
   };
 
   readonly transfer: AlfaClient['transfer'] = {

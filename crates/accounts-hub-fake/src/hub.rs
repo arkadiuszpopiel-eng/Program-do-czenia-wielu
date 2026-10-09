@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use accounts_hub_contract::{
     Account, AccountId, AccountState, AccountsError, AccountsHub, Assignments, AuthKind,
     ConnectionReport, ConnectionRequest, ConnectionTester, CostLimit, EnvImport, EnvImportOutcome,
-    EnvSource, ModelInfo, ModelListError, ModelLister, NewAccount, PriceTable,
+    EnvSource, ModelId, ModelInfo, ModelListError, ModelLister, NewAccount, PriceTable,
     ProviderCatalogEntry, ProviderId, SECRET_READER_PREFIX, SecretName, SecretStore, SecretString,
     TestOutcome, TestSummary, Wizard, WizardError, WizardStep, provider_state, validate_base_url,
 };
@@ -29,7 +29,7 @@ struct State {
 /// Atrapa `AccountsHub`.
 pub struct FakeAccountsHub {
     state: Mutex<State>,
-    secrets: Arc<MemorySecretStore>,
+    pub(crate) secrets: Arc<MemorySecretStore>,
     tester: Arc<ScriptedConnectionTester>,
     lister: Arc<ScriptedModelLister>,
 }
@@ -98,7 +98,7 @@ impl FakeAccountsHub {
         self.state.lock().unwrap_or_else(|p| p.into_inner())
     }
 
-    fn entry(&self, id: &ProviderId) -> Result<ProviderCatalogEntry, AccountsError> {
+    pub(crate) fn entry(&self, id: &ProviderId) -> Result<ProviderCatalogEntry, AccountsError> {
         self.lock()
             .catalog
             .get(id)
@@ -106,7 +106,7 @@ impl FakeAccountsHub {
             .ok_or_else(|| AccountsError::UnknownProvider(id.clone()))
     }
 
-    fn get(&self, id: &AccountId) -> Result<Account, AccountsError> {
+    pub(crate) fn get(&self, id: &AccountId) -> Result<Account, AccountsError> {
         self.lock()
             .accounts
             .get(id)
@@ -114,11 +114,19 @@ impl FakeAccountsHub {
             .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))
     }
 
-    fn put(&self, acc: Account) {
+    pub(crate) fn now(&self) -> chrono::DateTime<chrono::Utc> {
+        self.lock().now
+    }
+
+    pub(crate) fn accounts_snapshot(&self) -> Vec<Account> {
+        self.lock().accounts.values().cloned().collect()
+    }
+
+    pub(crate) fn put(&self, acc: Account) {
         self.lock().accounts.insert(acc.id.clone(), acc);
     }
 
-    async fn test_and_list(
+    pub(crate) async fn test_and_list(
         &self,
         entry: &ProviderCatalogEntry,
         base_url: Option<&str>,
@@ -130,8 +138,9 @@ impl FakeAccountsHub {
             secret,
         };
         let report = redact(self.tester.test(req).await, secret);
-        let models = if report.outcome.key_works() {
-            self.lister.list_models(req).await.ok()
+        let models = if report.outcome.may_list_models() {
+            let found = self.lister.list_models(req).await.ok();
+            found.filter(|found| !found.is_empty())
         } else {
             None
         };
@@ -226,26 +235,19 @@ impl AccountsHub for FakeAccountsHub {
     }
 
     async fn test_account(&self, id: &AccountId) -> Result<TestSummary, AccountsError> {
-        let mut acc = self.get(id)?;
-        let entry = self.entry(&acc.provider)?;
-        let secret = self.secrets.get(&acc.secret)?;
-        let base = acc.base_url.clone().or_else(|| entry.base_url.clone());
-        let (report, models) = self
-            .test_and_list(&entry, base.as_deref(), secret.as_ref())
-            .await;
-        let summary = TestSummary {
-            at: self.lock().now,
-            outcome: report.outcome.clone(),
-            latency_ms: report.latency_ms,
-            models_found: models.as_ref().map(Vec::len),
-        };
-        if let Some(models) = models {
-            acc.models = models;
-        }
-        acc.state = report.outcome.next_state(&acc.state);
-        acc.last_test = Some(summary.clone());
-        self.put(acc);
-        Ok(summary)
+        self.test_account_now(id).await
+    }
+
+    async fn try_rotate(
+        &self,
+        id: &AccountId,
+        secret: SecretString,
+    ) -> Result<TestSummary, AccountsError> {
+        self.try_rotate_now(id, secret).await
+    }
+
+    async fn set_manual_model(&self, id: &AccountId, model: ModelId) -> Result<(), AccountsError> {
+        self.set_manual_model_now(id, model)
     }
 
     async fn rotate(&self, id: &AccountId, secret: SecretString) -> Result<(), AccountsError> {
@@ -273,14 +275,7 @@ impl AccountsHub for FakeAccountsHub {
     }
 
     async fn set_disabled(&self, id: &AccountId, disabled: bool) -> Result<(), AccountsError> {
-        let mut acc = self.get(id)?;
-        acc.state = match (disabled, self.secrets.get(&acc.secret)?.is_some()) {
-            (true, _) => AccountState::Disabled,
-            (false, true) => AccountState::Active,
-            (false, false) => AccountState::Unconfigured,
-        };
-        self.put(acc);
-        Ok(())
+        self.set_disabled_now(id, disabled)
     }
 
     async fn update_settings(
@@ -318,6 +313,15 @@ impl AccountsHub for FakeAccountsHub {
             }
         }
         Ok(out)
+    }
+
+    fn find_by_secret(
+        &self,
+        provider: &ProviderId,
+        base_url: Option<&str>,
+        secret: &SecretString,
+    ) -> Option<AccountId> {
+        self.find_same_key(provider, base_url, secret)
     }
 
     fn resolve_secret(&self, id: &AccountId, caller: &str) -> Result<SecretString, AccountsError> {
@@ -383,6 +387,7 @@ impl AccountsHub for FakeAccountsHub {
             outcome: outcome.test.outcome.clone(),
             latency_ms: outcome.test.latency_ms,
             models_found: Some(outcome.models.len()),
+            detail: outcome.test.detail.clone(),
         });
         acc.models = outcome.models;
         acc.state = outcome.test.outcome.next_state(&acc.state);

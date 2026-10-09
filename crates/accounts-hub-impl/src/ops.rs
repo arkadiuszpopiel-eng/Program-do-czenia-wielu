@@ -2,10 +2,10 @@
 
 use accounts_hub_contract::{
     Account, AccountId, AccountSource, AccountState, AccountsError, AccountsHub, Assignments,
-    AuthKind, CostLimit, EVENT_KEY_ADDED, EVENT_KEY_REMOVED, EVENT_KEY_ROTATED, EVENT_KEY_TESTED,
-    EnvImport, EnvImportOutcome, EnvSource, NewAccount, PriceTable, ProviderCatalogEntry,
-    ProviderId, SECRET_READER_PREFIX, SecretName, SecretString, TestSummary, Wizard, WizardError,
-    WizardStep, provider_state, validate_base_url,
+    AuthKind, CostLimit, EVENT_KEY_ADDED, EVENT_KEY_REMOVED, EVENT_KEY_ROTATED, EnvImport,
+    EnvImportOutcome, EnvSource, ModelId, NewAccount, PriceTable, ProviderCatalogEntry, ProviderId,
+    SECRET_READER_PREFIX, SecretName, SecretString, TestSummary, Wizard, WizardError, WizardStep,
+    provider_state, validate_base_url,
 };
 use async_trait::async_trait;
 use core_bus_contract::Level;
@@ -37,7 +37,7 @@ fn check_new(entry: &ProviderCatalogEntry, new: &NewAccount) -> Result<(), Accou
 }
 
 impl AccountsHubService {
-    fn account_or_err(&self, id: &AccountId) -> Result<Account, AccountsError> {
+    pub(crate) fn account_or_err(&self, id: &AccountId) -> Result<Account, AccountsError> {
         self.accounts_read()
             .get(id)
             .cloned()
@@ -55,7 +55,7 @@ impl AccountsHubService {
         Ok(())
     }
 
-    fn secret_of(&self, acc: &Account) -> Result<Option<SecretString>, AccountsError> {
+    pub(crate) fn secret_of(&self, acc: &Account) -> Result<Option<SecretString>, AccountsError> {
         Ok(self.secrets.get(&acc.secret)?)
     }
 }
@@ -143,43 +143,19 @@ impl AccountsHub for AccountsHubService {
     }
 
     async fn test_account(&self, id: &AccountId) -> Result<TestSummary, AccountsError> {
-        let mut acc = self.account_or_err(id)?;
-        let entry = self.provider_entry(&acc.provider)?;
-        let from = acc.state.clone();
-        let secret = self.secret_of(&acc)?;
-        if entry.auth == AuthKind::ApiKey && secret.is_none() {
-            acc.state = AccountState::Unconfigured;
-            self.commit(acc, &from).await?;
-            return Err(AccountsError::SecretMissing(id.clone()));
-        }
-        let base_url = acc.base_url.clone().or_else(|| entry.base_url.clone());
-        let report = self
-            .run_test(&entry, base_url.as_deref(), secret.as_ref())
-            .await;
-        let mut models_found = None;
-        if report.outcome.key_works()
-            && let Ok(models) = self
-                .run_listing(&entry, base_url.as_deref(), secret.as_ref())
-                .await
-        {
-            models_found = Some(models.len());
-            acc.models = models;
-        }
-        let summary = TestSummary {
-            at: self.now(),
-            outcome: report.outcome.clone(),
-            latency_ms: report.latency_ms,
-            models_found,
-        };
-        acc.state = report.outcome.next_state(&acc.state);
-        acc.last_test = Some(summary.clone());
-        let payload = serde_json::json!({
-            "account": acc.id, "provider": acc.provider, "outcome": summary.outcome.code(),
-            "latency_ms": summary.latency_ms, "models": models_found,
-        });
-        self.commit(acc, &from).await?;
-        self.publish(EVENT_KEY_TESTED, Level::Info, payload).await;
-        Ok(summary)
+        self.test_account_now(id).await
+    }
+
+    async fn try_rotate(
+        &self,
+        id: &AccountId,
+        secret: SecretString,
+    ) -> Result<TestSummary, AccountsError> {
+        self.try_rotate_now(id, secret).await
+    }
+
+    async fn set_manual_model(&self, id: &AccountId, model: ModelId) -> Result<(), AccountsError> {
+        self.set_manual_model_now(id, model).await
     }
 
     async fn rotate(&self, id: &AccountId, secret: SecretString) -> Result<(), AccountsError> {
@@ -216,18 +192,7 @@ impl AccountsHub for AccountsHubService {
     }
 
     async fn set_disabled(&self, id: &AccountId, disabled: bool) -> Result<(), AccountsError> {
-        let mut acc = self.account_or_err(id)?;
-        let from = acc.state.clone();
-        acc.state = if disabled {
-            AccountState::Disabled
-        } else if self.secret_of(&acc)?.is_some()
-            || self.provider_entry(&acc.provider)?.auth == AuthKind::None
-        {
-            AccountState::Active
-        } else {
-            AccountState::Unconfigured
-        };
-        self.commit(acc, &from).await
+        self.set_disabled_now(id, disabled).await
     }
 
     async fn update_settings(
@@ -266,6 +231,15 @@ impl AccountsHub for AccountsHubService {
             }
         }
         Ok(report)
+    }
+
+    fn find_by_secret(
+        &self,
+        provider: &ProviderId,
+        base_url: Option<&str>,
+        secret: &SecretString,
+    ) -> Option<AccountId> {
+        self.find_same_key(provider, base_url, secret)
     }
 
     fn resolve_secret(&self, id: &AccountId, caller: &str) -> Result<SecretString, AccountsError> {
@@ -335,6 +309,7 @@ impl AccountsHub for AccountsHubService {
             outcome: outcome.test.outcome.clone(),
             latency_ms: outcome.test.latency_ms,
             models_found: Some(acc.models.len()),
+            detail: outcome.test.detail.clone(),
         });
         acc.state = outcome.test.outcome.next_state(&acc.state);
         self.commit(acc, &from).await?;

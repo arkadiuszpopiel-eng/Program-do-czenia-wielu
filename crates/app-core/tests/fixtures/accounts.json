@@ -37,7 +37,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "gray",
         "terms_url": "https://geminicli.com/docs/resources/tos-privacy/",
-        "needs_base_url": true
+        "needs_base_url": false
       },
       {
         "id": "xai",
@@ -61,7 +61,7 @@
         "jurisdiction": "CN",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": true
+        "needs_base_url": false
       },
       {
         "id": "kimi",
@@ -121,7 +121,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": true
+        "needs_base_url": false
       },
       {
         "id": "mistral",
@@ -133,7 +133,7 @@
         "jurisdiction": "unknown",
         "compliance_status": "unverified",
         "terms_url": null,
-        "needs_base_url": true
+        "needs_base_url": false
       },
       {
         "id": "elevenlabs",
@@ -276,7 +276,7 @@
       "id": "acc-muo1g480-15",
       "provider_id": "openai",
       "label": "OpenAI — praca",
-      "state": "unconfigured",
+      "state": "ok",
       "key_stored": true,
       "models": [],
       "assignments": {
@@ -288,9 +288,9 @@
         "voice_tts": false
       },
       "cost_limit": {
-        "enabled": true,
+        "enabled": false,
         "monthly": {
-          "minor": 10000,
+          "minor": 0,
           "currency": "PLN"
         }
       },
@@ -356,6 +356,286 @@
       }
     },
     "result": null
+  },
+  {
+    "command": "accounts_rotate",
+    "args": {
+      "accountId": "acc-muo1g480-15",
+      "secret": "test-restricted-XXXXXXXXXXXXXXXX"
+    },
+    "result": {
+      "ok": true,
+      "latency_ms": 312,
+      "models": [
+        {
+          "id": "gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "kinds": [
+            "chat",
+            "vision"
+          ],
+          "context_tokens": 400000
+        },
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000
+        }
+      ],
+      "error": null,
+      "reason": "restricted",
+      "status": 401,
+      "detail": "You have insufficient permissions for this operation. Missing scopes: api.model.read."
+    }
+  },
+  {
+    "command": "accounts_set_model",
+    "args": {
+      "accountId": "acc-muo1g480-15",
+      "model": "gpt-4o-mini"
+    },
+    "result": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "ok",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "gpt-4o-mini",
+          "name": "gpt-4o-mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": null
+        }
+      ],
+      "assignments": {
+        "task_classes": [
+          "chat",
+          "code"
+        ],
+        "agents": [
+          "beta"
+        ],
+        "voice_stt": true,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 5000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "restricted",
+        "latency_ms": 312,
+        "status": 401,
+        "detail": "You have insufficient permissions for this operation. Missing scopes: api.model.read."
+      }
+    }
+  },
+  {
+    "command": "accounts_list",
+    "args": {},
+    "result": [
+      {
+        "id": "acc-anthropic",
+        "provider_id": "anthropic",
+        "label": "Anthropic — prywatne",
+        "state": "ok",
+        "key_stored": true,
+        "models": [
+          {
+            "id": "claude-opus-5-5",
+            "name": "Claude Opus 5.5",
+            "kinds": [
+              "chat",
+              "vision"
+            ],
+            "context_tokens": 1000000
+          },
+          {
+            "id": "claude-haiku-5",
+            "name": "Claude Haiku 5",
+            "kinds": [
+              "chat"
+            ],
+            "context_tokens": 200000
+          }
+        ],
+        "assignments": {
+          "task_classes": [
+            "chat",
+            "code"
+          ],
+          "agents": [
+            "alfa",
+            "gama",
+            "delta"
+          ],
+          "voice_stt": false,
+          "voice_tts": false
+        },
+        "cost_limit": {
+          "enabled": true,
+          "monthly": {
+            "minor": 20000,
+            "currency": "PLN"
+          }
+        },
+        "last_tested_at": "2026-09-30T05:45:00.000Z"
+      },
+      {
+        "id": "acc-muo1g480-15",
+        "provider_id": "openai",
+        "label": "OpenAI — praca",
+        "state": "ok",
+        "key_stored": true,
+        "models": [
+          {
+            "id": "gpt-4o-mini",
+            "name": "gpt-4o-mini",
+            "kinds": [
+              "chat"
+            ],
+            "context_tokens": null
+          }
+        ],
+        "assignments": {
+          "task_classes": [
+            "chat",
+            "code"
+          ],
+          "agents": [
+            "beta"
+          ],
+          "voice_stt": true,
+          "voice_tts": false
+        },
+        "cost_limit": {
+          "enabled": true,
+          "monthly": {
+            "minor": 5000,
+            "currency": "PLN"
+          }
+        },
+        "last_tested_at": "2026-09-30T11:45:00.000Z",
+        "last_test": {
+          "ok": true,
+          "reason": "restricted",
+          "latency_ms": 312,
+          "status": 401,
+          "detail": "You have insufficient permissions for this operation. Missing scopes: api.model.read."
+        }
+      }
+    ]
+  },
+  {
+    "command": "accounts_set_disabled",
+    "args": {
+      "accountId": "acc-muo1g480-15",
+      "disabled": true
+    },
+    "result": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "disabled",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "gpt-4o-mini",
+          "name": "gpt-4o-mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": null
+        }
+      ],
+      "assignments": {
+        "task_classes": [
+          "chat",
+          "code"
+        ],
+        "agents": [
+          "beta"
+        ],
+        "voice_stt": true,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 5000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "restricted",
+        "latency_ms": 312,
+        "status": 401,
+        "detail": "You have insufficient permissions for this operation. Missing scopes: api.model.read."
+      }
+    }
+  },
+  {
+    "command": "accounts_set_disabled",
+    "args": {
+      "accountId": "acc-muo1g480-15",
+      "disabled": false
+    },
+    "result": {
+      "id": "acc-muo1g480-15",
+      "provider_id": "openai",
+      "label": "OpenAI — praca",
+      "state": "ok",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "gpt-4o-mini",
+          "name": "gpt-4o-mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": null
+        }
+      ],
+      "assignments": {
+        "task_classes": [
+          "chat",
+          "code"
+        ],
+        "agents": [
+          "beta"
+        ],
+        "voice_stt": true,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 5000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "restricted",
+        "latency_ms": 312,
+        "status": 401,
+        "detail": "You have insufficient permissions for this operation. Missing scopes: api.model.read."
+      }
+    }
   },
   {
     "command": "accounts_remove",

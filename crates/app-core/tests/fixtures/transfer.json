@@ -162,26 +162,26 @@
     "command": "transfer_inspect",
     "args": {
       "password": null,
-      "handle": "fh-muoilpwi-3"
+      "handle": "fh-muoilses-3"
     },
     "result": {
       "status": "needs_password",
-      "handle": "fh-muoilpwi-4"
+      "handle": "fh-muoilses-4"
     }
   },
   {
     "command": "transfer_inspect",
     "args": {
       "password": "długie hasło kopii",
-      "handle": "fh-muoilpwi-4"
+      "handle": "fh-muoilses-4"
     },
     "result": {
       "status": "inspected",
-      "handle": "fh-muoilpwi-5",
+      "handle": "fh-muoilses-5",
       "manifest": {
         "schema_version": "1.0.0",
         "app_version": "0.1.0-f1",
-        "created_at": "2026-09-29T19:45:14.850Z",
+        "created_at": "2026-09-29T19:45:18.100Z",
         "source_machine": "LAPTOP-ALFA (laptop-cuda)",
         "encrypted": true
       },

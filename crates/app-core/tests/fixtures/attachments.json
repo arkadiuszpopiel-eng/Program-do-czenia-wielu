@@ -14,7 +14,7 @@
     "result": {
       "added": [
         {
-          "id": "att-muoggk4i-37",
+          "id": "att-muoggmms-37",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -28,7 +28,7 @@
       "rejected": [],
       "staged": [
         {
-          "id": "att-muoggk4i-37",
+          "id": "att-muoggmms-37",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -49,12 +49,12 @@
     "result": {
       "added": [
         {
-          "id": "att-muoggk4i-38",
+          "id": "att-muoggmms-38",
           "session_id": "s-trip",
-          "name": "wklejony-obraz-20260930-184514.png",
+          "name": "wklejony-obraz-20260930-184518.png",
           "bytes": 182000,
           "mime": "image/png",
-          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184514.png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
           "kind": "image",
           "delivery": "full",
           "tokens": 1640
@@ -63,7 +63,7 @@
       "rejected": [],
       "staged": [
         {
-          "id": "att-muoggk4i-37",
+          "id": "att-muoggmms-37",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -74,12 +74,12 @@
           "tokens": 40
         },
         {
-          "id": "att-muoggk4i-38",
+          "id": "att-muoggmms-38",
           "session_id": "s-trip",
-          "name": "wklejony-obraz-20260930-184514.png",
+          "name": "wklejony-obraz-20260930-184518.png",
           "bytes": 182000,
           "mime": "image/png",
-          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184514.png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
           "kind": "image",
           "delivery": "full",
           "tokens": 1640
@@ -95,7 +95,7 @@
     "result": {
       "added": [
         {
-          "id": "att-muoggk4i-39",
+          "id": "att-muoggmms-39",
           "session_id": "s-trip",
           "name": "notatki.md",
           "bytes": 400000,
@@ -114,7 +114,7 @@
       ],
       "staged": [
         {
-          "id": "att-muoggk4i-37",
+          "id": "att-muoggmms-37",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -125,18 +125,18 @@
           "tokens": 40
         },
         {
-          "id": "att-muoggk4i-38",
+          "id": "att-muoggmms-38",
           "session_id": "s-trip",
-          "name": "wklejony-obraz-20260930-184514.png",
+          "name": "wklejony-obraz-20260930-184518.png",
           "bytes": 182000,
           "mime": "image/png",
-          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184514.png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
           "kind": "image",
           "delivery": "full",
           "tokens": 1640
         },
         {
-          "id": "att-muoggk4i-39",
+          "id": "att-muoggmms-39",
           "session_id": "s-trip",
           "name": "notatki.md",
           "bytes": 400000,
@@ -153,22 +153,22 @@
     "command": "attachments_remove",
     "args": {
       "sessionId": "s-trip",
-      "attachmentId": "att-muoggk4i-37"
+      "attachmentId": "att-muoggmms-37"
     },
     "result": [
       {
-        "id": "att-muoggk4i-38",
+        "id": "att-muoggmms-38",
         "session_id": "s-trip",
-        "name": "wklejony-obraz-20260930-184514.png",
+        "name": "wklejony-obraz-20260930-184518.png",
         "bytes": 182000,
         "mime": "image/png",
-        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184514.png",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
         "kind": "image",
         "delivery": "full",
         "tokens": 1640
       },
       {
-        "id": "att-muoggk4i-39",
+        "id": "att-muoggmms-39",
         "session_id": "s-trip",
         "name": "notatki.md",
         "bytes": 400000,
@@ -187,18 +187,18 @@
     },
     "result": [
       {
-        "id": "att-muoggk4i-38",
+        "id": "att-muoggmms-38",
         "session_id": "s-trip",
-        "name": "wklejony-obraz-20260930-184514.png",
+        "name": "wklejony-obraz-20260930-184518.png",
         "bytes": 182000,
         "mime": "image/png",
-        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184514.png",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
         "kind": "image",
         "delivery": "full",
         "tokens": 1640
       },
       {
-        "id": "att-muoggk4i-39",
+        "id": "att-muoggmms-39",
         "session_id": "s-trip",
         "name": "notatki.md",
         "bytes": 400000,

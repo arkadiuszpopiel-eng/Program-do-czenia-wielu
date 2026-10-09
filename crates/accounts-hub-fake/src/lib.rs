@@ -5,6 +5,7 @@
 
 mod hub;
 mod import;
+mod keys;
 mod ports;
 
 pub use hub::FakeAccountsHub;

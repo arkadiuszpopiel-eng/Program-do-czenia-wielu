@@ -9,7 +9,7 @@ o crate'ach: [`../CATALOG.md`](../CATALOG.md). Obecna architektura: [`../ARCHITE
                  ┌──────────────────────────── KOMPUTER (host) ─────────────────────────────┐
   okno Tauri ───▶│  transport: IPC ─┐                                                       │
                  │                  ├─▶ BRAMA KLIENTÓW ─▶ AppCore ─▶ moduły ─▶ BROKER ─▶ system
-  telefon  ──┐   │  transport:      │   (kto, co wolno,   (210 poleceń,        (zgody,      │
+  telefon  ──┐   │  transport:      │   (kto, co wolno,   (214 poleceń,        (zgody,      │
   przeglądarka├─▶ PRZEKAŹNIK ─▶ kanał E2E ─┘ numery zdarzeń) zdarzenia)        dziennik)    │
              │   │  (szyfrogram)                                │                            │
              │   │                                              └─▶ modele lokalne, głos     │
@@ -82,7 +82,7 @@ Uwaga: otwarte ustalenia analizatora powłoki (S-01…S-04, S-06) trzeba rozstrz
 
 ## Szew 3 — protokół niezależny od transportu
 
-**Dziś.** 210 poleceń w jednej liście (`app-api/src/commands.rs`, makro `with_commands!`), ok. 38 zdarzeń
+**Dziś.** 214 poleceń w jednej liście (`app-api/src/commands.rs`, makro `with_commands!`), ok. 38 zdarzeń
 (`AlfaEvent` w `app-api/src/dto/events.rs`), DTO w `app-api/src/dto/`. Interfejs zna tylko `AlfaClient`
 (`apps/desktop/ui/src/lib/api/client.ts`) — ma dwie implementacje: `TauriAlfaClient` i `FakeAlfaClient`.
 To bardzo dobry punkt wyjścia. Brakuje pięciu rzeczy:

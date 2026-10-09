@@ -54,11 +54,17 @@ fn every_catalog_entry_parses() {
 #[test]
 fn builder_rules() {
     // Katalog bez adresu (wpis-szkic) → konto musi podać adres.
-    let deepseek = entry("deepseek");
     assert!(matches!(
-        build_provider(&deepseek, account(None, "deepseek-chat")),
+        build_provider(&entry("kimi"), account(None, "kimi-latest")),
         Err(ConfigError::MissingBaseUrl(_))
     ));
+    // Adres z katalogu wystarcza (DeepSeek, Mistral, OpenRouter, Google).
+    for id in ["deepseek", "mistral", "openrouter", "google"] {
+        assert!(
+            build_provider(&entry(id), account(None, "m")).is_ok(),
+            "{id}"
+        );
+    }
     // Usługi głosowe nie są czatem.
     assert!(matches!(
         build_provider(&entry("elevenlabs"), account(None, "x")),
