@@ -1213,6 +1213,45 @@
     }
    },
    {
+    "key": "ui.style",
+    "label": {
+     "pl": "Styl",
+     "en": "Style"
+    },
+    "description": {
+     "pl": "Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”.",
+     "en": "The look of the whole interface. Every style has a light and a dark version — picked by “Theme”."
+    },
+    "default": "classic",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "classic",
+       "label": {
+        "pl": "Klasyczny",
+        "en": "Classic"
+       }
+      },
+      {
+       "value": "glass",
+       "label": {
+        "pl": "Szkło",
+        "en": "Glass"
+       }
+      },
+      {
+       "value": "next",
+       "label": {
+        "pl": "Next",
+        "en": "Next"
+       }
+      }
+     ]
+    }
+   },
+   {
     "key": "ui.accent",
     "label": {
      "pl": "Akcent",

@@ -2,10 +2,12 @@
 // szerokości okna. Zoom przez CSS `zoom` na <html> — szerokość efektywna dla responsywności to
 // innerWidth / skala.
 import { clampZoom } from './logic/layout';
-import { applyTheme } from './window-boot';
+import { applySkin, applyTheme } from './window-boot';
 
 export interface Appearance {
   readonly theme: string;
+  /** Styl interfejsu (`ui.style`): `classic`, `glass`, `next`. */
+  readonly style?: string;
   readonly density: string;
   readonly animations: boolean;
   readonly zoom: number;
@@ -51,6 +53,7 @@ export function effectiveScale(zoom: number, fit: boolean, width: number): numbe
 
 export function applyAppearance(root: HTMLElement, a: Appearance): void {
   applyTheme(root, a.theme);
+  applySkin(root, a.style);
   root.dataset['density'] = a.density === 'compact' ? 'compact' : 'comfortable';
   if (a.animations) delete root.dataset['motion'];
   else root.dataset['motion'] = 'off';

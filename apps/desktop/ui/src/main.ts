@@ -1,6 +1,7 @@
 import { mount } from 'svelte';
 import { installDefaultPolicy } from '@alfa/ui-kit';
 import '@alfa/ui-kit/tokens.css';
+import '@alfa/ui-kit/skins.css';
 import '@alfa/ui-kit/base.css';
 import './app.css';
 import App from './App.svelte';

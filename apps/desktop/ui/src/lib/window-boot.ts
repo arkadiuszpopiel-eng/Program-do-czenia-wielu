@@ -8,11 +8,21 @@ export function applyTheme(root: HTMLElement, theme: unknown): void {
   else root.removeAttribute('data-theme');
 }
 
-/** Ustawia `lang` dokumentu i motyw z ustawień startowych. */
+/** Style interfejsu poza klasycznym (`ui.style`); kolory w `@alfa/ui-kit/skins.css`. */
+export const SKINS = ['glass', 'next'] as const;
+
+/** `ui.style`: `glass` / `next` ustawia `data-skin`, wszystko inne — styl klasyczny (bez atrybutu). */
+export function applySkin(root: HTMLElement, style: unknown): void {
+  if (SKINS.some((skin) => skin === style)) root.setAttribute('data-skin', style as string);
+  else root.removeAttribute('data-skin');
+}
+
+/** Ustawia `lang` dokumentu oraz motyw i styl z ustawień startowych. */
 export function applyBootDocument(
   root: HTMLElement,
   boot: { readonly locale: string; readonly settings: Readonly<Record<string, unknown>> },
 ): void {
   root.lang = boot.locale;
   applyTheme(root, boot.settings['ui.theme']);
+  applySkin(root, boot.settings['ui.style']);
 }

@@ -1,0 +1,131 @@
+/*
+ * Style interfejsu Alfy (`ui.style` → atrybut `data-skin` na <html>): „Szkło" i „Next". Styl klasyczny
+ * to same tokeny z tokens.css (bez atrybutu). Każdy styl ma wariant jasny i ciemny — wybiera go
+ * ustawienie „Motyw" (`data-theme` / motyw systemu), a kolory są zapisane raz funkcją `light-dark()`,
+ * która czyta `color-scheme` ustawiony w tokens.css.
+ *
+ * Reguły twarde projektu (AGENTS.md): bez fontów webowych i bez `backdrop-filter` — „Szkło" uzyskuje
+ * efekt półprzezroczystymi powierzchniami na barwnym tle i połyskiem krawędzi, nie rozmyciem.
+ * Plik pisany ręcznie (nie generuje go build-tokens.mjs). Wymaga tokens.css; ładuj po nim.
+ */
+
+@media (forced-colors: none) {
+  /* ── Next: granat „ink" i cyjan z prototypu Hub AI ─────────────────────────────────────────── */
+  :root[data-skin='next'] {
+    --alfa-radius-control: 8px;
+    --alfa-radius-card: 13px;
+    --alfa-radius-overlay: 14px;
+    --alfa-color-bg: light-dark(#f2f5f9, #090d13);
+    --alfa-color-surface: light-dark(#ffffff, #171d25);
+    --alfa-color-surface2: light-dark(#e9eef4, #1c232d);
+    --alfa-color-surface3: light-dark(#dbe3ec, #26303c);
+    --alfa-color-border: light-dark(#d3dbe6, #29313c);
+    --alfa-color-border-strong: light-dark(#a6b3c4, #3f4a5a);
+    --alfa-color-text: light-dark(#0f1620, #eef2f7);
+    --alfa-color-text-muted: light-dark(#465163, #a3aab6);
+    --alfa-color-text-subtle: light-dark(#566274, #8b94a3);
+    --alfa-color-text-on-accent: light-dark(#ffffff, #031015);
+    --alfa-color-focus: light-dark(#0a7791, oklch(83% 0.105 196));
+    --alfa-color-scrim: light-dark(rgba(15, 22, 32, 0.36), rgba(3, 7, 11, 0.75));
+    --alfa-color-success: light-dark(#0e7a44, oklch(80% 0.15 158));
+    --alfa-color-warning: light-dark(#875600, oklch(85% 0.14 85));
+    --alfa-color-error: light-dark(#bd2424, oklch(72% 0.19 22));
+    --alfa-color-info: light-dark(#0a6c84, oklch(80% 0.125 198));
+    --alfa-color-risk-low: var(--alfa-color-success);
+    --alfa-color-risk-medium: var(--alfa-color-warning);
+    --alfa-color-risk-high: var(--alfa-color-error);
+    --alfa-shadow-1: 0 1px 2px light-dark(rgba(15, 22, 32, 0.06), rgba(0, 0, 0, 0));
+    --alfa-shadow-2: 0 4px 14px light-dark(rgba(15, 22, 32, 0.09), rgba(0, 0, 0, 0.28));
+    --alfa-shadow-3: 0 30px 90px light-dark(rgba(15, 22, 32, 0.2), rgba(0, 0, 0, 0.65));
+    /* Akcent stylu: przyciski główne, wybrane pozycje. */
+    --alfa-color-accent: light-dark(#0a7791, oklch(75% 0.13 200));
+    --alfa-accent-fill: linear-gradient(
+      135deg,
+      light-dark(#0b819c, oklch(83% 0.105 196)),
+      light-dark(#075d73, oklch(66% 0.125 205))
+    );
+    --alfa-accent-glow: 0 7px 22px light-dark(rgba(10, 119, 145, 0.22), oklch(75% 0.13 200 / 0.2));
+    /* Siatka 32 px z tła obszaru roboczego prototypu. */
+    --alfa-skin-grid: light-dark(rgba(15, 22, 32, 0.045), rgba(255, 255, 255, 0.045));
+  }
+  :root[data-skin='next'] [data-surface='app'] {
+    background-color: var(--alfa-color-bg);
+    background-image:
+      linear-gradient(to right, var(--alfa-skin-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--alfa-skin-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  /* Obszar zagnieżdżony w innym nie rysuje siatki drugi raz (przesunięte linie). */
+  :root[data-skin='next'] [data-surface='app'] [data-surface='app'] {
+    background: transparent;
+  }
+
+  /* ── Szkło: półprzezroczyste tafle na barwnej poświacie ────────────────────────────────────── */
+  :root[data-skin='glass'] {
+    --alfa-radius-control: 10px;
+    --alfa-radius-card: 16px;
+    --alfa-radius-overlay: 20px;
+    /* Kolor bazowy pod poświatą; używany też tam, gdzie tło musi być kryjące. */
+    --alfa-color-bg: light-dark(#e9edfb, #0c1124);
+    --alfa-color-surface: light-dark(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.07));
+    --alfa-color-surface2: light-dark(rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12));
+    --alfa-color-surface3: light-dark(rgba(40, 52, 120, 0.12), rgba(255, 255, 255, 0.18));
+    --alfa-color-border: light-dark(rgba(40, 52, 120, 0.16), rgba(255, 255, 255, 0.14));
+    --alfa-color-border-strong: light-dark(rgba(40, 52, 120, 0.36), rgba(255, 255, 255, 0.3));
+    --alfa-color-text: light-dark(#141a33, #f4f6ff);
+    --alfa-color-text-muted: light-dark(#434b6c, #c6cbe2);
+    --alfa-color-text-subtle: light-dark(#525b7c, #a9afc9);
+    --alfa-color-text-on-accent: light-dark(#ffffff, #0c1124);
+    --alfa-color-focus: light-dark(#3550e6, #a9bfff);
+    --alfa-color-scrim: light-dark(rgba(20, 26, 51, 0.3), rgba(4, 6, 16, 0.6));
+    /* Krawędź tafli: jasny połysk u góry zamiast płaskiej linii. */
+    --alfa-skin-sheen: light-dark(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.12));
+    --alfa-shadow-1: inset 0 1px 0 var(--alfa-skin-sheen);
+    --alfa-shadow-2:
+      0 8px 30px light-dark(rgba(31, 41, 99, 0.12), rgba(0, 0, 0, 0.35)),
+      inset 0 1px 0 var(--alfa-skin-sheen);
+    --alfa-shadow-3:
+      0 24px 60px light-dark(rgba(31, 41, 99, 0.22), rgba(0, 0, 0, 0.55)),
+      inset 0 1px 0 var(--alfa-skin-sheen);
+    --alfa-color-accent: light-dark(#4458e6, #c9d5ff);
+    --alfa-accent-fill: linear-gradient(
+      135deg,
+      light-dark(#4458e6, rgba(255, 255, 255, 0.94)),
+      light-dark(#6a3fe0, rgba(206, 218, 255, 0.86))
+    );
+    --alfa-accent-glow:
+      0 8px 24px light-dark(rgba(68, 88, 230, 0.28), rgba(140, 160, 255, 0.22)),
+      inset 0 1px 0 light-dark(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.9));
+    /* Tło kryjące dla warstw nad treścią (menu, okna dialogowe, szuflady, powiadomienia): bez
+       rozmycia półprzezroczysta warstwa nad tekstem byłaby nieczytelna. */
+    --alfa-skin-solid: light-dark(#f7f8ff, #171c36);
+    --alfa-skin-aurora-1: light-dark(rgba(129, 140, 248, 0.42), rgba(99, 102, 241, 0.4));
+    --alfa-skin-aurora-2: light-dark(rgba(56, 189, 248, 0.36), rgba(34, 197, 232, 0.3));
+    --alfa-skin-aurora-3: light-dark(rgba(244, 114, 182, 0.28), rgba(236, 72, 153, 0.24));
+  }
+  /* Poświata tylko w oknie głównym: Szybkie pytanie i pigułka są oknami przezroczystymi, więc tło
+     strony zamalowałoby pulpit, a półprzezroczysta tafla bez rozmycia byłaby nad nim nieczytelna. */
+  :root[data-skin='glass']:not(:has([data-surface='app'])) {
+    --alfa-color-surface: var(--alfa-skin-solid);
+    --alfa-color-surface2: light-dark(#e9ecfa, #20264a);
+    --alfa-color-surface3: light-dark(#d9def5, #2b3260);
+  }
+  :root[data-skin='glass'] body:has([data-surface='app']) {
+    background:
+      radial-gradient(70vw 60vh at 8% -12%, var(--alfa-skin-aurora-1), transparent 62%),
+      radial-gradient(60vw 55vh at 100% 4%, var(--alfa-skin-aurora-2), transparent 58%),
+      radial-gradient(60vw 70vh at 62% 112%, var(--alfa-skin-aurora-3), transparent 62%),
+      var(--alfa-color-bg);
+    background-attachment: fixed;
+  }
+  /* Duże obszary układu są przezroczyste — poświata przechodzi pod całym oknem. */
+  :root[data-skin='glass'] [data-surface='app'] {
+    background: transparent;
+  }
+  :root[data-skin='glass']
+    :is(dialog, [role='dialog'], [role='alertdialog'], [role='menu'], [role='listbox']),
+  :root[data-skin='glass'] .toasts > * {
+    background-color: var(--alfa-skin-solid);
+    box-shadow: var(--alfa-shadow-3);
+  }
+}

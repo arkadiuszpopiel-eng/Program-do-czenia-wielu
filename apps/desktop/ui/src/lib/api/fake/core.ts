@@ -77,6 +77,8 @@ export interface FakeOptions {
   readonly tokensPerSecond?: number;
   /** Sztuczne opóźnienie odpowiedzi komend (np. do pokazania szkieletów > 300 ms). */
   readonly latencyMs?: number;
+  /** Wartości ustawień nadpisujące domyślne (podgląd stylu: `?style=glass&theme=dark`). */
+  readonly settings?: Readonly<Record<string, SettingValue>>;
 }
 
 export const STANDARD_CAST: Readonly<Record<AgentId, readonly string[]>> = {
@@ -141,7 +143,7 @@ export class FakeCore {
     this.artifacts = empty ? [] : seedArtifacts(now);
     const noKeys = this.scenario === 'no-keys' || this.scenario === 'first-run';
     this.accounts = noKeys ? [] : seedAccounts(now);
-    this.settings = defaultValues();
+    this.settings = { ...defaultValues(), ...options.settings };
     this.activeSession = empty ? null : 's-q3';
     this.onboardingDone = this.scenario !== 'first-run';
     this.status = {

@@ -20,5 +20,12 @@ export async function createClient(): Promise<AlfaClient> {
   const { FakeAlfaClient, FAKE_SCENARIOS } = await import('./fake/fake-client');
   const wanted = scenarioFromUrl();
   const scenario = FAKE_SCENARIOS.find((s) => s === wanted) ?? 'default';
-  return new FakeAlfaClient({ scenario });
+  // Podgląd wyglądu bez klikania w ustawieniach: `?style=glass|next&theme=light|dark`.
+  const params = new URLSearchParams(location.search);
+  const settings: Record<string, string> = {};
+  const style = params.get('style');
+  const theme = params.get('theme');
+  if (style) settings['ui.style'] = style;
+  if (theme) settings['ui.theme'] = theme;
+  return new FakeAlfaClient({ scenario, settings });
 }

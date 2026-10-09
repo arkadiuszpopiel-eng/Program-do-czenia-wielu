@@ -35,6 +35,8 @@
   {type}
   class="btn {variant} {size} {className}"
   style:--accent={agent ? `var(--alfa-agent-${agent})` : undefined}
+  style:--accent-fill={agent ? 'var(--accent)' : undefined}
+  style:--accent-glow={agent ? 'none' : undefined}
   disabled={disabled || loading}
   aria-busy={loading || undefined}
 >
@@ -50,7 +52,10 @@
 
 <style>
   .btn {
-    --accent: var(--alfa-color-text);
+    /* Styl interfejsu (skins.css) może podać akcent, wypełnienie i poświatę przycisku głównego. */
+    --accent: var(--alfa-color-accent, var(--alfa-color-text));
+    --accent-fill: var(--alfa-accent-fill, var(--accent));
+    --accent-glow: var(--alfa-accent-glow, none);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -80,7 +85,8 @@
     font-size: var(--alfa-font-size-sm);
   }
   .primary {
-    background: var(--accent);
+    background: var(--accent-fill);
+    box-shadow: var(--accent-glow);
     color: var(--alfa-color-text-on-accent);
     border-color: transparent;
   }

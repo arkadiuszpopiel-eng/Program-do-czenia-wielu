@@ -55,6 +55,7 @@
 
 <div
   class="shell mode-{app.layout.mode}"
+  data-surface="app"
   class:focus={app.layout.focus}
   style:--conv-column={column}
 >

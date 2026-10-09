@@ -30,6 +30,7 @@
   $effect(() => {
     applyAppearance(document.documentElement, {
       theme: app.str('ui.theme', 'auto'),
+      style: app.str('ui.style', 'classic'),
       density: app.str('ui.density', 'comfortable'),
       animations: app.bool('ui.animations', true),
       zoom: app.num('ui.zoom', 100),
@@ -67,7 +68,7 @@
 <svelte:window onkeydown={(e) => handleKeydown(app, e)} oncontextmenu={onContextMenu} />
 
 {#if app.view === 'loading'}
-  <div class="boot" role="status" aria-label={t('app.loading')}></div>
+  <div class="boot" data-surface="app" role="status" aria-label={t('app.loading')}></div>
 {:else if app.view === 'error'}
   <!-- Start nieudany (np. rdzeń nie odpowiedział): komunikat i „Ponów" zamiast martwego okna. -->
   <div class="fatal">

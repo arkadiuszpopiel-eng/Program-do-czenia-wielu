@@ -27,7 +27,7 @@
   );
 </script>
 
-<section class="conv" aria-label={t('conv.label')}>
+<section class="conv" data-surface="app" aria-label={t('conv.label')}>
   <div class="top">
     <SystemBanners />
     {#if app.findOpen && conv}<FindBar path={conv.path} bind:focusTurn />{/if}

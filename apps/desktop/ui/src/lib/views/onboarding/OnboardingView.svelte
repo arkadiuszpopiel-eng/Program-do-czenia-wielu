@@ -106,7 +106,7 @@
   }
 </script>
 
-<main class="onboarding" aria-labelledby="ob-title">
+<main class="onboarding" data-surface="app" aria-labelledby="ob-title">
   <div class="card">
     <header class="head">
       <div class="cast" aria-hidden="true">

@@ -71,6 +71,9 @@ export default ts.config(
       'svelte/no-unused-svelte-ignore': 'error',
       'svelte/prefer-svelte-reactivity': 'error',
       'svelte/no-reactive-reassign': 'error',
+      // `{' '}` przed separatorem „·” jest celowe: bez niego Svelte skleja kropkę z poprzednim
+      // słowem (pilnuje tego scripts/check-svelte5.mjs).
+      'svelte/no-useless-mustaches': 'off',
     },
   },
 );

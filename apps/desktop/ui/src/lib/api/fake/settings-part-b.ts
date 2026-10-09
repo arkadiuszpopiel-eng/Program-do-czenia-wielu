@@ -154,6 +154,20 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'auto',
     ),
     select(
+      'ui.style',
+      L('Styl', 'Style'),
+      L(
+        'Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”.',
+        'The look of the whole interface. Every style has a light and a dark version — picked by “Theme”.',
+      ),
+      [
+        ['classic', L('Klasyczny', 'Classic')],
+        ['glass', L('Szkło', 'Glass')],
+        ['next', L('Next', 'Next')],
+      ],
+      'classic',
+    ),
+    select(
       'ui.accent',
       L('Akcent', 'Accent'),
       L(

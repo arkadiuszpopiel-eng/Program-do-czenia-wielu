@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/svelte-vite';
 import '../src/tokens.css';
+import '../src/skins.css';
 import '../src/base.css';
 
 /** Przełącznik motywu: ustawia data-theme na <html>, tak jak zrobi to aplikacja. */

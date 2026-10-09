@@ -4,6 +4,7 @@
 // i Wycisz. Dane: zdarzenia `VoicePill`/`MicLevel`. Odrzucona komenda (Wycisz, Stop) jest widoczna
 // w pigułce; „Wyciszony" dopiero po potwierdzeniu rdzenia (prywatność: nie przy żywym mikrofonie).
 import '@alfa/ui-kit/tokens.css';
+import '@alfa/ui-kit/skins.css';
 import './pill.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';

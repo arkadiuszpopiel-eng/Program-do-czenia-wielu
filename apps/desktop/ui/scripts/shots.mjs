@@ -2,7 +2,7 @@
 // Zrzuty ekranu wszystkich widoków (rozmowa, panele Alt+1…7, każda strona ustawień) w kilku rozmiarach
 // okna — do przeglądu układu i skalowania. Wymaga działającego `pnpm dev` (atrapa backendu).
 // Użycie: node scripts/shots.mjs <katalog-wyjściowy> [--sizes 1280x720,1920x1080] [--only chat,panels,settings,onboarding,windows,overlays]
-//         [--scenario default] [--theme dark] [--url http://localhost:5173]
+//         [--scenario default] [--theme dark] [--style glass|next] [--url http://localhost:5173]
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from '@playwright/test';
@@ -20,6 +20,14 @@ const only = new Set(flag('only', 'chat,panels,settings').split(','));
 const scenario = flag('scenario', '');
 const theme = flag('theme', 'dark');
 const base = flag('url', 'http://localhost:5173');
+// Styl interfejsu (`classic`, `glass`, `next`) — przekazywany atrapie razem z motywem.
+const style = flag('style', '');
+const query = new URLSearchParams({
+  ...(scenario ? { scenario } : {}),
+  ...(style ? { style, theme } : {}),
+}).toString();
+// Parametry stylu bez scenariusza — dla widoków, które mają własny scenariusz albo własną stronę.
+const skinQuery = style ? `style=${style}&theme=${theme}` : '';
 const slug = (s) =>
   s
     .toLowerCase()
@@ -35,7 +43,7 @@ const browser = await chromium.launch().catch(() => chromium.launch({ channel: '
 for (const [width, height] of sizes) {
   const page = await browser.newPage({ viewport: { width, height }, locale: 'pl-PL' });
   await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
-  await page.goto(`${base}/${scenario ? `?scenario=${scenario}` : ''}`);
+  await page.goto(`${base}/${query ? `?${query}` : ''}`);
   await page.locator('#alfa-composer').waitFor();
   await page.waitForTimeout(400);
   const shot = (name) => page.screenshot({ path: join(outDir, `${width}-${name}.png`) });
@@ -61,7 +69,7 @@ for (const [width, height] of sizes) {
   }
   // Nakładki: paleta poleceń (Ctrl+K) i ściągawka skrótów (Ctrl+/) nad rozmową.
   if (only.has('overlays')) {
-    await page.goto(`${base}/${scenario ? `?scenario=${scenario}` : ''}`);
+    await page.goto(`${base}/${query ? `?${query}` : ''}`);
     await page.locator('#alfa-composer').waitFor();
     await page.locator('#alfa-composer').focus();
     for (const [key, name] of [
@@ -82,7 +90,7 @@ for (const [width, height] of sizes) {
   if (only.has('onboarding')) {
     const ob = await browser.newPage({ viewport: { width, height }, locale: 'pl-PL' });
     await ob.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
-    await ob.goto(`${base}/?scenario=first-run`);
+    await ob.goto(`${base}/?scenario=first-run${skinQuery ? `&${skinQuery}` : ''}`);
     await ob.locator('#ob-title').waitFor();
     for (let i = 1; i <= 12; i++) {
       await ob.waitForTimeout(500);
@@ -101,7 +109,7 @@ for (const [width, height] of sizes) {
     ]) {
       const win = await browser.newPage({ viewport: { width: w, height: h }, locale: 'pl-PL' });
       await win.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
-      await win.goto(`${base}/${name}.html`);
+      await win.goto(`${base}/${name}.html${skinQuery ? `?${skinQuery}` : ''}`);
       await win.waitForTimeout(700);
       await win.screenshot({ path: join(outDir, `okno-${name}.png`) });
       await win.close();
