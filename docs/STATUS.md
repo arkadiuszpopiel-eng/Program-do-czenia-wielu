@@ -154,9 +154,11 @@ i głębokość cofania są w kodzie, bez pełnego przeglądu):
   bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).
 - *Do zrobienia bez decyzji, nietknięte:* pole „brakujące silniki” w DTO rdzenia (R-04) — interfejs liczy je sam
   z listy modeli i silników, więc to porządek, nie błąd.
-- *Bez własnych testów regresji* (przeszły tylko testy istniejące): R-02, schowek dla głosu, dyktowanie przy STOP.
-  Wyciek dzierżawy pamięci ma test `providers-local-impl/tests/lifecycle.rs::failed_start_on_gpu_and_cpu_leaves_no_lease`
-  (sprawdzone, że bez poprawki nie przechodzi).
+- *Bez własnych testów regresji:* R-02 (nieudany start odpowiedzi — wymaga Brokera odmawiającego przyjęcia oznaczenia
+  sesji; brak takiego przełącznika w atrapach) oraz schowek dla czytania na głos (błąd dotyczył braku wstrzykniętego
+  portu, więc test musiałby czytać prawdziwy schowek systemowy — nie da się go zrobić hermetycznie). Dyktowanie przy STOP
+  ma test `app-core/tests/review_voice.rs`, wyciek dzierżawy pamięci —
+  `providers-local-impl/tests/lifecycle.rs::failed_start_on_gpu_and_cpu_leaves_no_lease`.
 
 Przegląd interfejsu, runda z 2026-10-08 przed południem (zrzuty 1280–3840 px, osiem scenariuszy atrapy):
 
