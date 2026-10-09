@@ -132,7 +132,7 @@ export const plTasks = {
   'bridges.registryOnly': 'Trasa tylko w rejestrze zgodności — Alfa jej nie obsługuje.',
   'bridges.detected': 'Wykryta wersja',
   'bridges.pinned': 'Przypięta wersja',
-  'bridges.pinnedNone': 'brak — most odmówi startu',
+  'bridges.pinnedNone': 'brak',
   'bridges.registryPin': 'Przypięcie w rejestrze',
   'bridges.versionOk': 'Wersja zgodna z przypięciem.',
   'bridges.versionBad': 'Wykryta wersja nie jest przypięta — most odmówi startu.',

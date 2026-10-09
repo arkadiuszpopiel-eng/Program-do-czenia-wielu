@@ -134,7 +134,7 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'bridges.registryOnly': 'Route only in the compliance registry — Alfa does not support it.',
   'bridges.detected': 'Detected version',
   'bridges.pinned': 'Pinned version',
-  'bridges.pinnedNone': 'none — the bridge will refuse to start',
+  'bridges.pinnedNone': 'none',
   'bridges.registryPin': 'Registry pin',
   'bridges.versionOk': 'Version matches the pin.',
   'bridges.versionBad': 'The detected version is not pinned — the bridge will refuse to start.',

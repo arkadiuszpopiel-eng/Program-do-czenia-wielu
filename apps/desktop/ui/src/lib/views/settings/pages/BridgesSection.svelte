@@ -96,8 +96,11 @@
           <span class="status">{tk(`bridges.status.${card.status}`)}</span>
         </div>
         <p class="meta">
-          {card.provider} · {t('bridges.mode', { mode: card.mode })}{#if card.verified_at}
-            · {t('bridges.verified', { date: card.verified_at })}{/if}
+          {[
+            card.provider,
+            t('bridges.mode', { mode: card.mode }),
+            ...(card.verified_at ? [t('bridges.verified', { date: card.verified_at })] : []),
+          ].join(' · ')}
         </p>
         {#if card.stale}<p class="note">{t('bridges.stale')}</p>{/if}
         {#if !card.bridge}
