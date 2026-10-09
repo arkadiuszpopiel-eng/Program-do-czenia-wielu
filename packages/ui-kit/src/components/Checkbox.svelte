@@ -39,11 +39,45 @@
     min-height: var(--alfa-size-hit-target);
     font-size: var(--alfa-font-size-sm);
   }
+  /* Własny wygląd zamiast systemowego pola: ramka z tokenów, znaczek rysowany maską. */
   input {
+    appearance: none;
+    flex: none;
+    display: grid;
+    place-content: center;
     width: 16px;
     height: 16px;
     margin: 3px 0 0;
-    accent-color: var(--alfa-color-info);
+    border: 1px solid var(--alfa-color-border-strong);
+    border-radius: 4px;
+    background: var(--alfa-color-surface);
+    cursor: pointer;
+  }
+  input::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--alfa-color-text-on-accent, var(--alfa-color-bg));
+    clip-path: polygon(14% 52%, 0 66%, 38% 100%, 100% 22%, 86% 10%, 37% 70%);
+    transform: scale(0);
+  }
+  input:checked {
+    border-color: var(--alfa-color-accent, var(--alfa-color-info));
+    background: var(--alfa-color-accent, var(--alfa-color-info));
+  }
+  input:checked::before {
+    transform: scale(1);
+  }
+  input:disabled {
+    cursor: default;
+  }
+  @media (forced-colors: active) {
+    input {
+      appearance: auto;
+    }
+    input::before {
+      display: none;
+    }
   }
   .text {
     display: flex;

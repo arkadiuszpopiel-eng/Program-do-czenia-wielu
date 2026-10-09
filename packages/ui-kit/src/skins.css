@@ -103,6 +103,10 @@
     --alfa-skin-aurora-2: light-dark(rgba(56, 189, 248, 0.36), rgba(34, 197, 232, 0.3));
     --alfa-skin-aurora-3: light-dark(rgba(244, 114, 182, 0.28), rgba(236, 72, 153, 0.24));
   }
+  /* Na kryjącej tafli nakładki półprzezroczysta biel podświetlenia byłaby w wersji jasnej niewidoczna. */
+  :root[data-skin='glass'] [role='option'].active {
+    background: light-dark(rgba(40, 52, 120, 0.1), rgba(255, 255, 255, 0.12));
+  }
   /* Poświata tylko w oknie głównym: Szybkie pytanie i pigułka są oknami przezroczystymi, więc tło
      strony zamalowałoby pulpit, a półprzezroczysta tafla bez rozmycia byłaby nad nim nieczytelna. */
   :root[data-skin='glass']:not(:has([data-surface='app'])) {

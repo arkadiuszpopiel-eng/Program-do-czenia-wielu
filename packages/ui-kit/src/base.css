@@ -89,6 +89,140 @@ a {
   scrollbar-width: thin;
   scrollbar-color: var(--alfa-color-border-strong) transparent;
 }
+/* WebView2 / Chromium: własny pasek bez systemowych strzałek — sam zaokrąglony uchwyt w kolorach stylu.
+   (Standardowe właściwości wyżej wyłączają pseudoelementy, więc tu wracają do `auto`.) */
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--alfa-color-border-strong);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--alfa-color-text-subtle);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+/*
+ * Kontrolki, które domyślnie rysuje system: pasek postępu, suwak i przycisk wyboru pliku. Dostają
+ * wygląd z tokenów, żeby w każdym stylu i motywie wyglądały jak reszta interfejsu (listy wyboru
+ * i pola zaznaczenia mają własne komponenty: Select, Checkbox, Switch).
+ */
+progress {
+  appearance: none;
+  height: 6px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: var(--alfa-color-surface3);
+  color: var(--alfa-color-accent, var(--alfa-color-info));
+}
+progress::-webkit-progress-bar {
+  border-radius: 999px;
+  background: var(--alfa-color-surface3);
+}
+progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: var(--alfa-color-accent, var(--alfa-color-info));
+}
+progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: var(--alfa-color-accent, var(--alfa-color-info));
+}
+progress:indeterminate::-webkit-progress-bar {
+  background: linear-gradient(
+    90deg,
+    var(--alfa-color-surface3) 0 35%,
+    var(--alfa-color-accent, var(--alfa-color-info)) 35% 65%,
+    var(--alfa-color-surface3) 65%
+  );
+}
+
+input[type='range'] {
+  appearance: none;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--alfa-color-surface3);
+}
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: 2px solid var(--alfa-color-bg);
+  border-radius: 50%;
+  background: var(--alfa-color-accent, var(--alfa-color-info));
+  box-shadow: 0 0 0 1px var(--alfa-color-border-strong);
+}
+input[type='range']::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--alfa-color-surface3);
+}
+input[type='range']::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--alfa-color-bg);
+  border-radius: 50%;
+  background: var(--alfa-color-accent, var(--alfa-color-info));
+}
+input[type='range']:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Grupa pól: systemowa ramka „rzeźbiona" zastąpiona linią z tokenów. */
+fieldset {
+  min-width: 0;
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-control);
+}
+legend {
+  padding: 0 var(--alfa-space-1);
+  color: var(--alfa-color-text-muted);
+  font-size: var(--alfa-font-size-sm);
+}
+
+input[type='file'] {
+  color: var(--alfa-color-text-muted);
+  font-size: var(--alfa-font-size-sm);
+}
+input[type='file']::file-selector-button {
+  height: 28px;
+  margin-inline-end: var(--alfa-space-2);
+  padding: 0 var(--alfa-space-3);
+  border: 1px solid var(--alfa-color-border-strong);
+  border-radius: var(--alfa-radius-control);
+  background: var(--alfa-color-surface);
+  color: var(--alfa-color-text);
+  font: inherit;
+  cursor: pointer;
+}
+input[type='file']::file-selector-button:hover {
+  background: var(--alfa-color-surface2);
+}
 
 .alfa-visually-hidden {
   position: absolute;

@@ -4,7 +4,7 @@
   Odtwarzanie: Od początku / Poprzedni / Następny krok / Wszystkie.
 -->
 <script lang="ts">
-  import { Avatar, Button } from '@alfa/ui-kit';
+  import { Avatar, Button, Select } from '@alfa/ui-kit';
   import Brain from '@lucide/svelte/icons/brain';
   import ListChecks from '@lucide/svelte/icons/list-checks';
   import MessageSquare from '@lucide/svelte/icons/message-square';
@@ -114,16 +114,22 @@
     <p class="empty">{t('replay.empty')}</p>
   {:else}
     {#if runs.length > 1}
-      <label class="pick">
-        <span>{t('replay.run')}</span>
-        <select bind:value={selected} onchange={() => (cursor = null)}>
-          {#each [...runs].reverse() as r (r.run.id)}
-            <option value={r.run.id}
-              >{runLabel(r)}: {r.run.goal.slice(0, 48)} ({app.i18n.time(r.run.started_at)})</option
-            >
-          {/each}
-        </select>
-      </label>
+      <div class="pick">
+        <span id="replay-run-label">{t('replay.run')}</span>
+        <Select
+          size="sm"
+          labelledby="replay-run-label"
+          value={selected ?? ''}
+          options={[...runs].reverse().map((r) => ({
+            value: r.run.id,
+            label: `${runLabel(r)}: ${r.run.goal.slice(0, 48)} (${app.i18n.time(r.run.started_at)})`,
+          }))}
+          onchange={(id) => {
+            selected = id;
+            cursor = null;
+          }}
+        />
+      </div>
     {/if}
     {#if current}
       {@const run = current.run}
@@ -276,13 +282,6 @@
     flex-direction: column;
     gap: 4px;
     font-size: var(--alfa-font-size-xs);
-  }
-  .pick select {
-    min-height: 28px;
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-control);
-    background: var(--alfa-color-surface);
-    color: var(--alfa-color-text);
   }
   .head {
     display: flex;

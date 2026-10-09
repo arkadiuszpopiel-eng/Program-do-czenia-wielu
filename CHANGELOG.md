@@ -5,6 +5,32 @@ czterech miejscach naraz: `Cargo.toml` (workspace), `apps/desktop/src-tauri/Carg
 `apps/desktop/src-tauri/tauri.conf.json`, `apps/desktop/ui/package.json`. Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.4 — 2026-10-09
+
+Poprawka po zgłoszeniu właściciela: nieczytelne i systemowe listy wyboru.
+
+### Interfejs
+
+- **Listy wyboru są teraz rysowane przez Alfę**, nie przez system: własna lista opcji w stylu interfejsu, ze znaczkiem
+  przy wybranej pozycji, obsługą klawiatury (strzałki, Home/End, Enter, Esc, pierwsze litery) i czytnika ekranu.
+  W wersji 0.0.3 rozwinięta lista była systemowa, a w stylu „Szkło” miała jasny tekst na białym tle.
+- To samo dla pozostałych kontrolek rysowanych dotąd przez system: paski postępu, suwaki, pola zaznaczenia, przycisk
+  wyboru pliku i ramka grupy pól biorą kolory i kształt ze stylu interfejsu.
+- Paski przewijania bez systemowych strzałek: sam zaokrąglony uchwyt w kolorach stylu.
+- Ostatnia natywna lista (wybór przebiegu w odtwarzaniu pracy agentki) zastąpiona tym samym komponentem.
+
+### Testy
+
+- Lista wyboru jest sprawdzana **otwarta** w każdym stylu i motywie (6 kombinacji): tło kryjące, kontrast opcji
+  co najmniej 4,5:1, obsługa klawiaturą, brak natywnego `<select>` na stronie.
+- Ten sam test w prawdziwej aplikacji (WebView2), ze zrzutem każdego stylu.
+- `apps/desktop/ui/scripts/shots-open.mjs`: zrzuty kontrolek w stanie otwartym — uzupełnia zrzuty widoków.
+
+### Przyczyna błędu
+
+Style z 0.0.3 były oglądane tylko na zrzutach w stanie spoczynkowym; listy nikt nie rozwinął. Testy dostępności nie
+widzą listy systemowej, bo system rysuje ją poza stroną.
+
 ## 0.0.3 — 2026-10-09
 
 Dwa nowe style interfejsu i rozszerzony plan rozwoju (wersja 6) w MD i HTML. Bez zmian w rdzeniu.

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { expectAccessible, openApp, waitForChat } from './helpers';
+import { expectAccessible, openApp, pickOption, waitForChat } from './helpers';
 
 async function openModels(page: Page) {
   await page.keyboard.press('Control+,');
@@ -56,7 +56,7 @@ test('filtry, przerwanie i wznowienie, usuwanie z potwierdzeniem', async ({ page
   await openApp(page);
   await waitForChat(page);
   await openModels(page);
-  await page.getByLabel('Rodzaj', { exact: true }).selectOption('vad');
+  await pickOption(page.getByRole('combobox', { name: 'Rodzaj', exact: true }), 'vad');
   await expect(page.getByText('1 pozycja')).toBeVisible();
   const vad = row(page, 'Silero VAD 6.2.3 (op18, bez If)');
   await expect(vad.getByText('SHA-256 przypięty')).toBeVisible();
@@ -65,7 +65,7 @@ test('filtry, przerwanie i wznowienie, usuwanie z potwierdzeniem', async ({ page
   await expect(vad.getByText('Wstrzymano — możesz wznowić')).toBeVisible();
   await vad.getByRole('button', { name: 'Wznów' }).click();
   await expect(vad.getByText('Zainstalowano i sprawdzono')).toBeVisible({ timeout: 10_000 });
-  await page.getByLabel('Stan', { exact: true }).selectOption('installed');
+  await pickOption(page.getByRole('combobox', { name: 'Stan', exact: true }), 'installed');
   await expect(page.getByText('1 pozycja')).toBeVisible();
   await vad.getByRole('button', { name: 'Usuń' }).click();
   const confirm = page.getByRole('alertdialog', {

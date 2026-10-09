@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 /** Otwiera okno z atrapą w danym scenariuszu i motywie; czeka na gotowy widok. */
 export async function openApp(
@@ -9,6 +9,14 @@ export async function openApp(
   await page.emulateMedia({ colorScheme: opts.theme ?? 'light', reducedMotion: 'reduce' });
   const query = opts.scenario ? `?scenario=${opts.scenario}` : '';
   await page.goto(`${opts.path ?? '/'}${query}`);
+}
+
+/** Wybiera opcję z listy wyboru Alfy (przycisk `combobox` + własna lista opcji). */
+export async function pickOption(select: Locator, value: string) {
+  await select.click();
+  const listId = await select.getAttribute('aria-controls');
+  await select.page().locator(`[id="${listId}"] [role="option"][data-value="${value}"]`).click();
+  await expect(select).toHaveAttribute('data-value', value);
 }
 
 export async function waitForChat(page: Page, timeout?: number) {

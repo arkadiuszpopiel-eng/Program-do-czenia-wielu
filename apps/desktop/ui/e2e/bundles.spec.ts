@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { expectAccessible, openApp, waitForChat } from './helpers';
+import { expectAccessible, openApp, pickOption, waitForChat } from './helpers';
 
 async function openModels(page: Page) {
   await page.keyboard.press('Control+,');
@@ -98,8 +98,7 @@ test('ustawienia szczegółowe silników — opis z zaleceniem i zapis wartości
   await expect(page.getByRole('heading', { name: 'Ustawienia szczegółowe' })).toBeVisible();
   const backend = page.locator('[id="setting-engines.llm.backend"]');
   await expect(backend.getByText(/Zalecenie: Automatycznie/)).toBeVisible();
-  await backend.getByRole('combobox').selectOption('cpu');
-  await expect(backend.getByRole('combobox')).toHaveValue('cpu');
+  await pickOption(backend.getByRole('combobox'), 'cpu');
   const downloads = page.locator('[id="setting-models.parallel_downloads"]');
   await expect(downloads.getByText(/1 przy łączu komórkowym/)).toBeVisible();
   await expectAccessible(page, 'ustawienia silników');

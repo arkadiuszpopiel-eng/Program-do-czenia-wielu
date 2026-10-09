@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.3). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.4). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -24,6 +24,7 @@ Szczegółowe zadania: [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §6, etapy 0–3
 | A.1 | Skalowanie i układ interfejsu 1280–3840 px | zrobione | 2026-10-08 | wersja 0.0.2; testy e2e i test w prawdziwej aplikacji |
 | A.2 | Naprawy z przeglądów rdzenia, narzędzi i stanu interfejsu | zrobione | 2026-10-09 | wersja 0.0.2; lista w `CHANGELOG.md` |
 | A.3 | Style interfejsu „Szkło” i „Next” (jasny i ciemny) | zrobione | 2026-10-09 | wersja 0.0.3; `e2e/skins.spec.ts` |
+| A.3a | Własne listy wyboru i pozostałe kontrolki w stylu Alfy (bez kontrolek systemowych) | zrobione | 2026-10-09 | wersja 0.0.4; błąd zgłoszony przez właściciela; testy listy otwartej w 6 kombinacjach + prawdziwa aplikacja |
 | A.4 | Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1) | czeka | — | zgoda właściciela na pobranie pakietu ok. 6 GB |
 | A.5 | Głos na żywo: dyktowanie i czytanie | czeka | — | po A.4 (te same silniki w pakiecie) |
 | A.6 | Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2) | czeka | — | po A.4 |
@@ -175,4 +176,5 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data | Zmiana |
 | --- | --- |
+| 2026-10-09 | Wersja 0.0.4: listy wyboru i inne kontrolki rysowane przez Alfę (A.3a). |
 | 2026-10-09 | Powstanie planu v6. Etapy A.1–A.3 wpisane jako zrobione (wersje 0.0.2 i 0.0.3). Cztery decyzje właściciela o dostępie zdalnym. |
