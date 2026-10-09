@@ -1,7 +1,7 @@
 # Manifest narzędzi tools-window (docs/modules/tools-window/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 # Zdolność z tokenu Brokera per wywołanie: `gui.control(<aplikacja okna>)`; pulpit: `gui.control(desktop.exe)`.
 id = "tools-window"
-version = "0.0.11"
+version = "0.0.12"
 kind = "tool"
 provides = ["tools-window-contract@1"]
 requires = ["tools-common-contract@1", "safety-broker-contract@1", "platform-contract@1", "core-bus-contract@1"]

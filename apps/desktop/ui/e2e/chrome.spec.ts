@@ -170,3 +170,56 @@ test('karty graficzne: każda z rolą — główna i do lekkich zadań', async (
   await expect(cards.nth(1)).toContainText('pamięć współdzielona');
   await expect(cards.nth(1)).toContainText('llama.cpp Vulkan');
 });
+
+// Zgłoszenie właściciela (2026-10-09): obsada, mikrofon i stan w belce „też popraw solidnie”.
+for (const skin of SKINS) {
+  for (const theme of THEMES) {
+    test(`belka: obsada, mikrofon i stan z objaśnieniem — ${skin}/${theme}`, async ({ page }) => {
+      await open(page, `?style=${skin}&theme=${theme}`);
+      const cast = page.getByRole('group', { name: 'Obsada agentek' });
+      await expect(cast.getByRole('button')).toHaveCount(4);
+      // Każda agentka podaje imię, rolę i stan (podpowiedź rysuje Alfa z tego samego tekstu).
+      for (const name of ['Alfa', 'Beta', 'Gama', 'Delta']) {
+        await expect(cast.getByRole('button', { name: new RegExp(`^${name} · `) })).toBeVisible();
+      }
+
+      // Stan: połączenie + profil + autonomia; klik otwiera objaśnienie z przejściem do ustawień.
+      const state = page.getByRole('button', {
+        name: /^Stan: połączono, profil Hybryda, autonomia L\d/,
+      });
+      await state.click();
+      const details = page.getByRole('dialog', { name: 'Stan Alfy' });
+      await expect(details).toContainText('Proste rzeczy liczy ten komputer');
+      await expect(details).toContainText(/L\d — /);
+      await expectReadable(page, 'header.titlebar');
+      await details.getByRole('button', { name: 'Uprawnienia' }).click();
+      await expect(details).toHaveCount(0);
+      await expect(page.getByRole('heading', { level: 2, name: /Uprawnienia/ })).toBeVisible();
+      await page.keyboard.press('Escape');
+
+      // Koszt ma własną część i własne okienko.
+      await page.getByRole('button', { name: /^Koszt sesji / }).click();
+      await expect(page.getByRole('dialog', { name: 'Koszty i kontekst' })).toBeVisible();
+      await expectReadable(page, 'header.titlebar');
+      await page.keyboard.press('Escape');
+
+      // Mikrofon: włączony ma wypełniony stan i słupki poziomu.
+      const mic = page.getByRole('button', { name: /^Mikrofon: / });
+      await expect(mic).toHaveAttribute('aria-pressed', 'false');
+      await mic.click();
+      await expect(mic).toHaveAttribute('aria-pressed', 'true');
+      await expect(mic.locator('.bars span')).toHaveCount(3);
+      await expectReadable(page, 'header.titlebar');
+    });
+  }
+}
+
+test('belka bez sieci: znak braku połączenia i kolejka w objaśnieniu', async ({ page }) => {
+  await open(page, '?scenario=offline');
+  const state = page.getByRole('button', { name: /^Stan: brak sieci/ });
+  await expect(state).toBeVisible();
+  await state.click();
+  await expect(page.getByRole('dialog', { name: 'Stan Alfy' })).toContainText(
+    'Działa tylko model lokalny',
+  );
+});

@@ -8,6 +8,30 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.12 — 2026-10-09
+
+Zgłoszenie właściciela: obsada agentek, mikrofon i stan w górnej belce „też popraw solidnie”.
+
+### Interfejs
+
+- Obsada agentek jest jedną kapsułą: gotowa agentka jest przygaszona, pracująca ma pierścień i kropkę, mówiąca
+  pulsuje, a czekająca na zatwierdzenie dostaje bursztynowy znacznik. Podpowiedź podaje imię, rolę, stan i to, co
+  agentka właśnie robi.
+- Mikrofon to wyraźny przycisk stanu: włączony ma zieloną obwódkę i słupki poziomu, które ruszają się, gdy Alfa Cię
+  słyszy; wyciszony — bursztynową; niedostępny — przerywaną z wykrzyknikiem.
+- Stan („Hybryda · L2 · 0,00 zł”) to teraz kapsuła z dwiema częściami i ikonami: połączenie, profil modeli i poziom
+  autonomii oraz osobno koszt sesji.
+- Klik w profil i autonomię otwiera objaśnienie po ludzku — co znaczy profil, co wolno agentkom na tym poziomie, czy
+  jest sieć i ile wiadomości czeka — z przejściem do „Uprawnienia” i „Konta i klucze API”.
+- Klik w koszt otwiera szczegóły kosztów; przy 80 % limitu miesięcznego koszt jest oznaczony ostrzeżeniem.
+- Bez sieci zamiast zielonej kropki jest znak braku połączenia. W bardzo wąskim oknie belka zostawia tylko
+  najważniejsze elementy i nic nie wychodzi poza okno.
+
+### Testy
+
+- `e2e/chrome.spec.ts`: obsada, mikrofon, objaśnienie stanu i koszty w 3 stylach × 2 motywach, stan bez sieci;
+  zrzuty wszystkich stanów: `scripts/shots-bar.mjs`.
+
 ## 0.0.11 — 2026-10-09
 
 Zgłoszenia właściciela: górna belka z jadącym paskiem LED, mocno dopracowana nawigacja Ustawień i współpraca kilku

@@ -318,7 +318,7 @@ blockquote {
 <header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
 <div class="layout">
 <nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html" aria-current="page">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
-<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#0-0-11-2026-10-09">0.0.11 — 2026-10-09</a></li><li><a href="#0-0-10-2026-10-09">0.0.10 — 2026-10-09</a></li><li><a href="#0-0-9-2026-10-09">0.0.9 — 2026-10-09</a></li><li><a href="#0-0-8-2026-10-09">0.0.8 — 2026-10-09</a></li><li><a href="#0-0-7-2026-10-09">0.0.7 — 2026-10-09</a></li><li><a href="#0-0-6-2026-10-09">0.0.6 — 2026-10-09</a></li><li><a href="#0-0-5-2026-10-09">0.0.5 — 2026-10-09</a></li><li><a href="#0-0-4-2026-10-09">0.0.4 — 2026-10-09</a></li><li><a href="#0-0-3-2026-10-09">0.0.3 — 2026-10-09</a></li><li><a href="#0-0-2-2026-10-09">0.0.2 — 2026-10-09</a></li><li><a href="#0-0-1">0.0.1</a></li></ul></aside><article><h1 id="dziennik-zmian-alfy">Dziennik zmian Alfy</h1>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#0-0-12-2026-10-09">0.0.12 — 2026-10-09</a></li><li><a href="#0-0-11-2026-10-09">0.0.11 — 2026-10-09</a></li><li><a href="#0-0-10-2026-10-09">0.0.10 — 2026-10-09</a></li><li><a href="#0-0-9-2026-10-09">0.0.9 — 2026-10-09</a></li><li><a href="#0-0-8-2026-10-09">0.0.8 — 2026-10-09</a></li><li><a href="#0-0-7-2026-10-09">0.0.7 — 2026-10-09</a></li><li><a href="#0-0-6-2026-10-09">0.0.6 — 2026-10-09</a></li><li><a href="#0-0-5-2026-10-09">0.0.5 — 2026-10-09</a></li><li><a href="#0-0-4-2026-10-09">0.0.4 — 2026-10-09</a></li><li><a href="#0-0-3-2026-10-09">0.0.3 — 2026-10-09</a></li><li><a href="#0-0-2-2026-10-09">0.0.2 — 2026-10-09</a></li><li><a href="#0-0-1">0.0.1</a></li></ul></aside><article><h1 id="dziennik-zmian-alfy">Dziennik zmian Alfy</h1>
 <p>Każda seria poprawek podnosi numer wersji i dostaje wpis w tym pliku — po ludzku, od najnowszej. Wpis jest też
 źródłem okna „Co nowego” w programie (wstęp i pierwsze zdanie każdej pozycji; sekcje „Testy” i „Przyczyna błędu”
 są tam pomijane), więc pierwsze zdanie pozycji ma mówić, co się zmieniło dla użytkownika. Numer jest w
@@ -326,10 +326,32 @@ kilku miejscach naraz (workspace Cargo, dwa pliki powłoki Tauri, interfejs i ma
 wyłącznie skrypt: <code>node scripts/set-version.mjs &lt;numer&gt;</code>; spójność sprawdza <code>node scripts/set-version.mjs --check</code>
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 <a href="status.html"><code>docs/STATUS.md</code></a>.</p>
+<h2 id="0-0-12-2026-10-09">0.0.12 — 2026-10-09</h2>
+<p>Zgłoszenie właściciela: obsada agentek, mikrofon i stan w górnej belce „też popraw solidnie”.</p>
+<h3 id="interfejs">Interfejs</h3>
+<ul>
+<li>Obsada agentek jest jedną kapsułą: gotowa agentka jest przygaszona, pracująca ma pierścień i kropkę, mówiąca
+pulsuje, a czekająca na zatwierdzenie dostaje bursztynowy znacznik. Podpowiedź podaje imię, rolę, stan i to, co
+agentka właśnie robi.</li>
+<li>Mikrofon to wyraźny przycisk stanu: włączony ma zieloną obwódkę i słupki poziomu, które ruszają się, gdy Alfa Cię
+słyszy; wyciszony — bursztynową; niedostępny — przerywaną z wykrzyknikiem.</li>
+<li>Stan („Hybryda · L2 · 0,00 zł”) to teraz kapsuła z dwiema częściami i ikonami: połączenie, profil modeli i poziom
+autonomii oraz osobno koszt sesji.</li>
+<li>Klik w profil i autonomię otwiera objaśnienie po ludzku — co znaczy profil, co wolno agentkom na tym poziomie, czy
+jest sieć i ile wiadomości czeka — z przejściem do „Uprawnienia” i „Konta i klucze API”.</li>
+<li>Klik w koszt otwiera szczegóły kosztów; przy 80 % limitu miesięcznego koszt jest oznaczony ostrzeżeniem.</li>
+<li>Bez sieci zamiast zielonej kropki jest znak braku połączenia. W bardzo wąskim oknie belka zostawia tylko
+najważniejsze elementy i nic nie wychodzi poza okno.</li>
+</ul>
+<h3 id="testy">Testy</h3>
+<ul>
+<li><code>e2e/chrome.spec.ts</code>: obsada, mikrofon, objaśnienie stanu i koszty w 3 stylach × 2 motywach, stan bez sieci;
+zrzuty wszystkich stanów: <code>scripts/shots-bar.mjs</code>.</li>
+</ul>
 <h2 id="0-0-11-2026-10-09">0.0.11 — 2026-10-09</h2>
 <p>Zgłoszenia właściciela: górna belka z jadącym paskiem LED, mocno dopracowana nawigacja Ustawień i współpraca kilku
 kart graficznych.</p>
-<h3 id="interfejs">Interfejs</h3>
+<h3 id="interfejs-2">Interfejs</h3>
 <ul>
 <li>Górna belka okna jest teraz belką Alfy: systemowy pasek „Alfa” zniknął, a minimalizuj, maksymalizuj i zamknij
 rysuje program — w każdym stylu i motywie.</li>
@@ -350,7 +372,7 @@ zintegrowana — lekkie zadania w tle (streszczenia, tytuły, porządki pamięci
 silnika w „Modele lokalne i silniki” zaczynają działać same. Rozpoznawanie mowy zostaje na karcie głównej
 (silnik mowy nie ma wersji dla kart zintegrowanych).</li>
 </ul>
-<h3 id="testy">Testy</h3>
+<h3 id="testy-2">Testy</h3>
 <ul>
 <li>Nowe: <code>e2e/chrome.spec.ts</code> (belka, pasek LED, przyciski okna i nawigacja w 3 stylach × 2 motywach, klawiatura,
 wąskie okno, role kart), <code>settings-nav.test.ts</code>, testy przypinania do karty (<code>devices.rs</code>), lekkiego dostawcy
@@ -362,7 +384,7 @@ silnika Vulkan — pobranie wymaga zgody). Przyciąganie okna do układów Windo
 <h2 id="0-0-10-2026-10-09">0.0.10 — 2026-10-09</h2>
 <p>Zgłoszenia właściciela: systemowe menu po kliknięciu prawym przyciskiem, niewygodne przestawianie modeli strzałkami
 i słaba organizacja ustawień modeli.</p>
-<h3 id="interfejs-2">Interfejs</h3>
+<h3 id="interfejs-2-2">Interfejs</h3>
 <ul>
 <li>Menu po kliknięciu prawym przyciskiem rysuje Alfa (Cofnij, Wytnij, Kopiuj, Wklej, Zaznacz wszystko) — systemowe
 menu z „Emoji”, „Kierunek pisania” i „Wykonaj inspekcję” nie pojawia się w żadnym oknie.</li>
@@ -376,20 +398,20 @@ wyraźnie oznaczony, a po upuszczeniu albo dodaniu przez chwilę świeci. Z klaw
 <li>Ustawienia modeli mają jaśniejsze nazwy: „Konta i klucze API”, „Kolejki modeli API”, „Mosty CLI” (osobna strona),
 „Modele lokalne i silniki”.</li>
 </ul>
-<h3 id="testy-2">Testy</h3>
+<h3 id="testy-2-2">Testy</h3>
 <ul>
 <li>E2E: 12 testów menu kontekstowego i podpowiedzi (6 kombinacji stylu i motywu), przenoszenie kafelków wskaźnikiem
 i z klawiatury; test w prawdziwej aplikacji: menu Alfy i wklejanie ze schowka systemu.</li>
 </ul>
 <h2 id="0-0-9-2026-10-09">0.0.9 — 2026-10-09</h2>
 <p>Pierwszy krok porządkowania interfejsu po zgłoszeniu właściciela („organizacja”).</p>
-<h3 id="interfejs-2-2">Interfejs</h3>
+<h3 id="interfejs-2-2-2">Interfejs</h3>
 <ul>
 <li>Przy każdym koncie w „Modele i dostawcy” jest przycisk „Modele i kolejki” — otwiera stronę kolejek od razu z tym
 kontem; ze strony kolejek jednym kliknięciem wracasz do klucza, testu i limitu konta.</li>
 <li>Szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączyć w Ustawieniach → Wygląd.</li>
 </ul>
-<h3 id="testy-2-2">Testy</h3>
+<h3 id="testy-2-2-2">Testy</h3>
 <ul>
 <li>E2E: przejście z listy kont do kolejek i z powrotem, przełącznik szczegółów odpowiedzi; poprawiony test dymny listy
 stylu w prawdziwej aplikacji (sprzątanie zamykało Ustawienia).</li>
@@ -422,7 +444,7 @@ szumu działa filtr dudnienia wentylatorów i bramka, która ścisza tło międz
 <li>Szum wentylatora nie jest już brany za mowę, więc nie przedłuża wypowiedzi i nie budzi rozpoznawania.</li>
 <li>Test mikrofonu pokazuje dwa paski: sygnał po redukcji szumów i surowy sygnał z mikrofonu — widać, ile tła odcięto.</li>
 </ul>
-<h3 id="testy-2-2-2">Testy</h3>
+<h3 id="testy-2-2-2-2">Testy</h3>
 <ul>
 <li>Rdzeń: test całej ścieżki z lokalnym serwerem udającym OpenAI (lista z <code>tts-1</code> na początku → rozmowa idzie do
 modelu rozmowy; kolejka; pominięcie niedostępnego modelu) — <code>app-core/tests/accounts_models.rs</code>; reguły kolejek
@@ -480,7 +502,7 @@ sterujące; jest obcinana do 400 znaków.</li>
 <li>Połączenia z dostawcami nie podążają za przekierowaniami, żeby klucz nie trafił pod inny adres.</li>
 <li>Test i wymiana klucza nie wysyłają go do dostawcy, który został oznaczony jako zabroniony.</li>
 </ul>
-<h3 id="testy-2-2-2-2">Testy</h3>
+<h3 id="testy-2-2-2-2-2">Testy</h3>
 <ul>
 <li>Rdzeń: sześć testów całej ścieżki z lokalnym serwerem udającym dostawcę (<code>app-core/tests/accounts_keys.rs</code>,
 <code>accounts_rotate.rs</code>), klasyfikacja odpowiedzi (<code>app-modules/src/probe.rs</code>), wspólna tabela wklejanych kluczy dla
@@ -533,7 +555,7 @@ sprawdzane są też kotwice, a wiersz roadmapy z nieznanym stanem jest błędem.
 w tytułach stron.</li>
 <li><code>gates.ps1 -Test a,b</code> działa zgodnie z opisem; znacznik budowy w „O programie” nie zostaje stary po <code>git pull</code>.</li>
 </ul>
-<h3 id="testy-2-2-2-2-2">Testy</h3>
+<h3 id="testy-2-2-2-2-2-2">Testy</h3>
 <ul>
 <li>Kontrast tekstu jest mierzony po złożeniu warstw (półprzezroczyste tła), we wszystkich stylach i motywach — test
 dostępności nie oceniał tekstu nad gradientem. Miernik ma własny test, który musi odrzucić nieczytelny napis.</li>
@@ -543,19 +565,19 @@ Unicode, „rozmowa otwiera się na dole”, powtórzone zdanie w banerze Broker
 </ul>
 <h2 id="0-0-5-2026-10-09">0.0.5 — 2026-10-09</h2>
 <p>Okno „Co nowego” pokazuje krótką listę poprawek.</p>
-<h3 id="interfejs-2-2-2">Interfejs</h3>
+<h3 id="interfejs-2-2-2-2">Interfejs</h3>
 <ul>
 <li>Po zmianie wersji okno „Co nowego” wypisuje skrót zmian tej wersji. Wcześniej, gdy wersja nie miała dołączonych
 notatek (każda budowa lokalna), było tam tylko „Zaktualizowano Alfę do wersji…”.</li>
 <li>Skrót powstaje z tego dziennika zmian, wbudowanego w program: zdanie wstępu i pierwsze zdanie każdej pozycji.</li>
 </ul>
-<h3 id="testy-2-2-2-2-2-2">Testy</h3>
+<h3 id="testy-2-2-2-2-2-2-2">Testy</h3>
 <ul>
 <li>Test pilnuje, że uruchamiana wersja ma w dzienniku wpis z listą zmian — podbicie numeru bez opisu nie przejdzie.</li>
 </ul>
 <h2 id="0-0-4-2026-10-09">0.0.4 — 2026-10-09</h2>
 <p>Poprawka po zgłoszeniu właściciela: nieczytelne i systemowe listy wyboru.</p>
-<h3 id="interfejs-2-2-2-2">Interfejs</h3>
+<h3 id="interfejs-2-2-2-2-2">Interfejs</h3>
 <ul>
 <li><strong>Listy wyboru są teraz rysowane przez Alfę</strong>, nie przez system: własna lista opcji w stylu interfejsu, ze znaczkiem
 przy wybranej pozycji, obsługą klawiatury (strzałki, Home/End, Enter, Esc, pierwsze litery) i czytnika ekranu.
@@ -565,7 +587,7 @@ wyboru pliku i ramka grupy pól biorą kolory i kształt ze stylu interfejsu.</l
 <li>Paski przewijania bez systemowych strzałek: sam zaokrąglony uchwyt w kolorach stylu.</li>
 <li>Ostatnia natywna lista (wybór przebiegu w odtwarzaniu pracy agentki) zastąpiona tym samym komponentem.</li>
 </ul>
-<h3 id="testy-2-2-2-2-2-2-2">Testy</h3>
+<h3 id="testy-2-2-2-2-2-2-2-2">Testy</h3>
 <ul>
 <li>Lista wyboru jest sprawdzana <strong>otwarta</strong> w każdym stylu i motywie (6 kombinacji): tło kryjące, kontrast opcji
 co najmniej 4,5:1, obsługa klawiaturą, brak natywnego <code>&lt;select&gt;</code> na stronie.</li>
@@ -577,7 +599,7 @@ co najmniej 4,5:1, obsługa klawiaturą, brak natywnego <code>&lt;select&gt;</co
 widzą listy systemowej, bo system rysuje ją poza stroną.</p>
 <h2 id="0-0-3-2026-10-09">0.0.3 — 2026-10-09</h2>
 <p>Dwa nowe style interfejsu i rozszerzony plan rozwoju (wersja 6) w MD i HTML. Bez zmian w rdzeniu.</p>
-<h3 id="interfejs-2-2-2-2-2">Interfejs</h3>
+<h3 id="interfejs-2-2-2-2-2-2">Interfejs</h3>
 <ul>
 <li>Ustawienia → Wygląd → <strong>Styl</strong>: Klasyczny, <strong>Szkło</strong> albo <strong>Next</strong>. Każdy styl ma wersję jasną i ciemną — wybiera
 ją „Motyw”.</li>

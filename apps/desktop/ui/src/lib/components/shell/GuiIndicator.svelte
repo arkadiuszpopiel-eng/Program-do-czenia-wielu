@@ -60,9 +60,10 @@
     align-items: center;
     min-width: 0;
     gap: 2px;
-    height: 26px;
-    padding: 0 2px 0 var(--alfa-space-2);
+    height: 30px;
+    padding: 0 3px 0 var(--alfa-space-2);
     border: 1px solid var(--alfa-color-border);
+    background: var(--alfa-color-bg);
     border-radius: var(--alfa-radius-full);
     font-size: var(--alfa-font-size-xs);
   }
@@ -74,7 +75,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    height: 22px;
+    height: 24px;
     padding: 0 var(--alfa-space-2);
     border: 0;
     border-radius: var(--alfa-radius-full);
@@ -97,7 +98,18 @@
     white-space: nowrap;
   }
   @media (max-width: 720px) {
+    .gui {
+      flex: none;
+    }
     .live .text {
+      display: none;
+    }
+  }
+  @media (max-width: 520px) {
+    .live {
+      padding-left: 3px;
+    }
+    .live .label {
       display: none;
     }
   }
