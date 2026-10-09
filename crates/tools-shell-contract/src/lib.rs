@@ -172,9 +172,9 @@ impl Default for ShellToolsConfig {
 /// Windows), a narzędzie czyta UTF-8 — bez tego „ą ę ł" trafiały do modelu jako znaki zastępcze
 /// (sprawdzone na Windows 11: `Write-Output 'zażółć'` → bajty CP852).
 pub const PWSH_UTF8_PREFIX: &str = "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); ";
-// `cmd.exe` zostaje bez zmian: `chcp 65001` w tej samej linii nie zmienia kodowania poleceń
-// wbudowanych (sprawdzone na prawdziwym `ExecPort`), a zagnieżdżony `cmd` zmieniałby rozbiór
-// cudzysłowów względem tego, co ocenił analizator. Otwarte: dekodowanie OEM w warstwie platformy.
+// `cmd.exe` zostaje bez przedrostka: `chcp 65001` w tej samej linii nie zmienia kodowania poleceń
+// wbudowanych, a zagnieżdżony `cmd` zmieniałby rozbiór cudzysłowów względem tego, co ocenił
+// analizator. Jego wyjście dekoduje warstwa platformy (`ExecPort::decode_output`).
 
 impl ShellToolsConfig {
     /// Program i argumenty dla powłoki (`raw_args` dla `cmd.exe`, którego cudzysłowy różnią się

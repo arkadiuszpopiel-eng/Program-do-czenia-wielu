@@ -4,6 +4,7 @@
 
 mod cmdline;
 mod exec;
+mod oem;
 #[cfg(windows)]
 mod win;
 

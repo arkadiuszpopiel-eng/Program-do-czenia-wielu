@@ -279,6 +279,12 @@ pub trait ExecPort: ProcessPort {
         spec: ExecSpec,
         control: &ExecControl,
     ) -> Result<ExecOutput, PlatformError>;
+
+    /// Przechwycone wyjście jako tekst. Domyślnie UTF-8 ze znakami zastępczymi; implementacja
+    /// systemowa zna kodowanie konsoli (strona kodowa OEM dla `cmd.exe` i starszych narzędzi).
+    fn decode_output(&self, bytes: &[u8]) -> String {
+        String::from_utf8_lossy(bytes).into_owned()
+    }
 }
 
 #[cfg(test)]

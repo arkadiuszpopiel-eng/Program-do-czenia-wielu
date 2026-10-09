@@ -2,7 +2,7 @@
 //! polecenie złożone tak jak w `shell_run` (`ShellToolsConfig::invocation`) i uruchomione przez
 //! prawdziwy `ExecPort` oddaje polskie znaki w UTF-8. Bez przedrostka kodowania Windows PowerShell
 //! i `cmd.exe` piszą do potoku w stronie kodowej OEM (CP852) i model dostawał znaki zastępcze.
-//! Naprawione dla PowerShella; `cmd.exe` — zob. drugi test.
+//! PowerShell dostaje przedrostek kodowania; wyjście `cmd.exe` dekoduje warstwa platformy.
 
 #![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used)]
@@ -59,10 +59,10 @@ fn windows_powershell_output_keeps_polish_characters() {
     assert_eq!(out.trim(), TEXT);
 }
 
-/// `cmd.exe` nadal pisze w stronie kodowej OEM — test utrwala stan faktyczny, żeby zmiana
-/// (dekodowanie OEM w warstwie platformy) była świadoma. Otwarta część S-05.
+/// `cmd.exe` pisze w stronie kodowej OEM — tekst odzyskuje `ExecPort::decode_output` (to, czego
+/// używa `shell_run`), bez zmiany samego polecenia.
 #[test]
-fn cmd_output_is_still_in_the_oem_code_page() {
+fn cmd_output_is_decoded_from_the_oem_code_page() {
     let (program, args, raw_args) =
         ShellToolsConfig::default().invocation(ShellKind::Cmd, &format!("echo {TEXT}"));
     let spec = ExecSpec {
@@ -78,12 +78,14 @@ fn cmd_output_is_still_in_the_oem_code_page() {
         timeout_ms: 60_000,
         max_output_bytes: 4_096,
     };
-    let out = WinProcesses::new(JobLimits::default())
+    let exec = WinProcesses::new(JobLimits::default());
+    let out = exec
         .run_captured(spec, &ExecControl::new())
         .expect("start cmd");
     assert!(matches!(out.termination, ExecTermination::Exited(0)));
     assert!(
-        String::from_utf8(out.stdout).is_err(),
-        "cmd zaczął pisać UTF-8 — można usunąć zastrzeżenie przy S-05"
+        String::from_utf8(out.stdout.clone()).is_err(),
+        "cmd zaczął pisać UTF-8 — dekodowanie OEM przestało być potrzebne"
     );
+    assert_eq!(exec.decode_output(&out.stdout).trim(), TEXT);
 }

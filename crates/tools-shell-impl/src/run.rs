@@ -326,8 +326,9 @@ impl Core {
             ExecTermination::Killed => (Termination::Killed, None),
         };
         let half = self.config.output_max_chars / 2;
+        // Kodowanie konsoli zna warstwa platformy (`cmd.exe` pisze w stronie kodowej OEM).
         let render = |b: &[u8]| {
-            text::truncate_chars(&text::redact_secrets(&String::from_utf8_lossy(b)), half)
+            text::truncate_chars(&text::redact_secrets(&self.exec.decode_output(b)), half)
         };
         let ((stdout, cut_out), (stderr, cut_err)) = (render(&out.stdout), render(&out.stderr));
         let truncated = out.truncated() || cut_out || cut_err;

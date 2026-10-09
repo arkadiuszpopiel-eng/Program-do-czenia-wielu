@@ -193,6 +193,10 @@ impl ExecPort for WinProcesses {
             ))
         }
     }
+
+    fn decode_output(&self, bytes: &[u8]) -> String {
+        super::oem::decode_console(bytes)
+    }
 }
 
 impl ExecPort for crate::WindowsPlatform {
@@ -202,6 +206,10 @@ impl ExecPort for crate::WindowsPlatform {
         control: &ExecControl,
     ) -> Result<ExecOutput, PlatformError> {
         self.processes.run_captured(spec, control)
+    }
+
+    fn decode_output(&self, bytes: &[u8]) -> String {
+        super::oem::decode_console(bytes)
     }
 }
 
