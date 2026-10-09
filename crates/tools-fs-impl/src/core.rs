@@ -242,9 +242,18 @@ impl Core {
 /// Ten sam wpis katalogu: na Windows bez rozróżniania wielkości liter (model podaje ścieżkę
 /// wielkimi literami, system zwraca małymi).
 fn same_entry(a: &Path, b: &Path) -> bool {
-    a == b
-        || (cfg!(windows)
-            && a.to_string_lossy().to_lowercase() == b.to_string_lossy().to_lowercase())
+    a == b || (cfg!(windows) && same_ignoring_case(a, b))
+}
+
+/// Porównanie po składnikach ścieżki — niezależne od rodzaju ukośnika (`docs/Plik.md` podane
+/// przez model i `docs\plik.md` zwrócone przez system to ten sam plik).
+fn same_ignoring_case(a: &Path, b: &Path) -> bool {
+    let lower = |p: &Path| {
+        p.components()
+            .map(|c| c.as_os_str().to_string_lossy().to_lowercase())
+            .collect::<Vec<_>>()
+    };
+    lower(a) == lower(b)
 }
 
 /// Błąd platformy → wynik dla modelu.
@@ -274,5 +283,35 @@ pub(crate) fn undo_failure(e: &UndoError, action: &str) -> ToolOutcome {
             ToolErrorKind::Internal,
             format!("Nie wykonano: {action} — dziennik cofania: {other}."),
         ),
+    }
+}
+
+#[cfg(test)]
+mod same_entry_tests {
+    use super::*;
+
+    /// `fs_stat` zwracał rozmiar 0, gdy model podał ścieżkę z `/` i inną wielkością liter niż na dysku.
+    #[test]
+    fn separators_and_case_do_not_matter_when_matching_a_listed_entry() {
+        let listed = Path::new(r"C:\Dane\docs").join("readme.md");
+        assert!(same_ignoring_case(
+            &listed,
+            Path::new(r"C:\Dane\DOCS\README.MD")
+        ));
+        if cfg!(windows) {
+            assert!(same_ignoring_case(
+                &listed,
+                Path::new("C:/Dane/docs/README.MD")
+            ));
+            assert!(same_entry(&listed, Path::new("c:/dane/docs/Readme.md")));
+        }
+        assert!(!same_ignoring_case(
+            &listed,
+            Path::new(r"C:\Dane\docs\readme.txt")
+        ));
+        assert!(!same_ignoring_case(
+            &listed,
+            Path::new(r"C:\Dane\readme.md")
+        ));
     }
 }

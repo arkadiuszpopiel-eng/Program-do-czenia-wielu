@@ -24,7 +24,8 @@ if [ -x "$_alfa_tools/nodejs/node.exe" ]; then
   PATH="$_alfa_tools/nodejs:$PATH"
 fi
 
-if [ -d "$_alfa_tools" ]; then
+# Bez `cygpath` (np. WSL) zmienne byłyby puste i npm pisałby do katalogu bieżącego.
+if [ -d "$_alfa_tools" ] && command -v cygpath >/dev/null 2>&1; then
   npm_config_cache="$(cygpath -w "$_alfa_tools/npm-cache")"
   npm_config_store_dir="$(cygpath -w "$_alfa_tools/pnpm-store")"
   export npm_config_cache npm_config_store_dir

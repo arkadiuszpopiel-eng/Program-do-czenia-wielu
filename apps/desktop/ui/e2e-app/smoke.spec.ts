@@ -236,40 +236,49 @@ test('Ustawienia → Wygląd: lista wyboru Alfy otwarta w każdym stylu', async 
   await openSettings(main, 'Wygląd');
   await expect(main.locator('select')).toHaveCount(0);
   const style = main.getByRole('combobox', { name: 'Styl', exact: true });
-  for (const skin of ['glass', 'next', 'classic']) {
-    await style.click();
-    const list = main.getByRole('listbox', { name: 'Styl' });
-    await expect(list.getByRole('option')).toHaveCount(3);
-    await list.locator(`[role="option"][data-value="${skin}"]`).click();
-    await expect(style).toHaveAttribute('data-value', skin);
-    await style.click();
-    const look = await list.evaluate((el) => {
-      const probe = document.createElement('canvas').getContext('2d');
-      const rgba = (color: string) => {
-        if (!probe) return [0, 0, 0, 255];
-        probe.clearRect(0, 0, 1, 1);
-        probe.fillStyle = color;
-        probe.fillRect(0, 0, 1, 1);
-        return [...probe.getImageData(0, 0, 1, 1).data];
-      };
-      const lum = ([r = 0, g = 0, b = 0]: number[]) => {
-        const ch = (v: number) => {
-          const c = v / 255;
-          return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  try {
+    for (const skin of ['glass', 'next', 'classic']) {
+      await style.click();
+      const list = main.getByRole('listbox', { name: 'Styl' });
+      await expect(list.getByRole('option')).toHaveCount(3);
+      await list.locator(`[role="option"][data-value="${skin}"]`).click();
+      await expect(style).toHaveAttribute('data-value', skin);
+      await style.click();
+      const look = await list.evaluate((el) => {
+        const probe = document.createElement('canvas').getContext('2d');
+        const rgba = (color: string) => {
+          if (!probe) return [0, 0, 0, 255];
+          probe.clearRect(0, 0, 1, 1);
+          probe.fillStyle = color;
+          probe.fillRect(0, 0, 1, 1);
+          return [...probe.getImageData(0, 0, 1, 1).data];
         };
-        return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b);
-      };
-      const bg = rgba(getComputedStyle(el).backgroundColor);
-      const option = el.querySelector('[role="option"]:not(.active)') ?? el;
-      const fg = rgba(getComputedStyle(option).color);
-      const [hi, lo] = lum(bg) > lum(fg) ? [lum(bg), lum(fg)] : [lum(fg), lum(bg)];
-      return { alpha: bg[3] ?? 0, contrast: (hi + 0.05) / (lo + 0.05) };
-    });
-    expect(look.alpha, `tło listy kryjące (${skin})`).toBe(255);
-    expect(look.contrast, `kontrast opcji (${skin})`).toBeGreaterThanOrEqual(4.5);
-    await shot(alfa, `06a-lista-wyboru-${skin}`);
+        const lum = ([r = 0, g = 0, b = 0]: number[]) => {
+          const ch = (v: number) => {
+            const c = v / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b);
+        };
+        const bg = rgba(getComputedStyle(el).backgroundColor);
+        const option = el.querySelector('[role="option"]:not(.active)') ?? el;
+        const fg = rgba(getComputedStyle(option).color);
+        const [hi, lo] = lum(bg) > lum(fg) ? [lum(bg), lum(fg)] : [lum(fg), lum(bg)];
+        return { alpha: bg[3] ?? 0, contrast: (hi + 0.05) / (lo + 0.05) };
+      });
+      expect(look.alpha, `tło listy kryjące (${skin})`).toBe(255);
+      expect(look.contrast, `kontrast opcji (${skin})`).toBeGreaterThanOrEqual(4.5);
+      await shot(alfa, `06a-lista-wyboru-${skin}`);
+      await main.keyboard.press('Escape');
+      await expect(list).toHaveCount(0);
+    }
+  } finally {
+    // Jedna aplikacja obsługuje wszystkie testy — styl nie może zostać po nieudanej asercji.
     await main.keyboard.press('Escape');
-    await expect(list).toHaveCount(0);
+    if ((await style.getAttribute('data-value')) !== 'classic') {
+      await style.click();
+      await main.locator('[role="option"][data-value="classic"]').click();
+    }
   }
   await expect(main.locator('html')).not.toHaveAttribute('data-skin', /.+/);
 });

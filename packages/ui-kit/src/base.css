@@ -193,6 +193,14 @@ input[type='range']:disabled {
   cursor: default;
 }
 
+/* Wysoki kontrast Windows: kolory z tokenów zlewają się z tłem — wracamy do wyglądu systemu. */
+@media (forced-colors: active) {
+  progress,
+  input[type='range'] {
+    appearance: auto;
+  }
+}
+
 /* Grupa pól: systemowa ramka „rzeźbiona" zastąpiona linią z tokenów. */
 fieldset {
   min-width: 0;

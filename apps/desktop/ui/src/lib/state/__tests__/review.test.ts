@@ -146,3 +146,72 @@ describe('rozmowa — zdarzenia w trakcie wczytywania', () => {
     expect(stops).toBe(1);
   });
 });
+
+// Regresje z przeglądu zmian 0.0.1–0.0.5 (świeży kontekst, 2026-10-09).
+describe('przegląd 0.0.5', () => {
+  it('dwa równoległe wczytania rozmowy to jedno zapytanie i żadne zdarzenie nie ginie', async () => {
+    const streaming = {
+      ...turn('s:t2', 's', null, 'gama', 'Początek', T),
+      status: 'streaming' as const,
+    };
+    const answers: ((v: unknown) => void)[] = [];
+    const client = {
+      turns: { list: () => new Promise((resolve) => answers.push(resolve)) },
+    } as unknown as AlfaClient;
+    const conv = new ConversationState(client, 's');
+    const first = conv.load();
+    const second = conv.load();
+    expect(answers).toHaveLength(1);
+    // Zdarzenie w trakcie: przy dwóch wczytaniach trafiało do drzewa zastępowanego drugą migawką.
+    conv.apply({ type: 'Stop', session_id: 's', turn_id: streaming.id, reason: 'end' });
+    answers[0]?.({ turns: [streaming], annotations: {} });
+    await Promise.all([first, second]);
+    expect(conv.turn(streaming.id)?.status).toBe('complete');
+    // Po zakończeniu kolejne wczytanie znów pyta rdzeń.
+    const again = conv.load();
+    expect(answers).toHaveLength(2);
+    answers[1]?.({ turns: [streaming], annotations: {} });
+    await again;
+  });
+
+  it('usunięcie aktywnej sesji otwiera następną tylko raz, choć zdarzenie o usunięciu już czeka', async () => {
+    const { app } = setupApp();
+    await app.start();
+    const active = app.activeId ?? '';
+    const open = vi.spyOn(app, 'openSession');
+    const removing = app.sessionRemoved(active);
+    // To samo usunięcie wraca zdarzeniem, zanim pierwsze sprzątanie się skończy.
+    const again = app.sessionRemoved(active);
+    await Promise.all([removing, again]);
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(app.activeId).not.toBe(active);
+  });
+
+  it('blokada ponownego uruchomienia jest odpytywana z rdzenia w obie strony', async () => {
+    const view = (blocked: string | null) =>
+      ({
+        phase: 'ready',
+        restart_blocked: blocked ? { pl: blocked, en: blocked } : null,
+      }) as unknown as Awaited<ReturnType<UpdatesApi['status']>>;
+    const updates = new UpdatesState();
+    let blocked: string | null = 'trwa rozmowa głosowa';
+    const api = { status: () => Promise.resolve(view(blocked)) } as unknown as UpdatesApi;
+    // Pierwsze „ready” przychodzi zdarzeniem bez powodu, a agentka jest zajęta.
+    updates.applyEvent(view(null));
+    expect(updates.view?.restart_blocked).toBeNull();
+    await updates.refreshRestartBlock(api);
+    expect(updates.view?.restart_blocked).not.toBeNull();
+    // Rozmowa się skończyła — żadne zdarzenie o tym nie mówi.
+    blocked = null;
+    await updates.refreshRestartBlock(api);
+    expect(updates.view?.restart_blocked).toBeNull();
+  });
+
+  it('prawy panel przeciągnięty dokładnie na szerokość domyślną nie przeskakuje na szerokim oknie', () => {
+    const layout = new LayoutState();
+    const fallback = layout.rightWidth;
+    layout.setRightWidth(fallback);
+    expect(layout.rightWidth).not.toBe(fallback);
+    expect(Math.abs(layout.rightWidth - fallback)).toBe(1);
+  });
+});

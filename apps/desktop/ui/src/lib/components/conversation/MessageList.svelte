@@ -132,7 +132,7 @@
     transform: translateX(-50%);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-full);
-    background: var(--alfa-color-surface);
+    background: var(--alfa-color-overlay, var(--alfa-color-surface));
     box-shadow: var(--alfa-shadow-2);
     color: var(--alfa-color-text);
     font-size: var(--alfa-font-size-sm);

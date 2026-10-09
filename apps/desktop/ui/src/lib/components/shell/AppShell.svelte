@@ -157,7 +157,7 @@
     z-index: 200;
     padding: var(--alfa-space-1) var(--alfa-space-3);
     border-radius: var(--alfa-radius-control);
-    background: var(--alfa-color-surface);
+    background: var(--alfa-color-overlay, var(--alfa-color-surface));
   }
   .skip:focus {
     top: var(--alfa-space-2);

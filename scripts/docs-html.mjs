@@ -4,16 +4,28 @@
 // „Stan” w docs/plan/03-roadmapa.md. Wynik jest deterministyczny (bez dat budowy), więc ponowne
 // uruchomienie bez zmian w źródłach nie zmienia plików.
 //
-// Użycie: node scripts/docs-html.mjs [--check]
-//   --check  kończy się błędem, gdy w źródłach jest zerwany odnośnik względny.
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+// Użycie: node scripts/docs-html.mjs [--check | --verify]
+//   --check   buduje strony i kończy się błędem, gdy w źródłach jest zerwany odnośnik (także
+//             kotwica) albo wiersz roadmapy z nieznanym stanem.
+//   --verify  niczego nie zapisuje: porównuje wynik z docs/html na dysku i kończy się błędem,
+//             gdy zatwierdzona kopia jest nieaktualna (bramka i CI).
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Marked } from 'marked';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'docs', 'html');
-const check = process.argv.includes('--check');
+const verify = process.argv.includes('--verify');
+const check = verify || process.argv.includes('--check');
 const rel = (p) => relative(root, p).split('\\').join('/');
 const list = (dir, filter) =>
   readdirSync(join(root, dir))
@@ -58,8 +70,15 @@ const slugOf = (src) =>
         .toLowerCase();
 const pageOf = new Map(sources.map((src) => [src, `${slugOf(src)}.html`]));
 
-const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const plain = (html) => html.replace(/<[^>]+>/g, '').trim();
+const esc = (s) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" };
+/** Sam tekst z HTML-a: bez znaczników i z rozwiniętymi encjami (ponowne `esc` nie koduje ich dwa razy). */
+const plain = (html) =>
+  html
+    .replace(/<[^>]+>/g, '')
+    .replace(/&(amp|lt|gt|quot|#39);/g, (_, name) => ENTITIES[name])
+    .trim();
 const anchor = (text) =>
   text
     .toLowerCase()
@@ -71,20 +90,50 @@ const anchor = (text) =>
 
 const STATES = ['zrobione', 'w toku', 'do zrobienia', 'czeka', 'planowane', 'badawcze'];
 const broken = [];
+/** Odnośniki z kotwicą do sprawdzenia po wyrenderowaniu wszystkich stron: [źródło, href, strona, kotwica]. */
+const anchors = [];
+const SCHEMES = /^(https?|mailto):/i;
+
+/** Czy ścieżka istnieje dokładnie w tej pisowni (Windows nie rozróżnia wielkości liter, Linux i GitHub — tak). */
+function existsExact(target) {
+  const full = join(root, target);
+  if (!existsSync(full)) return false;
+  return rel(realpathSync.native(full)) === target;
+}
 
 /** Odnośnik względny: do strony HTML, gdy cel jest w zestawie; inaczej do pliku w repozytorium. */
 function rewrite(href, src) {
-  if (/^([a-z]+:|#)/i.test(href)) return href;
-  const [path, hash = ''] = href.split('#');
-  const target = posix.normalize(posix.join(posix.dirname(src), path));
-  // Odnośnik do samego katalogu wynikowego (np. z README planu) — strona obok.
-  if (target.startsWith('docs/html/')) return posix.basename(target) + (hash ? `#${hash}` : '');
-  if (!existsSync(join(root, target))) broken.push(`${src}: ${href}`);
-  let page = pageOf.get(target);
-  if (!page && existsSync(join(root, target, 'README.md')))
-    page = pageOf.get(`${target}/README.md`);
+  if (href.startsWith('#')) {
+    anchors.push([src, href, src, href.slice(1)]);
+    return href;
+  }
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href)) {
+    // Tylko zwykłe adresy; `javascript:` i podobne nie mają czego szukać w dokumentacji.
+    if (!SCHEMES.test(href)) broken.push(`${src}: ${href} (niedozwolony rodzaj adresu)`);
+    return SCHEMES.test(href) ? href : '#';
+  }
+  const [rawPath, hash = ''] = href.split('#');
+  let path = rawPath;
+  try {
+    path = decodeURI(rawPath);
+  } catch {
+    // Zostaje zapis ze źródła.
+  }
+  const target = posix.normalize(posix.join(posix.dirname(src), path)).replace(/\/$/, '');
   const suffix = hash ? `#${hash}` : '';
-  if (page) return `${page}${suffix}`;
+  // Odnośnik do samego katalogu wynikowego (np. z README planu) — strona obok.
+  if (target.startsWith('docs/html/')) {
+    const file = posix.basename(target);
+    if (![...pageOf.values()].includes(file)) broken.push(`${src}: ${href}`);
+    return file + suffix;
+  }
+  if (!existsExact(target)) broken.push(`${src}: ${href}`);
+  let pageSrc = pageOf.has(target) ? target : null;
+  if (!pageSrc && pageOf.has(`${target}/README.md`)) pageSrc = `${target}/README.md`;
+  if (pageSrc) {
+    if (hash) anchors.push([src, href, pageSrc, hash]);
+    return `${pageOf.get(pageSrc)}${suffix}`;
+  }
   return `${posix.relative('docs/html', target)}${suffix}`;
 }
 
@@ -124,13 +173,14 @@ function render(src) {
   const md = readFileSync(join(root, src), 'utf8');
   const body = marked.parse(md);
   const title = plain(/<h1[^>]*>(.*?)<\/h1>/s.exec(body)?.[1] ?? src);
-  return { body, title, toc };
+  return { body, title, toc, ids: used };
 }
 
 /** Postęp etapów: sekcje `## Etap X — …` i wartości kolumny „Stan” w ich tabelach. */
 function progress() {
   const md = readFileSync(join(root, 'docs/plan/03-roadmapa.md'), 'utf8');
   const stages = [];
+  const problems = [];
   let stage = null;
   let stateCol = -1;
   for (const line of md.split(/\r?\n/)) {
@@ -138,24 +188,32 @@ function progress() {
     if (head) {
       stage = { id: head[1], name: head[2], counts: STATES.map(() => 0) };
       stages.push(stage);
+      stateCol = -1;
       continue;
     }
+    if (/^## Etap/.test(line)) problems.push(`nagłówek etapu w nieznanym zapisie: ${line}`);
     if (/^## /.test(line)) stage = null;
+    // Koniec tabeli: następna zaczyna od własnego nagłówka.
+    if (!line.startsWith('|')) stateCol = -1;
     if (!stage || !line.startsWith('|')) continue;
     const cells = line
       .split('|')
       .slice(1, -1)
       .map((c) => c.trim());
     if (cells.includes('Stan')) stateCol = cells.indexOf('Stan');
-    else if (stateCol >= 0 && STATES.includes(cells[stateCol]))
-      stage.counts[STATES.indexOf(cells[stateCol])] += 1;
+    else if (stateCol < 0 || cells.every((c) => /^:?-+:?$/.test(c))) continue;
+    else if (STATES.includes(cells[stateCol])) stage.counts[STATES.indexOf(cells[stateCol])] += 1;
+    // Literówka albo dopisek w kolumnie „Stan” po cichu wypadałby z postępu.
+    else problems.push(`etap ${stage.id}: nieznany stan „${cells[stateCol]}” (${cells[0]})`);
   }
   const updated = /Ostatnia aktualizacja: \*\*([^*]+)\*\*/.exec(md)?.[1] ?? '';
-  return { stages, updated };
+  return { stages, updated, problems };
 }
 
+const roadmap = progress();
+
 function dashboard() {
-  const { stages, updated } = progress();
+  const { stages, updated } = roadmap;
   const version = /^version\s*=\s*"([^"]+)"/m.exec(
     readFileSync(join(root, 'Cargo.toml'), 'utf8'),
   )?.[1];
@@ -198,15 +256,19 @@ function nav(current) {
 }
 
 const pages = new Map(sources.map((src) => [src, render(src)]));
-rmSync(outDir, { recursive: true, force: true });
-mkdirSync(outDir, { recursive: true });
+for (const [src, href, pageSrc, hash] of anchors) {
+  if (!pages.get(pageSrc)?.ids.has(hash)) broken.push(`${src}: ${href} (brak takiej kotwicy)`);
+}
+// Wszystko powstaje w pamięci, zanim cokolwiek zniknie z dysku.
+const board = dashboard();
+const output = new Map();
 for (const [src, page] of pages) {
   const toc =
     page.toc.length > 2
       ? `<aside class="toc" aria-label="Na tej stronie"><ul>${page.toc.map(([id, text]) => `<li><a href="#${id}">${esc(text)}</a></li>`).join('')}</ul></aside>`
       : '';
   const home = src === HOME;
-  const body = home ? page.body.replace(/(<\/h1>\n)/, `$1${dashboard()}`) : page.body;
+  const body = home ? page.body.replace(/(<\/h1>\n)/, `$1${board}`) : page.body;
   const html = `<!doctype html>
 <html lang="pl">
 <head>
@@ -227,9 +289,36 @@ ${nav(src)}
 </body>
 </html>
 `;
-  writeFileSync(join(outDir, pageOf.get(src)), html);
+  output.set(pageOf.get(src), html);
 }
 
-console.log(`docs-html: ${pages.size} stron → ${rel(outDir)}; zerwane odnośniki: ${broken.length}`);
-for (const b of broken) console.log(`  zerwany odnośnik — ${b}`);
-if (check && broken.length) process.exit(1);
+const problems = [
+  ...broken.map((b) => `zerwany odnośnik — ${b}`),
+  ...roadmap.problems.map((p) => `roadmapa — ${p}`),
+];
+if (verify) {
+  // Porównanie z kopią na dysku (bez znaków CR, które dodaje Git na Windows).
+  const text = (s) => s.replace(/\r\n/g, '\n');
+  const onDisk = existsSync(outDir) ? readdirSync(outDir).filter((f) => f.endsWith('.html')) : [];
+  for (const [file, html] of output) {
+    const path = join(outDir, file);
+    if (!existsSync(path)) problems.push(`nieaktualne — brak strony ${file}`);
+    else if (text(readFileSync(path, 'utf8')) !== text(html))
+      problems.push(`nieaktualne — ${file} różni się od źródła`);
+  }
+  for (const file of onDisk) {
+    if (!output.has(file)) problems.push(`nieaktualne — zbędna strona ${file}`);
+  }
+} else {
+  rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(outDir, { recursive: true });
+  for (const [file, html] of output) writeFileSync(join(outDir, file), html);
+}
+
+console.log(
+  `docs-html: ${pages.size} stron ${verify ? 'sprawdzonych z' : '→'} ${rel(outDir)}; problemy: ${problems.length}`,
+);
+for (const p of problems) console.log(`  ${p}`);
+if (verify && problems.some((p) => p.startsWith('nieaktualne')))
+  console.log('  Uruchom: node scripts/docs-html.mjs i zatwierdź docs/html.');
+if (check && problems.length) process.exit(1);

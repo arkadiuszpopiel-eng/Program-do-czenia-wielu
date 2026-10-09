@@ -203,7 +203,14 @@ pub struct ShellTools {
 /// Środowisko procesu jako tekst. `std::env::vars()` panikuje, gdy nazwa albo wartość nie jest
 /// poprawnym Unicode — takie zmienne są pomijane (i tak nie dałoby się ich przekazać dalej).
 fn process_env() -> Vec<(String, String)> {
-    std::env::vars_os()
+    text_env(std::env::vars_os())
+}
+
+/// Zmienne, których nazwa i wartość są poprawnym Unicode.
+fn text_env(
+    vars: impl IntoIterator<Item = (std::ffi::OsString, std::ffi::OsString)>,
+) -> Vec<(String, String)> {
+    vars.into_iter()
         .filter_map(|(name, value)| Some((name.into_string().ok()?, value.into_string().ok()?)))
         .collect()
 }
@@ -291,6 +298,23 @@ mod tests {
                 .any(|(name, _)| name.eq_ignore_ascii_case("PATH"))
         );
         assert!(env.iter().all(|(name, _)| !name.is_empty()));
+    }
+
+    /// Zmienna z niesparowanym surogatem UTF-16 (dozwolona w Windows) nie wywołuje paniki — jest
+    /// pomijana, a pozostałe zostają. Ze starym `std::env::vars()` ten przypadek kończył proces.
+    #[cfg(windows)]
+    #[test]
+    fn variables_that_are_not_unicode_are_skipped() {
+        use std::ffi::OsString;
+        use std::os::windows::ffi::OsStringExt;
+
+        let broken = OsString::from_wide(&[0x0041, 0xD800]);
+        let env = text_env([
+            (OsString::from("DOBRA"), OsString::from("zażółć")),
+            (OsString::from("ZLA_WARTOSC"), broken.clone()),
+            (broken, OsString::from("x")),
+        ]);
+        assert_eq!(env, [("DOBRA".to_owned(), "zażółć".to_owned())]);
     }
 
     #[test]

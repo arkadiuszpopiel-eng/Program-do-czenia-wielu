@@ -70,7 +70,10 @@ export class LayoutState {
   }
 
   setRightWidth(width: number): void {
-    this.rightWidth = clampRight(width);
+    // Wartość domyślna znaczy „dopasuj do okna” (na szerokim oknie panel rośnie), więc ręcznie
+    // ustawiona szerokość nie może być jej równa — inaczej panel przeskakiwał.
+    const next = clampRight(width);
+    this.rightWidth = next === RIGHT_DEFAULT ? RIGHT_DEFAULT + 1 : next;
     this.save();
   }
 

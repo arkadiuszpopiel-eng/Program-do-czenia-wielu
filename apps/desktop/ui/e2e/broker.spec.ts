@@ -57,7 +57,9 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(page.getByText(/Broker jest niedostępny — tej prośby nie da się/)).toBeVisible();
       // Opis z przyczyną pada raz (wcześniej baner powtarzał to samo zdanie), a karta nie udaje,
       // że okno Brokera da się otworzyć.
-      await expect(alert.getByText(/Bezpieczny stan/)).toHaveCount(1);
+      // Liczymy wystąpienia w tekście, nie elementy — zdanie powtórzone w jednym akapicie też jest błędem.
+      const repeats = ((await alert.innerText()).match(/bezpieczny stan/gi) ?? []).length;
+      expect(repeats, 'zdanie o bezpiecznym stanie pada raz').toBe(1);
       await expect(alert).toContainText('proces Brokera zakończył działanie');
       await expect(page.getByRole('button', { name: /Otwórz w oknie Brokera/ })).toHaveCount(0);
       await expectAccessible(page, `Broker zerwany ${theme}`);

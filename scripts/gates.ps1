@@ -21,6 +21,8 @@ param(
 )
 
 Set-StrictMode -Version 1.0
+# Z `-File` lista `-Test a,b` przychodzi jako jeden napis — dzielimy ją sami.
+$Test = @($Test | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 $Root = Split-Path -Parent $PSScriptRoot
 . (Join-Path $PSScriptRoot 'portable-env.ps1') -Quiet
 Set-Location $Root
@@ -66,8 +68,10 @@ else { Skip-Gate 'Graf zależności modułów (check-deps.sh)' 'wymaga bash i jq
 Invoke-Gate 'Interfejs: lint (eslint, Svelte 5, CSS)' { & pnpm lint }
 Invoke-Gate 'Interfejs: typy (svelte-check)' { & pnpm check }
 Invoke-Gate 'Interfejs: testy jednostkowe (vitest)' { & pnpm --filter '@alfa/desktop-ui' test }
+Invoke-Gate 'Numer wersji spójny we wszystkich plikach' { & node scripts/set-version.mjs --check }
 Invoke-Gate 'Katalog modułów (docs/CATALOG.md)' { & node scripts/catalog.mjs }
-Invoke-Gate 'Plan w HTML i odnośniki (docs/html)' { & node scripts/docs-html.mjs --check }
+# Tylko porównanie: nieaktualna kopia w repozytorium ma zatrzymać bramkę, a nie po cichu się odświeżyć.
+Invoke-Gate 'Plan w HTML: aktualność i odnośniki (docs/html)' { & node scripts/docs-html.mjs --verify }
 
 if ($Test.Count -gt 0) {
     $packages = @(); foreach ($c in $Test) { $packages += @('-p', $c) }

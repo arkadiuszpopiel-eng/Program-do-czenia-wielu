@@ -45,7 +45,21 @@ export class ConversationState {
   /** Zdarzenia, które przyszły w trakcie `load` (`null` — nic się nie wczytuje). */
   private duringLoad: ChatStreamEvent[] | null = null;
 
-  async load(): Promise<void> {
+  /** Trwające wczytywanie — drugie wywołanie czeka na to samo zamiast zaczynać własne. */
+  private loading: Promise<void> | null = null;
+
+  /**
+   * Wczytuje rozmowę. Dwa równoległe wczytania psuły odtwarzanie zdarzeń: pierwsze kończyło
+   * bufor drugiego i zdarzenia (np. „Stop”) trafiały do drzewa, które zaraz było zastępowane.
+   */
+  load(): Promise<void> {
+    this.loading ??= this.loadOnce().finally(() => {
+      this.loading = null;
+    });
+    return this.loading;
+  }
+
+  private async loadOnce(): Promise<void> {
     this.duringLoad = [];
     try {
       const snapshot = await this.client.turns.list(this.sessionId);

@@ -60,7 +60,18 @@
   // Gest użytkownika: kółko, dotyk i klawisze działają przez chwilę po zdarzeniu, przeciąganie
   // (pasek przewijania, zaznaczanie tekstu) — dopóki przycisk jest wciśnięty.
   const USER_INTENT_MS = 400;
-  const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
+  // Tab przenosi fokus do elementu poza widokiem, a przeglądarka przewija do niego — bez tego
+  // lista wracała na dół i fokus zostawał poza ekranem.
+  const SCROLL_KEYS = new Set([
+    'ArrowUp',
+    'ArrowDown',
+    'PageUp',
+    'PageDown',
+    'Home',
+    'End',
+    ' ',
+    'Tab',
+  ]);
   let userUntil = 0;
   let dragging = false;
 
@@ -81,6 +92,13 @@
   function onPointerUp() {
     dragging = false;
     userIntent();
+    releasePointer();
+  }
+
+  /** Odpala się tylko jedno z dwóch zdarzeń — drugie trzeba zdjąć ręcznie. */
+  function releasePointer() {
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
   }
 
   function onScroll() {
@@ -152,6 +170,8 @@
     el?.addEventListener('touchmove', userIntent, passive);
     el?.addEventListener('keydown', onKeydown);
     el?.addEventListener('pointerdown', onPointerDown, passive);
+    // Fokus przeniesiony do wiadomości (Tab, czytnik ekranu) przewija listę — to wybór użytkownika.
+    el?.addEventListener('focusin', userIntent);
     lastCount = items.length;
     requestAnimationFrame(stickIfNeeded);
     return () => {
@@ -159,6 +179,8 @@
       el?.removeEventListener('touchmove', userIntent);
       el?.removeEventListener('keydown', onKeydown);
       el?.removeEventListener('pointerdown', onPointerDown);
+      el?.removeEventListener('focusin', userIntent);
+      releasePointer();
       observer?.disconnect();
       viewportObserver.disconnect();
     };

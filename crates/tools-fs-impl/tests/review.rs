@@ -26,6 +26,11 @@ async fn windows_device_names_are_refused_before_any_file_access() {
             !read.is_ok(),
             "odczyt „{path}” powinien być odrzucony: {read:?}"
         );
+        // Sama odmowa to za mało — atrapa nie ma takiego pliku, więc odczyt i tak by się nie udał.
+        assert!(
+            format!("{read:?}").contains("niedozwolon"),
+            "odczyt „{path}” ma być odrzucony jako niedozwolona ścieżka: {read:?}"
+        );
         let write = h
             .call(
                 K::Write,

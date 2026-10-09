@@ -253,8 +253,13 @@ function Invoke-Step([string]$Title, [scriptblock]$Action) {
 # Data kompilacji i commit dla „O programie". Wydanie ustawia je w workflow; budowa lokalna bez nich
 # pokazywała tylko „build deweloperski", więc nie było widać, z jakiego stanu kodu pochodzi program.
 function Set-BuildStamp {
-    if (-not $env:ALFA_BUILD_DATE) { $env:ALFA_BUILD_DATE = (Get-Date).ToString('yyyy-MM-dd') }
-    if (-not $env:ALFA_BUILD_COMMIT) {
+    # Wartości ustawione przez nas liczymy od nowa przy każdej budowie — w tym samym oknie po
+    # `git pull` zostawał stary commit. Wartości podane z zewnątrz (CI, wydanie) zostają.
+    if ($script:StampIsOurs -or -not $env:ALFA_BUILD_DATE) {
+        $env:ALFA_BUILD_DATE = (Get-Date).ToString('yyyy-MM-dd')
+    }
+    if ($script:StampIsOurs -or -not $env:ALFA_BUILD_COMMIT) {
+        $script:StampIsOurs = $true
         $sha = (& git -C $Root rev-parse --short HEAD 2>$null)
         if ($sha) {
             $dirty = @(& git -C $Root status --porcelain 2>$null).Count -gt 0

@@ -13,12 +13,20 @@
   const view = $derived(app.updates.view);
   let busy = $state(false);
 
+  // Blokada znika bez zdarzenia (koniec rozmowy głosowej albo zadania) — dopóki trwa, pytamy rdzeń.
+  $effect(() => {
+    if (!view?.restart_blocked) return;
+    const timer = setInterval(() => void app.updates.refreshRestartBlock(app.client.updates), 5000);
+    return () => clearInterval(timer);
+  });
+
   async function restart() {
     busy = true;
     try {
       await app.client.updates.restart();
       await app.updates.load(app.client.updates);
     } catch (error) {
+      void app.updates.refreshRestartBlock(app.client.updates);
       app.toasts.show({
         kind: 'error',
         message: error instanceof Error ? error.message : String(error),

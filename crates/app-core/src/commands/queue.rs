@@ -2,7 +2,7 @@
 
 use std::collections::{BTreeMap, VecDeque};
 
-use sessions_contract::{SessionHistory, SessionId, TurnId};
+use sessions_contract::{SessionCatalog, SessionHistory, SessionId, TurnId};
 
 use crate::core::AppCore;
 use crate::dto::{AlfaEvent, SystemStatus, TurnStatus};
@@ -25,32 +25,33 @@ fn requeue(queue: &mut BTreeMap<SessionId, Vec<TurnId>>, entries: impl IntoItera
 impl AppCore {
     /// Wysyła wiadomości z kolejki offline (po jednej odpowiedzi na sesję — na ostatnią).
     pub(crate) async fn flush_queue(&self) -> Result<(), AppError> {
-        let (mut queued, trashed): (VecDeque<Entry>, Vec<SessionId>) = {
-            let mut rt = self.rt();
-            let trashed = rt.trash.values().map(|(id, _)| id.clone()).collect();
-            (
-                std::mem::take(&mut rt.queued).into_iter().collect(),
-                trashed,
-            )
-        };
+        let mut queued: VecDeque<Entry> =
+            std::mem::take(&mut self.rt().queued).into_iter().collect();
+        // Wpisy, które zostają w kolejce: sesje w koszu i sesje, których odpowiedź nie wystartowała.
+        let mut waiting: Vec<Entry> = Vec::new();
+        let mut first_error = None;
         while let Some((id, turns)) = queued.pop_front() {
             // Sesja w koszu (trwa okno cofnięcia usunięcia): bez odpowiedzi modelu — wpis czeka
-            // na „Cofnij" albo znika razem z sesją (`shred_session`).
-            if trashed.contains(&id) {
-                requeue(&mut self.rt().queued, [(id, turns)]);
+            // na „Cofnij" albo znika razem z sesją (`shred_session`). Kosz sprawdzamy przy każdej
+            // sesji, bo usunięcie mogło nastąpić w trakcie opróżniania kolejki.
+            let trashed = self.rt().trash.values().any(|(sid, _)| *sid == id);
+            if trashed {
+                waiting.push((id, turns));
                 continue;
             }
+            // Sesja usunięta ostatecznie w trakcie opróżniania: jej wpis znika, nie wraca.
+            if self.inner.sessions.session(&id).is_err() {
+                continue;
+            }
+            // Błąd jednej sesji nie gubi jej wiadomości i nie zatrzymuje pozostałych sesji
+            // (wcześniej sesja, która trwale nie startowała, blokowała wszystkie następne).
             if let Err(e) = self.flush_session(&id, &turns).await {
-                // Błąd jednej sesji nie może zgubić kolejki: ta sesja i wszystkie nieobsłużone
-                // wracają do kolejki (nowe wpisy, które doszły w międzyczasie, zostają na końcu).
-                requeue(
-                    &mut self.rt().queued,
-                    std::iter::once((id, turns)).chain(queued),
-                );
-                return Err(e);
+                waiting.push((id, turns));
+                first_error.get_or_insert(e);
             }
         }
-        Ok(())
+        requeue(&mut self.rt().queued, waiting);
+        first_error.map_or(Ok(()), Err)
     }
 
     /// Usuwa wpisy kolejki offline ostatecznie usuwanej sesji.
@@ -63,16 +64,6 @@ impl AppCore {
         {
             let id = id.clone();
             let _guard = self.lock_session(&id).await;
-            for turn in turns {
-                self.inner
-                    .store
-                    .push_status(&id, *turn, TurnStatus::Complete)?;
-                self.emit(AlfaEvent::TurnStatus {
-                    session_id: id.to_string(),
-                    turn_id: ids::turn_dto(&id, *turn),
-                    status: TurnStatus::Complete,
-                });
-            }
             let Some(last) = turns.last().copied() else {
                 return Ok(());
             };
@@ -91,6 +82,18 @@ impl AppCore {
                     tap: None,
                 })
                 .await?;
+            // Dopiero gdy odpowiedź wystartowała: wiadomości przestają być „w kolejce”. Wcześniej
+            // status zmieniał się przed startem i po błędzie interfejs pokazywał je jako wysłane.
+            for turn in turns {
+                self.inner
+                    .store
+                    .push_status(&id, *turn, TurnStatus::Complete)?;
+                self.emit(AlfaEvent::TurnStatus {
+                    session_id: id.to_string(),
+                    turn_id: ids::turn_dto(&id, *turn),
+                    status: TurnStatus::Complete,
+                });
+            }
         }
         Ok(())
     }

@@ -131,6 +131,10 @@ jobs:
       - name: Kontrast WCAG
         run: pnpm --filter @alfa/ui-kit check:contrast
       - run: pnpm lint
+      - name: Numer wersji spójny we wszystkich plikach (także manifesty modułów)
+        run: node scripts/set-version.mjs --check
+      - name: Plan w HTML jest aktualny (docs/html), odnośniki i roadmapa są spójne
+        run: node scripts/docs-html.mjs --verify
       - run: pnpm check
       - run: pnpm -r build
       - name: Budżet bundla

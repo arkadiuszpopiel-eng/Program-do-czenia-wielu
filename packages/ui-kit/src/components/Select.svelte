@@ -8,6 +8,7 @@
   import Check from '@lucide/svelte/icons/check';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import { tick } from 'svelte';
+  import { uiZoom } from '../zoom';
 
   interface Option {
     readonly value: string;
@@ -43,6 +44,10 @@
   let anchor = $state<HTMLElement | null>(null);
   let open = $state(false);
   let upward = $state(false);
+  let alignEnd = $state(false);
+  let list = $state<HTMLElement | null>(null);
+  /** Chwila zamknięcia kliknięciem poza listą — klik etykiety nie może jej zaraz otworzyć. */
+  let closedAt = 0;
   let active = $state(-1);
   let typed = '';
   let typedAt = 0;
@@ -60,11 +65,16 @@
 
   async function show(start?: number) {
     if (disabled) return;
-    if (anchor) upward = anchor.getBoundingClientRect().bottom > window.innerHeight * 0.6;
+    // Wymiary elementów są w jednostkach po skali interfejsu, okno — w pikselach okna.
+    const zoom = uiZoom();
+    if (anchor) upward = anchor.getBoundingClientRect().bottom > (window.innerHeight / zoom) * 0.6;
     const selected = options.findIndex((o) => o.value === value && !o.disabled);
     active = start ?? (selected >= 0 ? selected : enabledFrom(0, 1));
+    alignEnd = false;
     open = true;
     await tick();
+    // Lista szersza niż przycisk nie może wyjść za prawą krawędź okna — wtedy równa do prawej.
+    if (list && list.getBoundingClientRect().right > window.innerWidth / zoom - 8) alignEnd = true;
     reveal();
   }
 
@@ -96,6 +106,12 @@
     return options.findIndex((o) => !o.disabled && o.label.toLocaleLowerCase().startsWith(needle));
   }
 
+  /** Znak do wyszukiwania po pierwszych literach. AltGr (polskie ą, ś, ł) zgłasza Ctrl+Alt. */
+  function isTypeahead(event: KeyboardEvent): boolean {
+    if (event.key.length !== 1 || event.metaKey) return false;
+    return event.getModifierState('AltGraph') || (!event.ctrlKey && !event.altKey);
+  }
+
   function onKey(event: KeyboardEvent) {
     const { key } = event;
     if (!open) {
@@ -105,7 +121,7 @@
       } else if (key === 'Home' || key === 'End') {
         event.preventDefault();
         void show(key === 'Home' ? enabledFrom(0, 1) : enabledFrom(options.length - 1, -1));
-      } else if (key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      } else if (isTypeahead(event)) {
         const hit = typeahead(key);
         if (hit >= 0) void show(hit);
       }
@@ -132,13 +148,16 @@
     } else if (key === 'End') {
       event.preventDefault();
       move(enabledFrom(options.length - 1, -1));
-    } else if (key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
+    } else if (isTypeahead(event)) {
       move(typeahead(key));
     }
   }
 
   function onWindowPointer(event: PointerEvent) {
-    if (open && anchor && !anchor.contains(event.target as Node)) open = false;
+    if (open && anchor && !anchor.contains(event.target as Node)) {
+      open = false;
+      closedAt = performance.now();
+    }
   }
 </script>
 
@@ -159,7 +178,13 @@
     aria-labelledby={labelledby}
     aria-describedby={describedby}
     data-value={value}
-    onclick={() => (open ? (open = false) : void show())}
+    onclick={() => {
+      // Klik w tekst etykiety zamyka listę (klik poza nią), a przeglądarka zaraz przekazuje go
+      // przyciskowi — bez tej przerwy lista od razu otwierała się ponownie.
+      if (open) open = false;
+      else if (performance.now() - closedAt > 300) void show();
+    }}
+    onblur={() => (open = false)}
     onkeydown={onKey}
   >
     <span class="value">{current?.label ?? ''}</span>
@@ -169,6 +194,12 @@
     <div
       class="list"
       class:upward
+      class:end={alignEnd}
+      bind:this={list}
+      onpointerdown={(event) => event.preventDefault()}
+      onclick={(event) => event.preventDefault()}
+      onkeydown={onKey}
+      tabindex="-1"
       role="listbox"
       id={listId}
       aria-label={labelledby ? undefined : label}
@@ -276,13 +307,18 @@
     padding: var(--alfa-space-1);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-card);
-    background: var(--alfa-color-surface);
+    /* Nakładka nad treścią musi być kryjąca także w stylach z półprzezroczystą powierzchnią. */
+    background: var(--alfa-color-overlay, var(--alfa-color-surface));
     box-shadow: var(--alfa-shadow-3);
     color: var(--alfa-color-text);
     font-size: var(--alfa-font-size-md);
   }
   .sm .list {
     font-size: var(--alfa-font-size-sm);
+  }
+  .list.end {
+    left: auto;
+    right: 0;
   }
   .list.upward {
     top: auto;

@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 107 |
 | Specyfikacje w indeksie | 85 |
 | Manifesty `module.toml` | 67 |
-| Linie Rust (z testami) | 373 765 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2523 |
+| Linie Rust (z testami) | 374 154 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2532 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -34,7 +34,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `device-profile` | F1 | service | inproc | C · I · F | 2561 | 21 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
 | `platform` | — | — | — | C · F | 13 977 | 109 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 4837 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
-| `platform-windows` | F1, F5, F6 | service | inproc | I | 6821 | 60 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| `platform-windows` | F1, F5, F6 | service | inproc | I | 6897 | 63 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2161 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-ocr` | F1, F5, F6 | — | — | I | 266 | 2 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -113,13 +113,13 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `tools-browser` | F6 | tool | inproc | C · I · F | 1572 | 8 | [tools-browser](modules/tools-browser/SPEC.md) | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
 | `tools-clipboard` | F3 | tool | inproc | C · I · F | 1060 | 10 | [tools-clipboard](modules/tools-clipboard/SPEC.md) | Odczyt (taint) i zapis schowka z cofaniem; historia schowka — szkic. |
 | `tools-common` | F3 | — | — | C | 2071 | 22 | [tools-common](modules/tools-common/SPEC.md) | Wspólny kontrakt narzędzi: manifest, `Tool`, `BrokerGate`, zasady ścieżek i treści niezaufanej. |
-| `tools-fs` | F3 | tool | inproc | C · I · F | 2714 | 23 | [tools-fs](modules/tools-fs/SPEC.md) | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza. |
+| `tools-fs` | F3 | tool | inproc | C · I · F | 2758 | 24 | [tools-fs](modules/tools-fs/SPEC.md) | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza. |
 | `tools-input` | F5–F6 | tool | inproc | C · I · F | 1694 | 16 | [tools-input](modules/tools-input/SPEC.md) | `SendInput` ze strażnikiem celów i przerwaniem przy fizycznym wejściu użytkownika. |
 | `tools-media` | F6 | tool | inproc | C · I · F | 3271 | 25 | [tools-media](modules/tools-media/SPEC.md) | Nagłówki multimediów bez ffmpeg, konwersje przez sidecar ffmpeg jako nowy plik z „Cofnij”, odtwarzanie w kolejce mówienia z duckingiem. |
 | `tools-net` | F6 | tool | inproc | C · I · F | 3072 | 29 | [tools-net](modules/tools-net/SPEC.md) | `net_fetch`/`net_download` tylko https do hostów publicznych, każdy host i przekierowanie przez Brokera, rebinding odrzucany, kwarantanna z SHA-256 i MOTW. |
 | `tools-office` | F6 | tool | inproc | C · I · F | 1703 | 12 | [tools-office](modules/tools-office/SPEC.md) | Word/Excel przez COM: odczyt (niezaufany) i edycja kopii jako nowa wersja z „Cofnij”; makra wyłączone. |
 | `tools-screen` | F6 | tool | inproc | C · I · F | 884 | 8 | [tools-screen](modules/tools-screen/SPEC.md) | Zrzuty na żądanie z maskowaniem okien Alfy/Brokera, deny-listy i pól haseł. |
-| `tools-shell` | F3 | tool | process | C · I · F | 2065 | 25 | [tools-shell](modules/tools-shell/SPEC.md) | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”. |
+| `tools-shell` | F3 | tool | process | C · I · F | 2127 | 26 | [tools-shell](modules/tools-shell/SPEC.md) | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”. |
 | `tools-system` | F6 | tool | inproc | C · I · F | 2784 | 22 | [tools-system](modules/tools-system/SPEC.md) | Procesy (zakończenie ze strażnikiem celów i tożsamością), usługi przez `system.admin`, Dziennik zdarzeń, zmienne z cofaniem, stan systemu. |
 | `tools-uia` | F5–F6 | tool | inproc | C · I · F | 1586 | 11 | [tools-uia](modules/tools-uia/SPEC.md) | Drzewo UIA, odczyt `TextPattern`, akcje tylko przez wzorce; wartości haseł nigdy nie wychodzą. |
 | `tools-vision` | F6 | tool | inproc | C · I · F | 2609 | 20 | [tools-vision](modules/tools-vision/SPEC.md) | OCR zrzutu/pliku (`Windows.Media.Ocr`) i opis obrazu przez Router „GUI/wizja”; maskowanie przed OCR i modelem; sesja prywatna tylko lokalnie. |
@@ -145,7 +145,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4287 | 23 | — |  |
 | `app-chat` | — | — | — | pojedynczy | 2123 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 12 819 | 78 | — |  |
+| `app-core` | — | — | — | pojedynczy | 12 928 | 79 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3184 | 26 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
 | `app-health` | — | — | — | pojedynczy | 1481 | 6 | — |  |
@@ -159,7 +159,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-store` | — | — | — | pojedynczy | 468 | 0 | — |  |
 | `app-tasks` | — | — | — | pojedynczy | 3063 | 7 | — |  |
 | `app-terminal` | — | — | — | pojedynczy | 441 | 2 | — |  |
-| `app-updates` | — | — | — | pojedynczy | 991 | 7 | — |  |
+| `app-updates` | — | — | — | pojedynczy | 1089 | 10 | — |  |
 | `app-voice` | — | — | — | pojedynczy | 4875 | 20 | — |  |
 
 ## Biblioteki wspólne (`lib-*`)

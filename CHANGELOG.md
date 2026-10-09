@@ -3,9 +3,59 @@
 Każda seria poprawek podnosi numer wersji i dostaje wpis w tym pliku — po ludzku, od najnowszej. Wpis jest też
 źródłem okna „Co nowego” w programie (wstęp i pierwsze zdanie każdej pozycji; sekcje „Testy” i „Przyczyna błędu”
 są tam pomijane), więc pierwsze zdanie pozycji ma mówić, co się zmieniło dla użytkownika. Numer jest w
-czterech miejscach naraz: `Cargo.toml` (workspace), `apps/desktop/src-tauri/Cargo.toml`,
-`apps/desktop/src-tauri/tauri.conf.json`, `apps/desktop/ui/package.json`. Szczegóły techniczne każdej pozycji:
+kilku miejscach naraz (workspace Cargo, dwa pliki powłoki Tauri, interfejs i manifesty modułów), dlatego zmienia go
+wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza `node scripts/set-version.mjs --check`
+(bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
+
+## 0.0.6 — 2026-10-09
+
+Poprawki po przeglądzie wszystkich zmian od 0.0.1 (trzy niezależne przeglądy w świeżym kontekście).
+
+### Rozmowa i interfejs
+
+- Przejście klawiszem Tab do wiadomości powyżej nie odsyła już listy na dół — fokus zostaje w widoku (także z czytnikiem
+  ekranu).
+- Lista wyboru: polskie litery wpisywane z AltGr przeskakują do opcji; lista zamyka się, gdy fokus przejdzie gdzie indziej;
+  klik w tekst etykiety nie otwiera jej ponownie; przy skali powyżej 100 % w dolnej części okna otwiera się w górę, a przy
+  prawej krawędzi równa do prawej. To samo przeliczenie skali dostało menu przycisków.
+- Styl „Szkło”: przycisk „nowe wiadomości”, podpowiedzi pola pisania i link „pomiń” mają kryjące tło; lista w palecie
+  poleceń nie dostaje już zbędnego cienia.
+- Tryb wysokiego kontrastu Windows: suwaki i paski postępu wracają do wyglądu systemowego, żeby tor był widoczny.
+- Dwa równoległe wczytania tej samej rozmowy nie gubią już zdarzenia „Stop”; usunięcie aktywnej sesji otwiera następną
+  raz, nie dwa.
+- Przycisk „Uruchom ponownie” po aktualizacji pyta rdzeń o blokadę (trwająca rozmowa głosowa, zadanie agentki) — nie
+  zostaje wyłączony po jej ustaniu ani włączony wbrew stanowi.
+- Prawy panel przeciągnięty dokładnie na szerokość domyślną nie przeskakuje na szerokim oknie.
+
+### Narzędzia agentek i rdzeń
+
+- Wyjście PowerShella ucięte limitem w środku znaku albo z pojedynczym obcym bajtem zostaje czytelne — wcześniej całe
+  zamieniało się w krzaczki.
+- Polecenia PowerShella zaczynające się od `using`, `param` albo `#requires` znów działają (dopisywany przedrostek
+  kodowania robił z nich błąd składni).
+- Kolejka offline: sesja, której odpowiedź nie może wystartować, nie blokuje pozostałych; jej wiadomość zostaje w kolejce
+  i nie jest pokazywana jako wysłana.
+- `fs_stat` podaje prawdziwy rozmiar pliku także wtedy, gdy ścieżka różni się wielkością liter i rodzajem ukośnika.
+- „Co nowego”: pozycje nie urywają się na dwukropku („Szkło.”), skrót „ok.” nie kończy zdania, za długi wpis kończy się
+  dopiskiem zamiast po cichu gubić pozycje.
+
+### Numer wersji i dokumenty
+
+- Podbijanie wersji w czterech plikach zostawiało manifesty modułów przy starym numerze i psuło ok. 20 testów — od 0.0.2.
+  Numer zmienia teraz jeden skrypt (`scripts/set-version.mjs`), a bramka i CI sprawdzają spójność.
+- `docs/html`: bramka i CI sprawdzają, czy zatwierdzona kopia jest aktualna (wcześniej bramka po cichu ją odświeżała);
+  sprawdzane są też kotwice, a wiersz roadmapy z nieznanym stanem jest błędem. Poprawione podwójne kodowanie znaków
+  w tytułach stron.
+- `gates.ps1 -Test a,b` działa zgodnie z opisem; znacznik budowy w „O programie” nie zostaje stary po `git pull`.
+
+### Testy
+
+- Kontrast tekstu jest mierzony po złożeniu warstw (półprzezroczyste tła), we wszystkich stylach i motywach — test
+  dostępności nie oceniał tekstu nad gradientem. Miernik ma własny test, który musi odrzucić nieczytelny napis.
+- Testy regresji dla każdej poprawki powyżej; test fokusu sprawdzony także bez poprawki (jest wtedy czerwony).
+- Wzmocnione testy, które przechodziły także bez poprawek (nazwy urządzeń przy odczycie, zmienne środowiskowe spoza
+  Unicode, „rozmowa otwiera się na dole”, powtórzone zdanie w banerze Brokera, kryjące tło okna Szybkiego pytania).
 
 ## 0.0.5 — 2026-10-09
 

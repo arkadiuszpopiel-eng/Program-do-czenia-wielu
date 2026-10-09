@@ -172,10 +172,15 @@ for (const [width, height] of [
     await openApp(page);
     await waitForChat(page);
     await page.waitForTimeout(800);
-    const gap = await page.evaluate(() => {
+    const { gap, scrollable } = await page.evaluate(() => {
       const feed = document.querySelector('[role=feed]') as HTMLElement;
-      return feed.scrollHeight - feed.scrollTop - feed.clientHeight;
+      return {
+        gap: feed.scrollHeight - feed.scrollTop - feed.clientHeight,
+        scrollable: feed.scrollHeight - feed.clientHeight,
+      };
     });
+    // Bez przewijania odległość od dołu zawsze wynosi 0 i test niczego by nie sprawdzał.
+    expect(scrollable, 'rozmowa dłuższa niż okno').toBeGreaterThan(100);
     expect(gap, 'odległość od dołu').toBeLessThanOrEqual(24);
     await expect(page.getByRole('button', { name: /Przewiń do najnowszych/ })).toHaveCount(0);
   });

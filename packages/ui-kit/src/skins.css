@@ -99,6 +99,8 @@
     /* Tło kryjące dla warstw nad treścią (menu, okna dialogowe, szuflady, powiadomienia): bez
        rozmycia półprzezroczysta warstwa nad tekstem byłaby nieczytelna. */
     --alfa-skin-solid: light-dark(#f7f8ff, #171c36);
+    /* Tło elementów pływających nad treścią (lista wyboru, podpowiedzi, „nowe wiadomości”). */
+    --alfa-color-overlay: var(--alfa-skin-solid);
     --alfa-skin-aurora-1: light-dark(rgba(129, 140, 248, 0.42), rgba(99, 102, 241, 0.4));
     --alfa-skin-aurora-2: light-dark(rgba(56, 189, 248, 0.36), rgba(34, 197, 232, 0.3));
     --alfa-skin-aurora-3: light-dark(rgba(244, 114, 182, 0.28), rgba(236, 72, 153, 0.24));
@@ -126,8 +128,7 @@
   :root[data-skin='glass'] [data-surface='app'] {
     background: transparent;
   }
-  :root[data-skin='glass']
-    :is(dialog, [role='dialog'], [role='alertdialog'], [role='menu'], [role='listbox']),
+  :root[data-skin='glass'] :is(dialog, [role='dialog'], [role='alertdialog'], [role='menu']),
   :root[data-skin='glass'] .toasts > * {
     background-color: var(--alfa-skin-solid);
     box-shadow: var(--alfa-shadow-3);

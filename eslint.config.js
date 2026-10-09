@@ -71,9 +71,21 @@ export default ts.config(
       'svelte/no-unused-svelte-ignore': 'error',
       'svelte/prefer-svelte-reactivity': 'error',
       'svelte/no-reactive-reassign': 'error',
-      // `{' '}` przed separatorem „·” jest celowe: bez niego Svelte skleja kropkę z poprzednim
-      // słowem (pilnuje tego scripts/check-svelte5.mjs).
-      'svelte/no-useless-mustaches': 'off',
     },
+  },
+  {
+    // `{' '}` przed separatorem „·” jest celowe: bez niego Svelte skleja kropkę z poprzednim
+    // słowem (pilnuje tego scripts/check-svelte5.mjs). Reguła zostaje włączona wszędzie indziej;
+    // nowy plik z takim separatorem trzeba tu dopisać świadomie.
+    files: [
+      'apps/desktop/ui/src/lib/components/panels/MemoryDetail.svelte',
+      'apps/desktop/ui/src/lib/components/panels/MemoryPanel.svelte',
+      'apps/desktop/ui/src/lib/components/panels/TaskNode.svelte',
+      'apps/desktop/ui/src/lib/components/panels/TimelinePanel.svelte',
+      'apps/desktop/ui/src/lib/views/settings/pages/MemoryPage.svelte',
+      'apps/desktop/ui/src/lib/views/settings/pages/TransferImport.svelte',
+      'apps/desktop/ui/src/lib/views/settings/pages/TriggersPage.svelte',
+    ],
+    rules: { 'svelte/no-useless-mustaches': 'off' },
   },
 );

@@ -176,6 +176,18 @@ pub const PWSH_UTF8_PREFIX: &str = "[Console]::OutputEncoding=[Text.UTF8Encoding
 // wbudowanych, a zagnieżdżony `cmd` zmieniałby rozbiór cudzysłowów względem tego, co ocenił
 // analizator. Jego wyjście dekoduje warstwa platformy (`ExecPort::decode_output`).
 
+/// Czy polecenie PowerShella zaczyna się instrukcją, która musi stać na początku skryptu.
+fn must_start_script(command: &str) -> bool {
+    let head = command.trim_start().to_ascii_lowercase();
+    let keyword = |word: &str, next: &[char]| {
+        head.strip_prefix(word)
+            .is_some_and(|rest| rest.starts_with(next))
+    };
+    keyword("using", &[' ', '\t'])
+        || keyword("param", &[' ', '\t', '('])
+        || head.starts_with("#requires")
+}
+
 impl ShellToolsConfig {
     /// Program i argumenty dla powłoki (`raw_args` dla `cmd.exe`, którego cudzysłowy różnią się
     /// od MSVCRT).
@@ -191,7 +203,14 @@ impl ShellToolsConfig {
                 } else {
                     &self.powershell_path
                 };
-                let script = format!("{PWSH_UTF8_PREFIX}{command}");
+                // `using`, `param` i `#requires` muszą być pierwszą instrukcją skryptu — przedrostek
+                // zrobiłby z poprawnego polecenia błąd składni. Takie polecenie idzie bez zmian,
+                // a jego wyjście dekoduje warstwa platformy (jak dla `cmd`).
+                let script = if must_start_script(command) {
+                    command.to_owned()
+                } else {
+                    format!("{PWSH_UTF8_PREFIX}{command}")
+                };
                 let args = [
                     "-NoLogo",
                     "-NoProfile",
@@ -324,6 +343,25 @@ mod tests {
                 && raw.is_none()
         );
         assert!(a.contains(&"-NonInteractive".to_owned()) && a.contains(&"-NoProfile".to_owned()));
+        // Instrukcje, które muszą stać pierwsze, idą bez przedrostka (z nim PowerShell zgłasza
+        // „A 'using' statement must appear before any other statements").
+        for first in [
+            "using namespace System.IO; [Path]::GetFileName('a')",
+            "  Using module X",
+            "param($x = 1); $x",
+            "PARAM ($x)",
+            "#Requires -Version 7",
+        ] {
+            let (_, a, _) = c.invocation(ShellKind::Pwsh, first);
+            assert_eq!(a.last().map(String::as_str), Some(first));
+        }
+        for normal in ["usingX", "parameters", "$using:x", "Get-Date # using "] {
+            let (_, a, _) = c.invocation(ShellKind::Pwsh, normal);
+            assert_eq!(
+                a.last().map(String::as_str),
+                Some(format!("{PWSH_UTF8_PREFIX}{normal}").as_str())
+            );
+        }
         let (p, a, raw) = c.invocation(ShellKind::Cmd, "dir & echo \"x\"");
         assert!(p.ends_with("cmd.exe") && a.is_empty());
         assert_eq!(raw.as_deref(), Some("/D /S /C \"dir & echo \"x\"\""));

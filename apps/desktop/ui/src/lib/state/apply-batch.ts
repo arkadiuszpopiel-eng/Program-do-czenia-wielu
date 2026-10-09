@@ -74,6 +74,7 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       break;
     case 'UpdateStatus':
       app.updates.applyEvent(event.status);
+      if (event.status.phase === 'ready') void app.updates.refreshRestartBlock(app.client.updates);
       app.notify(event);
       break;
     case 'BrokerStatus':

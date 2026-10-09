@@ -25,6 +25,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { tick } from 'svelte';
+  import { uiZoom } from '../zoom';
 
   interface Props {
     items: readonly MenuItem[];
@@ -46,7 +47,9 @@
     Array.from(menu?.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled])') ?? []);
 
   async function show(focus: 'first' | 'last' = 'first') {
-    if (anchor) upward = anchor.getBoundingClientRect().bottom > window.innerHeight * 0.6;
+    // Wymiary elementów są w jednostkach po skali interfejsu, okno — w pikselach okna.
+    if (anchor)
+      upward = anchor.getBoundingClientRect().bottom > (window.innerHeight / uiZoom()) * 0.6;
     open = true;
     await tick();
     const list = enabled();

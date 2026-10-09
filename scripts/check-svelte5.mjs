@@ -19,8 +19,8 @@ const RULES = [
   { re: /^\s*import\s+.*\bfrom\s+['"]svelte\/internal/m, msg: 'import z svelte/internal' },
   // Svelte obcina biały znak na początku bloku: `tekst{#if x}⏎ · reszta` renderuje „tekst· reszta”.
   {
-    re: /\S\{#if [^{}\n]*\}[ \t]*\r?\n[ \t]*· /,
-    msg: "separator „·” przyklejony do tekstu przed `{#if}` (wstaw `{' '}` przed „·”)",
+    re: /\S\{(?:#(?:if|each|key|snippet|await)|:else(?: if)?|:then|:catch)\b[^{}\n]*\}[ \t]*\r?\n[ \t]*· /,
+    msg: "separator „·” przyklejony do tekstu przed początkiem bloku (wstaw `{' '}` przed „·”)",
     label: 'układ',
   },
 ];

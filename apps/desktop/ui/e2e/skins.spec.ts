@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectReadable } from './contrast';
 import { expectAccessible, pickOption, waitForChat } from './helpers';
 
 // Style interfejsu („Szkło", „Next"): wybór w Ustawienia → Wygląd ustawia `data-skin` na <html>,
@@ -29,18 +30,21 @@ test('wybór stylu w ustawieniach przełącza interfejs i wraca do klasycznego',
   await expect(html).not.toHaveAttribute('data-skin', /.+/);
 });
 
-for (const skin of ['glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`styl ${skin}, motyw ${theme}: rozmowa i ustawienia dostępne`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
       await page.goto(`/?style=${skin}&theme=${theme}`);
       await waitForChat(page);
       const html = page.locator('html');
-      await expect(html).toHaveAttribute('data-skin', skin);
+      if (skin === 'classic') await expect(html).not.toHaveAttribute('data-skin', /.+/);
+      else await expect(html).toHaveAttribute('data-skin', skin);
       await expect(html).toHaveAttribute('data-theme', theme);
       await expectAccessible(page, `rozmowa ${skin} ${theme}`);
+      await expectReadable(page, `rozmowa ${skin} ${theme}`);
       await openAppearance(page);
       await expectAccessible(page, `ustawienia ${skin} ${theme}`);
+      await expectReadable(page, `ustawienia ${skin} ${theme}`);
     });
   }
 }
@@ -87,9 +91,15 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
       expect(look.alpha).toBe(1);
       expect(look.contrast).toBeGreaterThanOrEqual(4.5);
       await expectAccessible(page, `lista wyboru ${skin} ${theme}`);
-      // Klawiatura: strzałka i Enter wybierają, Esc zamyka bez zmiany.
+      await expectReadable(page, `lista wyboru ${skin} ${theme}`);
+      // Klawiatura: Esc zamyka bez zmiany, choć podświetlenie przeszło na inną opcję.
+      const before = (await select.getAttribute('data-value')) ?? '';
+      await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('ArrowUp');
       await page.keyboard.press('Escape');
       await expect(list).toHaveCount(0);
+      await expect(select).toHaveAttribute('data-value', before);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await expect(page.getByRole('heading', { name: 'Wygląd', level: 2 })).toBeVisible();
       const density = page.getByRole('combobox', { name: 'Gęstość', exact: true });
       await density.focus();
@@ -109,5 +119,19 @@ test('Szybkie pytanie w stylu Szkło ma kryjące tło panelu', async ({ page }) 
   // Okno jest przezroczyste: tło strony zostaje puste, a tafla panelu nie może prześwitywać.
   const bodyBg = await page.evaluate(() => getComputedStyle(document.body).backgroundImage);
   expect(bodyBg).toBe('none');
+  // Sama tafla: tło w pełni kryjące (wcześniej test sprawdzał tylko tło strony).
+  const panelAlpha = await page.getByLabel('Pytanie', { exact: true }).evaluate((input) => {
+    const probe = document.createElement('canvas').getContext('2d');
+    for (let node: Element | null = input; node && probe; node = node.parentElement) {
+      probe.clearRect(0, 0, 1, 1);
+      probe.fillStyle = getComputedStyle(node).backgroundColor;
+      probe.fillRect(0, 0, 1, 1);
+      const alpha = probe.getImageData(0, 0, 1, 1).data[3] ?? 0;
+      if (alpha > 0) return alpha;
+    }
+    return 0;
+  });
+  expect(panelAlpha).toBe(255);
+  await expectReadable(page, 'quick glass dark');
   await expectAccessible(page, 'quick glass dark');
 });

@@ -60,7 +60,7 @@
     list-style: none;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-card);
-    background: var(--alfa-color-surface);
+    background: var(--alfa-color-overlay, var(--alfa-color-surface));
     box-shadow: var(--alfa-shadow-3);
   }
   .suggest li {

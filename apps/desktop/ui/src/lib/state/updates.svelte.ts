@@ -34,6 +34,22 @@ export class UpdatesState {
     this.view = { ...view, restart_blocked: view.phase === 'ready' ? blocked : null };
   }
 
+  /**
+   * Powód blokady ponownego uruchomienia prosto z rdzenia. Zdarzenia go nie niosą, a zmienia się
+   * bez zdarzeń (koniec rozmowy głosowej, koniec zadania agentki) — bez odpytania przycisk
+   * zostawał wyłączony albo włączony wbrew stanowi.
+   */
+  async refreshRestartBlock(api: UpdatesApi): Promise<void> {
+    try {
+      const fresh = await api.status();
+      if (this.view?.phase === 'ready' && fresh.phase === 'ready') {
+        this.view = { ...this.view, restart_blocked: fresh.restart_blocked ?? null };
+      }
+    } catch {
+      // Brak odpowiedzi: zostaje ostatni znany stan.
+    }
+  }
+
   /** Czy stan przyszedł zdarzeniem od ostatniego `load` (wtedy odpowiedź `status` jest starsza). */
   private fromEvent = false;
 

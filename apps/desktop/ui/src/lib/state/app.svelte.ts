@@ -196,6 +196,21 @@ export class AppState {
 
   /** Sprzątanie po usuniętej sesji (także usuniętej poza tym oknem): stan per sesja i widok. */
   async sessionRemoved(id: string): Promise<void> {
+    // Otwarcie następnej sesji opróżnia kolejkę zdarzeń, w której może już czekać zdarzenie
+    // o tym samym usunięciu — drugie wejście otwierało sesję jeszcze raz.
+    if (this.removing.includes(id)) return;
+    this.removing.push(id);
+    try {
+      await this.forgetSession(id);
+    } finally {
+      this.removing = this.removing.filter((x) => x !== id);
+    }
+  }
+
+  /** Sesje w trakcie sprzątania (zwykła lista — nic w widoku od niej nie zależy). */
+  private removing: string[] = [];
+
+  private async forgetSession(id: string): Promise<void> {
     this.sessions.remove(id);
     delete this.cache[id];
     this.cacheOrder = this.cacheOrder.filter((x) => x !== id);
