@@ -91,8 +91,8 @@ fn unavailable(pl: &str, en: &str) -> Option<LocalizedText> {
 fn missing_text(pl: &str, en: &str, missing: &[String]) -> LocalizedText {
     let list = missing.join(", ");
     text(
-        format!("{pl}: brakuje — {list}. Pobierz w Ustawieniach → Modele i silniki."),
-        format!("{en}: missing — {list}. Download it in Settings → Models and engines."),
+        format!("{pl}: brakuje — {list}. Pobierz w Ustawieniach → Modele lokalne i silniki."),
+        format!("{en}: missing — {list}. Download it in Settings → Local models and engines."),
     )
 }
 

@@ -31,11 +31,10 @@ use app_api::dto::ModelProfile;
 use app_api::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, BrainTarget, RouteNote};
 
 /// Komunikat „brak mózgu" (PLAN §14.5: bez kluczy startuje profil lokalny).
-pub const NO_BRAIN: &str = "Brak mózgu: dodaj klucz API w Ustawieniach → Modele i dostawcy \
+pub const NO_BRAIN: &str = "Brak mózgu: dodaj klucz API w Ustawieniach → Konta i klucze API \
      albo pobierz model lokalny.";
 /// Profil lokalny bez pobranego modelu (są klucze API).
-pub const NO_LOCAL: &str = "Profil lokalny: pobierz model lokalny (Ustawienia → Modele i dostawcy \
-     → Lokalne) albo przełącz profil na Hybrydę.";
+pub const NO_LOCAL: &str = "Profil lokalny: pobierz model lokalny (Ustawienia → Modele lokalne i silniki) albo przełącz profil na Hybrydę.";
 
 /// Identyfikator trasy lokalnej (`local:<model>`).
 pub const LOCAL_PROVIDER: &str = "local";
@@ -141,7 +140,7 @@ impl RouterBrain {
         {
             return BrainError::Provider(format!(
                 "Dostawca jest skonfigurowany, ale niedostępny ({failure}). Sprawdź połączenie \
-                 albo przetestuj konto w Ustawieniach → Modele i dostawcy."
+                 albo przetestuj konto w Ustawieniach → Konta i klucze API."
             ));
         }
         if missing {

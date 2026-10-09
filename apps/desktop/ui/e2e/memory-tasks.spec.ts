@@ -86,7 +86,7 @@ for (const theme of ['light', 'dark'] as const) {
     test('karty zgodności mostów i Ustawienia → Pamięć', async ({ page }) => {
       await openApp(page, { theme });
       await waitForChat(page);
-      await settings(page, 'Modele i dostawcy');
+      await settings(page, 'Mosty CLI');
       const cards = page.getByRole('list', { name: 'Karty zgodności mostów' });
       await expect(cards).toContainText('Claude Code (CLI)');
       await expect(cards).toContainText('Zabroniona');

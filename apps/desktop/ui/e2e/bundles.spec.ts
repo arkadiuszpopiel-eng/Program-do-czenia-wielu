@@ -5,7 +5,7 @@ async function openModels(page: Page) {
   await page.keyboard.press('Control+,');
   await page
     .getByRole('navigation', { name: 'Sekcje ustawień' })
-    .getByRole('button', { name: 'Modele i silniki' })
+    .getByRole('button', { name: 'Modele lokalne i silniki' })
     .click();
   await expect(
     page.getByRole('heading', { name: 'Pakiety — od 6 (wzorcowy) do 1 (minimalny)' }),

@@ -28,7 +28,7 @@ test('udane wysłanie: pole zostaje puste (bez zdublowania treści)', async ({ p
 
 // Regresja z testu na laptopie (2026-10-07): model pobrany bez silnika — rozmowa pokazywała surowy
 // błąd uruchamiania procesu i nie mówiła, co zrobić.
-test('model lokalny bez silnika: zrozumiały błąd i przejście do „Modele i silniki”', async ({
+test('model lokalny bez silnika: zrozumiały błąd i przejście do „Modele lokalne i silniki”', async ({
   page,
 }) => {
   await openApp(page, { scenario: 'no-engine' });
@@ -40,6 +40,8 @@ test('model lokalny bez silnika: zrozumiały błąd i przejście do „Modele i 
   await expect(alert).toBeVisible();
   await expect(alert).not.toContainText('Błąd dostawcy');
   await expect(alert.getByRole('button', { name: 'Inny model' })).toHaveCount(0);
-  await alert.getByRole('button', { name: 'Modele i silniki' }).click();
-  await expect(page.getByRole('heading', { level: 2, name: 'Modele i silniki' })).toBeVisible();
+  await alert.getByRole('button', { name: 'Modele lokalne i silniki' }).click();
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Modele lokalne i silniki' }),
+  ).toBeVisible();
 });

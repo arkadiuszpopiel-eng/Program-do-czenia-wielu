@@ -12,7 +12,7 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 107 |
 | Specyfikacje w indeksie | 85 |
 | Manifesty `module.toml` | 67 |
-| Linie Rust (z testami) | 378 032 |
+| Linie Rust (z testami) | 378 033 |
 | Testy (`#[test]`, `#[tokio::test]`) | 2561 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
@@ -141,7 +141,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4258 | 26 | — |  |
-| `app-api` | — | — | — | pojedynczy | 5817 | 12 | — |  |
+| `app-api` | — | — | — | pojedynczy | 5819 | 12 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4287 | 23 | — |  |
 | `app-chat` | — | — | — | pojedynczy | 2135 | 6 | — |  |
@@ -152,7 +152,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 7101 | 42 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 3591 | 19 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 3590 | 19 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |

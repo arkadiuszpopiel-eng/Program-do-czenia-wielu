@@ -59,7 +59,7 @@ pub(crate) fn convert_failure(e: &ConvertError, action: &str) -> ToolOutcome {
     let (kind, hint) = match e {
         ConvertError::NotInstalled(_) => (
             ToolErrorKind::Unsupported,
-            " Poproś właściciela o instalację ffmpeg (Ustawienia → Modele i silniki → ffmpeg).",
+            " Poproś właściciela o instalację ffmpeg (Ustawienia → Modele lokalne i silniki → ffmpeg).",
         ),
         ConvertError::Unsupported(_) => (ToolErrorKind::Unsupported, ""),
         ConvertError::TooLarge(_) => (

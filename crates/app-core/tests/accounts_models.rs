@@ -1,4 +1,4 @@
-//! Wybór modelu konta API i kolejki modeli (zgłoszenie właściciela, 2026-10-09: klucz OpenAI
+//! Wybór modelu konta Kolejki modeli API (zgłoszenie właściciela, 2026-10-09: klucz OpenAI
 //! działał, lista miała 133 modele, a każda wiadomość kończyła się błędem „The model `tts-1` does
 //! not exist” — Router brał pierwszy model z listy; do tego nie dało się wybrać modeli). Cała
 //! ścieżka idzie przez prawdziwy adapter i Router do lokalnego serwera udającego dostawcę.

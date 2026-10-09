@@ -87,3 +87,18 @@ body {
     background: CanvasText;
   }
 }
+
+/* Podpowiedź przycisków pigułki (`installTooltips`) — pigułka nie ładuje `base.css`. */
+.alfa-tip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  max-width: 220px;
+  padding: 2px 6px;
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-control);
+  background: var(--alfa-color-surface);
+  color: var(--alfa-color-text);
+  font-size: var(--alfa-font-size-xs);
+  pointer-events: none;
+}

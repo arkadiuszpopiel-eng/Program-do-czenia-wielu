@@ -125,7 +125,8 @@
       : t('conv.messageYou', { time: app.i18n.dateTime(turn.created_at) })}
     oncontextmenu={(e) => {
       e.preventDefault();
-      pinned = !pinned;
+      // Z zaznaczonym tekstem prawy przycisk otwiera menu „Kopiuj”, bez przypinania wiadomości.
+      if (!document.getSelection()?.toString()) pinned = !pinned;
     }}
     style:--accent={agent ? `var(--alfa-agent-${agent})` : undefined}
   >

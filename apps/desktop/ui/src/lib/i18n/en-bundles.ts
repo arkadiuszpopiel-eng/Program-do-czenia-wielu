@@ -1,4 +1,4 @@
-// English dictionary: Settings → “Models and engines” → bundles 1–6, “Repair” of a single element,
+// English dictionary: Settings → “Local models and engines” → bundles 1–6, “Repair” of a single element,
 // the selection guide and quality notes per standards.
 import type { Message } from './core';
 import type { plBundles } from './pl-bundles';

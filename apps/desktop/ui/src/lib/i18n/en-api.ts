@@ -1,4 +1,4 @@
-// Settings → API and model queues (keys must match pl-api.ts).
+// Settings → API model queues (keys must match pl-api.ts).
 import type { Message } from './core';
 import type { plApi } from './pl-api';
 
@@ -11,11 +11,11 @@ export const enApi: Record<keyof typeof plApi, Message> = {
   'api.accounts': 'API accounts',
   'api.accountMeta': { one: '{provider} · {n} model', other: '{provider} · {n} models' },
   'api.noModels':
-    'This account has no model list yet. Click “Test connection” in “Models and providers” — the test fetches the list.',
+    'This account has no model list yet. Click “Test connection” in “API accounts and keys” — the test fetches the list.',
   'api.summary.chat': { one: '{n} chat model', other: '{n} chat models' },
   'api.summary.auto': 'automatic choice: {model}',
   'api.summary.noAuto': 'no chat model on the list',
-  'api.toAccount': 'Key, test and limit of this account — in “Models and providers”',
+  'api.toAccount': 'Key, test and limit of this account — in “API accounts and keys”',
   'api.disabled': 'The account is disabled — queues apply once it is enabled.',
 
   'api.queues': 'Model queues',
@@ -55,8 +55,14 @@ export const enApi: Record<keyof typeof plApi, Message> = {
   'api.position': 'Position {n}',
   'api.first': 'first choice',
   'api.fallback': 'fallback {n}',
-  'api.up': 'Move up: {model}',
-  'api.down': 'Move down: {model}',
+  'api.grab': 'Move: {model}',
+  'api.moving': 'moving',
+  'api.movedBadge': 'moved',
+  'api.addedBadge': 'added',
+  'api.dragHint':
+    'Drag a tile to change the order. From the keyboard: the handle, Space, arrows, Space; Escape puts it back.',
+  'api.announce': '{model}: position {n} of {total}',
+  'api.cancelled': 'Move cancelled.',
   'api.remove': 'Remove from queue: {model}',
   'api.missing': 'not on the account list',
   'api.missingHint':

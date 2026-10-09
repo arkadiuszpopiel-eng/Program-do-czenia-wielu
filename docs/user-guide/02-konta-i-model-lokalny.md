@@ -3,14 +3,14 @@
 ## Alfa bez kluczy — model lokalny
 
 Bez żadnego klucza Alfa myśli modelem uruchomionym na Twoim komputerze: **Bielik 4.5B v3.0 Instruct** (polski model,
-plik Q8_0 ok. 4,8 GB z oficjalnego repozytorium autorów). W **Ustawienia → Modele i silniki** jest też lżejszy
+plik Q8_0 ok. 4,8 GB z oficjalnego repozytorium autorów). W **Ustawienia → Modele lokalne i silniki** jest też lżejszy
 **Bielik 1.5B v3.0 Instruct** (ok. 1,6 GB) — szybszy na słabszych kartach (np. 6 GB), ale prostszy w rozmowie i bez
 zadań na plikach. Działa też bez internetu.
 
 1. W kroku **Konta i klucze** wprowadzenia kliknij na karcie **Model lokalny** przycisk „Pobierz”. Pobieranie można
    anulować i wznowić później — nie zaczyna się od zera. Model nie ma jeszcze przypiętej sumy kontrolnej, więc po
    pobraniu zobaczysz jego sumę SHA-256 i licencję — kliknij „Ufam temu plikowi — zainstaluj”. Jeśli pominąłeś ten
-   krok: **Ustawienia → Modele i silniki** (zobacz [Modele i silniki](10-modele-i-silniki.md)).
+   krok: **Ustawienia → Modele lokalne i silniki** (zobacz [Modele lokalne i silniki](10-modele-i-silniki.md)).
 2. Program `llama-server` (llama.cpp) pobierzesz tam samo: pozycja **llama-server (vulkan)** dla kart graficznych
    AMD/Intel/NVIDIA albo **llama-server (cpu)**. Wersja programu jest jeszcze **do potwierdzenia** — jeśli pobranie
    się nie uda, skopiuj `llama-server.exe` z bibliotekami do `%LOCALAPPDATA%\Alfa\sidecars\llama-vulkan\` (albo
@@ -31,14 +31,14 @@ Profil decyduje, gdzie Alfa szuka odpowiedzi:
 | Hybryda (domyślny) | Model lokalny i modele w chmurze — tam, gdzie lepiej pasują. |
 | Chmura             | Modele dostawców w chmurze. **Wymaga klucza.**               |
 
-Profil zmienisz chipem w polu wiadomości, komendą `/model` albo w **Ustawienia → Modele i dostawcy → Domyślny profil
+Profil zmienisz chipem w polu wiadomości, komendą `/model` albo w **Ustawienia → Konta i klucze API → Domyślny profil
 modelu**. Bez kluczy Alfa zawsze używa modelu lokalnego. Jeśli dostawca nie odpowiada, Alfa w ciągu 2 sekund
 przełącza się na inną trasę i nie gubi wiadomości. Przy każdej odpowiedzi widzisz, który model odpowiedział
 (kapsuła „Odpowiada X · model”) — wpis o wyborze trafia też na Oś czasu.
 
 ## Dodawanie konta i klucza
 
-**Ustawienia → Modele i dostawcy → Dodaj dostawcę.** Kreator ma 6 kroków:
+**Ustawienia → Konta i klucze API → Dodaj dostawcę.** Kreator ma 6 kroków:
 
 1. **Dostawca** — z listy: Anthropic (Claude), OpenAI, Google (Gemini), xAI (Grok), Mistral, DeepSeek, Kimi, Qwen,
    Z.ai, MiniMax, OpenRouter albo własny endpoint zgodny z OpenAI lub Anthropic (np. Ollama, LM Studio). Na liście są

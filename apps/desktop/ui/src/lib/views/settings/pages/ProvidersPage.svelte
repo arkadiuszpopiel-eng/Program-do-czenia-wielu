@@ -1,4 +1,4 @@
-<!-- Modele i dostawcy → Hub kont i kluczy (makieta 12): lista kont ze stanem, test, limit, usuń, kreator. -->
+<!-- Konta i klucze API → Hub kont i kluczy (makieta 12): lista kont ze stanem, test, limit, usuń, kreator. -->
 <script lang="ts">
   import { Button, ConfirmDialog, EmptyState } from '@alfa/ui-kit';
   import KeyRound from '@lucide/svelte/icons/key-round';
@@ -10,7 +10,6 @@
   import { useApp } from '../../../state/context';
   import AccountRow from './AccountRow.svelte';
   import AddProviderWizard from './AddProviderWizard.svelte';
-  import BridgesSection from './BridgesSection.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -118,8 +117,6 @@
     </ul>
   {/if}
 </section>
-
-<BridgesSection />
 
 <ConfirmDialog
   bind:open={confirmOpen}

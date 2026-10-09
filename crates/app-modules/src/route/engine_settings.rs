@@ -1,4 +1,4 @@
-//! Ustawienia silnika rozmowy (Ustawienia → Modele i silniki, klucze `engines.llm.*`, nakładka
+//! Ustawienia silnika rozmowy (Ustawienia → Modele lokalne i silniki, klucze `engines.llm.*`, nakładka
 //! maszyny): backend `llama-server`, najdłuższy kontekst, wątki procesora, zwalnianie modelu po
 //! bezczynności. Czytane przy budowie modułu `providers-local` — zmiana działa od następnego
 //! uruchomienia Alfy. Wartość nieznana albo spoza zakresu = ustawienie domyślne (bez błędu).
@@ -9,7 +9,7 @@ use device_profile_contract::Backend;
 use providers_local_impl::{BackendChoice, LocalConfig};
 use serde_json::Value;
 
-/// Klucze ustawień (`app-core/data/settings-pages.json`, strona „Modele i silniki”).
+/// Klucze ustawień (`app-core/data/settings-pages.json`, strona „Modele lokalne i silniki”).
 pub mod keys {
     /// `auto` | `cuda` | `vulkan` | `cpu`.
     pub const BACKEND: &str = "engines.llm.backend";

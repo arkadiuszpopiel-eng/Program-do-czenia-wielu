@@ -20,7 +20,7 @@ w terminalu).
 
 ## Karty zgodności
 
-**Ustawienia → Modele i dostawcy → Mosty CLI** (przycisk „Wykryj ponownie” sprawdza zainstalowane wersje). Każda
+**Ustawienia → Mosty CLI** (przycisk „Wykryj ponownie” sprawdza zainstalowane wersje). Każda
 trasa ma kartę:
 
 - stan: **Zgodna**, **Niezweryfikowana** albo **Zabroniona**; nieaktualny wpis rejestru zgodności automatycznie

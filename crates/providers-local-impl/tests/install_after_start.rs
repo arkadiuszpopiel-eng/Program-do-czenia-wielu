@@ -1,6 +1,6 @@
 //! Silnik pobrany po starcie aplikacji (fala 6, próba generalna): plik `llama-server` jest
 //! wybierany z kandydatów przy każdym starcie sidecara, nie raz przy składaniu aplikacji —
-//! `llama-server` zainstalowany w Ustawieniach → Modele i silniki działa bez ponownego
+//! `llama-server` zainstalowany w Ustawieniach → Modele lokalne i silniki działa bez ponownego
 //! uruchomienia Alfy (wcześniej pierwsza rozmowa z modelem lokalnym kończyła się błędem
 //! „nie znaleziono pliku” aż do restartu).
 

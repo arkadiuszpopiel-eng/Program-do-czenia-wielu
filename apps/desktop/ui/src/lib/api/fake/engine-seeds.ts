@@ -1,4 +1,4 @@
-// Atrapa: pozycje katalogu „Modele i silniki” (te same identyfikatory, rodzaje i możliwość
+// Atrapa: pozycje katalogu „Modele lokalne i silniki” (te same identyfikatory, rodzaje i możliwość
 // pobrania co katalog produkcyjny `app_models::builtin` — pakiety 1–6 składają się z nich).
 import type { ModelItem, ModelItemKind } from '../types-models';
 

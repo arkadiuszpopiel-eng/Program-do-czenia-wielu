@@ -94,7 +94,7 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       break;
     case 'ModelProgress':
     case 'ReindexStatus':
-      // Menedżer modeli: strona „Modele i silniki" i onboarding słuchają przez `app.on`.
+      // Menedżer modeli: strona „Modele lokalne i silniki" i onboarding słuchają przez `app.on`.
       app.notify(event);
       break;
     case 'MarshalReportReady':

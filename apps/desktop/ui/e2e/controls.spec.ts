@@ -97,7 +97,7 @@ test('lista wyboru: litera z AltGr przeskakuje do opcji', async ({ page }) => {
 test('lista wyboru: klik etykiety i utrata fokusu zamykają ją na stałe', async ({ page }) => {
   await openApp(page);
   await waitForChat(page);
-  await openSettingsPage(page, 'Modele i silniki');
+  await openSettingsPage(page, 'Modele lokalne i silniki');
   const kind = page.getByRole('combobox', { name: 'Rodzaj', exact: true });
   await kind.scrollIntoViewIfNeeded();
   const list = page.getByRole('listbox', { name: 'Rodzaj' });

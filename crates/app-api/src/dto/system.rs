@@ -85,8 +85,10 @@ pub struct SettingDef {
 #[serde(rename_all = "snake_case")]
 pub enum SettingsCustomPage {
     Providers,
-    /// API i kolejki modeli: wybór i kolejność modeli każdego konta dla klas zadań.
+    /// Kolejki modeli API: wybór i kolejność modeli każdego konta dla klas zadań.
     Api,
+    /// Mosty CLI: karty zgodności tras narzędzi wiersza poleceń.
+    Bridges,
     Costs,
     Shortcuts,
     Transfer,
@@ -113,7 +115,7 @@ pub enum SettingsCustomPage {
     About,
     /// Wtyczki Wasm: propozycje, karta zatwierdzenia (zdolności, limity, hash), stany, problemy.
     Plugins,
-    /// Modele i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
+    /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }
 

@@ -1,4 +1,4 @@
-//! Pakiety „Modele i silniki” w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny): dobór pozycji dla tej
+//! Pakiety „Modele lokalne i silniki” w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny): dobór pozycji dla tej
 //! maszyny (wersje silników CUDA / Vulkan / CPU), dopasowanie do sprzętu (pasuje / na styk / za
 //! słaby), zalecany pakiet (najwyższy pasujący bez kompromisów), rozmiar i stan z pozycji.
 //! Czysta logika (testy tabelaryczne); pobieranie, weryfikacja i naprawa — `bundle_ops`.

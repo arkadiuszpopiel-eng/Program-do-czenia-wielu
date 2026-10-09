@@ -1,11 +1,11 @@
-// English dictionary: Settings → "Models and engines" (download manager, TOFU consent, search
+// English dictionary: Settings → "Local models and engines" (download manager, TOFU consent, search
 // embedder, vector rebuild). Keys typed from pl-models.ts.
 import type { Message } from './core';
 import type { plModels } from './pl-models';
 
 export const enModels: Record<keyof typeof plModels, Message> = {
   'engines.intro':
-    'Models and engines run locally on this computer. Downloads resume after interruption and every file is checked with SHA-256 — a file without a pinned checksum is installed only after your consent. No telemetry.',
+    'Local models and engines run locally on this computer. Downloads resume after interruption and every file is checked with SHA-256 — a file without a pinned checksum is installed only after your consent. No telemetry.',
   'engines.loading': 'Loading the model list…',
   'engines.search.title': 'Memory search',
   'engines.search.active': 'Model in use: {name}',

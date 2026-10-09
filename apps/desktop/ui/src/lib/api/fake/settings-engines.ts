@@ -1,4 +1,4 @@
-// Atrapa drzewa §15: ustawienia silników na stronie „Modele i silniki” — te same klucze, teksty
+// Atrapa drzewa §15: ustawienia silników na stronie „Modele lokalne i silniki” — te same klucze, teksty
 // i zakresy co `crates/app-core/data/settings-pages.json` (silnik `llama-server`, kontekst, wątki,
 // zwalnianie po bezczynności, równoległe pobierania).
 import type { SettingDef } from '../types-system';

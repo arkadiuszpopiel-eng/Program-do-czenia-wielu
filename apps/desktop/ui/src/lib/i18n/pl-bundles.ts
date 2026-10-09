@@ -1,4 +1,4 @@
-// Słownik PL: Ustawienia → „Modele i silniki” → pakiety 1–6 (komplety modeli i silników dobrane do
+// Słownik PL: Ustawienia → „Modele lokalne i silniki” → pakiety 1–6 (komplety modeli i silników dobrane do
 // sprzętu), „Napraw” pojedynczego elementu, przewodnik wyboru i uwagi o jakości według norm.
 import type { Message } from './core';
 

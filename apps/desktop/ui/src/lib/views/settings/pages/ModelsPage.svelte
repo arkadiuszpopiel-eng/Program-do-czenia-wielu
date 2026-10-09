@@ -1,5 +1,5 @@
 <!--
-  Ustawienia → Modele i silniki (ładowana leniwie): pakiety 1–6 dobrane do sprzętu (BundlesSection),
+  Ustawienia → Modele lokalne i silniki (ładowana leniwie): pakiety 1–6 dobrane do sprzętu (BundlesSection),
   wyszukiwanie w pamięci (embedder leksykalny albo
   zainstalowany model, przebudowa wektorów w tle z postępem, „Przebuduj teraz” / „Przerwij”) i katalog
   pozycji (modele rozmowy, STT, głosy, VAD, słowa wywoławcze, głos właściciela, embeddingi, sidecary)

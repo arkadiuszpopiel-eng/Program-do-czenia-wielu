@@ -199,7 +199,7 @@ async fn missing_speech_engines_make_read_and_dictation_unavailable() {
     assert_eq!(v.dictation.state, DictationStateView::Unavailable);
     let read = v.read.reason.expect("powód czytania");
     assert!(read.pl.contains("silnik TTS"), "{}", read.pl);
-    assert!(read.pl.contains("Modele i silniki"), "{}", read.pl);
+    assert!(read.pl.contains("Modele lokalne i silniki"), "{}", read.pl);
     let dict = v.dictation.reason.expect("powód dyktowania");
     assert!(dict.pl.contains("whisper-server, model STT"), "{}", dict.pl);
 

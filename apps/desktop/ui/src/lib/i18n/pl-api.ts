@@ -1,4 +1,4 @@
-// Ustawienia → API i kolejki modeli (pl — źródło kluczy).
+// Ustawienia → Kolejki modeli API (pl — źródło kluczy).
 export const plApi = {
   'api.intro':
     'Tu wybierasz, których modeli każdego konta API Alfa używa do jakich zadań i w jakiej kolejności. Bez kolejki wybiera sama.',
@@ -13,7 +13,7 @@ export const plApi = {
     other: '{provider} · {n} modelu',
   },
   'api.noModels':
-    'To konto nie ma jeszcze listy modeli. Kliknij „Testuj połączenie” w „Modele i dostawcy” — test pobiera listę.',
+    'To konto nie ma jeszcze listy modeli. Kliknij „Testuj połączenie” w „Konta i klucze API” — test pobiera listę.',
   'api.summary.chat': {
     one: '{n} model do rozmowy',
     few: '{n} modele do rozmowy',
@@ -22,7 +22,7 @@ export const plApi = {
   },
   'api.summary.auto': 'wybór automatyczny: {model}',
   'api.summary.noAuto': 'brak modelu rozmowy na liście',
-  'api.toAccount': 'Klucz, test i limit tego konta — w „Modele i dostawcy”',
+  'api.toAccount': 'Klucz, test i limit tego konta — w „Konta i klucze API”',
   'api.disabled': 'Konto jest wyłączone — kolejki zadziałają po włączeniu.',
 
   'api.queues': 'Kolejki modeli',
@@ -64,8 +64,14 @@ export const plApi = {
   'api.position': 'Pozycja {n}',
   'api.first': 'pierwszy wybór',
   'api.fallback': 'zapas {n}',
-  'api.up': 'Wyżej: {model}',
-  'api.down': 'Niżej: {model}',
+  'api.grab': 'Przenieś: {model}',
+  'api.moving': 'przenoszę',
+  'api.movedBadge': 'przeniesiony',
+  'api.addedBadge': 'dodany',
+  'api.dragHint':
+    'Przeciągnij kafelek, żeby zmienić kolejność. Z klawiatury: uchwyt, Spacja, strzałki, Spacja; Escape odkłada na miejsce.',
+  'api.announce': '{model}: pozycja {n} z {total}',
+  'api.cancelled': 'Przenoszenie anulowane.',
   'api.remove': 'Usuń z kolejki: {model}',
   'api.missing': 'nie ma go na liście konta',
   'api.missingHint':

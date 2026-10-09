@@ -17,7 +17,7 @@ async function openProviders(page: Page, query = '') {
   await page.keyboard.press('Control+,');
   await page
     .getByRole('navigation', { name: 'Sekcje ustawień' })
-    .getByRole('button', { name: 'Modele i dostawcy' })
+    .getByRole('button', { name: 'Konta i klucze API' })
     .click();
 }
 
@@ -327,7 +327,7 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
       await page.keyboard.press('Control+,');
       await page
         .getByRole('navigation', { name: 'Sekcje ustawień' })
-        .getByRole('button', { name: 'Modele i dostawcy' })
+        .getByRole('button', { name: 'Konta i klucze API' })
         .click();
       await pickProvider(page, /^OpenAI/);
       await page.getByLabel('Klucz API').fill(`"${fakeKey('sk-ant-', 'api03')}"`);
@@ -355,7 +355,7 @@ test('kreator po angielsku: wynik i kroki naprawy są przetłumaczone', async ({
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.keyboard.press('Control+,');
-  await page.getByRole('button', { name: 'Models and providers' }).click();
+  await page.getByRole('button', { name: 'API accounts and keys' }).click();
   await page.getByRole('button', { name: 'Add provider' }).click();
   await page
     .getByRole('button', { name: /^OpenAI/ })

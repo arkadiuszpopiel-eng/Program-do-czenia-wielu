@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectReadable } from './contrast';
 import { expectAccessible, waitForChat } from './helpers';
 
-// Ustawienia → API i kolejki modeli (zgłoszenie właściciela 2026-10-09: konto ze 133 modelami,
+// Ustawienia → Kolejki modeli API (zgłoszenie właściciela 2026-10-09: konto ze 133 modelami,
 // rozmowa szła do modelu syntezy mowy, a wybrać nie dało się żadnego). Kolejka do dziesięciu
 // modeli na klasę zadań, przeglądarka pełnej listy z filtrami, dobieranie automatyczne.
 
@@ -13,12 +13,24 @@ async function openApi(page: Page, query = '') {
   await page.keyboard.press('Control+,');
   await page
     .getByRole('navigation', { name: 'Sekcje ustawień' })
-    .getByRole('button', { name: 'API i kolejki modeli' })
+    .getByRole('button', { name: 'Kolejki modeli API' })
     .click();
   await page.getByRole('tab', { name: /Praca — OpenAI/ }).click();
 }
 
-const queue = (page: Page) => page.locator('ol.queue > li');
+const queue = (page: Page) => page.locator('ol.tiles > li');
+const tile = (page: Page, id: string) => page.locator(`ol.tiles > li[data-tile="${id}"]`);
+
+/** Przenosi kafelek wskaźnikiem na miejsce innego kafelka (podnieś, przesuń, upuść). */
+async function drag(page: Page, from: string, to: string) {
+  const start = await tile(page, from).locator('.name').boundingBox();
+  const end = await tile(page, to).boundingBox();
+  if (!start || !end) throw new Error('kafelek poza widokiem');
+  await page.mouse.move(start.x + 10, start.y + 5);
+  await page.mouse.down();
+  await page.mouse.move(start.x + 20, start.y + 10, { steps: 3 });
+  await page.mouse.move(end.x + end.width / 2, end.y + end.height / 2, { steps: 8 });
+}
 const ids = (page: Page) => queue(page).locator('code').allTextContents();
 
 test('kolejka rozmowy: kolejność, usuwanie i dodawanie z listy modeli', async ({ page }) => {
@@ -30,13 +42,27 @@ test('kolejka rozmowy: kolejność, usuwanie i dodawanie z listy modeli', async 
   await expect(queue(page).first()).toContainText('pierwszy wybór');
   await expect(queue(page).nth(1)).toContainText('zapas 1');
 
-  // Kolejność: pierwszy niżej, ostatni wyżej; skrajne przyciski są wyłączone.
-  await expect(page.getByRole('button', { name: 'Wyżej: gpt-6-sol' })).toBeDisabled();
-  await page.getByRole('button', { name: 'Niżej: gpt-6-sol' }).click();
+  // Podniesiony kafelek jest wyraźnie oznaczony, a pozostałe rozsuwają się od razu.
+  await drag(page, 'gpt-6-sol', 'gpt-6-luna');
+  await expect(tile(page, 'gpt-6-sol')).toHaveAttribute('data-state', 'moving');
+  await expect(tile(page, 'gpt-6-sol')).toContainText('przenoszę');
+  expect(await ids(page)).toEqual(['gpt-6-luna', 'gpt-6-sol', 'gpt-5.5']);
+  await expectReadable(page, 'kolejka — kafelek w trakcie przenoszenia');
+  await page.mouse.up();
+  // Po upuszczeniu kolejność jest zapisana, a przeniesiony kafelek przez chwilę oznaczony.
+  await expect(tile(page, 'gpt-6-sol')).toHaveAttribute('data-state', 'moved');
+  await expect(tile(page, 'gpt-6-sol')).toContainText('przeniesiony');
   await expect.poll(() => ids(page)).toEqual(['gpt-6-luna', 'gpt-6-sol', 'gpt-5.5']);
-  await page.getByRole('button', { name: 'Wyżej: gpt-5.5' }).click();
+  await expect(queue(page).first()).toContainText('pierwszy wybór');
+  await drag(page, 'gpt-5.5', 'gpt-6-sol');
+  await page.mouse.up();
   await expect.poll(() => ids(page)).toEqual(['gpt-6-luna', 'gpt-5.5', 'gpt-6-sol']);
-  await expect(page.getByRole('button', { name: 'Niżej: gpt-6-sol' })).toBeDisabled();
+  // Escape w trakcie przenoszenia odkłada kafelek na miejsce i nie zamyka Ustawień.
+  await drag(page, 'gpt-6-sol', 'gpt-6-luna');
+  await page.keyboard.press('Escape');
+  await page.mouse.up();
+  await expect.poll(() => ids(page)).toEqual(['gpt-6-luna', 'gpt-5.5', 'gpt-6-sol']);
+  await expect(page.getByRole('heading', { name: 'Kolejki modeli API' })).toBeVisible();
   await page.getByRole('button', { name: 'Usuń z kolejki: gpt-5.5' }).click();
   await expect.poll(() => ids(page)).toEqual(['gpt-6-luna', 'gpt-6-sol']);
 
@@ -44,13 +70,14 @@ test('kolejka rozmowy: kolejność, usuwanie i dodawanie z listy modeli', async 
   await page.getByLabel('Szukaj modelu').fill('5 mini');
   await page.getByRole('button', { name: 'Dodaj do kolejki: gpt-5-mini' }).click();
   await expect.poll(() => ids(page)).toEqual(['gpt-6-luna', 'gpt-6-sol', 'gpt-5-mini']);
+  await expect(tile(page, 'gpt-5-mini')).toHaveAttribute('data-state', 'added');
   const row = page.locator('ul.models > li').filter({ hasText: 'gpt-5-mini' }).first();
   await expect(row).toContainText('w kolejce');
   await expect(page.getByRole('tab', { name: /^Rozmowa/ })).toContainText('3');
 
   // Zmiana zostaje po ponownym wejściu na stronę.
-  await page.getByRole('button', { name: 'Modele i dostawcy', exact: true }).click();
-  await page.getByRole('button', { name: 'API i kolejki modeli' }).click();
+  await page.getByRole('button', { name: 'Konta i klucze API', exact: true }).click();
+  await page.getByRole('button', { name: 'Kolejki modeli API' }).click();
   await page.getByRole('tab', { name: /Praca — OpenAI/ }).click();
   expect(await ids(page)).toEqual(['gpt-6-luna', 'gpt-6-sol', 'gpt-5-mini']);
 });
@@ -149,10 +176,10 @@ test('bez kont: strona prowadzi do dodania dostawcy', async ({ page }) => {
   await page.goto('/?scenario=no-keys');
   await waitForChat(page);
   await page.keyboard.press('Control+,');
-  await page.getByRole('button', { name: 'API i kolejki modeli' }).click();
+  await page.getByRole('button', { name: 'Kolejki modeli API' }).click();
   await expect(page.getByText('Nie masz jeszcze konta API')).toBeVisible();
   await page.getByRole('button', { name: 'Dodaj dostawcę' }).click();
-  await expect(page.getByRole('heading', { name: 'Modele i dostawcy' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Konta i klucze API' })).toBeVisible();
 });
 
 for (const skin of ['classic', 'glass', 'next'] as const) {
@@ -162,7 +189,7 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
       await page.goto(`/?style=${skin}&theme=${theme}`);
       await waitForChat(page);
       await page.keyboard.press('Control+,');
-      await page.getByRole('button', { name: 'API i kolejki modeli' }).click();
+      await page.getByRole('button', { name: 'Kolejki modeli API' }).click();
       await page.getByRole('tab', { name: /Praca — OpenAI/ }).click();
       await expectReadable(page, `${skin}/${theme} — kolejka`);
       await expectAccessible(page, `${skin}/${theme} — kolejka`);
@@ -188,7 +215,7 @@ test('strona API po angielsku', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.keyboard.press('Control+,');
-  await page.getByRole('button', { name: 'API and model queues' }).click();
+  await page.getByRole('button', { name: 'API model queues' }).click();
   await page.getByRole('tab', { name: /Praca — OpenAI/ }).click();
   await expect(page.getByRole('heading', { name: 'Queue: Chat' })).toBeVisible();
   await expect(queue(page).first()).toContainText('first choice');
@@ -216,20 +243,20 @@ test('z listy kont jednym kliknięciem do kolejek tego konta i z powrotem', asyn
   await page.goto('/');
   await waitForChat(page);
   await page.keyboard.press('Control+,');
-  await page.getByRole('button', { name: 'Modele i dostawcy' }).click();
+  await page.getByRole('button', { name: 'Konta i klucze API' }).click();
   const row = page
     .getByRole('list', { name: 'Twoje konta' })
     .getByRole('listitem')
     .filter({ hasText: 'Praca — OpenAI' });
   await row.getByRole('button', { name: 'Modele i kolejki' }).click();
-  await expect(page.getByRole('heading', { name: 'API i kolejki modeli' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Kolejki modeli API' })).toBeVisible();
   await expect(page.getByRole('tab', { name: /Praca — OpenAI/ })).toHaveAttribute(
     'aria-selected',
     'true',
   );
   expect(await ids(page)).toEqual(['gpt-6-sol', 'gpt-6-luna', 'gpt-5.5']);
   await page.getByRole('button', { name: /Klucz, test i limit tego konta/ }).click();
-  await expect(page.getByRole('heading', { name: 'Modele i dostawcy' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Konta i klucze API' })).toBeVisible();
 });
 
 test('szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączyć', async ({ page }) => {
@@ -245,4 +272,32 @@ test('szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączy
   await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();
   await waitForChat(page);
   await expect(details).toHaveCount(0);
+});
+
+test('kolejność z klawiatury: uchwyt, Spacja, strzałki, Spacja; Escape odkłada', async ({
+  page,
+}) => {
+  await openApi(page);
+  const grip = page.getByRole('button', { name: 'Przenieś: gpt-5.5' });
+  await grip.focus();
+  await page.keyboard.press('Space');
+  await expect(grip).toHaveAttribute('aria-pressed', 'true');
+  await expect(tile(page, 'gpt-5.5')).toHaveAttribute('data-state', 'moving');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  expect(await ids(page)).toEqual(['gpt-5.5', 'gpt-6-sol', 'gpt-6-luna']);
+  await expect(page.getByRole('status').filter({ hasText: 'gpt-5.5: pozycja 1 z 3' })).toHaveCount(
+    1,
+  );
+  await page.keyboard.press('Space');
+  await expect(tile(page, 'gpt-5.5')).toHaveAttribute('data-state', 'moved');
+  await expect.poll(() => ids(page)).toEqual(['gpt-5.5', 'gpt-6-sol', 'gpt-6-luna']);
+
+  await page.getByRole('button', { name: 'Przenieś: gpt-6-luna' }).focus();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('ArrowUp');
+  expect(await ids(page)).toEqual(['gpt-5.5', 'gpt-6-luna', 'gpt-6-sol']);
+  await page.keyboard.press('Escape');
+  expect(await ids(page)).toEqual(['gpt-5.5', 'gpt-6-sol', 'gpt-6-luna']);
+  await expect(page.getByRole('heading', { name: 'Kolejki modeli API' })).toBeVisible();
 });

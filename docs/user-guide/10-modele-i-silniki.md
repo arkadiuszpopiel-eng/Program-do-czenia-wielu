@@ -1,6 +1,6 @@
-# Modele i silniki
+# Modele lokalne i silniki
 
-Wszystko, czego Alfa potrzebuje do pracy bez internetu i bez kluczy, pobierzesz w **Ustawienia → Modele i silniki**
+Wszystko, czego Alfa potrzebuje do pracy bez internetu i bez kluczy, pobierzesz w **Ustawienia → Modele lokalne i silniki**
 (`Ctrl+,`). Są tam modele (rozmowy, rozpoznawania mowy, głosów, wykrywania mowy, słów wywoławczych, rozpoznawania
 Twojego głosu, wyszukiwania w pamięci) i programy pomocnicze — „silniki” uruchamiane obok Alfy: `llama-server`
 (model rozmowy), `whisper-server` (rozpoznawanie mowy) i `piper` (głos zapasowy).

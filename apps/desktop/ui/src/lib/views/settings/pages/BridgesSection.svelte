@@ -1,5 +1,5 @@
 <!--
-  Modele i dostawcy → Mosty CLI: karty zgodności tras (stan zielona / szara / zabroniona, wpis
+  Mosty CLI: karty zgodności tras (stan zielona / szara / zabroniona, wpis
   nieświeży, wersja wykryta vs przypięta, regulamin i źródła, data weryfikacji), wyłącznik trasy,
   jawna zgoda na uruchomienia z harmonogramu (z ostrzeżeniem) i „Zaloguj w terminalu" — wbudowany
   terminal z profilem logowania CLI (gest użytkownika; logowanie wykonuje człowiek) albo polecenie
@@ -11,6 +11,7 @@
   import type { BridgeCard, BridgeLogin } from '../../../api/types-tasks';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { loginProfile } from '../../../logic/work';
+  import Loading from '../../../components/shell/Loading.svelte';
   import { showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
@@ -84,7 +85,9 @@
   </div>
   {#if loadError}
     <LoadFailed error={loadError} onretry={() => void load()} />
-  {:else if loaded && cards.length === 0}
+  {:else if !loaded}
+    <Loading />
+  {:else if cards.length === 0}
     <p class="meta">{t('bridges.empty')}</p>
   {/if}
   <ul class="cards" aria-label={t('bridges.list')}>

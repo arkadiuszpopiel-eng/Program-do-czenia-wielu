@@ -221,14 +221,14 @@ mod tests {
     fn local_model_errors_are_plain_sentences_without_provider_prefix() {
         let e = ProviderError::new(
             ProviderErrorKind::Unsupported,
-            "brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele i silniki",
+            "brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele lokalne i silniki",
         );
         let turn = provider_error(&e, "local");
         assert_eq!(turn.code, TurnErrorCode::Provider);
         assert_eq!(turn.provider.as_deref(), Some("local"));
         assert_eq!(
             turn.message,
-            "Brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele i silniki."
+            "Brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele lokalne i silniki."
         );
     }
 

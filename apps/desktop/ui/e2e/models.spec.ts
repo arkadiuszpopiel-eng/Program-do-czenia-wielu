@@ -5,9 +5,11 @@ async function openModels(page: Page) {
   await page.keyboard.press('Control+,');
   await page
     .getByRole('navigation', { name: 'Sekcje ustawień' })
-    .getByRole('button', { name: 'Modele i silniki' })
+    .getByRole('button', { name: 'Modele lokalne i silniki' })
     .click();
-  await expect(page.getByRole('heading', { name: 'Modele i silniki', level: 2 })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Modele lokalne i silniki', level: 2 }),
+  ).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Pozycje katalogu' })).toBeVisible();
 }
 

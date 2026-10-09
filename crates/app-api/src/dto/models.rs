@@ -205,7 +205,7 @@ pub struct QualityNote {
     pub text: LocalizedText,
 }
 
-/// Pakiet „Modele i silniki” w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny) dla tej maszyny.
+/// Pakiet „Modele lokalne i silniki” w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny) dla tej maszyny.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ModelBundle {
     pub id: String,

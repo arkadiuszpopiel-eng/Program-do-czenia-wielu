@@ -380,7 +380,7 @@ export interface AlfaClient {
   /** Głos rozszerzony F5: słowa wywoławcze, weryfikacja głosu, dyktowanie, czytanie. */
   readonly voiceFeatures: VoiceFeaturesApi;
   readonly plugins: PluginsApi;
-  /** Modele i silniki: pobieranie, zgoda TOFU, weryfikacja, embedder wyszukiwania. */
+  /** Modele lokalne i silniki: pobieranie, zgoda TOFU, weryfikacja, embedder wyszukiwania. */
   readonly engines: EnginesApi;
   /** Załączniki composera (kopie w katalogu sesji; podgląd przez protokół zasobów). */
   readonly attachments: AttachmentsApi;

@@ -87,7 +87,7 @@ export class FakeChat {
       return {
         code: 'provider',
         message:
-          'Brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele i silniki.',
+          'Brak silnika modeli lokalnych (llama-server, wersja cuda) — pobierz go w Ustawieniach → Modele lokalne i silniki.',
         retry_at: null,
         provider: 'local',
       };

@@ -1,5 +1,5 @@
 <!--
-  Ustawienia → Modele i silniki → pakiety 1–6: przewodnik wyboru (zalecenia, „na styk”, agentki,
+  Ustawienia → Modele lokalne i silniki → pakiety 1–6: przewodnik wyboru (zalecenia, „na styk”, agentki,
   naprawa, normy), sprzęt tej maszyny i karty pakietów od 6 (wzorcowy) do 1 (minimalny). Stan na żywo:
   zdarzenia `ModelChanged` / `ModelProgress` → ponowne `models_bundles` (zbite w jedno odświeżenie).
   Pakiet za mocny dla sprzętu — pobranie dopiero po potwierdzeniu; „Napraw” elementu — też.

@@ -1,4 +1,4 @@
-// Logika strony „Modele i silniki" (bez Svelte — testowana w vitest): dostępne akcje pozycji,
+// Logika strony „Modele lokalne i silniki" (bez Svelte — testowana w vitest): dostępne akcje pozycji,
 // postęp, filtry rodzaju i stanu, hashe do zgody TOFU, postęp przebudowy wektorów.
 import type {
   EmbedderView,

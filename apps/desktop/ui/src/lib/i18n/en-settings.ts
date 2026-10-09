@@ -38,7 +38,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'costsPage.amount': 'Limit amount (PLN)',
   'costsPage.usage': 'Usage this month',
   'costsPage.perProvider':
-    'Per-provider limits are set in the accounts hub (Models and providers).',
+    'Per-provider limits are set in the accounts hub (API accounts and keys).',
 
   'hub.title': 'Accounts and keys',
   'hub.intro':
@@ -281,7 +281,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'ob.bundle.installed': 'Installed {done} of {total}',
   'ob.bundle.trust': 'Downloaded files are waiting for your consent — compare the checksums below.',
   'ob.bundle.done': 'The bundle is ready — local conversation works.',
-  'ob.bundle.later': 'You can pick another bundle later in Settings → Models and engines.',
+  'ob.bundle.later': 'You can pick another bundle later in Settings → Local models and engines.',
   'ob.autonomy.title': 'How much should the agents act on their own?',
   'ob.autonomy.desc':
     'We start at L3. You change it with one switch in Settings and confirm each change in the Broker window.',

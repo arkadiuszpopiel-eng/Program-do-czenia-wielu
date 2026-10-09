@@ -29,6 +29,7 @@
 <div class="field {className}">
   {#if label}<label class="label" for={fieldId}>{label}</label>{/if}
   <input
+    autocomplete="off"
     {...rest}
     id={fieldId}
     bind:this={input}

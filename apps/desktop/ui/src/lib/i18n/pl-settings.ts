@@ -39,7 +39,7 @@ export const plSettings = {
     'Ceny dostawców są w USD i przeliczamy je kursem NBP. Po wyłączeniu limitu zostaje tylko wskaźnik zużycia i opcjonalne alerty.',
   'costsPage.amount': 'Kwota limitu (zł)',
   'costsPage.usage': 'Zużycie w tym miesiącu',
-  'costsPage.perProvider': 'Limity per dostawca ustawisz w Hubie kont (Modele i dostawcy).',
+  'costsPage.perProvider': 'Limity per dostawca ustawisz w Hubie kont (Konta i klucze API).',
 
   'hub.title': 'Konta i klucze',
   'hub.intro':
@@ -303,7 +303,7 @@ export const plSettings = {
   'ob.bundle.installed': 'Zainstalowano {done} z {total}',
   'ob.bundle.trust': 'Pobrane pliki czekają na Twoją zgodę — porównaj sumy poniżej.',
   'ob.bundle.done': 'Pakiet jest gotowy — rozmowa lokalna działa.',
-  'ob.bundle.later': 'Inny pakiet wybierzesz później w Ustawieniach → Modele i silniki.',
+  'ob.bundle.later': 'Inny pakiet wybierzesz później w Ustawieniach → Modele lokalne i silniki.',
   'ob.autonomy.title': 'Jak bardzo agentki działają same?',
   'ob.autonomy.desc':
     'Zaczynamy od L3. Zmienisz to jednym przełącznikiem w Ustawieniach, a każdą zmianę potwierdzisz w oknie Brokera.',

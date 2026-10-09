@@ -72,7 +72,7 @@ export class AppState {
   agents = $state<Record<string, AgentState[]>>({});
   activity = $state<Record<string, ActivityInfo | null>>({});
   micState = $state<MicState>('off');
-  /** Konto wybrane na stronie „API i kolejki modeli” (ustawiane przez przejście z listy kont). */
+  /** Konto wybrane na stronie „Kolejki modeli API” (ustawiane przez przejście z listy kont). */
   apiAccount = $state('');
   micLevel = $state(0);
   /** Surowy poziom mikrofonu z testu (przed redukcją szumów); `null` poza testem. */
@@ -415,7 +415,7 @@ export class AppState {
     this.view = 'settings';
   }
 
-  /** Strona „API i kolejki modeli” z wybranym kontem (przycisk „Modele” przy koncie). */
+  /** Strona „Kolejki modeli API” z wybranym kontem (przycisk „Modele” przy koncie). */
   openApiFor(accountId: string): void {
     this.apiAccount = accountId;
     this.openSettings('api');
@@ -426,7 +426,7 @@ export class AppState {
     this.hubWizard = false;
   }
 
-  /** „Dodaj klucz, aby odblokować…" → Ustawienia › Modele i dostawcy z otwartym kreatorem. */
+  /** „Dodaj klucz, aby odblokować…" → Ustawienia › Konta i klucze API z otwartym kreatorem. */
   addProviderKey(): void {
     this.hubWizard = true;
     this.openSettings('providers');

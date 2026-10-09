@@ -189,10 +189,10 @@ test('Broker w procesie (build debug): baner i stan w Ustawieniach', async ({ al
   await shot(alfa, '05-broker');
 });
 
-test('Ustawienia → Modele i silniki: lista z katalogu', async ({ alfa }) => {
+test('Ustawienia → Modele lokalne i silniki: lista z katalogu', async ({ alfa }) => {
   const { main } = alfa;
   await toChat(main);
-  await openSettings(main, 'Modele i silniki');
+  await openSettings(main, 'Modele lokalne i silniki');
   await expect(main.getByRole('heading', { name: 'Pozycje katalogu' })).toBeVisible({
     timeout: 30_000,
   });
@@ -225,7 +225,7 @@ test('Ustawienia → Modele i silniki: lista z katalogu', async ({ alfa }) => {
     test.info().annotations.push({ type: 'pakiety', description: await machine.innerText() });
   }
   await shot(alfa, '06-modele-i-silniki');
-  await expectAccessible(alfa, 'Ustawienia → Modele i silniki');
+  await expectAccessible(alfa, 'Ustawienia → Modele lokalne i silniki');
 });
 
 // Błąd z wersji 0.0.3: lista wyboru była systemowa i w stylu „Szkło” nieczytelna. Sprawdzamy ją
@@ -284,6 +284,30 @@ test('Ustawienia → Wygląd: lista wyboru Alfy otwarta w każdym stylu', async 
     }
   }
   await expect(main.locator('html')).not.toHaveAttribute('data-skin', /.+/);
+});
+
+// Zgłoszenie właściciela (2026-10-09): prawy przycisk otwierał systemowe menu WebView2. W prawdziwym
+// WebView2 sprawdzamy własne menu Alfy i to, że „Wklej” naprawdę czyta schowek systemu.
+test('prawy przycisk w polu pisania: menu Alfy, wklejanie ze schowka systemu', async ({ alfa }) => {
+  const { main } = alfa;
+  await toChat(main);
+  const field = main.locator('#alfa-composer');
+  await field.fill('Ala ma kota');
+  await field.selectText();
+  await field.click({ button: 'right' });
+  const menu = main.getByRole('menu', { name: 'Menu edycji' });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitem')).toHaveCount(5);
+  await shot(alfa, '06b-menu-kontekstowe');
+  await menu.getByRole('menuitem', { name: /^Wytnij/ }).click();
+  await expect(field).toHaveValue('');
+  await field.click({ button: 'right' });
+  await menu.getByRole('menuitem', { name: /^Wklej/ }).click();
+  await expect(field).toHaveValue('Ala ma kota');
+  await field.fill('');
+  // Poza polem i bez zaznaczenia prawy przycisk nie otwiera niczego.
+  await main.locator('header').first().click({ button: 'right' });
+  await expect(menu).toHaveCount(0);
 });
 
 test('eksport .alfa do katalogu tymczasowego (natywne okno „Zapisz jako”)', async ({ alfa }) => {

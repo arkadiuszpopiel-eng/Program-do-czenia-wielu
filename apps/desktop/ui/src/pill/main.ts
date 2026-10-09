@@ -8,6 +8,7 @@ import '@alfa/ui-kit/skins.css';
 import './pill.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import { installTooltips } from '@alfa/ui-kit';
 import { errorText } from '../lib/api/command-error';
 import type { AppBootstrap } from '../lib/api/types-system';
 import { applyBootDocument } from '../lib/window-boot';
@@ -114,6 +115,10 @@ const wanted = boot?.locale ?? new URLSearchParams(location.search).get('lang');
 const lang = wanted === 'en' ? 'en' : 'pl';
 const L = TEXT[lang];
 applyBootDocument(document.documentElement, { locale: lang, settings: boot?.settings ?? {} });
+// Pigułka nie ma pól tekstowych: prawy przycisk nie otwiera niczego (zwłaszcza menu systemu),
+// a podpowiedzi przycisków rysuje Alfa.
+window.addEventListener('contextmenu', (event) => event.preventDefault());
+installTooltips();
 document.title = L.title;
 const state = {
   agent: 'beta' as Agent,

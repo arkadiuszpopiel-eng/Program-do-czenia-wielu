@@ -1,6 +1,11 @@
 // Punkt wejścia okna Szybkiego pytania (osobne okno Tauri, wspólne środowisko WebView2).
 import { mount } from 'svelte';
-import { installDefaultPolicy } from '@alfa/ui-kit';
+import {
+  CONTEXT_MENU_LABELS,
+  installContextMenu,
+  installDefaultPolicy,
+  installTooltips,
+} from '@alfa/ui-kit';
 import '@alfa/ui-kit/tokens.css';
 import '@alfa/ui-kit/skins.css';
 import '@alfa/ui-kit/base.css';
@@ -28,4 +33,6 @@ const boot = await client.app.bootstrap().catch((error: unknown) => {
 const locale = boot?.locale ?? 'pl';
 applyBootDocument(document.documentElement, { locale, settings: boot?.settings ?? {} });
 document.title = `Alfa — ${quickText(locale, 'title')}`;
+installContextMenu({ labels: () => CONTEXT_MENU_LABELS[locale] });
+installTooltips();
 mount(QuickApp, { target, props: { client, locale } });

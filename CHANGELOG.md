@@ -8,6 +8,28 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.10 — 2026-10-09
+
+Zgłoszenia właściciela: systemowe menu po kliknięciu prawym przyciskiem, niewygodne przestawianie modeli strzałkami
+i słaba organizacja ustawień modeli.
+
+### Interfejs
+
+- Menu po kliknięciu prawym przyciskiem rysuje Alfa (Cofnij, Wytnij, Kopiuj, Wklej, Zaznacz wszystko) — systemowe
+  menu z „Emoji”, „Kierunek pisania” i „Wykonaj inspekcję” nie pojawia się w żadnym oknie.
+- Podpowiedzi przycisków rysuje Alfa zamiast systemowych dymków.
+- Znikają pozostałe elementy rysowane przez system: strzałki pól liczbowych, krzyżyk i „oko” w polach, trójkąt
+  rozwijania sekcji, uchwyt zmiany rozmiaru pola; pola nie podpowiadają wcześniejszych wpisów listą systemu.
+- Kolejka modeli to kafelki do przenoszenia: podnieś kafelek i upuść w nowym miejscu. Podniesiony kafelek jest
+  wyraźnie oznaczony, a po upuszczeniu albo dodaniu przez chwilę świeci. Z klawiatury: uchwyt, Spacja, strzałki.
+- Ustawienia modeli mają jaśniejsze nazwy: „Konta i klucze API”, „Kolejki modeli API”, „Mosty CLI” (osobna strona),
+  „Modele lokalne i silniki”.
+
+### Testy
+
+- E2E: 12 testów menu kontekstowego i podpowiedzi (6 kombinacji stylu i motywu), przenoszenie kafelków wskaźnikiem
+  i z klawiatury; test w prawdziwej aplikacji: menu Alfy i wklejanie ze schowka systemu.
+
 ## 0.0.9 — 2026-10-09
 
 Pierwszy krok porządkowania interfejsu po zgłoszeniu właściciela („organizacja”).

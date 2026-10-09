@@ -2,7 +2,7 @@
   Model lokalny w onboardingu jako pakiet dobrany do tego komputera (model rozmowy razem z silnikiem,
   który go uruchamia). Test na laptopie (2026-10-07): karta pobierała sam model, bez `llama-server`,
   więc pierwsza rozmowa kończyła się błędem. Pakiet zalecany pobiera komplet jednym kliknięciem;
-  pliki bez przypiętej sumy zatrzymują się na jawnej zgodzie (jak w Ustawieniach → Modele i silniki).
+  pliki bez przypiętej sumy zatrzymują się na jawnej zgodzie (jak w Ustawieniach → Modele lokalne i silniki).
   Gdy rdzeń nie zwraca pakietów, zostaje poprzednia karta samego modelu.
 -->
 <script lang="ts">

@@ -1,4 +1,4 @@
-// Logika pakietów 1–6 na stronie „Modele i silniki” (bez Svelte — testowana w vitest): główne
+// Logika pakietów 1–6 na stronie „Modele lokalne i silniki” (bez Svelte — testowana w vitest): główne
 // działanie pakietu, postęp w bajtach, działania na elemencie, opis sprzętu tej maszyny.
 import type { DeviceProfile, GpuInfo } from '../api/types-hub';
 import type { BundleItemView, ModelBundle } from '../api/types-models';

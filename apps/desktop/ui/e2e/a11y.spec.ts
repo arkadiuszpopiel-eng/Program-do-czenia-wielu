@@ -49,7 +49,7 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(page.getByRole('heading', { name: 'Ogólne', level: 2 })).toBeVisible();
       await expectAccessible(page, `ustawienia ogólne ${theme}`);
       for (const section of [
-        'Modele i dostawcy',
+        'Konta i klucze API',
         'Import i eksport',
         'Uprawnienia i bezpieczeństwo',
         'Skróty',
@@ -68,7 +68,7 @@ for (const theme of ['light', 'dark'] as const) {
       }
       await page
         .getByRole('navigation', { name: 'Sekcje ustawień' })
-        .getByRole('button', { name: 'Modele i dostawcy' })
+        .getByRole('button', { name: 'Konta i klucze API' })
         .click();
       await page.getByRole('button', { name: 'Dodaj dostawcę' }).click();
       await expect(page.getByRole('heading', { name: 'Dodaj dostawcę' })).toBeVisible();

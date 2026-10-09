@@ -17,7 +17,7 @@ pub enum LocalError {
     NotInstalled(String),
     /// Brak pliku `llama-server` dla backendu.
     #[error(
-        "brak silnika modeli lokalnych (llama-server, wersja {0}) — pobierz go w Ustawieniach → Modele i silniki"
+        "brak silnika modeli lokalnych (llama-server, wersja {0}) — pobierz go w Ustawieniach → Modele lokalne i silniki"
     )]
     NoServerBinary(String),
     /// Uruchomienie procesu nie powiodło się.

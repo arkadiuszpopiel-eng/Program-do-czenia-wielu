@@ -48,7 +48,7 @@ fn piper_and_whisper_installed_after_start_are_found_without_restart() {
         voice.missing(),
         [MISSING_STT_SIDECAR, MISSING_STT_MODEL, MISSING_TTS]
     );
-    // Pobranie w Ustawieniach → Modele i silniki (aplikacja działa dalej).
+    // Pobranie w Ustawieniach → Modele lokalne i silniki (aplikacja działa dalej).
     install(&paths.sidecar("piper", "piper"));
     install(&paths.models().join("piper").join("pl_PL-gosia-medium.onnx"));
     assert_eq!(voice.missing(), [MISSING_STT_SIDECAR, MISSING_STT_MODEL]);

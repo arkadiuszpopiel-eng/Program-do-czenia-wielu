@@ -254,7 +254,7 @@ impl Embedding {
         }
         let manifest = lib_embed::installed(&model_dir(&self.models, id)).ok_or_else(|| {
             AppError::invalid(format!(
-                "Model „{id}” nie jest zainstalowany — pobierz go w Ustawieniach → Modele i silniki."
+                "Model „{id}” nie jest zainstalowany — pobierz go w Ustawieniach → Modele lokalne i silniki."
             ))
         })?;
         let residency = self.deps.residency.clone();

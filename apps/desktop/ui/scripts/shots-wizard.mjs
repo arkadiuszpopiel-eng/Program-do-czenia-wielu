@@ -44,7 +44,7 @@ for (const [skin, theme] of [
     await page.keyboard.press('Control+,');
     await page
       .getByRole('navigation', { name: 'Sekcje ustawień' })
-      .getByRole('button', { name: 'Modele i dostawcy' })
+      .getByRole('button', { name: 'Konta i klucze API' })
       .click();
     await page.getByRole('button', { name: 'Dodaj dostawcę' }).click();
     await page

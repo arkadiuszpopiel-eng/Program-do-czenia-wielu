@@ -99,7 +99,7 @@ fn warn_substitute(
             profil = wanted.as_str(),
             uzyty = used.as_str(),
             "brak llama-server dla backendu z profilu — używam kompilacji zastępczej; \
-             zainstaluj właściwą w Ustawieniach → Modele i silniki"
+             zainstaluj właściwą w Ustawieniach → Modele lokalne i silniki"
         );
     }
     used
@@ -115,7 +115,7 @@ pub fn residency(device: &Arc<dyn DeviceProfile>) -> Result<ResidencyModule, App
 }
 
 /// Moduł dostawcy lokalnego (sidecar uruchamiany dopiero przy pierwszym żądaniu) z ustawieniami
-/// silnika z Ustawień → Modele i silniki.
+/// silnika z Ustawień → Modele lokalne i silniki.
 pub fn provider_module(
     paths: &AppPaths,
     device: &Arc<dyn DeviceProfile>,

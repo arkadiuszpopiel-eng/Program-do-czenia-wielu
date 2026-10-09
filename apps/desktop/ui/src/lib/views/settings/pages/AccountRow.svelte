@@ -1,5 +1,5 @@
 <!--
-  Wiersz konta w „Modele i dostawcy": stan z powodem ostatniego testu (nie samo „klucz odrzucony”),
+  Wiersz konta w „Konta i klucze API": stan z powodem ostatniego testu (nie samo „klucz odrzucony”),
   wyjaśnienie z krokami naprawy, wymiana klucza bez usuwania konta (stary klucz zostaje, dopóki nowy
   nie przejdzie testu), wyłączanie i usuwanie.
 -->

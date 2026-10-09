@@ -1,5 +1,5 @@
 //! Komendy `models_local_*`: modele lokalne z manifestu `providers-local` (onboarding, Ustawienia →
-//! Modele i dostawcy → Lokalne) i ich pobieranie z wznawianiem i SHA-256; postęp jako zdarzenia
+//! Modele lokalne i silniki) i ich pobieranie z wznawianiem i SHA-256; postęp jako zdarzenia
 //! `LocalModelProgress` (most z `local.model.download.progress` w `lifecycle`). Pakiety 1–6
 //! menedżera modeli (`models_bundles`, `models_bundle_download`, `models_bundle_verify`) — dobór
 //! do bieżącego profilu urządzenia (`device-profile`), działania w `app-models`.

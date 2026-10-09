@@ -28,7 +28,7 @@ for (const skin of ['classic', 'glass', 'next']) {
     await page.getByRole('listbox', { name: 'Styl' }).waitFor();
     await page.screenshot({ path: join(outDir, `${skin}-${theme}-ustawienia.png`) });
     await page.keyboard.press('Escape');
-    await nav.getByRole('button', { name: 'Modele i silniki' }).click();
+    await nav.getByRole('button', { name: 'Modele lokalne i silniki' }).click();
     const kind = page.getByRole('combobox', { name: 'Rodzaj', exact: true });
     await kind.scrollIntoViewIfNeeded();
     await kind.click();

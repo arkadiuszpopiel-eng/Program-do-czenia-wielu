@@ -1,7 +1,7 @@
 <!-- Korzeń okna głównego: kontekst stanu, wygląd, skróty, widok (start / wprowadzenie / powłoka). -->
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { Button } from '@alfa/ui-kit';
+  import { Button, CONTEXT_MENU_LABELS, installContextMenu, installTooltips } from '@alfa/ui-kit';
   import { applyAppearance, effectiveWidth } from './lib/appearance';
   import AppShell from './lib/components/shell/AppShell.svelte';
   import Lazy from './lib/components/shell/Lazy.svelte';
@@ -53,19 +53,22 @@
 
   $effect(() => () => app.dispose());
 
-  function onContextMenu(event: MouseEvent) {
-    // Menu kontekstowe WebView tylko w polach tekstowych i treści do zaznaczania.
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest('input, textarea, [data-selectable], .alfa-prose')
-    )
-      return;
-    event.preventDefault();
-  }
+  // Menu kontekstowe i podpowiedzi rysuje Alfa — systemowe menu WebView i dymki `title` nie
+  // pojawiają się nigdzie.
+  $effect(() => {
+    const menu = installContextMenu({
+      labels: () => CONTEXT_MENU_LABELS[app.i18n.locale],
+      notify: (message) => app.toasts.show({ kind: 'warning', message }),
+    });
+    const tips = installTooltips();
+    return () => {
+      menu();
+      tips();
+    };
+  });
 </script>
 
-<svelte:window onkeydown={(e) => handleKeydown(app, e)} oncontextmenu={onContextMenu} />
+<svelte:window onkeydown={(e) => handleKeydown(app, e)} />
 
 {#if app.view === 'loading'}
   <div class="boot" data-surface="app" role="status" aria-label={t('app.loading')}></div>

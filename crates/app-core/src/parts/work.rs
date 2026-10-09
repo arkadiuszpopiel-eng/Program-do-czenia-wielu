@@ -37,7 +37,7 @@ pub(crate) struct WorkStack {
     pub updates: Arc<app_updates::UpdatesApp>,
     /// Wtyczki Wasm (`app-plugins`; te same, które dają narzędzia agentkom).
     pub plugins: Arc<app_plugins::PluginsApp>,
-    /// Modele i silniki, embedder wyszukiwania (`app-models`).
+    /// Modele lokalne i silniki, embedder wyszukiwania (`app-models`).
     pub models: Arc<app_models::ModelsApp>,
     /// Załączniki, eksport rozmowy, kopie zapasowe (`app-files`).
     pub files: Arc<app_files::FilesApp>,

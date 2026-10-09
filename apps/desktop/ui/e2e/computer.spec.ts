@@ -39,7 +39,7 @@ for (const theme of ['light', 'dark'] as const) {
     }) => {
       await openApp(page, { theme });
       await waitForChat(page);
-      await settings(page, 'Modele i dostawcy');
+      await settings(page, 'Mosty CLI');
       const cards = page.getByRole('list', { name: 'Karty zgodności mostów' });
       const claude = cards.getByRole('listitem').filter({ hasText: 'Claude Code (CLI)' });
       await claude.getByRole('button', { name: 'Zaloguj w terminalu' }).click();

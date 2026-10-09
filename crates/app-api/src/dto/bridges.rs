@@ -1,4 +1,4 @@
-//! DTO kart zgodności mostów CLI (Ustawienia → Modele i dostawcy → Mosty, PLAN §1.3, §5.5,
+//! DTO kart zgodności mostów CLI (Ustawienia → Mosty CLI, PLAN §1.3, §5.5,
 //! §8.5) — odpowiedniki `types-bridges.ts`. Logowanie do CLI wykonuje wyłącznie użytkownik
 //! (terminal z poleceniem do skopiowania); Alfa nie czyta ani nie przechowuje tokenów CLI.
 

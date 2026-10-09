@@ -38,7 +38,7 @@ tych części (kolumna „Laptop”).
 4. **Pierwszy start** (część 4, `-Run`) i **wprowadzenie** (część 5): w kroku **Sprzęt** ma być GeForce RTX 4050
    i profil **D** (CUDA); pozostałe kroki pomiń. Na karcie **Model lokalny** kliknij **Pobierz** (Bielik 4.5B Q8_0,
    ok. 4,8 GB — oficjalny plik autorów).
-5. **Model lokalny na karcie** (część 6, ok. 15 min). Ustawienia → **Modele i silniki** → **llama-server (cuda, …)**
+5. **Model lokalny na karcie** (część 6, ok. 15 min). Ustawienia → **Modele lokalne i silniki** → **llama-server (cuda, …)**
    (dwa archiwa: serwer i biblioteki cudart, razem ok. 550 MB), na zapas **llama-server (cpu, …)** (14 MB — gdy
    wersja CUDA nie wystartuje, Alfa przejdzie na nią) oraz Bielik, jeśli nie pobrał się we wprowadzeniu.
    Sumy SHA-256 na kartach zgody porównaj z tabelą niżej (pliki z GitHuba) albo z raportem CI. Ponowne uruchomienie
@@ -324,7 +324,7 @@ Przy pierwszym starcie Alfa prowadzi przez 8 kroków ([Pierwsze uruchomienie](01
 
 ## 6. Model lokalny i pierwsza rozmowa (F1-03)
 
-1. **Ustawienia** (`Ctrl+,`) → **Modele i silniki** ([opis](10-modele-i-silniki.md)). Pobierz model **Bielik 4.5B
+1. **Ustawienia** (`Ctrl+,`) → **Modele lokalne i silniki** ([opis](10-modele-i-silniki.md)). Pobierz model **Bielik 4.5B
    v3.0 Instruct** (Q8_0, ok. 4,8 GB), jeśli nie pobrał się we wprowadzeniu, oraz program do jego uruchamiania:
    - **Desktop:** **llama-server (vulkan)**.
    - **Laptop:** **llama-server (cuda, …)** — dwa archiwa (serwer i biblioteki cudart). Bez niej Alfa użyje wersji
@@ -405,7 +405,7 @@ mniej więcej trwało.
 
 ## 9. Mikrofon i rozmowa głosowa (F2-01, F2-04, F2-06)
 
-1. **Ustawienia → Modele i silniki** — pobierz **whisper-server (CPU)**, **piper**, głos **Piper pl_PL gosia**
+1. **Ustawienia → Modele lokalne i silniki** — pobierz **whisper-server (CPU)**, **piper**, głos **Piper pl_PL gosia**
    i **Silero VAD** (każdy przez kartę zgody jak w części 6) oraz model rozpoznawania mowy:
    - **Laptop:** **whisper-server (CUDA 12.4)** i model **Whisper large-v3-turbo-q5_0** — rozpoznawanie na karcie
      (gdy wersja CUDA nie wystartuje, Alfa sama przejdzie na procesor).
@@ -577,7 +577,7 @@ Typowe problemy:
 | `os error 112` albo brak miejsca                           | zwolnij miejsce; `cargo clean` w `C:\alfa` usuwa wyniki kompilacji (następna budowa potrwa dłużej)                   |
 | `the lock file … needs to be updated`                      | zgłoś sesji AI (nieaktualny `Cargo.lock` w repozytorium)                                                             |
 | model nie odpowiada, komunikat o braku `llama-server`      | część 6 (pobierz właściwy llama-server; na laptopie w razie kłopotów punkt 6a)                                       |
-| „Głos niedostępny” mimo pobranych silników                 | wejdź ponownie w Ustawienia → Głos; dalej — w Modele i silniki sprawdź stan „Zainstalowano” przy każdej pozycji      |
+| „Głos niedostępny” mimo pobranych silników                 | wejdź ponownie w Ustawienia → Głos; dalej — w Modele lokalne i silniki sprawdź stan „Zainstalowano” przy każdej pozycji      |
 | odpowiedź się urywa, w logu `out of memory` / `cudaMalloc` | brak pamięci karty — ramka „Pamięć karty” w skróconej ścieżce laptopa; zapisz `nvidia-smi` i log                     |
 | test na żywo: skrót zajęty                                 | wyłącz Alfę (także w zasobniku) i powtórz                                                                            |
 | instalator: „System Windows ochronił ten komputer”         | **Więcej informacji → Uruchom mimo to**                                                                              |

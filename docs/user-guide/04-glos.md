@@ -5,8 +5,8 @@ lokalnie, bez kluczy.
 
 ## Co trzeba przygotować
 
-Modele i programy głosu pobierzesz w **Ustawienia → Modele i silniki** (zobacz
-[Modele i silniki](10-modele-i-silniki.md)): `whisper-server (CPU)`, na komputerze z kartą NVIDIA także
+Modele i programy głosu pobierzesz w **Ustawienia → Modele lokalne i silniki** (zobacz
+[Modele lokalne i silniki](10-modele-i-silniki.md)): `whisper-server (CPU)`, na komputerze z kartą NVIDIA także
 `whisper-server (CUDA 12.4)` (rozpoznawanie na karcie; gdy nie wystartuje, Alfa sama wraca do procesora), model
 **Whisper large-v3-turbo-q5_0** (z kartą NVIDIA) albo lżejszy **small-q5_1** (na procesorze), **piper** z głosem
 **Piper pl_PL gosia** i **Silero VAD**. Pobrane silniki działają bez ponownego uruchamiania Alfy — od następnego
@@ -78,7 +78,7 @@ Akcja **Przeczytaj na głos** przy każdej wiadomości czyta ją głosem agentki
 ## Panel Głos (`Alt+6`): słowa wywoławcze, Twój głos, dyktowanie, czytanie
 
 Te funkcje są w aplikacji, ale każdą włączasz sam — w panelu Głos albo w **Ustawienia → Głos**. Potrzebują modeli
-z menedżera (**Ustawienia → Modele i silniki**, zobacz [Modele i silniki](10-modele-i-silniki.md)); bez modelu
+z menedżera (**Ustawienia → Modele lokalne i silniki**, zobacz [Modele lokalne i silniki](10-modele-i-silniki.md)); bez modelu
 panel pokazuje „niedostępne” i mówi, czego brakuje (**Wymaga plików**).
 
 - **Słowa wywoławcze** „Hej Alfa / Beta / Gama / Delta” — tryb „zawsze słucham”. Dopóki model nie jest

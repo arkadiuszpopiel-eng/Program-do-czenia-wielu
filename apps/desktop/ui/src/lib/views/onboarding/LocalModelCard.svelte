@@ -2,7 +2,7 @@
   Model lokalny w onboardingu (PLAN §14.5, ADR 0014) przez menedżer modeli: pobranie domyślnego
   modelu rozmowy jednym kliknięciem (wznawiane, SHA-256 w rdzeniu), postęp ze zdarzeń
   `ModelProgress`/`ModelChanged`, anulowanie; plik bez przypiętej sumy → jawna zgoda z policzonym
-  SHA-256 (jak w Ustawieniach → Modele i silniki).
+  SHA-256 (jak w Ustawieniach → Modele lokalne i silniki).
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';

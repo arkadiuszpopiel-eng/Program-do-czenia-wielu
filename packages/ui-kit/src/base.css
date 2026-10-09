@@ -232,6 +232,126 @@ input[type='file']::file-selector-button:hover {
   background: var(--alfa-color-surface2);
 }
 
+/*
+ * Pozostałe elementy, które WebView rysuje po swojemu: strzałki pól liczbowych, krzyżyk pola
+ * wyszukiwania, „oko” i krzyżyk pól w Edge/WebView2, trójkąt rozwijania i uchwyt zmiany rozmiaru.
+ * Zamiast nich — nic albo kształt z tokenów.
+ */
+input[type='number'] {
+  appearance: textfield;
+}
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
+  appearance: none;
+  margin: 0;
+}
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+::-webkit-resizer {
+  background: linear-gradient(
+    135deg,
+    transparent 50%,
+    var(--alfa-color-border-strong) 50% 58%,
+    transparent 58% 72%,
+    var(--alfa-color-border-strong) 72% 80%,
+    transparent 80%
+  );
+}
+summary {
+  list-style: none;
+  cursor: pointer;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+/* Własny znacznik rozwijania (kąt z obramowania); komponent z własną ikoną `.chev` go pomija. */
+summary:not(:has(.chev))::before {
+  content: '';
+  display: inline-block;
+  width: 0.42em;
+  height: 0.42em;
+  margin-inline: 0.15em 0.6em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-0.12em) rotate(-45deg);
+  transition: transform 0.12s ease;
+}
+details[open] > summary:not(:has(.chev))::before {
+  transform: translateY(-0.22em) rotate(45deg);
+}
+
+/* Menu kontekstowe i podpowiedzi Alfy (`overlays.ts`) — warstwa wierzchnia, pozycja z kodu. */
+.alfa-ctx,
+.alfa-tip {
+  position: fixed;
+  inset: auto;
+  z-index: 200;
+  margin: 0;
+  border: 1px solid var(--alfa-color-border);
+  background: var(--alfa-color-surface);
+  color: var(--alfa-color-text);
+  box-shadow: var(--alfa-shadow-3);
+  font-family: var(--alfa-font-ui);
+  font-size: var(--alfa-font-size-sm);
+}
+.alfa-ctx {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: var(--alfa-space-1);
+  border-radius: var(--alfa-radius-card);
+  outline: none;
+}
+.alfa-ctx:not(:popover-open):not([data-open]),
+.alfa-tip:not(:popover-open):not([data-open]) {
+  display: none;
+}
+.alfa-ctx button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--alfa-space-5);
+  min-height: 32px;
+  padding: 0 var(--alfa-space-3);
+  border: 0;
+  border-radius: var(--alfa-radius-control);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  white-space: nowrap;
+  cursor: default;
+}
+.alfa-ctx button:hover:not(:disabled),
+.alfa-ctx button.active {
+  background: var(--alfa-color-surface3);
+}
+.alfa-ctx button:disabled {
+  color: var(--alfa-color-text-muted);
+  opacity: 0.6;
+}
+.alfa-ctx .keys {
+  color: var(--alfa-color-text-muted);
+  font-size: var(--alfa-font-size-xs);
+}
+.alfa-ctx .sep {
+  height: 1px;
+  margin: var(--alfa-space-1) 0;
+  background: var(--alfa-color-border);
+}
+.alfa-tip {
+  max-width: 320px;
+  padding: var(--alfa-space-1) var(--alfa-space-2);
+  border-radius: var(--alfa-radius-control);
+  font-size: var(--alfa-font-size-xs);
+  line-height: 1.4;
+  pointer-events: none;
+}
+
 .alfa-visually-hidden {
   position: absolute;
   width: 1px;

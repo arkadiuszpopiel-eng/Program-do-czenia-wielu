@@ -29,6 +29,12 @@ export { default as Popover, type PopoverTriggerProps } from './components/Popov
 export { default as ResizeHandle } from './components/ResizeHandle.svelte';
 export { default as SanitizedHtml } from './components/SanitizedHtml.svelte';
 export { installDefaultPolicy, sanitizedHtml, sameOriginScriptUrl } from './trusted-types';
+export {
+  CONTEXT_MENU_LABELS,
+  installContextMenu,
+  installTooltips,
+  type ContextMenuLabels,
+} from './overlays';
 export { default as VariantSwitcher } from './components/VariantSwitcher.svelte';
 export { default as ConfirmDialog } from './components/ConfirmDialog.svelte';
 export { default as Stepper } from './components/Stepper.svelte';
@@ -44,3 +50,4 @@ export { default as ConversationScreen } from './screens/ConversationScreen.svel
 export { default as VoiceModeScreen } from './screens/VoiceModeScreen.svelte';
 
 export * as mock from './mock';
+export { uiZoom } from './zoom';

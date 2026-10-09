@@ -1,6 +1,6 @@
 // Interfejs menedżera modeli i silników (część `AlfaClient`; komendy `models_*`,
 // `models_bundle*`, `embed_model_activate`, `search_reindex_*` w COMMANDS.md). Działania z gestu właściciela
-// w Ustawieniach → „Modele i silniki” (i w onboardingu: lokalny model rozmowy).
+// w Ustawieniach → „Modele lokalne i silniki” (i w onboardingu: lokalny model rozmowy).
 import type {
   EmbedderView,
   ModelBundle,

@@ -137,8 +137,8 @@
  {
   "id": "providers",
   "label": {
-   "pl": "Modele i dostawcy",
-   "en": "Models and providers"
+   "pl": "Konta i klucze API",
+   "en": "API accounts and keys"
   },
   "wave": 1,
   "custom": "providers",
@@ -227,8 +227,8 @@
  {
   "id": "api",
   "label": {
-   "pl": "API i kolejki modeli",
-   "en": "API and model queues"
+   "pl": "Kolejki modeli API",
+   "en": "API model queues"
   },
   "wave": 1,
   "custom": "api",
@@ -236,10 +236,21 @@
   "upcoming": []
  },
  {
+  "id": "bridges",
+  "label": {
+   "pl": "Mosty CLI",
+   "en": "CLI bridges"
+  },
+  "wave": 1,
+  "custom": "bridges",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "models",
   "label": {
-   "pl": "Modele i silniki",
-   "en": "Models and engines"
+   "pl": "Modele lokalne i silniki",
+   "en": "Local models and engines"
   },
   "wave": 1,
   "custom": "models",

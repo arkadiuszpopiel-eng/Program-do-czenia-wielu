@@ -33,7 +33,7 @@ Windows **nie były jeszcze testowane na sprzęcie**. Zanim zaczniesz codziennie
 7. [Bezpieczeństwo: poziomy, kill-switch, cofanie](07-bezpieczenstwo.md)
 8. [Mosty CLI (Claude Code, Codex)](08-mosty-cli.md)
 9. [Przenoszenie danych, kopie i Zdrowie systemu](09-dane-i-zdrowie.md)
-10. [Modele i silniki](10-modele-i-silniki.md)
+10. [Modele lokalne i silniki](10-modele-i-silniki.md)
 11. [Pierwszy test na PC — lista kontrolna](11-pierwszy-test-na-pc.md) (budowa ze źródeł skryptem
     `scripts/setup-dev.ps1` i sprawdzenie krok po kroku na desktopie i laptopie)
 

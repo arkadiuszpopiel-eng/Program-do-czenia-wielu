@@ -159,7 +159,7 @@ impl Module for LocalModule {
             HealthStatus::Degraded("brak pobranego modelu lokalnego".into())
         } else if !self.provider.sidecar().config().engine_present() {
             HealthStatus::Degraded(
-                "brak silnika llama-server — pobierz go w Ustawieniach → Modele i silniki".into(),
+                "brak silnika llama-server — pobierz go w Ustawieniach → Modele lokalne i silniki".into(),
             )
         } else {
             HealthStatus::Healthy

@@ -1,5 +1,5 @@
 <!--
-  Pozycja katalogu „Modele i silniki": nazwa, rodzaj, rozmiar, licencja, stan (aria-live), uwagi
+  Pozycja katalogu „Modele lokalne i silniki": nazwa, rodzaj, rozmiar, licencja, stan (aria-live), uwagi
   („do potwierdzenia przez człowieka”, SHA-256 przypięty, instalacja ręczna), postęp pobierania,
   akcje (pobierz / wznów / przerwij / sprawdź / napraw / usuń / używaj do wyszukiwania) i karta zgody TOFU
   z policzonym SHA-256 każdego pliku bez przypiętej sumy.

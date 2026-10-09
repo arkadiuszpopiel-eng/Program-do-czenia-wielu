@@ -174,7 +174,7 @@ async fn missing_engine_gives_actionable_error_and_no_fallback() {
         })
         .expect("błąd dostawcy");
     assert!(
-        error.contains("brak silnika modeli lokalnych") && error.contains("Modele i silniki"),
+        error.contains("brak silnika modeli lokalnych") && error.contains("Modele lokalne i silniki"),
         "komunikat ma mówić, czego brakuje i gdzie to pobrać: {error}"
     );
     assert!(

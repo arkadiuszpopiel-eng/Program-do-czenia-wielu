@@ -281,7 +281,7 @@ pub fn convert_manifest() -> ToolManifest {
     manifest(
         "media_convert",
         "Konwersja multimediów",
-        "Konwertuje plik do formatu `format` (wav, mp3, flac, ogg, opus, m4a, mp4, webm, gif, png, jpg) przez ffmpeg, opcjonalnie fragment (`start_s`, `duration_s`) i pomniejszenie (`max_side`). Zapisuje NOWY plik (domyślnie „<nazwa> (Alfa).<ext>” obok źródła) — źródło zostaje bez zmian, krok można cofnąć. Wymaga zainstalowanego ffmpeg (Ustawienia → Modele i silniki).",
+        "Konwertuje plik do formatu `format` (wav, mp3, flac, ogg, opus, m4a, mp4, webm, gif, png, jpg) przez ffmpeg, opcjonalnie fragment (`start_s`, `duration_s`) i pomniejszenie (`max_side`). Zapisuje NOWY plik (domyślnie „<nazwa> (Alfa).<ext>” obok źródła) — źródło zostaje bez zmian, krok można cofnąć. Wymaga zainstalowanego ffmpeg (Ustawienia → Modele lokalne i silniki).",
         (schema_of::<ConvertArgs>(), schema_of::<ConvertOutput>()),
         &["fs.read", "fs.write"],
         "media.write",

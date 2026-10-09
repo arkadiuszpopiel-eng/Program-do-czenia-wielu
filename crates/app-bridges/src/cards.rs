@@ -1,4 +1,4 @@
-//! Karty zgodności tras mostów (Ustawienia → Modele i dostawcy → Mosty): stan trasy
+//! Karty zgodności tras mostów (Ustawienia → Mosty CLI): stan trasy
 //! z `compliance` (zielona/szara/zabroniona, nieświeży wpis), wersja wykryta vs przypięta,
 //! źródła regulaminu, data weryfikacji, wyłącznik i zgoda na harmonogram.
 

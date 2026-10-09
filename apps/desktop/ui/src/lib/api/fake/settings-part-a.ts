@@ -64,7 +64,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
   ]),
   page(
     'providers',
-    L('Modele i dostawcy', 'Models and providers'),
+    L('Konta i klucze API', 'API accounts and keys'),
     1,
     [
       select(
@@ -100,8 +100,9 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     ],
     { custom: 'providers' },
   ),
-  page('api', L('API i kolejki modeli', 'API and model queues'), 1, [], { custom: 'api' }),
-  page('models', L('Modele i silniki', 'Models and engines'), 1, ENGINE_SETTINGS, {
+  page('api', L('Kolejki modeli API', 'API model queues'), 1, [], { custom: 'api' }),
+  page('bridges', L('Mosty CLI', 'CLI bridges'), 1, [], { custom: 'bridges' }),
+  page('models', L('Modele lokalne i silniki', 'Local models and engines'), 1, ENGINE_SETTINGS, {
     custom: 'models',
   }),
   page(

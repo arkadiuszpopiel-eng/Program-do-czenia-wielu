@@ -1,10 +1,10 @@
-// Słownik PL: Ustawienia → „Modele i silniki" (menedżer pobierań, zgoda TOFU, embedder wyszukiwania,
+// Słownik PL: Ustawienia → „Modele lokalne i silniki" (menedżer pobierań, zgoda TOFU, embedder wyszukiwania,
 // przebudowa wektorów).
 import type { Message } from './core';
 
 export const plModels = {
   'engines.intro':
-    'Modele i silniki działają lokalnie na tym komputerze. Pobieranie wznawia się po przerwaniu, a każdy plik jest sprawdzany sumą SHA-256 — plik bez przypiętej sumy instaluje się dopiero po Twojej zgodzie. Bez telemetrii.',
+    'Modele lokalne i silniki działają lokalnie na tym komputerze. Pobieranie wznawia się po przerwaniu, a każdy plik jest sprawdzany sumą SHA-256 — plik bez przypiętej sumy instaluje się dopiero po Twojej zgodzie. Bez telemetrii.',
   'engines.loading': 'Ładowanie listy modeli…',
   'engines.search.title': 'Wyszukiwanie w pamięci',
   'engines.search.active': 'Używany model: {name}',

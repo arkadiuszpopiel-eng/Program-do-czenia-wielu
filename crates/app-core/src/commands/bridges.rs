@@ -1,4 +1,4 @@
-//! Komendy kart zgodności mostów CLI (`bridges_*`, Ustawienia → Modele i dostawcy → Mosty) —
+//! Komendy kart zgodności mostów CLI (`bridges_*`, Ustawienia → Mosty CLI) —
 //! delegują do `app-bridges::BridgesApp`. Logowanie do CLI wykonuje wyłącznie użytkownik:
 //! „Zaloguj w terminalu" otwiera terminal i podaje polecenie do skopiowania.
 

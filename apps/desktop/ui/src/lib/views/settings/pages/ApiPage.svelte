@@ -1,7 +1,7 @@
 <!--
-  Ustawienia → API i kolejki modeli (zgłoszenie właściciela, 2026-10-09: konto ze 133 modelami,
+  Ustawienia → Kolejki modeli API (zgłoszenie właściciela, 2026-10-09: konto ze 133 modelami,
   a wybrać nie dało się żadnego). Dla każdego konta API: kolejka do dziesięciu modeli na klasę
-  zadań i przeglądarka pełnej listy modeli dostawcy. Klucze i stan kont — „Modele i dostawcy”.
+  zadań i przeglądarka pełnej listy modeli dostawcy. Klucze i stan kont — „Konta i klucze API”.
 -->
 <script lang="ts">
   import { Banner, Button, EmptyState } from '@alfa/ui-kit';

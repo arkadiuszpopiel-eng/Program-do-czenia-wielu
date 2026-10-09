@@ -260,7 +260,7 @@ export class FakeEngines {
         if (model !== LEXICAL && this.items.get(model)?.state !== 'installed') {
           return Promise.reject(
             new Error(
-              `Model „${model}” nie jest zainstalowany — pobierz go w Ustawieniach → Modele i silniki.`,
+              `Model „${model}” nie jest zainstalowany — pobierz go w Ustawieniach → Modele lokalne i silniki.`,
             ),
           );
         }
