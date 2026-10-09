@@ -230,8 +230,10 @@ Porządki na dyskach, 2026-10-09 (zgoda właściciela): została jedna kopia rob
 kompilacji w `apps/desktop/src-tauri/target` (36 GB), te same w `D:\alfa` oraz w ukrytej, zmaterializowanej kopii repozytorium
 wewnątrz magazynu pnpm (`alfa-narzedzia/pnpm-store/v10/projects/…` — dowiązanie zamienione w katalog przy kopiowaniu z D:).
 Do Kosza: `D:\alfa`, `D:\alfa-narzedzia`, ta ukryta kopia, migawka ZIP z GitHuba i jej katalog — każde po sprawdzeniu, że ma
-ten sam commit co GitHub i zero niewypchniętych zmian. Nietknięte: `D:\alfa-narzedzia.rar` (12 GB, archiwum właściciela) i globalne
-`~/.npmrc` (`cache=D:\alfa-narzedzia\npm-cache` — poza środowiskiem przenośnym npm odtworzy ten katalog).
+ten sam commit co GitHub i zero niewypchniętych zmian. Nietknięte: `D:\alfa-narzedzia.rar` (12 GB, archiwum właściciela).
+Z globalnego `~/.npmrc` usunięto linię `cache=D:\alfa-narzedzia\npm-cache` (`npm config delete cache`): każde wywołanie npm poza
+środowiskiem przenośnym — także z haka formatującego — odtwarzało przez nią katalog na D:. npm używa teraz domyślnej
+lokalizacji w profilu użytkownika.
 
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
