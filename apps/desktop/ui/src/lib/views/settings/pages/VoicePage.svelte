@@ -5,12 +5,20 @@
   głosu, dyktowanie, czytanie) — sekcje ładowane leniwie (`VoiceSettings`).
 -->
 <script lang="ts">
+  import type { SettingDef } from '../../../api/types-system';
+  import SettingRow from '../SettingRow.svelte';
   import { Avatar, Button, Select, agentIds, agents } from '@alfa/ui-kit';
   import type { AudioDevice } from '../../../api/types-hub';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Lazy from '../../../components/shell/Lazy.svelte';
+
+  interface Props {
+    /** Ustawienia strojenia mowy (`voice.tts_*`) — pokazywane przy głosach agentek. */
+    settings?: readonly SettingDef[];
+  }
+  let { settings = [] }: Props = $props();
 
   const app = useApp();
   const { t } = app.i18n;
@@ -165,10 +173,16 @@
 <section class="card" aria-labelledby="voice-voices">
   <h3 id="voice-voices">{t('voice.voices')}</h3>
   <p class="muted">{t('voice.voicesHint')}</p>
+  {#if settings.length > 0}
+    <div class="tuning">
+      {#each settings as def (def.key)}<SettingRow {def} />{/each}
+    </div>
+    <p class="muted">{t('voice.tuningHint')}</p>
+  {/if}
   <ul class="voices">
     {#each agentIds as id (id)}
       <li class="voice">
-        <Avatar agent={id} size={24} decorative />
+        <Avatar agent={id} size={40} speaking={app.speechAgent === id} decorative />
         <span class="name">{agents[id].name}</span>
         <span class="muted">{t(`voice.bible.${id}`)}</span>
         <Button size="sm" variant="ghost" onclick={() => void preview(id)}
@@ -193,6 +207,9 @@
   }
   h3 {
     font-size: var(--alfa-font-size-md);
+  }
+  .tuning {
+    margin: var(--alfa-space-1) 0;
   }
   .muted {
     color: var(--alfa-color-text-muted);

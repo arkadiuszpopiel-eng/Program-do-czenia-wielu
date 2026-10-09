@@ -44,7 +44,7 @@ export const tokens = {
     full: 9999,
   },
   size: {
-    titlebar: 36,
+    titlebar: 44,
     hitTarget: 24,
     control: 32,
     sidebarMin: 240,

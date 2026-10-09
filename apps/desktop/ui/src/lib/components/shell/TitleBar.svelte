@@ -137,8 +137,10 @@
     display: flex;
     align-items: center;
     gap: var(--alfa-space-2);
+    --led-lane: 5px;
     height: var(--alfa-size-titlebar);
-    padding: 0 var(--alfa-space-2);
+    /* Elementy są wyśrodkowane w części nad torem paska LED. */
+    padding: 0 var(--alfa-space-2) var(--led-lane) var(--alfa-space-3);
     border-bottom: 1px solid var(--alfa-color-border);
     background: var(--alfa-color-surface);
     font-size: var(--alfa-font-size-sm);
@@ -164,15 +166,14 @@
     align-self: stretch;
     min-width: var(--alfa-space-4);
   }
-  /* Pasek LED: przygaszona listwa w kolorach agentek, po której od lewej do prawej jedzie jasne
-     światło z poświatą padającą na belkę. */
+  /* Pasek LED ma własny tor pod elementami belki (`--led-lane`): listwa w barwach agentek i jasne
+     światło jadące od lewej do prawej. Nic z paska nie wchodzi na przyciski i kapsuły. */
   .led {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -1px;
-    z-index: 1;
-    height: 22px;
+    bottom: 0;
+    height: 3px;
     overflow: hidden;
     pointer-events: none;
     /* Barwy agentek rozjaśnione do świecących — czytelne na jasnej i ciemnej belce. */
@@ -184,12 +185,9 @@
   .led::before {
     content: '';
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 4px;
+    inset: 0;
     background: linear-gradient(90deg, var(--led-a), var(--led-b), var(--led-c), var(--led-d));
-    opacity: 0.3;
+    opacity: 0.38;
   }
   .led::after {
     content: '';
@@ -197,24 +195,18 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 30%;
+    width: 28%;
     background:
-      linear-gradient(90deg, transparent 52%, #ffffff 80%, transparent 96%) bottom / 100% 2px
+      linear-gradient(90deg, transparent 55%, #ffffff 82%, transparent 97%) center / 100% 1px
         no-repeat,
       linear-gradient(
-          90deg,
-          transparent,
-          var(--led-a) 22%,
-          var(--led-b) 50%,
-          var(--led-c) 76%,
-          var(--led-d) 92%,
-          transparent
-        )
-        bottom / 100% 4px no-repeat,
-      radial-gradient(
-        ellipse 48% 100% at 70% 100%,
-        color-mix(in oklab, var(--led-c) 55%, transparent),
-        transparent 70%
+        90deg,
+        transparent,
+        var(--led-a) 22%,
+        var(--led-b) 50%,
+        var(--led-c) 76%,
+        var(--led-d) 92%,
+        transparent
       );
     transform: translateX(-100%);
     animation: led-run 3.2s linear infinite;
@@ -230,7 +222,7 @@
   }
   @keyframes led-run {
     to {
-      transform: translateX(334%);
+      transform: translateX(358%);
     }
   }
   /* Animacje wyłączone: światło stoi — zostaje równa, jaśniejsza listwa. */

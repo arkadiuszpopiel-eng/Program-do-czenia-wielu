@@ -1,0 +1,103 @@
+/* Ekran ładowania Alfy (`index.html`). Osobny plik, a nie blok <style> w stronie: wbudowany styl
+   dostaje w oknie programu jednorazowy znacznik CSP, który wyłącza style nadawane elementom przez
+   interfejs. Plik jest mały i wczytuje się przed kodem programu. */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+#alfa-boot {
+  --boot-bg: #f6f7f9;
+  --boot-text: #1a1c22;
+  --boot-muted: #5b6070;
+  --boot-track: #dfe2ea;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--boot-bg);
+  color: var(--boot-text);
+  font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  transition: opacity 260ms ease-out;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) #alfa-boot {
+    --boot-bg: #131417;
+    --boot-text: #f1f2f5;
+    --boot-muted: #a3a8b8;
+    --boot-track: #2c2f38;
+  }
+}
+:root[data-theme='dark'] #alfa-boot {
+  --boot-bg: #131417;
+  --boot-text: #f1f2f5;
+  --boot-muted: #a3a8b8;
+  --boot-track: #2c2f38;
+}
+#alfa-boot.done {
+  opacity: 0;
+  pointer-events: none;
+}
+#alfa-boot .mark {
+  width: 84px;
+  height: 84px;
+  animation: alfa-boot-breathe 1.8s ease-in-out infinite alternate;
+}
+#alfa-boot .name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+#alfa-boot .bar {
+  position: relative;
+  width: 220px;
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--boot-track);
+}
+#alfa-boot .bar span {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #f0483a, #7c5cff, #0ea5c6, #19b382);
+  transform: translateX(-100%);
+  animation: alfa-boot-run 1.3s ease-in-out infinite;
+}
+#alfa-boot .step {
+  margin: 0;
+  min-height: 20px;
+  color: var(--boot-muted);
+  font-size: 13px;
+}
+@keyframes alfa-boot-run {
+  to {
+    transform: translateX(250%);
+  }
+}
+@keyframes alfa-boot-breathe {
+  from {
+    transform: scale(0.96);
+  }
+  to {
+    transform: scale(1.03);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #alfa-boot .mark,
+  #alfa-boot .bar span {
+    animation: none;
+  }
+  #alfa-boot .bar span {
+    width: 100%;
+    transform: none;
+    opacity: 0.6;
+  }
+}

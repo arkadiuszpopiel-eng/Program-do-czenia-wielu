@@ -101,7 +101,9 @@ export const plAgents = {
   'voice.levelBoth': 'Po redukcji szumów: {level}% · surowy sygnał z mikrofonu: {raw}%',
   'voice.levelHint':
     'Niebieski pasek to sygnał po redukcji szumów — gdy nic nie mówisz, powinien opadać do zera. Szary pod spodem pokazuje, ile tła (wentylatory, otoczenie) łapie sam mikrofon. Siłę redukcji ustawisz niżej.',
-  'voice.voices': 'Głosy agentek (v0)',
+  'voice.voices': 'Głosy agentek',
+  'voice.tuningHint':
+    'Zmiany działają od następnego zdania — ustaw i od razu odsłuchaj poniżej. Lepsze głosy niż obecny (Piper „Gosia”) wymagają innego silnika mowy; to osobny etap.',
   'voice.voicesHint': 'Głosy v0 bez kluczy (lokalnie). Odsłuchaj próbkę każdej agentki.',
   'voice.preview': 'Odsłuchaj głos: {name}',
   'voice.bible.alfa': 'ciepły, spokojny, środkowy rejestr',

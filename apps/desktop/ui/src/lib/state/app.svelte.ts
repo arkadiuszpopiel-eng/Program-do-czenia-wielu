@@ -75,6 +75,9 @@ export class AppState {
   /** Konto wybrane na stronie „Kolejki modeli API” (ustawiane przez przejście z listy kont). */
   apiAccount = $state('');
   micLevel = $state(0);
+  /** Agentka, której mowę właśnie słychać z głośnika (z pomiaru poziomu); pusty = nikt. */
+  speechAgent = $state('');
+  private speechTimer: ReturnType<typeof setTimeout> | undefined;
   /** Surowy poziom mikrofonu z testu (przed redukcją szumów); `null` poza testem. */
   micRaw = $state<number | null>(null);
   conversation = $state.raw<ConversationState | null>(null);
@@ -92,6 +95,8 @@ export class AppState {
   announcement = $state('');
   dismissed = $state<Record<string, boolean>>({});
   appVersion = $state('');
+  /** Opis bieżącego kroku startu — pokazywany na ekranie ładowania. */
+  bootStep = $state('');
   /** Ostatni postęp pobierania modelu lokalnego (onboarding, Ustawienia). */
   localDownload = $state<LocalModelProgress | null>(null);
 
@@ -137,6 +142,14 @@ export class AppState {
     return this.sessions.activeId;
   }
 
+  /** Pomiar poziomu mowy: agentka „mówi”, dopóki przychodzą dźwięki; krótka pauza jej nie gasi. */
+  noteSpeech(agent: string, level: number): void {
+    if (level <= 0 || !agent) return;
+    this.speechAgent = agent;
+    clearTimeout(this.speechTimer);
+    this.speechTimer = setTimeout(() => (this.speechAgent = ''), 900);
+  }
+
   /**
    * Start okna. Krytyczne (widok błędu z „Ponów"): ustawienia startowe, słownik, lista sesji.
    * Reszta (stan systemu, głos, koszty, agentki, szkic) — toast albo dziennik, okno działa dalej.
@@ -144,6 +157,7 @@ export class AppState {
   async start(): Promise<void> {
     this.view = 'loading';
     this.fatal = null;
+    this.bootStep = '';
     let boot: AppBootstrap;
     let list: readonly SessionSummary[];
     let status: Promise<unknown> = Promise.resolve();
@@ -154,6 +168,7 @@ export class AppState {
       this.shortcutOverrides = { ...boot.shortcut_overrides };
       this.layout.load(boot.layout);
       await this.i18n.setLocale(boot.locale);
+      this.bootStep = this.i18n.t('boot.sessions');
       this.unsubscribe?.();
       this.unsubscribe = this.client.subscribe((batch) => this.batcher.push(...batch));
       status = this.client.system.status().then(

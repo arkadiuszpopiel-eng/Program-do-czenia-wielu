@@ -1,8 +1,16 @@
 <!-- Korzeń okna głównego: kontekst stanu, wygląd, skróty, widok (start / wprowadzenie / powłoka). -->
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { Button, CONTEXT_MENU_LABELS, installContextMenu, installTooltips } from '@alfa/ui-kit';
+  import {
+    Button,
+    CONTEXT_MENU_LABELS,
+    installContextMenu,
+    installTooltips,
+    setAvatarStyle,
+  } from '@alfa/ui-kit';
+  import { isTauri } from './lib/api';
   import { applyAppearance, effectiveWidth } from './lib/appearance';
+  import { BOOT_MIN_MS, bootStep, finishBoot, rememberTheme } from './lib/boot-screen';
   import AppShell from './lib/components/shell/AppShell.svelte';
   import Lazy from './lib/components/shell/Lazy.svelte';
   import type { AppState } from './lib/state/app.svelte';
@@ -52,6 +60,15 @@
   });
 
   $effect(() => () => app.dispose());
+
+  // Ekran ładowania (z `index.html`) znika, gdy interfejs ma dane startowe albo pokazuje błąd.
+  // Minimalny czas tylko w oknie programu — w przeglądarce (dev, testy) nie ma na co czekać.
+  $effect(() => {
+    if (app.view === 'loading') bootStep(app.bootStep || t('boot.core'));
+    else finishBoot(isTauri() ? BOOT_MIN_MS : 0);
+  });
+  $effect(() => setAvatarStyle(app.str('ui.avatars', 'animated')));
+  $effect(() => rememberTheme(window.localStorage, app.str('ui.theme', 'auto')));
 
   // Menu kontekstowe i podpowiedzi rysuje Alfa — systemowe menu WebView i dymki `title` nie
   // pojawiają się nigdzie.

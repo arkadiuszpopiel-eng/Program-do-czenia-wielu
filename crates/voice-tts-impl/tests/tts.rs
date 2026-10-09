@@ -322,3 +322,87 @@ async fn residency_lease_and_module() {
     );
     m.stop().await.unwrap();
 }
+
+/// Piper zapisujący argumenty wywołań — sprawdzamy, co naprawdę trafia do silnika.
+struct RecordingPiper(Arc<std::sync::Mutex<Vec<Vec<String>>>>);
+
+#[async_trait]
+impl ProcessRunner for RecordingPiper {
+    async fn run(
+        &self,
+        _p: &Path,
+        args: &[String],
+        stdin: Vec<u8>,
+        _t: Duration,
+    ) -> Result<Vec<u8>, String> {
+        self.0.lock().unwrap().push(args.to_vec());
+        Ok(tone_pcm16(
+            String::from_utf8_lossy(&stdin).trim().chars().count(),
+            22_050,
+        ))
+    }
+}
+
+fn arg(args: &[String], name: &str) -> f32 {
+    let at = args.iter().position(|a| a == name).expect(name);
+    args[at + 1].parse().expect("liczba")
+}
+
+/// Zgłoszenie właściciela (2026-10-09): głos sztywny i niemiły. Strojenie z Ustawień trafia do
+/// Pipera (tempo natywnie, ekspresja, rytm), odrębność głosów skaluje przestrajanie, a po zdaniu
+/// jest pauza.
+#[tokio::test]
+async fn tuning_reaches_piper_and_shapes_the_audio() {
+    use voice_tts_contract::{SharedTuning, TtsTuning};
+    let calls: Arc<std::sync::Mutex<Vec<Vec<String>>>> = Arc::default();
+    let tuning = SharedTuning::default();
+    let engine: Arc<dyn TtsBackend> = Arc::new(
+        PiperEngine::new(
+            "piper".into(),
+            "/modele".into(),
+            Arc::new(RecordingPiper(calls.clone())),
+        )
+        .with_tuning(tuning.clone()),
+    );
+    let tts = TtsService::new(v0_chains(), vec![engine])
+        .unwrap()
+        .with_tuning(tuning.clone());
+    let say = |id: u64| request(id, PersonaId::delta(), "Już sprawdzam.");
+
+    // Ustawienia domyślne silnika: pełne różnice głosów, bez pauzy. Delta mówi szybciej (preset
+    // 1.08), a tempo ustawia sam Piper — długość zdania skraca `--length_scale`, nie rozciąganie.
+    let plain = collect(&tts, say(1), CancelToken::new()).await.unwrap();
+    let first = calls.lock().unwrap().last().cloned().unwrap();
+    assert!((arg(&first, "--length_scale") - 1.0 / 1.08).abs() < 0.01);
+    assert!((arg(&first, "--noise_scale") - 0.667).abs() < 0.01);
+    assert!((arg(&first, "--noise_w") - 0.8).abs() < 0.01);
+
+    // Strojenie użytkownika: wolniej, żywiej, jeden głos, pauza 300 ms.
+    tuning.set(TtsTuning {
+        speed: 0.8,
+        expressiveness: 0.9,
+        rhythm: 1.0,
+        pause_ms: 300,
+        character: 0.0,
+    });
+    let tuned = collect(&tts, say(2), CancelToken::new()).await.unwrap();
+    let second = calls.lock().unwrap().last().cloned().unwrap();
+    assert!((arg(&second, "--length_scale") - 1.25).abs() < 0.01);
+    assert!((arg(&second, "--noise_scale") - 0.9).abs() < 0.01);
+    assert!((arg(&second, "--noise_w") - 1.0).abs() < 0.01);
+
+    // Jeden głos = bez przestrajania: wysokość tonu wraca do bazowej (atrapa gra 200 Hz).
+    let f0 = |c: &voice_tts_contract::TtsChunk| -> f32 {
+        estimate_f0(&c.audio.pcm[1_000..5_800], 24_000, 80.0, 400.0).unwrap()
+    };
+    let (delta_pitch, base_pitch) = (f0(&plain[0]), f0(&tuned[0]));
+    assert!((base_pitch - 200.0).abs() < 4.0, "bazowy {base_pitch} Hz");
+    assert!(delta_pitch > base_pitch + 15.0, "Delta {delta_pitch} Hz");
+
+    // Pauza: zdanie kończy się 300 ms ciszy.
+    let pcm = &tuned[0].audio.pcm;
+    let pause = 24_000 * 300 / 1000;
+    assert!(pcm.len() > pause);
+    assert!(pcm[pcm.len() - pause..].iter().all(|s| *s == 0.0));
+    assert!(plain[0].audio.pcm.iter().rev().take(100).any(|s| *s != 0.0));
+}

@@ -5,8 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <title>Alfa</title>
+    <!-- Ekran ładowania: widoczny od pierwszej klatki, zanim wczyta się kod interfejsu. Styl w osobnym
+         pliku (bez stylów wbudowanych w stronę — patrz komentarz w boot.css); kolory zgodne z motywem systemu albo
+         zapamiętanym. -->
+    <link rel="stylesheet" href="/boot.css" />
   </head>
   <body>
+    <div id="alfa-boot" role="status" aria-live="polite">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="alfa-boot-g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7c5cff" />
+            <stop offset="0.55" stop-color="#4f46e5" />
+            <stop offset="1" stop-color="#0ea5c6" />
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#alfa-boot-g)" />
+        <path
+          d="M46 19.5C40.5 33 33.5 45 24.5 45 17.5 45 13.5 39 13.5 32S17.5 19 24.5 19C33.5 19 40 31 47.5 45"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="5.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <p class="name">Alfa</p>
+      <div class="bar" aria-hidden="true"><span></span></div>
+      <p class="step" id="alfa-boot-step">Uruchamianie…</p>
+    </div>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

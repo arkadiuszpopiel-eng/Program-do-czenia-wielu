@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.13). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.14). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -35,6 +35,7 @@ Szczegółowe zadania: [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §6, etapy 0–3
 | A.3i | Kilka kart graficznych: role kart, przypinanie modelu do karty głównej, lekki dostawca lokalny na karcie zintegrowanej (klasa „streszczenia”) | zrobione | 2026-10-09 | wersja 0.0.11 (kod i testy); praca na karcie zintegrowanej niesprawdzona na sprzęcie — wymaga silnika Vulkan (zgoda właściciela na pobranie) |
 | A.3j | Belka: obsada agentek, mikrofon i stan (profil, autonomia, koszt) od nowa, objaśnienie stanu | zrobione | 2026-10-09 | wersja 0.0.12; zgłoszenie właściciela |
 | A.3k | Znak Alfy: ikona programu i znak z nazwą na belce okna | zrobione | 2026-10-09 | wersja 0.0.13; zgłoszenie właściciela |
+| A.3l | Belka z torem paska LED, ekran ładowania, żywe awatary agentek z ustami w rytm mowy (zdarzenie `SpeechLevel`), strojenie mowy w „Głos” (styl, tempo, pauzy, różnice głosów) | zrobione | 2026-10-09 | wersja 0.0.14; brzmienie do oceny właściciela; inne głosy niż Piper „Gosia” — osobna decyzja |
 | A.4 | Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1) | czeka | — | zgoda właściciela na pobranie pakietu ok. 6 GB |
 | A.5 | Głos na żywo: dyktowanie i czytanie | czeka | — | po A.4 (te same silniki w pakiecie) |
 | A.6 | Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2) | czeka | — | po A.4 |

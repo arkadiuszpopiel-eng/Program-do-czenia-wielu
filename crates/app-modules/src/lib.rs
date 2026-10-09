@@ -26,6 +26,7 @@ pub mod late;
 pub mod probe;
 pub mod route;
 pub mod secrets;
+pub mod speech_meter;
 pub mod stt;
 pub mod transfer;
 pub mod tts;

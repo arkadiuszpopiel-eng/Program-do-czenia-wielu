@@ -227,10 +227,16 @@ impl VoicePort for VoiceAdapter {
             .synth(request, cancel.clone())
             .await
             .map_err(|e| audio_error("Czytanie na głos", e))?;
-        let mut output = self
+        let output = self
             .io
             .open_output(None, &StreamConfig::output_default())
             .map_err(|e| audio_error("Czytanie na głos — głośnik", e))?;
+        // Poziom mowy do interfejsu (awatar mówiącej agentki).
+        let mut output: Box<dyn voice_audio_contract::OutputStream> =
+            Box::new(crate::speech_meter::MeteredOutput::new(
+                output,
+                crate::speech_meter::SpeechMeter::new(self.events.clone()),
+            ));
         lock(&self.state).speech = Some((utterance, cancel.clone()));
         let events = self.events.clone();
         let state = self.state.clone();

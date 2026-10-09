@@ -72,7 +72,7 @@
   .window-controls {
     display: flex;
     align-self: stretch;
-    margin-left: var(--alfa-space-1);
+    margin-left: var(--alfa-space-2);
     margin-right: calc(-1 * var(--alfa-space-2));
   }
   .wc {

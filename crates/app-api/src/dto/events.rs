@@ -124,6 +124,12 @@ pub enum AlfaEvent {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         raw: Option<f64>,
     },
+    /// Poziom mowy agentki z głośnika (0–1) — awatar rusza ustami w tym rytmie.
+    SpeechLevel {
+        /// Agentka, która mówi (puste przy ciszy po przerwaniu).
+        agent: String,
+        level: f64,
+    },
     VoicePill {
         state: VoicePillState,
     },

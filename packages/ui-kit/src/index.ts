@@ -6,6 +6,13 @@ export type * from './types';
 export { default as Button } from './components/Button.svelte';
 export { default as IconButton } from './components/IconButton.svelte';
 export { default as Avatar } from './components/Avatar.svelte';
+export {
+  avatarState,
+  mouthOpen,
+  setAvatarStyle,
+  setSpeechLevel,
+  type AvatarStyle,
+} from './avatar-state.svelte';
 export { default as Chip } from './components/Chip.svelte';
 export { default as Panel } from './components/Panel.svelte';
 export { default as Composer } from './components/Composer.svelte';

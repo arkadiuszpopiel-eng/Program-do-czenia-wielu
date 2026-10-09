@@ -1961,6 +1961,11 @@
     }
   },
   {
+    "type": "SpeechLevel",
+    "agent": "beta",
+    "level": 0.1
+  },
+  {
     "type": "SystemStatusChanged",
     "status": {
       "online": false,
@@ -2018,6 +2023,16 @@
     "session_id": "s-api",
     "turn_id": "t-muo3lc30-19",
     "status": "complete"
+  },
+  {
+    "type": "SpeechLevel",
+    "agent": "beta",
+    "level": 0.39484927202438314
+  },
+  {
+    "type": "SpeechLevel",
+    "agent": "beta",
+    "level": 0.6348339537962143
   },
   {
     "type": "Error",

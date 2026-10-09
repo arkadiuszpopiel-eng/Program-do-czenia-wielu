@@ -1,0 +1,201 @@
+//! Strojenie mowy przez użytkownika (Ustawienia → Głos): tempo, ekspresja, rytm, pauzy i to, jak
+//! bardzo głosy agentek różnią się od siebie. Wartości domyślne odpowiadają zachowaniu sprzed
+//! wprowadzenia strojenia; zalecane ustawienia programu wybiera aplikacja ([`VoiceStyle`]).
+
+use std::sync::{Arc, PoisonError, RwLock};
+
+/// Zakres tempa mowy (1.0 = tempo głosu bazowego).
+pub const SPEED_RANGE: (f32, f32) = (0.6, 1.6);
+/// Najdłuższa pauza między zdaniami (ms).
+pub const MAX_PAUSE_MS: u32 = 1_000;
+
+/// Parametry syntezy wspólne dla wszystkich agentek.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TtsTuning {
+    /// Tempo mowy (mnożnik; > 1 = szybciej).
+    pub speed: f32,
+    /// Ekspresja — zmienność intonacji (Piper: `noise_scale`, 0.3–1.0).
+    pub expressiveness: f32,
+    /// Zmienność rytmu — długości głosek (Piper: `noise_w`, 0.3–1.2).
+    pub rhythm: f32,
+    /// Pauza po każdym zdaniu (ms).
+    pub pause_ms: u32,
+    /// Odrębność głosów agentek: 0 = wszystkie mówią głosem bazowym (bez przestrajania, najczystszy
+    /// dźwięk), 1 = pełne różnice wysokości i tempa z presetów.
+    pub character: f32,
+}
+
+impl Default for TtsTuning {
+    fn default() -> Self {
+        Self {
+            speed: 1.0,
+            expressiveness: 0.667,
+            rhythm: 0.8,
+            pause_ms: 0,
+            character: 1.0,
+        }
+    }
+}
+
+impl TtsTuning {
+    /// Wartości sprowadzone do dopuszczalnych zakresów (NaN → domyślne).
+    #[must_use]
+    pub fn clamped(self) -> Self {
+        let base = Self::default();
+        let fix = |value: f32, fallback: f32, low: f32, high: f32| {
+            if value.is_finite() {
+                value.clamp(low, high)
+            } else {
+                fallback
+            }
+        };
+        Self {
+            speed: fix(self.speed, base.speed, SPEED_RANGE.0, SPEED_RANGE.1),
+            expressiveness: fix(self.expressiveness, base.expressiveness, 0.3, 1.0),
+            rhythm: fix(self.rhythm, base.rhythm, 0.3, 1.2),
+            pause_ms: self.pause_ms.min(MAX_PAUSE_MS),
+            character: fix(self.character, base.character, 0.0, 1.0),
+        }
+    }
+
+    /// Wysokość albo tempo presetu agentki po uwzględnieniu odrębności głosów: przy `character`
+    /// równym 0 każda wartość wraca do 1.0 (głos bazowy).
+    #[must_use]
+    pub fn blend(self, preset: f32) -> f32 {
+        1.0 + (preset - 1.0) * self.character.clamp(0.0, 1.0)
+    }
+}
+
+/// Styl mówienia wybierany w Ustawieniach — gotowe zestawy ekspresji i rytmu.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum VoiceStyle {
+    /// Spokojny, równy — mniej zmienności.
+    Calm,
+    /// Naturalny (zalecany) — żywsza intonacja i rytm niż domyślne ustawienia silnika.
+    #[default]
+    Natural,
+    /// Żywy — najwięcej ekspresji.
+    Lively,
+}
+
+impl VoiceStyle {
+    /// Styl z wartości ustawienia (`calm` / `natural` / `lively`); nieznana → naturalny.
+    #[must_use]
+    pub fn parse(text: &str) -> Self {
+        match text {
+            "calm" => Self::Calm,
+            "lively" => Self::Lively,
+            _ => Self::Natural,
+        }
+    }
+
+    /// Para (ekspresja, rytm).
+    #[must_use]
+    pub fn params(self) -> (f32, f32) {
+        match self {
+            Self::Calm => (0.5, 0.7),
+            Self::Natural => (0.75, 0.95),
+            Self::Lively => (0.92, 1.05),
+        }
+    }
+}
+
+/// Odrębność głosów agentek z wartości ustawienia (`same` / `subtle` / `distinct`).
+#[must_use]
+pub fn character_from_setting(text: &str) -> f32 {
+    match text {
+        "same" => 0.0,
+        "distinct" => 1.0,
+        _ => 0.45,
+    }
+}
+
+/// Strojenie współdzielone między Ustawieniami a silnikami — zmiana działa od następnego zdania.
+#[derive(Debug, Clone, Default)]
+pub struct SharedTuning(Arc<RwLock<TtsTuning>>);
+
+impl SharedTuning {
+    /// Bieżące strojenie.
+    #[must_use]
+    pub fn get(&self) -> TtsTuning {
+        *self.0.read().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Ustawia strojenie (wartości są sprowadzane do zakresów).
+    pub fn set(&self, tuning: TtsTuning) {
+        *self.0.write().unwrap_or_else(PoisonError::into_inner) = tuning.clamped();
+    }
+
+    /// Zmienia strojenie w miejscu.
+    pub fn update(&self, change: impl FnOnce(&mut TtsTuning)) {
+        let mut current = self.get();
+        change(&mut current);
+        self.set(current);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn defaults_keep_the_old_sound_and_values_are_clamped() {
+        let base = TtsTuning::default();
+        assert_eq!(base.blend(1.12), 1.12);
+        assert_eq!(base.pause_ms, 0);
+        let wild = TtsTuning {
+            speed: 9.0,
+            expressiveness: f32::NAN,
+            rhythm: -1.0,
+            pause_ms: 60_000,
+            character: 3.0,
+        }
+        .clamped();
+        assert_eq!(wild.speed, SPEED_RANGE.1);
+        assert_eq!(wild.expressiveness, base.expressiveness);
+        assert_eq!(wild.rhythm, 0.3);
+        assert_eq!(wild.pause_ms, MAX_PAUSE_MS);
+        assert_eq!(wild.character, 1.0);
+    }
+
+    #[test]
+    fn character_scales_the_difference_between_agents() {
+        let same = TtsTuning {
+            character: character_from_setting("same"),
+            ..TtsTuning::default()
+        };
+        assert_eq!(same.blend(1.14), 1.0);
+        assert_eq!(same.blend(0.9), 1.0);
+        let subtle = TtsTuning {
+            character: character_from_setting("subtle"),
+            ..TtsTuning::default()
+        };
+        let pitch = subtle.blend(1.14);
+        assert!(pitch > 1.05 && pitch < 1.08, "{pitch}");
+        assert_eq!(character_from_setting("distinct"), 1.0);
+        assert_eq!(
+            character_from_setting("???"),
+            character_from_setting("subtle")
+        );
+    }
+
+    #[test]
+    fn styles_differ_and_shared_tuning_is_visible_to_every_holder() {
+        let (calm, natural, lively) = (
+            VoiceStyle::Calm.params(),
+            VoiceStyle::parse("natural").params(),
+            VoiceStyle::parse("lively").params(),
+        );
+        assert!(calm.0 < natural.0 && natural.0 < lively.0);
+        assert!(calm.1 < natural.1 && natural.1 < lively.1);
+        assert_eq!(VoiceStyle::parse("nieznany"), VoiceStyle::Natural);
+        let shared = SharedTuning::default();
+        let other = shared.clone();
+        shared.update(|t| {
+            t.speed = 1.2;
+            t.pause_ms = 250;
+        });
+        assert_eq!(other.get().speed, 1.2);
+        assert_eq!(other.get().pause_ms, 250);
+    }
+}

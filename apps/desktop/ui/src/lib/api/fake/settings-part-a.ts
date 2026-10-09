@@ -168,6 +168,60 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
         'standard',
       ),
       select(
+        'voice.tts_style',
+        L('Styl mówienia', 'Speaking style'),
+        L(
+          'Jak żywo mówią agentki. „Naturalny” ma żywszą intonację i rytm niż surowe ustawienia silnika; „Spokojny” — równy, opanowany głos; „Żywy” — najwięcej ekspresji. Działa od następnego zdania.',
+          'How lively the agents speak. “Natural” has livelier intonation and rhythm than the raw engine settings; “Calm” is an even, composed voice; “Lively” is the most expressive. Applies from the next sentence.',
+        ),
+        [
+          ['calm', L('Spokojny', 'Calm')],
+          ['natural', L('Naturalny (zalecany)', 'Natural (recommended)')],
+          ['lively', L('Żywy', 'Lively')],
+        ],
+        'natural',
+      ),
+      number(
+        'voice.tts_speed',
+        L('Tempo mowy', 'Speech speed'),
+        L(
+          '100 % to naturalne tempo głosu. Tempo ustawia sam silnik mowy, więc szybsza albo wolniejsza mowa nie brzmi jak przyspieszone nagranie.',
+          '100% is the natural pace of the voice. The speech engine sets the pace itself, so faster or slower speech does not sound like a sped-up recording.',
+        ),
+        100,
+        60,
+        160,
+        5,
+        '%',
+      ),
+      number(
+        'voice.tts_pause',
+        L('Pauza między zdaniami', 'Pause between sentences'),
+        L(
+          'Krótki oddech po każdym zdaniu, żeby mowa nie szła jednym ciągiem. 0 wyłącza pauzy.',
+          'A short breath after each sentence so speech does not run together. 0 turns pauses off.',
+        ),
+        200,
+        0,
+        1000,
+        50,
+        'ms',
+      ),
+      select(
+        'voice.tts_character',
+        L('Różnice między głosami agentek', 'Differences between agent voices'),
+        L(
+          'Agentki mówią jednym głosem bazowym przestrojonym na cztery. Im mocniejsze przestrojenie, tym łatwiej je odróżnić, ale głos brzmi bardziej sztucznie. „Jeden głos” daje najczystszy dźwięk; „Delikatne” to zalecany kompromis.',
+          'The agents share one base voice retuned into four. The stronger the retuning, the easier they are to tell apart, but the more artificial the voice sounds. “One voice” gives the cleanest sound; “Subtle” is the recommended compromise.',
+        ),
+        [
+          ['same', L('Jeden głos (najczystszy)', 'One voice (cleanest)')],
+          ['subtle', L('Delikatne (zalecane)', 'Subtle (recommended)')],
+          ['distinct', L('Wyraźne', 'Distinct')],
+        ],
+        'subtle',
+      ),
+      select(
         'voice.mode',
         L('Włączanie mikrofonu', 'Microphone activation'),
         L(

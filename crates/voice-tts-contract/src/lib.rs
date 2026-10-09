@@ -8,6 +8,7 @@
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
 mod text;
+mod tuning;
 mod types;
 mod voices;
 
@@ -18,6 +19,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 pub use text::{estimate_marks, split_sentences};
+pub use tuning::{
+    MAX_PAUSE_MS, SPEED_RANGE, SharedTuning, TtsTuning, VoiceStyle, character_from_setting,
+};
 pub use types::{
     CancelToken, CloudTts, MarksKind, SpeechStyle, TtsChunk, TtsEngine, TtsError, TtsRequest,
     VoiceInfo, VoicePreset, VoiceRef, WordMark,

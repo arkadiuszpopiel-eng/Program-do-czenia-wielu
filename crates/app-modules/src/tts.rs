@@ -10,7 +10,8 @@ use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use async_trait::async_trait;
 use personas_contract::PersonaId;
 use voice_tts_contract::{
-    CancelToken, Tts, TtsError, TtsEvent, TtsHealth, TtsRequest, TtsStream, VoiceInfo, v0_chains,
+    CancelToken, SharedTuning, Tts, TtsError, TtsEvent, TtsHealth, TtsRequest, TtsStream,
+    VoiceInfo, v0_chains,
 };
 use voice_tts_impl::TtsService;
 use voice_tts_impl::engines::{PiperEngine, PocketSidecar, TokioRunner, TtsBackend};
@@ -53,7 +54,11 @@ fn has_piper_voice(dir: &std::path::Path) -> bool {
 }
 
 /// Serwis TTS dla zainstalowanych silników (`None` — żaden nie jest zainstalowany).
-fn build(paths: &AppPaths, installed: Installed) -> Result<Option<Arc<dyn Tts>>, TtsError> {
+fn build(
+    paths: &AppPaths,
+    installed: Installed,
+    tuning: &SharedTuning,
+) -> Result<Option<Arc<dyn Tts>>, TtsError> {
     let mut backends: Vec<Arc<dyn TtsBackend>> = Vec::new();
     if installed.pocket {
         let pocket = paths.sidecar("pocket-tts", "pocket-tts");
@@ -62,16 +67,21 @@ fn build(paths: &AppPaths, installed: Installed) -> Result<Option<Arc<dyn Tts>>,
         backends.push(Arc::new(PocketSidecar::process(pocket, args)));
     }
     if installed.piper {
-        backends.push(Arc::new(PiperEngine::new(
-            paths.sidecar("piper", "piper"),
-            paths.models().join("piper"),
-            Arc::new(TokioRunner),
-        )));
+        backends.push(Arc::new(
+            PiperEngine::new(
+                paths.sidecar("piper", "piper"),
+                paths.models().join("piper"),
+                Arc::new(TokioRunner),
+            )
+            .with_tuning(tuning.clone()),
+        ));
     }
     if backends.is_empty() {
         return Ok(None);
     }
-    Ok(Some(Arc::new(TtsService::new(v0_chains(), backends)?)))
+    Ok(Some(Arc::new(
+        TtsService::new(v0_chains(), backends)?.with_tuning(tuning.clone()),
+    )))
 }
 
 /// TTS z silników zainstalowanych **w chwili użycia**: każde wywołanie sprawdza pliki sidecarów
@@ -79,6 +89,7 @@ fn build(paths: &AppPaths, installed: Installed) -> Result<Option<Arc<dyn Tts>>,
 pub struct InstalledTts {
     paths: AppPaths,
     current: Mutex<Option<(Installed, Arc<dyn Tts>)>>,
+    tuning: SharedTuning,
 }
 
 impl InstalledTts {
@@ -87,7 +98,15 @@ impl InstalledTts {
         Self {
             paths,
             current: Mutex::new(None),
+            tuning: SharedTuning::default(),
         }
+    }
+
+    /// Strojenie mowy z Ustawień — wspólne dla każdego składanego serwisu.
+    #[must_use]
+    pub fn with_tuning(mut self, tuning: SharedTuning) -> Self {
+        self.tuning = tuning;
+        self
     }
 
     fn lock(&self) -> MutexGuard<'_, Option<(Installed, Arc<dyn Tts>)>> {
@@ -103,7 +122,7 @@ impl InstalledTts {
         {
             return Ok(Arc::clone(service));
         }
-        let service = build(&self.paths, now)?;
+        let service = build(&self.paths, now, &self.tuning)?;
         *current = service.clone().map(|s| (now, s));
         if service.is_some() {
             tracing::info!(
@@ -157,6 +176,11 @@ impl Tts for InstalledTts {
 /// TTS aplikacji: silniki z sidecarów wykrywane przy każdym użyciu.
 pub fn engines(paths: &AppPaths) -> Arc<dyn Tts> {
     Arc::new(InstalledTts::new(paths.clone()))
+}
+
+/// TTS aplikacji ze strojeniem mowy z Ustawień (zmiana działa od następnego zdania).
+pub fn engines_tuned(paths: &AppPaths, tuning: SharedTuning) -> Arc<dyn Tts> {
+    Arc::new(InstalledTts::new(paths.clone()).with_tuning(tuning))
 }
 
 /// TTS gotowy teraz (`None` — brak TTS albo żaden silnik nie jest zainstalowany: `Failed`).

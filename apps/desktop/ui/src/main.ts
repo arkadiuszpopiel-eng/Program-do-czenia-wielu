@@ -7,7 +7,10 @@ import './app.css';
 import App from './App.svelte';
 import { createClient } from './lib/api';
 import { errorText } from './lib/api/command-error';
+import { applyRememberedTheme } from './lib/boot-screen';
 import { AppState } from './lib/state/app.svelte';
+
+applyRememberedTheme(document.documentElement, window.localStorage);
 
 // Trusted Types: polityka `default` tylko dla workera podświetlania (CSP wydania, PT-33).
 installDefaultPolicy();

@@ -8,6 +8,41 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.14 — 2026-10-09
+
+Zgłoszenia właściciela: pasek LED wchodzi na elementy belki, brak ekranu ładowania, ikony agentek do solidnej
+poprawy (mruganie, mini awatary w rytm mowy), głos agentek sztywny i niemiły.
+
+### Interfejs
+
+- Belka jest wyższa (44 px), a pasek LED ma pod elementami własny tor — nic na niego nie wchodzi i między kapsułami
+  a paskiem jest wyraźny odstęp. Kapsuły, awatary i przyciski mają wspólną wysokość i równe odstępy.
+- Program ma ekran ładowania: znak Alfy, nazwa, pasek postępu i opis kroku („Uruchamiam rdzeń…”, „Wczytuję
+  rozmowy…”). Widać go od pierwszej klatki okna, w kolorach zapamiętanego motywu.
+- Awatary agentek ożyły: agentka, która mówi albo pracuje, dostaje twarz — mruga, mówiąc rusza ustami, pracując
+  rozgląda się, a wokół krąży łuk. Gotowa agentka zostaje literą. Duże awatary mają twarz zawsze.
+- Usta poruszają się w rytm prawdziwej mowy: program mierzy poziom tego, co gra głośnik, i wysyła go do awatara.
+- W „Wygląd” jest przełącznik „Awatary agentek”: „Żywe” albo „Same litery”.
+
+### Głos
+
+- Głos agentek brzmi naturalniej: silnik mowy dostaje żywszą intonację i rytm zamiast ustawień surowych, a po każdym
+  zdaniu jest krótka pauza — mowa nie idzie jednym ciągiem.
+- Tempo mowy ustawia sam silnik, a nie rozciąganie gotowego nagrania, więc szybsza albo wolniejsza mowa nie brzmi
+  jak przyspieszona taśma.
+- Różnice między głosami agentek są domyślnie delikatniejsze — mocne przestrajanie jednego głosu na cztery było
+  głównym źródłem sztucznego brzmienia.
+- Zakładka „Głos” ma nową część „Głosy agentek”: styl mówienia (spokojny, naturalny, żywy), tempo, pauza między
+  zdaniami i siła różnic między głosami. Zmiana działa od następnego zdania; obok jest odsłuch każdej agentki.
+
+### Testy
+
+- Nowe: `e2e/presence.spec.ts` (ekran ładowania, tor paska LED w 3 stylach × 2 motywach, awatary, strojenie mowy
+  i odsłuch), `boot-screen.test.ts`, testy strojenia Pipera, miernika poziomu mowy i ustawień głosu w Rust.
+- Nie sprawdzono na żywo: brzmienia po zmianach (ocena na słuch należy do właściciela) i ruchu ust przy prawdziwej
+  mowie — sprawdzone na danych testowych. Wszystkie agentki nadal mówią jednym głosem Pipera („Gosia”); wyraźnie
+  lepsze, różne głosy wymagają innego silnika mowy (pobranie albo usługa w chmurze — decyzja właściciela).
+
 ## 0.0.13 — 2026-10-09
 
 Zgłoszenie właściciela: belka okna z ikoną i nazwą „Alfa” — „ten element też dopracuj”.

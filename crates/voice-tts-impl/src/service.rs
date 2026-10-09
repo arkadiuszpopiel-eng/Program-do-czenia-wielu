@@ -12,9 +12,9 @@ use providers_contract::PrivacyTag;
 use tokio::sync::mpsc::Sender;
 use voice_audio_contract::{Frame, MediaTime, Resampler};
 use voice_tts_contract::{
-    CancelToken, MarksKind, TTS_RATE, Tts, TtsChunk, TtsEngine, TtsError, TtsEvent, TtsHealth,
-    TtsRequest, TtsStream, VoiceInfo, VoiceRef, WordMark, estimate_marks, split_sentences,
-    validate_chains,
+    CancelToken, MarksKind, SharedTuning, SpeechStyle, TTS_RATE, Tts, TtsChunk, TtsEngine,
+    TtsError, TtsEvent, TtsHealth, TtsRequest, TtsStream, TtsTuning, VoiceInfo, VoiceRef, WordMark,
+    estimate_marks, split_sentences, validate_chains,
 };
 
 use crate::cache::{CachedPhrase, PhraseCache};
@@ -40,6 +40,7 @@ pub struct TtsService {
     backends: Arc<HashMap<String, Arc<dyn TtsBackend>>>,
     cache: Option<PhraseCache>,
     shared: SharedRef,
+    tuning: SharedTuning,
 }
 
 impl TtsService {
@@ -58,7 +59,15 @@ impl TtsService {
             backends: Arc::new(backends),
             cache: None,
             shared: Arc::default(),
+            tuning: SharedTuning::default(),
         })
+    }
+
+    /// Strojenie mowy z Ustawień: tempo, odrębność głosów agentek i pauzy między zdaniami.
+    #[must_use]
+    pub fn with_tuning(mut self, tuning: SharedTuning) -> Self {
+        self.tuning = tuning;
+        self
     }
 
     /// Cache fraz stałych.
@@ -92,6 +101,7 @@ async fn synth_sentence(
     text: &str,
     first_idx: u32,
     offset_ms: u32,
+    tuning: TtsTuning,
 ) -> Result<Sentence, TtsError> {
     if let TtsEngine::Cloud { .. } = voice.engine {
         if req.privacy == PrivacyTag::Private {
@@ -107,10 +117,20 @@ async fn synth_sentence(
             voice.engine.name()
         ))
     })?;
-    let EngineAudio { pcm, rate, marks } = backend.synth(text, voice, &req.style).await?;
-    let tempo = voice.preset.rate * req.style.rate;
-    let modded = apply_preset(&pcm, rate, voice.preset.pitch, tempo);
-    let out = Resampler::convert(rate, TTS_RATE, &modded);
+    // Tempo: preset agentki (w stopniu wybranym w Ustawieniach) × styl wypowiedzi × tempo
+    // użytkownika. Silnik z własnym tempem dostaje je wprost; pozostałym rozciągamy nagranie.
+    let tempo = tuning.blend(voice.preset.rate) * req.style.rate * tuning.speed;
+    let pitch = tuning.blend(voice.preset.pitch);
+    let native = backend.native_tempo();
+    let style = SpeechStyle {
+        rate: tempo,
+        ..req.style.clone()
+    };
+    let EngineAudio { pcm, rate, marks } = backend
+        .synth(text, voice, if native { &style } else { &req.style })
+        .await?;
+    let modded = apply_preset(&pcm, rate, pitch, if native { 1.0 } else { tempo });
+    let mut out = Resampler::convert(rate, TTS_RATE, &modded);
     let dur = (out.len() as u64 * 1000 / u64::from(TTS_RATE)) as u32;
     let words: Vec<&str> = text.split_whitespace().collect();
     let (marks, kind) = match marks {
@@ -133,6 +153,9 @@ async fn synth_sentence(
             MarksKind::Estimated,
         ),
     };
+    // Pauza po zdaniu — oddech między zdaniami zamiast mowy „jednym ciągiem”.
+    let pause = (u64::from(tuning.pause_ms) * u64::from(TTS_RATE) / 1000) as usize;
+    out.resize(out.len() + pause, 0.0);
     Ok(Sentence {
         pcm: out,
         marks,
@@ -149,6 +172,7 @@ struct Job {
     shared: SharedRef,
     cancel: CancelToken,
     started: Instant,
+    tuning: TtsTuning,
 }
 
 impl Job {
@@ -180,6 +204,7 @@ impl Job {
                     text,
                     word_idx,
                     offset_ms,
+                    self.tuning,
                 )
                 .await
                 {
@@ -321,6 +346,7 @@ impl Tts for TtsService {
             shared: Arc::clone(&self.shared),
             cancel,
             started,
+            tuning: self.tuning.get(),
         };
         tokio::spawn(job.run(tx));
         Ok(rx)

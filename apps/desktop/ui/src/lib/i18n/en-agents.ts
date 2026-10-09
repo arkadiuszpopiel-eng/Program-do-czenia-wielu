@@ -93,7 +93,9 @@ export const enAgents: Record<keyof typeof plAgents, Message> = {
   'voice.levelBoth': 'After noise reduction: {level}% · raw microphone signal: {raw}%',
   'voice.levelHint':
     'The blue bar is the signal after noise reduction — when you are silent it should fall to zero. The grey bar underneath shows how much background (fans, surroundings) the microphone itself picks up. Set the strength below.',
-  'voice.voices': 'Agent voices (v0)',
+  'voice.voices': 'Agent voices',
+  'voice.tuningHint':
+    'Changes apply from the next sentence — adjust and listen below right away. Better voices than the current one (Piper “Gosia”) need a different speech engine; that is a separate stage.',
   'voice.voicesHint': 'Voices v0 without keys (local). Listen to a sample of each agent.',
   'voice.preview': 'Play voice: {name}',
   'voice.bible.alfa': 'warm, calm, middle register',

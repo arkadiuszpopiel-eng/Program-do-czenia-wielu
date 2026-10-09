@@ -60,8 +60,8 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
-    min-width: 30px;
-    height: 30px;
+    min-width: 34px;
+    height: 34px;
     padding: 0 var(--alfa-space-2);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-full);

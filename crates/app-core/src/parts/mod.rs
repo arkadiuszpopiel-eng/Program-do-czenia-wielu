@@ -8,6 +8,7 @@ mod memory;
 mod ports;
 pub(crate) mod signals;
 mod tasks;
+mod voice_tuning;
 mod work;
 
 use std::collections::HashMap;

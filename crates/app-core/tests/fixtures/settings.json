@@ -540,6 +540,124 @@
             }
           },
           {
+            "key": "voice.tts_style",
+            "label": {
+              "pl": "Styl mówienia",
+              "en": "Speaking style"
+            },
+            "description": {
+              "pl": "Jak żywo mówią agentki. „Naturalny” ma żywszą intonację i rytm niż surowe ustawienia silnika; „Spokojny” — równy, opanowany głos; „Żywy” — najwięcej ekspresji. Działa od następnego zdania.",
+              "en": "How lively the agents speak. “Natural” has livelier intonation and rhythm than the raw engine settings; “Calm” is an even, composed voice; “Lively” is the most expressive. Applies from the next sentence."
+            },
+            "default": "natural",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "calm",
+                  "label": {
+                    "pl": "Spokojny",
+                    "en": "Calm"
+                  }
+                },
+                {
+                  "value": "natural",
+                  "label": {
+                    "pl": "Naturalny (zalecany)",
+                    "en": "Natural (recommended)"
+                  }
+                },
+                {
+                  "value": "lively",
+                  "label": {
+                    "pl": "Żywy",
+                    "en": "Lively"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "voice.tts_speed",
+            "label": {
+              "pl": "Tempo mowy",
+              "en": "Speech speed"
+            },
+            "description": {
+              "pl": "100 % to naturalne tempo głosu. Tempo ustawia sam silnik mowy, więc szybsza albo wolniejsza mowa nie brzmi jak przyspieszone nagranie.",
+              "en": "100% is the natural pace of the voice. The speech engine sets the pace itself, so faster or slower speech does not sound like a sped-up recording."
+            },
+            "default": 100,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 60,
+              "max": 160,
+              "step": 5,
+              "unit": "%"
+            }
+          },
+          {
+            "key": "voice.tts_pause",
+            "label": {
+              "pl": "Pauza między zdaniami",
+              "en": "Pause between sentences"
+            },
+            "description": {
+              "pl": "Krótki oddech po każdym zdaniu, żeby mowa nie szła jednym ciągiem. 0 wyłącza pauzy.",
+              "en": "A short breath after each sentence so speech does not run together. 0 turns pauses off."
+            },
+            "default": 200,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 0,
+              "max": 1000,
+              "step": 50,
+              "unit": "ms"
+            }
+          },
+          {
+            "key": "voice.tts_character",
+            "label": {
+              "pl": "Różnice między głosami agentek",
+              "en": "Differences between agent voices"
+            },
+            "description": {
+              "pl": "Agentki mówią jednym głosem bazowym przestrojonym na cztery. Im mocniejsze przestrojenie, tym łatwiej je odróżnić, ale głos brzmi bardziej sztucznie. „Jeden głos” daje najczystszy dźwięk; „Delikatne” to zalecany kompromis.",
+              "en": "The agents share one base voice retuned into four. The stronger the retuning, the easier they are to tell apart, but the more artificial the voice sounds. “One voice” gives the cleanest sound; “Subtle” is the recommended compromise."
+            },
+            "default": "subtle",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "same",
+                  "label": {
+                    "pl": "Jeden głos (najczystszy)",
+                    "en": "One voice (cleanest)"
+                  }
+                },
+                {
+                  "value": "subtle",
+                  "label": {
+                    "pl": "Delikatne (zalecane)",
+                    "en": "Subtle (recommended)"
+                  }
+                },
+                {
+                  "value": "distinct",
+                  "label": {
+                    "pl": "Wyraźne",
+                    "en": "Distinct"
+                  }
+                }
+              ]
+            }
+          },
+          {
             "key": "voice.mode",
             "label": {
               "pl": "Włączanie mikrofonu",
@@ -1472,6 +1590,38 @@
             }
           },
           {
+            "key": "ui.avatars",
+            "label": {
+              "pl": "Awatary agentek",
+              "en": "Agent avatars"
+            },
+            "description": {
+              "pl": "„Żywe” — agentka, która mówi albo pracuje, dostaje twarz: mruga, a mówiąc rusza ustami w rytm mowy. „Same litery” — zostaje litera z pulsującym pierścieniem.",
+              "en": "“Animated” — an agent that is speaking or working gets a face: it blinks and moves its mouth in time with speech. “Letters only” keeps the letter with a pulsing ring."
+            },
+            "default": "animated",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "animated",
+                  "label": {
+                    "pl": "Żywe (zalecane)",
+                    "en": "Animated (recommended)"
+                  }
+                },
+                {
+                  "value": "letters",
+                  "label": {
+                    "pl": "Same litery",
+                    "en": "Letters only"
+                  }
+                }
+              ]
+            }
+          },
+          {
             "key": "ui.reply_details",
             "label": {
               "pl": "Szczegóły pod odpowiedzią",
@@ -1794,6 +1944,10 @@
       "costs.background_local_only": true,
       "costs.estimate_before_long": true,
       "voice.noise_reduction": "standard",
+      "voice.tts_style": "natural",
+      "voice.tts_speed": 100,
+      "voice.tts_pause": 200,
+      "voice.tts_character": "subtle",
       "voice.mode": "toggle",
       "voice.show_pill": true,
       "agents.max_steps": 40,
@@ -1823,6 +1977,7 @@
       "ui.zoom_fit": true,
       "ui.animations": true,
       "ui.column": "auto",
+      "ui.avatars": "animated",
       "ui.reply_details": true,
       "composer.enter_sends": true,
       "notify.toasts": true,

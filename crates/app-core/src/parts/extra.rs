@@ -344,7 +344,10 @@ impl Extra {
         self.tts_module = Some(started(module, deps.bus, deps.slot).await?);
         self.tts = match &deps.options.tts {
             Some(tts) => Some(tts.clone()),
-            None => Some(app_modules::tts::engines(deps.paths)),
+            None => Some(app_modules::tts::engines_tuned(
+                deps.paths,
+                super::voice_tuning::tts_tuning(&deps.kernel.config),
+            )),
         };
         Ok(())
     }

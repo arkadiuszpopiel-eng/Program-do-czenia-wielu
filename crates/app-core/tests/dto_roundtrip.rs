@@ -324,8 +324,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 38 typów z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 38, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 39 typów z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 39, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

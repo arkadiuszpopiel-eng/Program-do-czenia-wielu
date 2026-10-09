@@ -21,7 +21,8 @@ type PillEvent =
       type: 'VoicePill';
       state: { agent: Agent; mic: Mic; level: number; speaker?: Speaker; partial?: string | null };
     }
-  | { type: 'MicLevel'; level: number };
+  | { type: 'MicLevel'; level: number }
+  | { type: 'SpeechLevel'; agent: string; level: number };
 
 const GLYPH: Record<Agent, string> = { alfa: 'α', beta: 'β', gama: 'γ', delta: 'δ' };
 const NAME: Record<Agent, string> = { alfa: 'Alfa', beta: 'Beta', gama: 'Gama', delta: 'Delta' };

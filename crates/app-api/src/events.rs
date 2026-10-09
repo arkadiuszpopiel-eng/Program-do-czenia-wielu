@@ -108,6 +108,17 @@ pub fn push_coalesced(batch: &mut Vec<AlfaEvent>, event: AlfaEvent) {
             *level = newer;
             *raw = newer_raw;
         }
+        // Poziom mowy: w paczce liczy się tylko najnowszy pomiar.
+        (
+            Some(AlfaEvent::SpeechLevel { agent, level }),
+            AlfaEvent::SpeechLevel {
+                agent: newer_agent,
+                level: newer,
+            },
+        ) => {
+            *agent = newer_agent;
+            *level = newer;
+        }
         (_, event) => batch.push(event),
     }
 }

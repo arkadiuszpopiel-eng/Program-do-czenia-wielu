@@ -4,6 +4,8 @@ import type { plApp } from './pl-app';
 
 export const enApp: Record<keyof typeof plApp, Message> = {
   'app.name': 'Alfa',
+  'boot.core': 'Starting the core…',
+  'boot.sessions': 'Loading conversations…',
   'app.loading': 'Loading…',
   'app.failed': 'Could not start the interface: {error}',
   'app.skip': 'Skip to conversation',

@@ -1,6 +1,8 @@
 // Słownik PL — powłoka, rozmowa, composer, panele, paleta, stany systemowe.
 export const plApp = {
   'app.name': 'Alfa',
+  'boot.core': 'Uruchamiam rdzeń…',
+  'boot.sessions': 'Wczytuję rozmowy…',
   'app.loading': 'Wczytuję…',
   'app.failed': 'Nie udało się uruchomić interfejsu: {error}',
   'app.skip': 'Przejdź do rozmowy',

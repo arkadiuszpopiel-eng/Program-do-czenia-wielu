@@ -229,6 +229,8 @@ export type AlfaEvent =
   | { readonly type: 'AccountChanged'; readonly account: Account }
   /** `level` — po redukcji szumów; `raw` — surowy sygnał (tylko test mikrofonu). */
   | { readonly type: 'MicLevel'; readonly level: number; readonly raw?: number | null }
+  /** Poziom mowy agentki z głośnika (0–1); `agent` pusty = cisza po przerwaniu. */
+  | { readonly type: 'SpeechLevel'; readonly agent: string; readonly level: number }
   | { readonly type: 'VoicePill'; readonly state: VoicePillState }
   | {
       readonly type: 'Toast';

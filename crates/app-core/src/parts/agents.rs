@@ -124,7 +124,8 @@ impl Extra {
                     )
                     .with_vault(Arc::new(StoreKeyVault::new(kernel.secrets.clone())))
                     .with_clock(Arc::new(DeviceClock))
-                    .with_noise(noise),
+                    .with_noise(noise)
+                    .with_speech_meter(app_modules::speech_meter::SpeechMeter::new(events.clone())),
                 )),
                 (None, None) => None,
             };

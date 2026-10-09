@@ -14,7 +14,8 @@
 
   function describe(id: (typeof agentIds)[number]) {
     const state = states.find((a) => a.id === id);
-    const status = state?.status ?? 'idle';
+    // Mowę z głośnika widać od razu po pomiarze poziomu, także gdy rdzeń nie zgłosił jeszcze stanu.
+    const status = app.speechAgent === id ? 'speaking' : (state?.status ?? 'idle');
     const role = (state?.role_ids ?? []).map((r) => app.i18n.tk(`role.${r}`)).join(', ') || '—';
     const label = t('titlebar.agent', {
       name: agents[id].name,
@@ -37,7 +38,7 @@
     >
       <Avatar
         agent={id}
-        size={24}
+        size={28}
         speaking={info.status === 'speaking'}
         working={info.status === 'working' || info.status === 'waiting_approval'}
         decorative
@@ -51,8 +52,8 @@
   .cast {
     display: flex;
     align-items: center;
-    gap: 2px;
-    height: 30px;
+    gap: 3px;
+    height: 34px;
     padding: 0 3px;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-full);
@@ -63,8 +64,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     border: 0;
     border-radius: var(--alfa-radius-full);
@@ -73,7 +74,7 @@
   }
   /* Gotowa agentka jest spokojniejsza, żeby pracująca od razu rzucała się w oczy. */
   .cast-btn.idle :global(.avatar) {
-    opacity: 0.72;
+    opacity: 0.78;
   }
   .cast-btn:hover :global(.avatar),
   .cast-btn:focus-visible :global(.avatar) {

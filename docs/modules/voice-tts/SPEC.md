@@ -74,4 +74,4 @@ Napisy z podświetleniem wypowiedzianych słów, „przeczytaj na głos" (głose
   Piper pobrany w Ustawieniach działa od następnego czytania na głos / włączenia rozmowy, bez ponownego uruchomienia
   Alfy. Brak silników = `TtsHealth::Failed` → „brak silnika TTS” (czytanie) i „głos niedostępny” (rozmowa,
   `SystemVoice::missing`). Testy: `app-modules` `tts::tests`, `app-voice/tests/tts_after_start.rs`.
-
+- **Strojenie mowy (0.0.14):** `TtsTuning` / `SharedTuning` (`voice-tts-contract/src/tuning.rs`) — tempo, ekspresja, rytm, pauza po zdaniu, odrębność głosów. Piper dostaje `--length_scale`, `--noise_scale`, `--noise_w`; silnik z `native_tempo()` sam ustawia tempo (serwis nie rozciąga nagrania). Wartości domyślne typu = zachowanie sprzed strojenia; zalecane wybiera aplikacja (`app-core/src/parts/voice_tuning.rs`, klucze `voice.tts_*`).

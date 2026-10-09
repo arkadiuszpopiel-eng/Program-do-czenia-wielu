@@ -70,6 +70,8 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'slow-core',
 ];
 
+const CAST_STATES = ['idle', 'speaking', 'working', 'waiting_approval'] as const;
+
 export interface FakeOptions {
   readonly scenario?: FakeScenario;
   readonly scheduler?: Scheduler;
@@ -79,6 +81,8 @@ export interface FakeOptions {
   readonly latencyMs?: number;
   /** Wartości ustawień nadpisujące domyślne (podgląd stylu: `?style=glass&theme=dark`). */
   readonly settings?: Readonly<Record<string, SettingValue>>;
+  /** Stany obsady na start, w kolejności α β γ δ (podgląd awatarów: `?cast=speaking,working`). */
+  readonly cast?: readonly string[];
 }
 
 export const STANDARD_CAST: Readonly<Record<AgentId, readonly string[]>> = {
@@ -134,6 +138,7 @@ export class FakeCore {
   constructor(options: FakeOptions = {}) {
     this.scheduler = options.scheduler ?? realScheduler;
     this.scenario = options.scenario ?? 'default';
+    this.cast = options.cast ?? [];
     this.tokensPerSecond = options.tokensPerSecond ?? 100;
     this.latencyMs = options.latencyMs ?? (this.scenario === 'slow-core' ? SLOW_CORE_MS : 0);
     const now = this.scheduler.now();
@@ -237,13 +242,15 @@ export class FakeCore {
     return undefined;
   }
 
+  private readonly cast: readonly string[];
+
   agentsOf(sessionId: string): AgentState[] {
     let list = this.agents[sessionId];
     if (!list) {
-      list = (Object.keys(STANDARD_CAST) as AgentId[]).map((id) => ({
+      list = (Object.keys(STANDARD_CAST) as AgentId[]).map((id, index) => ({
         id,
         role_ids: STANDARD_CAST[id],
-        status: 'idle',
+        status: CAST_STATES.find((state) => state === this.cast[index]) ?? 'idle',
         activity: null,
       }));
       this.agents[sessionId] = list;

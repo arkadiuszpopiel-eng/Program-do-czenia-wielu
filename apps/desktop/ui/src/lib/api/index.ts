@@ -27,5 +27,9 @@ export async function createClient(): Promise<AlfaClient> {
   const theme = params.get('theme');
   if (style) settings['ui.style'] = style;
   if (theme) settings['ui.theme'] = theme;
-  return new FakeAlfaClient({ scenario, settings });
+  const avatars = params.get('avatars');
+  if (avatars) settings['ui.avatars'] = avatars;
+  // Podgląd stanów obsady: `?cast=speaking,working,waiting_approval,idle`.
+  const cast = params.get('cast')?.split(',') ?? [];
+  return new FakeAlfaClient({ scenario, settings, cast });
 }

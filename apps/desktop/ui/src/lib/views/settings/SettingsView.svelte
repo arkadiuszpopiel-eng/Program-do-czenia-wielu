@@ -75,6 +75,11 @@
     query.trim() ? schema.filter((p) => bestScore(query, app.i18n.text(p.label)) > 0.5) : [],
   );
   const hits = $derived(hitsByPage(results, pageMatches));
+  // Strojenie mowy stoi na stronie „Głos” przy głosach agentek, nie na liście ogólnej.
+  const isSpeechTuning = (def: { readonly key: string }) => def.key.startsWith('voice.tts_');
+  const rest = $derived(
+    page ? page.settings.filter((def) => page.custom !== 'voice' || !isSpeechTuning(def)) : [],
+  );
 
   function open(id: string) {
     query = '';
@@ -126,7 +131,9 @@
           {:else if page.custom === 'transfer'}<TransferPage />
           {:else if page.custom === 'permissions'}<PermissionsPage />
           {:else if page.custom === 'devices'}<DevicesPage />
-          {:else if page.custom === 'voice'}<VoicePage />
+          {:else if page.custom === 'voice'}<VoicePage
+              settings={page.settings.filter(isSpeechTuning)}
+            />
           {:else if page.custom === 'memory'}<MemoryPage />
           {:else if page.custom === 'triggers'}<TriggersPage />
           {:else if page.custom === 'marshal'}<MarshalPage />
@@ -143,10 +150,10 @@
               label={t('engines.loading')}
             />
           {/if}
-          {#if page.custom && page.settings.length > 0}
+          {#if page.custom && rest.length > 0}
             <h3 class="h3">{t('settings.pageSettings')}</h3>
           {/if}
-          {#each page.settings as def (def.key)}
+          {#each rest as def (def.key)}
             <SettingRow {def} />
           {/each}
         {/if}

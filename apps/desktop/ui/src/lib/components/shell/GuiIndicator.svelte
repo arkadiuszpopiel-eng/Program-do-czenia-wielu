@@ -60,7 +60,7 @@
     align-items: center;
     min-width: 0;
     gap: 2px;
-    height: 30px;
+    height: 34px;
     padding: 0 3px 0 var(--alfa-space-2);
     border: 1px solid var(--alfa-color-border);
     background: var(--alfa-color-bg);
@@ -75,7 +75,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    height: 24px;
+    height: 26px;
     padding: 0 var(--alfa-space-2);
     border: 0;
     border-radius: var(--alfa-radius-full);

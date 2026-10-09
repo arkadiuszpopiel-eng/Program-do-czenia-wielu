@@ -70,6 +70,8 @@ pub struct SystemVoice {
     /// Zegar potoku — w produkcji zegar urządzenia audio (ta sama podstawa co znaczniki ramek).
     pub(crate) clock: Arc<dyn voice_audio_contract::MediaClock>,
     noise: NoiseSetting,
+    /// Miernik poziomu mowy dla interfejsu (awatary); bez niego wyjście jest nieopakowane.
+    meter: Option<app_modules::speech_meter::SpeechMeter>,
 }
 
 pub(crate) fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
@@ -125,6 +127,7 @@ impl SystemVoice {
             vault: None,
             clock: Arc::new(MonotonicClock::new()),
             noise: NoiseSetting::default(),
+            meter: None,
         }
     }
 
@@ -141,6 +144,13 @@ impl SystemVoice {
     #[must_use]
     pub fn with_noise(mut self, noise: NoiseSetting) -> Self {
         self.noise = noise;
+        self
+    }
+
+    /// Poziom mowy agentek do interfejsu — awatar rusza ustami w rytm głośnika.
+    #[must_use]
+    pub fn with_speech_meter(mut self, meter: app_modules::speech_meter::SpeechMeter) -> Self {
+        self.meter = Some(meter);
         self
     }
 
@@ -226,6 +236,13 @@ impl VoiceEngineFactory for SystemVoice {
             .audio
             .open_output(None, &StreamConfig::output_default())
             .map_err(|e| component("speaker", e))?;
+        let output: Box<dyn voice_audio_contract::OutputStream> = match &self.meter {
+            Some(meter) => Box::new(app_modules::speech_meter::MeteredOutput::new(
+                output,
+                meter.clone(),
+            )),
+            None => output,
+        };
         let dsp = DspPipeline::new(DspCfg::default().with_noise(self.noise.get()))
             .map_err(|e| component("dsp", e))?;
         let parts = PipelineParts {

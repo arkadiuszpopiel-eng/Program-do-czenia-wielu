@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use tokio::io::{
     AsyncBufRead, AsyncBufReadExt, AsyncReadExt, AsyncWrite, AsyncWriteExt, BufReader,
 };
-use voice_tts_contract::{SpeechStyle, TtsEngine, TtsError, VoiceRef};
+use voice_tts_contract::{SharedTuning, SpeechStyle, TtsEngine, TtsError, TtsTuning, VoiceRef};
 
 /// Audio zdania z silnika (przed modyfikacją głosu).
 #[derive(Debug, Clone, PartialEq)]
@@ -39,6 +39,12 @@ pub trait TtsBackend: Send + Sync {
         voice: &VoiceRef,
         style: &SpeechStyle,
     ) -> Result<EngineAudio, TtsError>;
+
+    /// Czy silnik sam ustawia tempo mowy (`style.rate` = tempo docelowe). Serwis nie rozciąga
+    /// wtedy dźwięku po syntezie — tempo z silnika brzmi czyściej niż rozciąganie nagrania.
+    fn native_tempo(&self) -> bool {
+        false
+    }
 }
 
 fn engine_err(e: impl std::fmt::Display) -> TtsError {
@@ -306,6 +312,7 @@ pub struct PiperEngine {
     models_dir: PathBuf,
     runner: Arc<dyn ProcessRunner>,
     timeout: Duration,
+    tuning: SharedTuning,
 }
 
 impl PiperEngine {
@@ -316,7 +323,34 @@ impl PiperEngine {
             models_dir,
             runner,
             timeout: Duration::from_secs(20),
+            tuning: SharedTuning::default(),
         }
+    }
+
+    /// Strojenie mowy z Ustawień (ekspresja i rytm trafiają do argumentów Pipera).
+    #[must_use]
+    pub fn with_tuning(mut self, tuning: SharedTuning) -> Self {
+        self.tuning = tuning;
+        self
+    }
+
+    /// Argumenty Pipera: model, surowe PCM, tempo (`--length_scale` = 1 / tempo), ekspresja
+    /// (`--noise_scale`) i zmienność rytmu (`--noise_w`).
+    pub fn args(model: &Path, tuning: TtsTuning, tempo: f32) -> Vec<String> {
+        let tuning = tuning.clamped();
+        let length = 1.0 / tempo.clamp(0.4, 2.5);
+        vec![
+            "--model".into(),
+            model.display().to_string(),
+            "--output_raw".into(),
+            "--quiet".into(),
+            "--length_scale".into(),
+            format!("{length:.3}"),
+            "--noise_scale".into(),
+            format!("{:.3}", tuning.expressiveness),
+            "--noise_w".into(),
+            format!("{:.3}", tuning.rhythm),
+        ]
     }
 
     /// Częstotliwość modelu z `<model>.onnx.json` (`audio.sample_rate`, domyślnie 22 050 Hz).
@@ -340,7 +374,7 @@ impl TtsBackend for PiperEngine {
         &self,
         text: &str,
         voice: &VoiceRef,
-        _style: &SpeechStyle,
+        style: &SpeechStyle,
     ) -> Result<EngineAudio, TtsError> {
         let model = self
             .models_dir
@@ -348,12 +382,7 @@ impl TtsBackend for PiperEngine {
         let config = self
             .models_dir
             .join(format!("{}.onnx.json", voice.preset.base_speaker));
-        let args = vec![
-            "--model".into(),
-            model.display().to_string(),
-            "--output_raw".into(),
-            "--quiet".into(),
-        ];
+        let args = Self::args(&model, self.tuning.get(), style.rate);
         let line = text.replace(['\n', '\r'], " ") + "\n";
         let raw = self
             .runner
@@ -368,5 +397,9 @@ impl TtsBackend for PiperEngine {
             rate: Self::model_rate(&config),
             marks: None,
         })
+    }
+
+    fn native_tempo(&self) -> bool {
+        true
     }
 }

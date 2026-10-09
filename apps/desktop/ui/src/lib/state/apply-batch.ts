@@ -1,5 +1,6 @@
 // Zastosowanie jednego zdarzenia `alfa://events` do stanu okna głównego (wywoływane z paczki
 // raz na klatkę): sesje, agentki, koszty, stan systemu, głos, przebiegi agentek, rozmowa.
+import { setSpeechLevel } from '@alfa/ui-kit';
 import type { AlfaEvent } from '../api/types-system';
 import { isChatEvent } from '../logic/apply-event';
 import type { AppState } from './app.svelte';
@@ -29,6 +30,10 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       app.micLevel = event.level;
       app.micRaw = event.raw ?? null;
       app.voice.level = event.level;
+      break;
+    case 'SpeechLevel':
+      setSpeechLevel(event.level);
+      app.noteSpeech(event.agent, event.level);
       break;
     case 'VoicePill':
       app.micState = event.state.mic;

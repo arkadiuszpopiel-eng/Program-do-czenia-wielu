@@ -237,6 +237,19 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       ],
       'auto',
     ),
+    select(
+      'ui.avatars',
+      L('Awatary agentek', 'Agent avatars'),
+      L(
+        '„Żywe” — agentka, która mówi albo pracuje, dostaje twarz: mruga, a mówiąc rusza ustami w rytm mowy. „Same litery” — zostaje litera z pulsującym pierścieniem.',
+        '“Animated” — an agent that is speaking or working gets a face: it blinks and moves its mouth in time with speech. “Letters only” keeps the letter with a pulsing ring.',
+      ),
+      [
+        ['animated', L('Żywe (zalecane)', 'Animated (recommended)')],
+        ['letters', L('Same litery', 'Letters only')],
+      ],
+      'animated',
+    ),
     toggle(
       'ui.reply_details',
       L('Szczegóły pod odpowiedzią', 'Details under replies'),

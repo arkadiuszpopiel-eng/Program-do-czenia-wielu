@@ -135,6 +135,15 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
       else pill({ mic: 'off' });
       return core.reply(undefined);
     },
-    preview: () => core.reply(undefined),
+    // Odsłuch: ok. 2 s „mowy” — poziom z głośnika w rytmie sylab, na końcu cisza.
+    preview: (agent) => {
+      const speak = (step: number): void => {
+        const level = step >= 60 ? 0 : Math.abs(Math.sin(step / 2.3)) * 0.7 + 0.1;
+        core.emit([{ type: 'SpeechLevel', agent, level }]);
+        if (step < 60) core.scheduler.setTimeout(() => speak(step + 1), 34);
+      };
+      speak(0);
+      return core.reply(undefined);
+    },
   };
 }
