@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { VirtualModel, isAtBottom } from '../virtual';
+import { VirtualModel, isAtBottom, stickAfterScroll } from '../virtual';
 
 const keys = (n: number) => Array.from({ length: n }, (_, i) => `k${i}`);
 
@@ -47,5 +47,19 @@ describe('VirtualModel — lista wirtualizowana', () => {
   it('isAtBottom z tolerancją', () => {
     expect(isAtBottom(900, 100, 1000)).toBe(true);
     expect(isAtBottom(870, 100, 1000)).toBe(false);
+  });
+});
+
+describe('przyklejenie do dołu po przewinięciu', () => {
+  it('odkleja tylko gest użytkownika', () => {
+    // Układ strony przesunął widok (okno zmieniło rozmiar, doszło pole pisania): zostaje na dole.
+    expect(stickAfterScroll(true, false, false)).toBe(true);
+    // Użytkownik przewinął w górę: odklejone.
+    expect(stickAfterScroll(true, false, true)).toBe(false);
+    // Powrót na dół przykleja z powrotem, niezależnie od źródła.
+    expect(stickAfterScroll(false, true, true)).toBe(true);
+    expect(stickAfterScroll(false, true, false)).toBe(true);
+    // Odklejona lista nie przykleja się sama przy zmianie układu.
+    expect(stickAfterScroll(false, false, false)).toBe(false);
   });
 });

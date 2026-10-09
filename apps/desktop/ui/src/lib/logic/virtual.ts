@@ -102,3 +102,16 @@ export function isAtBottom(
 ): boolean {
   return total - (scrollTop + viewport) <= slack;
 }
+
+/**
+ * Przyklejenie do dołu po zdarzeniu przewinięcia. Odkleja tylko gest użytkownika (kółko, dotyk,
+ * klawisz, przeciąganie): przewinięcie wywołane samym układem strony — okno zmieniło rozmiar,
+ * doszło pole pisania, przeliczyła się skala — nie może zostawić rozmowy w połowie.
+ */
+export function stickAfterScroll(
+  wasStuck: boolean,
+  nowAtBottom: boolean,
+  byUser: boolean,
+): boolean {
+  return nowAtBottom || (wasStuck && !byUser);
+}

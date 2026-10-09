@@ -196,6 +196,13 @@ naprawione, a `scripts/check-svelte5.mjs` ma regułę, która ten wzorzec wykryw
 zdania. Test jednostkowy „przełączenie sesji 1000 wiadomości” (limit 150 ms) bywa czerwony na tym laptopie; zmierzony czas
 to 6–16 ms, więc to chwilowe zacięcia maszyny, nie kod.
 
+Rozmowa, 2026-10-09 — błąd naprawiony: przy starcie obszar rozmowy zmienia wysokość (dochodzi pole pisania, przelicza
+się skala) i przewinięcie wywołane samym układem strony potrafiło „odkleić” listę od dołu — rozmowa otwierała się 79–308 px
+nad ostatnią wiadomością z widocznym przyciskiem „Przewiń do najnowszych” (powtórzone przy ograniczonym ruchu i skali
+ponad 100 %). Teraz odkleja tylko gest użytkownika: kółko, dotyk, klawisz, przeciąganie
+(`logic/virtual.ts::stickAfterScroll`, `VirtualList.svelte`). Testy: jednostkowy oraz dwa e2e w `responsive.spec.ts`.
+Przegląd `lib-netguard` (blokowanie adresów lokalnych i prywatnych, osobna sesja, tylko odczyt): bez defektów.
+
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
 i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie

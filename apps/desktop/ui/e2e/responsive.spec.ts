@@ -156,3 +156,43 @@ for (const [width, height] of [
     expect(m.bottom, 'dół pola pisania').toBeLessThanOrEqual(height);
   });
 }
+
+// Przy starcie obszar rozmowy zmienia wysokość (dochodzi pole pisania, przelicza się skala).
+// Przewinięcie wywołane samym układem strony odklejało listę od dołu — rozmowa otwierała się
+// kilkaset pikseli nad ostatnią wiadomością (widoczne przy ograniczonym ruchu i skali > 100 %).
+for (const [width, height] of [
+  [1920, 1080],
+  [2560, 1440],
+] as const) {
+  test(`rozmowa otwiera się na ostatniej wiadomości (${width}×${height}, ograniczony ruch)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openApp(page);
+    await waitForChat(page);
+    await page.waitForTimeout(800);
+    const gap = await page.evaluate(() => {
+      const feed = document.querySelector('[role=feed]') as HTMLElement;
+      return feed.scrollHeight - feed.scrollTop - feed.clientHeight;
+    });
+    expect(gap, 'odległość od dołu').toBeLessThanOrEqual(24);
+    await expect(page.getByRole('button', { name: /Przewiń do najnowszych/ })).toHaveCount(0);
+  });
+}
+
+test('kółko myszy odkleja rozmowę od dołu, przycisk wraca na dół', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await openApp(page);
+  await waitForChat(page);
+  const feed = page.getByRole('feed');
+  await feed.hover();
+  await page.mouse.wheel(0, -600);
+  const jump = page.getByRole('button', { name: /Przewiń do najnowszych/ });
+  await expect(jump).toBeVisible();
+  // Zmiana rozmiaru okna nie przykleja odklejonej listy z powrotem.
+  await page.setViewportSize({ width: 1280, height: 640 });
+  await expect(jump).toBeVisible();
+  await jump.click();
+  await expect(jump).toHaveCount(0);
+});
