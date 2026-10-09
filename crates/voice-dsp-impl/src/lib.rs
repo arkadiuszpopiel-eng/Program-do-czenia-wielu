@@ -13,6 +13,7 @@
 
 pub mod agc;
 pub mod calibrate;
+pub mod gate;
 mod pipeline;
 pub mod reference;
 

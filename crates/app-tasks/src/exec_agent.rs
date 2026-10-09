@@ -193,6 +193,7 @@ pub(crate) async fn run(
                 profile: None,
                 privacy: deps.host.privacy(&session),
                 chat: None,
+                task: None,
             };
             let choice = match deps.brain.choose(&request).await {
                 Ok(c) => c,

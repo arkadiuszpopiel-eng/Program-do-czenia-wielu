@@ -11,7 +11,9 @@ mod account;
 mod api;
 mod catalog;
 mod ids;
+mod model_use;
 mod probe;
+mod queue;
 mod secret;
 mod wizard;
 
@@ -33,9 +35,14 @@ pub use catalog::{
     PriceTable, ProviderCatalogEntry, ProviderKind, Tribool, is_env_var_name, validate_base_url,
 };
 pub use ids::{AccountId, ModelId, ProviderId, SecretName};
+pub use model_use::{ModelUse, best_chat_model, chat_rank, is_snapshot, model_use};
 pub use probe::{
     CliBridge, CliProbe, ConnectionRequest, ConnectionTester, EnvSource, KNOWN_CLI_BRIDGES,
     ModelListError, ModelLister, detect_cli_bridges_with, parse_version,
+};
+pub use queue::{
+    MAX_QUEUE, ModelTier, QueueStrategy, fits_class, model_tier, suggest_queue, use_fits,
+    validate_queue,
 };
 pub use secret::{REDACTED, SecretStore, SecretStoreError, SecretString};
 pub use wizard::{Wizard, WizardError, WizardOutcome, WizardStep, WizardWarning};

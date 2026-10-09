@@ -27,6 +27,7 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       break;
     case 'MicLevel':
       app.micLevel = event.level;
+      app.micRaw = event.raw ?? null;
       app.voice.level = event.level;
       break;
     case 'VoicePill':

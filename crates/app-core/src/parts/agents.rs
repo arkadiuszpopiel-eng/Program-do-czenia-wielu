@@ -101,12 +101,12 @@ impl Extra {
         if let Some(port) = &options.voice {
             return port.clone();
         }
+        let noise = noise_setting(&kernel.config);
         let base: Arc<dyn VoicePort> = match &self.audio {
-            Some(audio) => Arc::new(app_modules::voice::VoiceAdapter::new(
-                audio.io(),
-                self.tts.clone(),
-                events.clone(),
-            )),
+            Some(audio) => Arc::new(
+                app_modules::voice::VoiceAdapter::new(audio.io(), self.tts.clone(), events.clone())
+                    .with_noise(noise.clone()),
+            ),
             None => Arc::new(VoiceUnavailable),
         };
         let factory: Option<Arc<dyn VoiceEngineFactory>> =
@@ -122,7 +122,9 @@ impl Extra {
                             .as_ref()
                             .map(|r| r.manager() as Arc<dyn model_residency_contract::Residency>),
                     )
-                    .with_vault(Arc::new(StoreKeyVault::new(kernel.secrets.clone()))),
+                    .with_vault(Arc::new(StoreKeyVault::new(kernel.secrets.clone())))
+                    .with_clock(Arc::new(DeviceClock))
+                    .with_noise(noise),
                 )),
                 (None, None) => None,
             };
@@ -150,4 +152,45 @@ impl Extra {
         );
         Arc::new(voice.with_features(FeatureDeps { config, desktop }))
     }
+}
+
+/// Zegar urządzenia audio: ta sama podstawa czasu, w której WASAPI znaczy ramki mikrofonu
+/// i pozycję odtwarzania (QPC). Potok głosowy porównuje „teraz” ze znacznikami ramek.
+struct DeviceClock;
+
+impl voice_audio_contract::MediaClock for DeviceClock {
+    fn now(&self) -> voice_audio_contract::MediaTime {
+        voice_audio_contract::MediaTime(platform_windows_impl::qpc_nanos())
+    }
+}
+
+/// Klucz ustawienia redukcji szumów mikrofonu (`off` / `standard` / `strong`).
+const NOISE_KEY: &str = "voice.noise_reduction";
+
+/// Ustawienie redukcji szumów śledzące konfigurację: test mikrofonu i rozmowa czytają je przy
+/// każdym starcie, więc zmiana w Ustawieniach działa bez restartu programu.
+fn noise_setting(
+    config: &Arc<core_config_impl::FileConfigStore>,
+) -> voice_dsp_contract::NoiseSetting {
+    use core_config_contract::{ConfigKey, ConfigStore, Scope};
+    use futures_util::StreamExt;
+
+    let setting = voice_dsp_contract::NoiseSetting::default();
+    let (config, shared) = (config.clone(), setting.clone());
+    tokio::spawn(async move {
+        let Ok(key) = ConfigKey::new(NOISE_KEY) else {
+            return;
+        };
+        let mut changes = config.watch(NOISE_KEY);
+        loop {
+            let value = config.get(&key, &Scope::Global).await.ok().flatten();
+            if let Some(text) = value.as_ref().and_then(|v| v.as_str()) {
+                shared.set(voice_dsp_contract::NoiseReduction::parse(text));
+            }
+            if changes.next().await.is_none() {
+                break;
+            }
+        }
+    });
+    setting
 }

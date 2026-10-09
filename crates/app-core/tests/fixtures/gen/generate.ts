@@ -167,6 +167,8 @@ async function run(): Promise<void> {
   // wyłączenie i włączenie konta.
   await both('accounts', 'rotate', account.id, 'test-restricted-XXXXXXXXXXXXXXXX');
   await both('accounts', 'setModel', account.id, 'gpt-4o-mini');
+  await both('accounts', 'setQueue', account.id, 'chat', ['gpt-4o-mini']);
+  await both('accounts', 'suggestQueue', account.id, 'chat', 'balanced');
   await both('accounts', 'list');
   await both('accounts', 'setDisabled', account.id, true);
   await both('accounts', 'setDisabled', account.id, false);

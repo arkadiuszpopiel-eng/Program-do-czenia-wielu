@@ -1,13 +1,13 @@
 //! Konto (klucz) dostawcy: stan, przypisania, limit kosztów, wynik ostatniego testu.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::ModelInfo;
-use crate::ids::{AccountId, ProviderId, SecretName};
+use crate::ids::{AccountId, ModelId, ProviderId, SecretName};
 use crate::secret::SecretString;
 
 /// Stan konta (także stan dostawcy w UI: „nieskonfigurowany”, „aktywny”, „błąd”, „wyłączony”).
@@ -292,6 +292,10 @@ pub struct Account {
     pub source: AccountSource,
     /// Modele wykryte przy ostatnim udanym teście.
     pub models: Vec<ModelInfo>,
+    /// Kolejki modeli: klasa zadań → modele w kolejności prób (najwyżej
+    /// [`crate::MAX_QUEUE`]). Brak wpisu = wybór automatyczny.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub queues: BTreeMap<TaskClass, Vec<ModelId>>,
 }
 
 /// Dane nowego konta.

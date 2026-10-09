@@ -14,6 +14,7 @@
 #![cfg_attr(not(windows), allow(dead_code))]
 
 mod clipboard;
+mod clock;
 mod config;
 mod error;
 mod fs;
@@ -35,6 +36,7 @@ use platform_contract::{
 };
 
 pub use clipboard::{ClipboardConfig, WinClipboard};
+pub use clock::qpc_nanos;
 pub use config::PlatformConfig;
 pub use fs::{DEFAULT_EXTRA_DENY_NAMES, DEFAULT_EXTRA_DENY_PREFIXES, FsConfig, WinFs};
 pub use hardware::WinHardware;

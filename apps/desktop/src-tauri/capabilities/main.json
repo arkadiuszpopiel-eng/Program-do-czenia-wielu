@@ -67,6 +67,8 @@
     "allow-accounts-rotate",
     "allow-accounts-set-disabled",
     "allow-accounts-set-model",
+    "allow-accounts-set-queue",
+    "allow-accounts-suggest-queue",
     "allow-transfer-export",
     "allow-transfer-inspect",
     "allow-transfer-import",

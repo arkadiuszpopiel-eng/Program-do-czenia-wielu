@@ -67,3 +67,13 @@ Ustawienia → Głos → Urządzenia (kalibracja, wskaźnik echa/szumu), diagnos
 
 ## Zmiany F5 (addytywne)
 - `voice_dsp_contract::fbank` — log-mel Kaldi (okno Poveya 25/10 ms, preemfaza 0,97, skala int16, FFT 512, `n_mels` 8–128, CMN): `Fbank::compute`, strumieniowe `FbankStream`. Wejście modeli KWS (`voice-wake` v1, rodzaj `log_mel`) i embeddingu mówcy (`voice-speaker`). Parametry jak domyślne `kaldi-native-fbank` (sherpa-onnx/WeSpeaker); testy: FFT vs DFT naiwna, pik tonu we właściwym paśmie, strumień = wsad, CMN. Zgodność numeryczna z referencją Kaldi — do potwierdzenia testem z prawdziwym modelem (`#[ignore]`, README `voice-speaker-impl`).
+
+## Redukcja szumów wybierana przez użytkownika (wersja 0.0.8, 2026-10-09)
+- `NoiseReduction` = `Off | Standard | Strong` (klucz ustawień `voice.noise_reduction`), `DspCfg::with_noise`:
+  filtr górnoprzepustowy (`highpass_hz`: 0 / 100 / 140) → RNNoise → bramka szumów (`gate_db`: 0 / 18 / 36) → AGC.
+- Bramka otwiera się tylko wtedy, gdy RNNoise widzi mowę **i** sygnał wystaje ≥ 6 dB ponad tło otoczenia — RNNoise
+  brał buczenie wentylatora za mowę. Ta sama poprawka trafia do `speech_prob` dla VAD.
+- `NoiseSetting` — wspólny uchwyt ustawienia dla testu mikrofonu i potoku rozmowy (zmiana bez restartu).
+- Test mikrofonu idzie przez ten sam potok (bez AEC i AGC); zdarzenie `MicLevel` niesie poziom po redukcji i surowy.
+- Zegar potoku rozmowy to zegar urządzenia audio (QPC, `platform_windows_impl::qpc_nanos`) — ta sama podstawa czasu
+  co znaczniki ramek WASAPI; potok ostrzega (`degraded: clock`), gdy różnią się o więcej niż 5 s.

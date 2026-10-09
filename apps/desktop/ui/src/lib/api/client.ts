@@ -205,6 +205,13 @@ export interface AccountsApi {
   setDisabled(accountId: string, disabled: boolean): Promise<Account>;
   /** Model wpisany ręcznie — dla klucza, który nie ma prawa do listy modeli. */
   setModel(accountId: string, model: string): Promise<Account>;
+  /**
+   * Kolejka modeli konta dla klasy zadań (kolejność prób Routera, najwyżej 10). Pusta lista
+   * przywraca wybór automatyczny; model niepasujący do klasy jest odrzucany z wyjaśnieniem.
+   */
+  setQueue(accountId: string, taskClass: string, models: readonly string[]): Promise<Account>;
+  /** Propozycja kolejki (`quality` / `balanced` / `economy`) — niczego nie zapisuje. */
+  suggestQueue(accountId: string, taskClass: string, strategy: string): Promise<string[]>;
 }
 
 export interface TransferApi {

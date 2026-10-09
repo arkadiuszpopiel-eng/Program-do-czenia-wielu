@@ -73,6 +73,7 @@ pub(crate) async fn prepare(
         profile: req.profile,
         privacy,
         chat: Some(request.clone()),
+        task: core.model_policy_of(&req.session, &req.agent),
     };
     let choice = core
         .inner

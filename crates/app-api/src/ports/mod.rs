@@ -38,6 +38,9 @@ pub struct BrainRequest {
     pub privacy: PrivacyTag,
     /// Żądanie (historia, narzędzia) — oszacowanie kosztu i wymagań przy wyborze trasy.
     pub chat: Option<ChatRequest>,
+    /// „Klasa modelu” głównej roli agentki (`conversation`, `code`, `planning`…) — od niej
+    /// zależy, która kolejka modeli konta zostanie użyta. `None` = rozmowa.
+    pub task: Option<String>,
 }
 
 /// Uzasadnienie wyboru trasy (oś czasu, „dlaczego ten model"), bez treści rozmowy.

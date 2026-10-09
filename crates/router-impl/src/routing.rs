@@ -8,13 +8,14 @@ use compliance_contract::Compliance;
 use providers_contract::{ChatRequest, HealthState, ModelProvider, ProviderErrorKind, ProviderId};
 use router_contract::{
     BreakerState, BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints, Outcome,
-    PlanWindow, RejectReason, RouteDecision, RouteError, RouteKind, RoutePolicy, RouteWarning,
-    Router, RouterClock, RouterEvent, TaskClass,
+    PlanWindow, RouteDecision, RouteError, RouteKind, RoutePolicy, Router, RouterClock,
+    RouterEvent, TaskClass,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::clock::TokioClock;
 use crate::evaluate::{Checked, Inputs, check};
+use crate::helpers::counts_as_failure;
 
 /// Zarejestrowany dostawca.
 #[derive(Clone)]
@@ -31,11 +32,16 @@ struct Health {
     windows: BTreeMap<ProviderId, PlanWindow>,
 }
 
+/// Kolejki modeli: dostawca → klasa zadań → modele w kolejności prób.
+pub type ProviderQueues = BTreeMap<ProviderId, BTreeMap<TaskClass, Vec<String>>>;
+
 /// Router.
 pub struct RouterCore {
     registry: RwLock<Vec<(ProviderId, Registered)>>,
     explicit: RwLock<Option<RoutePolicy>>,
     overrides: RwLock<Option<String>>,
+    /// Kolejki modeli dostawców API: dostawca → klasa → modele w kolejności prób.
+    queues: RwLock<ProviderQueues>,
     compliance: Option<Arc<dyn Compliance>>,
     budget: Option<Arc<dyn BudgetGate>>,
     clock: Arc<dyn RouterClock>,
@@ -63,6 +69,7 @@ impl RouterCore {
             registry: RwLock::new(Vec::new()),
             explicit: RwLock::new(None),
             overrides: RwLock::new(None),
+            queues: RwLock::new(ProviderQueues::new()),
             compliance,
             budget,
             clock: Arc::new(TokioClock::new()),
@@ -126,6 +133,12 @@ impl RouterCore {
         Ok(())
     }
 
+    /// Kolejki modeli dostawców (z kont użytkownika). W polityce automatycznej dostawca
+    /// z kolejką dla danej klasy wystawia jej modele po kolei zamiast jednego modelu domyślnego.
+    pub fn set_provider_queues(&self, queues: ProviderQueues) {
+        *self.queues.write().unwrap_or_else(|p| p.into_inner()) = queues;
+    }
+
     /// Polityka automatyczna z zarejestrowanych dostawców: lokalny (pierwszy `Local` z modelem
     /// domyślnym) + API skonfigurowane (z kluczem), w kolejności rejestracji.
     pub fn auto_policy(&self) -> RoutePolicy {
@@ -147,7 +160,29 @@ impl RouterCore {
             })
             .filter_map(|(_, r)| default(r))
             .collect();
-        RoutePolicy::defaults(local.as_ref(), &api)
+        let mut policy = RoutePolicy::defaults(local.as_ref(), &api);
+        let queues = self.queues.read().unwrap_or_else(|p| p.into_inner());
+        if !queues.is_empty() {
+            for (class, list) in &mut policy.classes {
+                *list = list
+                    .iter()
+                    .flat_map(|c| {
+                        let queue = queues
+                            .get(&c.provider)
+                            .and_then(|q| q.get(class))
+                            .filter(|q| !q.is_empty());
+                        match queue {
+                            Some(models) => models
+                                .iter()
+                                .map(|m| Candidate::new(c.provider.clone(), m.clone()))
+                                .collect(),
+                            None => vec![c.clone()],
+                        }
+                    })
+                    .collect();
+            }
+        }
+        policy
     }
 
     /// Podłącza kolejkę zdarzeń (moduł przekazuje je na magistralę).
@@ -352,41 +387,4 @@ impl Router for RouterCore {
             None => auto,
         }
     }
-}
-
-/// Czy błąd obciąża dostawcę (obwód): nie — odrzucenia żądania, prywatność, brak funkcji,
-/// limit 429 (osobne okno).
-pub fn counts_as_failure(kind: &ProviderErrorKind) -> bool {
-    !matches!(
-        kind,
-        ProviderErrorKind::InvalidRequest
-            | ProviderErrorKind::PrivacyBlocked
-            | ProviderErrorKind::Unsupported
-            | ProviderErrorKind::RateLimited { .. }
-    )
-}
-
-/// Ułatwienie dla kompozycji: `Arc<RouterCore>` z dostawcami.
-pub fn router_with(providers: Vec<(Arc<dyn ModelProvider>, RouteKind)>) -> Arc<RouterCore> {
-    let core = RouterCore::default();
-    for (p, kind) in providers {
-        core.register(p, kind);
-    }
-    Arc::new(core)
-}
-
-/// Pojedyncze odrzucenie — dla testów i UI.
-pub fn reason_code(reason: &RejectReason) -> String {
-    serde_json::to_value(reason)
-        .ok()
-        .and_then(|v| v["code"].as_str().map(str::to_owned))
-        .unwrap_or_default()
-}
-
-/// Ostrzeżenie — kod.
-pub fn warning_code(warning: &RouteWarning) -> String {
-    serde_json::to_value(warning)
-        .ok()
-        .and_then(|v| v["code"].as_str().map(str::to_owned))
-        .unwrap_or_default()
 }

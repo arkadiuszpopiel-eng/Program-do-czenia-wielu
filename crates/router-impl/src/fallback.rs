@@ -26,6 +26,24 @@ use tokio::time::{Instant, timeout_at};
 use crate::history::{localize_history, qualify_event};
 use crate::routing::RouterCore;
 
+/// Czy dostawca odrzucił sam model (nie istnieje, wycofany, konto nie ma do niego dostępu).
+pub(crate) fn model_unavailable(e: &providers_contract::ProviderError) -> bool {
+    if e.kind != ProviderErrorKind::InvalidRequest {
+        return false;
+    }
+    let code = e.provider_code.as_deref().unwrap_or_default();
+    let text = e.message.to_lowercase();
+    matches!(
+        code,
+        "model_not_found" | "not_found_error" | "unsupported_model"
+    ) || (text.contains("model")
+        && (text.contains("does not exist")
+            || text.contains("not found")
+            || text.contains("do not have access")
+            || text.contains("is not supported")
+            || text.contains("deprecated")))
+}
+
 fn ms(d: Duration) -> u64 {
     u64::try_from(d.as_millis()).unwrap_or(u64::MAX)
 }
@@ -198,8 +216,10 @@ impl Run {
                         kind: e.kind.clone(),
                     },
                 );
+                // „Nie ma takiego modelu / brak dostępu” dotyczy tego jednego modelu, nie treści
+                // żądania — następny model z kolejki ma szansę, więc przełączamy mimo kodu 400/404.
                 let switch = !e.after_output
-                    && e.should_fallback()
+                    && (e.should_fallback() || model_unavailable(&e))
                     && has_next
                     && !self.cancel.is_cancelled();
                 if switch {

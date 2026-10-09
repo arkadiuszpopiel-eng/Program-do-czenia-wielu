@@ -79,6 +79,7 @@ impl Loop {
                 last_level = now;
                 self.events.emit(AlfaEvent::MicLevel {
                     level: pill::level(status.level_db),
+                    raw: None,
                 });
             }
             if now >= last_stats + STATS_EVERY_MS {

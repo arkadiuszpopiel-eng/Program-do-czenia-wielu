@@ -85,6 +85,8 @@ pub struct SettingDef {
 #[serde(rename_all = "snake_case")]
 pub enum SettingsCustomPage {
     Providers,
+    /// API i kolejki modeli: wybór i kolejność modeli każdego konta dla klas zadań.
+    Api,
     Costs,
     Shortcuts,
     Transfer,

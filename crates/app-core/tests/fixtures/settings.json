@@ -229,6 +229,17 @@
         "upcoming": []
       },
       {
+        "id": "api",
+        "label": {
+          "pl": "API i kolejki modeli",
+          "en": "API and model queues"
+        },
+        "wave": 1,
+        "custom": "api",
+        "settings": [],
+        "upcoming": []
+      },
+      {
         "id": "models",
         "label": {
           "pl": "Modele i silniki",
@@ -478,6 +489,45 @@
         "wave": 1,
         "custom": "voice",
         "settings": [
+          {
+            "key": "voice.noise_reduction",
+            "label": {
+              "pl": "Redukcja szumów mikrofonu",
+              "en": "Microphone noise reduction"
+            },
+            "description": {
+              "pl": "Usuwa szum wentylatorów i otoczenia przed rozpoznawaniem mowy. „Mocna” — głośny laptop albo biuro; „Wyłączona” — mikrofon studyjny. Działa od następnego włączenia mikrofonu.",
+              "en": "Removes fan and background noise before speech recognition. “Strong” for a loud laptop or an office; “Off” for a studio microphone. Applies the next time the microphone is turned on."
+            },
+            "default": "standard",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Wyłączona",
+                    "en": "Off"
+                  }
+                },
+                {
+                  "value": "standard",
+                  "label": {
+                    "pl": "Standardowa",
+                    "en": "Standard"
+                  }
+                },
+                {
+                  "value": "strong",
+                  "label": {
+                    "pl": "Mocna",
+                    "en": "Strong"
+                  }
+                }
+              ]
+            }
+          },
           {
             "key": "voice.mode",
             "label": {
@@ -1716,6 +1766,7 @@
       "costs.warn_at": 80,
       "costs.background_local_only": true,
       "costs.estimate_before_long": true,
+      "voice.noise_reduction": "standard",
       "voice.mode": "toggle",
       "voice.show_pill": true,
       "agents.max_steps": 40,

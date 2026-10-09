@@ -19,6 +19,7 @@ mod codec;
 mod config;
 mod download;
 mod error;
+mod leak;
 mod manifest;
 mod module;
 mod placement;

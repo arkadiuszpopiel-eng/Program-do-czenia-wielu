@@ -30,7 +30,26 @@ export interface ModelInfo {
   readonly name: string;
   readonly kinds: readonly ('chat' | 'stt' | 'tts' | 'embeddings' | 'vision')[];
   readonly context_tokens: number | null;
+  /** Przeznaczenie rozpoznane przez rdzeń po nazwie modelu. */
+  readonly purpose: ModelPurpose;
+  /** Wielkość modelu w swojej rodzinie. */
+  readonly tier: ModelTier;
+  /** Przypięta migawka z datą w nazwie (np. `…-2024-08-06`). */
+  readonly snapshot: boolean;
 }
+
+export type ModelPurpose =
+  | 'chat'
+  | 'reasoning'
+  | 'embedding'
+  | 'speech'
+  | 'transcription'
+  | 'realtime'
+  | 'image'
+  | 'video'
+  | 'moderation'
+  | 'other';
+export type ModelTier = 'standard' | 'small' | 'tiny' | 'premium';
 
 export interface AccountAssignment {
   /** Klasy zadań routera (np. `chat`, `code`, `background`). */
@@ -53,6 +72,10 @@ export interface Account {
   readonly last_tested_at: Iso8601 | null;
   /** Wynik ostatniego testu — lista kont pokazuje powód, nie tylko „klucz odrzucony”. */
   readonly last_test?: AccountLastTest | null;
+  /** Kolejki modeli: klasa zadań → modele w kolejności prób (brak klasy = automatycznie). */
+  readonly queues?: Readonly<Record<string, readonly string[]>>;
+  /** Model, którego Alfa użyje do rozmowy bez kolejki. */
+  readonly auto_model?: string | null;
 }
 
 /** Ostatni test konta w skrócie (te same pola co w `TestReport`, bez listy modeli). */

@@ -23,6 +23,7 @@
   import MemoryPage from './pages/MemoryPage.svelte';
   import PermissionsPage from './pages/PermissionsPage.svelte';
   import PluginsPage from './pages/PluginsPage.svelte';
+  import ApiPage from './pages/ApiPage.svelte';
   import ProvidersPage from './pages/ProvidersPage.svelte';
   import ShortcutsPage from './pages/ShortcutsPage.svelte';
   import SkillsPage from './pages/SkillsPage.svelte';
@@ -153,6 +154,7 @@
           </EmptyState>
         {:else}
           {#if page.custom === 'providers'}<ProvidersPage />
+          {:else if page.custom === 'api'}<ApiPage />
           {:else if page.custom === 'costs'}<CostsPage />
           {:else if page.custom === 'shortcuts'}<ShortcutsPage />
           {:else if page.custom === 'transfer'}<TransferPage />

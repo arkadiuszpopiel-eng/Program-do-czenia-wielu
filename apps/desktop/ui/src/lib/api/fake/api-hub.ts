@@ -4,7 +4,15 @@ import type { AlfaClient } from '../client';
 import { cleanKey, isPlausibleKey, rotateStores, verdictOf } from '../../logic/api-key';
 import { CommandError } from '../command-error';
 import type { Account, DryRunItem, ModelInfo, TestReport } from '../types-hub';
+import {
+  MAX_QUEUE,
+  TASK_CLASSES,
+  fitsClass,
+  type QueueStrategy,
+  type TaskClassId,
+} from '../../logic/model-queue';
 import { FAKE_CATALOG } from './catalog';
+import { OPENAI_MODELS, fakeModel, purposeOf, suggestFake } from './model-info';
 import type { FakeCore } from './core';
 import {
   HANDLE_EXPIRED,
@@ -16,29 +24,18 @@ import {
 
 const MODELS: Readonly<Record<string, readonly ModelInfo[]>> = {
   anthropic: [
-    {
-      id: 'claude-opus-5-5',
-      name: 'Claude Opus 5.5',
-      kinds: ['chat', 'vision'],
-      context_tokens: 1_000_000,
-    },
-    { id: 'claude-haiku-5', name: 'Claude Haiku 5', kinds: ['chat'], context_tokens: 200_000 },
+    fakeModel('claude-opus-5-5', 'Claude Opus 5.5', 1_000_000),
+    fakeModel('claude-haiku-5', 'Claude Haiku 5', 200_000),
   ],
-  openai: [
-    { id: 'gpt-6-sol', name: 'GPT-6 Sol', kinds: ['chat', 'vision'], context_tokens: 400_000 },
-    { id: 'gpt-6-luna', name: 'GPT-6 Luna', kinds: ['chat'], context_tokens: 200_000 },
-  ],
+  openai: OPENAI_MODELS,
 };
 
 const genericModels = (providerId: string): readonly ModelInfo[] =>
-  MODELS[providerId] ?? [
-    {
-      id: `${providerId}-default`,
-      name: `${providerId} — model domyślny`,
-      kinds: ['chat'],
-      context_tokens: null,
-    },
-  ];
+  MODELS[providerId] ?? [fakeModel(`${providerId}-default`, `${providerId} — model domyślny`)];
+
+/** Model rozmowy wybierany automatycznie (jak `best_chat_model` w rdzeniu). */
+const autoModel = (models: readonly ModelInfo[]): string | null =>
+  suggestFake(models, 'chat', 'balanced')[0] ?? null;
 
 /** Odmowa zapisu konta jak w rdzeniu albo `null`. */
 function checkNewAccount(
@@ -155,6 +152,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     const stored: Partial<Account> = {
       state: account.state === 'disabled' ? 'disabled' : state,
       models,
+      auto_model: autoModel(models),
       last_tested_at: core.isoNow(),
       last_test: { ok, reason: outcome, latency_ms: ok ? 312 : null, ...shared },
     };
@@ -261,8 +259,33 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
         return Promise.reject(
           new CommandError('invalid_input', 'Podaj nazwę modelu, np. gpt-4o-mini.'),
         );
-      const models = [{ id: name, name, kinds: ['chat'] as const, context_tokens: null }];
-      return core.reply(update(id, { models }) ?? account);
+      const models = [fakeModel(name)];
+      return core.reply(update(id, { models, auto_model: name }) ?? account);
+    },
+    setQueue: (id, taskClass, models) => {
+      const account = core.accounts.find((a) => a.id === id);
+      if (!account) return missing();
+      const refuse = (message: string) =>
+        Promise.reject(new CommandError('invalid_input', message));
+      const known = TASK_CLASSES.find((c) => c === taskClass);
+      if (!known) return refuse(`Nieznana klasa zadań „${taskClass}”.`);
+      if (models.length > MAX_QUEUE)
+        return refuse(`Kolejka może mieć najwyżej ${MAX_QUEUE} modeli.`);
+      const twice = models.find((m, at) => models.indexOf(m) !== at);
+      if (twice) return refuse(`Model „${twice}” jest w kolejce dwa razy.`);
+      const unfit = models.find((m) => !fitsClass(known, purposeOf(m)));
+      if (unfit) return refuse(`„${unfit}” nie nadaje się do tej klasy zadań.`);
+      const queues: Record<string, readonly string[]> = { ...account.queues };
+      if (models.length) queues[known] = [...models];
+      else delete queues[known];
+      return core.reply(update(id, { queues }) ?? account);
+    },
+    suggestQueue: (id, taskClass, strategy) => {
+      const account = core.accounts.find((a) => a.id === id);
+      if (!account) return missing();
+      return core.reply(
+        suggestFake(account.models, taskClass as TaskClassId, strategy as QueueStrategy),
+      );
     },
     assign: (id, assignment) => core.reply(void update(id, { assignments: assignment })),
     setLimit: (id, enabled, monthly) =>

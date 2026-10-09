@@ -109,6 +109,7 @@ updater-impl = { path = "../updater-impl" }
 # Głos: audio (WASAPI) i TTS
 voice-audio-contract = { path = "../voice-audio-contract" }
 voice-audio-impl = { path = "../voice-audio-impl" }
+voice-dsp-contract = { path = "../voice-dsp-contract" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 voice-tts-impl = { path = "../voice-tts-impl" }
 # Zewnętrzne (wersje z [workspace.dependencies] albo już obecne w Cargo.lock)

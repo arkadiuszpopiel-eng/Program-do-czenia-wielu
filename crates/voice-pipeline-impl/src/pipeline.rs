@@ -103,6 +103,8 @@ pub(crate) struct State {
     pub active_persona: PersonaId,
     pub addressed: bool,
     pub preroll: VecDeque<Frame>,
+    /// Czy po otwarciu mikrofonu sprawdzono już zgodność zegara potoku ze znacznikami ramek.
+    pub clock_checked: bool,
     pub user: Option<UserUtt>,
     pub closing: Option<UserUtt>,
     pub next_stt: u64,
@@ -184,6 +186,7 @@ impl Pipeline {
             active_persona: cfg.default_persona.clone(),
             addressed: false,
             preroll: VecDeque::new(),
+            clock_checked: false,
             user: None,
             closing: None,
             next_stt: 0,

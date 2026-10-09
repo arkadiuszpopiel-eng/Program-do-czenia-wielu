@@ -204,6 +204,18 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             roundtrip::<TestReport>,
         ),
         "accounts_set_model" => (vec![("accountId", s), ("model", s)], roundtrip::<Account>),
+        "accounts_set_queue" => (
+            vec![
+                ("accountId", s),
+                ("taskClass", s),
+                ("models", roundtrip::<Vec<String>>),
+            ],
+            roundtrip::<Account>,
+        ),
+        "accounts_suggest_queue" => (
+            vec![("accountId", s), ("taskClass", s), ("strategy", s)],
+            roundtrip::<Vec<String>>,
+        ),
         "accounts_set_disabled" => (
             vec![("accountId", s), ("disabled", b)],
             roundtrip::<Account>,

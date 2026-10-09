@@ -103,4 +103,52 @@ impl AppCore {
         self.announce_account(&id).await;
         Ok(account_dto(&self.account(&id)?))
     }
+
+    /// `accounts_set_queue`: kolejka modeli konta dla klasy zadań (kolejność prób Routera,
+    /// najwyżej 10). Pusta lista przywraca wybór automatyczny. Model, który do klasy się nie
+    /// nadaje (np. synteza mowy w rozmowie), jest odrzucany z wyjaśnieniem.
+    pub async fn accounts_set_queue(
+        &self,
+        account_id: String,
+        task_class: String,
+        models: Vec<String>,
+    ) -> Result<Account, AppError> {
+        let id = super::accounts::account_id(&account_id)?;
+        let class = super::accounts::task_from_name(&task_class)?;
+        let models = models
+            .iter()
+            .map(|m| accounts_hub_contract::ModelId::new(m.trim()))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| {
+                AppError::invalid("Nazwa modelu w kolejce jest pusta albo niepoprawna.")
+            })?;
+        self.inner.hub.set_model_queue(&id, class, models).await?;
+        self.announce_account(&id).await;
+        Ok(account_dto(&self.account(&id)?))
+    }
+
+    /// `accounts_suggest_queue`: propozycja kolejki z modeli konta dla klasy zadań i strategii
+    /// (`quality`, `balanced`, `economy`). Niczego nie zapisuje.
+    pub async fn accounts_suggest_queue(
+        &self,
+        account_id: String,
+        task_class: String,
+        strategy: String,
+    ) -> Result<Vec<String>, AppError> {
+        use accounts_hub_contract::QueueStrategy;
+        let id = super::accounts::account_id(&account_id)?;
+        let class = super::accounts::task_from_name(&task_class)?;
+        let strategy = match strategy.as_str() {
+            "quality" => QueueStrategy::Quality,
+            "balanced" => QueueStrategy::Balanced,
+            "economy" => QueueStrategy::Economy,
+            other => return Err(AppError::invalid(format!("Nieznana strategia „{other}”."))),
+        };
+        let account = self.account(&id)?;
+        let ids = account.models.iter().map(|m| m.id.as_str());
+        Ok(accounts_hub_contract::suggest_queue(ids, class, strategy)
+            .into_iter()
+            .map(str::to_owned)
+            .collect())
+    }
 }

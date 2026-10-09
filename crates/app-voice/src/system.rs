@@ -22,7 +22,7 @@ use scheduler_lite_contract::SchedulerLite;
 use sessions_contract::KeyVault;
 use voice_audio_contract::{AudioIo, StreamConfig};
 use voice_cmd_contract::{Grammar, GrammarRecognizer};
-use voice_dsp_contract::DspCfg;
+use voice_dsp_contract::{DspCfg, NoiseSetting};
 use voice_dsp_impl::DspPipeline;
 use voice_pipeline_contract::{PipelineCfg, PipelineError, ReplySource};
 use voice_pipeline_impl::{MonotonicClock, Pipeline, PipelineParts};
@@ -67,7 +67,9 @@ pub struct SystemVoice {
     pub(crate) scheduler: Arc<dyn SchedulerLite>,
     residency: Option<Arc<dyn Residency>>,
     pub(crate) vault: Option<Arc<dyn KeyVault>>,
-    pub(crate) clock: MonotonicClock,
+    /// Zegar potoku — w produkcji zegar urządzenia audio (ta sama podstawa co znaczniki ramek).
+    pub(crate) clock: Arc<dyn voice_audio_contract::MediaClock>,
+    noise: NoiseSetting,
 }
 
 pub(crate) fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
@@ -121,8 +123,25 @@ impl SystemVoice {
             scheduler,
             residency,
             vault: None,
-            clock: MonotonicClock::new(),
+            clock: Arc::new(MonotonicClock::new()),
+            noise: NoiseSetting::default(),
         }
+    }
+
+    /// Zegar w podstawie czasu urządzenia audio. Znaczniki ramek mikrofonu i pozycja odtwarzania
+    /// przychodzą w czasie urządzenia (na Windows: QPC od startu systemu); z zegarem liczonym od
+    /// startu potoku cisza po wypowiedzi wychodziła zerowa i tura nigdy się nie kończyła.
+    #[must_use]
+    pub fn with_clock(mut self, clock: Arc<dyn voice_audio_contract::MediaClock>) -> Self {
+        self.clock = clock;
+        self
+    }
+
+    /// Wspólne ustawienie redukcji szumów (Ustawienia → Głos); czytane przy starcie rozmowy.
+    #[must_use]
+    pub fn with_noise(mut self, noise: NoiseSetting) -> Self {
+        self.noise = noise;
+        self
     }
 
     /// Sejf kluczy (Credential Manager) — klucz profilu głosu właściciela (bez sejfu
@@ -207,9 +226,10 @@ impl VoiceEngineFactory for SystemVoice {
             .audio
             .open_output(None, &StreamConfig::output_default())
             .map_err(|e| component("speaker", e))?;
-        let dsp = DspPipeline::new(DspCfg::default()).map_err(|e| component("dsp", e))?;
+        let dsp = DspPipeline::new(DspCfg::default().with_noise(self.noise.get()))
+            .map_err(|e| component("dsp", e))?;
         let parts = PipelineParts {
-            clock: Arc::new(MonotonicClock::new()),
+            clock: self.clock.clone(),
             audio: self.audio.clone(),
             output,
             dsp: Box::new(dsp),

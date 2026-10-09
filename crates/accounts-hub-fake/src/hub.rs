@@ -230,6 +230,7 @@ impl AccountsHub for FakeAccountsHub {
             cost_limit: new.cost_limit,
             source: new.source,
             models: Vec::new(),
+            queues: Default::default(),
         });
         Ok(id)
     }
@@ -248,6 +249,25 @@ impl AccountsHub for FakeAccountsHub {
 
     async fn set_manual_model(&self, id: &AccountId, model: ModelId) -> Result<(), AccountsError> {
         self.set_manual_model_now(id, model)
+    }
+
+    async fn set_model_queue(
+        &self,
+        id: &AccountId,
+        class: accounts_hub_contract::TaskClass,
+        models: Vec<ModelId>,
+    ) -> Result<(), AccountsError> {
+        let names: Vec<String> = models.iter().map(ToString::to_string).collect();
+        accounts_hub_contract::validate_queue(class, &names)
+            .map_err(AccountsError::InvalidInput)?;
+        let mut acc = self.get(id)?;
+        if models.is_empty() {
+            acc.queues.remove(&class);
+        } else {
+            acc.queues.insert(class, models);
+        }
+        self.put(acc);
+        Ok(())
     }
 
     async fn rotate(&self, id: &AccountId, secret: SecretString) -> Result<(), AccountsError> {

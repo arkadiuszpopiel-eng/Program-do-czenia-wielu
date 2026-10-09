@@ -97,6 +97,10 @@ export const plAgents = {
   'voice.testStart': 'Test mikrofonu',
   'voice.testStop': 'Zakończ test',
   'voice.level': 'Poziom mikrofonu',
+  'voice.levelNow': 'Poziom: {level}%',
+  'voice.levelBoth': 'Po redukcji szumów: {level}% · surowy sygnał z mikrofonu: {raw}%',
+  'voice.levelHint':
+    'Niebieski pasek to sygnał po redukcji szumów — gdy nic nie mówisz, powinien opadać do zera. Szary pod spodem pokazuje, ile tła (wentylatory, otoczenie) łapie sam mikrofon. Siłę redukcji ustawisz niżej.',
   'voice.voices': 'Głosy agentek (v0)',
   'voice.voicesHint': 'Głosy v0 bez kluczy (lokalnie). Odsłuchaj próbkę każdej agentki.',
   'voice.preview': 'Odsłuchaj głos: {name}',

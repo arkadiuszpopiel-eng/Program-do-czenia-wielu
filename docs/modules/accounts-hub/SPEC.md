@@ -82,3 +82,15 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
   z nazwą istniejącego konta.
 - Wynik testu jest scalany z bieżącym wpisem konta (zmiany przypisań i limitu z czasu testu nie giną).
 - Testy całej ścieżki: `app-core/tests/accounts_keys.rs`, `accounts_rotate.rs` (lokalny serwer udający dostawcę).
+
+## Przeznaczenie modeli i kolejki (wersja 0.0.8, 2026-10-09)
+- `model_use(id)` rozpoznaje po nazwie, do czego służy model (`Chat`, `Reasoning`, `Embedding`, `Speech`,
+  `Transcription`, `Realtime`, `Image`, `Video`, `Moderation`, `Other`); `best_chat_model` wybiera model domyślny
+  rozmowy — nigdy pierwszy z brzegu (błąd `tts-1` z laptopa).
+- `Account.queues: klasa zadań → modele` (najwyżej `MAX_QUEUE = 10`); `set_model_queue(id, klasa, modele)` sprawdza
+  limit, powtórzenia i dopasowanie do klasy (`validate_queue`); pusta lista = wybór automatyczny.
+- `suggest_queue(modele, klasa, strategia)` — propozycja (`Quality` / `Balanced` / `Economy`), bez przypiętych migawek.
+- Router dostaje kolejki przez `RouterCore::set_provider_queues` i w polityce automatycznej wystawia modele
+  dostawcy po kolei; błąd „model nie istnieje / brak dostępu” przełącza na następny (`router-impl/src/fallback.rs`).
+- Klasa zadań tury pochodzi z „klasy modelu” głównej roli agentki (`BrainRequest.task`).
+- Testy: `app-core/tests/accounts_models.rs`.

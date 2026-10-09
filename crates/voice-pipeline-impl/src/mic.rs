@@ -12,6 +12,9 @@ use voice_wake_contract::{WakeEvent, WakeInput, WakeSource};
 
 use crate::pipeline::Pipeline;
 
+/// Największa dopuszczalna różnica między zegarem potoku a znacznikiem pierwszej ramki (ms).
+const CLOCK_SKEW_LIMIT_MS: u64 = 5_000;
+
 impl Pipeline {
     /// Wejścia UI z kolejki (w kolejności).
     pub(crate) fn process_inputs(&mut self) {
@@ -100,6 +103,7 @@ impl Pipeline {
                     self.dsp.reset();
                     self.vad.reset();
                     self.st.preroll.clear();
+                    self.st.clock_checked = false;
                 }
                 Err(e) => {
                     self.degraded("audio", format!("mikrofon nie otworzył się: {e}"));
@@ -174,6 +178,21 @@ impl Pipeline {
             0.8 * self.st.level_db + 0.2 * level
         };
         let ts = p.frame.ts.as_ms();
+        if !self.st.clock_checked {
+            self.st.clock_checked = true;
+            // Zegar potoku i znaczniki ramek muszą mieć wspólną podstawę: koniec tury to
+            // „teraz − koniec mowy”. Rozjazd o sekundy = złożenie z niewłaściwym zegarem; bez
+            // tego ostrzeżenia mikrofon słucha, a odpowiedź nigdy nie przychodzi.
+            let skew = self.st.now_ms.abs_diff(ts);
+            if skew > CLOCK_SKEW_LIMIT_MS {
+                self.degraded(
+                    "clock",
+                    format!(
+                        "zegar potoku i znaczniki mikrofonu różnią się o {skew} ms — koniec wypowiedzi nie zostanie wykryty"
+                    ),
+                );
+            }
+        }
         let near = self.echo.near_end(ts, level, p.erle_db, p.aec_confidence);
         let vad_input = if near {
             p.clone()

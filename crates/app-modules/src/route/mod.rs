@@ -169,6 +169,18 @@ impl RouterBrain {
     }
 }
 
+/// Klasa zadań Routera z „klasy modelu” roli agentki (`model_policy` roli): programistka idzie
+/// kolejką „Kod”, planistka i recenzentka — „Planowanie”; reszta to rozmowa.
+pub fn task_class(policy: Option<&str>) -> TaskClass {
+    match policy.unwrap_or_default() {
+        "code" => TaskClass::Code,
+        "planning" | "review" | "research" => TaskClass::Planning,
+        "gui-vision" => TaskClass::GuiVision,
+        "summarize" => TaskClass::Summarize,
+        _ => TaskClass::Conversation,
+    }
+}
+
 fn note(decision: &RouteDecision) -> RouteNote {
     RouteNote {
         chosen: decision.chosen.qualified(),
@@ -199,10 +211,11 @@ impl BrainPort for RouterBrain {
         } else {
             &self.routers.hybrid
         };
+        let class = task_class(request.task.as_deref());
         let mut constraints = request
             .chat
             .as_ref()
-            .map(|c| Constraints::from_request(TaskClass::Conversation, c))
+            .map(|c| Constraints::from_request(class, c))
             .unwrap_or_default();
         constraints.session = match request.privacy {
             PrivacyTag::Normal => SessionTag::Standard,
@@ -212,9 +225,9 @@ impl BrainPort for RouterBrain {
         constraints.pinned = (!local_only)
             .then(|| self.accounts.assigned_to(&request.agent))
             .flatten()
-            .and_then(|(provider, r)| r.model.map(|m| Candidate::new(provider, m)));
+            .and_then(|(provider, r)| r.first_model(class).map(|m| Candidate::new(provider, m)));
         let decision = core
-            .decide(TaskClass::Conversation, &constraints, request.chat.as_ref())
+            .decide(class, &constraints, request.chat.as_ref())
             .map_err(|e| self.no_route(&e, local_only))?;
         let context_window = core.registered(&decision.chosen.provider).and_then(|r| {
             r.provider
@@ -225,7 +238,7 @@ impl BrainPort for RouterBrain {
                 .map(u64::from)
         });
         Ok(BrainChoice {
-            provider: Arc::new(RoutedProvider::new(core.clone(), TaskClass::Conversation)),
+            provider: Arc::new(RoutedProvider::new(core.clone(), class)),
             provider_id: router_contract::ROUTER_PROVIDER_ID.into(),
             provider_name: "Router".into(),
             account: None,

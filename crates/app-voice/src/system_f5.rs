@@ -13,7 +13,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use scheduler_lite_contract::SchedulerLite;
-use voice_audio_contract::{AudioIo, MediaClock, StreamConfig};
+use voice_audio_contract::{AudioIo, StreamConfig};
 use voice_dictation_impl::DictationAudio;
 use voice_speaker_contract::{SpeakerCfg, SpeakerError, SpeakerVerifier};
 use voice_wake_contract::{KeywordScorer, WakeError};

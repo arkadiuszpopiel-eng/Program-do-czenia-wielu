@@ -100,6 +100,17 @@ impl ChatEngine {
             .or_else(|| roles.iter().next().map(|r| r.as_str().to_owned()))
     }
 
+    /// „Klasa modelu” głównej roli agentki — Router wybiera po niej kolejkę modeli.
+    pub fn model_policy_of(&self, session: &SessionId, agent: &str) -> Option<String> {
+        let role = self.role_of(session, agent)?;
+        self.inner
+            .personas
+            .roles()
+            .into_iter()
+            .find(|r| r.id.as_str() == role)
+            .map(|r| r.model_policy)
+    }
+
     /// Agentki sesji ze stanem (mówi = aktywna generacja).
     pub fn agents_of(&self, session: &SessionId) -> Vec<AgentState> {
         let cast = self.inner.personas.cast(session);

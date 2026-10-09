@@ -10,6 +10,7 @@ import { plBundles } from './pl-bundles';
 import { plModels } from './pl-models';
 import { plSettings } from './pl-settings';
 import { plHub } from './pl-hub';
+import { plApi } from './pl-api';
 import { plTasks } from './pl-tasks';
 import { plUpdates } from './pl-updates';
 import { plBroker } from './pl-broker';
@@ -22,6 +23,7 @@ export const pl = {
   ...plAgents,
   ...plSettings,
   ...plHub,
+  ...plApi,
   ...plMemory,
   ...plTasks,
   ...plWork,

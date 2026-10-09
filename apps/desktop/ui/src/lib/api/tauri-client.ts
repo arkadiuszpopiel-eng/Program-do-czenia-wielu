@@ -111,6 +111,10 @@ export class TauriAlfaClient implements AlfaClient {
     rotate: (accountId, secret) => call('accounts_rotate', { accountId, secret }),
     setDisabled: (accountId, disabled) => call('accounts_set_disabled', { accountId, disabled }),
     setModel: (accountId, model) => call('accounts_set_model', { accountId, model }),
+    setQueue: (accountId, taskClass, models) =>
+      call('accounts_set_queue', { accountId, taskClass, models }),
+    suggestQueue: (accountId, taskClass, strategy) =>
+      call('accounts_suggest_queue', { accountId, taskClass, strategy }),
   };
 
   readonly transfer: AlfaClient['transfer'] = {

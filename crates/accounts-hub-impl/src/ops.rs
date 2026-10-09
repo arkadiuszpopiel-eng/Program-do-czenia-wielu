@@ -126,6 +126,7 @@ impl AccountsHub for AccountsHubService {
             cost_limit: new.cost_limit,
             source: new.source,
             models: Vec::new(),
+            queues: Default::default(),
         };
         let payload = serde_json::json!({
             "account": acc.id, "provider": acc.provider, "label": acc.label, "source": acc.source,
@@ -156,6 +157,15 @@ impl AccountsHub for AccountsHubService {
 
     async fn set_manual_model(&self, id: &AccountId, model: ModelId) -> Result<(), AccountsError> {
         self.set_manual_model_now(id, model).await
+    }
+
+    async fn set_model_queue(
+        &self,
+        id: &AccountId,
+        class: accounts_hub_contract::TaskClass,
+        models: Vec<ModelId>,
+    ) -> Result<(), AccountsError> {
+        self.set_model_queue_now(id, class, models).await
     }
 
     async fn rotate(&self, id: &AccountId, secret: SecretString) -> Result<(), AccountsError> {

@@ -59,6 +59,7 @@ export interface SettingDef {
 /** Strona o specjalnym widoku w UI (reszta renderowana generycznie z `settings`). */
 export type SettingsCustomPage =
   | 'providers'
+  | 'api'
   | 'costs'
   | 'shortcuts'
   | 'transfer'
@@ -225,7 +226,8 @@ export type AlfaEvent =
   | { readonly type: 'SystemStatusChanged'; readonly status: SystemStatus }
   | { readonly type: 'TimelineAppended'; readonly event: TimelineEvent }
   | { readonly type: 'AccountChanged'; readonly account: Account }
-  | { readonly type: 'MicLevel'; readonly level: number }
+  /** `level` — po redukcji szumów; `raw` — surowy sygnał (tylko test mikrofonu). */
+  | { readonly type: 'MicLevel'; readonly level: number; readonly raw?: number | null }
   | { readonly type: 'VoicePill'; readonly state: VoicePillState }
   | {
       readonly type: 'Toast';

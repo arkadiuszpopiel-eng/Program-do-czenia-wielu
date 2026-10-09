@@ -39,7 +39,9 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
     phase++;
     // Deterministyczna „mowa": obwiednia sinusoidalna, 30 kl./s.
     const level = Math.max(0, Math.sin(phase / 4) * 0.6 + Math.sin(phase / 1.7) * 0.25);
-    core.emit([{ type: 'MicLevel', level: Math.min(1, level) }]);
+    // Surowy sygnał ma stałe tło (wentylator laptopa); po redukcji zostaje sama mowa.
+    const raw = Math.min(1, Math.max(0.38, level + 0.05));
+    core.emit([{ type: 'MicLevel', level: Math.min(1, level), raw }]);
     timer = core.scheduler.setTimeout(tick, 33);
   };
   const pill = (patch: Partial<VoicePillState>): void => {

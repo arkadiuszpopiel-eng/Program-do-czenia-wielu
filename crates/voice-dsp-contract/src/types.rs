@@ -32,6 +32,67 @@ pub enum NsMode {
     Off,
 }
 
+/// Redukcja szumów wybierana przez użytkownika (Ustawienia → Głos; klucz `voice.noise_reduction`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum NoiseReduction {
+    /// Bez redukcji (mikrofon studyjny, ciche pomieszczenie).
+    Off,
+    /// RNNoise, filtr dudnienia 100 Hz, tło między wypowiedziami ciszej o 18 dB.
+    #[default]
+    Standard,
+    /// Jak wyżej, ale filtr 140 Hz i tło ciszej o 36 dB — głośne chłodzenie laptopa, biuro.
+    Strong,
+}
+
+impl NoiseReduction {
+    /// Wartość ustawienia (`off` / `standard` / `strong`); nieznana → domyślna.
+    pub fn parse(value: &str) -> Self {
+        match value {
+            "off" => Self::Off,
+            "strong" => Self::Strong,
+            _ => Self::Standard,
+        }
+    }
+
+    fn code(self) -> u8 {
+        match self {
+            Self::Off => 0,
+            Self::Standard => 1,
+            Self::Strong => 2,
+        }
+    }
+}
+
+/// Bieżące ustawienie redukcji szumów, wspólne dla testu mikrofonu i potoku rozmowy (zmiana
+/// w Ustawieniach działa od następnego uruchomienia mikrofonu, bez restartu programu).
+#[derive(Debug, Clone, Default)]
+pub struct NoiseSetting(std::sync::Arc<std::sync::atomic::AtomicU8>);
+
+impl NoiseSetting {
+    /// Ustawienie o wartości początkowej.
+    pub fn new(value: NoiseReduction) -> Self {
+        let setting = Self::default();
+        setting.set(value);
+        setting
+    }
+
+    /// Bieżąca wartość.
+    pub fn get(&self) -> NoiseReduction {
+        match self.0.load(std::sync::atomic::Ordering::Relaxed) {
+            0 => NoiseReduction::Off,
+            2 => NoiseReduction::Strong,
+            _ => NoiseReduction::Standard,
+        }
+    }
+
+    /// Zmiana wartości.
+    pub fn set(&self, value: NoiseReduction) {
+        self.0
+            .store(value.code(), std::sync::atomic::Ordering::Relaxed);
+    }
+}
+
 /// Konfiguracja DSP (`[voice.dsp]`).
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct DspCfg {
@@ -48,6 +109,11 @@ pub struct DspCfg {
     /// Wyprzedzenie referencji względem mikrofonu (ms) — margines przyczynowości AEC na
     /// niedokładne znaczniki czasu; AEC sam dostraja resztę opóźnienia.
     pub reference_margin_ms: u32,
+    /// Filtr górnoprzepustowy przed redukcją szumu (Hz; 0 = wyłączony) — dudnienie wentylatorów
+    /// i przydźwięk sieci.
+    pub highpass_hz: f32,
+    /// O ile decybeli ściszać ramki bez mowy po redukcji szumu (0 = bez bramki).
+    pub gate_db: f32,
 }
 
 impl Default for DspCfg {
@@ -59,6 +125,8 @@ impl Default for DspCfg {
             agc_target_db: -20.0,
             whisper_mode: false,
             reference_margin_ms: 20,
+            highpass_hz: 100.0,
+            gate_db: 18.0,
         }
     }
 }
@@ -69,7 +137,25 @@ impl DspCfg {
         Self {
             ns: NsMode::Off,
             agc: false,
+            highpass_hz: 0.0,
+            gate_db: 0.0,
             ..Self::default()
+        }
+    }
+
+    /// Ta konfiguracja z redukcją szumów wybraną przez użytkownika.
+    #[must_use]
+    pub fn with_noise(self, level: NoiseReduction) -> Self {
+        let (ns, highpass_hz, gate_db) = match level {
+            NoiseReduction::Off => (NsMode::Off, 0.0, 0.0),
+            NoiseReduction::Standard => (NsMode::RnNoise, 100.0, 18.0),
+            NoiseReduction::Strong => (NsMode::RnNoise, 140.0, 36.0),
+        };
+        Self {
+            ns,
+            highpass_hz,
+            gate_db,
+            ..self
         }
     }
 
@@ -79,6 +165,18 @@ impl DspCfg {
             return Err(DspError::InvalidConfig(format!(
                 "cel AGC {} dBFS poza [−40, −6]",
                 self.agc_target_db
+            )));
+        }
+        if !(0.0..=300.0).contains(&self.highpass_hz) {
+            return Err(DspError::InvalidConfig(format!(
+                "filtr górnoprzepustowy {} Hz poza [0, 300]",
+                self.highpass_hz
+            )));
+        }
+        if !(0.0..=48.0).contains(&self.gate_db) {
+            return Err(DspError::InvalidConfig(format!(
+                "tłumienie tła {} dB poza [0, 48]",
+                self.gate_db
             )));
         }
         if self.reference_margin_ms > 200 {

@@ -33,6 +33,23 @@ const TASKS: [(TaskClass, &str); 7] = [
     (TaskClass::Embeddings, "embeddings"),
 ];
 
+/// Nazwa wariantu wyliczenia tak, jak idzie przez IPC (`snake_case`).
+fn snake<T: serde::Serialize>(value: &T) -> String {
+    serde_json::to_value(value)
+        .ok()
+        .and_then(|v| v.as_str().map(str::to_owned))
+        .unwrap_or_default()
+}
+
+/// Klasa zadań z nazwy używanej w interfejsie (`chat`, `code`, …).
+pub(super) fn task_from_name(name: &str) -> Result<TaskClass, AppError> {
+    TASKS
+        .iter()
+        .find(|(_, n)| *n == name)
+        .map(|(t, _)| *t)
+        .ok_or_else(|| AppError::invalid(format!("Nieznana klasa zadań „{name}”.")))
+}
+
 /// Wpis katalogu → DTO.
 pub fn provider_info(e: &ProviderCatalogEntry) -> ProviderInfo {
     ProviderInfo {
@@ -104,19 +121,32 @@ pub fn account_dto(a: &CoreAccount) -> Account {
         models: a
             .models
             .iter()
-            .map(|m| ModelInfo {
-                id: m.id.to_string(),
-                name: m.display_name.clone().unwrap_or_else(|| m.id.to_string()),
-                kinds: if m
+            .map(|m| {
+                let purpose = accounts_hub_contract::model_use(m.id.as_str());
+                let vision = m
                     .capabilities
                     .as_ref()
-                    .is_some_and(|c| c.vision == Tribool::Yes)
-                {
-                    vec![ModelKind::Chat, ModelKind::Vision]
-                } else {
-                    vec![ModelKind::Chat]
-                },
-                context_tokens: m.context_window.map(u64::from),
+                    .is_some_and(|c| c.vision == Tribool::Yes);
+                use accounts_hub_contract::ModelUse as Use;
+                let kinds = match purpose {
+                    Use::Chat | Use::Reasoning if vision => {
+                        vec![ModelKind::Chat, ModelKind::Vision]
+                    }
+                    Use::Chat | Use::Reasoning => vec![ModelKind::Chat],
+                    Use::Embedding => vec![ModelKind::Embeddings],
+                    Use::Speech => vec![ModelKind::Tts],
+                    Use::Transcription => vec![ModelKind::Stt],
+                    _ => Vec::new(),
+                };
+                ModelInfo {
+                    id: m.id.to_string(),
+                    name: m.display_name.clone().unwrap_or_else(|| m.id.to_string()),
+                    kinds,
+                    context_tokens: m.context_window.map(u64::from),
+                    purpose: snake(&purpose),
+                    tier: snake(&accounts_hub_contract::model_tier(m.id.as_str())),
+                    snapshot: accounts_hub_contract::is_snapshot(m.id.as_str()),
+                }
             })
             .collect(),
         assignments: AccountAssignment {
@@ -139,6 +169,18 @@ pub fn account_dto(a: &CoreAccount) -> Account {
             provider_code: t.detail.as_ref().and_then(|d| d.code.clone()),
             detail: t.detail.as_ref().map(|d| d.message.clone()),
         }),
+        queues: TASKS
+            .iter()
+            .filter_map(|(class, name)| {
+                let models = a.queues.get(class).filter(|q| !q.is_empty())?;
+                Some((
+                    (*name).to_owned(),
+                    models.iter().map(ToString::to_string).collect(),
+                ))
+            })
+            .collect(),
+        auto_model: accounts_hub_contract::best_chat_model(a.models.iter().map(|m| m.id.as_str()))
+            .map(str::to_owned),
     }
 }
 

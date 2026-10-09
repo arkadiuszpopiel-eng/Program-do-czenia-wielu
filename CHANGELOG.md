@@ -8,6 +8,55 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.8 — 2026-10-09
+
+Pięć zgłoszeń właściciela z pierwszej próby wersji 0.0.7 na laptopie: rozmowa z kluczem OpenAI nie działała, nie dało
+się wybrać modeli, mikrofon zbierał szum, rozmowa głosowa słuchała bez odpowiedzi, a model lokalny dopisywał do
+odpowiedzi techniczny tekst.
+
+### Rozmowa i modele
+
+- Rozmowa z kontem OpenAI działa: Alfa wybiera model rozmowy, a nie pierwszy z listy dostawcy. Wcześniej trafiała na
+  `tts-1` (synteza mowy) i każda wiadomość kończyła się błędem „The model tts-1 does not exist”.
+- Nowa strona „API i kolejki modeli” w Ustawieniach. Dla każdego konta API ustawiasz kolejkę do dziesięciu modeli
+  osobno dla rozmowy, kodu, planowania, szybkiej odpowiedzi głosowej, ekranu i obrazu, streszczania i embeddingów.
+- Alfa bierze pierwszy model z kolejki, a następny dopiero wtedy, gdy poprzedni zawiedzie — także gdy dostawca
+  odpowie, że modelu nie ma albo konto nie ma do niego dostępu.
+- Przeglądarka modeli konta: wyszukiwarka, filtry rodzaju (rozmowa, rozumowanie, embeddingi, mowa, obrazy…),
+  ukrywanie wersji z datą w nazwie. Każdy model ma opis, do czego służy.
+- „Dobierz automatycznie” układa kolejkę jednym kliknięciem: najlepsza jakość, zrównoważone albo oszczędnie i szybko.
+- Model, który do zadania się nie nadaje (np. synteza mowy w rozmowie), nie wejdzie do kolejki — z wyjaśnieniem.
+- Agentki w roli programistki korzystają z kolejki „Kod”, planujące i recenzujące — z kolejki „Planowanie”.
+- Model lokalny nie dopisuje już do odpowiedzi zmyślonych wywołań narzędzi w rodzaju `{"name": "get_status", …}`.
+
+### Głos
+
+- Rozmowa głosowa odpowiada. Wcześniej mikrofon słuchał, ale koniec wypowiedzi nigdy nie był wykrywany, więc nic nie
+  trafiało do rozpoznawania mowy ani do modelu.
+- Redukcja szumów mikrofonu ma trzy poziomy — wyłączona, standardowa i mocna (Ustawienia → Głos). Poza usuwaniem
+  szumu działa filtr dudnienia wentylatorów i bramka, która ścisza tło między wypowiedziami.
+- Szum wentylatora nie jest już brany za mowę, więc nie przedłuża wypowiedzi i nie budzi rozpoznawania.
+- Test mikrofonu pokazuje dwa paski: sygnał po redukcji szumów i surowy sygnał z mikrofonu — widać, ile tła odcięto.
+
+### Testy
+
+- Rdzeń: test całej ścieżki z lokalnym serwerem udającym OpenAI (lista z `tts-1` na początku → rozmowa idzie do
+  modelu rozmowy; kolejka; pominięcie niedostępnego modelu) — `app-core/tests/accounts_models.rs`; reguły kolejek
+  i rozpoznawanie przeznaczenia modeli — `accounts-hub-contract` (`model_use.rs`, `queue.rs`).
+- Głos: zegar potoku sprawdzony na prawdziwym mikrofonie laptopa (`app-core/tests/voice_clock.rs`); szum wentylatora
+  na trzech poziomach redukcji i zachowanie mowy (`voice-dsp-impl/tests/module.rs`); filtr i bramka (`gate.rs`).
+- Model lokalny: odpowiedź z laptopa pocięta w każdym miejscu (`providers-local-impl/src/leak.rs`).
+- Interfejs: 15 testów E2E strony API i testu mikrofonu (6 kombinacji stylu i motywu, wersja angielska), 8 testów
+  logiki kolejek; zrzuty wszystkich stanów obejrzane ręcznie (`scripts/shots-api.mjs`).
+
+### Przyczyna błędu
+
+- Rozmowa: Router brał pierwszy model z listy konta; OpenAI zwraca listę alfabetycznie zmieszaną z modelami mowy,
+  obrazów i embeddingów.
+- Głos: znaczniki czasu ramek mikrofonu są w zegarze systemu (od jego startu), a potok liczył „teraz” od własnego
+  startu — cisza po wypowiedzi wychodziła zawsze zerowa. Na atrapach w testach oba zegary były zgodne.
+- Szum: redukcja szumu uznawała buczenie wentylatora za mowę, a test mikrofonu pokazywał sygnał przed redukcją.
+
 ## 0.0.7 — 2026-10-09
 
 Dodawanie klucza API zrobione od nowa po zgłoszeniu właściciela („401 Klucz odrzucony” bez wyjaśnienia) i po dwóch

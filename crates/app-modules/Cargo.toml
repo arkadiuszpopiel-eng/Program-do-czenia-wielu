@@ -42,6 +42,8 @@ transfer-impl = { path = "../transfer-impl" }
 undo-journal-contract = { path = "../undo-journal-contract" }
 undo-journal-impl = { path = "../undo-journal-impl" }
 voice-audio-contract = { path = "../voice-audio-contract" }
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-dsp-impl = { path = "../voice-dsp-impl" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 voice-tts-impl = { path = "../voice-tts-impl" }
 # Sidecar STT whisper-server (CPU/CUDA) — wspólna kompozycja dla app-voice i próby generalnej.

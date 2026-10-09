@@ -90,6 +90,13 @@ pub struct ModelInfo {
     pub name: String,
     pub kinds: Vec<ModelKind>,
     pub context_tokens: Option<u64>,
+    /// Przeznaczenie rozpoznane po nazwie: `chat`, `reasoning`, `embedding`, `speech`,
+    /// `transcription`, `realtime`, `image`, `video`, `moderation`, `other`.
+    pub purpose: String,
+    /// Wielkość: `standard`, `small`, `tiny`, `premium`.
+    pub tier: String,
+    /// Przypięta migawka z datą w nazwie (`…-2024-08-06`).
+    pub snapshot: bool,
 }
 
 /// Przypisania konta.
@@ -123,6 +130,13 @@ pub struct Account {
     /// Wynik ostatniego testu — lista kont pokazuje powód, nie tylko „klucz odrzucony”.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_test: Option<AccountLastTest>,
+    /// Kolejki modeli: klasa zadań (`chat`, `code`, …) → modele w kolejności prób. Brak klasy =
+    /// wybór automatyczny.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub queues: std::collections::BTreeMap<String, Vec<String>>,
+    /// Model, którego Alfa użyje do rozmowy bez kolejki (wybór automatyczny).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_model: Option<String>,
 }
 
 /// Ostatni test konta w skrócie (te same pola co w [`TestReport`], bez listy modeli).

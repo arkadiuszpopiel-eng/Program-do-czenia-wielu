@@ -16,6 +16,7 @@ mod clock;
 mod evaluate;
 mod fallback;
 mod gate;
+mod helpers;
 mod history;
 mod module;
 mod routed;
@@ -23,9 +24,8 @@ mod routing;
 
 pub use clock::{ManualClock, TokioClock};
 pub use gate::CostMeterGate;
+pub use helpers::{counts_as_failure, reason_code, router_with, warning_code};
 pub use history::{localize_history, qualify_event};
 pub use module::{MODULE_TOML, RouterModule};
 pub use routed::RoutedProvider;
-pub use routing::{
-    Registered, RouterCore, counts_as_failure, reason_code, router_with, warning_code,
-};
+pub use routing::{ProviderQueues, Registered, RouterCore};

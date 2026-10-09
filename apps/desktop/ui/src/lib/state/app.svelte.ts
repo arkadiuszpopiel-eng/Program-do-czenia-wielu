@@ -73,6 +73,8 @@ export class AppState {
   activity = $state<Record<string, ActivityInfo | null>>({});
   micState = $state<MicState>('off');
   micLevel = $state(0);
+  /** Surowy poziom mikrofonu z testu (przed redukcją szumów); `null` poza testem. */
+  micRaw = $state<number | null>(null);
   conversation = $state.raw<ConversationState | null>(null);
   palette = $state<{ open: boolean; mode: 'all' | 'sessions' }>({ open: false, mode: 'all' });
   cheatsheetOpen = $state(false);

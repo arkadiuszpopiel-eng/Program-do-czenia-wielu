@@ -29,7 +29,7 @@ impl LlamaCodec {
 }
 
 impl WireCodec for LlamaCodec {
-    type Decoder = ChatDecoder;
+    type Decoder = crate::leak::LeakGuard<ChatDecoder>;
 
     fn build(&self, req: &ChatRequest, _opts: BuildOptions) -> Result<WireRequest, ProviderError> {
         let options = ChatOptions {
@@ -57,8 +57,10 @@ impl WireCodec for LlamaCodec {
         })
     }
 
-    fn decoder(&self, _req: &ChatRequest) -> ChatDecoder {
-        ChatDecoder::default()
+    fn decoder(&self, req: &ChatRequest) -> Self::Decoder {
+        // Bez narzędzi w żądaniu model nie ma czego wywołać — tekst w kształcie wywołania to
+        // zmyślenie i nie trafia do odpowiedzi.
+        crate::leak::LeakGuard::new(ChatDecoder::default(), req.tools.is_empty())
     }
 
     fn classify(&self, status: u16, headers: &HeaderMap, body: &str) -> ProviderError {

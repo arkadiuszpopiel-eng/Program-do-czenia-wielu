@@ -10,6 +10,8 @@ use async_trait::async_trait;
 use personas_contract::PersonaId;
 use providers_contract::PrivacyTag;
 use voice_audio_contract::{AudioIo, DeviceId, DeviceKind, SourceId, StreamConfig};
+use voice_dsp_contract::{AecMode, Dsp, DspCfg, NoiseSetting};
+use voice_dsp_impl::DspPipeline;
 use voice_tts_contract::{CancelToken, SpeechStyle, Tts, TtsRequest};
 
 use app_api::dto::{AlfaEvent, AudioDevice, LocalizedText, ToastKind};
@@ -36,6 +38,7 @@ pub struct VoiceAdapter {
     events: EventHub,
     next: AtomicU64,
     state: Arc<Mutex<State>>,
+    noise: NoiseSetting,
 }
 
 fn audio_error(what: &str, e: impl std::fmt::Display) -> AppError {
@@ -72,7 +75,16 @@ impl VoiceAdapter {
             events,
             next: AtomicU64::new(1),
             state: Arc::default(),
+            noise: NoiseSetting::default(),
         }
+    }
+
+    /// Wspólne ustawienie redukcji szumów (Ustawienia → Głos) — test mikrofonu pokazuje sygnał
+    /// po tej samej redukcji, której używa rozmowa.
+    #[must_use]
+    pub fn with_noise(mut self, noise: NoiseSetting) -> Self {
+        self.noise = noise;
+        self
     }
 
     fn toast(events: &EventHub, pl: String) {
@@ -110,6 +122,14 @@ impl VoicePort for VoiceAdapter {
             .io
             .open_input(id.as_ref(), &StreamConfig::input_default())
             .map_err(|e| audio_error("Test mikrofonu", e))?;
+        // Ten sam potok co w rozmowie (filtr dudnienia, RNNoise, bramka), bez AEC i AGC: nic nie
+        // gra, a wzmacnianie zafałszowałoby wskaźnik. Bez potoku (błąd konfiguracji) — sam sygnał.
+        let cfg = DspCfg {
+            aec: AecMode::Off,
+            agc: false,
+            ..DspCfg::default().with_noise(self.noise.get())
+        };
+        let mut dsp = DspPipeline::new(cfg).ok();
         let stop = Arc::new(AtomicBool::new(false));
         lock(&self.state).mic_test = Some(stop.clone());
         let events = self.events.clone();
@@ -117,16 +137,40 @@ impl VoicePort for VoiceAdapter {
             let mut tick = tokio::time::interval(LEVEL_PERIOD);
             while !stop.load(Ordering::SeqCst) {
                 tick.tick().await;
-                let mut peak: Option<f64> = None;
+                let mut raw: Option<f64> = None;
+                let mut clean: Option<f64> = None;
+                let max = |slot: &mut Option<f64>, value: f64| {
+                    *slot = Some(slot.map_or(value, |p| p.max(value)));
+                };
                 while let Some(frame) = input.read() {
-                    let l = level(&frame.pcm);
-                    peak = Some(peak.map_or(l, |p| p.max(l)));
+                    max(&mut raw, level(&frame.pcm));
+                    match dsp.as_mut().map(|d| d.process(&frame)) {
+                        Some(Ok(processed)) => {
+                            for p in processed {
+                                max(&mut clean, level(&p.frame.pcm));
+                            }
+                        }
+                        // Potok odrzucił ramkę (nietypowy format urządzenia) — pokazujemy surowy.
+                        Some(Err(_)) => dsp = None,
+                        None => {}
+                    }
                 }
-                if let Some(level) = peak {
-                    events.emit(AlfaEvent::MicLevel { level });
+                if let Some(raw) = raw {
+                    let level = if dsp.is_some() {
+                        clean.unwrap_or(0.0)
+                    } else {
+                        raw
+                    };
+                    events.emit(AlfaEvent::MicLevel {
+                        level,
+                        raw: Some(raw),
+                    });
                 }
             }
-            events.emit(AlfaEvent::MicLevel { level: 0.0 });
+            events.emit(AlfaEvent::MicLevel {
+                level: 0.0,
+                raw: None,
+            });
         });
         Ok(())
     }

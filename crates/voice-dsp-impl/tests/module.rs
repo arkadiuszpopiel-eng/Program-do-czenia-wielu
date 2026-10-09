@@ -230,3 +230,89 @@ async fn module_lifecycle_and_publish() {
     assert_eq!(m.stop().await, Err(ModuleError::NotStarted));
     let _ = FakeAudio::new().devices();
 }
+
+/// Zgłoszenie właściciela (2026-10-09): mikrofon laptopa „łapie mocno szumy” — wiatraki
+/// i otoczenie. Szum wentylatora = dudnienie 60 Hz + szum szerokopasmowy, bez mowy. Każdy
+/// poziom redukcji ma go ściszać wyraźnie bardziej niż poprzedni, a przy wyłączonej redukcji
+/// sygnał przechodzi bez zmian.
+#[test]
+fn fan_noise_is_suppressed_more_at_each_level() {
+    use voice_audio_contract::synth::sine;
+    use voice_dsp_contract::NoiseReduction;
+
+    let rate = 48_000;
+    let secs = 4.0;
+    let rumble = sine(60.0, rate, secs, 0.03);
+    let hiss = white_noise(11, rumble.len(), 0.006);
+    let fan: Vec<f32> = rumble.iter().zip(&hiss).map(|(a, b)| a + b).collect();
+    let input_db = rms_db(&fan);
+    let residual = |level: NoiseReduction| {
+        let cfg = DspCfg {
+            aec: AecMode::Off,
+            agc: false,
+            ..DspCfg::default().with_noise(level)
+        };
+        let mut dsp = DspPipeline::new(cfg).unwrap();
+        let mut out = Vec::new();
+        for f in frames(&fan, rate) {
+            for p in dsp.process(&f).unwrap() {
+                out.extend_from_slice(&p.frame.pcm);
+            }
+        }
+        // Ostatnia sekunda: po ustaleniu się filtra, RNNoise i bramki.
+        rms_db(&out[out.len() - 16_000..])
+    };
+    let (off, standard, strong) = (
+        residual(NoiseReduction::Off),
+        residual(NoiseReduction::Standard),
+        residual(NoiseReduction::Strong),
+    );
+    assert!(
+        (off - input_db).abs() < 1.5,
+        "bez redukcji: {off} wobec {input_db}"
+    );
+    assert!(
+        standard < input_db - 30.0,
+        "standardowa: {standard} wobec {input_db}"
+    );
+    assert!(strong < standard - 10.0, "mocna: {strong} wobec {standard}");
+}
+
+/// Redukcja szumów nie może kosztować mowy: zdanie w szumie wentylatora wychodzi z potoku
+/// z poziomem zbliżonym do wejściowego, a ramki mowy są rozpoznawane jako mowa.
+#[test]
+fn speech_survives_strong_noise_reduction() {
+    use voice_dsp_contract::NoiseReduction;
+
+    let rate = 48_000;
+    let speech = synthetic_speech(
+        rate,
+        3.0,
+        SpeechParams {
+            amp: 0.4,
+            ..Default::default()
+        },
+    );
+    let hiss = white_noise(12, speech.len(), 0.004);
+    let mixed: Vec<f32> = speech.iter().zip(&hiss).map(|(a, b)| a + b).collect();
+    let cfg = DspCfg {
+        aec: AecMode::Off,
+        agc: false,
+        ..DspCfg::default().with_noise(NoiseReduction::Strong)
+    };
+    let mut dsp = DspPipeline::new(cfg).unwrap();
+    let (mut out, mut speech_frames, mut total) = (Vec::new(), 0, 0);
+    for f in frames(&mixed, rate) {
+        for p in dsp.process(&f).unwrap() {
+            total += 1;
+            speech_frames += usize::from(p.speech_likely);
+            out.extend_from_slice(&p.frame.pcm);
+        }
+    }
+    assert!(
+        speech_frames * 3 > total,
+        "mowa w {speech_frames} z {total} ramek"
+    );
+    let kept = rms_db(&out) - rms_db(&speech);
+    assert!(kept > -6.0, "mowa ściszona o {kept} dB");
+}

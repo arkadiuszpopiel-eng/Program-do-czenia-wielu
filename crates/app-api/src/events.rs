@@ -98,8 +98,15 @@ pub fn push_coalesced(batch: &mut Vec<AlfaEvent>, event: AlfaEvent) {
             }
             blocks.sort_by_key(|b| b.index);
         }
-        (Some(AlfaEvent::MicLevel { level }), AlfaEvent::MicLevel { level: newer }) => {
+        (
+            Some(AlfaEvent::MicLevel { level, raw }),
+            AlfaEvent::MicLevel {
+                level: newer,
+                raw: newer_raw,
+            },
+        ) => {
             *level = newer;
+            *raw = newer_raw;
         }
         (_, event) => batch.push(event),
     }

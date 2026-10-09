@@ -118,7 +118,11 @@ pub enum AlfaEvent {
         account: Account,
     },
     MicLevel {
+        /// Poziom 0–1 po redukcji szumów (to, co słyszy rozpoznawanie mowy).
         level: f64,
+        /// Poziom surowy z mikrofonu (test mikrofonu) — widać, ile tła odcięto.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        raw: Option<f64>,
     },
     VoicePill {
         state: VoicePillState,

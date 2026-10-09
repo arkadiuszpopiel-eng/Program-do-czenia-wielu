@@ -70,7 +70,13 @@ mod notify {
         .unwrap();
         assert!(n.body.contains("Brokera"));
         assert!(!n.body.to_lowercase().contains("zatwierdź"));
-        assert!(native_notice(&AlfaEvent::MicLevel { level: 0.1 }).is_none());
+        assert!(
+            native_notice(&AlfaEvent::MicLevel {
+                level: 0.1,
+                raw: None
+            })
+            .is_none()
+        );
         let done = native_notice(&AlfaEvent::Stop {
             session_id: "s".into(),
             turn_id: "s:t2".into(),
@@ -132,9 +138,27 @@ mod events {
     #[test]
     fn mic_levels_keep_latest() {
         let mut batch = Vec::new();
-        push_coalesced(&mut batch, AlfaEvent::MicLevel { level: 0.1 });
-        push_coalesced(&mut batch, AlfaEvent::MicLevel { level: 0.7 });
-        assert_eq!(batch, vec![AlfaEvent::MicLevel { level: 0.7 }]);
+        push_coalesced(
+            &mut batch,
+            AlfaEvent::MicLevel {
+                level: 0.1,
+                raw: None,
+            },
+        );
+        push_coalesced(
+            &mut batch,
+            AlfaEvent::MicLevel {
+                level: 0.7,
+                raw: None,
+            },
+        );
+        assert_eq!(
+            batch,
+            vec![AlfaEvent::MicLevel {
+                level: 0.7,
+                raw: None
+            }]
+        );
     }
 
     #[tokio::test(start_paused = true)]

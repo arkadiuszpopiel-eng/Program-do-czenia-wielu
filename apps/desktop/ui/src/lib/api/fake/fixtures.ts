@@ -3,6 +3,7 @@
 import type { AgentId } from '@alfa/ui-kit';
 import type { ArtifactInfo, Author, SessionSummary, TimelineEvent, ToolStep, Turn } from '../types';
 import type { Account, DeviceProfile } from '../types-hub';
+import { OPENAI_MODELS, fakeModel } from './model-info';
 import { renderBlocks } from './render';
 
 const MIN = 60_000;
@@ -359,14 +360,10 @@ export function seedAccounts(now: number): Account[] {
       state: 'ok',
       key_stored: true,
       models: [
-        {
-          id: 'claude-opus-5-5',
-          name: 'Claude Opus 5.5',
-          kinds: ['chat', 'vision'],
-          context_tokens: 1_000_000,
-        },
-        { id: 'claude-haiku-5', name: 'Claude Haiku 5', kinds: ['chat'], context_tokens: 200_000 },
+        fakeModel('claude-opus-5-5', 'Claude Opus 5.5', 1_000_000),
+        fakeModel('claude-haiku-5', 'Claude Haiku 5', 200_000),
       ],
+      auto_model: 'claude-opus-5-5',
       assignments: {
         task_classes: ['chat', 'code'],
         agents: ['alfa', 'gama', 'delta'],
@@ -375,6 +372,21 @@ export function seedAccounts(now: number): Account[] {
       },
       cost_limit: { enabled: true, monthly: pln(20_000) },
       last_tested_at: iso(now - 3 * 60 * MIN),
+    },
+    {
+      // Konto z długą, zmieszaną listą modeli (rozmowa, mowa, obrazy, embeddingi) i jedną kolejką.
+      id: 'acc-openai',
+      provider_id: 'openai',
+      label: 'Praca — OpenAI',
+      state: 'ok',
+      key_stored: true,
+      models: OPENAI_MODELS,
+      auto_model: 'gpt-6-sol',
+      queues: { chat: ['gpt-6-sol', 'gpt-6-luna', 'gpt-5.5'] },
+      assignments: { task_classes: ['chat'], agents: [], voice_stt: false, voice_tts: false },
+      cost_limit: { enabled: true, monthly: pln(5_000) },
+      last_tested_at: iso(now - 12 * MIN),
+      last_test: { ok: true, reason: 'ok', latency_ms: 298 },
     },
   ];
 }

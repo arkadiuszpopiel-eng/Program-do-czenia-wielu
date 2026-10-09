@@ -130,6 +130,7 @@ impl Proposer for LocalProposer {
             profile: Some(ModelProfile::Local),
             privacy: PrivacyTag::LocalOnly,
             chat: None,
+            task: None,
         };
         let choice = brain.choose(&request).await.map_err(|e| e.to_string())?;
         let metrics = serde_json::to_string(snapshot).map_err(|e| e.to_string())?;

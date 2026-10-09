@@ -22,7 +22,10 @@ use voice_audio_contract::synth::chirp;
 
 pub use fbank::{Fbank, FbankCfg, FbankStream, FbankWindow};
 pub use noise::NoiseFloorTracker;
-pub use types::{AecMode, Calibration, DspCfg, DspError, DspStats, NsMode, Processed, SILENCE_DB};
+pub use types::{
+    AecMode, Calibration, DspCfg, DspError, DspStats, NoiseReduction, NoiseSetting, NsMode,
+    Processed, SILENCE_DB,
+};
 
 /// Częstotliwość wyjścia DSP.
 pub const OUTPUT_RATE: u32 = voice_audio_contract::PIPELINE_RATE;
@@ -195,6 +198,31 @@ mod tests {
             .is_err()
         );
         assert_eq!(DspCfg::aec_only().ns, NsMode::Off);
+        // Poziomy redukcji szumów: wyłączona nie zostawia ani filtra, ani bramki; mocna tłumi
+        // tło wyraźnie bardziej niż standardowa.
+        let off = DspCfg::default().with_noise(NoiseReduction::Off);
+        assert_eq!(
+            (off.ns, off.highpass_hz, off.gate_db),
+            (NsMode::Off, 0.0, 0.0)
+        );
+        let standard = DspCfg::default().with_noise(NoiseReduction::Standard);
+        let strong = DspCfg::default().with_noise(NoiseReduction::Strong);
+        assert_eq!(standard, DspCfg::default());
+        assert!(strong.gate_db > standard.gate_db && strong.validate().is_ok());
+        assert!(
+            DspCfg {
+                gate_db: 90.0,
+                ..DspCfg::default()
+            }
+            .validate()
+            .is_err()
+        );
+        assert_eq!(NoiseReduction::parse("strong"), NoiseReduction::Strong);
+        assert_eq!(NoiseReduction::parse("cokolwiek"), NoiseReduction::Standard);
+        let setting = NoiseSetting::new(NoiseReduction::Strong);
+        let shared = setting.clone();
+        shared.set(NoiseReduction::Off);
+        assert_eq!(setting.get(), NoiseReduction::Off);
         let s = calibration_signal(16_000);
         assert_eq!(s.len(), 9_600);
         assert!(s[..1_600].iter().all(|x| *x == 0.0));

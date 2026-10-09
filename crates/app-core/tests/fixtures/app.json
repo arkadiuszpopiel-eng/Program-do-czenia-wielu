@@ -23,6 +23,7 @@
         "costs.warn_at": 80,
         "costs.background_local_only": true,
         "costs.estimate_before_long": true,
+        "voice.noise_reduction": "standard",
         "voice.mode": "toggle",
         "voice.show_pill": true,
         "agents.max_steps": 40,

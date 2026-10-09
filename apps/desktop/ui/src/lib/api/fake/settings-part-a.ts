@@ -100,6 +100,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     ],
     { custom: 'providers' },
   ),
+  page('api', L('API i kolejki modeli', 'API and model queues'), 1, [], { custom: 'api' }),
   page('models', L('Modele i silniki', 'Models and engines'), 1, ENGINE_SETTINGS, {
     custom: 'models',
   }),
@@ -151,6 +152,20 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     L('Głos', 'Voice'),
     1,
     [
+      select(
+        'voice.noise_reduction',
+        L('Redukcja szumów mikrofonu', 'Microphone noise reduction'),
+        L(
+          'Usuwa szum wentylatorów i otoczenia przed rozpoznawaniem mowy. „Mocna” — głośny laptop albo biuro; „Wyłączona” — mikrofon studyjny. Działa od następnego włączenia mikrofonu.',
+          'Removes fan and background noise before speech recognition. “Strong” for a loud laptop or an office; “Off” for a studio microphone. Applies the next time the microphone is turned on.',
+        ),
+        [
+          ['off', L('Wyłączona', 'Off')],
+          ['standard', L('Standardowa', 'Standard')],
+          ['strong', L('Mocna', 'Strong')],
+        ],
+        'standard',
+      ),
       select(
         'voice.mode',
         L('Włączanie mikrofonu', 'Microphone activation'),

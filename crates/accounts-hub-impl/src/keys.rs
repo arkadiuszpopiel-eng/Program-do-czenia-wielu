@@ -233,6 +233,32 @@ impl AccountsHubService {
         })
     }
 
+    /// Kolejka modeli klasy zadań (pusta = wybór automatyczny).
+    pub(crate) async fn set_model_queue_now(
+        &self,
+        id: &AccountId,
+        class: accounts_hub_contract::TaskClass,
+        models: Vec<ModelId>,
+    ) -> Result<(), AccountsError> {
+        let names: Vec<String> = models.iter().map(ToString::to_string).collect();
+        accounts_hub_contract::validate_queue(class, &names)
+            .map_err(AccountsError::InvalidInput)?;
+        let changed = self.update_accounts(|accounts| {
+            let current = accounts
+                .get_mut(id)
+                .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))?;
+            if models.is_empty() {
+                current.queues.remove(&class);
+            } else {
+                current.queues.insert(class, models);
+            }
+            Ok(current.clone())
+        })?;
+        // Router przelicza trasy po zmianie stanu konta — ten sam sygnał niesie nową kolejkę.
+        self.publish_state(&changed, &changed.state).await;
+        Ok(())
+    }
+
     /// Konto tego dostawcy pod tym samym adresem, które ma już dokładnie ten klucz.
     pub(crate) fn find_same_key(
         &self,

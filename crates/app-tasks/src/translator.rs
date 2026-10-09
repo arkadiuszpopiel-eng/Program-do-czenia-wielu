@@ -72,6 +72,7 @@ impl RuleTranslator for LlmTranslator {
             profile: None,
             privacy: PrivacyTag::Normal,
             chat: None,
+            task: None,
         };
         let brain = self
             .brain

@@ -4,6 +4,7 @@
 #![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
 
 pub mod agents;
+pub mod chat_stub;
 pub mod keys;
 pub mod voice;
 

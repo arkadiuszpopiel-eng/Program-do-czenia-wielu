@@ -89,6 +89,10 @@ export const enAgents: Record<keyof typeof plAgents, Message> = {
   'voice.testStart': 'Test microphone',
   'voice.testStop': 'Stop test',
   'voice.level': 'Microphone level',
+  'voice.levelNow': 'Level: {level}%',
+  'voice.levelBoth': 'After noise reduction: {level}% · raw microphone signal: {raw}%',
+  'voice.levelHint':
+    'The blue bar is the signal after noise reduction — when you are silent it should fall to zero. The grey bar underneath shows how much background (fans, surroundings) the microphone itself picks up. Set the strength below.',
   'voice.voices': 'Agent voices (v0)',
   'voice.voicesHint': 'Voices v0 without keys (local). Listen to a sample of each agent.',
   'voice.preview': 'Play voice: {name}',

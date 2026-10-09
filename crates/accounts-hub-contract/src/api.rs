@@ -176,6 +176,16 @@ pub trait AccountsHub: Send + Sync {
     /// wywołać. Następny udany odczyt listy modeli go zastępuje.
     async fn set_manual_model(&self, id: &AccountId, model: ModelId) -> Result<(), AccountsError>;
 
+    /// Kolejka modeli konta dla klasy zadań (kolejność prób Routera). Pusta lista przywraca wybór
+    /// automatyczny. Odmowa: więcej niż [`crate::MAX_QUEUE`] modeli, powtórzenia albo model, który
+    /// do tej klasy się nie nadaje (np. synteza mowy w rozmowie).
+    async fn set_model_queue(
+        &self,
+        id: &AccountId,
+        class: crate::TaskClass,
+        models: Vec<ModelId>,
+    ) -> Result<(), AccountsError>;
+
     /// Wartość klucza dla adaptera dostawcy (`caller` = id modułu `providers-*`).
     fn resolve_secret(&self, id: &AccountId, caller: &str) -> Result<SecretString, AccountsError>;
 

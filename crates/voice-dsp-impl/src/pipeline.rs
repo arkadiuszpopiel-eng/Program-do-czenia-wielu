@@ -16,6 +16,7 @@ use voice_dsp_contract::{
 
 use crate::agc::Agc;
 use crate::calibrate::estimate_delay;
+use crate::gate::{HighPass, NoiseGate};
 use crate::reference::{DSP_RATE, ReferenceTimeline};
 
 const BLOCK: usize = (DSP_RATE / 100) as usize;
@@ -26,6 +27,8 @@ const RNN_SCALE: f32 = 32_768.0;
 const REF_ACTIVE_DB: f32 = -55.0;
 /// Po tylu ramkach aktywnej referencji oceniamy echo / słuchawki (2 s).
 const JUDGE_FRAMES: u32 = 200;
+/// O tyle decybeli sygnał musi wystawać ponad tło otoczenia, żeby bramka uznała go za mowę.
+const GATE_MARGIN_DB: f32 = 6.0;
 
 fn new_apm() -> AudioProcessing {
     let config = Config {
@@ -44,6 +47,8 @@ pub struct DspPipeline {
     cfg: DspCfg,
     apm: Option<AudioProcessing>,
     ns: Option<Box<DenoiseState<'static>>>,
+    highpass: Option<HighPass>,
+    gate: NoiseGate,
     agc: Agc,
     mic_rs: Option<Resampler>,
     mic_buf: Vec<f32>,
@@ -84,6 +89,8 @@ impl DspPipeline {
             cfg,
             apm: None,
             ns: None,
+            highpass: None,
+            gate: NoiseGate::new(cfg.gate_db),
             agc: Agc::new(cfg.agc_target_db, cfg.whisper_mode),
             mic_rs: None,
             mic_buf: Vec::with_capacity(BLOCK * 4),
@@ -125,6 +132,13 @@ impl DspPipeline {
             }
         };
         self.agc = Agc::new(self.cfg.agc_target_db, self.cfg.whisper_mode);
+        self.apply_noise_stages();
+    }
+
+    fn apply_noise_stages(&mut self) {
+        self.highpass =
+            (self.cfg.highpass_hz > 0.0).then(|| HighPass::new(self.cfg.highpass_hz, DSP_RATE));
+        self.gate = NoiseGate::new(self.cfg.gate_db);
     }
 
     fn reference_offset(&self) -> i64 {
@@ -152,7 +166,11 @@ impl DspPipeline {
             let _ = apm.process_capture_f32(&[mic], &mut [&mut block[..]]);
         }
         let aec_power = rms(&block).powi(2);
-        let level_db = gain_to_db(aec_power.sqrt());
+        // Dudnienie poniżej pasma mowy usuwamy przed pomiarem tła i przed RNNoise.
+        if let Some(highpass) = self.highpass.as_mut() {
+            highpass.process(&mut block);
+        }
+        let level_db = gain_to_db(rms(&block));
         let floor = self.noise.update(level_db);
         self.update_echo_metrics(reference_active, ref_db, mic_power, aec_power);
         let speech_prob = match self.ns.as_mut() {
@@ -167,6 +185,17 @@ impl DspPipeline {
             }
             None => (((level_db - floor) - 6.0) / 12.0).clamp(0.0, 1.0),
         };
+        // Bramka przed AGC: to, co zostało z tła między wypowiedziami, nie jest potem wzmacniane.
+        // RNNoise potrafi uznać buczenie i szum wentylatora za mowę, więc samo jego
+        // prawdopodobieństwo nie wystarcza: sygnał musi też wystawać ponad tło otoczenia
+        // (poziom i tło mierzone przed redukcją — tam szum stały jest naprawdę stały).
+        // Z włączoną bramką ta sama poprawka trafia do VAD — inaczej sam wentylator „mówi”.
+        let speech_prob = if self.cfg.gate_db > 0.0 && level_db - floor < GATE_MARGIN_DB {
+            0.0
+        } else {
+            speech_prob
+        };
+        self.gate.process(&mut block, speech_prob);
         if self.cfg.agc {
             self.agc.process(&mut block, speech_prob >= 0.5);
         }
@@ -255,6 +284,7 @@ impl Dsp for DspPipeline {
             self.apply_modes();
         } else {
             self.agc = Agc::new(cfg.agc_target_db, cfg.whisper_mode);
+            self.apply_noise_stages();
         }
         Ok(())
     }

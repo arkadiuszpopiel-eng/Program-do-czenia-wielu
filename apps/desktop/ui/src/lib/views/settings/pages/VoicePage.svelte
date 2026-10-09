@@ -25,6 +25,7 @@
   const unavailable = $derived(status?.state === 'unavailable');
   const active = $derived(status?.state === 'active');
   const level = $derived(Math.round(app.micLevel * 100));
+  const raw = $derived(app.micRaw === null ? null : Math.round(app.micRaw * 100));
 
   async function loadStatus() {
     const result = await load(() => app.client.voice.status());
@@ -140,9 +141,18 @@
         aria-valuemax={100}
         aria-valuenow={testing ? level : 0}
       >
+        {#if testing && app.micRaw !== null}
+          <span class="bar raw" style:transform="scaleX({app.micRaw})"></span>
+        {/if}
         <span class="bar" style:transform="scaleX({testing ? app.micLevel : 0})"></span>
       </div>
     </div>
+    {#if testing}
+      <p class="muted levels">
+        {raw === null ? t('voice.levelNow', { level }) : t('voice.levelBoth', { level, raw })}
+      </p>
+    {/if}
+    <p class="muted">{t('voice.levelHint')}</p>
   {/if}
 </section>
 
@@ -207,6 +217,7 @@
     gap: 4px;
   }
   .meter {
+    position: relative;
     flex: 1;
     height: 8px;
     overflow: hidden;
@@ -214,10 +225,18 @@
     background: var(--alfa-color-surface2);
   }
   .bar {
+    position: absolute;
+    inset: 0;
     display: block;
-    height: 100%;
     background: var(--alfa-color-info);
     transform-origin: left;
+  }
+  /* Surowy sygnał pod spodem: różnica długości pasków = to, co odcięła redukcja szumów. */
+  .bar.raw {
+    background: var(--alfa-color-border-strong);
+  }
+  .levels {
+    font-variant-numeric: tabular-nums;
   }
   .voices {
     display: flex;

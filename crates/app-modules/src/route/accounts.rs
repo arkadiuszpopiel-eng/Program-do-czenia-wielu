@@ -6,12 +6,14 @@
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
-use accounts_hub_contract::{Account, AccountsHub, ProviderCatalogEntry, ProviderKind};
+use accounts_hub_contract::{
+    Account, AccountsHub, ProviderCatalogEntry, ProviderKind, best_chat_model, model_use,
+};
 use accounts_hub_impl::AccountsHubService;
 use providers_api_impl::{AccountProfile, CatalogEntry, build_provider};
 use providers_contract::{ModelKind, ModelProvider, ProviderId};
-use router_contract::RouteKind;
-use router_impl::RouterCore;
+use router_contract::{RouteKind, TaskClass};
+use router_impl::{ProviderQueues, RouterCore};
 
 use crate::secrets::HubKeySource;
 
@@ -24,6 +26,46 @@ pub(crate) struct Registered {
     pub name: String,
     /// Model domyślny.
     pub model: Option<String>,
+    /// Kolejki modeli konta (klasa → modele w kolejności prób).
+    pub queues: BTreeMap<TaskClass, Vec<String>>,
+}
+
+impl Registered {
+    /// Pierwszy model dla klasy zadań: z kolejki, a bez niej — domyślny.
+    pub fn first_model(&self, class: TaskClass) -> Option<String> {
+        self.queues
+            .get(&class)
+            .and_then(|q| q.first().cloned())
+            .or_else(|| self.model.clone())
+    }
+}
+
+/// Klasa zadań huba → klasa Routera (te same nazwy; osobne typy dwóch kontraktów).
+fn route_class(class: accounts_hub_contract::TaskClass) -> TaskClass {
+    use accounts_hub_contract::TaskClass as Hub;
+    match class {
+        Hub::VoiceFast => TaskClass::VoiceFast,
+        Hub::Conversation => TaskClass::Conversation,
+        Hub::Code => TaskClass::Code,
+        Hub::Planning => TaskClass::Planning,
+        Hub::GuiVision => TaskClass::GuiVision,
+        Hub::Summarize => TaskClass::Summarize,
+        Hub::Embeddings => TaskClass::Embeddings,
+    }
+}
+
+fn queues_of(account: &Account) -> BTreeMap<TaskClass, Vec<String>> {
+    account
+        .queues
+        .iter()
+        .filter(|(_, models)| !models.is_empty())
+        .map(|(class, models)| {
+            (
+                route_class(*class),
+                models.iter().map(|m| m.as_str().to_owned()).collect(),
+            )
+        })
+        .collect()
 }
 
 #[derive(Default)]
@@ -116,11 +158,12 @@ impl AccountRoutes {
         self.lock().registered.get(provider).cloned()
     }
 
+    /// Model domyślny konta: najlepszy model **rozmowy** z listy dostawcy. Lista miesza rozmowę
+    /// z syntezą mowy, transkrypcją i obrazami — pierwszy z brzegu bywał `tts-1` i każda
+    /// wiadomość kończyła się błędem dostawcy (zgłoszenie właściciela, 2026-10-09).
     fn model_of(&self, account: &Account) -> Option<String> {
-        account
-            .models
-            .first()
-            .map(|m| m.id.as_str().to_owned())
+        best_chat_model(account.models.iter().map(|m| m.id.as_str()))
+            .map(str::to_owned)
             .or_else(|| self.lock().detected.get(account.id.as_str()).cloned())
     }
 
@@ -152,11 +195,21 @@ impl AccountRoutes {
             };
             let provider_id = account.provider.as_str().to_owned();
             let found = match provider.list_models().await {
-                Ok(models) => models.into_iter().find(|m| {
-                    m.capabilities
-                        .as_ref()
-                        .is_none_or(|c| c.kinds.is_empty() || c.kinds.contains(&ModelKind::Chat))
-                }),
+                Ok(models) => {
+                    let chat: Vec<_> = models
+                        .into_iter()
+                        .filter(|m| {
+                            m.capabilities.as_ref().map_or_else(
+                                || model_use(&m.id).is_chat(),
+                                |c| c.kinds.is_empty() || c.kinds.contains(&ModelKind::Chat),
+                            )
+                        })
+                        .collect();
+                    let best =
+                        best_chat_model(chat.iter().map(|m| m.id.as_str())).map(str::to_owned);
+                    chat.into_iter()
+                        .find(|m| best.as_deref().is_none_or(|id| id == m.id))
+                }
                 Err(e) => {
                     tracing::warn!(konto = %account.id, error = %e, "wykrycie modeli nie powiodło się");
                     self.lock()
@@ -195,11 +248,12 @@ impl AccountRoutes {
             .values()
             .map(|a| {
                 format!(
-                    "{}|{}|{:?}|{:?}",
+                    "{}|{}|{:?}|{:?}|{:?}",
                     a.provider,
                     a.id,
                     a.base_url,
-                    self.model_of(a)
+                    self.model_of(a),
+                    a.queues
                 )
             })
             .collect();
@@ -207,6 +261,7 @@ impl AccountRoutes {
             return;
         }
         let mut registered = BTreeMap::new();
+        let mut queues = ProviderQueues::new();
         for (provider_id, account) in &chosen {
             let model = self.model_of(account);
             let Some(provider) = self.build(account, model.clone()) else {
@@ -224,8 +279,16 @@ impl AccountRoutes {
                     account: account.id.as_str().to_owned(),
                     name,
                     model,
+                    queues: queues_of(account),
                 },
             );
+            let own = queues_of(account);
+            if !own.is_empty() {
+                queues.insert(ProviderId::new(provider_id.as_str()), own);
+            }
+        }
+        for core in &self.cores {
+            core.set_provider_queues(queues.clone());
         }
         let mut state = self.lock();
         state
