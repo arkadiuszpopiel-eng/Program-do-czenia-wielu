@@ -6,6 +6,9 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
   fullyParallel: true,
+  // PW_WORKERS=4: mniej przeglądarek naraz na słabszej maszynie (laptop 16 GB dławi się przy
+  // domyślnych 8 i testy z budżetem czasu padają z przyczyn niezwiązanych z kodem).
+  ...(process.env['PW_WORKERS'] ? { workers: Number(process.env['PW_WORKERS']) } : {}),
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4173',

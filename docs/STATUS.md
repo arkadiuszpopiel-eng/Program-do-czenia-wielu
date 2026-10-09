@@ -180,6 +180,14 @@ nierozwiązywalna ścieżka omija deny-listę (S-03). Analizator to polityka bez
 2026-10-09: z tego raportu wdrożone z testami S-05, S-07, C-01, N-01, N-02 (zwykłe błędy). Pozostają do decyzji
 właściciela: S-01…S-04, S-06, C-02, C-03.
 
+Testy E2E, 2026-10-09: cztery testy czerwone w przebiegu równoległym to w trzech przypadkach obciążenie laptopa — przy
+`PW_WORKERS=4` (nowa zmienna w `playwright.config.ts`; domyślnie 8 procesów na 16 wątkach i 16 GB RAM) pełny przebieg daje
+129 zielonych i 1 czerwony. Czwarty, „strumień 100 tok/s: aktualizacje DOM najwyżej raz na klatkę”, pada także samodzielnie
+(3 na 6 prób, 4 klatki przy limicie 2). Sonda pokazała, że dodatkowe aktualizacje to nie tekst strumienia, tylko dokładanie
+i zdejmowanie elementów przez wirtualną listę po zmierzeniu wysokości (`childList` na przewijanym kontenerze; w każdym
+przebiegu są co najmniej dwie takie klatki, czyli test stoi na samym limicie). Kod produktu bez zmian; do decyzji
+właściciela: liczyć w teście tylko zmiany treści wiadomości albo podnieść limit.
+
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
 i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie
