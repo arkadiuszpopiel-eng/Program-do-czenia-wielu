@@ -233,7 +233,9 @@ Do Kosza: `D:\alfa`, `D:\alfa-narzedzia`, ta ukryta kopia, migawka ZIP z GitHuba
 ten sam commit co GitHub i zero niewypchniętych zmian. Nietknięte: `D:\alfa-narzedzia.rar` (12 GB, archiwum właściciela).
 Z globalnego `~/.npmrc` usunięto linię `cache=D:\alfa-narzedzia\npm-cache` (`npm config delete cache`): każde wywołanie npm poza
 środowiskiem przenośnym — także z haka formatującego — odtwarzało przez nią katalog na D:. npm używa teraz domyślnej
-lokalizacji w profilu użytkownika.
+lokalizacji w profilu użytkownika. Tak samo usunięto globalne `store-dir=D:\alfa-narzedzia\pnpm-store` z konfiguracji pnpm; w środowisku
+przenośnym magazyn pozostaje na E:. Kopie obu starych plików: `%TEMP%\npmrc-przed-porzadkami.txt`,
+`%TEMP%\pnpm-rc-przed-porzadkami.txt`.
 
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
