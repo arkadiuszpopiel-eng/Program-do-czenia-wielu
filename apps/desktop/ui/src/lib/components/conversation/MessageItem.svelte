@@ -238,7 +238,7 @@
       <div class="indent"><MessageError {turn} error={turn.error} {conv} /></div>
     {/if}
 
-    {#if turn.usage && agent && !streaming}
+    {#if turn.usage && agent && !streaming && app.bool('ui.reply_details', true)}
       <p class="usage">
         {t('msg.usage', {
           model: turn.usage.model,

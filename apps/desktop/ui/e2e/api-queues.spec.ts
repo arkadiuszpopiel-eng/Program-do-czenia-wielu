@@ -49,7 +49,7 @@ test('kolejka rozmowy: kolejność, usuwanie i dodawanie z listy modeli', async 
   await expect(page.getByRole('tab', { name: /^Rozmowa/ })).toContainText('3');
 
   // Zmiana zostaje po ponownym wejściu na stronę.
-  await page.getByRole('button', { name: 'Modele i dostawcy' }).click();
+  await page.getByRole('button', { name: 'Modele i dostawcy', exact: true }).click();
   await page.getByRole('button', { name: 'API i kolejki modeli' }).click();
   await page.getByRole('tab', { name: /Praca — OpenAI/ }).click();
   expect(await ids(page)).toEqual(['gpt-6-luna', 'gpt-6-sol', 'gpt-5-mini']);
@@ -209,4 +209,40 @@ test('test mikrofonu pokazuje poziom po redukcji szumów i surowy sygnał', asyn
   // Ustawienie siły redukcji jest na tej samej stronie i ma trzy poziomy.
   await expect(page.getByText('Redukcja szumów mikrofonu').first()).toBeVisible();
   await expectReadable(page, 'głos — test mikrofonu');
+});
+
+test('z listy kont jednym kliknięciem do kolejek tego konta i z powrotem', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await page.goto('/');
+  await waitForChat(page);
+  await page.keyboard.press('Control+,');
+  await page.getByRole('button', { name: 'Modele i dostawcy' }).click();
+  const row = page
+    .getByRole('list', { name: 'Twoje konta' })
+    .getByRole('listitem')
+    .filter({ hasText: 'Praca — OpenAI' });
+  await row.getByRole('button', { name: 'Modele i kolejki' }).click();
+  await expect(page.getByRole('heading', { name: 'API i kolejki modeli' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Praca — OpenAI/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  expect(await ids(page)).toEqual(['gpt-6-sol', 'gpt-6-luna', 'gpt-5.5']);
+  await page.getByRole('button', { name: /Klucz, test i limit tego konta/ }).click();
+  await expect(page.getByRole('heading', { name: 'Modele i dostawcy' })).toBeVisible();
+});
+
+test('szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączyć', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await page.goto('/');
+  await waitForChat(page);
+  const details = page.locator('p.usage');
+  await expect(details.first()).toBeVisible();
+  await expect(details.first()).toContainText('tok.');
+  await page.keyboard.press('Control+,');
+  await page.getByRole('button', { name: 'Wygląd' }).click();
+  await page.getByRole('switch', { name: 'Szczegóły pod odpowiedzią' }).click();
+  await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();
+  await waitForChat(page);
+  await expect(details).toHaveCount(0);
 });

@@ -15,6 +15,7 @@ export const enApi: Record<keyof typeof plApi, Message> = {
   'api.summary.chat': { one: '{n} chat model', other: '{n} chat models' },
   'api.summary.auto': 'automatic choice: {model}',
   'api.summary.noAuto': 'no chat model on the list',
+  'api.toAccount': 'Key, test and limit of this account — in “Models and providers”',
   'api.disabled': 'The account is disabled — queues apply once it is enabled.',
 
   'api.queues': 'Model queues',

@@ -7,6 +7,7 @@ export const enHub = {
   'hub.state.rate_limited': 'rate limited',
   'hub.state.disabled': 'disabled',
   'hub.test': 'Test connection',
+  'hub.toModels': 'Models and queues',
   'hub.rotate': 'Change key',
   'hub.rotateTitle': 'New key for “{label}”',
   'hub.rotateSubmit': 'Check and replace key',

@@ -237,6 +237,15 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       ],
       'auto',
     ),
+    toggle(
+      'ui.reply_details',
+      L('Szczegóły pod odpowiedzią', 'Details under replies'),
+      L(
+        'Pod każdą odpowiedzią: model, liczba tokenów, koszt i czas. Wyłącz, jeśli wolisz czystą rozmowę — te dane zostają w osi czasu.',
+        'Under each reply: model, token counts, cost and time. Turn off for a cleaner conversation — the data stays in the timeline.',
+      ),
+      true,
+    ),
   ]),
   page(
     'shortcuts',

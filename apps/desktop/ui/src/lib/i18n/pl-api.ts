@@ -22,6 +22,7 @@ export const plApi = {
   },
   'api.summary.auto': 'wybór automatyczny: {model}',
   'api.summary.noAuto': 'brak modelu rozmowy na liście',
+  'api.toAccount': 'Klucz, test i limit tego konta — w „Modele i dostawcy”',
   'api.disabled': 'Konto jest wyłączone — kolejki zadziałają po włączeniu.',
 
   'api.queues': 'Kolejki modeli',

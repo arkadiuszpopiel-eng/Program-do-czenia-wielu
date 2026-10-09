@@ -72,6 +72,8 @@ export class AppState {
   agents = $state<Record<string, AgentState[]>>({});
   activity = $state<Record<string, ActivityInfo | null>>({});
   micState = $state<MicState>('off');
+  /** Konto wybrane na stronie „API i kolejki modeli” (ustawiane przez przejście z listy kont). */
+  apiAccount = $state('');
   micLevel = $state(0);
   /** Surowy poziom mikrofonu z testu (przed redukcją szumów); `null` poza testem. */
   micRaw = $state<number | null>(null);
@@ -411,6 +413,12 @@ export class AppState {
   openSettings(page?: string): void {
     if (page) this.settingsPage = page;
     this.view = 'settings';
+  }
+
+  /** Strona „API i kolejki modeli” z wybranym kontem (przycisk „Modele” przy koncie). */
+  openApiFor(accountId: string): void {
+    this.apiAccount = accountId;
+    this.openSettings('api');
   }
 
   closeSettings(): void {

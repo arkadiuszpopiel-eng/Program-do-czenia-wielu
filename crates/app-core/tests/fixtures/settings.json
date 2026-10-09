@@ -1459,6 +1459,22 @@
                 }
               ]
             }
+          },
+          {
+            "key": "ui.reply_details",
+            "label": {
+              "pl": "Szczegóły pod odpowiedzią",
+              "en": "Details under replies"
+            },
+            "description": {
+              "pl": "Pod każdą odpowiedzią: model, liczba tokenów, koszt i czas. Wyłącz, jeśli wolisz czystą rozmowę — te dane zostają w osi czasu.",
+              "en": "Under each reply: model, token counts, cost and time. Turn off for a cleaner conversation — the data stays in the timeline."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
           }
         ],
         "upcoming": []
@@ -1796,6 +1812,7 @@
       "ui.zoom_fit": true,
       "ui.animations": true,
       "ui.column": "auto",
+      "ui.reply_details": true,
       "composer.enter_sends": true,
       "notify.toasts": true,
       "notify.earcons": true,

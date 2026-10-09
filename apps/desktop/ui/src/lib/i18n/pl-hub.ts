@@ -7,6 +7,7 @@ export const plHub = {
   'hub.state.rate_limited': 'limit zapytań',
   'hub.state.disabled': 'wyłączone',
   'hub.test': 'Testuj połączenie',
+  'hub.toModels': 'Modele i kolejki',
   'hub.rotate': 'Zmień klucz',
   'hub.rotateTitle': 'Nowy klucz dla konta „{label}”',
   'hub.rotateSubmit': 'Sprawdź i zamień klucz',

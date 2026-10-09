@@ -24,11 +24,10 @@
   let catalog = $state<readonly ProviderInfo[]>([]);
   let loaded = $state(false);
   let loadError = $state<string | null>(null);
-  let selectedId = $state('');
   let taskClass = $state<TaskClassId>('chat');
   let saving = $state(false);
 
-  const account = $derived(accounts.find((a) => a.id === selectedId) ?? accounts[0]);
+  const account = $derived(accounts.find((a) => a.id === app.apiAccount) ?? accounts[0]);
   const providerName = (a: Account) =>
     catalog.find((p) => p.id === a.provider_id)?.display_name ?? a.provider_id;
   const queue = $derived(account?.queues?.[taskClass] ?? []);
@@ -103,7 +102,7 @@
           id="{uid}-acc-{a.id}"
           aria-selected={a.id === account.id}
           aria-controls="{uid}-account"
-          onclick={() => (selectedId = a.id)}
+          onclick={() => (app.apiAccount = a.id)}
         >
           <span class="label">{a.label}</span>
           <span class="meta">
@@ -125,6 +124,11 @@
           ? t('api.summary.auto', { model: account.auto_model })
           : t('api.summary.noAuto')}
       </p>
+      <div>
+        <Button variant="ghost" size="sm" onclick={() => app.openSettings('providers')}
+          >{t('api.toAccount')}</Button
+        >
+      </div>
       {#if account.state === 'disabled'}
         <Banner kind="warning" icon="warning">{t('api.disabled')}</Banner>
       {/if}

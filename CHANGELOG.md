@@ -8,6 +8,21 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.9 — 2026-10-09
+
+Pierwszy krok porządkowania interfejsu po zgłoszeniu właściciela („organizacja”).
+
+### Interfejs
+
+- Przy każdym koncie w „Modele i dostawcy” jest przycisk „Modele i kolejki” — otwiera stronę kolejek od razu z tym
+  kontem; ze strony kolejek jednym kliknięciem wracasz do klucza, testu i limitu konta.
+- Szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączyć w Ustawieniach → Wygląd.
+
+### Testy
+
+- E2E: przejście z listy kont do kolejek i z powrotem, przełącznik szczegółów odpowiedzi; poprawiony test dymny listy
+  stylu w prawdziwej aplikacji (sprzątanie zamykało Ustawienia).
+
 ## 0.0.8 — 2026-10-09
 
 Pięć zgłoszeń właściciela z pierwszej próby wersji 0.0.7 na laptopie: rozmowa z kluczem OpenAI nie działała, nie dało

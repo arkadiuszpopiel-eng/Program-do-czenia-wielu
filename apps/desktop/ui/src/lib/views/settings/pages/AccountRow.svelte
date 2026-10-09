@@ -170,6 +170,11 @@
       <Button size="sm" variant="secondary" loading={busy} {disabled} onclick={test}
         >{t('hub.test')}</Button
       >
+      {#if account.models.length > 0}
+        <Button size="sm" variant="ghost" onclick={() => app.openApiFor(account.id)}
+          >{t('hub.toModels')}</Button
+        >
+      {/if}
       {#if provider?.auth === 'api_key'}
         <Button
           size="sm"
