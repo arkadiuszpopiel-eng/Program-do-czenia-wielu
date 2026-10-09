@@ -226,6 +226,13 @@ niesie numerów kolejnych, więc naprawa wymaga zmiany w rdzeniu (DTO zdarzeń);
 nadpisuje zdarzenia sprzed odpowiedzi). Niezweryfikowane podejrzenia: spóźniona delta po `Stop` przywraca status
 „pisze”; ponowny `start()` klienta Tauri dokłada nasłuchy.
 
+Porządki na dyskach, 2026-10-09 (zgoda właściciela): została jedna kopia robocza na E:. Usunięte `cargo clean`: stare wyniki
+kompilacji w `apps/desktop/src-tauri/target` (36 GB), te same w `D:\alfa` oraz w ukrytej, zmaterializowanej kopii repozytorium
+wewnątrz magazynu pnpm (`alfa-narzedzia/pnpm-store/v10/projects/…` — dowiązanie zamienione w katalog przy kopiowaniu z D:).
+Do Kosza: `D:\alfa`, `D:\alfa-narzedzia`, ta ukryta kopia, migawka ZIP z GitHuba i jej katalog — każde po sprawdzeniu, że ma
+ten sam commit co GitHub i zero niewypchniętych zmian. Nietknięte: `D:\alfa-narzedzia.rar` (12 GB, archiwum właściciela) i globalne
+`~/.npmrc` (`cache=D:\alfa-narzedzia\npm-cache` — poza środowiskiem przenośnym npm odtworzy ten katalog).
+
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
 i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie

@@ -8,7 +8,7 @@
     i restartują aplikację automatycznie (tauri dev). Bez Claude Code — instrukcja instalacji.
     Plik w UTF-8 z BOM (Windows PowerShell 5.1 i polskie znaki).
 .EXAMPLE
-    powershell -NoProfile -ExecutionPolicy Bypass -NoExit -File D:\alfa\scripts\code-session.ps1
+    powershell -NoProfile -ExecutionPolicy Bypass -NoExit -File .\scripts\code-session.ps1
 #>
 [CmdletBinding()]
 param()

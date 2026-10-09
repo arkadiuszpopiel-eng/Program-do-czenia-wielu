@@ -8,7 +8,7 @@
     git pull może odmówić — skrypt wtedy mówi, co zrobić, i niczego nie kasuje.
     Plik w UTF-8 z BOM (Windows PowerShell 5.1 i polskie znaki).
 .EXAMPLE
-    powershell -NoProfile -ExecutionPolicy Bypass -File D:\alfa\scripts\update-dev.ps1
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update-dev.ps1
 #>
 [CmdletBinding()]
 param([switch]$NoBuild, [switch]$NoPause)
