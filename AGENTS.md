@@ -47,6 +47,9 @@ zero TODO/unwrap/ostrzeżeń · budżety RAM/CPU/opóźnień zmierzone na baseli
 przegląd w świeżym kontekście zamknięty · lista bezpieczeństwa + dokumentacja ustawień · merge tylko na zielono ·
 kryterium akceptacji zaliczone dopiero po przebiegu na sprzęcie · błąd ze sprzętu → test prawdziwej aplikacji.
 
+Po zadaniu: stan w `docs/plan/03-roadmapa.md` (kryterium — w `docs/STATUS.md`). Po etapie: `docs/plan/00-stan-wykonania.md`,
+wyższa wersja z wpisem w `CHANGELOG.md` i `node scripts/docs-html.mjs` (HTML jest generowany — nie edytuj go ręcznie).
+
 ## Limity rozmiaru (egzekwowane lintem)
 
 - Plik ≤ 400 linii, crate ≤ 8 000 linii, funkcja: clippy `too_many_lines`. Moduł ma mieścić się w małym oknie kontekstu.
@@ -79,6 +82,7 @@ Testy sprzętowe (audio, GPU, UIA) uruchamia self-hosted runner na maszynach uż
 | Decyzje architektoniczne                           | `docs/ADR/`                                        |
 | Który crate do czego, grupy, rozmiary              | `docs/CATALOG.md` (generuje `scripts/catalog.mjs`) |
 | Mapa całej dokumentacji                            | `docs/README.md`                                   |
+| Plan rozszerzony (v6), roadmapa, inne platformy    | `docs/plan/` (HTML: `docs/html/index.html`)        |
 
 ## Język
 

@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/ADR/0011-silniki-glosu-v0-i-audio-wasapi-aec.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate&amp;#39;ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html" aria-current="page">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#kontekst">Kontekst</a></li><li><a href="#decyzja">Decyzja</a></li><li><a href="#alternatywy-odrzucone">Alternatywy (odrzucone)</a></li><li><a href="#konsekwencje">Konsekwencje</a></li><li><a href="#jak-cofnac">Jak cofnąć</a></li><li><a href="#aktualizacja-2026-10-07-wasapi-0-24-0-0-25-0-rustsec-2026-0332">Aktualizacja 2026-10-07 — wasapi 0.24.0 → 0.25.0 (RUSTSEC-2026-0332)</a></li></ul></aside><article><h1 id="adr-0011-silniki-glosu-v0-i-audio-crate-wasapi-aec-z-wlasna-referencja-tts">ADR 0011 — Silniki głosu v0 i audio: crate <code>wasapi</code>, AEC z własną referencją TTS</h1>
+<div class="tbl"><table><thead><tr><th>Pole</th><th>Wartość</th></tr></thead><tbody><tr><td>Status</td><td>Zaakceptowany (kandydaci TTS/STT do potwierdzenia w Voice Lab — spike (e), (a), (h) w F0)</td></tr>
+<tr><td>Data</td><td>2026-09-30</td></tr>
+<tr><td>Powiązane sekcje planu</td><td>§1.2 (Audio, ML), §6.2–6.8, §6.10, §16.2 (F0, F2), §17</td></tr></tbody></table></div>
+<h2 id="kontekst">Kontekst</h2>
+<p>Rozmowa pełnodupleksowa po polsku z barge-in wymaga: niskiego opóźnienia audio, AEC (agentka mówi przez głośniki, mikrofon ją słyszy), czterech odrębnych głosów bez kluczy (profil A na baseline AMD 8 GB), wymienialności każdego elementu. Jakość polskiego TTS/STT konkretnych modeli jest hipotezą z źródeł wtórnych, niezweryfikowaną odsłuchem. AI nie słyszy jakości głosu — potrzebna bramka ludzka.</p>
+<h2 id="decyzja">Decyzja</h2>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Wybór v0</th><th>Kandydaci / uwagi</th></tr></thead><tbody><tr><td>Audio I/O</td><td><strong>crate <code>wasapi</code></strong> (loopback, tryb zdarzeniowy, per-proces), wątek RT, in-proc, <strong>bez Wasm/IPC w callbacku audio</strong></td><td><code>cpal</code> odrzucony (ograniczona kontrola bufora, problemy z loopbackiem)</td></tr>
+<tr><td>AEC</td><td><strong>własny strumień TTS jako referencja</strong> (crate <code>aec3</code>/<code>sonora</code>); zapas: loopback procesowy (Win10 20348+) lub tryb Communications</td><td>spike (a) porównuje trzy warianty; tryb Communications domyślnie tłumi inne strumienie o 80%</td></tr>
+<tr><td>NS / AGC</td><td>RNNoise (DeepFilterNet3 jako opcja)</td><td><code>voice-dsp</code>, in-proc</td></tr>
+<tr><td>VAD</td><td>Silero VAD (MIT) / TEN VAD, CPU</td><td><code>voice-vad</code></td></tr>
+<tr><td>Koniec tury</td><td>Smart Turn v3.2 (PL wśród 23 języków, ~8 MB, ~10 ms CPU) + regulowana cierpliwość</td><td><code>voice-turn</code></td></tr>
+<tr><td>STT</td><td>whisper.cpp large-v3-turbo Q5_0 z bramką VAD (Vulkan/CUDA, fallback CPU); tryb dwuprzebiegowy</td><td>ADR 4; chmura: Scribe v2 RT, Soniox, gpt-4o-transcribe (po kluczach)</td></tr>
+<tr><td>TTS v0 (bez kluczy)</td><td><strong>Pocket TTS + model PL społeczności</strong> (CPU, RTF ≈ 0,21, ~200 ms do 1. fragmentu), Piper pl_PL jako zapas; <strong>≥ 2 różne bazowe mówczynie + modyfikacja wysokości i tempa → 4 głosy v0</strong> o sprawdzonej licencji</td><td>docelowo klon z 15–30 s referencji po castingu (Voice Design w chmurze → odsłuch ślepy A/B); Chatterbox/XTTS/F5 tylko profil D (NVIDIA)</td></tr>
+<tr><td>Wake / adresowanie v0</td><td>PTT/przełącznik (<code>WH_KEYBOARD_LL</code>) + adresowanie po imieniu z transkryptu</td><td>słowa wywoławcze „Hej Alfa/…&quot; dopiero w F5 po FAR/FRR</td></tr>
+<tr><td>Komendy szybkie</td><td><code>voice-cmd</code> bez LLM: „stop&quot;, „pauza&quot;, „głośniej&quot;, „przełącz na Deltę&quot;…; KWS „stop/czekaj&quot; &lt; 300 ms</td><td>„nie&quot; przerywa tylko jako samodzielne słowo z pauzami, tylko w <code>Speaking</code></td></tr></tbody></table></div>
+<p>Zatrzymanie dwustopniowe: ducking −15 dB &lt; 50 ms → twardy stop po ≥ 150–250 ms potwierdzonej mowy (stop TTS, anulowanie LLM, czyszczenie kolejki), realnie ≤ ~400 ms. Głośnik = zasób wyłączny w Schedulerze (jedna agentka naraz).</p>
+<h2 id="alternatywy-odrzucone">Alternatywy (odrzucone)</h2>
+<div class="tbl"><table><thead><tr><th>Alternatywa</th><th>Dlaczego nie</th></tr></thead><tbody><tr><td><code>cpal</code></td><td>brak niezawodnego loopbacku WASAPI, słaba kontrola bufora</td></tr>
+<tr><td>AEC wyłącznie z loopbacku systemowego</td><td>loopback zawiera inne aplikacje i opóźnienie urządzenia; własna referencja TTS jest najdokładniejsza</td></tr>
+<tr><td>Chatterbox / XTTS-v2 / F5 jako TTS domyślny</td><td>PyTorch-ROCm niestabilny na baseline AMD; RTF ≥ 1; zgłoszony akcent PL (Chatterbox)</td></tr>
+<tr><td>Kokoro, Orpheus, Kyutai, Dia, Sesame, Moonshine, Voxtral RT, Aura-2</td><td>brak polskiego (wg badania)</td></tr>
+<tr><td>openWakeWord jako słowa wywoławcze od startu</td><td>tylko angielski; własny trening dopiero w F5</td></tr>
+<tr><td>Chmurowy TTS jako jedyny</td><td>profil A musi działać bez kluczy</td></tr></tbody></table></div>
+<h2 id="konsekwencje">Konsekwencje</h2>
+<ul>
+<li>Cztery moduły in-proc na wątku RT (<code>voice-audio/dsp/vad/turn</code>) i dwa sidecary (<code>voice-stt</code>, <code>voice-tts</code>); <code>model-residency</code> pilnuje, by STT+TTS+LLM nie zajmowały VRAM naraz.</li>
+<li>Kryteria F2 (zestaw zamrożony z korpusu własnego): WER PL ≤ 12%; recall „stop/anuluj&quot; ≥ 99% przy reakcji &lt; 300 ms; fałszywe przerwania ≤ 1/godz. (głośniki laptopa + tło TV); prefiks ±1 słowo ≥ 90%; odrębność głosów cos-sim ECAPA ≤ 0,6 + ABX ≥ 90%.</li>
+<li>Cele opóźnień (wstępne): A p50 ≤ 2000 / p95 ≤ 3000 ms; B p50 ≤ 1300 / p95 ≤ 2000 ms; C p50 ≤ 900 / p95 ≤ 1500 ms — pomiar loopbackiem od ostatniej ramki mowy do pierwszej próbki na wyjściu.</li>
+<li>Bramki ludzkie: korpus własny (~30–45 min), odsłuchy castingu, testy akustyczne na obu maszynach (najtrudniej: wbudowany mikrofon i głośniki laptopa).</li>
+<li>Wszystkie oceny jakości PL są hipotezami do zmierzenia w Voice Lab; „nowszy = lepszy&quot; nie jest zakładane.</li>
+</ul>
+<h2 id="jak-cofnac">Jak cofnąć</h2>
+<ul>
+<li>Każdy silnik jest <code>-impl</code> za kontraktem (<code>voice-tts-contract</code>, <code>voice-stt-contract</code>); wymiana kandydata po Voice Lab nie dotyka <code>voice-dialog</code>.</li>
+<li>Gdyby <code>wasapi</code> okazał się niewystarczający, alternatywą jest własna warstwa na windows-rs (IAudioClient3) w <code>platform-windows</code> — ten sam kontrakt <code>voice-audio</code>.</li>
+<li>No-go castingu (średnia ocen TTS &lt; 4,0) nie blokuje F1 — zostają głosy v0.</li>
+</ul>
+<h2 id="aktualizacja-2026-10-07-wasapi-0-24-0-0-25-0-rustsec-2026-0332">Aktualizacja 2026-10-07 — <code>wasapi</code> 0.24.0 → 0.25.0 (RUSTSEC-2026-0332)</h2>
+<ul>
+<li><strong>Powód:</strong> ostrzeżenie <a href="https://rustsec.org/advisories/RUSTSEC-2026-0332">RUSTSEC-2026-0332</a> (<code>unsound</code>):
+w 0.24.0 bezpieczna funkcja <code>WaveFormat::parse(&amp;WAVEFORMATEX)</code> czyta poza nagłówkiem, gdy
+<code>wFormatTag = WAVE_FORMAT_EXTENSIBLE</code>. <code>cargo deny</code> (CI) odrzuca 0.24.0.</li>
+<li><strong>Zmiana:</strong> 0.25.0 (poprawka <code>2562db7</code>): <code>parse</code> jest teraz <code>unsafe fn</code> na wskaźniku; bezpieczna
+alternatywa to <code>WaveFormat::parse_from_blob_bytes</code>. <code>voice-audio-impl</code> nie woła <code>parse</code> — reszta
+używanego API (<code>DeviceEnumerator</code>, <code>AudioClient</code>, <code>WaveFormat::new</code>, <code>get_device_format</code>, strumień
+zdarzeniowy) bez zmian; 0.25.0 nadal zależy od <code>windows</code> 0.62 (jedna wersja windows-rs w workspace).</li>
+<li><strong>Sprawdzenie:</strong> <code>cargo clippy -p voice-audio-impl --target x86_64-pc-windows-msvc -D warnings</code>,
+<code>cargo deny check</code>, testy <code>voice-audio-impl</code> (Linux) i job „Rust (windows-latest)” w CI.</li>
+</ul>
+</article>
+<footer>Źródło: <code>docs/ADR/0011-silniki-glosu-v0-i-audio-wasapi-aec.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

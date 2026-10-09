@@ -121,6 +121,7 @@ Bez spełnienia wszystkich punktów — brak merge.
 6. Przegląd drugiego modelu w świeżym kontekście — wszystkie uwagi zamknięte.
 7. Lista kontrolna bezpieczeństwa (uprawnienia, wejście niezaufane, sekrety) i dokumentacja użytkownika/ustawień.
 8. Merge tylko na zielono; moduły Jądra/Brokera i zmiany polityk bezpieczeństwa dodatkowo przez człowieka.
+9. Plan prowadzony na bieżąco: stan zadania w `docs/plan/03-roadmapa.md`, kryterium w `docs/STATUS.md`; po etapie — `docs/plan/00-stan-wykonania.md`, wyższa wersja z wpisem w `CHANGELOG.md`, `node scripts/docs-html.mjs`.
 
 ## 8. Symulatory i fake'i
 

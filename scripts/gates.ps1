@@ -67,6 +67,7 @@ Invoke-Gate 'Interfejs: lint (eslint, Svelte 5, CSS)' { & pnpm lint }
 Invoke-Gate 'Interfejs: typy (svelte-check)' { & pnpm check }
 Invoke-Gate 'Interfejs: testy jednostkowe (vitest)' { & pnpm --filter '@alfa/desktop-ui' test }
 Invoke-Gate 'Katalog modułów (docs/CATALOG.md)' { & node scripts/catalog.mjs }
+Invoke-Gate 'Plan w HTML i odnośniki (docs/html)' { & node scripts/docs-html.mjs --check }
 
 if ($Test.Count -gt 0) {
     $packages = @(); foreach ($c in $Test) { $packages += @('-p', $c) }

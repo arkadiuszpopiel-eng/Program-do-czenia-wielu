@@ -57,7 +57,7 @@ Punkty „do ustalenia w SPEC v1", odwołania do ADR i spike'ów.
 
 ## Indeks SPEC-ów (stan: październik 2026)
 
-68 specyfikacji. Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
+77 specyfikacji modułów istniejących i 9 planowanych (plan v6, na końcu). Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
 implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja” na końcu pliku. Stan kryteriów akceptacji:
 `docs/STATUS.md`; crate'y: `crates/README.md`.
 
@@ -186,3 +186,19 @@ implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja”
 
 `voice-lab` i `voice-transcribe` — SPEC powstaje przed falą, w której moduł jest budowany. Korzeń kompozycji
 `app-*` i biblioteki `lib-*` nie mają SPEC-ów (opis w `crates/README.md` i `docs/ARCHITECTURE.md` §13).
+
+### Planowane (plan v6)
+
+Moduły planu v6 ([`../plan/02-architektura-docelowa.md`](../plan/02-architektura-docelowa.md)) — mają tylko szkice SPEC; ich crate'y jeszcze nie istnieją.
+
+| Moduł                                          | Fala | Opis                                                                                                              |
+| ---------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------- |
+| [`platform-select`](platform-select/SPEC.md)   | v6-B | Fabryka platform: wybór implementacji portów per system i mapa zdolności hosta dla klientów.                      |
+| [`remote-gateway`](remote-gateway/SPEC.md)     | v6-D | Brama klientów na hoście: sesje, ACL poleceń, ramki protokołu, numery zdarzeń i wznowienie; bez nasłuchu.         |
+| [`device-pairing`](device-pairing/SPEC.md)     | v6-D | Parowanie kodem QR z kodem kontrolnym, lista urządzeń, zakres per urządzenie, odwołanie.                          |
+| [`remote-relay`](remote-relay/SPEC.md)         | v6-D | Osobna usługa: przekaźnik szyfrogramu między hostem a klientem; do postawienia samodzielnie.                      |
+| [`host-headless`](host-headless/SPEC.md)       | v6-D | Binarka `alfa-host`: host bez okna; okno Tauri jako klient lokalny przez nazwany potok.                           |
+| [`web-panel`](web-panel/SPEC.md)               | v6-E | Panel WWW (PWA) z tego samego interfejsu Svelte; zgody z potwierdzeniem kluczem dostępu.                          |
+| [`offline-client`](offline-client/SPEC.md)     | v6-F | Rozmowa przez API bez hosta i kolejka tur dopisywanych po powrocie jako nowa gałąź.                               |
+| [`platform-android`](platform-android/SPEC.md) | v6-F | Porty Androida 15+: magazyn kluczy, biometria przy podpisie, powiadomienia, skan QR.                              |
+| [`platform-linux`](platform-linux/SPEC.md)     | v6-G | Porty Linuksa: pliki z koszem, procesy, schowek, sekrety, skróty, zasobnik, audio (PipeWire).                     |

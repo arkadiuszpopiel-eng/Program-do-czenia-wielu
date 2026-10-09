@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 — Katalog nowych funkcji — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/04-nowe-funkcje.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html" aria-current="page">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate&amp;#39;ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#modele-i-jakosc-odpowiedzi">Modele i jakość odpowiedzi</a></li><li><a href="#agentki-i-automatyzacja">Agentki i automatyzacja</a></li><li><a href="#wiele-urzadzen">Wiele urządzeń</a></li><li><a href="#zgodnosc-i-zaufanie">Zgodność i zaufanie</a></li><li><a href="#ograniczenia-ktore-plan-nazywa-wprost">Ograniczenia, które plan nazywa wprost</a></li><li><a href="#sprawy-do-rozstrzygniecia-przed-wdrozeniem">Sprawy do rozstrzygnięcia przed wdrożeniem</a></li></ul></aside><article><h1 id="04-katalog-nowych-funkcji">04 — Katalog nowych funkcji</h1>
+<p>Każda funkcja opiera się na technologii, która istnieje dziś (2026-10-09). Kolumna „Pewność” mówi, jak została
+sprawdzona — legenda i źródła: <a href="plan-11-technologie-2026-10.html"><code>11-technologie-2026-10.md</code></a>. <strong>Żadna z tych funkcji
+nie jest jeszcze zbudowana ani przetestowana w Alfie</strong>; stan wykonania jest w <a href="plan-03-roadmapa.html"><code>03-roadmapa.md</code></a>.</p>
+<p>Sprzęt bazowy: laptop i7-13620H, RTX 4050 z 6 GB pamięci karty, 16 GB RAM.</p>
+<h2 id="modele-i-jakosc-odpowiedzi">Modele i jakość odpowiedzi</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Funkcja</th><th>Co daje użytkownikowi</th><th>Technologia</th><th>Pewność</th><th>Na 6 GB</th></tr></thead><tbody><tr><td>C2.2a</td><td>Lepszy polski model domyślny</td><td>wyraźnie lepsze odpowiedzi niż Bielik 4.5B</td><td>Bielik-Minitron-7B v3 (GGUF Q4_K_M ≈ 4,5 GB, Apache 2.0)</td><td>P</td><td>tak; do pomiaru tok/s</td></tr>
+<tr><td>C2.2b</td><td>Model do narzędzi i obrazu</td><td>agentki trafniej wywołują narzędzia, rozumieją zrzuty i zdjęcia</td><td>Qwen3.5-4B (wizja wbudowana, Apache 2.0)</td><td>P (istnienie), W (parametry)</td><td>tak (≈ 3,4 GB)</td></tr>
+<tr><td>C2.2c</td><td>Kilka modeli bez restartu</td><td>przełączanie czat / narzędzia / embedder bez czekania na ręczne ładowanie</td><td>tryb routera w <code>llama-server</code> (<code>--models-max</code>, usypianie bezczynnych)</td><td>P</td><td>jeden duży model naraz</td></tr>
+<tr><td>C2.2d</td><td>Tryb „wolniej, ale lepiej”</td><td>najtrudniejsze pytania po polsku</td><td>Bielik-11B v3 z częściowym liczeniem na procesorze</td><td>W</td><td>wolno — tylko na życzenie</td></tr>
+<tr><td>C2.3</td><td>Zawsze poprawne wywołania narzędzi</td><td>koniec z „model odpowiedział zepsutym JSON-em”</td><td>gramatyki i JSON Schema w llama.cpp</td><td>P</td><td>tak</td></tr>
+<tr><td>C2.1</td><td>Zestaw ewaluacyjny po polsku</td><td>każda zmiana modelu lub silnika jest mierzona, nie zgadywana</td><td>własny zestaw w <code>evals/</code>, uruchamiany w CI i na sprzęcie</td><td>—</td><td>tak</td></tr></tbody></table></div>
+<h2 id="agentki-i-automatyzacja">Agentki i automatyzacja</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Funkcja</th><th>Co daje</th><th>Technologia</th><th>Pewność</th></tr></thead><tbody><tr><td>C2.5</td><td>Łączniki MCP nowej generacji</td><td>Alfa korzysta z serwerów MCP pisanych pod nową specyfikację i ze starszych</td><td>MCP 2026-07-28 (bezstanowy, <code>server/discover</code>) + 2025-11-25; SDK <code>rmcp</code> 3.5</td><td>P</td></tr>
+<tr><td>C2.6</td><td>Umiejętności w otwartym formacie</td><td>gotowe „przepisy” dla agentek do pobrania i wymiany; każda z przypiętą sumą i podglądem przed włączeniem</td><td>Agent Skills (<code>SKILL.md</code>)</td><td>W</td></tr>
+<tr><td>C2.7</td><td>Zadania zaplanowane</td><td>„co rano streść pocztę”, „w piątek zrób kopię” — z góry ustalonym zakresem uprawnień</td><td>moduły <code>scheduler</code> i <code>triggers</code> (już w kodzie) + budżet zdolności na zadanie</td><td>—</td></tr>
+<tr><td>C2.8</td><td>Kanwa artefaktów</td><td>dokument, strona albo rysunek obok rozmowy, z historią wersji</td><td>izolowana ramka bez dostępu do programu (ADR 0009)</td><td>—</td></tr>
+<tr><td>C2.4</td><td>Drugi strażnik treści</td><td>dodatkowe wykrywanie szkodliwych poleceń po polsku</td><td>Bielik-Guard 0.1B / 0.5B</td><td>P (istnienie)</td></tr>
+<tr><td>C2.11</td><td>Rozmowa o dokumentach</td><td>PDF i DOCX jako załącznik lub źródło pamięci</td><td>wyciąganie tekstu w Rust; skany — opcjonalnie Docling jako dodatek</td><td>W</td></tr>
+<tr><td>C1.3</td><td>Sterowanie komputerem z asystą</td><td>agentka klika i wpisuje, Ty potwierdzasz kroki</td><td>drzewo UI Automation + zrzut ekranu jako zapas; Qwen3.5-4B do obrazu</td><td>W</td></tr></tbody></table></div>
+<p>Zasada dla całej grupy: <strong>Broker pozostaje jedynym wykonawcą</strong>. Wbudowane narzędzia <code>llama-server</code> (<code>--tools</code>,
+własna obsługa MCP) pozostają wyłączone — ominęłyby zgody i dziennik.</p>
+<h2 id="wiele-urzadzen">Wiele urządzeń</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Funkcja</th><th>Co daje</th><th>Technologia</th><th>Pewność</th></tr></thead><tbody><tr><td>D</td><td>Dostęp przez Internet bez otwierania portów</td><td>Alfa w domu, Ty gdziekolwiek</td><td>przekaźnik + kanał szyfrowany end-to-end (wzorzec Noise); dla klientów natywnych opcjonalnie iroh 1.x</td><td>P (iroh), U (dobór wzorca)</td></tr>
+<tr><td>D.2</td><td>Parowanie kodem QR</td><td>nowe urządzenie w mniej niż minutę, bez haseł</td><td>klucz publiczny + jednorazowy sekret w kodzie; krótki kod kontrolny do porównania</td><td>U</td></tr>
+<tr><td>D.5</td><td>Zgody z telefonu i przeglądarki</td><td>zadania nie stoją, gdy nie ma Cię przy komputerze</td><td>podpis kluczem urządzenia po biometrii / kluczu dostępu (WebAuthn)</td><td>U</td></tr>
+<tr><td>E</td><td>Panel WWW</td><td>pełna Alfa w przeglądarce, także na cudzym komputerze</td><td>ten sam interfejs Svelte jako PWA</td><td>—</td></tr>
+<tr><td>F</td><td>Aplikacja Android</td><td>pilot w kieszeni, powiadomienia o zgodach, głos</td><td>Tauri 2 mobile (Android stabilny od 2.0)</td><td>P (wersja), W (dojrzałość)</td></tr>
+<tr><td>F.6</td><td>Rozmowa bez komputera</td><td>gdy komputer jest wyłączony, rozmawiasz przez ten sam model chmurowy</td><td><code>offline-client</code> + magazyn kluczy Androida</td><td>—</td></tr>
+<tr><td>D</td><td>Lista urządzeń i odwołanie</td><td>zgubiony telefon traci dostęp jednym kliknięciem</td><td><code>device-pairing</code></td><td>—</td></tr>
+<tr><td>D</td><td>STOP z każdego klienta</td><td>kill-switch działa także zdalnie</td><td>istniejący kill-switch + polecenie zdalne o najwyższym priorytecie</td><td>—</td></tr></tbody></table></div>
+<h2 id="zgodnosc-i-zaufanie">Zgodność i zaufanie</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Funkcja</th><th>Co daje</th><th>Podstawa</th><th>Pewność</th></tr></thead><tbody><tr><td>C2.9</td><td>Oznaczenie „wygenerowane przez AI”</td><td>eksport tekstu, dźwięku i obrazu ma czytelną i maszynową etykietę</td><td>art. 50 AI Act</td><td>W</td></tr>
+<tr><td>C2.9</td><td>Informacja „rozmawiasz z AI”</td><td>przy pierwszym uruchomieniu i stale w interfejsie</td><td>art. 50 AI Act</td><td>W</td></tr>
+<tr><td>C2.10</td><td>Lista składników oprogramowania (SBOM)</td><td>wiadomo, z czego zbudowano każde wydanie</td><td>CRA; <code>cargo-cyclonedx</code> + lista npm</td><td>W</td></tr>
+<tr><td>C2.10</td><td>Polityka zgłaszania podatności</td><td>jeden adres i jasna procedura</td><td>CRA art. 14</td><td>W</td></tr>
+<tr><td>—</td><td>Karty modeli i licencji w programie</td><td>przy każdym modelu: skąd, na jakiej licencji, do czego</td><td>dobra praktyka</td><td>—</td></tr></tbody></table></div>
+<h2 id="ograniczenia-ktore-plan-nazywa-wprost">Ograniczenia, które plan nazywa wprost</h2>
+<div class="tbl"><table><thead><tr><th>Czego nie obiecujemy</th><th>Dlaczego</th><th>Co zamiast</th></tr></thead><tbody><tr><td>Rozmowy głosowej w pełnym dupleksie po polsku na komputerze bazowym</td><td>modele tego typu są anglojęzyczne i potrzebują 16–24 GB pamięci karty</td><td>kaskada: wykrywanie mowy → rozpoznawanie → model → synteza, z przerywaniem w pół zdania</td></tr>
+<tr><td>W pełni samodzielnego sterowania komputerem na 6 GB</td><td>otwarte modele GUI (ok. 9 mld parametrów) zajmują całą kartę i ustępują modelom zamkniętym</td><td>narzędzia strukturalne i tryb z asystą; pełna autonomia przez model chmurowy</td></tr>
+<tr><td>Wielu agentek liczących naraz lokalnie</td><td>na karcie mieści się jeden duży model</td><td>kolejka: planistka i wykonawczynie po kolei, ze wspólną pamięcią podręczną</td></tr>
+<tr><td>Modelu lokalnego w telefonie</td><td>decyzja właściciela; polskiego modelu tej wielkości dziś nie potwierdziliśmy</td><td>telefon jako pilot; bez komputera — model chmurowy</td></tr>
+<tr><td>Rozmycia tła w stylu „Szkło”</td><td>reguła projektu zabrania <code>backdrop-filter</code> (wydajność WebView2)</td><td>półprzezroczyste tafle na barwnej poświacie</td></tr>
+<tr><td>Pełnej funkcjonalności bez komputera</td><td>narzędzia, pamięć i pliki są na komputerze</td><td>sama rozmowa przez API; reszta wraca z połączeniem</td></tr></tbody></table></div>
+<h2 id="sprawy-do-rozstrzygniecia-przed-wdrozeniem">Sprawy do rozstrzygnięcia przed wdrożeniem</h2>
+<div class="tbl"><table><thead><tr><th>Sprawa</th><th>Opcje</th><th>Kto</th></tr></thead><tbody><tr><td>Silnik mowy: następca Pipera ma licencję GPL-3.0</td><td>osobny proces + opinia prawna / starsze wydanie na MIT / inny silnik</td><td>właściciel (ADR 0024)</td></tr>
+<tr><td>Klucz API w przeglądarce (tryb bez komputera w panelu WWW)</td><td>nie przechowywać (tylko Android) / przechowywać zaszyfrowany kluczem dostępu</td><td>właściciel (ADR 0023)</td></tr>
+<tr><td>Wybór rozpoznawania mowy: Whisper turbo czy Parakeet v3</td><td>pomiar WER na polskim korpusie</td><td>sesja mierzy, właściciel ustala próg</td></tr>
+<tr><td>Wybór embeddera i rerankera dla polskiego</td><td>pomiar recall@5 na własnym zestawie</td><td>jak wyżej</td></tr>
+<tr><td>Kto prowadzi przekaźnik</td><td>własny serwer właściciela / dostawca chmurowy</td><td>właściciel</td></tr></tbody></table></div>
+</article>
+<footer>Źródło: <code>docs/plan/04-nowe-funkcje.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

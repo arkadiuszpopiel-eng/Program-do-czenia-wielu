@@ -295,6 +295,10 @@ Z tych samych zdarzeń powstają: drzewo postępów (Plan → kroki → status),
 
 ## 13. Stan implementacji (październik 2026)
 
+> **Uwaga (2026-10-09):** liczby w tym rozdziale pochodzą z 2026-10-02. Aktualne (241 crate'ów, 2514 testów)
+> podaje generowany [`CATALOG.md`](CATALOG.md); architektura docelowa dla wielu platform i klientów zdalnych:
+> [`plan/02-architektura-docelowa.md`](plan/02-architektura-docelowa.md).
+
 Stan na HEAD `51cbe91` (2026-10-02). Sekcje 1–12 opisują plan i zostają bez zmian; tu jest to, co faktycznie
 zbudowano, i gdzie implementacja odeszła od planu. Macierz kryteriów akceptacji: `docs/STATUS.md`. Tabela crate'ów:
 `crates/README.md`. Indeks SPEC-ów: `docs/modules/README.md`.

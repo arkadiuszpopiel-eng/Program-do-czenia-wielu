@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania) — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/ADR/0005-agentbackend-vs-modelprovider.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate&amp;#39;ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html" aria-current="page">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#kontekst">Kontekst</a></li><li><a href="#decyzja">Decyzja</a></li><li><a href="#alternatywy-odrzucone">Alternatywy (odrzucone)</a></li><li><a href="#konsekwencje">Konsekwencje</a></li><li><a href="#jak-cofnac">Jak cofnąć</a></li></ul></aside><article><h1 id="adr-0005-dwa-kontrakty-modelprovider-tokeny-i-agentbackend-zadania">ADR 0005 — Dwa kontrakty: <code>ModelProvider</code> (tokeny) i <code>AgentBackend</code> (zadania)</h1>
+<div class="tbl"><table><thead><tr><th>Pole</th><th>Wartość</th></tr></thead><tbody><tr><td>Status</td><td>Zaakceptowany</td></tr>
+<tr><td>Data</td><td>2026-09-30</td></tr>
+<tr><td>Powiązane sekcje planu</td><td>§1.3, §5.1–5.6, §8.5, §9.7, §16.2 (F1, F4)</td></tr></tbody></table></div>
+<h2 id="kontekst">Kontekst</h2>
+<p>Alfa łączy cztery klasy „mózgów&quot;: lokalne modele (llama.cpp), chmurowe API (Anthropic, OpenAI, adapter generyczny), mosty do oficjalnych CLI na planach abonamentowych (Claude Code, Codex, potem Grok Build, Kimi Code, <code>agy</code>) oraz własne endpointy. Klasy A/B/D dają strumień tokenów; klasa C to proces, który sam planuje, prosi o uprawnienia, wznawia sesje i zwraca zdarzenia. Regulaminy (§1.3) pozwalają sterować niezmodyfikowanym CLI, do którego loguje się użytkownik, ale zabraniają czytania tokenów i udawania <code>chat.completions</code>.</p>
+<h2 id="decyzja">Decyzja</h2>
+<div class="tbl"><table><thead><tr><th>Kontrakt</th><th>Jednostka</th><th>Metody</th><th>Klasy</th></tr></thead><tbody><tr><td><strong><code>ModelProvider</code></strong></td><td>tokeny</td><td><code>capabilities()</code>, <code>stream(req)</code> z anulowaniem, <code>health()</code>, <code>cost()</code></td><td>A. lokalne, B. chmura API, D. własne</td></tr>
+<tr><td><strong><code>AgentBackend</code></strong></td><td>zadania</td><td><code>submit_task</code>, <code>events</code>, <code>approve</code>, <code>steer</code>, <code>cancel</code>, <code>resume</code></td><td>C. mosty CLI („opaque worker&quot;), D. własne</td></tr></tbody></table></div>
+<ul>
+<li>Rodzaje <code>ModelProvider</code>: chat, STT, TTS, embeddings, wizja/OCR, S2S.</li>
+<li><strong>Router kieruje zadania</strong>, nie żądania tokenowe: klasa zadania (głos-szybka, rozmowa, kod, planowanie, GUI/wizja, streszczanie, embeddingi) × ograniczenia (tag prywatności i jurysdykcji, budżet, opóźnienie, możliwości); fallback, circuit breaker, reaktywne wykrywanie limitów okien planów.</li>
+<li>Most = sterowanie <strong>oficjalnym, niezmodyfikowanym CLI</strong> przez jego tryby nieinteraktywne/SDK/app-server; natywne „ask&quot; CLI przekierowane do naszego kanału (Claude Code: <code>--permission-prompt-tool</code>; Codex: approvals app-server — do potwierdzenia w spike (b)). Kod Alfy nigdy nie czyta ani nie przechowuje tokenów CLI.</li>
+<li>Mosty pracują w worktree/kopii; cofanie = snapshot przed/po; pamięć tylko przez <code>recall</code>; zdarzenia CLI w Audycie oznaczone „niezależnie niezweryfikowane&quot;; zimny start (sekundy) → nigdy na ścieżce głosu.</li>
+<li>Adapter generyczny (od F1): <code>baseURL</code>, klucz, model ID, flagi możliwości, tag prywatności/jurysdykcji per profil.</li>
+</ul>
+<h2 id="alternatywy-odrzucone">Alternatywy (odrzucone)</h2>
+<div class="tbl"><table><thead><tr><th>Alternatywa</th><th>Dlaczego nie</th></tr></thead><tbody><tr><td>Jeden kontrakt „chat completions&quot; dla wszystkiego</td><td>mosty CLI nie są strumieniem tokenów; wymuszanie tego oznacza obejście regulaminów (surowe <code>chat.completions</code> przez plan) i utratę zdarzeń CLI (plan, uprawnienia, wznawianie)</td></tr>
+<tr><td>Automatyzacja webowych UI dostawców</td><td>wprost wykluczone przez §1.3 (naruszenie regulaminów, kradzież ciasteczek/tokenów)</td></tr>
+<tr><td>Mosty przez własną implementację protokołów dostawców</td><td>modyfikacja/udawanie klienta = naruszenie; przypięte wersje oficjalnych CLI zamiast tego</td></tr>
+<tr><td>Router na poziomie tokenów</td><td>tagi prywatności, budżety i limity planów dotyczą zadań; fallback tokenowy w środku odpowiedzi psuje spójność</td></tr></tbody></table></div>
+<h2 id="konsekwencje">Konsekwencje</h2>
+<ul>
+<li>Dwa osobne moduły: <code>providers-api</code>/<code>providers-local</code> (<code>ModelProvider</code>) i <code>agent-backends</code> (<code>AgentBackend</code>); <code>router</code> zna oba.</li>
+<li>Egzekucja techniczna: deny-lista ścieżek poświadczeń (<code>~/.claude</code>, <code>~/.codex</code>, profile przeglądarek, Credential Manager) w <code>fs.*</code>/shellu; przypięte wersje CLI (nieznana wersja wyłącza trasę); osobne statusy „CLI <code>-p</code>&quot; i „Agent SDK&quot;; rejestr <code>compliance-registry.json</code> z wyłącznikiem trasy.</li>
+<li>Kryteria F4: 20/20 próśb o uprawnienia trafia do Broker-UI; monitor ETW: 0 odczytów <code>~/.claude</code>, <code>~/.codex</code>; wyłącznik: 0 wywołań wyłączonej trasy w 100 próbach.</li>
+<li>Testy chmurowe na fixture&#39;ach syntetycznych ze schematów API do czasu dodania kluczy (<code>accounts-hub</code>).</li>
+<li>Serwer MCP Alfy wystawia mostom tylko narzędzia specyficzne dla Windows (F4: schowek, okna; F6: UIA, zrzuty, rejestr), bez fs/shell.</li>
+</ul>
+<h2 id="jak-cofnac">Jak cofnąć</h2>
+<ul>
+<li>Dodanie trzeciego kontraktu (np. dla natywnego S2S) nie łamie tej decyzji — S2S jest rodzajem <code>ModelProvider</code>.</li>
+<li>Gdyby regulamin danego dostawcy zmienił się na niekorzyść, trasa jest wyłączana w rejestrze zgodności bez zmian w kodzie; adaptery są izolowane.</li>
+<li>Scalenie kontraktów wymagałoby przepisania <code>router</code> i <code>agent-runtime</code>; nie przewidujemy tego.</li>
+</ul>
+</article>
+<footer>Źródło: <code>docs/ADR/0005-agentbackend-vs-modelprovider.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | Kim jesteś | Czytaj w tej kolejności |
 | --- | --- |
 | Sesja AI | [`../AGENTS.md`](../AGENTS.md) → [`STATUS.md`](STATUS.md) → [`KONTYNUACJA.md`](KONTYNUACJA.md) → SPEC modułu, nad którym pracujesz |
-| Właściciel — co dalej | [`KONTYNUACJA.md`](KONTYNUACJA.md) (rozdz. 8: decyzje) → [`STATUS.md`](STATUS.md) („Co musi zrobić człowiek”) |
+| Właściciel — co dalej | [`html/index.html`](html/index.html) (plan i postęp w przeglądarce) → [`KONTYNUACJA.md`](KONTYNUACJA.md) (rozdz. 8: decyzje) → [`STATUS.md`](STATUS.md) („Co musi zrobić człowiek”) |
 | Właściciel — jak używać programu | [`user-guide/`](user-guide/README.md) |
 
 ## Plan i stan
@@ -15,6 +15,8 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | Dokument | Co zawiera | Kto zmienia |
 | --- | --- | --- |
 | [`PLAN.md`](PLAN.md) | Zatwierdzony plan programu (wersja 5): decyzje, architektura, fale F0–F9, ryzyka. Źródło prawdy o tym, **co** budujemy | zmiany tylko przez ADR albo za zgodą właściciela |
+| [`plan/`](plan/README.md) | **Plan v6** — rozszerzenie planu: stan wykonania, architektura docelowa, roadmapa etapów A–H, nowe funkcje, Windows / Linux / panel WWW / Android, dostęp zdalny, zgodność prawna, technologie | sesja AI po każdym zadaniu i etapie; decyzje — właściciel |
+| [`html/`](html/index.html) | Ten sam plan, stan, dziennik zmian i ADR-y jako strony HTML z paskiem postępu (`node scripts/docs-html.mjs`) | generowany — nie edytować |
 | [`STATUS.md`](STATUS.md) | Macierz 108 kryteriów akceptacji ze stanem i dowodem, luki techniczne, lista bramek ludzkich | sesja AI po każdej sesji |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Dziennik zmian po ludzku: każda seria poprawek = wyższy numer wersji i wpis | sesja AI przy podbiciu wersji |
 | [`KONTYNUACJA.md`](KONTYNUACJA.md) | Ocena stanu z 2026-10-07, etapy dalszych prac, decyzje właściciela | sesja AI; decyzje — właściciel |
@@ -28,7 +30,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Mikrojądro, magistrala, moduły, procesy, przepływy |
 | [`CATALOG.md`](CATALOG.md) | Generowany katalog wszystkich crate'ów i modułów: grupa, fala, rodzaj, rozmiar, testy, SPEC, niespójności (`node scripts/catalog.mjs`) |
 | [`modules/`](modules/README.md) | Jednostronicowe specyfikacje modułów (`<moduł>/SPEC.md`) i ich indeks |
-| [`ADR/`](ADR/README.md) | Rejestr decyzji architektonicznych 0001–0016 |
+| [`ADR/`](ADR/README.md) | Rejestr decyzji architektonicznych 0001–0016 oraz projekty 0017–0024 do planu v6 (czekają na podpis właściciela) |
 | [`VOICE.md`](VOICE.md) | Voice Suite: potok, profile A–D, barge-in |
 | [`PERSONAS.md`](PERSONAS.md) | Cztery agentki, role, obsady |
 | [`UI.md`](UI.md) | Interfejs: okna, panele, tokeny, budżety |
@@ -61,4 +63,6 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 - Nowy dokument trafia do istniejącej kategorii powyżej i dostaje wiersz w tej mapie.
 - Liczby o kodzie (crate'y, linie, testy) bierzemy z `CATALOG.md`, nie przepisujemy ręcznie.
 - Stan kryteriów zmienia się tylko w `STATUS.md`; inne dokumenty do niego odsyłają.
-- Pliki generowane (`CATALOG.md`, schematy, tokeny) nie są edytowane ręcznie.
+- Pliki generowane (`CATALOG.md`, `html/`, schematy, tokeny) nie są edytowane ręcznie.
+- Po zakończonym zadaniu: stan w `plan/03-roadmapa.md` (i w `STATUS.md`, jeśli zamyka kryterium). Po zakończonym
+  etapie: `plan/00-stan-wykonania.md`, wyższa wersja z wpisem w `CHANGELOG.md`, potem `node scripts/docs-html.mjs`.

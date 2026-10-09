@@ -20,5 +20,13 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0014](0014-lokalny-llm-llama-cpp-zamiast-ollamy.md) | Lokalny LLM: llama.cpp (Vulkan/CUDA) zamiast Ollamy | Zaakceptowany |
 | [0015](0015-model-uprawnien-tokeny-zdolnosci-l0-l4.md) | Model uprawnień: tokeny zdolności i poziomy L0–L4 | Zaakceptowany |
 | [0016](0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.md) | Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu | Zaakceptowany |
+| [0017](0017-strategia-wieloplatformowa.md) | Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux | **Proponowany** |
+| [0018](0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.md) | Fabryka platform (`platform-select`) i kontrakty Brokera niezależne od systemu | **Proponowany** |
+| [0019](0019-protokol-niezalezny-od-transportu.md) | Protokół klient–host niezależny od transportu (ramki z wersją, `seq`, ACL, typy TS generowane) | **Proponowany** |
+| [0020](0020-host-bez-okna.md) | Host bez okna: binarka `alfa-host`, okno Tauri jako klient lokalny | **Proponowany** |
+| [0021](0021-dostep-zdalny-przekaznik-e2e-i-parowanie.md) | Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń | **Proponowany** |
+| [0022](0022-zgody-zdalne-dowod-urzadzenia-sparowanego.md) | Zgody zdalne: dowód urządzenia sparowanego (`PairedDevice`) | **Proponowany** |
+| [0023](0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.md) | Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów | **Proponowany** |
+| [0024](0024-licencja-silnika-mowy.md) | Licencja silnika mowy (następca Pipera na GPL-3.0) | **Proponowany** |
 
-Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u.
+Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u. **Proponowany** — projekt przygotowany przez sesję AI; nie obowiązuje do podpisu właściciela.

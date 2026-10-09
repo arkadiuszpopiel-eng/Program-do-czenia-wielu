@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 — Architektura docelowa — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/02-architektura-docelowa.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html" aria-current="page">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate&amp;#39;ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#obraz-calosci">Obraz całości</a></li><li><a href="#warstwy-i-reguly-zaleznosci-bez-zmian">Warstwy i reguły zależności (bez zmian)</a></li><li><a href="#szew-1-fabryka-platform">Szew 1 — fabryka platform</a></li><li><a href="#szew-2-kontrakty-brokera-niezalezne-od-systemu">Szew 2 — kontrakty Brokera niezależne od systemu</a></li><li><a href="#szew-3-protokol-niezalezny-od-transportu">Szew 3 — protokół niezależny od transportu</a></li><li><a href="#szew-4-host-bez-okna">Szew 4 — host bez okna</a></li><li><a href="#mapa-zdolnosci-hosta">Mapa zdolności hosta</a></li><li><a href="#moduly-planu-v6">Moduły planu v6</a></li><li><a href="#mapa-gotowosci-kodu">Mapa gotowości kodu</a></li></ul></aside><article><h1 id="02-architektura-docelowa">02 — Architektura docelowa</h1>
+<p>Stan kodu opisany tutaj pochodzi z przeglądu repozytorium 2026-10-09 (odczyt kodu, bez budowania). Liczby
+o crate&#39;ach: <a href="../CATALOG.md"><code>../CATALOG.md</code></a>. Obecna architektura: <a href="../ARCHITECTURE.md"><code>../ARCHITECTURE.md</code></a>.</p>
+<h2 id="obraz-calosci">Obraz całości</h2>
+<pre><code>                 ┌──────────────────────────── KOMPUTER (host) ─────────────────────────────┐
+  okno Tauri ───▶│  transport: IPC ─┐                                                       │
+                 │                  ├─▶ BRAMA KLIENTÓW ─▶ AppCore ─▶ moduły ─▶ BROKER ─▶ system
+  telefon  ──┐   │  transport:      │   (kto, co wolno,   (210 poleceń,        (zgody,      │
+  przeglądarka├─▶ PRZEKAŹNIK ─▶ kanał E2E ─┘ numery zdarzeń) zdarzenia)        dziennik)    │
+             │   │  (szyfrogram)                                │                            │
+             │   │                                              └─▶ modele lokalne, głos     │
+             │   └──────────────────────────────────────────────────────────────────────────┘
+             └─▶ (bez komputera) model chmurowy przez API ─ rozmowa dopisywana później do historii
+</code></pre>
+<p>Trzy pojęcia:</p>
+<ul>
+<li><strong>Host</strong> — proces z <code>AppCore</code>, modułami i Brokerem. Dziś żyje wewnątrz okna Tauri; docelowo może działać
+także bez okna (moduł <code>host-headless</code>).</li>
+<li><strong>Klient</strong> — interfejs Svelte. Ten sam kod w trzech opakowaniach: okno Tauri, strona WWW (PWA), aplikacja
+Android (Tauri mobile).</li>
+<li><strong>Transport</strong> — sposób przesłania poleceń i zdarzeń. Klient nie wie, którego używa.</li>
+</ul>
+<h2 id="warstwy-i-reguly-zaleznosci-bez-zmian">Warstwy i reguły zależności (bez zmian)</h2>
+<div class="tbl"><table><thead><tr><th>Warstwa</th><th>Wzorzec nazw</th><th>Zależy od</th><th>Kto pilnuje</th></tr></thead><tbody><tr><td>Kontrakty</td><td><code>&lt;m&gt;-contract</code></td><td>innych kontraktów, <code>lib-*</code></td><td><code>scripts/check-deps.sh</code> w CI</td></tr>
+<tr><td>Implementacje</td><td><code>&lt;m&gt;-impl</code></td><td>kontraktów; nigdy od cudzego <code>-impl</code></td><td><code>check-deps.sh</code></td></tr>
+<tr><td>Atrapy</td><td><code>&lt;m&gt;-fake</code></td><td>kontraktów; tylko w testach</td><td><code>check-deps.sh</code></td></tr>
+<tr><td>Biblioteki</td><td><code>lib-*</code></td><td><code>lib-*</code> i kontraktów</td><td><code>check-deps.sh</code></td></tr>
+<tr><td>Kompozycja</td><td><code>app-*</code></td><td>wszystkiego powyżej</td><td><code>check-deps.sh</code></td></tr>
+<tr><td>Powłoki i klienci</td><td><code>apps/*</code></td><td><code>app-*</code> przez <code>app-api</code></td><td>przegląd</td></tr></tbody></table></div>
+<p>Dodatkowo <code>deny.toml</code> dopuszcza crate <code>windows</code> tylko w crate&#39;ach platformy. Plan v6 dodaje analogiczną regułę
+dla każdego nowego systemu (np. <code>zbus</code>, <code>jni</code> tylko w <code>platform-linux-*</code> / <code>platform-android-*</code>).</p>
+<h2 id="szew-1-fabryka-platform">Szew 1 — fabryka platform</h2>
+<p><strong>Dziś.</strong> Porty są zdefiniowane czysto (ok. 30 w <code>platform-contract</code>, m.in. <code>FsPort</code>, <code>ExecPort</code>,
+<code>ClipboardPort</code>, <code>HotkeyPort</code>, <code>TrayPort</code>, <code>SecurePipePort</code>, <code>UiaPort</code>, <code>ScreenCapturePort</code>; poza nim
+<code>AudioIo</code>, <code>SecretStore</code>, <code>KeyVault</code>, <code>ShellPort</code>). <code>AppOptions</code> przyjmuje każdy port jako
+<code>Option&lt;Arc&lt;dyn …&gt;&gt;</code>. Ale korzeń kompozycji wpisuje typy Windows wprost w ok. 10 miejscach
+(<code>app-core/src/parts/*</code>, <code>app-agents/src/sysnet.rs</code>, <code>app-gui</code>, <code>app-terminal</code>, <code>app-broker</code>, <code>app-safety</code>).</p>
+<p><strong>Docelowo.</strong> Jeden moduł <code>platform-select</code> z funkcją <code>platform() -&gt; PlatformPorts</code>, wybierający implementację
+przez <code>cfg(target_os)</code>. Korzeń kompozycji zna tylko <code>PlatformPorts</code>. Port, którego system nie ma, zwraca
+<code>Unsupported</code> — a interfejs ukrywa zależną od niego funkcję na podstawie <strong>mapy zdolności hosta</strong> (niżej).</p>
+<pre><code class="language-rust">// szkic — źródłem prawdy będzie crate platform-contract
+pub struct PlatformPorts {
+    pub fs: Arc&lt;dyn FsPort&gt;,
+    pub exec: Arc&lt;dyn ExecPort&gt;,
+    pub secrets: Arc&lt;dyn SecretStore&gt;,
+    pub audio: Option&lt;Arc&lt;dyn AudioIo&gt;&gt;,       // brak = głos niedostępny na tej platformie
+    pub uia: Option&lt;Arc&lt;dyn UiaPort&gt;&gt;,         // brak = sterowanie komputerem niedostępne
+    /* … pozostałe porty … */
+    pub capabilities: HostCapabilities,        // co ten host potrafi — trafia do klientów
+}
+</code></pre>
+<h2 id="szew-2-kontrakty-brokera-niezalezne-od-systemu">Szew 2 — kontrakty Brokera niezależne od systemu</h2>
+<p>Najtrudniejszy szew, bo dotyka Jądra (zmiany tylko po przeglądzie właściciela). Dziś semantyka Windows jest
+wpisana w kontrakty, a nie odgrodzona <code>cfg</code>:</p>
+<div class="tbl"><table><thead><tr><th>Miejsce</th><th>Dziś</th><th>Docelowo</th></tr></thead><tbody><tr><td><code>safety-broker-contract/src/scope.rs</code></td><td>ścieżki sprowadzane do małych liter z <code>\</code></td><td><code>PathScope</code> parametryzowany <code>PathFlavor</code> (Windows / POSIX): wielkość liter, separator, korzenie</td></tr>
+<tr><td><code>compliance-contract/src/deny/path.rs</code></td><td>listy zakazów rozwijają <code>%ZMIENNE%</code> profilu Windows</td><td><code>PathEnv</code> per system; listy zakazów jako dane per system</td></tr>
+<tr><td><code>safety-broker-contract/src/shell_guard.rs</code>, <code>tools-shell-contract</code></td><td>reguły tylko dla <code>cmd</code> i PowerShell; <code>ShellKind = Pwsh / Powershell / Cmd</code></td><td>analizator jako port z implementacją per powłoka; dochodzi <code>Posix</code> (bash/sh/zsh)</td></tr>
+<tr><td><code>safety-broker-contract/src/ipc.rs</code> (<code>Hello</code>)</td><td>tożsamość procesu = SID + ścieżka obrazu</td><td>tożsamość abstrakcyjna: Windows — SID; Linux — UID + <code>SO_PEERCRED</code></td></tr>
+<tr><td><code>platform-contract</code> (listy <code>PROTECTED_IMAGES</code>, klasy UWP)</td><td>stałe Windows eksportowane z kontraktu</td><td>dane platformy dostarczane przez implementację</td></tr></tbody></table></div>
+<p>Uwaga: otwarte ustalenia analizatora powłoki (S-01…S-04, S-06) trzeba rozstrzygnąć <strong>przed</strong> tą przebudową,
+żeby nie przenosić znanych dziur do nowej struktury.</p>
+<h2 id="szew-3-protokol-niezalezny-od-transportu">Szew 3 — protokół niezależny od transportu</h2>
+<p><strong>Dziś.</strong> 210 poleceń w jednej liście (<code>app-api/src/commands.rs</code>, makro <code>with_commands!</code>), ok. 38 zdarzeń
+(<code>AlfaEvent</code> w <code>app-api/src/dto/events.rs</code>), DTO w <code>app-api/src/dto/</code>. Interfejs zna tylko <code>AlfaClient</code>
+(<code>apps/desktop/ui/src/lib/api/client.ts</code>) — ma dwie implementacje: <code>TauriAlfaClient</code> i <code>FakeAlfaClient</code>.
+To bardzo dobry punkt wyjścia. Brakuje pięciu rzeczy:</p>
+<div class="tbl"><table><thead><tr><th>Brak</th><th>Skutek dziś</th><th>Rozwiązanie</th></tr></thead><tbody><tr><td>Numery sekwencji zdarzeń</td><td>klient, który nie nadąża, po cichu gubi paczki (<code>pump.rs</code>)</td><td>każde zdarzenie dostaje <code>seq</code>; host trzyma bufor ostatnich N; klient po przerwie prosi „od <code>seq</code>”, a gdy bufor nie sięga — dostaje <code>resync</code> i czyta stan od nowa</td></tr>
+<tr><td>Błędy strukturalne na łączu</td><td>powłoka spłaszcza <code>AppError</code> do tekstu</td><td>przez łącze idzie <code>{ code, message, details }</code>; tekst tłumaczy klient</td></tr>
+<tr><td>Tożsamość klienta i uprawnienia</td><td>jedyne ACL to uprawnienia okien Tauri</td><td>każda sesja klienta ma <code>ClientId</code>, rodzaj (okno / urządzenie sparowane) i zestaw dozwolonych poleceń</td></tr>
+<tr><td>Polecenia zakładające lokalną maszynę</td><td>okna dialogowe systemu, podgląd <code>asset:</code>, ścieżki bezwzględne w DTO</td><td>polecenia oznaczone <code>local_only</code>; dla klientów zdalnych odpowiedniki: wybór pliku z listy hosta, podgląd przesyłany strumieniem</td></tr>
+<tr><td>Typy TS pisane ręcznie</td><td>ryzyko rozjazdu przy trzech klientach</td><td>generator z Rust (ADR 0013); CI sprawdza <code>git diff --exit-code</code></td></tr></tbody></table></div>
+<p>Ramka protokołu (szkic do ADR 0019):</p>
+<pre><code>→ { &quot;v&quot;: 1, &quot;id&quot;: 4711, &quot;cmd&quot;: &quot;turn_send&quot;, &quot;args&quot;: { … } }
+← { &quot;v&quot;: 1, &quot;id&quot;: 4711, &quot;ok&quot;: { … } }            albo  &quot;err&quot;: { &quot;code&quot;: &quot;…&quot;, &quot;message&quot;: &quot;…&quot; }
+← { &quot;v&quot;: 1, &quot;seq&quot;: 90211, &quot;events&quot;: [ { &quot;type&quot;: &quot;TurnDelta&quot;, … }, … ] }
+→ { &quot;v&quot;: 1, &quot;id&quot;: 4712, &quot;cmd&quot;: &quot;events_resume&quot;, &quot;args&quot;: { &quot;after_seq&quot;: 90180 } }
+</code></pre>
+<p>Wersja protokołu <code>v</code> jest negocjowana przy połączeniu; host obsługuje bieżącą i poprzednią, żeby telefon
+z nieaktualną aplikacją nadal działał.</p>
+<h2 id="szew-4-host-bez-okna">Szew 4 — host bez okna</h2>
+<p><code>AppCore::build(paths, options)</code> już działa bez Tauri (<code>shell: None</code>, <code>HeadlessShell</code>), ale nie ma pliku
+wykonywalnego, który by go uruchomił. Moduł <code>host-headless</code> daje binarkę <code>alfa-host</code>: start przy logowaniu
+(opcjonalnie), ikona w zasobniku przez okno Tauri uruchamiane na żądanie, brama klientów zdalnych. Okno Tauri
+staje się wtedy jednym z klientów hosta — lokalnym, przez nazwany potok — zamiast jego właścicielem.</p>
+<p>Przejście jest dwustopniowe, żeby nie ryzykować wersji Windows: najpierw brama klientów <strong>wewnątrz</strong> obecnego
+procesu aplikacji (zdalny dostęp działa, gdy Alfa jest uruchomiona), potem wydzielenie hosta.</p>
+<h2 id="mapa-zdolnosci-hosta">Mapa zdolności hosta</h2>
+<p>Klient pyta hosta, co ten potrafi, i pokazuje tylko to. Dzięki temu jeden interfejs obsługuje Windows z pełnym
+zestawem, Linuksa bez Office i telefon bez komputera.</p>
+<div class="tbl"><table><thead><tr><th>Zdolność</th><th>Windows</th><th>Linux</th><th>Android bez komputera</th></tr></thead><tbody><tr><td>Rozmowa — model chmurowy</td><td>tak</td><td>tak</td><td>tak</td></tr>
+<tr><td>Rozmowa — model lokalny</td><td>tak</td><td>tak</td><td>nie</td></tr>
+<tr><td>Głos (STT/TTS)</td><td>tak (WASAPI)</td><td>planowane (PipeWire)</td><td>planowane (API systemu)</td></tr>
+<tr><td>Narzędzia: pliki, sieć</td><td>tak</td><td>tak</td><td>nie</td></tr>
+<tr><td>Narzędzia: powłoka</td><td>tak</td><td>po analizatorze POSIX</td><td>nie</td></tr>
+<tr><td>Sterowanie komputerem (UIA, wejście, ekran)</td><td>tak</td><td>badawcze (AT-SPI, portale)</td><td>nie</td></tr>
+<tr><td>Office, rejestr</td><td>tak</td><td>nie</td><td>nie</td></tr>
+<tr><td>Pamięć i wyszukiwanie</td><td>tak</td><td>tak</td><td>tylko bieżąca rozmowa</td></tr></tbody></table></div>
+<h2 id="moduly-planu-v6">Moduły planu v6</h2>
+<div class="tbl"><table><thead><tr><th>Moduł</th><th>Rodzaj</th><th>Zadanie</th><th>Etap</th></tr></thead><tbody><tr><td><code>platform-select</code></td><td>biblioteka kompozycji</td><td>wybór implementacji portów per system, mapa zdolności</td><td>B</td></tr>
+<tr><td><code>remote-gateway</code></td><td>moduł hosta</td><td>brama klientów: sesje, <code>seq</code>, ACL, ramki protokołu</td><td>D</td></tr>
+<tr><td><code>device-pairing</code></td><td>moduł hosta</td><td>parowanie QR, lista urządzeń, odwołanie, klucze</td><td>D</td></tr>
+<tr><td><code>remote-relay</code></td><td>osobna usługa</td><td>przekaźnik szyfrogramu; do postawienia samodzielnie</td><td>D</td></tr>
+<tr><td><code>host-headless</code></td><td>binarka</td><td>host bez okna</td><td>D</td></tr>
+<tr><td><code>web-panel</code></td><td>klient</td><td>PWA z interfejsem Svelte</td><td>E</td></tr>
+<tr><td><code>offline-client</code></td><td>biblioteka klienta</td><td>rozmowa przez API bez hosta, kolejka do scalenia</td><td>F</td></tr>
+<tr><td><code>platform-android</code></td><td>implementacje portów</td><td>magazyn kluczy, powiadomienia, biometria</td><td>F</td></tr>
+<tr><td><code>platform-linux</code></td><td>implementacje portów</td><td>pliki, procesy, schowek, skróty, zasobnik, sekrety, audio</td><td>G</td></tr></tbody></table></div>
+<p>Szkice SPEC: <a href="../modules/README.md"><code>../modules/README.md</code></a>, sekcja „Planowane (plan v6)”.</p>
+<h2 id="mapa-gotowosci-kodu">Mapa gotowości kodu</h2>
+<p><strong>Gotowe na wiele platform</strong></p>
+<ul>
+<li>Dyscyplina kontrakt / implementacja / atrapa i wstrzykiwanie portów przez <code>AppOptions</code>.</li>
+<li>Rdzeń logiki — magistrala, rejestr, konfiguracja, sesje, wyszukiwanie, pamięć, transfer, router, dostawcy
+chmurowi, licznik kosztów, persony, harmonogram, wyzwalacze, środowisko agentek, klasyfikator ryzyka,
+środowisko wtyczek, <code>lib-*</code> — CI buduje i testuje go także na Ubuntu.</li>
+<li>Jedna powierzchnia poleceń i zdarzeń; interfejs z pełną atrapą działa w zwykłej przeglądarce.</li>
+<li>Format <code>.alfa</code> (ścieżki względne), katalog dostawców, zarządzanie procesami llama.cpp i whisper.cpp, lokalny
+kanał MCP (ma już gałąź dla gniazda Unix), ścieżki danych (<code>AppPaths</code> ma gałąź XDG).</li>
+</ul>
+<p><strong>Potrzebny szew</strong></p>
+<ul>
+<li>Fabryka platform, protokół zdalny (pięć braków wyżej), generator typów TS.</li>
+<li>Magazyn sekretów i kluczy dla Linuksa i Androida.</li>
+<li>Semantyka ścieżek, powłok i tożsamości w kontraktach Brokera.</li>
+<li>Nowy rodzaj dowodu zgody (obszar pod przeglądem człowieka).</li>
+<li>Wymiar system / architektura w katalogu silników i modeli (<code>app-models/src/data.rs</code> zna tylko Windows x64).</li>
+<li>Zmienne środowiskowe wpisane na sztywno w binarkach Jądra, watchdoga i aktualizatora.</li>
+<li>Układ interfejsu na szerokość telefonu (dziś minimum okna to 400 × 500 px).</li>
+</ul>
+<p><strong>Tylko Windows</strong></p>
+<ul>
+<li>Siedem crate&#39;ów <code>platform-windows-*-impl</code>, <code>voice-audio-impl</code> (WASAPI) i z nim cały głos na żywo.</li>
+<li>Jądro poza procesem: usługa, potoki z DACL, okno Brokera na podwyższonej integralności, dowód fizycznego
+wejścia, skrót watchdoga.</li>
+<li>Launcher, aktualizator, instalator NSIS, proces wydania.</li>
+<li>Narzędzia sterowania komputerem: okna, UIA, wejście, ekran, Office, rejestr, OCR, terminal.</li>
+</ul>
+<p>Drobiazg znaleziony przy przeglądzie: <code>crates/app-bridges/src/app.rs:227</code> wybiera <code>cmd</code> dla systemów innych
+niż Windows — do poprawienia w etapie B.</p>
+</article>
+<footer>Źródło: <code>docs/plan/02-architektura-docelowa.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

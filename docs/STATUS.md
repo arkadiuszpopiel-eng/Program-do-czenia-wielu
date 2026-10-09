@@ -1,8 +1,39 @@
 # STATUS.md — macierz akceptacji fal F0–F9
 
-Stan na **2026-10-06**, gałąź `ccr-af4b63c6-3fyzaj` (fale 3–6: narzędzia systemowe, podział `app-core`, dziennik diagnostyczny, próba generalna na runnerze Windows). Kryteria i progi:
+Macierz: stan na **2026-10-06**; podsumowanie i bramki: **2026-10-09** (sekcja niżej). Gałąź `ccr-af4b63c6-3fyzaj` (fale 3–6: narzędzia systemowe, podział `app-core`, dziennik diagnostyczny, próba generalna na runnerze Windows). Kryteria i progi:
 `docs/ACCEPTANCE.md` (ten plik ich nie zmienia). Dowody sprawdzone w repo (`grep` po nazwach testów i plików);
 liczby z opisów commitów i README zestawów `evals/`.
+
+## Stan na 2026-10-09 (wersja 0.0.3)
+
+Tabele F0–F9 niżej mają stan z **2026-10-06** i znak ✅ oznacza w nich „zielone w CI / na atrapach”. Zgodnie
+z ADR 0016 kryterium jest spełnione dopiero po przebiegu na prawdziwej maszynie — takiego potwierdzenia nie ma
+jeszcze **żadne** z 108 kryteriów. Streszczenie dla właściciela: [`plan/00-stan-wykonania.md`](plan/00-stan-wykonania.md).
+
+| Oznaczenie | Znaczenie | Liczba kryteriów |
+| --- | --- | ---: |
+| ✅ CI | zielone w testach automatycznych, na atrapach | 38 |
+| ✅ sprzęt | potwierdzone w działającym programie na maszynie właściciela | 0 |
+| 🟡 | zbudowane, czeka na sprzęt, korpus albo klucz | 57 |
+| ⛔ | brak implementacji albo zestawu | 11 |
+| ⚖️ | decyzja właściciela | 2 |
+
+Sprawdzone na laptopie poza macierzą kryteriów (i7-13620H, RTX 4050, Windows 11): start aplikacji i modułów;
+okno główne, ustawienia, panele, kreator i paleta (`apps/desktop/ui/e2e-app`, 11/11 na profilu tymczasowym);
+skala interfejsu powyżej 100 %; ostrzeżenie o zajętym skrócie; wersja, data i commit w „O programie”.
+Nadal niesprawdzone na żadnej maszynie: odpowiedź modelu lokalnego, głos, Broker poza procesem, instalator.
+
+Bramki 2026-10-09: vitest 257/257; Playwright E2E (`PW_WORKERS=4`, Edge) 138 zielonych i 1 czerwony
+(`keyboard.spec.ts` „strumień 100 tok/s” — próg równy stanowi bazowemu, decyzja właściciela); svelte-check 0 błędów;
+lint, `check-css`, `check-svelte5` zielone. Nie uruchomiono: `cargo test --workspace`, clippy, cargo-deny.
+
+Uwagi do tabel niżej: wiersze F5-05…F5-12 mówią „niepodpięte w aplikacji” — to stan sprzed fali 6; funkcje głosu F5
+są podpięte w `app-voice` (luka techniczna nr 3), brakuje pomiarów. Wiersz F0-18 dotyczy dziś 16 ADR-ów
+zaakceptowanych i 8 projektów (0017–0024) czekających na podpis.
+
+Nowy zakres (Linux, panel WWW, Android, dostęp zdalny, nowe funkcje) i jego stan: [`plan/03-roadmapa.md`](plan/03-roadmapa.md).
+Kryteria `ACC-V6-…` dla tego zakresu są na razie szkicami w dokumentach planu; do `ACCEPTANCE.md` trafią
+z progami ustalonymi przez właściciela.
 
 ## Dopisek 2026-10-08 — pierwszy test na laptopie i porządki
 

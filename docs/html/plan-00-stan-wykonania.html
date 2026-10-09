@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>00 — Stan wykonania — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/00-stan-wykonania.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html" aria-current="page">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate&amp;#39;ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#jak-czytac-ten-dokument">Jak czytać ten dokument</a></li><li><a href="#skrot">Skrót</a></li><li><a href="#wersje">Wersje</a></li><li><a href="#sprawdzone-na-laptopie-i7-13620h-rtx-4050-6-gb-windows-11">Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)</a></li><li><a href="#fale-planu-v5">Fale planu v5</a></li><li><a href="#wykonane-i-przetestowane-od-macierzy-z-2026-10-06">Wykonane i przetestowane od macierzy z 2026-10-06</a></li><li><a href="#czego-nie-ma-w-kodzie-z-planu-v5">Czego nie ma w kodzie (z planu v5)</a></li><li><a href="#z-planu-v6">Z planu v6</a></li><li><a href="#znane-problemy">Znane problemy</a></li></ul></aside><article><h1 id="00-stan-wykonania">00 — Stan wykonania</h1>
+<p>Stan na <strong>2026-10-09</strong>, wersja programu <strong>0.0.3</strong>, gałąź <code>ccr-af4b63c6-3fyzaj</code> (commity lokalne, niewypchnięte).
+Źródło prawdy o kryteriach: <a href="status.html"><code>../STATUS.md</code></a>. Liczby o kodzie: <a href="../CATALOG.md"><code>../CATALOG.md</code></a>.
+Opis zmian po ludzku: <a href="changelog.html"><code>../../CHANGELOG.md</code></a>.</p>
+<h2 id="jak-czytac-ten-dokument">Jak czytać ten dokument</h2>
+<div class="tbl"><table><thead><tr><th>Oznaczenie</th><th>Znaczenie</th></tr></thead><tbody><tr><td>✅ CI</td><td>przechodzi w testach automatycznych, na atrapach — <strong>nie</strong> dowodzi działania na prawdziwej maszynie</td></tr>
+<tr><td>✅ sprzęt</td><td>zmierzone albo sprawdzone w działającym programie na laptopie właściciela</td></tr>
+<tr><td>🟡</td><td>zbudowane, czeka na pomiar na sprzęcie, korpus nagrań albo klucz</td></tr>
+<tr><td>⛔</td><td>brak implementacji albo brak zestawu testowego</td></tr></tbody></table></div>
+<h2 id="skrot">Skrót</h2>
+<div class="tbl"><table><thead><tr><th>Miara</th><th>Wartość</th><th>Źródło</th></tr></thead><tbody><tr><td>Kod Rust</td><td>241 crate&#39;ów, 107 modułów, ok. 373 tys. linii, 2514 testów</td><td>CATALOG</td></tr>
+<tr><td>Interfejs (Svelte 5 + TS)</td><td>ok. 46 tys. linii; vitest 257/257; E2E 138 zielonych, 1 czerwony (znany, próg czasowy)</td><td>przebieg 2026-10-09</td></tr>
+<tr><td>Prawdziwa aplikacja na laptopie</td><td>uruchamia się; testy dymne <code>e2e-app</code> 11/11 na profilu tymczasowym (wersja 0.0.2)</td><td>przebieg 2026-10-09</td></tr>
+<tr><td>Kryteria akceptacji F0–F9</td><td>108: 38 ✅ CI · 57 🟡 · 11 ⛔ · 2 do decyzji</td><td>STATUS (macierz z 2026-10-06)</td></tr>
+<tr><td>Kryteria potwierdzone na sprzęcie</td><td><strong>0 z 108</strong></td><td>STATUS</td></tr>
+<tr><td>Model lokalny odpowiada na laptopie</td><td><strong>nie sprawdzone</strong> — brak silnika; czeka na zgodę na pobranie ok. 6 GB</td><td>—</td></tr>
+<tr><td>Głos na żywo</td><td><strong>nie sprawdzone</strong> — jw.</td><td>—</td></tr></tbody></table></div>
+<p>Najważniejsze zdanie tego dokumentu: <strong>kod wszystkich fal F0–F9 istnieje i przechodzi testy automatyczne, ale
+żadna fala nie jest zamknięta na prawdziwej maszynie.</strong> Dlatego etap A roadmapy ma pierwszeństwo przed nowymi
+funkcjami.</p>
+<h2 id="wersje">Wersje</h2>
+<div class="tbl"><table><thead><tr><th>Wersja</th><th>Data</th><th>Co zawiera</th><th>Jak sprawdzone</th></tr></thead><tbody><tr><td>0.0.1</td><td>2026-10-07</td><td>pierwszy stan uruchamialny: kod fal F0–F9</td><td>CI; pierwszy test na laptopie znalazł błędy (brak silnika, skalowanie)</td></tr>
+<tr><td>0.0.2</td><td>2026-10-09</td><td>stabilizacja: skalowanie interfejsu, naprawy z przeglądów rdzenia, narzędzi i stanu interfejsu, porządek w repozytorium</td><td>testy jednostkowe i regresji dla każdej naprawy; E2E; <code>e2e-app</code> 11/11 na prawdziwej aplikacji</td></tr>
+<tr><td>0.0.3</td><td>2026-10-09</td><td>style „Szkło” i „Next” (jasny i ciemny); plan v6 w MD i HTML</td><td>vitest (<code>skin.test.ts</code>), E2E z kontrolą dostępności w czterech kombinacjach (<code>skins.spec.ts</code>), zrzuty wszystkich widoków</td></tr></tbody></table></div>
+<h2 id="sprawdzone-na-laptopie-i7-13620h-rtx-4050-6-gb-windows-11">Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)</h2>
+<p>Tylko to, co naprawdę uruchomiono w zbudowanym programie:</p>
+<div class="tbl"><table><thead><tr><th>Co</th><th>Wynik</th><th>Dowód</th></tr></thead><tbody><tr><td>Start aplikacji, moduły, wykrycie sprzętu (<code>laptop-cuda</code>)</td><td>działa</td><td>logi z 2026-10-07</td></tr>
+<tr><td>Okno główne, ustawienia, panele, kreator, paleta</td><td>działa</td><td><code>apps/desktop/ui/e2e-app</code> 11/11</td></tr>
+<tr><td>Skala interfejsu powyżej 100 % (pole pisania w oknie)</td><td>naprawione i sprawdzone</td><td>test w prawdziwej aplikacji (<code>Ctrl+=</code>)</td></tr>
+<tr><td>Ostrzeżenie o zajętym skrócie globalnym</td><td>widoczne</td><td>STATUS, dopisek 2026-10-08</td></tr>
+<tr><td>Komunikat „model bez silnika” z przyciskiem</td><td>kod i testy; w aplikacji <strong>nie obejrzany</strong></td><td>—</td></tr>
+<tr><td>Kodowanie polskich znaków z PowerShell i <code>cmd</code></td><td>sprawdzone na prawdziwych procesach</td><td><code>platform-windows-impl/tests/shell_utf8.rs</code></td></tr>
+<tr><td>„O programie”: wersja, data i commit kompilacji</td><td>działa (0.0.2)</td><td>zrzut z 2026-10-09</td></tr></tbody></table></div>
+<p>Próba generalna na serwerze CI z Windows (procesor 4 rdzenie, bez karty) zmierzyła: Bielik 4.5B — 6,8 tok/s,
+Bielik 1.5B — 21 tok/s, Piper — współczynnik czasu rzeczywistego 0,34. To pomiary na innej maszynie, nie na
+laptopie właściciela.</p>
+<h2 id="fale-planu-v5">Fale planu v5</h2>
+<div class="tbl"><table><thead><tr><th>Fala</th><th>Zakres</th><th style="text-align:right">✅ CI</th><th style="text-align:right">🟡</th><th style="text-align:right">⛔</th><th style="text-align:right">Do decyzji</th><th>Co blokuje zamknięcie</th></tr></thead><tbody><tr><td>F0 Fundament</td><td>repo, CI, kontrakty rdzenia, ADR-y, spike&#39;i</td><td style="text-align:right">4</td><td style="text-align:right">13</td><td style="text-align:right">0</td><td style="text-align:right">2</td><td>pomiary na sprzęcie; akceptacja makiet i ADR-ów</td></tr>
+<tr><td>F1 Czat</td><td>dostawcy, model lokalny, sesje, router, ustawienia, zasobnik, Szybkie pytanie</td><td style="text-align:right">7</td><td style="text-align:right">6</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td>model lokalny na żywo; budżety RAM i czasu</td></tr>
+<tr><td>F2 Głos i agentki</td><td>potok głosu, przerywanie, cztery persony</td><td style="text-align:right">2</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td>korpus nagrań, odsłuchy, sprzęt</td></tr>
+<tr><td>F3 Jądro bezpieczeństwa</td><td>Broker, okno zgód, watchdog, „Cofnij”, kill-switch, narzędzia</td><td style="text-align:right">6</td><td style="text-align:right">5</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td>zestaw ataków, scenariusz MVP, Jądro poza procesem na maszynie</td></tr>
+<tr><td>F4 Mosty i MCP</td><td>mosty CLI, terminal, MCP</td><td style="text-align:right">3</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td>logowanie do CLI (właściciel)</td></tr>
+<tr><td>F5 Agentki i głos rozszerzony</td><td>agentki równoległe, harmonogram, słowa wywoławcze, dyktowanie</td><td style="text-align:right">5</td><td style="text-align:right">7</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td>korpus i sprzęt</td></tr>
+<tr><td>F6 Sterowanie komputerem</td><td>UIA, ekran, wejście, przeglądarka, Office</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td>decyzja P2-01, pomocnik <code>uiAccess</code>, zestaw zadań</td></tr>
+<tr><td>F7 Pamięć i transfer</td><td>cztery warstwy pamięci, inspektor, kopie</td><td style="text-align:right">5</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td>recall na prawdziwym embedderze, migracje</td></tr>
+<tr><td>F8 Samonaprawa</td><td>diagnosta, ulepszacz, wtyczki Wasm</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td>zamrożony zestaw złośliwych wtyczek</td></tr>
+<tr><td>F9 Dopieszczenie</td><td>dostępność, wydajność, pentest</td><td style="text-align:right">0</td><td style="text-align:right">4</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td>pentest, audyt</td></tr>
+<tr><td><strong>Razem</strong></td><td></td><td style="text-align:right"><strong>38</strong></td><td style="text-align:right"><strong>57</strong></td><td style="text-align:right"><strong>11</strong></td><td style="text-align:right"><strong>2</strong></td><td></td></tr></tbody></table></div>
+<h2 id="wykonane-i-przetestowane-od-macierzy-z-2026-10-06">Wykonane i przetestowane od macierzy z 2026-10-06</h2>
+<p>Pozycje poniżej są w kodzie z testami regresji (✅ CI); te z dopiskiem „sprzęt” sprawdzono też w prawdziwej
+aplikacji. Szczegóły: STATUS, dopisek 2026-10-08/09.</p>
+<div class="tbl"><table><thead><tr><th>Obszar</th><th>Co</th><th>Testy</th></tr></thead><tbody><tr><td>Interfejs</td><td>skalowanie i układ 1280–3840 px; dopasowanie skali do okna; siedem grup ustawień; prawy panel obok rozmowy na laptopie</td><td>E2E <code>responsive.spec.ts</code>; <strong>sprzęt</strong></td></tr>
+<tr><td>Interfejs</td><td>rozmowa otwiera się na ostatniej wiadomości (trzymanie dołu listy)</td><td>E2E; test jednostkowy listy wirtualnej</td></tr>
+<tr><td>Interfejs</td><td>dziewięć napraw logiki stanu (usunięta sesja, szkic, błąd jednego zdarzenia, kolejność pamięci podręcznej…)</td><td><code>state/__tests__/review.test.ts</code></td></tr>
+<tr><td>Interfejs</td><td>style Klasyczny / Szkło / Next w wariancie jasnym i ciemnym</td><td><code>skin.test.ts</code>, <code>skins.spec.ts</code> (axe)</td></tr>
+<tr><td>Rozmowa</td><td>model bez silnika → czytelny błąd i przycisk; edycja z załącznikami; kolejka offline a kosz</td><td>Rust + E2E</td></tr>
+<tr><td>Głos</td><td>„Przeczytaj na głos” (dostęp do schowka); komunikaty o braku silnika; STOP kończy dyktowanie</td><td><code>app-core/tests/review_voice.rs</code></td></tr>
+<tr><td>Narzędzia</td><td>odczyt zakresowy pliku; limit zapisu; nazwy urządzeń Windows; kodowanie wyjścia powłok; kodowanie stron; przekierowania</td><td>testy crate&#39;ów <code>tools-*</code>, <code>platform-windows-impl</code>; część na prawdziwych procesach</td></tr>
+<tr><td>Cofanie</td><td>usuwanie utworzonych katalogów po restarcie; powtarzalne „Cofnij” schowka</td><td><code>undo-journal</code>, <code>tools-clipboard</code></td></tr>
+<tr><td>Modele i kopie</td><td>zwalnianie pamięci po nieudanym starcie; limit czasu ładowania; kopia nie powstaje bez szyfrowania</td><td><code>app-core/tests/review.rs</code></td></tr>
+<tr><td>Porządek</td><td>katalog modułów, README w każdym crate&#39;cie, żaden plik Rust ponad 400 linii, bramki jednym poleceniem</td><td><code>scripts/catalog.mjs</code>, <code>scripts/gates.ps1</code></td></tr>
+<tr><td>Wersjonowanie</td><td>dziennik zmian; „O programie” pokazuje datę i commit</td><td><strong>sprzęt</strong></td></tr></tbody></table></div>
+<h2 id="czego-nie-ma-w-kodzie-z-planu-v5">Czego nie ma w kodzie (z planu v5)</h2>
+<p>Narzędzie Voice Lab w interfejsie, transkrypcja spotkań, adapter chmurowy rozmowy głos–głos, pomocnik
+<code>uiAccess</code>, kamera i mikrofon w narzędziach mediów, dostawca wyszukiwania w sieci, własny pasek tytułu z Mica,
+generator typów TS (ADR 0013), eksport rozmowy do PDF.</p>
+<h2 id="z-planu-v6">Z planu v6</h2>
+<p>Żadna funkcja planu v6 nie jest jeszcze zbudowana. Gotowe są: dokumenty tego katalogu, projekty ADR 0017–0024,
+szkice SPEC dziewięciu modułów, przegląd technologii. Stan zadań: <a href="plan-03-roadmapa.html"><code>03-roadmapa.md</code></a>.</p>
+<h2 id="znane-problemy">Znane problemy</h2>
+<div class="tbl"><table><thead><tr><th>Problem</th><th>Waga</th><th>Stan</th></tr></thead><tbody><tr><td>Model lokalny i głos niesprawdzone na żywo</td><td>wysoka</td><td>czeka na zgodę na pobranie pakietu</td></tr>
+<tr><td>Jądro poza procesem niesprawdzone na żadnej maszynie</td><td>wysoka</td><td>etap A.6</td></tr>
+<tr><td>Analizator poleceń powłoki nie widzi poleceń w cudzysłowie (S-01, S-03)</td><td>wysoka</td><td>decyzja właściciela</td></tr>
+<tr><td>Zmiany Jądra bez przeglądu człowieka</td><td>wysoka</td><td>etap A.8</td></tr>
+<tr><td>Build wydaniowy ma <code>panic = &quot;abort&quot;</code> — strażnik paniki generacji tam nie działa</td><td>średnia</td><td>decyzja właściciela</td></tr>
+<tr><td>Test E2E „strumień 100 tok/s” na granicy progu; test czasowy palety niestabilny</td><td>niska</td><td>decyzja o progu</td></tr>
+<tr><td>Ponad 70 commitów lokalnych niewypchniętych</td><td>—</td><td><code>gh auth login</code> (właściciel)</td></tr></tbody></table></div>
+</article>
+<footer>Źródło: <code>docs/plan/00-stan-wykonania.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

@@ -98,6 +98,8 @@ function specFor(base, specs) {
   return prefixes.sort((a, b) => b.length - a.length)[0] ?? '';
 }
 
+// Moduły planu v6 mają SPEC przed kodem — osobny wiersz w niespójnościach, nie błąd.
+const PLANNED_GROUP = 'Planowane (plan v6)';
 const { specs, groups } = readSpecIndex();
 const crates = readdirSync(CRATES)
   .filter((n) => existsSync(join(CRATES, n, 'Cargo.toml')))
@@ -117,7 +119,12 @@ for (const m of modules.values()) {
   m.lines = m.crates.reduce((s, c) => s + c.lines, 0);
   m.tests = m.crates.reduce((s, c) => s + c.tests, 0);
   // Kontrakt dzielony przez kilka modułów (np. `providers` dla providers-api i providers-local).
-  m.sharedBy = m.spec ? [] : [...specs.keys()].filter((id) => id.startsWith(`${m.base}-`));
+  // SPEC-e modułów planowanych (bez kodu) nie dzielą jeszcze żadnego kontraktu.
+  m.sharedBy = m.spec
+    ? []
+    : [...specs.keys()].filter(
+        (id) => id.startsWith(`${m.base}-`) && specs.get(id).group !== PLANNED_GROUP,
+      );
   const home = m.spec || m.sharedBy[0];
   m.group = home ? specs.get(home).group : EXTRA_GROUPS.find((g) => g.test(m.base)).title;
 }
@@ -182,8 +189,13 @@ for (const group of order) {
 }
 
 // Niespójności — to jest lista zadań porządkowych, nie błędy builda.
+const hasCrate = (id) =>
+  [...modules.values()].some((m) => m.spec === id || m.sharedBy.includes(id));
 const specWithoutCrate = [...specs.keys()].filter(
-  (id) => ![...modules.values()].some((m) => m.spec === id || m.sharedBy.includes(id)),
+  (id) => specs.get(id).group !== PLANNED_GROUP && !hasCrate(id),
+);
+const plannedSpecs = [...specs.keys()].filter(
+  (id) => specs.get(id).group === PLANNED_GROUP && !hasCrate(id),
 );
 const moduleWithoutSpec = [...modules.values()]
   .filter((m) => !m.spec && !m.sharedBy.length && m.crates.some((c) => c.role !== 'single'))
@@ -211,6 +223,7 @@ out.push(
   '| Reguła | Liczba | Pozycje |',
   '| --- | ---: | --- |',
   `| SPEC w indeksie bez crate’a w \`crates/\` (moduły UI i powłoki są poza \`crates/\`) | ${specWithoutCrate.length} | ${list(specWithoutCrate)} |`,
+  `| SPEC modułów planowanych, jeszcze bez kodu (plan v6 — nie niespójność) | ${plannedSpecs.length} | ${list(plannedSpecs)} |`,
   `| Moduł z trójką crate’ów bez SPEC | ${moduleWithoutSpec.length} | ${list(moduleWithoutSpec)} |`,
   `| Crate \`-impl\` bez \`module.toml\` | ${implWithoutManifest.length} | ${list(implWithoutManifest)} |`,
   `| Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | ${implParts.length} | ${list(implParts)} |`,

@@ -4,6 +4,10 @@
 >
 > Wersja 5 — po Twoich sprecyzowaniach i odpowiedziach (użytek osobisty, budowa przez AI, nazwa Alfa, cztery agentki, rozbudowany głos, lekkość i modularność, **sprzęt minimalny (baseline) Ryzen 5 5600 + RX 7600 8 GB + 16 GB RAM + Win11 — tu program ma działać normalnie; Twoje maszyny: desktop RX 9070 XT i laptop RTX 4050**, API do zaawansowanej rozmowy, otwarte mosty, wysoka autonomia, klucze dodawane później, import/eksport zamiast synchronizacji), po trzech niezależnych przeglądach (architektura, szczegóły i UI/UX, roadmapa) i badaniach (29–30.09.2026).
 
+> **Rozszerzenie (2026-10-09):** plan v6 — kolejne systemy (Linux, panel WWW, Android 15+), dostęp zdalny,
+> nowe funkcje i stan wykonania — jest w [`plan/`](plan/README.md). Treść tego dokumentu (wersja 5) pozostaje
+> bez zmian i nadal jest podstawą; ustalenia, które plan v6 zmienia, mają projekty ADR 0017–0024.
+
 ---
 
 ## 0. Kontekst i cel

@@ -2,6 +2,10 @@
 
 Stan na 2026-10-07 (wieczór), laptop RTX 4050; decyzje właściciela i postęp Etapu 0 dopisane 2026-10-08.
 Autor: Claude (Opus 5.5), sesja lokalna na Windows.
+**Aktualizacja 2026-10-09:** etapy 0–8 z tego dokumentu są etapem A i częścią C1 planu v6 —
+[`plan/03-roadmapa.md`](plan/03-roadmapa.md); stan wykonania: [`plan/00-stan-wykonania.md`](plan/00-stan-wykonania.md).
+Liczby w rozdz. 2 to stan z 2026-10-07; aktualne podaje [`CATALOG.md`](CATALOG.md) (241 crate'ów, 2514 testów, 16 ADR-ów
+i 8 projektów).
 Źródła: repozytorium `alfa` (gałąź `ccr-af4b63c6-3fyzaj`, commit `75fee0d`), `docs/STATUS.md`, przeglądy w
 `docs/reviews/`, dzisiejsze logi Alfy z `%LOCALAPPDATA%\Alfa\logs` oraz bramki uruchomione w tej sesji.
 
@@ -151,7 +155,7 @@ szacunek, nie zobowiązanie.
 
 ### Etap 0 — Porządek w środowisku i repozytorium (1–2 sesje)
 
-| # | Zadanie | Stan na 2026-10-08 |
+| # | Zadanie | Stan (aktualizacja 2026-10-09) |
 | - | ------- | ------------------ |
 | 0.1 | Jedna kopia robocza: dysk przenośny E:. | **zrobione** — `node_modules` naprawione, narzędzia (Rust 1.94, Node.js + pnpm, Strawberry Perl, magazyn pnpm) skopiowane do `alfa-narzedzia`, `scripts/portable-env.ps1` i `.sh` |
 | 0.2 | Zwolnić miejsce na E: (26 GB wolnego, 95 % zajęte). Kandydaci: skopiowane z D: wyniki kompilacji powłoki (36 GB, do odtworzenia budową), migawka ZIP z GitHuba, nieużywana kopia `D:\alfa`. | **zrobione 2026-10-09** (zgoda właściciela): stare wyniki kompilacji usunięte `cargo clean` (36 GB na E:, 37 GB na D: oraz 37 GB ukrytej kopii repozytorium w magazynie pnpm), stare katalogi i migawka w Koszu; E: 107 GB wolnego, D: 59 GB |
@@ -162,16 +166,18 @@ szacunek, nie zobowiązanie.
 | 0.7 | Przejrzeć 19 gałęzi Dependabota i 2 gałęzie Copilota. | czeka na 0.3 |
 | 0.8 | Katalog modułów i crate'ów. | **zrobione** — `docs/CATALOG.md` generowany przez `scripts/catalog.mjs`, z listą niespójności |
 | 0.9 | Reguła recenzji zgodna z praktyką (bez Codexa). | **zrobione** — ADR 0016, `AGENTS.md`, `AI_WORKFLOW.md`, odsyłacz w PLAN §4 |
-| 0.10 | Uporządkować niespójności z katalogu: 62 crate'y bez README, 3 pliki ponad 400 linii, 7 crate'ów `-impl` bez `module.toml`, SPEC dla `example-module`. | do zrobienia |
-| 0.11 | Pierwsza pełna budowa powłoki na E: w środowisku przenośnym i zielony komplet `gates.ps1 -Full`. | do zrobienia — wymaga 0.2 |
+| 0.10 | Uporządkować niespójności z katalogu: 62 crate'y bez README, 3 pliki ponad 400 linii, 7 crate'ów `-impl` bez `module.toml`, SPEC dla `example-module`. | **zrobione 2026-10-08/09** poza dwiema pozycjami: `core-bus-impl` bez `module.toml` (Jądro — decyzja właściciela) i brak SPEC dla `example-module` |
+| 0.11 | Pierwsza pełna budowa powłoki na E: w środowisku przenośnym i zielony komplet `gates.ps1 -Full`. | częściowo: powłoka zbudowana na E: (wersje 0.0.2 i 0.0.3), bramki szybkie zielone; `gates.ps1 -Full` (clippy, cały workspace, cargo-deny) nieuruchomione |
 
 Wyjście: jedna kopia robocza, komplet bramek lokalnych przechodzi jednym poleceniem, drzewo git czyste po budowie,
 STATUS i README zgodne z rzeczywistością, katalog bez niespójności.
 
 ### Etap 1 — Pierwsza prawdziwa rozmowa na laptopie (2–3 sesje)
 
-Stan na 2026-10-08: zadania 1.1 i 1.2 zrobione w kodzie i w testach (commit `e594e61`), niesprawdzone jeszcze
-w działającej aplikacji. Poza planem doszły poprawki skalowania interfejsu — opis w `docs/STATUS.md` (dopisek).
+Stan na 2026-10-09: zadania 1.1 i 1.2 zrobione w kodzie i w testach (commit `e594e61`), niesprawdzone jeszcze
+w działającej aplikacji; 1.3 — ostrzeżenie o zajętym skrócie widać w aplikacji; 1.4 czeka na decyzję R-05 i zgodę
+na pobranie pakietu (ok. 6 GB); 1.5–1.6 częściowo — testy prawdziwej aplikacji `e2e-app` 11/11, bez odpowiedzi modelu
+i bez głosu. Poza planem doszły poprawki skalowania interfejsu — opis w `docs/STATUS.md` (dopisek).
 
 | #   | Zadanie                                                                                                                                                                                                      | Kryteria                      |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
@@ -283,9 +289,17 @@ Podjęte 2026-10-07/08:
 
 Otwarte:
 
-1. **Miejsce na E:** — co wolno usunąć (rozdz. 6, zadanie 0.2)? Bez tego pełna budowa i pełne testy się nie zmieszczą.
-2. **`gh auth login`** — bez tego sesja nie widzi CI, PR-ów ani gałęzi Dependabota.
-3. **Commit zmian porządkowych** — zmiany z 2026-10-08 leżą w drzewie roboczym, niezatwierdzone.
+1. ~~Miejsce na E:~~ — rozwiązane 2026-10-09 (107 GB wolnego).
+2. **`gh auth login`** — bez tego sesja nie widzi CI, PR-ów ani gałęzi Dependabota i nie wypchnie commitów.
+3. ~~Commit zmian porządkowych~~ — zatwierdzone lokalnie.
+4. **Zgoda na pobranie pakietu modeli (ok. 6 GB)** — bez niej nie da się sprawdzić rozmowy z modelem ani głosu.
+5. **Ustalenia bezpieczeństwa** czekające na decyzję — lista w [`plan/03-roadmapa.md`](plan/03-roadmapa.md),
+   „Decyzje właściciela, które blokują zadania”.
+6. **Projekty ADR 0017–0024** (plan v6) — do podpisu.
+
+Podjęte 2026-10-09 (plan v6): dostęp zdalny przez przekaźnik z szyfrowaniem end-to-end; zgody zdalne dla wszystkich
+poziomów ryzyka; telefon i panel WWW jako pilot ze 100 % funkcji, bez komputera — rozmowa przez model chmurowy;
+plan v6 obok planu v5. Szczegóły: [`plan/01-wizja-i-zasady.md`](plan/01-wizja-i-zasady.md).
 
 ## 9. Trzy najbliższe sesje
 

@@ -7,7 +7,7 @@ w każdej chwili.
 
 ## Stan tej wersji (październik 2026)
 
-To wersja rozwojowa (0.0.1). Opisujemy tylko to, co jest w aplikacji. Tam, gdzie czegoś brakuje albo trzeba coś
+To wersja rozwojowa (0.0.3; lista zmian: [`CHANGELOG.md`](../../CHANGELOG.md)). Opisujemy tylko to, co jest w aplikacji. Tam, gdzie czegoś brakuje albo trzeba coś
 przygotować samodzielnie, w tekście są oznaczenia:
 
 | Oznaczenie              | Znaczenie                                                                                           |
@@ -16,8 +16,9 @@ przygotować samodzielnie, w tekście są oznaczenia:
 | **Wymaga plików**       | Program lub model trzeba na razie skopiować ręcznie do katalogu Alfy.                               |
 | **Jeszcze niedostępne** | Funkcja jest zaplanowana albo gotowa „pod spodem”, ale aplikacja jej jeszcze nie pokazuje.          |
 
-Najważniejsze ograniczenie: Alfa nie była jeszcze testowana na prawdziwym sprzęcie (mikrofon, karta graficzna,
-okno Brokera jako usługa Windows). Zanim zaczniesz codziennie z niej korzystać, przejdź
+Najważniejsze ograniczenie: na prawdziwym laptopie sprawdzone są dotąd uruchomienie, okna, ustawienia i skalowanie
+interfejsu (2026-10-09). Rozmowa z modelem lokalnym, głos (mikrofon, karta graficzna) i okno Brokera jako usługa
+Windows **nie były jeszcze testowane na sprzęcie**. Zanim zaczniesz codziennie z niej korzystać, przejdź
 [Pierwszy test na Twoim PC](11-pierwszy-test-na-pc.md). Okno zatwierdzeń prowadzi osobny proces Brokera — szczegóły:
 [Bezpieczeństwo](07-bezpieczenstwo.md).
 
