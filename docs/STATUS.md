@@ -177,7 +177,8 @@ niewdrożonych** — [`reviews/2026-10-08-tools-shell-clipboard-net-review.md`](
 Najpoważniejsze: tekst w cudzysłowie ukrywa przed analizatorem poleceń polecenia niszczące i sieciowe (S-01), a
 nierozwiązywalna ścieżka omija deny-listę (S-03). Analizator to polityka bezpieczeństwa — decyzja właściciela.
 
-2026-10-09: z tego raportu wdrożone z testami S-05, S-07, C-01, N-01, N-02 (zwykłe błędy). Pozostają do decyzji
+2026-10-09: z tego raportu wdrożone z testami S-07, C-01, N-01, N-02 oraz S-05 dla PowerShella (test na prawdziwych
+procesach; `cmd.exe` nadal pisze w stronie kodowej OEM — otwarte, opis w raporcie). Pozostają do decyzji
 właściciela: S-01…S-04, S-06, C-02, C-03.
 
 Testy E2E, 2026-10-09: cztery testy czerwone w przebiegu równoległym to w trzech przypadkach obciążenie laptopa — przy

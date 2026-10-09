@@ -57,6 +57,8 @@ windows = { version = "0.62.2", features = [
 # Spójność z bazową deny-listą Jądra (tests/review.rs) — tylko w testach.
 compliance-contract = { path = "../compliance-contract" }
 core-registry-contract.workspace = true
+# Złożenie polecenia powłoki jak w `shell_run` (tests/shell_utf8.rs) — tylko w testach.
+tools-shell-contract = { path = "../tools-shell-contract" }
 proptest.workspace = true
 serde_json.workspace = true
 tempfile = "3.27.0"
