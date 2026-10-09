@@ -183,7 +183,31 @@ export class AppState {
 
   /** Stosuje paczkę zdarzeń (najwyżej raz na klatkę). */
   applyBatch(batch: readonly AlfaEvent[]): void {
-    for (const event of batch) applyEvent(this, event);
+    // Jedno wadliwe zdarzenie nie może zgubić reszty paczki — wśród nich bywa `Stop`, bez którego
+    // tura zostałaby na stałe w stanie „pisze".
+    for (const event of batch) {
+      try {
+        applyEvent(this, event);
+      } catch (error) {
+        logFailure(`zdarzenie ${event.type}`)(error);
+      }
+    }
+  }
+
+  /** Sprzątanie po usuniętej sesji (także usuniętej poza tym oknem): stan per sesja i widok. */
+  async sessionRemoved(id: string): Promise<void> {
+    this.sessions.remove(id);
+    delete this.cache[id];
+    this.cacheOrder = this.cacheOrder.filter((x) => x !== id);
+    delete this.agents[id];
+    delete this.activity[id];
+    if (this.activeId !== id) return;
+    const next = this.sessions.list.find((s) => !s.archived);
+    if (next) await this.openSession(next.id);
+    else {
+      this.sessions.activeId = null;
+      this.conversation = null;
+    }
   }
 
   /** Zdarzenie strumienia do rozmowy sesji (jeśli jest w pamięci podręcznej). */
@@ -232,7 +256,9 @@ export class AppState {
     }
     this.cacheOrder = [id, ...this.cacheOrder.filter((x) => x !== id)];
     for (const old of this.cacheOrder.splice(CACHE_SIZE)) {
-      if (!this.cache[old]?.streaming) delete this.cache[old];
+      // Rozmowa w trakcie strumienia zostaje w kolejce — inaczej po jego końcu nikt by jej nie zwolnił.
+      if (this.cache[old]?.streaming) this.cacheOrder.push(old);
+      else delete this.cache[old];
     }
     return conv;
   }
@@ -250,7 +276,12 @@ export class AppState {
     const loads: Promise<unknown>[] = [this.refreshCosts(), this.loadAgents(id)];
     if (!conv.loaded || conv.loadError) loads.push(conv.load());
     if (this.sessions.drafts[id] === undefined) {
-      loads.push(this.client.sessions.getDraft(id).then((d) => (this.sessions.drafts[id] = d)));
+      loads.push(
+        this.client.sessions.getDraft(id).then((d) => {
+          // Tekst wpisany, zanim przyszła odpowiedź, jest nowszy niż zapisany szkic.
+          if (this.sessions.drafts[id] === undefined) this.sessions.drafts[id] = d;
+        }),
+      );
     }
     const failed = (await Promise.allSettled(loads)).find((r) => r.status === 'rejected');
     // Szybkie przełączanie: spóźnione A nie może nadpisać aktywnej B w rdzeniu.

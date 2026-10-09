@@ -42,7 +42,11 @@ export class ConversationState {
     private readonly hooks: StreamHooks = {},
   ) {}
 
+  /** Zdarzenia, które przyszły w trakcie `load` (`null` — nic się nie wczytuje). */
+  private duringLoad: ChatStreamEvent[] | null = null;
+
   async load(): Promise<void> {
+    this.duringLoad = [];
     try {
       const snapshot = await this.client.turns.list(this.sessionId);
       this.tree = buildTree(snapshot.turns);
@@ -52,6 +56,12 @@ export class ConversationState {
       this.loadError = errorText(error);
     } finally {
       this.loaded = true;
+      const pending = this.duringLoad ?? [];
+      this.duringLoad = null;
+      // Migawka zastąpiła drzewo, do którego trafiły zdarzenia z czasu wczytywania. Odtwarzamy te,
+      // które da się powtórzyć bez szkody (nowa tura, status, koniec, błąd, kroki); delt tekstu
+      // nie — migawka może już je zawierać, a protokół nie niesie numerów kolejnych.
+      for (const event of pending) if (event.type !== 'TextDelta') this.apply(event);
     }
   }
 
@@ -68,6 +78,7 @@ export class ConversationState {
   }
 
   apply(event: ChatStreamEvent): void {
+    this.duringLoad?.push(event);
     if (event.type === 'TurnAppended') {
       if (addTurn(this.tree, event.turn)) {
         const stored = this.tree.turns[event.turn.id];

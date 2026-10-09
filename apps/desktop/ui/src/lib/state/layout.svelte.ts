@@ -24,8 +24,10 @@ export class LayoutState {
   constructor(private readonly persist: (prefs: LayoutPrefs) => void = () => undefined) {}
 
   current(sessionId: string | null): SessionPanels {
+    // Ten sam klucz co w `update`: bez aktywnej sesji (pusta instalacja, usunięta ostatnia
+    // rozmowa) przełączniki paneli zapisywały stan, którego potem nikt nie czytał.
     return (
-      (sessionId ? this.panels[sessionId] : undefined) ?? {
+      this.panels[sessionId ?? '$none'] ?? {
         left_open: this.mode !== 'compact' && this.mode !== 'narrow',
         right_open: this.mode === 'wide',
         right_tab: 'agents',

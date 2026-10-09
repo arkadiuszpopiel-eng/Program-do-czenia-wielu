@@ -50,15 +50,7 @@ export async function deleteSession(app: AppState, id: string): Promise<boolean>
     showError(app.toasts, error);
     return false;
   }
-  app.sessions.remove(id);
-  if (app.activeId === id) {
-    const next = app.sessions.list.find((s) => !s.archived);
-    if (next) await app.openSession(next.id);
-    else {
-      app.sessions.activeId = null;
-      app.conversation = null;
-    }
-  }
+  await app.sessionRemoved(id);
   app.toasts.show({
     kind: 'info',
     message: app.i18n.t('sessions.deleted', { title: session?.title ?? '' }),

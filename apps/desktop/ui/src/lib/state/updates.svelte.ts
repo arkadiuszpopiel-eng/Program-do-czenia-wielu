@@ -29,9 +29,13 @@ export class UpdatesState {
    * odblokowywał się po każdym zdarzeniu, a kliknięcie kończyło się błędem.
    */
   applyEvent(view: UpdatesView): void {
+    this.fromEvent = true;
     const blocked = view.restart_blocked ?? this.view?.restart_blocked ?? null;
     this.view = { ...view, restart_blocked: view.phase === 'ready' ? blocked : null };
   }
+
+  /** Czy stan przyszedł zdarzeniem od ostatniego `load` (wtedy odpowiedź `status` jest starsza). */
+  private fromEvent = false;
 
   hideBanner(): void {
     this.bannerHiddenFor = this.readyVersion;
@@ -39,11 +43,19 @@ export class UpdatesState {
 
   /** Po starcie: stan i „Co nowego" (błąd = brak modułu; UI działa dalej bez aktualizacji). */
   async load(api: UpdatesApi): Promise<void> {
+    this.fromEvent = false;
     try {
-      this.view = await api.status();
+      const view = await api.status();
+      // Zdarzenie, które przyszło w trakcie pytania o stan, jest nowsze niż odpowiedź.
+      if (!this.fromEvent) this.view = view;
+    } catch {
+      if (!this.fromEvent) this.view = null;
+    }
+    // Osobno: błąd „Co nowego" nie może skasować informacji, że wersja czeka na restart.
+    try {
       this.whatsNew = await api.whatsNew();
     } catch {
-      this.view = null;
+      this.whatsNew = null;
     }
   }
 

@@ -80,6 +80,8 @@ export class SessionsState {
   remove(id: string): void {
     this.list = this.list.filter((s) => s.id !== id);
     this.mru = this.mru.filter((x) => x !== id);
+    this.closed = this.closed.filter((x) => x !== id);
+    delete this.drafts[id];
   }
 
   touch(id: string): void {
@@ -106,8 +108,12 @@ export class SessionsState {
     return this.recent().find((x) => x !== id);
   }
 
+  /** Ostatnio zamknięta karta, która nadal istnieje (usunięte w międzyczasie są pomijane). */
   reopen(): string | undefined {
-    return this.closed.pop();
+    for (;;) {
+      const id = this.closed.pop();
+      if (id === undefined || this.list.some((s) => s.id === id)) return id;
+    }
   }
 
   private recent(): string[] {

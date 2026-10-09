@@ -11,6 +11,7 @@ export const logFailure =
 /** Opóźnienie per klucz: kolejne wywołanie przed upływem `ms` zastępuje poprzednie. */
 export class Debouncer {
   private readonly pending: Record<string, ReturnType<typeof setTimeout>> = {};
+  private readonly tasks: Record<string, () => void> = {};
 
   constructor(private readonly ms: number) {}
 
@@ -21,14 +22,23 @@ export class Debouncer {
       task();
       return;
     }
+    this.tasks[key] = task;
     this.pending[key] = setTimeout(() => {
       delete this.pending[key];
+      delete this.tasks[key];
       task();
     }, this.ms);
   }
 
+  /** Wykonuje zaległe zadania od razu: zmiana z ostatnich `ms` przed zamknięciem nie przepada. */
   dispose(): void {
-    for (const handle of Object.values(this.pending)) clearTimeout(handle);
+    for (const [key, handle] of Object.entries(this.pending)) {
+      clearTimeout(handle);
+      delete this.pending[key];
+      const task = this.tasks[key];
+      delete this.tasks[key];
+      task?.();
+    }
   }
 }
 

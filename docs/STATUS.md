@@ -207,6 +207,25 @@ Przegląd `lib-netguard` (blokowanie adresów lokalnych i prywatnych, osobna ses
 Modele i silniki: licznik pozycji pokazywał „0 pozycji” w trakcie wczytywania katalogu (przez to test dymny prawdziwej
 aplikacji bywał czerwony) — licznik pojawia się teraz po wczytaniu; `e2e-app` 11/11 w trzech kolejnych przebiegach.
 
+Przegląd logiki stanu interfejsu (2026-10-09, osobna sesja, tylko odczyt) — 10 ustaleń, 9 wdrożonych z testami
+(`state/__tests__/review.test.ts`):
+
+- sesja usunięta poza tym oknem zostawała „aktywna” z martwą rozmową — teraz ta sama ścieżka co usunięcie w oknie
+  (`AppState::sessionRemoved`), ze sprzątaniem stanu per sesja;
+- przełączniki paneli bez aktywnej sesji nie działały (zapis i odczyt pod różnymi kluczami);
+- „Przywróć zamkniętą kartę” mogło otworzyć usuniętą sesję;
+- wyjątek w jednym zdarzeniu gubił resztę paczki (także `Stop` — tura na stałe „pisze”);
+- błąd „Co nowego” kasował informację o gotowej aktualizacji; starsza odpowiedź nadpisywała nowsze zdarzenie;
+- rozmowa w trakcie strumienia wypadała z kolejki pamięci podręcznej i nigdy nie była zwalniana;
+- zapisany szkic nadpisywał tekst wpisany tuż po otwarciu sesji;
+- zamknięcie okna porzucało szkic i układ z ostatnich 400 ms;
+- zdarzenia kończące turę, które przyszły w trakcie wczytywania rozmowy, przepadały.
+
+Otwarte z tego przeglądu: delty tekstu z czasu wczytywania rozmowy nadal mogą zginąć albo się zdublować — protokół nie
+niesie numerów kolejnych, więc naprawa wymaga zmiany w rdzeniu (DTO zdarzeń); to samo okno przy starcie (lista sesji
+nadpisuje zdarzenia sprzed odpowiedzi). Niezweryfikowane podejrzenia: spóźniona delta po `Stop` przywraca status
+„pisze”; ponowny `start()` klienta Tauri dokłada nasłuchy.
+
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
 i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie

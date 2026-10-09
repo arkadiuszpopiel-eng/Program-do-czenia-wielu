@@ -11,7 +11,7 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       app.sessions.upsert(event.session);
       break;
     case 'SessionRemoved':
-      app.sessions.remove(event.session_id);
+      void app.sessionRemoved(event.session_id);
       break;
     case 'AgentsChanged':
       app.agents[event.session_id] = [...event.agents];
