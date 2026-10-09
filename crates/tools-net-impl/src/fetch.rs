@@ -83,13 +83,15 @@ impl Core {
         let resp = &opened.response;
         let max_chars = a.max_chars.unwrap_or(self.config.max_chars) as usize;
         let (page, chars_cut) = match (textual(resp.content_type.as_deref()), method) {
-            (true, HttpMethod::Get) => match text::decode_text(&body) {
-                Some(t) => {
-                    let (t, c) = text::truncate_chars(&text::redact_secrets(&t), max_chars);
-                    (Some(t), c)
+            (true, HttpMethod::Get) => {
+                match crate::charset::decode_page(&body, resp.content_type.as_deref()) {
+                    Some(t) => {
+                        let (t, c) = text::truncate_chars(&text::redact_secrets(&t), max_chars);
+                        (Some(t), c)
+                    }
+                    None => (None, false),
                 }
-                None => (None, false),
-            },
+            }
             _ => (None, false),
         };
         let out = FetchOut {

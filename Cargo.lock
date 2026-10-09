@@ -6331,6 +6331,7 @@ dependencies = [
  "core-bus-contract",
  "core-bus-fake",
  "core-registry-contract",
+ "encoding_rs",
  "lib-netguard",
  "platform-apps-contract",
  "platform-apps-fake",
