@@ -189,6 +189,11 @@ i zdejmowanie elementów przez wirtualną listę po zmierzeniu wysokości (`chil
 przebiegu są co najmniej dwie takie klatki, czyli test stoi na samym limicie). Kod produktu bez zmian; do decyzji
 właściciela: liczyć w teście tylko zmiany treści wiadomości albo podnieść limit.
 
+Interfejs, 2026-10-09: separator „·” przyklejał się do poprzedniego słowa w siedmiu plikach („6 zdarzeń· Koszt”) —
+naprawione, a `scripts/check-svelte5.mjs` ma regułę, która ten wzorzec wykrywa. Mosty CLI: opis trasy bez powtórzonego
+zdania. Test jednostkowy „przełączenie sesji 1000 wiadomości” (limit 150 ms) bywa czerwony na tym laptopie; zmierzony czas
+to 6–16 ms, więc to chwilowe zacięcia maszyny, nie kod.
+
 Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): `gates.ps1` zielone, vitest 243/243, `e2e-app` 11/11
 po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
 i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie
