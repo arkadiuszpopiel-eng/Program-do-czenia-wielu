@@ -28,5 +28,6 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0022](0022-zgody-zdalne-dowod-urzadzenia-sparowanego.md) | Zgody zdalne: dowód urządzenia sparowanego (`PairedDevice`) | **Proponowany** |
 | [0023](0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.md) | Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów | **Proponowany** |
 | [0024](0024-licencja-silnika-mowy.md) | Licencja silnika mowy (następca Pipera na GPL-3.0) | **Proponowany** |
+| [0025](0025-kamery-i-biometria-twarzy.md) | Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją | **Proponowany** |
 
 Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u. **Proponowany** — projekt przygotowany przez sesję AI; nie obowiązuje do podpisu właściciela.

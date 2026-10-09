@@ -32,6 +32,21 @@ Sprzęt bazowy: laptop i7-13620H, RTX 4050 z 6 GB pamięci karty, 16 GB RAM.
 Zasada dla całej grupy: **Broker pozostaje jedynym wykonawcą**. Wbudowane narzędzia `llama-server` (`--tools`,
 własna obsługa MCP) pozostają wyłączone — ominęłyby zgody i dziennik.
 
+## Kamery, osoby i obraz
+
+Pełny opis: [`12-kamery-i-rozpoznawanie-osob.md`](12-kamery-i-rozpoznawanie-osob.md).
+
+| ID | Funkcja | Co daje | Technologia | Pewność |
+| --- | --- | --- | --- | --- |
+| C3.1–C3.5 | System kamer | kilka kamer naraz: wbudowana, na USB, sieciowa po kablu i Wi-Fi; podgląd, nazwy, przełączniki, wskaźnik w belce | Media Foundation (USB), RTSP i ONVIF (sieć), dekoder w osobnym procesie | U |
+| C3.6–C3.7 | „Opisz mi to, co widzisz” | Alfa opisuje obraz z kamery i odpowiada na pytania o niego | model z wejściem obrazowym: lokalnie przez `llama-server` albo w chmurze za zgodą | P (tryb obrazu `llama-server` — eksperymentalny) / U (wybór modelu) |
+| C3.8–C3.10 | Rozpoznawanie zapisanych osób | Alfa wie, kto przed nią siedzi, i wita po imieniu; nieznana osoba to gość | wykrywanie i wzorzec twarzy na procesorze (ONNX Runtime — już w stosie) | U (modele i ich licencje) |
+| C3.11–C3.12 | Pamięć osób | Alfa pamięta każdą zapisaną osobę i to, o czym z nią rozmawiała — także po ponownym uruchomieniu | istniejący moduł pamięci + wymiar „czyje to” | — |
+| C3.13 | Twarz i głos razem | pewniejsze rozpoznanie rozmówcy; rozbieżność = pytanie zamiast zgadywania | moduł `voice-speaker` (już w kodzie) | — |
+
+Zasada dla całej grupy: **rozpoznanie twarzy to personalizacja, nie logowanie** — nie zatwierdza niczego
+w Brokerze. Wzorce twarzy powstają tylko za zgodą osoby i nie opuszczają komputera (projekt ADR 0025).
+
 ## Wiele urządzeń
 
 | ID | Funkcja | Co daje | Technologia | Pewność |
@@ -85,6 +100,9 @@ Poza zakresem: wspólny magazyn kluczy dla zespołu i logowanie jednokrotne — 
 | Modelu lokalnego w telefonie | decyzja właściciela; polskiego modelu tej wielkości dziś nie potwierdziliśmy | telefon jako pilot; bez komputera — model chmurowy |
 | Rozmycia tła w stylu „Szkło” | reguła projektu zabrania `backdrop-filter` (wydajność WebView2) | półprzezroczyste tafle na barwnej poświacie |
 | Pełnej funkcjonalności bez komputera | narzędzia, pamięć i pliki są na komputerze | sama rozmowa przez API; reszta wraca z połączeniem |
+- **Kamery:** opis obrazu modelem lokalnym może nie zmieścić się w 6 GB razem z modelem rozmowy — wtedy model
+  widzący ładuje się tylko na czas pytania. Alfa nie prowadzi ciągłej obserwacji ani nagrywania i nie rozpoznaje
+  osób, które się nie zapisały.
 
 ## Sprawy do rozstrzygnięcia przed wdrożeniem
 

@@ -43,6 +43,15 @@ obowiązków jej nie dotyczy — ale projektujemy tak, żeby wydanie nie wymaga�
 | Aplikacja w sklepie | regulaminy sklepów, deklaracje o danych | decyzja właściciela (F.8) |
 | Nagrywanie głosu osób trzecich | zgoda rozmówców to obowiązek użytkownika | wyraźny wskaźnik nagrywania; opis w przewodniku |
 
+## Kamery i biometria (grupa C3)
+
+| Temat | Co z niego wynika dla Alfy |
+| --- | --- |
+| Wzorzec twarzy = dane biometryczne (RODO, art. 9) | wyraźna zgoda każdej zapisywanej osoby, dane tylko lokalnie i zaszyfrowane, łatwe usunięcie (projekt ADR 0025) |
+| Użytek domowy a inne osoby w kadrze | kamery domyślnie wyłączone, brak nagrywania, brak wzorców osób niezapisanych |
+| AI Act: zakaz rozpoznawania emocji w pracy i szkole, zakaz baz twarzy z niecelowanego pobierania | Alfa nie ocenia emocji i nie buduje wzorców bez zapisu — do potwierdzenia przez prawnika |
+| Obraz wysyłany do dostawcy w chmurze | osobna zgoda per kamera, nigdy w sesji prywatnej, widoczny odbiorca |
+
 ## Pytania do prawnika
 
 1. Czy Alfa — asystent na komputer, rozprowadzany bezpłatnie albo odpłatnie — podlega Europejskiemu Aktowi
@@ -54,6 +63,9 @@ obowiązków jej nie dotyczy — ale projektujemy tak, żeby wydanie nie wymaga�
 4. Licencja GPL-3.0 silnika mowy uruchamianego jako osobny proces — skutki dla licencji Alfy (ADR 0024).
 5. Licencje modeli (część wariantów PLLuM jest niekomercyjna) i głosów (każdy głos Pipera ma własną).
 6. Status prowadzącego przekaźnik: administrator czy podmiot przetwarzający; czy potrzebna ocena skutków.
+- Kamery (C3): czy rozpoznawanie zapisanych domowników i gości mieści się w wyjątku użytku domowego; jakie
+  obowiązki dochodzą, gdy program jest używany w firmie; czy rozpoznawanie rozmówcy podlega przepisom AI Act
+  o identyfikacji biometrycznej.
 
 ## Zasada na co dzień
 

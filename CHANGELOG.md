@@ -8,6 +8,30 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.15 — 2026-10-09
+
+Zlecenie właściciela: dopisać do planu prac system kamer, rozpoznawanie użytkowników z pamięcią i opis obrazu.
+
+### Plan
+
+- W planie jest nowa grupa zadań „Kamery, rozpoznawanie osób i opis obrazu” (C3, 15 zadań): kamery USB, IP i Wi-Fi,
+  kilka naraz, przez osobny system kamer z podglądem, przełącznikami i wskaźnikiem w belce.
+- Zaplanowane jest polecenie „opisz mi to, co widzisz”: Alfa bierze klatkę z kamery i opisuje ją modelem lokalnym
+  albo — za osobną zgodą — modelem w chmurze.
+- Zaplanowane jest rozpoznawanie zapisanych osób po twarzy i pamięć długoterminowa każdej osoby: kim jest i o czym
+  Alfa z nią rozmawiała, także po ponownym uruchomieniu programu.
+- Zasady prywatności są spisane jako projekt decyzji (ADR 0025): kamery domyślnie wyłączone, bez nagrywania, wzorce
+  twarzy tylko za zgodą osoby i tylko na komputerze, a rozpoznanie twarzy nigdy nie zastępuje zgody w Brokerze.
+- To jest plan — w programie nic się jeszcze nie zmieniło. Kamery i opis obrazu mogą ruszyć od razu; rozpoznawanie
+  osób czeka na podpis pod ADR 0025.
+
+### Dokumenty
+
+- Nowe: `docs/plan/12-kamery-i-rozpoznawanie-osob.md`, szkice SPEC `camera-hub`, `vision-describe`,
+  `person-recognition`, `person-memory`, projekt `docs/ADR/0025-kamery-i-biometria-twarzy.md`.
+- Uzupełnione: roadmapa (C3 i decyzje blokujące), katalog funkcji, zgodność prawna, przegląd technologii (rozdział 10 —
+  bez przeglądu źródeł, wszystko oznaczone jako niesprawdzone).
+
 ## 0.0.14 — 2026-10-09
 
 Zgłoszenia właściciela: pasek LED wchodzi na elementy belki, brak ekranu ładowania, ikony agentek do solidnej

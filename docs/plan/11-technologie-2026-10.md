@@ -113,6 +113,22 @@ podział pracy na podagentów, zgody i dziennik działań. Alfa ma już w kodzie
 pamięć z inspektorem, MCP, umiejętności, Broker z dziennikiem); plan v6 dodaje brakujące (C2.5–C2.8).
 Wyróżnik Alfy, który jest realny na sprzęcie bazowym: działanie w całości lokalnie po polsku i jawny Broker.
 
+## 10. Kamery i obraz (dopisane 2026-10-09 — bez przeglądu źródeł)
+
+Ten rozdział powstał razem ze zleceniem C3 i **nie był sprawdzany w źródłach** — wszystko ma etykietę U albo
+odwołuje się do pozycji sprawdzonych wyżej. Przegląd źródeł jest pierwszym krokiem zadań C3.5, C3.6 i C3.8.
+
+| Technologia | Stan | Pewność | Wniosek dla Alfy |
+| --- | --- | --- | --- |
+| Media Foundation (kamery USB na Windows) | interfejs systemowy Windows | U | przez `windows-rs` wyłącznie w `platform-windows-impl`, za portem `CameraPort` |
+| RTSP (strumień kamer sieciowych) | powszechny w kamerach IP i Wi-Fi | U | dekoder w osobnym procesie; kandydat: `ffmpeg` (już sidecar `tools-media`) albo biblioteka w Rust |
+| ONVIF (wyszukiwanie i opis kamer w sieci) | standard branżowy | U | tylko sieć lokalna; zakres uzgodnić z regułą „bez nasłuchu” |
+| Obraz w `llama-server` | istnieje, eksperymentalny (patrz rozdział 1) | P | droga lokalna opisu obrazu; pomiar pamięci na 6 GB |
+| Modele lokalne z wejściem obrazowym na 6 GB | patrz rozdział 2 (Qwen3.5-4B do obrazu) | W | wybór po pomiarze (C3.6) |
+| Modele chmurowe z wejściem obrazowym | dostępne u głównych dostawców | U | droga za zgodą; sprawdzić ceny i zasady przechowywania obrazów |
+| Wykrywanie twarzy i wzorzec twarzy w ONNX | wiele otwartych modeli | U | **licencje**: część popularnych modeli jest tylko do badań — sprawdzić przed C3.8 |
+| Wykrywanie żywej twarzy (ochrona przed zdjęciem) | istnieją modele i metody | U | decyzja w SPEC v1 `person-recognition` |
+
 ## Do sprawdzenia przed wdrożeniem
 
 1. Bielik v3: długość kontekstu, zachowanie przy wywołaniach narzędzi, tok/s na RTX 4050.
