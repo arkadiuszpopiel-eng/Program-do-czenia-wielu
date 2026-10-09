@@ -7,7 +7,7 @@ w każdej chwili.
 
 ## Stan tej wersji (październik 2026)
 
-To wersja rozwojowa (0.0.4; lista zmian: [`CHANGELOG.md`](../../CHANGELOG.md)). Opisujemy tylko to, co jest w aplikacji. Tam, gdzie czegoś brakuje albo trzeba coś
+To wersja rozwojowa (0.0.5; lista zmian: [`CHANGELOG.md`](../../CHANGELOG.md)). Opisujemy tylko to, co jest w aplikacji. Tam, gdzie czegoś brakuje albo trzeba coś
 przygotować samodzielnie, w tekście są oznaczenia:
 
 | Oznaczenie              | Znaczenie                                                                                           |

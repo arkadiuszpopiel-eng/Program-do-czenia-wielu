@@ -8,6 +8,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod about;
+mod changelog;
 mod schedule;
 mod view;
 
@@ -272,6 +273,12 @@ impl UpdatesApp {
             self.dismiss_whats_new().await?;
             return Ok(None);
         }
+        // Wersja bez notatek w paczce (np. budowa lokalna): skrót wpisu z wbudowanego dziennika zmian.
+        let notes = if notes.trim().is_empty() {
+            changelog::notes_for(&version.to_string()).unwrap_or_default()
+        } else {
+            notes
+        };
         Ok(Some(WhatsNew {
             version: version.to_string(),
             notes,

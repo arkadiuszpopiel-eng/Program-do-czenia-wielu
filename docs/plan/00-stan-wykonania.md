@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-09**, wersja programu **0.0.4**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-09**, wersja programu **0.0.5**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -37,6 +37,7 @@ funkcjami.
 | 0.0.2 | 2026-10-09 | stabilizacja: skalowanie interfejsu, naprawy z przeglądów rdzenia, narzędzi i stanu interfejsu, porządek w repozytorium | testy jednostkowe i regresji dla każdej naprawy; E2E; `e2e-app` 11/11 na prawdziwej aplikacji |
 | 0.0.3 | 2026-10-09 | style „Szkło” i „Next” (jasny i ciemny); plan v6 w MD i HTML | vitest (`skin.test.ts`), E2E z kontrolą dostępności w czterech kombinacjach (`skins.spec.ts`), zrzuty wszystkich widoków |
 | 0.0.4 | 2026-10-09 | własne listy wyboru i pozostałe kontrolki w stylu Alfy (zgłoszenie właściciela: nieczytelna lista systemowa w stylu „Szkło”) | E2E: lista otwarta w 6 kombinacjach stylu i motywu; test w prawdziwej aplikacji; zrzuty stanu otwartego |
+| 0.0.5 | 2026-10-09 | okno „Co nowego” pokazuje skrót poprawek z dziennika zmian | testy `app-updates` (skrót wpisu; wpis istnieje dla uruchamianej wersji) |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 

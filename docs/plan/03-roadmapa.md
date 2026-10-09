@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.4). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.5). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -25,6 +25,7 @@ Szczegółowe zadania: [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §6, etapy 0–3
 | A.2 | Naprawy z przeglądów rdzenia, narzędzi i stanu interfejsu | zrobione | 2026-10-09 | wersja 0.0.2; lista w `CHANGELOG.md` |
 | A.3 | Style interfejsu „Szkło” i „Next” (jasny i ciemny) | zrobione | 2026-10-09 | wersja 0.0.3; `e2e/skins.spec.ts` |
 | A.3a | Własne listy wyboru i pozostałe kontrolki w stylu Alfy (bez kontrolek systemowych) | zrobione | 2026-10-09 | wersja 0.0.4; błąd zgłoszony przez właściciela; testy listy otwartej w 6 kombinacjach + prawdziwa aplikacja |
+| A.3b | Okno „Co nowego” ze skrótem poprawek z dziennika zmian | zrobione | 2026-10-09 | wersja 0.0.5; zgłoszenie właściciela; test pilnuje wpisu dla każdej wersji |
 | A.4 | Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1) | czeka | — | zgoda właściciela na pobranie pakietu ok. 6 GB |
 | A.5 | Głos na żywo: dyktowanie i czytanie | czeka | — | po A.4 (te same silniki w pakiecie) |
 | A.6 | Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2) | czeka | — | po A.4 |

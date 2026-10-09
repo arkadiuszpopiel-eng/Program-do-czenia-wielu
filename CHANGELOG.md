@@ -1,9 +1,25 @@
 # Dziennik zmian Alfy
 
-Każda seria poprawek podnosi numer wersji i dostaje wpis w tym pliku — po ludzku, od najnowszej. Numer jest w
+Każda seria poprawek podnosi numer wersji i dostaje wpis w tym pliku — po ludzku, od najnowszej. Wpis jest też
+źródłem okna „Co nowego” w programie (wstęp i pierwsze zdanie każdej pozycji; sekcje „Testy” i „Przyczyna błędu”
+są tam pomijane), więc pierwsze zdanie pozycji ma mówić, co się zmieniło dla użytkownika. Numer jest w
 czterech miejscach naraz: `Cargo.toml` (workspace), `apps/desktop/src-tauri/Cargo.toml`,
 `apps/desktop/src-tauri/tauri.conf.json`, `apps/desktop/ui/package.json`. Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
+
+## 0.0.5 — 2026-10-09
+
+Okno „Co nowego” pokazuje krótką listę poprawek.
+
+### Interfejs
+
+- Po zmianie wersji okno „Co nowego” wypisuje skrót zmian tej wersji. Wcześniej, gdy wersja nie miała dołączonych
+  notatek (każda budowa lokalna), było tam tylko „Zaktualizowano Alfę do wersji…”.
+- Skrót powstaje z tego dziennika zmian, wbudowanego w program: zdanie wstępu i pierwsze zdanie każdej pozycji.
+
+### Testy
+
+- Test pilnuje, że uruchamiana wersja ma w dzienniku wpis z listą zmian — podbicie numeru bez opisu nie przejdzie.
 
 ## 0.0.4 — 2026-10-09
 
