@@ -324,14 +324,16 @@ impl ClipboardUndo for ClipboardTools {
         if current != ledger.entries[pos].2 {
             return Err(ClipboardUndoError::Conflict);
         }
-        let (_, previous, _) = ledger
-            .entries
-            .remove(pos)
-            .ok_or(ClipboardUndoError::Unknown(id))?;
+        // Najpierw przywrócenie, potem usunięcie wpisu: zajęty schowek (częste na Windows) zostawiał
+        // rejestr bez wpisu — druga próba „Cofnij" kończyła się „nieznany wpis", a poprzednia
+        // zawartość przepadała.
+        let previous = ledger.entries[pos].1.clone();
         self.core
             .clipboard
             .set(previous)
-            .map_err(|e| ClipboardUndoError::Platform(e.to_string()))
+            .map_err(|e| ClipboardUndoError::Platform(e.to_string()))?;
+        ledger.entries.remove(pos);
+        Ok(())
     }
 }
 

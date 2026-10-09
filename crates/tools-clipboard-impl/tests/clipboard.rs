@@ -155,3 +155,66 @@ async fn l3_without_grant_asks_and_respects_denial() {
     ));
     assert_eq!(clip.get().unwrap(), ClipboardContent::Text("stare".into()));
 }
+
+/// Schowek, którego ustawienie raz się nie udaje (inny program trzyma go otwartego).
+struct BusyOnce {
+    inner: FakeClipboard,
+    busy: std::sync::atomic::AtomicBool,
+}
+
+impl ClipboardPort for BusyOnce {
+    fn get(&self) -> Result<ClipboardContent, platform_contract::PlatformError> {
+        self.inner.get()
+    }
+    fn set(&self, content: ClipboardContent) -> Result<(), platform_contract::PlatformError> {
+        if self.busy.swap(false, std::sync::atomic::Ordering::SeqCst) {
+            return Err(platform_contract::PlatformError::Unsupported(
+                "schowek zajęty".into(),
+            ));
+        }
+        self.inner.set(content)
+    }
+    fn restore_previous(&self) -> Result<bool, platform_contract::PlatformError> {
+        self.inner.restore_previous()
+    }
+}
+
+/// C-01 (docs/reviews/2026-10-08-tools-shell-clipboard-net-review.md): nieudane przywrócenie nie
+/// gubi wpisu — ponowne „Cofnij” przywraca poprzednią zawartość.
+#[tokio::test]
+async fn failed_undo_keeps_the_entry_for_a_retry() {
+    let env = PathEnv::windows_profile("/Users/ala");
+    let clip = Arc::new(BusyOnce {
+        inner: FakeClipboard::default(),
+        busy: std::sync::atomic::AtomicBool::new(false),
+    });
+    clip.set(ClipboardContent::Text("stare".into())).unwrap();
+    let policy = KernelPolicy::baseline("/Users/ala", "/ProgramData/AlfaBroker").unwrap();
+    let broker = Arc::new(
+        FakeBroker::with(policy, env.clone(), Arc::new(ManualClock::new(1_000_000))).unwrap(),
+    );
+    broker.script("tools-clipboard.write", ScriptedDecision::Allow);
+    let t = ClipboardTools::new(ClipboardToolsDeps {
+        clipboard: clip.clone(),
+        broker,
+        env,
+        deny: DenyLists::baseline(),
+        config: ClipboardToolsConfig::default(),
+        bus: None,
+    });
+    let undo = tool(&t, 1)
+        .call(json!({"text": "nowe"}), &ctx())
+        .await
+        .undo
+        .unwrap();
+
+    clip.busy.store(true, std::sync::atomic::Ordering::SeqCst);
+    assert!(matches!(
+        t.undo(undo.id),
+        Err(ClipboardUndoError::Platform(_))
+    ));
+    assert_eq!(clip.get().unwrap(), ClipboardContent::Text("nowe".into()));
+    t.undo(undo.id).unwrap();
+    assert_eq!(clip.get().unwrap(), ClipboardContent::Text("stare".into()));
+    assert_eq!(t.undo(undo.id), Err(ClipboardUndoError::Unknown(undo.id)));
+}

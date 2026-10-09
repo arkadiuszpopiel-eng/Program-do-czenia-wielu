@@ -200,10 +200,18 @@ pub struct ShellTools {
     core: Arc<Core>,
 }
 
+/// Środowisko procesu jako tekst. `std::env::vars()` panikuje, gdy nazwa albo wartość nie jest
+/// poprawnym Unicode — takie zmienne są pomijane (i tak nie dałoby się ich przekazać dalej).
+fn process_env() -> Vec<(String, String)> {
+    std::env::vars_os()
+        .filter_map(|(name, value)| Some((name.into_string().ok()?, value.into_string().ok()?)))
+        .collect()
+}
+
 impl ShellTools {
     /// Zestaw nad zależnościami.
     pub fn new(deps: ShellToolsDeps) -> Self {
-        let base_env = deps.base_env.unwrap_or_else(|| std::env::vars().collect());
+        let base_env = deps.base_env.unwrap_or_else(process_env);
         Self {
             core: Arc::new(Core {
                 deny: DenyChecker::new(deps.deny, &deps.env),
@@ -272,6 +280,18 @@ impl Tool for ShellTool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// S-07 (docs/reviews/2026-10-08-tools-shell-clipboard-net-review.md): środowisko procesu
+    /// czytane bez paniki; zwykłe zmienne są na liście.
+    #[test]
+    fn process_env_lists_text_variables() {
+        let env = process_env();
+        assert!(
+            env.iter()
+                .any(|(name, _)| name.eq_ignore_ascii_case("PATH"))
+        );
+        assert!(env.iter().all(|(name, _)| !name.is_empty()));
+    }
 
     #[test]
     fn module_manifest_parses() {

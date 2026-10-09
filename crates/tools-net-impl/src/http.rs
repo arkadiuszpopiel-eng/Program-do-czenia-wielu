@@ -60,11 +60,25 @@ impl BodyReader for Body {
     }
 }
 
+/// Limit długości nagłówka przekazywanego dalej (znaki).
+const HEADER_MAX: usize = 2_048;
+
 fn header(resp: &reqwest::Response, name: reqwest::header::HeaderName) -> Option<String> {
     resp.headers()
         .get(name)
         .and_then(|v| v.to_str().ok())
-        .map(|s| s.chars().take(2_048).collect())
+        .map(|s| s.chars().take(HEADER_MAX).collect())
+}
+
+/// Cel przekierowania w całości albo odmowa: adres obcięty do limitu nagłówka byłby innym
+/// adresem niż ten, który podał serwer.
+fn location(value: Option<&str>) -> Result<Option<String>, NetError> {
+    match value {
+        Some(v) if v.chars().count() > HEADER_MAX => Err(NetError::Blocked(format!(
+            "cel przekierowania dłuższy niż {HEADER_MAX} znaków"
+        ))),
+        other => Ok(other.map(str::to_owned)),
+    }
 }
 
 #[async_trait]
@@ -88,7 +102,7 @@ impl HttpPort for ReqwestHttp {
             status: resp.status().as_u16(),
             content_type: header(&resp, CONTENT_TYPE),
             content_length: resp.content_length(),
-            location: header(&resp, LOCATION),
+            location: location(resp.headers().get(LOCATION).and_then(|v| v.to_str().ok()))?,
             content_disposition: header(&resp, CONTENT_DISPOSITION),
             body: Box::new(Body(resp)),
         })
@@ -117,6 +131,20 @@ mod tests {
     use lib_netguard::client::LookupFuture;
 
     use super::*;
+
+    /// N-02 (docs/reviews/2026-10-08-tools-shell-clipboard-net-review.md): za długi cel
+    /// przekierowania to odmowa — obcięty adres byłby innym adresem.
+    #[test]
+    fn overlong_redirect_target_is_refused_not_truncated() {
+        assert_eq!(location(None).ok(), Some(None));
+        let short = "https://example.org/a?b=c";
+        assert_eq!(location(Some(short)).ok(), Some(Some(short.to_owned())));
+        let limit = format!("https://example.org/{}", "a".repeat(HEADER_MAX - 20));
+        assert_eq!(limit.chars().count(), HEADER_MAX);
+        assert_eq!(location(Some(&limit)).ok(), Some(Some(limit.clone())));
+        let long = format!("{limit}x");
+        assert!(matches!(location(Some(&long)), Err(NetError::Blocked(_))));
+    }
 
     struct Answers(Mutex<Vec<Vec<IpAddr>>>);
 
