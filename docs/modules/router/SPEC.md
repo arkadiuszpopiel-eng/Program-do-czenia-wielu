@@ -83,3 +83,4 @@ Chip profilu modelu/„Hybryda" w pasku i composerze, `/model`, Ustawienia → R
 - Estymata okien planów mostów CLI (reaktywna, jak dla 429 API) — F4, razem z `AgentBackend`.
 - Orkiestracja Mówczyni + Myślicielka (`DuoConfig`, `Tempo`) — `agent-runtime`.
 - Format `Weights` dla uczenia z wyników — do ustalenia w SPEC v1 razem z `improver` (F8).
+- Ustalone (0.0.11): `set_light_local` — lekki dostawca lokalny jest pierwszy w klasach `LIGHT_CLASSES` (dziś: streszczenia) i nie występuje w pozostałych; gdy jest niedostępny, kolejka idzie dalej jak dotąd.

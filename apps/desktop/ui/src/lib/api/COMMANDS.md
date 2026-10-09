@@ -294,11 +294,11 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 
 ## Okna
 
-| Okno (label) | Strona       | Rozmiar                      | Uwagi                                                                                                                |
-| ------------ | ------------ | ---------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `main`       | `index.html` | 1200 × 800, min. 400 × 500   | własny pasek tytułu: `data-tauri-drag-region`; miejsce na natywne przyciski — zmienna CSS `--alfa-titlebar-controls` |
-| `quick`      | `quick.html` | 640 × auto, środek ekranu    | skrót globalny `Ctrl+Alt+Space` (rdzeń), przezroczyste tło                                                           |
-| `pill`       | `pill.html`  | 220 × 48, zawsze na wierzchu | bez frameworka; zdarzenia `VoicePill` / `MicLevel`                                                                   |
+| Okno (label) | Strona       | Rozmiar                      | Uwagi                                                                                                            |
+| ------------ | ------------ | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `main`       | `index.html` | 1200 × 800, min. 400 × 500   | bez belki systemowej; pasek tytułu z `data-tauri-drag-region`, przyciski okna rysuje interfejs (`api/window.ts`) |
+| `quick`      | `quick.html` | 640 × auto, środek ekranu    | skrót globalny `Ctrl+Alt+Space` (rdzeń), przezroczyste tło                                                       |
+| `pill`       | `pill.html`  | 220 × 48, zawsze na wierzchu | bez frameworka; zdarzenia `VoicePill` / `MicLevel`                                                               |
 
 Skróty obsługiwane przez rdzeń (nie przez WebView): `Ctrl+Alt+Space` (Szybkie pytanie),
 `Ctrl+Shift+F12` (STOP WSZYSTKIEGO), przytrzymanie `Spacji` (PTT, hook `WH_KEYBOARD_LL`).

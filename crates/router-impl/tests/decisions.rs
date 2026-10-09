@@ -385,3 +385,49 @@ async fn breaker_half_open_plan_window_and_events_on_bus() {
     assert_eq!(module.stop().await, Err(ModuleError::NotStarted));
     assert!(MODULE_TOML.contains("router-contract@1"));
 }
+
+/// Maszyna z dwiema kartami: lekki dostawca lokalny (model pomocniczy na karcie zintegrowanej)
+/// bierze streszczenia jako pierwszy, a w rozmowie nie występuje — tam modelem lokalnym jest
+/// dostawca główny. Bez silnika lekki dostawca jest „nieskonfigurowany” i Router go pomija.
+#[test]
+fn light_local_provider_takes_light_classes_only() {
+    let core = Arc::new(RouterCore::default());
+    core.register(Arc::new(fake("local")), RouteKind::Local);
+    let light = Switchable::new(fake("local-light"), None);
+    core.register(light.clone(), RouteKind::Local);
+    core.register(Arc::new(fake("anthropic")), RouteKind::Api);
+    core.set_light_local(Some(providers_contract::ProviderId::new("local-light")));
+    let policy = core.policy();
+    assert_eq!(
+        policy.candidates(TaskClass::Summarize),
+        [cand("local-light"), cand("anthropic"), cand("local")]
+    );
+    for class in [
+        TaskClass::Conversation,
+        TaskClass::Code,
+        TaskClass::VoiceFast,
+    ] {
+        assert!(
+            !policy.candidates(class).contains(&cand("local-light")),
+            "{class:?}: {:?}",
+            policy.candidates(class)
+        );
+        assert!(policy.candidates(class).contains(&cand("local")));
+    }
+    let d = core
+        .route(TaskClass::Summarize, &Constraints::default(), None)
+        .unwrap();
+    assert_eq!(d.chosen, cand("local-light"));
+    // Silnik karty zintegrowanej nie jest zainstalowany: streszczenia idą dalej jak dotąd.
+    light.set(unconfigured());
+    let d = core
+        .route(TaskClass::Summarize, &Constraints::default(), None)
+        .unwrap();
+    assert_eq!(d.chosen, cand("anthropic"));
+    // Bez wskazania lekkiego dostawcy drugi lokalny jest zwykłym zapasem, nie pierwszym wyborem.
+    core.set_light_local(None);
+    assert_eq!(
+        core.policy().candidates(TaskClass::Summarize)[0],
+        cand("anthropic")
+    );
+}

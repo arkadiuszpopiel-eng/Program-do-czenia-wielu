@@ -54,6 +54,16 @@ pub fn device_dto(p: &Profile, r: &Recommendation, name: String) -> DeviceProfil
                     model: g.name.clone(),
                     vram_mb: u64::from(g.vram_mb),
                     backends: g.backends.iter().map(|b| backend(*b).to_owned()).collect(),
+                    role: if p.primary_gpu().is_some_and(|primary| primary.id == g.id) {
+                        "heavy"
+                    } else if p.light_gpu().is_some_and(|light| light.id == g.id) {
+                        "light"
+                    } else {
+                        "spare"
+                    }
+                    .to_owned(),
+                    integrated: g.integrated,
+                    shared_mb: u64::from(g.shared_mb),
                 })
                 .collect(),
             npu: p.npu.as_ref().map(|n| n.name.clone()),

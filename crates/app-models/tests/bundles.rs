@@ -45,12 +45,7 @@ fn machine(gpu: Option<(GpuVendor, u32)>, ram_mb: u32, cores: u32) -> Machine {
     let base = fixtures::baseline();
     Machine::from_profile(&Profile {
         gpus: gpu
-            .map(|(vendor, vram_mb)| GpuInfo {
-                name: "karta".into(),
-                vendor,
-                vram_mb,
-                backends: vendor.backends(),
-            })
+            .map(|(vendor, vram_mb)| GpuInfo::describe(0, "karta", vendor, vram_mb, 8_000))
             .into_iter()
             .collect(),
         ram_mb,

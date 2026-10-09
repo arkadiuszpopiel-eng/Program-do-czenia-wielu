@@ -1,7 +1,7 @@
 //! Profile referencyjne z PLAN §3.5 (fixture'y dla testów tabelarycznych, `-fake` i CI sprzętowego).
 
 use crate::types::{
-    Backend, BatteryInfo, CpuInfo, GpuInfo, GpuVendor, MachineId, OsInfo, PowerState, Profile,
+    BatteryInfo, CpuInfo, GpuInfo, GpuVendor, MachineId, OsInfo, PowerState, Profile,
 };
 
 fn id(hex: &'static str) -> MachineId {
@@ -17,12 +17,9 @@ fn windows11() -> OsInfo {
 }
 
 fn gpu(name: &str, vendor: GpuVendor, vram_mb: u32) -> GpuInfo {
-    GpuInfo {
-        name: name.into(),
-        vendor,
-        vram_mb,
-        backends: vendor.backends(),
-    }
+    // Jak na prawdziwej maszynie: karta zintegrowana jest adapterem 0 (rysuje pulpit).
+    let integrated = GpuInfo::looks_integrated(vendor, vram_mb);
+    GpuInfo::describe(u32::from(!integrated), name, vendor, vram_mb, 8_000)
 }
 
 /// Baseline: Ryzen 5 5600 (6c/12t, L3 32 MB) · RX 7600 8 GB · 16 GB · Windows 11.
@@ -115,12 +112,13 @@ pub fn below_baseline() -> Profile {
             l3_cache_mb: Some(6),
         },
         ram_mb: 8_192,
-        gpus: vec![GpuInfo {
-            name: "Intel(R) UHD Graphics 620".into(),
-            vendor: GpuVendor::Intel,
-            vram_mb: 128,
-            backends: vec![Backend::Vulkan],
-        }],
+        gpus: vec![GpuInfo::describe(
+            0,
+            "Intel(R) UHD Graphics 620",
+            GpuVendor::Intel,
+            128,
+            4_000,
+        )],
         npu: None,
         battery: None,
         power: PowerState::Ac,

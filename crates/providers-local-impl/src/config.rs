@@ -50,6 +50,14 @@ pub struct LocalConfig {
     pub server_candidates: BTreeMap<BackendKey, Vec<PathBuf>>,
     /// Model domyślny.
     pub default_model: String,
+    /// Karta, na której ma działać model (fragment nazwy z profilu urządzenia); `None` = główna.
+    pub gpu_name: Option<String>,
+    /// Przypinanie do karty przez `--device` (lista urządzeń z `llama-server --list-devices`).
+    /// Włączane przez aplikację; testy z fałszywym serwerem zostawiają wyłączone.
+    pub pin_device: bool,
+    /// Dzierżawa pamięci modelu liczona jako RAM, nie VRAM — dla karty zintegrowanej, która nie
+    /// ma własnej pamięci i nie może zabierać budżetu karty głównej.
+    pub shared_memory: bool,
     /// Kontekst (`-c`) — największy; na GPU zmniejszany do `min_ctx` ([`LocalConfig::ctx_for`]).
     pub ctx: u32,
     /// Najmniejszy kontekst przy zmniejszaniu na małej karcie (`min_ctx = ctx` — stały kontekst).
@@ -123,6 +131,9 @@ impl LocalConfig {
                 .collect(),
             server_candidates: BTreeMap::new(),
             default_model: "bielik-4.5b-v3.0-instruct-q8_0".into(),
+            gpu_name: None,
+            pin_device: false,
+            shared_memory: false,
             ctx: 8_192,
             min_ctx: MIN_CTX,
             stt_reserve_mb: STT_VRAM_RESERVE_MB,
@@ -218,6 +229,8 @@ pub struct LaunchPlan {
     pub ctx: u32,
     /// Wątki.
     pub threads: u32,
+    /// Urządzenie serwera (`--device`), gdy model jest przypięty do konkretnej karty.
+    pub device: Option<String>,
 }
 
 /// Warstwy GPU wg budżetu VRAM dla kontekstu `ctx` (wagi + narzut + KV cache): pełne
@@ -266,6 +279,10 @@ impl LaunchPlan {
             "-np".into(),
             "1".into(),
         ];
+        if let Some(device) = self.device.as_ref().filter(|_| self.gpu_layers > 0) {
+            args.push("--device".into());
+            args.push(device.clone());
+        }
         if entry.tools {
             args.push("--jinja".into());
         }

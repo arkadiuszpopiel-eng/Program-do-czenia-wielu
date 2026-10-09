@@ -139,6 +139,39 @@ pub struct GpuInfo {
     pub vram_mb: u32,
     /// Dostępne backendy (kolejność = preferencja).
     pub backends: Vec<Backend>,
+    /// Numer karty w systemie (kolejność adapterów) — stały identyfikator w obrębie maszyny.
+    #[serde(default)]
+    pub id: u32,
+    /// Karta zintegrowana z procesorem: bez własnej pamięci, korzysta z pamięci RAM.
+    #[serde(default)]
+    pub integrated: bool,
+    /// Pamięć współdzielona z systemem w MB (dla karty zintegrowanej to jej cała pamięć).
+    #[serde(default)]
+    pub shared_mb: u32,
+}
+
+/// Najmniejsza dedykowana pamięć, od której kartę Intela albo AMD uznajemy za osobną (MB).
+/// Zintegrowane układy zgłaszają symboliczne 64–512 MB i resztę biorą z RAM.
+pub const DISCRETE_MIN_VRAM_MB: u32 = 1_024;
+
+impl GpuInfo {
+    /// Czy karta o takim producencie i pamięci dedykowanej jest zintegrowana.
+    pub fn looks_integrated(vendor: GpuVendor, vram_mb: u32) -> bool {
+        matches!(vendor, GpuVendor::Intel | GpuVendor::Amd) && vram_mb < DISCRETE_MIN_VRAM_MB
+    }
+
+    /// Karta z opisu: identyfikator, typ i backendy wynikają z producenta i pamięci.
+    pub fn describe(id: u32, name: &str, vendor: GpuVendor, vram_mb: u32, shared_mb: u32) -> Self {
+        Self {
+            name: name.trim().to_owned(),
+            vendor,
+            vram_mb,
+            backends: vendor.backends(),
+            id,
+            integrated: Self::looks_integrated(vendor, vram_mb),
+            shared_mb,
+        }
+    }
 }
 
 /// NPU (tylko raportowanie w v1).

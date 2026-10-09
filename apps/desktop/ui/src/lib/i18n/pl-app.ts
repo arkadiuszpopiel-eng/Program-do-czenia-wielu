@@ -53,6 +53,11 @@ export const plApp = {
   'titlebar.status': 'Profil {profile}, autonomia {level}, koszt sesji {cost}. Szczegóły kosztów',
   'titlebar.settings': 'Ustawienia (Ctrl+,)',
   'titlebar.noSession': 'Nowa rozmowa',
+  'window.controls': 'Okno',
+  'window.minimize': 'Minimalizuj',
+  'window.maximize': 'Maksymalizuj',
+  'window.restore': 'Przywróć rozmiar',
+  'window.close': 'Zamknij',
 
   'costs.title': 'Koszty i kontekst',
   'costs.session': 'Ta sesja',

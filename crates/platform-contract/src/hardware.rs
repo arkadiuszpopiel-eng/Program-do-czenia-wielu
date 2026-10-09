@@ -47,6 +47,9 @@ pub struct GpuAdapter {
     pub shared_memory_mb: u64,
     /// Adapter programowy (np. Microsoft Basic Render Driver).
     pub software: bool,
+    /// Numer adaptera w kolejności systemu (DXGI) — rozróżnia dwie takie same karty.
+    #[serde(default)]
+    pub index: u32,
 }
 
 /// Stan zasilania.

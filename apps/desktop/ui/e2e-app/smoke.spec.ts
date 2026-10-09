@@ -310,6 +310,29 @@ test('prawy przycisk w polu pisania: menu Alfy, wklejanie ze schowka systemu', a
   await expect(menu).toHaveCount(0);
 });
 
+// Zgłoszenie właściciela (2026-10-09): górna belka ma być belką Alfy z paskiem LED. W prawdziwym
+// oknie sprawdzamy, że belki systemowej nie ma, a przyciski okna naprawdę zmieniają jego rozmiar.
+test('belka okna: bez belki systemowej, pasek LED, maksymalizacja i przywrócenie', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await toChat(main);
+  const frame = await main.evaluate(() => window.outerHeight - window.innerHeight);
+  expect(frame, 'wysokość ramki systemowej nad stroną').toBeLessThan(12);
+  await expect(main.locator('header.titlebar .led')).toBeVisible();
+  const controls = main.getByRole('group', { name: 'Okno' });
+  const width = () => main.evaluate(() => window.outerWidth);
+  const before = await width();
+  await controls.getByRole('button', { name: 'Maksymalizuj' }).click();
+  await expect(controls.getByRole('button', { name: 'Przywróć rozmiar' })).toBeVisible();
+  await expect.poll(width).toBeGreaterThan(before);
+  await shot(alfa, '06c-belka-zmaksymalizowana');
+  await controls.getByRole('button', { name: 'Przywróć rozmiar' }).click();
+  await expect(controls.getByRole('button', { name: 'Maksymalizuj' })).toBeVisible();
+  await expect.poll(width).toBe(before);
+  await shot(alfa, '06d-belka');
+});
+
 test('eksport .alfa do katalogu tymczasowego (natywne okno „Zapisz jako”)', async ({ alfa }) => {
   test.skip(process.platform !== 'win32', 'okno „Zapisz jako” obsługuje UI Automation Windows');
   const { main } = alfa;

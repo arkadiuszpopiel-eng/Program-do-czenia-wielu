@@ -12,13 +12,13 @@ for (const theme of ['light', 'dark'] as const) {
     await waitForChat(page);
     await page.keyboard.press('Control+,');
     const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
-    await expect(nav.getByRole('button').first()).toBeVisible();
-    await expect(nav.getByRole('button').first()).toBeVisible();
-    const names = await nav.getByRole('button').allInnerTexts();
+    await expect(nav.locator('button.node').first()).toBeVisible();
+    await expect(nav.locator('button.node').first()).toBeVisible();
+    const names = await nav.locator('button.node').allInnerTexts();
     expect(names.length).toBeGreaterThan(20);
     for (const [i, raw] of names.entries()) {
       const name = raw.split('\n')[0]?.trim() ?? raw;
-      await nav.getByRole('button').nth(i).click();
+      await nav.locator('button.node').nth(i).click();
       await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
       await page.waitForTimeout(250);
       await expectAccessible(page, `ustawienia: ${name} (${theme})`);

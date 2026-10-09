@@ -97,7 +97,10 @@ pub fn ensure_main(app: &AppHandle) -> tauri::Result<WebviewWindow> {
         .min_inner_size(400.0, 500.0)
         .center()
         .resizable(true)
-        .decorations(true)
+        // Bez belki systemowej: pasek tytułu z przyciskami okna rysuje interfejs; cień zostawia
+        // systemową ramkę, zaokrąglenie i zmianę rozmiaru krawędziami.
+        .decorations(false)
+        .shadow(true)
         .visible(true)
         .build()
 }

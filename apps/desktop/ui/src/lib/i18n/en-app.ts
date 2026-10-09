@@ -56,6 +56,11 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'titlebar.status': 'Profile {profile}, autonomy {level}, session cost {cost}. Cost details',
   'titlebar.settings': 'Settings (Ctrl+,)',
   'titlebar.noSession': 'New conversation',
+  'window.controls': 'Window',
+  'window.minimize': 'Minimize',
+  'window.maximize': 'Maximize',
+  'window.restore': 'Restore size',
+  'window.close': 'Close',
 
   'costs.title': 'Costs and context',
   'costs.session': 'This session',

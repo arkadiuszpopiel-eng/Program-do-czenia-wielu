@@ -24,7 +24,7 @@ for (const theme of ['light', 'dark'] as const) {
     await openApp(page, { theme });
     await waitForChat(page);
     await openModels(page);
-    await expect(page.getByText(/Ten komputer: Radeon 780M/)).toBeVisible();
+    await expect(page.getByText(/Ten komputer: GeForce RTX 4050 Laptop GPU/)).toBeVisible();
 
     const good = card(page, 'Dobry');
     await expect(good.getByRole('img', { name: 'Ocena 4 z 6' })).toBeVisible();

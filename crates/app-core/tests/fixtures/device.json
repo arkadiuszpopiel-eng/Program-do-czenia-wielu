@@ -15,13 +15,27 @@
         "ram_mb": 32768,
         "gpus": [
           {
-            "vendor": "AMD",
-            "model": "Radeon 780M",
-            "vram_mb": 4096,
+            "vendor": "NVIDIA",
+            "model": "GeForce RTX 4050 Laptop GPU",
+            "vram_mb": 6144,
             "backends": [
-              "Vulkan",
-              "CPU"
-            ]
+              "CUDA",
+              "Vulkan"
+            ],
+            "role": "heavy",
+            "integrated": false,
+            "shared_mb": 8000
+          },
+          {
+            "vendor": "Intel",
+            "model": "Iris Xe Graphics",
+            "vram_mb": 128,
+            "backends": [
+              "Vulkan"
+            ],
+            "role": "light",
+            "integrated": true,
+            "shared_mb": 8000
           }
         ],
         "npu": "AMD XDNA (10 TOPS)",
@@ -64,13 +78,27 @@
         "ram_mb": 32768,
         "gpus": [
           {
-            "vendor": "AMD",
-            "model": "Radeon 780M",
-            "vram_mb": 4096,
+            "vendor": "NVIDIA",
+            "model": "GeForce RTX 4050 Laptop GPU",
+            "vram_mb": 6144,
             "backends": [
-              "Vulkan",
-              "CPU"
-            ]
+              "CUDA",
+              "Vulkan"
+            ],
+            "role": "heavy",
+            "integrated": false,
+            "shared_mb": 8000
+          },
+          {
+            "vendor": "Intel",
+            "model": "Iris Xe Graphics",
+            "vram_mb": 128,
+            "backends": [
+              "Vulkan"
+            ],
+            "role": "light",
+            "integrated": true,
+            "shared_mb": 8000
           }
         ],
         "npu": "AMD XDNA (10 TOPS)",

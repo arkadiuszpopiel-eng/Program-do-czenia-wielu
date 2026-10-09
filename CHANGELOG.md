@@ -8,6 +8,41 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.11 — 2026-10-09
+
+Zgłoszenia właściciela: górna belka z jadącym paskiem LED, mocno dopracowana nawigacja Ustawień i współpraca kilku
+kart graficznych.
+
+### Interfejs
+
+- Górna belka okna jest teraz belką Alfy: systemowy pasek „Alfa” zniknął, a minimalizuj, maksymalizuj i zamknij
+  rysuje program — w każdym stylu i motywie.
+- Wzdłuż belki jedzie od lewej do prawej pasek LED w barwach agentek; przyspiesza, gdy agentka pracuje albo mówi,
+  robi się bursztynowy bez sieci, a przy wyłączonych animacjach stoi jako równa listwa.
+- Nawigacja Ustawień od nowa: każda strona ma ikonę, bieżąca — znacznik przy krawędzi, grupy można zwijać (program
+  to pamięta), nagłówek z wyszukiwarką stoi w miejscu, a przewija się tylko lista.
+- Szukanie ustawień pokazuje w nawigacji tylko strony z trafieniami i ich liczbę; `Ctrl+F` przenosi do pola, krzyżyk
+  albo `Esc` czyści, strzałki, `Home` i `End` chodzą po liście, `Enter` otwiera pierwszą stronę.
+- W wąskim oknie lista stron chowa się pod przyciskiem z nazwą bieżącej strony, więc treść strony ma całe okno.
+
+### Karty graficzne
+
+- Alfa rozpoznaje każdą kartę osobno i nadaje jej rolę: mocna karta dostaje model rozmowy i rozpoznawanie mowy,
+  zintegrowana — lekkie zadania w tle (streszczenia, tytuły, porządki pamięci). Role widać w „Urządzenia”.
+- Model rozmowy jest przypinany do karty głównej, więc na laptopie z dwiema kartami nie trafi przypadkiem na słabszą.
+- Lekkie zadania na karcie zintegrowanej wymagają silnika „llama.cpp Vulkan” — bez niego idą jak dotąd; po pobraniu
+  silnika w „Modele lokalne i silniki” zaczynają działać same. Rozpoznawanie mowy zostaje na karcie głównej
+  (silnik mowy nie ma wersji dla kart zintegrowanych).
+
+### Testy
+
+- Nowe: `e2e/chrome.spec.ts` (belka, pasek LED, przyciski okna i nawigacja w 3 stylach × 2 motywach, klawiatura,
+  wąskie okno, role kart), `settings-nav.test.ts`, testy przypinania do karty (`devices.rs`), lekkiego dostawcy
+  w Routerze i wykrywania kart.
+- Nie sprawdzono na sprzęcie: praca modelu pomocniczego na karcie zintegrowanej (na laptopie właściciela nie ma
+  silnika Vulkan — pobranie wymaga zgody). Przyciąganie okna do układów Windows po najechaniu na „maksymalizuj”
+  (Snap Layouts) nie działa przy własnej belce; skróty `Win+strzałki` i przeciąganie do krawędzi działają.
+
 ## 0.0.10 — 2026-10-09
 
 Zgłoszenia właściciela: systemowe menu po kliknięciu prawym przyciskiem, niewygodne przestawianie modeli strzałkami

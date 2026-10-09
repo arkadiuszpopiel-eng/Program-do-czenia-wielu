@@ -116,12 +116,13 @@ fn table_for_reference_machines() {
 #[test]
 fn strong_machines_get_full_local_stack() {
     let mut nvidia = fixtures::desktop();
-    nvidia.gpus[0] = GpuInfo {
-        name: "NVIDIA GeForce RTX 4080".into(),
-        vendor: GpuVendor::Nvidia,
-        vram_mb: 16_376,
-        backends: GpuVendor::Nvidia.backends(),
-    };
+    nvidia.gpus[0] = GpuInfo::describe(
+        0,
+        "NVIDIA GeForce RTX 4080",
+        GpuVendor::Nvidia,
+        16_376,
+        16_000,
+    );
     let rec = recommend(&nvidia);
     assert_eq!(rec.class, HwClass::Strong);
     assert_eq!(rec.voice_variant, Some(VoiceVariant::Full));

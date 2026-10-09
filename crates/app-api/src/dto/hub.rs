@@ -265,6 +265,13 @@ pub struct GpuView {
     pub model: String,
     pub vram_mb: u64,
     pub backends: Vec<String>,
+    /// Rola na maszynie z kilkoma kartami: `heavy` (modele główne), `light` (lekkie zadania
+    /// na karcie zintegrowanej), `spare` (nieużywana przez Alfę).
+    pub role: String,
+    /// Karta zintegrowana (pamięć współdzielona z RAM).
+    pub integrated: bool,
+    /// Pamięć współdzielona z systemem (MB).
+    pub shared_mb: u64,
 }
 
 /// Procesor.

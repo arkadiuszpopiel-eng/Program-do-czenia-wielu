@@ -78,6 +78,8 @@ pub fn local_config(paths: &AppPaths) -> LocalConfig {
     let common = paths.sidecar("llama", "llama-server");
     let mut config = LocalConfig::new(paths.models(), common);
     config.provider_id = LOCAL_PROVIDER.into();
+    // Na maszynie z kilkoma kartami model główny jest przypinany do karty głównej.
+    config.pin_device = true;
     for key in [BackendKey::Vulkan, BackendKey::Cuda, BackendKey::Cpu] {
         config.server_bin.insert(key, server_for(paths, key).0);
         config.server_candidates.insert(key, candidates(paths, key));
@@ -139,6 +141,82 @@ pub fn provider_module(
     LocalModule::new(provider, LOCAL_TICK).map_err(|e| internal("manifest", e.to_string()))
 }
 
+/// Identyfikator lekkiego dostawcy lokalnego (trasy `local-light:<model>`).
+pub const LIGHT_PROVIDER: &str = "local-light";
+
+/// Model pomocniczy: najmniejszy z manifestu — mieści się w pamięci współdzielonej karty
+/// zintegrowanej i wystarcza do streszczeń.
+const LIGHT_MODEL: &str = "bielik-1.5b-v3.0-instruct-q8_0";
+
+/// Najwięcej pamięci współdzielonej, jaką oddajemy modelowi pomocniczemu (MB) — karta
+/// zintegrowana bierze ją z RAM, którego potrzebuje reszta systemu.
+const LIGHT_MEMORY_CAP_MB: u32 = 4_096;
+
+/// Konfiguracja modelu pomocniczego na karcie zintegrowanej: wyłącznie kompilacja Vulkan
+/// (zastępcza CUDA albo CPU przeniosłaby go na kartę główną albo procesor), przypięcie do karty
+/// po nazwie, pamięć liczona jako RAM, mały kontekst, bez rezerwy na STT.
+pub fn light_config(
+    paths: &AppPaths,
+    gpu: &device_profile_contract::GpuInfo,
+    ram_mb: u32,
+) -> LocalConfig {
+    use providers_local_impl::BackendChoice;
+    let server = paths.sidecar("llama-vulkan", "llama-server");
+    let mut config = LocalConfig::new(paths.models(), server.clone());
+    config.provider_id = LIGHT_PROVIDER.into();
+    config.server_bin = [(BackendKey::Vulkan, server.clone())].into_iter().collect();
+    config.server_candidates = [(BackendKey::Vulkan, vec![server])].into_iter().collect();
+    config.backend = BackendChoice::Fixed(device_profile_contract::Backend::Vulkan);
+    config.default_model = LIGHT_MODEL.into();
+    config.gpu_name = Some(gpu.name.clone());
+    config.pin_device = true;
+    config.shared_memory = true;
+    config.stt_reserve_mb = 0;
+    config.ctx = 4_096;
+    config.min_ctx = 2_048;
+    config.max_vram_mb = Some(gpu.shared_mb.min(ram_mb / 4).min(LIGHT_MEMORY_CAP_MB));
+    config
+}
+
+/// Lekki dostawca lokalny dla maszyny z dwiema kartami: model pomocniczy na karcie zintegrowanej,
+/// uruchamiany przy pierwszym żądaniu. `None`, gdy maszyna nie ma osobnej karty do lekkich zadań.
+/// Bez zainstalowanego silnika Vulkan dostawca zgłasza „nieskonfigurowany” i Router go pomija —
+/// po pobraniu silnika w Ustawieniach zaczyna działać bez ponownego uruchomienia.
+pub fn light_provider(
+    paths: &AppPaths,
+    device: &Arc<dyn DeviceProfile>,
+    residency: Option<Arc<dyn Residency>>,
+) -> Result<Option<Arc<LocalProvider>>, AppError> {
+    let profile = device.current();
+    let Some(gpu) = profile.light_gpu() else {
+        return Ok(None);
+    };
+    let internal =
+        |what: &str, e: String| AppError::internal(format!("providers-local (lekki): {what}: {e}"));
+    let models = builtin_models().map_err(|e| internal("manifest", e.to_string()))?;
+    let config = light_config(paths, gpu, profile.ram_mb);
+    let sidecar = Sidecar::new(
+        config,
+        Arc::new(TokioLauncher::default()),
+        Some(device.clone()),
+        residency,
+    )
+    .map_err(|e| internal("sidecar", e.to_string()))?;
+    let provider = Arc::new(LocalProvider::new(models, sidecar));
+    // Zwalnianie bezczynnego modelu pomocniczego (dostawca główny robi to w swoim module).
+    let idle = Arc::downgrade(provider.sidecar());
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(LOCAL_TICK);
+        loop {
+            interval.tick().await;
+            let Some(sidecar) = idle.upgrade() else { break };
+            sidecar.reap_idle_at(tokio::time::Instant::now()).await;
+        }
+    });
+    tracing::info!(karta = %gpu.name, "karta do lekkich zadań: model pomocniczy (silnik Vulkan)");
+    Ok(Some(provider))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -165,6 +243,47 @@ mod tests {
         std::fs::create_dir_all(file.parent().unwrap()).unwrap();
         std::fs::write(&file, b"exe").unwrap();
         file
+    }
+
+    /// Model pomocniczy nigdy nie trafia na kartę główną ani procesor: jedyną kompilacją jest
+    /// Vulkan, model jest przypięty do karty zintegrowanej, a jego pamięć liczy się jako RAM.
+    #[test]
+    fn light_model_is_bound_to_the_integrated_card() {
+        let tmp = Temp::new();
+        let paths = AppPaths::under(&tmp.0);
+        let laptop = device_profile_contract::fixtures::laptop();
+        let gpu = laptop
+            .light_gpu()
+            .expect("laptop ma kartę zintegrowaną obok NVIDII");
+        assert!(gpu.name.contains("Iris"));
+        let config = light_config(&paths, gpu, laptop.ram_mb);
+        assert_eq!(config.provider_id, LIGHT_PROVIDER);
+        assert_eq!(config.gpu_name.as_deref(), Some(gpu.name.as_str()));
+        assert!(config.pin_device && config.shared_memory);
+        assert_eq!(config.stt_reserve_mb, 0);
+        assert_eq!(config.max_vram_mb, Some(4_096));
+        // Bez silnika Vulkan — nieobecny (Router go pominie); z silnikiem — tylko ten plik.
+        assert!(!config.engine_present());
+        install(&paths, "llama-cuda");
+        install(&paths, "llama-cpu");
+        assert!(
+            !config.engine_present(),
+            "CUDA i CPU nie zastępują silnika karty zintegrowanej"
+        );
+        let vulkan = install(&paths, "llama-vulkan");
+        assert!(config.engine_present());
+        assert_eq!(config.server(BackendKey::Vulkan), Some(vulkan));
+        // Maszyna z jedną kartą nie ma karty „do lekkich zadań”.
+        assert!(
+            device_profile_contract::fixtures::baseline()
+                .light_gpu()
+                .is_none()
+        );
+        assert!(
+            device_profile_contract::fixtures::desktop()
+                .light_gpu()
+                .is_none()
+        );
     }
 
     #[test]

@@ -2,7 +2,8 @@
   Pasek tytułu (36 px, PLAN §14.2): przełącznik panelu Sesje, ścieżka projekt ▸ sesja (klik = zmień
   nazwę), obsada α β γ δ z pierścieniem koloru (świeci mówiąca / pracująca), stan (profil · L · koszt),
   panel prawy, ustawienia. Puste obszary to region przeciągania okna (Tauri); natywne przyciski
-  okna rysuje system — miejsce na nie rezerwuje `--alfa-titlebar-controls`.
+  okna (`WindowControls`) rysuje interfejs — okno nie ma belki systemowej. Wzdłuż dolnej krawędzi
+  biegnie pasek LED: światło jedzie od lewej do prawej, szybciej, gdy któraś agentka pracuje.
 -->
 <script lang="ts">
   import { Avatar, IconButton, Popover, agentIds, agents } from '@alfa/ui-kit';
@@ -14,6 +15,7 @@
   import CostDetails from './CostDetails.svelte';
   import GuiIndicator from './GuiIndicator.svelte';
   import MicIndicator from './MicIndicator.svelte';
+  import WindowControls from './WindowControls.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -27,6 +29,10 @@
   const profile = $derived(t(`profile.${app.system?.profile ?? session?.profile ?? 'hybrid'}`));
   const level = $derived(session?.autonomy ?? 'L3');
   const cost = $derived(app.costs ? app.i18n.money(app.costs.session) : '—');
+  const busy = $derived(
+    agentStates.some((a) => a.status === 'working' || a.status === 'speaking') ||
+      app.conversation?.streaming !== undefined,
+  );
   let costOpen = $state(false);
   let draft = $state('');
 
@@ -162,11 +168,13 @@
   >
     <Settings size={16} strokeWidth={1.5} />
   </IconButton>
-  <div class="controls" data-tauri-drag-region></div>
+  <WindowControls />
+  <div class="led" class:busy class:offline={app.system?.online === false} aria-hidden="true"></div>
 </header>
 
 <style>
   .titlebar {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--alfa-space-2);
@@ -182,9 +190,94 @@
     align-self: stretch;
     min-width: var(--alfa-space-4);
   }
-  .controls {
-    width: var(--alfa-titlebar-controls, 0px);
-    align-self: stretch;
+  /* Pasek LED: przygaszona listwa w kolorach agentek, po której od lewej do prawej jedzie jasne
+     światło z poświatą padającą na belkę. */
+  .led {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    z-index: 1;
+    height: 22px;
+    overflow: hidden;
+    pointer-events: none;
+    /* Barwy agentek rozjaśnione do świecących — czytelne na jasnej i ciemnej belce. */
+    --led-a: oklch(66% 0.23 27);
+    --led-b: oklch(66% 0.22 292);
+    --led-c: oklch(72% 0.15 215);
+    --led-d: oklch(72% 0.17 162);
+  }
+  .led::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--led-a), var(--led-b), var(--led-c), var(--led-d));
+    opacity: 0.3;
+  }
+  .led::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 30%;
+    background:
+      linear-gradient(90deg, transparent 52%, #ffffff 80%, transparent 96%) bottom / 100% 2px
+        no-repeat,
+      linear-gradient(
+          90deg,
+          transparent,
+          var(--led-a) 22%,
+          var(--led-b) 50%,
+          var(--led-c) 76%,
+          var(--led-d) 92%,
+          transparent
+        )
+        bottom / 100% 4px no-repeat,
+      radial-gradient(
+        ellipse 48% 100% at 70% 100%,
+        color-mix(in oklab, var(--led-c) 55%, transparent),
+        transparent 70%
+      );
+    transform: translateX(-100%);
+    animation: led-run 3.2s linear infinite;
+  }
+  .led.busy::after {
+    animation-duration: 1.4s;
+  }
+  .led.offline {
+    --led-a: var(--alfa-color-warning);
+    --led-b: var(--alfa-color-warning);
+    --led-c: var(--alfa-color-warning);
+    --led-d: var(--alfa-color-warning);
+  }
+  @keyframes led-run {
+    to {
+      transform: translateX(334%);
+    }
+  }
+  /* Animacje wyłączone: światło stoi — zostaje równa, jaśniejsza listwa. */
+  :global(:root[data-motion='off']) .led::after {
+    display: none;
+  }
+  :global(:root[data-motion='off']) .led::before {
+    opacity: 0.85;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .led::after {
+      display: none;
+    }
+    .led::before {
+      opacity: 0.85;
+    }
+  }
+  @media (forced-colors: active) {
+    .led {
+      display: none;
+    }
   }
   .crumbs,
   .status,

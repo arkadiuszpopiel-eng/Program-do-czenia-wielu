@@ -61,3 +61,4 @@ Onboarding „pomiar sprzętu", Ustawienia → Urządzenia (profil per maszyna, 
 - Ustalone (F1): `MachineId` = SHA-256 z separacją domeny nad `MachineGuid` (Windows) / `/etc/machine-id`, a bez nich nad losowym UUID zapisanym raz w katalogu stanu.
 - Detekcja NPU: DXCore (adapter „generic ML” bez grafiki) — tylko raportowanie; użycie poza v1.
 - Nasłuch zmian bez pollingu (`WM_POWERBROADCAST`, zdarzenia okien) — F2; w F1 `poll_changes()` wołane przez jądro.
+- Ustalone (0.0.11): każda karta ma `id` (numer adaptera), `integrated` i `shared_mb`; `Profile::light_gpu()` zwraca kartę zintegrowaną do lekkich zadań tylko wtedy, gdy obok jest osobna karta główna. Dwie identyczne karty nie zlewają się w jedną.

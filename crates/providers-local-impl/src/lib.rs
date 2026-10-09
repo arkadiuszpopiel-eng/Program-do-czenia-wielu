@@ -17,6 +17,7 @@
 
 mod codec;
 mod config;
+mod devices;
 mod download;
 mod error;
 mod leak;
@@ -33,6 +34,7 @@ pub use config::{
     BackendChoice, BackendKey, GpuLayers, LaunchPlan, LocalConfig, MIN_CTX, STT_VRAM_RESERVE_MB,
     layers_for,
 };
+pub use devices::{EngineDevice, PROBE_TIMEOUT, device_for, parse_devices, probe};
 pub use download::{Downloaded, Downloader, MAX_RESUMES, hash_path, installed, part_path};
 pub use error::{
     DownloadProgress, EVENT_BACKEND_FALLBACK, EVENT_DOWNLOAD_FAILED, EVENT_DOWNLOAD_FINISHED,

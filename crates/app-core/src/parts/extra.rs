@@ -58,6 +58,8 @@ pub(crate) struct Deps<'a> {
 pub(crate) struct Extra {
     pub residency: Option<Arc<ResidencyModule>>,
     pub local: Option<Arc<LocalModule>>,
+    /// Model pomocniczy na karcie zintegrowanej (maszyny z dwiema kartami).
+    pub local_light: Option<Arc<providers_local_impl::LocalProvider>>,
     pub routers: Option<Routers>,
     pub router: Option<Arc<RouterModule>>,
     pub classifier: Option<Arc<TableClassifier>>,
@@ -156,8 +158,17 @@ impl Extra {
             }
         }
         let settings = engine_settings::LlmSettings::from_values(|k| values.get(k).cloned());
-        let module =
-            local::provider_module(deps.paths, &Self::device(deps)?, residency, &settings)?;
+        let device = Self::device(deps)?;
+        // Maszyna z kartą zintegrowaną obok głównej: model pomocniczy do lekkich zadań. Błąd
+        // złożenia nie zatrzymuje startu — zostaje sam model główny.
+        self.local_light = match local::light_provider(deps.paths, &device, residency.clone()) {
+            Ok(provider) => provider,
+            Err(e) => {
+                tracing::warn!(error = %e.message, "model pomocniczy niedostępny");
+                None
+            }
+        };
+        let module = local::provider_module(deps.paths, &device, residency, &settings)?;
         self.local = Some(started(module, deps.bus, deps.slot).await?);
         Ok(())
     }
@@ -185,6 +196,13 @@ impl Extra {
         };
         if let Some(local) = &self.local {
             routers.register(local.provider(), router_contract::RouteKind::Local);
+        }
+        if let Some(light) = &self.local_light {
+            let id = providers_contract::ModelProvider::id(light.as_ref()).clone();
+            routers.register(light.clone(), router_contract::RouteKind::Local);
+            for core in [&routers.hybrid, &routers.local] {
+                core.set_light_local(Some(id.clone()));
+            }
         }
         for (provider, kind) in &deps.options.providers {
             routers.register(provider.clone(), *kind);

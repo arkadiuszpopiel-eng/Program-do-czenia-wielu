@@ -22,6 +22,20 @@ impl Profile {
         })
     }
 
+    /// Karta do lekkich zadań: zintegrowana, inna niż główna, z obsługiwanym backendem. Jest
+    /// tylko na maszynach z dwiema kartami (np. laptop: Intel + NVIDIA) — sama karta zintegrowana
+    /// jest kartą główną, a nie „lekką”.
+    pub fn light_gpu(&self) -> Option<&GpuInfo> {
+        let primary = self.primary_gpu()?;
+        if primary.integrated {
+            return None;
+        }
+        self.gpus
+            .iter()
+            .filter(|g| g.integrated && g.id != primary.id && !g.backends.is_empty())
+            .max_by_key(|g| g.shared_mb)
+    }
+
     /// VRAM głównego GPU w MB (0 = brak GPU).
     pub fn primary_vram_mb(&self) -> u32 {
         self.primary_gpu().map_or(0, |g| g.vram_mb)

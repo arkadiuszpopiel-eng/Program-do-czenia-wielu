@@ -63,21 +63,23 @@ pub(crate) fn build_profile(hw: &dyn HardwarePort, machine_id: MachineId) -> Pro
     }
 }
 
-/// Tylko sprzętowe GPU, bez duplikatów, z backendami producenta.
+/// Tylko sprzętowe GPU z backendami producenta. System potrafi wymienić ten sam adapter dwa
+/// razy (ten sam numer) — to odrzucamy; dwie takie same karty mają różne numery i zostają obie.
 pub(crate) fn map_gpus(adapters: Vec<GpuAdapter>) -> Vec<GpuInfo> {
     let mut seen = BTreeSet::new();
+    let mb = |value: u64| u32::try_from(value).unwrap_or(u32::MAX);
     adapters
         .into_iter()
         .filter(|a| !a.software && a.vendor_id != MICROSOFT_PCI)
-        .filter(|a| seen.insert((a.vendor_id, a.device_id, a.name.clone())))
+        .filter(|a| seen.insert((a.index, a.vendor_id, a.device_id)))
         .map(|a| {
-            let vendor = GpuVendor::from_pci(a.vendor_id);
-            GpuInfo {
-                name: a.name.trim().to_owned(),
-                vendor,
-                vram_mb: u32::try_from(a.dedicated_vram_mb).unwrap_or(u32::MAX),
-                backends: vendor.backends(),
-            }
+            GpuInfo::describe(
+                a.index,
+                &a.name,
+                GpuVendor::from_pci(a.vendor_id),
+                mb(a.dedicated_vram_mb),
+                mb(a.shared_memory_mb),
+            )
         })
         .collect()
 }
@@ -134,7 +136,45 @@ mod tests {
             dedicated_vram_mb: vram,
             shared_memory_mb: 8_000,
             software,
+            index: 0,
         }
+    }
+
+    /// Laptop z dwiema kartami: obie zostają, każda z numerem i typem; dwie identyczne karty
+    /// (stacja robocza) nie zlewają się w jedną.
+    #[test]
+    fn every_card_is_kept_with_its_number_and_kind() {
+        let at = |index: u32, mut a: GpuAdapter| {
+            a.index = index;
+            a
+        };
+        let gpus = map_gpus(vec![
+            at(
+                0,
+                adapter("Intel(R) Iris(R) Xe Graphics", 0x8086, 128, false),
+            ),
+            at(
+                1,
+                adapter("NVIDIA GeForce RTX 4050 Laptop GPU", 0x10DE, 5_921, false),
+            ),
+            at(
+                2,
+                adapter("NVIDIA GeForce RTX 4050 Laptop GPU", 0x10DE, 5_921, false),
+            ),
+            at(
+                2,
+                adapter("NVIDIA GeForce RTX 4050 Laptop GPU", 0x10DE, 5_921, false),
+            ),
+            at(3, adapter("Microsoft Basic Render Driver", 0x1414, 0, true)),
+        ]);
+        let seen: Vec<(u32, bool, u32)> = gpus
+            .iter()
+            .map(|g| (g.id, g.integrated, g.shared_mb))
+            .collect();
+        assert_eq!(
+            seen,
+            [(0, true, 8_000), (1, false, 8_000), (2, false, 8_000)]
+        );
     }
 
     #[test]

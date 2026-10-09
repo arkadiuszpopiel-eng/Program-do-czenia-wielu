@@ -35,6 +35,10 @@ struct Health {
 /// Kolejki modeli: dostawca → klasa zadań → modele w kolejności prób.
 pub type ProviderQueues = BTreeMap<ProviderId, BTreeMap<TaskClass, Vec<String>>>;
 
+/// Klasy zadań, które bierze lekki dostawca lokalny: prace w tle, którym wystarcza mały model
+/// i które nie powinny zajmować karty głównej (streszczenia, tytuły, porządki pamięci).
+pub const LIGHT_CLASSES: [TaskClass; 1] = [TaskClass::Summarize];
+
 /// Router.
 pub struct RouterCore {
     registry: RwLock<Vec<(ProviderId, Registered)>>,
@@ -42,6 +46,9 @@ pub struct RouterCore {
     overrides: RwLock<Option<String>>,
     /// Kolejki modeli dostawców API: dostawca → klasa → modele w kolejności prób.
     queues: RwLock<ProviderQueues>,
+    /// Lekki dostawca lokalny (model pomocniczy na karcie zintegrowanej) — pierwszy w klasach
+    /// [`LIGHT_CLASSES`], poza nimi nieużywany.
+    light: RwLock<Option<ProviderId>>,
     compliance: Option<Arc<dyn Compliance>>,
     budget: Option<Arc<dyn BudgetGate>>,
     clock: Arc<dyn RouterClock>,
@@ -70,6 +77,7 @@ impl RouterCore {
             explicit: RwLock::new(None),
             overrides: RwLock::new(None),
             queues: RwLock::new(ProviderQueues::new()),
+            light: RwLock::new(None),
             compliance,
             budget,
             clock: Arc::new(TokioClock::new()),
@@ -139,6 +147,13 @@ impl RouterCore {
         *self.queues.write().unwrap_or_else(|p| p.into_inner()) = queues;
     }
 
+    /// Wskazuje lekkiego dostawcę lokalnego (zarejestrowanego jak każdy inny, rodzaj `Local`).
+    /// W klasach [`LIGHT_CLASSES`] jest próbowany pierwszy; w pozostałych nie występuje, a rolę
+    /// modelu lokalnego pełni dostawca główny.
+    pub fn set_light_local(&self, id: Option<ProviderId>) {
+        *self.light.write().unwrap_or_else(|p| p.into_inner()) = id;
+    }
+
     /// Polityka automatyczna z zarejestrowanych dostawców: lokalny (pierwszy `Local` z modelem
     /// domyślnym) + API skonfigurowane (z kluczem), w kolejności rejestracji.
     pub fn auto_policy(&self) -> RoutePolicy {
@@ -149,9 +164,14 @@ impl RouterCore {
                 .default_model
                 .map(|m| Candidate::new(r.provider.id().clone(), m))
         };
+        let light_id = self.light.read().unwrap_or_else(|p| p.into_inner()).clone();
         let local = reg
             .iter()
-            .filter(|(_, r)| r.kind == RouteKind::Local)
+            .filter(|(id, r)| r.kind == RouteKind::Local && Some(id) != light_id.as_ref())
+            .find_map(|(_, r)| default(r));
+        let light = reg
+            .iter()
+            .filter(|(id, r)| r.kind == RouteKind::Local && Some(id) == light_id.as_ref())
             .find_map(|(_, r)| default(r));
         let api: Vec<Candidate> = reg
             .iter()
@@ -180,6 +200,15 @@ impl RouterCore {
                         }
                     })
                     .collect();
+            }
+        }
+        if let Some(light) = light {
+            for class in LIGHT_CLASSES {
+                policy
+                    .classes
+                    .entry(class)
+                    .or_default()
+                    .insert(0, light.clone());
             }
         }
         policy

@@ -227,6 +227,11 @@ export interface GpuInfo {
   readonly model: string;
   readonly vram_mb: number;
   readonly backends: readonly string[];
+  /** Rola przy kilku kartach: modele główne, lekkie zadania albo nieużywana. */
+  readonly role: 'heavy' | 'light' | 'spare';
+  /** Karta zintegrowana — pamięć współdzielona z RAM. */
+  readonly integrated: boolean;
+  readonly shared_mb: number;
 }
 
 export interface DeviceProfile {

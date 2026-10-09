@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.10). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.11). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -31,6 +31,8 @@ Szczegółowe zadania: [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §6, etapy 0–3
 | A.3e | Naprawy po pierwszej próbie 0.0.7 na laptopie: wybór modelu rozmowy, strona „API i kolejki modeli”, redukcja szumów, koniec wypowiedzi w rozmowie głosowej, filtr zmyślonych wywołań narzędzi | zrobione | 2026-10-09 | wersja 0.0.8; pięć zgłoszeń właściciela; zegar potoku sprawdzony na mikrofonie laptopa |
 | A.3f | Porządkowanie interfejsu, krok 1: przejścia konto ↔ kolejki modeli, przełącznik szczegółów odpowiedzi | zrobione | 2026-10-09 | wersja 0.0.9; dalsze kroki wymagają wskazań właściciela (lista propozycji w raporcie sesji) |
 | A.3g | Własne menu kontekstowe i podpowiedzi (bez elementów systemowych), kolejka modeli jako kafelki do przenoszenia, nowe nazwy stron ustawień modeli, osobna strona „Mosty CLI” | zrobione | 2026-10-09 | wersja 0.0.10; zgłoszenia właściciela |
+| A.3h | Własna belka okna z paskiem LED i przyciskami okna, nawigacja Ustawień od nowa (ikony, zwijane grupy, szukanie z licznikami, klawiatura, wąskie okno) | zrobione | 2026-10-09 | wersja 0.0.11; zgłoszenia właściciela; bez Snap Layouts po najechaniu |
+| A.3i | Kilka kart graficznych: role kart, przypinanie modelu do karty głównej, lekki dostawca lokalny na karcie zintegrowanej (klasa „streszczenia”) | zrobione | 2026-10-09 | wersja 0.0.11 (kod i testy); praca na karcie zintegrowanej niesprawdzona na sprzęcie — wymaga silnika Vulkan (zgoda właściciela na pobranie) |
 | A.4 | Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1) | czeka | — | zgoda właściciela na pobranie pakietu ok. 6 GB |
 | A.5 | Głos na żywo: dyktowanie i czytanie | czeka | — | po A.4 (te same silniki w pakiecie) |
 | A.6 | Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2) | czeka | — | po A.4 |

@@ -45,8 +45,8 @@ test('wszystkie strony ustawień: błąd rdzenia widoczny na miejscu, bez nieobs
   await waitForChat(page);
   await page.keyboard.press('Control+,');
   const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
-  await expect(nav.getByRole('button').first()).toBeVisible();
-  const names = await nav.getByRole('button').allInnerTexts();
+  await expect(nav.locator('button.node').first()).toBeVisible();
+  const names = await nav.locator('button.node').allInnerTexts();
   expect(names.length).toBeGreaterThan(20);
   const report: string[] = [];
   const shown: string[] = [];
@@ -54,7 +54,7 @@ test('wszystkie strony ustawień: błąd rdzenia widoczny na miejscu, bez nieobs
     const name = raw.split('\n')[0]?.trim() ?? raw;
     const before = seen.unhandled.length + seen.crashes.length;
     const toastsBefore = (await visible(page, 'main')).toasts;
-    await nav.getByRole('button').nth(i).click();
+    await nav.locator('button.node').nth(i).click();
     await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
     await settle(page);
     const v = await visible(page, 'section[aria-labelledby="settings-page-title"]');

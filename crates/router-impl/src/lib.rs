@@ -28,4 +28,4 @@ pub use helpers::{counts_as_failure, reason_code, router_with, warning_code};
 pub use history::{localize_history, qualify_event};
 pub use module::{MODULE_TOML, RouterModule};
 pub use routed::RoutedProvider;
-pub use routing::{ProviderQueues, Registered, RouterCore};
+pub use routing::{LIGHT_CLASSES, ProviderQueues, Registered, RouterCore};

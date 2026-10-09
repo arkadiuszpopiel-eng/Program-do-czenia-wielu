@@ -65,6 +65,7 @@ impl HardwarePort for LaptopProbe {
                 dedicated_vram_mb: *self.vram_mb.lock().unwrap(),
                 shared_memory_mb: 7_900,
                 software: false,
+                index: 0,
             },
             GpuAdapter {
                 name: "Microsoft Basic Render Driver".into(),
@@ -73,6 +74,7 @@ impl HardwarePort for LaptopProbe {
                 dedicated_vram_mb: 0,
                 shared_memory_mb: 7_900,
                 software: true,
+                index: 1,
             },
         ])
     }

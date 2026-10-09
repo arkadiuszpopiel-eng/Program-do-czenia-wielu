@@ -157,6 +157,7 @@ pub(crate) fn gpus() -> Result<Vec<GpuAdapter>, PlatformError> {
             dedicated_vram_mb: desc.DedicatedVideoMemory as u64 / MB,
             shared_memory_mb: desc.SharedSystemMemory as u64 / MB,
             software: desc.Flags & (DXGI_ADAPTER_FLAG_SOFTWARE.0 as u32) != 0,
+            index,
         });
     }
     Ok(out)

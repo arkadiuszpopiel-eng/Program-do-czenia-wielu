@@ -32,14 +32,17 @@ for (const width of [720, 480]) {
     await waitForChat(page);
     await page.keyboard.press('Control+,');
     const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
-    await expect(nav.getByRole('button').first()).toBeVisible();
-    await expect(nav.getByRole('button').first()).toBeVisible();
-    const names = await nav.getByRole('button').allInnerTexts();
+    // W wąskim oknie lista stron jest schowana pod przyciskiem bieżącej strony.
+    const showList = () => page.getByRole('button', { name: /^Sekcja: / }).click();
+    await showList();
+    await expect(nav.locator('button.node').first()).toBeVisible();
+    const names = await nav.locator('button.node').allInnerTexts();
     expect(names.length).toBeGreaterThan(20);
     const report: string[] = [];
     for (const [i, raw] of names.entries()) {
       const name = raw.split('\n')[0]?.trim() ?? raw;
-      await nav.getByRole('button').nth(i).click();
+      if (i > 0) await showList();
+      await nav.locator('button.node').nth(i).click();
       await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
       await page.waitForTimeout(250);
       const bad = await overflowing(page);

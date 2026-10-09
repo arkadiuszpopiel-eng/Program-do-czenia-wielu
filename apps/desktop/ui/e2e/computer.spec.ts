@@ -4,7 +4,7 @@ import { expectAccessible, openApp, waitForChat } from './helpers';
 async function settings(page: Page, section: string) {
   const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
   if (!(await nav.isVisible())) await page.keyboard.press('Control+,');
-  await nav.getByRole('button', { name: section }).click();
+  await nav.getByRole('button', { name: section, exact: true }).click();
   await expect(page.getByRole('heading', { name: section, level: 2 })).toBeVisible();
 }
 

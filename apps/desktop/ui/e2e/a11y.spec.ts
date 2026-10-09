@@ -60,7 +60,7 @@ for (const theme of ['light', 'dark'] as const) {
       ]) {
         await page
           .getByRole('navigation', { name: 'Sekcje ustawień' })
-          .getByRole('button', { name: section })
+          .getByRole('button', { name: section, exact: true })
           .click();
         await expect(page.getByRole('heading', { name: section, level: 2 })).toBeVisible();
         await page.waitForTimeout(100);

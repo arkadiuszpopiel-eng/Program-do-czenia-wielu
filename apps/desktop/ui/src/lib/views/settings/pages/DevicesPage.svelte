@@ -8,7 +8,7 @@
   import { useApp } from '../../../state/context';
 
   const app = useApp();
-  const { t } = app.i18n;
+  const { t, tk } = app.i18n;
   let profile = $state<DeviceProfile | null>(null);
   let loadError = $state<string | null>(null);
   let measuring = $state(false);
@@ -60,10 +60,22 @@
       <dd>{app.i18n.bytes(m.ram_mb * 1024 * 1024)}</dd>
       <dt>{t('dev.gpu')}</dt>
       <dd>
-        {#each m.gpus as gpu (gpu.model)}
-          {gpu.vendor}
-          {gpu.model} · {app.i18n.bytes(gpu.vram_mb * 1024 * 1024)} · {gpu.backends.join(', ')}
-        {:else}{t('common.none')}{/each}
+        <ul class="gpus">
+          {#each m.gpus as gpu, index (index)}
+            <li>
+              <span class="gpu-name">{gpu.vendor} {gpu.model}</span>
+              <span class="gpu-role {gpu.role}">{tk(`dev.gpuRole.${gpu.role}`)}</span>
+              <span class="gpu-meta">
+                {gpu.integrated
+                  ? t('dev.gpuShared', { size: app.i18n.bytes(gpu.shared_mb * 1024 * 1024) })
+                  : app.i18n.bytes(gpu.vram_mb * 1024 * 1024)} · {gpu.backends.join(', ')}
+              </span>
+              <span class="gpu-hint">{tk(`dev.gpuHint.${gpu.role}`)}</span>
+            </li>
+          {:else}
+            <li>{t('common.none')}</li>
+          {/each}
+        </ul>
       </dd>
       <dt>{t('dev.npu')}</dt>
       <dd>{m.npu ?? t('common.none')}</dd>
@@ -103,6 +115,41 @@
 {/if}
 
 <style>
+  .gpus {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .gpus li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px var(--alfa-space-2);
+    align-items: center;
+  }
+  .gpu-name {
+    font-weight: var(--alfa-weight-semibold);
+  }
+  .gpu-role {
+    justify-self: start;
+    padding: 0 var(--alfa-space-2);
+    border: 1px solid var(--alfa-color-border-strong);
+    border-radius: var(--alfa-radius-full);
+    font-size: var(--alfa-font-size-xs);
+    line-height: 1.6;
+  }
+  .gpu-role.spare {
+    border-color: var(--alfa-color-border);
+    color: var(--alfa-color-text-muted);
+  }
+  .gpu-meta,
+  .gpu-hint {
+    grid-column: 1 / -1;
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
+  }
   .card {
     display: flex;
     flex-direction: column;

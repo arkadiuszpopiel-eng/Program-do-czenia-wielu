@@ -152,7 +152,21 @@ fn launch_args_are_localhost_only_and_secret_is_redacted() {
         gpu_layers: 32,
         ctx: 4_096,
         threads: 6,
+        device: None,
     };
+    // Przypięcie do karty: `--device` tylko wtedy, gdy cokolwiek idzie na GPU.
+    let pinned = LaunchPlan {
+        device: Some("Vulkan1".into()),
+        ..plan.clone()
+    };
+    let with = pinned.args(&e, std::path::Path::new("/m/x.gguf"), 4321, "k");
+    assert_eq!(support::arg(&with, "--device").as_deref(), Some("Vulkan1"));
+    let on_cpu = LaunchPlan {
+        gpu_layers: 0,
+        ..pinned
+    };
+    let without = on_cpu.args(&e, std::path::Path::new("/m/x.gguf"), 4321, "k");
+    assert_eq!(support::arg(&without, "--device"), None);
     let args = plan.args(&e, std::path::Path::new("/m/x.gguf"), 4321, "tajny-klucz");
     assert_eq!(support::arg(&args, "--host").as_deref(), Some("127.0.0.1"));
     assert!(!args.iter().any(|a| a == "0.0.0.0"));

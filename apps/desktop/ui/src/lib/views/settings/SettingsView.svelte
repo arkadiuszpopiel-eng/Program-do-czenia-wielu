@@ -1,19 +1,19 @@
 <!--
-  Ustawienia (PLAN §15, makieta 11): drzewo sekcji + wyszukiwarka. Każde ustawienie ma opis,
+  Ustawienia (PLAN §15, makieta 11): nawigacja (`SettingsNav`) + strona. Każde ustawienie ma opis,
   domyślną, zakres i reset. Strony z późniejszych fal pokazują, co się na nich pojawi.
 -->
 <script lang="ts">
   import { Button, EmptyState } from '@alfa/ui-kit';
-  import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-  import Search from '@lucide/svelte/icons/search';
   import Hourglass from '@lucide/svelte/icons/hourglass';
   import type { SettingsPageDef } from '../../api/types-system';
   import LoadFailed from '../../components/shell/LoadFailed.svelte';
   import { bestScore } from '../../logic/fuzzy';
   import { groupSettingsPages } from '../../logic/settings-groups';
+  import { hitsByPage } from '../../logic/settings-nav';
   import { load, type Loadable } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import SettingRow from './SettingRow.svelte';
+  import SettingsNav from './SettingsNav.svelte';
   import BuilderPage from './pages/BuilderPage.svelte';
   import ComputerPage from './pages/ComputerPage.svelte';
   import CostsPage from './pages/CostsPage.svelte';
@@ -74,6 +74,7 @@
   const pageMatches = $derived(
     query.trim() ? schema.filter((p) => bestScore(query, app.i18n.text(p.label)) > 0.5) : [],
   );
+  const hits = $derived(hitsByPage(results, pageMatches));
 
   function open(id: string) {
     query = '';
@@ -83,44 +84,7 @@
 </script>
 
 <div class="settings">
-  <aside class="nav">
-    <Button size="sm" variant="ghost" onclick={() => app.closeSettings()}>
-      {#snippet icon()}<ArrowLeft size={14} strokeWidth={1.5} />{/snippet}
-      {t('settings.back')}
-    </Button>
-    <h1 class="h1">{t('settings.title')}</h1>
-    <div class="search">
-      <Search size={14} strokeWidth={1.5} aria-hidden="true" />
-      <label class="alfa-visually-hidden" for="alfa-settings-search">{t('settings.search')}</label>
-      <input
-        id="alfa-settings-search"
-        type="search"
-        placeholder={t('settings.searchPlaceholder')}
-        bind:value={query}
-      />
-    </div>
-    <nav aria-label={t('settings.tree')}>
-      {#each groups as group (group.id)}
-        <p class="group" id="settings-group-{group.id}">{t(`settings.group.${group.id}`)}</p>
-        <ul class="tree" aria-labelledby="settings-group-{group.id}">
-          {#each group.pages as p (p.id)}
-            <li>
-              <button
-                type="button"
-                class="node"
-                class:later={p.wave > 1}
-                aria-current={p.id === page?.id && !query ? 'page' : undefined}
-                onclick={() => open(p.id)}
-              >
-                <span>{app.i18n.text(p.label)}</span>
-                {#if p.wave > 1}<span class="wave">{t('settings.soon')}</span>{/if}
-              </button>
-            </li>
-          {/each}
-        </ul>
-      {/each}
-    </nav>
-  </aside>
+  <SettingsNav {groups} current={page?.id} bind:query {hits} onopen={open} />
   <section class="content" aria-labelledby="settings-page-title">
     <div class="page">
       {#if loaded.status === 'failed'}
@@ -197,100 +161,6 @@
     height: 100%;
     min-height: 0;
   }
-  .nav {
-    display: flex;
-    flex-direction: column;
-    gap: var(--alfa-space-2);
-    width: 260px;
-    flex: none;
-    padding: var(--alfa-space-3);
-    border-right: 1px solid var(--alfa-color-border);
-    background: var(--alfa-color-surface);
-  }
-  /* Przewija się tylko lista stron — „Wróć do rozmowy” i wyszukiwarka zostają na miejscu. */
-  .nav > nav {
-    flex: 1;
-    min-height: 0;
-    margin: 0 calc(-1 * var(--alfa-space-3));
-    padding: 0 var(--alfa-space-3);
-    overflow: auto;
-  }
-  .nav > :global(button:first-child) {
-    align-self: flex-start;
-  }
-  .h1 {
-    padding: var(--alfa-space-2) var(--alfa-space-2) 0;
-    font-size: var(--alfa-font-size-xl);
-  }
-  .search {
-    display: flex;
-    align-items: center;
-    gap: var(--alfa-space-2);
-    height: 32px;
-    padding: 0 var(--alfa-space-2);
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-control);
-    background: var(--alfa-color-bg);
-    color: var(--alfa-color-text-subtle);
-  }
-  .search input {
-    flex: 1;
-    min-width: 0;
-    border: 0;
-    background: transparent;
-  }
-  .search input:focus {
-    outline: none;
-  }
-  .search:focus-within {
-    outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
-    outline-offset: 1px;
-  }
-  .group {
-    margin: var(--alfa-space-3) 0 var(--alfa-space-1);
-    padding: 0 var(--alfa-space-2);
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-xs);
-    font-weight: var(--alfa-weight-semibold);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .tree {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .node {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    min-height: 30px;
-    padding: 0 var(--alfa-space-2);
-    border: 0;
-    border-radius: var(--alfa-radius-control);
-    background: transparent;
-    color: var(--alfa-color-text);
-    font-size: var(--alfa-font-size-sm);
-    text-align: left;
-  }
-  .node:hover {
-    background: var(--alfa-color-surface2);
-  }
-  .node[aria-current='page'] {
-    background: var(--alfa-color-surface3);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .node.later {
-    color: var(--alfa-color-text-muted);
-  }
-  .wave {
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-xs);
-  }
   .content {
     flex: 1;
     min-width: 0;
@@ -330,12 +200,6 @@
   @media (max-width: 720px) {
     .settings {
       flex-direction: column;
-    }
-    .nav {
-      width: 100%;
-      max-height: 40%;
-      border-right: 0;
-      border-bottom: 1px solid var(--alfa-color-border);
     }
     .content {
       padding: var(--alfa-space-4);

@@ -150,3 +150,4 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   `n_ctx_train` 8192 (manifest miał `ctx = 32768` — poprawione; dłuższe `-c` niż trening pogarsza odpowiedzi), 4,76 mld
   parametrów, KV 480 MiB przy `-c 8192`; 1.5B — 32 warstwy, 2 głowice KV, `n_ctx_train` 8192, KV 256 MiB. CPU 4 vCPU:
   4.5B 6,8 tok/s, 1.5B 21 tok/s; żądanie z narzędziem (4.5B, `--jinja`) — wywołanie narzędzia.
+- **Kilka kart (0.0.11):** `pin_device` — identyfikator urządzenia z `llama-server --list-devices` dopasowany po nazwie karty i przekazany w `--device` (tylko gdy serwer widzi więcej niż jedno urządzenie albo karta jest wskazana wprost). `shared_memory` — dzierżawa modelu na karcie zintegrowanej liczona jako RAM, bez budżetu VRAM karty głównej. Drugi egzemplarz dostawcy (`local-light`, tylko Vulkan, Bielik 1.5B) obsługuje lekkie zadania; bez silnika Vulkan zgłasza „nieskonfigurowany”.

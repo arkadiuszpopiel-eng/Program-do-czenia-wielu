@@ -2,7 +2,8 @@
 //! restart po awarii z limitem, fallback GPU → CPU, dzierżawa `model-residency`, zwolnienie
 //! po bezczynności. Każde uruchomienie: `127.0.0.1`, losowy port, losowy klucz API.
 
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, VecDeque};
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
@@ -52,6 +53,8 @@ pub struct Sidecar {
     restarts: Mutex<VecDeque<Instant>>,
     events: Mutex<Option<UnboundedSender<LocalEvent>>>,
     health: reqwest::Client,
+    /// Urządzenia zgłoszone przez serwer (`--list-devices`), pytane raz na plik serwera.
+    pub(crate) devices: Mutex<BTreeMap<PathBuf, Vec<crate::devices::EngineDevice>>>,
 }
 
 pub(crate) fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -88,14 +91,26 @@ impl Sidecar {
             restarts: Mutex::new(VecDeque::new()),
             events: Mutex::new(None),
             health,
+            devices: Mutex::new(BTreeMap::new()),
         });
         if let Some(r) = &sidecar.residency {
             r.listen(
-                RESIDENCY_OWNER,
+                &sidecar.owner(),
                 Arc::new(Listener(Arc::downgrade(&sidecar))),
             );
         }
         Ok(sidecar)
+    }
+
+    /// Właściciel dzierżaw w zarządcy rezydencji. Dostawca główny zachowuje stałą nazwę; każdy
+    /// kolejny (np. pomocnik na karcie zintegrowanej) ma własną, żeby odebranie dzierżawy jednemu
+    /// nie zatrzymywało drugiego.
+    pub fn owner(&self) -> String {
+        if self.config.provider_id == "local" {
+            RESIDENCY_OWNER.to_owned()
+        } else {
+            format!("{RESIDENCY_OWNER}:{}", self.config.provider_id)
+        }
     }
 
     /// Konfiguracja.

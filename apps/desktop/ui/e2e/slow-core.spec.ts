@@ -42,13 +42,13 @@ test('strony ustawień pokazują stan ładowania, gdy rdzeń odpowiada wolno', a
   await waitForChat(page, 20_000);
   await page.keyboard.press('Control+,');
   const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
-  await expect(nav.getByRole('button').first()).toBeVisible({ timeout: 10_000 });
-  const names = await nav.getByRole('button').allInnerTexts();
+  await expect(nav.locator('button.node').first()).toBeVisible({ timeout: 10_000 });
+  const names = await nav.locator('button.node').allInnerTexts();
   const report: string[] = [];
   for (const [i, raw] of names.entries()) {
     const name = raw.split('\n')[0]?.trim() ?? raw;
     const problem = await check(page, 'section[aria-labelledby="settings-page-title"]', name, () =>
-      nav.getByRole('button').nth(i).click(),
+      nav.locator('button.node').nth(i).click(),
     );
     if (problem) report.push(problem);
     await page.waitForTimeout(1_000);
