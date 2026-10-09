@@ -97,6 +97,7 @@
     "allow-voice-dictation",
     "allow-voice-read",
     "allow-system-status",
+    "allow-system-clipboard-text",
     "allow-system-retry-queue",
     "allow-quick-ask",
     "allow-quick-expand-to-main",

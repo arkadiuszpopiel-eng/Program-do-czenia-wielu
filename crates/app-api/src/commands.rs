@@ -100,6 +100,7 @@ macro_rules! with_commands {
             voice_dictation(action: $crate::dto::DictationAction) -> $crate::dto::VoiceFeatures;
             voice_read(action: $crate::dto::ReadAction) -> $crate::dto::VoiceFeatures;
             system_status() -> $crate::dto::SystemStatus;
+            system_clipboard_text() -> Option<String>;
             system_retry_queue() -> ();
             quick_ask(text: String) -> $crate::dto::QuickAskResult;
             quick_expand_to_main(session_id: String) -> ();
@@ -249,6 +250,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 216);
+        assert_eq!(super::COMMANDS.len(), 217);
     }
 }

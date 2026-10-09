@@ -33,6 +33,9 @@ const boot = await client.app.bootstrap().catch((error: unknown) => {
 const locale = boot?.locale ?? 'pl';
 applyBootDocument(document.documentElement, { locale, settings: boot?.settings ?? {} });
 document.title = `Alfa — ${quickText(locale, 'title')}`;
-installContextMenu({ labels: () => CONTEXT_MENU_LABELS[locale] });
+installContextMenu({
+  labels: () => CONTEXT_MENU_LABELS[locale],
+  readClipboard: () => client.system.clipboardText(),
+});
 installTooltips();
 mount(QuickApp, { target, props: { client, locale } });

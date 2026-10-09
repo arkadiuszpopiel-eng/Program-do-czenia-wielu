@@ -268,6 +268,8 @@ export interface SystemApi {
   status(): Promise<SystemStatus>;
   /** Ponów wysłanie kolejki offline. */
   retryQueue(): Promise<void>;
+  /** Tekst ze schowka systemu — dla „Wklej” z menu Alfy (`null`: pusty albo nie tekst). */
+  clipboardText(): Promise<string | null>;
 }
 
 export interface QuickApi {

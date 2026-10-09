@@ -156,6 +156,7 @@ export class TauriAlfaClient implements AlfaClient {
   readonly system: AlfaClient['system'] = {
     status: () => call('system_status'),
     retryQueue: () => call('system_retry_queue'),
+    clipboardText: () => call('system_clipboard_text'),
   };
 
   readonly quick: AlfaClient['quick'] = {

@@ -259,6 +259,7 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
         "voice_ptt" => (vec![("pressed", b)], unit),
         "voice_preview" => (vec![("agent", s)], unit),
         "system_status" => (vec![], roundtrip::<SystemStatus>),
+        "system_clipboard_text" => (vec![], roundtrip::<Option<String>>),
         "system_retry_queue" | "quick_hide" => (vec![], unit),
         "quick_ask" => (vec![("text", s)], roundtrip::<QuickAskResult>),
         "quick_expand_to_main" => (vec![("sessionId", s)], unit),

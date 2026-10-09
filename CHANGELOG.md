@@ -17,6 +17,8 @@ i słaba organizacja ustawień modeli.
 
 - Menu po kliknięciu prawym przyciskiem rysuje Alfa (Cofnij, Wytnij, Kopiuj, Wklej, Zaznacz wszystko) — systemowe
   menu z „Emoji”, „Kierunek pisania” i „Wykonaj inspekcję” nie pojawia się w żadnym oknie.
+- „Wklej” z menu czyta schowek przez rdzeń programu — WebView2 odmawia stronie dostępu do schowka (wyszło w teście
+  prawdziwej aplikacji).
 - Podpowiedzi przycisków rysuje Alfa zamiast systemowych dymków.
 - Znikają pozostałe elementy rysowane przez system: strzałki pól liczbowych, krzyżyk i „oko” w polach, trójkąt
   rozwijania sekcji, uchwyt zmiany rozmiaru pola; pola nie podpowiadają wcześniejszych wpisów listą systemu.

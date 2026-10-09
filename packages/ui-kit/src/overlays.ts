@@ -41,6 +41,11 @@ export const CONTEXT_MENU_LABELS: Readonly<Record<'pl' | 'en', ContextMenuLabels
 
 export interface ContextMenuOptions {
   readonly labels: () => ContextMenuLabels;
+  /**
+   * Odczyt tekstu schowka. WebView2 odmawia stronie `navigator.clipboard.readText()`, więc aplikacja
+   * podaje tu polecenie rdzenia; bez tego używany jest schowek przeglądarki.
+   */
+  readonly readClipboard?: () => Promise<string | null>;
   /** Pokazanie komunikatu (toast); bez tego błąd wklejania trafia tylko do konsoli. */
   readonly notify?: (message: string) => void;
 }
@@ -120,7 +125,10 @@ export function installContextMenu(options: ContextMenuOptions): () => void {
       return;
     }
     try {
-      const text = await navigator.clipboard.readText();
+      const read = options.readClipboard ?? (() => navigator.clipboard.readText());
+      const text = await read();
+      // Pole mogło stracić fokus w czasie odczytu (np. okno potwierdzenia przeglądarki).
+      field?.focus();
       // `insertText` zachowuje historię cofania i wysyła zdarzenie `input` (pola powiązane).
       if (text) document.execCommand('insertText', false, text);
     } catch {

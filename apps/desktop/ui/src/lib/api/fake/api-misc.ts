@@ -175,6 +175,11 @@ export function deviceApi(core: FakeCore): AlfaClient['device'] {
 export function systemApi(core: FakeCore, chat: FakeChat): AlfaClient['system'] {
   return {
     status: () => core.reply(core.status),
+    // Przeglądarka z atrapą ma własny schowek (w programie czyta go rdzeń).
+    clipboardText: () =>
+      typeof navigator !== 'undefined' && navigator.clipboard
+        ? navigator.clipboard.readText().then((text) => text || null)
+        : Promise.resolve(null),
     retryQueue: () => {
       if (core.status.online) chat.flushQueue();
       else

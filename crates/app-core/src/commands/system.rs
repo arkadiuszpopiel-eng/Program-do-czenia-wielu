@@ -48,6 +48,23 @@ impl AppCore {
         Ok(self.status_snapshot().await)
     }
 
+    /// `system_clipboard_text`: tekst ze schowka systemu dla polecenia „Wklej” z menu Alfy
+    /// (WebView2 odmawia stronie odczytu schowka). Wywoływane wyłącznie po wyborze „Wklej” przez
+    /// użytkownika; `None`, gdy schowek jest pusty albo nie zawiera tekstu. Treść nie trafia do
+    /// logów ani zdarzeń.
+    pub async fn system_clipboard_text(&self) -> Result<Option<String>, AppError> {
+        use platform_contract::ClipboardContent;
+        let clipboard = self.inner.clipboard.clone();
+        let content = tokio::task::spawn_blocking(move || clipboard.get())
+            .await
+            .map_err(|e| AppError::internal(format!("schowek: {e}")))?
+            .map_err(|e| AppError::internal(format!("schowek: {e}")))?;
+        Ok(match content {
+            ClipboardContent::Text(text) => Some(text),
+            _ => None,
+        })
+    }
+
     /// `system_retry_queue`: offline → komunikat; online → wysłanie kolejki.
     pub async fn system_retry_queue(&self) -> Result<(), AppError> {
         if !self.rt().online {

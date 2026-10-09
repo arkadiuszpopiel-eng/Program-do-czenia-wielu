@@ -239,6 +239,7 @@ async function run(): Promise<void> {
     profile: null,
   });
   await both('system', 'retryQueue');
+  await both('system', 'clipboardText');
   await flush();
   fake.setOnline(true);
   fake.setRateLimited(3);

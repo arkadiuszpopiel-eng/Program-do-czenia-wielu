@@ -21,6 +21,11 @@
     "result": null
   },
   {
+    "command": "system_clipboard_text",
+    "args": {},
+    "result": null
+  },
+  {
     "command": "system_status",
     "args": {},
     "result": {

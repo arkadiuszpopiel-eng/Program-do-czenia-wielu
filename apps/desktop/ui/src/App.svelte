@@ -58,6 +58,7 @@
   $effect(() => {
     const menu = installContextMenu({
       labels: () => CONTEXT_MENU_LABELS[app.i18n.locale],
+      readClipboard: () => app.client.system.clipboardText(),
       notify: (message) => app.toasts.show({ kind: 'warning', message }),
     });
     const tips = installTooltips();

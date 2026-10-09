@@ -7,6 +7,7 @@
     "core:event:allow-listen",
     "core:event:allow-unlisten",
     "allow-app-bootstrap",
+    "allow-system-clipboard-text",
     "allow-quick-ask",
     "allow-quick-expand-to-main",
     "allow-quick-hide"

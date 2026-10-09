@@ -47,6 +47,8 @@ pub(crate) struct Inner {
     pub app_version: String,
     /// Po jakim czasie bez awarii start jest zdrowy (`updater::mark_good`).
     pub healthy_after: Duration,
+    /// Schowek systemu dla interfejsu (własne menu „Wklej”; WebView2 nie daje stronie odczytu).
+    pub clipboard: Arc<dyn platform_contract::ClipboardPort>,
     pub undo_window: Option<Duration>,
     pub bus: Arc<dyn EventBus>,
     pub registry: Arc<ModuleRegistry>,
