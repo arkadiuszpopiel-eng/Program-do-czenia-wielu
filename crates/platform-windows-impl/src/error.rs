@@ -16,7 +16,7 @@ pub(crate) const HR_HOTKEY_ALREADY_REGISTERED: u32 = 0x8007_0581;
 pub(crate) const HR_CANCELLED: u32 = 0x8007_04C7;
 
 /// Polskie opisy najczęstszych kodów (HRESULT; kody Win32 w postaci `0x8007xxxx`).
-const DESCRIPTIONS: [(u32, &str); 22] = [
+const DESCRIPTIONS: [(u32, &str); 25] = [
     (0x8000_4005, "nieokreślony błąd"),
     (
         0x8000_4001,
@@ -45,6 +45,12 @@ const DESCRIPTIONS: [(u32, &str); 22] = [
     (0x8007_05AA, "brak zasobów systemowych"),
     (0x8007_05B4, "przekroczono limit czasu"),
     (0x887A_0002, "nie znaleziono obiektu (DXGI)"),
+    (
+        0xC00D_3704,
+        "kamera nie wystartowała — może jej używać inna aplikacja",
+    ),
+    (0xC00D_36B4, "kamera nie obsługuje żądanego formatu obrazu"),
+    (0xC00D_3EA2, "urządzenie wideo zostało odłączone"),
 ];
 
 /// Polski opis kodu HRESULT, jeśli znany.

@@ -183,6 +183,8 @@ pub fn options(provider: Option<Arc<ScriptedProvider>>, shell: Arc<HeadlessShell
         shell: Some(shell),
         // Wirtualne audio (deterministyczne na każdym systemie); TTS — brak sidecarów.
         audio: Some(Arc::new(voice_audio_fake::FakeAudio::new())),
+        // Wirtualne kamery — testy nie dotykają kamer maszyny.
+        cameras: Some(Arc::new(platform_fake::FakeCameras::new(2))),
         ..AppOptions::default()
     }
 }

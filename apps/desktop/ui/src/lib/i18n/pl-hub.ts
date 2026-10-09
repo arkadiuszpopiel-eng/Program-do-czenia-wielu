@@ -161,4 +161,22 @@ export const plHub = {
   'wiz.finish': 'Zakończ',
   'wiz.skip': 'Pomiń — dodam później',
   'wiz.added': 'Dodano konto „{label}".',
+  'env.button': 'Importuj ze zmiennych środowiskowych',
+  'env.imported': 'dodano konto',
+  'env.already': 'ten klucz jest już zapisany',
+  'env.nothing': 'Nie znalazłam nowych kluczy w zmiennych środowiskowych',
+  'env.note':
+    'Sprawdzam tylko nazwy z katalogu dostawców. Znaleziony klucz trafia do Windows Credential Manager; jego wartości nie widzi ani interfejs, ani dziennik. Zmienną możesz potem usunąć z systemu.',
+  'env.done': {
+    one: 'Dodano {n} konto ze zmiennych środowiskowych',
+    few: 'Dodano {n} konta ze zmiennych środowiskowych',
+    many: 'Dodano {n} kont ze zmiennych środowiskowych',
+    other: 'Dodano {n} konta ze zmiennych środowiskowych',
+  },
+  'env.missing': {
+    one: 'Nieustawiona {n} zmienna:',
+    few: 'Nieustawione {n} zmienne:',
+    many: 'Nieustawionych {n} zmiennych:',
+    other: 'Nieustawione {n} zmiennej:',
+  },
 } as const;

@@ -108,6 +108,23 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
     L('Budżety RAM i CPU', 'RAM and CPU budgets'),
   ]),
   page(
+    'cameras',
+    L('Kamery', 'Cameras'),
+    1,
+    [
+      toggle(
+        'camera.enabled',
+        L('Kamery włączone', 'Cameras enabled'),
+        L(
+          'Przełącznik główny. Wyłączony: żadna kamera się nie otworzy, niezależnie od tego, kto prosi o obraz. Włączony: kamera otwiera się na żądanie (podgląd) i sama zasypia; działającą kamerę zawsze widać w górnej belce.',
+          'Master switch. Off: no camera opens, no matter who asks for an image. On: a camera opens on request (preview) and goes to sleep by itself; a live camera is always shown in the top bar.',
+        ),
+        false,
+      ),
+    ],
+    { custom: 'cameras' },
+  ),
+  page(
     'devices',
     L('Urządzenia', 'Devices'),
     1,

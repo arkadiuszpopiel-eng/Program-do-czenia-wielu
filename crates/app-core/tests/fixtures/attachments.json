@@ -1,5 +1,41 @@
 [
   {
+    "command": "attachments_add_camera",
+    "args": {
+      "sessionId": "s-api",
+      "cameraId": "usb-integrated"
+    },
+    "result": {
+      "added": [
+        {
+          "id": "att-muo3lago-19",
+          "session_id": "s-api",
+          "name": "kamera-usb-integrated-124500.png",
+          "bytes": 412000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-api\\in\\kamera-usb-integrated-124500.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        }
+      ],
+      "rejected": [],
+      "staged": [
+        {
+          "id": "att-muo3lago-19",
+          "session_id": "s-api",
+          "name": "kamera-usb-integrated-124500.png",
+          "bytes": 412000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-api\\in\\kamera-usb-integrated-124500.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        }
+      ]
+    }
+  },
+  {
     "command": "attachments_list",
     "args": {
       "sessionId": "s-trip"
@@ -14,7 +50,7 @@
     "result": {
       "added": [
         {
-          "id": "att-muoggmms-37",
+          "id": "att-muoilses-38",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -28,7 +64,7 @@
       "rejected": [],
       "staged": [
         {
-          "id": "att-muoggmms-37",
+          "id": "att-muoilses-38",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -49,12 +85,12 @@
     "result": {
       "added": [
         {
-          "id": "att-muoggmms-38",
+          "id": "att-muoilses-39",
           "session_id": "s-trip",
-          "name": "wklejony-obraz-20260930-184518.png",
+          "name": "wklejony-obraz-20260930-194518.png",
           "bytes": 182000,
           "mime": "image/png",
-          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
           "kind": "image",
           "delivery": "full",
           "tokens": 1640
@@ -63,7 +99,7 @@
       "rejected": [],
       "staged": [
         {
-          "id": "att-muoggmms-37",
+          "id": "att-muoilses-38",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -74,12 +110,12 @@
           "tokens": 40
         },
         {
-          "id": "att-muoggmms-38",
+          "id": "att-muoilses-39",
           "session_id": "s-trip",
-          "name": "wklejony-obraz-20260930-184518.png",
+          "name": "wklejony-obraz-20260930-194518.png",
           "bytes": 182000,
           "mime": "image/png",
-          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
           "kind": "image",
           "delivery": "full",
           "tokens": 1640
@@ -95,7 +131,7 @@
     "result": {
       "added": [
         {
-          "id": "att-muoggmms-39",
+          "id": "att-muoilses-40",
           "session_id": "s-trip",
           "name": "notatki.md",
           "bytes": 400000,
@@ -114,7 +150,7 @@
       ],
       "staged": [
         {
-          "id": "att-muoggmms-37",
+          "id": "att-muoilses-38",
           "session_id": "s-trip",
           "name": "raport-q3.pdf",
           "bytes": 1240000,
@@ -125,18 +161,18 @@
           "tokens": 40
         },
         {
-          "id": "att-muoggmms-38",
+          "id": "att-muoilses-39",
           "session_id": "s-trip",
-          "name": "wklejony-obraz-20260930-184518.png",
+          "name": "wklejony-obraz-20260930-194518.png",
           "bytes": 182000,
           "mime": "image/png",
-          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
           "kind": "image",
           "delivery": "full",
           "tokens": 1640
         },
         {
-          "id": "att-muoggmms-39",
+          "id": "att-muoilses-40",
           "session_id": "s-trip",
           "name": "notatki.md",
           "bytes": 400000,
@@ -153,22 +189,22 @@
     "command": "attachments_remove",
     "args": {
       "sessionId": "s-trip",
-      "attachmentId": "att-muoggmms-37"
+      "attachmentId": "att-muoilses-38"
     },
     "result": [
       {
-        "id": "att-muoggmms-38",
+        "id": "att-muoilses-39",
         "session_id": "s-trip",
-        "name": "wklejony-obraz-20260930-184518.png",
+        "name": "wklejony-obraz-20260930-194518.png",
         "bytes": 182000,
         "mime": "image/png",
-        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
         "kind": "image",
         "delivery": "full",
         "tokens": 1640
       },
       {
-        "id": "att-muoggmms-39",
+        "id": "att-muoilses-40",
         "session_id": "s-trip",
         "name": "notatki.md",
         "bytes": 400000,
@@ -187,18 +223,18 @@
     },
     "result": [
       {
-        "id": "att-muoggmms-38",
+        "id": "att-muoilses-39",
         "session_id": "s-trip",
-        "name": "wklejony-obraz-20260930-184518.png",
+        "name": "wklejony-obraz-20260930-194518.png",
         "bytes": 182000,
         "mime": "image/png",
-        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-184518.png",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
         "kind": "image",
         "delivery": "full",
         "tokens": 1640
       },
       {
-        "id": "att-muoggmms-39",
+        "id": "att-muoilses-40",
         "session_id": "s-trip",
         "name": "notatki.md",
         "bytes": 400000,

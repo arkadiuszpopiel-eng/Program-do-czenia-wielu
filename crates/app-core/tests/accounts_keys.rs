@@ -175,3 +175,40 @@ async fn pasted_extras_are_removed_prose_is_refused_and_duplicates_are_caught() 
         .unwrap();
     assert_eq!(core.accounts_list().await.unwrap().len(), 2);
 }
+
+/// Źródło zmiennych do testu importu: podaje tylko to, co wpisano.
+struct TestEnv(Vec<(&'static str, &'static str)>);
+
+impl accounts_hub_contract::EnvSource for TestEnv {
+    fn var(&self, name: &str) -> Option<accounts_hub_contract::SecretString> {
+        self.0
+            .iter()
+            .find(|(key, _)| *key == name)
+            .map(|(_, value)| accounts_hub_contract::SecretString::new((*value).to_owned()))
+    }
+}
+
+/// Plan v6, C2.17: import ze zmiennych środowiskowych zgłasza każdą zmienną z katalogu po nazwie;
+/// brak zmiennej i wartość, która nie wygląda na klucz, niczego nie dodają, a raport nie zawiera
+/// żadnej wartości.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn env_import_reports_names_only_and_ignores_values_that_are_not_keys() {
+    use app_core::dto::EnvImportKind;
+    let (core, _dir) = core().await;
+    let empty = core.import_env_from(&TestEnv(vec![])).await.unwrap();
+    assert!(empty.iter().any(|r| r.var == "OPENAI_API_KEY"));
+    assert!(empty.iter().all(|r| r.result == EnvImportKind::NotSet));
+    assert!(empty.iter().all(|r| r.account_id.is_none()));
+    assert!(empty.iter().all(|r| !r.provider_name.is_empty()));
+
+    // Zdanie zamiast klucza (np. pomyłka w konfiguracji) nie staje się kontem.
+    let prose = TestEnv(vec![("OPENAI_API_KEY", "to nie jest klucz, tylko zdanie")]);
+    let report = core.import_env_from(&prose).await.unwrap();
+    assert!(report.iter().all(|r| r.result == EnvImportKind::NotSet));
+    assert!(core.accounts_list().await.unwrap().is_empty());
+    let text = serde_json::to_string(&report).unwrap();
+    assert!(
+        !text.contains("to nie jest klucz"),
+        "raport nie niesie wartości"
+    );
+}

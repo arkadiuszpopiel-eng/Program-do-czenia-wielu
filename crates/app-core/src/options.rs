@@ -80,6 +80,12 @@ pub struct AppOptions {
     pub signals: Option<Arc<dyn platform_contract::SystemSignalsPort>>,
     /// Obserwacja katalogów wyzwalaczy (`None` = `ReadDirectoryChangesW` na Windows).
     pub dir_watch: Option<Arc<dyn platform_contract::DirWatchPort>>,
+    /// Kamery systemu dla `camera-hub` (`None` = Media Foundation; testy: `platform-fake`).
+    pub cameras: Option<Arc<dyn platform_contract::CameraPort>>,
+    /// Gotowy hub kamer (`None` = `camera-hub-impl` nad `cameras` i konfiguracją).
+    pub camera_hub: Option<Arc<dyn camera_hub_contract::CameraHub>>,
+    /// Po jakim czasie bez żądań kamera zasypia (`None` = 20 s).
+    pub camera_idle: Option<Duration>,
     /// Po jakim czasie bez awarii start uznać za zdrowy (`updater::mark_good`).
     pub healthy_after: Duration,
     /// Zapis logów NDJSON z magistrali (`core-log`).
@@ -116,6 +122,9 @@ impl Default for AppOptions {
             pty: None,
             signals: None,
             dir_watch: None,
+            cameras: None,
+            camera_hub: None,
+            camera_idle: None,
             healthy_after: Duration::from_secs(30),
             file_logs: true,
         }

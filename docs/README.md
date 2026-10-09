@@ -42,7 +42,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | Dokument | Co zawiera |
 | --- | --- |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Aktywa, granice zaufania, scenariusze ataku, twarde blokady |
-| [`reviews/`](reviews/) | Przeglądy bezpieczeństwa #1–#3, przegląd fali 3, audyt interfejsu, przegląd zmian 0.0.1–0.0.5 — z listą ustaleń otwartych |
+| [`reviews/`](reviews/) | Przeglądy bezpieczeństwa #1–#3, przegląd fali 3, audyt interfejsu, przegląd zmian 0.0.1–0.0.5 — z listą ustaleń otwartych; **pakiet decyzji właściciela** (`2026-10-10-pakiet-decyzji-wlasciciela.md`) |
 | [`compliance/`](compliance/subscription-routes.md) | Zgodność tras abonamentowych, rejestr tras |
 | [`AI_WORKFLOW.md`](AI_WORKFLOW.md) | Jak pracują sesje AI: kolejność pracy nad modułem, recenzja, Definition of Done, bramki ludzkie |
 

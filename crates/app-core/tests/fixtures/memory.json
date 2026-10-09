@@ -394,7 +394,7 @@
       }
     },
     "result": {
-      "id": "global#m-muoa0tf0-27",
+      "id": "global#m-muoc5z70-28",
       "scope": {
         "kind": "global",
         "id": null
@@ -411,7 +411,7 @@
       "confidence": 0.95,
       "pinned": true,
       "version": 2,
-      "created_at": "2026-09-30T15:45:02.700Z",
+      "created_at": "2026-09-30T16:45:02.700Z",
       "expires_at": null,
       "session_id": null,
       "turn": null,
@@ -494,7 +494,7 @@
       }
     },
     "result": {
-      "id": "global#m-muoa0tf0-30",
+      "id": "global#m-muoc5z70-31",
       "scope": {
         "kind": "global",
         "id": null
@@ -513,7 +513,7 @@
       "confidence": 0.9,
       "pinned": false,
       "version": 1,
-      "created_at": "2026-09-30T15:45:02.700Z",
+      "created_at": "2026-09-30T16:45:02.700Z",
       "expires_at": null,
       "session_id": null,
       "turn": null,
@@ -610,28 +610,28 @@
     },
     "result": [
       {
-        "id": "chg-muoa0tf0-31",
+        "id": "chg-muoc5z70-32",
         "scope_key": "global",
         "run": null,
-        "at": "2026-09-30T15:45:02.700Z",
+        "at": "2026-09-30T16:45:02.700Z",
         "kind": "promote",
         "note": "Awans z zakresu project:p-x.",
         "entries": [
-          "global#m-muoa0tf0-30"
+          "global#m-muoc5z70-31"
         ],
         "undone": false,
         "undoable": true
       },
       {
-        "id": "chg-muoa0tf0-28",
+        "id": "chg-muoc5z70-29",
         "scope_key": "global",
         "run": null,
-        "at": "2026-09-30T15:45:02.700Z",
+        "at": "2026-09-30T16:45:02.700Z",
         "kind": "edit",
         "note": "Edycja przez użytkownika (nowa wersja).",
         "entries": [
           "global#m5",
-          "global#m-muoa0tf0-27"
+          "global#m-muoc5z70-28"
         ],
         "undone": false,
         "undoable": true
@@ -642,7 +642,7 @@
     "command": "memory_undo",
     "args": {
       "scope": "global",
-      "changeId": "chg-muoa0tf0-28"
+      "changeId": "chg-muoc5z70-29"
     },
     "result": {
       "removed": 1,
@@ -654,9 +654,9 @@
     "command": "memory_consolidate_now",
     "args": {},
     "result": {
-      "run": "run-muoa0tf0-32",
+      "run": "run-muoc5z70-33",
       "manual": true,
-      "started_at": "2026-09-30T15:45:02.700Z",
+      "started_at": "2026-09-30T16:45:02.700Z",
       "skipped": null,
       "interrupted": null,
       "scopes": 2,

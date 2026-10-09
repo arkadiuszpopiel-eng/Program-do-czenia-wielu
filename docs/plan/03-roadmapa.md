@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.15). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.16). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -39,7 +39,7 @@ Szczegółowe zadania: [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §6, etapy 0–3
 | A.4 | Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1) | czeka | — | zgoda właściciela na pobranie pakietu ok. 6 GB |
 | A.5 | Głos na żywo: dyktowanie i czytanie | czeka | — | po A.4 (te same silniki w pakiecie) |
 | A.6 | Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2) | czeka | — | po A.4 |
-| A.7 | Decyzje bezpieczeństwa: B-01…B-08, S-01…S-04, S-06, C-02, C-03, R-05, P-… | czeka | — | właściciel; pakiet do przeglądu przygotuje sesja |
+| A.7 | Decyzje bezpieczeństwa: B-01…B-08, S-01…S-04, S-06, C-02, C-03, R-05, P-… | czeka | — | właściciel; pakiet gotowy: [`reviews/2026-10-10-pakiet-decyzji-wlasciciela.md`](../reviews/2026-10-10-pakiet-decyzji-wlasciciela.md) (44 decyzje z rekomendacjami) |
 | A.8 | Wdrożenie decyzji i przegląd Jądra, wejście na `main` (KONTYNUACJA etap 3) | czeka | — | po A.7 |
 
 **Wyjście:** scenariusz MVP 6/6 na laptopie, każde kryterium F0–F3 z wynikiem z maszyny, `main` zawiera
@@ -97,7 +97,7 @@ Bez nowych funkcji dla użytkownika; każde zadanie kończy się tym, że wszyst
 | C2.14 | Okresowe sprawdzanie kluczy w tle, wiek klucza i przypomnienie o wymianie | planowane | — | moduł `scheduler` już jest; bez zużycia tokenów (lista modeli) |
 | C2.15 | Konto zapasowe: przełączenie na inne konto tego samego dostawcy, gdy pierwsze nie ma środków albo jest ograniczane | planowane | — | reguły routera; widoczne w osi czasu |
 | C2.16 | Dziennik operacji na kluczach (dodanie, wymiana, wyłączenie, usunięcie, wynik testu) bez treści klucza | czeka | — | audyt jest w Jądrze — decyzja właściciela |
-| C2.17 | Import kluczy ze zmiennych środowiskowych: przycisk w interfejsie i polecenie rdzenia | planowane | — | hub już to umie (`import_from_env`, tylko nazwy z `env_vars` katalogu); brakuje polecenia i widoku |
+| C2.17 | Import kluczy ze zmiennych środowiskowych: przycisk w interfejsie i polecenie rdzenia | zrobione | 2026-10-10 | wersja 0.0.16; polecenie `accounts_import_env` i raport w „Konta i klucze API”; nieuruchamiane na prawdziwych zmiennych |
 
 **Wyjście:** każda funkcja ma kryterium w `ACCEPTANCE.md` (progi ustala właściciel) i wynik ze sprzętu.
 
@@ -107,13 +107,13 @@ Zlecenie właściciela z 2026-10-09. Kolejność: najpierw kamery i opis obrazu 
 
 | ID | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
-| C3.1 | Port kamery w `platform-contract` (`CameraPort`) i atrapa: lista urządzeń, tryby, strumień, podłączanie na żywo | planowane | — | SPEC `camera-hub`; kod systemowy tylko w `platform-windows-impl` |
-| C3.2 | Kamery USB na Windows (Media Foundation) | planowane | — | po C3.1; pomiar na laptopie właściciela |
-| C3.3 | Hub kamer: rejestr, kilka strumieni naraz, usypianie, klatka na żądanie, podgląd, przełącznik główny i kill-switch | planowane | — | moduł `camera-hub` (contract, fake, impl) |
-| C3.4 | Strona Ustawień „Kamery” i wskaźnik kamery w belce oraz pigułce głosowej | planowane | — | bez kontrolek systemowych; każdy stan w 3 stylach × 2 motywach |
+| C3.1 | Port kamery w `platform-contract` (`CameraPort`) i atrapa: lista urządzeń, tryby, strumień, podłączanie na żywo | zrobione | 2026-10-10 | wersja 0.0.16; `platform-contract/src/camera.rs`, atrapa w `platform-fake` |
+| C3.2 | Kamery USB na Windows (Media Foundation) | w toku | — | kod w `platform-windows-impl/src/camera/` (wersja 0.0.16); **niesprawdzone na prawdziwej kamerze** — kamera laptopa odłączona sprzętowo |
+| C3.3 | Hub kamer: rejestr, kilka strumieni naraz, usypianie, klatka na żądanie, podgląd, przełącznik główny i kill-switch | zrobione | 2026-10-10 | wersja 0.0.16; moduł `camera-hub` (contract, fake, impl), testy na atrapie portu; zdarzenia magistrali i kamery sieciowe — dalej |
+| C3.4 | Strona Ustawień „Kamery” i wskaźnik kamery w belce oraz pigułce głosowej | zrobione | 2026-10-10 | wersja 0.0.16; strona „Kamery”, wskaźnik w belce (pigułka głosowa — dalej); 3 style × 2 motywy |
 | C3.5 | Kamery sieciowe: RTSP, wyszukiwanie ONVIF w sieci lokalnej, hasła w Credential Manager, dekoder w osobnym procesie | planowane | — | dotyka `lib-netguard` (lista adresów) — uzgodnić zakres z właścicielem |
 | C3.6 | Model widzący lokalnie: wybór modelu, pomiar pamięci karty razem z modelem rozmowy na 6 GB | czeka | — | zgoda właściciela na pobranie modelu; technologia do sprawdzenia ([`11`](11-technologie-2026-10.md)) |
-| C3.7 | Narzędzie `camera.look` i opis obrazu („opisz mi to, co widzisz”): droga lokalna i chmurowa za zgodą, miniatura w rozmowie | planowane | — | moduł `vision-describe`; obraz = treść niezaufana |
+| C3.7 | Narzędzie `camera.look` i opis obrazu („opisz mi to, co widzisz”): droga lokalna i chmurowa za zgodą, miniatura w rozmowie | w toku | — | wersja 0.0.16: zdjęcie z kamery jako załącznik wiadomości (ręcznie, przyciskiem); narzędzie `camera.look` dla agentek wymaga zdolności Brokera — decyzja właściciela |
 | C3.8 | Wykrywanie twarzy i wzorzec twarzy (ONNX Runtime na procesorze); wybór modeli po sprawdzeniu licencji | czeka | — | podpis ADR 0025; zgoda na pobranie modeli |
 | C3.9 | Rejestr osób i kreator „Zapisz osobę” (zgoda, imię, trzy ujęcia); wzorce zaszyfrowane, klucz w Credential Manager | czeka | — | podpis ADR 0025; moduły `person-recognition`, `person-memory` |
 | C3.10 | Rozpoznanie rozmówcy: kto jest przed kamerą, próg pewności, gość bez pamięci, narzędzie `camera.who`, powitanie po imieniu | czeka | — | po C3.8–C3.9 |
@@ -223,6 +223,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data | Zmiana |
 | --- | --- |
+| 2026-10-10 | Wersja 0.0.16 (noc bez właściciela): kamery USB — port, hub, strona „Kamery”, wskaźnik, zdjęcie jako załącznik (C3.1–C3.4, część C3.7); import kluczy ze zmiennych (C2.17); pakiet decyzji A.7; podsumowanie i dalsze kroki w dokumencie [`13`](13-podsumowanie-i-dalsze-kroki.md). |
 | 2026-10-09 | Zlecenie właściciela: grupa C3 — kamery (USB, IP, Wi-Fi, kilka naraz), rozpoznawanie zapisanych osób z pamięcią długoterminową, opis obrazu na polecenie. Dokument [`12`](12-kamery-i-rozpoznawanie-osob.md), cztery szkice SPEC, projekt ADR 0025. Tylko plan — kod nie powstał. |
 | 2026-10-09 | Wersja 0.0.8: naprawy po próbie na laptopie (A.3e) — rozmowa przez API, kolejki modeli, głos. Właściciel pobrał silniki głosu i model lokalny: pierwsza rozmowa lokalna i nasłuch działają (A.4/A.5 w toku). |
 | 2026-10-09 | Wersja 0.0.7: dodawanie klucza API od nowa (A.3d); zadania C2.12–C2.17 (klucze dla firm) dopisane do planu. |

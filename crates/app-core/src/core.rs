@@ -74,6 +74,8 @@ pub(crate) struct Inner {
     pub work: crate::parts::WorkStack,
     /// Sygnały systemowe (bezczynność, tryb gry, zasilanie, blokada); `None` — brak monitora.
     pub signals: Option<Arc<dyn platform_contract::SystemSignalsPort>>,
+    /// Hub kamer (`camera-hub`): przełączniki, klatki na żądanie, stan dla wskaźnika.
+    pub cameras: crate::parts::Cameras,
     /// Moduły podpięte po F1 (rezydencja, model lokalny, Router, Broker, transfer, głos,
     /// aktualizacje) — trzymane przez cały czas życia rdzenia.
     pub extra: crate::parts::Extra,

@@ -73,6 +73,7 @@
     "allow-accounts-set-model",
     "allow-accounts-set-queue",
     "allow-accounts-suggest-queue",
+    "allow-accounts-import-env",
     "allow-transfer-export",
     "allow-transfer-inspect",
     "allow-transfer-import",
@@ -227,6 +228,13 @@
     "allow-backups-set-password",
     "allow-backups-run-now",
     "allow-backups-verify",
-    "allow-backups-restore"
+    "allow-backups-restore",
+    "allow-cameras-state",
+    "allow-cameras-set-master",
+    "allow-cameras-set-enabled",
+    "allow-cameras-rename",
+    "allow-cameras-refresh",
+    "allow-cameras-frame",
+    "allow-attachments-add-camera"
   ]
 }

@@ -92,7 +92,7 @@ test('nawigacja ustawień: grupy, szukanie, klawiatura, pamięć zwinięcia', as
   const voice = page.getByRole('button', { name: 'Grupa: Głos' });
   await voice.click();
   await expect(voice).toHaveAttribute('aria-expanded', 'false');
-  await expect(node(page, 'Urządzenia')).toBeHidden();
+  await expect(node(page, 'Kamery')).toBeHidden();
   await expect(voice.locator('.count')).toHaveText('2');
   await page.reload();
   await waitForChat(page);

@@ -169,6 +169,7 @@ async function run(): Promise<void> {
   await both('accounts', 'setModel', account.id, 'gpt-4o-mini');
   await both('accounts', 'setQueue', account.id, 'chat', ['gpt-4o-mini']);
   await both('accounts', 'suggestQueue', account.id, 'chat', 'balanced');
+  await both('accounts', 'importEnv');
   await both('accounts', 'list');
   await both('accounts', 'setDisabled', account.id, true);
   await both('accounts', 'setDisabled', account.id, false);
@@ -214,6 +215,18 @@ async function run(): Promise<void> {
 
   await both('device', 'profile');
   await both('device', 'measure');
+
+  // Kamery: stan, przełączniki, klatka i zdjęcie jako załącznik (kamery włączone tylko na chwilę).
+  await both('cameras', 'state');
+  await both('cameras', 'setMaster', true);
+  await both('cameras', 'setEnabled', 'usb-logi-c920', false);
+  await both('cameras', 'rename', 'usb-integrated', 'Biurko');
+  await both('cameras', 'refresh');
+  await both('cameras', 'frame', 'usb-integrated', 320);
+  await both('attachments', 'addCamera', 's-api', 'usb-integrated');
+  await both('cameras', 'setMaster', false);
+  scheduler.runAll();
+  await flush();
 
   await both('voice', 'devices');
   await both('voice', 'startMicTest', 'mic-1');

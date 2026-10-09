@@ -129,7 +129,7 @@
       "agent": "beta",
       "bridge": null,
       "tz": "Europe/Warsaw",
-      "next_fire_at": "2026-09-30T18:15:03.200Z",
+      "next_fire_at": "2026-09-30T19:15:03.200Z",
       "last_fire_at": null,
       "fired": 0,
       "suppressed": 0,
@@ -152,11 +152,11 @@
       "triggerId": "porzadki"
     },
     "result": {
-      "at": "2026-09-30T16:45:03.200Z",
+      "at": "2026-09-30T17:45:03.200Z",
       "trigger_id": "porzadki",
       "cause": "ręcznie",
       "outcome": "submitted",
-      "task_id": "tr-muoc5zkw-35",
+      "task_id": "tr-muoeb5cw-36",
       "detail": null
     }
   },
@@ -167,11 +167,11 @@
     },
     "result": [
       {
-        "at": "2026-09-30T16:45:03.200Z",
+        "at": "2026-09-30T17:45:03.200Z",
         "trigger_id": "porzadki",
         "cause": "ręcznie",
         "outcome": "submitted",
-        "task_id": "tr-muoc5zkw-35",
+        "task_id": "tr-muoeb5cw-36",
         "detail": null
       }
     ]
@@ -183,11 +183,11 @@
     },
     "result": [
       {
-        "at": "2026-09-30T16:45:03.200Z",
+        "at": "2026-09-30T17:45:03.200Z",
         "trigger_id": "porzadki",
         "cause": "ręcznie",
         "outcome": "submitted",
-        "task_id": "tr-muoc5zkw-35",
+        "task_id": "tr-muoeb5cw-36",
         "detail": null
       }
     ]

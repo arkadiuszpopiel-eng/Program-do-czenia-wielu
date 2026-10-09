@@ -26,6 +26,8 @@ export interface AttachmentsApi {
   addDropped(sessionId: string, hints: readonly DroppedFileHint[]): Promise<AttachmentsAdded>;
   /** Wklejenie plików albo obrazu ze schowka systemowego (czyta rdzeń, nie WebView). */
   paste(sessionId: string): Promise<AttachmentsAdded>;
+  /** Zdjęcie z kamery jako załącznik PNG (klatka z `camera-hub`; kamera musi być włączona). */
+  addCamera(sessionId: string, cameraId: string): Promise<AttachmentsAdded>;
   list(sessionId: string): Promise<readonly AttachmentInfo[]>;
   remove(sessionId: string, attachmentId: string): Promise<readonly AttachmentInfo[]>;
   /** Przeciąganie plików nad oknem (Tauri: zdarzenia `tauri://drag-*`); atrapa — bez zdarzeń. */

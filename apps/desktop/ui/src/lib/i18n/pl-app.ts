@@ -158,7 +158,7 @@ export const plApp = {
   'agents.noRole': 'bez roli w tej sesji',
   'agents.now': 'Teraz: {activity}',
   'agents.applied': 'Obsada zmieniona — zapisano w dzienniku.',
-  'agents.hint': 'Napisz @{name}, aby zwrócić się bezpośrednio do niej.',
+  'agents.hintAll': 'Napisz @imię (np. @Beta), aby zwrócić się bezpośrednio do agentki.',
   'agents.conductorHint': 'Gdy nie zwracasz się po imieniu, odpowiada Dyrygentka.',
 
   'timeline.kind': 'Rodzaj',

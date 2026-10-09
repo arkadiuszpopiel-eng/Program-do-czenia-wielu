@@ -15,6 +15,7 @@
   import SettingRow from './SettingRow.svelte';
   import SettingsNav from './SettingsNav.svelte';
   import BuilderPage from './pages/BuilderPage.svelte';
+  import CamerasPage from './pages/CamerasPage.svelte';
   import ComputerPage from './pages/ComputerPage.svelte';
   import CostsPage from './pages/CostsPage.svelte';
   import DevicesPage from './pages/DevicesPage.svelte';
@@ -75,10 +76,13 @@
     query.trim() ? schema.filter((p) => bestScore(query, app.i18n.text(p.label)) > 0.5) : [],
   );
   const hits = $derived(hitsByPage(results, pageMatches));
-  // Strojenie mowy stoi na stronie „Głos” przy głosach agentek, nie na liście ogólnej.
+  // Strojenie mowy stoi na stronie „Głos” przy głosach agentek, a przełącznik kamer na górze
+  // strony „Kamery” — nie na liście ogólnej.
   const isSpeechTuning = (def: { readonly key: string }) => def.key.startsWith('voice.tts_');
   const rest = $derived(
-    page ? page.settings.filter((def) => page.custom !== 'voice' || !isSpeechTuning(def)) : [],
+    !page || page.custom === 'cameras'
+      ? []
+      : page.settings.filter((def) => page.custom !== 'voice' || !isSpeechTuning(def)),
   );
 
   function open(id: string) {
@@ -131,6 +135,7 @@
           {:else if page.custom === 'transfer'}<TransferPage />
           {:else if page.custom === 'permissions'}<PermissionsPage />
           {:else if page.custom === 'devices'}<DevicesPage />
+          {:else if page.custom === 'cameras'}<CamerasPage settings={page.settings} />
           {:else if page.custom === 'voice'}<VoicePage
               settings={page.settings.filter(isSpeechTuning)}
             />

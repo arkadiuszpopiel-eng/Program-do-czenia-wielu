@@ -17,6 +17,7 @@ import { plBroker } from './pl-broker';
 import { plVoice } from './pl-voice';
 import { plWork } from './pl-work';
 import { plFiles } from './pl-files';
+import { plCameras } from './pl-cameras';
 
 export const pl = {
   ...plApp,
@@ -35,6 +36,7 @@ export const pl = {
   ...plModels,
   ...plBundles,
   ...plFiles,
+  ...plCameras,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

@@ -165,6 +165,14 @@ export class FakeFiles {
         const name = `wklejony-obraz-${stamp.replace(/[-:]/g, '').replace('T', '-')}.png`;
         return this.add(sessionId, [{ name, bytes: 182_000, mime: 'image/png' }]);
       },
+      addCamera: (sessionId, cameraId) => {
+        if (this.core.settings['camera.enabled'] !== true) {
+          return Promise.reject(new Error('Kamery są wyłączone.'));
+        }
+        const stamp = new Date(this.core.scheduler.now()).toISOString().slice(11, 19);
+        const name = `kamera-${cameraId}-${stamp.replace(/:/g, '')}.png`;
+        return this.add(sessionId, [{ name, bytes: 412_000, mime: 'image/png' }]);
+      },
       list: (sessionId) => this.core.reply(this.staged(sessionId)),
       remove: (sessionId, attachmentId) => {
         const left = this.staged(sessionId).filter((a) => a.id !== attachmentId);

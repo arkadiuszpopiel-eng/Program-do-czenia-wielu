@@ -1,6 +1,6 @@
 [package]
 name = "platform-windows-impl"
-description = "Implementacja SystemPort i HardwarePort dla Windows (windows-rs): pliki z Koszem i dziennikiem cofnięć, procesy w Job Object, schowek, okna, skróty globalne + hook PTT, adapter zasobnika"
+description = "Implementacja SystemPort i HardwarePort dla Windows (windows-rs): pliki z Koszem i dziennikiem cofnięć, procesy w Job Object, schowek, okna, skróty globalne + hook PTT, adapter zasobnika, kamery (Media Foundation)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -27,6 +27,7 @@ windows = { version = "0.62.2", features = [
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Gdi",
     "Win32_Media_Audio",
+    "Win32_Media_MediaFoundation",
     "Win32_Security",
     "Win32_Security_Authorization",
     "Win32_Storage_FileSystem",

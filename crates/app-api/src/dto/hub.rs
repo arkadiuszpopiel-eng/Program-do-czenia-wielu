@@ -83,6 +83,27 @@ pub enum ModelKind {
     Vision,
 }
 
+/// Wynik importu jednej zmiennej środowiskowej (tylko nazwa zmiennej — nigdy wartość).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EnvImportResult {
+    pub provider: String,
+    pub provider_name: String,
+    /// Nazwa zmiennej, np. `OPENAI_API_KEY`.
+    pub var: String,
+    pub result: EnvImportKind,
+    /// Konto dodane albo już istniejące z tym kluczem.
+    pub account_id: Option<String>,
+}
+
+/// Co stało się ze zmienną.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EnvImportKind {
+    Imported,
+    AlreadyPresent,
+    NotSet,
+}
+
 /// Model konta.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ModelInfo {

@@ -94,6 +94,8 @@ pub enum SettingsCustomPage {
     Transfer,
     Permissions,
     Devices,
+    /// Kamery: lista, podgląd, przełączniki (`camera-hub`).
+    Cameras,
     Voice,
     /// Pamięć: porządkowanie (Strażniczka), Inspektor na pełną szerokość.
     Memory,

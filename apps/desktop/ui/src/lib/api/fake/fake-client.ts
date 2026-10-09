@@ -1,6 +1,7 @@
 // FakeAlfaClient: pełna implementacja `AlfaClient` w pamięci — deterministyczna (wirtualny zegar
 // w testach), strumień ~100 tokenów/s, scenariusze: offline, 429 z czasem odnowienia, brak kluczy,
 // pierwsze uruchomienie, brak mikrofonu, mało miejsca na dysku.
+import { camerasApi } from './api-cameras';
 import type { AlfaClient } from '../client';
 import type { AlfaEvent } from '../types-system';
 import { FakeChat } from './api-chat';
@@ -56,6 +57,7 @@ export class FakeAlfaClient implements AlfaClient {
   readonly permissions: AlfaClient['permissions'];
   readonly models: AlfaClient['models'];
   readonly device: AlfaClient['device'];
+  readonly cameras: AlfaClient['cameras'];
   readonly voice: AlfaClient['voice'];
   readonly system: AlfaClient['system'];
   readonly quick: AlfaClient['quick'];
@@ -98,6 +100,7 @@ export class FakeAlfaClient implements AlfaClient {
     this.permissions = broker.guard(permissionsApi(core));
     this.models = modelsApi(core);
     this.device = deviceApi(core);
+    this.cameras = camerasApi(core);
     this.voice = voiceApi(core);
     this.system = systemApi(core, chat);
     this.memory = memoryApi(core);

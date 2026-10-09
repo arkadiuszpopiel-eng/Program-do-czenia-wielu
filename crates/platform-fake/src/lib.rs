@@ -2,6 +2,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod camera;
 mod clipboard;
 mod desktop;
 mod dirwatch;
@@ -22,6 +23,7 @@ use platform_contract::{
     ProcessStatus, TrayMenuItem, TrayPort, TrayState, UndoToken, WindowId, WindowInfo, WindowPort,
 };
 
+pub use camera::FakeCameras;
 pub use clipboard::FakeClipboard;
 pub use exec::{ExecEffect, FakeExec, FakeRun, command_text};
 pub use fs::{FakeFs, FsSnapshot};

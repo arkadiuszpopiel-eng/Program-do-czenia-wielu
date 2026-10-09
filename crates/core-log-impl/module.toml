@@ -1,6 +1,6 @@
 # Manifest log-writera jądra (docs/modules/core-log/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "core-log"
-version = "0.0.15"
+version = "0.0.16"
 kind = "service"
 provides = ["core-log-contract@1"]
 requires = ["core-bus-contract@1"]

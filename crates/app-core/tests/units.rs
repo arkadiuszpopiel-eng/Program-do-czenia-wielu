@@ -161,6 +161,28 @@ mod events {
         );
     }
 
+    #[test]
+    fn camera_states_keep_latest() {
+        let state = |enabled| AlfaEvent::CamerasChanged {
+            state: app_core::dto::CamerasState {
+                enabled,
+                cameras: Vec::new(),
+            },
+        };
+        let mut batch = vec![state(false)];
+        push_coalesced(&mut batch, state(true));
+        assert_eq!(batch, vec![state(true)]);
+        push_coalesced(
+            &mut batch,
+            AlfaEvent::MicLevel {
+                level: 0.1,
+                raw: None,
+            },
+        );
+        push_coalesced(&mut batch, state(false));
+        assert_eq!(batch.len(), 3, "scalane są tylko zdarzenia sąsiednie");
+    }
+
     #[tokio::test(start_paused = true)]
     async fn events_arrive_in_one_batch_per_frame() {
         let hub = EventHub::start(Duration::from_millis(16));

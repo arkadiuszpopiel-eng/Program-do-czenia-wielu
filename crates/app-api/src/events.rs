@@ -1,7 +1,7 @@
 //! Strumień `alfa://events`: zdarzenia z modułów i komend grupowane w paczki najwyżej raz na
 //! klatkę (PLAN §14.7 „batch co klatkę"). Brak zdarzeń = brak wybudzeń (idle ~0% CPU).
 //! Sąsiednie `TextDelta` tej samej tury są scalane (tekst sklejony, bloki — ostatnia wersja
-//! per indeks), a sąsiednie `MicLevel` — zastępowane najnowszym.
+//! per indeks), a sąsiednie `MicLevel` i `CamerasChanged` — zastępowane najnowszym.
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -118,6 +118,10 @@ pub fn push_coalesced(batch: &mut Vec<AlfaEvent>, event: AlfaEvent) {
         ) => {
             *agent = newer_agent;
             *level = newer;
+        }
+        // Stan kamer: pełna migawka — w paczce liczy się tylko najnowsza.
+        (Some(AlfaEvent::CamerasChanged { state }), AlfaEvent::CamerasChanged { state: newer }) => {
+            *state = newer;
         }
         (_, event) => batch.push(event),
     }

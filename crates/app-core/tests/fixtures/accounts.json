@@ -1510,6 +1510,47 @@
     ]
   },
   {
+    "command": "accounts_import_env",
+    "args": {},
+    "result": [
+      {
+        "provider": "openai",
+        "provider_name": "OpenAI",
+        "var": "OPENAI_API_KEY",
+        "result": "already_present",
+        "account_id": "acc-openai"
+      },
+      {
+        "provider": "anthropic",
+        "provider_name": "Anthropic",
+        "var": "ANTHROPIC_API_KEY",
+        "result": "imported",
+        "account_id": "acc-anthropic"
+      },
+      {
+        "provider": "google",
+        "provider_name": "Google",
+        "var": "GEMINI_API_KEY",
+        "result": "not_set",
+        "account_id": null
+      },
+      {
+        "provider": "mistral",
+        "provider_name": "Mistral",
+        "var": "MISTRAL_API_KEY",
+        "result": "not_set",
+        "account_id": null
+      },
+      {
+        "provider": "openrouter",
+        "provider_name": "OpenRouter",
+        "var": "OPENROUTER_API_KEY",
+        "result": "not_set",
+        "account_id": null
+      }
+    ]
+  },
+  {
     "command": "accounts_list",
     "args": {},
     "result": [

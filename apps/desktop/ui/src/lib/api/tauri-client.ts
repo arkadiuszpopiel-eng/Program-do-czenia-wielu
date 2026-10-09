@@ -115,6 +115,7 @@ export class TauriAlfaClient implements AlfaClient {
       call('accounts_set_queue', { accountId, taskClass, models }),
     suggestQueue: (accountId, taskClass, strategy) =>
       call('accounts_suggest_queue', { accountId, taskClass, strategy }),
+    importEnv: () => call('accounts_import_env'),
   };
 
   readonly transfer: AlfaClient['transfer'] = {
@@ -134,6 +135,15 @@ export class TauriAlfaClient implements AlfaClient {
     localList: () => call('models_local_list'),
     localDownload: (modelId) => call('models_local_download', { modelId }),
     localCancel: (modelId) => call('models_local_cancel', { modelId }),
+  };
+
+  readonly cameras: AlfaClient['cameras'] = {
+    state: () => call('cameras_state'),
+    setMaster: (enabled) => call('cameras_set_master', { enabled }),
+    setEnabled: (id, enabled) => call('cameras_set_enabled', { id, enabled }),
+    rename: (id, name) => call('cameras_rename', { id, name }),
+    refresh: () => call('cameras_refresh'),
+    frame: (id, maxSide) => call('cameras_frame', { id, maxSide }),
   };
 
   readonly device: AlfaClient['device'] = {
@@ -336,6 +346,7 @@ export class TauriAlfaClient implements AlfaClient {
     // Ścieżki upuszczenia zna wyłącznie powłoka (zdarzenie systemowe) — wskazówek z UI nie wysyłamy.
     addDropped: (sessionId) => call('attachments_add_dropped', { sessionId }),
     paste: (sessionId) => call('attachments_paste', { sessionId }),
+    addCamera: (sessionId, cameraId) => call('attachments_add_camera', { sessionId, cameraId }),
     list: (sessionId) => call('attachments_list', { sessionId }),
     remove: (sessionId, attachmentId) => call('attachments_remove', { sessionId, attachmentId }),
     watchDrag: (handler) => {

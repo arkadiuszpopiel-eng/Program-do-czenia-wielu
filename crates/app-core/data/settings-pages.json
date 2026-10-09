@@ -1266,6 +1266,34 @@
   ]
  },
  {
+  "id": "cameras",
+  "label": {
+   "pl": "Kamery",
+   "en": "Cameras"
+  },
+  "wave": 1,
+  "custom": "cameras",
+  "settings": [
+   {
+    "key": "camera.enabled",
+    "label": {
+     "pl": "Kamery włączone",
+     "en": "Cameras enabled"
+    },
+    "description": {
+     "pl": "Przełącznik główny. Wyłączony: żadna kamera się nie otworzy, niezależnie od tego, kto prosi o obraz. Włączony: kamera otwiera się na żądanie (podgląd) i sama zasypia; działającą kamerę zawsze widać w górnej belce.",
+     "en": "Master switch. Off: no camera opens, no matter who asks for an image. On: a camera opens on request (preview) and goes to sleep by itself; a live camera is always shown in the top bar."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": false,
+    "scope": "global"
+   }
+  ],
+  "upcoming": []
+ },
+ {
   "id": "devices",
   "label": {
    "pl": "Urządzenia",

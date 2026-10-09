@@ -5,6 +5,7 @@ use app_core::dto::*;
 
 use super::{Check, roundtrip};
 
+mod cameras;
 mod computer;
 mod files;
 mod models;
@@ -113,7 +114,8 @@ pub fn spec(command: &str) -> Option<Spec> {
                 .or_else(|| voice::spec(other))
                 .or_else(|| plugins::spec(other))
                 .or_else(|| models::spec(other))
-                .or_else(|| files::spec(other));
+                .or_else(|| files::spec(other))
+                .or_else(|| cameras::spec(other));
         }
     };
     Some(found)

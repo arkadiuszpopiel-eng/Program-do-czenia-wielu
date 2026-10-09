@@ -5,7 +5,8 @@
 //! adapter zasobnika, sonda sprzętu. UIA i SendInput dochodzą w F5/F6.
 //!
 //! Wątki: skróty i hook — dedykowany wątek z pętlą komunikatów; `IFileOperation` — krótkotrwały
-//! wątek STA; MMDevice — krótkotrwały wątek MTA; schowek i okna — wątek wywołującego (bez COM).
+//! wątek STA; MMDevice — krótkotrwały wątek MTA; schowek i okna — wątek wywołującego (bez COM);
+//! kamery (`WinCameras`, Media Foundation) — jeden wątek MTA na otwartą kamerę.
 //! Poza Windows crate się kompiluje: FS działa przenośnie (bez Kosza), reszta zwraca `Unsupported`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -13,6 +14,7 @@
 // martwy kod wyłapuje `cargo clippy --target x86_64-pc-windows-msvc`.
 #![cfg_attr(not(windows), allow(dead_code))]
 
+mod camera;
 mod clipboard;
 mod clock;
 mod config;
@@ -35,6 +37,7 @@ use platform_contract::{
     TrayMenuItem, TrayPort, TrayState, UndoToken, WindowId, WindowInfo, WindowPort,
 };
 
+pub use camera::WinCameras;
 pub use clipboard::{ClipboardConfig, WinClipboard};
 pub use clock::qpc_nanos;
 pub use config::PlatformConfig;

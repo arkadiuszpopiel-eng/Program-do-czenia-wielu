@@ -20,6 +20,9 @@
 F3/2 (porty Jądra): `Win32_System_IO` (`ReadFile`/`WriteFile`/`ConnectNamedPipe` wymagają typu `OVERLAPPED`),
 `Win32_System_Pipes`, `Win32_System_RemoteDesktop` (`WTS*`), `Win32_System_Services`, `Win32_UI_Input`
 (`GetCurrentInputMessageSource`).
+C3 (kamery, `camera/`): `Win32_Media_MediaFoundation` (pociąga tylko `Win32_Media`; `IMFAttributes::Get/SetUINT32/GUID/String`
+i `IMFSourceReader::ReadSample` nie wymagają dodatkowych feature'ów — metody z `PROPVARIANT` są pod już włączonymi
+`Win32_System_Com_StructuredStorage` + `Win32_System_Variant`).
 F6 (`platform-windows-gui-impl`): `Win32_UI_Accessibility` (UIA), `Win32_System_Ole`, `Win32_System_Variant` +
 `Win32_System_Com_StructuredStorage` (bez niej brak `TryFrom<&VARIANT> for BSTR`), `Win32_Storage_Xps` (`PrintWindow`),
 `Win32_UI_Input_KeyboardAndMouse` (`SendInput`). F4 (`platform-windows-pty-impl`): `Win32_System_Console`
@@ -61,6 +64,7 @@ Sygnały i obserwacja (`platform-windows-sys-impl`): `Win32_System_Power` + `Win
 | `hotkey/thread.rs` | `PeekMessageW(PM_NOREMOVE)` (utworzenie kolejki), `SetWindowsHookExW(WH_KEYBOARD_LL, Some(proc), GetModuleHandleW(None).map(HINSTANCE::from), 0)`, `GetMessageW`, `PostThreadMessageW(WM_APP+1 / WM_QUIT)`, `RegisterHotKey(None, id, HOT_KEY_MODIFIERS(m \| MOD_NOREPEAT), vk)` (błąd 1409 = zajęty), `SetTimer(None, 0, 15, None)` (licznik wątku → `WM_TIMER`), `GetAsyncKeyState` |
 | `hardware/win.rs` | `GetLogicalProcessorInformation` (`RelationProcessorCore`, `RelationCache` L3), `GetPhysicallyInstalledSystemMemory`, `IDXGIFactory1::EnumAdapters1` + `GetDesc1` (koniec: `DXGI_ERROR_NOT_FOUND`), DXCore `CreateAdapterList(&[GENERIC_ML])` (GUID `b71b0d41-…-0250b7d3a988` zdefiniowany lokalnie — brak w 0.62), `GetSystemPowerStatus`, MMDevice (`IMMDeviceEnumerator::EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE)`, `OpenPropertyStore(STGM_READ)`, `GetValue(&PKEY_Device_FriendlyName)` → `PROPVARIANT::to_string()`) na wątku MTA |
 
+| `camera/win.rs` (wątek MTA na kamerę) | `CoInitializeEx(COINIT_MULTITHREADED)` + `MFStartup(MF_VERSION, MFSTARTUP_LITE)` / `MFShutdown` (pary na tym samym wątku, po zwolnieniu obiektów), `MFCreateAttributes(&mut Option<IMFAttributes>, n)`, `SetGUID(&MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, &…_VIDCAP_GUID)`, `MFEnumDeviceSources(&attrs, &mut *mut Option<IMFActivate>, &mut count)` → `GetAllocatedString(&MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME / …_VIDCAP_SYMBOLIC_LINK, &mut PWSTR, &mut len)` + `CoTaskMemFree` (napisy i tablica), `MFCreateDeviceSource(&attrs z …_SYMBOLIC_LINK)`, `MFCreateSourceReaderFromMediaSource(&source, &attrs{MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING = 1})`, `GetNativeMediaType(VIDEO, i)` do `MF_E_NO_MORE_TYPES` (`MF_MT_FRAME_SIZE`/`MF_MT_FRAME_RATE` = UINT64: starsze 32 bity szerokość/licznik), `SetCurrentMediaType(VIDEO, None, &typ)` (natywny, potem częściowy `MFMediaType_Video` + `MFVideoFormat_RGB32`), `GetCurrentMediaType` → `MF_MT_DEFAULT_STRIDE` (UINT32 ze znakiem) albo `MFGetStrideForBitmapInfoHeader(MFVideoFormat_RGB32.data1, szer.)`, `ReadSample(VIDEO, 0, None, Some(&mut flags), None, Some(&mut Option<IMFSample>))` synchronicznie, `IMFSample::ConvertToContiguousBuffer` → `cast::<IMF2DBuffer>()` + `Lock2D(&mut scanline0, &mut pitch)` (wiersz górny + krok ze znakiem) albo `IMFMediaBuffer::Lock`, `IMFMediaSource::Shutdown` przy zamykaniu |
 | `kernel/win_pipe.rs` | `ConvertStringSecurityDescriptorToSecurityDescriptorW(SDDL_REVISION_1)` → `SECURITY_ATTRIBUTES`, `CreateNamedPipeW(PIPE_ACCESS_DUPLEX \| FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_TYPE_BYTE \| PIPE_READMODE_BYTE \| PIPE_WAIT \| PIPE_REJECT_REMOTE_CLIENTS, …)` (zwraca `HANDLE`, błąd = `INVALID_HANDLE_VALUE`), `ConnectNamedPipe(h, None)` (`ERROR_PIPE_CONNECTED` = sukces), `GetNamedPipeClientProcessId`/`GetNamedPipeServerProcessId`, klient `CreateFileW(…, 0x12008B, FILE_SHARE_NONE, None, OPEN_EXISTING, SECURITY_SQOS_PRESENT \| SECURITY_IDENTIFICATION, None)` + `WaitNamedPipeW` przy `ERROR_PIPE_BUSY`, `ReadFile` → `ERROR_BROKEN_PIPE` = koniec strumienia |
 | `kernel/win_sec.rs` | `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)`, `OpenProcessToken(TOKEN_QUERY)`, `GetTokenInformation(TokenUser / TokenIntegrityLevel / TokenSessionId)` (bufor `Vec<u64>` — wyrównanie), `ConvertSidToStringSidW` + `LocalFree`, `GetSidSubAuthorityCount`/`GetSidSubAuthority` (RID), `CreateDirectoryW` z deskryptorem / `GetSecurityDescriptorDacl` + `SetNamedSecurityInfoW(SE_FILE_OBJECT, DACL \| PROTECTED_DACL)`, `AvSetMmThreadCharacteristicsW` / `AvRevertMmThreadCharacteristics`, `GetDiskFreeSpaceExW` |
 | `kernel/win_launch.rs` | `WTSGetActiveConsoleSessionId`, `WTSQueryUserToken` (SeTcbPrivilege), `DuplicateTokenEx(TokenPrimary)`, `SetTokenInformation(TokenIntegrityLevel, S-1-16-12288)`, `CreatePipe` + `SetHandleInformation(HANDLE_FLAG_INHERIT, 0)`, `CreateProcessAsUserW(lpDesktop = winsta0\\default, STARTF_USESTDHANDLES)`; usługa: `StartServiceCtrlDispatcherW`, `RegisterServiceCtrlHandlerExW`, `SetServiceStatus` |
@@ -93,6 +97,17 @@ Sygnały i obserwacja (`platform-windows-sys-impl`): `Win32_System_Power` + `Win
 - ConPTY nie kończy strumienia wyjścia, gdy proces się zakończy — trzeba wykryć koniec (`WaitForSingleObject`) i
   wywołać `ClosePseudoConsole`; przed Windows 11 24H2 `ClosePseudoConsole` czeka na opróżnienie wyjścia (osobny wątek).
 - Współrzędne myszy i zrzutów w pikselach fizycznych wymagają procesu per-monitor DPI aware (powłoka Tauri jest).
+
+- Media Foundation (kamery): `MF_SOURCE_READER_FIRST_VIDEO_STREAM` to `MF_SOURCE_READER_CONSTANTS(-4i32)`, a metody czytnika
+  biorą `u32` — rzutować (`.0 as u32` = `0xFFFFFFFC`); flagi `MF_SOURCE_READERF_*` to `MF_SOURCE_READER_FLAG(i32)`, a `ReadSample`
+  oddaje je jako `u32`. Synchroniczny `ReadSample` blokuje do następnej klatki, a obiekty MF nie są `Send` — czytnik żyje na
+  własnym wątku, strumień bierze ostatnią klatkę z pamięci współdzielonej. Bez `IMFMediaSource::Shutdown` kamera zostaje zajęta
+  (dioda świeci) do końca procesu. Kamera zajęta przez inną aplikację zwykle zgłasza się dopiero przy pierwszym `ReadSample`
+  (`MF_E_HW_MFT_FAILED_START_STREAMING` 0xC00D3704), blokada prywatności Windows — `E_ACCESSDENIED` przy otwarciu, odłączenie —
+  `MF_E_VIDEO_RECORDING_DEVICE_INVALIDATED` 0xC00D3EA2. Orientację wierszy RGB32 podaje `Lock2D` (krok ujemny = od dołu) albo
+  znak `MF_MT_DEFAULT_STRIDE`; samo `Lock` jej nie mówi. Kamera wyłączona sprzętowo (przesłona/klawisz odłączający USB) w ogóle
+  nie występuje na liście `MFEnumDeviceSources`. Stan 2026-10-09: kod sprawdzony kompilacją i testami jednostkowymi; **przebiegu
+  na fizycznej kamerze jeszcze nie było** (kamera laptopa była odłączona w systemie) — `tests/camera_hw.rs` (`--ignored`).
 
 ## F6: `platform-windows-office-impl` (Office COM, przeglądarka, rejestr)
 Feature'y: `Win32_Foundation`, `Win32_Security`, `Win32_System_Com`, `Win32_System_Com_StructuredStorage`,

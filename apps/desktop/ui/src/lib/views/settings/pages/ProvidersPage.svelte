@@ -2,14 +2,16 @@
 <script lang="ts">
   import { Button, ConfirmDialog, EmptyState } from '@alfa/ui-kit';
   import KeyRound from '@lucide/svelte/icons/key-round';
+  import Download from '@lucide/svelte/icons/download';
   import Plus from '@lucide/svelte/icons/plus';
-  import type { Account, ProviderInfo } from '../../../api/types-hub';
+  import type { Account, EnvImportResult, ProviderInfo } from '../../../api/types-hub';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import AccountRow from './AccountRow.svelte';
   import AddProviderWizard from './AddProviderWizard.svelte';
+  import EnvImportPanel from './EnvImportPanel.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -20,6 +22,8 @@
   let wizard = $state(false);
   let removing = $state<Account | null>(null);
   let confirmOpen = $state(false);
+  let envResults = $state<readonly EnvImportResult[] | null>(null);
+  let importing = $state(false);
 
   $effect(() => {
     if (app.hubWizard) wizard = true;
@@ -56,6 +60,18 @@
     });
   });
 
+  /** Import kluczy ze zmiennych środowiskowych; nowe konta pojawiają się od razu na liście. */
+  async function importEnv() {
+    importing = true;
+    const ok = await attempt(app.toasts, async () => {
+      envResults = await app.client.accounts.importEnv();
+    });
+    importing = false;
+    if (!ok) return;
+    await reload();
+    await refreshSystem();
+  }
+
   async function remove() {
     // AlertDialog.Action (bits-ui) nie zamyka okna sam — zamykamy je przed wywołaniem rdzenia.
     confirmOpen = false;
@@ -76,12 +92,21 @@
       <p class="desc">{t('hub.intro')}</p>
     </div>
     {#if !wizard}
-      <Button variant="primary" onclick={() => (wizard = true)}>
-        {#snippet icon()}<Plus size={14} strokeWidth={1.5} />{/snippet}
-        {t('hub.add')}
-      </Button>
+      <div class="head-actions">
+        <Button variant="secondary" disabled={importing} onclick={() => void importEnv()}>
+          {#snippet icon()}<Download size={14} strokeWidth={1.5} />{/snippet}
+          {t('env.button')}
+        </Button>
+        <Button variant="primary" onclick={() => (wizard = true)}>
+          {#snippet icon()}<Plus size={14} strokeWidth={1.5} />{/snippet}
+          {t('hub.add')}
+        </Button>
+      </div>
     {/if}
   </div>
+  {#if envResults}
+    <EnvImportPanel results={envResults} onclose={() => (envResults = null)} />
+  {/if}
   {#if wizard}
     <AddProviderWizard
       onfinish={async () => {
@@ -129,6 +154,12 @@
 />
 
 <style>
+  .head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--alfa-space-2);
+  }
   .hub {
     display: flex;
     flex-direction: column;

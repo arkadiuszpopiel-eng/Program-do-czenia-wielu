@@ -32,7 +32,7 @@ export const plSettings = {
   'settings.soon': 'wkrótce',
   'settings.group.basics': 'Podstawy',
   'settings.group.models': 'Modele i koszty',
-  'settings.group.voice': 'Głos',
+  'settings.group.voice': 'Głos i kamery',
   'settings.group.agents': 'Agentki i automatyzacja',
   'settings.group.safety': 'Bezpieczeństwo',
   'settings.group.data': 'Dane i pamięć',

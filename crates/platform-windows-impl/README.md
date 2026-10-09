@@ -17,6 +17,7 @@ Implementacja `SystemPort` + `HardwarePort` z `platform-contract` dla Windows
 | `HotkeyPort` (`WinHotkeys`) | `RegisterHotKey` (`MOD_NOREPEAT`) na dedykowanym wątku z pętlą komunikatów + `WH_KEYBOARD_LL` do puszczenia klawisza (PTT) + zapasowe `GetAsyncKeyState` co 15 ms (okno admina na wierzchu); konflikt → `HotkeyConflict`; `register_kill_switch()` tylko dla watchdoga/Brokera; `wait_events` dla niskiej latencji. |
 | `TrayPort` (`TrayAdapter`) | adapter: stan i menu w pamięci, rysuje backend powłoki Tauri (`TrayBackend`) — bez drugiej ikony `Shell_NotifyIconW`. |
 | `HardwarePort` (`WinHardware`) | rejestr (model CPU, wersja systemu, `MachineGuid`), `GetLogicalProcessorInformation` (rdzenie, L3), `GetPhysicallyInstalledSystemMemory`, DXGI `EnumAdapters1`, DXCore (NPU), `GetSystemPowerStatus`, MMDevice (wątek MTA). |
+| `CameraPort` (`WinCameras`) | Media Foundation: `MFEnumDeviceSources` (nazwa + dowiązanie symboliczne jako identyfikator), `IMFSourceReader` z wyjściem RGB32 na własnym wątku MTA (tryb najbliższy żądanemu bokowi, reszta — pomniejszenie), ostatnia klatka w pamięci → `CameraStream::read` z limitem czasu; `Drop` zamyka źródło (`Shutdown`). Nic nie trafia na dysk. Test sprzętowy: `tests/camera_hw.rs` (`#[ignore]`). |
 
 Wątki: skróty/hook — własny wątek komunikatów; `IFileOperation` — krótkotrwały wątek STA;
 MMDevice — krótkotrwały wątek MTA; schowek i okna — wątek wywołującego (bez COM). Nigdy COM na

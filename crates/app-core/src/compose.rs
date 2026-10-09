@@ -25,6 +25,7 @@ use crate::parts::{Built, Kernel};
 const MODULES: &[(&str, &str)] = &[
     ("platform-windows", platform_windows_impl::MODULE_TOML),
     ("device-profile", device_profile_impl::MODULE_TOML),
+    ("camera-hub", camera_hub_impl::MODULE_TOML),
     ("compliance", compliance_impl::MODULE_TOML),
     ("accounts-hub", accounts_hub_impl::MODULE_TOML),
     ("providers-api", providers_api_impl::MODULE_TOML),

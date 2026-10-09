@@ -30,7 +30,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'settings.soon': 'soon',
   'settings.group.basics': 'Basics',
   'settings.group.models': 'Models and costs',
-  'settings.group.voice': 'Voice',
+  'settings.group.voice': 'Voice and cameras',
   'settings.group.agents': 'Agents and automation',
   'settings.group.safety': 'Safety',
   'settings.group.data': 'Data and memory',

@@ -5,11 +5,12 @@
 export const SETTINGS_GROUPS = [
   { id: 'basics', pages: ['general', 'appearance', 'language', 'shortcuts', 'notifications'] },
   { id: 'models', pages: ['providers', 'api', 'bridges', 'models', 'costs', 'router'] },
-  { id: 'voice', pages: ['voice', 'devices'] },
+  { id: 'voice', pages: ['voice', 'cameras'] },
   { id: 'agents', pages: ['agents', 'builder', 'skills', 'plugins', 'triggers', 'marshal'] },
   { id: 'safety', pages: ['permissions', 'computer'] },
   { id: 'data', pages: ['memory', 'sessions', 'files', 'transfer', 'logs'] },
-  { id: 'system', pages: ['improve', 'modules', 'updates', 'advanced', 'about'] },
+  // „Urządzenia” to sprzęt komputera (procesor, karty, bateria) — sprawa systemu, nie głosu.
+  { id: 'system', pages: ['devices', 'improve', 'modules', 'updates', 'advanced', 'about'] },
 ] as const;
 
 export type SettingsGroupId = (typeof SETTINGS_GROUPS)[number]['id'] | 'other';

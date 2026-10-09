@@ -154,4 +154,18 @@ export const enHub = {
   'wiz.finish': 'Finish',
   'wiz.skip': 'Skip — I will add it later',
   'wiz.added': 'Account "{label}" added.',
+  'env.button': 'Import from environment variables',
+  'env.imported': 'account added',
+  'env.already': 'this key is already saved',
+  'env.nothing': 'I found no new keys in environment variables',
+  'env.note':
+    'I check only the names from the provider catalog. A found key goes to Windows Credential Manager; neither the interface nor the log sees its value. You can then remove the variable from the system.',
+  'env.done': {
+    one: 'Added {n} account from environment variables',
+    other: 'Added {n} accounts from environment variables',
+  },
+  'env.missing': {
+    one: '{n} variable is not set:',
+    other: '{n} variables are not set:',
+  },
 } as const;

@@ -78,6 +78,11 @@ export class AttachmentsState {
     return this.run((id) => this.app.client.attachments.paste(id));
   }
 
+  /** Zdjęcie z kamery jako załącznik. */
+  camera(cameraId: string): Promise<void> {
+    return this.run((id) => this.app.client.attachments.addCamera(id, cameraId));
+  }
+
   drop(hints: readonly DroppedFileHint[]): Promise<void> {
     this.dragging = false;
     return this.run((id) => this.app.client.attachments.addDropped(id, hints));

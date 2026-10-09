@@ -1058,7 +1058,7 @@
       }
     },
     "result": {
-      "user_turn_id": "t-muo3lc30-19",
+      "user_turn_id": "t-muo5qhv0-20",
       "assistant_turn_id": null
     }
   },
@@ -1074,8 +1074,8 @@
       }
     },
     "result": {
-      "user_turn_id": "t-muo5qhv0-22",
-      "assistant_turn_id": "t-muo5qhv0-23"
+      "user_turn_id": "t-muo7vnn0-23",
+      "assistant_turn_id": "t-muo7vnn0-24"
     }
   },
   {
@@ -1088,14 +1088,14 @@
         "addressed_to": null,
         "profile": "local",
         "attachments": [
-          "att-muoggmms-38",
-          "att-muoggmms-39"
+          "att-muoilses-39",
+          "att-muoilses-40"
         ]
       }
     },
     "result": {
-      "user_turn_id": "t-muoggmms-40",
-      "assistant_turn_id": "t-muoggmms-41"
+      "user_turn_id": "t-muoilses-41",
+      "assistant_turn_id": "t-muoilses-42"
     }
   },
   {
@@ -1111,7 +1111,7 @@
           "parent_id": null,
           "author": "user",
           "role_id": null,
-          "created_at": "2026-09-30T12:55:02.700Z",
+          "created_at": "2026-09-30T13:55:02.700Z",
           "status": "complete",
           "text": "Zaplanuj trzy dni w Gdańsku w październiku.",
           "blocks": [
@@ -1139,7 +1139,7 @@
           "parent_id": "s-trip-1",
           "author": "alfa",
           "role_id": "conductor",
-          "created_at": "2026-09-30T12:56:02.700Z",
+          "created_at": "2026-09-30T13:56:02.700Z",
           "status": "complete",
           "text": "Jasne — zaczęłam od listy kroków. Daj znać, czy mam od razu działać.",
           "blocks": [
@@ -1162,12 +1162,12 @@
           "heard_prefix": null
         },
         {
-          "id": "t-muo5qhv0-22",
+          "id": "t-muo7vnn0-23",
           "session_id": "s-trip",
           "parent_id": null,
           "author": "user",
           "role_id": null,
-          "created_at": "2026-09-30T13:45:02.700Z",
+          "created_at": "2026-09-30T14:45:02.700Z",
           "status": "complete",
           "text": "Sprawdź pociągi do Gdańska.",
           "blocks": [
@@ -1190,12 +1190,12 @@
           "heard_prefix": null
         },
         {
-          "id": "t-muo5qhv0-23",
+          "id": "t-muo7vnn0-24",
           "session_id": "s-trip",
-          "parent_id": "t-muo5qhv0-22",
+          "parent_id": "t-muo7vnn0-23",
           "author": "alfa",
           "role_id": "conductor",
-          "created_at": "2026-09-30T13:45:02.700Z",
+          "created_at": "2026-09-30T14:45:02.700Z",
           "status": "error",
           "text": "",
           "blocks": [],
@@ -1209,7 +1209,7 @@
           "error": {
             "code": "rate_limited",
             "message": "Limit zapytań u dostawcy Anthropic.",
-            "retry_at": "2026-09-30T12:48:02.700Z",
+            "retry_at": "2026-09-30T13:48:02.700Z",
             "provider": "Anthropic"
           },
           "continues": null,
@@ -1218,12 +1218,12 @@
           "heard_prefix": null
         },
         {
-          "id": "t-muoggmms-40",
+          "id": "t-muoilses-41",
           "session_id": "s-trip",
           "parent_id": null,
           "author": "user",
           "role_id": null,
-          "created_at": "2026-09-30T18:45:18.100Z",
+          "created_at": "2026-09-30T19:45:18.100Z",
           "status": "complete",
           "text": "Podsumuj załączniki",
           "blocks": [
@@ -1246,28 +1246,28 @@
           "heard_prefix": null,
           "attachments": [
             {
-              "name": "wklejony-obraz-20260930-184518.png",
+              "name": "wklejony-obraz-20260930-194518.png",
               "mime": "image/png",
               "kind": "image",
               "bytes": 182000,
-              "artifact_id": "art-s-trip-muoggmms-0"
+              "artifact_id": "art-s-trip-muoilses-0"
             },
             {
               "name": "notatki.md",
               "mime": "text/markdown",
               "kind": "text",
               "bytes": 400000,
-              "artifact_id": "art-s-trip-muoggmms-1"
+              "artifact_id": "art-s-trip-muoilses-1"
             }
           ]
         },
         {
-          "id": "t-muoggmms-41",
+          "id": "t-muoilses-42",
           "session_id": "s-trip",
-          "parent_id": "t-muoggmms-40",
+          "parent_id": "t-muoilses-41",
           "author": "alfa",
           "role_id": "conductor",
-          "created_at": "2026-09-30T18:45:18.100Z",
+          "created_at": "2026-09-30T19:45:18.100Z",
           "status": "complete",
           "text": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam znać.",
           "blocks": [

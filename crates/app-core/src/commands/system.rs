@@ -96,6 +96,8 @@ impl AppCore {
             zadania = tasks,
             "kill-switch: zatrzymano zadania schedulera"
         );
+        // Kamery: wszystkie strumienie zamknięte od razu (przełączników nie zmienia).
+        self.inner.cameras.hub.stop_all().await;
         // Przeglądarki agentek (F6): drzewa procesów zamknięte, zgody hostów wygasają.
         let _ = self.inner.agents.as_ref().map(|a| a.tools.kill_switch());
         if let Err(e) = self.inner.broker.kill_all(origin).await {

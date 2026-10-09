@@ -1,4 +1,5 @@
 // DTO: ustawienia (drzewo §15), stan systemu (§14.4), start aplikacji, układ okna i zdarzenia.
+import type { CamerasState } from './types-cameras';
 import type { AgentId, MicState } from '@alfa/ui-kit';
 import type {
   ActivityInfo,
@@ -66,6 +67,7 @@ export type SettingsCustomPage =
   | 'transfer'
   | 'permissions'
   | 'devices'
+  | 'cameras'
   | 'voice'
   | 'memory'
   | 'triggers'
@@ -231,6 +233,8 @@ export type AlfaEvent =
   | { readonly type: 'MicLevel'; readonly level: number; readonly raw?: number | null }
   /** Poziom mowy agentki z głośnika (0–1); `agent` pusty = cisza po przerwaniu. */
   | { readonly type: 'SpeechLevel'; readonly agent: string; readonly level: number }
+  /** Zmiana listy albo stanu kamer (podłączenie, otwarcie, uśpienie, przełącznik). */
+  | { readonly type: 'CamerasChanged'; readonly state: CamerasState }
   | { readonly type: 'VoicePill'; readonly state: VoicePillState }
   | {
       readonly type: 'Toast';

@@ -2,6 +2,7 @@
 //! poszczególnych modułów wywoływana w kolejności z rejestru (`compose.rs`).
 
 mod agents;
+mod cameras;
 mod extra;
 mod kernel;
 mod memory;
@@ -40,6 +41,7 @@ use app_modules::embedder::LexicalEmbedder;
 use app_modules::late::{LateDbProvider, LateIndexer};
 use app_modules::secrets::StoreKeyVault;
 use app_store::AppStore;
+pub(crate) use cameras::Cameras;
 pub(crate) use extra::Extra;
 pub(crate) use kernel::Kernel;
 pub(crate) use work::WorkStack;
@@ -60,6 +62,7 @@ pub(crate) struct Built {
     consolidation: Option<Arc<ConsolidationModule>>,
     artifacts: Option<Arc<SqliteArtifacts>>,
     personas: Option<Arc<PersonasModule>>,
+    cameras: Option<Cameras>,
     tasks: tasks::TaskParts,
     extra: Extra,
     /// Gniazda zdrowia modułów `app-gui/terminal/skills/health` (wypełniane po złożeniu).
@@ -101,6 +104,10 @@ impl Built {
                 }
                 None => healthy(),
             },
+            "camera-hub" => {
+                self.cameras = Some(cameras::build(options, kernel).await);
+                healthy();
+            }
             "compliance" => {
                 let policy = kernel
                     .catalog
@@ -288,6 +295,8 @@ impl Built {
             })
             .await;
         work.health.bind_brain(ports.brain.clone());
+        let cameras = (self.cameras)
+            .ok_or_else(|| AppError::internal("moduł camera-hub nie został zbudowany"))?;
         let mut extra = self.extra;
         let ready = match ports.agents {
             Some(_) => Ok(()),
@@ -343,6 +352,7 @@ impl Built {
             personas,
             work,
             signals: kernel.signals,
+            cameras,
             tasks: stack.tasks,
             bridges: stack.bridges,
             hub,

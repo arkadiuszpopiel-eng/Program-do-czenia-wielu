@@ -93,14 +93,14 @@
           >
         </div>
         {#if st?.activity}<p class="activity">{t('agents.now', { activity: st.activity })}</p>{/if}
-        <div class="roles" aria-label={t('agents.roles')}>
-          {#each st?.role_ids ?? [] as role (role)}
-            <Chip size="sm" agent={id}>{app.i18n.tk(`role.${role}`)}</Chip>
-          {:else}
-            <span class="hint">{t('agents.noRole')}</span>
-          {/each}
-        </div>
-        <div class="actions">
+        <div class="roles-row">
+          <div class="roles" aria-label={t('agents.roles')}>
+            {#each st?.role_ids ?? [] as role (role)}
+              <Chip size="sm" agent={id}>{app.i18n.tk(`role.${role}`)}</Chip>
+            {:else}
+              <span class="hint">{t('agents.noRole')}</span>
+            {/each}
+          </div>
           <Button
             size="sm"
             variant="ghost"
@@ -127,10 +127,10 @@
             {/key}
           </fieldset>
         {/if}
-        <p class="hint">{t('agents.hint', { name: agents[id].name })}</p>
       </li>
     {/each}
   </ul>
+  <p class="hint">{t('agents.hintAll')}</p>
 </div>
 
 <style>
@@ -151,7 +151,7 @@
   .list {
     display: flex;
     flex-direction: column;
-    gap: var(--alfa-space-3);
+    gap: var(--alfa-space-2);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -159,8 +159,8 @@
   .card {
     display: flex;
     flex-direction: column;
-    gap: var(--alfa-space-2);
-    padding: var(--alfa-space-3);
+    gap: var(--alfa-space-1);
+    padding: var(--alfa-space-2) var(--alfa-space-3);
     border: 1px solid var(--alfa-color-border);
     border-left: 3px solid var(--accent);
     border-radius: var(--alfa-radius-card);
@@ -194,10 +194,19 @@
     color: var(--accent);
     font-weight: var(--alfa-weight-semibold);
   }
+  /* Role i „Zmień role” w jednym wierszu — karta mieści się w trzech liniach. */
+  .roles-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--alfa-space-2);
+  }
   .roles {
     display: flex;
+    flex: 1;
     flex-wrap: wrap;
     gap: var(--alfa-space-1);
+    min-width: 0;
   }
   .role-editor {
     display: grid;

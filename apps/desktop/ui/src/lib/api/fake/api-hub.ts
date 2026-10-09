@@ -280,6 +280,23 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       else delete queues[known];
       return core.reply(update(id, { queues }) ?? account);
     },
+    // Atrapa: zmienne z katalogu; klucz OpenAI „już jest”, Anthropic „dodany”, reszta nieustawiona.
+    importEnv: () =>
+      core.reply(
+        [
+          ['openai', 'OpenAI', 'OPENAI_API_KEY', 'already_present'],
+          ['anthropic', 'Anthropic', 'ANTHROPIC_API_KEY', 'imported'],
+          ['google', 'Google', 'GEMINI_API_KEY', 'not_set'],
+          ['mistral', 'Mistral', 'MISTRAL_API_KEY', 'not_set'],
+          ['openrouter', 'OpenRouter', 'OPENROUTER_API_KEY', 'not_set'],
+        ].map(([provider, provider_name, name, result]) => ({
+          provider: provider ?? '',
+          provider_name: provider_name ?? '',
+          var: name ?? '',
+          result: result as 'imported' | 'already_present' | 'not_set',
+          account_id: result === 'not_set' ? null : `acc-${provider}`,
+        })),
+      ),
     suggestQueue: (id, taskClass, strategy) => {
       const account = core.accounts.find((a) => a.id === id);
       if (!account) return missing();

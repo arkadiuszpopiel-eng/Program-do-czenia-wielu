@@ -6,6 +6,7 @@ import Bell from '@lucide/svelte/icons/bell';
 import Blocks from '@lucide/svelte/icons/blocks';
 import Brain from '@lucide/svelte/icons/brain';
 import CalendarClock from '@lucide/svelte/icons/calendar-clock';
+import Camera from '@lucide/svelte/icons/camera';
 import Cpu from '@lucide/svelte/icons/cpu';
 import Download from '@lucide/svelte/icons/download';
 import FolderOpen from '@lucide/svelte/icons/folder-open';
@@ -49,6 +50,7 @@ const ICONS: Record<string, Icon> = {
   router: Route,
   voice: Mic,
   devices: MonitorSpeaker,
+  cameras: Camera,
   agents: Users,
   builder: WandSparkles,
   skills: GraduationCap,

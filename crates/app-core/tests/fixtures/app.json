@@ -47,6 +47,7 @@
         "files.workdir_root": "%USERPROFILE%\\Alfa\\Sesje",
         "files.image_thumbnails": true,
         "diagnostician.autonomy": "auto_low_risk",
+        "camera.enabled": false,
         "device.battery_mode": "auto",
         "device.game_mode": true,
         "ui.theme": "auto",

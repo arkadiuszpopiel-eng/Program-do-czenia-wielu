@@ -13,6 +13,7 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import { useApp } from '../../state/context';
   import AlfaMark from './AlfaMark.svelte';
+  import CameraIndicator from './CameraIndicator.svelte';
   import CastStrip from './CastStrip.svelte';
   import GuiIndicator from './GuiIndicator.svelte';
   import MicIndicator from './MicIndicator.svelte';
@@ -105,6 +106,7 @@
   <div class="drag" data-tauri-drag-region></div>
   <CastStrip />
   <GuiIndicator />
+  <CameraIndicator />
   <MicIndicator />
   <StatusCluster />
   {#if app.view !== 'settings'}

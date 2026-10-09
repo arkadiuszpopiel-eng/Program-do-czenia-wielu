@@ -216,6 +216,7 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             vec![("accountId", s), ("taskClass", s), ("strategy", s)],
             roundtrip::<Vec<String>>,
         ),
+        "accounts_import_env" => (vec![], roundtrip::<Vec<EnvImportResult>>),
         "accounts_set_disabled" => (
             vec![("accountId", s), ("disabled", b)],
             roundtrip::<Account>,
@@ -324,8 +325,8 @@ fn every_event_sample_roundtrips() {
         roundtrip::<AlfaEvent>("zdarzenie", event);
         types.insert(event["type"].as_str().unwrap().to_owned());
     }
-    // Wszystkie 39 typów z COMMANDS.md (tabela „Zdarzenia").
-    assert_eq!(types.len(), 39, "typy zdarzeń w fixture'ach: {types:?}");
+    // Wszystkie 40 typów z COMMANDS.md (tabela „Zdarzenia").
+    assert_eq!(types.len(), 40, "typy zdarzeń w fixture'ach: {types:?}");
 }
 
 #[test]

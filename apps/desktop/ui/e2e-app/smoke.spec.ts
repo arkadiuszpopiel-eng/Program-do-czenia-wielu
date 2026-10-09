@@ -392,6 +392,56 @@ test('zatrzymanie z UI (bez skrótu globalnego): „Zatrzymaj sterowanie” → 
   await expect(main.getByText('Żadna agentka nie steruje teraz ekranem.').first()).toBeVisible();
 });
 
+// Zlecenie właściciela (2026-10-09): system kamer. W prawdziwym oknie: kamery są domyślnie
+// wyłączone; po włączeniu podgląd prawdziwej kamery pokazuje obraz, a belka — znak kamery; po
+// wyłączeniu wszystko gaśnie. Na maszynie bez kamery (CI) sprawdzamy pusty stan.
+test('Ustawienia → Kamery: wyłączone domyślnie, podgląd prawdziwej kamery, wskaźnik w belce', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await toChat(main);
+  await openSettings(main, 'Kamery');
+  const master = main.getByRole('switch', { name: 'Kamery włączone' });
+  await expect(master).toHaveAttribute('aria-checked', 'false');
+  const indicator = main.locator('header.titlebar button.cam');
+  await expect(indicator).toHaveCount(0);
+  const cameras = main.locator('li.camera');
+  await expect(main.getByRole('heading', { name: 'Twoje kamery' })).toBeVisible();
+  // Lista albo pusty stan — zależnie od sprzętu.
+  await expect(cameras.first().or(main.getByText('Nie widzę żadnej kamery'))).toBeVisible();
+  const count = await cameras.count();
+  test.info().annotations.push({ type: 'kamery', description: String(count) });
+  if (count === 0) return;
+
+  const first = cameras.first();
+  await expect(first.getByRole('button', { name: 'Podgląd', exact: true })).toBeDisabled();
+  await master.click();
+  try {
+    const preview = first.getByRole('button', { name: 'Podgląd', exact: true });
+    await expect(preview).toBeEnabled();
+    await preview.click();
+    // Prawdziwa klatka: obraz o rozsądnym rozmiarze, stan „działa”, znak kamery w belce.
+    const image = first.locator('img');
+    await expect(image).toBeVisible({ timeout: 20_000 });
+    const size = await image.evaluate((el: HTMLImageElement) => [
+      el.naturalWidth,
+      el.naturalHeight,
+    ]);
+    expect(size[0], 'szerokość klatki').toBeGreaterThanOrEqual(64);
+    expect(size[1], 'wysokość klatki').toBeGreaterThanOrEqual(36);
+    await expect(first.locator('.state')).toHaveText('działa');
+    await expect(indicator).toBeVisible();
+    // Zrzut tylko belki — obrazu z kamery nie zapisujemy do artefaktów testu.
+    await first.getByRole('button', { name: 'Zakończ podgląd' }).click();
+    await expect(image).toHaveCount(0);
+  } finally {
+    // Zawsze wyłącz kamery po teście.
+    if ((await master.getAttribute('aria-checked')) === 'true') await master.click();
+  }
+  await expect(indicator).toHaveCount(0, { timeout: 15_000 });
+  await main.keyboard.press('Escape');
+});
+
 test('okna poboczne (Szybkie pytanie, pigułka) ładują się w WebView2', async ({ alfa }) => {
   const { quick, pill } = alfa.windows;
   expect(quick, 'okno „quick” wśród stron CDP').toBeTruthy();

@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::agents::{AgentRun, ReplayStep, VoiceStatus};
 use super::broker::BrokerStatusView;
+use super::cameras::CamerasState;
 use super::common::LocalizedText;
 use super::gui::GuiStatus;
 use super::health::HealthOverall;
@@ -220,5 +221,9 @@ pub enum AlfaEvent {
     /// Przebudowa wektorów w tle po zmianie embeddera (tylko liczniki, bez treści).
     ReindexStatus {
         status: ReindexView,
+    },
+    /// Kamery: zmiana listy, stanu strumienia, przełącznika albo nazwy (bez obrazu).
+    CamerasChanged {
+        state: CamerasState,
     },
 }

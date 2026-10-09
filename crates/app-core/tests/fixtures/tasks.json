@@ -144,7 +144,7 @@
       }
     },
     "result": {
-      "id": "u-muoa0tf0-33",
+      "id": "u-muoc5z70-34",
       "title": "Sprawdź pisownię raportu",
       "parent_id": null,
       "deps": [],
@@ -169,8 +169,8 @@
       },
       "session_id": "s-q3",
       "tainted": false,
-      "submitted_at": "2026-09-30T15:45:02.700Z",
-      "deadline_at": "2026-09-30T16:45:02.700Z"
+      "submitted_at": "2026-09-30T16:45:02.700Z",
+      "deadline_at": "2026-09-30T17:45:02.700Z"
     }
   },
   {
@@ -182,18 +182,18 @@
         "goal": "Wyślij raport do zarządu",
         "agent": null,
         "after": [
-          "u-muoa0tf0-33"
+          "u-muoc5z70-34"
         ],
         "parent_id": null
       }
     },
     "result": {
-      "id": "u-muoa0tf0-34",
+      "id": "u-muoc5z70-35",
       "title": "Wyślij raport",
       "parent_id": null,
       "deps": [
         {
-          "task_id": "u-muoa0tf0-33",
+          "task_id": "u-muoc5z70-34",
           "condition": "succeeded"
         }
       ],
@@ -218,14 +218,14 @@
       },
       "session_id": "s-q3",
       "tainted": false,
-      "submitted_at": "2026-09-30T15:45:02.700Z",
-      "deadline_at": "2026-09-30T16:45:02.700Z"
+      "submitted_at": "2026-09-30T16:45:02.700Z",
+      "deadline_at": "2026-09-30T17:45:02.700Z"
     }
   },
   {
     "command": "tasks_steer",
     "args": {
-      "taskId": "u-muoa0tf0-33",
+      "taskId": "u-muoc5z70-34",
       "text": "Pomiń tabele"
     },
     "result": null
@@ -233,24 +233,24 @@
   {
     "command": "tasks_pause",
     "args": {
-      "taskId": "u-muoa0tf0-33"
+      "taskId": "u-muoc5z70-34"
     },
     "result": null
   },
   {
     "command": "tasks_resume",
     "args": {
-      "taskId": "u-muoa0tf0-33"
+      "taskId": "u-muoc5z70-34"
     },
     "result": null
   },
   {
     "command": "tasks_retry",
     "args": {
-      "taskId": "u-muoa0tf0-33"
+      "taskId": "u-muoc5z70-34"
     },
     "result": {
-      "id": "u-muoa0tf0-33.retry1",
+      "id": "u-muoc5z70-34.retry1",
       "title": "Sprawdź pisownię raportu",
       "parent_id": null,
       "deps": [],
@@ -275,8 +275,8 @@
       },
       "session_id": "s-q3",
       "tainted": false,
-      "submitted_at": "2026-09-30T16:45:03.200Z",
-      "deadline_at": "2026-09-30T16:45:02.700Z"
+      "submitted_at": "2026-09-30T17:45:03.200Z",
+      "deadline_at": "2026-09-30T17:45:02.700Z"
     }
   },
   {

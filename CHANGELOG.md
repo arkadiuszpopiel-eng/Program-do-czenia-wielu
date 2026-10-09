@@ -8,6 +8,48 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.16 — 2026-10-10
+
+Praca nocna bez właściciela: pierwszy krok systemu kamer, import kluczy ze zmiennych środowiskowych, porządki
+w interfejsie i pakiet decyzji do podjęcia.
+
+### Kamery (pierwszy krok planu C3)
+
+- W Ustawieniach jest strona „Kamery”: lista kamer wbudowanych i na USB, nazwy do zmiany, przełącznik każdej kamery
+  i przełącznik główny. Kamery są domyślnie wyłączone.
+- Podgląd na żywo z kilku kamer naraz. Kamera otwiera się dopiero na żądanie i sama zasypia po 20 sekundach bez
+  podglądu; podgląd niczego nie zapisuje.
+- Gdy którakolwiek kamera działa, w górnej belce świeci czerwony znak kamery z liczbą działających kamer.
+- W polu pisania jest przycisk z aparatem: dołącza zdjęcie z kamery do wiadomości — można wtedy napisać „opisz mi
+  to, co widzisz”. Potrzebny jest model, który przyjmuje obrazy.
+- „STOP WSZYSTKIEGO” zamyka także kamery.
+
+### Konta i klucze
+
+- „Importuj ze zmiennych środowiskowych” na stronie kont: Alfa sprawdza nazwy z katalogu dostawców (np.
+  `OPENAI_API_KEY`), znaleziony klucz zapisuje w Windows Credential Manager i pokazuje raport z samymi nazwami zmiennych.
+
+### Interfejs
+
+- Panel „Agentki” jest zwarty: role i „Zmień role” w jednym wierszu, jedna podpowiedź na dole zamiast czterech —
+  cała obsada mieści się bez przewijania.
+- Strona „Urządzenia” (procesor, karty, bateria) przeniesiona z grupy głosu do grupy „System”; grupa głosu nazywa się
+  teraz „Głos i kamery”.
+
+### Dokumenty
+
+- Pakiet decyzji właściciela: 44 otwarte decyzje bezpieczeństwa i podpisy pod projektami ADR, każda z opisem po
+  ludzku, opcjami i rekomendacją (`docs/reviews/2026-10-10-pakiet-decyzji-wlasciciela.md`).
+- Podsumowanie nocy i plan dalszych prac: `docs/plan/13-podsumowanie-i-dalsze-kroki.md`.
+
+### Testy
+
+- Nowe: `e2e/cameras.spec.ts`, `e2e/env-import.spec.ts`, testy huba kamer i portu kamery w Rust, test importu kluczy.
+- **Nie sprawdzono na prawdziwej kamerze.** Windows zgłasza kamerę laptopa jako odłączoną sprzętowo (zasłonka albo
+  klawisz funkcyjny), więc kod przechwytywania obrazu działał tylko na atrapach. Po odsłonięciu kamery trzeba to
+  sprawdzić: „Kamery” → włącz → „Szukaj kamer” → „Podgląd”.
+- Import kluczy z prawdziwych zmiennych środowiskowych nie był uruchamiany (sesja nie dotyka kluczy właściciela).
+
 ## 0.0.15 — 2026-10-09
 
 Zlecenie właściciela: dopisać do planu prac system kamer, rozpoznawanie użytkowników z pamięcią i opis obrazu.

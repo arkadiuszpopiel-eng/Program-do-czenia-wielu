@@ -15,6 +15,7 @@
     type AgentId,
     type MenuItem,
   } from '@alfa/ui-kit';
+  import CameraSnapButton from './CameraSnapButton.svelte';
   import type { ModelProfile } from '../../api/types';
   import {
     SentHistory,
@@ -329,6 +330,7 @@
       {/if}
     {/snippet}
     {#snippet chips()}
+      <CameraSnapButton {att} />
       <Menu
         items={agentItems}
         label={t('composer.agent', {

@@ -9,6 +9,7 @@
 mod agents;
 mod bridges;
 mod broker;
+mod cameras;
 mod common;
 mod events;
 mod files;
@@ -34,6 +35,10 @@ pub use agents::{
 };
 pub use bridges::{BridgeCard, BridgeLogin, BridgeSource};
 pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView};
+pub use cameras::{
+    CAMERA_FRAME_MAX_SIDE, CAMERA_FRAME_MIN_SIDE, CameraFrame, CameraKindView, CameraStateView,
+    CameraView, CamerasState,
+};
 pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };
@@ -55,9 +60,9 @@ pub use health::{
 pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
     AudioDevice, AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind,
-    ComplianceStatus, CpuView, DeviceProfile, GpuView, HwClass, LocalDownloadState, LocalModelInfo,
-    MachineView, ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind,
-    RecommendationView, SecretInput, TestReport, VoiceProfileId,
+    ComplianceStatus, CpuView, DeviceProfile, EnvImportKind, EnvImportResult, GpuView, HwClass,
+    LocalDownloadState, LocalModelInfo, MachineView, ModelInfo, ModelKind, PermissionsState,
+    ProviderInfo, ProviderKind, RecommendationView, SecretInput, TestReport, VoiceProfileId,
 };
 pub use memory::{
     ConsolidationReport, MemoryCascadeItem, MemoryEdit, MemoryExplanation, MemoryForgetPreview,

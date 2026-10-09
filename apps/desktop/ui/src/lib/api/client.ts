@@ -40,6 +40,7 @@ import type {
   PermissionsState,
   ProviderInfo,
   TestReport,
+  EnvImportResult,
 } from './types-hub';
 import type {
   ConsolidationReport,
@@ -72,6 +73,7 @@ import type {
   TriggerRunInfo,
 } from './types-tasks';
 import type { BuilderApi, GuiApi, HealthApi, SkillsApi, TerminalApi } from './client-work';
+import type { CameraFrame, CamerasState } from './types-cameras';
 import type { UpdatesApi } from './client-updates';
 import type { BrokerApi } from './client-broker';
 import type { VoiceFeaturesApi } from './client-voice';
@@ -212,6 +214,8 @@ export interface AccountsApi {
   setQueue(accountId: string, taskClass: string, models: readonly string[]): Promise<Account>;
   /** Propozycja kolejki (`quality` / `balanced` / `economy`) — niczego nie zapisuje. */
   suggestQueue(accountId: string, taskClass: string, strategy: string): Promise<string[]>;
+  /** Import kluczy ze zmiennych środowiskowych z katalogu dostawców (raport bez wartości). */
+  importEnv(): Promise<readonly EnvImportResult[]>;
 }
 
 export interface TransferApi {
@@ -241,6 +245,18 @@ export interface ModelsApi {
   localDownload(modelId: string | null): Promise<void>;
   /** Anulowanie pobierania (`null` = wszystkich). */
   localCancel(modelId: string | null): Promise<void>;
+}
+
+export interface CamerasApi {
+  state(): Promise<CamerasState>;
+  /** Przełącznik główny (to samo co ustawienie `camera.enabled`). */
+  setMaster(enabled: boolean): Promise<CamerasState>;
+  setEnabled(id: string, enabled: boolean): Promise<CamerasState>;
+  rename(id: string, name: string): Promise<CamerasState>;
+  /** Ponowne wyszukanie kamer (podłączone / odłączone). */
+  refresh(): Promise<CamerasState>;
+  /** Jedna bieżąca klatka; budzi kamerę, jeśli śpi. `maxSide`: dłuższy bok w pikselach. */
+  frame(id: string, maxSide: number): Promise<CameraFrame>;
 }
 
 export interface DeviceApi {
@@ -363,6 +379,7 @@ export interface AlfaClient {
   readonly permissions: PermissionsApi;
   readonly models: ModelsApi;
   readonly device: DeviceApi;
+  readonly cameras: CamerasApi;
   readonly voice: VoiceApi;
   readonly system: SystemApi;
   readonly quick: QuickApi;

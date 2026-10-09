@@ -1,0 +1,260 @@
+[
+  {
+    "command": "cameras_state",
+    "args": {},
+    "result": {
+      "enabled": false,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Integrated Camera",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "command": "cameras_set_master",
+    "args": {
+      "enabled": true
+    },
+    "result": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Integrated Camera",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "command": "cameras_set_enabled",
+    "args": {
+      "id": "usb-logi-c920",
+      "enabled": false
+    },
+    "result": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Integrated Camera",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": false,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "command": "cameras_rename",
+    "args": {
+      "id": "usb-integrated",
+      "name": "Biurko"
+    },
+    "result": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Biurko",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": false,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "command": "cameras_refresh",
+    "args": {},
+    "result": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Biurko",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": false,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "command": "cameras_frame",
+    "args": {
+      "id": "usb-integrated",
+      "maxSide": 320
+    },
+    "result": {
+      "camera": "usb-integrated",
+      "width": 320,
+      "height": 180,
+      "taken_ms": 1790772300600,
+      "png_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNoaGj4DwAFhAKAjM1mJgAAAABJRU5ErkJggg=="
+    }
+  },
+  {
+    "command": "cameras_set_master",
+    "args": {
+      "enabled": false
+    },
+    "result": {
+      "enabled": false,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Biurko",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": false,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  }
+]

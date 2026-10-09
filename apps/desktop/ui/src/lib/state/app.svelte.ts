@@ -1,5 +1,6 @@
 // Stan aplikacji okna głównego: start, zdarzenia (paczka raz na klatkę), sesje, rozmowa,
 // ustawienia, stan systemu, koszty, agentki. Komponenty czytają pola, akcje wołają metody.
+import type { CamerasState } from '../api/types-cameras';
 import type { MicState } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
 import type {
@@ -75,6 +76,8 @@ export class AppState {
   /** Konto wybrane na stronie „Kolejki modeli API” (ustawiane przez przejście z listy kont). */
   apiAccount = $state('');
   micLevel = $state(0);
+  /** Kamery: lista i stan (`null`, dopóki nie wczytano). */
+  cameras = $state.raw<CamerasState | null>(null);
   /** Agentka, której mowę właśnie słychać z głośnika (z pomiaru poziomu); pusty = nikt. */
   speechAgent = $state('');
   private speechTimer: ReturnType<typeof setTimeout> | undefined;
@@ -184,6 +187,7 @@ export class AppState {
     this.sessions.list = [...list];
     void this.client.voice.status().then((v) => this.voice.applyStatus(v), logFailure('voice'));
     void this.client.gui.status().then((g) => this.work.applyGui(g), logFailure('gui'));
+    void this.client.cameras.state().then((c) => (this.cameras = c), logFailure('cameras'));
     void this.updates.load(this.client.updates);
     void this.broker.load(this.client.broker);
     const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;

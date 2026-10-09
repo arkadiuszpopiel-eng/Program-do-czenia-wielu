@@ -31,6 +31,9 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       app.micRaw = event.raw ?? null;
       app.voice.level = event.level;
       break;
+    case 'CamerasChanged':
+      app.cameras = event.state;
+      break;
     case 'SpeechLevel':
       setSpeechLevel(event.level);
       app.noteSpeech(event.agent, event.level);

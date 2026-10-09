@@ -5,7 +5,11 @@
 „System kamer” Alfy: jeden rejestr wszystkich kamer (USB, IP po kablu, Wi-Fi), kilka strumieni naraz, klatka na
 żądanie i podgląd w niskiej rozdzielczości, stan każdej kamery. Moduł **nie** rozpoznaje osób, **nie** opisuje
 obrazu i **nie** zapisuje nagrań — dostarcza klatki modułom `vision-describe` i `person-recognition`.
-Stan: propozycja, kod nie istnieje. Opis całości: [`../../plan/12-kamery-i-rozpoznawanie-osob.md`](../../plan/12-kamery-i-rozpoznawanie-osob.md).
+Stan (2026-10-09): istnieje podzbiór v0 — kamery USB przez `CameraPort`, przełącznik główny i per kamera,
+klatka na żądanie, usypianie, `stop_all`, komendy interfejsu `cameras_*`; źródłem prawdy kontraktu jest crate
+`camera-hub-contract` (szkic poniżej opisuje cel v1: kamery sieciowe, `add`/`remove`, podgląd strumieniowy,
+zdarzenia `camera.*` na magistrali, zdolność `camera.view` — tego jeszcze nie ma). Przebiegu na fizycznej
+kamerze jeszcze nie było. Opis całości: [`../../plan/12-kamery-i-rozpoznawanie-osob.md`](../../plan/12-kamery-i-rozpoznawanie-osob.md).
 
 ## Fala i priorytet
 

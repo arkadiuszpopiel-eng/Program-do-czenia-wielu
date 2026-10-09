@@ -5,7 +5,7 @@
     "result": {
       "overall": "degraded",
       "safe_mode": null,
-      "generated_at": "2026-09-30T18:45:03.200Z",
+      "generated_at": "2026-09-30T19:45:03.200Z",
       "modules": [
         {
           "module": "core-bus",
@@ -64,7 +64,7 @@
           "title": "Dostawca odrzuca klucz (401)",
           "target": "anthropic",
           "count": 3,
-          "last_at": "2026-09-30T18:45:03.200Z",
+          "last_at": "2026-09-30T19:45:03.200Z",
           "status": "awaiting_approval"
         }
       ],
@@ -117,7 +117,7 @@
     "result": {
       "overall": "degraded",
       "safe_mode": null,
-      "generated_at": "2026-09-30T18:45:03.200Z",
+      "generated_at": "2026-09-30T19:45:03.200Z",
       "modules": [
         {
           "module": "core-bus",
@@ -176,7 +176,7 @@
           "title": "Dostawca odrzuca klucz (401)",
           "target": "anthropic",
           "count": 3,
-          "last_at": "2026-09-30T18:45:03.200Z",
+          "last_at": "2026-09-30T19:45:03.200Z",
           "status": "awaiting_approval"
         }
       ],
@@ -231,7 +231,7 @@
     "result": {
       "overall": "degraded",
       "safe_mode": null,
-      "generated_at": "2026-09-30T18:45:03.200Z",
+      "generated_at": "2026-09-30T19:45:03.200Z",
       "modules": [
         {
           "module": "core-bus",
@@ -290,7 +290,7 @@
           "title": "Dostawca odrzuca klucz (401)",
           "target": "anthropic",
           "count": 3,
-          "last_at": "2026-09-30T18:45:03.200Z",
+          "last_at": "2026-09-30T19:45:03.200Z",
           "status": "resolved"
         }
       ],
@@ -301,7 +301,7 @@
           "diff": [
             "router.routes.anthropic.enabled: true → false"
           ],
-          "at": "2026-09-30T18:45:03.200Z",
+          "at": "2026-09-30T19:45:03.200Z",
           "undoable": true
         },
         {
@@ -339,7 +339,7 @@
     "result": {
       "overall": "degraded",
       "safe_mode": null,
-      "generated_at": "2026-09-30T18:45:03.200Z",
+      "generated_at": "2026-09-30T19:45:03.200Z",
       "modules": [
         {
           "module": "core-bus",
@@ -398,7 +398,7 @@
           "title": "Dostawca odrzuca klucz (401)",
           "target": "anthropic",
           "count": 3,
-          "last_at": "2026-09-30T18:45:03.200Z",
+          "last_at": "2026-09-30T19:45:03.200Z",
           "status": "resolved"
         }
       ],
@@ -409,7 +409,7 @@
           "diff": [
             "router.routes.anthropic.enabled: true → false"
           ],
-          "at": "2026-09-30T18:45:03.200Z",
+          "at": "2026-09-30T19:45:03.200Z",
           "undoable": true
         },
         {
@@ -449,7 +449,7 @@
     "result": {
       "overall": "degraded",
       "safe_mode": null,
-      "generated_at": "2026-09-30T18:45:03.200Z",
+      "generated_at": "2026-09-30T19:45:03.200Z",
       "modules": [
         {
           "module": "core-bus",
@@ -508,7 +508,7 @@
           "title": "Dostawca odrzuca klucz (401)",
           "target": "anthropic",
           "count": 3,
-          "last_at": "2026-09-30T18:45:03.200Z",
+          "last_at": "2026-09-30T19:45:03.200Z",
           "status": "resolved"
         }
       ],
@@ -519,7 +519,7 @@
           "diff": [
             "router.routes.anthropic.enabled: true → false"
           ],
-          "at": "2026-09-30T18:45:03.200Z",
+          "at": "2026-09-30T19:45:03.200Z",
           "undoable": false
         },
         {
@@ -559,7 +559,7 @@
     "result": {
       "overall": "ok",
       "safe_mode": null,
-      "generated_at": "2026-09-30T18:45:03.200Z",
+      "generated_at": "2026-09-30T19:45:03.200Z",
       "modules": [
         {
           "module": "core-bus",
@@ -618,7 +618,7 @@
           "title": "Dostawca odrzuca klucz (401)",
           "target": "anthropic",
           "count": 3,
-          "last_at": "2026-09-30T18:45:03.200Z",
+          "last_at": "2026-09-30T19:45:03.200Z",
           "status": "resolved"
         }
       ],
@@ -629,7 +629,7 @@
           "diff": [
             "router.routes.anthropic.enabled: true → false"
           ],
-          "at": "2026-09-30T18:45:03.200Z",
+          "at": "2026-09-30T19:45:03.200Z",
           "undoable": false
         },
         {
@@ -748,7 +748,7 @@
       "blocked": [],
       "issues": [],
       "idle_cycle": false,
-      "last_cycle": "2026-09-30T18:45:03.200Z"
+      "last_cycle": "2026-09-30T19:45:03.200Z"
     }
   },
   {
@@ -803,7 +803,7 @@
       "blocked": [],
       "issues": [],
       "idle_cycle": false,
-      "last_cycle": "2026-09-30T18:45:03.200Z"
+      "last_cycle": "2026-09-30T19:45:03.200Z"
     }
   },
   {
@@ -857,7 +857,7 @@
       "blocked": [],
       "issues": [],
       "idle_cycle": false,
-      "last_cycle": "2026-09-30T18:45:03.200Z"
+      "last_cycle": "2026-09-30T19:45:03.200Z"
     }
   },
   {
@@ -911,7 +911,7 @@
       "blocked": [],
       "issues": [],
       "idle_cycle": false,
-      "last_cycle": "2026-09-30T18:45:03.200Z"
+      "last_cycle": "2026-09-30T19:45:03.200Z"
     }
   },
   {

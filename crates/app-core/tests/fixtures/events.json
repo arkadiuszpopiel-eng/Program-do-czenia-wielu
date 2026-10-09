@@ -1894,6 +1894,120 @@
     "error": null
   },
   {
+    "type": "CamerasChanged",
+    "state": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Integrated Camera",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "type": "CamerasChanged",
+    "state": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Integrated Camera",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": false,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
+    "type": "CamerasChanged",
+    "state": {
+      "enabled": true,
+      "cameras": [
+        {
+          "id": "usb-integrated",
+          "name": "Biurko",
+          "kind": "usb",
+          "enabled": true,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-logi-c920",
+          "name": "Logitech C920",
+          "kind": "usb",
+          "enabled": false,
+          "state": "asleep",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        },
+        {
+          "id": "usb-old",
+          "name": "USB2.0 Camera",
+          "kind": "usb",
+          "enabled": false,
+          "state": "unplugged",
+          "detail": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  },
+  {
     "type": "MicLevel",
     "level": 0.28716582341864194,
     "raw": 0.38
@@ -2021,7 +2135,7 @@
   {
     "type": "TurnStatus",
     "session_id": "s-api",
-    "turn_id": "t-muo3lc30-19",
+    "turn_id": "t-muo5qhv0-20",
     "status": "complete"
   },
   {
@@ -2037,11 +2151,11 @@
   {
     "type": "Error",
     "session_id": "s-trip",
-    "turn_id": "t-muo5qhv0-23",
+    "turn_id": "t-muo7vnn0-24",
     "error": {
       "code": "rate_limited",
       "message": "Limit zapytań u dostawcy Anthropic.",
-      "retry_at": "2026-09-30T12:48:02.700Z",
+      "retry_at": "2026-09-30T13:48:02.700Z",
       "provider": "Anthropic"
     }
   },
@@ -2060,7 +2174,7 @@
   {
     "type": "TaskUpdated",
     "task": {
-      "id": "u-muoa0tf0-33",
+      "id": "u-muoc5z70-34",
       "title": "Sprawdź pisownię raportu",
       "parent_id": null,
       "deps": [],
@@ -2085,19 +2199,19 @@
       },
       "session_id": "s-q3",
       "tainted": false,
-      "submitted_at": "2026-09-30T15:45:02.700Z",
-      "deadline_at": "2026-09-30T16:45:02.700Z"
+      "submitted_at": "2026-09-30T16:45:02.700Z",
+      "deadline_at": "2026-09-30T17:45:02.700Z"
     }
   },
   {
     "type": "TaskUpdated",
     "task": {
-      "id": "u-muoa0tf0-34",
+      "id": "u-muoc5z70-35",
       "title": "Wyślij raport",
       "parent_id": null,
       "deps": [
         {
-          "task_id": "u-muoa0tf0-33",
+          "task_id": "u-muoc5z70-34",
           "condition": "succeeded"
         }
       ],
@@ -2122,14 +2236,14 @@
       },
       "session_id": "s-q3",
       "tainted": false,
-      "submitted_at": "2026-09-30T15:45:02.700Z",
-      "deadline_at": "2026-09-30T16:45:02.700Z"
+      "submitted_at": "2026-09-30T16:45:02.700Z",
+      "deadline_at": "2026-09-30T17:45:02.700Z"
     }
   },
   {
     "type": "TaskUpdated",
     "task": {
-      "id": "u-muoa0tf0-33",
+      "id": "u-muoc5z70-34",
       "title": "Sprawdź pisownię raportu",
       "parent_id": null,
       "deps": [],
@@ -2154,18 +2268,18 @@
       },
       "session_id": "s-q3",
       "tainted": false,
-      "submitted_at": "2026-09-30T15:45:02.700Z",
-      "deadline_at": "2026-09-30T16:45:02.700Z"
+      "submitted_at": "2026-09-30T16:45:02.700Z",
+      "deadline_at": "2026-09-30T17:45:02.700Z"
     }
   },
   {
     "type": "TriggerFired",
     "run": {
-      "at": "2026-09-30T16:45:03.200Z",
+      "at": "2026-09-30T17:45:03.200Z",
       "trigger_id": "porzadki",
       "cause": "ręcznie",
       "outcome": "submitted",
-      "task_id": "tr-muoc5zkw-35",
+      "task_id": "tr-muoeb5cw-36",
       "detail": null
     }
   },
@@ -2322,7 +2436,7 @@
       "progress": null,
       "ready": null,
       "previous": null,
-      "last_check": "2026-09-30T18:45:03.200Z",
+      "last_check": "2026-09-30T19:45:03.200Z",
       "error": null,
       "restart_blocked": null
     }
@@ -2341,7 +2455,7 @@
       "progress": null,
       "ready": null,
       "previous": null,
-      "last_check": "2026-09-30T18:45:03.200Z",
+      "last_check": "2026-09-30T19:45:03.200Z",
       "error": null,
       "restart_blocked": null
     }
@@ -2364,7 +2478,7 @@
       },
       "ready": null,
       "previous": null,
-      "last_check": "2026-09-30T18:45:03.200Z",
+      "last_check": "2026-09-30T19:45:03.200Z",
       "error": null,
       "restart_blocked": null
     }

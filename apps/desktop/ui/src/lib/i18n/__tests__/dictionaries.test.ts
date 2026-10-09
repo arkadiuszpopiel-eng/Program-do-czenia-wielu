@@ -27,7 +27,7 @@ describe('słowniki PL/EN', () => {
   });
 
   it('agentki w rodzaju żeńskim (wybrane komunikaty)', () => {
-    expect(pl['agents.hint']).toContain('do niej');
+    expect(pl['agents.hintAll']).toContain('do agentki');
     expect(pl['ob.voice.desc']).toMatch(/Dobrałyśmy/);
   });
 });

@@ -5,7 +5,7 @@ use accounts_hub_contract::{AccountId, AccountsHub, SecretString, TestSummary};
 
 use super::accounts::{NOT_A_KEY, account_dto};
 use crate::core::AppCore;
-use crate::dto::{Account, SecretInput, TestReport};
+use crate::dto::{Account, EnvImportKind, EnvImportResult, SecretInput, TestReport};
 use crate::error::AppError;
 
 impl AppCore {
@@ -150,5 +150,45 @@ impl AppCore {
             .into_iter()
             .map(str::to_owned)
             .collect())
+    }
+
+    /// `accounts_import_env`: import kluczy ze zmiennych środowiskowych wymienionych w katalogu
+    /// dostawców (np. `OPENAI_API_KEY`). Wyłącznie na życzenie użytkownika; znaleziony klucz
+    /// trafia do sejfu, a raport zawiera tylko nazwy zmiennych.
+    pub async fn accounts_import_env(&self) -> Result<Vec<EnvImportResult>, AppError> {
+        self.import_env_from(&accounts_hub_impl::ProcessEnv).await
+    }
+
+    /// Import z podanego źródła zmiennych (testy podają własne).
+    pub async fn import_env_from(
+        &self,
+        env: &dyn accounts_hub_contract::EnvSource,
+    ) -> Result<Vec<EnvImportResult>, AppError> {
+        use accounts_hub_contract::EnvImportOutcome as O;
+        let report = self.inner.hub.import_from_env(env).await?;
+        let mut out = Vec::with_capacity(report.len());
+        for item in report {
+            let (result, account) = match item.outcome {
+                O::Imported { account } => (EnvImportKind::Imported, Some(account)),
+                O::AlreadyPresent { account } => (EnvImportKind::AlreadyPresent, Some(account)),
+                O::NotSet => (EnvImportKind::NotSet, None),
+            };
+            if let (EnvImportKind::Imported, Some(id)) = (result, &account) {
+                self.announce_account(id).await;
+            }
+            let provider_name = self
+                .inner
+                .hub
+                .provider(&item.provider)
+                .map_or_else(|| item.provider.to_string(), |p| p.display_name.clone());
+            out.push(EnvImportResult {
+                provider: item.provider.to_string(),
+                provider_name,
+                var: item.var,
+                result,
+                account_id: account.map(|a| a.to_string()),
+            });
+        }
+        Ok(out)
     }
 }

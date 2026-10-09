@@ -274,3 +274,14 @@ export interface LocalModelInfo {
 }
 
 export type LocalDownloadState = 'downloading' | 'done' | 'failed' | 'cancelled';
+
+/** Wynik importu jednej zmiennej środowiskowej (tylko nazwa zmiennej — nigdy wartość). */
+export interface EnvImportResult {
+  readonly provider: string;
+  readonly provider_name: string;
+  /** Nazwa zmiennej, np. `OPENAI_API_KEY`. */
+  readonly var: string;
+  readonly result: 'imported' | 'already_present' | 'not_set';
+  /** Konto dodane albo już istniejące z tym kluczem. */
+  readonly account_id: string | null;
+}

@@ -83,6 +83,9 @@ compliance-impl = { path = "../compliance-impl" }
 # Sprzęt, agentki, zasoby
 device-profile-contract = { path = "../device-profile-contract" }
 device-profile-impl = { path = "../device-profile-impl" }
+# Kamery (plan v6, C3): hub nad portem kamer systemu.
+camera-hub-contract = { path = "../camera-hub-contract" }
+camera-hub-impl = { path = "../camera-hub-impl" }
 personas-contract = { path = "../personas-contract" }
 personas-impl = { path = "../personas-impl" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
@@ -123,6 +126,9 @@ serde_json.workspace = true
 tokio = { workspace = true, features = ["rt"] }
 tracing.workspace = true
 uuid.workspace = true
+# Klatka kamery dla interfejsu: PNG (zlib z flate2/miniz_oxide) w base64 — te same wersje co w innych crate'ach.
+base64 = "0.22.1"
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 # Klient HTTP kursu NBP dla cost-meter (ta sama wersja i cechy co providers-api-impl: rustls, bez OpenSSL).
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 
@@ -146,7 +152,6 @@ voice-audio-fake = { path = "../voice-audio-fake" }
 voice-tts-fake = { path = "../voice-tts-fake" }
 # Wtyczka testowa (WAT → komponent) dla `tests/plugins.rs`.
 plugin-runtime-contract = { path = "../plugin-runtime-contract" }
-base64 = "0.22.1"
 wat = "=1.236.1"
 tempfile = "3.27.0"
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }

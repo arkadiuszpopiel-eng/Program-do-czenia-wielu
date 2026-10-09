@@ -157,7 +157,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'agents.noRole': 'no role in this session',
   'agents.now': 'Now: {activity}',
   'agents.applied': 'Cast changed — recorded in the log.',
-  'agents.hint': 'Write @{name} to address her directly.',
+  'agents.hintAll': 'Type @name (e.g. @Beta) to address an agent directly.',
   'agents.conductorHint': 'When you do not address anyone by name, the Conductor answers.',
 
   'timeline.kind': 'Kind',

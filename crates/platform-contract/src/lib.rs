@@ -5,6 +5,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod camera;
 mod capture;
 mod capture_check;
 mod clipboard;
@@ -42,6 +43,7 @@ mod uia;
 mod uia_action;
 mod window;
 
+pub use camera::{CameraDevice, CameraPort, CameraStream};
 pub use clipboard::{ClipboardContent, ClipboardPort};
 pub use error::PlatformError;
 pub use exec::{

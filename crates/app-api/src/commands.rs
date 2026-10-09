@@ -72,6 +72,7 @@ macro_rules! with_commands {
             accounts_set_model(account_id: String, model: String) -> $crate::dto::Account;
             accounts_set_queue(account_id: String, task_class: String, models: Vec<String>) -> $crate::dto::Account;
             accounts_suggest_queue(account_id: String, task_class: String, strategy: String) -> Vec<String>;
+            accounts_import_env() -> Vec<$crate::dto::EnvImportResult>;
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
             transfer_inspect(password: Option<$crate::dto::SecretInput>, handle: Option<String>) -> $crate::dto::InspectResult;
             transfer_import(request: $crate::dto::ImportRequest) -> $crate::dto::ImportResult;
@@ -225,6 +226,13 @@ macro_rules! with_commands {
             backups_run_now() -> $crate::dto::BackupView;
             backups_verify(file: String) -> $crate::dto::BackupCheck;
             backups_restore(file: String) -> String;
+            cameras_state() -> $crate::dto::CamerasState;
+            cameras_set_master(enabled: bool) -> $crate::dto::CamerasState;
+            cameras_set_enabled(id: String, enabled: bool) -> $crate::dto::CamerasState;
+            cameras_rename(id: String, name: String) -> $crate::dto::CamerasState;
+            cameras_refresh() -> $crate::dto::CamerasState;
+            cameras_frame(id: String, max_side: u32) -> $crate::dto::CameraFrame;
+            attachments_add_camera(session_id: String, camera_id: String) -> $crate::dto::AttachmentsAdded;
         }
     };
 }
@@ -250,6 +258,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 217);
+        assert_eq!(super::COMMANDS.len(), 225);
     }
 }
