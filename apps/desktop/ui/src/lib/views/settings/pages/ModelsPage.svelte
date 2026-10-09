@@ -269,7 +269,11 @@
         options={STATE_FILTERS.map((s) => ({ value: s, label: tk(`engines.stateFilter.${s}`) }))}
       />
     </label>
-    <span class="wk-meta count" aria-live="polite">{t('engines.count', { n: items.length })}</span>
+    <!-- Licznik dopiero po wczytaniu katalogu: „0 pozycji" w trakcie ładowania było nieprawdą
+         (i trafiało do czytnika ekranu). -->
+    <span class="wk-meta count" aria-live="polite"
+      >{#if view}{t('engines.count', { n: items.length })}{/if}</span
+    >
   </div>
   {#if view && items.length === 0}
     <p class="wk-meta">{t('engines.empty')}</p>
