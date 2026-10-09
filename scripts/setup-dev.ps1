@@ -250,7 +250,21 @@ function Invoke-Step([string]$Title, [scriptblock]$Action) {
     Write-Host "<== $result, $minutes min: $Title" -ForegroundColor $color
 }
 
+# Data kompilacji i commit dla „O programie". Wydanie ustawia je w workflow; budowa lokalna bez nich
+# pokazywała tylko „build deweloperski", więc nie było widać, z jakiego stanu kodu pochodzi program.
+function Set-BuildStamp {
+    if (-not $env:ALFA_BUILD_DATE) { $env:ALFA_BUILD_DATE = (Get-Date).ToString('yyyy-MM-dd') }
+    if (-not $env:ALFA_BUILD_COMMIT) {
+        $sha = (& git -C $Root rev-parse --short HEAD 2>$null)
+        if ($sha) {
+            $dirty = @(& git -C $Root status --porcelain 2>$null).Count -gt 0
+            $env:ALFA_BUILD_COMMIT = if ($dirty) { "$sha + zmiany lokalne" } else { "$sha" }
+        }
+    }
+}
+
 function Invoke-Build {
+    Set-BuildStamp
     $shellManifest = Join-Path $ShellDir 'Cargo.toml'
     Invoke-Step 'Zależności interfejsu: pnpm install --frozen-lockfile' { pnpm install --frozen-lockfile }
     if ($script:StepOk) { Invoke-Step 'Interfejs: pnpm --filter @alfa/desktop-ui build' { pnpm --filter '@alfa/desktop-ui' build } }
@@ -296,6 +310,7 @@ function Invoke-Tests {
 }
 
 function Invoke-InstallerBuild {
+    Set-BuildStamp
     # Te same kroki co .github/workflows/release.yml (bez licencji, podpisu minisign i adresu aktualizacji).
     $triple = 'x86_64-pc-windows-msvc'
     $binaries = Join-Path $ShellDir 'binaries'

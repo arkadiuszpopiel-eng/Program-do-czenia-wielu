@@ -16,6 +16,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | --- | --- | --- |
 | [`PLAN.md`](PLAN.md) | Zatwierdzony plan programu (wersja 5): decyzje, architektura, fale F0–F9, ryzyka. Źródło prawdy o tym, **co** budujemy | zmiany tylko przez ADR albo za zgodą właściciela |
 | [`STATUS.md`](STATUS.md) | Macierz 108 kryteriów akceptacji ze stanem i dowodem, luki techniczne, lista bramek ludzkich | sesja AI po każdej sesji |
+| [`../CHANGELOG.md`](../CHANGELOG.md) | Dziennik zmian po ludzku: każda seria poprawek = wyższy numer wersji i wpis | sesja AI przy podbiciu wersji |
 | [`KONTYNUACJA.md`](KONTYNUACJA.md) | Ocena stanu z 2026-10-07, etapy dalszych prac, decyzje właściciela | sesja AI; decyzje — właściciel |
 | [`ACCEPTANCE.md`](ACCEPTANCE.md) | Definicje kryteriów i progi fal, definicja MVP | progi — tylko właściciel |
 | [`RELEASE.md`](RELEASE.md) | Jak powstaje wydanie i instalator | sesja AI |
