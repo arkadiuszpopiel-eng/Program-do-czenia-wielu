@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Zrzuty ekranu wszystkich widoków (rozmowa, panele Alt+1…7, każda strona ustawień) w kilku rozmiarach
 // okna — do przeglądu układu i skalowania. Wymaga działającego `pnpm dev` (atrapa backendu).
-// Użycie: node scripts/shots.mjs <katalog-wyjściowy> [--sizes 1280x720,1920x1080] [--only chat,panels,settings,onboarding,windows]
+// Użycie: node scripts/shots.mjs <katalog-wyjściowy> [--sizes 1280x720,1920x1080] [--only chat,panels,settings,onboarding,windows,overlays]
 //         [--scenario default] [--theme dark] [--url http://localhost:5173]
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -57,6 +57,23 @@ for (const [width, height] of sizes) {
       await nav.getByRole('button').nth(i).click();
       await page.waitForTimeout(450);
       await shot(`s${String(i + 1).padStart(2, '0')}-${slug(raw.split('\n')[0].trim())}`);
+    }
+  }
+  // Nakładki: paleta poleceń (Ctrl+K) i ściągawka skrótów (Ctrl+/) nad rozmową.
+  if (only.has('overlays')) {
+    await page.goto(`${base}/${scenario ? `?scenario=${scenario}` : ''}`);
+    await page.locator('#alfa-composer').waitFor();
+    await page.locator('#alfa-composer').focus();
+    for (const [key, name] of [
+      ['Control+k', 'paleta'],
+      ['Control+/', 'sciagawka'],
+    ]) {
+      await page.keyboard.press(key);
+      await page.locator('dialog[open], [role=dialog]').first().waitFor();
+      await page.waitForTimeout(400);
+      await shot(`n-${name}`);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
     }
   }
   await page.close();
