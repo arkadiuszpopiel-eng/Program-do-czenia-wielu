@@ -20,4 +20,5 @@ Skrypty są częścią bramek jakości z §4.4 planu (`docs/PLAN.md`).
 Narzędzia interfejsu (`apps/desktop/ui/scripts/`): `bundle-size.mjs` — budżet paczki JS/CSS (CI);
 `shots.mjs` — zrzuty ekranu wszystkich widoków (rozmowa, panele, każda strona ustawień) w kilku rozmiarach okna,
 do przeglądu układu i skalowania (`pnpm dev` w tle, potem `node scripts/shots.mjs <katalog> --sizes 1280x720,1920x1080`).
-Testy E2E bez pobierania przeglądarki Playwrighta: `PW_CHANNEL=msedge pnpm test:e2e`.
+Testy E2E bez pobierania przeglądarki Playwrighta: `PW_CHANNEL=msedge pnpm test:e2e`; na laptopie z 16 GB RAM dodaj
+`PW_WORKERS=4` (mniej przeglądarek naraz).

@@ -7987,6 +7987,7 @@ dependencies = [
  "compliance-contract",
  "core-bus-contract",
  "core-registry-contract",
+ "encoding_rs",
  "lib-netguard",
  "platform-apps-contract",
  "reqwest 0.12.28",
