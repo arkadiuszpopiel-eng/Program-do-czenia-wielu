@@ -50,6 +50,11 @@ for (const skin of SKINS) {
   for (const theme of THEMES) {
     test(`przyciski okna i nawigacja ustawień są czytelne — ${skin}/${theme}`, async ({ page }) => {
       await open(page, `?style=${skin}&theme=${theme}`);
+      // Znak i nazwa programu stoją na początku belki.
+      const brand = page.locator('header.titlebar .brand');
+      await expect(brand.locator('svg.mark')).toBeVisible();
+      await expect(brand).toHaveText('Alfa');
+      expect((await brand.boundingBox())?.x).toBeLessThan(16);
       const controls = page.getByRole('group', { name: 'Okno' });
       for (const name of ['Minimalizuj', 'Maksymalizuj', 'Zamknij']) {
         await expect(controls.getByRole('button', { name, exact: true })).toBeVisible();

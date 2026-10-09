@@ -1,5 +1,5 @@
 <!--
-  Pasek tytułu (36 px, PLAN §14.2): przełącznik panelu Sesje, ścieżka projekt ▸ sesja (klik = zmień
+  Pasek tytułu (36 px, PLAN §14.2): znak i nazwa programu, przełącznik panelu Sesje, ścieżka projekt ▸ sesja (klik = zmień
   nazwę), obsada α β γ δ z pierścieniem koloru (świeci mówiąca / pracująca), stan (profil · L · koszt),
   panel prawy, ustawienia. Puste obszary to region przeciągania okna (Tauri); natywne przyciski
   okna (`WindowControls`) rysuje interfejs — okno nie ma belki systemowej. Wzdłuż dolnej krawędzi
@@ -12,6 +12,7 @@
   import PanelRight from '@lucide/svelte/icons/panel-right';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import { useApp } from '../../state/context';
+  import AlfaMark from './AlfaMark.svelte';
   import CastStrip from './CastStrip.svelte';
   import GuiIndicator from './GuiIndicator.svelte';
   import MicIndicator from './MicIndicator.svelte';
@@ -56,6 +57,10 @@
 </script>
 
 <header class="titlebar" data-tauri-drag-region>
+  <div class="brand" data-tauri-drag-region>
+    <AlfaMark size={18} />
+    <span class="name" data-tauri-drag-region>Alfa</span>
+  </div>
   {#if app.view !== 'settings'}
     <IconButton
       label={place.left === 'hidden' ? t('titlebar.showSessions') : t('titlebar.hideSessions')}
@@ -138,6 +143,21 @@
     background: var(--alfa-color-surface);
     font-size: var(--alfa-font-size-sm);
     user-select: none;
+  }
+  /* Znak i nazwa programu — jak na belce okna; też region przeciągania. */
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--alfa-space-2);
+    align-self: stretch;
+    padding: 0 var(--alfa-space-1) 0 var(--alfa-space-1);
+  }
+  .brand :global(svg) {
+    pointer-events: none;
+  }
+  .name {
+    font-weight: var(--alfa-weight-semibold);
+    letter-spacing: 0.01em;
   }
   .drag {
     flex: 1;
@@ -277,6 +297,9 @@
     .titlebar {
       gap: var(--alfa-space-1);
     }
+    .brand {
+      display: none;
+    }
     .drag {
       min-width: 0;
     }
@@ -285,6 +308,9 @@
     }
   }
   @media (max-width: 720px) {
+    .name {
+      display: none;
+    }
     .crumbs .project,
     .crumbs .sep {
       display: none;

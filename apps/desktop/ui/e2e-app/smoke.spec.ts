@@ -326,6 +326,9 @@ test('belka okna: bez belki systemowej, pasek LED, maksymalizacja i przywróceni
   await controls.getByRole('button', { name: 'Maksymalizuj' }).click();
   await expect(controls.getByRole('button', { name: 'Przywróć rozmiar' })).toBeVisible();
   await expect.poll(width).toBeGreaterThan(before);
+  // Także zmaksymalizowane okno nie ma belki systemowej, a znak Alfy jest na naszej belce.
+  expect(await main.evaluate(() => window.outerHeight - window.innerHeight)).toBeLessThan(20);
+  await expect(main.locator('header.titlebar .brand svg.mark')).toBeVisible();
   await shot(alfa, '06c-belka-zmaksymalizowana');
   await controls.getByRole('button', { name: 'Przywróć rozmiar' }).click();
   await expect(controls.getByRole('button', { name: 'Maksymalizuj' })).toBeVisible();

@@ -8,6 +8,24 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.13 — 2026-10-09
+
+Zgłoszenie właściciela: belka okna z ikoną i nazwą „Alfa” — „ten element też dopracuj”.
+
+### Interfejs
+
+- Alfa ma własny znak: zaokrąglony kwadrat z przejściem fiolet → błękit i białą literą α. Zastępuje pusty fioletowy
+  krążek jako ikona programu — na pasku zadań, w zasobniku i w przełączniku okien.
+- Belka okna zaczyna się od znaku i nazwy „Alfa”, jak belka systemowa, ale w stylu programu; za znak też można
+  przeciągać okno. W wąskim oknie zostaje sam znak, w bardzo wąskim ustępuje miejsca przyciskom.
+- Belki systemowej nie ma także po maksymalizacji i po przywróceniu okna z paska zadań (sprawdzone na działającym
+  programie).
+
+### Testy
+
+- `e2e/chrome.spec.ts`: znak i nazwa na belce w 3 stylach × 2 motywach; `e2e-app`: brak belki systemowej także w
+  oknie zmaksymalizowanym.
+
 ## 0.0.12 — 2026-10-09
 
 Zgłoszenie właściciela: obsada agentek, mikrofon i stan w górnej belce „też popraw solidnie”.
