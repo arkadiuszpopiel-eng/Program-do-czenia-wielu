@@ -113,21 +113,22 @@ podział pracy na podagentów, zgody i dziennik działań. Alfa ma już w kodzie
 pamięć z inspektorem, MCP, umiejętności, Broker z dziennikiem); plan v6 dodaje brakujące (C2.5–C2.8).
 Wyróżnik Alfy, który jest realny na sprzęcie bazowym: działanie w całości lokalnie po polsku i jawny Broker.
 
-## 10. Kamery i obraz (dopisane 2026-10-09 — bez przeglądu źródeł)
+## 10. Kamery i obraz (przegląd z 2026-10-10)
 
-Ten rozdział powstał razem ze zleceniem C3 i **nie był sprawdzany w źródłach** — wszystko ma etykietę U albo
-odwołuje się do pozycji sprawdzonych wyżej. Przegląd źródeł jest pierwszym krokiem zadań C3.5, C3.6 i C3.8.
+Pierwszy przegląd źródeł dla grupy C3, wykonany wyszukiwarką 2026-10-10. Większość wyników to źródła wtórne (kopie
+repozytoriów, strony pakietów) — etykieta **W**; przed kodem każdą pozycję trzeba potwierdzić w źródle pierwotnym.
 
-| Technologia                                      | Stan                                         | Pewność | Wniosek dla Alfy                                                                                  |
-| ------------------------------------------------ | -------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
-| Media Foundation (kamery USB na Windows)         | interfejs systemowy Windows                  | U       | przez `windows-rs` wyłącznie w `platform-windows-impl`, za portem `CameraPort`                    |
-| RTSP (strumień kamer sieciowych)                 | powszechny w kamerach IP i Wi-Fi             | U       | dekoder w osobnym procesie; kandydat: `ffmpeg` (już sidecar `tools-media`) albo biblioteka w Rust |
-| ONVIF (wyszukiwanie i opis kamer w sieci)        | standard branżowy                            | U       | tylko sieć lokalna; zakres uzgodnić z regułą „bez nasłuchu”                                       |
-| Obraz w `llama-server`                           | istnieje, eksperymentalny (patrz rozdział 1) | P       | droga lokalna opisu obrazu; pomiar pamięci na 6 GB                                                |
-| Modele lokalne z wejściem obrazowym na 6 GB      | patrz rozdział 2 (Qwen3.5-4B do obrazu)      | W       | wybór po pomiarze (C3.6)                                                                          |
-| Modele chmurowe z wejściem obrazowym             | dostępne u głównych dostawców                | U       | droga za zgodą; sprawdzić ceny i zasady przechowywania obrazów                                    |
-| Wykrywanie twarzy i wzorzec twarzy w ONNX        | wiele otwartych modeli                       | U       | **licencje**: część popularnych modeli jest tylko do badań — sprawdzić przed C3.8                 |
-| Wykrywanie żywej twarzy (ochrona przed zdjęciem) | istnieją modele i metody                     | U       | decyzja w SPEC v1 `person-recognition`                                                            |
+| Technologia | Stan | Pewność | Źródło | Wniosek dla Alfy |
+| --- | --- | --- | --- | --- |
+| Media Foundation (kamery USB na Windows) | użyte w kodzie 0.0.16 (`platform-windows-impl/src/camera/`) | U (działanie na sprzęcie niesprawdzone) | — | próba na prawdziwej kamerze: zadanie C3.2 |
+| `retina` — klient RTSP w Rust | wersja 0.4.15 (2025-10); H.264 i H.265, uwierzytelnianie basic i digest, RTP po TCP; używany w Moonfire NVR; autor zaznacza braki i nierówne pokrycie testami; licencja wg kopii repozytorium: Apache-2.0 | W | github.com/scottlamb/retina, crates.io | kandydat do C3.5 zamiast `ffmpeg`: odbiór strumienia w Rust; **dekodowanie H.264 do klatek to osobny temat** (retina tylko rozpakowuje strumień) — potrzebny dekoder (Media Foundation albo `ffmpeg`) |
+| ONVIF (wyszukiwanie i opis kamer w sieci) | standard branżowy | U | — | tylko sieć lokalna; zakres uzgodnić z regułą „bez nasłuchu” |
+| Obraz w `llama-server` | obsługa przez `libmtmd` od 2025-05; model + osobny plik projektora (`--mmproj`), wejście przez `/chat/completions`; autorzy ostrzegają o intensywnych zmianach | P | github.com/ggml-org/llama.cpp `docs/multimodal.md` | droga lokalna opisu obrazu (C3.6): przypiąć wersję silnika, zmierzyć pamięć na 6 GB |
+| Modele lokalne z wejściem obrazowym | dokumentacja wymienia m.in. Gemma 3 (4B), SmolVLM, Qwen2-VL, Pixtral | W | jw. | wybór po pomiarze jakości po polsku i pamięci (C3.6) |
+| Modele chmurowe z wejściem obrazowym | dostępne u głównych dostawców | U | — | droga za zgodą; sprawdzić ceny i zasady przechowywania obrazów |
+| YuNet (wykrywanie twarzy) + SFace (wzorzec twarzy), OpenCV Zoo | pliki ONNX; repozytorium na Apache-2.0 z zastrzeżeniem „sprawdź licencję każdego modelu”; kopie podają MIT dla YuNet i Apache-2.0 dla SFace | W | github.com/opencv/opencv_zoo | **kandydat do C3.8** — licencje pozwalają na użycie w produkcie, do potwierdzenia w plikach LICENSE obu modeli |
+| InsightFace `buffalo_*` | kod na MIT, ale **modele tylko do badań niekomercyjnych** | W (dokumentacja projektu i PyPI) | pypi.org/project/insightface | **nie używać** w Alfie |
+| Wykrywanie żywej twarzy (ochrona przed zdjęciem) | istnieją modele i metody | U | — | decyzja w SPEC v1 `person-recognition` |
 
 ## Do sprawdzenia przed wdrożeniem
 

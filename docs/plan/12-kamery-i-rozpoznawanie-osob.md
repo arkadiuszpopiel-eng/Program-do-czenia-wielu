@@ -173,6 +173,6 @@ Krok 1 i 2 nie dotykają biometrii i mogą ruszyć bez ADR 0025. Kroki 3 i 4 cze
 | Podpis pod ADR 0025 (biometria twarzy)                                    | przyjąć / zmienić zasady / zrezygnować z rozpoznawania osób                    | C3.8–C3.13   |
 | Czy obraz z kamery może iść do modelu w chmurze                           | nigdy / za zgodą per kamera (propozycja) / za zgodą globalną                   | C3.7         |
 | Zgoda na pobranie modelu widzącego i modeli twarzy                        | rozmiar do ustalenia w C3.6 i C3.8                                             | C3.6, C3.8   |
-| Licencje modeli twarzy                                                    | tylko modele z licencją pozwalającą na użycie w produkcie — sprawdzenie w C3.8 | C3.8         |
+| Licencje modeli twarzy | kandydat: YuNet + SFace (OpenCV Zoo) — do potwierdzenia w plikach licencji; InsightFace odpada (tylko badania) | C3.8 |
 | Progi akceptacji (trafność rozpoznania, fałszywe rozpoznania, czas opisu) | ustala właściciel                                                              | wyjście z C3 |
 | Czy osoba nieznana może rozmawiać z Alfą                                  | tak jako gość bez pamięci (propozycja) / tylko zapisani                        | C3.10        |

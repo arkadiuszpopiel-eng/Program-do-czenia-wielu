@@ -98,6 +98,8 @@ w belce („rozmawiasz jako: Arek”), przełącznik rozpoznawania w tle.
 
 ## Otwarte pytania
 
-- Modele wykrywania i wzorca z licencją dopuszczającą użycie w produkcie — do sprawdzenia przed C3.8.
+- Modele wykrywania i wzorca z licencją dopuszczającą użycie w produkcie — kandydat po przeglądzie 2026-10-10:
+  YuNet + SFace z OpenCV Zoo (źródła wtórne: MIT i Apache-2.0); modele InsightFace `buffalo_*` odpadają (tylko
+  badania niekomercyjne). Potwierdzić w plikach LICENSE przed C3.8.
 - Wykrywanie żywej twarzy (ochrona przed zdjęciem) — czy w v1, czy wystarczy zasada „rozpoznanie ≠ zgoda”.
 - Wzorce na osobę: ile ujęć i jak odświeżać, gdy wygląd się zmienia.
