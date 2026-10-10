@@ -93,5 +93,6 @@ i jedno o ekranie ładowania, który mógł zostać na zawsze (naprawione).
 | Testy Rust — kamery, rdzeń, mowa, silnik lokalny | zielone; `clippy -D warnings` czysty dla zmienionych pakietów |
 | Prawdziwa aplikacja na profilu tymczasowym | 15 z 15 (jedno podejście miało 14 z 15 — niestabilny pomocnik systemowego okna „Zapisz jako”; powtórka zielona) |
 | Prawdziwa kamera | **nie sprawdzono** — kamera laptopa odłączona sprzętowo |
-| Pełny zestaw testów Rust całego repozytorium | patrz dopisek na końcu tego dokumentu |
+| Pełny zestaw testów Rust całego repozytorium (`cargo test --workspace`) | **2565 zaliczonych, 0 czerwonych**, 33 pominięte (oznaczone w kodzie jako wymagające sprzętu albo decyzji człowieka) |
+| Kontrola ostrzeżeń całego repozytorium (`cargo clippy --workspace --all-targets -D warnings`) | czysto |
 
