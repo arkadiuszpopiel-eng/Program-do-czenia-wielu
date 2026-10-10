@@ -1,6 +1,6 @@
 # 13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki
 
-Stan na **2026-10-10 rano**, wersja programu **0.0.17**. Dokument dla właściciela: co zostało zrobione od wersji
+Stan na **2026-10-10 rano**, wersja programu **0.0.18**. Dokument dla właściciela: co zostało zrobione od wersji
 0.0.7, co jest sprawdzone, a co nie, i co proponuję dalej. Szczegóły zmian: [`../../CHANGELOG.md`](../../CHANGELOG.md);
 stan zadań: [`03-roadmapa.md`](03-roadmapa.md).
 
@@ -77,8 +77,8 @@ stan zadań: [`03-roadmapa.md`](03-roadmapa.md).
 ## 6. Przegląd kodu kamer i wyniki testów
 
 Przegląd w świeżym kontekście: [`../reviews/2026-10-10-przeglad-kamer.md`](../reviews/2026-10-10-przeglad-kamer.md)
-— 9 ustaleń, 6 naprawionych tej samej nocy (między innymi: znak kamery świeci już podczas otwierania i jeszcze
-podczas zamykania; „STOP WSZYSTKIEGO” nie czeka na zawieszoną kamerę), 3 otwarte — wszystkie wymagają prawdziwej
+— 9 ustaleń, 7 naprawionych (ostatnie w 0.0.18) (między innymi: znak kamery świeci już podczas otwierania i jeszcze
+podczas zamykania; „STOP WSZYSTKIEGO” nie czeka na zawieszoną kamerę), 2 otwarte — oba wymagają prawdziwej
 kamery.
 
 Drugi przegląd objął zmiany 0.0.11–0.0.17 poza kamerami:

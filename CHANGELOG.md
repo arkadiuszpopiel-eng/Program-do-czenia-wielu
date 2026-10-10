@@ -8,6 +8,27 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.18 — 2026-10-10
+
+Domknięcie otwartych ustaleń z dwóch przeglądów, które nie wymagają prawdziwej kamery.
+
+### Kamery
+
+- Znak działającej kamery jest też w małym oknie głosowym (pigułce) — widać go, gdy okno główne jest schowane.
+- Wyłączenie kamer nie przepada przez chwilowy błąd zapisu ustawień: zapis jest ponawiany.
+- Obraz z kamery jest dodatkowo sprawdzany pod kątem rozmiaru bufora, zanim program go skopiuje.
+
+### Modele lokalne i głos
+
+- Pierwsze uruchomienie modelu na komputerze z kilkoma kartami nie wstrzymuje reszty programu na czas wykrywania kart.
+- Gdy brakuje pliku silnika, pamięć zarezerwowana dla modelu jest od razu zwalniana.
+- Zapamiętane frazy mowy uwzględniają ustawienia głosu — po zmianie tempa albo głośności nie wróci stare nagranie.
+
+### Testy
+
+- Z 14 ustaleń obu przeglądów otwarte zostają 2 — oba wymagają prawdziwej kamery (zawieszony sterownik, kierunek
+  wierszy obrazu). Kamera laptopa jest nadal odłączona sprzętowo (sprawdzone 2026-10-10 rano).
+
 ## 0.0.17 — 2026-10-10
 
 „Opisz mi to, co widzisz”, poprawki po przeglądzie kodu kamer w świeżym kontekście i głośność mowy.

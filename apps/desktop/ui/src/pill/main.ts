@@ -22,7 +22,8 @@ type PillEvent =
       state: { agent: Agent; mic: Mic; level: number; speaker?: Speaker; partial?: string | null };
     }
   | { type: 'MicLevel'; level: number }
-  | { type: 'SpeechLevel'; agent: string; level: number };
+  | { type: 'SpeechLevel'; agent: string; level: number }
+  | { type: 'CamerasChanged'; state: { cameras: readonly { state: string }[] } };
 
 const GLYPH: Record<Agent, string> = { alfa: 'α', beta: 'β', gama: 'γ', delta: 'δ' };
 const NAME: Record<Agent, string> = { alfa: 'Alfa', beta: 'Beta', gama: 'Gama', delta: 'Delta' };
@@ -41,6 +42,7 @@ const TEXT = {
     label: 'Pigułka głosowa',
     title: 'Alfa — pigułka głosowa',
     failed: 'Nie udało się',
+    camera: 'Kamera działa',
   },
   en: {
     off: 'Microphone off',
@@ -56,6 +58,7 @@ const TEXT = {
     label: 'Voice pill',
     title: 'Alfa — voice pill',
     failed: 'Failed',
+    camera: 'A camera is live',
   },
 } as const;
 const ICON: Record<Mic, string> = {
@@ -167,7 +170,12 @@ const stop = el('button', 'btn');
 const mute = el('button', 'btn');
 stop.append(icon(SQUARE));
 for (const b of [stop, mute]) b.type = 'button';
-root.append(avatar, wave, status, stop, mute);
+// Znak działającej kamery (otwierana, działa, zamykana) — widoczny także, gdy okno główne jest ukryte.
+const camera = el('span', 'cam-dot');
+camera.setAttribute('role', 'img');
+camera.hidden = true;
+let camerasOpen = 0;
+root.append(avatar, wave, status, stop, mute, camera);
 
 /** Błąd komendy pokazywany w miejscu stanu (pigułka nie ma toastów); `null` — brak. */
 let failure: string | null = null;
@@ -194,6 +202,9 @@ function render(): void {
   const partial = state.speaker === 'user' && state.partial ? ` „${state.partial}”` : '';
   status.textContent = failure ?? `${ICON[state.mic]} ${label}${partial}`;
   status.title = status.textContent;
+  camera.hidden = camerasOpen === 0;
+  camera.setAttribute('aria-label', L.camera);
+  camera.title = L.camera;
   stop.setAttribute('aria-label', L.stop);
   stop.title = L.stop;
   const muted = state.mic === 'muted';
@@ -252,6 +263,10 @@ if (tauri) {
     for (const e of event.payload) {
       if (e.type === 'VoicePill') Object.assign(state, e.state);
       else if (e.type === 'MicLevel') state.level = e.level;
+      else if (e.type === 'CamerasChanged')
+        camerasOpen = e.state.cameras.filter((c) =>
+          ['live', 'opening', 'closing'].includes(c.state),
+        ).length;
     }
     render();
   }).catch((error: unknown) => fail(error, 0));

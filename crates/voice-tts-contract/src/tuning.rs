@@ -71,6 +71,17 @@ impl TtsTuning {
         1.0 + (preset - 1.0) * self.character.clamp(0.0, 1.0)
     }
 
+    /// Odcisk strojenia do kluczy pamięci podręcznej: nagranie zapisane przy innych
+    /// ustawieniach nie może zostać odtworzone po ich zmianie.
+    #[must_use]
+    pub fn fingerprint(self) -> String {
+        let t = self.clamped();
+        format!(
+            "{:.3}|{:.3}|{:.3}|{}|{:.3}|{:.3}",
+            t.speed, t.expressiveness, t.rhythm, t.pause_ms, t.character, t.volume
+        )
+    }
+
     /// Nakłada głośność na próbki (z ograniczeniem do zakresu −1…1, bez przesterowania „zawijaniem”).
     pub fn apply_volume(self, pcm: &mut [f32]) {
         let gain = self.volume.clamp(VOLUME_RANGE.0, VOLUME_RANGE.1);
@@ -173,6 +184,14 @@ mod tests {
         let mut pcm = [0.5f32, -0.9, 0.0];
         wild.apply_volume(&mut pcm);
         assert_eq!(pcm, [0.75, -1.0, 0.0]);
+        // Odcisk zmienia się z każdym parametrem, a równe strojenia mają równy odcisk.
+        assert_eq!(base.fingerprint(), TtsTuning::default().fingerprint());
+        assert_ne!(base.fingerprint(), wild.fingerprint());
+        let quieter = TtsTuning {
+            volume: 0.5,
+            ..base
+        };
+        assert_ne!(base.fingerprint(), quieter.fingerprint());
         let mut same = [0.5f32, -0.9];
         base.apply_volume(&mut same);
         assert_eq!(same, [0.5, -0.9]);

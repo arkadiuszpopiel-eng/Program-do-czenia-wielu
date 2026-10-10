@@ -92,9 +92,25 @@ impl Inner {
     async fn save(&self) -> Result<(), CameraError> {
         let _order = self.saving.lock().await;
         let data = self.lock().stored.clone();
-        self.store.save(&data).await.map_err(CameraError::Store)
+        // Chwilowy błąd zapisu (plik zajęty) nie może zostawić w ustawieniach „kamery włączone”
+        // po tym, jak użytkownik je wyłączył — ponawiamy, zanim zgłosimy błąd.
+        let mut last = String::new();
+        for attempt in 0..SAVE_ATTEMPTS {
+            if attempt > 0 {
+                tokio::time::sleep(SAVE_RETRY_DELAY).await;
+            }
+            match self.store.save(&data).await {
+                Ok(()) => return Ok(()),
+                Err(text) => last = text,
+            }
+        }
+        Err(CameraError::Store(last))
     }
 }
+
+/// Liczba prób zapisu ustawień kamer i odstęp między nimi.
+const SAVE_ATTEMPTS: u32 = 3;
+const SAVE_RETRY_DELAY: std::time::Duration = std::time::Duration::from_millis(60);
 
 /// Zamyka strumienie wskazanych gniazd (czeka na zakończenie odczytów w toku).
 async fn close(slots: Vec<(Arc<Slot>, u64)>) {

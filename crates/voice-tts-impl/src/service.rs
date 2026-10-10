@@ -305,7 +305,9 @@ impl Tts for TtsService {
         let (tx, rx) = tokio::sync::mpsc::channel(16);
         let cache = match (&self.cache, req.cacheable) {
             (Some(c), true) => {
-                let key = PhraseCache::key(&req.text, &chain[0].timbre(), req.style.rate);
+                // Brzmienie obejmuje strojenie użytkownika — po jego zmianie stare nagrania nie pasują.
+                let voice = format!("{}|{}", chain[0].timbre(), self.tuning.get().fingerprint());
+                let key = PhraseCache::key(&req.text, &voice, req.style.rate);
                 if let Some(hit) = c.get(&key) {
                     let ms = (hit.pcm.len() as u64 * 1000 / u64::from(TTS_RATE)) as u32;
                     let mut sh = lock(&self.shared);

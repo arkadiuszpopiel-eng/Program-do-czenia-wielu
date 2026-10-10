@@ -152,7 +152,7 @@ impl Sidecar {
         let devices = match cached {
             Some(devices) => devices,
             None => {
-                let found = crate::devices::probe(program, crate::devices::PROBE_TIMEOUT);
+                let found = probe_blocking(program);
                 if !found.is_empty() {
                     lock(&self.devices).insert(program.to_path_buf(), found.clone());
                 }
@@ -200,10 +200,11 @@ impl Sidecar {
         if gpu_layers == 0 {
             backend = BackendKey::Cpu;
         }
-        let program = self
-            .config
-            .server(backend)
-            .ok_or_else(|| LocalError::NoServerBinary(backend.as_str().into()))?;
+        let Some(program) = self.config.server(backend) else {
+            // Bez pliku silnika model nie wystartuje — dzierżawa pamięci nie może zostać zajęta.
+            self.release_lease(lease.map(|l| l.id));
+            return Err(LocalError::NoServerBinary(backend.as_str().into()));
+        };
         let device = self.pinned_device(&program, backend);
         let plan = LaunchPlan {
             program,
@@ -214,5 +215,19 @@ impl Sidecar {
             device,
         };
         Ok((plan, lease.map(|l| l.id)))
+    }
+}
+
+/// Sonda urządzeń silnika trwa do kilku sekund i blokuje wątek. W środowisku wielowątkowym
+/// oddajemy na ten czas wątek roboczy (`block_in_place`), żeby inne zadania nie stały; poza nim
+/// (środowisko jednowątkowe, zwykły wątek) wywołanie jest bezpośrednie.
+fn probe_blocking(program: &std::path::Path) -> Vec<crate::devices::EngineDevice> {
+    use tokio::runtime::{Handle, RuntimeFlavor};
+    let run = || crate::devices::probe(program, crate::devices::PROBE_TIMEOUT);
+    match Handle::try_current() {
+        Ok(handle) if handle.runtime_flavor() == RuntimeFlavor::MultiThread => {
+            tokio::task::block_in_place(run)
+        }
+        _ => run(),
     }
 }

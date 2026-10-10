@@ -179,7 +179,15 @@ fn sample_pixels(sample: &IMFSample, layout: (u32, u32, i32)) -> Result<Vec<u8>,
             let (mut first, mut pitch) = (null_mut::<u8>(), 0i32);
             if planar.Lock2D(&raw mut first, &raw mut pitch).is_ok() {
                 let row = width as usize * 4;
-                let fits = !first.is_null() && pitch.unsigned_abs() as usize >= row;
+                // Bufor musi mieścić `height` wierszy co `pitch`; długość 0 = sterownik jej nie
+                // podaje (wtedy zostaje gwarancja samej blokady).
+                let have = buffer.GetCurrentLength().map_or(0, |len| len as usize);
+                let need = (pitch.unsigned_abs() as usize)
+                    .saturating_mul((height as usize).saturating_sub(1))
+                    .saturating_add(row);
+                let fits = !first.is_null()
+                    && pitch.unsigned_abs() as usize >= row
+                    && (have == 0 || have >= need);
                 let mut out = Vec::with_capacity(if fits { row * height as usize } else { 0 });
                 if fits {
                     for y in 0..height as isize {

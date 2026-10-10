@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.17). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.18). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -111,7 +111,7 @@ Zlecenie właściciela z 2026-10-09. Kolejność: najpierw kamery i opis obrazu 
 | C3.1  | Port kamery w `platform-contract` (`CameraPort`) i atrapa: lista urządzeń, tryby, strumień, podłączanie na żywo            | zrobione  | 2026-10-10 | wersja 0.0.16; `platform-contract/src/camera.rs`, atrapa w `platform-fake`                                                                                           |
 | C3.2  | Kamery USB na Windows (Media Foundation)                                                                                   | w toku    | —          | kod w `platform-windows-impl/src/camera/` (wersja 0.0.16); **niesprawdzone na prawdziwej kamerze** — kamera laptopa odłączona sprzętowo                              |
 | C3.3  | Hub kamer: rejestr, kilka strumieni naraz, usypianie, klatka na żądanie, podgląd, przełącznik główny i kill-switch         | zrobione  | 2026-10-10 | wersja 0.0.16; moduł `camera-hub` (contract, fake, impl), testy na atrapie portu; zdarzenia magistrali i kamery sieciowe — dalej                                     |
-| C3.4  | Strona Ustawień „Kamery” i wskaźnik kamery w belce oraz pigułce głosowej                                                   | zrobione  | 2026-10-10 | wersja 0.0.16; strona „Kamery”, wskaźnik w belce (pigułka głosowa — dalej); 3 style × 2 motywy                                                                       |
+| C3.4  | Strona Ustawień „Kamery” i wskaźnik kamery w belce oraz pigułce głosowej                                                   | zrobione  | 2026-10-10 | wersja 0.0.16; strona „Kamery”, wskaźnik w belce i w pigułce głosowej (0.0.18); 3 style × 2 motywy                                                                       |
 | C3.5  | Kamery sieciowe: RTSP, wyszukiwanie ONVIF w sieci lokalnej, hasła w Credential Manager, dekoder w osobnym procesie         | planowane | —          | dotyka `lib-netguard` (lista adresów) — uzgodnić zakres z właścicielem                                                                                               |
 | C3.6  | Model widzący lokalnie: wybór modelu, pomiar pamięci karty razem z modelem rozmowy na 6 GB                                 | czeka     | —          | zgoda właściciela na pobranie modelu; technologia do sprawdzenia ([`11`](11-technologie-2026-10.md))                                                                 |
 | C3.7  | Narzędzie `camera.look` i opis obrazu („opisz mi to, co widzisz”): droga lokalna i chmurowa za zgodą, miniatura w rozmowie | w toku    | —          | 0.0.16: zdjęcie z kamery jako załącznik (przycisk); 0.0.17: prośba „opisz mi to, co widzisz” w tekście sama dołącza zdjęcie (`logic/camera-look.ts`). Dalej: to samo w rozmowie głosowej i narzędzie `camera.look` dla agentek (zdolność Brokera — decyzja właściciela) |

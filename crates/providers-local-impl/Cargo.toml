@@ -28,7 +28,7 @@ serde_json.workspace = true
 thiserror.workspace = true
 toml.workspace = true
 tracing.workspace = true
-tokio = { workspace = true, features = ["rt", "process", "io-util", "fs"] }
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "process", "io-util", "fs"] }
 futures-util.workspace = true
 # Te same wersje co w Cargo.lock (providers-api-impl, artifacts-contract, lib-sqlstore).
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots", "stream", "http2"] }
