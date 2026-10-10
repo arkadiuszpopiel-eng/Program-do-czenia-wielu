@@ -367,6 +367,7 @@ w rozmowie głosowej jeszcze nie.</li>
 <tr><td>ADR 0025 — kamery i biometria</td><td>podpisać w zaproponowanym kształcie</td><td>rozpoznawanie osób i pamięć osób (C3.8–C3.13)</td></tr>
 <tr><td>Dostęp agentek do kamer (<code>camera.look</code>)</td><td>zgoda na nową zdolność Brokera <code>camera.view</code></td><td>„opisz, co widzisz” bez ręcznego dołączania zdjęcia, także głosem</td></tr>
 <tr><td>Obraz z kamery do modelu w chmurze</td><td>za zgodą dla konkretnej kamery</td><td>droga chmurowa opisu obrazu</td></tr>
+<tr><td>„Opisz, co widzisz” głosem</td><td>w rozmowie głosowej nie ma podglądu zdjęcia przed wysłaniem, a pomyłka rozpoznawania mowy mogłaby zrobić zdjęcie. Propozycja: tylko pełna fraza, Alfa najpierw mówi „robię zdjęcie z kamery …”, a do modelu w chmurze wysyła je tylko, gdy na to zezwolisz</td><td>prośba głosowa o opis obrazu (miejsce w kodzie: <code>CoreVoiceChat::voice_turn</code>; jeszcze nienapisane)</td></tr>
 <tr><td>Pobranie silnika „llama.cpp Vulkan”</td><td>zgoda</td><td>lekkie zadania na karcie zintegrowanej</td></tr>
 <tr><td>Pięć najważniejszych decyzji bezpieczeństwa</td><td>„tak” dla rekomendacji</td><td>wdrożenie i przegląd Jądra, wejście na <code>main</code></td></tr>
 <tr><td><code>gh auth login</code> i wypchnięcie commitów</td><td>Twoje działanie</td><td>kopia pracy poza tym dyskiem — dziś wszystko jest tylko lokalnie</td></tr></tbody></table></div>
@@ -383,7 +384,7 @@ w rozmowie głosowej jeszcze nie.</li>
 <h2 id="6-przeglad-kodu-kamer-i-wyniki-testow">6. Przegląd kodu kamer i wyniki testów</h2>
 <p>Przegląd w świeżym kontekście: <a href="../reviews/2026-10-10-przeglad-kamer.md"><code>../reviews/2026-10-10-przeglad-kamer.md</code></a>
 — 9 ustaleń, 7 naprawionych (ostatnie w 0.0.18) (między innymi: znak kamery świeci już podczas otwierania i jeszcze
-podczas zamykania; „STOP WSZYSTKIEGO” nie czeka na zawieszoną kamerę), 3 otwarte — wszystkie wymagają prawdziwej
+podczas zamykania; „STOP WSZYSTKIEGO” nie czeka na zawieszoną kamerę), 2 otwarte — oba wymagają prawdziwej
 kamery.</p>
 <p>Drugi przegląd objął zmiany 0.0.11–0.0.17 poza kamerami:
 <a href="../reviews/2026-10-10-przeglad-0.0.11-0.0.17.md"><code>../reviews/2026-10-10-przeglad-0.0.11-0.0.17.md</code></a> — 5 ustaleń, w tym dwa
