@@ -9,33 +9,33 @@ w `platform-android` i we wtyczkach Kotlin.
 
 ## Budowa
 
-| Element | Rozwiązanie | Pewność / uwagi |
-| --- | --- | --- |
-| Powłoka | Tauri 2 mobile (Android stabilny od 2.0; bieżąca 2.12) | P; `crate-type` w `src-tauri/Cargo.toml` już to dopuszcza |
-| Interfejs | ten sam kod Svelte co okno i panel WWW; układ z E.1 | |
-| Rdzeń w telefonie | **nie cały `AppCore`** — tylko klient protokołu, `offline-client`, magazyn lokalny | host zostaje na komputerze |
-| Transport | WebSocket do przekaźnika + kanał szyfrowany w Rust (`snow`); później opcjonalnie iroh | |
-| Klucze | Android Keystore (sprzętowy, klucz wymaga biometrii przy każdym użyciu) | wtyczka Kotlin |
-| Biometria | BiometricPrompt, klasa 3 (silna) | wtyczka Kotlin |
-| Powiadomienia | FCM bez treści → pobranie przez kanał E2E; kanały powiadomień: zgody / zakończone zadania / błędy | alternatywa bez usług Google: stałe połączenie w usłudze pierwszoplanowej |
-| Praca w tle | usługa pierwszoplanowa dla rozmowy głosowej i stałego połączenia | U — brak gotowej wtyczki Tauri; własna |
-| Skan QR | aparat przez wtyczkę skanera | |
-| Budowa i testy | APK/AAB w CI; emulator API 35 i 36; testy interfejsu na WebView Androida | |
+| Element           | Rozwiązanie                                                                                       | Pewność / uwagi                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Powłoka           | Tauri 2 mobile (Android stabilny od 2.0; bieżąca 2.12)                                            | P; `crate-type` w `src-tauri/Cargo.toml` już to dopuszcza                 |
+| Interfejs         | ten sam kod Svelte co okno i panel WWW; układ z E.1                                               |                                                                           |
+| Rdzeń w telefonie | **nie cały `AppCore`** — tylko klient protokołu, `offline-client`, magazyn lokalny                | host zostaje na komputerze                                                |
+| Transport         | WebSocket do przekaźnika + kanał szyfrowany w Rust (`snow`); później opcjonalnie iroh             |                                                                           |
+| Klucze            | Android Keystore (sprzętowy, klucz wymaga biometrii przy każdym użyciu)                           | wtyczka Kotlin                                                            |
+| Biometria         | BiometricPrompt, klasa 3 (silna)                                                                  | wtyczka Kotlin                                                            |
+| Powiadomienia     | FCM bez treści → pobranie przez kanał E2E; kanały powiadomień: zgody / zakończone zadania / błędy | alternatywa bez usług Google: stałe połączenie w usłudze pierwszoplanowej |
+| Praca w tle       | usługa pierwszoplanowa dla rozmowy głosowej i stałego połączenia                                  | U — brak gotowej wtyczki Tauri; własna                                    |
+| Skan QR           | aparat przez wtyczkę skanera                                                                      |                                                                           |
+| Budowa i testy    | APK/AAB w CI; emulator API 35 i 36; testy interfejsu na WebView Androida                          |                                                                           |
 
 ## Zakres — pilot
 
-| Funkcja | W telefonie |
-| --- | --- |
-| Rozmowa, sesje, projekty, wyszukiwanie | pełne |
-| Agentki, zadania, oś czasu | pełne; postęp na żywo, powiadomienie po zakończeniu |
-| Zgody | karta zgody + biometria; także z powiadomienia (akcja „Pokaż”) — nigdy samo „Zatwierdź” z belki bez biometrii |
-| STOP WSZYSTKIEGO | zawsze widoczny; także jako akcja w stałym powiadomieniu podczas pracy agentek |
-| Pliki | przeglądanie katalogu roboczego hosta, pobieranie na telefon, wysyłanie z telefonu (zdjęcie, dokument, udostępnianie z innych aplikacji) |
-| Głos | mikrofon i głośnik telefonu; rozpoznawanie, model i synteza na hoście; „naciśnij i mów” jako tryb domyślny |
-| Pamięć, ustawienia, modele, koszty | pełne (ustawienia maszyny dotyczą hosta) |
-| Sterowanie komputerem | podgląd ekranu hosta i Przejmij / Pauza / Stop |
-| Terminal | dostępny; klawiatura ekranowa z paskiem klawiszy specjalnych |
-| Lista urządzeń | podgląd i odwoływanie innych urządzeń |
+| Funkcja                                | W telefonie                                                                                                                              |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Rozmowa, sesje, projekty, wyszukiwanie | pełne                                                                                                                                    |
+| Agentki, zadania, oś czasu             | pełne; postęp na żywo, powiadomienie po zakończeniu                                                                                      |
+| Zgody                                  | karta zgody + biometria; także z powiadomienia (akcja „Pokaż”) — nigdy samo „Zatwierdź” z belki bez biometrii                            |
+| STOP WSZYSTKIEGO                       | zawsze widoczny; także jako akcja w stałym powiadomieniu podczas pracy agentek                                                           |
+| Pliki                                  | przeglądanie katalogu roboczego hosta, pobieranie na telefon, wysyłanie z telefonu (zdjęcie, dokument, udostępnianie z innych aplikacji) |
+| Głos                                   | mikrofon i głośnik telefonu; rozpoznawanie, model i synteza na hoście; „naciśnij i mów” jako tryb domyślny                               |
+| Pamięć, ustawienia, modele, koszty     | pełne (ustawienia maszyny dotyczą hosta)                                                                                                 |
+| Sterowanie komputerem                  | podgląd ekranu hosta i Przejmij / Pauza / Stop                                                                                           |
+| Terminal                               | dostępny; klawiatura ekranowa z paskiem klawiszy specjalnych                                                                             |
+| Lista urządzeń                         | podgląd i odwoływanie innych urządzeń                                                                                                    |
 
 Funkcje specyficzne dla telefonu, które nie istnieją na komputerze: udostępnianie do Alfy z innych aplikacji,
 zdjęcie z aparatu jako załącznik, kafelek szybkich ustawień „Zapytaj Alfę”, widżet ostatniej rozmowy
@@ -59,14 +59,14 @@ i magazyn certyfikatów na Androidzie.
 
 ## Ograniczenia Androida, które wpływają na projekt
 
-| Ograniczenie | Skutek | Rozwiązanie |
-| --- | --- | --- |
-| System zabija procesy w tle | połączenie z hostem zrywa się po zminimalizowaniu | powiadomienia push budzą aplikację; wznowienie „od `seq`” (B.2) |
-| Uprawnienia czasu działania (mikrofon, powiadomienia, aparat) | prośba w chwili pierwszego użycia | wyjaśnienie przed systemowym oknem zgody |
-| Optymalizacja baterii producentów | opóźnione powiadomienia | instrukcja wyłączenia optymalizacji; wskaźnik „ostatnie połączenie” |
-| WebView systemowy w różnych wersjach | różnice w CSS (m.in. `light-dark()`, `:has()`) | minimalna wersja WebView sprawdzana przy starcie; testy na WebView z API 35 |
-| Brak fontów Segoe / Cascadia | inny wygląd | `system-ui` (Roboto / font producenta) — reguła „fonty systemowe” zachowana |
-| Dane w kopii zapasowej systemu | wyciek rozmów do chmury producenta | wyłączenie kopii dla danych aplikacji; klucze i tak nie są eksportowalne |
+| Ograniczenie                                                  | Skutek                                            | Rozwiązanie                                                                 |
+| ------------------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------- |
+| System zabija procesy w tle                                   | połączenie z hostem zrywa się po zminimalizowaniu | powiadomienia push budzą aplikację; wznowienie „od `seq`” (B.2)             |
+| Uprawnienia czasu działania (mikrofon, powiadomienia, aparat) | prośba w chwili pierwszego użycia                 | wyjaśnienie przed systemowym oknem zgody                                    |
+| Optymalizacja baterii producentów                             | opóźnione powiadomienia                           | instrukcja wyłączenia optymalizacji; wskaźnik „ostatnie połączenie”         |
+| WebView systemowy w różnych wersjach                          | różnice w CSS (m.in. `light-dark()`, `:has()`)    | minimalna wersja WebView sprawdzana przy starcie; testy na WebView z API 35 |
+| Brak fontów Segoe / Cascadia                                  | inny wygląd                                       | `system-ui` (Roboto / font producenta) — reguła „fonty systemowe” zachowana |
+| Dane w kopii zapasowej systemu                                | wyciek rozmów do chmury producenta                | wyłączenie kopii dla danych aplikacji; klucze i tak nie są eksportowalne    |
 
 ## Publikacja
 

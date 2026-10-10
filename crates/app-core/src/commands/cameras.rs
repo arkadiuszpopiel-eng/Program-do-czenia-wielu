@@ -24,6 +24,7 @@ fn camera_view(camera: &CameraInfo) -> CameraView {
         CameraState::Asleep => (CameraStateView::Asleep, None, 0, 0),
         CameraState::Opening => (CameraStateView::Opening, None, 0, 0),
         CameraState::Live { width, height } => (CameraStateView::Live, None, *width, *height),
+        CameraState::Closing => (CameraStateView::Closing, None, 0, 0),
         CameraState::Failed(text) => (CameraStateView::Failed, Some(text.clone()), 0, 0),
         CameraState::Unplugged => (CameraStateView::Unplugged, None, 0, 0),
     };
@@ -59,6 +60,10 @@ fn camera_error(error: CameraError) -> AppError {
         CameraError::Store(text) => AppError::storage(text),
         CameraError::Unplugged => AppError::new(ErrorCode::Unavailable, "Kamera jest odłączona."),
         CameraError::Stopped => AppError::new(ErrorCode::Unavailable, "Kamera została zatrzymana."),
+        CameraError::Busy => AppError::new(
+            ErrorCode::Unavailable,
+            "Kamera właśnie się otwiera — spróbuj za chwilę.",
+        ),
         CameraError::Timeout => AppError::new(
             ErrorCode::Unavailable,
             "Kamera nie odpowiedziała w wyznaczonym czasie.",

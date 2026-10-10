@@ -121,6 +121,15 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
         ),
         false,
       ),
+      toggle(
+        'camera.auto_look',
+        L('„Opisz, co widzisz” robi zdjęcie', '“Describe what you see” takes a photo'),
+        L(
+          'Gdy napiszesz „opisz mi to, co widzisz” (albo „co widzisz na kamerze Kuchnia?”), Alfa dołączy do wiadomości zdjęcie z kamery — nazwanej w prośbie albo pierwszej włączonej. Działa tylko przy włączonych kamerach; zdjęcie zostaje w rozmowie jak każdy załącznik.',
+          'When you write “describe what you see” (or “what do you see on camera Kitchen?”), Alfa attaches a photo from the camera — the one named in the request or the first enabled one. Works only while cameras are enabled; the photo stays in the conversation like any attachment.',
+        ),
+        true,
+      ),
     ],
     { custom: 'cameras' },
   ),

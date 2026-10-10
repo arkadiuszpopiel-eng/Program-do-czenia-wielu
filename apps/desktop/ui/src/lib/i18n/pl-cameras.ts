@@ -23,6 +23,7 @@ export const plCameras = {
   'cam.state.asleep': 'uśpiona',
   'cam.state.opening': 'otwieram…',
   'cam.state.live': 'działa',
+  'cam.state.closing': 'zamykam…',
   'cam.state.failed': 'błąd',
   'cam.state.unplugged': 'odłączona',
   'cam.privacy': 'Prywatność',
@@ -36,6 +37,8 @@ export const plCameras = {
     'Przyciskiem z aparatem w polu pisania dołączysz zdjęcie z kamery i zapytasz „opisz mi to, co widzisz” — potrzebny jest model, który przyjmuje obrazy. Agentki same nie sięgają do kamer; to następny krok planu.',
   'cam.snap': 'Dołącz zdjęcie z kamery: {name}',
   'cam.snapPick': 'Dołącz zdjęcie z kamery',
+  'cam.autoLook':
+    'Dołączyłam zdjęcie z kamery „{name}”. Sprawdź je i naciśnij Enter, aby wysłać — albo usuń załącznik.',
   'cam.indicator': {
     one: 'Działa {n} kamera: {names}. Otwórz ustawienia kamer',
     few: 'Działają {n} kamery: {names}. Otwórz ustawienia kamer',

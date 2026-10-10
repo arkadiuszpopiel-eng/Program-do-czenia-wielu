@@ -1,5 +1,6 @@
 <!--
-  Wskaźnik kamery w pasku tytułu: widoczny zawsze, gdy którakolwiek kamera jest otwarta (nie da się
+  Wskaźnik kamery w pasku tytułu: widoczny zawsze, gdy którakolwiek kamera jest otwarta, otwiera
+  się albo jeszcze się zamyka (nie da się
   go ukryć ustawieniem — projekt ADR 0025). Pokazuje liczbę działających kamer; klik prowadzi do
   Ustawień → Kamery.
 -->
@@ -9,7 +10,10 @@
 
   const app = useApp();
   const { t } = app.i18n;
-  const live = $derived((app.cameras?.cameras ?? []).filter((c) => c.state === 'live'));
+  // Kamera otwierana i zamykana też może już (albo jeszcze) patrzeć — znak świeci w każdym
+  // z tych stanów, nie tylko przy „działa”.
+  const OPEN = ['live', 'opening', 'closing'];
+  const live = $derived((app.cameras?.cameras ?? []).filter((c) => OPEN.includes(c.state)));
   const names = $derived(live.map((c) => c.name).join(', '));
 </script>
 

@@ -23,6 +23,7 @@ export const enCameras = {
   'cam.state.asleep': 'asleep',
   'cam.state.opening': 'opening…',
   'cam.state.live': 'live',
+  'cam.state.closing': 'closing…',
   'cam.state.failed': 'error',
   'cam.state.unplugged': 'unplugged',
   'cam.privacy': 'Privacy',
@@ -35,6 +36,8 @@ export const enCameras = {
     'Use the camera button in the message field to attach a photo and ask “describe what you see” — this needs a model that accepts images. Agents do not reach for cameras on their own; that is the next step of the plan.',
   'cam.snap': 'Attach a photo from camera: {name}',
   'cam.snapPick': 'Attach a photo from a camera',
+  'cam.autoLook':
+    'I attached a photo from camera “{name}”. Check it and press Enter to send — or remove the attachment.',
   'cam.indicator': {
     one: '{n} camera is live: {names}. Open camera settings',
     other: '{n} cameras are live: {names}. Open camera settings',

@@ -8,6 +8,40 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.17 — 2026-10-10
+
+„Opisz mi to, co widzisz”, poprawki po przeglądzie kodu kamer w świeżym kontekście i głośność mowy.
+
+### Kamery
+
+- **„Opisz mi to, co widzisz”:** gdy kamery są włączone i napiszesz taką prośbę (także „co widzisz na kamerze
+  Kuchnia?”), Alfa dołączy zdjęcie z kamery — nazwanej w prośbie albo pierwszej włączonej — i pokaże je przy polu
+  pisania. Wiadomość idzie dopiero po drugim Enterze, więc widzisz zdjęcie przed wysłaniem i możesz je usunąć.
+  Zwykłe zdania („co widzisz w tym kodzie?”) zdjęcia nie robią. Można to wyłączyć w „Kamery”. Model musi
+  przyjmować obrazy; w rozmowie głosowej jeszcze nie działa.
+- Znak kamery w górnej belce świeci już wtedy, gdy kamera się otwiera, i jeszcze wtedy, gdy się zamyka — nie tylko
+  przy stanie „działa”. Kamera pokazuje nowy stan „zamykam…”, a „uśpiona” dopiero po faktycznym zamknięciu.
+- „STOP WSZYSTKIEGO” nie czeka już na kamery: zawieszona kamera nie opóźni zatrzymania agentek.
+- Przerwane żądanie obrazu nie zostawia kamery włączonej na stałe; podgląd kończy się sam, gdy kamera zgłosi błąd.
+- Nazwa niedostępnej kamery jest czytelna także w jasnym motywie.
+
+### Uruchamianie
+
+- Ekran ładowania nie może już zostać na zawsze: błąd startu jest na nim pokazywany razem z przyciskiem „Zamknij
+  program”, a gdy start trwa ponad 20 sekund, pojawia się to samo wyjście. Górny pas ekranu ładowania przesuwa okno.
+
+### Głos
+
+- „Głośność mowy” w zakładce „Głos”: głośność głosu agentek niezależnie od głośności systemu (20–150 %).
+
+### Testy
+
+- Przegląd: `docs/reviews/2026-10-10-przeglad-kamer.md` — 9 ustaleń, 6 naprawionych, 3 otwarte (wymagają prawdziwej
+  kamery: zawieszony sterownik, kierunek wierszy obrazu, ponawianie zapisu wyłączenia).
+- Drugi przegląd (zmiany 0.0.11–0.0.17): `docs/reviews/2026-10-10-przeglad-0.0.11-0.0.17.md` — 5 ustaleń, 3
+  naprawione (dwa dotyczyły prywatności zdjęcia z kamery), 1 częściowo, 1 otwarte.
+- Nadal nie sprawdzono na prawdziwej kamerze (kamera laptopa odłączona sprzętowo).
+
 ## 0.0.16 — 2026-10-10
 
 Praca nocna bez właściciela: pierwszy krok systemu kamer, import kluczy ze zmiennych środowiskowych, porządki

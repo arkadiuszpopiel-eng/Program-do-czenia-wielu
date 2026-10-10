@@ -46,7 +46,18 @@ impl Entry {
     /// Unieważnia żądania w toku i usypia wpis; zwraca gniazdo z epoką do zamknięcia strumienia.
     pub(crate) fn stop(&mut self) -> (Arc<Slot>, u64) {
         if self.present {
-            self.state = CameraState::Asleep;
+            // Kamera, która mogła być otwarta, jest „zamykana” do potwierdzenia zamknięcia
+            // strumienia ([`Registry::settle`]) — dopiero wtedy stan mówi „uśpiona”.
+            let maybe_open = self.in_flight > 0
+                || matches!(
+                    self.state,
+                    CameraState::Live { .. } | CameraState::Opening | CameraState::Closing
+                );
+            self.state = if maybe_open {
+                CameraState::Closing
+            } else {
+                CameraState::Asleep
+            };
         }
         (self.slot.clone(), self.slot.invalidate())
     }
@@ -71,6 +82,19 @@ impl Registry {
             master: stored.master,
             stored,
             cameras: Vec::new(),
+        }
+    }
+
+    /// Potwierdza zamknięcie strumieni: wpisy „zamykane”, których gniazdo zostało zamknięte dla
+    /// bieżącej epoki (nie było późniejszego zatrzymania), stają się uśpione.
+    pub(crate) fn settle(&mut self, closed: &[(Arc<Slot>, u64)]) {
+        for entry in &mut self.cameras {
+            let confirmed = closed.iter().any(|(slot, epoch)| {
+                Arc::ptr_eq(slot, &entry.slot) && entry.slot.epoch() == *epoch
+            });
+            if confirmed && entry.state == CameraState::Closing {
+                entry.state = CameraState::Asleep;
+            }
         }
     }
 
@@ -215,6 +239,16 @@ mod tests {
         };
         reg.entry(&id).unwrap().state = live;
         assert!(reg.entry(&id).unwrap().is_live());
+        // Zatrzymana kamera, która działała, jest „zamykana” do potwierdzenia zamknięcia strumienia;
+        // potwierdzenie dla starszej epoki (było późniejsze zatrzymanie) niczego nie zmienia.
+        let (slot, stale) = reg.entry(&id).unwrap().stop();
+        assert_eq!(reg.snapshot().cameras[0].state, CameraState::Closing);
+        let (_, current) = reg.entry(&id).unwrap().stop();
+        reg.settle(&[(slot.clone(), stale)]);
+        assert_eq!(reg.snapshot().cameras[0].state, CameraState::Closing);
+        reg.settle(&[(slot, current)]);
+        assert_eq!(reg.snapshot().cameras[0].state, CameraState::Asleep);
+        // Uśpiona kamera po zatrzymaniu zostaje uśpiona (nie było czego zamykać).
         reg.entry(&id).unwrap().stop();
         assert_eq!(reg.snapshot().cameras[0].state, CameraState::Asleep);
     }

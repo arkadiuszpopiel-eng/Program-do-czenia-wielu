@@ -1,8 +1,7 @@
 <!--
   Composer rozmowy: szkic per sesja, @agentka i /komendy z podpowiedziami (listbox), chipy agentki
   i profilu modelu, historia Ctrl+↑/↓, ↑ w pustym polu = edytuj ostatnią, Stop w trakcie strumienia.
-  Załączniki: spinacz (natywny dialog), wklejenie plików/obrazu (czyta rdzeń ze schowka systemowego),
-  przeciągnięcie (w Tauri ścieżki zna tylko powłoka) — wysyłane z turą jako artefakty sesji.
+  Załączniki: spinacz, wklejenie (czyta rdzeń), przeciągnięcie, zdjęcie z kamery — artefakty sesji.
 -->
 <script lang="ts">
   import {
@@ -179,6 +178,7 @@
   }
 
   async function deliver(text: string) {
+    if (await att.lookIfAsked(text)) return setDraft(text);
     if (text) history.push(text);
     trigger = null;
     const files = att.ids;

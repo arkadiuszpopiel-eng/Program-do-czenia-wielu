@@ -88,15 +88,15 @@ Reguły:
 Decyzja właściciela dopuszcza zdalne zatwierdzanie wysokiego ryzyka. To wygodne, ale przejęty odblokowany
 telefon staje się wtedy kluczem do komputera. Plan ogranicza to tak, żeby nie odbierać wygody:
 
-| Zabezpieczenie | Jak działa | Można wyłączyć? |
-| --- | --- | --- |
-| Biometria przy każdej zgodzie | sam odblokowany ekran nie wystarcza | nie |
-| Wysokie ryzyko: pełny opis i przytrzymanie przycisku | chroni przed przypadkowym dotknięciem | nie |
-| Powiadomienie na komputerze i pozostałych urządzeniach o zgodzie wysokiego ryzyka | właściciel widzi, że coś zatwierdzono | tak |
-| Limit zgód wysokiego ryzyka w czasie (np. 5 na 10 minut) | hamuje serię działań po przejęciu | tak (ustawienie) |
-| Zakres per urządzenie | urządzeniu można odebrać prawo do wysokiego ryzyka | tak — domyślnie pełny, zgodnie z decyzją |
-| Odwołanie urządzenia z dowolnego klienta | natychmiastowe | nie |
-| Twarde blokady z modelu zagrożeń | to, czego Broker nie pozwala nikomu, pozostaje zabronione | nie |
+| Zabezpieczenie                                                                    | Jak działa                                                | Można wyłączyć?                          |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------- |
+| Biometria przy każdej zgodzie                                                     | sam odblokowany ekran nie wystarcza                       | nie                                      |
+| Wysokie ryzyko: pełny opis i przytrzymanie przycisku                              | chroni przed przypadkowym dotknięciem                     | nie                                      |
+| Powiadomienie na komputerze i pozostałych urządzeniach o zgodzie wysokiego ryzyka | właściciel widzi, że coś zatwierdzono                     | tak                                      |
+| Limit zgód wysokiego ryzyka w czasie (np. 5 na 10 minut)                          | hamuje serię działań po przejęciu                         | tak (ustawienie)                         |
+| Zakres per urządzenie                                                             | urządzeniu można odebrać prawo do wysokiego ryzyka        | tak — domyślnie pełny, zgodnie z decyzją |
+| Odwołanie urządzenia z dowolnego klienta                                          | natychmiastowe                                            | nie                                      |
+| Twarde blokady z modelu zagrożeń                                                  | to, czego Broker nie pozwala nikomu, pozostaje zabronione | nie                                      |
 
 Rekomendacja sesji (do decyzji przy ADR 0022): zostawić domyślnie pełny zakres, zgodnie z decyzją, ale
 pokazać przy parowaniu przełącznik „to urządzenie może zatwierdzać wysokie ryzyko”.
@@ -131,19 +131,19 @@ dialogowego systemu) mają zdalne odpowiedniki.
 
 ## Nowe scenariusze zagrożeń (do dopisania w `THREAT_MODEL.md`)
 
-| ID | Scenariusz | Obrona |
-| --- | --- | --- |
-| R1 | Przekaźnik przejęty albo złośliwy | E2E: widzi tylko szyfrogram; nie może podszyć się pod host (klucz hosta znany klientowi z parowania) |
-| R2 | Podsłuch lub modyfikacja po drodze | TLS + Noise; ramki z licznikiem — powtórzenie odrzucane |
-| R3 | Kradzież odblokowanego telefonu | biometria przy każdej zgodzie; limit; odwołanie z innego klienta |
-| R4 | Kradzież telefonu z kluczem API | klucz w magazynie sprzętowym, nieeksportowalny w postaci jawnej dla innych aplikacji; odwołanie + przypomnienie o wymianie klucza |
-| R5 | Podmiana kodu QR / atak przy parowaniu | krótki kod kontrolny potwierdzany fizycznie na komputerze |
-| R6 | Złośliwa strona udająca panel | panel pod stałą domeną z CSP; klucz dostępu WebAuthn jest związany z domeną — na innej nie zadziała |
-| R7 | Przejęcie hostingu panelu (podmiana skryptów) | integralność zasobów, wersjonowane wydania; opcja: panel serwowany wyłącznie z własnego serwera właściciela |
-| R8 | Wstrzyknięcie poleceń w treści (strona, plik) wywołuje działanie zdalnie | bez zmian: znakowanie treści niezaufanych i reguła „trzech uprawnień” w Brokerze działają niezależnie od klienta |
-| R9 | Zalanie hosta żądaniami przez przekaźnik | limit połączeń na identyfikator hosta w przekaźniku; host odrzuca nieuwierzytelnione ramki przed jakimkolwiek przetwarzaniem |
-| R10 | Stare urządzenie z nieaktualną aplikacją | wersja protokołu negocjowana; host może wymusić minimalną |
-| R11 | Dane rozmów w pamięci telefonu | szyfrowanie kluczem z magazynu; kasowanie przy odwołaniu i przy wylogowaniu |
+| ID  | Scenariusz                                                               | Obrona                                                                                                                            |
+| --- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | Przekaźnik przejęty albo złośliwy                                        | E2E: widzi tylko szyfrogram; nie może podszyć się pod host (klucz hosta znany klientowi z parowania)                              |
+| R2  | Podsłuch lub modyfikacja po drodze                                       | TLS + Noise; ramki z licznikiem — powtórzenie odrzucane                                                                           |
+| R3  | Kradzież odblokowanego telefonu                                          | biometria przy każdej zgodzie; limit; odwołanie z innego klienta                                                                  |
+| R4  | Kradzież telefonu z kluczem API                                          | klucz w magazynie sprzętowym, nieeksportowalny w postaci jawnej dla innych aplikacji; odwołanie + przypomnienie o wymianie klucza |
+| R5  | Podmiana kodu QR / atak przy parowaniu                                   | krótki kod kontrolny potwierdzany fizycznie na komputerze                                                                         |
+| R6  | Złośliwa strona udająca panel                                            | panel pod stałą domeną z CSP; klucz dostępu WebAuthn jest związany z domeną — na innej nie zadziała                               |
+| R7  | Przejęcie hostingu panelu (podmiana skryptów)                            | integralność zasobów, wersjonowane wydania; opcja: panel serwowany wyłącznie z własnego serwera właściciela                       |
+| R8  | Wstrzyknięcie poleceń w treści (strona, plik) wywołuje działanie zdalnie | bez zmian: znakowanie treści niezaufanych i reguła „trzech uprawnień” w Brokerze działają niezależnie od klienta                  |
+| R9  | Zalanie hosta żądaniami przez przekaźnik                                 | limit połączeń na identyfikator hosta w przekaźniku; host odrzuca nieuwierzytelnione ramki przed jakimkolwiek przetwarzaniem      |
+| R10 | Stare urządzenie z nieaktualną aplikacją                                 | wersja protokołu negocjowana; host może wymusić minimalną                                                                         |
+| R11 | Dane rozmów w pamięci telefonu                                           | szyfrowanie kluczem z magazynu; kasowanie przy odwołaniu i przy wylogowaniu                                                       |
 
 Zmiana S13 / S14: scenariusze „otwarty port lokalny” i „zdalne sterowanie interfejsem” **pozostają
 zagrożeniami** — plan ich nie dopuszcza. Dostęp zdalny jest nową, osobną drogą z własnym uwierzytelnieniem,

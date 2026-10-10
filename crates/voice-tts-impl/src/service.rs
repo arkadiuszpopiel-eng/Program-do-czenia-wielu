@@ -153,6 +153,7 @@ async fn synth_sentence(
             MarksKind::Estimated,
         ),
     };
+    tuning.apply_volume(&mut out);
     // Pauza po zdaniu — oddech między zdaniami zamiast mowy „jednym ciągiem”.
     let pause = (u64::from(tuning.pause_ms) * u64::from(TTS_RATE) / 1000) as usize;
     out.resize(out.len() + pause, 0.0);

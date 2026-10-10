@@ -61,6 +61,17 @@ struct Inner {
 }
 
 impl Inner {
+    /// Zamyka strumienie i dopiero po potwierdzeniu zamknięcia oznacza kamery jako uśpione.
+    /// Stan „zamykana” jest ogłaszany od razu, żeby znak kamery nie zgasł przed czasem.
+    async fn close_and_settle(&self, slots: Vec<(Arc<Slot>, u64)>) {
+        if slots.is_empty() {
+            return;
+        }
+        self.publish();
+        close(slots.clone()).await;
+        self.lock().settle(&slots);
+    }
+
     fn lock(&self) -> MutexGuard<'_, Registry> {
         self.registry.lock().unwrap_or_else(PoisonError::into_inner)
     }
@@ -164,7 +175,7 @@ impl CameraHubService {
                     entry.sleeper = false;
                     entry.stop()
                 };
-                close(vec![closing]).await;
+                inner.close_and_settle(vec![closing]).await;
                 inner.publish();
                 return;
             }
@@ -248,7 +259,7 @@ impl CameraHub for CameraHubService {
                 registry.cameras.iter_mut().map(|c| c.stop()).collect()
             }
         };
-        close(closing).await;
+        self.inner.close_and_settle(closing).await;
         self.inner.publish();
         let saved = self.inner.save().await;
         if enabled {
@@ -270,7 +281,9 @@ impl CameraHub for CameraHubService {
             registry.remember(id);
             closing
         };
-        close(closing.into_iter().collect()).await;
+        self.inner
+            .close_and_settle(closing.into_iter().collect())
+            .await;
         let state = self.inner.publish();
         self.inner.save().await.map(|()| state)
     }
@@ -303,6 +316,11 @@ impl CameraHub for CameraHubService {
             if !entry.present {
                 return Err(CameraError::Unplugged);
             }
+            // Kamera już się otwiera dla innego żądania: nie ustawiamy kolejki zadań blokujących
+            // (zawieszony sterownik zebrałby ich setki).
+            if entry.in_flight > 0 && !entry.is_live() {
+                return Err(CameraError::Busy);
+            }
             entry.in_flight += 1;
             entry.last_used = Instant::now();
             if !entry.is_live() {
@@ -319,12 +337,22 @@ impl CameraHub for CameraHubService {
         };
         let (inner, link) = (self.inner.clone(), id.0.clone());
         let work = move || read_frame(inner.port.as_ref(), &slot, &link, plan);
-        let outcome = tokio::task::spawn_blocking(work).await.unwrap_or_else(|e| {
-            Err(ReadFailure::Failed(format!(
+        // Rozliczenie żądania działa w osobnym zadaniu: porzucenie tej przyszłości (np. przerwane
+        // polecenie) nie zostawia licznika żądań w górze ani kamery bez usypiania.
+        let (service, camera) = (self.clone(), id.clone());
+        let settled = tokio::spawn(async move {
+            let outcome = tokio::task::spawn_blocking(work).await.unwrap_or_else(|e| {
+                Err(ReadFailure::Failed(format!(
+                    "zadanie kamery przerwane: {e}"
+                )))
+            });
+            service.finish(&camera, epoch, outcome)
+        });
+        settled.await.unwrap_or_else(|e| {
+            Err(CameraError::Platform(format!(
                 "zadanie kamery przerwane: {e}"
             )))
-        });
-        self.finish(id, epoch, outcome)
+        })
     }
 
     async fn stop_all(&self) {
@@ -332,7 +360,7 @@ impl CameraHub for CameraHubService {
             let mut registry = self.inner.lock();
             registry.cameras.iter_mut().map(|c| c.stop()).collect()
         };
-        close(closing).await;
+        self.inner.close_and_settle(closing).await;
         self.inner.publish();
     }
 
@@ -343,7 +371,7 @@ impl CameraHub for CameraHubService {
             .map_err(|e| CameraError::Platform(format!("wyliczanie kamer przerwane: {e}")))?
             .map_err(|e| CameraError::Platform(e.to_string()))?;
         let closing = self.inner.lock().merge(devices);
-        close(closing).await;
+        self.inner.close_and_settle(closing).await;
         Ok(self.inner.publish())
     }
 

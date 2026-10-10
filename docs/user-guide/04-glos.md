@@ -34,6 +34,25 @@ mikrofonu w pasku tytułu podpowiada to samo.
 - **Głosy agentek (v0)** — odsłuchaj próbkę każdej z czterech: Alfa (ciepły, spokojny), Beta (pogodny, wyraźna
   dykcja), Gama (niższy, wolniejszy), Delta (jaśniejszy, żwawy).
 
+## Głosy agentek: jak brzmią
+
+W **Ustawienia → Głos → „Głosy agentek”** ustawisz brzmienie mowy; zmiana działa od następnego zdania, a obok każdej
+agentki jest przycisk **„Odsłuchaj”**.
+
+| Ustawienie | Co robi |
+| --- | --- |
+| Styl mówienia | „Spokojny” — równy głos; „Naturalny” (zalecany) — żywsza intonacja; „Żywy” — najwięcej ekspresji |
+| Tempo mowy | 60–160 %; tempo ustawia silnik mowy, więc szybka mowa nie brzmi jak przyspieszone nagranie |
+| Głośność mowy | 20–150 %, niezależnie od głośności systemu |
+| Pauza między zdaniami | krótki oddech po zdaniu; 0 wyłącza |
+| Różnice między głosami agentek | „Jeden głos” brzmi najczyściej; „Delikatne” (zalecane) i „Wyraźne” coraz mocniej odróżniają agentki, kosztem naturalności |
+
+Wszystkie agentki mówią dziś jednym głosem bazowym. Naprawdę różne głosy wymagają innego silnika mowy —
+**jeszcze niedostępne**.
+
+Agentka, która mówi, ma w belce i w rozmowie żywy awatar: mruga i rusza ustami w rytm mowy. Wyłączysz to
+w **Ustawienia → Wygląd → „Awatary agentek”**.
+
 ## Mówienie
 
 - **Przełącznik**: `Ctrl+Shift+M`, przycisk mikrofonu albo „Głos wł./wył.” w zasobniku. Mów naturalnie — Alfa sama

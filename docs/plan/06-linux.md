@@ -8,24 +8,24 @@ Cel: Ubuntu LTS i Fedora (bieżące wydania), środowiska GNOME i KDE na Wayland
 
 ## Porty do zaimplementowania
 
-| Port | Windows dziś | Linux — propozycja | Trudność |
-| --- | --- | --- | --- |
-| `FsPort` (z koszem) | API powłoki | specyfikacja kosza freedesktop | mała |
-| `ProcessPort`, `ExecPort` | Job Objects | grupy procesów / cgroups v2 użytkownika; dekodowanie wyjścia UTF-8 | średnia |
-| `ClipboardPort` | Win32 | portale / `wl-clipboard`; na Waylandzie dostęp w tle ograniczony | średnia |
-| `HotkeyPort` | hak klawiatury | portal `GlobalShortcuts` (zależny od środowiska) | średnia — nie wszędzie dostępny |
-| `TrayPort` | zasobnik | StatusNotifierItem | mała |
-| `SecretStore`, `KeyVault` | Credential Manager | Secret Service (GNOME Keyring, KWallet) przez D-Bus | mała |
-| `AudioIo` | WASAPI | PipeWire | średnia; AEC już jest w czystym Rust |
-| `PseudoConsolePort` | ConPTY | PTY | mała |
-| `SecurePipePort`, tożsamość procesu | potok z DACL, SID | gniazdo Unix 0600 + `SO_PEERCRED` | średnia — obszar Jądra |
-| `ServiceHostPort` | usługa Windows | usługa użytkownika systemd | średnia — obszar Jądra |
-| `ApprovalSurfacePort` | okno na podwyższonej integralności | **brak prostego odpowiednika** — patrz niżej | duża |
-| `ScreenCapturePort` | API Windows | portal `ScreenCast` (każdorazowa zgoda systemu) | średnia |
-| `UiaPort`, `InputPort` | UI Automation, `SendInput` | AT-SPI; wstrzykiwanie wejścia przez portal `RemoteDesktop` | duża — badawcze |
-| `IdlePort`, `PowerPort`, `SessionPort`, sygnały | Win32 | logind / portale | mała |
-| `OfficePort`, `RegistryPort` | COM, rejestr | **bez odpowiednika** | nie planujemy |
-| `OcrPort` | OCR systemu | silnik dołączony (do wyboru) | średnia |
+| Port                                            | Windows dziś                       | Linux — propozycja                                                 | Trudność                             |
+| ----------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------ | ------------------------------------ |
+| `FsPort` (z koszem)                             | API powłoki                        | specyfikacja kosza freedesktop                                     | mała                                 |
+| `ProcessPort`, `ExecPort`                       | Job Objects                        | grupy procesów / cgroups v2 użytkownika; dekodowanie wyjścia UTF-8 | średnia                              |
+| `ClipboardPort`                                 | Win32                              | portale / `wl-clipboard`; na Waylandzie dostęp w tle ograniczony   | średnia                              |
+| `HotkeyPort`                                    | hak klawiatury                     | portal `GlobalShortcuts` (zależny od środowiska)                   | średnia — nie wszędzie dostępny      |
+| `TrayPort`                                      | zasobnik                           | StatusNotifierItem                                                 | mała                                 |
+| `SecretStore`, `KeyVault`                       | Credential Manager                 | Secret Service (GNOME Keyring, KWallet) przez D-Bus                | mała                                 |
+| `AudioIo`                                       | WASAPI                             | PipeWire                                                           | średnia; AEC już jest w czystym Rust |
+| `PseudoConsolePort`                             | ConPTY                             | PTY                                                                | mała                                 |
+| `SecurePipePort`, tożsamość procesu             | potok z DACL, SID                  | gniazdo Unix 0600 + `SO_PEERCRED`                                  | średnia — obszar Jądra               |
+| `ServiceHostPort`                               | usługa Windows                     | usługa użytkownika systemd                                         | średnia — obszar Jądra               |
+| `ApprovalSurfacePort`                           | okno na podwyższonej integralności | **brak prostego odpowiednika** — patrz niżej                       | duża                                 |
+| `ScreenCapturePort`                             | API Windows                        | portal `ScreenCast` (każdorazowa zgoda systemu)                    | średnia                              |
+| `UiaPort`, `InputPort`                          | UI Automation, `SendInput`         | AT-SPI; wstrzykiwanie wejścia przez portal `RemoteDesktop`         | duża — badawcze                      |
+| `IdlePort`, `PowerPort`, `SessionPort`, sygnały | Win32                              | logind / portale                                                   | mała                                 |
+| `OfficePort`, `RegistryPort`                    | COM, rejestr                       | **bez odpowiednika**                                               | nie planujemy                        |
+| `OcrPort`                                       | OCR systemu                        | silnik dołączony (do wyboru)                                       | średnia                              |
 
 ## Największe ryzyka
 
@@ -69,19 +69,19 @@ Modele GGUF są te same.
 
 ## Pakowanie
 
-| Format | Kolejność | Uwagi |
-| --- | --- | --- |
-| deb, rpm | 1 | korzysta z WebKitGTK i sterowników hosta — najmniej tarcia dla CUDA |
-| Flatpak | 2 | niesie własne środowisko; wymaga uprawnień do karty, dźwięku i plików; skróty i ekran przez portale |
-| AppImage | 3, w miarę możliwości | bywa kruchy przy niezgodności WebKitGTK z hostem |
+| Format   | Kolejność             | Uwagi                                                                                               |
+| -------- | --------------------- | --------------------------------------------------------------------------------------------------- |
+| deb, rpm | 1                     | korzysta z WebKitGTK i sterowników hosta — najmniej tarcia dla CUDA                                 |
+| Flatpak  | 2                     | niesie własne środowisko; wymaga uprawnień do karty, dźwięku i plików; skróty i ekran przez portale |
+| AppImage | 3, w miarę możliwości | bywa kruchy przy niezgodności WebKitGTK z hostem                                                    |
 
 Aktualizacje: mechanizm side-by-side z launcherem (ADR 0007) jest pomyślany pod Windows; na Linuksie
 aktualizuje menedżer pakietów albo Flatpak — `updater` dostaje tryb „tylko powiadom”.
 
 ## Mapa zdolności na start
 
-| Działa od pierwszego wydania | Później | Nie planujemy |
-| --- | --- | --- |
+| Działa od pierwszego wydania                                                                                                                    | Później                                                                                     | Nie planujemy             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------- |
 | rozmowa (lokalnie i chmura), sesje, pamięć, wyszukiwanie, pliki z „Cofnij”, sieć, MCP, wtyczki, import/eksport `.alfa`, dostęp zdalny jako host | głos (G.5), powłoka (G.2), skróty globalne, zrzuty ekranu, sterowanie komputerem (badawcze) | Office przez COM, rejestr |
 
 ## Kryteria akceptacji (szkic; progi ustala właściciel)

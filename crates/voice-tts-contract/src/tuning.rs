@@ -6,6 +6,8 @@ use std::sync::{Arc, PoisonError, RwLock};
 
 /// Zakres tempa mowy (1.0 = tempo głosu bazowego).
 pub const SPEED_RANGE: (f32, f32) = (0.6, 1.6);
+/// Zakres głośności mowy (mnożnik amplitudy).
+pub const VOLUME_RANGE: (f32, f32) = (0.2, 1.5);
 /// Najdłuższa pauza między zdaniami (ms).
 pub const MAX_PAUSE_MS: u32 = 1_000;
 
@@ -23,6 +25,8 @@ pub struct TtsTuning {
     /// Odrębność głosów agentek: 0 = wszystkie mówią głosem bazowym (bez przestrajania, najczystszy
     /// dźwięk), 1 = pełne różnice wysokości i tempa z presetów.
     pub character: f32,
+    /// Głośność mowy (mnożnik amplitudy; 1.0 = bez zmiany).
+    pub volume: f32,
 }
 
 impl Default for TtsTuning {
@@ -33,6 +37,7 @@ impl Default for TtsTuning {
             rhythm: 0.8,
             pause_ms: 0,
             character: 1.0,
+            volume: 1.0,
         }
     }
 }
@@ -55,6 +60,7 @@ impl TtsTuning {
             rhythm: fix(self.rhythm, base.rhythm, 0.3, 1.2),
             pause_ms: self.pause_ms.min(MAX_PAUSE_MS),
             character: fix(self.character, base.character, 0.0, 1.0),
+            volume: fix(self.volume, base.volume, VOLUME_RANGE.0, VOLUME_RANGE.1),
         }
     }
 
@@ -63,6 +69,17 @@ impl TtsTuning {
     #[must_use]
     pub fn blend(self, preset: f32) -> f32 {
         1.0 + (preset - 1.0) * self.character.clamp(0.0, 1.0)
+    }
+
+    /// Nakłada głośność na próbki (z ograniczeniem do zakresu −1…1, bez przesterowania „zawijaniem”).
+    pub fn apply_volume(self, pcm: &mut [f32]) {
+        let gain = self.volume.clamp(VOLUME_RANGE.0, VOLUME_RANGE.1);
+        if (gain - 1.0).abs() < 1e-3 {
+            return;
+        }
+        for sample in pcm {
+            *sample = (*sample * gain).clamp(-1.0, 1.0);
+        }
     }
 }
 
@@ -149,8 +166,16 @@ mod tests {
             rhythm: -1.0,
             pause_ms: 60_000,
             character: 3.0,
+            volume: 40.0,
         }
         .clamped();
+        assert_eq!(wild.volume, VOLUME_RANGE.1);
+        let mut pcm = [0.5f32, -0.9, 0.0];
+        wild.apply_volume(&mut pcm);
+        assert_eq!(pcm, [0.75, -1.0, 0.0]);
+        let mut same = [0.5f32, -0.9];
+        base.apply_volume(&mut same);
+        assert_eq!(same, [0.5, -0.9]);
         assert_eq!(wild.speed, SPEED_RANGE.1);
         assert_eq!(wild.expressiveness, base.expressiveness);
         assert_eq!(wild.rhythm, 0.3);

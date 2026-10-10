@@ -17,7 +17,10 @@ pub(crate) const PAUSE_KEY: &str = "voice.tts_pause";
 /// Odrębność głosów agentek (`same` / `subtle` / `distinct`).
 pub(crate) const CHARACTER_KEY: &str = "voice.tts_character";
 
-const KEYS: [&str; 4] = [SPEED_KEY, STYLE_KEY, PAUSE_KEY, CHARACTER_KEY];
+/// Głośność mowy w procentach (20–150).
+pub(crate) const VOLUME_KEY: &str = "voice.tts_volume";
+
+const KEYS: [&str; 5] = [SPEED_KEY, STYLE_KEY, PAUSE_KEY, CHARACTER_KEY, VOLUME_KEY];
 
 /// Zalecane strojenie programu — używane, dopóki użytkownik niczego nie zmieni.
 pub(crate) fn recommended() -> TtsTuning {
@@ -28,6 +31,7 @@ pub(crate) fn recommended() -> TtsTuning {
         rhythm,
         pause_ms: 200,
         character: character_from_setting("subtle"),
+        volume: 1.0,
     }
 }
 
@@ -37,6 +41,7 @@ pub(crate) fn from_values(
     style: Option<&str>,
     pause: Option<f64>,
     character: Option<&str>,
+    volume: Option<f64>,
 ) -> TtsTuning {
     let base = recommended();
     let (expressiveness, rhythm) = style.map_or((base.expressiveness, base.rhythm), |s| {
@@ -48,6 +53,7 @@ pub(crate) fn from_values(
         rhythm,
         pause_ms: pause.map_or(base.pause_ms, |ms| ms.clamp(0.0, 60_000.0) as u32),
         character: character.map_or(base.character, character_from_setting),
+        volume: volume.map_or(base.volume, |percent| (percent / 100.0) as f32),
     }
     .clamped()
 }
@@ -71,7 +77,13 @@ pub(crate) fn tts_tuning(config: &Arc<core_config_impl::FileConfigStore>) -> Sha
             }
             let number = |i: usize| values[i].as_ref().and_then(serde_json::Value::as_f64);
             let text = |i: usize| values[i].as_ref().and_then(serde_json::Value::as_str);
-            handle.set(from_values(number(0), text(1), number(2), text(3)));
+            handle.set(from_values(
+                number(0),
+                text(1),
+                number(2),
+                text(3),
+                number(4),
+            ));
             if changes.next().await.is_none() {
                 break;
             }
@@ -86,7 +98,7 @@ mod tests {
 
     #[test]
     fn missing_settings_give_the_recommended_natural_voice() {
-        let tuning = from_values(None, None, None, None);
+        let tuning = from_values(None, None, None, None, None);
         assert_eq!(tuning, recommended().clamped());
         // Zalecane brzmi inaczej niż surowe ustawienia silnika: żywsza intonacja, pauzy, łagodniejsze
         // różnice między agentkami.
@@ -98,7 +110,14 @@ mod tests {
 
     #[test]
     fn settings_values_map_to_tuning_and_stay_in_range() {
-        let tuning = from_values(Some(120.0), Some("calm"), Some(400.0), Some("same"));
+        let tuning = from_values(
+            Some(120.0),
+            Some("calm"),
+            Some(400.0),
+            Some("same"),
+            Some(60.0),
+        );
+        assert!((tuning.volume - 0.6).abs() < 1e-6);
         assert!((tuning.speed - 1.2).abs() < 1e-6);
         assert_eq!(
             (tuning.expressiveness, tuning.rhythm),
@@ -106,7 +125,14 @@ mod tests {
         );
         assert_eq!(tuning.pause_ms, 400);
         assert_eq!(tuning.character, 0.0);
-        let wild = from_values(Some(900.0), Some("???"), Some(-5.0), Some("distinct"));
+        let wild = from_values(
+            Some(900.0),
+            Some("???"),
+            Some(-5.0),
+            Some("distinct"),
+            Some(900.0),
+        );
+        assert_eq!(wild.volume, voice_tts_contract::VOLUME_RANGE.1);
         assert_eq!(wild.speed, voice_tts_contract::SPEED_RANGE.1);
         assert_eq!(wild.pause_ms, 0);
         assert_eq!(wild.character, 1.0);

@@ -3,6 +3,7 @@
 import { errorText } from '../api/command-error';
 import type { AttachmentInfo, AttachmentsAdded, DroppedFileHint } from '../api/types-files';
 import type { AppState } from './app.svelte';
+import { cameraFor, wantsCameraLook } from '../logic/camera-look';
 import { showError } from './attempt';
 
 export class AttachmentsState {
@@ -76,6 +77,27 @@ export class AttachmentsState {
 
   paste(): Promise<void> {
     return this.run((id) => this.app.client.attachments.paste(id));
+  }
+
+  /**
+   * „Opisz mi to, co widzisz”: gdy kamery są włączone i wiadomość jest prośbą o opis obrazu,
+   * dołącza zdjęcie z kamery (nazwanej w prośbie albo pierwszej włączonej) i zwraca `true` —
+   * wiadomość **nie jest wtedy wysyłana**: użytkownik widzi zdjęcie i wysyła drugim Enterem albo
+   * je usuwa. `false`: nic nie dołączono (to nie prośba, kamery wyłączone, obraz już dołączony,
+   * pomoc wyłączona w ustawieniach kamer albo trwa praca agentki).
+   */
+  async lookIfAsked(text: string): Promise<boolean> {
+    const app = this.app;
+    if (!app.bool('camera.enabled', false) || !app.bool('camera.auto_look', true)) return false;
+    if (!wantsCameraLook(text) || this.items.some((a) => a.kind === 'image')) return false;
+    if (app.runs.active(app.activeId)) return false;
+    const camera = cameraFor(text, app.cameras?.cameras ?? []);
+    if (!camera) return false;
+    const before = this.items.length;
+    await this.camera(camera.id);
+    if (this.items.length === before) return false;
+    app.toasts.show({ kind: 'info', message: app.i18n.t('cam.autoLook', { name: camera.name }) });
+    return true;
   }
 
   /** Zdjęcie z kamery jako załącznik. */

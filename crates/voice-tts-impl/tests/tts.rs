@@ -384,6 +384,7 @@ async fn tuning_reaches_piper_and_shapes_the_audio() {
         rhythm: 1.0,
         pause_ms: 300,
         character: 0.0,
+        volume: 1.0,
     });
     let tuned = collect(&tts, say(2), CancelToken::new()).await.unwrap();
     let second = calls.lock().unwrap().last().cloned().unwrap();

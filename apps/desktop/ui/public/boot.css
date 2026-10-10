@@ -101,3 +101,34 @@ body {
     opacity: 0.6;
   }
 }
+/* Górny pas ekranu ładowania przesuwa okno (okno nie ma belki systemowej). */
+#alfa-boot .drag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+}
+#alfa-boot.problem .bar span {
+  animation: none;
+  opacity: 0;
+}
+#alfa-boot.problem .step {
+  max-width: 520px;
+  padding: 0 16px;
+  color: var(--boot-text);
+  text-align: center;
+}
+#alfa-boot .quit {
+  padding: 6px 14px;
+  border: 1px solid var(--boot-muted);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--boot-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+#alfa-boot .quit[hidden] {
+  display: none;
+}

@@ -595,6 +595,26 @@
     "scope": "global"
    },
    {
+    "key": "voice.tts_volume",
+    "label": {
+     "pl": "Głośność mowy",
+     "en": "Speech volume"
+    },
+    "description": {
+     "pl": "Głośność głosu agentek niezależnie od głośności systemu. 100 % to poziom z silnika mowy; powyżej 100 % cichy głos jest podbijany (bardzo głośne fragmenty mogą być spłaszczone).",
+     "en": "Volume of the agents' voice, independent of the system volume. 100% is the level from the speech engine; above 100% a quiet voice is boosted (very loud passages may be flattened)."
+    },
+    "control": {
+     "kind": "number",
+     "min": 20,
+     "max": 150,
+     "step": 5,
+     "unit": "%"
+    },
+    "default": 100,
+    "scope": "global"
+   },
+   {
     "key": "voice.tts_pause",
     "label": {
      "pl": "Pauza między zdaniami",
@@ -1288,6 +1308,22 @@
      "kind": "toggle"
     },
     "default": false,
+    "scope": "global"
+   },
+   {
+    "key": "camera.auto_look",
+    "label": {
+     "pl": "„Opisz, co widzisz” robi zdjęcie",
+     "en": "“Describe what you see” takes a photo"
+    },
+    "description": {
+     "pl": "Gdy napiszesz „opisz mi to, co widzisz” (albo „co widzisz na kamerze Kuchnia?”), Alfa dołączy do wiadomości zdjęcie z kamery — nazwanej w prośbie albo pierwszej włączonej. Działa tylko przy włączonych kamerach; zdjęcie zostaje w rozmowie jak każdy załącznik.",
+     "en": "When you write “describe what you see” (or “what do you see on camera Kitchen?”), Alfa attaches a photo from the camera — the one named in the request or the first enabled one. Works only while cameras are enabled; the photo stays in the conversation like any attachment."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": true,
     "scope": "global"
    }
   ],

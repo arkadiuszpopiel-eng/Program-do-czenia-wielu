@@ -63,6 +63,9 @@ pub enum CameraState {
         /// Wysokość klatki kamery.
         height: u32,
     },
+    /// Zatrzymana, ale strumień nie został jeszcze potwierdzony jako zamknięty — urządzenie może
+    /// być nadal otwarte (sygnał prywatności traktuje ten stan jak działającą kamerę).
+    Closing,
     /// Ostatnie otwarcie albo odczyt nie powiodły się (opis po polsku); kolejne żądanie ponawia.
     Failed(String),
     /// Kamera odłączona od systemu.
@@ -101,9 +104,12 @@ impl HubState {
 
     /// Czy którakolwiek kamera jest otwarta albo właśnie się otwiera (wskaźnik w interfejsie).
     pub fn any_open(&self) -> bool {
-        self.cameras
-            .iter()
-            .any(|c| matches!(c.state, CameraState::Opening | CameraState::Live { .. }))
+        self.cameras.iter().any(|c| {
+            matches!(
+                c.state,
+                CameraState::Opening | CameraState::Live { .. } | CameraState::Closing
+            )
+        })
     }
 }
 
@@ -133,6 +139,9 @@ pub enum CameraError {
     /// Żądanie przerwane przez `stop_all`, wyłączenie kamery albo przełącznika głównego.
     #[error("kamera została zatrzymana w trakcie żądania")]
     Stopped,
+    /// Kamera jest właśnie otwierana przez inne żądanie — kolejne nie ustawiają się w kolejce.
+    #[error("kamera jest właśnie otwierana")]
+    Busy,
     /// Kamera nie dostarczyła klatki w wyznaczonym czasie.
     #[error("kamera nie odpowiedziała w wyznaczonym czasie")]
     Timeout,

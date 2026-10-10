@@ -23,6 +23,8 @@ pub enum CameraStateView {
     Asleep,
     Opening,
     Live,
+    /// Zatrzymana, zamknięcie strumienia jeszcze niepotwierdzone.
+    Closing,
     Failed,
     Unplugged,
 }

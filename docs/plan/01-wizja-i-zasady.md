@@ -15,22 +15,22 @@ Plan v6 odpowiada na trzy pytania:
 
 ## Cele produktu
 
-| Cel | Co to znaczy w praktyce |
-| --- | --- |
-| Asystent po polsku, który działa bez Internetu | rozmowa, głos i narzędzia na modelach lokalnych; chmura jest opcją, nie warunkiem |
-| Agentki, którym można zaufać | każde działanie przechodzi przez Brokera, ma poziom ryzyka, zgodę, wpis w dzienniku i „Cofnij” tam, gdzie to możliwe |
-| Jeden asystent, wiele ekranów | komputer jest „domem” Alfy; telefon i przeglądarka to pełnoprawne piloty do niego |
-| Rozbudowa bez przebudowy | nowa platforma to nowa implementacja portów, nowa funkcja to nowy moduł; rdzeń się nie zmienia |
-| Zgodność z prawem UE od początku | oznaczanie treści AI, zgłaszanie podatności, brak telemetrii domyślnie |
+| Cel                                            | Co to znaczy w praktyce                                                                                              |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Asystent po polsku, który działa bez Internetu | rozmowa, głos i narzędzia na modelach lokalnych; chmura jest opcją, nie warunkiem                                    |
+| Agentki, którym można zaufać                   | każde działanie przechodzi przez Brokera, ma poziom ryzyka, zgodę, wpis w dzienniku i „Cofnij” tam, gdzie to możliwe |
+| Jeden asystent, wiele ekranów                  | komputer jest „domem” Alfy; telefon i przeglądarka to pełnoprawne piloty do niego                                    |
+| Rozbudowa bez przebudowy                       | nowa platforma to nowa implementacja portów, nowa funkcja to nowy moduł; rdzeń się nie zmienia                       |
+| Zgodność z prawem UE od początku               | oznaczanie treści AI, zgłaszanie podatności, brak telemetrii domyślnie                                               |
 
 ## Kolejność platform
 
-| Kolejność | Platforma | Rola | Dokument |
-| --- | --- | --- | --- |
-| 1 | **Windows 11** (x64) | pierwsza wersja, host i interfejs | [`05-windows.md`](05-windows.md) |
-| 2 | **Panel WWW** | pilot przez Internet (przeglądarka) | [`07-panel-www.md`](07-panel-www.md) |
-| 3 | **Android 15+** | pilot w telefonie; bez komputera — rozmowa przez model chmurowy | [`08-android.md`](08-android.md) |
-| 4 | **Linux** | drugi system dla hosta i interfejsu | [`06-linux.md`](06-linux.md) |
+| Kolejność | Platforma            | Rola                                                            | Dokument                             |
+| --------- | -------------------- | --------------------------------------------------------------- | ------------------------------------ |
+| 1         | **Windows 11** (x64) | pierwsza wersja, host i interfejs                               | [`05-windows.md`](05-windows.md)     |
+| 2         | **Panel WWW**        | pilot przez Internet (przeglądarka)                             | [`07-panel-www.md`](07-panel-www.md) |
+| 3         | **Android 15+**      | pilot w telefonie; bez komputera — rozmowa przez model chmurowy | [`08-android.md`](08-android.md)     |
+| 4         | **Linux**            | drugi system dla hosta i interfejsu                             | [`06-linux.md`](06-linux.md)         |
 
 Panel WWW i Android są przed Linuksem, bo korzystają z tego samego fundamentu (host bez okna i protokół zdalny)
 i nie wymagają przepisywania warstwy systemowej. Linux to najwięcej pracy „pod spodem” — ok. 30 portów
@@ -42,26 +42,26 @@ pozostałym.
 
 ## Decyzje właściciela z 2026-10-09
 
-| # | Pytanie | Decyzja | Gdzie rozpisana |
-| --- | --- | --- | --- |
-| 1 | Jak telefon i panel WWW łączą się z komputerem? | Przez **przekaźnik z szyfrowaniem end-to-end**; komputer nie otwiera żadnego portu; parowanie kodem QR | ADR 0021, [`09`](09-dostep-zdalny-i-bezpieczenstwo.md) |
-| 2 | Czy zdalnie wolno zatwierdzać ryzykowne działania? | **Tak, wszystkie**, także wysokiego ryzyka | ADR 0022, [`09`](09-dostep-zdalny-i-bezpieczenstwo.md) |
-| 3 | Czym są telefon i panel WWW? | **Pilotem ze 100 % funkcji**. Gdy nie ma połączenia z komputerem, klient rozmawia przez **ten sam model chmurowy (API)**, który jest ustawiony na komputerze. Model lokalny zostaje tylko na komputerze | ADR 0023, [`08`](08-android.md) |
-| 4 | Jak nowy plan ma się do v5? | Plan v6 **obok**, v5 zostaje bazą; do `AGENTS.md` jedna reguła o prowadzeniu planu | ten katalog |
+| #   | Pytanie                                            | Decyzja                                                                                                                                                                                                 | Gdzie rozpisana                                        |
+| --- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| 1   | Jak telefon i panel WWW łączą się z komputerem?    | Przez **przekaźnik z szyfrowaniem end-to-end**; komputer nie otwiera żadnego portu; parowanie kodem QR                                                                                                  | ADR 0021, [`09`](09-dostep-zdalny-i-bezpieczenstwo.md) |
+| 2   | Czy zdalnie wolno zatwierdzać ryzykowne działania? | **Tak, wszystkie**, także wysokiego ryzyka                                                                                                                                                              | ADR 0022, [`09`](09-dostep-zdalny-i-bezpieczenstwo.md) |
+| 3   | Czym są telefon i panel WWW?                       | **Pilotem ze 100 % funkcji**. Gdy nie ma połączenia z komputerem, klient rozmawia przez **ten sam model chmurowy (API)**, który jest ustawiony na komputerze. Model lokalny zostaje tylko na komputerze | ADR 0023, [`08`](08-android.md)                        |
+| 4   | Jak nowy plan ma się do v5?                        | Plan v6 **obok**, v5 zostaje bazą; do `AGENTS.md` jedna reguła o prowadzeniu planu                                                                                                                      | ten katalog                                            |
 
 Decyzje 1–3 zmieniają ustalenia planu v5 i modelu zagrożeń. Każda ma projekt ADR, który wymaga podpisu
 właściciela, zanim powstanie kod — to obszar Jądra bezpieczeństwa (bramka ludzka #7).
 
 ## Co się zmienia względem planu v5
 
-| Ustalenie v5 | Po zmianie | Dlaczego to bezpieczne | ADR |
-| --- | --- | --- | --- |
-| Cel: tylko Windows 11 | Windows pierwszy; Linux i Android przez nowe implementacje portów | kod systemowy nadal tylko za portami; reguła „żadnego `windows::` poza platformą” zostaje | 0017, 0018 |
-| Żadnego nasłuchu sieciowego na komputerze (S14 — test F4-07; S13 — port CDP, test F3-13) | Nadal **żadnego nasłuchu na komputerze**: host sam wychodzi do przekaźnika; testy zostają i obejmują nowe moduły hosta. Nasłuchuje tylko przekaźnik — osobna usługa poza komputerem | brak otwartego portu = brak powierzchni do skanowania; przekaźnik widzi tylko szyfrogram | 0021 |
-| Zgoda tylko w oknie Brokera, z dowodem fizycznego kliknięcia | Dochodzi drugi rodzaj dowodu: podpis sparowanego urządzenia po biometrii | podpis kluczem z bezpiecznego magazynu urządzenia, wiązany z konkretnym żądaniem; urządzenie można odwołać | 0022 |
-| Sekrety nigdy nie opuszczają komputera | Klucz API dostawcy chmurowego może trafić na sparowany telefon (do magazynu kluczy Androida) | tylko kanałem E2E, tylko po osobnej zgodzie, z możliwością zdalnego skasowania | 0023 |
-| Bez synchronizacji — tylko import/eksport `.alfa` | Rozmowy prowadzone bez komputera **dołączają się** do historii po powrocie połączenia | historia jest tylko-do-dopisywania, więc scalanie to dopisanie gałęzi, nie nadpisanie | 0023 |
-| Typy TS pisane ręcznie | Generowane z Rust (ADR 0013 — w końcu wykonany) | trzy klienty jednego protokołu nie mogą się rozjechać | 0019 |
+| Ustalenie v5                                                                             | Po zmianie                                                                                                                                                                          | Dlaczego to bezpieczne                                                                                     | ADR        |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------- |
+| Cel: tylko Windows 11                                                                    | Windows pierwszy; Linux i Android przez nowe implementacje portów                                                                                                                   | kod systemowy nadal tylko za portami; reguła „żadnego `windows::` poza platformą” zostaje                  | 0017, 0018 |
+| Żadnego nasłuchu sieciowego na komputerze (S14 — test F4-07; S13 — port CDP, test F3-13) | Nadal **żadnego nasłuchu na komputerze**: host sam wychodzi do przekaźnika; testy zostają i obejmują nowe moduły hosta. Nasłuchuje tylko przekaźnik — osobna usługa poza komputerem | brak otwartego portu = brak powierzchni do skanowania; przekaźnik widzi tylko szyfrogram                   | 0021       |
+| Zgoda tylko w oknie Brokera, z dowodem fizycznego kliknięcia                             | Dochodzi drugi rodzaj dowodu: podpis sparowanego urządzenia po biometrii                                                                                                            | podpis kluczem z bezpiecznego magazynu urządzenia, wiązany z konkretnym żądaniem; urządzenie można odwołać | 0022       |
+| Sekrety nigdy nie opuszczają komputera                                                   | Klucz API dostawcy chmurowego może trafić na sparowany telefon (do magazynu kluczy Androida)                                                                                        | tylko kanałem E2E, tylko po osobnej zgodzie, z możliwością zdalnego skasowania                             | 0023       |
+| Bez synchronizacji — tylko import/eksport `.alfa`                                        | Rozmowy prowadzone bez komputera **dołączają się** do historii po powrocie połączenia                                                                                               | historia jest tylko-do-dopisywania, więc scalanie to dopisanie gałęzi, nie nadpisanie                      | 0023       |
+| Typy TS pisane ręcznie                                                                   | Generowane z Rust (ADR 0013 — w końcu wykonany)                                                                                                                                     | trzy klienty jednego protokołu nie mogą się rozjechać                                                      | 0019       |
 
 Reguły twarde z `AGENTS.md` („cel: Windows 11”, „sekrety tylko w Windows Credential Manager”) obowiązują bez zmian,
 dopóki właściciel nie podpisze ADR 0017 i 0023 i nie zatwierdzi odpowiedniej zmiany `AGENTS.md`.
@@ -91,9 +91,9 @@ brak telemetrii, przegląd człowieka nad Jądrem, zasada „kryterium spełnion
 
 Podział z [`../KONTYNUACJA.md`](../KONTYNUACJA.md) §4 obowiązuje dalej. Nowe pozycje:
 
-| Obszar | Sesja AI | Właściciel |
-| --- | --- | --- |
-| ADR 0017–0024 | projekt, opcje, rekomendacja | **decyzja i podpis** |
-| Przekaźnik w Internecie | kod, obraz kontenera, instrukcja | konto u dostawcy hostingu, domena, opłaty |
-| Aplikacja Android | kod, budowa, testy w emulatorze | telefon do testów, konto dewelopera przy publikacji |
-| Zgodność prawna | lista zadań, dokumenty techniczne (SBOM, polityka zgłoszeń) | konsultacja z prawnikiem przed wydaniem komercyjnym |
+| Obszar                  | Sesja AI                                                    | Właściciel                                          |
+| ----------------------- | ----------------------------------------------------------- | --------------------------------------------------- |
+| ADR 0017–0024           | projekt, opcje, rekomendacja                                | **decyzja i podpis**                                |
+| Przekaźnik w Internecie | kod, obraz kontenera, instrukcja                            | konto u dostawcy hostingu, domena, opłaty           |
+| Aplikacja Android       | kod, budowa, testy w emulatorze                             | telefon do testów, konto dewelopera przy publikacji |
+| Zgodność prawna         | lista zadań, dokumenty techniczne (SBOM, polityka zgłoszeń) | konsultacja z prawnikiem przed wydaniem komercyjnym |

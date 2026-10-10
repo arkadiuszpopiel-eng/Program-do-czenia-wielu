@@ -333,9 +333,12 @@
     height: 100%;
     object-fit: cover;
   }
-  .dim .view,
-  .dim .name {
+  .dim .view {
     opacity: 0.6;
+  }
+  /* Nazwa niedostępnej kamery: kolor przygaszony, nie przezroczystość (czytelność). */
+  .dim .name {
+    color: var(--alfa-color-text-muted);
   }
   /* Znak „podgląd działa” w rogu obrazu. */
   .rec {

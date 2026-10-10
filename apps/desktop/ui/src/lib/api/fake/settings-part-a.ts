@@ -195,6 +195,19 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
         '%',
       ),
       number(
+        'voice.tts_volume',
+        L('Głośność mowy', 'Speech volume'),
+        L(
+          'Głośność głosu agentek niezależnie od głośności systemu. 100 % to poziom z silnika mowy; powyżej 100 % cichy głos jest podbijany (bardzo głośne fragmenty mogą być spłaszczone).',
+          "Volume of the agents' voice, independent of the system volume. 100% is the level from the speech engine; above 100% a quiet voice is boosted (very loud passages may be flattened).",
+        ),
+        100,
+        20,
+        150,
+        5,
+        '%',
+      ),
+      number(
         'voice.tts_pause',
         L('Pauza między zdaniami', 'Pause between sentences'),
         L(

@@ -145,12 +145,19 @@ impl Sidecar {
             let profile = self.device.as_ref()?.current();
             profile.primary_gpu().map(|g| g.name.clone())
         })?;
-        let devices = {
-            let mut cache = lock(&self.devices);
-            cache
-                .entry(program.to_path_buf())
-                .or_insert_with(|| crate::devices::probe(program, crate::devices::PROBE_TIMEOUT))
-                .clone()
+        // Sonda trwa do kilku sekund — zamek pamięci urządzeń nie jest trzymany na jej czas, a pusty
+        // wynik (silnik nie odpowiedział, np. skaner antywirusowy przy zimnym starcie) nie zostaje
+        // w pamięci: następne uruchomienie modelu spróbuje ponownie.
+        let cached = lock(&self.devices).get(program).cloned();
+        let devices = match cached {
+            Some(devices) => devices,
+            None => {
+                let found = crate::devices::probe(program, crate::devices::PROBE_TIMEOUT);
+                if !found.is_empty() {
+                    lock(&self.devices).insert(program.to_path_buf(), found.clone());
+                }
+                found
+            }
         };
         let explicit = self.config.gpu_name.is_some();
         if devices.len() < 2 && !explicit {

@@ -599,6 +599,26 @@
             }
           },
           {
+            "key": "voice.tts_volume",
+            "label": {
+              "pl": "Głośność mowy",
+              "en": "Speech volume"
+            },
+            "description": {
+              "pl": "Głośność głosu agentek niezależnie od głośności systemu. 100 % to poziom z silnika mowy; powyżej 100 % cichy głos jest podbijany (bardzo głośne fragmenty mogą być spłaszczone).",
+              "en": "Volume of the agents' voice, independent of the system volume. 100% is the level from the speech engine; above 100% a quiet voice is boosted (very loud passages may be flattened)."
+            },
+            "default": 100,
+            "scope": "global",
+            "control": {
+              "kind": "number",
+              "min": 20,
+              "max": 150,
+              "step": 5,
+              "unit": "%"
+            }
+          },
+          {
             "key": "voice.tts_pause",
             "label": {
               "pl": "Pauza między zdaniami",
@@ -1293,6 +1313,22 @@
             },
             "default": false,
             "scope": "global"
+          },
+          {
+            "key": "camera.auto_look",
+            "label": {
+              "pl": "„Opisz, co widzisz” robi zdjęcie",
+              "en": "“Describe what you see” takes a photo"
+            },
+            "description": {
+              "pl": "Gdy napiszesz „opisz mi to, co widzisz” (albo „co widzisz na kamerze Kuchnia?”), Alfa dołączy do wiadomości zdjęcie z kamery — nazwanej w prośbie albo pierwszej włączonej. Działa tylko przy włączonych kamerach; zdjęcie zostaje w rozmowie jak każdy załącznik.",
+              "en": "When you write “describe what you see” (or “what do you see on camera Kitchen?”), Alfa attaches a photo from the camera — the one named in the request or the first enabled one. Works only while cameras are enabled; the photo stays in the conversation like any attachment."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
           }
         ],
         "upcoming": []
@@ -1974,6 +2010,7 @@
       "voice.noise_reduction": "standard",
       "voice.tts_style": "natural",
       "voice.tts_speed": 100,
+      "voice.tts_volume": 100,
       "voice.tts_pause": 200,
       "voice.tts_character": "subtle",
       "voice.mode": "toggle",
@@ -1996,6 +2033,7 @@
       "files.image_thumbnails": true,
       "diagnostician.autonomy": "auto_low_risk",
       "camera.enabled": false,
+      "camera.auto_look": true,
       "device.battery_mode": "auto",
       "device.game_mode": true,
       "ui.theme": "auto",

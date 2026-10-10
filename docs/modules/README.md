@@ -57,7 +57,7 @@ Punkty „do ustalenia w SPEC v1", odwołania do ADR i spike'ów.
 
 ## Indeks SPEC-ów (stan: październik 2026)
 
-77 specyfikacji modułów istniejących i 13 planowanych (plan v6, na końcu). Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
+77 specyfikacji modułów istniejących i 12 planowanych i 1 w budowie (`camera-hub`) (plan v6, na końcu). Wersję i stan SPEC-a (szkic, v0, v1 „zaimplementowany”) podaje jego nagłówek; zmiany po
 implementacji są w sekcjach „Zmiany po implementacji” / „Implementacja” na końcu pliku. Stan kryteriów akceptacji:
 `docs/STATUS.md`; crate'y: `crates/README.md`.
 
@@ -202,7 +202,7 @@ Moduły planu v6 ([`../plan/02-architektura-docelowa.md`](../plan/02-architektur
 | [`offline-client`](offline-client/SPEC.md)     | v6-F | Rozmowa przez API bez hosta i kolejka tur dopisywanych po powrocie jako nowa gałąź.                               |
 | [`platform-android`](platform-android/SPEC.md) | v6-F | Porty Androida 15+: magazyn kluczy, biometria przy podpisie, powiadomienia, skan QR.                              |
 | [`platform-linux`](platform-linux/SPEC.md)     | v6-G | Porty Linuksa: pliki z koszem, procesy, schowek, sekrety, skróty, zasobnik, audio (PipeWire).                     |
-| [`camera-hub`](camera-hub/SPEC.md) | v6-C3 | System kamer: USB, IP i Wi-Fi, kilka strumieni naraz, klatka na żądanie, podgląd; bez nagrywania. |
+| [`camera-hub`](camera-hub/SPEC.md) | v6-C3 | System kamer. **v0 jest w kodzie (0.0.16): kamery USB**, kilka strumieni naraz, klatka na żądanie, podgląd, usypianie; bez nagrywania. Kamery sieciowe — dalej. |
 | [`vision-describe`](vision-describe/SPEC.md) | v6-C3 | Opis obrazu z kamery na polecenie („opisz, co widzisz”): model lokalny albo chmurowy za zgodą. |
 | [`person-recognition`](person-recognition/SPEC.md) | v6-C3 | Rozpoznawanie zapisanych osób po twarzy; wzorce lokalne i zaszyfrowane; rozpoznanie nie jest zgodą. |
 | [`person-memory`](person-memory/SPEC.md) | v6-C3 | Rejestr osób i pamięć długoterminowa per osoba: profil, fakty, streszczenia rozmów. |

@@ -110,3 +110,7 @@ Wskaźnik kamery w belce okna i w pigułce głosowej.
 - Dekoder strumieni sieciowych: `ffmpeg` jako proces czy biblioteka RTSP w Rust — decyzja po próbie (C3.5).
 - Wyszukiwanie kamer ONVIF w sieci lokalnej a reguła „bez nasłuchu” — zakres do uzgodnienia z właścicielem.
 - Telefon jako kamera — po etapie D (kanał zdalny), osobny szkic.
+- **Po przeglądzie 2026-10-10** ([`../../reviews/2026-10-10-przeglad-kamer.md`](../../reviews/2026-10-10-przeglad-kamer.md)):
+  doszedł stan `Closing` (zatrzymana, zamknięcie niepotwierdzone — sygnał prywatności liczy go jak działającą kamerę)
+  i błąd `Busy` (drugie żądanie w czasie otwierania). Otwarte: K-04 (wątek zablokowany w `ReadSample`), K-08
+  (kierunek wierszy bez atrybutu sterownika), K-09 (ponawianie zapisu wyłączenia) — wszystkie do próby na sprzęcie.

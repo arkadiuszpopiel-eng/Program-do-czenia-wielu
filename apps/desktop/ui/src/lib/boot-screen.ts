@@ -48,3 +48,22 @@ export function finishBoot(minMs: number): void {
     remainingBootTime(performance.now(), started, minMs),
   );
 }
+
+/** Po tylu ms startu bez skutku ekran ładowania pokazuje wyjście („Zamknij program”). */
+export const BOOT_SLOW_MS = 20_000;
+
+/**
+ * Start się nie udał albo trwa zbyt długo: komunikat zamiast paska i przycisk zamknięcia okna
+ * (ekran ładowania zasłania belkę z przyciskami okna, więc musi mieć własne wyjście).
+ */
+export function bootProblem(message: string, close: () => void): void {
+  const boot = document.getElementById('alfa-boot');
+  if (!boot || boot.classList.contains('done')) return;
+  boot.classList.add('problem');
+  bootStep(message);
+  const quit = document.getElementById('alfa-boot-quit');
+  if (quit instanceof HTMLButtonElement) {
+    quit.hidden = false;
+    quit.onclick = close;
+  }
+}

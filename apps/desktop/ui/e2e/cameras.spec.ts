@@ -148,3 +148,58 @@ test('zdjęcie z kamery jako załącznik: przycisk tylko przy włączonych kamer
   await page.getByRole('menuitem', { name: 'Logitech C920' }).click();
   await expect(page.getByText(/^kamera-usb-logi-c920-\d+\.png/)).toBeVisible();
 });
+
+test('„opisz mi to, co widzisz” samo dołącza zdjęcie z kamery; bez kamer i po wyłączeniu pomocy — nie', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await page.goto('/');
+  await waitForChat(page);
+  const field = page.locator('#alfa-composer');
+  const sent = page.locator('.turn, article').filter({ hasText: /opisz mi to, co widzisz/i });
+
+  // Kamery wyłączone: zwykła wiadomość, bez zdjęcia.
+  await field.fill('Opisz mi to, co widzisz');
+  await field.press('Enter');
+  await expect(sent.first()).toBeVisible();
+  await expect(page.getByText(/kamera-usb-[a-z0-9-]+\.png/)).toHaveCount(0);
+
+  // Kamery włączone: prośba z nazwą kamery dołącza zdjęcie z tej kamery.
+  await page.keyboard.press('Control+,');
+  await page
+    .getByRole('navigation', { name: 'Sekcje ustawień' })
+    .getByRole('button', { name: 'Kamery', exact: true })
+    .click();
+  await master(page).click();
+  await expect(page.getByRole('switch', { name: /Opisz, co widzisz/ })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();
+  await field.fill('Co widzisz na kamerze Logitech C920?');
+  await field.press('Enter');
+  // Pierwszy Enter tylko dołącza zdjęcie: widać je przy polu, tekst zostaje, nic nie poszło.
+  const chip = page.getByText(/kamera-usb-logi-c920-\d+\.png/);
+  await expect(chip.first()).toBeVisible();
+  await expect(field).toHaveValue('Co widzisz na kamerze Logitech C920?');
+  await expect(page.getByText(/Dołączyłam zdjęcie z kamery „Logitech C920”/)).toBeVisible();
+  const asked = page
+    .locator('.turn, article')
+    .filter({ hasText: 'Co widzisz na kamerze Logitech' });
+  await expect(asked).toHaveCount(0);
+  // Drugi Enter wysyła wiadomość ze zdjęciem.
+  await field.press('Enter');
+  await expect(asked.first()).toBeVisible();
+  await expect(field).toHaveValue('');
+
+  // Pytanie o kod z „co widzisz” nie robi zdjęcia.
+  await field.fill('Co widzisz w tym kodzie?');
+  await field.press('Enter');
+  await expect(field).toHaveValue('');
+  await expect(page.getByText(/kamera-usb-[a-z0-9-]+\.png/)).toHaveCount(1);
+
+  // Zwykłe zdanie z „widzisz” niczego nie dołącza.
+  await field.fill('Jak widzisz, raport jest gotowy.');
+  await field.press('Enter');
+  await expect(page.getByText(/kamera-usb-[a-z0-9-]+\.png/)).toHaveCount(1);
+});

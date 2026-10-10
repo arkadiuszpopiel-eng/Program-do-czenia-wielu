@@ -27,14 +27,14 @@ Trzy pojęcia:
 
 ## Warstwy i reguły zależności (bez zmian)
 
-| Warstwa | Wzorzec nazw | Zależy od | Kto pilnuje |
-| --- | --- | --- | --- |
-| Kontrakty | `<m>-contract` | innych kontraktów, `lib-*` | `scripts/check-deps.sh` w CI |
-| Implementacje | `<m>-impl` | kontraktów; nigdy od cudzego `-impl` | `check-deps.sh` |
-| Atrapy | `<m>-fake` | kontraktów; tylko w testach | `check-deps.sh` |
-| Biblioteki | `lib-*` | `lib-*` i kontraktów | `check-deps.sh` |
-| Kompozycja | `app-*` | wszystkiego powyżej | `check-deps.sh` |
-| Powłoki i klienci | `apps/*` | `app-*` przez `app-api` | przegląd |
+| Warstwa           | Wzorzec nazw   | Zależy od                            | Kto pilnuje                  |
+| ----------------- | -------------- | ------------------------------------ | ---------------------------- |
+| Kontrakty         | `<m>-contract` | innych kontraktów, `lib-*`           | `scripts/check-deps.sh` w CI |
+| Implementacje     | `<m>-impl`     | kontraktów; nigdy od cudzego `-impl` | `check-deps.sh`              |
+| Atrapy            | `<m>-fake`     | kontraktów; tylko w testach          | `check-deps.sh`              |
+| Biblioteki        | `lib-*`        | `lib-*` i kontraktów                 | `check-deps.sh`              |
+| Kompozycja        | `app-*`        | wszystkiego powyżej                  | `check-deps.sh`              |
+| Powłoki i klienci | `apps/*`       | `app-*` przez `app-api`              | przegląd                     |
 
 Dodatkowo `deny.toml` dopuszcza crate `windows` tylko w crate'ach platformy. Plan v6 dodaje analogiczną regułę
 dla każdego nowego systemu (np. `zbus`, `jni` tylko w `platform-linux-*` / `platform-android-*`).
@@ -69,13 +69,13 @@ pub struct PlatformPorts {
 Najtrudniejszy szew, bo dotyka Jądra (zmiany tylko po przeglądzie właściciela). Dziś semantyka Windows jest
 wpisana w kontrakty, a nie odgrodzona `cfg`:
 
-| Miejsce | Dziś | Docelowo |
-| --- | --- | --- |
-| `safety-broker-contract/src/scope.rs` | ścieżki sprowadzane do małych liter z `\` | `PathScope` parametryzowany `PathFlavor` (Windows / POSIX): wielkość liter, separator, korzenie |
-| `compliance-contract/src/deny/path.rs` | listy zakazów rozwijają `%ZMIENNE%` profilu Windows | `PathEnv` per system; listy zakazów jako dane per system |
-| `safety-broker-contract/src/shell_guard.rs`, `tools-shell-contract` | reguły tylko dla `cmd` i PowerShell; `ShellKind = Pwsh / Powershell / Cmd` | analizator jako port z implementacją per powłoka; dochodzi `Posix` (bash/sh/zsh) |
-| `safety-broker-contract/src/ipc.rs` (`Hello`) | tożsamość procesu = SID + ścieżka obrazu | tożsamość abstrakcyjna: Windows — SID; Linux — UID + `SO_PEERCRED` |
-| `platform-contract` (listy `PROTECTED_IMAGES`, klasy UWP) | stałe Windows eksportowane z kontraktu | dane platformy dostarczane przez implementację |
+| Miejsce                                                             | Dziś                                                                       | Docelowo                                                                                        |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `safety-broker-contract/src/scope.rs`                               | ścieżki sprowadzane do małych liter z `\`                                  | `PathScope` parametryzowany `PathFlavor` (Windows / POSIX): wielkość liter, separator, korzenie |
+| `compliance-contract/src/deny/path.rs`                              | listy zakazów rozwijają `%ZMIENNE%` profilu Windows                        | `PathEnv` per system; listy zakazów jako dane per system                                        |
+| `safety-broker-contract/src/shell_guard.rs`, `tools-shell-contract` | reguły tylko dla `cmd` i PowerShell; `ShellKind = Pwsh / Powershell / Cmd` | analizator jako port z implementacją per powłoka; dochodzi `Posix` (bash/sh/zsh)                |
+| `safety-broker-contract/src/ipc.rs` (`Hello`)                       | tożsamość procesu = SID + ścieżka obrazu                                   | tożsamość abstrakcyjna: Windows — SID; Linux — UID + `SO_PEERCRED`                              |
+| `platform-contract` (listy `PROTECTED_IMAGES`, klasy UWP)           | stałe Windows eksportowane z kontraktu                                     | dane platformy dostarczane przez implementację                                                  |
 
 Uwaga: otwarte ustalenia analizatora powłoki (S-01…S-04, S-06) trzeba rozstrzygnąć **przed** tą przebudową,
 żeby nie przenosić znanych dziur do nowej struktury.
@@ -87,13 +87,13 @@ Uwaga: otwarte ustalenia analizatora powłoki (S-01…S-04, S-06) trzeba rozstrz
 (`apps/desktop/ui/src/lib/api/client.ts`) — ma dwie implementacje: `TauriAlfaClient` i `FakeAlfaClient`.
 To bardzo dobry punkt wyjścia. Brakuje pięciu rzeczy:
 
-| Brak | Skutek dziś | Rozwiązanie |
-| --- | --- | --- |
-| Numery sekwencji zdarzeń | klient, który nie nadąża, po cichu gubi paczki (`pump.rs`) | każde zdarzenie dostaje `seq`; host trzyma bufor ostatnich N; klient po przerwie prosi „od `seq`”, a gdy bufor nie sięga — dostaje `resync` i czyta stan od nowa |
-| Błędy strukturalne na łączu | powłoka spłaszcza `AppError` do tekstu | przez łącze idzie `{ code, message, details }`; tekst tłumaczy klient |
-| Tożsamość klienta i uprawnienia | jedyne ACL to uprawnienia okien Tauri | każda sesja klienta ma `ClientId`, rodzaj (okno / urządzenie sparowane) i zestaw dozwolonych poleceń |
-| Polecenia zakładające lokalną maszynę | okna dialogowe systemu, podgląd `asset:`, ścieżki bezwzględne w DTO | polecenia oznaczone `local_only`; dla klientów zdalnych odpowiedniki: wybór pliku z listy hosta, podgląd przesyłany strumieniem |
-| Typy TS pisane ręcznie | ryzyko rozjazdu przy trzech klientach | generator z Rust (ADR 0013); CI sprawdza `git diff --exit-code` |
+| Brak                                  | Skutek dziś                                                         | Rozwiązanie                                                                                                                                                      |
+| ------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Numery sekwencji zdarzeń              | klient, który nie nadąża, po cichu gubi paczki (`pump.rs`)          | każde zdarzenie dostaje `seq`; host trzyma bufor ostatnich N; klient po przerwie prosi „od `seq`”, a gdy bufor nie sięga — dostaje `resync` i czyta stan od nowa |
+| Błędy strukturalne na łączu           | powłoka spłaszcza `AppError` do tekstu                              | przez łącze idzie `{ code, message, details }`; tekst tłumaczy klient                                                                                            |
+| Tożsamość klienta i uprawnienia       | jedyne ACL to uprawnienia okien Tauri                               | każda sesja klienta ma `ClientId`, rodzaj (okno / urządzenie sparowane) i zestaw dozwolonych poleceń                                                             |
+| Polecenia zakładające lokalną maszynę | okna dialogowe systemu, podgląd `asset:`, ścieżki bezwzględne w DTO | polecenia oznaczone `local_only`; dla klientów zdalnych odpowiedniki: wybór pliku z listy hosta, podgląd przesyłany strumieniem                                  |
+| Typy TS pisane ręcznie                | ryzyko rozjazdu przy trzech klientach                               | generator z Rust (ADR 0013); CI sprawdza `git diff --exit-code`                                                                                                  |
 
 Ramka protokołu (szkic do ADR 0019):
 
@@ -122,30 +122,30 @@ procesu aplikacji (zdalny dostęp działa, gdy Alfa jest uruchomiona), potem wyd
 Klient pyta hosta, co ten potrafi, i pokazuje tylko to. Dzięki temu jeden interfejs obsługuje Windows z pełnym
 zestawem, Linuksa bez Office i telefon bez komputera.
 
-| Zdolność | Windows | Linux | Android bez komputera |
-| --- | --- | --- | --- |
-| Rozmowa — model chmurowy | tak | tak | tak |
-| Rozmowa — model lokalny | tak | tak | nie |
-| Głos (STT/TTS) | tak (WASAPI) | planowane (PipeWire) | planowane (API systemu) |
-| Narzędzia: pliki, sieć | tak | tak | nie |
-| Narzędzia: powłoka | tak | po analizatorze POSIX | nie |
-| Sterowanie komputerem (UIA, wejście, ekran) | tak | badawcze (AT-SPI, portale) | nie |
-| Office, rejestr | tak | nie | nie |
-| Pamięć i wyszukiwanie | tak | tak | tylko bieżąca rozmowa |
+| Zdolność                                    | Windows      | Linux                      | Android bez komputera   |
+| ------------------------------------------- | ------------ | -------------------------- | ----------------------- |
+| Rozmowa — model chmurowy                    | tak          | tak                        | tak                     |
+| Rozmowa — model lokalny                     | tak          | tak                        | nie                     |
+| Głos (STT/TTS)                              | tak (WASAPI) | planowane (PipeWire)       | planowane (API systemu) |
+| Narzędzia: pliki, sieć                      | tak          | tak                        | nie                     |
+| Narzędzia: powłoka                          | tak          | po analizatorze POSIX      | nie                     |
+| Sterowanie komputerem (UIA, wejście, ekran) | tak          | badawcze (AT-SPI, portale) | nie                     |
+| Office, rejestr                             | tak          | nie                        | nie                     |
+| Pamięć i wyszukiwanie                       | tak          | tak                        | tylko bieżąca rozmowa   |
 
 ## Moduły planu v6
 
-| Moduł | Rodzaj | Zadanie | Etap |
-| --- | --- | --- | --- |
-| `platform-select` | biblioteka kompozycji | wybór implementacji portów per system, mapa zdolności | B |
-| `remote-gateway` | moduł hosta | brama klientów: sesje, `seq`, ACL, ramki protokołu | D |
-| `device-pairing` | moduł hosta | parowanie QR, lista urządzeń, odwołanie, klucze | D |
-| `remote-relay` | osobna usługa | przekaźnik szyfrogramu; do postawienia samodzielnie | D |
-| `host-headless` | binarka | host bez okna | D |
-| `web-panel` | klient | PWA z interfejsem Svelte | E |
-| `offline-client` | biblioteka klienta | rozmowa przez API bez hosta, kolejka do scalenia | F |
-| `platform-android` | implementacje portów | magazyn kluczy, powiadomienia, biometria | F |
-| `platform-linux` | implementacje portów | pliki, procesy, schowek, skróty, zasobnik, sekrety, audio | G |
+| Moduł              | Rodzaj                | Zadanie                                                   | Etap |
+| ------------------ | --------------------- | --------------------------------------------------------- | ---- |
+| `platform-select`  | biblioteka kompozycji | wybór implementacji portów per system, mapa zdolności     | B    |
+| `remote-gateway`   | moduł hosta           | brama klientów: sesje, `seq`, ACL, ramki protokołu        | D    |
+| `device-pairing`   | moduł hosta           | parowanie QR, lista urządzeń, odwołanie, klucze           | D    |
+| `remote-relay`     | osobna usługa         | przekaźnik szyfrogramu; do postawienia samodzielnie       | D    |
+| `host-headless`    | binarka               | host bez okna                                             | D    |
+| `web-panel`        | klient                | PWA z interfejsem Svelte                                  | E    |
+| `offline-client`   | biblioteka klienta    | rozmowa przez API bez hosta, kolejka do scalenia          | F    |
+| `platform-android` | implementacje portów  | magazyn kluczy, powiadomienia, biometria                  | F    |
+| `platform-linux`   | implementacje portów  | pliki, procesy, schowek, skróty, zasobnik, sekrety, audio | G    |
 
 Szkice SPEC: [`../modules/README.md`](../modules/README.md), sekcja „Planowane (plan v6)”.
 

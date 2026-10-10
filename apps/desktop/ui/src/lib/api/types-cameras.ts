@@ -2,7 +2,7 @@
 // Kształty zgodne z `crates/app-api/src/dto` (snake_case, wyliczenia małymi literami).
 
 export type CameraKind = 'usb' | 'network';
-export type CameraStateName = 'asleep' | 'opening' | 'live' | 'failed' | 'unplugged';
+export type CameraStateName = 'asleep' | 'opening' | 'live' | 'closing' | 'failed' | 'unplugged';
 
 export interface CameraView {
   readonly id: string;

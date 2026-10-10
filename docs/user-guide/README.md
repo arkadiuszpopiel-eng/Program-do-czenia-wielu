@@ -7,7 +7,7 @@ w każdej chwili.
 
 ## Stan tej wersji (październik 2026)
 
-To wersja rozwojowa (0.0.6; lista zmian: [`CHANGELOG.md`](../../CHANGELOG.md)). Opisujemy tylko to, co jest w aplikacji. Tam, gdzie czegoś brakuje albo trzeba coś
+To wersja rozwojowa (0.0.17; lista zmian: [`CHANGELOG.md`](../../CHANGELOG.md)). Opisujemy tylko to, co jest w aplikacji. Tam, gdzie czegoś brakuje albo trzeba coś
 przygotować samodzielnie, w tekście są oznaczenia:
 
 | Oznaczenie              | Znaczenie                                                                                           |
@@ -36,6 +36,7 @@ Windows **nie były jeszcze testowane na sprzęcie**. Zanim zaczniesz codziennie
 10. [Modele lokalne i silniki](10-modele-i-silniki.md)
 11. [Pierwszy test na PC — lista kontrolna](11-pierwszy-test-na-pc.md) (budowa ze źródeł skryptem
     `scripts/setup-dev.ps1` i sprawdzenie krok po kroku na desktopie i laptopie)
+12. [Kamery](12-kamery.md) — kamery USB, podgląd, „opisz mi to, co widzisz”
 
 ## Skróty klawiszowe
 

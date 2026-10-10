@@ -150,6 +150,12 @@ fn output_layout(reader: &IMFSourceReader) -> Result<(u32, u32, i32), PlatformEr
     let (width, height) = halves(&current, &MF_MT_FRAME_SIZE)
         .filter(|(w, h)| *w > 0 && *h > 0)
         .ok_or_else(|| PlatformError::Io("kamera nie podała rozmiaru klatki".into()))?;
+    // Rozmiar pochodzi od sterownika: zanim cokolwiek zaalokujemy, musi mieścić się w limicie obrazu.
+    if u64::from(width) * u64::from(height) > platform_contract::MAX_IMAGE_PIXELS {
+        return Err(PlatformError::Io(
+            "kamera podała zbyt duży rozmiar klatki".into(),
+        ));
+    }
     // SAFETY: obiekt typu jest ważny. Atrybut jest liczbą ze znakiem zapisaną jako UINT32.
     let stride = unsafe { current.GetUINT32(&MF_MT_DEFAULT_STRIDE) }
         .map(|raw| i32::from_ne_bytes(raw.to_ne_bytes()))

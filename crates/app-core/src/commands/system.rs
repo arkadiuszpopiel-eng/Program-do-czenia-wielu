@@ -96,8 +96,11 @@ impl AppCore {
             zadania = tasks,
             "kill-switch: zatrzymano zadania schedulera"
         );
-        // Kamery: wszystkie strumienie zamknięte od razu (przełączników nie zmienia).
-        self.inner.cameras.hub.stop_all().await;
+        // Kamery: zatrzymanie w osobnym zadaniu — zawieszony sterownik kamery nie może opóźnić
+        // zatrzymania Brokera i agentek. Żądania w toku są unieważniane od razu; na zamknięcie
+        // strumieni czekamy krótko na końcu (przełączników nie zmienia).
+        let cameras = self.inner.cameras.hub.clone();
+        let cameras_stopped = tokio::spawn(async move { cameras.stop_all().await });
         // Przeglądarki agentek (F6): drzewa procesów zamknięte, zgody hostów wygasają.
         let _ = self.inner.agents.as_ref().map(|a| a.tools.kill_switch());
         if let Err(e) = self.inner.broker.kill_all(origin).await {
@@ -105,6 +108,14 @@ impl AppCore {
         }
         if let Err(e) = self.inner.voice.stop_speech().await {
             tracing::warn!(error = %e, "stop mowy przy kill-switchu nie powiódł się");
+        }
+        if tokio::time::timeout(std::time::Duration::from_secs(2), cameras_stopped)
+            .await
+            .is_err()
+        {
+            tracing::warn!(
+                "kill-switch: kamery zamykają się dłużej niż 2 s (zamykanie trwa w tle)"
+            );
         }
         // Dyktowanie wpisuje tekst do cudzych okien — STOP WSZYSTKIEGO musi je też zakończyć
         // (wcześniej zatrzymywała je tylko komenda głosowa). Brak aktywnego dyktowania to nie błąd.

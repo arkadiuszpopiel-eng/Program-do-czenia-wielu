@@ -10,26 +10,26 @@ Definicja MVP: [`../ACCEPTANCE.md`](../ACCEPTANCE.md) §2 — scenariusz sześci
 fale F0–F3 planu v5: rozmowa z modelem lokalnym, głos podstawowy, cztery agentki, Broker z oknem zgód,
 watchdog, kill-switch, „Cofnij”, narzędzia plików, powłoki i schowka.
 
-| Element | Stan kodu | Stan na sprzęcie |
-| --- | --- | --- |
-| Uruchomienie, okna, zasobnik, skalowanie 1280–3840 px | jest | ✅ laptop (testy `e2e-app` 11/11 na prawdziwej aplikacji) |
-| Style interfejsu: Klasyczny, Szkło, Next (jasny i ciemny) | jest | obejrzane w przeglądarce na atrapie; w prawdziwej aplikacji — po przebudowie 0.0.3 |
-| Rozmowa z modelem lokalnym | jest | **nie sprawdzone** — brak silnika na laptopie (czeka na pobranie pakietu) |
-| Głos: dyktowanie, czytanie, rozmowa | jest | **nie sprawdzone** — jw. |
-| Broker poza procesem, okno zgód, watchdog | jest | **nie sprawdzone** na żadnej maszynie (tryb deweloperski: Broker w procesie) |
-| Instalator NSIS, aktualizacje side-by-side | jest | nie sprawdzone lokalnie |
-| Narzędzia agentek z „Cofnij” | jest | testy na prawdziwych procesach (m.in. kodowanie wyjścia powłok) |
+| Element                                                   | Stan kodu | Stan na sprzęcie                                                                   |
+| --------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------- |
+| Uruchomienie, okna, zasobnik, skalowanie 1280–3840 px     | jest      | ✅ laptop (testy `e2e-app` 11/11 na prawdziwej aplikacji)                          |
+| Style interfejsu: Klasyczny, Szkło, Next (jasny i ciemny) | jest      | obejrzane w przeglądarce na atrapie; w prawdziwej aplikacji — po przebudowie 0.0.3 |
+| Rozmowa z modelem lokalnym                                | jest      | **nie sprawdzone** — brak silnika na laptopie (czeka na pobranie pakietu)          |
+| Głos: dyktowanie, czytanie, rozmowa                       | jest      | **nie sprawdzone** — jw.                                                           |
+| Broker poza procesem, okno zgód, watchdog                 | jest      | **nie sprawdzone** na żadnej maszynie (tryb deweloperski: Broker w procesie)       |
+| Instalator NSIS, aktualizacje side-by-side                | jest      | nie sprawdzone lokalnie                                                            |
+| Narzędzia agentek z „Cofnij”                              | jest      | testy na prawdziwych procesach (m.in. kodowanie wyjścia powłok)                    |
 
 Pełna macierz: [`../STATUS.md`](../STATUS.md); streszczenie: [`00-stan-wykonania.md`](00-stan-wykonania.md).
 
 ## Wymagania sprzętowe
 
-| Klasa | Przykład | Co działa |
-| --- | --- | --- |
-| Minimalna | procesor 4 rdzenie, 8 GB RAM, bez karty | rozmowa z małym modelem na procesorze albo przez chmurę; głos wolny |
-| Bazowa (laptop CUDA) | i7-13620H, RTX 4050 6 GB, 16 GB RAM | model 7B na karcie, głos, agentki z narzędziami |
-| Desktop AMD | karta AMD przez Vulkan | jak bazowa; rozpoznawanie mowy na procesorze — do pomiaru |
-| Mocna | karta 12–24 GB | modele 11B i większe, model obrazu obok czatu |
+| Klasa                | Przykład                                | Co działa                                                           |
+| -------------------- | --------------------------------------- | ------------------------------------------------------------------- |
+| Minimalna            | procesor 4 rdzenie, 8 GB RAM, bez karty | rozmowa z małym modelem na procesorze albo przez chmurę; głos wolny |
+| Bazowa (laptop CUDA) | i7-13620H, RTX 4050 6 GB, 16 GB RAM     | model 7B na karcie, głos, agentki z narzędziami                     |
+| Desktop AMD          | karta AMD przez Vulkan                  | jak bazowa; rozpoznawanie mowy na procesorze — do pomiaru           |
+| Mocna                | karta 12–24 GB                          | modele 11B i większe, model obrazu obok czatu                       |
 
 Pakiety modeli „od 6 (wzorcowy) do 1 (minimalny)” w Ustawienia → Modele i silniki dobierają zestaw do klasy.
 
@@ -45,16 +45,16 @@ Kolejność i stan: [`03-roadmapa.md`](03-roadmapa.md), etapy A, B, C.
 
 ## Specyfika Windows, która zostaje
 
-| Obszar | Rozwiązanie | Uwagi |
-| --- | --- | --- |
-| Okno i tło | WebView2; tło przez natywną Mica (własny pasek tytułu — planowany, C1.5) | `backdrop-filter` zabroniony |
-| Audio | WASAPI (crate `wasapi`), AEC z własną referencją | ADR 0011 |
-| Sekrety | Windows Credential Manager | jedyne miejsce na klucze |
-| Jądro | usługa `AlfaBroker` albo tryb przenośny; potok nazwany z DACL; okno zgód na podwyższonej integralności | ADR 0003 |
-| Zgody lokalne | fizyczne kliknięcie albo Windows Hello | zostaje obok zgód zdalnych (ADR 0022) |
-| Instalacja | NSIS na użytkownika, wersje obok siebie, podpis minisign | ADR 0007; brak Authenticode |
-| Skróty | reguła AltGr; kill-switch `Ctrl+Shift+F12` | ADR 0010 |
-| Powłoki | PowerShell i `cmd` z analizatorem poleceń | otwarte ustalenia S-01…S-04, S-06 |
+| Obszar        | Rozwiązanie                                                                                            | Uwagi                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| Okno i tło    | WebView2; tło przez natywną Mica (własny pasek tytułu — planowany, C1.5)                               | `backdrop-filter` zabroniony          |
+| Audio         | WASAPI (crate `wasapi`), AEC z własną referencją                                                       | ADR 0011                              |
+| Sekrety       | Windows Credential Manager                                                                             | jedyne miejsce na klucze              |
+| Jądro         | usługa `AlfaBroker` albo tryb przenośny; potok nazwany z DACL; okno zgód na podwyższonej integralności | ADR 0003                              |
+| Zgody lokalne | fizyczne kliknięcie albo Windows Hello                                                                 | zostaje obok zgód zdalnych (ADR 0022) |
+| Instalacja    | NSIS na użytkownika, wersje obok siebie, podpis minisign                                               | ADR 0007; brak Authenticode           |
+| Skróty        | reguła AltGr; kill-switch `Ctrl+Shift+F12`                                                             | ADR 0010                              |
+| Powłoki       | PowerShell i `cmd` z analizatorem poleceń                                                              | otwarte ustalenia S-01…S-04, S-06     |
 
 ## Windows jako host dla innych klientów
 

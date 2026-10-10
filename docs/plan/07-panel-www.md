@@ -30,37 +30,37 @@ w przeglądarce (do rozpisania w SPEC `web-panel`).
 
 Wszystko, co host ogłasza w mapie zdolności, z odpowiednikami dla działań lokalnych:
 
-| W oknie na komputerze | W panelu |
-| --- | --- |
-| Okno wyboru pliku systemu | przeglądarka plików hosta (w zakresie katalogu roboczego) albo wysłanie pliku z urządzenia |
-| „Otwórz”, „Pokaż w Eksploratorze” | „Pobierz na to urządzenie”, podgląd przesyłany strumieniem |
-| Okno Brokera | karta zgody w panelu + potwierdzenie kluczem dostępu (E.4) |
-| Skróty globalne | brak; skróty w obrębie karty przeglądarki działają |
-| Głos | mikrofon i głośnik przeglądarki; rozpoznawanie i synteza na hoście — po F.5, jeśli opóźnienie pozwoli |
-| Terminal | dostępny; dane terminala tylko kanałem E2E, nigdy w logach (reguła już obowiązuje) |
-| Kill-switch | przycisk STOP zawsze widoczny; polecenie o najwyższym priorytecie |
+| W oknie na komputerze             | W panelu                                                                                              |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Okno wyboru pliku systemu         | przeglądarka plików hosta (w zakresie katalogu roboczego) albo wysłanie pliku z urządzenia            |
+| „Otwórz”, „Pokaż w Eksploratorze” | „Pobierz na to urządzenie”, podgląd przesyłany strumieniem                                            |
+| Okno Brokera                      | karta zgody w panelu + potwierdzenie kluczem dostępu (E.4)                                            |
+| Skróty globalne                   | brak; skróty w obrębie karty przeglądarki działają                                                    |
+| Głos                              | mikrofon i głośnik przeglądarki; rozpoznawanie i synteza na hoście — po F.5, jeśli opóźnienie pozwoli |
+| Terminal                          | dostępny; dane terminala tylko kanałem E2E, nigdy w logach (reguła już obowiązuje)                    |
+| Kill-switch                       | przycisk STOP zawsze widoczny; polecenie o najwyższym priorytecie                                     |
 
 ## Technika
 
-| Element | Rozwiązanie | Uwagi |
-| --- | --- | --- |
-| Kod | ten sam pakiet interfejsu (`apps/desktop/ui`), nowy punkt wejścia i cel budowy | bez rozgałęziania komponentów; różnice przez mapę zdolności |
-| Transport | WebSocket do przekaźnika + kanał szyfrowany w przeglądarce (WebCrypto / WASM) | przeglądarka nie obsłuży iroh — stąd WebSocket jako wspólna baza |
-| Klucze | klucz dostępu WebAuthn związany z domeną panelu; klucz kanału w IndexedDB jako nieeksportowalny `CryptoKey` | |
-| PWA | manifest, instalacja na ekranie głównym, pamięć podręczna powłoki aplikacji | treść rozmów nie trafia do pamięci podręcznej service workera |
-| Powiadomienia | Web Push bez treści: „Alfa czeka na Twoją zgodę” → po otwarciu pobranie przez kanał E2E | iOS poza zakresem planu |
-| Typy | generowane z Rust (B.1) | wspólne z oknem Tauri i Androidem |
-| Markdown | host renderuje do HTML w Rust (reguła twarda) — panel tylko wstawia wynik | bez zmian |
-| Fonty | systemowe; bez fontów webowych | reguła twarda obowiązuje też w panelu |
+| Element       | Rozwiązanie                                                                                                 | Uwagi                                                            |
+| ------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Kod           | ten sam pakiet interfejsu (`apps/desktop/ui`), nowy punkt wejścia i cel budowy                              | bez rozgałęziania komponentów; różnice przez mapę zdolności      |
+| Transport     | WebSocket do przekaźnika + kanał szyfrowany w przeglądarce (WebCrypto / WASM)                               | przeglądarka nie obsłuży iroh — stąd WebSocket jako wspólna baza |
+| Klucze        | klucz dostępu WebAuthn związany z domeną panelu; klucz kanału w IndexedDB jako nieeksportowalny `CryptoKey` |                                                                  |
+| PWA           | manifest, instalacja na ekranie głównym, pamięć podręczna powłoki aplikacji                                 | treść rozmów nie trafia do pamięci podręcznej service workera    |
+| Powiadomienia | Web Push bez treści: „Alfa czeka na Twoją zgodę” → po otwarciu pobranie przez kanał E2E                     | iOS poza zakresem planu                                          |
+| Typy          | generowane z Rust (B.1)                                                                                     | wspólne z oknem Tauri i Androidem                                |
+| Markdown      | host renderuje do HTML w Rust (reguła twarda) — panel tylko wstawia wynik                                   | bez zmian                                                        |
+| Fonty         | systemowe; bez fontów webowych                                                                              | reguła twarda obowiązuje też w panelu                            |
 
 ## Hosting panelu
 
 Panel to pliki statyczne. Dwie opcje (do decyzji właściciela przy E.7):
 
-| Opcja | Zalety | Wady |
-| --- | --- | --- |
-| Własna domena właściciela + przekaźnik na tym samym serwerze | pełna kontrola; zagrożenie R7 ograniczone do własnego serwera | utrzymanie serwera i certyfikatu |
-| Hosting statyczny u dostawcy + osobny przekaźnik | najprostsze | zaufanie do dostawcy co do integralności plików |
+| Opcja                                                        | Zalety                                                        | Wady                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------------- | ----------------------------------------------- |
+| Własna domena właściciela + przekaźnik na tym samym serwerze | pełna kontrola; zagrożenie R7 ograniczone do własnego serwera | utrzymanie serwera i certyfikatu                |
+| Hosting statyczny u dostawcy + osobny przekaźnik             | najprostsze                                                   | zaufanie do dostawcy co do integralności plików |
 
 W obu przypadkach: ścisła polityka CSP (bez skryptów z zewnątrz, bez `eval`), integralność zasobów,
 wersjonowane wydania, nagłówki izolacji. Kod panelu jest publiczny i nie zawiera sekretów — bezpieczeństwo
