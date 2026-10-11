@@ -75,8 +75,8 @@ pub struct SystemVoice {
     /// Ostatnio złożone rozpoznawanie ze strażnikiem (rozmowa albo dyktowanie) — do podglądu
     /// stanu bezpiecznika i telemetrii w Ustawieniach.
     pub(crate) guard: std::sync::Mutex<Option<Arc<GuardedStt>>>,
-    /// Czy ostatnio złożony Qwen3-ASR liczy na karcie (`None` — jeszcze nie był składany).
-    pub(crate) stt_on_gpu: std::sync::Mutex<Option<bool>>,
+    /// Plan rozpoznawania z ostatniego złożenia (`None` — jeszcze nie było składane).
+    pub(crate) stt_plan: std::sync::Mutex<Option<app_modules::stt::SttPlan>>,
     /// Ustawienia rozmowy (Smart Turn, próg, najdłuższa cisza, silnik rozpoznawania).
     pub(crate) talk: crate::talk::TalkSettings,
     /// Liczniki modelu końca wypowiedzi (wspólne dla kolejnych rozmów).
@@ -138,7 +138,7 @@ impl SystemVoice {
             noise: NoiseSetting::default(),
             meter: None,
             guard: std::sync::Mutex::new(None),
-            stt_on_gpu: std::sync::Mutex::new(None),
+            stt_plan: std::sync::Mutex::new(None),
             talk: crate::talk::TalkSettings::default(),
             turn_stats: voice_turn_impl::TurnStats::default(),
         }

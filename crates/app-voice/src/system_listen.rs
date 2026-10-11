@@ -72,21 +72,30 @@ impl SystemVoice {
         if self.talk.whisper_only() {
             return Ok(whisper);
         }
-        // Pomiar wolnej pamięci karty: gdy zajął ją model rozmowy, Qwen3-ASR liczy na procesorze.
-        let free = app_modules::gpu_mem::nvidia_free_mb();
-        let Some(config) = app_modules::stt::qwen(&self.paths, free) else {
+        // Silnik i model są na miejscu? (bez pomiaru: flaga `gpu` mówi, czy to kompilacja na kartę)
+        let Some(mut config) = app_modules::stt::qwen(&self.paths, None) else {
             return Ok(whisper);
         };
-        let on_gpu = config.gpu;
-        tracing::info!(on_gpu, free_vram_mb = ?free, "Qwen3-ASR: wybór karta / procesor");
+        // Pomiar wolnej pamięci karty: gdy zajął ją model rozmowy, wybieramy silnik, który da radę.
+        let free = app_modules::gpu_mem::nvidia_free_mb();
+        let plan = app_modules::stt::stt_plan(
+            config.gpu,
+            app_modules::stt::server_cuda(&self.paths).is_some(),
+            free,
+        );
+        tracing::info!(?plan, free_vram_mb = ?free, "rozpoznawanie mowy: wybór silnika");
+        *self
+            .stt_plan
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(plan);
+        if plan == app_modules::stt::SttPlan::WhisperGpu {
+            return Ok(whisper);
+        }
+        config.gpu = plan == app_modules::stt::SttPlan::QwenGpu;
         match QwenStt::new(config, Arc::new(ProcessLauncher)) {
             Ok(qwen) => {
                 let qwen = Arc::new(qwen);
                 idle_unload(&qwen);
-                *self
-                    .stt_on_gpu
-                    .lock()
-                    .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(on_gpu);
                 let guarded = Arc::new(GuardedStt::new(qwen, whisper));
                 *self
                     .guard

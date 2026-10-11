@@ -209,6 +209,18 @@ Bez rozgrzewki silników pierwsza wypowiedź czekała 1,7 s (model w pamięci po
 Nagranie ma na końcu ok. 0,2 s ciszy, więc czasy „od końca mowy” są o tyle dłuższe. Czas myślenia modelu rozmowy
 nie jest tu wliczony.
 
+### Karta czy procesor (pomiar 2026-10-12, zdanie 4 s, laptop z RTX 4050 6 GB)
+
+| Silnik | Na karcie | Na procesorze |
+| --- | --- | --- |
+| Qwen3-ASR 1.7B Q8 (ciepły) | 0,26 s | 2,4 s |
+| Qwen3-ASR — zimny start | 2,4 s | 6,2 s |
+| Whisper large-v3-turbo q5 | ok. 3 s razem z wczytaniem modelu | 54 s |
+
+Wniosek zapisany w `app_modules::stt::stt_plan`: wolne ≥ 3,2 GB — Qwen3-ASR na karcie; wolne ≥ 1,6 GB i jest
+kompilacja Whispera na kartę — sam Whisper na karcie; inaczej Qwen3-ASR na procesorze. Zapas Whispera na
+procesorze bierze mały model (`WhisperServerConfig::cpu_model_path`).
+
 ## 9. Kryteria odbioru P1
 
 Testy przepisane z Delty: bezpiecznik (otwarcie po 3., jedna próba po czasie), flagi jakości, bramka mowy, odrzut

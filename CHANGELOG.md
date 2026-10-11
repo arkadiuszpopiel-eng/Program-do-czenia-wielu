@@ -12,6 +12,28 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.38 — 2026-10-12
+
+Rozpoznawanie mowy dobiera silnik do zajętości karty graficznej — według pomiarów z tego laptopa.
+
+### Głos
+
+- [poważne] Gdy model rozmowy zajmie kartę graficzną, Alfa wybiera silnik rozpoznawania, który da radę: Qwen3-ASR
+  na karcie przy co najmniej 3,2 GB wolnej pamięci; sam Whisper na karcie przy co najmniej 1,6 GB; w pozostałych
+  przypadkach Qwen3-ASR na procesorze. Powód: zmierzone czasy dla zdania 4-sekundowego — Qwen3-ASR na karcie
+  0,26 s, na procesorze 2,4 s, a Whisper turbo na procesorze 54 s.
+- [poważne] Zapas Whispera po nieudanym starcie na karcie używa małego modelu (jeśli jest pobrany), a nie dużego,
+  który na procesorze jest za wolny do rozmowy.
+
+### Modele i silniki
+
+- Pakiety Wzorcowy, Bardzo dobry i Dobry zawierają mały model Whisper (181 MB) jako zapas na procesor.
+
+### Testy
+
+- Plan wyboru silnika dla sześciu przypadków zajętości karty; model na procesor w argumentach silnika; skład
+  pakietów. Pomiar na prawdziwych silnikach: `qwen_live` z `ALFA_QWEN_CPU=1` i program `whisper-cli`.
+
 ## 0.0.37 — 2026-10-12
 
 „Wstecz” i „Dalej” jak w przeglądarce oraz liczniki modelu końca wypowiedzi.

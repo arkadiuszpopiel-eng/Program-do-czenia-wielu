@@ -49,6 +49,15 @@
         "fallback": false
       },
       {
+        "id": "whisper-small-q5_1",
+        "name": "Whisper small-q5_1",
+        "kind": "stt",
+        "state": "missing",
+        "size_bytes": 189792256,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "supertonic-3",
         "name": "Supertonic 3 (31 języków, 10 barw)",
         "kind": "tts",
@@ -157,10 +166,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 9356759255,
-    "missing_bytes": 9356759255,
+    "size_bytes": 9546551511,
+    "missing_bytes": 9546551511,
     "installed": 0,
-    "total": 15,
+    "total": 16,
     "state": "not_installed",
     "fit": {
       "kind": "too_weak",
@@ -291,6 +300,15 @@
         "fallback": false
       },
       {
+        "id": "whisper-small-q5_1",
+        "name": "Whisper small-q5_1",
+        "kind": "stt",
+        "state": "missing",
+        "size_bytes": 189792256,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "supertonic-3",
         "name": "Supertonic 3 (31 języków, 10 barw)",
         "kind": "tts",
@@ -381,10 +399,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6792082654,
-    "missing_bytes": 6792082654,
+    "size_bytes": 6981874910,
+    "missing_bytes": 6981874910,
     "installed": 0,
-    "total": 12,
+    "total": 13,
     "state": "not_installed",
     "fit": {
       "kind": "tight",
@@ -504,6 +522,15 @@
         "fallback": false
       },
       {
+        "id": "whisper-small-q5_1",
+        "name": "Whisper small-q5_1",
+        "kind": "stt",
+        "state": "missing",
+        "size_bytes": 189792256,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "supertonic-3",
         "name": "Supertonic 3 (31 języków, 10 barw)",
         "kind": "tts",
@@ -594,10 +621,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 3430347998,
-    "missing_bytes": 3430347998,
+    "size_bytes": 3620140254,
+    "missing_bytes": 3620140254,
     "installed": 0,
-    "total": 12,
+    "total": 13,
     "state": "not_installed",
     "fit": {
       "kind": "fits",

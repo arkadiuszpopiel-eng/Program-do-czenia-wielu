@@ -57,10 +57,12 @@ impl SystemVoice {
         let qwen = (!self.talk.whisper_only())
             .then(|| app_modules::stt::qwen(&self.paths, None))
             .flatten();
-        let chosen = *self
-            .stt_on_gpu
+        let plan = *self
+            .stt_plan
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
+        // Karta zajęta przez inny model: ostatnio rozpoznawał sam Whisper na karcie.
+        let qwen = qwen.filter(|_| plan != Some(app_modules::stt::SttPlan::WhisperGpu));
         let guard = self
             .guard
             .lock()
@@ -70,7 +72,7 @@ impl SystemVoice {
         let stt = match (&qwen, whisper) {
             (Some(cfg), true) => SttEngineView {
                 engine: SttEngineKind::QwenAsr,
-                gpu: chosen.unwrap_or(cfg.gpu),
+                gpu: plan.map_or(cfg.gpu, |p| p == app_modules::stt::SttPlan::QwenGpu),
                 fallback: Some(SttEngineKind::Whisper),
                 missing: Vec::new(),
                 guard,
@@ -83,7 +85,9 @@ impl SystemVoice {
                     .is_file(),
                 fallback: None,
                 // Wybór „tylko Whisper” to decyzja użytkownika — nic nie brakuje.
-                missing: if self.talk.whisper_only() {
+                missing: if self.talk.whisper_only()
+                    || plan == Some(app_modules::stt::SttPlan::WhisperGpu)
+                {
                     Vec::new()
                 } else {
                     app_modules::stt::qwen_missing(&self.paths)

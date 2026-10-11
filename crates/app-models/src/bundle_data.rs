@@ -172,6 +172,7 @@ pub const DEFS: [Def; 6] = [
             LLM_BIG,
             STT_QWEN,
             STT_TURBO,
+            STT_SMALL,
             TTS_SUPERTONIC,
             TTS_PIPER,
             SMART_TURN,
@@ -203,6 +204,7 @@ pub const DEFS: [Def; 6] = [
         models: &[
             LLM_BIG,
             STT_TURBO,
+            STT_SMALL,
             TTS_SUPERTONIC,
             TTS_PIPER,
             SMART_TURN,
@@ -232,6 +234,7 @@ pub const DEFS: [Def; 6] = [
         models: &[
             LLM_SMALL,
             STT_TURBO,
+            STT_SMALL,
             TTS_SUPERTONIC,
             TTS_PIPER,
             SMART_TURN,

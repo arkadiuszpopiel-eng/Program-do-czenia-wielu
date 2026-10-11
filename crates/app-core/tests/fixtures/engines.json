@@ -2388,6 +2388,15 @@
             "fallback": false
           },
           {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "supertonic-3",
             "name": "Supertonic 3",
             "kind": "tts",
@@ -2496,10 +2505,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 9388949504,
-        "missing_bytes": 8877244416,
+        "size_bytes": 9578741760,
+        "missing_bytes": 9067036672,
         "installed": 1,
-        "total": 15,
+        "total": 16,
         "state": "partial",
         "fit": {
           "kind": "too_weak",
@@ -2630,6 +2639,15 @@
             "fallback": false
           },
           {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "supertonic-3",
             "name": "Supertonic 3",
             "kind": "tts",
@@ -2720,10 +2738,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 6824132608,
-        "missing_bytes": 6312427520,
+        "size_bytes": 7013924864,
+        "missing_bytes": 6502219776,
         "installed": 1,
-        "total": 12,
+        "total": 13,
         "state": "partial",
         "fit": {
           "kind": "tight",
@@ -2843,6 +2861,15 @@
             "fallback": false
           },
           {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "supertonic-3",
             "name": "Supertonic 3",
             "kind": "tts",
@@ -2933,10 +2960,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 3462397952,
-        "missing_bytes": 2950692864,
+        "size_bytes": 3652190208,
+        "missing_bytes": 3140485120,
         "installed": 1,
-        "total": 12,
+        "total": 13,
         "state": "partial",
         "fit": {
           "kind": "fits",
@@ -3768,6 +3795,15 @@
             "fallback": false
           },
           {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "supertonic-3",
             "name": "Supertonic 3",
             "kind": "tts",
@@ -3876,10 +3912,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 9388949504,
-        "missing_bytes": 8781824000,
+        "size_bytes": 9578741760,
+        "missing_bytes": 8971616256,
         "installed": 2,
-        "total": 15,
+        "total": 16,
         "state": "needs_trust",
         "fit": {
           "kind": "too_weak",
@@ -4010,6 +4046,15 @@
             "fallback": false
           },
           {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "supertonic-3",
             "name": "Supertonic 3",
             "kind": "tts",
@@ -4100,10 +4145,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 6824132608,
-        "missing_bytes": 6217007104,
+        "size_bytes": 7013924864,
+        "missing_bytes": 6406799360,
         "installed": 2,
-        "total": 12,
+        "total": 13,
         "state": "needs_trust",
         "fit": {
           "kind": "tight",
@@ -4223,6 +4268,15 @@
             "fallback": false
           },
           {
+            "id": "whisper-small-q5_1",
+            "name": "Whisper small-q5_1",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 189792256,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "supertonic-3",
             "name": "Supertonic 3",
             "kind": "tts",
@@ -4313,10 +4367,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 3462397952,
-        "missing_bytes": 1156579328,
+        "size_bytes": 3652190208,
+        "missing_bytes": 1346371584,
         "installed": 2,
-        "total": 12,
+        "total": 13,
         "state": "needs_trust",
         "fit": {
           "kind": "fits",

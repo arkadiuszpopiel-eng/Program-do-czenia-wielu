@@ -51,6 +51,10 @@ pub struct WhisperServerConfig {
     pub binaries: SidecarBinaries,
     /// Plik modelu GGML (`ggml-large-v3-turbo-q5_0.bin`, hash sprawdza instalator modeli).
     pub model_path: PathBuf,
+    /// Osobny model dla startu na procesorze (`None` — ten sam). Duży model jest na procesorze
+    /// o rząd wolniejszy od mowy (zmierzone: `large-v3-turbo` 54 s na zdanie 4 s), więc zapas
+    /// po nieudanym starcie na karcie powinien wziąć mały model.
+    pub cpu_model_path: Option<PathBuf>,
     /// Wątki CPU.
     pub threads: u16,
     /// Limit startu (ładowanie modelu).
@@ -69,6 +73,7 @@ impl WhisperServerConfig {
         Self {
             binaries,
             model_path,
+            cpu_model_path: None,
             threads: 4,
             startup_timeout: Duration::from_secs(60),
             request_timeout: Duration::from_secs(30),
@@ -80,9 +85,13 @@ impl WhisperServerConfig {
 
 /// Argumenty `whisper-server` dla backendu i portu.
 pub fn build_args(cfg: &WhisperServerConfig, backend: Backend, port: u16) -> Vec<String> {
+    let model = match (backend, &cfg.cpu_model_path) {
+        (Backend::Cpu, Some(cpu)) => cpu,
+        _ => &cfg.model_path,
+    };
     let mut args = vec![
         "-m".to_owned(),
-        cfg.model_path.display().to_string(),
+        model.display().to_string(),
         "--host".into(),
         "127.0.0.1".into(),
         "--port".into(),
@@ -239,6 +248,19 @@ mod tests {
         assert!(cpu.windows(2).any(|w| w == ["--host", "127.0.0.1"]));
         let gpu = build_args(&cfg, Backend::Vulkan, 1);
         assert!(!gpu.contains(&"-ng".to_owned()) && gpu.contains(&"-fa".to_owned()));
+        // Osobny model na procesor: karta bierze duży, procesor mały.
+        let mut split = cfg.clone();
+        split.cpu_model_path = Some("ggml-small-q5_1.bin".into());
+        let model_of = |args: &[String]| args[1].clone();
+        assert_eq!(
+            model_of(&build_args(&split, Backend::Cpu, 1)),
+            "ggml-small-q5_1.bin"
+        );
+        assert_eq!(
+            model_of(&build_args(&split, Backend::Cuda, 1)),
+            "ggml-large-v3-turbo-q5_0.bin"
+        );
+        assert_eq!(model_of(&cpu), "ggml-large-v3-turbo-q5_0.bin");
         assert_eq!(bins.for_backend(Backend::Cuda), None);
         assert_eq!(
             bins.for_backend(Backend::Cpu),

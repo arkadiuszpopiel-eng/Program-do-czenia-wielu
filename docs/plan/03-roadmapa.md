@@ -310,6 +310,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-12 | Wersja 0.0.38: P1 — wybór silnika rozpoznawania wg zajętości karty (pomiary: Qwen3-ASR 0,26 s na karcie, 2,4 s na procesorze; Whisper turbo 54 s na procesorze), mały model Whisper jako zapas na procesor. |
 | 2026-10-12 | Wersja 0.0.37: P3 — „Wstecz / Dalej” po odwiedzonych miejscach; P1 — liczniki modelu Smart Turn na karcie „Silniki rozmowy”. |
 | 2026-10-12 | Wersja 0.0.36: P2 — karty graficzne na żywo na stronie „Urządzenia” (pamięć, obciążenie, temperatura, moc, programy; silniki Alfy oznaczone). |
 | 2026-10-12 | Wersja 0.0.35: P1 — karta „Silniki rozmowy” (stan strażnika, bezpiecznik, telemetria), ustawienia rozmowy, wybór karta / procesor dla Qwen3-ASR wg wolnej pamięci, nowe silniki głosu w pakietach. |

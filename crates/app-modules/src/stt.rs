@@ -23,6 +23,38 @@ pub fn qwen_on_gpu(gpu_build: bool, free_vram_mb: Option<u32>) -> bool {
     gpu_build && free_vram_mb.is_none_or(|free| free >= QWEN_MIN_FREE_VRAM_MB)
 }
 
+/// Wolna pamięć karty, przy której Whisper turbo zmieści się na karcie obok innych modeli.
+pub const WHISPER_MIN_FREE_VRAM_MB: u32 = 1_600;
+
+/// Który silnik rozpoznaje mowę przy danej wolnej pamięci karty.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SttPlan {
+    /// Qwen3-ASR na karcie (ok. 0,3 s na zdanie).
+    QwenGpu,
+    /// Sam Whisper na karcie — Qwen3-ASR się nie mieści, a Whisper tak.
+    WhisperGpu,
+    /// Qwen3-ASR na procesorze (ok. 2,4 s na zdanie) z Whisperem w zapasie.
+    QwenCpu,
+}
+
+/// Plan rozpoznawania. Pomiary z laptopa z RTX 4050 (2026-10-12, zdanie 4 s): Qwen3-ASR na karcie
+/// 0,26 s, na procesorze 2,4 s; Whisper turbo na procesorze 54 s — dlatego przy zajętej karcie
+/// Whisper jest wybierany tylko wtedy, gdy sam zmieści się na karcie, a inaczej zostaje Qwen3-ASR
+/// na procesorze.
+pub fn stt_plan(
+    qwen_gpu_build: bool,
+    whisper_gpu_build: bool,
+    free_vram_mb: Option<u32>,
+) -> SttPlan {
+    if qwen_on_gpu(qwen_gpu_build, free_vram_mb) {
+        return SttPlan::QwenGpu;
+    }
+    match free_vram_mb {
+        Some(free) if whisper_gpu_build && free >= WHISPER_MIN_FREE_VRAM_MB => SttPlan::WhisperGpu,
+        _ => SttPlan::QwenCpu,
+    }
+}
+
 /// Qwen3-ASR, jeśli są: model, projektor dźwięku i `llama-server` (kompilacja na kartę NVIDIA
 /// ma pierwszeństwo, potem Vulkan, na końcu procesor). `None` — rozpoznaje sam Whisper.
 /// `free_vram_mb` — zmierzona wolna pamięć karty: gdy jest jej za mało (np. zajął ją model
@@ -190,6 +222,11 @@ pub fn whisper(paths: &AppPaths) -> Option<(WhisperServerConfig, Backend)> {
         cpu: server_cpu(paths),
     };
     let mut config = WhisperServerConfig::new(binaries, model);
+    // Zapas na procesorze: mały model, jeśli jest pobrany (duży jest tam za wolny do rozmowy).
+    if preferred != Backend::Cpu {
+        config.cpu_model_path = model_for(&paths.models().join("whisper"), false)
+            .filter(|cpu| *cpu != config.model_path);
+    }
     config.threads = threads_for(std::thread::available_parallelism().map_or(8, |n| n.get()));
     Some((config, preferred))
 }
@@ -197,6 +234,21 @@ pub fn whisper(paths: &AppPaths) -> Option<(WhisperServerConfig, Backend)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn plan_follows_free_card_memory() {
+        // Wolna karta albo brak pomiaru: Qwen3-ASR na karcie.
+        assert_eq!(stt_plan(true, true, Some(5_368)), SttPlan::QwenGpu);
+        assert_eq!(stt_plan(true, true, None), SttPlan::QwenGpu);
+        // Model rozmowy zajął większość karty: Whisper na karcie, jeśli się mieści.
+        assert_eq!(stt_plan(true, true, Some(2_000)), SttPlan::WhisperGpu);
+        assert_eq!(stt_plan(true, false, Some(2_000)), SttPlan::QwenCpu);
+        // Karta pełna: Qwen3-ASR na procesorze (Whisper turbo na procesorze jest o rząd wolniejszy).
+        assert_eq!(stt_plan(true, true, Some(800)), SttPlan::QwenCpu);
+        // Silnik tylko na procesor.
+        assert_eq!(stt_plan(false, true, None), SttPlan::QwenCpu);
+        assert_eq!(stt_plan(false, true, Some(4_000)), SttPlan::WhisperGpu);
+    }
 
     #[test]
     fn qwen_uses_the_card_only_with_enough_free_memory() {
@@ -225,6 +277,7 @@ mod tests {
         let (config, backend) = whisper(&paths).unwrap();
         assert_eq!(backend, Backend::Cpu);
         assert_eq!(config.binaries.cuda, None);
+        assert_eq!(config.cpu_model_path, None, "bez karty jeden model");
         // Bez karty: mały model, choć „large" jest pierwszy alfabetycznie (na procesorze za wolny).
         assert_eq!(config.model_path, models.join("ggml-small-q5_1.bin"));
         let cuda = paths.sidecar("whisper-cuda", "whisper-server");
@@ -236,6 +289,11 @@ mod tests {
         assert_eq!(
             config.model_path,
             models.join("ggml-large-v3-turbo-q5_0.bin")
+        );
+        // Zapas na procesorze po nieudanym starcie na karcie: mały model.
+        assert_eq!(
+            config.cpu_model_path,
+            Some(models.join("ggml-small-q5_1.bin"))
         );
         // Model tylko angielski przegrywa z wielojęzycznym, także gdy jest pierwszy alfabetycznie.
         std::fs::write(models.join("ggml-base.en.bin"), b"m").unwrap();

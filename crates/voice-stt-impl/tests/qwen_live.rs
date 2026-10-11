@@ -1,6 +1,6 @@
 //! Próba na prawdziwym modelu Qwen3-ASR (domyślnie pomijana — wymaga plików spoza repozytorium):
 //! `ALFA_QWEN_SERVER`, `ALFA_QWEN_MODEL`, `ALFA_QWEN_MMPROJ`, `ALFA_QWEN_WAV` (WAV PCM16 16 kHz mono)
-//! i opcjonalnie `ALFA_QWEN_EXPECT` (fragment oczekiwanego tekstu).
+//! i opcjonalnie `ALFA_QWEN_EXPECT` (fragment oczekiwanego tekstu), `ALFA_QWEN_CPU=1` (bez karty).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -36,7 +36,13 @@ async fn real_model_transcribes_polish_speech() {
         return;
     };
     let stt = QwenStt::new(
-        QwenConfig::new(server.into(), model.into(), mmproj.into(), true),
+        // `ALFA_QWEN_CPU=1` — pomiar na samym procesorze (przypadek zajętej karty).
+        QwenConfig::new(
+            server.into(),
+            model.into(),
+            mmproj.into(),
+            std::env::var("ALFA_QWEN_CPU").is_err(),
+        ),
         Arc::new(ProcessLauncher),
     )
     .unwrap();
