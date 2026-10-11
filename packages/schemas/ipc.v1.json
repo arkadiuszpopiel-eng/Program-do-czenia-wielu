@@ -10191,11 +10191,23 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "stats": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TurnStatsView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Liczniki modelu (`None` — model jeszcze niczego nie oceniał)."
         }
       },
       "required": [
         "engine",
-        "missing"
+        "missing",
+        "stats"
       ],
       "type": "object"
     },
@@ -10240,6 +10252,49 @@
         "budget_blocked"
       ],
       "type": "string"
+    },
+    "TurnStatsView": {
+      "description": "Praca modelu końca wypowiedzi od startu programu.",
+      "properties": {
+        "failed": {
+          "description": "Oceny nieudane (odpowiedziała ocena z tekstu).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "last_ms": {
+          "description": "Czas ostatniej oceny (ms).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "last_pct": {
+          "description": "Ostatnia pewność końca wypowiedzi (%).",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "scored": {
+          "description": "Udane oceny modelu.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "scored",
+        "failed",
+        "last_pct",
+        "last_ms"
+      ],
+      "type": "object"
     },
     "TurnStatus": {
       "description": "Stan tury w widoku.",

@@ -86,12 +86,27 @@ pub enum TurnEngineKind {
     Text,
 }
 
+/// Praca modelu końca wypowiedzi od startu programu.
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct TurnStatsView {
+    /// Udane oceny modelu.
+    pub scored: u32,
+    /// Oceny nieudane (odpowiedziała ocena z tekstu).
+    pub failed: u32,
+    /// Ostatnia pewność końca wypowiedzi (%).
+    pub last_pct: Option<u8>,
+    /// Czas ostatniej oceny (ms).
+    pub last_ms: Option<u32>,
+}
+
 /// Koniec wypowiedzi.
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TurnEngineView {
     pub engine: TurnEngineKind,
     /// Pozycje katalogu, których pobranie włączy Smart Turn (pusto — już działa).
     pub missing: Vec<String>,
+    /// Liczniki modelu (`None` — model jeszcze niczego nie oceniał).
+    pub stats: Option<TurnStatsView>,
 }
 
 /// Silnik mowy z łańcucha (kolejność = kolejność prób).
@@ -142,6 +157,7 @@ mod tests {
             turn: TurnEngineView {
                 engine: TurnEngineKind::SmartTurn,
                 missing: Vec::new(),
+                stats: None,
             },
             tts: vec![TtsEngineView {
                 engine: "supertonic".into(),

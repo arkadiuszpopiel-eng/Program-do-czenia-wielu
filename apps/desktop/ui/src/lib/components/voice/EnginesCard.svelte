@@ -90,6 +90,17 @@
     <dd>
       <span class="vf-state">{t(`vf.eng.turn.${e.turn.engine}`)}</span>
       <span class="vf-muted">{t(`vf.eng.turn.${e.turn.engine}.hint`)}</span>
+      {#if e.turn.stats}
+        <span class="vf-muted" data-testid="voice-turn-stats"
+          >{t('vf.eng.turn.stats', {
+            n: e.turn.stats.scored,
+            pct: e.turn.stats.last_pct ?? '—',
+            ms: e.turn.stats.last_ms ?? '—',
+          })}{e.turn.stats.failed > 0
+            ? ` ${t('vf.eng.turn.failed', { n: e.turn.stats.failed })}`
+            : ''}</span
+        >
+      {/if}
     </dd>
 
     <dt>{t('vf.eng.tts')}</dt>

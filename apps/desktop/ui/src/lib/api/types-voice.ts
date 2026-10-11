@@ -141,9 +141,19 @@ export interface SttEngineView {
   readonly guard: SttGuardView | null;
 }
 
+/** Praca modelu końca wypowiedzi od startu programu. */
+export interface TurnStatsView {
+  readonly scored: number;
+  readonly failed: number;
+  readonly last_pct: number | null;
+  readonly last_ms: number | null;
+}
+
 export interface TurnEngineView {
   readonly engine: TurnEngineKind;
   readonly missing: readonly string[];
+  /** `null` — model jeszcze niczego nie oceniał. */
+  readonly stats: TurnStatsView | null;
 }
 
 export interface TtsEngineView {

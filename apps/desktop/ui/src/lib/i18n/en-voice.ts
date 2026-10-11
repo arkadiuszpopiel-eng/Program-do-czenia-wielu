@@ -139,6 +139,8 @@ export const enVoice: Record<keyof typeof plVoice, Message> = {
   'vf.eng.turn': 'End of turn',
   'vf.eng.turn.smart_turn': 'Smart Turn',
   'vf.eng.turn.smart_turn.hint': 'listens to the sound — does not cut in mid-sentence',
+  'vf.eng.turn.stats': 'scores: {n} · last confidence {pct}% · {ms} ms',
+  'vf.eng.turn.failed': '(failed: {n})',
   'vf.eng.turn.text': 'Silence length and text',
   'vf.eng.turn.text.hint': 'works without downloads, but waits too long or too short more often',
   'vf.eng.tts': 'Voice',

@@ -13,7 +13,7 @@ export function initialEngines(noMic: boolean): VoiceEnginesView {
         missing: ['qwen3-asr-1.7b-q8'],
         guard: null,
       },
-      turn: { engine: 'text', missing: ['smart-turn-v3.2', 'onnxruntime-cpu'] },
+      turn: { engine: 'text', missing: ['smart-turn-v3.2', 'onnxruntime-cpu'], stats: null },
       tts: [
         { engine: 'supertonic', ready: false },
         { engine: 'pocket', ready: false },
@@ -40,7 +40,11 @@ export function initialEngines(noMic: boolean): VoiceEnginesView {
         flagged: 1,
       },
     },
-    turn: { engine: 'smart_turn', missing: [] },
+    turn: {
+      engine: 'smart_turn',
+      missing: [],
+      stats: { scored: 31, failed: 0, last_pct: 93, last_ms: 26 },
+    },
     tts: [
       { engine: 'supertonic', ready: true },
       { engine: 'pocket', ready: false },

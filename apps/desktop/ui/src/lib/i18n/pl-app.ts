@@ -394,6 +394,10 @@ export const plApp = {
   'focus.on': 'Tryb skupienia · F11 albo Esc, aby wyjść',
   'toast.close': 'Zamknij powiadomienie',
   'toast.region': 'Powiadomienia',
+  'nav.wentBack': 'Wstecz.',
+  'nav.wentForward': 'Dalej.',
+  'nav.noBack': 'Nie ma wcześniejszego miejsca.',
+  'nav.noForward': 'Nie ma następnego miejsca.',
   'zoom.level': 'Powiększenie {pct}',
   'live.region': 'Ogłoszenia odpowiedzi',
 } as const;

@@ -119,6 +119,12 @@ export function runCommand(app: AppState, id: string): void {
     case 'view.focus':
       app.layout.focus = !app.layout.focus;
       break;
+    case 'nav.back':
+      void app.navigate(-1);
+      break;
+    case 'nav.forward':
+      void app.navigate(1);
+      break;
     case 'view.zoomIn':
     case 'view.zoomOut':
     case 'view.zoomReset': {
@@ -230,6 +236,17 @@ export function escapeChain(app: AppState): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * Boczne przyciski myszy: wstecz (3) i dalej (4) po odwiedzonych miejscach — jak w przeglądarce.
+ * Poza rozmową i Ustawieniami (start, wprowadzenie) nic nie robią.
+ */
+export function handleMouseNav(app: AppState, event: MouseEvent): void {
+  if (event.button !== 3 && event.button !== 4) return;
+  if (app.view !== 'chat' && app.view !== 'settings') return;
+  event.preventDefault();
+  void app.navigate(event.button === 3 ? -1 : 1);
 }
 
 export function handleKeydown(app: AppState, event: KeyboardEvent): void {

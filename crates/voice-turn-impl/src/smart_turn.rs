@@ -30,11 +30,48 @@ pub trait AudioScorer: Send + Sync {
     fn score(&self, samples: &[f32]) -> Result<f32, TurnError>;
 }
 
+/// Liczniki pracy modelu (do podglądu w Ustawieniach).
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub struct TurnStatsSnapshot {
+    /// Udane oceny.
+    pub scored: u32,
+    /// Oceny nieudane (wtedy odpowiedział model tekstowy).
+    pub failed: u32,
+    /// Ostatnie prawdopodobieństwo końca wypowiedzi.
+    pub last_probability: Option<f32>,
+    /// Czas ostatniej oceny (ms).
+    pub last_ms: Option<u32>,
+}
+
+/// Współdzielony uchwyt liczników.
+#[derive(Debug, Clone, Default)]
+pub struct TurnStats(std::sync::Arc<std::sync::Mutex<TurnStatsSnapshot>>);
+
+impl TurnStats {
+    /// Bieżące wartości.
+    pub fn snapshot(&self) -> TurnStatsSnapshot {
+        *self
+            .0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
+    fn update(&self, change: impl FnOnce(&mut TurnStatsSnapshot)) {
+        change(
+            &mut self
+                .0
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner),
+        );
+    }
+}
+
 /// Model końca wypowiedzi: dźwięk ocenia [`AudioScorer`], a bez dźwięku, przy zbyt krótkim nagraniu
 /// albo po błędzie — model tekstowy.
 pub struct SmartTurnModel {
     scorer: Box<dyn AudioScorer>,
     text: HeuristicTurnModel,
+    stats: TurnStats,
 }
 
 impl std::fmt::Debug for SmartTurnModel {
@@ -49,7 +86,20 @@ impl SmartTurnModel {
         Self {
             scorer,
             text: HeuristicTurnModel,
+            stats: TurnStats::default(),
         }
+    }
+
+    /// Liczniki zapisywane we wskazanym uchwycie (np. trzymanym przez okno Ustawień).
+    #[must_use]
+    pub fn with_stats(mut self, stats: TurnStats) -> Self {
+        self.stats = stats;
+        self
+    }
+
+    /// Uchwyt liczników.
+    pub fn stats(&self) -> TurnStats {
+        self.stats.clone()
     }
 
     /// Model z procesem `alfa-smart-turn`.
@@ -67,9 +117,20 @@ impl TurnModel for SmartTurnModel {
         if let Some(tail) = input.audio
             && tail.sample_rate == SAMPLE_RATE
             && tail.samples.len() >= MIN_SAMPLES
-            && let Ok(p) = self.scorer.score(tail.samples)
         {
-            return Ok(p);
+            let started = std::time::Instant::now();
+            match self.scorer.score(tail.samples) {
+                Ok(p) => {
+                    let ms = u32::try_from(started.elapsed().as_millis()).unwrap_or(u32::MAX);
+                    self.stats.update(|s| {
+                        s.scored = s.scored.saturating_add(1);
+                        s.last_probability = Some(p);
+                        s.last_ms = Some(ms);
+                    });
+                    return Ok(p);
+                }
+                Err(_) => self.stats.update(|s| s.failed = s.failed.saturating_add(1)),
+            }
         }
         self.text.end_probability(input)
     }
@@ -146,5 +207,22 @@ mod tests {
         let (m, calls) = model(Err(()));
         assert_eq!(ask(&m, &[0.1; 16_000], 16_000, Some("Dziękuję.")), P_CLEAR);
         assert_eq!(calls.load(Ordering::SeqCst), 1);
+        let stats = m.stats().snapshot();
+        assert_eq!((stats.scored, stats.failed), (0, 1));
+        assert_eq!(stats.last_probability, None);
+    }
+
+    #[test]
+    fn stats_count_scores_in_a_shared_handle() {
+        let shared = TurnStats::default();
+        let (m, _) = model(Ok(0.93));
+        let m = m.with_stats(shared.clone());
+        ask(&m, &[0.1; 16_000], 16_000, None);
+        ask(&m, &[0.1; 16_000], 16_000, None);
+        ask(&m, &[0.1; 100], 16_000, None); // za krótkie — bez oceny modelem
+        let stats = shared.snapshot();
+        assert_eq!((stats.scored, stats.failed), (2, 0));
+        assert!((stats.last_probability.unwrap() - 0.93).abs() < 1e-6);
+        assert!(stats.last_ms.is_some());
     }
 }

@@ -371,6 +371,10 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'focus.on': 'Focus mode · F11 or Esc to exit',
   'toast.close': 'Close notification',
   'toast.region': 'Notifications',
+  'nav.wentBack': 'Back.',
+  'nav.wentForward': 'Forward.',
+  'nav.noBack': 'There is no earlier place.',
+  'nav.noForward': 'There is no next place.',
   'zoom.level': 'Zoom {pct}',
   'live.region': 'Answer announcements',
 };

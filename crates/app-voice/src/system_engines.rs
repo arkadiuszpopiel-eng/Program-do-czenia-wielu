@@ -4,7 +4,7 @@
 
 use app_api::dto::{
     BreakerStateView, SttEngineKind, SttEngineView, SttGuardView, TtsEngineView, TurnEngineKind,
-    TurnEngineView, VoiceEnginesView,
+    TurnEngineView, TurnStatsView, VoiceEnginesView,
 };
 use voice_stt_impl::breaker::BreakerState;
 use voice_stt_impl::fallback::GuardStatus;
@@ -34,6 +34,19 @@ pub(crate) fn guard_view(status: &GuardStatus) -> SttGuardView {
         fallbacks: count(fallbacks),
         flagged: count(flagged),
     }
+}
+
+/// Liczniki modelu końca wypowiedzi w postaci dla okna (`None` — nic jeszcze nie oceniał).
+pub(crate) fn turn_stats_view(stats: voice_turn_impl::TurnStatsSnapshot) -> Option<TurnStatsView> {
+    (stats.scored > 0 || stats.failed > 0).then(|| TurnStatsView {
+        scored: stats.scored,
+        failed: stats.failed,
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        last_pct: stats
+            .last_probability
+            .map(|p| (p.clamp(0.0, 1.0) * 100.0).round() as u8),
+        last_ms: stats.last_ms,
+    })
 }
 
 impl SystemVoice {
@@ -95,6 +108,7 @@ impl SystemVoice {
                 TurnEngineKind::Text
             },
             missing: turn_missing,
+            stats: turn_stats_view(self.turn_stats.snapshot()),
         };
         let tts = app_modules::tts::installed(&self.paths)
             .into_iter()
@@ -150,5 +164,26 @@ mod tests {
         });
         assert_eq!(idle.breaker, BreakerStateView::Closed);
         assert_eq!((idle.median_ms, idle.p95_ms), (None, None));
+    }
+
+    #[test]
+    fn turn_stats_appear_only_after_the_first_score() {
+        use voice_turn_impl::TurnStatsSnapshot;
+        assert_eq!(turn_stats_view(TurnStatsSnapshot::default()), None);
+        let view = turn_stats_view(TurnStatsSnapshot {
+            scored: 7,
+            failed: 1,
+            last_probability: Some(0.934),
+            last_ms: Some(26),
+        })
+        .unwrap();
+        assert_eq!((view.scored, view.failed), (7, 1));
+        assert_eq!((view.last_pct, view.last_ms), (Some(93), Some(26)));
+        let failed_only = turn_stats_view(TurnStatsSnapshot {
+            failed: 2,
+            ..TurnStatsSnapshot::default()
+        })
+        .unwrap();
+        assert_eq!((failed_only.scored, failed_only.last_pct), (0, None));
     }
 }

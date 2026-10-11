@@ -26,13 +26,9 @@ use voice_dsp_contract::{DspCfg, NoiseSetting};
 use voice_dsp_impl::DspPipeline;
 use voice_pipeline_contract::{PipelineCfg, PipelineError, ReplySource};
 use voice_pipeline_impl::{MonotonicClock, Pipeline, PipelineParts};
-use voice_stt_contract::Stt;
 use voice_stt_impl::fallback::GuardedStt;
-use voice_stt_impl::qwen::QwenStt;
 use voice_stt_impl::{ProcessLauncher, WhisperStt};
 use voice_tts_contract::Tts;
-use voice_turn_contract::TurnDetector;
-use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector, SmartTurnModel};
 use voice_vad_contract::VadCfg;
 use voice_vad_impl::{HashPolicy, SileroModel, SileroVad};
 use voice_wake_contract::{Wake, WakeCfg, WakeWordCfg};
@@ -83,31 +79,8 @@ pub struct SystemVoice {
     pub(crate) stt_on_gpu: std::sync::Mutex<Option<bool>>,
     /// Ustawienia rozmowy (Smart Turn, próg, najdłuższa cisza, silnik rozpoznawania).
     pub(crate) talk: crate::talk::TalkSettings,
-}
-
-/// Co minutę sprawdza, czy silnik Qwen3-ASR stoi bez użycia dłużej niż jego limit — wtedy go
-/// zamyka i zwalnia pamięć karty. Zadanie kończy się samo, gdy silnik przestaje istnieć.
-fn idle_unload(qwen: &Arc<QwenStt>) {
-    let Ok(runtime) = tokio::runtime::Handle::try_current() else {
-        return;
-    };
-    // Rozgrzewka: model wczytuje się w tle od startu rozmowy, nie przy pierwszym zdaniu.
-    let warm = qwen.clone();
-    runtime.spawn(async move {
-        if let Err(e) = warm.warm().await {
-            tracing::warn!(error = %e, "Qwen3-ASR: rozgrzewka nieudana (spróbuje przy pierwszej wypowiedzi)");
-        }
-    });
-    let weak = Arc::downgrade(qwen);
-    runtime.spawn(async move {
-        loop {
-            tokio::time::sleep(Duration::from_secs(60)).await;
-            let Some(engine) = weak.upgrade() else {
-                break;
-            };
-            engine.unload_if_idle().await;
-        }
-    });
+    /// Liczniki modelu końca wypowiedzi (wspólne dla kolejnych rozmów).
+    pub(crate) turn_stats: voice_turn_impl::TurnStats,
 }
 
 pub(crate) fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
@@ -167,6 +140,7 @@ impl SystemVoice {
             guard: std::sync::Mutex::new(None),
             stt_on_gpu: std::sync::Mutex::new(None),
             talk: crate::talk::TalkSettings::default(),
+            turn_stats: voice_turn_impl::TurnStats::default(),
         }
     }
 
@@ -227,63 +201,6 @@ impl SystemVoice {
             stt = stt.with_residency(r.clone());
         }
         Ok(stt)
-    }
-
-    /// Koniec wypowiedzi: model Smart Turn na dźwięku (z czasami strojonymi do rozmowy), gdy są
-    /// jego pliki; inaczej model tekstowy z domyślną cierpliwością.
-    pub(crate) fn turn(&self) -> Box<dyn TurnDetector> {
-        let sidecar = self
-            .talk
-            .smart_turn()
-            .then(|| app_modules::turn::smart_turn(&self.paths))
-            .flatten();
-        let Some(sidecar) = sidecar else {
-            return Box::new(PatienceTurnDetector::new(HeuristicTurnModel));
-        };
-        let cfg = self.talk.turn_cfg();
-        match PatienceTurnDetector::with_cfg(SmartTurnModel::sidecar(sidecar), cfg) {
-            Ok(detector) => Box::new(detector),
-            Err(e) => {
-                tracing::warn!(error = %e, "Smart Turn niedostępny — koniec wypowiedzi z tekstu");
-                Box::new(PatienceTurnDetector::new(HeuristicTurnModel))
-            }
-        }
-    }
-
-    /// Rozpoznawanie mowy dla rozmowy i dyktowania: Qwen3-ASR ze strażnikiem i Whisperem jako
-    /// zapasem, gdy model Qwen3-ASR jest pobrany; inaczej sam Whisper.
-    pub(crate) fn stt(&self) -> Result<Arc<dyn Stt>, PipelineError> {
-        let whisper: Arc<dyn Stt> = Arc::new(self.whisper()?);
-        if self.talk.whisper_only() {
-            return Ok(whisper);
-        }
-        // Pomiar wolnej pamięci karty: gdy zajął ją model rozmowy, Qwen3-ASR liczy na procesorze.
-        let free = app_modules::gpu_mem::nvidia_free_mb();
-        let Some(config) = app_modules::stt::qwen(&self.paths, free) else {
-            return Ok(whisper);
-        };
-        let on_gpu = config.gpu;
-        tracing::info!(on_gpu, free_vram_mb = ?free, "Qwen3-ASR: wybór karta / procesor");
-        match QwenStt::new(config, Arc::new(ProcessLauncher)) {
-            Ok(qwen) => {
-                let qwen = Arc::new(qwen);
-                idle_unload(&qwen);
-                *self
-                    .stt_on_gpu
-                    .lock()
-                    .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(on_gpu);
-                let guarded = Arc::new(GuardedStt::new(qwen, whisper));
-                *self
-                    .guard
-                    .lock()
-                    .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(guarded.clone());
-                Ok(guarded)
-            }
-            Err(e) => {
-                tracing::warn!(error = %e, "Qwen3-ASR niedostępny — rozpoznaje Whisper");
-                Ok(whisper)
-            }
-        }
     }
 
     /// Silnik TTS gotowy teraz: produkcyjny (`app_modules::tts::engines`) wykrywa Pipera i Pocket

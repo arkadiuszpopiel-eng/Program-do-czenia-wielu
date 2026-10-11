@@ -235,6 +235,8 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'shortcut.view.focus': 'Focus mode',
   'shortcut.view.zoomIn': 'Zoom in',
   'shortcut.view.zoomOut': 'Zoom out',
+  'shortcut.nav.back': 'Back (previous place)',
+  'shortcut.nav.forward': 'Forward (next place)',
   'shortcut.view.zoomReset': 'Default size',
   'shortcut.panel.sessions': 'Sessions panel',
   'shortcut.panel.right': 'Side panel',

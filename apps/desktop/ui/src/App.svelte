@@ -14,7 +14,7 @@
   import AppShell from './lib/components/shell/AppShell.svelte';
   import Lazy from './lib/components/shell/Lazy.svelte';
   import type { AppState } from './lib/state/app.svelte';
-  import { handleKeydown } from './lib/state/commands';
+  import { handleKeydown, handleMouseNav } from './lib/state/commands';
   import { provideApp } from './lib/state/context';
 
   interface Props {
@@ -61,6 +61,9 @@
 
   $effect(() => () => app.dispose());
 
+  // „Wstecz / Dalej”: każda zmiana widoku, strony Ustawień albo sesji to odwiedzone miejsce.
+  $effect(() => app.recordPlace(app.place()));
+
   // Ekran ładowania (z `index.html`) znika, gdy interfejs ma dane startowe albo pokazuje błąd.
   // Minimalny czas tylko w oknie programu — w przeglądarce (dev, testy) nie ma na co czekać.
   $effect(() => {
@@ -86,7 +89,7 @@
   });
 </script>
 
-<svelte:window onkeydown={(e) => handleKeydown(app, e)} />
+<svelte:window onkeydown={(e) => handleKeydown(app, e)} onmouseup={(e) => handleMouseNav(app, e)} />
 
 {#if app.view === 'loading'}
   <div class="boot" data-surface="app" role="status" aria-label={t('app.loading')}></div>

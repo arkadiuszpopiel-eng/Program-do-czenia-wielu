@@ -2748,6 +2748,8 @@ export interface TurnEngineView {
   readonly engine: TurnEngineKind;
   /** Pozycje katalogu, których pobranie włączy Smart Turn (pusto — już działa). */
   readonly missing: readonly string[];
+  /** Liczniki modelu (`None` — model jeszcze niczego nie oceniał). */
+  readonly stats: TurnStatsView | null;
 }
 
 /** Błąd tury. */
@@ -2761,6 +2763,18 @@ export interface TurnError {
 /** Kod błędu tury. */
 export type TurnErrorCode =
   'offline' | 'rate_limited' | 'no_keys' | 'provider' | 'context_overflow' | 'budget_blocked';
+
+/** Praca modelu końca wypowiedzi od startu programu. */
+export interface TurnStatsView {
+  /** Oceny nieudane (odpowiedziała ocena z tekstu). */
+  readonly failed: number;
+  /** Czas ostatniej oceny (ms). */
+  readonly last_ms: number | null;
+  /** Ostatnia pewność końca wypowiedzi (%). */
+  readonly last_pct: number | null;
+  /** Udane oceny modelu. */
+  readonly scored: number;
+}
 
 /** Stan tury w widoku. */
 export type TurnStatus = 'queued' | 'streaming' | 'complete' | 'cancelled' | 'error';

@@ -15,7 +15,8 @@ pub use detector::PatienceTurnDetector;
 pub use hesitation::{Hesitation, ends_clearly, hesitation};
 pub use model::{HeuristicTurnModel, P_CLEAR, P_HESITATION, P_NEUTRAL, P_QUESTION};
 pub use smart_turn::{
-    AudioScorer, MODEL_FILE, REPROBE_MS, SAMPLE_RATE, SmartTurnModel, WINDOW_SAMPLES,
+    AudioScorer, MODEL_FILE, REPROBE_MS, SAMPLE_RATE, SmartTurnModel, TurnStats, TurnStatsSnapshot,
+    WINDOW_SAMPLES,
 };
 pub use turn_sidecar::{SidecarCfg, SidecarScorer, encode_tail, parse_reply};
 

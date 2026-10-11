@@ -114,6 +114,9 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(card.getByText('Qwen3-ASR', { exact: true })).toBeVisible();
       await expect(card.getByText('zapas: Whisper')).toBeVisible();
       await expect(card.getByText('Smart Turn', { exact: true })).toBeVisible();
+      await expect(card.getByTestId('voice-turn-stats')).toHaveText(
+        'ocen: 31 · ostatnia pewność 93 % · 26 ms',
+      );
       await expect(card.getByText('Supertonic 3 · mówi')).toBeVisible();
       await expect(card.getByText('Pocket TTS · do pobrania')).toBeVisible();
       await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny odstawiony');

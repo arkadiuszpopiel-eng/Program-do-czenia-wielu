@@ -175,6 +175,10 @@ async fn real_engines_hear_a_sentence_and_answer() {
     writeln!(log, "silniki po rozmowie: {after:?}").unwrap();
     let guard = after.stt.guard.expect("stan strażnika po rozmowie");
     assert!(guard.samples >= 2, "{guard:?}");
+    // Koniec wypowiedzi naprawdę oceniał model słuchający dźwięku (a nie zapasowa ocena z tekstu).
+    let turn = after.turn.stats.expect("liczniki Smart Turn po rozmowie");
+    writeln!(log, "Smart Turn: {turn:?}").unwrap();
+    assert!(turn.scored >= 2 && turn.failed == 0, "{turn:?}");
     voice.set_mic_enabled(false).await.unwrap();
     ticker.abort();
 }

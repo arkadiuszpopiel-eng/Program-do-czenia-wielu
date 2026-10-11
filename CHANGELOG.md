@@ -12,6 +12,29 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.37 — 2026-10-12
+
+„Wstecz” i „Dalej” jak w przeglądarce oraz liczniki modelu końca wypowiedzi.
+
+### Interfejs
+
+- Alt+← wraca do poprzedniego miejsca, Alt+→ idzie dalej: między stronami Ustawień, rozmową i sesjami. Działają
+  też boczne przyciski myszy. Program pamięta 50 ostatnich miejsc; nowe miejsce po cofnięciu ucina gałąź „Dalej”.
+  Oba skróty są w tabeli skrótów (można je zmienić) i w palecie poleceń.
+
+### Głos
+
+- Karta „Silniki rozmowy” pokazuje pracę modelu Smart Turn: ile razy oceniał koniec wypowiedzi, ostatnią pewność
+  i czas oceny. Widać, czy model naprawdę pracuje, czy odpowiada zapasowa ocena z tekstu.
+
+### Testy
+
+- Historia miejsc: kolejność, ucinanie gałęzi, limit, usunięte sesje; w przeglądarce — klawiatura, boczne przyciski
+  myszy, powrót do poprzedniej sesji, obecność w tabeli skrótów i palecie.
+- Rozmowa „na sucho” potwierdza liczniki: w dwóch wypowiedziach model Smart Turn oceniał cztery razy, bez błędu,
+  ostatnia ocena 93 % w 22 ms.
+- Test prawdziwej aplikacji (wersja 0.0.36): 18 z 18, w tym nowe karty na prawdziwym rdzeniu.
+
 ## 0.0.36 — 2026-10-12
 
 Widać, co dzieje się na karcie graficznej — pierwszy krok panelu sprzętu z planu P2.

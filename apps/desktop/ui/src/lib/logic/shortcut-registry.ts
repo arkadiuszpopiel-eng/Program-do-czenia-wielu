@@ -46,6 +46,8 @@ export const SHORTCUTS: readonly ShortcutDef[] = [
   app('view.zoomIn', 'view', ['Ctrl+=']),
   app('view.zoomOut', 'view', ['Ctrl+-']),
   app('view.zoomReset', 'view', ['Ctrl+0']),
+  app('nav.back', 'view', ['Alt+Left'], { inInput: true }),
+  app('nav.forward', 'view', ['Alt+Right'], { inInput: true }),
   app('panel.sessions', 'panels', ['Ctrl+B']),
   app('panel.right', 'panels', ['Ctrl+\\']),
   app('panel.agents', 'panels', ['Alt+1']),

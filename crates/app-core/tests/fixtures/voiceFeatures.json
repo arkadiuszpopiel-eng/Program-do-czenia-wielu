@@ -105,7 +105,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -235,7 +241,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -365,7 +377,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -494,7 +512,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -623,7 +647,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -758,7 +788,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -893,7 +929,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1028,7 +1070,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1163,7 +1211,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1298,7 +1352,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1427,7 +1487,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1557,7 +1623,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1689,7 +1761,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1819,7 +1897,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -1959,7 +2043,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2094,7 +2184,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2229,7 +2325,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2364,7 +2466,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2494,7 +2602,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2624,7 +2738,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2754,7 +2874,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -2884,7 +3010,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -3014,7 +3146,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -3144,7 +3282,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -3273,7 +3417,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -3402,7 +3552,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {
@@ -3531,7 +3687,13 @@
         },
         "turn": {
           "engine": "smart_turn",
-          "missing": []
+          "missing": [],
+          "stats": {
+            "scored": 31,
+            "failed": 0,
+            "last_pct": 93,
+            "last_ms": 26
+          }
         },
         "tts": [
           {

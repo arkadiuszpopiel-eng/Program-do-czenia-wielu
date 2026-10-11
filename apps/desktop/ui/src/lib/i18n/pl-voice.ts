@@ -140,6 +140,8 @@ export const plVoice = {
   'vf.eng.turn': 'Koniec wypowiedzi',
   'vf.eng.turn.smart_turn': 'Smart Turn',
   'vf.eng.turn.smart_turn.hint': 'słucha brzmienia — nie wchodzi w słowo w połowie zdania',
+  'vf.eng.turn.stats': 'ocen: {n} · ostatnia pewność {pct} % · {ms} ms',
+  'vf.eng.turn.failed': '(nieudanych: {n})',
   'vf.eng.turn.text': 'Długość ciszy i tekst',
   'vf.eng.turn.text.hint': 'działa bez pobierania, ale częściej czeka za długo albo za krótko',
   'vf.eng.tts': 'Głos',

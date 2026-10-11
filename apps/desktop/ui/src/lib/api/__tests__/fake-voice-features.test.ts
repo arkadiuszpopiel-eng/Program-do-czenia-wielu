@@ -35,7 +35,12 @@ describe('atrapa: głos rozszerzony F5', () => {
     const bare = (await setup('no-mic').api.features()).engines;
     expect(bare.stt.guard).toBeNull();
     expect(bare.stt.missing).toEqual(['qwen3-asr-1.7b-q8']);
-    expect(bare.turn).toEqual({ engine: 'text', missing: ['smart-turn-v3.2', 'onnxruntime-cpu'] });
+    expect(bare.turn).toEqual({
+      engine: 'text',
+      missing: ['smart-turn-v3.2', 'onnxruntime-cpu'],
+      stats: null,
+    });
+    expect(before.turn.stats).toEqual({ scored: 31, failed: 0, last_pct: 93, last_ms: 26 });
     const untouched = await setup('no-mic').api.engines({ kind: 'reset_breaker' });
     expect(untouched.engines).toEqual(bare);
   });

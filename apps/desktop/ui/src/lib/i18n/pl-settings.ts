@@ -246,6 +246,8 @@ export const plSettings = {
   'shortcut.view.focus': 'Tryb skupienia',
   'shortcut.view.zoomIn': 'Powiększ',
   'shortcut.view.zoomOut': 'Pomniejsz',
+  'shortcut.nav.back': 'Wstecz (poprzednie miejsce)',
+  'shortcut.nav.forward': 'Dalej (następne miejsce)',
   'shortcut.view.zoomReset': 'Rozmiar domyślny',
   'shortcut.panel.sessions': 'Panel Sesje',
   'shortcut.panel.right': 'Panel prawy',

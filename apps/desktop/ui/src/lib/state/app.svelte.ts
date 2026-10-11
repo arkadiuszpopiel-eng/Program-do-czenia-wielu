@@ -41,6 +41,7 @@ import { VoiceUiState } from './voice.svelte';
 import { UpdatesState } from './updates.svelte';
 import { BrokerState } from './broker.svelte';
 import { WorkState } from './work.svelte';
+import { NavHistory, type Place } from '../logic/nav-history';
 
 export type View = 'loading' | 'chat' | 'settings' | 'onboarding' | 'error';
 
@@ -88,6 +89,10 @@ export class AppState {
   cheatsheetOpen = $state(false);
   findOpen = $state(false);
   settingsPage = $state('general');
+  /** Odwiedzone miejsca dla „Wstecz / Dalej” (Alt+←, Alt+→, boczne przyciski myszy). */
+  readonly nav = new NavHistory();
+  /** Trwa przejście po historii — pośrednie stany nie są zapisywane jako nowe miejsca. */
+  private navBusy = false;
   timelineTurn = $state<string | null>(null);
   /** Tura użytkownika edytowana w miejscu (edytuj → nowa gałąź). */
   editingTurnId = $state<string | null>(null);
@@ -451,6 +456,43 @@ export class AppState {
 
   setShortcut(actionId: string, chord: string | null): Promise<boolean> {
     return settingsActions.setShortcut(this, actionId, chord);
+  }
+
+  // ── Wstecz / Dalej ────────────────────────────────────────────────────────────────────────────
+
+  /** Bieżące miejsce (rozmowa z sesją albo strona Ustawień); `null` poza nimi (start, wprowadzenie). */
+  place(): Place | null {
+    if (this.view === 'chat') return { view: 'chat', page: null, session: this.activeId };
+    if (this.view === 'settings')
+      return { view: 'settings', page: this.settingsPage, session: this.activeId };
+    return null;
+  }
+
+  /** Zapis odwiedzonego miejsca (wołany po każdej zmianie widoku, strony albo sesji). */
+  recordPlace(place: Place | null): void {
+    if (place && !this.navBusy) this.nav.record(place);
+  }
+
+  /** Krok wstecz (`-1`) albo dalej (`1`) po odwiedzonych miejscach; bez historii — tylko komunikat. */
+  async navigate(direction: -1 | 1): Promise<void> {
+    if (this.navBusy || this.place() === null) return;
+    // Sesje usunięte w międzyczasie nie są celem powrotu.
+    this.nav.prune((p) => p.session === null || this.sessions.list.some((s) => s.id === p.session));
+    const target = direction < 0 ? this.nav.back() : this.nav.forward();
+    if (!target) {
+      this.announcement = this.i18n.t(direction < 0 ? 'nav.noBack' : 'nav.noForward');
+      return;
+    }
+    this.navBusy = true;
+    try {
+      if (target.session && target.session !== this.activeId)
+        await this.openSession(target.session);
+      if (target.view === 'settings') this.openSettings(target.page ?? undefined);
+      else this.closeSettings();
+    } finally {
+      this.navBusy = false;
+    }
+    this.announcement = this.i18n.t(direction < 0 ? 'nav.wentBack' : 'nav.wentForward');
   }
 
   // ── Widok i panele ────────────────────────────────────────────────────────────────────────────
