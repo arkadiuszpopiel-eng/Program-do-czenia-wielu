@@ -148,3 +148,29 @@ export function missingEngines(items: readonly ModelItem[]): MissingEngine[] {
       !engines.some((id) => ENGINE_PREFIX[kind].some((prefix) => id.startsWith(prefix))),
   );
 }
+
+/** Ocena „mieści się na karcie” dla modelu rozmowy. */
+export type CardFit = 'fits' | 'partly' | 'cpu';
+
+/** Zapas pamięci karty na kontekst i bufory modelu (MiB) — reguła z Delty AI: plik + 1,5 GB. */
+export const CARD_HEADROOM_MB = 1536;
+/** Poniżej tylu MiB pamięci karty model rozmowy liczy procesor. */
+export const CARD_MIN_MB = 2000;
+
+/** Pamięć karty głównej (największa karta niezintegrowana); `null` — nie ma takiej karty. */
+export function mainCardMb(
+  gpus: readonly { readonly vram_mb: number; readonly integrated: boolean }[],
+): number | null {
+  const sizes = gpus.filter((g) => !g.integrated).map((g) => g.vram_mb);
+  return sizes.length > 0 ? Math.max(...sizes) : null;
+}
+
+/**
+ * Czy model o rozmiarze pliku `sizeBytes` zmieści się na karcie: cały („fits”), tylko część warstw
+ * („partly” — reszta liczy się w pamięci RAM, wolniej) albo wcale („cpu”).
+ */
+export function cardFit(sizeBytes: number, cardMb: number | null): CardFit {
+  if (cardMb === null || cardMb < CARD_MIN_MB) return 'cpu';
+  const needMb = sizeBytes / (1024 * 1024) + CARD_HEADROOM_MB;
+  return needMb <= cardMb ? 'fits' : 'partly';
+}

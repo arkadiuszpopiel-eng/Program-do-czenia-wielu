@@ -12,6 +12,25 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.39 — 2026-10-12
+
+Przy modelach rozmowy widać, czy zmieszczą się na karcie graficznej; rozmowa sprawdzona na prawdziwym mikrofonie.
+
+### Modele i silniki
+
+- W „Modele lokalne i silniki” każdy model rozmowy ma ocenę: „mieści się na karcie”, „częściowo na karcie —
+  wolniej” albo „liczy procesor”. Reguła: rozmiar pliku i 1,5 GB zapasu muszą zmieścić się w pamięci karty
+  głównej.
+
+### Testy
+
+- Próba na prawdziwym mikrofonie laptopa, po cichu (`app-core/tests/live_mic.rs`, `ALFA_LIVE_MIC=1`): rozmowa
+  startuje na urządzeniu dźwiękowym z prawdziwymi silnikami, słucha pięć sekund i się wyłącza. Potok zaczął
+  słuchać, wykrył dźwięk otoczenia, Smart Turn ocenił koniec (98 %, 44 ms), a strażnik nie przepuścił szumu do
+  czatu. Nic nie było odtwarzane ani zapisywane. Nadal niesprawdzone: żywa mowa człowieka do mikrofonu i tłumienie
+  echa, gdy agentka mówi z głośnika.
+- Ocena dopasowania do karty: jednostkowo (granice, brak karty) i w przeglądarce na obu modelach Bielik.
+
 ## 0.0.38 — 2026-10-12
 
 Rozpoznawanie mowy dobiera silnik do zajętości karty graficznej — według pomiarów z tego laptopa.

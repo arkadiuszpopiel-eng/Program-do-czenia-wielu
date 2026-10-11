@@ -23,6 +23,7 @@
     upsertItem,
     type KindFilter,
     type StateFilter,
+    mainCardMb,
   } from '../../../logic/models';
   import { useApp } from '../../../state/context';
   import BundlesSection from './BundlesSection.svelte';
@@ -32,6 +33,8 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   let view = $state<ModelsView | null>(null);
+  /** Pamięć karty głównej do oceny „mieści się na karcie” (`undefined` — jeszcze nie wczytana). */
+  let cardMb = $state<number | null | undefined>(undefined);
   let loadError = $state<string | null>(null);
   let kind = $state<string>('all');
   let stateFilter = $state<string>('all');
@@ -74,6 +77,11 @@
 
   $effect(() => {
     void load();
+    // Ocena dopasowania modeli do karty jest dodatkiem — błąd odczytu sprzętu nie blokuje strony.
+    void app.client.device.profile().then(
+      (profile) => (cardMb = mainCardMb(profile.machine.gpus)),
+      () => (cardMb = undefined),
+    );
     return app.on((event) => {
       if (!view) return;
       if (event.type === 'ModelChanged')
@@ -282,6 +290,7 @@
     {#each items as item (item.id)}
       <ModelRow
         {item}
+        {cardMb}
         busy={busy === item.id}
         ondownload={() => void act(item.id, () => app.client.engines.download(item.id))}
         oncancel={() => void act(item.id, () => app.client.engines.cancel(item.id))}

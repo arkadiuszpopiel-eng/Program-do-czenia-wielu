@@ -79,6 +79,23 @@ test('filtry, przerwanie i wznowienie, usuwanie z potwierdzeniem', async ({ page
   await expect(page.getByText('Brak pozycji dla wybranych filtrów.')).toBeVisible();
 });
 
+test('modele rozmowy mają ocenę dopasowania do karty graficznej', async ({ page }) => {
+  await openApp(page);
+  await waitForChat(page);
+  await openModels(page);
+  await pickOption(page.getByRole('combobox', { name: 'Rodzaj', exact: true }), 'llm');
+  // Karta 6 GB z atrapy: mały Bielik mieści się cały, duży tylko częściowo.
+  await expect(
+    row(page, 'Bielik 1.5B v3.0 Instruct (Q8_0)').getByText('mieści się na karcie'),
+  ).toBeVisible();
+  await expect(
+    row(page, 'Bielik 4.5B v3.0 Instruct (Q8_0)').getByText('częściowo na karcie — wolniej'),
+  ).toBeVisible();
+  // Inne rodzaje pozycji nie dostają tej oceny.
+  await pickOption(page.getByRole('combobox', { name: 'Rodzaj', exact: true }), 'stt');
+  await expect(page.getByText('mieści się na karcie')).toHaveCount(0);
+});
+
 test('offline: pobieranie kończy się czytelnym błędem', async ({ page }) => {
   await openApp(page, { scenario: 'offline' });
   await waitForChat(page);

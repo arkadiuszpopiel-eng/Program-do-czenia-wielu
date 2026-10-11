@@ -7,12 +7,14 @@
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { ModelItem } from '../../../api/types-models';
-  import { groupedHash, itemActions, progressPercent } from '../../../logic/models';
+  import { cardFit, groupedHash, itemActions, progressPercent } from '../../../logic/models';
   import { useApp } from '../../../state/context';
 
   interface Props {
     item: ModelItem;
     busy: boolean;
+    /** Pamięć karty głównej (MiB); `null` — brak karty; `undefined` — jeszcze nieznana. */
+    cardMb?: number | null;
     ondownload: () => void;
     oncancel: () => void;
     onverify: () => void;
@@ -25,6 +27,7 @@
   let {
     item,
     busy,
+    cardMb,
     ondownload,
     oncancel,
     onverify,
@@ -39,6 +42,10 @@
   const percent = $derived(progressPercent(item));
   const titleId = $derived(`mm-${item.id}`);
   const unpinned = $derived(item.files.filter((f) => !f.pinned_sha256 && f.sha256));
+  // Ocena dopasowania do karty ma sens tylko dla modeli rozmowy (pliki GGUF liczone warstwami).
+  const fit = $derived(
+    item.kind === 'llm' && cardMb !== undefined ? cardFit(item.size_bytes, cardMb) : null,
+  );
 
   function progressLabel(): string {
     const p = item.progress;
@@ -60,6 +67,11 @@
   </p>
   <ul class="badges">
     {#if item.active}<li class="badge ok">{t('engines.active')}</li>{/if}
+    {#if fit}
+      <li class="badge" class:ok={fit === 'fits'} class:warn={fit === 'partly'}>
+        {t(`engines.fit.${fit}`)}
+      </li>
+    {/if}
     {#if item.pinned}<li class="badge">{t('engines.pinned')}</li>{/if}
     {#if !item.confirmed}<li class="badge warn">{t('engines.unconfirmed')}</li>{/if}
     {#if !item.downloadable}<li class="badge">{t('engines.manual')}</li>{/if}
