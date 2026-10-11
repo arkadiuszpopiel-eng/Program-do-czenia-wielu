@@ -92,6 +92,7 @@
   .grid {
     min-height: 0;
     overflow: auto;
+    padding: var(--alfa-space-2);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--alfa-space-6);

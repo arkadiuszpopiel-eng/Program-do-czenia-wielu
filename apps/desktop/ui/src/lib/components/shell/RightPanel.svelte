@@ -16,9 +16,9 @@
     'timeline',
     'files',
     'memory',
-    'tasks',
     'screen',
     'voice',
+    'tasks',
   ];
   const tabs = $derived(TABS.map((id) => ({ id, label: t(`panel.${id}`) })));
   const current = $derived(app.layout.current(app.activeId).right_tab);

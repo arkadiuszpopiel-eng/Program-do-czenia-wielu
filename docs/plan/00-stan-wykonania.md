@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-11**, wersja programu **0.0.26**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-11**, wersja programu **0.0.27**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -59,6 +59,7 @@ funkcjami.
 | 0.0.24 | 2026-10-11 | zautomatyzowany przegląd okien, paneli i skrótów w trzech stylach i dwóch motywach; naprawa szukania w sesjach |
 | 0.0.25 | 2026-10-11 | tylko plan: dodatek o głosie lokalnym (dokument 15), grupa C5; w programie bez zmian |
 | 0.0.26 | 2026-10-11 | poprawki z przeglądu Ustawień w pełnej skali (zmienne stylów, sformułowania); pomiar trzech silników mowy na laptopie bazowym |
+| 0.0.27 | 2026-10-11 | poprawki z przeglądu paneli bocznych i nakładek w skali 1:1 (kolejność kart a skróty, pole wiadomości zadania) |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 

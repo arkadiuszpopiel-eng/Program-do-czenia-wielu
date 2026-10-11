@@ -40,9 +40,25 @@ for (const style of STYLES) {
       await openApp(page, { theme, path: `/?style=${style}` });
       await waitForChat(page);
       const found: string[] = [];
-      for (const key of ['Alt+1', 'Alt+2', 'Alt+3', 'Alt+4', 'Alt+5', 'Alt+6', 'Alt+7']) {
+      for (const [index, key] of [
+        'Alt+1',
+        'Alt+2',
+        'Alt+3',
+        'Alt+4',
+        'Alt+5',
+        'Alt+6',
+        'Alt+7',
+      ].entries()) {
         await page.keyboard.press(key);
         await page.waitForTimeout(300);
+        // Skrót z numerem N ma otwierać N-tą kartę od lewej — inaczej numer niczego nie podpowiada.
+        const tabs = page.getByRole('tab');
+        if ((await tabs.count()) === 7) {
+          await expect(tabs.nth(index), `${key} wybiera kartę nr ${index + 1}`).toHaveAttribute(
+            'aria-selected',
+            'true',
+          );
+        } else found.push(`panel ${key}: oczekiwano 7 kart, jest ${await tabs.count()}`);
         for (const defect of await layoutDefects(page)) found.push(`panel ${key}: ${defect}`);
       }
       // Nakładki otwierane skrótem: każda ma się pokazać jako okno dialogowe i zamknąć Escape.

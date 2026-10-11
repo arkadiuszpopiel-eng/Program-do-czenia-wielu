@@ -179,7 +179,7 @@
   .steer {
     flex: 1 1 100%;
   }
-  .steer :global(label) {
+  .steer :global(.field) {
     flex: 1;
   }
   .children {

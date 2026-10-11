@@ -321,7 +321,7 @@ export const plApp = {
   'composer.commands': 'Komendy',
   'composer.cmd.obsada': 'Zmień obsadę agentek',
   'composer.cmd.model': 'Zmień profil modelu',
-  'composer.cmd.pamiec': 'Pamięć — w kolejnej fali',
+  'composer.cmd.pamiec': 'Otwórz panel Pamięć',
   'composer.cmd.eksport': 'Eksportuj sesję do .alfa',
   'composer.cmd.ustawienia': 'Otwórz ustawienia',
   'composer.cmd.skupienie': 'Tryb skupienia',
@@ -383,7 +383,7 @@ export const plApp = {
 
   'cheatsheet.title': 'Skróty klawiszowe',
   'cheatsheet.group.sessions': 'Sesje i karty',
-  'cheatsheet.group.conversation': 'Rozmowa i composer',
+  'cheatsheet.group.conversation': 'Rozmowa i pole pisania',
   'cheatsheet.group.view': 'Widok',
   'cheatsheet.group.panels': 'Panele',
   'cheatsheet.group.voice': 'Głos',

@@ -12,6 +12,30 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.27 — 2026-10-11
+
+Poprawki z przeglądu paneli bocznych i nakładek w pełnej skali.
+
+### Interfejs
+
+- [poważne] Skróty `Alt+5`, `Alt+6` i `Alt+7` otwierają teraz kartę stojącą na tym miejscu od lewej: karty panelu
+  bocznego mają kolejność Agentki, Oś czasu, Pliki, Pamięć, Ekran, Głos, Zadania — taką samą jak skróty. Wcześniej
+  `Alt+5` otwierał szóstą kartę, `Alt+6` siódmą, a `Alt+7` piątą.
+- Pole „Wiadomość dla agentki” w panelu Zadania zajmuje całą szerokość karty zamiast wąskiego kawałka.
+- Polecenie `/pamięć` w polu pisania ma opis „Otwórz panel Pamięć” (robi to od dawna; opis mówił „w kolejnej fali”).
+- Ściąga skrótów: „pole pisania” zamiast „composer” i odstęp między treścią a ramką.
+
+### Testy
+
+- Przegląd paneli sprawdza teraz, że skrót z numerem N wybiera N-tą kartę (we wszystkich stylach i motywach).
+- Nowy skrypt zrzutów widoku głównego, paneli i nakładek w skali 1:1: `scripts/shots-panels.mjs`.
+- vitest 311/311; testy okna w przeglądarce 308 z 309 (znany próg strumienia).
+
+### Przyczyna błędu
+
+- Kolejność kart i numery skrótów były zapisane w dwóch miejscach i rozjechały się po dodaniu karty Zadania;
+  reguła stylu pola wiadomości celowała w element, którego w tym miejscu nie ma.
+
 ## 0.0.26 — 2026-10-11
 
 Poprawki z przeglądu stron Ustawień w pełnej skali i pierwszy pomiar silników mowy na tym laptopie.

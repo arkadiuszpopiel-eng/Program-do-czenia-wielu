@@ -241,7 +241,7 @@ export const plSettings = {
   'shortcut.conversation.escape': 'Zamknij menu → stop mowy → stop generowania',
   'shortcut.composer.send': 'Wyślij',
   'shortcut.composer.newline': 'Nowa linia',
-  'shortcut.composer.editLast': 'Edytuj ostatnią (pusty composer)',
+  'shortcut.composer.editLast': 'Edytuj ostatnią (puste pole pisania)',
   'shortcut.composer.historyPrev': 'Poprzednia wysłana',
   'shortcut.composer.historyNext': 'Następna wysłana',
   'shortcut.composer.pastePlain': 'Wklej jako zwykły tekst',

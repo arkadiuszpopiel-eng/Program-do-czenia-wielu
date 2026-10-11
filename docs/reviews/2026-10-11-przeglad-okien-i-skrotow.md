@@ -33,6 +33,9 @@ stany otwarte list wyboru — `skins.spec.ts` i `controls.spec.ts`; prawdziwą a
 | P-05 | poważne | style odwoływały się do czterech zmiennych, które nie istnieją: przycisk „Rozwiń wszystkie” i wiersze wersji w Historii zmian były kanciaste, w menu pod prawym przyciskiem nie było odstępu między nazwą a skrótem, nazwy zmiennych przy imporcie kluczy nie miały kroju o stałej szerokości | **naprawione (0.0.26)**; bramka `check-css` pilnuje tego odtąd |
 | P-06 | drobne  | żargon i niezgodności w tekstach: „fallbacki”, „leniwe miniatury”, „Limity per dostawca … w Hubie kont”, „Bardzo wysoka (domyślny) (obecny)” | **naprawione (0.0.26)** |
 | P-07 | drobne  | dane przykładowe podglądu: karta opisana jako 6 GB, a w powodzie „karta ma 4,0 GB” | **naprawione (0.0.26)** |
+| P-08 | poważne | `Alt+5`, `Alt+6`, `Alt+7` otwierały inną kartę panelu bocznego, niż wynikało z jej miejsca (karta Zadania stała piąta, a miała skrót `Alt+7`) | **naprawione (0.0.27)** — kolejność kart zgodna ze skrótami; test pilnuje |
+| P-09 | drobne  | pole „Wiadomość dla agentki” w panelu Zadania było wąskie (reguła stylu celowała w zły element) | **naprawione (0.0.27)** |
+| P-10 | drobne  | polecenie `/pamięć` miało opis „Pamięć — w kolejnej fali”, choć otwiera działający panel; „composer” w ściądze skrótów | **naprawione (0.0.27)** |
 
 ## Druga część przeglądu (tego samego dnia)
 
@@ -65,8 +68,9 @@ rozmiaru pól wielowierszowych jest rysowany przez Alfę (`base.css`), nie przez
 ocenić drobnych odstępów ani typografii.
 
 **Ocena w pełnej skali (0.0.26):** obejrzałem wszystkie 32 strony Ustawień w stylu Szkło ciemnym w skali 1:1
-(1280 × 800). Stąd ustalenia P-05–P-07. Zostało: pozostałe pięć kombinacji stylu i motywu w pełnej skali,
-panele boczne i okna poboczne w pełnej skali.
+(1280 × 800). Stąd ustalenia P-05–P-07. W 0.0.27 doszły w skali 1:1 (1440 × 900): widok główny, siedem paneli bocznych i trzy nakładki w stylu
+Szkło ciemnym oraz panel Zadania w Klasycznym jasnym — stąd P-08–P-10. Zostało: pozostałe kombinacje stylu
+i motywu w pełnej skali (różnią się tylko kolorami i zaokrągleniami) oraz okna poboczne.
 
 ## Czego ten przegląd nie obejmuje
 

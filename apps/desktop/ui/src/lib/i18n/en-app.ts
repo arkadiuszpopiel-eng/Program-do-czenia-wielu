@@ -305,7 +305,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'composer.commands': 'Commands',
   'composer.cmd.obsada': 'Change the agent cast',
   'composer.cmd.model': 'Change the model profile',
-  'composer.cmd.pamiec': 'Memory — in a later wave',
+  'composer.cmd.pamiec': 'Open the Memory panel',
   'composer.cmd.eksport': 'Export session to .alfa',
   'composer.cmd.ustawienia': 'Open settings',
   'composer.cmd.skupienie': 'Focus mode',
