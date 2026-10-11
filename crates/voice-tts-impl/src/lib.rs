@@ -9,6 +9,7 @@
 pub mod cache;
 pub mod engines;
 mod service;
+pub mod sidecar;
 pub mod voice_mod;
 
 use std::sync::Arc;

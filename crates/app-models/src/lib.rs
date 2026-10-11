@@ -24,6 +24,7 @@ pub mod fetch;
 pub mod install;
 mod jobs;
 pub mod store;
+pub mod supertonic;
 pub mod unpack;
 mod view;
 

@@ -1,6 +1,7 @@
-//! Głosy v0 bez kluczy (ADR 0011): dwie bazowe mówczynie Pocket TTS PL × wysokość/tempo → cztery
-//! odrębne głosy; zapas Piper `pl_PL` z tymi samymi proporcjami. Reguła: głos (także zapasowy)
-//! jednej agentki nie może brzmieć jak głos innej.
+//! Głosy bez kluczy: pierwsze ogniwo to **Supertonic 3** — cztery różne barwy modelu, po jednej
+//! na agentkę (bez przestrajania); dalej jak w v0 (ADR 0011): dwie bazowe mówczynie Pocket TTS PL ×
+//! wysokość/tempo i zapas Piper `pl_PL`. Reguła: głos (także zapasowy) jednej agentki nie może
+//! brzmieć jak głos innej.
 
 use std::collections::HashMap;
 
@@ -8,6 +9,11 @@ use personas_contract::PersonaId;
 
 use crate::{TtsEngine, TtsError, VoicePreset, VoiceRef};
 
+/// Barwy Supertonic 3 agentek: Alfa — F1 (ciepła, domyślna), Beta — F2, Gama — F4, Delta — F5
+/// (wyrazista). Wybór ostateczny po odsłuchu właściciela; wszystkie barwy: F1–F5, M1–M5.
+pub const SUPERTONIC_VOICES: [&str; 4] = ["F1", "F2", "F4", "F5"];
+/// Wszystkie barwy modelu Supertonic 3 (do wyboru w Ustawieniach).
+pub const SUPERTONIC_ALL: [&str; 10] = ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"];
 /// Mówczynie bazowe Pocket TTS PL (nazwy głosów modelu społeczności; wybór ostateczny: casting, ADR 11).
 pub const POCKET_BASE: [&str; 2] = ["pl-f1", "pl-f2"];
 /// Głos zapasowy Piper (kobiecy, `pl_PL`).
@@ -30,9 +36,17 @@ fn voice(persona: PersonaId, engine: TtsEngine, base: &str, pitch: f32, rate: f3
 /// Gama — niżej, wolniej; Delta — jaśniej, żwawo).
 pub fn v0_chains() -> Vec<(PersonaId, Vec<VoiceRef>)> {
     let p = |id: PersonaId, base: &str, pitch: f32, rate: f32, piper_pitch: f32| {
+        let timbre = match id.as_str() {
+            "beta" => SUPERTONIC_VOICES[1],
+            "gama" => SUPERTONIC_VOICES[2],
+            "delta" => SUPERTONIC_VOICES[3],
+            _ => SUPERTONIC_VOICES[0],
+        };
         (
             id.clone(),
             vec![
+                // Barwa jest już inna dla każdej agentki — bez zmiany wysokości; tempo zostaje.
+                voice(id.clone(), TtsEngine::Supertonic, timbre, 1.0, rate),
                 voice(id.clone(), TtsEngine::Pocket, base, pitch, rate),
                 voice(id, TtsEngine::Piper, PIPER_BASE, piper_pitch, rate),
             ],
@@ -88,9 +102,19 @@ mod tests {
         let chains = v0_chains();
         assert_eq!(chains.len(), 4);
         assert!(validate_chains(&chains).is_ok());
-        let bases: std::collections::BTreeSet<&str> = chains
+        let timbres: std::collections::BTreeSet<&str> = chains
             .iter()
             .map(|(_, c)| c[0].preset.base_speaker.as_str())
+            .collect();
+        assert_eq!(timbres.len(), 4, "Supertonic: cztery różne barwy");
+        assert!(
+            chains
+                .iter()
+                .all(|(_, c)| c[0].engine == TtsEngine::Supertonic)
+        );
+        let bases: std::collections::BTreeSet<&str> = chains
+            .iter()
+            .map(|(_, c)| c[1].preset.base_speaker.as_str())
             .collect();
         assert_eq!(bases.len(), 2);
     }

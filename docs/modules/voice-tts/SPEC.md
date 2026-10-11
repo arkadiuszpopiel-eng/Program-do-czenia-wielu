@@ -63,6 +63,7 @@ Napisy z podświetleniem wypowiedzianych słów, „przeczytaj na głos" (głose
 - Forced alignment: własny (whisper.cpp) czy aligner z silnika — do ustalenia w SPEC v1.
 
 ## Decyzje v0 (F2)
+- Supertonic 3 (od 0.0.30, głos główny): sidecar `alfa-supertonic` (`crates/lib-supertonic`, ONNX Runtime w osobnym procesie), ten sam protokół JSON-lines; tempo ustawia silnik (tempo agentki × 1,05); barwy Alfa F1, Beta F2, Gama F4, Delta F5; silnik bez plików jest pomijany bez zdarzenia awarii.
 - Pocket TTS PL: trwały sidecar z protokołem JSON-lines po stdio (opis w `crates/voice-tts-impl/README.md`); Piper: proces na zdanie (`--output_raw`).
 - Głosy v0: mówczynie `pl-f1`/`pl-f2` (Pocket) × wysokość/tempo (Alfa 1,00/1,00, Beta 1,06/0,97, Gama 0,92/0,92, Delta 1,12/1,08); zapas Piper `pl_PL-gosia-medium` z odpowiadającą wysokością. Modyfikacja: WSOLA + resampling (błąd F0 i długości < 0,01% w testach, próg ±3%). Nazwy głosów i licencje — casting (ADR 11).
 - Fallback per zdanie (łańcuch idzie dalej, nie wraca w obrębie wypowiedzi); w sesji prywatnej ogniwa chmurowe pomijane.

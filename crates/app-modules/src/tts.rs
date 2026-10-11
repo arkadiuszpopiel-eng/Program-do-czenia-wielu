@@ -1,5 +1,5 @@
-//! Silniki TTS z sidecarów (`voice-tts-impl`): Pocket TTS PL (trwały proces, JSON-lines) i Piper
-//! `pl_PL` (proces na zdanie), łańcuchy głosów v0 bez kluczy. Silniki są wykrywane **przy użyciu**
+//! Silniki TTS z sidecarów (`voice-tts-impl`): Supertonic 3 (`alfa-supertonic`, trwały proces,
+//! JSON-lines), Pocket TTS PL i Piper `pl_PL` (proces na zdanie), łańcuchy głosów bez kluczy. Silniki są wykrywane **przy użyciu**
 //! ([`InstalledTts`]), tak jak `llama-server` (`route::local::candidates`): Piper pobrany
 //! w Ustawieniach działa od następnego czytania na głos albo włączenia rozmowy głosowej — bez
 //! ponownego uruchomienia Alfy. Brak obu plików = stan `Failed` ([`ready`] → `None`): czytanie na
@@ -14,7 +14,8 @@ use voice_tts_contract::{
     VoiceInfo, v0_chains,
 };
 use voice_tts_impl::TtsService;
-use voice_tts_impl::engines::{PiperEngine, PocketSidecar, TokioRunner, TtsBackend};
+use voice_tts_impl::engines::{PiperEngine, TokioRunner, TtsBackend};
+use voice_tts_impl::sidecar::PocketSidecar;
 
 use app_api::AppPaths;
 
@@ -23,6 +24,7 @@ use crate::voice::NO_TTS;
 /// Zainstalowane silniki (pliki sidecarów w chwili sprawdzenia).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Installed {
+    supertonic: bool,
     pocket: bool,
     piper: bool,
 }
@@ -30,6 +32,7 @@ struct Installed {
 impl Installed {
     fn detect(paths: &AppPaths) -> Self {
         Self {
+            supertonic: supertonic_ready(paths),
             pocket: paths.sidecar("pocket-tts", "pocket-tts").is_file(),
             // Piper bez modelu głosu (`*.onnx`) nie potrafi nic powiedzieć: sam plik silnika to
             // jeszcze nie „głos gotowy" (wcześniej rozmowa startowała i każde zdanie kończyło się
@@ -38,6 +41,34 @@ impl Installed {
                 && has_piper_voice(&paths.models().join("piper")),
         }
     }
+}
+
+/// Katalog modeli Supertonic 3 (płasko: cztery sieci, konfiguracja i barwy `F1.json`…).
+fn supertonic_models(paths: &AppPaths) -> std::path::PathBuf {
+    paths.models().join("supertonic")
+}
+
+/// Biblioteka ONNX Runtime leży obok sidecara — ładuje ją tylko proces `alfa-supertonic`.
+fn supertonic_runtime(paths: &AppPaths) -> std::path::PathBuf {
+    paths
+        .sidecar("supertonic", "alfa-supertonic")
+        .with_file_name(if cfg!(windows) {
+            "onnxruntime.dll"
+        } else {
+            "libonnxruntime.so"
+        })
+}
+
+/// Supertonic jest gotowy, gdy są: sidecar, biblioteka ONNX Runtime, konfiguracja modelu i barwa
+/// domyślna. Bez któregoś z plików rozmowa od razu używa następnego silnika z łańcucha.
+fn supertonic_ready(paths: &AppPaths) -> bool {
+    let models = supertonic_models(paths);
+    paths.sidecar("supertonic", "alfa-supertonic").is_file()
+        && supertonic_runtime(paths).is_file()
+        && models.join("tts.json").is_file()
+        && models.join("vector_estimator.onnx").is_file()
+        && models.join("vocoder.onnx").is_file()
+        && models.join("F1.json").is_file()
 }
 
 /// Czy w katalogu jest co najmniej jeden model głosu Pipera (`*.onnx`).
@@ -60,6 +91,27 @@ fn build(
     tuning: &SharedTuning,
 ) -> Result<Option<Arc<dyn Tts>>, TtsError> {
     let mut backends: Vec<Arc<dyn TtsBackend>> = Vec::new();
+    if installed.supertonic {
+        let models = supertonic_models(paths);
+        let lossy = |p: std::path::PathBuf| p.to_string_lossy().into_owned();
+        // Ustawienia strojone na sprzęcie w Delcie AI: 6 kroków, język polski (tempo — w żądaniu).
+        let args = vec![
+            "--onnx-dir".to_owned(),
+            lossy(models.clone()),
+            "--voices-dir".to_owned(),
+            lossy(models),
+            "--ort".to_owned(),
+            lossy(supertonic_runtime(paths)),
+            "--steps".to_owned(),
+            "6".to_owned(),
+            "--lang".to_owned(),
+            "pl".to_owned(),
+        ];
+        backends.push(Arc::new(
+            PocketSidecar::process(paths.sidecar("supertonic", "alfa-supertonic"), args)
+                .supertonic(),
+        ));
+    }
     if installed.pocket {
         let pocket = paths.sidecar("pocket-tts", "pocket-tts");
         let models = paths.models().join("pocket-tts");

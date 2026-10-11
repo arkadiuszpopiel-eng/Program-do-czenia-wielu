@@ -198,6 +198,18 @@ impl Job {
             let mut last_err = String::new();
             let mut done = None;
             while link < self.chain.len() {
+                // Silnik niezainstalowany to nie awaria: pomijamy ogniwo bez zdarzenia i bez stanu
+                // „pogorszony” (np. komputer bez Supertonica mówi od razu Piperem).
+                if !matches!(self.chain[link].engine, TtsEngine::Cloud { .. })
+                    && !self.backends.contains_key(&self.chain[link].engine.name())
+                {
+                    last_err = format!(
+                        "silnik {} nie jest zainstalowany",
+                        self.chain[link].engine.name()
+                    );
+                    link += 1;
+                    continue;
+                }
                 match synth_sentence(
                     &self.backends,
                     &self.chain[link],

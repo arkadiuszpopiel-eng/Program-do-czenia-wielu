@@ -1,6 +1,6 @@
 # 14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów
 
-Stan na **2026-10-11**, wersja 0.0.29. Zgłoszenie właściciela: „w programie jest dużo funkcji z informacją
+Stan na **2026-10-11**, wersja 0.0.30. Zgłoszenie właściciela: „w programie jest dużo funkcji z informacją
 «wkrótce» — czy wszystko jest zanotowane?”. Ten dokument jest spisem: każde miejsce w programie, które mówi
 „wkrótce” albo „funkcja dostępna po podłączeniu modułu”, ma tu wiersz i zadanie w
 [roadmapie](03-roadmapa.md). Test `app-core/tests/soon_inventory.rs` nie przejdzie, jeśli w Ustawieniach

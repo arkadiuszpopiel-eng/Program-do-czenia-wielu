@@ -35,6 +35,8 @@ pub enum CloudTts {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TtsEngine {
+    /// Supertonic 3 (sidecar `alfa-supertonic` na ONNX Runtime; CPU; 31 języków z polskim).
+    Supertonic,
     /// Pocket TTS + model PL społeczności (sidecar JSON-lines po stdio; CPU).
     Pocket,
     /// Piper `pl_PL-*` (proces na zdanie; zapas).
@@ -58,6 +60,7 @@ impl TtsEngine {
     /// Krótka nazwa (zdarzenia, klucz cache).
     pub fn name(&self) -> String {
         match self {
+            TtsEngine::Supertonic => "supertonic".into(),
             TtsEngine::Pocket => "pocket".into(),
             TtsEngine::Piper => "piper".into(),
             TtsEngine::Chatterbox => "chatterbox".into(),

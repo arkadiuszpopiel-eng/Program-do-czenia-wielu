@@ -21,7 +21,8 @@ use voice_tts_contract::{
     v0_chains,
 };
 use voice_tts_impl::cache::PhraseCache;
-use voice_tts_impl::engines::{PiperEngine, PocketSidecar, ProcessRunner, TtsBackend};
+use voice_tts_impl::engines::{PiperEngine, ProcessRunner, TtsBackend};
+use voice_tts_impl::sidecar::PocketSidecar;
 use voice_tts_impl::{TtsLease, TtsService, VoiceTtsModule};
 
 fn tone_pcm16(chars: usize, rate: u32) -> Vec<u8> {
@@ -280,9 +281,10 @@ async fn stop_cancels_running_job_and_errors() {
     .await;
     assert!(matches!(r, Err(TtsError::AllEnginesFailed(_))));
     let mut bad = v0_chains();
-    bad[1].1[0].preset.pitch = 1.0;
-    bad[1].1[0].preset.rate = 1.0;
-    bad[1].1[0].preset.base_speaker = "pl-f1".into();
+    // Ogniwo 0 to Supertonic (własna barwa na agentkę); 1 — Pocket, gdzie odrębność daje preset.
+    bad[1].1[1].preset.pitch = 1.0;
+    bad[1].1[1].preset.rate = 1.0;
+    bad[1].1[1].preset.base_speaker = "pl-f1".into();
     assert!(
         TtsService::new(bad, vec![]).is_err(),
         "Beta brzmiałaby jak Alfa"

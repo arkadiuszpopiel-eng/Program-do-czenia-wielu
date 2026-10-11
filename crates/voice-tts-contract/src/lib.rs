@@ -27,7 +27,9 @@ pub use types::{
     CancelToken, CloudTts, MarksKind, SpeechStyle, TtsChunk, TtsEngine, TtsError, TtsRequest,
     VoiceInfo, VoicePreset, VoiceRef, WordMark,
 };
-pub use voices::{PIPER_BASE, POCKET_BASE, v0_chains, validate_chains};
+pub use voices::{
+    PIPER_BASE, POCKET_BASE, SUPERTONIC_ALL, SUPERTONIC_VOICES, v0_chains, validate_chains,
+};
 
 /// Częstotliwość wyjścia TTS (resampling na urządzenie robi `voice-audio`).
 pub const TTS_RATE: u32 = 24_000;

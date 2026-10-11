@@ -12,6 +12,44 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.30 — 2026-10-11
+
+Nowy głos agentek: Supertonic 3. Cztery agentki mówią czterema różnymi, naturalniejszymi barwami — lokalnie, bez
+Internetu i bez opłat. To pierwszy krok przenoszenia rozmowy i mowy z Delty AI (zadanie P1).
+
+### Głos
+
+- [poważne] Agentki mówią głosem Supertonic 3, gdy jego model jest pobrany: Alfa barwą F1, Beta F2, Gama F4,
+  Delta F5 — naprawdę różne głosy zamiast jednego przestrajanego. Model (383 MB) pobierasz w Ustawieniach →
+  „Modele lokalne i silniki”; bez niego wszystko działa jak dotąd na Piperze.
+- Silnik działa jako osobny proces bez Pythona, na procesorze. Ustawienia przejęte z Delty: 6 kroków i tempo 1,05.
+  Na tym laptopie zdanie jest gotowe po ok. 1 s (mediana 0,97 s; wcześniejsza próba w Pythonie: 2,10 s).
+- Brak pobranego silnika mowy nie jest już zgłaszany jako awaria przy każdej wypowiedzi — program po prostu
+  używa następnego głosu z listy.
+
+### Naprawy
+
+- Dane przykładowe podglądu pakietów modeli wróciły do postaci generowanej z rdzenia. Ręczna poprawka z 0.0.26
+  („karta ma 6,0 GB”) rozjechała je z testem rdzenia, którego wtedy nie uruchomiłam.
+
+### Czego nie sprawdzono
+
+- Brzmienia po polsku nie da się ocenić automatycznie — odsłuch należy do Ciebie (Ustawienia → Głos → „Odsłuchaj”
+  przy każdej agentce albo próbki w `alfa-glos-proba/wyniki/alfa-supertonic`).
+- Rozmowy głosowej na żywo z nowym głosem, pobierania modelu przyciskiem w Ustawieniach i reguł licencji
+  zależności (`cargo deny` działa tylko w CI) jeszcze nie sprawdzono.
+- Biblioteka ONNX Runtime dla tego silnika nie jest jeszcze w katalogu pobrań — w tej budowie leży obok programu.
+
+### Testy
+
+- 11 testów nowego silnika (protokół, przygotowanie tekstu), 2 testy łańcucha głosów (barwa agentki i tempo,
+  ciche pominięcie niezainstalowanego silnika), test katalogu (16 plików z sumami SHA-256).
+
+### Przyczyna błędu
+
+- Łańcuch głosów traktował silnik bez plików tak samo jak silnik, który się zepsuł: wysyłał zdarzenie przejścia na
+  zapas i oznaczał głos jako pogorszony.
+
 ## 0.0.29 — 2026-10-11
 
 Plan uzupełniony o pełną macierz funkcji Delty, trzy nowe grupy zadań i nowości z rynku. W samym programie ta
