@@ -6,8 +6,10 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+pub mod breaker;
 pub mod client;
 mod engine;
+pub mod guard;
 pub mod sidecar;
 
 use std::sync::Arc;
