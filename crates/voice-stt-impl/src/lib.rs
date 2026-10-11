@@ -9,6 +9,7 @@
 pub mod breaker;
 pub mod client;
 mod engine;
+pub mod fallback;
 pub mod guard;
 pub mod qwen;
 mod qwen_wire;

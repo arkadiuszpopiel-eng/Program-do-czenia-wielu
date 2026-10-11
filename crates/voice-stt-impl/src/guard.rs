@@ -70,7 +70,14 @@ pub fn audio_stats(pcm: &[f32]) -> AudioStats {
         clippy::cast_sign_loss
     )]
     let floor = sorted[((sorted.len() - 1) as f32 * 0.1).round() as usize];
-    let threshold = ACTIVE_FLOOR.max(floor * 2.5);
+    // Odstępstwo od Delty: gdy nawet najcichsze ramki są wyraźnie słyszalne (mowa bez pauz, np.
+    // jedno słowo wypowiedziane ciągiem), próg względny wyszedłby ponad całe nagranie i odrzucił
+    // prawdziwą mowę jako „ciszę”. Wtedy liczy się próg stały.
+    let threshold = if floor >= MIN_PEAK {
+        ACTIVE_FLOOR
+    } else {
+        ACTIVE_FLOOR.max(floor * 2.5)
+    };
     frames.retain(|rms| *rms >= threshold);
     #[allow(clippy::cast_precision_loss)]
     let speech_ms = frames.len() as f32 * 20.0;
@@ -291,6 +298,10 @@ mod tests {
             "{stats:?}"
         );
         assert_eq!(audio_stats(&[]), AudioStats::default());
+        // Mowa ciągła bez żadnej pauzy też jest mową (w Delcie wychodziła jako „0 ms sygnału”).
+        let steady = audio_stats(&tone(600, 0.2));
+        assert_eq!(reject_reason(&steady), None, "{steady:?}");
+        assert!(steady.speech_ms >= 580.0);
     }
 
     #[test]
