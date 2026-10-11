@@ -8,6 +8,8 @@ przejścia po kodzie (zaplecze Python: 46 grup i 356 tras API, 59 narzędzi agen
 50 widoków). Niczego nie uruchamiano. Specyfikacja głosu ze stałymi: [`19`](19-specyfikacja-glosu-delty.md).
 Macierz pozycja po pozycji: [`20`](20-macierz-delty-czesc-1.md) i [`21`](21-macierz-delty-czesc-2.md).
 
+Nowości z rynku dopisane do grup (R1–R13): [`22-nowosci-2026-10.md`](22-nowosci-2026-10.md).
+
 ## Zasady przenoszenia
 
 1. Szkielet Alfy zostaje: moduły z kontraktami, Broker, klucze w Menedżerze poświadczeń, bez Pythona.
@@ -72,13 +74,15 @@ wypowiedź 30 s.
 - **Panel System**: podsumowanie (model, gdzie działa, warstwy, szybkość, ocena wydajności) i zakładki Model /
   Sprzęt / Łącze; przełącznik „Korzystanie z modeli” (tylko offline / offline + online / tylko online).
 - **Monitor sprzętu**: wszystkie karty (pamięć, obciążenie, temperatura, moc), pamięć karty per proces.
+- **Nowe (R10, R11)**: „Alfa Link” — modele z mocniejszego własnego komputera używane jak lokalne (kanał z etapu D);
+  parametr przyspieszenia dla modeli z przewidywaniem kilku słów naraz.
 
 ## P3 — nawigacja i powłoka
 
 - **Menu kołowe**: F1 „Rdzeń poleceń” (8 pól), F2 „Macierz narzędzi” (8 grup z podmenu), środkowy przycisk
   myszy; 6 suwaków dostrajania, import i eksport ustawień.
-- **Doki w górnej belce**: grupy widoków; „Funkcje” — 12 przełączników zdolności i przycisk „Odetnij od
-  komputera”; „Skróty” — własne ulubione widoki; „Okna”.
+- **Doki w górnej belce**: grupy widoków (pokazują tylko widoki, które już istnieją); „Funkcje” — 12
+  przełączników zdolności ze zdaniem stanu i kolorem ryzyka oraz przycisk „Odetnij od komputera”; „Skróty” — własne ulubione widoki; „Okna”.
 - **Okna odczepiane**: każdy widok, do 12 okien, gotowe układy (Laptop, 2 monitory, 21:9), profile pracy,
   przenoszenie między monitorami, zawsze na wierzchu.
 - **Pulpit kafelkowy**: do 12 kafli, trzy skale (także dotykowa), tryb edycji, 8 zapisanych układów, osobne okno.
@@ -117,7 +121,7 @@ w Menedżerze poświadczeń, kasowanie na żądanie. Łączy się z kontami z et
 Głośność, uruchamianie programów, lista i przełączanie okien, schowek, klawisze multimediów, mysz i klawiatura,
 klik po tekście z ekranu, zrzuty — wszystko przez Brokera, z dziennikiem · menedżer procesów · spis urządzeń
 i sieci · ekran uprawnień · praca agentki programistki, która w Delcie była tylko podglądem, w Alfie realnie
-przez mosty CLI i Brokera.
+przez mosty CLI i Brokera · **nowe (R7)**: „zobacz to okno” — pytanie o zawartość wskazanego okna, z maskowaniem.
 
 ## P8 — twórczość
 
@@ -159,6 +163,9 @@ w trakcie pracy i dobierając model do trudności zadania. W Delcie był to tylk
 | Dobór modelu do zadania | czytanie plików, szukanie i streszczanie — model lekki (lokalny albo tani); planowanie, trudne poprawki, przegląd — model mocny, dopiero gdy trzeba; podniesienie klasy po nieudanej próbie | klasy zadań i kolejki modeli (Rozmowa, Kod, Planowanie, Streszczanie), limity kosztów |
 | Budżet i raport | limit kroków, czasu i kosztu na zadanie; po pracy raport: co zmieniono, wynik testów, co nie zostało sprawdzone | limity zadań, samoweryfikacja „Gotowe” |
 | Bezpieczniki | treść z plików i z sieci traktowana jako dane, nie polecenia; sekrety nie trafiają do modelu; STOP przerywa wszystko | Broker, kill-switch, filtr sekretów |
+| Równoległe przebiegi (R3) | każda agentka w osobnej kopii roboczej repozytorium; panel przebiegów z podglądem zmian | zadania równoległe, oś czasu |
+| Model do etapu pracy (R4, R5) | tani model szuka i czyta, mocny pisze, średni sprawdza; praca dzielona tylko wtedy, gdy części są niezależne | klasy zadań i kolejki |
+| Jedna rozmowa (R1) i głos (R6) | zwykłe pytanie samo przechodzi w zadanie; głosem można zapytać o postęp, wstrzymać i zatwierdzić | rozmowa głosowa |
 
 Co zostaje także przy włączonym przycisku: każde działanie wykonuje Broker i trafia do dziennika (bez pytania,
 ale z zapisem i możliwością cofnięcia kroków); agentki nie mogą same włączyć przycisku ani zmieniać Brokera,
@@ -176,6 +183,7 @@ sieciowych i chmurowych, z pełnymi uprawnieniami do tworzenia kopii zapasowych.
 | Przeglądanie i praca na plikach | magazyny widoczne w panelu Pliki jak zwykłe katalogi; agentki mogą na nich czytać, zapisywać i porządkować — przez Brokera, w granicach nadanych uprawnień | panel Pliki, wersje artefaktów, cofanie kroków |
 | Kopie zapasowe | pełne uprawnienia do tworzenia kopii: danych Alfy (rozmowy, pamięć, ustawienia, agentki) i wskazanych katalogów użytkownika; harmonogram, kopie przyrostowe, wersje z rotacją, szyfrowanie po stronie komputera przed wysłaniem, sprawdzanie sum, przywracanie całości albo pojedynczych plików | eksport `.alfa` z szyfrowaniem i kopie z rotacją (moduł `transfer`), harmonogram zadań |
 | Kilka celów naraz | zasada 3-2-1: kopia lokalna, na dysku sieciowym i w chmurze; raport po każdej kopii i alarm, gdy kopia się nie udała albo jest stara | Zdrowie systemu, powiadomienia |
+| Zasady z rynku (R12) | migawki bez powtórzeń, rotacja dzienna / tygodniowa / miesięczna, okresowe sprawdzanie próbki danych, ćwiczone przywracanie; łączniki z logowaniem u dostawcy (R9) | — |
 | Bezpieczniki | kopia nigdy nie kasuje źródła; usuwanie starych wersji tylko według ustawionej rotacji; klucze API i sekrety nie trafiają do kopii jawnie; w sesji prywatnej nic nie idzie do chmury | twarda reguła: sekrety tylko w Menedżerze poświadczeń |
 
 Uwaga do budowy: połączenia z siecią lokalną i z chmurą przechodzą przez strażnika sieci (`lib-netguard`) —
@@ -194,7 +202,8 @@ sprawdzanie poczty.
 | Inne wzory | przegląd wiadomości z ulubionych stron (P5), porządki w Pobranych, kopia zapasowa (P13), raport kosztów, sprawdzenie stanu systemu, pilnowanie strony albo ceny | Ulepszacz, Zdrowie systemu |
 | Budżet i model | każdy obowiązek ma limit kosztu i czasu; domyślnie model lekki albo lokalny, mocny tylko gdy zadanie tego wymaga (jak w P12) | limity zadań, „zadania w tle tylko lokalnie” |
 | Raport | po każdym przebiegu krótki wpis w osi czasu i w raporcie dnia: co zrobiono, co czeka na decyzję; możliwość odczytania głosem | raport dnia, oś czasu |
-| Bezpieczniki | treść wiadomości to dane, nie polecenia (ochrona przed poleceniami ukrytymi w poczcie); obowiązek nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków | Broker, tagi prywatności |
+| Rutyny (R2) i poranny przegląd (R8) | obowiązek to zapisane polecenie + zakres + łączniki, uruchamiane z harmonogramu, zdarzeniem albo ręcznie; rano raport: poczta, kalendarz, zadania, koszty | wyzwalacze, raport dnia |
+| Bezpieczniki (R13) | treść wiadomości to dane, nie polecenia; wysyłka po zatwierdzeniu; nowy adresat zawsze z pytaniem; obowiązek nie ma dostępu do płatności ani kluczy i nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków | Broker, tagi prywatności |
 
 Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.
 

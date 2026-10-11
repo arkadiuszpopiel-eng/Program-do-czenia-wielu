@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-11** (wersja programu 0.0.28). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-11** (wersja programu 0.0.29). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -310,6 +310,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-11 | Wersja 0.0.29: P0 zrobione (specyfikacja głosu — dokument [`19`](19-specyfikacja-glosu-delty.md), macierz — [`20`](20-macierz-delty-czesc-1.md), [`21`](21-macierz-delty-czesc-2.md)); nowe grupy P12 (agentki programistki z przyciskiem „Pełne uprawnienia”), P13 (dyski sieciowe i chmurowe, kopie), P14 (obowiązki codzienne); nowości z rynku R1–R13 (dokument [`22`](22-nowosci-2026-10.md)); macierz porównana ze zrzutami menu Delty. |
 | 2026-10-11 | Wersja 0.0.28: plan zbiorczy (dokument [`16`](16-plan-zbiorczy.md)), nowy etap P — przeniesienie funkcji z Delty AI (dokument [`17`](17-przeniesienie-z-delty.md)) i nowy etap U — wielu użytkowników (dokument [`18`](18-wielu-uzytkownikow.md), ADR 0027). Decyzje właściciela: Alfa programem docelowym, ADR 0025 przyjęty, stała zgoda na pobrania do 3 GB. |
 | 2026-10-11 | Wersja 0.0.27: poprawki z przeglądu paneli bocznych i nakładek w skali 1:1 — kolejność kart zgodna ze skrótami `Alt+1…7`, pole wiadomości w Zadaniach, opis polecenia `/pamięć`. |
 | 2026-10-11 | Wersja 0.0.26: pierwszy pomiar głosów na laptopie bazowym (C5.2 w toku) — Chatterbox z pakietu producenta i Supertonic 3 są za wolne do rozmowy, decyzja po odsłuchu; poprawki z przeglądu stron Ustawień w pełnej skali i nowa reguła bramki (niezdefiniowane zmienne stylów). |

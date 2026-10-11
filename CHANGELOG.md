@@ -12,6 +12,25 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.29 — 2026-10-11
+
+Plan uzupełniony o pełną macierz funkcji Delty, trzy nowe grupy zadań i nowości z rynku. W samym programie ta
+wersja niczego nie zmienia.
+
+### Plan
+
+- Macierz funkcji Delty pozycja po pozycji z decyzją dla każdej (`docs/plan/20`, `21`) i specyfikacja jej systemu
+  rozmowy i mowy ze wszystkimi stałymi (`docs/plan/19`). Macierz porównana ze zrzutami menu od właściciela.
+- Nowe grupy: agentki programistki z nadrzędnym przyciskiem „Pełne uprawnienia” (P12), dyski sieciowe i chmurowe
+  z kopiami zapasowymi (P13), obowiązki codzienne agentek — poczta, kalendarz, przypomnienia (P14).
+- Nowości z rynku dopisane do grup (`docs/plan/22`): rutyny, równoległe przebiegi agentek, tani model do czytania
+  i mocny do pisania, sterowanie zadaniami głosem, poranny przegląd, zasady kopii i obrona poczty przed poleceniami
+  ukrytymi w listach.
+
+### Czego nie sprawdzono
+
+- Nowości z rynku pochodzą częściowo ze źródeł wtórnych; każda będzie sprawdzona u źródła przed rozpoczęciem zadania.
+
 ## 0.0.28 — 2026-10-11
 
 Jeden plan całości: dotychczasowe etapy, przeniesienie funkcji z Delty AI i wielu użytkowników. W samym programie

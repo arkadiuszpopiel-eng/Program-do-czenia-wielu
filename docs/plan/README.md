@@ -30,6 +30,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`18-wielu-uzytkownikow.md`](18-wielu-uzytkownikow.md) | Etap U: konta, logowanie, role, rozdzielenie danych | z postępem etapu U i ADR 0027 |
 | [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glosu-delty.md) | Jak dokładnie działa rozmowa i mowa w Delcie: stałe, progi, kolejność kroków, 17 głosów, kontrolki ekranu | wzorzec dla P1 — zmienia się tylko przy korekcie |
 | [`20-macierz-delty-czesc-1.md`](20-macierz-delty-czesc-1.md), [`21-macierz-delty-czesc-2.md`](21-macierz-delty-czesc-2.md) | Macierz funkcji Delty pozycja po pozycji z decyzją: przenosimy / dostosowujemy / jest / nie | po każdej grupie etapu P |
+| [`22-nowosci-2026-10.md`](22-nowosci-2026-10.md) | Nowości z rynku (R1–R13) dopisane do grup etapu P: rutyny, równoległe przebiegi, model do etapu pracy, kopie, obrona poczty | przy kolejnym przeglądzie rynku |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).

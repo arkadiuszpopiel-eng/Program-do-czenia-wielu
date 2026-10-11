@@ -145,5 +145,5 @@ Stan na **2026-10-11**. Ciąg dalszy [`20`](20-macierz-delty-czesc-1.md); te sam
 
 ## Podsumowanie liczbowe
 
-Wierszy w obu częściach (bez listy kandydatów N): 203 — grupują ok. 400 pojedynczych funkcji. Decyzje: przenosimy — 143 ·
-dostosowujemy — 20 · jest — 36 · nie — 3 · wstrzymane — 1.
+Wierszy w obu częściach (bez listy kandydatów N): 208 — grupują ok. 400 pojedynczych funkcji. Decyzje: przenosimy — 146 ·
+dostosowujemy — 20 · jest — 38 · nie — 3 · wstrzymane — 1.

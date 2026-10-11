@@ -2,6 +2,8 @@
 
 Stan na **2026-10-11**. Każda funkcja Delty 0.8.35 znaleziona w kodzie ma tu wiersz z decyzją. Część 2 (wiedza,
 komputer, modele, twórczość, awatar, multimedia, diagnostyka, przepływy): [`21`](21-macierz-delty-czesc-2.md).
+Porównana ze zrzutami menu Delty od właściciela (2026-10-11): wszystkie doki mają wiersze; dopisane szczegóły
+to A15a, A22a, A36, B26, B27. Zasada: jeśli Alfa ma coś lepszego, zostaje Alfa.
 Głos: [`19`](19-specyfikacja-glosu-delty.md).
 
 Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechanizm) · **jest** (Alfa już to ma) ·
@@ -26,6 +28,7 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | A13 | Dok „Ustawienia”: ustawienia, instrukcja, co nowego, moduły, komendy, skróty, diagnostyka, pulpity | strona Ustawień | dostosowujemy: skrót do stron Ustawień | P3 |
 | A14 | Przypinanie doku (tylko na czas sesji) | brak | przenosimy, z zapamiętaniem | P3 |
 | A15 | Dok „Funkcje”: 12 przełączników (komputer, mysz i klawiatura, uprawnienia, zrzuty, schowek, Internet, pliki, kod, kamera, multimedia, obrazy) | poziomy autonomii, strona Uprawnienia | przenosimy jako szybkie przełączniki zdolności | P3, P7 |
+| A15a | Dok „Funkcje”: zdanie stanu na górze („może klikać i pisać na tym komputerze”) i dwa kolory włączenia — zielony dla zwykłych zdolności, pomarańczowy dla ryzykownych (system, mysz i klawiatura, kod) | objaśnienie stanu w belce | przenosimy | P3 |
 | A16 | „Odetnij Deltę od komputera” — jednym kliknięciem wyłącza mysz, klawiaturę, system i kod | STOP WSZYSTKIEGO `Ctrl+Shift+F12` | przenosimy jako łagodniejszy stopień obok STOP | P3 |
 | A17 | Dok „Skróty”: własne ulubione widoki z listy wszystkich | brak | przenosimy | P3 |
 | A18 | Dok „Okna”: lista odczepionych okien (do 12), Pokaż / Przywróć / Wierzch / Reset / Zamknij | brak | przenosimy | P3 |
@@ -33,6 +36,7 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | A20 | Przenoszenie okna na monitor M1…Mn | brak | przenosimy | P3 |
 | A21 | Profile pracy (kilka okien naraz): Centrum pracy, Live rozmowa, Dev / Coding, Media lab, Modele i sklepy | brak | przenosimy | P3 |
 | A22 | „Profile układu” zamkniętych okien | brak | przenosimy | P3 |
+| A22a | Okna: liczba okien przy profilu pracy; przy zapisanym układzie nazwa widoku, rozmiar i położenie (np. 1196×769 @ 370,136); akcja „W głównym” | brak | przenosimy | P3 |
 | A23 | Wstecz / Dalej przy znaku, 50 pozycji, podpowiedź z nazwą celu | brak | przenosimy | P3 |
 | A24 | Menu kołowe: F1, F2, środkowy przycisk myszy; 8 pól Rdzenia, 8 grup Macierzy z podmenu; strzałki, Enter, Esc | brak | przenosimy | P3 |
 | A25 | Dostrajanie menu kołowego: skala 86–108 %, promień etykiet, rozmiar rdzenia, odstęp, grubość, poświata; 4 przełączniki; import / eksport | brak | przenosimy | P3 |
@@ -46,6 +50,7 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | A33 | Ekran startowy z fazami, znacznikami API / BOOT / WS, „Wejdź mimo to” po 12 s, granica 40 s | ekran ładowania | przenosimy bramkę gotowości | P3 |
 | A34 | Skróty: F10 / `Ctrl+/` tabela, `Ctrl+N`, `Ctrl+L`, `Ctrl+E`, `Ctrl+M`, `Ctrl+,`, `Ctrl+Shift+D/S/I/M`, Alt+←/→, boczne przyciski myszy | własny zestaw z nagrywaniem skrótów | dostosowujemy: brakujące dochodzą, kolizje rozstrzyga rejestr Alfy | P3 |
 | A35 | Tabela skrótów: „Na start”, wyszukiwanie bez polskich znaków, filtr obszaru, „Otwórz” | ściąga `Ctrl+/` | dostosowujemy: wyszukiwanie i filtr | P3 |
+| A36 | Dymek doku z etykietą programu | własne podpowiedzi Alfy | jest (lepsze) | — |
 
 ## B. Ustawienia i panel System
 
@@ -76,6 +81,8 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | B23 | „Zapas VRAM” 0–512 MiB co 32, „Przeładuj model” | brak | przenosimy | P2 |
 | B24 | Karta zintegrowana: lekkie zadania wizji, interfejs na karcie zintegrowanej | lekki dostawca na karcie zintegrowanej | jest; dochodzi przełącznik interfejsu | P2 |
 | B25 | Zakładka Łącze: połączenia, liczba narzędzi, zapas, katalog silnika | Zdrowie systemu | dostosowujemy | P2 |
+| B26 | Panel System — szczegóły: wersja w nagłówku, licznik kart przy „Sprzęt”, niedostępny wariant silnika wyszarzony, dymek „Gotowy · CUDA · CPU % · RAM % · GPU %” | stan w belce (prawdziwy; w Delcie belka częściowo na sztywno) | przenosimy do panelu System; belka Alfy zostaje | P2 |
+| B27 | Nawigacja ustawień jako dok z 9 kaflami | nawigacja Ustawień z wyszukiwaniem, licznikami i klawiaturą | jest (lepsze); dok tylko jako skrót | — |
 
 ## C. Rozmowa
 
