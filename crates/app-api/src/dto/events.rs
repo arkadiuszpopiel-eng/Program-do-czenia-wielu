@@ -59,6 +59,10 @@ pub enum AlfaEvent {
         turn_id: String,
         text: String,
         blocks: Vec<RenderedBlock>,
+        /// Długość tekstu tury przed tą deltą (w jednostkach UTF-16, jak `String.length` w JS):
+        /// klient pomija część, którą już ma (np. z migawki `turns_list`), i wykrywa lukę.
+        #[serde(default)]
+        offset: u64,
     },
     ThinkingDelta {
         session_id: String,
@@ -226,4 +230,42 @@ pub enum AlfaEvent {
     CamerasChanged {
         state: CamerasState,
     },
+}
+
+/// Ramka zdarzeń `alfa://events`: paczka z numerami kolejnymi (plan v6 B.2, ADR 0019).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct EventFrame {
+    /// Wersja ramki.
+    pub v: u8,
+    /// Znacznik uruchomienia rdzenia (numery z innego uruchomienia nic nie znaczą).
+    pub epoch: String,
+    /// `seq` poprzedniej ramki (0 — to pierwsza); inna wartość niż ostatnia znana klientowi
+    /// oznacza zgubioną ramkę.
+    pub prev: u64,
+    /// Numer ostatniego zdarzenia w tej ramce.
+    pub seq: u64,
+    /// Zdarzenia w kolejności.
+    pub events: Vec<AlfaEvent>,
+}
+
+impl std::ops::Deref for EventFrame {
+    type Target = Vec<AlfaEvent>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.events
+    }
+}
+
+/// Wynik `events_resume`: brakujące ramki albo informacja, że trzeba wczytać stan od nowa.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct EventsResume {
+    /// Znacznik bieżącego uruchomienia rdzenia.
+    pub epoch: String,
+    /// `seq` ostatniej wydanej ramki.
+    pub latest_seq: u64,
+    /// `false` — brakujących ramek nie da się już odtworzyć (inne uruchomienie albo wypadły
+    /// z bufora); klient wczytuje stan od nowa i liczy od `latest_seq`.
+    pub complete: bool,
+    /// Ramki po `after_seq`, w kolejności.
+    pub frames: Vec<EventFrame>,
 }

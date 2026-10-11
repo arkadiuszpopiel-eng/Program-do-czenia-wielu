@@ -172,6 +172,8 @@ export type ChatStreamEvent =
       readonly text: string;
       /** Tylko zmienione bloki: otwarty (ostatni) i nowo zamknięte. */
       readonly blocks: readonly RenderedBlock[];
+      /** Długość tekstu tury przed tą deltą (jak `String.length`): pozwala pominąć część już znaną. */
+      readonly offset: number;
     }
   | {
       readonly type: 'ThinkingDelta';
@@ -297,3 +299,23 @@ export type AlfaEvent =
 
 export type AlfaEventType = AlfaEvent['type'];
 export type Unsubscribe = () => void;
+
+/** Ramka zdarzeń `alfa://events`: paczka z numerami kolejnymi (COMMANDS.md, „Zdarzenia”). */
+export interface EventFrame {
+  readonly v: number;
+  /** Znacznik uruchomienia rdzenia. */
+  readonly epoch: string;
+  /** `seq` poprzedniej ramki; inna wartość niż ostatnia znana = zgubiona ramka. */
+  readonly prev: number;
+  /** Numer ostatniego zdarzenia w ramce. */
+  readonly seq: number;
+  readonly events: readonly AlfaEvent[];
+}
+
+/** Wynik `events_resume`. `complete: false` — stan trzeba wczytać od nowa. */
+export interface EventsResume {
+  readonly epoch: string;
+  readonly latest_seq: number;
+  readonly complete: boolean;
+  readonly frames: readonly EventFrame[];
+}

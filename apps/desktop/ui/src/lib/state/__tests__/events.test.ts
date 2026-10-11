@@ -18,6 +18,36 @@ describe('Zdarzenia rdzenia → stan UI', () => {
     expect(app.view).toBe('chat');
   });
 
+  it('utracone zdarzenia: stan (lista sesji, otwarta rozmowa) wczytuje się z rdzenia od nowa', async () => {
+    const { app, client, advance } = setupApp();
+    let lost: (() => void) | undefined;
+    const subscribe = client.subscribe.bind(client);
+    client.subscribe = (handler, onLost) => {
+      lost = onLost;
+      return subscribe(handler);
+    };
+    await app.start();
+    const active = app.activeId ?? '';
+    // Zmiana w rdzeniu, o której zdarzenie do okna nie dotarło.
+    client.core.sessions = client.core.sessions.map((s) =>
+      s.id === active ? { ...s, title: 'Zmieniony tytuł' } : s,
+    );
+    expect(app.sessions.list.find((s) => s.id === active)?.title).not.toBe('Zmieniony tytuł');
+    let turnLoads = 0;
+    const list = client.turns.list;
+    client.turns.list = (id) => {
+      turnLoads += 1;
+      return list(id);
+    };
+    lost?.();
+    await advance(0);
+    await advance(0);
+    expect(app.sessions.list.find((s) => s.id === active)?.title).toBe('Zmieniony tytuł');
+    expect(turnLoads).toBe(1);
+    expect(app.activeId).toBe(active);
+    expect(app.view).toBe('chat');
+  });
+
   it('LocalModelProgress: postęp pobierania modelu lokalnego aż do „gotowy"', async () => {
     const { app, client, advance } = setupApp({ scenario: 'no-keys' });
     await app.start();

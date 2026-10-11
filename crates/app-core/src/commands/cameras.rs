@@ -55,23 +55,27 @@ fn camera_error(error: CameraError) -> AppError {
     match error {
         CameraError::Disabled => AppError::forbidden(
             "Kamery są wyłączone — włącz przełącznik kamer i przełącznik tej kamery.",
-        ),
-        CameraError::UnknownCamera(_) => AppError::not_found("Nie ma takiej kamery."),
+        )
+        .with("reason", "disabled"),
+        CameraError::UnknownCamera(id) => AppError::missing("camera", id, "Nie ma takiej kamery."),
         CameraError::Store(text) => AppError::storage(text),
-        CameraError::Unplugged => AppError::new(ErrorCode::Unavailable, "Kamera jest odłączona."),
-        CameraError::Stopped => AppError::new(ErrorCode::Unavailable, "Kamera została zatrzymana."),
-        CameraError::Busy => AppError::new(
-            ErrorCode::Unavailable,
-            "Kamera właśnie się otwiera — spróbuj za chwilę.",
-        ),
-        CameraError::Timeout => AppError::new(
-            ErrorCode::Unavailable,
-            "Kamera nie odpowiedziała w wyznaczonym czasie.",
-        ),
+        CameraError::Unplugged => unavailable("unplugged", "Kamera jest odłączona."),
+        CameraError::Stopped => unavailable("stopped", "Kamera została zatrzymana."),
+        CameraError::Busy => unavailable("busy", "Kamera właśnie się otwiera — spróbuj za chwilę."),
+        CameraError::Timeout => {
+            unavailable("timeout", "Kamera nie odpowiedziała w wyznaczonym czasie.")
+        }
         CameraError::Platform(text) => {
-            AppError::new(ErrorCode::Unavailable, format!("Kamera nie działa: {text}"))
+            unavailable("platform", format!("Kamera nie działa: {text}"))
         }
     }
+}
+
+/// Kamera chwilowo niedostępna; `reason` pozwala interfejsowi rozróżnić przypadki bez czytania tekstu.
+fn unavailable(reason: &str, message: impl Into<String>) -> AppError {
+    AppError::new(ErrorCode::Unavailable, message)
+        .with("kind", "camera")
+        .with("reason", reason)
 }
 
 /// Kompresja zlib dla PNG klatki (poziom szybki — podgląd pobiera klatki kilka razy na sekundę).

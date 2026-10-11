@@ -72,10 +72,10 @@ export class ConversationState {
       this.loaded = true;
       const pending = this.duringLoad ?? [];
       this.duringLoad = null;
-      // Migawka zastąpiła drzewo, do którego trafiły zdarzenia z czasu wczytywania. Odtwarzamy te,
-      // które da się powtórzyć bez szkody (nowa tura, status, koniec, błąd, kroki); delt tekstu
-      // nie — migawka może już je zawierać, a protokół nie niesie numerów kolejnych.
-      for (const event of pending) if (event.type !== 'TextDelta') this.apply(event);
+      // Migawka zastąpiła drzewo, do którego trafiły zdarzenia z czasu wczytywania — odtwarzamy
+      // je wszystkie. Delty tekstu niosą pozycję (`offset`), więc te, które migawka już zawiera,
+      // są pomijane, a nowsze dopisywane (nic nie ginie i nic się nie dubluje).
+      for (const event of pending) this.apply(event);
     }
   }
 

@@ -235,6 +235,7 @@
     "allow-cameras-rename",
     "allow-cameras-refresh",
     "allow-cameras-frame",
-    "allow-attachments-add-camera"
+    "allow-attachments-add-camera",
+    "allow-events-resume"
   ]
 }

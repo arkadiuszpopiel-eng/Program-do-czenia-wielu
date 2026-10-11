@@ -252,8 +252,8 @@ Przegląd logiki stanu interfejsu (2026-10-09, osobna sesja, tylko odczyt) — 1
 - zamknięcie okna porzucało szkic i układ z ostatnich 400 ms;
 - zdarzenia kończące turę, które przyszły w trakcie wczytywania rozmowy, przepadały.
 
-Otwarte z tego przeglądu: delty tekstu z czasu wczytywania rozmowy nadal mogą zginąć albo się zdublować — protokół nie
-niesie numerów kolejnych, więc naprawa wymaga zmiany w rdzeniu (DTO zdarzeń); to samo okno przy starcie (lista sesji
+Zamknięte w 0.0.19 (B.2): delty tekstu z czasu wczytywania rozmowy — `TextDelta` niesie pozycję (`offset`), więc
+okno pomija część, którą ma z migawki, i dopisuje resztę. Nadal otwarte: to samo okno przy starcie (lista sesji
 nadpisuje zdarzenia sprzed odpowiedzi). Niezweryfikowane podejrzenia: spóźniona delta po `Stop` przywraca status
 „pisze”; ponowny `start()` klienta Tauri dokłada nasłuchy.
 

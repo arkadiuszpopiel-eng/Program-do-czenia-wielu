@@ -145,6 +145,40 @@ describe('rozmowa — zdarzenia w trakcie wczytywania', () => {
     expect(conv.streaming).toBeUndefined();
     expect(stops).toBe(1);
   });
+
+  it('delty tekstu z czasu wczytywania nie giną i się nie dublują (pozycja w delcie)', async () => {
+    const streaming = {
+      ...turn('s:t2', 's', null, 'gama', 'Ala ma', T),
+      status: 'streaming' as const,
+    };
+    let answer: (v: unknown) => void = () => undefined;
+    const client = {
+      turns: { list: () => new Promise((resolve) => (answer = resolve)) },
+    } as unknown as AlfaClient;
+    const conv = new ConversationState(client, 's');
+    const loading = conv.load();
+    const delta = (text: string, offset: number) =>
+      conv.apply({
+        type: 'TextDelta',
+        session_id: 's',
+        turn_id: streaming.id,
+        text,
+        blocks: [],
+        offset,
+      });
+    // Migawka zawiera już „Ala ma”; pierwsza delta jest w niej w całości, druga w połowie,
+    // trzecia jest nowa.
+    delta('Ala', 0);
+    delta(' ma kota', 3);
+    delta(' i psa', 11);
+    answer({ turns: [streaming], annotations: {} });
+    await loading;
+    expect(conv.turn(streaming.id)?.text).toBe('Ala ma kota i psa');
+    // Po wczytaniu zwykłe delty idą dalej, a powtórzona jest pomijana.
+    delta('.', 17);
+    delta('.', 17);
+    expect(conv.turn(streaming.id)?.text).toBe('Ala ma kota i psa.');
+  });
 });
 
 // Regresje z przeglądu zmian 0.0.1–0.0.5 (świeży kontekst, 2026-10-09).

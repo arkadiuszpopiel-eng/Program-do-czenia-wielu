@@ -357,7 +357,8 @@
         "html_sanitized": "<p>Prze</p>",
         "closed": false
       }
-    ]
+    ],
+    "offset": 0
   },
   {
     "type": "TextDelta",
@@ -372,7 +373,8 @@
         "html_sanitized": "<p>Przenios</p>",
         "closed": false
       }
-    ]
+    ],
+    "offset": 4
   },
   {
     "type": "TextDelta",
@@ -387,7 +389,8 @@
         "html_sanitized": "<p>Przeniosłam</p>",
         "closed": false
       }
-    ]
+    ],
+    "offset": 8
   },
   {
     "type": "AgentRunUpdated",

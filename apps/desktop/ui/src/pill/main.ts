@@ -259,8 +259,10 @@ async function toggleMute(): Promise<void> {
 mute.addEventListener('click', () => void toggleMute());
 
 if (tauri) {
-  void listen<readonly PillEvent[]>('alfa://events', (event) => {
-    for (const e of event.payload) {
+  // Ładunek to ramka z numerami (`EventFrame`); pigułka bierze same zdarzenia — każde niesie
+  // pełny stan (pigułki, kamer), więc zgubiona ramka naprawia się przy następnej.
+  void listen<{ readonly events: readonly PillEvent[] }>('alfa://events', (event) => {
+    for (const e of event.payload.events) {
       if (e.type === 'VoicePill') Object.assign(state, e.state);
       else if (e.type === 'MicLevel') state.level = e.level;
       else if (e.type === 'CamerasChanged')

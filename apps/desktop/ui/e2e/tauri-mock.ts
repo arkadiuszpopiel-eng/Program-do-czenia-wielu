@@ -26,6 +26,13 @@ export async function mockTauri(page: Page, mock: TauriMock): Promise<void> {
     const emit = (event: string, payload: unknown): void => {
       for (const id of listeners[event] ?? []) callbacks[id]?.({ event, id, payload });
     };
+    // Paczka zdarzeń w ramce z numerami — tak jak wysyła ją rdzeń (`EventFrame`).
+    let seq = 0;
+    const emitEvents = (events: readonly unknown[]): void => {
+      const prev = seq;
+      seq += events.length;
+      emit('alfa://events', { v: 1, epoch: 'e2e', prev, seq, events });
+    };
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
     const turn = (id: string, author: string, text: string, status: string) => ({
       id,
@@ -80,7 +87,7 @@ export async function mockTauri(page: Page, mock: TauriMock): Promise<void> {
           }
           case 'quick_ask': {
             const sid = 's-quick-1';
-            emit('alfa://events', [
+            emitEvents([
               {
                 type: 'TurnAppended',
                 session_id: sid,
@@ -92,12 +99,13 @@ export async function mockTauri(page: Page, mock: TauriMock): Promise<void> {
                 turn: turn('t-alfa-1', 'alfa', '', 'streaming'),
               },
             ]);
-            emit('alfa://events', [
+            emitEvents([
               {
                 type: 'TextDelta',
                 session_id: sid,
                 turn_id: 't-alfa-1',
                 text: 'Cztery.',
+                offset: 0,
                 blocks: [
                   {
                     index: 0,

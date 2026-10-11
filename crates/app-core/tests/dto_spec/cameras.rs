@@ -1,4 +1,5 @@
-//! Specyfikacje komend kamer (`cameras_*`, `attachments_add_camera`) dla `dto_roundtrip.rs`.
+//! Specyfikacje komend kamer (`cameras_*`, `attachments_add_camera`) i wznowienia zdarzeń
+//! (`events_resume`) dla `dto_roundtrip.rs`.
 
 use app_core::dto::*;
 
@@ -25,6 +26,13 @@ pub fn spec(command: &str) -> Option<Spec> {
                 ("cameraId", roundtrip::<String>),
             ],
             roundtrip::<AttachmentsAdded>,
+        ),
+        "events_resume" => (
+            vec![
+                ("afterSeq", roundtrip::<u64>),
+                ("epoch", roundtrip::<Option<String>>),
+            ],
+            roundtrip::<EventsResume>,
         ),
         _ => return None,
     })

@@ -2,28 +2,29 @@
 //! klatkę (PLAN §14.7 „batch co klatkę"). Brak zdarzeń = brak wybudzeń (idle ~0% CPU).
 //! Sąsiednie `TextDelta` tej samej tury są scalane (tekst sklejony, bloki — ostatnia wersja
 //! per indeks), a sąsiednie `MicLevel` i `CamerasChanged` — zastępowane najnowszym.
+//! Paczka wychodzi jako ramka z numerami kolejnymi (`event_log.rs`, plan v6 zadanie B.2).
 
 use std::sync::Arc;
 use std::time::Duration;
 
 use tokio::sync::{broadcast, mpsc};
 
-use crate::dto::AlfaEvent;
-
-/// Paczka zdarzeń wysyłana do UI jednym `emit`.
-pub type EventBatch = Arc<Vec<AlfaEvent>>;
+use crate::dto::{AlfaEvent, EventsResume};
+pub use crate::event_log::{EventBatch, EventLog};
 
 /// Domyślna długość klatki (≈ 60 Hz).
 pub const DEFAULT_FRAME: Duration = Duration::from_millis(16);
 
-/// Pojemność kanału paczek na subskrybenta (zaległy subskrybent traci najstarsze paczki).
+/// Pojemność kanału paczek na subskrybenta (zaległy subskrybent traci najstarsze paczki —
+/// odzyskuje je przez [`EventHub::resume`]).
 const BATCH_CAPACITY: usize = 1024;
 
 /// Nadawca zdarzeń (tani do klonowania).
 #[derive(Clone)]
 pub struct EventHub {
-    tx: mpsc::UnboundedSender<AlfaEvent>,
+    tx: mpsc::UnboundedSender<(u64, AlfaEvent)>,
     out: broadcast::Sender<EventBatch>,
+    log: Arc<EventLog>,
 }
 
 impl EventHub {
@@ -31,14 +32,17 @@ impl EventHub {
     pub fn start(frame: Duration) -> Self {
         let (tx, rx) = mpsc::unbounded_channel();
         let (out, _) = broadcast::channel(BATCH_CAPACITY);
-        tokio::spawn(batcher(rx, out.clone(), frame));
-        Self { tx, out }
+        let log = Arc::new(EventLog::new());
+        tokio::spawn(batcher(rx, out.clone(), log.clone(), frame));
+        Self { tx, out, log }
     }
 
-    /// Wysyła zdarzenie (trafi do najbliższej paczki).
+    /// Wysyła zdarzenie (trafi do najbliższej paczki); numer kolejny dostaje od razu.
     pub fn emit(&self, event: AlfaEvent) {
         // Zamknięty odbiornik = aplikacja się zamyka; zdarzenie nie ma już adresata.
-        let _ = self.tx.send(event);
+        self.log.issue(|seq| {
+            let _ = self.tx.send((seq, event));
+        });
     }
 
     /// Wysyła kilka zdarzeń w kolejności.
@@ -52,23 +56,35 @@ impl EventHub {
     pub fn subscribe(&self) -> broadcast::Receiver<EventBatch> {
         self.out.subscribe()
     }
+
+    /// Ramki po `after_seq` dla klienta, który zgubił paczki (polecenie `events_resume`).
+    pub fn resume(&self, after_seq: u64, epoch: Option<&str>) -> EventsResume {
+        self.log.resume(after_seq, epoch)
+    }
+
+    /// Znacznik uruchomienia i `seq` ostatniej wydanej ramki.
+    pub fn position(&self) -> (&str, u64) {
+        (self.log.epoch(), self.log.latest())
+    }
 }
 
 async fn batcher(
-    mut rx: mpsc::UnboundedReceiver<AlfaEvent>,
+    mut rx: mpsc::UnboundedReceiver<(u64, AlfaEvent)>,
     out: broadcast::Sender<EventBatch>,
+    log: Arc<EventLog>,
     frame: Duration,
 ) {
-    while let Some(first) = rx.recv().await {
+    while let Some((mut seq, first)) = rx.recv().await {
         let mut batch = vec![first];
         if !frame.is_zero() {
             tokio::time::sleep(frame).await;
         }
-        while let Ok(event) = rx.try_recv() {
+        while let Ok((next, event)) = rx.try_recv() {
+            seq = next;
             push_coalesced(&mut batch, event);
         }
         // Brak subskrybentów nie jest błędem (UI jeszcze nie nasłuchuje).
-        let _ = out.send(Arc::new(batch));
+        let _ = out.send(log.seal(seq, batch));
     }
 }
 
@@ -81,12 +97,15 @@ pub fn push_coalesced(batch: &mut Vec<AlfaEvent>, event: AlfaEvent) {
                 turn_id,
                 text,
                 blocks,
+                // Scalona delta zaczyna się tam, gdzie pierwsza.
+                offset: _,
             }),
             AlfaEvent::TextDelta {
                 session_id: s2,
                 turn_id: t2,
                 text: more,
                 blocks: newer,
+                offset: _,
             },
         ) if *session_id == s2 && *turn_id == t2 => {
             text.push_str(&more);

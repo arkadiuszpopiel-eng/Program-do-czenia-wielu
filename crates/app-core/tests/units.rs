@@ -109,6 +109,7 @@ mod events {
                     closed: *closed,
                 })
                 .collect(),
+            offset: 0,
         }
     }
 
@@ -199,6 +200,34 @@ mod events {
             panic!("oczekiwano TextDelta");
         };
         assert_eq!(text, "01234");
+        // Ramka niesie numer ostatniego zdarzenia (6 wysłanych) i numer ramki poprzedniej.
+        assert_eq!((batch.prev, batch.seq), (0, 6));
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn lost_frames_come_back_through_resume() {
+        let hub = EventHub::start(Duration::from_millis(16));
+        let mut rx = hub.subscribe();
+        hub.emit(delta("t1", "a", &[]));
+        let first = rx.recv().await.unwrap();
+        hub.emit(delta("t1", "b", &[]));
+        hub.emit(delta("t2", "c", &[]));
+        let second = rx.recv().await.unwrap();
+        hub.emit(delta("t1", "d", &[]));
+        let third = rx.recv().await.unwrap();
+        assert_eq!((second.prev, second.seq), (first.seq, 3));
+        assert_eq!((third.prev, third.seq), (3, 4));
+        let (epoch, latest) = hub.position();
+        assert_eq!(latest, 4);
+        assert_eq!(first.epoch, epoch);
+        // Klient, który widział tylko pierwszą ramkę, dostaje dwie brakujące w kolejności.
+        let resumed = hub.resume(first.seq, Some(epoch));
+        assert!(resumed.complete);
+        assert_eq!(resumed.frames, vec![(*second).clone(), (*third).clone()]);
+        // Numery z innego uruchomienia: nic do odtworzenia, stan od nowa.
+        let foreign = hub.resume(first.seq, Some("inne-uruchomienie"));
+        assert!(!foreign.complete && foreign.frames.is_empty());
+        assert_eq!(foreign.latest_seq, 4);
     }
 }
 

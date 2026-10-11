@@ -7,8 +7,10 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod commands;
+pub mod details;
 pub mod dto;
 pub mod error;
+pub mod event_log;
 pub mod events;
 pub mod ids;
 pub mod notify;

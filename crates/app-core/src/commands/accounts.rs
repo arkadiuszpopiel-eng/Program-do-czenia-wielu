@@ -213,10 +213,13 @@ pub(super) fn account_id(id: &str) -> Result<AccountId, AppError> {
 
 impl AppCore {
     pub(super) fn account(&self, id: &AccountId) -> Result<CoreAccount, AppError> {
-        self.inner
-            .hub
-            .account(id)
-            .ok_or_else(|| AppError::not_found(format!("Konto „{id}” nie istnieje.")))
+        self.inner.hub.account(id).ok_or_else(|| {
+            AppError::missing(
+                "account",
+                id.to_string(),
+                format!("Konto „{id}” nie istnieje."),
+            )
+        })
     }
 
     pub(super) async fn announce_account(&self, id: &AccountId) {
@@ -242,11 +245,13 @@ impl AppCore {
     /// `accounts_add`: klucz → Credential Manager (nigdy z powrotem do UI).
     pub async fn accounts_add(&self, input: AddAccountInput) -> Result<Account, AppError> {
         let provider = ProviderId::new(input.provider_id.as_str())?;
-        let entry = self
-            .inner
-            .hub
-            .provider(&provider)
-            .ok_or_else(|| AppError::not_found(format!("Nieznany dostawca „{provider}”.")))?;
+        let entry = self.inner.hub.provider(&provider).ok_or_else(|| {
+            AppError::missing(
+                "provider",
+                provider.to_string(),
+                format!("Nieznany dostawca „{provider}”."),
+            )
+        })?;
         let secret = SecretString::from_input(input.secret.expose());
         if entry.auth == CoreAuth::ApiKey && !secret.is_plausible_key() {
             return Err(AppError::invalid(NOT_A_KEY));

@@ -82,6 +82,7 @@ import type { EnginesApi } from './client-models';
 import type { AttachmentsApi, BackupsApi, ConversationExportApi } from './client-files';
 import type {
   AlfaEvent,
+  EventsResume,
   AppBootstrap,
   LayoutPrefs,
   QuickAskResult,
@@ -407,7 +408,14 @@ export interface AlfaClient {
   readonly conversation: ConversationExportApi;
   /** Kopie zapasowe `.alfa` z harmonogramem, rotacją i testem przywracania. */
   readonly backups: BackupsApi;
-  /** Jeden kanał zdarzeń; rdzeń wysyła je paczkami (batch co klatkę). */
-  subscribe(handler: (batch: readonly AlfaEvent[]) => void): Unsubscribe;
+  /** Wznowienie strumienia zdarzeń po zgubionej ramce (używa go sam klient). */
+  readonly eventLog: {
+    resume(afterSeq: number, epoch: string | null): Promise<EventsResume>;
+  };
+  /**
+   * Jeden kanał zdarzeń; rdzeń wysyła je paczkami (batch co klatkę). `onLost` — zdarzenia
+   * przepadły i nie da się ich odtworzyć: stan trzeba wczytać z rdzenia od nowa.
+   */
+  subscribe(handler: (batch: readonly AlfaEvent[]) => void, onLost?: () => void): Unsubscribe;
   dispose(): void;
 }

@@ -2,7 +2,8 @@
 
 use crate::core::AppCore;
 use crate::dto::{
-    AlfaEvent, DiskInfo, LocalizedText, MicAvailability, RateLimitInfo, SystemStatus, ToastKind,
+    AlfaEvent, DiskInfo, EventsResume, LocalizedText, MicAvailability, RateLimitInfo, SystemStatus,
+    ToastKind,
 };
 use crate::error::AppError;
 
@@ -136,5 +137,18 @@ impl AppCore {
             ),
         });
         handles.len()
+    }
+}
+
+impl AppCore {
+    /// `events_resume`: ramki zdarzeń po `after_seq` dla klienta, który zgubił paczki (zaległy
+    /// odbiorca, zerwane łącze). `complete = false` — brakujących ramek nie ma już w buforze
+    /// albo klient pamięta numery z innego uruchomienia; wtedy wczytuje stan od nowa.
+    pub async fn events_resume(
+        &self,
+        after_seq: u64,
+        epoch: Option<String>,
+    ) -> Result<EventsResume, AppError> {
+        Ok(self.inner.events.resume(after_seq, epoch.as_deref()))
     }
 }

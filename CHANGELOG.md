@@ -8,6 +8,35 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.19 — 2026-10-11
+
+Pewniejsze łącze między rdzeniem a oknem: zdarzenia mają numery i dają się odtworzyć, a błędy niosą kod
+i szczegóły. To pierwsze dwa „szwy” pod panel WWW i telefon (zadania B.2 i B.3 planu).
+
+### Rozmowa
+
+- Odpowiedź pisana w chwili otwierania rozmowy nie gubi już ani nie powtarza fragmentów tekstu.
+- Gdy okno nie nadąży za rdzeniem (bardzo dużo zdarzeń naraz), samo dociąga brakujące zdarzenia zamiast po cichu
+  je tracić; jeśli nie da się ich odtworzyć, wczytuje stan od nowa — bez zmiany widoku.
+
+### Komunikaty błędów
+
+- W działającym programie błędy docierają do okna z kodem i szczegółami (czego dotyczą, które pole, po ilu
+  sekundach ponowić), a nie jako sam tekst — okno może reagować na rodzaj błędu, a nie zgadywać z treści.
+- Szczegóły błędu nigdy nie niosą kluczy ani treści rozmów: przechodzą przez filtr, który odrzuca wszystko, co
+  wygląda na sekret.
+
+### Testy
+
+- Nowe testy: bufor i numeracja zdarzeń (rdzeń), kolejność ramek po stronie okna (luka, utrata, inne uruchomienie
+  rdzenia), fragmenty tekstu z czasu wczytywania, wczytanie stanu od nowa, filtr sekretów w szczegółach błędu,
+  test prawdziwej aplikacji (błąd jako obiekt, polecenie `events_resume`).
+
+### Przyczyna błędu
+
+- Powłoka zamieniała każdy błąd rdzenia na napis, więc kod błędu działał tylko na atrapie interfejsu. Zdarzenia nie
+  miały numerów, więc okno nie mogło wykryć zgubionej paczki ani odróżnić fragmentu tekstu, który już ma.
+
 ## 0.0.18 — 2026-10-10
 
 Domknięcie otwartych ustaleń z dwóch przeglądów, które nie wymagają prawdziwej kamery.

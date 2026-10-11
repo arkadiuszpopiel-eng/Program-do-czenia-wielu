@@ -98,7 +98,13 @@ impl TasksApp {
             .scheduler
             .task(id)
             .map(|v| map::task(&v))
-            .ok_or_else(|| AppError::not_found(format!("Zadanie „{id}” nie istnieje.")))
+            .ok_or_else(|| {
+                AppError::missing(
+                    "task",
+                    id.to_string(),
+                    format!("Zadanie „{id}” nie istnieje."),
+                )
+            })
     }
 
     /// `tasks_list`.

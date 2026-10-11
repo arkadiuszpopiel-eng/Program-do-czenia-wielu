@@ -110,7 +110,14 @@ export class FakeStreamer {
         const changed = changedBlocks(blocks, final);
         turn.blocks = final;
         if (changed.length)
-          emit({ type: 'TextDelta', session_id: sid, turn_id: tid, text: '', blocks: changed });
+          emit({
+            type: 'TextDelta',
+            session_id: sid,
+            turn_id: tid,
+            text: '',
+            blocks: changed,
+            offset: turn.text.length,
+          });
         const out = Math.max(1, tokenIndex);
         usage = {
           input_tokens: 1200 + turn.text.length,
@@ -143,12 +150,20 @@ export class FakeStreamer {
         finish(script.truncated ? 'max_tokens' : 'end');
         return;
       }
+      const offset = turn.text.length;
       turn.text += token;
       const next = renderBlocks(turn.text, true);
       const changed = changedBlocks(blocks, next);
       blocks = next;
       turn.blocks = next;
-      emit({ type: 'TextDelta', session_id: sid, turn_id: tid, text: token, blocks: changed });
+      emit({
+        type: 'TextDelta',
+        session_id: sid,
+        turn_id: tid,
+        text: token,
+        blocks: changed,
+        offset,
+      });
       at(1000 / tokensPerSecond, nextToken);
     };
 

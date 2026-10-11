@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-09**, wersja programu **0.0.18**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-11**, wersja programu **0.0.19**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -41,6 +41,17 @@ funkcjami.
 | 0.0.6  | 2026-10-09 | naprawy po przeglądzie zmian 0.0.1–0.0.5: dekodowanie wyjścia powłoki, kolejka offline, fokus w rozmowie, lista wyboru, „Co nowego”, spójność numeru wersji, świeżość HTML                                                                            | testy regresji dla każdej poprawki; pełny zestaw testów interfejsu; testy crate'ów; test prawdziwej aplikacji                                                                                                                                           |
 | 0.0.7  | 2026-10-09 | dodawanie klucza API od nowa: diagnoza przyczyny odmowy, sprzątanie wklejonego klucza, wymiana klucza bez utraty działającego, wyłączanie konta, adresy API czterech dostawców w katalogu                                                             | Rust: 6 testów całej ścieżki z lokalnym serwerem dostawcy, klasyfikacja odpowiedzi, wspólna tabela kluczy; E2E: 24 testy kreatora (6 kombinacji stylu i motywu, EN); zrzuty wszystkich stanów. Nie sprawdzono z prawdziwym kluczem — robi to właściciel |
 | 0.0.8  | 2026-10-09 | wybór modelu rozmowy z listy dostawcy, strona „API i kolejki modeli” (do 10 modeli na klasę zadań), redukcja szumów mikrofonu w trzech poziomach, wykrywanie końca wypowiedzi w rozmowie głosowej, filtr zmyślonych wywołań narzędzi modelu lokalnego | Rust: ścieżka z lokalnym serwerem dostawcy, reguły kolejek, szum wentylatora, zegar potoku na prawdziwym mikrofonie; E2E: 15 testów strony API i mikrofonu; zrzuty. Rozmowa głosowa od końca do końca na laptopie — do potwierdzenia przez właściciela  |
+| 0.0.9  | 2026-10-09 | porządki w interfejsie i kodzie po 0.0.8 |
+| 0.0.10 | 2026-10-09 | własne menu kontekstowe i podpowiedzi, kafelki kolejki modeli |
+| 0.0.11 | 2026-10-09 | własna belka okna z paskiem LED, nawigacja Ustawień od nowa, kilka kart graficznych (role, lekki dostawca) |
+| 0.0.12 | 2026-10-09 | belka: obsada agentek, mikrofon i stan systemu od nowa |
+| 0.0.13 | 2026-10-09 | znak Alfy: ikona programu i znak z nazwą na belce |
+| 0.0.14 | 2026-10-09 | belka 44 px z torem paska LED, ekran ładowania, żywe awatary agentek, strojenie mowy |
+| 0.0.15 | 2026-10-09 | tylko plan: grupa C3 (kamery, rozpoznawanie osób, opis obrazu), projekt ADR 0025 |
+| 0.0.16 | 2026-10-10 | kamery USB (port, hub, strona „Kamery”, wskaźnik, zdjęcie jako załącznik), import kluczy ze zmiennych środowiskowych |
+| 0.0.17 | 2026-10-10 | „opisz mi to, co widzisz”, poprawki po dwóch przeglądach w świeżym kontekście, głośność mowy, ekran ładowania z wyjściem |
+| 0.0.18 | 2026-10-10 | domknięcie ustaleń przeglądów niewymagających kamery, znak kamery w pigułce głosowej |
+| 0.0.19 | 2026-10-11 | szwy B.2 i B.3: numery zdarzeń ze wznowieniem (`events_resume`), pozycja w deltach tekstu, błędy z kodem i szczegółami na łączu |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 
@@ -103,8 +114,9 @@ generator typów TS (ADR 0013), eksport rozmowy do PDF.
 
 ## Z planu v6
 
-Żadna funkcja planu v6 nie jest jeszcze zbudowana. Gotowe są: dokumenty tego katalogu, projekty ADR 0017–0024,
-szkice SPEC dziewięciu modułów, przegląd technologii. Stan zadań: [`03-roadmapa.md`](03-roadmapa.md).
+Zbudowane z planu v6: kamery USB i „opisz mi to, co widzisz” (C3.1, C3.3, C3.4, część C3.2 i C3.7 — bez próby na
+prawdziwej kamerze), import kluczy ze zmiennych (C2.17), szwy B.2 i B.3 (numery zdarzeń, błędy strukturalne).
+Poza tym gotowe są dokumenty tego katalogu, projekty ADR 0017–0026, szkice SPEC nowych modułów i przegląd technologii. Stan zadań: [`03-roadmapa.md`](03-roadmapa.md).
 
 ## Znane problemy
 

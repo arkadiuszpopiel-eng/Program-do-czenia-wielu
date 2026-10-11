@@ -115,6 +115,49 @@ test('okno główne startuje na prawdziwym rdzeniu (IPC Tauri, nie atrapa)', asy
   await shot(alfa, '01-start');
 });
 
+test('łącze z rdzeniem: błąd jako obiekt z kodem i szczegółami, wznowienie zdarzeń', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await startView(main);
+  const result = await main.evaluate(async () => {
+    const { invoke } = (
+      window as unknown as {
+        __TAURI_INTERNALS__: {
+          invoke: (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
+        };
+      }
+    ).__TAURI_INTERNALS__;
+    // Polecenie na nieistniejącej sesji: odrzucenie ma być obiektem `AppError`, nie napisem.
+    const error = await invoke('sessions_rename', {
+      sessionId: 'nie-ma-takiej-sesji',
+      title: 'x',
+    }).then(
+      () => null,
+      (reason: unknown) => reason,
+    );
+    const resume = await invoke('events_resume', { afterSeq: 0, epoch: null });
+    const foreign = await invoke('events_resume', { afterSeq: 0, epoch: 'inne-uruchomienie' });
+    return { error, resume, foreign };
+  });
+  const error = result.error as {
+    code: string;
+    message: string;
+    details?: Record<string, unknown>;
+  };
+  expect(typeof error, 'odrzucenie jest obiektem').toBe('object');
+  expect(error.code).toBe('not_found');
+  expect(error.message.length).toBeGreaterThan(0);
+  expect(error.details?.kind).toBe('session');
+  const resume = result.resume as { epoch: string; latest_seq: number; frames: { seq: number }[] };
+  expect(resume.epoch.length).toBeGreaterThan(0);
+  expect(resume.latest_seq).toBeGreaterThanOrEqual(0);
+  for (const frame of resume.frames) expect(frame.seq).toBeLessThanOrEqual(resume.latest_seq);
+  const foreign = result.foreign as { complete: boolean; frames: unknown[] };
+  expect(foreign.complete).toBe(false);
+  expect(foreign.frames).toEqual([]);
+});
+
 test('wprowadzenie: pominięcie kroków prowadzi do rozmowy', async ({ alfa }) => {
   const { main } = alfa;
   await startView(main);

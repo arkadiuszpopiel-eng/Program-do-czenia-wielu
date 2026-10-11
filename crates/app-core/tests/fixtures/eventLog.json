@@ -1,0 +1,28 @@
+[
+  {
+    "command": "events_resume",
+    "args": {
+      "afterSeq": 41,
+      "epoch": "e-2026"
+    },
+    "result": {
+      "epoch": "e-2026",
+      "latest_seq": 41,
+      "complete": true,
+      "frames": []
+    }
+  },
+  {
+    "command": "events_resume",
+    "args": {
+      "afterSeq": 0,
+      "epoch": null
+    },
+    "result": {
+      "epoch": "fake",
+      "latest_seq": 0,
+      "complete": true,
+      "frames": []
+    }
+  }
+]

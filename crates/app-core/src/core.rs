@@ -153,10 +153,17 @@ impl AppCore {
         self.emit(event);
     }
 
-    /// Komunikat błędu w języku interfejsu (`ui.locale`) — odrzucenie `invoke` w UI.
+    /// Komunikat błędu w języku interfejsu (`ui.locale`).
     pub async fn error_text(&self, error: &AppError) -> String {
         let locale = self.config_str(crate::settings::keys::LOCALE).await;
         error.localized(locale.as_deref().unwrap_or("pl"))
+    }
+
+    /// Błąd w kształcie dla interfejsu (odrzucenie `invoke`): ten sam kod i szczegóły,
+    /// komunikat w języku interfejsu.
+    pub async fn error_for_ui(&self, error: AppError) -> AppError {
+        let message = self.error_text(&error).await;
+        AppError { message, ..error }
     }
 
     /// Blokada zapisu historii sesji (dopisywanie tur jest szeregowane per sesja).
@@ -306,10 +313,13 @@ impl AppCore {
                 ..Default::default()
             })
             .map_err(AppError::from)?;
-        let found = all
-            .iter()
-            .find(|s| &s.meta.id == id)
-            .ok_or_else(|| AppError::not_found(format!("Sesja „{id}” nie istnieje.")))?;
+        let found = all.iter().find(|s| &s.meta.id == id).ok_or_else(|| {
+            AppError::missing(
+                "session",
+                id.to_string(),
+                format!("Sesja „{id}” nie istnieje."),
+            )
+        })?;
         Ok(self.session_dto(found).await)
     }
 
@@ -324,7 +334,12 @@ impl AppCore {
     pub(crate) fn ensure_session(&self, id: &SessionId) -> Result<(), AppError> {
         let meta = self.inner.sessions.session(id).map_err(AppError::from)?;
         if meta.trashed {
-            return Err(AppError::not_found(format!("Sesja „{id}” jest w koszu.")));
+            return Err(AppError::missing(
+                "session",
+                id.to_string(),
+                format!("Sesja „{id}” jest w koszu."),
+            )
+            .with("reason", "trashed"));
         }
         Ok(())
     }

@@ -225,6 +225,8 @@ async function run(): Promise<void> {
   await both('cameras', 'frame', 'usb-integrated', 320);
   await both('attachments', 'addCamera', 's-api', 'usb-integrated');
   await both('cameras', 'setMaster', false);
+  await both('eventLog', 'resume', 41, 'e-2026');
+  await both('eventLog', 'resume', 0, null);
   scheduler.runAll();
   await flush();
 

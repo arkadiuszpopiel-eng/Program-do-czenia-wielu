@@ -233,6 +233,7 @@ macro_rules! with_commands {
             cameras_refresh() -> $crate::dto::CamerasState;
             cameras_frame(id: String, max_side: u32) -> $crate::dto::CameraFrame;
             attachments_add_camera(session_id: String, camera_id: String) -> $crate::dto::AttachmentsAdded;
+            events_resume(after_seq: u64, epoch: Option<String>) -> $crate::dto::EventsResume;
         }
     };
 }
@@ -258,6 +259,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 225);
+        assert_eq!(super::COMMANDS.len(), 226);
     }
 }

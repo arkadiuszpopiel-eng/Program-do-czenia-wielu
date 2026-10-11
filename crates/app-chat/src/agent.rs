@@ -302,6 +302,7 @@ pub(crate) async fn run(
             turn_id,
             text: fin.text.clone(),
             blocks,
+            offset: 0,
         });
     }
     let tokens = totals.input_tokens + totals.output_tokens;

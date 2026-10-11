@@ -127,7 +127,14 @@ export class FakeAlfaClient implements AlfaClient {
     if (core.scenario === 'slow-core') recordCalls(this);
   }
 
-  subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {
+  // Atrapa nie gubi zdarzeń (jeden proces, brak łącza): wznowienie zawsze „nic nie brakuje”.
+  readonly eventLog: AlfaClient['eventLog'] = {
+    resume: (afterSeq, epoch) =>
+      this.core.reply({ epoch: epoch ?? 'fake', latest_seq: afterSeq, complete: true, frames: [] }),
+  };
+
+  // `onLost` nie jest wołane: atrapa nie gubi zdarzeń.
+  subscribe(handler: (batch: readonly AlfaEvent[]) => void, _onLost?: () => void): () => void {
     return this.core.subscribe(handler);
   }
 

@@ -118,6 +118,7 @@ pub(crate) async fn run(
         turn_id: ids::turn_dto(&req.session, handle.turn),
         text: text.clone(),
         blocks,
+        offset: 0,
     });
     let mut out = outcome(text, TurnStatus::Complete, StopReason::End, None);
     out.latency_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);

@@ -42,7 +42,7 @@ pub use cameras::{
 pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
 };
-pub use events::{AlfaEvent, StopReason, ToastKind};
+pub use events::{AlfaEvent, EventFrame, EventsResume, StopReason, ToastKind};
 pub use files::{
     AttachmentDelivery, AttachmentInfo, AttachmentKind, AttachmentRejectReason,
     AttachmentRejection, AttachmentsAdded, BackupCheck, BackupConfig, BackupEntry, BackupView,

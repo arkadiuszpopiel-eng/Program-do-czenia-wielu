@@ -5,10 +5,11 @@ import { Channel, convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { AlfaClient } from './client';
 import { toError } from './command-error';
-import type { AlfaEvent } from './types-system';
+import { EventSequencer } from './event-sequencer';
+import type { AlfaEvent, EventFrame } from './types-system';
 import type { TerminalFrame } from './types-work';
 
-/** Nazwa jedynego kanału zdarzeń rdzeń → UI (paczki zdarzeń, najwyżej jedna na klatkę). */
+/** Nazwa jedynego kanału zdarzeń rdzeń → UI (ramki `EventFrame`, najwyżej jedna na klatkę). */
 export const EVENTS_CHANNEL = 'alfa://events';
 
 // Odrzucenie zawsze jako `Error` (rdzeń odsyła `AppError` jako zwykły obiekt).
@@ -385,11 +386,24 @@ export class TauriAlfaClient implements AlfaClient {
     restore: (file) => call('backups_restore', { file }),
   };
 
-  subscribe(handler: (batch: readonly AlfaEvent[]) => void): () => void {
+  readonly eventLog: AlfaClient['eventLog'] = {
+    resume: (afterSeq, epoch) => call('events_resume', { afterSeq, epoch }),
+  };
+
+  subscribe(handler: (batch: readonly AlfaEvent[]) => void, onLost?: () => void): () => void {
     let active = true;
     let unlisten: UnlistenFn | null = null;
-    void listen<readonly AlfaEvent[]>(EVENTS_CHANNEL, (event) => {
-      if (active) handler(event.payload);
+    const sequencer = new EventSequencer({
+      deliver: (events) => {
+        if (active) handler(events);
+      },
+      resume: (afterSeq, epoch) => this.eventLog.resume(afterSeq, epoch),
+      lost: () => {
+        if (active) onLost?.();
+      },
+    });
+    void listen<EventFrame>(EVENTS_CHANNEL, (event) => {
+      if (active) sequencer.push(event.payload);
     }).then((fn) => {
       if (active) {
         unlisten = fn;

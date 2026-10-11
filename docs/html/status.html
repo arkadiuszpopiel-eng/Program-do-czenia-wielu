@@ -519,8 +519,8 @@ aplikacji bywał czerwony) — licznik pojawia się teraz po wczytaniu; <code>e2
 <li>zamknięcie okna porzucało szkic i układ z ostatnich 400 ms;</li>
 <li>zdarzenia kończące turę, które przyszły w trakcie wczytywania rozmowy, przepadały.</li>
 </ul>
-<p>Otwarte z tego przeglądu: delty tekstu z czasu wczytywania rozmowy nadal mogą zginąć albo się zdublować — protokół nie
-niesie numerów kolejnych, więc naprawa wymaga zmiany w rdzeniu (DTO zdarzeń); to samo okno przy starcie (lista sesji
+<p>Zamknięte w 0.0.19 (B.2): delty tekstu z czasu wczytywania rozmowy — <code>TextDelta</code> niesie pozycję (<code>offset</code>), więc
+okno pomija część, którą ma z migawki, i dopisuje resztę. Nadal otwarte: to samo okno przy starcie (lista sesji
 nadpisuje zdarzenia sprzed odpowiedzi). Niezweryfikowane podejrzenia: spóźniona delta po <code>Stop</code> przywraca status
 „pisze”; ponowny <code>start()</code> klienta Tauri dokłada nasłuchy.</p>
 <p>Porządki na dyskach, 2026-10-09 (zgoda właściciela): została jedna kopia robocza na E:. Usunięte <code>cargo clean</code>: stare wyniki

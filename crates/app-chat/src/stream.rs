@@ -36,6 +36,11 @@ fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
     }
 }
 
+/// Długość tekstu w jednostkach UTF-16 (tak liczy ją interfejs: `String.length`).
+fn utf16_len(text: &str) -> u64 {
+    text.encode_utf16().count() as u64
+}
+
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
 pub(crate) async fn prepare(
     core: &ChatEngine,
@@ -147,6 +152,8 @@ pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHa
     let mut acc = TurnAccumulator::new(choice.provider.id().clone());
     let mut renderer = IncrementalRenderer::new(RenderOptions::default());
     let mut thinking: Option<(Instant, Instant)> = None;
+    // Długość tekstu wysłanego w deltach tej tury (pole `offset` zdarzenia `TextDelta`).
+    let mut sent_units = handle.live.lock().map(|l| utf16_len(&l.text)).unwrap_or(0);
     let mut thinking_ms = None;
     let mut cancelled = false;
     loop {
@@ -192,6 +199,8 @@ pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHa
                     let _ = tap.send(VoiceChunk::Text(text.clone()));
                 }
                 let blocks = update_blocks(renderer.push(text));
+                let offset = sent_units;
+                sent_units += utf16_len(text);
                 if let Ok(mut live) = handle.live.lock() {
                     merge_live(&mut live, text, &blocks);
                 }
@@ -200,6 +209,7 @@ pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHa
                     turn_id: tid.clone(),
                     text: text.clone(),
                     blocks,
+                    offset,
                 });
             }
             _ => {}
@@ -214,6 +224,7 @@ pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHa
             turn_id: tid,
             text: String::new(),
             blocks: closing,
+            offset: sent_units,
         });
     }
     let turn = acc.finish();

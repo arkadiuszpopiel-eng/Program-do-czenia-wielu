@@ -15,11 +15,19 @@ export function applyTurnEvent(
     case 'TurnStatus':
       turn.status = event.status;
       return { text: null, stopped: false };
-    case 'TextDelta':
+    case 'TextDelta': {
+      // `offset` = długość tekstu tury przed deltą. Delta w całości starsza niż tekst, który już
+      // mamy (migawka z `turns_list` ją zawiera), jest pomijana razem z blokami — inaczej
+      // cofnęłaby treść; częściowo znana — dopisujemy tylko nową końcówkę.
+      const have = turn.text.length;
+      const offset = event.offset ?? have;
+      if (offset + event.text.length < have) return { text: null, stopped: false };
       if (turn.status !== 'streaming') turn.status = 'streaming';
-      if (event.text) turn.text += event.text;
+      const fresh = event.text.slice(Math.max(0, have - offset));
+      if (fresh) turn.text += fresh;
       for (const block of event.blocks) turn.blocks[block.index] = block;
-      return { text: event.text || null, stopped: false };
+      return { text: fresh || null, stopped: false };
+    }
     case 'ThinkingDelta':
       turn.thinking = { duration_ms: event.elapsed_ms, active: !event.done };
       return { text: null, stopped: false };

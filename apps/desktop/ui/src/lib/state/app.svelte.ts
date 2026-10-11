@@ -173,7 +173,10 @@ export class AppState {
       await this.i18n.setLocale(boot.locale);
       this.bootStep = this.i18n.t('boot.sessions');
       this.unsubscribe?.();
-      this.unsubscribe = this.client.subscribe((batch) => this.batcher.push(...batch));
+      this.unsubscribe = this.client.subscribe(
+        (batch) => this.batcher.push(...batch),
+        () => void this.resync(),
+      );
       status = this.client.system.status().then(
         (value) => (this.system = value),
         (error: unknown) => this.loadFailed(error),
@@ -195,6 +198,29 @@ export class AppState {
     else await this.refreshCosts().catch((error: unknown) => this.loadFailed(error));
     await status;
     this.view = boot.onboarding_done ? 'chat' : 'onboarding';
+  }
+
+  /**
+   * Zdarzenia przepadły i rdzeń nie umie ich już odtworzyć: stan z rdzenia od nowa, bez zmiany
+   * widoku. Rozmowy w pamięci podręcznej poza otwartą są porzucane (wczytają się przy otwarciu).
+   */
+  private async resync(): Promise<void> {
+    this.batcher.flushNow();
+    const active = this.activeId;
+    for (const id of Object.keys(this.cache)) if (id !== active) delete this.cache[id];
+    this.cacheOrder = this.cacheOrder.filter((id) => id === active);
+    const failed = (
+      await Promise.allSettled([
+        this.client.sessions.list().then((list) => (this.sessions.list = [...list])),
+        this.client.system.status().then((value) => (this.system = value)),
+        this.client.voice.status().then((v) => this.voice.applyStatus(v)),
+        this.client.cameras.state().then((c) => (this.cameras = c)),
+        this.conversation?.load(),
+        this.refreshCosts(),
+        active ? this.loadAgents(active) : null,
+      ])
+    ).find((r) => r.status === 'rejected');
+    if (failed) this.loadFailed(failed.reason);
   }
 
   dispose(): void {
