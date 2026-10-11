@@ -222,6 +222,7 @@ impl AccountsHub for FakeAccountsHub {
             provider: new.provider,
             label,
             created_at: now,
+            key_saved_at: Some(now),
             last_test: None,
             state: AccountState::Active,
             secret,
@@ -280,6 +281,7 @@ impl AccountsHub for FakeAccountsHub {
             acc.state = AccountState::Active;
         }
         acc.last_test = None;
+        acc.key_saved_at = Some(self.now());
         self.put(acc);
         Ok(())
     }

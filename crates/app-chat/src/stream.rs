@@ -251,6 +251,15 @@ pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHa
         .and_then(|m| choice.provider.cost(m, &turn.usage))
         .or_else(|| choice.provider.cost(&chosen.model, &turn.usage));
     let (status, stop, error) = classify(cancelled, &turn, &chosen.provider_name);
+    // Błąd przed pierwszym zdarzeniem trasy: konto nie jest jeszcze znane — bierzemy je z decyzji
+    // Routera, żeby rdzeń wiedział, które konto zawiodło (konto zapasowe, zadanie C2.15).
+    if error.is_some() && chosen.account.is_none() {
+        chosen.account = choice
+            .route
+            .as_ref()
+            .and_then(|route| core.inner.brain.target(&route.chosen))
+            .and_then(|target| target.account);
+    }
     if let Some(model) = turn.model.clone().filter(|_| !choice.routed) {
         chosen.model = model;
     }

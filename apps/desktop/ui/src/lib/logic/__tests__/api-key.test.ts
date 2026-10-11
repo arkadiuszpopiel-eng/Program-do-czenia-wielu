@@ -10,9 +10,11 @@ import {
   checkKey,
   cleanKey,
   isPlausibleKey,
+  keyAgeDays,
+  keyRotationDue,
   rotateStores,
-  verdictOf,
   type TestVerdict,
+  verdictOf,
 } from '../api-key';
 import { en } from '../../i18n/en';
 import { pl } from '../../i18n/pl';
@@ -184,5 +186,30 @@ describe('teksty kreatora', () => {
   it('adresy stron z kluczami są adresami https', () => {
     for (const [id, help] of Object.entries(KEY_HELP))
       expect(help.url, id).toMatch(/^https:\/\/[a-z0-9.-]+(\/|$)/);
+  });
+});
+
+describe('wiek klucza', () => {
+  const now = Date.parse('2026-10-11T12:00:00Z');
+
+  it('liczy pełne dni od zapisu klucza', () => {
+    expect(keyAgeDays('2026-10-11T08:00:00Z', now)).toBe(0);
+    expect(keyAgeDays('2026-10-10T11:59:00Z', now)).toBe(1);
+    expect(keyAgeDays('2026-04-14T12:00:00Z', now)).toBe(180);
+    // Zegar cofnięty albo data z przyszłości: nigdy liczba ujemna.
+    expect(keyAgeDays('2026-12-01T00:00:00Z', now)).toBe(0);
+  });
+
+  it('brak albo nieczytelna data to „nie wiadomo”, nie zero', () => {
+    expect(keyAgeDays(null, now)).toBeNull();
+    expect(keyAgeDays(undefined, now)).toBeNull();
+    expect(keyAgeDays('wczoraj', now)).toBeNull();
+  });
+
+  it('przypomnienie o wymianie: od progu, a próg 0 je wyłącza', () => {
+    expect(keyRotationDue(179, 180)).toBe(false);
+    expect(keyRotationDue(180, 180)).toBe(true);
+    expect(keyRotationDue(999, 0)).toBe(false);
+    expect(keyRotationDue(null, 180)).toBe(false);
   });
 });

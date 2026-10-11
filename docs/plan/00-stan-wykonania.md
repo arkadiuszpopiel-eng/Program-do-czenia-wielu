@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-11**, wersja programu **0.0.19**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-11**, wersja programu **0.0.20**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -52,6 +52,7 @@ funkcjami.
 | 0.0.17 | 2026-10-10 | „opisz mi to, co widzisz”, poprawki po dwóch przeglądach w świeżym kontekście, głośność mowy, ekran ładowania z wyjściem |
 | 0.0.18 | 2026-10-10 | domknięcie ustaleń przeglądów niewymagających kamery, znak kamery w pigułce głosowej |
 | 0.0.19 | 2026-10-11 | szwy B.2 i B.3: numery zdarzeń ze wznowieniem (`events_resume`), pozycja w deltach tekstu, błędy z kodem i szczegółami na łączu |
+| 0.0.20 | 2026-10-11 | klucze API: sprawdzanie w tle, wiek klucza z przypomnieniem o wymianie, konto zapasowe tego samego dostawcy (C2.14, C2.15) |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 
@@ -115,7 +116,8 @@ generator typów TS (ADR 0013), eksport rozmowy do PDF.
 ## Z planu v6
 
 Zbudowane z planu v6: kamery USB i „opisz mi to, co widzisz” (C3.1, C3.3, C3.4, część C3.2 i C3.7 — bez próby na
-prawdziwej kamerze), import kluczy ze zmiennych (C2.17), szwy B.2 i B.3 (numery zdarzeń, błędy strukturalne).
+prawdziwej kamerze), import kluczy ze zmiennych (C2.17), sprawdzanie kluczy w tle i konto zapasowe (C2.14, C2.15), szwy B.2 i B.3
+(numery zdarzeń, błędy strukturalne).
 Poza tym gotowe są dokumenty tego katalogu, projekty ADR 0017–0026, szkice SPEC nowych modułów i przegląd technologii. Stan zadań: [`03-roadmapa.md`](03-roadmapa.md).
 
 ## Znane problemy

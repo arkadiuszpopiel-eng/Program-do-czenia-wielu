@@ -70,6 +70,8 @@ pub(crate) struct Inner {
     /// Mosty CLI (karty zgodności, delegacja, logowanie w terminalu) i serwer MCP na żądanie.
     pub bridges: Arc<app_bridges::BridgesApp>,
     pub brain: Arc<dyn BrainPort>,
+    /// Kiedy ostatnio sprawdzano konto po błędzie w rozmowie (konto zapasowe, C2.15).
+    pub retests: crate::parts::backup_account::Retests,
     /// Computer use, terminal, umiejętności, Kreator, „Zdrowie systemu" (`parts/work.rs`).
     pub work: crate::parts::WorkStack,
     /// Sygnały systemowe (bezczynność, tryb gry, zasilanie, blokada); `None` — brak monitora.

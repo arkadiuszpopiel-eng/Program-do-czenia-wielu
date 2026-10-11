@@ -264,7 +264,8 @@
             "currency": "PLN"
           }
         },
-        "last_tested_at": "2026-09-30T05:45:00.000Z"
+        "last_tested_at": "2026-09-30T05:45:00.000Z",
+        "key_saved_at": "2026-03-14T08:45:00.000Z"
       },
       {
         "id": "acc-openai",
@@ -625,6 +626,7 @@
           }
         },
         "last_tested_at": "2026-09-30T08:33:00.000Z",
+        "key_saved_at": "2026-09-18T08:45:00.000Z",
         "last_test": {
           "ok": true,
           "reason": "ok",
@@ -665,7 +667,8 @@
           "currency": "PLN"
         }
       },
-      "last_tested_at": null
+      "last_tested_at": null,
+      "key_saved_at": "2026-09-30T11:45:00.000Z"
     }
   },
   {
@@ -1426,6 +1429,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-4o-mini",
       "last_test": {
         "ok": true,
@@ -1483,6 +1487,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-4o-mini",
       "last_test": {
         "ok": true,
@@ -1605,7 +1610,8 @@
             "currency": "PLN"
           }
         },
-        "last_tested_at": "2026-09-30T05:45:00.000Z"
+        "last_tested_at": "2026-09-30T05:45:00.000Z",
+        "key_saved_at": "2026-03-14T08:45:00.000Z"
       },
       {
         "id": "acc-openai",
@@ -1966,6 +1972,7 @@
           }
         },
         "last_tested_at": "2026-09-30T08:33:00.000Z",
+        "key_saved_at": "2026-09-18T08:45:00.000Z",
         "last_test": {
           "ok": true,
           "reason": "ok",
@@ -2010,6 +2017,7 @@
           }
         },
         "last_tested_at": "2026-09-30T11:45:00.000Z",
+        "key_saved_at": "2026-09-30T11:45:00.000Z",
         "auto_model": "gpt-4o-mini",
         "last_test": {
           "ok": true,
@@ -2070,6 +2078,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-4o-mini",
       "last_test": {
         "ok": true,
@@ -2129,6 +2138,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-4o-mini",
       "last_test": {
         "ok": true,

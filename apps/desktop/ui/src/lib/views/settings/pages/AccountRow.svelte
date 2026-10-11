@@ -7,7 +7,14 @@
   import { Button } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { Account, ProviderInfo, TestReport } from '../../../api/types-hub';
-  import { actionFor, cleanKey, rotateStores, verdictOf } from '../../../logic/api-key';
+  import {
+    actionFor,
+    cleanKey,
+    keyAgeDays,
+    keyRotationDue,
+    rotateStores,
+    verdictOf,
+  } from '../../../logic/api-key';
   import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import WizardKeyStep from './WizardKeyStep.svelte';
@@ -52,6 +59,9 @@
   );
   const verdict = $derived(lastReport ? verdictOf(lastReport) : null);
   const disabled = $derived(account.state === 'disabled');
+  /** Wiek klucza w dniach i przypomnienie o wymianie (ustawienie `accounts.key_max_age_days`). */
+  const keyAge = $derived(keyAgeDays(account.key_saved_at, Date.now()));
+  const keyOld = $derived(keyRotationDue(keyAge, app.num('accounts.key_max_age_days', 180)));
   const busy = $derived(testing || account.state === 'testing');
   /** Konto bez klucza w magazynie: ostatni test niczego już nie opisuje. */
   const keyless = $derived(account.state === 'unconfigured' || !account.key_stored);
@@ -155,7 +165,11 @@
         {#if account.last_tested_at}· {t('hub.tested', {
             when: app.i18n.relative(account.last_tested_at),
           })}{/if}
+        {#if keyAge !== null && !keyOld}· {t('hub.keyAge', { n: keyAge })}{/if}
       </span>
+      {#if keyOld && keyAge !== null}
+        <span class="meta old">{t('hub.keyOld', { n: keyAge })}</span>
+      {/if}
     </div>
     <span class="state {tone}">{stateLabel}</span>
     <div class="actions">
@@ -272,6 +286,9 @@
   .meta {
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-xs);
+  }
+  .meta.old {
+    color: var(--alfa-color-warning);
   }
   .state {
     font-size: var(--alfa-font-size-xs);

@@ -51,6 +51,12 @@ impl ChatHost for CoreChatHost {
             });
         }
     }
+
+    async fn account_trouble(&self, account: &str, error: &TurnError) {
+        if let Some(core) = self.core() {
+            core.account_trouble(account, error).await;
+        }
+    }
 }
 
 impl AppCore {

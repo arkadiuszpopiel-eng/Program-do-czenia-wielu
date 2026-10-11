@@ -276,6 +276,10 @@ pub struct Account {
     pub label: String,
     /// Kiedy utworzono.
     pub created_at: DateTime<Utc>,
+    /// Kiedy zapisano obecny klucz (dodanie konta albo wymiana klucza). Brak — konto sprzed
+    /// wprowadzenia pola; najlepszym przybliżeniem jest wtedy `created_at`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub key_saved_at: Option<DateTime<Utc>>,
     /// Ostatni test.
     pub last_test: Option<TestSummary>,
     /// Stan.

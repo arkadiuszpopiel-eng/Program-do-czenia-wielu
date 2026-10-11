@@ -211,6 +211,10 @@ impl ChatEngine {
         if let Some(host) = self.host() {
             let answered = outcome.chosen.is_some() && outcome.status != TurnStatus::Error;
             host.connectivity(outcome.error.as_ref(), answered).await;
+            let account = outcome.chosen.as_ref().and_then(|c| c.account.as_deref());
+            if let (Some(account), Some(error)) = (account, &outcome.error) {
+                host.account_trouble(account, error).await;
+            }
         }
         match (&outcome.error, outcome.stop) {
             (Some(error), _) => self.emit(AlfaEvent::Error {

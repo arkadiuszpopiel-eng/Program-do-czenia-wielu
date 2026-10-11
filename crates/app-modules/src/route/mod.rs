@@ -256,6 +256,14 @@ impl BrainPort for RouterBrain {
         self.api_ready()
     }
 
+    fn bench_account(&self, account: &str, until: chrono::DateTime<chrono::Utc>) -> Option<String> {
+        self.accounts.bench(account, until).map(|a| a.label)
+    }
+
+    fn backup_for(&self, account: &str) -> Option<String> {
+        self.accounts.backup_for(account).map(|a| a.label)
+    }
+
     fn target(&self, model: &str) -> Option<BrainTarget> {
         let c = Candidate::parse(model)?;
         let provider = c.provider.as_str().to_owned();

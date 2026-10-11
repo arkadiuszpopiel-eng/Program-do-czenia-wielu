@@ -220,6 +220,46 @@
       }
      ]
     }
+   },
+   {
+    "key": "accounts.check_interval_hours",
+    "label": {
+     "pl": "Sprawdzanie kluczy w tle",
+     "en": "Background key checks"
+    },
+    "description": {
+     "pl": "Co ile godzin Alfa sama sprawdza klucze kont — tym samym testem co przycisk „Testuj połączenie” (pytanie o listę modeli, bez zużycia tokenów). O kluczu, który przestał działać, dowiesz się z komunikatu, zanim zaczniesz rozmowę. 0 wyłącza sprawdzanie.",
+     "en": "How often Alfa checks account keys by itself — the same test as the “Test connection” button (a model list request, no tokens used). You learn about a key that stopped working from a notice, before you start a conversation. 0 turns the checks off."
+    },
+    "control": {
+     "kind": "number",
+     "min": 0,
+     "max": 168,
+     "step": 1,
+     "unit": "h"
+    },
+    "default": 24,
+    "scope": "global"
+   },
+   {
+    "key": "accounts.key_max_age_days",
+    "label": {
+     "pl": "Przypomnienie o wymianie klucza",
+     "en": "Key rotation reminder"
+    },
+    "description": {
+     "pl": "Po ilu dniach od zapisania klucza lista kont pokazuje przypomnienie o wymianie. Alfa niczego nie wymienia sama — to tylko znak przy koncie. 0 wyłącza przypomnienie.",
+     "en": "After how many days since the key was saved the account list shows a rotation reminder. Alfa never rotates anything by itself — it is only a mark next to the account. 0 turns the reminder off."
+    },
+    "control": {
+     "kind": "number",
+     "min": 0,
+     "max": 730,
+     "step": 10,
+     "unit": "dni"
+    },
+    "default": 180,
+    "scope": "global"
    }
   ],
   "upcoming": []

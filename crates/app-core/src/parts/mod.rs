@@ -2,9 +2,11 @@
 //! poszczególnych modułów wywoływana w kolejności z rejestru (`compose.rs`).
 
 mod agents;
+pub(crate) mod backup_account;
 mod cameras;
 mod extra;
 mod kernel;
+pub(crate) mod key_watch;
 mod memory;
 mod ports;
 pub(crate) mod signals;
@@ -359,6 +361,7 @@ impl Built {
             sessions,
             device,
             brain: ports.brain,
+            retests: backup_account::Retests::default(),
             extra,
             transfer: ports.transfer,
             voice: ports.voice,

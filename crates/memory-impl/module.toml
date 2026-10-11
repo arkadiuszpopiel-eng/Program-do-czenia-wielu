@@ -2,7 +2,7 @@
 # Brak własnych zdolności: zakres sesji w bazie sesji (SessionDbProvider), projekt/agentka/globalna w osobnych
 # szyfrowanych bazach z kluczem w sejfie (KeyVault), indeks i zapytania przez search-contract (TxIndexer/TxSearcher).
 id = "memory"
-version = "0.0.19"
+version = "0.0.20"
 kind = "service"
 provides = ["memory-contract@1"]
 requires = ["core-bus-contract@1", "sessions-contract@1", "search-contract@1"]

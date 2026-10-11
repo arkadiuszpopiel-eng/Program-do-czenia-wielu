@@ -118,6 +118,7 @@ impl AccountsHub for AccountsHubService {
             provider: new.provider,
             label,
             created_at: self.now(),
+            key_saved_at: Some(self.now()),
             last_test: None,
             state: AccountState::Active,
             secret,
@@ -179,6 +180,7 @@ impl AccountsHub for AccountsHubService {
             acc.state = AccountState::Active;
         }
         acc.last_test = None;
+        acc.key_saved_at = Some(self.now());
         let payload = serde_json::json!({ "account": acc.id, "provider": acc.provider });
         self.commit(acc, &from).await?;
         self.publish(EVENT_KEY_ROTATED, Level::Info, payload).await;

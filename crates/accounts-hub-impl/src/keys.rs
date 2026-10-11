@@ -142,6 +142,7 @@ impl AccountsHubService {
         }
         let previous = self.secret_of(&acc)?;
         self.secrets.put(&acc.secret, &secret)?;
+        let saved_at = self.now();
         let stored = self.update_accounts(|accounts| {
             let current = accounts
                 .get_mut(id)
@@ -149,6 +150,7 @@ impl AccountsHubService {
             let from = current.state.clone();
             current.state = summary.outcome.next_state(&current.state);
             current.last_test = Some(summary.clone());
+            current.key_saved_at = Some(saved_at);
             if let Some(models) = &models {
                 current.models.clone_from(models);
             }

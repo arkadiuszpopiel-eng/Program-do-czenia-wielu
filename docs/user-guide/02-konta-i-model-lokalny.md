@@ -65,3 +65,17 @@ i **Usuń konto** (usuwa też klucz z Menedżera poświadczeń).
   włączone) i szacowanie kosztu przed długim zadaniem.
 - Ceny dostawców są w dolarach; Alfa przelicza je kursem NBP z danego dnia (gdy kursu brak — kursem zapasowym).
 - Po przekroczeniu limitu odpowiedź z płatnego modelu jest blokowana z komunikatem „Przekroczono limit kosztów”.
+
+## Klucze pod opieką: sprawdzanie w tle, wiek klucza, konto zapasowe
+
+- **Sprawdzanie w tle.** Co 24 godziny Alfa sama sprawdza każde włączone konto — tym samym testem co przycisk
+  „Testuj połączenie” (pytanie o listę modeli, bez zużycia tokenów). Gdy klucz przestanie działać, zobaczysz komunikat
+  i powód przy koncie. Odstęp zmienisz w **Ustawienia → Konta i klucze API → Sprawdzanie kluczy w tle**; 0 wyłącza.
+  Bez sieci nic nie jest sprawdzane.
+- **Wiek klucza.** Przy koncie widać, ile dni ma zapisany klucz (liczone od dodania konta albo ostatniej wymiany).
+  Po 180 dniach pojawia się przypomnienie o wymianie — próg zmienisz w **Przypomnienie o wymianie klucza**, 0 je
+  wyłącza. Alfa nigdy nie wymienia klucza sama: robisz to przyciskiem „Zmień klucz”.
+- **Konto zapasowe.** Dodaj drugie konto u tego samego dostawcy. Gdy pierwsze dostanie limit zapytań albo zacznie
+  odrzucać zapytania (zły klucz, brak środków), kolejne wiadomości pójdą przez drugie; zobaczysz o tym komunikat.
+  Wiadomość, która trafiła na błąd, ponów przyciskiem. Po limicie zapytań pierwsze konto wraca samo, gdy limit
+  minie (najpóźniej po godzinie); po odrzuconym kluczu — gdy go wymienisz albo test znów przejdzie.

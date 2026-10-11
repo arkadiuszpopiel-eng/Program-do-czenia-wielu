@@ -59,6 +59,8 @@ export const plSettings = {
     'Konto „{label}" zniknie, a klucz zostanie usunięty z Menedżera poświadczeń.',
   'hub.models': { one: '{n} model', few: '{n} modele', many: '{n} modeli', other: '{n} modelu' },
   'hub.tested': 'Ostatni test: {when}',
+  'hub.keyAge': 'Wiek klucza (dni): {n}',
+  'hub.keyOld': 'Klucz ma już {n} dni — warto go wymienić („Zmień klucz”).',
   'hub.limit': 'Limit {amount}/mies.',
   'hub.noLimit': 'bez limitu',
   'hub.accounts': 'Twoje konta',

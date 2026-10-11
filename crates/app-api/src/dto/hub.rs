@@ -148,6 +148,10 @@ pub struct Account {
     pub assignments: AccountAssignment,
     pub cost_limit: AccountCostLimit,
     pub last_tested_at: Option<Iso8601>,
+    /// Kiedy zapisano obecny klucz (dodanie konta albo ostatnia wymiana) — wiek klucza
+    /// i przypomnienie o wymianie liczy interfejs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub key_saved_at: Option<Iso8601>,
     /// Wynik ostatniego testu — lista kont pokazuje powód, nie tylko „klucz odrzucony”.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_test: Option<AccountLastTest>,

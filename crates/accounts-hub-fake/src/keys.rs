@@ -90,6 +90,9 @@ impl FakeAccountsHub {
         }
         self.secrets.put(&acc.secret, &secret)?;
         self.store_test(id, Some(&secret), &summary, models)?;
+        let mut saved = self.get(id)?;
+        saved.key_saved_at = Some(self.now());
+        self.put(saved);
         Ok(summary)
     }
 

@@ -8,6 +8,36 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.20 — 2026-10-11
+
+Klucze API pod opieką: Alfa sama sprawdza je w tle, pokazuje wiek klucza i przełącza się na konto zapasowe.
+
+### Konta i klucze API
+
+- **Sprawdzanie kluczy w tle:** co 24 godziny (do zmiany w Ustawieniach → Konta i klucze API; 0 wyłącza) Alfa
+  sprawdza każde włączone konto tym samym testem co przycisk „Testuj połączenie” — bez zużycia tokenów. Gdy klucz przestanie
+  działać, dostaniesz komunikat, zanim zaczniesz rozmowę.
+- **Wiek klucza:** przy każdym koncie widać, ile dni ma zapisany klucz; po 180 dniach (do zmiany, 0 wyłącza) pojawia
+  się przypomnienie o wymianie. Alfa niczego nie wymienia sama.
+- **Konto zapasowe:** gdy masz dwa konta u tego samego dostawcy, a pierwsze dostanie limit zapytań albo zacznie
+  odrzucać zapytania (klucz, brak środków), kolejne wiadomości pójdą przez drugie — z komunikatem, bez Twojego
+  udziału. Wiadomość, która trafiła na błąd, ponawiasz sam.
+- Konto, które dostało limit zapytań, wraca na swoje miejsce, gdy limit minie (najpóźniej po godzinie).
+
+### Testy
+
+- Nowe testy całej ścieżki na lokalnych serwerach udających dostawcę: sprawdzanie w tle (klucz psuje się i wraca),
+  wyłączone sprawdzanie i wyłączone konto bez zapytań, data klucza przy dodaniu i wymianie, przełączenie na konto
+  zapasowe po limicie zapytań i po odrzuconym kluczu, brak przełączenia przy jednym koncie.
+- Nie sprawdzono u prawdziwego dostawcy (wymaga dwóch prawdziwych kluczy tego samego dostawcy).
+- Test `review.rs::queued_message_of_a_trashed_session_waits_for_undo` raz nie przeszedł w pełnym przebiegu pod
+  obciążeniem i sześć razy z rzędu przeszedł osobno — przyczyna nieustalona, do obserwacji.
+
+### Przyczyna błędu
+
+- Router pamiętał limit zapytań dla dostawcy, a nie dla konta — drugie konto tego samego dostawcy było blokowane
+  razem z pierwszym. Przy błędzie przed pierwszym fragmentem odpowiedzi nie było też wiadomo, które konto zawiodło.
+
 ## 0.0.19 — 2026-10-11
 
 Pewniejsze łącze między rdzeniem a oknem: zdarzenia mają numery i dają się odtworzyć, a błędy niosą kod

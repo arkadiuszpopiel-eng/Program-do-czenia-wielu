@@ -15,6 +15,8 @@
         "quick.session_mode": "single",
         "models.default_profile": "hybrid",
         "models.effort": "medium",
+        "accounts.check_interval_hours": 24,
+        "accounts.key_max_age_days": 180,
         "engines.llm.backend": "auto",
         "engines.llm.context": "auto",
         "engines.llm.threads": 0,

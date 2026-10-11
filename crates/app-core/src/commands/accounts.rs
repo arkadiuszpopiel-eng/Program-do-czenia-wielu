@@ -161,6 +161,8 @@ pub fn account_dto(a: &CoreAccount) -> Account {
         },
         cost_limit: limit,
         last_tested_at: a.last_test.as_ref().map(|t| crate::dto::iso(t.at)),
+        // Konto sprzed wprowadzenia pola: klucz jest co najmniej tak stary jak konto.
+        key_saved_at: key_stored.then(|| crate::dto::iso(a.key_saved_at.unwrap_or(a.created_at))),
         last_test: a.last_test.as_ref().map(|t| AccountLastTest {
             ok: t.outcome.key_works(),
             reason: t.outcome.code().to_owned(),
@@ -222,7 +224,7 @@ impl AppCore {
         })
     }
 
-    pub(super) async fn announce_account(&self, id: &AccountId) {
+    pub(crate) async fn announce_account(&self, id: &AccountId) {
         if let Some(a) = self.inner.hub.account(id) {
             self.emit(AlfaEvent::AccountChanged {
                 account: account_dto(&a),

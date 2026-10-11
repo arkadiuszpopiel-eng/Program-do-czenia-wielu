@@ -291,6 +291,30 @@ test('lista kont: powód przy koncie, wymiana klucza, wyłączenie i ten sam klu
   );
 });
 
+test('wiek klucza przy koncie, przypomnienie o wymianie i ustawienia sprawdzania w tle', async ({
+  page,
+}) => {
+  await openProviders(page);
+  const row = (label: string) => page.getByRole('listitem').filter({ hasText: label });
+  // Klucz zapisany 200 dni temu przekracza próg 180 dni — jest przypomnienie; młody ma sam wiek.
+  await expect(row('Praca — OpenAI')).toContainText('Wiek klucza (dni): 12');
+  await expect(row('Praca — OpenAI')).not.toContainText('warto go wymienić');
+  const old = page.getByRole('listitem').filter({ hasText: 'Klucz ma już 200 dni' });
+  await expect(old).toHaveCount(1);
+  // Oba ustawienia są na tej samej stronie.
+  const reminder = page.getByRole('spinbutton', { name: 'Przypomnienie o wymianie klucza' });
+  await expect(page.getByRole('spinbutton', { name: 'Sprawdzanie kluczy w tle' })).toHaveValue(
+    '24',
+  );
+  await expect(reminder).toHaveValue('180');
+  // Próg 0 wyłącza przypomnienie: zostaje sam wiek klucza.
+  await reminder.fill('0');
+  await reminder.blur();
+  await expect(page.getByText('Klucz ma już 200 dni')).toHaveCount(0);
+  await expect(page.getByText('Wiek klucza (dni): 200')).toBeVisible();
+  await expectAccessible(page, 'konta: wiek klucza');
+});
+
 test('włączenie konta z odrzuconym kluczem nie robi z niego działającego', async ({ page }) => {
   await openWizard(page);
   await check(page, fakeKey('sk-', 'nocredit'), 'no_credit');

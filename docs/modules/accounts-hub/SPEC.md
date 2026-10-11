@@ -94,3 +94,6 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
   dostawcy po kolei; błąd „model nie istnieje / brak dostępu” przełącza na następny (`router-impl/src/fallback.rs`).
 - Klasa zadań tury pochodzi z „klasy modelu” głównej roli agentki (`BrainRequest.task`).
 - Testy: `app-core/tests/accounts_models.rs`.
+- **0.0.20 (C2.14):** `Account.key_saved_at` — chwila zapisania obecnego klucza (`add_account`, `rotate`, `try_rotate`);
+  brak pola w starych danych = `created_at`. Okresowe sprawdzanie kont i przypomnienie o wymianie żyją w kompozycji
+  (`app-core/src/parts/key_watch.rs`) i w interfejsie — hub tylko przechowuje datę i wykonuje test.

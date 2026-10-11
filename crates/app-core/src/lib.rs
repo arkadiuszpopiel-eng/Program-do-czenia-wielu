@@ -34,5 +34,6 @@ pub use app_voice::{Pacer, VoiceEngine, VoiceEngineFactory};
 pub use commands::app::SYSTEM_SETTINGS_ALLOWED;
 pub use commands::settings::{KILL_SWITCH_CHORD, validate_chord};
 pub use options::{AppOptions, AppPaths, BridgeFactory};
+pub use parts::key_watch::KeyCheckRound;
 pub use providers_contract::CancellationToken;
 pub use router_contract::RouteKind;

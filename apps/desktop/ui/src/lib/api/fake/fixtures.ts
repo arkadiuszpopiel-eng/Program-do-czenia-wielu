@@ -391,6 +391,7 @@ export function seedAccounts(now: number): Account[] {
       },
       cost_limit: { enabled: true, monthly: pln(20_000) },
       last_tested_at: iso(now - 3 * 60 * MIN),
+      key_saved_at: iso(now - 200 * 24 * 60 * MIN),
     },
     {
       // Konto z długą, zmieszaną listą modeli (rozmowa, mowa, obrazy, embeddingi) i jedną kolejką.
@@ -405,6 +406,7 @@ export function seedAccounts(now: number): Account[] {
       assignments: { task_classes: ['chat'], agents: [], voice_stt: false, voice_tts: false },
       cost_limit: { enabled: true, monthly: pln(5_000) },
       last_tested_at: iso(now - 12 * MIN),
+      key_saved_at: iso(now - 12 * 24 * 60 * MIN),
       last_test: { ok: true, reason: 'ok', latency_ms: 298 },
     },
   ];

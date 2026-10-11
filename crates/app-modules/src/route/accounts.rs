@@ -76,6 +76,9 @@ struct State {
     detected: HashMap<String, String>,
     /// Ostatni błąd wykrywania modeli (dostawca → opis) — zamiast „brak mózgu".
     failed: HashMap<String, String>,
+    /// Konta odstawione po limicie zapytań (konto → do kiedy): w tym czasie pierwszeństwo ma
+    /// inne konto tego samego dostawcy (plan v6, zadanie C2.15).
+    benched: HashMap<String, chrono::DateTime<chrono::Utc>>,
 }
 
 /// Synchronizacja kont z Routerami.
@@ -122,14 +125,46 @@ impl AccountRoutes {
                     .is_some_and(|e| matches!(e.kind, ProviderKind::Chat | ProviderKind::Multi))
             })
             .collect();
-        accounts.sort_by_key(|a| a.created_at);
+        // Konto odstawione po limicie zapytań idzie na koniec (zostaje używalne, gdy nie ma
+        // innego); po upływie czasu wraca na swoje miejsce.
+        let now = chrono::Utc::now();
+        let benched: Vec<String> = {
+            let mut state = self.lock();
+            state.benched.retain(|_, until| *until > now);
+            state.benched.keys().cloned().collect()
+        };
+        accounts.sort_by_key(|a| (benched.iter().any(|b| b == a.id.as_str()), a.created_at));
         accounts
+    }
+
+    /// Inne używalne konto tego samego dostawcy (konto zapasowe), jeśli jest.
+    pub fn backup_for(&self, account: &str) -> Option<Account> {
+        let all = self.eligible();
+        let provider = self
+            .hub
+            .accounts()
+            .into_iter()
+            .find(|a| a.id.as_str() == account)?
+            .provider;
+        all.into_iter()
+            .find(|a| a.provider == provider && a.id.as_str() != account)
+    }
+
+    /// Odstawia konto do `until`; zwraca konto zapasowe, które przejmie zapytania (bez
+    /// zapasowego nic nie jest odstawiane — jedyne konto ma dalej próbować).
+    pub fn bench(&self, account: &str, until: chrono::DateTime<chrono::Utc>) -> Option<Account> {
+        let backup = self.backup_for(account)?;
+        self.lock().benched.insert(account.to_owned(), until);
+        self.sync();
+        Some(backup)
     }
 
     /// Konto przypisane agentce (pierwsze używalne), jeśli jest.
     pub fn assigned_to(&self, agent: &str) -> Option<(String, Registered)> {
+        // Lista kont przed zamkiem stanu: `eligible` sama z niego korzysta.
+        let eligible = self.eligible();
         let state = self.lock();
-        self.eligible()
+        eligible
             .into_iter()
             .find(|a| a.assignments.agents.iter().any(|x| x == agent))
             .and_then(|a| {
@@ -267,8 +302,18 @@ impl AccountRoutes {
             let Some(provider) = self.build(account, model.clone()) else {
                 continue;
             };
+            // Inne konto pod tym samym dostawcą ma własne limity — pamięć Routera o limicie
+            // poprzedniego konta nie może go blokować.
+            let switched = self
+                .lock()
+                .registered
+                .get(provider_id)
+                .is_some_and(|before| before.account != account.id.as_str());
             for core in &self.cores {
                 core.register(provider.clone(), RouteKind::Api);
+                if switched {
+                    core.reset_health(&ProviderId::new(provider_id.as_str()));
+                }
             }
             let name = self
                 .entry(account)

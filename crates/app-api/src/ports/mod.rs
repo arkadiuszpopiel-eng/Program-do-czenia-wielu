@@ -117,4 +117,18 @@ pub trait BrainPort: Send + Sync {
     fn target(&self, _model: &str) -> Option<BrainTarget> {
         None
     }
+    /// Odstawia konto do `until` (limit zapytań u dostawcy): przez ten czas pierwszeństwo ma
+    /// inne używalne konto tego samego dostawcy. Zwraca etykietę konta zapasowego, które
+    /// przejmie zapytania — `None`, gdy takiego nie ma (wtedy nic się nie zmienia).
+    fn bench_account(
+        &self,
+        _account: &str,
+        _until: chrono::DateTime<chrono::Utc>,
+    ) -> Option<String> {
+        None
+    }
+    /// Etykieta innego używalnego konta tego samego dostawcy (konto zapasowe), jeśli jest.
+    fn backup_for(&self, _account: &str) -> Option<String> {
+        None
+    }
 }

@@ -213,3 +213,18 @@ export const FIX_STEPS: Readonly<Record<TestVerdict, number>> = {
   network: 2,
   unsupported: 1,
 };
+
+const DAY_MS = 86_400_000;
+
+/** Wiek klucza w pełnych dniach (`null` — data zapisu nieznana albo nieczytelna). */
+export function keyAgeDays(savedAt: string | null | undefined, now: number): number | null {
+  if (!savedAt) return null;
+  const saved = Date.parse(savedAt);
+  if (Number.isNaN(saved)) return null;
+  return Math.max(0, Math.floor((now - saved) / DAY_MS));
+}
+
+/** Czy pokazać przypomnienie o wymianie (`maxAgeDays` = 0 wyłącza). */
+export function keyRotationDue(ageDays: number | null, maxAgeDays: number): boolean {
+  return ageDays !== null && maxAgeDays > 0 && ageDays >= maxAgeDays;
+}

@@ -70,6 +70,8 @@ export interface Account {
   readonly assignments: AccountAssignment;
   readonly cost_limit: { readonly enabled: boolean; readonly monthly: Money };
   readonly last_tested_at: Iso8601 | null;
+  /** Kiedy zapisano obecny klucz (dodanie konta albo ostatnia wymiana). */
+  readonly key_saved_at?: Iso8601 | null;
   /** Wynik ostatniego testu — lista kont pokazuje powód, nie tylko „klucz odrzucony”. */
   readonly last_test?: AccountLastTest | null;
   /** Kolejki modeli: klasa zadań → modele w kolejności prób (brak klasy = automatycznie). */

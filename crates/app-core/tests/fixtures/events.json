@@ -1136,6 +1136,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-6-sol",
       "last_test": {
         "ok": true,
@@ -1500,6 +1501,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-6-sol",
       "last_test": {
         "ok": true,
@@ -1864,6 +1866,7 @@
         }
       },
       "last_tested_at": "2026-09-30T11:45:00.000Z",
+      "key_saved_at": "2026-09-30T11:45:00.000Z",
       "auto_model": "gpt-6-sol",
       "last_test": {
         "ok": true,

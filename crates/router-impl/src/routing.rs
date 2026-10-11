@@ -101,6 +101,14 @@ impl RouterCore {
         reg.push((id, Registered { provider, kind }));
     }
 
+    /// Zeruje pamięć o kłopotach dostawcy (bezpiecznik, okno limitu zapytań). Wołane, gdy pod
+    /// tym samym identyfikatorem zaczyna odpowiadać inne konto — jego limity są osobne.
+    pub fn reset_health(&self, id: &ProviderId) {
+        let mut health = lock(&self.health);
+        health.breakers.remove(id);
+        health.windows.remove(id);
+    }
+
     /// Wyrejestrowuje dostawcę.
     pub fn unregister(&self, id: &ProviderId) {
         self.registry

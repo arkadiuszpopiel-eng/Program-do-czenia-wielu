@@ -41,6 +41,7 @@ impl AppCore {
         app_memory::spawn_bridge(self.inner.bus.clone(), self.inner.events.clone()).await;
         self.spawn_task_bridges().await;
         self.spawn_updates(self.inner.healthy_after);
+        self.spawn_key_watch();
         self.inner.work.files.start();
     }
 

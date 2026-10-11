@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 108 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 384 739 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2622 |
+| Linie Rust (z testami) | 385 594 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2628 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -58,7 +58,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `accounts-hub` | F1 | service | inproc | C · I · F | 6272 | 36 | [accounts-hub](modules/accounts-hub/SPEC.md) | Katalog dostawców, konta i klucze w Menedżerze poświadczeń, kreator, wykrywanie mostów CLI. |
+| `accounts-hub` | F1 | service | inproc | C · I · F | 6285 | 36 | [accounts-hub](modules/accounts-hub/SPEC.md) | Katalog dostawców, konta i klucze w Menedżerze poświadczeń, kreator, wykrywanie mostów CLI. |
 | `agent-backends` | F4 | service | process | C · I · F | 7027 | 48 | [agent-backends](modules/agent-backends/SPEC.md) | Mosty do oficjalnych CLI (Claude Code, Codex) jako „opaque worker” w worktree, bez dostępu do poświadczeń. |
 | `compliance` | F1, F4 | service | inproc | C · I · F | 3306 | 30 | [compliance](modules/compliance/SPEC.md) | Rejestr zgodności tras, tagi prywatności i jurysdykcji, deny-listy Jądra z normalizacją ścieżek Windows. |
 | `cost-meter` | F1 | service | inproc | C · I · F | 2795 | 24 | [cost-meter](modules/cost-meter/SPEC.md) | Koszty w PLN po kursie NBP, limit miesięczny i budżet tła. |
@@ -67,7 +67,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `providers` | — | — | — | C · F | 4733 | 44 | kontrakt wspólny: providers-api, providers-local |  |
 | `providers-api` | F1 | provider | inproc | I | 4976 | 38 | [providers-api](modules/providers-api/SPEC.md) | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem. |
 | `providers-local` | F1 | provider | process | I | 5298 | 49 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
-| `router` | F1 | service | inproc | C · I · F | 4440 | 27 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
+| `router` | F1 | service | inproc | C · I · F | 4448 | 27 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
 
 ## Głos
 
@@ -147,18 +147,18 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4258 | 26 | — |  |
-| `app-api` | — | — | — | pojedynczy | 6690 | 28 | — |  |
+| `app-api` | — | — | — | pojedynczy | 6708 | 28 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4287 | 23 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 2148 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 15 240 | 99 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 2164 | 6 | — |  |
+| `app-core` | — | — | — | pojedynczy | 15 987 | 105 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3184 | 26 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
 | `app-health` | — | — | — | pojedynczy | 1482 | 6 | — |  |
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 7096 | 42 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 4007 | 22 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 4060 | 22 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |
@@ -196,5 +196,5 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Crate `-impl` bez `module.toml` | 1 | `core-bus-impl` |
 | Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | 6 | `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
 | Crate bez `README.md` | 0 | brak |
-| Plik Rust powyżej 400 linii | 6 | `crates/router-impl/tests/decisions.rs` (433), `crates/app-modules/src/probe.rs` (421), `crates/router-impl/src/routing.rs` (419), `crates/accounts-hub-fake/src/hub.rs` (417), `crates/voice-tts-impl/tests/tts.rs` (409), `crates/voice-tts-impl/src/engines.rs` (405) |
+| Plik Rust powyżej 400 linii | 6 | `crates/router-impl/tests/decisions.rs` (433), `crates/router-impl/src/routing.rs` (427), `crates/app-modules/src/probe.rs` (421), `crates/accounts-hub-fake/src/hub.rs` (419), `crates/voice-tts-impl/tests/tts.rs` (409), `crates/voice-tts-impl/src/engines.rs` (405) |
 | Crate powyżej 8000 linii w `src/` | 0 | brak |

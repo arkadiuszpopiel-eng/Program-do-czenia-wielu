@@ -84,6 +84,9 @@ pub trait ChatHost: Send + Sync {
     async fn connectivity(&self, error: Option<&TurnError>, answered: bool);
     /// `CostsChanged` dla sesji po zapisie kosztu tury.
     async fn costs_changed(&self, session: &SessionId);
+    /// Tura skończyła się błędem dostawcy na koncie `account` — rdzeń może przełączyć
+    /// zapytania na konto zapasowe tego samego dostawcy.
+    async fn account_trouble(&self, _account: &str, _error: &TurnError) {}
 }
 
 /// Moduły i porty, z których korzysta silnik (składa je `app-core`).

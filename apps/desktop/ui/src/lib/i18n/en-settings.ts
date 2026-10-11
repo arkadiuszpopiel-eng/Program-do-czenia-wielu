@@ -58,6 +58,8 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
     'Account "{label}" will be removed and its key deleted from Credential Manager.',
   'hub.models': { one: '{n} model', other: '{n} models' },
   'hub.tested': 'Last test: {when}',
+  'hub.keyAge': 'Key age (days): {n}',
+  'hub.keyOld': 'This key is {n} days old — consider rotating it (“Change key”).',
   'hub.limit': 'Limit {amount}/month',
   'hub.noLimit': 'no limit',
   'hub.accounts': 'Your accounts',

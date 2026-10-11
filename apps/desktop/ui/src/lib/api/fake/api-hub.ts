@@ -204,6 +204,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
         assignments: { task_classes: ['chat'], agents: [], voice_stt: false, voice_tts: false },
         cost_limit: { enabled: false, monthly: { minor: 0, currency: 'PLN' } },
         last_tested_at: null,
+        key_saved_at: core.isoNow(),
       };
       keys.set(account.id, key);
       urls.set(account.id, url ?? '');
@@ -237,7 +238,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       const { stored, report } = probe(account, key);
       if (rotateStores(verdictOf(report))) {
         keys.set(id, key);
-        update(id, { ...stored, key_stored: true });
+        update(id, { ...stored, key_stored: true, key_saved_at: core.isoNow() });
       }
       return core.reply(report);
     },
