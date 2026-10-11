@@ -86,19 +86,19 @@
       },
       {
         "id": "sidecar-llama-vulkan",
-        "name": "llama-server (vulkan, llama.cpp b6710)",
+        "name": "llama-server (vulkan, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 32084119,
         "downloadable": true,
         "fallback": false
       },
       {
         "id": "sidecar-llama-cpu",
-        "name": "llama-server (cpu, llama.cpp b6710)",
+        "name": "llama-server (cpu, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 19501338,
         "downloadable": true,
         "fallback": true
       },
@@ -121,8 +121,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6380260272,
-    "missing_bytes": 6380260272,
+    "size_bytes": 6347959649,
+    "missing_bytes": 6347959649,
     "installed": 0,
     "total": 11,
     "state": "not_installed",
@@ -283,19 +283,19 @@
       },
       {
         "id": "sidecar-llama-vulkan",
-        "name": "llama-server (vulkan, llama.cpp b6710)",
+        "name": "llama-server (vulkan, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 32084119,
         "downloadable": true,
         "fallback": false
       },
       {
         "id": "sidecar-llama-cpu",
-        "name": "llama-server (cpu, llama.cpp b6710)",
+        "name": "llama-server (cpu, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 19501338,
         "downloadable": true,
         "fallback": true
       },
@@ -318,8 +318,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6336327959,
-    "missing_bytes": 6336327959,
+    "size_bytes": 6304027336,
+    "missing_bytes": 6304027336,
     "installed": 0,
     "total": 9,
     "state": "not_installed",
@@ -469,19 +469,19 @@
       },
       {
         "id": "sidecar-llama-vulkan",
-        "name": "llama-server (vulkan, llama.cpp b6710)",
+        "name": "llama-server (vulkan, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 32084119,
         "downloadable": true,
         "fallback": false
       },
       {
         "id": "sidecar-llama-cpu",
-        "name": "llama-server (cpu, llama.cpp b6710)",
+        "name": "llama-server (cpu, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 19501338,
         "downloadable": true,
         "fallback": true
       },
@@ -504,8 +504,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 2974593303,
-    "missing_bytes": 2974593303,
+    "size_bytes": 2942292680,
+    "missing_bytes": 2942292680,
     "installed": 0,
     "total": 9,
     "state": "not_installed",
@@ -643,19 +643,19 @@
       },
       {
         "id": "sidecar-llama-vulkan",
-        "name": "llama-server (vulkan, llama.cpp b6710)",
+        "name": "llama-server (vulkan, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 32084119,
         "downloadable": true,
         "fallback": false
       },
       {
         "id": "sidecar-llama-cpu",
-        "name": "llama-server (cpu, llama.cpp b6710)",
+        "name": "llama-server (cpu, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 19501338,
         "downloadable": true,
         "fallback": true
       },
@@ -678,8 +678,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 2079109399,
-    "missing_bytes": 2079109399,
+    "size_bytes": 2046808776,
+    "missing_bytes": 2046808776,
     "installed": 0,
     "total": 8,
     "state": "not_installed",
@@ -808,19 +808,19 @@
       },
       {
         "id": "sidecar-llama-vulkan",
-        "name": "llama-server (vulkan, llama.cpp b6710)",
+        "name": "llama-server (vulkan, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 32084119,
         "downloadable": true,
         "fallback": false
       },
       {
         "id": "sidecar-llama-cpu",
-        "name": "llama-server (cpu, llama.cpp b6710)",
+        "name": "llama-server (cpu, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 19501338,
         "downloadable": true,
         "fallback": true
       },
@@ -834,8 +834,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 1992077591,
-    "missing_bytes": 1992077591,
+    "size_bytes": 1959776968,
+    "missing_bytes": 1959776968,
     "installed": 0,
     "total": 6,
     "state": "not_installed",
@@ -924,25 +924,25 @@
       },
       {
         "id": "sidecar-llama-vulkan",
-        "name": "llama-server (vulkan, llama.cpp b6710)",
+        "name": "llama-server (vulkan, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 32084119,
         "downloadable": true,
         "fallback": false
       },
       {
         "id": "sidecar-llama-cpu",
-        "name": "llama-server (cpu, llama.cpp b6710)",
+        "name": "llama-server (cpu, llama.cpp b11559)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 41943040,
+        "size_bytes": 19501338,
         "downloadable": true,
         "fallback": true
       }
     ],
-    "size_bytes": 1782579200,
-    "missing_bytes": 1782579200,
+    "size_bytes": 1750278577,
+    "missing_bytes": 1750278577,
     "installed": 0,
     "total": 3,
     "state": "not_installed",

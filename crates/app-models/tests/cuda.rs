@@ -27,7 +27,7 @@ fn zip_of(entries: &[(&str, &[u8])]) -> Vec<u8> {
 }
 
 #[test]
-fn catalog_has_unconfirmed_cuda_build_with_cudart() {
+fn catalog_has_pinned_cuda_build_with_cudart() {
     let items = app_models::builtin();
     let cuda = items
         .iter()
@@ -38,8 +38,18 @@ fn catalog_has_unconfirmed_cuda_build_with_cudart() {
         (cuda.root, cuda.dir.as_str()),
         (Root::Sidecars, "llama-cuda")
     );
-    assert!(!cuda.confirmed, "do potwierdzenia przez człowieka");
-    assert!(!cuda.pinned(), "bez zgadywania hashy");
+    // Licencja bibliotek NVIDIA nadal do potwierdzenia przez człowieka; sumy archiwów są już
+    // przypięte z listy plików wydania (nie zgadywane).
+    assert!(
+        !cuda.confirmed,
+        "licencja cudart do potwierdzenia przez człowieka"
+    );
+    assert!(cuda.pinned(), "sumy z wydania");
+    assert!(
+        cuda.files
+            .iter()
+            .all(|f| f.sha256.as_deref().map(str::len) == Some(64) && f.size > 1 << 20)
+    );
     assert_eq!(cuda.files.len(), 2);
     assert!(cuda.files.iter().all(|f| {
         f.url
@@ -55,7 +65,8 @@ fn catalog_has_unconfirmed_cuda_build_with_cudart() {
     );
     for backend in ["vulkan", "cpu"] {
         let id = format!("sidecar-llama-{backend}");
-        assert!(items.iter().any(|i| i.id == id), "{id}");
+        let item = items.iter().find(|i| i.id == id).expect("pozycja silnika");
+        assert!(item.pinned() && item.confirmed, "{id}: suma przypięta");
     }
 }
 

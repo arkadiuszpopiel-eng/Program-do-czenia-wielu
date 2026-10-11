@@ -12,6 +12,34 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.32 — 2026-10-11
+
+Nowszy silnik modeli lokalnych w katalogu pobrań — potrzebny do rozpoznawania mowy Qwen3-ASR.
+
+### Modele lokalne
+
+- [poważne] Katalog pobiera `llama-server` w wydaniu b11559 (było b6710) dla procesora, Vulkan i kart NVIDIA.
+  Stare wydanie nie umiało wczytać modelu rozpoznawania mowy Qwen3-ASR („unknown model architecture”).
+- [poważne] Archiwa silnika mają przypięte rozmiary i sumy SHA-256 z listy plików wydania — pobranie jest
+  sprawdzane bez pytania o zgodę na policzony hash. Dla wersji na karty NVIDIA licencja bibliotek pozostaje
+  do potwierdzenia przed wydaniem publicznym.
+
+### Pomiary (bez zmian w programie)
+
+- Rozpoznawanie mowy Qwen3-ASR na tym laptopie: 0,43 s na zdanie (mediana), wszystkie 40 nagrań rozpoznane jako
+  polskie; poza dwoma łamańcami językowymi 3 błędne słowa na 120 przy głosie Supertonic i 5 przy Piperze.
+
+### Czego nie sprawdzono
+
+- Nowy silnik sprawdziłam tylko z modelem rozpoznawania mowy (wersja CUDA, pobrana i rozpakowana ręcznie). Rozmowy
+  z modelem tekstowym na nowym silniku ani pobrania przyciskiem w Ustawieniach nie sprawdzałam.
+- Aplikacja w tej wersji nie była budowana ani uruchamiana (budowa co pięć dużych ulepszeń albo na polecenie).
+
+### Testy
+
+- Testy katalogu (12 grup) zielone; test instalacji z archiwów zdejmuje przypięte sumy, bo używa archiwów
+  zbudowanych na miejscu.
+
 ## 0.0.31 — 2026-10-11
 
 Każdej agentce wybierasz głos: dziesięć barw Supertonic 3 w Ustawieniach → Głos.

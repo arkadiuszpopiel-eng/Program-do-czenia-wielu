@@ -367,9 +367,9 @@ przechodzi przez zabezpieczenia i nie trafia do rozmowy.</p>
 <p>Błędy poza łamańcami: przy Supertonicu 3 słowa („Alpha”, „Hm”, „Żeszow”), przy Piperze 5 (m.in. „Czy mogę” zamiast
 „W czym mogę”, „pik” zamiast „plik”). To pomiar zrozumiałości dla maszyny, nie ocena brzmienia. Zdania z liczbami
 model zapisuje słowami („dziesięć minut”), więc porównanie z cyframi w tekście nic nie mówi — pominięte.</p>
-<p><strong>Blokada:</strong> silnik <code>llama-server</code> zainstalowany w Alfie (wydanie 6710) nie zna architektury tego modelu
-(„unknown model architecture: qwen3vl”). Qwen3-ASR wymaga nowszego silnika — aktualizacja silników w katalogu
-Alfy (zadanie z P2) musi wejść przed rozpoznawaniem z P1.</p>
+<p><strong>Blokada zdjęta w 0.0.32:</strong> silnik <code>llama-server</code> w wydaniu 6710 nie znał architektury tego modelu („unknown
+model architecture: qwen3vl”). Katalog Alfy pobiera teraz oficjalne wydanie b11559, sprawdzone z tym modelem
+(0,43 s na zdanie). Kto ma zainstalowany stary silnik, musi pobrać go ponownie w Ustawieniach.</p>
 <h2 id="3-zabezpieczenia-rozpoznawania-kolejnosc-jak-w-b-routers-stt-router-py">3. Zabezpieczenia rozpoznawania (kolejność jak w <code>B/routers/stt_router.py</code>)</h2>
 <div class="tbl"><table><thead><tr><th>Nr</th><th>Zabezpieczenie</th><th>Reguła</th></tr></thead><tbody><tr><td>1</td><td>Bramka mowy Silero v5</td><td>okna 512 próbek; mowa, gdy okna z prawdopodobieństwem &gt; 0,5 dają ≥ 250 ms; przy błędzie przepuszcza</td></tr>
 <tr><td>2</td><td>Odrzut jakości</td><td>nagranie &lt; 0,25 s, szczyt &lt; 0,02 albo &lt; 120 ms aktywnego sygnału (ramka 20 ms, próg max(0,01; 2,5 × 10. percentyl)) → pusty wynik z powodem</td></tr>

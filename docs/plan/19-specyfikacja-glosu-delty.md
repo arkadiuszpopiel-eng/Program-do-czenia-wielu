@@ -71,9 +71,9 @@ Błędy poza łamańcami: przy Supertonicu 3 słowa („Alpha”, „Hm”, „�
 „W czym mogę”, „pik” zamiast „plik”). To pomiar zrozumiałości dla maszyny, nie ocena brzmienia. Zdania z liczbami
 model zapisuje słowami („dziesięć minut”), więc porównanie z cyframi w tekście nic nie mówi — pominięte.
 
-**Blokada:** silnik `llama-server` zainstalowany w Alfie (wydanie 6710) nie zna architektury tego modelu
-(„unknown model architecture: qwen3vl”). Qwen3-ASR wymaga nowszego silnika — aktualizacja silników w katalogu
-Alfy (zadanie z P2) musi wejść przed rozpoznawaniem z P1.
+**Blokada zdjęta w 0.0.32:** silnik `llama-server` w wydaniu 6710 nie znał architektury tego modelu („unknown
+model architecture: qwen3vl”). Katalog Alfy pobiera teraz oficjalne wydanie b11559, sprawdzone z tym modelem
+(0,43 s na zdanie). Kto ma zainstalowany stary silnik, musi pobrać go ponownie w Ustawieniach.
 
 ## 3. Zabezpieczenia rozpoznawania (kolejność jak w `B/routers/stt_router.py`)
 

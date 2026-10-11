@@ -5,7 +5,7 @@
 //!
 //! Źródło wiedzy o układzie — skrypty pakujące wydań (stan wiedzy z 2025 r.; do potwierdzenia jobem
 //! „Silniki na żywo (CPU)” w `.github/workflows/rehearsal.yml`, który wypisuje faktyczny układ):
-//! - llama.cpp `b6710`: `7z a llama-…-bin-win-<backend>-x64.zip .\build\bin\Release\*` — pliki
+//! - llama.cpp `b6710` i `b11559` (układ bez zmian — sprawdzone 2026-10-11 rozpakowaniem archiwum CUDA): `7z a llama-…-bin-win-<backend>-x64.zip .\build\bin\Release\*` — pliki
 //!   w korzeniu (`llama-server.exe`, `llama.dll`, `ggml*.dll`, warianty `ggml-cpu-*.dll`);
 //!   `cudart-llama-bin-win-cuda-12.4-x64.zip` — same biblioteki CUDA w korzeniu;
 //! - whisper.cpp `v1.8.1`: `Compress-Archive -Path build/bin/Release` — katalog `Release/`;
@@ -59,7 +59,11 @@ fn local_copy(id: &str, server: &Server, archives: &[Vec<u8>]) -> ItemSpec {
         server.put(&path, bytes.clone());
         f.url = format!("{}{path}", server.base);
         f.size = bytes.len() as u64;
+        // Archiwa w tym teście są zbudowane na miejscu — sumy prawdziwego wydania ich nie dotyczą;
+        // test sprawdza drogę ze zgodą na policzony hash.
+        f.sha256 = None;
     }
+    spec.confirmed = false;
     spec
 }
 

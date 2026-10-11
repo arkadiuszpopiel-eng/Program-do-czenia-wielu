@@ -14,7 +14,26 @@ use app_api::dto::ModelItemKind;
 use crate::catalog::{FileSpec, Install, ItemSpec, Pick, Root, exe, note};
 
 /// Wydanie llama.cpp dla `llama-server` (do przypięcia przez człowieka).
-pub const LLAMA_TAG: &str = "b6710";
+pub const LLAMA_TAG: &str = "b11559";
+
+/// Archiwa wydania [`LLAMA_TAG`]: (rozmiar w bajtach, SHA-256) z listy plików wydania na GitHubie
+/// (2026-10-11); suma archiwum CUDA sprawdzona dodatkowo po pobraniu.
+const LLAMA_CPU_ZIP: (u64, &str) = (
+    19_501_338,
+    "1228f133868c02a424bcf663a688e66d8c7d5499077649f305188f756f584377",
+);
+const LLAMA_VULKAN_ZIP: (u64, &str) = (
+    32_084_119,
+    "bf2fb2a7fc5d7669ccabbb6de3f6dd6b54058f213b32e731abc62b590f8566dc",
+);
+const LLAMA_CUDA_ZIP: (u64, &str) = (
+    265_207_128,
+    "4a885b80b26a213e86b774a580ac14fb210eba6220579051339c71b2bda1ecd7",
+);
+const CUDART_ZIP: (u64, &str) = (
+    391_443_627,
+    "8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6",
+);
 /// Wydanie whisper.cpp dla `whisper-server` (SPEC `voice-stt`: ≥ 1.8.1, przypięte).
 pub const WHISPER_TAG: &str = "v1.8.1";
 
@@ -185,7 +204,7 @@ fn speech() -> Vec<ItemSpec> {
     ]
 }
 
-fn llama(backend: &str, asset: &str) -> ItemSpec {
+fn llama(backend: &str, asset: &str, (size, sha256): (u64, &str)) -> ItemSpec {
     let url = format!(
         "https://github.com/ggml-org/llama.cpp/releases/download/{LLAMA_TAG}/llama-{LLAMA_TAG}-bin-win-{asset}-x64.zip"
     );
@@ -196,20 +215,20 @@ fn llama(backend: &str, asset: &str) -> ItemSpec {
         "MIT",
         "https://github.com/ggml-org/llama.cpp/releases",
         (Root::Sidecars, &format!("llama-{backend}")),
-        vec![FileSpec::new(
-            &format!("llama-{LLAMA_TAG}-{asset}.zip"),
-            &url,
-            40,
-            None,
-        )],
+        vec![FileSpec {
+            name: format!("llama-{LLAMA_TAG}-{asset}.zip"),
+            url,
+            size,
+            sha256: Some(sha256.into()),
+        }],
         Install::Tree {
             strip: String::new(),
             require: vec![exe("llama-server")],
         },
-        false,
+        true,
         (
-            "Serwer modeli lokalnych (127.0.0.1, losowy port i klucz). Wersja i układ archiwum do potwierdzenia.",
-            "Local model server (127.0.0.1, random port and key). Version and archive layout to be confirmed.",
+            "Serwer modeli lokalnych (127.0.0.1, losowy port i klucz). Suma archiwum przypięta; to wydanie obsługuje też rozpoznawanie mowy Qwen3-ASR.",
+            "Local model server (127.0.0.1, random port and key). Archive checksum pinned; this release also runs Qwen3-ASR speech recognition.",
         ),
     )
 }
@@ -231,18 +250,18 @@ fn llama_cuda() -> ItemSpec {
         "https://github.com/ggml-org/llama.cpp/releases",
         (Root::Sidecars, "llama-cuda"),
         vec![
-            FileSpec::new(
-                &format!("llama-{LLAMA_TAG}-{LLAMA_CUDA}.zip"),
-                &format!("{base}/llama-{LLAMA_TAG}-bin-win-{LLAMA_CUDA}-x64.zip"),
-                200,
-                None,
-            ),
-            FileSpec::new(
-                &format!("cudart-{LLAMA_CUDA}.zip"),
-                &format!("{base}/cudart-llama-bin-win-{LLAMA_CUDA}-x64.zip"),
-                400,
-                None,
-            ),
+            FileSpec {
+                name: format!("llama-{LLAMA_TAG}-{LLAMA_CUDA}.zip"),
+                url: format!("{base}/llama-{LLAMA_TAG}-bin-win-{LLAMA_CUDA}-x64.zip"),
+                size: LLAMA_CUDA_ZIP.0,
+                sha256: Some(LLAMA_CUDA_ZIP.1.into()),
+            },
+            FileSpec {
+                name: format!("cudart-{LLAMA_CUDA}.zip"),
+                url: format!("{base}/cudart-llama-bin-win-{LLAMA_CUDA}-x64.zip"),
+                size: CUDART_ZIP.0,
+                sha256: Some(CUDART_ZIP.1.into()),
+            },
         ],
         Install::Tree {
             strip: String::new(),
@@ -250,8 +269,8 @@ fn llama_cuda() -> ItemSpec {
         },
         false,
         (
-            "Serwer modeli lokalnych na kartach NVIDIA (CUDA 12.4, z bibliotekami cudart). Bez niego profil CUDA używa kompilacji Vulkan albo CPU (ostrzeżenie w dzienniku). Wersja, rozmiary, układ archiwów i licencja do potwierdzenia.",
-            "Local model server for NVIDIA GPUs (CUDA 12.4, with cudart libraries). Without it the CUDA profile uses the Vulkan or CPU build (warning in the log). Version, sizes, archive layout and licence to be confirmed.",
+            "Serwer modeli lokalnych na kartach NVIDIA (CUDA 12.4, z bibliotekami cudart). Bez niego profil CUDA używa kompilacji Vulkan albo CPU (ostrzeżenie w dzienniku). Sumy archiwów przypięte; licencja bibliotek NVIDIA do potwierdzenia przed wydaniem publicznym.",
+            "Local model server for NVIDIA GPUs (CUDA 12.4, with cudart libraries). Without it the CUDA profile uses the Vulkan or CPU build (warning in the log). Archive checksums pinned; the NVIDIA library licence is to be confirmed before a public release.",
         ),
     )
 }
@@ -289,9 +308,9 @@ fn whisper_cuda() -> ItemSpec {
 
 fn sidecars() -> Vec<ItemSpec> {
     vec![
-        llama("vulkan", "vulkan"),
+        llama("vulkan", "vulkan", LLAMA_VULKAN_ZIP),
         llama_cuda(),
-        llama("cpu", "cpu"),
+        llama("cpu", "cpu", LLAMA_CPU_ZIP),
         item(
             "sidecar-whisper-cpu",
             ModelItemKind::Sidecar,
