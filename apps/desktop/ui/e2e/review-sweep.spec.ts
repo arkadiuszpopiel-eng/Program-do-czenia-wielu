@@ -1,5 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { openApp, waitForChat } from './helpers';
+import { STYLES, THEMES, layoutDefects, watchConsole } from './layout';
 
 // Przegląd układu „każde okno, każdy panel, każdy skrót” (zgłoszenie właściciela 2026-10-11):
 // w każdym stylu i motywie przechodzi wszystkie strony Ustawień (w dwóch szerokościach okna),
@@ -9,71 +10,6 @@ import { openApp, waitForChat } from './helpers';
 // Dostępność (kontrast, role) sprawdzają `a11y.spec.ts` i `a11y-all.spec.ts`.
 
 test.describe.configure({ timeout: 240_000 });
-
-const STYLES = ['classic', 'glass', 'next'] as const;
-const THEMES = ['light', 'dark'] as const;
-
-/** Wady układu widoczne na ekranie: opis elementu i powód. */
-async function layoutDefects(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
-    const defects: string[] = [];
-    const width = window.innerWidth;
-    const describe = (el: Element): string => {
-      const text = (el.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40);
-      const cls = typeof el.className === 'string' ? el.className.split(' ')[0] : '';
-      return `<${el.tagName.toLowerCase()}${cls ? `.${cls}` : ''}> „${text}”`;
-    };
-    if (document.documentElement.scrollWidth > width + 1)
-      defects.push(
-        `strona przewija się w poziomie (${document.documentElement.scrollWidth} > ${width})`,
-      );
-    const visible = (el: Element): boolean => {
-      const style = getComputedStyle(el);
-      if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0')
-        return false;
-      const rect = el.getBoundingClientRect();
-      // Tekst tylko dla czytników ekranu (1 × 1 px) nie jest częścią układu.
-      if (rect.width <= 2 || rect.height <= 2) return false;
-      return rect.bottom > 0 && rect.top < window.innerHeight;
-    };
-    /** Element w przewijanym w poziomie albo przycinającym przodku ma prawo wystawać. */
-    const clippedByAncestor = (el: Element): boolean => {
-      for (let node = el.parentElement; node; node = node.parentElement) {
-        const overflow = getComputedStyle(node).overflowX;
-        if (overflow !== 'visible') return true;
-      }
-      return false;
-    };
-    for (const el of document.querySelectorAll(
-      'button, a, input, [role="combobox"], h1, h2, h3, label',
-    )) {
-      if (!visible(el)) continue;
-      const rect = el.getBoundingClientRect();
-      if (rect.right > width + 1 && !clippedByAncestor(el))
-        defects.push(`${describe(el)} wystaje poza okno (${Math.round(rect.right)} > ${width})`);
-      // Ucięty tekst: treść szersza niż element, a element jej nie przewija i nie skraca wielokropkiem.
-      const style = getComputedStyle(el);
-      const cut =
-        el.scrollWidth > el.clientWidth + 2 &&
-        style.overflowX !== 'visible' &&
-        style.overflowX !== 'auto' &&
-        style.overflowX !== 'scroll' &&
-        style.textOverflow !== 'ellipsis' &&
-        el.tagName !== 'INPUT';
-      if (cut) defects.push(`${describe(el)} ma ucięty tekst`);
-    }
-    return [...new Set(defects)];
-  });
-}
-
-function watchConsole(page: Page): string[] {
-  const errors: string[] = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(`${message.text()} ${message.location().url}`);
-  });
-  page.on('pageerror', (error) => errors.push(String(error)));
-  return errors;
-}
 
 for (const style of STYLES) {
   for (const theme of THEMES) {

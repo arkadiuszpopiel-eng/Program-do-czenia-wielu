@@ -30,6 +30,26 @@ stany otwarte list wyboru — `skins.spec.ts` i `controls.spec.ts`; prawdziwą a
 | P-03 | drobne  | w jasnym motywie kropka wagi „poważna” w historii zmian wychodziła brązowa zamiast pomarańczowej                                                                                                  | naprawione przed wydaniem 0.0.23 |
 | P-04 | drobne  | w stylu Next (jasny) przycisk „Rozwiń wszystkie” w historii zmian miał za słaby kontrast                                                                                                          | naprawione przed wydaniem 0.0.23 |
 
+## Druga część przeglądu (tego samego dnia)
+
+Plik `e2e/review-sweep-flows.spec.ts` dokłada to, czego nie widać po samym wejściu na stronę — także w trzech
+stylach i dwóch motywach:
+
+- **pierwsze uruchomienie** — każdy z ośmiu kroków kreatora powitalnego;
+- **kreator dostawcy** — lista dostawców i krok klucza; **okno potwierdzenia** usunięcia konta (Escape rezygnuje,
+  konto zostaje);
+- **każda lista wyboru na każdej stronie Ustawień w stanie otwartym** — lista się otwiera, ma opcje, mieści się
+  w oknie i zamyka klawiszem Escape;
+- **stany systemowe** — brak sieci, limit zapytań, brak kluczy, brak mikrofonu, mało miejsca, pusta lista sesji;
+- **okna poboczne** — „Szybkie pytanie” i pigułka głosowa.
+
+Razem z pierwszą częścią: 43 testy, wszystkie zielone; w drugiej części nie wyszła żadna nowa wada.
+
+**Ocena na oko:** obejrzałem zbiorcze zrzuty wszystkich 32 stron Ustawień w stylu Klasycznym (jasny) —
+`scripts/shots-settings-all.mjs`. W tej skali (miniatury) nie widać rozjechanych układów, pustych kart ani
+uciętych elementów. Uchwyt zmiany rozmiaru pól wielowierszowych jest rysowany przez Alfę (`base.css`), nie przez
+system. Miniatury nie pozwalają ocenić drobnych odstępów ani typografii — to wymaga oglądania stron w pełnej skali.
+
 ## Czego ten przegląd nie obejmuje
 
 - **Oceny wizualnej „na oko”** — test mierzy wady układu, nie estetykę. Zrzuty do oglądania robią skrypty
@@ -38,11 +58,14 @@ stany otwarte list wyboru — `skins.spec.ts` i `controls.spec.ts`; prawdziwą a
   oknem przeglądarki; sprawdza je częściowo `e2e-app`, reszta wymaga ręcznej próby na komputerze.
 - **Okien Brokera** (zatwierdzenia) — osobny proces, obszar Jądra.
 - **Stanów zależnych od sprzętu** — prawdziwa kamera, mikrofon, model lokalny.
-- **Kreatorów wieloetapowych w każdym kroku** (kreator dostawcy, kreator agentek, pierwsze uruchomienie) —
-  mają własne testy przebiegu; przegląd układu każdego kroku w każdym stylu jest do dopisania.
+- **Oceny na oko w pełnej skali** stylów Szkło i Next oraz motywów ciemnych — zrzuty są gotowe do zrobienia
+  jednym poleceniem, obejrzany w całości jest na razie tylko styl Klasyczny jasny (w miniaturach).
+- **Kreatora agentek krok po kroku i okien dialogowych poza usunięciem konta** (przywracanie wersji, usuwanie
+  sesji, zgody) — mają własne testy przebiegu, bez przeglądu układu w każdym stylu.
 
 ## Następne kroki przeglądu
 
-1. Dopisać do `review-sweep` każdy krok kreatorów i okna potwierdzeń.
-2. Ręczna próba skrótów globalnych na laptopie właściciela (lista w Ustawienia → Skróty).
-3. Przegląd na oko zrzutów wszystkich stron w trzech stylach — po jednym stylu na sesję.
+1. Ręczna próba skrótów globalnych na laptopie właściciela (lista w Ustawienia → Skróty).
+2. Ocena na oko w pełnej skali: po jednym stylu na sesję, wszystkie strony i panele.
+3. Dopisać do przeglądu pozostałe okna dialogowe i kroki Kreatora agentek.
+4. Okna Brokera i stany zależne od sprzętu — razem z właścicielem.
