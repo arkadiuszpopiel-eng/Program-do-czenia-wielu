@@ -12,7 +12,7 @@ use base64::Engine as _;
 use personas_contract::PersonaId;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use voice_tts_contract::contract_tests::{collect, request};
-use voice_tts_contract::{CancelToken, Tts, TtsEvent, TtsHealth, v0_chains};
+use voice_tts_contract::{CancelToken, SharedTuning, Tts, TtsEvent, TtsHealth, v0_chains};
 use voice_tts_impl::TtsService;
 use voice_tts_impl::engines::{PiperEngine, ProcessRunner, TtsBackend};
 use voice_tts_impl::sidecar::{PocketSidecar, SUPERTONIC_BASE_RATE};
@@ -25,6 +25,13 @@ fn tone(samples: usize) -> Vec<u8> {
 
 /// Udawany `alfa-supertonic`: zapisuje żądania, odpowiada dźwiękiem 44,1 kHz i `done`.
 fn supertonic(seen: Arc<Mutex<Vec<serde_json::Value>>>) -> Arc<dyn TtsBackend> {
+    supertonic_with(seen, None)
+}
+
+fn supertonic_with(
+    seen: Arc<Mutex<Vec<serde_json::Value>>>,
+    tuning: Option<SharedTuning>,
+) -> Arc<dyn TtsBackend> {
     let (client, server) = tokio::io::duplex(1 << 20);
     let (sr, mut sw) = tokio::io::split(server);
     tokio::spawn(async move {
@@ -45,7 +52,12 @@ fn supertonic(seen: Arc<Mutex<Vec<serde_json::Value>>>) -> Arc<dyn TtsBackend> {
         }
     });
     let (cr, cw) = tokio::io::split(client);
-    Arc::new(PocketSidecar::with_channel(Box::new(BufReader::new(cr)), Box::new(cw)).supertonic())
+    let sidecar =
+        PocketSidecar::with_channel(Box::new(BufReader::new(cr)), Box::new(cw)).supertonic();
+    Arc::new(match tuning {
+        Some(tuning) => sidecar.with_tuning(tuning),
+        None => sidecar,
+    })
 }
 
 struct FakePiper;
@@ -100,6 +112,20 @@ async fn supertonic_speaks_first_with_agent_timbre_and_native_tempo() {
             .all(|e| !matches!(e, TtsEvent::Fallback { .. })),
         "bez przejścia na zapas"
     );
+}
+
+#[tokio::test]
+async fn timbre_chosen_in_settings_wins_for_built_in_agents_only() {
+    let seen = Arc::new(Mutex::new(Vec::new()));
+    let tuning = SharedTuning::default();
+    let backend = supertonic_with(Arc::clone(&seen), Some(tuning.clone()));
+    let tts = TtsService::new(v0_chains(), vec![backend]).expect("serwis");
+    tuning.update(|t| t.timbres = [6, 1, 3, 4]); // Alfa → M2
+    engines_used(&tts, 3, PersonaId::alfa(), "Raz.").await;
+    engines_used(&tts, 4, PersonaId::beta(), "Dwa.").await;
+    let seen = seen.lock().unwrap_or_else(|e| e.into_inner());
+    assert_eq!(seen[0]["voice"], "M2", "barwa z Ustawień");
+    assert_eq!(seen[1]["voice"], "F2", "Beta bez zmian");
 }
 
 #[tokio::test]

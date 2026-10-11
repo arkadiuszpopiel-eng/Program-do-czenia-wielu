@@ -718,6 +718,358 @@
             }
           },
           {
+            "key": "voice.tts_voice_alfa",
+            "label": {
+              "pl": "Głos Alfy",
+              "en": "Alfa's voice"
+            },
+            "description": {
+              "pl": "Barwa głosu Supertonic 3 dla tej agentki. Działa od następnego zdania; wymaga pobranego modelu Supertonic 3 (Modele lokalne i silniki) — bez niego agentka mówi głosem zapasowym.",
+              "en": "Supertonic 3 voice timbre for this agent. Applies from the next sentence; requires the Supertonic 3 model (Local models and engines) — without it the agent uses the fallback voice."
+            },
+            "default": "F1",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "F1",
+                  "label": {
+                    "pl": "F1 — kobiecy, ciepły",
+                    "en": "F1 — female, warm"
+                  }
+                },
+                {
+                  "value": "F2",
+                  "label": {
+                    "pl": "F2 — kobiecy",
+                    "en": "F2 — female"
+                  }
+                },
+                {
+                  "value": "F3",
+                  "label": {
+                    "pl": "F3 — kobiecy",
+                    "en": "F3 — female"
+                  }
+                },
+                {
+                  "value": "F4",
+                  "label": {
+                    "pl": "F4 — kobiecy",
+                    "en": "F4 — female"
+                  }
+                },
+                {
+                  "value": "F5",
+                  "label": {
+                    "pl": "F5 — kobiecy, wyrazisty",
+                    "en": "F5 — female, expressive"
+                  }
+                },
+                {
+                  "value": "M1",
+                  "label": {
+                    "pl": "M1 — męski",
+                    "en": "M1 — male"
+                  }
+                },
+                {
+                  "value": "M2",
+                  "label": {
+                    "pl": "M2 — męski",
+                    "en": "M2 — male"
+                  }
+                },
+                {
+                  "value": "M3",
+                  "label": {
+                    "pl": "M3 — męski",
+                    "en": "M3 — male"
+                  }
+                },
+                {
+                  "value": "M4",
+                  "label": {
+                    "pl": "M4 — męski",
+                    "en": "M4 — male"
+                  }
+                },
+                {
+                  "value": "M5",
+                  "label": {
+                    "pl": "M5 — męski",
+                    "en": "M5 — male"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "voice.tts_voice_beta",
+            "label": {
+              "pl": "Głos Bety",
+              "en": "Beta's voice"
+            },
+            "description": {
+              "pl": "Barwa głosu Supertonic 3 dla tej agentki. Działa od następnego zdania; wymaga pobranego modelu Supertonic 3 (Modele lokalne i silniki) — bez niego agentka mówi głosem zapasowym.",
+              "en": "Supertonic 3 voice timbre for this agent. Applies from the next sentence; requires the Supertonic 3 model (Local models and engines) — without it the agent uses the fallback voice."
+            },
+            "default": "F2",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "F1",
+                  "label": {
+                    "pl": "F1 — kobiecy, ciepły",
+                    "en": "F1 — female, warm"
+                  }
+                },
+                {
+                  "value": "F2",
+                  "label": {
+                    "pl": "F2 — kobiecy",
+                    "en": "F2 — female"
+                  }
+                },
+                {
+                  "value": "F3",
+                  "label": {
+                    "pl": "F3 — kobiecy",
+                    "en": "F3 — female"
+                  }
+                },
+                {
+                  "value": "F4",
+                  "label": {
+                    "pl": "F4 — kobiecy",
+                    "en": "F4 — female"
+                  }
+                },
+                {
+                  "value": "F5",
+                  "label": {
+                    "pl": "F5 — kobiecy, wyrazisty",
+                    "en": "F5 — female, expressive"
+                  }
+                },
+                {
+                  "value": "M1",
+                  "label": {
+                    "pl": "M1 — męski",
+                    "en": "M1 — male"
+                  }
+                },
+                {
+                  "value": "M2",
+                  "label": {
+                    "pl": "M2 — męski",
+                    "en": "M2 — male"
+                  }
+                },
+                {
+                  "value": "M3",
+                  "label": {
+                    "pl": "M3 — męski",
+                    "en": "M3 — male"
+                  }
+                },
+                {
+                  "value": "M4",
+                  "label": {
+                    "pl": "M4 — męski",
+                    "en": "M4 — male"
+                  }
+                },
+                {
+                  "value": "M5",
+                  "label": {
+                    "pl": "M5 — męski",
+                    "en": "M5 — male"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "voice.tts_voice_gama",
+            "label": {
+              "pl": "Głos Gamy",
+              "en": "Gama's voice"
+            },
+            "description": {
+              "pl": "Barwa głosu Supertonic 3 dla tej agentki. Działa od następnego zdania; wymaga pobranego modelu Supertonic 3 (Modele lokalne i silniki) — bez niego agentka mówi głosem zapasowym.",
+              "en": "Supertonic 3 voice timbre for this agent. Applies from the next sentence; requires the Supertonic 3 model (Local models and engines) — without it the agent uses the fallback voice."
+            },
+            "default": "F4",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "F1",
+                  "label": {
+                    "pl": "F1 — kobiecy, ciepły",
+                    "en": "F1 — female, warm"
+                  }
+                },
+                {
+                  "value": "F2",
+                  "label": {
+                    "pl": "F2 — kobiecy",
+                    "en": "F2 — female"
+                  }
+                },
+                {
+                  "value": "F3",
+                  "label": {
+                    "pl": "F3 — kobiecy",
+                    "en": "F3 — female"
+                  }
+                },
+                {
+                  "value": "F4",
+                  "label": {
+                    "pl": "F4 — kobiecy",
+                    "en": "F4 — female"
+                  }
+                },
+                {
+                  "value": "F5",
+                  "label": {
+                    "pl": "F5 — kobiecy, wyrazisty",
+                    "en": "F5 — female, expressive"
+                  }
+                },
+                {
+                  "value": "M1",
+                  "label": {
+                    "pl": "M1 — męski",
+                    "en": "M1 — male"
+                  }
+                },
+                {
+                  "value": "M2",
+                  "label": {
+                    "pl": "M2 — męski",
+                    "en": "M2 — male"
+                  }
+                },
+                {
+                  "value": "M3",
+                  "label": {
+                    "pl": "M3 — męski",
+                    "en": "M3 — male"
+                  }
+                },
+                {
+                  "value": "M4",
+                  "label": {
+                    "pl": "M4 — męski",
+                    "en": "M4 — male"
+                  }
+                },
+                {
+                  "value": "M5",
+                  "label": {
+                    "pl": "M5 — męski",
+                    "en": "M5 — male"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "voice.tts_voice_delta",
+            "label": {
+              "pl": "Głos Delty",
+              "en": "Delta's voice"
+            },
+            "description": {
+              "pl": "Barwa głosu Supertonic 3 dla tej agentki. Działa od następnego zdania; wymaga pobranego modelu Supertonic 3 (Modele lokalne i silniki) — bez niego agentka mówi głosem zapasowym.",
+              "en": "Supertonic 3 voice timbre for this agent. Applies from the next sentence; requires the Supertonic 3 model (Local models and engines) — without it the agent uses the fallback voice."
+            },
+            "default": "F5",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "F1",
+                  "label": {
+                    "pl": "F1 — kobiecy, ciepły",
+                    "en": "F1 — female, warm"
+                  }
+                },
+                {
+                  "value": "F2",
+                  "label": {
+                    "pl": "F2 — kobiecy",
+                    "en": "F2 — female"
+                  }
+                },
+                {
+                  "value": "F3",
+                  "label": {
+                    "pl": "F3 — kobiecy",
+                    "en": "F3 — female"
+                  }
+                },
+                {
+                  "value": "F4",
+                  "label": {
+                    "pl": "F4 — kobiecy",
+                    "en": "F4 — female"
+                  }
+                },
+                {
+                  "value": "F5",
+                  "label": {
+                    "pl": "F5 — kobiecy, wyrazisty",
+                    "en": "F5 — female, expressive"
+                  }
+                },
+                {
+                  "value": "M1",
+                  "label": {
+                    "pl": "M1 — męski",
+                    "en": "M1 — male"
+                  }
+                },
+                {
+                  "value": "M2",
+                  "label": {
+                    "pl": "M2 — męski",
+                    "en": "M2 — male"
+                  }
+                },
+                {
+                  "value": "M3",
+                  "label": {
+                    "pl": "M3 — męski",
+                    "en": "M3 — male"
+                  }
+                },
+                {
+                  "value": "M4",
+                  "label": {
+                    "pl": "M4 — męski",
+                    "en": "M4 — male"
+                  }
+                },
+                {
+                  "value": "M5",
+                  "label": {
+                    "pl": "M5 — męski",
+                    "en": "M5 — male"
+                  }
+                }
+              ]
+            }
+          },
+          {
             "key": "voice.mode",
             "label": {
               "pl": "Włączanie mikrofonu",
@@ -2055,6 +2407,10 @@
       "voice.tts_volume": 100,
       "voice.tts_pause": 200,
       "voice.tts_character": "subtle",
+      "voice.tts_voice_alfa": "F1",
+      "voice.tts_voice_beta": "F2",
+      "voice.tts_voice_gama": "F4",
+      "voice.tts_voice_delta": "F5",
       "voice.mode": "toggle",
       "voice.show_pill": true,
       "agents.max_steps": 40,

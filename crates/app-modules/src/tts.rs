@@ -109,7 +109,8 @@ fn build(
         ];
         backends.push(Arc::new(
             PocketSidecar::process(paths.sidecar("supertonic", "alfa-supertonic"), args)
-                .supertonic(),
+                .supertonic()
+                .with_tuning(tuning.clone()),
         ));
     }
     if installed.pocket {

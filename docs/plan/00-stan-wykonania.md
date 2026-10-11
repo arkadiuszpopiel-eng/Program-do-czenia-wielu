@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-11**, wersja programu **0.0.30**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-11**, wersja programu **0.0.31**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -63,6 +63,7 @@ funkcjami.
 | 0.0.28 | 2026-10-11 | tylko plan: plan zbiorczy, etap P (funkcje z Delty AI), etap U (wielu użytkowników), ADR 0027; w programie bez zmian |
 | 0.0.29 | 2026-10-11 | tylko plan: specyfikacja głosu i macierz funkcji Delty, grupy P12–P14, nowości z rynku; w programie bez zmian |
 | 0.0.30 | 2026-10-11 | P1: głos Supertonic 3 jako osobny proces w Rust, cztery barwy agentek; zmierzone 0,97 s na zdanie na laptopie (brzmienie — do odsłuchu właściciela) |
+| 0.0.31 | 2026-10-11 | P1: wybór barwy głosu dla każdej agentki (10 barw Supertonic 3) |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 

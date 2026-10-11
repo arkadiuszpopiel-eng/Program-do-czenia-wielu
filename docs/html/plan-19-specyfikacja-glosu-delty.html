@@ -332,7 +332,7 @@ kroków — żeby przeniesienie do Alfy (zadanie P1) niczego nie zgubiło. Źró
 <tr><td>Rozpoznanie</td><td>całe nagranie WAV 16 kHz mono → silnik → zabezpieczenia (rozdz. 3)</td><td>bierzemy</td></tr>
 <tr><td>Słowo wywoławcze</td><td>jeśli włączone: musi paść w pierwszych 3 słowach tekstu; dalej idzie reszta zdania</td><td>bierzemy</td></tr>
 <tr><td>Odpowiedź modelu</td><td>zwykła tura rozmowy + stała wskazówka „odpowiadaj naturalnie, krótko i konkretnie” (do 4096 znaków)</td><td>bierzemy wskazówkę; tura przez rdzeń Alfy</td></tr>
-<tr><td>Mowa</td><td>tekst dzielony na zdania, 2 zdania syntezowane z wyprzedzeniem, odtwarzane kolejno</td><td>bierzemy wyprzedzenie; kolejka Alfy</td></tr>
+<tr><td>Mowa</td><td>tekst dzielony na zdania, 2 zdania syntezowane z wyprzedzeniem, odtwarzane kolejno</td><td><strong>jest</strong> — sprawdzone 2026-10-11: serwis mowy Alfy syntezuje naprzód do kolejki 16 fragmentów</td></tr>
 <tr><td>Przerwanie głosem</td><td>głośność &gt; 1,7 × próg przez 350 ms podczas mówienia → stop mowy i modelu</td><td>zostaje Alfa (tłumienie echa, potwierdzenie 200–350 ms, słowa „stop / czekaj”)</td></tr>
 <tr><td>Zatrzymanie rozmowy</td><td>Delta nie przerywa modelu</td><td>nie bierzemy — Alfa przerywa wszystko</td></tr></tbody></table></div>
 <p>Stany widoczne dla użytkownika: Gotowy · Słucham · Analizuję · Odpowiadam. Komunikaty: „Nie dosłyszałam —
@@ -356,6 +356,20 @@ powtórz trochę głośniej” (znika po 3 s), „Długa wypowiedź — wysyłam
 <h3 id="transkrypt-w-trakcie-mowienia">Transkrypt w trakcie mówienia</h3>
 <p>Co 1200 ms (zakres 500–5000), na procesorze nie częściej niż co 3000 ms; pokazywane ostatnie 90 znaków; nie
 przechodzi przez zabezpieczenia i nie trafia do rozmowy.</p>
+<h3 id="pomiar-na-laptopie-wlasciciela-2026-10-11">Pomiar na laptopie właściciela (2026-10-11)</h3>
+<p>Model Qwen3-ASR z katalogu Delty uruchomiony silnikiem <code>llama-server</code> z Delty (wydanie 11022) na karcie RTX 4050;
+40 nagrań: te same 20 zdań głosem Supertonic 3 (z <code>alfa-supertonic</code>) i Piperem.</p>
+<div class="tbl"><table><thead><tr><th>Miara</th><th>Wynik</th></tr></thead><tbody><tr><td>Start serwera z modelem</td><td>4 s</td></tr>
+<tr><td>Czas rozpoznania zdania</td><td>mediana 0,44 s, najwolniejsze 5 %: 0,87 s</td></tr>
+<tr><td>Pamięć karty zajęta w trakcie</td><td>ok. 3,4 GB (cała karta, razem z pulpitem)</td></tr>
+<tr><td>Wykryty język</td><td>„Polish” we wszystkich 40 nagraniach</td></tr>
+<tr><td>Błędne słowa w zdaniach bez liczb i skrótów</td><td>Supertonic: 13 ze 120 · Piper: 14 ze 120 — w obu głównie dwa łamańce językowe</td></tr></tbody></table></div>
+<p>Błędy poza łamańcami: przy Supertonicu 3 słowa („Alpha”, „Hm”, „Żeszow”), przy Piperze 5 (m.in. „Czy mogę” zamiast
+„W czym mogę”, „pik” zamiast „plik”). To pomiar zrozumiałości dla maszyny, nie ocena brzmienia. Zdania z liczbami
+model zapisuje słowami („dziesięć minut”), więc porównanie z cyframi w tekście nic nie mówi — pominięte.</p>
+<p><strong>Blokada:</strong> silnik <code>llama-server</code> zainstalowany w Alfie (wydanie 6710) nie zna architektury tego modelu
+(„unknown model architecture: qwen3vl”). Qwen3-ASR wymaga nowszego silnika — aktualizacja silników w katalogu
+Alfy (zadanie z P2) musi wejść przed rozpoznawaniem z P1.</p>
 <h2 id="3-zabezpieczenia-rozpoznawania-kolejnosc-jak-w-b-routers-stt-router-py">3. Zabezpieczenia rozpoznawania (kolejność jak w <code>B/routers/stt_router.py</code>)</h2>
 <div class="tbl"><table><thead><tr><th>Nr</th><th>Zabezpieczenie</th><th>Reguła</th></tr></thead><tbody><tr><td>1</td><td>Bramka mowy Silero v5</td><td>okna 512 próbek; mowa, gdy okna z prawdopodobieństwem &gt; 0,5 dają ≥ 250 ms; przy błędzie przepuszcza</td></tr>
 <tr><td>2</td><td>Odrzut jakości</td><td>nagranie &lt; 0,25 s, szczyt &lt; 0,02 albo &lt; 120 ms aktywnego sygnału (ramka 20 ms, próg max(0,01; 2,5 × 10. percentyl)) → pusty wynik z powodem</td></tr>

@@ -6,7 +6,9 @@ use std::sync::Arc;
 
 use core_config_contract::{ConfigKey, ConfigStore, Scope};
 use futures_util::StreamExt;
-use voice_tts_contract::{SharedTuning, TtsTuning, VoiceStyle, character_from_setting};
+use voice_tts_contract::{
+    DEFAULT_TIMBRES, SharedTuning, TtsTuning, VoiceStyle, character_from_setting, timbre_index,
+};
 
 /// Tempo mowy w procentach (60–160).
 pub(crate) const SPEED_KEY: &str = "voice.tts_speed";
@@ -20,7 +22,36 @@ pub(crate) const CHARACTER_KEY: &str = "voice.tts_character";
 /// Głośność mowy w procentach (20–150).
 pub(crate) const VOLUME_KEY: &str = "voice.tts_volume";
 
-const KEYS: [&str; 5] = [SPEED_KEY, STYLE_KEY, PAUSE_KEY, CHARACTER_KEY, VOLUME_KEY];
+/// Barwy głosu agentek (Supertonic 3): `F1`…`F5`, `M1`…`M5`.
+pub(crate) const VOICE_KEYS: [&str; 4] = [
+    "voice.tts_voice_alfa",
+    "voice.tts_voice_beta",
+    "voice.tts_voice_gama",
+    "voice.tts_voice_delta",
+];
+
+const KEYS: [&str; 9] = [
+    SPEED_KEY,
+    STYLE_KEY,
+    PAUSE_KEY,
+    CHARACTER_KEY,
+    VOLUME_KEY,
+    VOICE_KEYS[0],
+    VOICE_KEYS[1],
+    VOICE_KEYS[2],
+    VOICE_KEYS[3],
+];
+
+/// Barwy agentek z wartości ustawień (brak albo nieznana nazwa → barwa domyślna agentki).
+pub(crate) fn timbres_from(values: [Option<&str>; 4]) -> [u8; 4] {
+    let mut timbres = DEFAULT_TIMBRES;
+    for (slot, value) in timbres.iter_mut().zip(values) {
+        if let Some(index) = value.and_then(timbre_index) {
+            *slot = index;
+        }
+    }
+    timbres
+}
 
 /// Zalecane strojenie programu — używane, dopóki użytkownik niczego nie zmieni.
 pub(crate) fn recommended() -> TtsTuning {
@@ -32,6 +63,7 @@ pub(crate) fn recommended() -> TtsTuning {
         pause_ms: 200,
         character: character_from_setting("subtle"),
         volume: 1.0,
+        timbres: DEFAULT_TIMBRES,
     }
 }
 
@@ -54,6 +86,7 @@ pub(crate) fn from_values(
         pause_ms: pause.map_or(base.pause_ms, |ms| ms.clamp(0.0, 60_000.0) as u32),
         character: character.map_or(base.character, character_from_setting),
         volume: volume.map_or(base.volume, |percent| (percent / 100.0) as f32),
+        timbres: base.timbres,
     }
     .clamped()
 }
@@ -77,13 +110,9 @@ pub(crate) fn tts_tuning(config: &Arc<core_config_impl::FileConfigStore>) -> Sha
             }
             let number = |i: usize| values[i].as_ref().and_then(serde_json::Value::as_f64);
             let text = |i: usize| values[i].as_ref().and_then(serde_json::Value::as_str);
-            handle.set(from_values(
-                number(0),
-                text(1),
-                number(2),
-                text(3),
-                number(4),
-            ));
+            let mut tuning = from_values(number(0), text(1), number(2), text(3), number(4));
+            tuning.timbres = timbres_from([text(5), text(6), text(7), text(8)]);
+            handle.set(tuning);
             if changes.next().await.is_none() {
                 break;
             }
@@ -95,6 +124,21 @@ pub(crate) fn tts_tuning(config: &Arc<core_config_impl::FileConfigStore>) -> Sha
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn agent_timbres_follow_settings_and_fall_back_to_defaults() {
+        assert_eq!(timbres_from([None; 4]), DEFAULT_TIMBRES);
+        let chosen = timbres_from([Some("M2"), Some("f3"), Some("nie ma"), None]);
+        assert_eq!(chosen, [6, 2, DEFAULT_TIMBRES[2], DEFAULT_TIMBRES[3]]);
+        let tuning = TtsTuning {
+            timbres: chosen,
+            ..recommended()
+        };
+        assert_eq!(tuning.timbre_for("alfa"), Some("M2"));
+        assert_eq!(tuning.timbre_for("beta"), Some("F3"));
+        assert_eq!(tuning.timbre_for("gama"), Some("F4"));
+        assert_eq!(tuning.timbre_for("zofia"), None, "agentka z Kreatora");
+    }
 
     #[test]
     fn missing_settings_give_the_recommended_natural_voice() {

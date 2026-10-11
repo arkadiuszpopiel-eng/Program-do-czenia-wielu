@@ -18,7 +18,7 @@ Kolumna „Alfa” mówi, co robimy: **bierzemy** (wartość z Delty), **zostaje
 | Rozpoznanie | całe nagranie WAV 16 kHz mono → silnik → zabezpieczenia (rozdz. 3) | bierzemy |
 | Słowo wywoławcze | jeśli włączone: musi paść w pierwszych 3 słowach tekstu; dalej idzie reszta zdania | bierzemy |
 | Odpowiedź modelu | zwykła tura rozmowy + stała wskazówka „odpowiadaj naturalnie, krótko i konkretnie” (do 4096 znaków) | bierzemy wskazówkę; tura przez rdzeń Alfy |
-| Mowa | tekst dzielony na zdania, 2 zdania syntezowane z wyprzedzeniem, odtwarzane kolejno | bierzemy wyprzedzenie; kolejka Alfy |
+| Mowa | tekst dzielony na zdania, 2 zdania syntezowane z wyprzedzeniem, odtwarzane kolejno | **jest** — sprawdzone 2026-10-11: serwis mowy Alfy syntezuje naprzód do kolejki 16 fragmentów |
 | Przerwanie głosem | głośność > 1,7 × próg przez 350 ms podczas mówienia → stop mowy i modelu | zostaje Alfa (tłumienie echa, potwierdzenie 200–350 ms, słowa „stop / czekaj”) |
 | Zatrzymanie rozmowy | Delta nie przerywa modelu | nie bierzemy — Alfa przerywa wszystko |
 
@@ -53,6 +53,27 @@ Domyślnie `large-v3-turbo`; bez karty NVIDIA modele większe niż `small` są z
 
 Co 1200 ms (zakres 500–5000), na procesorze nie częściej niż co 3000 ms; pokazywane ostatnie 90 znaków; nie
 przechodzi przez zabezpieczenia i nie trafia do rozmowy.
+
+### Pomiar na laptopie właściciela (2026-10-11)
+
+Model Qwen3-ASR z katalogu Delty uruchomiony silnikiem `llama-server` z Delty (wydanie 11022) na karcie RTX 4050;
+40 nagrań: te same 20 zdań głosem Supertonic 3 (z `alfa-supertonic`) i Piperem.
+
+| Miara | Wynik |
+| --- | --- |
+| Start serwera z modelem | 4 s |
+| Czas rozpoznania zdania | mediana 0,44 s, najwolniejsze 5 %: 0,87 s |
+| Pamięć karty zajęta w trakcie | ok. 3,4 GB (cała karta, razem z pulpitem) |
+| Wykryty język | „Polish” we wszystkich 40 nagraniach |
+| Błędne słowa w zdaniach bez liczb i skrótów | Supertonic: 13 ze 120 · Piper: 14 ze 120 — w obu głównie dwa łamańce językowe |
+
+Błędy poza łamańcami: przy Supertonicu 3 słowa („Alpha”, „Hm”, „Żeszow”), przy Piperze 5 (m.in. „Czy mogę” zamiast
+„W czym mogę”, „pik” zamiast „plik”). To pomiar zrozumiałości dla maszyny, nie ocena brzmienia. Zdania z liczbami
+model zapisuje słowami („dziesięć minut”), więc porównanie z cyframi w tekście nic nie mówi — pominięte.
+
+**Blokada:** silnik `llama-server` zainstalowany w Alfie (wydanie 6710) nie zna architektury tego modelu
+(„unknown model architecture: qwen3vl”). Qwen3-ASR wymaga nowszego silnika — aktualizacja silników w katalogu
+Alfy (zadanie z P2) musi wejść przed rozpoznawaniem z P1.
 
 ## 3. Zabezpieczenia rozpoznawania (kolejność jak w `B/routers/stt_router.py`)
 

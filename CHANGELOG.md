@@ -12,6 +12,26 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.31 — 2026-10-11
+
+Każdej agentce wybierasz głos: dziesięć barw Supertonic 3 w Ustawieniach → Głos.
+
+### Głos
+
+- Cztery nowe ustawienia „Głos Alfy”, „Głos Bety”, „Głos Gamy”, „Głos Delty”: pięć barw kobiecych (F1–F5)
+  i pięć męskich (M1–M5). Zmiana działa od następnego zdania, bez ponownego uruchamiania rozmowy.
+- Domyślnie jak dotąd: Alfa F1, Beta F2, Gama F4, Delta F5. Agentki z Kreatora zostają przy głosie z łańcucha.
+
+### Czego nie sprawdzono
+
+- Brzmienia barw nie da się ocenić automatycznie; kliknij „Odsłuchaj” przy agentce po zmianie.
+- Dwie agentki mogą dostać tę samą barwę — program na to pozwala i nie ostrzega.
+
+### Testy
+
+- Test łańcucha głosów: barwa z Ustawień trafia do silnika tylko dla agentek wbudowanych; test mapowania
+  ustawień (nieznana nazwa barwy → barwa domyślna). vitest 311/311; testy okna 308 z 309 (znany próg strumienia).
+
 ## 0.0.30 — 2026-10-11
 
 Nowy głos agentek: Supertonic 3. Cztery agentki mówią czterema różnymi, naturalniejszymi barwami — lokalnie, bez

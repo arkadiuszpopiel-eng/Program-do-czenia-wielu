@@ -27,6 +27,21 @@ pub struct TtsTuning {
     pub character: f32,
     /// Głośność mowy (mnożnik amplitudy; 1.0 = bez zmiany).
     pub volume: f32,
+    /// Barwy Supertonic agentek wbudowanych (Alfa, Beta, Gama, Delta) jako numery w
+    /// [`crate::SUPERTONIC_ALL`]; wybierane w Ustawieniach → Głos.
+    pub timbres: [u8; 4],
+}
+
+/// Barwy domyślne: Alfa F1, Beta F2, Gama F4, Delta F5.
+pub const DEFAULT_TIMBRES: [u8; 4] = [0, 1, 3, 4];
+
+/// Numer barwy Supertonic o podanej nazwie (`F1`…`M5`).
+#[must_use]
+pub fn timbre_index(name: &str) -> Option<u8> {
+    crate::SUPERTONIC_ALL
+        .iter()
+        .position(|v| v.eq_ignore_ascii_case(name))
+        .and_then(|i| u8::try_from(i).ok())
 }
 
 impl Default for TtsTuning {
@@ -38,6 +53,7 @@ impl Default for TtsTuning {
             pause_ms: 0,
             character: 1.0,
             volume: 1.0,
+            timbres: DEFAULT_TIMBRES,
         }
     }
 }
@@ -61,7 +77,20 @@ impl TtsTuning {
             pause_ms: self.pause_ms.min(MAX_PAUSE_MS),
             character: fix(self.character, base.character, 0.0, 1.0),
             volume: fix(self.volume, base.volume, VOLUME_RANGE.0, VOLUME_RANGE.1),
+            timbres: self.timbres.map(|t| t.min(9)),
         }
+    }
+
+    /// Barwa Supertonic wybrana dla agentki wbudowanej; dla innych agentek `None` (zostaje barwa
+    /// z łańcucha głosów).
+    #[must_use]
+    pub fn timbre_for(self, persona: &str) -> Option<&'static str> {
+        let slot = ["alfa", "beta", "gama", "delta"]
+            .iter()
+            .position(|p| *p == persona)?;
+        crate::SUPERTONIC_ALL
+            .get(usize::from(self.timbres[slot]))
+            .copied()
     }
 
     /// Wysokość albo tempo presetu agentki po uwzględnieniu odrębności głosów: przy `character`
@@ -77,8 +106,8 @@ impl TtsTuning {
     pub fn fingerprint(self) -> String {
         let t = self.clamped();
         format!(
-            "{:.3}|{:.3}|{:.3}|{}|{:.3}|{:.3}",
-            t.speed, t.expressiveness, t.rhythm, t.pause_ms, t.character, t.volume
+            "{:.3}|{:.3}|{:.3}|{}|{:.3}|{:.3}|{:?}",
+            t.speed, t.expressiveness, t.rhythm, t.pause_ms, t.character, t.volume, t.timbres
         )
     }
 
@@ -178,6 +207,7 @@ mod tests {
             pause_ms: 60_000,
             character: 3.0,
             volume: 40.0,
+            ..TtsTuning::default()
         }
         .clamped();
         assert_eq!(wild.volume, VOLUME_RANGE.1);

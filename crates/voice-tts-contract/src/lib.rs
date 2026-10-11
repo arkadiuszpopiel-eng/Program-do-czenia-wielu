@@ -20,8 +20,8 @@ use serde::{Deserialize, Serialize};
 
 pub use text::{estimate_marks, split_sentences};
 pub use tuning::{
-    MAX_PAUSE_MS, SPEED_RANGE, SharedTuning, TtsTuning, VOLUME_RANGE, VoiceStyle,
-    character_from_setting,
+    DEFAULT_TIMBRES, MAX_PAUSE_MS, SPEED_RANGE, SharedTuning, TtsTuning, VOLUME_RANGE, VoiceStyle,
+    character_from_setting, timbre_index,
 };
 pub use types::{
     CancelToken, CloudTts, MarksKind, SpeechStyle, TtsChunk, TtsEngine, TtsError, TtsRequest,

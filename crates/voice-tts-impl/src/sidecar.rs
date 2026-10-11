@@ -10,7 +10,7 @@ use async_trait::async_trait;
 use base64::Engine as _;
 use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncBufRead, AsyncBufReadExt, AsyncWrite, AsyncWriteExt, BufReader};
-use voice_tts_contract::{SpeechStyle, TtsEngine, TtsError, VoiceRef};
+use voice_tts_contract::{SharedTuning, SpeechStyle, TtsEngine, TtsError, VoiceRef};
 
 use crate::engines::{EngineAudio, TtsBackend, engine_err, pcm16_to_f32};
 
@@ -68,6 +68,8 @@ pub struct PocketSidecar {
     engine: TtsEngine,
     /// Mnożnik tempa wysyłany do silnika (`None` = tempo nakłada serwis po syntezie).
     native_rate: Option<f32>,
+    /// Strojenie z Ustawień — Supertonic bierze z niego barwę wybraną dla agentki.
+    tuning: Option<SharedTuning>,
     command: Option<(PathBuf, Vec<String>)>,
     channel: tokio::sync::Mutex<Option<Channel>>,
     next_id: AtomicU64,
@@ -79,6 +81,7 @@ impl PocketSidecar {
         Self {
             engine: TtsEngine::Pocket,
             native_rate: None,
+            tuning: None,
             command: Some((program, args)),
             channel: tokio::sync::Mutex::new(None),
             next_id: AtomicU64::new(1),
@@ -90,6 +93,7 @@ impl PocketSidecar {
         Self {
             engine: TtsEngine::Pocket,
             native_rate: None,
+            tuning: None,
             command: None,
             channel: tokio::sync::Mutex::new(Some(Channel {
                 reader,
@@ -107,6 +111,25 @@ impl PocketSidecar {
         self.engine = TtsEngine::Supertonic;
         self.native_rate = Some(SUPERTONIC_BASE_RATE);
         self
+    }
+
+    /// Strojenie z Ustawień (barwy agentek czytane przy każdym zdaniu — zmiana działa od razu).
+    #[must_use]
+    pub fn with_tuning(mut self, tuning: SharedTuning) -> Self {
+        self.tuning = Some(tuning);
+        self
+    }
+
+    /// Głos wysyłany do silnika: barwa wybrana w Ustawieniach (tylko Supertonic i agentki
+    /// wbudowane) albo mówczyni z łańcucha głosów.
+    fn speaker<'a>(&self, voice: &'a VoiceRef) -> &'a str {
+        if self.engine == TtsEngine::Supertonic
+            && let Some(tuning) = &self.tuning
+            && let Some(timbre) = tuning.get().timbre_for(voice.persona.as_str())
+        {
+            return timbre;
+        }
+        &voice.preset.base_speaker
     }
 
     fn spawn(&self) -> Result<Channel, TtsError> {
@@ -208,7 +231,7 @@ impl TtsBackend for PocketSidecar {
             id,
             op: "synth",
             text,
-            voice: &voice.preset.base_speaker,
+            voice: self.speaker(voice),
             energy: style.energy,
             emotion: style.emotion.as_deref(),
             rate: self
