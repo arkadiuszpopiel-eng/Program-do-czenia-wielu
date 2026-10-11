@@ -2952,6 +2952,80 @@
       ],
       "type": "string"
     },
+    "ChangeItem": {
+      "description": "Pozycja historii zmian.",
+      "properties": {
+        "section": {
+          "description": "Tytuł sekcji wpisu (np. „Interfejs”, „Głos”).",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/ChangeSeverity"
+        },
+        "text": {
+          "description": "Treść pozycji jako zwykły tekst.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "section",
+        "text",
+        "severity"
+      ],
+      "type": "object"
+    },
+    "ChangeLogEntry": {
+      "description": "Wpis historii zmian — jedna wersja programu.",
+      "properties": {
+        "date": {
+          "description": "Data wydania `RRRR-MM-DD`, jeśli wpis ją podaje.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/ChangeItem"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "description": "Zdanie wstępu wpisu.",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "date",
+        "summary",
+        "items"
+      ],
+      "type": "object"
+    },
+    "ChangeSeverity": {
+      "description": "Waga pozycji w historii zmian (kolor w interfejsie: czerwony, pomarańczowy, zielony).",
+      "oneOf": [
+        {
+          "const": "critical",
+          "description": "Bezpieczeństwo, prywatność, utrata danych albo funkcja, która nie działała wcale.",
+          "type": "string"
+        },
+        {
+          "const": "serious",
+          "description": "Istotny błąd albo zabezpieczenie.",
+          "type": "string"
+        },
+        {
+          "const": "normal",
+          "description": "Zwykła zmiana: nowa funkcja, usprawnienie, drobna poprawka.",
+          "type": "string"
+        }
+      ]
+    },
     "CollisionResolution": {
       "description": "Rozwiązanie kolizji.",
       "enum": [
@@ -13441,6 +13515,15 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/UpdatesView"
+      }
+    },
+    "updates_history": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/ChangeLogEntry"
+        },
+        "type": "array"
       }
     },
     "updates_restart": {

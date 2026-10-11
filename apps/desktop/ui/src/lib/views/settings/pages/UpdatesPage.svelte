@@ -2,7 +2,8 @@
   Ustawienia → Aktualizacje: wersja i kanał, stan (sprawdzanie, pobieranie z postępem i wznawianiem,
   weryfikacja podpisu, gotowa do restartu), „Sprawdź teraz", „Pobierz i przygotuj", „Uruchom ponownie,
   aby zaktualizować" (zablokowane w trakcie zadania agentki / rozmowy głosowej), „Przywróć poprzednią
-  wersję" z potwierdzeniem. Pod kartą — ustawienia strony (kanał, tryb, „Co nowego").
+  wersję" z potwierdzeniem. Niżej historia zmian (`ChangeHistory`), a pod nią ustawienia strony
+  (kanał, tryb, „Co nowego").
 -->
 <script lang="ts">
   import { Button, ConfirmDialog } from '@alfa/ui-kit';
@@ -11,6 +12,7 @@
   import { phaseMessage, progressPercent, updateActions, isRollback } from '../../../logic/updates';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import ChangeHistory from './ChangeHistory.svelte';
   import './work.css';
 
   const app = useApp();
@@ -177,6 +179,8 @@
     <p class="wk-meta">{t('updates.noTelemetry')}</p>
   {/if}
 </section>
+
+<ChangeHistory />
 
 <ConfirmDialog
   bind:open={confirmRollback}

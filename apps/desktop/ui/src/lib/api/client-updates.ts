@@ -1,5 +1,5 @@
 // Interfejs aktualizacji i „O programie" (część `AlfaClient`; komendy `updates_*` w COMMANDS.md).
-import type { AboutInfo, UpdatesView, WhatsNew } from './types-updates';
+import type { AboutInfo, ChangeLogEntry, UpdatesView, WhatsNew } from './types-updates';
 
 /** Aktualizacje: sprawdź → pobierz (z wznawianiem) → zweryfikuj → uruchom ponownie. */
 export interface UpdatesApi {
@@ -18,4 +18,6 @@ export interface UpdatesApi {
   /** „Co nowego" — raz po aktualizacji (`null` — nic do pokazania). */
   whatsNew(): Promise<WhatsNew | null>;
   dismissWhatsNew(): Promise<void>;
+  /** Historia zmian z dziennika wbudowanego w program, od najnowszej wersji. */
+  history(): Promise<readonly ChangeLogEntry[]>;
 }

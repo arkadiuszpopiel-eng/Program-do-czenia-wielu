@@ -5,10 +5,10 @@
 //! zdanie wstępu i po pierwszym zdaniu każdej pozycji, jako zwykły tekst.
 
 /// Dziennik zmian z korzenia repozytorium, wkompilowany w program.
-const CHANGELOG: &str = include_str!("../../../CHANGELOG.md");
+pub(crate) const CHANGELOG: &str = include_str!("../../../CHANGELOG.md");
 
 /// Sekcje dla osób rozwijających program — pomijane w oknie „Co nowego”.
-const SKIPPED: [&str; 2] = ["Testy", "Przyczyna błędu"];
+pub(crate) const SKIPPED: [&str; 2] = ["Testy", "Przyczyna błędu"];
 
 /// Limit długości — okno ma pokazać skrót, nie cały wpis.
 const MAX_CHARS: usize = 1600;
@@ -60,7 +60,10 @@ fn summarize(changelog: &str, version: &str) -> Option<String> {
                 heading = (!skipping).then(|| format!("\n{text}:\n"));
                 continue;
             }
-            Kind::Item => format!("• {}", first_sentence(&text)),
+            Kind::Item => format!(
+                "• {}",
+                first_sentence(crate::history::split_severity(&text).1)
+            ),
             Kind::Text => text,
         };
         if skipping {
@@ -96,7 +99,7 @@ fn is_entry(line: &str, version: &str) -> bool {
 }
 
 /// Zdejmuje znaczniki Markdown, których zwykły tekst nie potrzebuje.
-fn plain(text: &str) -> String {
+pub(crate) fn plain(text: &str) -> String {
     text.replace("**", "").replace('`', "")
 }
 

@@ -24,6 +24,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`11-technologie-2026-10.md`](11-technologie-2026-10.md)                       | Przegląd technologii ze źródłami i datą sprawdzenia                                         | co kwartał i przed wyborem technologii |
 | [`12-kamery-i-rozpoznawanie-osob.md`](12-kamery-i-rozpoznawanie-osob.md)       | Kamery (USB, IP, Wi-Fi), rozpoznawanie zapisanych osób z pamięcią, opis obrazu na polecenie | z postępem grupy C3                    |
 | [`13-podsumowanie-i-dalsze-kroki.md`](13-podsumowanie-i-dalsze-kroki.md)       | Podsumowanie zgłoszeń właściciela i ich stanu, decyzje do podjęcia, plan następnych sesji   | po każdej dłuższej sesji               |
+| [`14-funkcje-wkrotce.md`](14-funkcje-wkrotce.md) | Spis funkcji ze znakiem „wkrótce” i funkcji zależnych od modułów — każda z zadaniem w roadmapie | gdy strona zmienia stan albo dochodzi nowa |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0026 (status „Proponowany”).
 Szkice specyfikacji nowych modułów: [`../modules/README.md`](../modules/README.md), sekcja „Planowane (plan v6)”.

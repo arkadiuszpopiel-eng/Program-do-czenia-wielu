@@ -114,3 +114,36 @@ pub struct WhatsNew {
     /// Notatki z podpisanej paczki (`notes.md`) — UI pokazuje jako zwykły tekst.
     pub notes: String,
 }
+
+/// Waga pozycji w historii zmian (kolor w interfejsie: czerwony, pomarańczowy, zielony).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum ChangeSeverity {
+    /// Bezpieczeństwo, prywatność, utrata danych albo funkcja, która nie działała wcale.
+    Critical,
+    /// Istotny błąd albo zabezpieczenie.
+    Serious,
+    /// Zwykła zmiana: nowa funkcja, usprawnienie, drobna poprawka.
+    Normal,
+}
+
+/// Pozycja historii zmian.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct ChangeItem {
+    /// Tytuł sekcji wpisu (np. „Interfejs”, „Głos”).
+    pub section: String,
+    /// Treść pozycji jako zwykły tekst.
+    pub text: String,
+    pub severity: ChangeSeverity,
+}
+
+/// Wpis historii zmian — jedna wersja programu.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct ChangeLogEntry {
+    pub version: String,
+    /// Data wydania `RRRR-MM-DD`, jeśli wpis ją podaje.
+    pub date: Option<String>,
+    /// Zdanie wstępu wpisu.
+    pub summary: String,
+    pub items: Vec<ChangeItem>,
+}

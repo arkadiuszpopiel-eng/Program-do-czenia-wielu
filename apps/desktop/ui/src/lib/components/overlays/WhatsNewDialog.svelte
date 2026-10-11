@@ -37,7 +37,7 @@
         {news.notes.trim() || t('whatsNew.empty', { version: news.version })}
       </Dialog.Description>
       <div class="actions">
-        <Button variant="secondary" onclick={settings}>{t('whatsNew.settings')}</Button>
+        <Button variant="secondary" onclick={settings}>{t('whatsNew.history')}</Button>
         <Button variant="primary" onclick={close}>{t('whatsNew.close')}</Button>
       </div>
     </Dialog.Content>

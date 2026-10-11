@@ -76,3 +76,23 @@ export interface WhatsNew {
   /** Notatki z podpisanej paczki — pokazywane jako zwykły tekst. */
   readonly notes: string;
 }
+
+/** Waga pozycji historii zmian: czerwona, pomarańczowa, zielona. */
+export type ChangeSeverity = 'critical' | 'serious' | 'normal';
+
+/** Pozycja historii zmian. */
+export interface ChangeItem {
+  /** Tytuł sekcji wpisu (np. „Interfejs”, „Głos”). */
+  readonly section: string;
+  readonly text: string;
+  readonly severity: ChangeSeverity;
+}
+
+/** Wpis historii zmian — jedna wersja programu. */
+export interface ChangeLogEntry {
+  readonly version: string;
+  /** Data wydania `RRRR-MM-DD`, jeśli wpis ją podaje. */
+  readonly date: string | null;
+  readonly summary: string;
+  readonly items: readonly ChangeItem[];
+}

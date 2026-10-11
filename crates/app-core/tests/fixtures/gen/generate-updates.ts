@@ -25,5 +25,6 @@ export async function runUpdates(
   await both('updates', 'dismissWhatsNew');
   await both('updates', 'rollback');
   await both('updates', 'about');
+  await both('updates', 'history');
   await flush();
 }

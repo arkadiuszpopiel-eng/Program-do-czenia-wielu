@@ -91,3 +91,44 @@ test('offline: sprawdzanie aktualizacji kończy się czytelnym błędem', async 
   await expect(page.getByText('Aktualizacja nie powiodła się.')).toBeVisible();
   await expect(page.getByText('Brak połączenia z serwerem wydań.')).toBeVisible();
 });
+
+for (const style of ['classic', 'glass', 'next'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`historia zmian: wagi, filtr i zwijanie — ${style} ${theme}`, async ({ page }) => {
+      await openApp(page, { theme, path: `/?style=${style}` });
+      await waitForChat(page);
+      await page.keyboard.press('Control+,');
+      await openSection(page, 'Aktualizacje');
+      const history = page.getByRole('region', { name: 'Historia zmian' });
+      const version = (v: string) => history.getByRole('button', { name: `Wersja ${v}` });
+      // Najnowsza wersja jest rozwinięta, starsze zwinięte.
+      await expect(version('0.1.0-f1')).toHaveAttribute('aria-expanded', 'true');
+      await expect(version('0.0.9')).toHaveAttribute('aria-expanded', 'false');
+      await expect(
+        history.getByText('Kopia zapasowa nie powstaje w wersji nieszyfrowanej'),
+      ).toBeVisible();
+      // Waga jest podana słowem, nie tylko kolorem; liczniki przy wersji mają opis dla czytnika.
+      await expect(history.getByText('krytyczna', { exact: true })).toBeVisible();
+      await expect(version('0.1.0-f1')).toContainText('krytyczna: 1');
+      // Filtr „Krytyczne” zostawia jedną wersję i jedną pozycję.
+      await history.getByRole('button', { name: /^Krytyczne/ }).click();
+      await expect(history.getByRole('button', { name: /^Krytyczne/ })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      await expect(history.getByRole('button', { name: /^Wersja / })).toHaveCount(1);
+      await expect(history.getByText('zwykła', { exact: true })).toHaveCount(0);
+      await history.getByRole('button', { name: /^Wszystkie/ }).click();
+      // Zwijanie i rozwijanie klawiaturą oraz wszystkiego naraz.
+      await version('0.0.9').focus();
+      await page.keyboard.press('Enter');
+      await expect(history.getByText('Głośność mowy: głośność głosu agentek')).toBeVisible();
+      await history.getByRole('button', { name: 'Rozwiń wszystkie', exact: true }).click();
+      await expect(history.getByText('Pierwszy stan uruchamialny.')).toBeVisible();
+      await expectAccessible(page, `historia zmian ${style} ${theme}`);
+      await history.getByRole('button', { name: 'Zwiń wszystkie', exact: true }).click();
+      await expect(history.getByText('Kopia zapasowa nie powstaje')).toHaveCount(0);
+      await expect(version('0.1.0-f1')).toHaveAttribute('aria-expanded', 'false');
+    });
+  }
+}

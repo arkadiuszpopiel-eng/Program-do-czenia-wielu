@@ -782,6 +782,28 @@ export interface CamerasState {
 /** Szablon obsady. */
 export type CastTemplateId = 'standard' | 'solo' | 'coding' | 'research';
 
+/** Pozycja historii zmian. */
+export interface ChangeItem {
+  /** Tytuł sekcji wpisu (np. „Interfejs”, „Głos”). */
+  readonly section: string;
+  readonly severity: ChangeSeverity;
+  /** Treść pozycji jako zwykły tekst. */
+  readonly text: string;
+}
+
+/** Wpis historii zmian — jedna wersja programu. */
+export interface ChangeLogEntry {
+  /** Data wydania `RRRR-MM-DD`, jeśli wpis ją podaje. */
+  readonly date: string | null;
+  readonly items: readonly ChangeItem[];
+  /** Zdanie wstępu wpisu. */
+  readonly summary: string;
+  readonly version: string;
+}
+
+/** Waga pozycji w historii zmian (kolor w interfejsie: czerwony, pomarańczowy, zielony). */
+export type ChangeSeverity = 'critical' | 'serious' | 'normal';
+
 /** Rozwiązanie kolizji. */
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
@@ -3660,6 +3682,10 @@ export interface IpcCommands {
   readonly updates_download: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: UpdatesView;
+  };
+  readonly updates_history: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly ChangeLogEntry[];
   };
   readonly updates_restart: {
     readonly args: Readonly<Record<string, never>>;

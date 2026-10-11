@@ -82,7 +82,7 @@ Uwaga: otwarte ustalenia analizatora powłoki (S-01…S-04, S-06) trzeba rozstrz
 
 ## Szew 3 — protokół niezależny od transportu
 
-**Dziś.** 226 poleceń w jednej liście (`app-api/src/commands.rs`, makro `with_commands!`), 40 zdarzeń
+**Dziś.** 227 poleceń w jednej liście (`app-api/src/commands.rs`, makro `with_commands!`), 40 zdarzeń
 (`AlfaEvent` w `app-api/src/dto/events.rs`), DTO w `app-api/src/dto/`. Interfejs zna tylko `AlfaClient`
 (`apps/desktop/ui/src/lib/api/client.ts`) — ma dwie implementacje: `TauriAlfaClient` i `FakeAlfaClient`.
 To bardzo dobry punkt wyjścia. Brakuje pięciu rzeczy:

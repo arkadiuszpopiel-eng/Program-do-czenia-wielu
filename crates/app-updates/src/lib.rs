@@ -9,6 +9,7 @@
 
 mod about;
 mod changelog;
+mod history;
 mod schedule;
 mod view;
 
@@ -17,7 +18,7 @@ use std::path::Path;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex, PoisonError};
 
-use app_api::dto::{AboutInfo, LocalizedText, UpdatesView, WhatsNew};
+use app_api::dto::{AboutInfo, ChangeLogEntry, LocalizedText, UpdatesView, WhatsNew};
 use app_api::events::EventHub;
 use app_api::ports::ShellPort;
 use app_api::{AppError, dto::AlfaEvent};
@@ -283,6 +284,11 @@ impl UpdatesApp {
             version: version.to_string(),
             notes,
         }))
+    }
+
+    /// `updates_history` — historia zmian z dziennika wbudowanego w program (od najnowszej).
+    pub async fn history(&self) -> Result<Vec<ChangeLogEntry>, AppError> {
+        Ok(history::history())
     }
 
     /// `updates_dismiss_whats_new`.

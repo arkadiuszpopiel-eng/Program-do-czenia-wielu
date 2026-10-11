@@ -236,6 +236,7 @@
     "allow-cameras-refresh",
     "allow-cameras-frame",
     "allow-attachments-add-camera",
-    "allow-events-resume"
+    "allow-events-resume",
+    "allow-updates-history"
   ]
 }

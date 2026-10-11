@@ -485,6 +485,49 @@ test('Ustawienia → Kamery: wyłączone domyślnie, podgląd prawdziwej kamery,
   await main.keyboard.press('Escape');
 });
 
+test('Ustawienia → Aktualizacje: historia zmian z prawdziwego dziennika, wagi i filtr', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await startView(main);
+  await openSettings(main, 'Aktualizacje');
+  const version = await main.evaluate(async () => {
+    const ipcWindow = window as unknown as {
+      __TAURI_INTERNALS__: { invoke: (cmd: string) => Promise<{ app_version: string }> };
+    };
+    return (await ipcWindow.__TAURI_INTERNALS__.invoke('app_bootstrap')).app_version;
+  });
+  const history = main.getByRole('region', { name: 'Historia zmian' });
+  await history.scrollIntoViewIfNeeded();
+  // Bieżąca wersja programu jest pierwszym wpisem i jest rozwinięta.
+  const rows = history.getByRole('button', { name: /^Wersja / });
+  await expect(rows.first()).toContainText(`Wersja ${version}`);
+  await expect(rows.first()).toHaveAttribute('aria-expanded', 'true');
+  expect(await rows.count()).toBeGreaterThanOrEqual(20);
+  // Dziennik ma pozycje każdej wagi; filtr „Krytyczne” zostawia tylko czerwone.
+  for (const name of [/^Krytyczne/, /^Poważne/, /^Zwykłe/]) {
+    const chip = history.getByRole('button', { name });
+    await expect(chip).toBeVisible();
+    expect(Number((await chip.innerText()).replace(/\D+/g, ''))).toBeGreaterThan(0);
+  }
+  await history.getByRole('button', { name: /^Krytyczne/ }).click();
+  await history.getByRole('button', { name: 'Rozwiń wszystkie', exact: true }).click();
+  await expect(history.getByText('krytyczna', { exact: true }).first()).toBeVisible();
+  await expect(history.getByText('zwykła', { exact: true })).toHaveCount(0);
+  await expect(history.getByText('poważna', { exact: true })).toHaveCount(0);
+  await shot(alfa, '13-historia-zmian-krytyczne');
+  await history.getByRole('button', { name: /^Wszystkie/ }).click();
+  // Po zmianie filtra rozwinięte są tylko wersje z pozycjami krytycznymi — rozwijamy resztę i zwijamy całość.
+  await history.getByRole('button', { name: 'Rozwiń wszystkie', exact: true }).click();
+  await history.getByRole('button', { name: 'Zwiń wszystkie', exact: true }).click();
+  await expect(rows.first()).toHaveAttribute('aria-expanded', 'false');
+  await rows.first().click();
+  await shot(alfa, '14-historia-zmian');
+  // Znaczniki z dziennika nie przeciekają do tekstu.
+  await expect(history.getByText('[krytyczne]')).toHaveCount(0);
+  await expect(history.getByText('[poważne]')).toHaveCount(0);
+});
+
 test('okna poboczne (Szybkie pytanie, pigułka) ładują się w WebView2', async ({ alfa }) => {
   const { quick, pill } = alfa.windows;
   expect(quick, 'okno „quick” wśród stron CDP').toBeTruthy();

@@ -110,8 +110,8 @@ pub use transfer::{
     ImportMode, ImportRequest, ImportResult, InspectResult, ItemDiff, PackageManifestSummary,
 };
 pub use updates::{
-    AboutInfo, LicenseEntry, LicenseSource, UpdateChannel, UpdateMode, UpdatePhase, UpdateProgress,
-    UpdateRelease, UpdatesView, WhatsNew,
+    AboutInfo, ChangeItem, ChangeLogEntry, ChangeSeverity, LicenseEntry, LicenseSource,
+    UpdateChannel, UpdateMode, UpdatePhase, UpdateProgress, UpdateRelease, UpdatesView, WhatsNew,
 };
 pub use voice_features::{
     DictationAction, DictationProfile, DictationStateView, DictationView, EnrollSampleView,

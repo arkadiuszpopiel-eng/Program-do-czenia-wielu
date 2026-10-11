@@ -316,6 +316,7 @@ export class TauriAlfaClient implements AlfaClient {
     about: () => call('updates_about'),
     whatsNew: () => call('updates_whats_new'),
     dismissWhatsNew: () => call('updates_dismiss_whats_new'),
+    history: () => call('updates_history'),
   };
 
   readonly broker: AlfaClient['broker'] = {

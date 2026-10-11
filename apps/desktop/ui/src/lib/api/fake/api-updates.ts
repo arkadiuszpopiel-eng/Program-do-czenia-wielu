@@ -6,6 +6,7 @@
 import type { UpdatesApi } from '../client-updates';
 import type {
   AboutInfo,
+  ChangeLogEntry,
   LicenseEntry,
   UpdateChannel,
   UpdateMode,
@@ -18,6 +19,60 @@ export const FAKE_CURRENT = '0.1.0-f1';
 export const FAKE_NEXT = '0.2.0';
 export const FAKE_TOTAL = 48_234_496;
 export const FAKE_STEP_MS = 250;
+/** Historia zmian atrapy: trzy wersje, wszystkie wagi, wpis bez pozycji i wpis bez daty. */
+export const FAKE_HISTORY: readonly ChangeLogEntry[] = [
+  {
+    version: '0.1.0-f1',
+    date: '2026-10-04',
+    summary: 'Klucze API pod opieką i pewniejsze kopie zapasowe.',
+    items: [
+      {
+        section: 'Kopie zapasowe',
+        severity: 'critical',
+        text: 'Kopia zapasowa nie powstaje w wersji nieszyfrowanej, gdy nie da się odczytać hasła.',
+      },
+      {
+        section: 'Konta i klucze API',
+        severity: 'serious',
+        text: 'Zły klucz u Google i xAI jest pokazywany jako zły klucz, a nie „błąd połączenia”.',
+      },
+      {
+        section: 'Konta i klucze API',
+        severity: 'normal',
+        text: 'Sprawdzanie kluczy w tle: co 24 godziny Alfa sprawdza każde włączone konto, bez zużycia tokenów.',
+      },
+      {
+        section: 'Konta i klucze API',
+        severity: 'normal',
+        text: 'Wiek klucza: przy każdym koncie widać, ile dni ma zapisany klucz.',
+      },
+    ],
+  },
+  {
+    version: '0.0.9',
+    date: '2026-09-28',
+    summary: 'Porządki w interfejsie.',
+    items: [
+      {
+        section: 'Interfejs',
+        severity: 'serious',
+        text: 'Ekran ładowania nie może już zostać na zawsze: błąd startu jest na nim pokazywany.',
+      },
+      {
+        section: 'Interfejs',
+        severity: 'normal',
+        text: 'Szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączyć w Ustawieniach → Wygląd.',
+      },
+      {
+        section: 'Głos',
+        severity: 'normal',
+        text: 'Głośność mowy: głośność głosu agentek niezależnie od głośności systemu.',
+      },
+    ],
+  },
+  { version: '0.0.8', date: null, summary: 'Pierwszy stan uruchamialny.', items: [] },
+];
+
 const NOTES = `Co nowego w ${FAKE_NEXT}:
 - Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.
 - Strona „O programie" z licencjami zależności.
@@ -184,6 +239,7 @@ export class FakeUpdates {
         this.news = null;
         return core.reply(undefined);
       },
+      history: () => core.reply(FAKE_HISTORY),
     };
   }
 }

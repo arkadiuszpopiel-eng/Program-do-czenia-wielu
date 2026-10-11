@@ -8,6 +8,39 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata danych, funkcja nie działała wcale),
+`[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
+na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
+
+## 0.0.23 — 2026-10-11
+
+Historia zmian w Aktualizacjach i spis funkcji oznaczonych „wkrótce”.
+
+### Aktualizacje
+
+- **Historia zmian:** Ustawienia → Aktualizacje pokazują teraz wszystkie wersje od najnowszej — co zostało zrobione
+  w każdej. Okno „Co nowego” pojawia się jak dotąd raz, ale historia zostaje na stałe.
+- Każda pozycja ma wagę: krytyczna (czerwona), poważna (pomarańczowa) albo zwykła (zielona) — pokazaną kolorem
+  i słowem. Przy wersji widać, ile ma pozycji każdej wagi.
+- Filtr „Krytyczne / Poważne / Zwykłe” zostawia tylko pozycje wybranej wagi; wersje można zwijać i rozwijać,
+  także wszystkie naraz i z klawiatury.
+- Wstecznie oznaczone zostały wszystkie dotychczasowe wersje: 12 pozycji krytycznych i 31 poważnych.
+- Przycisk w oknie „Co nowego” prowadzi do historii zmian.
+
+### Plan i porządek
+
+- Spis funkcji oznaczonych „wkrótce” (`docs/plan/14-funkcje-wkrotce.md`): cztery strony Ustawień ze znakiem
+  „wkrótce” (Router i reguły, Logi i prywatność, Moduły, Zaawansowane) dostały zadania w planie (grupa C4).
+  Wcześniej istniały tylko w programie.
+- W tym samym spisie są funkcje, które mówią „dostępna po podłączeniu modułu”, z wyjaśnieniem, kiedy ten
+  komunikat widać, oraz funkcje zaplanowane, których program jeszcze nie pokazuje.
+
+### Testy
+
+- Historia zmian: testy rozbioru dziennika (wagi, sekcje, pomijane części), testy interfejsu w trzech stylach
+  i dwóch motywach z kontrolą dostępności, zrzuty wszystkich stanów (`scripts/shots-history.mjs`).
+- Nowy test pilnuje, żeby każda strona „wkrótce” była w spisie i miała zadanie w planie.
+
 ## 0.0.22 — 2026-10-11
 
 Szkic zestawu do mierzenia jakości odpowiedzi po polsku. Bez zmian widocznych w programie (zadanie C2.1 planu).
@@ -85,15 +118,15 @@ i szczegóły. To pierwsze dwa „szwy” pod panel WWW i telefon (zadania B.2 i
 
 ### Rozmowa
 
-- Odpowiedź pisana w chwili otwierania rozmowy nie gubi już ani nie powtarza fragmentów tekstu.
-- Gdy okno nie nadąży za rdzeniem (bardzo dużo zdarzeń naraz), samo dociąga brakujące zdarzenia zamiast po cichu
+- [poważne] Odpowiedź pisana w chwili otwierania rozmowy nie gubi już ani nie powtarza fragmentów tekstu.
+- [poważne] Gdy okno nie nadąży za rdzeniem (bardzo dużo zdarzeń naraz), samo dociąga brakujące zdarzenia zamiast po cichu
   je tracić; jeśli nie da się ich odtworzyć, wczytuje stan od nowa — bez zmiany widoku.
 
 ### Komunikaty błędów
 
-- W działającym programie błędy docierają do okna z kodem i szczegółami (czego dotyczą, które pole, po ilu
+- [poważne] W działającym programie błędy docierają do okna z kodem i szczegółami (czego dotyczą, które pole, po ilu
   sekundach ponowić), a nie jako sam tekst — okno może reagować na rodzaj błędu, a nie zgadywać z treści.
-- Szczegóły błędu nigdy nie niosą kluczy ani treści rozmów: przechodzą przez filtr, który odrzuca wszystko, co
+- [poważne] Szczegóły błędu nigdy nie niosą kluczy ani treści rozmów: przechodzą przez filtr, który odrzuca wszystko, co
   wygląda na sekret.
 
 ### Testy
@@ -114,13 +147,13 @@ Domknięcie otwartych ustaleń z dwóch przeglądów, które nie wymagają prawd
 ### Kamery
 
 - Znak działającej kamery jest też w małym oknie głosowym (pigułce) — widać go, gdy okno główne jest schowane.
-- Wyłączenie kamer nie przepada przez chwilowy błąd zapisu ustawień: zapis jest ponawiany.
-- Obraz z kamery jest dodatkowo sprawdzany pod kątem rozmiaru bufora, zanim program go skopiuje.
+- [poważne] Wyłączenie kamer nie przepada przez chwilowy błąd zapisu ustawień: zapis jest ponawiany.
+- [poważne] Obraz z kamery jest dodatkowo sprawdzany pod kątem rozmiaru bufora, zanim program go skopiuje.
 
 ### Modele lokalne i głos
 
-- Pierwsze uruchomienie modelu na komputerze z kilkoma kartami nie wstrzymuje reszty programu na czas wykrywania kart.
-- Gdy brakuje pliku silnika, pamięć zarezerwowana dla modelu jest od razu zwalniana.
+- [poważne] Pierwsze uruchomienie modelu na komputerze z kilkoma kartami nie wstrzymuje reszty programu na czas wykrywania kart.
+- [poważne] Gdy brakuje pliku silnika, pamięć zarezerwowana dla modelu jest od razu zwalniana.
 - Zapamiętane frazy mowy uwzględniają ustawienia głosu — po zmianie tempa albo głośności nie wróci stare nagranie.
 
 ### Testy
@@ -139,15 +172,15 @@ Domknięcie otwartych ustaleń z dwóch przeglądów, które nie wymagają prawd
   pisania. Wiadomość idzie dopiero po drugim Enterze, więc widzisz zdjęcie przed wysłaniem i możesz je usunąć.
   Zwykłe zdania („co widzisz w tym kodzie?”) zdjęcia nie robią. Można to wyłączyć w „Kamery”. Model musi
   przyjmować obrazy; w rozmowie głosowej jeszcze nie działa.
-- Znak kamery w górnej belce świeci już wtedy, gdy kamera się otwiera, i jeszcze wtedy, gdy się zamyka — nie tylko
+- [poważne] Znak kamery w górnej belce świeci już wtedy, gdy kamera się otwiera, i jeszcze wtedy, gdy się zamyka — nie tylko
   przy stanie „działa”. Kamera pokazuje nowy stan „zamykam…”, a „uśpiona” dopiero po faktycznym zamknięciu.
-- „STOP WSZYSTKIEGO” nie czeka już na kamery: zawieszona kamera nie opóźni zatrzymania agentek.
-- Przerwane żądanie obrazu nie zostawia kamery włączonej na stałe; podgląd kończy się sam, gdy kamera zgłosi błąd.
+- [krytyczne] „STOP WSZYSTKIEGO” nie czeka już na kamery: zawieszona kamera nie opóźni zatrzymania agentek.
+- [krytyczne] Przerwane żądanie obrazu nie zostawia kamery włączonej na stałe; podgląd kończy się sam, gdy kamera zgłosi błąd.
 - Nazwa niedostępnej kamery jest czytelna także w jasnym motywie.
 
 ### Uruchamianie
 
-- Ekran ładowania nie może już zostać na zawsze: błąd startu jest na nim pokazywany razem z przyciskiem „Zamknij
+- [poważne] Ekran ładowania nie może już zostać na zawsze: błąd startu jest na nim pokazywany razem z przyciskiem „Zamknij
   program”, a gdy start trwa ponad 20 sekund, pojawia się to samo wyjście. Górny pas ekranu ładowania przesuwa okno.
 
 ### Głos
@@ -176,7 +209,7 @@ w interfejsie i pakiet decyzji do podjęcia.
 - Gdy którakolwiek kamera działa, w górnej belce świeci czerwony znak kamery z liczbą działających kamer.
 - W polu pisania jest przycisk z aparatem: dołącza zdjęcie z kamery do wiadomości — można wtedy napisać „opisz mi
   to, co widzisz”. Potrzebny jest model, który przyjmuje obrazy.
-- „STOP WSZYSTKIEGO” zamyka także kamery.
+- [poważne] „STOP WSZYSTKIEGO” zamyka także kamery.
 
 ### Konta i klucze
 
@@ -387,7 +420,7 @@ odpowiedzi techniczny tekst.
 
 ### Rozmowa i modele
 
-- Rozmowa z kontem OpenAI działa: Alfa wybiera model rozmowy, a nie pierwszy z listy dostawcy. Wcześniej trafiała na
+- [krytyczne] Rozmowa z kontem OpenAI działa: Alfa wybiera model rozmowy, a nie pierwszy z listy dostawcy. Wcześniej trafiała na
   `tts-1` (synteza mowy) i każda wiadomość kończyła się błędem „The model tts-1 does not exist”.
 - Nowa strona „API i kolejki modeli” w Ustawieniach. Dla każdego konta API ustawiasz kolejkę do dziesięciu modeli
   osobno dla rozmowy, kodu, planowania, szybkiej odpowiedzi głosowej, ekranu i obrazu, streszczania i embeddingów.
@@ -398,15 +431,15 @@ odpowiedzi techniczny tekst.
 - „Dobierz automatycznie” układa kolejkę jednym kliknięciem: najlepsza jakość, zrównoważone albo oszczędnie i szybko.
 - Model, który do zadania się nie nadaje (np. synteza mowy w rozmowie), nie wejdzie do kolejki — z wyjaśnieniem.
 - Agentki w roli programistki korzystają z kolejki „Kod”, planujące i recenzujące — z kolejki „Planowanie”.
-- Model lokalny nie dopisuje już do odpowiedzi zmyślonych wywołań narzędzi w rodzaju `{"name": "get_status", …}`.
+- [poważne] Model lokalny nie dopisuje już do odpowiedzi zmyślonych wywołań narzędzi w rodzaju `{"name": "get_status", …}`.
 
 ### Głos
 
-- Rozmowa głosowa odpowiada. Wcześniej mikrofon słuchał, ale koniec wypowiedzi nigdy nie był wykrywany, więc nic nie
+- [krytyczne] Rozmowa głosowa odpowiada. Wcześniej mikrofon słuchał, ale koniec wypowiedzi nigdy nie był wykrywany, więc nic nie
   trafiało do rozpoznawania mowy ani do modelu.
 - Redukcja szumów mikrofonu ma trzy poziomy — wyłączona, standardowa i mocna (Ustawienia → Głos). Poza usuwaniem
   szumu działa filtr dudnienia wentylatorów i bramka, która ścisza tło między wypowiedziami.
-- Szum wentylatora nie jest już brany za mowę, więc nie przedłuża wypowiedzi i nie budzi rozpoznawania.
+- [poważne] Szum wentylatora nie jest już brany za mowę, więc nie przedłuża wypowiedzi i nie budzi rozpoznawania.
 - Test mikrofonu pokazuje dwa paski: sygnał po redukcji szumów i surowy sygnał z mikrofonu — widać, ile tła odcięto.
 
 ### Testy
@@ -445,29 +478,29 @@ raport: `docs/reviews/2026-10-09-przeglad-kluczy-api.md`.
   przecinka, znaków nowej linii i znaków niewidocznych.
 - Zdanie zamiast klucza, klucz innego dostawcy albo token logowania Claude Code są rozpoznawane, zanim cokolwiek
   zostanie wysłane.
-- Klucz bez prawa do listy modeli działa po wpisaniu nazwy modelu — wcześniej takie konto było bezużyteczne.
+- [poważne] Klucz bez prawa do listy modeli działa po wpisaniu nazwy modelu — wcześniej takie konto było bezużyteczne.
 - „Zmień klucz” przy koncie: nowy klucz jest najpierw sprawdzany, a poprzedni zostaje, dopóki dostawca nie rozpozna
   nowego. Limit zapytań, błąd sieci ani odmowa nie zastępują działającego klucza. Ustawienia konta (przypisania,
   limit) nie giną.
-- Zły klucz u Google i xAI (zgłaszany kodem 400) jest pokazywany jako zły klucz, a nie „błąd połączenia”.
+- [poważne] Zły klucz u Google i xAI (zgłaszany kodem 400) jest pokazywany jako zły klucz, a nie „błąd połączenia”.
 - OpenRouter i własne adresy bez listy modeli: Alfa mówi wprost, że klucza nie da się sprawdzić z góry, i prosi
   o nazwę modelu — zamiast udawać, że test się udał.
-- Dwie linie pliku `.env` wklejone naraz nie są już sklejane w jeden „klucz”.
+- [poważne] Dwie linie pliku `.env` wklejone naraz nie są już sklejane w jeden „klucz”.
 - Konto można wyłączyć i włączyć bez usuwania klucza; włączenie przywraca stan z ostatniego testu.
 - Lista kont pokazuje powód ostatniego testu („brak środków na koncie”, „dostęp odmówiony”) i przycisk „Co zrobić”.
 - Ten sam klucz dodany drugi raz daje czytelną odmowę z nazwą istniejącego konta.
 - Mistral, DeepSeek, OpenRouter i Google nie pytają już o adres API — jest w katalogu.
-- Zmiana dostawcy w kreatorze czyści wpisany klucz i adres, żeby klucz nie poszedł na serwer innego dostawcy.
+- [krytyczne] Zmiana dostawcy w kreatorze czyści wpisany klucz i adres, żeby klucz nie poszedł na serwer innego dostawcy.
 - Gdy klucz może być dobry (brak środków, sieć, odmowa), konto można zostawić i sprawdzić ponownie później.
 
 ### Bezpieczeństwo
 
-- Odpowiedź dostawcy pokazywana w interfejsie ma zamaskowane wszystko, co wygląda jak klucz, i usunięte znaki
+- [poważne] Odpowiedź dostawcy pokazywana w interfejsie ma zamaskowane wszystko, co wygląda jak klucz, i usunięte znaki
   sterujące; jest obcinana do 400 znaków.
-- Rdzeń odrzuca tekst, który po sprzątaniu ma spacje albo znaki spoza ASCII — nie trafia on do Menedżera poświadczeń.
-- Adres własnego endpointu z danymi logowania przed `@` (np. `http://localhost:80@inny.host`) jest odrzucany.
-- Połączenia z dostawcami nie podążają za przekierowaniami, żeby klucz nie trafił pod inny adres.
-- Test i wymiana klucza nie wysyłają go do dostawcy, który został oznaczony jako zabroniony.
+- [poważne] Rdzeń odrzuca tekst, który po sprzątaniu ma spacje albo znaki spoza ASCII — nie trafia on do Menedżera poświadczeń.
+- [krytyczne] Adres własnego endpointu z danymi logowania przed `@` (np. `http://localhost:80@inny.host`) jest odrzucany.
+- [krytyczne] Połączenia z dostawcami nie podążają za przekierowaniami, żeby klucz nie trafił pod inny adres.
+- [krytyczne] Test i wymiana klucza nie wysyłają go do dostawcy, który został oznaczony jako zabroniony.
 
 ### Testy
 
@@ -497,19 +530,19 @@ Poprawki po przeglądzie wszystkich zmian od 0.0.1 (trzy niezależne przeglądy 
 - Styl „Szkło”: przycisk „nowe wiadomości”, podpowiedzi pola pisania i link „pomiń” mają kryjące tło; lista w palecie
   poleceń nie dostaje już zbędnego cienia.
 - Tryb wysokiego kontrastu Windows: suwaki i paski postępu wracają do wyglądu systemowego, żeby tor był widoczny.
-- Dwa równoległe wczytania tej samej rozmowy nie gubią już zdarzenia „Stop”; usunięcie aktywnej sesji otwiera następną
+- [poważne] Dwa równoległe wczytania tej samej rozmowy nie gubią już zdarzenia „Stop”; usunięcie aktywnej sesji otwiera następną
   raz, nie dwa.
-- Przycisk „Uruchom ponownie” po aktualizacji pyta rdzeń o blokadę (trwająca rozmowa głosowa, zadanie agentki) — nie
+- [poważne] Przycisk „Uruchom ponownie” po aktualizacji pyta rdzeń o blokadę (trwająca rozmowa głosowa, zadanie agentki) — nie
   zostaje wyłączony po jej ustaniu ani włączony wbrew stanowi.
 - Prawy panel przeciągnięty dokładnie na szerokość domyślną nie przeskakuje na szerokim oknie.
 
 ### Narzędzia agentek i rdzeń
 
-- Wyjście PowerShella ucięte limitem w środku znaku albo z pojedynczym obcym bajtem zostaje czytelne — wcześniej całe
+- [poważne] Wyjście PowerShella ucięte limitem w środku znaku albo z pojedynczym obcym bajtem zostaje czytelne — wcześniej całe
   zamieniało się w krzaczki.
-- Polecenia PowerShella zaczynające się od `using`, `param` albo `#requires` znów działają (dopisywany przedrostek
+- [poważne] Polecenia PowerShella zaczynające się od `using`, `param` albo `#requires` znów działają (dopisywany przedrostek
   kodowania robił z nich błąd składni).
-- Kolejka offline: sesja, której odpowiedź nie może wystartować, nie blokuje pozostałych; jej wiadomość zostaje w kolejce
+- [poważne] Kolejka offline: sesja, której odpowiedź nie może wystartować, nie blokuje pozostałych; jej wiadomość zostaje w kolejce
   i nie jest pokazywana jako wysłana.
 - `fs_stat` podaje prawdziwy rozmiar pliku także wtedy, gdy ścieżka różni się wielkością liter i rodzajem ukośnika.
 - „Co nowego”: pozycje nie urywają się na dwukropku („Szkło.”), skrót „ok.” nie kończy zdania, za długi wpis kończy się
@@ -608,7 +641,7 @@ i interfejsu, porządek w repozytorium. Bez nowych funkcji.
 
 ### Interfejs i skalowanie
 
-- Przy skali powyżej 100 % (każde okno od 1920 px) strona była wyższa niż okno i pole pisania lądowało pod dolną
+- [krytyczne] Przy skali powyżej 100 % (każde okno od 1920 px) strona była wyższa niż okno i pole pisania lądowało pod dolną
   krawędzią — naprawione.
 - Interfejs sam dopasowuje skalę do szerokości okna (1920 → 108 %, 2560 → 125 %, 3840 → 150 %); kolumna rozmowy rośnie
   z oknem; ustawienia są wyśrodkowane i podzielone na siedem grup.
@@ -623,29 +656,29 @@ i interfejsu, porządek w repozytorium. Bez nowych funkcji.
 
 - Model pobrany bez silnika daje czytelny komunikat z przyciskiem do „Modele i silniki”; kreator proponuje pakiet razem
   z silnikiem.
-- „Edytuj i wyślij ponownie” zachowuje załączniki; nieudany start odpowiedzi nie dubluje wiadomości.
-- Kolejka offline nie gubi wiadomości przy błędzie jednej sesji i nie wysyła wiadomości z sesji leżącej w koszu.
-- Sesja usunięta poza oknem nie zostaje „aktywna”; błąd w jednym zdarzeniu nie blokuje tury w stanie „pisze”;
+- [poważne] „Edytuj i wyślij ponownie” zachowuje załączniki; nieudany start odpowiedzi nie dubluje wiadomości.
+- [krytyczne] Kolejka offline nie gubi wiadomości przy błędzie jednej sesji i nie wysyła wiadomości z sesji leżącej w koszu.
+- [poważne] Sesja usunięta poza oknem nie zostaje „aktywna”; błąd w jednym zdarzeniu nie blokuje tury w stanie „pisze”;
   zamknięcie okna nie gubi szkicu.
 
 ### Głos
 
-- „Przeczytaj na głos” zawsze odmawiało (aplikacja nie miała dostępu do schowka) — naprawione.
+- [poważne] „Przeczytaj na głos” zawsze odmawiało (aplikacja nie miała dostępu do schowka) — naprawione.
 - Czytanie i dyktowanie bez silnika lub modelu mowy mówią, czego brakuje i gdzie to pobrać.
-- STOP WSZYSTKIEGO kończy także dyktowanie.
+- [poważne] STOP WSZYSTKIEGO kończy także dyktowanie.
 
 ### Narzędzia agentek
 
-- Odczyt pliku wczytuje tylko żądany fragment (duży plik nie zabija procesu); limit zapisu obejmuje plik po dopisaniu.
-- Nazwy urządzeń Windows (`nul`, `con`, `com1`…) są odrzucane jako ścieżki.
+- [krytyczne] Odczyt pliku wczytuje tylko żądany fragment (duży plik nie zabija procesu); limit zapisu obejmuje plik po dopisaniu.
+- [poważne] Nazwy urządzeń Windows (`nul`, `con`, `com1`…) są odrzucane jako ścieżki.
 - Wyjście poleceń PowerShell i `cmd` zachowuje polskie znaki.
-- Pobierane strony są dekodowane według kodowania serwera; za długie przekierowanie jest odmową.
-- Cofnięcie zmian po restarcie aplikacji usuwa też utworzone katalogi; nieudane „Cofnij” schowka można powtórzyć.
+- [poważne] Pobierane strony są dekodowane według kodowania serwera; za długie przekierowanie jest odmową.
+- [poważne] Cofnięcie zmian po restarcie aplikacji usuwa też utworzone katalogi; nieudane „Cofnij” schowka można powtórzyć.
 
 ### Modele, kopie i import
 
-- Nieudany start modelu nie zostawia „zajętej” pamięci; duże modele mają dłuższy limit czasu ładowania.
-- Kopia zapasowa nie powstaje w wersji nieszyfrowanej, gdy nie da się odczytać hasła.
+- [poważne] Nieudany start modelu nie zostawia „zajętej” pamięci; duże modele mają dłuższy limit czasu ładowania.
+- [krytyczne] Kopia zapasowa nie powstaje w wersji nieszyfrowanej, gdy nie da się odczytać hasła.
 - Import paczki pokazuje osobno elementy, których nie udało się zapisać.
 
 ### Porządek

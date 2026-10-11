@@ -10,11 +10,11 @@ use crate::core::AppCore;
 use crate::dto::{
     AboutInfo, AgentDraft, AttachmentInfo, AttachmentsAdded, BackupCheck, BackupConfig, BackupView,
     BrokerIntentResult, BuilderAgentInfo, BuilderDryRun, BuilderPolicyView, BuilderPreview,
-    BuilderProposal, BuilderSaved, ConversationFormat, EmbedderView, EvalSuiteView, EvalsView,
-    ExportResult, GuiScreenshot, GuiStatus, HealthView, ImproverView, ModelItem, ModelsView,
-    PluginInfo, PluginInspection, PluginsView, ReindexView, SecretInput, SkillImportResult,
-    SkillInfo, SkillReview, TaskInfo, TerminalProfileId, TerminalSession, TrustedHashes,
-    UpdatesView, WhatsNew,
+    BuilderProposal, BuilderSaved, ChangeLogEntry, ConversationFormat, EmbedderView, EvalSuiteView,
+    EvalsView, ExportResult, GuiScreenshot, GuiStatus, HealthView, ImproverView, ModelItem,
+    ModelsView, PluginInfo, PluginInspection, PluginsView, ReindexView, SecretInput,
+    SkillImportResult, SkillInfo, SkillReview, TaskInfo, TerminalProfileId, TerminalSession,
+    TrustedHashes, UpdatesView, WhatsNew,
 };
 use crate::error::AppError;
 
@@ -80,6 +80,7 @@ work_commands! {
     wait updates_about() -> AboutInfo = updates.about();
     wait updates_whats_new() -> Option<WhatsNew> = updates.whats_new();
     wait updates_dismiss_whats_new() -> () = updates.dismiss_whats_new();
+    wait updates_history() -> Vec<ChangeLogEntry> = updates.history();
     res plugins_list() -> PluginsView = plugins.list();
     wait plugins_inspect(wasm_b64: String) -> PluginInspection = plugins.inspect(&wasm_b64);
     wait plugins_propose(manifest: serde_json::Value, wasm_b64: String) -> PluginInfo = plugins.propose(manifest, &wasm_b64);

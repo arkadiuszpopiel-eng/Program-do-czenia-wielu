@@ -112,7 +112,7 @@ Zlecenie właściciela z 2026-10-09. Kolejność: najpierw kamery i opis obrazu 
 | C3.2  | Kamery USB na Windows (Media Foundation)                                                                                   | w toku    | —          | kod w `platform-windows-impl/src/camera/` (wersja 0.0.16); **niesprawdzone na prawdziwej kamerze** — kamera laptopa odłączona sprzętowo                              |
 | C3.3  | Hub kamer: rejestr, kilka strumieni naraz, usypianie, klatka na żądanie, podgląd, przełącznik główny i kill-switch         | zrobione  | 2026-10-10 | wersja 0.0.16; moduł `camera-hub` (contract, fake, impl), testy na atrapie portu; zdarzenia magistrali i kamery sieciowe — dalej                                     |
 | C3.4  | Strona Ustawień „Kamery” i wskaźnik kamery w belce oraz pigułce głosowej                                                   | zrobione  | 2026-10-10 | wersja 0.0.16; strona „Kamery”, wskaźnik w belce i w pigułce głosowej (0.0.18); 3 style × 2 motywy                                                                       |
-| C3.5  | Kamery sieciowe: RTSP, wyszukiwanie ONVIF w sieci lokalnej, hasła w Credential Manager, dekoder w osobnym procesie         | planowane | —          | dotyka `lib-netguard` (lista adresów) — uzgodnić zakres z właścicielem                                                                                               |
+| C3.5  | Kamery sieciowe: RTSP, wyszukiwanie ONVIF w sieci lokalnej, hasła w Credential Manager, dekoder w osobnym procesie         | do zrobienia | —          | zgoda właściciela 2026-10-11 na bibliotekę dekodującą obraz i pracę w sieci lokalnej; zmiany w `lib-netguard` nadal z przeglądem właściciela                                                                                               |
 | C3.6  | Model widzący lokalnie: wybór modelu, pomiar pamięci karty razem z modelem rozmowy na 6 GB                                 | czeka     | —          | zgoda właściciela na pobranie modelu; technologia do sprawdzenia ([`11`](11-technologie-2026-10.md))                                                                 |
 | C3.7  | Narzędzie `camera.look` i opis obrazu („opisz mi to, co widzisz”): droga lokalna i chmurowa za zgodą, miniatura w rozmowie | w toku    | —          | 0.0.16: zdjęcie z kamery jako załącznik (przycisk); 0.0.17: prośba „opisz mi to, co widzisz” w tekście sama dołącza zdjęcie (`logic/camera-look.ts`). Dalej: to samo w rozmowie głosowej i narzędzie `camera.look` dla agentek (zdolność Brokera — decyzja właściciela) |
 | C3.8  | Wykrywanie twarzy i wzorzec twarzy (ONNX Runtime na procesorze); wybór modeli po sprawdzeniu licencji                      | czeka     | —          | podpis ADR 0025; zgoda na pobranie modeli                                                                                                                            |
@@ -127,6 +127,21 @@ Zlecenie właściciela z 2026-10-09. Kolejność: najpierw kamery i opis obrazu 
 **Wyjście z C3:** „opisz mi to, co widzisz” działa na laptopie właściciela z co najmniej dwiema kamerami naraz;
 Alfa rozpoznaje zapisane osoby po restarcie i pamięta, o czym z każdą rozmawiała; żadne kryterium prywatności
 z ADR 0025 nie jest złamane (testy w prawdziwej aplikacji).
+
+### C4 — strony Ustawień oznaczone „wkrótce” (spis: [`14-funkcje-wkrotce.md`](14-funkcje-wkrotce.md))
+
+Zgłoszenie właściciela z 2026-10-11: funkcje ze znakiem „wkrótce” mają być zapisane w planie. Test
+`app-core/tests/soon_inventory.rs` pilnuje, żeby każda taka strona miała tu zadanie.
+
+| ID   | Zadanie                                                                                                   | Stan      | Data | Uwagi                                                                                          |
+| ---- | --------------------------------------------------------------------------------------------------------- | --------- | ---- | ---------------------------------------------------------------------------------------------- |
+| C4.1 | Strona „Router i reguły”: klasy zadań i zapas w oknie, tagi prywatności i jurysdykcji                     | planowane | —    | Router już działa; brakuje widoku i edycji reguł (dziś tylko plik)                             |
+| C4.2 | Strona „Logi i prywatność”: retencja i redakcja logów, widok „co poszło do chmury”                        | czeka     | —    | widok czyta audyt i tagi prywatności — obszar Jądra; zakres uzgodnić z właścicielem            |
+| C4.3 | Strona „Moduły”: lista modułów ze stanem, włącz / wyłącz, budżety RAM i CPU                               | planowane | —    | bez Brokera, watchdoga, audytu i kill-switcha (reguła twarda); część danych jest w „Zdrowie systemu” |
+| C4.4 | Strona „Zaawansowane”: edytor surowy TOML ze sprawdzaniem schematu, flagi eksperymentalne                 | planowane | —    | klucze polityki Jądra tylko do odczytu (rdzeń je odrzuca)                                      |
+
+**Wyjście z C4:** w nawigacji Ustawień nie ma znaku „wkrótce”; każda strona przechodzi przegląd w trzech stylach
+i dwóch motywach.
 
 ## Etap D — Host bez okna i protokół zdalny
 
@@ -219,15 +234,15 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | ADR 0026 — głos z chmury jako opcja | C1.1a |
 | Czy obraz z kamery może iść do modelu w chmurze    | C3.7 (droga chmurowa)                 |
 | Zgoda na pobranie modelu widzącego i modeli twarzy | C3.6, C3.8                            |
-| Kamery sieciowe: nowa zależność do dekodowania obrazu (JPEG dla kamer HTTP/MJPEG albo H.264 dla RTSP) i zakres dostępu do sieci lokalnej | C3.5 |
-| Akceptacja i progi zestawu `evals/V6/pl-core` | C2.1 (bramka w CI) |
-| Generator typów: `schemars` + własny skrypt zamiast `tauri-specta`/`ts-rs` (ADR 0013); wyliczenia w Rust czy zawężanie w oknie dla 19 typów | B.1 (etap 2) |
+| Zakres widoku „co poszło do chmury” (czyta audyt i tagi prywatności) | C4.2 |
+| Progi liczbowe zestawu `evals/V6/pl-core` (zestaw zaakceptowany do pracy 2026-10-11) | C2.1 (bramka w CI) |
 | Progi nowych kryteriów w `ACCEPTANCE.md`           | wyjście z C, D, E, F, G               |
 
 ## Dziennik roadmapy
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-11 | Wersja 0.0.23: historia zmian w Aktualizacjach (wagi krytyczna / poważna / zwykła), spis funkcji „wkrótce” (dokument [`14`](14-funkcje-wkrotce.md)) i nowa grupa C4. Zgoda właściciela na: kamery sieciowe (C3.5), `schemars` w generatorze typów (B.1), dalszą pracę nad zestawem `evals/V6/pl-core` (C2.1). |
 | 2026-10-11 | Wersja 0.0.22: C2.1 — szkic zestawu ewaluacyjnego po polsku (`evals/V6/pl-core`), do akceptacji właściciela. C3.5 (kamery sieciowe) wstrzymane: wymaga nowej zależności do dekodowania obrazu — decyzja właściciela. |
 | 2026-10-11 | Wersja 0.0.21: B.1 etap 1 — schemat łącza i typy TS generowane z Rusta, kontrola zgodności w kompilacji, bramce i CI. |
 | 2026-10-11 | Wersja 0.0.20: C2.14 (sprawdzanie kluczy w tle, wiek klucza) i C2.15 (konto zapasowe tego samego dostawcy). |

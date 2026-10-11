@@ -191,6 +191,7 @@ macro_rules! with_commands {
             updates_about() -> $crate::dto::AboutInfo;
             updates_whats_new() -> Option<$crate::dto::WhatsNew>;
             updates_dismiss_whats_new() -> ();
+            updates_history() -> Vec<$crate::dto::ChangeLogEntry>;
             plugins_list() -> $crate::dto::PluginsView;
             plugins_inspect(wasm_b64: String) -> $crate::dto::PluginInspection;
             plugins_propose(manifest: serde_json::Value, wasm_b64: String) -> $crate::dto::PluginInfo;
@@ -259,6 +260,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 226);
+        assert_eq!(super::COMMANDS.len(), 227);
     }
 }

@@ -16,6 +16,7 @@ pub fn spec(command: &str) -> Option<Spec> {
         "updates_restart" | "updates_dismiss_whats_new" => (vec![], unit),
         "updates_about" => (vec![], roundtrip::<AboutInfo>),
         "updates_whats_new" => (vec![], roundtrip::<Option<WhatsNew>>),
+        "updates_history" => (vec![], roundtrip::<Vec<ChangeLogEntry>>),
         _ => return None,
     })
 }

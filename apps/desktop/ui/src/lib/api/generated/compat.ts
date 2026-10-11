@@ -22,7 +22,7 @@ import type * as H13 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 260 typów wspólnych, 501 sprawdzeń. */
+/** 263 typów wspólnych, 507 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H11.AboutInfo>>,
   Expect<Fits<H11.AboutInfo, G.AboutInfo>>,
@@ -122,6 +122,12 @@ export type IpcCompat = [
   Expect<Fits<H3.CamerasState, G.CamerasState>>,
   Expect<Fits<G.CastTemplateId, H0.CastTemplateId>>,
   Expect<Fits<H0.CastTemplateId, G.CastTemplateId>>,
+  Expect<Fits<G.ChangeItem, H11.ChangeItem>>,
+  Expect<Fits<H11.ChangeItem, G.ChangeItem>>,
+  Expect<Fits<G.ChangeLogEntry, H11.ChangeLogEntry>>,
+  Expect<Fits<H11.ChangeLogEntry, G.ChangeLogEntry>>,
+  Expect<Fits<G.ChangeSeverity, H11.ChangeSeverity>>,
+  Expect<Fits<H11.ChangeSeverity, G.ChangeSeverity>>,
   Expect<Fits<G.CollisionResolution, H5.CollisionResolution>>,
   Expect<Fits<H5.CollisionResolution, G.CollisionResolution>>,
   Expect<Fits<G.ComplianceStatus, H5.ComplianceStatus>>,
