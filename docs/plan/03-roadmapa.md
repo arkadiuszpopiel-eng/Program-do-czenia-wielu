@@ -70,8 +70,8 @@ Bez nowych funkcji dla użytkownika; każde zadanie kończy się tym, że wszyst
 
 | ID   | Zadanie                                                   | Stan      | Data | Uwagi                           |
 | ---- | --------------------------------------------------------- | --------- | ---- | ------------------------------- |
-| C1.1 | Jakość głosu (WER PL, przerwania, cztery głosy)           | czeka     | —    | korpus nagrań od właściciela    |
-| C1.1a | Głos agentek z chmury jako opcja (adapter mowy przez konto API, zapas lokalny, nigdy w sesji prywatnej) | czeka | — | decyzja właściciela: ADR 0026 |
+| C1.1 | Jakość głosu (WER PL, przerwania, cztery głosy)           | czeka     | —    | korpus nagrań od właściciela; cztery głosy — grupa C5 |
+| C1.1a | Głos agentek z chmury jako opcja (adapter mowy przez konto API, zapas lokalny, nigdy w sesji prywatnej) | czeka | — | po grupie C5 — właściciel wybrał 2026-10-11 głos lokalny (koszt chmury); ADR 0026 |
 | C1.2 | Mosty CLI, klucze i dostawcy chmurowi na żywo             | czeka     | —    | logowanie i klucze — właściciel |
 | C1.3 | Sterowanie komputerem (UIA, ekran, wejście)               | czeka     | —    | po decyzji P2-01                |
 | C1.4 | Pamięć i transfer: recall@5, migracje, round-trip `.alfa` | czeka     | —    | recall możliwy zaraz po A.4     |
@@ -142,6 +142,25 @@ Zgłoszenie właściciela z 2026-10-11: funkcje ze znakiem „wkrótce” mają 
 
 **Wyjście z C4:** w nawigacji Ustawień nie ma znaku „wkrótce”; każda strona przechodzi przegląd w trzech stylach
 i dwóch motywach.
+
+### C5 — głos lokalny wysokiej jakości (opis: [`15-glos-lokalny.md`](15-glos-lokalny.md))
+
+Decyzja właściciela z 2026-10-11: lepszy głos ma być lokalny, nie z chmury. Dwa poziomy — „Naturalny” na karcie
+graficznej i „Szybki” na procesorze — przełączane automatycznie.
+
+| ID   | Zadanie                                                                                                              | Stan         | Data | Uwagi                                                                              |
+| ---- | -------------------------------------------------------------------------------------------------------------------- | ------------ | ---- | ---------------------------------------------------------------------------------- |
+| C5.1 | Licencje i źródła u źródła: pliki LICENSE silników i wag, stan znaku wodnego, pochodzenie wpisu „Pocket TTS PL”      | do zrobienia | —    | wynik w `docs/vendor/`; bez pobierania modeli                                      |
+| C5.2 | Stanowisko pomiarowe głosu i odsłuch: 20 zdań po polsku, pierwszy dźwięk, szybkość, pamięć karty                     | czeka        | —    | zgoda właściciela na pobranie ok. 1,5 GB; progi z dokumentu 15 do zatwierdzenia    |
+| C5.3 | Silnik Chatterbox Multilingual jako proces poboczny bez Pythona (`chatterbox.cpp`) za `TtsBackend`                   | czeka        | —    | po C5.2 — tylko jeśli przejdzie odsłuch i progi                                    |
+| C5.4 | Głos szybki na procesorze: próba Supertonic 3 (`tract` albo proces poboczny); do tego czasu Piper                    | czeka        | —    | zgoda na pobranie; licencja wag OpenRAIL-M do przeczytania; repozytorium archiwalne |
+| C5.5 | Automatyczny wybór poziomu głosu (wolna karta, bateria, budżet opóźnienia) i ustawienie w zakładce „Głos”            | planowane    | —    | po C5.3                                                                            |
+| C5.6 | Cztery głosy wzorcowe agentek z krótkich próbek                                                                      | czeka        | —    | decyzja właściciela: skąd próbki; nigdy głos prawdziwej osoby bez jej zgody        |
+| C5.7 | Karta licencji każdego silnika i głosu w programie; oznaczenie mowy syntetycznej (znak wodny)                        | planowane    | —    | łączy się z C2.9 (art. 50) i C2.10 (SBOM); decyzja o znaku wodnym                  |
+
+**Wyjście z C5:** właściciel w odsłuchu 20 zdań ocenia głos jako wyraźnie lepszy od Pipera; cztery agentki mają
+różne głosy; pierwszy dźwięk mieści się w budżecie z `docs/VOICE.md` na laptopie bazowym; rozmowa nie urywa się,
+gdy karta jest zajęta (przełączenie na poziom szybki).
 
 ## Etap D — Host bez okna i protokół zdalny
 
@@ -229,9 +248,11 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | Ustalenia bezpieczeństwa (B-…, S-…, C-…, R-…, P-…) | A.7, A.8, B.7                         |
 | Podpis pod ADR 0017–0018                           | B.4, B.7, G                           |
 | Podpis pod ADR 0019–0023                           | D, E, F                               |
-| ADR 0024 — licencja silnika mowy                   | C1.1 (wybór głosu), wydanie publiczne |
+| ADR 0024 — licencja silnika mowy                   | C1.1 (wybór głosu), C5.3 (dołączenie do wydania), wydanie publiczne |
 | ADR 0025 — kamery i biometria twarzy               | C3.8–C3.13                            |
 | ADR 0026 — głos z chmury jako opcja | C1.1a |
+| Zgoda na pobranie silników mowy do próby (ok. 1,5 GB) | C5.2, C5.4 |
+| Znak wodny w mowie syntetycznej; skąd głosy wzorcowe agentek | C5.6, C5.7 |
 | Czy obraz z kamery może iść do modelu w chmurze    | C3.7 (droga chmurowa)                 |
 | Zgoda na pobranie modelu widzącego i modeli twarzy | C3.6, C3.8                            |
 | Zakres widoku „co poszło do chmury” (czyta audyt i tagi prywatności) | C4.2 |
@@ -242,6 +263,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-11 | Wersja 0.0.25: dodatek o głosie lokalnym (dokument [`15`](15-glos-lokalny.md)) i nowa grupa C5. Decyzja właściciela: lepszy głos lokalnie (Chatterbox Multilingual + głos szybki na procesorze), chmura (C1.1a) na koniec kolejki. |
 | 2026-10-11 | Wersja 0.0.24: zautomatyzowany przegląd okien, paneli i skrótów (`e2e/review-sweep.spec.ts`, raport w `docs/reviews/2026-10-11-przeglad-okien-i-skrotow.md`); naprawione szukanie w sesjach na oknie szerokości laptopa. |
 | 2026-10-11 | Wersja 0.0.23: historia zmian w Aktualizacjach (wagi krytyczna / poważna / zwykła), spis funkcji „wkrótce” (dokument [`14`](14-funkcje-wkrotce.md)) i nowa grupa C4. Zgoda właściciela na: kamery sieciowe (C3.5), `schemars` w generatorze typów (B.1), dalszą pracę nad zestawem `evals/V6/pl-core` (C2.1). |
 | 2026-10-11 | Wersja 0.0.22: C2.1 — szkic zestawu ewaluacyjnego po polsku (`evals/V6/pl-core`), do akceptacji właściciela. C3.5 (kamery sieciowe) wstrzymane: wymaga nowej zależności do dekodowania obrazu — decyzja właściciela. |

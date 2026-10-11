@@ -1,6 +1,6 @@
 # 14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów
 
-Stan na **2026-10-11**, wersja 0.0.24. Zgłoszenie właściciela: „w programie jest dużo funkcji z informacją
+Stan na **2026-10-11**, wersja 0.0.25. Zgłoszenie właściciela: „w programie jest dużo funkcji z informacją
 «wkrótce» — czy wszystko jest zanotowane?”. Ten dokument jest spisem: każde miejsce w programie, które mówi
 „wkrótce” albo „funkcja dostępna po podłączeniu modułu”, ma tu wiersz i zadanie w
 [roadmapie](03-roadmapa.md). Test `app-core/tests/soon_inventory.rs` nie przejdzie, jeśli w Ustawieniach
@@ -60,7 +60,8 @@ Tych miejsc program nie pokazuje wcale (nie ma znaku „wkrótce”), ale są w 
 | Kamery sieciowe (IP, Wi-Fi)                                    | C3.5          | zgoda właściciela z 2026-10-11; do zrobienia |
 | Opis obrazu modelem lokalnym, narzędzie `camera.look`          | C3.6, C3.7    | czeka na pobranie modelu i zdolność Brokera |
 | Rozpoznawanie zapisanych osób i pamięć osób, strona „Osoby”    | C3.8–C3.13    | czeka na podpis ADR 0025                  |
-| Głos z chmury albo nowy głos lokalny                           | C1.1, C1.1a   | czeka na ocenę głosu i ADR 0024/0026      |
+| Nowy głos lokalny: poziom naturalny i szybki, cztery głosy agentek | C5.1–C5.7 | wybrane 2026-10-11; czeka na zgodę na pobranie do próby |
+| Głos z chmury jako opcja                                       | C1.1a         | po C5; ADR 0026                           |
 | Kanwa artefaktów, zadania zaplanowane z budżetem, MCP 2026-07-28 | C2.5–C2.8     | planowane                                 |
 | Oznaczanie treści AI (termin prawny 2026-12-02)                | C2.9          | planowane                                 |
 | Panel WWW, telefon, Linux                                      | etapy D, E, F, G | czekają na podpis ADR 0017–0023           |

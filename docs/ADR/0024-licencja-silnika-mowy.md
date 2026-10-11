@@ -2,7 +2,7 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na podpis właściciela (brak rekomendowanej decyzji; to pytanie do właściciela) |
+| Status | Proponowany — czeka na podpis właściciela; od 2026-10-11 z opcją zalecaną (C z zapasem B) |
 | Data | 2026-10-09 |
 | Powiązane | plan v6: `docs/plan/04-nowe-funkcje.md` (sprawy do rozstrzygnięcia), `03-roadmapa.md` (C1.1, decyzje blokujące); ADR 0004, 0011; `docs/modules/voice-tts/SPEC.md` |
 | Zmienia | potencjalnie ADR 0011 (Piper pl_PL jako zapasowy silnik TTS v0) — zależnie od wybranej opcji |
@@ -42,6 +42,29 @@ Wspólne dla wszystkich opcji (propozycja, niezależna od wyboru):
 | Karty licencji | każdy silnik i głos dostaje w programie kartę: skąd pochodzi, na jakiej licencji, do czego wolno go użyć (pozycja z katalogu funkcji) |
 | SBOM | silnik mowy i głosy trafiają do listy składników wydania (C2.10) |
 | Konsultacja prawna | przed wydaniem komercyjnym — po stronie właściciela (podział ról w planie v6) |
+
+## Uzupełnienie z 2026-10-11 — opcja zalecana
+
+Analiza silników mowy ([`docs/plan/15-glos-lokalny.md`](../plan/15-glos-lokalny.md)) potwierdziła fakty u źródła
+i wskazała inny silnik główny. Właściciel zaakceptował rekomendację; podpis pod tym ADR jest nadal potrzebny
+przed wydaniem publicznym.
+
+| Ustalenie | Pewność |
+|---|---|
+| `OHF-Voice/piper1-gpl` jest na GPL-3.0 i wbudowuje espeak-ng | potwierdzone w repozytorium (2026-10-11) |
+| Chatterbox Multilingual V3: kod i wagi na MIT, polski na liście 23 języków | potwierdzone w repozytorium |
+| `chatterbox.cpp` (uruchomienie bez Pythona, ggml): MIT | potwierdzone w repozytorium |
+| Supertonic 3: kod MIT, wagi OpenRAIL-M; repozytorium zarchiwizowane 2026-09-09 | potwierdzone; treść licencji wag do przeczytania |
+| Oficjalny Pocket TTS nie ma języka polskiego (6 języków) | źródło pierwotne i wtórne; wpis „Pocket TTS PL” w kodzie do wyjaśnienia (C5.1) |
+
+**Opcja zalecana: C z zapasem B.** Głosem głównym zostaje Chatterbox Multilingual (MIT) uruchamiany jako osobny
+proces; zapasem — przypięte wydanie Pipera na MIT z głosem o sprawdzonej licencji. Następcy Pipera na GPL-3.0
+nie dołączamy. Zdanie „Pocket TTS pozostaje silnikiem głównym v0” z tabeli wyżej przestaje obowiązywać po
+wykonaniu C5.1 — w praktyce i tak mówi wyłącznie Piper.
+
+Co to zmienia w ryzykach: znika pytanie o GPL przy wspólnej dystrybucji; dochodzą — zależność od projektu
+społecznościowego bez numerowanych wydań (przypinamy konkretny commit i sumy SHA-256 wag) oraz znak wodny
+w mowie Chatterboxa (decyzja właściciela, zadanie C5.7).
 
 ## Alternatywy (odrzucone)
 

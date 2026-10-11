@@ -2,7 +2,7 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na decyzję właściciela |
+| Status | Proponowany — od 2026-10-11 opcja drugorzędna: właściciel wybrał głos lokalny (patrz uzupełnienie) |
 | Data | 2026-10-10 |
 | Powiązane | zgłoszenie właściciela z 2026-10-09 („głos sztywny i niemiły”); ADR 0011 (silniki mowy v0), ADR 0024 (licencja silnika mowy); `docs/modules/voice-tts/SPEC.md`; `docs/plan/13-podsumowanie-i-dalsze-kroki.md` |
 | Zmienia | ADR 0011 w części „chmura w kolejnej fali” — proponuje konkretny, opcjonalny adapter |
@@ -43,6 +43,22 @@ konta i ustawień. Sesja nie zrobiła tego bez właściciela, bo adapter używa 
 | Którą drogą iść | B jako opcja teraz, A po rozstrzygnięciu ADR 0024 | tylko A · tylko B |
 | Który dostawca pierwszy | ten, do którego właściciel ma już klucz | inny dostawca z lepszym polskim głosem — po próbie |
 | Kiedy chmura, kiedy lokalnie | chmura w profilach „Hybryda” i „Chmura”, lokalnie w „Lokalny” | zawsze chmura, gdy włączona |
+
+## Uzupełnienie z 2026-10-11 — decyzja właściciela co do kierunku
+
+Właściciel odrzucił chmurę jako drogę do lepszego głosu z powodu kosztu i wybrał drogę A (głos lokalny).
+W pytaniu „Którą drogą iść” obowiązuje więc **tylko A teraz; B ewentualnie później jako opcja**.
+
+| Usługa | Cena za 1 mln znaków (źródła wtórne) | Przy 30 min mowy dziennie (ok. 0,8 mln znaków na miesiąc) |
+|---|---|---|
+| ElevenLabs Multilingual / Flash | ok. 100 / 50 USD | 40–80 USD |
+| Cartesia | ok. 37 USD | ok. 30 USD |
+| OpenAI `gpt-4o-mini-tts` | ok. 16 USD | ok. 13 USD |
+| Google, Amazon Polly | ok. 4 USD | ok. 3 USD |
+
+Pozostałe punkty propozycji (domyślnie wyłączony, nigdy w sesji prywatnej, tylko tekst zdania, koszt w limitach)
+zostają aktualne na wypadek, gdyby opcja B była kiedyś budowana. Zadanie C1.1a jest w kolejce po grupie C5.
+Szczegóły i porównanie silników lokalnych: [`docs/plan/15-glos-lokalny.md`](../plan/15-glos-lokalny.md).
 
 ## Konsekwencje
 

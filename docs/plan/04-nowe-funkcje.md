@@ -109,7 +109,7 @@ Poza zakresem: wspólny magazyn kluczy dla zespołu i logowanie jednokrotne — 
 
 | Sprawa                                                     | Opcje                                                                        | Kto                                  |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------ |
-| Silnik mowy: następca Pipera ma licencję GPL-3.0           | osobny proces + opinia prawna / starsze wydanie na MIT / inny silnik         | właściciel (ADR 0024)                |
+| Silnik mowy: następca Pipera ma licencję GPL-3.0           | osobny proces + opinia prawna / starsze wydanie na MIT / inny silnik         | właściciel (ADR 0024); zalecane od 2026-10-11: inny silnik — [dokument 15](15-glos-lokalny.md) |
 | Klucz API w przeglądarce (tryb bez komputera w panelu WWW) | nie przechowywać (tylko Android) / przechowywać zaszyfrowany kluczem dostępu | właściciel (ADR 0023)                |
 | Wybór rozpoznawania mowy: Whisper turbo czy Parakeet v3    | pomiar WER na polskim korpusie                                               | sesja mierzy, właściciel ustala próg |
 | Wybór embeddera i rerankera dla polskiego                  | pomiar recall@5 na własnym zestawie                                          | jak wyżej                            |

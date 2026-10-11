@@ -58,8 +58,14 @@ istnienia Bielika v3 mniejszego niż 5 mld parametrów (istotne dla telefonu —
 | NVIDIA Parakeet-TDT-0.6b-v3            | 25 języków w tym polski (WER ok. 7,3 % na FLEURS), CC-BY-4.0                   | P       | huggingface.co/nvidia/parakeet-tdt-0.6b-v3 | kandydat — rozstrzyga pomiar na własnym korpusie  |
 | Silero VAD v6                          | dostępny w ONNX                                                                | W       | —                                          | już używamy Silero                                |
 | Piper — głosy polskie                  | `gosia`, `darkman`, `mc_speech` i inne                                         | P       | huggingface.co/rhasspy/piper-voices        | zostaje                                           |
-| Piper — licencja                       | pierwotne repozytorium zarchiwizowane 2025-10; następca na GPL-3.0             | W       | —                                          | **ADR 0024**                                      |
-| Kokoro, Kyutai, Moonshine              | bez polskiego                                                                  | W / P   | kyutai.org                                 | nie                                               |
+| Piper — licencja                       | pierwotne repozytorium zarchiwizowane 2025-10 (W); następca na GPL-3.0 (P)     | P / W   | github.com/OHF-Voice/piper1-gpl            | **ADR 0024**; zostaje tylko jako zapas            |
+| Chatterbox Multilingual V3             | 500 mln parametrów, 23 języki z polskim, MIT; własny głos z próbki 5–10 s      | P       | github.com/resemble-ai/chatterbox          | głos „naturalny” — [dokument 15](15-glos-lokalny.md) |
+| `chatterbox.cpp` (ggml)                | Chatterbox bez Pythona: procesor, CUDA, Vulkan; strumień dźwięku; MIT          | P       | github.com/gianni-cor/chatterbox.cpp       | sposób uruchomienia; brak wydań — przypiąć commit |
+| Supertonic 3                           | 99 mln parametrów, 31 języków z polskim, ONNX; wagi OpenRAIL-M; archiwum 2026-09 | P     | github.com/supertone-inc/supertonic        | głos „szybki” — po próbie i lekturze licencji     |
+| Pocket TTS (Kyutai)                    | 100 mln parametrów, procesor, MIT; 6 języków, **bez polskiego**                | P / W   | kyutai.org/tts                             | badawczo (otwarty przepis treningu)               |
+| Qwen3-TTS                              | Apache-2.0, 10 języków, bez polskiego                                          | P       | huggingface.co/Qwen                        | nie                                               |
+| XTTS v2, F5-TTS, Fish Speech, Higgs v3 | wagi tylko do użytku niekomercyjnego                                           | W       | —                                          | nie                                               |
+| Kokoro, Kyutai TTS 1.6B, Moonshine     | bez polskiego                                                                  | W / P   | kyutai.org                                 | nie                                               |
 | Pełny dupleks (PersonaPlex, Moshi)     | angielski, 16–24 GB                                                            | W       | —                                          | H.3                                               |
 | Słowo wywoławcze                       | Porcupine: koniec darmowego planu 2026-06; openWakeWord: ostatnie wydanie 2024 | W       | —                                          | opcja eksperymentalna; domyślnie „naciśnij i mów” |
 
@@ -135,7 +141,8 @@ repozytoriów, strony pakietów) — etykieta **W**; przed kodem każdą pozycj�
 1. Bielik v3: długość kontekstu, zachowanie przy wywołaniach narzędzi, tok/s na RTX 4050.
 2. Polskie zestawy do oceny wyszukiwania (PIRB, MTEB-pl) — wybór embeddera i rerankera.
 3. Praca w tle i usługa pierwszoplanowa w Tauri na Androidzie.
-4. Licencja następcy Pipera i licencje poszczególnych głosów.
+4. Głos lokalny: treść licencji OpenRAIL-M wag Supertonic 3, znak wodny w `chatterbox.cpp`, licencje
+   poszczególnych głosów Pipera, jakość polskiej mowy i opóźnienie na RTX 4050 (zadania C5.1 i C5.2).
 5. Oryginalne teksty: OWASP LLM Top 10 2026, rozporządzenia z [`10-zgodnosc-prawna.md`](10-zgodnosc-prawna.md).
 6. Wersje i ograniczenia: `snow`, biblioteki WebAuthn, WebRTC w WebView Androida.
 7. Dokładny numer wydania llama.cpp, w którym są tryb routera i `/v1/rerank` — przed podbiciem wersji silnika.

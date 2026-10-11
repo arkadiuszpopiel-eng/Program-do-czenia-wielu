@@ -12,6 +12,27 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.25 — 2026-10-11
+
+Plan lepszego głosu bez opłat za każde zdanie: zamiast głosu z chmury — dwa poziomy głosu lokalnego. W samym
+programie ta wersja niczego nie zmienia; to dodatek do planu po analizie silników mowy i konkurencji.
+
+### Plan
+
+- Kierunek głosu zmieniony z chmury na lokalny: poziom „Naturalny” (Chatterbox Multilingual na karcie graficznej,
+  cztery różne głosy agentek z krótkich próbek) i poziom „Szybki” na procesorze, przełączane automatycznie.
+  Opis, porównanie silników, koszty chmury i kryteria wyboru: `docs/plan/15-glos-lokalny.md`.
+- Nowa grupa zadań C5 w roadmapie (siedem zadań: licencje u źródła, stanowisko pomiarowe i odsłuch, silnik,
+  głos szybki, automatyczny wybór, głosy wzorcowe, karty licencji).
+- Głos z chmury (C1.1a) zostaje opcją wyłączoną domyślnie i schodzi na koniec kolejki — codzienna rozmowa
+  najlepszymi głosami kosztowałaby kilkadziesiąt dolarów miesięcznie.
+- Projekty decyzji 0024 i 0026 uzupełnione o wynik analizy; oba nadal czekają na podpis właściciela.
+
+### Czego nie sprawdzono
+
+- Żaden silnik nie został pobrany ani odsłuchany: jakość mowy po polsku i opóźnienie na karcie RTX 4050 są
+  niezmierzone. Pierwszym zadaniem jest pomiar (C5.2) — wymaga zgody na pobranie ok. 1,5 GB.
+
 ## 0.0.24 — 2026-10-11
 
 Przegląd każdego okna, panelu i skrótu — jako test, który powtarza się przy każdej zmianie — i poprawki z niego.
