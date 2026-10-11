@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::common::{Iso8601, LocalizedText};
 
 /// Stan akcji GUI agentki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum GuiActionStatus {
     Running,
@@ -17,7 +17,7 @@ pub enum GuiActionStatus {
 }
 
 /// Kto steruje teraz (wskaźnik w pasku tytułu).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct GuiControl {
     pub session_id: String,
     pub agent: String,
@@ -26,7 +26,7 @@ pub struct GuiControl {
 }
 
 /// Akcja GUI agentki (bez treści wpisywanej — tylko rodzaj, cel i wynik).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct GuiAction {
     pub id: u64,
     pub at: Iso8601,
@@ -41,7 +41,7 @@ pub struct GuiAction {
 }
 
 /// Metadane ostatniego zrzutu (piksele — tylko `gui_screenshot`, nigdy w zdarzeniach).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct GuiShotInfo {
     pub at: Iso8601,
     pub session_id: String,
@@ -53,7 +53,7 @@ pub struct GuiShotInfo {
 }
 
 /// Stan panelu „Ekran".
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct GuiStatus {
     pub available: bool,
     pub reason: Option<LocalizedText>,
@@ -64,14 +64,14 @@ pub struct GuiStatus {
 }
 
 /// Ostatni zrzut agentki (zamaskowany w porcie: okna Alfy/Brokera, deny-lista, pola haseł).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct GuiScreenshot {
     pub info: GuiShotInfo,
     pub data_url: String,
 }
 
 /// Profil terminala.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TerminalProfileId {
     Shell,
@@ -81,7 +81,7 @@ pub enum TerminalProfileId {
 }
 
 /// Otwarty terminal (bez treści).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TerminalSession {
     pub id: u64,
     pub profile: TerminalProfileId,
@@ -90,7 +90,7 @@ pub struct TerminalSession {
 }
 
 /// Ramka strumienia terminala — wyłącznie kanał `tauri::ipc::Channel` otwarcia (nigdy zdarzenia).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TerminalFrame {
     Output { data_b64: String },

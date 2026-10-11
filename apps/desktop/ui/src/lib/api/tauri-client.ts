@@ -6,15 +6,26 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { AlfaClient } from './client';
 import { toError } from './command-error';
 import { EventSequencer } from './event-sequencer';
+import type { IpcCommandName, IpcCommands } from './generated/ipc';
 import type { AlfaEvent, EventFrame } from './types-system';
-import type { TerminalFrame } from './types-work';
+import type { TerminalFrame, TerminalSession } from './types-work';
 
 /** Nazwa jedynego kanału zdarzeń rdzeń → UI (ramki `EventFrame`, najwyżej jedna na klatkę). */
 export const EVENTS_CHANNEL = 'alfa://events';
 
 // Odrzucenie zawsze jako `Error` (rdzeń odsyła `AppError` jako zwykły obiekt).
-const call = <T>(command: string, args?: Record<string, unknown>): Promise<T> =>
-  invoke<T>(command, args).catch((reason: unknown) => {
+// Nazwa komendy i nazwy argumentów są sprawdzane w czasie kompilacji z typami generowanymi
+// z Rusta (`generated/ipc.ts`): literówka w nazwie albo brak argumentu to błąd typów, nie
+// „command not found” w działającym programie.
+type CallArgs<K extends IpcCommandName> =
+  IpcCommands[K]['args'] extends Readonly<Record<string, never>>
+    ? []
+    : [args: IpcCommands[K]['args']];
+const call = <T, K extends IpcCommandName = IpcCommandName>(
+  command: K,
+  ...args: CallArgs<K>
+): Promise<T> =>
+  invoke<T>(command, args[0]).catch((reason: unknown) => {
     throw toError(reason);
   });
 
@@ -242,7 +253,13 @@ export class TauriAlfaClient implements AlfaClient {
     open: (profile, cols, rows, cwd, onFrame) => {
       const channel = new Channel<TerminalFrame>();
       channel.onmessage = onFrame;
-      return call('terminal_open', { profile, cols, rows, cwd, channel });
+      // Komenda ze strumieniem w kanale ma handler ręczny w powłoce — nie ma jej na liście
+      // generowanej z `with_commands!`, stąd wywołanie bez sprawdzania typów argumentów.
+      return invoke<TerminalSession>('terminal_open', { profile, cols, rows, cwd, channel }).catch(
+        (reason: unknown) => {
+          throw toError(reason);
+        },
+      );
     },
     input: (terminal, dataB64) => call('terminal_input', { terminal, dataB64 }),
     resize: (terminal, cols, rows) => call('terminal_resize', { terminal, cols, rows }),

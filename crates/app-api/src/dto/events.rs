@@ -21,7 +21,7 @@ use super::updates::UpdatesView;
 use super::voice_features::VoiceFeatures;
 
 /// Powód zakończenia strumienia.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum StopReason {
     End,
@@ -32,7 +32,7 @@ pub enum StopReason {
 }
 
 /// Rodzaj komunikatu rdzenia.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ToastKind {
     Info,
@@ -42,7 +42,7 @@ pub enum ToastKind {
 }
 
 /// Zdarzenie rdzeń → UI.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "type")]
 pub enum AlfaEvent {
     TurnAppended {
@@ -233,7 +233,7 @@ pub enum AlfaEvent {
 }
 
 /// Ramka zdarzeń `alfa://events`: paczka z numerami kolejnymi (plan v6 B.2, ADR 0019).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EventFrame {
     /// Wersja ramki.
     pub v: u8,
@@ -257,7 +257,7 @@ impl std::ops::Deref for EventFrame {
 }
 
 /// Wynik `events_resume`: brakujące ramki albo informacja, że trzeba wczytać stan od nowa.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EventsResume {
     /// Znacznik bieżącego uruchomienia rdzenia.
     pub epoch: String,

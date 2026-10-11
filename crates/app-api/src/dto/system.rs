@@ -8,7 +8,7 @@ use super::agents::VoiceSpeaker;
 use super::common::{Iso8601, Locale, LocalizedText, ModelProfile, px};
 
 /// Wartość ustawienia (`boolean | number | string`); liczba zachowuje postać całkowitą/ułamkową.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(untagged)]
 pub enum SettingValue {
     Bool(bool),
@@ -36,7 +36,7 @@ impl SettingValue {
 }
 
 /// Zakres ustawienia.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SettingScope {
     Global,
@@ -46,14 +46,14 @@ pub enum SettingScope {
 }
 
 /// Opcja listy wyboru.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SelectOption {
     pub value: String,
     pub label: LocalizedText,
 }
 
 /// Kontrolka ustawienia.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum SettingControl {
     Toggle,
@@ -70,7 +70,7 @@ pub enum SettingControl {
 }
 
 /// Definicja ustawienia.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SettingDef {
     pub key: String,
     pub label: LocalizedText,
@@ -81,7 +81,7 @@ pub struct SettingDef {
 }
 
 /// Strona z własnym widokiem.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SettingsCustomPage {
     Providers,
@@ -122,7 +122,7 @@ pub enum SettingsCustomPage {
 }
 
 /// Strona ustawień (drzewo §15).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SettingsPageDef {
     pub id: String,
     pub label: LocalizedText,
@@ -133,14 +133,14 @@ pub struct SettingsPageDef {
 }
 
 /// Limit zapytań u dostawcy.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RateLimitInfo {
     pub provider: String,
     pub resets_at: Iso8601,
 }
 
 /// Stan mikrofonu (uprawnienie/obecność).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MicAvailability {
     Ok,
@@ -149,14 +149,14 @@ pub enum MicAvailability {
 }
 
 /// Dysk.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct DiskInfo {
     pub free_bytes: u64,
     pub low: bool,
 }
 
 /// Stan systemu (PLAN §14.4).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SystemStatus {
     pub online: bool,
     pub queued_messages: u64,
@@ -168,7 +168,7 @@ pub struct SystemStatus {
 }
 
 /// Panel prawy.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PanelId {
     Agents,
@@ -182,7 +182,7 @@ pub enum PanelId {
 }
 
 /// Otwarte panele sesji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SessionPanels {
     pub left_open: bool,
     pub right_open: bool,
@@ -190,7 +190,7 @@ pub struct SessionPanels {
 }
 
 /// Układ okna (per maszyna).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct LayoutPrefs {
     #[serde(deserialize_with = "px::deserialize")]
     pub left_width: u32,
@@ -201,7 +201,7 @@ pub struct LayoutPrefs {
 }
 
 /// Dane startowe UI.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AppBootstrap {
     pub app_version: String,
     pub locale: Locale,
@@ -214,7 +214,7 @@ pub struct AppBootstrap {
 }
 
 /// Wynik Szybkiego pytania.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct QuickAskResult {
     pub session_id: String,
     pub user_turn_id: String,
@@ -222,7 +222,7 @@ pub struct QuickAskResult {
 }
 
 /// Stan mikrofonu w pigułce.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MicState {
     Off,
@@ -235,7 +235,7 @@ pub enum MicState {
 }
 
 /// Pigułka głosowa.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct VoicePillState {
     pub agent: String,
     pub mic: MicState,

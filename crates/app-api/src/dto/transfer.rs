@@ -9,7 +9,7 @@ use super::common::Iso8601;
 use super::hub::SecretInput;
 
 /// Zakres eksportu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ExportScope {
     pub config_common: bool,
     pub personas: bool,
@@ -24,7 +24,7 @@ pub struct ExportScope {
 }
 
 /// Żądanie eksportu. Hasło nigdy nie trafia do logów (`Debug` redaguje).
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, schemars::JsonSchema)]
 pub struct ExportRequest {
     pub scope: ExportScope,
     pub password: Option<SecretInput>,
@@ -40,7 +40,7 @@ impl fmt::Debug for ExportRequest {
 }
 
 /// Wynik eksportu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum ExportResult {
     Cancelled,
@@ -52,7 +52,7 @@ pub enum ExportResult {
 }
 
 /// Różnica elementu paczki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ItemDiff {
     New,
@@ -62,7 +62,7 @@ pub enum ItemDiff {
 }
 
 /// Rodzaj elementu paczki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum DryRunKind {
     Session,
@@ -73,7 +73,7 @@ pub enum DryRunKind {
 }
 
 /// Element podglądu importu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct DryRunItem {
     pub key: String,
     pub kind: DryRunKind,
@@ -82,7 +82,7 @@ pub struct DryRunItem {
 }
 
 /// Manifest paczki.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PackageManifestSummary {
     pub schema_version: String,
     pub app_version: String,
@@ -93,7 +93,7 @@ pub struct PackageManifestSummary {
 
 /// Wynik podglądu paczki. `handle` — jednorazowy uchwyt pliku dla następnego kroku (hasło,
 /// import); UI nigdy nie podaje ścieżki paczki.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum InspectResult {
     Cancelled,
@@ -110,7 +110,7 @@ pub enum InspectResult {
 }
 
 /// Tryb importu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ImportMode {
     Add,
@@ -119,7 +119,7 @@ pub enum ImportMode {
 }
 
 /// Rozwiązanie kolizji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum CollisionResolution {
     KeepLocal,
@@ -128,7 +128,7 @@ pub enum CollisionResolution {
 }
 
 /// Żądanie importu.
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, schemars::JsonSchema)]
 pub struct ImportRequest {
     /// Jednorazowy uchwyt z ostatniego `InspectResult`.
     pub handle: String,
@@ -149,7 +149,7 @@ impl fmt::Debug for ImportRequest {
 }
 
 /// Wynik importu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ImportResult {
     pub snapshot_id: String,
     pub imported: u64,

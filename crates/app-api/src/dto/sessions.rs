@@ -8,14 +8,14 @@ use super::agents::ToolIntent;
 use super::common::{AutonomyLevel, Iso8601, ModelProfile, Money};
 
 /// Projekt (folder sesji).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ProjectRef {
     pub id: String,
     pub name: String,
 }
 
 /// Pozycja listy sesji.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SessionSummary {
     pub id: String,
     pub title: String,
@@ -31,7 +31,7 @@ pub struct SessionSummary {
 }
 
 /// Szablon nowej sesji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SessionTemplate {
     Empty,
@@ -54,14 +54,14 @@ impl SessionTemplate {
 }
 
 /// Bilet cofnięcia usunięcia (10 s).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UndoTicket {
     pub token: String,
     pub expires_at: Iso8601,
 }
 
 /// Trafienie wyszukiwania pełnotekstowego.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SessionSearchHit {
     pub session_id: String,
     pub title: String,
@@ -70,7 +70,7 @@ pub struct SessionSearchHit {
 }
 
 /// Stan tury w widoku.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TurnStatus {
     Queued,
@@ -81,7 +81,7 @@ pub enum TurnStatus {
 }
 
 /// Rodzaj bloku treści.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum BlockKind {
     Text,
@@ -89,7 +89,7 @@ pub enum BlockKind {
 }
 
 /// Blok wyrenderowany w Rust (pulldown-cmark + ammonia).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RenderedBlock {
     pub index: u64,
     pub kind: BlockKind,
@@ -99,7 +99,7 @@ pub struct RenderedBlock {
 }
 
 /// Ikona kroku narzędzia.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ToolIcon {
     File,
@@ -111,7 +111,7 @@ pub enum ToolIcon {
 }
 
 /// Stan kroku narzędzia.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ToolStatus {
     Running,
@@ -120,7 +120,7 @@ pub enum ToolStatus {
 }
 
 /// Krok narzędzia.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ToolStep {
     pub id: String,
     pub icon: ToolIcon,
@@ -135,7 +135,7 @@ pub struct ToolStep {
 }
 
 /// Poziom ryzyka akcji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RiskLevel {
     Low,
@@ -144,7 +144,7 @@ pub enum RiskLevel {
 }
 
 /// Stan prośby o zatwierdzenie.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ApprovalStatus {
     Pending,
@@ -154,7 +154,7 @@ pub enum ApprovalStatus {
 }
 
 /// Karta „czeka na zatwierdzenie" (UI tylko przenosi do okna Brokera).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ApprovalPending {
     pub id: String,
     pub what: String,
@@ -171,7 +171,7 @@ pub struct ApprovalPending {
 }
 
 /// Zużycie i koszt tury.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TurnUsage {
     pub input_tokens: u64,
     pub output_tokens: u64,
@@ -182,7 +182,7 @@ pub struct TurnUsage {
 }
 
 /// Kod błędu tury.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TurnErrorCode {
     Offline,
@@ -194,7 +194,7 @@ pub enum TurnErrorCode {
 }
 
 /// Błąd tury.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TurnError {
     pub code: TurnErrorCode,
     pub message: String,
@@ -203,14 +203,14 @@ pub struct TurnError {
 }
 
 /// Blok „myślenie" (bez treści).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ThinkingInfo {
     pub duration_ms: u64,
     pub active: bool,
 }
 
 /// Tura (węzeł drzewa gałęzi, append-only).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Turn {
     pub id: String,
     pub session_id: String,
@@ -238,7 +238,7 @@ pub struct Turn {
 }
 
 /// Ocena tury.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Rating {
     Up,
@@ -246,21 +246,23 @@ pub enum Rating {
 }
 
 /// Adnotacje widoku (osobne rekordy, nie zmieniają tury).
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema,
+)]
 pub struct TurnAnnotation {
     pub rating: Option<Rating>,
     pub hidden: bool,
 }
 
 /// Całe drzewo tur sesji + adnotacje.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TurnsSnapshot {
     pub turns: Vec<Turn>,
     pub annotations: BTreeMap<String, TurnAnnotation>,
 }
 
 /// Opcje wysłania wiadomości.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SendOptions {
     pub parent_id: Option<String>,
     pub text: String,
@@ -272,14 +274,14 @@ pub struct SendOptions {
 }
 
 /// Wynik wysłania.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SendResult {
     pub user_turn_id: String,
     pub assistant_turn_id: Option<String>,
 }
 
 /// Zakres „zapamiętaj".
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RememberScope {
     Session,

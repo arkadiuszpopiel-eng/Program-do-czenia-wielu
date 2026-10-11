@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use super::common::LocalizedText;
 
 /// Gdzie działa Broker (ADR 0003).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum BrokerMode {
     /// Usługa Windows `AlfaBroker` na osobnym koncie (pełna izolacja, Broker-UI z wysoką
@@ -23,7 +23,7 @@ pub enum BrokerMode {
 }
 
 /// Stan łącza z Brokerem.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum BrokerLinkState {
     Connected,
@@ -33,7 +33,7 @@ pub enum BrokerLinkState {
 }
 
 /// Stan Brokera dla Ustawień → Uprawnienia i bezpieczeństwo oraz banera w oknie głównym.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BrokerStatusView {
     pub mode: BrokerMode,
     pub state: BrokerLinkState,

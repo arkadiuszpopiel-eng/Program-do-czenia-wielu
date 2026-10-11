@@ -70,6 +70,7 @@ Invoke-Gate 'Interfejs: typy (svelte-check)' { & pnpm check }
 Invoke-Gate 'Interfejs: testy jednostkowe (vitest)' { & pnpm --filter '@alfa/desktop-ui' test }
 Invoke-Gate 'Numer wersji spójny we wszystkich plikach' { & node scripts/set-version.mjs --check }
 Invoke-Gate 'Katalog modułów (docs/CATALOG.md)' { & node scripts/catalog.mjs }
+Invoke-Gate 'Typy TS łącza zgodne ze schematem z Rusta (generated/ipc.ts)' { & node scripts/gen-ipc-types.mjs --check }
 # Tylko porównanie: nieaktualna kopia w repozytorium ma zatrzymać bramkę, a nie po cichu się odświeżyć.
 Invoke-Gate 'Plan w HTML: aktualność i odnośniki (docs/html)' { & node scripts/docs-html.mjs --verify }
 

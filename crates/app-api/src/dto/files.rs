@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::common::Iso8601;
 
 /// Rodzaj załącznika (podgląd w UI i sposób przekazania modelowi).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AttachmentKind {
     Image,
@@ -15,7 +15,7 @@ pub enum AttachmentKind {
 }
 
 /// Co z treści załącznika trafi do modelu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AttachmentDelivery {
     /// Cała treść (tekst albo obraz).
@@ -28,7 +28,7 @@ pub enum AttachmentDelivery {
 
 /// Załącznik przygotowany w composerze (kopia w katalogu sesji `…\in`, jeszcze niewysłany).
 /// Podgląd w UI przez protokół zasobów (`path`), nigdy bajty przez IPC.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AttachmentInfo {
     pub id: String,
     pub session_id: String,
@@ -42,7 +42,7 @@ pub struct AttachmentInfo {
 }
 
 /// Powód odrzucenia pliku.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AttachmentRejectReason {
     TooLarge,
@@ -55,14 +55,14 @@ pub enum AttachmentRejectReason {
 }
 
 /// Odrzucony plik (nazwa bez ścieżki).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AttachmentRejection {
     pub name: String,
     pub reason: AttachmentRejectReason,
 }
 
 /// Wynik dodania plików: przyjęte i odrzucone z powodem; `staged` = wszystkie przygotowane.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AttachmentsAdded {
     pub added: Vec<AttachmentInfo>,
     pub rejected: Vec<AttachmentRejection>,
@@ -70,7 +70,7 @@ pub struct AttachmentsAdded {
 }
 
 /// Załącznik wysłanej tury (artefakt sesji).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TurnAttachment {
     pub name: String,
     pub mime: String,
@@ -80,7 +80,7 @@ pub struct TurnAttachment {
 }
 
 /// Format eksportu rozmowy.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ConversationFormat {
     Markdown,
@@ -88,7 +88,7 @@ pub enum ConversationFormat {
 }
 
 /// Ustawienia kopii zapasowych (per maszyna, `%LOCALAPPDATA%\Alfa\state\backup.json`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BackupConfig {
     pub enabled: bool,
     pub dir: Option<String>,
@@ -100,7 +100,7 @@ pub struct BackupConfig {
 }
 
 /// Plik kopii w katalogu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BackupEntry {
     pub file: String,
     pub path: String,
@@ -109,7 +109,7 @@ pub struct BackupEntry {
 }
 
 /// Stan kopii zapasowych.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BackupView {
     pub config: BackupConfig,
     pub password_set: bool,
@@ -121,7 +121,7 @@ pub struct BackupView {
 }
 
 /// Wynik próby przywrócenia (otwarcie, sumy kontrolne, dry-run — nic nie zapisuje).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BackupCheck {
     pub file: String,
     pub ok: bool,

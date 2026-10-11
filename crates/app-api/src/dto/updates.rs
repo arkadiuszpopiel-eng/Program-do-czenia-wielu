@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::common::{Iso8601, LocalizedText};
 
 /// Etap aktualizacji (`updater-contract::UpdatePhase`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum UpdatePhase {
     Disabled,
@@ -22,7 +22,7 @@ pub enum UpdatePhase {
 }
 
 /// Kanał aktualizacji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum UpdateChannel {
     Stable,
@@ -30,7 +30,7 @@ pub enum UpdateChannel {
 }
 
 /// Tryb aktualizacji (`updates.mode`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum UpdateMode {
     Auto,
@@ -39,7 +39,7 @@ pub enum UpdateMode {
 }
 
 /// Znalezione wydanie.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UpdateRelease {
     pub version: String,
     /// „Co nowego” z manifestu — UI pokazuje jako zwykły tekst.
@@ -47,7 +47,7 @@ pub struct UpdateRelease {
 }
 
 /// Postęp pobierania (także częściowy plik czekający na wznowienie).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UpdateProgress {
     pub downloaded: u64,
     pub total: Option<u64>,
@@ -55,7 +55,7 @@ pub struct UpdateProgress {
 }
 
 /// Stan aktualizacji dla „Ustawienia → Aktualizacje” i banera restartu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UpdatesView {
     pub phase: UpdatePhase,
     pub current: String,
@@ -74,7 +74,7 @@ pub struct UpdatesView {
 }
 
 /// Źródło licencji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum LicenseSource {
     Cargo,
@@ -82,7 +82,7 @@ pub enum LicenseSource {
 }
 
 /// Licencja zależności.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct LicenseEntry {
     pub name: String,
     pub version: String,
@@ -92,7 +92,7 @@ pub struct LicenseEntry {
 }
 
 /// „O programie”.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AboutInfo {
     pub version: String,
     pub channel: UpdateChannel,
@@ -108,7 +108,7 @@ pub struct AboutInfo {
 }
 
 /// „Co nowego” — raz po aktualizacji.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct WhatsNew {
     pub version: String,
     /// Notatki z podpisanej paczki (`notes.md`) — UI pokazuje jako zwykły tekst.

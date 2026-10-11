@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub use crate::details::{DetailValue, ErrorDetails};
 
 /// Kod błędu komendy (stabilny, do testów i ewentualnej logiki UI).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ErrorCode {
     /// Obiekt (sesja, tura, konto, artefakt…) nie istnieje.
@@ -44,7 +44,9 @@ impl ErrorCode {
 }
 
 /// Błąd komendy: kod i komunikat PL gotowy do pokazania użytkownikowi.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, thiserror::Error)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, thiserror::Error, schemars::JsonSchema,
+)]
 #[error("{message}")]
 pub struct AppError {
     /// Kod.

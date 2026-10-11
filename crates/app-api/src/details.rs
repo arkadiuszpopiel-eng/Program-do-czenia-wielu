@@ -40,7 +40,7 @@ const SECRET_PREFIXES: [&str; 11] = [
 ];
 
 /// Wartość szczegółu: tekst (identyfikator, wartość wyliczenia), liczba albo flaga.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(untagged)]
 pub enum DetailValue {
     /// Flaga.
@@ -82,7 +82,7 @@ impl From<String> for DetailValue {
 }
 
 /// Słownik szczegółów błędu (pusty = pole `details` nie jest wysyłane).
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(transparent)]
 pub struct ErrorDetails(#[serde(deserialize_with = "filtered")] BTreeMap<String, DetailValue>);
 

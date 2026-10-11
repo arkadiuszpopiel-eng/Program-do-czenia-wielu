@@ -8,7 +8,7 @@ use zeroize::Zeroizing;
 use super::common::{AutonomyLevel, Iso8601, LocalizedText, Money};
 
 /// Rodzaj usług dostawcy.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ProviderKind {
     Chat,
@@ -18,7 +18,7 @@ pub enum ProviderKind {
 }
 
 /// Status zgodności.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ComplianceStatus {
     Green,
@@ -28,7 +28,7 @@ pub enum ComplianceStatus {
 }
 
 /// Uwierzytelnienie.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AuthKind {
     ApiKey,
@@ -37,7 +37,7 @@ pub enum AuthKind {
 }
 
 /// Zgodność protokołu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum CompatKind {
     Openai,
@@ -46,7 +46,7 @@ pub enum CompatKind {
 }
 
 /// Wpis katalogu dostawców.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ProviderInfo {
     pub id: String,
     pub display_name: String,
@@ -61,7 +61,7 @@ pub struct ProviderInfo {
 }
 
 /// Stan konta w UI.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AccountState {
     Unconfigured,
@@ -73,7 +73,7 @@ pub enum AccountState {
 }
 
 /// Rodzaj modelu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelKind {
     Chat,
@@ -84,7 +84,7 @@ pub enum ModelKind {
 }
 
 /// Wynik importu jednej zmiennej środowiskowej (tylko nazwa zmiennej — nigdy wartość).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EnvImportResult {
     pub provider: String,
     pub provider_name: String,
@@ -96,7 +96,7 @@ pub struct EnvImportResult {
 }
 
 /// Co stało się ze zmienną.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum EnvImportKind {
     Imported,
@@ -105,7 +105,7 @@ pub enum EnvImportKind {
 }
 
 /// Model konta.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ModelInfo {
     pub id: String,
     pub name: String,
@@ -121,7 +121,7 @@ pub struct ModelInfo {
 }
 
 /// Przypisania konta.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AccountAssignment {
     pub task_classes: Vec<String>,
     pub agents: Vec<String>,
@@ -130,14 +130,14 @@ pub struct AccountAssignment {
 }
 
 /// Limit kosztów konta.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AccountCostLimit {
     pub enabled: bool,
     pub monthly: Money,
 }
 
 /// Konto (bez sekretu).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Account {
     pub id: String,
     pub provider_id: String,
@@ -165,7 +165,7 @@ pub struct Account {
 }
 
 /// Ostatni test konta w skrócie (te same pola co w [`TestReport`], bez listy modeli).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AccountLastTest {
     pub ok: bool,
     /// `ok`, `invalid_key`, `restricted`, `no_credit`, `rate_limited`, `timeout`, `network`, `unsupported`.
@@ -189,6 +189,17 @@ impl<'de> Deserialize<'de> for SecretInput {
     }
 }
 
+impl schemars::JsonSchema for SecretInput {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        "SecretInput".into()
+    }
+
+    fn json_schema(_: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        // Na łączu to zwykły napis; wartość nigdy nie wraca z rdzenia.
+        schemars::json_schema!({ "type": "string", "writeOnly": true })
+    }
+}
+
 impl SecretInput {
     pub fn expose(&self) -> &str {
         &self.0
@@ -208,7 +219,7 @@ impl From<&str> for SecretInput {
 }
 
 /// Dane kreatora konta. Sekret trafia wyłącznie do Credential Managera.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
 pub struct AddAccountInput {
     pub provider_id: String,
     pub label: String,
@@ -217,7 +228,7 @@ pub struct AddAccountInput {
 }
 
 /// Raport testu konta.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TestReport {
     pub ok: bool,
     pub latency_ms: Option<u64>,
@@ -240,7 +251,7 @@ pub struct TestReport {
 }
 
 /// Uprawnienia (PLAN §8.3).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PermissionsState {
     pub global: AutonomyLevel,
     pub session: Option<AutonomyLevel>,
@@ -249,7 +260,7 @@ pub struct PermissionsState {
 
 /// Stan intencji Brokera: `opened_broker` — prośba czeka w oknie Brokera; `applied` — zmiana
 /// niewymagająca zatwierdzenia (obniżenie poziomu) została zastosowana od razu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum BrokerIntentStatus {
     OpenedBroker,
@@ -257,14 +268,14 @@ pub enum BrokerIntentStatus {
 }
 
 /// Wynik intencji Brokera.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BrokerIntentResult {
     pub status: BrokerIntentStatus,
     pub request_id: String,
 }
 
 /// Klasa sprzętu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum HwClass {
     Baseline,
@@ -275,7 +286,7 @@ pub enum HwClass {
 }
 
 /// Profil głosu A–D.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 pub enum VoiceProfileId {
     A,
     B,
@@ -284,7 +295,7 @@ pub enum VoiceProfileId {
 }
 
 /// Karta graficzna.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct GpuView {
     pub vendor: String,
     pub model: String,
@@ -300,7 +311,7 @@ pub struct GpuView {
 }
 
 /// Procesor.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CpuView {
     pub model: String,
     pub cores: u32,
@@ -308,14 +319,14 @@ pub struct CpuView {
 }
 
 /// Bateria.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BatteryView {
     pub percent: u8,
     pub on_ac: bool,
 }
 
 /// Maszyna.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MachineView {
     pub id: String,
     pub name: String,
@@ -328,7 +339,7 @@ pub struct MachineView {
 }
 
 /// Rekomendacja profilu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RecommendationView {
     pub hw_class: HwClass,
     pub voice_profile: VoiceProfileId,
@@ -337,7 +348,7 @@ pub struct RecommendationView {
 }
 
 /// Profil urządzenia.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct DeviceProfile {
     pub machine: MachineView,
     pub recommendation: RecommendationView,
@@ -345,7 +356,7 @@ pub struct DeviceProfile {
 }
 
 /// Urządzenie audio.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AudioDevice {
     pub id: String,
     pub name: String,
@@ -353,7 +364,7 @@ pub struct AudioDevice {
 }
 
 /// Model lokalny z manifestu `providers-local` (onboarding, Ustawienia → Modele lokalne).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct LocalModelInfo {
     pub id: String,
     pub name: String,
@@ -364,7 +375,7 @@ pub struct LocalModelInfo {
 }
 
 /// Stan pobierania modelu lokalnego (zdarzenie `LocalModelProgress`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum LocalDownloadState {
     Downloading,

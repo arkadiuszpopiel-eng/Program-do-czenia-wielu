@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::common::{Iso8601, LocalizedText, Money};
 
 /// Rodzaj intencji kroku (akcja, którą właściciel wykonuje sam).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum IntentKind {
     /// „Uruchom w terminalu": terminal w katalogu + polecenie do skopiowania (bez wykonania).
@@ -16,7 +16,7 @@ pub enum IntentKind {
 }
 
 /// Intencja kroku narzędzia (karta w wątku i w Replay).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ToolIntent {
     pub kind: IntentKind,
     pub title: String,
@@ -28,7 +28,7 @@ pub struct ToolIntent {
 }
 
 /// Stan przebiegu agentki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RunState {
     Running,
@@ -50,7 +50,7 @@ impl RunState {
 }
 
 /// Rodzaj kroku w Replay.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReplayKind {
     Plan,
@@ -61,7 +61,7 @@ pub enum ReplayKind {
 }
 
 /// Stan kroku w Replay.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReplayStatus {
     Running,
@@ -74,7 +74,7 @@ pub enum ReplayStatus {
 }
 
 /// Krok przebiegu (Replay: krok, narzędzie, wejście/wyjście w skrócie, status, czas, „Cofnij").
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ReplayStep {
     pub id: String,
     pub n: u32,
@@ -94,7 +94,7 @@ pub struct ReplayStep {
 }
 
 /// Zużycie przebiegu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RunUsage {
     pub steps: u32,
     pub tool_calls: u32,
@@ -105,7 +105,7 @@ pub struct RunUsage {
 }
 
 /// Budżety przebiegu (z Ustawień → Agentki).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RunBudgetView {
     pub max_steps: u32,
     pub max_minutes: u32,
@@ -113,7 +113,7 @@ pub struct RunBudgetView {
 }
 
 /// Przebieg agentki (nagłówek; kroki — `AgentRunDetail.steps` / zdarzenie `AgentStep`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AgentRun {
     pub id: String,
     pub session_id: String,
@@ -142,14 +142,14 @@ pub struct AgentRun {
 }
 
 /// Przebieg z krokami (`agents_runs`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AgentRunDetail {
     pub run: AgentRun,
     pub steps: Vec<ReplayStep>,
 }
 
 /// Wybór katalogu roboczego sesji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkdirChoice {
     /// Natywny dialog wyboru katalogu.
@@ -161,14 +161,14 @@ pub enum WorkdirChoice {
 }
 
 /// Katalog roboczy sesji (zakres narzędzi agentek).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SessionWorkdir {
     pub path: Option<String>,
     pub default_path: String,
 }
 
 /// Stan trybu głosowego.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum VoiceState {
     /// Brak modeli/sidecarów (czytelny powód w `reason`).
@@ -180,7 +180,7 @@ pub enum VoiceState {
 }
 
 /// Sposób włączania mikrofonu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum VoiceMode {
     Toggle,
@@ -188,7 +188,7 @@ pub enum VoiceMode {
 }
 
 /// Stan potoku głosu (pasek tytułu, Ustawienia → Głos).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct VoiceStatus {
     pub state: VoiceState,
     pub reason: Option<LocalizedText>,
@@ -213,7 +213,9 @@ impl VoiceStatus {
 }
 
 /// Kto mówi (pigułka).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, schemars::JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum VoiceSpeaker {
     #[default]

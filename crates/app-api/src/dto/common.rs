@@ -11,7 +11,7 @@ pub fn iso(ts: chrono::DateTime<chrono::Utc>) -> Iso8601 {
 }
 
 /// Waluta kwoty.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 pub enum Currency {
     #[serde(rename = "PLN")]
     Pln,
@@ -20,7 +20,7 @@ pub enum Currency {
 }
 
 /// Kwota w jednostkach drobnych (grosze / centy).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Money {
     pub minor: i64,
     pub currency: Currency,
@@ -41,7 +41,7 @@ impl Money {
 }
 
 /// Tekst w dwóch językach interfejsu.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct LocalizedText {
     pub pl: String,
     pub en: String,
@@ -57,7 +57,9 @@ impl LocalizedText {
 }
 
 /// Język interfejsu.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum Locale {
     #[default]
@@ -67,7 +69,18 @@ pub enum Locale {
 
 /// Poziom autonomii (PLAN §8.3).
 #[derive(
-    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    schemars::JsonSchema,
 )]
 pub enum AutonomyLevel {
     L0,
@@ -79,7 +92,9 @@ pub enum AutonomyLevel {
 }
 
 /// Profil modelu sesji.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ModelProfile {
     Local,

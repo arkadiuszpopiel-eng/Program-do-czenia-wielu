@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use super::common::LocalizedText;
 
 /// Rodzaj pozycji katalogu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelItemKind {
     Llm,
@@ -23,7 +23,7 @@ pub enum ModelItemKind {
 }
 
 /// Stan pozycji: brak → (kolejka) → pobieranie → [zgoda TOFU] → instalacja → zainstalowana.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelItemState {
     Missing,
@@ -44,7 +44,7 @@ pub enum ModelItemState {
 }
 
 /// Plik pozycji (pobierany albo wynikowy).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ModelFileView {
     pub name: String,
     pub url: String,
@@ -56,7 +56,7 @@ pub struct ModelFileView {
 }
 
 /// Postęp pobierania pliku.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ModelProgressView {
     pub file: String,
     pub done: u64,
@@ -64,7 +64,7 @@ pub struct ModelProgressView {
 }
 
 /// Pozycja katalogu z jej stanem na tej maszynie.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ModelItem {
     pub id: String,
     pub kind: ModelItemKind,
@@ -92,7 +92,7 @@ pub struct ModelItem {
 }
 
 /// Embedder wyszukiwania (`[search.embedder] model`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EmbedderView {
     /// Wybór w ustawieniach (`lexical` albo identyfikator modelu).
     pub configured: String,
@@ -105,7 +105,7 @@ pub struct EmbedderView {
 }
 
 /// Przebudowa wektorów w tle (bez treści: tylko liczniki).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ReindexView {
     pub running: bool,
     pub embedder: String,
@@ -121,7 +121,7 @@ pub struct ReindexView {
 }
 
 /// Lista pozycji, embedder i przebudowa (`models_list`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ModelsView {
     pub items: Vec<ModelItem>,
     pub embedder: EmbedderView,
@@ -134,7 +134,7 @@ pub struct ModelsView {
 pub type TrustedHashes = BTreeMap<String, String>;
 
 /// Stan pakietu na tej maszynie (wyliczany ze stanów jego pozycji).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum BundleState {
     /// Żadna pozycja nie jest zainstalowana.
@@ -152,7 +152,7 @@ pub enum BundleState {
 }
 
 /// Dopasowanie pakietu do sprzętu tej maszyny.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum BundleFitKind {
     Fits,
@@ -162,7 +162,7 @@ pub enum BundleFitKind {
 }
 
 /// Dopasowanie z uzasadnieniem (`reason` — dla `tight` i `too_weak`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BundleFit {
     pub kind: BundleFitKind,
     pub reason: Option<LocalizedText>,
@@ -170,7 +170,7 @@ pub struct BundleFit {
 
 /// Wymagania pakietu. Progi w MB z tolerancją raportowania systemu (np. 16 GB RAM ≈ ≥ 15 000 MB,
 /// karta 8 GB ≈ ≥ 7 500 MB); `text` — opis do pokazania z wartościami nominalnymi.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BundleRequirements {
     pub min_ram_mb: u64,
     /// Pamięć karty graficznej (CUDA albo Vulkan); `null` — karta niepotrzebna.
@@ -183,7 +183,7 @@ pub struct BundleRequirements {
 }
 
 /// Pozycja pakietu (wariant silnika dobrany dla tej maszyny) z jej stanem.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BundleItemView {
     pub id: String,
     pub name: String,
@@ -197,7 +197,7 @@ pub struct BundleItemView {
 }
 
 /// Uwaga o jakości: zalecenie albo metoda pomiaru według normy (bez deklaracji certyfikacji).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct QualityNote {
     pub aspect: LocalizedText,
     /// Norma albo metoda (np. `ITU-T P.800 / P.808`).
@@ -206,7 +206,7 @@ pub struct QualityNote {
 }
 
 /// Pakiet „Modele lokalne i silniki” w skali ocen 1–6 (6 — wzorcowy, 1 — minimalny) dla tej maszyny.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ModelBundle {
     pub id: String,
     /// Ocena 1–6.

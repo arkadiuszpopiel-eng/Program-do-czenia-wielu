@@ -17,6 +17,7 @@ pub mod notify;
 pub mod paths;
 pub mod ports;
 pub mod protocol;
+pub mod schema;
 
 pub use commands::{CHANNEL_COMMANDS, COMMANDS};
 pub use error::{AppError, ErrorCode};

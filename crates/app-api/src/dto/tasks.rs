@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use super::common::{Iso8601, Money};
 
 /// Stan zadania.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskStateKind {
     Pending,
@@ -19,7 +19,7 @@ pub enum TaskStateKind {
 }
 
 /// Wynik zakończonego zadania.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskResultKind {
     Succeeded,
@@ -32,7 +32,7 @@ pub enum TaskResultKind {
 }
 
 /// Klasa priorytetu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskClassKind {
     User,
@@ -41,7 +41,7 @@ pub enum TaskClassKind {
 }
 
 /// Pochodzenie zadania (mosty CLI tylko z `user` albo `schedule`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskOriginKind {
     User,
@@ -53,7 +53,7 @@ pub enum TaskOriginKind {
 }
 
 /// Krawędź DAG.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TaskDep {
     pub task_id: String,
     /// `succeeded`, `failed`, `finished`, `output_equals`.
@@ -61,7 +61,7 @@ pub struct TaskDep {
 }
 
 /// Zadanie w panelu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TaskInfo {
     pub id: String,
     pub title: String,
@@ -93,7 +93,7 @@ pub struct TaskInfo {
 }
 
 /// Nowe zadanie od użytkownika (węzeł DAG: `after` = poprzedniczki, `parent_id` = delegacja).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct NewTaskInput {
     pub session_id: Option<String>,
     pub title: String,
@@ -104,7 +104,7 @@ pub struct NewTaskInput {
 }
 
 /// Rodzaj wyzwalacza.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TriggerKindView {
     Cron {
@@ -132,7 +132,7 @@ pub enum TriggerKindView {
 }
 
 /// Wyzwalacz w liście.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TriggerInfo {
     pub id: String,
     pub name: String,
@@ -157,7 +157,7 @@ pub struct TriggerInfo {
 }
 
 /// Nowy wyzwalacz (właściciel = użytkownik).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TriggerDraft {
     pub name: String,
     pub kind: TriggerKindView,
@@ -169,7 +169,7 @@ pub struct TriggerDraft {
 }
 
 /// Wpis dziennika uruchomień.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TriggerRunInfo {
     pub at: Iso8601,
     pub trigger_id: String,
@@ -182,7 +182,7 @@ pub struct TriggerRunInfo {
 }
 
 /// Podgląd wyrażenia cron (następne uruchomienia w strefie Europe/Warsaw).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CronPreview {
     pub valid: bool,
     pub error: Option<String>,
@@ -190,7 +190,7 @@ pub struct CronPreview {
 }
 
 /// Reguła Marszałka (opis zawężeń po polsku + reguła źródłowa).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MarshalRuleInfo {
     pub id: String,
     pub description: String,
@@ -200,14 +200,14 @@ pub struct MarshalRuleInfo {
 }
 
 /// Odrzucony szkic (nigdy nie wejdzie w życie).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MarshalRejected {
     pub draft: serde_json::Value,
     pub errors: Vec<String>,
 }
 
 /// Propozycja reguł.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MarshalProposalInfo {
     pub id: u64,
     pub text: String,
@@ -220,7 +220,7 @@ pub struct MarshalProposalInfo {
 }
 
 /// Stan Marszałka (Ustawienia → Agentki → Reguły).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MarshalState {
     pub rules: Vec<MarshalRuleInfo>,
     pub proposals: Vec<MarshalProposalInfo>,
@@ -231,7 +231,7 @@ pub struct MarshalState {
 }
 
 /// Raport dzienny Marszałka (relacjonuje Dyrygentka).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MarshalReport {
     pub day: String,
     pub submitted: u64,

@@ -8,6 +8,28 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.21 — 2026-10-11
+
+Typy łącza między rdzeniem a oknem powstają teraz z kodu rdzenia — rozjazd wyłapuje kompilator, a nie użytkownik.
+Bez zmian widocznych w programie (zadanie B.1 planu, etap pierwszy).
+
+### Pod maską
+
+- Z typów rdzenia powstaje schemat łącza (`packages/schemas/ipc.v1.json`: 225 poleceń, ramka zdarzeń, błąd,
+  298 typów), a z niego plik typów dla okna. Zmiana typu w rdzeniu bez odświeżenia tych plików zatrzymuje testy.
+- Kompilator sprawdza 501 zgodności typów okna z typami rdzenia oraz nazwy i argumenty wszystkich 224 wywołań
+  poleceń — literówka w nazwie polecenia albo brak argumentu to teraz błąd budowania, a nie błąd w działającym
+  programie.
+- Przegląd przy okazji: typy pisane ręcznie zgadzały się z rdzeniem poza jednym polem (zakres pamięci w eksporcie
+  paczki) — poprawione.
+
+### Testy
+
+- Schemat jest porównywany z kodem w testach rdzenia; plik typów — w bramce i w CI. Sprawdzone, że celowo zepsuty
+  typ okna jest wyłapywany.
+- Okno nadal używa typów pisanych ręcznie (teraz pilnowanych przez kompilator); ich usunięcie na rzecz
+  generowanych to drugi etap zadania.
+
 ## 0.0.20 — 2026-10-11
 
 Klucze API pod opieką: Alfa sama sprawdza je w tle, pokazuje wiek klucza i przełącza się na konto zapasowe.

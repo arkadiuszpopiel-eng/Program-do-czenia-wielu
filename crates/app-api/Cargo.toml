@@ -25,6 +25,8 @@ search-contract = { path = "../search-contract" }
 sessions-contract = { path = "../sessions-contract" }
 async-trait.workspace = true
 chrono.workspace = true
+# Schemat JSON łącza (typy TS generowane z Rust — ADR 0013, plan v6 zadanie B.1).
+schemars.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

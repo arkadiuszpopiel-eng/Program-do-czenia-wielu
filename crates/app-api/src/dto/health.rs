@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use super::common::Iso8601;
 
 /// Stan ogólny.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum HealthOverall {
     Ok,
@@ -17,7 +17,7 @@ pub enum HealthOverall {
 }
 
 /// Stan modułu w rejestrze.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ModuleHealth {
     Healthy,
@@ -28,7 +28,7 @@ pub enum ModuleHealth {
 }
 
 /// Wiersz modułu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct HealthModule {
     pub module: String,
     pub version: String,
@@ -38,7 +38,7 @@ pub struct HealthModule {
 }
 
 /// Incydent Diagnosty.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct HealthIncident {
     pub id: u64,
     pub kind: String,
@@ -50,7 +50,7 @@ pub struct HealthIncident {
 }
 
 /// Wykonana naprawa (z „Cofnij").
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct HealthRepair {
     pub id: u64,
     pub title: String,
@@ -60,7 +60,7 @@ pub struct HealthRepair {
 }
 
 /// Co wymaga człowieka.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct HealthHumanAction {
     pub id: u64,
     pub title: String,
@@ -69,7 +69,7 @@ pub struct HealthHumanAction {
 }
 
 /// Ryzyko zmiany.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RiskView {
     Low,
@@ -78,7 +78,7 @@ pub enum RiskView {
 }
 
 /// Propozycja naprawy czekająca na zgodę (Jądro → wyłącznie Broker-UI).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct HealthProposal {
     pub id: u64,
     pub title: String,
@@ -90,7 +90,7 @@ pub struct HealthProposal {
 }
 
 /// Raport „Zdrowie systemu".
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct HealthView {
     pub overall: HealthOverall,
     pub safe_mode: Option<String>,
@@ -104,7 +104,7 @@ pub struct HealthView {
 }
 
 /// Zmiana konfiguracji w propozycji Ulepszacza.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ImproverChange {
     pub key: String,
     pub old: Option<serde_json::Value>,
@@ -114,7 +114,7 @@ pub struct ImproverChange {
 }
 
 /// Propozycja Ulepszacza.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ImproverProposalView {
     pub id: u64,
     pub title: String,
@@ -133,7 +133,7 @@ pub struct ImproverProposalView {
 }
 
 /// Zablokowana próba (bez treści wartości).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ImproverBlocked {
     pub at: Iso8601,
     pub source: String,
@@ -142,7 +142,7 @@ pub struct ImproverBlocked {
 }
 
 /// Szkic zgłoszenia R3 (kod — tylko do przeglądu człowieka).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ImproverIssue {
     pub at: Iso8601,
     pub title: String,
@@ -151,7 +151,7 @@ pub struct ImproverIssue {
 }
 
 /// Panel Ulepszacza.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ImproverView {
     pub proposals: Vec<ImproverProposalView>,
     pub blocked: Vec<ImproverBlocked>,
@@ -161,7 +161,7 @@ pub struct ImproverView {
 }
 
 /// Zestaw ewaluacyjny (bez przypadków).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EvalSuiteView {
     pub id: String,
     pub wave: String,
@@ -173,7 +173,7 @@ pub struct EvalSuiteView {
 }
 
 /// Werdykt bramki (wynik zbiorczy — bez danych przypadków holdoutu).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EvalVerdictView {
     pub at: Iso8601,
     pub suite: String,
@@ -183,7 +183,7 @@ pub struct EvalVerdictView {
 }
 
 /// Wyniki evali.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EvalsView {
     pub available: bool,
     pub reason: Option<String>,

@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use super::common::Iso8601;
 
 /// Stan wersji wtyczki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PluginStateView {
     Proposed,
@@ -19,7 +19,7 @@ pub enum PluginStateView {
 }
 
 /// Pochodzenie wtyczki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PluginOrigin {
     /// Plik wskazany przez właściciela.
@@ -33,14 +33,14 @@ pub enum PluginOrigin {
 }
 
 /// Zadeklarowana zdolność (`fs.read`, `fs.write`, `net.egress`) z zakresem.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginCapabilityView {
     pub family: String,
     pub scope: String,
 }
 
 /// Limity piaskownicy jednego wywołania.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginLimitsView {
     pub memory_mib: u32,
     pub fuel_per_call: u64,
@@ -51,7 +51,7 @@ pub struct PluginLimitsView {
 }
 
 /// Narzędzie wtyczki widziane przez agentki (`plugin_<nazwa>`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginToolView {
     pub name: String,
     pub title: String,
@@ -60,7 +60,7 @@ pub struct PluginToolView {
 }
 
 /// Zmiana pierścienia R2 dla Ulepszacza (klucz `plugins.<id>.version` = hash przejrzanej wersji).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginR2View {
     pub key: String,
     pub value: String,
@@ -69,7 +69,7 @@ pub struct PluginR2View {
 }
 
 /// Wersja wtyczki w bibliotece.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginInfo {
     pub id: String,
     pub version: String,
@@ -91,7 +91,7 @@ pub struct PluginInfo {
 }
 
 /// Rodzaj problemu wtyczki (dla Diagnosty i listy błędów).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PluginProblemKind {
     /// Piaskownica przerwała wywołanie (paliwo, czas, pamięć, pułapka).
@@ -101,7 +101,7 @@ pub enum PluginProblemKind {
 }
 
 /// Ostatni problem wtyczki (bez treści wejścia/wyjścia).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginProblem {
     pub plugin: String,
     pub version: String,
@@ -111,7 +111,7 @@ pub struct PluginProblem {
 }
 
 /// Biblioteka wtyczek.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginsView {
     /// Wtyczki działają (Broker i dziennik cofania podłączone, magazyn otwarty).
     pub available: bool,
@@ -121,7 +121,7 @@ pub struct PluginsView {
 }
 
 /// Wynik kontroli modułu przed propozycją (bez instalacji).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PluginInspection {
     pub ok: bool,
     pub wasm_sha256: String,

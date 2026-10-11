@@ -135,6 +135,8 @@ jobs:
         run: node scripts/set-version.mjs --check
       - name: Plan w HTML jest aktualny (docs/html), odnośniki i roadmapa są spójne
         run: node scripts/docs-html.mjs --verify
+      - name: Typy TS łącza zgodne ze schematem z Rusta
+        run: node scripts/gen-ipc-types.mjs --check
       - run: pnpm check
       - run: pnpm -r build
       - name: Budżet bundla

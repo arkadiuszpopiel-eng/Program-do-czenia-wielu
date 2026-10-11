@@ -403,6 +403,7 @@ dependencies = [
  "memory-contract",
  "personas-contract",
  "providers-contract",
+ "schemars",
  "search-contract",
  "serde",
  "serde_json",

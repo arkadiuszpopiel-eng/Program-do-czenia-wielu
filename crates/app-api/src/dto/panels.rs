@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use super::common::{Iso8601, Money};
 
 /// Stan agentki.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AgentStatus {
     Idle,
@@ -15,7 +15,7 @@ pub enum AgentStatus {
 }
 
 /// Agentka w sesji.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AgentState {
     pub id: String,
     pub role_ids: Vec<String>,
@@ -24,7 +24,7 @@ pub struct AgentState {
 }
 
 /// Szablon obsady.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum CastTemplateId {
     Standard,
@@ -45,7 +45,7 @@ impl CastTemplateId {
 }
 
 /// Kapsuła aktywności.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ActivityInfo {
     pub session_id: String,
     pub agent: String,
@@ -56,14 +56,14 @@ pub struct ActivityInfo {
 }
 
 /// Limit miesięczny w podsumowaniu kosztów.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CostLimitView {
     pub enabled: bool,
     pub monthly: Money,
 }
 
 /// Zużycie okna kontekstu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ContextUsage {
     pub used_tokens: u64,
     pub max_tokens: u64,
@@ -71,7 +71,7 @@ pub struct ContextUsage {
 }
 
 /// Kurs walut użyty do przeliczeń.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct FxView {
     pub usd_pln: f64,
     pub date: String,
@@ -79,7 +79,7 @@ pub struct FxView {
 }
 
 /// Podsumowanie kosztów.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CostSummary {
     pub session: Money,
     pub day: Money,
@@ -90,7 +90,7 @@ pub struct CostSummary {
 }
 
 /// Rodzaj zdarzenia osi czasu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TimelineKind {
     ModelCall,
@@ -102,7 +102,19 @@ pub enum TimelineKind {
 }
 
 /// Poziom zdarzenia (rosnąco).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    schemars::JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum EventLevel {
     Trace,
@@ -114,7 +126,7 @@ pub enum EventLevel {
 }
 
 /// Zdarzenie osi czasu v0.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TimelineEvent {
     pub id: String,
     pub ts: Iso8601,
@@ -130,7 +142,7 @@ pub struct TimelineEvent {
 }
 
 /// Filtr osi czasu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TimelineFilter {
     pub kinds: Vec<TimelineKind>,
     pub min_level: EventLevel,
@@ -143,7 +155,7 @@ impl TimelineFilter {
 }
 
 /// Artefakt (plik wyjściowy) sesji.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ArtifactInfo {
     pub id: String,
     pub session_id: String,
@@ -157,7 +169,7 @@ pub struct ArtifactInfo {
 }
 
 /// Podgląd pliku: tekst jako zwykły tekst; obraz przez protokół zasobów.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ArtifactPreview {
     Text { text: String, truncated: bool },
@@ -166,7 +178,7 @@ pub enum ArtifactPreview {
 }
 
 /// Akcja na pliku (intencja).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ArtifactAction {
     Open,

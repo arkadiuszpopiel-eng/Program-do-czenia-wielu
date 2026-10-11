@@ -184,6 +184,7 @@ async function run(): Promise<void> {
       artifacts: false,
       logs: false,
       config_machine: false,
+      memory: [],
     },
     password: null,
   });

@@ -1,7 +1,7 @@
 # Manifest modułu device-profile (docs/modules/device-profile/SPEC.md, PLAN §3.5).
 # Schemat: packages/schemas/module-manifest.v1.json
 id = "device-profile"
-version = "0.0.20"
+version = "0.0.21"
 kind = "service"
 provides = ["device-profile-contract@1"]
 requires = ["core-bus-contract@1", "platform-contract@1"]

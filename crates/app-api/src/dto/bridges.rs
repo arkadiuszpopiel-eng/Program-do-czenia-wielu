@@ -7,14 +7,14 @@ use serde::{Deserialize, Serialize};
 use super::hub::ComplianceStatus;
 
 /// Źródło (regulamin, dokumentacja) z rejestru zgodności.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BridgeSource {
     pub url: String,
     pub quote: String,
 }
 
 /// Karta zgodności trasy mostu.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BridgeCard {
     pub route_id: String,
     /// Most obsługiwany przez Alfę (`claude_code`, `codex`); `null` — trasa tylko w rejestrze.
@@ -53,7 +53,7 @@ pub struct BridgeCard {
 
 /// Wynik „Zaloguj w terminalu": terminal otwarty w katalogu domowym, polecenie do skopiowania
 /// (Alfa go nie wykonuje).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BridgeLogin {
     pub command: String,
     pub cwd: String,

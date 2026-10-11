@@ -9,7 +9,7 @@ pub const CAMERA_FRAME_MIN_SIDE: u32 = 64;
 pub const CAMERA_FRAME_MAX_SIDE: u32 = 1280;
 
 /// Rodzaj kamery.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum CameraKindView {
     Usb,
@@ -17,7 +17,7 @@ pub enum CameraKindView {
 }
 
 /// Stan strumienia kamery.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum CameraStateView {
     Asleep,
@@ -30,7 +30,7 @@ pub enum CameraStateView {
 }
 
 /// Kamera na liście.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CameraView {
     pub id: String,
     pub name: String,
@@ -45,14 +45,14 @@ pub struct CameraView {
 }
 
 /// Stan kamer: przełącznik główny i lista.
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CamerasState {
     pub enabled: bool,
     pub cameras: Vec<CameraView>,
 }
 
 /// Klatka z kamery jako PNG (base64), już pomniejszona.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CameraFrame {
     pub camera: String,
     pub width: u32,

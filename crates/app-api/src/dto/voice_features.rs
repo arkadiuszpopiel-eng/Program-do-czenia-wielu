@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use super::common::LocalizedText;
 
 /// Stan słów wywoławczych.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum WakeWordsState {
     Unavailable,
@@ -19,7 +19,7 @@ pub enum WakeWordsState {
 }
 
 /// Wynik pomiaru FAR/FRR z runnera `alfa-wake-eval` (brak pomiaru — `measured = false`).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct WakeCalibrationView {
     pub measured: bool,
     pub sufficient: bool,
@@ -30,7 +30,7 @@ pub struct WakeCalibrationView {
 }
 
 /// Test słowa wywoławczego (wykrycia bez otwierania rozmowy).
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct WakeTestView {
     pub active: bool,
     pub detections: u32,
@@ -39,7 +39,7 @@ pub struct WakeTestView {
 }
 
 /// Słowa wywoławcze „Hej Alfa/Beta/Gama/Delta”.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct WakeWordsView {
     pub state: WakeWordsState,
     pub reason: Option<LocalizedText>,
@@ -53,7 +53,7 @@ pub struct WakeWordsView {
 }
 
 /// Stan rejestracji głosu właściciela.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SpeakerState {
     Unavailable,
@@ -63,7 +63,7 @@ pub enum SpeakerState {
 }
 
 /// Jakość nagranej frazy rejestracji.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SampleQuality {
     Good,
@@ -74,7 +74,7 @@ pub enum SampleQuality {
 }
 
 /// Ostatnia nagrana fraza rejestracji (bez audio).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EnrollSampleView {
     pub accepted: bool,
     pub quality: SampleQuality,
@@ -84,7 +84,7 @@ pub struct EnrollSampleView {
 }
 
 /// Decyzja weryfikacji mówcy ostatniej tury głosowej.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SpeakerDecisionView {
     Verified,
@@ -94,14 +94,14 @@ pub enum SpeakerDecisionView {
 }
 
 /// Wynik weryfikacji ostatniej tury głosowej (wynik w ‰, bez embeddingu).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SpeakerCheckView {
     pub decision: SpeakerDecisionView,
     pub score_permille: Option<u16>,
 }
 
 /// Weryfikacja właściciela („Rozpoznawanie mojego głosu”).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SpeakerView {
     pub state: SpeakerState,
     pub reason: Option<LocalizedText>,
@@ -115,7 +115,7 @@ pub struct SpeakerView {
 }
 
 /// Stan dyktowania.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum DictationStateView {
     Unavailable,
@@ -125,7 +125,7 @@ pub enum DictationStateView {
 }
 
 /// Profil dyktowania dla aplikacji (nazwa pliku procesu, np. `notepad.exe`).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct DictationProfile {
     pub app: String,
     pub capitalize_start: bool,
@@ -133,7 +133,7 @@ pub struct DictationProfile {
 }
 
 /// Dyktowanie do dowolnej aplikacji.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct DictationView {
     pub state: DictationStateView,
     pub reason: Option<LocalizedText>,
@@ -147,7 +147,7 @@ pub struct DictationView {
 }
 
 /// Stan czytania na głos.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReadStateView {
     Unavailable,
@@ -157,7 +157,7 @@ pub enum ReadStateView {
 }
 
 /// Czytanie zaznaczenia / dokumentu / schowka głosem bieżącej agentki.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ReadAloudView {
     pub state: ReadStateView,
     pub reason: Option<LocalizedText>,
@@ -171,14 +171,14 @@ pub struct ReadAloudView {
 }
 
 /// Szybka rozmowa w chmurze (speech-to-speech) — dziś tylko kontrakt i atrapa.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct S2sView {
     pub available: bool,
     pub reason: LocalizedText,
 }
 
 /// Głos rozszerzony (panel Głos, Ustawienia → Głos).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct VoiceFeatures {
     pub wake: WakeWordsView,
     pub speaker: SpeakerView,
@@ -188,7 +188,7 @@ pub struct VoiceFeatures {
 }
 
 /// Akcja słów wywoławczych.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum WakeAction {
     /// Włączenie wyłącznie jawne; bez pomiaru FAR/FRR wymaga `accept_risk`.
@@ -206,7 +206,7 @@ pub enum WakeAction {
 }
 
 /// Akcja kreatora rejestracji i weryfikacji właściciela.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum SpeakerAction {
     Begin,
@@ -219,7 +219,7 @@ pub enum SpeakerAction {
 }
 
 /// Akcja dyktowania.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum DictationAction {
     Start,
@@ -231,7 +231,7 @@ pub enum DictationAction {
 }
 
 /// Skąd czytać.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReadSource {
     Selection,
@@ -240,7 +240,7 @@ pub enum ReadSource {
 }
 
 /// Sterowanie czytaniem.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReadControlAction {
     Pause,
@@ -254,7 +254,7 @@ pub enum ReadControlAction {
 }
 
 /// Akcja czytania na głos.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ReadAction {
     Start { source: ReadSource },

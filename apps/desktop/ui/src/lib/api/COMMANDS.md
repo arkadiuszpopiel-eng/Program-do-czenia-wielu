@@ -10,6 +10,9 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 
 ## Zasady
 
+- **Typy generowane:** `generated/ipc.ts` (wszystkie DTO i mapa `IpcCommands`: nazwa → argumenty i wynik)
+  powstaje z typów Rust przez `packages/schemas/ipc.v1.json` — `node scripts/gen-ipc-types.mjs`; nie edytuj ręcznie.
+  `generated/compat.ts` sprawdza w czasie kompilacji zgodność typów pisanych ręcznie (`types*.ts`) z generowanymi.
 - **Argumenty komend** przekazywane z JS w `camelCase` (Tauri 2 mapuje na parametry `snake_case`
   funkcji `#[tauri::command]`). **Pola obiektów** (DTO) — `snake_case`, jak serializuje serde.
 - **Jeden kanał zdarzeń** rdzeń → UI: `alfa://events`, ładunek `EventFrame` (paczka `AlfaEvent[]`

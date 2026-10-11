@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use super::common::Iso8601;
 
 /// Rodzaj zakresu pamięci.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MemoryScopeKind {
     Session,
@@ -19,14 +19,14 @@ pub enum MemoryScopeKind {
 }
 
 /// Zakres pamięci (`id` = sesja / projekt / agentka; `null` dla globalnej).
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryScopeRef {
     pub kind: MemoryScopeKind,
     pub id: Option<String>,
 }
 
 /// Warstwa pamięci.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MemoryLayer {
     Working,
@@ -36,7 +36,7 @@ pub enum MemoryLayer {
 }
 
 /// Stan wpisu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MemoryState {
     Active,
@@ -46,7 +46,7 @@ pub enum MemoryState {
 }
 
 /// Pochodzenie wpisu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MemorySourceKind {
     User,
@@ -56,7 +56,7 @@ pub enum MemorySourceKind {
 }
 
 /// Zakres z danymi (lista Inspektora).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryScopeInfo {
     pub key: String,
     pub scope: MemoryScopeRef,
@@ -69,7 +69,7 @@ pub struct MemoryScopeInfo {
 }
 
 /// Zapytanie Inspektora (filtry łączone AND; puste listy = bez filtra).
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryQuery {
     pub scopes: Vec<String>,
     pub text: Option<String>,
@@ -82,7 +82,7 @@ pub struct MemoryQuery {
 }
 
 /// Wpis pamięci.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryItem {
     pub id: String,
     pub scope: MemoryScopeRef,
@@ -109,14 +109,14 @@ pub struct MemoryItem {
 }
 
 /// Strona wyników.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryPage {
     pub items: Vec<MemoryItem>,
     pub total: u64,
 }
 
 /// Źródło wpisu w „dlaczego to pamiętam".
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemorySourceLink {
     pub id: String,
     pub exists: bool,
@@ -124,7 +124,7 @@ pub struct MemorySourceLink {
 }
 
 /// Rekord dziennika zmian.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryJournalEntry {
     pub id: String,
     pub scope_key: String,
@@ -141,7 +141,7 @@ pub struct MemoryJournalEntry {
 }
 
 /// „Dlaczego to pamiętam".
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryExplanation {
     pub item: MemoryItem,
     pub reasons: Vec<String>,
@@ -154,7 +154,7 @@ pub struct MemoryExplanation {
 }
 
 /// Edycja = nowa wersja (pola `null` bez zmian; pusty `subject` usuwa temat).
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryEdit {
     pub text: Option<String>,
     pub subject: Option<String>,
@@ -162,7 +162,7 @@ pub struct MemoryEdit {
 }
 
 /// Co zapomnieć (kaskadowo).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(tag = "target", rename_all = "snake_case")]
 pub enum MemoryForgetTarget {
     Entry { id: String },
@@ -170,7 +170,7 @@ pub enum MemoryForgetTarget {
 }
 
 /// Pozycja podglądu kaskady.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryCascadeItem {
     pub id: String,
     pub scope_key: String,
@@ -181,7 +181,7 @@ pub struct MemoryCascadeItem {
 }
 
 /// Podgląd kaskady przed zapomnieniem.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryForgetPreview {
     pub target: MemoryForgetTarget,
     pub remove: Vec<MemoryCascadeItem>,
@@ -192,7 +192,7 @@ pub struct MemoryForgetPreview {
 }
 
 /// Raport zapomnienia (weryfikowalny).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryForgetReport {
     pub removed: u64,
     pub derived: u64,
@@ -206,7 +206,7 @@ pub struct MemoryForgetReport {
 }
 
 /// Wynik cofnięcia zmiany z dziennika.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryUndoResult {
     pub removed: u64,
     pub restored: u64,
@@ -214,7 +214,7 @@ pub struct MemoryUndoResult {
 }
 
 /// Raport porządkowania pamięci (Strażniczka).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ConsolidationReport {
     pub run: String,
     pub manual: bool,
@@ -235,7 +235,7 @@ pub struct ConsolidationReport {
 }
 
 /// Stan pamięci dla Inspektora (porządkowanie, licznik bezczynności, oczekujące).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MemoryStatus {
     pub consolidation_enabled: bool,
     /// Licznik bezczynności dostępny (bez niego harmonogram nocny nie startuje; ręcznie — tak).

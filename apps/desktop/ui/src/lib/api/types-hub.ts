@@ -129,7 +129,7 @@ export interface ExportScope {
   readonly logs: boolean;
   readonly config_machine: boolean;
   /** Zakresy pamięci (dokumenty `memory/<zakres>`; sesje prywatne poza eksportem). */
-  readonly memory?: readonly string[];
+  readonly memory: readonly string[];
 }
 
 export interface ExportRequest {
