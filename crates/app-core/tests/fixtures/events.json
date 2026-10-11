@@ -2615,7 +2615,8 @@
             "engine": "piper",
             "ready": true
           }
-        ]
+        ],
+        "self_test": null
       }
     }
   },
@@ -2745,7 +2746,8 @@
             "engine": "piper",
             "ready": true
           }
-        ]
+        ],
+        "self_test": null
       }
     }
   },
@@ -2875,7 +2877,8 @@
             "engine": "piper",
             "ready": true
           }
-        ]
+        ],
+        "self_test": null
       }
     }
   },

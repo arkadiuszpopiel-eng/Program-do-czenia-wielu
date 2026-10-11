@@ -351,11 +351,15 @@ impl VoicePort for PipelineVoice {
         Voice::read_action(&self.0, action).await
     }
     async fn engines(&self, action: EnginesAction) -> Result<VoiceFeatures, AppError> {
-        if action == EnginesAction::ResetBreaker
-            && let Some(parts) = self.0.f5.parts()
-        {
-            parts.reset_stt_breaker();
-            self.0.f5.publish();
+        if let Some(parts) = self.0.f5.parts() {
+            match action {
+                EnginesAction::Refresh => {}
+                EnginesAction::ResetBreaker => parts.reset_stt_breaker(),
+                EnginesAction::SelfTest => parts.self_test().await,
+            }
+            if action != EnginesAction::Refresh {
+                self.0.f5.publish();
+            }
         }
         Ok(self.features().await)
     }

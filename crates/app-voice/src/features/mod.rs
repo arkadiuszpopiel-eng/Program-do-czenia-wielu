@@ -84,6 +84,10 @@ pub trait FeatureFactory: Send + Sync {
     }
     /// Zamyka bezpiecznik rozpoznawania (silnik główny dostaje szansę od razu).
     fn reset_stt_breaker(&self) {}
+    /// Próba silników rozmowy (wynik trafia do [`Self::engines`]).
+    fn self_test(&self) -> std::pin::Pin<Box<dyn Future<Output = ()> + Send + '_>> {
+        Box::pin(async {})
+    }
     /// Czego brakuje dyktowaniu (silnik i model STT) — tanie sprawdzenie plików dla widoku;
     /// pusta lista = gotowe.
     fn dictation_missing(&self) -> Vec<String> {

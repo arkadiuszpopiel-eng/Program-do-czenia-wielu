@@ -3647,6 +3647,34 @@
       ],
       "type": "object"
     },
+    "EngineCheckView": {
+      "description": "Wynik próby jednego silnika.",
+      "properties": {
+        "detail": {
+          "description": "Wyjaśnienie: przyczyna błędu albo uwaga do udanej próby.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ms": {
+          "description": "Czas próby (ms).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ok": {
+          "description": "Silnik odpowiedział.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ok",
+        "ms",
+        "detail"
+      ],
+      "type": "object"
+    },
     "EnginesAction": {
       "description": "Akcja na silnikach rozmowy.",
       "oneOf": [
@@ -3668,6 +3696,19 @@
           "properties": {
             "kind": {
               "const": "reset_breaker",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Próba każdego silnika (wczytanie modelu, ocena, próbna synteza) bez mikrofonu i głośnika.",
+          "properties": {
+            "kind": {
+              "const": "self_test",
               "type": "string"
             }
           },
@@ -8026,6 +8067,26 @@
       ],
       "type": "object"
     },
+    "SelfTestView": {
+      "description": "Wynik „Sprawdź silniki” (bez mikrofonu i bez odtwarzania).",
+      "properties": {
+        "stt": {
+          "$ref": "#/$defs/EngineCheckView"
+        },
+        "tts": {
+          "$ref": "#/$defs/EngineCheckView"
+        },
+        "turn": {
+          "$ref": "#/$defs/EngineCheckView"
+        }
+      },
+      "required": [
+        "stt",
+        "turn",
+        "tts"
+      ],
+      "type": "object"
+    },
     "SendOptions": {
       "description": "Opcje wysłania wiadomości.",
       "properties": {
@@ -10594,6 +10655,17 @@
     "VoiceEnginesView": {
       "description": "Silniki rozmowy.",
       "properties": {
+        "self_test": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SelfTestView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Wynik ostatniej próby silników (`None` — jeszcze nie była uruchamiana)."
+        },
         "stt": {
           "$ref": "#/$defs/SttEngineView"
         },
@@ -10610,7 +10682,8 @@
       "required": [
         "stt",
         "turn",
-        "tts"
+        "tts",
+        "self_test"
       ],
       "type": "object"
     },

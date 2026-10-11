@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-12**, wersja programu **0.0.40**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-12**, wersja programu **0.0.41**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -65,6 +65,7 @@ funkcjami.
 | 0.0.30 | 2026-10-11 | P1: głos Supertonic 3 jako osobny proces w Rust, cztery barwy agentek; zmierzone 0,97 s na zdanie na laptopie (brzmienie — do odsłuchu właściciela) |
 | 0.0.31 | 2026-10-11 | P1: wybór barwy głosu dla każdej agentki (10 barw Supertonic 3) |
 | 0.0.32 | 2026-10-11 | silnik llama.cpp b11559 w katalogu z przypiętymi sumami; pomiar Qwen3-ASR (aplikacja nie budowana) |
+| 0.0.41 | 2026-10-12 | P1: „Sprawdź silniki” — próba rozpoznawania, końca wypowiedzi i głosu bez mikrofonu, z czasem i przyczyną |
 | 0.0.40 | 2026-10-12 | P14: gotowe obowiązki codzienne agentek (cztery szablony wypełniające formularz wyzwalacza) |
 | 0.0.39 | 2026-10-12 | P2: ocena „mieści się na karcie” przy modelach rozmowy; P1: potok rozmowy sprawdzony na prawdziwym mikrofonie (bez mowy człowieka) |
 | 0.0.38 | 2026-10-12 | P1: wybór silnika rozpoznawania wg zajętości karty (z pomiarów), mały Whisper jako zapas na procesor i w pakietach |

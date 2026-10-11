@@ -128,6 +128,13 @@ export const enVoice: Record<keyof typeof plVoice, Message> = {
   'vf.eng.title': 'Conversation engines',
   'vf.eng.desc':
     'What recognises speech, senses the end of a sentence and speaks on this computer. Everything runs locally.',
+  'vf.eng.test.run': 'Check the engines',
+  'vf.eng.test.title': 'Engine check result',
+  'vf.eng.test.ok': 'working',
+  'vf.eng.test.failed': 'not working',
+  'vf.eng.test.time': '{s} s',
+  'vf.eng.test.note':
+    'The check loads the recognition model, scores a second of noise and does a trial synthesis — without the microphone and without playing sound.',
   'vf.eng.refresh': 'Refresh',
   'vf.eng.stt': 'Speech recognition',
   'vf.eng.stt.qwen_asr': 'Qwen3-ASR',

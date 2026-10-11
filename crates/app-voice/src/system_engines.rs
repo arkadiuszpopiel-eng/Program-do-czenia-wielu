@@ -121,7 +121,17 @@ impl SystemVoice {
                 ready,
             })
             .collect();
-        VoiceEnginesView { stt, turn, tts }
+        let self_test = self
+            .self_test
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .clone();
+        VoiceEnginesView {
+            stt,
+            turn,
+            tts,
+            self_test,
+        }
     }
 
     /// Zamyka bezpiecznik ostatnio złożonego rozpoznawania.

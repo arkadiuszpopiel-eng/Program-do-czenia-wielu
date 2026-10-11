@@ -182,3 +182,37 @@ async fn real_engines_hear_a_sentence_and_answer() {
     voice.set_mic_enabled(false).await.unwrap();
     ticker.abort();
 }
+
+/// „Sprawdź silniki” na prawdziwych plikach tej maszyny (bez mikrofonu i bez odtwarzania).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn self_test_runs_every_engine() {
+    if std::env::var("ALFA_LIVE_TALK").is_err() {
+        return;
+    }
+    let mut log = std::io::stderr();
+    let paths = AppPaths::from_env().unwrap();
+    let factory = Arc::new(SystemVoice::new(
+        paths.clone(),
+        Arc::new(FakeAudio::new()),
+        Some(app_modules::tts::engines(&paths)),
+        Arc::new(FakeScheduler::new()),
+        None,
+    ));
+    let voice = PipelineVoice::new(
+        Arc::new(VoiceUnavailable),
+        Some(factory),
+        EventHub::start(Duration::from_millis(5)),
+        None,
+        PipelineCfg::default(),
+    );
+    assert!(voice.features().await.engines.self_test.is_none());
+    let view = voice
+        .engines(app_api::dto::EnginesAction::SelfTest)
+        .await
+        .unwrap();
+    let result = view.engines.self_test.expect("wynik próby");
+    writeln!(log, "próba silników: {result:?}").unwrap();
+    assert!(result.turn.ok, "{:?}", result.turn);
+    assert!(result.tts.ok, "{:?}", result.tts);
+    assert!(result.stt.ok, "{:?}", result.stt);
+}

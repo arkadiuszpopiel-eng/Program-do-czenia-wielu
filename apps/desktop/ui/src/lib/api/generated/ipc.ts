@@ -976,6 +976,16 @@ export interface EmbedderView {
   readonly index_id: string;
 }
 
+/** Wynik próby jednego silnika. */
+export interface EngineCheckView {
+  /** Wyjaśnienie: przyczyna błędu albo uwaga do udanej próby. */
+  readonly detail: string | null;
+  /** Czas próby (ms). */
+  readonly ms: number;
+  /** Silnik odpowiedział. */
+  readonly ok: boolean;
+}
+
 /** Akcja na silnikach rozmowy. */
 export type EnginesAction =
   | {
@@ -983,6 +993,9 @@ export type EnginesAction =
     }
   | {
       readonly kind: 'reset_breaker';
+    }
+  | {
+      readonly kind: 'self_test';
     };
 
 /** Ostatnia nagrana fraza rejestracji (bez audio). */
@@ -2195,6 +2208,13 @@ export interface SelectOption {
   readonly value: string;
 }
 
+/** Wynik „Sprawdź silniki” (bez mikrofonu i bez odtwarzania). */
+export interface SelfTestView {
+  readonly stt: EngineCheckView;
+  readonly tts: EngineCheckView;
+  readonly turn: EngineCheckView;
+}
+
 /** Opcje wysłania wiadomości. */
 export interface SendOptions {
   readonly addressed_to: string | null;
@@ -2870,6 +2890,8 @@ export interface VoiceDraft {
 
 /** Silniki rozmowy. */
 export interface VoiceEnginesView {
+  /** Wynik ostatniej próby silników (`None` — jeszcze nie była uruchamiana). */
+  readonly self_test: SelfTestView | null;
   readonly stt: SttEngineView;
   readonly tts: readonly TtsEngineView[];
   readonly turn: TurnEngineView;

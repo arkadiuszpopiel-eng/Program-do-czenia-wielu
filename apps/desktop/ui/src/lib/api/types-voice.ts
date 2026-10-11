@@ -161,14 +161,33 @@ export interface TtsEngineView {
   readonly ready: boolean;
 }
 
+/** Wynik próby jednego silnika; `detail` — przyczyna błędu albo uwaga do udanej próby. */
+export interface EngineCheckView {
+  readonly ok: boolean;
+  readonly ms: number;
+  readonly detail: string | null;
+}
+
+/** Wynik „Sprawdź silniki” (bez mikrofonu i bez odtwarzania). */
+export interface SelfTestView {
+  readonly stt: EngineCheckView;
+  readonly turn: EngineCheckView;
+  readonly tts: EngineCheckView;
+}
+
 /** Silniki rozmowy: rozpoznawanie ze strażnikiem, koniec wypowiedzi, głosy (w kolejności prób). */
 export interface VoiceEnginesView {
   readonly stt: SttEngineView;
   readonly turn: TurnEngineView;
   readonly tts: readonly TtsEngineView[];
+  /** `null` — próba jeszcze nie była uruchamiana. */
+  readonly self_test: SelfTestView | null;
 }
 
-export type EnginesAction = { readonly kind: 'refresh' } | { readonly kind: 'reset_breaker' };
+export type EnginesAction =
+  | { readonly kind: 'refresh' }
+  | { readonly kind: 'reset_breaker' }
+  | { readonly kind: 'self_test' };
 
 export interface VoiceFeatures {
   readonly wake: WakeWordsView;

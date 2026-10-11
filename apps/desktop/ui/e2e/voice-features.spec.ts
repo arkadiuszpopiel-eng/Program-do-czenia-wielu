@@ -132,6 +132,15 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(card.getByText('280 ms')).toBeVisible();
       await card.getByRole('button', { name: 'Odśwież' }).click();
       await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
+
+      // „Sprawdź silniki”: trzy wyniki z czasem; nic nie jest odtwarzane.
+      await expect(card.getByTestId('voice-self-test')).toHaveCount(0);
+      await card.getByRole('button', { name: 'Sprawdź silniki' }).click();
+      const result = card.getByTestId('voice-self-test');
+      await expect(result.getByRole('listitem')).toHaveCount(3);
+      await expect(result.getByText('działa', { exact: true })).toHaveCount(3);
+      await expect(result.getByText('2,5 s')).toBeVisible();
+      await expect(result.getByText('Qwen3-ASR wczytany na karcie graficznej')).toBeVisible();
       await expectAccessible(page, `silniki rozmowy zamknięty ${theme}`);
     });
 
@@ -150,6 +159,12 @@ for (const theme of ['light', 'dark'] as const) {
         ),
       ).toBeVisible();
       await expect(card.getByTestId('voice-guard')).toHaveCount(0);
+      await card.getByRole('button', { name: 'Sprawdź silniki' }).click();
+      const result = card.getByTestId('voice-self-test');
+      await expect(result.getByText('nie działa', { exact: true })).toHaveCount(1);
+      await expect(
+        result.getByText('brak plików Smart Turn — działa ocena z tekstu'),
+      ).toBeVisible();
       await expectAccessible(page, `silniki rozmowy braki ${theme}`);
       await card.getByRole('button', { name: 'Otwórz „Modele lokalne i silniki”' }).click();
       await expect(

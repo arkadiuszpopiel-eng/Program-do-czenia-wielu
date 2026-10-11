@@ -43,6 +43,15 @@ describe('atrapa: głos rozszerzony F5', () => {
     expect(before.turn.stats).toEqual({ scored: 31, failed: 0, last_pct: 93, last_ms: 26 });
     const untouched = await setup('no-mic').api.engines({ kind: 'reset_breaker' });
     expect(untouched.engines).toEqual(bare);
+
+    // Próba silników: wynik zależy od tego, co zainstalowane.
+    expect(before.self_test).toBeNull();
+    const tested = (await api.engines({ kind: 'self_test' })).engines.self_test;
+    expect([tested?.stt.ok, tested?.turn.ok, tested?.tts.ok]).toEqual([true, true, true]);
+    expect(tested?.stt.detail).toMatch(/karcie graficznej/);
+    const lacking = (await setup('no-mic').api.engines({ kind: 'self_test' })).engines.self_test;
+    expect([lacking?.stt.ok, lacking?.turn.ok, lacking?.tts.ok]).toEqual([true, false, true]);
+    expect(lacking?.turn.detail).toMatch(/brak plików Smart Turn/);
   });
 
   it('słowa wywoławcze: domyślnie wyłączone, tylko jawnie i z ryzykiem, bramka wymaga głosu', async () => {

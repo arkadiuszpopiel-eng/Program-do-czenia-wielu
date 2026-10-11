@@ -117,8 +117,8 @@ pub use updates::{
     UpdateChannel, UpdateMode, UpdatePhase, UpdateProgress, UpdateRelease, UpdatesView, WhatsNew,
 };
 pub use voice_engines::{
-    BreakerStateView, EnginesAction, SttEngineKind, SttEngineView, SttGuardView, TtsEngineView,
-    TurnEngineKind, TurnEngineView, TurnStatsView, VoiceEnginesView,
+    BreakerStateView, EngineCheckView, EnginesAction, SelfTestView, SttEngineKind, SttEngineView,
+    SttGuardView, TtsEngineView, TurnEngineKind, TurnEngineView, TurnStatsView, VoiceEnginesView,
 };
 pub use voice_features::{
     DictationAction, DictationProfile, DictationStateView, DictationView, EnrollSampleView,

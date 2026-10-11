@@ -81,6 +81,8 @@ pub struct SystemVoice {
     pub(crate) talk: crate::talk::TalkSettings,
     /// Liczniki modelu końca wypowiedzi (wspólne dla kolejnych rozmów).
     pub(crate) turn_stats: voice_turn_impl::TurnStats,
+    /// Wynik ostatniego „Sprawdź silniki”.
+    pub(crate) self_test: std::sync::Mutex<Option<app_api::dto::SelfTestView>>,
 }
 
 pub(crate) fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
@@ -141,6 +143,7 @@ impl SystemVoice {
             stt_plan: std::sync::Mutex::new(None),
             talk: crate::talk::TalkSettings::default(),
             turn_stats: voice_turn_impl::TurnStats::default(),
+            self_test: std::sync::Mutex::new(None),
         }
     }
 

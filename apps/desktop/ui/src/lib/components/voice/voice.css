@@ -166,3 +166,17 @@
     grid-template-columns: 1fr;
   }
 }
+.vf-checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vf-checks li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--alfa-space-2);
+}

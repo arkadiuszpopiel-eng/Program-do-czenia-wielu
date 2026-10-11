@@ -87,6 +87,10 @@ impl FeatureFactory for SystemVoice {
         self.reset_guard();
     }
 
+    fn self_test(&self) -> std::pin::Pin<Box<dyn Future<Output = ()> + Send + '_>> {
+        Box::pin(self.run_self_test())
+    }
+
     fn dictation_missing(&self) -> Vec<String> {
         let mut out = Vec::new();
         if !app_modules::stt::server_cpu(&self.paths).is_file() {

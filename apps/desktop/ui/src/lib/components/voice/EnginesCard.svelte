@@ -23,7 +23,7 @@
   const activeTts = $derived(e.tts.find((x) => x.ready)?.engine ?? null);
   let busy = $state(false);
 
-  async function run(kind: 'refresh' | 'reset_breaker') {
+  async function run(kind: 'refresh' | 'reset_breaker' | 'self_test') {
     busy = true;
     await act.engines({ kind });
     busy = false;
@@ -60,15 +60,32 @@
   }
   const names = (ids: readonly string[]) => ids.map(itemName).join(', ');
 
+  let testing = $state(false);
+
+  // Próba trwa kilka sekund (wczytanie modelu) — przycisk pokazuje pracę, wynik zostaje na karcie.
+  async function selfTest() {
+    testing = true;
+    await run('self_test');
+    testing = false;
+  }
+
+  const seconds = (value: number) =>
+    (value / 1000).toLocaleString(app.i18n.locale, { maximumFractionDigits: 1 });
+
   const ms = (value: number | null) => (value === null ? '—' : t('vf.eng.ms', { n: value }));
 </script>
 
 <section class="vf-card" aria-labelledby="{uid}-title" data-testid="voice-engines">
   <div class="vf-head">
     <h3 id="{uid}-title">{t('vf.eng.title')}</h3>
-    <Button size="sm" variant="ghost" disabled={busy} onclick={() => void run('refresh')}
-      >{t('vf.eng.refresh')}</Button
-    >
+    <div class="vf-row">
+      <Button size="sm" variant="secondary" loading={testing} onclick={() => void selfTest()}
+        >{t('vf.eng.test.run')}</Button
+      >
+      <Button size="sm" variant="ghost" disabled={busy} onclick={() => void run('refresh')}
+        >{t('vf.eng.refresh')}</Button
+      >
+    </div>
   </div>
   <p class="vf-muted">{t('vf.eng.desc')}</p>
 
@@ -118,6 +135,30 @@
       {/each}
     </dd>
   </dl>
+
+  {#if e.self_test}
+    {@const checks = [
+      { id: 'stt', label: t('vf.eng.stt'), result: e.self_test.stt },
+      { id: 'turn', label: t('vf.eng.turn'), result: e.self_test.turn },
+      { id: 'tts', label: t('vf.eng.tts'), result: e.self_test.tts },
+    ]}
+    <div class="vf-guard" data-testid="voice-self-test" role="status">
+      <h4>{t('vf.eng.test.title')}</h4>
+      <ul class="vf-checks">
+        {#each checks as check (check.id)}
+          <li>
+            <span class="vf-badge" class:on={check.result.ok} class:alert={!check.result.ok}
+              >{t(check.result.ok ? 'vf.eng.test.ok' : 'vf.eng.test.failed')}</span
+            >
+            <span class="vf-state">{check.label}</span>
+            <span class="vf-muted">{t('vf.eng.test.time', { s: seconds(check.result.ms) })}</span>
+            {#if check.result.detail}<span class="vf-muted">{check.result.detail}</span>{/if}
+          </li>
+        {/each}
+      </ul>
+      <p class="vf-muted">{t('vf.eng.test.note')}</p>
+    </div>
+  {/if}
 
   {#if e.stt.missing.length > 0 || e.turn.missing.length > 0}
     <div class="vf-warn" role="status">

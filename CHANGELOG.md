@@ -12,6 +12,25 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.41 — 2026-10-12
+
+Jeden przycisk sprawdza, czy rozmowa głosowa zadziała — bez mikrofonu i bez dźwięku.
+
+### Głos
+
+- [poważne] Na karcie „Silniki rozmowy” jest przycisk „Sprawdź silniki”. Naprawdę uruchamia każdy silnik:
+  wczytuje model rozpoznawania mowy, każe modelowi Smart Turn ocenić sekundę szumu i robi próbną syntezę głosu.
+  Wynik — „działa” albo „nie działa” z czasem i przyczyną — zostaje na karcie. Nic nie jest nagrywane ani
+  odtwarzane. Na tym laptopie: rozpoznawanie 2,5 s (wczytanie modelu na kartę), koniec wypowiedzi 0,2 s,
+  głos 1,9 s.
+- Próba nie zabiera karty trwającej rozmowie: przy zajętej pamięci karty model próbny wczytuje się na procesor.
+
+### Testy
+
+- Próba na prawdziwych silnikach (`live_talk.rs`, test `self_test_runs_every_engine`): wszystkie trzy silniki
+  odpowiedziały. W przeglądarce: trzy wyniki z czasem, scenariusz z brakującym Smart Turn pokazuje „nie działa”
+  z przyczyną; zrzuty w trzech stylach i dwóch motywach.
+
 ## 0.0.40 — 2026-10-12
 
 Pierwszy krok obowiązków codziennych agentek: gotowe obowiązki do wyboru jednym kliknięciem.

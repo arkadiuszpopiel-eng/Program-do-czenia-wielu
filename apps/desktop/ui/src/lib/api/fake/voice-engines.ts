@@ -19,6 +19,7 @@ export function initialEngines(noMic: boolean): VoiceEnginesView {
         { engine: 'pocket', ready: false },
         { engine: 'piper', ready: true },
       ],
+      self_test: null,
     };
   }
   return {
@@ -50,6 +51,7 @@ export function initialEngines(noMic: boolean): VoiceEnginesView {
       { engine: 'pocket', ready: false },
       { engine: 'piper', ready: true },
     ],
+    self_test: null,
   };
 }
 
@@ -58,6 +60,30 @@ export function applyEnginesAction(
   view: VoiceEnginesView,
   action: EnginesAction,
 ): VoiceEnginesView {
+  if (action.kind === 'self_test') {
+    // Próba odzwierciedla to, co jest zainstalowane: brakujący Smart Turn i głos główny dają błąd.
+    const smart = view.turn.engine === 'smart_turn';
+    const voice = view.tts.some((e) => e.ready);
+    return {
+      ...view,
+      self_test: {
+        stt:
+          view.stt.engine === 'qwen_asr'
+            ? { ok: true, ms: 2463, detail: 'Qwen3-ASR wczytany na karcie graficznej' }
+            : {
+                ok: true,
+                ms: 3,
+                detail: 'Whisper: pliki na miejscu (silnik startuje przy pierwszej wypowiedzi)',
+              },
+        turn: smart
+          ? { ok: true, ms: 236, detail: null }
+          : { ok: false, ms: 1, detail: 'brak plików Smart Turn — działa ocena z tekstu' },
+        tts: voice
+          ? { ok: true, ms: 1876, detail: null }
+          : { ok: false, ms: 1, detail: 'brak silnika mowy' },
+      },
+    };
+  }
   if (action.kind !== 'reset_breaker' || !view.stt.guard) return view;
   return {
     ...view,

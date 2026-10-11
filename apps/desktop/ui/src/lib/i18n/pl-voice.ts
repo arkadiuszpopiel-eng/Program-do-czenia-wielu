@@ -129,6 +129,13 @@ export const plVoice = {
   'vf.eng.title': 'Silniki rozmowy',
   'vf.eng.desc':
     'Co na tym komputerze rozpoznaje mowę, wyczuwa koniec wypowiedzi i mówi. Wszystko działa lokalnie.',
+  'vf.eng.test.run': 'Sprawdź silniki',
+  'vf.eng.test.title': 'Wynik próby silników',
+  'vf.eng.test.ok': 'działa',
+  'vf.eng.test.failed': 'nie działa',
+  'vf.eng.test.time': '{s} s',
+  'vf.eng.test.note':
+    'Próba wczytuje model rozpoznawania, ocenia sekundę szumu i robi próbną syntezę — bez mikrofonu i bez odtwarzania dźwięku.',
   'vf.eng.refresh': 'Odśwież',
   'vf.eng.stt': 'Rozpoznawanie mowy',
   'vf.eng.stt.qwen_asr': 'Qwen3-ASR',

@@ -118,12 +118,33 @@ pub struct TtsEngineView {
     pub ready: bool,
 }
 
+/// Wynik próby jednego silnika.
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct EngineCheckView {
+    /// Silnik odpowiedział.
+    pub ok: bool,
+    /// Czas próby (ms).
+    pub ms: u32,
+    /// Wyjaśnienie: przyczyna błędu albo uwaga do udanej próby.
+    pub detail: Option<String>,
+}
+
+/// Wynik „Sprawdź silniki” (bez mikrofonu i bez odtwarzania).
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct SelfTestView {
+    pub stt: EngineCheckView,
+    pub turn: EngineCheckView,
+    pub tts: EngineCheckView,
+}
+
 /// Silniki rozmowy.
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct VoiceEnginesView {
     pub stt: SttEngineView,
     pub turn: TurnEngineView,
     pub tts: Vec<TtsEngineView>,
+    /// Wynik ostatniej próby silników (`None` — jeszcze nie była uruchamiana).
+    pub self_test: Option<SelfTestView>,
 }
 
 /// Akcja na silnikach rozmowy.
@@ -134,6 +155,8 @@ pub enum EnginesAction {
     Refresh,
     /// Zamknięcie bezpiecznika: silnik główny dostaje szansę od razu, bez czekania na koniec przerwy.
     ResetBreaker,
+    /// Próba każdego silnika (wczytanie modelu, ocena, próbna synteza) bez mikrofonu i głośnika.
+    SelfTest,
 }
 
 #[cfg(test)]
@@ -163,6 +186,7 @@ mod tests {
                 engine: "supertonic".into(),
                 ready: true,
             }],
+            self_test: None,
         };
         let json = serde_json::to_value(&view).unwrap_or_default();
         assert_eq!(json["stt"]["engine"], "qwen_asr");

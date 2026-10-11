@@ -23,6 +23,7 @@ mod system;
 mod system_engines;
 mod system_f5;
 mod system_listen;
+mod system_selftest;
 mod talk;
 mod tap;
 
