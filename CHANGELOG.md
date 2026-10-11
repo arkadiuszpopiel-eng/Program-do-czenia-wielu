@@ -26,7 +26,9 @@ ta wersja niczego nie zmienia.
   pozostałe) — `docs/plan/17-przeniesienie-z-delty.md`.
 - Nowa grupa P12: agentki programistki — piszą, uruchamiają i budują oprogramowanie w katalogu projektu,
   rozmawiają ze sobą w trakcie pracy i dobierają model do trudności zadania (lekki do czytania, mocny dopiero
-  gdy trzeba).
+  gdy trzeba), z nadrzędnym przyciskiem „Pełne uprawnienia” jak w Claude Code i Codex.
+- Nowe grupy P13 i P14: dyski sieciowe i chmurowe z kopiami zapasowymi oraz obowiązki codzienne agentek
+  (poczta, kalendarz, przypomnienia).
 - Nowy etap U: wielu użytkowników z kontami, logowaniem i rolami (Właściciel, Dorosły, Dziecko, Gość) na
   komputerze i zdalnie — `docs/plan/18-wielu-uzytkownikow.md`, projekt decyzji ADR 0027.
 - Decyzje właściciela zapisane w planie: Alfa jest programem docelowym; ADR 0025 (dane biometryczne) przyjęty;
@@ -34,8 +36,9 @@ ta wersja niczego nie zmienia.
 
 ### Czego nie sprawdzono
 
-- Analiza Delty powstała z czytania kodu, bez uruchamiania programu. Pełna macierz jej funkcji (ok. 400 pozycji)
-  i specyfikacja głosu ze stałymi są zadaniem P0 — jeszcze niegotowe.
+- Analiza Delty powstała z czytania kodu, bez uruchamiania programu. Specyfikacja głosu (`docs/plan/19`) i macierz
+  funkcji (`docs/plan/20`, `21`) są spisane z dwóch przejść po kodzie; jeśli przy pracy wyjdzie pominięta funkcja,
+  macierz zostanie uzupełniona.
 
 ## 0.0.27 — 2026-10-11
 

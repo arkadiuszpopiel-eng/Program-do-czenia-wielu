@@ -5,8 +5,8 @@ system rozmowy i mowy oraz wszystkie brakujące elementy — skrupulatnie, poł�
 
 Źródło: `Delta_AI_0.8.35_KOMPLET_2026-09-18/03_REPOZYTORIUM_GIT_CZYSTE/Delta-AI-System`. Analiza objęła dwa
 przejścia po kodzie (zaplecze Python: 46 grup i 356 tras API, 59 narzędzi agenta; okno: 11 obszarów roboczych,
-50 widoków). Niczego nie uruchamiano. Pełna macierz pozycja po pozycji i specyfikacja głosu ze stałymi powstają
-w zadaniu P0 jako osobne dokumenty.
+50 widoków). Niczego nie uruchamiano. Specyfikacja głosu ze stałymi: [`19`](19-specyfikacja-glosu-delty.md).
+Macierz pozycja po pozycji: [`20`](20-macierz-delty-czesc-1.md) i [`21`](21-macierz-delty-czesc-2.md).
 
 ## Zasady przenoszenia
 
@@ -164,6 +164,39 @@ Co zostaje także przy włączonym przycisku: każde działanie wykonuje Broker 
 ale z zapisem i możliwością cofnięcia kroków); agentki nie mogą same włączyć przycisku ani zmieniać Brokera,
 audytu i własnych uprawnień; sekrety nie trafiają do modelu; STOP (`Ctrl+Shift+F12`) działa zawsze. Role Dziecko
 i Gość z etapu U nie mają tego przycisku.
+
+## P13 — dyski sieciowe i chmurowe, kopie zapasowe
+
+Zlecenie właściciela z 2026-10-11 (nowa funkcja, w Delcie jej nie było): zaawansowane korzystanie z dysków
+sieciowych i chmurowych, z pełnymi uprawnieniami do tworzenia kopii zapasowych.
+
+| Element | Opis | Co Alfa już ma |
+| --- | --- | --- |
+| Podłączanie magazynów | dyski sieciowe w domu i firmie (SMB / NAS), WebDAV, SFTP, magazyny zgodne z S3, OneDrive, Google Drive, Dropbox; logowanie przez okno dostawcy, bez podawania hasła Alfie | klucze i hasła w Menedżerze poświadczeń; kreator kont |
+| Przeglądanie i praca na plikach | magazyny widoczne w panelu Pliki jak zwykłe katalogi; agentki mogą na nich czytać, zapisywać i porządkować — przez Brokera, w granicach nadanych uprawnień | panel Pliki, wersje artefaktów, cofanie kroków |
+| Kopie zapasowe | pełne uprawnienia do tworzenia kopii: danych Alfy (rozmowy, pamięć, ustawienia, agentki) i wskazanych katalogów użytkownika; harmonogram, kopie przyrostowe, wersje z rotacją, szyfrowanie po stronie komputera przed wysłaniem, sprawdzanie sum, przywracanie całości albo pojedynczych plików | eksport `.alfa` z szyfrowaniem i kopie z rotacją (moduł `transfer`), harmonogram zadań |
+| Kilka celów naraz | zasada 3-2-1: kopia lokalna, na dysku sieciowym i w chmurze; raport po każdej kopii i alarm, gdy kopia się nie udała albo jest stara | Zdrowie systemu, powiadomienia |
+| Bezpieczniki | kopia nigdy nie kasuje źródła; usuwanie starych wersji tylko według ustawionej rotacji; klucze API i sekrety nie trafiają do kopii jawnie; w sesji prywatnej nic nie idzie do chmury | twarda reguła: sekrety tylko w Menedżerze poświadczeń |
+
+Uwaga do budowy: połączenia z siecią lokalną i z chmurą przechodzą przez strażnika sieci (`lib-netguard`) —
+jego zmiany wymagają przeglądu właściciela. Konta z etapu U mają własne magazyny i własne kopie.
+
+## P14 — obowiązki codzienne agentek
+
+Zlecenie właściciela z 2026-10-11 (nowa funkcja): możliwość przypisania agentki do zadań codziennych, takich jak
+sprawdzanie poczty.
+
+| Element | Opis | Co Alfa już ma |
+| --- | --- | --- |
+| Przypisanie obowiązku | ekran „Obowiązki”: wybierasz agentkę, zadanie i porę (codziennie o 8:00, co godzinę, po zdarzeniu); gotowe wzory i własne opisy słowami | zadania w tle, wyzwalacze (czas, nowy plik, ręcznie), reguły Marszałka |
+| Poczta | konta IMAP, Gmail i Outlook: przegląd nowych wiadomości, streszczenie, oznaczenie ważnych, szkice odpowiedzi; **wysłanie zawsze po Twoim zatwierdzeniu**, chyba że sam zezwolisz dla wybranych nadawców | Broker i zgody; hasła w Menedżerze poświadczeń |
+| Kalendarz i przypomnienia | plan dnia rano, przypomnienia głosem i powiadomieniem, wykrywanie kolizji terminów | powiadomienia, głos |
+| Inne wzory | przegląd wiadomości z ulubionych stron (P5), porządki w Pobranych, kopia zapasowa (P13), raport kosztów, sprawdzenie stanu systemu, pilnowanie strony albo ceny | Ulepszacz, Zdrowie systemu |
+| Budżet i model | każdy obowiązek ma limit kosztu i czasu; domyślnie model lekki albo lokalny, mocny tylko gdy zadanie tego wymaga (jak w P12) | limity zadań, „zadania w tle tylko lokalnie” |
+| Raport | po każdym przebiegu krótki wpis w osi czasu i w raporcie dnia: co zrobiono, co czeka na decyzję; możliwość odczytania głosem | raport dnia, oś czasu |
+| Bezpieczniki | treść wiadomości to dane, nie polecenia (ochrona przed poleceniami ukrytymi w poczcie); obowiązek nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków | Broker, tagi prywatności |
+
+Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.
 
 ## Nie przenosimy
 

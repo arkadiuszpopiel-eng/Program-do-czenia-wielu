@@ -28,6 +28,8 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md) | **Zacznij tutaj**: stan prac i cały plan w jednym miejscu — etapy A–H, etap P (funkcje z Delty AI), etap U (wielu użytkowników), cztery cele: Windows, Linux, panel WWW, Android | po każdym etapie |
 | [`17-przeniesienie-z-delty.md`](17-przeniesienie-z-delty.md) | Etap P: co i jak przenosimy z Delty AI 0.8.35 (rozmowa i mowa, modele, nawigacja, twórczość, awatar…) | z postępem etapu P |
 | [`18-wielu-uzytkownikow.md`](18-wielu-uzytkownikow.md) | Etap U: konta, logowanie, role, rozdzielenie danych | z postępem etapu U i ADR 0027 |
+| [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glosu-delty.md) | Jak dokładnie działa rozmowa i mowa w Delcie: stałe, progi, kolejność kroków, 17 głosów, kontrolki ekranu | wzorzec dla P1 — zmienia się tylko przy korekcie |
+| [`20-macierz-delty-czesc-1.md`](20-macierz-delty-czesc-1.md), [`21-macierz-delty-czesc-2.md`](21-macierz-delty-czesc-2.md) | Macierz funkcji Delty pozycja po pozycji z decyzją: przenosimy / dostosowujemy / jest / nie | po każdej grupie etapu P |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).

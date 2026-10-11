@@ -50,7 +50,7 @@ A (Windows MVP) ══▶ P (funkcje Delty) ══▶ C (pozostałe funkcje Wind
 | A | Windows — pierwsza wersja działająca na sprzęcie („Alfa 0.1”) | w toku | 15 / 21 |
 | B | Szwy pod wiele platform i klientów | w toku | 2 / 9 |
 | C | Funkcje Windows po MVP (C1–C5) | w toku | 6 / 50 |
-| **P** | **Funkcje przeniesione z Delty AI (P0–P11)** | **nowy** | 0 / 13 |
+| **P** | **Funkcje przeniesione z Delty AI (P0–P11)** | **nowy** | 0 / 15 |
 | **U** | **Wielu użytkowników: konta, logowanie, role** | **nowy** | 0 / 10 |
 | D | Host bez okna i bezpieczne połączenie zdalne | czeka na ADR 0019–0023 | 0 / 10 |
 | E | Panel WWW — sterowanie przez przeglądarkę | planowane | 0 / 7 |
@@ -81,7 +81,7 @@ wad bezpieczeństwa Delty.
 
 | Grupa | Zakres | Łączy się z |
 | --- | --- | --- |
-| P0 | Dokumenty: specyfikacja głosu Delty, macierz ok. 400 funkcji | — |
+| P0 | Dokumenty: specyfikacja głosu Delty ([`19`](19-specyfikacja-glosu-delty.md)), macierz funkcji ([`20`](20-macierz-delty-czesc-1.md), [`21`](21-macierz-delty-czesc-2.md)) — **gotowe** | — |
 | **P1** | **Rozmowa i mowa**: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, Smart Turn, ekran „Rozmowa na żywo” | A.5, C1.1, C5 |
 | **P2** | **Modele lokalne**: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, panel System | A.4, C2.2 |
 | P3 | Nawigacja: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej | — |
@@ -94,6 +94,8 @@ wad bezpieczeństwa Delty.
 | P10 | Odtwarzanie multimediów i sterowanie głosem (bez biblioteki) | — |
 | P11 | Przepływy, role i przepływ wieloagentowy, edytor persony, trening, pulpit testowy | C1.5 |
 | **P12** | **Agentki programistki**: pisanie, uruchamianie i budowanie oprogramowania z nadrzędnym przyciskiem „Pełne uprawnienia” (jak w Claude Code i Codex), rozmowa między agentkami w trakcie pracy, model dobierany do trudności zadania | C1.2, mosty CLI |
+| **P13** | **Dyski sieciowe i chmurowe**: podłączanie (NAS, WebDAV, SFTP, S3, OneDrive, Google Drive, Dropbox), praca agentek na plikach, kopie zapasowe z harmonogramem, wersjami i przywracaniem | C1.4 (transfer) |
+| **P14** | **Obowiązki codzienne agentek**: przypisanie agentki do stałych zadań — poczta, kalendarz, przegląd wiadomości, przypomnienia, porządki, raport dnia — z harmonogramem i budżetem | C2.7 |
 
 ## 6. Etap C — pozostałe funkcje Windows
 
@@ -157,7 +159,7 @@ typów (B.1, etap 1).
 
 ## 10. Kolejność prac
 
-1. **P0** — dokumenty przeniesienia (macierz funkcji, specyfikacja głosu).
+1. **P0** — dokumenty przeniesienia (macierz funkcji, specyfikacja głosu) — gotowe, do przeglądu właściciela.
 2. **P1** — rozmowa i mowa na żywo na laptopie → zamyka A.5.
 3. **P2** — modele lokalne → zamyka A.4; potem pomiary A.6.
 4. **P3–P5** — nawigacja, rozmowa, sieć i wiedza.
@@ -173,7 +175,8 @@ niezależnie od tej kolejności.
 Podjęte 2026-10-11: Alfa programem docelowym · głos lokalny, nie z chmury · głos Edge „Zofia” tylko jako opcja
 wyłączona domyślnie · zgoda na pobrania do P1 · ADR 0025 (dane biometryczne) przyjęty · bez biblioteki
 multimediów, z systemem odtwarzania · wielu użytkowników z kontami i logowaniem · agentki mają pisać
-i uruchamiać oprogramowanie z pełnymi uprawnieniami w projekcie i dobierać model do zadania · stała zgoda na
+i uruchamiać oprogramowanie z pełnymi uprawnieniami w projekcie i dobierać model do zadania · dyski sieciowe i chmurowe z pełnymi uprawnieniami do kopii zapasowych · agentki przypisywane do
+obowiązków codziennych (poczta i podobne) · stała zgoda na
 pobrania do 3 GB.
 
 Nadal otwarte:
