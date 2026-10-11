@@ -49,13 +49,16 @@ stylach i dwóch motywach:
 - **Kreator agentek** z wpisanym opisem oraz strony z formularzami (zadania w tle, reguły Marszałka,
   umiejętności, wtyczki): każda zakładka i każda rozwijana sekcja w stanie otwartym.
 
-Razem z pierwszą częścią: 55 testów, wszystkie zielone; w drugiej części nie wyszła żadna nowa wada.
+- **Kreator agentek krok po kroku** — szkic z opisu, podgląd persony, wynik testu na sucho, zapis i lista
+  agentek z Kreatora.
 
-**Ocena na oko:** obejrzałem zbiorcze zrzuty wszystkich 32 stron Ustawień w stylu Klasycznym (jasny) oraz po
-ośmiu stron w stylach Szkło (ciemny) i Next (jasny) —
-`scripts/shots-settings-all.mjs`. W tej skali (miniatury) nie widać rozjechanych układów, pustych kart ani
-uciętych elementów. Uchwyt zmiany rozmiaru pól wielowierszowych jest rysowany przez Alfę (`base.css`), nie przez
-system. Miniatury nie pozwalają ocenić drobnych odstępów ani typografii — to wymaga oglądania stron w pełnej skali.
+Razem z pierwszą częścią: 61 testów, wszystkie zielone; w drugiej części nie wyszła żadna nowa wada.
+
+**Ocena na oko:** obejrzałem zbiorcze zrzuty stron Ustawień we wszystkich sześciu kombinacjach stylu i motywu
+(`scripts/shots-settings-all.mjs`): cały styl Klasyczny jasny (32 strony) i po osiem stron w pozostałych pięciu.
+W tej skali (miniatury) nie widać rozjechanych układów, pustych kart ani uciętych elementów. Uchwyt zmiany
+rozmiaru pól wielowierszowych jest rysowany przez Alfę (`base.css`), nie przez system. Miniatury nie pozwalają
+ocenić drobnych odstępów ani typografii.
 
 ## Czego ten przegląd nie obejmuje
 
@@ -65,14 +68,11 @@ system. Miniatury nie pozwalają ocenić drobnych odstępów ani typografii — 
   oknem przeglądarki; sprawdza je częściowo `e2e-app`, reszta wymaga ręcznej próby na komputerze.
 - **Okien Brokera** (zatwierdzenia) — osobny proces, obszar Jądra.
 - **Stanów zależnych od sprzętu** — prawdziwa kamera, mikrofon, model lokalny.
-- **Oceny na oko w pełnej skali** — obejrzane są miniatury: cały styl Klasyczny jasny i po osiem stron stylów
-  Szkło ciemny i Next jasny; pozostałe kombinacje i ocena drobnych odstępów w pełnej skali są do zrobienia.
-- **Dalszych kroków Kreatora agentek** (podgląd persony, test na sucho, zapis) i okien zgód — mają własne
-  testy przebiegu, bez przeglądu układu w każdym stylu.
+- **Oceny na oko w pełnej skali** — drobne odstępy i typografia; miniatury tego nie pokażą.
+- **Okien zgód agentek** — otwiera je Broker.
 
 ## Następne kroki przeglądu
 
-1. Ręczna próba skrótów globalnych na laptopie właściciela (lista w Ustawienia → Skróty).
+1. Razem z właścicielem (ok. 15 minut przy laptopie): skróty globalne z listy w Ustawienia → Skróty, okna
+   Brokera, prawdziwa kamera i mikrofon.
 2. Ocena na oko w pełnej skali: po jednym stylu na sesję, wszystkie strony i panele.
-3. Dopisać do przeglądu pozostałe okna dialogowe i kroki Kreatora agentek.
-4. Okna Brokera i stany zależne od sprzętu — razem z właścicielem.

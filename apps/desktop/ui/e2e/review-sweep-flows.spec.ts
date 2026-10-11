@@ -228,6 +228,39 @@ for (const style of STYLES) {
       expect(errors, 'błędy w konsoli').toEqual([]);
     });
 
+    test(`Kreator agentek krok po kroku — ${style} ${theme}`, async ({ page }) => {
+      const errors = watchConsole(page);
+      await open(page, style, theme);
+      await waitForChat(page);
+      await openSettings(page, 'Kreator agentek');
+      const found: string[] = [];
+      const check = async (label: string) => {
+        await page.waitForTimeout(200);
+        for (const defect of await layoutDefects(page)) found.push(`${label}: ${defect}`);
+      };
+      await page
+        .getByLabel('Jaka ma być nowa agentka?')
+        .fill('Agentka o imieniu Zofia, która porządkuje pobrane pliki.');
+      await page.getByRole('button', { name: 'Zaproponuj szkic' }).click();
+      await expect(page.getByLabel('Imię', { exact: true })).toHaveValue('Zofia');
+      await check('szkic z opisu');
+      await page.getByRole('button', { name: 'Pokaż podgląd' }).click();
+      const preview = page.getByRole('region', { name: 'Podgląd persony' });
+      await expect(preview).toBeVisible();
+      await preview.scrollIntoViewIfNeeded();
+      await check('podgląd persony');
+      await preview.getByRole('button', { name: 'Test na sucho' }).click();
+      await expect(preview.getByText('Test na sucho zaliczony')).toBeVisible();
+      await check('wynik testu na sucho');
+      await preview.getByRole('button', { name: 'Zapisz agentkę' }).click();
+      await expect(page.getByText('Zapisano agentkę Zofia.')).toBeVisible();
+      const saved = page.getByRole('region', { name: 'Agentki z Kreatora' });
+      await saved.scrollIntoViewIfNeeded();
+      await check('lista agentek z Kreatora');
+      expect(found, 'wady układu Kreatora agentek').toEqual([]);
+      expect(errors, 'błędy w konsoli').toEqual([]);
+    });
+
     test(`stany systemowe i okna poboczne — ${style} ${theme}`, async ({ page }) => {
       const errors = watchConsole(page);
       const found: string[] = [];
