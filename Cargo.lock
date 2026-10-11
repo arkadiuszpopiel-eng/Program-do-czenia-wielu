@@ -7891,6 +7891,7 @@ name = "voice-stt-impl"
 version = "0.0.32"
 dependencies = [
  "async-trait",
+ "base64 0.22.1",
  "core-bus-contract",
  "core-bus-fake",
  "core-registry-contract",

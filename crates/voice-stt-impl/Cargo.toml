@@ -22,7 +22,9 @@ tokio = { workspace = true, features = ["process", "io-util"] }
 # Wiersze stderr `whisper-server` (błędy, backend) w dzienniku diagnostycznym Alfy (`app-logs`).
 tracing.workspace = true
 # Klient HTTP tylko do 127.0.0.1: bez TLS, bez proxy, z multipart (docs/vendor/reqwest.md: 0.12.28).
-reqwest = { version = "0.12.28", default-features = false, features = ["multipart"] }
+reqwest = { version = "0.12.28", default-features = false, features = ["multipart", "json"] }
+# Nagranie WAV w zapytaniu do `llama-server` (Qwen3-ASR) jest kodowane base64.
+base64 = "0.22.1"
 
 [dev-dependencies]
 voice-stt-contract = { path = "../voice-stt-contract", features = ["contract-tests"] }

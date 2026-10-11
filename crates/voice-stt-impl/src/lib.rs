@@ -10,6 +10,8 @@ pub mod breaker;
 pub mod client;
 mod engine;
 pub mod guard;
+pub mod qwen;
+mod qwen_wire;
 pub mod sidecar;
 
 use std::sync::Arc;
