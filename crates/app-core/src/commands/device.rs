@@ -7,8 +7,8 @@ use device_profile_contract::{
 
 use crate::core::AppCore;
 use crate::dto::{
-    self, BatteryView, CpuView, DeviceProfile, GpuView, HwClass, LocalizedText, MachineView,
-    RecommendationView, VoiceProfileId,
+    self, BatteryView, CpuView, DeviceProfile, GpuLive, GpuLiveCard, GpuLiveProcess, GpuView,
+    HwClass, LocalizedText, MachineView, RecommendationView, VoiceProfileId,
 };
 use crate::error::AppError;
 
@@ -116,5 +116,48 @@ impl AppCore {
             tracing::warn!(error = %e, "ponowna detekcja sprzętu nie powiodła się");
         }
         Ok(self.device_now())
+    }
+
+    /// `device_gpu_live`: karty graficzne na żywo (pamięć, obciążenie, temperatura, moc, programy).
+    /// Odczyt uruchamia narzędzie sterownika, więc idzie poza wątkiem obsługi poleceń.
+    pub async fn device_gpu_live(&self) -> Result<GpuLive, AppError> {
+        let read = tokio::task::spawn_blocking(app_modules::gpu_mem::nvidia_live)
+            .await
+            .map_err(|e| AppError::internal(e.to_string()))?;
+        Ok(read.map_or_else(GpuLive::default, gpu_live_view))
+    }
+}
+
+/// Odczyt w kształcie dla okna.
+fn gpu_live_view(
+    (cards, processes): (
+        Vec<app_modules::gpu_mem::GpuCard>,
+        Vec<app_modules::gpu_mem::GpuProcess>,
+    ),
+) -> GpuLive {
+    GpuLive {
+        available: true,
+        cards: cards
+            .into_iter()
+            .map(|c| GpuLiveCard {
+                index: c.index,
+                name: c.name,
+                total_mb: c.total_mb,
+                used_mb: c.used_mb,
+                free_mb: c.free_mb,
+                load_pct: c.load_pct,
+                temp_c: c.temp_c,
+                power_w: c.power_w,
+            })
+            .collect(),
+        processes: processes
+            .into_iter()
+            .map(|p| GpuLiveProcess {
+                pid: p.pid,
+                name: p.name,
+                used_mb: p.used_mb,
+                alfa: p.alfa,
+            })
+            .collect(),
     }
 }

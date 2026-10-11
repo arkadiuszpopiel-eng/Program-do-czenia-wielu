@@ -1124,6 +1124,43 @@ export interface FxView {
   readonly usd_pln: number;
 }
 
+/** Odczyt kart na żywo. */
+export interface GpuLive {
+  /** Pomiar dostępny (dziś: karty NVIDIA ze sterownikiem); `false` — listy są puste. */
+  readonly available: boolean;
+  readonly cards: readonly GpuLiveCard[];
+  readonly processes: readonly GpuLiveProcess[];
+}
+
+/** Stan jednej karty. */
+export interface GpuLiveCard {
+  /** Pamięć wolna (MiB). */
+  readonly free_mb: number;
+  readonly index: number;
+  /** Obciążenie (%); `None` — karta go nie podaje. */
+  readonly load_pct: number | null;
+  readonly name: string;
+  /** Pobór mocy (W). */
+  readonly power_w: number | null;
+  /** Temperatura (°C). */
+  readonly temp_c: number | null;
+  /** Pamięć razem (MiB). */
+  readonly total_mb: number;
+  /** Pamięć zajęta (MiB). */
+  readonly used_mb: number;
+}
+
+/** Program korzystający z karty. */
+export interface GpuLiveProcess {
+  /** Program uruchomiony przez Alfę (silnik modelu, mowy albo sam program). */
+  readonly alfa: boolean;
+  /** Nazwa pliku programu (bez katalogu). */
+  readonly name: string;
+  readonly pid: number;
+  /** Zajęta pamięć karty (MiB); `None` — system jej nie podaje. */
+  readonly used_mb: number | null;
+}
+
 /** Karta graficzna. */
 export interface GpuView {
   readonly backends: readonly string[];
@@ -3178,6 +3215,10 @@ export interface IpcCommands {
   readonly costs_summary: {
     readonly args: { readonly sessionId: string | null };
     readonly result: CostSummary;
+  };
+  readonly device_gpu_live: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: GpuLive;
   };
   readonly device_measure: {
     readonly args: Readonly<Record<string, never>>;

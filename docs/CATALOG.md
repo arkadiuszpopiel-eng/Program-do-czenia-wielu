@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 110 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 391 747 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2701 |
+| Linie Rust (z testami) | 392 270 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2704 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -83,8 +83,8 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `voice-readaloud` | F5 | voice-engine | inproc | C · I · F | 1930 | 7 | [voice-readaloud](modules/voice-readaloud/SPEC.md) | Czytanie zaznaczenia lub okna przez UIA `TextPattern` głosem agentki; treść niezaufana. |
 | `voice-s2s` | F5 | — | — | C · F | 1088 | 6 | [voice-s2s](modules/voice-s2s/SPEC.md) | Kontrakt trybu speech-to-speech w chmurze z obcinaniem odpowiedzi po stronie dostawcy (adapter później). |
 | `voice-speaker` | F5 | voice-engine | inproc | C · I · F | 2780 | 15 | [voice-speaker](modules/voice-speaker/SPEC.md) | Weryfikacja właściciela (ECAPA), profil szyfrowany; ryzyko głosem bez weryfikacji → potwierdzenie nie-głosem. |
-| `voice-stt` | F2 | voice-engine | process | C · I · F | 4462 | 38 | [voice-stt](modules/voice-stt/SPEC.md) | whisper.cpp jako sidecar `whisper-server`: transkrypt częściowy i końcowy, hotwords, fallback GPU → CPU. |
-| `voice-tts` | F2 | voice-engine | process | C · I · F | 3367 | 25 | [voice-tts](modules/voice-tts/SPEC.md) | Pocket TTS i Piper, głosy v0 (wysokość, tempo), łańcuch zapasowy per agentka, cache fraz. |
+| `voice-stt` | F2 | voice-engine | process | C · I · F | 4469 | 38 | [voice-stt](modules/voice-stt/SPEC.md) | whisper.cpp jako sidecar `whisper-server`: transkrypt częściowy i końcowy, hotwords, fallback GPU → CPU. |
+| `voice-tts` | F2 | voice-engine | process | C · I · F | 3404 | 25 | [voice-tts](modules/voice-tts/SPEC.md) | Pocket TTS i Piper, głosy v0 (wysokość, tempo), łańcuch zapasowy per agentka, cache fraz. |
 | `voice-turn` | F2 | voice-engine | inproc | C · I · F | 1899 | 28 | [voice-turn](modules/voice-turn/SPEC.md) | Wykrywanie końca tury z polityką cierpliwości wobec hezytacji. |
 | `voice-vad` | F2 | voice-engine | inproc | C · I · F | 1808 | 12 | [voice-vad](modules/voice-vad/SPEC.md) | Silero VAD przez `tract-onnx` z progiem adaptacyjnym — bramka dla STT i sygnał przerwania. |
 | `voice-wake` | F2, F5 | voice-engine | inproc | C · I · F | 4922 | 27 | [voice-wake](modules/voice-wake/SPEC.md) | PTT, przełącznik, adresowanie po imieniu; v1 — słowa wywoławcze „Hej …” lokalnie, domyślnie wyłączone. |
@@ -147,18 +147,18 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4258 | 26 | — |  |
-| `app-api` | — | — | — | pojedynczy | 7102 | 32 | — |  |
+| `app-api` | — | — | — | pojedynczy | 7149 | 32 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4287 | 23 | — |  |
 | `app-chat` | — | — | — | pojedynczy | 2164 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 16 214 | 109 | — |  |
+| `app-core` | — | — | — | pojedynczy | 16 258 | 109 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3184 | 26 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
 | `app-health` | — | — | — | pojedynczy | 1482 | 6 | — |  |
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 7540 | 46 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 4307 | 24 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 4501 | 26 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |
@@ -166,7 +166,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-tasks` | — | — | — | pojedynczy | 3071 | 7 | — |  |
 | `app-terminal` | — | — | — | pojedynczy | 441 | 2 | — |  |
 | `app-updates` | — | — | — | pojedynczy | 1301 | 13 | — |  |
-| `app-voice` | — | — | — | pojedynczy | 5353 | 24 | — |  |
+| `app-voice` | — | — | — | pojedynczy | 5547 | 25 | — |  |
 
 ## Biblioteki wspólne (`lib-*`)
 

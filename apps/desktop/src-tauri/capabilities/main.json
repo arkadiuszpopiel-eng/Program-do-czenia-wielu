@@ -87,6 +87,7 @@
     "allow-models-local-cancel",
     "allow-device-profile",
     "allow-device-measure",
+    "allow-device-gpu-live",
     "allow-voice-devices",
     "allow-voice-start-mic-test",
     "allow-voice-stop-mic-test",

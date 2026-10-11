@@ -161,6 +161,7 @@ export class TauriAlfaClient implements AlfaClient {
   readonly device: AlfaClient['device'] = {
     profile: () => call('device_profile'),
     measure: () => call('device_measure'),
+    gpuLive: () => call('device_gpu_live'),
   };
 
   readonly voice: AlfaClient['voice'] = {

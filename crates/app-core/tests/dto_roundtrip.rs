@@ -243,6 +243,7 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
         "models_local_list" => (vec![], roundtrip::<Vec<LocalModelInfo>>),
         "models_local_download" | "models_local_cancel" => (vec![("modelId", os)], unit),
         "device_profile" | "device_measure" => (vec![], roundtrip::<DeviceProfile>),
+        "device_gpu_live" => (vec![], roundtrip::<GpuLive>),
         "voice_devices" => (vec![], roundtrip::<Vec<AudioDevice>>),
         "voice_start_mic_test"
         | "voice_stop_mic_test"

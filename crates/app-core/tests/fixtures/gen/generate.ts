@@ -216,6 +216,7 @@ async function run(): Promise<void> {
 
   await both('device', 'profile');
   await both('device', 'measure');
+  await both('device', 'gpuLive');
 
   // Kamery: stan, przełączniki, klatka i zdjęcie jako załącznik (kamery włączone tylko na chwilę).
   await both('cameras', 'state');

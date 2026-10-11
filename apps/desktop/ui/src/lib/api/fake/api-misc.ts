@@ -169,6 +169,31 @@ export function deviceApi(core: FakeCore): AlfaClient['device'] {
   return {
     profile: () => core.reply(seedDevice(core.scheduler.now())),
     measure: () => core.reply(seedDevice(core.scheduler.now())),
+    gpuLive: () =>
+      core.reply(
+        core.scenario === 'no-mic'
+          ? { available: false, cards: [], processes: [] }
+          : {
+              available: true,
+              cards: [
+                {
+                  index: 0,
+                  name: 'NVIDIA GeForce RTX 4050 Laptop GPU',
+                  total_mb: 6141,
+                  used_mb: 3420,
+                  free_mb: 2721,
+                  load_pct: 37,
+                  temp_c: 61,
+                  power_w: 48,
+                },
+              ],
+              processes: [
+                { pid: 4242, name: 'llama-server.exe', used_mb: 2610, alfa: true },
+                { pid: 5120, name: 'alfa-desktop.exe', used_mb: 180, alfa: true },
+                { pid: 12696, name: 'explorer.exe', used_mb: null, alfa: false },
+              ],
+            },
+      ),
   };
 }
 

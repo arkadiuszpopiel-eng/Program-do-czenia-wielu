@@ -12,6 +12,26 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.36 — 2026-10-12
+
+Widać, co dzieje się na karcie graficznej — pierwszy krok panelu sprzętu z planu P2.
+
+### Modele i silniki
+
+- Ustawienia → Urządzenia pokazują kartę „Karty graficzne na żywo”: ile pamięci karty jest zajęte i wolne,
+  obciążenie, temperaturę, pobór mocy oraz programy, które z karty korzystają — z oznaczeniem silników Alfy
+  i sumą pamięci, którą zajmują. Odczyt odświeża się co 3 sekundy; można go wstrzymać.
+- Odczyt działa dziś dla kart NVIDIA (narzędzie sterownika). Na innym sprzęcie karta mówi to wprost, zamiast
+  pokazywać puste pola; karty AMD i Intel dojdą przez liczniki systemu Windows.
+
+### Testy
+
+- Odczyt kart: nazwy z przecinkiem, brakujące pomiary, powtórzone procesy, kolejność (Rust); w przeglądarce — oba
+  motywy z kontrolą dostępności, wstrzymanie z klawiatury, scenariusz bez pomiaru; zrzuty w trzech stylach.
+- Test prawdziwej aplikacji: nowe sprawdzenie kart „Silniki rozmowy” i „Karty graficzne na żywo” na rdzeniu
+  (odczyt z prawdziwego sterownika).
+- 229 poleceń łącza (doszło `device_gpu_live`).
+
 ## 0.0.35 — 2026-10-12
 
 Rozmowę widać i da się ją stroić: karta „Silniki rozmowy”, ustawienia końca wypowiedzi i nowe silniki w pakietach.

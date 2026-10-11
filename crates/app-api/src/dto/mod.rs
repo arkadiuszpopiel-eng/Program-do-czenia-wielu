@@ -13,6 +13,7 @@ mod cameras;
 mod common;
 mod events;
 mod files;
+mod gpu_live;
 mod gui;
 mod health;
 mod hub;
@@ -49,6 +50,7 @@ pub use files::{
     AttachmentRejection, AttachmentsAdded, BackupCheck, BackupConfig, BackupEntry, BackupView,
     ConversationFormat, TurnAttachment,
 };
+pub use gpu_live::{GpuLive, GpuLiveCard, GpuLiveProcess};
 pub use gui::{
     GuiAction, GuiActionStatus, GuiControl, GuiScreenshot, GuiShotInfo, GuiStatus, TerminalFrame,
     TerminalProfileId, TerminalSession,

@@ -528,6 +528,63 @@ test('Ustawienia → Aktualizacje: historia zmian z prawdziwego dziennika, wagi 
   await expect(history.getByText('[poważne]')).toHaveCount(0);
 });
 
+test('Ustawienia → Głos i Urządzenia: silniki rozmowy i karty graficzne z prawdziwego rdzenia', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await startView(main);
+  await openSettings(main, 'Głos');
+  const engines = main.getByTestId('voice-engines');
+  await engines.scrollIntoViewIfNeeded();
+  await expect(engines.getByRole('heading', { name: 'Silniki rozmowy' })).toBeVisible();
+  await expect(engines.getByText('Rozpoznawanie mowy', { exact: true })).toBeVisible();
+  await expect(engines.getByText('Koniec wypowiedzi', { exact: true })).toBeVisible();
+  // Widok pochodzi z rdzenia: ma komplet pól i trzy silniki mowy w kolejności prób.
+  const view = await main.evaluate(async () => {
+    const ipcWindow = window as unknown as {
+      __TAURI_INTERNALS__: {
+        invoke: (
+          cmd: string,
+          args?: unknown,
+        ) => Promise<{
+          engines: {
+            stt: { engine: string; missing: string[] };
+            turn: { engine: string; missing: string[] };
+            tts: { engine: string; ready: boolean }[];
+          };
+        }>;
+      };
+    };
+    return (
+      await ipcWindow.__TAURI_INTERNALS__.invoke('voice_engines', { action: { kind: 'refresh' } })
+    ).engines;
+  });
+  expect(view.tts.map((e) => e.engine)).toEqual(['supertonic', 'pocket', 'piper']);
+  expect(['qwen_asr', 'whisper', 'none']).toContain(view.stt.engine);
+  expect(['smart_turn', 'text']).toContain(view.turn.engine);
+  // Na świeżym profilu nie ma modeli: karta mówi, co pobrać, i prowadzi do katalogu.
+  if (view.stt.missing.length > 0 || view.turn.missing.length > 0) {
+    await expect(
+      engines.getByRole('button', { name: 'Otwórz „Modele lokalne i silniki”' }),
+    ).toBeVisible();
+  }
+  await expect(main.getByText('Wyczucie końca wypowiedzi (Smart Turn)').first()).toBeVisible();
+  await shot(alfa, '15-silniki-rozmowy');
+
+  await openSettings(main, 'Urządzenia');
+  const live = main.getByTestId('gpu-live');
+  await live.scrollIntoViewIfNeeded();
+  await expect(live.getByRole('heading', { name: 'Karty graficzne na żywo' })).toBeVisible();
+  // Z kartą NVIDIA jest miernik pamięci; bez niej — wyjaśnienie. Nigdy pusta karta.
+  await expect(
+    live
+      .getByRole('meter')
+      .first()
+      .or(live.getByText(/Odczyt na żywo działa dziś dla kart NVIDIA/)),
+  ).toBeVisible({ timeout: 15_000 });
+  await shot(alfa, '16-karty-na-zywo');
+});
+
 test('okna poboczne (Szybkie pytanie, pigułka) ładują się w WebView2', async ({ alfa }) => {
   const { quick, pill } = alfa.windows;
   expect(quick, 'okno „quick” wśród stron CDP').toBeTruthy();

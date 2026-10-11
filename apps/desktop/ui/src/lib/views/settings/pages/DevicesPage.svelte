@@ -6,6 +6,7 @@
   import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import GpuLiveCard from './GpuLiveCard.svelte';
 
   const app = useApp();
   const { t, tk } = app.i18n;
@@ -87,6 +88,7 @@
       </dd>
     </dl>
   </section>
+  <GpuLiveCard />
   <section class="card" aria-labelledby="dev-rec">
     <h3 id="dev-rec">{t('dev.recommendation')}</h3>
     <dl class="grid">

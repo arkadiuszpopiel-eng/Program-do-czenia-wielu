@@ -236,6 +236,33 @@ export interface GpuInfo {
   readonly shared_mb: number;
 }
 
+/** Stan jednej karty graficznej na żywo (pamięć w MiB). */
+export interface GpuLiveCard {
+  readonly index: number;
+  readonly name: string;
+  readonly total_mb: number;
+  readonly used_mb: number;
+  readonly free_mb: number;
+  readonly load_pct: number | null;
+  readonly temp_c: number | null;
+  readonly power_w: number | null;
+}
+
+/** Program korzystający z karty; `alfa` — uruchomiony przez Alfę. */
+export interface GpuLiveProcess {
+  readonly pid: number;
+  readonly name: string;
+  readonly used_mb: number | null;
+  readonly alfa: boolean;
+}
+
+/** Karty graficzne na żywo (`device_gpu_live`); `available: false` — pomiaru nie da się zrobić. */
+export interface GpuLive {
+  readonly available: boolean;
+  readonly cards: readonly GpuLiveCard[];
+  readonly processes: readonly GpuLiveProcess[];
+}
+
 export interface DeviceProfile {
   readonly machine: {
     readonly id: string;

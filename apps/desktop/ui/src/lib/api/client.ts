@@ -31,6 +31,7 @@ import type {
   AudioDevice,
   BrokerIntentResult,
   DeviceProfile,
+  GpuLive,
   ExportRequest,
   ExportResult,
   ImportRequest,
@@ -263,6 +264,8 @@ export interface CamerasApi {
 export interface DeviceApi {
   profile(): Promise<DeviceProfile>;
   measure(): Promise<DeviceProfile>;
+  /** Karty graficzne na żywo: pamięć, obciążenie, temperatura, moc, programy. */
+  gpuLive(): Promise<GpuLive>;
 }
 
 export interface VoiceApi {

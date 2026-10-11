@@ -4143,6 +4143,136 @@
       ],
       "type": "object"
     },
+    "GpuLive": {
+      "description": "Odczyt kart na żywo.",
+      "properties": {
+        "available": {
+          "description": "Pomiar dostępny (dziś: karty NVIDIA ze sterownikiem); `false` — listy są puste.",
+          "type": "boolean"
+        },
+        "cards": {
+          "items": {
+            "$ref": "#/$defs/GpuLiveCard"
+          },
+          "type": "array"
+        },
+        "processes": {
+          "items": {
+            "$ref": "#/$defs/GpuLiveProcess"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "available",
+        "cards",
+        "processes"
+      ],
+      "type": "object"
+    },
+    "GpuLiveCard": {
+      "description": "Stan jednej karty.",
+      "properties": {
+        "free_mb": {
+          "description": "Pamięć wolna (MiB).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "index": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "load_pct": {
+          "description": "Obciążenie (%); `None` — karta go nie podaje.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "power_w": {
+          "description": "Pobór mocy (W).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "temp_c": {
+          "description": "Temperatura (°C).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "total_mb": {
+          "description": "Pamięć razem (MiB).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "used_mb": {
+          "description": "Pamięć zajęta (MiB).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "index",
+        "name",
+        "total_mb",
+        "used_mb",
+        "free_mb",
+        "load_pct",
+        "temp_c",
+        "power_w"
+      ],
+      "type": "object"
+    },
+    "GpuLiveProcess": {
+      "description": "Program korzystający z karty.",
+      "properties": {
+        "alfa": {
+          "description": "Program uruchomiony przez Alfę (silnik modelu, mowy albo sam program).",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "Nazwa pliku programu (bez katalogu).",
+          "type": "string"
+        },
+        "pid": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "used_mb": {
+          "description": "Zajęta pamięć karty (MiB); `None` — system jej nie podaje.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "pid",
+        "name",
+        "used_mb",
+        "alfa"
+      ],
+      "type": "object"
+    },
     "GpuView": {
       "description": "Karta graficzna.",
       "properties": {
@@ -11687,6 +11817,12 @@
       ],
       "result": {
         "$ref": "#/$defs/CostSummary"
+      }
+    },
+    "device_gpu_live": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/GpuLive"
       }
     },
     "device_measure": {

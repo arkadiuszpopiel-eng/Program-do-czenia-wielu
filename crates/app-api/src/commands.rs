@@ -86,6 +86,7 @@ macro_rules! with_commands {
             models_local_cancel(model_id: Option<String>) -> ();
             device_profile() -> $crate::dto::DeviceProfile;
             device_measure() -> $crate::dto::DeviceProfile;
+            device_gpu_live() -> $crate::dto::GpuLive;
             voice_devices() -> Vec<$crate::dto::AudioDevice>;
             voice_start_mic_test(device_id: Option<String>) -> ();
             voice_stop_mic_test() -> ();
@@ -261,6 +262,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 228);
+        assert_eq!(super::COMMANDS.len(), 229);
     }
 }
