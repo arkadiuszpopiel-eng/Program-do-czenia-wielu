@@ -136,6 +136,37 @@ Progi liczbowe są propozycją — po pierwszym pomiarze właściciel je zatwier
 Zestaw 20 zdań obejmuje: liczebniki i daty, skróty, nazwy własne, zdania pytające i wykrzyknikowe, zbitki
 spółgłoskowe („chrząszcz”, „bezwzględny”), wtrącenia angielskie, jedno długie zdanie złożone.
 
+## 5a. Pierwszy pomiar (2026-10-11, po zgodzie właściciela na pobranie)
+
+Pobrane do folderu `alfa-glos-proba` obok repozytorium (poza programem): Supertonic 3 z oficjalnego archiwum
+`supertone-oss-archive/supertonic-3`, wersja `aafc6e32` (383 MB), uruchomiony przykładem producenta na ONNX
+Runtime 1.23.1, sam procesor. Dla porównania te same 20 zdań obecnym Piperem. Strona do odsłuchu:
+`alfa-glos-proba/odsluch.html`.
+
+| Silnik                              | Zdanie gotowe — mediana | Najwolniejsze 5 % | Czas syntezy do czasu dźwięku |
+| ----------------------------------- | ----------------------- | ----------------- | ----------------------------- |
+| Piper „Gosia” (proces na zdanie)    | 0,56 s                  | 0,79 s            | 0,12                          |
+| Supertonic 3, 8 kroków (domyślnie)  | 2,10 s                  | 3,18 s            | 0,38                          |
+| Supertonic 3, 2 kroki, krótkie zdanie | 0,75 s                | —                 | 0,19                          |
+
+Wnioski z pomiaru (bez oceny brzmienia — tę wystawia właściciel na słuch):
+
+- **Supertonic 3 nie jest „szybki” na tym laptopie**: przy ustawieniach domyślnych jest około 4 razy wolniejszy
+  od Pipera i nie mieści się w budżecie 500 ms; nie podaje dźwięku strumieniowo, więc pierwszy dźwięk pojawia
+  się dopiero po całym zdaniu. Mieści się w progu czytania na głos (1500 ms) tylko przy 2–4 krokach.
+- Jeśli na słuch okaże się wyraźnie lepszy od Pipera, jego miejsce to czytanie na głos i dłuższe wypowiedzi,
+  a w rozmowie — tylko z małą liczbą kroków. Jeśli nie — poziomem szybkim zostaje Piper.
+- Wszystkie 56 plików ma poprawny dźwięk (bez przesterowania i ciszy); czy mowa jest poprawna po polsku,
+  tego pomiar nie mówi.
+- Licencja wag (OpenRAIL-M) przeczytana: wolno używać i rozpowszechniać, także komercyjnie, pod warunkiem
+  przekazania dalej listy zakazanych zastosowań i kopii licencji. Lista zakazuje m.in. podszywania się pod
+  osoby bez zgody, treści bez oznaczenia, że pochodzą od maszyny, oraz **udzielania porad medycznych** — to
+  ostatnie wymaga decyzji, bo asystentka może przeczytać na głos odpowiedź o zdrowiu.
+
+Chatterbox nie jest jeszcze pobrany: do odsłuchu potrzebny jest oryginalny pakiet producenta z PyTorch
+(ok. 3,5 GB bez karty albo ok. 6 GB z kartą), a nie 1 GB wag skwantyzowanych, które podałam wcześniej — tamte
+wymagają najpierw zbudowania `chatterbox.cpp`. Czekam na potwierdzenie rozmiaru.
+
 ## 6. Zadania (roadmapa, grupa C5)
 
 | ID   | Zadanie                                                                                                         | Wymaga właściciela                       |
