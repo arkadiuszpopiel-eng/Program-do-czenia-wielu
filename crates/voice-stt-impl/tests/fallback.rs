@@ -159,8 +159,10 @@ async fn flagged_result_is_replaced_and_foreign_language_is_blanked() {
     // Chiński przy żądanym polskim i pusty zapas → tekst skasowany.
     let (main, spare) = (Scripted::says("你好", "zh"), Scripted::says("", "pl"));
     let stt = GuardedStt::new(main, spare);
-    let mut cfg = SttCfg::default();
-    cfg.language = LangMode::Pl;
+    let cfg = SttCfg {
+        language: LangMode::Pl,
+        ..SttCfg::default()
+    };
     stt.configure(cfg).await.unwrap();
     assert!(
         say(&stt, 2, &frames(1000, 0.2))

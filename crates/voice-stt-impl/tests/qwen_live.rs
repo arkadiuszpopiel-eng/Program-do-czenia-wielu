@@ -4,6 +4,7 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+use std::io::Write as _;
 use std::sync::Arc;
 
 use voice_stt_contract::{Health, Stt, UtteranceId};
@@ -31,7 +32,7 @@ async fn real_model_transcribes_polish_speech() {
         std::env::var("ALFA_QWEN_MMPROJ"),
         std::env::var("ALFA_QWEN_WAV"),
     ) else {
-        eprintln!("pominięte: brak zmiennych ALFA_QWEN_*");
+        let _ = writeln!(std::io::stderr(), "pominięte: brak zmiennych ALFA_QWEN_*");
         return;
     };
     let stt = QwenStt::new(
@@ -47,10 +48,11 @@ async fn real_model_transcribes_polish_speech() {
     let started = std::time::Instant::now();
     let second = stt.transcribe(UtteranceId(2), &pcm, true).await.unwrap();
     let warm = started.elapsed();
-    println!(
+    let report = format!(
         "zimny start {cold:?}, ciepłe rozpoznanie {warm:?}, język „{}”, tekst: {}",
         second.lang, second.text
     );
+    let _ = writeln!(std::io::stderr(), "{report}");
     assert_eq!(first.lang, "pl");
     assert!(!second.text.is_empty());
     if let Ok(expect) = std::env::var("ALFA_QWEN_EXPECT") {
