@@ -14,6 +14,7 @@
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { CronPreview, TriggerKindView } from '../../../api/types-tasks';
+  import { DUTY_TEMPLATES, type DutyTemplate } from '../../../logic/duties';
   import { useApp } from '../../../state/context';
 
   interface Props {
@@ -47,6 +48,16 @@
       },
     );
   });
+
+  /** Gotowy obowiązek: wypełnia formularz (nazwa, harmonogram, polecenie, agentka) — nic nie tworzy. */
+  function useDuty(duty: DutyTemplate) {
+    name = t(duty.name);
+    kind = 'cron';
+    expr = duty.cron;
+    goal = t(duty.goal);
+    agent = duty.agent;
+    app.announcement = t('duty.filled', { name: t(duty.name) });
+  }
 
   function view(): TriggerKindView {
     switch (kind) {
@@ -94,6 +105,19 @@
   }}
 >
   <h3 id="trg-new">{t('triggers.new')}</h3>
+  <div class="duties" role="group" aria-labelledby="trg-duties">
+    <h4 id="trg-duties">{t('duty.title')}</h4>
+    <p class="hint">{t('duty.hint')}</p>
+    <ul>
+      {#each DUTY_TEMPLATES as duty (duty.id)}
+        <li>
+          <Button size="sm" variant="secondary" onclick={() => useDuty(duty)}>{t(duty.name)}</Button
+          >
+          <span class="hint">{t(duty.when)} · {AGENTS[duty.agent].name}</span>
+        </li>
+      {/each}
+    </ul>
+  </div>
   <TextField label={t('triggers.name')} bind:value={name} />
   <SegmentedControl
     label={t('triggers.kind')}
@@ -162,5 +186,33 @@
   .note {
     font-size: var(--alfa-font-size-xs);
     font-style: italic;
+  }
+  .duties {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-2);
+    padding: var(--alfa-space-3);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-control);
+    background: var(--alfa-color-surface2);
+  }
+  .duties ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .duties li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--alfa-space-2);
+  }
+  .hint {
+    margin: 0;
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-xs);
   }
 </style>

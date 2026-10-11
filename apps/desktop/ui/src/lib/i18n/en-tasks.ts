@@ -83,6 +83,26 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'triggers.agentAny': 'Any',
   'triggers.dnd': 'Respect “do not disturb”',
   'triggers.preview': 'Next runs',
+  'duty.title': 'Ready-made daily duties',
+  'duty.hint':
+    'Pick a duty and the form fills itself in — you can change the name, time, agent and instruction before creating it.',
+  'duty.filled': 'Form filled in: {name}.',
+  'duty.morning.name': 'Morning overview',
+  'duty.morning.when': 'weekdays at 8:00',
+  'duty.morning.goal':
+    'Prepare a short overview for today: open tasks and their state, background tasks scheduled for today, and costs from yesterday and the current month. At most 7 points, most important first.',
+  'duty.evening.name': 'End-of-day summary',
+  'duty.evening.when': 'weekdays at 18:00',
+  'duty.evening.goal':
+    'Summarise today’s work: what was done, what waits for tomorrow and what needs my decision. Short, as bullet points.',
+  'duty.tidy.name': 'Tidy the working folder',
+  'duty.tidy.when': 'Saturdays at 12:00',
+  'duty.tidy.goal':
+    'Go through the working folder: list temporary files, duplicates and the ten largest files. Do not delete or move anything — prepare a list with a proposal and wait for my approval.',
+  'duty.costs.name': 'Cost check',
+  'duty.costs.when': 'Mondays at 9:00',
+  'duty.costs.goal':
+    'Compare model costs from the last week with the week before: point out what grew the most and suggest which simple tasks could move to a cheaper or local model.',
   'triggers.create': 'Create trigger',
   'triggers.created': 'Trigger “{name}” created.',
   'triggers.log': 'Run log',

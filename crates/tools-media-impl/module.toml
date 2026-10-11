@@ -2,7 +2,7 @@
 # Zdolności z tokenu Brokera per wywołanie: `fs.read(plik)`, przy konwersji także `fs.write(nowy plik)`.
 # Sidecar `ffmpeg` (opcjonalny, instalacja ręczna) w Job Object; głośnik przez kolejkę mówienia `scheduler-lite`.
 id = "tools-media"
-version = "0.0.39"
+version = "0.0.40"
 kind = "tool"
 provides = ["tools-media-contract@1"]
 requires = ["tools-common-contract@1", "safety-broker-contract@1", "undo-journal-contract@1", "voice-audio-contract@1", "scheduler-lite-contract@1", "platform-contract@1", "core-bus-contract@1"]

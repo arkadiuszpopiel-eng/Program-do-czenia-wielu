@@ -81,6 +81,26 @@ export const plTasks = {
   'triggers.agentAny': 'Dowolna',
   'triggers.dnd': 'Szanuj „nie przeszkadzać"',
   'triggers.preview': 'Najbliższe uruchomienia',
+  'duty.title': 'Gotowe obowiązki codzienne',
+  'duty.hint':
+    'Wybierz obowiązek, a formularz wypełni się sam — nazwę, porę, agentkę i polecenie możesz zmienić przed utworzeniem.',
+  'duty.filled': 'Formularz wypełniony: {name}.',
+  'duty.morning.name': 'Poranny przegląd dnia',
+  'duty.morning.when': 'dni robocze o 8:00',
+  'duty.morning.goal':
+    'Przygotuj krótki przegląd na dziś: otwarte zadania i ich stan, zadania w tle zaplanowane na dziś oraz koszty z wczoraj i z bieżącego miesiąca. Najwyżej 7 punktów, najważniejsze na górze.',
+  'duty.evening.name': 'Podsumowanie dnia',
+  'duty.evening.when': 'dni robocze o 18:00',
+  'duty.evening.goal':
+    'Podsumuj dzisiejszy dzień pracy: co zostało zrobione, co czeka na jutro i co wymaga mojej decyzji. Krótko, w punktach.',
+  'duty.tidy.name': 'Porządki w katalogu roboczym',
+  'duty.tidy.when': 'w soboty o 12:00',
+  'duty.tidy.goal':
+    'Przejrzyj katalog roboczy: wypisz pliki tymczasowe, duplikaty i dziesięć największych plików. Niczego nie usuwaj ani nie przenoś — przygotuj listę z propozycją i poczekaj na moją zgodę.',
+  'duty.costs.name': 'Kontrola kosztów',
+  'duty.costs.when': 'w poniedziałki o 9:00',
+  'duty.costs.goal':
+    'Porównaj koszty modeli z ostatniego tygodnia z poprzednim: wskaż, co urosło najbardziej, i zaproponuj, które proste zadania można przenieść na tańszy albo lokalny model.',
   'triggers.create': 'Utwórz wyzwalacz',
   'triggers.created': 'Utworzono wyzwalacz „{name}".',
   'triggers.log': 'Dziennik uruchomień',

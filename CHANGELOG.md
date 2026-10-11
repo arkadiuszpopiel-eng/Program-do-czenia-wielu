@@ -12,6 +12,25 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.40 — 2026-10-12
+
+Pierwszy krok obowiązków codziennych agentek: gotowe obowiązki do wyboru jednym kliknięciem.
+
+### Agentki
+
+- W Ustawienia → „Zadania w tle i wyzwalacze” są cztery gotowe obowiązki codzienne: „Poranny przegląd dnia”
+  (Alfa, dni robocze o 8:00), „Podsumowanie dnia” (Beta, 18:00), „Porządki w katalogu roboczym” (Gama, soboty)
+  i „Kontrola kosztów” (Delta, poniedziałki). Wybranie obowiązku wypełnia formularz — porę, agentkę i polecenie
+  można zmienić przed utworzeniem; podgląd pokazuje najbliższe uruchomienia.
+- Obowiązek „porządki” ma w poleceniu wprost: niczego nie usuwać ani nie przenosić bez zgody.
+- Poczta i kalendarz jako obowiązki wymagają łączników — zostają w planie (P14), nie ma ich jeszcze na liście.
+
+### Testy
+
+- Szablony: harmonogramy, agentki, teksty w obu językach, zakaz usuwania bez zgody; w przeglądarce — oba motywy
+  z kontrolą dostępności, wybór z klawiatury, utworzenie i obecność na liście; zrzuty w trzech stylach.
+- Samego wykonania obowiązku przez model tej nocy nie uruchamiałem — sprawdzone jest tworzenie i harmonogram.
+
 ## 0.0.39 — 2026-10-12
 
 Przy modelach rozmowy widać, czy zmieszczą się na karcie graficznej; rozmowa sprawdzona na prawdziwym mikrofonie.
