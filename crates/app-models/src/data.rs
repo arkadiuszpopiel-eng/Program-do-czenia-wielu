@@ -121,6 +121,7 @@ fn speech() -> Vec<ItemSpec> {
             ("Lżejszy model STT na CPU (zapas). Aplikacja bierze pierwszy model ggml-* alfabetycznie.",
              "Lighter CPU speech model (fallback). The app uses the first ggml-* model alphabetically."),
         ),
+        crate::qwen_asr::qwen_asr(),
         crate::supertonic::supertonic(),
         item(
             "piper-pl_PL-gosia-medium",

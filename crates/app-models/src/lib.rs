@@ -23,6 +23,7 @@ pub mod embed;
 pub mod fetch;
 pub mod install;
 mod jobs;
+pub mod qwen_asr;
 pub mod store;
 pub mod supertonic;
 pub mod unpack;

@@ -10,7 +10,31 @@ use std::path::{Path, PathBuf};
 
 use app_api::AppPaths;
 use device_profile_contract::Backend;
+use voice_stt_impl::qwen::QwenConfig;
 use voice_stt_impl::{SidecarBinaries, WhisperServerConfig};
+
+/// Qwen3-ASR, jeśli są: model, projektor dźwięku i `llama-server` (kompilacja na kartę NVIDIA
+/// ma pierwszeństwo, potem Vulkan, na końcu procesor). `None` — rozpoznaje sam Whisper.
+///
+/// Stary `llama-server` (sprzed b11559) nie wczyta tego modelu; wtedy start się nie uda, bezpiecznik
+/// odstawi silnik, a rozmowę przejmie Whisper — bez przerwy dla użytkownika.
+pub fn qwen(paths: &AppPaths) -> Option<QwenConfig> {
+    let dir = paths.models().join("qwen3-asr");
+    let model = dir.join("Qwen3-ASR-1.7B-Q8_0.gguf");
+    let mmproj = dir.join("mmproj-Qwen3-ASR-1.7B-Q8_0.gguf");
+    if !model.is_file() || !mmproj.is_file() {
+        return None;
+    }
+    let (server, gpu) = [
+        ("llama-cuda", true),
+        ("llama-vulkan", true),
+        ("llama-cpu", false),
+    ]
+    .into_iter()
+    .map(|(engine, gpu)| (paths.sidecar(engine, "llama-server"), gpu))
+    .find(|(path, _)| path.is_file())?;
+    Some(QwenConfig::new(server, model, mmproj, gpu))
+}
 
 /// `whisper-server` CPU.
 pub fn server_cpu(paths: &AppPaths) -> PathBuf {

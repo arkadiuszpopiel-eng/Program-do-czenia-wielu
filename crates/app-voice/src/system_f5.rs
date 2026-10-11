@@ -101,12 +101,12 @@ impl FeatureFactory for SystemVoice {
         if !self.paths.sidecar("whisper", "whisper-server").is_file() {
             return Err(format!("brak {MISSING_STT_SIDECAR}"));
         }
-        let stt = self.whisper().map_err(|e| e.to_string())?;
+        let stt = self.stt().map_err(|e| e.to_string())?;
         let vad = self.vad().map_err(|e| e.to_string())?;
         Ok(DictationAudio {
             audio: self.audio.clone(),
             vad: Box::new(vad),
-            stt: Arc::new(stt),
+            stt,
             scheduler: self.scheduler.clone(),
         })
     }

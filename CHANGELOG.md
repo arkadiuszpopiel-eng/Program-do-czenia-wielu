@@ -12,6 +12,42 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.33 — 2026-10-11
+
+Rozpoznawanie mowy Qwen3-ASR ze strażnikiem jakości — drugi duży krok przenoszenia rozmowy z Delty AI.
+
+### Głos
+
+- [poważne] Rozmowa głosowa i dyktowanie rozpoznają mowę modelem Qwen3-ASR, gdy jest pobrany (Ustawienia →
+  „Modele lokalne i silniki”, ok. 2,5 GB). Na tym laptopie zdanie jest rozpoznane po ok. 0,3 s; pierwszy start
+  silnika trwa ok. 2,5 s. Bez modelu wszystko działa jak dotąd na Whisperze.
+- [poważne] Strażnik rozpoznawania: nagrania, w których nic nie ma (cisza, brak sygnału, krócej niż ćwierć sekundy),
+  nie trafiają do modelu; wynik w nieoczekiwanym języku, zapętlony albo pusty mimo wyraźnej mowy jest sprawdzany
+  drugim silnikiem; znane zmyślenia na ciszy („dziękuję za oglądanie”) są odrzucane.
+- [poważne] Bezpiecznik: po trzech awariach z rzędu silnik główny jest odstawiany na 30 sekund, a rozmowę
+  przejmuje Whisper — bez utraty wypowiedzi, bo nagranie jest trzymane do końca.
+- Silnik zwalnia pamięć karty po 10 minutach bez użycia (mechanizm jest; wywołanie z zegara dojdzie z ekranem
+  „Rozmowa na żywo”).
+
+### Czego nie sprawdzono
+
+- Rozmowy głosowej na żywo z mikrofonem. Sprawdzone jest rozpoznawanie nagrań prawdziwym modelem (test na żywo)
+  i całe przełączanie silników na udawanych silnikach.
+- Aplikacja w tej wersji nie była budowana ani uruchamiana (budowa co pięć dużych ulepszeń albo na polecenie).
+- Wybór karta / procesor nie patrzy jeszcze na wolną pamięć karty: Qwen3-ASR startuje na karcie zawsze, gdy
+  jest silnik na kartę. Razem z dużym modelem rozmowy na 6 GB może się nie zmieścić — wtedy zadziała bezpiecznik.
+- Stanu bezpiecznika i telemetrii nie widać jeszcze w oknie.
+
+### Testy
+
+- 12 testów strażnika i bezpiecznika, 4 testy części silnika bez sieci, 7 testów opakowania z silnikiem zapasowym,
+  test na prawdziwym modelu (pomijany bez plików), test katalogu. vitest 311/311.
+
+### Przyczyna błędu
+
+- Reguła odrzutu ciszy przeniesiona z Delty liczyła tło z najcichszych ramek, więc mowa ciągła bez żadnej pauzy
+  wychodziła jako „0 ms sygnału”. W Alfie przy wyraźnie słyszalnym tle obowiązuje próg stały.
+
 ## 0.0.32 — 2026-10-11
 
 Nowszy silnik modeli lokalnych w katalogu pobrań — potrzebny do rozpoznawania mowy Qwen3-ASR.

@@ -26,6 +26,9 @@ use voice_dsp_contract::{DspCfg, NoiseSetting};
 use voice_dsp_impl::DspPipeline;
 use voice_pipeline_contract::{PipelineCfg, PipelineError, ReplySource};
 use voice_pipeline_impl::{MonotonicClock, Pipeline, PipelineParts};
+use voice_stt_contract::Stt;
+use voice_stt_impl::fallback::GuardedStt;
+use voice_stt_impl::qwen::QwenStt;
 use voice_stt_impl::{ProcessLauncher, WhisperStt};
 use voice_tts_contract::Tts;
 use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector};
@@ -183,6 +186,22 @@ impl SystemVoice {
         Ok(stt)
     }
 
+    /// Rozpoznawanie mowy dla rozmowy i dyktowania: Qwen3-ASR ze strażnikiem i Whisperem jako
+    /// zapasem, gdy model Qwen3-ASR jest pobrany; inaczej sam Whisper.
+    pub(crate) fn stt(&self) -> Result<Arc<dyn Stt>, PipelineError> {
+        let whisper: Arc<dyn Stt> = Arc::new(self.whisper()?);
+        let Some(config) = app_modules::stt::qwen(&self.paths) else {
+            return Ok(whisper);
+        };
+        match QwenStt::new(config, Arc::new(ProcessLauncher)) {
+            Ok(qwen) => Ok(Arc::new(GuardedStt::new(Arc::new(qwen), whisper))),
+            Err(e) => {
+                tracing::warn!(error = %e, "Qwen3-ASR niedostępny — rozpoznaje Whisper");
+                Ok(whisper)
+            }
+        }
+    }
+
     /// Silnik TTS gotowy teraz: produkcyjny (`app_modules::tts::engines`) wykrywa Pipera i Pocket
     /// TTS przy każdym sprawdzeniu, więc silnik pobrany w Ustawieniach działa bez restartu Alfy.
     pub(crate) fn tts_ready(&self) -> Option<Arc<dyn Tts>> {
@@ -231,7 +250,7 @@ impl VoiceEngineFactory for SystemVoice {
         let tts = self
             .tts_ready()
             .ok_or_else(|| component("tts", MISSING_TTS))?;
-        let stt = self.whisper()?;
+        let stt = self.stt()?;
         let output = self
             .audio
             .open_output(None, &StreamConfig::output_default())
@@ -251,7 +270,7 @@ impl VoiceEngineFactory for SystemVoice {
             output,
             dsp: Box::new(dsp),
             vad: Box::new(self.vad()?),
-            stt: Arc::new(stt),
+            stt,
             turn: Box::new(PatienceTurnDetector::new(HeuristicTurnModel)),
             commands: Arc::new(GrammarRecognizer::new(Grammar::default_pl_en())),
             dialog: Box::new(voice_dialog_contract::default_machine()),
