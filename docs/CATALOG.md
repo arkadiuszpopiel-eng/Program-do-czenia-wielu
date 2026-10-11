@@ -12,7 +12,7 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 108 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 386 131 |
+| Linie Rust (z testami) | 386 133 |
 | Testy (`#[test]`, `#[tokio::test]`) | 2636 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
@@ -165,7 +165,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-store` | — | — | — | pojedynczy | 468 | 0 | — |  |
 | `app-tasks` | — | — | — | pojedynczy | 3071 | 7 | — |  |
 | `app-terminal` | — | — | — | pojedynczy | 441 | 2 | — |  |
-| `app-updates` | — | — | — | pojedynczy | 1299 | 13 | — |  |
+| `app-updates` | — | — | — | pojedynczy | 1301 | 13 | — |  |
 | `app-voice` | — | — | — | pojedynczy | 4913 | 20 | — |  |
 
 ## Biblioteki wspólne (`lib-*`)

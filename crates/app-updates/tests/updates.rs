@@ -171,7 +171,9 @@ async fn ask_mode_check_download_restart() {
         (view.ready.as_deref(), view.previous.as_deref()),
         (Some("1.1.0"), Some("1.0.0"))
     );
-    // Zdarzenia dla UI: postęp aż do gotowości.
+    // Zdarzenia dla UI: postęp aż do gotowości. Ostatnie zdarzenie może jeszcze czekać na swoją
+    // paczkę (zadanie grupujące) — pod obciążeniem test czytał kanał, zanim paczka wyszła.
+    tokio::time::sleep(Duration::from_millis(50)).await;
     let mut phases = Vec::new();
     while let Ok(batch) = rx.try_recv() {
         for e in batch.iter() {

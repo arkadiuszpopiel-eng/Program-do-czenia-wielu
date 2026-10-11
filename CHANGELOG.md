@@ -12,6 +12,35 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.24 — 2026-10-11
+
+Przegląd każdego okna, panelu i skrótu — jako test, który powtarza się przy każdej zmianie — i poprawki z niego.
+
+### Interfejs
+
+- [poważne] `Ctrl+Shift+F` i przycisk „Szukaj” na pasku ikon sesji znów działają na oknie szerokości laptopa
+  z otwartym prawym panelem: lista sesji rozwija się i fokus trafia do pola szukania. Wcześniej nie działo się nic.
+- Okna programu mają ikonę strony (znak Alfy); podgląd w przeglądarce nie zgłasza już brakującej ikony.
+
+### Przegląd
+
+- Nowy przegląd układu przechodzi w trzech stylach i dwóch motywach: wszystkie 32 strony Ustawień (także w wąskim
+  oknie), siedem paneli bocznych, nakładki otwierane skrótami, objaśnienia w górnej belce, podpowiedzi i menu pola
+  pisania. Sprawdza, czy nic nie wystaje poza okno, czy żaden tekst nie jest ucięty, czy wszystko zamyka się
+  klawiszem Escape i czy konsola jest bez błędów.
+- Wynik i lista tego, czego przegląd jeszcze nie obejmuje: `docs/reviews/2026-10-11-przeglad-okien-i-skrotow.md`.
+
+### Testy
+
+- 19 nowych testów przeglądu (`e2e/review-sweep.spec.ts`); znalazły dwie wady opisane wyżej.
+- Poza przeglądem zostają: ocena wizualna na oko, skróty globalne, okna Brokera, stany zależne od sprzętu i każdy
+  krok kreatorów — zapisane jako następne kroki.
+
+### Przyczyna błędu
+
+- Polecenie szukania ustawiało „lista sesji otwarta”, ale na średnim oknie z prawym panelem lista jest zwinięta do
+  paska ikon i pola szukania w ogóle nie ma na stronie — fokus trafiał w nic.
+
 ## 0.0.23 — 2026-10-11
 
 Historia zmian w Aktualizacjach i spis funkcji oznaczonych „wkrótce”.

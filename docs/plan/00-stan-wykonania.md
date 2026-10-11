@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-11**, wersja programu **0.0.23**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-11**, wersja programu **0.0.24**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -56,6 +56,7 @@ funkcjami.
 | 0.0.21 | 2026-10-11 | typy łącza generowane z Rusta (schemat `ipc.v1.json`, `generated/ipc.ts`), zgodność typów pilnowana przez kompilator (B.1, etap 1) |
 | 0.0.22 | 2026-10-11 | szkic zestawu ewaluacyjnego po polsku `evals/V6/pl-core` (C2.1) — do akceptacji właściciela |
 | 0.0.23 | 2026-10-11 | historia zmian w Aktualizacjach z wagami (krytyczna, poważna, zwykła), spis funkcji „wkrótce” i grupa C4 w planie |
+| 0.0.24 | 2026-10-11 | zautomatyzowany przegląd okien, paneli i skrótów w trzech stylach i dwóch motywach; naprawa szukania w sesjach |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 

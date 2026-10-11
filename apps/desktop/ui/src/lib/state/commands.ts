@@ -41,8 +41,13 @@ const ONBOARDING_ALLOWED = new Set([
   'cheatsheet.open',
 ]);
 
-function focusById(id: string): void {
-  requestAnimationFrame(() => document.getElementById(id)?.focus());
+/** Fokus na element, który może dopiero powstać (panel właśnie się otwiera): kilka klatek prób. */
+function focusById(id: string, attempts = 12): void {
+  requestAnimationFrame(() => {
+    const element = document.getElementById(id);
+    if (element) element.focus();
+    else if (attempts > 0) focusById(id, attempts - 1);
+  });
 }
 
 async function open(app: AppState, id: string | undefined): Promise<void> {
@@ -87,8 +92,13 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'search.everywhere':
       app.view = 'chat';
-      app.layout.setLeftCollapsed(false);
       app.layout.update(sid, { left_open: true });
+      // Pole szukania jest w pełnej liście sesji. Na średnim oknie z otwartym prawym panelem
+      // lista jest zwinięta do paska ikon, a na wąskim — schowana: rozwinięcie zamyka wtedy
+      // prawy panel (oba się nie mieszczą). Bez tego skrót i przycisk „Szukaj” nic nie robiły.
+      app.layout.expandLeft(sid);
+      if (app.layout.placement(sid).left === 'hidden')
+        app.layout.update(sid, { right_open: false });
       focusById('alfa-sessions-search');
       break;
     case 'search.conversation':
