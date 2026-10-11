@@ -81,7 +81,7 @@ Bez nowych funkcji dla użytkownika; każde zadanie kończy się tym, że wszyst
 
 | ID     | Zadanie                                                                                                            | Stan      | Data       | Uwagi                                                                                                                   |
 | ------ | ------------------------------------------------------------------------------------------------------------------ | --------- | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| C2.1   | Zestaw ewaluacyjny po polsku w CI (poprawność wywołań narzędzi, wierność RAG, ataki, WER, czas, VRAM)              | planowane | —          | można wcześniej — pomaga w A.6                                                                                          |
+| C2.1   | Zestaw ewaluacyjny po polsku w CI (poprawność wywołań narzędzi, wierność RAG, ataki, WER, czas, VRAM)              | w toku    | 2026-10-11 | 0.0.22: szkic `evals/V6/pl-core` (36 przypadków: narzędzia, wierność wobec źródła, wstrzyknięcia; status `proposed`, test integralności w `evals-impl/tests/repo_suites.rs`). **Zostaje:** akceptacja i progi właściciela, wariant runnera uruchamiający model z narzędziami, pomiary sprzętowe (WER, czas, VRAM) |
 | C2.2   | Modele na 6 GB: Bielik-Minitron-7B v3, Qwen3.5-4B; tryb wielu modeli w `llama-server`                              | planowane | —          | po A.4; pomiar przed wpisaniem do pakietów                                                                              |
 | C2.3   | Wymuszanie poprawnego JSON wywołań narzędzi schematem (gramatyka)                                                  | planowane | —          |                                                                                                                         |
 | C2.4   | Bielik-Guard jako dodatkowy klasyfikator w Brokerze                                                                | czeka     | —          | obszar Jądra — decyzja właściciela                                                                                      |
@@ -219,12 +219,16 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | ADR 0026 — głos z chmury jako opcja | C1.1a |
 | Czy obraz z kamery może iść do modelu w chmurze    | C3.7 (droga chmurowa)                 |
 | Zgoda na pobranie modelu widzącego i modeli twarzy | C3.6, C3.8                            |
+| Kamery sieciowe: nowa zależność do dekodowania obrazu (JPEG dla kamer HTTP/MJPEG albo H.264 dla RTSP) i zakres dostępu do sieci lokalnej | C3.5 |
+| Akceptacja i progi zestawu `evals/V6/pl-core` | C2.1 (bramka w CI) |
+| Generator typów: `schemars` + własny skrypt zamiast `tauri-specta`/`ts-rs` (ADR 0013); wyliczenia w Rust czy zawężanie w oknie dla 19 typów | B.1 (etap 2) |
 | Progi nowych kryteriów w `ACCEPTANCE.md`           | wyjście z C, D, E, F, G               |
 
 ## Dziennik roadmapy
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-11 | Wersja 0.0.22: C2.1 — szkic zestawu ewaluacyjnego po polsku (`evals/V6/pl-core`), do akceptacji właściciela. C3.5 (kamery sieciowe) wstrzymane: wymaga nowej zależności do dekodowania obrazu — decyzja właściciela. |
 | 2026-10-11 | Wersja 0.0.21: B.1 etap 1 — schemat łącza i typy TS generowane z Rusta, kontrola zgodności w kompilacji, bramce i CI. |
 | 2026-10-11 | Wersja 0.0.20: C2.14 (sprawdzanie kluczy w tle, wiek klucza) i C2.15 (konto zapasowe tego samego dostawcy). |
 | 2026-10-11 | Wersja 0.0.19: B.2 (numery zdarzeń, wznowienie, pozycja w deltach tekstu) i B.3 (błędy z kodem i szczegółami docierają do okna także w prawdziwej aplikacji). 226 poleceń. |

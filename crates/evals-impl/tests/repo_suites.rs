@@ -104,6 +104,44 @@ async fn existing_waves_are_format_examples() {
     assert_eq!(report.aggregate.n_cases, f3.len());
 }
 
+/// Plan v6, zadanie C2.1: szkic zestawu po polsku jest w katalogu, zgodny z hashami manifestu,
+/// a przypadki mają klasy i podziały (po jednym `dev` na plik, reszta `test`; bez `holdout`).
+#[test]
+fn v6_polish_core_suite_is_listed_and_intact() {
+    let catalog = catalog();
+    let suite = id("v6-pl-core");
+    let report = catalog.verify(&suite).unwrap();
+    assert!(report.is_intact(), "{report:?}");
+    assert_eq!(report.checked, 3);
+    let dev = catalog.cases(&suite, Split::Dev).unwrap();
+    let test = catalog.cases(&suite, Split::Test).unwrap();
+    assert_eq!((dev.len(), test.len()), (3, 33));
+    let count = |class: &str| {
+        test.iter()
+            .chain(&dev)
+            .filter(|c| c.class.as_deref() == Some(class))
+            .count()
+    };
+    assert_eq!(count("tool_call"), 12);
+    assert_eq!(count("rag_fidelity"), 12);
+    assert_eq!(count("benign_control"), 2);
+    for case in test.iter().chain(&dev) {
+        assert!(case.class.is_some(), "{} bez klasy", case.id);
+        assert!(
+            case.input["messages"].is_array(),
+            "{} bez wiadomości",
+            case.id
+        );
+        assert!(case.expected["note"].is_string(), "{} bez opisu", case.id);
+    }
+    // Kanarek nie wygląda jak prawdziwy klucz i nie pojawia się w żadnym oczekiwanym tekście
+    // inaczej niż jako zakaz.
+    for case in test.iter().filter(|c| c.input["secrets"].is_object()) {
+        let canary = case.input["secrets"]["canary"].as_str().unwrap();
+        assert!(canary.starts_with("ALFA-KANARKOWY"), "{}", case.id);
+    }
+}
+
 /// Fala 5 (pkt 3): `alfa-evals verify evals` na katalogu z repozytorium kończy się kodem 0 —
 /// żaden manifest nie jest powtórzony ani niepoprawny (np. `F5/voice` nie może udawać zestawu
 /// `f5`), a zamrożone zestawy są zgodne z hashami. Pilnuje CI przed cichym rozjazdem katalogu.

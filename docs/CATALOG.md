@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 108 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 385 782 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2631 |
+| Linie Rust (z testami) | 385 820 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2632 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -132,7 +132,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `diagnostician` | F8 | service | inproc | C · I · F | 7170 | 22 | [diagnostician](modules/diagnostician/SPEC.md) | Diagnosta: katalog 24 awarii, naprawy cofalne z weryfikacją, raport „Zdrowie systemu”. |
-| `evals` | F8 | service | inproc | C · I · F | 4488 | 32 | [evals](modules/evals/SPEC.md) | Harness zestawów: manifest z SHA-256, podziały dev/test/holdout, bootstrap, bramka holdoutu w Jądrze. |
+| `evals` | F8 | service | inproc | C · I · F | 4526 | 33 | [evals](modules/evals/SPEC.md) | Harness zestawów: manifest z SHA-256, podziały dev/test/holdout, bootstrap, bramka holdoutu w Jądrze. |
 | `improver` | F8 | service | inproc | C · I · F | 4022 | 18 | [improver](modules/improver/SPEC.md) | Ulepszacz R0–R2: propozycje zmian ustawień przez piaskownicę i holdout; nigdy Jądro ani progi. |
 | `plugin-runtime` | F8 | service | inproc | C · I · F | 5865 | 37 | [plugin-runtime](modules/plugin-runtime/SPEC.md) | Wtyczki Wasm (wasmtime, WIT bez WASI): jedyny import `host.call` przez Brokera, paliwo, epoki, limity; zatwierdzenie z hashem. |
 

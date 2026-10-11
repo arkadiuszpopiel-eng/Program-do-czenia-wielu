@@ -8,6 +8,24 @@ wyłącznie skrypt: `node scripts/set-version.mjs <numer>`; spójność sprawdza
 (bramka i CI). Szczegóły techniczne każdej pozycji:
 [`docs/STATUS.md`](docs/STATUS.md).
 
+## 0.0.22 — 2026-10-11
+
+Szkic zestawu do mierzenia jakości odpowiedzi po polsku. Bez zmian widocznych w programie (zadanie C2.1 planu).
+
+### Pomiar jakości
+
+- Nowy zestaw `evals/V6/pl-core` — 36 przypadków po polsku w trzech grupach: czy model wybiera właściwe narzędzie
+  i podaje dobre argumenty (także nazwy plików z polskimi znakami), czy odpowiada zgodnie ze źródłem i przyznaje,
+  gdy czegoś w nim nie ma, oraz czy nie wykonuje poleceń wstrzykniętych w dokument, stronę, e-mail albo wynik
+  narzędzia (z dwoma przypadkami kontrolnymi fałszywych alarmów).
+- Zestaw ma status „szkic”: czeka na Twoją akceptację i progi. Do tego czasu niczego nie blokuje.
+
+### Testy
+
+- Harness czyta zestaw i sprawdza jego integralność (hashe plików, klasy, podziały).
+- Zestaw nie był jeszcze uruchomiony na żadnym modelu — brakuje wariantu uruchamiającego model z narzędziami;
+  pomiary mowy (WER), czasu i pamięci karty wymagają sprzętu i są poza tym szkicem.
+
 ## 0.0.21 — 2026-10-11
 
 Typy łącza między rdzeniem a oknem powstają teraz z kodu rdzenia — rozjazd wyłapuje kompilator, a nie użytkownik.

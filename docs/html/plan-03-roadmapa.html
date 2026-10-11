@@ -376,7 +376,7 @@ zweryfikowany kod. To jest „Alfa 0.1”.</p>
 <tr><td>C1.4</td><td>Pamięć i transfer: recall@5, migracje, round-trip <code>.alfa</code></td><td class="st st3">czeka</td><td>—</td><td>recall możliwy zaraz po A.4</td></tr>
 <tr><td>C1.5</td><td>Samonaprawa, wtyczki, pentest, audyt WCAG</td><td class="st st4">planowane</td><td>—</td><td></td></tr></tbody></table></div>
 <h3 id="c2-nowe-opis-04-nowe-funkcje-md">C2 — nowe (opis: <a href="plan-04-nowe-funkcje.html"><code>04-nowe-funkcje.md</code></a>)</h3>
-<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C2.1</td><td>Zestaw ewaluacyjny po polsku w CI (poprawność wywołań narzędzi, wierność RAG, ataki, WER, czas, VRAM)</td><td class="st st4">planowane</td><td>—</td><td>można wcześniej — pomaga w A.6</td></tr>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C2.1</td><td>Zestaw ewaluacyjny po polsku w CI (poprawność wywołań narzędzi, wierność RAG, ataki, WER, czas, VRAM)</td><td class="st st1">w toku</td><td>2026-10-11</td><td>0.0.22: szkic <code>evals/V6/pl-core</code> (36 przypadków: narzędzia, wierność wobec źródła, wstrzyknięcia; status <code>proposed</code>, test integralności w <code>evals-impl/tests/repo_suites.rs</code>). <strong>Zostaje:</strong> akceptacja i progi właściciela, wariant runnera uruchamiający model z narzędziami, pomiary sprzętowe (WER, czas, VRAM)</td></tr>
 <tr><td>C2.2</td><td>Modele na 6 GB: Bielik-Minitron-7B v3, Qwen3.5-4B; tryb wielu modeli w <code>llama-server</code></td><td class="st st4">planowane</td><td>—</td><td>po A.4; pomiar przed wpisaniem do pakietów</td></tr>
 <tr><td>C2.3</td><td>Wymuszanie poprawnego JSON wywołań narzędzi schematem (gramatyka)</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
 <tr><td>C2.4</td><td>Bielik-Guard jako dodatkowy klasyfikator w Brokerze</td><td class="st st3">czeka</td><td>—</td><td>obszar Jądra — decyzja właściciela</td></tr>
@@ -479,9 +479,13 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 <tr><td>ADR 0026 — głos z chmury jako opcja</td><td>C1.1a</td></tr>
 <tr><td>Czy obraz z kamery może iść do modelu w chmurze</td><td>C3.7 (droga chmurowa)</td></tr>
 <tr><td>Zgoda na pobranie modelu widzącego i modeli twarzy</td><td>C3.6, C3.8</td></tr>
+<tr><td>Kamery sieciowe: nowa zależność do dekodowania obrazu (JPEG dla kamer HTTP/MJPEG albo H.264 dla RTSP) i zakres dostępu do sieci lokalnej</td><td>C3.5</td></tr>
+<tr><td>Akceptacja i progi zestawu <code>evals/V6/pl-core</code></td><td>C2.1 (bramka w CI)</td></tr>
+<tr><td>Generator typów: <code>schemars</code> + własny skrypt zamiast <code>tauri-specta</code>/<code>ts-rs</code> (ADR 0013); wyliczenia w Rust czy zawężanie w oknie dla 19 typów</td><td>B.1 (etap 2)</td></tr>
 <tr><td>Progi nowych kryteriów w <code>ACCEPTANCE.md</code></td><td>wyjście z C, D, E, F, G</td></tr></tbody></table></div>
 <h2 id="dziennik-roadmapy">Dziennik roadmapy</h2>
-<div class="tbl"><table><thead><tr><th>Data</th><th>Zmiana</th></tr></thead><tbody><tr><td>2026-10-11</td><td>Wersja 0.0.21: B.1 etap 1 — schemat łącza i typy TS generowane z Rusta, kontrola zgodności w kompilacji, bramce i CI.</td></tr>
+<div class="tbl"><table><thead><tr><th>Data</th><th>Zmiana</th></tr></thead><tbody><tr><td>2026-10-11</td><td>Wersja 0.0.22: C2.1 — szkic zestawu ewaluacyjnego po polsku (<code>evals/V6/pl-core</code>), do akceptacji właściciela. C3.5 (kamery sieciowe) wstrzymane: wymaga nowej zależności do dekodowania obrazu — decyzja właściciela.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.21: B.1 etap 1 — schemat łącza i typy TS generowane z Rusta, kontrola zgodności w kompilacji, bramce i CI.</td></tr>
 <tr><td>2026-10-11</td><td>Wersja 0.0.20: C2.14 (sprawdzanie kluczy w tle, wiek klucza) i C2.15 (konto zapasowe tego samego dostawcy).</td></tr>
 <tr><td>2026-10-11</td><td>Wersja 0.0.19: B.2 (numery zdarzeń, wznowienie, pozycja w deltach tekstu) i B.3 (błędy z kodem i szczegółami docierają do okna także w prawdziwej aplikacji). 226 poleceń.</td></tr>
 <tr><td>2026-10-10</td><td>Wersja 0.0.16 (noc bez właściciela): kamery USB — port, hub, strona „Kamery”, wskaźnik, zdjęcie jako załącznik (C3.1–C3.4, część C3.7); import kluczy ze zmiennych (C2.17); pakiet decyzji A.7; podsumowanie i dalsze kroki w dokumencie <a href="plan-13-podsumowanie-i-dalsze-kroki.html"><code>13</code></a>.</td></tr>

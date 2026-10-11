@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-11**, wersja programu **0.0.21**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-11**, wersja programu **0.0.22**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -54,6 +54,7 @@ funkcjami.
 | 0.0.19 | 2026-10-11 | szwy B.2 i B.3: numery zdarzeń ze wznowieniem (`events_resume`), pozycja w deltach tekstu, błędy z kodem i szczegółami na łączu |
 | 0.0.20 | 2026-10-11 | klucze API: sprawdzanie w tle, wiek klucza z przypomnieniem o wymianie, konto zapasowe tego samego dostawcy (C2.14, C2.15) |
 | 0.0.21 | 2026-10-11 | typy łącza generowane z Rusta (schemat `ipc.v1.json`, `generated/ipc.ts`), zgodność typów pilnowana przez kompilator (B.1, etap 1) |
+| 0.0.22 | 2026-10-11 | szkic zestawu ewaluacyjnego po polsku `evals/V6/pl-core` (C2.1) — do akceptacji właściciela |
 
 ## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
 
