@@ -12,6 +12,38 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.26 — 2026-10-11
+
+Poprawki z przeglądu stron Ustawień w pełnej skali i pierwszy pomiar silników mowy na tym laptopie.
+
+### Interfejs
+
+- [poważne] Przycisk „Rozwiń wszystkie” i wiersze wersji w Historii zmian mają zaokrąglone rogi jak reszta programu,
+  a w menu pod prawym przyciskiem jest odstęp między nazwą polecenia a skrótem. Style odwoływały się do zmiennych,
+  które nie istnieją, więc reguły po cichu nie działały.
+- Nazwy zmiennych w oknie importu kluczy są pisane krojem o stałej szerokości.
+- Prostsze teksty: „modele zapasowe” zamiast „fallbacki”, opis miniatur obrazów, „Limit dla każdego dostawcy ustawisz
+  w „Konta i klucze API””, „L3 · Bardzo wysoka — poziom domyślny”.
+
+### Głos (plan, bez zmian w programie)
+
+- Zmierzone na tym laptopie trzy silniki mowy na 20 polskich zdaniach; strona do odsłuchu: `alfa-glos-proba/odsluch.html`
+  (folder obok programu). Piper: 0,56 s na zdanie. Supertonic 3: 2,1 s. Chatterbox na karcie graficznej: 4,8 s
+  i 3,6 GB pamięci karty.
+- Wniosek: oba nowe silniki są w obecnej postaci za wolne do rozmowy; o dalszych krokach decyduje odsłuch.
+  Szczegóły: `docs/plan/15-glos-lokalny.md`, część 5a.
+
+### Testy
+
+- Bramka `check-css` zgłasza teraz każdą zmienną stylu użytą bez definicji (sprawdzone na starej wersji pliku:
+  zgłasza obie wady).
+- vitest 311/311; testy okna w przeglądarce 308 z 309 (znany próg strumienia).
+
+### Przyczyna błędu
+
+- Literówka w nazwie zmiennej CSS nie daje błędu — przeglądarka pomija całą deklarację. Testy układu tego nie
+  widziały, bo nic nie wystawało poza okno; wyszło dopiero przy oglądaniu zrzutów w skali 1:1.
+
 ## 0.0.25 — 2026-10-11
 
 Plan lepszego głosu bez opłat za każde zdanie: zamiast głosu z chmury — dwa poziomy głosu lokalnego. W samym

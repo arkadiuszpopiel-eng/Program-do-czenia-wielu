@@ -518,7 +518,7 @@
   "settings": [],
   "upcoming": [
    {
-    "pl": "Klasy zadań i fallbacki",
+    "pl": "Klasy zadań i modele zapasowe",
     "en": "Task classes and fallbacks"
    },
    {
@@ -1222,8 +1222,8 @@
      "en": "Image thumbnails"
     },
     "description": {
-     "pl": "Obrazy w rozmowie jako leniwe miniatury.",
-     "en": "Images in the conversation as lazy thumbnails."
+     "pl": "Obrazy w rozmowie pokazujemy jako miniatury, wczytywane dopiero wtedy, gdy są widoczne.",
+     "en": "Images in the conversation are shown as thumbnails, loaded only once they are visible."
     },
     "control": {
      "kind": "toggle"

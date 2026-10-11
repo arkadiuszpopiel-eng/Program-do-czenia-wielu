@@ -171,7 +171,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
     { custom: 'costs' },
   ),
   later('router', L('Router i reguły', 'Router and rules'), 2, [
-    L('Klasy zadań i fallbacki', 'Task classes and fallbacks'),
+    L('Klasy zadań i modele zapasowe', 'Task classes and fallbacks'),
     L('Tagi prywatności i jurysdykcji', 'Privacy and jurisdiction tags'),
   ]),
   page(

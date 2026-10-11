@@ -2015,8 +2015,8 @@
         "fit": {
           "kind": "too_weak",
           "reason": {
-            "pl": "Potrzebna karta graficzna ≥ 8 GB (CUDA albo Vulkan) — karta ma 4,0 GB.",
-            "en": "A GPU ≥ 8 GB (CUDA or Vulkan) is needed — the GPU has 4.0 GB."
+            "pl": "Potrzebna karta graficzna ≥ 8 GB (CUDA albo Vulkan) — karta ma 6,0 GB.",
+            "en": "A GPU ≥ 8 GB (CUDA or Vulkan) is needed — the GPU has 6.0 GB."
           }
         },
         "recommended": false,
@@ -3287,8 +3287,8 @@
         "fit": {
           "kind": "too_weak",
           "reason": {
-            "pl": "Potrzebna karta graficzna ≥ 8 GB (CUDA albo Vulkan) — karta ma 4,0 GB.",
-            "en": "A GPU ≥ 8 GB (CUDA or Vulkan) is needed — the GPU has 4.0 GB."
+            "pl": "Potrzebna karta graficzna ≥ 8 GB (CUDA albo Vulkan) — karta ma 6,0 GB.",
+            "en": "A GPU ≥ 8 GB (CUDA or Vulkan) is needed — the GPU has 6.0 GB."
           }
         },
         "recommended": false,

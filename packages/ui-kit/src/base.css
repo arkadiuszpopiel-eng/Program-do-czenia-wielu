@@ -295,7 +295,7 @@ details[open] > summary:not(:has(.chev))::before {
   background: var(--alfa-color-surface);
   color: var(--alfa-color-text);
   box-shadow: var(--alfa-shadow-3);
-  font-family: var(--alfa-font-ui);
+  font-family: var(--alfa-font-sans);
   font-size: var(--alfa-font-size-sm);
 }
 .alfa-ctx {
@@ -314,7 +314,7 @@ details[open] > summary:not(:has(.chev))::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--alfa-space-5);
+  gap: var(--alfa-space-4);
   min-height: 32px;
   padding: 0 var(--alfa-space-3);
   border: 0;

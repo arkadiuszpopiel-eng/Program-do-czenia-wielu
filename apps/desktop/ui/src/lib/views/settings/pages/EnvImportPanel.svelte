@@ -108,7 +108,7 @@
     font-weight: var(--alfa-weight-semibold);
   }
   code {
-    font-family: var(--alfa-font-family-mono);
+    font-family: var(--alfa-font-mono);
     font-size: var(--alfa-font-size-xs);
   }
   .what,
@@ -119,7 +119,7 @@
   }
   .vars {
     display: block;
-    font-family: var(--alfa-font-family-mono);
+    font-family: var(--alfa-font-mono);
     font-size: var(--alfa-font-size-xs);
     overflow-wrap: anywhere;
   }

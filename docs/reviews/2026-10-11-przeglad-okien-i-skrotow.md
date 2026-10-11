@@ -30,6 +30,10 @@ stany otwarte list wyboru — `skins.spec.ts` i `controls.spec.ts`; prawdziwą a
 | P-03 | drobne  | w jasnym motywie kropka wagi „poważna” w historii zmian wychodziła brązowa zamiast pomarańczowej                                                                                                  | naprawione przed wydaniem 0.0.23 |
 | P-04 | drobne  | w stylu Next (jasny) przycisk „Rozwiń wszystkie” w historii zmian miał za słaby kontrast                                                                                                          | naprawione przed wydaniem 0.0.23 |
 
+| P-05 | poważne | style odwoływały się do czterech zmiennych, które nie istnieją: przycisk „Rozwiń wszystkie” i wiersze wersji w Historii zmian były kanciaste, w menu pod prawym przyciskiem nie było odstępu między nazwą a skrótem, nazwy zmiennych przy imporcie kluczy nie miały kroju o stałej szerokości | **naprawione (0.0.26)**; bramka `check-css` pilnuje tego odtąd |
+| P-06 | drobne  | żargon i niezgodności w tekstach: „fallbacki”, „leniwe miniatury”, „Limity per dostawca … w Hubie kont”, „Bardzo wysoka (domyślny) (obecny)” | **naprawione (0.0.26)** |
+| P-07 | drobne  | dane przykładowe podglądu: karta opisana jako 6 GB, a w powodzie „karta ma 4,0 GB” | **naprawione (0.0.26)** |
+
 ## Druga część przeglądu (tego samego dnia)
 
 Plik `e2e/review-sweep-flows.spec.ts` dokłada to, czego nie widać po samym wejściu na stronę — także w trzech
@@ -59,6 +63,10 @@ Razem z pierwszą częścią: 61 testów, wszystkie zielone; w drugiej części 
 W tej skali (miniatury) nie widać rozjechanych układów, pustych kart ani uciętych elementów. Uchwyt zmiany
 rozmiaru pól wielowierszowych jest rysowany przez Alfę (`base.css`), nie przez system. Miniatury nie pozwalają
 ocenić drobnych odstępów ani typografii.
+
+**Ocena w pełnej skali (0.0.26):** obejrzałem wszystkie 32 strony Ustawień w stylu Szkło ciemnym w skali 1:1
+(1280 × 800). Stąd ustalenia P-05–P-07. Zostało: pozostałe pięć kombinacji stylu i motywu w pełnej skali,
+panele boczne i okna poboczne w pełnej skali.
 
 ## Czego ten przegląd nie obejmuje
 

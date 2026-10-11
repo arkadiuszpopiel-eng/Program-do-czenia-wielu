@@ -46,7 +46,7 @@ export const plSettings = {
     'Ceny dostawców są w USD i przeliczamy je kursem NBP. Po wyłączeniu limitu zostaje tylko wskaźnik zużycia i opcjonalne alerty.',
   'costsPage.amount': 'Kwota limitu (zł)',
   'costsPage.usage': 'Zużycie w tym miesiącu',
-  'costsPage.perProvider': 'Limity per dostawca ustawisz w Hubie kont (Konta i klucze API).',
+  'costsPage.perProvider': 'Limit dla każdego dostawcy ustawisz w „Konta i klucze API”.',
 
   'hub.title': 'Konta i klucze',
   'hub.intro':
@@ -143,7 +143,7 @@ export const plSettings = {
   'perm.L2.name': 'Pytaj o ryzykowne',
   'perm.L2.desc':
     'Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji.',
-  'perm.L3.name': 'Bardzo wysoka (domyślny)',
+  'perm.L3.name': 'Bardzo wysoka — poziom domyślny',
   'perm.L3.desc':
     'Działa sama w całym Twoim profilu i we wskazanych aplikacjach; pyta tylko przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).',
   'perm.L4.name': 'Maks',

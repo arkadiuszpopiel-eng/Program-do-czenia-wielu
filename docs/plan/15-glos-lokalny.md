@@ -1,6 +1,6 @@
 # 15 — Głos lokalny wysokiej jakości (dodatek do planu v6)
 
-Stan na **2026-10-11**, wersja 0.0.25. Zgłoszenie właściciela: głos przez API będzie za drogi; są zaawansowane
+Stan na **2026-10-11**, wersja 0.0.26. Zgłoszenie właściciela: głos przez API będzie za drogi; są zaawansowane
 silniki lokalne — sprawdzić, jak robi to konkurencja, i przedstawić dodatek do planu. Rekomendacja z tego
 dokumentu została **zaakceptowana przez właściciela 2026-10-11**.
 
@@ -163,9 +163,44 @@ Wnioski z pomiaru (bez oceny brzmienia — tę wystawia właściciel na słuch):
   osoby bez zgody, treści bez oznaczenia, że pochodzą od maszyny, oraz **udzielania porad medycznych** — to
   ostatnie wymaga decyzji, bo asystentka może przeczytać na głos odpowiedź o zdrowiu.
 
-Chatterbox nie jest jeszcze pobrany: do odsłuchu potrzebny jest oryginalny pakiet producenta z PyTorch
-(ok. 3,5 GB bez karty albo ok. 6 GB z kartą), a nie 1 GB wag skwantyzowanych, które podałam wcześniej — tamte
-wymagają najpierw zbudowania `chatterbox.cpp`. Czekam na potwierdzenie rozmiaru.
+### Chatterbox Multilingual na karcie RTX 4050 (pakiet producenta, PyTorch 2.6 z CUDA)
+
+Pobrane za zgodą właściciela (wybór „z kartą”): środowisko i model zajmują razem **8,4 GB** na dysku C:
+(zapowiadałam ok. 6 GB). 46 próbek: 20 zdań głosem wbudowanym, 20 z barwą z próbki syntetycznej (Supertonic F1),
+6 z drugą barwą (F2) — bez użycia głosu prawdziwej osoby.
+
+| Miara                                         | Wynik                    | Próg z §5                     |
+| --------------------------------------------- | ------------------------ | ----------------------------- |
+| Zdanie gotowe — mediana / najwolniejsze 5 %   | 4,8 s / 8,0 s            | 0,5 s / 0,9 s (rozmowa)       |
+| Najkrótsze zdanie                             | 2,6 s                    | —                             |
+| Czas syntezy do czasu dźwięku (mediana)       | 0,98 — tyle samo, co mowa | najwyżej 0,5                  |
+| Pamięć karty: szczyt / zarezerwowana          | 3,63 GB / 4,08 GB        | do 3,5 GB                     |
+| Wczytanie modelu (już pobranego)              | kilkadziesiąt sekund     | —                             |
+
+Wnioski:
+
+- **W tej postaci Chatterbox nie nadaje się do rozmowy na laptopie bazowym.** Pakiet producenta generuje mowę
+  dokładnie w tempie jej trwania i oddaje ją dopiero po całym zdaniu: na odpowiedź czeka się średnio prawie
+  5 sekund. Do czytania na głos dłuższego tekstu też jest za wolny bez strumieniowania.
+- Pamięć karty zgadza się z kartą NVIDIA (ok. 3,5 GB) i jest o włos ponad próg; z rozpoznawaniem mowy
+  zmieści się w 6 GB tylko wtedy, gdy model rozmowy jest w chmurze.
+- W kilku zdaniach model sam uciął generowanie („forcing EOS”) — przy odsłuchu trzeba sprawdzić końcówki zdań.
+- Czy poziom „Naturalny” ma sens, rozstrzygną dwie rzeczy, w tej kolejności: **(1) odsłuch** — jeśli głos nie
+  jest wyraźnie lepszy od Pipera, temat się zamyka; **(2) pomiar `chatterbox.cpp`** z wagami skwantyzowanymi
+  i strumieniowaniem — autorzy podają wielokrotne przyspieszenie, ale na innych kartach; dopiero ten pomiar
+  powie, czy da się zejść do budżetu rozmowy. To wymaga zbudowania projektu społecznościowego ze źródeł
+  (osobna zgoda właściciela, bo to uruchomienie cudzego kodu spoza oficjalnych wydań).
+
+### Stan po pierwszym pomiarze
+
+| Silnik                         | Szybkość na laptopie bazowym             | Wniosek przed odsłuchem                                |
+| ------------------------------ | ---------------------------------------- | ------------------------------------------------------ |
+| Piper „Gosia”                  | 0,56 s na zdanie, procesor               | jedyny, który dziś mieści się w budżecie rozmowy       |
+| Supertonic 3                   | 2,1 s (8 kroków) / 0,75 s (2 kroki), procesor | kandydat do czytania na głos; w rozmowie tylko z 2–3 krokami |
+| Chatterbox (pakiet producenta) | 4,8 s na zdanie, karta 3,6 GB            | za wolny; decyzja po odsłuchu i pomiarze `chatterbox.cpp` |
+
+Rekomendacja z §4 była oparta na danych producentów i **nie potwierdziła się co do szybkości**. Zostaje w mocy
+jako kierunek tylko warunkowo — do odsłuchu właściciela.
 
 ## 6. Zadania (roadmapa, grupa C5)
 

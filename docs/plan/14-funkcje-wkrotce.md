@@ -1,6 +1,6 @@
 # 14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów
 
-Stan na **2026-10-11**, wersja 0.0.25. Zgłoszenie właściciela: „w programie jest dużo funkcji z informacją
+Stan na **2026-10-11**, wersja 0.0.26. Zgłoszenie właściciela: „w programie jest dużo funkcji z informacją
 «wkrótce» — czy wszystko jest zanotowane?”. Ten dokument jest spisem: każde miejsce w programie, które mówi
 „wkrótce” albo „funkcja dostępna po podłączeniu modułu”, ma tu wiersz i zadanie w
 [roadmapie](03-roadmapa.md). Test `app-core/tests/soon_inventory.rs` nie przejdzie, jeśli w Ustawieniach
@@ -13,7 +13,7 @@ Znak „wkrótce” w nawigacji Ustawień dostaje strona, która w `crates/app-c
 
 | Strona (`id`)             | Zapowiedzi na stronie                                 | Co już jest w rdzeniu                                                                                       | Zadanie |
 | ------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------- |
-| Router i reguły (`router`) | klasy zadań i fallbacki; tagi prywatności i jurysdykcji | Router działa (klasy zadań, kolejki modeli, zapas, bezpieczniki); reguły da się dziś zmienić tylko plikiem | C4.1    |
+| Router i reguły (`router`) | klasy zadań i modele zapasowe; tagi prywatności i jurysdykcji | Router działa (klasy zadań, kolejki modeli, zapas, bezpieczniki); reguły da się dziś zmienić tylko plikiem | C4.1    |
 | Logi i prywatność (`logs`) | retencja i redakcja; „co poszło do chmury”            | dziennik NDJSON i audyt są zapisywane; nie ma przeglądarki ani ustawień retencji w oknie                    | C4.2    |
 | Moduły (`modules`)        | lista modułów, włącz / wyłącz; budżety RAM i CPU      | rejestr modułów z manifestami i stanem zdrowia; część widać w „Zdrowie systemu”                             | C4.3    |
 | Zaawansowane (`advanced`) | edytor surowy TOML; flagi eksperymentalne             | konfiguracja TOML ze schematem i przeładowaniem na żywo                                                     | C4.4    |

@@ -176,7 +176,7 @@
     flex: none;
     padding: var(--alfa-space-1) var(--alfa-space-2);
     border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-sm);
+    border-radius: var(--alfa-radius-control);
     background: transparent;
     color: var(--alfa-color-text);
     font: inherit;
@@ -252,7 +252,7 @@
     min-height: 40px;
     padding: var(--alfa-space-2) var(--alfa-space-1);
     border: 0;
-    border-radius: var(--alfa-radius-sm);
+    border-radius: var(--alfa-radius-control);
     background: transparent;
     color: var(--alfa-color-text);
     font: inherit;

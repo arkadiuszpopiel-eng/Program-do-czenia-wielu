@@ -32,7 +32,42 @@ function* walk(dir) {
   }
 }
 
+// Zmienne `--alfa-*` użyte przez `var(...)` bez wartości zapasowej muszą być gdzieś zdefiniowane:
+// literówka w nazwie nie daje błędu, tylko po cichu wyłącza regułę (kanciasty przycisk, zerowy odstęp).
+// Definicją jest deklaracja w CSS, `style:--alfa-x` w Svelte albo `setProperty('--alfa-x', …)` w skrypcie.
+const DEFINED =
+  /(?:^|[\s;{"'(:])(--alfa-[a-z0-9-]+)\s*[:=,]|setProperty\(\s*['"](--alfa-[a-z0-9-]+)['"]/gm;
+const USED = /var\(\s*(--alfa-[a-z0-9-]+)\s*\)/g;
+const defined = new Set();
+const sources = [];
+function* walkAll(dir) {
+  for (const name of readdirSync(dir)) {
+    if (SKIP.has(name) || name === 'html') continue;
+    const p = join(dir, name);
+    if (statSync(p).isDirectory()) yield* walkAll(p);
+    else if (/\.(css|svelte|html|ts)$/.test(name)) yield p;
+  }
+}
+for (const dir of ['apps/desktop/ui/src', 'apps/desktop/ui/public', 'packages/ui-kit/src']) {
+  for (const file of walkAll(join(ROOT, dir))) {
+    const src = readFileSync(file, 'utf8');
+    sources.push([file, src]);
+    for (const m of src.matchAll(DEFINED)) defined.add(m[1] ?? m[2]);
+  }
+}
+
 let errors = 0;
+for (const [file, src] of sources) {
+  for (const m of src.matchAll(USED)) {
+    if (defined.has(m[1])) continue;
+    const line = src.slice(0, m.index).split('\n').length;
+    console.error(
+      `${relative(ROOT, file)}:${line}: zmienna \`${m[1]}\` nie jest nigdzie zdefiniowana`,
+    );
+    errors++;
+  }
+}
+
 let files = 0;
 for (const file of walk(ROOT)) {
   files++;

@@ -68,8 +68,8 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'files.image_thumbnails',
       L('Miniatury obrazów', 'Image thumbnails'),
       L(
-        'Obrazy w rozmowie jako leniwe miniatury.',
-        'Images in the conversation as lazy thumbnails.',
+        'Obrazy w rozmowie pokazujemy jako miniatury, wczytywane dopiero wtedy, gdy są widoczne.',
+        'Images in the conversation are shown as thumbnails, loaded only once they are visible.',
       ),
       true,
     ),

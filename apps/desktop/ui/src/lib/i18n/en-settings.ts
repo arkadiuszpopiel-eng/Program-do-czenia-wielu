@@ -137,7 +137,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'perm.L2.name': 'Ask about risky things',
   'perm.L2.desc':
     'Small things she does herself; she asks before deleting, sending data out and installing.',
-  'perm.L3.name': 'Very high (default)',
+  'perm.L3.name': 'Very high — the default level',
   'perm.L3.desc':
     'Works on her own across your profile and selected apps; asks only for irreversible things outside the scope or when acting on untrusted content (mail, web page, file).',
   'perm.L4.name': 'Max',
