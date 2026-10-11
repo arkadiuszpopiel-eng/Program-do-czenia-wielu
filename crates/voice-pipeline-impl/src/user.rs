@@ -7,7 +7,7 @@ use voice_cmd_contract::{CmdDecision, CmdInput, CmdSource};
 use voice_dialog_contract::{DialogEvent, DialogPhase};
 use voice_pipeline_contract::{PipelineEvent, SwitchSource};
 use voice_stt_contract::{SttError, Transcript, UtteranceId};
-use voice_turn_contract::{TurnDecision, TurnEvent};
+use voice_turn_contract::{AudioTail, TurnDecision, TurnEvent};
 use voice_wake_contract::{WakeEvent, WakeInput};
 
 use crate::pipeline::Pipeline;
@@ -29,6 +29,51 @@ pub(crate) struct UserUtt {
     pub cmd_fired: Option<voice_cmd_contract::VoiceCommand>,
     pub cmd_recheck: Option<(u64, CmdInput)>,
     pub next_barge_partial: u64,
+    /// Ostatnie sekundy nagrania dla modelu końca wypowiedzi: (chwila złożenia, próbki 16 kHz).
+    pub turn_tail: Option<(u64, Vec<f32>)>,
+}
+
+/// Okno modelu końca wypowiedzi: ostatnie 8 s przy 16 kHz.
+const TURN_TAIL_SAMPLES: usize = 128_000;
+const TURN_TAIL_RATE: u32 = 16_000;
+/// Ogon składany najwyżej co tyle milisekund (model i tak ocenia ponownie rzadziej).
+const TURN_TAIL_REFRESH_MS: u64 = 300;
+
+impl UserUtt {
+    /// Ostatnie sekundy nagrania (16 kHz mono) dla modelu końca wypowiedzi; `None`, gdy potok
+    /// pracuje w innym formacie. Ogon jest zapamiętany i odświeżany co [`TURN_TAIL_REFRESH_MS`].
+    pub(crate) fn turn_tail(&mut self, now_ms: u64) -> Option<AudioTail<'_>> {
+        let stale = self
+            .turn_tail
+            .as_ref()
+            .is_none_or(|(at, _)| now_ms.saturating_sub(*at) >= TURN_TAIL_REFRESH_MS);
+        if stale {
+            let mut picked = Vec::new();
+            let mut total = 0usize;
+            for f in self.frames.iter().rev() {
+                if f.format.sample_rate != TURN_TAIL_RATE || f.format.channels != 1 {
+                    return None;
+                }
+                picked.push(f);
+                total += f.pcm.len();
+                if total >= TURN_TAIL_SAMPLES {
+                    break;
+                }
+            }
+            let mut samples = Vec::with_capacity(total);
+            for f in picked.iter().rev() {
+                samples.extend_from_slice(&f.pcm);
+            }
+            self.turn_tail = Some((now_ms, samples));
+        }
+        self.turn_tail
+            .as_ref()
+            .filter(|(_, s)| !s.is_empty())
+            .map(|(_, s)| AudioTail {
+                samples: s,
+                sample_rate: TURN_TAIL_RATE,
+            })
+    }
 }
 
 impl Pipeline {
@@ -62,6 +107,7 @@ impl Pipeline {
             cmd_fired: None,
             cmd_recheck: None,
             next_barge_partial: self.st.now_ms + u64::from(self.cfg.barge_partial_ms),
+            turn_tail: None,
         };
         for f in pre {
             Self::store(&mut u, f, self.cfg.max_utterance_ms);
@@ -138,7 +184,8 @@ impl Pipeline {
             .as_ref()
             .is_some_and(|u| !u.closing && !u.vad_active && u.speech_end_ms.is_some());
         if waiting {
-            let decision = self.turn.decide(now, None);
+            let tail = self.st.user.as_mut().and_then(|u| u.turn_tail(now));
+            let decision = self.turn.decide(now, tail);
             if let TurnDecision::EndOfTurn { .. } = decision {
                 self.outbox.push(core_bus_contract::Event::new(
                     voice_turn_contract::event_kind(voice_turn_contract::EVENT_END),

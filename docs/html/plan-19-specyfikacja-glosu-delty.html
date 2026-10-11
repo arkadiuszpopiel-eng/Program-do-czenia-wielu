@@ -394,7 +394,11 @@ na silnik: liczba, p50 i p95 czasu oraz stosunku czasu, ostatnie 20.</p>
 <tr><td>Cechy</td><td>log-mel jak w Whisperze: okno 400, krok 160, 80 pasm, obcięcie do max − 8, potem (x + 4) / 4 → tablica 1 × 80 × 800</td></tr>
 <tr><td>Decyzja</td><td>„skończone”, gdy prawdopodobieństwo &gt; 0,5</td></tr>
 <tr><td>Strojenie</td><td>jeśli ucina: próg 0,6–0,7 albo pierwsza próba po 350 ms; jeśli zwleka: próg 0,4</td></tr></tbody></table></div>
-<p>W Alfie zastępuje atrapę tekstową w <code>voice-turn-impl</code>. Test zgodności cech z wzorcem przepisujemy z Delty.</p>
+<p>W Alfie (od 0.0.34) model liczy osobny proces <code>alfa-smart-turn</code> (<code>crates/lib-smart-turn</code>) z ONNX Runtime, bo
+biblioteka <code>tract</code> liczy ten skwantowany model błędnie (0,33 zamiast 0,95 dla tego samego nagrania). Wynik zgadza
+się z ONNX Runtime w Pythonie do czwartego miejsca po przecinku; ocena trwa 25–45 ms. Czasy z tabeli realizuje
+zestaw <code>Patience::Conversation</code> (250 ms przy pewnym końcu, 350 ms przy umiarkowanym, do 2000 ms z ponowną oceną co
+350 ms, gdy model mówi „jeszcze nie skończył”). Próg 0,5 i próg pewności 0,85 są w <code>TurnCfg</code>.</p>
 <h2 id="6-synteza-mowy">6. Synteza mowy</h2>
 <div class="tbl"><table><thead><tr><th>Silnik</th><th>Jak działa w Delcie</th><th>Parametry</th><th>Alfa</th></tr></thead><tbody><tr><td><strong>Supertonic 3</strong></td><td>ONNX Runtime na procesorze</td><td>6 kroków, tempo 1,05, język <code>pl</code>, wątki min(4, rdzenie), barwy F1–F5 i M1–M5, 44,1 kHz</td><td>bierzemy jako głos główny; proces poboczny</td></tr>
 <tr><td><strong>Piper</strong></td><td>pakiet Pythona</td><td>głosy <code>gosia-medium</code>, <code>mc_speech-medium</code>, <code>darkman-medium</code>; długość = 1 / tempo (0,4–2,0); <code>noise_scale</code>, <code>noise_w</code></td><td>Alfa ma Pipera; dochodzą głosy i parametry</td></tr>

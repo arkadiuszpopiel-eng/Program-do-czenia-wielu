@@ -1,6 +1,6 @@
 # Manifest modułu voice-dialog (docs/modules/voice-dialog/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "voice-dialog"
-version = "0.0.33"
+version = "0.0.34"
 kind = "service"
 provides = ["voice-dialog-contract@1"]
 requires = ["core-bus-contract@1", "voice-cmd-contract@1", "personas-contract@1"]

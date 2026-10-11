@@ -1,7 +1,7 @@
 # Manifest narzędzia powłoki (docs/modules/tools-shell/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 # Zdolności z tokenów Brokera per wywołanie: `shell.exec(katalog roboczy)`, `net.egress(host)`.
 id = "tools-shell"
-version = "0.0.33"
+version = "0.0.34"
 kind = "tool"
 provides = ["tools-shell-contract@1"]
 requires = ["tools-common-contract@1", "safety-broker-contract@1", "undo-journal-contract@1", "platform-contract@1", "watchdog-contract@1", "core-bus-contract@1"]

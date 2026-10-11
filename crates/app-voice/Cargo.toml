@@ -22,6 +22,7 @@ voice-vad-contract = { path = "../voice-vad-contract" }
 voice-vad-impl = { path = "../voice-vad-impl" }
 voice-stt-contract = { path = "../voice-stt-contract" }
 voice-stt-impl = { path = "../voice-stt-impl" }
+voice-turn-contract = { path = "../voice-turn-contract" }
 voice-turn-impl = { path = "../voice-turn-impl" }
 voice-cmd-contract = { path = "../voice-cmd-contract" }
 voice-dialog-contract = { path = "../voice-dialog-contract" }
@@ -62,7 +63,6 @@ voice-vad-fake = { path = "../voice-vad-fake" }
 voice-dsp-fake = { path = "../voice-dsp-fake" }
 voice-cmd-fake = { path = "../voice-cmd-fake" }
 voice-persona-fake = { path = "../voice-persona-fake" }
-voice-turn-contract = { path = "../voice-turn-contract" }
 voice-turn-fake = { path = "../voice-turn-fake" }
 voice-wake-fake = { path = "../voice-wake-fake" }
 voice-speaker-fake = { path = "../voice-speaker-fake" }

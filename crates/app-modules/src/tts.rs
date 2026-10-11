@@ -48,15 +48,10 @@ fn supertonic_models(paths: &AppPaths) -> std::path::PathBuf {
     paths.models().join("supertonic")
 }
 
-/// Biblioteka ONNX Runtime leży obok sidecara — ładuje ją tylko proces `alfa-supertonic`.
-fn supertonic_runtime(paths: &AppPaths) -> std::path::PathBuf {
-    paths
-        .sidecar("supertonic", "alfa-supertonic")
-        .with_file_name(if cfg!(windows) {
-            "onnxruntime.dll"
-        } else {
-            "libonnxruntime.so"
-        })
+/// Biblioteka ONNX Runtime (obok sidecara albo pobrana z katalogu) — ładuje ją tylko proces
+/// `alfa-supertonic`.
+fn supertonic_runtime(paths: &AppPaths) -> Option<std::path::PathBuf> {
+    crate::turn::onnxruntime(paths, &paths.sidecar("supertonic", "alfa-supertonic"))
 }
 
 /// Supertonic jest gotowy, gdy są: sidecar, biblioteka ONNX Runtime, konfiguracja modelu i barwa
@@ -64,7 +59,7 @@ fn supertonic_runtime(paths: &AppPaths) -> std::path::PathBuf {
 fn supertonic_ready(paths: &AppPaths) -> bool {
     let models = supertonic_models(paths);
     paths.sidecar("supertonic", "alfa-supertonic").is_file()
-        && supertonic_runtime(paths).is_file()
+        && supertonic_runtime(paths).is_some()
         && models.join("tts.json").is_file()
         && models.join("vector_estimator.onnx").is_file()
         && models.join("vocoder.onnx").is_file()
@@ -101,7 +96,7 @@ fn build(
             "--voices-dir".to_owned(),
             lossy(models),
             "--ort".to_owned(),
-            lossy(supertonic_runtime(paths)),
+            lossy(supertonic_runtime(paths).unwrap_or_default()),
             "--steps".to_owned(),
             "6".to_owned(),
             "--lang".to_owned(),

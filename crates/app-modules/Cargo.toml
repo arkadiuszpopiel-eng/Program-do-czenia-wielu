@@ -48,6 +48,7 @@ voice-tts-contract = { path = "../voice-tts-contract" }
 voice-tts-impl = { path = "../voice-tts-impl" }
 # Sidecar STT whisper-server (CPU/CUDA) — wspólna kompozycja dla app-voice i próby generalnej.
 voice-stt-impl = { path = "../voice-stt-impl" }
+voice-turn-impl = { path = "../voice-turn-impl" }
 watchdog-contract = { path = "../watchdog-contract" }
 async-trait.workspace = true
 chrono.workspace = true

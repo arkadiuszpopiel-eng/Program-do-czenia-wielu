@@ -111,7 +111,11 @@ na silnik: liczba, p50 i p95 czasu oraz stosunku czasu, ostatnie 20.
 | Decyzja | „skończone”, gdy prawdopodobieństwo > 0,5 |
 | Strojenie | jeśli ucina: próg 0,6–0,7 albo pierwsza próba po 350 ms; jeśli zwleka: próg 0,4 |
 
-W Alfie zastępuje atrapę tekstową w `voice-turn-impl`. Test zgodności cech z wzorcem przepisujemy z Delty.
+W Alfie (od 0.0.34) model liczy osobny proces `alfa-smart-turn` (`crates/lib-smart-turn`) z ONNX Runtime, bo
+biblioteka `tract` liczy ten skwantowany model błędnie (0,33 zamiast 0,95 dla tego samego nagrania). Wynik zgadza
+się z ONNX Runtime w Pythonie do czwartego miejsca po przecinku; ocena trwa 25–45 ms. Czasy z tabeli realizuje
+zestaw `Patience::Conversation` (250 ms przy pewnym końcu, 350 ms przy umiarkowanym, do 2000 ms z ponowną oceną co
+350 ms, gdy model mówi „jeszcze nie skończył”). Próg 0,5 i próg pewności 0,85 są w `TurnCfg`.
 
 ## 6. Synteza mowy
 

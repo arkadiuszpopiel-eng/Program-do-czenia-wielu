@@ -78,11 +78,28 @@ impl FakeTts {
             .max(1) as u32;
         let ms = (chars * MS_PER_CHAR) as f32 / (voice.preset.rate * rate).max(0.1);
         let params = SpeechParams {
-            f0: 200.0 * voice.preset.pitch,
+            f0: 200.0 * voice.preset.pitch * timbre_factor(&voice.preset.base_speaker),
             seed,
             ..SpeechParams::default()
         };
         synthetic_speech(TTS_RATE, ms / 1000.0, params)
+    }
+}
+
+/// Barwy Supertonic różnią agentki brzmieniem, nie wysokością — atrapa oddaje to wysokością tonu,
+/// żeby testy mogły rozpoznać, która agentka mówi (F1 bez zmian, F2 wyżej, F4 niżej, F5 najwyżej).
+fn timbre_factor(base_speaker: &str) -> f32 {
+    match base_speaker {
+        "F2" => 1.06,
+        "F3" => 0.96,
+        "F4" => 0.92,
+        "F5" => 1.12,
+        "M1" => 0.70,
+        "M2" => 0.66,
+        "M3" => 0.74,
+        "M4" => 0.62,
+        "M5" => 0.78,
+        _ => 1.0,
     }
 }
 

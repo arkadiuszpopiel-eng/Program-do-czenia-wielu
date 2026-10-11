@@ -12,6 +12,35 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.34 — 2026-10-11
+
+Alfa słyszy, czy skończyłeś mówić — trzeci duży krok przenoszenia rozmowy z Delty AI.
+
+### Głos
+
+- [poważne] Koniec wypowiedzi ocenia model Smart Turn v3.2, który słucha brzmienia ostatnich 8 sekund, zamiast
+  samego liczenia ciszy. Gdy model jest pewny końca, Alfa odpowiada po ćwierć sekundy ciszy; gdy słyszy, że zdanie
+  jest urwane, czeka do 2 sekund i co 350 ms sprawdza ponownie. Na tym laptopie ocena trwa 25–45 ms i wynik zgadza
+  się z wzorcem wydawcy. Bez pobranego modelu wszystko działa jak dotąd (ocena z tekstu).
+- Model Smart Turn (ok. 9 MB) i biblioteka ONNX Runtime (78 MB) są w Ustawieniach → „Modele lokalne i silniki”,
+  z przypiętymi sumami kontrolnymi. Głos Supertonic znajduje bibliotekę także po pobraniu z katalogu — nie musi
+  już leżeć obok programu.
+- [poważne] Naprawione dwa testy zmiany głosu agentki, czerwone od wersji 0.0.30 (nie były wtedy uruchomione):
+  atrapa głosu rozróżnia teraz agentki także przy barwach Supertonic.
+
+### Testy
+
+- `lib-smart-turn` (nowy): protokół na udawanym modelu, cechy dźwięku — 7 testów.
+- `voice-turn-impl`: klient procesu, powrót do oceny z tekstu po błędzie, przerwa po trzech błędach, ponowna ocena
+  w ciszy, czasy rozmowy 250 / 350 / 2000 ms; próba na prawdziwym modelu ze wzorcem (`smart_turn_live`).
+- `voice-pipeline-impl`: model dostaje nagranie 16 kHz nie dłuższe niż 8 s.
+- Aplikacja nie była budowana (budowa na koniec nocy).
+
+### Przyczyna błędu
+
+- Biblioteka `tract` liczy skwantowany model Smart Turn inaczej niż ONNX Runtime (0,33 zamiast 0,95 dla tego
+  samego nagrania), dlatego model działa w osobnym procesie z ONNX Runtime — jak głos Supertonic.
+
 ## 0.0.33 — 2026-10-11
 
 Rozpoznawanie mowy Qwen3-ASR ze strażnikiem jakości — drugi duży krok przenoszenia rozmowy z Delty AI.

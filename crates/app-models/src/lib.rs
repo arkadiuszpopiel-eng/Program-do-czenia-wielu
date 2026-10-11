@@ -28,6 +28,7 @@ pub mod store;
 pub mod supertonic;
 pub mod unpack;
 mod view;
+pub mod voice_runtime;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, PoisonError};

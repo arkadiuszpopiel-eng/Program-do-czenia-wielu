@@ -123,6 +123,8 @@ fn speech() -> Vec<ItemSpec> {
         ),
         crate::qwen_asr::qwen_asr(),
         crate::supertonic::supertonic(),
+        crate::voice_runtime::smart_turn(),
+        crate::voice_runtime::onnxruntime(),
         item(
             "piper-pl_PL-gosia-medium",
             ModelItemKind::Tts,

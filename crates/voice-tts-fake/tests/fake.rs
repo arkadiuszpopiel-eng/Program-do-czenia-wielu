@@ -16,6 +16,8 @@ async fn contract_suite() {
 #[tokio::test]
 async fn fallback_chain_and_voice_pitch() {
     let tts = FakeTts::new();
+    // Łańcuch: Supertonic → Pocket → Piper; dwa pierwsze zawodzą, mówi ostatni.
+    tts.fail_engine("supertonic");
     tts.fail_engine("pocket");
     tts.set_ttfb_ms(321);
     let chunks = collect(
@@ -28,7 +30,7 @@ async fn fallback_chain_and_voice_pitch() {
     assert_eq!(chunks[0].engine, "piper");
     let ev = tts.take_events();
     assert!(ev.iter().any(
-        |e| matches!(e, TtsEvent::Fallback { from, to, .. } if from == "pocket" && to == "piper")
+        |e| matches!(e, TtsEvent::Fallback { from, to, .. } if from == "supertonic" && to == "piper")
     ));
     assert!(
         ev.iter()

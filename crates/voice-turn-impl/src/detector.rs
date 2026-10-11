@@ -15,8 +15,8 @@ struct State {
     last_end: Option<u64>,
     partial: String,
     partial_version: u64,
-    /// (koniec mowy, wersja transkryptu) → wynik modelu (`None` = błąd modelu).
-    cached: Option<((u64, u64), Option<f32>)>,
+    /// (koniec mowy, wersja transkryptu, numer oceny w ciszy) → wynik modelu (`None` = błąd).
+    cached: Option<((u64, u64, u64), Option<f32>)>,
 }
 
 /// Detektor końca tury z regulowaną cierpliwością.
@@ -58,7 +58,12 @@ impl<M: TurnModel> PatienceTurnDetector<M> {
         silence_ms: u64,
         audio: Option<AudioTail<'_>>,
     ) -> Option<f32> {
-        let key = (end, self.st.partial_version);
+        // Model słuchający dźwięku ocenia ponownie co `reprobe_ms` ciszy; pozostałe — raz.
+        let round = match (self.model.reprobe_ms(), audio.is_some()) {
+            (Some(every), true) if every > 0 => silence_ms / every,
+            _ => 0,
+        };
+        let key = (end, self.st.partial_version, round);
         if let Some((k, p)) = self.st.cached
             && k == key
         {

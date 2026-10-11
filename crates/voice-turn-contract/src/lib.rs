@@ -3,7 +3,7 @@
 //!
 //! Wejście: zdarzenia VAD (początek/koniec mowy z czasem), transkrypt częściowy (hezytacje:
 //! „yyy”, „eee”, niedokończone „i…”, „że…”), prawdopodobieństwo końca tury z modelu (`TurnModel`;
-//! Smart Turn v3.2 jako impl ONNX przyjdzie później). Wynik: `TurnDecision` — `EndOfTurn` albo
+//! Smart Turn v3.2 słucha dźwięku, model tekstowy patrzy na interpunkcję). Wynik: `TurnDecision` — `EndOfTurn` albo
 //! `Wait { until_ms }` (następna ocena). Czas: milisekundy zegara monotonicznego (w testach wirtualnego).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -79,6 +79,11 @@ pub trait TurnModel: Send + Sync {
     fn name(&self) -> &str;
     /// Prawdopodobieństwo, że użytkownik skończył turę (0–1).
     fn end_probability(&self, input: &TurnModelInput<'_>) -> Result<f32, TurnError>;
+    /// Co ile milisekund ciszy model chce ocenić nagranie ponownie (`None` — ocena raz na koniec
+    /// mowy). Modele słuchające dźwięku zmieniają zdanie, gdy cisza się wydłuża.
+    fn reprobe_ms(&self) -> Option<u64> {
+        None
+    }
 }
 
 /// Detektor końca tury (stanowy, deterministyczny; czas podaje wywołujący).

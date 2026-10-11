@@ -30,6 +30,9 @@ pub enum Patience {
     Normal,
     /// Dłuższe czekanie (np. dyktowanie myśli).
     High,
+    /// Rozmowa z modelem słuchającym dźwięku (wartości strojone w Delcie AI: pierwsza ocena po
+    /// 250 ms ciszy, a gdy model mówi „jeszcze nie skończył” — czekanie do 2 s).
+    Conversation,
     /// Własne wartości.
     Custom(PatienceCfg),
 }
@@ -49,6 +52,7 @@ impl Patience {
             Self::Low => p(150, 200, 250, 300, 1000),
             Self::Normal => p(200, 300, 400, 500, 1500),
             Self::High => p(300, 600, 700, 800, 2500),
+            Self::Conversation => p(250, 350, 400, 1650, 2000),
             Self::Custom(c) => *c,
         }
     }
@@ -117,7 +121,21 @@ mod tests {
             (normal.base_ms, normal.hesitation_bonus_ms, normal.max_ms),
             (300, 400, 1500)
         );
-        for p in [Patience::Low, Patience::Normal, Patience::High] {
+        let talk = Patience::Conversation.cfg();
+        assert_eq!(
+            (
+                talk.min_silence_ms,
+                talk.base_ms + talk.low_prob_bonus_ms,
+                talk.max_ms
+            ),
+            (250, 2000, 2000)
+        );
+        for p in [
+            Patience::Low,
+            Patience::Normal,
+            Patience::High,
+            Patience::Conversation,
+        ] {
             TurnCfg {
                 patience: p,
                 ..TurnCfg::default()

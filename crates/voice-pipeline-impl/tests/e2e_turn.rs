@@ -30,6 +30,10 @@ async fn full_turn_speech_to_audible_reply() {
     w.run_until(6_000).await;
     let s = w.p.status();
     assert_eq!(s.turns, 1, "{s:?}");
+    // Model końca wypowiedzi dostał nagranie: 16 kHz, nie dłuższe niż okno 8 s, z całą mową.
+    let (samples, rate) = w.turn.0.lock().unwrap().longest_audio().expect("nagranie");
+    assert_eq!(rate, 16_000);
+    assert!((14_000..=128_000).contains(&samples), "{samples}");
     assert_eq!(s.phase, DialogPhase::Listening, "{s:?}");
     let first = w
         .first_audio_after(1_900, 6_000)

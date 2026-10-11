@@ -31,7 +31,8 @@ use voice_stt_impl::fallback::GuardedStt;
 use voice_stt_impl::qwen::QwenStt;
 use voice_stt_impl::{ProcessLauncher, WhisperStt};
 use voice_tts_contract::Tts;
-use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector};
+use voice_turn_contract::{Patience, TurnCfg, TurnDetector};
+use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector, SmartTurnModel};
 use voice_vad_contract::VadCfg;
 use voice_vad_impl::{HashPolicy, SileroModel, SileroVad};
 use voice_wake_contract::{Wake, WakeCfg, WakeWordCfg};
@@ -186,6 +187,25 @@ impl SystemVoice {
         Ok(stt)
     }
 
+    /// Koniec wypowiedzi: model Smart Turn na dźwięku (z czasami strojonymi do rozmowy), gdy są
+    /// jego pliki; inaczej model tekstowy z domyślną cierpliwością.
+    pub(crate) fn turn(&self) -> Box<dyn TurnDetector> {
+        let Some(sidecar) = app_modules::turn::smart_turn(&self.paths) else {
+            return Box::new(PatienceTurnDetector::new(HeuristicTurnModel));
+        };
+        let cfg = TurnCfg {
+            patience: Patience::Conversation,
+            ..TurnCfg::default()
+        };
+        match PatienceTurnDetector::with_cfg(SmartTurnModel::sidecar(sidecar), cfg) {
+            Ok(detector) => Box::new(detector),
+            Err(e) => {
+                tracing::warn!(error = %e, "Smart Turn niedostępny — koniec wypowiedzi z tekstu");
+                Box::new(PatienceTurnDetector::new(HeuristicTurnModel))
+            }
+        }
+    }
+
     /// Rozpoznawanie mowy dla rozmowy i dyktowania: Qwen3-ASR ze strażnikiem i Whisperem jako
     /// zapasem, gdy model Qwen3-ASR jest pobrany; inaczej sam Whisper.
     pub(crate) fn stt(&self) -> Result<Arc<dyn Stt>, PipelineError> {
@@ -271,7 +291,7 @@ impl VoiceEngineFactory for SystemVoice {
             dsp: Box::new(dsp),
             vad: Box::new(self.vad()?),
             stt,
-            turn: Box::new(PatienceTurnDetector::new(HeuristicTurnModel)),
+            turn: self.turn(),
             commands: Arc::new(GrammarRecognizer::new(Grammar::default_pl_en())),
             dialog: Box::new(voice_dialog_contract::default_machine()),
             wake: Box::new(wake_service()?),

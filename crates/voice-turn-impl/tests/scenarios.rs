@@ -5,7 +5,8 @@
 use core_registry_contract::ModuleManifest;
 use voice_turn_contract::contract_tests::{self, poll_end};
 use voice_turn_contract::{
-    EndReason, Patience, TurnCfg, TurnDecision, TurnDetector, TurnError, TurnEvent, WaitReason,
+    AudioTail, EndReason, Patience, TurnCfg, TurnDecision, TurnDetector, TurnError, TurnEvent,
+    WaitReason,
 };
 use voice_turn_fake::ScriptedTurnModel;
 use voice_turn_impl::{HeuristicTurnModel, MODULE_TOML, PatienceTurnDetector};
@@ -185,4 +186,67 @@ fn patience_levels_order_and_partial_text_toggle() {
         )
         .is_err()
     );
+}
+
+/// Cisza po końcu mowy (koniec w 2000 ms), po której detektor zamknął turę; `audio` — czy potok
+/// podaje nagranie.
+fn silence_until_end<D: TurnDetector>(d: &mut D, audio: bool) -> u64 {
+    let samples = vec![0.1f32; 16_000];
+    d.observe(&TurnEvent::SpeechStart { at_ms: 1000 });
+    d.observe(&TurnEvent::SpeechEnd { at_ms: 2000 });
+    let mut now = 2000;
+    loop {
+        let tail = audio.then_some(AudioTail {
+            samples: &samples,
+            sample_rate: 16_000,
+        });
+        if let TurnDecision::EndOfTurn { .. } = d.decide(now, tail) {
+            return now - 2000;
+        }
+        now += 10;
+        assert!(now < 8000, "detektor nie zamknął tury");
+    }
+}
+
+fn conversation(model: ScriptedTurnModel) -> PatienceTurnDetector<ScriptedTurnModel> {
+    PatienceTurnDetector::with_cfg(
+        model,
+        TurnCfg {
+            patience: Patience::Conversation,
+            ..TurnCfg::default()
+        },
+    )
+    .unwrap()
+}
+
+#[test]
+fn listening_model_is_asked_again_as_silence_grows() {
+    // Dwie pierwsze oceny: „jeszcze nie skończył”; trzecia (po 700 ms ciszy): „skończył”.
+    let model = ScriptedTurnModel::constant(0.95).with_reprobe(350);
+    model.push(Ok(0.1));
+    model.push(Ok(0.1));
+    let mut d = conversation(model);
+    assert_eq!(silence_until_end(&mut d, true), 700);
+    assert_eq!(d.model().calls().len(), 3);
+}
+
+#[test]
+fn conversation_timing_matches_the_tuned_values() {
+    // Pewny koniec → 250 ms; umiarkowany → 350 ms; „nie skończył” do końca → twarde 2 s.
+    let sure = ScriptedTurnModel::constant(0.95).with_reprobe(350);
+    assert_eq!(silence_until_end(&mut conversation(sure), true), 250);
+    let likely = ScriptedTurnModel::constant(0.6).with_reprobe(350);
+    assert_eq!(silence_until_end(&mut conversation(likely), true), 350);
+    let never = ScriptedTurnModel::constant(0.05).with_reprobe(350);
+    let mut d = conversation(never);
+    assert_eq!(silence_until_end(&mut d, true), 2000);
+    assert_eq!(d.model().calls().len(), 6);
+}
+
+#[test]
+fn without_audio_the_model_is_asked_once() {
+    let model = ScriptedTurnModel::constant(0.1).with_reprobe(350);
+    let mut d = conversation(model);
+    assert_eq!(silence_until_end(&mut d, false), 2000);
+    assert_eq!(d.model().calls().len(), 1);
 }

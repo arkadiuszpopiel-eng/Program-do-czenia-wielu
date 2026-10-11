@@ -22,6 +22,7 @@ struct ModelState {
 #[derive(Debug)]
 pub struct ScriptedTurnModel {
     default: f32,
+    reprobe_ms: Option<u64>,
     state: Mutex<ModelState>,
 }
 
@@ -30,8 +31,16 @@ impl ScriptedTurnModel {
     pub fn constant(default: f32) -> Self {
         Self {
             default,
+            reprobe_ms: None,
             state: Mutex::new(ModelState::default()),
         }
+    }
+
+    /// Model, który chce oceniać nagranie ponownie co `every_ms` ciszy.
+    #[must_use]
+    pub fn with_reprobe(mut self, every_ms: u64) -> Self {
+        self.reprobe_ms = Some(every_ms);
+        self
     }
 
     /// Dokłada wynik do kolejki.
@@ -59,6 +68,10 @@ impl TurnModel for ScriptedTurnModel {
         st.calls.push(input.partial_text.map(str::to_owned));
         st.queue.pop_front().unwrap_or(Ok(self.default))
     }
+
+    fn reprobe_ms(&self) -> Option<u64> {
+        self.reprobe_ms
+    }
 }
 
 /// Detektor z adnotacji: koniec tury po `delay` ms ciszy (kolejne tury — kolejne adnotacje),
@@ -72,6 +85,7 @@ pub struct ScriptedTurnDetector {
     ended: bool,
     last_end: Option<u64>,
     decisions: u32,
+    audio: Option<(usize, u32)>,
 }
 
 impl ScriptedTurnDetector {
@@ -83,6 +97,11 @@ impl ScriptedTurnDetector {
     /// Adnotacja: następna tura kończy się po `delay_ms` ciszy.
     pub fn push_delay(&mut self, delay_ms: u64) {
         self.delays.push_back(delay_ms);
+    }
+
+    /// Najdłuższe nagranie przekazane do `decide`: (liczba próbek, częstotliwość).
+    pub fn longest_audio(&self) -> Option<(usize, u32)> {
+        self.audio
     }
 
     /// Liczba wywołań `decide`.
@@ -125,8 +144,13 @@ impl TurnDetector for ScriptedTurnDetector {
         }
     }
 
-    fn decide(&mut self, now_ms: u64, _audio: Option<AudioTail<'_>>) -> TurnDecision {
+    fn decide(&mut self, now_ms: u64, audio: Option<AudioTail<'_>>) -> TurnDecision {
         self.decisions += 1;
+        if let Some(tail) = audio
+            && self.audio.is_none_or(|(n, _)| tail.samples.len() > n)
+        {
+            self.audio = Some((tail.samples.len(), tail.sample_rate));
+        }
         let p = self.cfg.patience.cfg();
         if !self.had_speech || self.ended {
             return TurnDecision::Idle;
