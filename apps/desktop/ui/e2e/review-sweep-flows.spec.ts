@@ -131,6 +131,103 @@ for (const style of STYLES) {
       expect(errors, 'błędy w konsoli').toEqual([]);
     });
 
+    test(`aktualizacja: postęp, „Co nowego” i potwierdzenie przywrócenia — ${style} ${theme}`, async ({
+      page,
+    }) => {
+      const errors = watchConsole(page);
+      await open(page, style, theme);
+      await waitForChat(page);
+      await openSettings(page, 'Aktualizacje');
+      const found: string[] = [];
+      const check = async (label: string) => {
+        await page.waitForTimeout(200);
+        for (const defect of await layoutDefects(page)) found.push(`${label}: ${defect}`);
+      };
+      await page.getByRole('button', { name: 'Sprawdź teraz' }).click();
+      await expect(page.getByText('Dostępna jest wersja 0.2.0.')).toBeVisible();
+      await check('dostępna wersja');
+      await page.getByRole('button', { name: 'Pobierz i przygotuj' }).click();
+      await expect(
+        page.getByRole('progressbar', { name: 'Pobieranie aktualizacji' }),
+      ).toBeVisible();
+      await check('pobieranie');
+      const restart = page.getByRole('button', { name: 'Uruchom ponownie, aby zaktualizować' });
+      await expect(restart).toBeVisible({ timeout: 10_000 });
+      await check('gotowa do ponownego uruchomienia');
+      await restart.click();
+      const news = page.getByRole('dialog', { name: 'Co nowego w wersji 0.2.0' });
+      await expect(news).toBeVisible();
+      await check('okno „Co nowego”');
+      await expect(news.getByRole('button', { name: 'Historia zmian' })).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(news).toBeHidden();
+      await page.getByRole('button', { name: 'Przywróć poprzednią wersję (0.1.0-f1)' }).click();
+      const confirm = page.getByRole('alertdialog', { name: 'Przywrócić poprzednią wersję?' });
+      await expect(confirm).toBeVisible();
+      await check('potwierdzenie przywrócenia');
+      await page.keyboard.press('Escape');
+      await expect(confirm).toBeHidden();
+      expect(found, 'wady układu aktualizacji').toEqual([]);
+      expect(errors, 'błędy w konsoli').toEqual([]);
+    });
+
+    test(`menu wiadomości, Kreator agentek i strony z formularzami — ${style} ${theme}`, async ({
+      page,
+    }) => {
+      const errors = watchConsole(page);
+      await open(page, style, theme);
+      await waitForChat(page);
+      const found: string[] = [];
+      const check = async (label: string) => {
+        await page.waitForTimeout(200);
+        for (const defect of await layoutDefects(page)) found.push(`${label}: ${defect}`);
+      };
+      // Prawy przycisk na wiadomości przypina jej pasek akcji (kopiuj, ponów…); drugi — odpina.
+      const message = page.locator('.message, article').first();
+      await message.click({ button: 'right', position: { x: 12, y: 12 } });
+      await expect(message).toHaveClass(/pinned/);
+      await check('wiadomość z przypiętym paskiem akcji');
+      await message.click({ button: 'right', position: { x: 12, y: 12 } });
+      await expect(message).not.toHaveClass(/pinned/);
+      // Kreator agentek: propozycja szkicu z opisu i podgląd — pełny przebieg formularza.
+      await openSettings(page, 'Kreator agentek');
+      await page
+        .getByRole('textbox')
+        .first()
+        .fill('Agentka Zofia, która porządkuje pobrane pliki.');
+      await check('kreator agentek — opis');
+      for (const name of [
+        'Zadania w tle i wyzwalacze',
+        'Reguły Marszałka',
+        'Umiejętności',
+        'Wtyczki',
+      ]) {
+        await page
+          .getByRole('navigation', { name: 'Sekcje ustawień' })
+          .getByRole('button', { name, exact: true })
+          .click();
+        await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();
+        // Każda zakładka wewnątrz strony (jeśli są) — przełączana myszką.
+        const tabs = page.getByRole('main').getByRole('tab');
+        const count = await tabs.count();
+        for (let t = 0; t < count; t += 1) {
+          await tabs.nth(t).click();
+          await check(`${name} — zakładka ${t + 1}`);
+        }
+        // Każda rozwijana sekcja strony w stanie otwartym.
+        const toggles = page.getByRole('main').locator('button[aria-expanded="false"]');
+        const closed = await toggles.count();
+        for (let t = 0; t < Math.min(closed, 6); t += 1) {
+          const toggle = toggles.first();
+          if (!(await toggle.isVisible())) break;
+          await toggle.click();
+          await check(`${name} — rozwinięcie ${t + 1}`);
+        }
+      }
+      expect(found, 'wady układu menu i formularzy').toEqual([]);
+      expect(errors, 'błędy w konsoli').toEqual([]);
+    });
+
     test(`stany systemowe i okna poboczne — ${style} ${theme}`, async ({ page }) => {
       const errors = watchConsole(page);
       const found: string[] = [];
