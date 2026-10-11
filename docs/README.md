@@ -30,7 +30,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Mikrojądro, magistrala, moduły, procesy, przepływy |
 | [`CATALOG.md`](CATALOG.md) | Generowany katalog wszystkich crate'ów i modułów: grupa, fala, rodzaj, rozmiar, testy, SPEC, niespójności (`node scripts/catalog.mjs`) |
 | [`modules/`](modules/README.md) | Jednostronicowe specyfikacje modułów (`<moduł>/SPEC.md`) i ich indeks |
-| [`ADR/`](ADR/README.md) | Rejestr decyzji architektonicznych 0001–0016 oraz projekty 0017–0026 do planu v6 (czekają na podpis właściciela) |
+| [`ADR/`](ADR/README.md) | Rejestr decyzji architektonicznych 0001–0016 oraz projekty 0017–0027 do planu v6 (czekają na podpis właściciela) |
 | [`VOICE.md`](VOICE.md) | Voice Suite: potok, profile A–D, barge-in |
 | [`PERSONAS.md`](PERSONAS.md) | Cztery agentki, role, obsady |
 | [`UI.md`](UI.md) | Interfejs: okna, panele, tokeny, budżety |

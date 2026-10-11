@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-09** (wersja programu 0.0.18). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-11** (wersja programu 0.0.28). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -8,9 +8,9 @@ Etapy C–G startują po zamknięciu MVP (A.8) — z wyjątkiem zadań oznaczony
 (Linux) wymaga tylko etapu B; o tym, czy ruszy przed D–F, decyduje właściciel.
 
 ```
-A (MVP Windows) ══▶ C (funkcje Windows)
-   │
-   └▶ B (szwy) ─▶ D (host i protokół) ─▶ E (panel WWW) ─▶ F (Android)
+A (MVP Windows) ══▶ P (funkcje Delty) ══▶ C (funkcje Windows)
+   │                    └▶ U (wielu użytkowników) ─┐
+   └▶ B (szwy) ─▶ D (host i protokół) ◀────────────┘ ─▶ E (panel WWW) ─▶ F (Android)
         └───────────────────────────────▶ G (Linux)               H (badawcze — bez terminu)
 ```
 
@@ -145,8 +145,8 @@ i dwóch motywach.
 
 ### C5 — głos lokalny wysokiej jakości (opis: [`15-glos-lokalny.md`](15-glos-lokalny.md))
 
-Decyzja właściciela z 2026-10-11: lepszy głos ma być lokalny, nie z chmury. Dwa poziomy — „Naturalny” na karcie
-graficznej i „Szybki” na procesorze — przełączane automatycznie.
+Decyzja właściciela z 2026-10-11: lepszy głos ma być lokalny, nie z chmury. **Grupa wchłonięta przez zadanie P1**
+(głos w konfiguracji Delty: Supertonic 3 z 6 krokami i wyprzedzeniem o dwa zdania); zadania niżej zostają jako ślad.
 
 | ID   | Zadanie                                                                                                              | Stan         | Data | Uwagi                                                                              |
 | ---- | -------------------------------------------------------------------------------------------------------------------- | ------------ | ---- | ---------------------------------------------------------------------------------- |
@@ -161,6 +161,50 @@ graficznej i „Szybki” na procesorze — przełączane automatycznie.
 **Wyjście z C5:** właściciel w odsłuchu 20 zdań ocenia głos jako wyraźnie lepszy od Pipera; cztery agentki mają
 różne głosy; pierwszy dźwięk mieści się w budżecie z `docs/VOICE.md` na laptopie bazowym; rozmowa nie urywa się,
 gdy karta jest zajęta (przełączenie na poziom szybki).
+
+## Etap P — Przeniesienie funkcji z Delty AI
+
+Opis: [`17-przeniesienie-z-delty.md`](17-przeniesienie-z-delty.md). Decyzja właściciela z 2026-10-11: Alfa jest programem docelowym; z Delty AI 0.8.35 przenosimy system rozmowy
+i mowy oraz wszystkie brakujące funkcje. P1 i P2 mają pierwszeństwo — zamykają A.5 i A.4.
+
+| ID  | Zadanie                                                                                                                              | Stan         | Data | Uwagi                                                                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ---- | --------------------------------------------------------------------------------------- |
+| P0  | Dokumenty: specyfikacja głosu Delty ze stałymi i macierz wszystkich funkcji Delty (ok. 400 pozycji) z decyzją dla każdej              | w toku       | —    | 0.0.28: plan zbiorczy (dokument 16) i opis etapu (17); zostaje macierz i specyfikacja    |
+| P1  | Rozmowa i mowa: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, bezpiecznik, Smart Turn, ekran „Rozmowa na żywo”    | do zrobienia | —    | wchłania C5; zamyka A.5; zgoda na pobrania udzielona; wyjście: 8 scenariuszy na laptopie |
+| P2  | Modele lokalne: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, warianty silnika, panel System      | do zrobienia | —    | zamyka A.4; łączy się z C2.2                                                            |
+| P3  | Nawigacja i powłoka: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej, tabela skrótów                             | planowane    | —    | obok obecnej nawigacji Alfy                                                             |
+| P4  | Rozmowa: karty z profilem, Tablica, Tryb skupienia, Arena, załączniki z czytnikami, archiwum i eksporty, szablony                     | planowane    | —    | łączy się z C2.8                                                                        |
+| P5  | Sieć i wiedza: wyszukiwanie, głębokie badanie, wiadomości, „Naucz”, polecenia bez modelu, tłumaczenie, instrukcja                     | planowane    | —    | treść z sieci oznaczana jako niezaufana; łączy się z C2.6, C2.11                        |
+| P6  | Osoby: baza osób, rozpoznawanie twarzy i głosu, pamięć per osoba                                                                      | planowane    | —    | ADR 0025 przyjęty 2026-10-11; realizuje C3.8–C3.13; łączy się z etapem U                |
+| P7  | Komputer: sterowanie do poziomu Delty przez Brokera, menedżer procesów, spis urządzeń, ekran uprawnień                                | czeka        | —    | realizuje C1.3; zmiany zdolności Brokera — przegląd właściciela                         |
+| P8  | Twórczość: Studio obrazu, dostawcy obrazów, tryb hybrydowy, Galeria, Studio opowieści, Audio, menedżer kamer                          | planowane    | —    | modele obrazu: pobrania powyżej 3 GB za osobną zgodą                                    |
+| P9  | Awatar: 2D / 2.5D / 3D / VRM, emocje, ruch ust (12 kształtów), osobne okno                                                            | planowane    | —    |                                                                                         |
+| P10 | Odtwarzanie multimediów i sterowanie głosem (bez biblioteki)                                                                          | planowane    | —    | pobieranie z serwisów — osobna decyzja właściciela                                      |
+| P11 | Przepływy, role i przepływ wieloagentowy, edytor persony, laboratorium treningu, pulpit testowy, personalizacja                       | planowane    | —    | łączy się z C1.5                                                                        |
+| P12 | Agentki programistki: pisanie, uruchamianie i budowanie oprogramowania w katalogu projektu, rozmowa między agentkami w trakcie pracy, dobór modelu do trudności zadania | planowane    | —    | zlecenie właściciela 2026-10-11; pełne uprawnienia w obrębie projektu przez Brokera — zmiana zdolności Brokera z przeglądem właściciela |
+
+**Wyjście z P:** każda pozycja macierzy funkcji Delty ma stan „jest / przeniesione / odrzucone z powodem”, a to,
+co przeniesione, ma test i wynik z laptopa właściciela.
+
+## Etap U — Wielu użytkowników
+
+Opis: [`18-wielu-uzytkownikow.md`](18-wielu-uzytkownikow.md). Zlecenie właściciela z 2026-10-11: konta i logowanie na wszystkich celach. Projekt decyzji: ADR 0027.
+
+| ID  | Zadanie                                                                                                   | Stan      | Data | Uwagi                                          |
+| --- | --------------------------------------------------------------------------------------------------------- | --------- | ---- | ---------------------------------------------- |
+| U.0 | Podpis właściciela pod ADR 0027                                                                           | czeka     | —    | zmienia model uprawnień — obszar Jądra         |
+| U.1 | Moduł kont: rejestr, role, logowanie lokalne (Windows Hello, klucz dostępu, PIN), blokada                 | czeka     | —    | po U.0                                         |
+| U.2 | Rozdzielenie danych na konta i migracja dotychczasowych danych na konto właściciela                       | czeka     | —    | po U.1                                         |
+| U.3 | Klucze API, limity kosztów i poziom autonomii na konto                                                    | czeka     | —    | po U.1                                         |
+| U.4 | Broker: konto w prośbie o zgodę, ograniczenia roli, dziennik z kontem                                     | czeka     | —    | przegląd właściciela                           |
+| U.5 | Okno: ekran logowania, przełącznik kont w belce, strona Ustawień „Użytkownicy”                            | czeka     | —    | po U.1                                         |
+| U.6 | Role Dziecko i Gość: filtr treści, brak pamięci gościa                                                    | czeka     | —    | po U.2                                         |
+| U.7 | Połączenie z bazą osób: rozpoznanie głosu i twarzy wybiera konto                                          | czeka     | —    | po U.2 i P6                                    |
+| U.8 | Konta w dostępie zdalnym: parowanie urządzenia z kontem, logowanie w panelu WWW i w telefonie             | czeka     | —    | po U.1, D.2, E.3, F.2                          |
+| U.9 | Testy ataków (przejęcie sesji, podniesienie roli, dostęp do cudzych danych) i przegląd w świeżym kontekście | planowane | —    |                                                |
+
+**Wyjście z U:** dwie osoby korzystają z jednej Alfy na komputerze i z dwóch telefonów, nie widząc swoich danych;
+dziecko nie uruchomi działania w systemie; właściciel odbiera dostęp jednym kliknięciem.
 
 ## Etap D — Host bez okna i protokół zdalny
 
@@ -249,9 +293,10 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | Podpis pod ADR 0017–0018                           | B.4, B.7, G                           |
 | Podpis pod ADR 0019–0023                           | D, E, F                               |
 | ADR 0024 — licencja silnika mowy                   | C1.1 (wybór głosu), C5.3 (dołączenie do wydania), wydanie publiczne |
-| ADR 0025 — kamery i biometria twarzy               | C3.8–C3.13                            |
 | ADR 0026 — głos z chmury jako opcja | C1.1a |
-| Zgoda na pobranie silników mowy do próby (ok. 1,5 GB) | C5.2, C5.4 |
+| ADR 0027 — konta, logowanie i role | etap U |
+| Pobieranie multimediów z serwisów internetowych | część P10 |
+| Pobrania powyżej 3 GB (modele obrazu, duże modele rozmowy) — poniżej tej granicy zgoda stała z 2026-10-11 | części P2 i P8 |
 | Znak wodny w mowie syntetycznej; skąd głosy wzorcowe agentek | C5.6, C5.7 |
 | Czy obraz z kamery może iść do modelu w chmurze    | C3.7 (droga chmurowa)                 |
 | Zgoda na pobranie modelu widzącego i modeli twarzy | C3.6, C3.8                            |
@@ -263,6 +308,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-11 | Wersja 0.0.28: plan zbiorczy (dokument [`16`](16-plan-zbiorczy.md)), nowy etap P — przeniesienie funkcji z Delty AI (dokument [`17`](17-przeniesienie-z-delty.md)) i nowy etap U — wielu użytkowników (dokument [`18`](18-wielu-uzytkownikow.md), ADR 0027). Decyzje właściciela: Alfa programem docelowym, ADR 0025 przyjęty, stała zgoda na pobrania do 3 GB. |
 | 2026-10-11 | Wersja 0.0.27: poprawki z przeglądu paneli bocznych i nakładek w skali 1:1 — kolejność kart zgodna ze skrótami `Alt+1…7`, pole wiadomości w Zadaniach, opis polecenia `/pamięć`. |
 | 2026-10-11 | Wersja 0.0.26: pierwszy pomiar głosów na laptopie bazowym (C5.2 w toku) — Chatterbox z pakietu producenta i Supertonic 3 są za wolne do rozmowy, decyzja po odsłuchu; poprawki z przeglądu stron Ustawień w pełnej skali i nowa reguła bramki (niezdefiniowane zmienne stylów). |
 | 2026-10-11 | Wersja 0.0.25: dodatek o głosie lokalnym (dokument [`15`](15-glos-lokalny.md)) i nowa grupa C5. Decyzja właściciela: lepszy głos lokalnie (Chatterbox Multilingual + głos szybki na procesorze), chmura (C1.1a) na koniec kolejki. |

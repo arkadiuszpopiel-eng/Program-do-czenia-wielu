@@ -25,9 +25,12 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`12-kamery-i-rozpoznawanie-osob.md`](12-kamery-i-rozpoznawanie-osob.md)       | Kamery (USB, IP, Wi-Fi), rozpoznawanie zapisanych osób z pamięcią, opis obrazu na polecenie | z postępem grupy C3                    |
 | [`13-podsumowanie-i-dalsze-kroki.md`](13-podsumowanie-i-dalsze-kroki.md)       | Podsumowanie zgłoszeń właściciela i ich stanu, decyzje do podjęcia, plan następnych sesji   | po każdej dłuższej sesji               |
 | [`14-funkcje-wkrotce.md`](14-funkcje-wkrotce.md) | Spis funkcji ze znakiem „wkrótce” i funkcji zależnych od modułów — każda z zadaniem w roadmapie | gdy strona zmienia stan albo dochodzi nowa |
+| [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md) | **Zacznij tutaj**: stan prac i cały plan w jednym miejscu — etapy A–H, etap P (funkcje z Delty AI), etap U (wielu użytkowników), cztery cele: Windows, Linux, panel WWW, Android | po każdym etapie |
+| [`17-przeniesienie-z-delty.md`](17-przeniesienie-z-delty.md) | Etap P: co i jak przenosimy z Delty AI 0.8.35 (rozmowa i mowa, modele, nawigacja, twórczość, awatar…) | z postępem etapu P |
+| [`18-wielu-uzytkownikow.md`](18-wielu-uzytkownikow.md) | Etap U: konta, logowanie, role, rozdzielenie danych | z postępem etapu U i ADR 0027 |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
-Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0026 (status „Proponowany”).
+Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).
 Szkice specyfikacji nowych modułów: [`../modules/README.md`](../modules/README.md), sekcja „Planowane (plan v6)”.
 
 ## Zasady prowadzenia

@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11) — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/16-plan-zbiorczy.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html" aria-current="page">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-czym-jest-alfa">1. Czym jest Alfa</a></li><li><a href="#2-gdzie-jestesmy">2. Gdzie jesteśmy</a></li><li><a href="#3-mapa-etapow">3. Mapa etapów</a></li><li><a href="#4-etap-a-windows-pierwsza-wersja">4. Etap A — Windows, pierwsza wersja</a></li><li><a href="#5-etap-p-przeniesienie-z-delty-ai">5. Etap P — przeniesienie z Delty AI</a></li><li><a href="#6-etap-c-pozostale-funkcje-windows">6. Etap C — pozostałe funkcje Windows</a></li><li><a href="#7-etap-u-wielu-uzytkownikow">7. Etap U — wielu użytkowników</a></li><li><a href="#8-cztery-cele-platformy-i-klienci">8. Cztery cele: platformy i klienci</a></li><li><a href="#9-etapy-d-h-w-skrocie">9. Etapy D–H w skrócie</a></li><li><a href="#10-kolejnosc-prac">10. Kolejność prac</a></li><li><a href="#11-decyzje-wlasciciela">11. Decyzje właściciela</a></li><li><a href="#12-jak-pracujemy">12. Jak pracujemy</a></li></ul></aside><article><h1 id="16-plan-zbiorczy-alfy-stan-i-calosc-planu-na-2026-10-11">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</h1>
+<p>Wersja programu <strong>0.0.28</strong>. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
+(etapy A–H), nowy etap <strong>P</strong> (przeniesienie funkcji z Delty AI) i nowy etap <strong>U</strong> (wielu użytkowników z kontami
+i logowaniem) oraz cztery cele: <strong>Windows, Linux, panel WWW, Android</strong> z pełnym sterowaniem i komunikacją.
+Szczegóły zadań: <a href="plan-03-roadmapa.html"><code>03-roadmapa.md</code></a> (dokument żywy). Tu jest obraz całości.</p>
+<h2 id="1-czym-jest-alfa">1. Czym jest Alfa</h2>
+<p>Asystentka AI na komputer: cztery agentki (Alfa, Beta, Gama, Delta) rozmawiają tekstem i głosem, pamiętają,
+wykonują zadania na plikach i w programach. Trzy zasady, które się nie zmieniają:</p>
+<ol>
+<li><strong>Lokalnie najpierw.</strong> Model, pamięć i głos mogą działać bez Internetu; chmura jest wyborem.</li>
+<li><strong>Jedno miejsce wykonuje działania.</strong> Każdą akcję w systemie wykonuje Broker — osobny proces ze zgodami,
+dziennikiem i przyciskiem STOP. Agentki nie mają do niego dostępu.</li>
+<li><strong>Moduły z kontraktami.</strong> Każdy moduł ma opis, atrapę i testy; platformy i klienci są wymienne.</li>
+</ol>
+<p>Decyzja właściciela z 2026-10-11: <strong>Alfa jest programem docelowym</strong>, a z Delty AI 0.8.35 przenosimy system
+rozmowy i mowy oraz wszystkie brakujące funkcje.</p>
+<h2 id="2-gdzie-jestesmy">2. Gdzie jesteśmy</h2>
+<div class="tbl"><table><thead><tr><th>Miara</th><th>Stan</th></tr></thead><tbody><tr><td>Wersje</td><td>0.0.1 → 0.0.28 w dniach 2026-10-07 → 11; historia w programie: Ustawienia → Aktualizacje</td></tr>
+<tr><td>Kod</td><td>Rust ok. 304 tys. linii w 245 modułach, okno Svelte ok. 56 tys. linii, 227 poleceń rdzenia</td></tr>
+<tr><td>Testy automatyczne</td><td>Rust ok. 2600, okno 311 jednostkowych i 309 w przeglądarce (61 to przegląd układu w 3 stylach × 2 motywach), 17 w prawdziwej aplikacji</td></tr>
+<tr><td><strong>Potwierdzone na sprzęcie</strong></td><td><strong>0 ze 108 kryteriów.</strong> Działa okno, ustawienia, skalowanie; odpowiedź modelu lokalnego, rozmowa głosowa i Broker poza procesem — niesprawdzone</td></tr>
+<tr><td>Repozytorium</td><td>gałąź lokalna, niewypchnięta (czeka na <code>gh auth login</code> właściciela)</td></tr></tbody></table></div>
+<p>Co już jest w programie: rozmowa z gałęziami, cztery agentki z rolami, Kreator agentek, umiejętności, wtyczki,
+zadania w tle, pamięć i wyszukiwanie, konta dostawców z kolejkami modeli i kontem zapasowym, mosty CLI, kamery
+USB, terminal, pliki i artefakty, eksport <code>.alfa</code>, aktualizacje z historią zmian (wagi: czerwona / pomarańczowa /
+zielona), Zdrowie systemu, trzy style interfejsu w dwóch motywach, PL/EN.</p>
+<h2 id="3-mapa-etapow">3. Mapa etapów</h2>
+<pre><code>A (Windows MVP) ══▶ P (funkcje Delty) ══▶ C (pozostałe funkcje Windows)
+   │                    │
+   │                    └▶ U (wielu użytkowników) ─┐
+   └▶ B (szwy) ─▶ D (host i protokół zdalny) ◀─────┘
+                    ├▶ E (panel WWW)
+                    ├▶ F (Android)
+        └──────────▶ G (Linux)                    H (badawcze)
+</code></pre>
+<div class="tbl"><table><thead><tr><th>Etap</th><th>Co daje</th><th>Stan</th><th>Zadań: zrobione / wszystkie</th></tr></thead><tbody><tr><td>A</td><td>Windows — pierwsza wersja działająca na sprzęcie („Alfa 0.1”)</td><td class="st st1">w toku</td><td>15 / 21</td></tr>
+<tr><td>B</td><td>Szwy pod wiele platform i klientów</td><td class="st st1">w toku</td><td>2 / 9</td></tr>
+<tr><td>C</td><td>Funkcje Windows po MVP (C1–C5)</td><td class="st st1">w toku</td><td>6 / 50</td></tr>
+<tr><td><strong>P</strong></td><td><strong>Funkcje przeniesione z Delty AI (P0–P11)</strong></td><td><strong>nowy</strong></td><td>0 / 13</td></tr>
+<tr><td><strong>U</strong></td><td><strong>Wielu użytkowników: konta, logowanie, role</strong></td><td><strong>nowy</strong></td><td>0 / 10</td></tr>
+<tr><td>D</td><td>Host bez okna i bezpieczne połączenie zdalne</td><td>czeka na ADR 0019–0023</td><td>0 / 10</td></tr>
+<tr><td>E</td><td>Panel WWW — sterowanie przez przeglądarkę</td><td class="st st4">planowane</td><td>0 / 7</td></tr>
+<tr><td>F</td><td>Android 15+ — pilot i tryb bez komputera</td><td class="st st4">planowane</td><td>0 / 8</td></tr>
+<tr><td>G</td><td>Linux</td><td class="st st4">planowane</td><td>0 / 9</td></tr>
+<tr><td>H</td><td>Tematy badawcze</td><td>bez terminu</td><td>—</td></tr></tbody></table></div>
+<h2 id="4-etap-a-windows-pierwsza-wersja">4. Etap A — Windows, pierwsza wersja</h2>
+<p>Zrobione: skalowanie 1280–3840 px, style „Szkło” i „Next”, własne kontrolki, belka okna z paskiem LED, nawigacja
+Ustawień, klucze API z diagnozą, kolejki modeli, kilka kart graficznych, znak programu, strojenie mowy.</p>
+<p>Zostało (wszystko wymaga właściciela albo sprzętu):</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Na co czeka</th></tr></thead><tbody><tr><td>A.4</td><td>Pierwsza rozmowa z modelem lokalnym</td><td>łączy się z <strong>P2</strong>; pobranie modeli</td></tr>
+<tr><td>A.5</td><td>Głos na żywo</td><td>łączy się z <strong>P1</strong></td></tr>
+<tr><td>A.6</td><td>Pomiary na sprzęcie (fale F0–F3)</td><td>po A.4 i A.5</td></tr>
+<tr><td>A.7</td><td>44 decyzje bezpieczeństwa</td><td>właściciel — pakiet gotowy</td></tr>
+<tr><td>A.8</td><td>Wdrożenie decyzji, wejście na gałąź główną</td><td>po A.7 i <code>gh auth login</code></td></tr></tbody></table></div>
+<h2 id="5-etap-p-przeniesienie-z-delty-ai">5. Etap P — przeniesienie z Delty AI</h2>
+<p>Pełny opis: <a href="plan-17-przeniesienie-z-delty.html"><code>17-przeniesienie-z-delty.md</code></a>. Zasada: z Delty bierzemy zachowanie,
+progi zdobyte na sprzęcie i ekrany; piszemy od nowa w Rust, w wyglądzie Alfy, z Brokerem — bez Pythona i bez
+wad bezpieczeństwa Delty.</p>
+<div class="tbl"><table><thead><tr><th>Grupa</th><th>Zakres</th><th>Łączy się z</th></tr></thead><tbody><tr><td>P0</td><td>Dokumenty: specyfikacja głosu Delty, macierz ok. 400 funkcji</td><td>—</td></tr>
+<tr><td><strong>P1</strong></td><td><strong>Rozmowa i mowa</strong>: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, Smart Turn, ekran „Rozmowa na żywo”</td><td>A.5, C1.1, C5</td></tr>
+<tr><td><strong>P2</strong></td><td><strong>Modele lokalne</strong>: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, panel System</td><td>A.4, C2.2</td></tr>
+<tr><td>P3</td><td>Nawigacja: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej</td><td>—</td></tr>
+<tr><td>P4</td><td>Rozmowa: karty, Tablica, Tryb skupienia, Arena, załączniki z czytnikami, eksporty</td><td>C2.8</td></tr>
+<tr><td>P5</td><td>Sieć i wiedza: wyszukiwanie, wiadomości, „Naucz”, polecenia bez modelu, tłumaczenie, instrukcja</td><td>C2.6, C2.11</td></tr>
+<tr><td>P6</td><td>Osoby: baza osób, rozpoznawanie twarzy i głosu, pamięć per osoba</td><td>C3.8–C3.13, <strong>U</strong></td></tr>
+<tr><td>P7</td><td>Komputer: sterowanie do poziomu Delty przez Brokera, procesy, urządzenia</td><td>C1.3</td></tr>
+<tr><td>P8</td><td>Twórczość: Studio obrazu, Galeria, Studio opowieści, Audio</td><td>—</td></tr>
+<tr><td>P9</td><td>Awatar: 2D / 3D / VRM, emocje, ruch ust</td><td>—</td></tr>
+<tr><td>P10</td><td>Odtwarzanie multimediów i sterowanie głosem (bez biblioteki)</td><td>—</td></tr>
+<tr><td>P11</td><td>Przepływy, role i przepływ wieloagentowy, edytor persony, trening, pulpit testowy</td><td>C1.5</td></tr>
+<tr><td><strong>P12</strong></td><td><strong>Agentki programistki</strong>: pisanie, uruchamianie i budowanie oprogramowania z pełnymi uprawnieniami w katalogu projektu, rozmowa między agentkami w trakcie pracy, model dobierany do trudności zadania</td><td>C1.2, mosty CLI</td></tr></tbody></table></div>
+<h2 id="6-etap-c-pozostale-funkcje-windows">6. Etap C — pozostałe funkcje Windows</h2>
+<div class="tbl"><table><thead><tr><th>Grupa</th><th>Zakres</th><th>Stan</th></tr></thead><tbody><tr><td>C1</td><td>Z planu v5: jakość głosu, mosty CLI na żywo, sterowanie komputerem, pamięć i transfer, samonaprawa</td><td>czeka na sprzęt i decyzje; C1.1 i C1.3 wchodzą w P1 i P7</td></tr>
+<tr><td>C2</td><td>Nowe: zestaw ewaluacyjny po polsku, modele na 6 GB, MCP 2026-07-28, Agent Skills, zadania z budżetem, kanwa artefaktów, oznaczanie treści AI (termin 2026-12-02), SBOM, klucze dla firm</td><td>3 z 18 zrobione, 1 w toku (liczby zbiorcze etapu liczy strona startowa HTML)</td></tr>
+<tr><td>C3</td><td>Kamery i osoby: USB zrobione, sieciowe do zrobienia, opis obrazu w toku, osoby — w P6</td><td>4 z 15 zrobione</td></tr>
+<tr><td>C4</td><td>Cztery strony Ustawień ze znakiem „wkrótce”</td><td>planowane; spis w dokumencie 14</td></tr>
+<tr><td>C5</td><td>Głos lokalny</td><td>wchłonięty przez P1 (Supertonic 3 w ustawieniach Delty)</td></tr></tbody></table></div>
+<h2 id="7-etap-u-wielu-uzytkownikow">7. Etap U — wielu użytkowników</h2>
+<p>Pełny opis: <a href="plan-18-wielu-uzytkownikow.html"><code>18-wielu-uzytkownikow.md</code></a>; projekt decyzji: ADR 0027 (Proponowany).</p>
+<p>Dziś Alfa zakłada jedną osobę. Docelowo: <strong>konta użytkowników z logowaniem</strong>, na komputerze i zdalnie.</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Opis</th></tr></thead><tbody><tr><td>Konta i role</td><td>Właściciel (pełnia praw), Dorosły, Dziecko, Gość; każda rola ma własny najwyższy poziom autonomii agentek</td></tr>
+<tr><td>Logowanie na komputerze</td><td>Windows Hello / klucz dostępu albo PIN; szybkie przełączanie; blokada po bezczynności</td></tr>
+<tr><td>Rozdzielenie danych</td><td>osobne rozmowy, pamięć, pliki, klucze API i limity kosztów; dane wspólne tylko za zgodą właściciela</td></tr>
+<tr><td>Rozpoznanie po głosie i twarzy</td><td>wybiera konto do rozmowy (z P6); do ryzykownych działań zawsze logowanie</td></tr>
+<tr><td>Zdalnie</td><td>każde urządzenie sparowane z kontem; panel WWW i telefon logują się na konkretne konto</td></tr>
+<tr><td>Nadzór</td><td>dziennik działań per konto; właściciel widzi zgody i koszty wszystkich; STOP dla każdego</td></tr></tbody></table></div>
+<h2 id="8-cztery-cele-platformy-i-klienci">8. Cztery cele: platformy i klienci</h2>
+<p>Jeden rdzeń (host) i wymienni klienci. Opisy: <a href="plan-05-windows.html"><code>05-windows.md</code></a>, <a href="plan-06-linux.html"><code>06-linux.md</code></a>,
+<a href="plan-07-panel-www.html"><code>07-panel-www.md</code></a>, <a href="plan-08-android.html"><code>08-android.md</code></a>,
+<a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html"><code>09-dostep-zdalny-i-bezpieczenstwo.md</code></a>.</p>
+<div class="tbl"><table><thead><tr><th>Cel</th><th>Rola</th><th>Pełne sterowanie i komunikacja</th><th>Etap</th><th>Stan</th></tr></thead><tbody><tr><td><strong>Windows 11</strong></td><td>komputer główny: rdzeń, modele, głos, Broker</td><td>wszystko lokalnie</td><td>A, P, C</td><td>w budowie</td></tr>
+<tr><td><strong>Linux</strong></td><td>drugi komputer główny</td><td>to samo co Windows; zdolności niedostępne są ukryte</td><td>B → G</td><td class="st st4">planowane</td></tr>
+<tr><td><strong>Panel WWW</strong></td><td>sterowanie z dowolnej przeglądarki</td><td>rozmowa, agentki, pliki hosta, zgody, STOP, podgląd kamer i stanu — 100 % funkcji przez przekaźnik z szyfrowaniem end-to-end</td><td>B → D → E</td><td class="st st4">planowane</td></tr>
+<tr><td><strong>Android 15+</strong></td><td>pilot w kieszeni</td><td>to samo co panel + głos przez mikrofon telefonu, powiadomienia o zgodach, parowanie kodem QR; bez komputera — rozmowa przez model API</td><td>B → D → F</td><td class="st st4">planowane</td></tr></tbody></table></div>
+<p>Jak to się łączy:</p>
+<ul>
+<li><strong>Komputer nie otwiera portu.</strong> Klienci łączą się przez przekaźnik, który widzi tylko szyfrogram (ADR 0021).</li>
+<li><strong>Parowanie kodem QR</strong>; lista urządzeń i odwołanie jednym kliknięciem.</li>
+<li><strong>Zgody zdalne</strong> dla wszystkich poziomów ryzyka, zawsze z potwierdzeniem biometrią albo kluczem dostępu (ADR 0022).</li>
+<li><strong>Konta (etap U)</strong> obowiązują wszędzie: urządzenie jest sparowane z kontem, a uprawnienia wynikają z roli.</li>
+<li><strong>Funkcje z etapu P</strong> trafiają do klientów zdalnych przez ten sam zestaw poleceń: rozmowa na żywo z telefonu
+(dźwięk przetwarza host), sklep modeli i panel System zdalnie, podgląd awatara i kamer.</li>
+</ul>
+<p>Zrobione pod to wcześniej: numery zdarzeń i wznawianie połączenia (B.2), błędy jako obiekty (B.3), generator
+typów (B.1, etap 1).</p>
+<h2 id="9-etapy-d-h-w-skrocie">9. Etapy D–H w skrócie</h2>
+<div class="tbl"><table><thead><tr><th>Etap</th><th>Najważniejsze zadania</th><th>Wyjście</th></tr></thead><tbody><tr><td>D</td><td>brama zdalna, parowanie, przekaźnik, kanał E2E, zgoda z urządzenia, host bez okna</td><td>drugi komputer prowadzi rozmowę i zatwierdza działanie przez przekaźnik</td></tr>
+<tr><td>E</td><td>układ od 360 px, PWA z tego samego kodu, logowanie kluczem dostępu, powiadomienia</td><td>wszystko, na co pozwala host, da się zrobić z przeglądarki</td></tr>
+<tr><td>F</td><td>aplikacja Tauri mobile, magazyn kluczy i biometria, pilot 100 %, głos w telefonie, tryb bez komputera</td><td>telefon sparowany w minutę; rozmowa działa także po wyłączeniu komputera</td></tr>
+<tr><td>G</td><td>porty platformy Linux, analizator powłoki POSIX, Jądro jako usługa, PipeWire, pakiety deb / rpm / Flatpak</td><td>scenariusz MVP na Ubuntu z kartą NVIDIA</td></tr>
+<tr><td>H</td><td>pełny dupleks głosowy, model w telefonie, NPU, MCP Apps, kandydaci z planów Delty (klonowanie głosu Chatterbox, śledzenie twarzy dla awatara)</td><td>bez zobowiązania</td></tr></tbody></table></div>
+<h2 id="10-kolejnosc-prac">10. Kolejność prac</h2>
+<ol>
+<li><strong>P0</strong> — dokumenty przeniesienia (macierz funkcji, specyfikacja głosu).</li>
+<li><strong>P1</strong> — rozmowa i mowa na żywo na laptopie → zamyka A.5.</li>
+<li><strong>P2</strong> — modele lokalne → zamyka A.4; potem pomiary A.6.</li>
+<li><strong>P3–P5</strong> — nawigacja, rozmowa, sieć i wiedza.</li>
+<li><strong>U (pierwsza część)</strong> — konta i logowanie na komputerze; <strong>P6</strong> — osoby (korzysta z kont).</li>
+<li><strong>P12</strong> — agentki programistki (po P2, bo korzysta z doboru modeli); <strong>P7–P11</strong> — komputer, twórczość, awatar, multimedia, pozostałe.</li>
+<li><strong>B</strong> (reszta) → <strong>D</strong> → <strong>E</strong> i <strong>F</strong> → <strong>U (część zdalna)</strong> → <strong>G</strong>.</li>
+</ol>
+<p>Zadania C2 z terminami prawnymi (oznaczanie treści AI do 2026-12-02, SBOM przed wydaniem publicznym) wchodzą
+niezależnie od tej kolejności.</p>
+<h2 id="11-decyzje-wlasciciela">11. Decyzje właściciela</h2>
+<p>Podjęte 2026-10-11: Alfa programem docelowym · głos lokalny, nie z chmury · głos Edge „Zofia” tylko jako opcja
+wyłączona domyślnie · zgoda na pobrania do P1 · ADR 0025 (dane biometryczne) przyjęty · bez biblioteki
+multimediów, z systemem odtwarzania · wielu użytkowników z kontami i logowaniem · agentki mają pisać
+i uruchamiać oprogramowanie z pełnymi uprawnieniami w projekcie i dobierać model do zadania · stała zgoda na
+pobrania do 3 GB.</p>
+<p>Nadal otwarte:</p>
+<div class="tbl"><table><thead><tr><th>Decyzja</th><th>Blokuje</th></tr></thead><tbody><tr><td><code>gh auth login</code> i wypchnięcie commitów</td><td>A.0, A.8</td></tr>
+<tr><td>44 decyzje bezpieczeństwa</td><td>A.7, A.8, B.7</td></tr>
+<tr><td>Podpis pod ADR 0017–0018</td><td>B.4, B.7, G</td></tr>
+<tr><td>Podpis pod ADR 0019–0023</td><td>D, E, F</td></tr>
+<tr><td>Podpis pod ADR 0027 (konta i role)</td><td>U</td></tr>
+<tr><td>Pobieranie multimediów z serwisów</td><td>część P10</td></tr>
+<tr><td>Progi kryteriów akceptacji</td><td>wyjście z każdego etapu</td></tr></tbody></table></div>
+<h2 id="12-jak-pracujemy">12. Jak pracujemy</h2>
+<ul>
+<li>Każda seria zmian to wyższa wersja z wpisem w dzienniku zmian i wagą każdej pozycji.</li>
+<li>Każdy ekran sprawdzany w trzech stylach i dwóch motywach, w stanie otwartym, i w prawdziwej aplikacji.</li>
+<li>Nic nie jest „sprawdzone”, jeśli nie było uruchomione; kryterium zalicza dopiero wynik ze sprzętu.</li>
+<li>Pobieranie modeli i silników tylko za zgodą właściciela, z podaniem rzeczywistego rozmiaru.</li>
+<li>Ten dokument i roadmapa są aktualizowane po każdym etapie; wersja HTML powstaje z plików MD.</li>
+</ul>
+</article>
+<footer>Źródło: <code>docs/plan/16-plan-zbiorczy.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

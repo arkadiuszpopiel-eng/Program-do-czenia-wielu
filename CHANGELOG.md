@@ -12,6 +12,31 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.28 — 2026-10-11
+
+Jeden plan całości: dotychczasowe etapy, przeniesienie funkcji z Delty AI i wielu użytkowników. W samym programie
+ta wersja niczego nie zmienia.
+
+### Plan
+
+- Plan zbiorczy w jednym dokumencie: stan prac, etapy A–H, cztery cele (Windows, Linux, panel WWW, Android)
+  z pełnym sterowaniem i komunikacją — `docs/plan/16-plan-zbiorczy.md` (w przeglądarce: `docs/html/index.html`).
+- Nowy etap P: przeniesienie z Delty AI 0.8.35 systemu rozmowy i mowy oraz brakujących funkcji w 12 grupach
+  (głos, modele lokalne, nawigacja, rozmowa, sieć i wiedza, osoby, komputer, twórczość, awatar, multimedia,
+  pozostałe) — `docs/plan/17-przeniesienie-z-delty.md`.
+- Nowa grupa P12: agentki programistki — piszą, uruchamiają i budują oprogramowanie w katalogu projektu,
+  rozmawiają ze sobą w trakcie pracy i dobierają model do trudności zadania (lekki do czytania, mocny dopiero
+  gdy trzeba).
+- Nowy etap U: wielu użytkowników z kontami, logowaniem i rolami (Właściciel, Dorosły, Dziecko, Gość) na
+  komputerze i zdalnie — `docs/plan/18-wielu-uzytkownikow.md`, projekt decyzji ADR 0027.
+- Decyzje właściciela zapisane w planie: Alfa jest programem docelowym; ADR 0025 (dane biometryczne) przyjęty;
+  głos Edge tylko jako opcja wyłączona domyślnie; stała zgoda na pobrania do 3 GB.
+
+### Czego nie sprawdzono
+
+- Analiza Delty powstała z czytania kodu, bez uruchamiania programu. Pełna macierz jej funkcji (ok. 400 pozycji)
+  i specyfikacja głosu ze stałymi są zadaniem P0 — jeszcze niegotowe.
+
 ## 0.0.27 — 2026-10-11
 
 Poprawki z przeglądu paneli bocznych i nakładek w pełnej skali.
