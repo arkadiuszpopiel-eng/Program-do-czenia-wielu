@@ -439,13 +439,16 @@ routera, przepływ planista → wykonawcy → synteza · edytor persony z blokó
 robi to asystent programisty — pisać kod, uruchamiać go, budować i testować programy — rozmawiając ze sobą
 w trakcie pracy i dobierając model do trudności zadania. W Delcie był to tylko podgląd bez wykonywania.</p>
 <div class="tbl"><table><thead><tr><th>Element</th><th>Opis</th><th>Co Alfa już ma</th></tr></thead><tbody><tr><td>Warsztat projektu</td><td>katalog projektu jako obszar roboczy: czytanie, szukanie, edycja plików, polecenia, testy, budowanie, git</td><td>terminal, panel Pliki, wersje artefaktów, cofanie kroków</td></tr>
-<tr><td>Pełne uprawnienia w projekcie</td><td>w obrębie wskazanego katalogu agentka działa bez pytania o każdy krok; poza nim, przy kasowaniu, sieci i instalacjach — zgoda w oknie Brokera</td><td>poziomy autonomii L0–L4, zakresy katalogów w Brokerze</td></tr>
+<tr><td><strong>Przycisk „Pełne uprawnienia”</strong></td><td>nadrzędny przełącznik w belce i w polu pisania, jak tryb pełnego dostępu w Claude Code i Codex: po włączeniu agentki nie pytają o żaden krok — piszą, uruchamiają, instalują i budują bez zatwierdzeń. Włącza go wyłącznie człowiek (potwierdzenie w oknie Brokera), dla sesji albo projektu; stan jest stale widoczny (czerwony znak w belce i w pigułce), jedno kliknięcie albo STOP go wyłącza</td><td>poziom L4 „Maks” już istnieje („nie pyta o nic poza twardymi blokadami Jądra”) — przycisk jest jego szybkim włącznikiem</td></tr>
+<tr><td>Tryb zwykły w projekcie</td><td>bez przycisku: w obrębie katalogu projektu agentka działa sama, a poza nim, przy kasowaniu, sieci i instalacjach — zgoda w oknie Brokera</td><td>poziomy autonomii L0–L3, zakresy katalogów w Brokerze</td></tr>
 <tr><td>Rozmowa między agentkami</td><td>planistka dzieli zadanie, wykonawczynie pracują równolegle i zgłaszają wyniki, krytyczka sprawdza; właściciel widzi ich wymianę i może wejść w słowo</td><td>role, delegowanie, zadania równoległe, oś czasu</td></tr>
 <tr><td>Dobór modelu do zadania</td><td>czytanie plików, szukanie i streszczanie — model lekki (lokalny albo tani); planowanie, trudne poprawki, przegląd — model mocny, dopiero gdy trzeba; podniesienie klasy po nieudanej próbie</td><td>klasy zadań i kolejki modeli (Rozmowa, Kod, Planowanie, Streszczanie), limity kosztów</td></tr>
 <tr><td>Budżet i raport</td><td>limit kroków, czasu i kosztu na zadanie; po pracy raport: co zmieniono, wynik testów, co nie zostało sprawdzone</td><td>limity zadań, samoweryfikacja „Gotowe”</td></tr>
 <tr><td>Bezpieczniki</td><td>treść z plików i z sieci traktowana jako dane, nie polecenia; sekrety nie trafiają do modelu; STOP przerywa wszystko</td><td>Broker, kill-switch, filtr sekretów</td></tr></tbody></table></div>
-<p>Granica, która zostaje: nawet przy „pełnych uprawnieniach” każde działanie wykonuje Broker i trafia do dziennika,
-a agentki nie mogą zmieniać Brokera, audytu ani własnych uprawnień (reguła twarda projektu).</p>
+<p>Co zostaje także przy włączonym przycisku: każde działanie wykonuje Broker i trafia do dziennika (bez pytania,
+ale z zapisem i możliwością cofnięcia kroków); agentki nie mogą same włączyć przycisku ani zmieniać Brokera,
+audytu i własnych uprawnień; sekrety nie trafiają do modelu; STOP (<code>Ctrl+Shift+F12</code>) działa zawsze. Role Dziecko
+i Gość z etapu U nie mają tego przycisku.</p>
 <h2 id="nie-przenosimy">Nie przenosimy</h2>
 <ul>
 <li>Rój Ruflo — Alfa ma własne agentki i MCP.</li>

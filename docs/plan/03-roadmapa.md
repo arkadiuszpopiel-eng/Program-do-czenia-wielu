@@ -181,7 +181,7 @@ i mowy oraz wszystkie brakujące funkcje. P1 i P2 mają pierwszeństwo — zamyk
 | P9  | Awatar: 2D / 2.5D / 3D / VRM, emocje, ruch ust (12 kształtów), osobne okno                                                            | planowane    | —    |                                                                                         |
 | P10 | Odtwarzanie multimediów i sterowanie głosem (bez biblioteki)                                                                          | planowane    | —    | pobieranie z serwisów — osobna decyzja właściciela                                      |
 | P11 | Przepływy, role i przepływ wieloagentowy, edytor persony, laboratorium treningu, pulpit testowy, personalizacja                       | planowane    | —    | łączy się z C1.5                                                                        |
-| P12 | Agentki programistki: pisanie, uruchamianie i budowanie oprogramowania w katalogu projektu, rozmowa między agentkami w trakcie pracy, dobór modelu do trudności zadania | planowane    | —    | zlecenie właściciela 2026-10-11; pełne uprawnienia w obrębie projektu przez Brokera — zmiana zdolności Brokera z przeglądem właściciela |
+| P12 | Agentki programistki: pisanie, uruchamianie i budowanie oprogramowania w katalogu projektu, rozmowa między agentkami w trakcie pracy, dobór modelu do trudności zadania | planowane    | —    | zlecenie właściciela 2026-10-11; nadrzędny przycisk „Pełne uprawnienia” jak w Claude Code i Codex (szybki włącznik poziomu L4, włącza tylko człowiek, stale widoczny); zmiana w Brokerze — przegląd właściciela |
 
 **Wyjście z P:** każda pozycja macierzy funkcji Delty ma stan „jest / przeniesione / odrzucone z powodem”, a to,
 co przeniesione, ma test i wynik z laptopa właściciela.

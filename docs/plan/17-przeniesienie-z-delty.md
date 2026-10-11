@@ -153,14 +153,17 @@ w trakcie pracy i dobierając model do trudności zadania. W Delcie był to tylk
 | Element | Opis | Co Alfa już ma |
 | --- | --- | --- |
 | Warsztat projektu | katalog projektu jako obszar roboczy: czytanie, szukanie, edycja plików, polecenia, testy, budowanie, git | terminal, panel Pliki, wersje artefaktów, cofanie kroków |
-| Pełne uprawnienia w projekcie | w obrębie wskazanego katalogu agentka działa bez pytania o każdy krok; poza nim, przy kasowaniu, sieci i instalacjach — zgoda w oknie Brokera | poziomy autonomii L0–L4, zakresy katalogów w Brokerze |
+| **Przycisk „Pełne uprawnienia”** | nadrzędny przełącznik w belce i w polu pisania, jak tryb pełnego dostępu w Claude Code i Codex: po włączeniu agentki nie pytają o żaden krok — piszą, uruchamiają, instalują i budują bez zatwierdzeń. Włącza go wyłącznie człowiek (potwierdzenie w oknie Brokera), dla sesji albo projektu; stan jest stale widoczny (czerwony znak w belce i w pigułce), jedno kliknięcie albo STOP go wyłącza | poziom L4 „Maks” już istnieje („nie pyta o nic poza twardymi blokadami Jądra”) — przycisk jest jego szybkim włącznikiem |
+| Tryb zwykły w projekcie | bez przycisku: w obrębie katalogu projektu agentka działa sama, a poza nim, przy kasowaniu, sieci i instalacjach — zgoda w oknie Brokera | poziomy autonomii L0–L3, zakresy katalogów w Brokerze |
 | Rozmowa między agentkami | planistka dzieli zadanie, wykonawczynie pracują równolegle i zgłaszają wyniki, krytyczka sprawdza; właściciel widzi ich wymianę i może wejść w słowo | role, delegowanie, zadania równoległe, oś czasu |
 | Dobór modelu do zadania | czytanie plików, szukanie i streszczanie — model lekki (lokalny albo tani); planowanie, trudne poprawki, przegląd — model mocny, dopiero gdy trzeba; podniesienie klasy po nieudanej próbie | klasy zadań i kolejki modeli (Rozmowa, Kod, Planowanie, Streszczanie), limity kosztów |
 | Budżet i raport | limit kroków, czasu i kosztu na zadanie; po pracy raport: co zmieniono, wynik testów, co nie zostało sprawdzone | limity zadań, samoweryfikacja „Gotowe” |
 | Bezpieczniki | treść z plików i z sieci traktowana jako dane, nie polecenia; sekrety nie trafiają do modelu; STOP przerywa wszystko | Broker, kill-switch, filtr sekretów |
 
-Granica, która zostaje: nawet przy „pełnych uprawnieniach” każde działanie wykonuje Broker i trafia do dziennika,
-a agentki nie mogą zmieniać Brokera, audytu ani własnych uprawnień (reguła twarda projektu).
+Co zostaje także przy włączonym przycisku: każde działanie wykonuje Broker i trafia do dziennika (bez pytania,
+ale z zapisem i możliwością cofnięcia kroków); agentki nie mogą same włączyć przycisku ani zmieniać Brokera,
+audytu i własnych uprawnień; sekrety nie trafiają do modelu; STOP (`Ctrl+Shift+F12`) działa zawsze. Role Dziecko
+i Gość z etapu U nie mają tego przycisku.
 
 ## Nie przenosimy
 

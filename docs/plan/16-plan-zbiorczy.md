@@ -93,7 +93,7 @@ wad bezpieczeństwa Delty.
 | P9 | Awatar: 2D / 3D / VRM, emocje, ruch ust | — |
 | P10 | Odtwarzanie multimediów i sterowanie głosem (bez biblioteki) | — |
 | P11 | Przepływy, role i przepływ wieloagentowy, edytor persony, trening, pulpit testowy | C1.5 |
-| **P12** | **Agentki programistki**: pisanie, uruchamianie i budowanie oprogramowania z pełnymi uprawnieniami w katalogu projektu, rozmowa między agentkami w trakcie pracy, model dobierany do trudności zadania | C1.2, mosty CLI |
+| **P12** | **Agentki programistki**: pisanie, uruchamianie i budowanie oprogramowania z nadrzędnym przyciskiem „Pełne uprawnienia” (jak w Claude Code i Codex), rozmowa między agentkami w trakcie pracy, model dobierany do trudności zadania | C1.2, mosty CLI |
 
 ## 6. Etap C — pozostałe funkcje Windows
 
