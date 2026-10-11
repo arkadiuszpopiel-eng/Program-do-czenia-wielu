@@ -6,7 +6,8 @@ use personas_contract::Personas;
 
 use crate::core::AppCore;
 use crate::dto::{
-    AudioDevice, DictationAction, ReadAction, SpeakerAction, VoiceFeatures, VoiceStatus, WakeAction,
+    AudioDevice, DictationAction, EnginesAction, ReadAction, SpeakerAction, VoiceFeatures,
+    VoiceStatus, WakeAction,
 };
 use crate::error::AppError;
 
@@ -116,4 +117,5 @@ voice_f5! {
     voice_speaker(SpeakerAction) = speaker;
     voice_dictation(DictationAction) = dictation;
     voice_read(ReadAction) = read;
+    voice_engines(EnginesAction) = engines;
 }

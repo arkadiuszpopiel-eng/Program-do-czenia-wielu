@@ -13,6 +13,7 @@ import type {
   WakeAction,
 } from '../types-voice';
 import type { FakeCore } from './core';
+import { applyEnginesAction, initialEngines } from './voice-engines';
 
 export const FAKE_WAKE_TEST_MS = 1_500;
 export const FAKE_DICTATION_MS = 600;
@@ -97,6 +98,7 @@ function initial(noMic: boolean): VoiceFeatures {
         'Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation.',
       ),
     },
+    engines: initialEngines(noMic),
   };
 }
 
@@ -357,6 +359,8 @@ export class FakeVoiceFeatures {
       speaker: (action) => this.speaker(action),
       dictation: (action) => this.dictation(action),
       read: (action) => this.read(action),
+      engines: (action) =>
+        this.core.reply(this.set({ engines: applyEnginesAction(this.view.engines, action) })),
     };
   }
 }

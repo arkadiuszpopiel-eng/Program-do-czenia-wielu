@@ -185,6 +185,8 @@ pub struct VoiceFeatures {
     pub dictation: DictationView,
     pub read: ReadAloudView,
     pub s2s: S2sView,
+    /// Silniki rozmowy: rozpoznawanie ze strażnikiem, koniec wypowiedzi, głosy.
+    pub engines: super::voice_engines::VoiceEnginesView,
 }
 
 /// Akcja słów wywoławczych.
@@ -324,6 +326,7 @@ impl VoiceFeatures {
                     "Fast cloud conversation needs a provider API key (OpenAI Realtime) — adapter in preparation.",
                 ),
             },
+            engines: super::voice_engines::VoiceEnginesView::default(),
         }
     }
 }

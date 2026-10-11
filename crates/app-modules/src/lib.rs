@@ -21,6 +21,7 @@
 pub mod broker;
 pub mod catalog;
 pub mod embedder;
+pub mod gpu_mem;
 pub mod handles;
 pub mod late;
 pub mod probe;

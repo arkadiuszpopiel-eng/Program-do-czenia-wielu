@@ -1,8 +1,9 @@
 // Interfejs głosu rozszerzonego F5 (część `AlfaClient`; komendy `voice_features`, `voice_wake`,
-// `voice_speaker`, `voice_dictation`, `voice_read` w COMMANDS.md). Każda akcja zwraca nowy widok;
+// `voice_speaker`, `voice_dictation`, `voice_read`, `voice_engines` w COMMANDS.md). Każda akcja zwraca nowy widok;
 // zmiany w tle (wykrycia, postęp czytania, dyktowanie) przychodzą zdarzeniem `VoiceFeaturesChanged`.
 import type {
   DictationAction,
+  EnginesAction,
   ReadAction,
   SpeakerAction,
   VoiceFeatures,
@@ -20,4 +21,6 @@ export interface VoiceFeaturesApi {
   dictation(action: DictationAction): Promise<VoiceFeatures>;
   /** Czytanie zaznaczenia / dokumentu / schowka; sterowanie i tempo. */
   read(action: ReadAction): Promise<VoiceFeatures>;
+  /** Silniki rozmowy: odczyt stanu albo zamknięcie bezpiecznika rozpoznawania. */
+  engines(action: EnginesAction): Promise<VoiceFeatures>;
 }

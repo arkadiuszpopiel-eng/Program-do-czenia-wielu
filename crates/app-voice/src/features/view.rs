@@ -278,5 +278,9 @@ pub fn build(f5: &F5) -> VoiceFeatures {
         available: false,
         reason: out.s2s.reason.clone(),
     };
+    drop(st);
+    if let Some(parts) = f5.parts() {
+        out.engines = parts.engines();
+    }
     out
 }

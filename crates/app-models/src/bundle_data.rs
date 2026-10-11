@@ -17,6 +17,14 @@ pub const STT_SMALL: &str = "whisper-small-q5_1";
 pub const TTS_PIPER: &str = "piper-pl_PL-gosia-medium";
 /// Silero VAD.
 pub const VAD: &str = "silero-vad";
+/// Rozpoznawanie mowy Qwen3-ASR 1.7B (główne; Whisper zostaje zapasem).
+pub const STT_QWEN: &str = "qwen3-asr-1.7b-q8";
+/// Głos Supertonic 3 (główny; Piper zostaje zapasem).
+pub const TTS_SUPERTONIC: &str = "supertonic-3";
+/// Model końca wypowiedzi Smart Turn v3.2.
+pub const SMART_TURN: &str = "smart-turn-v3.2";
+/// Biblioteka ONNX Runtime dla procesów pobocznych mowy (Supertonic, Smart Turn).
+pub const ONNX_RUNTIME: &str = "onnxruntime-cpu";
 /// Cechy słów wywoławczych openWakeWord.
 pub const WAKE: &str = "openwakeword-features";
 /// Model mówcy WeSpeaker (weryfikacja właściciela).
@@ -149,8 +157,8 @@ pub const DEFS: [Def; 6] = [
         rating: 6,
         name: ("Wzorcowy", "Reference"),
         summary: (
-            "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Whisper turbo, głos Piper, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
-            "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Whisper turbo speech recognition, the Piper voice, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback.",
+            "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Qwen3-ASR z Whisperem turbo w zapasie, naturalny głos Supertonic 3 z Piperem w zapasie, wyczucie końca wypowiedzi Smart Turn, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
+            "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Qwen3-ASR speech recognition with Whisper turbo as the fallback, the natural Supertonic 3 voice with Piper as the fallback, Smart Turn end-of-turn sensing, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback.",
         ),
         need: need(RAM_16, Some(VRAM_8), None, true),
         tight: Some(Tight {
@@ -160,7 +168,19 @@ pub const DEFS: [Def; 6] = [
                 "The GPU has less than 8 GB of memory: Bielik 4.5B fits on it only partly (the remaining layers in RAM), so replies are slower than on an 8 GB card.",
             ),
         }),
-        models: &[LLM_BIG, STT_TURBO, TTS_PIPER, VAD, WAKE, SPEAKER, EMBED],
+        models: &[
+            LLM_BIG,
+            STT_QWEN,
+            STT_TURBO,
+            TTS_SUPERTONIC,
+            TTS_PIPER,
+            SMART_TURN,
+            ONNX_RUNTIME,
+            VAD,
+            WAKE,
+            SPEAKER,
+            EMBED,
+        ],
         engines: ALL_ENGINES,
         quality: quality_6,
     },
@@ -169,8 +189,8 @@ pub const DEFS: [Def; 6] = [
         rating: 5,
         name: ("Bardzo dobry", "Very good"),
         summary: (
-            "Jak Wzorcowy, ale bez słowa wywoławczego i weryfikacji głosu. Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-            "Like Reference, but without the wake word and voice verification. On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies.",
+            "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
+            "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies.",
         ),
         need: need(RAM_16, Some(VRAM_6), None, true),
         tight: Some(Tight {
@@ -180,7 +200,16 @@ pub const DEFS: [Def; 6] = [
                 "The GPU has less than 6 GB of memory: most of Bielik 4.5B runs on the CPU — noticeably slower replies.",
             ),
         }),
-        models: &[LLM_BIG, STT_TURBO, TTS_PIPER, VAD, EMBED],
+        models: &[
+            LLM_BIG,
+            STT_TURBO,
+            TTS_SUPERTONIC,
+            TTS_PIPER,
+            SMART_TURN,
+            ONNX_RUNTIME,
+            VAD,
+            EMBED,
+        ],
         engines: ALL_ENGINES,
         quality: quality_5,
     },
@@ -189,8 +218,8 @@ pub const DEFS: [Def; 6] = [
         rating: 4,
         name: ("Dobry", "Good"),
         summary: (
-            "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, głosem Piper i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-            "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the Piper voice and semantic search. Runs on a 4 GB GPU or a strong CPU.",
+            "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
+            "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU.",
         ),
         need: need(RAM_12, Some(VRAM_4), Some(8), false),
         tight: Some(Tight {
@@ -200,7 +229,16 @@ pub const DEFS: [Def; 6] = [
                 "Without a ≥ 4 GB GPU and with fewer than 8 CPU cores, Whisper turbo recognises speech slowly — delayed voice conversation.",
             ),
         }),
-        models: &[LLM_SMALL, STT_TURBO, TTS_PIPER, VAD, EMBED],
+        models: &[
+            LLM_SMALL,
+            STT_TURBO,
+            TTS_SUPERTONIC,
+            TTS_PIPER,
+            SMART_TURN,
+            ONNX_RUNTIME,
+            VAD,
+            EMBED,
+        ],
         engines: ALL_ENGINES,
         quality: quality_4,
     },
@@ -209,8 +247,8 @@ pub const DEFS: [Def; 6] = [
         rating: 3,
         name: ("Zrównoważony", "Balanced"),
         summary: (
-            "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small i głos Piper — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
-            "Bielik 1.5B, the smaller Whisper small speech model and the Piper voice — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model).",
+            "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small, głos Piper i wyczucie końca wypowiedzi Smart Turn — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
+            "Bielik 1.5B, the smaller Whisper small speech model, the Piper voice and Smart Turn end-of-turn sensing — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model).",
         ),
         need: need(RAM_8, Some(VRAM_4), Some(6), false),
         tight: Some(Tight {
@@ -220,7 +258,14 @@ pub const DEFS: [Def; 6] = [
                 "The CPU has fewer than 6 cores: speech recognition will be very slow — typing is more convenient.",
             ),
         }),
-        models: &[LLM_SMALL, STT_SMALL, TTS_PIPER, VAD],
+        models: &[
+            LLM_SMALL,
+            STT_SMALL,
+            TTS_PIPER,
+            SMART_TURN,
+            ONNX_RUNTIME,
+            VAD,
+        ],
         engines: ALL_ENGINES,
         quality: quality_3,
     },

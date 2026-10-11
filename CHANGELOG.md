@@ -12,6 +12,55 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.35 — 2026-10-12
+
+Rozmowę widać i da się ją stroić: karta „Silniki rozmowy”, ustawienia końca wypowiedzi i nowe silniki w pakietach.
+
+### Głos
+
+- [poważne] Ustawienia → Głos pokazują kartę „Silniki rozmowy”: który silnik rozpoznaje mowę (i czy liczy na
+  karcie graficznej), co wyczuwa koniec wypowiedzi, które głosy są gotowe. Gdy czegoś brakuje, karta mówi, co
+  pobrać, i prowadzi do „Modele lokalne i silniki”.
+- [poważne] Strażnik rozpoznawania ma podgląd: stan bezpiecznika, liczba wypowiedzi, typowy czas rozpoznania,
+  najwolniejsze 5 %, ile razy rozpoznał silnik zapasowy. Po zadziałaniu bezpiecznika przycisk „Zamknij bezpiecznik”
+  od razu przywraca silnik główny.
+- Cztery nowe ustawienia rozmowy: wyczucie końca wypowiedzi (Smart Turn) włącz / wyłącz, pewność końca wypowiedzi
+  (30–90 %), najdłuższe czekanie w ciszy (0,5–6 s) i wybór silnika rozpoznawania („najlepszy dostępny” albo
+  „tylko Whisper”). Działają od następnego włączenia mikrofonu.
+- [poważne] Qwen3-ASR sam wybiera kartę albo procesor: przed startem mierzy wolną pamięć karty i gdy jest jej
+  mniej niż 3,2 GB (zajął ją model rozmowy), liczy na procesorze zamiast wypychać inne modele z karty.
+- [poważne] Silniki rozgrzewają się przy włączeniu mikrofonu, a nie przy pierwszym zdaniu: model rozpoznawania
+  wczytuje się w tle, a proces głosu startuje i robi próbną syntezę. Wcześniej pierwsza wypowiedź czekała na
+  wczytanie modelu z dysku (zmierzone: do 20 sekund po zimnym starcie komputera). Teraz na tym laptopie od końca
+  mowy do przekazania tekstu mija ok. 0,2 s, a odpowiedź słychać po ok. 1 s (pierwszą po 1,6 s) — bez czasu
+  myślenia modelu rozmowy.
+- Silnik Qwen3-ASR po 10 minutach bez użycia sam się zamyka i zwalnia pamięć karty (sprawdzane co minutę).
+- Imiona agentek zapisane przez rozpoznawanie mowy po angielsku („Alpha”, „Gamma”, „Betta”) trafiają do
+  właściwej agentki.
+
+### Modele i silniki
+
+- Pakiety jednym kliknięciem zawierają nowe silniki głosu: Wzorcowy — Qwen3-ASR, Supertonic 3, Smart Turn
+  i bibliotekę ONNX Runtime; Bardzo dobry i Dobry — Supertonic 3, Smart Turn i bibliotekę; Zrównoważony — Smart
+  Turn i bibliotekę.
+
+### Interfejs
+
+- Poprawiona nieaktualna uwaga przy głosach agentek (mówiła, że lepszy głos to „osobny etap”).
+
+### Testy
+
+- Pełne testy całego projektu (698 programów testowych) przeszły po wersji 0.0.34.
+- Nowe: widok silników i strażnika (Rust), ustawienia rozmowy z zakresami, wybór karta / procesor, pomiar wolnej
+  pamięci karty, pisownia imion; w przeglądarce — karta w obu motywach z zamknięciem bezpiecznika z klawiatury
+  i scenariusz z brakującymi silnikami; zrzuty w trzech stylach i dwóch motywach.
+- Rozmowa „na sucho” na prawdziwych silnikach (`app-voice/tests/live_talk.rs`, uruchamiana z `ALFA_LIVE_TALK=1`):
+  nagranie zamiast mikrofonu przechodzi przez wykrywanie mowy, Smart Turn i Qwen3-ASR do czatu, a odpowiedź jest
+  wypowiadana głosem Supertonic. Dwie wypowiedzi z rzędu rozpoznane bezbłędnie. Rozmowy z żywym mikrofonem nadal
+  nie sprawdzałem — to wymaga człowieka przy komputerze.
+- Testy w przeglądarce: 313 z 314 zielonych (czerwony ten sam co dotąd — pomiar płynności strumienia).
+- 228 poleceń łącza (doszło `voice_engines`).
+
 ## 0.0.34 — 2026-10-11
 
 Alfa słyszy, czy skończyłeś mówić — trzeci duży krok przenoszenia rozmowy z Delty AI.

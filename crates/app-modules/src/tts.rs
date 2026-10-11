@@ -221,6 +221,16 @@ impl Tts for InstalledTts {
     }
 }
 
+/// Silniki mowy w kolejności prób z informacją, czy ich pliki są na miejscu.
+pub fn installed(paths: &AppPaths) -> [(&'static str, bool); 3] {
+    let found = Installed::detect(paths);
+    [
+        ("supertonic", found.supertonic),
+        ("pocket", found.pocket),
+        ("piper", found.piper),
+    ]
+}
+
 /// TTS aplikacji: silniki z sidecarów wykrywane przy każdym użyciu.
 pub fn engines(paths: &AppPaths) -> Arc<dyn Tts> {
     Arc::new(InstalledTts::new(paths.clone()))

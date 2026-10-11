@@ -6,8 +6,8 @@
 use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 
 use app_api::dto::{
-    AlfaEvent, AudioDevice, DictationAction, ReadAction, SpeakerAction, VoiceFeatures, VoiceMode,
-    VoiceState, VoiceStatus, WakeAction,
+    AlfaEvent, AudioDevice, DictationAction, EnginesAction, ReadAction, SpeakerAction,
+    VoiceFeatures, VoiceMode, VoiceState, VoiceStatus, WakeAction,
 };
 use app_api::error::{AppError, ErrorCode};
 use app_api::events::EventHub;
@@ -349,5 +349,14 @@ impl VoicePort for PipelineVoice {
     }
     async fn read(&self, action: ReadAction) -> Result<VoiceFeatures, AppError> {
         Voice::read_action(&self.0, action).await
+    }
+    async fn engines(&self, action: EnginesAction) -> Result<VoiceFeatures, AppError> {
+        if action == EnginesAction::ResetBreaker
+            && let Some(parts) = self.0.f5.parts()
+        {
+            parts.reset_stt_breaker();
+            self.0.f5.publish();
+        }
+        Ok(self.features().await)
     }
 }

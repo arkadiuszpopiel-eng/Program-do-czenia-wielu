@@ -11,6 +11,7 @@ mod memory;
 mod ports;
 pub(crate) mod signals;
 mod tasks;
+mod voice_talk;
 mod voice_tuning;
 mod work;
 

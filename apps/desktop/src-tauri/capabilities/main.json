@@ -101,6 +101,7 @@
     "allow-voice-speaker",
     "allow-voice-dictation",
     "allow-voice-read",
+    "allow-voice-engines",
     "allow-system-status",
     "allow-system-clipboard-text",
     "allow-system-retry-queue",

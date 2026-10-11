@@ -39,6 +39,12 @@ pub trait TtsBackend: Send + Sync {
     fn native_tempo(&self) -> bool {
         false
     }
+
+    /// Rozgrzewka przed pierwszym zdaniem (start procesu, wczytanie modelu). Domyślnie nic —
+    /// silniki uruchamiane na każde zdanie nie mają czego rozgrzewać.
+    async fn warm(&self) -> Result<(), TtsError> {
+        Ok(())
+    }
 }
 
 pub(crate) fn engine_err(e: impl std::fmt::Display) -> TtsError {

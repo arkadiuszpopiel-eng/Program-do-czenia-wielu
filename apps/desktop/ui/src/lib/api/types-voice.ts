@@ -114,12 +114,59 @@ export interface S2sView {
   readonly reason: LocalizedText;
 }
 
+export type SttEngineKind = 'qwen_asr' | 'whisper' | 'none';
+export type BreakerStateView = 'closed' | 'open' | 'half_open';
+export type TurnEngineKind = 'smart_turn' | 'text';
+
+/** Strażnik rozpoznawania: bezpiecznik i skrót telemetrii (bez nagrań i bez tekstu). */
+export interface SttGuardView {
+  readonly breaker: BreakerStateView;
+  readonly failures: number;
+  readonly failures_to_open: number;
+  readonly opened_count: number;
+  readonly retry_in_s: number | null;
+  readonly median_ms: number | null;
+  readonly p95_ms: number | null;
+  readonly samples: number;
+  readonly fallbacks: number;
+  readonly flagged: number;
+}
+
+export interface SttEngineView {
+  readonly engine: SttEngineKind;
+  readonly gpu: boolean;
+  readonly fallback: SttEngineKind | null;
+  /** Pozycje katalogu, których pobranie włączy lepszy silnik. */
+  readonly missing: readonly string[];
+  readonly guard: SttGuardView | null;
+}
+
+export interface TurnEngineView {
+  readonly engine: TurnEngineKind;
+  readonly missing: readonly string[];
+}
+
+export interface TtsEngineView {
+  readonly engine: string;
+  readonly ready: boolean;
+}
+
+/** Silniki rozmowy: rozpoznawanie ze strażnikiem, koniec wypowiedzi, głosy (w kolejności prób). */
+export interface VoiceEnginesView {
+  readonly stt: SttEngineView;
+  readonly turn: TurnEngineView;
+  readonly tts: readonly TtsEngineView[];
+}
+
+export type EnginesAction = { readonly kind: 'refresh' } | { readonly kind: 'reset_breaker' };
+
 export interface VoiceFeatures {
   readonly wake: WakeWordsView;
   readonly speaker: SpeakerView;
   readonly dictation: DictationView;
   readonly read: ReadAloudView;
   readonly s2s: S2sView;
+  readonly engines: VoiceEnginesView;
 }
 
 export type WakeAction =

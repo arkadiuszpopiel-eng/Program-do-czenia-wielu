@@ -252,4 +252,35 @@ impl TtsBackend for PocketSidecar {
         }
         result
     }
+
+    /// Uruchamia proces zawczasu; Supertonic dodatkowo syntezuje krótkie słowo (wynik odrzucany),
+    /// bo pierwsza synteza po wczytaniu modelu jest wyraźnie wolniejsza od następnych.
+    async fn warm(&self) -> Result<(), TtsError> {
+        let mut slot = self.channel.lock().await;
+        if slot.is_none() {
+            *slot = Some(self.spawn()?);
+        }
+        if self.native_rate.is_none() {
+            return Ok(());
+        }
+        let Some(ch) = slot.as_mut() else {
+            return Ok(());
+        };
+        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
+        let req = Request {
+            id,
+            op: "synth",
+            text: "Tak.",
+            voice: "F1",
+            energy: 1.0,
+            emotion: None,
+            rate: self.native_rate,
+        };
+        let line = serde_json::to_string(&req).map_err(engine_err)? + "\n";
+        let result = Self::exchange(ch, line, id).await;
+        if result.is_err() && self.command.is_some() {
+            *slot = None;
+        }
+        result.map(|_| ())
+    }
 }

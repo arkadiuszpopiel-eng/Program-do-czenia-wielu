@@ -102,6 +102,7 @@ impl Extra {
             return port.clone();
         }
         let noise = noise_setting(&kernel.config);
+        let talk = super::voice_talk::talk_settings(&kernel.config);
         let base: Arc<dyn VoicePort> = match &self.audio {
             Some(audio) => Arc::new(
                 app_modules::voice::VoiceAdapter::new(audio.io(), self.tts.clone(), events.clone())
@@ -125,6 +126,7 @@ impl Extra {
                     .with_vault(Arc::new(StoreKeyVault::new(kernel.secrets.clone())))
                     .with_clock(Arc::new(DeviceClock))
                     .with_noise(noise)
+                    .with_talk(talk)
                     .with_speech_meter(app_modules::speech_meter::SpeechMeter::new(events.clone())),
                 )),
                 (None, None) => None,

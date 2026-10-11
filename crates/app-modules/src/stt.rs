@@ -13,12 +13,24 @@ use device_profile_contract::Backend;
 use voice_stt_impl::qwen::QwenConfig;
 use voice_stt_impl::{SidecarBinaries, WhisperServerConfig};
 
+/// Wolna pamięć karty, od której Qwen3-ASR liczy na karcie (model z projektorem zajmuje ok.
+/// 2,6 GB; wartość strojona w Delcie AI).
+pub const QWEN_MIN_FREE_VRAM_MB: u32 = 3_200;
+
+/// Czy liczyć na karcie: kompilacja silnika na kartę i dość wolnej pamięci. Bez pomiaru
+/// (`None`) próbujemy karty — nieudany start przejmie silnik zapasowy.
+pub fn qwen_on_gpu(gpu_build: bool, free_vram_mb: Option<u32>) -> bool {
+    gpu_build && free_vram_mb.is_none_or(|free| free >= QWEN_MIN_FREE_VRAM_MB)
+}
+
 /// Qwen3-ASR, jeśli są: model, projektor dźwięku i `llama-server` (kompilacja na kartę NVIDIA
 /// ma pierwszeństwo, potem Vulkan, na końcu procesor). `None` — rozpoznaje sam Whisper.
+/// `free_vram_mb` — zmierzona wolna pamięć karty: gdy jest jej za mało (np. zajął ją model
+/// rozmowy), ten sam silnik liczy na procesorze zamiast wypychać inne modele z karty.
 ///
 /// Stary `llama-server` (sprzed b11559) nie wczyta tego modelu; wtedy start się nie uda, bezpiecznik
 /// odstawi silnik, a rozmowę przejmie Whisper — bez przerwy dla użytkownika.
-pub fn qwen(paths: &AppPaths) -> Option<QwenConfig> {
+pub fn qwen(paths: &AppPaths, free_vram_mb: Option<u32>) -> Option<QwenConfig> {
     let dir = paths.models().join("qwen3-asr");
     let model = dir.join("Qwen3-ASR-1.7B-Q8_0.gguf");
     let mmproj = dir.join("mmproj-Qwen3-ASR-1.7B-Q8_0.gguf");
@@ -33,7 +45,30 @@ pub fn qwen(paths: &AppPaths) -> Option<QwenConfig> {
     .into_iter()
     .map(|(engine, gpu)| (paths.sidecar(engine, "llama-server"), gpu))
     .find(|(path, _)| path.is_file())?;
-    Some(QwenConfig::new(server, model, mmproj, gpu))
+    Some(QwenConfig::new(
+        server,
+        model,
+        mmproj,
+        qwen_on_gpu(gpu, free_vram_mb),
+    ))
+}
+
+/// Pozycje katalogu, których brakuje do włączenia Qwen3-ASR (pusto — silnik jest gotowy).
+pub fn qwen_missing(paths: &AppPaths) -> Vec<String> {
+    let dir = paths.models().join("qwen3-asr");
+    let mut out = Vec::new();
+    if !dir.join("Qwen3-ASR-1.7B-Q8_0.gguf").is_file()
+        || !dir.join("mmproj-Qwen3-ASR-1.7B-Q8_0.gguf").is_file()
+    {
+        out.push("qwen3-asr-1.7b-q8".to_owned());
+    }
+    let server = ["llama-cuda", "llama-vulkan", "llama-cpu"]
+        .into_iter()
+        .any(|engine| paths.sidecar(engine, "llama-server").is_file());
+    if !server {
+        out.push("sidecar-llama-cpu".to_owned());
+    }
+    out
 }
 
 /// `whisper-server` CPU.
@@ -162,6 +197,16 @@ pub fn whisper(paths: &AppPaths) -> Option<(WhisperServerConfig, Backend)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn qwen_uses_the_card_only_with_enough_free_memory() {
+        assert!(qwen_on_gpu(true, None));
+        assert!(qwen_on_gpu(true, Some(QWEN_MIN_FREE_VRAM_MB)));
+        assert!(qwen_on_gpu(true, Some(5_368)));
+        assert!(!qwen_on_gpu(true, Some(QWEN_MIN_FREE_VRAM_MB - 1)));
+        assert!(!qwen_on_gpu(false, Some(16_000)));
+        assert!(!qwen_on_gpu(false, None));
+    }
 
     #[test]
     fn cuda_build_is_preferred_when_installed_and_model_is_first_ggml() {

@@ -48,5 +48,7 @@ export async function runVoice(
   await both(ns, 'read', { kind: 'control', control: 'pause' });
   await both(ns, 'read', { kind: 'control', control: 'stop' });
   await both(ns, 'speaker', { kind: 'delete' });
+  await both(ns, 'engines', { kind: 'refresh' });
+  await both(ns, 'engines', { kind: 'reset_breaker' });
   await flush();
 }

@@ -26,6 +26,7 @@ mod system;
 mod tasks;
 mod transfer;
 mod updates;
+mod voice_engines;
 mod voice_features;
 
 pub use agents::{
@@ -112,6 +113,10 @@ pub use transfer::{
 pub use updates::{
     AboutInfo, ChangeItem, ChangeLogEntry, ChangeSeverity, LicenseEntry, LicenseSource,
     UpdateChannel, UpdateMode, UpdatePhase, UpdateProgress, UpdateRelease, UpdatesView, WhatsNew,
+};
+pub use voice_engines::{
+    BreakerStateView, EnginesAction, SttEngineKind, SttEngineView, SttGuardView, TtsEngineView,
+    TurnEngineKind, TurnEngineView, VoiceEnginesView,
 };
 pub use voice_features::{
     DictationAction, DictationProfile, DictationStateView, DictationView, EnrollSampleView,

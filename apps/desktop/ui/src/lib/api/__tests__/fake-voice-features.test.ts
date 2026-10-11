@@ -15,6 +15,31 @@ function setup(scenario?: 'no-mic') {
 }
 
 describe('atrapa: głos rozszerzony F5', () => {
+  it('silniki rozmowy: zamknięcie bezpiecznika zeruje awarie; bez mikrofonu nie ma strażnika', async () => {
+    const { api, events } = setup();
+    const before = (await api.features()).engines;
+    expect([before.stt.engine, before.stt.fallback, before.turn.engine]).toEqual([
+      'qwen_asr',
+      'whisper',
+      'smart_turn',
+    ]);
+    expect(before.stt.guard?.breaker).toBe('open');
+    expect(before.tts.find((e) => e.ready)?.engine).toBe('supertonic');
+    const same = await api.engines({ kind: 'refresh' });
+    expect(same.engines).toEqual(before);
+    const after = (await api.engines({ kind: 'reset_breaker' })).engines;
+    expect(after.stt.guard).toMatchObject({ breaker: 'closed', failures: 0, retry_in_s: null });
+    expect(after.stt.guard?.samples).toBe(before.stt.guard?.samples);
+    expect(events.some((e) => e.type === 'VoiceFeaturesChanged')).toBe(true);
+
+    const bare = (await setup('no-mic').api.features()).engines;
+    expect(bare.stt.guard).toBeNull();
+    expect(bare.stt.missing).toEqual(['qwen3-asr-1.7b-q8']);
+    expect(bare.turn).toEqual({ engine: 'text', missing: ['smart-turn-v3.2', 'onnxruntime-cpu'] });
+    const untouched = await setup('no-mic').api.engines({ kind: 'reset_breaker' });
+    expect(untouched.engines).toEqual(bare);
+  });
+
   it('słowa wywoławcze: domyślnie wyłączone, tylko jawnie i z ryzykiem, bramka wymaga głosu', async () => {
     const { api, scheduler, events } = setup();
     const v = await api.features();

@@ -447,8 +447,22 @@ z zaszyfrowanym profilem; progi i powiązanie z osobami w P6.</p>
 <tr><td></td><td>silnik rozpoznawania, model zapasowy</td><td>Qwen3-ASR; Whisper tiny…large-v3</td></tr>
 <tr><td></td><td>słowo wywoławcze i jego treść</td><td>wyłączone; w Alfie imię agentki</td></tr>
 <tr><td>Zaawansowane</td><td>przełącznik rozmowy, informacja o silnikach</td><td>—</td></tr></tbody></table></div>
+<p>Stan w Alfie po 0.0.35: blok „Silniki” i „Telemetria” to karta „Silniki rozmowy” w Ustawieniach → Głos (silnik
+rozpoznawania z zapasem, koniec wypowiedzi, głosy, bezpiecznik z „Zamknij bezpiecznik”, liczniki i czasy); Smart Turn,
+próg i najdłuższa cisza to ustawienia <code>voice.talk_*</code>; głos i tempo — <code>voice.tts_*</code>. Zostają: kula stanu z miernikiem
+w nagłówku, diagnostyka mikrofonu (5 testów), bramka szumów jako suwak.</p>
 <p>W Alfie każda kontrolka działa od razu (w Delcie część dopiero od następnego startu rozmowy), a trzy martwe
 pozycje Delty („Auto-wyślij”, „Głos” i „Prędkość” przy silnikach offline) znikają albo zaczynają działać.</p>
+<h3 id="pomiar-toru-rozmowy-w-alfie-2026-10-12-laptop-z-rtx-4050-budowa-testowa-bez-optymalizacji">Pomiar toru rozmowy w Alfie (2026-10-12, laptop z RTX 4050, budowa testowa bez optymalizacji)</h3>
+<p>Próba <code>app-voice/tests/live_talk.rs</code>: nagranie zdania „Dzień dobry, tu Alfa. W czym mogę dziś pomóc?” podane zamiast
+mikrofonu, prawdziwe silniki (Silero, Smart Turn, Qwen3-ASR na karcie, Supertonic 3), czat odpowiada od razu stałym
+zdaniem.</p>
+<div class="tbl"><table><thead><tr><th>Etap</th><th>Pierwsza wypowiedź</th><th>Druga wypowiedź</th></tr></thead><tbody><tr><td>od końca nagrania do przekazania tekstu czatowi</td><td>155 ms</td><td>180 ms</td></tr>
+<tr><td>od przekazania tekstu do słyszalnej odpowiedzi</td><td>1560 ms</td><td>960 ms</td></tr>
+<tr><td>rozpoznany tekst</td><td>bez błędu</td><td>bez błędu</td></tr></tbody></table></div>
+<p>Bez rozgrzewki silników pierwsza wypowiedź czekała 1,7 s (model w pamięci podręcznej dysku) do 20 s (zimny dysk).
+Nagranie ma na końcu ok. 0,2 s ciszy, więc czasy „od końca mowy” są o tyle dłuższe. Czas myślenia modelu rozmowy
+nie jest tu wliczony.</p>
 <h2 id="9-kryteria-odbioru-p1">9. Kryteria odbioru P1</h2>
 <p>Testy przepisane z Delty: bezpiecznik (otwarcie po 3., jedna próba po czasie), flagi jakości, bramka mowy, odrzut
 ciszy i szumu, cechy Smart Turn zgodne z wzorcem, wybór silnika i zapasów, głosy i ich parametry, podział na

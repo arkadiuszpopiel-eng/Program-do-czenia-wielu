@@ -7,8 +7,8 @@
       "en": "Reference"
     },
     "summary": {
-      "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Whisper turbo, głos Piper, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
-      "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Whisper turbo speech recognition, the Piper voice, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
+      "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Qwen3-ASR z Whisperem turbo w zapasie, naturalny głos Supertonic 3 z Piperem w zapasie, wyczucie końca wypowiedzi Smart Turn, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
+      "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Qwen3-ASR speech recognition with Whisper turbo as the fallback, the natural Supertonic 3 voice with Piper as the fallback, Smart Turn end-of-turn sensing, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
     },
     "requirements": {
       "min_ram_mb": 15000,
@@ -31,6 +31,15 @@
         "fallback": false
       },
       {
+        "id": "qwen3-asr-1.7b-q8",
+        "name": "Qwen3-ASR 1.7B (Q8)",
+        "kind": "stt",
+        "state": "missing",
+        "size_bytes": 2520744288,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "whisper-large-v3-turbo-q5_0",
         "name": "Whisper large-v3-turbo-q5_0",
         "kind": "stt",
@@ -40,11 +49,38 @@
         "fallback": false
       },
       {
+        "id": "supertonic-3",
+        "name": "Supertonic 3 (31 języków, 10 barw)",
+        "kind": "tts",
+        "state": "missing",
+        "size_bytes": 401276744,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "piper-pl_PL-gosia-medium",
         "name": "Piper pl_PL gosia (medium)",
         "kind": "tts",
         "state": "missing",
         "size_bytes": 63963136,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "smart-turn-v3.2",
+        "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+        "kind": "vad",
+        "state": "missing",
+        "size_bytes": 8679182,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "onnxruntime-cpu",
+        "name": "ONNX Runtime 1.23.1 (procesor)",
+        "kind": "sidecar",
+        "state": "missing",
+        "size_bytes": 78099392,
         "downloadable": true,
         "fallback": false
       },
@@ -121,10 +157,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6347959649,
-    "missing_bytes": 6347959649,
+    "size_bytes": 9356759255,
+    "missing_bytes": 9356759255,
     "installed": 0,
-    "total": 11,
+    "total": 15,
     "state": "not_installed",
     "fit": {
       "kind": "too_weak",
@@ -222,8 +258,8 @@
       "en": "Very good"
     },
     "summary": {
-      "pl": "Jak Wzorcowy, ale bez słowa wywoławczego i weryfikacji głosu. Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-      "en": "Like Reference, but without the wake word and voice verification. On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+      "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
+      "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
     },
     "requirements": {
       "min_ram_mb": 15000,
@@ -255,11 +291,38 @@
         "fallback": false
       },
       {
+        "id": "supertonic-3",
+        "name": "Supertonic 3 (31 języków, 10 barw)",
+        "kind": "tts",
+        "state": "missing",
+        "size_bytes": 401276744,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "piper-pl_PL-gosia-medium",
         "name": "Piper pl_PL gosia (medium)",
         "kind": "tts",
         "state": "missing",
         "size_bytes": 63963136,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "smart-turn-v3.2",
+        "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+        "kind": "vad",
+        "state": "missing",
+        "size_bytes": 8679182,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "onnxruntime-cpu",
+        "name": "ONNX Runtime 1.23.1 (procesor)",
+        "kind": "sidecar",
+        "state": "missing",
+        "size_bytes": 78099392,
         "downloadable": true,
         "fallback": false
       },
@@ -318,10 +381,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6304027336,
-    "missing_bytes": 6304027336,
+    "size_bytes": 6792082654,
+    "missing_bytes": 6792082654,
     "installed": 0,
-    "total": 9,
+    "total": 12,
     "state": "not_installed",
     "fit": {
       "kind": "tight",
@@ -408,8 +471,8 @@
       "en": "Good"
     },
     "summary": {
-      "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, głosem Piper i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-      "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the Piper voice and semantic search. Runs on a 4 GB GPU or a strong CPU."
+      "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
+      "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU."
     },
     "requirements": {
       "min_ram_mb": 11000,
@@ -441,11 +504,38 @@
         "fallback": false
       },
       {
+        "id": "supertonic-3",
+        "name": "Supertonic 3 (31 języków, 10 barw)",
+        "kind": "tts",
+        "state": "missing",
+        "size_bytes": 401276744,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
         "id": "piper-pl_PL-gosia-medium",
         "name": "Piper pl_PL gosia (medium)",
         "kind": "tts",
         "state": "missing",
         "size_bytes": 63963136,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "smart-turn-v3.2",
+        "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+        "kind": "vad",
+        "state": "missing",
+        "size_bytes": 8679182,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "onnxruntime-cpu",
+        "name": "ONNX Runtime 1.23.1 (procesor)",
+        "kind": "sidecar",
+        "state": "missing",
+        "size_bytes": 78099392,
         "downloadable": true,
         "fallback": false
       },
@@ -504,10 +594,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 2942292680,
-    "missing_bytes": 2942292680,
+    "size_bytes": 3430347998,
+    "missing_bytes": 3430347998,
     "installed": 0,
-    "total": 9,
+    "total": 12,
     "state": "not_installed",
     "fit": {
       "kind": "fits",
@@ -591,8 +681,8 @@
       "en": "Balanced"
     },
     "summary": {
-      "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small i głos Piper — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
-      "en": "Bielik 1.5B, the smaller Whisper small speech model and the Piper voice — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
+      "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small, głos Piper i wyczucie końca wypowiedzi Smart Turn — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
+      "en": "Bielik 1.5B, the smaller Whisper small speech model, the Piper voice and Smart Turn end-of-turn sensing — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
     },
     "requirements": {
       "min_ram_mb": 7000,
@@ -629,6 +719,24 @@
         "kind": "tts",
         "state": "missing",
         "size_bytes": 63963136,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "smart-turn-v3.2",
+        "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+        "kind": "vad",
+        "state": "missing",
+        "size_bytes": 8679182,
+        "downloadable": true,
+        "fallback": false
+      },
+      {
+        "id": "onnxruntime-cpu",
+        "name": "ONNX Runtime 1.23.1 (procesor)",
+        "kind": "sidecar",
+        "state": "missing",
+        "size_bytes": 78099392,
         "downloadable": true,
         "fallback": false
       },
@@ -678,10 +786,10 @@
         "fallback": false
       }
     ],
-    "size_bytes": 2046808776,
-    "missing_bytes": 2046808776,
+    "size_bytes": 2133587350,
+    "missing_bytes": 2133587350,
     "installed": 0,
-    "total": 8,
+    "total": 10,
     "state": "not_installed",
     "fit": {
       "kind": "fits",

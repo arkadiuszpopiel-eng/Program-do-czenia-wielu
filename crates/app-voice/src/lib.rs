@@ -20,7 +20,9 @@ mod port;
 mod reply;
 mod runloop;
 mod system;
+mod system_engines;
 mod system_f5;
+mod talk;
 mod tap;
 
 pub use engine::{IntervalPacer, Pacer, VoiceEngine, VoiceEngineFactory, VoiceRuntime};
@@ -32,4 +34,5 @@ pub use port::PipelineVoice;
 pub use reply::{CHECK_WAIT, ChatReply, UNVERIFIED_CAP_PERMILLE, origin_of};
 pub use system::{MISSING_STT_MODEL, MISSING_STT_SIDECAR, MISSING_TTS, SystemVoice};
 pub use system_f5::CALIBRATION_FILE;
+pub use talk::{MAX_SILENCE_RANGE, THRESHOLD_RANGE, TalkSettings};
 pub use tap::TapBus;

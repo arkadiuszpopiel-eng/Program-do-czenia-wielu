@@ -157,6 +157,99 @@
           "active": false
         },
         {
+          "id": "qwen3-asr-1.7b-q8",
+          "kind": "stt",
+          "name": "Qwen3-ASR 1.7B (Q8)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 2520776704,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\qwen3-asr-1.7b-q8",
+          "files": [
+            {
+              "name": "Qwen3-ASR-1.7B-Q8_0.gguf",
+              "url": "https://example.invalid/Qwen3-ASR-1.7B-Q8_0.gguf",
+              "size_bytes": 1260388352,
+              "pinned_sha256": "77fd12bb6776d571e70abcfea85e38f0e596ed9d3bd3f76d59075c65d9f46746",
+              "sha256": null
+            },
+            {
+              "name": "mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+              "url": "https://example.invalid/mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+              "size_bytes": 1260388352,
+              "pinned_sha256": "ee77dde9b7edf4a529b54ac0363d336aaf56cd43a245ae99cfa83f3b728a36fa",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Dokładne rozpoznawanie mowy po polsku na karcie graficznej. Gdy zawiedzie, rozpoznaje Whisper.",
+            "en": "Accurate Polish speech recognition on the GPU. If it fails, Whisper takes over."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "supertonic-3",
+          "kind": "tts",
+          "name": "Supertonic 3",
+          "license": "OpenRAIL-M",
+          "source": "https://huggingface.co/",
+          "size_bytes": 401604608,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\supertonic-3",
+          "files": [
+            {
+              "name": "vector_estimator.onnx",
+              "url": "https://example.invalid/vector_estimator.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "0cd6e1d018d8474d474b19c73f612e60a175481acd9451b152356d789acf5138",
+              "sha256": null
+            },
+            {
+              "name": "vocoder.onnx",
+              "url": "https://example.invalid/vocoder.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "8586d1a01118f1fbba45ce5d506ecedee4644d96caa938f70909c52a86877cc0",
+              "sha256": null
+            },
+            {
+              "name": "text_encoder.onnx",
+              "url": "https://example.invalid/text_encoder.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "eed790d2feaaf84de85d2d519f3a028c3fe45e64a73f75bd61382622bcca8a90",
+              "sha256": null
+            },
+            {
+              "name": "tts.json",
+              "url": "https://example.invalid/tts.json",
+              "size_bytes": 80320922,
+              "pinned_sha256": "10ef8862b09526e7fab0b39f3b6da9ae0e8e35f4c626304bb7a20820975b0954",
+              "sha256": null
+            },
+            {
+              "name": "F1.json",
+              "url": "https://example.invalid/F1.json",
+              "size_bytes": 80320922,
+              "pinned_sha256": "644eb884397d8b654b5f975336a4e0f0b029f226a7d10ac954c963c4e6480138",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Naturalny głos agentek (10 barw), liczony na procesorze. Wymaga biblioteki ONNX Runtime.",
+            "en": "Natural agent voice (10 timbres), computed on the CPU. Requires the ONNX Runtime library."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "piper-pl_PL-gosia-medium",
           "kind": "tts",
           "name": "Piper pl_PL gosia (medium)",
@@ -216,6 +309,35 @@
           "note": {
             "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
             "en": "Voice activity detection. From the PyPI package, pinned hash."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "smart-turn-v3.2",
+          "kind": "vad",
+          "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+          "license": "BSD-2-Clause",
+          "source": "https://huggingface.co/",
+          "size_bytes": 8388608,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\smart-turn-v3.2",
+          "files": [
+            {
+              "name": "smart-turn-v3.2-cpu.onnx",
+              "url": "https://example.invalid/smart-turn-v3.2-cpu.onnx",
+              "size_bytes": 8388608,
+              "pinned_sha256": "92c44336c456231366890b0b3efd0cba1300d2f0b0ea3fbb72a4f0f0eb1eb2c0",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznaje po brzmieniu, czy skończyłeś mówić. Wymaga biblioteki ONNX Runtime.",
+            "en": "Tells from the sound whether you have finished speaking. Requires the ONNX Runtime library."
           },
           "progress": null,
           "error": null,
@@ -426,6 +548,35 @@
           "note": {
             "pl": "Rozpoznawanie mowy na karcie NVIDIA.",
             "en": "Speech recognition on NVIDIA GPUs."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "onnxruntime-cpu",
+          "kind": "sidecar",
+          "name": "ONNX Runtime 1.23.1 (procesor)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 77594624,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\onnxruntime-cpu",
+          "files": [
+            {
+              "name": "onnxruntime-win-x64-1.23.1.zip",
+              "url": "https://example.invalid/onnxruntime-win-x64-1.23.1.zip",
+              "size_bytes": 77594624,
+              "pinned_sha256": "b9524ad331e45625dda0a3a253accfccc909569d32ebb1b5d3c55595fd93755e",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Biblioteka obliczeń dla głosu Supertonic i wykrywania końca wypowiedzi.",
+            "en": "Compute library for the Supertonic voice and end-of-turn detection."
           },
           "progress": null,
           "error": null,
@@ -839,6 +990,99 @@
           "active": false
         },
         {
+          "id": "qwen3-asr-1.7b-q8",
+          "kind": "stt",
+          "name": "Qwen3-ASR 1.7B (Q8)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 2520776704,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\qwen3-asr-1.7b-q8",
+          "files": [
+            {
+              "name": "Qwen3-ASR-1.7B-Q8_0.gguf",
+              "url": "https://example.invalid/Qwen3-ASR-1.7B-Q8_0.gguf",
+              "size_bytes": 1260388352,
+              "pinned_sha256": "77fd12bb6776d571e70abcfea85e38f0e596ed9d3bd3f76d59075c65d9f46746",
+              "sha256": null
+            },
+            {
+              "name": "mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+              "url": "https://example.invalid/mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+              "size_bytes": 1260388352,
+              "pinned_sha256": "ee77dde9b7edf4a529b54ac0363d336aaf56cd43a245ae99cfa83f3b728a36fa",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Dokładne rozpoznawanie mowy po polsku na karcie graficznej. Gdy zawiedzie, rozpoznaje Whisper.",
+            "en": "Accurate Polish speech recognition on the GPU. If it fails, Whisper takes over."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "supertonic-3",
+          "kind": "tts",
+          "name": "Supertonic 3",
+          "license": "OpenRAIL-M",
+          "source": "https://huggingface.co/",
+          "size_bytes": 401604608,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\supertonic-3",
+          "files": [
+            {
+              "name": "vector_estimator.onnx",
+              "url": "https://example.invalid/vector_estimator.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "0cd6e1d018d8474d474b19c73f612e60a175481acd9451b152356d789acf5138",
+              "sha256": null
+            },
+            {
+              "name": "vocoder.onnx",
+              "url": "https://example.invalid/vocoder.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "8586d1a01118f1fbba45ce5d506ecedee4644d96caa938f70909c52a86877cc0",
+              "sha256": null
+            },
+            {
+              "name": "text_encoder.onnx",
+              "url": "https://example.invalid/text_encoder.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "eed790d2feaaf84de85d2d519f3a028c3fe45e64a73f75bd61382622bcca8a90",
+              "sha256": null
+            },
+            {
+              "name": "tts.json",
+              "url": "https://example.invalid/tts.json",
+              "size_bytes": 80320922,
+              "pinned_sha256": "10ef8862b09526e7fab0b39f3b6da9ae0e8e35f4c626304bb7a20820975b0954",
+              "sha256": null
+            },
+            {
+              "name": "F1.json",
+              "url": "https://example.invalid/F1.json",
+              "size_bytes": 80320922,
+              "pinned_sha256": "644eb884397d8b654b5f975336a4e0f0b029f226a7d10ac954c963c4e6480138",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Naturalny głos agentek (10 barw), liczony na procesorze. Wymaga biblioteki ONNX Runtime.",
+            "en": "Natural agent voice (10 timbres), computed on the CPU. Requires the ONNX Runtime library."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "piper-pl_PL-gosia-medium",
           "kind": "tts",
           "name": "Piper pl_PL gosia (medium)",
@@ -898,6 +1142,35 @@
           "note": {
             "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
             "en": "Voice activity detection. From the PyPI package, pinned hash."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "smart-turn-v3.2",
+          "kind": "vad",
+          "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+          "license": "BSD-2-Clause",
+          "source": "https://huggingface.co/",
+          "size_bytes": 8388608,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\smart-turn-v3.2",
+          "files": [
+            {
+              "name": "smart-turn-v3.2-cpu.onnx",
+              "url": "https://example.invalid/smart-turn-v3.2-cpu.onnx",
+              "size_bytes": 8388608,
+              "pinned_sha256": "92c44336c456231366890b0b3efd0cba1300d2f0b0ea3fbb72a4f0f0eb1eb2c0",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznaje po brzmieniu, czy skończyłeś mówić. Wymaga biblioteki ONNX Runtime.",
+            "en": "Tells from the sound whether you have finished speaking. Requires the ONNX Runtime library."
           },
           "progress": null,
           "error": null,
@@ -1108,6 +1381,35 @@
           "note": {
             "pl": "Rozpoznawanie mowy na karcie NVIDIA.",
             "en": "Speech recognition on NVIDIA GPUs."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "onnxruntime-cpu",
+          "kind": "sidecar",
+          "name": "ONNX Runtime 1.23.1 (procesor)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 77594624,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\onnxruntime-cpu",
+          "files": [
+            {
+              "name": "onnxruntime-win-x64-1.23.1.zip",
+              "url": "https://example.invalid/onnxruntime-win-x64-1.23.1.zip",
+              "size_bytes": 77594624,
+              "pinned_sha256": "b9524ad331e45625dda0a3a253accfccc909569d32ebb1b5d3c55595fd93755e",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Biblioteka obliczeń dla głosu Supertonic i wykrywania końca wypowiedzi.",
+            "en": "Compute library for the Supertonic voice and end-of-turn detection."
           },
           "progress": null,
           "error": null,
@@ -1534,6 +1836,99 @@
           "active": false
         },
         {
+          "id": "qwen3-asr-1.7b-q8",
+          "kind": "stt",
+          "name": "Qwen3-ASR 1.7B (Q8)",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/",
+          "size_bytes": 2520776704,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\qwen3-asr-1.7b-q8",
+          "files": [
+            {
+              "name": "Qwen3-ASR-1.7B-Q8_0.gguf",
+              "url": "https://example.invalid/Qwen3-ASR-1.7B-Q8_0.gguf",
+              "size_bytes": 1260388352,
+              "pinned_sha256": "77fd12bb6776d571e70abcfea85e38f0e596ed9d3bd3f76d59075c65d9f46746",
+              "sha256": null
+            },
+            {
+              "name": "mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+              "url": "https://example.invalid/mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+              "size_bytes": 1260388352,
+              "pinned_sha256": "ee77dde9b7edf4a529b54ac0363d336aaf56cd43a245ae99cfa83f3b728a36fa",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Dokładne rozpoznawanie mowy po polsku na karcie graficznej. Gdy zawiedzie, rozpoznaje Whisper.",
+            "en": "Accurate Polish speech recognition on the GPU. If it fails, Whisper takes over."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "supertonic-3",
+          "kind": "tts",
+          "name": "Supertonic 3",
+          "license": "OpenRAIL-M",
+          "source": "https://huggingface.co/",
+          "size_bytes": 401604608,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\supertonic-3",
+          "files": [
+            {
+              "name": "vector_estimator.onnx",
+              "url": "https://example.invalid/vector_estimator.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "0cd6e1d018d8474d474b19c73f612e60a175481acd9451b152356d789acf5138",
+              "sha256": null
+            },
+            {
+              "name": "vocoder.onnx",
+              "url": "https://example.invalid/vocoder.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "8586d1a01118f1fbba45ce5d506ecedee4644d96caa938f70909c52a86877cc0",
+              "sha256": null
+            },
+            {
+              "name": "text_encoder.onnx",
+              "url": "https://example.invalid/text_encoder.onnx",
+              "size_bytes": 80320922,
+              "pinned_sha256": "eed790d2feaaf84de85d2d519f3a028c3fe45e64a73f75bd61382622bcca8a90",
+              "sha256": null
+            },
+            {
+              "name": "tts.json",
+              "url": "https://example.invalid/tts.json",
+              "size_bytes": 80320922,
+              "pinned_sha256": "10ef8862b09526e7fab0b39f3b6da9ae0e8e35f4c626304bb7a20820975b0954",
+              "sha256": null
+            },
+            {
+              "name": "F1.json",
+              "url": "https://example.invalid/F1.json",
+              "size_bytes": 80320922,
+              "pinned_sha256": "644eb884397d8b654b5f975336a4e0f0b029f226a7d10ac954c963c4e6480138",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Naturalny głos agentek (10 barw), liczony na procesorze. Wymaga biblioteki ONNX Runtime.",
+            "en": "Natural agent voice (10 timbres), computed on the CPU. Requires the ONNX Runtime library."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "piper-pl_PL-gosia-medium",
           "kind": "tts",
           "name": "Piper pl_PL gosia (medium)",
@@ -1593,6 +1988,35 @@
           "note": {
             "pl": "Wykrywanie mowy. Z paczki PyPI, hash przypięty.",
             "en": "Voice activity detection. From the PyPI package, pinned hash."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
+          "id": "smart-turn-v3.2",
+          "kind": "vad",
+          "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+          "license": "BSD-2-Clause",
+          "source": "https://huggingface.co/",
+          "size_bytes": 8388608,
+          "target": "%LOCALAPPDATA%\\Alfa\\models\\smart-turn-v3.2",
+          "files": [
+            {
+              "name": "smart-turn-v3.2-cpu.onnx",
+              "url": "https://example.invalid/smart-turn-v3.2-cpu.onnx",
+              "size_bytes": 8388608,
+              "pinned_sha256": "92c44336c456231366890b0b3efd0cba1300d2f0b0ea3fbb72a4f0f0eb1eb2c0",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Rozpoznaje po brzmieniu, czy skończyłeś mówić. Wymaga biblioteki ONNX Runtime.",
+            "en": "Tells from the sound whether you have finished speaking. Requires the ONNX Runtime library."
           },
           "progress": null,
           "error": null,
@@ -1809,6 +2233,35 @@
           "active": false
         },
         {
+          "id": "onnxruntime-cpu",
+          "kind": "sidecar",
+          "name": "ONNX Runtime 1.23.1 (procesor)",
+          "license": "MIT",
+          "source": "https://huggingface.co/",
+          "size_bytes": 77594624,
+          "target": "%LOCALAPPDATA%\\Alfa\\sidecars\\onnxruntime-cpu",
+          "files": [
+            {
+              "name": "onnxruntime-win-x64-1.23.1.zip",
+              "url": "https://example.invalid/onnxruntime-win-x64-1.23.1.zip",
+              "size_bytes": 77594624,
+              "pinned_sha256": "b9524ad331e45625dda0a3a253accfccc909569d32ebb1b5d3c55595fd93755e",
+              "sha256": null
+            }
+          ],
+          "state": "missing",
+          "pinned": true,
+          "confirmed": true,
+          "downloadable": true,
+          "note": {
+            "pl": "Biblioteka obliczeń dla głosu Supertonic i wykrywania końca wypowiedzi.",
+            "en": "Compute library for the Supertonic voice and end-of-turn detection."
+          },
+          "progress": null,
+          "error": null,
+          "active": false
+        },
+        {
           "id": "sidecar-piper",
           "kind": "sidecar",
           "name": "piper (2023.11.14-2)",
@@ -1893,8 +2346,8 @@
           "en": "Reference"
         },
         "summary": {
-          "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Whisper turbo, głos Piper, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
-          "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Whisper turbo speech recognition, the Piper voice, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
+          "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Qwen3-ASR z Whisperem turbo w zapasie, naturalny głos Supertonic 3 z Piperem w zapasie, wyczucie końca wypowiedzi Smart Turn, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
+          "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Qwen3-ASR speech recognition with Whisper turbo as the fallback, the natural Supertonic 3 voice with Piper as the fallback, Smart Turn end-of-turn sensing, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
         },
         "requirements": {
           "min_ram_mb": 15000,
@@ -1917,6 +2370,15 @@
             "fallback": false
           },
           {
+            "id": "qwen3-asr-1.7b-q8",
+            "name": "Qwen3-ASR 1.7B (Q8)",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 2520776704,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "whisper-large-v3-turbo-q5_0",
             "name": "Whisper large-v3-turbo-q5_0",
             "kind": "stt",
@@ -1926,11 +2388,38 @@
             "fallback": false
           },
           {
+            "id": "supertonic-3",
+            "name": "Supertonic 3",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 401604608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "piper-pl_PL-gosia-medium",
             "name": "Piper pl_PL gosia (medium)",
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -2007,10 +2496,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 6380584960,
-        "missing_bytes": 5868879872,
+        "size_bytes": 9388949504,
+        "missing_bytes": 8877244416,
         "installed": 1,
-        "total": 11,
+        "total": 15,
         "state": "partial",
         "fit": {
           "kind": "too_weak",
@@ -2108,8 +2597,8 @@
           "en": "Very good"
         },
         "summary": {
-          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego i weryfikacji głosu. Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-          "en": "Like Reference, but without the wake word and voice verification. On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
+          "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
         },
         "requirements": {
           "min_ram_mb": 15000,
@@ -2141,11 +2630,38 @@
             "fallback": false
           },
           {
+            "id": "supertonic-3",
+            "name": "Supertonic 3",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 401604608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "piper-pl_PL-gosia-medium",
             "name": "Piper pl_PL gosia (medium)",
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -2204,10 +2720,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 6336544768,
-        "missing_bytes": 5824839680,
+        "size_bytes": 6824132608,
+        "missing_bytes": 6312427520,
         "installed": 1,
-        "total": 9,
+        "total": 12,
         "state": "partial",
         "fit": {
           "kind": "tight",
@@ -2294,8 +2810,8 @@
           "en": "Good"
         },
         "summary": {
-          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, głosem Piper i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the Piper voice and semantic search. Runs on a 4 GB GPU or a strong CPU."
+          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
+          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU."
         },
         "requirements": {
           "min_ram_mb": 11000,
@@ -2327,11 +2843,38 @@
             "fallback": false
           },
           {
+            "id": "supertonic-3",
+            "name": "Supertonic 3",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 401604608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "piper-pl_PL-gosia-medium",
             "name": "Piper pl_PL gosia (medium)",
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -2390,10 +2933,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 2974810112,
-        "missing_bytes": 2463105024,
+        "size_bytes": 3462397952,
+        "missing_bytes": 2950692864,
         "installed": 1,
-        "total": 9,
+        "total": 12,
         "state": "partial",
         "fit": {
           "kind": "fits",
@@ -2477,8 +3020,8 @@
           "en": "Balanced"
         },
         "summary": {
-          "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small i głos Piper — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
-          "en": "Bielik 1.5B, the smaller Whisper small speech model and the Piper voice — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
+          "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small, głos Piper i wyczucie końca wypowiedzi Smart Turn — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
+          "en": "Bielik 1.5B, the smaller Whisper small speech model, the Piper voice and Smart Turn end-of-turn sensing — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
         },
         "requirements": {
           "min_ram_mb": 7000,
@@ -2515,6 +3058,24 @@
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -2564,10 +3125,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 2079326208,
-        "missing_bytes": 2079326208,
+        "size_bytes": 2165309440,
+        "missing_bytes": 2165309440,
         "installed": 0,
-        "total": 8,
+        "total": 10,
         "state": "not_installed",
         "fit": {
           "kind": "fits",
@@ -3165,8 +3726,8 @@
           "en": "Reference"
         },
         "summary": {
-          "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Whisper turbo, głos Piper, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
-          "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Whisper turbo speech recognition, the Piper voice, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
+          "pl": "Pełna Alfa na tym komputerze: największy model rozmowy Bielik 4.5B (z narzędziami agentek), dokładne rozpoznawanie mowy Qwen3-ASR z Whisperem turbo w zapasie, naturalny głos Supertonic 3 z Piperem w zapasie, wyczucie końca wypowiedzi Smart Turn, wykrywanie mowy, cechy słowa wywoławczego, weryfikacja Twojego głosu i wyszukiwanie znaczeniowe w pamięci. Silniki na kartę graficzną z zapasem na procesor.",
+          "en": "Full Alfa on this computer: the largest chat model Bielik 4.5B (with the agents' tools), accurate Qwen3-ASR speech recognition with Whisper turbo as the fallback, the natural Supertonic 3 voice with Piper as the fallback, Smart Turn end-of-turn sensing, voice activity detection, wake-word features, verification of your voice and semantic memory search. GPU engines with a CPU fallback."
         },
         "requirements": {
           "min_ram_mb": 15000,
@@ -3189,6 +3750,15 @@
             "fallback": false
           },
           {
+            "id": "qwen3-asr-1.7b-q8",
+            "name": "Qwen3-ASR 1.7B (Q8)",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 2520776704,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "whisper-large-v3-turbo-q5_0",
             "name": "Whisper large-v3-turbo-q5_0",
             "kind": "stt",
@@ -3198,11 +3768,38 @@
             "fallback": false
           },
           {
+            "id": "supertonic-3",
+            "name": "Supertonic 3",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 401604608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "piper-pl_PL-gosia-medium",
             "name": "Piper pl_PL gosia (medium)",
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -3279,10 +3876,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 6380584960,
-        "missing_bytes": 5773459456,
+        "size_bytes": 9388949504,
+        "missing_bytes": 8781824000,
         "installed": 2,
-        "total": 11,
+        "total": 15,
         "state": "needs_trust",
         "fit": {
           "kind": "too_weak",
@@ -3380,8 +3977,8 @@
           "en": "Very good"
         },
         "summary": {
-          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego i weryfikacji głosu. Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-          "en": "Like Reference, but without the wake word and voice verification. On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
+          "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
         },
         "requirements": {
           "min_ram_mb": 15000,
@@ -3413,11 +4010,38 @@
             "fallback": false
           },
           {
+            "id": "supertonic-3",
+            "name": "Supertonic 3",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 401604608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "piper-pl_PL-gosia-medium",
             "name": "Piper pl_PL gosia (medium)",
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -3476,10 +4100,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 6336544768,
-        "missing_bytes": 5729419264,
+        "size_bytes": 6824132608,
+        "missing_bytes": 6217007104,
         "installed": 2,
-        "total": 9,
+        "total": 12,
         "state": "needs_trust",
         "fit": {
           "kind": "tight",
@@ -3566,8 +4190,8 @@
           "en": "Good"
         },
         "summary": {
-          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, głosem Piper i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the Piper voice and semantic search. Runs on a 4 GB GPU or a strong CPU."
+          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
+          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU."
         },
         "requirements": {
           "min_ram_mb": 11000,
@@ -3599,11 +4223,38 @@
             "fallback": false
           },
           {
+            "id": "supertonic-3",
+            "name": "Supertonic 3",
+            "kind": "tts",
+            "state": "missing",
+            "size_bytes": 401604608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
             "id": "piper-pl_PL-gosia-medium",
             "name": "Piper pl_PL gosia (medium)",
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -3662,10 +4313,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 2974810112,
-        "missing_bytes": 668991488,
+        "size_bytes": 3462397952,
+        "missing_bytes": 1156579328,
         "installed": 2,
-        "total": 9,
+        "total": 12,
         "state": "needs_trust",
         "fit": {
           "kind": "fits",
@@ -3749,8 +4400,8 @@
           "en": "Balanced"
         },
         "summary": {
-          "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small i głos Piper — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
-          "en": "Bielik 1.5B, the smaller Whisper small speech model and the Piper voice — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
+          "pl": "Bielik 1.5B, mniejszy model rozpoznawania mowy Whisper small, głos Piper i wyczucie końca wypowiedzi Smart Turn — rozmowa głosowa bez karty graficznej, wolniejsza niż na karcie. Wyszukiwanie w pamięci po słowach (bez modelu znaczeniowego).",
+          "en": "Bielik 1.5B, the smaller Whisper small speech model, the Piper voice and Smart Turn end-of-turn sensing — voice conversation without a GPU, slower than on a GPU. Memory search by words (no semantic model)."
         },
         "requirements": {
           "min_ram_mb": 7000,
@@ -3787,6 +4438,24 @@
             "kind": "tts",
             "state": "missing",
             "size_bytes": 63963136,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "smart-turn-v3.2",
+            "name": "Smart Turn v3.2 (koniec wypowiedzi)",
+            "kind": "vad",
+            "state": "missing",
+            "size_bytes": 8388608,
+            "downloadable": true,
+            "fallback": false
+          },
+          {
+            "id": "onnxruntime-cpu",
+            "name": "ONNX Runtime 1.23.1 (procesor)",
+            "kind": "sidecar",
+            "state": "missing",
+            "size_bytes": 77594624,
             "downloadable": true,
             "fallback": false
           },
@@ -3836,10 +4505,10 @@
             "fallback": false
           }
         ],
-        "size_bytes": 2079326208,
-        "missing_bytes": 285212672,
+        "size_bytes": 2165309440,
+        "missing_bytes": 371195904,
         "installed": 1,
-        "total": 8,
+        "total": 10,
         "state": "needs_trust",
         "fit": {
           "kind": "fits",

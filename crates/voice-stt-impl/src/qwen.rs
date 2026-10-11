@@ -95,6 +95,13 @@ impl QwenStt {
         idle
     }
 
+    /// Uruchamia serwer i wczytuje model zawczasu (start rozmowy), żeby pierwsza wypowiedź nie
+    /// czekała na wczytanie kilku gigabajtów z dysku.
+    pub async fn warm(&self) -> Result<(), SttError> {
+        let mut slot = self.server.lock().await;
+        self.ensure(&mut slot).await.map(|_| ())
+    }
+
     async fn ensure(&self, slot: &mut Option<Running>) -> Result<String, SttError> {
         if let Some(running) = slot.as_ref()
             && running.sidecar.exited().is_none()

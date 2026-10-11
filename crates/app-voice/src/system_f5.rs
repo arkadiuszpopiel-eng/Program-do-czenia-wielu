@@ -79,6 +79,14 @@ impl FeatureFactory for SystemVoice {
         Some(self.audio.clone())
     }
 
+    fn engines(&self) -> app_api::dto::VoiceEnginesView {
+        self.engines_view()
+    }
+
+    fn reset_stt_breaker(&self) {
+        self.reset_guard();
+    }
+
     fn dictation_missing(&self) -> Vec<String> {
         let mut out = Vec::new();
         if !app_modules::stt::server_cpu(&self.paths).is_file() {

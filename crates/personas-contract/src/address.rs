@@ -37,14 +37,27 @@ impl Mention {
     }
 }
 
+/// Pisownia, którą rozpoznawanie mowy często oddaje imiona z greckich liter („Alpha”, „Gamma”,
+/// „Betta”), sprowadzona do polskiej — żeby „Gamma, sprawdź to” trafiło do Gamy. Inne słowa
+/// zostają bez zmian (dopasowanie i tak wymaga pełnej formy imienia).
+fn asr_spelling(word: &str) -> std::borrow::Cow<'_, str> {
+    for (heard, written) in [("alph", "alf"), ("gamm", "gam"), ("bett", "bet")] {
+        if let Some(rest) = word.strip_prefix(heard) {
+            return std::borrow::Cow::Owned(format!("{written}{rest}"));
+        }
+    }
+    std::borrow::Cow::Borrowed(word)
+}
+
 /// Wszystkie wzmianki o personach (każda forma odmiany imienia) w kolejności słów.
 pub fn find_mentions(tokens: &[Token], personas: &[Persona]) -> Vec<Mention> {
     tokens
         .iter()
         .enumerate()
         .flat_map(|(index, token)| {
+            let word = asr_spelling(&token.word);
             personas.iter().filter_map(move |p| {
-                let cases = p.forms.cases_of(&token.word);
+                let cases = p.forms.cases_of(&word);
                 (!cases.is_empty()).then(|| Mention {
                     persona: p.id.clone(),
                     index,
@@ -118,6 +131,17 @@ mod tests {
 
     fn who(text: &str) -> Option<String> {
         parse_addressee(text, &builtin_personas()).map(|p| p.0)
+    }
+
+    #[test]
+    fn speech_recognition_spellings_reach_the_right_persona() {
+        assert_eq!(who("Alpha, co słychać?").as_deref(), Some("alfa"));
+        assert_eq!(who("Hej Gamma, sprawdź to").as_deref(), Some("gama"));
+        assert_eq!(who("Gammo, jakie mam zadania?").as_deref(), Some("gama"));
+        assert_eq!(who("Betta, przypomnij mi").as_deref(), Some("beta"));
+        assert_eq!(who("Alphabet ma 26 liter"), None);
+        assert_eq!(who("Promieniowanie gamma jest groźne"), None);
+        assert_eq!(asr_spelling("delta"), "delta");
     }
 
     #[test]

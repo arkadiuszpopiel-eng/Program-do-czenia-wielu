@@ -1066,6 +1066,94 @@
     "scope": "global"
    },
    {
+    "key": "voice.talk_smart_turn",
+    "label": {
+     "pl": "Wyczucie końca wypowiedzi (Smart Turn)",
+     "en": "End-of-turn sensing (Smart Turn)"
+    },
+    "description": {
+     "pl": "Model słucha brzmienia Twojego głosu i rozpoznaje, czy skończyłeś zdanie — Alfa nie wchodzi w słowo i nie czeka niepotrzebnie. Po wyłączeniu liczy się sama długość ciszy. Wymaga modelu Smart Turn (Modele lokalne i silniki). Działa od następnego włączenia mikrofonu.",
+     "en": "The model listens to your voice and tells whether you have finished the sentence — Alfa does not cut in and does not wait needlessly. When off, only the length of silence counts. Requires the Smart Turn model (Local models and engines). Applies the next time the microphone is turned on."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": true,
+    "scope": "global"
+   },
+   {
+    "key": "voice.talk_turn_threshold",
+    "label": {
+     "pl": "Pewność końca wypowiedzi",
+     "en": "End-of-turn confidence"
+    },
+    "description": {
+     "pl": "Od jakiej pewności modelu Alfa uznaje, że skończyłeś. Jeśli wchodzi Ci w słowo — podnieś do 60–70 %. Jeśli zwleka z odpowiedzią — obniż do 40 %.",
+     "en": "How sure the model must be before Alfa treats you as finished. If she cuts in — raise it to 60–70%. If she is slow to answer — lower it to 40%."
+    },
+    "control": {
+     "kind": "number",
+     "min": 30,
+     "max": 90,
+     "step": 5,
+     "unit": "%"
+    },
+    "default": 50,
+    "scope": "global"
+   },
+   {
+    "key": "voice.talk_max_silence",
+    "label": {
+     "pl": "Najdłuższe czekanie w ciszy",
+     "en": "Longest wait in silence"
+    },
+    "description": {
+     "pl": "Po tylu milisekundach ciszy wypowiedź kończy się zawsze, nawet gdy model uważa, że zdanie jest urwane. Dłużej — więcej czasu na zastanowienie; krócej — szybsze odpowiedzi.",
+     "en": "After this many milliseconds of silence the turn always ends, even if the model thinks the sentence is unfinished. Longer gives more time to think; shorter gives faster answers."
+    },
+    "control": {
+     "kind": "number",
+     "min": 500,
+     "max": 6000,
+     "step": 100,
+     "unit": "ms"
+    },
+    "default": 2000,
+    "scope": "global"
+   },
+   {
+    "key": "voice.talk_stt_engine",
+    "label": {
+     "pl": "Silnik rozpoznawania mowy",
+     "en": "Speech recognition engine"
+    },
+    "description": {
+     "pl": "„Najlepszy dostępny” używa Qwen3-ASR, gdy jest pobrany, a Whispera jako zapasu. „Tylko Whisper” przydaje się, gdy pamięć karty graficznej jest potrzebna dla modelu rozmowy. Działa od następnego włączenia mikrofonu.",
+     "en": "“Best available” uses Qwen3-ASR when it is downloaded, with Whisper as the fallback. “Whisper only” helps when the graphics card memory is needed for the chat model. Applies the next time the microphone is turned on."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "auto",
+       "label": {
+        "pl": "Najlepszy dostępny (zalecane)",
+        "en": "Best available (recommended)"
+       }
+      },
+      {
+       "value": "whisper",
+       "label": {
+        "pl": "Tylko Whisper",
+        "en": "Whisper only"
+       }
+      }
+     ]
+    },
+    "default": "auto",
+    "scope": "global"
+   },
+   {
     "key": "voice.mode",
     "label": {
      "pl": "Włączanie mikrofonu",

@@ -2,6 +2,7 @@
 // (np. odmowa w polu hasła, „nieskalibrowane — potwierdź ryzyko").
 import type {
   DictationAction,
+  EnginesAction,
   ReadAction,
   SpeakerAction,
   VoiceFeatures,
@@ -16,6 +17,7 @@ export interface VoiceActions {
   speaker(action: SpeakerAction): Promise<boolean>;
   dictation(action: DictationAction): Promise<boolean>;
   read(action: ReadAction): Promise<boolean>;
+  engines(action: EnginesAction): Promise<boolean>;
 }
 
 export function voiceActions(app: AppState): VoiceActions {
@@ -34,6 +36,7 @@ export function voiceActions(app: AppState): VoiceActions {
     speaker: (action) => run(api.speaker(action)),
     dictation: (action) => run(api.dictation(action)),
     read: (action) => run(api.read(action)),
+    engines: (action) => run(api.engines(action)),
   };
 }
 

@@ -93,6 +93,34 @@ export const SEEDS: readonly Seed[] = [
     ['Lżejszy model rozpoznawania mowy na CPU (zapas).', 'Lighter CPU speech model (fallback).'],
   ],
   [
+    'qwen3-asr-1.7b-q8',
+    'stt',
+    'Qwen3-ASR 1.7B (Q8)',
+    'Apache-2.0',
+    2404,
+    ['Qwen3-ASR-1.7B-Q8_0.gguf', 'mmproj-Qwen3-ASR-1.7B-Q8_0.gguf'],
+    true,
+    true,
+    [
+      'Dokładne rozpoznawanie mowy po polsku na karcie graficznej. Gdy zawiedzie, rozpoznaje Whisper.',
+      'Accurate Polish speech recognition on the GPU. If it fails, Whisper takes over.',
+    ],
+  ],
+  [
+    'supertonic-3',
+    'tts',
+    'Supertonic 3',
+    'OpenRAIL-M',
+    383,
+    ['vector_estimator.onnx', 'vocoder.onnx', 'text_encoder.onnx', 'tts.json', 'F1.json'],
+    true,
+    true,
+    [
+      'Naturalny głos agentek (10 barw), liczony na procesorze. Wymaga biblioteki ONNX Runtime.',
+      'Natural agent voice (10 timbres), computed on the CPU. Requires the ONNX Runtime library.',
+    ],
+  ],
+  [
     'piper-pl_PL-gosia-medium',
     'tts',
     'Piper pl_PL gosia (medium)',
@@ -115,6 +143,20 @@ export const SEEDS: readonly Seed[] = [
     [
       'Wykrywanie mowy. Z paczki PyPI, hash przypięty.',
       'Voice activity detection. From the PyPI package, pinned hash.',
+    ],
+  ],
+  [
+    'smart-turn-v3.2',
+    'vad',
+    'Smart Turn v3.2 (koniec wypowiedzi)',
+    'BSD-2-Clause',
+    8,
+    ['smart-turn-v3.2-cpu.onnx'],
+    true,
+    true,
+    [
+      'Rozpoznaje po brzmieniu, czy skończyłeś mówić. Wymaga biblioteki ONNX Runtime.',
+      'Tells from the sound whether you have finished speaking. Requires the ONNX Runtime library.',
     ],
   ],
   [
@@ -202,6 +244,20 @@ export const SEEDS: readonly Seed[] = [
     false,
     false,
     ['Rozpoznawanie mowy na karcie NVIDIA.', 'Speech recognition on NVIDIA GPUs.'],
+  ],
+  [
+    'onnxruntime-cpu',
+    'sidecar',
+    'ONNX Runtime 1.23.1 (procesor)',
+    'MIT',
+    74,
+    ['onnxruntime-win-x64-1.23.1.zip'],
+    true,
+    true,
+    [
+      'Biblioteka obliczeń dla głosu Supertonic i wykrywania końca wypowiedzi.',
+      'Compute library for the Supertonic voice and end-of-turn detection.',
+    ],
   ],
   [
     'sidecar-piper',

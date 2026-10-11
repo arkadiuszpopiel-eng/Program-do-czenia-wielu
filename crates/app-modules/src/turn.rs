@@ -26,6 +26,23 @@ pub fn onnxruntime(paths: &AppPaths, program: &Path) -> Option<PathBuf> {
     shared.is_file().then_some(shared)
 }
 
+/// Pozycje katalogu, których brakuje do włączenia Smart Turn (pusto — wszystko jest). Sam
+/// program `alfa-smart-turn` jest częścią wydania; jego brak zgłaszamy nazwą pliku.
+pub fn smart_turn_missing(paths: &AppPaths) -> Vec<String> {
+    let program = paths.sidecar("smart-turn", "alfa-smart-turn");
+    let mut out = Vec::new();
+    if !program.is_file() {
+        out.push("alfa-smart-turn".to_owned());
+    }
+    if !paths.models().join("turn").join(MODEL_FILE).is_file() {
+        out.push("smart-turn-v3.2".to_owned());
+    }
+    if onnxruntime(paths, &program).is_none() {
+        out.push("onnxruntime-cpu".to_owned());
+    }
+    out
+}
+
 /// Ustawienia procesu Smart Turn, jeśli są: program, model i biblioteka. `None` — koniec
 /// wypowiedzi ocenia model tekstowy.
 pub fn smart_turn(paths: &AppPaths) -> Option<SidecarCfg> {

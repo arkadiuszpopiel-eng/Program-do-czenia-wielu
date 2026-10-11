@@ -102,5 +102,56 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(page.getByRole('slider', { name: /Tempo czytania/ })).toBeVisible();
       await expectAccessible(page, `ustawienia głos po zmianach ${theme}`);
     });
+
+    test('Ustawienia → Głos: silniki rozmowy, zamknięcie bezpiecznika z klawiatury', async ({
+      page,
+    }) => {
+      await openApp(page, { theme });
+      await waitForChat(page);
+      await settings(page, 'Głos');
+      const card = page.getByTestId('voice-engines');
+      await expect(card.getByRole('heading', { name: 'Silniki rozmowy' })).toBeVisible();
+      await expect(card.getByText('Qwen3-ASR', { exact: true })).toBeVisible();
+      await expect(card.getByText('zapas: Whisper')).toBeVisible();
+      await expect(card.getByText('Smart Turn', { exact: true })).toBeVisible();
+      await expect(card.getByText('Supertonic 3 · mówi')).toBeVisible();
+      await expect(card.getByText('Pocket TTS · do pobrania')).toBeVisible();
+      await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny odstawiony');
+      await expect(card.getByText(/rozpoznaje Whisper\. Następna próba .* za 18 s/)).toBeVisible();
+      await expectAccessible(page, `silniki rozmowy otwarty ${theme}`);
+
+      const reset = card.getByRole('button', { name: 'Zamknij bezpiecznik' });
+      await reset.focus();
+      await page.keyboard.press('Enter');
+      await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
+      await expect(reset).toHaveCount(0);
+      await expect(card.getByText('0 / 3')).toBeVisible();
+      await expect(card.getByText('280 ms')).toBeVisible();
+      await card.getByRole('button', { name: 'Odśwież' }).click();
+      await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
+      await expectAccessible(page, `silniki rozmowy zamknięty ${theme}`);
+    });
+
+    test('Ustawienia → Głos: brakujące silniki prowadzą do katalogu modeli', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'no-mic' });
+      await waitForChat(page);
+      await settings(page, 'Głos');
+      const card = page.getByTestId('voice-engines');
+      await expect(card.getByText('Długość ciszy i tekst')).toBeVisible();
+      await expect(
+        card.getByText(/Qwen3-ASR\) włączy się po pobraniu: model Qwen3-ASR 1\.7B\./),
+      ).toBeVisible();
+      await expect(
+        card.getByText(
+          /Smart Turn włączy się po pobraniu: model Smart Turn v3\.2, biblioteka ONNX Runtime\./,
+        ),
+      ).toBeVisible();
+      await expect(card.getByTestId('voice-guard')).toHaveCount(0);
+      await expectAccessible(page, `silniki rozmowy braki ${theme}`);
+      await card.getByRole('button', { name: 'Otwórz „Modele lokalne i silniki”' }).click();
+      await expect(
+        page.getByRole('heading', { name: 'Modele lokalne i silniki', level: 2 }),
+      ).toBeVisible();
+    });
   });
 }

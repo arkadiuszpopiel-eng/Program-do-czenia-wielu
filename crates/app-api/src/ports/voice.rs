@@ -10,8 +10,8 @@ use sessions_contract::{SessionId, TurnId};
 use tokio::sync::mpsc;
 
 use crate::dto::{
-    AudioDevice, DictationAction, LocalizedText, ReadAction, SpeakerAction, VoiceFeatures,
-    VoiceStatus, WakeAction,
+    AudioDevice, DictationAction, EnginesAction, LocalizedText, ReadAction, SpeakerAction,
+    VoiceFeatures, VoiceStatus, WakeAction,
 };
 use crate::error::AppError;
 
@@ -144,6 +144,10 @@ pub trait VoicePort: Send + Sync {
     /// Czytanie na głos zaznaczenia, dokumentu albo schowka.
     async fn read(&self, _action: ReadAction) -> Result<VoiceFeatures, AppError> {
         Err(AppError::unavailable("Czytanie na głos", "voice-readaloud"))
+    }
+    /// Silniki rozmowy: odczyt stanu albo zamknięcie bezpiecznika rozpoznawania.
+    async fn engines(&self, _action: EnginesAction) -> Result<VoiceFeatures, AppError> {
+        Ok(self.features().await)
     }
 }
 

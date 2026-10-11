@@ -59,7 +59,9 @@ test('filtry, przerwanie i wznowienie, usuwanie z potwierdzeniem', async ({ page
   await waitForChat(page);
   await openModels(page);
   await pickOption(page.getByRole('combobox', { name: 'Rodzaj', exact: true }), 'vad');
-  await expect(page.getByText('1 pozycja')).toBeVisible();
+  // Wykrywanie mowy (Silero) i koniec wypowiedzi (Smart Turn).
+  await expect(page.getByText('2 pozycje')).toBeVisible();
+  await expect(row(page, 'Smart Turn v3.2 (koniec wypowiedzi)')).toBeVisible();
   const vad = row(page, 'Silero VAD 6.2.3 (op18, bez If)');
   await expect(vad.getByText('SHA-256 przypięty')).toBeVisible();
   await vad.getByRole('button', { name: 'Pobierz' }).click();

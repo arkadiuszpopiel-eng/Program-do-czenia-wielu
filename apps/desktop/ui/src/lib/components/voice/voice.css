@@ -101,3 +101,68 @@
   flex: 1;
   accent-color: var(--alfa-color-info);
 }
+
+/* Silniki rozmowy: lista „nazwa — wartość" i kafle telemetrii strażnika. */
+.vf-kv {
+  display: grid;
+  grid-template-columns: minmax(9rem, max-content) 1fr;
+  gap: var(--alfa-space-2) var(--alfa-space-3);
+  margin: 0;
+}
+.vf-kv dt {
+  color: var(--alfa-color-text-muted);
+}
+.vf-kv dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--alfa-space-2);
+  margin: 0;
+}
+.vf-badge.off {
+  color: var(--alfa-color-text-muted);
+  border-style: dashed;
+}
+.vf-badge.alert {
+  border-color: var(--alfa-color-warning);
+}
+.vf-warn p {
+  margin: 0 0 var(--alfa-space-2);
+}
+.vf-guard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alfa-space-2);
+  padding-top: var(--alfa-space-3);
+  border-top: 1px solid var(--alfa-color-border);
+}
+.vf-guard h4 {
+  margin: 0;
+  font-size: var(--alfa-font-size-sm);
+}
+.vf-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--alfa-space-2);
+  margin: 0;
+}
+.vf-stats > div {
+  padding: var(--alfa-space-2);
+  border: 1px solid var(--alfa-color-border);
+  border-radius: var(--alfa-radius-control);
+  background: var(--alfa-color-surface2);
+}
+.vf-stats dt {
+  color: var(--alfa-color-text-muted);
+  font-size: var(--alfa-font-size-xs);
+}
+.vf-stats dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 520px) {
+  .vf-kv {
+    grid-template-columns: 1fr;
+  }
+}

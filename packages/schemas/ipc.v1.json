@@ -2095,6 +2095,26 @@
       ],
       "type": "string"
     },
+    "BreakerStateView": {
+      "description": "Stan bezpiecznika silnika głównego.",
+      "oneOf": [
+        {
+          "const": "closed",
+          "description": "Silnik główny pracuje.",
+          "type": "string"
+        },
+        {
+          "const": "open",
+          "description": "Silnik główny odstawiony — rozpoznaje zapasowy.",
+          "type": "string"
+        },
+        {
+          "const": "half_open",
+          "description": "Po przerwie: jedna próba silnika głównego.",
+          "type": "string"
+        }
+      ]
+    },
     "BridgeCard": {
       "description": "Karta zgodności trasy mostu.",
       "properties": {
@@ -3626,6 +3646,37 @@
         "error"
       ],
       "type": "object"
+    },
+    "EnginesAction": {
+      "description": "Akcja na silnikach rozmowy.",
+      "oneOf": [
+        {
+          "description": "Odczyt bieżącego stanu (liczniki zmieniają się w trakcie rozmowy).",
+          "properties": {
+            "kind": {
+              "const": "refresh",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Zamknięcie bezpiecznika: silnik główny dostaje szansę od razu, bez czekania na koniec przerwy.",
+          "properties": {
+            "kind": {
+              "const": "reset_breaker",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
     },
     "EnrollSampleView": {
       "description": "Ostatnia nagrana fraza rejestracji (bez audio).",
@@ -8688,6 +8739,160 @@
       ],
       "type": "string"
     },
+    "SttEngineKind": {
+      "description": "Silnik rozpoznawania mowy.",
+      "oneOf": [
+        {
+          "const": "qwen_asr",
+          "description": "Qwen3-ASR na `llama-server`.",
+          "type": "string"
+        },
+        {
+          "const": "whisper",
+          "description": "Whisper na `whisper-server`.",
+          "type": "string"
+        },
+        {
+          "const": "none",
+          "description": "Brak silnika.",
+          "type": "string"
+        }
+      ]
+    },
+    "SttEngineView": {
+      "description": "Rozpoznawanie mowy.",
+      "properties": {
+        "engine": {
+          "$ref": "#/$defs/SttEngineKind",
+          "description": "Silnik główny."
+        },
+        "fallback": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SttEngineKind"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Silnik zapasowy (gdy główny ma strażnika)."
+        },
+        "gpu": {
+          "description": "Silnik główny liczy na karcie graficznej.",
+          "type": "boolean"
+        },
+        "guard": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SttGuardView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Stan strażnika (`None` — rozmowa ani dyktowanie jeszcze nie ruszyły albo strażnika nie ma)."
+        },
+        "missing": {
+          "description": "Pozycje katalogu, których pobranie włączy lepszy silnik (pusto — lepszego nie ma).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "engine",
+        "gpu",
+        "fallback",
+        "missing",
+        "guard"
+      ],
+      "type": "object"
+    },
+    "SttGuardView": {
+      "description": "Strażnik rozpoznawania: bezpiecznik i skrót telemetrii z ostatnich wypowiedzi.",
+      "properties": {
+        "breaker": {
+          "$ref": "#/$defs/BreakerStateView"
+        },
+        "failures": {
+          "description": "Awarie z rzędu.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "failures_to_open": {
+          "description": "Próg odstawienia silnika.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fallbacks": {
+          "description": "Ile z nich rozpoznał silnik zapasowy.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "flagged": {
+          "description": "Ile wyników miało zastrzeżenie strażnika.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "median_ms": {
+          "description": "Mediana czasu rozpoznania (ms).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "opened_count": {
+          "description": "Ile razy bezpiecznik zadziałał od startu rozmowy.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "p95_ms": {
+          "description": "95. centyl czasu rozpoznania (ms).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "retry_in_s": {
+          "description": "Sekundy do następnej próby (gdy otwarty).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "samples": {
+          "description": "Liczba wypowiedzi w telemetrii.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "breaker",
+        "failures",
+        "failures_to_open",
+        "opened_count",
+        "retry_in_s",
+        "median_ms",
+        "p95_ms",
+        "samples",
+        "fallbacks",
+        "flagged"
+      ],
+      "type": "object"
+    },
     "SystemStatus": {
       "description": "Stan systemu (PLAN §14.4).",
       "properties": {
@@ -9614,6 +9819,24 @@
       ],
       "type": "object"
     },
+    "TtsEngineView": {
+      "description": "Silnik mowy z łańcucha (kolejność = kolejność prób).",
+      "properties": {
+        "engine": {
+          "description": "Nazwa silnika (`supertonic`, `pocket`, `piper`).",
+          "type": "string"
+        },
+        "ready": {
+          "description": "Pliki silnika i głosu są na miejscu.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "engine",
+        "ready"
+      ],
+      "type": "object"
+    },
     "Turn": {
       "description": "Tura (węzeł drzewa gałęzi, append-only).",
       "properties": {
@@ -9808,6 +10031,41 @@
         "kind",
         "bytes",
         "artifact_id"
+      ],
+      "type": "object"
+    },
+    "TurnEngineKind": {
+      "description": "Co ocenia koniec wypowiedzi.",
+      "oneOf": [
+        {
+          "const": "smart_turn",
+          "description": "Model Smart Turn słuchający dźwięku.",
+          "type": "string"
+        },
+        {
+          "const": "text",
+          "description": "Ocena z tekstu i długości ciszy.",
+          "type": "string"
+        }
+      ]
+    },
+    "TurnEngineView": {
+      "description": "Koniec wypowiedzi.",
+      "properties": {
+        "engine": {
+          "$ref": "#/$defs/TurnEngineKind"
+        },
+        "missing": {
+          "description": "Pozycje katalogu, których pobranie włączy Smart Turn (pusto — już działa).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "engine",
+        "missing"
       ],
       "type": "object"
     },
@@ -10148,11 +10406,38 @@
       ],
       "type": "object"
     },
+    "VoiceEnginesView": {
+      "description": "Silniki rozmowy.",
+      "properties": {
+        "stt": {
+          "$ref": "#/$defs/SttEngineView"
+        },
+        "tts": {
+          "items": {
+            "$ref": "#/$defs/TtsEngineView"
+          },
+          "type": "array"
+        },
+        "turn": {
+          "$ref": "#/$defs/TurnEngineView"
+        }
+      },
+      "required": [
+        "stt",
+        "turn",
+        "tts"
+      ],
+      "type": "object"
+    },
     "VoiceFeatures": {
       "description": "Głos rozszerzony (panel Głos, Ustawienia → Głos).",
       "properties": {
         "dictation": {
           "$ref": "#/$defs/DictationView"
+        },
+        "engines": {
+          "$ref": "#/$defs/VoiceEnginesView",
+          "description": "Silniki rozmowy: rozpoznawanie ze strażnikiem, koniec wypowiedzi, głosy."
         },
         "read": {
           "$ref": "#/$defs/ReadAloudView"
@@ -10172,7 +10457,8 @@
         "speaker",
         "dictation",
         "read",
-        "s2s"
+        "s2s",
+        "engines"
       ],
       "type": "object"
     },
@@ -13572,6 +13858,19 @@
           "name": "action",
           "schema": {
             "$ref": "#/$defs/DictationAction"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/VoiceFeatures"
+      }
+    },
+    "voice_engines": {
+      "args": [
+        {
+          "name": "action",
+          "schema": {
+            "$ref": "#/$defs/EnginesAction"
           }
         }
       ],

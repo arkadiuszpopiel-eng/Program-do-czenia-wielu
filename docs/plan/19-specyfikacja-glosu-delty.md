@@ -185,8 +185,29 @@ z zaszyfrowanym profilem; progi i powiązanie z osobami w P6.
 | | słowo wywoławcze i jego treść | wyłączone; w Alfie imię agentki |
 | Zaawansowane | przełącznik rozmowy, informacja o silnikach | — |
 
+Stan w Alfie po 0.0.35: blok „Silniki” i „Telemetria” to karta „Silniki rozmowy” w Ustawieniach → Głos (silnik
+rozpoznawania z zapasem, koniec wypowiedzi, głosy, bezpiecznik z „Zamknij bezpiecznik”, liczniki i czasy); Smart Turn,
+próg i najdłuższa cisza to ustawienia `voice.talk_*`; głos i tempo — `voice.tts_*`. Zostają: kula stanu z miernikiem
+w nagłówku, diagnostyka mikrofonu (5 testów), bramka szumów jako suwak.
+
 W Alfie każda kontrolka działa od razu (w Delcie część dopiero od następnego startu rozmowy), a trzy martwe
 pozycje Delty („Auto-wyślij”, „Głos” i „Prędkość” przy silnikach offline) znikają albo zaczynają działać.
+
+### Pomiar toru rozmowy w Alfie (2026-10-12, laptop z RTX 4050, budowa testowa bez optymalizacji)
+
+Próba `app-voice/tests/live_talk.rs`: nagranie zdania „Dzień dobry, tu Alfa. W czym mogę dziś pomóc?” podane zamiast
+mikrofonu, prawdziwe silniki (Silero, Smart Turn, Qwen3-ASR na karcie, Supertonic 3), czat odpowiada od razu stałym
+zdaniem.
+
+| Etap | Pierwsza wypowiedź | Druga wypowiedź |
+| --- | --- | --- |
+| od końca nagrania do przekazania tekstu czatowi | 155 ms | 180 ms |
+| od przekazania tekstu do słyszalnej odpowiedzi | 1560 ms | 960 ms |
+| rozpoznany tekst | bez błędu | bez błędu |
+
+Bez rozgrzewki silników pierwsza wypowiedź czekała 1,7 s (model w pamięci podręcznej dysku) do 20 s (zimny dysk).
+Nagranie ma na końcu ok. 0,2 s ciszy, więc czasy „od końca mowy” są o tyle dłuższe. Czas myślenia modelu rozmowy
+nie jest tu wliczony.
 
 ## 9. Kryteria odbioru P1
 

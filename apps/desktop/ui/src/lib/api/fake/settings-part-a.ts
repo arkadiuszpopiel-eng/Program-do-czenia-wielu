@@ -344,6 +344,54 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
         ],
         'F5',
       ),
+      toggle(
+        'voice.talk_smart_turn',
+        L('Wyczucie końca wypowiedzi (Smart Turn)', 'End-of-turn sensing (Smart Turn)'),
+        L(
+          'Model słucha brzmienia Twojego głosu i rozpoznaje, czy skończyłeś zdanie — Alfa nie wchodzi w słowo i nie czeka niepotrzebnie. Po wyłączeniu liczy się sama długość ciszy. Wymaga modelu Smart Turn (Modele lokalne i silniki). Działa od następnego włączenia mikrofonu.',
+          'The model listens to your voice and tells whether you have finished the sentence — Alfa does not cut in and does not wait needlessly. When off, only the length of silence counts. Requires the Smart Turn model (Local models and engines). Applies the next time the microphone is turned on.',
+        ),
+        true,
+      ),
+      number(
+        'voice.talk_turn_threshold',
+        L('Pewność końca wypowiedzi', 'End-of-turn confidence'),
+        L(
+          'Od jakiej pewności modelu Alfa uznaje, że skończyłeś. Jeśli wchodzi Ci w słowo — podnieś do 60–70 %. Jeśli zwleka z odpowiedzią — obniż do 40 %.',
+          'How sure the model must be before Alfa treats you as finished. If she cuts in — raise it to 60–70%. If she is slow to answer — lower it to 40%.',
+        ),
+        50,
+        30,
+        90,
+        5,
+        '%',
+      ),
+      number(
+        'voice.talk_max_silence',
+        L('Najdłuższe czekanie w ciszy', 'Longest wait in silence'),
+        L(
+          'Po tylu milisekundach ciszy wypowiedź kończy się zawsze, nawet gdy model uważa, że zdanie jest urwane. Dłużej — więcej czasu na zastanowienie; krócej — szybsze odpowiedzi.',
+          'After this many milliseconds of silence the turn always ends, even if the model thinks the sentence is unfinished. Longer gives more time to think; shorter gives faster answers.',
+        ),
+        2000,
+        500,
+        6000,
+        100,
+        'ms',
+      ),
+      select(
+        'voice.talk_stt_engine',
+        L('Silnik rozpoznawania mowy', 'Speech recognition engine'),
+        L(
+          '„Najlepszy dostępny” używa Qwen3-ASR, gdy jest pobrany, a Whispera jako zapasu. „Tylko Whisper” przydaje się, gdy pamięć karty graficznej jest potrzebna dla modelu rozmowy. Działa od następnego włączenia mikrofonu.',
+          '“Best available” uses Qwen3-ASR when it is downloaded, with Whisper as the fallback. “Whisper only” helps when the graphics card memory is needed for the chat model. Applies the next time the microphone is turned on.',
+        ),
+        [
+          ['auto', L('Najlepszy dostępny (zalecane)', 'Best available (recommended)')],
+          ['whisper', L('Tylko Whisper', 'Whisper only')],
+        ],
+        'auto',
+      ),
       select(
         'voice.mode',
         L('Włączanie mikrofonu', 'Microphone activation'),

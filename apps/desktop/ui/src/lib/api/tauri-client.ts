@@ -329,6 +329,7 @@ export class TauriAlfaClient implements AlfaClient {
     speaker: (action) => call('voice_speaker', { action }),
     dictation: (action) => call('voice_dictation', { action }),
     read: (action) => call('voice_read', { action }),
+    engines: (action) => call('voice_engines', { action }),
   };
 
   readonly plugins: AlfaClient['plugins'] = {

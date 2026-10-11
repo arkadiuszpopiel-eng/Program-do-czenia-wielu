@@ -377,11 +377,11 @@ impl Tts for TtsService {
 
     async fn warm(&self, persona: &PersonaId) -> Result<(), TtsError> {
         let chain = self.chain(persona)?;
-        chain
+        let first = chain
             .iter()
-            .any(|v| self.backends.contains_key(&v.engine.name()))
-            .then_some(())
-            .ok_or_else(|| TtsError::NotAvailable(format!("brak silnika dla {persona}")))
+            .find_map(|v| self.backends.get(&v.engine.name()))
+            .ok_or_else(|| TtsError::NotAvailable(format!("brak silnika dla {persona}")))?;
+        first.warm().await
     }
 
     fn health(&self) -> TtsHealth {

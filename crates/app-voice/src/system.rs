@@ -31,7 +31,7 @@ use voice_stt_impl::fallback::GuardedStt;
 use voice_stt_impl::qwen::QwenStt;
 use voice_stt_impl::{ProcessLauncher, WhisperStt};
 use voice_tts_contract::Tts;
-use voice_turn_contract::{Patience, TurnCfg, TurnDetector};
+use voice_turn_contract::TurnDetector;
 use voice_turn_impl::{HeuristicTurnModel, PatienceTurnDetector, SmartTurnModel};
 use voice_vad_contract::VadCfg;
 use voice_vad_impl::{HashPolicy, SileroModel, SileroVad};
@@ -76,6 +76,38 @@ pub struct SystemVoice {
     noise: NoiseSetting,
     /// Miernik poziomu mowy dla interfejsu (awatary); bez niego wyjście jest nieopakowane.
     meter: Option<app_modules::speech_meter::SpeechMeter>,
+    /// Ostatnio złożone rozpoznawanie ze strażnikiem (rozmowa albo dyktowanie) — do podglądu
+    /// stanu bezpiecznika i telemetrii w Ustawieniach.
+    pub(crate) guard: std::sync::Mutex<Option<Arc<GuardedStt>>>,
+    /// Czy ostatnio złożony Qwen3-ASR liczy na karcie (`None` — jeszcze nie był składany).
+    pub(crate) stt_on_gpu: std::sync::Mutex<Option<bool>>,
+    /// Ustawienia rozmowy (Smart Turn, próg, najdłuższa cisza, silnik rozpoznawania).
+    pub(crate) talk: crate::talk::TalkSettings,
+}
+
+/// Co minutę sprawdza, czy silnik Qwen3-ASR stoi bez użycia dłużej niż jego limit — wtedy go
+/// zamyka i zwalnia pamięć karty. Zadanie kończy się samo, gdy silnik przestaje istnieć.
+fn idle_unload(qwen: &Arc<QwenStt>) {
+    let Ok(runtime) = tokio::runtime::Handle::try_current() else {
+        return;
+    };
+    // Rozgrzewka: model wczytuje się w tle od startu rozmowy, nie przy pierwszym zdaniu.
+    let warm = qwen.clone();
+    runtime.spawn(async move {
+        if let Err(e) = warm.warm().await {
+            tracing::warn!(error = %e, "Qwen3-ASR: rozgrzewka nieudana (spróbuje przy pierwszej wypowiedzi)");
+        }
+    });
+    let weak = Arc::downgrade(qwen);
+    runtime.spawn(async move {
+        loop {
+            tokio::time::sleep(Duration::from_secs(60)).await;
+            let Some(engine) = weak.upgrade() else {
+                break;
+            };
+            engine.unload_if_idle().await;
+        }
+    });
 }
 
 pub(crate) fn component(component: &str, e: impl std::fmt::Display) -> PipelineError {
@@ -132,6 +164,9 @@ impl SystemVoice {
             clock: Arc::new(MonotonicClock::new()),
             noise: NoiseSetting::default(),
             meter: None,
+            guard: std::sync::Mutex::new(None),
+            stt_on_gpu: std::sync::Mutex::new(None),
+            talk: crate::talk::TalkSettings::default(),
         }
     }
 
@@ -141,6 +176,13 @@ impl SystemVoice {
     #[must_use]
     pub fn with_clock(mut self, clock: Arc<dyn voice_audio_contract::MediaClock>) -> Self {
         self.clock = clock;
+        self
+    }
+
+    /// Ustawienia rozmowy śledzące konfigurację (czytane przy starcie rozmowy i dyktowania).
+    #[must_use]
+    pub fn with_talk(mut self, talk: crate::talk::TalkSettings) -> Self {
+        self.talk = talk;
         self
     }
 
@@ -166,11 +208,11 @@ impl SystemVoice {
         self
     }
 
-    fn whisper_server(&self) -> PathBuf {
+    pub(crate) fn whisper_server(&self) -> PathBuf {
         app_modules::stt::server_cpu(&self.paths)
     }
 
-    fn whisper_model(&self) -> Option<PathBuf> {
+    pub(crate) fn whisper_model(&self) -> Option<PathBuf> {
         app_modules::stt::model(&self.paths)
     }
 
@@ -190,13 +232,15 @@ impl SystemVoice {
     /// Koniec wypowiedzi: model Smart Turn na dźwięku (z czasami strojonymi do rozmowy), gdy są
     /// jego pliki; inaczej model tekstowy z domyślną cierpliwością.
     pub(crate) fn turn(&self) -> Box<dyn TurnDetector> {
-        let Some(sidecar) = app_modules::turn::smart_turn(&self.paths) else {
+        let sidecar = self
+            .talk
+            .smart_turn()
+            .then(|| app_modules::turn::smart_turn(&self.paths))
+            .flatten();
+        let Some(sidecar) = sidecar else {
             return Box::new(PatienceTurnDetector::new(HeuristicTurnModel));
         };
-        let cfg = TurnCfg {
-            patience: Patience::Conversation,
-            ..TurnCfg::default()
-        };
+        let cfg = self.talk.turn_cfg();
         match PatienceTurnDetector::with_cfg(SmartTurnModel::sidecar(sidecar), cfg) {
             Ok(detector) => Box::new(detector),
             Err(e) => {
@@ -210,11 +254,31 @@ impl SystemVoice {
     /// zapasem, gdy model Qwen3-ASR jest pobrany; inaczej sam Whisper.
     pub(crate) fn stt(&self) -> Result<Arc<dyn Stt>, PipelineError> {
         let whisper: Arc<dyn Stt> = Arc::new(self.whisper()?);
-        let Some(config) = app_modules::stt::qwen(&self.paths) else {
+        if self.talk.whisper_only() {
+            return Ok(whisper);
+        }
+        // Pomiar wolnej pamięci karty: gdy zajął ją model rozmowy, Qwen3-ASR liczy na procesorze.
+        let free = app_modules::gpu_mem::nvidia_free_mb();
+        let Some(config) = app_modules::stt::qwen(&self.paths, free) else {
             return Ok(whisper);
         };
+        let on_gpu = config.gpu;
+        tracing::info!(on_gpu, free_vram_mb = ?free, "Qwen3-ASR: wybór karta / procesor");
         match QwenStt::new(config, Arc::new(ProcessLauncher)) {
-            Ok(qwen) => Ok(Arc::new(GuardedStt::new(Arc::new(qwen), whisper))),
+            Ok(qwen) => {
+                let qwen = Arc::new(qwen);
+                idle_unload(&qwen);
+                *self
+                    .stt_on_gpu
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(on_gpu);
+                let guarded = Arc::new(GuardedStt::new(qwen, whisper));
+                *self
+                    .guard
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(guarded.clone());
+                Ok(guarded)
+            }
             Err(e) => {
                 tracing::warn!(error = %e, "Qwen3-ASR niedostępny — rozpoznaje Whisper");
                 Ok(whisper)
@@ -271,6 +335,13 @@ impl VoiceEngineFactory for SystemVoice {
             .tts_ready()
             .ok_or_else(|| component("tts", MISSING_TTS))?;
         let stt = self.stt()?;
+        // Rozgrzewka głosu w tle: proces mowy startuje teraz, a nie przy pierwszej odpowiedzi.
+        if let Ok(runtime) = tokio::runtime::Handle::try_current() {
+            let voice = tts.clone();
+            runtime.spawn(async move {
+                let _ = voice.warm(&personas_contract::PersonaId::alfa()).await;
+            });
+        }
         let output = self
             .audio
             .open_output(None, &StreamConfig::output_default())

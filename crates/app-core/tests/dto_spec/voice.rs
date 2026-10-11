@@ -16,6 +16,7 @@ pub fn spec(command: &str) -> Option<Spec> {
         "voice_speaker" => (vec![("action", roundtrip::<SpeakerAction>)], view),
         "voice_dictation" => (vec![("action", roundtrip::<DictationAction>)], view),
         "voice_read" => (vec![("action", roundtrip::<ReadAction>)], view),
+        "voice_engines" => (vec![("action", roundtrip::<EnginesAction>)], view),
         _ => return None,
     })
 }

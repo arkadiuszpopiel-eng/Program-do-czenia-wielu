@@ -1,12 +1,14 @@
 <!--
   Ustawienia → Głos (F5, ładowane leniwie): słowa wywoławcze (jawne włączenie, pomiar FAR/FRR,
   bramka właściciela), rozpoznawanie głosu (kreator, „wymagaj weryfikacji dla akcji ryzykownych",
-  usunięcie profilu), dyktowanie (profile aplikacji) i czytanie (tempo).
+  usunięcie profilu), dyktowanie (profile aplikacji) i czytanie (tempo); na górze — silniki
+  rozmowy ze stanem strażnika rozpoznawania.
 -->
 <script lang="ts">
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import DictationCard from './DictationCard.svelte';
+  import EnginesCard from './EnginesCard.svelte';
   import ReadCard from './ReadCard.svelte';
   import SpeakerEnroll from './SpeakerEnroll.svelte';
   import WakeCard from './WakeCard.svelte';
@@ -35,6 +37,7 @@
   {#if !loadError}<p class="vf-muted">{t('vf.loading')}</p>{/if}
 {:else}
   <div class="vf-settings">
+    <EnginesCard {features} />
     <WakeCard {features} settings />
     <SpeakerEnroll {features} settings />
     <DictationCard {features} settings />

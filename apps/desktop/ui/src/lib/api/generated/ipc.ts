@@ -545,6 +545,9 @@ export interface BatteryView {
 /** Rodzaj bloku treści. */
 export type BlockKind = 'text' | 'code';
 
+/** Stan bezpiecznika silnika głównego. */
+export type BreakerStateView = 'closed' | 'open' | 'half_open';
+
 /** Karta zgodności trasy mostu. */
 export interface BridgeCard {
   readonly allowed: readonly string[];
@@ -972,6 +975,15 @@ export interface EmbedderView {
   /** Identyfikator w indeksie (`model_id/wymiar` — zmiana = przebudowa wektorów). */
   readonly index_id: string;
 }
+
+/** Akcja na silnikach rozmowy. */
+export type EnginesAction =
+  | {
+      readonly kind: 'refresh';
+    }
+  | {
+      readonly kind: 'reset_breaker';
+    };
 
 /** Ostatnia nagrana fraza rejestracji (bez audio). */
 export interface EnrollSampleView {
@@ -2363,6 +2375,46 @@ export interface SpeakerView {
 /** Powód zakończenia strumienia. */
 export type StopReason = 'end' | 'refusal' | 'tool_use' | 'max_tokens' | 'cancelled';
 
+/** Silnik rozpoznawania mowy. */
+export type SttEngineKind = 'qwen_asr' | 'whisper' | 'none';
+
+/** Rozpoznawanie mowy. */
+export interface SttEngineView {
+  /** Silnik główny. */
+  readonly engine: SttEngineKind;
+  /** Silnik zapasowy (gdy główny ma strażnika). */
+  readonly fallback: SttEngineKind | null;
+  /** Silnik główny liczy na karcie graficznej. */
+  readonly gpu: boolean;
+  /** Stan strażnika (`None` — rozmowa ani dyktowanie jeszcze nie ruszyły albo strażnika nie ma). */
+  readonly guard: SttGuardView | null;
+  /** Pozycje katalogu, których pobranie włączy lepszy silnik (pusto — lepszego nie ma). */
+  readonly missing: readonly string[];
+}
+
+/** Strażnik rozpoznawania: bezpiecznik i skrót telemetrii z ostatnich wypowiedzi. */
+export interface SttGuardView {
+  readonly breaker: BreakerStateView;
+  /** Awarie z rzędu. */
+  readonly failures: number;
+  /** Próg odstawienia silnika. */
+  readonly failures_to_open: number;
+  /** Ile z nich rozpoznał silnik zapasowy. */
+  readonly fallbacks: number;
+  /** Ile wyników miało zastrzeżenie strażnika. */
+  readonly flagged: number;
+  /** Mediana czasu rozpoznania (ms). */
+  readonly median_ms: number | null;
+  /** Ile razy bezpiecznik zadziałał od startu rozmowy. */
+  readonly opened_count: number;
+  /** 95. centyl czasu rozpoznania (ms). */
+  readonly p95_ms: number | null;
+  /** Sekundy do następnej próby (gdy otwarty). */
+  readonly retry_in_s: number | null;
+  /** Liczba wypowiedzi w telemetrii. */
+  readonly samples: number;
+}
+
 /** Stan systemu (PLAN §14.4). */
 export interface SystemStatus {
   readonly disk: DiskInfo;
@@ -2603,6 +2655,14 @@ export interface TriggerRunInfo {
   readonly trigger_id: string;
 }
 
+/** Silnik mowy z łańcucha (kolejność = kolejność prób). */
+export interface TtsEngineView {
+  /** Nazwa silnika (`supertonic`, `pocket`, `piper`). */
+  readonly engine: string;
+  /** Pliki silnika i głosu są na miejscu. */
+  readonly ready: boolean;
+}
+
 /** Tura (węzeł drzewa gałęzi, append-only). */
 export interface Turn {
   readonly addressed_to: string | null;
@@ -2641,6 +2701,16 @@ export interface TurnAttachment {
   readonly kind: AttachmentKind;
   readonly mime: string;
   readonly name: string;
+}
+
+/** Co ocenia koniec wypowiedzi. */
+export type TurnEngineKind = 'smart_turn' | 'text';
+
+/** Koniec wypowiedzi. */
+export interface TurnEngineView {
+  readonly engine: TurnEngineKind;
+  /** Pozycje katalogu, których pobranie włączy Smart Turn (pusto — już działa). */
+  readonly missing: readonly string[];
 }
 
 /** Błąd tury. */
@@ -2747,9 +2817,18 @@ export interface VoiceDraft {
   readonly timbre: string;
 }
 
+/** Silniki rozmowy. */
+export interface VoiceEnginesView {
+  readonly stt: SttEngineView;
+  readonly tts: readonly TtsEngineView[];
+  readonly turn: TurnEngineView;
+}
+
 /** Głos rozszerzony (panel Głos, Ustawienia → Głos). */
 export interface VoiceFeatures {
   readonly dictation: DictationView;
+  /** Silniki rozmowy: rozpoznawanie ze strażnikiem, koniec wypowiedzi, głosy. */
+  readonly engines: VoiceEnginesView;
   readonly read: ReadAloudView;
   readonly s2s: S2sView;
   readonly speaker: SpeakerView;
@@ -3709,6 +3788,10 @@ export interface IpcCommands {
   };
   readonly voice_dictation: {
     readonly args: { readonly action: DictationAction };
+    readonly result: VoiceFeatures;
+  };
+  readonly voice_engines: {
+    readonly args: { readonly action: EnginesAction };
     readonly result: VoiceFeatures;
   };
   readonly voice_features: {

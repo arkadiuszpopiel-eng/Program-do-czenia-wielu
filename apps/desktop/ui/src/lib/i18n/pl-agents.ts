@@ -103,7 +103,7 @@ export const plAgents = {
     'Niebieski pasek to sygnał po redukcji szumów — gdy nic nie mówisz, powinien opadać do zera. Szary pod spodem pokazuje, ile tła (wentylatory, otoczenie) łapie sam mikrofon. Siłę redukcji ustawisz niżej.',
   'voice.voices': 'Głosy agentek',
   'voice.tuningHint':
-    'Zmiany działają od następnego zdania — ustaw i od razu odsłuchaj poniżej. Lepsze głosy niż obecny (Piper „Gosia”) wymagają innego silnika mowy; to osobny etap.',
+    'Zmiany działają od następnego zdania — ustaw i od razu odsłuchaj poniżej. Najnaturalniej brzmi głos Supertonic 3 (do pobrania w „Modele lokalne i silniki”); bez niego agentki mówią głosem zapasowym Piper „Gosia”.',
   'voice.voicesHint': 'Głosy v0 bez kluczy (lokalnie). Odsłuchaj próbkę każdej agentki.',
   'voice.preview': 'Odsłuchaj głos: {name}',
   'voice.bible.alfa': 'ciepły, spokojny, środkowy rejestr',
