@@ -100,7 +100,7 @@ export const plTasks = {
   'duty.costs.name': 'Kontrola kosztów',
   'duty.costs.when': 'w poniedziałki o 9:00',
   'duty.costs.goal':
-    'Na podstawie danych z programu sprawdź koszty modeli: koszt z dziś, koszt z bieżącego miesiąca i jaka to część limitu miesięcznego. Jeśli limit jest wyłączony albo koszty są zerowe, napisz to wprost. Nie podawaj kwot, których nie ma w danych. Odpowiedz w trzech krótkich punktach, bez opisu kolejnych kroków.',
+    'Na podstawie danych z programu sprawdź koszty modeli: koszt z dziś, koszt z bieżącego miesiąca, jaka to część limitu miesięcznego oraz czy ostatnie 7 dni kosztowało więcej niż 7 dni wcześniej. Jeśli limit jest wyłączony albo koszty są zerowe, napisz to wprost. Nie podawaj kwot, których nie ma w danych. Odpowiedz w czterech krótkich punktach, bez opisu kolejnych kroków.',
   'triggers.create': 'Utwórz wyzwalacz',
   'triggers.created': 'Utworzono wyzwalacz „{name}".',
   'triggers.last.never': 'Jeszcze nie był uruchamiany.',

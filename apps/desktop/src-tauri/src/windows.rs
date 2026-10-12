@@ -92,7 +92,12 @@ pub fn ensure_main(app: &AppHandle) -> tauri::Result<WebviewWindow> {
         return Ok(window);
     }
     builder(app, MAIN, "index.html", data_dir(app))
-        .title("Alfa")
+        // Instancja testowa (tylko build `e2e`) ma to w tytule — właściciel widzi, że to nie jego okno.
+        .title(if crate::cdp::test_instance() {
+            "Alfa — instancja testowa (nie zamykaj)"
+        } else {
+            "Alfa"
+        })
         .inner_size(1200.0, 800.0)
         .min_inner_size(400.0, 500.0)
         .center()

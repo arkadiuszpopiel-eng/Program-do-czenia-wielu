@@ -102,7 +102,7 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'duty.costs.name': 'Cost check',
   'duty.costs.when': 'Mondays at 9:00',
   'duty.costs.goal':
-    'Using the program data, check model costs: the cost for today, the cost for the current month and what share of the monthly limit that is. If the limit is off or costs are zero, say so plainly. Do not give amounts that are not in the data. Answer in three short points, without describing your steps.',
+    'Using the program data, check model costs: the cost for today, the cost for the current month, what share of the monthly limit that is, and whether the last 7 days cost more than the 7 days before. If the limit is off or costs are zero, say so plainly. Do not give amounts that are not in the data. Answer in four short points, without describing your steps.',
   'triggers.create': 'Create trigger',
   'triggers.created': 'Trigger “{name}” created.',
   'triggers.last.never': 'Not run yet.',

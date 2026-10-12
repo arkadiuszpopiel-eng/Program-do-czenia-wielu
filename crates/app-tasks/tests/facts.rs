@@ -1,7 +1,9 @@
 //! Arkusz faktów zadania w tle: komu przysługuje, co zawiera i czego nie ujawnia.
 
 use app_api::dto::{CostSummary, TaskInfo, TriggerInfo};
-use app_tasks::{FactInput, FileFact, WorkdirFacts, fact_sheet, visible_tasks, wants_facts};
+use app_tasks::{
+    CostHistory, FactInput, FileFact, WorkdirFacts, fact_sheet, visible_tasks, wants_facts,
+};
 use chrono::{Local, NaiveDate, TimeZone};
 use scheduler_contract::{Assignee, Dispatch, DispatchId, TaskClass, TaskOrigin, TaskSpec};
 use serde_json::json;
@@ -78,6 +80,7 @@ fn input() -> FactInput {
         tasks: Vec::new(),
         triggers: Vec::new(),
         costs: None,
+        history: None,
         workdir: None,
     }
 }
@@ -133,6 +136,11 @@ fn sheet_lists_tasks_triggers_costs_and_files() {
         trigger("Porządki", false),
     ];
     i.costs = Some(costs(123, 4505, true));
+    i.history = Some(CostHistory {
+        yesterday: app_api::dto::Money::pln(250),
+        last_week: app_api::dto::Money::pln(1999),
+        week_before: app_api::dto::Money::pln(0),
+    });
     i.workdir = Some(WorkdirFacts {
         path: "C:/praca".into(),
         entries: vec![
@@ -170,6 +178,10 @@ fn sheet_lists_tasks_triggers_costs_and_files() {
     ));
     assert!(sheet.contains("- „Porządki” — wyłączony"));
     assert!(sheet.contains("dziś 1,23 zł; bieżący miesiąc 45,05 zł; limit miesięczny 50,00 zł"));
+    assert!(sheet.contains(
+        "Koszty z poprzednich dni: wczoraj 2,50 zł; ostatnie 7 dni bez dzisiejszego 19,99 zł; \
+         7 dni wcześniej 0,00 zł."
+    ));
     assert!(sheet.contains(
         "Katalog roboczy C:/praca (5 pozycji na poziomie głównym): docs/, plan.md (2 kB), \
          film.mp4 (3,0 MB) … i 2 kolejnych"

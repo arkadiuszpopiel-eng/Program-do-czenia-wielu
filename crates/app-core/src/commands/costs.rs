@@ -76,6 +76,25 @@ impl AppCore {
         }
     }
 
+    /// Koszty z poprzednich dni dla arkusza faktów zadań w tle: wczoraj, ostatnie 7 pełnych dni
+    /// i 7 dni przed nimi (dni lokalne).
+    pub(crate) fn cost_history(&self) -> app_tasks::CostHistory {
+        let costs = &self.inner.costs;
+        let today = Local::now().date_naive();
+        let span = |from: i64, to: i64| -> Money {
+            let micro: u64 = (from..=to)
+                .filter_map(|back| today.checked_sub_signed(chrono::Duration::days(back)))
+                .map(|day| costs.totals(&TotalsQuery::Day { day }).micro_pln)
+                .sum();
+            Money::from_micro_pln(micro)
+        };
+        app_tasks::CostHistory {
+            yesterday: span(1, 1),
+            last_week: span(1, 7),
+            week_before: span(8, 14),
+        }
+    }
+
     /// `costs_summary`.
     pub async fn costs_summary(&self, session_id: Option<String>) -> Result<CostSummary, AppError> {
         let id = match session_id {

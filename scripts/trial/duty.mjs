@@ -52,6 +52,8 @@ function factsText(tasks, triggers, costs, goal, startedMs) {
   }
   if (costs) {
     lines.push(`${money(costs.day)} ${money(costs.month)} ${money(costs.limit.monthly)}`);
+    // Okresy z arkusza („7 dni”) i zerowa historia kosztów profilu próbnego.
+    lines.push('7 14 0,00');
     const share =
       costs.limit.monthly.minor > 0 ? (costs.month.minor / costs.limit.monthly.minor) * 100 : 0;
     lines.push(`${share.toFixed(0)} ${share.toFixed(1)} ${share.toFixed(2)} 100`);
@@ -103,9 +105,18 @@ for (const [id, goal] of Object.entries(dutyGoals())) {
   const report = task?.summary ?? '';
   const otherTasks = (await invoke('tasks_list')).filter((t) => t.id !== run.task_id);
   const triggers = await invoke('triggers_list');
-  const facts = factsText(otherTasks, triggers, await invoke('costs_summary', { sessionId: null }), goal, started);
+  const facts = factsText(
+    otherTasks,
+    triggers,
+    await invoke('costs_summary', { sessionId: null }),
+    goal,
+    started,
+  );
   const outside = finished
-    ? [...judge(report, [facts], Math.max(otherTasks.length, triggers.length)), ...formProblems(report)]
+    ? [
+        ...judge(report, [facts], Math.max(otherTasks.length, triggers.length)),
+        ...formProblems(report),
+      ]
     : [];
   const state = !finished ? 'CZERWONY' : outside.length > 0 ? 'CZERWONY' : 'zielony';
   const why = !finished

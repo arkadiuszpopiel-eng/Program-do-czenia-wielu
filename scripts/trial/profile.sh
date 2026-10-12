@@ -20,6 +20,12 @@ EXE="$ROOT/target/shell/debug/alfa-desktop.exe"
 case "${1:-}" in
 start)
   [ -f "$EXE" ] || { echo "Brak $EXE — najpierw budowa powłoki z cechą e2e."; exit 2; }
+  # Czysty stan przy każdym starcie: zostają tylko skopiowane modele i silniki. Stare zadania
+  # i wyzwalacze z poprzednich prób ruszałyby w tle i zajmowały kartę graficzną.
+  if [ -d "$PROFILE/Local/Alfa" ]; then
+    find "$PROFILE/Local/Alfa" -mindepth 1 -maxdepth 1 ! -name models ! -name sidecars -exec rm -rf {} +
+  fi
+  rm -rf "$PROFILE/Roaming"
   mkdir -p "$PROFILE/Roaming" "$PROFILE/Local/Alfa/models" "$PROFILE/Local/Alfa/sidecars"
   if [ "${2:-}" = "--model" ]; then
     for f in Bielik-4.5B-v3.0-Instruct.Q8_0.gguf Bielik-4.5B-v3.0-Instruct.Q8_0.gguf.sha256; do
@@ -31,10 +37,10 @@ start)
   fi
   if [ "${2:-}" = "--voice" ]; then
     # Silniki rozmowy: rozpoznawanie (Qwen3-ASR + llama), wykrywanie mowy, koniec wypowiedzi, głos.
-    for d in qwen3-asr silero turn supertonic; do
+    for d in qwen3-asr silero turn supertonic whisper; do
       [ -d "$PROFILE/Local/Alfa/models/$d" ] || cp -r "$OWNER/models/$d" "$PROFILE/Local/Alfa/models/$d"
     done
-    for d in llama-cuda llama-cpu supertonic smart-turn onnxruntime; do
+    for d in llama-cuda llama-cpu supertonic smart-turn onnxruntime whisper whisper-cuda; do
       [ -d "$PROFILE/Local/Alfa/sidecars/$d" ] || cp -r "$OWNER/sidecars/$d" "$PROFILE/Local/Alfa/sidecars/$d"
     done
   fi

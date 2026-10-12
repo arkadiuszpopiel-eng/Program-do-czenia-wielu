@@ -304,7 +304,6 @@ test('nieznane identyfikatory: każde polecenie odmawia z kodem i opisem', async
   const cases: readonly (readonly [string, Record<string, unknown>])[] = [
     ['memory_explain', { entryId: unknown }],
     ['memory_set_pinned', { entryId: unknown, pinned: true }],
-    ['plugins_inspect', { wasmB64: 'AAAA' }],
     ['skills_review', { skillId: unknown, version: '1.0.0' }],
     ['health_undo', { repairId: 999_999 }],
     ['health_approve', { repairId: 999_999 }],
@@ -321,11 +320,12 @@ test('nieznane identyfikatory: każde polecenie odmawia z kodem i opisem', async
     ['sessions_undo_remove', { token: unknown }],
     ['files_list', { sessionId: unknown }],
     ['agents_runs', { sessionId: unknown }],
-    ['settings_set_shortcut', { actionId: unknown, chord: 'Ctrl+Alt+F9' }],
     ['settings_reset', { key: 'nie.ma.takiego.ustawienia' }],
     ['evals_verify', { suiteId: unknown }],
     ['embed_model_activate', { model: unknown }],
   ];
+  // Poza listą celowo: `plugins_inspect` (zwraca opis wad paczki, nie błąd) i
+  // `settings_set_shortcut` (identyfikatory akcji zna tylko okno — rdzeń sprawdza sam zapis skrótu).
   const silent: string[] = [];
   for (const [command, args] of cases) {
     const reply = await raw(main, command, args);

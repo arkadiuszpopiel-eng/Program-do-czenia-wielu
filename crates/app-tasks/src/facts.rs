@@ -51,6 +51,17 @@ pub struct WorkdirFacts {
     pub total: usize,
 }
 
+/// Koszty modeli z poprzednich dni (do porównań tydzień do tygodnia).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CostHistory {
+    /// Wczoraj.
+    pub yesterday: Money,
+    /// Ostatnie 7 pełnych dni (bez dzisiejszego).
+    pub last_week: Money,
+    /// 7 dni przed nimi.
+    pub week_before: Money,
+}
+
 /// Dane wejściowe arkusza (zbiera je rdzeń).
 #[derive(Debug, Clone)]
 pub struct FactInput {
@@ -64,6 +75,8 @@ pub struct FactInput {
     pub triggers: Vec<TriggerInfo>,
     /// Koszty (`None` — licznik niedostępny).
     pub costs: Option<CostSummary>,
+    /// Koszty z poprzednich dni (`None` — bez historii).
+    pub history: Option<CostHistory>,
     /// Katalog roboczy (`None` — sesja bez katalogu).
     pub workdir: Option<WorkdirFacts>,
 }
@@ -250,11 +263,20 @@ pub fn fact_sheet(input: &FactInput) -> String {
                 "limit miesięczny wyłączony".to_owned()
             };
             out.push_str(&format!(
-                "Koszty modeli: dziś {}; bieżący miesiąc {}; {limit}. Kosztów z innych dni \
-                 program tu nie podaje.\n",
+                "Koszty modeli: dziś {}; bieżący miesiąc {}; {limit}.\n",
                 money(c.day),
                 money(c.month),
             ));
+            match &input.history {
+                Some(h) => out.push_str(&format!(
+                    "Koszty z poprzednich dni: wczoraj {}; ostatnie 7 dni bez dzisiejszego {}; \
+                     7 dni wcześniej {}. Innych okresów program tu nie podaje.\n",
+                    money(h.yesterday),
+                    money(h.last_week),
+                    money(h.week_before),
+                )),
+                None => out.push_str("Kosztów z poprzednich dni program tu nie podaje.\n"),
+            }
         }
         None => out.push_str("Koszty modeli: brak danych.\n"),
     }

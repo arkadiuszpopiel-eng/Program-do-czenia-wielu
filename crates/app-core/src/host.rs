@@ -124,6 +124,7 @@ impl TaskHost for CoreHost {
             tasks,
             triggers: core.inner.tasks.triggers_list(),
             costs: Some(core.cost_summary(None).await),
+            history: Some(core.cost_history()),
             workdir,
         }))
     }

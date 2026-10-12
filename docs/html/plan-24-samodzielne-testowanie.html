@@ -409,11 +409,12 @@ poleceń; <code>scripts/trial/profile.sh</code> uruchamia instancję testową do
 <tr><td>Ocena raportów z obowiązków (dane + forma) i skrypt prób</td><td>zrobione: pierwszy bieg wykrył odgrywanie ról we wszystkich czterech raportach (przepuszczone w 0.0.45); po poprawce polecenia 3 z 4 czyste, czwarty odrzucony błędnie przez oceniającego — poprawione</td></tr>
 <tr><td>Testy sprzętowe dotykające pulpitu (schowek, Kosz, skróty, Notatnik, Edge, poświadczenia)</td><td>do zrobienia — gdy właściciel nie pracuje przy komputerze</td></tr>
 <tr><td><code>scripts/verify.mjs</code> z jednym raportem</td><td>zrobione (poziomy szybki / wersja / sprzet)</td></tr>
-<tr><td>Tor akustyczny</td><td class="st st2">do zrobienia</td></tr>
+<tr><td>Tor akustyczny</td><td>zrobione (<code>scripts/trial/voice-loop.mjs</code>): pierwszy bieg — koniec wypowiedzi wykryty po 3 s, ale rozpoznanie przez głośnik i mikrofon laptopa złe (1 z 8 słów); próbka głosu z Ustawień wraca jako wypowiedź użytkownika</td></tr>
 <tr><td>Zrozumiałość głosów</td><td class="st st2">do zrobienia</td></tr>
 <tr><td>Pobranie Qwen3-ASR i <code>llama-server</code> przez program</td><td class="st st2">do zrobienia</td></tr>
 <tr><td><code>cargo deny</code> lokalnie</td><td class="st st2">do zrobienia</td></tr>
-<tr><td>Pokrycie poleceń rdzenia ≥ 60 %</td><td>do zrobienia (scenariusze: konta, zadania, wyzwalacze, pamięć, pliki, sesje)</td></tr></tbody></table></div>
+<tr><td>Pokrycie poleceń rdzenia ≥ 60 %</td><td>w toku: 119 z 228 (52,2 %); zostają konta (wymagają osobnego magazynu poświadczeń dla testów), tury rozmowy z modelem, umiejętności, wtyczki, kopie</td></tr>
+<tr><td>Wady znalezione biegami 0.0.46–0.0.47</td><td>osierocony <code>llama-server</code> po zamknięciu programu (trzyma kartę; naprawa: jedna grupa procesów dla silników pobocznych przez <code>ProcessPort</code>); niestabilny test <code>providers-local-impl::idle_unload_module_events_and_health</code>; głos dostępny dopiero z Whisperem, choć Qwen3-ASR jest zainstalowany (komunikat „brakuje whisper-server”) — do wyjaśnienia, czy to zamierzone</td></tr></tbody></table></div>
 </article>
 <footer>Źródło: <code>docs/plan/24-samodzielne-testowanie.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

@@ -63,9 +63,12 @@ function play(path) {
 }
 
 const textOf = (turn) =>
-  JSON.stringify(turn.blocks ?? [])
+  (turn.blocks ?? [])
+    .map((block) => String(block.html_sanitized ?? block.text ?? ''))
+    .join(' ')
     .replace(/<[^>]+>/g, ' ')
-    .replace(/\\n/g, ' ');
+    .replace(/\s+/g, ' ')
+    .trim();
 
 if (!existsSync(wav)) {
   console.error(`Brak nagrania ${wav}`);
@@ -91,9 +94,16 @@ const userTurns = async (sessionId) =>
 const results = [];
 const session = await invoke('sessions_create', { template: 'empty' });
 await invoke('app_set_active_session', { sessionId: session.id });
-await invoke('voice_set_mic_enabled', { enabled: true });
+let refused = '';
+try {
+  await invoke('voice_set_mic_enabled', { enabled: true });
+} catch (error) {
+  refused = String(error.message ?? error)
+    .split(/\r?\n/)[0]
+    .slice(0, 300);
+}
 let status = await invoke('voice_status');
-for (let i = 0; i < 30 && status.state !== 'active'; i++) {
+for (let i = 0; i < 30 && status.state !== 'active' && !refused; i++) {
   await sleep(1_000);
   status = await invoke('voice_status');
 }
@@ -101,7 +111,7 @@ if (status.state !== 'active') {
   results.push({
     id: 'glosnik-mikrofon',
     state: 'nieuruchomiony',
-    why: `rozmowa głosowa niedostępna: ${status.reason?.pl ?? status.state}; brakuje: ${(status.missing ?? []).join(', ') || '—'}`,
+    why: `rozmowa głosowa niedostępna: ${status.reason?.pl ?? status.state}; brakuje: ${(status.missing ?? []).join(', ') || '—'}${refused ? `; odmowa: ${refused}` : ''}`,
   });
 } else {
   // Silniki rozgrzewają się po włączeniu mikrofonu — pierwsze rozpoznanie bywa wolniejsze.

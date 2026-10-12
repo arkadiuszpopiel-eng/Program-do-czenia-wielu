@@ -113,8 +113,9 @@ programu). Od 0.0.46:
 | Ocena raportów z obowiązków (dane + forma) i skrypt prób | zrobione: pierwszy bieg wykrył odgrywanie ról we wszystkich czterech raportach (przepuszczone w 0.0.45); po poprawce polecenia 3 z 4 czyste, czwarty odrzucony błędnie przez oceniającego — poprawione |
 | Testy sprzętowe dotykające pulpitu (schowek, Kosz, skróty, Notatnik, Edge, poświadczenia) | do zrobienia — gdy właściciel nie pracuje przy komputerze |
 | `scripts/verify.mjs` z jednym raportem | zrobione (poziomy szybki / wersja / sprzet) |
-| Tor akustyczny | do zrobienia |
+| Tor akustyczny | zrobione (`scripts/trial/voice-loop.mjs`): pierwszy bieg — koniec wypowiedzi wykryty po 3 s, ale rozpoznanie przez głośnik i mikrofon laptopa złe (1 z 8 słów); próbka głosu z Ustawień wraca jako wypowiedź użytkownika |
 | Zrozumiałość głosów | do zrobienia |
 | Pobranie Qwen3-ASR i `llama-server` przez program | do zrobienia |
 | `cargo deny` lokalnie | do zrobienia |
-| Pokrycie poleceń rdzenia ≥ 60 % | do zrobienia (scenariusze: konta, zadania, wyzwalacze, pamięć, pliki, sesje) |
+| Pokrycie poleceń rdzenia ≥ 60 % | w toku: 119 z 228 (52,2 %); zostają konta (wymagają osobnego magazynu poświadczeń dla testów), tury rozmowy z modelem, umiejętności, wtyczki, kopie |
+| Wady znalezione biegami 0.0.46–0.0.47 | osierocony `llama-server` po zamknięciu programu (trzyma kartę; naprawa: jedna grupa procesów dla silników pobocznych przez `ProcessPort`); niestabilny test `providers-local-impl::idle_unload_module_events_and_health`; głos dostępny dopiero z Whisperem, choć Qwen3-ASR jest zainstalowany (komunikat „brakuje whisper-server”) — do wyjaśnienia, czy to zamierzone |

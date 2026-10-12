@@ -12,6 +12,49 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.47 — 2026-10-12
+
+Przy wyzwalaczach widać ostatni wynik z raportem agentki, a nad polem pisania — co Alfa właśnie słyszy. Agentka
+dostaje też koszty z poprzednich dni. Sprawdzanie programu objęło połowę poleceń rdzenia i prawdziwy głośnik
+z mikrofonem; te biegi pokazały trzy wady, które są opisane niżej i czekają na naprawę.
+
+### Agentki
+
+- Przy każdym wyzwalaczu (Ustawienia → Zadania w tle i wyzwalacze) jest ostatni wynik: kiedy ruszył, jak się
+  skończyło — słowem i kolorem — oraz przycisk „Pokaż raport” z tym, co napisała agentka. Wynik odświeża się sam,
+  gdy zadanie się kończy.
+- Dane dla zadania w tle zawierają koszty z poprzednich dni: wczoraj, ostatnie 7 dni i 7 dni wcześniej. Wzór
+  „Kontrola kosztów” porównuje teraz tydzień do tygodnia.
+
+### Głos
+
+- Nad polem pisania pojawia się pasek „rozmowa na żywo”, gdy Alfa Cię słyszy, przetwarza wypowiedź albo mówi:
+  stan słowem, mały wskaźnik głośności i tekst rozpoznawany na bieżąco. Gdy Alfa tylko czeka, paska nie ma.
+
+### Znane wady (znalezione testami tej wersji, jeszcze nienaprawione)
+
+- [poważne] Po zakończeniu programu silnik lokalnego modelu (`llama-server`) potrafi zostać jako osobny proces
+  i trzymać ok. 4 GB pamięci karty graficznej do ponownego uruchomienia komputera albo ręcznego zamknięcia.
+  Skutek zmierzony: kolejne wczytanie rozpoznawania mowy trwało 54 s zamiast kilku. Naprawa (wspólna grupa procesów
+  dla wszystkich silników pobocznych) jest pierwszym zadaniem następnej wersji.
+- [poważne] Mowa odtworzona z głośnika laptopa i złapana jego mikrofonem jest rozpoznawana źle (z ośmiu słów zdania
+  kontrolnego zgadza się jedno). Wykrycie początku i końca wypowiedzi działa (koniec po 3 s). Nie wiadomo jeszcze,
+  ile w tym głośności i akustyki laptopa, a ile toru dźwięku programu — do zbadania z nagraniem tego, co słyszy mikrofon.
+- Próbka głosu z Ustawień odtwarzana przy włączonym mikrofonie trafia do rozmowy jako wypowiedź użytkownika.
+
+### Testy
+
+- Pełne sprawdzenie wersji 0.0.46 nowym sposobem: linter bez uwag; 2676 testów zielonych i 1 czerwony (test
+  zwalniania bezczynnego modelu — niestabilny pod obciążeniem, osobno 3 z 3 zielone); przeglądarka 348 z 348;
+  prawdziwa aplikacja 23 z 24 (czerwony był mój nowy scenariusz ze zbyt ostrym założeniem — poprawiony).
+- Pokrycie poleceń rdzenia w prawdziwej aplikacji: 119 z 228 (52,2 %; było 38,2 %). Doszły scenariusze poleceń bez
+  skutków dla danych oraz „nieznany identyfikator = czytelna odmowa z kodem” dla 21 poleceń.
+- Tor akustyczny (`scripts/trial/voice-loop.mjs`, tylko w dzień): komputer odtwarza zdanie syntetycznym głosem
+  i sprawdza, co program rozpoznał z mikrofonu, oraz czy głos agentki nie wraca jako wypowiedź. Wyniki — wyżej.
+- Instancja testowa ma w tytule okna „instancja testowa (nie zamykaj)” i startuje z czystym stanem (stare zadania
+  z poprzednich prób ruszały w tle i zajmowały kartę).
+- Przeglądarka: ostatni wynik wyzwalacza i pasek rozmowy na żywo w trzech stylach i dwóch motywach.
+
 ## 0.0.46 — 2026-10-12
 
 Wersja o sprawdzaniu: program jest teraz testowany dużo szerzej bez udziału właściciela, a pierwsze takie biegi od
