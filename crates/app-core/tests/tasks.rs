@@ -140,6 +140,13 @@ async fn kill_switch_stops_a_running_task_at_once() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn manual_trigger_submits_a_trigger_task() {
     let mut h = harness().await;
+    h.core
+        .settings_set(
+            "agents.verify_before_done".into(),
+            SettingValue::Bool(false),
+        )
+        .await
+        .unwrap();
     let created = h
         .core
         .triggers_create(TriggerDraft {
@@ -164,6 +171,9 @@ async fn manual_trigger_submits_a_trigger_task() {
         .find_map(|e| update(e, &task_id))
         .unwrap();
     assert_eq!(last.origin, TaskOriginKind::Trigger);
+    // Atrapa modelu odpowiada echem polecenia: zadanie z wyzwalacza dostało arkusz faktów.
+    let echoed = format!("{last:?}");
+    assert!(echoed.contains("Dane z programu"), "{echoed}");
     assert_eq!(
         h.core.triggers_log(Some(created.id)).await.unwrap().len(),
         1

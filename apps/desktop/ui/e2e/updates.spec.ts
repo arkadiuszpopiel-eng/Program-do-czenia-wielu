@@ -132,3 +132,54 @@ for (const style of ['classic', 'glass', 'next'] as const) {
     });
   }
 }
+
+for (const style of ['classic', 'glass', 'next'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`historia zmian: dziesięć ostatnich i zakładka „Starsze” — ${style} ${theme}`, async ({
+      page,
+    }) => {
+      await openApp(page, { theme, path: `/?style=${style}&history=long` });
+      await waitForChat(page);
+      await page.keyboard.press('Control+,');
+      await openSection(page, 'Aktualizacje');
+      const history = page.getByRole('region', { name: 'Historia zmian' });
+      const versions = history.getByRole('button', { name: /^Wersja / });
+      const recent = history.getByRole('tab', { name: /^Ostatnie/ });
+      const older = history.getByRole('tab', { name: /^Starsze/ });
+      // Główny widok: dziesięć wersji, najnowsza rozwinięta; reszta czeka w zakładce.
+      await expect(recent).toHaveAttribute('aria-selected', 'true');
+      await expect(recent).toContainText('10');
+      await expect(older).toContainText('7');
+      await expect(versions).toHaveCount(10);
+      await expect(versions.first()).toHaveAttribute('aria-expanded', 'true');
+      await expectAccessible(page, `historia: ostatnie ${style} ${theme}`);
+      // Przycisk pod listą prowadzi do starszych i oddaje fokus zakładce.
+      await history.getByRole('button', { name: 'Starsze wersje (7)' }).click();
+      await expect(older).toHaveAttribute('aria-selected', 'true');
+      await expect(older).toBeFocused();
+      await expect(versions).toHaveCount(7);
+      await expect(history.getByRole('button', { name: /^Wersja 0\.0\.7-p1 / })).toBeVisible();
+      await history.getByRole('button', { name: 'Rozwiń wszystkie', exact: true }).click();
+      await expect(history.getByText('Poprawka numer 1 z okresu prób.')).toBeVisible();
+      await expectAccessible(page, `historia: starsze ${style} ${theme}`);
+      // Filtr działa w obrębie zakładki, a liczniki zakładek idą za filtrem.
+      await history.getByRole('button', { name: /^Poważne/ }).click();
+      await expect(versions).toHaveCount(1);
+      await expect(recent).toContainText('3');
+      await history.getByRole('button', { name: /^Krytyczne/ }).click();
+      await expect(
+        history.getByText('W tym zakresie żadna wersja nie ma zmian o tej wadze.'),
+      ).toBeVisible();
+      await history.getByRole('button', { name: /^Wszystkie/ }).click();
+      // Strzałki przełączają zakładki; powrót także przyciskiem pod listą.
+      await older.focus();
+      await page.keyboard.press('ArrowLeft');
+      await expect(recent).toHaveAttribute('aria-selected', 'true');
+      await expect(recent).toBeFocused();
+      await expect(versions).toHaveCount(10);
+      await page.keyboard.press('ArrowRight');
+      await history.getByRole('button', { name: 'Wróć do ostatnich wersji' }).click();
+      await expect(recent).toHaveAttribute('aria-selected', 'true');
+    });
+  }
+}

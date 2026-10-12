@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { FAKE_HISTORY } from '../../api/fake/api-updates';
 import type { ChangeItem, ChangeLogEntry } from '../../api/types-updates';
-import { SEVERITIES, countBySeverity, filterHistory, groupBySection } from '../change-history';
+import {
+  RECENT_VERSIONS,
+  SEVERITIES,
+  countBySeverity,
+  filterHistory,
+  groupBySection,
+  splitHistory,
+} from '../change-history';
+import { longHistory } from '../../api/fake/api-updates';
 
 const item = (section: string, severity: ChangeItem['severity'], text: string): ChangeItem => ({
   section,
@@ -55,5 +63,20 @@ describe('historia zmian', () => {
     expect(counts.normal).toBeGreaterThan(0);
     expect(FAKE_HISTORY.some((e) => e.items.length === 0)).toBe(true);
     expect(FAKE_HISTORY.some((e) => e.date === null)).toBe(true);
+  });
+
+  it('dzieli historię na dziesięć ostatnich wersji i starsze', () => {
+    expect(RECENT_VERSIONS).toBe(10);
+    expect(splitHistory(HISTORY)).toEqual({ recent: HISTORY, older: [] });
+    const long = longHistory(14);
+    expect(long).toHaveLength(FAKE_HISTORY.length + 14);
+    const { recent, older } = splitHistory(long);
+    expect(recent).toHaveLength(10);
+    expect(older).toHaveLength(long.length - 10);
+    expect(recent[0]).toBe(long[0]);
+    expect(older[0]).toBe(long[10]);
+    expect(new Set(long.map((e) => e.version)).size).toBe(long.length);
+    expect(splitHistory(HISTORY, 1).older.map((e) => e.version)).toEqual(['1.9.0', '1.8.0']);
+    expect(splitHistory(HISTORY, -3).recent).toEqual([]);
   });
 });

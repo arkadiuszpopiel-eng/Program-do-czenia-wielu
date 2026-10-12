@@ -51,3 +51,22 @@ export function groupBySection(items: readonly ChangeItem[]): readonly SectionGr
   }
   return groups;
 }
+
+/** Ile najnowszych wersji pokazuje główny widok historii; starsze są w osobnej zakładce. */
+export const RECENT_VERSIONS = 10;
+
+export type HistoryTab = 'recent' | 'older';
+
+export interface HistorySplit {
+  readonly recent: readonly ChangeLogEntry[];
+  readonly older: readonly ChangeLogEntry[];
+}
+
+/** Podział historii (od najnowszej) na ostatnie wersje i starsze. */
+export function splitHistory(
+  entries: readonly ChangeLogEntry[],
+  limit: number = RECENT_VERSIONS,
+): HistorySplit {
+  const cut = Math.max(0, Math.floor(limit));
+  return { recent: entries.slice(0, cut), older: entries.slice(cut) };
+}

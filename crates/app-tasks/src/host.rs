@@ -34,6 +34,11 @@ pub trait TaskHost: Send + Sync {
     async fn sync_taint(&self, _session: &SessionId) -> Result<(), String> {
         Ok(())
     }
+    /// Arkusz faktów dla zadania w tle (`crate::facts`): stan zadań, wyzwalaczy, kosztów
+    /// i katalogu roboczego doklejany do polecenia. Domyślnie brak (host bez danych).
+    async fn facts(&self, _session: &SessionId, _own_task: &str) -> Option<String> {
+        None
+    }
 }
 
 /// Narzędzia agentek (z Brokerem i dziennikiem cofania).

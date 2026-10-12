@@ -3,15 +3,19 @@
   w program, od najnowszej. Każda pozycja ma wagę — krytyczna (czerwona), poważna (pomarańczowa),
   zwykła (zielona) — pokazaną kolorem i słowem (kolor nie jest jedynym nośnikiem informacji).
   Filtr zostawia pozycje wybranej wagi; wersje bez takich pozycji znikają z listy.
+  Główny widok pokazuje dziesięć ostatnich wersji; starsze są w zakładce „Starsze” — dojście
+  z zakładki u góry i z przycisku pod listą.
 -->
 <script lang="ts">
-  import type { ChangeLogEntry, ChangeSeverity } from '../../../api/types-updates';
+  import type { ChangeLogEntry } from '../../../api/types-updates';
+  import ChangeHistoryVersion from './ChangeHistoryVersion.svelte';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import {
     SEVERITIES,
     countBySeverity,
     filterHistory,
-    groupBySection,
+    splitHistory,
+    type HistoryTab,
     type SeverityFilter,
   } from '../../../logic/change-history';
   import { load } from '../../../state/attempt';
@@ -23,6 +27,8 @@
   let entries = $state<readonly ChangeLogEntry[] | null>(null);
   let loadError = $state<string | null>(null);
   let filter = $state<SeverityFilter>('all');
+  let tab = $state<HistoryTab>('recent');
+  let tabsEl = $state<HTMLElement | null>(null);
   /** Rozwinięte wersje; na starcie najnowsza. */
   let open = $state<Record<string, boolean>>({});
 
@@ -41,7 +47,13 @@
   });
 
   const totals = $derived(countBySeverity(entries ?? []));
-  const shown = $derived(filterHistory(entries ?? [], filter));
+  const split = $derived(splitHistory(entries ?? []));
+  const hasOlder = $derived(split.older.length > 0);
+  const lists = $derived({
+    recent: filterHistory(split.recent, filter),
+    older: filterHistory(split.older, filter),
+  });
+  const shown = $derived(lists[hasOlder ? tab : 'recent']);
   const allOpen = $derived(shown.length > 0 && shown.every((e) => open[e.version]));
 
   function toggle(version: string) {
@@ -52,7 +64,18 @@
     open = allOpen ? {} : Object.fromEntries(shown.map((e) => [e.version, true]));
   }
 
-  const label = (severity: ChangeSeverity) => tk(`history.severity.${severity}`);
+  /** Zmiana zakładki; `focus` przenosi fokus na nową zakładkę (klawiatura, przycisk pod listą). */
+  function selectTab(next: HistoryTab, focus = false) {
+    tab = next;
+    if (focus)
+      queueMicrotask(() => tabsEl?.querySelector<HTMLElement>(`[data-tab='${next}']`)?.focus());
+  }
+
+  function onTabKey(event: KeyboardEvent) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    selectTab(tab === 'recent' ? 'older' : 'recent', true);
+  }
 </script>
 
 <section class="wk-card history" aria-labelledby="history-title">
@@ -93,64 +116,60 @@
       {/each}
     </div>
 
-    {#if shown.length === 0}
-      <p class="empty">{t('history.empty')}</p>
-    {/if}
-
-    <ul class="versions">
-      {#each shown as entry (entry.version)}
-        {@const counts = countBySeverity([entry])}
-        {@const expanded = Boolean(open[entry.version])}
-        <li class="version" class:expanded>
+    {#if hasOlder}
+      <div class="tabs" role="tablist" aria-label={t('history.tabs')} bind:this={tabsEl}>
+        {#each ['recent', 'older'] as const as key (key)}
           <button
             type="button"
-            class="row"
-            aria-expanded={expanded}
-            aria-controls="history-{entry.version}"
-            onclick={() => toggle(entry.version)}
+            role="tab"
+            class="tab"
+            id="history-tab-{key}"
+            data-tab={key}
+            aria-selected={tab === key}
+            aria-controls="history-panel"
+            tabindex={tab === key ? 0 : -1}
+            onclick={() => selectTab(key)}
+            onkeydown={onTabKey}
           >
-            <span class="chevron" aria-hidden="true"></span>
-            <span class="name">{t('history.version', { version: entry.version })}</span>
-            {#if entry.date}<span class="date">{entry.date}</span>{/if}
-            <span class="badges">
-              {#each SEVERITIES as severity (severity)}
-                {#if counts[severity] > 0}
-                  <span
-                    class="badge {severity}"
-                    title={t('history.badge', { n: counts[severity], kind: label(severity) })}
-                  >
-                    <span class="dot {severity}" aria-hidden="true"></span>
-                    <span aria-hidden="true">{counts[severity]}</span>
-                    <span class="sr"
-                      >{t('history.badge', { n: counts[severity], kind: label(severity) })}</span
-                    >
-                  </span>
-                {/if}
-              {/each}
-            </span>
+            {tk(`history.tab.${key}`)} <span class="count">{lists[key].length}</span>
           </button>
-          {#if expanded}
-            <div class="body" id="history-{entry.version}">
-              {#if entry.summary}<p class="summary">{entry.summary}</p>{/if}
-              {#each groupBySection(entry.items) as group (group.section)}
-                <h4>{group.section}</h4>
-                <ul class="items">
-                  {#each group.items as item, index (index)}
-                    <li class="item {item.severity}">
-                      <span class="mark {item.severity}">
-                        <span class="dot {item.severity}" aria-hidden="true"></span>
-                        {label(item.severity)}
-                      </span>
-                      <span class="text">{item.text}</span>
-                    </li>
-                  {/each}
-                </ul>
-              {/each}
-            </div>
-          {/if}
-        </li>
-      {/each}
-    </ul>
+        {/each}
+      </div>
+    {/if}
+
+    {#if shown.length === 0}
+      <p class="empty">{hasOlder ? t('history.emptyTab') : t('history.empty')}</p>
+    {/if}
+
+    <div
+      id="history-panel"
+      role={hasOlder ? 'tabpanel' : undefined}
+      aria-labelledby={hasOlder ? `history-tab-${tab}` : undefined}
+    >
+      <ul class="versions">
+        {#each shown as entry (entry.version)}
+          <ChangeHistoryVersion
+            {entry}
+            expanded={Boolean(open[entry.version])}
+            ontoggle={() => toggle(entry.version)}
+          />
+        {/each}
+      </ul>
+    </div>
+
+    {#if hasOlder}
+      <div class="more">
+        {#if tab === 'recent'}
+          <button type="button" class="link" onclick={() => selectTab('older', true)}>
+            {t('history.showOlder', { n: split.older.length })}
+          </button>
+        {:else}
+          <button type="button" class="link" onclick={() => selectTab('recent', true)}>
+            {t('history.showRecent')}
+          </button>
+        {/if}
+      </div>
+    {/if}
   {/if}
 </section>
 
@@ -218,6 +237,43 @@
     color: var(--alfa-color-text-muted);
     font-variant-numeric: tabular-nums;
   }
+  .tabs {
+    display: flex;
+    gap: var(--alfa-space-1);
+    margin-bottom: var(--alfa-space-2);
+    border-bottom: 1px solid var(--alfa-color-border);
+  }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--alfa-space-2);
+    min-height: 32px;
+    margin-bottom: -1px;
+    padding: 0 var(--alfa-space-3);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--alfa-radius-control) var(--alfa-radius-control) 0 0;
+    background: transparent;
+    color: var(--alfa-color-text-muted);
+    font: inherit;
+    font-size: var(--alfa-font-size-sm);
+    cursor: pointer;
+  }
+  .tab:hover {
+    background: var(--alfa-color-surface2);
+    color: var(--alfa-color-text);
+  }
+  .tab[aria-selected='true'] {
+    border-bottom-color: var(--alfa-color-focus);
+    color: var(--alfa-color-text);
+    font-weight: var(--alfa-weight-semibold);
+  }
+  .more {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--alfa-space-3);
+    border-top: 1px solid var(--alfa-color-border);
+  }
   .dot {
     flex: none;
     width: 8px;
@@ -235,118 +291,12 @@
   .dot.normal {
     background: var(--sev-normal);
   }
-  .versions,
-  .items {
+  .versions {
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .version {
-    border-top: 1px solid var(--alfa-color-border);
-  }
-  .row {
-    display: flex;
-    align-items: center;
-    gap: var(--alfa-space-3);
-    width: 100%;
-    min-height: 40px;
-    padding: var(--alfa-space-2) var(--alfa-space-1);
-    border: 0;
-    border-radius: var(--alfa-radius-control);
-    background: transparent;
-    color: var(--alfa-color-text);
-    font: inherit;
-    text-align: start;
-    cursor: pointer;
-  }
-  .row:hover {
-    background: var(--alfa-color-surface2);
-  }
-  .chevron {
-    flex: none;
-    width: 7px;
-    height: 7px;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: rotate(-45deg);
-    transition: transform 120ms ease;
-  }
-  .expanded .chevron {
-    transform: rotate(45deg);
-  }
-  :global([data-motion='off']) .chevron {
-    transition: none;
-  }
-  .name {
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .date {
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-sm);
-    font-variant-numeric: tabular-nums;
-  }
-  .badges {
-    display: inline-flex;
-    gap: var(--alfa-space-2);
-    margin-inline-start: auto;
-  }
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: var(--alfa-font-size-sm);
-    font-variant-numeric: tabular-nums;
-  }
-  .sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-  .body {
-    padding: 0 var(--alfa-space-1) var(--alfa-space-3) calc(var(--alfa-space-3) + 11px);
-  }
-  .summary {
-    margin: 0 0 var(--alfa-space-2);
-  }
-  h4 {
-    margin: var(--alfa-space-3) 0 var(--alfa-space-1);
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-xs);
-    font-weight: var(--alfa-weight-semibold);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .item {
-    display: grid;
-    grid-template-columns: 104px 1fr;
-    gap: var(--alfa-space-3);
-    align-items: baseline;
-    padding: var(--alfa-space-1) 0;
-    font-size: var(--alfa-font-size-sm);
-  }
-  .mark {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--alfa-font-size-xs);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .mark.critical {
-    color: var(--sev-critical);
-  }
-  .mark.serious {
-    color: var(--sev-serious);
-  }
-  .mark.normal {
-    color: var(--sev-normal);
-  }
-  @media (max-width: 560px) {
-    .item {
-      grid-template-columns: 1fr;
-      gap: 2px;
-    }
+  .tabs + div > .versions > :global(.version:first-child) {
+    border-top: 0;
   }
 </style>

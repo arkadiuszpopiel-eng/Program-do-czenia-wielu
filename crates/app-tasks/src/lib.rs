@@ -19,6 +19,7 @@ mod delegate;
 mod exec_agent;
 mod exec_bridge;
 mod executor;
+mod facts;
 mod host;
 mod late;
 pub mod map;
@@ -46,6 +47,9 @@ pub use delegate::{Delegated, is_unverified};
 pub use exec_agent::{TaskRuntimes, goal_of, origin_of};
 pub use exec_bridge::UNVERIFIED_NOTE;
 pub use executor::AppExecutor;
+pub use facts::{
+    FactInput, FileFact, MAX_FILES, WorkdirFacts, fact_sheet, visible_tasks, wants_facts,
+};
 pub use host::{AgentKit, ExecDeps, TaskHost};
 pub use late::{BIND_WAIT, LateExecutor};
 pub use marshal_impl::MarshalModule;

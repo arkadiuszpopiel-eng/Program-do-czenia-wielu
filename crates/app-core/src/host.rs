@@ -5,7 +5,7 @@
 use std::sync::{Arc, Weak};
 
 use app_agents::{AgentSettings, Projection};
-use app_tasks::TaskHost;
+use app_tasks::{FactInput, FileFact, TaskHost, WorkdirFacts};
 use async_trait::async_trait;
 use core_config_contract::{ConfigKey, ConfigLayer, ConfigStore, Origin, Scope};
 use cost_meter_contract::CostMeter;
@@ -105,9 +105,56 @@ impl TaskHost for CoreHost {
         }
     }
 
+    async fn facts(&self, session: &SessionId, own_task: &str) -> Option<String> {
+        let core = self.core()?;
+        let own_private = self.privacy(session) == PrivacyTag::Private;
+        let tasks = app_tasks::visible_tasks(core.inner.tasks.tasks(), own_private, |s| {
+            ids::session(s).map_or(true, |id| self.privacy(&id) == PrivacyTag::Private)
+        });
+        let workdir = match self.workdir(session) {
+            Some(path) => tokio::task::spawn_blocking(move || list_workdir(path))
+                .await
+                .ok()
+                .flatten(),
+            None => None,
+        };
+        Some(app_tasks::fact_sheet(&FactInput {
+            now: chrono::Local::now().naive_local(),
+            own_task: own_task.to_owned(),
+            tasks,
+            triggers: core.inner.tasks.triggers_list(),
+            costs: Some(core.cost_summary(None).await),
+            workdir,
+        }))
+    }
+
     fn project(&self, session: &SessionId, run: &AgentRun, projection: Projection) {
         if let Some(core) = self.core() {
             core.chat().project_task(session, run, projection);
         }
     }
+}
+
+/// Poziom główny katalogu roboczego do arkusza faktów (nazwy i rozmiary; katalogi najpierw).
+fn list_workdir(path: String) -> Option<WorkdirFacts> {
+    let mut all: Vec<FileFact> = std::fs::read_dir(&path)
+        .ok()?
+        .filter_map(Result::ok)
+        .map(|entry| {
+            let meta = entry.metadata().ok();
+            FileFact {
+                name: entry.file_name().to_string_lossy().into_owned(),
+                dir: meta.as_ref().is_some_and(std::fs::Metadata::is_dir),
+                bytes: meta.map_or(0, |m| m.len()),
+            }
+        })
+        .collect();
+    all.sort_by(|a, b| b.dir.cmp(&a.dir).then_with(|| a.name.cmp(&b.name)));
+    let total = all.len();
+    all.truncate(app_tasks::MAX_FILES);
+    Some(WorkdirFacts {
+        path,
+        entries: all,
+        total,
+    })
 }

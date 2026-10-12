@@ -73,6 +73,32 @@ export const FAKE_HISTORY: readonly ChangeLogEntry[] = [
   { version: '0.0.8', date: null, summary: 'Pierwszy stan uruchamialny.', items: [] },
 ];
 
+/** Długa historia do podglądu zakładki „Starsze” (`?history=long`): atrapa + `extra` starszych wersji. */
+export function longHistory(extra: number): readonly ChangeLogEntry[] {
+  const older = Array.from({ length: extra }, (_, index): ChangeLogEntry => {
+    const n = extra - index;
+    return {
+      version: `0.0.7-p${n}`,
+      date: null,
+      summary: `Wersja próbna ${n}.`,
+      items: [
+        {
+          section: 'Porządki',
+          severity: n % 5 === 0 ? 'serious' : 'normal',
+          text: `Poprawka numer ${n} z okresu prób.`,
+        },
+      ],
+    };
+  });
+  return [...FAKE_HISTORY, ...older];
+}
+
+function historyFromUrl(): readonly ChangeLogEntry[] {
+  if (typeof location === 'undefined') return FAKE_HISTORY;
+  const long = new URLSearchParams(location.search).get('history') === 'long';
+  return long ? longHistory(14) : FAKE_HISTORY;
+}
+
 const NOTES = `Co nowego w ${FAKE_NEXT}:
 - Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.
 - Strona „O programie" z licencjami zależności.
@@ -239,7 +265,7 @@ export class FakeUpdates {
         this.news = null;
         return core.reply(undefined);
       },
-      history: () => core.reply(FAKE_HISTORY),
+      history: () => core.reply(historyFromUrl()),
     };
   }
 }
