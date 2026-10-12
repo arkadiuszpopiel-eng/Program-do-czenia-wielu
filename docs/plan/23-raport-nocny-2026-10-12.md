@@ -98,6 +98,7 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 | Linter Rust, formatowanie, kontrola zależności, kontrola stylów | bez uwag |
 | Polecenia łącza | 229 |
 | Aplikacja na Twoim profilu | uruchomiona o 4:35; wersja 0.0.44; „Sprawdź silniki”: rozpoznawanie działa (3,5 s, Qwen3-ASR na karcie), koniec wypowiedzi działa (0,2 s), głos działa (1,6 s); na ekranie czeka okno „Co nowego” |
+| Próby na wersji końcowej (4:45–4:52) | rozmowa „na sucho”: obie wypowiedzi bez błędu, tekst po 0,17 s (pierwsza 1,3 s), Smart Turn 3 oceny bez błędu; prawdziwy mikrofon po cichu: potok słucha, nic nie trafiło do czatu; linter Rust dla całego projektu bez uwag |
 | Commity | wszystkie lokalne (wypchnięcie wymaga `gh auth login`) |
 
 ## 8. Co zostaje w grupach, które ruszyłem
