@@ -52,7 +52,7 @@ Stan na **2026-10-11**. Ciąg dalszy [`20`](20-macierz-delty-czesc-1.md); te sam
 | --- | --- | --- | --- | --- |
 | I1 | Sklep modeli: 4 zakładki, wiersz z parametrami, rozmiarem, oceną dopasowania, pobraniami | stały katalog pakietów | przenosimy | P2 |
 | I2 | Filtr rozmiaru (≤3B, 4–9B, 10–15B, 16–35B, >35B), kategorie (9), sortowania | brak | przenosimy | P2 |
-| I3 | Ocena: mieści się (plik + 1,5 GB ≤ pamięć karty) / część na procesorze (≤ 1,4 ×) / za duży | ocena pakietów | przenosimy | P2 |
+| I3 | Ocena: mieści się (plik + 1,5 GB ≤ pamięć karty) / część na procesorze (≤ 1,4 ×) / za duży | ocena pakietów; od 0.0.39 ocena przy każdym modelu rozmowy | przenosimy — **zrobione 0.0.39** (mieści się / częściowo / procesor; bez progu „za duży”) | P2 |
 | I4 | HuggingFace: 60 na stronę, „Załaduj więcej”, lista plików repozytorium, kolejka pobierania | brak | przenosimy (pobrania z sumą kontrolną) | P2 |
 | I5 | Modele w częściach: komplet w kolejce, znak „Niepełny”, blokada wczytania | brak | przenosimy | P2 |
 | I6 | Ostrzeżenia o nieobsługiwanej kwantyzacji | brak | przenosimy | P2 |
@@ -142,6 +142,12 @@ Stan na **2026-10-11**. Ciąg dalszy [`20`](20-macierz-delty-czesc-1.md); te sam
 | N7 | Wiadomości: karty w rozmowie, licznik nowych, usuwanie powtórek | P5 |
 | N8 | Obrazy: domalowywanie, powiększanie; ulubione w galerii | P8 |
 | N9 | Węzły przepływu: plik, zdarzenie z sieci, przekształcenie, API, poczta | P11, P14 |
+
+## Postęp po wersji 0.0.43 (2026-10-12)
+
+Pozycje macierzy ruszone w nocy 11/12 października: A23 i I3 — zrobione; A34, A35, B11 — częściowo. Rozmowa
+i mowa (grupa P1) nie ma wierszy w macierzy — jej stan jest w [`19`](19-specyfikacja-glosu-delty.md)
+i w [`17`](17-przeniesienie-z-delty.md). Raport: [`23`](23-raport-nocny-2026-10-12.md).
 
 ## Podsumowanie liczbowe
 

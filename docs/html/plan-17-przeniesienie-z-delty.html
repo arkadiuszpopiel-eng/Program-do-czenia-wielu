@@ -356,6 +356,19 @@ silniki, strojenie ze sprzętu, zabezpieczenia i pełny ekran sterowania. Przeno
 <tr><td>Telemetria i diagnostyka</td><td>200 ostatnich próbek, p50 / p95 na silnik; 5 testów mikrofonu i silnika</td><td>panel w oknie</td></tr>
 <tr><td>Ekran „Rozmowa na żywo”</td><td>7 bloków, ok. 30 kontrolek, test głosu i mikrofonu, „Posłuchaj”</td><td>strona „Głos” i panel boczny</td></tr>
 <tr><td>Kula stanu</td><td>w belce, jako nakładka, w osobnym oknie</td><td>rozszerzenie pigułki głosowej</td></tr></tbody></table></div>
+<p>Stan po wersji 0.0.43 (2026-10-12):</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Stan</th><th>Wersja</th></tr></thead><tbody><tr><td>Synteza Supertonic 3</td><td>zrobione; rozgrzewka przy włączeniu mikrofonu</td><td>0.0.30, 0.0.35</td></tr>
+<tr><td>17 gotowych głosów</td><td>częściowo: 10 barw Supertonic do wyboru dla każdej agentki; głosy Pipera z parametrami i Edge zostają</td><td>0.0.31</td></tr>
+<tr><td>Rozpoznawanie Qwen3-ASR</td><td>zrobione, z wyborem karta / Whisper na karcie / procesor według wolnej pamięci karty</td><td>0.0.33, 0.0.38</td></tr>
+<tr><td>Zabezpieczenia rozpoznawania</td><td>zrobione (strażnik, flagi, lista zmyśleń, zapas)</td><td>0.0.33</td></tr>
+<tr><td>Bezpiecznik silnika</td><td>zrobione, ze stanem i przyciskiem „Zamknij bezpiecznik”</td><td>0.0.33, 0.0.35</td></tr>
+<tr><td>Koniec wypowiedzi</td><td>zrobione (Smart Turn w osobnym procesie, 250 / 350 / 2000 ms, ustawienia progu i ciszy)</td><td>0.0.34, 0.0.35</td></tr>
+<tr><td>Słowo wywoławcze w tekście</td><td>Alfa ma własne rozpoznawanie zwrotu po imieniu (dokładniejsze); dopisana pisownia „Alpha”, „Gamma”, „Betta”</td><td>0.0.35</td></tr>
+<tr><td>Telemetria i diagnostyka</td><td>zrobione: liczniki strażnika i Smart Turn, „Sprawdź silniki”; pięć testów mikrofonu zostaje</td><td>0.0.35–0.0.41</td></tr>
+<tr><td>Ekran „Rozmowa na żywo”</td><td>częściowo: karta „Silniki rozmowy” w Ustawieniach i w panelu, pięć ustawień rozmowy, język rozpoznawania; kula stanu i miernik w nagłówku zostają</td><td>0.0.35–0.0.43</td></tr>
+<tr><td>Kula stanu</td><td class="st st2">do zrobienia</td><td>—</td></tr></tbody></table></div>
+<p>Wyjście z P1 (8 scenariuszy na żywo) czeka na właściciela; rozmowa „na sucho” na prawdziwych silnikach przeszła
+(pomiary w <a href="plan-19-specyfikacja-glosu-delty.html"><code>19</code></a>).</p>
 <p>Czego z Delty nie bierzemy: martwych kontrolek („Auto-wyślij”, „Głos” i „Prędkość” przy silnikach offline),
 braku przerwania modelu przy zatrzymaniu rozmowy, braku rozwijania liczb (Alfa to ma).</p>
 <p>Pomiar z 2026-10-11 (<a href="plan-15-glos-lokalny.html"><code>15</code></a> §5a) to potwierdza: Supertonic potrzebuje 1–2 s na zdanie, a jest
@@ -383,6 +396,8 @@ Sprzęt / Łącze; przełącznik „Korzystanie z modeli” (tylko offline / off
 <li><strong>Nowe (R10, R11)</strong>: „Alfa Link” — modele z mocniejszego własnego komputera używane jak lokalne (kanał z etapu D);
 parametr przyspieszenia dla modeli z przewidywaniem kilku słów naraz.</li>
 </ul>
+<p>Stan po wersji 0.0.43: zrobione — monitor kart NVIDIA na żywo (0.0.36), ocena „mieści się na karcie” (0.0.39),
+nowe silniki głosu w pakietach (0.0.35, 0.0.38); reszta listy do zrobienia.</p>
 <h2 id="p3-nawigacja-i-powloka">P3 — nawigacja i powłoka</h2>
 <ul>
 <li><strong>Menu kołowe</strong>: F1 „Rdzeń poleceń” (8 pól), F2 „Macierz narzędzi” (8 grup z podmenu), środkowy przycisk
@@ -397,6 +412,8 @@ przenoszenie między monitorami, zawsze na wierzchu.</li>
 </ul>
 <p>Dostosowanie: obecna nawigacja Alfy i jej skróty zostają; menu kołowe, doki i pulpit dochodzą jako dodatkowe
 sposoby poruszania się. Reguła o skrótach z AltGr obowiązuje.</p>
+<p>Stan po wersji 0.0.43: zrobione — Wstecz / Dalej (0.0.37) i wyszukiwanie w tabeli skrótów (0.0.42); reszta listy
+do zrobienia.</p>
 <h2 id="p4-rozmowa-brakujace-funkcje">P4 — rozmowa: brakujące funkcje</h2>
 <p>Karty rozmów z profilem (zakres pamięci: Sesja / Osoba / Projekt) · panel boczny: Tablica (40 przypiętych
 odpowiedzi), pytania „z boku”, Źródła · Tryb skupienia · Arena (dwa modele, głosowanie, tryb ślepy, historia) ·
@@ -477,6 +494,8 @@ sprawdzanie poczty.</p>
 <tr><td>Raport</td><td>po każdym przebiegu krótki wpis w osi czasu i w raporcie dnia: co zrobiono, co czeka na decyzję; możliwość odczytania głosem</td><td>raport dnia, oś czasu</td></tr>
 <tr><td>Rutyny (R2) i poranny przegląd (R8)</td><td>obowiązek to zapisane polecenie + zakres + łączniki, uruchamiane z harmonogramu, zdarzeniem albo ręcznie; rano raport: poczta, kalendarz, zadania, koszty</td><td>wyzwalacze, raport dnia</td></tr>
 <tr><td>Bezpieczniki (R13)</td><td>treść wiadomości to dane, nie polecenia; wysyłka po zatwierdzeniu; nowy adresat zawsze z pytaniem; obowiązek nie ma dostępu do płatności ani kluczy i nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków</td><td>Broker, tagi prywatności</td></tr></tbody></table></div>
+<p>Stan po wersji 0.0.43: zrobione — cztery gotowe wzory obowiązków wypełniające formularz wyzwalacza (0.0.40);
+ekran „Obowiązki”, poczta, kalendarz, budżet i raport do zrobienia.</p>
 <p>Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.</p>
 <h2 id="nie-przenosimy">Nie przenosimy</h2>
 <ul>

@@ -47,6 +47,24 @@ silniki, strojenie ze sprzętu, zabezpieczenia i pełny ekran sterowania. Przeno
 | Ekran „Rozmowa na żywo” | 7 bloków, ok. 30 kontrolek, test głosu i mikrofonu, „Posłuchaj” | strona „Głos” i panel boczny |
 | Kula stanu | w belce, jako nakładka, w osobnym oknie | rozszerzenie pigułki głosowej |
 
+Stan po wersji 0.0.43 (2026-10-12):
+
+| Element | Stan | Wersja |
+| --- | --- | --- |
+| Synteza Supertonic 3 | zrobione; rozgrzewka przy włączeniu mikrofonu | 0.0.30, 0.0.35 |
+| 17 gotowych głosów | częściowo: 10 barw Supertonic do wyboru dla każdej agentki; głosy Pipera z parametrami i Edge zostają | 0.0.31 |
+| Rozpoznawanie Qwen3-ASR | zrobione, z wyborem karta / Whisper na karcie / procesor według wolnej pamięci karty | 0.0.33, 0.0.38 |
+| Zabezpieczenia rozpoznawania | zrobione (strażnik, flagi, lista zmyśleń, zapas) | 0.0.33 |
+| Bezpiecznik silnika | zrobione, ze stanem i przyciskiem „Zamknij bezpiecznik” | 0.0.33, 0.0.35 |
+| Koniec wypowiedzi | zrobione (Smart Turn w osobnym procesie, 250 / 350 / 2000 ms, ustawienia progu i ciszy) | 0.0.34, 0.0.35 |
+| Słowo wywoławcze w tekście | Alfa ma własne rozpoznawanie zwrotu po imieniu (dokładniejsze); dopisana pisownia „Alpha”, „Gamma”, „Betta” | 0.0.35 |
+| Telemetria i diagnostyka | zrobione: liczniki strażnika i Smart Turn, „Sprawdź silniki”; pięć testów mikrofonu zostaje | 0.0.35–0.0.41 |
+| Ekran „Rozmowa na żywo” | częściowo: karta „Silniki rozmowy” w Ustawieniach i w panelu, pięć ustawień rozmowy, język rozpoznawania; kula stanu i miernik w nagłówku zostają | 0.0.35–0.0.43 |
+| Kula stanu | do zrobienia | — |
+
+Wyjście z P1 (8 scenariuszy na żywo) czeka na właściciela; rozmowa „na sucho” na prawdziwych silnikach przeszła
+(pomiary w [`19`](19-specyfikacja-glosu-delty.md)).
+
 Czego z Delty nie bierzemy: martwych kontrolek („Auto-wyślij”, „Głos” i „Prędkość” przy silnikach offline),
 braku przerwania modelu przy zatrzymaniu rozmowy, braku rozwijania liczb (Alfa to ma).
 
@@ -77,6 +95,9 @@ wypowiedź 30 s.
 - **Nowe (R10, R11)**: „Alfa Link” — modele z mocniejszego własnego komputera używane jak lokalne (kanał z etapu D);
   parametr przyspieszenia dla modeli z przewidywaniem kilku słów naraz.
 
+Stan po wersji 0.0.43: zrobione — monitor kart NVIDIA na żywo (0.0.36), ocena „mieści się na karcie” (0.0.39),
+nowe silniki głosu w pakietach (0.0.35, 0.0.38); reszta listy do zrobienia.
+
 ## P3 — nawigacja i powłoka
 
 - **Menu kołowe**: F1 „Rdzeń poleceń” (8 pól), F2 „Macierz narzędzi” (8 grup z podmenu), środkowy przycisk
@@ -91,6 +112,9 @@ wypowiedź 30 s.
 
 Dostosowanie: obecna nawigacja Alfy i jej skróty zostają; menu kołowe, doki i pulpit dochodzą jako dodatkowe
 sposoby poruszania się. Reguła o skrótach z AltGr obowiązuje.
+
+Stan po wersji 0.0.43: zrobione — Wstecz / Dalej (0.0.37) i wyszukiwanie w tabeli skrótów (0.0.42); reszta listy
+do zrobienia.
 
 ## P4 — rozmowa: brakujące funkcje
 
@@ -204,6 +228,9 @@ sprawdzanie poczty.
 | Raport | po każdym przebiegu krótki wpis w osi czasu i w raporcie dnia: co zrobiono, co czeka na decyzję; możliwość odczytania głosem | raport dnia, oś czasu |
 | Rutyny (R2) i poranny przegląd (R8) | obowiązek to zapisane polecenie + zakres + łączniki, uruchamiane z harmonogramu, zdarzeniem albo ręcznie; rano raport: poczta, kalendarz, zadania, koszty | wyzwalacze, raport dnia |
 | Bezpieczniki (R13) | treść wiadomości to dane, nie polecenia; wysyłka po zatwierdzeniu; nowy adresat zawsze z pytaniem; obowiązek nie ma dostępu do płatności ani kluczy i nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków | Broker, tagi prywatności |
+
+Stan po wersji 0.0.43: zrobione — cztery gotowe wzory obowiązków wypełniające formularz wyzwalacza (0.0.40);
+ekran „Obowiązki”, poczta, kalendarz, budżet i raport do zrobienia.
 
 Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.
 

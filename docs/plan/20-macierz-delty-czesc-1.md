@@ -1,6 +1,6 @@
 # 20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia
 
-Stan na **2026-10-11**. Każda funkcja Delty 0.8.35 znaleziona w kodzie ma tu wiersz z decyzją. Część 2 (wiedza,
+Stan na **2026-10-12** (postęp pozycji po wersji 0.0.43 dopisany w kolumnie „Decyzja”). Każda funkcja Delty 0.8.35 znaleziona w kodzie ma tu wiersz z decyzją. Część 2 (wiedza,
 komputer, modele, twórczość, awatar, multimedia, diagnostyka, przepływy): [`21`](21-macierz-delty-czesc-2.md).
 Porównana ze zrzutami menu Delty od właściciela (2026-10-11): wszystkie doki mają wiersze; dopisane szczegóły
 to A15a, A22a, A36, B26, B27. Zasada: jeśli Alfa ma coś lepszego, zostaje Alfa.
@@ -37,7 +37,7 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | A21 | Profile pracy (kilka okien naraz): Centrum pracy, Live rozmowa, Dev / Coding, Media lab, Modele i sklepy | brak | przenosimy | P3 |
 | A22 | „Profile układu” zamkniętych okien | brak | przenosimy | P3 |
 | A22a | Okna: liczba okien przy profilu pracy; przy zapisanym układzie nazwa widoku, rozmiar i położenie (np. 1196×769 @ 370,136); akcja „W głównym” | brak | przenosimy | P3 |
-| A23 | Wstecz / Dalej przy znaku, 50 pozycji, podpowiedź z nazwą celu | brak | przenosimy | P3 |
+| A23 | Wstecz / Dalej przy znaku, 50 pozycji, podpowiedź z nazwą celu | od 0.0.37: Alt+←, Alt+→, boczne przyciski myszy, 50 miejsc | przenosimy — **zrobione 0.0.37**; zostają przyciski przy znaku i podpowiedź z nazwą celu | P3 |
 | A24 | Menu kołowe: F1, F2, środkowy przycisk myszy; 8 pól Rdzenia, 8 grup Macierzy z podmenu; strzałki, Enter, Esc | brak | przenosimy | P3 |
 | A25 | Dostrajanie menu kołowego: skala 86–108 %, promień etykiet, rozmiar rdzenia, odstęp, grubość, poświata; 4 przełączniki; import / eksport | brak | przenosimy | P3 |
 | A26 | Pulpit kafelkowy: do 12 kafli, domyślnie 8, skale Mały / Średni / Duży (dotykowy) | brak | przenosimy | P3 |
@@ -48,8 +48,8 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | A31 | Stały pasek odtwarzacza i pasek pobierania | brak | przenosimy | P10, P2 |
 | A32 | Zasobnik: Pokaż, Zamknij; jedna kopia programu | jest | jest | — |
 | A33 | Ekran startowy z fazami, znacznikami API / BOOT / WS, „Wejdź mimo to” po 12 s, granica 40 s | ekran ładowania | przenosimy bramkę gotowości | P3 |
-| A34 | Skróty: F10 / `Ctrl+/` tabela, `Ctrl+N`, `Ctrl+L`, `Ctrl+E`, `Ctrl+M`, `Ctrl+,`, `Ctrl+Shift+D/S/I/M`, Alt+←/→, boczne przyciski myszy | własny zestaw z nagrywaniem skrótów | dostosowujemy: brakujące dochodzą, kolizje rozstrzyga rejestr Alfy | P3 |
-| A35 | Tabela skrótów: „Na start”, wyszukiwanie bez polskich znaków, filtr obszaru, „Otwórz” | ściąga `Ctrl+/` | dostosowujemy: wyszukiwanie i filtr | P3 |
+| A34 | Skróty: F10 / `Ctrl+/` tabela, `Ctrl+N`, `Ctrl+L`, `Ctrl+E`, `Ctrl+M`, `Ctrl+,`, `Ctrl+Shift+D/S/I/M`, Alt+←/→, boczne przyciski myszy | własny zestaw z nagrywaniem skrótów | dostosowujemy: brakujące dochodzą, kolizje rozstrzyga rejestr Alfy — **częściowo 0.0.37** (Alt+←/→, boczne przyciski myszy) | P3 |
+| A35 | Tabela skrótów: „Na start”, wyszukiwanie bez polskich znaków, filtr obszaru, „Otwórz” | ściąga `Ctrl+/` | dostosowujemy: wyszukiwanie i filtr — **wyszukiwanie zrobione 0.0.42**; filtr obszaru zostaje | P3 |
 | A36 | Dymek doku z etykietą programu | własne podpowiedzi Alfy | jest (lepsze) | — |
 
 ## B. Ustawienia i panel System
@@ -66,7 +66,7 @@ Decyzje: **przenosimy** · **dostosowujemy** (inaczej, bo Alfa ma własny mechan
 | B8 | Role agentów z dostawcą i modelem | obsada ról, kolejki modeli | jest | — |
 | B9 | „Automatyczny dobór modelu”: pula modeli z rolami, polityka, podgląd decyzji | kolejki na klasę zadania | dostosowujemy: podgląd decyzji i pula | P2, P12 |
 | B10 | Kolejka awaryjna: do 5 pozycji, przerwa 1 / 5 / 15 / 30 min, stan dostępności | kolejki modeli (do 10), bezpieczniki | jest | — |
-| B11 | Monitor: procesor, pamięć, dysk, każda karta (pamięć, obciążenie, temperatura, moc), silnik | strona Urządzenia | przenosimy pełny monitor | P2 |
+| B11 | Monitor: procesor, pamięć, dysk, każda karta (pamięć, obciążenie, temperatura, moc), silnik | strona Urządzenia | przenosimy pełny monitor — **częściowo 0.0.36**: karty NVIDIA na żywo (pamięć, obciążenie, temperatura, moc, programy); procesor, pamięć, dysk oraz karty AMD i Intel zostają | P2 |
 | B12 | Wygląd: motyw, gęstość (3), czcionka (4), kolor akcentu (8 + własny) | motyw, 3 style, gęstość, powiększenie, akcent | jest; dochodzi skala czcionki | P11 |
 | B13 | Zaawansowane: próbkowanie „dobierane do modelu” albo własne (temperatura, top-p, top-k, kara za powtórzenia) | brak w oknie | przenosimy | P4 |
 | B14 | Edytor persony z bloków: włącz / wyłącz, kolejność, edycja, własne bloki, licznik, podgląd, eksport do treningu | Kreator agentek (persona, test na sucho) | dostosowujemy: bloki w Kreatorze | P11 |
