@@ -363,8 +363,8 @@ wzory wrócą, gdy program będzie podawał jej fakty.</p>
 <h2 id="4-co-i-jak-sprawdzilem">4. Co i jak sprawdziłem</h2>
 <div class="tbl"><table><thead><tr><th>Sprawdzenie</th><th>Wynik</th></tr></thead><tbody><tr><td>Pełne testy całego projektu (Rust)</td><td>zielone po 0.0.34, 0.0.41, 0.0.42 i na wersji końcowej 0.0.43 (945 programów testowych, zero błędów)</td></tr>
 <tr><td>Testy interfejsu (jednostkowe)</td><td>328 z 328</td></tr>
-<tr><td>Testy w przeglądarce</td><td>324 z 324 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności</td></tr>
-<tr><td>Prawdziwa aplikacja (test dymny, profil tymczasowy)</td><td>18 z 18 dla 0.0.36, 0.0.42 i 0.0.43 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu</td></tr>
+<tr><td>Testy w przeglądarce</td><td>324 z 324 na 0.0.43 i 323 z 323 na 0.0.44 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności</td></tr>
+<tr><td>Prawdziwa aplikacja (test dymny, profil tymczasowy)</td><td>18 z 18 dla 0.0.36, 0.0.42, 0.0.43 i 0.0.44 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu</td></tr>
 <tr><td>Rozmowa „na sucho” na prawdziwych silnikach</td><td>dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana</td></tr>
 <tr><td>Prawdziwy mikrofon, po cichu</td><td>potok słucha, wykrywa dźwięk, strażnik odrzuca szum</td></tr>
 <tr><td>Zrzuty nowych ekranów</td><td>trzy style × dwa motywy, także wąskie okno</td></tr>
@@ -398,11 +398,11 @@ budowy testów; dane i program nietknięte. Wniosek zapisany: rzadziej podbijać
 <div class="tbl"><table><thead><tr><th>Co</th><th>Wynik</th></tr></thead><tbody><tr><td>Wersja</td><td>0.0.44, zbudowana (<code>target/shell/debug/alfa-desktop.exe</code>) i uruchomiona</td></tr>
 <tr><td>Pełne testy projektu (Rust)</td><td>945 programów testowych, zero błędów (przebieg na 0.0.43; 0.0.44 zmienia tylko interfejs — ukrycie wzorów)</td></tr>
 <tr><td>Testy interfejsu</td><td>329 z 329</td></tr>
-<tr><td>Testy w przeglądarce</td><td>324 z 324</td></tr>
+<tr><td>Testy w przeglądarce</td><td>323 z 323</td></tr>
 <tr><td>Test prawdziwej aplikacji</td><td>18 z 18</td></tr>
 <tr><td>Linter Rust, formatowanie, kontrola zależności, kontrola stylów</td><td>bez uwag</td></tr>
 <tr><td>Polecenia łącza</td><td>229</td></tr>
-<tr><td>Aplikacja na Twoim profilu</td><td>uruchomiona o 3:50; wersja 0.0.43; „Sprawdź silniki”: rozpoznawanie działa (3,0 s, Qwen3-ASR na karcie), koniec wypowiedzi działa (0,15 s), głos działa (1,3 s); karta RTX 4050: 0,5 z 6 GB zajęte</td></tr>
+<tr><td>Aplikacja na Twoim profilu</td><td>uruchomiona o 4:35; wersja 0.0.44; „Sprawdź silniki”: rozpoznawanie działa (3,5 s, Qwen3-ASR na karcie), koniec wypowiedzi działa (0,2 s), głos działa (1,6 s); na ekranie czeka okno „Co nowego”</td></tr>
 <tr><td>Commity</td><td>wszystkie lokalne (wypchnięcie wymaga <code>gh auth login</code>)</td></tr></tbody></table></div>
 <h2 id="8-co-zostaje-w-grupach-ktore-ruszylem">8. Co zostaje w grupach, które ruszyłem</h2>
 <div class="tbl"><table><thead><tr><th>Grupa</th><th>Zostaje</th></tr></thead><tbody><tr><td>P1 Rozmowa i mowa</td><td>próba z żywą mową (Ty), kula stanu i miernik w nagłówku rozmowy, głosy Pipera z parametrami, głos Edge jako opcja (łączy się z siecią — wymaga Twojego przeglądu)</td></tr>

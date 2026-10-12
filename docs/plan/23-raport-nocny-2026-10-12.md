@@ -55,8 +55,8 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 | --- | --- |
 | Pełne testy całego projektu (Rust) | zielone po 0.0.34, 0.0.41, 0.0.42 i na wersji końcowej 0.0.43 (945 programów testowych, zero błędów) |
 | Testy interfejsu (jednostkowe) | 328 z 328 |
-| Testy w przeglądarce | 324 z 324 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności |
-| Prawdziwa aplikacja (test dymny, profil tymczasowy) | 18 z 18 dla 0.0.36, 0.0.42 i 0.0.43 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu |
+| Testy w przeglądarce | 324 z 324 na 0.0.43 i 323 z 323 na 0.0.44 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności |
+| Prawdziwa aplikacja (test dymny, profil tymczasowy) | 18 z 18 dla 0.0.36, 0.0.42, 0.0.43 i 0.0.44 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu |
 | Rozmowa „na sucho” na prawdziwych silnikach | dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana |
 | Prawdziwy mikrofon, po cichu | potok słucha, wykrywa dźwięk, strażnik odrzuca szum |
 | Zrzuty nowych ekranów | trzy style × dwa motywy, także wąskie okno |
@@ -94,11 +94,11 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 | Wersja | 0.0.44, zbudowana (`target/shell/debug/alfa-desktop.exe`) i uruchomiona |
 | Pełne testy projektu (Rust) | 945 programów testowych, zero błędów (przebieg na 0.0.43; 0.0.44 zmienia tylko interfejs — ukrycie wzorów) |
 | Testy interfejsu | 329 z 329 |
-| Testy w przeglądarce | 324 z 324 |
+| Testy w przeglądarce | 323 z 323 |
 | Test prawdziwej aplikacji | 18 z 18 |
 | Linter Rust, formatowanie, kontrola zależności, kontrola stylów | bez uwag |
 | Polecenia łącza | 229 |
-| Aplikacja na Twoim profilu | uruchomiona o 3:50; wersja 0.0.43; „Sprawdź silniki”: rozpoznawanie działa (3,0 s, Qwen3-ASR na karcie), koniec wypowiedzi działa (0,15 s), głos działa (1,3 s); karta RTX 4050: 0,5 z 6 GB zajęte |
+| Aplikacja na Twoim profilu | uruchomiona o 4:35; wersja 0.0.44; „Sprawdź silniki”: rozpoznawanie działa (3,5 s, Qwen3-ASR na karcie), koniec wypowiedzi działa (0,2 s), głos działa (1,6 s); na ekranie czeka okno „Co nowego” |
 | Commity | wszystkie lokalne (wypchnięcie wymaga `gh auth login`) |
 
 ## 8. Co zostaje w grupach, które ruszyłem
