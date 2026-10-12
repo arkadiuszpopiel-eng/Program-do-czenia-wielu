@@ -12,6 +12,50 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.46 — 2026-10-12
+
+Wersja o sprawdzaniu: program jest teraz testowany dużo szerzej bez udziału właściciela, a pierwsze takie biegi od
+razu znalazły i pozwoliły naprawić dwa błędy. Raporty z obowiązków agentek są czystsze — bez odgrywania ról.
+
+### Agentki
+
+- [poważne] Raport z obowiązku w tle jest samym raportem: agentka nie odgrywa już ról obsady („Dyrygentka:”,
+  „Przekazuję Delcie”) i nie kończy pytaniem, na które nikt nie odpowie. Zadanie w tle dostaje razem z danymi
+  wymaganą formę wyniku. Wcześniej na małym modelu lokalnym wszystkie cztery wzory miały tę wadę.
+
+### Sieć i pobieranie
+
+- [poważne] Kwarantanna pobrań agentek przyjmuje katalog podany w skróconej postaci Windows (np. `SPOPIE~1` — tak
+  system podaje katalog tymczasowy). Dotąd taki katalog był odrzucany jako rzekome dowiązanie i pobranie się nie
+  udawało. Sprawdzenie „bez dowiązań i junction” zostaje bez zmian.
+
+### Testy
+
+- Nowy sposób sprawdzania (plan: `docs/plan/24-samodzielne-testowanie.md`): `node scripts/verify.mjs` z poziomami
+  „szybki”, „wersja” i „sprzet”; każdy bieg zapisuje raport z liczbami i z listą tego, czego nie uruchomił.
+- Testy sprzętowe na tym komputerze (`scripts/verify-hw.mjs`) — dotąd oznaczone „uruchamia maszyna użytkownika”
+  i nigdy nieuruchomione: prawdziwy model wykrywania mowy, koniec wypowiedzi, rozpoznawanie mowy na karcie, rozmowa
+  na prawdziwych silnikach, prawdziwy mikrofon, model mówcy, embeddingi, procesy i usługi systemu, rejestr,
+  znacznik pochodzenia pobranego pliku, wydajność Markdown. Pierwszy bieg: 11 etapów zielonych, 1 pominięty
+  (brak wytrenowanego modelu słowa wywoławczego).
+- Test prawdziwej aplikacji działa jako osobna instancja testowa obok uruchomionej Alfy właściciela (własny profil
+  i port, tylko w budowie testowej) — nie trzeba już zamykać okna właściciela. Alfa właściciela działa z osobnej
+  kopii programu.
+- Prawdziwa aplikacja: 22 scenariusze (było 18). Doszły: przegląd 38 poleceń odczytu ze sprawdzeniem odpowiedzi
+  ze schematem łącza oraz cykle życia sesji, wyzwalaczy, zadań, kosztów i ustawień. Zmierzone pokrycie poleceń
+  rdzenia: 87 z 228 (38,2 %); przed tą wersją nikt go nie liczył (pierwszy pomiar: 27,2 %).
+- Próby obowiązków na lokalnym modelu z automatyczną oceną (`scripts/trial/duty.mjs`): czy liczby i nazwy w raporcie
+  pochodzą z danych programu i czy wynik jest raportem, a nie rozmową. Przed poprawką formy: 4 z 4 z wadą formy;
+  po poprawce: 3 z 4 czyste, czwarty odrzucony błędnie przez oceniającego (poprawione).
+- Pełne testy projektu dla 0.0.45 (zaległe): linter bez uwag, 946 programów testowych, 2676 testów zielonych.
+
+### Przyczyna błędów
+
+- Kwarantanna porównywała ścieżkę podaną ze ścieżką rzeczywistą znak po znaku; nazwa skrócona 8.3 to ten sam
+  katalog pod inną nazwą. Testy pakietu omijały problem, bo same najpierw rozwijały ścieżkę.
+- Wadę formy raportów przepuściłem w 0.0.45, bo oceniałem raporty wzrokiem i sprawdzałem tylko, czy dane są
+  prawdziwe. Teraz ocenia to skrypt, z dwoma kryteriami.
+
 ## 0.0.45 — 2026-10-12
 
 Historia zmian pokazuje dziesięć ostatnich wersji, a starsze czekają w zakładce „Starsze”; tę samą listę ma teraz

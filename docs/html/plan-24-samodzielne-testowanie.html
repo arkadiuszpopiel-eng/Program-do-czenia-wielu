@@ -338,7 +338,7 @@ Ten dokument mówi, co dokładnie było pomijane, dlaczego, i co się zmienia. S
 kamera, ocena „czy głos się podoba” i decyzje bezpieczeństwa. Resztę mogę i powinienem robić sam.</p>
 <h2 id="2-co-sie-zmienia">2. Co się zmienia</h2>
 <h3 id="2-1-trzy-poziomy-sprawdzenia-jeden-skrypt-jeden-raport">2.1 Trzy poziomy sprawdzenia — jeden skrypt, jeden raport</h3>
-<p><code>scripts/verify.sh &lt;poziom&gt;</code> uruchamia etapy po kolei, pilnuje miejsca na dysku i zapisuje wynik do
+<p><code>node scripts/verify.mjs &lt;poziom&gt;</code> uruchamia etapy po kolei, pilnuje miejsca na dysku i zapisuje wynik do
 <code>target/verify/&lt;wersja&gt;/raport.md</code> (oraz <code>raport.json</code>). Raport sam wypisuje, czego <strong>nie</strong> uruchomiono i z jakiego
 powodu — lista „nie sprawdziłem” przestaje być pisana z pamięci.</p>
 <div class="tbl"><table><thead><tr><th>Poziom</th><th>Kiedy</th><th>Etapy</th></tr></thead><tbody><tr><td><code>szybki</code></td><td>po każdej zmianie</td><td>formatowanie, linter i testy zmienionych pakietów, testy interfejsu, kontrola typów</td></tr>
@@ -405,10 +405,10 @@ poleceń; <code>scripts/trial/profile.sh</code> uruchamia instancję testową do
 <tr><td>Pełne testy i linter całego projektu dla 0.0.45</td><td>zrobione: linter bez uwag; 946 programów testowych, 2676 testów zielonych, 0 czerwonych, 33 pominięte (sprzętowe)</td></tr>
 <tr><td><code>scripts/verify-hw.mjs</code> i pierwszy bieg testów sprzętowych</td><td>zrobione: 12 etapów „cichych” — 11 zielonych, 1 pominięty (brak wytrenowanego modelu słowa wywoławczego). Pierwszy bieg znalazł błąd w kwarantannie pobrań (katalog w skróconej postaci <code>SPOPIE~1</code> brany za dowiązanie) — naprawiony z testem</td></tr>
 <tr><td>Instancja testowa obok Alfy właściciela</td><td>zrobione: test prawdziwej aplikacji przechodzi (19 z 19) przy uruchomionej Alfie właściciela</td></tr>
-<tr><td>Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń”</td><td>zrobione: 38 poleceń odczytu sprawdzanych ze schematem łącza; <strong>pokrycie 62 z 228 poleceń (27,2 %)</strong> — punkt wyjścia do podnoszenia</td></tr>
-<tr><td>Ocena „raport trzyma się danych” i skrypt prób obowiązków</td><td>napisane (<code>scripts/trial/grounding.mjs</code>, <code>duty.mjs</code>); pierwszy bieg — do zrobienia</td></tr>
+<tr><td>Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń”</td><td>zrobione: 38 poleceń odczytu sprawdzanych ze schematem łącza; pierwszy pomiar 62 z 228 (27,2 %); po scenariuszach cykli życia <strong>87 z 228 (38,2 %)</strong></td></tr>
+<tr><td>Ocena raportów z obowiązków (dane + forma) i skrypt prób</td><td>zrobione: pierwszy bieg wykrył odgrywanie ról we wszystkich czterech raportach (przepuszczone w 0.0.45); po poprawce polecenia 3 z 4 czyste, czwarty odrzucony błędnie przez oceniającego — poprawione</td></tr>
 <tr><td>Testy sprzętowe dotykające pulpitu (schowek, Kosz, skróty, Notatnik, Edge, poświadczenia)</td><td>do zrobienia — gdy właściciel nie pracuje przy komputerze</td></tr>
-<tr><td><code>scripts/verify.sh</code> z jednym raportem</td><td class="st st2">do zrobienia</td></tr>
+<tr><td><code>scripts/verify.mjs</code> z jednym raportem</td><td>zrobione (poziomy szybki / wersja / sprzet)</td></tr>
 <tr><td>Tor akustyczny</td><td class="st st2">do zrobienia</td></tr>
 <tr><td>Zrozumiałość głosów</td><td class="st st2">do zrobienia</td></tr>
 <tr><td>Pobranie Qwen3-ASR i <code>llama-server</code> przez program</td><td class="st st2">do zrobienia</td></tr>

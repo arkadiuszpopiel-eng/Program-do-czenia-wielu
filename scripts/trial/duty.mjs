@@ -10,7 +10,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { judge } from './grounding.mjs';
+import { formProblems, judge } from './grounding.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const require = createRequire(join(root, 'apps', 'desktop', 'ui', 'package.json'));
@@ -39,9 +39,13 @@ const localStamp = (iso) => {
 const money = (m) => `${Math.floor(Math.abs(m.minor) / 100)},${pad(Math.abs(m.minor) % 100)}`;
 
 /** Dane, które program podaje agentce — odtworzone z tych samych poleceń rdzenia co arkusz faktów. */
-function factsText(tasks, triggers, costs, goal) {
-  const now = new Date();
-  const lines = [goal, localStamp(now.toISOString()), `${tasks.length} ${triggers.length}`];
+function factsText(tasks, triggers, costs, goal, startedMs) {
+  // Arkusz faktów ma godzinę startu zadania — dozwolona jest każda minuta od startu do teraz.
+  const stamps = [];
+  for (let t = startedMs - 60_000; t <= Date.now() + 60_000; t += 60_000) {
+    stamps.push(localStamp(new Date(t).toISOString()));
+  }
+  const lines = [goal, ...stamps, `${tasks.length} ${triggers.length}`];
   for (const t of tasks) lines.push(`„${t.title}” ${t.steps} ${t.max_steps} ${money(t.cost)}`);
   for (const t of triggers) {
     lines.push(`„${t.name}” ${t.next_fire_at ? localStamp(t.next_fire_at) : ''}`);
@@ -97,13 +101,12 @@ for (const [id, goal] of Object.entries(dutyGoals())) {
   const seconds = Math.round((Date.now() - started) / 1000);
   const finished = task?.state === 'done' && task.result === 'succeeded';
   const report = task?.summary ?? '';
-  const facts = factsText(
-    (await invoke('tasks_list')).filter((t) => t.id !== run.task_id),
-    await invoke('triggers_list'),
-    await invoke('costs_summary', { sessionId: null }),
-    goal,
-  );
-  const outside = finished ? judge(report, [facts]) : [];
+  const otherTasks = (await invoke('tasks_list')).filter((t) => t.id !== run.task_id);
+  const triggers = await invoke('triggers_list');
+  const facts = factsText(otherTasks, triggers, await invoke('costs_summary', { sessionId: null }), goal, started);
+  const outside = finished
+    ? [...judge(report, [facts], Math.max(otherTasks.length, triggers.length)), ...formProblems(report)]
+    : [];
   const state = !finished ? 'CZERWONY' : outside.length > 0 ? 'CZERWONY' : 'zielony';
   const why = !finished
     ? `zadanie nie skończyło się powodzeniem w ${minutes} min (stan: ${task?.state ?? 'brak'}, wynik: ${task?.result ?? '—'}, błąd: ${task?.error ?? '—'})`

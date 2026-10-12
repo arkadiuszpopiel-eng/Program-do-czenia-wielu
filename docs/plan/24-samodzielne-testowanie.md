@@ -27,7 +27,7 @@ kamera, ocena „czy głos się podoba” i decyzje bezpieczeństwa. Resztę mog
 
 ### 2.1 Trzy poziomy sprawdzenia — jeden skrypt, jeden raport
 
-`scripts/verify.sh <poziom>` uruchamia etapy po kolei, pilnuje miejsca na dysku i zapisuje wynik do
+`node scripts/verify.mjs <poziom>` uruchamia etapy po kolei, pilnuje miejsca na dysku i zapisuje wynik do
 `target/verify/<wersja>/raport.md` (oraz `raport.json`). Raport sam wypisuje, czego **nie** uruchomiono i z jakiego
 powodu — lista „nie sprawdziłem” przestaje być pisana z pamięci.
 
@@ -109,10 +109,10 @@ programu). Od 0.0.46:
 | Pełne testy i linter całego projektu dla 0.0.45 | zrobione: linter bez uwag; 946 programów testowych, 2676 testów zielonych, 0 czerwonych, 33 pominięte (sprzętowe) |
 | `scripts/verify-hw.mjs` i pierwszy bieg testów sprzętowych | zrobione: 12 etapów „cichych” — 11 zielonych, 1 pominięty (brak wytrenowanego modelu słowa wywoławczego). Pierwszy bieg znalazł błąd w kwarantannie pobrań (katalog w skróconej postaci `SPOPIE~1` brany za dowiązanie) — naprawiony z testem |
 | Instancja testowa obok Alfy właściciela | zrobione: test prawdziwej aplikacji przechodzi (19 z 19) przy uruchomionej Alfie właściciela |
-| Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń” | zrobione: 38 poleceń odczytu sprawdzanych ze schematem łącza; **pokrycie 62 z 228 poleceń (27,2 %)** — punkt wyjścia do podnoszenia |
-| Ocena „raport trzyma się danych” i skrypt prób obowiązków | napisane (`scripts/trial/grounding.mjs`, `duty.mjs`); pierwszy bieg — do zrobienia |
+| Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń” | zrobione: 38 poleceń odczytu sprawdzanych ze schematem łącza; pierwszy pomiar 62 z 228 (27,2 %); po scenariuszach cykli życia **87 z 228 (38,2 %)** |
+| Ocena raportów z obowiązków (dane + forma) i skrypt prób | zrobione: pierwszy bieg wykrył odgrywanie ról we wszystkich czterech raportach (przepuszczone w 0.0.45); po poprawce polecenia 3 z 4 czyste, czwarty odrzucony błędnie przez oceniającego — poprawione |
 | Testy sprzętowe dotykające pulpitu (schowek, Kosz, skróty, Notatnik, Edge, poświadczenia) | do zrobienia — gdy właściciel nie pracuje przy komputerze |
-| `scripts/verify.sh` z jednym raportem | do zrobienia |
+| `scripts/verify.mjs` z jednym raportem | zrobione (poziomy szybki / wersja / sprzet) |
 | Tor akustyczny | do zrobienia |
 | Zrozumiałość głosów | do zrobienia |
 | Pobranie Qwen3-ASR i `llama-server` przez program | do zrobienia |

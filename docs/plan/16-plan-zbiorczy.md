@@ -1,6 +1,6 @@
 # 16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)
 
-Wersja programu **0.0.45**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
+Wersja programu **0.0.46**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
 (etapy A–H), nowy etap **P** (przeniesienie funkcji z Delty AI) i nowy etap **U** (wielu użytkowników z kontami
 i logowaniem) oraz cztery cele: **Windows, Linux, panel WWW, Android** z pełnym sterowaniem i komunikacją.
 Szczegóły zadań: [`03-roadmapa.md`](03-roadmapa.md) (dokument żywy). Tu jest obraz całości.

@@ -111,7 +111,10 @@ fn empty_program_says_so_instead_of_leaving_room_for_invention() {
     assert!(sheet.contains("Koszty modeli: brak danych."));
     assert!(sheet.contains("sesja nie ma katalogu roboczego"));
     assert!(sheet.contains("Nie dopisuj zadań, kwot"));
-    assert!(sheet.contains("<dane-programu>") && sheet.ends_with("</dane-programu>"));
+    assert!(sheet.contains("<dane-programu>") && sheet.contains("</dane-programu>"));
+    // Po danych — wymagana forma: sam raport, bez odgrywania ról i bez pytań.
+    assert!(sheet.ends_with(app_tasks::REPORT_FORM));
+    assert!(sheet.contains("Nie odgrywaj ról") && sheet.contains("nie kończ pytaniem"));
 }
 
 #[test]
