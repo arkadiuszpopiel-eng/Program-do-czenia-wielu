@@ -235,6 +235,12 @@ i kwoty, bo agentka w zadaniu w tle nie dostaje prawdziwych danych. **Pierwsze z
 fakty (lista zadań, koszty, pliki katalogu roboczego) razem z poleceniem i zakazem wyjścia poza nie; dopiero potem
 wzory wracają. Ekran „Obowiązki”, poczta, kalendarz, budżet i raport — do zrobienia.
 
+Gdzie to wpiąć: polecenie dla agentki składa `goal_of` w `crates/app-tasks/src/exec_agent.rs` — tam dochodzi blok
+„Dane” (zadania z harmonogramu, koszty z licznika kosztów, lista plików katalogu roboczego) i zdanie, że raport ma
+opierać się wyłącznie na tym bloku. Kryterium: ta sama próba co 2026-10-12 (profil tymczasowy z kopią modelu) daje
+na pustym profilu raport „brak zadań, koszty 0 zł”, a nie wymyślone pozycje. Dopiero potem `DUTIES_ENABLED = true`
+w `apps/desktop/ui/src/lib/logic/duties.ts`.
+
 Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.
 
 ## Nie przenosimy
