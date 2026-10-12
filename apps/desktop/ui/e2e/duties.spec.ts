@@ -44,3 +44,35 @@ for (const theme of ['light', 'dark'] as const) {
     await expect(page.getByRole('textbox', { name: 'Nazwa' })).toHaveValue('');
   });
 }
+
+for (const style of ['classic', 'glass', 'next'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`ostatni wynik wyzwalacza z raportem agentki — ${style} ${theme}`, async ({ page }) => {
+      await openApp(page, { theme, path: `/?style=${style}` });
+      await waitForChat(page);
+      await triggers(page);
+      const duties = page.getByRole('group', { name: 'Gotowe obowiązki codzienne' });
+      await duties.getByRole('button', { name: 'Kontrola kosztów' }).click();
+      await page.getByRole('button', { name: 'Utwórz wyzwalacz' }).click();
+      const item = page
+        .getByRole('list', { name: 'Lista wyzwalaczy' })
+        .getByRole('listitem')
+        .filter({ hasText: 'Kontrola kosztów' });
+      const last = item.getByTestId('trigger-last-run');
+      // Przed pierwszym uruchomieniem — jedno zdanie, bez przycisku raportu.
+      await expect(last).toHaveText('Jeszcze nie był uruchamiany.');
+      await item.getByRole('button', { name: 'Uruchom teraz' }).click();
+      // Wynik przychodzi ze zdarzeń zadania, bez przeładowania strony.
+      await expect(last).toHaveAttribute('data-tone', 'ok', { timeout: 15_000 });
+      await expect(last).toContainText('Udane');
+      await expect(last).toContainText('Ostatnio:');
+      const toggle = last.getByRole('button', { name: 'Pokaż raport' });
+      await toggle.focus();
+      await page.keyboard.press('Enter');
+      await expect(item.getByText('Gotowe (atrapa).')).toBeVisible();
+      await expectAccessible(page, `ostatni wynik ${style} ${theme}`);
+      await last.getByRole('button', { name: 'Ukryj raport' }).click();
+      await expect(item.getByText('Gotowe (atrapa).')).toHaveCount(0);
+    });
+  }
+}

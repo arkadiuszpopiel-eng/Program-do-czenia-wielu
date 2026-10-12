@@ -1,32 +1,46 @@
 <!--
   Ustawienia → Zadania w tle i wyzwalacze: lista (rodzaj, najbliższe uruchomienie, statystyki,
+  ostatni wynik z raportem agentki,
   włącznik, „Uruchom teraz", usuń), formularz nowego wyzwalacza i dziennik uruchomień.
 -->
 <script lang="ts">
   import { Button, EmptyState, Switch } from '@alfa/ui-kit';
   import Timer from '@lucide/svelte/icons/timer';
-  import type { TriggerInfo, TriggerKindView, TriggerRunInfo } from '../../../api/types-tasks';
+  import type {
+    TaskInfo,
+    TriggerInfo,
+    TriggerKindView,
+    TriggerRunInfo,
+  } from '../../../api/types-tasks';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { describeCron } from '../../../logic/cron-text';
+  import { lastRuns } from '../../../logic/trigger-runs';
   import { useApp } from '../../../state/context';
   import TriggerForm from './TriggerForm.svelte';
+  import TriggerLastRun from './TriggerLastRun.svelte';
 
   const app = useApp();
   const { t, tk } = app.i18n;
   let triggers = $state<readonly TriggerInfo[]>([]);
   let log = $state<readonly TriggerRunInfo[]>([]);
+  let tasks = $state<readonly TaskInfo[]>([]);
+  const last = $derived(lastRuns(log, tasks));
   let loaded = $state(false);
   let loadError = $state<string | null>(null);
 
   /** Lista i dziennik; błąd → komunikat z „Ponów" zamiast pustej listy. */
   async function reload() {
     const result = await load(() =>
-      Promise.all([app.client.triggers.list(), app.client.triggers.log(null)]),
+      Promise.all([
+        app.client.triggers.list(),
+        app.client.triggers.log(null),
+        app.client.tasks.list(),
+      ]),
     );
     if (result.status === 'ready') {
-      [triggers, log] = result.value;
+      [triggers, log, tasks] = result.value;
       loaded = true;
       loadError = null;
     } else if (result.status === 'failed') loadError = result.error;
@@ -36,6 +50,13 @@
     void reload();
     return app.on((event) => {
       if (event.type === 'TriggerFired') void reload();
+      // Wynik zadania z wyzwalacza zmienia „ostatni wynik” bez przeładowania całej strony.
+      if (event.type === 'TaskUpdated') {
+        const updated = event.task;
+        tasks = tasks.some((x) => x.id === updated.id)
+          ? tasks.map((x) => (x.id === updated.id ? updated : x))
+          : [...tasks, updated];
+      }
     });
   });
 
@@ -101,6 +122,7 @@
             · {t('triggers.stats', { fired: trg.fired, suppressed: trg.suppressed })}
           </p>
           <p class="goal">{trg.goal}</p>
+          <TriggerLastRun run={last.get(trg.id)} triggerId={trg.id} />
           {#if trg.watch_unavailable}<p class="note">{t('triggers.watchUnavailable')}</p>{/if}
           <div class="actions">
             <Button
