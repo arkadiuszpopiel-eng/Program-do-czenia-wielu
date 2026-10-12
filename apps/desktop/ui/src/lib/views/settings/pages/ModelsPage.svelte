@@ -3,7 +3,7 @@
   wyszukiwanie w pamięci (embedder leksykalny albo
   zainstalowany model, przebudowa wektorów w tle z postępem, „Przebuduj teraz” / „Przerwij”) i katalog
   pozycji (modele rozmowy, STT, głosy, VAD, słowa wywoławcze, głos właściciela, embeddingi, sidecary)
-  z filtrami rodzaju i stanu; „Napraw” (usuń i pobierz od nowa) po potwierdzeniu. Stan na żywo ze zdarzeń `ModelChanged`, `ModelProgress`, `ReindexStatus`.
+  z wyszukiwaniem, filtrami rodzaju i stanu, kolejnością i podsumowaniem miejsca na dysku (ModelFilters); „Napraw” (usuń i pobierz od nowa) po potwierdzeniu. Stan na żywo ze zdarzeń `ModelChanged`, `ModelProgress`, `ReindexStatus`.
 -->
 <script lang="ts">
   import { Button, ConfirmDialog, Select } from '@alfa/ui-kit';
@@ -11,9 +11,7 @@
   import type { ModelItem, ModelsView } from '../../../api/types-models';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import {
-    KIND_FILTERS,
     LEXICAL,
-    STATE_FILTERS,
     embedderChoices,
     missingEngines,
     embedderFallback,
@@ -26,7 +24,9 @@
     mainCardMb,
   } from '../../../logic/models';
   import { useApp } from '../../../state/context';
+  import { diskUsage, searchItems, sortItems, type SortOrder } from '../../../logic/model-catalog';
   import BundlesSection from './BundlesSection.svelte';
+  import ModelFilters from './ModelFilters.svelte';
   import ModelRow from './ModelRow.svelte';
   import './work.css';
 
@@ -38,6 +38,8 @@
   let loadError = $state<string | null>(null);
   let kind = $state<string>('all');
   let stateFilter = $state<string>('all');
+  let query = $state('');
+  let order = $state<string>('catalog');
   let choice = $state('');
   let busy = $state<string | null>(null);
   let removing = $state<ModelItem | null>(null);
@@ -52,8 +54,17 @@
   }
 
   const items = $derived(
-    view ? filterItems(view.items, kind as KindFilter, stateFilter as StateFilter) : [],
+    view
+      ? sortItems(
+          searchItems(
+            filterItems(view.items, kind as KindFilter, stateFilter as StateFilter),
+            query,
+          ),
+          order as SortOrder,
+        )
+      : [],
   );
+  const usage = $derived(view ? diskUsage(view.items) : null);
   const choices = $derived(view ? embedderChoices(view.items) : []);
   const withoutEngine = $derived(view ? missingEngines(view.items) : []);
   const reindex = $derived(view?.reindex ?? null);
@@ -258,31 +269,14 @@
 
 <section class="wk-card" aria-labelledby="mm-list">
   <h3 id="mm-list">{t('engines.list')}</h3>
-  <div class="filters">
-    <label class="wk-field">
-      <span>{t('engines.filter.kind')}</span>
-      <Select
-        size="sm"
-        bind:value={kind}
-        label={t('engines.filter.kind')}
-        options={KIND_FILTERS.map((k) => ({ value: k, label: tk(`engines.kind.${k}`) }))}
-      />
-    </label>
-    <label class="wk-field">
-      <span>{t('engines.filter.state')}</span>
-      <Select
-        size="sm"
-        bind:value={stateFilter}
-        label={t('engines.filter.state')}
-        options={STATE_FILTERS.map((s) => ({ value: s, label: tk(`engines.stateFilter.${s}`) }))}
-      />
-    </label>
-    <!-- Licznik dopiero po wczytaniu katalogu: „0 pozycji" w trakcie ładowania było nieprawdą
-         (i trafiało do czytnika ekranu). -->
-    <span class="wk-meta count" aria-live="polite"
-      >{#if view}{t('engines.count', { n: items.length })}{/if}</span
-    >
-  </div>
+  <ModelFilters
+    bind:kind
+    bind:stateFilter
+    bind:query
+    bind:order
+    count={view ? items.length : null}
+    {usage}
+  />
   {#if view && items.length === 0}
     <p class="wk-meta">{t('engines.empty')}</p>
   {/if}
@@ -365,15 +359,6 @@
     width: 100%;
     height: 8px;
     accent-color: var(--alfa-color-info);
-  }
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: var(--alfa-space-3);
-  }
-  .count {
-    margin-left: auto;
   }
   .list {
     display: flex;

@@ -104,3 +104,41 @@ test('offline: pobieranie kończy się czytelnym błędem', async ({ page }) => 
   await vad.getByRole('button', { name: 'Pobierz' }).click();
   await expect(vad.getByText('sieć: brak połączenia (atrapa)')).toBeVisible();
 });
+
+for (const style of ['classic', 'glass', 'next'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`katalog: wyszukiwanie, kolejność i miejsce na dysku — ${style} ${theme}`, async ({
+      page,
+    }) => {
+      await openApp(page, { theme, path: `/?style=${style}` });
+      await waitForChat(page);
+      await openModels(page);
+      const list = page.locator('#mm-list').locator('xpath=..').locator('ul.list');
+      const names = list.getByRole('heading', { level: 4 });
+      const usage = page.getByTestId('models-usage');
+      await expect(usage).toContainText(/Na dysku: .+ w \d+ pozycj/);
+      await expect(usage).toContainText(/do pobrania: .+ w \d+ pozycj/);
+      // Wyszukiwanie bez polskich znaków i wielkości liter; licznik idzie za wynikiem.
+      const search = page.getByRole('searchbox', { name: 'Szukaj w katalogu' });
+      await search.fill('BIELIK');
+      await expect(names.first()).toContainText('Bielik');
+      const found = await names.count();
+      expect(found).toBeGreaterThan(0);
+      for (const text of await names.allTextContents()) expect(text).toContain('Bielik');
+      await search.fill('nie ma takiego modelu');
+      await expect(page.getByText('Brak pozycji dla wybranych filtrów.')).toBeVisible();
+      await search.fill('');
+      // Kolejność: od największych — pierwsza pozycja nie jest mniejsza od drugiej.
+      await pickOption(page.getByRole('combobox', { name: 'Kolejność', exact: true }), 'size_desc');
+      await pickOption(page.getByRole('combobox', { name: 'Rodzaj', exact: true }), 'llm');
+      const bySize = await names.allTextContents();
+      await pickOption(page.getByRole('combobox', { name: 'Kolejność', exact: true }), 'size_asc');
+      await expect(names.first()).toHaveText(bySize[bySize.length - 1] ?? '');
+      expect(await names.allTextContents()).toEqual([...bySize].reverse());
+      await pickOption(page.getByRole('combobox', { name: 'Kolejność', exact: true }), 'name');
+      const byName = await names.allTextContents();
+      expect(byName).toEqual([...byName].sort((a, b) => a.localeCompare(b, 'pl')));
+      await expectAccessible(page, `katalog modeli ${style} ${theme}`);
+    });
+  }
+}
