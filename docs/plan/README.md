@@ -1,6 +1,7 @@
 # Plan Alfy — wersja 6 (rozszerzona)
 
-Stan na 2026-10-09. Ten katalog jest **rozszerzeniem** zatwierdzonego planu [`../PLAN.md`](../PLAN.md) (wersja 5):
+Stan na 2026-10-12 (wersja 0.0.43; co doszło ostatnio — [`23-raport-nocny-2026-10-12.md`](23-raport-nocny-2026-10-12.md),
+całość na jednej stronie — [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md)). Ten katalog jest **rozszerzeniem** zatwierdzonego planu [`../PLAN.md`](../PLAN.md) (wersja 5):
 niczego w nim nie kasuje, tylko dopisuje nowe cele — kolejne systemy, sterowanie przez Internet i nowe funkcje —
 oraz pokazuje, co z planu v5 jest już wykonane i sprawdzone.
 
