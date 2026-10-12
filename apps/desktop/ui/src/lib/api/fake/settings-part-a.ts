@@ -393,6 +393,20 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
         'auto',
       ),
       select(
+        'voice.talk_language',
+        L('Język rozpoznawania mowy', 'Speech recognition language'),
+        L(
+          'W jakim języku mówisz do Alfy. Wskazany język daje pewniejsze rozpoznanie krótkich zdań niż zgadywanie; „Automatycznie” przydaje się, gdy mieszasz polski z angielskim. Działa od następnego włączenia mikrofonu.',
+          'The language you speak to Alfa. A chosen language recognises short sentences more reliably than guessing; “Automatic” helps when you mix Polish and English. Applies the next time the microphone is turned on.',
+        ),
+        [
+          ['pl', L('Polski (zalecane)', 'Polish (recommended)')],
+          ['en', L('Angielski', 'English')],
+          ['auto', L('Automatycznie', 'Automatic')],
+        ],
+        'pl',
+      ),
+      select(
         'voice.mode',
         L('Włączanie mikrofonu', 'Microphone activation'),
         L(

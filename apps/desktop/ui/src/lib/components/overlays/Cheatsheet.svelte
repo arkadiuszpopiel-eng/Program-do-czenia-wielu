@@ -1,18 +1,34 @@
-<!-- Ściągawka skrótów (Ctrl+/): wszystkie skróty z PLAN §14.8 w grupach, z bieżącymi przypisaniami. -->
+<!--
+  Ściągawka skrótów (Ctrl+/): wszystkie skróty z PLAN §14.8 w grupach, z bieżącymi przypisaniami
+  i wyszukiwarką po nazwie polecenia albo klawiszach.
+-->
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import { Kbd } from '@alfa/ui-kit';
+  import { Kbd, TextField } from '@alfa/ui-kit';
+  import { matchesShortcut } from '../../logic/shortcut-search';
   import { SHORTCUTS, SHORTCUT_GROUPS } from '../../logic/shortcut-registry';
   import { useApp } from '../../state/context';
 
   const app = useApp();
   const { t } = app.i18n;
+  let query = $state('');
   const byGroup = $derived(
     SHORTCUT_GROUPS.map((group) => ({
       group,
-      items: SHORTCUTS.filter((d) => d.group === group && !/goto[2-9]/.test(d.id)),
-    })),
+      items: SHORTCUTS.filter(
+        (d) =>
+          d.group === group &&
+          !/goto[2-9]/.test(d.id) &&
+          matchesShortcut(query, label(d.id), chords(d.id)),
+      ),
+    })).filter((g) => g.items.length > 0),
   );
+  const found = $derived(byGroup.reduce((sum, g) => sum + g.items.length, 0));
+
+  // Każde otwarcie zaczyna od pełnej listy.
+  $effect(() => {
+    if (!app.cheatsheetOpen) query = '';
+  });
 
   function label(id: string): string {
     return id === 'session.goto1'
@@ -32,6 +48,15 @@
     <Dialog.Content class="alfa-sheet">
       <Dialog.Title class="alfa-sheet-title">{t('cheatsheet.title')}</Dialog.Title>
       <Dialog.Description class="alfa-sheet-desc">{t('cheatsheet.customize')}</Dialog.Description>
+      <div class="search">
+        <TextField label={t('cheatsheet.search')} bind:value={query} />
+        <p class="count" role="status">
+          {query.trim() ? t('cheatsheet.found', { n: found }) : ''}
+        </p>
+      </div>
+      {#if found === 0}
+        <p class="empty">{t('cheatsheet.none', { query: query.trim() })}</p>
+      {/if}
       <!-- tabindex: przewijana treść dostępna z klawiatury (strzałki / PgDn). -->
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div class="grid" tabindex="0">
@@ -115,6 +140,23 @@
     justify-content: flex-end;
     gap: var(--alfa-space-1);
     margin: 0;
+  }
+  .search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-1);
+    margin-bottom: var(--alfa-space-3);
+  }
+  .count {
+    min-height: 1.2em;
+    margin: 0;
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-xs);
+  }
+  .empty {
+    margin: 0 0 var(--alfa-space-3);
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
   }
   .off {
     color: var(--alfa-color-text-subtle);

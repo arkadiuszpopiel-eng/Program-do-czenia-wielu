@@ -1,5 +1,5 @@
 //! Ustawienia rozmowy z Ustawień → Głos (`voice.talk_*`): Smart Turn, próg pewności końca
-//! wypowiedzi, najdłuższa cisza i wybór silnika rozpoznawania. Potok głosu czyta je przy starcie
+//! wypowiedzi, najdłuższa cisza, wybór silnika rozpoznawania i język rozpoznawania. Potok głosu czyta je przy starcie
 //! rozmowy albo dyktowania — zmiana działa od następnego włączenia mikrofonu, bez restartu programu.
 
 use std::sync::Arc;
@@ -16,12 +16,15 @@ pub(crate) const THRESHOLD_KEY: &str = "voice.talk_turn_threshold";
 pub(crate) const MAX_SILENCE_KEY: &str = "voice.talk_max_silence";
 /// Silnik rozpoznawania (`auto` / `whisper`).
 pub(crate) const STT_ENGINE_KEY: &str = "voice.talk_stt_engine";
+/// Język rozpoznawania (`pl` / `en` / `auto`).
+pub(crate) const LANGUAGE_KEY: &str = "voice.talk_language";
 
-const KEYS: [&str; 4] = [
+const KEYS: [&str; 5] = [
     SMART_TURN_KEY,
     THRESHOLD_KEY,
     MAX_SILENCE_KEY,
     STT_ENGINE_KEY,
+    LANGUAGE_KEY,
 ];
 
 /// Wpisuje wartości ustawień do uchwytu (brak albo zły typ wartości → bez zmiany).
@@ -38,6 +41,9 @@ pub(crate) fn apply(talk: &TalkSettings, values: &[Option<serde_json::Value>]) {
     }
     if let Some(engine) = at(3).and_then(serde_json::Value::as_str) {
         talk.set_stt_engine(engine);
+    }
+    if let Some(language) = at(4).and_then(serde_json::Value::as_str) {
+        talk.set_language(language);
     }
 }
 
@@ -98,6 +104,11 @@ mod tests {
         assert_eq!((talk.threshold_pct(), talk.max_silence_ms()), (65, 3_200));
         apply(&talk, &[Some(json!(true)), None, None, Some(json!("auto"))]);
         assert!(talk.smart_turn() && !talk.whisper_only());
+        assert_eq!(talk.language().code(), "pl");
+        apply(&talk, &[None, None, None, None, Some(json!("en"))]);
+        assert_eq!(talk.language().code(), "en");
+        apply(&talk, &[None, None, None, None, Some(json!(12))]);
+        assert_eq!(talk.language().code(), "en", "zły typ — bez zmiany");
     }
 
     #[test]

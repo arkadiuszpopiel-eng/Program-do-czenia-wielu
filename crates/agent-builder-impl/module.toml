@@ -1,7 +1,7 @@
 # Manifest Kreatora agentów (docs/modules/agent-builder/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 # Kreator nie żąda zdolności; zapis persony i roli idzie przez usługę personas (po zatwierdzeniu właściciela).
 id = "agent-builder"
-version = "0.0.41"
+version = "0.0.42"
 kind = "service"
 provides = ["agent-builder-contract@1"]
 requires = ["core-bus-contract@1", "personas-contract@1", "tools-common-contract@1"]

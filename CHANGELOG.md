@@ -12,6 +12,34 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.42 — 2026-10-12
+
+Język rozpoznawania mowy do wyboru i wyszukiwarka w ściągawce skrótów.
+
+### Głos
+
+- [poważne] Nowe ustawienie „Język rozpoznawania mowy” (Ustawienia → Głos): polski (domyślnie), angielski albo
+  automatycznie. Dotąd silnik zawsze zgadywał język, co przy krótkich zdaniach bywa zawodne; wskazany język trafia
+  też do strażnika, który sprawdza wynik w nieoczekiwanym języku drugim silnikiem. Działa od następnego włączenia
+  mikrofonu.
+
+### Interfejs
+
+- Ściągawka skrótów (Ctrl+/) ma wyszukiwarkę: po nazwie polecenia („pamięć”, „wstecz”) albo po klawiszach
+  („alt+1”, „ctrl k”), bez rozróżniania wielkości liter i polskich znaków. Gdy nic nie pasuje, okno mówi to
+  wprost.
+
+### Testy
+
+- Pełne testy całego projektu po wersji 0.0.41: 945 programów testowych, zero błędów.
+- Nowe: język w ustawieniach rozmowy (zakres, złe typy), wyszukiwanie skrótów (jednostkowo i w przeglądarce
+  w obu motywach z kontrolą dostępności); zrzuty w trzech stylach.
+
+### Przyczyna błędu
+
+- W trakcie nocy zabrakło miejsca na dysku: każda nowa wersja przebudowuje cały projekt, a stare pliki pośrednie
+  zostają (121 GB po ośmiu wersjach). Usunąłem tylko odtwarzalne pliki budowy testów; dane i program są nietknięte.
+
 ## 0.0.41 — 2026-10-12
 
 Jeden przycisk sprawdza, czy rozmowa głosowa zadziała — bez mikrofonu i bez dźwięku.

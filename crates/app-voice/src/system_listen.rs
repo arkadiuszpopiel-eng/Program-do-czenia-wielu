@@ -68,6 +68,25 @@ impl SystemVoice {
     /// Rozpoznawanie mowy dla rozmowy i dyktowania: Qwen3-ASR ze strażnikiem i Whisperem jako
     /// zapasem, gdy model Qwen3-ASR jest pobrany; inaczej sam Whisper.
     pub(crate) fn stt(&self) -> Result<Arc<dyn Stt>, PipelineError> {
+        let stt = self.compose_stt()?;
+        // Język z Ustawień trafia do silnika od razu po złożeniu (zanim padnie pierwsze zdanie).
+        if let Ok(runtime) = tokio::runtime::Handle::try_current() {
+            let cfg = voice_stt_contract::SttCfg {
+                language: self.talk.language(),
+                ..voice_stt_contract::SttCfg::default()
+            };
+            let engine = stt.clone();
+            runtime.spawn(async move {
+                if let Err(e) = engine.configure(cfg).await {
+                    tracing::warn!(error = %e, "rozpoznawanie mowy: nie udało się ustawić języka");
+                }
+            });
+        }
+        Ok(stt)
+    }
+
+    /// Silnik rozpoznawania dobrany do plików, ustawień i wolnej pamięci karty.
+    fn compose_stt(&self) -> Result<Arc<dyn Stt>, PipelineError> {
         let whisper: Arc<dyn Stt> = Arc::new(self.whisper()?);
         if self.talk.whisper_only() {
             return Ok(whisper);

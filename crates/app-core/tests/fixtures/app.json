@@ -39,6 +39,7 @@
         "voice.talk_turn_threshold": 50,
         "voice.talk_max_silence": 2000,
         "voice.talk_stt_engine": "auto",
+        "voice.talk_language": "pl",
         "voice.mode": "toggle",
         "voice.show_pill": true,
         "agents.max_steps": 40,

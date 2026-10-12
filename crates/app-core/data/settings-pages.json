@@ -1154,6 +1154,45 @@
     "scope": "global"
    },
    {
+    "key": "voice.talk_language",
+    "label": {
+     "pl": "Język rozpoznawania mowy",
+     "en": "Speech recognition language"
+    },
+    "description": {
+     "pl": "W jakim języku mówisz do Alfy. Wskazany język daje pewniejsze rozpoznanie krótkich zdań niż zgadywanie; „Automatycznie” przydaje się, gdy mieszasz polski z angielskim. Działa od następnego włączenia mikrofonu.",
+     "en": "The language you speak to Alfa. A chosen language recognises short sentences more reliably than guessing; “Automatic” helps when you mix Polish and English. Applies the next time the microphone is turned on."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "pl",
+       "label": {
+        "pl": "Polski (zalecane)",
+        "en": "Polish (recommended)"
+       }
+      },
+      {
+       "value": "en",
+       "label": {
+        "pl": "Angielski",
+        "en": "English"
+       }
+      },
+      {
+       "value": "auto",
+       "label": {
+        "pl": "Automatycznie",
+        "en": "Automatic"
+       }
+      }
+     ]
+    },
+    "default": "pl",
+    "scope": "global"
+   },
+   {
     "key": "voice.mode",
     "label": {
      "pl": "Włączanie mikrofonu",

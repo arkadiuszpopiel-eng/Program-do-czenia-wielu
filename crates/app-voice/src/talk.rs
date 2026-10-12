@@ -5,6 +5,7 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
 
+use voice_stt_contract::LangMode;
 use voice_turn_contract::{Patience, PatienceCfg, TurnCfg};
 
 /// Zakres progu pewności końca wypowiedzi (%).
@@ -22,6 +23,8 @@ struct Inner {
     threshold_pct: AtomicU8,
     max_silence_ms: AtomicU32,
     whisper_only: AtomicBool,
+    /// Język rozpoznawania: 0 — automatycznie, 1 — polski, 2 — angielski.
+    language: AtomicU8,
 }
 
 /// Ustawienia rozmowy współdzielone między Ustawieniami a potokiem głosu.
@@ -35,6 +38,7 @@ impl Default for TalkSettings {
             threshold_pct: AtomicU8::new(50),
             max_silence_ms: AtomicU32::new(2_000),
             whisper_only: AtomicBool::new(false),
+            language: AtomicU8::new(1),
         }))
     }
 }
@@ -86,6 +90,26 @@ impl TalkSettings {
         self.0
             .whisper_only
             .store(value.eq_ignore_ascii_case("whisper"), Ordering::Relaxed);
+    }
+
+    /// Język rozpoznawania mowy (domyślnie polski: silnik nie zgaduje języka krótkich zdań,
+    /// a strażnik wie, jakiego języka się spodziewać).
+    pub fn language(&self) -> LangMode {
+        match self.0.language.load(Ordering::Relaxed) {
+            0 => LangMode::Auto,
+            2 => LangMode::En,
+            _ => LangMode::Pl,
+        }
+    }
+
+    /// Wybór języka: `auto`, `en`, cokolwiek innego — polski.
+    pub fn set_language(&self, value: &str) {
+        let code = match value.trim().to_ascii_lowercase().as_str() {
+            "auto" => 0,
+            "en" => 2,
+            _ => 1,
+        };
+        self.0.language.store(code, Ordering::Relaxed);
     }
 
     /// Ustawienia detektora końca wypowiedzi dla modelu słuchającego dźwięku.
@@ -156,5 +180,12 @@ mod tests {
         assert!(talk.whisper_only() && !talk.smart_turn());
         other.set_stt_engine("auto");
         assert!(!talk.whisper_only());
+        assert_eq!(talk.language(), LangMode::Pl, "domyślnie polski");
+        other.set_language("EN");
+        assert_eq!(talk.language(), LangMode::En);
+        other.set_language("auto");
+        assert_eq!(talk.language(), LangMode::Auto);
+        other.set_language("cokolwiek");
+        assert_eq!(talk.language(), LangMode::Pl);
     }
 }
