@@ -14,7 +14,7 @@
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { CronPreview, TriggerKindView } from '../../../api/types-tasks';
-  import { DUTY_TEMPLATES, type DutyTemplate } from '../../../logic/duties';
+  import { DUTIES_ENABLED, DUTY_TEMPLATES, type DutyTemplate } from '../../../logic/duties';
   import { useApp } from '../../../state/context';
 
   interface Props {
@@ -105,19 +105,22 @@
   }}
 >
   <h3 id="trg-new">{t('triggers.new')}</h3>
-  <div class="duties" role="group" aria-labelledby="trg-duties">
-    <h4 id="trg-duties">{t('duty.title')}</h4>
-    <p class="hint">{t('duty.hint')}</p>
-    <ul>
-      {#each DUTY_TEMPLATES as duty (duty.id)}
-        <li>
-          <Button size="sm" variant="secondary" onclick={() => useDuty(duty)}>{t(duty.name)}</Button
-          >
-          <span class="hint">{t(duty.when)} · {AGENTS[duty.agent].name}</span>
-        </li>
-      {/each}
-    </ul>
-  </div>
+  {#if DUTIES_ENABLED}
+    <div class="duties" role="group" aria-labelledby="trg-duties">
+      <h4 id="trg-duties">{t('duty.title')}</h4>
+      <p class="hint">{t('duty.hint')}</p>
+      <ul>
+        {#each DUTY_TEMPLATES as duty (duty.id)}
+          <li>
+            <Button size="sm" variant="secondary" onclick={() => useDuty(duty)}
+              >{t(duty.name)}</Button
+            >
+            <span class="hint">{t(duty.when)} · {AGENTS[duty.agent].name}</span>
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
   <TextField label={t('triggers.name')} bind:value={name} />
   <SegmentedControl
     label={t('triggers.kind')}

@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { en } from '../../i18n/en';
 import { pl } from '../../i18n/pl';
-import { DUTY_TEMPLATES, looksLikeCron } from '../duties';
+import { DUTIES_ENABLED, DUTY_TEMPLATES, looksLikeCron } from '../duties';
 
 describe('gotowe obowiązki codzienne', () => {
+  it('wzory są ukryte, dopóki agentka nie dostaje prawdziwych danych', () => {
+    // Włączenie wymaga podawania faktów przez rdzeń (P14) i próby na modelu — nie zmieniać bez niej.
+    expect(DUTIES_ENABLED).toBe(false);
+  });
+
   it('każdy szablon ma harmonogram, agentkę i teksty w obu językach', () => {
     expect(DUTY_TEMPLATES.length).toBeGreaterThanOrEqual(4);
     const ids = new Set<string>();

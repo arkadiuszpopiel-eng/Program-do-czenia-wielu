@@ -12,11 +12,37 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.44 — 2026-10-12
+
+Ostatnia z jedenastu wersji z nocy 11/12 października. Gotowe obowiązki codzienne agentek zostały ukryte, bo próba
+na lokalnym modelu dała raport z wymyślonymi danymi. Wszystko, co doszło tej nocy (wersje 0.0.34–0.0.44: rozmowa
+głosowa na lokalnych silnikach, „Sprawdź silniki”, karty graficzne na żywo, „Wstecz / Dalej”), jest w Historii zmian.
+
+### Agentki
+
+- [poważne] Gotowe obowiązki codzienne (dodane w 0.0.40) nie są już pokazywane w formularzu wyzwalacza. Próba
+  wykonania „Porannego przeglądu dnia” na lokalnym modelu Bielik 4.5B pokazała, że mechanizm działa (wyzwalacz →
+  zadanie → agentka → zakończone po 4 min 19 s), ale agentka nie ma dostępu do prawdziwych zadań i kosztów i na
+  pustym profilu napisała raport z nieistniejącymi zadaniami i kwotami. Wzory wrócą, gdy program będzie podawał
+  agentce fakty razem z poleceniem. Własne wyzwalacze działają jak dotąd.
+
+### Testy
+
+- Pobieranie samym programem na świeżym profilu: Smart Turn i ONNX Runtime (23 s) oraz Supertonic 3 (16 plików,
+  383 MB, 101 s) — wszystkie z przypiętymi sumami; po pobraniu koniec wypowiedzi przeszedł na Smart Turn, a głos
+  przeszedł próbę.
+- Wykonanie obowiązku na lokalnym modelu (profil tymczasowy z kopią modelu) — wynik opisany wyżej; druga próba,
+  z zakazem zmyślania w poleceniu, nie skończyła się w 7 minut.
+- Formularz wyzwalacza: wzory ukryte, własny wyzwalacz tworzy się jak dotąd (przeglądarka).
+
+### Przyczyna błędu
+
+- Wzory obowiązków dodałem w 0.0.40 bez uruchomienia ich na modelu — sprawdzone było tylko tworzenie i harmonogram.
+  Polecenia prosiły o dane (zadania, koszty), których agentka w zadaniu w tle nie dostaje.
+
 ## 0.0.43 — 2026-10-12
 
-Ostatnia z dziesięciu wersji z nocy 11/12 października: stan silników rozmowy pod ręką w panelu „Głos”. Wszystko, co
-doszło tej nocy (wersje 0.0.34–0.0.43: rozmowa głosowa na lokalnych silnikach, „Sprawdź silniki”, karty graficzne
-na żywo, „Wstecz / Dalej”, gotowe obowiązki agentek), jest w Historii zmian.
+Stan silników rozmowy pod ręką w panelu „Głos”.
 
 ### Głos
 

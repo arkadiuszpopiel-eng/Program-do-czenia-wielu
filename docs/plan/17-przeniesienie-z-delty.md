@@ -229,8 +229,11 @@ sprawdzanie poczty.
 | Rutyny (R2) i poranny przegląd (R8) | obowiązek to zapisane polecenie + zakres + łączniki, uruchamiane z harmonogramu, zdarzeniem albo ręcznie; rano raport: poczta, kalendarz, zadania, koszty | wyzwalacze, raport dnia |
 | Bezpieczniki (R13) | treść wiadomości to dane, nie polecenia; wysyłka po zatwierdzeniu; nowy adresat zawsze z pytaniem; obowiązek nie ma dostępu do płatności ani kluczy i nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków | Broker, tagi prywatności |
 
-Stan po wersji 0.0.43: zrobione — cztery gotowe wzory obowiązków wypełniające formularz wyzwalacza (0.0.40);
-ekran „Obowiązki”, poczta, kalendarz, budżet i raport do zrobienia.
+Stan po wersji 0.0.44: cztery wzory obowiązków są w kodzie (0.0.40), ale **ukryte** — próba na lokalnym modelu
+(Bielik 4.5B) wykonała obowiązek od wyzwalacza do końca zadania w 4 min 19 s, lecz raport zawierał wymyślone zadania
+i kwoty, bo agentka w zadaniu w tle nie dostaje prawdziwych danych. **Pierwsze zadanie P14:** rdzeń podaje agentce
+fakty (lista zadań, koszty, pliki katalogu roboczego) razem z poleceniem i zakazem wyjścia poza nie; dopiero potem
+wzory wracają. Ekran „Obowiązki”, poczta, kalendarz, budżet i raport — do zrobienia.
 
 Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.
 

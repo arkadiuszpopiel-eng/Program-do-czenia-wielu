@@ -1,6 +1,6 @@
 # Manifest Marszałka (docs/modules/marshal/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "marshal"
-version = "0.0.43"
+version = "0.0.44"
 kind = "service"
 provides = ["marshal-contract@1"]
 requires = ["core-bus-contract@1", "scheduler-contract@1", "triggers-contract@1"]

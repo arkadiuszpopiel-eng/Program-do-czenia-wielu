@@ -4,6 +4,14 @@
 // (zadania, koszty, katalog roboczy, rozmowy); poczta i kalendarz dojdą z łącznikami.
 import type { MessageKey } from '../i18n/i18n.svelte';
 
+/**
+ * Czy wzory są pokazywane w oknie. WYŁĄCZONE od 0.0.44: próba na lokalnym modelu (Bielik 4.5B,
+ * 2026-10-12) pokazała, że agentka bez dostępu do prawdziwych danych pisze raport z wymyślonymi
+ * zadaniami i kosztami. Wzory wrócą, gdy rdzeń będzie podawał agentce fakty (lista zadań, koszty,
+ * pliki) razem z poleceniem — zadanie w planie P14.
+ */
+export const DUTIES_ENABLED = false;
+
 export interface DutyTemplate {
   readonly id: string;
   /** Klucz nazwy (także nazwa utworzonego wyzwalacza). */
