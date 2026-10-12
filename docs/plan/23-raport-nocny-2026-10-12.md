@@ -55,14 +55,16 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 | Rozmowa „na sucho” na prawdziwych silnikach | dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana |
 | Prawdziwy mikrofon, po cichu | potok słucha, wykrywa dźwięk, strażnik odrzuca szum |
 | Zrzuty nowych ekranów | trzy style × dwa motywy, także wąskie okno |
+| Pobieranie samym programem na świeżym profilu | Smart Turn i ONNX Runtime: 23 s, Supertonic 3 (16 plików, 383 MB): 101 s — wszystkie z przypiętymi sumami; po pobraniu koniec wypowiedzi przeszedł na Smart Turn, a głos Supertonic przeszedł próbę (1,8 s) |
 | Uruchomiona aplikacja na profilu właściciela | wersja, silniki, próba silników i podgląd karty odczytane z działającego programu (bez klikania w okno i bez dźwięku) |
 
 ## 5. Czego nie sprawdziłem
 
 - **Żywa mowa do mikrofonu i tłumienie echa**, gdy agentka mówi z głośnika — nie odtwarzałem dźwięku w nocy.
 - **Brzmienie głosów** — ocena słuchem należy do Ciebie (próbki: `alfa-glos-proba/odsluch.html`).
-- **Pobieranie nowych pozycji przyciskami w Ustawieniach** — sumy i adresy są przypięte i sprawdzone na pobranych
-  plikach, ale samego kliknięcia „Pobierz” w programie nie wykonywałem.
+- **Pobieranie modelu Qwen3-ASR (2,5 GB) i silnika `llama-server` samym programem** — sumy i adresy są przypięte
+  i sprawdzone na plikach, ale tych dwóch pobrań przez program nie wykonywałem (pozostałe nowe pozycje — patrz
+  rozdział 4).
 - **Wykonanie obowiązku codziennego przez model** — sprawdzone jest tworzenie i harmonogram, nie wynik pracy agentki.
 - **Karty AMD i Intel w podglądzie na żywo** — odczyt działa dziś tylko dla kart NVIDIA; na innym sprzęcie karta
   mówi to wprost.

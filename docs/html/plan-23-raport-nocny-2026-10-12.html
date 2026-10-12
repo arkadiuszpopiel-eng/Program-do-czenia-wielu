@@ -360,13 +360,15 @@ wyczucie końca wypowiedzi i głos działają u Ciebie, z czasem każdego z nich
 <tr><td>Rozmowa „na sucho” na prawdziwych silnikach</td><td>dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana</td></tr>
 <tr><td>Prawdziwy mikrofon, po cichu</td><td>potok słucha, wykrywa dźwięk, strażnik odrzuca szum</td></tr>
 <tr><td>Zrzuty nowych ekranów</td><td>trzy style × dwa motywy, także wąskie okno</td></tr>
+<tr><td>Pobieranie samym programem na świeżym profilu</td><td>Smart Turn i ONNX Runtime: 23 s, Supertonic 3 (16 plików, 383 MB): 101 s — wszystkie z przypiętymi sumami; po pobraniu koniec wypowiedzi przeszedł na Smart Turn, a głos Supertonic przeszedł próbę (1,8 s)</td></tr>
 <tr><td>Uruchomiona aplikacja na profilu właściciela</td><td>wersja, silniki, próba silników i podgląd karty odczytane z działającego programu (bez klikania w okno i bez dźwięku)</td></tr></tbody></table></div>
 <h2 id="5-czego-nie-sprawdzilem">5. Czego nie sprawdziłem</h2>
 <ul>
 <li><strong>Żywa mowa do mikrofonu i tłumienie echa</strong>, gdy agentka mówi z głośnika — nie odtwarzałem dźwięku w nocy.</li>
 <li><strong>Brzmienie głosów</strong> — ocena słuchem należy do Ciebie (próbki: <code>alfa-glos-proba/odsluch.html</code>).</li>
-<li><strong>Pobieranie nowych pozycji przyciskami w Ustawieniach</strong> — sumy i adresy są przypięte i sprawdzone na pobranych
-plikach, ale samego kliknięcia „Pobierz” w programie nie wykonywałem.</li>
+<li><strong>Pobieranie modelu Qwen3-ASR (2,5 GB) i silnika <code>llama-server</code> samym programem</strong> — sumy i adresy są przypięte
+i sprawdzone na plikach, ale tych dwóch pobrań przez program nie wykonywałem (pozostałe nowe pozycje — patrz
+rozdział 4).</li>
 <li><strong>Wykonanie obowiązku codziennego przez model</strong> — sprawdzone jest tworzenie i harmonogram, nie wynik pracy agentki.</li>
 <li><strong>Karty AMD i Intel w podglądzie na żywo</strong> — odczyt działa dziś tylko dla kart NVIDIA; na innym sprzęcie karta
 mówi to wprost.</li>
