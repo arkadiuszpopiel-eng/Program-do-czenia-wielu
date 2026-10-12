@@ -3,7 +3,8 @@
 # (docs/plan/24 §2.7). Dane właściciela nie są dotykane: profil leży w `target/trial-profile`,
 # a model i silnik rozmowy są do niego KOPIOWANE (nie dowiązywane).
 #
-#   scripts/trial/profile.sh start [--model]   uruchamia (z --model: kopia Bielika 4.5B i llama)
+#   scripts/trial/profile.sh start [--model|--voice]   uruchamia (--model: kopia Bielika 4.5B i llama;
+#                                                      --voice: kopia silników rozmowy)
 #   scripts/trial/profile.sh stop              kończy tylko tę instancję (po numerze procesu)
 #   scripts/trial/profile.sh port              wypisuje port CDP instancji testowej
 #
@@ -25,6 +26,15 @@ start)
       [ -f "$PROFILE/Local/Alfa/models/$f" ] || cp "$OWNER/models/$f" "$PROFILE/Local/Alfa/models/$f"
     done
     for d in llama-cuda llama-cpu; do
+      [ -d "$PROFILE/Local/Alfa/sidecars/$d" ] || cp -r "$OWNER/sidecars/$d" "$PROFILE/Local/Alfa/sidecars/$d"
+    done
+  fi
+  if [ "${2:-}" = "--voice" ]; then
+    # Silniki rozmowy: rozpoznawanie (Qwen3-ASR + llama), wykrywanie mowy, koniec wypowiedzi, głos.
+    for d in qwen3-asr silero turn supertonic; do
+      [ -d "$PROFILE/Local/Alfa/models/$d" ] || cp -r "$OWNER/models/$d" "$PROFILE/Local/Alfa/models/$d"
+    done
+    for d in llama-cuda llama-cpu supertonic smart-turn onnxruntime; do
       [ -d "$PROFILE/Local/Alfa/sidecars/$d" ] || cp -r "$OWNER/sidecars/$d" "$PROFILE/Local/Alfa/sidecars/$d"
     done
   fi

@@ -237,3 +237,106 @@ test('koszty i ustawienia: zmiana, odczyt, powrót do wartości domyślnej', asy
   }
   await refused(main, 'settings_set', { key: 'nie.ma.takiego.ustawienia', value: true });
 });
+
+test('polecenia bez skutków dla danych: działają albo odmawiają czytelnie', async ({ alfa }) => {
+  const { main } = alfa;
+  await call(main, 'app_save_layout', {
+    layout: { left_width: 280, right_width: 360, left_collapsed: false, sessions: {} },
+  });
+  // Pamięć: zakresy, dziennik pierwszego zakresu, Inspektor bez filtrów, konsolidacja na żądanie.
+  const scopes = await call<{ id?: string; scope?: string }[]>(main, 'memory_scopes');
+  const scope = scopes[0]?.id ?? scopes[0]?.scope ?? 'global';
+  await settled(main, 'memory_journal', { scope });
+  await call(main, 'memory_inspect', {
+    query: {
+      scopes: [],
+      text: null,
+      layers: [],
+      states: [],
+      trusted: null,
+      pinned: null,
+      offset: 0,
+      limit: 20,
+    },
+  });
+  await settled(main, 'memory_consolidate_now', {});
+  // Wyszukiwanie: przebudowa wektorów startuje, podaje stan i daje się przerwać.
+  await settled(main, 'search_reindex_start', {});
+  await call(main, 'search_reindex_status');
+  await settled(main, 'search_reindex_cancel', {});
+  await call(main, 'embed_model_activate', { model: 'lexical' });
+  // Zdrowie systemu i zestawy ocen.
+  await settled(main, 'health_scan', {});
+  await call(main, 'health_report');
+  const suites = await call<{ id: string }[]>(main, 'evals_list');
+  if (suites[0]) await settled(main, 'evals_verify', { suiteId: suites[0].id });
+  // Modele: sprawdzenie i przerwanie na pierwszej pozycji katalogu (bez pobierania).
+  const models = await call<{ items: { id: string }[] }>(main, 'models_list');
+  const item = models.items[0];
+  if (item) {
+    await settled(main, 'models_verify', { itemId: item.id });
+    await settled(main, 'models_cancel', { itemId: item.id });
+  }
+  // Głos, kamery, sterowanie pulpitem, okno szybkiego pytania — bez sprzętu odmowa ma kod i opis.
+  for (const [command, args] of [
+    ['voice_set_muted', { muted: true }],
+    ['voice_set_muted', { muted: false }],
+    ['voice_stop_speech', {}],
+    ['voice_stop_mic_test', {}],
+    ['voice_engines', { action: { kind: 'refresh' } }],
+    ['cameras_refresh', {}],
+    ['cameras_set_master', { enabled: false }],
+    ['gui_stop', {}],
+    ['gui_release', {}],
+    ['quick_hide', {}],
+    ['system_retry_queue', {}],
+    ['improver_cycle', {}],
+    ['updates_dismiss_whats_new', {}],
+    ['marshal_propose', { text: 'Nie uruchamiaj zadań w tle po 22:00.', drafts: null }],
+  ] as const) {
+    await settled(main, command, args);
+  }
+});
+
+test('nieznane identyfikatory: każde polecenie odmawia z kodem i opisem', async ({ alfa }) => {
+  const { main } = alfa;
+  const unknown = 'nie-ma-takiego-identyfikatora';
+  const cases: readonly (readonly [string, Record<string, unknown>])[] = [
+    ['memory_explain', { entryId: unknown }],
+    ['memory_set_pinned', { entryId: unknown, pinned: true }],
+    ['plugins_inspect', { wasmB64: 'AAAA' }],
+    ['skills_review', { skillId: unknown, version: '1.0.0' }],
+    ['health_undo', { repairId: 999_999 }],
+    ['health_approve', { repairId: 999_999 }],
+    ['marshal_revoke', { ruleId: unknown }],
+    ['cameras_set_enabled', { id: unknown, enabled: true }],
+    ['models_remove', { itemId: unknown }],
+    ['models_download', { itemId: unknown }],
+    ['turns_read_aloud', { turnId: unknown }],
+    ['tasks_cancel', { taskId: unknown }],
+    ['tasks_retry', { taskId: unknown }],
+    ['triggers_remove', { triggerId: unknown }],
+    ['triggers_fire_now', { triggerId: unknown }],
+    ['sessions_remove', { sessionId: unknown }],
+    ['sessions_undo_remove', { token: unknown }],
+    ['files_list', { sessionId: unknown }],
+    ['agents_runs', { sessionId: unknown }],
+    ['settings_set_shortcut', { actionId: unknown, chord: 'Ctrl+Alt+F9' }],
+    ['settings_reset', { key: 'nie.ma.takiego.ustawienia' }],
+    ['evals_verify', { suiteId: unknown }],
+    ['embed_model_activate', { model: unknown }],
+  ];
+  const silent: string[] = [];
+  for (const [command, args] of cases) {
+    const reply = await raw(main, command, args);
+    if (reply.ok) {
+      silent.push(`${command}: przyjęło nieznany identyfikator bez błędu`);
+      continue;
+    }
+    const { code, message } = reply.error;
+    if (typeof code !== 'string' || (message ?? '').length < 4) {
+      silent.push(`${command}: błąd bez kodu albo opisu (${JSON.stringify(reply.error)})`);
+    }
+  }
+  expect(silent, 'polecenia, które nie odmawiają czytelnie').toEqual([]);
+});
