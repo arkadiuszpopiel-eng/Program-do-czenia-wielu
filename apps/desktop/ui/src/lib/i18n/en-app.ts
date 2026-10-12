@@ -323,6 +323,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'mic.muted': 'Muted',
   'mic.dnd': 'Do not disturb',
   'orb.agent': '{name} is speaking — you can interrupt by voice.',
+  'live.agent': '{name} is speaking',
   'orb.user': 'Keep talking — Alfa waits for the end of your sentence.',
   'orb.hint.off': 'Turn the conversation on to talk to Alfa.',
   'orb.hint.listening': 'Waiting for you to speak.',

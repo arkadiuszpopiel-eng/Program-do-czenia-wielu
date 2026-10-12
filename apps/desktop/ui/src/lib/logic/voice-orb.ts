@@ -23,3 +23,8 @@ export function orbSpeaker(state: MicState, speaker: VoiceSpeaker): 'agent' | 'u
   if (state === 'hearing') return 'user';
   return 'nobody';
 }
+
+/** Pasek „rozmowa na żywo” nad polem pisania: tylko gdy tor głosu coś robi, nie gdy czeka. */
+export function liveStripVisible(state: MicState): boolean {
+  return state === 'hearing' || state === 'processing' || state === 'speaking';
+}

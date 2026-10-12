@@ -339,6 +339,7 @@ export const plApp = {
   'mic.muted': 'Wyciszony',
   'mic.dnd': 'Nie przeszkadzać',
   'orb.agent': 'Mówi {name} — możesz przerwać głosem.',
+  'live.agent': 'Mówi {name}',
   'orb.user': 'Mów dalej — Alfa czeka na koniec wypowiedzi.',
   'orb.hint.off': 'Włącz rozmowę, żeby mówić do Alfy.',
   'orb.hint.listening': 'Czeka, aż się odezwiesz.',

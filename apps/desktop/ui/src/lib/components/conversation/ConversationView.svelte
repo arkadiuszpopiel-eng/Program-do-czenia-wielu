@@ -4,6 +4,7 @@
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import ChatComposer from './ChatComposer.svelte';
+  import VoiceLiveStrip from '../voice/VoiceLiveStrip.svelte';
   import FindBar from './FindBar.svelte';
   import MessageList from './MessageList.svelte';
   import StartState from './StartState.svelte';
@@ -65,6 +66,7 @@
         />
       </div>
     {/if}
+    <VoiceLiveStrip />
     <ChatComposer {conv} />
   </div>
 </section>

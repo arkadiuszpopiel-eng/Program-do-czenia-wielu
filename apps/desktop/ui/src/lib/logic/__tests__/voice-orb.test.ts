@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ORB_RING_MIN, orbRing, orbSpeaker } from '../voice-orb';
+import { ORB_RING_MIN, liveStripVisible, orbRing, orbSpeaker } from '../voice-orb';
 
 describe('kula stanu rozmowy', () => {
   it('pierścień rośnie z poziomem tylko wtedy, gdy tor pracuje na dźwięku', () => {
@@ -11,6 +11,15 @@ describe('kula stanu rozmowy', () => {
     expect(orbRing('hearing', Number.NaN)).toBe(ORB_RING_MIN);
     for (const state of ['off', 'muted', 'dnd', 'processing'] as const) {
       expect(orbRing(state, 0.9)).toBe(ORB_RING_MIN);
+    }
+  });
+
+  it('pasek na żywo jest tylko wtedy, gdy tor głosu coś robi', () => {
+    for (const state of ['hearing', 'processing', 'speaking'] as const) {
+      expect(liveStripVisible(state)).toBe(true);
+    }
+    for (const state of ['off', 'listening', 'muted', 'dnd'] as const) {
+      expect(liveStripVisible(state)).toBe(false);
     }
   });
 
