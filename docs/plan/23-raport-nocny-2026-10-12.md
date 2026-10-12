@@ -100,6 +100,6 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 ## 9. Decyzje i czynności po Twojej stronie
 
 - Posłuchać głosów i powiedzieć rozmowę na żywo — to jedyne, czego nie mogę zrobić sam.
-- `gh auth login` — bez tego ponad 90 commitów zostaje lokalnie.
+- `gh auth login` — bez tego ponad 130 commitów zostaje lokalnie.
 - Podpisy pod ADR 0017–0023 i 0027 oraz 44 decyzje bezpieczeństwa z pakietu decyzji.
 - Środowisko próbne Chatterboxa (8,4 GB) — do usunięcia, jeśli niepotrzebne.
