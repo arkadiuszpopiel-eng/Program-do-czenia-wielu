@@ -93,6 +93,26 @@ export function longHistory(extra: number): readonly ChangeLogEntry[] {
   return [...FAKE_HISTORY, ...older];
 }
 
+/** Wpis nowej wersji — w dzienniku dopiero po aktualizacji (jak w prawdziwym programie). */
+export const FAKE_NEXT_ENTRY: ChangeLogEntry = {
+  version: FAKE_NEXT,
+  date: '2026-10-12',
+  summary: 'Aktualizacje z wznawianiem pobierania i strona „O programie".',
+  items: [
+    {
+      section: 'Aktualizacje',
+      severity: 'serious',
+      text: 'Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.',
+    },
+    {
+      section: 'Interfejs',
+      severity: 'normal',
+      text: 'Strona „O programie" z licencjami zależności.',
+    },
+    { section: 'Interfejs', severity: 'normal', text: 'Szybsze wyszukiwanie w sesjach.' },
+  ],
+};
+
 function historyFromUrl(): readonly ChangeLogEntry[] {
   if (typeof location === 'undefined') return FAKE_HISTORY;
   const long = new URLSearchParams(location.search).get('history') === 'long';
@@ -265,7 +285,12 @@ export class FakeUpdates {
         this.news = null;
         return core.reply(undefined);
       },
-      history: () => core.reply(historyFromUrl()),
+      history: () =>
+        core.reply(
+          this.view.current === FAKE_NEXT
+            ? [FAKE_NEXT_ENTRY, ...historyFromUrl()]
+            : historyFromUrl(),
+        ),
     };
   }
 }

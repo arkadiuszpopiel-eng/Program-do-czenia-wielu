@@ -7,6 +7,7 @@ import {
   countBySeverity,
   filterHistory,
   groupBySection,
+  entryFor,
   splitHistory,
 } from '../change-history';
 import { longHistory } from '../../api/fake/api-updates';
@@ -78,5 +79,12 @@ describe('historia zmian', () => {
     expect(new Set(long.map((e) => e.version)).size).toBe(long.length);
     expect(splitHistory(HISTORY, 1).older.map((e) => e.version)).toEqual(['1.9.0', '1.8.0']);
     expect(splitHistory(HISTORY, -3).recent).toEqual([]);
+  });
+
+  it('znajduje wpis wersji także z przedrostkiem „v”', () => {
+    expect(entryFor(HISTORY, '1.9.0')?.summary).toBe('Sam wstęp.');
+    expect(entryFor(HISTORY, ' v2.0.0 ')?.version).toBe('2.0.0');
+    expect(entryFor(HISTORY, '3.0.0')).toBeNull();
+    expect(entryFor([], '1.0.0')).toBeNull();
   });
 });

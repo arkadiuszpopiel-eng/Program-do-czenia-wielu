@@ -41,6 +41,16 @@ for (const theme of ['light', 'dark'] as const) {
       const news = page.getByRole('dialog', { name: 'Co nowego w wersji 0.2.0' });
       await expect(news).toBeVisible();
       await expect(news.getByText(/Strona „O programie" z licencjami/)).toBeVisible();
+      // Ta sama lista co w Historii zmian: bieżąca wersja rozwinięta, waga słowem, starsze zwinięte.
+      await expect(news.getByRole('button', { name: /^Wersja 0\.2\.0 / })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+      await expect(news.getByText('poważna', { exact: true })).toBeVisible();
+      await expect(news.getByRole('button', { name: /^Wersja 0\.1\.0-f1 / })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
       await expectAccessible(page, `co nowego ${theme}`);
       await news.getByRole('button', { name: 'Zamknij' }).click();
       await expect(news).toBeHidden();

@@ -10,10 +10,12 @@
   interface Props {
     entry: ChangeLogEntry;
     expanded: boolean;
+    /** Identyfikator rozwijanej treści (unikalny także, gdy lista jest na stronie i w oknie). */
+    panelId: string;
     ontoggle: () => void;
   }
 
-  let { entry, expanded, ontoggle }: Props = $props();
+  let { entry, expanded, panelId, ontoggle }: Props = $props();
   const { t, tk } = useApp().i18n;
 
   const counts = $derived(countBySeverity([entry]));
@@ -25,7 +27,7 @@
     type="button"
     class="row"
     aria-expanded={expanded}
-    aria-controls="history-{entry.version}"
+    aria-controls={panelId}
     onclick={ontoggle}
   >
     <span class="chevron" aria-hidden="true"></span>
@@ -49,7 +51,7 @@
     </span>
   </button>
   {#if expanded}
-    <div class="body" id="history-{entry.version}">
+    <div class="body" id={panelId}>
       {#if entry.summary}<p class="summary">{entry.summary}</p>{/if}
       {#each groupBySection(entry.items) as group (group.section)}
         <h4>{group.section}</h4>

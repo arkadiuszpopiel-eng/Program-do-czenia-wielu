@@ -5,6 +5,8 @@
   Filtr zostawia pozycje wybranej wagi; wersje bez takich pozycji znikają z listy.
   Główny widok pokazuje dziesięć ostatnich wersji; starsze są w zakładce „Starsze” — dojście
   z zakładki u góry i z przycisku pod listą.
+  Tryb osadzony (`embedded`, okno „Co nowego”): bez karty i nagłówka, z gotową listą wpisów
+  (`preloaded`) — ta sama lista, te same zakładki.
 -->
 <script lang="ts">
   import type { ChangeLogEntry } from '../../../api/types-updates';
@@ -21,6 +23,15 @@
   import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
+  interface Props {
+    /** Bez karty i nagłówka (w oknie „Co nowego”). */
+    embedded?: boolean;
+    /** Wpisy wczytane przez rodzica — komponent nie pyta rdzenia drugi raz. */
+    preloaded?: readonly ChangeLogEntry[] | null;
+  }
+
+  let { embedded = false, preloaded = null }: Props = $props();
+  const uid = $props.id();
   const app = useApp();
   const { t, tk } = app.i18n;
 
@@ -32,18 +43,22 @@
   /** Rozwinięte wersje; na starcie najnowsza. */
   let open = $state<Record<string, boolean>>({});
 
+  function show(list: readonly ChangeLogEntry[]) {
+    entries = list;
+    loadError = null;
+    const first = list[0];
+    if (first) open = { [first.version]: true };
+  }
+
   async function reload() {
     const result = await load(() => app.client.updates.history());
-    if (result.status === 'ready') {
-      entries = result.value;
-      loadError = null;
-      const first = result.value[0];
-      if (first) open = { [first.version]: true };
-    } else if (result.status === 'failed') loadError = result.error;
+    if (result.status === 'ready') show(result.value);
+    else if (result.status === 'failed') loadError = result.error;
   }
 
   $effect(() => {
-    void reload();
+    if (preloaded) show(preloaded);
+    else void reload();
   });
 
   const totals = $derived(countBySeverity(entries ?? []));
@@ -78,11 +93,17 @@
   }
 </script>
 
-<section class="wk-card history" aria-labelledby="history-title">
+<svelte:element
+  this={embedded ? 'div' : 'section'}
+  class={embedded ? 'history embedded' : 'wk-card history'}
+  aria-labelledby={embedded ? undefined : 'history-title'}
+>
   <div class="head">
     <div>
-      <h3 id="history-title">{t('history.title')}</h3>
-      <p class="hint">{t('history.hint')}</p>
+      {#if !embedded}
+        <h3 id="history-title">{t('history.title')}</h3>
+        <p class="hint">{t('history.hint')}</p>
+      {/if}
     </div>
     {#if shown.length > 1}
       <button type="button" class="link" onclick={toggleAll}>
@@ -123,10 +144,10 @@
             type="button"
             role="tab"
             class="tab"
-            id="history-tab-{key}"
+            id="{uid}-tab-{key}"
             data-tab={key}
             aria-selected={tab === key}
-            aria-controls="history-panel"
+            aria-controls="{uid}-panel"
             tabindex={tab === key ? 0 : -1}
             onclick={() => selectTab(key)}
             onkeydown={onTabKey}
@@ -142,14 +163,15 @@
     {/if}
 
     <div
-      id="history-panel"
+      id="{uid}-panel"
       role={hasOlder ? 'tabpanel' : undefined}
-      aria-labelledby={hasOlder ? `history-tab-${tab}` : undefined}
+      aria-labelledby={hasOlder ? `${uid}-tab-${tab}` : undefined}
     >
       <ul class="versions">
         {#each shown as entry (entry.version)}
           <ChangeHistoryVersion
             {entry}
+            panelId="{uid}-{entry.version}"
             expanded={Boolean(open[entry.version])}
             ontoggle={() => toggle(entry.version)}
           />
@@ -171,13 +193,20 @@
       </div>
     {/if}
   {/if}
-</section>
+</svelte:element>
 
 <style>
   .history {
     --sev-critical: var(--alfa-color-error);
     --sev-serious: var(--alfa-color-warning);
     --sev-normal: var(--alfa-color-success);
+  }
+  .embedded .filters {
+    margin-top: 0;
+  }
+  .embedded .head {
+    justify-content: flex-end;
+    margin-bottom: var(--alfa-space-2);
   }
   .head {
     display: flex;

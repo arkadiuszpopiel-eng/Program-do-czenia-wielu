@@ -70,3 +70,12 @@ export function splitHistory(
   const cut = Math.max(0, Math.floor(limit));
   return { recent: entries.slice(0, cut), older: entries.slice(cut) };
 }
+
+/** Wpis dziennika dla wersji (numer bez początkowego „v”); `null` — dziennik jej nie zna. */
+export function entryFor(
+  entries: readonly ChangeLogEntry[],
+  version: string,
+): ChangeLogEntry | null {
+  const wanted = version.trim().replace(/^v/i, '');
+  return entries.find((entry) => entry.version === wanted) ?? null;
+}
