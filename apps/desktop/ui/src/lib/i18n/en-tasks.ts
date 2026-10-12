@@ -90,19 +90,19 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'duty.morning.name': 'Morning overview',
   'duty.morning.when': 'weekdays at 8:00',
   'duty.morning.goal':
-    'Prepare a short overview for today: open tasks and their state, background tasks scheduled for today, and costs from yesterday and the current month. At most 7 points, most important first.',
+    'Using the program data, prepare a short overview for today: open tasks and their state, enabled triggers with their next run, and costs for today and the current month. At most 7 points, most important first. If something is not in the data, write “no data”.',
   'duty.evening.name': 'End-of-day summary',
   'duty.evening.when': 'weekdays at 18:00',
   'duty.evening.goal':
-    'Summarise today’s work: what was done, what waits for tomorrow and what needs my decision. Short, as bullet points.',
+    'Using the program data, summarise today’s work: tasks finished today, tasks still open for tomorrow and those that need my decision (paused or failed). Short, as bullet points. If a list is empty, say so plainly.',
   'duty.tidy.name': 'Tidy the working folder',
   'duty.tidy.when': 'Saturdays at 12:00',
   'duty.tidy.goal':
-    'Go through the working folder: list temporary files, duplicates and the ten largest files. Do not delete or move anything — prepare a list with a proposal and wait for my approval.',
+    'Go through the working folder given in the program data: list files that look temporary, possible duplicates and the largest files. Do not delete or move anything — prepare a list with a proposal and wait for my approval. If the session has no working folder, say so and finish.',
   'duty.costs.name': 'Cost check',
   'duty.costs.when': 'Mondays at 9:00',
   'duty.costs.goal':
-    'Compare model costs from the last week with the week before: point out what grew the most and suggest which simple tasks could move to a cheaper or local model.',
+    'Using the program data, check model costs: the cost for today, the cost for the current month and what share of the monthly limit that is. If the limit is off or costs are zero, say so plainly. Do not give amounts that are not in the data.',
   'triggers.create': 'Create trigger',
   'triggers.created': 'Trigger “{name}” created.',
   'triggers.log': 'Run log',

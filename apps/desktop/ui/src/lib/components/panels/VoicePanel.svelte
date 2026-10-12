@@ -1,5 +1,5 @@
 <!--
-  Panel „Głos" (Alt+6, ładowany leniwie): rozmowa głosowa wł./wył., słowa wywoławcze z testem,
+  Panel „Głos" (Alt+6, ładowany leniwie): rozmowa głosowa wł./wył. z kulą stanu, słowa wywoławcze z testem,
   silniki rozmowy (wersja zwarta), kreator rejestracji głosu, dyktowanie, czytanie na głos i „szybka rozmowa (chmura) — wymaga
   klucza". Zmiany stanu ogłaszane czytnikowi ekranu przez `aria-live` z throttlingiem.
 -->
@@ -15,6 +15,7 @@
   import EnginesCard from '../voice/EnginesCard.svelte';
   import ReadCard from '../voice/ReadCard.svelte';
   import SpeakerEnroll from '../voice/SpeakerEnroll.svelte';
+  import VoiceOrb from '../voice/VoiceOrb.svelte';
   import WakeCard from '../voice/WakeCard.svelte';
   import { loadVoiceFeatures } from '../voice/voice-act';
   import '../voice/voice.css';
@@ -93,6 +94,7 @@
         {status.reason ? app.i18n.text(status.reason) : t('voice.unavailable')}
       </p>
     {:else}
+      <VoiceOrb />
       <div class="vf-row">
         <span class="vf-state">{t(active ? 'voice.active' : 'voice.off')}</span>
         <Button

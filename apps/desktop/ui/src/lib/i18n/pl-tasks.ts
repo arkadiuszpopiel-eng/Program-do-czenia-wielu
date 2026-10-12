@@ -88,19 +88,19 @@ export const plTasks = {
   'duty.morning.name': 'Poranny przegląd dnia',
   'duty.morning.when': 'dni robocze o 8:00',
   'duty.morning.goal':
-    'Przygotuj krótki przegląd na dziś: otwarte zadania i ich stan, zadania w tle zaplanowane na dziś oraz koszty z wczoraj i z bieżącego miesiąca. Najwyżej 7 punktów, najważniejsze na górze.',
+    'Na podstawie danych z programu przygotuj krótki przegląd na dziś: otwarte zadania i ich stan, włączone wyzwalacze z najbliższym uruchomieniem oraz koszty z dziś i z bieżącego miesiąca. Najwyżej 7 punktów, najważniejsze na górze. Jeśli czegoś nie ma w danych, napisz „brak danych”.',
   'duty.evening.name': 'Podsumowanie dnia',
   'duty.evening.when': 'dni robocze o 18:00',
   'duty.evening.goal':
-    'Podsumuj dzisiejszy dzień pracy: co zostało zrobione, co czeka na jutro i co wymaga mojej decyzji. Krótko, w punktach.',
+    'Na podstawie danych z programu podsumuj dzisiejszy dzień pracy: zadania zakończone dziś, zadania otwarte na jutro i te, które wymagają mojej decyzji (wstrzymane albo zakończone błędem). Krótko, w punktach. Jeśli lista jest pusta, napisz to wprost.',
   'duty.tidy.name': 'Porządki w katalogu roboczym',
   'duty.tidy.when': 'w soboty o 12:00',
   'duty.tidy.goal':
-    'Przejrzyj katalog roboczy: wypisz pliki tymczasowe, duplikaty i dziesięć największych plików. Niczego nie usuwaj ani nie przenoś — przygotuj listę z propozycją i poczekaj na moją zgodę.',
+    'Przejrzyj katalog roboczy podany w danych z programu: wypisz pliki wyglądające na tymczasowe, możliwe duplikaty i największe pliki. Niczego nie usuwaj ani nie przenoś — przygotuj listę z propozycją i poczekaj na moją zgodę. Jeśli sesja nie ma katalogu roboczego, napisz to i zakończ.',
   'duty.costs.name': 'Kontrola kosztów',
   'duty.costs.when': 'w poniedziałki o 9:00',
   'duty.costs.goal':
-    'Porównaj koszty modeli z ostatniego tygodnia z poprzednim: wskaż, co urosło najbardziej, i zaproponuj, które proste zadania można przenieść na tańszy albo lokalny model.',
+    'Na podstawie danych z programu sprawdź koszty modeli: koszt z dziś, koszt z bieżącego miesiąca i jaka to część limitu miesięcznego. Jeśli limit jest wyłączony albo koszty są zerowe, napisz to wprost. Nie podawaj kwot, których nie ma w danych.',
   'triggers.create': 'Utwórz wyzwalacz',
   'triggers.created': 'Utworzono wyzwalacz „{name}".',
   'triggers.log': 'Dziennik uruchomień',
