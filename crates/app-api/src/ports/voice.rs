@@ -116,6 +116,10 @@ pub trait VoicePort: Send + Sync {
     async fn status(&self) -> VoiceStatus {
         VoiceStatus::unavailable(voice_unavailable_reason(), vec!["voice-pipeline".into()])
     }
+    /// Czy trwa czytanie na głos albo próbka głosu (odtwarzanie poza rozmową).
+    async fn reading(&self) -> bool {
+        false
+    }
     /// Próbka głosu agentki (głosy v0).
     async fn preview(&self, agent: &str) -> Result<(), AppError> {
         self.read_aloud(agent, VOICE_PREVIEW_TEXT).await

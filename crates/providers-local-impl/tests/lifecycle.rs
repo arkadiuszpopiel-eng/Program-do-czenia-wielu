@@ -311,11 +311,20 @@ async fn idle_unload_module_events_and_health() {
         !sidecar.reap_idle_at(Instant::now()).await,
         "świeżo używany"
     );
-    assert!(
-        sidecar
+    // Licznik żądań w toku spada chwilę po końcu strumienia (strażnik zwalnia się w tle) — pod
+    // obciążeniem test trafiał w to okno i padał. Czekamy na zwolnienie, najwyżej 5 s.
+    let mut reaped = false;
+    for _ in 0..500 {
+        if sidecar
             .reap_idle_at(Instant::now() + Duration::from_secs(601))
             .await
-    );
+        {
+            reaped = true;
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    assert!(reaped, "bezczynny model zwolniony po zakończeniu żądania");
     assert!(sidecar.running_plan().await.is_none());
     module.stop().await.unwrap();
     assert_eq!(module.stop().await, Err(ModuleError::NotStarted));

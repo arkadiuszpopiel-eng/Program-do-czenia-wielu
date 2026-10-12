@@ -3,7 +3,7 @@
 # (docs/plan/24 §2.7). Dane właściciela nie są dotykane: profil leży w `target/trial-profile`,
 # a model i silnik rozmowy są do niego KOPIOWANE (nie dowiązywane).
 #
-#   scripts/trial/profile.sh start [--model|--voice]   uruchamia (--model: kopia Bielika 4.5B i llama;
+#   scripts/trial/profile.sh start [--model|--voice|--fresh]   uruchamia (--model: kopia Bielika 4.5B i llama;
 #                                                      --voice: kopia silników rozmowy)
 #   scripts/trial/profile.sh stop              kończy tylko tę instancję (po numerze procesu)
 #   scripts/trial/profile.sh port              wypisuje port CDP instancji testowej
@@ -11,7 +11,7 @@
 # Wymaga powłoki zbudowanej z cechą `e2e` (`target/shell/debug/alfa-desktop.exe`).
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PROFILE="$ROOT/target/trial-profile"
+PROFILE="${ALFA_TRIAL_PROFILE:-$ROOT/target/trial-profile}"
 PORT="${ALFA_TRIAL_PORT:-9333}"
 PIDFILE="$PROFILE/instancja.pid"
 OWNER="${LOCALAPPDATA:-}/Alfa"
@@ -22,6 +22,10 @@ start)
   [ -f "$EXE" ] || { echo "Brak $EXE — najpierw budowa powłoki z cechą e2e."; exit 2; }
   # Czysty stan przy każdym starcie: zostają tylko skopiowane modele i silniki. Stare zadania
   # i wyzwalacze z poprzednich prób ruszałyby w tle i zajmowały kartę graficzną.
+  # `--fresh`: profil bez żadnych modeli i silników (próba pobierania samym programem).
+  if [ "${2:-}" = "--fresh" ]; then
+    rm -rf "$PROFILE/Local/Alfa"
+  fi
   if [ -d "$PROFILE/Local/Alfa" ]; then
     find "$PROFILE/Local/Alfa" -mindepth 1 -maxdepth 1 ! -name models ! -name sidecars -exec rm -rf {} +
   fi

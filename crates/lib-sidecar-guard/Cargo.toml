@@ -1,0 +1,18 @@
+[package]
+name = "lib-sidecar-guard"
+description = "Wspólna biblioteka (bez logiki modułu): rejestr procesów pobocznych Alfy (llama-server, whisper-server, silniki głosu) — zamykane przy wyjściu z programu i sprzątane po awarii przy następnym starcie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

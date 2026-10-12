@@ -411,10 +411,10 @@ poleceń; <code>scripts/trial/profile.sh</code> uruchamia instancję testową do
 <tr><td><code>scripts/verify.mjs</code> z jednym raportem</td><td>zrobione (poziomy szybki / wersja / sprzet)</td></tr>
 <tr><td>Tor akustyczny</td><td>zrobione (<code>scripts/trial/voice-loop.mjs</code>): pierwszy bieg — koniec wypowiedzi wykryty po 3 s, ale rozpoznanie przez głośnik i mikrofon laptopa złe (1 z 8 słów); próbka głosu z Ustawień wraca jako wypowiedź użytkownika</td></tr>
 <tr><td>Zrozumiałość głosów</td><td class="st st2">do zrobienia</td></tr>
-<tr><td>Pobranie Qwen3-ASR i <code>llama-server</code> przez program</td><td class="st st2">do zrobienia</td></tr>
-<tr><td><code>cargo deny</code> lokalnie</td><td class="st st2">do zrobienia</td></tr>
+<tr><td>Pobranie Qwen3-ASR i <code>llama-server</code> przez program</td><td>zrobione — Qwen3-ASR (2,35 GB) i silnik <code>llama-server</code> na kartę NVIDIA (0,61 GB) pobrane, sprawdzone z przypiętymi sumami i oznaczone jako zainstalowane w 13 minut (<code>scripts/trial/download.mjs</code>)</td></tr>
+<tr><td><code>cargo deny</code> lokalnie</td><td>zrobione: narzędzie doinstalowane, etap „zależności” zielony od 0.0.47</td></tr>
 <tr><td>Pokrycie poleceń rdzenia ≥ 60 %</td><td>w toku: 119 z 228 (52,2 %); zostają konta (wymagają osobnego magazynu poświadczeń dla testów), tury rozmowy z modelem, umiejętności, wtyczki, kopie</td></tr>
-<tr><td>Wady znalezione biegami 0.0.46–0.0.47</td><td>osierocony <code>llama-server</code> po zamknięciu programu (trzyma kartę; naprawa: jedna grupa procesów dla silników pobocznych przez <code>ProcessPort</code>); niestabilny test <code>providers-local-impl::idle_unload_module_events_and_health</code>; głos dostępny dopiero z Whisperem, choć Qwen3-ASR jest zainstalowany (komunikat „brakuje whisper-server”) — do wyjaśnienia, czy to zamierzone</td></tr></tbody></table></div>
+<tr><td>Wady znalezione biegami 0.0.46–0.0.47</td><td>naprawione w 0.0.48: osierocone silniki po zamknięciu programu (<code>crates/lib-sidecar-guard</code>), próbka głosu łapana przez mikrofon, niestabilny test zwalniania modelu. Wyjaśnione: Whisper jest obowiązkowym zapasem strażnika rozpoznawania; słabe rozpoznanie przez głośnik i mikrofon to głównie akustyka laptopa (diagnostyka: <code>voice-audio-impl</code> test <code>capture_microphone_to_wav</code>)</td></tr></tbody></table></div>
 </article>
 <footer>Źródło: <code>docs/plan/24-samodzielne-testowanie.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

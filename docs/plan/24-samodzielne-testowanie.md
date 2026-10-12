@@ -115,7 +115,7 @@ programu). Od 0.0.46:
 | `scripts/verify.mjs` z jednym raportem | zrobione (poziomy szybki / wersja / sprzet) |
 | Tor akustyczny | zrobione (`scripts/trial/voice-loop.mjs`): pierwszy bieg — koniec wypowiedzi wykryty po 3 s, ale rozpoznanie przez głośnik i mikrofon laptopa złe (1 z 8 słów); próbka głosu z Ustawień wraca jako wypowiedź użytkownika |
 | Zrozumiałość głosów | do zrobienia |
-| Pobranie Qwen3-ASR i `llama-server` przez program | do zrobienia |
-| `cargo deny` lokalnie | do zrobienia |
+| Pobranie Qwen3-ASR i `llama-server` przez program | zrobione — Qwen3-ASR (2,35 GB) i silnik `llama-server` na kartę NVIDIA (0,61 GB) pobrane, sprawdzone z przypiętymi sumami i oznaczone jako zainstalowane w 13 minut (`scripts/trial/download.mjs`) |
+| `cargo deny` lokalnie | zrobione: narzędzie doinstalowane, etap „zależności” zielony od 0.0.47 |
 | Pokrycie poleceń rdzenia ≥ 60 % | w toku: 119 z 228 (52,2 %); zostają konta (wymagają osobnego magazynu poświadczeń dla testów), tury rozmowy z modelem, umiejętności, wtyczki, kopie |
-| Wady znalezione biegami 0.0.46–0.0.47 | osierocony `llama-server` po zamknięciu programu (trzyma kartę; naprawa: jedna grupa procesów dla silników pobocznych przez `ProcessPort`); niestabilny test `providers-local-impl::idle_unload_module_events_and_health`; głos dostępny dopiero z Whisperem, choć Qwen3-ASR jest zainstalowany (komunikat „brakuje whisper-server”) — do wyjaśnienia, czy to zamierzone |
+| Wady znalezione biegami 0.0.46–0.0.47 | naprawione w 0.0.48: osierocone silniki po zamknięciu programu (`crates/lib-sidecar-guard`), próbka głosu łapana przez mikrofon, niestabilny test zwalniania modelu. Wyjaśnione: Whisper jest obowiązkowym zapasem strażnika rozpoznawania; słabe rozpoznanie przez głośnik i mikrofon to głównie akustyka laptopa (diagnostyka: `voice-audio-impl` test `capture_microphone_to_wav`) |

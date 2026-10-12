@@ -148,6 +148,9 @@ impl PocketSidecar {
         let mut child = cmd
             .spawn()
             .map_err(|e| TtsError::NotAvailable(format!("{}: {e}", program.display())))?;
+        if let Some(pid) = child.id() {
+            lib_sidecar_guard::register(pid, program);
+        }
         let (Some(stdin), Some(stdout)) = (child.stdin.take(), child.stdout.take()) else {
             return Err(engine_err("brak stdio sidecara"));
         };

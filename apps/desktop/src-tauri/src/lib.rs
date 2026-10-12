@@ -60,6 +60,16 @@ pub fn run() {
         .setup(move |app| {
             tracing::info!(wersja = %app.package_info().version, "start powłoki Alfy");
             let paths = AppPaths::from_env().map_err(|e| e.message)?;
+            // Silniki osierocone przez awarię poprzedniego uruchomienia trzymałyby pamięć karty
+            // graficznej — kończymy je, zanim rdzeń zacznie uruchamiać nowe.
+            let _ = std::fs::create_dir_all(paths.state());
+            let orphans = lib_sidecar_guard::init(paths.state().join("sidecars.pids"));
+            if orphans > 0 {
+                tracing::warn!(
+                    orphans,
+                    "zakończono procesy poboczne poprzedniego uruchomienia"
+                );
+            }
             let handle = app.handle().clone();
             // Procesy Jądra przed rdzeniem: Broker poza procesem (usługa / tryb przenośny),
             // watchdog z kill-switchem; release bez izolowanego Brokera — bezpieczny stan.
@@ -90,7 +100,17 @@ pub fn run() {
             shell::handle_args(&handle, std::env::args().collect());
             Ok(())
         })
-        .run(tauri::generate_context!());
+        .build(tauri::generate_context!())
+        .map(|app| {
+            app.run(|_, event| {
+                // Wyjście przez `exit` nie niszczy obiektów procesów (`kill_on_drop` nie zadziała):
+                // silniki poboczne kończymy jawnie, inaczej zostają i trzymają pamięć karty.
+                if let tauri::RunEvent::Exit = event {
+                    let closed = lib_sidecar_guard::kill_all();
+                    tracing::info!(closed, "zamknięto procesy poboczne przy wyjściu");
+                }
+            });
+        });
     if let Err(error) = result {
         tracing::error!(error = %error, "błąd uruchomienia Tauri");
         eprintln!("alfa-desktop: błąd uruchomienia Tauri: {error}");

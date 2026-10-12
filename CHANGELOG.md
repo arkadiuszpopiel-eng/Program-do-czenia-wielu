@@ -12,6 +12,44 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.48 — 2026-10-12
+
+Wersja naprawcza: pięć wad znalezionych testami poprzednich dwóch wersji. Najważniejsze — po zamknięciu programu
+nie zostają już procesy silników, które trzymały pamięć karty graficznej.
+
+### Modele lokalne i głos
+
+- [poważne] Po wyjściu z programu wszystkie silniki poboczne (`llama-server`, `whisper-server`, silniki głosu,
+  Smart Turn) są zamykane. Dotąd silnik modelu potrafił zostać jako osobny proces i trzymać ok. 4 GB pamięci karty;
+  następne wczytanie rozpoznawania mowy trwało wtedy 54 s zamiast kilku. Jeśli program skończy się awarią, silniki
+  po nim są zamykane przy następnym starcie.
+- Próbka głosu i czytanie na głos przy włączonym mikrofonie nie trafiają już do rozmowy jako Twoja wypowiedź:
+  na czas odtwarzania słuchanie jest wstrzymane i wraca samo po zakończeniu.
+
+### Testy
+
+- Naprawa procesów sprawdzona na żywo na instancji testowej: silnik modelu uruchomiony zadaniem, wyjście
+  z programu, po wyjściu żadnego procesu silnika. Biblioteka rejestru ma test na prawdziwych procesach: zamknięcie
+  przy wyjściu, sprzątanie po awarii, nietknięcie obcego procesu pod tym samym numerem.
+- Tor akustyczny po poprawce: wypowiedź z głośnika wykryta i zakończona, głos agentki nie wraca jako wypowiedź.
+- Słabe rozpoznanie mowy przez głośnik i mikrofon laptopa — zbadane nagraniem tego, co słyszy mikrofon
+  (nowy test diagnostyczny): poziom sygnału dobry, ale rozpoznanie surowego nagrania też jest złe (z ośmiu słów
+  zgadzają się dwa–trzy; przez tor programu jedno). Główna przyczyna leży w samym układzie głośnik–mikrofon
+  laptopa, który tłumi własny głośnik, więc ta próba sprawdza teraz wykrycie i zakończenie wypowiedzi, a zgodność
+  słów podaje tylko informacyjnie. Jakość rozpoznawania żywej mowy nadal wymaga próby z właścicielem.
+- Pobieranie samym programem na czystym profilu: zrobione — Qwen3-ASR (2,35 GB) i silnik `llama-server` na kartę NVIDIA (0,61 GB) pobrane, sprawdzone z przypiętymi sumami i oznaczone jako zainstalowane w 13 minut
+- Niestabilny test zwalniania bezczynnego modelu naprawiony (czekał za krótko na koniec żądania).
+- Sprawdzanie: próba rozmowy biegnie jednym wątkiem (dwa równoległe wczytania rozpoznawania nie mieszczą się na
+  karcie 6 GB — to było źródłem czerwonego etapu), oceniający raporty zna zapis daty z kropkami i imiona obsady.
+- Wyjaśnione, bez zmiany w programie: rozmowa głosowa wymaga Whispera także wtedy, gdy jest Qwen3-ASR — Whisper
+  jest zapasem, do którego strażnik rozpoznawania sięga przy awarii silnika głównego.
+
+### Przyczyna błędów
+
+- Silniki poboczne były zamykane tylko przez zniszczenie obiektu procesu, a wyjście z programu nie niszczy
+  obiektów. Teraz każdy uruchomiony silnik jest zapisywany w rejestrze, który powłoka opróżnia przy wyjściu.
+- Próbka głosu gra osobną ścieżką niż rozmowa, bez tłumienia echa — mikrofon słyszał ją jak rozmówcę.
+
 ## 0.0.47 — 2026-10-12
 
 Przy wyzwalaczach widać ostatni wynik z raportem agentki, a nad polem pisania — co Alfa właśnie słyszy. Agentka

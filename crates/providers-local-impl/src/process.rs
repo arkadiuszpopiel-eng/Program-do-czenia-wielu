@@ -60,7 +60,12 @@ impl SidecarProcess for TokioProcess {
 
     fn exited(&mut self) -> Option<Option<i32>> {
         match self.0.try_wait() {
-            Ok(Some(status)) => Some(status.code()),
+            Ok(Some(status)) => {
+                if let Some(pid) = self.0.id() {
+                    lib_sidecar_guard::unregister(pid);
+                }
+                Some(status.code())
+            }
             Ok(None) => None,
             Err(_) => Some(None),
         }
@@ -103,6 +108,9 @@ impl SidecarLauncher for TokioLauncher {
                     log_server_line(&line);
                 }
             });
+        }
+        if let Some(pid) = child.id() {
+            lib_sidecar_guard::register(pid, &spec.program);
         }
         Ok(Box::new(TokioProcess(child)))
     }

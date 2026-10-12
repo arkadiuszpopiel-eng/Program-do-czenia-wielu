@@ -9,6 +9,8 @@ rust-version.workspace = true
 repository.workspace = true
 
 [dependencies]
+# Rejestr procesów pobocznych: zamykane przy wyjściu z programu, sprzątane po awarii.
+lib-sidecar-guard = { path = "../lib-sidecar-guard" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 voice-audio-contract = { path = "../voice-audio-contract" }
 personas-contract = { path = "../personas-contract" }

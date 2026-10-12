@@ -207,6 +207,9 @@ impl SidecarLauncher for ProcessLauncher {
         let mut child = cmd
             .spawn()
             .map_err(|e| SttError::Sidecar(format!("{}: {e}", spec.program.display())))?;
+        if let Some(pid) = child.id() {
+            lib_sidecar_guard::register(pid, &spec.program);
+        }
         let stderr: Arc<Mutex<VecDeque<String>>> = Arc::default();
         if let Some(err) = child.stderr.take() {
             let tail = Arc::clone(&stderr);

@@ -16,6 +16,8 @@ test = false
 doc = false
 
 [dependencies]
+# Rejestr procesów pobocznych: zamykane przy wyjściu z programu, sprzątane po awarii.
+lib-sidecar-guard = { path = "../lib-sidecar-guard" }
 providers-contract = { path = "../providers-contract" }
 lib-openai-compat = { path = "../lib-openai-compat" }
 device-profile-contract = { path = "../device-profile-contract" }

@@ -203,6 +203,10 @@ impl VoicePort for VoiceAdapter {
         Ok(())
     }
 
+    async fn reading(&self) -> bool {
+        lock(&self.state).speech.is_some()
+    }
+
     async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError> {
         let tts = crate::tts::ready(self.tts.as_ref())
             .ok_or_else(|| AppError::new(ErrorCode::Unavailable, NO_TTS))?;

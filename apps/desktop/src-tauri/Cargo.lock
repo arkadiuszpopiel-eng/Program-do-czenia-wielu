@@ -201,6 +201,7 @@ version = "0.0.47"
 dependencies = [
  "app-core",
  "app-logs",
+ "lib-sidecar-guard",
  "serde",
  "serde_json",
  "tauri",
@@ -3993,6 +3994,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "lib-sidecar-guard"
+version = "0.0.47"
+dependencies = [
+ "tracing",
+]
+
+[[package]]
 name = "lib-sqlstore"
 version = "0.0.47"
 dependencies = [
@@ -5580,6 +5588,7 @@ dependencies = [
  "futures-util",
  "getrandom 0.4.3",
  "lib-openai-compat",
+ "lib-sidecar-guard",
  "model-residency-contract",
  "providers-contract",
  "reqwest 0.12.28",
@@ -9112,6 +9121,7 @@ dependencies = [
  "core-bus-contract",
  "core-registry-contract",
  "device-profile-contract",
+ "lib-sidecar-guard",
  "model-residency-contract",
  "reqwest 0.12.28",
  "serde",
@@ -9146,6 +9156,7 @@ dependencies = [
  "base64 0.22.1",
  "core-bus-contract",
  "core-registry-contract",
+ "lib-sidecar-guard",
  "model-residency-contract",
  "personas-contract",
  "providers-contract",
@@ -9173,6 +9184,7 @@ name = "voice-turn-impl"
 version = "0.0.47"
 dependencies = [
  "base64 0.22.1",
+ "lib-sidecar-guard",
  "serde_json",
  "voice-turn-contract",
 ]

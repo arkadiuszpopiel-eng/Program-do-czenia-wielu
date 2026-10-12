@@ -95,3 +95,76 @@ fn contract_suite_on_hardware() {
     });
     let _ = system_audio();
 }
+
+/// Diagnostyka toru akustycznego (docs/plan/24 §2.4): nagrywa to, co słyszy domyślny mikrofon,
+/// do pliku WAV — `ALFA_CAPTURE_WAV=<plik>`, `ALFA_CAPTURE_SECS` (domyślnie 8). Z `ALFA_CAPTURE_PLAY=<wav>`
+/// po sekundzie odtwarza nagranie z głośnika (dźwięk — tylko w dzień). Wypisuje poziom sygnału.
+/// Surowe nagranie można potem podać rozpoznawaniu (`ALFA_QWEN_WAV`) i porównać z wynikiem potoku.
+#[cfg(windows)]
+#[test]
+#[ignore = "wymaga mikrofonu; z ALFA_CAPTURE_PLAY odtwarza dźwięk"]
+fn capture_microphone_to_wav() {
+    use std::time::{Duration, Instant};
+    use voice_audio_contract::wav::{WavEncoding, encode_wav};
+    use voice_audio_contract::{AudioIo, StreamConfig};
+
+    let Some(target) = std::env::var_os("ALFA_CAPTURE_WAV") else {
+        eprintln!("ALFA_CAPTURE_WAV nie ustawione — pomijam");
+        return;
+    };
+    let secs = std::env::var("ALFA_CAPTURE_SECS")
+        .ok()
+        .and_then(|s| s.parse::<u64>().ok())
+        .unwrap_or(8);
+    let io = voice_audio_impl::WasapiAudio::new();
+    let mut input = io
+        .open_input(None, &StreamConfig::input_default())
+        .unwrap_or_else(|e| panic!("mikrofon: {e}"));
+    let format = input.format();
+    let started = Instant::now();
+    let mut player = None;
+    let mut samples: Vec<f32> = Vec::new();
+    while started.elapsed() < Duration::from_secs(secs) {
+        if player.is_none()
+            && started.elapsed() > Duration::from_secs(1)
+            && let Some(wav) = std::env::var_os("ALFA_CAPTURE_PLAY")
+        {
+            let script = format!(
+                "(New-Object System.Media.SoundPlayer '{}').PlaySync()",
+                wav.to_string_lossy().replace('\'', "''")
+            );
+            player = std::process::Command::new("powershell")
+                .args(["-NoProfile", "-Command", &script])
+                .spawn()
+                .ok();
+        }
+        match input.read() {
+            Some(frame) => samples.extend(
+                frame
+                    .pcm
+                    .iter()
+                    .step_by(usize::from(format.channels.max(1))),
+            ),
+            None => std::thread::sleep(Duration::from_millis(5)),
+        }
+    }
+    if let Some(mut child) = player {
+        let _ = child.wait();
+    }
+    assert!(!samples.is_empty(), "mikrofon nie oddał żadnej ramki");
+    let peak = samples.iter().fold(0.0f32, |m, s| m.max(s.abs()));
+    let rms = (samples.iter().map(|s| s * s).sum::<f32>() / samples.len() as f32).sqrt();
+    let mono = voice_audio_contract::AudioFormat {
+        channels: 1,
+        ..format
+    };
+    std::fs::write(&target, encode_wav(&samples, mono, WavEncoding::Pcm16))
+        .unwrap_or_else(|e| panic!("zapis: {e}"));
+    eprintln!(
+        "POMIAR mikrofon: {} próbek, {} Hz, szczyt {peak:.3}, RMS {rms:.4}, zgubione bloki {} → {}",
+        samples.len(),
+        format.sample_rate,
+        input.overruns(),
+        std::path::Path::new(&target).display()
+    );
+}

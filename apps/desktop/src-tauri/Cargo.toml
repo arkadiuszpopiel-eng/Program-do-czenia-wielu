@@ -1,6 +1,6 @@
 [package]
 name = "alfa-desktop"
-version = "0.0.47"
+version = "0.0.48"
 description = "Alfa — cienka powłoka Tauri 2 (WebView2): okna, zasobnik, skróty globalne, powiadomienia; komendy deleguje do app-core."
 edition = "2024"
 rust-version = "1.94"
@@ -25,6 +25,7 @@ tauri-build = { version = "=2.7.0", features = [] }
 
 [dependencies]
 app-core = { path = "../../../crates/app-core" }
+lib-sidecar-guard = { path = "../../../crates/lib-sidecar-guard" }
 # Dziennik diagnostyczny procesu (subskrybent `tracing`, plik rotowany w %LOCALAPPDATA%\Alfa\logs).
 app-logs = { path = "../../../crates/app-logs" }
 # `tray-icon` — zasobnik (§14.8); `protocol-asset` — podgląd obrazów artefaktów przez `asset:`.

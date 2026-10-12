@@ -152,6 +152,7 @@ impl SidecarScorer {
         let mut child = cmd
             .spawn()
             .map_err(|e| model_err(format!("{}: {e}", self.cfg.program.display())))?;
+        lib_sidecar_guard::register(child.id(), &self.cfg.program);
         let (Some(stdin), Some(stdout)) = (child.stdin.take(), child.stdout.take()) else {
             let _ = child.kill();
             return Err(model_err("proces bez potoków"));

@@ -41,6 +41,11 @@ pub(crate) struct Shared {
     pub agent: String,
 }
 
+/// Bramka słuchania na czas czytania na głos: krok sprawdzania, pogłos po końcu, górny limit.
+const READ_GATE_STEP: std::time::Duration = std::time::Duration::from_millis(100);
+const READ_GATE_TAIL: std::time::Duration = std::time::Duration::from_millis(400);
+const READ_GATE_MAX: std::time::Duration = std::time::Duration::from_secs(120);
+
 /// Głos z potokiem rozmowy (uchwyt; stan we współdzielonym [`Voice`] — zadania w tle).
 pub struct PipelineVoice(Arc<Voice>);
 
@@ -308,8 +313,36 @@ impl VoicePort for PipelineVoice {
         self.0.f5.stop_reading();
         self.0.base.stop_speech().await
     }
+    async fn reading(&self) -> bool {
+        self.0.base.reading().await
+    }
     async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError> {
-        self.0.base.read_aloud(agent, text).await
+        // Czytanie i próbka głosu grają poza rozmową (bez tłumienia echa): przy włączonym
+        // mikrofonie wracałyby jako wypowiedź użytkownika (próba toru akustycznego,
+        // 2026-10-12). Na czas odtwarzania słuchanie jest wstrzymane.
+        let v = &self.0;
+        let gate = v.running().is_some() && !lock(&v.shared).muted;
+        if gate {
+            v.ctl(Ctl::Input(PipelineInput::SetMuted { muted: true }));
+        }
+        let result = v.base.read_aloud(agent, text).await;
+        if gate {
+            let voice = self.0.clone();
+            tokio::spawn(async move {
+                let deadline = tokio::time::Instant::now() + READ_GATE_MAX;
+                tokio::time::sleep(READ_GATE_STEP).await;
+                while voice.base.reading().await && tokio::time::Instant::now() < deadline {
+                    tokio::time::sleep(READ_GATE_STEP).await;
+                }
+                // Pogłos pokoju po ostatnim słowie.
+                tokio::time::sleep(READ_GATE_TAIL).await;
+                // Użytkownik mógł w tym czasie sam wyciszyć mikrofon — wtedy zostaje wyciszony.
+                if !lock(&voice.shared).muted {
+                    voice.ctl(Ctl::Input(PipelineInput::SetMuted { muted: false }));
+                }
+            });
+        }
+        result
     }
     async fn ptt(&self, pressed: bool) -> Result<(), AppError> {
         let v = &self.0;

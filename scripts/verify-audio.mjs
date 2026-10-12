@@ -3,14 +3,14 @@
 // osoby) przeliczona do 16 kHz mono 16 bit — tego formatu oczekują VAD, rozpoznawanie i model mówcy.
 // Źródło: nagrania głosu Supertonic z prób (poza repozytorium); wynik: target/verify/audio/.
 //
-//   node scripts/verify-audio.mjs [katalog-źródłowy]
+//   node scripts/verify-audio.mjs [katalog-źródłowy] [katalog-wyniku]
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const source = process.argv[2] ?? join(root, '..', 'alfa-glos-proba', 'wyniki', 'supertonic3');
-const out = join(root, 'target', 'verify', 'audio');
+const out = process.argv[3] ?? join(root, 'target', 'verify', 'audio');
 const RATE = 16_000;
 
 /** Odczyt WAV PCM 16 bit: próbki pierwszego kanału i częstotliwość. */
