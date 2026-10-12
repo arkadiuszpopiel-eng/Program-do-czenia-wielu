@@ -278,12 +278,13 @@ impl TasksApp {
             .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
             .take(32)
             .collect();
-        let id = format!(
-            "{}-{}",
-            slug.trim_matches('-'),
+        // Licznik zaczyna od zera po każdym starcie programu — identyfikator musi ominąć zapisane
+        // wyzwalacze, inaczej drugi wyzwalacz o tej samej nazwie kończył się błędem „już istnieje”.
+        let taken: Vec<String> = self.triggers_list().into_iter().map(|t| t.id).collect();
+        let id = crate::text::free_id(slug.trim_matches('-'), &taken, || {
             self.seq.fetch_add(1, Ordering::SeqCst)
-        );
-        let spec = map::spec(id.trim_start_matches('-'), draft)?;
+        });
+        let spec = map::spec(&id, draft)?;
         let view = self
             .triggers_module()?
             .create(spec, Actor::User)

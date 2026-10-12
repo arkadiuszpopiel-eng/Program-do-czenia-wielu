@@ -12,6 +12,64 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.45 — 2026-10-12
+
+Historia zmian pokazuje dziesięć ostatnich wersji, a starsze czekają w zakładce „Starsze”; tę samą listę ma teraz
+okno „Co nowego”. Wróciły gotowe obowiązki codzienne agentek — agentka dostaje z programu prawdziwe dane. Doszła
+kula stanu rozmowy w panelu „Głos” oraz wyszukiwarka i podsumowanie miejsca na dysku w katalogu modeli.
+
+### Aktualizacje
+
+- Historia zmian (Ustawienia → Aktualizacje) pokazuje dziesięć ostatnich wersji do rozwinięcia. Starsze są w zakładce
+  „Starsze” — dojście z zakładki nad listą i z przycisku „Starsze wersje” pod listą; filtr wagi i „Rozwiń wszystkie”
+  działają w obrębie zakładki, a liczniki zakładek idą za filtrem. Zakładki obsługuje się też strzałkami.
+- Okno „Co nowego” pokazuje tę samą listę co Historia zmian: bieżąca wersja rozwinięta, pozycje z wagami (kolor
+  i słowo), dziesięć ostatnich wersji i zakładka „Starsze”. Wcześniej był tam sam tekst jednej wersji.
+
+### Agentki
+
+- [poważne] Zadanie w tle uruchomione wyzwalaczem albo harmonogramem dostaje razem z poleceniem dane z programu:
+  otwarte zadania i ich stan, zadania zakończone dziś, wyzwalacze z najbliższym uruchomieniem, koszty modeli z dziś
+  i z bieżącego miesiąca z limitem oraz zawartość katalogu roboczego. Agentka ma zakaz dopisywania czegokolwiek spoza
+  tych danych. Zadania z sesji prywatnych nie trafiają do zadań spoza takich sesji, tytuły zadań z treści niezaufanej
+  są pomijane, a zadanie oparte na treści niezaufanej danych nie dostaje wcale.
+- [poważne] Drugi wyzwalacz o tej samej nazwie da się utworzyć także po ponownym uruchomieniu programu. Dotąd
+  kończyło się to błędem „wyzwalacz już istnieje”, bo numeracja identyfikatorów zaczynała po starcie od zera.
+- Wróciły gotowe obowiązki codzienne w formularzu wyzwalacza (ukryte w 0.0.44): przegląd dnia, podsumowanie dnia,
+  porządki w katalogu roboczym i kontrola kosztów. Polecenia zostały przepisane tak, żeby opierały się na danych
+  z programu; kontrola kosztów porównuje koszt z limitem miesięcznym (porównania tygodni program jeszcze nie podaje).
+
+### Głos
+
+- Kula stanu rozmowy w panelu „Głos”: jedno miejsce, w którym widać, czy Alfa słucha, słyszy Cię, przetwarza, czy
+  mówi agentka — słowem, kolorem i pierścieniem rosnącym z głośnością. Pod stanem jest imię mówiącej agentki
+  i tekst rozpoznawany na bieżąco (dotąd rdzeń go wysyłał, ale okno nigdzie nie pokazywało).
+
+### Modele lokalne
+
+- Katalog modeli ma wyszukiwarkę (nazwa, identyfikator, licencja; bez polskich znaków i wielkości liter), wybór
+  kolejności (jak w katalogu, po nazwie, od największych, od najmniejszych) oraz podsumowanie: ile miejsca zajmują
+  pozycje na dysku i ile zajęłyby te, które można jeszcze pobrać.
+
+### Testy
+
+- Próba obowiązków na lokalnym modelu (Bielik 4.5B, profil tymczasowy z kopią modelu, dwa wyzwalacze jako stan
+  programu): „Poranny przegląd dnia” — raport w 85 s, wyłącznie z danych (brak zadań, trzy istniejące wyzwalacze
+  z prawdziwymi terminami, koszty 0,00 zł); „Podsumowanie dnia” — raport w 3 min 8 s, zgodny z danymi, z jednym
+  dopowiedzeniem („jutro” przy wyzwalaczu ręcznym) — arkusz mówi teraz wprost „bez harmonogramu”; „Kontrola
+  kosztów” — liczby zgodne z danymi (0,00 zł, limit 100 zł, 0 %), ale model zamiast krótkiego raportu opisywał
+  kolejne kroki, więc polecenie żąda teraz trzech krótkich punktów.
+- Arkusz faktów: 5 testów (komu przysługuje, pusty program, pełny arkusz, obcinanie długich list, prywatność)
+  i test rdzenia — zadanie z wyzwalacza dostaje arkusz.
+- Przeglądarka: historia z 17 wersjami (dziesięć + zakładka, klawiatura, filtr), okno „Co nowego” z listą, kula
+  stanu przez wszystkie stany, katalog modeli (szukanie, kolejność, miejsce) — każdy scenariusz w trzech stylach
+  i dwóch motywach z kontrolą dostępności. Cały zestaw: 342 z 342; testy interfejsu 336 z 336.
+
+### Przyczyna błędu
+
+- Identyfikator wyzwalacza powstawał z nazwy i licznika trzymanego tylko w pamięci programu; po restarcie licznik
+  wracał do zera i trafiał na zapisany wyzwalacz. Wyszło w próbie obowiązków na profilu z wcześniejszymi wyzwalaczami.
+
 ## 0.0.44 — 2026-10-12
 
 Ostatnia z jedenastu wersji z nocy 11/12 października. Gotowe obowiązki codzienne agentek zostały ukryte, bo próba

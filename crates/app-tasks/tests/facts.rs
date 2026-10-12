@@ -162,7 +162,9 @@ fn sheet_lists_tasks_triggers_costs_and_files() {
     assert!(sheet.contains("tytuł pominięty"));
     assert!(sheet.contains("Zadania zakończone dziś (1):"));
     assert!(sheet.contains("„Raport tygodniowy” — zakończone powodzeniem"));
-    assert!(sheet.contains("- „Poranny przegląd dnia” — włączony"));
+    assert!(sheet.contains(
+        "- „Poranny przegląd dnia” — włączony, bez harmonogramu (uruchamiany ręcznie albo zdarzeniem)"
+    ));
     assert!(sheet.contains("- „Porządki” — wyłączony"));
     assert!(sheet.contains("dziś 1,23 zł; bieżący miesiąc 45,05 zł; limit miesięczny 50,00 zł"));
     assert!(sheet.contains(

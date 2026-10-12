@@ -59,8 +59,8 @@ Stan po wersji 0.0.43 (2026-10-12):
 | Koniec wypowiedzi | zrobione (Smart Turn w osobnym procesie, 250 / 350 / 2000 ms, ustawienia progu i ciszy) | 0.0.34, 0.0.35 |
 | Słowo wywoławcze w tekście | Alfa ma własne rozpoznawanie zwrotu po imieniu (dokładniejsze); dopisana pisownia „Alpha”, „Gamma”, „Betta” | 0.0.35 |
 | Telemetria i diagnostyka | zrobione: liczniki strażnika i Smart Turn, „Sprawdź silniki”; pięć testów mikrofonu zostaje | 0.0.35–0.0.41 |
-| Ekran „Rozmowa na żywo” | częściowo: karta „Silniki rozmowy” w Ustawieniach i w panelu, pięć ustawień rozmowy, język rozpoznawania; kula stanu i miernik w nagłówku zostają | 0.0.35–0.0.43 |
-| Kula stanu | do zrobienia | — |
+| Ekran „Rozmowa na żywo” | częściowo: karta „Silniki rozmowy” w Ustawieniach i w panelu, pięć ustawień rozmowy, język rozpoznawania, kula stanu z tekstem rozpoznawanym na bieżąco w panelu „Głos” | 0.0.35–0.0.45 |
+| Kula stanu | częściowo: w panelu „Głos” (stan słowem, kto mówi, tekst na bieżąco); jako nakładka i w osobnym oknie — do zrobienia | 0.0.45 |
 
 Wyjście z P1 (8 scenariuszy na żywo) czeka na właściciela; rozmowa „na sucho” na prawdziwych silnikach przeszła
 (pomiary w [`19`](19-specyfikacja-glosu-delty.md)).
@@ -95,8 +95,9 @@ wypowiedź 30 s.
 - **Nowe (R10, R11)**: „Alfa Link” — modele z mocniejszego własnego komputera używane jak lokalne (kanał z etapu D);
   parametr przyspieszenia dla modeli z przewidywaniem kilku słów naraz.
 
-Stan po wersji 0.0.43: zrobione — monitor kart NVIDIA na żywo (0.0.36), ocena „mieści się na karcie” (0.0.39),
-nowe silniki głosu w pakietach (0.0.35, 0.0.38); reszta listy do zrobienia.
+Stan po wersji 0.0.45: zrobione — monitor kart NVIDIA na żywo (0.0.36), ocena „mieści się na karcie” (0.0.39),
+nowe silniki głosu w pakietach (0.0.35, 0.0.38), wyszukiwarka, kolejność i podsumowanie miejsca na dysku
+w katalogu modeli (0.0.45); reszta listy do zrobienia.
 
 ## P3 — nawigacja i powłoka
 
@@ -229,17 +230,20 @@ sprawdzanie poczty.
 | Rutyny (R2) i poranny przegląd (R8) | obowiązek to zapisane polecenie + zakres + łączniki, uruchamiane z harmonogramu, zdarzeniem albo ręcznie; rano raport: poczta, kalendarz, zadania, koszty | wyzwalacze, raport dnia |
 | Bezpieczniki (R13) | treść wiadomości to dane, nie polecenia; wysyłka po zatwierdzeniu; nowy adresat zawsze z pytaniem; obowiązek nie ma dostępu do płatności ani kluczy i nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków | Broker, tagi prywatności |
 
-Stan po wersji 0.0.44: cztery wzory obowiązków są w kodzie (0.0.40), ale **ukryte** — próba na lokalnym modelu
-(Bielik 4.5B) wykonała obowiązek od wyzwalacza do końca zadania w 4 min 19 s, lecz raport zawierał wymyślone zadania
-i kwoty, bo agentka w zadaniu w tle nie dostaje prawdziwych danych. **Pierwsze zadanie P14:** rdzeń podaje agentce
-fakty (lista zadań, koszty, pliki katalogu roboczego) razem z poleceniem i zakazem wyjścia poza nie; dopiero potem
-wzory wracają. Ekran „Obowiązki”, poczta, kalendarz, budżet i raport — do zrobienia.
+Stan po wersji 0.0.45: cztery wzory obowiązków (0.0.40, ukryte w 0.0.44) **wróciły**. Zadanie w tle uruchomione
+wyzwalaczem albo harmonogramem dostaje razem z poleceniem arkusz faktów z programu — otwarte zadania, zadania
+zakończone dziś, wyzwalacze z terminami, koszty z dziś i z miesiąca z limitem, katalog roboczy — z zakazem wyjścia
+poza te dane (`crates/app-tasks/src/facts.rs`, zbiera `CoreHost::facts` w `crates/app-core/src/host.rs`). Zadania
+z sesji prywatnych nie trafiają do przebiegów spoza nich; zadanie oparte na treści niezaufanej arkusza nie dostaje.
+Próba na lokalnym modelu (Bielik 4.5B, profil tymczasowy): „Poranny przegląd dnia” w 85 s i „Podsumowanie dnia”
+w 3 min 8 s — raporty zgodne z danymi; „Kontrola kosztów” po doprecyzowaniu polecenia — 30 s, trzy punkty
+zgodne z danymi. Próba ujawniła i pozwoliła naprawić błąd tworzenia drugiego wyzwalacza o tej samej nazwie po
+restarcie programu.
 
-Gdzie to wpiąć: polecenie dla agentki składa `goal_of` w `crates/app-tasks/src/exec_agent.rs` — tam dochodzi blok
-„Dane” (zadania z harmonogramu, koszty z licznika kosztów, lista plików katalogu roboczego) i zdanie, że raport ma
-opierać się wyłącznie na tym bloku. Kryterium: ta sama próba co 2026-10-12 (profil tymczasowy z kopią modelu) daje
-na pustym profilu raport „brak zadań, koszty 0 zł”, a nie wymyślone pozycje. Dopiero potem `DUTIES_ENABLED = true`
-w `apps/desktop/ui/src/lib/logic/duties.ts`.
+Zostaje w P14: koszty z poszczególnych dni (do porównań tygodni), krótszy krok sprawdzania odpowiedzi przez drugą
+agentkę na lokalnym modelu (dziś to większość czasu obowiązku), ekran „Obowiązki”, poczta, kalendarz, budżet
+obowiązku i raport z wykonania. Zmiana poleceń wzorów wymaga powtórzenia próby na modelu
+(`apps/desktop/ui/src/lib/logic/duties.ts`).
 
 Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.
 

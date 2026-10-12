@@ -236,6 +236,17 @@ pub fn policy(p: &EffectivePolicy) -> Vec<String> {
     out
 }
 
+/// Wolny identyfikator `<podstawa>-<numer>`: kolejne numery z licznika, aż trafi się niezajęty.
+pub fn free_id(base: &str, taken: &[String], mut next: impl FnMut() -> u64) -> String {
+    loop {
+        let candidate = format!("{base}-{}", next());
+        let candidate = candidate.trim_start_matches('-').to_owned();
+        if !taken.contains(&candidate) {
+            return candidate;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -263,5 +274,18 @@ mod tests {
             }),
             "nowy plik: b.pdf"
         );
+    }
+
+    #[test]
+    fn free_id_skips_ids_saved_before_restart() {
+        let taken = vec!["porzadki-0".to_owned(), "porzadki-1".to_owned()];
+        let mut n = 0;
+        let mut next = || {
+            n += 1;
+            n - 1
+        };
+        assert_eq!(free_id("porzadki", &taken, &mut next), "porzadki-2");
+        assert_eq!(free_id("porzadki", &taken, &mut next), "porzadki-3");
+        assert_eq!(free_id("", &[], || 7), "7");
     }
 }

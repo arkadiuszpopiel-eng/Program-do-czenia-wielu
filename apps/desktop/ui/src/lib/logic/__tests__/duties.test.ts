@@ -4,9 +4,13 @@ import { pl } from '../../i18n/pl';
 import { DUTIES_ENABLED, DUTY_TEMPLATES, looksLikeCron } from '../duties';
 
 describe('gotowe obowiązki codzienne', () => {
-  it('wzory są ukryte, dopóki agentka nie dostaje prawdziwych danych', () => {
-    // Włączenie wymaga podawania faktów przez rdzeń (P14) i próby na modelu — nie zmieniać bez niej.
-    expect(DUTIES_ENABLED).toBe(false);
+  it('wzory są pokazywane, a każde polecenie odwołuje się do danych z programu', () => {
+    // Rdzeń dokleja arkusz faktów do zadania w tle; polecenie bez odwołania do niego zachęca do zmyślania.
+    expect(DUTIES_ENABLED).toBe(true);
+    for (const duty of DUTY_TEMPLATES) {
+      expect(String(pl[duty.goal]), duty.id).toMatch(/dan(ych|e) z programu/);
+      expect(String(en[duty.goal]), duty.id).toMatch(/program data/);
+    }
   });
 
   it('każdy szablon ma harmonogram, agentkę i teksty w obu językach', () => {

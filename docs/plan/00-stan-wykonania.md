@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-12**, wersja programu **0.0.44**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-12**, wersja programu **0.0.45**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -65,6 +65,7 @@ funkcjami.
 | 0.0.30 | 2026-10-11 | P1: głos Supertonic 3 jako osobny proces w Rust, cztery barwy agentek; zmierzone 0,97 s na zdanie na laptopie (brzmienie — do odsłuchu właściciela) |
 | 0.0.31 | 2026-10-11 | P1: wybór barwy głosu dla każdej agentki (10 barw Supertonic 3) |
 | 0.0.32 | 2026-10-11 | silnik llama.cpp b11559 w katalogu z przypiętymi sumami; pomiar Qwen3-ASR (aplikacja nie budowana) |
+| 0.0.45 | 2026-10-12 | Historia zmian: 10 ostatnich wersji + zakładka „Starsze”, lista także w oknie „Co nowego”; P14: arkusz faktów dla zadań w tle, gotowe obowiązki wróciły po próbie na lokalnym modelu; P1: kula stanu rozmowy; P2: wyszukiwarka i miejsce na dysku w katalogu modeli; wersja zbudowana i uruchomiona |
 | 0.0.44 | 2026-10-12 | P14: gotowe obowiązki ukryte (próba na lokalnym modelu dała zmyślony raport); pobieranie nowych pozycji przez program sprawdzone; wersja zbudowana i uruchomiona |
 | 0.0.43 | 2026-10-12 | P1: karta silników w panelu „Głos”; testy w przeglądarce 324 z 324; wersja zbudowana i sprawdzona testem prawdziwej aplikacji |
 | 0.0.42 | 2026-10-12 | P1: język rozpoznawania mowy w ustawieniach; P3: wyszukiwarka w ściągawce skrótów; pełne testy projektu zielone |

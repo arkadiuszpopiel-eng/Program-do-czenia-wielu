@@ -1,6 +1,6 @@
 # 16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)
 
-Wersja programu **0.0.44**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
+Wersja programu **0.0.45**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
 (etapy A–H), nowy etap **P** (przeniesienie funkcji z Delty AI) i nowy etap **U** (wielu użytkowników z kontami
 i logowaniem) oraz cztery cele: **Windows, Linux, panel WWW, Android** z pełnym sterowaniem i komunikacją.
 Szczegóły zadań: [`03-roadmapa.md`](03-roadmapa.md) (dokument żywy). Tu jest obraz całości.
@@ -98,7 +98,7 @@ wad bezpieczeństwa Delty.
 | P11 | Przepływy, role i przepływ wieloagentowy, edytor persony, trening, pulpit testowy | C1.5 |
 | **P12** | **Agentki programistki**: pisanie, uruchamianie i budowanie oprogramowania z nadrzędnym przyciskiem „Pełne uprawnienia” (jak w Claude Code i Codex), rozmowa między agentkami w trakcie pracy, model dobierany do trudności zadania | C1.2, mosty CLI |
 | **P13** | **Dyski sieciowe i chmurowe**: podłączanie (NAS, WebDAV, SFTP, S3, OneDrive, Google Drive, Dropbox), praca agentek na plikach, kopie zapasowe z harmonogramem, wersjami i przywracaniem | C1.4 (transfer) |
-| **P14** | **Obowiązki codzienne agentek**: przypisanie agentki do stałych zadań — poczta, kalendarz, przegląd wiadomości, przypomnienia, porządki, raport dnia — z harmonogramem i budżetem — **w toku**: mechanizm sprawdzony na lokalnym modelu (0.0.44), gotowe wzory ukryte do czasu podawania agentce faktów | C2.7 |
+| **P14** | **Obowiązki codzienne agentek**: przypisanie agentki do stałych zadań — poczta, kalendarz, przegląd wiadomości, przypomnienia, porządki, raport dnia — z harmonogramem i budżetem — **w toku**: zadanie w tle dostaje arkusz faktów z programu, cztery gotowe wzory działają i są sprawdzone na lokalnym modelu (0.0.45); poczta, kalendarz, ekran „Obowiązki”, budżet i raport — do zrobienia | C2.7 |
 
 ## 6. Etap C — pozostałe funkcje Windows
 

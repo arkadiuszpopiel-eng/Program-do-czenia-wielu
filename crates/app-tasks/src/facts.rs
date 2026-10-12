@@ -208,13 +208,10 @@ pub fn fact_sheet(input: &FactInput) -> String {
         .triggers
         .iter()
         .map(|t| {
-            let next = t
-                .next_fire_at
-                .as_deref()
-                .and_then(local)
-                .map_or_else(String::new, |at| {
-                    format!(", następne uruchomienie {}", at.format("%Y-%m-%d %H:%M"))
-                });
+            let next = t.next_fire_at.as_deref().and_then(local).map_or_else(
+                || ", bez harmonogramu (uruchamiany ręcznie albo zdarzeniem)".to_owned(),
+                |at| format!(", następne uruchomienie {}", at.format("%Y-%m-%d %H:%M")),
+            );
             let on = if t.enabled {
                 "włączony"
             } else {

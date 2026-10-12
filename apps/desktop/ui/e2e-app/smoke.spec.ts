@@ -503,8 +503,14 @@ test('Ustawienia → Aktualizacje: historia zmian z prawdziwego dziennika, wagi 
   const rows = history.getByRole('button', { name: /^Wersja / });
   await expect(rows.first()).toContainText(`Wersja ${version}`);
   await expect(rows.first()).toHaveAttribute('aria-expanded', 'true');
+  // Główny widok: dziesięć ostatnich wersji; starsze czekają w zakładce i pod przyciskiem.
+  await expect(rows).toHaveCount(10);
+  const older = history.getByRole('tab', { name: /^Starsze/ });
+  await history.getByRole('button', { name: /^Starsze wersje \(\d+\)$/ }).click();
+  await expect(older).toHaveAttribute('aria-selected', 'true');
   expect(await rows.count()).toBeGreaterThanOrEqual(20);
-  // Dziennik ma pozycje każdej wagi; filtr „Krytyczne” zostawia tylko czerwone.
+  await shot(alfa, '13-historia-zmian-starsze');
+  // Dziennik ma pozycje każdej wagi; filtr „Krytyczne” zostawia tylko czerwone (są w starszych wersjach).
   for (const name of [/^Krytyczne/, /^Poważne/, /^Zwykłe/]) {
     const chip = history.getByRole('button', { name });
     await expect(chip).toBeVisible();
@@ -517,6 +523,8 @@ test('Ustawienia → Aktualizacje: historia zmian z prawdziwego dziennika, wagi 
   await expect(history.getByText('poważna', { exact: true })).toHaveCount(0);
   await shot(alfa, '13-historia-zmian-krytyczne');
   await history.getByRole('button', { name: /^Wszystkie/ }).click();
+  await history.getByRole('tab', { name: /^Ostatnie/ }).click();
+  await expect(rows).toHaveCount(10);
   // Po zmianie filtra rozwinięte są tylko wersje z pozycjami krytycznymi — rozwijamy resztę i zwijamy całość.
   await history.getByRole('button', { name: 'Rozwiń wszystkie', exact: true }).click();
   await history.getByRole('button', { name: 'Zwiń wszystkie', exact: true }).click();
