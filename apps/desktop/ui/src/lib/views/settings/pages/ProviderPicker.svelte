@@ -7,6 +7,7 @@
   import type { ProviderInfo } from '../../../api/types-hub';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { fuzzyRank } from '../../../logic/fuzzy';
+  import { KNOWN_REGIONS, providerMeta, type RegionCode } from '../../../logic/provider-meta';
   import { load, type Loadable } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
@@ -28,6 +29,17 @@
       : catalog,
   );
 
+  /** Opis zasad danych dostawcy zdaniami, bez surowych znaczników katalogu. */
+  function describe(p: { privacy_tag: string; jurisdiction: string }): string {
+    const region = (code: string) =>
+      (KNOWN_REGIONS as readonly string[]).includes(code)
+        ? t(`hub.region.${code as RegionCode}`)
+        : code;
+    return providerMeta(p, region)
+      .map((part) => t(part.key, part.params))
+      .join(' · ');
+  }
+
   async function loadCatalog() {
     loaded = { status: 'loading' };
     loaded = await load(() => app.client.accounts.catalog());
@@ -47,10 +59,9 @@
       <li>
         <button type="button" class="provider" onclick={() => onchoose(p)}>
           <span class="p-name">{p.display_name}</span>
-          <span class="p-meta"
-            >{t('hub.privacy', { tag: p.privacy_tag, jurisdiction: p.jurisdiction })} · {t(
-              `hub.compliance.${p.compliance_status}`,
-            )}</span
+          <span class="p-meta">{describe(p)}</span>
+          <span class="p-status {p.compliance_status}"
+            >{t(`hub.compliance.${p.compliance_status}`)}</span
           >
         </button>
       </li>
@@ -92,5 +103,18 @@
   .p-meta {
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-xs);
+  }
+  .p-status {
+    color: var(--alfa-color-text-subtle);
+    font-size: var(--alfa-font-size-xs);
+  }
+  .p-status.green {
+    color: var(--alfa-color-success);
+  }
+  .p-status.gray {
+    color: var(--alfa-color-warning);
+  }
+  .p-status.forbidden {
+    color: var(--alfa-color-error);
   }
 </style>

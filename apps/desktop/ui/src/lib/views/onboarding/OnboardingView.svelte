@@ -1,24 +1,28 @@
 <!--
   Wprowadzenie (PLAN §14.5, makieta 14): mikrofon → profil głosu → pomiar sprzętu → konta i klucze
-  („dodaj teraz" / „pomiń — dodam później") + pobranie modelu lokalnego → poziomy autonomii (start
-  L3) → korpus (opcjonalnie)
-  → import `.alfa` (opcjonalnie). Krok „mosty CLI" pojawi się od fali 4. Kroki mikrofonu i importu:
-  `MicStep`, `ImportStep`. Każdy błąd rdzenia jest widoczny (toast albo „Ponów"), nigdy cichy.
+  („dodaj teraz" / „pomiń — dodam później") + pakiet modelu lokalnego → poziomy autonomii (start
+  L3) → korpus (opcjonalnie) → mosty CLI (opcjonalnie) → import `.alfa` (opcjonalnie).
+  Układ: boczna szyna z krokami (`OnboardingRail`) i panel kroku o stałej wysokości — stopka
+  z przyciskami nie skacze między krokami, a dłuższa treść przewija się w panelu.
+  Każdy błąd rdzenia jest widoczny (toast albo „Ponów"), nigdy cichy.
 -->
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { Avatar, Button, SegmentedControl, Stepper, agentIds } from '@alfa/ui-kit';
+  import { Button } from '@alfa/ui-kit';
   import type { AutonomyLevel } from '../../api/types';
   import { errorText } from '../../api/command-error';
   import type { DeviceProfile } from '../../api/types-hub';
-  import LoadFailed from '../../components/shell/LoadFailed.svelte';
   import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import AddProviderWizard from '../settings/pages/AddProviderWizard.svelte';
   import BridgesStep from './BridgesStep.svelte';
+  import HardwareStep from './HardwareStep.svelte';
   import ImportStep from './ImportStep.svelte';
   import LocalBundleCard from './LocalBundleCard.svelte';
   import MicStep from './MicStep.svelte';
+  import OnboardingRail from './OnboardingRail.svelte';
+  import OptionCards from './OptionCards.svelte';
+  import StepIcon from './StepIcon.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -32,7 +36,9 @@
     'bridges',
     'import',
   ] as const;
+  const OPTIONAL: readonly string[] = ['corpus', 'bridges', 'import'];
   const LEVELS: readonly AutonomyLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
+  const VOICES = ['A', 'B', 'C', 'D'] as const;
 
   let step = $state(untrack(() => app.onboardingStep));
   let profile = $state<DeviceProfile | null>(null);
@@ -46,6 +52,9 @@
   let finishing = $state(false);
 
   const current = $derived(STEPS[step] ?? 'mic');
+  /** Tytuł i opis kroku w nagłówku panelu (kroki z własnym komponentem mają te same klucze). */
+  const heading = $derived(t(`ob.${current === 'hardware' ? 'hw' : current}.title`));
+  const lead = $derived(t(`ob.${current === 'hardware' ? 'hw' : current}.desc`));
 
   $effect(() => {
     // Tylko rekomendacja głosu; bez niej krok „głos" działa, a pomiar (z „Ponów") jest w kroku „sprzęt".
@@ -107,123 +116,115 @@
 </script>
 
 <main class="onboarding" data-surface="app" aria-labelledby="ob-title">
-  <div class="card">
-    <header class="head">
-      <div class="cast" aria-hidden="true">
-        {#each agentIds as id (id)}<Avatar agent={id} size={28} />{/each}
-      </div>
-      <h1 id="ob-title">{t('ob.title')}</h1>
-      <p class="muted">{t('ob.stepOf', { n: step + 1, total: STEPS.length })}</p>
-      <Stepper
-        steps={STEPS.map((id) => ({ id, label: t(`ob.step.${id}`) }))}
-        current={step}
-        label={t('ob.steps')}
-        onselect={(i) => (step = i)}
-      />
-    </header>
+  <div class="shell">
+    <OnboardingRail
+      steps={STEPS.map((id) => ({
+        id,
+        label: t(`ob.step.${id}`),
+        optional: OPTIONAL.includes(id),
+      }))}
+      current={step}
+      title={t('ob.title')}
+      tagline={t('ob.tagline')}
+      label={t('ob.steps')}
+      optionalLabel={t('ob.optional')}
+      progressLabel={t('ob.progress')}
+      onselect={(i) => (step = i)}
+    />
 
-    <section class="body" aria-live="polite">
-      {#if current === 'mic'}
-        <MicStep />
-      {:else if current === 'voice'}
-        <h2>{t('ob.voice.title')}</h2>
-        <p class="muted">{t('ob.voice.desc')}</p>
-        <SegmentedControl
-          label={t('ob.voice.title')}
-          variant="cards"
-          bind:value={voice}
-          options={(['A', 'B', 'C', 'D'] as const).map((v) => ({
-            value: v,
-            label: `${t(`ob.voice.${v}`)}${profile?.recommendation.voice_profile === v ? ` · ${t('ob.voice.recommended')}` : ''}`,
-          }))}
-        />
-      {:else if current === 'hardware'}
-        <h2>{t('ob.hw.title')}</h2>
-        <p class="muted">{t('ob.hw.desc')}</p>
-        {#if measureError && !measuring}
-          <LoadFailed error={measureError} onretry={() => void measure()} />
-        {:else if measuring || !profile}
-          <p role="status">{t('ob.hw.measuring')}</p>
-        {:else}
-          <dl class="grid">
-            <dt>{t('dev.cpu')}</dt>
-            <dd>{profile.machine.cpu.model}</dd>
-            <dt>{t('dev.ram')}</dt>
-            <dd>{app.i18n.bytes(profile.machine.ram_mb * 1024 * 1024)}</dd>
-            <dt>{t('dev.gpu')}</dt>
-            <dd>
-              {profile.machine.gpus.map((g) => `${g.vendor} ${g.model}`).join(', ') ||
-                t('common.none')}
-            </dd>
-            <dt>{t('dev.hwClass')}</dt>
-            <dd>{t(`dev.hw.${profile.recommendation.hw_class}`)}</dd>
-            <dt>{t('dev.llm')}</dt>
-            <dd>{profile.recommendation.llm_backend}</dd>
-          </dl>
-          <ul class="list">
-            {#each profile.recommendation.tradeoffs as item (item.pl)}<li>
-                {app.i18n.text(item)}
-              </li>{/each}
-          </ul>
-        {/if}
-      {:else if current === 'keys'}
-        <h2>{t('ob.keys.title')}</h2>
-        <p class="muted">{t('ob.keys.desc')}</p>
-        {#if wizard}
-          <AddProviderWizard
-            onfinish={(account) => {
-              wizard = false;
-              if (account) added++;
-            }}
+    <div class="pane">
+      <header class="head">
+        <span class="icon" aria-hidden="true"><StepIcon step={current} size={22} /></span>
+        <div class="titles">
+          <p class="eyebrow">{t('ob.stepOf', { n: step + 1, total: STEPS.length })}</p>
+          <h2>{heading}</h2>
+          <p class="lead">{lead}</p>
+        </div>
+      </header>
+
+      <section class="body" aria-live="polite">
+        {#if current === 'mic'}
+          <MicStep />
+        {:else if current === 'voice'}
+          <OptionCards
+            label={t('ob.voice.title')}
+            columns={2}
+            bind:value={voice}
+            options={VOICES.map((v) => ({
+              value: v,
+              badge: v,
+              title: t(`ob.voice.${v}`),
+              description: t(`ob.voice.${v}.desc`),
+              tag: profile?.recommendation.voice_profile === v ? t('ob.voice.recommended') : null,
+            }))}
           />
+        {:else if current === 'hardware'}
+          <HardwareStep {profile} {measuring} error={measureError} onretry={() => void measure()} />
+        {:else if current === 'keys'}
+          {#if wizard}
+            <AddProviderWizard
+              onfinish={(account) => {
+                wizard = false;
+                if (account) added++;
+              }}
+            />
+          {:else}
+            <div class="panel">
+              <h3>{t('ob.keys.cloud.title')}</h3>
+              <p class="muted">{t('ob.keys.cloud.desc')}</p>
+              {#if added > 0}<p class="ok" role="status">{t('ob.keys.added', { n: added })}</p>{/if}
+              <div class="choices">
+                <Button variant="primary" onclick={() => (wizard = true)}
+                  >{t('ob.keys.addNow')}</Button
+                >
+                <Button variant="secondary" onclick={next}>{t('ob.keys.skip')}</Button>
+              </div>
+            </div>
+            <div class="panel"><LocalBundleCard /></div>
+          {/if}
+        {:else if current === 'autonomy'}
+          <OptionCards
+            label={t('perm.title')}
+            bind:value={level}
+            options={LEVELS.map((l) => ({
+              value: l,
+              badge: l,
+              title: t(`perm.${l}.name`),
+              description: t(`perm.${l}.desc`),
+            }))}
+          />
+          <p class="muted small">{t('perm.kept')}</p>
+        {:else if current === 'corpus'}
+          <ul class="points">
+            {#each ['p1', 'p2', 'p3'] as const as point (point)}
+              <li>{t(`ob.corpus.${point}`)}</li>
+            {/each}
+          </ul>
+          <p class="panel muted">{t('ob.corpus.soon')}</p>
+        {:else if current === 'bridges'}
+          <BridgesStep />
         {:else}
-          {#if added > 0}<p class="ok" role="status">{t('ob.keys.added', { n: added })}</p>{/if}
-          <div class="choices">
-            <Button variant="primary" onclick={() => (wizard = true)}>{t('ob.keys.addNow')}</Button>
-            <Button variant="secondary" onclick={next}>{t('ob.keys.skip')}</Button>
-          </div>
-          <LocalBundleCard />
+          <ImportStep />
         {/if}
-      {:else if current === 'autonomy'}
-        <h2>{t('ob.autonomy.title')}</h2>
-        <p class="muted">{t('ob.autonomy.desc')}</p>
-        <SegmentedControl
-          label={t('perm.title')}
-          variant="cards"
-          bind:value={level}
-          options={LEVELS.map((l) => ({
-            value: l,
-            label: `${l} · ${t(`perm.${l}.name`)}`,
-            description: t(`perm.${l}.desc`),
-          }))}
-        />
-        <p class="muted small">{t('perm.kept')}</p>
-      {:else if current === 'corpus'}
-        <h2>{t('ob.corpus.title')}</h2>
-        <p class="muted">{t('ob.corpus.desc')}</p>
-      {:else if current === 'bridges'}
-        <BridgesStep />
-      {:else}
-        <ImportStep />
-      {/if}
-    </section>
+      </section>
 
-    <footer class="foot">
-      <Button variant="ghost" disabled={step === 0} onclick={() => (step = Math.max(0, step - 1))}
-        >{t('common.back')}</Button
-      >
-      <span class="spacer"></span>
-      {#if current === 'corpus' || current === 'import'}
-        <Button variant="secondary" onclick={next}
-          >{current === 'corpus' ? t('ob.later') : t('ob.skip')}</Button
+      <footer class="foot">
+        <Button variant="ghost" disabled={step === 0} onclick={() => (step = Math.max(0, step - 1))}
+          >{t('common.back')}</Button
         >
-      {/if}
-      {#if current !== 'keys' || wizard === false}
-        <Button variant="primary" loading={finishing} disabled={finishing} onclick={next}
-          >{step === STEPS.length - 1 ? t('ob.finish') : t('common.next')}</Button
-        >
-      {/if}
-    </footer>
+        <span class="spacer"></span>
+        {#if current === 'corpus' || current === 'import'}
+          <Button variant="secondary" onclick={next}
+            >{current === 'corpus' ? t('ob.later') : t('ob.skip')}</Button
+          >
+        {/if}
+        {#if current !== 'keys' || wizard === false}
+          <Button variant="primary" loading={finishing} disabled={finishing} onclick={next}
+            >{step === STEPS.length - 1 ? t('ob.finish') : t('common.next')}</Button
+          >
+        {/if}
+      </footer>
+    </div>
   </div>
 </main>
 
@@ -234,84 +235,164 @@
     justify-content: center;
     height: 100%;
     overflow: auto;
-    padding: var(--alfa-space-8) var(--alfa-space-4);
+    padding: var(--alfa-space-6) var(--alfa-space-4);
     background: var(--alfa-color-bg);
   }
-  .card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--alfa-space-4);
-    width: min(940px, 100%);
-    /* `margin: auto` w kontenerze flex: karta na środku okna, a gdy jest wyższa niż okno — od góry
-       (bez ucinania). Wcześniej wisiała pod górną krawędzią z pustą połową ekranu pod spodem. */
+  .shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    width: min(1040px, 100%);
+    /* Stała wysokość (o ile okno pozwala): stopka nie skacze między krokami. `margin: auto`
+       w kontenerze flex trzyma kartę na środku, a gdy jest wyższa niż okno — od góry. */
+    height: min(680px, 100%);
+    min-height: min(520px, 100%);
     margin: auto;
-    padding: var(--alfa-space-6);
+    overflow: hidden;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-overlay);
     background: var(--alfa-color-surface);
-    box-shadow: var(--alfa-shadow-2);
+    box-shadow: var(--alfa-shadow-3);
+  }
+  .pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
   }
   .head {
     display: flex;
-    flex-direction: column;
-    gap: var(--alfa-space-2);
+    align-items: flex-start;
+    gap: var(--alfa-space-4);
+    padding: var(--alfa-space-6) var(--alfa-space-8) var(--alfa-space-4);
   }
-  .cast {
+  .icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface2);
+  }
+  .titles {
     display: flex;
+    flex-direction: column;
     gap: var(--alfa-space-1);
+    min-width: 0;
   }
-  h1 {
-    font-size: var(--alfa-font-size-2xl);
+  .eyebrow {
+    margin: 0;
+    color: var(--alfa-color-text-subtle);
+    font-size: var(--alfa-font-size-xs);
+    font-weight: var(--alfa-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
   h2 {
+    margin: 0;
     font-size: var(--alfa-font-size-xl);
+    line-height: 1.25;
+  }
+  .lead {
+    margin: 0;
+    color: var(--alfa-color-text-muted);
+    line-height: 1.5;
   }
   .body {
     display: flex;
+    flex: 1;
     flex-direction: column;
     gap: var(--alfa-space-3);
-    min-height: 260px;
+    min-height: 0;
+    overflow: auto;
+    padding: var(--alfa-space-2) var(--alfa-space-8) var(--alfa-space-6);
+  }
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-2);
+    margin: 0;
+    padding: var(--alfa-space-4);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface2);
+  }
+  .panel h3 {
+    margin: 0;
+    font-size: var(--alfa-font-size-md);
+  }
+  .panel p {
+    margin: 0;
   }
   .muted {
     color: var(--alfa-color-text-muted);
   }
   .small {
+    margin: 0;
     font-size: var(--alfa-font-size-sm);
   }
   .ok {
     color: var(--alfa-color-success);
     font-weight: var(--alfa-weight-semibold);
   }
-  .grid {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: var(--alfa-space-1) var(--alfa-space-4);
-    margin: 0;
-  }
-  dt {
-    color: var(--alfa-color-text-muted);
-  }
-  dd {
-    margin: 0;
-  }
-  .list {
-    margin: 0;
-    padding-left: var(--alfa-space-4);
-    font-size: var(--alfa-font-size-sm);
-  }
   .choices {
     display: flex;
     flex-wrap: wrap;
     gap: var(--alfa-space-2);
+    margin-top: var(--alfa-space-1);
+  }
+  .points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .points li {
+    display: flex;
+    align-items: center;
+    gap: var(--alfa-space-3);
+  }
+  .points li::before {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--alfa-radius-full);
+    background: var(--alfa-color-success);
   }
   .foot {
     display: flex;
+    flex: none;
     align-items: center;
     gap: var(--alfa-space-2);
-    padding-top: var(--alfa-space-3);
+    padding: var(--alfa-space-4) var(--alfa-space-8);
     border-top: 1px solid var(--alfa-color-border);
+    background: var(--alfa-color-surface);
   }
   .spacer {
     flex: 1;
+  }
+  @media (max-width: 760px) {
+    .onboarding {
+      padding: var(--alfa-space-2);
+    }
+    .shell {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto minmax(0, 1fr);
+      height: 100%;
+    }
+    .head {
+      padding: var(--alfa-space-4) var(--alfa-space-4) var(--alfa-space-3);
+    }
+    .body {
+      padding: var(--alfa-space-2) var(--alfa-space-4) var(--alfa-space-4);
+    }
+    .foot {
+      padding: var(--alfa-space-3) var(--alfa-space-4);
+    }
   }
 </style>

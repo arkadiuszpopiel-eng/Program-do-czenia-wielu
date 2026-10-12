@@ -37,3 +37,22 @@ input,
   --alfa-space-4: 12px;
   --alfa-font-size-md: 13px;
 }
+
+/* Instancja testowa (budowa `e2e`, znacznik ustawia powłoka): plakietka, żeby nikt nie wziął tego
+   okna za swoją Alfę — testy zamykają je bez ostrzeżenia. Nie przechwytuje kliknięć. */
+html[data-test-instance] body::after {
+  content: 'Instancja testowa — zamknie się sama, nie używaj tego okna';
+  position: fixed;
+  bottom: var(--alfa-space-2);
+  left: 50%;
+  z-index: 9999;
+  padding: var(--alfa-space-1) var(--alfa-space-3);
+  transform: translateX(-50%);
+  border-radius: var(--alfa-radius-full);
+  background: var(--alfa-color-warning);
+  color: var(--alfa-color-bg);
+  font-size: var(--alfa-font-size-xs);
+  font-weight: var(--alfa-weight-semibold);
+  white-space: nowrap;
+  pointer-events: none;
+}

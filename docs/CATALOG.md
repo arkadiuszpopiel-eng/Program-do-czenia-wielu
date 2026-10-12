@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 111 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 394 094 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2721 |
+| Linie Rust (z testami) | 394 169 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2722 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -158,7 +158,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 7543 | 46 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 4563 | 27 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 4638 | 28 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |

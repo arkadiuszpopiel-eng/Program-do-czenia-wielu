@@ -167,7 +167,6 @@
     /* Przyciski mają naturalną szerokość — rozciągnięte na całą kartę wyglądały jak pole. */
     align-items: flex-start;
     gap: var(--alfa-space-2);
-    margin-top: var(--alfa-space-4);
   }
   h3 {
     font-size: var(--alfa-font-size-md);

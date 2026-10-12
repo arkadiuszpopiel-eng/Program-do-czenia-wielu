@@ -49,8 +49,6 @@
   }
 </script>
 
-<h2>{t('ob.mic.title')}</h2>
-<p class="muted">{t('ob.mic.desc')}</p>
 {#if app.system?.mic === 'denied'}
   <p class="warn">{t('banner.micDenied')}</p>
   <Button variant="secondary" onclick={openMicSettings}>{t('banner.micSettings')}</Button>
@@ -69,17 +67,56 @@
       label={t('ob.mic.device')}
     />
   </label>
-  <LevelMeter level={app.micLevel} label={t('ob.mic.level')} />
-  {#if micFailed}
-    <p class="warn">{t('ob.mic.failed')}</p>
-  {:else}
-    <p class:ok={heard} class="muted">{heard ? t('ob.mic.ok') : t('ob.mic.silent')}</p>
-  {/if}
+  <div class="meter">
+    <div class="row">
+      <span class="cap">{t('ob.mic.level')}</span>
+      {#if micFailed}
+        <span class="state warn">{t('ob.mic.failed')}</span>
+      {:else}
+        <span class="state" class:ok={heard}
+          ><span class="dot" aria-hidden="true"></span>{heard
+            ? t('ob.mic.ok')
+            : t('ob.mic.silent')}</span
+        >
+      {/if}
+    </div>
+    <LevelMeter level={app.micLevel} label={t('ob.mic.level')} />
+  </div>
 {/if}
 
 <style>
-  h2 {
-    font-size: var(--alfa-font-size-xl);
+  .meter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-3);
+    padding: var(--alfa-space-4);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface2);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--alfa-space-2);
+  }
+  .cap {
+    font-size: var(--alfa-font-size-sm);
+    font-weight: var(--alfa-weight-semibold);
+  }
+  .state {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--alfa-space-2);
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--alfa-radius-full);
+    background: currentColor;
   }
   .muted {
     color: var(--alfa-color-text-muted);

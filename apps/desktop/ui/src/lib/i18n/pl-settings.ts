@@ -64,7 +64,6 @@ export const plSettings = {
   'hub.limit': 'Limit {amount}/mies.',
   'hub.noLimit': 'bez limitu',
   'hub.accounts': 'Twoje konta',
-  'hub.privacy': 'Prywatność: {tag} · Jurysdykcja: {jurisdiction}',
   'hub.compliance.green': 'zgodne',
   'hub.compliance.gray': 'szara strefa',
   'hub.compliance.forbidden': 'niedozwolone',
@@ -297,11 +296,11 @@ export const plSettings = {
   'ob.mic.failed':
     'Nie udało się uruchomić testu mikrofonu — sprawdź urządzenie albo przejdź dalej.',
   'ob.voice.title': 'Profil głosu',
-  'ob.voice.desc': 'Dobrałyśmy profil do Twojego sprzętu. Zmienisz go później w Voice Lab.',
-  'ob.voice.A': 'A — najlżejszy, działa na samym procesorze',
-  'ob.voice.B': 'B — zrównoważony, GPU zintegrowane',
-  'ob.voice.C': 'C — szybki, karta z CUDA',
-  'ob.voice.D': 'D — najlepsza jakość, mocna karta',
+  'ob.voice.desc': 'Dobrałyśmy profil do Twojego sprzętu. Zmienisz go później w Ustawieniach.',
+  'ob.voice.A': 'Najlżejszy',
+  'ob.voice.B': 'Zrównoważony',
+  'ob.voice.C': 'Szybki',
+  'ob.voice.D': 'Najlepsza jakość',
   'ob.voice.recommended': 'zalecany',
   'ob.hw.title': 'Pomiar sprzętu',
   'ob.hw.desc': 'Sprawdzamy procesor, pamięć i kartę graficzną, żeby dobrać modele do tej maszyny.',
@@ -347,7 +346,7 @@ export const plSettings = {
     'Zaczynamy od L3. Zmienisz to jednym przełącznikiem w Ustawieniach, a każdą zmianę potwierdzisz w oknie Brokera.',
   'ob.corpus.title': 'Nagranie korpusu (opcjonalne)',
   'ob.corpus.desc':
-    'Kilka minut Twojego głosu poprawi rozpoznawanie mowy. Nagrania nie opuszczają komputera. Nagrywanie pojawi się w fali 2.',
+    'Kilka minut Twojego głosu poprawi rozpoznawanie mowy. Nagrania nie opuszczają komputera.',
   'ob.import.title': 'Import z innej maszyny (opcjonalny)',
   'ob.import.desc':
     'Masz paczkę .alfa z laptopa? Zaimportujesz konfigurację i sesje — teraz albo później w Ustawieniach.',

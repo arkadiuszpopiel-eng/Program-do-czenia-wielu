@@ -1,6 +1,6 @@
 # Manifest konfiguracji jądra (docs/modules/core-config/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "core-config"
-version = "0.0.48"
+version = "0.0.49"
 kind = "service"
 provides = ["core-config-contract@1"]
 requires = ["core-bus-contract@1"]

@@ -28,7 +28,7 @@ pub use app_api::{AppError, DEFAULT_FRAME, ErrorCode, EventBatch};
 pub use app_api::{CHANNEL_COMMANDS, COMMANDS, with_commands};
 pub use app_modules::NO_TTS;
 pub use app_modules::route::{LOCAL_PROVIDER, NO_BRAIN, NO_LOCAL, RouterBrain};
-pub use app_modules::secrets::MemorySecretStore;
+pub use app_modules::secrets::{MemorySecretStore, scoped_system_store};
 pub use app_terminal::FrameSink;
 pub use app_voice::{Pacer, VoiceEngine, VoiceEngineFactory};
 pub use commands::app::SYSTEM_SETTINGS_ALLOWED;

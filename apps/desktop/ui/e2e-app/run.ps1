@@ -136,10 +136,20 @@ try {
         $env:ALFA_E2E_CDP_PORT = "$Port"
         $env:ALFA_E2E_INSTANCE = '1'
     }
+    # Aplikacja dostaje środowisko bez kluczy API (import kluczy ze zmiennych nie może zrobić konta
+    # z prawdziwego klucza). Zmiana dotyczy tylko uruchamianego procesu. Katalog użytkownika
+    # instancji testowej ustawia sama powłoka (src-tauri/src/lib.rs) — podmiana USERPROFILE
+    # blokuje start portu CDP w WebView2.
+    $keyVars = 'ANTHROPIC', 'OPENAI', 'DEEPSEEK', 'ELEVENLABS', 'GEMINI', 'GOOGLE', 'MOONSHOT', 'MISTRAL',
+        'OPENROUTER', 'DASHSCOPE', 'XAI' | ForEach-Object { "${_}_API_KEY" }
+    $saved = @{}
+    foreach ($name in $keyVars) { $saved[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
+    foreach ($name in $keyVars) { [Environment]::SetEnvironmentVariable($name, $null, 'Process') }
     $proc = Start-Process -FilePath $Exe -WorkingDirectory (Split-Path -Parent $Exe) -PassThru -NoNewWindow `
         -RedirectStandardOutput (Join-Path $OutDir 'alfa-desktop.stdout.log') `
         -RedirectStandardError (Join-Path $OutDir 'alfa-desktop.stderr.log')
     $null = $proc.Handle  # uchwyt zapamiętany — inaczej ExitCode po zakończeniu bywa pusty
+    foreach ($name in @($saved.Keys)) { [Environment]::SetEnvironmentVariable($name, $saved[$name], 'Process') }
     $deadline = (Get-Date).AddSeconds($StartTimeoutSec)
     while ($null -eq $script:Version) {
         if ($proc.HasExited) { throw "alfa-desktop zakończyła się przed otwarciem portu CDP (kod $($proc.ExitCode)) — zobacz alfa-desktop.stderr.log i logs\." }

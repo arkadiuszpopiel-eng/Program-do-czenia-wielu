@@ -82,6 +82,9 @@ fn builder<'a>(
     }
 }
 
+/// Skrypt startowy okna instancji testowej: znacznik na `<html>`, po którym arkusz rysuje plakietkę.
+const TEST_INSTANCE_MARK: &str = "addEventListener('DOMContentLoaded', () => document.documentElement.setAttribute('data-test-instance', '1'));";
+
 fn data_dir(app: &AppHandle) -> PathBuf {
     app.state::<WindowState>().data_dir.clone()
 }
@@ -91,9 +94,18 @@ pub fn ensure_main(app: &AppHandle) -> tauri::Result<WebviewWindow> {
     if let Some(window) = app.get_webview_window(MAIN) {
         return Ok(window);
     }
-    builder(app, MAIN, "index.html", data_dir(app))
-        // Instancja testowa (tylko build `e2e`) ma to w tytule — właściciel widzi, że to nie jego okno.
-        .title(if crate::cdp::test_instance() {
+    let test = crate::cdp::test_instance();
+    let window = builder(app, MAIN, "index.html", data_dir(app));
+    // Instancja testowa (tylko build `e2e`): okno nie ma belki systemowej, więc sam tytuł jest
+    // niewidoczny — interfejs dostaje znacznik i rysuje plakietkę „instancja testowa” (`app.css`).
+    // Bez niej właściciel bierze to okno za swoją Alfę, a test zamyka je w trakcie pracy.
+    let window = if test {
+        window.initialization_script(TEST_INSTANCE_MARK)
+    } else {
+        window
+    };
+    window
+        .title(if test {
             "Alfa — instancja testowa (nie zamykaj)"
         } else {
             "Alfa"

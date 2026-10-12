@@ -25,7 +25,13 @@
   let session = $state<TerminalSession | null>(null);
   let exited = $state<number | null | undefined>(undefined);
   let error = $state<string | null>(null);
-  const title = $derived(tk(`term.profile.${request.profile}`));
+  /** Logowanie do narzędzia dostawcy: okno prowadzi krok po kroku, zamiast zostawiać z terminalem. */
+  const login = $derived(request.profile === 'claude_login' || request.profile === 'codex_login');
+  const title = $derived(
+    login
+      ? t('term.loginTitle', { name: tk(`term.service.${request.profile}`) })
+      : t('term.title', { name: tk(`term.profile.${request.profile}`) }),
+  );
 
   function fail(e: unknown) {
     error = e instanceof Error ? e.message : String(e);
@@ -88,6 +94,11 @@
   function close() {
     app.work.closeTerminal();
   }
+
+  /** Ponowna próba: nowe żądanie tego samego profilu uruchamia terminal od początku. */
+  function retry() {
+    app.work.openTerminal(request.profile);
+  }
 </script>
 
 <Dialog.Root open onOpenChange={(open) => !open && close()}>
@@ -99,15 +110,38 @@
       interactOutsideBehavior="ignore"
     >
       <header class="head">
-        <Dialog.Title class="alfa-term-title">{t('term.title', { name: title })}</Dialog.Title>
-        <Button size="sm" variant="secondary" onclick={close}>{t('term.close')}</Button>
+        <Dialog.Title class="alfa-term-title">{title}</Dialog.Title>
+        {#if login}
+          <Button size="sm" variant={exited === 0 ? 'primary' : 'secondary'} onclick={close}
+            >{t('term.done')}</Button
+          >
+        {:else}
+          <Button size="sm" variant="secondary" onclick={close}>{t('term.close')}</Button>
+        {/if}
       </header>
       <Dialog.Description class="alfa-term-desc">
-        {request.profile === 'claude_login' || request.profile === 'codex_login'
-          ? t('term.loginHint')
-          : t('term.privacy')}
+        {login ? t('term.loginHint') : t('term.privacy')}
       </Dialog.Description>
-      {#if error}<p class="error" role="alert">{error}</p>{/if}
+      {#if login}
+        <ol class="guide" aria-label={t('term.guide.label')}>
+          {#each ['1', '2', '3'] as const as n (n)}
+            <li><span class="num" aria-hidden="true">{n}</span>{t(`term.guide.${n}`)}</li>
+          {/each}
+        </ol>
+      {/if}
+      {#if error}
+        <div class="note bad" role="alert">
+          <span>{login ? t('term.openFailed', { error }) : error}</span>
+          <Button size="sm" variant="secondary" onclick={retry}>{t('term.retry')}</Button>
+        </div>
+      {:else if login && exited === 0}
+        <p class="note good" role="status">{t('term.loginOk')}</p>
+      {:else if login && exited !== undefined}
+        <div class="note bad" role="status">
+          <span>{t('term.loginFailed', { code: exited ?? '—' })}</span>
+          <Button size="sm" variant="secondary" onclick={retry}>{t('term.retry')}</Button>
+        </div>
+      {/if}
       <div class="screen" bind:this={container}></div>
       <p class="meta" role="status">
         {#if exited !== undefined}{t('term.exited', { code: exited ?? '—' })}
@@ -173,8 +207,59 @@
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-xs);
   }
-  .error {
-    color: var(--alfa-color-error);
+  .guide {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--alfa-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .guide li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--alfa-space-2);
+    padding: var(--alfa-space-2) var(--alfa-space-3);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface2);
     font-size: var(--alfa-font-size-sm);
+    line-height: 1.45;
+  }
+  .num {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--alfa-radius-full);
+    background: var(--alfa-color-text);
+    color: var(--alfa-color-text-on-accent);
+    font-size: var(--alfa-font-size-xs);
+    font-weight: var(--alfa-weight-semibold);
+  }
+  .note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--alfa-space-2);
+    margin: 0;
+    padding: var(--alfa-space-2) var(--alfa-space-3);
+    border: 1px solid currentColor;
+    border-radius: var(--alfa-radius-card);
+    font-size: var(--alfa-font-size-sm);
+  }
+  .note.good {
+    color: var(--alfa-color-success);
+  }
+  .note.bad {
+    color: var(--alfa-color-error);
+  }
+  @media (max-width: 760px) {
+    .guide {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

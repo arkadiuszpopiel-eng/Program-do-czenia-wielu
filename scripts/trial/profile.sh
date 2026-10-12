@@ -48,6 +48,11 @@ start)
       [ -d "$PROFILE/Local/Alfa/sidecars/$d" ] || cp -r "$OWNER/sidecars/$d" "$PROFILE/Local/Alfa/sidecars/$d"
     done
   fi
+  # Środowisko bez kluczy API — import kluczy ze zmiennych nie może zrobić konta z prawdziwego
+  # klucza właściciela. Katalog użytkownika instancji testowej ustawia sama powłoka.
+  for v in ANTHROPIC OPENAI DEEPSEEK ELEVENLABS GEMINI GOOGLE MOONSHOT MISTRAL OPENROUTER DASHSCOPE XAI; do
+    unset "${v}_API_KEY"
+  done
   APPDATA="$(cygpath -w "$PROFILE/Roaming")" LOCALAPPDATA="$(cygpath -w "$PROFILE/Local")" \
     ALFA_E2E_INSTANCE=1 ALFA_E2E_CDP_PORT="$PORT" "$EXE" >"$PROFILE/instancja.log" 2>&1 &
   echo $! >"$PIDFILE"

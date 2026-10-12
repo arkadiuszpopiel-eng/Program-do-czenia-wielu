@@ -32,8 +32,6 @@
   });
 </script>
 
-<h2>{t('ob.bridges.title')}</h2>
-<p class="muted">{t('ob.bridges.desc')}</p>
 {#if cards.status === 'loading'}
   <p role="status">{t('common.loading')}</p>
 {:else if cards.status === 'failed'}
@@ -45,15 +43,17 @@
     {#each bridges as card (card.route_id)}
       {@const profile = card.bridge ? loginProfile(card.bridge) : null}
       <li>
-        <span
-          >{card.name}{card.detected
-            ? ` · ${card.version ?? ''}`
-            : ` · ${t('ob.bridges.missing')}`}</span
-        >
+        <span class="who">
+          <span class="name">{card.name}</span>
+          <span class="state" class:ok={card.detected}
+            >{card.detected
+              ? t('ob.bridges.installed', { version: card.version ?? '—' })
+              : t('ob.bridges.missing')}</span
+          >
+        </span>
         {#if profile}
           <Button
-            size="sm"
-            variant="secondary"
+            variant={card.detected ? 'primary' : 'secondary'}
             disabled={!card.detected}
             aria-label={`${t('bridges.loginTerminal')}: ${card.name}`}
             onclick={() => app.work.openTerminal(profile)}>{t('bridges.loginTerminal')}</Button
@@ -79,6 +79,25 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--alfa-space-3);
+    padding: var(--alfa-space-3) var(--alfa-space-4);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface2);
+    font-weight: var(--alfa-weight-semibold);
+  }
+  .who {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .state {
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
+    font-weight: var(--alfa-weight-regular);
+  }
+  .state.ok {
+    color: var(--alfa-color-success);
   }
   .muted {
     color: var(--alfa-color-text-muted);

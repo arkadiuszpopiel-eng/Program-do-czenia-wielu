@@ -42,8 +42,8 @@ for (const theme of ['light', 'dark'] as const) {
       await settings(page, 'Mosty CLI');
       const cards = page.getByRole('list', { name: 'Karty zgodności mostów' });
       const claude = cards.getByRole('listitem').filter({ hasText: 'Claude Code (CLI)' });
-      await claude.getByRole('button', { name: 'Zaloguj w terminalu' }).click();
-      const dialog = page.getByRole('dialog', { name: /Terminal — logowanie do Claude Code/ });
+      await claude.getByRole('button', { name: 'Zaloguj się' }).click();
+      const dialog = page.getByRole('dialog', { name: 'Logowanie do Claude Code' });
       await expect(dialog).toBeVisible();
       await expect(dialog.getByText('Claude Code (atrapa)')).toBeVisible();
       await expect(dialog.getByText(/Proces \d+ działa/)).toBeVisible();
@@ -52,7 +52,8 @@ for (const theme of ['light', 'dark'] as const) {
       await page.keyboard.press('Escape');
       await expect(dialog).toBeVisible();
       await expect(dialog.getByText(/> \/login/).first()).toBeVisible();
-      await dialog.getByRole('button', { name: 'Zamknij terminal' }).click();
+      await expect(dialog.getByRole('list', { name: 'Jak się zalogować' })).toBeVisible();
+      await dialog.getByRole('button', { name: 'Gotowe' }).click();
       await expect(dialog).toHaveCount(0);
     });
 

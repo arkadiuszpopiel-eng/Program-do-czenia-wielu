@@ -12,6 +12,65 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.49 — 2026-10-12
+
+Okna pierwszego uruchomienia („Witaj w Alfie”) mają nowy wygląd. Z lewej strony jest lista ośmiu kroków
+z postępem, z prawej — treść kroku; przyciski „Wstecz” i „Dalej” są zawsze w tym samym miejscu.
+
+### Pierwsze uruchomienie
+
+- [poważne] Kreator pierwszego uruchomienia przebudowany: boczna lista kroków z ikonami, oznaczeniem kroków
+  opcjonalnych i paskiem postępu; do kroków już odwiedzonych wraca się kliknięciem. Okno ma stałą wysokość —
+  dłuższa treść przewija się w środku, a stopka nie skacze między krokami.
+- Profil głosu i poziom autonomii wybiera się kartami z nazwą i opisem; profil dobrany do sprzętu ma etykietę
+  „zalecany”.
+- Pomiar sprzętu pokazuje wynik w kaflach (procesor, karta, pamięć, klasa, silnik modelu) i osobno wnioski.
+- Krok „Konta i klucze” ma dwie wyraźne części: modele w chmurze (klucz dostawcy) i pakiet modelu lokalnego.
+- Test mikrofonu pokazuje poziom i stan („Słyszę Cię”) w jednej ramce.
+- Teksty bez żargonu: zniknęły „Voice Lab” i „fala 2”; krok korpusu mówi wprost, że nagrywanie dojdzie
+  w jednej z kolejnych wersji.
+- W wąskim oknie lista kroków zwija się do rzędu ikon nad treścią.
+
+### Logowanie do Claude Code i Codex
+
+- [poważne] Krok kreatora nazywa się teraz „Konto Claude / ChatGPT” (zamiast „Mosty CLI”) i mówi prosto, po
+  co jest: masz płatne konto — zaloguj się raz, a Alfa będzie mogła z niego korzystać. Każde narzędzie ma
+  kartę ze stanem („zainstalowane · wersja …” albo „nie zainstalowano na tym komputerze”) i przycisk
+  „Zaloguj się”.
+- Okno logowania prowadzi w trzech punktach (poczekaj na adres albo przeglądarkę → zaloguj się → „Gotowe”),
+  ma tytuł „Logowanie do Claude Code” i przycisk „Gotowe”. Gdy okna nie da się otworzyć albo narzędzie
+  skończy z błędem, pojawia się wyjaśnienie i „Spróbuj ponownie” zamiast gołego komunikatu.
+- Zgłoszone „wywalenie przy logowaniu” nie było awarią programu: okno należało do instancji testowej, którą
+  skrypt testów zamknął po przekroczeniu czasu (w dzienniku: otwarcie logowania 13:35:37, zamknięcie testu
+  chwilę później). Instancja testowa ma teraz widoczną plakietkę „Instancja testowa — zamknie się sama,
+  nie używaj tego okna”; wcześniej jedynym znakiem był tytuł okna, którego własna belka Alfy nie pokazuje.
+
+### Konta i klucze
+
+- Karty dostawców w kreatorze „Dodaj dostawcę” opisują zasady danych zdaniami („może trenować na Twoich
+  danych · prawo: Chiny”, „przechowuje dane 30 dni”) zamiast surowych znaczników katalogu
+  („cn-may-train”, „unknown”). Gdy katalog nic nie mówi, karta podaje to wprost.
+
+### Testy i instancja testowa
+
+- [poważne] Instancja testowa uruchamiana obok Alfy właściciela zapisuje sekrety pod własnymi wpisami
+  (`Alfa/test/…` w Menedżerze poświadczeń Windows) — test kont albo hasła kopii nie może już odczytać ani
+  nadpisać kluczy właściciela.
+- Instancja testowa dostaje własny katalog użytkownika (ustawia go powłoka w budowie testowej) i środowisko bez
+  zmiennych z kluczami API. Dotąd
+  katalogi robocze sesji testowych powstawały w `%USERPROFILE%\Alfa\Sesje` właściciela, a import kluczy ze
+  zmiennych mógłby zrobić konto z prawdziwego klucza.
+- Nowe testy w przeglądarce: lista kroków i powrót, stałe położenie stopki, karty wyboru z klawiaturą, opisy
+  dostawców. Nowy skrypt zrzutów kreatora: `apps/desktop/ui/scripts/shots-onboarding.mjs` (3 style × 2 motywy,
+  także wąskie okno).
+
+### Przyczyna błędów
+
+- Kreator pierwszego uruchomienia pochodził z pierwszych wersji i nie przeszedł przebudowy interfejsu
+  z 0.0.11–0.0.45 — widać go tylko na świeżym profilu, więc nie trafiał do przeglądów ekranów.
+- Magazyn poświadczeń i katalog użytkownika są wspólne dla całego konta Windows; osobny profil testu
+  (`APPDATA`, `LOCALAPPDATA`) ich nie obejmował.
+
 ## 0.0.48 — 2026-10-12
 
 Wersja naprawcza: pięć wad znalezionych testami poprzednich dwóch wersji. Najważniejsze — po zamknięciu programu

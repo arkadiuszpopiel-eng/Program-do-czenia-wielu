@@ -49,8 +49,6 @@
   }
 </script>
 
-<h2>{t('ob.import.title')}</h2>
-<p class="muted">{t('ob.import.desc')}</p>
 {#if imported}
   <p class="muted small">
     {t('tr.manifest', {
@@ -72,15 +70,14 @@
     >
   {/if}
 {:else}
-  <Button variant="secondary" loading={busy} disabled={busy} onclick={chooseImport}
-    >{t('tr.choose')}</Button
-  >
+  <div class="pick">
+    <Button variant="secondary" loading={busy} disabled={busy} onclick={chooseImport}
+      >{t('tr.choose')}</Button
+    >
+  </div>
 {/if}
 
 <style>
-  h2 {
-    font-size: var(--alfa-font-size-xl);
-  }
   .muted {
     color: var(--alfa-color-text-muted);
   }
@@ -95,5 +92,13 @@
     margin: 0;
     padding-left: var(--alfa-space-4);
     font-size: var(--alfa-font-size-sm);
+  }
+  .pick {
+    display: flex;
+    justify-content: center;
+    padding: var(--alfa-space-8) var(--alfa-space-4);
+    border: 1px dashed var(--alfa-color-border-strong);
+    border-radius: var(--alfa-radius-card);
+    background: var(--alfa-color-surface2);
   }
 </style>

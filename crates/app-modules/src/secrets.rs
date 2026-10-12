@@ -90,6 +90,61 @@ impl SecretStore for MemorySecretStore {
     }
 }
 
+/// Magazyn zawężony do przedrostka nazw (`<zakres>/<nazwa>`). Instancja testowa uruchamiana obok
+/// Alfy właściciela zapisuje przez niego swoje sekrety osobno, więc nie nadpisze ani nie odczyta
+/// kluczy właściciela (ten sam Credential Manager, inne wpisy).
+pub struct ScopedSecretStore {
+    inner: Arc<dyn SecretStore>,
+    prefix: String,
+}
+
+impl ScopedSecretStore {
+    /// Magazyn widzący wyłącznie wpisy `<scope>/…`.
+    pub fn new(inner: Arc<dyn SecretStore>, scope: &str) -> Self {
+        Self {
+            inner,
+            prefix: format!("{scope}/"),
+        }
+    }
+
+    fn scoped(&self, name: &SecretName) -> Result<SecretName, SecretStoreError> {
+        SecretName::new(format!("{}{}", self.prefix, name.as_str()))
+            .map_err(|e| SecretStoreError::Backend(e.to_string()))
+    }
+}
+
+impl SecretStore for ScopedSecretStore {
+    fn put(&self, name: &SecretName, value: &SecretString) -> Result<(), SecretStoreError> {
+        self.inner.put(&self.scoped(name)?, value)
+    }
+
+    fn get(&self, name: &SecretName) -> Result<Option<SecretString>, SecretStoreError> {
+        self.inner.get(&self.scoped(name)?)
+    }
+
+    fn delete(&self, name: &SecretName) -> Result<bool, SecretStoreError> {
+        self.inner.delete(&self.scoped(name)?)
+    }
+
+    fn list(&self) -> Result<Vec<SecretName>, SecretStoreError> {
+        Ok(self
+            .inner
+            .list()?
+            .iter()
+            .filter_map(|name| name.as_str().strip_prefix(&self.prefix))
+            .filter_map(|name| SecretName::new(name).ok())
+            .collect())
+    }
+}
+
+/// Magazyn systemowy zawężony do zakresu (instancja testowa: `test`).
+pub fn scoped_system_store(scope: &str) -> Result<Arc<dyn SecretStore>, SecretStoreError> {
+    Ok(Arc::new(ScopedSecretStore::new(
+        system_secret_store()?,
+        scope,
+    )))
+}
+
 /// Magazyn systemowy: Windows Credential Manager; poza Windows — pamięć procesu.
 pub fn system_secret_store() -> Result<Arc<dyn SecretStore>, SecretStoreError> {
     #[cfg(windows)]
@@ -148,5 +203,25 @@ mod tests {
         assert_eq!(names, vec!["vault/alfa/sessions/index".to_owned()]);
         assert!(vault.delete("alfa/sessions/index").unwrap());
         assert!(vault.load("bad..name").is_err());
+    }
+
+    #[test]
+    fn scoped_store_sees_only_its_own_entries() {
+        let base: Arc<dyn SecretStore> = Arc::new(MemorySecretStore::default());
+        let owner_key = SecretName::new("accounts/acc-1").unwrap();
+        base.put(&owner_key, &SecretString::new("wlasciciel".to_owned()))
+            .unwrap();
+        let scoped = ScopedSecretStore::new(base.clone(), "test");
+        // Wpis właściciela jest niewidoczny i nie da się go nadpisać ani usunąć tą samą nazwą.
+        assert!(scoped.get(&owner_key).unwrap().is_none());
+        assert!(scoped.list().unwrap().is_empty());
+        scoped
+            .put(&owner_key, &SecretString::new("proba".to_owned()))
+            .unwrap();
+        assert_eq!(scoped.list().unwrap(), vec![owner_key.clone()]);
+        assert!(scoped.delete(&owner_key).unwrap());
+        let kept = base.get(&owner_key).unwrap().unwrap();
+        assert_eq!(kept.expose_secret(), "wlasciciel");
+        assert_eq!(base.list().unwrap(), vec![owner_key]);
     }
 }

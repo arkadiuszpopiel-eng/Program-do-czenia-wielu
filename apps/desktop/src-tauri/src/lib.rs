@@ -59,7 +59,12 @@ pub fn run() {
         })
         .setup(move |app| {
             tracing::info!(wersja = %app.package_info().version, "start powłoki Alfy");
-            let paths = AppPaths::from_env().map_err(|e| e.message)?;
+            let mut paths = AppPaths::from_env().map_err(|e| e.message)?;
+            // Instancja testowa: katalogi robocze sesji zostają w profilu testu, nie w katalogu
+            // `Alfa` właściciela (`%USERPROFILE%` jest wspólny dla całego konta Windows).
+            if cdp::test_instance() {
+                paths.user_root = paths.local.join("uzytkownik-testowy");
+            }
             // Silniki osierocone przez awarię poprzedniego uruchomienia trzymałyby pamięć karty
             // graficznej — kończymy je, zanim rdzeń zacznie uruchamiać nowe.
             let _ = std::fs::create_dir_all(paths.state());
@@ -78,6 +83,13 @@ pub fn run() {
                 app_version: app.package_info().version.to_string(),
                 shell: Some(std::sync::Arc::new(shell::TauriShell::new(handle.clone()))),
                 kernel: broker,
+                // Instancja testowa obok Alfy właściciela: własne wpisy `Alfa/test/…` w magazynie
+                // poświadczeń — nie odczyta ani nie nadpisze kluczy właściciela.
+                secrets: if cdp::test_instance() {
+                    Some(app_core::scoped_system_store("test").map_err(|e| e.to_string())?)
+                } else {
+                    None
+                },
                 ..AppOptions::default()
             };
             let core = tauri::async_runtime::block_on(AppCore::build(paths.clone(), options))
