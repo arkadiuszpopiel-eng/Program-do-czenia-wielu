@@ -3,7 +3,7 @@
 // pseudokonsolę), wpisuje polecenie, zamyka okno i sprawdza, że program działa dalej; potem to samo
 // dla okna logowania — bez wpisywania czegokolwiek do narzędzia (logowanie wykonuje człowiek).
 import type { Page } from '@playwright/test';
-import { expect, shot, test } from './alfa';
+import { expect, inEverySkin, shot, test } from './alfa';
 
 async function openSettings(page: Page, section: string): Promise<void> {
   const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
@@ -47,6 +47,24 @@ test('terminal: prawdziwy PowerShell przyjmuje polecenie, zamknięcie nie wywrac
   await dialog.getByRole('button', { name: 'Zamknij terminal' }).click();
   await expect(dialog).toHaveCount(0);
   await coreAlive(main);
+  // Kolory terminala są liczone przy otwarciu — każdy styl i motyw dostaje własne otwarcie.
+  await inEverySkin(main, async (skin, theme) => {
+    await main.getByRole('button', { name: 'Otwórz PowerShell' }).click();
+    await expect(dialog.getByText(/Proces \d+ działa/)).toBeVisible({ timeout: 30_000 });
+    await expect(dialog.locator('.xterm-rows')).toContainText('PS ', { timeout: 30_000 });
+    const colors = await dialog.locator('.xterm-rows').evaluate((rows) => {
+      const screen = rows.closest('.screen') as HTMLElement;
+      return { text: getComputedStyle(rows).color, back: screen.style.background };
+    });
+    // Jasny motyw = jasne tło terminala i ciemny tekst (wcześniej czarny terminal wszędzie).
+    const light = (rgb: string) =>
+      (rgb.match(/\d+/g) ?? []).slice(0, 3).reduce((sum, n) => sum + Number(n), 0) > 382;
+    expect(light(colors.back), `${skin}/${theme}: tło ${colors.back}`).toBe(theme === 'light');
+    expect(light(colors.text), `${skin}/${theme}: tekst ${colors.text}`).toBe(theme === 'dark');
+    await shot(alfa, `20-terminal-${skin}-${theme}`);
+    await dialog.getByRole('button', { name: 'Zamknij terminal' }).click();
+    await expect(dialog).toHaveCount(0);
+  });
   const left = await main.evaluate(() => {
     const ipc = window as unknown as {
       __TAURI_INTERNALS__: { invoke: (cmd: string) => Promise<unknown[]> };
@@ -90,6 +108,16 @@ test('logowanie do Claude Code: okno z instrukcją otwiera się i zamyka, progra
   await coreAlive(main);
   await dialog.getByRole('button', { name: 'Gotowe' }).click();
   await expect(dialog).toHaveCount(0);
+  await coreAlive(main);
+  // Okno logowania w każdym stylu i motywie (każde otwarcie od nowa, bez wpisywania czegokolwiek).
+  await inEverySkin(main, async (skin, theme) => {
+    await login.click();
+    await expect(dialog.getByText(/Proces \d+ działa/)).toBeVisible({ timeout: 30_000 });
+    await main.waitForTimeout(2_500);
+    await shot(alfa, `21-logowanie-${skin}-${theme}`);
+    await dialog.getByRole('button', { name: 'Gotowe' }).click();
+    await expect(dialog).toHaveCount(0);
+  });
   await coreAlive(main);
   await expect(card).toBeVisible();
 });

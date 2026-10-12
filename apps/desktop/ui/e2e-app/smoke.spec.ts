@@ -15,6 +15,7 @@ import {
   driveSaveDialog,
   expect,
   expectAccessible,
+  inEverySkin,
   readFindings,
   shot,
   test,
@@ -176,6 +177,10 @@ test('wprowadzenie: pominięcie kroków prowadzi do rozmowy', async ({ alfa }) =
   const steps = await skipOnboarding(main, async (index) => {
     await main.waitForTimeout(index === 3 ? 2_500 : 400);
     await shot(alfa, `02-wprowadzenie-krok-${index}`);
+    // Ten sam krok w każdym stylu i motywie — na prawdziwej aplikacji, nie na atrapie.
+    await inEverySkin(main, async (skin, theme) => {
+      await shot(alfa, `02-wprowadzenie-${skin}-${theme}-krok-${index}`);
+    });
   });
   test.info().annotations.push({ type: 'kroki', description: steps.join(' → ') });
   await expect(main.locator('#alfa-composer')).toBeVisible();
@@ -390,43 +395,48 @@ test('belka okna: bez belki systemowej, pasek LED, maksymalizacja i przywróceni
   await shot(alfa, '06d-belka');
 });
 
-test('eksport .alfa do katalogu tymczasowego (natywne okno „Zapisz jako”)', async ({ alfa }) => {
-  test.skip(process.platform !== 'win32', 'okno „Zapisz jako” obsługuje UI Automation Windows');
-  const { main } = alfa;
-  await toChat(main);
-  await openSettings(main, 'Import i eksport');
-  const dir = process.env['ALFA_E2E_EXPORT_DIR'] ?? join(OUT, 'export');
-  mkdirSync(dir, { recursive: true });
-  const target = join(dir, `alfa-e2e-${Date.now()}.alfa`);
-  const dialog = driveSaveDialog(target);
-  await main.getByRole('button', { name: 'Eksportuj…', exact: true }).click();
-  const result = await dialog;
-  await test
-    .info()
-    .attach('okno-zapisz-jako.log', { body: result.output, contentType: 'text/plain' });
-  try {
-    expect(result.code, `UI Automation okna „Zapisz jako”:\n${result.output}`).toBe(0);
-    const saved = main.getByRole('status').filter({ hasText: /^Zapisano / });
-    await expect(saved).toBeVisible({ timeout: 60_000 });
-    // Ścieżka z komunikatu rdzenia („Zapisano <ścieżka> · …”) — ta, którą zwróciło okno systemowe.
-    const status = (await saved.textContent()) ?? '';
-    const written = /^Zapisano (.+?\.alfa)/.exec(status)?.[1] ?? '';
-    expect(written, `komunikat: ${status}`).not.toBe('');
-    if (basename(written) !== basename(target)) {
-      // Okno przyjęło inną nazwę niż wpisana (np. inne wydanie Windows) — eksport i tak sprawdzamy.
-      test.info().annotations.push({
-        type: 'warning',
-        description: `okno zapisu zwróciło ${written} zamiast ${target}`,
-      });
+// Okno systemowe obsługuje UI Automation i potrzebuje pierwszego planu: gdy ktoś w tej chwili
+// pracuje na pulpicie, pierwsza próba bywa nieudana — powtórka jest raportowana jako „flaky”.
+test.describe('eksport przez okno systemowe', () => {
+  test.describe.configure({ retries: 2 });
+  test('eksport .alfa do katalogu tymczasowego (natywne okno „Zapisz jako”)', async ({ alfa }) => {
+    test.skip(process.platform !== 'win32', 'okno „Zapisz jako” obsługuje UI Automation Windows');
+    const { main } = alfa;
+    await toChat(main);
+    await openSettings(main, 'Import i eksport');
+    const dir = process.env['ALFA_E2E_EXPORT_DIR'] ?? join(OUT, 'export');
+    mkdirSync(dir, { recursive: true });
+    const target = join(dir, `alfa-e2e-${Date.now()}.alfa`);
+    const dialog = driveSaveDialog(target);
+    await main.getByRole('button', { name: 'Eksportuj…', exact: true }).click();
+    const result = await dialog;
+    await test
+      .info()
+      .attach('okno-zapisz-jako.log', { body: result.output, contentType: 'text/plain' });
+    try {
+      expect(result.code, `UI Automation okna „Zapisz jako”:\n${result.output}`).toBe(0);
+      const saved = main.getByRole('status').filter({ hasText: /^Zapisano / });
+      await expect(saved).toBeVisible({ timeout: 60_000 });
+      // Ścieżka z komunikatu rdzenia („Zapisano <ścieżka> · …”) — ta, którą zwróciło okno systemowe.
+      const status = (await saved.textContent()) ?? '';
+      const written = /^Zapisano (.+?\.alfa)/.exec(status)?.[1] ?? '';
+      expect(written, `komunikat: ${status}`).not.toBe('');
+      if (basename(written) !== basename(target)) {
+        // Okno przyjęło inną nazwę niż wpisana (np. inne wydanie Windows) — eksport i tak sprawdzamy.
+        test.info().annotations.push({
+          type: 'warning',
+          description: `okno zapisu zwróciło ${written} zamiast ${target}`,
+        });
+      }
+      const head = readFileSync(written).subarray(0, 2).toString('latin1');
+      expect(head, 'paczka .alfa to archiwum ZIP').toBe('PK');
+      if (written !== target) rmSync(written, { force: true });
+    } finally {
+      // Okno, którego nie udało się obsłużyć, nie może zostać otwarte dla kolejnych testów.
+      if (result.code !== 0) await driveSaveDialog(null, 5);
     }
-    const head = readFileSync(written).subarray(0, 2).toString('latin1');
-    expect(head, 'paczka .alfa to archiwum ZIP').toBe('PK');
-    if (written !== target) rmSync(written, { force: true });
-  } finally {
-    // Okno, którego nie udało się obsłużyć, nie może zostać otwarte dla kolejnych testów.
-    if (result.code !== 0) await driveSaveDialog(null, 5);
-  }
-  await shot(alfa, '07-eksport');
+    await shot(alfa, '07-eksport');
+  });
 });
 
 test('zatrzymanie z UI (bez skrótu globalnego): „Zatrzymaj sterowanie” → „Sterujesz Ty”', async ({

@@ -274,6 +274,56 @@ export async function shot(alfa: Alfa, name: string): Promise<void> {
   }
 }
 
+/** Style i motywy interfejsu (`ui.style` × `ui.theme`). */
+export const SKINS: readonly (readonly [string, string])[] = [
+  ['classic', 'light'],
+  ['classic', 'dark'],
+  ['glass', 'light'],
+  ['glass', 'dark'],
+  ['next', 'light'],
+  ['next', 'dark'],
+];
+
+/** Atrybuty stylu i motywu na `<html>` — tym samym sposobem ustawia je program (`window-boot.ts`). */
+async function setLook(page: Page, skin: string | null, theme: string | null): Promise<void> {
+  await page.evaluate(
+    ([s, t]) => {
+      const root = document.documentElement;
+      for (const [name, value] of [
+        ['data-skin', s],
+        ['data-theme', t],
+      ] as const) {
+        if (value === null) root.removeAttribute(name);
+        else root.setAttribute(name, value);
+      }
+    },
+    [skin, theme] as const,
+  );
+}
+
+/**
+ * Wykonuje `each` w każdym stylu i motywie PRAWDZIWEJ aplikacji, a potem przywraca wygląd sprzed
+ * wywołania. Wygląd przełączają atrybuty `<html>`, tak jak robi to program po zmianie ustawień
+ * (samo ustawienie przez łącze nie odświeża otwartego okna — robi to interfejs).
+ */
+export async function inEverySkin(
+  page: Page,
+  each: (skin: string, theme: string) => Promise<void>,
+): Promise<void> {
+  const html = page.locator('html');
+  const before = [await html.getAttribute('data-skin'), await html.getAttribute('data-theme')];
+  try {
+    for (const [skin, theme] of SKINS) {
+      await setLook(page, skin, theme);
+      await page.waitForTimeout(350);
+      await each(skin, theme);
+    }
+  } finally {
+    await setLook(page, before[0] ?? null, before[1] ?? null);
+    await page.waitForTimeout(350);
+  }
+}
+
 /**
  * axe (WCAG 2.2 AA — 0 naruszeń critical/serious) jak `e2e/helpers.ts`, ale miękko (porażka nie
  * przerywa scenariusza) i w fazie `axe: …` dziennika. Kod narzędzi (axe, Playwright) wchodzi przez
