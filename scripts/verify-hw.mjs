@@ -92,7 +92,8 @@ const STAGES = [
     title: 'Rozmowa „na sucho”: nagranie zamiast mikrofonu, prawdziwe silniki, próba silników',
     group: 'cichy',
     pkg: 'app-voice',
-    test: ['--test', 'live_talk', '--', '--nocapture'],
+    // Jeden test naraz: oba wczytują rozpoznawanie mowy na kartę — równolegle nie mieszczą się w 6 GB.
+    test: ['--test', 'live_talk', '--', '--nocapture', '--test-threads', '1'],
     needs: [wav(1)],
     env: { ALFA_LIVE_TALK: '1', ALFA_LIVE_TALK_WAV: wav(1) },
   },

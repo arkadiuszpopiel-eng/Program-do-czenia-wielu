@@ -45,7 +45,11 @@ function factsText(tasks, triggers, costs, goal, startedMs) {
   for (let t = startedMs - 60_000; t <= Date.now() + 60_000; t += 60_000) {
     stamps.push(localStamp(new Date(t).toISOString()));
   }
-  const lines = [goal, ...stamps, `${tasks.length} ${triggers.length}`];
+  // Ta sama data w zapisie z kropkami oraz imiona obsady — agentka może ich użyć bez zmyślania.
+  const now = new Date();
+  const dotted = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}`;
+  const cast = '„alfa” „beta” „gama” „delta” „Alfa” „Beta” „Gama” „Delta”';
+  const lines = [goal, ...stamps, dotted, cast, `${tasks.length} ${triggers.length}`];
   for (const t of tasks) lines.push(`„${t.title}” ${t.steps} ${t.max_steps} ${money(t.cost)}`);
   for (const t of triggers) {
     lines.push(`„${t.name}” ${t.next_fire_at ? localStamp(t.next_fire_at) : ''}`);
