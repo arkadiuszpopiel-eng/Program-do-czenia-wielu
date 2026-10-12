@@ -19,6 +19,7 @@ import {
   shot,
   test,
 } from './alfa';
+import { READ_SWEEP, loadIpcSchema, schemaErrors } from './ipc';
 
 /**
  * Szum środowiska runnera — NIE błędy Alfy. Każdy wpis z uzasadnieniem; reszta błędów konsoli
@@ -591,6 +592,45 @@ test('Ustawienia → Głos i Urządzenia: silniki rozmowy i karty graficzne z pr
       .or(live.getByText(/Odczyt na żywo działa dziś dla kart NVIDIA/)),
   ).toBeVisible({ timeout: 15_000 });
   await shot(alfa, '16-karty-na-zywo');
+});
+
+test('przegląd poleceń odczytu: prawdziwy rdzeń odpowiada zgodnie ze schematem łącza', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  await startView(main);
+  const schema = loadIpcSchema();
+  const problems: string[] = [];
+  const slow: string[] = [];
+  for (const command of READ_SWEEP) {
+    const spec = schema.commands[command];
+    expect(spec, `polecenie ${command} jest w schemacie`).toBeTruthy();
+    expect(spec?.args, `polecenie ${command} nie ma argumentów`).toEqual([]);
+    const started = Date.now();
+    const reply = await main.evaluate(async (name) => {
+      const ipc = (
+        window as unknown as {
+          __TAURI_INTERNALS__: { invoke: (cmd: string) => Promise<unknown> };
+        }
+      ).__TAURI_INTERNALS__;
+      try {
+        return { ok: true as const, value: await ipc.invoke(name) };
+      } catch (error) {
+        return { ok: false as const, error: JSON.stringify(error) };
+      }
+    }, command);
+    const ms = Date.now() - started;
+    if (ms > 3_000) slow.push(`${command}: ${ms} ms`);
+    if (!reply.ok) {
+      problems.push(`${command}: błąd ${reply.error}`);
+      continue;
+    }
+    if (!spec?.result) continue;
+    const errors = schemaErrors(schema, spec.result, (reply.value ?? null) as never);
+    if (errors.length > 0) problems.push(`${command}: ${errors.slice(0, 3).join('; ')}`);
+  }
+  expect(problems, 'odpowiedzi niezgodne ze schematem albo błędy').toEqual([]);
+  expect(slow, 'polecenia odczytu wolniejsze niż 3 s').toEqual([]);
 });
 
 test('okna poboczne (Szybkie pytanie, pigułka) ładują się w WebView2', async ({ alfa }) => {

@@ -10,6 +10,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, expect, test as base, type Browser, type Page } from '@playwright/test';
+import { traceIpc } from './ipc';
 
 /** Adres CDP WebView2 (`--remote-debugging-port=9222` z `cdp::browser_args`). */
 export const CDP_URL = process.env['ALFA_CDP_URL'] ?? 'http://127.0.0.1:9222';
@@ -237,6 +238,8 @@ export const test = base.extend<object, { alfa: Alfa }>({
         for (const name of names) {
           const page = windows[name];
           if (page) await watch(page, name, log);
+          // Ślad poleceń rdzenia (pokrycie łącza) — tylko okno główne.
+          if (page && name === 'main') await traceIpc(page, OUT);
         }
         // Przeładowanie: nasłuch od pierwszej linii dokumentu (także skrypty wstrzykiwane przez
         // Tauri/IPC). Okna ukryte (`quick`, `pill`) — tylko do zatwierdzenia nawigacji.
