@@ -56,12 +56,16 @@ async function firstVisible(candidates: Locator[]): Promise<Locator> {
 }
 
 /** Pomija kroki wprowadzenia („Pomiń — dodam później”, „Później”, „Pomiń”, inaczej „Dalej”). */
-async function skipOnboarding(page: Page): Promise<string[]> {
+async function skipOnboarding(
+  page: Page,
+  onStep?: (index: number) => Promise<void>,
+): Promise<string[]> {
   const steps: string[] = [];
   const composer = page.locator('#alfa-composer');
   const counter = page.getByText(/^Krok \d+ z \d+$/);
   for (let i = 0; i < 12 && !(await composer.isVisible()); i++) {
     const before = (await counter.textContent({ timeout: 10_000 })) ?? '?';
+    await onStep?.(i + 1);
     const button = await firstVisible([
       page.getByRole('button', { name: 'Pomiń — dodam później', exact: true }),
       page.getByRole('button', { name: 'Później', exact: true }),
@@ -164,9 +168,15 @@ test('wprowadzenie: pominięcie kroków prowadzi do rozmowy', async ({ alfa }) =
   await startView(main);
   const onboarding = main.getByRole('heading', { name: ONBOARDING });
   test.skip(!(await onboarding.isVisible()), 'wprowadzenie już ukończone (profil nie jest świeży)');
+  // Ekran startowy znika z opóźnieniem — zrzut dopiero, gdy go nie ma.
+  await expect(main.getByText('Wczytuję rozmowy…')).toHaveCount(0);
   await shot(alfa, '02-wprowadzenie');
   await expectAccessible(alfa, 'wprowadzenie — krok 1');
-  const steps = await skipOnboarding(main);
+  // Każdy krok kreatora na zrzucie z prawdziwej aplikacji (pomiar sprzętu dostaje chwilę na wynik).
+  const steps = await skipOnboarding(main, async (index) => {
+    await main.waitForTimeout(index === 3 ? 2_500 : 400);
+    await shot(alfa, `02-wprowadzenie-krok-${index}`);
+  });
   test.info().annotations.push({ type: 'kroki', description: steps.join(' → ') });
   await expect(main.locator('#alfa-composer')).toBeVisible();
   await shot(alfa, '03-rozmowa-pusta');

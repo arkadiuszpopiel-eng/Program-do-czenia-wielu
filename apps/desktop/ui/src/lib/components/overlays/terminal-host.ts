@@ -4,6 +4,7 @@
 import { FitAddon } from '@xterm/addon-fit';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
+import { terminalColors } from './terminal-colors';
 
 export interface TerminalHost {
   readonly cols: number;
@@ -21,24 +22,17 @@ export interface HostOptions {
   onBinary(data: string): void;
 }
 
-function token(name: string, fallback: string): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return value || fallback;
-}
-
 export function createTerminal(container: HTMLElement, options: HostOptions): TerminalHost {
+  const colors = terminalColors();
+  // Ramka wokół emulatora ma ten sam kolor co jego tło — bez obwódki w innym odcieniu.
+  container.style.background = colors.background;
   const term = new Terminal({
     fontFamily: '"Cascadia Mono", Consolas, monospace',
     fontSize: 13,
     cursorBlink: true,
     scrollback: 5_000,
     screenReaderMode: false,
-    theme: {
-      background: token('--alfa-color-bg', '#1e1e1e'),
-      foreground: token('--alfa-color-text', '#e6e6e6'),
-      cursor: token('--alfa-color-focus', '#4f8cff'),
-      selectionBackground: token('--alfa-color-border-strong', '#264f78'),
-    },
+    theme: colors,
   });
   const fitter = new FitAddon();
   term.loadAddon(fitter);

@@ -355,10 +355,21 @@ kartę ze stanem („zainstalowane · wersja …” albo „nie zainstalowano na
 <li>Okno logowania prowadzi w trzech punktach (poczekaj na adres albo przeglądarkę → zaloguj się → „Gotowe”),
 ma tytuł „Logowanie do Claude Code” i przycisk „Gotowe”. Gdy okna nie da się otworzyć albo narzędzie
 skończy z błędem, pojawia się wyjaśnienie i „Spróbuj ponownie” zamiast gołego komunikatu.</li>
+<li>Okno logowania podpowiada, co zrobić, gdy narzędzie (po angielsku) zapyta o zaufanie do folderu — to pierwsze
+pytanie prawdziwego Claude Code i zwykły użytkownik nie musi go rozumieć.</li>
+<li>Terminal w jasnym motywie stylów „Szkło” i „Next” jest jasny. Wcześniej był czarny z białym tekstem, bo
+emulator nie rozumiał kolorów tych stylów.</li>
+<li>Numer procesu w oknie terminala nie ma już odstępu tysięcy („Proces 29936 działa”, nie „29 936”).</li>
 <li>Zgłoszone „wywalenie przy logowaniu” nie było awarią programu: okno należało do instancji testowej, którą
 skrypt testów zamknął po przekroczeniu czasu (w dzienniku: otwarcie logowania 13:35:37, zamknięcie testu
 chwilę później). Instancja testowa ma teraz widoczną plakietkę „Instancja testowa — zamknie się sama,
 nie używaj tego okna”; wcześniej jedynym znakiem był tytuł okna, którego własna belka Alfy nie pokazuje.</li>
+</ul>
+<h3 id="glos">Głos</h3>
+<ul>
+<li>[poważne] Bardzo krótkie naciśnięcie klawisza „naciśnij i mów” (wciśnięcie i puszczenie w tej samej chwili) nie
+zostawia już programu w stanie „słucham” przy zamkniętym mikrofonie. Błąd znalazł losowy test potoku głosu
+podczas sprawdzania tej wersji; przypadek jest zapisany jako stały test.</li>
 </ul>
 <h3 id="konta-i-klucze">Konta i klucze</h3>
 <ul>
@@ -375,6 +386,9 @@ nadpisać kluczy właściciela.</li>
 zmiennych z kluczami API. Dotąd
 katalogi robocze sesji testowych powstawały w <code>%USERPROFILE%\Alfa\Sesje</code> właściciela, a import kluczy ze
 zmiennych mógłby zrobić konto z prawdziwego klucza.</li>
+<li>Test prawdziwej aplikacji otwiera prawdziwy terminal (PowerShell: wpisane polecenie daje wynik), zamyka go
+i sprawdza, że program działa dalej; to samo dla okna logowania do Claude Code (bez wpisywania czegokolwiek do
+narzędzia). Każdy krok kreatora jest też zapisywany na zrzucie z prawdziwej aplikacji.</li>
 <li>Nowe testy w przeglądarce: lista kroków i powrót, stałe położenie stopki, karty wyboru z klawiaturą, opisy
 dostawców. Nowy skrypt zrzutów kreatora: <code>apps/desktop/ui/scripts/shots-onboarding.mjs</code> (3 style × 2 motywy,
 także wąskie okno).</li>
@@ -434,7 +448,7 @@ gdy zadanie się kończy.</li>
 <li>Dane dla zadania w tle zawierają koszty z poprzednich dni: wczoraj, ostatnie 7 dni i 7 dni wcześniej. Wzór
 „Kontrola kosztów” porównuje teraz tydzień do tygodnia.</li>
 </ul>
-<h3 id="glos">Głos</h3>
+<h3 id="glos-2">Głos</h3>
 <ul>
 <li>Nad polem pisania pojawia się pasek „rozmowa na żywo”, gdy Alfa Cię słyszy, przetwarza wypowiedź albo mówi:
 stan słowem, mały wskaźnik głośności i tekst rozpoznawany na bieżąco. Gdy Alfa tylko czeka, paska nie ma.</li>
@@ -530,7 +544,7 @@ kończyło się to błędem „wyzwalacz już istnieje”, bo numeracja identyfi
 porządki w katalogu roboczym i kontrola kosztów. Polecenia zostały przepisane tak, żeby opierały się na danych
 z programu; kontrola kosztów porównuje koszt z limitem miesięcznym (porównania tygodni program jeszcze nie podaje).</li>
 </ul>
-<h3 id="glos-2">Głos</h3>
+<h3 id="glos-2-2">Głos</h3>
 <ul>
 <li>Kula stanu rozmowy w panelu „Głos”: jedno miejsce, w którym widać, czy Alfa słucha, słyszy Cię, przetwarza, czy
 mówi agentka — słowem, kolorem i pierścieniem rosnącym z głośnością. Pod stanem jest imię mówiącej agentki
@@ -589,7 +603,7 @@ Polecenia prosiły o dane (zadania, koszty), których agentka w zadaniu w tle ni
 </ul>
 <h2 id="0-0-43-2026-10-12">0.0.43 — 2026-10-12</h2>
 <p>Stan silników rozmowy pod ręką w panelu „Głos”.</p>
-<h3 id="glos-2-2">Głos</h3>
+<h3 id="glos-2-2-2">Głos</h3>
 <ul>
 <li>Boczny panel „Głos” (Alt+6) pokazuje zwartą kartę „Silniki rozmowy”: który silnik rozpoznaje mowę, co wyczuwa
 koniec wypowiedzi, który głos mówi, stan bezpiecznika z przyciskiem „Zamknij bezpiecznik” i przycisk „Sprawdź
@@ -605,7 +619,7 @@ przebiegów z rzędu zielonych).</li>
 </ul>
 <h2 id="0-0-42-2026-10-12">0.0.42 — 2026-10-12</h2>
 <p>Język rozpoznawania mowy do wyboru i wyszukiwarka w ściągawce skrótów.</p>
-<h3 id="glos-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Nowe ustawienie „Język rozpoznawania mowy” (Ustawienia → Głos): polski (domyślnie), angielski albo
 automatycznie. Dotąd silnik zawsze zgadywał język, co przy krótkich zdaniach bywa zawodne; wskazany język trafia
@@ -631,7 +645,7 @@ zostają (121 GB po ośmiu wersjach). Usunąłem tylko odtwarzalne pliki budowy 
 </ul>
 <h2 id="0-0-41-2026-10-12">0.0.41 — 2026-10-12</h2>
 <p>Jeden przycisk sprawdza, czy rozmowa głosowa zadziała — bez mikrofonu i bez dźwięku.</p>
-<h3 id="glos-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Na karcie „Silniki rozmowy” jest przycisk „Sprawdź silniki”. Naprawdę uruchamia każdy silnik:
 wczytuje model rozpoznawania mowy, każe modelowi Smart Turn ocenić sekundę szumu i robi próbną syntezę głosu.
@@ -682,7 +696,7 @@ echa, gdy agentka mówi z głośnika.</li>
 </ul>
 <h2 id="0-0-38-2026-10-12">0.0.38 — 2026-10-12</h2>
 <p>Rozpoznawanie mowy dobiera silnik do zajętości karty graficznej — według pomiarów z tego laptopa.</p>
-<h3 id="glos-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Gdy model rozmowy zajmie kartę graficzną, Alfa wybiera silnik rozpoznawania, który da radę: Qwen3-ASR
 na karcie przy co najmniej 3,2 GB wolnej pamięci; sam Whisper na karcie przy co najmniej 1,6 GB; w pozostałych
@@ -708,7 +722,7 @@ pakietów. Pomiar na prawdziwych silnikach: <code>qwen_live</code> z <code>ALFA_
 też boczne przyciski myszy. Program pamięta 50 ostatnich miejsc; nowe miejsce po cofnięciu ucina gałąź „Dalej”.
 Oba skróty są w tabeli skrótów (można je zmienić) i w palecie poleceń.</li>
 </ul>
-<h3 id="glos-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>Karta „Silniki rozmowy” pokazuje pracę modelu Smart Turn: ile razy oceniał koniec wypowiedzi, ostatnią pewność
 i czas oceny. Widać, czy model naprawdę pracuje, czy odpowiada zapasowa ocena z tekstu.</li>
@@ -741,7 +755,7 @@ motywy z kontrolą dostępności, wstrzymanie z klawiatury, scenariusz bez pomia
 </ul>
 <h2 id="0-0-35-2026-10-12">0.0.35 — 2026-10-12</h2>
 <p>Rozmowę widać i da się ją stroić: karta „Silniki rozmowy”, ustawienia końca wypowiedzi i nowe silniki w pakietach.</p>
-<h3 id="glos-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Ustawienia → Głos pokazują kartę „Silniki rozmowy”: który silnik rozpoznaje mowę (i czy liczy na
 karcie graficznej), co wyczuwa koniec wypowiedzi, które głosy są gotowe. Gdy czegoś brakuje, karta mówi, co
@@ -788,7 +802,7 @@ nie sprawdzałem — to wymaga człowieka przy komputerze.</li>
 </ul>
 <h2 id="0-0-34-2026-10-11">0.0.34 — 2026-10-11</h2>
 <p>Alfa słyszy, czy skończyłeś mówić — trzeci duży krok przenoszenia rozmowy z Delty AI.</p>
-<h3 id="glos-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Koniec wypowiedzi ocenia model Smart Turn v3.2, który słucha brzmienia ostatnich 8 sekund, zamiast
 samego liczenia ciszy. Gdy model jest pewny końca, Alfa odpowiada po ćwierć sekundy ciszy; gdy słyszy, że zdanie
@@ -815,7 +829,7 @@ samego nagrania), dlatego model działa w osobnym procesie z ONNX Runtime — ja
 </ul>
 <h2 id="0-0-33-2026-10-11">0.0.33 — 2026-10-11</h2>
 <p>Rozpoznawanie mowy Qwen3-ASR ze strażnikiem jakości — drugi duży krok przenoszenia rozmowy z Delty AI.</p>
-<h3 id="glos-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Rozmowa głosowa i dyktowanie rozpoznają mowę modelem Qwen3-ASR, gdy jest pobrany (Ustawienia →
 „Modele lokalne i silniki”, ok. 2,5 GB). Na tym laptopie zdanie jest rozpoznane po ok. 0,3 s; pierwszy start
@@ -875,7 +889,7 @@ zbudowanych na miejscu.</li>
 </ul>
 <h2 id="0-0-31-2026-10-11">0.0.31 — 2026-10-11</h2>
 <p>Każdej agentce wybierasz głos: dziesięć barw Supertonic 3 w Ustawieniach → Głos.</p>
-<h3 id="glos-2-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>Cztery nowe ustawienia „Głos Alfy”, „Głos Bety”, „Głos Gamy”, „Głos Delty”: pięć barw kobiecych (F1–F5)
 i pięć męskich (M1–M5). Zmiana działa od następnego zdania, bez ponownego uruchamiania rozmowy.</li>
@@ -894,7 +908,7 @@ ustawień (nieznana nazwa barwy → barwa domyślna). vitest 311/311; testy okna
 <h2 id="0-0-30-2026-10-11">0.0.30 — 2026-10-11</h2>
 <p>Nowy głos agentek: Supertonic 3. Cztery agentki mówią czterema różnymi, naturalniejszymi barwami — lokalnie, bez
 Internetu i bez opłat. To pierwszy krok przenoszenia rozmowy i mowy z Delty AI (zadanie P1).</p>
-<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] Agentki mówią głosem Supertonic 3, gdy jego model jest pobrany: Alfa barwą F1, Beta F2, Gama F4,
 Delta F5 — naprawdę różne głosy zamiast jednego przestrajanego. Model (383 MB) pobierasz w Ustawieniach →
@@ -1225,7 +1239,7 @@ przy stanie „działa”. Kamera pokazuje nowy stan „zamykam…”, a „uśp
 <li>[poważne] Ekran ładowania nie może już zostać na zawsze: błąd startu jest na nim pokazywany razem z przyciskiem „Zamknij
 program”, a gdy start trwa ponad 20 sekund, pojawia się to samo wyjście. Górny pas ekranu ładowania przesuwa okno.</li>
 </ul>
-<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>„Głośność mowy” w zakładce „Głos”: głośność głosu agentek niezależnie od głośności systemu (20–150 %).</li>
 </ul>
@@ -1313,7 +1327,7 @@ rozgląda się, a wokół krąży łuk. Gotowa agentka zostaje literą. Duże aw
 <li>Usta poruszają się w rytm prawdziwej mowy: program mierzy poziom tego, co gra głośnik, i wysyła go do awatara.</li>
 <li>W „Wygląd” jest przełącznik „Awatary agentek”: „Żywe” albo „Same litery”.</li>
 </ul>
-<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>Głos agentek brzmi naturalniej: silnik mowy dostaje żywszą intonację i rytm zamiast ustawień surowych, a po każdym
 zdaniu jest krótka pauza — mowa nie idzie jednym ciągiem.</li>
@@ -1457,7 +1471,7 @@ ukrywanie wersji z datą w nazwie. Każdy model ma opis, do czego służy.</li>
 <li>Agentki w roli programistki korzystają z kolejki „Kod”, planujące i recenzujące — z kolejki „Planowanie”.</li>
 <li>[poważne] Model lokalny nie dopisuje już do odpowiedzi zmyślonych wywołań narzędzi w rodzaju <code>{&quot;name&quot;: &quot;get_status&quot;, …}</code>.</li>
 </ul>
-<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[krytyczne] Rozmowa głosowa odpowiada. Wcześniej mikrofon słuchał, ale koniec wypowiedzi nigdy nie był wykrywany, więc nic nie
 trafiało do rozpoznawania mowy ani do modelu.</li>
@@ -1671,7 +1685,7 @@ z silnikiem.</li>
 <li>[poważne] Sesja usunięta poza oknem nie zostaje „aktywna”; błąd w jednym zdarzeniu nie blokuje tury w stanie „pisze”;
 zamknięcie okna nie gubi szkicu.</li>
 </ul>
-<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
+<h3 id="glos-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2">Głos</h3>
 <ul>
 <li>[poważne] „Przeczytaj na głos” zawsze odmawiało (aplikacja nie miała dostępu do schowka) — naprawione.</li>
 <li>Czytanie i dyktowanie bez silnika lub modelu mowy mówią, czego brakuje i gdzie to pobrać.</li>

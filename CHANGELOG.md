@@ -40,10 +40,21 @@ z postępem, z prawej — treść kroku; przyciski „Wstecz” i „Dalej” s�
 - Okno logowania prowadzi w trzech punktach (poczekaj na adres albo przeglądarkę → zaloguj się → „Gotowe”),
   ma tytuł „Logowanie do Claude Code” i przycisk „Gotowe”. Gdy okna nie da się otworzyć albo narzędzie
   skończy z błędem, pojawia się wyjaśnienie i „Spróbuj ponownie” zamiast gołego komunikatu.
+- Okno logowania podpowiada, co zrobić, gdy narzędzie (po angielsku) zapyta o zaufanie do folderu — to pierwsze
+  pytanie prawdziwego Claude Code i zwykły użytkownik nie musi go rozumieć.
+- Terminal w jasnym motywie stylów „Szkło” i „Next” jest jasny. Wcześniej był czarny z białym tekstem, bo
+  emulator nie rozumiał kolorów tych stylów.
+- Numer procesu w oknie terminala nie ma już odstępu tysięcy („Proces 29936 działa”, nie „29 936”).
 - Zgłoszone „wywalenie przy logowaniu” nie było awarią programu: okno należało do instancji testowej, którą
   skrypt testów zamknął po przekroczeniu czasu (w dzienniku: otwarcie logowania 13:35:37, zamknięcie testu
   chwilę później). Instancja testowa ma teraz widoczną plakietkę „Instancja testowa — zamknie się sama,
   nie używaj tego okna”; wcześniej jedynym znakiem był tytuł okna, którego własna belka Alfy nie pokazuje.
+
+### Głos
+
+- [poważne] Bardzo krótkie naciśnięcie klawisza „naciśnij i mów” (wciśnięcie i puszczenie w tej samej chwili) nie
+  zostawia już programu w stanie „słucham” przy zamkniętym mikrofonie. Błąd znalazł losowy test potoku głosu
+  podczas sprawdzania tej wersji; przypadek jest zapisany jako stały test.
 
 ### Konta i klucze
 
@@ -60,6 +71,9 @@ z postępem, z prawej — treść kroku; przyciski „Wstecz” i „Dalej” s�
   zmiennych z kluczami API. Dotąd
   katalogi robocze sesji testowych powstawały w `%USERPROFILE%\Alfa\Sesje` właściciela, a import kluczy ze
   zmiennych mógłby zrobić konto z prawdziwego klucza.
+- Test prawdziwej aplikacji otwiera prawdziwy terminal (PowerShell: wpisane polecenie daje wynik), zamyka go
+  i sprawdza, że program działa dalej; to samo dla okna logowania do Claude Code (bez wpisywania czegokolwiek do
+  narzędzia). Każdy krok kreatora jest też zapisywany na zrzucie z prawdziwej aplikacji.
 - Nowe testy w przeglądarce: lista kroków i powrót, stałe położenie stopki, karty wyboru z klawiaturą, opisy
   dostawców. Nowy skrypt zrzutów kreatora: `apps/desktop/ui/scripts/shots-onboarding.mjs` (3 style × 2 motywy,
   także wąskie okno).

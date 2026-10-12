@@ -82,6 +82,8 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'term.guide.1': 'Wait a moment — the tool will show an address or open the browser itself.',
   'term.guide.2': 'Sign in to your account in the browser and come back to this window.',
   'term.guide.3': 'When you see the confirmation, click “Done”.',
+  'term.guide.note':
+    'If the tool asks whether you trust the folder (“Yes, I trust this folder”), pick that answer with the arrow key and press Enter — it is Alfa’s data folder.',
   'term.loginOk': 'The tool finished without an error. You can close this window.',
   'term.loginFailed': 'Sign-in was not completed (code {code}). You can try again.',
   'term.openFailed': 'The sign-in window could not be opened: {error}',

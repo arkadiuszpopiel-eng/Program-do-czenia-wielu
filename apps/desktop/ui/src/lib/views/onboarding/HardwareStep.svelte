@@ -18,6 +18,13 @@
   const app = useApp();
   const { t } = app.i18n;
 
+  /** Nazwa karty bez powtórzonego producenta („NVIDIA NVIDIA GeForce…” z prawdziwego pomiaru). */
+  function gpuName(gpu: { vendor: string; model: string }): string {
+    return gpu.model.toLowerCase().startsWith(gpu.vendor.toLowerCase())
+      ? gpu.model
+      : `${gpu.vendor} ${gpu.model}`;
+  }
+
   const tiles = $derived(
     profile
       ? [
@@ -25,9 +32,7 @@
           {
             key: 'gpu',
             label: t('dev.gpu'),
-            value:
-              profile.machine.gpus.map((g) => `${g.vendor} ${g.model}`).join(', ') ||
-              t('common.none'),
+            value: profile.machine.gpus.map(gpuName).join(', ') || t('common.none'),
           },
           {
             key: 'ram',

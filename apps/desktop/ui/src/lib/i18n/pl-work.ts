@@ -82,6 +82,8 @@ export const plWork = {
   'term.guide.1': 'Poczekaj chwilę — narzędzie poda adres albo samo otworzy przeglądarkę.',
   'term.guide.2': 'Zaloguj się w przeglądarce na swoje konto i wróć do tego okna.',
   'term.guide.3': 'Gdy zobaczysz potwierdzenie, kliknij „Gotowe”.',
+  'term.guide.note':
+    'Narzędzie jest po angielsku. Jeśli zapyta, czy ufasz folderowi („Yes, I trust this folder”), wybierz tę odpowiedź strzałką i naciśnij Enter — to folder danych Alfy.',
   'term.loginOk': 'Narzędzie zakończyło pracę bez błędu. Możesz zamknąć to okno.',
   'term.loginFailed':
     'Logowanie nie zostało dokończone (kod {code}). Możesz spróbować jeszcze raz.',

@@ -128,6 +128,7 @@
             <li><span class="num" aria-hidden="true">{n}</span>{t(`term.guide.${n}`)}</li>
           {/each}
         </ol>
+        <p class="hint">{t('term.guide.note')}</p>
       {/if}
       {#if error}
         <div class="note bad" role="alert">
@@ -145,7 +146,7 @@
       <div class="screen" bind:this={container}></div>
       <p class="meta" role="status">
         {#if exited !== undefined}{t('term.exited', { code: exited ?? '—' })}
-        {:else if session}{t('term.running', { pid: session.pid })}
+        {:else if session}{t('term.running', { pid: String(session.pid) })}
         {:else}{t('term.starting')}{/if}
       </p>
     </Dialog.Content>
@@ -238,6 +239,11 @@
     color: var(--alfa-color-text-on-accent);
     font-size: var(--alfa-font-size-xs);
     font-weight: var(--alfa-weight-semibold);
+  }
+  .hint {
+    margin: 0;
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
   }
   .note {
     display: flex;

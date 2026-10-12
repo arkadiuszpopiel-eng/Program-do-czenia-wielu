@@ -78,8 +78,15 @@ impl Pipeline {
         for ev in events {
             self.outbox.push(ev.to_bus_event());
             match ev {
-                WakeEvent::ListenStart { source, .. } => self.open_mic(source),
-                WakeEvent::ListenStop { .. } => self.close_mic(),
+                // Paczka zdarzeń bywa starsza niż stan automatu: wciśnięcie i puszczenie klawisza
+                // w jednym kroku daje naraz start i stop. Start, po którym automat już nie słucha,
+                // nie otwiera mikrofonu (inaczej dialog włączał słuchanie od nowa, a spóźniony stop
+                // zamykał strumień — stan „słucham” przy zamkniętym mikrofonie). Stop nie zamyka
+                // strumienia, gdy automat w międzyczasie zaczął słuchać z innego źródła.
+                WakeEvent::ListenStart { source, .. } if self.wake.is_listening() => {
+                    self.open_mic(source);
+                }
+                WakeEvent::ListenStop { .. } if !self.wake.is_listening() => self.close_mic(),
                 _ => {}
             }
         }
