@@ -17,18 +17,52 @@ pub const ENV_BROWSER: &str = "WEBVIEW2_BROWSER_EXECUTABLE_FOLDER";
 /// Rdzeń flag zdalnego debugowania (`…-port`, `…-pipe`, `…-address`; bez wielkości liter).
 const REMOTE_DEBUGGING: &str = "remote-debugging";
 
-/// Argumenty przeglądarki okien w buildzie testowym (`e2e`): port CDP dla Playwrighta.
+/// Domyślny port CDP buildu testowego.
 #[cfg(feature = "e2e")]
-pub fn browser_args() -> Option<&'static str> {
-    Some(
-        "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9222",
-    )
+const DEFAULT_PORT: u16 = 9222;
+/// Zmienna z portem CDP instancji testowej (tylko build `e2e`; docs/plan/24 §2.7).
+#[cfg(feature = "e2e")]
+pub const ENV_PORT: &str = "ALFA_E2E_CDP_PORT";
+/// Zmienna oznaczająca instancję testową uruchamianą obok Alfy właściciela (tylko build `e2e`).
+#[cfg(feature = "e2e")]
+pub const ENV_INSTANCE: &str = "ALFA_E2E_INSTANCE";
+
+/// Port CDP z wartości zmiennej: tylko porty nieuprzywilejowane; śmieci → domyślny.
+#[cfg(feature = "e2e")]
+fn port_from(value: Option<&str>) -> u16 {
+    value
+        .and_then(|v| v.trim().parse::<u16>().ok())
+        .filter(|port| *port >= 1024)
+        .unwrap_or(DEFAULT_PORT)
+}
+
+/// Argumenty przeglądarki okien w buildzie testowym (`e2e`): port CDP dla Playwrighta
+/// (domyślnie 9222; instancja testowa obok Alfy właściciela bierze własny z [`ENV_PORT`]).
+#[cfg(feature = "e2e")]
+pub fn browser_args() -> Option<String> {
+    let port = port_from(std::env::var(ENV_PORT).ok().as_deref());
+    Some(format!(
+        "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port={port}"
+    ))
 }
 
 /// Build produkcyjny: bez dodatkowych argumentów przeglądarki — bez portu CDP.
 #[cfg(not(feature = "e2e"))]
-pub fn browser_args() -> Option<&'static str> {
+pub fn browser_args() -> Option<String> {
     None
+}
+
+/// Instancja testowa (`e2e` + [`ENV_INSTANCE`]`=1`): działa obok uruchomionej Alfy właściciela na
+/// własnym profilu, więc nie przekazuje argumentów istniejącej instancji i się nie zamyka.
+#[cfg(feature = "e2e")]
+pub fn test_instance() -> bool {
+    std::env::var(ENV_INSTANCE).is_ok_and(|v| v == "1")
+}
+
+/// Build produkcyjny nie ma instancji testowych — zawsze jedna instancja.
+#[cfg(not(feature = "e2e"))]
+pub fn test_instance() -> bool {
+    false
 }
 
 /// Powód odmowy startu, gdy środowisko otwiera CDP albo podmienia silnik WebView2 (`None` —
@@ -66,12 +100,23 @@ mod tests {
     #[test]
     fn production_build_adds_no_browser_args() {
         assert_eq!(browser_args(), None);
+        assert!(
+            !test_instance(),
+            "build produkcyjny zawsze pilnuje jednej instancji"
+        );
     }
 
     #[cfg(feature = "e2e")]
     #[test]
     fn e2e_build_opens_cdp_for_playwright() {
         assert!(browser_args().is_some_and(|args| args.contains(FLAG)));
+        assert_eq!(port_from(None), 9222);
+        assert_eq!(port_from(Some("9333")), 9333);
+        assert_eq!(port_from(Some(" 9444 ")), 9444);
+        // Porty uprzywilejowane i śmieci nie przechodzą.
+        assert_eq!(port_from(Some("80")), 9222);
+        assert_eq!(port_from(Some("abc")), 9222);
+        assert_eq!(port_from(Some("99999")), 9222);
         assert_eq!(environment_violation(|_| Some(FLAG.to_owned())), None);
     }
 

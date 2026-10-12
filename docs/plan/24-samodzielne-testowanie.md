@@ -89,17 +89,32 @@ z czymkolwiek spoza danych = próba czerwona.
 3. Raport dla właściciela bierze liczby z `raport.json`, nie z pamięci.
 4. Błąd znaleziony przez próbę na żywo dostaje test, który by go złapał (jak nazwy wyzwalaczy po restarcie w 0.0.45).
 
+### 2.7 Instancja testowa obok uruchomionej Alfy
+
+Dotąd każdy test prawdziwej aplikacji wymagał zamknięcia okna właściciela (jeden port, jedna instancja, ten sam plik
+programu). Od 0.0.46:
+
+- powłoka testowa przyjmuje własny port (`ALFA_E2E_CDP_PORT`) i tryb instancji testowej (`ALFA_E2E_INSTANCE=1`) —
+  wyłącznie w budowie z cechą `e2e`; budowa produkcyjna nadal pilnuje jednej instancji i nie otwiera portu;
+- Alfa właściciela działa z osobnej kopii programu (`Alfa-uruchomiona/`, kładzie ją `scripts/deploy-owner.sh`),
+  więc budowa i testy jej nie dotykają;
+- `scripts/verify-app.sh` buduje, uruchamia test prawdziwej aplikacji na profilu tymczasowym i liczy pokrycie
+  poleceń; `scripts/trial/profile.sh` uruchamia instancję testową do prób (z kopią modelu albo bez).
+
 ## 4. Stan wykonania
 
-| Element                                                   | Stan                |
-| --------------------------------------------------------- | ------------------- |
-| Rozliczenie pominięć (ten dokument)                       | zrobione 2026-10-12 |
-| Pełne testy i linter całego projektu dla 0.0.45           | w toku              |
-| `scripts/verify-hw.sh` i pierwszy bieg testów sprzętowych | do zrobienia        |
-| Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń”  | do zrobienia        |
-| `scripts/verify.sh` z raportem                            | do zrobienia        |
-| Tor akustyczny                                            | do zrobienia        |
-| Zrozumiałość głosów                                       | do zrobienia        |
-| Próby modelowe z automatyczną oceną                       | do zrobienia        |
-| Pobranie Qwen3-ASR i `llama-server` przez program         | do zrobienia        |
-| `cargo deny` lokalnie                                     | do zrobienia        |
+| Element | Stan |
+| --- | --- |
+| Rozliczenie pominięć (ten dokument) | zrobione 2026-10-12 |
+| Pełne testy i linter całego projektu dla 0.0.45 | zrobione: linter bez uwag; 946 programów testowych, 2676 testów zielonych, 0 czerwonych, 33 pominięte (sprzętowe) |
+| `scripts/verify-hw.mjs` i pierwszy bieg testów sprzętowych | zrobione: 12 etapów „cichych” — 11 zielonych, 1 pominięty (brak wytrenowanego modelu słowa wywoławczego). Pierwszy bieg znalazł błąd w kwarantannie pobrań (katalog w skróconej postaci `SPOPIE~1` brany za dowiązanie) — naprawiony z testem |
+| Instancja testowa obok Alfy właściciela | zrobione: test prawdziwej aplikacji przechodzi (19 z 19) przy uruchomionej Alfie właściciela |
+| Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń” | zrobione: 38 poleceń odczytu sprawdzanych ze schematem łącza; **pokrycie 62 z 228 poleceń (27,2 %)** — punkt wyjścia do podnoszenia |
+| Ocena „raport trzyma się danych” i skrypt prób obowiązków | napisane (`scripts/trial/grounding.mjs`, `duty.mjs`); pierwszy bieg — do zrobienia |
+| Testy sprzętowe dotykające pulpitu (schowek, Kosz, skróty, Notatnik, Edge, poświadczenia) | do zrobienia — gdy właściciel nie pracuje przy komputerze |
+| `scripts/verify.sh` z jednym raportem | do zrobienia |
+| Tor akustyczny | do zrobienia |
+| Zrozumiałość głosów | do zrobienia |
+| Pobranie Qwen3-ASR i `llama-server` przez program | do zrobienia |
+| `cargo deny` lokalnie | do zrobienia |
+| Pokrycie poleceń rdzenia ≥ 60 % | do zrobienia (scenariusze: konta, zadania, wyzwalacze, pamięć, pliki, sesje) |

@@ -25,11 +25,16 @@ pub fn run() {
         eprintln!("alfa-desktop: {why}");
         std::process::exit(1);
     }
-    let result = tauri::Builder::default()
-        // Single-instance musi być pierwszą wtyczką: druga instancja przekazuje argumenty/URI.
-        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+    let mut builder = tauri::Builder::default();
+    // Single-instance musi być pierwszą wtyczką: druga instancja przekazuje argumenty/URI.
+    // Wyjątek tylko w buildzie testowym: instancja testowa na własnym profilu działa obok
+    // uruchomionej Alfy właściciela (`cdp::test_instance`, docs/plan/24 §2.7).
+    if !cdp::test_instance() {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             shell::handle_args(app, argv);
-        }))
+        }));
+    }
+    let result = builder
         .plugin(shortcuts::plugin())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())

@@ -239,7 +239,7 @@ export const test = base.extend<object, { alfa: Alfa }>({
           const page = windows[name];
           if (page) await watch(page, name, log);
           // Ślad poleceń rdzenia (pokrycie łącza) — tylko okno główne.
-          if (page && name === 'main') await traceIpc(page, OUT);
+          if (page && name === 'main') traceIpc(page, OUT);
         }
         // Przeładowanie: nasłuch od pierwszej linii dokumentu (także skrypty wstrzykiwane przez
         // Tauri/IPC). Okna ukryte (`quick`, `pill`) — tylko do zatwierdzenia nawigacji.

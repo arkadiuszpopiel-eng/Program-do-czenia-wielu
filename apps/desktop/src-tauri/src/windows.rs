@@ -77,7 +77,7 @@ fn builder<'a>(
         .content_protected(protect);
     // Port CDP tylko w buildzie testowym (Playwright); w produkcji zamknięty (PLAN §8.2, `cdp`).
     match crate::cdp::browser_args() {
-        Some(args) => builder.additional_browser_args(args),
+        Some(args) => builder.additional_browser_args(&args),
         None => builder,
     }
 }

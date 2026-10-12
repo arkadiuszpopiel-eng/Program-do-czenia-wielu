@@ -36,6 +36,8 @@ mod events_xml;
 #[cfg(windows)]
 mod monitor_win;
 mod notify;
+#[cfg(windows)]
+mod paths_win;
 #[cfg(not(windows))]
 mod portable;
 #[cfg(windows)]

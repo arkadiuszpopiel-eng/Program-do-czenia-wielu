@@ -39,6 +39,15 @@ fn comparable(p: &Path) -> String {
     }
 }
 
+#[cfg(windows)]
+use crate::paths_win::long_form;
+
+/// Poza Windows nazw skróconych 8.3 nie ma.
+#[cfg(not(windows))]
+fn long_form(p: &Path) -> PathBuf {
+    p.to_path_buf()
+}
+
 fn unsafe_dir(dir: &Path) -> DownloadError {
     DownloadError::Unsafe(format!(
         "{} prowadzi przez dowiązanie albo junction",
@@ -68,7 +77,10 @@ fn checked_dir(dir: &Path) -> Result<(), DownloadError> {
         }
     }
     let real = std::fs::canonicalize(existing).map_err(|e| io(&e))?;
-    if comparable(&real) != comparable(existing) {
+    // Nazwa skrócona 8.3 (np. `SPOPIE~1` — tak Windows potrafi podać `%TEMP%`) to ten sam katalog,
+    // nie dowiązanie: porównujemy z postacią długą. Dowiązania i junction nadal różnią się od
+    // ścieżki rzeczywistej, więc sprawdzenie nie słabnie.
+    if comparable(&real) != comparable(&long_form(existing)) {
         return Err(unsafe_dir(dir));
     }
     let mut cur = existing.to_path_buf();
@@ -81,7 +93,7 @@ fn checked_dir(dir: &Path) -> Result<(), DownloadError> {
         }
     }
     let real = std::fs::canonicalize(dir).map_err(|e| io(&e))?;
-    if comparable(&real) != comparable(dir) || !real.is_dir() {
+    if comparable(&real) != comparable(&long_form(dir)) || !real.is_dir() {
         return Err(unsafe_dir(dir));
     }
     Ok(())
@@ -269,5 +281,19 @@ mod tests {
             0,
             "nic nie powstało po drugiej stronie dowiązania"
         );
+    }
+
+    /// Regresja z testu sprzętowego 2026-10-12: `%TEMP%` w postaci 8.3 było brane za junction.
+    #[test]
+    fn short_8_3_names_are_not_mistaken_for_links() {
+        let t = tempfile::tempdir().unwrap();
+        // Bez wcześniejszego `canonicalize` — dokładnie tak, jak ścieżkę podaje system.
+        let dir = t.path().join("kwarantanna");
+        let mut sink = DiskDownloads.begin(&dir, "plik.txt").unwrap();
+        sink.write(b"x").unwrap();
+        let path = sink.commit("https://example.com/plik.txt").unwrap();
+        assert!(path.exists());
+        let real = std::fs::canonicalize(t.path()).unwrap();
+        assert_eq!(comparable(&real), comparable(&long_form(t.path())));
     }
 }

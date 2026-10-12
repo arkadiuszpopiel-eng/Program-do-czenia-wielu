@@ -130,6 +130,12 @@ try {
     if ($null -ne (Get-Cdp 'version')) { throw "Port $Port już odpowiada — inna przeglądarka/WebView2 z debugowaniem; zamknij ją." }
 
     Write-Host "Start: $Exe"
+    # Port inny niż domyślny = instancja testowa obok uruchomionej Alfy właściciela: własny port CDP
+    # i bez przekazywania argumentów istniejącej instancji (src-tauri/src/cdp.rs, docs/plan/24 §2.7).
+    if ($Port -ne 9222) {
+        $env:ALFA_E2E_CDP_PORT = "$Port"
+        $env:ALFA_E2E_INSTANCE = '1'
+    }
     $proc = Start-Process -FilePath $Exe -WorkingDirectory (Split-Path -Parent $Exe) -PassThru -NoNewWindow `
         -RedirectStandardOutput (Join-Path $OutDir 'alfa-desktop.stdout.log') `
         -RedirectStandardError (Join-Path $OutDir 'alfa-desktop.stderr.log')

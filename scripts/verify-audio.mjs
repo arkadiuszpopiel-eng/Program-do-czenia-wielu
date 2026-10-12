@@ -74,6 +74,17 @@ function resample(samples, from, to) {
   return result;
 }
 
+/** Bez ciszy na początku i końcu (próg 1 % skali, zapas 20 ms) — testy zakładają mowę od pierwszej próbki. */
+function trimSilence(samples) {
+  const threshold = 328;
+  let first = 0;
+  let last = samples.length - 1;
+  while (first < samples.length && Math.abs(samples[first]) < threshold) first++;
+  while (last > first && Math.abs(samples[last]) < threshold) last--;
+  const margin = RATE / 50;
+  return samples.slice(Math.max(0, first - margin), Math.min(samples.length, last + margin));
+}
+
 function writeWav(path, samples) {
   const header = Buffer.alloc(44);
   header.write('RIFF', 0, 'ascii');
@@ -111,7 +122,7 @@ mkdirSync(out, { recursive: true });
 files.forEach((name, index) => {
   const { samples, rate } = readWav(join(source, name));
   const target = join(out, `mowa-0${index + 1}-16k.wav`);
-  const converted = resample(samples, rate, RATE);
+  const converted = trimSilence(resample(samples, rate, RATE));
   writeWav(target, converted);
   console.log(`${name} (${rate} Hz) → ${target} (${(converted.length / RATE).toFixed(1)} s)`);
 });

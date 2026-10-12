@@ -154,35 +154,28 @@ export function schemaErrors(root: IpcSchema, schema: Schema, value: Json, path 
   return errors;
 }
 
-/** Ślad poleceń okna: opakowanie `__TAURI_INTERNALS__.invoke` przez CDP, zapis nazw do pliku. */
-export async function traceIpc(page: Page, outDir: string): Promise<void> {
+/**
+ * Ślad poleceń okna: Tauri wysyła każde `invoke` jako żądanie do `ipc.localhost/<polecenie>`
+ * (obiekt `__TAURI_INTERNALS__` jest zamrożony, więc nie da się go opakować) — nazwy z adresów
+ * żądań trafiają do `ipc-seen.txt`. Wtyczki Tauri (`plugin:…`) nie są poleceniami rdzenia Alfy.
+ */
+export function traceIpc(page: Page, outDir: string): void {
   mkdirSync(outDir, { recursive: true });
   const file = join(outDir, 'ipc-seen.txt');
-  const binding = `__alfaE2eIpc${Date.now()}`;
-  await page.exposeFunction(binding, (command: string) => {
-    appendFileSync(file, `${command}\n`);
-  });
-  await page.addInitScript((name: string) => {
-    type Invoke = (command: string, ...rest: unknown[]) => unknown;
-    interface Internals {
-      invoke?: Invoke;
-      __alfaTraced?: boolean;
+  page.on('request', (request) => {
+    let url: URL;
+    try {
+      url = new URL(request.url());
+    } catch {
+      return;
     }
-    const host = window as unknown as Record<string, unknown>;
-    const wrap = (internals: Internals | undefined): void => {
-      if (!internals?.invoke || internals.__alfaTraced) return;
-      const original = internals.invoke.bind(internals);
-      internals.__alfaTraced = true;
-      internals.invoke = (command, ...rest) => {
-        // Wtyczki Tauri (`plugin:…`) nie są poleceniami rdzenia Alfy.
-        if (!command.startsWith('plugin:'))
-          (host[name] as ((c: string) => void) | undefined)?.(command);
-        return original(command, ...rest);
-      };
-    };
-    // Tauri wstawia obiekt przed skryptami strony albo tuż po nich — opakowujemy w obu przypadkach.
-    wrap(host['__TAURI_INTERNALS__'] as Internals | undefined);
-    const timer = setInterval(() => wrap(host['__TAURI_INTERNALS__'] as Internals | undefined), 5);
-    setTimeout(() => clearInterval(timer), 10_000);
-  }, binding);
+    if (url.hostname !== 'ipc.localhost') return;
+    const command = decodeURIComponent(url.pathname.replace(/^\//, ''));
+    if (command && !command.startsWith('plugin:'))
+      appendFileSync(
+        file,
+        `${command}
+`,
+      );
+  });
 }
