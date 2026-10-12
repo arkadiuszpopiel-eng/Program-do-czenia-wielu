@@ -1,7 +1,8 @@
 <!--
   Silniki rozmowy (Ustawienia → Głos): który silnik rozpoznaje mowę i czy pracuje na karcie,
   strażnik z bezpiecznikiem i skrótem telemetrii, co ocenia koniec wypowiedzi, które głosy są
-  gotowe. Brakujące pozycje prowadzą do „Modele lokalne i silniki".
+  gotowe. Brakujące pozycje prowadzą do „Modele lokalne i silniki". W panelu bocznym „Głos” —
+  wersja zwarta (`compact`).
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
@@ -11,9 +12,11 @@
 
   interface Props {
     features: VoiceFeatures;
+    /** Wersja do panelu bocznego: bez opisu i kafli telemetrii. */
+    compact?: boolean;
   }
 
-  let { features }: Props = $props();
+  let { features, compact = false }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
   const act = voiceActions(app);
@@ -75,7 +78,11 @@
   const ms = (value: number | null) => (value === null ? '—' : t('vf.eng.ms', { n: value }));
 </script>
 
-<section class="vf-card" aria-labelledby="{uid}-title" data-testid="voice-engines">
+<section
+  class="vf-card"
+  aria-labelledby="{uid}-title"
+  data-testid={compact ? 'voice-engines-panel' : 'voice-engines'}
+>
   <div class="vf-head">
     <h3 id="{uid}-title">{t('vf.eng.title')}</h3>
     <div class="vf-row">
@@ -87,7 +94,7 @@
       >
     </div>
   </div>
-  <p class="vf-muted">{t('vf.eng.desc')}</p>
+  {#if !compact}<p class="vf-muted">{t('vf.eng.desc')}</p>{/if}
 
   <dl class="vf-kv">
     <dt>{t('vf.eng.stt')}</dt>
@@ -156,7 +163,7 @@
           </li>
         {/each}
       </ul>
-      <p class="vf-muted">{t('vf.eng.test.note')}</p>
+      {#if !compact}<p class="vf-muted">{t('vf.eng.test.note')}</p>{/if}
     </div>
   {/if}
 
@@ -201,38 +208,40 @@
           >
         </div>
       {/if}
-      <dl class="vf-stats">
-        <div>
-          <dt>{t('vf.eng.stat.samples')}</dt>
-          <dd>{guard.samples}</dd>
-        </div>
-        <div>
-          <dt>{t('vf.eng.stat.median')}</dt>
-          <dd>{ms(guard.median_ms)}</dd>
-        </div>
-        <div>
-          <dt>{t('vf.eng.stat.p95')}</dt>
-          <dd>{ms(guard.p95_ms)}</dd>
-        </div>
-        <div>
-          <dt>{t('vf.eng.stat.fallbacks')}</dt>
-          <dd>{guard.fallbacks}</dd>
-        </div>
-        <div>
-          <dt>{t('vf.eng.stat.flagged')}</dt>
-          <dd>{guard.flagged}</dd>
-        </div>
-        <div>
-          <dt>{t('vf.eng.stat.failures')}</dt>
-          <dd>{guard.failures} / {guard.failures_to_open}</dd>
-        </div>
-        <div>
-          <dt>{t('vf.eng.stat.opened')}</dt>
-          <dd>{guard.opened_count}</dd>
-        </div>
-      </dl>
+      {#if !compact}
+        <dl class="vf-stats">
+          <div>
+            <dt>{t('vf.eng.stat.samples')}</dt>
+            <dd>{guard.samples}</dd>
+          </div>
+          <div>
+            <dt>{t('vf.eng.stat.median')}</dt>
+            <dd>{ms(guard.median_ms)}</dd>
+          </div>
+          <div>
+            <dt>{t('vf.eng.stat.p95')}</dt>
+            <dd>{ms(guard.p95_ms)}</dd>
+          </div>
+          <div>
+            <dt>{t('vf.eng.stat.fallbacks')}</dt>
+            <dd>{guard.fallbacks}</dd>
+          </div>
+          <div>
+            <dt>{t('vf.eng.stat.flagged')}</dt>
+            <dd>{guard.flagged}</dd>
+          </div>
+          <div>
+            <dt>{t('vf.eng.stat.failures')}</dt>
+            <dd>{guard.failures} / {guard.failures_to_open}</dd>
+          </div>
+          <div>
+            <dt>{t('vf.eng.stat.opened')}</dt>
+            <dd>{guard.opened_count}</dd>
+          </div>
+        </dl>
+      {/if}
     </div>
-  {:else if e.stt.engine === 'qwen_asr'}
+  {:else if e.stt.engine === 'qwen_asr' && !compact}
     <p class="vf-muted">{t('vf.eng.guard.idle')}</p>
   {/if}
 </section>

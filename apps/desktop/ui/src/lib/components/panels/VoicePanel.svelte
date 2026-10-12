@@ -1,6 +1,6 @@
 <!--
   Panel „Głos" (Alt+6, ładowany leniwie): rozmowa głosowa wł./wył., słowa wywoławcze z testem,
-  kreator rejestracji głosu, dyktowanie, czytanie na głos i „szybka rozmowa (chmura) — wymaga
+  silniki rozmowy (wersja zwarta), kreator rejestracji głosu, dyktowanie, czytanie na głos i „szybka rozmowa (chmura) — wymaga
   klucza". Zmiany stanu ogłaszane czytnikowi ekranu przez `aria-live` z throttlingiem.
 -->
 <script lang="ts">
@@ -12,6 +12,7 @@
   import LoadFailed from '../shell/LoadFailed.svelte';
   import Loading from '../shell/Loading.svelte';
   import DictationCard from '../voice/DictationCard.svelte';
+  import EnginesCard from '../voice/EnginesCard.svelte';
   import ReadCard from '../voice/ReadCard.svelte';
   import SpeakerEnroll from '../voice/SpeakerEnroll.svelte';
   import WakeCard from '../voice/WakeCard.svelte';
@@ -109,6 +110,7 @@
   {#if !features}
     {#if !featuresError}<Loading label={t('vf.loading')} />{/if}
   {:else}
+    <EnginesCard {features} compact />
     <WakeCard {features} />
     <SpeakerEnroll {features} />
     <DictationCard {features} />

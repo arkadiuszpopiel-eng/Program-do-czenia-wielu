@@ -12,6 +12,24 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.43 — 2026-10-12
+
+Stan silników rozmowy pod ręką w panelu „Głos”; wszystkie testy w przeglądarce zielone.
+
+### Głos
+
+- Boczny panel „Głos” (Alt+6) pokazuje zwartą kartę „Silniki rozmowy”: który silnik rozpoznaje mowę, co wyczuwa
+  koniec wypowiedzi, który głos mówi, stan bezpiecznika z przyciskiem „Zamknij bezpiecznik” i przycisk „Sprawdź
+  silniki”. Pełna karta z telemetrią zostaje w Ustawieniach → Głos.
+
+### Testy
+
+- Test płynności strumienia odpowiedzi był czerwony od dawna, bo liczył także wstawianie całych tur do listy.
+  Teraz mierzy to, co ma mierzyć: tekst odpowiedzi jest aktualizowany najwyżej raz na klatkę obrazu (sześć
+  przebiegów z rzędu zielonych).
+- Stan końcowy nocy: pełne testy projektu 945 programów testowych bez błędu (wersja 0.0.42), testy interfejsu
+  328 z 328, testy w przeglądarce 324 z 324, test prawdziwej aplikacji 18 z 18.
+
 ## 0.0.42 — 2026-10-12
 
 Język rozpoznawania mowy do wyboru i wyszukiwarka w ściągawce skrótów.

@@ -92,26 +92,32 @@ test('strumień 100 tok/s: aktualizacje DOM najwyżej raz na klatkę', async ({ 
   await openApp(page);
   await waitForChat(page);
   await page.evaluate(() => {
-    const w = window as unknown as {
-      frames_: number;
-      mut: number;
-      lastFrame: number;
-      multi: number;
-    };
-    w.frames_ = 0;
+    const w = window as unknown as { mut: number; multi: number; structural: number };
     w.mut = 0;
     w.multi = 0;
-    let seenThisFrame = 0;
+    w.structural = 0;
+    let contentThisFrame = 0;
     const loop = () => {
-      w.frames_++;
-      seenThisFrame = 0;
+      contentThisFrame = 0;
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
-    new MutationObserver(() => {
+    new MutationObserver((records) => {
       w.mut++;
-      seenThisFrame++;
-      if (seenThisFrame > 1) w.multi++;
+      // Treść tury (tekst w `<article>`) to strumień tokenów — ma być składany raz na klatkę.
+      // Wstawienie albo usunięcie całej tury przez listę (zmiana poza `<article>`) to zmiana
+      // układu: zdarza się kilka razy na wypowiedź (tura użytkownika, tura agentki, stan) i nie
+      // jest strumieniem.
+      const content = records.some((r) => {
+        const el = r.target.nodeType === Node.TEXT_NODE ? r.target.parentElement : r.target;
+        return el instanceof Element && el.closest('article') !== null;
+      });
+      if (!content) {
+        w.structural++;
+        return;
+      }
+      contentThisFrame++;
+      if (contentThisFrame > 1) w.multi++;
     }).observe(document.querySelector('[role=feed]') as Node, {
       subtree: true,
       childList: true,
@@ -122,11 +128,14 @@ test('strumień 100 tok/s: aktualizacje DOM najwyżej raz na klatkę', async ({ 
   await page.keyboard.press('Enter');
   await page.waitForTimeout(1500);
   const stats = await page.evaluate(() => {
-    const w = window as unknown as { frames_: number; mut: number; multi: number };
-    return { frames: w.frames_, mut: w.mut, multi: w.multi };
+    const w = window as unknown as { mut: number; multi: number; structural: number };
+    return { mut: w.mut, multi: w.multi, structural: w.structural };
   });
   expect(stats.mut).toBeGreaterThan(5);
-  expect(stats.multi).toBeLessThanOrEqual(2);
+  // Strumień: najwyżej jedna aktualizacja treści na klatkę (jedno odstępstwo na granicy klatek).
+  expect(stats.multi, JSON.stringify(stats)).toBeLessThanOrEqual(1);
+  // Zmian układu listy jest kilka na wypowiedź, a nie tyle, ile tokenów.
+  expect(stats.structural, JSON.stringify(stats)).toBeLessThanOrEqual(6);
 });
 
 test('responsywność: < 720 px — panele jako arkusze, Ctrl+B otwiera arkusz Sesji', async ({

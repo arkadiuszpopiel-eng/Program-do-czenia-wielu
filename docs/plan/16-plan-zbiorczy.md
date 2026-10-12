@@ -1,6 +1,6 @@
 # 16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)
 
-Wersja programu **0.0.42**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
+Wersja programu **0.0.43**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
 (etapy A–H), nowy etap **P** (przeniesienie funkcji z Delty AI) i nowy etap **U** (wielu użytkowników z kontami
 i logowaniem) oraz cztery cele: **Windows, Linux, panel WWW, Android** z pełnym sterowaniem i komunikacją.
 Szczegóły zadań: [`03-roadmapa.md`](03-roadmapa.md) (dokument żywy). Tu jest obraz całości.
@@ -75,6 +75,8 @@ Zostało (wszystko wymaga właściciela albo sprzętu):
 
 ## 5. Etap P — przeniesienie z Delty AI
 
+Stan po nocy 2026-10-11 / 12: [`23-raport-nocny-2026-10-12.md`](23-raport-nocny-2026-10-12.md).
+
 Pełny opis: [`17-przeniesienie-z-delty.md`](17-przeniesienie-z-delty.md); nowości z rynku dopisane do grup:
 [`22-nowosci-2026-10.md`](22-nowosci-2026-10.md). Zasada: z Delty bierzemy zachowanie,
 progi zdobyte na sprzęcie i ekrany; piszemy od nowa w Rust, w wyglądzie Alfy, z Brokerem — bez Pythona i bez
@@ -83,9 +85,9 @@ wad bezpieczeństwa Delty.
 | Grupa | Zakres | Łączy się z |
 | --- | --- | --- |
 | P0 | Dokumenty: specyfikacja głosu Delty ([`19`](19-specyfikacja-glosu-delty.md)), macierz funkcji ([`20`](20-macierz-delty-czesc-1.md), [`21`](21-macierz-delty-czesc-2.md)) — **gotowe** | — |
-| **P1** | **Rozmowa i mowa**: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, Smart Turn, ekran „Rozmowa na żywo” | A.5, C1.1, C5 |
-| **P2** | **Modele lokalne**: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, panel System | A.4, C2.2 |
-| P3 | Nawigacja: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej | — |
+| **P1** | **Rozmowa i mowa**: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, Smart Turn, ekran „Rozmowa na żywo” — **w toku, większość zrobiona (0.0.30–0.0.42)**: silniki, strażnik, karta „Silniki rozmowy” z próbą silników, ustawienia rozmowy; zostaje próba z żywą mową, głosy Pipera i Edge | A.5, C1.1, C5 |
+| **P2** | **Modele lokalne**: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, panel System — **w toku (0.0.35–0.0.39)**: karty graficzne na żywo, ocena „mieści się na karcie”, nowe silniki w pakietach | A.4, C2.2 |
+| P3 | Nawigacja: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej — **w toku (0.0.37, 0.0.42)**: Wstecz / Dalej, wyszukiwarka skrótów | — |
 | P4 | Rozmowa: karty, Tablica, Tryb skupienia, Arena, załączniki z czytnikami, eksporty | C2.8 |
 | P5 | Sieć i wiedza: wyszukiwanie, wiadomości, „Naucz”, polecenia bez modelu, tłumaczenie, instrukcja | C2.6, C2.11 |
 | P6 | Osoby: baza osób, rozpoznawanie twarzy i głosu, pamięć per osoba | C3.8–C3.13, **U** |
@@ -96,7 +98,7 @@ wad bezpieczeństwa Delty.
 | P11 | Przepływy, role i przepływ wieloagentowy, edytor persony, trening, pulpit testowy | C1.5 |
 | **P12** | **Agentki programistki**: pisanie, uruchamianie i budowanie oprogramowania z nadrzędnym przyciskiem „Pełne uprawnienia” (jak w Claude Code i Codex), rozmowa między agentkami w trakcie pracy, model dobierany do trudności zadania | C1.2, mosty CLI |
 | **P13** | **Dyski sieciowe i chmurowe**: podłączanie (NAS, WebDAV, SFTP, S3, OneDrive, Google Drive, Dropbox), praca agentek na plikach, kopie zapasowe z harmonogramem, wersjami i przywracaniem | C1.4 (transfer) |
-| **P14** | **Obowiązki codzienne agentek**: przypisanie agentki do stałych zadań — poczta, kalendarz, przegląd wiadomości, przypomnienia, porządki, raport dnia — z harmonogramem i budżetem | C2.7 |
+| **P14** | **Obowiązki codzienne agentek**: przypisanie agentki do stałych zadań — poczta, kalendarz, przegląd wiadomości, przypomnienia, porządki, raport dnia — z harmonogramem i budżetem — **w toku (0.0.40)**: cztery gotowe obowiązki | C2.7 |
 
 ## 6. Etap C — pozostałe funkcje Windows
 

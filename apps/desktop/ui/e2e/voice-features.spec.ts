@@ -18,6 +18,13 @@ for (const theme of ['light', 'dark'] as const) {
       await waitForChat(page);
       await page.keyboard.press('Alt+6');
       await expect(page.getByRole('tab', { name: 'Głos', selected: true })).toBeVisible();
+      // Zwarta karta silników jest pod ręką także w panelu: stan i bezpiecznik, bez kafli telemetrii.
+      const engines = page.getByTestId('voice-engines-panel');
+      await expect(engines.getByText('Qwen3-ASR', { exact: true })).toBeVisible();
+      await expect(engines.getByTestId('voice-breaker')).toHaveText('Silnik główny odstawiony');
+      await expect(engines.getByText('Typowy czas')).toHaveCount(0);
+      await engines.getByRole('button', { name: 'Zamknij bezpiecznik' }).click();
+      await expect(engines.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
       await expect(page.getByText('Słowa wywoławcze wyłączone.')).toBeVisible();
       await expect(page.getByText(/Nieskalibrowane — brak pomiaru FAR\/FRR/)).toBeVisible();
       await expect(page.getByText('Wymaga klucza', { exact: true })).toBeVisible();

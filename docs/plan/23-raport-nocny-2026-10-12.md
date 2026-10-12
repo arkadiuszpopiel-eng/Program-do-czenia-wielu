@@ -1,0 +1,105 @@
+# Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.43)
+
+Praca od 22:18 do rana, bez udziału właściciela. Dziesięć wersji; ostatnia zbudowana i sprawdzona to **0.0.43**.
+Ten dokument mówi, co doszło, co jest sprawdzone i jak, czego nie sprawdziłem oraz co czeka na decyzję.
+
+## 1. Najważniejsze w trzech zdaniach
+
+- **Rozmowa głosowa ma komplet lokalnych silników i przeszła próbę na prawdziwych silnikach tego laptopa**: nagranie
+  podane zamiast mikrofonu zostało rozpoznane bezbłędnie, a odpowiedź wypowiedziana głosem Supertonic; od końca mowy
+  do przekazania tekstu mija ok. 0,2 s, odpowiedź słychać po ok. 1 s (bez czasu myślenia modelu rozmowy).
+- **Żywej mowy człowieka do mikrofonu nie sprawdzałem** — to wymaga Ciebie przy komputerze. Sprawdziłem po cichu, że
+  potok startuje na prawdziwym mikrofonie laptopa, słyszy otoczenie i nie przepuszcza szumu do rozmowy.
+- **W Ustawieniach → Głos jest przycisk „Sprawdź silniki”** — jednym kliknięciem zobaczysz, czy rozpoznawanie,
+  wyczucie końca wypowiedzi i głos działają u Ciebie, z czasem każdego z nich.
+
+## 2. Co doszło — wersja po wersji
+
+| Wersja | Co doszło dla użytkownika | Grupa planu |
+| --- | --- | --- |
+| 0.0.34 | Alfa słyszy po brzmieniu, czy skończyłeś mówić (model Smart Turn v3.2); model i biblioteka ONNX Runtime w katalogu pobrań | P1 |
+| 0.0.35 | Karta „Silniki rozmowy” ze stanem strażnika i przyciskiem „Zamknij bezpiecznik”; cztery ustawienia rozmowy; silniki rozgrzewają się przy włączeniu mikrofonu; nowe silniki głosu w pakietach jednym kliknięciem | P1, P2 |
+| 0.0.36 | „Karty graficzne na żywo” na stronie Urządzenia: pamięć, obciążenie, temperatura, moc, programy zajmujące kartę | P2 |
+| 0.0.37 | „Wstecz / Dalej” po widokach (Alt+←, Alt+→, boczne przyciski myszy); liczniki pracy Smart Turn | P3, P1 |
+| 0.0.38 | Rozpoznawanie mowy dobiera silnik do zajętości karty graficznej; mały Whisper jako zapas na procesor | P1 |
+| 0.0.39 | Ocena „mieści się na karcie” przy modelach rozmowy; próba potoku na prawdziwym mikrofonie | P2, P1 |
+| 0.0.40 | Cztery gotowe obowiązki codzienne agentek (przegląd dnia, podsumowanie, porządki, koszty) | P14 |
+| 0.0.41 | „Sprawdź silniki” — próba każdego silnika rozmowy bez mikrofonu i bez dźwięku | P1 |
+| 0.0.42 | Język rozpoznawania mowy w ustawieniach (domyślnie polski); wyszukiwarka w ściągawce skrótów | P1, P3 |
+| 0.0.43 | Zwarta karta silników w bocznym panelu „Głos”; test płynności strumienia doprecyzowany | P1 |
+
+Szczegóły każdej wersji: [`CHANGELOG.md`](../../CHANGELOG.md).
+
+## 3. Pomiary z tego laptopa (RTX 4050 6 GB)
+
+| Co | Wynik |
+| --- | --- |
+| Smart Turn — ocena końca wypowiedzi | 21–46 ms; zgodność z wzorcem wydawcy do czwartego miejsca po przecinku |
+| Qwen3-ASR na karcie — zdanie 4 s | 0,26 s (zimny start 2,4 s) |
+| Qwen3-ASR na procesorze — to samo zdanie | 2,4 s (zimny start 6,2 s) |
+| Whisper turbo na procesorze — to samo zdanie | 54 s — dlatego zapas na procesorze bierze mały model |
+| Rozmowa „na sucho”: od końca mowy do przekazania tekstu | 0,13–0,18 s; pierwsza wypowiedź po włączeniu mikrofonu do 3,5 s, gdy silnik jeszcze się wczytuje |
+| Rozmowa „na sucho”: od tekstu do słyszalnej odpowiedzi | 1,0–1,2 s (pierwsza 1,6 s) |
+| „Sprawdź silniki” | rozpoznawanie 2,5 s, koniec wypowiedzi 0,2 s, głos 1,9 s |
+
+Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glosu-delty.md), rozdziały o pomiarach.
+
+## 4. Co i jak sprawdziłem
+
+| Sprawdzenie | Wynik |
+| --- | --- |
+| Pełne testy całego projektu (Rust) | zielone po 0.0.34, 0.0.41 i 0.0.42 (945 programów testowych, zero błędów) |
+| Testy interfejsu (jednostkowe) | 328 z 328 |
+| Testy w przeglądarce | 324 z 324 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności |
+| Prawdziwa aplikacja (test dymny, profil tymczasowy) | 18 z 18 dla 0.0.36, 0.0.42 i 0.0.43 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu |
+| Rozmowa „na sucho” na prawdziwych silnikach | dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana |
+| Prawdziwy mikrofon, po cichu | potok słucha, wykrywa dźwięk, strażnik odrzuca szum |
+| Zrzuty nowych ekranów | trzy style × dwa motywy, także wąskie okno |
+
+## 5. Czego nie sprawdziłem
+
+- **Żywa mowa do mikrofonu i tłumienie echa**, gdy agentka mówi z głośnika — nie odtwarzałem dźwięku w nocy.
+- **Brzmienie głosów** — ocena słuchem należy do Ciebie (próbki: `alfa-glos-proba/odsluch.html`).
+- **Pobieranie nowych pozycji przyciskami w Ustawieniach** — sumy i adresy są przypięte i sprawdzone na pobranych
+  plikach, ale samego kliknięcia „Pobierz” w programie nie wykonywałem.
+- **Wykonanie obowiązku codziennego przez model** — sprawdzone jest tworzenie i harmonogram, nie wynik pracy agentki.
+- **Karty AMD i Intel w podglądzie na żywo** — odczyt działa dziś tylko dla kart NVIDIA; na innym sprzęcie karta
+  mówi to wprost.
+- `cargo deny` (brak narzędzia lokalnie — tylko w CI).
+
+## 6. Błędy, które sam wprowadziłem i naprawiłem
+
+- Dwa testy zmiany głosu agentki były czerwone od 0.0.30 (nie uruchomiłem ich wtedy) — naprawione w 0.0.34.
+- Biblioteka `tract` liczyła model Smart Turn błędnie (0,33 zamiast 0,95) — model działa w osobnym procesie.
+- Pierwsza wypowiedź po zimnym starcie czekała do 20 s na wczytanie modelu — dodana rozgrzewka (0.0.35).
+- W nocy zabrakło miejsca na dysku (121 GB plików pośrednich po ośmiu wersjach) — usunąłem tylko odtwarzalne pliki
+  budowy testów; dane i program nietknięte. Wniosek zapisany: rzadziej podbijać wersję w serii i pilnować dysku.
+
+## 7. Stan końcowy wersji 0.0.43
+
+| Co | Wynik |
+| --- | --- |
+| Wersja | 0.0.43, zbudowana (`target/shell/debug/alfa-desktop.exe`) i uruchomiona |
+| Pełne testy projektu (Rust) | 945 programów testowych, zero błędów (przebieg na 0.0.42; 0.0.43 zmienia tylko interfejs) |
+| Testy interfejsu | 328 z 328 |
+| Testy w przeglądarce | 324 z 324 |
+| Test prawdziwej aplikacji | 18 z 18 |
+| Linter Rust, formatowanie, kontrola zależności, kontrola stylów | bez uwag |
+| Polecenia łącza | 229 |
+| Commity | wszystkie lokalne (wypchnięcie wymaga `gh auth login`) |
+
+## 8. Co zostaje w grupach, które ruszyłem
+
+| Grupa | Zostaje |
+| --- | --- |
+| P1 Rozmowa i mowa | próba z żywą mową (Ty), kula stanu i miernik w nagłówku rozmowy, głosy Pipera z parametrami, głos Edge jako opcja (łączy się z siecią — wymaga Twojego przeglądu) |
+| P2 Modele lokalne | Sklep modeli, rozkład modelu na karty, pięć stopni awaryjnego startu, poprawki szablonów, panel System, podgląd kart AMD / Intel |
+| P3 Nawigacja | menu kołowe, doki, okna odczepiane, pulpit kafelkowy, ekran startowy |
+| P14 Obowiązki codzienne | łączniki poczty i kalendarza, raport z wykonania, budżet obowiązku |
+
+## 9. Decyzje i czynności po Twojej stronie
+
+- Posłuchać głosów i powiedzieć rozmowę na żywo — to jedyne, czego nie mogę zrobić sam.
+- `gh auth login` — bez tego ponad 90 commitów zostaje lokalnie.
+- Podpisy pod ADR 0017–0023 i 0027 oraz 44 decyzje bezpieczeństwa z pakietu decyzji.
+- Środowisko próbne Chatterboxa (8,4 GB) — do usunięcia, jeśli niepotrzebne.
