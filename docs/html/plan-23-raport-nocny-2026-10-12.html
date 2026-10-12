@@ -323,20 +323,16 @@ blockquote {
 Ten dokument mówi, co doszło, co jest sprawdzone i jak, czego nie sprawdziłem oraz co czeka na decyzję.</p>
 <h2 id="1-najwazniejsze-w-czterech-punktach">1. Najważniejsze w czterech punktach</h2>
 <ul>
-<li><p><strong>Rozmowa głosowa ma komplet lokalnych silników i przeszła próbę na prawdziwych silnikach tego laptopa</strong>: nagranie
+<li><strong>Rozmowa głosowa ma komplet lokalnych silników i przeszła próbę na prawdziwych silnikach tego laptopa</strong>: nagranie
 podane zamiast mikrofonu zostało rozpoznane bezbłędnie, a odpowiedź wypowiedziana głosem Supertonic; od końca mowy
-do przekazania tekstu mija ok. 0,2 s, odpowiedź słychać po ok. 1 s (bez czasu myślenia modelu rozmowy).</p>
-</li>
-<li><p><strong>Żywej mowy człowieka do mikrofonu nie sprawdzałem</strong> — to wymaga Ciebie przy komputerze. Sprawdziłem po cichu, że
-potok startuje na prawdziwym mikrofonie laptopa, słyszy otoczenie i nie przepuszcza szumu do rozmowy.</p>
-</li>
-<li><p><strong>W Ustawieniach → Głos jest przycisk „Sprawdź silniki”</strong> — jednym kliknięciem zobaczysz, czy rozpoznawanie,
-wyczucie końca wypowiedzi i głos działają u Ciebie, z czasem każdego z nich.</p>
-</li>
-<li><p><strong>Gotowe obowiązki codzienne agentek dodałem i tej samej nocy ukryłem</strong>: próba na lokalnym modelu pokazała, że
+do przekazania tekstu mija ok. 0,2 s, odpowiedź słychać po ok. 1 s (bez czasu myślenia modelu rozmowy).</li>
+<li><strong>Żywej mowy człowieka do mikrofonu nie sprawdzałem</strong> — to wymaga Ciebie przy komputerze. Sprawdziłem po cichu, że
+potok startuje na prawdziwym mikrofonie laptopa, słyszy otoczenie i nie przepuszcza szumu do rozmowy.</li>
+<li><strong>W Ustawieniach → Głos jest przycisk „Sprawdź silniki”</strong> — jednym kliknięciem zobaczysz, czy rozpoznawanie,
+wyczucie końca wypowiedzi i głos działają u Ciebie, z czasem każdego z nich.</li>
+<li><strong>Gotowe obowiązki codzienne agentek dodałem i tej samej nocy ukryłem</strong>: próba na lokalnym modelu pokazała, że
 agentka pisze raport z wymyślonymi zadaniami i kwotami, bo nie dostaje prawdziwych danych. Mechanizm działa;
-wzory wrócą, gdy program będzie podawał jej fakty.</p>
-</li>
+wzory wrócą, gdy program będzie podawał jej fakty.</li>
 </ul>
 <h2 id="2-co-doszlo-wersja-po-wersji">2. Co doszło — wersja po wersji</h2>
 <div class="tbl"><table><thead><tr><th>Wersja</th><th>Co doszło dla użytkownika</th><th>Grupa planu</th></tr></thead><tbody><tr><td>0.0.34</td><td>Alfa słyszy po brzmieniu, czy skończyłeś mówić (model Smart Turn v3.2); model i biblioteka ONNX Runtime w katalogu pobrań</td><td>P1</td></tr>
@@ -362,7 +358,7 @@ wzory wrócą, gdy program będzie podawał jej fakty.</p>
 <p>Tabele ze szczegółami: <a href="plan-19-specyfikacja-glosu-delty.html"><code>19-specyfikacja-glosu-delty.md</code></a>, rozdziały o pomiarach.</p>
 <h2 id="4-co-i-jak-sprawdzilem">4. Co i jak sprawdziłem</h2>
 <div class="tbl"><table><thead><tr><th>Sprawdzenie</th><th>Wynik</th></tr></thead><tbody><tr><td>Pełne testy całego projektu (Rust)</td><td>zielone po 0.0.34, 0.0.41, 0.0.42 i na wersji końcowej 0.0.43 (945 programów testowych, zero błędów)</td></tr>
-<tr><td>Testy interfejsu (jednostkowe)</td><td>328 z 328</td></tr>
+<tr><td>Testy interfejsu (jednostkowe)</td><td>329 z 329</td></tr>
 <tr><td>Testy w przeglądarce</td><td>324 z 324 na 0.0.43 i 323 z 323 na 0.0.44 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności</td></tr>
 <tr><td>Prawdziwa aplikacja (test dymny, profil tymczasowy)</td><td>18 z 18 dla 0.0.36, 0.0.42, 0.0.43 i 0.0.44 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu</td></tr>
 <tr><td>Rozmowa „na sucho” na prawdziwych silnikach</td><td>dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana</td></tr>
@@ -411,7 +407,7 @@ budowy testów; dane i program nietknięte. Wniosek zapisany: rzadziej podbijać
 <tr><td>P14 Obowiązki codzienne</td><td><strong>najpierw</strong> podawanie agentce prawdziwych danych (zadania, koszty, pliki) i powrót wzorów; potem łączniki poczty i kalendarza, raport z wykonania, budżet obowiązku</td></tr></tbody></table></div>
 <h2 id="9-decyzje-i-czynnosci-po-twojej-stronie">9. Decyzje i czynności po Twojej stronie</h2>
 <ul>
-<li>Posłuchać głosów i powiedzieć rozmowę na żywo — to jedyne, czego nie mogę zrobić sam.</li>
+<li>Posłuchać głosów i wypróbować rozmowę na żywo — tego nie mogę zrobić sam.</li>
 <li><code>gh auth login</code> — bez tego ponad 130 commitów zostaje lokalnie.</li>
 <li>Podpisy pod ADR 0017–0023 i 0027 oraz 44 decyzje bezpieczeństwa z pakietu decyzji.</li>
 <li>Środowisko próbne Chatterboxa (8,4 GB) — do usunięcia, jeśli niepotrzebne.</li>

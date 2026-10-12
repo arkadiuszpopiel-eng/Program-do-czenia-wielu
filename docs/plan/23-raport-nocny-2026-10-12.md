@@ -12,7 +12,6 @@ Ten dokument mówi, co doszło, co jest sprawdzone i jak, czego nie sprawdziłem
   potok startuje na prawdziwym mikrofonie laptopa, słyszy otoczenie i nie przepuszcza szumu do rozmowy.
 - **W Ustawieniach → Głos jest przycisk „Sprawdź silniki”** — jednym kliknięciem zobaczysz, czy rozpoznawanie,
   wyczucie końca wypowiedzi i głos działają u Ciebie, z czasem każdego z nich.
-
 - **Gotowe obowiązki codzienne agentek dodałem i tej samej nocy ukryłem**: próba na lokalnym modelu pokazała, że
   agentka pisze raport z wymyślonymi zadaniami i kwotami, bo nie dostaje prawdziwych danych. Mechanizm działa;
   wzory wrócą, gdy program będzie podawał jej fakty.
@@ -54,7 +53,7 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 | Sprawdzenie | Wynik |
 | --- | --- |
 | Pełne testy całego projektu (Rust) | zielone po 0.0.34, 0.0.41, 0.0.42 i na wersji końcowej 0.0.43 (945 programów testowych, zero błędów) |
-| Testy interfejsu (jednostkowe) | 328 z 328 |
+| Testy interfejsu (jednostkowe) | 329 z 329 |
 | Testy w przeglądarce | 324 z 324 na 0.0.43 i 323 z 323 na 0.0.44 (pierwszy raz bez czerwonego testu); nowe scenariusze w obu motywach z kontrolą dostępności |
 | Prawdziwa aplikacja (test dymny, profil tymczasowy) | 18 z 18 dla 0.0.36, 0.0.42, 0.0.43 i 0.0.44 — w tym karty „Silniki rozmowy” i „Karty graficzne na żywo” na prawdziwym rdzeniu |
 | Rozmowa „na sucho” na prawdziwych silnikach | dwie wypowiedzi z rzędu rozpoznane bezbłędnie, odpowiedź wypowiedziana |
@@ -112,7 +111,7 @@ Tabele ze szczegółami: [`19-specyfikacja-glosu-delty.md`](19-specyfikacja-glos
 
 ## 9. Decyzje i czynności po Twojej stronie
 
-- Posłuchać głosów i powiedzieć rozmowę na żywo — to jedyne, czego nie mogę zrobić sam.
+- Posłuchać głosów i wypróbować rozmowę na żywo — tego nie mogę zrobić sam.
 - `gh auth login` — bez tego ponad 130 commitów zostaje lokalnie.
 - Podpisy pod ADR 0017–0023 i 0027 oraz 44 decyzje bezpieczeństwa z pakietu decyzji.
 - Środowisko próbne Chatterboxa (8,4 GB) — do usunięcia, jeśli niepotrzebne.
