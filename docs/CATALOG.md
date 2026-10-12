@@ -12,7 +12,7 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 111 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 394 169 |
+| Linie Rust (z testami) | 394 176 |
 | Testy (`#[test]`, `#[tokio::test]`) | 2722 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
@@ -79,7 +79,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `voice-dictation` | F5 | voice-engine | inproc | C · I · F | 2711 | 14 | [voice-dictation](modules/voice-dictation/SPEC.md) | Dyktowanie do okna docelowego z normalizacją odwrotną PL; nigdy do okien Alfy ani pól haseł. |
 | `voice-dsp` | F2 | voice-engine | inproc | C · I · F | 2923 | 28 | [voice-dsp](modules/voice-dsp/SPEC.md) | AEC3 z własną referencją TTS, redukcja szumu, AGC; fbank log-mel dla słów wywoławczych i mówcy. |
 | `voice-persona` | F2 | service | inproc | C · I · F | 5362 | 45 | [voice-persona](modules/voice-persona/SPEC.md) | Normalizator PL do mowy, słownik wymowy, chunker i planista stylu per silnik. |
-| `voice-pipeline` | F2 | service | inproc | C · I · F | 9094 | 52 | [voice-pipeline](modules/voice-pipeline/SPEC.md) | Runtime potoku: mikrofon → DSP → VAD → STT → dialog → TTS → wyjście, z przerywaniem i runnerem zestawu F2. |
+| `voice-pipeline` | F2 | service | inproc | C · I · F | 9101 | 52 | [voice-pipeline](modules/voice-pipeline/SPEC.md) | Runtime potoku: mikrofon → DSP → VAD → STT → dialog → TTS → wyjście, z przerywaniem i runnerem zestawu F2. |
 | `voice-readaloud` | F5 | voice-engine | inproc | C · I · F | 1930 | 7 | [voice-readaloud](modules/voice-readaloud/SPEC.md) | Czytanie zaznaczenia lub okna przez UIA `TextPattern` głosem agentki; treść niezaufana. |
 | `voice-s2s` | F5 | — | — | C · F | 1088 | 6 | [voice-s2s](modules/voice-s2s/SPEC.md) | Kontrakt trybu speech-to-speech w chmurze z obcinaniem odpowiedzi po stronie dostawcy (adapter później). |
 | `voice-speaker` | F5 | voice-engine | inproc | C · I · F | 2780 | 15 | [voice-speaker](modules/voice-speaker/SPEC.md) | Weryfikacja właściciela (ECAPA), profil szyfrowany; ryzyko głosem bez weryfikacji → potwierdzenie nie-głosem. |

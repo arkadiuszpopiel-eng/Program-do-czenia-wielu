@@ -1,0 +1,10 @@
+- [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — kopia robocza na przenośnym E:, portable-env, pułapki budowy na Windows
+- [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
+- [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie
+- [Alfa — budowanie aplikacji](alfa-budowanie-aplikacji.md) — budować i uruchamiać co pięć dużych ulepszeń albo na polecenie, nie po każdej wersji
+- [Alfa — zgoda na pobrania](alfa-zgoda-na-pobrania.md) — do 3 GB bez pytania, powyżej pytać z rzeczywistym rozmiarem
+- [Alfa — głos lokalnie](alfa-glos-lokalnie.md) — chmura odrzucona z powodu kosztu; najpierw warianty lokalne, pobieranie nadal za zgodą
+- [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”
+- [Alfa — praca nocna](alfa-praca-nocna.md) — sesja do rana kończy się raportem, planem HTML i zbudowaną wersją; bez dźwięku w nocy
+- [Alfa — samodzielne testowanie](alfa-samodzielne-testowanie.md) — poziomy verify, testy sprzętowe, instancja testowa obok Alfy właściciela; „nie sprawdziłem” tylko z trzech powodów
+- [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji

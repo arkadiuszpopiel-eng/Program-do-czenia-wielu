@@ -66,3 +66,5 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 - Pliki generowane (`CATALOG.md`, `html/`, schematy, tokeny) nie są edytowane ręcznie.
 - Po zakończonym zadaniu: stan w `plan/03-roadmapa.md` (i w `STATUS.md`, jeśli zamyka kryterium). Po zakończonym
   etapie: `plan/00-stan-wykonania.md`, wyższa wersja z wpisem w `CHANGELOG.md`, potem `node scripts/docs-html.mjs`.
+- Pamięć projektu (stan prac, zasady ustalone z właścicielem, dziennik sesji) ma kopię w
+  [`pamiec-projektu/`](pamiec-projektu/README.md); odświeża ją `bash scripts/memory-sync.sh` na końcu każdej sesji.

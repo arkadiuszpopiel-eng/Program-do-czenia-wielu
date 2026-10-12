@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "version": "2.1",
+    "project": "Alfa AI Program",
+    "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
+    "last_updated": "2026-10-12T05:00:00+02:00",
+    "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
+    "updated": "2026-10-12T15:50:00+02:00"
+  },
+  "current_state": {
+    "phase": "stabilizacja MVP (etap A planu v6) + plan v6 prowadzony w docs/plan i docs/html",
+    "active_branch": "ccr-af4b63c6-3fyzaj",
+    "last_commit": "wersja 0.0.49 (65d1e361), lokalny, niewypchnięty; verify wersja 10/10 zielone 15:45; plik aplikacji z tego commita w Alfa-uruchomiona (15:47); właściciel: okna startowe „na chwilę obecną OK”",
+    "detected_stack": {
+      "python": false,
+      "rust": true,
+      "node": true,
+      "tauri": true,
+      "go": false
+    },
+    "module_health": {
+      "bramki lokalne (gates.ps1, zestaw szybki)": "zielone 2026-10-08 01:10 na E:",
+      "rdzeń (7 crate'ów)": "122 testy zielone 2026-10-07",
+      "model lokalny na laptopie": "nie działa — brak llama-server.exe w %LOCALAPPDATA%/Alfa/sidecars",
+      "broker poza procesem": "niezweryfikowany na żadnej maszynie",
+      "ui: skalowanie i układ": "NAPRAWIONY POWAŻNY BŁĄD 2026-10-08: przy skali > 100 % strona była wyższa niż okno (min-height:100vh x zoom) i pole pisania znikało pod dolną krawędzią — app.css (--alfa-vh/--alfa-vw), appearance.ts; testy e2e 1920/2560/3840 i test w prawdziwej aplikacji (Ctrl+=). Prawy panel 460 px na szerokim oknie, kreator 940 px, Szybkie pytanie mieści się w oknie.",
+      "ui: E2E (PW_CHANNEL=msedge)": "123/124; paleta — opóźniona pojedyncza klatka ~2 s po starcie, bez długiego zadania JS (prawdopodobnie przeglądarka bez okna)",
+      "model lokalny bez silnika": "naprawione w kodzie i testach (providers-local-impl, app-chat, e2e); NIEsprawdzone w działającej aplikacji",
+      "ui: przegląd stron i paneli": "29 stron ustawień i 7 paneli obejrzane na zrzutach 1280 px; poprawione karty panelu, nagłówki, zakresy pamięci, nazwy narzędzi",
+      "ui: przegląd": "29 stron ustawień, 7 paneli, onboarding, Szybkie pytanie, pigułka — obejrzane na zrzutach z atrapy; poprawki w commitach e358807…9648483",
+      "ui: testy": "vitest 257/257; E2E z PW_WORKERS=4: 138 zielonych, 1 czerwony (strumień 100 tok/s — próg; decyzja właściciela)",
+      "rdzeń: przeglądy": "9 obszarów przejrzanych. Naprawione rano 2026-10-08: T-02 (odczyt zakresowy), R-09 (strażnik paniki; build wydaniowy ma panic=abort), R-12, R-13, R-16, R-26 (kolejka offline a kosz). Wyjaśnione jako niepotwierdzone: R-22 (reszta), R-25. Decyzja właściciela: R-05, R-10, R-20, R-21, R-24, B-01…B-08, T-06, progi testów czasowych, strategia paniki w buildzie wydaniowym.",
+      "prawdziwa aplikacja": "zbudowana z 7f5d64e (0.0.18) 2026-10-10: e2e-app 15/15 na profilu tymczasowym; uruchomiona na profilu właściciela 06:49.",
+      "porządek": "0 plików Rust > 400 linii, 0 crate'ów bez README; bez module.toml tylko core-bus-impl (Jądro — decyzja właściciela)",
+      "narzędzia powłoki/schowka/sieci": "2026-10-09 wdrożone z testami: S-05 (PowerShell: przedrostek UTF-8; cmd: dekodowanie OEM w platform-windows-impl przez ExecPort::decode_output — obie powłoki sprawdzone na prawdziwych procesach), S-07, C-01, N-01, N-02. Decyzja właściciela: S-01…S-04, S-06, C-02, C-03. Raport: alfa/docs/reviews/2026-10-08-tools-shell-clipboard-net-review.md",
+      "ui: rozmowa": "2026-10-09: listę od dołu odkleja tylko gest użytkownika (wcześniej zmiana układu przy starcie potrafiła zostawić rozmowę 79–308 px nad końcem); testy e2e w responsive.spec.ts",
+      "lib-netguard": "przegląd 2026-10-09 (tylko odczyt): bez defektów",
+      "dyski": "porządki 2026-10-09: E: 107 GB wolnego, D: 59 GB; stare kopie (D:/alfa, D:/alfa-narzedzia, migawka ZIP, ukryta kopia w magazynie pnpm) w Koszu; z globalnej konfiguracji npm i pnpm usunięte ścieżki na D: (kopie plików w %TEMP%); nietknięte: D:/alfa-narzedzia.rar (12 GB)",
+      "ui: logika stanu": "przegląd 2026-10-09: 9 z 10 ustaleń wdrożonych z testami (state/__tests__/review.test.ts); otwarte: delty tekstu z czasu wczytywania rozmowy (wymaga numerów sekwencji w protokole)",
+      "wersja": "0.0.8 od 2026-10-09 (CHANGELOG.md). Numer zmienia wyłącznie node scripts/set-version.mjs <numer>.",
+      "ui: style": "2026-10-09: ui.style = classic | glass | next (data-skin na <html>, packages/ui-kit/src/skins.css, light-dark()); testy skin.test.ts i e2e/skins.spec.ts; bez backdrop-filter (reguła twarda), fonty systemowe",
+      "plan v6": "2026-10-09: docs/plan/ (12 plików MD), docs/html/ (generowane: node scripts/docs-html.mjs --check; bramka w gates.ps1), ADR 0017–0024 Proponowane, SPEC-e 9 modułów planowanych. Żadna funkcja planu v6 nie jest zbudowana.",
+      "klucze API": "0.0.7: diagnoza przyczyny odmowy (TestOutcome + ProbeDetail), sprzątanie klucza (wspólna tabela Rust/TS), try_rotate z regułą accepts_new_key, wyłączanie konta, model ręczny, adresy 4 dostawców w katalogu. Testy: app-core/tests/accounts_keys.rs, accounts_rotate.rs; e2e/api-keys.spec.ts. Bez próby z prawdziwym kluczem. Raport: alfa/docs/reviews/2026-10-09-przeglad-kluczy-api.md",
+      "modele API": "0.0.8: model_use/best_chat_model (rozmowa nie trafia do tts-1), kolejki modeli konta (MAX 10 na klasę zadań), Router: set_provider_queues + fallback przy niedostępnym modelu, klasa zadań z roli agentki; strona Ustawienia → API. Testy: app-core/tests/accounts_models.rs, e2e/api-queues.spec.ts.",
+      "głos": "0.0.8: zegar potoku = QPC (koniec wypowiedzi wykrywany), redukcja szumów off/standard/strong (filtr 100/140 Hz, bramka 18/36 dB, poprawka speech_prob), test mikrofonu przez DSP. Rozmowa głosowa na żywo — do potwierdzenia przez właściciela.",
+      "ui: belka i nawigacja (0.0.11)": "własna belka z paskiem LED i przyciskami okna; nawigacja Ustawień od nowa; sprawdzone w 3 stylach x 2 motywach i w prawdziwym oknie",
+      "kilka kart graficznych (0.0.11)": "kod i testy zielone; praca na karcie zintegrowanej niesprawdzona — brak silnika llama-vulkan (zgoda właściciela na pobranie)",
+      "głos: strojenie mowy (0.0.14)": "kod i testy zielone; brzmienie nieocenione na słuch — czeka na właściciela",
+      "kamery i osoby (C3)": "C3.1, C3.3, C3.4 zrobione; C3.2 (kamery USB na Windows) w kodzie, niesprawdzone na sprzęcie; C3.7 częściowo (zdjęcie jako załącznik, prośba tekstowa); osoby czekają na ADR 0025",
+      "pakiet decyzji właściciela": "docs/reviews/2026-10-10-pakiet-decyzji-wlasciciela.md — 44 decyzje, czeka na odpowiedzi",
+      "całe repozytorium (2026-10-10)": "cargo test --workspace: 2565 zielonych, 0 czerwonych, 33 pominięte; cargo clippy --workspace --all-targets -D warnings: czysto",
+      "B.2/B.3 (szwy protokołu)": "rozpoczęte i przerwane na prośbę właściciela 2026-10-10 07:00; początek B.3 odłożony w `git stash` (app-api error.rs, details.rs) — kontynuować od nowa albo `git stash pop`",
+      "rozmowa głosowa (P1)": "2026-10-12: tor słuchania i mówienia sprawdzony na prawdziwych silnikach laptopa nagraniem zamiast mikrofonu (live_talk) i po cichu na prawdziwym mikrofonie (live_mic); żywa mowa i echo — niesprawdzone, czeka na właściciela",
+      "dysk": "2026-10-12: target/debug/deps rośnie ok. 15 GB na każdą podbitą wersję; sprzątać tylko deps i incremental (build trzyma OpenSSL)",
+      "procesy poboczne (0.0.48)": "lib-sidecar-guard: rejestr PID w state/sidecars.pids, zamykanie przy RunEvent::Exit, sprzątanie po awarii przy starcie; sprawdzone na żywo na instancji testowej"
+    }
+  },
+  "session_goal": {
+    "objective": "Nowe okna startowe (kreator, logowanie) — 0.0.49",
+    "completed": true,
+    "pct": 100,
+    "notes": "Wstrzymany cel: pokrycie poleceń rdzenia 52,2 % → 70 %."
+  },
+  "in_progress": [],
+  "blocking_issues": [
+    "gh niezalogowany — commity niewypchnięte",
+    "Zgoda na pobranie pakietu modeli ok. 6 GB (rozmowa lokalna i głos niesprawdzone)",
+    "Ustalenia bezpieczeństwa B-01…B-08, S-01…S-04, S-06, C-02, C-03, R-05 i inne — decyzja właściciela",
+    "ADR 0017–0024 czekają na podpis właściciela (blokują etapy B.4, B.7, D, E, F, G)"
+  ],
+  "next_session": {
+    "first_action": "cd alfa && source scripts/portable-env.sh && git status -sb; przeczytaj alfa/docs/plan/24-samodzielne-testowanie.md i alfa/target/verify/<wersja>/raport-*.md",
+    "tasks": [
+      "Pokrycie poleceń rdzenia do 70 % (160 z 228): napisać e2e-app/z-*.spec.ts dla kont, tur, pamięci, umiejętności, kreatora agentek, kopii, mostów, głosu (bez dialogów i bez otwierania programów)",
+      "`node scripts/verify.mjs sprzet` dla 0.0.49",
+      "Testy sprzętowe --pulpit, gdy właściciel nie pracuje przy komputerze",
+      "Pokrycie poleceń rdzenia ≥ 60 % (konta z osobnym magazynem poświadczeń, tury z modelem, umiejętności, wtyczki, kopie)",
+      "Plan P: P14 ekran Obowiązki i krótszy krok Krytyczki, P1 głosy Pipera, P2 Sklep modeli, P3 menu kołowe",
+      "Żywa mowa do mikrofonu i brzmienie głosów — próba z właścicielem"
+    ],
+    "warm_up_commands": [
+      "cd alfa && source scripts/portable-env.sh && git status -sb",
+      "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/gates.ps1",
+      "budowa aplikacji: CARGO_TARGET_DIR=<repo>/target/shell CARGO_PROFILE_DEV_DEBUG=0 cargo build --features \"e2e tauri/custom-protocol\" w apps/desktop/src-tauri (ok. 10 min od zera)",
+      "test na żywo bez ruszania danych właściciela: APPDATA i LOCALAPPDATA na katalog tymczasowy, potem apps/desktop/ui/e2e-app/run.ps1 -Exe <target/shell/debug/alfa-desktop.exe>"
+    ]
+  },
+  "env_snapshot": {
+    "key_paths": {
+      "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
+      "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia",
+      "dane_alfy": "%LOCALAPPDATA%/Alfa",
+      "plan": "alfa/docs/plan/README.md (v6) + alfa/docs/KONTYNUACJA.md (etapy 0–8 = etap A i C1)",
+      "status": "alfa/docs/STATUS.md",
+      "katalog": "alfa/docs/CATALOG.md",
+      "plan_html": "alfa/docs/html/index.html (generowany)"
+    },
+    "ports": {
+      "alfa-ui (atrapa)": 5173,
+      "alfa-docs (podgląd HTML)": 5180
+    }
+  },
+  "test_results": {
+    "timestamp": "2026-10-12T14:22:00+02:00",
+    "last_run": "0.0.49: verify wersja 10/10 (cargo test 2680 zielonych, 0 czerwonych, 34 pominięte; vitest 344; E2E 353; e2e-app 24/24; pokrycie poleceń 51,3 %)"
+  },
+  "decisions_this_session": [
+    "Kopia robocza = dysk przenośny E:",
+    "Codex nie recenzuje — ADR 0016",
+    "Najpierw porządek i stabilizacja, bez nowych funkcji",
+    "ADR 0016 dopisane dwie reguły od Claude (sprzęt przed ✅, błąd ze sprzętu → test prawdziwej aplikacji) — do potwierdzenia przez właściciela",
+    "ui.column domyślnie auto; ui.zoom_fit domyślnie włączone",
+    "2026-10-09 plan v6: dostęp zdalny przez przekaźnik z szyfrowaniem E2E, komputer nie otwiera portu, parowanie QR",
+    "2026-10-09 plan v6: zgody zdalne dla wszystkich poziomów ryzyka (ADR 0022 — do podpisu)",
+    "2026-10-09 plan v6: telefon i panel WWW = pilot 100 %; bez komputera rozmowa przez ten sam model API; model lokalny tylko na komputerze",
+    "2026-10-09 plan v6 obok planu v5; reguła prowadzenia planu dopisana do AGENTS.md"
+  ]
+}
