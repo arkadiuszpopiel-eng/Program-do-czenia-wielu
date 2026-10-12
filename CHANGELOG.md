@@ -14,7 +14,9 @@ na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Hist
 
 ## 0.0.43 — 2026-10-12
 
-Stan silników rozmowy pod ręką w panelu „Głos”; wszystkie testy w przeglądarce zielone.
+Ostatnia z dziesięciu wersji z nocy 11/12 października: stan silników rozmowy pod ręką w panelu „Głos”. Wszystko, co
+doszło tej nocy (wersje 0.0.34–0.0.43: rozmowa głosowa na lokalnych silnikach, „Sprawdź silniki”, karty graficzne
+na żywo, „Wstecz / Dalej”, gotowe obowiązki agentek), jest w Historii zmian.
 
 ### Głos
 
