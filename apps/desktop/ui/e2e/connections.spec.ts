@@ -25,8 +25,9 @@ test('stan połączeń: konta, mosty z planem, modele, ochrona; „Sprawdź wszy
   const claude = page.locator('[data-conn="bridge:claude_code"]');
   // Logowanie wykrytych narzędzi sprawdza się samo przy otwarciu strony.
   await expect(claude).toContainText('plan Max');
-  await expect(claude).toContainText('Alfa może zlecać mu zadania');
-  await expect(claude).toHaveAttribute('data-state', 'ok');
+  // Atrapa: wersja wykryta, ale nieprzypięta — wiersz mówi, co zrobić.
+  await expect(claude).toContainText('przypnij ją w Mostach CLI');
+  await expect(claude).toHaveAttribute('data-state', 'attention');
   await expect(page.locator('[data-conn="bridge:codex"]')).toHaveAttribute('data-state', 'off');
   await expect(page.locator('[data-conn="bridge:antigravity"]')).toContainText(
     'nie podaje stanu logowania',
@@ -39,7 +40,7 @@ test('stan połączeń: konta, mosty z planem, modele, ochrona; „Sprawdź wszy
 
   await page.getByRole('button', { name: 'Sprawdź wszystko' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'działa' }).first()).toBeVisible();
-  await expect(claude).toHaveAttribute('data-state', 'ok');
+  await expect(claude).toHaveAttribute('data-state', 'attention');
 
   // „Szczegóły” prowadzą do strony z ustawieniami tej pozycji.
   await claude.getByRole('button', { name: /Szczegóły/ }).click();
