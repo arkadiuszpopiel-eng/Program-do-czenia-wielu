@@ -3,16 +3,9 @@
 import type { CamerasState } from '../api/types-cameras';
 import type { MicState } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
-import type {
-  ActivityInfo,
-  AgentState,
-  CostSummary,
-  SessionSummary,
-  SessionTemplate,
-} from '../api/types';
+import type { ActivityInfo, AgentState, CostSummary, SessionTemplate } from '../api/types';
 import type {
   AlfaEvent,
-  AppBootstrap,
   ChatStreamEvent,
   PanelId,
   SettingValue,
@@ -28,7 +21,7 @@ import { SentenceAnnouncer, type Timers } from '../logic/sentence-announcer';
 import { SHORTCUTS } from '../logic/shortcut-registry';
 import { buildKeymap, effectiveBindings } from '../logic/shortcuts';
 import { applyEvent } from './apply-batch';
-import { attempt, showError } from './attempt';
+import { showError } from './attempt';
 import { Debouncer, DraftSaver, logFailure } from './background';
 import { ConversationState } from './conversation.svelte';
 import { LayoutState } from './layout.svelte';
@@ -42,6 +35,7 @@ import { UpdatesState } from './updates.svelte';
 import { BrokerState } from './broker.svelte';
 import { WorkState } from './work.svelte';
 import { NavHistory, type Place } from '../logic/nav-history';
+import * as flow from './app-flow';
 
 export type View = 'loading' | 'chat' | 'settings' | 'onboarding' | 'error';
 
@@ -92,7 +86,7 @@ export class AppState {
   /** Odwiedzone miejsca dla „Wstecz / Dalej” (Alt+←, Alt+→, boczne przyciski myszy). */
   readonly nav = new NavHistory();
   /** Trwa przejście po historii — pośrednie stany nie są zapisywane jako nowe miejsca. */
-  private navBusy = false;
+  navBusy = false;
   timelineTurn = $state<string | null>(null);
   /** Tura użytkownika edytowana w miejscu (edytuj → nowa gałąź). */
   editingTurnId = $state<string | null>(null);
@@ -108,14 +102,16 @@ export class AppState {
   /** Ostatni postęp pobierania modelu lokalnego (onboarding, Ustawienia). */
   localDownload = $state<LocalModelProgress | null>(null);
 
+  // Pola bez `private` niżej (batcher, announcer, cache, removing, navBusy, unsubscribe,
+  // conversationFor, loadFailed, loadAgents) są wewnętrzne — używa ich tylko `app-flow.ts`.
   readonly keymap = $derived(buildKeymap(SHORTCUTS, this.shortcutOverrides));
   readonly bindings = $derived(effectiveBindings(SHORTCUTS, this.shortcutOverrides));
 
-  private readonly batcher: RafBatcher<AlfaEvent>;
-  private readonly announcer: SentenceAnnouncer;
-  private readonly cache: Record<string, ConversationState> = {};
-  private cacheOrder: string[] = [];
-  private unsubscribe: (() => void) | null = null;
+  readonly batcher: RafBatcher<AlfaEvent>;
+  readonly announcer: SentenceAnnouncer;
+  readonly cache: Record<string, ConversationState> = {};
+  cacheOrder: string[] = [];
+  unsubscribe: (() => void) | null = null;
   private listeners: ((event: AlfaEvent) => void)[] = [];
   private readonly debouncer: Debouncer;
   private readonly drafts: DraftSaver;
@@ -163,69 +159,15 @@ export class AppState {
    * Reszta (stan systemu, głos, koszty, agentki, szkic) — toast albo dziennik, okno działa dalej.
    */
   async start(): Promise<void> {
-    this.view = 'loading';
-    this.fatal = null;
-    this.bootStep = '';
-    let boot: AppBootstrap;
-    let list: readonly SessionSummary[];
-    let status: Promise<unknown> = Promise.resolve();
-    try {
-      boot = await this.client.app.bootstrap();
-      this.appVersion = boot.app_version;
-      this.settings = { ...boot.settings };
-      this.shortcutOverrides = { ...boot.shortcut_overrides };
-      this.layout.load(boot.layout);
-      await this.i18n.setLocale(boot.locale);
-      this.bootStep = this.i18n.t('boot.sessions');
-      this.unsubscribe?.();
-      this.unsubscribe = this.client.subscribe(
-        (batch) => this.batcher.push(...batch),
-        () => void this.resync(),
-      );
-      status = this.client.system.status().then(
-        (value) => (this.system = value),
-        (error: unknown) => this.loadFailed(error),
-      );
-      list = await this.client.sessions.list();
-    } catch (error) {
-      this.fatal = errorText(error);
-      this.view = 'error';
-      return;
-    }
-    this.sessions.list = [...list];
-    void this.client.voice.status().then((v) => this.voice.applyStatus(v), logFailure('voice'));
-    void this.client.gui.status().then((g) => this.work.applyGui(g), logFailure('gui'));
-    void this.client.cameras.state().then((c) => (this.cameras = c), logFailure('cameras'));
-    void this.updates.load(this.client.updates);
-    void this.broker.load(this.client.broker);
-    const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;
-    if (first) await this.openSession(first);
-    else await this.refreshCosts().catch((error: unknown) => this.loadFailed(error));
-    await status;
-    this.view = boot.onboarding_done ? 'chat' : 'onboarding';
+    return flow.start(this);
   }
 
   /**
    * Zdarzenia przepadły i rdzeń nie umie ich już odtworzyć: stan z rdzenia od nowa, bez zmiany
    * widoku. Rozmowy w pamięci podręcznej poza otwartą są porzucane (wczytają się przy otwarciu).
    */
-  private async resync(): Promise<void> {
-    this.batcher.flushNow();
-    const active = this.activeId;
-    for (const id of Object.keys(this.cache)) if (id !== active) delete this.cache[id];
-    this.cacheOrder = this.cacheOrder.filter((id) => id === active);
-    const failed = (
-      await Promise.allSettled([
-        this.client.sessions.list().then((list) => (this.sessions.list = [...list])),
-        this.client.system.status().then((value) => (this.system = value)),
-        this.client.voice.status().then((v) => this.voice.applyStatus(v)),
-        this.client.cameras.state().then((c) => (this.cameras = c)),
-        this.conversation?.load(),
-        this.refreshCosts(),
-        active ? this.loadAgents(active) : null,
-      ])
-    ).find((r) => r.status === 'rejected');
-    if (failed) this.loadFailed(failed.reason);
+  async resync(): Promise<void> {
+    return flow.resync(this);
   }
 
   dispose(): void {
@@ -250,33 +192,14 @@ export class AppState {
 
   /** Sprzątanie po usuniętej sesji (także usuniętej poza tym oknem): stan per sesja i widok. */
   async sessionRemoved(id: string): Promise<void> {
-    // Otwarcie następnej sesji opróżnia kolejkę zdarzeń, w której może już czekać zdarzenie
-    // o tym samym usunięciu — drugie wejście otwierało sesję jeszcze raz.
-    if (this.removing.includes(id)) return;
-    this.removing.push(id);
-    try {
-      await this.forgetSession(id);
-    } finally {
-      this.removing = this.removing.filter((x) => x !== id);
-    }
+    return flow.sessionRemoved(this, id);
   }
 
   /** Sesje w trakcie sprzątania (zwykła lista — nic w widoku od niej nie zależy). */
-  private removing: string[] = [];
+  removing: string[] = [];
 
-  private async forgetSession(id: string): Promise<void> {
-    this.sessions.remove(id);
-    delete this.cache[id];
-    this.cacheOrder = this.cacheOrder.filter((x) => x !== id);
-    delete this.agents[id];
-    delete this.activity[id];
-    if (this.activeId !== id) return;
-    const next = this.sessions.list.find((s) => !s.archived);
-    if (next) await this.openSession(next.id);
-    else {
-      this.sessions.activeId = null;
-      this.conversation = null;
-    }
+  async forgetSession(id: string): Promise<void> {
+    return flow.forgetSession(this, id);
   }
 
   /** Zdarzenie strumienia do rozmowy sesji (jeśli jest w pamięci podręcznej). */
@@ -291,12 +214,7 @@ export class AppState {
 
   /** Cofa krok agentki (karta, toast, Replay) — przez dziennik cofania; `false` — nie cofnięto. */
   async undoStep(token: string, label: string): Promise<boolean> {
-    const ok = await attempt(this.toasts, () => this.client.turns.undoStep(token));
-    if (ok) {
-      this.runs.markUndone(token);
-      this.toasts.show({ kind: 'success', message: this.i18n.t('conv.undone', { label }) });
-    }
-    return ok;
+    return flow.undoStep(this, token, label);
   }
 
   /** Subskrypcje paneli ładowanych leniwie (oś czasu, Hub kont). */
@@ -309,7 +227,7 @@ export class AppState {
 
   // ── Sesje ─────────────────────────────────────────────────────────────────────────────────────
 
-  private conversationFor(id: string): ConversationState {
+  conversationFor(id: string): ConversationState {
     let conv = this.cache[id];
     if (!conv) {
       conv = new ConversationState(this.client, id, {
@@ -334,56 +252,23 @@ export class AppState {
 
   /** Nie odrzuca: błąd rozmowy pokazuje widok („Ponów"), reszty (koszty, agentki, szkic) — toast. */
   async openSession(id: string): Promise<void> {
-    this.batcher.flushNow();
-    this.announcer.reset();
-    const conv = this.conversationFor(id);
-    this.sessions.activeId = id;
-    this.sessions.touch(id);
-    this.conversation = conv;
-    this.findOpen = false;
-    this.timelineTurn = null;
-    const loads: Promise<unknown>[] = [this.refreshCosts(), this.loadAgents(id)];
-    if (!conv.loaded || conv.loadError) loads.push(conv.load());
-    if (this.sessions.drafts[id] === undefined) {
-      loads.push(
-        this.client.sessions.getDraft(id).then((d) => {
-          // Tekst wpisany, zanim przyszła odpowiedź, jest nowszy niż zapisany szkic.
-          if (this.sessions.drafts[id] === undefined) this.sessions.drafts[id] = d;
-        }),
-      );
-    }
-    const failed = (await Promise.allSettled(loads)).find((r) => r.status === 'rejected');
-    // Szybkie przełączanie: spóźnione A nie może nadpisać aktywnej B w rdzeniu.
-    if (this.activeId !== id) return;
-    if (failed) this.loadFailed(failed.reason);
-    this.client.app.setActiveSession(id).catch(logFailure('setActiveSession'));
-    if (this.sessions.active?.unread)
-      this.client.sessions.markRead(id).catch(logFailure('markRead'));
+    return flow.openSession(this, id);
   }
 
   /** „Przejdź do sesji" spoza okna (zasobnik, `alfa://session/…`, Szybkie pytanie). */
   async focusSession(id: string): Promise<void> {
-    if (!this.sessions.list.some((s) => s.id === id)) {
-      try {
-        this.sessions.list = [...(await this.client.sessions.list())];
-      } catch (error) {
-        this.loadFailed(error);
-        return;
-      }
-    }
-    if (this.view === 'settings') this.view = 'chat';
-    await this.openSession(id);
+    return flow.focusSession(this, id);
   }
 
   /** Toast „Nie udało się wczytać: …" dla danych dociąganych w tle. */
-  private loadFailed(error: unknown): void {
+  loadFailed(error: unknown): void {
     this.toasts.show({
       kind: 'error',
       message: this.i18n.t('common.loadFailed', { error: errorText(error) }),
     });
   }
 
-  private async loadAgents(id: string): Promise<void> {
+  async loadAgents(id: string): Promise<void> {
     if (!this.agents[id]) this.agents[id] = [...(await this.client.agents.list(id))];
   }
 
@@ -432,18 +317,15 @@ export class AppState {
   // ── Ustawienia i wygląd ───────────────────────────────────────────────────────────────────────
 
   str(key: string, fallback: string): string {
-    const value = this.settings[key];
-    return typeof value === 'string' ? value : fallback;
+    return typeof this.settings[key] === 'string' ? (this.settings[key] as string) : fallback;
   }
 
   num(key: string, fallback: number): number {
-    const value = this.settings[key];
-    return typeof value === 'number' ? value : fallback;
+    return typeof this.settings[key] === 'number' ? (this.settings[key] as number) : fallback;
   }
 
   bool(key: string, fallback: boolean): boolean {
-    const value = this.settings[key];
-    return typeof value === 'boolean' ? value : fallback;
+    return typeof this.settings[key] === 'boolean' ? (this.settings[key] as boolean) : fallback;
   }
 
   setSetting(key: string, value: SettingValue): Promise<boolean> {
@@ -475,24 +357,7 @@ export class AppState {
 
   /** Krok wstecz (`-1`) albo dalej (`1`) po odwiedzonych miejscach; bez historii — tylko komunikat. */
   async navigate(direction: -1 | 1): Promise<void> {
-    if (this.navBusy || this.place() === null) return;
-    // Sesje usunięte w międzyczasie nie są celem powrotu.
-    this.nav.prune((p) => p.session === null || this.sessions.list.some((s) => s.id === p.session));
-    const target = direction < 0 ? this.nav.back() : this.nav.forward();
-    if (!target) {
-      this.announcement = this.i18n.t(direction < 0 ? 'nav.noBack' : 'nav.noForward');
-      return;
-    }
-    this.navBusy = true;
-    try {
-      if (target.session && target.session !== this.activeId)
-        await this.openSession(target.session);
-      if (target.view === 'settings') this.openSettings(target.page ?? undefined);
-      else this.closeSettings();
-    } finally {
-      this.navBusy = false;
-    }
-    this.announcement = this.i18n.t(direction < 0 ? 'nav.wentBack' : 'nav.wentForward');
+    return flow.navigate(this, direction);
   }
 
   // ── Widok i panele ────────────────────────────────────────────────────────────────────────────

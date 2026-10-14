@@ -6,28 +6,13 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { AlfaClient } from './client';
 import { toError } from './command-error';
 import { EventSequencer } from './event-sequencer';
-import type { IpcCommandName, IpcCommands } from './generated/ipc';
+import { call } from './tauri-call';
+import { accountsApi, enginesApi, transferApi } from './tauri-client-hub';
 import type { AlfaEvent, EventFrame } from './types-system';
 import type { TerminalFrame, TerminalSession } from './types-work';
 
 /** Nazwa jedynego kanału zdarzeń rdzeń → UI (ramki `EventFrame`, najwyżej jedna na klatkę). */
 export const EVENTS_CHANNEL = 'alfa://events';
-
-// Odrzucenie zawsze jako `Error` (rdzeń odsyła `AppError` jako zwykły obiekt).
-// Nazwa komendy i nazwy argumentów są sprawdzane w czasie kompilacji z typami generowanymi
-// z Rusta (`generated/ipc.ts`): literówka w nazwie albo brak argumentu to błąd typów, nie
-// „command not found” w działającym programie.
-type CallArgs<K extends IpcCommandName> =
-  IpcCommands[K]['args'] extends Readonly<Record<string, never>>
-    ? []
-    : [args: IpcCommands[K]['args']];
-const call = <T, K extends IpcCommandName = IpcCommandName>(
-  command: K,
-  ...args: CallArgs<K>
-): Promise<T> =>
-  invoke<T>(command, args[0]).catch((reason: unknown) => {
-    throw toError(reason);
-  });
 
 export class TauriAlfaClient implements AlfaClient {
   readonly kind = 'tauri' as const;
@@ -111,37 +96,9 @@ export class TauriAlfaClient implements AlfaClient {
     act: (artifactId, action) => call('files_act', { artifactId, action }),
   };
 
-  readonly accounts: AlfaClient['accounts'] = {
-    catalog: () => call('accounts_catalog'),
-    list: () => call('accounts_list'),
-    add: (input) => call('accounts_add', { input }),
-    test: (accountId) => call('accounts_test', { accountId }),
-    assign: (accountId, assignment) => call('accounts_assign', { accountId, assignment }),
-    setLimit: (accountId, enabled, monthly) =>
-      call('accounts_set_limit', { accountId, enabled, monthly }),
-    remove: (accountId) => call('accounts_remove', { accountId }),
-    rotate: (accountId, secret) => call('accounts_rotate', { accountId, secret }),
-    setDisabled: (accountId, disabled) => call('accounts_set_disabled', { accountId, disabled }),
-    setModel: (accountId, model) => call('accounts_set_model', { accountId, model }),
-    setQueue: (accountId, taskClass, models) =>
-      call('accounts_set_queue', { accountId, taskClass, models }),
-    suggestQueue: (accountId, taskClass, strategy) =>
-      call('accounts_suggest_queue', { accountId, taskClass, strategy }),
-    sharedQueues: () => call('accounts_shared_queues'),
-    setSharedQueue: (taskClass, entries) =>
-      call('accounts_set_shared_queue', { taskClass, entries }),
-    routing: () => call('routing_get'),
-    setRouting: (settings) => call('routing_set', { settings }),
-    routingPreview: (text, taskClass) => call('routing_preview', { text, taskClass }),
-    importEnv: () => call('accounts_import_env'),
-  };
+  readonly accounts: AlfaClient['accounts'] = accountsApi();
 
-  readonly transfer: AlfaClient['transfer'] = {
-    exportPackage: (request) => call('transfer_export', { request }),
-    inspect: (password, handle) => call('transfer_inspect', { password, handle }),
-    importPackage: (request) => call('transfer_import', { request }),
-    rollback: (snapshotId) => call('transfer_rollback', { snapshotId }),
-  };
+  readonly transfer: AlfaClient['transfer'] = transferApi();
 
   readonly permissions: AlfaClient['permissions'] = {
     get: (sessionId) => call('permissions_get', { sessionId }),
@@ -351,22 +308,7 @@ export class TauriAlfaClient implements AlfaClient {
     remove: (pluginId) => call('plugins_remove', { pluginId }),
   };
 
-  readonly engines: AlfaClient['engines'] = {
-    list: () => call('models_list'),
-    download: (itemId) => call('models_download', { itemId }),
-    cancel: (itemId) => call('models_cancel', { itemId }),
-    verify: (itemId) => call('models_verify', { itemId }),
-    remove: (itemId) => call('models_remove', { itemId }),
-    trustHash: (itemId, hashes) => call('models_trust_hash', { itemId, hashes }),
-    repair: (itemId) => call('models_repair', { itemId }),
-    bundles: () => call('models_bundles'),
-    bundleDownload: (bundleId) => call('models_bundle_download', { bundleId }),
-    bundleVerify: (bundleId) => call('models_bundle_verify', { bundleId }),
-    activateEmbedder: (model) => call('embed_model_activate', { model }),
-    reindexStart: () => call('search_reindex_start'),
-    reindexCancel: () => call('search_reindex_cancel'),
-    reindexStatus: () => call('search_reindex_status'),
-  };
+  readonly engines: AlfaClient['engines'] = enginesApi();
 
   readonly attachments: AlfaClient['attachments'] = {
     pick: (sessionId) => call('attachments_pick', { sessionId }),

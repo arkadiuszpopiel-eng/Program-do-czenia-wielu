@@ -18,6 +18,7 @@
   import Loading from '../../../components/shell/Loading.svelte';
   import { useApp } from '../../../state/context';
   import SettingRow from '../SettingRow.svelte';
+  import CameraPreview from './CameraPreview.svelte';
 
   interface Props {
     /** Ustawienia strony (przełącznik główny) — pokazywane nad listą kamer. */
@@ -168,21 +169,7 @@
         {@const live = watching.includes(camera.id)}
         {@const frame = frames[camera.id]}
         <li class="camera" class:dim={!usable} data-camera={camera.id}>
-          <div class="view" class:live>
-            {#if live && frame}
-              <img
-                src="data:image/png;base64,{frame.png_base64}"
-                alt={t('cam.previewAlt', { name: camera.name })}
-                width={frame.width}
-                height={frame.height}
-              />
-            {:else}
-              <span class="placeholder" aria-hidden="true">
-                <Camera size={28} strokeWidth={1.25} />
-              </span>
-            {/if}
-            {#if live}<span class="rec" aria-hidden="true"></span>{/if}
-          </div>
+          <CameraPreview {live} {frame} name={camera.name} dim={!usable} />
           <div class="info">
             <div class="title">
               {#if renaming === camera.id}
@@ -319,37 +306,9 @@
     border-radius: var(--alfa-radius-card);
     background: var(--alfa-color-bg);
   }
-  .view {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 16 / 9;
-    background: var(--alfa-color-surface2);
-    color: var(--alfa-color-text-muted);
-  }
-  .view img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .dim .view {
-    opacity: 0.6;
-  }
   /* Nazwa niedostępnej kamery: kolor przygaszony, nie przezroczystość (czytelność). */
   .dim .name {
     color: var(--alfa-color-text-muted);
-  }
-  /* Znak „podgląd działa” w rogu obrazu. */
-  .rec {
-    position: absolute;
-    top: var(--alfa-space-2);
-    right: var(--alfa-space-2);
-    width: 10px;
-    height: 10px;
-    border: 2px solid var(--alfa-color-bg);
-    border-radius: var(--alfa-radius-full);
-    background: var(--alfa-color-error);
   }
   .info {
     display: flex;

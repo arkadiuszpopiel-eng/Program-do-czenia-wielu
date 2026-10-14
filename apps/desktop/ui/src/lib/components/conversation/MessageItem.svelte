@@ -98,20 +98,11 @@
     node.focus();
     node.setSelectionRange(node.value.length, node.value.length);
   }
+  import HiddenMessage from './HiddenMessage.svelte';
 </script>
 
 {#if annotation?.hidden}
-  <article
-    class="hidden-note"
-    aria-posinset={position}
-    aria-setsize={count}
-    aria-label={t('conv.hidden')}
-  >
-    <span>{t('conv.hidden')}</span>
-    <Button size="sm" variant="ghost" onclick={() => act(() => conv.setHidden(turn, false))}
-      >{t('conv.unhide')}</Button
-    >
-  </article>
+  <HiddenMessage {position} {count} onunhide={() => act(() => conv.setHidden(turn, false))} />
 {:else}
   <article
     class="msg"
@@ -384,14 +375,6 @@
     justify-content: flex-start;
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-sm);
-  }
-  .hidden-note {
-    display: flex;
-    align-items: center;
-    gap: var(--alfa-space-2);
-    padding: var(--alfa-space-2) var(--alfa-space-2) var(--alfa-space-2) 40px;
-    color: var(--alfa-color-text-subtle);
-    font-size: var(--alfa-font-size-xs);
   }
   @media (prefers-reduced-motion: reduce) {
     .caret,
