@@ -32,6 +32,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'broker.banner.watchdog':
     'The watchdog is not running — STOP EVERYTHING (Ctrl+Shift+F12) is handled by the app as a fallback.',
   'broker.banner.dev': 'Developer mode: Broker inside the app process, no approval window.',
+  'broker.banner.unknown':
+    'Could not read the Broker state — it is unknown whether the approval window works. Check Details or restart Alfa.',
   'broker.banner.details': 'Details',
   'broker.approval.lost':
     'The Broker is unavailable — this request cannot be approved now; the agent will be denied.',

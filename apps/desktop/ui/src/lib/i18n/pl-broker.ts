@@ -30,6 +30,8 @@ export const plBroker = {
   'broker.banner.watchdog':
     'Watchdog nie działa — STOP WSZYSTKIEGO (Ctrl+Shift+F12) obsługuje awaryjnie aplikacja.',
   'broker.banner.dev': 'Tryb deweloperski: Broker w procesie aplikacji, bez okna zatwierdzeń.',
+  'broker.banner.unknown':
+    'Nie udało się odczytać stanu Brokera — nie wiadomo, czy okno zatwierdzeń działa. Sprawdź Szczegóły albo uruchom Alfę ponownie.',
   'broker.banner.details': 'Szczegóły',
   'broker.approval.lost':
     'Broker jest niedostępny — tej prośby nie da się teraz zatwierdzić; agentka dostanie odmowę.',

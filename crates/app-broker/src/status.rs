@@ -60,8 +60,15 @@ fn unavailable_text(reason: &str) -> LocalizedText {
     )
 }
 
-fn connected_text(mode: BrokerMode) -> Option<LocalizedText> {
+fn connected_text(mode: BrokerMode, window: bool) -> Option<LocalizedText> {
     match mode {
+        // Audyt A-12: o oknie z wysoką integralnością tylko wtedy, gdy okno naprawdę działa.
+        BrokerMode::Service if !window => Some(LocalizedText::new(
+            "Połączono z usługą Brokera (osobne konto Windows), ale okno zatwierdzeń nie działa — \
+             prośby o zgodę są odrzucane.",
+            "Connected to the Broker service (separate Windows account), but the approval window \
+             is not running — approval requests are denied.",
+        )),
         BrokerMode::Service => Some(LocalizedText::new(
             "Połączono z usługą Brokera: osobne konto Windows, okno zatwierdzeń z wysoką \
              integralnością (UIPI).",
@@ -82,7 +89,10 @@ fn connected_text(mode: BrokerMode) -> Option<LocalizedText> {
 
 fn render(p: &Parts) -> BrokerStatusView {
     let (state, detail) = match &p.link {
-        LinkState::Connected => (BrokerLinkState::Connected, connected_text(p.mode)),
+        LinkState::Connected => (
+            BrokerLinkState::Connected,
+            connected_text(p.mode, p.window),
+        ),
         LinkState::Connecting => (
             BrokerLinkState::Connecting,
             Some(LocalizedText::new(
@@ -100,7 +110,9 @@ fn render(p: &Parts) -> BrokerStatusView {
         state,
         approval_window: p.window && state == BrokerLinkState::Connected,
         watchdog: p.watchdog,
-        isolated: p.mode == BrokerMode::Service,
+        // Izolacja tylko przy działającym łączu z usługą (audyt A-12): sama konfiguracja
+        // „usługa” przy zerwanym łączu niczego nie chroni.
+        isolated: p.mode == BrokerMode::Service && state == BrokerLinkState::Connected,
         detail,
     }
 }
@@ -222,5 +234,22 @@ mod tests {
         s.set_link(LinkState::Connected);
         assert!(s.view().isolated && s.connected());
         assert_eq!(s.health(), HealthStatus::Healthy);
+    }
+
+    /// Audyt A-12: „izolowany” tylko przy działającym łączu z usługą, a opis okna zatwierdzeń
+    /// zgodny z tym, czy okno naprawdę działa.
+    #[test]
+    fn service_is_not_isolated_without_link_and_tells_about_missing_window() {
+        let s = KernelStatus::new(BrokerMode::Service, true);
+        assert!(!s.view().isolated, "łączenie — jeszcze bez izolacji");
+        s.set_link(LinkState::Lost("rura zamknięta".into()));
+        assert!(!s.view().isolated, "zerwane łącze — bez izolacji");
+        let no_window = KernelStatus::new(BrokerMode::Service, false);
+        no_window.set_link(LinkState::Connected);
+        let view = no_window.view();
+        assert!(view.isolated && !view.approval_window);
+        let detail = view.detail.map(|d| d.pl).unwrap_or_default();
+        assert!(detail.contains("okno zatwierdzeń nie działa"), "{detail}");
+        assert!(!detail.contains("wysoką"), "{detail}");
     }
 }

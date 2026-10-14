@@ -4,21 +4,26 @@ import type { BrokerStatusView } from '../api/types-broker';
 
 /**
  * Baner Brokera: `unavailable`/`lost` — bezpieczny stan (alert, bez ukrywania), `connecting` —
- * łączenie, `watchdog` — kill-switch awaryjnie w aplikacji, `dev` — Broker w procesie.
+ * łączenie, `watchdog` — kill-switch awaryjnie w aplikacji, `dev` — Broker w procesie,
+ * `unknown` — stanu nie udało się odczytać (nie wolno wtedy milczeć; audyt 2026-10-14, A-12).
  */
-export type BrokerBanner = 'unavailable' | 'lost' | 'connecting' | 'watchdog' | 'dev';
+export type BrokerBanner = 'unavailable' | 'lost' | 'connecting' | 'watchdog' | 'dev' | 'unknown';
 
 /** Bezpieczny stan: brak Brokera albo łącze niedziałające. */
 export function safeState(view: BrokerStatusView | null): boolean {
   return view !== null && (view.mode === 'unavailable' || view.state !== 'connected');
 }
 
-/** Najważniejszy baner (albo brak); `dismissed` — banery ukryte przez użytkownika. */
+/**
+ * Najważniejszy baner (albo brak); `dismissed` — banery ukryte przez użytkownika; `failed` —
+ * odczyt stanu się nie udał (bez widoku to baner „stan nieznany”, nie cisza).
+ */
 export function brokerBanner(
   view: BrokerStatusView | null,
   dismissed: readonly BrokerBanner[] = [],
+  failed = false,
 ): BrokerBanner | null {
-  if (view === null) return null;
+  if (view === null) return failed ? 'unknown' : null;
   const pick = (b: BrokerBanner): BrokerBanner | null => (dismissed.includes(b) ? null : b);
   if (view.mode === 'unavailable') return 'unavailable';
   if (view.state === 'lost') return 'lost';
@@ -30,5 +35,5 @@ export function brokerBanner(
 
 /** Banery, których nie da się ukryć (bezpieczny stan). */
 export function bannerIsSticky(banner: BrokerBanner): boolean {
-  return banner === 'unavailable' || banner === 'lost';
+  return banner === 'unavailable' || banner === 'lost' || banner === 'unknown';
 }

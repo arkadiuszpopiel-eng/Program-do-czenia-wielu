@@ -12,6 +12,13 @@ const service: BrokerStatusView = {
 };
 
 describe('baner Brokera', () => {
+  it('stan nieodczytany — baner „nieznany”, którego nie da się ukryć (audyt A-12)', () => {
+    expect(brokerBanner(null, [], true)).toBe('unknown');
+    expect(brokerBanner(null, ['unknown'], true)).toBe('unknown');
+    expect(bannerIsSticky('unknown')).toBe(true);
+    expect(brokerBanner(service, [], true)).toBeNull();
+  });
+
   it('usługa z watchdogiem — bez banera i bez bezpiecznego stanu', () => {
     expect(brokerBanner(service)).toBeNull();
     expect(safeState(service)).toBe(false);
