@@ -104,9 +104,13 @@ impl AppCore {
         let cameras_stopped = tokio::spawn(async move { cameras.stop_all().await });
         // Przeglądarki agentek (F6): drzewa procesów zamknięte, zgody hostów wygasają.
         let _ = self.inner.agents.as_ref().map(|a| a.tools.kill_switch());
-        if let Err(e) = self.inner.broker.kill_all(origin).await {
-            tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
-        }
+        let gap = match self.inner.broker.kill_all(origin).await {
+            Ok(gap) => gap,
+            Err(e) => {
+                tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
+                Some(format!("kill-switch Brokera nie powiódł się: {}", e.message))
+            }
+        };
         if let Err(e) = self.inner.voice.stop_speech().await {
             tracing::warn!(error = %e, "stop mowy przy kill-switchu nie powiódł się");
         }
@@ -129,13 +133,31 @@ impl AppCore {
         for h in &handles {
             h.wait(std::time::Duration::from_secs(5)).await;
         }
-        self.emit(AlfaEvent::Toast {
-            kind: ToastKind::Warning,
-            message: LocalizedText::new(
+        // Audyt A-03: „zatrzymano” tylko wtedy, gdy Broker potwierdził; inaczej trwały komunikat
+        // o zatrzymaniu niepełnym (praca w Alfie przerwana, ale nie wszystko po stronie Brokera).
+        let message = match &gap {
+            None => LocalizedText::new(
                 "STOP WSZYSTKIEGO: zatrzymano pracę agentek.",
                 "STOP EVERYTHING: agents stopped.",
             ),
-        });
+            Some(what) => {
+                tracing::error!(brak = %what, "kill-switch: zatrzymanie niepełne");
+                LocalizedText::new(
+                    format!(
+                        "STOP WSZYSTKIEGO: praca agentek w Alfie przerwana, ale zatrzymanie jest                          NIEPEŁNE — {what}. Sprawdź Ustawienia → Bezpieczeństwo."
+                    ),
+                    format!(
+                        "STOP EVERYTHING: agents stopped in Alfa, but the stop is INCOMPLETE —                          {what}. Check Settings → Security."
+                    ),
+                )
+            }
+        };
+        let kind = if gap.is_some() {
+            ToastKind::Error
+        } else {
+            ToastKind::Warning
+        };
+        self.emit(AlfaEvent::Toast { kind, message });
         handles.len()
     }
 }

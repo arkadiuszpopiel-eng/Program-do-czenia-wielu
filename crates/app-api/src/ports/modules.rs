@@ -109,8 +109,11 @@ pub trait BrokerPort: Send + Sync {
     /// Cofnięcie kroku narzędzia (dziennik cofania `fs.*`); zwraca opis cofniętego kroku.
     async fn undo_step(&self, session: &SessionId, step: u64) -> Result<String, AppError>;
     /// Kill-switch Brokera: unieważnia tokeny, zabija drzewa procesów, wycisza audio.
-    async fn kill_all(&self, _origin: KillOrigin) -> Result<(), AppError> {
-        Ok(())
+    /// `Ok(None)` — Broker potwierdził zatrzymanie; `Ok(Some(opis))` — zatrzymanie niepełne
+    /// (Broker nieosiągalny, audyt niezapisany, drzewo procesów nie dało się zabić) — interfejs
+    /// nie może wtedy mówić „zatrzymano” (audyt 2026-10-14, A-03).
+    async fn kill_all(&self, _origin: KillOrigin) -> Result<Option<String>, AppError> {
+        Ok(None)
     }
     /// Czy działa okno zatwierdzeń (Broker-UI) — bez niego prośby czekają do limitu i kończą
     /// się odmową (karta „czeka na zatwierdzenie" pokazuje wyjaśnienie zamiast przycisku).

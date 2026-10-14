@@ -47,7 +47,12 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
       if (event.status.state !== 'active') app.micState = app.voice.mic;
       break;
     case 'Toast':
-      app.toasts.show({ kind: event.kind, message: app.i18n.text(event.message) });
+      // Błąd z rdzenia (np. niepełne STOP WSZYSTKIEGO) zostaje, aż użytkownik go zamknie.
+      app.toasts.show({
+        kind: event.kind,
+        message: app.i18n.text(event.message),
+        ...(event.kind === 'error' ? { timeoutMs: 0 } : {}),
+      });
       break;
     case 'OpenSession':
       void app.focusSession(event.session_id);

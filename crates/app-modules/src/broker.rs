@@ -247,7 +247,7 @@ impl BrokerPort for InprocBroker {
             .unwrap_or_else(|| BrokerStatusView::in_process(self.window.available()))
     }
 
-    async fn kill_all(&self, origin: KillOrigin) -> Result<(), AppError> {
+    async fn kill_all(&self, origin: KillOrigin) -> Result<Option<String>, AppError> {
         let reason = match origin {
             KillOrigin::Hotkey => KillReason::Hotkey,
             KillOrigin::Tray => KillReason::TrayButton,
@@ -261,10 +261,66 @@ impl BrokerPort for InprocBroker {
             audyt = report.audited,
             "kill-switch Brokera"
         );
-        Ok(())
+        Ok(kill_gap(&report))
     }
+}
+
+/// Czego kill-switch nie potwierdził (`None` — wszystko zatrzymane i zapisane w audycie).
+pub fn kill_gap(report: &watchdog_contract::KillReport) -> Option<String> {
+    let mut gaps = Vec::new();
+    if !report.audited {
+        gaps.push(
+            "Broker nie potwierdził zatrzymania — uprawnienia agentek wygasną same,              a zapis w dzienniku audytu nie powstał"
+                .to_owned(),
+        );
+    }
+    if !report.jobs_failed.is_empty() {
+        gaps.push(format!(
+            "nie udało się zatrzymać procesów: {}",
+            report.jobs_failed.len()
+        ));
+    }
+    (!gaps.is_empty()).then(|| gaps.join("; "))
 }
 
 // Środowisko ścieżek i katalog Brokera w procesie żyją w `app-broker` (wybór Brokera dla
 // `AppOptions`); reeksport dla dotychczasowych użytkowników.
 pub use app_broker::inproc::{dev_dir, path_env, path_env_for};
+
+#[cfg(test)]
+mod tests {
+    use watchdog_contract::{JobFailure, KillReport};
+
+    use super::*;
+
+    fn report(audited: bool, failed: usize) -> KillReport {
+        KillReport {
+            reason: KillReason::Hotkey,
+            tokens_revoked: 2,
+            jobs_killed: 1,
+            jobs_failed: (0..failed)
+                .map(|i| JobFailure {
+                    job: u32::try_from(i).unwrap_or(0),
+                    error: "odmowa dostępu".into(),
+                })
+                .collect(),
+            audio_silenced: true,
+            audited,
+            latency_us: 10,
+        }
+    }
+
+    #[test]
+    fn kill_gap_names_what_was_not_confirmed() {
+        assert_eq!(kill_gap(&report(true, 0)), None);
+        let broker = kill_gap(&report(false, 0)).unwrap_or_default();
+        assert!(broker.contains("Broker nie potwierdził"), "{broker}");
+        let jobs = kill_gap(&report(true, 2)).unwrap_or_default();
+        assert_eq!(jobs, "nie udało się zatrzymać procesów: 2");
+        let both = kill_gap(&report(false, 1)).unwrap_or_default();
+        assert!(
+            both.contains("Broker") && both.contains("procesów: 1"),
+            "{both}"
+        );
+    }
+}
