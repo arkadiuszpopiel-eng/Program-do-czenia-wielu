@@ -346,7 +346,9 @@ impl Extra {
             Some(tts) => Some(tts.clone()),
             None => Some(app_modules::tts::engines_tuned(
                 deps.paths,
-                super::voice_tuning::tts_tuning(&deps.kernel.config),
+                app_voice::tuning::tts_tuning(
+                    &(deps.kernel.config.clone() as Arc<dyn core_config_contract::ConfigStore>),
+                ),
             )),
         };
         Ok(())

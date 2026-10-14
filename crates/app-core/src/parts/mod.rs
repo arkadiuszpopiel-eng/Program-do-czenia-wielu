@@ -9,10 +9,8 @@ mod kernel;
 pub(crate) mod key_watch;
 mod memory;
 mod ports;
-pub(crate) mod signals;
-mod tasks;
+pub(crate) mod tasks;
 mod voice_talk;
-mod voice_tuning;
 mod work;
 
 use std::collections::HashMap;

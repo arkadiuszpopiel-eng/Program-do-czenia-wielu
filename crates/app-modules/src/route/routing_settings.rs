@@ -220,8 +220,10 @@ mod tests {
         let file = PolicyFile::new(path.clone());
         assert_eq!(file.changed(), Some(DifficultyPolicy::default()));
         assert_eq!(file.changed(), None, "bez zmiany — bez ponownego odczytu");
-        let mut p = DifficultyPolicy::default();
-        p.strategy = Strategy::Quality;
+        let mut p = DifficultyPolicy {
+            strategy: Strategy::Quality,
+            ..DifficultyPolicy::default()
+        };
         p.rungs.insert("openai:gpt-6-luna".into(), Rung::Strong);
         save(&path, &p).unwrap();
         file.forget();
@@ -232,8 +234,10 @@ mod tests {
 
     #[test]
     fn settings_convert_both_ways_and_reject_bad_keys() {
-        let mut p = DifficultyPolicy::default();
-        p.review = Difficulty::Medium;
+        let mut p = DifficultyPolicy {
+            review: Difficulty::Medium,
+            ..DifficultyPolicy::default()
+        };
         p.rungs.insert("local:qwen3-27b".into(), Rung::Light);
         let dto = settings_dto(&p);
         assert_eq!(dto.review, RoutingLevel::Medium);

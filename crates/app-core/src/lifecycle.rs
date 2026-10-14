@@ -67,7 +67,7 @@ impl AppCore {
             .map(|r| r.manager() as std::sync::Arc<dyn model_residency_contract::Residency>);
         let signals = self.inner.signals.clone();
         let probe = std::sync::Arc::new(move || {
-            let s = crate::parts::signals::snapshot(signals.as_ref());
+            let s = app_modules::system_signals::snapshot(signals.as_ref());
             scheduler_contract::SystemConditions {
                 user_idle: s.user_idle || s.locked(),
                 game_mode: s.game_mode()

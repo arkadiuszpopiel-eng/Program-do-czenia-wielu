@@ -75,7 +75,7 @@ impl Built {
             privacy,
             device,
             idle: match &kernel.signals {
-                Some(port) => Arc::new(super::signals::PortIdle(port.clone())),
+                Some(port) => Arc::new(app_modules::system_signals::PortIdle(port.clone())),
                 None => Arc::new(UnknownIdle),
             },
             meter: need(&self.costs, "cost-meter")?,

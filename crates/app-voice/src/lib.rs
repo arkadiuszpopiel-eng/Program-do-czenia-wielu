@@ -26,6 +26,7 @@ mod system_listen;
 mod system_selftest;
 mod talk;
 mod tap;
+pub mod tuning;
 
 pub use engine::{IntervalPacer, Pacer, VoiceEngine, VoiceEngineFactory, VoiceRuntime};
 pub use features::{

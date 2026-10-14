@@ -12,6 +12,12 @@ repository.workspace = true
 # (limit 8 000 linii na crate). Implementuje porty `app-api` na modułach `-impl`; używa jej tylko
 # `app-core` (jedno miejsce kompozycji: `AppOptions` → `parts`).
 [dependencies]
+platform-contract = { path = "../platform-contract" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+cost-meter-impl = { path = "../cost-meter-impl" }
+app-memory = { path = "../app-memory" }
+platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 app-api = { path = "../app-api" }
 # Broker poza procesem / w procesie (`BrokerPort` nad `KernelBroker`, ścieżki Brokera).
 app-broker = { path = "../app-broker" }

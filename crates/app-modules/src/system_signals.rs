@@ -8,11 +8,9 @@ use std::sync::Arc;
 use app_memory::guardian::IdleSource;
 use platform_contract::{DirWatchPort, SignalConfig, SystemSignals, SystemSignalsPort};
 
-use crate::options::AppOptions;
-
-/// Monitor sygnałów: z opcji albo Windows (uruchomiony); `None` — brak monitora.
-pub(crate) fn signals(options: &AppOptions) -> Option<Arc<dyn SystemSignalsPort>> {
-    if let Some(port) = &options.signals {
+/// Monitor sygnałów: podany (opcje aplikacji, testy) albo Windows (uruchomiony); `None` — brak.
+pub fn signals(custom: Option<&Arc<dyn SystemSignalsPort>>) -> Option<Arc<dyn SystemSignalsPort>> {
+    if let Some(port) = custom {
         return Some(port.clone());
     }
     let monitor = platform_windows_sys_impl::WinSignals::new(SignalConfig::default());
@@ -25,9 +23,9 @@ pub(crate) fn signals(options: &AppOptions) -> Option<Arc<dyn SystemSignalsPort>
     }
 }
 
-/// Obserwacja katalogów: z opcji albo Windows; poza Windows — brak.
-pub(crate) fn dir_watch(options: &AppOptions) -> Option<Arc<dyn DirWatchPort>> {
-    if let Some(port) = &options.dir_watch {
+/// Obserwacja katalogów: podana albo Windows; poza Windows — brak.
+pub fn dir_watch(custom: Option<&Arc<dyn DirWatchPort>>) -> Option<Arc<dyn DirWatchPort>> {
+    if let Some(port) = custom {
         return Some(port.clone());
     }
     cfg!(windows).then(|| {
@@ -36,12 +34,12 @@ pub(crate) fn dir_watch(options: &AppOptions) -> Option<Arc<dyn DirWatchPort>> {
 }
 
 /// Stan sygnałów (bez monitora — domyślny: aktywny użytkownik, bez gry, zasilanie nieznane).
-pub(crate) fn snapshot(port: Option<&Arc<dyn SystemSignalsPort>>) -> SystemSignals {
+pub fn snapshot(port: Option<&Arc<dyn SystemSignalsPort>>) -> SystemSignals {
     port.map(|p| p.snapshot()).unwrap_or_default()
 }
 
 /// Bezczynność dla Strażniczki pamięci z monitora sygnałów.
-pub(crate) struct PortIdle(pub Arc<dyn SystemSignalsPort>);
+pub struct PortIdle(pub Arc<dyn SystemSignalsPort>);
 
 impl IdleSource for PortIdle {
     fn idle_secs(&self) -> u64 {

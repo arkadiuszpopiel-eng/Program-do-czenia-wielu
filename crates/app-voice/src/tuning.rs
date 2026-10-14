@@ -11,19 +11,19 @@ use voice_tts_contract::{
 };
 
 /// Tempo mowy w procentach (60–160).
-pub(crate) const SPEED_KEY: &str = "voice.tts_speed";
+pub const SPEED_KEY: &str = "voice.tts_speed";
 /// Styl mówienia (`calm` / `natural` / `lively`).
-pub(crate) const STYLE_KEY: &str = "voice.tts_style";
+pub const STYLE_KEY: &str = "voice.tts_style";
 /// Pauza między zdaniami w ms (0–1000).
-pub(crate) const PAUSE_KEY: &str = "voice.tts_pause";
+pub const PAUSE_KEY: &str = "voice.tts_pause";
 /// Odrębność głosów agentek (`same` / `subtle` / `distinct`).
-pub(crate) const CHARACTER_KEY: &str = "voice.tts_character";
+pub const CHARACTER_KEY: &str = "voice.tts_character";
 
 /// Głośność mowy w procentach (20–150).
-pub(crate) const VOLUME_KEY: &str = "voice.tts_volume";
+pub const VOLUME_KEY: &str = "voice.tts_volume";
 
 /// Barwy głosu agentek (Supertonic 3): `F1`…`F5`, `M1`…`M5`.
-pub(crate) const VOICE_KEYS: [&str; 4] = [
+pub const VOICE_KEYS: [&str; 4] = [
     "voice.tts_voice_alfa",
     "voice.tts_voice_beta",
     "voice.tts_voice_gama",
@@ -43,7 +43,7 @@ const KEYS: [&str; 9] = [
 ];
 
 /// Barwy agentek z wartości ustawień (brak albo nieznana nazwa → barwa domyślna agentki).
-pub(crate) fn timbres_from(values: [Option<&str>; 4]) -> [u8; 4] {
+pub fn timbres_from(values: [Option<&str>; 4]) -> [u8; 4] {
     let mut timbres = DEFAULT_TIMBRES;
     for (slot, value) in timbres.iter_mut().zip(values) {
         if let Some(index) = value.and_then(timbre_index) {
@@ -54,7 +54,7 @@ pub(crate) fn timbres_from(values: [Option<&str>; 4]) -> [u8; 4] {
 }
 
 /// Zalecane strojenie programu — używane, dopóki użytkownik niczego nie zmieni.
-pub(crate) fn recommended() -> TtsTuning {
+pub fn recommended() -> TtsTuning {
     let (expressiveness, rhythm) = VoiceStyle::Natural.params();
     TtsTuning {
         speed: 1.0,
@@ -68,7 +68,7 @@ pub(crate) fn recommended() -> TtsTuning {
 }
 
 /// Strojenie z wartości ustawień (brak albo zły typ wartości → zalecane).
-pub(crate) fn from_values(
+pub fn from_values(
     speed: Option<f64>,
     style: Option<&str>,
     pause: Option<f64>,
@@ -92,7 +92,7 @@ pub(crate) fn from_values(
 }
 
 /// Strojenie śledzące konfigurację.
-pub(crate) fn tts_tuning(config: &Arc<core_config_impl::FileConfigStore>) -> SharedTuning {
+pub fn tts_tuning(config: &Arc<dyn ConfigStore>) -> SharedTuning {
     let shared = SharedTuning::default();
     shared.set(recommended());
     let (config, handle) = (config.clone(), shared.clone());

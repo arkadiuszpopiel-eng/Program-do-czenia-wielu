@@ -21,6 +21,7 @@
 pub mod broker;
 pub mod catalog;
 pub mod embedder;
+pub mod fx_http;
 pub mod gpu_mem;
 pub mod handles;
 pub mod late;
@@ -29,6 +30,7 @@ pub mod route;
 pub mod secrets;
 pub mod speech_meter;
 pub mod stt;
+pub mod system_signals;
 pub mod transfer;
 pub mod tts;
 pub mod turn;

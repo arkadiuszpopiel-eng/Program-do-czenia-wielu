@@ -16,7 +16,7 @@ use crate::compose::internal;
 use crate::error::AppError;
 use crate::events::EventHub;
 use crate::infra::catalog::ProviderCatalog;
-use crate::infra::http::{OfflineFx, ReqwestGet};
+use app_modules::fx_http::{OfflineFx, ReqwestGet};
 use crate::options::{AppOptions, AppPaths};
 use crate::settings::{SettingsCatalog, keys};
 use app_modules::secrets::system_secret_store;
@@ -104,8 +104,8 @@ impl Kernel {
             settings,
             device_pending,
             device,
-            signals: super::signals::signals(options),
-            dir_watch: super::signals::dir_watch(options),
+            signals: app_modules::system_signals::signals(options.signals.as_ref()),
+            dir_watch: app_modules::system_signals::dir_watch(options.dir_watch.as_ref()),
         })
     }
 }
