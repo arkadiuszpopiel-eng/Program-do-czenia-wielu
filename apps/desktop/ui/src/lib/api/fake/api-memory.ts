@@ -240,7 +240,8 @@ export function memoryApi(core: FakeCore): AlfaClient['memory'] {
         confidence: edit.confidence ?? e.confidence,
         version: e.version + 1,
         derivation: 'edited',
-        state: 'active',
+        // Edycja nie zatwierdza propozycji (jak rdzeń; audyt A-14).
+        state: e.state === 'pending' ? 'pending' : 'active',
       });
       entries = entries.map((x) => (x.id === e.id ? { ...x, state: 'superseded' } : x));
       log(e.scope_key, 'edit', 'Edycja przez użytkownika (nowa wersja).', [e.id, next.id]);

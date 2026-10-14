@@ -166,6 +166,7 @@ pub fn cases() -> Vec<(&'static str, Case)> {
         ),
         ("pin_and_working_set", versions::pin_and_working_set),
         ("ttl_and_pending", versions::ttl_and_pending),
+        ("edit_keeps_pending", versions::edit_keeps_pending),
         ("inspector_filters", inspector::inspector_filters),
         ("explain_why", inspector::explain_why),
         (

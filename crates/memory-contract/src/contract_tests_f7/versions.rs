@@ -199,3 +199,46 @@ pub fn ttl_and_pending(m: &dyn MemoryService, ctx: &Ctx) {
     let report = ok(m.forget_as(&owner(), &ForgetTarget::Entry(short.entry_ref())));
     assert_eq!(report.removed.len(), 1);
 }
+
+/// Edycja nie jest zatwierdzeniem (audyt 2026-10-14, A-14): oczekująca propozycja agentki po
+/// poprawce właściciela dalej czeka i nie trafia do przypomnień; zatwierdzony wpis po edycji
+/// zostaje zatwierdzony.
+pub fn edit_keeps_pending(m: &dyn MemoryService, _ctx: &Ctx) {
+    let beta = agent_with(
+        "beta",
+        "B",
+        None,
+        &[ScopeGrant::Session, ScopeGrant::Agent, ScopeGrant::Global],
+        &[ScopeGrant::Session, ScopeGrant::Agent, ScopeGrant::Global],
+    );
+    let proposal = NewMemory {
+        provenance: Provenance::Agent {
+            agent: crate::AgentId::new("beta"),
+        },
+        ..fact(MemoryScope::Global, "Spotkanie zespołu w czwartek")
+    };
+    let pending = ok(m.remember_as(&beta, proposal, RememberMode::Explicit));
+    assert!(!pending.approved);
+    let edit = EntryEdit {
+        text: Some("Spotkanie zespołu w piątek".into()),
+        ..EntryEdit::default()
+    };
+    let edited = ok(m.edit(&owner(), &pending.entry_ref(), &edit));
+    assert!(
+        !edited.approved,
+        "poprawiona propozycja dalej czeka na zgodę"
+    );
+    assert!(
+        !recall_texts(m, &beta, vec![], "spotkanie piątek", 5)
+            .iter()
+            .any(|t| t.contains("piątek")),
+        "niezatwierdzona — bez przypomnień"
+    );
+    let approved = ok(m.approve_as(&owner(), &edited.entry_ref()));
+    assert!(approved.approved);
+    let again = EntryEdit {
+        text: Some("Spotkanie zespołu w piątek o 10".into()),
+        ..EntryEdit::default()
+    };
+    assert!(ok(m.edit(&owner(), &approved.entry_ref(), &again)).approved);
+}
