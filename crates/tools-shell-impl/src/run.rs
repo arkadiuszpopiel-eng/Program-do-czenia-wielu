@@ -68,7 +68,7 @@ impl Core {
         m: &ToolManifest,
         cwd: &str,
         command: &str,
-    ) -> Step<Vec<Authorization>> {
+    ) -> Step<(Vec<Authorization>, bool)> {
         let action = format!("polecenie „{}”", text::truncate_chars(command, 80).0);
         let a = analyze(command);
         if a.credential_path {
@@ -134,6 +134,15 @@ impl Core {
         }
         facts.install = a.install;
         facts.command = Some(command.to_owned());
+        // Izolacja (integralność Low): tylko gdy całe znane działanie mieści się w katalogu
+        // roboczym — instalacje, sieć i cele spoza katalogu idą jak dotąd, za zgodą Brokera.
+        let isolate = self.config.low_integrity
+            && outside.is_empty()
+            && !unresolved
+            && a.hosts.is_empty()
+            && !a.network
+            && !a.install
+            && !a.opaque_targets;
         let mut caps = vec![(Capability::ShellExec(cwd_scope), facts.clone())];
         for scope in outside {
             let mut f = facts.clone();
@@ -151,7 +160,7 @@ impl Core {
             f.reversible = Reversibility::No;
             caps.push((Capability::NetEgress(pattern), f));
         }
-        self.authorize(ctx, caps, &action).await
+        Ok((self.authorize(ctx, caps, &action).await?, isolate))
     }
 
     fn snapshot(&self, ctx: &ToolCtx, m: &ToolManifest, cwd: &str) -> Step<StepId> {
@@ -186,7 +195,7 @@ impl Core {
         }
     }
 
-    fn spec(&self, args: &RunArgs, cwd: &str) -> ExecSpec {
+    fn spec(&self, args: &RunArgs, cwd: &str, integrity: Integrity) -> ExecSpec {
         let shell = args.shell.unwrap_or(self.config.default_shell);
         let (program, argv, raw) = self.config.invocation(shell, &args.command);
         let allow: Vec<&str> = self
@@ -204,7 +213,7 @@ impl Core {
                 cmd: PathBuf::from(program),
                 args: argv,
                 cwd: PathBuf::from(cwd),
-                integrity: Integrity::Medium,
+                integrity,
                 memory_limit_mb: Some(self.config.memory_limit_mb),
             },
             raw_args: raw,
@@ -264,7 +273,7 @@ impl Core {
             ));
         }
         let cwd = self.cwd(a.cwd.as_deref(), ctx).await?;
-        let auths = self.capabilities(ctx, m, &cwd, command).await?;
+        let (auths, isolate) = self.capabilities(ctx, m, &cwd, command).await?;
         if ctx.cancel.is_cancelled() {
             self.release(&auths).await;
             return Ok(ToolOutcome::cancelled("polecenie powłoki"));
@@ -276,12 +285,18 @@ impl Core {
                 return Ok(*out);
             }
         };
+        let integrity = if isolate {
+            Integrity::Low
+        } else {
+            Integrity::Medium
+        };
         let spec = self.spec(
             &RunArgs {
                 command: command.to_owned(),
                 ..a
             },
             &cwd,
+            integrity,
         );
         self.emit(
             EVENT_STARTED,
@@ -314,6 +329,12 @@ impl Core {
             Err(_) => None,
         };
         let mut result = self.outcome(out, undo, ctx).await;
+        if isolate {
+            result.text.push_str(
+                "
+[izolacja] Polecenie działało z niską integralnością: zapis tylko w katalogu                  roboczym (odmowa dostępu poza nim to zabezpieczenie, nie usterka).",
+            );
+        }
         result.approval = approval;
         Ok(result)
     }

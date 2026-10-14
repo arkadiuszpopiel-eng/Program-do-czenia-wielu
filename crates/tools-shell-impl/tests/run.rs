@@ -286,3 +286,32 @@ async fn spawn_failure_is_reported_and_step_aborted() {
     );
     assert!(out.text.contains("brak pwsh"));
 }
+
+/// Dokument 25 §1: polecenie mieszczące się w katalogu roboczym idzie z niską integralnością
+/// (zapis poza katalogiem odrzuci system), wynik mówi o izolacji; wyłącznik w konfiguracji.
+#[tokio::test]
+async fn workdir_only_commands_run_at_low_integrity() {
+    use platform_contract::Integrity;
+    let h = harness(&[("/Users/ala/Projekt/a.txt", "a")]);
+    h.exec.set_default(FakeRun::exit(0, "ok", ""));
+    let out = h.sh("Get-ChildItem").await;
+    assert!(out.is_ok(), "{out:?}");
+    assert_eq!(h.exec.runs()[0].process.integrity, Integrity::Low);
+    assert!(out.text.contains("[izolacja]"), "{}", out.text);
+    let del = h.sh("Remove-Item a.txt").await;
+    assert!(del.is_ok(), "{del:?}");
+    assert_eq!(h.exec.runs()[1].process.integrity, Integrity::Low);
+
+    let off = common::harness_with(
+        &[],
+        tools_shell_contract::ShellToolsConfig {
+            low_integrity: false,
+            ..Default::default()
+        },
+    );
+    off.exec.set_default(FakeRun::exit(0, "ok", ""));
+    let out = off.sh("Get-ChildItem").await;
+    assert!(out.is_ok(), "{out:?}");
+    assert_eq!(off.exec.runs()[0].process.integrity, Integrity::Medium);
+    assert!(!out.text.contains("[izolacja]"));
+}

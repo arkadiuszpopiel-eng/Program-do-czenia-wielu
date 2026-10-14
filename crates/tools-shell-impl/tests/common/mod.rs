@@ -33,6 +33,10 @@ pub struct Harness {
 }
 
 pub fn harness(files: &[(&str, &str)]) -> Harness {
+    harness_with(files, ShellToolsConfig::default())
+}
+
+pub fn harness_with(files: &[(&str, &str)], config: ShellToolsConfig) -> Harness {
     let env = PathEnv::windows_profile(HOME);
     let fs = Arc::new(FakeFs::with_files(
         files
@@ -64,7 +68,7 @@ pub fn harness(files: &[(&str, &str)]) -> Harness {
         broker: broker.clone(),
         env,
         deny: DenyLists::baseline(),
-        config: ShellToolsConfig::default(),
+        config,
         base_env: Some(vec![
             ("PATH".into(), "C:\\Windows".into()),
             ("ANTHROPIC_API_KEY".into(), "sk-ant-sekret".into()),

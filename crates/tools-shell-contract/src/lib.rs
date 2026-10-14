@@ -147,6 +147,15 @@ pub struct ShellToolsConfig {
     pub memory_limit_mb: u32,
     /// Allowlista zmiennych środowiska (sekrety odrzucane zawsze).
     pub env_allowlist: Vec<String>,
+    /// Polecenia, które według analizy działają tylko w katalogu roboczym (bez sieci, instalacji
+    /// i celów spoza katalogu), idą z niską integralnością: zapis poza katalogiem roboczym
+    /// odrzuca system, nawet gdy analiza czegoś nie zauważyła (dokument 25 §1, audyt A-07).
+    #[serde(default = "isolation_on")]
+    pub low_integrity: bool,
+}
+
+fn isolation_on() -> bool {
+    true
 }
 
 impl Default for ShellToolsConfig {
@@ -165,6 +174,7 @@ impl Default for ShellToolsConfig {
                 .iter()
                 .map(|s| (*s).to_owned())
                 .collect(),
+            low_integrity: true,
         }
     }
 }
