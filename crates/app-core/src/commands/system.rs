@@ -108,7 +108,10 @@ impl AppCore {
             Ok(gap) => gap,
             Err(e) => {
                 tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
-                Some(format!("kill-switch Brokera nie powiódł się: {}", e.message))
+                Some(format!(
+                    "kill-switch Brokera nie powiódł się: {}",
+                    e.message
+                ))
             }
         };
         if let Err(e) = self.inner.voice.stop_speech().await {

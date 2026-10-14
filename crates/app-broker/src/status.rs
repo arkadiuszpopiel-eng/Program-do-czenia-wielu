@@ -89,10 +89,7 @@ fn connected_text(mode: BrokerMode, window: bool) -> Option<LocalizedText> {
 
 fn render(p: &Parts) -> BrokerStatusView {
     let (state, detail) = match &p.link {
-        LinkState::Connected => (
-            BrokerLinkState::Connected,
-            connected_text(p.mode, p.window),
-        ),
+        LinkState::Connected => (BrokerLinkState::Connected, connected_text(p.mode, p.window)),
         LinkState::Connecting => (
             BrokerLinkState::Connecting,
             Some(LocalizedText::new(

@@ -340,8 +340,7 @@ impl<B: MemoryBackend> MemoryEngine<B> {
         let now = self.now();
         // Edycja nie jest zatwierdzeniem (audyt 2026-10-14, A-14): oczekująca propozycja po
         // poprawce dalej czeka na „Zatwierdź”; wpis zatwierdzony zostaje zatwierdzony.
-        let mut entry =
-            MemoryEntry::from_new(MemoryId(self.new_id("mem")), new, now, old.approved);
+        let mut entry = MemoryEntry::from_new(MemoryId(self.new_id("mem")), new, now, old.approved);
         entry.pinned = old.pinned;
         entry.version = old.version + 1;
         entry.supersedes = Some(old.id.clone());

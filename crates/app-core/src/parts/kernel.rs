@@ -16,9 +16,9 @@ use crate::compose::internal;
 use crate::error::AppError;
 use crate::events::EventHub;
 use crate::infra::catalog::ProviderCatalog;
-use app_modules::fx_http::{OfflineFx, ReqwestGet};
 use crate::options::{AppOptions, AppPaths};
 use crate::settings::{SettingsCatalog, keys};
+use app_modules::fx_http::{OfflineFx, ReqwestGet};
 use app_modules::secrets::system_secret_store;
 
 /// Jądro: wszystko, co nie jest modułem rejestru albo jest potrzebne przed modułami.
