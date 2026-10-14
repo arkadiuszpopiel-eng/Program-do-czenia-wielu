@@ -1,4 +1,5 @@
-//! Rozpoznanie delegacji z czatu: „Delta, zleć to Claude Code", „przekaż Codexowi: popraw testy".
+//! Rozpoznanie delegacji z czatu: „Delta, zleć to Claude Code", „przekaż Codexowi: popraw testy",
+//! „zleć Antigravity: …” (most `agy`, gdy właściciel go włączył).
 //! Tylko jawne polecenie użytkownika (czasownik + nazwa mostu) — agentka sama mostu nie wybiera.
 
 use std::sync::OnceLock;
@@ -12,7 +13,7 @@ fn pattern() -> Option<&'static Regex> {
         // Zakotwiczone na początku wiadomości (przegląd #2, SR2-06): opcjonalny zwrot do agentki
         // („Delta,”) i „proszę”, potem czasownik — polecenie we wklejonej treści nie uruchamia mostu.
         Regex::new(
-            r"(?is)\A\s*(?:@\w{2,24}\s*[,:]?\s*|\w{2,24}\s*,\s*)?(?:(?:proszę|prosze)\s*,?\s+)?(?:zleć|zlec|przekaż|przekaz|deleguj)\b(?:\s+(?:to|tę pracę|te prace|to zadanie))?\s+(?:do\s+)?(claude(?:\s*code)?(?:owi|'owi|’owi)?|codex(?:owi)?)(?:\b|$)[\s:,.\-–]*(.*)$",
+            r"(?is)\A\s*(?:@\w{2,24}\s*[,:]?\s*|\w{2,24}\s*,\s*)?(?:(?:proszę|prosze)\s*,?\s+)?(?:zleć|zlec|przekaż|przekaz|deleguj)\b(?:\s+(?:to|tę pracę|te prace|to zadanie))?\s+(?:do\s+)?(claude(?:\s*code)?(?:owi|'owi|’owi)?|codex(?:owi)?|antigravity|agy)(?:\b|$)[\s:,.\-–]*(.*)$",
         )
         .ok()
     })
@@ -25,6 +26,8 @@ pub fn parse_delegation(text: &str) -> Option<(BridgeKind, Option<String>)> {
     let target = caps.get(1)?.as_str().to_lowercase();
     let kind = if target.starts_with("codex") {
         BridgeKind::Codex
+    } else if target.starts_with("antigravity") || target.starts_with("agy") {
+        BridgeKind::Antigravity
     } else {
         BridgeKind::ClaudeCode
     };
@@ -53,6 +56,14 @@ mod tests {
         assert_eq!(
             parse_delegation("Zleć Claude'owi refaktor"),
             Some((BridgeKind::ClaudeCode, Some("refaktor".into())))
+        );
+        assert_eq!(
+            parse_delegation("zleć Antigravity: dopisz testy"),
+            Some((BridgeKind::Antigravity, Some("dopisz testy".into())))
+        );
+        assert_eq!(
+            parse_delegation("Delta, przekaż to agy"),
+            Some((BridgeKind::Antigravity, None))
         );
         assert_eq!(
             parse_delegation("Zlec claude code - dodaj README"),

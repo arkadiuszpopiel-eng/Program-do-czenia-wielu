@@ -58,7 +58,7 @@ export interface GuiScreenshot {
 
 // ── Terminal ────────────────────────────────────────────────────────────────────────────────────
 
-export type TerminalProfileId = 'shell' | 'cmd' | 'claude_login' | 'codex_login';
+export type TerminalProfileId = 'shell' | 'cmd' | 'claude_login' | 'codex_login' | 'agy_login';
 
 export interface TerminalSession {
   readonly id: number;

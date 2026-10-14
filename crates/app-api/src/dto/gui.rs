@@ -78,6 +78,7 @@ pub enum TerminalProfileId {
     Cmd,
     ClaudeLogin,
     CodexLogin,
+    AgyLogin,
 }
 
 /// Otwarty terminal (bez treści).

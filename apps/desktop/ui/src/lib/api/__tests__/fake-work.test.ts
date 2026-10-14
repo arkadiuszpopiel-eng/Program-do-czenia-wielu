@@ -162,7 +162,12 @@ describe('atrapa: Marszałek i mosty', () => {
     const { client } = setup();
     const cards = await client.bridges.list(false);
     expect(cards.find((c) => c.status === 'forbidden')?.can_enable).toBe(false);
-    await expect(client.bridges.setEnabled('agy-antigravity', true)).rejects.toThrow();
+    await expect(client.bridges.setEnabled('qwen-coding-plan', true)).rejects.toThrow();
+    // Antigravity: trasa szara — właściciel może ją świadomie włączyć.
+    expect((await client.bridges.setEnabled('agy-antigravity', true)).enabled).toBe(true);
+    const checked = await client.bridges.check('claude_code');
+    expect(checked.account?.state).toBe('logged_in');
+    expect(checked.account?.plan).toBe('Max');
     await expect(client.bridges.pin('claude_code', '9.9.9')).rejects.toThrow();
     const pinned = await client.bridges.pin('claude_code', '2.1.3');
     expect(pinned.version_ok).toBe(true);

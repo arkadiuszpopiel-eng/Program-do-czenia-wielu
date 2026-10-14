@@ -28,7 +28,7 @@
   let exited = $state<number | null | undefined>(undefined);
   let error = $state<string | null>(null);
   /** Logowanie do narzędzia dostawcy: okno prowadzi krok po kroku, zamiast zostawiać z terminalem. */
-  const login = $derived(request.profile === 'claude_login' || request.profile === 'codex_login');
+  const login = $derived(loginBridge(request.profile) !== null);
   const title = $derived(
     login
       ? t('term.loginTitle', { name: tk(`term.service.${request.profile}`) })

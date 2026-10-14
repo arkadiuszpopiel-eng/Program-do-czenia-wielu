@@ -2634,7 +2634,7 @@ export type TaskResultKind =
 export type TaskStateKind = 'pending' | 'ready' | 'running' | 'retry_wait' | 'paused' | 'done';
 
 /** Profil terminala. */
-export type TerminalProfileId = 'shell' | 'cmd' | 'claude_login' | 'codex_login';
+export type TerminalProfileId = 'shell' | 'cmd' | 'claude_login' | 'codex_login' | 'agy_login';
 
 /** Otwarty terminal (bez treści). */
 export interface TerminalSession {

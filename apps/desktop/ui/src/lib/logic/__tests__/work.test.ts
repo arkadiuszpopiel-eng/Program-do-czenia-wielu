@@ -5,6 +5,7 @@ import {
   binaryToB64,
   emptyDraft,
   isStandardAgent,
+  loginBridge,
   loginProfile,
   paramsTemplate,
   textToB64,
@@ -30,6 +31,9 @@ describe('pomocniki F8', () => {
   it('profil logowania mostu CLI', () => {
     expect(loginProfile('claude_code')).toBe('claude_login');
     expect(loginProfile('codex')).toBe('codex_login');
+    expect(loginProfile('antigravity')).toBe('agy_login');
+    expect(loginBridge('agy_login')).toBe('antigravity');
+    expect(loginBridge('shell')).toBeNull();
     expect(loginProfile('gemini')).toBeNull();
   });
 

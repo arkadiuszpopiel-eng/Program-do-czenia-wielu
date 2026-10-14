@@ -8,7 +8,7 @@
 //! - **Strumień** VT trafia wyłącznie do [`FrameSink`] przekazanego w `terminal_open` (powłoka:
 //!   `tauri::ipc::Channel<TerminalFrame>`) — nigdy do zdarzeń `alfa://events`, magistrali ani logów
 //!   (ten crate nie zależy od `tracing`); na magistralę idą tylko zdarzenia cyklu życia bez treści.
-//! - **Programy profili**: PowerShell 7 (albo 5.1), `cmd.exe`, `claude`/`codex` z wykrycia CLI mostów
+//! - **Programy profili**: PowerShell 7 (albo 5.1), `cmd.exe`, `claude`/`codex`/`agy` z wykrycia CLI mostów
 //!   (`CliProbe`) — sprawdzane przy każdym otwarciu (CLI zainstalowane później działa bez restartu).
 //!   Polecenie logowania wpisuje użytkownik; Alfa nie czyta strumienia ani poświadczeń CLI.
 
@@ -97,6 +97,7 @@ impl Programs {
                 .or_else(|| Some(root.join(r"System32\cmd.exe")).filter(|p| p.is_file())),
             claude: locate("claude"),
             codex: locate("codex"),
+            agy: locate("agy"),
         }
     }
 }
@@ -107,6 +108,7 @@ fn profile(p: TerminalProfileId) -> TerminalProfile {
         TerminalProfileId::Cmd => TerminalProfile::Cmd,
         TerminalProfileId::ClaudeLogin => TerminalProfile::ClaudeLogin,
         TerminalProfileId::CodexLogin => TerminalProfile::CodexLogin,
+        TerminalProfileId::AgyLogin => TerminalProfile::AgyLogin,
     }
 }
 
@@ -116,6 +118,7 @@ fn profile_id(p: TerminalProfile) -> TerminalProfileId {
         TerminalProfile::Cmd => TerminalProfileId::Cmd,
         TerminalProfile::ClaudeLogin => TerminalProfileId::ClaudeLogin,
         TerminalProfile::CodexLogin => TerminalProfileId::CodexLogin,
+        TerminalProfile::AgyLogin => TerminalProfileId::AgyLogin,
     }
 }
 

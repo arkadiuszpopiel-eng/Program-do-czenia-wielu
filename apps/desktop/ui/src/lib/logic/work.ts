@@ -44,6 +44,7 @@ export function binaryToB64(data: string): string {
 export function loginProfile(bridge: string): TerminalProfileId | null {
   if (bridge === 'claude_code') return 'claude_login';
   if (bridge === 'codex') return 'codex_login';
+  if (bridge === 'antigravity') return 'agy_login';
   return null;
 }
 
@@ -51,6 +52,7 @@ export function loginProfile(bridge: string): TerminalProfileId | null {
 export function loginBridge(profile: TerminalProfileId): string | null {
   if (profile === 'claude_login') return 'claude_code';
   if (profile === 'codex_login') return 'codex';
+  if (profile === 'agy_login') return 'antigravity';
   return null;
 }
 

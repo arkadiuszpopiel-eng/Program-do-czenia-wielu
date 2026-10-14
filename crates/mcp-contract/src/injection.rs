@@ -110,6 +110,8 @@ const SENSITIVE: &[&str] = &[
     "id_ed25519",
     ".claude",
     ".codex",
+    ".agy",
+    ".gemini",
     ".aws",
     ".env",
     "mcp.json",

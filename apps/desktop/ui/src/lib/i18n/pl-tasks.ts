@@ -177,6 +177,8 @@ export const plTasks = {
   'bridges.perDay': 'Najwięcej uruchomień na dobę',
   'bridges.login': 'Pokaż polecenie logowania',
   'bridges.checkLogin': 'Sprawdź logowanie',
+  'bridges.agyWarn':
+    'Uwaga: regulamin Antigravity (pkt 6) zabrania korzystania z usługi w połączeniu z produktami innymi niż Google. Włączając ten most, ryzykujesz ograniczenie lub zawieszenie konta Google. Alfa nie daje mu automatycznej zgody na polecenia — sam je odrzuca — i uruchamia go w piaskownicy.',
   'bridges.loginHint': 'Wpisz w terminalu (Alfa niczego nie wykonuje):',
   'bridges.loginNoTerminal': 'Nie udało się otworzyć terminala — otwórz go sam i wpisz:',
   'bridges.copy': 'Kopiuj polecenie',

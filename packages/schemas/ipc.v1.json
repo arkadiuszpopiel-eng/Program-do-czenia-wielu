@@ -9641,7 +9641,8 @@
         "shell",
         "cmd",
         "claude_login",
-        "codex_login"
+        "codex_login",
+        "agy_login"
       ],
       "type": "string"
     },

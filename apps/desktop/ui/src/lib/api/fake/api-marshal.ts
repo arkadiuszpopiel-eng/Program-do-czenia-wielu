@@ -179,6 +179,13 @@ function seedCards(): BridgeCard[] {
     }),
     card({ route_id: 'kimi-code-cli', name: 'Kimi Code CLI', provider: 'moonshot' }),
     card({
+      route_id: 'qwen-coding-plan',
+      name: 'Qwen Coding Plan',
+      provider: 'qwen',
+      status: 'forbidden',
+      forbidden: ['użycie poza oficjalnymi narzędziami'],
+    }),
+    card({
       route_id: 'agy-antigravity',
       name: 'Antigravity CLI (agy)',
       bridge: 'antigravity',

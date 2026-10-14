@@ -25,7 +25,7 @@ pub const MAX_SCHEMA_BYTES: usize = 16 * 1024;
 pub const COMPONENT_HEADER: [u8; 8] = [0x00, 0x61, 0x73, 0x6d, 0x0d, 0x00, 0x01, 0x00];
 
 /// Fragmenty (po złożeniu) wskazujące na próbę wstrzyknięcia w opisie dla modelu.
-const SUSPICIOUS: [&str; 15] = [
+const SUSPICIOUS: [&str; 17] = [
     "zignoruj",
     "ignore previous",
     "ignore all",
@@ -39,6 +39,8 @@ const SUSPICIOUS: [&str; 15] = [
     "poziom autonomii",
     "~/.claude",
     ".codex",
+    ".agy",
+    ".gemini",
     "secrets.read",
     "system.admin",
 ];

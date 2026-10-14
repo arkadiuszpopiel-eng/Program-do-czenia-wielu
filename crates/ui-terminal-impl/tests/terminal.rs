@@ -40,6 +40,11 @@ fn config() -> TerminalConfig {
             } else {
                 "/usr/bin/codex"
             })),
+            agy: Some(PathBuf::from(if cfg!(windows) {
+                r"C:\agy\bin\agy.exe"
+            } else {
+                "/usr/bin/agy"
+            })),
         },
         default_cwd: PathBuf::from("/"),
         max_sessions: 2,
@@ -140,6 +145,14 @@ fn close_kills_tree_and_process_exit_reaches_ui() {
     assert!(sink.wait(|_| !manager.list()[0].alive));
     manager.close(a).unwrap();
     assert!(pty.tree_killed(pid));
+    // Antigravity: sam `agy` (bez argumentów) — bez zapisanej sesji otwiera logowanie Google.
+    let g2 = manager
+        .open(req(TerminalProfile::AgyLogin), &g, sink.clone())
+        .unwrap();
+    let agy = pty.spawned().pop().unwrap();
+    assert!(agy.args.is_empty(), "{:?}", agy.args);
+    assert!(agy.program.to_string_lossy().contains("agy"));
+    manager.close(g2).unwrap();
     assert_eq!(
         manager.open(req(TerminalProfile::Cmd), &g, sink.clone()),
         Err(TerminalError::ProgramMissing("Cmd".into()))

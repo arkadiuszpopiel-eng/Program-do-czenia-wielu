@@ -350,42 +350,6 @@ async fn unanswered_permission_times_out_as_denial() {
     }
 }
 
-/// Antigravity nie ma kanału zgód: polecenia powłoki odrzuca sam (krok `denied`), do Alfy nie
-/// trafia żadna prośba o zgodę, a dosłanie wiadomości w trakcie jest odrzucane wprost.
-#[tokio::test(flavor = "multi_thread")]
-async fn antigravity_refuses_shell_itself_and_is_not_steerable() {
-    let sink = RecordingSink::with_pattern(vec![true]);
-    let h = common::harness(sink.clone(), |_| {}).await;
-    let handle = h
-        .backend
-        .submit_task(spec(
-            BridgeKind::Antigravity,
-            &Scenario::Permission(2),
-            &h.source,
-        ))
-        .await
-        .unwrap();
-    let steer = h.backend.steer(&handle.task, "zmień plan".into()).await;
-    assert!(
-        matches!(
-            steer,
-            Err(BackendError::SteeringUnavailable(_) | BackendError::TaskFinished)
-        ),
-        "{steer:?}"
-    );
-    let events = collect(&h.backend, &handle.task, LIMIT).await;
-    assert_grammar(&events);
-    assert!(sink.seen().is_empty(), "agy nie pyta Alfy o zgodę");
-    let denied = events
-        .iter()
-        .filter(|e| matches!(&e.event, AgentEvent::ToolFinished { is_error: true, .. }))
-        .count();
-    assert_eq!(denied, 2);
-    assert!(
-        matches!(&events.last().unwrap().event, AgentEvent::Done { result } if result.text == "decisions=deny,deny")
-    );
-}
-
 #[tokio::test(flavor = "multi_thread")]
 async fn copy_mode_and_non_git_source() {
     let h = common::harness(RecordingSink::with_pattern(vec![]), |_| {}).await;

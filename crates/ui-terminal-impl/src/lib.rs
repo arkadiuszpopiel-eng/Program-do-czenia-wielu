@@ -116,6 +116,7 @@ impl TerminalManager {
             TerminalProfile::Cmd => (p.cmd.as_ref(), &[]),
             TerminalProfile::ClaudeLogin => (p.claude.as_ref(), &[]),
             TerminalProfile::CodexLogin => (p.codex.as_ref(), &["login"]),
+            TerminalProfile::AgyLogin => (p.agy.as_ref(), &[]),
         };
         let path = path.ok_or_else(|| TerminalError::ProgramMissing(format!("{profile:?}")))?;
         Ok((path.clone(), args.iter().map(|a| (*a).to_owned()).collect()))

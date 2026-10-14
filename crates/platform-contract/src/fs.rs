@@ -97,9 +97,12 @@ pub enum KnownFolder {
 }
 
 /// Fragmenty ścieżek poświadczeń, których żadna implementacja nie może czytać (AGENTS.md).
-const CREDENTIAL_MARKERS: [&str; 6] = [
+const CREDENTIAL_MARKERS: [&str; 8] = [
     ".claude",
     ".codex",
+    // Antigravity CLI i Gemini CLI (sesja konta Google).
+    ".agy",
+    ".gemini",
     "Credentials",
     "Login Data",
     "Cookies",

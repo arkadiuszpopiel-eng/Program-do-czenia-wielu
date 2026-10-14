@@ -176,10 +176,16 @@
         }
       ],
       "privacy_tags": ["google-personal-may-train"],
-      "allowed": [],
+      "allowed": [
+        "agy -p na własnym koncie Google AI Pro po świadomym włączeniu przez właściciela (decyzja 2026-10-14, ostrzeżenie o regulaminie na karcie)",
+        "logowanie wyłącznie przez człowieka we wbudowanym terminalu (profil agy_login)",
+        "sprawdzanie stanu bez czytania danych logowania"
+      ],
       "forbidden": [
-        "użycie agy z Alfy do czasu wyjaśnienia sprzeczności (Gemini przez klucz API w adapterze generycznym)",
-        "przechwytywanie OAuth"
+        "włączanie trasy domyślnie albo bez ostrzeżenia",
+        "--dangerously-skip-permissions i inne automatyczne zgody",
+        "uruchamianie z harmonogramu bez jawnej zgody",
+        "przechwytywanie OAuth i czytanie ~/.agy, ~/.gemini"
       ],
       "cli_pinned_version": null,
       "enabled_by_default": false

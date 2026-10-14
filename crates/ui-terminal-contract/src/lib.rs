@@ -47,6 +47,8 @@ pub enum TerminalProfile {
     ClaudeLogin,
     /// Codex (`codex login`).
     CodexLogin,
+    /// Antigravity CLI (`agy`; pierwsze uruchomienie bez sesji otwiera logowanie kontem Google).
+    AgyLogin,
 }
 
 /// Programy profili (ścieżki bezwzględne; CLI mostów z wykrycia w `accounts-hub`).
@@ -60,6 +62,9 @@ pub struct TerminalPrograms {
     pub claude: Option<PathBuf>,
     /// `codex`.
     pub codex: Option<PathBuf>,
+    /// `agy` (Antigravity CLI).
+    #[serde(default)]
+    pub agy: Option<PathBuf>,
 }
 
 /// Konfiguracja (`[ui.terminal]`).

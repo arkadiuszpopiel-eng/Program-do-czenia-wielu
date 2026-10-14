@@ -93,7 +93,7 @@ pub const KERNEL_MARKERS: [&str; 27] = [
 ];
 
 /// Frazy (po `fold`) poleceń obejścia zabezpieczeń w promptach i opisach.
-pub const PROMPT_PHRASES: [&str; 29] = [
+pub const PROMPT_PHRASES: [&str; 31] = [
     "jadr",
     "podnies poziom",
     "podnies autonomi",
@@ -119,6 +119,8 @@ pub const PROMPT_PHRASES: [&str; 29] = [
     "hasla",
     ".claude",
     ".codex",
+    ".agy",
+    ".gemini",
     "ciasteczk",
     "cookies",
     "ignoruj poprzednie",
@@ -129,7 +131,7 @@ pub const PROMPT_PHRASES: [&str; 29] = [
 pub const PROMPT_TOKENS: [&str; 5] = ["l4", "sudo", "root", "admin", "administrator"];
 
 /// Fragmenty zakazanych zakresów zapisu (po normalizacji: małe litery, `/`).
-pub const FORBIDDEN_PATH_PARTS: [&str; 14] = [
+pub const FORBIDDEN_PATH_PARTS: [&str; 16] = [
     "%localappdata%/alfa",
     "appdata/local/alfa",
     "/alfa/broker",
@@ -140,6 +142,8 @@ pub const FORBIDDEN_PATH_PARTS: [&str; 14] = [
     "/.ssh",
     "/.claude",
     "/.codex",
+    "/.agy",
+    "/.gemini",
     "/.gnupg",
     "microsoft/credentials",
     "microsoft/protect",

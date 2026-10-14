@@ -63,6 +63,7 @@ fn programs(claude: bool) -> Programs {
         cmd: None,
         claude: claude.then(|| program(r"C:\npm\claude.exe", "/usr/bin/claude")),
         codex: None,
+        agy: None,
     })
 }
 
