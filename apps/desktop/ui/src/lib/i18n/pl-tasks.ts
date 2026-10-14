@@ -176,6 +176,7 @@ export const plTasks = {
     'Most uruchomiony z harmonogramu działa bez Ciebie przy komputerze — na Twoim koncie i według regulaminu dostawcy. Wyzwalacze zdarzeniowe nigdy nie uruchamiają mostów.',
   'bridges.perDay': 'Najwięcej uruchomień na dobę',
   'bridges.login': 'Pokaż polecenie logowania',
+  'bridges.checkLogin': 'Sprawdź logowanie',
   'bridges.loginHint': 'Wpisz w terminalu (Alfa niczego nie wykonuje):',
   'bridges.loginNoTerminal': 'Nie udało się otworzyć terminala — otwórz go sam i wpisz:',
   'bridges.copy': 'Kopiuj polecenie',

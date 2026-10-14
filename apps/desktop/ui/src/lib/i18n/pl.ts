@@ -19,6 +19,7 @@ import { plWork } from './pl-work';
 import { plFiles } from './pl-files';
 import { plCameras } from './pl-cameras';
 import { plRouting } from './pl-routing';
+import { plConnections } from './pl-connections';
 
 export const pl = {
   ...plApp,
@@ -39,6 +40,7 @@ export const pl = {
   ...plFiles,
   ...plCameras,
   ...plRouting,
+  ...plConnections,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

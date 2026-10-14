@@ -11,7 +11,7 @@ use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 use accounts_hub_contract::{
-    CliBridge, CliProbe, EnvSource, SecretString, detect_cli_bridges_with,
+    CliBridge, CliOutput, CliProbe, EnvSource, SecretString, detect_cli_bridges_with,
 };
 
 /// Zmienne przekazywane do `--version` (reszta środowiska, w tym klucze API, jest czyszczona).
@@ -95,25 +95,59 @@ impl CliProbe for SystemCliProbe {
             .find(|candidate| is_executable(candidate))
     }
 
+    fn run_output(&self, path: &Path, args: &[&str]) -> Option<CliOutput> {
+        let (success, out, err) = self.run(path, args)?;
+        let mut text = String::from_utf8_lossy(&out).into_owned();
+        if !err.is_empty() {
+            text.push('\n');
+            text.push_str(&String::from_utf8_lossy(&err));
+        }
+        Some(CliOutput { success, text })
+    }
+
     fn version_output(&self, path: &Path) -> Option<String> {
+        let (success, out, _) = self.run(path, &["--version"])?;
+        success.then(|| String::from_utf8_lossy(&out).into_owned())
+    }
+}
+
+impl SystemCliProbe {
+    /// Uruchamia program z argumentami: czyste środowisko (tylko [`CHILD_ENV_ALLOWLIST`]),
+    /// limit czasu, wyjście ograniczone do [`MAX_VERSION_OUTPUT`] bajtów na strumień.
+    fn run(&self, path: &Path, args: &[&str]) -> Option<(bool, Vec<u8>, Vec<u8>)> {
         let mut cmd = Command::new(path);
-        cmd.arg("--version")
+        cmd.args(args)
             .env_clear()
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
-            .stderr(Stdio::null());
+            .stderr(Stdio::piped());
         for name in CHILD_ENV_ALLOWLIST {
             if let Some(value) = std::env::var_os(name) {
                 cmd.env(name, value);
             }
         }
         let mut child = cmd.spawn().ok()?;
-        let stdout = child.stdout.take()?;
-        let reader = std::thread::spawn(move || {
-            let mut buf = Vec::new();
-            stdout.take(MAX_VERSION_OUTPUT).read_to_end(&mut buf).ok()?;
-            Some(buf)
-        });
+        let read = |stream: Option<Box<dyn Read + Send>>| {
+            std::thread::spawn(move || {
+                let mut buf = Vec::new();
+                if let Some(stream) = stream {
+                    let _ = stream.take(MAX_VERSION_OUTPUT).read_to_end(&mut buf);
+                }
+                buf
+            })
+        };
+        let stdout = read(
+            child
+                .stdout
+                .take()
+                .map(|s| Box::new(s) as Box<dyn Read + Send>),
+        );
+        let stderr = read(
+            child
+                .stderr
+                .take()
+                .map(|s| Box::new(s) as Box<dyn Read + Send>),
+        );
         let deadline = Instant::now() + self.timeout;
         let status = loop {
             match child.try_wait() {
@@ -130,9 +164,10 @@ impl CliProbe for SystemCliProbe {
         };
         // Po przekroczeniu czasu nie czekamy na wątek czytający: wnuk procesu (np. skrypt
         // powłoki) może trzymać otwarty potok; wątek zakończy się sam po jego zamknięciu.
-        status.filter(|s| s.success())?;
-        let output = reader.join().ok().flatten()?;
-        Some(String::from_utf8_lossy(&output).into_owned())
+        let status = status?;
+        let out = stdout.join().unwrap_or_default();
+        let err = stderr.join().unwrap_or_default();
+        Some((status.success(), out, err))
     }
 }
 

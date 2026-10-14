@@ -66,8 +66,20 @@ pub trait EnvSource: Send + Sync {
     fn var(&self, name: &str) -> Option<SecretString>;
 }
 
-/// Mosty CLI wykrywane w F1 (kolejne — Grok Build, Kimi, agy — od F4).
-pub const KNOWN_CLI_BRIDGES: [&str; 2] = ["claude", "codex"];
+/// Mosty CLI wykrywane przez Alfę: Claude Code, Codex i Antigravity CLI (`agy`, następca
+/// Gemini CLI dla kont Google AI Pro).
+pub const KNOWN_CLI_BRIDGES: [&str; 3] = ["claude", "codex", "agy"];
+
+/// Wynik krótkiego polecenia CLI (np. stanu logowania): czy zakończyło się sukcesem i co
+/// wypisało (standardowe wyjście, potem błędy). Wywołujący wyciąga z tego tylko stan — bez
+/// zapisywania adresów, identyfikatorów ani tokenów.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CliOutput {
+    /// Kod wyjścia 0.
+    pub success: bool,
+    /// Wyjście (stdout, potem stderr), najwyżej kilka kB.
+    pub text: String,
+}
 
 /// Wykryty most CLI: tylko nazwa, ścieżka programu i wersja. Alfa nie czyta katalogów
 /// konfiguracji ani tokenów CLI — logowanie wykonuje użytkownik w terminalu ConPTY (F4).
@@ -88,6 +100,12 @@ pub trait CliProbe: Send + Sync {
 
     /// Uruchamia `<program> --version` z limitem czasu i zwraca standardowe wyjście.
     fn version_output(&self, path: &Path) -> Option<String>;
+
+    /// Uruchamia `<program> <args…>` (czyste środowisko, limit czasu) — polecenia tylko do
+    /// odczytu stanu, np. `claude auth status`. `None` — nie dało się uruchomić albo minął czas.
+    fn run_output(&self, _path: &Path, _args: &[&str]) -> Option<CliOutput> {
+        None
+    }
 }
 
 /// Wykrywa znane mosty CLI przez podany port.

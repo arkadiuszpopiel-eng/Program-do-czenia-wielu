@@ -4,7 +4,7 @@
 
 export const SETTINGS_GROUPS = [
   { id: 'basics', pages: ['general', 'appearance', 'language', 'shortcuts', 'notifications'] },
-  { id: 'models', pages: ['providers', 'api', 'bridges', 'models', 'costs', 'router'] },
+  { id: 'models', pages: ['connections', 'providers', 'api', 'bridges', 'models', 'costs', 'router'] },
   { id: 'voice', pages: ['voice', 'cameras'] },
   { id: 'agents', pages: ['agents', 'builder', 'skills', 'plugins', 'triggers', 'marshal'] },
   { id: 'safety', pages: ['permissions', 'computer'] },

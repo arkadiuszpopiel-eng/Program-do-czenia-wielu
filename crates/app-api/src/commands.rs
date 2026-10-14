@@ -151,6 +151,7 @@ macro_rules! with_commands {
             bridges_set_schedule(bridge: String, per_day: u32) -> $crate::dto::BridgeCard;
             bridges_pin(bridge: String, version: Option<String>) -> $crate::dto::BridgeCard;
             bridges_open_login(bridge: String) -> $crate::dto::BridgeLogin;
+            bridges_check(bridge: String) -> $crate::dto::BridgeCard;
             gui_status() -> $crate::dto::GuiStatus;
             gui_screenshot() -> Option<$crate::dto::GuiScreenshot>;
             gui_stop() -> $crate::dto::GuiStatus;
@@ -267,6 +268,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 234);
+        assert_eq!(super::COMMANDS.len(), 235);
     }
 }

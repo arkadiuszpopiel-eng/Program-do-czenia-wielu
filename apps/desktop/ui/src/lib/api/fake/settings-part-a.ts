@@ -62,6 +62,7 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
       'single',
     ),
   ]),
+  page('connections', L('Stan połączeń', 'Connection status'), 1, [], { custom: 'connections' }),
   page(
     'providers',
     L('Konta i klucze API', 'API accounts and keys'),

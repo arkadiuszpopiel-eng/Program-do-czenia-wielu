@@ -1,11 +1,13 @@
 //! `alfa-fake-agent-cli` — fałszywe CLI do testów mostów (bez prawdziwych `claude`/`codex`):
 //! - `--version` → [`io::FAKE_VERSION`];
 //! - `app-server` → atrapa `codex app-server` (JSON-RPC po stdio);
+//! - `-p ... --sandbox` → atrapa `agy -p <polecenie> --output-format stream-json` (Antigravity);
 //! - `-p ...` → atrapa `claude -p --output-format stream-json --input-format stream-json`;
 //! - `--alfa-fake-sleep` → długi sen (proces-wnuk do testu zabijania drzewa).
 //!
 //! Zachowanie wybiera znacznik scenariusza w poleceniu (`[alfa-fake:<nazwa>]`).
 
+mod agy;
 mod claude;
 mod codex;
 mod io;
@@ -22,6 +24,8 @@ fn main() -> ExitCode {
         0
     } else if args.first().map(String::as_str) == Some("app-server") {
         codex::run()
+    } else if args.iter().any(|a| a == "--sandbox") {
+        agy::run(&args)
     } else if args.iter().any(|a| a == "-p" || a == "--print") {
         claude::run(&args)
     } else {

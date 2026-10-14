@@ -97,14 +97,16 @@ pub async fn compliance() -> Arc<FakeCompliance> {
     .unwrap();
     let today = chrono::NaiveDate::from_ymd_opt(2026, 10, 1).unwrap();
     let c = Arc::new(FakeCompliance::new(registry, Vec::new(), today));
-    let codex = RouteId::new("codex-cli").unwrap();
-    c.set_enabled(&codex, true, ChangeOrigin::User)
-        .await
-        .unwrap();
+    // Szare trasy włączone przez użytkownika: Codex i Antigravity (domyślnie wyłączona).
+    for route in ["codex-cli", "agy-antigravity"] {
+        c.set_enabled(&RouteId::new(route).unwrap(), true, ChangeOrigin::User)
+            .await
+            .unwrap();
+    }
     c
 }
 
-/// Konfiguracja z oboma mostami wskazującymi fałszywe CLI.
+/// Konfiguracja ze wszystkimi mostami wskazującymi fałszywe CLI.
 pub fn config(base: &Path) -> BridgeConfig {
     let pin = CliPin {
         versions: vec![FAKE_VERSION.into()],
@@ -112,7 +114,8 @@ pub fn config(base: &Path) -> BridgeConfig {
     };
     let mut cfg = BridgeConfig::new(base.join("runtime"))
         .with_bridge(BridgeKind::ClaudeCode, fake_cli(), pin.clone())
-        .with_bridge(BridgeKind::Codex, fake_cli(), pin);
+        .with_bridge(BridgeKind::Codex, fake_cli(), pin.clone())
+        .with_bridge(BridgeKind::Antigravity, fake_cli(), pin);
     cfg.max_line_bytes = 1024 * 1024;
     cfg
 }

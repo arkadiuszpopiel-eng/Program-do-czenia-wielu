@@ -37,7 +37,7 @@ pub use agents::{
     RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,
     VoiceStatus, WorkdirChoice,
 };
-pub use bridges::{BridgeCard, BridgeLogin, BridgeSource};
+pub use bridges::{BridgeAccount, BridgeAccountState, BridgeCard, BridgeLogin, BridgeSource};
 pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView};
 pub use cameras::{
     CAMERA_FRAME_MAX_SIDE, CAMERA_FRAME_MIN_SIDE, CameraFrame, CameraKindView, CameraStateView,

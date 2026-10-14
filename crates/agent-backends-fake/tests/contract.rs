@@ -1,5 +1,5 @@
 //! Współdzielone testy kontraktowe `AgentBackend`: na atrapie w pamięci i na prawdziwych mostach
-//! (Claude Code, Codex) z fałszywym CLI i atrapą hosta MCP.
+//! (Claude Code, Codex, Antigravity) z fałszywym CLI i atrapą hosta MCP.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -40,6 +40,19 @@ async fn codex_bridge_passes_contract() {
     let source = common::git_repo(&common::temp_dir("src-codex"));
     let env = Env {
         bridge: BridgeKind::Codex,
+        source,
+    };
+    run_all(env, |sink| async move {
+        common::harness(sink, |_| {}).await.backend
+    })
+    .await;
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn antigravity_bridge_passes_contract() {
+    let source = common::git_repo(&common::temp_dir("src-agy"));
+    let env = Env {
+        bridge: BridgeKind::Antigravity,
         source,
     };
     run_all(env, |sink| async move {

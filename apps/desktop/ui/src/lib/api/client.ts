@@ -319,6 +319,8 @@ export interface BridgesApi {
   pin(bridge: string, version: string | null): Promise<BridgeCard>;
   /** Intencja: terminal w katalogu domowym + polecenie logowania do skopiowania. */
   openLogin(bridge: string): Promise<BridgeLogin>;
+  /** Czy narzędzie jest zainstalowane i zalogowane (polecenie stanu CLI; wynik zostaje na karcie). */
+  check(bridge: string): Promise<BridgeCard>;
 }
 
 export interface AlfaClient {

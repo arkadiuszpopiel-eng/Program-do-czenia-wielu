@@ -14,7 +14,7 @@ use agent_backends_contract::{
 };
 use agent_backends_impl::{BackendDeps, BridgeBackend, BridgeConfig, GitWorkspace};
 use app_api::AppError;
-use app_api::dto::{BridgeCard, BridgeLogin};
+use app_api::dto::{BridgeAccount, BridgeCard, BridgeLogin};
 use app_api::ports::ShellPort;
 use compliance_contract::{ChangeOrigin, Compliance, RouteId, RouteMode, RouteOrigin};
 use core_bus_contract::EventBus;
@@ -59,6 +59,8 @@ pub struct BridgesApp {
     p: BridgesParts,
     current: Mutex<Option<Arc<dyn AgentBackend>>>,
     detected: Mutex<Option<(Instant, Vec<CliBridge>)>>,
+    /// Ostatnie sprawdzenie konta każdego mostu (w pamięci; tylko stan, bez danych konta).
+    accounts: Mutex<BTreeMap<BridgeKind, BridgeAccount>>,
 }
 
 fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -76,6 +78,7 @@ impl BridgesApp {
             p: parts,
             current: Mutex::new(None),
             detected: Mutex::new(None),
+            accounts: Mutex::new(BTreeMap::new()),
         }
     }
 
@@ -147,15 +150,48 @@ impl BridgesApp {
                 Some(k) => (self.pins(k).await, self.schedule(k).await),
                 None => (Vec::new(), 0),
             };
-            out.push(card(CardInput {
+            let mut c = card(CardInput {
                 view: &view,
                 route: route.as_ref(),
                 detected: found,
                 pinned,
                 schedule,
-            }));
+            });
+            c.account = kind.and_then(|k| lock(&self.accounts).get(&k).cloned());
+            out.push(c);
         }
         out
+    }
+
+    /// `bridges_check`: świeże wykrycie i stan logowania mostu (oficjalne polecenie stanu
+    /// narzędzia — bez czytania danych logowania); wynik zostaje na karcie.
+    pub async fn check(&self, bridge: &str) -> Result<BridgeCard, AppError> {
+        let kind = bridge_from_key(bridge)
+            .ok_or_else(|| AppError::invalid(format!("Nieznany most „{bridge}”.")))?;
+        let found = self
+            .detected(true)
+            .await
+            .into_iter()
+            .find(|d| d.name == kind.program());
+        let account = match (&found, crate::login::status_args(kind)) {
+            (None, _) => crate::login::not_installed(kind),
+            (Some(_), None) => crate::login::check(kind, None),
+            (Some(d), Some(args)) => {
+                let probe = self.p.probe.clone();
+                let path = d.path.clone();
+                let out = tokio::task::spawn_blocking(move || probe.run_output(&path, args))
+                    .await
+                    .ok()
+                    .flatten();
+                crate::login::check(kind, out.as_ref())
+            }
+        };
+        lock(&self.accounts).insert(kind, account);
+        self.cards()
+            .await
+            .into_iter()
+            .find(|c| c.bridge.as_deref() == Some(bridge))
+            .ok_or_else(|| AppError::not_found(format!("Brak karty mostu „{bridge}”.")))
     }
 
     async fn card_for(&self, route: &str) -> Result<BridgeCard, AppError> {

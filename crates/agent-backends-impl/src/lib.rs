@@ -12,6 +12,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+pub mod agy;
 mod approvals;
 mod backend;
 pub mod claude;

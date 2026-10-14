@@ -9,6 +9,7 @@
   import { Button, Checkbox, Switch, TextField } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { BridgeCard, BridgeLogin } from '../../../api/types-tasks';
+  import BridgeAccountBox from './BridgeAccountBox.svelte';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import { loginProfile } from '../../../logic/work';
   import Loading from '../../../components/shell/Loading.svelte';
@@ -36,8 +37,14 @@
     }
   }
 
+  // Po wczytaniu sprawdzamy po cichu logowanie wykrytych narzędzi, których jeszcze nie sprawdzano.
   $effect(() => {
-    void load();
+    void load().then(() => {
+      for (const c of cards) {
+        if (!c.bridge || !c.detected || c.account) continue;
+        app.client.bridges.check(c.bridge).then(replace, () => undefined);
+      }
+    });
   });
 
   function replace(card: BridgeCard) {
@@ -53,6 +60,12 @@
       cards = cards.map((c) => ({ ...c }));
     }
   }
+
+  // Wynik sprawdzenia po „Gotowe” w oknie logowania trafia od razu na kartę.
+  $effect(() => {
+    const card = app.work.bridgeChecked;
+    if (card) replace(card);
+  });
 
   async function login(bridge: string) {
     try {
@@ -124,6 +137,7 @@
           <p class={card.version_ok ? 'ok' : 'warn'}>
             {card.version_ok ? t('bridges.versionOk') : t('bridges.versionBad')}
           </p>
+          <BridgeAccountBox {card} onchange={replace} />
         {/if}
         {#if card.sources.length}
           <details>

@@ -105,6 +105,7 @@ pub fn spec(command: &str) -> Option<Spec> {
         "bridges_set_schedule" => (vec![("bridge", s), ("perDay", roundtrip::<u32>)], card),
         "bridges_pin" => (vec![("bridge", s), ("version", os)], card),
         "bridges_open_login" => (vec![("bridge", s)], roundtrip::<BridgeLogin>),
+        "bridges_check" => (vec![("bridge", s)], card),
         "broker_status" => (vec![], roundtrip::<BrokerStatusView>),
         other => {
             return memory(other)

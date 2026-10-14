@@ -2,7 +2,12 @@
 // przez użytkownika, cofnięcie, raport dnia) i karty zgodności mostów CLI (wykrycie, wersja
 // przypięta, zgoda na harmonogram, „Zaloguj w terminalu" — polecenie do skopiowania).
 import type { AlfaClient } from '../client';
-import type { BridgeCard, MarshalProposalInfo, MarshalRuleInfo } from '../types-tasks';
+import type {
+  BridgeAccount,
+  BridgeCard,
+  MarshalProposalInfo,
+  MarshalRuleInfo,
+} from '../types-tasks';
 import type { FakeCore } from './core';
 import type { FakeTasks } from './api-tasks';
 
@@ -138,6 +143,7 @@ function seedCards(): BridgeCard[] {
     can_enable: false,
     schedule_per_day: 0,
     login_command: null,
+    account: null,
     ...patch,
   });
   return [
@@ -175,11 +181,35 @@ function seedCards(): BridgeCard[] {
     card({
       route_id: 'agy-antigravity',
       name: 'Antigravity CLI (agy)',
+      bridge: 'antigravity',
       provider: 'google',
-      status: 'forbidden',
-      forbidden: ['automatyzacja poza IDE'],
+      program: 'agy',
+      detected: true,
+      path: 'C:\\Users\\Ty\\AppData\\Local\\agy\\bin\\agy.exe',
+      version: '1.2.11',
+      can_enable: true,
+      forbidden: ['korzystanie z usługi w produktach innych niż Google (regulamin, pkt 6)'],
+      login_command: 'agy',
     }),
   ];
+}
+
+/** Atrapa `bridges_check`: Claude zalogowany (plan Max), brak Codexa, Antigravity bez stanu. */
+function fakeAccount(c: BridgeCard, at: string): BridgeAccount {
+  const base = { plan: null, method: null, checked_at: at };
+  if (!c.detected) {
+    return { ...base, state: 'not_installed', detail: `${c.name} nie jest zainstalowany.` };
+  }
+  if (c.bridge === 'claude_code') {
+    return {
+      ...base,
+      state: 'logged_in',
+      plan: 'Max',
+      method: 'konto claude.ai',
+      detail: 'Zalogowano — plan Max. Alfa może zlecać zadania Claude Code.',
+    };
+  }
+  return { ...base, state: 'unknown', detail: 'Narzędzie nie ma polecenia stanu logowania.' };
 }
 
 export function bridgesApi(core: FakeCore): AlfaClient['bridges'] {
@@ -220,6 +250,8 @@ export function bridgesApi(core: FakeCore): AlfaClient['bridges'] {
         const pinned = version === null ? [] : [version];
         return { pinned, version_ok: c.version !== null && pinned.includes(c.version) };
       }),
+    check: (bridge) =>
+      update(bridge, (c) => ({ account: fakeAccount(c, new Date().toISOString()) })),
     openLogin: (bridge) => {
       const c = cards.find((x) => x.bridge === bridge);
       if (!c?.login_command) return Promise.reject(new Error(`Nieznany most „${bridge}”.`));

@@ -135,6 +135,17 @@
   "upcoming": []
  },
  {
+  "id": "connections",
+  "label": {
+   "pl": "Stan połączeń",
+   "en": "Connection status"
+  },
+  "wave": 1,
+  "custom": "connections",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "providers",
   "label": {
    "pl": "Konta i klucze API",

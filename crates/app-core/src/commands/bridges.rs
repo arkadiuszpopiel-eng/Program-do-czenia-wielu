@@ -42,6 +42,12 @@ impl AppCore {
         self.inner.bridges.pin(&bridge, version).await
     }
 
+    /// `bridges_check`: czy narzędzie jest zainstalowane i zalogowane (oficjalne polecenie stanu
+    /// CLI, bez czytania danych logowania); wynik zostaje na karcie mostu.
+    pub async fn bridges_check(&self, bridge: String) -> Result<BridgeCard, AppError> {
+        self.inner.bridges.check(&bridge).await
+    }
+
     /// `bridges_open_login`: terminal w katalogu domowym + polecenie logowania do skopiowania.
     pub async fn bridges_open_login(&self, bridge: String) -> Result<BridgeLogin, AppError> {
         let bridges = self.inner.bridges.clone();

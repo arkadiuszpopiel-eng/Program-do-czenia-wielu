@@ -202,6 +202,7 @@ export class TauriAlfaClient implements AlfaClient {
     setSchedule: (bridge, perDay) => call('bridges_set_schedule', { bridge, perDay }),
     pin: (bridge, version) => call('bridges_pin', { bridge, version }),
     openLogin: (bridge) => call('bridges_open_login', { bridge }),
+    check: (bridge) => call('bridges_check', { bridge }),
   };
 
   readonly gui: AlfaClient['gui'] = {

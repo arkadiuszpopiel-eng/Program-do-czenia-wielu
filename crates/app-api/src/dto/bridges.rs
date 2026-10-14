@@ -49,6 +49,39 @@ pub struct BridgeCard {
     pub schedule_per_day: u32,
     /// Polecenie logowania do wpisania przez użytkownika w terminalu.
     pub login_command: Option<String>,
+    /// Ostatnie sprawdzenie konta (`bridges_check`); `None` — jeszcze nie sprawdzano.
+    #[serde(default)]
+    pub account: Option<BridgeAccount>,
+}
+
+/// Stan konta mostu CLI.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum BridgeAccountState {
+    /// Zalogowano — Alfa może zlecać zadania (gdy most jest włączony).
+    LoggedIn,
+    /// Narzędzie jest, ale nikt się nie zalogował.
+    LoggedOut,
+    /// Narzędzie nie podaje stanu bez wywołania modelu (Antigravity).
+    Unknown,
+    /// Narzędzia nie ma na komputerze.
+    NotInstalled,
+    /// Polecenie stanu się nie powiodło.
+    Error,
+}
+
+/// Wynik sprawdzenia konta mostu — tylko stan, sposób logowania i plan (bez e-maila, tokenów).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct BridgeAccount {
+    pub state: BridgeAccountState,
+    /// Plan podany przez narzędzie (np. „Max”).
+    pub plan: Option<String>,
+    /// Sposób logowania (np. „konto claude.ai”).
+    pub method: Option<String>,
+    /// Zdanie dla użytkownika: co działa albo co zrobić.
+    pub detail: String,
+    /// Kiedy sprawdzono.
+    pub checked_at: super::Iso8601,
 }
 
 /// Wynik „Zaloguj w terminalu": terminal otwarty w katalogu domowym, polecenie do skopiowania

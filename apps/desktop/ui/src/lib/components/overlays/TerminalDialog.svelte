@@ -9,7 +9,9 @@
   import { Dialog } from 'bits-ui';
   import { Button } from '@alfa/ui-kit';
   import type { TerminalFrame, TerminalSession } from '../../api/types-work';
-  import { b64ToBytes, binaryToB64, textToB64 } from '../../logic/work';
+  import { loginResult } from '../../logic/connections';
+  import { b64ToBytes, binaryToB64, loginBridge, textToB64 } from '../../logic/work';
+  import { showError } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import type { TerminalRequest } from '../../state/work.svelte';
   import { createTerminal, type TerminalHost } from './terminal-host';
@@ -93,6 +95,28 @@
 
   function close() {
     app.work.closeTerminal();
+    // Po logowaniu od razu sprawdzamy stan konta — właściciel widzi, czy Alfa może korzystać
+    // z narzędzia (np. „zalogowano · plan Max”), zamiast zgadywać po zamknięciu okna.
+    const bridge = loginBridge(request.profile);
+    if (bridge) void checkLogin(bridge);
+  }
+
+  async function checkLogin(bridge: string) {
+    try {
+      const card = await app.client.bridges.check(bridge);
+      app.work.bridgeChecked = card;
+      const r = loginResult(card);
+      const plan = r.withPlan ? t('conn.loginResult.planSuffix', { plan: r.vars.plan ?? '' }) : '';
+      app.toasts.show({
+        kind: r.kind,
+        message: tk(r.key, { ...r.vars, plan }),
+        actionLabel: t('conn.openPage'),
+        onAction: () => app.openSettings('connections'),
+        timeoutMs: 12_000,
+      });
+    } catch (error) {
+      showError(app.toasts, error);
+    }
   }
 
   /** Ponowna próba: nowe żądanie tego samego profilu uruchamia terminal od początku. */

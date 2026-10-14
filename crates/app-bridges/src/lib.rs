@@ -14,6 +14,7 @@
 mod app;
 pub mod cards;
 mod delegate;
+pub mod login;
 mod mcp;
 
 use std::collections::BTreeMap;

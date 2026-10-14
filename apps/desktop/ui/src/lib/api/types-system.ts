@@ -59,6 +59,7 @@ export interface SettingDef {
 
 /** Strona o specjalnym widoku w UI (reszta renderowana generycznie z `settings`). */
 export type SettingsCustomPage =
+  | 'connections'
   | 'providers'
   | 'api'
   | 'router'

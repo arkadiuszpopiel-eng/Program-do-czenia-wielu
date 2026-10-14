@@ -118,5 +118,7 @@ export async function runWork(
   await both('bridges', 'pin', 'claude_code', null);
   await both('bridges', 'setSchedule', 'claude_code', 2);
   await both('bridges', 'openLogin', 'claude_code');
+  await both('bridges', 'check', 'claude_code');
+  await both('bridges', 'check', 'antigravity');
   await flush();
 }

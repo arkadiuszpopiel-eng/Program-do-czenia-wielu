@@ -1,5 +1,6 @@
 // Stan F8 w oknie głównym: computer use (kto steruje — wskaźnik w pasku tytułu, panel „Ekran"),
 // prośba o otwarcie wbudowanego terminala (dialog ładowany leniwie) i skrót „Zdrowia systemu".
+import type { BridgeCard } from '../api/types-tasks';
 import type { GuiStatus, HealthOverall, TerminalProfileId } from '../api/types-work';
 
 export interface TerminalRequest {
@@ -12,6 +13,8 @@ export class WorkState {
   gui = $state<GuiStatus | null>(null);
   terminal = $state<TerminalRequest | null>(null);
   health = $state<{ overall: HealthOverall; pending: number } | null>(null);
+  /** Ostatnio sprawdzona karta mostu (po logowaniu) — strony mostów i stanu połączeń ją podmieniają. */
+  bridgeChecked = $state<BridgeCard | null>(null);
   private seq = 0;
 
   /** Agentka steruje teraz ekranem (i właściciel nie przejął sterowania). */

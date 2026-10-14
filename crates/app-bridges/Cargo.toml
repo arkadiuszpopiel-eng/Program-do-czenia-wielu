@@ -27,6 +27,7 @@ core-config-contract.workspace = true
 core-bus-contract.workspace = true
 platform-contract.workspace = true
 async-trait.workspace = true
+chrono.workspace = true
 regex.workspace = true
 serde_json.workspace = true
 tokio.workspace = true

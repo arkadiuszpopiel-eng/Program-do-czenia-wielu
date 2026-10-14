@@ -375,12 +375,18 @@ where
 {
     let none = RecordingSink::with_pattern(Vec::new());
     ok_flow(&factory(none.clone()).await, &env).await;
-    let alternating = RecordingSink::with_pattern(vec![true, false]);
-    permissions_reach_sink(&factory(alternating.clone()).await, &alternating, &env).await;
-    approve_through_backend(&factory(none.clone()).await, &env).await;
+    // Zgody i sterowanie — tylko mosty, które mają taki kanał (`BridgeKind::asks_approval`,
+    // `steerable`); Antigravity odrzuca polecenia powłoki sam i dostaje polecenie jednorazowo.
+    if env.bridge.asks_approval() {
+        let alternating = RecordingSink::with_pattern(vec![true, false]);
+        permissions_reach_sink(&factory(alternating.clone()).await, &alternating, &env).await;
+        approve_through_backend(&factory(none.clone()).await, &env).await;
+    }
     cancel_within_budget(&factory(none.clone()).await, &env).await;
     origins_refused(&factory(none.clone()).await, &env).await;
     unknown_ids(&factory(none.clone()).await).await;
     crash_is_error(&factory(none.clone()).await, &env).await;
-    steering_reaches_task(&factory(none).await, &env).await;
+    if env.bridge.steerable() {
+        steering_reaches_task(&factory(none).await, &env).await;
+    }
 }

@@ -19,6 +19,7 @@ pub fn bridge_key(kind: BridgeKind) -> &'static str {
     match kind {
         BridgeKind::ClaudeCode => "claude_code",
         BridgeKind::Codex => "codex",
+        BridgeKind::Antigravity => "antigravity",
     }
 }
 
@@ -32,6 +33,8 @@ pub fn login_command(kind: BridgeKind) -> &'static str {
     match kind {
         BridgeKind::ClaudeCode => "claude /login",
         BridgeKind::Codex => "codex login",
+        // Pierwsze uruchomienie `agy` bez zapisanej sesji samo otwiera logowanie Google.
+        BridgeKind::Antigravity => "agy",
     }
 }
 
@@ -129,6 +132,7 @@ pub fn card(input: CardInput<'_>) -> BridgeCard {
         can_enable: !forbidden && bridge.is_some(),
         schedule_per_day: schedule,
         login_command: bridge.map(|b| login_command(b).to_owned()),
+        account: None,
     }
 }
 

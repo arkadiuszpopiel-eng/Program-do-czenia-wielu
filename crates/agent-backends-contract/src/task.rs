@@ -8,7 +8,7 @@ use core_bus_contract::SessionId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// Most CLI (klasa C, PLAN §5.2). Kolejne (Grok Build, Kimi Code, `agy`) — po weryfikacji tras.
+/// Most CLI (klasa C, PLAN §5.2). Kolejne (Grok Build, Kimi Code) — po weryfikacji tras.
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
@@ -18,17 +18,27 @@ pub enum BridgeKind {
     ClaudeCode,
     /// Codex CLI (`codex app-server`, JSON-RPC po stdio, zatwierdzenia serwera).
     Codex,
+    /// Antigravity CLI (`agy -p`, stream-json; następca Gemini CLI dla kont Google AI Pro).
+    /// Trasa szara, domyślnie wyłączona — regulamin Antigravity (pkt 6) zakazuje korzystania
+    /// z usługi „w połączeniu z produktami nie dostarczonymi przez Google”; włącza ją właściciel
+    /// świadomie (decyzja 2026-10-14). Polecenia powłoki `agy` odrzuca sam w trybie bez zgód.
+    Antigravity,
 }
 
 impl BridgeKind {
     /// Wszystkie mosty.
-    pub const ALL: [BridgeKind; 2] = [BridgeKind::ClaudeCode, BridgeKind::Codex];
+    pub const ALL: [BridgeKind; 3] = [
+        BridgeKind::ClaudeCode,
+        BridgeKind::Codex,
+        BridgeKind::Antigravity,
+    ];
 
     /// Identyfikator trasy w rejestrze zgodności.
     pub fn route_id_str(self) -> &'static str {
         match self {
             BridgeKind::ClaudeCode => "claude-code-cli",
             BridgeKind::Codex => "codex-cli",
+            BridgeKind::Antigravity => "agy-antigravity",
         }
     }
 
@@ -38,11 +48,25 @@ impl BridgeKind {
         RouteId::new(self.route_id_str())
     }
 
+    /// Czy CLI pyta Alfę o zgodę na narzędzia (Claude Code — narzędzie MCP `approve`, Codex —
+    /// zatwierdzenia serwera). Antigravity w trybie `-p` sam odrzuca polecenia powłoki bez zgody
+    /// i nie ma kanału, którym Alfa mogłaby jej udzielić.
+    pub fn asks_approval(self) -> bool {
+        !matches!(self, BridgeKind::Antigravity)
+    }
+
+    /// Czy do trwającego zadania da się dosłać wiadomość (sterowanie). Antigravity dostaje
+    /// polecenie jednorazowo (`-p`).
+    pub fn steerable(self) -> bool {
+        !matches!(self, BridgeKind::Antigravity)
+    }
+
     /// Nazwa programu CLI w PATH.
     pub fn program(self) -> &'static str {
         match self {
             BridgeKind::ClaudeCode => "claude",
             BridgeKind::Codex => "codex",
+            BridgeKind::Antigravity => "agy",
         }
     }
 }

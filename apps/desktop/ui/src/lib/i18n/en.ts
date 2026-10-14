@@ -19,6 +19,7 @@ import { enWork } from './en-work';
 import { enFiles } from './en-files';
 import { enCameras } from './en-cameras';
 import { enRouting } from './en-routing';
+import { enConnections } from './en-connections';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -40,4 +41,5 @@ export const en: Record<MessageKey, Message> = {
   ...enFiles,
   ...enCameras,
   ...enRouting,
+  ...enConnections,
 };

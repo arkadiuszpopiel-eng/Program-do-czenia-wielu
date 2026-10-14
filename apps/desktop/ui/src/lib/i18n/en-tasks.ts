@@ -178,6 +178,7 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
     'A bridge started on a schedule runs while you are away — on your account and under the provider’s terms. Event triggers never start bridges.',
   'bridges.perDay': 'Most runs per day',
   'bridges.login': 'Show sign-in command',
+  'bridges.checkLogin': 'Check sign-in',
   'bridges.loginHint': 'Type in the terminal (Alfa runs nothing):',
   'bridges.loginNoTerminal': 'Could not open a terminal — open one yourself and type:',
   'bridges.copy': 'Copy command',

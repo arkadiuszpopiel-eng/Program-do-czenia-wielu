@@ -14,7 +14,7 @@
       "reason": "atrapa — dane przykładowe"
     },
     "apps/desktop/ui/src/lib/api/fake/settings-part-a.ts": {
-      "max": 574,
+      "max": 575,
       "reason": "atrapa — schemat ustawień (dane)"
     },
     "apps/desktop/ui/src/lib/api/fake/settings-part-b.ts": {

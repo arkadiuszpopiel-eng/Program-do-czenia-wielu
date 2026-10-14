@@ -37,8 +37,8 @@ pub use catalog::{
 pub use ids::{AccountId, ModelId, ProviderId, SecretName};
 pub use model_use::{ModelUse, best_chat_model, chat_rank, is_snapshot, model_use};
 pub use probe::{
-    CliBridge, CliProbe, ConnectionRequest, ConnectionTester, EnvSource, KNOWN_CLI_BRIDGES,
-    ModelListError, ModelLister, detect_cli_bridges_with, parse_version,
+    CliBridge, CliOutput, CliProbe, ConnectionRequest, ConnectionTester, EnvSource,
+    KNOWN_CLI_BRIDGES, ModelListError, ModelLister, detect_cli_bridges_with, parse_version,
 };
 pub use queue::{
     MAX_QUEUE, ModelTier, QueueStrategy, fits_class, model_tier, suggest_queue, use_fits,

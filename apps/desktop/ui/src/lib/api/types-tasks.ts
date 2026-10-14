@@ -203,6 +203,23 @@ export interface BridgeCard {
   readonly schedule_per_day: number;
   /** Polecenie logowania do wpisania przez użytkownika. */
   readonly login_command: string | null;
+  /** Ostatnie sprawdzenie konta (`bridges_check`); `null` — jeszcze nie sprawdzano. */
+  readonly account: BridgeAccount | null;
+}
+
+/** Stan konta mostu CLI (`unknown` — narzędzie nie ma polecenia stanu, np. Antigravity). */
+export type BridgeAccountState = 'logged_in' | 'logged_out' | 'unknown' | 'not_installed' | 'error';
+
+/** Wynik sprawdzenia konta mostu: tylko stan, sposób logowania i plan (bez e-maila i tokenów). */
+export interface BridgeAccount {
+  readonly state: BridgeAccountState;
+  /** Plan podany przez narzędzie (np. „Max”). */
+  readonly plan: string | null;
+  /** Sposób logowania (np. „konto claude.ai”). */
+  readonly method: string | null;
+  /** Zdanie rdzenia (po polsku): co działa albo co zrobić. */
+  readonly detail: string;
+  readonly checked_at: Iso8601;
 }
 
 /** „Zaloguj w terminalu": polecenie do skopiowania (Alfa go nie wykonuje). */

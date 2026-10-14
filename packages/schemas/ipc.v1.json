@@ -2115,9 +2115,89 @@
         }
       ]
     },
+    "BridgeAccount": {
+      "description": "Wynik sprawdzenia konta mostu — tylko stan, sposób logowania i plan (bez e-maila, tokenów).",
+      "properties": {
+        "checked_at": {
+          "description": "Kiedy sprawdzono.",
+          "type": "string"
+        },
+        "detail": {
+          "description": "Zdanie dla użytkownika: co działa albo co zrobić.",
+          "type": "string"
+        },
+        "method": {
+          "description": "Sposób logowania (np. „konto claude.ai”).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plan": {
+          "description": "Plan podany przez narzędzie (np. „Max”).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/BridgeAccountState"
+        }
+      },
+      "required": [
+        "state",
+        "plan",
+        "method",
+        "detail",
+        "checked_at"
+      ],
+      "type": "object"
+    },
+    "BridgeAccountState": {
+      "description": "Stan konta mostu CLI.",
+      "oneOf": [
+        {
+          "const": "logged_in",
+          "description": "Zalogowano — Alfa może zlecać zadania (gdy most jest włączony).",
+          "type": "string"
+        },
+        {
+          "const": "logged_out",
+          "description": "Narzędzie jest, ale nikt się nie zalogował.",
+          "type": "string"
+        },
+        {
+          "const": "unknown",
+          "description": "Narzędzie nie podaje stanu bez wywołania modelu (Antigravity).",
+          "type": "string"
+        },
+        {
+          "const": "not_installed",
+          "description": "Narzędzia nie ma na komputerze.",
+          "type": "string"
+        },
+        {
+          "const": "error",
+          "description": "Polecenie stanu się nie powiodło.",
+          "type": "string"
+        }
+      ]
+    },
     "BridgeCard": {
       "description": "Karta zgodności trasy mostu.",
       "properties": {
+        "account": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeAccount"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Ostatnie sprawdzenie konta (`bridges_check`); `None` — jeszcze nie sprawdzano."
+        },
         "allowed": {
           "items": {
             "type": "string"
@@ -2253,7 +2333,8 @@
         "enabled",
         "can_enable",
         "schedule_per_day",
-        "login_command"
+        "login_command",
+        "account"
       ],
       "type": "object"
     },
@@ -8638,6 +8719,11 @@
           "type": "string"
         },
         {
+          "const": "connections",
+          "description": "Stan połączeń: co jest zalogowane i działa (konta API, mosty CLI, modele, głos, Broker).",
+          "type": "string"
+        },
+        {
           "const": "router",
           "description": "Dobór modelu według trudności: ustawienia, szczeble modeli, podgląd.",
           "type": "string"
@@ -11894,6 +11980,19 @@
       ],
       "result": {
         "$ref": "#/$defs/BackupCheck"
+      }
+    },
+    "bridges_check": {
+      "args": [
+        {
+          "name": "bridge",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/BridgeCard"
       }
     },
     "bridges_list": {

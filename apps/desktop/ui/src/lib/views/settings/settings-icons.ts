@@ -22,6 +22,7 @@ import MonitorSpeaker from '@lucide/svelte/icons/monitor-speaker';
 import MousePointerClick from '@lucide/svelte/icons/mouse-pointer-click';
 import Network from '@lucide/svelte/icons/network';
 import Palette from '@lucide/svelte/icons/palette';
+import PlugZap from '@lucide/svelte/icons/plug-zap';
 import Puzzle from '@lucide/svelte/icons/puzzle';
 import Route from '@lucide/svelte/icons/route';
 import ScrollText from '@lucide/svelte/icons/scroll-text';
@@ -42,6 +43,7 @@ const ICONS: Record<string, Icon> = {
   language: Languages,
   shortcuts: Keyboard,
   notifications: Bell,
+  connections: PlugZap,
   providers: KeyRound,
   api: ListOrdered,
   bridges: SquareTerminal,

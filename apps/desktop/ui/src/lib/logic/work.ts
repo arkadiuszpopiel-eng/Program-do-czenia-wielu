@@ -47,6 +47,13 @@ export function loginProfile(bridge: string): TerminalProfileId | null {
   return null;
 }
 
+/** Most, do którego loguje dany profil terminala (`null` — zwykła powłoka). */
+export function loginBridge(profile: TerminalProfileId): string | null {
+  if (profile === 'claude_login') return 'claude_code';
+  if (profile === 'codex_login') return 'codex';
+  return null;
+}
+
 /** Pusty szkic agentki (formularz Kreatora). */
 export function emptyDraft(): AgentDraft {
   return {

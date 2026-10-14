@@ -548,8 +548,26 @@ export type BlockKind = 'text' | 'code';
 /** Stan bezpiecznika silnika głównego. */
 export type BreakerStateView = 'closed' | 'open' | 'half_open';
 
+/** Wynik sprawdzenia konta mostu — tylko stan, sposób logowania i plan (bez e-maila, tokenów). */
+export interface BridgeAccount {
+  /** Kiedy sprawdzono. */
+  readonly checked_at: string;
+  /** Zdanie dla użytkownika: co działa albo co zrobić. */
+  readonly detail: string;
+  /** Sposób logowania (np. „konto claude.ai”). */
+  readonly method: string | null;
+  /** Plan podany przez narzędzie (np. „Max”). */
+  readonly plan: string | null;
+  readonly state: BridgeAccountState;
+}
+
+/** Stan konta mostu CLI. */
+export type BridgeAccountState = 'logged_in' | 'logged_out' | 'unknown' | 'not_installed' | 'error';
+
 /** Karta zgodności trasy mostu. */
 export interface BridgeCard {
+  /** Ostatnie sprawdzenie konta (`bridges_check`); `None` — jeszcze nie sprawdzano. */
+  readonly account: BridgeAccount | null;
   readonly allowed: readonly string[];
   /** Most obsługiwany przez Alfę (`claude_code`, `codex`); `null` — trasa tylko w rejestrze. */
   readonly bridge: string | null;
@@ -2383,6 +2401,7 @@ export type SettingsCustomPage =
   | 'devices'
   | 'voice'
   | 'api'
+  | 'connections'
   | 'router'
   | 'bridges'
   | 'cameras'
@@ -3249,6 +3268,10 @@ export interface IpcCommands {
   readonly backups_verify: {
     readonly args: { readonly file: string };
     readonly result: BackupCheck;
+  };
+  readonly bridges_check: {
+    readonly args: { readonly bridge: string };
+    readonly result: BridgeCard;
   };
   readonly bridges_list: {
     readonly args: { readonly refresh: boolean };

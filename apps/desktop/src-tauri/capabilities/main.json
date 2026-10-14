@@ -152,6 +152,7 @@
     "allow-bridges-set-enabled",
     "allow-bridges-set-schedule",
     "allow-bridges-pin",
+    "allow-bridges-check",
     "allow-bridges-open-login",
     "allow-gui-status",
     "allow-gui-screenshot",

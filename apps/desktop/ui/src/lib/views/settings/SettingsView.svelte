@@ -17,6 +17,7 @@
   import BuilderPage from './pages/BuilderPage.svelte';
   import CamerasPage from './pages/CamerasPage.svelte';
   import ComputerPage from './pages/ComputerPage.svelte';
+  import ConnectionsPage from './pages/ConnectionsPage.svelte';
   import CostsPage from './pages/CostsPage.svelte';
   import DevicesPage from './pages/DevicesPage.svelte';
   import HealthPage from './pages/HealthPage.svelte';
@@ -128,7 +129,8 @@
             </ul>
           </EmptyState>
         {:else}
-          {#if page.custom === 'providers'}<ProvidersPage />
+          {#if page.custom === 'connections'}<ConnectionsPage />
+          {:else if page.custom === 'providers'}<ProvidersPage />
           {:else if page.custom === 'api'}<ApiPage />
           {:else if page.custom === 'router'}<RoutingPage />
           {:else if page.custom === 'bridges'}<BridgesSection />

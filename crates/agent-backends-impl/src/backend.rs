@@ -17,6 +17,7 @@ use mcp_contract::{BridgeMcpHost, BridgeScope};
 use providers_contract::CancellationToken;
 use tokio::sync::mpsc;
 
+use crate::agy;
 use crate::approvals::Approvals;
 use crate::claude::{self, ClaudeApprovals};
 use crate::codex;
@@ -42,6 +43,8 @@ struct Entry {
     log: Arc<TaskLog>,
     cancel: CancellationToken,
     steer: mpsc::UnboundedSender<String>,
+    /// Most przyjmuje wiadomości w trakcie zadania (`BridgeKind::steerable`).
+    steerable: bool,
 }
 
 /// Zakres serwera MCP Alfy dla zadania mostu: narzędzia Windows v1 (v0 + UIA, zrzut, rejestr
@@ -241,6 +244,17 @@ impl AgentBackend for BridgeBackend {
             },
             None => None,
         };
+        let agy_args = if spec.bridge == BridgeKind::Antigravity {
+            match agy::args(&spec, &spec.prompt) {
+                Ok(a) => Some(a),
+                Err(e) => {
+                    let _ = self.deps.workspace.release(&prepared, false).await;
+                    return Err(e);
+                }
+            }
+        } else {
+            None
+        };
         log.emit(AgentEvent::Started {
             bridge: spec.bridge,
             cli_version: admitted.version,
@@ -252,6 +266,7 @@ impl AgentBackend for BridgeBackend {
                 log: log.clone(),
                 cancel,
                 steer: steer_tx,
+                steerable: spec.bridge.steerable(),
             },
         );
         self.spawned.fetch_add(1, Ordering::SeqCst);
@@ -263,9 +278,10 @@ impl AgentBackend for BridgeBackend {
         let task_id = task.clone();
         let program = admitted.program;
         tokio::spawn(async move {
-            match claude_args {
-                Some(args) => claude::run(ctx, program, args, spec.prompt).await,
-                None => codex::run(ctx, program, spec.prompt, spec.session, spec.model).await,
+            match (spec.bridge, claude_args, agy_args) {
+                (_, Some(args), _) => claude::run(ctx, program, args, spec.prompt).await,
+                (BridgeKind::Antigravity, _, Some(args)) => agy::run(ctx, program, args).await,
+                _ => codex::run(ctx, program, spec.prompt, spec.session, spec.model).await,
             }
             if let Some(reg) = registration {
                 let _ = mcp.revoke(&reg.id).await;
@@ -293,9 +309,16 @@ impl AgentBackend for BridgeBackend {
     }
 
     async fn steer(&self, task: &TaskId, message: String) -> Result<(), BackendError> {
-        let (finished, tx) = self.with_entry(task, |e| (e.log.is_finished(), e.steer.clone()))?;
+        let (finished, tx, steerable) = self.with_entry(task, |e| {
+            (e.log.is_finished(), e.steer.clone(), e.steerable)
+        })?;
         if finished {
             return Err(BackendError::TaskFinished);
+        }
+        if !steerable {
+            return Err(BackendError::SteeringUnavailable(
+                "ten most dostaje polecenie jednorazowo — wyślij nowe zadanie".into(),
+            ));
         }
         tx.send(message)
             .map_err(|_| BackendError::SteeringUnavailable("zadanie kończy się".into()))

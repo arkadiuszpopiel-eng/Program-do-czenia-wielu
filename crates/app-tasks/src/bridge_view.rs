@@ -18,6 +18,7 @@ pub fn bridge_name(kind: BridgeKind) -> &'static str {
     match kind {
         BridgeKind::ClaudeCode => "claude_code",
         BridgeKind::Codex => "codex",
+        BridgeKind::Antigravity => "antigravity",
     }
 }
 
