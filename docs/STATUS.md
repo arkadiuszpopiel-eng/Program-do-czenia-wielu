@@ -10,8 +10,8 @@ Macierz niżej to **zapisany stan kryteriów**, a nie pomiar dzisiejszego kodu: 
 znaczy, że żadne kryterium nie ma jeszcze zapisanego dowodu z maszyny, a nie, że nic na sprzęcie nie działa
 (od 0.0.46 są raporty `scripts/verify.mjs` z testami silników na laptopie — `target/verify/<wersja>/`).
 Audyt z 14.10 (raport poza repozytorium: `../audyt-2026-10-14/RAPORT.md`) wskazał 17 pozycji; poprawki
-są w 0.0.51 (CHANGELOG). Otwarte: jedna macierz dowodów (kryterium, data, commit, sprzęt, komenda,
-artefakt) zamiast tej tabeli — zadanie w `plan/03-roadmapa.md`; izolacja procesu poleceń powłoki —
+są w 0.0.51 (CHANGELOG). Rejestr biegów sprawdzeń z datą, commitem, sprzętem, poleceniem i logiem: [`DOWODY.md`](DOWODY.md)
+(generowany, `node scripts/evidence.mjs`). Otwarte: przypisanie kryteriów do biegów (decyzja właściciela); izolacja procesu poleceń powłoki —
 do przeglądu właściciela.
 
 ## Stan na 2026-10-09 (wersja 0.0.3)

@@ -48,7 +48,7 @@ const PLANNED = [
 
 const groups = [
   ['Plan v6', list('docs/plan', (f) => f.endsWith('.md') && f !== 'README.md')],
-  ['Stan i historia', ['docs/STATUS.md', 'docs/KONTYNUACJA.md', 'CHANGELOG.md']],
+  ['Stan i historia', ['docs/STATUS.md', 'docs/DOWODY.md', 'docs/KONTYNUACJA.md', 'CHANGELOG.md']],
   ['Decyzje (ADR)', ['docs/ADR/README.md', ...list('docs/ADR', (f) => /^\d.*\.md$/.test(f))]],
   [
     'Nowe moduły (SPEC)',

@@ -13,6 +13,7 @@
 // niekompletny. Poziom „wersja” obejmuje te same bramki co CI (audyt 2026-10-14, A-09).
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs';
+import { cpus, totalmem } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -207,6 +208,33 @@ const missingTool = (stage) => {
   return spawnSync(tool[0], tool[1], { encoding: 'utf8' }).status === 0 ? null : tool[2];
 };
 
+// Metryka biegu do rejestru dowodów (audyt A-15): kiedy, na czym, z którego commita.
+const git = (...args) =>
+  spawnSync('git', args, { cwd: root, encoding: 'utf8' }).stdout?.trim() ?? '';
+const gpus = () => {
+  if (process.platform !== 'win32') return [];
+  const run = spawnSync(
+    'powershell',
+    [
+      '-NoProfile',
+      '-Command',
+      '(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join "|"',
+    ],
+    { encoding: 'utf8' },
+  );
+  return (run.stdout ?? '').trim().split('|').filter(Boolean);
+};
+const meta = {
+  started: new Date().toISOString(),
+  commit: git('rev-parse', 'HEAD'),
+  dirty: git('status', '--porcelain', '--untracked-files=no') !== '',
+  hardware: {
+    cpu: cpus()[0]?.model?.trim() ?? '',
+    ram_gb: Math.round(totalmem() / 1024 ** 3),
+    gpus: gpus(),
+  },
+};
+
 const results = [];
 for (const [id, title, command, cwd, needGb] of STAGES) {
   const tool = missingTool(id);
@@ -242,7 +270,15 @@ for (const [id, title, command, cwd, needGb] of STAGES) {
   writeFileSync(join(out, `${level}-${id}.log`), output);
   const seconds = Math.round((Date.now() - started) / 1000);
   const state = run.status === 0 ? 'zielony' : 'CZERWONY';
-  results.push({ id, title, state, seconds, numbers: numbersFrom(id, output) });
+  results.push({
+    id,
+    title,
+    state,
+    seconds,
+    numbers: numbersFrom(id, output),
+    command,
+    log: `${level}-${id}.log`,
+  });
   console.log(`— ${id}: ${state} (${seconds} s) ${numbersFrom(id, output)}`);
 }
 
@@ -308,7 +344,11 @@ if (level === 'sprzet' && existsSync(hw)) lines.push(readFileSync(hw, 'utf8'));
 writeFileSync(join(out, `raport-${level}.md`), `${lines.join('\n')}\n`);
 writeFileSync(
   join(out, `raport-${level}.json`),
-  `${JSON.stringify({ version, level, verdict, results }, null, 2)}\n`,
+  `${JSON.stringify(
+    { version, level, verdict, ...meta, finished: new Date().toISOString(), results },
+    null,
+    2,
+  )}\n`,
 );
 console.log(`Raport: ${join(out, `raport-${level}.md`)}`);
 console.log(`Wynik: ${verdict}`);
