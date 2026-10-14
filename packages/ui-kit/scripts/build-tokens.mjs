@@ -2,6 +2,7 @@
 // Generuje src/tokens.css (zmienne --alfa-*) i src/tokens.ts z src/tokens/tokens.json.
 // Uruchom: pnpm --filter @alfa/ui-kit build:tokens. CI pilnuje `git diff --exit-code`.
 import { readFileSync, writeFileSync } from 'node:fs';
+import * as prettier from 'prettier';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -135,6 +136,14 @@ export const agentSoftVar = (id: AgentId): string => \`var(--alfa-agent-\${id}-s
 export const agentHex = (id: AgentId, theme: Theme): string => tokens.color.agent[id][theme];
 `;
 
-writeFileSync(join(pkg, 'src/tokens.css'), css);
-writeFileSync(join(pkg, 'src/tokens.ts'), ts);
+// Zapis w formacie repozytorium (prettier) — bramka CI porównuje plik bajt w bajt.
+const pretty = async (path, text) =>
+  prettier.format(text, { ...(await prettier.resolveConfig(path)), filepath: path });
+for (const [file, text] of [
+  ['src/tokens.css', css],
+  ['src/tokens.ts', ts],
+]) {
+  const path = join(pkg, file);
+  writeFileSync(path, await pretty(path, text));
+}
 console.log('build-tokens: zapisano src/tokens.css i src/tokens.ts');
