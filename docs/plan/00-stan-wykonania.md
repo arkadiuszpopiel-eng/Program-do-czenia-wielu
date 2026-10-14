@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-14**, wersja programu **0.0.52**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-15**, wersja programu **0.0.53**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -65,6 +65,7 @@ funkcjami.
 | 0.0.30 | 2026-10-11 | P1: głos Supertonic 3 jako osobny proces w Rust, cztery barwy agentek; zmierzone 0,97 s na zdanie na laptopie (brzmienie — do odsłuchu właściciela) |
 | 0.0.31 | 2026-10-11 | P1: wybór barwy głosu dla każdej agentki (10 barw Supertonic 3) |
 | 0.0.32 | 2026-10-11 | silnik llama.cpp b11559 w katalogu z przypiętymi sumami; pomiar Qwen3-ASR (aplikacja nie budowana) |
+| 0.0.53 | 2026-10-15 | Izolacja poleceń powłoki (integralność Low), Markdown 100 KB w 7,8 ms, wasmtime 36.0.18, pokrycie łącza 71,8 %; decyzje z dokumentu 25 |
 | 0.0.52 | 2026-10-14 | Stan połączeń w Ustawieniach; sprawdzanie logowania mostów po „Gotowe”; Antigravity (konto Google AI Pro) — logowanie i most z ostrzeżeniem; regresja próby obowiązków |
 | 0.0.51 | 2026-10-14 | Dobór modelu według trudności; poprawki audytu zewnętrznego (bezpieczeństwo, bramki, zależności, rozmiary) |
 | 0.0.50 | 2026-10-14 | Test klucza OpenRoutera; wspólna kolejka modeli wszystkich kont |

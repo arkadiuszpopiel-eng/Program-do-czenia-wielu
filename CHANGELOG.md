@@ -12,6 +12,49 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.53 — 2026-10-15
+
+Polecenia powłoki agentek, które według analizy pracują tylko w katalogu roboczym, działają teraz
+z niską integralnością Windows: każdą próbę zapisu poza tym katalogiem odrzuca sam system, nawet
+gdy analiza polecenia czegoś nie zauważyła. Długie odpowiedzi wyświetlają się prawie trzy razy
+szybciej. Do tego testy prawdziwej aplikacji obejmują ponad 70 % poleceń.
+
+### Bezpieczeństwo
+
+- [poważne] Izolacja poleceń powłoki: token niskiej integralności, katalog roboczy z etykietą Low,
+  pliki tymczasowe w `AppData\LocalLow\Alfa\tmp`. Polecenie czyta to co Ty (git, cargo, node
+  działają), ale nie zapisze niczego poza katalogiem roboczym. Polecenia sieciowe, instalacje
+  i z celami poza katalogiem działają jak dotąd — za Twoją zgodą w oknie Brokera. Wynik polecenia
+  mówi, że działało w izolacji. Wyłącznik: `tools.shell.low_integrity`.
+- Izolacja nie obejmuje katalogów zbyt szerokich (profil, korzeń dysku, katalogi systemu) ani
+  narzędzi, które zapisują w profilu (cargo, npm, pip i podobne). Gdy izolacji nie da się
+  zastosować (np. dysk exFAT), polecenie działa jak dotąd, a wynik to mówi.
+- [poważne] wasmtime 36.0.18 — poprawka ostrzeżenia bezpieczeństwa RUSTSEC-2026-0363 (limity
+  tabel uchwytów w modelu komponentów wtyczek).
+- Zatwierdzony wpis Antigravity w rejestrze zgodności (szara trasa, domyślnie wyłączona).
+
+### Szybkość
+
+- Odpowiedź 100 KB wyświetla się w 7,8 ms zamiast 22–24 ms (budżet 20 ms): czyszczenie HTML idzie
+  w kilku wątkach. Zabezpieczenie (ammonia) bez zmian, wynik identyczny co do znaku.
+
+### Poprawki po przeglądzie
+
+- Sprawdzanie logowania narzędzi: awaria narzędzia pokazuje błąd zamiast „Zaloguj się”, wartości
+  z jego wyjścia są przycinane, odczyt ma limit czasu (narzędzie nie zawiesi okna).
+- Okno logowania: spóźniony sygnał zamkniętej sesji nie psuje ponownej próby.
+- Most Antigravity: identyfikator rozmowy sprawdzany przed wznowieniem.
+
+### Testy
+
+- Test prawdziwej aplikacji: dodanie i obsługa konta API (model, wyłączenie, limit, przypisania,
+  kolejki, usunięcie), mosty CLI, obsada agentek, czytelne odmowy dla nieistniejących celów —
+  pokrycie łącza 71,8 % (było 52,6 %); bramka pokrycia podniesiona do 70 %.
+- Izolacja na prawdziwych procesach Windows: cmd i PowerShell piszą w katalogu roboczym, zapis
+  obok jest odrzucany, odczyt plików systemu i katalog tymczasowy działają.
+- Testy w przeglądarce odporne na przeciążoną maszynę: liczba przeglądarek dobierana do wolnej
+  pamięci, ponowienie otwarcia listy wyboru, dłuższe oczekiwanie na pierwszy ekran.
+
 ## 0.0.52 — 2026-10-14
 
 Nowe okno Ustawienia → Stan połączeń pokazuje w jednym miejscu, co jest zalogowane i działa: konta
