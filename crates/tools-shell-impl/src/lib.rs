@@ -8,6 +8,8 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod isolation;
+mod outcome;
 mod run;
 
 use std::sync::Arc;

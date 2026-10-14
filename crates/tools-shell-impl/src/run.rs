@@ -8,23 +8,20 @@ use std::sync::Arc;
 
 use core_bus_contract::Level;
 use platform_contract::{
-    ExecControl, ExecOutput, ExecSpec, ExecTermination, Integrity, PlatformError, ProcessSpec,
-    filter_env,
+    ExecControl, ExecOutput, ExecSpec, Integrity, PlatformError, ProcessSpec, filter_env,
 };
 use risk_classifier_contract::Reversibility;
-use safety_broker_contract::{Capability, HostPattern, TaintSource};
+use safety_broker_contract::{Capability, HostPattern};
 use tools_common_contract::{
-    Authorization, DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, ToolStatus,
-    UndoRef, UndoService, base_facts, parse_args, paths, report_untrusted, text,
+    Authorization, DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, UndoRef,
+    UndoService, base_facts, parse_args, paths, text,
 };
-use tools_shell_contract::{
-    EVENT_DENIED, EVENT_EXITED, EVENT_KILLED, EVENT_STARTED, MAX_COMMAND_CHARS, RunArgs, RunOutput,
-    Termination, analyze,
-};
+use tools_shell_contract::{EVENT_DENIED, EVENT_STARTED, MAX_COMMAND_CHARS, RunArgs, analyze};
 use undo_journal_contract::{StepCtx, StepId, UndoError};
 use watchdog_contract::ProcessRole;
 
 use crate::Core;
+use crate::isolation::{Isolation, uses_profile_toolchain};
 
 type Step<T> = Result<T, Box<ToolOutcome>>;
 
@@ -142,7 +139,8 @@ impl Core {
             && a.hosts.is_empty()
             && !a.network
             && !a.install
-            && !a.opaque_targets;
+            && !a.opaque_targets
+            && !uses_profile_toolchain(command);
         let mut caps = vec![(Capability::ShellExec(cwd_scope), facts.clone())];
         for scope in outside {
             let mut f = facts.clone();
@@ -305,7 +303,20 @@ impl Core {
             ctx,
         )
         .await;
-        let result = self.execute(spec, ctx, command).await;
+        let mut isolation = if isolate {
+            Isolation::Low
+        } else {
+            Isolation::Off
+        };
+        let mut result = self.execute(spec.clone(), ctx, command).await;
+        if isolate && let Err(PlatformError::Unsupported(why)) = &result {
+            // Izolacji nie da się zastosować (katalog zbyt szeroki, dysk bez ACL — exFAT, udział
+            // sieciowy): polecenie i tak ma zgody na działanie w katalogu, więc idzie jak dotąd.
+            isolation = Isolation::Unavailable(why.clone());
+            let mut medium = spec;
+            medium.process.integrity = Integrity::Medium;
+            result = self.execute(medium, ctx, command).await;
+        }
         let approval = auths.iter().find_map(|a| a.approval);
         self.release(&auths).await;
         // Krok trafia do dziennika dopiero po uruchomieniu polecenia: nieudany start zostawiał
@@ -329,77 +340,18 @@ impl Core {
             Err(_) => None,
         };
         let mut result = self.outcome(out, undo, ctx).await;
-        if isolate {
-            result.text.push_str(
+        match isolation {
+            Isolation::Low => result.text.push_str(
                 "
-[izolacja] Polecenie działało z niską integralnością: zapis tylko w katalogu                  roboczym (odmowa dostępu poza nim to zabezpieczenie, nie usterka).",
-            );
+[izolacja] Polecenie działało z niską integralnością: zapis tylko w katalogu roboczym (odmowa dostępu poza nim to zabezpieczenie, nie usterka).",
+            ),
+            Isolation::Unavailable(why) => result.text.push_str(&format!(
+                "
+[izolacja] Niedostępna ({why}) — polecenie działało jak zwykle, w granicach zgód."
+            )),
+            Isolation::Off => {}
         }
         result.approval = approval;
         Ok(result)
-    }
-
-    async fn outcome(&self, out: ExecOutput, undo: Option<UndoRef>, ctx: &ToolCtx) -> ToolOutcome {
-        let (termination, code) = match out.termination {
-            ExecTermination::Exited(c) => (Termination::Exited, Some(c)),
-            ExecTermination::TimedOut => (Termination::TimedOut, None),
-            ExecTermination::Cancelled => (Termination::Cancelled, None),
-            ExecTermination::Killed => (Termination::Killed, None),
-        };
-        let half = self.config.output_max_chars / 2;
-        // Kodowanie konsoli zna warstwa platformy (`cmd.exe` pisze w stronie kodowej OEM).
-        let render = |b: &[u8]| {
-            text::truncate_chars(&text::redact_secrets(&self.exec.decode_output(b)), half)
-        };
-        let ((stdout, cut_out), (stderr, cut_err)) = (render(&out.stdout), render(&out.stderr));
-        let truncated = out.truncated() || cut_out || cut_err;
-        let payload = serde_json::json!({ "termination": termination, "exit_code": code, "elapsed_ms": out.elapsed_ms, "truncated": truncated });
-        let event = if termination == Termination::Exited {
-            EVENT_EXITED
-        } else {
-            EVENT_KILLED
-        };
-        self.emit(event, Level::Info, payload, ctx).await;
-        report_untrusted(&self.gate, ctx, TaintSource::File).await;
-        let head = match (termination, code) {
-            (Termination::Exited, Some(c)) => format!(
-                "Polecenie zakończone, kod wyjścia {c} ({} ms).",
-                out.elapsed_ms
-            ),
-            (Termination::TimedOut, _) => {
-                "Przekroczony limit czasu — zabito całe drzewo procesów.".to_owned()
-            }
-            (Termination::Killed, _) => "Polecenie zabite (kill-switch).".to_owned(),
-            _ => "Polecenie anulowane — zabito całe drzewo procesów.".to_owned(),
-        };
-        let undo_note = if undo.is_some() {
-            " Zmiany w katalogu roboczym można cofnąć."
-        } else {
-            ""
-        };
-        let body = format!("{head}{undo_note}\n[stdout]\n{stdout}\n[stderr]\n{stderr}");
-        let data = RunOutput {
-            termination,
-            exit_code: code,
-            stdout,
-            stderr,
-            stdout_bytes: out.stdout_total,
-            stderr_bytes: out.stderr_total,
-            truncated,
-            elapsed_ms: out.elapsed_ms,
-            undo_step: undo.as_ref().map(|u| u.id),
-        };
-        let mut result = ToolOutcome::ok(body, serde_json::to_value(data).unwrap_or_default())
-            .untrusted(TaintSource::File);
-        result.status = match termination {
-            Termination::Exited => ToolStatus::Ok,
-            Termination::TimedOut => ToolStatus::Failed {
-                error: ToolErrorKind::Timeout,
-            },
-            Termination::Cancelled | Termination::Killed => ToolStatus::Cancelled,
-        };
-        result.undo = undo;
-        result.truncated = truncated;
-        result
     }
 }

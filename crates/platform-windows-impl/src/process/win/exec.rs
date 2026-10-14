@@ -5,10 +5,10 @@
 
 #![allow(unsafe_code)]
 
-use std::os::windows::io::IntoRawHandle;
-use std::os::windows::process::CommandExt;
 use std::fs::File;
+use std::os::windows::io::IntoRawHandle;
 use std::os::windows::io::OwnedHandle as StdHandle;
+use std::os::windows::process::CommandExt;
 use std::process::{Command, Stdio};
 
 use platform_contract::{ExecSpec, PlatformError};
@@ -94,9 +94,12 @@ pub(crate) fn spawn_captured(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .creation_flags((CREATE_SUSPENDED | CREATE_NO_WINDOW).0);
-    let mut child = cmd
-        .spawn()
-        .map_err(|e| PlatformError::Io(format!("{}: {e}", spec.process.cmd.display())))?;
+    // Ta sama blokada co przy starcie o niskiej integralności (dziedziczone uchwyty potoków).
+    let guard = super::spawn_lock();
+    let spawned = cmd.spawn();
+    drop(guard);
+    let mut child =
+        spawned.map_err(|e| PlatformError::Io(format!("{}: {e}", spec.process.cmd.display())))?;
     let stdout = child.stdout.take();
     let stderr = child.stderr.take();
     let pid = child.id();

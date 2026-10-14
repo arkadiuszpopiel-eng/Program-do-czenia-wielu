@@ -110,6 +110,14 @@ fn create_job(limits: &JobLimits) -> Result<OwnedHandle, PlatformError> {
     Ok(job)
 }
 
+/// Blokada startu procesów z dziedziczonymi uchwytami potoków (obie ścieżki: Medium przez
+/// `std::process::Command`, Low przez `CreateProcessAsUserW`).
+pub(crate) fn spawn_lock() -> std::sync::MutexGuard<'static, ()> {
+    static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    LOCK.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
 /// Kopia tokenu procesu z poziomem integralności Low (S-1-16-4096).
 fn low_integrity_token() -> Result<OwnedHandle, PlatformError> {
     let mut own = HANDLE::default();

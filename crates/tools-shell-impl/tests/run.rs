@@ -315,3 +315,30 @@ async fn workdir_only_commands_run_at_low_integrity() {
     assert_eq!(off.exec.runs()[0].process.integrity, Integrity::Medium);
     assert!(!out.text.contains("[izolacja]"));
 }
+
+/// Izolacja niedostępna (katalog zbyt szeroki, dysk bez ACL): polecenie idzie jak zwykle,
+/// a wynik to mówi; narzędzia piszące w profilu (cargo, npm…) nie są izolowane.
+#[tokio::test]
+async fn isolation_falls_back_and_skips_profile_toolchains() {
+    use platform_contract::{Integrity, PlatformError};
+    let h = harness(&[]);
+    h.exec.set_default(FakeRun::exit(0, "ok", ""));
+    h.exec
+        .fail_next_spawn(PlatformError::Unsupported("katalog zbyt szeroki".into()));
+    let out = h.sh("Get-ChildItem").await;
+    assert!(out.is_ok(), "{out:?}");
+    assert!(
+        out.text.contains("Niedostępna (") && out.text.contains("zbyt szeroki"),
+        "{}",
+        out.text
+    );
+    let runs = h.exec.runs();
+    assert_eq!(runs.last().unwrap().process.integrity, Integrity::Medium);
+    let cargo = h.sh("cargo build --release").await;
+    assert!(cargo.is_ok(), "{cargo:?}");
+    assert_eq!(
+        h.exec.runs().last().unwrap().process.integrity,
+        Integrity::Medium
+    );
+    assert!(!cargo.text.contains("[izolacja]"));
+}

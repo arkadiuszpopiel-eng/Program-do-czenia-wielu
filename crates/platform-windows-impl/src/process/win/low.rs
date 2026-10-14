@@ -14,10 +14,11 @@ use std::mem::size_of;
 use std::os::windows::io::{FromRawHandle, RawHandle};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
+use std::time::SystemTime;
 
 use platform_contract::{ExecSpec, PlatformError};
 use windows::Win32::Foundation::{
-    HANDLE, HANDLE_FLAG_INHERIT, HANDLE_FLAGS, HLOCAL, LocalFree, SetHandleInformation,
+    HANDLE, HANDLE_FLAG_INHERIT, HLOCAL, LocalFree, SetHandleInformation,
 };
 use windows::Win32::Security::Authorization::{
     ConvertStringSecurityDescriptorToSecurityDescriptorW, SDDL_REVISION_1, SE_FILE_OBJECT,
@@ -47,16 +48,77 @@ use crate::process::JobLimits;
 use crate::process::exec::args_line;
 use crate::win::{OwnedHandle, last_error, wide, win_error};
 
-/// Katalogi już oznaczone w tym procesie (etykieta przechodzi na całe drzewo — raz wystarczy).
-fn labeled() -> &'static Mutex<HashSet<PathBuf>> {
-    static SET: OnceLock<Mutex<HashSet<PathBuf>>> = OnceLock::new();
+/// Katalogi już oznaczone w tym procesie, z czasem utworzenia katalogu: odtworzony katalog
+/// (np. `rm -rf` i `mkdir`) ma inny czas i dostaje etykietę ponownie.
+type Labeled = Mutex<HashSet<(PathBuf, Option<SystemTime>)>>;
+
+fn labeled() -> &'static Labeled {
+    static SET: OnceLock<Labeled> = OnceLock::new();
     SET.get_or_init(|| Mutex::new(HashSet::new()))
+}
+
+/// Katalogi zbyt szerokie na etykietę Low (trwała, przechodzi na całe drzewo): korzeń dysku,
+/// profil użytkownika i każdy jego przodek, foldery profilu (Pulpit, Dokumenty, Pobrane…),
+/// katalogi systemu. Dla nich polecenie idzie z integralnością Medium (za zgodami jak dotąd).
+pub(crate) fn too_broad(dir: &Path) -> bool {
+    let norm = |p: &Path| {
+        p.to_string_lossy()
+            .trim_end_matches(['\\', '/'])
+            .to_lowercase()
+    };
+    let d = norm(dir);
+    if dir.parent().is_none() || d.len() <= 3 {
+        return true;
+    }
+    let env = |k: &str| std::env::var_os(k).map(PathBuf::from);
+    if let Some(home) = env("USERPROFILE") {
+        let h = norm(&home);
+        if h == d || h.starts_with(&format!("{d}\\")) {
+            return true;
+        }
+        for name in [
+            "Desktop",
+            "Documents",
+            "Downloads",
+            "Pictures",
+            "Music",
+            "Videos",
+            "OneDrive",
+            "AppData",
+            "Pulpit",
+            "Dokumenty",
+            "Pobrane",
+        ] {
+            if norm(&home.join(name)) == d {
+                return true;
+            }
+        }
+    }
+    [
+        "SystemRoot",
+        "ProgramFiles",
+        "ProgramFiles(x86)",
+        "ProgramData",
+    ]
+    .iter()
+    .filter_map(|k| env(k))
+    .any(|sys| {
+        let s = norm(&sys);
+        d == s || d.starts_with(&format!("{s}\\"))
+    })
 }
 
 /// Etykieta Low z dziedziczeniem (pliki i podkatalogi) na katalogu roboczym: proces Low może tam
 /// pisać; procesy Medium (użytkownik, Alfa) — bez zmian.
 pub(crate) fn label_low(dir: &Path) -> Result<(), PlatformError> {
-    let key = dir.to_path_buf();
+    if too_broad(dir) {
+        return Err(PlatformError::Unsupported(format!(
+            "katalog {} jest zbyt szeroki na izolację (profil, korzeń dysku albo katalog systemu)",
+            dir.display()
+        )));
+    }
+    let created = std::fs::metadata(dir).and_then(|m| m.created()).ok();
+    let key = (dir.to_path_buf(), created);
     if labeled().lock().map(|s| s.contains(&key)).unwrap_or(false) {
         return Ok(());
     }
@@ -107,7 +169,9 @@ pub(crate) fn label_low(dir: &Path) -> Result<(), PlatformError> {
         });
     // SAFETY: deskryptor zaalokowany przez system, zwalniany dokładnie raz.
     unsafe { LocalFree(Some(HLOCAL(sd.0))) };
-    set?;
+    // Dysk bez ACL (exFAT, FAT32), udział sieciowy, brak prawa zmiany etykiety: izolacja
+    // niedostępna — wywołujący decyduje, czy uruchomić bez niej.
+    set.map_err(|e| PlatformError::Unsupported(format!("izolacja niedostępna: {e}")))?;
     if let Ok(mut s) = labeled().lock() {
         s.insert(key);
     }
@@ -143,12 +207,13 @@ fn env_block(env: &[(String, String)]) -> Vec<u16> {
     block
 }
 
-/// Potok: koniec do odczytu (nasz, niedziedziczony) i do zapisu (dziedziczony przez proces).
+/// Potok (oba końce niedziedziczone; koniec procesu staje się dziedziczony dopiero pod
+/// [`super::spawn_lock`], tuż przed startem).
 fn pipe() -> Result<(OwnedHandle, OwnedHandle), PlatformError> {
     let sa = SECURITY_ATTRIBUTES {
         nLength: u32::try_from(size_of::<SECURITY_ATTRIBUTES>()).unwrap_or(0),
         lpSecurityDescriptor: std::ptr::null_mut(),
-        bInheritHandle: true.into(),
+        bInheritHandle: false.into(),
     };
     let (mut read, mut write) = (HANDLE::default(), HANDLE::default());
     // SAFETY: wskaźniki na lokalne zmienne; uchwyty przejmują `OwnedHandle`.
@@ -156,18 +221,15 @@ fn pipe() -> Result<(OwnedHandle, OwnedHandle), PlatformError> {
         .map_err(job_error("CreatePipe"))?;
     let read = OwnedHandle::new(read).ok_or_else(|| last_error("CreatePipe"))?;
     let write = OwnedHandle::new(write).ok_or_else(|| last_error("CreatePipe"))?;
-    // SAFETY: ważny uchwyt; wyłączamy dziedziczenie końca, który zostaje u nas.
-    unsafe { SetHandleInformation(read.raw(), HANDLE_FLAG_INHERIT.0, HANDLE_FLAGS(0)) }
-        .map_err(job_error("SetHandleInformation"))?;
     Ok((read, write))
 }
 
-/// `NUL` jako wejście (dziedziczony) — część programów nie znosi pustego uchwytu stdin.
+/// `NUL` jako wejście — część programów nie znosi pustego uchwytu stdin.
 fn null_input() -> Result<OwnedHandle, PlatformError> {
     let sa = SECURITY_ATTRIBUTES {
         nLength: u32::try_from(size_of::<SECURITY_ATTRIBUTES>()).unwrap_or(0),
         lpSecurityDescriptor: std::ptr::null_mut(),
-        bInheritHandle: true.into(),
+        bInheritHandle: false.into(),
     };
     // SAFETY: literał zakończony zerem; uchwyt przejmuje `OwnedHandle`.
     let h = unsafe {
@@ -271,6 +333,14 @@ pub(crate) fn spawn_low(spec: &ExecSpec, limits: &JobLimits) -> Result<Spawned, 
         | CREATE_UNICODE_ENVIRONMENT
         | CREATE_NO_WINDOW
         | EXTENDED_STARTUPINFO_PRESENT;
+    // Uchwyty procesu stają się dziedziczone tylko pod blokadą wspólną z drugą ścieżką startu
+    // (`exec.rs`) — równoległe polecenie nie odziedziczy cudzego końca potoku.
+    let guard = super::spawn_lock();
+    for h in [input.raw(), out_write.raw(), err_write.raw()] {
+        // SAFETY: ważne uchwyty należące do nas.
+        unsafe { SetHandleInformation(h, HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT) }
+            .map_err(job_error("SetHandleInformation"))?;
+    }
     // SAFETY: bufory zakończone zerem żyją przez wywołanie; `line` modyfikowalny (wymóg API);
     // dziedziczone są wyłącznie trzy uchwyty z listy atrybutów.
     let created = unsafe {
@@ -289,8 +359,10 @@ pub(crate) fn spawn_low(spec: &ExecSpec, limits: &JobLimits) -> Result<Spawned, 
         )
     };
     drop(attrs);
-    // Końce procesu zamykamy u siebie — inaczej odczyt nie zobaczy końca strumienia.
+    // Końce procesu zamykamy u siebie (jeszcze pod blokadą) — inaczej odczyt nie zobaczy końca
+    // strumienia, a kolejny start nie odziedziczy ich przypadkiem.
     drop((input, out_write, err_write));
+    drop(guard);
     created.map_err(|e| {
         win_error(
             &format!("CreateProcessAsUserW({}, Low)", spec.process.cmd.display()),

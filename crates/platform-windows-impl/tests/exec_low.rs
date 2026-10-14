@@ -166,3 +166,34 @@ fn powershell_runs_at_low_integrity() {
     assert!(!outside.exists());
     let _ = std::fs::remove_dir_all(work.parent().unwrap());
 }
+
+/// Katalog zbyt szeroki (profil użytkownika, korzeń dysku) nie dostaje trwałej etykiety Low:
+/// start kończy się odmową „izolacja niedostępna”, a wywołujący uruchamia polecenie bez niej.
+#[test]
+fn broad_directories_are_never_labeled() {
+    use platform_contract::PlatformError;
+    let home = PathBuf::from(std::env::var("USERPROFILE").unwrap());
+    let root = PathBuf::from(r"C:\");
+    for dir in [home.clone(), root, home.join("Documents")] {
+        let root_cmd = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
+        let spec = ExecSpec {
+            process: ProcessSpec {
+                cmd: PathBuf::from(root_cmd).join(r"System32\cmd.exe"),
+                args: Vec::new(),
+                cwd: dir.clone(),
+                integrity: Integrity::Low,
+                memory_limit_mb: None,
+            },
+            raw_args: Some("/d /s /c \"echo x\"".into()),
+            env: env(),
+            timeout_ms: 10_000,
+            max_output_bytes: 1_024,
+        };
+        let out = WinProcesses::new(JobLimits::default()).run_captured(spec, &ExecControl::new());
+        assert!(
+            matches!(out, Err(PlatformError::Unsupported(_))),
+            "{}: {out:?}",
+            dir.display()
+        );
+    }
+}
