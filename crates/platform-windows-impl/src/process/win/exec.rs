@@ -7,7 +7,9 @@
 
 use std::os::windows::io::IntoRawHandle;
 use std::os::windows::process::CommandExt;
-use std::process::{ChildStderr, ChildStdout, Command, Stdio};
+use std::fs::File;
+use std::os::windows::io::OwnedHandle as StdHandle;
+use std::process::{Command, Stdio};
 
 use platform_contract::{ExecSpec, PlatformError};
 use windows::Win32::Foundation::HANDLE;
@@ -30,9 +32,9 @@ pub(crate) struct Spawned {
     /// Proces (do tabeli `WinProcesses`).
     pub(crate) child: Child,
     /// Koniec odczytu stdout.
-    pub(crate) stdout: ChildStdout,
+    pub(crate) stdout: File,
     /// Koniec odczytu stderr.
-    pub(crate) stderr: ChildStderr,
+    pub(crate) stderr: File,
 }
 
 /// Wznawia wątki procesu (nowy proces wstrzymany ma dokładnie jeden — główny).
@@ -123,7 +125,7 @@ pub(crate) fn spawn_captured(
             process,
             killed: false,
         },
-        stdout,
-        stderr,
+        stdout: File::from(StdHandle::from(stdout)),
+        stderr: File::from(StdHandle::from(stderr)),
     })
 }

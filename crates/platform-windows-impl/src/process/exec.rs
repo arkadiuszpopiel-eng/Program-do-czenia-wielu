@@ -121,11 +121,11 @@ pub(crate) fn drain(
 fn precheck(spec: &ExecSpec) -> Result<(), PlatformError> {
     spec.validate()?;
     super::cmdline::validate_spec(&spec.process)?;
-    if spec.process.integrity != Integrity::Medium {
-        // Proces o niskiej integralności nie zapisze plików użytkownika (zakres shella);
-        // AppContainer dochodzi z izolacją narzędzi (F3, część 2 Brokera).
+    if spec.process.integrity == Integrity::AppContainer {
+        // AppContainer odciąłby narzędzia od profilu użytkownika (git, cargo, npm) — polecenia
+        // izoluje integralność Low z katalogiem roboczym oznaczonym Low (dokument 25 §1).
         return Err(PlatformError::Unsupported(
-            "uruchamianie z przechwyceniem: tylko integralność Medium w Job Object".into(),
+            "uruchamianie z przechwyceniem: integralność Medium albo Low (bez AppContainer)".into(),
         ));
     }
     Ok(())
@@ -145,7 +145,10 @@ impl ExecPort for WinProcesses {
                 ..super::JobLimits::default()
             });
             let started = Instant::now();
-            let spawned = super::win::exec::spawn_captured(&spec, &limits)?;
+            let spawned = match spec.process.integrity {
+                Integrity::Low => super::win::low::spawn_low(&spec, &limits)?,
+                _ => super::win::exec::spawn_captured(&spec, &limits)?,
+            };
             let handle = ProcessHandle(spawned.child.pid());
             self.lock().insert(handle.0, spawned.child);
             control.notify_spawned(handle);
@@ -331,14 +334,14 @@ mod tests {
             p.run_captured(spec("relative.exe"), &c),
             Err(PlatformError::InvalidPath(_))
         ));
-        let mut low = spec(if cfg!(windows) {
+        let mut container = spec(if cfg!(windows) {
             r"C:\Windows\System32\cmd.exe"
         } else {
             "/bin/sh"
         });
-        low.process.integrity = Integrity::Low;
+        container.process.integrity = Integrity::AppContainer;
         assert!(matches!(
-            p.run_captured(low, &c),
+            p.run_captured(container, &c),
             Err(PlatformError::Unsupported(_))
         ));
         let mut zero = spec("/bin/sh");

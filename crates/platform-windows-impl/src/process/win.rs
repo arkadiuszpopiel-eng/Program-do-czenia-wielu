@@ -4,6 +4,7 @@
 #![allow(unsafe_code)]
 
 pub(crate) mod exec;
+pub(crate) mod low;
 
 use std::ffi::c_void;
 use std::mem::size_of;
