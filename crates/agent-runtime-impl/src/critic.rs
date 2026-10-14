@@ -185,7 +185,11 @@ impl Engine {
         let mut result = self.run_child(spec, options, review.clone()).await;
         let (mut ok, mut note, mut tainted, mut yielded) = read_verdict(&result);
         // Lżejszy model nie dał rady ocenić (błąd, brak werdyktu) → jeszcze raz, szczebel wyżej.
-        let weak = result.as_ref().ok().and_then(|r| r.model.clone());
+        let weak = result
+            .as_ref()
+            .ok()
+            .and_then(|r| r.model.clone())
+            .filter(|m| self.shared.provider.can_escalate(m));
         if ok.is_none()
             && !yielded
             && !self.handle.cancel.is_cancelled()

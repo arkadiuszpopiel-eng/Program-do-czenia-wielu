@@ -148,6 +148,13 @@ pub trait ModelProvider: Send + Sync {
     /// Lista modeli z Models API dostawcy (test połączenia w kreatorze kont).
     async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError>;
 
+    /// Czy dostawca ma model mocniejszy niż `from` (`dostawca:model` z `Started`) — wtedy ma
+    /// sens poprawka „szczebel wyżej” (`RouteHint::escalate_from`). Domyślnie nie: zwykły
+    /// dostawca odpowiada jednym modelem, więc ponowienie dałoby ten sam wynik.
+    fn can_escalate(&self, _from: &str) -> bool {
+        false
+    }
+
     /// Sprawdzenie samego klucza tam, gdzie lista modeli go nie sprawdza (OpenRouter oddaje
     /// listę każdemu). `Ok(opis)` — klucz przyjęty, z krótkim opisem konta (limit, zużycie)
     /// albo bez; `Unsupported` — dostawca nie ma takiej drogi. Domyślnie nieobsługiwane.
@@ -203,6 +210,10 @@ impl<P: ModelProvider + ?Sized> ModelProvider for std::sync::Arc<P> {
 
     async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError> {
         (**self).list_models().await
+    }
+
+    fn can_escalate(&self, from: &str) -> bool {
+        (**self).can_escalate(from)
     }
 
     async fn check_key(&self) -> Result<Option<String>, ProviderError> {

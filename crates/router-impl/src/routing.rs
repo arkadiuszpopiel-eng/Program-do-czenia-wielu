@@ -7,9 +7,9 @@ use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 use compliance_contract::Compliance;
 use providers_contract::{ChatRequest, HealthState, ModelProvider, ProviderId};
 use router_contract::{
-    BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints, DIFFICULTY_CLASSES,
-    DifficultyPolicy, PlanWindow, RouteDecision, RouteError, RouteKind, RoutePolicy, Router,
-    RouterClock, RouterEvent, TaskClass,
+    BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints, DifficultyPolicy,
+    PlanWindow, RouteDecision, RouteError, RouteKind, RoutePolicy, Router, RouterClock,
+    RouterEvent, TaskClass,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -232,15 +232,9 @@ impl RouterCore {
                     .or_default()
                     .insert(0, light.clone());
             }
-            // Dobór według trudności: lekki model lokalny jako szczebel „lekki” zwykłej pracy.
-            if self.difficulty_policy().enabled {
-                for class in DIFFICULTY_CLASSES {
-                    let list = policy.classes.entry(class).or_default();
-                    if !list.contains(&light) {
-                        list.push(light.clone());
-                    }
-                }
-            }
+            // Lekki model na karcie zintegrowanej nie wchodzi do zwykłej pracy (także przy doborze
+            // według trudności): na laptopie jest kilka razy wolniejszy niż główny (próba
+            // obowiązków 0.0.51 — wieczór ponad 10 min zamiast 46 s w 0.0.48).
         }
         let global = self.global.read().unwrap_or_else(|p| p.into_inner());
         crate::helpers::put_first(&mut policy.classes, &global);

@@ -240,3 +240,29 @@ async fn delegation_carries_the_role_class_and_its_own_goal() {
         "rodzic — klasa własnego dostawcy"
     );
 }
+
+/// Regresja próby obowiązków 0.0.51: bez mocniejszego modelu nie ma drugiej Krytyczki ani
+/// podniesienia — ponowienie tym samym modelem tylko wydłużało pracę (wieczór > 10 min).
+#[tokio::test(start_paused = true)]
+async fn without_a_stronger_model_there_is_no_retry_and_no_escalation() {
+    let (p, rt) = world();
+    let d = p.model("m-delta");
+    d.push_script(answer_by("local:jedyny-27b", "v1"));
+    d.push_script(answer_by("local:jedyny-27b", "v2"));
+    let g = p.model("m-gama");
+    g.push_script(answer_by("local:jedyny-27b", "Nie wiem."));
+    g.push_script(answer_by(
+        "local:jedyny-27b",
+        "WERYFIKACJA: BŁĄD — brak testów.",
+    ));
+    let run = rt.start_with(author(), crew()).await.unwrap();
+    let _ = rt.wait(&run).await.unwrap();
+    // Pierwsza Krytyczka bez werdyktu — bez drugiej próby (jest tylko ten jeden model).
+    assert_eq!(g.requests().len(), 1, "jedna próba Krytyczki");
+    assert!(
+        d.requests()
+            .iter()
+            .all(|r| r.meta.route.escalate_from.is_none()),
+        "bez podniesienia"
+    );
+}

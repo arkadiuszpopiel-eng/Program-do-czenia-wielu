@@ -59,6 +59,11 @@ impl ModelProvider for Routed {
     fn health(&self) -> ProviderHealth {
         ProviderHealth::healthy()
     }
+    /// Jak Router z modelami od lekkich do Opusa: mocniejszy istnieje, chyba że odrzucono
+    /// Opusa albo model „jedyny” (próba bez mocniejszego modelu).
+    fn can_escalate(&self, from: &str) -> bool {
+        !from.contains("opus") && !from.contains("jedyny")
+    }
     fn estimate_cost(&self, _request: &ChatRequest) -> Option<CostEstimate> {
         None
     }

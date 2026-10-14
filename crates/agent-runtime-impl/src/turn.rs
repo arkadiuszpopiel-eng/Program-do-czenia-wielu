@@ -28,7 +28,12 @@ impl Engine {
     /// Odpowiedź odrzucona: poprawka idzie do modelu szczebel mocniejszego niż ten, który ją
     /// napisał (Router: `escalate_from`). Zwraca opis dla notatki weryfikacji.
     pub(crate) fn escalate(&mut self) -> Option<String> {
-        let model = self.cp.answer_model.clone()?;
+        // Bez mocniejszego modelu podniesienie tylko powtórzyłoby ten sam model.
+        let model = self
+            .cp
+            .answer_model
+            .clone()
+            .filter(|m| self.shared.provider.can_escalate(m))?;
         self.cp.route.escalate_from = Some(model.clone());
         Some(format!("poprawka trafi do mocniejszego modelu niż {model}"))
     }

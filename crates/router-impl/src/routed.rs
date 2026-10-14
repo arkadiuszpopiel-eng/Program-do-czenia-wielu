@@ -184,6 +184,23 @@ impl ModelProvider for RoutedProvider {
         self.provider_of(&c)?.cost(&c.model, usage)
     }
 
+    /// Czy w kolejce klasy jest model wyższego szczebla niż `from` (zarejestrowany, inny niż
+    /// `from`) — bez tego podniesienie po odrzuceniu tylko powtórzyłoby ten sam model.
+    fn can_escalate(&self, from: &str) -> bool {
+        let Some(from) = Candidate::parse(from) else {
+            return false;
+        };
+        if !self.core.difficulty_policy().escalate {
+            return false;
+        }
+        let floor = self.core.rung_of(&from);
+        self.core.policy().candidates(self.class).iter().any(|c| {
+            *c != from
+                && self.core.registered(&c.provider).is_some()
+                && self.core.rung_of(c) > floor
+        })
+    }
+
     /// Modele z możliwości zarejestrowanych dostawców (bez ruchu sieciowego).
     async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError> {
         Ok(self

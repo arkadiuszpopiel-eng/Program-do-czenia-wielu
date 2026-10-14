@@ -344,3 +344,28 @@ fn manual_queue_keeps_its_order_unless_reordering_is_allowed() {
         BIELIK
     );
 }
+
+#[test]
+fn can_escalate_only_when_a_stronger_model_is_queued() {
+    use providers_contract::ModelProvider;
+    let s = setup();
+    let chat = RoutedProvider::new(s.core.clone(), TaskClass::Conversation);
+    assert!(
+        chat.can_escalate(&format!("local:{QWEN}")),
+        "Qwen → są mocne"
+    );
+    assert!(chat.can_escalate(&format!("local-light:{BIELIK}")));
+    assert!(
+        !chat.can_escalate(&format!("anthropic:{OPUS}")),
+        "nad mocnym nic"
+    );
+    assert!(!chat.can_escalate("bez-dwukropka"));
+    s.core.set_difficulty_policy(DifficultyPolicy {
+        escalate: false,
+        ..DifficultyPolicy::default()
+    });
+    assert!(
+        !chat.can_escalate(&format!("local:{QWEN}")),
+        "podnoszenie wyłączone"
+    );
+}

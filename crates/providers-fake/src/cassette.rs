@@ -175,6 +175,10 @@ impl<P: ModelProvider> ModelProvider for Recorder<P> {
         self.inner.list_models().await
     }
 
+    fn can_escalate(&self, from: &str) -> bool {
+        self.inner.can_escalate(from)
+    }
+
     async fn check_key(&self) -> Result<Option<String>, ProviderError> {
         self.inner.check_key().await
     }
