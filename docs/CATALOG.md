@@ -12,7 +12,7 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 111 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 398 724 |
+| Linie Rust (z testami) | 398 749 |
 | Testy (`#[test]`, `#[tokio::test]`) | 2774 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
@@ -32,7 +32,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `device-profile` | F1 | service | inproc | C · I · F | 2649 | 22 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
-| `platform` | — | — | — | C · F | 14 377 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
+| `platform` | — | — | — | C · F | 14 387 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 4837 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
 | `platform-windows` | F1, F5, F6 | service | inproc | I | 7844 | 70 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -147,18 +147,18 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4258 | 26 | — |  |
-| `app-api` | — | — | — | pojedynczy | 7331 | 32 | — |  |
+| `app-api` | — | — | — | pojedynczy | 7333 | 32 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4387 | 24 | — |  |
 | `app-chat` | — | — | — | pojedynczy | 2167 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 17 209 | 114 | — |  |
+| `app-core` | — | — | — | pojedynczy | 17 070 | 113 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3184 | 26 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
 | `app-health` | — | — | — | pojedynczy | 1482 | 6 | — |  |
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
-| `app-models` | — | — | — | pojedynczy | 7543 | 46 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 5223 | 33 | — |  |
+| `app-models` | — | — | — | pojedynczy | 7554 | 46 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 5364 | 34 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |
@@ -199,5 +199,5 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Crate `-impl` bez `module.toml` | 1 | `core-bus-impl` |
 | Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | 6 | `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
 | Crate bez `README.md` | 0 | brak |
-| Plik Rust powyżej 400 linii | 7 | `crates/app-modules/src/probe.rs` (443), `crates/router-impl/tests/decisions.rs` (437), `crates/accounts-hub-fake/src/hub.rs` (419), `crates/voice-tts-impl/tests/tts.rs` (412), `crates/app-core/tests/dto_roundtrip.rs` (406), `crates/app-models/src/data.rs` (406), `crates/providers-local-impl/tests/lifecycle.rs` (404) |
-| Crate powyżej 8000 linii w `src/` | 2 | `app-core` (8112), `platform-contract` (8039) |
+| Plik Rust powyżej 400 linii | 5 | `crates/router-impl/tests/decisions.rs` (437), `crates/accounts-hub-fake/src/hub.rs` (419), `crates/voice-tts-impl/tests/tts.rs` (412), `crates/app-core/tests/dto_roundtrip.rs` (406), `crates/providers-local-impl/tests/lifecycle.rs` (404) |
+| Crate powyżej 8000 linii w `src/` | 0 | brak |

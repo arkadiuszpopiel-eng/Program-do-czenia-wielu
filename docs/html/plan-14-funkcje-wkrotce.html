@@ -327,10 +327,12 @@ pojawi się strona „wkrótce”, której tu nie ma.</p>
 <h2 id="1-strony-ustawien-ze-znakiem-wkrotce">1. Strony Ustawień ze znakiem „wkrótce”</h2>
 <p>Znak „wkrótce” w nawigacji Ustawień dostaje strona, która w <code>crates/app-core/data/settings-pages.json</code> ma
 <code>wave</code> większe niż 1. Po wejściu widać „Ta strona jest jeszcze w przygotowaniu” i listę zapowiedzi.</p>
-<div class="tbl"><table><thead><tr><th>Strona (<code>id</code>)</th><th>Zapowiedzi na stronie</th><th>Co już jest w rdzeniu</th><th>Zadanie</th></tr></thead><tbody><tr><td>Router i reguły (<code>router</code>)</td><td>klasy zadań i modele zapasowe; tagi prywatności i jurysdykcji</td><td>Router działa (klasy zadań, kolejki modeli, zapas, bezpieczniki); reguły da się dziś zmienić tylko plikiem</td><td>C4.1</td></tr>
-<tr><td>Logi i prywatność (<code>logs</code>)</td><td>retencja i redakcja; „co poszło do chmury”</td><td>dziennik NDJSON i audyt są zapisywane; nie ma przeglądarki ani ustawień retencji w oknie</td><td>C4.2</td></tr>
+<div class="tbl"><table><thead><tr><th>Strona (<code>id</code>)</th><th>Zapowiedzi na stronie</th><th>Co już jest w rdzeniu</th><th>Zadanie</th></tr></thead><tbody><tr><td>Logi i prywatność (<code>logs</code>)</td><td>retencja i redakcja; „co poszło do chmury”</td><td>dziennik NDJSON i audyt są zapisywane; nie ma przeglądarki ani ustawień retencji w oknie</td><td>C4.2</td></tr>
 <tr><td>Moduły (<code>modules</code>)</td><td>lista modułów, włącz / wyłącz; budżety RAM i CPU</td><td>rejestr modułów z manifestami i stanem zdrowia; część widać w „Zdrowie systemu”</td><td>C4.3</td></tr>
 <tr><td>Zaawansowane (<code>advanced</code>)</td><td>edytor surowy TOML; flagi eksperymentalne</td><td>konfiguracja TOML ze schematem i przeładowaniem na żywo</td><td>C4.4</td></tr></tbody></table></div>
+<p>Strona <code>router</code> działa od wersji 0.0.51 jako „Dobór modelu” (dobór według trudności, szczeble modeli,
+Krytyczka, podgląd). Z jej dawnych zapowiedzi zostały w planie tagi prywatności i jurysdykcji w oknie —
+zadanie C4.1.</p>
 <p>Uwagi do kolejności:</p>
 <ul>
 <li><strong>C4.2 „co poszło do chmury”</strong> dotyka audytu i tagów prywatności — to obszar Jądra, więc widok może tylko

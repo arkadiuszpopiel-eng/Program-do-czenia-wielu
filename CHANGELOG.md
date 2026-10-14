@@ -12,6 +12,78 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.51 — 2026-10-14
+
+Alfa dobiera model do trudności zadania: łatwe sprawy idą do lekkiego, taniego albo lokalnego modelu,
+kod do średniego (np. lokalny Qwen 27B), a trudne do najmocniejszego (np. GPT Sol, Opus). Gdy
+Krytyczka odrzuci odpowiedź, poprawkę robi mocniejszy model. Do tego poprawki wszystkich usterek
+z zewnętrznego audytu z 14 października.
+
+### Dobór modelu
+
+- Nowa strona Ustawienia → Dobór modelu (dawne „Router i reguły — wkrótce”): włącznik, strategia
+  (oszczędnie, zrównoważenie, jakość), na jakim modelu sprawdza Krytyczka, „najpierw model lokalny”,
+  szczebel każdego modelu (lekki, średni, mocny — rozpoznany z nazwy, można zmienić) i „Sprawdź na
+  przykładzie”: wpisujesz prośbę i widzisz, jak trudna jest i który model odpowie pierwszy.
+- Ocena trudności: kod, prośba o analizę albo projekt, wiele kroków, obraz, długość, kilka pytań,
+  krótka prośba w rozmowie o kodzie („popraw to”). Polskie słowa są rozpoznawane także bez ogonków.
+- Kod, planowanie i sterowanie ekranem nie schodzą poniżej średniego szczebla.
+- Krytyczka sprawdza odpowiedzi na lekkim modelu. Odrzucona odpowiedź wraca do poprawki na modelu
+  mocniejszym niż ten, który ją napisał. Gdy lekka Krytyczka nie potrafi ocenić, druga próba idzie
+  szczebel wyżej.
+- Zadanie przekazane Koderce idzie kolejką „Kod”, a nie kolejką Dyrygentki.
+- Kolejka ustawiona ręcznie (konta albo wspólna) ma pierwszeństwo — Alfa trzyma się jej kolejności,
+  chyba że włączysz „Zmieniaj też kolejność kolejek ustawionych ręcznie”. Podniesienie po odrzuceniu
+  odpowiedzi działa zawsze.
+- Oś czasu rozmowy mówi, dlaczego odpowiada dany model („dobór: trudne (kod, rozumowanie) →
+  szczebel mocny”).
+
+### Bezpieczeństwo (audyt z 14.10)
+
+- [krytyczne] STOP WSZYSTKIEGO bez potwierdzenia Brokera nie mówi już „zatrzymano”. Pokazuje trwały
+  komunikat o zatrzymaniu niepełnym i podaje, czego nie potwierdzono.
+- [krytyczne] Obniżony poziom autonomii (globalny i dla sesji) wraca także wtedy, gdy Broker
+  uruchamia się później albo ponownie. Strażnik pilnuje go cały czas.
+- [krytyczne] Po ponownym uruchomieniu Brokera watchdog dostaje jego nową tożsamość, więc
+  kill-switch spoza aplikacji dalej do niego dociera.
+- [poważne] Cofnięcie częściowe da się powtórzyć, także po restarcie — wracają tylko pliki, które
+  poprzednio nie wróciły. Błąd zapisu dziennika cofania nie jest już przemilczany, a komunikat mówi,
+  co nie wróciło.
+- [poważne] Analiza poleceń powłoki widzi polecenia zagnieżdżone (`powershell -Command "…"`,
+  `cmd /c`), zakodowane i `Invoke-Expression`, `git clean -f`, `robocopy /MIR`, nadpisanie przez `>`
+  i `Out-File` oraz ścieżki poświadczeń zapisane wzorcem (`.s?h`).
+- [poważne] Widok bezpieczeństwa nie pokazuje „izolacji” przy zerwanym łączu z usługą Brokera, opis
+  okna zatwierdzeń zgadza się z jego stanem, a nieodczytany stan Brokera daje baner „stan nieznany”.
+- [poważne] Rejestr silników pobocznych kończy proces tylko przy zgodnej tożsamości (pełna ścieżka
+  i czas utworzenia), a nie po samym numerze i nazwie.
+- Edycja oczekującej propozycji pamięci nie zatwierdza jej — trzeba kliknąć „Zatwierdź”.
+
+### Jakość i budowa (audyt z 14.10)
+
+- Zależności z ostrzeżeniami bezpieczeństwa podniesione: ammonia 4.2.3, Storybook 9.1.21,
+  `@vitest/mocker` 4.1.11. `cargo deny` i `pnpm audit` są czyste.
+- Pigułka głosowa mieści się w budżecie startowym (7,9 KB przy limicie 8 KB) — dymki bez menu edycji.
+- „verify wersja” obejmuje te same bramki co CI (lint, schematy, tokeny i kontrast, typy łącza,
+  budżet rozmiaru, powłoka zwykła i testowa, audyt npm). Pominięty etap daje wynik NIEKOMPLETNY,
+  a nie zielony. Pokrycie łącza w prawdziwej aplikacji jest bramką.
+- Plik zależności powłoki był przy starej wersji i budowa z `--locked` odmawiała — skrypt wersji
+  odświeża go teraz i sprawdza.
+- Nowa bramka rozmiaru: plik ≤ 400 linii, crate ≤ 8000 linii; jawne wyjątki (testy, atrapy, dane)
+  mają sufit. `app-core` zszedł poniżej limitu; podzielone duże pliki interfejsu i rdzenia.
+- Poprawione: test, który się nie kompilował, rozjazd schematu i uprawnień poleceń doboru, lint
+  i formatowanie.
+
+### Testy
+
+- Rdzeń: ocena trudności (tabela polskich i angielskich próśb), szczeble i kolejność prób, router
+  (8 scenariuszy, w tym pierwszeństwo kolejki ręcznej), agentka (Krytyczka na lekkim, podnoszenie
+  po odrzuceniu, druga próba Krytyczki, klasa roli przy delegacji), pełna ścieżka rozmowy przez
+  prawdziwy adapter, STOP WSZYSTKIEGO, strażnik autonomii, ponowienie cofania po restarcie,
+  watchdog po restarcie Brokera, analiza poleceń, odcisk procesów pobocznych na prawdziwych
+  procesach, edycja propozycji pamięci.
+- Interfejs: logika doboru, stan Brokera (wyścig migawki, stan nieznany), strona „Dobór modelu”
+  w przeglądarce i w prawdziwej aplikacji; zrzuty w 3 stylach × 2 motywach.
+
 ## 0.0.50 — 2026-10-14
 
 „Testuj połączenie” przy koncie OpenRouter naprawdę sprawdza klucz, a kolejkę modeli można teraz ustawić

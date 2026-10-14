@@ -4,7 +4,7 @@ Alfa to lekki, bardzo modułowy program dla Windows 11, który łączy modele lo
 
 ## Stan projektu
 
-**Stabilizacja MVP na sprzęcie** (stan na 2026-10-08). Kod wszystkich fal F0–F9 istnieje: 241 crate'ów Rust (ok. 374 tys. linii, ok. 2500 testów) i interfejs Svelte 5 (ok. 46 tys. linii). Z 108 kryteriów akceptacji 38 jest spełnionych w CI na atrapach, 57 czeka na pomiar na sprzęcie, korpusie albo kluczu, 11 nie ma zestawu lub implementacji, 2 czekają na decyzję właściciela — szczegóły w [`docs/STATUS.md`](docs/STATUS.md). Żadne kryterium nie jest jeszcze potwierdzone na prawdziwej maszynie; pierwszy test na laptopie (2026-10-07) znalazł błędy, których atrapy nie pokazały. Do zamknięcia MVP nie dochodzą nowe funkcje — kolejność prac: [`docs/KONTYNUACJA.md`](docs/KONTYNUACJA.md).
+**Stabilizacja MVP na sprzęcie** (stan na 2026-10-14, wersja 0.0.51). Kod wszystkich fal F0–F9 istnieje: 247 crate'ów Rust (ok. 400 tys. linii z testami) i interfejs Svelte 5 (ok. 75 tys. linii z testami); liczby testów z ostatniego pełnego biegu są w raporcie `target/verify/<wersja>/raport-wersja.md`. Z 108 kryteriów akceptacji 38 jest spełnionych w CI na atrapach, 57 czeka na pomiar na sprzęcie, korpusie albo kluczu, 11 nie ma zestawu lub implementacji, 2 czekają na decyzję właściciela — szczegóły w [`docs/STATUS.md`](docs/STATUS.md). Żadne kryterium nie jest jeszcze potwierdzone na prawdziwej maszynie; pierwszy test na laptopie (2026-10-07) znalazł błędy, których atrapy nie pokazały. Do zamknięcia MVP nie dochodzą nowe funkcje — kolejność prac: [`docs/KONTYNUACJA.md`](docs/KONTYNUACJA.md).
 
 ## Kluczowe założenia
 
@@ -23,7 +23,7 @@ Alfa to lekki, bardzo modułowy program dla Windows 11, który łączy modele lo
 
 ```
 apps/desktop/         powłoka Tauri 2 (src-tauri) + interfejs Svelte 5 (ui)
-crates/               241 crate'ów: moduły jako trójki <moduł>-contract | -impl | -fake,
+crates/               247 crate'ów: moduły jako trójki <moduł>-contract | -impl | -fake,
                       jądro core-*, kompozycja app-*, biblioteki lib-*  → docs/CATALOG.md
 packages/ui-kit/      tokeny designu, komponenty, Storybook
 packages/schemas/     JSON Schema zdarzeń i manifestu modułu

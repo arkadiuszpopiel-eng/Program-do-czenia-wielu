@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-12**, wersja programu **0.0.50**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-14**, wersja programu **0.0.51**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -65,6 +65,7 @@ funkcjami.
 | 0.0.30 | 2026-10-11 | P1: głos Supertonic 3 jako osobny proces w Rust, cztery barwy agentek; zmierzone 0,97 s na zdanie na laptopie (brzmienie — do odsłuchu właściciela) |
 | 0.0.31 | 2026-10-11 | P1: wybór barwy głosu dla każdej agentki (10 barw Supertonic 3) |
 | 0.0.32 | 2026-10-11 | silnik llama.cpp b11559 w katalogu z przypiętymi sumami; pomiar Qwen3-ASR (aplikacja nie budowana) |
+| 0.0.51 | 2026-10-14 | Dobór modelu według trudności; poprawki audytu zewnętrznego (bezpieczeństwo, bramki, zależności, rozmiary) |
 | 0.0.50 | 2026-10-14 | Test klucza OpenRoutera; wspólna kolejka modeli wszystkich kont |
 | 0.0.49 | 2026-10-12 | Kreator pierwszego uruchomienia w nowym układzie; opisy dostawców zdaniami; izolacja instancji testowej (sekrety `Alfa/test/…`, katalog użytkownika, środowisko bez kluczy) |
 | 0.0.48 | 2026-10-12 | Naprawy wad znalezionych testami: silniki poboczne zamykane przy wyjściu (rejestr `lib-sidecar-guard`), bramka słuchania na czas próbki głosu, stabilny test; diagnostyka mikrofonu; pobieranie przez program sprawdzone |
