@@ -22,7 +22,7 @@ import type * as H13 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 278 typów wspólnych, 537 sprawdzeń. */
+/** 286 typów wspólnych, 553 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H11.AboutInfo>>,
   Expect<Fits<H11.AboutInfo, G.AboutInfo>>,
@@ -320,6 +320,10 @@ export type IpcCompat = [
   Expect<Fits<H0.ModelProfile, G.ModelProfile>>,
   Expect<Fits<G.ModelProgressView, H7.ModelProgressView>>,
   Expect<Fits<H7.ModelProgressView, G.ModelProgressView>>,
+  Expect<Fits<G.ModelRouting, H5.ModelRouting>>,
+  Expect<Fits<H5.ModelRouting, G.ModelRouting>>,
+  Expect<Fits<G.ModelRoutingSettings, H5.ModelRoutingSettings>>,
+  Expect<Fits<H5.ModelRoutingSettings, G.ModelRoutingSettings>>,
   Expect<Fits<G.ModelsView, H7.ModelsView>>,
   Expect<Fits<H7.ModelsView, G.ModelsView>>,
   Expect<Fits<G.ModuleHealth, H13.ModuleHealth>>,
@@ -394,6 +398,16 @@ export type IpcCompat = [
   Expect<Fits<H13.RiskView, G.RiskView>>,
   Expect<Fits<G.RoleDraft, H13.RoleDraft>>,
   Expect<Fits<H13.RoleDraft, G.RoleDraft>>,
+  Expect<Fits<G.RoutingLevel, H5.RoutingLevel>>,
+  Expect<Fits<H5.RoutingLevel, G.RoutingLevel>>,
+  Expect<Fits<G.RoutingModel, H5.RoutingModel>>,
+  Expect<Fits<H5.RoutingModel, G.RoutingModel>>,
+  Expect<Fits<G.RoutingPreview, H5.RoutingPreview>>,
+  Expect<Fits<H5.RoutingPreview, G.RoutingPreview>>,
+  Expect<Fits<G.RoutingRung, H5.RoutingRung>>,
+  Expect<Fits<H5.RoutingRung, G.RoutingRung>>,
+  Expect<Fits<G.RoutingStrategy, H5.RoutingStrategy>>,
+  Expect<Fits<H5.RoutingStrategy, G.RoutingStrategy>>,
   Expect<Fits<G.RunBudgetView, H1.RunBudgetView>>,
   Expect<Fits<H1.RunBudgetView, G.RunBudgetView>>,
   Expect<Fits<G.RunState, H1.RunState>>,
@@ -431,6 +445,8 @@ export type IpcCompat = [
   Expect<Fits<H9.SettingsCustomPage, G.SettingsCustomPage>>,
   Expect<Fits<G.SettingsPageDef, H9.SettingsPageDef>>,
   Expect<Fits<H9.SettingsPageDef, G.SettingsPageDef>>,
+  Expect<Fits<G.SharedQueueEntry, H5.SharedQueueEntry>>,
+  Expect<Fits<H5.SharedQueueEntry, G.SharedQueueEntry>>,
   Expect<Fits<G.SkillImportResult, H13.SkillImportResult>>,
   Expect<Fits<H13.SkillImportResult, G.SkillImportResult>>,
   Expect<Fits<G.SkillInfo, H13.SkillInfo>>,

@@ -12,6 +12,7 @@ import {
   type TaskClassId,
 } from '../../logic/model-queue';
 import { FAKE_CATALOG } from './catalog';
+import { routingApi } from './api-routing';
 import { sharedQueueApi } from './api-shared-queue';
 import { OPENAI_MODELS, fakeModel, purposeOf, suggestFake } from './model-info';
 import type { FakeCore } from './core';
@@ -183,6 +184,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
   const urls = new Map<string, string>();
   return {
     ...sharedQueueApi(core),
+    ...routingApi(core),
     catalog: () => core.reply(FAKE_CATALOG),
     list: () => core.reply(core.accounts),
     add: (input) => {

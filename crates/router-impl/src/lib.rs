@@ -21,6 +21,7 @@ mod helpers;
 mod history;
 mod module;
 mod routed;
+mod router_trait;
 mod routing;
 
 pub use clock::{ManualClock, TokioClock};

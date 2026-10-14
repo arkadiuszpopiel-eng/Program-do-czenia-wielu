@@ -30,8 +30,8 @@ use sessions_contract::PrivacyTag;
 
 use accounts::AccountRoutes;
 use app_api::dto::{ModelProfile, ModelRouting, ModelRoutingSettings, RoutingPreview};
-use routing_settings::PolicyFile;
 use app_api::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, BrainTarget, RouteNote};
+use routing_settings::PolicyFile;
 
 /// Komunikat „brak mózgu" (PLAN §14.5: bez kluczy startuje profil lokalny).
 pub const NO_BRAIN: &str = "Brak mózgu: dodaj klucz API w Ustawieniach → Konta i klucze API \
@@ -136,7 +136,11 @@ impl RouterBrain {
     }
 
     fn cores(&self) -> [&Arc<RouterCore>; 3] {
-        [&self.routers.hybrid, &self.routers.cloud, &self.routers.local]
+        [
+            &self.routers.hybrid,
+            &self.routers.cloud,
+            &self.routers.local,
+        ]
     }
 
     /// Nakłada ustawienia doboru na rdzenie, gdy plik się zmienił.

@@ -60,6 +60,14 @@ async fn chat_picks_light_medium_or_strong_model_by_difficulty() {
     assert_eq!(rung("gpt-4o"), RoutingRung::Standard);
     assert_eq!(rung("gpt-6-sol"), RoutingRung::Strong);
 
+    // Domyślnie kolejka ustawiona ręcznie ma pierwszeństwo (audyt A-02: kolejka konta nie może
+    // zostać po cichu przestawiona).
+    assert!(!routing.settings.reorder_queues);
+    assert_eq!(world.first(&mut rx, EASY).await, "gpt-6-sol");
+    let mut settings = routing.settings.clone();
+    settings.reorder_queues = true;
+    core.routing_set(settings.clone()).await.unwrap();
+
     assert_eq!(world.first(&mut rx, EASY).await, "gpt-4o-mini");
     assert_eq!(world.first(&mut rx, MEDIUM).await, "gpt-4o");
     assert_eq!(world.first(&mut rx, HARD).await, "gpt-6-sol");
@@ -86,9 +94,14 @@ async fn chat_picks_light_medium_or_strong_model_by_difficulty() {
         details.iter().any(|d| d.contains("dobór: trudne (")),
         "{details:?}"
     );
+    assert!(
+        details
+            .iter()
+            .any(|d| d.contains("kolejka ustawiona ręcznie, bez zmian")),
+        "{details:?}"
+    );
 
     // Oszczędnie: wyjaśnienie zostaje na lekkim modelu.
-    let mut settings = routing.settings.clone();
     settings.strategy = RoutingStrategy::Economy;
     core.routing_set(settings.clone()).await.unwrap();
     assert_eq!(world.first(&mut rx, MEDIUM).await, "gpt-4o-mini");
@@ -125,7 +138,7 @@ impl World {
     /// Wysyła pytanie i zwraca pierwszy model, o który Router zapytał dostawcę.
     async fn first(
         &self,
-        rx: &mut tokio::sync::broadcast::Receiver<app_core::dto::EventBatch>,
+        rx: &mut tokio::sync::broadcast::Receiver<app_core::EventBatch>,
         text: &str,
     ) -> String {
         self.asked.lock().unwrap().clear();
@@ -171,7 +184,19 @@ async fn preview_explains_the_choice_and_bad_input_is_refused() {
     assert_eq!(easy.start, Some(RoutingRung::Light));
     assert_eq!(easy.reasons, "krótka, prosta prośba");
 
-    // Kod: prosta prośba nie schodzi poniżej średniego; kolejność kolejki konta „Kod”.
+    // Kolejka „Kod” ustawiona ręcznie — domyślnie bez zmian kolejności.
+    let kept = core
+        .routing_preview("dodaj komentarz".into(), "code".into())
+        .await
+        .unwrap();
+    assert!(kept.kept_queue);
+    let order: Vec<&str> = kept.order.iter().map(|m| m.model.as_str()).collect();
+    assert_eq!(order, ["gpt-6-sol", "gpt-4o", "gpt-4o-mini"]);
+    let mut settings = core.routing_get().await.unwrap().settings;
+    settings.reorder_queues = true;
+    core.routing_set(settings).await.unwrap();
+
+    // Kod: prosta prośba nie schodzi poniżej średniego.
     let code = core
         .routing_preview("dodaj komentarz".into(), "code".into())
         .await
@@ -180,7 +205,13 @@ async fn preview_explains_the_choice_and_bad_input_is_refused() {
     assert!(code.reasons.contains("zadanie kodu"), "{}", code.reasons);
     let order: Vec<&str> = code.order.iter().map(|m| m.model.as_str()).collect();
     assert_eq!(order, ["gpt-4o", "gpt-6-sol", "gpt-4o-mini"]);
-    assert!(code.order.iter().all(|m| m.provider_name == "OpenAI"));
+    assert!(
+        code.order
+            .iter()
+            .all(|m| m.provider_name == "Własny endpoint (zgodny z OpenAI)"),
+        "{:?}",
+        code.order
+    );
 
     let hard = core
         .routing_preview(HARD.into(), "code".into())

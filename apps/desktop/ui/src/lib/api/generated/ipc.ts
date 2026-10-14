@@ -1821,6 +1821,32 @@ export interface ModelProgressView {
   readonly total: number | null;
 }
 
+/** Ustawienia i modele, które Router bierze pod uwagę. */
+export interface ModelRouting {
+  readonly models: readonly RoutingModel[];
+  readonly settings: ModelRoutingSettings;
+}
+
+/** Ustawienia doboru. */
+export interface ModelRoutingSettings {
+  /** Dobór włączony. */
+  readonly enabled: boolean;
+  /** Poprawka po odrzuceniu odpowiedzi na mocniejszym modelu. */
+  readonly escalate: boolean;
+  /** Przy równym szczeblu najpierw model lokalny. */
+  readonly local_first: boolean;
+  /**
+   * Dobór zmienia też kolejność kolejek ustawionych ręcznie (domyślnie nie — kolejka ręczna
+   * ma pierwszeństwo).
+   */
+  readonly reorder_queues: boolean;
+  /** Trudność sprawdzania odpowiedzi (Krytyczka). */
+  readonly review: RoutingLevel;
+  /** Szczeble ustawione ręcznie: `dostawca:model` → szczebel. */
+  readonly rungs: Readonly<Record<string, RoutingRung>>;
+  readonly strategy: RoutingStrategy;
+}
+
 /** Lista pozycji, embedder i przebudowa (`models_list`). */
 export interface ModelsView {
   readonly embedder: EmbedderView;
@@ -2147,6 +2173,47 @@ export interface RoleDraft {
   /** Praca na niezaufanych źródłach w izolacji. */
   readonly untrusted_isolated: boolean;
 }
+
+/** Trudność zadania. */
+export type RoutingLevel = 'easy' | 'medium' | 'hard';
+
+/** Model w doborze: kandydat Routera z jego szczeblem. */
+export interface RoutingModel {
+  /** Szczebel rozpoznany automatycznie (po nazwie, lekki dostawca lokalny). */
+  readonly automatic: RoutingRung;
+  /** `dostawca:model`. */
+  readonly candidate: string;
+  /** Trasa lokalna. */
+  readonly local: boolean;
+  /** Model u dostawcy. */
+  readonly model: string;
+  /** Nazwa dostawcy („OpenAI”, „Model lokalny”). */
+  readonly provider_name: string;
+  /** Szczebel obowiązujący. */
+  readonly rung: RoutingRung;
+}
+
+/** Podgląd: jak Router potraktuje przykładowe zadanie. */
+export interface RoutingPreview {
+  /** Trudność (brak — klasa bez doboru albo dobór wyłączony). */
+  readonly difficulty: RoutingLevel | null;
+  /** Klasa ma kolejkę ustawioną ręcznie i zostaje w jej kolejności. */
+  readonly kept_queue: boolean;
+  /** Kolejność prób (pierwszy odpowiada, reszta to zapas). */
+  readonly order: readonly RoutingModel[];
+  /** Powody oceny po ludzku. */
+  readonly reasons: string;
+  /** Wynik oceny 0–100. */
+  readonly score: number | null;
+  /** Szczebel startowy. */
+  readonly start: RoutingRung | null;
+}
+
+/** Szczebel modelu. */
+export type RoutingRung = 'light' | 'standard' | 'strong';
+
+/** Strategia progów trudności. */
+export type RoutingStrategy = 'economy' | 'balanced' | 'quality';
 
 /** Budżety przebiegu (`[agent] default_budget`); przekroczenie = czyste zatrzymanie z raportem. */
 export interface RunBudget {
@@ -3542,6 +3609,18 @@ export interface IpcCommands {
     readonly result: null;
   };
   readonly quick_hide: { readonly args: Readonly<Record<string, never>>; readonly result: null };
+  readonly routing_get: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: ModelRouting;
+  };
+  readonly routing_preview: {
+    readonly args: { readonly text: string; readonly taskClass: string };
+    readonly result: RoutingPreview;
+  };
+  readonly routing_set: {
+    readonly args: { readonly settings: ModelRoutingSettings };
+    readonly result: ModelRouting;
+  };
   readonly search_reindex_cancel: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: ReindexView;

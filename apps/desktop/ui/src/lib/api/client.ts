@@ -40,6 +40,9 @@ import type {
   LocalModelInfo,
   PermissionsState,
   ProviderInfo,
+  ModelRouting,
+  ModelRoutingSettings,
+  RoutingPreview,
   SharedQueueEntry,
   SharedQueues,
   TestReport,
@@ -222,6 +225,12 @@ export interface AccountsApi {
   sharedQueues(): Promise<SharedQueues>;
   /** Wspólna kolejka klasy zadań (najwyżej 10 pozycji); pusta lista ją usuwa. */
   setSharedQueue(taskClass: string, entries: readonly SharedQueueEntry[]): Promise<SharedQueues>;
+  /** Dobór modelu według trudności: ustawienia i modele Routera z ich szczeblami. */
+  routing(): Promise<ModelRouting>;
+  /** Zapisuje ustawienia doboru (działają od następnej odpowiedzi). */
+  setRouting(settings: ModelRoutingSettings): Promise<ModelRouting>;
+  /** Jak Router potraktuje przykładowe zadanie w klasie (`chat`, `code`, …). */
+  routingPreview(text: string, taskClass: string): Promise<RoutingPreview>;
   /** Import kluczy ze zmiennych środowiskowych z katalogu dostawców (raport bez wartości). */
   importEnv(): Promise<readonly EnvImportResult[]>;
 }

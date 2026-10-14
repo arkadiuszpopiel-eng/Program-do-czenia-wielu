@@ -6705,6 +6705,70 @@
       ],
       "type": "object"
     },
+    "ModelRouting": {
+      "description": "Ustawienia i modele, które Router bierze pod uwagę.",
+      "properties": {
+        "models": {
+          "items": {
+            "$ref": "#/$defs/RoutingModel"
+          },
+          "type": "array"
+        },
+        "settings": {
+          "$ref": "#/$defs/ModelRoutingSettings"
+        }
+      },
+      "required": [
+        "settings",
+        "models"
+      ],
+      "type": "object"
+    },
+    "ModelRoutingSettings": {
+      "description": "Ustawienia doboru.",
+      "properties": {
+        "enabled": {
+          "description": "Dobór włączony.",
+          "type": "boolean"
+        },
+        "escalate": {
+          "description": "Poprawka po odrzuceniu odpowiedzi na mocniejszym modelu.",
+          "type": "boolean"
+        },
+        "local_first": {
+          "description": "Przy równym szczeblu najpierw model lokalny.",
+          "type": "boolean"
+        },
+        "reorder_queues": {
+          "description": "Dobór zmienia też kolejność kolejek ustawionych ręcznie (domyślnie nie — kolejka ręczna\nma pierwszeństwo).",
+          "type": "boolean"
+        },
+        "review": {
+          "$ref": "#/$defs/RoutingLevel",
+          "description": "Trudność sprawdzania odpowiedzi (Krytyczka)."
+        },
+        "rungs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/RoutingRung"
+          },
+          "description": "Szczeble ustawione ręcznie: `dostawca:model` → szczebel.",
+          "type": "object"
+        },
+        "strategy": {
+          "$ref": "#/$defs/RoutingStrategy"
+        }
+      },
+      "required": [
+        "enabled",
+        "strategy",
+        "escalate",
+        "review",
+        "local_first",
+        "rungs",
+        "reorder_queues"
+      ],
+      "type": "object"
+    },
     "ModelsView": {
       "description": "Lista pozycji, embedder i przebudowa (`models_list`).",
       "properties": {
@@ -7885,6 +7949,132 @@
         "author"
       ],
       "type": "object"
+    },
+    "RoutingLevel": {
+      "description": "Trudność zadania.",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "type": "string"
+    },
+    "RoutingModel": {
+      "description": "Model w doborze: kandydat Routera z jego szczeblem.",
+      "properties": {
+        "automatic": {
+          "$ref": "#/$defs/RoutingRung",
+          "description": "Szczebel rozpoznany automatycznie (po nazwie, lekki dostawca lokalny)."
+        },
+        "candidate": {
+          "description": "`dostawca:model`.",
+          "type": "string"
+        },
+        "local": {
+          "description": "Trasa lokalna.",
+          "type": "boolean"
+        },
+        "model": {
+          "description": "Model u dostawcy.",
+          "type": "string"
+        },
+        "provider_name": {
+          "description": "Nazwa dostawcy („OpenAI”, „Model lokalny”).",
+          "type": "string"
+        },
+        "rung": {
+          "$ref": "#/$defs/RoutingRung",
+          "description": "Szczebel obowiązujący."
+        }
+      },
+      "required": [
+        "candidate",
+        "provider_name",
+        "model",
+        "local",
+        "rung",
+        "automatic"
+      ],
+      "type": "object"
+    },
+    "RoutingPreview": {
+      "description": "Podgląd: jak Router potraktuje przykładowe zadanie.",
+      "properties": {
+        "difficulty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoutingLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Trudność (brak — klasa bez doboru albo dobór wyłączony)."
+        },
+        "kept_queue": {
+          "description": "Klasa ma kolejkę ustawioną ręcznie i zostaje w jej kolejności.",
+          "type": "boolean"
+        },
+        "order": {
+          "description": "Kolejność prób (pierwszy odpowiada, reszta to zapas).",
+          "items": {
+            "$ref": "#/$defs/RoutingModel"
+          },
+          "type": "array"
+        },
+        "reasons": {
+          "description": "Powody oceny po ludzku.",
+          "type": "string"
+        },
+        "score": {
+          "description": "Wynik oceny 0–100.",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "start": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoutingRung"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Szczebel startowy."
+        }
+      },
+      "required": [
+        "difficulty",
+        "score",
+        "reasons",
+        "start",
+        "kept_queue",
+        "order"
+      ],
+      "type": "object"
+    },
+    "RoutingRung": {
+      "description": "Szczebel modelu.",
+      "enum": [
+        "light",
+        "standard",
+        "strong"
+      ],
+      "type": "string"
+    },
+    "RoutingStrategy": {
+      "description": "Strategia progów trudności.",
+      "enum": [
+        "economy",
+        "balanced",
+        "quality"
+      ],
+      "type": "string"
     },
     "RunBudget": {
       "description": "Budżety przebiegu (`[agent] default_budget`); przekroczenie = czyste zatrzymanie z raportem.",
@@ -12929,6 +13119,44 @@
       "args": [],
       "result": {
         "type": "null"
+      }
+    },
+    "routing_get": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/ModelRouting"
+      }
+    },
+    "routing_preview": {
+      "args": [
+        {
+          "name": "text",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "task_class",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/RoutingPreview"
+      }
+    },
+    "routing_set": {
+      "args": [
+        {
+          "name": "settings",
+          "schema": {
+            "$ref": "#/$defs/ModelRoutingSettings"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/ModelRouting"
       }
     },
     "search_reindex_cancel": {

@@ -130,6 +130,9 @@ export class TauriAlfaClient implements AlfaClient {
     sharedQueues: () => call('accounts_shared_queues'),
     setSharedQueue: (taskClass, entries) =>
       call('accounts_set_shared_queue', { taskClass, entries }),
+    routing: () => call('routing_get'),
+    setRouting: (settings) => call('routing_set', { settings }),
+    routingPreview: (text, taskClass) => call('routing_preview', { text, taskClass }),
     importEnv: () => call('accounts_import_env'),
   };
 

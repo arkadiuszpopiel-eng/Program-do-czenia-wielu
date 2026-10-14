@@ -14,8 +14,8 @@ export function numbersOf(text) {
     .split(/\r?\n/)
     .map((line) => line.replace(/^\s*(?:[-*•]\s*)?\d{1,2}[.)]\s+/, ''))
     .join('\n');
-  const found = cleaned.match(/\d+(?:[  ]\d{3})*(?:[.,:-]\d+)*/g) ?? [];
-  return found.map((n) => n.replace(/[  ]/g, '').replace(/,/g, '.'));
+  const found = cleaned.match(/\d+(?:[ \u00a0]\d{3})*(?:[.,:-]\d+)*/g) ?? [];
+  return found.map((n) => n.replace(/[ \u00a0]/g, '').replace(/,/g, '.'));
 }
 
 /** Nazwy w cudzysłowach („…”, "…", «…»). */

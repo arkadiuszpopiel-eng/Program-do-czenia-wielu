@@ -287,3 +287,60 @@ async fn routed_provider_answers_with_the_chosen_rung_and_role_class() {
     assert_eq!(note.difficulty, Difficulty::Hard);
     assert!(note.summary().starts_with("trudne ("), "{}", note.summary());
 }
+
+#[test]
+fn manual_queue_keeps_its_order_unless_reordering_is_allowed() {
+    let s = setup();
+    // Kolejka konta dla rozmowy ustawiona ręcznie → dobór nie zmienia kolejności.
+    s.core.set_provider_queues(BTreeMap::from([(
+        providers_contract::ProviderId::new("openai"),
+        BTreeMap::from([(TaskClass::Conversation, vec![SOL.to_owned()])]),
+    )]));
+    assert!(s.core.manual_queue(TaskClass::Conversation));
+    assert!(!s.core.manual_queue(TaskClass::Code));
+    assert_eq!(
+        order(&s.core, TaskClass::Conversation, &ask(EASY)),
+        [OPUS, SOL, LUNA, QWEN, BIELIK]
+    );
+    let r = ask(EASY);
+    let note = s
+        .core
+        .judge(
+            TaskClass::Conversation,
+            &Constraints::from_request(TaskClass::Conversation, &r),
+            Some(&r),
+        )
+        .unwrap();
+    assert!(note.kept_queue && !note.reorders());
+    assert!(
+        note.summary().contains("kolejka ustawiona ręcznie"),
+        "{}",
+        note.summary()
+    );
+    // Klasa bez kolejki — dobór działa.
+    assert_eq!(
+        order(&s.core, TaskClass::Code, &ask("dodaj komentarz"))[0],
+        QWEN
+    );
+    // Podniesienie po odrzuceniu działa także przy ręcznej kolejce.
+    let fix = with_hint(
+        "popraw",
+        RouteHint {
+            escalate_from: Some(format!("local:{QWEN}")),
+            ..RouteHint::default()
+        },
+    );
+    assert_eq!(
+        order(&s.core, TaskClass::Conversation, &fix),
+        [OPUS, SOL, LUNA, BIELIK, QWEN]
+    );
+    // Włączone „zmieniaj też kolejki ręczne”.
+    s.core.set_difficulty_policy(DifficultyPolicy {
+        reorder_queues: true,
+        ..DifficultyPolicy::default()
+    });
+    assert_eq!(
+        order(&s.core, TaskClass::Conversation, &ask(EASY))[0],
+        BIELIK
+    );
+}

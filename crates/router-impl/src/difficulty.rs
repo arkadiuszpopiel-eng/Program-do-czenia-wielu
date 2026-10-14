@@ -113,12 +113,14 @@ impl RouterCore {
         if let Some(from) = &escalated_from {
             start = start.max(self.rung_of(from).up());
         }
+        let kept_queue = !policy.reorder_queues && self.manual_queue(class);
         Some(DifficultyNote {
             difficulty,
             score,
             reasons,
             start,
             escalated_from,
+            kept_queue,
         })
     }
 

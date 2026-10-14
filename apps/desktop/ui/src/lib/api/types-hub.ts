@@ -108,6 +108,53 @@ export interface SharedQueueEntry {
 /** Klasa zadań (`chat`, `code`, …) → wspólna kolejka w kolejności prób Routera. */
 export type SharedQueues = Readonly<Record<string, readonly SharedQueueEntry[]>>;
 
+// ── Dobór modelu według trudności ───────────────────────────────────────────────────────────────
+
+export type RoutingLevel = 'easy' | 'medium' | 'hard';
+export type RoutingRung = 'light' | 'standard' | 'strong';
+export type RoutingStrategy = 'economy' | 'balanced' | 'quality';
+
+/** Ustawienia doboru (plik `model-routing.json` rdzenia). */
+export interface ModelRoutingSettings {
+  readonly enabled: boolean;
+  readonly strategy: RoutingStrategy;
+  /** Poprawka po odrzuceniu odpowiedzi na mocniejszym modelu. */
+  readonly escalate: boolean;
+  /** Trudność sprawdzania odpowiedzi przez Krytyczkę. */
+  readonly review: RoutingLevel;
+  /** Przy równym szczeblu najpierw model lokalny. */
+  readonly local_first: boolean;
+  /** Szczeble ustawione ręcznie: `dostawca:model` → szczebel. */
+  readonly rungs: Readonly<Record<string, RoutingRung>>;
+  /** Dobór zmienia też kolejność kolejek ustawionych ręcznie. */
+  readonly reorder_queues: boolean;
+}
+
+/** Model Routera z jego szczeblem. */
+export interface RoutingModel {
+  readonly candidate: string;
+  readonly provider_name: string;
+  readonly model: string;
+  readonly local: boolean;
+  readonly rung: RoutingRung;
+  readonly automatic: RoutingRung;
+}
+
+export interface ModelRouting {
+  readonly settings: ModelRoutingSettings;
+  readonly models: readonly RoutingModel[];
+}
+
+/** Podgląd: jak Router potraktuje przykładowe zadanie. */
+export interface RoutingPreview {
+  readonly difficulty: RoutingLevel | null;
+  readonly score: number | null;
+  readonly reasons: string;
+  readonly start: RoutingRung | null;
+  readonly kept_queue: boolean;
+  readonly order: readonly RoutingModel[];
+}
+
 export interface TestReport {
   readonly ok: boolean;
   readonly latency_ms: number | null;

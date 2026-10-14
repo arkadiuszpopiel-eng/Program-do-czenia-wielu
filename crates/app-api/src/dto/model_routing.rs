@@ -46,6 +46,9 @@ pub struct ModelRoutingSettings {
     pub local_first: bool,
     /// Szczeble ustawione ręcznie: `dostawca:model` → szczebel.
     pub rungs: BTreeMap<String, RoutingRung>,
+    /// Dobór zmienia też kolejność kolejek ustawionych ręcznie (domyślnie nie — kolejka ręczna
+    /// ma pierwszeństwo).
+    pub reorder_queues: bool,
 }
 
 /// Model w doborze: kandydat Routera z jego szczeblem.
@@ -83,6 +86,8 @@ pub struct RoutingPreview {
     pub reasons: String,
     /// Szczebel startowy.
     pub start: Option<RoutingRung>,
+    /// Klasa ma kolejkę ustawioną ręcznie i zostaje w jej kolejności.
+    pub kept_queue: bool,
     /// Kolejność prób (pierwszy odpowiada, reszta to zapas).
     pub order: Vec<RoutingModel>,
 }

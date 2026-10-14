@@ -224,6 +224,15 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             ],
             roundtrip::<SharedQueues>,
         ),
+        "routing_get" => (vec![], roundtrip::<ModelRouting>),
+        "routing_set" => (
+            vec![("settings", roundtrip::<ModelRoutingSettings>)],
+            roundtrip::<ModelRouting>,
+        ),
+        "routing_preview" => (
+            vec![("text", s), ("taskClass", s)],
+            roundtrip::<RoutingPreview>,
+        ),
         "accounts_import_env" => (vec![], roundtrip::<Vec<EnvImportResult>>),
         "accounts_set_disabled" => (
             vec![("accountId", s), ("disabled", b)],

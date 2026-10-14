@@ -14,6 +14,8 @@ import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from '
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Kody kolorów terminala (ESC[…m) — bez znaku sterującego w literale wyrażenia.
+const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const [level, ...rest] = process.argv.slice(2);
 if (!['szybki', 'wersja', 'sprzet'].includes(level)) {
@@ -164,7 +166,7 @@ for (const [id, title, command, cwd, needGb] of STAGES) {
     encoding: 'utf8',
     maxBuffer: 256 * 1024 * 1024,
   });
-  const output = `${run.stdout ?? ''}\n${run.stderr ?? ''}`.replace(/\x1b\[[0-9;]*m/g, '');
+  const output = `${run.stdout ?? ''}\n${run.stderr ?? ''}`.replace(ANSI, '');
   writeFileSync(join(out, `${level}-${id}.log`), output);
   const seconds = Math.round((Date.now() - started) / 1000);
   const state = run.status === 0 ? 'zielony' : 'CZERWONY';

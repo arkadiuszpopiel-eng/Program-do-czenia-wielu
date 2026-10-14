@@ -127,6 +127,7 @@ pub fn settings_dto(p: &DifficultyPolicy) -> ModelRoutingSettings {
             .iter()
             .map(|(k, v)| (k.clone(), rung_dto(*v)))
             .collect(),
+        reorder_queues: p.reorder_queues,
     }
 }
 
@@ -149,6 +150,7 @@ pub fn policy_of(s: &ModelRoutingSettings) -> Result<DifficultyPolicy, String> {
         review: level_of(s.review),
         local_first: s.local_first,
         rungs,
+        reorder_queues: s.reorder_queues,
     })
 }
 
@@ -201,6 +203,7 @@ pub(crate) fn preview(
         score: note.as_ref().and_then(|n| n.score),
         reasons: note.as_ref().map(|n| n.reasons.clone()).unwrap_or_default(),
         start: note.as_ref().map(|n| rung_dto(n.start)),
+        kept_queue: note.as_ref().is_some_and(|n| n.kept_queue),
         order: order.iter().map(|c| model_of(core, c, name(c))).collect(),
     }
 }

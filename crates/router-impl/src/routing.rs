@@ -5,17 +5,16 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 
 use compliance_contract::Compliance;
-use providers_contract::{ChatRequest, HealthState, ModelProvider, ProviderErrorKind, ProviderId};
+use providers_contract::{ChatRequest, HealthState, ModelProvider, ProviderId};
 use router_contract::{
-    BreakerState, BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints,
-    DIFFICULTY_CLASSES, DifficultyPolicy, Outcome, PlanWindow, RouteDecision, RouteError,
-    RouteKind, RoutePolicy, Router, RouterClock, RouterEvent, TaskClass,
+    BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints, DIFFICULTY_CLASSES,
+    DifficultyPolicy, PlanWindow, RouteDecision, RouteError, RouteKind, RoutePolicy, Router,
+    RouterClock, RouterEvent, TaskClass,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::clock::TokioClock;
 use crate::evaluate::{Checked, Inputs, check};
-use crate::helpers::counts_as_failure;
 
 /// Zarejestrowany dostawca.
 #[derive(Clone)]
@@ -27,9 +26,9 @@ pub struct Registered {
 }
 
 #[derive(Default)]
-struct Health {
-    breakers: BTreeMap<ProviderId, CircuitBreaker>,
-    windows: BTreeMap<ProviderId, PlanWindow>,
+pub(crate) struct Health {
+    pub(crate) breakers: BTreeMap<ProviderId, CircuitBreaker>,
+    pub(crate) windows: BTreeMap<ProviderId, PlanWindow>,
 }
 
 /// Kolejki modeli: dostawca → klasa zadań → modele w kolejności prób.
@@ -44,9 +43,9 @@ pub const LIGHT_CLASSES: [TaskClass; 1] = [TaskClass::Summarize];
 
 /// Router.
 pub struct RouterCore {
-    registry: RwLock<Vec<(ProviderId, Registered)>>,
-    explicit: RwLock<Option<RoutePolicy>>,
-    overrides: RwLock<Option<String>>,
+    pub(crate) registry: RwLock<Vec<(ProviderId, Registered)>>,
+    pub(crate) explicit: RwLock<Option<RoutePolicy>>,
+    pub(crate) overrides: RwLock<Option<String>>,
     /// Kolejki modeli dostawców API: dostawca → klasa → modele w kolejności prób.
     queues: RwLock<ProviderQueues>,
     /// Wspólna kolejka wszystkich kont — pierwszeństwo przed kolejkami kont i modelem lekkim.
@@ -58,12 +57,12 @@ pub struct RouterCore {
     pub(crate) difficulty: RwLock<DifficultyPolicy>,
     compliance: Option<Arc<dyn Compliance>>,
     budget: Option<Arc<dyn BudgetGate>>,
-    clock: Arc<dyn RouterClock>,
-    health: Mutex<Health>,
-    sink: Mutex<Option<UnboundedSender<RouterEvent>>>,
+    pub(crate) clock: Arc<dyn RouterClock>,
+    pub(crate) health: Mutex<Health>,
+    pub(crate) sink: Mutex<Option<UnboundedSender<RouterEvent>>>,
 }
 
-fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
+pub(crate) fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
     m.lock().unwrap_or_else(|p| p.into_inner())
 }
 
@@ -178,6 +177,19 @@ impl RouterCore {
         *self.light.write().unwrap_or_else(|p| p.into_inner()) = id;
     }
 
+    /// Czy klasa ma kolejkę ustawioną ręcznie (wspólną albo któregoś konta).
+    pub fn manual_queue(&self, class: TaskClass) -> bool {
+        let global = self.global.read().unwrap_or_else(|p| p.into_inner());
+        if global.get(&class).is_some_and(|q| !q.is_empty()) {
+            return true;
+        }
+        self.queues
+            .read()
+            .unwrap_or_else(|p| p.into_inner())
+            .values()
+            .any(|q| q.get(&class).is_some_and(|m| !m.is_empty()))
+    }
+
     /// Lekki dostawca lokalny (jeśli wskazany).
     pub(crate) fn light_id(&self) -> Option<ProviderId> {
         self.light.read().unwrap_or_else(|p| p.into_inner()).clone()
@@ -269,7 +281,7 @@ impl RouterCore {
         }
         // Przypięty model zostaje pierwszy; reszta według trudności zadania.
         let difficulty = self.judge(class, constraints, request);
-        if let Some(note) = &difficulty {
+        if let Some(note) = difficulty.as_ref().filter(|n| n.reorders()) {
             rest = self.arrange(rest, note);
         }
         let list = pinned.into_iter().chain(rest);
@@ -327,7 +339,7 @@ impl RouterCore {
         }
     }
 
-    fn breaker_event(&self, provider: &ProviderId, t: Option<BreakerTransition>) {
+    pub(crate) fn breaker_event(&self, provider: &ProviderId, t: Option<BreakerTransition>) {
         match t {
             Some(BreakerTransition::Opened { until_ms }) => {
                 tracing::warn!(%provider, until_ms, "obwód otwarty");
@@ -342,107 +354,6 @@ impl RouterCore {
                 });
             }
             Some(BreakerTransition::HalfOpened) | None => {}
-        }
-    }
-}
-
-impl Router for RouterCore {
-    fn route(
-        &self,
-        class: TaskClass,
-        constraints: &Constraints,
-        request: Option<&ChatRequest>,
-    ) -> Result<RouteDecision, RouteError> {
-        let result = self.decide(class, constraints, request);
-        match &result {
-            Ok(decision) => self.emit(RouterEvent::Decision {
-                decision: decision.clone(),
-            }),
-            Err(RouteError::NoRoute { class, rejected }) => {
-                tracing::warn!(?class, rejected = rejected.len(), "brak trasy");
-                self.emit(RouterEvent::NoRoute {
-                    class: *class,
-                    rejected: rejected.clone(),
-                });
-            }
-        }
-        result
-    }
-
-    fn report(&self, candidate: &Candidate, outcome: Outcome) {
-        let now = self.clock.now_ms();
-        let config = self.policy().breaker;
-        let provider = &candidate.provider;
-        let (transition, window) = {
-            let mut h = lock(&self.health);
-            let window = match &outcome {
-                Outcome::Failed {
-                    kind: ProviderErrorKind::RateLimited { retry_after_ms },
-                } => {
-                    let until = h
-                        .windows
-                        .entry(provider.clone())
-                        .or_default()
-                        .on_rate_limited(now, *retry_after_ms);
-                    Some((until.saturating_sub(now), retry_after_ms.is_some()))
-                }
-                Outcome::Ok { .. } => {
-                    h.windows.remove(provider);
-                    None
-                }
-                _ => None,
-            };
-            let b = h
-                .breakers
-                .entry(provider.clone())
-                .or_insert_with(|| CircuitBreaker::new(config));
-            let transition = match &outcome {
-                Outcome::Ok { .. } => b.on_success(),
-                Outcome::Failed { kind } if counts_as_failure(kind) => b.on_failure(now),
-                Outcome::Failed { .. } | Outcome::Cancelled => {
-                    b.on_cancel();
-                    None
-                }
-            };
-            (transition, window)
-        };
-        self.breaker_event(provider, transition);
-        if let Some((retry_in_ms, from_header)) = window {
-            self.emit(RouterEvent::PlanWindowExhausted {
-                provider: provider.clone(),
-                retry_in_ms,
-                from_header,
-            });
-        }
-    }
-
-    fn breaker_state(&self, provider: &ProviderId) -> BreakerState {
-        let now = self.clock.now_ms();
-        lock(&self.health)
-            .breakers
-            .get(provider)
-            .map_or(BreakerState::Closed, |b| b.state(now))
-    }
-
-    fn policy(&self) -> RoutePolicy {
-        if let Some(p) = self
-            .explicit
-            .read()
-            .unwrap_or_else(|p| p.into_inner())
-            .clone()
-        {
-            return p;
-        }
-        let auto = self.auto_policy();
-        let overrides = self
-            .overrides
-            .read()
-            .unwrap_or_else(|p| p.into_inner())
-            .clone();
-        match overrides {
-            // Nadpisania zwalidowane przy ustawieniu; błąd tu = polityka automatyczna.
-            Some(t) => auto.clone().with_toml(&t).unwrap_or(auto),
-            None => auto,
         }
     }
 }

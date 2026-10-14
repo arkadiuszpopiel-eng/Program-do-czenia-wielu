@@ -173,6 +173,17 @@ async function run(): Promise<void> {
     { account_id: account.id, model: 'gpt-4o-mini' },
   ]);
   await both('accounts', 'sharedQueues');
+  await both('accounts', 'routing');
+  await both('accounts', 'setRouting', {
+    enabled: true,
+    strategy: 'quality',
+    escalate: true,
+    review: 'easy',
+    local_first: true,
+    rungs: { [`openai:gpt-4o-mini`]: 'standard' },
+    reorder_queues: true,
+  });
+  await both('accounts', 'routingPreview', 'Która jest godzina?', 'chat');
   await both('accounts', 'importEnv');
   await both('accounts', 'list');
   await both('accounts', 'setDisabled', account.id, true);

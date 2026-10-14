@@ -7,6 +7,7 @@
 // Użycie:
 //   node scripts/set-version.mjs 0.0.7    ustawia wersję wszędzie (wymaga wpisu w CHANGELOG.md)
 //   node scripts/set-version.mjs --check  sprawdza spójność; kod wyjścia 1 przy rozjeździe
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +23,14 @@ const FILES = [
   ['apps/desktop/ui/package.json', /^\s*"version": "([^"]+)"/m],
 ];
 const MANIFEST = /^version = "([^"]+)"/m;
+/** Pliki Cargo.lock (workspace i osobny workspace powłoki) z pakietem prowadzonym razem z programem.
+ *  Audyt 2026-10-14 (A-17): lock powłoki został przy starej wersji i `--locked` odmawiał budowy. */
+const LOCKS = [
+  ['Cargo.lock', 'app-core', '.'],
+  ['apps/desktop/src-tauri/Cargo.lock', 'alfa-desktop', 'apps/desktop/src-tauri/Cargo.toml'],
+];
+const lockVersion = (path, name) =>
+  new RegExp(`^name = "${name}"\r?\nversion = "([^"]+)"`, 'm').exec(read(path))?.[1] ?? null;
 const manifests = readdirSync(join(root, 'crates'))
   .map((name) => `crates/${name}/module.toml`)
   .filter((path) => existsSync(join(root, path)));
@@ -50,6 +59,11 @@ function check() {
     const v = versionIn(path, MANIFEST);
     if (v !== current) problems.push(`${path}: ${v} (oczekiwano ${current})`);
   }
+  for (const [path, name] of LOCKS) {
+    const v = existsSync(join(root, path)) ? lockVersion(path, name) : null;
+    if (v !== current)
+      problems.push(`${path}: ${name} ${v} (oczekiwano ${current}; odśwież: cargo metadata)`);
+  }
   if (!new RegExp(`^## ${current.replace(/\./g, '\\.')}(\\s|$)`, 'm').test(read('CHANGELOG.md')))
     problems.push(`CHANGELOG.md: brak wpisu „## ${current}”`);
   console.log(
@@ -76,11 +90,17 @@ function set(next) {
   };
   for (const [path, re] of FILES) replace(path, re);
   for (const path of tracked) replace(path, MANIFEST);
+  for (const [path, , manifest] of LOCKS) {
+    const args = ['metadata', '--format-version', '1', '--offline'];
+    if (manifest !== '.') args.push('--manifest-path', manifest);
+    const run = spawnSync('cargo', args, { cwd: root, stdio: ['ignore', 'ignore', 'pipe'] });
+    if (run.status !== 0) console.error(`  ${path}: nie odświeżono (cargo metadata, kod ${run.status})`);
+  }
   console.log(
     `set-version: ${current} → ${next} (${FILES.length} pliki, ${tracked.length} manifestów modułów)`,
   );
   console.log(
-    '  Dalej: wpis w CHANGELOG.md, `cargo metadata` (pliki Cargo.lock), node scripts/docs-html.mjs',
+    '  Dalej: wpis w CHANGELOG.md, node scripts/docs-html.mjs (pliki Cargo.lock odświeżone)',
   );
 }
 

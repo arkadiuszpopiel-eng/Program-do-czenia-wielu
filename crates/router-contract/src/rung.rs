@@ -161,6 +161,10 @@ pub struct DifficultyPolicy {
     pub local_first: bool,
     /// Szczeble ustawione ręcznie: `dostawca:model` → szczebel (zastępuje rozpoznanie po nazwie).
     pub rungs: BTreeMap<String, Rung>,
+    /// Dobór zmienia też kolejność kolejek ustawionych ręcznie (konta, wspólna). Wyłączone —
+    /// ręczna kolejka klasy ma pierwszeństwo, dobór działa tylko w klasach bez kolejki
+    /// (podniesienie po odrzuceniu odpowiedzi działa zawsze).
+    pub reorder_queues: bool,
 }
 
 impl Default for DifficultyPolicy {
@@ -172,6 +176,7 @@ impl Default for DifficultyPolicy {
             review: Difficulty::Easy,
             local_first: true,
             rungs: BTreeMap::new(),
+            reorder_queues: false,
         }
     }
 }
@@ -225,6 +230,16 @@ pub struct DifficultyNote {
     /// Model, którego odpowiedź odrzucono (podniesienie).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub escalated_from: Option<Candidate>,
+    /// Klasa ma kolejkę ustawioną ręcznie i zostaje w jej kolejności (bez podniesienia).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub kept_queue: bool,
+}
+
+impl DifficultyNote {
+    /// Czy dobór zmienia kolejność prób.
+    pub fn reorders(&self) -> bool {
+        !self.kept_queue || self.escalated_from.is_some()
+    }
 }
 
 impl DifficultyNote {
@@ -238,6 +253,12 @@ impl DifficultyNote {
         );
         if let Some(from) = &self.escalated_from {
             text.push_str(&format!(", podniesione po odrzuceniu odpowiedzi {from}"));
+        } else if self.kept_queue {
+            text = format!(
+                "{} ({}) → kolejka ustawiona ręcznie, bez zmian",
+                self.difficulty.label(),
+                self.reasons
+            );
         }
         text
     }

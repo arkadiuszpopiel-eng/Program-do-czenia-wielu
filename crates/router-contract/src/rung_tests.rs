@@ -97,6 +97,7 @@ fn rejected_model_goes_last() {
 fn policy_defaults_and_partial_json() {
     let p = DifficultyPolicy::default();
     assert!(p.enabled && p.escalate && p.local_first);
+    assert!(!p.reorder_queues, "ręczna kolejka ma pierwszeństwo");
     assert_eq!(p.review, Difficulty::Easy);
     let partial: DifficultyPolicy =
         serde_json::from_str(r#"{"strategy":"quality","rungs":{"openai:gpt-6-luna":"strong"}}"#)
@@ -114,9 +115,21 @@ fn note_summary_mentions_escalation() {
         reasons: "kod, rozumowanie".into(),
         start: Rung::Strong,
         escalated_from: Some(Candidate::new("local", "qwen-27b")),
+        kept_queue: false,
     };
     assert_eq!(
         note.summary(),
         "trudne (kod, rozumowanie) → szczebel mocny, podniesione po odrzuceniu odpowiedzi local:qwen-27b"
+    );
+    assert!(note.reorders());
+    let kept = DifficultyNote {
+        escalated_from: None,
+        kept_queue: true,
+        ..note
+    };
+    assert!(!kept.reorders());
+    assert_eq!(
+        kept.summary(),
+        "trudne (kod, rozumowanie) → kolejka ustawiona ręcznie, bez zmian"
     );
 }
