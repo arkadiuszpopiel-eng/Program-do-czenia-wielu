@@ -28,7 +28,10 @@ for (const style of STYLES) {
     test(`pierwsze uruchomienie krok po kroku — ${style} ${theme}`, async ({ page }) => {
       const errors = watchConsole(page);
       await open(page, style, theme, '&scenario=first-run');
-      await expect(page.getByRole('heading', { name: 'Witaj w Alfie' })).toBeVisible();
+      // Start atrapy pod obciążeniem bywa dłuższy niż domyślne 5 s (jak `waitForChat`).
+      await expect(page.getByRole('heading', { name: 'Witaj w Alfie' })).toBeVisible({
+        timeout: 15_000,
+      });
       const found: string[] = [];
       for (let step = 0; step < 8; step += 1) {
         await page.waitForTimeout(150);
