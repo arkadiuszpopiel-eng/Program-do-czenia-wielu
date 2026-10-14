@@ -30,7 +30,9 @@ impl AppCore {
         tokio::spawn(async move {
             costs.refresh_fx().await;
         });
-        self.restore_autonomy().await;
+        // Zapamiętane obniżenia autonomii — od razu i pilnowane dalej (A-04).
+        self.enforce_autonomy().await;
+        self.spawn_autonomy_guard();
         self.inner
             .voice
             .attach(std::sync::Arc::new(crate::voice_chat::CoreVoiceChat::new(
