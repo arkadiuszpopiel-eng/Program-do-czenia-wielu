@@ -80,11 +80,53 @@ pub(crate) fn render_slice(id: u64, slice: &str, opts: &RenderOptions, san: &San
 /// sanitizowane jednym przebiegiem `ammonia` (fragmenty są zbalansowane, więc wynik jest
 /// identyczny z połączeniem bloków — sprawdza to test własności strumienia).
 pub(crate) fn render_document(md: &str, opts: RenderOptions) -> String {
-    let raw: String = top_level_ranges(md)
+    let raw: Vec<String> = top_level_ranges(md)
         .into_iter()
         .map(|range| write_events(Parser::new_ext(&md[range], parser_options()), &opts).0)
         .collect();
-    Sanitizer::shared(opts).clean(&raw)
+    clean_parallel(&raw, Sanitizer::shared(opts))
+}
+
+/// Od tylu bajtów HTML czyszczenie dzieli się na wątki (mniejsze — jeden przebieg, bez narzutu).
+const PARALLEL_FROM: usize = 32 * 1024;
+
+/// Czyści bloki: małe dokumenty jednym przebiegiem, duże w kilku wątkach po ciągłych grupach
+/// bloków. Bloki są zbalansowane, więc połączenie wyczyszczonych grup jest tym samym, co
+/// wyczyszczenie całości (test `parallel_clean_matches_single_pass`). Sanitizer zostaje ten sam
+/// (AGENTS.md) — zmienia się tylko podział pracy; budżet 100 KB < 20 ms (ADR 0009).
+fn clean_parallel(raw: &[String], san: &Sanitizer) -> String {
+    let total: usize = raw.iter().map(String::len).sum();
+    let threads = std::thread::available_parallelism()
+        .map_or(1, std::num::NonZero::get)
+        .min(8);
+    if total < PARALLEL_FROM || threads < 2 || raw.len() < 2 {
+        return san.clean(&raw.concat());
+    }
+    let target = total.div_ceil(threads);
+    let mut groups: Vec<String> = Vec::with_capacity(threads);
+    let mut current = String::new();
+    for block in raw {
+        current.push_str(block);
+        if current.len() >= target {
+            groups.push(std::mem::take(&mut current));
+        }
+    }
+    if !current.is_empty() {
+        groups.push(current);
+    }
+    let cleaned: Vec<String> = std::thread::scope(|scope| {
+        let handles: Vec<_> = groups
+            .iter()
+            .map(|group| scope.spawn(move || san.clean(group)))
+            .collect();
+        handles
+            .into_iter()
+            .zip(&groups)
+            // Wątek nie powinien paść; gdyby jednak — ta grupa czyszczona w bieżącym wątku.
+            .map(|(h, group)| h.join().unwrap_or_else(|_| san.clean(group)))
+            .collect()
+    });
+    cleaned.concat()
 }
 
 /// Renderuje cały dokument jako listę bloków najwyższego poziomu (id od 0).
@@ -297,5 +339,38 @@ mod tests {
             let md: String = parts.concat();
             prop_assert_eq!(sliced_raw(&md), whole_raw(&md));
         }
+    }
+
+    #[test]
+    fn parallel_clean_matches_single_pass() {
+        let section = "## A
+
+Tekst <b>surowy</b> [x](javascript:alert(1)) i [y](https://a.pl).
+
+            - [x] punkt
+
+```rust
+fn a() {}
+```
+
+| a | b |
+|:-|-:|
+| 1 | 2 |
+
+            > cytat <script>x</script>
+
+";
+        let md = section.repeat(400);
+        let opts = RenderOptions::default();
+        let raw: Vec<String> = top_level_ranges(&md)
+            .into_iter()
+            .map(|r| write_events(Parser::new_ext(&md[r], parser_options()), &opts).0)
+            .collect();
+        let san = Sanitizer::shared(opts);
+        assert!(raw.iter().map(String::len).sum::<usize>() > PARALLEL_FROM);
+        let single = san.clean(&raw.concat());
+        assert_eq!(clean_parallel(&raw, san), single);
+        assert_eq!(render_document(&md, opts), single);
+        assert!(!single.contains("<script") && !single.contains("javascript:"));
     }
 }
