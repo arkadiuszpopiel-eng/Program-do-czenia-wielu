@@ -4,7 +4,9 @@ import { defineConfig, devices } from '@playwright/test';
 // axe (WCAG 2.2 AA — 0 naruszeń critical/serious), klawiatura, budżety klatek.
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30_000,
+  // 60 s na test: kilka przebiegów axe w jednym teście przy przeciążonej maszynie przekraczało 30 s
+  // (2026-10-15: losowe przekroczenia w różnych plikach). Budżety czasu działań mają własne progi.
+  timeout: 60_000,
   fullyParallel: true,
   // PW_WORKERS=4: mniej przeglądarek naraz na słabszej maszynie (laptop 16 GB dławi się przy
   // domyślnych 8 i testy z budżetem czasu padają z przyczyn niezwiązanych z kodem).
