@@ -423,6 +423,7 @@ dependencies = [
  "agent-backends-impl",
  "app-api",
  "async-trait",
+ "chrono",
  "compliance-contract",
  "core-bus-contract",
  "core-config-contract",
