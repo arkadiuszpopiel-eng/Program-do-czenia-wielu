@@ -189,3 +189,11 @@ pub fn budget(strict: std::time::Duration) -> std::time::Duration {
         strict * 10
     }
 }
+
+/// Dobór według trudności wyłączony — testy kolejności samej polityki.
+pub fn fixed_order() -> router_contract::DifficultyPolicy {
+    router_contract::DifficultyPolicy {
+        enabled: false,
+        ..router_contract::DifficultyPolicy::default()
+    }
+}

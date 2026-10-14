@@ -49,6 +49,8 @@ pub struct ChildPlan {
     pub spec: RunSpec,
     /// Opcje potomka (koperta ⊆ koperta rodzica).
     pub options: RunOptions,
+    /// Wskazówka trasy: klasa roli wykonawczyni (Koderka → kolejka „Kod”).
+    pub route: providers_contract::RouteHint,
 }
 
 /// Dlaczego delegacja odrzucona.
@@ -229,7 +231,15 @@ pub fn plan_delegation(
             view.spec.persona.name, persona.name, role.name
         )),
     };
-    Ok(ChildPlan { spec, options })
+    let route = providers_contract::RouteHint {
+        class: (!role.model_policy.is_empty()).then(|| role.model_policy.clone()),
+        ..providers_contract::RouteHint::default()
+    };
+    Ok(ChildPlan {
+        spec,
+        options,
+        route,
+    })
 }
 
 /// Pozostały budżet (budżet rodzica minus zużycie własne i podprzebiegów).

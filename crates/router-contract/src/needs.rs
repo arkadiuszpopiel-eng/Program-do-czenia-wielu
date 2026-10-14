@@ -2,8 +2,8 @@
 
 use compliance_contract::SessionTag;
 use providers_contract::{
-    ChatRequest, ContentBlock, ModelCapabilities, ModelKind, PrivacyTag, ThinkingSupport,
-    ToolResultPart,
+    ChatRequest, ContentBlock, ModelCapabilities, ModelKind, PrivacyTag, RouteHint,
+    ThinkingSupport, ToolResultPart,
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -144,6 +144,9 @@ pub struct Constraints {
     /// Sesja „skażona" treścią niezaufaną (F3: `net.egress` z potwierdzeniem Brokera).
     #[serde(default)]
     pub tainted: bool,
+    /// Wskazówka trasy z żądania (trudność, sprawdzanie, podniesienie po odrzuceniu).
+    #[serde(default)]
+    pub hint: RouteHint,
 }
 
 impl Constraints {
@@ -158,6 +161,7 @@ impl Constraints {
             jurisdiction_allow: req.meta.privacy.jurisdiction_allow.clone(),
             needs: CapabilityNeeds::for_class(class).with_request(req),
             pinned: Candidate::parse(&req.model),
+            hint: req.meta.route.clone(),
             ..Self::default()
         }
     }

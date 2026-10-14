@@ -5,7 +5,7 @@
 use agent_runtime_contract::{
     Checkpoint, DelegateArgs, RunEvent, RunId, RunOptions, RunOutcome, RunSpec, UsageTotals,
 };
-use providers_contract::ToolUse;
+use providers_contract::{RouteHint, ToolUse};
 use safety_broker_contract::TaintSource;
 use tools_common_contract::{DenialReason, ToolErrorKind, ToolOutcome};
 
@@ -22,6 +22,8 @@ pub(crate) struct ChildResult {
     pub(crate) usage: UsageTotals,
     /// Scheduler zażądał oddania zadania w trakcie podprzebiegu (potomek przerwany).
     pub(crate) yielded: bool,
+    /// Model (`dostawca:model`), który napisał odpowiedź potomka.
+    pub(crate) model: Option<String>,
 }
 
 fn add(acc: &mut UsageTotals, u: &UsageTotals) {
@@ -66,14 +68,17 @@ impl Engine {
     }
 
     /// Uruchamia podprzebieg i czeka na jego koniec; zużycie dolicza do budżetu rodzica.
+    /// `route` — wskazówka trasy potomka (klasa roli, sprawdzanie, podniesienie).
     pub(crate) async fn run_child(
         &mut self,
         spec: RunSpec,
         options: RunOptions,
+        route: RouteHint,
     ) -> Result<ChildResult, String> {
         let n = self.handle.children().len() + 1;
         let run = RunId::new(format!("{}-c{n}", self.handle.run));
-        let cp = Checkpoint::with_options(run.clone(), spec, options);
+        let mut cp = Checkpoint::with_options(run.clone(), spec, options);
+        cp.route = route;
         let hooks = Hooks {
             gate: self.hooks.gate.clone(),
             lease_holder: self.hooks.lease_holder.clone(),
@@ -127,6 +132,7 @@ impl Engine {
             taint,
             usage,
             yielded,
+            model: saved.and_then(|c| c.answer_model),
         })
     }
 
@@ -163,7 +169,7 @@ impl Engine {
             }
         };
         let who = format!("{} ({})", plan.spec.persona.name, args.role);
-        let result = match self.run_child(plan.spec, plan.options).await {
+        let result = match self.run_child(plan.spec, plan.options, plan.route).await {
             Ok(r) => r,
             Err(e) => {
                 return ToolOutcome::failed(

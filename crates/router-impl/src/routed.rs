@@ -68,8 +68,13 @@ impl RoutedProvider {
         self.class
     }
 
+    /// Klasa żądania: klasa roli ze wskazówki (delegacja do Koderki → „Kod”), inaczej własna.
+    fn class_of(&self, req: &ChatRequest) -> TaskClass {
+        self.core.class_for(self.class, req)
+    }
+
     fn constraints(&self, req: &ChatRequest) -> Constraints {
-        let mut c = Constraints::from_request(self.class, req);
+        let mut c = Constraints::from_request(self.class_of(req), req);
         c.background = self.background;
         c.max_latency_ms = self.max_latency_ms;
         c
@@ -81,7 +86,7 @@ impl RoutedProvider {
 
     fn decide_quiet(&self, req: &ChatRequest) -> Result<RouteDecision, RouteError> {
         self.core
-            .decide(self.class, &self.constraints(req), Some(req))
+            .decide(self.class_of(req), &self.constraints(req), Some(req))
     }
 }
 
@@ -121,8 +126,9 @@ impl ModelProvider for RoutedProvider {
         if let Err(e) = probe.validate() {
             return single(ProviderEvent::Error(e));
         }
+        let class = self.class_of(&request);
         let constraints = self.constraints(&request);
-        let decision = match self.core.route(self.class, &constraints, Some(&request)) {
+        let decision = match self.core.route(class, &constraints, Some(&request)) {
             Ok(d) => d,
             Err(e) => return single(ProviderEvent::Error(e.to_provider_error())),
         };
@@ -136,7 +142,7 @@ impl ModelProvider for RoutedProvider {
         let run = Run {
             core: Arc::clone(&self.core),
             router_id: self.id.clone(),
-            class: self.class,
+            class,
             decision,
             request,
             cancel,

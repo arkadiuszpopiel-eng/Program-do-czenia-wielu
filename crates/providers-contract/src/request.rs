@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::error::ProviderError;
 use crate::message::{ContentBlock, Message, Role};
 use crate::privacy::RequestPrivacy;
+use crate::route_hint::RouteHint;
 
 /// Poziom wysiłku (głębokość myślenia / zużycie tokenów). Adapter mapuje na parametr dostawcy
 /// (Anthropic `output_config.effort`, OpenAI `reasoning_effort`); dla Opus 5.5 ustawiany jawnie.
@@ -164,6 +165,9 @@ pub struct RequestMeta {
     /// Sesja (dla zdarzeń `provider.call.*`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session: Option<String>,
+    /// Wskazówka trasy dla Routera (trudność, klasa roli, sprawdzenie, podniesienie).
+    #[serde(default, skip_serializing_if = "RouteHint::is_empty")]
+    pub route: RouteHint,
 }
 
 /// Żądanie czatu (strumieniowe).

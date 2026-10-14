@@ -23,6 +23,7 @@ mod decision;
 mod events;
 mod needs;
 mod policy;
+mod rung;
 
 pub use accounts_hub_contract::TaskClass;
 pub use breaker::{
@@ -37,6 +38,10 @@ pub use events::{
 };
 pub use needs::{CapabilityNeeds, Constraints, MissingCapability};
 pub use policy::{ALL_CLASSES, DuoConfig, RoutePolicy, Tempo, default_deadlines, parse_duration};
+pub use rung::{
+    DIFFICULTY_CLASSES, DifficultyNote, DifficultyPolicy, Ranked, Rung, class_floor,
+    class_from_policy, order_by_rung, params_billions, rung_by_name,
+};
 
 use cost_meter_contract::BudgetDecision;
 use providers_contract::{ChatRequest, ProviderId};

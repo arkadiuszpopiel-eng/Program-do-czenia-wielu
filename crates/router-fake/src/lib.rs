@@ -132,6 +132,7 @@ impl Router for FakeRouter {
             fallbacks: targets.collect(),
             rejected,
             warnings: Vec::new(),
+            difficulty: None,
         })
     }
 

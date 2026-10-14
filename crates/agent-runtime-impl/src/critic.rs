@@ -10,9 +10,11 @@ use agent_runtime_contract::{
     RunEvent, RunGrant, RunOptions, RunOutcome, RunSpec, StepKind, StepStatus, min_budget,
 };
 use personas_contract::{Persona, PersonaId, Role, RoleId, Verifier};
-use providers_contract::{ContentBlock, Role as MsgRole};
+use providers_contract::{ContentBlock, Role as MsgRole, RouteHint};
+use safety_broker_contract::TaintSource;
 use tools_common_contract::text;
 
+use crate::child::ChildResult;
 use crate::delegate::parent_grant;
 use crate::engine::{Engine, Next};
 use crate::prompt::{summary, verdict};
@@ -23,6 +25,23 @@ pub(crate) struct CriticPick {
     role: Role,
     model: String,
     substitute: bool,
+}
+
+/// Werdykt z wyniku podprzebiegu Krytyczki: (ok, uwagi, taint, oddanie schedulerowi).
+fn read_verdict(
+    result: &Result<ChildResult, String>,
+) -> (Option<bool>, String, Option<TaintSource>, bool) {
+    match result {
+        Ok(r) => {
+            let (ok, said) = match &r.outcome {
+                Some(RunOutcome::Completed { summary: s, .. }) => (verdict(s), s.clone()),
+                Some(other) => (None, format!("weryfikacja nieukończona: {other:?}")),
+                None => (None, "weryfikacja bez wyniku".to_owned()),
+            };
+            (ok, said, r.taint.clone(), r.yielded)
+        }
+        Err(e) => (None, format!("weryfikacja nieudana: {e}"), None, false),
+    }
 }
 
 /// Cel dla Krytyczki: zadanie właściciela + wynik i kroki autorki jako dane do oceny.
@@ -157,25 +176,43 @@ impl Engine {
                 input: input.clone(),
             })
             .await;
-        let (spec, options) = self.critic_plan(&pick, &answer);
-        let result = self.run_child(spec, options).await;
-        let (ok, note, tainted, yielded) = match &result {
-            Ok(r) => {
-                let (ok, said) = match &r.outcome {
-                    Some(RunOutcome::Completed { summary: s, .. }) => (verdict(s), s.clone()),
-                    Some(other) => (None, format!("weryfikacja nieukończona: {other:?}")),
-                    None => (None, "weryfikacja bez wyniku".to_owned()),
-                };
-                (ok, said, r.taint.clone(), r.yielded)
-            }
-            Err(e) => (None, format!("weryfikacja nieudana: {e}"), None, false),
+        // Sprawdzanie na szczeblu z ustawień Routera (domyślnie lekki model).
+        let review = RouteHint {
+            review: true,
+            ..RouteHint::default()
         };
+        let (spec, options) = self.critic_plan(&pick, &answer);
+        let mut result = self.run_child(spec, options, review.clone()).await;
+        let (mut ok, mut note, mut tainted, mut yielded) = read_verdict(&result);
+        // Lżejszy model nie dał rady ocenić (błąd, brak werdyktu) → jeszcze raz, szczebel wyżej.
+        let weak = result.as_ref().ok().and_then(|r| r.model.clone());
+        if ok.is_none()
+            && !yielded
+            && !self.handle.cancel.is_cancelled()
+            && let Some(model) = weak
+        {
+            let stronger = RouteHint {
+                escalate_from: Some(model),
+                ..review
+            };
+            let (spec, options) = self.critic_plan(&pick, &answer);
+            result = self.run_child(spec, options, stronger).await;
+            let first = tainted.take();
+            (ok, note, tainted, yielded) = read_verdict(&result);
+            tainted = tainted.or(first);
+        }
         let role = if pick.substitute {
             "Krytyczka, zastępstwo"
         } else {
             "Krytyczka"
         };
-        let note = format!("{} ({role}): {}", pick.persona.name, summary(&note, 400));
+        let mut note = format!("{} ({role}): {}", pick.persona.name, summary(&note, 400));
+        if ok == Some(false)
+            && self.cp.verify_rounds < self.shared.config.max_verify_rounds
+            && let Some(up) = self.escalate()
+        {
+            note.push_str(&format!(" · {up}"));
+        }
         self.handle
             .emit(RunEvent::Verified {
                 ok: ok.unwrap_or(false),

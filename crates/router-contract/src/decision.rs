@@ -135,6 +135,9 @@ pub struct RouteDecision {
     pub rejected: Vec<(Candidate, RejectReason)>,
     /// Ostrzeżenia dozwolonych kandydatów.
     pub warnings: Vec<(Candidate, RouteWarning)>,
+    /// Dobór według trudności (brak — klasa bez doboru albo dobór wyłączony).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub difficulty: Option<crate::rung::DifficultyNote>,
 }
 
 impl RouteDecision {

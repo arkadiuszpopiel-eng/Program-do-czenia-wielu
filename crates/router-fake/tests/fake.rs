@@ -33,6 +33,7 @@ fn scripted_routes_calls_and_half_open() {
         fallbacks: vec![],
         rejected: vec![],
         warnings: vec![],
+        difficulty: None,
     };
     fake.push_route(TaskClass::Code, Ok(scripted.clone()));
     fake.push_route(

@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex};
 
 use core_bus_contract::RunId;
-use providers_contract::{Message, ToolUse};
+use providers_contract::{Message, RouteHint, ToolUse};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -63,6 +63,12 @@ pub struct Checkpoint {
     /// Zużycie podprzebiegów (delegacje, Krytyczka) — liczone do budżetu tego przebiegu.
     #[serde(default)]
     pub delegated: UsageTotals,
+    /// Wskazówka trasy przebiegu (klasa roli, sprawdzanie, podniesienie po odrzuceniu).
+    #[serde(default)]
+    pub route: RouteHint,
+    /// Model (`dostawca:model`), który napisał ostatnią odpowiedź przebiegu.
+    #[serde(default)]
+    pub answer_model: Option<String>,
 }
 
 impl Checkpoint {
@@ -96,6 +102,8 @@ impl Checkpoint {
             options,
             taint_source,
             delegated: UsageTotals::default(),
+            route: RouteHint::default(),
+            answer_model: None,
         }
     }
 }

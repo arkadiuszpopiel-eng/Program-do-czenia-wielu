@@ -32,6 +32,7 @@
 
 mod accumulate;
 mod capabilities;
+mod difficulty;
 mod error;
 mod event;
 mod interruption;
@@ -40,6 +41,7 @@ mod pricing;
 mod privacy;
 mod provider;
 mod request;
+mod route_hint;
 mod schema;
 mod secret;
 
@@ -50,6 +52,7 @@ pub use accumulate::{AssistantTurn, TurnAccumulator};
 pub use capabilities::{
     ModelCapabilities, ModelInfo, ModelKind, ProviderCapabilities, ThinkingSupport,
 };
+pub use difficulty::{Estimate, Signal, Strategy, estimate_request, estimate_text};
 pub use error::{
     ProviderError, ProviderErrorKind, TimeoutPhase, classify_http_status, parse_retry_after_ms,
 };
@@ -73,6 +76,7 @@ pub use request::{
     CachePolicy, CacheTtl, ChatRequest, Effort, GenerationParams, RequestMeta, ThinkingConfig,
     ThinkingDisplay, ToolChoice, ToolSpec, valid_tool_name,
 };
+pub use route_hint::{Difficulty, RouteHint, TASK_EXCERPT};
 pub use schema::{IR_SCHEMA_VERSION, chat_request_schema, provider_event_schema};
 pub use secret::{ApiKey, REDACTED_KEY, SecretSource, StaticKey};
 /// Token anulowania używany w [`ModelProvider::stream`] (re-eksport `tokio-util`).

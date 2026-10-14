@@ -13,6 +13,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod clock;
+mod difficulty;
 mod evaluate;
 mod fallback;
 mod gate;

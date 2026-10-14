@@ -7,7 +7,7 @@ use std::sync::Arc;
 use providers_contract::{ModelProvider, ProviderErrorKind};
 use router_contract::{Candidate, RejectReason, RouteKind, RouteWarning, TaskClass};
 
-use crate::routing::RouterCore;
+use crate::routing::{ProviderQueues, RouterCore};
 
 /// Czy błąd obciąża dostawcę (obwód): nie — odrzucenia żądania, prywatność, brak funkcji,
 /// limit 429 (osobne okno).
@@ -44,6 +44,35 @@ pub fn warning_code(warning: &RouteWarning) -> String {
         .ok()
         .and_then(|v| v["code"].as_str().map(str::to_owned))
         .unwrap_or_default()
+}
+
+/// Kolejki modeli kont: dostawca z kolejką dla klasy wystawia jej modele po kolei zamiast
+/// jednego modelu domyślnego.
+pub(crate) fn apply_queues(
+    classes: &mut BTreeMap<TaskClass, Vec<Candidate>>,
+    queues: &ProviderQueues,
+) {
+    if queues.is_empty() {
+        return;
+    }
+    for (class, list) in classes.iter_mut() {
+        *list = list
+            .iter()
+            .flat_map(|c| {
+                let queue = queues
+                    .get(&c.provider)
+                    .and_then(|q| q.get(class))
+                    .filter(|q| !q.is_empty());
+                match queue {
+                    Some(models) => models
+                        .iter()
+                        .map(|m| Candidate::new(c.provider.clone(), m.clone()))
+                        .collect(),
+                    None => vec![c.clone()],
+                }
+            })
+            .collect();
+    }
 }
 
 /// Kolejka wspólna na początek listy kandydatów klasy; dotychczasowi kandydaci (bez powtórzeń)

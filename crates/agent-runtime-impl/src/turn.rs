@@ -16,7 +16,21 @@ impl Engine {
         req.tools = self.registry.specs(self.cp.verifying);
         req.params.max_tokens = self.shared.config.max_output_tokens;
         req.meta.session = Some(spec.session.as_str().to_owned());
+        // Trudność oceniana z celu przebiegu, nie z ostatniej wiadomości (wyniki narzędzi).
+        let mut hint = self.cp.route.clone();
+        if !hint.review && hint.difficulty.is_none() && hint.task.is_none() {
+            hint.set_task(&spec.goal);
+        }
+        req.meta.route = hint;
         req
+    }
+
+    /// Odpowiedź odrzucona: poprawka idzie do modelu szczebel mocniejszego niż ten, który ją
+    /// napisał (Router: `escalate_from`). Zwraca opis dla notatki weryfikacji.
+    pub(crate) fn escalate(&mut self) -> Option<String> {
+        let model = self.cp.answer_model.clone()?;
+        self.cp.route.escalate_from = Some(model.clone());
+        Some(format!("poprawka trafi do mocniejszego modelu niż {model}"))
     }
 
     /// Tura modelu.
@@ -104,6 +118,11 @@ impl Engine {
             }
             _ => {}
         }
+        if !self.cp.verifying
+            && let Some(model) = turn.model.clone().filter(|m| !m.is_empty())
+        {
+            self.cp.answer_model = Some(model);
+        }
         let text = turn.message.visible_text();
         let uses: Vec<ToolUse> = turn.message.tool_uses().cloned().collect();
         if !turn.message.content.is_empty() {
@@ -157,6 +176,7 @@ impl Engine {
                 .await;
             if ok == Some(false) && self.cp.verify_rounds < self.shared.config.max_verify_rounds {
                 self.cp.verifying = false;
+                self.escalate();
                 self.push(
                     Role::User,
                     vec![ContentBlock::text(

@@ -53,6 +53,7 @@ async fn default_policy_profile_a_then_api_key_added() {
     let local = fake("local").with_model(FAKE_MODEL, caps(false, false));
     let api = Switchable::new(fake("anthropic"), unconfigured());
     let core = Arc::new(RouterCore::default());
+    core.set_difficulty_policy(fixed_order());
     core.register(Arc::new(local.clone()), RouteKind::Local);
     core.register(api.clone(), RouteKind::Api);
     // Bez klucza: wszystko lokalnie (profil A), trasa API niewidoczna.
@@ -96,6 +97,7 @@ async fn private_session_and_jurisdiction() {
         catalog_entry("mystery", &[], "unknown"),
     ]));
     let core = RouterCore::new(Some(comp.clone()), None);
+    core.set_difficulty_policy(fixed_order());
     core.register(
         Arc::new(fake("deepseek").with_privacy(ProviderPrivacy::new("cn-may-train", "CN"))),
         RouteKind::Api,
@@ -188,6 +190,7 @@ async fn disabled_route_gets_zero_calls_in_100_tries() {
 async fn capabilities_budget_latency_and_warnings() {
     let gate = Arc::new(ScriptedGate::default());
     let core = RouterCore::new(None, Some(gate.clone()));
+    core.set_difficulty_policy(fixed_order());
     core.register(Arc::new(fake("alpha")), RouteKind::Api);
     core.register(
         Arc::new(fake("local").with_model(FAKE_MODEL, caps(false, true))),
@@ -392,6 +395,7 @@ async fn breaker_half_open_plan_window_and_events_on_bus() {
 #[test]
 fn light_local_provider_takes_light_classes_only() {
     let core = Arc::new(RouterCore::default());
+    core.set_difficulty_policy(fixed_order());
     core.register(Arc::new(fake("local")), RouteKind::Local);
     let light = Switchable::new(fake("local-light"), None);
     core.register(light.clone(), RouteKind::Local);

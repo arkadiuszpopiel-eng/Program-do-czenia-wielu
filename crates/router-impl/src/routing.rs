@@ -7,9 +7,9 @@ use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 use compliance_contract::Compliance;
 use providers_contract::{ChatRequest, HealthState, ModelProvider, ProviderErrorKind, ProviderId};
 use router_contract::{
-    BreakerState, BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints, Outcome,
-    PlanWindow, RouteDecision, RouteError, RouteKind, RoutePolicy, Router, RouterClock,
-    RouterEvent, TaskClass,
+    BreakerState, BreakerTransition, BudgetGate, Candidate, CircuitBreaker, Constraints,
+    DIFFICULTY_CLASSES, DifficultyPolicy, Outcome, PlanWindow, RouteDecision, RouteError,
+    RouteKind, RoutePolicy, Router, RouterClock, RouterEvent, TaskClass,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -54,6 +54,8 @@ pub struct RouterCore {
     /// Lekki dostawca lokalny (model pomocniczy na karcie zintegrowanej) — pierwszy w klasach
     /// [`LIGHT_CLASSES`], poza nimi nieużywany.
     light: RwLock<Option<ProviderId>>,
+    /// Dobór według trudności (Ustawienia → Dobór modelu).
+    pub(crate) difficulty: RwLock<DifficultyPolicy>,
     compliance: Option<Arc<dyn Compliance>>,
     budget: Option<Arc<dyn BudgetGate>>,
     clock: Arc<dyn RouterClock>,
@@ -84,6 +86,7 @@ impl RouterCore {
             queues: RwLock::new(ProviderQueues::new()),
             global: RwLock::new(GlobalQueues::new()),
             light: RwLock::new(None),
+            difficulty: RwLock::new(DifficultyPolicy::default()),
             compliance,
             budget,
             clock: Arc::new(TokioClock::new()),
@@ -175,6 +178,11 @@ impl RouterCore {
         *self.light.write().unwrap_or_else(|p| p.into_inner()) = id;
     }
 
+    /// Lekki dostawca lokalny (jeśli wskazany).
+    pub(crate) fn light_id(&self) -> Option<ProviderId> {
+        self.light.read().unwrap_or_else(|p| p.into_inner()).clone()
+    }
+
     /// Polityka automatyczna z zarejestrowanych dostawców: lokalny (pierwszy `Local` z modelem
     /// domyślnym) + API skonfigurowane (z kluczem), w kolejności rejestracji.
     pub fn auto_policy(&self) -> RoutePolicy {
@@ -185,7 +193,7 @@ impl RouterCore {
                 .default_model
                 .map(|m| Candidate::new(r.provider.id().clone(), m))
         };
-        let light_id = self.light.read().unwrap_or_else(|p| p.into_inner()).clone();
+        let light_id = self.light_id();
         let local = reg
             .iter()
             .filter(|(id, r)| r.kind == RouteKind::Local && Some(id) != light_id.as_ref())
@@ -203,26 +211,7 @@ impl RouterCore {
             .collect();
         let mut policy = RoutePolicy::defaults(local.as_ref(), &api);
         let queues = self.queues.read().unwrap_or_else(|p| p.into_inner());
-        if !queues.is_empty() {
-            for (class, list) in &mut policy.classes {
-                *list = list
-                    .iter()
-                    .flat_map(|c| {
-                        let queue = queues
-                            .get(&c.provider)
-                            .and_then(|q| q.get(class))
-                            .filter(|q| !q.is_empty());
-                        match queue {
-                            Some(models) => models
-                                .iter()
-                                .map(|m| Candidate::new(c.provider.clone(), m.clone()))
-                                .collect(),
-                            None => vec![c.clone()],
-                        }
-                    })
-                    .collect();
-            }
-        }
+        crate::helpers::apply_queues(&mut policy.classes, &queues);
         if let Some(light) = light {
             for class in LIGHT_CLASSES {
                 policy
@@ -230,6 +219,15 @@ impl RouterCore {
                     .entry(class)
                     .or_default()
                     .insert(0, light.clone());
+            }
+            // Dobór według trudności: lekki model lokalny jako szczebel „lekki” zwykłej pracy.
+            if self.difficulty_policy().enabled {
+                for class in DIFFICULTY_CLASSES {
+                    let list = policy.classes.entry(class).or_default();
+                    if !list.contains(&light) {
+                        list.push(light.clone());
+                    }
+                }
             }
         }
         let global = self.global.read().unwrap_or_else(|p| p.into_inner());
@@ -262,12 +260,19 @@ impl RouterCore {
         request: Option<&ChatRequest>,
     ) -> Result<RouteDecision, RouteError> {
         let policy = self.policy();
-        let mut list: Vec<Candidate> = constraints.pinned.iter().cloned().collect();
+        let pinned: Vec<Candidate> = constraints.pinned.iter().cloned().collect();
+        let mut rest: Vec<Candidate> = Vec::new();
         for c in policy.candidates(class) {
-            if !list.contains(c) {
-                list.push(c.clone());
+            if !pinned.contains(c) && !rest.contains(c) {
+                rest.push(c.clone());
             }
         }
+        // Przypięty model zostaje pierwszy; reszta według trudności zadania.
+        let difficulty = self.judge(class, constraints, request);
+        if let Some(note) = &difficulty {
+            rest = self.arrange(rest, note);
+        }
+        let list = pinned.into_iter().chain(rest);
         let now = self.clock.now_ms();
         // Migawka stanu obwodów — bez trzymania blokady podczas wywołań dostawców.
         let (breakers, windows) = {
@@ -304,6 +309,7 @@ impl RouterCore {
             fallbacks: targets.collect(),
             rejected,
             warnings,
+            difficulty,
         })
     }
 
