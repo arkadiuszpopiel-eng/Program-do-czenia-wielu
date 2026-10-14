@@ -34,6 +34,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`22-nowosci-2026-10.md`](22-nowosci-2026-10.md) | Nowości z rynku (R1–R13) dopisane do grup etapu P: rutyny, równoległe przebiegi, model do etapu pracy, kopie, obrona poczty | przy kolejnym przeglądzie rynku |
 | [`23-raport-nocny-2026-10-12.md`](23-raport-nocny-2026-10-12.md) | Raport z nocy 2026-10-11 / 12: wersje 0.0.34–0.0.42, pomiary, co sprawdzone, czego nie, co zostaje | jednorazowy |
 | [`25-do-przegladu-po-audycie.md`](25-do-przegladu-po-audycie.md) | Audyt zewnętrzny z 14.10: co naprawiono w 0.0.51, co czeka na decyzję właściciela (izolacja procesu poleceń, macierz dowodów) | do decyzji |
+| [`26-raport-nocny-2026-10-15.md`](26-raport-nocny-2026-10-15.md) | Raport z nocy 2026-10-14 / 15: izolacja poleceń powłoki, decyzje z dokumentu 25, Markdown, pokrycie łącza, czego nie sprawdziłem | jednorazowy |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).
