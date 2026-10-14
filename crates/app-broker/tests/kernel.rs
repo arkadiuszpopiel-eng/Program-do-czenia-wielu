@@ -137,6 +137,28 @@ async fn portable_mode_starts_kernel_processes_and_recovers_from_broker_crash() 
     assert_ne!(second, first_pid, "nowy proces Brokera");
     assert_eq!(kernel.broker.autonomy(&s1, None), AutonomyLevel::L3);
 
+    // Audyt A-05: watchdog dostaje tożsamość nowego Brokera (stary — zakończony).
+    let is_watchdog = |spec: &&app_broker::children::ChildSpec| {
+        spec.image
+            .file_name()
+            .is_some_and(|n| n.to_string_lossy().contains("alfa-watchdog"))
+    };
+    common::wait_until("watchdog z nowym numerem Brokera", || {
+        fake.specs().iter().filter(is_watchdog).count() == 2 && procs.view().watchdog
+    });
+    let specs = fake.specs();
+    let restarted = specs.iter().rev().find(is_watchdog).unwrap();
+    let second_pid = second.to_string();
+    assert!(
+        restarted
+            .args
+            .windows(2)
+            .any(|w| w[0] == "--broker-pid" && w[1] == second_pid),
+        "{:?}",
+        restarted.args
+    );
+    assert!(procs.watchdog_active());
+
     // Koniec watchdoga → aplikacja przejmuje skrót (stan dla banera).
     fake.watchdog_exits();
     common::wait_until("watchdog zakończony", || !procs.view().watchdog);

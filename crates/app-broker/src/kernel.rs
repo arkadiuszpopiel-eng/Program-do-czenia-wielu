@@ -74,8 +74,30 @@ pub struct KernelProcesses {
     link: Arc<BrokerLink>,
     kills: Arc<watch::Sender<u64>>,
     stop: StopSignal,
-    watchdog: Mutex<Option<Box<dyn ChildProc>>>,
+    watchdog: Arc<Mutex<Option<Box<dyn ChildProc>>>>,
     supervisor: Option<JoinHandle<()>>,
+}
+
+/// Co potrzeba do (ponownego) uruchomienia watchdoga z wątku nadzoru.
+struct WatchdogStarter {
+    exe_dir: PathBuf,
+    spawner: Arc<dyn Spawner>,
+    ready: Duration,
+    /// Argumenty bez `--broker-pid` (potok Brokera).
+    base_args: Vec<String>,
+    status: Arc<KernelStatus>,
+    kills: Arc<watch::Sender<u64>>,
+}
+
+impl WatchdogStarter {
+    /// Argumenty dla Brokera o numerze `pid` (tryb przenośny) albo bez numeru (usługa).
+    fn args(&self, pid: Option<u32>) -> Vec<String> {
+        let mut args = self.base_args.clone();
+        if let Some(pid) = pid {
+            args.extend(["--broker-pid".into(), pid.to_string()]);
+        }
+        args
+    }
 }
 
 impl std::fmt::Debug for KernelProcesses {
@@ -152,13 +174,18 @@ impl KernelProcesses {
         let mut sup = Supervisor::new(link.clone(), plan.target, setup.timing);
         let deadline = Instant::now() + setup.timing.first_connect;
         let _ = sup.step(true);
-        let mut watchdog_args = plan.watchdog_args;
-        if let Some(pid) = sup.broker_pid() {
-            watchdog_args.extend(["--broker-pid".into(), pid.to_string()]);
-        }
         let (kills, _) = watch::channel(0u64);
         let kills = Arc::new(kills);
-        let watchdog = start_watchdog(&setup, watchdog_args, &status, &kills);
+        let starter = WatchdogStarter {
+            exe_dir: setup.exe_dir.clone(),
+            spawner: setup.spawner.clone(),
+            ready: setup.timing.watchdog_ready,
+            base_args: plan.watchdog_args,
+            status: status.clone(),
+            kills: kills.clone(),
+        };
+        let mut watched = sup.broker_pid();
+        let watchdog = Arc::new(Mutex::new(start_watchdog(&starter, starter.args(watched))));
         // Czekamy tylko na błędy przejściowe (potok jeszcze nie istnieje); odmowa serwera albo
         // uszkodzona konfiguracja usługi kończą czekanie od razu (stan „zerwane” z powodem).
         while status.link() == LinkState::Connecting && Instant::now() < deadline {
@@ -173,11 +200,20 @@ impl KernelProcesses {
         }
         let stop = StopSignal::new();
         let thread_stop = stop.clone();
+        let thread_watchdog = watchdog.clone();
         let supervisor = std::thread::Builder::new()
             .name("alfa-broker-supervisor".into())
             .spawn(move || {
                 loop {
                     let wait = sup.step(false);
+                    // Audyt A-05: Broker uruchomiony ponownie ma nowy PID — watchdog dostaje nową
+                    // tożsamość (inaczej odrzuca potok nowego procesu i kill-switch do niego nie
+                    // dociera).
+                    let now = sup.broker_pid();
+                    if now.is_some() && now != watched {
+                        watched = now;
+                        restart_watchdog(&starter, &thread_watchdog, now);
+                    }
                     if thread_stop.wait(wait) {
                         break;
                     }
@@ -190,7 +226,7 @@ impl KernelProcesses {
             link,
             kills,
             stop,
-            watchdog: Mutex::new(watchdog),
+            watchdog,
             supervisor,
         })
     }
@@ -239,16 +275,29 @@ impl Drop for KernelProcesses {
     }
 }
 
+/// Kończy watchdoga z poprzednią tożsamością Brokera i uruchamia nowego.
+fn restart_watchdog(
+    starter: &WatchdogStarter,
+    slot: &Mutex<Option<Box<dyn ChildProc>>>,
+    pid: Option<u32>,
+) {
+    let mut slot = slot.lock().unwrap_or_else(|p| p.into_inner());
+    if let Some(mut old) = slot.take() {
+        old.kill();
+    }
+    tracing::warn!(
+        ?pid,
+        "Broker uruchomiony ponownie — watchdog z nową tożsamością Brokera"
+    );
+    *slot = start_watchdog(starter, starter.args(pid));
+}
+
 /// Uruchamia `alfa-watchdog` (jeśli jest obok aplikacji) i czeka na gotowość (skrót zarejestrowany).
-fn start_watchdog(
-    setup: &KernelSetup,
-    mut args: Vec<String>,
-    status: &Arc<KernelStatus>,
-    kills: &Arc<watch::Sender<u64>>,
-) -> Option<Box<dyn ChildProc>> {
-    let image = mode::watchdog_image(&setup.exe_dir)?;
+fn start_watchdog(starter: &WatchdogStarter, mut args: Vec<String>) -> Option<Box<dyn ChildProc>> {
+    let (status, kills) = (&starter.status, &starter.kills);
+    let image = mode::watchdog_image(&starter.exe_dir)?;
     args.push("--lifeline".into());
-    let mut child = match setup.spawner.spawn(&ChildSpec { image, args }) {
+    let mut child = match starter.spawner.spawn(&ChildSpec { image, args }) {
         Ok(child) => child,
         Err(e) => {
             tracing::error!(error = %e, "alfa-watchdog nie wystartował — skrót obsłuży aplikacja");
@@ -256,7 +305,7 @@ fn start_watchdog(
         }
     };
     let last = notice::attach(child.as_mut(), status, kills);
-    let deadline = Instant::now() + setup.timing.watchdog_ready;
+    let deadline = Instant::now() + starter.ready;
     while !status.watchdog() && child.running() && Instant::now() < deadline {
         std::thread::sleep(Duration::from_millis(10));
     }
