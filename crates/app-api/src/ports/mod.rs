@@ -52,6 +52,8 @@ pub struct RouteNote {
     pub fallbacks: Vec<String>,
     /// Odrzuceni kandydaci: „`dostawca:model` — powód".
     pub rejected: Vec<String>,
+    /// Dobór według trudności („trudne (kod, rozumowanie) → szczebel mocny”).
+    pub difficulty: Option<String>,
 }
 
 /// Wybrany dostawca i model.
@@ -129,6 +131,21 @@ pub trait BrainPort: Send + Sync {
     }
     /// Etykieta innego używalnego konta tego samego dostawcy (konto zapasowe), jeśli jest.
     fn backup_for(&self, _account: &str) -> Option<String> {
+        None
+    }
+    /// Dobór modelu według trudności: ustawienia i modele Routera (`None` — bez Routera).
+    fn routing(&self) -> Option<crate::dto::ModelRouting> {
+        None
+    }
+    /// Zapisuje ustawienia doboru; `Err` — komunikat dla użytkownika.
+    fn set_routing(
+        &self,
+        _settings: crate::dto::ModelRoutingSettings,
+    ) -> Result<crate::dto::ModelRouting, String> {
+        Err("Dobór modelu wymaga Routera (brak w tej konfiguracji).".into())
+    }
+    /// Podgląd decyzji dla przykładowego zadania w klasie (`chat`, `code`, …).
+    fn routing_preview(&self, _text: &str, _class: &str) -> Option<crate::dto::RoutingPreview> {
         None
     }
 }

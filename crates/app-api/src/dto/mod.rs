@@ -19,6 +19,7 @@ mod health;
 mod hub;
 mod memory;
 mod model_queues;
+mod model_routing;
 mod models;
 mod panels;
 mod plugins;
@@ -75,6 +76,10 @@ pub use memory::{
     MemorySourceLink, MemoryState, MemoryStatus, MemoryUndoResult,
 };
 pub use model_queues::{SharedQueueEntry, SharedQueues};
+pub use model_routing::{
+    ModelRouting, ModelRoutingSettings, RoutingLevel, RoutingModel, RoutingPreview, RoutingRung,
+    RoutingStrategy,
+};
 pub use models::{
     BundleFit, BundleFitKind, BundleItemView, BundleRequirements, BundleState, EmbedderView,
     ModelBundle, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,

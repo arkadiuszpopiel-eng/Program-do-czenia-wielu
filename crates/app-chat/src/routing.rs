@@ -23,6 +23,9 @@ pub(crate) fn chosen_of(target: &BrainTarget) -> Chosen {
 fn detail(choice: &BrainChoice, actual: &str) -> Option<String> {
     let route = choice.route.as_ref()?;
     let mut parts = Vec::new();
+    if let Some(difficulty) = &route.difficulty {
+        parts.push(format!("dobór: {difficulty}"));
+    }
     if route.chosen != actual {
         parts.push(format!("fallback z {}", route.chosen));
     }

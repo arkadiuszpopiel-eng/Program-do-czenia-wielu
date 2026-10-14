@@ -27,6 +27,10 @@ async fn shared_queue_goes_before_account_queues_and_clearing_it_restores_them()
     let mut rx = core.subscribe_events();
     let account = core.accounts_add(input(KEY, &base, "praca")).await.unwrap();
     assert!(core.accounts_test(account.id.clone()).await.unwrap().ok);
+    // Sama kolejność kolejek — dobór według trudności wyłączony (osobny test: model_routing.rs).
+    let mut settings = core.routing_get().await.unwrap().settings;
+    settings.enabled = false;
+    core.routing_set(settings).await.unwrap();
     let session = core
         .sessions_create(SessionTemplate::Empty)
         .await

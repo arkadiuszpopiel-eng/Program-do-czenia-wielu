@@ -10,6 +10,7 @@ pub mod config;
 pub mod engine_settings;
 pub mod global_queue;
 pub mod local;
+pub mod routing_settings;
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -28,7 +29,8 @@ use router_impl::{RoutedProvider, RouterCore};
 use sessions_contract::PrivacyTag;
 
 use accounts::AccountRoutes;
-use app_api::dto::ModelProfile;
+use app_api::dto::{ModelProfile, ModelRouting, ModelRoutingSettings, RoutingPreview};
+use routing_settings::PolicyFile;
 use app_api::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, BrainTarget, RouteNote};
 
 /// Komunikat „brak mózgu" (PLAN §14.5: bez kluczy startuje profil lokalny).
@@ -107,6 +109,8 @@ impl BrainPort for RouterUnavailable {
 pub struct RouterBrain {
     routers: Routers,
     accounts: AccountRoutes,
+    /// Ustawienia doboru według trudności (`model-routing.json`).
+    routing: PolicyFile,
 }
 
 impl RouterBrain {
@@ -116,6 +120,7 @@ impl RouterBrain {
         hub: Arc<AccountsHubService>,
         catalog: Arc<BTreeMap<String, CatalogEntry>>,
         shared_queues: std::path::PathBuf,
+        routing: std::path::PathBuf,
     ) -> Self {
         let accounts = AccountRoutes::new(
             hub,
@@ -123,7 +128,44 @@ impl RouterBrain {
             vec![routers.hybrid.clone(), routers.cloud.clone()],
             shared_queues,
         );
-        Self { routers, accounts }
+        Self {
+            routers,
+            accounts,
+            routing: PolicyFile::new(routing),
+        }
+    }
+
+    fn cores(&self) -> [&Arc<RouterCore>; 3] {
+        [&self.routers.hybrid, &self.routers.cloud, &self.routers.local]
+    }
+
+    /// Nakłada ustawienia doboru na rdzenie, gdy plik się zmienił.
+    fn apply_routing(&self) {
+        if let Some(policy) = self.routing.changed() {
+            for core in self.cores() {
+                core.set_difficulty_policy(policy.clone());
+            }
+        }
+    }
+
+    /// Nazwa dostawcy kandydata do interfejsu.
+    fn provider_name(&self, c: &Candidate) -> String {
+        self.target(&c.qualified())
+            .map_or_else(|| c.provider.as_str().to_owned(), |t| t.provider_name)
+    }
+
+    fn routing_view(&self) -> ModelRouting {
+        self.accounts.sync();
+        self.apply_routing();
+        let hybrid = &self.routers.hybrid;
+        let models = routing_settings::candidates(&[hybrid, &self.routers.local])
+            .iter()
+            .map(|c| routing_settings::model_of(hybrid, c, self.provider_name(c)))
+            .collect();
+        ModelRouting {
+            settings: routing_settings::settings_dto(&hybrid.difficulty_policy()),
+            models,
+        }
     }
 
     fn api_ready(&self) -> bool {
@@ -174,13 +216,8 @@ impl RouterBrain {
 /// Klasa zadań Routera z „klasy modelu” roli agentki (`model_policy` roli): programistka idzie
 /// kolejką „Kod”, planistka i recenzentka — „Planowanie”; reszta to rozmowa.
 pub fn task_class(policy: Option<&str>) -> TaskClass {
-    match policy.unwrap_or_default() {
-        "code" => TaskClass::Code,
-        "planning" | "review" | "research" => TaskClass::Planning,
-        "gui-vision" => TaskClass::GuiVision,
-        "summarize" => TaskClass::Summarize,
-        _ => TaskClass::Conversation,
-    }
+    router_contract::class_from_policy(policy.unwrap_or_default())
+        .unwrap_or(TaskClass::Conversation)
 }
 
 fn note(decision: &RouteDecision) -> RouteNote {
@@ -196,6 +233,7 @@ fn note(decision: &RouteDecision) -> RouteNote {
             .iter()
             .map(|(c, r)| format!("{c} — {r}"))
             .collect(),
+        difficulty: decision.difficulty.as_ref().map(|d| d.summary()),
     }
 }
 
@@ -204,6 +242,7 @@ impl BrainPort for RouterBrain {
     async fn choose(&self, request: &BrainRequest) -> Result<BrainChoice, BrainError> {
         self.accounts.detect_models().await;
         self.accounts.sync();
+        self.apply_routing();
         let local_only = request.privacy == PrivacyTag::LocalOnly
             || request.profile == Some(ModelProfile::Local);
         let core = if local_only {
@@ -265,6 +304,30 @@ impl BrainPort for RouterBrain {
 
     fn backup_for(&self, account: &str) -> Option<String> {
         self.accounts.backup_for(account).map(|a| a.label)
+    }
+
+    fn routing(&self) -> Option<ModelRouting> {
+        Some(self.routing_view())
+    }
+
+    fn set_routing(&self, settings: ModelRoutingSettings) -> Result<ModelRouting, String> {
+        let policy = routing_settings::policy_of(&settings)?;
+        routing_settings::save(self.routing.path(), &policy)
+            .map_err(|e| format!("Nie udało się zapisać ustawień doboru modelu: {e}."))?;
+        self.routing.forget();
+        Ok(self.routing_view())
+    }
+
+    fn routing_preview(&self, text: &str, class: &str) -> Option<RoutingPreview> {
+        let class = global_queue::class_of(class)?;
+        self.accounts.sync();
+        self.apply_routing();
+        Some(routing_settings::preview(
+            &self.routers.hybrid,
+            class,
+            text,
+            |c| self.provider_name(c),
+        ))
     }
 
     fn target(&self, model: &str) -> Option<BrainTarget> {

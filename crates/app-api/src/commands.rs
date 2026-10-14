@@ -74,6 +74,9 @@ macro_rules! with_commands {
             accounts_suggest_queue(account_id: String, task_class: String, strategy: String) -> Vec<String>;
             accounts_shared_queues() -> $crate::dto::SharedQueues;
             accounts_set_shared_queue(task_class: String, entries: Vec<$crate::dto::SharedQueueEntry>) -> $crate::dto::SharedQueues;
+            routing_get() -> $crate::dto::ModelRouting;
+            routing_set(settings: $crate::dto::ModelRoutingSettings) -> $crate::dto::ModelRouting;
+            routing_preview(text: String, task_class: String) -> $crate::dto::RoutingPreview;
             accounts_import_env() -> Vec<$crate::dto::EnvImportResult>;
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
             transfer_inspect(password: Option<$crate::dto::SecretInput>, handle: Option<String>) -> $crate::dto::InspectResult;
@@ -264,6 +267,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 231);
+        assert_eq!(super::COMMANDS.len(), 234);
     }
 }

@@ -16,6 +16,7 @@ mod queue;
 mod quick;
 mod sessions;
 pub(crate) mod settings;
+mod model_routing;
 mod shared_queue;
 mod system;
 mod tasks;
