@@ -12,7 +12,7 @@ repository.workspace = true
 # Parser CommonMark + GFM (tabele, listy zadań, przekreślenia). Bez domyślnego `html` — HTML pisze nasz writer.
 pulldown-cmark = { version = "0.13.4", default-features = false }
 # Sanitizacja HTML z białą listą (ADR 0009, THREAT_MODEL S12).
-ammonia = "4.2.0"
+ammonia = "4.2.3"
 serde.workspace = true
 
 [dev-dependencies]

@@ -8,7 +8,8 @@ import '@alfa/ui-kit/skins.css';
 import './pill.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-import { installTooltips } from '@alfa/ui-kit';
+// Tylko podpowiedzi, bez reszty ui-kit (budżet ≤ 8 KB gzip; audyt 2026-10-14, A-11).
+import { installTooltips } from '@alfa/ui-kit/tooltips';
 import { errorText } from '../lib/api/command-error';
 import type { AppBootstrap } from '../lib/api/types-system';
 import { applyBootDocument } from '../lib/window-boot';

@@ -4,3 +4,6 @@ packages:
   - 'packages/*'
 onlyBuiltDependencies:
   - esbuild
+overrides:
+  # Audyt 2026-10-14 (A-08): GHSA-82fw-gwwq-j7x9 w @vitest/mocker < 4.1.11 (zależność Storybooka 9.1).
+  '@vitest/mocker@<4.1.11': 4.1.11

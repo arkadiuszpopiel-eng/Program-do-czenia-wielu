@@ -19,7 +19,7 @@ if [ "${1:-}" != "--no-build" ]; then
     cd apps/desktop/src-tauri &&
       CARGO_TARGET_DIR="$(cygpath -w "$ROOT/target/shell")" CARGO_PROFILE_DEV_DEBUG=0 \
         ALFA_BUILD_DATE="$(date +%F)" ALFA_BUILD_COMMIT="$(git rev-parse --short HEAD)" \
-        cargo build -j 3 --features "e2e tauri/custom-protocol" >"$OUT/shell-build.log" 2>&1
+        cargo build --locked -j 3 --features "e2e tauri/custom-protocol" >"$OUT/shell-build.log" 2>&1
   )
   code=$?
   echo "budowa: kod $code, $(tail -1 "$OUT/shell-build.log")"
@@ -38,5 +38,9 @@ APPDATA="$(cygpath -w "$PROFILE/Roaming")" LOCALAPPDATA="$(cygpath -w "$PROFILE/
 smoke=$?
 echo "test prawdziwej aplikacji: kod $smoke"
 sed 's/\x1b\[[0-9;]*m//g' "$OUT/smoke.log" | grep -E "^\s+[0-9]+ (passed|failed|flaky)|^\s+x\s" | cut -c1-170
-node scripts/ipc-coverage.mjs "$OUT/out" --json "$OUT/ipc-coverage.json" | head -3
-exit "$smoke"
+# Bramka pokrycia łącza (audyt A-09): spadek poniżej progu = błąd biegu, nie tylko liczba w raporcie.
+node scripts/ipc-coverage.mjs "$OUT/out" --json "$OUT/ipc-coverage.json" --min "${ALFA_IPC_MIN:-50}" >"$OUT/ipc-coverage.log" 2>&1
+coverage=$?
+head -3 "$OUT/ipc-coverage.log"
+[ "$smoke" -eq 0 ] || exit "$smoke"
+exit "$coverage"

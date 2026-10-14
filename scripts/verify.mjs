@@ -8,7 +8,9 @@
 //   node scripts/verify.mjs wersja             cały projekt + przeglądarka + prawdziwa aplikacja + pokrycie łącza
 //   node scripts/verify.mjs sprzet [--pulpit] [--dzwiek]   testy sprzętowe + próby na modelu
 //
-// Przed startem: `source scripts/portable-env.sh`. Kod wyjścia 1, gdy którykolwiek etap jest czerwony.
+// Przed startem: `source scripts/portable-env.sh`. Kod wyjścia 1, gdy którykolwiek etap jest czerwony;
+// 3, gdy żaden nie jest czerwony, ale któryś się nie uruchomił (brak narzędzia, miejsca) — bieg
+// niekompletny. Poziom „wersja” obejmuje te same bramki co CI (audyt 2026-10-14, A-09).
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -38,6 +40,7 @@ const cargoEnv = {
   CARGO_PROFILE_TEST_DEBUG: '0',
 };
 const pkgArgs = packages.flatMap((p) => ['-p', p]);
+const SHELL = 'apps/desktop/src-tauri/Cargo.toml';
 
 /** Etap: `id`, opis, polecenie (`sh -c` w Git Bash), katalog, minimalne wolne miejsce w GB. */
 const STAGES = {
@@ -71,28 +74,77 @@ const STAGES = {
     ['interfejs', 'Testy interfejsu', 'npx vitest run', ui, 0],
   ],
   wersja: [
-    ['wersja', 'Spójność numeru wersji', 'node scripts/set-version.mjs --check', root, 0],
     [
-      'format',
-      'Formatowanie Rust',
-      `git ls-files '*.rs' | xargs -n 200 rustfmt --edition 2024 --check`,
+      'wersja',
+      'Spójność numeru wersji (pliki, manifesty, Cargo.lock)',
+      'node scripts/set-version.mjs --check',
       root,
       0,
     ],
     [
+      'format',
+      'Formatowanie Rust (workspace i powłoka)',
+      `git ls-files '*.rs' | xargs -n 200 rustfmt --edition 2024 --check && cargo fmt --manifest-path ${SHELL} -- --check`,
+      root,
+      0,
+    ],
+    ['graf', 'Graf zależności modułów', 'bash scripts/check-deps.sh', root, 0],
+    [
       'linter',
       'Linter całego projektu',
-      'cargo clippy -j 3 --workspace --all-targets -- -D warnings',
+      'cargo clippy --locked -j 3 --workspace --all-targets -- -D warnings',
       root,
       30,
     ],
-    ['testy', 'Testy całego projektu', 'cargo test --workspace --no-fail-fast -j 3', root, 30],
+    [
+      'linter-powloka',
+      'Linter powłoki Tauri (zwykła i testowa)',
+      `cargo clippy --locked -j 3 --manifest-path ${SHELL} --all-targets -- -D warnings && cargo clippy --locked -j 3 --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
+      root,
+      15,
+    ],
+    [
+      'testy',
+      'Testy całego projektu',
+      'cargo test --locked --workspace --no-fail-fast -j 3',
+      root,
+      30,
+    ],
+    [
+      'testy-powloka',
+      'Testy powłoki Tauri (zwykła i testowa)',
+      `cargo test --locked -j 3 --manifest-path ${SHELL} --lib && cargo test --locked -j 3 --manifest-path ${SHELL} --lib --features e2e`,
+      root,
+      15,
+    ],
+    [
+      'schematy',
+      'Schematy JSON zgodne z Rustem',
+      'git diff --exit-code -- packages/schemas',
+      root,
+      0,
+    ],
+    [
+      'tokeny',
+      'Tokeny wyglądu i kontrast',
+      'pnpm --filter @alfa/ui-kit build:tokens && git diff --exit-code -- packages/ui-kit/src/tokens.css packages/ui-kit/src/tokens.ts && pnpm --filter @alfa/ui-kit check:contrast',
+      root,
+      0,
+    ],
+    ['lint', 'Lint interfejsu i skryptów (eslint, Svelte 5, CSS)', 'pnpm lint', root, 0],
+    [
+      'typy-ipc',
+      'Typy łącza zgodne ze schematem',
+      'node scripts/gen-ipc-types.mjs --check',
+      root,
+      0,
+    ],
     ['typy', 'Kontrola typów interfejsu', 'pnpm check', ui, 0],
     ['interfejs', 'Testy interfejsu', 'npx vitest run', ui, 0],
     [
       'przegladarka',
-      'Testy w przeglądarce',
-      'pnpm build && PW_WORKERS=4 PW_CHANNEL=msedge pnpm test:e2e',
+      'Budowa, budżet rozmiaru i testy w przeglądarce',
+      'pnpm build && node scripts/bundle-size.mjs && PW_WORKERS=4 PW_CHANNEL=msedge pnpm test:e2e',
       ui,
       0,
     ],
@@ -103,8 +155,21 @@ const STAGES = {
       root,
       15,
     ],
-    ['dokumenty', 'Plan w HTML: odnośniki', 'node scripts/docs-html.mjs --check', root, 0],
+    [
+      'dokumenty',
+      'Plan w HTML: aktualność i odnośniki',
+      'node scripts/docs-html.mjs --verify',
+      root,
+      0,
+    ],
     ['zaleznosci', 'Zależności i licencje (cargo deny)', 'cargo deny check', root, 0],
+    [
+      'audyt-npm',
+      'Podatności pakietów JS (pnpm audit)',
+      'pnpm audit --audit-level moderate',
+      root,
+      0,
+    ],
   ],
   sprzet: [
     ['nagrania', 'Nagrania kontrolne 16 kHz', 'node scripts/verify-audio.mjs', root, 0],
@@ -131,19 +196,26 @@ const freeGb = () => {
   const s = statfsSync(root);
   return Math.round((s.bavail * s.bsize) / 1024 ** 3);
 };
-const hasTool = (stage) => {
-  if (stage !== 'zaleznosci') return true;
-  return spawnSync('cargo', ['deny', '--version'], { encoding: 'utf8' }).status === 0;
+/** Narzędzie wymagane przez etap (brak = etap NIEURUCHOMIONY, a cały bieg — niekompletny). */
+const TOOLS = {
+  zaleznosci: ['cargo', ['deny', '--version'], 'cargo-deny'],
+  graf: ['jq', ['--version'], 'jq'],
+};
+const missingTool = (stage) => {
+  const tool = TOOLS[stage];
+  if (!tool) return null;
+  return spawnSync(tool[0], tool[1], { encoding: 'utf8' }).status === 0 ? null : tool[2];
 };
 
 const results = [];
 for (const [id, title, command, cwd, needGb] of STAGES) {
-  if (!hasTool(id)) {
+  const tool = missingTool(id);
+  if (tool) {
     results.push({
       id,
       title,
       state: 'nieuruchomiony',
-      why: 'brak narzędzia cargo-deny na tym komputerze',
+      why: `brak narzędzia ${tool} na tym komputerze`,
     });
     console.log(`— ${id}: NIEURUCHOMIONY (brak narzędzia)`);
     continue;
@@ -202,8 +274,11 @@ function numbersFrom(id, output) {
 
 const count = (state) => results.filter((r) => r.state === state).length;
 const other = { szybki: ['wersja', 'sprzet'], wersja: ['sprzet'], sprzet: [] }[level];
+// Audyt A-09: bieg z pominiętym etapem nie jest „zielony” — jest NIEKOMPLETNY (kod 3).
+const verdict =
+  count('CZERWONY') > 0 ? 'CZERWONY' : count('nieuruchomiony') > 0 ? 'NIEKOMPLETNY' : 'ZIELONY';
 const lines = [
-  `# Sprawdzenie „${level}” — wersja ${version}`,
+  `# Sprawdzenie „${level}” — wersja ${version}: ${verdict}`,
   '',
   `Bieg: ${new Date().toISOString()} · commit ${spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim()} · zielone ${count('zielony')}, czerwone ${count('CZERWONY')}, nieuruchomione ${count('nieuruchomiony')}`,
   '',
@@ -233,7 +308,8 @@ if (level === 'sprzet' && existsSync(hw)) lines.push(readFileSync(hw, 'utf8'));
 writeFileSync(join(out, `raport-${level}.md`), `${lines.join('\n')}\n`);
 writeFileSync(
   join(out, `raport-${level}.json`),
-  `${JSON.stringify({ version, level, results }, null, 2)}\n`,
+  `${JSON.stringify({ version, level, verdict, results }, null, 2)}\n`,
 );
 console.log(`Raport: ${join(out, `raport-${level}.md`)}`);
-process.exit(count('CZERWONY') > 0 ? 1 : 0);
+console.log(`Wynik: ${verdict}`);
+process.exit({ CZERWONY: 1, NIEKOMPLETNY: 3, ZIELONY: 0 }[verdict]);

@@ -19,6 +19,10 @@
       "svelte": "./src/components/*",
       "default": "./src/components/*"
     },
+    "./tooltips": {
+      "types": "./src/tooltips.ts",
+      "default": "./src/tooltips.ts"
+    },
     "./tokens": {
       "types": "./src/tokens.ts",
       "default": "./src/tokens.ts"
@@ -48,10 +52,10 @@
     "bits-ui": "2.19.3"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "9.1.9",
-    "@storybook/svelte-vite": "9.1.9",
+    "@storybook/addon-a11y": "9.1.21",
+    "@storybook/svelte-vite": "9.1.21",
     "@sveltejs/vite-plugin-svelte": "6.2.4",
-    "storybook": "9.1.9",
+    "storybook": "9.1.21",
     "svelte": "5.57.1",
     "svelte-check": "4.7.6",
     "typescript": "5.9.3",
