@@ -53,6 +53,7 @@ watchdog-contract = { path = "../watchdog-contract" }
 async-trait.workspace = true
 chrono.workspace = true
 futures-util.workspace = true
+serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true
 tokio = { workspace = true, features = ["rt"] }
@@ -66,3 +67,4 @@ workspace = true
 [dev-dependencies]
 # Wirtualny zegar w testach miernika poziomu mowy.
 tokio = { workspace = true, features = ["test-util", "macros"] }
+tempfile = "3.27.0"

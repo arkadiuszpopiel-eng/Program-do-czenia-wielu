@@ -35,6 +35,9 @@ struct Health {
 /// Kolejki modeli: dostawca → klasa zadań → modele w kolejności prób.
 pub type ProviderQueues = BTreeMap<ProviderId, BTreeMap<TaskClass, Vec<String>>>;
 
+/// Wspólna kolejka wszystkich kont: klasa zadań → kandydaci (dostawca i model) w kolejności prób.
+pub type GlobalQueues = BTreeMap<TaskClass, Vec<Candidate>>;
+
 /// Klasy zadań, które bierze lekki dostawca lokalny: prace w tle, którym wystarcza mały model
 /// i które nie powinny zajmować karty głównej (streszczenia, tytuły, porządki pamięci).
 pub const LIGHT_CLASSES: [TaskClass; 1] = [TaskClass::Summarize];
@@ -46,6 +49,8 @@ pub struct RouterCore {
     overrides: RwLock<Option<String>>,
     /// Kolejki modeli dostawców API: dostawca → klasa → modele w kolejności prób.
     queues: RwLock<ProviderQueues>,
+    /// Wspólna kolejka wszystkich kont — pierwszeństwo przed kolejkami kont i modelem lekkim.
+    global: RwLock<GlobalQueues>,
     /// Lekki dostawca lokalny (model pomocniczy na karcie zintegrowanej) — pierwszy w klasach
     /// [`LIGHT_CLASSES`], poza nimi nieużywany.
     light: RwLock<Option<ProviderId>>,
@@ -77,6 +82,7 @@ impl RouterCore {
             explicit: RwLock::new(None),
             overrides: RwLock::new(None),
             queues: RwLock::new(ProviderQueues::new()),
+            global: RwLock::new(GlobalQueues::new()),
             light: RwLock::new(None),
             compliance,
             budget,
@@ -155,6 +161,13 @@ impl RouterCore {
         *self.queues.write().unwrap_or_else(|p| p.into_inner()) = queues;
     }
 
+    /// Wspólna kolejka wszystkich kont (Ustawienia → Kolejki modeli API → „Wszystkie konta”).
+    /// Dla klasy z niepustą kolejką jej kandydaci idą pierwsi, a reszta polityki zostaje za nimi
+    /// jako zapas.
+    pub fn set_global_queues(&self, queues: GlobalQueues) {
+        *self.global.write().unwrap_or_else(|p| p.into_inner()) = queues;
+    }
+
     /// Wskazuje lekkiego dostawcę lokalnego (zarejestrowanego jak każdy inny, rodzaj `Local`).
     /// W klasach [`LIGHT_CLASSES`] jest próbowany pierwszy; w pozostałych nie występuje, a rolę
     /// modelu lokalnego pełni dostawca główny.
@@ -219,6 +232,8 @@ impl RouterCore {
                     .insert(0, light.clone());
             }
         }
+        let global = self.global.read().unwrap_or_else(|p| p.into_inner());
+        crate::helpers::put_first(&mut policy.classes, &global);
         policy
     }
 

@@ -8561,6 +8561,22 @@
       ],
       "type": "object"
     },
+    "SharedQueueEntry": {
+      "description": "Pozycja wspólnej kolejki: model wybranego konta.",
+      "properties": {
+        "account_id": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "account_id",
+        "model"
+      ],
+      "type": "object"
+    },
     "SkillImportResult": {
       "description": "Wynik importu paczki umiejętności (zawsze propozycje, nigdy instalacja).",
       "properties": {
@@ -11264,6 +11280,46 @@
       ],
       "result": {
         "$ref": "#/$defs/Account"
+      }
+    },
+    "accounts_set_shared_queue": {
+      "args": [
+        {
+          "name": "task_class",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "entries",
+          "schema": {
+            "items": {
+              "$ref": "#/$defs/SharedQueueEntry"
+            },
+            "type": "array"
+          }
+        }
+      ],
+      "result": {
+        "additionalProperties": {
+          "items": {
+            "$ref": "#/$defs/SharedQueueEntry"
+          },
+          "type": "array"
+        },
+        "type": "object"
+      }
+    },
+    "accounts_shared_queues": {
+      "args": [],
+      "result": {
+        "additionalProperties": {
+          "items": {
+            "$ref": "#/$defs/SharedQueueEntry"
+          },
+          "type": "array"
+        },
+        "type": "object"
       }
     },
     "accounts_suggest_queue": {

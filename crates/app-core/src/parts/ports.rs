@@ -66,6 +66,7 @@ impl Extra {
                 routers.clone(),
                 hub.clone(),
                 Arc::new(kernel.catalog.api.clone()),
+                paths.config.join(app_modules::route::global_queue::FILE),
             )),
             (None, None) => Arc::new(RouterUnavailable),
         };

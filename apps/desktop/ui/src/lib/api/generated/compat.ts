@@ -22,7 +22,7 @@ import type * as H13 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 276 typów wspólnych, 533 sprawdzeń. */
+/** 278 typów wspólnych, 537 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H11.AboutInfo>>,
   Expect<Fits<H11.AboutInfo, G.AboutInfo>>,
@@ -161,6 +161,8 @@ export type IpcCompat = [
   Expect<Fits<H5.DryRunItem, G.DryRunItem>>,
   Expect<Fits<G.EmbedderView, H7.EmbedderView>>,
   Expect<Fits<H7.EmbedderView, G.EmbedderView>>,
+  Expect<Fits<G.EngineCheckView, H12.EngineCheckView>>,
+  Expect<Fits<H12.EngineCheckView, G.EngineCheckView>>,
   Expect<Fits<G.EnginesAction, H12.EnginesAction>>,
   Expect<Fits<H12.EnginesAction, G.EnginesAction>>,
   Expect<Fits<G.EnrollSampleView, H12.EnrollSampleView>>,
@@ -402,6 +404,8 @@ export type IpcCompat = [
   Expect<Fits<H12.S2sView, G.S2sView>>,
   Expect<Fits<G.SampleQuality, H12.SampleQuality>>,
   Expect<Fits<H12.SampleQuality, G.SampleQuality>>,
+  Expect<Fits<G.SelfTestView, H12.SelfTestView>>,
+  Expect<Fits<H12.SelfTestView, G.SelfTestView>>,
   Expect<Fits<H0.SendOptions, G.SendOptions>>,
   Expect<Fits<G.SendResult, H0.SendResult>>,
   Expect<Fits<H0.SendResult, G.SendResult>>,

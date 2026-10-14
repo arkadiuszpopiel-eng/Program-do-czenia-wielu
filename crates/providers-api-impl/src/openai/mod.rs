@@ -160,6 +160,23 @@ fn unknown_openai() -> ModelCapabilities {
     }
 }
 
+/// Identyfikator OpenRoutera w katalogu dostawców.
+const OPENROUTER: &str = "openrouter";
+
+/// Opis konta OpenRoutera z `GET /key` (kwoty w USD): limit, zużycie, konto darmowe.
+pub fn openrouter_key_note(data: &Value) -> String {
+    let usd = |v: f64| format!("{v:.2} USD").replace('.', ",");
+    let usage = data["usage"].as_f64().unwrap_or(0.0);
+    let mut note = match data["limit"].as_f64() {
+        Some(limit) => format!("limit klucza {}, zużyto {}", usd(limit), usd(usage)),
+        None => format!("klucz bez limitu, zużyto {}", usd(usage)),
+    };
+    if data["is_free_tier"].as_bool() == Some(true) {
+        note.push_str(" · konto darmowe (bez doładowania)");
+    }
+    note
+}
+
 /// Dostawca OpenAI lub endpoint zgodny.
 pub struct OpenAiProvider {
     engine: Arc<Engine<OpenAiCodec>>,
@@ -247,6 +264,19 @@ impl ModelProvider for OpenAiProvider {
                 })
             })
             .collect())
+    }
+
+    /// OpenRouter: `GET /key` — jedyny sposób, żeby sprawdzić klucz (lista modeli jest publiczna).
+    /// Zły klucz → 401 jak w każdym innym wywołaniu; dobry → limit i zużycie konta.
+    async fn check_key(&self) -> Result<Option<String>, ProviderError> {
+        if self.engine.profile.id.as_str() != OPENROUTER {
+            return Err(ProviderError::new(
+                ProviderErrorKind::Unsupported,
+                "ten dostawca nie ma osobnego sprawdzenia klucza",
+            ));
+        }
+        let info = self.engine.request_json("/key", None).await?;
+        Ok(Some(openrouter_key_note(&info["data"])))
     }
 
     /// `POST /embeddings`.

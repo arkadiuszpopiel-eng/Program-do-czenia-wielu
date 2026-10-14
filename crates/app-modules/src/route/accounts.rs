@@ -12,8 +12,10 @@ use accounts_hub_contract::{
 use accounts_hub_impl::AccountsHubService;
 use providers_api_impl::{AccountProfile, CatalogEntry, build_provider};
 use providers_contract::{ModelKind, ModelProvider, ProviderId};
-use router_contract::{RouteKind, TaskClass};
-use router_impl::{ProviderQueues, RouterCore};
+use router_contract::{Candidate, RouteKind, TaskClass};
+use router_impl::{GlobalQueues, ProviderQueues, RouterCore};
+
+use super::global_queue::{QueueFile, SharedQueues, class_of};
 
 use crate::secrets::HubKeySource;
 
@@ -54,6 +56,28 @@ fn route_class(class: accounts_hub_contract::TaskClass) -> TaskClass {
     }
 }
 
+/// Wspólna kolejka → kandydaci Routera. Pozycja konta, które nie jest trasą swojego dostawcy
+/// (wyłączone, bez klucza, drugie konto tego samego dostawcy), jest pomijana — Router zna tylko
+/// jedną trasę na dostawcę.
+fn global_candidates(shared: &SharedQueues, chosen: &BTreeMap<String, Account>) -> GlobalQueues {
+    shared
+        .iter()
+        .filter_map(|(name, entries)| {
+            let class = class_of(name)?;
+            let list: Vec<Candidate> = entries
+                .iter()
+                .filter_map(|entry| {
+                    let (provider, _) = chosen
+                        .iter()
+                        .find(|(_, account)| account.id.as_str() == entry.account_id)?;
+                    Some(Candidate::new(provider.as_str(), entry.model.clone()))
+                })
+                .collect();
+            (!list.is_empty()).then_some((class, list))
+        })
+        .collect()
+}
+
 fn queues_of(account: &Account) -> BTreeMap<TaskClass, Vec<String>> {
     account
         .queues
@@ -87,6 +111,8 @@ pub(crate) struct AccountRoutes {
     catalog: Arc<BTreeMap<String, CatalogEntry>>,
     /// Routery z trasami API (hybrydowy, chmurowy).
     cores: Vec<Arc<RouterCore>>,
+    /// Wspólna kolejka wszystkich kont (`model-queues.json`).
+    shared: QueueFile,
     state: Mutex<State>,
 }
 
@@ -95,11 +121,13 @@ impl AccountRoutes {
         hub: Arc<AccountsHubService>,
         catalog: Arc<BTreeMap<String, CatalogEntry>>,
         cores: Vec<Arc<RouterCore>>,
+        shared: std::path::PathBuf,
     ) -> Self {
         Self {
             hub,
             catalog,
             cores,
+            shared: QueueFile::new(shared),
             state: Mutex::new(State::default()),
         }
     }
@@ -273,6 +301,7 @@ impl AccountRoutes {
 
     /// Rejestruje/wyrejestrowuje trasy API, gdy konta się zmieniły.
     pub fn sync(&self) {
+        let shared = self.shared.current();
         let mut chosen: BTreeMap<String, Account> = BTreeMap::new();
         for account in self.eligible() {
             chosen
@@ -291,6 +320,7 @@ impl AccountRoutes {
                     a.queues
                 )
             })
+            .chain(std::iter::once(format!("{shared:?}")))
             .collect();
         if self.lock().fingerprint == fingerprint {
             return;
@@ -332,8 +362,10 @@ impl AccountRoutes {
                 queues.insert(ProviderId::new(provider_id.as_str()), own);
             }
         }
+        let global = global_candidates(&shared, &chosen);
         for core in &self.cores {
             core.set_provider_queues(queues.clone());
+            core.set_global_queues(global.clone());
         }
         let mut state = self.lock();
         state

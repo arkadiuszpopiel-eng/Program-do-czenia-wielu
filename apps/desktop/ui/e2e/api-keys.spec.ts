@@ -394,3 +394,21 @@ test('kreator po angielsku: wynik i kroki naprawy są przetłumaczone', async ({
   await expect(verdict).toContainText('Incorrect API key provided: [•••]');
   await expect(page.getByRole('button', { name: 'Fix the key' })).toBeVisible();
 });
+
+// Zgłoszenie właściciela 2026-10-14: przy OpenRouterze „Testuj połączenie” nic nie robił (lista
+// modeli jest publiczna, więc test kończył się „bez testu”). Teraz klucz sprawdza osobne zapytanie
+// i konto pokazuje limit i zużycie klucza.
+test('OpenRouter: test klucza daje „działa” i opis konta u dostawcy', async ({ page }) => {
+  await openWizard(page, /^OpenRouter/);
+  await check(page, fakeKey('sk-or-v1-', 'proj'), 'ok');
+  await page.getByRole('button', { name: /Zamknij — resztę/ }).click();
+  const row = page
+    .getByRole('list', { name: 'Twoje konta' })
+    .getByRole('listitem')
+    .filter({ hasText: /^OpenRouter/ });
+  await expect(row).toContainText('działa');
+  await row.getByRole('button', { name: 'Testuj połączenie' }).click();
+  await expect(row).toContainText('działa');
+  await expect(row).toContainText('Konto u dostawcy: limit klucza 50,00 USD, zużyto 1,23 USD');
+  await expect(row).not.toContainText('bez testu');
+});

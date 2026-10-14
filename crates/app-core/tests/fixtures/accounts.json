@@ -1515,6 +1515,38 @@
     ]
   },
   {
+    "command": "accounts_set_shared_queue",
+    "args": {
+      "taskClass": "chat",
+      "entries": [
+        {
+          "account_id": "acc-muo1g480-15",
+          "model": "gpt-4o-mini"
+        }
+      ]
+    },
+    "result": {
+      "chat": [
+        {
+          "account_id": "acc-muo1g480-15",
+          "model": "gpt-4o-mini"
+        }
+      ]
+    }
+  },
+  {
+    "command": "accounts_shared_queues",
+    "args": {},
+    "result": {
+      "chat": [
+        {
+          "account_id": "acc-muo1g480-15",
+          "model": "gpt-4o-mini"
+        }
+      ]
+    }
+  },
+  {
     "command": "accounts_import_env",
     "args": {},
     "result": [

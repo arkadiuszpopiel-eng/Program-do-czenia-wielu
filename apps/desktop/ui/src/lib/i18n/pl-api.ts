@@ -25,6 +25,29 @@ export const plApi = {
   'api.toAccount': 'Klucz, test i limit tego konta — w „Konta i klucze API”',
   'api.disabled': 'Konto jest wyłączone — kolejki zadziałają po włączeniu.',
 
+  'api.shared.tab': 'Wszystkie konta',
+  'api.shared.tabMeta': {
+    one: 'wspólna kolejka · {n} konto',
+    few: 'wspólna kolejka · {n} konta',
+    many: 'wspólna kolejka · {n} kont',
+    other: 'wspólna kolejka · {n} konta',
+  },
+  'api.shared.title': 'Wspólna kolejka wszystkich kont',
+  'api.shared.hint':
+    'Jedna kolejność prób dla wszystkich kont naraz — możesz mieszać modele OpenAI, OpenRoutera i innych. Wspólna kolejka ma pierwszeństwo przed kolejkami pojedynczych kont; gdy jest pusta, działają kolejki kont i wybór automatyczny.',
+  'api.shared.queue': 'Wspólna kolejka: {name}',
+  'api.shared.empty': 'Brak wspólnej kolejki.',
+  'api.shared.emptyHint':
+    'Alfa użyje kolejek pojedynczych kont. Dodaj model z listy poniżej albo złóż kolejkę z kolejek kont.',
+  'api.shared.compose': 'Złóż z kolejek kont',
+  'api.shared.composed': 'Wspólna kolejka „{name}” złożona z kolejek kont.',
+  'api.shared.composeEmpty': 'Żadne konto nie ma kolejki dla tej klasy zadań.',
+  'api.shared.cleared': 'Wspólna kolejka „{name}” wyczyszczona — działają kolejki kont.',
+  'api.shared.oneRoute':
+    'Z kilku kont tego samego dostawcy Alfa korzysta z jednego (najstarszego działającego) — modele pozostałych kont tego dostawcy są wtedy pomijane.',
+  'api.shared.add': 'Dodaj model do wspólnej kolejki',
+  'api.shared.fromAccount': 'Konto',
+  'api.shared.gone': 'konto usunięte',
   'api.queues': 'Kolejki modeli',
   'api.queuesHint':
     'Alfa bierze pierwszy model z kolejki. Następny dopiero wtedy, gdy poprzedni zawiedzie: błąd dostawcy, limit zapytań, brak dostępu do modelu albo brak odpowiedzi na czas.',

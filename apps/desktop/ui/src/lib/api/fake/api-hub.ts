@@ -12,6 +12,7 @@ import {
   type TaskClassId,
 } from '../../logic/model-queue';
 import { FAKE_CATALOG } from './catalog';
+import { sharedQueueApi } from './api-shared-queue';
 import { OPENAI_MODELS, fakeModel, purposeOf, suggestFake } from './model-info';
 import type { FakeCore } from './core';
 import {
@@ -144,6 +145,10 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       ...(extra.status ? { status: extra.status } : {}),
       ...(extra.code ? { provider_code: extra.code } : {}),
       ...(extra.detail ? { detail: extra.detail } : {}),
+      // OpenRouter sprawdza klucz osobno (`GET /key`) i podaje limit i zużycie klucza.
+      ...(outcome === 'ok' && account.provider_id === 'openrouter'
+        ? { detail: 'limit klucza 50,00 USD, zużyto 1,23 USD' }
+        : {}),
     };
     // Lista modeli zmienia się tylko po jej udanym odczycie (jak w rdzeniu).
     const models = outcome === 'ok' ? genericModels(account.provider_id) : account.models;
@@ -177,6 +182,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     );
   const urls = new Map<string, string>();
   return {
+    ...sharedQueueApi(core),
     catalog: () => core.reply(FAKE_CATALOG),
     list: () => core.reply(core.accounts),
     add: (input) => {

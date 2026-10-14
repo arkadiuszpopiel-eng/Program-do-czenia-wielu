@@ -73,6 +73,8 @@
     "allow-accounts-set-model",
     "allow-accounts-set-queue",
     "allow-accounts-suggest-queue",
+    "allow-accounts-shared-queues",
+    "allow-accounts-set-shared-queue",
     "allow-accounts-import-env",
     "allow-transfer-export",
     "allow-transfer-inspect",

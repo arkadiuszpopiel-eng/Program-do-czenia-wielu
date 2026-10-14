@@ -15,6 +15,7 @@
   import { useApp } from '../../../state/context';
   import ApiModelBrowser from './ApiModelBrowser.svelte';
   import ApiQueueEditor from './ApiQueueEditor.svelte';
+  import SharedQueuePanel from './SharedQueuePanel.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -27,7 +28,15 @@
   let taskClass = $state<TaskClassId>('chat');
   let saving = $state(false);
 
+  /** Zakładka wspólnej kolejki wszystkich kont (obok zakładek kont). */
+  const SHARED = '*';
+  const shared = $derived(app.apiAccount === SHARED);
   const account = $derived(accounts.find((a) => a.id === app.apiAccount) ?? accounts[0]);
+  /** Nazwa konta w kafelkach wspólnej kolejki: dostawca, a przy kilku kontach — też etykieta. */
+  const accountName = (a: Account) =>
+    accounts.filter((x) => x.provider_id === a.provider_id).length > 1
+      ? `${providerName(a)} — ${a.label}`
+      : providerName(a);
   const providerName = (a: Account) =>
     catalog.find((p) => p.id === a.provider_id)?.display_name ?? a.provider_id;
   const queue = $derived(account?.queues?.[taskClass] ?? []);
@@ -94,13 +103,25 @@
     </EmptyState>
   {:else}
     <div class="accounts" role="tablist" aria-label={t('api.accounts')}>
+      <button
+        type="button"
+        role="tab"
+        class="account all"
+        id="{uid}-acc-all"
+        aria-selected={shared}
+        aria-controls="{uid}-account"
+        onclick={() => (app.apiAccount = SHARED)}
+      >
+        <span class="label">{t('api.shared.tab')}</span>
+        <span class="meta">{t('api.shared.tabMeta', { n: accounts.length })}</span>
+      </button>
       {#each accounts as a (a.id)}
         <button
           type="button"
           role="tab"
           class="account"
           id="{uid}-acc-{a.id}"
-          aria-selected={a.id === account.id}
+          aria-selected={!shared && a.id === account.id}
           aria-controls="{uid}-account"
           onclick={() => (app.apiAccount = a.id)}
         >
@@ -112,42 +133,48 @@
       {/each}
     </div>
 
-    <div
-      class="selected"
-      role="tabpanel"
-      id="{uid}-account"
-      aria-labelledby="{uid}-acc-{account.id}"
-    >
-      <p class="summary">
-        {t('api.summary.chat', { n: chatModels })} ·
-        {account.auto_model
-          ? t('api.summary.auto', { model: account.auto_model })
-          : t('api.summary.noAuto')}
-      </p>
-      <div>
-        <Button variant="ghost" size="sm" onclick={() => app.openSettings('providers')}
-          >{t('api.toAccount')}</Button
-        >
+    {#if shared}
+      <div class="selected" role="tabpanel" id="{uid}-account" aria-labelledby="{uid}-acc-all">
+        <SharedQueuePanel {accounts} label={accountName} />
       </div>
-      {#if account.state === 'disabled'}
-        <Banner kind="warning" icon="warning">{t('api.disabled')}</Banner>
-      {/if}
-
-      <section class="card" aria-labelledby="{uid}-queues">
-        <h3 id="{uid}-queues">{t('api.queues')}</h3>
-        <p class="muted">{t('api.queuesHint')}</p>
-        <ApiQueueEditor {account} bind:taskClass onsave={save} {saving} />
-      </section>
-
-      <section class="card" aria-labelledby="{uid}-browser">
-        <h3 id="{uid}-browser">{t('api.browser')}</h3>
-        {#if account.models.length === 0}
-          <p class="muted">{t('api.noModels')}</p>
-        {:else}
-          <ApiModelBrowser models={account.models} {queue} {taskClass} {saving} onadd={add} />
+    {:else}
+      <div
+        class="selected"
+        role="tabpanel"
+        id="{uid}-account"
+        aria-labelledby="{uid}-acc-{account.id}"
+      >
+        <p class="summary">
+          {t('api.summary.chat', { n: chatModels })} ·
+          {account.auto_model
+            ? t('api.summary.auto', { model: account.auto_model })
+            : t('api.summary.noAuto')}
+        </p>
+        <div>
+          <Button variant="ghost" size="sm" onclick={() => app.openSettings('providers')}
+            >{t('api.toAccount')}</Button
+          >
+        </div>
+        {#if account.state === 'disabled'}
+          <Banner kind="warning" icon="warning">{t('api.disabled')}</Banner>
         {/if}
-      </section>
-    </div>
+
+        <section class="card" aria-labelledby="{uid}-queues">
+          <h3 id="{uid}-queues">{t('api.queues')}</h3>
+          <p class="muted">{t('api.queuesHint')}</p>
+          <ApiQueueEditor {account} bind:taskClass onsave={save} {saving} />
+        </section>
+
+        <section class="card" aria-labelledby="{uid}-browser">
+          <h3 id="{uid}-browser">{t('api.browser')}</h3>
+          {#if account.models.length === 0}
+            <p class="muted">{t('api.noModels')}</p>
+          {:else}
+            <ApiModelBrowser models={account.models} {queue} {taskClass} {saving} onadd={add} />
+          {/if}
+        </section>
+      </div>
+    {/if}
   {/if}
 </div>
 

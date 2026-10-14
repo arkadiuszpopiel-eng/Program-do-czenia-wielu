@@ -170,6 +170,9 @@
       {#if keyOld && keyAge !== null}
         <span class="meta old">{t('hub.keyOld', { n: keyAge })}</span>
       {/if}
+      {#if last?.ok && last.detail}
+        <span class="meta">{t('hub.testNote', { note: last.detail })}</span>
+      {/if}
     </div>
     <span class="state {tone}">{stateLabel}</span>
     <div class="actions">

@@ -2340,6 +2340,12 @@ export interface SettingsPageDef {
   readonly wave: number;
 }
 
+/** Pozycja wspólnej kolejki: model wybranego konta. */
+export interface SharedQueueEntry {
+  readonly account_id: string;
+  readonly model: string;
+}
+
 /** Wynik importu paczki umiejętności (zawsze propozycje, nigdy instalacja). */
 export interface SkillImportResult {
   readonly proposed: readonly SkillInfo[];
@@ -3058,6 +3064,14 @@ export interface IpcCommands {
       readonly models: readonly string[];
     };
     readonly result: Account;
+  };
+  readonly accounts_set_shared_queue: {
+    readonly args: { readonly taskClass: string; readonly entries: readonly SharedQueueEntry[] };
+    readonly result: Readonly<Record<string, readonly SharedQueueEntry[]>>;
+  };
+  readonly accounts_shared_queues: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: Readonly<Record<string, readonly SharedQueueEntry[]>>;
   };
   readonly accounts_suggest_queue: {
     readonly args: {

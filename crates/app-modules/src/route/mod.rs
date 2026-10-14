@@ -8,6 +8,7 @@
 mod accounts;
 pub mod config;
 pub mod engine_settings;
+pub mod global_queue;
 pub mod local;
 
 use std::collections::BTreeMap;
@@ -114,11 +115,13 @@ impl RouterBrain {
         routers: Routers,
         hub: Arc<AccountsHubService>,
         catalog: Arc<BTreeMap<String, CatalogEntry>>,
+        shared_queues: std::path::PathBuf,
     ) -> Self {
         let accounts = AccountRoutes::new(
             hub,
             catalog,
             vec![routers.hybrid.clone(), routers.cloud.clone()],
+            shared_queues,
         );
         Self { routers, accounts }
     }

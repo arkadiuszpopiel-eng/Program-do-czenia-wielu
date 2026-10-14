@@ -216,6 +216,14 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             vec![("accountId", s), ("taskClass", s), ("strategy", s)],
             roundtrip::<Vec<String>>,
         ),
+        "accounts_shared_queues" => (vec![], roundtrip::<SharedQueues>),
+        "accounts_set_shared_queue" => (
+            vec![
+                ("taskClass", s),
+                ("entries", roundtrip::<Vec<SharedQueueEntry>>),
+            ],
+            roundtrip::<SharedQueues>,
+        ),
         "accounts_import_env" => (vec![], roundtrip::<Vec<EnvImportResult>>),
         "accounts_set_disabled" => (
             vec![("accountId", s), ("disabled", b)],

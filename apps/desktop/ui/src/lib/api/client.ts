@@ -40,6 +40,8 @@ import type {
   LocalModelInfo,
   PermissionsState,
   ProviderInfo,
+  SharedQueueEntry,
+  SharedQueues,
   TestReport,
   EnvImportResult,
 } from './types-hub';
@@ -216,6 +218,10 @@ export interface AccountsApi {
   setQueue(accountId: string, taskClass: string, models: readonly string[]): Promise<Account>;
   /** Propozycja kolejki (`quality` / `balanced` / `economy`) — niczego nie zapisuje. */
   suggestQueue(accountId: string, taskClass: string, strategy: string): Promise<string[]>;
+  /** Wspólna kolejka wszystkich kont (pierwszeństwo przed kolejkami kont). */
+  sharedQueues(): Promise<SharedQueues>;
+  /** Wspólna kolejka klasy zadań (najwyżej 10 pozycji); pusta lista ją usuwa. */
+  setSharedQueue(taskClass: string, entries: readonly SharedQueueEntry[]): Promise<SharedQueues>;
   /** Import kluczy ze zmiennych środowiskowych z katalogu dostawców (raport bez wartości). */
   importEnv(): Promise<readonly EnvImportResult[]>;
 }

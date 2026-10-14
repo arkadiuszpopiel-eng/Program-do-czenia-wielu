@@ -183,6 +183,35 @@ fn detail(error: &ProviderError) -> ProbeDetail {
     }
 }
 
+/// Lista modeli jest publiczna — o kluczu mówi dopiero osobne sprawdzenie (`check_key`).
+async fn key_report(provider: &dyn ModelProvider, started: Instant) -> ConnectionReport {
+    let result = provider.check_key().await;
+    let latency_ms = u64::try_from(started.elapsed().as_millis()).ok();
+    match result {
+        Ok(note) => ConnectionReport {
+            outcome: TestOutcome::Ok,
+            latency_ms,
+            detail: note.map(|message| ProbeDetail {
+                status: None,
+                code: None,
+                message: scrub(&message),
+            }),
+        },
+        Err(e) if matches!(e.kind, ProviderErrorKind::Unsupported) => ConnectionReport {
+            outcome: TestOutcome::Unsupported {
+                message: "ten dostawca pokazuje listę modeli bez klucza — klucz sprawdzi dopiero pierwsza rozmowa".to_owned(),
+            },
+            latency_ms,
+            detail: None,
+        },
+        Err(e) => ConnectionReport {
+            outcome: outcome(&e),
+            latency_ms,
+            detail: Some(detail(&e)),
+        },
+    }
+}
+
 #[async_trait]
 impl ConnectionTester for ProviderProbe {
     async fn test(&self, request: ConnectionRequest<'_>) -> ConnectionReport {
@@ -201,14 +230,7 @@ impl ConnectionTester for ProviderProbe {
         let latency_ms = u64::try_from(started.elapsed().as_millis()).ok();
         match result {
             Ok(_) if PUBLIC_MODEL_LISTS.contains(&request.provider.id.as_str()) => {
-                ConnectionReport {
-                    outcome: TestOutcome::Unsupported {
-                        message: "ten dostawca pokazuje listę modeli bez klucza — klucz sprawdzi                                   dopiero pierwsza rozmowa"
-                            .to_owned(),
-                    },
-                    latency_ms,
-                    detail: None,
-                }
+                key_report(provider.as_ref(), started).await
             }
             Ok(_) => ConnectionReport {
                 outcome: TestOutcome::Ok,

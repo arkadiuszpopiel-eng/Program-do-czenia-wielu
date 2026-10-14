@@ -72,6 +72,8 @@ macro_rules! with_commands {
             accounts_set_model(account_id: String, model: String) -> $crate::dto::Account;
             accounts_set_queue(account_id: String, task_class: String, models: Vec<String>) -> $crate::dto::Account;
             accounts_suggest_queue(account_id: String, task_class: String, strategy: String) -> Vec<String>;
+            accounts_shared_queues() -> $crate::dto::SharedQueues;
+            accounts_set_shared_queue(task_class: String, entries: Vec<$crate::dto::SharedQueueEntry>) -> $crate::dto::SharedQueues;
             accounts_import_env() -> Vec<$crate::dto::EnvImportResult>;
             transfer_export(request: $crate::dto::ExportRequest) -> $crate::dto::ExportResult;
             transfer_inspect(password: Option<$crate::dto::SecretInput>, handle: Option<String>) -> $crate::dto::InspectResult;
@@ -262,6 +264,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 229);
+        assert_eq!(super::COMMANDS.len(), 231);
     }
 }

@@ -18,6 +18,7 @@ mod gui;
 mod health;
 mod hub;
 mod memory;
+mod model_queues;
 mod models;
 mod panels;
 mod plugins;
@@ -73,6 +74,7 @@ pub use memory::{
     MemoryPage, MemoryQuery, MemoryScopeInfo, MemoryScopeKind, MemoryScopeRef, MemorySourceKind,
     MemorySourceLink, MemoryState, MemoryStatus, MemoryUndoResult,
 };
+pub use model_queues::{SharedQueueEntry, SharedQueues};
 pub use models::{
     BundleFit, BundleFitKind, BundleItemView, BundleRequirements, BundleState, EmbedderView,
     ModelBundle, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,

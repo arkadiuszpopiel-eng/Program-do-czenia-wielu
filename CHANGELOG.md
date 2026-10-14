@@ -12,6 +12,46 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.50 — 2026-10-14
+
+„Testuj połączenie” przy koncie OpenRouter naprawdę sprawdza klucz, a kolejkę modeli można teraz ustawić
+też wspólnie dla wszystkich kont naraz.
+
+### Konta i klucze
+
+- [poważne] „Testuj połączenie” przy OpenRouterze sprawdza klucz i mówi wprost, czy działa. Dotąd test
+  kończył się wynikiem „bez testu” i wyglądało, że przycisk nic nie robi — OpenRouter pokazuje listę modeli
+  każdemu, więc sama lista nie mówiła nic o kluczu. Teraz Alfa pyta OpenRoutera o sam klucz: zły klucz daje
+  „klucz odrzucony”, dobry — „działa” i pod kontem limit oraz zużycie klucza
+  („Konto u dostawcy: limit klucza 50,00 USD, zużyto 1,23 USD”).
+
+### Kolejki modeli
+
+- Nowa zakładka „Wszystkie konta” na stronie „Kolejki modeli API”: jedna wspólna kolejka dla każdej klasy
+  zadań, w której można mieszać modele z różnych kont (np. najpierw model z OpenRoutera, potem z OpenAI).
+  Wspólna kolejka ma pierwszeństwo przed kolejkami pojedynczych kont; gdy jest pusta, działają kolejki kont
+  i wybór automatyczny — dotychczasowe ustawienia zostają bez zmian.
+- Kafelki wspólnej kolejki pokazują, z którego konta jest model; kolejność zmienia się przeciągnięciem albo
+  z klawiatury, jak w kolejce konta. Przycisk „Złóż z kolejek kont” układa wspólną kolejkę z kolejek
+  poszczególnych kont tej klasy.
+- Model do wspólnej kolejki wybiera się z listy modeli wskazanego konta (te same filtry i wyszukiwanie co
+  w kolejce konta).
+
+### Testy
+
+- Rdzeń: sprawdzenie klucza OpenRoutera na serwerze udającym dostawcę (dobry klucz, odrzucony klucz,
+  dostawca bez takiej drogi — bez ruchu sieciowego), opis limitu i zużycia; Router stawia wspólną kolejkę
+  przed resztą kandydatów; pełna ścieżka rozmowy: wspólna kolejka przed kolejką konta, model, którego konto
+  nie ma, jest pomijany, pusta wspólna kolejka przywraca kolejkę konta; odmowy z czytelnym komunikatem
+  (nieznana klasa, nieistniejące konto, pozycja dwa razy, pusta nazwa, ponad 10 pozycji).
+- Interfejs: testy zapisu i składania wspólnej kolejki, test w przeglądarce całej zakładki i testu klucza
+  OpenRoutera; zrzuty w 3 stylach × 2 motywach.
+
+### Przyczyna błędów
+
+- Test połączenia sprawdzał klucz listą modeli. Dla dostawców, którzy oddają ją bez klucza, zwracał
+  „bez testu” zamiast pytać o sam klucz.
+
 ## 0.0.49 — 2026-10-12
 
 Okna pierwszego uruchomienia („Witaj w Alfie”) mają nowy wygląd. Z lewej strony jest lista ośmiu kroków

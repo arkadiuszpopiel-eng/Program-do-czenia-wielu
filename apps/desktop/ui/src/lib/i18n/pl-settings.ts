@@ -58,6 +58,7 @@ export const plSettings = {
   'hub.removeConfirm':
     'Konto „{label}" zniknie, a klucz zostanie usunięty z Menedżera poświadczeń.',
   'hub.models': { one: '{n} model', few: '{n} modele', many: '{n} modeli', other: '{n} modelu' },
+  'hub.testNote': 'Konto u dostawcy: {note}',
   'hub.tested': 'Ostatni test: {when}',
   'hub.keyAge': 'Wiek klucza (dni): {n}',
   'hub.keyOld': 'Klucz ma już {n} dni — warto go wymienić („Zmień klucz”).',

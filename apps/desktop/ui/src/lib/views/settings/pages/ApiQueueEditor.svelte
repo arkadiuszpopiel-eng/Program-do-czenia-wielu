@@ -15,6 +15,7 @@
     type TaskClassId,
   } from '../../../logic/model-queue';
   import { useApp } from '../../../state/context';
+  import QueueClassTabs from './QueueClassTabs.svelte';
   import QueueTiles from './QueueTiles.svelte';
 
   interface Props {
@@ -84,33 +85,11 @@
   );
 </script>
 
-<div class="classes" role="tablist" aria-label={t('api.classes')}>
-  {#each TASK_CLASSES as id (id)}
-    {@const n = account.queues?.[id]?.length ?? 0}
-    <button
-      type="button"
-      role="tab"
-      id="{uid}-tab-{id}"
-      class="class"
-      aria-selected={taskClass === id}
-      aria-controls="{uid}-panel"
-      tabindex={taskClass === id ? 0 : -1}
-      onclick={() => (taskClass = id)}
-      onkeydown={(event) => {
-        const at = TASK_CLASSES.indexOf(taskClass);
-        const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-        const next = TASK_CLASSES[(at + step + TASK_CLASSES.length) % TASK_CLASSES.length];
-        if (!step || !next) return;
-        event.preventDefault();
-        taskClass = next;
-        document.getElementById(`${uid}-tab-${next}`)?.focus();
-      }}
-    >
-      <span>{tk(`api.class.${id}`)}</span>
-      <span class="count" class:set={n > 0}>{n > 0 ? n : t('api.autoShort')}</span>
-    </button>
-  {/each}
-</div>
+<QueueClassTabs
+  bind:value={taskClass}
+  prefix={uid}
+  counts={Object.fromEntries(TASK_CLASSES.map((id) => [id, account.queues?.[id]?.length ?? 0]))}
+/>
 
 <div class="panel" role="tabpanel" id="{uid}-panel" aria-labelledby="{uid}-tab-{taskClass}">
   <p class="hint">{tk(`api.classHint.${taskClass}`)}</p>
@@ -165,50 +144,6 @@
 </div>
 
 <style>
-  .classes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--alfa-space-2);
-  }
-  .class {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--alfa-space-2);
-    padding: var(--alfa-space-2) var(--alfa-space-3);
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-control);
-    background: var(--alfa-color-surface);
-    color: var(--alfa-color-text);
-    font: inherit;
-    font-size: var(--alfa-font-size-sm);
-    cursor: pointer;
-  }
-  .class:hover {
-    border-color: var(--alfa-color-border-strong);
-  }
-  .class[aria-selected='true'] {
-    border-color: var(--alfa-color-accent);
-    background: var(--alfa-color-surface2);
-    font-weight: var(--alfa-weight-semibold);
-  }
-  .class:focus-visible {
-    outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
-    outline-offset: 2px;
-  }
-  .count {
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-xs);
-    font-weight: var(--alfa-weight-regular);
-  }
-  .count.set {
-    min-width: 1.5em;
-    padding: 0 var(--alfa-space-1);
-    border-radius: var(--alfa-radius-full);
-    border: 1px solid var(--alfa-color-border-strong);
-    color: var(--alfa-color-text);
-    font-weight: var(--alfa-weight-semibold);
-    text-align: center;
-  }
   .panel {
     display: flex;
     flex-direction: column;

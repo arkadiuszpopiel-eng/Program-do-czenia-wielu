@@ -18,6 +18,24 @@ export const enApi: Record<keyof typeof plApi, Message> = {
   'api.toAccount': 'Key, test and limit of this account — in “API accounts and keys”',
   'api.disabled': 'The account is disabled — queues apply once it is enabled.',
 
+  'api.shared.tab': 'All accounts',
+  'api.shared.tabMeta': { one: 'shared queue · {n} account', other: 'shared queue · {n} accounts' },
+  'api.shared.title': 'Shared queue for all accounts',
+  'api.shared.hint':
+    'One order of attempts for all accounts at once — you can mix models from OpenAI, OpenRouter and others. The shared queue goes before the queues of single accounts; when it is empty, account queues and automatic choice apply.',
+  'api.shared.queue': 'Shared queue: {name}',
+  'api.shared.empty': 'No shared queue.',
+  'api.shared.emptyHint':
+    'Alfa will use the queues of single accounts. Add a model from the list below or build the queue from account queues.',
+  'api.shared.compose': 'Build from account queues',
+  'api.shared.composed': 'Shared queue “{name}” built from account queues.',
+  'api.shared.composeEmpty': 'No account has a queue for this task class.',
+  'api.shared.cleared': 'Shared queue “{name}” cleared — account queues apply.',
+  'api.shared.oneRoute':
+    'Of several accounts of the same provider Alfa uses one (the oldest working one) — models of the other accounts of that provider are skipped.',
+  'api.shared.add': 'Add a model to the shared queue',
+  'api.shared.fromAccount': 'Account',
+  'api.shared.gone': 'account removed',
   'api.queues': 'Model queues',
   'api.queuesHint':
     'Alfa takes the first model in the queue. The next one only when the previous fails: a provider error, a rate limit, no access to the model, or no answer in time.',

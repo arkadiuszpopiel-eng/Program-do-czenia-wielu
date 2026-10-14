@@ -189,6 +189,10 @@ impl ModelProvider for ObservedProvider {
         self.inner.list_models().await
     }
 
+    async fn check_key(&self) -> Result<Option<String>, ProviderError> {
+        self.inner.check_key().await
+    }
+
     async fn embed(&self, request: EmbeddingRequest) -> Result<EmbeddingResponse, ProviderError> {
         self.inner.embed(request).await
     }

@@ -50,4 +50,4 @@ pub use lib_openai_compat::{
 };
 pub use module::{MODULE_TOML, ProvidersApiModule};
 pub use observe::ObservedProvider;
-pub use openai::{MaxTokensField, OpenAiApi, OpenAiOptions, OpenAiProvider};
+pub use openai::{MaxTokensField, OpenAiApi, OpenAiOptions, OpenAiProvider, openrouter_key_note};

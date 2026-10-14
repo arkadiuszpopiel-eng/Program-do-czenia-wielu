@@ -148,6 +148,19 @@ pub trait ModelProvider: Send + Sync {
     /// Lista modeli z Models API dostawcy (test połączenia w kreatorze kont).
     async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError>;
 
+    /// Sprawdzenie samego klucza tam, gdzie lista modeli go nie sprawdza (OpenRouter oddaje
+    /// listę każdemu). `Ok(opis)` — klucz przyjęty, z krótkim opisem konta (limit, zużycie)
+    /// albo bez; `Unsupported` — dostawca nie ma takiej drogi. Domyślnie nieobsługiwane.
+    async fn check_key(&self) -> Result<Option<String>, ProviderError> {
+        Err(ProviderError::new(
+            ProviderErrorKind::Unsupported,
+            format!(
+                "dostawca `{}` nie ma osobnego sprawdzenia klucza",
+                self.id()
+            ),
+        ))
+    }
+
     /// Osadzenia. Domyślnie nieobsługiwane.
     async fn embed(&self, request: EmbeddingRequest) -> Result<EmbeddingResponse, ProviderError> {
         Err(ProviderError::new(
@@ -190,6 +203,10 @@ impl<P: ModelProvider + ?Sized> ModelProvider for std::sync::Arc<P> {
 
     async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError> {
         (**self).list_models().await
+    }
+
+    async fn check_key(&self) -> Result<Option<String>, ProviderError> {
+        (**self).check_key().await
     }
 
     async fn embed(&self, request: EmbeddingRequest) -> Result<EmbeddingResponse, ProviderError> {

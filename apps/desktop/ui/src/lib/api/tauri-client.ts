@@ -127,6 +127,9 @@ export class TauriAlfaClient implements AlfaClient {
       call('accounts_set_queue', { accountId, taskClass, models }),
     suggestQueue: (accountId, taskClass, strategy) =>
       call('accounts_suggest_queue', { accountId, taskClass, strategy }),
+    sharedQueues: () => call('accounts_shared_queues'),
+    setSharedQueue: (taskClass, entries) =>
+      call('accounts_set_shared_queue', { taskClass, entries }),
     importEnv: () => call('accounts_import_env'),
   };
 

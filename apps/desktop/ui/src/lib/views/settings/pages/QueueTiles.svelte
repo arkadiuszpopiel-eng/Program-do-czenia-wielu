@@ -19,9 +19,15 @@
     saving: boolean;
     /** Zapis nowej kolejności albo listy bez usuniętego modelu. */
     onsave: (models: string[]) => Promise<boolean>;
+    /** Nazwa modelu pod kafelkiem (domyślnie sam klucz pozycji). */
+    code?: (id: string) => string;
+    /** Konto pozycji (kolejka wspólna) — osobny wiersz nad nazwą i część opisu przycisków. */
+    owner?: (id: string) => string;
   }
 
-  let { queue, models, saving, onsave }: Props = $props();
+  let { queue, models, saving, onsave, code = (id) => id, owner }: Props = $props();
+  /** Opis pozycji dla czytników ekranu i komunikatów: konto i model. */
+  const spoken = (id: string) => (owner ? `${owner(id)} · ${code(id)}` : code(id));
   const app = useApp();
   const { t } = app.i18n;
 
@@ -72,7 +78,11 @@
   });
 
   function say(id: string, list: readonly string[]) {
-    announce = t('api.announce', { model: id, n: list.indexOf(id) + 1, total: list.length });
+    announce = t('api.announce', {
+      model: spoken(id),
+      n: list.indexOf(id) + 1,
+      total: list.length,
+    });
   }
 
   function shift(id: string, to: number) {
@@ -191,7 +201,7 @@
         <button
           type="button"
           class="grip"
-          aria-label={t('api.grab', { model: id })}
+          aria-label={t('api.grab', { model: spoken(id) })}
           aria-pressed={moving}
           disabled={saving}
           onkeydown={(event) => onkeydown(event, id)}
@@ -204,14 +214,15 @@
         <IconButton
           size="sm"
           tone="danger"
-          label={t('api.remove', { model: id })}
+          label={t('api.remove', { model: spoken(id) })}
           disabled={saving || lifted !== null}
           onclick={() => void onsave(queue.filter((m) => m !== id))}
           ><X size={16} strokeWidth={1.75} /></IconButton
         >
       </div>
-      <span class="name">{model?.name ?? id}</span>
-      <code>{id}</code>
+      {#if owner}<span class="owner">{owner(id)}</span>{/if}
+      <span class="name">{model?.name ?? code(id)}</span>
+      <code>{code(id)}</code>
       {#if model}
         <ModelBadges {model} />
       {:else}
@@ -332,6 +343,14 @@
   .grip:focus-visible {
     outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
     outline-offset: 1px;
+  }
+  .owner {
+    overflow: hidden;
+    color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-xs);
+    font-weight: var(--alfa-weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .name {
     overflow: hidden;

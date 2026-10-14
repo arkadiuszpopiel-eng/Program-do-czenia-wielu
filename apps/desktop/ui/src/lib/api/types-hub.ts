@@ -99,6 +99,15 @@ export interface AddAccountInput {
   readonly base_url: string | null;
 }
 
+/** Pozycja wspólnej kolejki wszystkich kont: model wybranego konta. */
+export interface SharedQueueEntry {
+  readonly account_id: string;
+  readonly model: string;
+}
+
+/** Klasa zadań (`chat`, `code`, …) → wspólna kolejka w kolejności prób Routera. */
+export type SharedQueues = Readonly<Record<string, readonly SharedQueueEntry[]>>;
+
 export interface TestReport {
   readonly ok: boolean;
   readonly latency_ms: number | null;

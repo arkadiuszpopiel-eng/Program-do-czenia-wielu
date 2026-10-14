@@ -200,6 +200,28 @@
     "args": {},
     "result": [
       {
+        "version": "0.2.0",
+        "date": "2026-10-12",
+        "summary": "Aktualizacje z wznawianiem pobierania i strona „O programie\".",
+        "items": [
+          {
+            "section": "Aktualizacje",
+            "severity": "serious",
+            "text": "Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji."
+          },
+          {
+            "section": "Interfejs",
+            "severity": "normal",
+            "text": "Strona „O programie\" z licencjami zależności."
+          },
+          {
+            "section": "Interfejs",
+            "severity": "normal",
+            "text": "Szybsze wyszukiwanie w sesjach."
+          }
+        ]
+      },
+      {
         "version": "0.1.0-f1",
         "date": "2026-10-04",
         "summary": "Klucze API pod opieką i pewniejsze kopie zapasowe.",
