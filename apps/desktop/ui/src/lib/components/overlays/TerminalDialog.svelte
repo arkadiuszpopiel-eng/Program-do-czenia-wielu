@@ -62,6 +62,8 @@
     });
     host.fit();
     const onFrame = (frame: TerminalFrame) => {
+      // Spóźniona ramka zamkniętej sesji (po „Spróbuj ponownie”) nie zmienia stanu nowej.
+      if (closed) return;
       if (frame.kind === 'output') host?.write(b64ToBytes(frame.data_b64));
       else {
         exited = frame.code;

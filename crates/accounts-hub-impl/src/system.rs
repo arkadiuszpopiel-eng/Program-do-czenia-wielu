@@ -41,6 +41,9 @@ pub struct SystemCliProbe {
     timeout: Duration,
 }
 
+/// Ile czekać na resztę wyjścia po zakończeniu procesu.
+const DRAIN: Duration = Duration::from_secs(2);
+
 impl SystemCliProbe {
     /// PATH i PATHEXT z bieżącego procesu, limit `--version` 5 s.
     pub fn from_env() -> Self {
@@ -127,14 +130,18 @@ impl SystemCliProbe {
             }
         }
         let mut child = cmd.spawn().ok()?;
+        // Wynik przez kanał: czekamy z limitem, bo wnuk (np. `node` za skryptem `claude.cmd`)
+        // może trzymać potok po wyjściu procesu — wtedy oddajemy to, co zdążyło przyjść.
         let read = |stream: Option<Box<dyn Read + Send>>| {
+            let (tx, rx) = std::sync::mpsc::channel();
             std::thread::spawn(move || {
                 let mut buf = Vec::new();
                 if let Some(stream) = stream {
                     let _ = stream.take(MAX_VERSION_OUTPUT).read_to_end(&mut buf);
                 }
-                buf
-            })
+                let _ = tx.send(buf);
+            });
+            rx
         };
         let stdout = read(
             child
@@ -165,8 +172,8 @@ impl SystemCliProbe {
         // Po przekroczeniu czasu nie czekamy na wątek czytający: wnuk procesu (np. skrypt
         // powłoki) może trzymać otwarty potok; wątek zakończy się sam po jego zamknięciu.
         let status = status?;
-        let out = stdout.join().unwrap_or_default();
-        let err = stderr.join().unwrap_or_default();
+        let out = stdout.recv_timeout(DRAIN).unwrap_or_default();
+        let err = stderr.recv_timeout(DRAIN).unwrap_or_default();
         Some((status.success(), out, err))
     }
 }

@@ -47,7 +47,8 @@
     try {
       return await call();
     } catch (error) {
-      failures = [...failures, `${what} (${errorText(error)})`];
+      const text = `${what} (${errorText(error)})`;
+      if (!failures.includes(text)) failures = [...failures, text];
       return null;
     }
   }
@@ -105,6 +106,7 @@
 
   async function checkAll() {
     checkingAll = true;
+    failures = [];
     try {
       await load(true);
       const tests = (accounts ?? [])

@@ -43,7 +43,19 @@ pub fn args(spec: &TaskSpec, prompt: &str) -> Result<Vec<String>, BackendError> 
         a.extend(["--model".into(), model.clone()]);
     }
     if let Some(session) = &spec.session {
-        a.extend(["--conversation".into(), session.id.clone()]);
+        // Identyfikator pochodzi z wyjścia CLI — tylko bezpieczne znaki, bez `-` na początku.
+        let id = &session.id;
+        if id.is_empty()
+            || id.starts_with('-')
+            || !id
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+        {
+            return Err(BackendError::InvalidSpec(
+                "niepoprawny identyfikator rozmowy Antigravity".into(),
+            ));
+        }
+        a.extend(["--conversation".into(), id.clone()]);
     }
     Ok(a)
 }
@@ -156,5 +168,11 @@ mod tests {
         assert!(joined.contains("--conversation conv-7"));
         assert!(!a.iter().any(|x| x.contains("dangerously") || x == "--mode"));
         assert!(args(&spec, &"x".repeat(MAX_PROMPT_CHARS + 1)).is_err());
+        spec.session = Some(SessionRef {
+            bridge: BridgeKind::Antigravity,
+            id: "--mode".into(),
+            workdir: "/wt".into(),
+        });
+        assert!(args(&spec, "p").is_err());
     }
 }

@@ -32,6 +32,14 @@ fn account(
     }
 }
 
+/// Wartość z wyjścia zewnętrznego narzędzia: tylko litery, cyfry, spacje i `.-_`, najwyżej 24 znaki.
+fn tidy(raw: &str) -> String {
+    raw.chars()
+        .filter(|c| c.is_alphanumeric() || matches!(c, ' ' | '.' | '-' | '_'))
+        .take(24)
+        .collect()
+}
+
 /// Nazwa planu Claude po ludzku (`max` → „Max”).
 fn claude_plan(raw: &str) -> String {
     match raw.to_ascii_lowercase().as_str() {
@@ -40,7 +48,7 @@ fn claude_plan(raw: &str) -> String {
         "team" => "Team".to_owned(),
         "enterprise" => "Enterprise".to_owned(),
         "free" => "bezpłatny".to_owned(),
-        other => other.to_owned(),
+        other => tidy(other),
     }
 }
 
@@ -62,7 +70,7 @@ pub fn parse_claude(out: &CliOutput) -> BridgeAccount {
     let method = json["authMethod"].as_str().map(|m| match m {
         "claude.ai" => "konto claude.ai".to_owned(),
         "api_key" | "apiKey" => "klucz API".to_owned(),
-        other => other.to_owned(),
+        other => tidy(other),
     });
     let plan = json["subscriptionType"].as_str().map(claude_plan);
     if logged {
@@ -84,7 +92,7 @@ pub fn parse_claude(out: &CliOutput) -> BridgeAccount {
 /// Wynik `codex login status`: „Logged in using ChatGPT” / „… an API key” / „Not logged in”.
 pub fn parse_codex(out: &CliOutput) -> BridgeAccount {
     let text = out.text.to_ascii_lowercase();
-    if text.contains("not logged in") || (!out.success && !text.contains("logged in")) {
+    if text.contains("not logged in") {
         return account(
             BridgeAccountState::LoggedOut,
             None,
@@ -200,6 +208,17 @@ mod tests {
             parse_codex(&out(true, "???")).state,
             BridgeAccountState::Error
         );
+        // Awaria narzędzia to błąd, a nie „nie zalogowano” (nie odsyłamy do logowania na próżno).
+        assert_eq!(
+            parse_codex(&out(false, "panic: config broken")).state,
+            BridgeAccountState::Error
+        );
+        let odd = parse_claude(&out(
+            true,
+            r#"{"loggedIn": true, "subscriptionType": "<script>bardzo-dlugi-plan-ktory-nie-zmiesci-sie</script>"}"#,
+        ));
+        let plan = odd.plan.unwrap_or_default();
+        assert!(plan.len() <= 24 && !plan.contains('<'), "{plan}");
     }
 
     #[test]
