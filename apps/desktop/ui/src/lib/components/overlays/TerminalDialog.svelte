@@ -94,10 +94,11 @@
   });
 
   function close() {
+    // Most odczytany przed zamknięciem — zamknięcie zdejmuje żądanie (i `request`).
+    const bridge = loginBridge(request.profile);
     app.work.closeTerminal();
     // Po logowaniu od razu sprawdzamy stan konta — właściciel widzi, czy Alfa może korzystać
     // z narzędzia (np. „zalogowano · plan Max”), zamiast zgadywać po zamknięciu okna.
-    const bridge = loginBridge(request.profile);
     if (bridge) void checkLogin(bridge);
   }
 

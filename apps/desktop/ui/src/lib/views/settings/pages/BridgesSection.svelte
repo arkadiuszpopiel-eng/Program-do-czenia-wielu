@@ -6,6 +6,7 @@
   do skopiowania. Alfa nie czyta tokenów CLI.
 -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { Button, Checkbox, Switch, TextField } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import type { BridgeCard, BridgeLogin } from '../../../api/types-tasks';
@@ -64,7 +65,8 @@
   // Wynik sprawdzenia po „Gotowe” w oknie logowania trafia od razu na kartę.
   $effect(() => {
     const card = app.work.bridgeChecked;
-    if (card) replace(card);
+    // Tylko ta karta wyzwala efekt — `replace` czyta i zapisuje listę (bez śledzenia).
+    if (card) untrack(() => replace(card));
   });
 
   async function login(bridge: string) {

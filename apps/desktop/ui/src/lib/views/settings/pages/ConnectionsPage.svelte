@@ -6,6 +6,7 @@
   Logowanie narzędzi sprawdza się samo przy otwarciu strony (polecenie stanu CLI, bez danych konta).
 -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
   import { Button } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
@@ -147,7 +148,8 @@
   // Wynik sprawdzenia po „Gotowe” w oknie logowania trafia od razu do wiersza.
   $effect(() => {
     const card = app.work.bridgeChecked;
-    if (card && bridges) putBridge(card);
+    // Tylko ta karta wyzwala efekt — `putBridge` czyta i zapisuje listę (bez śledzenia).
+    if (card) untrack(() => bridges && putBridge(card));
   });
 
   const name = (r: ConnRow) => (r.nameKey ? tk(r.nameKey) : r.name);

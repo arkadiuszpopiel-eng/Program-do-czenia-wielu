@@ -155,6 +155,8 @@ function seedCards(): BridgeCard[] {
       detected: true,
       path: 'C:\\Users\\Ty\\AppData\\Roaming\\npm\\claude.cmd',
       version: '2.1.3',
+      pinned: ['2.1.3'],
+      version_ok: true,
       status: 'green',
       sources: [
         {
