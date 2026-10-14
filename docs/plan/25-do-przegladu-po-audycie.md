@@ -26,7 +26,30 @@ polityki bezpieczeństwa — tylko z przeglądem). Ten dokument zbiera to, co zo
 | A-16 rozmiary | naprawione (bramka `check-size.mjs`, jawne wyjątki) | `scripts/size-exceptions.json` |
 | A-17 lock powłoki | naprawione i pilnowane przez `set-version.mjs` | `apps/desktop/src-tauri/Cargo.lock` |
 
-## Do decyzji właściciela
+## Rozstrzygnięte (0.0.53, 2026-10-14 w nocy)
+
+Właściciel przekazał decyzje: „wykonaj to tak, jak uważasz za najlepsze rozwiązanie dla programu i jego
+funkcjonalności”. Rozstrzygnięcia:
+
+1. **Izolacja poleceń powłoki — integralność Low zamiast AppContainer.** AppContainer odciąłby polecenia od
+   profilu użytkownika (git nie przeczyta `~/.gitconfig`, cargo i npm swoich katalogów) — agentki straciłyby
+   zwykłe narzędzia. Wybrano niską integralność: polecenie, które według analizy działa tylko w katalogu
+   roboczym (bez sieci, instalacji i celów spoza katalogu), dostaje token Low, a katalog roboczy etykietę Low
+   z dziedziczeniem. Proces czyta to co użytkownik, ale **zapis poza katalogiem roboczym odrzuca system**
+   (No-Write-Up), także gdy analiza czegoś nie zauważyła. `TEMP` w `%USERPROFILE%\AppData\LocalLow\Alfa\tmp`.
+   Polecenia sieciowe, instalacje i z celami spoza katalogu — jak dotąd: integralność Medium, zgoda Brokera.
+   Kod: `platform-windows-impl/src/process/win/low.rs`, `tools-shell-impl/src/run.rs`; wyłącznik
+   `tools.shell.low_integrity` (domyślnie włączony). Testy na prawdziwych procesach: `tests/exec_low.rs`
+   (cmd i PowerShell: zapis w katalogu działa, obok — odmowa, odczyt systemu i `TEMP` działają). Skutek
+   uboczny: katalog roboczy ma etykietę Low — inne procesy Low (rzadkie) też mogą w nim pisać.
+2. **Macierz dowodów** — rejestr `docs/DOWODY.md` generowany z raportów `verify` (0.0.51+), stare tabele
+   `STATUS.md` zostają jako historia, bez przenoszenia.
+3. **Antigravity w rejestrze** — zmiana z 0.0.52 zatwierdzona zgodnie z wyborem właściciela; status szary,
+   domyślnie wyłączony, ostrzeżenie na karcie. Test na prawdziwym `agy` z właścicielem 2026-10-15 o 10:00.
+4. **Budżet Markdown** — bez zmiany budżetu i bez starszej ammonii: czyszczenie dużych odpowiedzi w kilku
+   wątkach (grupy zbalansowanych bloków, wynik identyczny — test). 100 KB: 7,8 ms (było 22–24 ms).
+
+## Archiwum: opis decyzji (stan przed rozstrzygnięciem)
 
 ### 1. Izolacja procesu poleceń powłoki (A-07, druga część)
 
