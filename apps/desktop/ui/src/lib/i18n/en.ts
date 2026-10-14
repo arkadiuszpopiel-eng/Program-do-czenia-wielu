@@ -18,6 +18,7 @@ import { enVoice } from './en-voice';
 import { enWork } from './en-work';
 import { enFiles } from './en-files';
 import { enCameras } from './en-cameras';
+import { enRouting } from './en-routing';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -38,4 +39,5 @@ export const en: Record<MessageKey, Message> = {
   ...enBundles,
   ...enFiles,
   ...enCameras,
+  ...enRouting,
 };

@@ -87,6 +87,8 @@ pub enum SettingsCustomPage {
     Providers,
     /// Kolejki modeli API: wybór i kolejność modeli każdego konta dla klas zadań.
     Api,
+    /// Dobór modelu według trudności: ustawienia, szczeble modeli, podgląd.
+    Router,
     /// Mosty CLI: karty zgodności tras narzędzi wiersza poleceń.
     Bridges,
     Costs,

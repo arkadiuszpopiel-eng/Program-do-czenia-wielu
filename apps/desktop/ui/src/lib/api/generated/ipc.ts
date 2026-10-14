@@ -2383,6 +2383,7 @@ export type SettingsCustomPage =
   | 'devices'
   | 'voice'
   | 'api'
+  | 'router'
   | 'bridges'
   | 'cameras'
   | 'memory'

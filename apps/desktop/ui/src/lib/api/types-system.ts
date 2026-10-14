@@ -61,6 +61,7 @@ export interface SettingDef {
 export type SettingsCustomPage =
   | 'providers'
   | 'api'
+  | 'router'
   | 'bridges'
   | 'costs'
   | 'shortcuts'

@@ -8638,6 +8638,11 @@
           "type": "string"
         },
         {
+          "const": "router",
+          "description": "Dobór modelu według trudności: ustawienia, szczeble modeli, podgląd.",
+          "type": "string"
+        },
+        {
           "const": "bridges",
           "description": "Mosty CLI: karty zgodności tras narzędzi wiersza poleceń.",
           "type": "string"

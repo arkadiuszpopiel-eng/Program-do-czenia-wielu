@@ -25,6 +25,7 @@
   import PermissionsPage from './pages/PermissionsPage.svelte';
   import PluginsPage from './pages/PluginsPage.svelte';
   import ApiPage from './pages/ApiPage.svelte';
+  import RoutingPage from './pages/RoutingPage.svelte';
   import BridgesSection from './pages/BridgesSection.svelte';
   import ProvidersPage from './pages/ProvidersPage.svelte';
   import ShortcutsPage from './pages/ShortcutsPage.svelte';
@@ -129,6 +130,7 @@
         {:else}
           {#if page.custom === 'providers'}<ProvidersPage />
           {:else if page.custom === 'api'}<ApiPage />
+          {:else if page.custom === 'router'}<RoutingPage />
           {:else if page.custom === 'bridges'}<BridgesSection />
           {:else if page.custom === 'costs'}<CostsPage />
           {:else if page.custom === 'shortcuts'}<ShortcutsPage />

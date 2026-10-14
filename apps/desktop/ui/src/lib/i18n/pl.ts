@@ -18,6 +18,7 @@ import { plVoice } from './pl-voice';
 import { plWork } from './pl-work';
 import { plFiles } from './pl-files';
 import { plCameras } from './pl-cameras';
+import { plRouting } from './pl-routing';
 
 export const pl = {
   ...plApp,
@@ -37,6 +38,7 @@ export const pl = {
   ...plBundles,
   ...plFiles,
   ...plCameras,
+  ...plRouting,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;
