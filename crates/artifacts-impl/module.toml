@@ -2,7 +2,7 @@
 # Rejestr w bazie sesji; odczyt plików sesji. Akcje (Zapisz jako, Pokaż w Eksploratorze…) wykonuje
 # platform-windows jako użytkownik na podstawie intencji.
 id = "artifacts"
-version = "0.0.51"
+version = "0.0.52"
 kind = "service"
 provides = ["artifacts-contract@1"]
 requires = ["core-bus-contract@1", "sessions-contract@1"]

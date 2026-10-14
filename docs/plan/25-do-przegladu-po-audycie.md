@@ -50,3 +50,24 @@ Propozycja (zmiana w `platform-windows-impl` i polityce Brokera — wymaga przeg
 Zamiast tabel w `STATUS.md`: plik z wierszem na kryterium — kryterium, data, commit, sprzęt, polecenie,
 artefakt (raport `target/verify/…`), ograniczenia. Generowany z raportów `verify.mjs`, nie pisany ręcznie.
 Do ustalenia: czy przenosimy stare wpisy, czy zaczynamy od wersji 0.0.51.
+
+### 3. Antigravity w rejestrze zgodności (0.0.52)
+
+Na polecenie właściciela (2026-10-14: „Terminal Alfy i dodatkowo pełny most z ostrzeżeniem jako opcja łatwego
+włączenia”) wpis `agy-antigravity` w `docs/compliance/compliance-registry.json` zmienił listy: zamiast zakazu
+„użycie agy z Alfy” — dozwolone `agy -p` na własnym koncie po świadomym włączeniu, logowanie wyłącznie przez
+człowieka, sprawdzanie stanu bez danych logowania; zakazane: włączanie domyślne lub bez ostrzeżenia,
+automatyczne zgody, harmonogram bez zgody, czytanie `~/.agy` i `~/.gemini`. Status zostaje **szary**,
+`enabled_by_default: false`. Regulamin (pkt 6) nadal zabrania korzystania z usługi w produktach innych niż
+Google — ryzyko konta ponosi właściciel; karta to mówi. Rejestr jest polityką bezpieczeństwa — zmiana czeka
+na podpis.
+
+Do potwierdzenia na prawdziwym `agy`: kształt zdarzeń `stream-json` (parser jest tolerancyjny, pola przyjęte
+z opisu trybu bez okna); Alfa nie wywołała modelu na koncie właściciela.
+
+### 4. Budżet renderowania Markdown (ADR 0009)
+
+Pomiar 0.0.51 na sprzęcie: dokument 100 KB 22–24 ms przy budżecie 20 ms. Przyczyna potwierdzona: ammonia 4.2.3
+(4.2.0 dawała 16,5–17,3 ms). Do wyboru: zmiana budżetu, przypięcie starszej ammonii (ostrzeżenia bezpieczeństwa)
+albo przyspieszenie czyszczenia po naszej stronie.
+

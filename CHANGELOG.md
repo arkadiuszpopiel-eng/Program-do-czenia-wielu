@@ -12,6 +12,60 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.52 — 2026-10-14
+
+Nowe okno Ustawienia → Stan połączeń pokazuje w jednym miejscu, co jest zalogowane i działa: konta
+API, narzędzia z kontem (Claude Code, Codex, Antigravity), modele lokalne, głos, Broker, internet
+i mikrofon. Po zalogowaniu się do narzędzia i kliknięciu „Gotowe” Alfa sama sprawdza konto i mówi
+wprost, np. „Claude Code: zalogowano (plan Max) — Alfa może zlecać zadania”. Dochodzi też konto
+Google AI Pro przez Antigravity CLI — bez klucza API, świadomie włączane, z ostrzeżeniem.
+
+### Stan połączeń
+
+- Każda pozycja ma kolor i jedno zdanie: zielone działa, pomarańczowe wymaga Twojego ruchu (np.
+  „Nie zalogowano — kliknij Zaloguj”), szare jest nieaktywne. Na górze liczniki i „Sprawdź
+  wszystko”; przy każdej pozycji „Sprawdź”, „Zaloguj” albo „Szczegóły”.
+- Konta API pokazują wynik ostatniego testu klucza i jego powód (klucz odrzucony, brak środków,
+  limit zapytań, brak sieci). „Sprawdź” testuje klucz listą modeli — bez płatnego zapytania.
+- Mosty CLI: zainstalowany? zalogowany? jaki plan? czy most jest włączony i z zatwierdzoną
+  wersją? Logowanie sprawdza się samo przy otwarciu strony.
+- [poważne] Po „Gotowe” w oknie logowania nic nie mówiło, czy logowanie się udało i czy Alfa może
+  z niego korzystać. Teraz Alfa od razu sprawdza konto, pokazuje wynik w powiadomieniu i na karcie
+  mostu („Sprawdź logowanie” jest też na każdej karcie w Mostach CLI).
+- Alfa sprawdza logowanie oficjalnym poleceniem stanu narzędzia (`claude auth status`, `codex
+  login status`) i zostawia z odpowiedzi tylko „zalogowano / nie”, sposób logowania i plan —
+  adres e-mail, identyfikator organizacji i tokeny są od razu odrzucane.
+
+### Antigravity (konto Google AI Pro bez klucza API)
+
+- Logowanie kontem Google we wbudowanym terminalu Alfy (Mosty CLI → Antigravity → Zaloguj się)
+  — tak samo jak Claude Code i Codex.
+- Most Antigravity: Alfa może zlecać mu zadania („Delta, zleć Antigravity: …”), gdy go włączysz.
+  Trasa jest domyślnie wyłączona, a karta ostrzega: regulamin Antigravity (pkt 6) zabrania
+  korzystania z usługi w połączeniu z produktami innymi niż Google — grozi ograniczenie albo
+  zawieszenie konta. Alfa nie daje mu automatycznej zgody na polecenia (sam je odrzuca), uruchamia
+  go w piaskownicy i nie dosyła wiadomości w trakcie zadania.
+- [poważne] Katalogi z sesją konta Google (`.agy`, `.gemini`) dołączyły do blokad: żaden moduł,
+  wtyczka ani agentka ich nie przeczyta.
+
+### Poprawki
+
+- [poważne] Próba obowiązków zwalniała z 62 s do kilku minut: lekki model z karty zintegrowanej
+  trafiał do zwykłej pracy, a odrzucona odpowiedź wracała do tego samego modelu. Lekki model
+  zostaje przy lekkich sprawach, a poprawka i druga Krytyczka idą dalej tylko wtedy, gdy jest
+  mocniejszy model. Próba po poprawce: rano 58 s, wieczór 28 s.
+- Raporty `verify` mają metrykę (commit, czas, sprzęt, polecenie, log), a rejestr dowodów
+  `docs/DOWODY.md` powstaje z nich sam (audyt A-15).
+- rustls 0.23.46 (nowe ostrzeżenia bezpieczeństwa w 0.23.45).
+
+### Testy
+
+- Rdzeń: `bridges_check` na atrapie narzędzi (plan Max, brak e-maila na karcie, tylko polecenia
+  stanu), brak narzędzia; most Antigravity przechodzi kontrakt mostów na fałszywym CLI, osobny
+  test braku kanału zgód i sterowania; parser `agy`; profil terminala `agy_login`.
+- Interfejs: logika okna (9 testów, klucze tekstów w obu językach), test przeglądarkowy okna
+  i przebiegu „Zaloguj → Gotowe → powiadomienie”, zrzuty w 3 stylach × 2 motywach i w wąskim oknie.
+
 ## 0.0.51 — 2026-10-14
 
 Alfa dobiera model do trudności zadania: łatwe sprawy idą do lekkiego, taniego albo lokalnego modelu,
