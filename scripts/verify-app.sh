@@ -39,7 +39,7 @@ smoke=$?
 echo "test prawdziwej aplikacji: kod $smoke"
 sed 's/\x1b\[[0-9;]*m//g' "$OUT/smoke.log" | grep -E "^\s+[0-9]+ (passed|failed|flaky)|^\s+x\s" | cut -c1-170
 # Bramka pokrycia łącza (audyt A-09): spadek poniżej progu = błąd biegu, nie tylko liczba w raporcie.
-node scripts/ipc-coverage.mjs "$OUT/out" --json "$OUT/ipc-coverage.json" --min "${ALFA_IPC_MIN:-50}" >"$OUT/ipc-coverage.log" 2>&1
+node scripts/ipc-coverage.mjs "$OUT/out" --json "$OUT/ipc-coverage.json" --min "${ALFA_IPC_MIN:-70}" >"$OUT/ipc-coverage.log" 2>&1
 coverage=$?
 head -3 "$OUT/ipc-coverage.log"
 [ "$smoke" -eq 0 ] || exit "$smoke"
