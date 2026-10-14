@@ -106,14 +106,56 @@ const CREDENTIAL_MARKERS: [&str; 6] = [
     ".ssh",
 ];
 
-/// Czy ścieżka zawiera segment z deny-listy poświadczeń.
+/// Czy ścieżka zawiera segment z deny-listy poświadczeń — także zapisany wzorcem (`.s?h`,
+/// `.cl*`, `[.]ssh`), który może go objąć (audyt 2026-10-14, A-07).
 pub fn is_credential_path(path: &Path) -> bool {
     path.components().any(|c| {
         let seg = c.as_os_str().to_string_lossy();
         CREDENTIAL_MARKERS
             .iter()
-            .any(|m| seg.eq_ignore_ascii_case(m))
+            .any(|m| seg.eq_ignore_ascii_case(m) || glob_matches(&seg, m))
     })
+}
+
+/// Czy wzorzec z `*`, `?` i `[…]` może pasować do nazwy (bez rozróżniania wielkości liter).
+/// `[…]` traktowany jak dowolny znak — ostrożnie, w stronę „pasuje”.
+fn glob_matches(pattern: &str, name: &str) -> bool {
+    if !pattern.contains(['*', '?', '[']) {
+        return false;
+    }
+    let mut pat: Vec<char> = Vec::new();
+    let mut in_class = false;
+    for c in pattern.to_lowercase().chars() {
+        match (c, in_class) {
+            ('[', false) => {
+                in_class = true;
+                pat.push('?');
+            }
+            (']', true) => in_class = false,
+            (_, true) => {}
+            (c, false) => pat.push(c),
+        }
+    }
+    let text: Vec<char> = name.to_lowercase().chars().collect();
+    // Dopasowanie z nawrotem dla `*` (wzorce są krótkie — segment ścieżki).
+    let (mut p, mut t, mut star, mut mark) = (0, 0, None, 0);
+    while t < text.len() {
+        if p < pat.len() && (pat[p] == '?' || pat[p] == text[t]) {
+            p += 1;
+            t += 1;
+        } else if p < pat.len() && pat[p] == '*' {
+            star = Some(p);
+            mark = t;
+            p += 1;
+        } else if let Some(s) = star {
+            p = s + 1;
+            mark += 1;
+            t = mark;
+        } else {
+            return false;
+        }
+    }
+    pat[p..].iter().all(|c| *c == '*')
 }
 
 /// Port systemu plików. Usuwanie domyślnie do Kosza; zapis zawsze atomowy.
@@ -236,5 +278,23 @@ mod tests {
         assert!(!is_credential_path(Path::new(
             "/home/u/projects/claude-notes.md"
         )));
+    }
+
+    /// Audyt A-07: wzorzec, który może objąć katalog poświadczeń, liczy się jak ten katalog.
+    #[test]
+    fn credential_globs_detected() {
+        for p in [
+            "C:/Users/a/.s?h/id_rsa",
+            "C:/Users/a/.SS*/id_rsa",
+            "C:/Users/a/[.]ssh/id_rsa",
+            "C:/Users/a/*/x",
+            "/home/u/.cl*de/creds.json",
+            "C:/Chrome/User Data/Default/Login*",
+        ] {
+            assert!(is_credential_path(Path::new(p)), "{p}");
+        }
+        for p in ["C:/Users/a/*.txt", "C:/Users/a/do?s/x", "/home/u/.s?x/a"] {
+            assert!(!is_credential_path(Path::new(p)), "{p}");
+        }
     }
 }
