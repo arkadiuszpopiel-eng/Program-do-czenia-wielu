@@ -13,10 +13,17 @@ export async function openApp(
 
 /** Wybiera opcję z listy wyboru Alfy (przycisk `combobox` + własna lista opcji). */
 export async function pickOption(select: Locator, value: string) {
-  await select.click();
-  const listId = await select.getAttribute('aria-controls');
-  await select.page().locator(`[id="${listId}"] [role="option"][data-value="${value}"]`).click();
-  await expect(select).toHaveAttribute('data-value', value);
+  // Ponowienie otwarcia: pod koniec długiego biegu (mało pamięci) pierwsze kliknięcie potrafi
+  // trafić przed podpięciem obsługi listy.
+  await expect(async () => {
+    if ((await select.getAttribute('aria-expanded')) !== 'true') await select.click();
+    const listId = await select.getAttribute('aria-controls');
+    await select
+      .page()
+      .locator(`[id="${listId}"] [role="option"][data-value="${value}"]`)
+      .click({ timeout: 2_000 });
+    await expect(select).toHaveAttribute('data-value', value, { timeout: 2_000 });
+  }).toPass({ timeout: 15_000 });
 }
 
 export async function waitForChat(page: Page, timeout?: number) {

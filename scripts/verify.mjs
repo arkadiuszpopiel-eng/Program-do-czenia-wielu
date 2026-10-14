@@ -13,9 +13,20 @@
 // niekompletny. Poziom „wersja” obejmuje te same bramki co CI (audyt 2026-10-14, A-09).
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs';
-import { cpus, totalmem } from 'node:os';
+import { cpus, freemem, totalmem } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+/**
+ * Ile przeglądarek testowych naraz: każda zajmuje ok. 1,5 GB. Przy małej wolnej pamięci (inne programy
+ * otwarte obok) cztery naraz dławią maszynę i testy padają na przekroczeniu czasu w losowych
+ * miejscach (2026-10-14: 2,6 GB wolnej pamięci → 11–14 losowych czerwonych). `PW_WORKERS` nadpisuje.
+ */
+function e2eWorkers() {
+  if (process.env.PW_WORKERS) return process.env.PW_WORKERS;
+  const freeGb = freemem() / 1024 ** 3;
+  return String(Math.max(1, Math.min(4, Math.floor(freeGb / 1.5))));
+}
 
 // Kody kolorów terminala (ESC[…m) — bez znaku sterującego w literale wyrażenia.
 const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
@@ -145,7 +156,7 @@ const STAGES = {
     [
       'przegladarka',
       'Budowa, budżet rozmiaru i testy w przeglądarce',
-      'pnpm build && node scripts/bundle-size.mjs && PW_WORKERS=4 PW_CHANNEL=msedge pnpm test:e2e',
+      `pnpm build && node scripts/bundle-size.mjs && PW_WORKERS=${e2eWorkers()} PW_CHANNEL=msedge pnpm test:e2e`,
       ui,
       0,
     ],

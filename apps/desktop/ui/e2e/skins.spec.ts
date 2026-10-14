@@ -62,9 +62,13 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
       await openAppearance(page);
       await expect(page.locator('select')).toHaveCount(0);
       const select = page.getByRole('combobox', { name: 'Motyw', exact: true });
-      await select.click();
       const list = page.getByRole('listbox', { name: 'Motyw' });
-      await expect(list.getByRole('option')).toHaveCount(3);
+      // Pod koniec długiego biegu (mało pamięci) pierwsze kliknięcie potrafi trafić przed
+      // podpięciem obsługi listy — ponowienie, zamiast fałszywego czerwonego.
+      await expect(async () => {
+        if (!(await list.isVisible())) await select.click();
+        await expect(list.getByRole('option')).toHaveCount(3, { timeout: 2_000 });
+      }).toPass({ timeout: 15_000 });
       const look = await list.evaluate((el) => {
         // Kolory mogą być w oklch() — rozwiązuje je płótno, nie parsowanie tekstu.
         const probe = document.createElement('canvas').getContext('2d');
