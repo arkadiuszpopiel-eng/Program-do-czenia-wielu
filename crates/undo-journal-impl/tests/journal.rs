@@ -97,6 +97,44 @@ fn corrupted_pre_image_gives_partial_report_never_silent() {
     assert_eq!(fs.read(&p("/w/b")).unwrap(), b"2");
 }
 
+/// Audyt 2026-10-14 (A-06): po cofnięciu częściowym krok da się cofnąć ponownie — także po
+/// restarcie — i wracają tylko operacje, które poprzednio nie wróciły (bez ponawiania reszty).
+#[test]
+fn partial_undo_can_be_retried_after_restart_and_restores_only_the_rest() {
+    let dir = tempfile::tempdir().unwrap();
+    let fs = Arc::new(FakeFs::with_files([
+        (p("/w/a"), b"1".to_vec()),
+        (p("/w/b"), b"2".to_vec()),
+    ]));
+    let s = service(fs.clone(), dir.path(), UndoLimits::default(), 1);
+    let step = s.begin_step(StepCtx::new("s1", None, "x")).unwrap();
+    s.delete_permanent(step, &p("/w/a")).unwrap();
+    s.delete_permanent(step, &p("/w/b")).unwrap();
+    s.commit_step(step).unwrap();
+    let blob = dir
+        .path()
+        .join("blobs")
+        .join(undo_journal_contract::sha256_hex(b"1"));
+    std::fs::write(&blob, b"podmienione").unwrap();
+    assert!(matches!(s.undo(step), Err(UndoError::Partial(_))));
+    let summary = &s.steps(&SessionId::new("s1"))[0];
+    assert!(!summary.undone, "częściowo cofnięty — nie zamknięty");
+    assert!(summary.reversible, "można spróbować ponownie");
+    // Plik /w/b (już przywrócony) zmienia właściciel — ponowienie nie może go nadpisać.
+    fs.write_atomic(&p("/w/b"), b"zmiana wlasciciela").unwrap();
+    drop(s);
+
+    // Restart: stan częściowy odtworzony z dziennika; naprawione pre-image → reszta wraca.
+    std::fs::write(&blob, b"1").unwrap();
+    let s = service(fs.clone(), dir.path(), UndoLimits::default(), 2);
+    let report = s.undo(step).unwrap();
+    assert_eq!(report.restored, 1, "tylko operacja, która nie wróciła");
+    assert_eq!(fs.read(&p("/w/a")).unwrap(), b"1");
+    assert_eq!(fs.read(&p("/w/b")).unwrap(), b"zmiana wlasciciela");
+    assert!(s.steps(&SessionId::new("s1"))[0].undone);
+    assert!(matches!(s.undo(step), Err(UndoError::BadState { .. })));
+}
+
 #[test]
 fn store_limit_evicts_oldest_steps() {
     let dir = tempfile::tempdir().unwrap();

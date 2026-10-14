@@ -1,7 +1,7 @@
 //! Rdzeń dziennika: kroki i operacje `fs.*` wykonywane przez dziennik (brak wpisu = brak
 //! operacji). Kolejność: pre-image → operacja platformy → wpis; błąd wpisu cofa operację.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
 
@@ -22,6 +22,8 @@ pub(crate) struct StepRec {
     pub committed_ms: Option<u64>,
     pub undone: bool,
     pub expired: bool,
+    /// Operacje już przywrócone (numery `seq`) — po cofnięciu częściowym.
+    pub restored: BTreeSet<u32>,
 }
 
 pub(crate) struct JState {
@@ -66,6 +68,7 @@ impl Journal {
                             committed_ms: None,
                             undone: false,
                             expired: false,
+                            restored: BTreeSet::new(),
                         },
                     );
                 }
@@ -80,9 +83,15 @@ impl Journal {
                         s.posts = posts;
                     }
                 }
-                JournalRecord::Undone { step, .. } => {
+                JournalRecord::Restored { step, seq } => {
                     if let Some(s) = steps.get_mut(&step) {
-                        s.undone = true;
+                        s.restored.insert(seq);
+                    }
+                }
+                JournalRecord::Undone { step, partial } => {
+                    if let Some(s) = steps.get_mut(&step) {
+                        // Częściowe: krok zostaje do ponownego cofnięcia (audyt 2026-10-14, A-06).
+                        s.undone = !partial;
                     }
                 }
                 JournalRecord::Expired { step } => {
@@ -145,6 +154,7 @@ impl Journal {
                 committed_ms: None,
                 undone: false,
                 expired: false,
+                restored: BTreeSet::new(),
             },
         );
         Ok(step)

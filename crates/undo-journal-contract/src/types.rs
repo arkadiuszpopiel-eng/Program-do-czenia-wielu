@@ -167,7 +167,15 @@ pub enum JournalRecord {
         /// Stany „po” snapshotów zakresu.
         posts: BTreeMap<u32, BTreeMap<PathBuf, String>>,
     },
-    /// Krok cofnięty (`partial` = część nie wróciła — raport w zdarzeniu).
+    /// Operacja kroku przywrócona przy cofaniu (ponowienie po cofnięciu częściowym pomija ją).
+    Restored {
+        /// Krok.
+        step: StepId,
+        /// Numer operacji w kroku.
+        seq: u32,
+    },
+    /// Krok cofnięty (`partial` = część nie wróciła; krok można cofać ponownie — wrócą tylko
+    /// operacje bez rekordu `Restored`).
     Undone {
         /// Krok.
         step: StepId,

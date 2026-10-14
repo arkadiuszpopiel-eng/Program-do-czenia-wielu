@@ -71,6 +71,29 @@ fn broker_error(e: BrokerError) -> AppError {
 }
 
 fn undo_error(e: UndoError) -> AppError {
+    if let UndoError::Partial(report) = &e {
+        // Audyt A-06: częściowe cofnięcie mówi, co nie wróciło, i że krok można cofnąć ponownie.
+        let paths: Vec<String> = report
+            .failed
+            .iter()
+            .take(5)
+            .map(|(path, why)| format!("„{}” ({why})", path.display()))
+            .collect();
+        let more = report.failed.len().saturating_sub(paths.len());
+        let rest = if more > 0 {
+            format!(" i {more} więcej")
+        } else {
+            String::new()
+        };
+        return AppError::new(
+            ErrorCode::Storage,
+            format!(
+                "Cofnięcie częściowe: przywrócono {}, nie wróciło: {}{rest}. Kliknij „Cofnij”                  jeszcze raz, żeby spróbować przywrócić resztę.",
+                report.restored,
+                paths.join(", ")
+            ),
+        );
+    }
     let code = match &e {
         UndoError::UnknownStep(_) => ErrorCode::NotFound,
         UndoError::Conflict { .. } | UndoError::Expired(_) | UndoError::BadState { .. } => {

@@ -182,7 +182,8 @@ impl Journal {
     }
 
     /// Cofa zatwierdzony krok. Konflikt → nic nie jest zmieniane; częściowe niepowodzenie →
-    /// `UndoError::Partial` z raportem (krok oznaczony jako cofnięty, by nie powtarzać zmian).
+    /// `UndoError::Partial` z raportem. Każda przywrócona operacja ma rekord w dzienniku, więc
+    /// ponowne cofnięcie (także po restarcie) przywraca tylko to, co nie wróciło.
     pub fn undo(&self, step: StepId) -> Result<UndoReport, UndoError> {
         let (entries, posts) = {
             let st = self.lock();
@@ -202,7 +203,13 @@ impl Journal {
                     reason: "krok niezatwierdzony (użyj abort)".into(),
                 });
             }
-            (s.entries.clone(), s.posts.clone())
+            let left: Vec<JournalEntry> = s
+                .entries
+                .iter()
+                .filter(|e| !s.restored.contains(&e.seq))
+                .cloned()
+                .collect();
+            (left, s.posts.clone())
         };
         self.check_conflicts(&entries, &posts)?;
         self.revert(step, &entries)
@@ -228,12 +235,25 @@ impl Journal {
         let mut failed = Vec::new();
         let mut restored = 0;
         for e in entries.iter().rev() {
+            let before = failed.len();
             restored += self.restore(e, &mut failed);
+            if failed.len() == before {
+                // Przywrócona — zapis od razu: przerwanie w połowie nie powtórzy tej zmiany.
+                self.store
+                    .append(&JournalRecord::Restored { step, seq: e.seq })
+                    .map_err(UndoError::Store)?;
+                if let Some(s) = self.lock().steps.get_mut(&step) {
+                    s.restored.insert(e.seq);
+                }
+            }
         }
         let partial = !failed.is_empty();
-        let _ = self.store.append(&JournalRecord::Undone { step, partial });
+        // Błąd zapisu nie jest już przemilczany: stan po restarcie musi zgadzać się z dyskiem.
+        self.store
+            .append(&JournalRecord::Undone { step, partial })
+            .map_err(UndoError::Store)?;
         if let Some(s) = self.lock().steps.get_mut(&step) {
-            s.undone = true;
+            s.undone = !partial;
         }
         let report = UndoReport {
             step,
