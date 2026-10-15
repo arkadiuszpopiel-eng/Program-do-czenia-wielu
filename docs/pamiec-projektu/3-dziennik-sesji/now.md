@@ -25,3 +25,13 @@ Wdrożono poprawki z przeglądu (izolacja Low w `low.rs`: zbyt szerokie katalogi
 Drugi pełny bieg sprawdzenia 0.0.53 zakończony exit 0 po wyczyszczeniu 116,6 GB starych plików kompilacji (E: ma 144 GB wolnego), wersja 0.0.53 wgrana do Alfa-uruchomiona i sprawdzona, raport nocny wysłany, a test sprzętowy na modelu lokalnym jeszcze w toku.
 ## 05:14 | unknown
 Zamknięto próbną instancję 0.0.54 (wgraną, startuje bez błędów; PID 8424), zmieniono werdykt Krytyki ze zdarzającą się literówką, zbudowano i wgrano 0.0.54, a pełne sprawdzenie 0.0.54 zakończyło się czerwono (1 test Rust, 2 przeglądarkowe), trwa poprawianie — w tym czasie nie ma działającej Alfy-uruchomionej do testu z użytkownikiem o 10:00 (Antigravity na koncie Google, wymaga udziału człowieka).
+## 06:39 | unknown
+Po uwadze, że logowanie do Antigravity jest nieczytelne, okno logowania dostało osobny pusty folder (`%LOCALAPPDATA%\Alfa\logowanie`) zamiast katalogu domowego, instrukcje dla każdego narzędzia, automatyczne wykrywanie zalogowania zapisywane w Stanie połączeń (`bridges_mark_login`) i nazwę „Google Gemini (Antigravity CLI)”; zmiany są w toku, jeszcze niezbudowane i niesprawdzone.
+## 06:47 | unknown
+Dodano e2e test przebiegu logowania Antigravity (`connections.spec.ts`, atrapa `api-gui.ts`), który przechodzi w przeglądarce, a test rdzenia `app-core` na trwałość `bridges_mark_login` jest w toku; zmiany niezcommitowane i niezbudowane, dysk E był odłączony, użytkownik zgłosił ponowne podłączenie.
+## 07:04 | unknown
+Zrobiono wersję 0.0.55 z logowaniem Google Gemini przez Antigravity CLI (osobny pusty folder, auto-wykrycie zalogowania, plan zapisany w Stanie połączeń, przycisk /login w Claude Code), commit roboczy i kopia na C:; build shell 0.0.55 i testy prawdziwej apki zakończone exit 0 (wynik weryfikacji nieodczytany), wgranie do Alfa-uruchomiona czeka na zielony wynik, a po instalacji użytkownik musi otworzyć Mosty CLI → Google Gemini → „Zaloguj się” i kliknąć „Gotowe”.
+## 07:28 | unknown
+Sprawdzono, czy Alfa zapisała zalogowanie Antigravity CLI: przeszukano zapis Alfy, przeczytano parser `agy/parse.rs`, dodano lokalny test na prawdziwym zapisie, poprawiono atrapę `alfa-fake` (pole `status` → `state`) i zatrzymano zadanie tła (TaskStop); status: nieukończone, wynik weryfikacji nieznany.
+## 07:59 | unknown
+Wgrano Alfę 0.0.56 (32 testy prawdziwej apki zielone), ale pełne sprawdzenie przerwało się przez zawieszenia USB dysku E: (UASPStor reset, zdarzenia 129/153/50/140), dysk fizycznie podłączony; przeniesienie `target` na C: czeka na potwierdzenie użytkownika (AskUserQuestion), sprawdzenie niedokończone.

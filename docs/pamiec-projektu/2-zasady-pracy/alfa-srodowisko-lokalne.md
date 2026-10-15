@@ -5,13 +5,17 @@ metadata:
   node_type: memory
   type: reference
   originSessionId: 526ab23b-611a-489a-a8a3-7c1153e69825
-  modified: 2026-10-12T00:29:42.600Z
+  modified: 2026-10-15T05:59:58.577Z
 ---
 
 Stan z 2026-10-08 (laptop i7-13620H, RTX 4050 6 GB) — sprawdź, czy nadal aktualne.
 
 - **Kopia robocza: `E:\PROGRAMY W CZASIE PRAC\Alfa AI Program\alfa`** — decyzja właściciela (2026-10-08): pracuje na
   E:, bo dysk jest przenośny (USB NVMe). Repo git to podkatalog `alfa/`; katalog sesji nie jest repozytorium.
+- **Rozłączenia E: (14–15.10.2026):** pod dużym obciążeniem (kompilacja, testy) sterownik USB resetuje dysk
+  (UASPStor 129, disk 153, potem Ntfs 50/140); kabel jest podłączony, Alfa uruchomiona z E: wtedy się zamyka.
+  Właściciel zdecydował 2026-10-15: **wszystko zostaje na E:** — nie proponować przenoszenia `target` ani niczego
+  na C:. Po rozłączeniu: `git fsck`, `cargo clean -p <pakiet>` przy błędzie linkera LNK1207, ponowne uruchomienie Alfy.
 - To jedyna kopia: stare `D:\alfa`, `D:\alfa-narzedzia` i migawka ZIP z GitHuba usunięto 2026-10-09 za zgodą
   właściciela (Kosz). Z globalnego `~/.npmrc` usunięto `cache=D:\alfa-narzedzia\npm-cache` (odtwarzało katalog na D:
   przy każdym `npx` poza `portable-env`, także z haka formatującego); kopia starego pliku:
