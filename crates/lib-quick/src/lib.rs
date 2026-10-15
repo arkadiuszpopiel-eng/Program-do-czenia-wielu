@@ -6,8 +6,11 @@
 //! więc „ile kosztuje 5 jabłek” czy „która godzina w Tokio” nie dostaną odpowiedzi z tej
 //! biblioteki. Biblioteka nie wykonuje żadnych akcji — tylko liczy tekst odpowiedzi.
 
+#![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
+
 mod clock;
 mod math;
+pub mod quiz;
 mod random;
 mod spell;
 pub mod text;
@@ -26,6 +29,8 @@ pub enum Command {
     Random,
     /// Data albo godzina.
     Clock,
+    /// Quiz z tabliczki mnożenia (stan trzyma wywołujący — [`quiz`]).
+    Quiz,
 }
 
 impl Command {
@@ -36,6 +41,7 @@ impl Command {
             Self::Spell => "literowanie",
             Self::Random => "losowanie",
             Self::Clock => "data i godzina",
+            Self::Quiz => "quiz",
         }
     }
 }
@@ -103,6 +109,15 @@ pub const CATALOG: &[Entry] = &[
             "Hej Alfa, jaki dziś dzień?",
             "jaka jest data",
             "którego dzisiaj",
+        ],
+    },
+    Entry {
+        command: Command::Quiz,
+        title: "Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)",
+        examples: &[
+            "Przepytaj mnie z tabliczki mnożenia",
+            "sprawdź mnie z tabliczki mnożenia przez 7",
+            "tabliczka mnożenia przez 3",
         ],
     },
 ];

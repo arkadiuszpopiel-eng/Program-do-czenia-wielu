@@ -1,4 +1,5 @@
-//! Polecenia bez modelu (P5, `lib-quick`): rachunki, literowanie, losowanie, data i godzina.
+//! Polecenia bez modelu (P5, `lib-quick`): rachunki, literowanie, losowanie, data i godzina
+//! oraz quiz z tabliczki mnożenia (stan w pamięci, jeden na sesję).
 //! Tylko jawna wiadomość użytkownika (tekst albo głos) — nigdy treść agentki, wyzwalacza ani
 //! kontynuacja. Odpowiedź liczona lokalnie, natychmiast i także offline (wtedy wiadomość nie
 //! trafia do kolejki); bez dostawcy, kosztu i tokenów. Wyłączane ustawieniem
@@ -7,9 +8,9 @@
 use std::hash::{BuildHasher, Hasher};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use lib_quick::Reply;
+use lib_quick::{Command, Reply, quiz};
 use risk_classifier_contract::CommandOrigin;
-use sessions_contract::{Role, SessionHistory};
+use sessions_contract::{Role, SessionHistory, SessionId};
 
 use app_api::dto::{AlfaEvent, StopReason, TurnStatus};
 use app_api::ids;
@@ -37,9 +38,42 @@ fn now() -> chrono::NaiveDateTime {
 }
 
 impl ChatEngine {
-    /// Czy wiadomość użytkownika dostanie odpowiedź bez modelu (np. offline — bez kolejki).
-    pub async fn answers_locally(&self, text: &str) -> bool {
-        lib_quick::matches(text) && self.config_bool(LOCAL_COMMANDS_KEY, true).await
+    /// Czy wiadomość użytkownika dostanie odpowiedź bez modelu (np. offline — bez kolejki):
+    /// polecenie, początek quizu albo odpowiedź w trwającym quizie tej sesji.
+    pub async fn answers_locally(&self, session: &SessionId, text: &str) -> bool {
+        if !self.config_bool(LOCAL_COMMANDS_KEY, true).await {
+            return false;
+        }
+        let quiz = self.rt().quizzes.get(session).cloned();
+        let answer = quiz.is_some_and(|mut q| quiz::reply(&mut q, text, &mut |_| 0).is_some());
+        answer || lib_quick::matches(text) || quiz::start(text, &mut |_| 0).is_some()
+    }
+
+    /// Odpowiedź bez modelu z trwającym quizem sesji: odpowiedź w quizie, początek quizu albo
+    /// polecenie jednorazowe. Wiadomość spoza quizu kończy go bez słowa.
+    fn local_reply(&self, session: &SessionId, text: &str) -> Option<Reply> {
+        let mut rt = self.rt();
+        if let Some(state) = rt.quizzes.get_mut(session) {
+            let step = quiz::reply(state, text, &mut roll);
+            if step.as_ref().is_none_or(|(_, done)| *done) {
+                rt.quizzes.remove(session);
+            }
+            if let Some((text, _)) = step {
+                return Some(Reply {
+                    command: Command::Quiz,
+                    text,
+                });
+            }
+        }
+        if let Some((state, text)) = quiz::start(text, &mut roll) {
+            rt.quizzes.insert(session.clone(), state);
+            return Some(Reply {
+                command: Command::Quiz,
+                text,
+            });
+        }
+        drop(rt);
+        lib_quick::answer(text, now(), &mut roll)
     }
 
     /// Polecenie w ostatniej wiadomości użytkownika (tylko świeża tura z tekstu albo głosu).
@@ -58,13 +92,11 @@ impl ChatEngine {
             .ok()?;
         let last = path.last().filter(|t| t.role == Role::User)?;
         let text = last.content.text.trim().to_owned();
-        if !last.content.blocks.is_empty() || !lib_quick::matches(&text) {
+        if !last.content.blocks.is_empty() || !self.config_bool(LOCAL_COMMANDS_KEY, true).await {
+            self.rt().quizzes.remove(&req.session);
             return None;
         }
-        if !self.config_bool(LOCAL_COMMANDS_KEY, true).await {
-            return None;
-        }
-        lib_quick::answer(&text, now(), &mut roll)
+        self.local_reply(&req.session, &text)
     }
 }
 

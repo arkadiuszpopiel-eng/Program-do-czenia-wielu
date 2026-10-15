@@ -16,6 +16,13 @@ fn now() -> chrono::NaiveDateTime {
 fn every_example_triggers_its_command() {
     for entry in CATALOG {
         for example in entry.examples {
+            if entry.command == Command::Quiz {
+                let (_, first) = lib_quick::quiz::start(example, &mut |n| n / 2)
+                    .unwrap_or_else(|| panic!("brak quizu: {example}"));
+                assert!(first.contains("= ?"), "{example}");
+                assert!(!matches(example), "quiz nie jest poleceniem jednorazowym");
+                continue;
+            }
             let reply = answer(example, now(), &mut |n| n / 2)
                 .unwrap_or_else(|| panic!("brak odpowiedzi: {example}"));
             assert_eq!(reply.command, entry.command, "{example}");

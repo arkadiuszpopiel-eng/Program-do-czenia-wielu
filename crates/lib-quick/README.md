@@ -9,6 +9,7 @@ Wspólna biblioteka (kategoria `lib-*`, bez logiki modułu): **polecenia wykonyw
 | Literowanie    | „Przeliteruj rower”, „jak się literuje słowo żółw”                        |
 | Losowanie      | „Rzuć kostką”, „orzeł czy reszka?”, „wylosuj liczbę od 1 do 10”           |
 | Data i godzina | „Która godzina?”, „Jaki dziś dzień?”                                      |
+| Quiz           | „Przepytaj mnie z tabliczki mnożenia przez 7” — 10 pytań, „koniec” przerywa |
 
 ## Zasady
 
@@ -20,6 +21,8 @@ Wspólna biblioteka (kategoria `lib-*`, bez logiki modułu): **polecenia wykonyw
   dzielenie przez zero i pierwiastek z liczby ujemnej mają własne odpowiedzi.
 - **Bez akcji.** Biblioteka tylko liczy tekst odpowiedzi; zegar i źródło losowości podaje
   wywołujący (testy podstawiają stałe).
+- **Quiz** (`quiz`) ma stan, który trzyma wywołujący — w Alfie jeden quiz na sesję, w pamięci;
+  wiadomość, która nie jest odpowiedzią ani „koniec”, kończy quiz bez słowa i idzie dalej.
 - Katalog `CATALOG` ma przykłady każdego polecenia — test sprawdza, że każdy trafia we własne
   polecenie, a lista zwykłych pytań nie trafia w żadne.
 

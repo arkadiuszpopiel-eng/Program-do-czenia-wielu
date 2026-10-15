@@ -79,7 +79,9 @@ Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — ta
 - **rachunki** — „Ile to jest 7 razy 8?”, „oblicz (2+3)*4”, „20% z 150”, „pierwiastek z 81”, także liczby słowami;
 - **literowanie** — „Przeliteruj rower”, „jak się literuje słowo żółw”;
 - **losowanie** — „Rzuć kostką”, „orzeł czy reszka?”, „wylosuj liczbę od 1 do 10”;
-- **data i godzina** — „Która godzina?”, „Jaki dziś dzień?” (z zegara komputera).
+- **data i godzina** — „Która godzina?”, „Jaki dziś dzień?” (z zegara komputera);
+- **quiz z tabliczki mnożenia** — „Przepytaj mnie z tabliczki mnożenia (przez 7)”: 10 pytań, odpowiadasz liczbą
+  (także słowami albo głosem), „koniec” przerywa z podsumowaniem; inna wiadomość kończy quiz.
 
 Polecenie musi być całą wiadomością — „ile kosztuje 5 jabłek” czy „która godzina w Tokio” trafią do modelu.
 Wyłączysz to w Ustawienia → Sesje i okna → „Polecenia bez modelu”.

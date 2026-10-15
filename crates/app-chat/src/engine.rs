@@ -133,6 +133,8 @@ pub(crate) struct ChatState {
     /// Kroki cofalne poza dziennikiem (schowek, zmienne użytkownika) — token należy do sesji,
     /// której przebieg go utworzył.
     pub owned_undo: HashMap<SessionId, BTreeSet<(UndoKind, u64)>>,
+    /// Trwające quizy poleceń bez modelu (sesja → stan).
+    pub quizzes: HashMap<SessionId, lib_quick::quiz::Quiz>,
 }
 
 pub(crate) struct Engine {

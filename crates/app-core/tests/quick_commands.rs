@@ -101,3 +101,48 @@ async fn local_commands_answer_without_a_model() {
     );
     core.turns_stop(sid).await.unwrap();
 }
+
+/// Liczby z ostatniego pytania quizu („**a × b = ?**”).
+fn question(text: &str) -> (u64, u64) {
+    let q = text.rsplit("**").nth(1).unwrap();
+    let (a, rest) = q.split_once(" × ").unwrap();
+    let b = rest.trim_end_matches(" = ?");
+    (a.parse().unwrap(), b.parse().unwrap())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn multiplication_quiz_keeps_state_per_session() {
+    let dir = tempfile::tempdir().unwrap();
+    let provider = Arc::new(ScriptedProvider::new(Duration::from_millis(1)));
+    let opts = options(Some(provider.clone()), Arc::new(HeadlessShell::default()));
+    let core = AppCore::build(AppPaths::under(dir.path()), opts)
+        .await
+        .unwrap();
+    let sid = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    let (first, _) = reply(&core, &sid, "Przepytaj mnie z tabliczki mnożenia przez 7").await;
+    let (a, b) = question(&first.text);
+    assert_eq!(a, 7, "{}", first.text);
+    let (good, _) = reply(&core, &sid, &(a * b).to_string()).await;
+    assert!(good.text.starts_with("Dobrze!"), "{}", good.text);
+    let (c, d) = question(&good.text);
+    let (bad, _) = reply(&core, &sid, &(c * d + 1).to_string()).await;
+    assert!(bad.text.starts_with("Prawie"), "{}", bad.text);
+    let (end, _) = reply(&core, &sid, "koniec").await;
+    assert!(end.text.contains("Dobrze: 1 z 2"), "{}", end.text);
+    // Po zakończeniu liczba to zwykła wiadomość — idzie do modelu.
+    core.turns_send(sid.clone(), send("42", None))
+        .await
+        .unwrap();
+    for _ in 0..300 {
+        if !provider.requests().is_empty() {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    assert_eq!(provider.requests().len(), 1);
+    core.turns_stop(sid).await.unwrap();
+}

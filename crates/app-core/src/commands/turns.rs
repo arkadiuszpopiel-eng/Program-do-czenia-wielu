@@ -94,7 +94,7 @@ impl AppCore {
         };
         self.inner.store.put_meta(id, turn.id, &meta)?;
         let queued =
-            !self.system_status_snapshot_online() && !self.chat().answers_locally(text).await;
+            !self.system_status_snapshot_online() && !self.chat().answers_locally(id, text).await;
         if queued {
             self.inner
                 .store
