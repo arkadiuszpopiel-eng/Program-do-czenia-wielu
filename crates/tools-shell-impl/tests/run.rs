@@ -8,7 +8,7 @@ mod common;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use common::{WORK, ctx, harness};
+use common::{Harness, WORK, ctx, harness};
 use platform_contract::FsPort;
 use platform_fake::FakeRun;
 use safety_broker_contract::{Broker, TaintSource};
@@ -120,6 +120,15 @@ async fn timeout_kills_and_keeps_undo() {
     assert_eq!(h.exec.runs()[0].timeout_ms, 1000);
 }
 
+/// Czeka, aż uruchomione polecenie trafi do rejestru kill-switcha (stały sen 50 ms zawodził
+/// na obciążonej maszynie — start przechodzi przez analizę polecenia i politykę).
+async fn registered(h: &Harness) {
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while h.jobs.jobs().is_empty() && Instant::now() < deadline {
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+}
+
 #[tokio::test]
 async fn cancel_in_flight_stops_within_budget() {
     let h = Arc::new(harness(&[]));
@@ -132,7 +141,7 @@ async fn cancel_in_flight_stops_within_budget() {
             .call(json!({"command": "Start-Sleep 600"}), &c)
             .await
     });
-    tokio::time::sleep(Duration::from_millis(50)).await;
+    registered(&h).await;
     assert_eq!(h.jobs.jobs().len(), 1, "proces w rejestrze kill-switcha");
     let t0 = Instant::now();
     cancel.cancel();
@@ -157,7 +166,7 @@ async fn kill_switch_kills_running_shell() {
     h.exec.push(FakeRun::hanging());
     let h2 = h.clone();
     let task = tokio::spawn(async move { h2.sh("Start-Sleep 600").await });
-    tokio::time::sleep(Duration::from_millis(50)).await;
+    registered(&h).await;
     let (killed, failed) = h.jobs.kill_all(h.exec.as_ref());
     assert_eq!((killed, failed.len()), (1, 0));
     let out = task.await.unwrap();
