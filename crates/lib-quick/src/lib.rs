@@ -1,5 +1,5 @@
 //! Polecenia wykonywane bez modelu (plan v6, P5): rachunki, literowanie, losowanie, data
-//! i godzina. Odpowiedź jest deterministyczna (poza losowaniem), natychmiastowa i działa offline.
+//! i godzina, rachunki na datach, przeliczanie jednostek. Odpowiedź jest deterministyczna (poza losowaniem), natychmiastowa i działa offline.
 //!
 //! Zasada dopasowania: całe polecenie (po normalizacji) musi pasować do wzorca albo — w rachunkach
 //! — każde słowo musi być liczbą, działaniem albo wypełniaczem. Wszystko inne idzie do modelu,
@@ -10,6 +10,7 @@
 
 mod clock;
 pub mod custom;
+mod dates;
 
 /// Klucze konfiguracji poleceń (wspólne dla rdzenia i silnika rozmowy).
 pub mod keys {
@@ -23,6 +24,7 @@ pub mod quiz;
 mod random;
 mod spell;
 pub mod text;
+mod units;
 mod words;
 
 use chrono::NaiveDateTime;
@@ -42,6 +44,10 @@ pub enum Command {
     Quiz,
     /// Własne polecenie użytkownika ([`custom`]).
     Custom,
+    /// Rachunek na datach: dni do daty, dzień tygodnia, data za N dni.
+    Dates,
+    /// Przeliczanie jednostek.
+    Units,
 }
 
 impl Command {
@@ -54,6 +60,8 @@ impl Command {
             Self::Clock => "data i godzina",
             Self::Quiz => "quiz",
             Self::Custom => "własne polecenie",
+            Self::Dates => "rachunek na datach",
+            Self::Units => "przeliczanie jednostek",
         }
     }
 }
@@ -132,6 +140,28 @@ pub const CATALOG: &[Entry] = &[
             "tabliczka mnożenia przez 3",
         ],
     },
+    Entry {
+        command: Command::Dates,
+        title: "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni",
+        examples: &[
+            "Ile dni do 24 grudnia?",
+            "ile dni minęło od 1 września",
+            "Jaki dzień tygodnia był 1 stycznia 2000?",
+            "jaka data będzie za 30 dni",
+            "jaki dzień będzie jutro",
+        ],
+    },
+    Entry {
+        command: Command::Units,
+        title: "Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas",
+        examples: &[
+            "Ile to 5 km w milach?",
+            "zamień 30 stopni Celsjusza na Fahrenheita",
+            "ile cm ma cal",
+            "100 km/h na m/s",
+            "2,5 kg w funtach",
+        ],
+    },
 ];
 
 /// Najdłuższa wiadomość, którą biblioteka w ogóle rozważa (dłuższe idą do modelu).
@@ -155,11 +185,17 @@ pub fn answer(
     if let Some(t) = clock::answer(&text, now) {
         return reply(Command::Clock, t);
     }
+    if let Some(t) = dates::answer(&text, now) {
+        return reply(Command::Dates, t);
+    }
     if let Some(t) = spell::answer(message, &text) {
         return reply(Command::Spell, t);
     }
     if let Some(t) = random::answer(&text, roll) {
         return reply(Command::Random, t);
+    }
+    if let Some(t) = units::answer(&text) {
+        return reply(Command::Units, t);
     }
     math::answer(&text).and_then(|t| reply(Command::Math, t))
 }

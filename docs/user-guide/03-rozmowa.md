@@ -100,6 +100,12 @@ Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — ta
 - **literowanie** — „Przeliteruj rower”, „jak się literuje słowo żółw”;
 - **losowanie** — „Rzuć kostką”, „orzeł czy reszka?”, „wylosuj liczbę od 1 do 10”;
 - **data i godzina** — „Która godzina?”, „Jaki dziś dzień?” (z zegara komputera);
+- **rachunki na datach** — „Ile dni do 24 grudnia?”, „Ile dni minęło od 1 września?”, „Jaki dzień tygodnia był
+  1 stycznia 2000?”, „Jaka data będzie za 30 dni?”, „Jaki dzień będzie jutro?”; data bez roku to najbliższa
+  w przód (do) albo w tył (od);
+- **przeliczanie jednostek** — „Ile to 5 km w milach?”, „Zamień 30 stopni Celsjusza na Fahrenheita”, „Ile cm ma
+  cal?”, „100 km/h na m/s”: długość, masa, objętość, temperatura, prędkość i czas (jednostki z różnych grup trafią
+  do modelu);
 - **quiz z tabliczki mnożenia** — „Przepytaj mnie z tabliczki mnożenia (przez 7)”: 10 pytań, odpowiadasz liczbą
   (także słowami albo głosem), „koniec” przerywa z podsumowaniem; inna wiadomość kończy quiz.
 

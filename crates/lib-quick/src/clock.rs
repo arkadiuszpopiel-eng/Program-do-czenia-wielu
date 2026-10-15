@@ -11,7 +11,7 @@ use crate::text::re;
 const TIME: &str = r"^(?:(?:ktora|jaka) (?:jest |mamy )?(?:teraz )?godzina(?: jest| teraz)?|ktora (?:jest|mamy)(?: teraz)?|podaj (?:aktualna |obecna )?godzine)$";
 const DATE: &str = r"^(?:(?:jaki|ktory) (?:dzis |dzisiaj |teraz )?(?:jest |mamy )?(?:dzis |dzisiaj )?dzien(?: tygodnia)?(?: jest| mamy)?(?: dzis| dzisiaj)?|(?:jaka|ktora) (?:jest )?(?:dzis |dzisiaj )?data(?: dzis| dzisiaj)?|dzisiejsza data|podaj (?:dzisiejsza |aktualna )?date|ktorego (?:jest |mamy )?(?:dzis|dzisiaj)|ktory (?:jest |mamy )?(?:dzis|dzisiaj))$";
 
-const DAYS: [&str; 7] = [
+pub(crate) const DAYS: [&str; 7] = [
     "poniedziałek",
     "wtorek",
     "środa",
@@ -20,7 +20,7 @@ const DAYS: [&str; 7] = [
     "sobota",
     "niedziela",
 ];
-const MONTHS: [&str; 12] = [
+pub(crate) const MONTHS: [&str; 12] = [
     "stycznia",
     "lutego",
     "marca",

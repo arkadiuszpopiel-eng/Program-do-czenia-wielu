@@ -17,6 +17,14 @@ const BUILTINS: readonly BuiltinCommand[] = [
     title: 'Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)',
     examples: ['Przepytaj mnie z tabliczki mnożenia'],
   },
+  {
+    title: 'Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni',
+    examples: ['Ile dni do 24 grudnia?', 'Jaki dzień tygodnia był 1 stycznia 2000?'],
+  },
+  {
+    title: 'Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas',
+    examples: ['Ile to 5 km w milach?', 'ile cm ma cal'],
+  },
 ];
 
 const fold = (s: string): string =>

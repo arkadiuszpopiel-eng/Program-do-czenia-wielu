@@ -41,7 +41,8 @@ fn ordinary_questions_go_to_the_model() {
         "Napisz funkcję, która liczy 2+2 w Pythonie",
         "Podaj liczbę mieszkańców Polski",
         "Rzuć okiem na ten plik",
-        "Jaki dzień tygodnia był 1 stycznia 2000?",
+        "Ile dni do świąt?",
+        "Ile kosztuje 5 kg ziemniaków?",
         "Opowiedz o roku 1984",
         "ile to jest\n7 razy 8",
         "",
@@ -67,6 +68,14 @@ fn replies_are_exact() {
         Some("Dziś jest czwartek, 15 października 2026.")
     );
     assert_eq!(a("rzuć kostką").as_deref(), Some("Wypadło: **1**."));
+    assert_eq!(
+        a("Jaki dzień tygodnia był 1 stycznia 2000?").as_deref(),
+        Some("1 stycznia 2000 to **sobota**.")
+    );
+    assert_eq!(
+        a("Ile to 5 km w milach?").as_deref(),
+        Some("5 km = **3,10686 mi**")
+    );
     assert_eq!(
         answer("2x3", now(), &mut |_| 0).map(|r| r.command),
         Some(Command::Math)
