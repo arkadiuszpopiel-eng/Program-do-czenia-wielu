@@ -36,6 +36,8 @@ pub(crate) struct Outcome {
     pub tools: Vec<dto::ToolStep>,
     /// Karta „czeka na zatwierdzenie" (przebieg agentki).
     pub approval: Option<dto::ApprovalPending>,
+    /// Odpowiedź polecenia bez modelu (nazwa polecenia na osi czasu).
+    pub local: Option<&'static str>,
 }
 
 impl Outcome {
@@ -53,6 +55,7 @@ impl Outcome {
             thinking_ms: None,
             tools: Vec::new(),
             approval: None,
+            local: None,
         }
     }
 }

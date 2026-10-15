@@ -93,7 +93,8 @@ impl AppCore {
             ..TurnMeta::default()
         };
         self.inner.store.put_meta(id, turn.id, &meta)?;
-        let queued = !self.system_status_snapshot_online();
+        let queued =
+            !self.system_status_snapshot_online() && !self.chat().answers_locally(text).await;
         if queued {
             self.inner
                 .store

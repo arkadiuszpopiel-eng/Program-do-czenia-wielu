@@ -17,7 +17,7 @@ use app_api::ids;
 
 use crate::engine::{ChatEngine, GenHandle};
 use crate::outcome::guarded;
-use crate::{agent, delegate, stream};
+use crate::{agent, delegate, quick, stream};
 
 /// Gdzie zapisać turę agentki.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -200,16 +200,21 @@ impl ChatEngine {
         self.announce_session(&req.session).await;
         let core = self.clone();
         let delegation = self.delegation(&req);
-        let setup = match (req.continues, &delegation) {
-            (None, None) => self.agent_setup(&req.session, &req.agent),
+        let local = match delegation {
+            None => self.quick(&req).await,
+            Some(_) => None,
+        };
+        let setup = match (req.continues, &delegation, &local) {
+            (None, None, None) => self.agent_setup(&req.session, &req.agent),
             _ => None,
         };
         tokio::spawn(async move {
             let outcome = guarded(async {
-                match (delegation, setup) {
-                    (Some(d), _) => delegate::run(&core, &req, &handle, d).await,
-                    (None, Some(setup)) => agent::run(&core, &req, &handle, setup).await,
-                    (None, None) => stream::generate(&core, &req, &handle).await,
+                match (delegation, local, setup) {
+                    (Some(d), _, _) => delegate::run(&core, &req, &handle, d).await,
+                    (None, Some(reply), _) => quick::run(&core, &req, &handle, reply),
+                    (None, None, Some(setup)) => agent::run(&core, &req, &handle, setup).await,
+                    (None, None, None) => stream::generate(&core, &req, &handle).await,
                 }
             })
             .await;

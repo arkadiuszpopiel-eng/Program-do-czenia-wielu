@@ -1689,6 +1689,22 @@
      "step": 1,
      "unit": null
     }
+   },
+   {
+    "key": "sessions.local_commands",
+    "label": {
+     "pl": "Polecenia bez modelu",
+     "en": "Commands without a model"
+    },
+    "description": {
+     "pl": "Rachunki, literowanie, losowanie, data i godzina — Alfa odpowiada od razu, bez modelu i bez kosztu, także offline.",
+     "en": "Arithmetic, spelling, random draws, date and time — Alfa answers at once, without a model or cost, offline too."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": true,
+    "scope": "global"
    }
   ],
   "upcoming": []

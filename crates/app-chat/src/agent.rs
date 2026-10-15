@@ -329,5 +329,6 @@ pub(crate) async fn run(
         thinking_ms: None,
         tools: projector.tool_steps().to_vec(),
         approval: projector.approval().cloned(),
+        local: None,
     }
 }

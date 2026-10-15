@@ -14,6 +14,7 @@ mod generate;
 mod history;
 mod outcome;
 mod project;
+mod quick;
 mod routing;
 mod stream;
 mod taint;

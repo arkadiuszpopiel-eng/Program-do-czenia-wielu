@@ -499,6 +499,7 @@ dependencies = [
  "cost-meter-contract",
  "futures-util",
  "lib-markdown",
+ "lib-quick",
  "personas-contract",
  "providers-contract",
  "risk-classifier-contract",
@@ -3287,6 +3288,14 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tracing",
+]
+
+[[package]]
+name = "lib-quick"
+version = "0.0.59"
+dependencies = [
+ "chrono",
+ "regex",
 ]
 
 [[package]]

@@ -72,10 +72,22 @@ pracuje w tle; wyróżnienie — nieprzeczytane odpowiedzi. Menu sesji (prawy pr
 
 Każda sesja ma osobną, zaszyfrowaną bazę i osobną pamięć — agentka w jednej sesji nie widzi treści innej.
 
+## Polecenia bez modelu
+
+Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — także bez internetu:
+
+- **rachunki** — „Ile to jest 7 razy 8?”, „oblicz (2+3)*4”, „20% z 150”, „pierwiastek z 81”, także liczby słowami;
+- **literowanie** — „Przeliteruj rower”, „jak się literuje słowo żółw”;
+- **losowanie** — „Rzuć kostką”, „orzeł czy reszka?”, „wylosuj liczbę od 1 do 10”;
+- **data i godzina** — „Która godzina?”, „Jaki dziś dzień?” (z zegara komputera).
+
+Polecenie musi być całą wiadomością — „ile kosztuje 5 jabłek” czy „która godzina w Tokio” trafią do modelu.
+Wyłączysz to w Ustawienia → Sesje i okna → „Polecenia bez modelu”.
+
 ## Brak internetu
 
 Gdy nie ma połączenia, wiadomość do modelu w chmurze czeka w kolejce („W kolejce — wyślę po odzyskaniu
-połączenia”), a model lokalny odpowiada dalej. Baner u góry ma przycisk „Ponów teraz”.
+połączenia”), a model lokalny odpowiada dalej. Polecenia bez modelu (rachunki, data, losowanie) działają od razu. Baner u góry ma przycisk „Ponów teraz”.
 
 ## Panele Pliki i Oś czasu
 

@@ -276,5 +276,6 @@ pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHa
         thinking_ms: thinking_ms.or_else(|| thinking.map(|(s, _)| millis(s.elapsed()))),
         tools: Vec::new(),
         approval: None,
+        local: None,
     }
 }

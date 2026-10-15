@@ -14,7 +14,8 @@ use common::keys::{core, input};
 use common::{ends, send, until};
 
 const KEY: &str = "test-dobor-XXXXXXXXXXXXXXXXXXXXXXX";
-const EASY: &str = "Która jest godzina?";
+// Nie „która godzina” — na to Alfa odpowiada bez modelu (polecenia `lib-quick`).
+const EASY: &str = "Jak się masz?";
 const MEDIUM: &str = "Wyjaśnij, jak działa fotosynteza.";
 const HARD: &str = "Zaprojektuj architekturę usługi kolejkowej: najpierw opisz wymagania, \
                     następnie model danych, a potem plan wdrożenia. Uzasadnij wybory.";

@@ -1,0 +1,16 @@
+[package]
+name = "lib-quick"
+description = "Wspólna biblioteka (bez logiki modułu): polecenia wykonywane bez modelu — rachunki, literowanie, losowanie, data i godzina (P5)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+chrono.workspace = true
+regex.workspace = true
+
+[lints]
+workspace = true

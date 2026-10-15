@@ -8,12 +8,12 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 
 | Miara | Wartość |
 | --- | --- |
-| Crate’y | 247 |
-| Moduły (wspólna baza nazwy) | 111 |
+| Crate’y | 257 |
+| Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
-| Manifesty `module.toml` | 68 |
-| Linie Rust (z testami) | 398 749 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2774 |
+| Manifesty `module.toml` | 70 |
+| Linie Rust (z testami) | 414 512 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2888 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -32,13 +32,14 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `device-profile` | F1 | service | inproc | C · I · F | 2649 | 22 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
-| `platform` | — | — | — | C · F | 14 387 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
-| `platform-apps` | F6 | — | — | C · F | 4837 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
-| `platform-windows` | F1, F5, F6 | service | inproc | I | 7844 | 70 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| `platform` | — | — | — | C · F | 14 390 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
+| `platform-apps` | F6 | — | — | C · F | 5223 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
+| `platform-windows` | F1, F5, F6 | service | inproc | I | 8457 | 75 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| `platform-windows-diag` | F1, F5, F6 | — | — | I | 659 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2161 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-ocr` | F1, F5, F6 | — | — | I | 266 | 2 | [platform-windows](modules/platform-windows/SPEC.md) |  |
-| `platform-windows-office` | F1, F5, F6 | — | — | I | 3507 | 10 | [platform-windows](modules/platform-windows/SPEC.md) |  |
+| `platform-windows-office` | F1, F5, F6 | — | — | I | 4003 | 12 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-pty` | F1, F5, F6 | — | — | I | 694 | 8 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-sys` | F1, F5, F6 | — | — | I | 3660 | 27 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `updater` | F1, F3 | service | inproc | C · I · F | 6317 | 49 | [updater](modules/updater/SPEC.md) | Stały launcher, wersje obok siebie, podpis minisign, rollback i ochrona przed pętlą awarii. |
@@ -48,7 +49,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `artifacts` | F1 | service | inproc | C · I · F | 1944 | 15 | [artifacts](modules/artifacts/SPEC.md) | Rejestr plików oddanych przez agentki: wersje, podgląd, diff, akcje jako intencje. |
-| `memory` | F1, F7 | service | inproc | C · I · F | 10 573 | 35 | [memory](modules/memory/SPEC.md) | Pamięć w 4 warstwach i 4 zakresach z proweniencją, wersjami faktów, Inspektorem i kaskadowym `forget`. |
+| `memory` | F1, F7 | service | inproc | C · I · F | 10 572 | 35 | [memory](modules/memory/SPEC.md) | Pamięć w 4 warstwach i 4 zakresach z proweniencją, wersjami faktów, Inspektorem i kaskadowym `forget`. |
 | `memory-consolidation` | F7 | service | inproc | C · I · F | 2901 | 19 | [memory-consolidation](modules/memory-consolidation/SPEC.md) | Strażniczka pamięci: nocna konsolidacja z budżetem, dziennikiem i cofaniem, nie na baterii ani w grze. |
 | `search` | F1 | service | inproc | C · I · F | 4011 | 31 | [search](modules/search/SPEC.md) | Wyszukiwanie FTS5 i wektorowe w bazie sesji, hybryda RRF; „szukaj wszędzie” tylko dla właściciela. |
 | `sessions` | F1 | service | inproc | C · I · F | 5512 | 39 | [sessions](modules/sessions/SPEC.md) | Sesje z osobną szyfrowaną bazą, historia append-only jako drzewo gałęzi, usłyszany prefiks, crypto-shredding. |
@@ -58,16 +59,16 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `accounts-hub` | F1 | service | inproc | C · I · F | 6285 | 36 | [accounts-hub](modules/accounts-hub/SPEC.md) | Katalog dostawców, konta i klucze w Menedżerze poświadczeń, kreator, wykrywanie mostów CLI. |
-| `agent-backends` | F4 | service | process | C · I · F | 7027 | 48 | [agent-backends](modules/agent-backends/SPEC.md) | Mosty do oficjalnych CLI (Claude Code, Codex) jako „opaque worker” w worktree, bez dostępu do poświadczeń. |
+| `accounts-hub` | F1 | service | inproc | C · I · F | 6345 | 36 | [accounts-hub](modules/accounts-hub/SPEC.md) | Katalog dostawców, konta i klucze w Menedżerze poświadczeń, kreator, wykrywanie mostów CLI. |
+| `agent-backends` | F4 | service | process | C · I · F | 8001 | 56 | [agent-backends](modules/agent-backends/SPEC.md) | Mosty do oficjalnych CLI (Claude Code, Codex) jako „opaque worker” w worktree, bez dostępu do poświadczeń. |
 | `compliance` | F1, F4 | service | inproc | C · I · F | 3306 | 30 | [compliance](modules/compliance/SPEC.md) | Rejestr zgodności tras, tagi prywatności i jurysdykcji, deny-listy Jądra z normalizacją ścieżek Windows. |
 | `cost-meter` | F1 | service | inproc | C · I · F | 2795 | 24 | [cost-meter](modules/cost-meter/SPEC.md) | Koszty w PLN po kursie NBP, limit miesięczny i budżet tła. |
-| `mcp` | F4, F6 | service | inproc | C · I · F | 6442 | 51 | [mcp](modules/mcp/SPEC.md) | Klient MCP z odciskiem opisów narzędzi i serwer MCP Alfy (v0: schowek, okna; v1: UIA, zrzuty, rejestr) bez TCP. |
+| `mcp` | F4, F6 | service | inproc | C · I · F | 6825 | 57 | [mcp](modules/mcp/SPEC.md) | Klient MCP z odciskiem opisów narzędzi i serwer MCP Alfy (v0: schowek, okna; v1: UIA, zrzuty, rejestr) bez TCP. |
 | `model-residency` | F2 | service | inproc | C · I · F | 2957 | 21 | [model-residency](modules/model-residency/SPEC.md) | Zarządca RAM/VRAM: dzierżawy modeli, wymiana wg priorytetów, tryb gry i baterii. |
-| `providers` | — | — | — | C · F | 5377 | 55 | kontrakt wspólny: providers-api, providers-local |  |
-| `providers-api` | F1 | provider | inproc | I | 5089 | 42 | [providers-api](modules/providers-api/SPEC.md) | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem. |
+| `providers` | — | — | — | C · F | 5392 | 55 | kontrakt wspólny: providers-api, providers-local |  |
+| `providers-api` | F1 | provider | inproc | I | 5093 | 42 | [providers-api](modules/providers-api/SPEC.md) | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem. |
 | `providers-local` | F1 | provider | process | I | 5315 | 49 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
-| `router` | F1 | service | inproc | C · I · F | 5510 | 42 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
+| `router` | F1 | service | inproc | C · I · F | 5546 | 43 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
 
 ## Głos
 
@@ -103,14 +104,14 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `agent-builder` | F5 | service | inproc | C · I · F | 3118 | 17 | [agent-builder](modules/agent-builder/SPEC.md) | Kreator agentek: szkic → podgląd → test na sucho → zapis po zatwierdzeniu; autonomia nigdy L4. |
-| `agent-runtime` | F3, F5 | service | inproc | C · I · F | 8668 | 66 | [agent-runtime](modules/agent-runtime/SPEC.md) | Pętla agentki z budżetami i checkpointami; v1 — równoległość, delegacja z atenuacją, Krytyczka, steering. |
+| `agent-builder` | F5 | service | inproc | C · I · F | 3122 | 17 | [agent-builder](modules/agent-builder/SPEC.md) | Kreator agentek: szkic → podgląd → test na sucho → zapis po zatwierdzeniu; autonomia nigdy L4. |
+| `agent-runtime` | F3, F5 | service | inproc | C · I · F | 8779 | 68 | [agent-runtime](modules/agent-runtime/SPEC.md) | Pętla agentki z budżetami i checkpointami; v1 — równoległość, delegacja z atenuacją, Krytyczka, steering. |
 | `marshal` | F5 | service | inproc | C · I · F | 3307 | 9 | [marshal](modules/marshal/SPEC.md) | Marszałek: polecenia → reguły, które tylko zawężają; nadzór postępu i raport dnia. |
-| `personas` | F2 | service | inproc | C · I · F | 3821 | 32 | [personas](modules/personas/SPEC.md) | Cztery persony, katalog ról, obsady i szablony, adresowanie z polską odmianą imion. |
+| `personas` | F2 | service | inproc | C · I · F | 3822 | 32 | [personas](modules/personas/SPEC.md) | Cztery persony, katalog ról, obsady i szablony, adresowanie z polską odmianą imion. |
 | `scheduler` | F5 | service | inproc | C · I · F | 7599 | 29 | [scheduler](modules/scheduler/SPEC.md) | DAG zadań, równoległe agentki z atomowym przydziałem zasobów, priorytety voice-first, trwałość. |
 | `scheduler-lite` | F2 | service | inproc | C · I · F | 3417 | 15 | [scheduler-lite](modules/scheduler-lite/SPEC.md) | Zasoby wyłączne (mikrofon, głośnik), kolejka mowy, wykrywanie zakleszczeń. |
-| `skills` | F5 | service | inproc | C · I · F | 3194 | 20 | [skills](modules/skills/SPEC.md) | Wersjonowane umiejętności, instalacja po przeglądzie z hashem, kwarantanna treści z zewnątrz. |
-| `tools-browser` | F6 | tool | inproc | C · I · F | 1572 | 8 | [tools-browser](modules/tools-browser/SPEC.md) | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
+| `skills` | F5 | service | inproc | C · I · F | 3195 | 20 | [skills](modules/skills/SPEC.md) | Wersjonowane umiejętności, instalacja po przeglądzie z hashem, kwarantanna treści z zewnątrz. |
+| `tools-browser` | F6 | tool | inproc | C · I · F | 2236 | 10 | [tools-browser](modules/tools-browser/SPEC.md) | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
 | `tools-clipboard` | F3 | tool | inproc | C · I · F | 1060 | 10 | [tools-clipboard](modules/tools-clipboard/SPEC.md) | Odczyt (taint) i zapis schowka z cofaniem; historia schowka — szkic. |
 | `tools-common` | F3 | — | — | C | 2071 | 22 | [tools-common](modules/tools-common/SPEC.md) | Wspólny kontrakt narzędzi: manifest, `Tool`, `BrokerGate`, zasady ścieżek i treści niezaufanej. |
 | `tools-fs` | F3 | tool | inproc | C · I · F | 2758 | 24 | [tools-fs](modules/tools-fs/SPEC.md) | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza. |
@@ -119,13 +120,13 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `tools-net` | F6 | tool | inproc | C · I · F | 3072 | 29 | [tools-net](modules/tools-net/SPEC.md) | `net_fetch`/`net_download` tylko https do hostów publicznych, każdy host i przekierowanie przez Brokera, rebinding odrzucany, kwarantanna z SHA-256 i MOTW. |
 | `tools-office` | F6 | tool | inproc | C · I · F | 1703 | 12 | [tools-office](modules/tools-office/SPEC.md) | Word/Excel przez COM: odczyt (niezaufany) i edycja kopii jako nowa wersja z „Cofnij”; makra wyłączone. |
 | `tools-screen` | F6 | tool | inproc | C · I · F | 884 | 8 | [tools-screen](modules/tools-screen/SPEC.md) | Zrzuty na żądanie z maskowaniem okien Alfy/Brokera, deny-listy i pól haseł. |
-| `tools-shell` | F3 | tool | process | C · I · F | 2361 | 27 | [tools-shell](modules/tools-shell/SPEC.md) | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”. |
-| `tools-system` | F6 | tool | inproc | C · I · F | 2784 | 22 | [tools-system](modules/tools-system/SPEC.md) | Procesy (zakończenie ze strażnikiem celów i tożsamością), usługi przez `system.admin`, Dziennik zdarzeń, zmienne z cofaniem, stan systemu. |
+| `tools-shell` | F3 | tool | process | C · I · F | 2516 | 29 | [tools-shell](modules/tools-shell/SPEC.md) | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”. |
+| `tools-system` | F6 | tool | inproc | C · I · F | 3457 | 26 | [tools-system](modules/tools-system/SPEC.md) | Procesy (zakończenie ze strażnikiem celów i tożsamością), usługi przez `system.admin`, Dziennik zdarzeń, zmienne z cofaniem, stan systemu. |
 | `tools-uia` | F5–F6 | tool | inproc | C · I · F | 1586 | 11 | [tools-uia](modules/tools-uia/SPEC.md) | Drzewo UIA, odczyt `TextPattern`, akcje tylko przez wzorce; wartości haseł nigdy nie wychodzą. |
 | `tools-vision` | F6 | tool | inproc | C · I · F | 2609 | 20 | [tools-vision](modules/tools-vision/SPEC.md) | OCR zrzutu/pliku (`Windows.Media.Ocr`) i opis obrazu przez Router „GUI/wizja”; maskowanie przed OCR i modelem; sesja prywatna tylko lokalnie. |
 | `tools-window` | F6 | tool | inproc | C · I · F | 1398 | 11 | [tools-window](modules/tools-window/SPEC.md) | Okna i monitory dla agentek oraz wspólna bramka GUI (`gui.control`). |
 | `triggers` | F5 | service | inproc | C · I · F | 4676 | 19 | [triggers](modules/triggers/SPEC.md) | Wyzwalacze czasowe (cron w strefie PL z DST), zdarzeniowe i ręczne; nigdy nie uruchamiają mostu CLI. |
-| `ui-terminal` | F4 | ui-panel | inproc | C · I · F | 1103 | 8 | [ui-terminal](modules/ui-terminal/SPEC.md) | Terminal ConPTY sterowany wyłącznie przez użytkownika (logowanie do CLI); treść poza logami i zdarzeniami. |
+| `ui-terminal` | F4 | ui-panel | inproc | C · I · F | 1122 | 8 | [ui-terminal](modules/ui-terminal/SPEC.md) | Terminal ConPTY sterowany wyłącznie przez użytkownika (logowanie do CLI); treść poza logami i zdarzeniami. |
 
 ## Samonaprawa i ulepszanie
 
@@ -134,7 +135,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `diagnostician` | F8 | service | inproc | C · I · F | 7170 | 22 | [diagnostician](modules/diagnostician/SPEC.md) | Diagnosta: katalog 24 awarii, naprawy cofalne z weryfikacją, raport „Zdrowie systemu”. |
 | `evals` | F8 | service | inproc | C · I · F | 4526 | 33 | [evals](modules/evals/SPEC.md) | Harness zestawów: manifest z SHA-256, podziały dev/test/holdout, bootstrap, bramka holdoutu w Jądrze. |
 | `improver` | F8 | service | inproc | C · I · F | 4022 | 18 | [improver](modules/improver/SPEC.md) | Ulepszacz R0–R2: propozycje zmian ustawień przez piaskownicę i holdout; nigdy Jądro ani progi. |
-| `plugin-runtime` | F8 | service | inproc | C · I · F | 5865 | 37 | [plugin-runtime](modules/plugin-runtime/SPEC.md) | Wtyczki Wasm (wasmtime, WIT bez WASI): jedyny import `host.call` przez Brokera, paliwo, epoki, limity; zatwierdzenie z hashem. |
+| `plugin-runtime` | F8 | service | inproc | C · I · F | 5867 | 37 | [plugin-runtime](modules/plugin-runtime/SPEC.md) | Wtyczki Wasm (wasmtime, WIT bez WASI): jedyny import `host.call` przez Brokera, paliwo, epoki, limity; zatwierdzenie z hashem. |
 
 ## Planowane (plan v6)
 
@@ -146,25 +147,27 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `app-agents` | — | — | — | pojedynczy | 4258 | 26 | — |  |
-| `app-api` | — | — | — | pojedynczy | 7333 | 32 | — |  |
-| `app-bridges` | — | — | — | pojedynczy | 839 | 6 | — |  |
-| `app-broker` | — | — | — | pojedynczy | 4387 | 24 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 2167 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 17 070 | 113 | — |  |
-| `app-files` | — | — | — | pojedynczy | 3184 | 26 | — |  |
+| `app-agents` | — | — | — | pojedynczy | 4395 | 30 | — |  |
+| `app-api` | — | — | — | pojedynczy | 7660 | 32 | — |  |
+| `app-bridges` | — | — | — | pojedynczy | 1190 | 9 | — |  |
+| `app-broker` | — | — | — | pojedynczy | 4384 | 24 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 2287 | 6 | — |  |
+| `app-core` | — | — | — | pojedynczy | 17 729 | 120 | — |  |
+| `app-diag` | — | — | — | pojedynczy | 545 | 3 | — |  |
+| `app-files` | — | — | — | pojedynczy | 3315 | 26 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
 | `app-health` | — | — | — | pojedynczy | 1482 | 6 | — |  |
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
+| `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
-| `app-models` | — | — | — | pojedynczy | 7554 | 46 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 5364 | 34 | — |  |
+| `app-models` | — | — | — | pojedynczy | 7619 | 47 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 6011 | 38 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |
 | `app-store` | — | — | — | pojedynczy | 468 | 0 | — |  |
-| `app-tasks` | — | — | — | pojedynczy | 3658 | 13 | — |  |
-| `app-terminal` | — | — | — | pojedynczy | 441 | 2 | — |  |
+| `app-tasks` | — | — | — | pojedynczy | 3660 | 13 | — |  |
+| `app-terminal` | — | — | — | pojedynczy | 493 | 3 | — |  |
 | `app-updates` | — | — | — | pojedynczy | 1301 | 13 | — |  |
 | `app-voice` | — | — | — | pojedynczy | 6108 | 32 | — |  |
 
@@ -173,10 +176,11 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `lib-embed` | — | — | — | pojedynczy | 4572 | 44 | — |  |
-| `lib-markdown` | — | — | — | pojedynczy | 1979 | 25 | — |  |
+| `lib-markdown` | — | — | — | pojedynczy | 2054 | 26 | — |  |
 | `lib-media` | — | — | — | pojedynczy | 2049 | 17 | — |  |
 | `lib-netguard` | — | — | — | pojedynczy | 649 | 7 | — |  |
 | `lib-openai-compat` | — | — | — | pojedynczy | 1714 | 11 | — |  |
+| `lib-quick` | — | — | — | pojedynczy | 1112 | 11 | — |  |
 | `lib-sidecar-guard` | — | — | — | pojedynczy | 518 | 4 | — |  |
 | `lib-smart-turn` | — | — | — | pojedynczy | 588 | 7 | — |  |
 | `lib-sqlstore` | — | — | — | pojedynczy | 1321 | 30 | — |  |
@@ -189,15 +193,22 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `example-module` | — | service | inproc | C · I · F | 384 | 8 | — |  |
 | `spike-data` | — | — | — | pojedynczy | 488 | 4 | — |  |
 
+## Pozostałe
+
+| Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
+| --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
+| `pc-diag` | — | service | inproc | C · I · F | 2838 | 13 | — |  |
+| `tools-dev` | — | tool | inproc | C · I · F | 1495 | 10 | — |  |
+
 ## Niespójności do uporządkowania
 
 | Reguła | Liczba | Pozycje |
 | --- | ---: | --- |
 | SPEC w indeksie bez crate’a w `crates/` (moduły UI i powłoki są poza `crates/`) | 6 | `models`, `shell-integration`, `notify`, `ui-kit`, `ui-shell`, `ui-quick` |
 | SPEC modułów planowanych, jeszcze bez kodu (plan v6 — nie niespójność) | 12 | `platform-select`, `remote-gateway`, `device-pairing`, `remote-relay`, `host-headless`, `web-panel`, `offline-client`, `platform-android`, `platform-linux`, `vision-describe`, `person-recognition`, `person-memory` |
-| Moduł z trójką crate’ów bez SPEC | 1 | `example-module` |
+| Moduł z trójką crate’ów bez SPEC | 3 | `example-module`, `pc-diag`, `tools-dev` |
 | Crate `-impl` bez `module.toml` | 1 | `core-bus-impl` |
-| Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | 6 | `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
-| Crate bez `README.md` | 0 | brak |
+| Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | 7 | `platform-windows-diag-impl`, `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
+| Crate bez `README.md` | 7 | `app-diag`, `app-mcp`, `pc-diag-contract`, `pc-diag-fake`, `platform-windows-diag-impl`, `tools-dev-contract`, `tools-dev-fake` |
 | Plik Rust powyżej 400 linii | 5 | `crates/router-impl/tests/decisions.rs` (437), `crates/accounts-hub-fake/src/hub.rs` (419), `crates/voice-tts-impl/tests/tts.rs` (412), `crates/app-core/tests/dto_roundtrip.rs` (406), `crates/providers-local-impl/tests/lifecycle.rs` (404) |
 | Crate powyżej 8000 linii w `src/` | 0 | brak |

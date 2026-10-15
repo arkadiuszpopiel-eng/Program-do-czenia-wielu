@@ -133,7 +133,10 @@ impl ChatEngine {
                 EventLevel::Info,
             ),
             (Some(c), None, None) => (c.model.clone(), EventLevel::Info),
-            (None, _, None) => ("Wywołanie modelu".to_owned(), EventLevel::Info),
+            (None, _, None) => match outcome.local {
+                Some(name) => (format!("Bez modelu: {name}"), EventLevel::Info),
+                None => ("Wywołanie modelu".to_owned(), EventLevel::Info),
+            },
         };
         let event = TimelineEvent {
             id: ids::timeline_dto(&req.session),
