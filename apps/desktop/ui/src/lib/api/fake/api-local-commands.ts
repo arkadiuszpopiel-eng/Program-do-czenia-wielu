@@ -11,14 +11,18 @@ const BUILTINS: readonly BuiltinCommand[] = [
     examples: ['Ile to jest 7 razy 8?', '20% z 150'],
   },
   { title: 'Literowanie jednego słowa', examples: ['Przeliteruj rower'] },
-  { title: 'Kostka, moneta, liczba losowa', examples: ['Rzuć kostką', 'orzeł czy reszka?'] },
+  {
+    title: 'Kostka, moneta, liczba losowa, wybór z podanej listy',
+    examples: ['Rzuć kostką', 'wybierz jedno: pizza, sushi, żurek'],
+  },
   { title: 'Data i godzina z zegara komputera', examples: ['Która godzina?'] },
   {
     title: 'Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)',
     examples: ['Przepytaj mnie z tabliczki mnożenia'],
   },
   {
-    title: 'Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni',
+    title:
+      'Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni, lata przestępne',
     examples: ['Ile dni do 24 grudnia?', 'Jaki dzień tygodnia był 1 stycznia 2000?'],
   },
   {

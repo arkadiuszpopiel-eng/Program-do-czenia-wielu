@@ -8,6 +8,8 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod calendar;
+mod choice;
 mod clock;
 pub mod custom;
 mod dates;
@@ -119,8 +121,9 @@ pub const CATALOG: &[Entry] = &[
     },
     Entry {
         command: Command::Random,
-        title: "Kostka, moneta, liczba losowa",
+        title: "Kostka, moneta, liczba losowa, wybór z podanej listy",
         examples: &[
+            "wybierz jedno: pizza, sushi, żurek",
             "Rzuć kostką",
             "rzuć dwiema kostkami",
             "orzeł czy reszka?",
@@ -149,8 +152,10 @@ pub const CATALOG: &[Entry] = &[
     },
     Entry {
         command: Command::Dates,
-        title: "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni",
+        title: "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni, lata przestępne",
         examples: &[
+            "czy 2028 jest rokiem przestępnym",
+            "ile dni ma luty 2028",
             "Ile dni do 24 grudnia?",
             "ile dni minęło od 1 września",
             "Jaki dzień tygodnia był 1 stycznia 2000?",
@@ -205,10 +210,16 @@ pub fn answer(
     if let Some(t) = dates::answer(&text, now) {
         return reply(Command::Dates, t);
     }
+    if let Some(t) = calendar::answer(&text, now) {
+        return reply(Command::Dates, t);
+    }
     if let Some(t) = spell::answer(message, &text) {
         return reply(Command::Spell, t);
     }
     if let Some(t) = random::answer(&text, roll) {
+        return reply(Command::Random, t);
+    }
+    if let Some(t) = choice::answer(message, roll) {
         return reply(Command::Random, t);
     }
     if let Some(t) = units::answer(&text) {
