@@ -1,8 +1,8 @@
-# Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.53)
+# Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)
 
 Praca od ok. 23:15 do 5:00 na Twoje polecenie: „kontynuuj ulepszenia wraz z testami; decyzje z dokumentu 25 wykonaj
-tak, jak uważasz za najlepsze dla programu; o koncie Google przypomnij o 10:00”. Ostatnia zbudowana i sprawdzona
-wersja to **0.0.53**. Ten dokument mówi, co doszło, jak to sprawdziłem, czego nie sprawdziłem i co zostaje.
+tak, jak uważasz za najlepsze dla programu; o koncie Google przypomnij o 10:00”. Ostatnia w pełni sprawdzona wersja
+to **0.0.53**; ostatnia zbudowana i wgrana — **0.0.54** (jedna poprawka, sprawdzenie węższe — niżej). Ten dokument mówi, co doszło, jak to sprawdziłem, czego nie sprawdziłem i co zostaje.
 
 ## 1. Najważniejsze w czterech punktach
 
@@ -20,6 +20,7 @@ wersja to **0.0.53**. Ten dokument mówi, co doszło, jak to sprawdziłem, czego
 | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 0.0.52 | Ustawienia → Stan połączeń; sprawdzanie logowania po „Gotowe”; Antigravity (logowanie i most z ostrzeżeniem)                                                                            |
 | 0.0.53 | Izolacja poleceń powłoki (integralność Low); Markdown w wątkach; wasmtime 36.0.18 (RUSTSEC-2026-0363); testy prawdziwej aplikacji obejmują 71,8 % poleceń; poprawki po przeglądzie kodu |
+| 0.0.54 | Werdykt Krytyczki rozpoznawany mimo literówki lekkiego modelu (poprawna odpowiedź nie idzie już do zbędnej poprawki) |
 
 ### Decyzje z dokumentu 25 — co wybrałem i dlaczego
 
@@ -49,6 +50,14 @@ wersja to **0.0.53**. Ten dokument mówi, co doszło, jak to sprawdziłem, czego
   `target/verify/0.0.53/raport-wersja.md`. Wcześniejsze biegi padały na przeciążeniu maszyny (mało pamięci,
   27 GB wolnego na E:) — usunąłem 116,6 GB starych plików kompilacji (do odtworzenia), a testy przeglądarkowe
   dostały limity dopasowane do obciążenia.
+
+- Próba obowiązków na prawdziwym modelu lokalnym (0.0.53, ok. 3:30): rano zielony (329 s), wieczór przekroczył
+  10 min. Przyczyna: komputer przeciążony (ok. 2 GB wolnej pamięci; model generował ok. 1,4 słowa/s zamiast ok. 11 —
+  te same wybory routera co w zielonej próbie z 0.0.52, rano 58 s / wieczór 28 s). Dziennik pokazał przy tym
+  prawdziwy błąd: Krytyczka napisała „WERYFIkcja: OK”, a Alfa wzięła to za odrzucenie i zleciła poprawkę —
+  naprawione w 0.0.54: testy modułu agentek zielone, clippy czysty, budowa i test prawdziwej aplikacji 32 z 32
+  (pokrycie łącza 71,8 %), wgrane do `Alfa-uruchomiona` o 4:03 i sprawdzony start (`wersja=0.0.54`, bez błędów).
+  **Pełne `verify wersja` dla 0.0.54 — nie zdążyłem przed 5:00** (trwa ok. 80 min); 0.0.53 przeszła je w całości.
 
 ## 4. Czego nie sprawdziłem
 
