@@ -4,7 +4,9 @@ use crate::{DiagProbe, Snapshot};
 
 /// Zapis spójny: procesor i pamięć opisane, woluminy w granicach rozmiaru, brak adresów sieci.
 pub fn snapshot_is_consistent<P: DiagProbe + ?Sized>(probe: &P) -> Snapshot {
-    let s = probe.snapshot().expect("zapis parametrów");
+    let s = probe
+        .snapshot()
+        .unwrap_or_else(|e| panic!("zapis parametrów: {e}"));
     assert!(!s.cpu.name.is_empty(), "nazwa procesora");
     assert!(
         s.cpu.threads >= s.cpu.cores && s.cpu.cores > 0,
@@ -19,7 +21,7 @@ pub fn snapshot_is_consistent<P: DiagProbe + ?Sized>(probe: &P) -> Snapshot {
             v.letter
         );
     }
-    let json = serde_json::to_string(&s).expect("JSON");
+    let json = serde_json::to_string(&s).unwrap_or_else(|e| panic!("JSON: {e}"));
     for forbidden in ["IPAddress", "MACAddress", "\"mac\"", "\"ip\""] {
         assert!(
             !json.contains(forbidden),
