@@ -26,4 +26,11 @@ export const plStats = {
   'stats.copy': 'Kopiuj jako Markdown',
   'stats.copied': 'Skopiowano statystyki.',
   'stats.close': 'Zamknij',
+  'action.copyConversation': 'Kopiuj rozmowę (Markdown)',
+  'copyConv.you': 'Ty',
+  'copyConv.untitled': 'Rozmowa',
+  'copyConv.aiNote':
+    'Wiadomości oznaczone „AI” wygenerowała sztuczna inteligencja (modele językowe) — mogą zawierać błędy.',
+  'copyConv.done': 'Skopiowano rozmowę jako Markdown.',
+  'copyConv.empty': 'Ta rozmowa nie ma jeszcze wiadomości.',
 };

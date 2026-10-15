@@ -40,6 +40,23 @@ test('polecenia bez modelu: przykład wbudowany trafia do testera', async ({ pag
   await expect(page.getByTestId('commands-test-result')).toContainText('rachunek');
 });
 
+test('paleta: „Kopiuj rozmowę (Markdown)” z notą o treści AI', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await open(page);
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('dialog[open] input')).toBeFocused();
+  await page.keyboard.type('Kopiuj rozmowę');
+  await expect(page.locator('dialog [role=option][data-selected]')).toContainText(
+    'Kopiuj rozmowę (Markdown)',
+  );
+  await page.keyboard.press('Enter');
+  await expect(page.getByText('Skopiowano rozmowę jako Markdown.')).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied.startsWith('# ')).toBe(true);
+  expect(copied).toContain('wygenerowała sztuczna inteligencja');
+  expect(copied).toContain('### Ty · ');
+});
+
 for (const skin of ['classic', 'glass', 'next'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`seria 4 — podpowiedź i przykłady: ${skin}, ${theme}`, async ({ page }) => {

@@ -47,9 +47,13 @@ Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
   `Ctrl+K` → **Pokaż Tablicę**: wyszukiwanie, otwórz rozmowę, kopiuj, odepnij, „Kopiuj wszystko (Markdown)”),
 - **Zapisz jako szablon promptu** (Twoje wiadomości) — treść trafia do szablonów, nazwa z pierwszej linii.
 
+Pod polem pisania pojawia się dopisek **„Bez modelu: …”**, gdy wpisana wiadomość dostanie odpowiedź od razu,
+bez modelu (polecenie wbudowane, własne albo quiz).
+
 **Statystyki rozmowy** (paleta `Ctrl+K` → „Statystyki rozmowy”) pokazują dla bieżącej ścieżki: liczbę wiadomości
 i słów, czas czytania, tokeny, koszt odpowiedzi, średni czas odpowiedzi, użycia narzędzi, okres, inne wersje
-(gałęzie po „edytuj” i „ponów”) oraz modele — z kopią jako Markdown.
+(gałęzie po „edytuj” i „ponów”) oraz modele — z kopią jako Markdown. Całą bieżącą rozmowę skopiujesz do schowka paletą → **Kopiuj rozmowę (Markdown)** — z oznaczeniem
+wiadomości wygenerowanych przez AI, jak w eksporcie.
 
 Styl odpowiedzi (zwięźle, szczegółowo, prostym językiem, formalnie) i swobodę (precyzyjnie, zrównoważenie, twórczo)
 ustawisz w Ustawienia → Ogólne; „Automatycznie” zostawia to personie agentki i modelowi.

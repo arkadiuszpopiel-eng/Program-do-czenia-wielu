@@ -8,7 +8,7 @@ import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
 import { RESERVED, allowedInInput, chordFromEvent } from '../logic/shortcuts';
 import type { AppState } from './app.svelte';
 import { attempt, showError } from './attempt';
-import { exportConversation } from './exports';
+import { copyConversation, exportConversation } from './exports';
 import { openTemplates } from './template-dialog.svelte';
 import { openBoard } from './board-dialog.svelte';
 import { openStats } from './stats-dialog.svelte';
@@ -41,6 +41,7 @@ export const EXTRA_COMMANDS = [
   'action.help',
   'action.board',
   'action.stats',
+  'action.copyConversation',
 ] as const;
 
 const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
@@ -203,6 +204,9 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.stats':
       openStats();
+      break;
+    case 'action.copyConversation':
+      void copyConversation(app);
       break;
     case 'action.help':
       app.openSettings('help');
