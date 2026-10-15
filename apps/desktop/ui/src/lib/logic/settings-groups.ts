@@ -3,7 +3,7 @@
 // grupy „other”, żeby nigdy nie zniknęła z nawigacji.
 
 export const SETTINGS_GROUPS = [
-  { id: 'basics', pages: ['general', 'appearance', 'language', 'shortcuts', 'commands', 'notifications'] },
+  { id: 'basics', pages: ['general', 'appearance', 'language', 'shortcuts', 'commands', 'templates', 'notifications'] },
   {
     id: 'models',
     pages: ['connections', 'providers', 'api', 'bridges', 'models', 'costs', 'router'],

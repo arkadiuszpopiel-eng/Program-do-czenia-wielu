@@ -7,7 +7,6 @@
 #![allow(missing_docs)]
 
 mod advanced;
-mod quick;
 mod agents;
 mod bridges;
 mod broker;
@@ -28,19 +27,18 @@ mod models;
 mod modules;
 mod panels;
 mod plugins;
+mod quick;
 mod sessions;
 mod skills;
 mod system;
 mod tasks;
+mod templates;
 mod transfer;
 mod updates;
 mod voice_engines;
 mod voice_features;
 
 pub use advanced::RawConfig;
-pub use quick::{
-    BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
-};
 pub use agents::{
     AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
     RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,
@@ -113,6 +111,9 @@ pub use plugins::{
     PluginCapabilityView, PluginInfo, PluginInspection, PluginLimitsView, PluginOrigin,
     PluginProblem, PluginProblemKind, PluginR2View, PluginStateView, PluginToolView, PluginsView,
 };
+pub use quick::{
+    BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
+};
 pub use sessions::{
     ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,
     RiskLevel, SendOptions, SendResult, SessionSearchHit, SessionSummary, SessionTemplate,
@@ -134,6 +135,7 @@ pub use tasks::{
     MarshalState, NewTaskInput, TaskClassKind, TaskDep, TaskInfo, TaskOriginKind, TaskResultKind,
     TaskStateKind, TriggerDraft, TriggerInfo, TriggerKindView, TriggerRunInfo,
 };
+pub use templates::PromptTemplate;
 pub use transfer::{
     CollisionResolution, DryRunItem, DryRunKind, ExportRequest, ExportResult, ExportScope,
     ImportMode, ImportRequest, ImportResult, InspectResult, ItemDiff, PackageManifestSummary,

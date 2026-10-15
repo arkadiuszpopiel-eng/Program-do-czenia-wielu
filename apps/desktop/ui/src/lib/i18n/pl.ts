@@ -25,6 +25,7 @@ import { plDiag } from './pl-diag';
 import { plModules } from './pl-modules';
 import { plAdvanced } from './pl-advanced';
 import { plCommands } from './pl-commands';
+import { plTemplates } from './pl-templates';
 
 export const pl = {
   ...plApp,
@@ -51,6 +52,7 @@ export const pl = {
   ...plModules,
   ...plAdvanced,
   ...plCommands,
+  ...plTemplates,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

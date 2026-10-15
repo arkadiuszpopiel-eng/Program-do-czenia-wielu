@@ -131,6 +131,8 @@ pub enum SettingsCustomPage {
     Advanced,
     /// Polecenia bez modelu: włączanie, własne polecenia, tester, katalog wbudowanych.
     Commands,
+    /// Szablony promptów ze zmiennymi.
+    Templates,
     /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }

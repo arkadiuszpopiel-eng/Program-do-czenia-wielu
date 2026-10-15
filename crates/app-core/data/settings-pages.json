@@ -2291,6 +2291,17 @@
   "upcoming": []
  },
  {
+  "id": "templates",
+  "label": {
+   "pl": "Szablony promptów",
+   "en": "Prompt templates"
+  },
+  "wave": 1,
+  "custom": "templates",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "notifications",
   "label": {
    "pl": "Powiadomienia",

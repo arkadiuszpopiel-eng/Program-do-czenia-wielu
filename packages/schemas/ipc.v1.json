@@ -8908,6 +8908,28 @@
       ],
       "type": "object"
     },
+    "PromptTemplate": {
+      "description": "Szablon promptu: tekst ze zmiennymi `{{nazwa}}` do uzupełnienia przed wstawieniem.",
+      "properties": {
+        "id": {
+          "description": "Identyfikator (pusty przy dodawaniu — nadaje rdzeń).",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "text": {
+          "description": "Treść ze zmiennymi `{{nazwa}}`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "text"
+      ],
+      "type": "object"
+    },
     "ProviderInfo": {
       "description": "Wpis katalogu dostawców.",
       "properties": {
@@ -10434,6 +10456,11 @@
         {
           "const": "commands",
           "description": "Polecenia bez modelu: włączanie, własne polecenia, tester, katalog wbudowanych.",
+          "type": "string"
+        },
+        {
+          "const": "templates",
+          "description": "Szablony promptów ze zmiennymi.",
           "type": "string"
         },
         {
@@ -15239,6 +15266,34 @@
       ],
       "result": {
         "$ref": "#/$defs/PluginsView"
+      }
+    },
+    "prompt_templates_get": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/PromptTemplate"
+        },
+        "type": "array"
+      }
+    },
+    "prompt_templates_set": {
+      "args": [
+        {
+          "name": "templates",
+          "schema": {
+            "items": {
+              "$ref": "#/$defs/PromptTemplate"
+            },
+            "type": "array"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/PromptTemplate"
+        },
+        "type": "array"
       }
     },
     "quick_ask": {

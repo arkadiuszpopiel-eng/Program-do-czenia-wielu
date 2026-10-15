@@ -85,3 +85,8 @@ export const localCommandsApi = (): AlfaClient['localCommands'] => ({
   set: (commands) => call('quick_commands_set', { commands }),
   test: (message) => call('quick_commands_test', { message }),
 });
+
+export const templatesApi = (): AlfaClient['templates'] => ({
+  list: () => call('prompt_templates_get'),
+  save: (templates) => call('prompt_templates_set', { templates }),
+});

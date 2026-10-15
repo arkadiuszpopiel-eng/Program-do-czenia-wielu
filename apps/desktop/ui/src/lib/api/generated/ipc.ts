@@ -2406,6 +2406,15 @@ export interface ProjectRef {
   readonly name: string;
 }
 
+/** Szablon promptu: tekst ze zmiennymi `{{nazwa}}` do uzupełnienia przed wstawieniem. */
+export interface PromptTemplate {
+  /** Identyfikator (pusty przy dodawaniu — nadaje rdzeń). */
+  readonly id: string;
+  readonly name: string;
+  /** Treść ze zmiennymi `{{nazwa}}`. */
+  readonly text: string;
+}
+
 /** Wpis katalogu dostawców. */
 export interface ProviderInfo {
   readonly auth: AuthKind;
@@ -2837,6 +2846,7 @@ export type SettingsCustomPage =
   | 'modules'
   | 'advanced'
   | 'commands'
+  | 'templates'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -4144,6 +4154,14 @@ export interface IpcCommands {
   readonly plugins_remove: {
     readonly args: { readonly pluginId: string };
     readonly result: PluginsView;
+  };
+  readonly prompt_templates_get: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly PromptTemplate[];
+  };
+  readonly prompt_templates_set: {
+    readonly args: { readonly templates: readonly PromptTemplate[] };
+    readonly result: readonly PromptTemplate[];
   };
   readonly quick_ask: { readonly args: { readonly text: string }; readonly result: QuickAskResult };
   readonly quick_commands_get: {

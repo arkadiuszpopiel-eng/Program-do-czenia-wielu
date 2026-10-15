@@ -4,6 +4,7 @@ pub(crate) mod account_keys;
 mod accounts;
 mod advanced;
 mod local_commands;
+mod templates;
 mod agents;
 pub(crate) mod app;
 mod bridges;

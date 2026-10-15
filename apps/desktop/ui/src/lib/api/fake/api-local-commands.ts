@@ -46,7 +46,10 @@ function matches(c: CustomCommand, message: string): string | null {
 
 function builtin(message: string): QuickTest | null {
   const text = fold(message);
-  const raw = message.toLowerCase().trim().replace(/[?!.]+$/, '');
+  const raw = message
+    .toLowerCase()
+    .trim()
+    .replace(/[?!.]+$/, '');
   const math = /^(?:ile to (?:jest )?)?(\d+) ?(\+|-|razy|\*) ?(\d+)$/.exec(raw);
   if (math) {
     const [a, b] = [Number(math[1]), Number(math[3])];

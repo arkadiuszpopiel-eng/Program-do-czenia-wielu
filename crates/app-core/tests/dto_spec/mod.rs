@@ -129,6 +129,11 @@ pub fn spec(command: &str) -> Option<Spec> {
             roundtrip::<QuickCommandsView>,
         ),
         "quick_commands_test" => (vec![("message", s)], roundtrip::<QuickTest>),
+        "prompt_templates_get" => (vec![], roundtrip::<Vec<PromptTemplate>>),
+        "prompt_templates_set" => (
+            vec![("templates", roundtrip::<Vec<PromptTemplate>>)],
+            roundtrip::<Vec<PromptTemplate>>,
+        ),
         "diag_runs" => (
             vec![("limit", roundtrip::<u32>)],
             roundtrip::<Vec<CheckRun>>,

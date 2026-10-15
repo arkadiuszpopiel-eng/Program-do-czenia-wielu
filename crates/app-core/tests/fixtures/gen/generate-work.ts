@@ -148,6 +148,11 @@ export async function runWork(
   await both('advanced', 'raw');
   const quick = (await both('localCommands', 'get')) as { commands: unknown[] };
   await both('localCommands', 'test', 'Ile to jest 7 razy 8?');
+  const templates = (await both('templates', 'list')) as unknown[];
+  await both('templates', 'save', [
+    ...templates,
+    { id: '', name: 'Plan dnia', text: 'Ułóż plan dnia na {{dzień}} z zadaniami: {{zadania}}.' },
+  ]);
   await both('localCommands', 'set', [
     ...quick.commands,
     {

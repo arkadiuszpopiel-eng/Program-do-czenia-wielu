@@ -29,6 +29,7 @@ pub mod handles;
 pub mod late;
 pub mod modules;
 pub mod probe;
+pub mod prompt_templates;
 pub mod quick_commands;
 pub mod raw_config;
 pub mod route;

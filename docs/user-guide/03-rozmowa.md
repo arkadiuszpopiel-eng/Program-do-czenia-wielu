@@ -74,6 +74,14 @@ pracuje w tle; wyróżnienie — nieprzeczytane odpowiedzi. Menu sesji (prawy pr
 
 Każda sesja ma osobną, zaszyfrowaną bazę i osobną pamięć — agentka w jednej sesji nie widzi treści innej.
 
+## Szablony promptów
+
+Często powtarzane prośby zapiszesz jako szablon w Ustawienia → Szablony promptów, ze zmiennymi w podwójnych
+klamrach, np. „Napisz e-mail do {{adresat}} w sprawie {{temat}}”. Paleta `Ctrl+K` → **Wstaw szablon promptu** (albo
+przycisk **Użyj** przy szablonie) otwiera okno: wybierasz szablon, uzupełniasz zmienne, widzisz podgląd i wstawiasz
+tekst do pola wpisywania. Nic nie wysyła się samo — sprawdzasz i wysyłasz. Puste zmienne zostają w tekście
+do poprawienia.
+
 ## Polecenia bez modelu
 
 Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — także bez internetu:
