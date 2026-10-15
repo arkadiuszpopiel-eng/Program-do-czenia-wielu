@@ -96,11 +96,17 @@ fn tokenize(text: &str) -> Option<(Vec<Tok>, bool)> {
     'outer: while i < words.len() {
         let w = words[i];
         if let Some(value) = decimal(w) {
+            if value > LIMIT {
+                return None;
+            }
             out.push(Tok::Num(value));
             i += 1;
             continue;
         }
         if let Some((value, used)) = words::parse(&words[i..]) {
+            if value as f64 > LIMIT {
+                return None;
+            }
             out.push(Tok::Num(value as f64));
             i += used;
             continue;
@@ -172,6 +178,8 @@ fn decimal(w: &str) -> Option<f64> {
 struct Parser<'a> {
     toks: &'a [Tok],
     pos: usize,
+    /// Ostatni czynnik był procentem liczby („23%”) — w sumie to procent lewej strony.
+    percent: bool,
 }
 
 type Calc = Result<f64, &'static str>;
@@ -186,7 +194,10 @@ impl Parser<'_> {
         while let Some(Tok::Op(op @ ('+' | '-'), _)) = self.peek() {
             let op = *op;
             self.pos += 1;
+            self.percent = false;
             let r = self.product()?;
+            // „100 plus 23%” = 123, „200 minus 10%” = 180 (jak w kalkulatorze).
+            let r = if self.percent { v * r } else { r };
             v = if op == '+' { v + r } else { v - r };
         }
         Ok(v)
@@ -197,6 +208,7 @@ impl Parser<'_> {
         while let Some(Tok::Op(op @ ('*' | '/'), _)) = self.peek() {
             let op = *op;
             self.pos += 1;
+            self.percent = false;
             let r = self.unary()?;
             if op == '/' && r == 0.0 {
                 return Err("zero");
@@ -229,9 +241,11 @@ impl Parser<'_> {
 
     fn postfix(&mut self) -> Calc {
         let mut v = self.primary()?;
+        self.percent = false;
         while let Some(Tok::Percent) = self.peek() {
             self.pos += 1;
             v /= 100.0;
+            self.percent = true;
         }
         Ok(v)
     }
@@ -318,6 +332,7 @@ pub fn answer(text: &str) -> Option<String> {
             "Pierwiastka kwadratowego z liczby ujemnej nie ma wśród liczb rzeczywistych.".into()
         }
         Err("syntax") => return None,
+        Ok(v) if v.is_nan() => "To działanie nie ma wyniku wśród liczb rzeczywistych.".into(),
         _ => "Wynik jest za duży, żeby podać go tutaj dokładnie.".into(),
     })
 }
@@ -336,56 +351,5 @@ fn remainder(toks: &[Tok]) -> Option<String> {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::answer;
-
-    #[test]
-    fn computes_and_explains() {
-        assert_eq!(
-            answer("ile to jest 7 razy 8").as_deref(),
-            Some("7 × 8 = **56**")
-        );
-        assert_eq!(answer("2+2*2").as_deref(), Some("2 + 2 × 2 = **6**"));
-        assert_eq!(
-            answer("oblicz (2+3)*4").as_deref(),
-            Some("(2 + 3) × 4 = **20**")
-        );
-        assert_eq!(answer("20% z 150").as_deref(), Some("20% z 150 = **30**"));
-        assert_eq!(answer("pierwiastek z 81").as_deref(), Some("√81 = **9**"));
-        assert_eq!(
-            answer("dwa do potegi dziesiec").as_deref(),
-            Some("2 ^ 10 = **1024**")
-        );
-        assert_eq!(
-            answer("ile to 3,5 razy 2").as_deref(),
-            Some("3,5 × 2 = **7**")
-        );
-        assert_eq!(
-            answer("12 do kwadratu").as_deref(),
-            Some("12 ^ 2 = **144**")
-        );
-        let div = answer("ile to jest 7 podzielone przez 2").unwrap_or_default();
-        assert!(
-            div.starts_with("7 : 2 = **3,5**") && div.contains("3 reszty 1"),
-            "{div}"
-        );
-        assert!(answer("5/0").unwrap_or_default().contains("zero"));
-        assert!(answer("10^40").unwrap_or_default().contains("za duży"));
-    }
-
-    #[test]
-    fn leaves_other_questions_to_the_model() {
-        for text in [
-            "ile kosztuje 5 jablek",
-            "ile to jest kilometr",
-            "2026-10-15",
-            "7",
-            "oblicz",
-            "ile lat ma ziemia",
-            "2 +",
-            "(2+3",
-        ] {
-            assert_eq!(answer(text), None, "{text}");
-        }
-    }
-}
+#[path = "math_tests.rs"]
+mod tests;

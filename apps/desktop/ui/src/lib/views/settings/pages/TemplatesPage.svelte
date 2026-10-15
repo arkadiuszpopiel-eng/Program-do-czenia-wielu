@@ -18,6 +18,7 @@
   let list = $state<readonly PromptTemplate[] | null>(null);
   let loadError = $state<string | null>(null);
   let editing = $state<number | null>(null);
+  let editingId = $state<string | null>(null);
   let name = $state('');
   let text = $state('');
   let formError = $state<string | null>(null);
@@ -40,6 +41,7 @@
 
   function edit(index: number) {
     const current = index >= 0 ? list?.[index] : undefined;
+    editingId = current?.id ?? null;
     name = current?.name ?? '';
     text = current?.text ?? '';
     formError = null;
@@ -63,9 +65,11 @@
   async function save() {
     if (!list || editing === null) return;
     const next = [...list];
-    const item: PromptTemplate = { id: next[editing]?.id ?? '', name, text };
-    if (editing < 0) next.push(item);
-    else next[editing] = item;
+    const id = editing >= 0 ? (editingId ?? '') : '';
+    const item: PromptTemplate = { id, name, text };
+    const at = id ? next.findIndex((x) => x.id === id) : -1;
+    if (at < 0) next.push(item);
+    else next[at] = item;
     if (await store(next)) editing = null;
   }
 
@@ -107,10 +111,18 @@
               <Button size="sm" variant="primary" onclick={() => openTemplates(item.id)}
                 >{t('tpl.use')}</Button
               >
-              <Button size="sm" variant="secondary" disabled={busy} onclick={() => edit(i)}
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={busy || editing !== null}
+                onclick={() => edit(i)}
                 >{t('tpl.edit')}</Button
               >
-              <Button size="sm" variant="ghost" disabled={busy} onclick={() => (confirm = item.id)}
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={busy || editing !== null}
+                onclick={() => (confirm = item.id)}
                 >{t('tpl.remove')}</Button
               >
             {/if}

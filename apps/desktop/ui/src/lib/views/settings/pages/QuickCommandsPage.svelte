@@ -80,8 +80,9 @@
   async function save(command: CustomCommand) {
     if (!view || !editing) return;
     const list = [...view.commands];
-    if (editing.index < 0) list.push(command);
-    else list[editing.index] = command;
+    const at = command.id ? list.findIndex((c) => c.id === command.id) : -1;
+    if (at < 0) list.push(command);
+    else list[at] = command;
     formError = null;
     if (await store(list)) editing = null;
   }
@@ -161,13 +162,17 @@
               <Button
                 size="sm"
                 variant="secondary"
-                disabled={busy}
+                disabled={busy || editing !== null}
                 onclick={() => {
                   formError = null;
                   editing = { index: i, command: c };
                 }}>{t('commands.own.edit')}</Button
               >
-              <Button size="sm" variant="ghost" disabled={busy} onclick={() => (confirm = c.id)}
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={busy || editing !== null}
+                onclick={() => (confirm = c.id)}
                 >{t('commands.own.remove')}</Button
               >
             {/if}

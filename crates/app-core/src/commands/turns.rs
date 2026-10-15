@@ -81,6 +81,7 @@ impl AppCore {
             return Err(AppError::invalid("Wiadomość jest pusta."));
         }
         let first = self.inner.sessions.turn_count(id)? == 0;
+        let plain = blocks.is_empty();
         let mut user = NewTurn::user(text);
         user.content.blocks = blocks;
         let turn = match sibling_of {
@@ -93,8 +94,11 @@ impl AppCore {
             ..TurnMeta::default()
         };
         self.inner.store.put_meta(id, turn.id, &meta)?;
-        let queued =
-            !self.system_status_snapshot_online() && !self.chat().answers_locally(id, text).await;
+        // Offline odpowiada tylko polecenie bez modelu: bez załączników i gdy nic nie czeka
+        // w kolejce sesji (inaczej odpowiedź wyprzedziłaby wcześniejsze wiadomości).
+        let waiting = self.rt().queued.get(id).is_some_and(|q| !q.is_empty());
+        let local = plain && !waiting && self.chat().answers_locally(id, text).await;
+        let queued = !self.system_status_snapshot_online() && !local;
         if queued {
             self.inner
                 .store

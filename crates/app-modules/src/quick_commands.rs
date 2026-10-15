@@ -78,6 +78,15 @@ fn slug(name: &str, taken: &[String]) -> String {
     id
 }
 
+/// Identyfikator z klienta: małe litery łacińskie, cyfry i myślnik, do 64 znaków.
+fn valid_id(id: &str) -> bool {
+    !id.is_empty()
+        && id.len() <= 64
+        && id
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+}
+
 fn bad(what: String) -> AppError {
     AppError::invalid_field("commands", what)
 }
@@ -133,7 +142,7 @@ pub fn validate(commands: Vec<CustomCommand>) -> Result<serde_json::Value, AppEr
     for mut c in commands {
         check(&mut c)?;
         let taken: Vec<String> = out.iter().map(|o| o.id.clone()).collect();
-        if c.id.trim().is_empty() || taken.contains(&c.id) {
+        if !valid_id(&c.id) || taken.contains(&c.id) {
             c.id = slug(&c.name, &taken);
         }
         out.push(c);
@@ -246,6 +255,10 @@ mod tests {
         ] {
             assert!(validate(vec![wrong]).is_err());
         }
+        let mut odd = command("Dziwny", &["x"], QuickMatchMode::Exact, "y");
+        odd.id = "<script>".into();
+        let fixed = parse(Some(&validate(vec![odd]).unwrap()));
+        assert_eq!(fixed[0].id, "dziwny", "identyfikator spoza wzorca nadany od nowa");
         let many = vec![command("a", &["x"], QuickMatchMode::Exact, "y"); 51];
         assert!(validate(many).is_err());
     }

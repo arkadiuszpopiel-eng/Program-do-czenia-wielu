@@ -47,18 +47,41 @@ fn read(p: &Path) -> String {
     std::fs::read_to_string(p).unwrap_or_default()
 }
 
-/// Treść obu plików i problemy z ostatniego wczytania.
+/// Treść obu plików i problemy: składnia każdego pliku sprawdzana teraz, a problemy z walidacji
+/// przy starcie programu — tylko dopóki plik się nie zmienił od startu (po naprawie w edytorze
+/// stary wpis znika). Magazyn konfiguracji to Jądro, więc jego stanu tu nie zmieniamy.
 pub fn get(store: &FileConfigStore, machine: &str) -> RawConfig {
     let dir = store.dir();
     let shared = path(dir, machine, RawLayer::Shared);
     let own = path(dir, machine, RawLayer::Machine);
+    let (shared_text, own_text) = (read(&shared), read(&own));
+    let mut problems: Vec<String> = Vec::new();
+    for (name, text) in [("shared.toml", &shared_text), ("nakładka maszyny", &own_text)] {
+        if let Err(e) = check(text) {
+            problems.push(format!("{name}: {e}"));
+        }
+    }
+    if problems.is_empty() && !store.load_problems().is_empty() && !edited_since_start(&[&shared, &own]) {
+        problems.extend(store.load_problems().iter().cloned());
+    }
     RawConfig {
-        shared: read(&shared),
-        machine: read(&own),
+        shared: shared_text,
+        machine: own_text,
         shared_path: shared.display().to_string(),
         machine_path: own.display().to_string(),
-        problems: store.load_problems().to_vec(),
+        problems,
     }
+}
+
+/// Czy któryś plik zmienił się po starcie procesu (wtedy problemy ze startu są nieaktualne).
+fn edited_since_start(paths: &[&Path]) -> bool {
+    static STARTED: std::sync::OnceLock<std::time::SystemTime> = std::sync::OnceLock::new();
+    let started = *STARTED.get_or_init(std::time::SystemTime::now);
+    paths.iter().any(|p| {
+        std::fs::metadata(p)
+            .and_then(|m| m.modified())
+            .is_ok_and(|t| t > started)
+    })
 }
 
 /// Kontrola składni TOML: liczba kluczy (płasko) albo błąd z wierszem.

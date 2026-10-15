@@ -13,13 +13,13 @@ use lib_quick::custom::{CustomRef, Mode};
 use lib_quick::keys::{CUSTOM, ENABLED};
 use lib_quick::{Command, Reply, quiz};
 use risk_classifier_contract::CommandOrigin;
-use sessions_contract::{Role, SessionHistory, SessionId};
+use sessions_contract::{Author, Role, SessionHistory, SessionId};
 
 use app_api::dto::{AlfaEvent, CustomCommand, QuickMatchMode, StopReason, TurnStatus};
 use app_api::ids;
 
 use crate::engine::{ChatEngine, GenHandle};
-use crate::generate::GenRequest;
+use crate::generate::{GenRequest, Placement};
 use crate::outcome::Outcome;
 use crate::project::render_closed;
 
@@ -81,41 +81,46 @@ impl ChatEngine {
     }
 
     /// Odpowiedź bez modelu: odpowiedź w trwającym quizie sesji, własne polecenie, początek
-    /// quizu albo polecenie wbudowane. Wiadomość spoza quizu kończy go bez słowa.
+    /// quizu albo polecenie wbudowane. Wiadomość spoza quizu kończy go bez słowa. Quiz tylko dla
+    /// świeżej wiadomości (`fresh`) — „ponów” nie ocenia odpowiedzi drugi raz. Własne polecenia
+    /// (wyrażenia regularne) liczone przed blokadą stanu, żeby nie wstrzymywać kill-switcha.
     fn local_reply(
         &self,
         session: &SessionId,
         text: &str,
         commands: Option<&serde_json::Value>,
+        fresh: bool,
     ) -> Option<Reply> {
-        let mut rt = self.rt();
-        if let Some(state) = rt.quizzes.get_mut(session) {
-            let step = quiz::reply(state, text, &mut roll);
-            if step.as_ref().is_none_or(|(_, done)| *done) {
-                rt.quizzes.remove(session);
+        let own = custom(commands, text);
+        if fresh {
+            let mut rt = self.rt();
+            if let Some(state) = rt.quizzes.get_mut(session) {
+                let step = quiz::reply(state, text, &mut roll);
+                if step.as_ref().is_none_or(|(_, done)| *done) {
+                    rt.quizzes.remove(session);
+                }
+                if let Some((text, _)) = step {
+                    return Some(Reply {
+                        command: Command::Quiz,
+                        text,
+                    });
+                }
             }
-            if let Some((text, _)) = step {
+            if own.is_none()
+                && let Some((state, text)) = quiz::start(text, &mut roll)
+            {
+                rt.quizzes.insert(session.clone(), state);
                 return Some(Reply {
                     command: Command::Quiz,
                     text,
                 });
             }
         }
-        if let Some(reply) = custom(commands, text) {
-            return Some(reply);
-        }
-        if let Some((state, text)) = quiz::start(text, &mut roll) {
-            rt.quizzes.insert(session.clone(), state);
-            return Some(Reply {
-                command: Command::Quiz,
-                text,
-            });
-        }
-        drop(rt);
-        lib_quick::answer(text, now(), &mut roll)
+        own.or_else(|| lib_quick::answer(text, now(), &mut roll))
     }
 
-    /// Polecenie w ostatniej wiadomości użytkownika (tylko świeża tura z tekstu albo głosu).
+    /// Polecenie w ostatniej wiadomości użytkownika (tylko tura z tekstu albo głosu, autor —
+    /// użytkownik, bez załączników).
     pub(crate) async fn quick(&self, req: &GenRequest) -> Option<Reply> {
         let from_user = matches!(
             req.origin,
@@ -124,19 +129,34 @@ impl ChatEngine {
         if req.continues.is_some() || !from_user {
             return None;
         }
-        let path = self
-            .inner
-            .sessions
-            .branch_projection(&req.session, req.history_leaf)
-            .ok()?;
-        let last = path.last().filter(|t| t.role == Role::User)?;
+        let sessions = &self.inner.sessions;
+        let last = sessions
+            .turn(&req.session, req.history_leaf)
+            .ok()
+            .filter(|t| t.role == Role::User && t.author == Author::User)?;
         let text = last.content.text.trim().to_owned();
+        // Przed nią czeka nieodpowiedziana wiadomość (np. z kolejki offline) — odpowiada model,
+        // żeby wcześniejsze pytanie nie zostało bez odpowiedzi.
+        let after_unanswered = last
+            .parent
+            .and_then(|p| sessions.turn(&req.session, p).ok())
+            .is_some_and(|p| p.role == Role::User);
+        if after_unanswered {
+            return None;
+        }
         if !last.content.blocks.is_empty() || !self.config_bool(ENABLED, true).await {
             self.rt().quizzes.remove(&req.session);
             return None;
         }
+        // Świeża wiadomość: zwykła odpowiedź, a wiadomość nie ma jeszcze żadnej odpowiedzi
+        // (przy „ponów” ma — wtedy quiz nie rusza, a kostka czy zegar liczą się na nowo).
+        let fresh = matches!(req.placement, Placement::Child(_))
+            && sessions
+                .latest_leaf(&req.session, req.history_leaf)
+                .ok()
+                .is_some_and(|leaf| leaf == req.history_leaf);
         let commands = self.config_value(CUSTOM).await;
-        self.local_reply(&req.session, &text, commands.as_ref())
+        self.local_reply(&req.session, &text, commands.as_ref(), fresh)
     }
 }
 

@@ -9,6 +9,10 @@ use crate::text::fold;
 
 /// Najdłuższe wyrażenie regularne.
 pub const MAX_PATTERN: usize = 300;
+/// Najdłuższa wiadomość, do której pasują własne polecenia (dłuższa idzie do modelu).
+pub const MAX_MESSAGE: usize = 2000;
+/// Najdłuższa odpowiedź po podstawieniu zmiennych.
+pub const MAX_REPLY: usize = 4000;
 
 /// Tryb dopasowania frazy.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -130,6 +134,9 @@ pub fn render(template: &str, vars: &[(String, String)]) -> String {
 
 /// Pierwsze pasujące polecenie: indeks i gotowa odpowiedź.
 pub fn find(commands: &[CustomRef<'_>], message: &str) -> Option<(usize, String)> {
+    if message.chars().count() > MAX_MESSAGE {
+        return None;
+    }
     let mut best: Option<(i32, usize, usize, String)> = None;
     for (i, c) in commands.iter().enumerate().filter(|(_, c)| c.enabled) {
         for phrase in c.phrases {
@@ -145,7 +152,14 @@ pub fn find(commands: &[CustomRef<'_>], message: &str) -> Option<(usize, String)
             }
         }
     }
-    best.map(|(_, _, i, reply)| (i, reply))
+    let (_, _, i, reply) = best?;
+    // Pusta odpowiedź (np. sama `{reszta}` bez dalszego tekstu) — wiadomość idzie dalej.
+    let reply = reply.trim();
+    if reply.is_empty() {
+        return None;
+    }
+    let capped: String = reply.chars().take(MAX_REPLY).collect();
+    Some((i, capped))
 }
 
 #[cfg(test)]
@@ -213,5 +227,14 @@ mod tests {
             "priorytet"
         );
         assert!(compile("(").is_err() && compile(&"a".repeat(301)).is_err());
+        let rest = vec!["powiedz".to_owned()];
+        let only = [cmd(&rest, Mode::Starts, "{reszta}", 0)];
+        assert_eq!(find(&only, "powiedz"), None, "pusta odpowiedź");
+        let long = format!("powiedz {}", "x".repeat(MAX_MESSAGE));
+        assert_eq!(find(&only, &long), None, "za długa wiadomość");
+        let many = vec!["echo".to_owned()];
+        let boom = [cmd(&many, Mode::Starts, &"{reszta}".repeat(50), 0)];
+        let out = find(&boom, &format!("echo {}", "y".repeat(500))).unwrap().1;
+        assert_eq!(out.chars().count(), MAX_REPLY);
     }
 }

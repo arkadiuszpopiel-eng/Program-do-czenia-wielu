@@ -79,6 +79,15 @@ fn slug(name: &str, taken: &[String]) -> String {
     id
 }
 
+/// Identyfikator z klienta: małe litery łacińskie, cyfry i myślnik, do 64 znaków.
+fn valid_id(id: &str) -> bool {
+    !id.is_empty()
+        && id.len() <= 64
+        && id
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+}
+
 fn bad(what: String) -> AppError {
     AppError::invalid_field("templates", what)
 }
@@ -109,7 +118,7 @@ pub fn validate(templates: Vec<PromptTemplate>) -> Result<serde_json::Value, App
             )));
         }
         let taken: Vec<String> = out.iter().map(|o| o.id.clone()).collect();
-        if t.id.trim().is_empty() || taken.contains(&t.id) {
+        if !valid_id(&t.id) || taken.contains(&t.id) {
             t.id = slug(&t.name, &taken);
         }
         out.push(t);

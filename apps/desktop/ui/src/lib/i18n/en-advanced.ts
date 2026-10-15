@@ -8,7 +8,7 @@ export const enAdvanced: Record<keyof typeof plAdvanced, Message> = {
     'Edit the configuration files directly, in TOML. The shared file applies on every computer, the overlay — only on this one. Before saving, Alfa checks the syntax and every key; if something is wrong, the file stays unchanged.',
   'advanced.rules':
     'Kernel settings (approvals, supervision, blocks) cannot be changed here — only through the approval window. Do not put API keys or passwords in files: they belong in Windows Credential Manager.',
-  'advanced.problems': 'Problems from the last load',
+  'advanced.problems': 'Problems with configuration files',
   'advanced.layer': 'File',
   'advanced.layer.shared': 'Shared',
   'advanced.layer.machine': 'This computer',

@@ -196,3 +196,73 @@ async fn custom_commands_reply_test_and_validate() {
     let off = core.quick_commands_test("2+2".into()).await.unwrap();
     assert_eq!(off.source, QuickSource::Disabled);
 }
+
+/// Przegląd serii 1: offline polecenie nie wyprzedza wiadomości w kolejce, a „ponów” odpowiedzi
+/// w quizie nie ocenia odpowiedzi drugi raz (quiz zostaje przy tym samym pytaniu).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn queue_order_and_regenerate_keep_quiz_consistent() {
+    let dir = tempfile::tempdir().unwrap();
+    let provider = Arc::new(ScriptedProvider::new(Duration::from_millis(1)));
+    let opts = options(Some(provider.clone()), Arc::new(HeadlessShell::default()));
+    let core = AppCore::build(AppPaths::under(dir.path()), opts)
+        .await
+        .unwrap();
+    let sid = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    core.set_online(false).await;
+    let first = core
+        .turns_send(sid.clone(), send("Opowiedz o Krakowie", None))
+        .await
+        .unwrap();
+    assert_eq!(first.assistant_turn_id, None);
+    let second = core.turns_send(sid.clone(), send("2+2", None)).await.unwrap();
+    assert_eq!(
+        second.assistant_turn_id, None,
+        "polecenie czeka za wiadomością w kolejce"
+    );
+    core.set_online(true).await;
+    core.system_retry_queue().await.unwrap();
+    for _ in 0..300 {
+        if !provider.requests().is_empty() {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    assert_eq!(
+        provider.requests().len(),
+        1,
+        "po kolejce odpowiada model — wcześniejsze pytanie nie zostaje bez odpowiedzi"
+    );
+    core.turns_stop(sid.clone()).await.unwrap();
+
+    let quiz = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    let (q1, _) = reply(&core, &quiz, "Przepytaj mnie z tabliczki mnożenia przez 3").await;
+    let (a, b) = question(&q1.text);
+    let (r1, r1_id) = reply(&core, &quiz, &(a * b).to_string()).await;
+    let (c, d) = question(&r1.text);
+    let before = provider.requests().len();
+    core.turns_regenerate(quiz.clone(), r1_id.unwrap(), None)
+        .await
+        .unwrap();
+    for _ in 0..300 {
+        if provider.requests().len() > before {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    assert_eq!(
+        provider.requests().len(),
+        before + 1,
+        "„ponów” liczby nie trafia do quizu"
+    );
+    core.turns_stop(quiz.clone()).await.unwrap();
+    let (next, _) = reply(&core, &quiz, &(c * d).to_string()).await;
+    assert!(next.text.starts_with("Dobrze!"), "quiz przy tym samym pytaniu: {}", next.text);
+}
