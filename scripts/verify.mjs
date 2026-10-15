@@ -182,6 +182,13 @@ const STAGES = {
       root,
       0,
     ],
+    [
+      'sbom',
+      'SBOM wydania (CycloneDX) i licencje interfejsu',
+      'node scripts/sbom.mjs --check',
+      root,
+      0,
+    ],
   ],
   sprzet: [
     ['nagrania', 'Nagrania kontrolne 16 kHz', 'node scripts/verify-audio.mjs', root, 0],
