@@ -27,6 +27,7 @@ pub mod embedder;
 pub mod fx_http;
 pub mod gpu_mem;
 pub mod handles;
+pub mod help;
 pub mod late;
 pub mod modules;
 pub mod probe;

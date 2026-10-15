@@ -37,6 +37,7 @@ import { FakeAdvanced } from './api-advanced';
 import { FakeLocalCommands } from './api-local-commands';
 import { FakeTemplates } from './api-templates';
 import { FakeDataRoutes } from './api-data-routes';
+import { FakeHelp } from './api-help';
 import { FakeEngines } from './api-engines';
 import { FakeFiles } from './api-files';
 import { FakeCore, type FakeOptions } from './core';
@@ -89,6 +90,7 @@ export class FakeAlfaClient implements AlfaClient {
   readonly localCommands: AlfaClient['localCommands'];
   readonly templates: AlfaClient['templates'];
   readonly dataRoutes: AlfaClient['dataRoutes'];
+  readonly help: AlfaClient['help'];
   readonly engines: AlfaClient['engines'];
   readonly attachments: AlfaClient['attachments'];
   readonly conversation: AlfaClient['conversation'];
@@ -139,6 +141,7 @@ export class FakeAlfaClient implements AlfaClient {
     this.localCommands = new FakeLocalCommands(core).api();
     this.templates = new FakeTemplates(core).api();
     this.dataRoutes = new FakeDataRoutes(core).api();
+    this.help = new FakeHelp(core).api();
     this.engines = new FakeEngines(core).api();
     const files = new FakeFiles(core);
     this.attachments = files.attachmentsApi();

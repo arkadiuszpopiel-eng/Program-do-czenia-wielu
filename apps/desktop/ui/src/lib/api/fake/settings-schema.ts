@@ -45,6 +45,7 @@ const SETTINGS_LATER: readonly SettingsPageDef[] = [
     { custom: 'commands' },
   ),
   page('templates', L('Szablony promptów', 'Prompt templates'), 1, [], { custom: 'templates' }),
+  page('help', L('Instrukcja', 'User guide'), 1, [], { custom: 'help' }),
 ];
 
 export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [

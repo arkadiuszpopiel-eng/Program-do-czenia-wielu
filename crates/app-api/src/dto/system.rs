@@ -133,6 +133,8 @@ pub enum SettingsCustomPage {
     Commands,
     /// Szablony promptów ze zmiennymi.
     Templates,
+    /// Wbudowana instrukcja (przewodnik użytkownika).
+    Help,
     /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }

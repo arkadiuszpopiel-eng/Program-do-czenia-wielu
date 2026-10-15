@@ -27,6 +27,7 @@ mod models;
 mod modules;
 mod panels;
 mod plugins;
+mod help;
 mod quick;
 mod routes;
 mod sessions;
@@ -115,6 +116,7 @@ pub use plugins::{
 pub use quick::{
     BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
 };
+pub use help::{HelpHit, HelpPage, HelpTopic};
 pub use routes::{DataRoute, DataRoutesView};
 pub use sessions::{
     ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,

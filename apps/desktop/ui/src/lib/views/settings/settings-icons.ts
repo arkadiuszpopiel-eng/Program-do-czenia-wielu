@@ -37,6 +37,7 @@ import Wallet from '@lucide/svelte/icons/wallet';
 import WandSparkles from '@lucide/svelte/icons/wand-sparkles';
 import Zap from '@lucide/svelte/icons/zap';
 import FileText from '@lucide/svelte/icons/file-text';
+import BookOpen from '@lucide/svelte/icons/book-open';
 import Wrench from '@lucide/svelte/icons/wrench';
 
 type Icon = Component<{ size?: number | string; strokeWidth?: number | string }>;
@@ -78,6 +79,7 @@ const ICONS: Record<string, Icon> = {
   advanced: Wrench,
   commands: Zap,
   templates: FileText,
+  help: BookOpen,
   about: Info,
 };
 

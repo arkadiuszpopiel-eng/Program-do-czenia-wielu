@@ -13,7 +13,7 @@ export const SETTINGS_GROUPS = [
   { id: 'safety', pages: ['permissions', 'computer'] },
   { id: 'data', pages: ['memory', 'sessions', 'files', 'transfer', 'logs'] },
   // „Urządzenia” to sprzęt komputera (procesor, karty, bateria) — sprawa systemu, nie głosu.
-  { id: 'system', pages: ['devices', 'diag', 'improve', 'modules', 'updates', 'advanced', 'about'] },
+  { id: 'system', pages: ['devices', 'diag', 'improve', 'modules', 'updates', 'advanced', 'about', 'help'] },
 ] as const;
 
 export type SettingsGroupId = (typeof SETTINGS_GROUPS)[number]['id'] | 'other';

@@ -94,3 +94,9 @@ export const templatesApi = (): AlfaClient['templates'] => ({
 export const dataRoutesApi = (): AlfaClient['dataRoutes'] => ({
   list: () => call('compliance_routes'),
 });
+
+export const helpApi = (): AlfaClient['help'] => ({
+  topics: () => call('help_topics'),
+  page: (id) => call('help_page', { id }),
+  search: (query) => call('help_search', { query }),
+});

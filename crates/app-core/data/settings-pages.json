@@ -2562,5 +2562,16 @@
   "custom": "about",
   "settings": [],
   "upcoming": []
+ },
+ {
+  "id": "help",
+  "label": {
+   "pl": "Instrukcja",
+   "en": "User guide"
+  },
+  "wave": 1,
+  "custom": "help",
+  "settings": [],
+  "upcoming": []
  }
 ]

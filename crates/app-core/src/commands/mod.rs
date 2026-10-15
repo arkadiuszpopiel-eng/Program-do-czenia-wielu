@@ -11,6 +11,7 @@ mod costs;
 pub(crate) mod device;
 mod diag;
 pub(crate) mod files;
+mod help;
 mod local_commands;
 mod mcp;
 mod memory;

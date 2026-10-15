@@ -131,6 +131,9 @@ pub fn spec(command: &str) -> Option<Spec> {
         "quick_commands_test" => (vec![("message", s)], roundtrip::<QuickTest>),
         "prompt_templates_get" => (vec![], roundtrip::<Vec<PromptTemplate>>),
         "compliance_routes" => (vec![], roundtrip::<DataRoutesView>),
+        "help_topics" => (vec![], roundtrip::<Vec<HelpTopic>>),
+        "help_page" => (vec![("id", s)], roundtrip::<HelpPage>),
+        "help_search" => (vec![("query", s)], roundtrip::<Vec<HelpHit>>),
         "prompt_templates_set" => (
             vec![("templates", roundtrip::<Vec<PromptTemplate>>)],
             roundtrip::<Vec<PromptTemplate>>,

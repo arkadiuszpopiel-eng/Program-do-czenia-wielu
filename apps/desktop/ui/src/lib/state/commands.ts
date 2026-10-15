@@ -36,6 +36,7 @@ export const EXTRA_COMMANDS = [
   'action.exportHtml',
   'action.exportJson',
   'action.templates',
+  'action.help',
 ] as const;
 
 const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
@@ -189,6 +190,9 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.stopGeneration':
       void app.stopGeneration();
+      break;
+    case 'action.help':
+      app.openSettings('help');
       break;
     case 'action.templates':
       openTemplates();

@@ -87,6 +87,7 @@ export type SettingsCustomPage =
   | 'advanced'
   | 'commands'
   | 'templates'
+  | 'help'
   | 'models';
 
 export interface SettingsPageDef {
