@@ -41,11 +41,13 @@ Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
 - **Kontynuuj** — dokończ odpowiedź uciętą limitem długości,
 - **Zapamiętaj** — w tej sesji, w projekcie, globalnie albo u agentki (zobacz [Pamięć](06-pamiec.md)),
 - ocena „Dobra odpowiedź” / „Słaba odpowiedź”, **Szczegóły → Oś czasu**, **Ukryj z widoku**,
-- **Eksportuj wiadomość do Markdown / HTML** (menu „Więcej akcji”).
+- **Eksportuj wiadomość do Markdown / HTML / JSON** (menu „Więcej akcji”).
 
 Całą rozmowę (widoczną gałąź, bez wiadomości ukrytych) wyeksportujesz z menu sesji albo z palety `Ctrl+K`:
-**Eksportuj rozmowę do Markdown** / **do HTML**. Plik HTML jest samodzielny: bez skryptów i zasobów z sieci, z fontami
-systemowymi — można go otworzyć w przeglądarce i wydrukować do PDF.
+**Eksportuj rozmowę do Markdown** / **do HTML** / **do JSON**. Plik HTML jest samodzielny: bez skryptów i zasobów
+z sieci, z fontami systemowymi — można go otworzyć w przeglądarce i wydrukować do PDF. JSON służy do dalszej obróbki
+(autor, rola, czas, model, treść, załączniki). Wiadomości agentek są w każdym formacie oznaczone jako wygenerowane
+przez sztuczną inteligencję — czytelnie i w metadanych.
 
 ## Gałęzie: nic nie jest nadpisywane
 

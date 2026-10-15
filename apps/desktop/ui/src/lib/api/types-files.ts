@@ -54,7 +54,7 @@ export interface TurnAttachment {
   readonly artifact_id: string | null;
 }
 
-export type ConversationFormat = 'markdown' | 'html';
+export type ConversationFormat = 'markdown' | 'html' | 'json';
 
 /** Ustawienia kopii (per maszyna). `dir` zmienia wyłącznie natywny dialog (`backups_choose_dir`). */
 export interface BackupConfig {

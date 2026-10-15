@@ -919,7 +919,7 @@ export interface ContextUsage {
 }
 
 /** Format eksportu rozmowy. */
-export type ConversationFormat = 'markdown' | 'html';
+export type ConversationFormat = 'markdown' | 'html' | 'json';
 
 /** Limit miesięczny w podsumowaniu kosztów. */
 export interface CostLimitView {

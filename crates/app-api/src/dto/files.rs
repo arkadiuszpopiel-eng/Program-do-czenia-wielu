@@ -85,6 +85,8 @@ pub struct TurnAttachment {
 pub enum ConversationFormat {
     Markdown,
     Html,
+    /// Dane do dalszej obróbki: wiadomości z autorem, rolą, znacznikiem AI, modelem i czasem.
+    Json,
 }
 
 /// Ustawienia kopii zapasowych (per maszyna, `%LOCALAPPDATA%\Alfa\state\backup.json`).

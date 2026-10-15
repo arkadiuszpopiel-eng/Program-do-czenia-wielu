@@ -96,6 +96,11 @@
         label: t('exp.messageHtml'),
         onSelect: () => void exportConversation(app, conv.sessionId, 'html', turn.id),
       },
+      {
+        id: 'export-json',
+        label: t('exp.messageJson'),
+        onSelect: () => void exportConversation(app, conv.sessionId, 'json', turn.id),
+      },
     );
     return items;
   });

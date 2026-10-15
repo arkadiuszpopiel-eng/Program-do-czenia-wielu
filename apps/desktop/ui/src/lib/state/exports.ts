@@ -1,4 +1,4 @@
-// Eksport rozmowy do Markdown / HTML z menu wiadomości, menu sesji i palety poleceń: rdzeń składa
+// Eksport rozmowy do Markdown / HTML / JSON z menu wiadomości, menu sesji i palety poleceń: rdzeń składa
 // plik (HTML renderowany w Rust, bez skryptów) i pyta o miejsce natywnym dialogiem.
 import type { ConversationFormat } from '../api/types-files';
 import type { AppState } from './app.svelte';

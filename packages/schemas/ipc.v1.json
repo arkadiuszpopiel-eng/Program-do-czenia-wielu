@@ -3495,11 +3495,20 @@
     },
     "ConversationFormat": {
       "description": "Format eksportu rozmowy.",
-      "enum": [
-        "markdown",
-        "html"
-      ],
-      "type": "string"
+      "oneOf": [
+        {
+          "enum": [
+            "markdown",
+            "html"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "json",
+          "description": "Dane do dalszej obróbki: wiadomości z autorem, rolą, znacznikiem AI, modelem i czasem.",
+          "type": "string"
+        }
+      ]
     },
     "CostLimitView": {
       "description": "Limit miesięczny w podsumowaniu kosztów.",

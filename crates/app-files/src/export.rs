@@ -1,5 +1,5 @@
 //! Eksport rozmowy (PLAN §14.8 „eksport sesji do MD/HTML”): aktywna gałąź (albo jedna
-//! wiadomość) jako Markdown albo samodzielny HTML. HTML treści renderuje Rust (`lib-markdown`:
+//! wiadomość) jako Markdown, samodzielny HTML albo JSON. HTML treści renderuje Rust (`lib-markdown`:
 //! pulldown-cmark + ammonia), dokument ma CSP bez skryptów i sieci, fonty systemowe; tytuł, autorzy
 //! i nazwy załączników są escapowane. Tury systemowe, puste i ukryte z widoku są pomijane.
 //!
@@ -259,6 +259,42 @@ pub fn html(title: &str, messages: &[ExportMessage], exported: DateTime<Utc>) ->
         stamp(exported),
         messages.len()
     )
+}
+
+/// JSON (`alfa-conversation`, wersja 1): metadane eksportu ze znacznikiem treści AI i wiadomości
+/// z autorem, rolą, `ai`, modelem, czasem (RFC 3339), treścią (Markdown) i załącznikami.
+pub fn json(title: &str, messages: &[ExportMessage], exported: DateTime<Utc>) -> String {
+    let items: Vec<serde_json::Value> = messages
+        .iter()
+        .map(|m| {
+            serde_json::json!({
+                "author": m.author,
+                "role": if m.user { "user" } else { "assistant" },
+                "ai": m.ai,
+                "model": m.model,
+                "at": m.at.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+                "text": m.text,
+                "attachments": m
+                    .attachments
+                    .iter()
+                    .map(|(name, desc)| serde_json::json!({ "name": name, "description": desc }))
+                    .collect::<Vec<_>>(),
+            })
+        })
+        .collect();
+    let doc = serde_json::json!({
+        "format": "alfa-conversation",
+        "version": 1,
+        "generator": "Alfa",
+        "title": title.trim(),
+        "exported": exported.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+        "ai_generated_messages": ai_count(messages),
+        "digital_source_type": source_type(messages),
+        "messages": items,
+    });
+    let mut out = serde_json::to_string_pretty(&doc).unwrap_or_default();
+    out.push('\n');
+    out
 }
 
 /// Bezpieczna nazwa pliku eksportu: tytuł (litery, cyfry, spacje, myślniki; ≤ 60) + data.

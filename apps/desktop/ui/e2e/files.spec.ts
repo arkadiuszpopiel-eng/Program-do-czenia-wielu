@@ -128,4 +128,12 @@ test('eksport rozmowy z palety i z menu wiadomości', async ({ page }) => {
   await message.getByRole('button', { name: 'Więcej akcji' }).click();
   await page.getByRole('menuitem', { name: 'Eksportuj wiadomość do HTML' }).click();
   await expect(page.getByText(/^Zapisano rozmowę: .*\.html$/)).toBeVisible();
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('dialog[open] input')).toBeFocused();
+  await page.keyboard.type('Eksportuj rozmowę do JSON');
+  await expect(page.locator('dialog [role=option][data-selected]')).toContainText(
+    'Eksportuj rozmowę do JSON',
+  );
+  await page.keyboard.press('Enter');
+  await expect(page.getByText(/^Zapisano rozmowę: .*\.json$/)).toBeVisible();
 });

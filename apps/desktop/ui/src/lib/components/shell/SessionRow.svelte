@@ -61,6 +61,11 @@
       onSelect: () => void exportConversation(app, session.id, 'html'),
     },
     {
+      id: 'export-json',
+      label: t('exp.json'),
+      onSelect: () => void exportConversation(app, session.id, 'json'),
+    },
+    {
       id: 'delete',
       label: t('sessions.delete'),
       danger: true,

@@ -1,6 +1,7 @@
 // Komendy okna głównego: jedno miejsce dla skrótów klawiszowych i palety poleceń.
 // Skróty globalne (Szybkie pytanie, STOP WSZYSTKIEGO) obsługuje rdzeń — nie ma ich tutaj.
 import { errorText } from '../api/command-error';
+import type { ConversationFormat } from '../api/types-files';
 import type { PanelId } from '../api/types-system';
 import { nextColumn, stepZoom } from '../logic/layout';
 import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
@@ -32,7 +33,14 @@ export const EXTRA_COMMANDS = [
   'action.onboarding',
   'action.exportMarkdown',
   'action.exportHtml',
+  'action.exportJson',
 ] as const;
+
+const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
+  'action.exportMarkdown': 'markdown',
+  'action.exportHtml': 'html',
+  'action.exportJson': 'json',
+};
 
 const ONBOARDING_ALLOWED = new Set([
   'view.zoomIn',
@@ -185,7 +193,8 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.exportMarkdown':
     case 'action.exportHtml':
-      void exportConversation(app, sid, id === 'action.exportHtml' ? 'html' : 'markdown');
+    case 'action.exportJson':
+      void exportConversation(app, sid, EXPORT_FORMAT[id] ?? 'markdown');
       break;
   }
 }

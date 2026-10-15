@@ -277,6 +277,7 @@ impl FilesApp {
                 "Markdown",
             ),
             ConversationFormat::Html => (export::html(&meta.title, &messages, now), "html", "HTML"),
+            ConversationFormat::Json => (export::json(&meta.title, &messages, now), "json", "JSON"),
         };
         let name = export::file_name(&meta.title, now, ext);
         let Some(path) = self.shell.pick_save_file(&name, filter, &[ext])? else {

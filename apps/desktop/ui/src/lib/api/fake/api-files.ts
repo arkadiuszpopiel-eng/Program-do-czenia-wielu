@@ -193,7 +193,7 @@ export class FakeFiles {
         if (!session || turns.length === 0) {
           return Promise.reject(new Error('Brak wiadomości do eksportu.'));
         }
-        const ext = format === 'markdown' ? 'md' : 'html';
+        const ext = format === 'markdown' ? 'md' : format;
         const day = new Date(core.scheduler.now()).toISOString().slice(0, 10);
         const result: ExportResult = {
           status: 'saved',

@@ -141,6 +141,44 @@ async fn html_is_sanitized_standalone_document() {
 }
 
 #[tokio::test]
+async fn json_has_roles_ai_marks_and_models() {
+    let env = Env::new();
+    let s = conversation(&env);
+    let path = env.dir.path().join("rozmowa.json");
+    env.shell.answer_dialog(Some(path.clone()));
+    env.app
+        .export_conversation(s.as_str(), ConversationFormat::Json, None)
+        .await
+        .unwrap();
+    let text = std::fs::read_to_string(&path).unwrap();
+    let doc: serde_json::Value = serde_json::from_str(&text).unwrap();
+    assert_eq!(doc["format"], "alfa-conversation");
+    assert_eq!(doc["version"], 1);
+    assert_eq!(doc["ai_generated_messages"], 2);
+    assert!(
+        doc["digital_source_type"]
+            .as_str()
+            .unwrap()
+            .ends_with("compositeWithTrainedAlgorithmicMedia")
+    );
+    let messages = doc["messages"].as_array().unwrap();
+    assert_eq!(messages.len(), 3, "bez tur ukrytych i systemowych");
+    assert_eq!(messages[0]["role"], "user");
+    assert_eq!(messages[0]["ai"], false);
+    assert_eq!(messages[1]["role"], "assistant");
+    assert_eq!(messages[1]["ai"], true);
+    assert_eq!(messages[1]["model"], "openai/gpt-5");
+    assert!(
+        messages[2]["text"]
+            .as_str()
+            .unwrap()
+            .contains("<script>alert(2)</script>"),
+        "JSON to dane — treść bez zmian (escapowana przez serializację)"
+    );
+    assert!(env.shell.calls().iter().any(|c| c.contains(".json")));
+}
+
+#[tokio::test]
 async fn single_message_cancel_and_errors() {
     let env = Env::new();
     let s = conversation(&env);

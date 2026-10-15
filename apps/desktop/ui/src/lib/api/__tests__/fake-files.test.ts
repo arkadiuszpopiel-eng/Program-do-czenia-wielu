@@ -73,6 +73,8 @@ describe('atrapa: eksport rozmowy i kopie zapasowe', () => {
     expect(md.status === 'saved' && md.path.endsWith('.md')).toBe(true);
     const html = await client.conversation.exportConversation('s-q3', 'html', 'q3');
     expect(html.status === 'saved' && html.path.endsWith('.html')).toBe(true);
+    const json = await client.conversation.exportConversation('s-q3', 'json', null);
+    expect(json.status === 'saved' && json.path.endsWith('.json')).toBe(true);
     await expect(client.conversation.exportConversation('s-x', 'html', null)).rejects.toThrow();
   });
 
