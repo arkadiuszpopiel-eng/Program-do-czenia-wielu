@@ -96,7 +96,8 @@ test('logowanie do Claude Code: okno z instrukcją otwiera się i zamyka, progra
   await expect(dialog).toBeVisible();
   await expect(
     dialog.getByRole('list', { name: 'Jak się zalogować' }).getByRole('listitem'),
-  ).toHaveCount(3);
+  ).toHaveCount(4);
+  await expect(dialog).toContainText('Claude account with subscription');
   // Narzędzie albo działa, albo okno mówi wprost, że się nie otworzyło i daje „Spróbuj ponownie”.
   await expect(
     dialog
