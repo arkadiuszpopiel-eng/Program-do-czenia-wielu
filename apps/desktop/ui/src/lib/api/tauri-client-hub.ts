@@ -90,3 +90,7 @@ export const templatesApi = (): AlfaClient['templates'] => ({
   list: () => call('prompt_templates_get'),
   save: (templates) => call('prompt_templates_set', { templates }),
 });
+
+export const dataRoutesApi = (): AlfaClient['dataRoutes'] => ({
+  list: () => call('compliance_routes'),
+});

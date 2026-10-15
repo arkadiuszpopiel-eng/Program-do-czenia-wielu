@@ -304,6 +304,7 @@ export class TauriAlfaClient implements AlfaClient {
   readonly advanced: AlfaClient['advanced'] = hub.advancedApi();
   readonly localCommands: AlfaClient['localCommands'] = hub.localCommandsApi();
   readonly templates: AlfaClient['templates'] = hub.templatesApi();
+  readonly dataRoutes: AlfaClient['dataRoutes'] = hub.dataRoutesApi();
   readonly plugins: AlfaClient['plugins'] = {
     list: () => call('plugins_list'),
     inspect: (wasmB64) => call('plugins_inspect', { wasmB64 }),

@@ -866,6 +866,7 @@ dependencies = [
  "camera-hub-contract",
  "chrono",
  "compliance-contract",
+ "compliance-fake",
  "core-bus-contract",
  "core-config-contract",
  "core-config-impl",

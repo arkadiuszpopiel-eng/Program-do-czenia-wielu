@@ -3738,6 +3738,97 @@
       ],
       "type": "object"
     },
+    "DataRoute": {
+      "description": "Trasa do dostawcy (API albo most CLI).",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "description": "Kody jurysdykcji (np. `US`, `EU`, `CN`); pusta lista — nieznana.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "mode": {
+          "description": "`api`, `cli-p` albo `sdk`.",
+          "type": "string"
+        },
+        "privacy": {
+          "description": "Tagi prywatności (np. `eu`, `cn-may-train`, `unknown`).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "private_allowed": {
+          "description": "Czy trasa obsłuży sesję prywatną.",
+          "type": "boolean"
+        },
+        "private_reason": {
+          "description": "Powód decyzji dla sesji prywatnej (po polsku).",
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "stale": {
+          "description": "Wpis rejestru nieświeży.",
+          "type": "boolean"
+        },
+        "standard_allowed": {
+          "description": "Czy trasa obsłuży zwykłą sesję.",
+          "type": "boolean"
+        },
+        "status": {
+          "description": "Status po degradacji: `green`, `grey`, `forbidden`.",
+          "type": "string"
+        },
+        "training": {
+          "description": "Ryzyko trenowania na danych: `no_train`, `may_train`, `unknown`.",
+          "type": "string"
+        },
+        "unverified": {
+          "description": "Wpis katalogu niezweryfikowany.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "mode",
+        "jurisdiction",
+        "privacy",
+        "training",
+        "status",
+        "stale",
+        "unverified",
+        "enabled",
+        "standard_allowed",
+        "private_allowed",
+        "private_reason"
+      ],
+      "type": "object"
+    },
+    "DataRoutesView": {
+      "description": "Wszystkie trasy.",
+      "properties": {
+        "routes": {
+          "items": {
+            "$ref": "#/$defs/DataRoute"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "routes"
+      ],
+      "type": "object"
+    },
     "DetailValue": {
       "anyOf": [
         {
@@ -14120,6 +14211,12 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/CamerasState"
+      }
+    },
+    "compliance_routes": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/DataRoutesView"
       }
     },
     "config_raw_check": {

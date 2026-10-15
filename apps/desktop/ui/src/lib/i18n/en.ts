@@ -26,6 +26,7 @@ import { enModules } from './en-modules';
 import { enAdvanced } from './en-advanced';
 import { enCommands } from './en-commands';
 import { enTemplates } from './en-templates';
+import { enRoutes } from './en-routes';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -54,4 +55,5 @@ export const en: Record<MessageKey, Message> = {
   ...enAdvanced,
   ...enCommands,
   ...enTemplates,
+  ...enRoutes,
 };

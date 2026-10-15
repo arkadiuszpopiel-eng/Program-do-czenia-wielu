@@ -21,6 +21,7 @@
 pub mod broker;
 pub mod cameras;
 pub mod catalog;
+pub mod data_routes;
 pub mod device_view;
 pub mod embedder;
 pub mod fx_http;

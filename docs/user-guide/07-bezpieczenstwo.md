@@ -87,6 +87,13 @@ Agentka z rolą **Wykonawczyni** może obsługiwać okna aplikacji: czytać ich 
   Brokera — w tej wersji niedostępna).
 - Okna programów uruchomionych jako administrator — **jeszcze niedostępne** (wymagają osobnego pomocnika).
 
+## Gdzie trafiają dane
+
+Ustawienia → Dobór modelu → **Gdzie trafiają dane** pokazuje każdą drogę do modelu w chmurze (klucz API albo most
+CLI): w jakim kraju działa dostawca, czy może uczyć modele na twoich wiadomościach i czy obsłuży sesję prywatną —
+a jeśli nie, dlaczego (np. Chiny albo nieznane zasady trenowania). Te reguły pochodzą z rejestru zgodności Alfy
+i nie zmienia się ich w tym miejscu.
+
 ## Twoje sekrety
 
 Klucze API są tylko w Menedżerze poświadczeń Windows. Alfa nigdy nie czyta ani nie przechowuje tokenów narzędzi CLI

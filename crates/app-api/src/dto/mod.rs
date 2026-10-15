@@ -28,6 +28,7 @@ mod modules;
 mod panels;
 mod plugins;
 mod quick;
+mod routes;
 mod sessions;
 mod skills;
 mod system;
@@ -114,6 +115,7 @@ pub use plugins::{
 pub use quick::{
     BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
 };
+pub use routes::{DataRoute, DataRoutesView};
 pub use sessions::{
     ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,
     RiskLevel, SendOptions, SendResult, SessionSearchHit, SessionSummary, SessionTemplate,

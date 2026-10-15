@@ -20,8 +20,8 @@ maszyny (sprawdzanie składni z numerem wiersza, zapis z pełną walidacją rdze
 przy odmowie) oraz flaga `experimental.diag_daily` — zadanie C4.4.
 
 Strona `router` działa od wersji 0.0.51 jako „Dobór modelu” (dobór według trudności, szczeble modeli,
-Krytyczka, podgląd). Z jej dawnych zapowiedzi zostały w planie tagi prywatności i jurysdykcji w oknie —
-zadanie C4.1.
+Krytyczka, podgląd). Od serii po 0.0.59 ma też sekcję „Gdzie trafiają dane” (C4.1): kraj, tagi prywatności,
+ryzyko trenowania i decyzję dla sesji prywatnej każdej trasy — tylko do odczytu, bo rejestr i polityka należą do Jądra.
 
 Uwagi do kolejności:
 

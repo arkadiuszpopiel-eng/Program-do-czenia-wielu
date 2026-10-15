@@ -130,6 +130,7 @@ pub fn spec(command: &str) -> Option<Spec> {
         ),
         "quick_commands_test" => (vec![("message", s)], roundtrip::<QuickTest>),
         "prompt_templates_get" => (vec![], roundtrip::<Vec<PromptTemplate>>),
+        "compliance_routes" => (vec![], roundtrip::<DataRoutesView>),
         "prompt_templates_set" => (
             vec![("templates", roundtrip::<Vec<PromptTemplate>>)],
             roundtrip::<Vec<PromptTemplate>>,

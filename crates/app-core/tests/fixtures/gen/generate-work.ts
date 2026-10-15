@@ -148,6 +148,7 @@ export async function runWork(
   await both('advanced', 'raw');
   const quick = (await both('localCommands', 'get')) as { commands: unknown[] };
   await both('localCommands', 'test', 'Ile to jest 7 razy 8?');
+  await both('dataRoutes', 'list');
   const templates = (await both('templates', 'list')) as unknown[];
   await both('templates', 'save', [
     ...templates,

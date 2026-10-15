@@ -77,6 +77,7 @@ uuid.workspace = true
 workspace = true
 
 [dev-dependencies]
+compliance-fake = { path = "../compliance-fake" }
 # Wirtualny zegar w testach miernika poziomu mowy.
 tokio = { workspace = true, features = ["test-util", "macros"] }
 tempfile = "3.27.0"

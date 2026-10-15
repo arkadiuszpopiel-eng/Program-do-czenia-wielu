@@ -1,0 +1,31 @@
+// „Gdzie trafiają dane” (Ustawienia → Dobór modelu) — pl, źródło kluczy.
+export const plRoutes = {
+  'routes.title': 'Gdzie trafiają dane',
+  'routes.intro':
+    'Każda droga do modelu w chmurze: w jakim kraju działa dostawca, czy może uczyć modele na twoich wiadomościach i czy obsłuży sesję prywatną. Dane pochodzą z rejestru zgodności Alfy; tych zasad nie zmienia się tutaj.',
+  'routes.onlyEnabled': 'Tylko włączone trasy',
+  'routes.list': 'Trasy do dostawców',
+  'routes.mode.api': 'klucz API',
+  'routes.mode.cli-p': 'most CLI',
+  'routes.mode.sdk': 'Agent SDK',
+  'routes.where': 'dane: {place}',
+  'routes.place.unknown': 'kraj nieznany',
+  'routes.place.US': 'USA',
+  'routes.place.EU': 'Unia Europejska',
+  'routes.place.CN': 'Chiny',
+  'routes.place.SG': 'Singapur',
+  'routes.place.UK': 'Wielka Brytania',
+  'routes.disabled': 'wyłączona',
+  'routes.training.no_train': 'Dostawca deklaruje, że nie uczy modeli na twoich danych.',
+  'routes.training.may_train': 'Dostawca może uczyć modele na twoich danych.',
+  'routes.training.unknown':
+    'Nie wiadomo, czy dostawca uczy modele na twoich danych — Alfa zakłada, że może.',
+  'routes.status.green': 'trasa sprawdzona',
+  'routes.status.grey': 'trasa do weryfikacji',
+  'routes.status.forbidden': 'trasa zabroniona',
+  'routes.stale': 'wpis wymaga ponownego sprawdzenia',
+  'routes.unverified': 'wpis katalogu niezweryfikowany',
+  'routes.tags': 'tagi',
+  'routes.private.yes': 'Sesja prywatna: dozwolona.',
+  'routes.private.no': 'Sesja prywatna: zablokowana — {why}.',
+};

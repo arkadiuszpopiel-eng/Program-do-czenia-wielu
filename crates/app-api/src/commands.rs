@@ -163,6 +163,7 @@ macro_rules! with_commands {
             quick_commands_set(commands: Vec<$crate::dto::CustomCommand>) -> $crate::dto::QuickCommandsView;
             quick_commands_test(message: String) -> $crate::dto::QuickTest;
             prompt_templates_get() -> Vec<$crate::dto::PromptTemplate>;
+            compliance_routes() -> $crate::dto::DataRoutesView;
             prompt_templates_set(templates: Vec<$crate::dto::PromptTemplate>) -> Vec<$crate::dto::PromptTemplate>;
             modules_set_enabled(id: String, enabled: bool) -> $crate::dto::ModulesView;
             diag_snapshot() -> $crate::dto::DiagView;
@@ -291,6 +292,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 258);
+        assert_eq!(super::COMMANDS.len(), 259);
     }
 }

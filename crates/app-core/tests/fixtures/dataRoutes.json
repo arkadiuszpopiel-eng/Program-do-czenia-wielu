@@ -1,0 +1,124 @@
+[
+  {
+    "command": "compliance_routes",
+    "args": {},
+    "result": {
+      "routes": [
+        {
+          "id": "anthropic.api",
+          "provider": "anthropic",
+          "mode": "api",
+          "jurisdiction": [
+            "US"
+          ],
+          "privacy": [
+            "unknown"
+          ],
+          "training": "unknown",
+          "status": "green",
+          "stale": false,
+          "unverified": false,
+          "enabled": true,
+          "standard_allowed": true,
+          "private_allowed": false,
+          "private_reason": "sesja prywatna: tag prywatności nieznany (traktowany jak „może trenować”)"
+        },
+        {
+          "id": "claude-code.cli-p",
+          "provider": "anthropic",
+          "mode": "cli-p",
+          "jurisdiction": [
+            "US"
+          ],
+          "privacy": [
+            "unknown"
+          ],
+          "training": "unknown",
+          "status": "green",
+          "stale": false,
+          "unverified": false,
+          "enabled": true,
+          "standard_allowed": true,
+          "private_allowed": false,
+          "private_reason": "sesja prywatna: tag prywatności nieznany (traktowany jak „może trenować”)"
+        },
+        {
+          "id": "deepseek.api",
+          "provider": "deepseek",
+          "mode": "api",
+          "jurisdiction": [
+            "CN"
+          ],
+          "privacy": [
+            "cn-may-train"
+          ],
+          "training": "may_train",
+          "status": "green",
+          "stale": false,
+          "unverified": false,
+          "enabled": true,
+          "standard_allowed": true,
+          "private_allowed": false,
+          "private_reason": "sesja prywatna: jurysdykcja CN niedozwolona"
+        },
+        {
+          "id": "mistral.api",
+          "provider": "mistral",
+          "mode": "api",
+          "jurisdiction": [
+            "EU"
+          ],
+          "privacy": [
+            "eu"
+          ],
+          "training": "no_train",
+          "status": "green",
+          "stale": false,
+          "unverified": false,
+          "enabled": true,
+          "standard_allowed": true,
+          "private_allowed": true,
+          "private_reason": "trasa dozwolona"
+        },
+        {
+          "id": "openai.api",
+          "provider": "openai",
+          "mode": "api",
+          "jurisdiction": [
+            "US"
+          ],
+          "privacy": [
+            "unknown"
+          ],
+          "training": "unknown",
+          "status": "green",
+          "stale": false,
+          "unverified": false,
+          "enabled": true,
+          "standard_allowed": true,
+          "private_allowed": false,
+          "private_reason": "sesja prywatna: tag prywatności nieznany (traktowany jak „może trenować”)"
+        },
+        {
+          "id": "gemini-cli.cli-p",
+          "provider": "google",
+          "mode": "cli-p",
+          "jurisdiction": [
+            "US"
+          ],
+          "privacy": [
+            "google-personal-may-train"
+          ],
+          "training": "may_train",
+          "status": "grey",
+          "stale": false,
+          "unverified": false,
+          "enabled": false,
+          "standard_allowed": false,
+          "private_allowed": false,
+          "private_reason": "trasa wyłączona"
+        }
+      ]
+    }
+  }
+]

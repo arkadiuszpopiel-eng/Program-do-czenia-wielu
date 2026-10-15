@@ -985,6 +985,38 @@ export interface CustomCommand {
   readonly reply: string;
 }
 
+/** Trasa do dostawcy (API albo most CLI). */
+export interface DataRoute {
+  readonly enabled: boolean;
+  readonly id: string;
+  /** Kody jurysdykcji (np. `US`, `EU`, `CN`); pusta lista — nieznana. */
+  readonly jurisdiction: readonly string[];
+  /** `api`, `cli-p` albo `sdk`. */
+  readonly mode: string;
+  /** Tagi prywatności (np. `eu`, `cn-may-train`, `unknown`). */
+  readonly privacy: readonly string[];
+  /** Czy trasa obsłuży sesję prywatną. */
+  readonly private_allowed: boolean;
+  /** Powód decyzji dla sesji prywatnej (po polsku). */
+  readonly private_reason: string;
+  readonly provider: string;
+  /** Wpis rejestru nieświeży. */
+  readonly stale: boolean;
+  /** Czy trasa obsłuży zwykłą sesję. */
+  readonly standard_allowed: boolean;
+  /** Status po degradacji: `green`, `grey`, `forbidden`. */
+  readonly status: string;
+  /** Ryzyko trenowania na danych: `no_train`, `may_train`, `unknown`. */
+  readonly training: string;
+  /** Wpis katalogu niezweryfikowany. */
+  readonly unverified: boolean;
+}
+
+/** Wszystkie trasy. */
+export interface DataRoutesView {
+  readonly routes: readonly DataRoute[];
+}
+
 /** Wartość szczegółu: tekst (identyfikator, wartość wyliczenia), liczba albo flaga. */
 export type DetailValue = boolean | number | string;
 
@@ -3823,6 +3855,10 @@ export interface IpcCommands {
   readonly cameras_state: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: CamerasState;
+  };
+  readonly compliance_routes: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: DataRoutesView;
   };
   readonly config_raw_check: { readonly args: { readonly text: string }; readonly result: number };
   readonly config_raw_get: {

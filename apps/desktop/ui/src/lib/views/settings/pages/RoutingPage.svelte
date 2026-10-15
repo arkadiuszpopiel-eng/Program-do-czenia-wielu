@@ -18,6 +18,7 @@
   import { LEVELS, RUNGS, STRATEGIES } from '../../../logic/routing';
   import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import DataRoutes from './DataRoutes.svelte';
   import RoutingPreview from './RoutingPreview.svelte';
 
   const app = useApp();
@@ -178,6 +179,8 @@
 
   <RoutingPreview />
 {/if}
+
+<DataRoutes />
 
 <style>
   .lead {

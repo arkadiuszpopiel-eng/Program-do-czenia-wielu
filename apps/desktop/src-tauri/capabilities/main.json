@@ -166,6 +166,7 @@
     "allow-quick-commands-test",
     "allow-prompt-templates-get",
     "allow-prompt-templates-set",
+    "allow-compliance-routes",
     "allow-diag-snapshot",
     "allow-diag-run",
     "allow-diag-cancel",
