@@ -12,6 +12,7 @@
 
 mod builder;
 mod diff;
+mod skill_md;
 mod skills;
 
 use std::path::Path;

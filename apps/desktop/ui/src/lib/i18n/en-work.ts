@@ -168,7 +168,7 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'skills.intro':
     'A skill is a described recipe for a task (instructions, parameters, required tools). Only the reviewed version gets installed.',
   'skills.export': 'Export bundle…',
-  'skills.import': 'Import bundle…',
+  'skills.import': 'Import bundle or SKILL.md…',
   'skills.exported': 'Bundle saved: {path}',
   'skills.imported': 'Imported proposals: {n}, skipped: {skipped}.',
   'skills.pending': 'To review',

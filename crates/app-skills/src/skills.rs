@@ -287,6 +287,14 @@ impl SkillsApp {
         }
         let bytes = std::fs::read(&path)
             .map_err(|e| AppError::storage(format!("{}: {e}", path.display())))?;
+        // Plik SKILL.md (Agent Skills) → paczka Alfy; dalej ta sama kwarantanna (C2.6).
+        let bytes = if crate::skill_md::is_skill_md(&bytes) {
+            crate::skill_md::bundle(&String::from_utf8_lossy(&bytes))
+                .and_then(|b| b.to_bytes())
+                .map_err(|e| AppError::invalid(format!("SKILL.md: {e}")))?
+        } else {
+            bytes
+        };
         self.import_bytes(&bytes).await
     }
 

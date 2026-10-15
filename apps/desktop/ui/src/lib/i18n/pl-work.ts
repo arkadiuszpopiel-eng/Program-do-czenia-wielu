@@ -170,7 +170,7 @@ export const plWork = {
   'skills.intro':
     'Umiejętność to opisany przepis na zadanie (instrukcja, parametry, wymagane narzędzia). Instalujesz tylko przejrzaną wersję.',
   'skills.export': 'Eksportuj paczkę…',
-  'skills.import': 'Importuj paczkę…',
+  'skills.import': 'Importuj paczkę albo SKILL.md…',
   'skills.exported': 'Zapisano paczkę: {path}',
   'skills.imported': 'Zaimportowano propozycje: {n}, pominięto: {skipped}.',
   'skills.pending': 'Do przejrzenia',
