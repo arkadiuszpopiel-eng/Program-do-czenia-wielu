@@ -77,6 +77,12 @@ fn need<T: ?Sized>(value: &Option<Arc<T>>, what: &str) -> Result<Arc<T>, AppErro
 }
 
 impl Built {
+    /// Moduły opcjonalne wyłączone w konfiguracji (pomijane przy budowie).
+    pub async fn disable_modules(&mut self, kernel: &Kernel) {
+        let value = memory::setting(kernel, app_modules::modules::DISABLED_KEY).await;
+        self.extra.disabled = app_modules::modules::parse_disabled(value.as_ref());
+    }
+
     /// Buduje i uruchamia moduł `id` (zależności są już zbudowane — kolejność z rejestru).
     pub async fn build_module(
         &mut self,
@@ -88,6 +94,11 @@ impl Built {
         slot: Option<&HealthSlot>,
     ) -> Result<(), AppError> {
         let healthy = || extra::healthy(slot);
+        // Moduł opcjonalny wyłączony w Ustawieniach → Moduły: bez budowy (port „niepodłączony”).
+        if self.extra.disabled.contains(id) {
+            self.extra.skipped.insert(id.to_owned());
+            return Ok(());
+        }
         if work::is_work(id) {
             self.work_slots
                 .extend(slot.map(|s| (id.to_owned(), s.clone())));

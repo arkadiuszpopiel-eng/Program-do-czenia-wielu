@@ -1814,19 +1814,10 @@
    "pl": "Moduły",
    "en": "Modules"
   },
-  "wave": 2,
-  "custom": null,
+  "wave": 1,
+  "custom": "modules",
   "settings": [],
-  "upcoming": [
-   {
-    "pl": "Lista modułów, włącz / wyłącz",
-    "en": "Module list, enable / disable"
-   },
-   {
-    "pl": "Budżety RAM i CPU",
-    "en": "RAM and CPU budgets"
-   }
-  ]
+  "upcoming": []
  },
  {
   "id": "cameras",

@@ -68,3 +68,8 @@ export const diagApi = (): AlfaClient['diag'] => ({
   runs: (limit) => call('diag_runs', { limit }),
   export: () => call('diag_export'),
 });
+
+export const modulesApi = (): AlfaClient['modules'] => ({
+  list: () => call('modules_list'),
+  setEnabled: (id, enabled) => call('modules_set_enabled', { id, enabled }),
+});

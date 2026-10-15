@@ -103,10 +103,7 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
     ],
     { custom: 'health' },
   ),
-  later('modules', L('Moduły', 'Modules'), 2, [
-    L('Lista modułów, włącz / wyłącz', 'Module list, enable / disable'),
-    L('Budżety RAM i CPU', 'RAM and CPU budgets'),
-  ]),
+  page('modules', L('Moduły', 'Modules'), 1, [], { custom: 'modules' }),
   page(
     'cameras',
     L('Kamery', 'Cameras'),

@@ -81,6 +81,9 @@ pub(crate) struct Extra {
     pub keep: Vec<Arc<dyn std::any::Any + Send + Sync>>,
     /// Serwery MCP użytkownika (narzędzia agentek składane w `agent_stack`).
     pub mcp: Option<Arc<app_mcp::McpHub>>,
+    /// Moduły opcjonalne wyłączone w konfiguracji i pominięte przy tym starcie.
+    pub disabled: std::collections::BTreeSet<String>,
+    pub skipped: std::collections::BTreeSet<String>,
     /// Diagnostyka komputera (narzędzie agentek w `agent_stack`).
     pub diag: Option<Arc<app_diag::DiagApp>>,
 }

@@ -23,6 +23,7 @@ mod memory;
 mod model_queues;
 mod model_routing;
 mod models;
+mod modules;
 mod panels;
 mod plugins;
 mod sessions;
@@ -96,6 +97,7 @@ pub use models::{
     ModelBundle, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,
     ModelsView, QualityNote, ReindexView, TrustedHashes,
 };
+pub use modules::{ModuleRow, ModulesView};
 pub use panels::{
     ActivityInfo, AgentState, AgentStatus, ArtifactAction, ArtifactInfo, ArtifactPreview,
     CastTemplateId, ContextUsage, CostLimitView, CostSummary, EventLevel, FxView, TimelineEvent,

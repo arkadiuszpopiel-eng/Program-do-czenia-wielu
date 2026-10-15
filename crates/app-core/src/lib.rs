@@ -14,7 +14,10 @@ mod infra;
 mod lifecycle;
 mod options;
 mod parts;
-mod settings;
+/// Katalog ustawień (`app_modules::settings` — wydzielony przez limit rozmiaru crate'a).
+mod settings {
+    pub use app_modules::settings::*;
+}
 mod voice_chat;
 
 // Kontrakt IPC (DTO, błędy, zdarzenia, porty) — crate `app-api`, pod dawnymi ścieżkami.

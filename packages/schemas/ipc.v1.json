@@ -8086,6 +8086,140 @@
       ],
       "type": "string"
     },
+    "ModuleRow": {
+      "description": "Moduł na liście.",
+      "properties": {
+        "can_disable": {
+          "description": "Moduł opcjonalny, który można wyłączyć (od następnego uruchomienia).",
+          "type": "boolean"
+        },
+        "capabilities": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "cpu_pct": {
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "detail": {
+          "description": "Powód stanu (ograniczenie, błąd).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "disabled": {
+          "description": "Wyłączony w ustawieniach.",
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "isolation": {
+          "description": "`inproc`, `process`, `wasm`.",
+          "type": "string"
+        },
+        "kind": {
+          "description": "`service`, `tool`, `provider`, `voice-engine`, `agent-pack`, `ui-panel`.",
+          "type": "string"
+        },
+        "lifecycle": {
+          "description": "`always`, `lazy`, `on-demand`.",
+          "type": "string"
+        },
+        "protected": {
+          "description": "Moduł Jądra (Broker, watchdog, audyt, aktualizacje, `core-*`) — bez wyłączania.",
+          "type": "boolean"
+        },
+        "provides": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ram_mb": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "requires": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "skipped": {
+          "description": "Pominięty przy tym uruchomieniu (wyłączony, gdy program startował).",
+          "type": "boolean"
+        },
+        "state": {
+          "description": "`disabled`, `unloaded`, `loading`, `ready`, `degraded`, `failed`.",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "vram_mb": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "kind",
+        "lifecycle",
+        "isolation",
+        "state",
+        "detail",
+        "ram_mb",
+        "cpu_pct",
+        "vram_mb",
+        "capabilities",
+        "provides",
+        "requires",
+        "protected",
+        "can_disable",
+        "disabled",
+        "skipped"
+      ],
+      "type": "object"
+    },
+    "ModulesView": {
+      "description": "Lista modułów.",
+      "properties": {
+        "modules": {
+          "items": {
+            "$ref": "#/$defs/ModuleRow"
+          },
+          "type": "array"
+        },
+        "ram_total_mb": {
+          "description": "Suma budżetów RAM modułów niewyłączonych (MB).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "restart_needed": {
+          "description": "Ustawienia różnią się od stanu z uruchomienia — zmiana zadziała po ponownym uruchomieniu.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "modules",
+        "restart_needed",
+        "ram_total_mb"
+      ],
+      "type": "object"
+    },
     "Money": {
       "description": "Kwota w jednostkach drobnych (grosze / centy).",
       "properties": {
@@ -10030,6 +10164,11 @@
         {
           "const": "diag",
           "description": "Diagnostyka komputera: zapis parametrów, testy podzespołów, historia, raport.",
+          "type": "string"
+        },
+        {
+          "const": "modules",
+          "description": "Moduły: stan, budżety, zdolności; wyłączanie modułów opcjonalnych.",
           "type": "string"
         },
         {
@@ -14594,6 +14733,31 @@
       ],
       "result": {
         "$ref": "#/$defs/ModelItem"
+      }
+    },
+    "modules_list": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/ModulesView"
+      }
+    },
+    "modules_set_enabled": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "enabled",
+          "schema": {
+            "type": "boolean"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/ModulesView"
       }
     },
     "permissions_get": {

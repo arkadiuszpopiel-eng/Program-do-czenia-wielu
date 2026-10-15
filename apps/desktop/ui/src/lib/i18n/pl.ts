@@ -22,6 +22,7 @@ import { plRouting } from './pl-routing';
 import { plConnections } from './pl-connections';
 import { plMcp } from './pl-mcp';
 import { plDiag } from './pl-diag';
+import { plModules } from './pl-modules';
 
 export const pl = {
   ...plApp,
@@ -45,6 +46,7 @@ export const pl = {
   ...plConnections,
   ...plMcp,
   ...plDiag,
+  ...plModules,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

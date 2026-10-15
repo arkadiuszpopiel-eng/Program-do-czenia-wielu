@@ -7,7 +7,7 @@ import type { AlfaClient } from './client';
 import { toError } from './command-error';
 import { EventSequencer } from './event-sequencer';
 import { call } from './tauri-call';
-import { accountsApi, diagApi, enginesApi, mcpApi, transferApi } from './tauri-client-hub';
+import * as hub from './tauri-client-hub';
 import type { AlfaEvent, EventFrame } from './types-system';
 import type { TerminalFrame, TerminalSession } from './types-work';
 
@@ -96,9 +96,9 @@ export class TauriAlfaClient implements AlfaClient {
     act: (artifactId, action) => call('files_act', { artifactId, action }),
   };
 
-  readonly accounts: AlfaClient['accounts'] = accountsApi();
+  readonly accounts: AlfaClient['accounts'] = hub.accountsApi();
 
-  readonly transfer: AlfaClient['transfer'] = transferApi();
+  readonly transfer: AlfaClient['transfer'] = hub.transferApi();
 
   readonly permissions: AlfaClient['permissions'] = {
     get: (sessionId) => call('permissions_get', { sessionId }),
@@ -298,8 +298,9 @@ export class TauriAlfaClient implements AlfaClient {
     engines: (action) => call('voice_engines', { action }),
   };
 
-  readonly mcp: AlfaClient['mcp'] = mcpApi();
-  readonly diag: AlfaClient['diag'] = diagApi();
+  readonly mcp: AlfaClient['mcp'] = hub.mcpApi();
+  readonly diag: AlfaClient['diag'] = hub.diagApi();
+  readonly modules: AlfaClient['modules'] = hub.modulesApi();
   readonly plugins: AlfaClient['plugins'] = {
     list: () => call('plugins_list'),
     inspect: (wasmB64) => call('plugins_inspect', { wasmB64 }),
@@ -312,7 +313,7 @@ export class TauriAlfaClient implements AlfaClient {
     remove: (pluginId) => call('plugins_remove', { pluginId }),
   };
 
-  readonly engines: AlfaClient['engines'] = enginesApi();
+  readonly engines: AlfaClient['engines'] = hub.enginesApi();
 
   readonly attachments: AlfaClient['attachments'] = {
     pick: (sessionId) => call('attachments_pick', { sessionId }),

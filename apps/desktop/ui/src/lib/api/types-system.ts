@@ -83,6 +83,7 @@ export type SettingsCustomPage =
   | 'plugins'
   | 'mcp'
   | 'diag'
+  | 'modules'
   | 'models';
 
 export interface SettingsPageDef {

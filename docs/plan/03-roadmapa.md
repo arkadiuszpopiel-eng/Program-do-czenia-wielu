@@ -137,7 +137,7 @@ Zgłoszenie właściciela z 2026-10-11: funkcje ze znakiem „wkrótce” mają 
 | ---- | --------------------------------------------------------------------------------------------------------- | --------- | ---- | ---------------------------------------------------------------------------------------------- |
 | C4.1 | Strona „Router i reguły”: klasy zadań i zapas w oknie, tagi prywatności i jurysdykcji                     | planowane | —    | Router już działa; brakuje widoku i edycji reguł (dziś tylko plik)                             |
 | C4.2 | Strona „Logi i prywatność”: retencja i redakcja logów, widok „co poszło do chmury”                        | czeka     | —    | widok czyta audyt i tagi prywatności — obszar Jądra; zakres uzgodnić z właścicielem            |
-| C4.3 | Strona „Moduły”: lista modułów ze stanem, włącz / wyłącz, budżety RAM i CPU                               | planowane | —    | bez Brokera, watchdoga, audytu i kill-switcha (reguła twarda); część danych jest w „Zdrowie systemu” |
+| C4.3 | Strona „Moduły”: lista modułów ze stanem, włącz / wyłącz, budżety RAM i CPU                               | zrobione (seria 1, punkt 1) | —    | bez Brokera, watchdoga, audytu i kill-switcha (reguła twarda); część danych jest w „Zdrowie systemu” |
 | C4.4 | Strona „Zaawansowane”: edytor surowy TOML ze sprawdzaniem schematu, flagi eksperymentalne                 | planowane | —    | klucze polityki Jądra tylko do odczytu (rdzeń je odrzuca)                                      |
 
 **Wyjście z C4:** w nawigacji Ustawień nie ma znaku „wkrótce”; każda strona przechodzi przegląd w trzech stylach

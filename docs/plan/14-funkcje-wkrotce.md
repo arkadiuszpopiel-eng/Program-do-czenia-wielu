@@ -14,7 +14,6 @@ Znak „wkrótce” w nawigacji Ustawień dostaje strona, która w `crates/app-c
 | Strona (`id`)             | Zapowiedzi na stronie                                 | Co już jest w rdzeniu                                                                                       | Zadanie |
 | ------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------- |
 | Logi i prywatność (`logs`) | retencja i redakcja; „co poszło do chmury”            | dziennik NDJSON i audyt są zapisywane; nie ma przeglądarki ani ustawień retencji w oknie                    | C4.2    |
-| Moduły (`modules`)        | lista modułów, włącz / wyłącz; budżety RAM i CPU      | rejestr modułów z manifestami i stanem zdrowia; część widać w „Zdrowie systemu”                             | C4.3    |
 | Zaawansowane (`advanced`) | edytor surowy TOML; flagi eksperymentalne             | konfiguracja TOML ze schematem i przeładowaniem na żywo                                                     | C4.4    |
 
 Strona `router` działa od wersji 0.0.51 jako „Dobór modelu” (dobór według trudności, szczeble modeli,

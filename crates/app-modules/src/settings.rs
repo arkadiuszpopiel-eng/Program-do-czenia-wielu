@@ -7,10 +7,11 @@ use std::collections::BTreeMap;
 use core_config_contract::ConfigKey;
 use serde_json::{Map, Value, json};
 
-use crate::dto::{SettingControl, SettingDef, SettingsPageDef};
-use crate::error::AppError;
+use app_api::AppError;
+use app_api::dto::{SettingControl, SettingDef, SettingsPageDef};
 
-const PAGES_JSON: &str = include_str!("../data/settings-pages.json");
+/// Plik stron leży przy rdzeniu (`app-core/data`) — czyta go też test spisu „wkrótce”.
+const PAGES_JSON: &str = include_str!("../../app-core/data/settings-pages.json");
 
 /// Klucze pomocnicze rdzenia (poza drzewem UI).
 pub mod keys {
@@ -116,7 +117,7 @@ fn value_schema(def: &SettingDef) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dto::SettingValue;
+    use app_api::dto::SettingValue;
 
     #[test]
     fn builtin_catalog_has_pages_defaults_and_schemas() {

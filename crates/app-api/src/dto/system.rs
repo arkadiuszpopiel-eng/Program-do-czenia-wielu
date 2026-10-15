@@ -125,6 +125,8 @@ pub enum SettingsCustomPage {
     Mcp,
     /// Diagnostyka komputera: zapis parametrów, testy podzespołów, historia, raport.
     Diag,
+    /// Moduły: stan, budżety, zdolności; wyłączanie modułów opcjonalnych.
+    Modules,
     /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }

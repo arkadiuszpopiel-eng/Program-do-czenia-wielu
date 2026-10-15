@@ -115,6 +115,11 @@ pub fn spec(command: &str) -> Option<Spec> {
             roundtrip::<CheckRun>,
         ),
         "diag_cancel" => (vec![], roundtrip::<()>),
+        "modules_list" => (vec![], roundtrip::<ModulesView>),
+        "modules_set_enabled" => (
+            vec![("id", s), ("enabled", roundtrip::<bool>)],
+            roundtrip::<ModulesView>,
+        ),
         "diag_runs" => (
             vec![("limit", roundtrip::<u32>)],
             roundtrip::<Vec<CheckRun>>,

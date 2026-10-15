@@ -92,6 +92,27 @@ fn contract(name: &str) -> ContractRef {
 /// Gniazdo zdrowia modułu (wypełniane po starcie usługi).
 pub(crate) type HealthSlot = Arc<OnceLock<HealthFn>>;
 
+/// Manifesty wszystkich modułów (id, treść `module.toml`).
+fn all_modules() -> impl Iterator<Item = &'static (&'static str, &'static str)> {
+    MODULES
+        .iter()
+        .chain(app_agents::MODULES)
+        .chain(app_tasks::MODULES)
+        .chain(app_bridges::MODULES)
+        .chain(app_gui::MODULES)
+        .chain(app_terminal::MODULES)
+        .chain(app_skills::MODULES)
+        .chain(app_health::MODULES)
+        .chain(app_plugins::MODULES)
+}
+
+/// Manifesty modułów (Ustawienia → Moduły); nieczytelny manifest jest pomijany.
+pub(crate) fn manifests() -> Vec<ModuleManifest> {
+    all_modules()
+        .filter_map(|(_, toml)| ModuleManifest::parse_toml(toml).ok())
+        .collect()
+}
+
 /// Rejestruje pośredników i zwraca kolejność startu + gniazda zdrowia.
 async fn plan(
     registry: &ModuleRegistry,
@@ -105,17 +126,7 @@ async fn plan(
 > {
     let mut slots = BTreeMap::new();
     let mut lifecycles = BTreeMap::new();
-    let all = MODULES
-        .iter()
-        .chain(app_agents::MODULES)
-        .chain(app_tasks::MODULES)
-        .chain(app_bridges::MODULES)
-        .chain(app_gui::MODULES)
-        .chain(app_terminal::MODULES)
-        .chain(app_skills::MODULES)
-        .chain(app_health::MODULES)
-        .chain(app_plugins::MODULES);
-    for (id, toml) in all {
+    for (id, toml) in all_modules() {
         let manifest = manifest_for_graph(id, toml)?;
         lifecycles.insert((*id).to_owned(), manifest.lifecycle);
         let slot: HealthSlot = Arc::new(OnceLock::new());
@@ -172,6 +183,7 @@ impl AppCore {
         tracing::info!(kolejnosc = ?order, "kolejność startu modułów");
         let mut kernel = Kernel::start(&paths, &options, &bus).await?;
         let mut built = Built::default();
+        built.disable_modules(&kernel).await;
         for id in &order {
             built
                 .build_module(id, &paths, &options, &bus, &mut kernel, slots.get(id))

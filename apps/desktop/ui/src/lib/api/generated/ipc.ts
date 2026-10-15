@@ -2171,6 +2171,45 @@ export interface ModelsView {
 /** Stan modułu w rejestrze. */
 export type ModuleHealth = 'healthy' | 'degraded' | 'unhealthy' | 'not_started' | 'disabled';
 
+/** Moduł na liście. */
+export interface ModuleRow {
+  /** Moduł opcjonalny, który można wyłączyć (od następnego uruchomienia). */
+  readonly can_disable: boolean;
+  readonly capabilities: readonly string[];
+  readonly cpu_pct: number;
+  /** Powód stanu (ograniczenie, błąd). */
+  readonly detail: string | null;
+  /** Wyłączony w ustawieniach. */
+  readonly disabled: boolean;
+  readonly id: string;
+  /** `inproc`, `process`, `wasm`. */
+  readonly isolation: string;
+  /** `service`, `tool`, `provider`, `voice-engine`, `agent-pack`, `ui-panel`. */
+  readonly kind: string;
+  /** `always`, `lazy`, `on-demand`. */
+  readonly lifecycle: string;
+  /** Moduł Jądra (Broker, watchdog, audyt, aktualizacje, `core-*`) — bez wyłączania. */
+  readonly protected: boolean;
+  readonly provides: readonly string[];
+  readonly ram_mb: number;
+  readonly requires: readonly string[];
+  /** Pominięty przy tym uruchomieniu (wyłączony, gdy program startował). */
+  readonly skipped: boolean;
+  /** `disabled`, `unloaded`, `loading`, `ready`, `degraded`, `failed`. */
+  readonly state: string;
+  readonly version: string;
+  readonly vram_mb: number | null;
+}
+
+/** Lista modułów. */
+export interface ModulesView {
+  readonly modules: readonly ModuleRow[];
+  /** Suma budżetów RAM modułów niewyłączonych (MB). */
+  readonly ram_total_mb: number;
+  /** Ustawienia różnią się od stanu z uruchomienia — zmiana zadziała po ponownym uruchomieniu. */
+  readonly restart_needed: boolean;
+}
+
 /** Kwota w jednostkach drobnych (grosze / centy). */
 export interface Money {
   readonly currency: Currency;
@@ -2723,6 +2762,7 @@ export type SettingsCustomPage =
   | 'plugins'
   | 'mcp'
   | 'diag'
+  | 'modules'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -3965,6 +4005,14 @@ export interface IpcCommands {
   readonly models_verify: {
     readonly args: { readonly itemId: string };
     readonly result: ModelItem;
+  };
+  readonly modules_list: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: ModulesView;
+  };
+  readonly modules_set_enabled: {
+    readonly args: { readonly id: string; readonly enabled: boolean };
+    readonly result: ModulesView;
   };
   readonly permissions_get: {
     readonly args: { readonly sessionId: string | null };

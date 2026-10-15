@@ -11,6 +11,7 @@ pub(crate) mod device;
 mod diag;
 pub(crate) mod files;
 mod mcp;
+mod modules;
 mod memory;
 mod model_routing;
 mod models;

@@ -26,6 +26,7 @@ accounts-hub-impl = { path = "../accounts-hub-impl" }
 compliance-contract = { path = "../compliance-contract" }
 core-bus-contract.workspace = true
 core-config-contract.workspace = true
+core-registry-contract.workspace = true
 camera-hub-contract = { path = "../camera-hub-contract" }
 # Klatka kamery dla interfejsu: PNG (zlib z flate2) w base64 — te same wersje co w app-core.
 base64 = "0.22.1"
