@@ -162,6 +162,20 @@ Decyzja właściciela z 2026-10-11: lepszy głos ma być lokalny, nie z chmury. 
 różne głosy; pierwszy dźwięk mieści się w budżecie z `docs/VOICE.md` na laptopie bazowym; rozmowa nie urywa się,
 gdy karta jest zajęta (przełączenie na poziom szybki).
 
+### C6 — Alfa zna komputer i jego narzędzia (polecenie właściciela 2026-10-15)
+
+Właściciel: „funkcje, które pozwalają korzystać w pełni z przeglądarek, pisać programy, testować … system serwerów MCP,
+by Alfa mogła tworzyć i dostosowywać się do warunków na maszynie” oraz „system diagnostyki komputera, bardzo dokładny,
+z zapisem parametrów i testami systemów”.
+
+| ID   | Zadanie                                                                                               | Stan         | Data       | Uwagi                                                                                     |
+| ---- | ----------------------------------------------------------------------------------------------------- | ------------ | ---------- | ----------------------------------------------------------------------------------------- |
+| C6.1 | Znajomość zainstalowanych programów (`system_software`) i opis maszyny w zasadach agentek             | zrobione     | 2026-10-15 | 0.0.58; prawdziwy laptop: 23 programy w 1,6 s                                             |
+| C6.2 | Serwery MCP użytkownika: przepisy, zgody z odciskiem, zmienne tajne w Menedżerze poświadczeń, Broker  | zrobione     | 2026-10-15 | 0.0.58; `app-mcp`, `mcp_tools`/`mcp_call`; przepis Playwright = pełna przeglądarka         |
+| C6.3 | Diagnostyka komputera `pc-diag`: zapis parametrów, zdarzenia awarii, testy, historia, raport, narzędzie | zrobione     | 2026-10-15 | 0.0.58; sonda i testy sprawdzone na prawdziwym sprzęcie (bez testu dysku E: — dysk USB)    |
+| C6.4 | Przeglądarka Alfy: przewijanie, klawisze, listy wyboru, historia, czekanie na tekst, konsola i błędy JS | w toku       | —          | `BrowserPort` + CDP; do testowania pisanych stron (`http://localhost`)                    |
+| C6.5 | Narzędzia programisty: Git (stan, różnice, gałęzie, zatwierdzenie w katalogu roboczym), uruchamianie testów z czytelnym wynikiem | planowane | — | po C6.4                                                                    |
+
 ## Etap P — Przeniesienie funkcji z Delty AI
 
 Opis: [`17-przeniesienie-z-delty.md`](17-przeniesienie-z-delty.md). Decyzja właściciela z 2026-10-11: Alfa jest programem docelowym; z Delty AI 0.8.35 przenosimy system rozmowy
@@ -310,6 +324,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 
 | Data       | Zmiana                                                                                                                                                                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-15 | Wersja 0.0.58: C6.1–C6.3 — Alfa zna zainstalowane programy (`system_software`), serwery MCP użytkownika (Ustawienia → Serwery MCP, przepisy Playwright / Chrome DevTools / pliki / Git / GitHub, zgody z odciskiem opisu, zmienne tajne w Menedżerze poświadczeń, wywołania przez Brokera), diagnostyka komputera (Ustawienia → Diagnostyka komputera: parametry, zdarzenia awarii z kodami BSOD, błędy przypisane do dysku, testy procesora / pamięci / dysku / sieci, historia z porównaniem, raport, narzędzie `system_diagnostics`). Na laptopie właściciela diagnostyka wykazała: BSOD 0x116 (sterownik karty graficznej), 4 nieoczekiwane wyłączenia i 200 błędów dysku E: (mostek USB Realtek RTL9210B). |
 | 2026-10-15 | Wersja 0.0.53: decyzje z dokumentu 25 rozstrzygnięte na polecenie właściciela — izolacja poleceń powłoki integralnością Low (zapis tylko w katalogu roboczym, test na prawdziwych procesach), macierz dowodów generowana od 0.0.51, wpis Antigravity zatwierdzony, budżet Markdown dotrzymany przez czyszczenie w wątkach (7,8 ms); wasmtime 36.0.18 (RUSTSEC-2026-0363); pokrycie łącza w prawdziwej aplikacji 71,8 % (bramka 70 %). |
 | 2026-10-14 | Wersja 0.0.52: okno Ustawienia → Stan połączeń (konta API, mosty CLI z planem i stanem logowania, modele, głos, Broker, sieć, mikrofon; „Sprawdź wszystko”); `bridges_check` — oficjalne polecenie stanu CLI, bez danych konta; sprawdzenie po „Gotowe” w oknie logowania; Antigravity (Google AI Pro bez klucza API): logowanie w terminalu Alfy i most `agy` (szara trasa, domyślnie wyłączona, ostrzeżenie o regulaminie, piaskownica, bez automatycznej zgody); blokady `.agy`/`.gemini`; poprawka regresji próby obowiązków. Do przeglądu właściciela: zmiana wpisu `agy-antigravity` w rejestrze zgodności (dokument 25 §3). |
 | 2026-10-14 | Wersja 0.0.51: dobór modelu według trudności (P12 — część: ocena trudności, szczeble modeli, podnoszenie po odrzuceniu przez Krytyczkę, Krytyczka na lekkim modelu, klasa roli przy delegacji, strona „Dobór modelu”); poprawki audytu zewnętrznego A-01…A-17 (STOP WSZYSTKIEGO niepełne, strażnik autonomii, watchdog po restarcie Brokera, ponawianie cofania, analiza poleceń powłoki, widok Brokera, odcisk procesów pobocznych, edycja propozycji pamięci, zależności, bramki verify = CI, bramka rozmiaru, lock powłoki). Do przeglądu właściciela: izolacja procesu poleceń powłoki (token, prawa plików i sieci). |

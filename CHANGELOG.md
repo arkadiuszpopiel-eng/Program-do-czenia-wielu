@@ -12,6 +12,48 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.58 — 2026-10-15
+
+Alfa poznaje komputer, na którym pracuje: wie, jakie programy są zainstalowane, potrafi podłączyć
+serwery MCP (pełna przeglądarka, narzędzia programisty Chrome, pliki, Git, GitHub i inne) oraz ma
+dokładną diagnostykę komputera z zapisem parametrów, testami podzespołów i historią.
+
+### Diagnostyka komputera
+
+- Nowa strona Ustawienia → Diagnostyka komputera: zapis parametrów (procesor, pamięć z modułami, dyski
+  z kondycją, woluminy, karty graficzne ze sterownikami, sieć bez adresów, bateria, temperatury) i zdarzeń
+  awarii z 7 dni z oceną — niebieskie ekrany z objaśnieniem kodu, nieoczekiwane wyłączenia, błędy dysku
+  przypisane do konkretnego dysku, resety USB.
+- Testy podzespołów z postępem i przerwaniem: procesor (jeden i wszystkie wątki), pamięć (wzorzec
+  z weryfikacją), dysk (zapis i odczyt z pominięciem pamięci podręcznej, sumy kontrolne, odczyt losowy
+  4 KB; plik próbny zawsze usuwany), sieć (DNS i połączenie).
+- Historia zapisów i testów z porównaniem do poprzedniego pomiaru (spadek wydajności = ostrzeżenie),
+  raport Markdown do folderu `Alfa\Diagnostyka`, automatyczny zapis parametrów raz na dobę.
+- Agentka może odczytać raport narzędziem `system_diagnostics` (przez Brokera) i uruchomić lekkie
+  testy; testów dysków agentka nie uruchamia.
+
+### Serwery MCP
+
+- Nowa strona Ustawienia → Serwery MCP: gotowe przepisy (przeglądarka Playwright, Chrome DevTools,
+  pliki w folderze, Git, GitHub, pobieranie stron, notatnik wiedzy) albo własny serwer; serwer startuje
+  dopiero przy pierwszym użyciu.
+- [poważne] Agentka używa wyłącznie narzędzi, na które się zgodzisz; zmiana opisu narzędzia po zgodzie
+  blokuje je do ponownej zgody, a każde wywołanie przechodzi przez Brokera.
+- Zmienne tajne (tokeny, klucze) trafiają do Menedżera poświadczeń Windows, nie do plików; serwer
+  dostaje czyste środowisko bez kluczy Alfy; nieudany start pokazuje przyczynę (np. `npm ERR! 404`).
+
+### Znajomość komputera
+
+- Narzędzie `system_software` i opis maszyny w zasadach agentek: przeglądarki, środowiska (Node.js,
+  Python, .NET, Java), kompilatory, Git, menedżery pakietów — agentka używa tego, co jest, zamiast
+  zgadywać.
+
+### Testy
+
+- Sonda Windows sprawdzona na prawdziwym laptopie (3 dyski NVMe, w tym jeden na mostku USB), testy
+  procesora, pamięci, sieci i dysku C: uruchomione na prawdziwym sprzęcie; atrapy serwera MCP i sondy
+  diagnostyki jako osobne procesy; e2e stron w 3 stylach × 2 motywach.
+
 ## 0.0.57 — 2026-10-15
 
 Terminal Alfy (także okno logowania) nie przestawia już liter przy szybkim pisaniu: przy obciążonym
@@ -150,7 +192,7 @@ Google AI Pro przez Antigravity CLI — bez klucza API, świadomie włączane, z
   z niego korzystać. Teraz Alfa od razu sprawdza konto, pokazuje wynik w powiadomieniu i na karcie
   mostu („Sprawdź logowanie” jest też na każdej karcie w Mostach CLI).
 - Alfa sprawdza logowanie oficjalnym poleceniem stanu narzędzia (`claude auth status`, `codex
-  login status`) i zostawia z odpowiedzi tylko „zalogowano / nie”, sposób logowania i plan —
+login status`) i zostawia z odpowiedzi tylko „zalogowano / nie”, sposób logowania i plan —
   adres e-mail, identyfikator organizacji i tokeny są od razu odrzucane.
 
 ### Antigravity (konto Google AI Pro bez klucza API)

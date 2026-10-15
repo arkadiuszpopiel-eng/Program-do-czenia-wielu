@@ -1,0 +1,18 @@
+# Manifest modułu pc-diag (docs/modules/pc-diag/SPEC.md).
+# Schemat: packages/schemas/module-manifest.v1.json
+id = "pc-diag"
+version = "0.0.58"
+kind = "service"
+provides = ["pc-diag-contract@1"]
+requires = []
+capabilities = []
+lifecycle = "on-demand"
+isolation = "inproc"
+
+[budget]
+ram_mb = 600
+cpu_pct = 100
+
+[health]
+check = "ping"
+interval_s = 3600
