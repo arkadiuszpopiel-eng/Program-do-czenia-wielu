@@ -1,0 +1,34 @@
+[
+  {
+    "command": "config_raw_get",
+    "args": {},
+    "result": {
+      "shared": "[ui]\ntheme = \"auto\"\nscale = 1.0\n\n[voice]\nmic_enabled = true\n",
+      "machine": "[camera]\nenabled = false\n",
+      "shared_path": "C:\\Users\\Ty\\AppData\\Roaming\\Alfa\\config\\shared.toml",
+      "machine_path": "C:\\Users\\Ty\\AppData\\Roaming\\Alfa\\config\\machine\\laptop.toml",
+      "problems": []
+    }
+  },
+  {
+    "command": "config_raw_check",
+    "args": {
+      "text": "[ui]\ntheme = \"dark\"\n"
+    },
+    "result": 1
+  },
+  {
+    "command": "config_raw_save",
+    "args": {
+      "layer": "machine",
+      "text": "[camera]\nenabled = true\n"
+    },
+    "result": {
+      "shared": "[ui]\ntheme = \"auto\"\nscale = 1.0\n\n[voice]\nmic_enabled = true\n",
+      "machine": "[camera]\nenabled = true\n",
+      "shared_path": "C:\\Users\\Ty\\AppData\\Roaming\\Alfa\\config\\shared.toml",
+      "machine_path": "C:\\Users\\Ty\\AppData\\Roaming\\Alfa\\config\\machine\\laptop.toml",
+      "problems": []
+    }
+  }
+]

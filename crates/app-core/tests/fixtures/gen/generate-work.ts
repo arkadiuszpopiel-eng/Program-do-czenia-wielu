@@ -145,6 +145,9 @@ export async function runWork(
   await both('modules', 'list');
   await both('modules', 'setEnabled', 'voice-tts', false);
   await both('modules', 'setEnabled', 'voice-tts', true);
+  await both('advanced', 'raw');
+  await both('advanced', 'check', '[ui]\ntheme = "dark"\n');
+  await both('advanced', 'save', 'machine', '[camera]\nenabled = true\n');
   await both('diag', 'state');
   await both('diag', 'snapshot');
   await both('diag', 'run', ['integrity', 'cpu_single', 'memory', 'disk:C:', 'disk:E:']);

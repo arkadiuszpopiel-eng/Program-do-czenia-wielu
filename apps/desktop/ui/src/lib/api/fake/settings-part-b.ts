@@ -1,4 +1,4 @@
-// Drzewo ustawień (PLAN §15), część 2: Sesje i okna … Zaawansowane.
+// Drzewo ustawień (PLAN §15), część 2: Sesje i okna i dalej (Zaawansowane — w `settings-schema.ts`).
 import type { SettingsPageDef } from '../types-system';
 import { L, later, number, page, select, text, toggle } from './settings-helpers';
 
@@ -398,9 +398,5 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
     ],
     { custom: 'updates' },
   ),
-  later('advanced', L('Zaawansowane', 'Advanced'), 8, [
-    L('Edytor surowy TOML', 'Raw TOML editor'),
-    L('Flagi eksperymentalne', 'Experimental flags'),
-  ]),
   page('about', L('O programie', 'About'), 1, [], { custom: 'about' }),
 ];

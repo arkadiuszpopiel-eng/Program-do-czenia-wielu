@@ -156,6 +156,9 @@ macro_rules! with_commands {
             mcp_list() -> Vec<$crate::dto::McpServerView>;
             diag_state() -> $crate::dto::DiagView;
             modules_list() -> $crate::dto::ModulesView;
+            config_raw_get() -> $crate::dto::RawConfig;
+            config_raw_check(text: String) -> u32;
+            config_raw_save(layer: String, text: String) -> $crate::dto::RawConfig;
             modules_set_enabled(id: String, enabled: bool) -> $crate::dto::ModulesView;
             diag_snapshot() -> $crate::dto::DiagView;
             diag_run(tests: Vec<String>) -> $crate::dto::CheckRun;
@@ -283,6 +286,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 250);
+        assert_eq!(super::COMMANDS.len(), 253);
     }
 }

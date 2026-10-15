@@ -248,7 +248,7 @@ impl Built {
         let (gui, monitor) = work::gui(&options, &paths, &kernel);
         let mcp = agents::mcp_hub(&options, &paths, &kernel);
         self.extra.mcp = Some(mcp.clone());
-        let diag = agents::diag_app(&options, &paths);
+        let diag = agents::diag_app(&options, &paths, &kernel).await;
         self.extra.diag = Some(diag.clone());
         let ports = self.extra.ports(
             &options,

@@ -28,6 +28,7 @@ pub mod handles;
 pub mod late;
 pub mod modules;
 pub mod probe;
+pub mod raw_config;
 pub mod route;
 pub mod secrets;
 pub mod settings;

@@ -6,6 +6,7 @@
 
 #![allow(missing_docs)]
 
+mod advanced;
 mod agents;
 mod bridges;
 mod broker;
@@ -35,6 +36,7 @@ mod updates;
 mod voice_engines;
 mod voice_features;
 
+pub use advanced::RawConfig;
 pub use agents::{
     AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
     RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,

@@ -120,6 +120,9 @@ pub fn spec(command: &str) -> Option<Spec> {
             vec![("id", s), ("enabled", roundtrip::<bool>)],
             roundtrip::<ModulesView>,
         ),
+        "config_raw_get" => (vec![], roundtrip::<RawConfig>),
+        "config_raw_check" => (vec![("text", s)], roundtrip::<u32>),
+        "config_raw_save" => (vec![("layer", s), ("text", s)], roundtrip::<RawConfig>),
         "diag_runs" => (
             vec![("limit", roundtrip::<u32>)],
             roundtrip::<Vec<CheckRun>>,

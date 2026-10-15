@@ -33,6 +33,7 @@ import { FakePlugins } from './api-plugins';
 import { FakeMcp } from './api-mcp';
 import { FakeDiag } from './api-diag';
 import { FakeModules } from './api-modules';
+import { FakeAdvanced } from './api-advanced';
 import { FakeEngines } from './api-engines';
 import { FakeFiles } from './api-files';
 import { FakeCore, type FakeOptions } from './core';
@@ -81,6 +82,7 @@ export class FakeAlfaClient implements AlfaClient {
   readonly mcp: AlfaClient['mcp'];
   readonly diag: AlfaClient['diag'];
   readonly modules: AlfaClient['modules'];
+  readonly advanced: AlfaClient['advanced'];
   readonly engines: AlfaClient['engines'];
   readonly attachments: AlfaClient['attachments'];
   readonly conversation: AlfaClient['conversation'];
@@ -127,6 +129,7 @@ export class FakeAlfaClient implements AlfaClient {
     this.mcp = new FakeMcp(core).api();
     this.diag = new FakeDiag(core).api();
     this.modules = new FakeModules(core).api();
+    this.advanced = new FakeAdvanced(core).api();
     this.engines = new FakeEngines(core).api();
     const files = new FakeFiles(core);
     this.attachments = files.attachmentsApi();

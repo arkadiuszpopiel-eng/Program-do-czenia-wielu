@@ -228,7 +228,11 @@ pub(crate) fn mcp_hub(
 
 /// Diagnostyka komputera: historia w danych lokalnych, raporty w `<Alfa>\Diagnostyka`,
 /// codzienny zapis parametrów w tle.
-pub(crate) fn diag_app(options: &AppOptions, paths: &AppPaths) -> Arc<app_diag::DiagApp> {
+pub(crate) async fn diag_app(
+    options: &AppOptions,
+    paths: &AppPaths,
+    kernel: &super::Kernel,
+) -> Arc<app_diag::DiagApp> {
     let probe = options
         .diag_probe
         .clone()
@@ -238,6 +242,10 @@ pub(crate) fn diag_app(options: &AppOptions, paths: &AppPaths) -> Arc<app_diag::
         local: paths.local.clone(),
         reports: paths.user_root.join("Diagnostyka"),
     }));
-    app.spawn_auto();
+    // Flaga eksperymentalna (Ustawienia → Zaawansowane), domyślnie włączona.
+    let daily = super::memory::setting(kernel, "experimental.diag_daily").await;
+    if daily.and_then(|v| v.as_bool()).unwrap_or(true) {
+        app.spawn_auto();
+    }
     app
 }

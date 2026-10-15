@@ -23,6 +23,7 @@ import { enConnections } from './en-connections';
 import { enMcp } from './en-mcp';
 import { enDiag } from './en-diag';
 import { enModules } from './en-modules';
+import { enAdvanced } from './en-advanced';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -48,4 +49,5 @@ export const en: Record<MessageKey, Message> = {
   ...enMcp,
   ...enDiag,
   ...enModules,
+  ...enAdvanced,
 };

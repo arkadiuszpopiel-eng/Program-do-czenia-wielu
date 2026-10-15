@@ -2,6 +2,7 @@
 
 pub(crate) mod account_keys;
 mod accounts;
+mod advanced;
 mod agents;
 pub(crate) mod app;
 mod bridges;

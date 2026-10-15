@@ -2468,26 +2468,6 @@
         "upcoming": []
       },
       {
-        "id": "advanced",
-        "label": {
-          "pl": "Zaawansowane",
-          "en": "Advanced"
-        },
-        "wave": 8,
-        "custom": null,
-        "settings": [],
-        "upcoming": [
-          {
-            "pl": "Edytor surowy TOML",
-            "en": "Raw TOML editor"
-          },
-          {
-            "pl": "Flagi eksperymentalne",
-            "en": "Experimental flags"
-          }
-        ]
-      },
-      {
         "id": "about",
         "label": {
           "pl": "O programie",
@@ -2518,6 +2498,34 @@
         "wave": 1,
         "custom": "diag",
         "settings": [],
+        "upcoming": []
+      },
+      {
+        "id": "advanced",
+        "label": {
+          "pl": "Zaawansowane",
+          "en": "Advanced"
+        },
+        "wave": 1,
+        "custom": "advanced",
+        "settings": [
+          {
+            "key": "experimental.diag_daily",
+            "label": {
+              "pl": "Codzienny zapis parametrów komputera",
+              "en": "Daily computer parameter record"
+            },
+            "description": {
+              "pl": "Raz na dobę Alfa zapisuje parametry komputera i zdarzenia awarii do historii diagnostyki (kilka sekund, tylko odczyt). Zmiana po ponownym uruchomieniu.",
+              "en": "Once a day Alfa records computer parameters and failure events to the diagnostics history (a few seconds, read-only). Takes effect after a restart."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "machine"
+          }
+        ],
         "upcoming": []
       }
     ]
@@ -2599,7 +2607,8 @@
       "ui.locale": "pl",
       "updates.channel": "stable",
       "updates.mode": "ask",
-      "updates.whats_new": true
+      "updates.whats_new": true,
+      "experimental.diag_daily": true
     }
   },
   {

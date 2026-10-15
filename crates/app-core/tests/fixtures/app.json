@@ -81,7 +81,8 @@
         "ui.locale": "pl",
         "updates.channel": "stable",
         "updates.mode": "ask",
-        "updates.whats_new": true
+        "updates.whats_new": true,
+        "experimental.diag_daily": true
       },
       "layout": null,
       "active_session_id": "s-q3",

@@ -73,3 +73,9 @@ export const modulesApi = (): AlfaClient['modules'] => ({
   list: () => call('modules_list'),
   setEnabled: (id, enabled) => call('modules_set_enabled', { id, enabled }),
 });
+
+export const advancedApi = (): AlfaClient['advanced'] => ({
+  raw: () => call('config_raw_get'),
+  check: (text) => call('config_raw_check', { text }),
+  save: (layer, text) => call('config_raw_save', { layer, text }),
+});

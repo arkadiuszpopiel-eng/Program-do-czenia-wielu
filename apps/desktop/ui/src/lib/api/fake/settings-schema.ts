@@ -3,12 +3,30 @@
 import type { SettingValue, SettingsPageDef } from '../types-system';
 import { SETTINGS_PART_A } from './settings-part-a';
 import { SETTINGS_PART_B } from './settings-part-b';
-import { L, page } from './settings-helpers';
+import { L, page, toggle } from './settings-helpers';
 
 /** Strony dodane po podziale na części (każda część jest u limitu długości pliku). */
 const SETTINGS_LATER: readonly SettingsPageDef[] = [
   page('mcp', L('Serwery MCP', 'MCP servers'), 1, [], { custom: 'mcp' }),
   page('diag', L('Diagnostyka komputera', 'Computer diagnostics'), 1, [], { custom: 'diag' }),
+  page(
+    'advanced',
+    L('Zaawansowane', 'Advanced'),
+    1,
+    [
+      toggle(
+        'experimental.diag_daily',
+        L('Codzienny zapis parametrów komputera', 'Daily computer parameter record'),
+        L(
+          'Raz na dobę Alfa zapisuje parametry komputera i zdarzenia awarii do historii diagnostyki (kilka sekund, tylko odczyt). Zmiana po ponownym uruchomieniu.',
+          'Once a day Alfa records computer parameters and failure events to the diagnostics history (a few seconds, read-only). Takes effect after a restart.',
+        ),
+        true,
+        'machine',
+      ),
+    ],
+    { custom: 'advanced' },
+  ),
 ];
 
 export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [

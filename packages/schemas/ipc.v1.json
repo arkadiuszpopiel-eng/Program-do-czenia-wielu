@@ -8926,6 +8926,40 @@
       ],
       "type": "string"
     },
+    "RawConfig": {
+      "description": "Treść plików konfiguracji.",
+      "properties": {
+        "machine": {
+          "description": "Nakładka tej maszyny.",
+          "type": "string"
+        },
+        "machine_path": {
+          "type": "string"
+        },
+        "problems": {
+          "description": "Problemy z ostatniego wczytania plików.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "shared": {
+          "description": "`shared.toml` (wspólny dla maszyn).",
+          "type": "string"
+        },
+        "shared_path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "shared",
+        "machine",
+        "shared_path",
+        "machine_path",
+        "problems"
+      ],
+      "type": "object"
+    },
     "ReadAction": {
       "description": "Akcja czytania na głos.",
       "oneOf": [
@@ -10169,6 +10203,11 @@
         {
           "const": "modules",
           "description": "Moduły: stan, budżety, zdolności; wyłączanie modułów opcjonalnych.",
+          "type": "string"
+        },
+        {
+          "const": "advanced",
+          "description": "Zaawansowane: surowy edytor plików konfiguracji, flagi eksperymentalne.",
           "type": "string"
         },
         {
@@ -13828,6 +13867,46 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/CamerasState"
+      }
+    },
+    "config_raw_check": {
+      "args": [
+        {
+          "name": "text",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      }
+    },
+    "config_raw_get": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/RawConfig"
+      }
+    },
+    "config_raw_save": {
+      "args": [
+        {
+          "name": "layer",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "text",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/RawConfig"
       }
     },
     "costs_set_monthly_limit": {

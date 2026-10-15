@@ -301,6 +301,7 @@ export class TauriAlfaClient implements AlfaClient {
   readonly mcp: AlfaClient['mcp'] = hub.mcpApi();
   readonly diag: AlfaClient['diag'] = hub.diagApi();
   readonly modules: AlfaClient['modules'] = hub.modulesApi();
+  readonly advanced: AlfaClient['advanced'] = hub.advancedApi();
   readonly plugins: AlfaClient['plugins'] = {
     list: () => call('plugins_list'),
     inspect: (wasmB64) => call('plugins_inspect', { wasmB64 }),

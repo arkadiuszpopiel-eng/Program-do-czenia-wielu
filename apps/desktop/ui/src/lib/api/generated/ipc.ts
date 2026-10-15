@@ -2410,6 +2410,18 @@ export interface RateLimitInfo {
 /** Ocena tury. */
 export type Rating = 'up' | 'down';
 
+/** Treść plików konfiguracji. */
+export interface RawConfig {
+  /** Nakładka tej maszyny. */
+  readonly machine: string;
+  readonly machine_path: string;
+  /** Problemy z ostatniego wczytania plików. */
+  readonly problems: readonly string[];
+  /** `shared.toml` (wspólny dla maszyn). */
+  readonly shared: string;
+  readonly shared_path: string;
+}
+
 /** Akcja czytania na głos. */
 export type ReadAction =
   | {
@@ -2763,6 +2775,7 @@ export type SettingsCustomPage =
   | 'mcp'
   | 'diag'
   | 'modules'
+  | 'advanced'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -3739,6 +3752,15 @@ export interface IpcCommands {
   readonly cameras_state: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: CamerasState;
+  };
+  readonly config_raw_check: { readonly args: { readonly text: string }; readonly result: number };
+  readonly config_raw_get: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: RawConfig;
+  };
+  readonly config_raw_save: {
+    readonly args: { readonly layer: string; readonly text: string };
+    readonly result: RawConfig;
   };
   readonly costs_set_monthly_limit: {
     readonly args: { readonly enabled: boolean; readonly monthly: Money };

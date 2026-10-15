@@ -127,6 +127,8 @@ pub enum SettingsCustomPage {
     Diag,
     /// Moduły: stan, budżety, zdolności; wyłączanie modułów opcjonalnych.
     Modules,
+    /// Zaawansowane: surowy edytor plików konfiguracji, flagi eksperymentalne.
+    Advanced,
     /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }
