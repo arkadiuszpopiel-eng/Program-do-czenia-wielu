@@ -7,7 +7,7 @@ import type { FakeCore } from './core';
 
 const BUILTINS: readonly BuiltinCommand[] = [
   {
-    title: 'Rachunki: działania, procenty, potęgi, pierwiastki, liczby słowami',
+    title: 'Rachunki: działania, procenty i zmiana procentowa, potęgi, pierwiastki, liczby słowami',
     examples: ['Ile to jest 7 razy 8?', '20% z 150'],
   },
   { title: 'Literowanie jednego słowa', examples: ['Przeliteruj rower'] },

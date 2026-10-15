@@ -103,6 +103,7 @@ komputerami albo do kopii — wklejone pozycje dopisują się do listy po sprawd
 Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — także bez internetu:
 
 - **rachunki** — „Ile to jest 7 razy 8?”, „oblicz (2+3)*4”, „20% z 150”, „pierwiastek z 81”, także liczby słowami;
+  procenty: „Ile procent to 25 z 200?”, „O ile procent wzrosło z 80 do 100?”;
 - **literowanie** — „Przeliteruj rower”, „jak się literuje słowo żółw”;
 - **losowanie** — „Rzuć kostką”, „orzeł czy reszka?”, „wylosuj liczbę od 1 do 10”;
 - **data i godzina** — „Która godzina?”, „Jaki dziś dzień?” (z zegara komputera);

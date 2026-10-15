@@ -21,6 +21,7 @@ pub mod keys {
 }
 mod math;
 pub mod numerals;
+mod percent;
 pub mod quiz;
 mod random;
 mod spell;
@@ -33,7 +34,7 @@ use chrono::NaiveDateTime;
 /// Rodzaj polecenia.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
-    /// Rachunek.
+    /// Rachunek (także pytania o procenty).
     Math,
     /// Literowanie słowa.
     Spell,
@@ -94,7 +95,7 @@ pub struct Entry {
 pub const CATALOG: &[Entry] = &[
     Entry {
         command: Command::Math,
-        title: "Rachunki: działania, procenty, potęgi, pierwiastki, liczby słowami",
+        title: "Rachunki: działania, procenty i zmiana procentowa, potęgi, pierwiastki, liczby słowami",
         examples: &[
             "Ile to jest 7 razy 8?",
             "oblicz (2+3)*4",
@@ -103,6 +104,8 @@ pub const CATALOG: &[Entry] = &[
             "dwadzieścia trzy plus sto",
             "2 do potęgi 10",
             "ile to jest 7 podzielone przez 2",
+            "ile procent to 25 z 200",
+            "o ile procent wzrosło z 80 do 100",
         ],
     },
     Entry {
@@ -213,6 +216,9 @@ pub fn answer(
     }
     if let Some(t) = numerals::answer(&text) {
         return reply(Command::Numerals, t);
+    }
+    if let Some(t) = percent::answer(&text) {
+        return reply(Command::Math, t);
     }
     math::answer(&text).and_then(|t| reply(Command::Math, t))
 }
