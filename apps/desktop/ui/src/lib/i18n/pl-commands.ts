@@ -1,0 +1,47 @@
+// Ustawienia → Polecenia bez modelu (pl — źródło kluczy).
+export const plCommands = {
+  'commands.title': 'Polecenia bez modelu',
+  'commands.intro':
+    'Na proste polecenia Alfa odpowiada sama — od razu, bez modelu i bez kosztu, także bez internetu. Polecenie musi być całą wiadomością; wszystko inne idzie do modelu.',
+  'commands.off': 'Polecenia są wyłączone — każda wiadomość idzie do modelu. Włączysz je niżej.',
+  'commands.test.title': 'Sprawdź wiadomość',
+  'commands.test.input': 'Wiadomość do sprawdzenia',
+  'commands.test.custom': 'Odpowie własne polecenie „{name}”:',
+  'commands.test.builtin': 'Odpowie polecenie wbudowane ({name}):',
+  'commands.test.quiz': 'Zacznie się quiz:',
+  'commands.test.model': 'Żadne polecenie nie pasuje — wiadomość pójdzie do modelu.',
+  'commands.test.disabled': 'Polecenia są wyłączone — wiadomość pójdzie do modelu.',
+  'commands.own.title': 'Własne polecenia',
+  'commands.own.hint':
+    'Fraza → stała odpowiedź. Mają pierwszeństwo przed wbudowanymi; przy kilku pasujących wygrywa wyższy priorytet, potem dłuższa fraza.',
+  'commands.own.empty': 'Nie masz jeszcze własnych poleceń.',
+  'commands.own.add': 'Dodaj polecenie',
+  'commands.own.edit': 'Edytuj',
+  'commands.own.remove': 'Usuń',
+  'commands.own.confirm': 'Usunąć „{name}”?',
+  'commands.own.confirmYes': 'Tak, usuń',
+  'commands.own.cancel': 'Anuluj',
+  'commands.own.enabled': 'Polecenie {name} włączone',
+  'commands.own.phrases': 'frazy',
+  'commands.own.priority': 'priorytet {n}',
+  'commands.mode.exact': 'cała wiadomość',
+  'commands.mode.starts': 'początek wiadomości',
+  'commands.mode.contains': 'zawiera frazę',
+  'commands.mode.regex': 'wyrażenie regularne',
+  'commands.form.title': 'Polecenie',
+  'commands.form.name': 'Nazwa',
+  'commands.form.phrases': 'Frazy (każda w osobnym wierszu)',
+  'commands.form.mode': 'Dopasowanie',
+  'commands.form.reply': 'Odpowiedź',
+  'commands.form.priority': 'Priorytet (−10…10)',
+  'commands.form.hint.exact':
+    'Wiadomość musi brzmieć dokładnie jak fraza (bez wielkości liter i polskich znaków).',
+  'commands.form.hint.starts':
+    'Wiadomość zaczyna się frazą; dalszy tekst wstawisz w odpowiedzi jako {reszta}.',
+  'commands.form.hint.contains': 'Fraza gdziekolwiek w wiadomości, jako pełne słowa.',
+  'commands.form.hint.regex':
+    'Wyrażenie regularne bez wielkości liter; nazwaną grupę (?P<miasto>…) wstawisz jako {miasto}.',
+  'commands.form.save': 'Zapisz',
+  'commands.form.cancel': 'Anuluj',
+  'commands.builtin.title': 'Polecenia wbudowane',
+};

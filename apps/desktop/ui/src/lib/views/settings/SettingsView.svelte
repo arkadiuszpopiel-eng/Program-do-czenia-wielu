@@ -29,6 +29,7 @@
   import DiagPage from './pages/DiagPage.svelte';
   import ModulesPage from './pages/ModulesPage.svelte';
   import AdvancedPage from './pages/AdvancedPage.svelte';
+  import QuickCommandsPage from './pages/QuickCommandsPage.svelte';
   import ApiPage from './pages/ApiPage.svelte';
   import RoutingPage from './pages/RoutingPage.svelte';
   import BridgesSection from './pages/BridgesSection.svelte';
@@ -161,6 +162,7 @@
           {:else if page.custom === 'diag'}<DiagPage />
           {:else if page.custom === 'modules'}<ModulesPage />
           {:else if page.custom === 'advanced'}<AdvancedPage />
+          {:else if page.custom === 'commands'}<QuickCommandsPage />
           {:else if page.custom === 'models'}<Lazy
               load={() => import('./pages/ModelsPage.svelte')}
               props={{}}

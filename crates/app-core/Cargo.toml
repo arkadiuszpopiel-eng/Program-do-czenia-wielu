@@ -65,6 +65,7 @@ platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
 # Dane
 lib-sqlstore = { path = "../lib-sqlstore" }
 lib-markdown = { path = "../lib-markdown" }
+lib-quick = { path = "../lib-quick" }
 sessions-contract = { path = "../sessions-contract" }
 sessions-impl = { path = "../sessions-impl" }
 search-contract = { path = "../search-contract" }

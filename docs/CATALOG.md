@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 70 |
-| Linie Rust (z testami) | 414 512 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2888 |
+| Linie Rust (z testami) | 415 508 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2894 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -148,11 +148,11 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4395 | 30 | — |  |
-| `app-api` | — | — | — | pojedynczy | 7660 | 32 | — |  |
+| `app-api` | — | — | — | pojedynczy | 7744 | 32 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 1190 | 9 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4384 | 24 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 2287 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 17 729 | 120 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 2361 | 6 | — |  |
+| `app-core` | — | — | — | pojedynczy | 17 740 | 122 | — |  |
 | `app-diag` | — | — | — | pojedynczy | 545 | 3 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3315 | 26 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
@@ -161,7 +161,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 7619 | 47 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 6011 | 38 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 6396 | 39 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |
@@ -180,7 +180,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `lib-media` | — | — | — | pojedynczy | 2049 | 17 | — |  |
 | `lib-netguard` | — | — | — | pojedynczy | 649 | 7 | — |  |
 | `lib-openai-compat` | — | — | — | pojedynczy | 1714 | 11 | — |  |
-| `lib-quick` | — | — | — | pojedynczy | 1112 | 11 | — |  |
+| `lib-quick` | — | — | — | pojedynczy | 1554 | 14 | — |  |
 | `lib-sidecar-guard` | — | — | — | pojedynczy | 518 | 4 | — |  |
 | `lib-smart-turn` | — | — | — | pojedynczy | 588 | 7 | — |  |
 | `lib-sqlstore` | — | — | — | pojedynczy | 1321 | 30 | — |  |

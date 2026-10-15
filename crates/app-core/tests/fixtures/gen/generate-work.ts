@@ -146,6 +146,20 @@ export async function runWork(
   await both('modules', 'setEnabled', 'voice-tts', false);
   await both('modules', 'setEnabled', 'voice-tts', true);
   await both('advanced', 'raw');
+  const quick = (await both('localCommands', 'get')) as { commands: unknown[] };
+  await both('localCommands', 'test', 'Ile to jest 7 razy 8?');
+  await both('localCommands', 'set', [
+    ...quick.commands,
+    {
+      id: '',
+      name: 'Zanotuj',
+      phrases: ['zanotuj'],
+      mode: 'starts',
+      reply: 'Zapisuję: {reszta}',
+      enabled: true,
+      priority: 0,
+    },
+  ]);
   await both('advanced', 'check', '[ui]\ntheme = "dark"\n');
   await both('advanced', 'save', 'machine', '[camera]\nenabled = true\n');
   await both('diag', 'state');

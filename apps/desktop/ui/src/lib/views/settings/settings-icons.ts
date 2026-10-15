@@ -35,6 +35,7 @@ import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 import Users from '@lucide/svelte/icons/users';
 import Wallet from '@lucide/svelte/icons/wallet';
 import WandSparkles from '@lucide/svelte/icons/wand-sparkles';
+import Zap from '@lucide/svelte/icons/zap';
 import Wrench from '@lucide/svelte/icons/wrench';
 
 type Icon = Component<{ size?: number | string; strokeWidth?: number | string }>;
@@ -74,6 +75,7 @@ const ICONS: Record<string, Icon> = {
   modules: Blocks,
   updates: Download,
   advanced: Wrench,
+  commands: Zap,
   about: Info,
 };
 

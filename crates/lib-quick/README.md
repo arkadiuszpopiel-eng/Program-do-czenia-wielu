@@ -23,6 +23,10 @@ Wspólna biblioteka (kategoria `lib-*`, bez logiki modułu): **polecenia wykonyw
   wywołujący (testy podstawiają stałe).
 - **Quiz** (`quiz`) ma stan, który trzyma wywołujący — w Alfie jeden quiz na sesję, w pamięci;
   wiadomość, która nie jest odpowiedzią ani „koniec”, kończy quiz bez słowa i idzie dalej.
+- **Własne polecenia** (`custom`): fraza → stała odpowiedź z `{reszta}` i nazwanymi grupami;
+  tryby: cała wiadomość, początek, zawiera (pełne słowa), wyrażenie regularne (limit 300 znaków
+  i rozmiaru automatu). Pierwszeństwo: priorytet, potem dłuższa fraza. Listę trzyma rdzeń
+  (`sessions.custom_commands`, walidacja w `app-modules/src/quick_commands.rs`).
 - Katalog `CATALOG` ma przykłady każdego polecenia — test sprawdza, że każdy trafia we własne
   polecenie, a lista zwykłych pytań nie trafia w żadne.
 
@@ -30,5 +34,6 @@ Wspólna biblioteka (kategoria `lib-*`, bez logiki modułu): **polecenia wykonyw
 
 `app-chat` (`src/quick.rs`) sprawdza ostatnią wiadomość użytkownika (tekst albo głos, bez
 załączników) przed delegacją do modelu; odpowiedź jest zwykłą turą agentki bez `usage`, na osi czasu
-„Bez modelu: <polecenie>”. Offline taka wiadomość nie trafia do kolejki. Wyłącza ustawienie
-`sessions.local_commands` (Ustawienia → Sesje i okna → „Polecenia bez modelu”).
+„Bez modelu: <polecenie>”. Offline taka wiadomość nie trafia do kolejki. Kolejność: odpowiedź w trwającym
+quizie, własne polecenie, początek quizu, polecenie wbudowane. Wyłącza ustawienie
+`sessions.local_commands` (Ustawienia → Polecenia bez modelu).

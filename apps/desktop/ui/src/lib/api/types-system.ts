@@ -85,6 +85,7 @@ export type SettingsCustomPage =
   | 'diag'
   | 'modules'
   | 'advanced'
+  | 'commands'
   | 'models';
 
 export interface SettingsPageDef {

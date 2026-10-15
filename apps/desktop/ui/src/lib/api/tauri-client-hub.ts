@@ -79,3 +79,9 @@ export const advancedApi = (): AlfaClient['advanced'] => ({
   check: (text) => call('config_raw_check', { text }),
   save: (layer, text) => call('config_raw_save', { layer, text }),
 });
+
+export const localCommandsApi = (): AlfaClient['localCommands'] => ({
+  get: () => call('quick_commands_get'),
+  set: (commands) => call('quick_commands_set', { commands }),
+  test: (message) => call('quick_commands_test', { message }),
+});

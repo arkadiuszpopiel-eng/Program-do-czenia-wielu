@@ -9,6 +9,15 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod clock;
+pub mod custom;
+
+/// Klucze konfiguracji poleceń (wspólne dla rdzenia i silnika rozmowy).
+pub mod keys {
+    /// Polecenia bez modelu włączone (domyślnie tak).
+    pub const ENABLED: &str = "sessions.local_commands";
+    /// Własne polecenia użytkownika (tekst JSON).
+    pub const CUSTOM: &str = "sessions.custom_commands";
+}
 mod math;
 pub mod quiz;
 mod random;
@@ -31,6 +40,8 @@ pub enum Command {
     Clock,
     /// Quiz z tabliczki mnożenia (stan trzyma wywołujący — [`quiz`]).
     Quiz,
+    /// Własne polecenie użytkownika ([`custom`]).
+    Custom,
 }
 
 impl Command {
@@ -42,6 +53,7 @@ impl Command {
             Self::Random => "losowanie",
             Self::Clock => "data i godzina",
             Self::Quiz => "quiz",
+            Self::Custom => "własne polecenie",
         }
     }
 }

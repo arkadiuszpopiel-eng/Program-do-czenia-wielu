@@ -21,6 +21,7 @@
 pub mod broker;
 pub mod cameras;
 pub mod catalog;
+pub mod device_view;
 pub mod embedder;
 pub mod fx_http;
 pub mod gpu_mem;
@@ -28,6 +29,7 @@ pub mod handles;
 pub mod late;
 pub mod modules;
 pub mod probe;
+pub mod quick_commands;
 pub mod raw_config;
 pub mod route;
 pub mod secrets;

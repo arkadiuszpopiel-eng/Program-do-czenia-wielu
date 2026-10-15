@@ -27,28 +27,30 @@ const SETTINGS_LATER: readonly SettingsPageDef[] = [
     ],
     { custom: 'advanced' },
   ),
-];
-
-/** Ustawienia dopisane do stron z części (części są u limitu długości pliku). */
-const EXTRA: Readonly<Record<string, SettingsPageDef['settings']>> = {
-  sessions: [
-    toggle(
-      'sessions.local_commands',
-      L('Polecenia bez modelu', 'Commands without a model'),
-      L(
-        'Rachunki, literowanie, losowanie, data i godzina — Alfa odpowiada od razu, bez modelu i bez kosztu, także offline.',
-        'Arithmetic, spelling, random draws, date and time — Alfa answers at once, without a model or cost, offline too.',
+  page(
+    'commands',
+    L('Polecenia bez modelu', 'Commands without a model'),
+    1,
+    [
+      toggle(
+        'sessions.local_commands',
+        L('Odpowiadaj bez modelu', 'Answer without a model'),
+        L(
+          'Rachunki, literowanie, losowanie, data i godzina — Alfa odpowiada od razu, bez modelu i bez kosztu, także offline.',
+          'Arithmetic, spelling, random draws, date and time — Alfa answers at once, without a model or cost, offline too.',
+        ),
+        true,
       ),
-      true,
-    ),
-  ],
-};
+    ],
+    { custom: 'commands' },
+  ),
+];
 
 export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [
   ...SETTINGS_PART_A,
   ...SETTINGS_PART_B,
   ...SETTINGS_LATER,
-].map((p) => (EXTRA[p.id] ? { ...p, settings: [...p.settings, ...(EXTRA[p.id] ?? [])] } : p));
+];
 
 export function defaultValues(): Record<string, SettingValue> {
   const out: Record<string, SettingValue> = {};

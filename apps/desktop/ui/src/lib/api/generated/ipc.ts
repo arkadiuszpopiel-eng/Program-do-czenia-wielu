@@ -733,6 +733,12 @@ export interface BuilderSaved {
   readonly role: string;
 }
 
+/** Polecenie wbudowane (opis i przykłady). */
+export interface BuiltinCommand {
+  readonly examples: readonly string[];
+  readonly title: string;
+}
+
 /** Dopasowanie z uzasadnieniem (`reason` — dla `tight` i `too_weak`). */
 export interface BundleFit {
   readonly kind: BundleFitKind;
@@ -964,6 +970,20 @@ export interface CronPreview {
 
 /** Waluta kwoty. */
 export type Currency = 'PLN' | 'USD';
+
+/** Własne polecenie: frazy → stała odpowiedź. */
+export interface CustomCommand {
+  readonly enabled: boolean;
+  /** Identyfikator (pusty przy dodawaniu — nadaje rdzeń). */
+  readonly id: string;
+  readonly mode: QuickMatchMode;
+  readonly name: string;
+  readonly phrases: readonly string[];
+  /** Wyższy wygrywa (−10…10). */
+  readonly priority: number;
+  /** Odpowiedź (Markdown) z `{reszta}` i nazwanymi grupami wyrażenia. */
+  readonly reply: string;
+}
 
 /** Wartość szczegółu: tekst (identyfikator, wartość wyliczenia), liczba albo flaga. */
 export type DetailValue = boolean | number | string;
@@ -2418,6 +2438,29 @@ export interface QuickAskResult {
   readonly user_turn_id: string;
 }
 
+/** Widok strony. */
+export interface QuickCommandsView {
+  readonly builtins: readonly BuiltinCommand[];
+  readonly commands: readonly CustomCommand[];
+  /** Polecenia bez modelu włączone (`sessions.local_commands`). */
+  readonly enabled: boolean;
+}
+
+/** Tryb dopasowania frazy własnego polecenia. */
+export type QuickMatchMode = 'exact' | 'starts' | 'contains' | 'regex';
+
+/** Kto odpowie na wiadomość. */
+export type QuickSource = 'custom' | 'builtin' | 'quiz' | 'model' | 'disabled';
+
+/** Wynik testera. */
+export interface QuickTest {
+  /** Nazwa polecenia (własne) albo rodzaj (wbudowane). */
+  readonly name: string | null;
+  /** Odpowiedź, którą dostanie użytkownik. */
+  readonly reply: string | null;
+  readonly source: QuickSource;
+}
+
 /** Limit zapytań u dostawcy. */
 export interface RateLimitInfo {
   readonly provider: string;
@@ -2793,6 +2836,7 @@ export type SettingsCustomPage =
   | 'diag'
   | 'modules'
   | 'advanced'
+  | 'commands'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -4102,6 +4146,18 @@ export interface IpcCommands {
     readonly result: PluginsView;
   };
   readonly quick_ask: { readonly args: { readonly text: string }; readonly result: QuickAskResult };
+  readonly quick_commands_get: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: QuickCommandsView;
+  };
+  readonly quick_commands_set: {
+    readonly args: { readonly commands: readonly CustomCommand[] };
+    readonly result: QuickCommandsView;
+  };
+  readonly quick_commands_test: {
+    readonly args: { readonly message: string };
+    readonly result: QuickTest;
+  };
   readonly quick_expand_to_main: {
     readonly args: { readonly sessionId: string };
     readonly result: null;

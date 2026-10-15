@@ -2806,6 +2806,25 @@
       ],
       "type": "object"
     },
+    "BuiltinCommand": {
+      "description": "Polecenie wbudowane (opis i przykłady).",
+      "properties": {
+        "examples": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "examples"
+      ],
+      "type": "object"
+    },
     "BundleFit": {
       "description": "Dopasowanie z uzasadnieniem (`reason` — dla `tight` i `too_weak`).",
       "properties": {
@@ -3666,6 +3685,49 @@
         "USD"
       ],
       "type": "string"
+    },
+    "CustomCommand": {
+      "description": "Własne polecenie: frazy → stała odpowiedź.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "description": "Identyfikator (pusty przy dodawaniu — nadaje rdzeń).",
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/QuickMatchMode"
+        },
+        "name": {
+          "type": "string"
+        },
+        "phrases": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "priority": {
+          "description": "Wyższy wygrywa (−10…10).",
+          "format": "int32",
+          "type": "integer"
+        },
+        "reply": {
+          "description": "Odpowiedź (Markdown) z `{reszta}` i nazwanymi grupami wyrażenia.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "phrases",
+        "mode",
+        "reply",
+        "enabled",
+        "priority"
+      ],
+      "type": "object"
     },
     "DetailValue": {
       "anyOf": [
@@ -8942,6 +9004,116 @@
       ],
       "type": "object"
     },
+    "QuickCommandsView": {
+      "description": "Widok strony.",
+      "properties": {
+        "builtins": {
+          "items": {
+            "$ref": "#/$defs/BuiltinCommand"
+          },
+          "type": "array"
+        },
+        "commands": {
+          "items": {
+            "$ref": "#/$defs/CustomCommand"
+          },
+          "type": "array"
+        },
+        "enabled": {
+          "description": "Polecenia bez modelu włączone (`sessions.local_commands`).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "commands",
+        "builtins",
+        "enabled"
+      ],
+      "type": "object"
+    },
+    "QuickMatchMode": {
+      "description": "Tryb dopasowania frazy własnego polecenia.",
+      "oneOf": [
+        {
+          "const": "exact",
+          "description": "Cała wiadomość.",
+          "type": "string"
+        },
+        {
+          "const": "starts",
+          "description": "Początek wiadomości; dalszy tekst to `{reszta}`.",
+          "type": "string"
+        },
+        {
+          "const": "contains",
+          "description": "Fraza w wiadomości (pełne słowa).",
+          "type": "string"
+        },
+        {
+          "const": "regex",
+          "description": "Wyrażenie regularne; nazwane grupy to zmienne.",
+          "type": "string"
+        }
+      ]
+    },
+    "QuickSource": {
+      "description": "Kto odpowie na wiadomość.",
+      "oneOf": [
+        {
+          "const": "custom",
+          "description": "Własne polecenie.",
+          "type": "string"
+        },
+        {
+          "const": "builtin",
+          "description": "Polecenie wbudowane.",
+          "type": "string"
+        },
+        {
+          "const": "quiz",
+          "description": "Początek quizu.",
+          "type": "string"
+        },
+        {
+          "const": "model",
+          "description": "Model (żadne polecenie nie pasuje).",
+          "type": "string"
+        },
+        {
+          "const": "disabled",
+          "description": "Polecenia wyłączone w ustawieniach.",
+          "type": "string"
+        }
+      ]
+    },
+    "QuickTest": {
+      "description": "Wynik testera.",
+      "properties": {
+        "name": {
+          "description": "Nazwa polecenia (własne) albo rodzaj (wbudowane).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reply": {
+          "description": "Odpowiedź, którą dostanie użytkownik.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/QuickSource"
+        }
+      },
+      "required": [
+        "source",
+        "name",
+        "reply"
+      ],
+      "type": "object"
+    },
     "RateLimitInfo": {
       "description": "Limit zapytań u dostawcy.",
       "properties": {
@@ -10248,6 +10420,11 @@
         {
           "const": "advanced",
           "description": "Zaawansowane: surowy edytor plików konfiguracji, flagi eksperymentalne.",
+          "type": "string"
+        },
+        {
+          "const": "commands",
+          "description": "Polecenia bez modelu: włączanie, własne polecenia, tester, katalog wbudowanych.",
           "type": "string"
         },
         {
@@ -15066,6 +15243,41 @@
       ],
       "result": {
         "$ref": "#/$defs/QuickAskResult"
+      }
+    },
+    "quick_commands_get": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/QuickCommandsView"
+      }
+    },
+    "quick_commands_set": {
+      "args": [
+        {
+          "name": "commands",
+          "schema": {
+            "items": {
+              "$ref": "#/$defs/CustomCommand"
+            },
+            "type": "array"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/QuickCommandsView"
+      }
+    },
+    "quick_commands_test": {
+      "args": [
+        {
+          "name": "message",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/QuickTest"
       }
     },
     "quick_expand_to_main": {

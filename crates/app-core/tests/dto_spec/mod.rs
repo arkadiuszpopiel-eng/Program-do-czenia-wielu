@@ -123,6 +123,12 @@ pub fn spec(command: &str) -> Option<Spec> {
         "config_raw_get" => (vec![], roundtrip::<RawConfig>),
         "config_raw_check" => (vec![("text", s)], roundtrip::<u32>),
         "config_raw_save" => (vec![("layer", s), ("text", s)], roundtrip::<RawConfig>),
+        "quick_commands_get" => (vec![], roundtrip::<QuickCommandsView>),
+        "quick_commands_set" => (
+            vec![("commands", roundtrip::<Vec<CustomCommand>>)],
+            roundtrip::<QuickCommandsView>,
+        ),
+        "quick_commands_test" => (vec![("message", s)], roundtrip::<QuickTest>),
         "diag_runs" => (
             vec![("limit", roundtrip::<u32>)],
             roundtrip::<Vec<CheckRun>>,

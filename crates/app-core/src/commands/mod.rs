@@ -3,6 +3,7 @@
 pub(crate) mod account_keys;
 mod accounts;
 mod advanced;
+mod local_commands;
 mod agents;
 pub(crate) mod app;
 mod bridges;

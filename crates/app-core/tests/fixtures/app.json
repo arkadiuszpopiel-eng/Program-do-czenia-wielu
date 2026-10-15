@@ -56,7 +56,6 @@
         "sessions.auto_title": true,
         "sessions.delete_undo_seconds": 10,
         "ui.max_detached_windows": 4,
-        "sessions.local_commands": true,
         "files.workdir_root": "%USERPROFILE%\\Alfa\\Sesje",
         "files.image_thumbnails": true,
         "diagnostician.autonomy": "auto_low_risk",
@@ -83,7 +82,8 @@
         "updates.channel": "stable",
         "updates.mode": "ask",
         "updates.whats_new": true,
-        "experimental.diag_daily": true
+        "experimental.diag_daily": true,
+        "sessions.local_commands": true
       },
       "layout": null,
       "active_session_id": "s-q3",

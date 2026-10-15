@@ -7,6 +7,7 @@
 #![allow(missing_docs)]
 
 mod advanced;
+mod quick;
 mod agents;
 mod bridges;
 mod broker;
@@ -37,6 +38,9 @@ mod voice_engines;
 mod voice_features;
 
 pub use advanced::RawConfig;
+pub use quick::{
+    BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
+};
 pub use agents::{
     AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
     RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,

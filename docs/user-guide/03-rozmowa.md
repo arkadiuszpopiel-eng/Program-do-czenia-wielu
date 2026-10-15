@@ -84,7 +84,12 @@ Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — ta
   (także słowami albo głosem), „koniec” przerywa z podsumowaniem; inna wiadomość kończy quiz.
 
 Polecenie musi być całą wiadomością — „ile kosztuje 5 jabłek” czy „która godzina w Tokio” trafią do modelu.
-Wyłączysz to w Ustawienia → Sesje i okna → „Polecenia bez modelu”.
+
+**Własne polecenia** dodasz w Ustawienia → Polecenia bez modelu: fraza → stała odpowiedź, np. „dobranoc” →
+„Dobranoc! Do jutra.”. Dopasowanie: cała wiadomość, początek (dalszy tekst wstawisz jako `{reszta}`, np. „Zanotuj:
+kupić mleko” → „Zapisuję: kupić mleko”), fraza w środku albo wyrażenie regularne. Tester na tej stronie pokazuje,
+kto odpowie na wpisaną wiadomość — własne polecenie, wbudowane, quiz czy model. Tam też wyłączysz polecenia
+bez modelu.
 
 ## Brak internetu
 

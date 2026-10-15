@@ -146,3 +146,53 @@ async fn multiplication_quiz_keeps_state_per_session() {
     assert_eq!(provider.requests().len(), 1);
     core.turns_stop(sid).await.unwrap();
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn custom_commands_reply_test_and_validate() {
+    use app_core::dto::{CustomCommand, QuickMatchMode, QuickSource};
+    let dir = tempfile::tempdir().unwrap();
+    let provider = Arc::new(ScriptedProvider::new(Duration::from_millis(1)));
+    let opts = options(Some(provider.clone()), Arc::new(HeadlessShell::default()));
+    let core = AppCore::build(AppPaths::under(dir.path()), opts)
+        .await
+        .unwrap();
+    let view = core.quick_commands_get().await.unwrap();
+    assert!(view.commands.is_empty() && view.enabled);
+    assert!(view.builtins.len() >= 5);
+    let note = CustomCommand {
+        id: String::new(),
+        name: "Zanotuj".into(),
+        phrases: vec!["zanotuj".into()],
+        mode: QuickMatchMode::Starts,
+        reply: "Zapisuję: {reszta}".into(),
+        enabled: true,
+        priority: 0,
+    };
+    let saved = core.quick_commands_set(vec![note.clone()]).await.unwrap();
+    assert_eq!(saved.commands[0].id, "zanotuj");
+    let t = core
+        .quick_commands_test("Zanotuj: kupić mleko".into())
+        .await
+        .unwrap();
+    assert_eq!(t.source, QuickSource::Custom);
+    assert_eq!(t.reply.as_deref(), Some("Zapisuję: kupić mleko"));
+    let sid = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    let (turn, _) = reply(&core, &sid, "Zanotuj: kupić mleko").await;
+    assert_eq!(turn.text, "Zapisuję: kupić mleko");
+    assert!(provider.requests().is_empty(), "bez modelu");
+
+    let mut bad = note;
+    bad.mode = QuickMatchMode::Regex;
+    bad.phrases = vec!["(".into()];
+    assert!(core.quick_commands_set(vec![bad]).await.is_err());
+    assert_eq!(core.quick_commands_get().await.unwrap().commands.len(), 1);
+    core.settings_set("sessions.local_commands".into(), SettingValue::Bool(false))
+        .await
+        .unwrap();
+    let off = core.quick_commands_test("2+2".into()).await.unwrap();
+    assert_eq!(off.source, QuickSource::Disabled);
+}
