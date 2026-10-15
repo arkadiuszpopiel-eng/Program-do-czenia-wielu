@@ -79,13 +79,40 @@ export const plWork = {
   'term.loginTitle': 'Logowanie do {name}',
   'term.service.claude_login': 'Claude Code',
   'term.service.codex_login': 'Codex',
-  'term.service.agy_login': 'Antigravity (konto Google)',
+  'term.service.agy_login': 'Google Gemini — Antigravity (konto Google AI Pro)',
   'term.guide.label': 'Jak się zalogować',
-  'term.guide.1': 'Poczekaj chwilę — narzędzie poda adres albo samo otworzy przeglądarkę.',
-  'term.guide.2': 'Zaloguj się w przeglądarce na swoje konto i wróć do tego okna.',
-  'term.guide.3': 'Gdy zobaczysz potwierdzenie, kliknij „Gotowe”.',
-  'term.guide.note':
-    'Narzędzie jest po angielsku. Jeśli zapyta, czy ufasz folderowi („Yes, I trust this folder”), wybierz tę odpowiedź strzałką i naciśnij Enter — to folder danych Alfy.',
+  'term.guide.claude_login.1':
+    'Jeśli narzędzie pyta o wygląd („Choose the text style”), naciśnij Enter.',
+  'term.guide.claude_login.2':
+    'Przy „Select login method” zostaw pierwszą opcję („Claude account with subscription”) i naciśnij Enter — otworzy się przeglądarka.',
+  'term.guide.claude_login.3':
+    'W przeglądarce kliknij „Authorize” (Autoryzuj) i wróć tutaj. Jeśli widzisz tylko pole „>”, kliknij przycisk „Wpisz /login” poniżej.',
+  'term.guide.claude_login.4':
+    'Gdy pojawi się „Login successful”, Alfa pokaże zielony komunikat — kliknij „Gotowe”.',
+  'term.guide.claude_login.note':
+    'Narzędzie jest po angielsku: strzałki ↑ ↓ wybierają, Enter zatwierdza. Jeśli zapyta, czy ufasz folderowi, wybierz „Yes” — to pusty folder logowania Alfy, nie Twoje pliki.',
+  'term.guide.codex_login.1': 'Poczekaj chwilę — przeglądarka otworzy się sama.',
+  'term.guide.codex_login.2':
+    'Zaloguj się kontem ChatGPT (tym, na którym masz plan) i wróć do tego okna.',
+  'term.guide.codex_login.3':
+    'Gdy pojawi się „Successfully logged in”, Alfa pokaże zielony komunikat — kliknij „Gotowe”.',
+  'term.guide.codex_login.note':
+    'Nic nie musisz wpisywać. Jeśli przeglądarka się nie otworzyła, skopiuj adres, który pokazało narzędzie, i wklej go w przeglądarce.',
+  'term.guide.agy_login.1':
+    'Jeśli narzędzie pyta, czy ufasz folderowi, wybierz strzałką „Yes” i naciśnij Enter — to pusty folder logowania Alfy, nie Twoje pliki.',
+  'term.guide.agy_login.2':
+    'Jeśli pyta o sposób logowania, wybierz logowanie kontem Google („Login with Google”) i naciśnij Enter — otworzy się przeglądarka.',
+  'term.guide.agy_login.3':
+    'Zaloguj się w przeglądarce kontem Google z planem AI Pro i wróć tutaj.',
+  'term.guide.agy_login.4':
+    'Gdy w nagłówku zobaczysz swoje konto i „(Google AI Pro)”, Alfa pokaże zielony komunikat — kliknij „Gotowe”.',
+  'term.guide.agy_login.note':
+    'Ważne: nie wpisuj nic w pole „>” — tam zaczyna się rozmowa z modelem, nie logowanie. Na odpowiedzi „Yes” w tym polu model zacznie działać na plikach.',
+  'term.detected': 'Zalogowano — możesz kliknąć „Gotowe”.',
+  'term.detectedPlan':
+    'Zalogowano — plan {plan}. Kliknij „Gotowe”, a Alfa zapamięta, że może korzystać z tego konta.',
+  'term.typeLogin': 'Wpisz /login',
+  'term.typeLoginHint': 'gdy narzędzie od razu pokazało pole „>” zamiast wyboru logowania',
   'term.loginOk': 'Narzędzie zakończyło pracę bez błędu. Możesz zamknąć to okno.',
   'term.loginFailed':
     'Logowanie nie zostało dokończone (kod {code}). Możesz spróbować jeszcze raz.',

@@ -63,7 +63,7 @@ pub fn route_name(id: &str) -> String {
         "grok-build-subscription" => "Grok Build (subskrypcja)".into(),
         "grok-build-api" => "Grok Build (klucz API)".into(),
         "kimi-code-cli" => "Kimi Code CLI".into(),
-        "agy-antigravity" => "Antigravity CLI (agy)".into(),
+        "agy-antigravity" => "Google Gemini — Antigravity CLI (agy)".into(),
         "qwen-coding-plan" => "Qwen Coding Plan".into(),
         "glm-zcode-plan" => "GLM / ZCode Plan".into(),
         other => other.replace('-', " "),

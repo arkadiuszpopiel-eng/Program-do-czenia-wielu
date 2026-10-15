@@ -7,6 +7,8 @@ import {
   isStandardAgent,
   loginBridge,
   loginProfile,
+  loginSignal,
+  stripAnsi,
   paramsTemplate,
   textToB64,
 } from '../work';
@@ -58,5 +60,17 @@ describe('pomocniki F8', () => {
     expect(d.limits.autonomy).toBe('L2');
     expect(d.limits.fs_write).toEqual([]);
     expect(d.role?.tools).toEqual([]);
+  });
+
+  it('wykrycie zalogowania w oknie logowania — plan bez adresu e-mail', () => {
+    const esc = String.fromCharCode(27);
+    const header = `${esc}[34mAntigravity CLI 1.3.5${esc}[0m\r\nala@example.com (Google AI Pro)\r\n`;
+    expect(loginSignal('agy_login', header)).toEqual({ plan: 'Google AI Pro' });
+    expect(JSON.stringify(loginSignal('agy_login', header))).not.toContain('@');
+    expect(loginSignal('agy_login', 'Do you trust this folder?')).toBeNull();
+    expect(loginSignal('claude_login', 'Login successful. Press Enter')).toEqual({ plan: null });
+    expect(loginSignal('codex_login', 'Successfully logged in')).toEqual({ plan: null });
+    expect(loginSignal('shell', 'Login successful')).toBeNull();
+    expect(stripAnsi(`${esc}[1;34mA${esc}[0m${esc}[2KB`)).toBe('AB');
   });
 });

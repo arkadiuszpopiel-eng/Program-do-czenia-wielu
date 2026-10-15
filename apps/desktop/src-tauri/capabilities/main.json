@@ -153,6 +153,7 @@
     "allow-bridges-set-schedule",
     "allow-bridges-pin",
     "allow-bridges-check",
+    "allow-bridges-mark-login",
     "allow-bridges-open-login",
     "allow-gui-status",
     "allow-gui-screenshot",

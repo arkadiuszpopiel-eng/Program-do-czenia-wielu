@@ -143,3 +143,51 @@ async fn check_without_the_tool_says_not_installed() {
         Some(BridgeAccountState::NotInstalled)
     );
 }
+
+/// Antigravity nie ma polecenia stanu: okno logowania przekazuje plan z nagłówka, rdzeń
+/// zapamiętuje tylko plan i dzień (bez adresu e-mail) — stan zostaje po ponownym uruchomieniu.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn antigravity_login_seen_in_the_window_is_remembered() {
+    let dir = tempfile::tempdir().unwrap();
+    // Ten sam magazyn sekretów — drugi start otwiera tę samą zaszyfrowaną bazę.
+    let secrets = Arc::new(app_core::MemorySecretStore::default());
+    let build = |dir: &std::path::Path| {
+        let provider = Arc::new(ScriptedProvider::new(Duration::from_millis(1)));
+        let shell = Arc::new(app_core::ports::HeadlessShell::default());
+        let mut opts = options(Some(provider), shell);
+        opts.cli_probe = Some(Arc::new(Probe::default()));
+        opts.secrets = Some(secrets.clone());
+        AppCore::build(AppPaths::under(dir), opts)
+    };
+    let core = build(dir.path()).await.unwrap();
+    let card = core
+        .bridges_mark_login(
+            "antigravity".into(),
+            Some("Google AI Pro <ala@example.com>".into()),
+        )
+        .await
+        .unwrap();
+    let account = card.account.clone().expect("konto");
+    assert_eq!(account.state, BridgeAccountState::LoggedIn);
+    let plan = account.plan.clone().unwrap_or_default();
+    assert!(plan.starts_with("Google AI Pro"), "{plan}");
+    let json = serde_json::to_string(&card).unwrap();
+    assert!(!json.contains('@') && !json.contains('<'), "{json}");
+    // Narzędzie z poleceniem stanu: zapisu nie ma, decyduje polecenie stanu.
+    let claude = core
+        .bridges_mark_login("claude_code".into(), Some("x".into()))
+        .await
+        .unwrap();
+    assert_eq!(
+        claude.account.map(|a| a.state),
+        Some(BridgeAccountState::LoggedIn)
+    );
+    drop(core);
+    let again = build(dir.path()).await.unwrap();
+    let agy = again.bridges_check("antigravity".into()).await.unwrap();
+    assert_eq!(
+        agy.account.map(|a| a.state),
+        Some(BridgeAccountState::LoggedIn),
+        "stan po ponownym uruchomieniu"
+    );
+}

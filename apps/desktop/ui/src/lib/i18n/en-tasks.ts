@@ -179,6 +179,8 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'bridges.perDay': 'Most runs per day',
   'bridges.login': 'Show sign-in command',
   'bridges.checkLogin': 'Check sign-in',
+  'bridges.agyWhy':
+    'A personal Google AI Pro account works in Google’s tools only through Antigravity CLI — Google turned off personal sign-in for Gemini CLI in June 2026. No API key is needed.',
   'bridges.agyWarn':
     'Warning: the Antigravity terms (section 6) forbid using the service in connection with products not provided by Google. Turning this bridge on risks your Google account being limited or suspended. Alfa never auto-approves its commands — it refuses them itself — and runs it in a sandbox.',
   'bridges.loginHint': 'Type in the terminal (Alfa runs nothing):',

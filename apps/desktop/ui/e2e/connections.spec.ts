@@ -70,7 +70,19 @@ test('po „Gotowe” w oknie logowania Alfa sama sprawdza konto i mówi, czy mo
   await openSettingsPage(page, 'Mosty CLI');
   const agy = page.locator('li.card').filter({ hasText: 'Antigravity CLI (agy)' });
   await expect(agy.getByRole('note')).toContainText('regulamin Antigravity');
+  await expect(agy).toContainText('Gemini CLI Google wyłączył');
   await agy.getByRole('button', { name: 'Zaloguj się' }).click();
-  await expect(page.getByRole('dialog', { name: /Logowanie do Antigravity/ })).toBeVisible();
+  const agyDialog = page.getByRole('dialog', { name: /Logowanie do Google Gemini/ });
+  await expect(agyDialog).toBeVisible();
+  // Instrukcja krok po kroku i ostrzeżenie przed pisaniem w polu rozmowy z modelem.
+  await expect(agyDialog).toContainText('Login with Google');
+  await expect(agyDialog).toContainText('nie wpisuj nic w pole „>”');
+  // Nagłówek narzędzia z planem → Alfa sama wykrywa zalogowanie (adres e-mail nie jest zapisywany).
+  await expect(
+    agyDialog.getByRole('status').filter({ hasText: 'plan Google AI Pro' }),
+  ).toBeVisible();
+  await agyDialog.getByRole('button', { name: 'Gotowe' }).click();
+  await expect(page.getByText(/zalogowano \(plan Google AI Pro\)/)).toBeVisible();
+  await expect(agy).toContainText('Zalogowano · plan Google AI Pro');
   expect(errors).toEqual([]);
 });

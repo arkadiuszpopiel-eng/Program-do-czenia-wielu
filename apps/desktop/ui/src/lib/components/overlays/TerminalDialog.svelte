@@ -10,7 +10,15 @@
   import { Button } from '@alfa/ui-kit';
   import type { TerminalFrame, TerminalSession } from '../../api/types-work';
   import { loginResult } from '../../logic/connections';
-  import { b64ToBytes, binaryToB64, loginBridge, textToB64 } from '../../logic/work';
+  import {
+    GUIDE_STEPS,
+    b64ToBytes,
+    binaryToB64,
+    loginBridge,
+    loginSignal,
+    textToB64,
+    type LoginSignal,
+  } from '../../logic/work';
   import { showError } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import type { TerminalRequest } from '../../state/work.svelte';
@@ -27,6 +35,10 @@
   let session = $state<TerminalSession | null>(null);
   let exited = $state<number | null | undefined>(undefined);
   let error = $state<string | null>(null);
+  /** Zalogowanie wykryte w wyjściu narzędzia (np. „(Google AI Pro)” w nagłówku Antigravity). */
+  let detected = $state<LoginSignal | null>(null);
+  /** Kroki instrukcji dla tego narzędzia (klucze `term.guide.<profil>.<n>`). */
+  const steps = $derived(GUIDE_STEPS[request.profile] ?? 0);
   /** Logowanie do narzędzia dostawcy: okno prowadzi krok po kroku, zamiast zostawiać z terminalem. */
   const login = $derived(loginBridge(request.profile) !== null);
   const title = $derived(
@@ -47,6 +59,10 @@
     exited = undefined;
     session = null;
     error = null;
+    detected = null;
+    // Ostatnie znaki wyjścia (bez treści w logach — tylko do wykrycia zalogowania tutaj).
+    const decoder = new TextDecoder();
+    let tail = '';
     let host: TerminalHost | null = null;
     let id: number | null = null;
     let closed = false;
@@ -64,8 +80,15 @@
     const onFrame = (frame: TerminalFrame) => {
       // Spóźniona ramka zamkniętej sesji (po „Spróbuj ponownie”) nie zmienia stanu nowej.
       if (closed) return;
-      if (frame.kind === 'output') host?.write(b64ToBytes(frame.data_b64));
-      else {
+      if (frame.kind === 'output') {
+        const bytes = b64ToBytes(frame.data_b64);
+        host?.write(bytes);
+        if (untrack(() => detected) === null) {
+          tail = (tail + decoder.decode(bytes, { stream: true })).slice(-16_384);
+          const signal = loginSignal(profile, tail);
+          if (signal) detected = signal;
+        }
+      } else {
         exited = frame.code;
         const note = untrack(() => t('term.exited', { code: frame.code ?? '—' }));
         host?.write(`\r\n${note}\r\n`);
@@ -98,15 +121,20 @@
   function close() {
     // Most odczytany przed zamknięciem — zamknięcie zdejmuje żądanie (i `request`).
     const bridge = loginBridge(request.profile);
+    const signal = detected;
     app.work.closeTerminal();
     // Po logowaniu od razu sprawdzamy stan konta — właściciel widzi, czy Alfa może korzystać
     // z narzędzia (np. „zalogowano · plan Max”), zamiast zgadywać po zamknięciu okna.
-    if (bridge) void checkLogin(bridge);
+    if (bridge) void checkLogin(bridge, signal);
   }
 
-  async function checkLogin(bridge: string) {
+  async function checkLogin(bridge: string, signal: LoginSignal | null) {
     try {
-      const card = await app.client.bridges.check(bridge);
+      // Antigravity nie ma polecenia stanu: zalogowanie wykryte w oknie zapamiętuje rdzeń.
+      const card =
+        bridge === 'antigravity' && signal
+          ? await app.client.bridges.markLogin(bridge, signal.plan)
+          : await app.client.bridges.check(bridge);
       app.work.bridgeChecked = card;
       const r = loginResult(card);
       const plan = r.withPlan ? t('conn.loginResult.planSuffix', { plan: r.vars.plan ?? '' }) : '';
@@ -120,6 +148,19 @@
     } catch (error) {
       showError(app.toasts, error);
     }
+  }
+
+  /** Gest użytkownika: wpisuje polecenie w terminal narzędzia (np. `/login` w Claude Code). */
+  function type(command: string) {
+    const id = session?.id;
+    if (id === undefined || exited !== undefined) return;
+    app.client.terminal
+      .input(
+        id,
+        textToB64(`${command}
+`),
+      )
+      .catch(() => undefined);
   }
 
   /** Ponowna próba: nowe żądanie tego samego profilu uruchamia terminal od początku. */
@@ -139,8 +180,10 @@
       <header class="head">
         <Dialog.Title class="alfa-term-title">{title}</Dialog.Title>
         {#if login}
-          <Button size="sm" variant={exited === 0 ? 'primary' : 'secondary'} onclick={close}
-            >{t('term.done')}</Button
+          <Button
+            size="sm"
+            variant={exited === 0 || detected ? 'primary' : 'secondary'}
+            onclick={close}>{t('term.done')}</Button
           >
         {:else}
           <Button size="sm" variant="secondary" onclick={close}>{t('term.close')}</Button>
@@ -151,11 +194,28 @@
       </Dialog.Description>
       {#if login}
         <ol class="guide" aria-label={t('term.guide.label')}>
-          {#each ['1', '2', '3'] as const as n (n)}
-            <li><span class="num" aria-hidden="true">{n}</span>{t(`term.guide.${n}`)}</li>
+          {#each Array.from({ length: steps }, (_, i) => String(i + 1)) as n (n)}
+            <li>
+              <span class="num" aria-hidden="true">{n}</span>{tk(
+                `term.guide.${request.profile}.${n}`,
+              )}
+            </li>
           {/each}
         </ol>
-        <p class="hint">{t('term.guide.note')}</p>
+        <p class="hint">{tk(`term.guide.${request.profile}.note`)}</p>
+        {#if request.profile === 'claude_login' && session && exited === undefined && !detected}
+          <div class="quick">
+            <Button size="sm" variant="secondary" onclick={() => type('/login')}
+              >{t('term.typeLogin')}</Button
+            >
+            <span class="hint">{t('term.typeLoginHint')}</span>
+          </div>
+        {/if}
+      {/if}
+      {#if login && detected}
+        <p class="note good" role="status">
+          {detected.plan ? t('term.detectedPlan', { plan: detected.plan }) : t('term.detected')}
+        </p>
       {/if}
       {#if error}
         <div class="note bad" role="alert">
@@ -294,5 +354,11 @@
     .guide {
       grid-template-columns: 1fr;
     }
+  }
+  .quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--alfa-space-2);
   }
 </style>

@@ -79,13 +79,39 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'term.loginTitle': 'Sign in to {name}',
   'term.service.claude_login': 'Claude Code',
   'term.service.codex_login': 'Codex',
-  'term.service.agy_login': 'Antigravity (Google account)',
+  'term.service.agy_login': 'Google Gemini — Antigravity (Google AI Pro account)',
   'term.guide.label': 'How to sign in',
-  'term.guide.1': 'Wait a moment — the tool will show an address or open the browser itself.',
-  'term.guide.2': 'Sign in to your account in the browser and come back to this window.',
-  'term.guide.3': 'When you see the confirmation, click “Done”.',
-  'term.guide.note':
-    'If the tool asks whether you trust the folder (“Yes, I trust this folder”), pick that answer with the arrow key and press Enter — it is Alfa’s data folder.',
+  'term.guide.claude_login.1':
+    'If the tool asks about the look (“Choose the text style”), press Enter.',
+  'term.guide.claude_login.2':
+    'At “Select login method” keep the first option (“Claude account with subscription”) and press Enter — a browser opens.',
+  'term.guide.claude_login.3':
+    'In the browser click “Authorize” and come back. If you only see a “>” field, click “Type /login” below.',
+  'term.guide.claude_login.4':
+    'When “Login successful” appears, Alfa shows a green note — click “Done”.',
+  'term.guide.claude_login.note':
+    'Arrow keys ↑ ↓ choose, Enter confirms. If it asks whether you trust the folder, choose “Yes” — it is Alfa’s empty sign-in folder, not your files.',
+  'term.guide.codex_login.1': 'Wait a moment — the browser opens by itself.',
+  'term.guide.codex_login.2':
+    'Sign in with your ChatGPT account (the one with the plan) and come back.',
+  'term.guide.codex_login.3':
+    'When “Successfully logged in” appears, Alfa shows a green note — click “Done”.',
+  'term.guide.codex_login.note':
+    'You do not need to type anything. If no browser opened, copy the address the tool printed into a browser.',
+  'term.guide.agy_login.1':
+    'If the tool asks whether you trust the folder, choose “Yes” with the arrows and press Enter — it is Alfa’s empty sign-in folder, not your files.',
+  'term.guide.agy_login.2':
+    'If it asks how to sign in, choose “Login with Google” and press Enter — a browser opens.',
+  'term.guide.agy_login.3': 'Sign in with the Google account that has AI Pro and come back.',
+  'term.guide.agy_login.4':
+    'When the header shows your account and “(Google AI Pro)”, Alfa shows a green note — click “Done”.',
+  'term.guide.agy_login.note':
+    'Important: do not type anything in the “>” field — that starts a chat with the model, not sign-in. Answering “Yes” there makes the model act on files.',
+  'term.detected': 'Signed in — you can click “Done”.',
+  'term.detectedPlan':
+    'Signed in — {plan} plan. Click “Done” and Alfa will remember it can use this account.',
+  'term.typeLogin': 'Type /login',
+  'term.typeLoginHint': 'when the tool showed a “>” field instead of the sign-in choice',
   'term.loginOk': 'The tool finished without an error. You can close this window.',
   'term.loginFailed': 'Sign-in was not completed (code {code}). You can try again.',
   'term.openFailed': 'The sign-in window could not be opened: {error}',

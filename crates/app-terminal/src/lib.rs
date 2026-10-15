@@ -144,6 +144,9 @@ pub struct TerminalApp {
     pty: Arc<dyn PseudoConsolePort>,
     programs: Programs,
     default_cwd: PathBuf,
+    /// Pusty folder dla profili logowania (`claude`, `codex`, `agy`): narzędzie pyta o zaufanie
+    /// temu folderowi, a nie profilowi użytkownika, i nie ma czego czytać.
+    login_cwd: Option<PathBuf>,
     bus: Option<(Arc<dyn EventBus>, tokio::runtime::Handle)>,
     manager: Mutex<Option<(TerminalPrograms, Arc<TerminalManager>)>>,
 }
@@ -167,9 +170,17 @@ impl TerminalApp {
             pty: pty.unwrap_or_else(|| Arc::new(platform_windows_pty_impl::WinPty)),
             programs,
             default_cwd,
+            login_cwd: None,
             bus: None,
             manager: Mutex::new(None),
         }
+    }
+
+    /// Folder startowy profili logowania (builder).
+    #[must_use]
+    pub fn with_login_cwd(mut self, dir: PathBuf) -> Self {
+        self.login_cwd = Some(dir);
+        self
     }
 
     /// Zdarzenia cyklu życia (bez treści) na magistrali (builder).
@@ -222,7 +233,17 @@ impl TerminalApp {
         let size = PtySize { cols, rows };
         size.validate()
             .map_err(|e| AppError::invalid(format!("Rozmiar terminala: {e}")))?;
-        let cwd = cwd.map(PathBuf::from).filter(|p| p.is_dir());
+        let login = matches!(
+            profile_id,
+            TerminalProfileId::ClaudeLogin
+                | TerminalProfileId::CodexLogin
+                | TerminalProfileId::AgyLogin
+        );
+        let cwd = cwd.map(PathBuf::from).filter(|p| p.is_dir()).or_else(|| {
+            let dir = self.login_cwd.clone().filter(|_| login)?;
+            std::fs::create_dir_all(&dir).ok()?;
+            Some(dir)
+        });
         let manager = self.manager();
         let request = OpenRequest {
             profile: profile(profile_id),

@@ -48,6 +48,16 @@ impl AppCore {
         self.inner.bridges.check(&bridge).await
     }
 
+    /// `bridges_mark_login`: okno logowania wykryło zalogowanie narzędzia bez polecenia stanu
+    /// (Antigravity — konto i plan w nagłówku); zapamiętany tylko plan i dzień.
+    pub async fn bridges_mark_login(
+        &self,
+        bridge: String,
+        plan: Option<String>,
+    ) -> Result<BridgeCard, AppError> {
+        self.inner.bridges.mark_login(&bridge, plan).await
+    }
+
     /// `bridges_open_login`: terminal w katalogu domowym + polecenie logowania do skopiowania.
     pub async fn bridges_open_login(&self, bridge: String) -> Result<BridgeLogin, AppError> {
         let bridges = self.inner.bridges.clone();

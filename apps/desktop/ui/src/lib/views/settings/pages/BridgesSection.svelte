@@ -122,6 +122,7 @@
         </p>
         {#if card.stale}<p class="note">{t('bridges.stale')}</p>{/if}
         {#if card.bridge === 'antigravity'}
+          <p class="note">{t('bridges.agyWhy')}</p>
           <p class="warn" role="note">{t('bridges.agyWarn')}</p>
         {/if}
         {#if !card.bridge}

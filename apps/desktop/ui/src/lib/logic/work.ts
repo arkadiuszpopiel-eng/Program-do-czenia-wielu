@@ -104,3 +104,39 @@ export function paramsTemplate(schema: unknown): Record<string, unknown> {
   }
   return out;
 }
+
+/** Zalogowanie wykryte w oknie logowania (plan tylko, gdy narzędzie go pokazuje). */
+export interface LoginSignal {
+  readonly plan: string | null;
+}
+
+const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;?]*[ -/]*[@-~]`, 'g');
+
+/** Tekst terminala bez sekwencji sterujących (kolory, kursor). */
+export function stripAnsi(text: string): string {
+  return text.replace(ANSI, '');
+}
+
+/**
+ * Czy wyjście narzędzia mówi, że logowanie się udało. Antigravity pokazuje w nagłówku konto
+ * i plan („(Google AI Pro)”) — bierzemy tylko plan, nigdy adres e-mail.
+ */
+export function loginSignal(profile: TerminalProfileId, output: string): LoginSignal | null {
+  const text = stripAnsi(output);
+  if (profile === 'agy_login') {
+    const plan = /\((Google AI [A-Za-z]+(?: [A-Za-z]+)?)\)/.exec(text)?.[1];
+    return plan ? { plan } : null;
+  }
+  if (profile === 'claude_login') return /Login successful/i.test(text) ? { plan: null } : null;
+  if (profile === 'codex_login') {
+    return /Successfully logged in|Logged in using/i.test(text) ? { plan: null } : null;
+  }
+  return null;
+}
+
+/** Liczba kroków instrukcji logowania dla profilu (teksty: `term.guide.<profil>.<n>`). */
+export const GUIDE_STEPS: Partial<Record<TerminalProfileId, number>> = {
+  claude_login: 4,
+  codex_login: 3,
+  agy_login: 4,
+};

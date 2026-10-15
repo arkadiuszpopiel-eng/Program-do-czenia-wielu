@@ -3277,6 +3277,10 @@ export interface IpcCommands {
     readonly args: { readonly refresh: boolean };
     readonly result: readonly BridgeCard[];
   };
+  readonly bridges_mark_login: {
+    readonly args: { readonly bridge: string; readonly plan: string | null };
+    readonly result: BridgeCard;
+  };
   readonly bridges_open_login: {
     readonly args: { readonly bridge: string };
     readonly result: BridgeLogin;

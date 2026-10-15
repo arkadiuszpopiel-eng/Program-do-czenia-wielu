@@ -93,6 +93,7 @@ impl Built {
             .parent()
             .map_or_else(|| d.paths.user_root.clone(), std::path::Path::to_path_buf);
         let terminal = TerminalApp::new(d.options.pty.clone(), Programs::detect(Some(probe)), home)
+            .with_login_cwd(d.paths.local.join("logowanie"))
             .with_bus(d.bus.clone(), tokio::runtime::Handle::current());
         let catalog = d.stack.map_or_else(Vec::new, |s| {
             s.tools.all().iter().map(|t| t.manifest().clone()).collect()

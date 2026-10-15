@@ -321,6 +321,8 @@ export interface BridgesApi {
   openLogin(bridge: string): Promise<BridgeLogin>;
   /** Czy narzędzie jest zainstalowane i zalogowane (polecenie stanu CLI; wynik zostaje na karcie). */
   check(bridge: string): Promise<BridgeCard>;
+  /** Okno logowania wykryło zalogowanie (narzędzie bez polecenia stanu): zapamiętuje plan. */
+  markLogin(bridge: string, plan: string | null): Promise<BridgeCard>;
 }
 
 export interface AlfaClient {

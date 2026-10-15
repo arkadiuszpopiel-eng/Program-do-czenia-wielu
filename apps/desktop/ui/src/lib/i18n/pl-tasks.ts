@@ -177,6 +177,8 @@ export const plTasks = {
   'bridges.perDay': 'Najwięcej uruchomień na dobę',
   'bridges.login': 'Pokaż polecenie logowania',
   'bridges.checkLogin': 'Sprawdź logowanie',
+  'bridges.agyWhy':
+    'Konto prywatne Google AI Pro działa w narzędziach Google tylko przez Antigravity CLI — logowanie kontem prywatnym w Gemini CLI Google wyłączył w czerwcu 2026. Klucz API nie jest potrzebny.',
   'bridges.agyWarn':
     'Uwaga: regulamin Antigravity (pkt 6) zabrania korzystania z usługi w połączeniu z produktami innymi niż Google. Włączając ten most, ryzykujesz ograniczenie lub zawieszenie konta Google. Alfa nie daje mu automatycznej zgody na polecenia — sam je odrzuca — i uruchamia go w piaskownicy.',
   'bridges.loginHint': 'Wpisz w terminalu (Alfa niczego nie wykonuje):',

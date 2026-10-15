@@ -143,7 +143,7 @@ export class FakeGui {
       cmd: 'Microsoft Windows (atrapa)\r\nC:\\Users\\ala>',
       claude_login: 'Claude Code (atrapa) — wpisz /login, aby się zalogować\r\n> ',
       codex_login: 'Codex (atrapa) — logowanie: postępuj zgodnie z instrukcją\r\n> ',
-      agy_login: 'Antigravity (atrapa) — zaloguj się kontem Google w przeglądarce\r\n> ',
+      agy_login: 'Antigravity CLI (atrapa)\r\nty@example.com (Google AI Pro)\r\n> ',
     };
     const session = (id: number): TerminalSession => {
       const s = this.sessions.get(id);

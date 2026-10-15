@@ -120,5 +120,6 @@ export async function runWork(
   await both('bridges', 'openLogin', 'claude_code');
   await both('bridges', 'check', 'claude_code');
   await both('bridges', 'check', 'antigravity');
+  await both('bridges', 'markLogin', 'antigravity', 'Google AI Pro');
   await flush();
 }

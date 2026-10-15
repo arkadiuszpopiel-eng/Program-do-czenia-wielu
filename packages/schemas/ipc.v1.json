@@ -12012,6 +12012,28 @@
         "type": "array"
       }
     },
+    "bridges_mark_login": {
+      "args": [
+        {
+          "name": "bridge",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "plan",
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/BridgeCard"
+      }
+    },
     "bridges_open_login": {
       "args": [
         {

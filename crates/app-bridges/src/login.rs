@@ -32,8 +32,8 @@ fn account(
     }
 }
 
-/// Wartość z wyjścia zewnętrznego narzędzia: tylko litery, cyfry, spacje i `.-_`, najwyżej 24 znaki.
-fn tidy(raw: &str) -> String {
+/// Wartość z wyjścia zewnętrznego narzędzia (też plan z nagłówka `agy`): tylko litery, cyfry, spacje i `.-_`, najwyżej 24 znaki.
+pub fn tidy(raw: &str) -> String {
     raw.chars()
         .filter(|c| c.is_alphanumeric() || matches!(c, ' ' | '.' | '-' | '_'))
         .take(24)
@@ -140,6 +140,30 @@ pub fn check(kind: BridgeKind, out: Option<&CliOutput>) -> BridgeAccount {
         (BridgeKind::ClaudeCode, Some(out)) => parse_claude(out),
         (BridgeKind::Codex, Some(out)) => parse_codex(out),
     }
+}
+
+/// Zalogowanie wykryte w oknie logowania (narzędzie bez polecenia stanu — Antigravity pokazuje
+/// w nagłówku konto i plan, np. „Google AI Pro”). `day` — kiedy wykryto (RRRR-MM-DD).
+pub fn seen(kind: BridgeKind, plan: Option<String>, day: &str) -> BridgeAccount {
+    let name = match kind {
+        BridgeKind::ClaudeCode => "Claude Code",
+        BridgeKind::Codex => "Codex",
+        BridgeKind::Antigravity => "Antigravity",
+    };
+    let detail = match &plan {
+        Some(p) => format!(
+            "Zalogowano — plan {p} (wykryte w oknie logowania {day}). Alfa może zlecać zadania {name}, gdy włączysz most."
+        ),
+        None => format!(
+            "Zalogowano (wykryte w oknie logowania {day}). Alfa może zlecać zadania {name}, gdy włączysz most."
+        ),
+    };
+    account(
+        BridgeAccountState::LoggedIn,
+        plan,
+        Some("konto Google".to_owned()).filter(|_| kind == BridgeKind::Antigravity),
+        &detail,
+    )
 }
 
 /// Konto, gdy narzędzia nie ma na komputerze.

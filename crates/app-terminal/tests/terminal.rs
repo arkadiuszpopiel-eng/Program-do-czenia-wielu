@@ -142,3 +142,30 @@ async fn exit_is_reported_and_bad_input_is_rejected() {
         "zły rozmiar"
     );
 }
+
+/// Logowanie startuje w pustym folderze Alfy (narzędzie pyta o zaufanie temu folderowi, a nie
+/// profilowi użytkownika); zwykła powłoka — jak dotąd w katalogu domowym.
+#[tokio::test(flavor = "multi_thread")]
+async fn login_profiles_start_in_the_login_folder() {
+    let pty = Arc::new(FakePty::with_banner(b"", true));
+    let dir = std::env::temp_dir().join(format!("alfa-logowanie-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    let app = TerminalApp::new(Some(pty.clone()), programs(true), PathBuf::from("/"))
+        .with_login_cwd(dir.clone());
+    let sink = Arc::new(Collect::default());
+    let login = app
+        .open(TerminalProfileId::ClaudeLogin, 80, 24, None, sink.clone())
+        .unwrap();
+    assert_eq!(pty.spawned().last().unwrap().cwd, dir);
+    assert!(
+        dir.is_dir(),
+        "folder logowania tworzony przy pierwszym użyciu"
+    );
+    app.close(login.id).unwrap();
+    let shell = app
+        .open(TerminalProfileId::Shell, 80, 24, None, sink)
+        .unwrap();
+    assert_eq!(pty.spawned().last().unwrap().cwd, PathBuf::from("/"));
+    app.close(shell.id).unwrap();
+    let _ = std::fs::remove_dir_all(&dir);
+}

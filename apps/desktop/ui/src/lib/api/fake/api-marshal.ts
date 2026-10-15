@@ -187,7 +187,7 @@ function seedCards(): BridgeCard[] {
     }),
     card({
       route_id: 'agy-antigravity',
-      name: 'Antigravity CLI (agy)',
+      name: 'Google Gemini — Antigravity CLI (agy)',
       bridge: 'antigravity',
       provider: 'google',
       program: 'agy',
@@ -259,6 +259,16 @@ export function bridgesApi(core: FakeCore): AlfaClient['bridges'] {
       }),
     check: (bridge) =>
       update(bridge, (c) => ({ account: fakeAccount(c, new Date().toISOString()) })),
+    markLogin: (bridge, plan) =>
+      update(bridge, (c) => ({
+        account: {
+          state: 'logged_in',
+          plan,
+          method: 'konto Google',
+          detail: 'Zalogowano (wykryte w oknie logowania).',
+          checked_at: new Date().toISOString(),
+        },
+      })),
     openLogin: (bridge) => {
       const c = cards.find((x) => x.bridge === bridge);
       if (!c?.login_command) return Promise.reject(new Error(`Nieznany most „${bridge}”.`));

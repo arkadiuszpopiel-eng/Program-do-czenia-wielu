@@ -203,6 +203,7 @@ export class TauriAlfaClient implements AlfaClient {
     pin: (bridge, version) => call('bridges_pin', { bridge, version }),
     openLogin: (bridge) => call('bridges_open_login', { bridge }),
     check: (bridge) => call('bridges_check', { bridge }),
+    markLogin: (bridge, plan) => call('bridges_mark_login', { bridge, plan }),
   };
 
   readonly gui: AlfaClient['gui'] = {

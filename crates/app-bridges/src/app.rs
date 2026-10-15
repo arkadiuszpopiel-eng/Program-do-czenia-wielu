@@ -71,6 +71,11 @@ fn key(name: &str) -> Result<ConfigKey, AppError> {
     ConfigKey::new(name).map_err(AppError::from)
 }
 
+/// Klucz konfiguracji „ostatnie logowanie wykryte w oknie Alfy” (narzędzia bez polecenia stanu).
+fn login_key(kind: BridgeKind) -> String {
+    format!("agent_backends.login_seen_{}", bridge_key(kind))
+}
+
 impl BridgesApp {
     /// Nowe mosty.
     pub fn new(parts: BridgesParts) -> Self {
@@ -175,7 +180,15 @@ impl BridgesApp {
             .find(|d| d.name == kind.program());
         let account = match (&found, crate::login::status_args(kind)) {
             (None, _) => crate::login::not_installed(kind),
-            (Some(_), None) => crate::login::check(kind, None),
+            (Some(_), None) => match self.value(&login_key(kind)).await {
+                // „plan|dzień” z ostatniego logowania w oknie Alfy (narzędzie bez polecenia stanu).
+                Some(serde_json::Value::String(saved)) => {
+                    let (plan, day) = saved.split_once('|').unwrap_or(("", saved.as_str()));
+                    let plan = Some(plan.to_owned()).filter(|p| !p.is_empty());
+                    crate::login::seen(kind, plan, day)
+                }
+                _ => crate::login::check(kind, None),
+            },
             (Some(d), Some(args)) => {
                 let probe = self.p.probe.clone();
                 let path = d.path.clone();
@@ -192,6 +205,28 @@ impl BridgesApp {
             .into_iter()
             .find(|c| c.bridge.as_deref() == Some(bridge))
             .ok_or_else(|| AppError::not_found(format!("Brak karty mostu „{bridge}”.")))
+    }
+
+    /// `bridges_mark_login`: okno logowania wykryło zalogowanie narzędzia bez polecenia stanu
+    /// (Antigravity: konto i plan w nagłówku). Zapamiętuje tylko plan i dzień — bez adresu e-mail.
+    pub async fn mark_login(
+        &self,
+        bridge: &str,
+        plan: Option<String>,
+    ) -> Result<BridgeCard, AppError> {
+        let kind = Self::kind(bridge)?;
+        if crate::login::status_args(kind).is_some() {
+            // Narzędzie ma własne polecenie stanu — ono jest źródłem prawdy.
+            return self.check(bridge).await;
+        }
+        let plan = plan
+            .map(|p| crate::login::tidy(&p))
+            .filter(|p| !p.trim().is_empty())
+            .unwrap_or_default();
+        let day = chrono::Utc::now().format("%Y-%m-%d").to_string();
+        self.set(&login_key(kind), format!("{plan}|{day}").into())
+            .await?;
+        self.check(bridge).await
     }
 
     async fn card_for(&self, route: &str) -> Result<BridgeCard, AppError> {
