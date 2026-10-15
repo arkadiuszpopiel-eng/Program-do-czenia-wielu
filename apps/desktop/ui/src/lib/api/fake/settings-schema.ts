@@ -8,6 +8,7 @@ import { L, page } from './settings-helpers';
 /** Strony dodane po podziale na części (każda część jest u limitu długości pliku). */
 const SETTINGS_LATER: readonly SettingsPageDef[] = [
   page('mcp', L('Serwery MCP', 'MCP servers'), 1, [], { custom: 'mcp' }),
+  page('diag', L('Diagnostyka komputera', 'Computer diagnostics'), 1, [], { custom: 'diag' }),
 ];
 
 export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [

@@ -133,6 +133,7 @@ uuid.workspace = true
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 
 [dev-dependencies]
+pc-diag-fake = { path = "../pc-diag-fake" }
 base64 = "0.22.1"
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 providers-fake = { path = "../providers-fake" }

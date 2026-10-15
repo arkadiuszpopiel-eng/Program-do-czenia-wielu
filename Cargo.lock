@@ -572,6 +572,7 @@ dependencies = [
  "model-residency-contract",
  "model-residency-impl",
  "pc-diag-contract",
+ "pc-diag-fake",
  "personas-contract",
  "personas-impl",
  "platform-contract",

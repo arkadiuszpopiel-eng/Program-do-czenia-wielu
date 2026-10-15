@@ -1,0 +1,884 @@
+[
+  {
+    "command": "diag_state",
+    "args": {},
+    "result": {
+      "latest": {
+        "at": "2026-09-30T08:45:00.000Z",
+        "machine": {
+          "os": "Windows 11 Pro",
+          "os_version": "10.0.26200",
+          "model": "Laptop 15",
+          "bios": "1.20",
+          "uptime_s": 10800
+        },
+        "cpu": {
+          "name": "Procesor 10C/16T",
+          "cores": 10,
+          "threads": 16,
+          "base_mhz": 2400,
+          "current_mhz": 2400,
+          "load_pct": 12,
+          "l2_kb": 9728,
+          "l3_kb": 24576,
+          "virtualization": true
+        },
+        "memory": {
+          "total_mb": 16384,
+          "available_mb": 5120,
+          "pagefile_mb": 28672,
+          "pagefile_used_mb": 700,
+          "modules": [
+            {
+              "slot": "DIMM 0",
+              "capacity_mb": 8192,
+              "speed_mhz": 4800,
+              "manufacturer": "Producent",
+              "part": "M-8G"
+            },
+            {
+              "slot": "DIMM 1",
+              "capacity_mb": 8192,
+              "speed_mhz": 4800,
+              "manufacturer": "Producent",
+              "part": "M-8G"
+            }
+          ]
+        },
+        "disks": [
+          {
+            "number": 1,
+            "model": "NVMe 512GB",
+            "serial_tail": "…4F2A",
+            "media": "ssd",
+            "bus": "NVMe",
+            "size_mb": 488386,
+            "health": "healthy",
+            "operational": "OK",
+            "wear_pct": null,
+            "temperature_c": null,
+            "power_on_hours": null,
+            "read_errors": null,
+            "write_errors": null,
+            "removable": false,
+            "volumes": [
+              "C:"
+            ],
+            "event_errors": 0
+          },
+          {
+            "number": 2,
+            "model": "Mostek USB NVMe",
+            "serial_tail": null,
+            "media": "ssd",
+            "bus": "USB",
+            "size_mb": 488386,
+            "health": "healthy",
+            "operational": "OK",
+            "wear_pct": null,
+            "temperature_c": null,
+            "power_on_hours": null,
+            "read_errors": null,
+            "write_errors": null,
+            "removable": true,
+            "volumes": [
+              "E:"
+            ],
+            "event_errors": 200
+          }
+        ],
+        "volumes": [
+          {
+            "letter": "C:",
+            "label": "OS",
+            "file_system": "NTFS",
+            "size_mb": 487500,
+            "free_mb": 103500,
+            "system": true
+          },
+          {
+            "letter": "E:",
+            "label": "Dane",
+            "file_system": "NTFS",
+            "size_mb": 488300,
+            "free_mb": 68400,
+            "system": false
+          }
+        ],
+        "gpus": [
+          {
+            "name": "Karta graficzna 6 GB",
+            "driver_version": "32.0.16.1692",
+            "driver_date": "2026-09-04",
+            "vram_mb": 6144,
+            "status": "OK"
+          },
+          {
+            "name": "Grafika zintegrowana",
+            "driver_version": "32.0.101.7082",
+            "driver_date": "2025-12-01",
+            "vram_mb": 2048,
+            "status": "OK"
+          }
+        ],
+        "network": [
+          {
+            "name": "Wi-Fi",
+            "description": "Karta Wi-Fi",
+            "up": true,
+            "link_mbps": 1201,
+            "kind": "wifi"
+          },
+          {
+            "name": "Ethernet",
+            "description": "Karta Ethernet",
+            "up": false,
+            "link_mbps": null,
+            "kind": "ethernet"
+          }
+        ],
+        "battery": {
+          "charge_pct": 100,
+          "on_ac": true,
+          "design_mwh": null,
+          "full_mwh": null,
+          "cycles": null
+        },
+        "thermal": [
+          {
+            "name": "Strefa CPU",
+            "celsius": 71
+          }
+        ],
+        "events": {
+          "window_days": 7,
+          "counts": [
+            {
+              "kind": "unexpected_shutdown",
+              "count": 4
+            },
+            {
+              "kind": "bugcheck",
+              "count": 2
+            },
+            {
+              "kind": "disk",
+              "count": 275
+            },
+            {
+              "kind": "usb",
+              "count": 5
+            }
+          ],
+          "recent": [
+            {
+              "at": "2026-10-15T09:59:59Z",
+              "source": "Microsoft-Windows-WER-SystemErrorReporting",
+              "id": 1001,
+              "kind": "bugcheck",
+              "message": "Ponowny rozruch po błędzie: 0x00000116 (…)"
+            },
+            {
+              "at": "2026-10-15T09:05:08Z",
+              "source": "disk",
+              "id": 51,
+              "kind": "disk",
+              "message": "Błąd urządzenia \\Device\\Harddisk2\\DR19 podczas stronicowania. (×9)"
+            }
+          ]
+        },
+        "gaps": [
+          "liczniki SMART dysków (zużycie, godziny pracy, błędy) — wymagają uprawnień administratora"
+        ]
+      },
+      "integrity": {
+        "kind": {
+          "test": "integrity"
+        },
+        "verdict": "fail",
+        "metrics": [
+          {
+            "key": "disk_events",
+            "label": "Błędy dysku (dni)",
+            "value": 275,
+            "unit": "szt.",
+            "higher_is_better": false
+          }
+        ],
+        "notes": [
+          "2 niebieskich ekranów w ostatnich 7 dniach.",
+          "4 nieoczekiwanych wyłączeń w ostatnich 7 dniach.",
+          "275 błędów dysku lub systemu plików w ostatnich 7 dniach.",
+          "Niebieski ekran 0x116 VIDEO_TDR_FAILURE — karta graficzna przestała odpowiadać — sterownik, przegrzanie albo zasilanie karty.",
+          "Dysk Mostek USB NVMe (E:): 200 błędów w dzienniku — sprawdź kabel, mostek USB i kopię danych."
+        ],
+        "duration_ms": 1500
+      },
+      "last_run": null,
+      "available": [
+        "integrity",
+        "cpu_single",
+        "cpu_multi",
+        "memory",
+        "network",
+        "disk:C:",
+        "disk:E:"
+      ],
+      "running": null,
+      "snapshots": 1,
+      "runs": 0,
+      "recording": false
+    }
+  },
+  {
+    "command": "diag_snapshot",
+    "args": {},
+    "result": {
+      "latest": {
+        "at": "2026-09-30T18:45:03.200Z",
+        "machine": {
+          "os": "Windows 11 Pro",
+          "os_version": "10.0.26200",
+          "model": "Laptop 15",
+          "bios": "1.20",
+          "uptime_s": 10800
+        },
+        "cpu": {
+          "name": "Procesor 10C/16T",
+          "cores": 10,
+          "threads": 16,
+          "base_mhz": 2400,
+          "current_mhz": 2400,
+          "load_pct": 12,
+          "l2_kb": 9728,
+          "l3_kb": 24576,
+          "virtualization": true
+        },
+        "memory": {
+          "total_mb": 16384,
+          "available_mb": 5120,
+          "pagefile_mb": 28672,
+          "pagefile_used_mb": 700,
+          "modules": [
+            {
+              "slot": "DIMM 0",
+              "capacity_mb": 8192,
+              "speed_mhz": 4800,
+              "manufacturer": "Producent",
+              "part": "M-8G"
+            },
+            {
+              "slot": "DIMM 1",
+              "capacity_mb": 8192,
+              "speed_mhz": 4800,
+              "manufacturer": "Producent",
+              "part": "M-8G"
+            }
+          ]
+        },
+        "disks": [
+          {
+            "number": 1,
+            "model": "NVMe 512GB",
+            "serial_tail": "…4F2A",
+            "media": "ssd",
+            "bus": "NVMe",
+            "size_mb": 488386,
+            "health": "healthy",
+            "operational": "OK",
+            "wear_pct": null,
+            "temperature_c": null,
+            "power_on_hours": null,
+            "read_errors": null,
+            "write_errors": null,
+            "removable": false,
+            "volumes": [
+              "C:"
+            ],
+            "event_errors": 0
+          },
+          {
+            "number": 2,
+            "model": "Mostek USB NVMe",
+            "serial_tail": null,
+            "media": "ssd",
+            "bus": "USB",
+            "size_mb": 488386,
+            "health": "healthy",
+            "operational": "OK",
+            "wear_pct": null,
+            "temperature_c": null,
+            "power_on_hours": null,
+            "read_errors": null,
+            "write_errors": null,
+            "removable": true,
+            "volumes": [
+              "E:"
+            ],
+            "event_errors": 200
+          }
+        ],
+        "volumes": [
+          {
+            "letter": "C:",
+            "label": "OS",
+            "file_system": "NTFS",
+            "size_mb": 487500,
+            "free_mb": 103500,
+            "system": true
+          },
+          {
+            "letter": "E:",
+            "label": "Dane",
+            "file_system": "NTFS",
+            "size_mb": 488300,
+            "free_mb": 68400,
+            "system": false
+          }
+        ],
+        "gpus": [
+          {
+            "name": "Karta graficzna 6 GB",
+            "driver_version": "32.0.16.1692",
+            "driver_date": "2026-09-04",
+            "vram_mb": 6144,
+            "status": "OK"
+          },
+          {
+            "name": "Grafika zintegrowana",
+            "driver_version": "32.0.101.7082",
+            "driver_date": "2025-12-01",
+            "vram_mb": 2048,
+            "status": "OK"
+          }
+        ],
+        "network": [
+          {
+            "name": "Wi-Fi",
+            "description": "Karta Wi-Fi",
+            "up": true,
+            "link_mbps": 1201,
+            "kind": "wifi"
+          },
+          {
+            "name": "Ethernet",
+            "description": "Karta Ethernet",
+            "up": false,
+            "link_mbps": null,
+            "kind": "ethernet"
+          }
+        ],
+        "battery": {
+          "charge_pct": 100,
+          "on_ac": true,
+          "design_mwh": null,
+          "full_mwh": null,
+          "cycles": null
+        },
+        "thermal": [
+          {
+            "name": "Strefa CPU",
+            "celsius": 71
+          }
+        ],
+        "events": {
+          "window_days": 7,
+          "counts": [
+            {
+              "kind": "unexpected_shutdown",
+              "count": 4
+            },
+            {
+              "kind": "bugcheck",
+              "count": 2
+            },
+            {
+              "kind": "disk",
+              "count": 275
+            },
+            {
+              "kind": "usb",
+              "count": 5
+            }
+          ],
+          "recent": [
+            {
+              "at": "2026-10-15T09:59:59Z",
+              "source": "Microsoft-Windows-WER-SystemErrorReporting",
+              "id": 1001,
+              "kind": "bugcheck",
+              "message": "Ponowny rozruch po błędzie: 0x00000116 (…)"
+            },
+            {
+              "at": "2026-10-15T09:05:08Z",
+              "source": "disk",
+              "id": 51,
+              "kind": "disk",
+              "message": "Błąd urządzenia \\Device\\Harddisk2\\DR19 podczas stronicowania. (×9)"
+            }
+          ]
+        },
+        "gaps": [
+          "liczniki SMART dysków (zużycie, godziny pracy, błędy) — wymagają uprawnień administratora"
+        ]
+      },
+      "integrity": {
+        "kind": {
+          "test": "integrity"
+        },
+        "verdict": "fail",
+        "metrics": [
+          {
+            "key": "disk_events",
+            "label": "Błędy dysku (dni)",
+            "value": 275,
+            "unit": "szt.",
+            "higher_is_better": false
+          }
+        ],
+        "notes": [
+          "2 niebieskich ekranów w ostatnich 7 dniach.",
+          "4 nieoczekiwanych wyłączeń w ostatnich 7 dniach.",
+          "275 błędów dysku lub systemu plików w ostatnich 7 dniach.",
+          "Niebieski ekran 0x116 VIDEO_TDR_FAILURE — karta graficzna przestała odpowiadać — sterownik, przegrzanie albo zasilanie karty.",
+          "Dysk Mostek USB NVMe (E:): 200 błędów w dzienniku — sprawdź kabel, mostek USB i kopię danych."
+        ],
+        "duration_ms": 1500
+      },
+      "last_run": null,
+      "available": [
+        "integrity",
+        "cpu_single",
+        "cpu_multi",
+        "memory",
+        "network",
+        "disk:C:",
+        "disk:E:"
+      ],
+      "running": null,
+      "snapshots": 1,
+      "runs": 0,
+      "recording": false
+    }
+  },
+  {
+    "command": "diag_run",
+    "args": {
+      "tests": [
+        "integrity",
+        "cpu_single",
+        "memory",
+        "disk:C:",
+        "disk:E:"
+      ]
+    },
+    "result": {
+      "at": "2026-09-30T18:45:03.200Z",
+      "results": [
+        {
+          "kind": {
+            "test": "integrity"
+          },
+          "verdict": "fail",
+          "metrics": [
+            {
+              "key": "disk_events",
+              "label": "Błędy dysku (dni)",
+              "value": 275,
+              "unit": "szt.",
+              "higher_is_better": false
+            }
+          ],
+          "notes": [
+            "2 niebieskich ekranów w ostatnich 7 dniach.",
+            "4 nieoczekiwanych wyłączeń w ostatnich 7 dniach.",
+            "275 błędów dysku lub systemu plików w ostatnich 7 dniach.",
+            "Niebieski ekran 0x116 VIDEO_TDR_FAILURE — karta graficzna przestała odpowiadać — sterownik, przegrzanie albo zasilanie karty.",
+            "Dysk Mostek USB NVMe (E:): 200 błędów w dzienniku — sprawdź kabel, mostek USB i kopię danych."
+          ],
+          "duration_ms": 1500
+        },
+        {
+          "kind": {
+            "test": "cpu_single"
+          },
+          "verdict": "pass",
+          "metrics": [
+            {
+              "key": "mops",
+              "label": "Wynik (jeden wątek)",
+              "value": 410,
+              "unit": "mln op/s",
+              "higher_is_better": true
+            }
+          ],
+          "notes": [],
+          "duration_ms": 1500
+        },
+        {
+          "kind": {
+            "test": "memory"
+          },
+          "verdict": "pass",
+          "metrics": [
+            {
+              "key": "tested_mb",
+              "label": "Sprawdzono",
+              "value": 512,
+              "unit": "MB",
+              "higher_is_better": true
+            },
+            {
+              "key": "errors",
+              "label": "Błędy wzorca",
+              "value": 0,
+              "unit": "szt.",
+              "higher_is_better": false
+            },
+            {
+              "key": "copy_gbps",
+              "label": "Kopiowanie",
+              "value": 11.2,
+              "unit": "GB/s",
+              "higher_is_better": true
+            }
+          ],
+          "notes": [
+            "Wzorzec zapisany i odczytany bez błędów."
+          ],
+          "duration_ms": 1500
+        },
+        {
+          "kind": {
+            "test": "disk",
+            "target": "C:"
+          },
+          "verdict": "pass",
+          "metrics": [
+            {
+              "key": "seq_write_mbps",
+              "label": "Zapis sekwencyjny",
+              "value": 1450,
+              "unit": "MB/s",
+              "higher_is_better": true
+            },
+            {
+              "key": "seq_read_mbps",
+              "label": "Odczyt sekwencyjny",
+              "value": 2100,
+              "unit": "MB/s",
+              "higher_is_better": true
+            },
+            {
+              "key": "verify_errors",
+              "label": "Bloki z błędną sumą",
+              "value": 0,
+              "unit": "szt.",
+              "higher_is_better": false
+            },
+            {
+              "key": "rand_read_ms",
+              "label": "Odczyt losowy 4 KB (średnio)",
+              "value": 0.1,
+              "unit": "ms",
+              "higher_is_better": false
+            }
+          ],
+          "notes": [],
+          "duration_ms": 1500
+        },
+        {
+          "kind": {
+            "test": "disk",
+            "target": "E:"
+          },
+          "verdict": "warn",
+          "metrics": [
+            {
+              "key": "seq_write_mbps",
+              "label": "Zapis sekwencyjny",
+              "value": 140,
+              "unit": "MB/s",
+              "higher_is_better": true
+            },
+            {
+              "key": "seq_read_mbps",
+              "label": "Odczyt sekwencyjny",
+              "value": 320,
+              "unit": "MB/s",
+              "higher_is_better": true
+            },
+            {
+              "key": "verify_errors",
+              "label": "Bloki z błędną sumą",
+              "value": 0,
+              "unit": "szt.",
+              "higher_is_better": false
+            },
+            {
+              "key": "rand_read_ms",
+              "label": "Odczyt losowy 4 KB (średnio)",
+              "value": 0.9,
+              "unit": "ms",
+              "higher_is_better": false
+            }
+          ],
+          "notes": [
+            "Zapis 140 MB/s — wolniej niż typowo (próg 150) [disk:E:]."
+          ],
+          "duration_ms": 1500
+        }
+      ],
+      "overall": "fail"
+    }
+  },
+  {
+    "command": "diag_run",
+    "args": {
+      "tests": [
+        "network"
+      ]
+    },
+    "result": {
+      "at": "2026-09-30T18:45:03.200Z",
+      "results": [
+        {
+          "kind": {
+            "test": "network"
+          },
+          "verdict": "pass",
+          "metrics": [
+            {
+              "key": "dns_ms",
+              "label": "Rozwiązywanie nazw",
+              "value": 18,
+              "unit": "ms",
+              "higher_is_better": false
+            },
+            {
+              "key": "connect_ms",
+              "label": "Nawiązanie połączenia",
+              "value": 24,
+              "unit": "ms",
+              "higher_is_better": false
+            }
+          ],
+          "notes": [
+            "Połączenie z internetem działa."
+          ],
+          "duration_ms": 1500
+        }
+      ],
+      "overall": "pass"
+    }
+  },
+  {
+    "command": "diag_runs",
+    "args": {
+      "limit": 10
+    },
+    "result": [
+      {
+        "at": "2026-09-30T18:45:03.200Z",
+        "results": [
+          {
+            "kind": {
+              "test": "network"
+            },
+            "verdict": "pass",
+            "metrics": [
+              {
+                "key": "dns_ms",
+                "label": "Rozwiązywanie nazw",
+                "value": 18,
+                "unit": "ms",
+                "higher_is_better": false
+              },
+              {
+                "key": "connect_ms",
+                "label": "Nawiązanie połączenia",
+                "value": 24,
+                "unit": "ms",
+                "higher_is_better": false
+              }
+            ],
+            "notes": [
+              "Połączenie z internetem działa."
+            ],
+            "duration_ms": 1500
+          }
+        ],
+        "overall": "pass"
+      },
+      {
+        "at": "2026-09-30T18:45:03.200Z",
+        "results": [
+          {
+            "kind": {
+              "test": "integrity"
+            },
+            "verdict": "fail",
+            "metrics": [
+              {
+                "key": "disk_events",
+                "label": "Błędy dysku (dni)",
+                "value": 275,
+                "unit": "szt.",
+                "higher_is_better": false
+              }
+            ],
+            "notes": [
+              "2 niebieskich ekranów w ostatnich 7 dniach.",
+              "4 nieoczekiwanych wyłączeń w ostatnich 7 dniach.",
+              "275 błędów dysku lub systemu plików w ostatnich 7 dniach.",
+              "Niebieski ekran 0x116 VIDEO_TDR_FAILURE — karta graficzna przestała odpowiadać — sterownik, przegrzanie albo zasilanie karty.",
+              "Dysk Mostek USB NVMe (E:): 200 błędów w dzienniku — sprawdź kabel, mostek USB i kopię danych."
+            ],
+            "duration_ms": 1500
+          },
+          {
+            "kind": {
+              "test": "cpu_single"
+            },
+            "verdict": "pass",
+            "metrics": [
+              {
+                "key": "mops",
+                "label": "Wynik (jeden wątek)",
+                "value": 410,
+                "unit": "mln op/s",
+                "higher_is_better": true
+              }
+            ],
+            "notes": [],
+            "duration_ms": 1500
+          },
+          {
+            "kind": {
+              "test": "memory"
+            },
+            "verdict": "pass",
+            "metrics": [
+              {
+                "key": "tested_mb",
+                "label": "Sprawdzono",
+                "value": 512,
+                "unit": "MB",
+                "higher_is_better": true
+              },
+              {
+                "key": "errors",
+                "label": "Błędy wzorca",
+                "value": 0,
+                "unit": "szt.",
+                "higher_is_better": false
+              },
+              {
+                "key": "copy_gbps",
+                "label": "Kopiowanie",
+                "value": 11.2,
+                "unit": "GB/s",
+                "higher_is_better": true
+              }
+            ],
+            "notes": [
+              "Wzorzec zapisany i odczytany bez błędów."
+            ],
+            "duration_ms": 1500
+          },
+          {
+            "kind": {
+              "test": "disk",
+              "target": "C:"
+            },
+            "verdict": "pass",
+            "metrics": [
+              {
+                "key": "seq_write_mbps",
+                "label": "Zapis sekwencyjny",
+                "value": 1450,
+                "unit": "MB/s",
+                "higher_is_better": true
+              },
+              {
+                "key": "seq_read_mbps",
+                "label": "Odczyt sekwencyjny",
+                "value": 2100,
+                "unit": "MB/s",
+                "higher_is_better": true
+              },
+              {
+                "key": "verify_errors",
+                "label": "Bloki z błędną sumą",
+                "value": 0,
+                "unit": "szt.",
+                "higher_is_better": false
+              },
+              {
+                "key": "rand_read_ms",
+                "label": "Odczyt losowy 4 KB (średnio)",
+                "value": 0.1,
+                "unit": "ms",
+                "higher_is_better": false
+              }
+            ],
+            "notes": [],
+            "duration_ms": 1500
+          },
+          {
+            "kind": {
+              "test": "disk",
+              "target": "E:"
+            },
+            "verdict": "warn",
+            "metrics": [
+              {
+                "key": "seq_write_mbps",
+                "label": "Zapis sekwencyjny",
+                "value": 140,
+                "unit": "MB/s",
+                "higher_is_better": true
+              },
+              {
+                "key": "seq_read_mbps",
+                "label": "Odczyt sekwencyjny",
+                "value": 320,
+                "unit": "MB/s",
+                "higher_is_better": true
+              },
+              {
+                "key": "verify_errors",
+                "label": "Bloki z błędną sumą",
+                "value": 0,
+                "unit": "szt.",
+                "higher_is_better": false
+              },
+              {
+                "key": "rand_read_ms",
+                "label": "Odczyt losowy 4 KB (średnio)",
+                "value": 0.9,
+                "unit": "ms",
+                "higher_is_better": false
+              }
+            ],
+            "notes": [
+              "Zapis 140 MB/s — wolniej niż typowo (próg 150) [disk:E:]."
+            ],
+            "duration_ms": 1500
+          }
+        ],
+        "overall": "fail"
+      }
+    ]
+  },
+  {
+    "command": "diag_cancel",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "diag_export",
+    "args": {},
+    "result": "C:\\Users\\Ty\\Alfa\\Diagnostyka\\diagnostyka-2026-10-15-120000.md"
+  }
+]

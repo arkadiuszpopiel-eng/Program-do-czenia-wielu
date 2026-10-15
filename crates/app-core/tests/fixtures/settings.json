@@ -2517,6 +2517,17 @@
         "custom": "mcp",
         "settings": [],
         "upcoming": []
+      },
+      {
+        "id": "diag",
+        "label": {
+          "pl": "Diagnostyka komputera",
+          "en": "Computer diagnostics"
+        },
+        "wave": 1,
+        "custom": "diag",
+        "settings": [],
+        "upcoming": []
       }
     ]
   },

@@ -1407,6 +1407,17 @@
   "upcoming": []
  },
  {
+  "id": "diag",
+  "label": {
+   "pl": "Diagnostyka komputera",
+   "en": "Computer diagnostics"
+  },
+  "wave": 1,
+  "custom": "diag",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "builder",
   "label": {
    "pl": "Kreator agentek",

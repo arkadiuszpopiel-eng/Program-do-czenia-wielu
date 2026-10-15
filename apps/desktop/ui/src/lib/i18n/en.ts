@@ -21,6 +21,7 @@ import { enCameras } from './en-cameras';
 import { enRouting } from './en-routing';
 import { enConnections } from './en-connections';
 import { enMcp } from './en-mcp';
+import { enDiag } from './en-diag';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -44,4 +45,5 @@ export const en: Record<MessageKey, Message> = {
   ...enRouting,
   ...enConnections,
   ...enMcp,
+  ...enDiag,
 };

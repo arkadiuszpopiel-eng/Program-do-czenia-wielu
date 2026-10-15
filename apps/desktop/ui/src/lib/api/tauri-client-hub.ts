@@ -59,3 +59,12 @@ export const mcpApi = (): AlfaClient['mcp'] => ({
   approve: (id, tool, fingerprint) => call('mcp_approve', { id, tool, fingerprint }),
   revoke: (id, tool) => call('mcp_revoke', { id, tool }),
 });
+
+export const diagApi = (): AlfaClient['diag'] => ({
+  state: () => call('diag_state'),
+  snapshot: () => call('diag_snapshot'),
+  run: (tests) => call('diag_run', { tests }),
+  cancel: () => call('diag_cancel'),
+  runs: (limit) => call('diag_runs', { limit }),
+  export: () => call('diag_export'),
+});

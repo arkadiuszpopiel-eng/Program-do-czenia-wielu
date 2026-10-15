@@ -142,5 +142,12 @@ export async function runWork(
   await both('mcp', 'approve', 'pliki', 'write_file', writeFile.fingerprint);
   await both('mcp', 'revoke', 'pliki', 'write_file');
   await both('mcp', 'remove', 'przegladarka-playwright');
+  await both('diag', 'state');
+  await both('diag', 'snapshot');
+  await both('diag', 'run', ['integrity', 'cpu_single', 'memory', 'disk:C:', 'disk:E:']);
+  await both('diag', 'run', ['network']);
+  await both('diag', 'runs', 10);
+  await both('diag', 'cancel');
+  await both('diag', 'export');
   await flush();
 }

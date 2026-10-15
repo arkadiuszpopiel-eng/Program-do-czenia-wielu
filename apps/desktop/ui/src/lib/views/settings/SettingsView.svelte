@@ -26,6 +26,7 @@
   import PermissionsPage from './pages/PermissionsPage.svelte';
   import PluginsPage from './pages/PluginsPage.svelte';
   import McpPage from './pages/McpPage.svelte';
+  import DiagPage from './pages/DiagPage.svelte';
   import ApiPage from './pages/ApiPage.svelte';
   import RoutingPage from './pages/RoutingPage.svelte';
   import BridgesSection from './pages/BridgesSection.svelte';
@@ -155,6 +156,7 @@
           {:else if page.custom === 'about'}<AboutPage />
           {:else if page.custom === 'plugins'}<PluginsPage />
           {:else if page.custom === 'mcp'}<McpPage />
+          {:else if page.custom === 'diag'}<DiagPage />
           {:else if page.custom === 'models'}<Lazy
               load={() => import('./pages/ModelsPage.svelte')}
               props={{}}

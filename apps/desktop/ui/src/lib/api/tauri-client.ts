@@ -7,7 +7,7 @@ import type { AlfaClient } from './client';
 import { toError } from './command-error';
 import { EventSequencer } from './event-sequencer';
 import { call } from './tauri-call';
-import { accountsApi, enginesApi, mcpApi, transferApi } from './tauri-client-hub';
+import { accountsApi, diagApi, enginesApi, mcpApi, transferApi } from './tauri-client-hub';
 import type { AlfaEvent, EventFrame } from './types-system';
 import type { TerminalFrame, TerminalSession } from './types-work';
 
@@ -299,6 +299,7 @@ export class TauriAlfaClient implements AlfaClient {
   };
 
   readonly mcp: AlfaClient['mcp'] = mcpApi();
+  readonly diag: AlfaClient['diag'] = diagApi();
   readonly plugins: AlfaClient['plugins'] = {
     list: () => call('plugins_list'),
     inspect: (wasmB64) => call('plugins_inspect', { wasmB64 }),
