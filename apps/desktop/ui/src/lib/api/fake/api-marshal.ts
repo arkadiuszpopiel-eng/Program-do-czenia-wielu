@@ -260,7 +260,7 @@ export function bridgesApi(core: FakeCore): AlfaClient['bridges'] {
     check: (bridge) =>
       update(bridge, (c) => ({ account: fakeAccount(c, new Date().toISOString()) })),
     markLogin: (bridge, plan) =>
-      update(bridge, (c) => ({
+      update(bridge, () => ({
         account: {
           state: 'logged_in',
           plan,
