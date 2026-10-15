@@ -117,7 +117,8 @@
             "right_open": true,
             "right_tab": "timeline"
           }
-        }
+        },
+        "focus": true
       }
     },
     "result": null

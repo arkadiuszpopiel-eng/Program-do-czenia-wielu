@@ -1,6 +1,6 @@
 # Plan Alfy — wersja 6 (rozszerzona)
 
-Stan na 2026-10-12 (wersja 0.0.43; co doszło ostatnio — [`23-raport-nocny-2026-10-12.md`](23-raport-nocny-2026-10-12.md),
+Stan na 2026-10-16 (wersja 0.0.62; co doszło ostatnio — [`27-raport-nocny-2026-10-16.md`](27-raport-nocny-2026-10-16.md),
 całość na jednej stronie — [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md)). Ten katalog jest **rozszerzeniem** zatwierdzonego planu [`../PLAN.md`](../PLAN.md) (wersja 5):
 niczego w nim nie kasuje, tylko dopisuje nowe cele — kolejne systemy, sterowanie przez Internet i nowe funkcje —
 oraz pokazuje, co z planu v5 jest już wykonane i sprawdzone.
@@ -35,6 +35,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`23-raport-nocny-2026-10-12.md`](23-raport-nocny-2026-10-12.md) | Raport z nocy 2026-10-11 / 12: wersje 0.0.34–0.0.42, pomiary, co sprawdzone, czego nie, co zostaje | jednorazowy |
 | [`25-do-przegladu-po-audycie.md`](25-do-przegladu-po-audycie.md) | Audyt zewnętrzny z 14.10: co naprawiono w 0.0.51, co czeka na decyzję właściciela (izolacja procesu poleceń, macierz dowodów) | do decyzji |
 | [`26-raport-nocny-2026-10-15.md`](26-raport-nocny-2026-10-15.md) | Raport z nocy 2026-10-14 / 15: izolacja poleceń powłoki, decyzje z dokumentu 25, Markdown, pokrycie łącza, czego nie sprawdziłem | jednorazowy |
+| [`27-raport-nocny-2026-10-16.md`](27-raport-nocny-2026-10-16.md) | Raport z nocy 2026-10-15 / 16: wersje 0.0.60–0.0.62 (cztery serie po dziesięć punktów), testy, czego nie sprawdziłem, co zostaje, kopia na F: | jednorazowy |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).

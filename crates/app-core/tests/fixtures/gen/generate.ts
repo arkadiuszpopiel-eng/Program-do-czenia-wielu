@@ -62,6 +62,7 @@ async function run(): Promise<void> {
     right_width: 380,
     left_collapsed: false,
     sessions: { 's-q3': { left_open: true, right_open: true, right_tab: 'timeline' } },
+    focus: true,
   });
   await both('app', 'setActiveSession', 's-q3');
   await both('app', 'setActiveSession', null);

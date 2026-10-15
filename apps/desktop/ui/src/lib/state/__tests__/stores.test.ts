@@ -116,7 +116,13 @@ describe('LayoutState', () => {
     });
     const saved: unknown[] = [];
     const persisted = new LayoutState((p) => saved.push(p));
-    persisted.load({ left_width: 300, right_width: 400, left_collapsed: false, sessions: {} });
+    persisted.load({
+      left_width: 300,
+      right_width: 400,
+      left_collapsed: false,
+      sessions: {},
+      focus: false,
+    });
     expect(persisted.focus).toBe(false);
     persisted.setFocus(true);
     expect(saved).toEqual([expect.objectContaining({ focus: true })]);

@@ -6230,6 +6230,11 @@
     "LayoutPrefs": {
       "description": "Układ okna (per maszyna).",
       "properties": {
+        "focus": {
+          "default": false,
+          "description": "Tryb skupienia (F11) — przywracany po ponownym uruchomieniu; brak w starszym zapisie = wyłączony.",
+          "type": "boolean"
+        },
         "left_collapsed": {
           "type": "boolean"
         },
@@ -6254,7 +6259,8 @@
         "left_width",
         "right_width",
         "left_collapsed",
-        "sessions"
+        "sessions",
+        "focus"
       ],
       "type": "object"
     },

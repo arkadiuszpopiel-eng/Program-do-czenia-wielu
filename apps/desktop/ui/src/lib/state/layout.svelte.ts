@@ -102,7 +102,7 @@ export class LayoutState {
     this.leftWidth = clampLeft(prefs.left_width);
     this.rightWidth = clampRight(prefs.right_width);
     this.leftCollapsed = prefs.left_collapsed;
-    this.focus = prefs.focus ?? false;
+    this.focus = prefs.focus;
     this.panels = { ...prefs.sessions };
   }
 

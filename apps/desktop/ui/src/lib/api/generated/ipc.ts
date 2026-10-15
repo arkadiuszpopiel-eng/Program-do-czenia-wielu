@@ -1688,6 +1688,8 @@ export type ItemDiff = 'new' | 'same' | 'changed' | 'collision';
 
 /** Układ okna (per maszyna). */
 export interface LayoutPrefs {
+  /** Tryb skupienia (F11) — przywracany po ponownym uruchomieniu; brak w starszym zapisie = wyłączony. */
+  readonly focus: boolean;
   readonly left_collapsed: boolean;
   readonly left_width: number;
   readonly right_width: number;

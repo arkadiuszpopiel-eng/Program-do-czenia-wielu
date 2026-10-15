@@ -131,8 +131,8 @@ export interface LayoutPrefs {
   readonly right_width: number;
   readonly left_collapsed: boolean;
   readonly sessions: Readonly<Record<string, SessionPanels>>;
-  /** Tryb skupienia (F11) — przywracany po ponownym uruchomieniu. */
-  readonly focus?: boolean;
+  /** Tryb skupienia (F11) — przywracany po ponownym uruchomieniu (starszy zapis bez pola = wyłączony). */
+  readonly focus: boolean;
 }
 
 export interface AppBootstrap {

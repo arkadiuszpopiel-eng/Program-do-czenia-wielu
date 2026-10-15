@@ -19,7 +19,7 @@
       ],
       "builtins": [
         {
-          "title": "Rachunki: działania, procenty, potęgi, pierwiastki, liczby słowami",
+          "title": "Rachunki: działania, procenty i zmiana procentowa, potęgi, pierwiastki, liczby słowami",
           "examples": [
             "Ile to jest 7 razy 8?",
             "20% z 150"
@@ -32,10 +32,10 @@
           ]
         },
         {
-          "title": "Kostka, moneta, liczba losowa",
+          "title": "Kostka, moneta, liczba losowa, wybór z podanej listy",
           "examples": [
             "Rzuć kostką",
-            "orzeł czy reszka?"
+            "wybierz jedno: pizza, sushi, żurek"
           ]
         },
         {
@@ -48,6 +48,33 @@
           "title": "Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)",
           "examples": [
             "Przepytaj mnie z tabliczki mnożenia"
+          ]
+        },
+        {
+          "title": "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni, lata przestępne",
+          "examples": [
+            "Ile dni do 24 grudnia?",
+            "Jaki dzień tygodnia był 1 stycznia 2000?"
+          ]
+        },
+        {
+          "title": "Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas",
+          "examples": [
+            "Ile to 5 km w milach?",
+            "ile cm ma cal"
+          ]
+        },
+        {
+          "title": "Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie",
+          "examples": [
+            "1234 słownie",
+            "2026 rzymskimi"
+          ]
+        },
+        {
+          "title": "Liczenie znaków, liter i słów w podanym tekście (SMS, wpis, tytuł)",
+          "examples": [
+            "policz znaki: Ala ma kota"
           ]
         }
       ],
@@ -122,7 +149,7 @@
       ],
       "builtins": [
         {
-          "title": "Rachunki: działania, procenty, potęgi, pierwiastki, liczby słowami",
+          "title": "Rachunki: działania, procenty i zmiana procentowa, potęgi, pierwiastki, liczby słowami",
           "examples": [
             "Ile to jest 7 razy 8?",
             "20% z 150"
@@ -135,10 +162,10 @@
           ]
         },
         {
-          "title": "Kostka, moneta, liczba losowa",
+          "title": "Kostka, moneta, liczba losowa, wybór z podanej listy",
           "examples": [
             "Rzuć kostką",
-            "orzeł czy reszka?"
+            "wybierz jedno: pizza, sushi, żurek"
           ]
         },
         {
@@ -151,6 +178,33 @@
           "title": "Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)",
           "examples": [
             "Przepytaj mnie z tabliczki mnożenia"
+          ]
+        },
+        {
+          "title": "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni, lata przestępne",
+          "examples": [
+            "Ile dni do 24 grudnia?",
+            "Jaki dzień tygodnia był 1 stycznia 2000?"
+          ]
+        },
+        {
+          "title": "Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas",
+          "examples": [
+            "Ile to 5 km w milach?",
+            "ile cm ma cal"
+          ]
+        },
+        {
+          "title": "Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie",
+          "examples": [
+            "1234 słownie",
+            "2026 rzymskimi"
+          ]
+        },
+        {
+          "title": "Liczenie znaków, liter i słów w podanym tekście (SMS, wpis, tytuł)",
+          "examples": [
+            "policz znaki: Ala ma kota"
           ]
         }
       ],
