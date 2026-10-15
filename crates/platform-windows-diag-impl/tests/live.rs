@@ -8,8 +8,13 @@ use pc_diag_contract::DiagProbe;
 #[ignore = "czyta prawdziwy system (kilka-kilkanaście sekund)"]
 fn live_snapshot() {
     let start = std::time::Instant::now();
-    let s = platform_windows_diag_impl::WinDiagProbe::default().snapshot().unwrap();
+    let s = platform_windows_diag_impl::WinDiagProbe::default()
+        .snapshot()
+        .unwrap();
     eprintln!("{} ms", start.elapsed().as_millis());
     eprintln!("{}", pc_diag_contract::report::markdown(&s, None));
-    pc_diag_contract::rating::integrity(&s).notes.iter().for_each(|n| eprintln!("OCENA: {n}"));
+    pc_diag_contract::rating::integrity(&s)
+        .notes
+        .iter()
+        .for_each(|n| eprintln!("OCENA: {n}"));
 }
