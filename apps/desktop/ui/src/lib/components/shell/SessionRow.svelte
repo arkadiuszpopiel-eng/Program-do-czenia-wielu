@@ -126,6 +126,10 @@
       data-session-row
       aria-current={active ? 'page' : undefined}
       aria-keyshortcuts="F2 Delete"
+      title={t('sessions.stats', {
+        n: session.turn_count,
+        date: app.i18n.dateTime(session.created_at),
+      })}
       onclick={() => void app.openSession(session.id)}
       onkeydown={rowKey}
     >

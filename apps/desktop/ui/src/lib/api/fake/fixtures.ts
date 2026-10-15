@@ -28,6 +28,8 @@ export function session(
     tags: [],
     autonomy: 'L3',
     profile: 'hybrid',
+    turn_count: 0,
+    created_at: iso(updatedAt - 86_400_000),
     ...extra,
   };
 }

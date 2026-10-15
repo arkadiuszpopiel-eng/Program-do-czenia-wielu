@@ -28,6 +28,10 @@ pub struct SessionSummary {
     pub tags: Vec<String>,
     pub autonomy: AutonomyLevel,
     pub profile: ModelProfile,
+    /// Liczba tur (archiwum: statystyka rozmowy).
+    pub turn_count: u64,
+    /// Czas założenia rozmowy.
+    pub created_at: Iso8601,
 }
 
 /// Szablon nowej sesji.

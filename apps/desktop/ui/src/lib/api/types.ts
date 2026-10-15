@@ -44,6 +44,9 @@ export interface SessionSummary {
   readonly tags: readonly string[];
   readonly autonomy: AutonomyLevel;
   readonly profile: ModelProfile;
+  /** Liczba tur (statystyka w archiwum). */
+  readonly turn_count: number;
+  readonly created_at: Iso8601;
 }
 
 export type SessionTemplate = 'empty' | 'coding' | 'research' | 'voice' | 'admin';

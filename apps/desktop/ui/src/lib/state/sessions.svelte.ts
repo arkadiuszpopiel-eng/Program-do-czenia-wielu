@@ -9,6 +9,24 @@ export interface SessionGroup {
   readonly sessions: readonly SessionSummary[];
 }
 
+/** Okres na liście rozmów (archiwum): wszystkie, dziś, ostatnie 7 albo 30 dni. */
+export type SessionPeriod = 'all' | 'today' | 'week' | 'month';
+
+/** Rozmowy z aktywnością w okresie (po `updated_at`; „dziś” od północy czasu lokalnego). */
+export function inPeriod(
+  list: readonly SessionSummary[],
+  period: SessionPeriod,
+  now: number,
+): SessionSummary[] {
+  if (period === 'all') return [...list];
+  const day = 86_400_000;
+  const midnight = new Date(now);
+  midnight.setHours(0, 0, 0, 0);
+  const since =
+    period === 'today' ? midnight.getTime() : now - (period === 'week' ? 7 : 30) * day;
+  return list.filter((s) => Date.parse(s.updated_at) >= since);
+}
+
 const byUpdated = (a: SessionSummary, b: SessionSummary): number =>
   a.updated_at < b.updated_at ? 1 : a.updated_at > b.updated_at ? -1 : 0;
 
@@ -66,7 +84,10 @@ export class SessionsState {
   readonly active: SessionSummary | null = $derived(
     this.list.find((s) => s.id === this.activeId) ?? null,
   );
-  readonly groups: SessionGroup[] = $derived(groupSessions(this.list, this.showArchived));
+  period = $state<SessionPeriod>('all');
+  readonly groups: SessionGroup[] = $derived(
+    groupSessions(inPeriod(this.list, this.period, Date.now()), this.showArchived),
+  );
   /** Ostatnio używane (najnowsza na początku) i zamknięte „karty". */
   private mru: string[] = [];
   private closed: string[] = [];

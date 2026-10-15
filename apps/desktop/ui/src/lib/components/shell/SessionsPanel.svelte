@@ -1,6 +1,6 @@
 <!-- Panel Sesje (PLAN §14.8): wyszukiwanie pełnotekstowe, przypięte, projekty, archiwum, nowa rozmowa. -->
 <script lang="ts">
-  import { IconButton } from '@alfa/ui-kit';
+  import { IconButton, Select } from '@alfa/ui-kit';
   import Plus from '@lucide/svelte/icons/plus';
   import Search from '@lucide/svelte/icons/search';
   import PanelLeftClose from '@lucide/svelte/icons/panel-left-close';
@@ -89,6 +89,19 @@
       aria-keyshortcuts="Control+Shift+F"
     />
   </div>
+  <div class="period">
+    <Select
+      label={t('sessions.period')}
+      size="sm"
+      bind:value={sessions.period}
+      options={[
+        { value: 'all', label: t('sessions.period.all') },
+        { value: 'today', label: t('sessions.period.today') },
+        { value: 'week', label: t('sessions.period.week') },
+        { value: 'month', label: t('sessions.period.month') },
+      ]}
+    />
+  </div>
   <div class="scroll">
     {#if sessions.query.trim()}
       {#if searchError}
@@ -114,6 +127,8 @@
       </ul>
     {:else if sessions.list.length === 0}
       <p class="meta">{t('sessions.empty')}</p>
+    {:else if sessions.groups.length === 0}
+      <p class="meta">{t('sessions.periodEmpty')}</p>
     {:else}
       {#each sessions.groups as group (group.id)}
         <section class="group" aria-labelledby="grp-{group.id}">
@@ -149,6 +164,9 @@
 </nav>
 
 <style>
+  .period {
+    padding: 0 var(--alfa-space-3) var(--alfa-space-2);
+  }
   .sessions {
     display: flex;
     flex-direction: column;

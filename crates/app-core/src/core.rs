@@ -306,6 +306,8 @@ impl AppCore {
             tags: s.meta.tags.clone(),
             autonomy: self.session_autonomy(&s.meta.id).await,
             profile,
+            turn_count: s.turns,
+            created_at: dto::iso(s.meta.created_at),
         }
     }
 

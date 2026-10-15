@@ -10,7 +10,7 @@
       "reason": "test w przeglądarce — scenariusze kont i kluczy"
     },
     "apps/desktop/ui/src/lib/api/fake/fixtures.ts": {
-      "max": 413,
+      "max": 415,
       "reason": "atrapa — dane przykładowe"
     },
     "apps/desktop/ui/src/lib/api/fake/settings-part-a.ts": {

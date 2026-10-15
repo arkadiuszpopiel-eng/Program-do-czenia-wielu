@@ -16,7 +16,10 @@ export const TEMPLATE_TITLES: Readonly<Record<SessionTemplate, string>> = {
 export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
   const trash = new Map<string, { session: SessionSummary; timer: number }>();
   return {
-    list: () => core.reply(core.sessions),
+    list: () =>
+      core.reply(
+        core.sessions.map((s) => ({ ...s, turn_count: core.turnsOf(s.id).length })),
+      ),
     create: (template) => {
       const created = makeSession(
         core.nextId('s'),
