@@ -19,6 +19,7 @@ const item = (patch: Partial<ModelItem>): ModelItem => ({
   progress: null,
   error: null,
   active: false,
+  card: null,
   ...patch,
 });
 

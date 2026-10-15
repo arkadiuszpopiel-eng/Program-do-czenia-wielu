@@ -2911,7 +2911,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -2943,7 +2958,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -2989,7 +3019,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+          "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+          "en": "Local use: Multilingual E5 small (ONNX fp32)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {

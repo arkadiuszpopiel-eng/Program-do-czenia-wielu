@@ -123,5 +123,6 @@ pub fn item(spec: &ItemSpec, store: &Store, live: &Live, active: bool) -> ModelI
         progress,
         error: live.error.clone(),
         active,
+        card: crate::cards::card(&spec.id),
     }
 }

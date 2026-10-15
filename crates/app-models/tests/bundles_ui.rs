@@ -49,6 +49,7 @@ fn catalog_items() -> Vec<ModelItem> {
         progress: None,
         error: None,
         active: false,
+        card: None,
     };
     builtin().iter().map(item).collect()
 }

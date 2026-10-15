@@ -89,6 +89,22 @@ pub struct ModelItem {
     pub error: Option<String>,
     /// Embedder aktywny w wyszukiwaniu (tylko `embed`).
     pub active: bool,
+    /// Karta modelu (pochodzenie, przeznaczenie, ograniczenia).
+    pub card: Option<ModelCard>,
+}
+
+/// Karta modelu (AI Act art. 50): skąd pochodzi, do czego służy, czego nie umie i czy tworzy
+/// treść oznaczaną jako wygenerowaną przez AI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct ModelCard {
+    /// Autor i kraj pochodzenia, podstawa modelu.
+    pub origin: LocalizedText,
+    /// Przeznaczenie w Alfie.
+    pub purpose: LocalizedText,
+    /// Ograniczenia i ryzyka.
+    pub limits: LocalizedText,
+    /// Tworzy treść (tekst albo mowę) oznaczaną jako wygenerowaną przez AI.
+    pub generative: bool,
 }
 
 /// Embedder wyszukiwania (`[search.embedder] model`).

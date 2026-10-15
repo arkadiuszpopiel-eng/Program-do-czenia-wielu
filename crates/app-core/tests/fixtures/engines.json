@@ -31,7 +31,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Bielik 4.5B v3.0 Instruct (Q8_0), wagi otwarte",
+              "en": "Authors of Bielik 4.5B v3.0 Instruct (Q8_0), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Bielik 4.5B v3.0 Instruct (Q8_0)",
+              "en": "Local use: Bielik 4.5B v3.0 Instruct (Q8_0)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "bielik-1.5b-v3.0-instruct-q8_0",
@@ -60,7 +75,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Bielik 1.5B v3.0 Instruct (Q8_0), wagi otwarte",
+              "en": "Authors of Bielik 1.5B v3.0 Instruct (Q8_0), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Bielik 1.5B v3.0 Instruct (Q8_0)",
+              "en": "Local use: Bielik 1.5B v3.0 Instruct (Q8_0)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "multilingual-e5-small",
@@ -96,7 +126,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+              "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+              "en": "Local use: Multilingual E5 small (ONNX fp32)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "whisper-large-v3-turbo-q5_0",
@@ -125,7 +170,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Whisper large-v3-turbo-q5_0, wagi otwarte",
+              "en": "Authors of Whisper large-v3-turbo-q5_0, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Whisper large-v3-turbo-q5_0",
+              "en": "Local use: Whisper large-v3-turbo-q5_0"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "whisper-small-q5_1",
@@ -154,7 +214,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Whisper small-q5_1, wagi otwarte",
+              "en": "Authors of Whisper small-q5_1, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Whisper small-q5_1",
+              "en": "Local use: Whisper small-q5_1"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "qwen3-asr-1.7b-q8",
@@ -190,7 +265,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Qwen3-ASR 1.7B (Q8), wagi otwarte",
+              "en": "Authors of Qwen3-ASR 1.7B (Q8), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Qwen3-ASR 1.7B (Q8)",
+              "en": "Local use: Qwen3-ASR 1.7B (Q8)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "supertonic-3",
@@ -247,7 +337,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Supertonic 3, wagi otwarte",
+              "en": "Authors of Supertonic 3, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Supertonic 3",
+              "en": "Local use: Supertonic 3"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "piper-pl_PL-gosia-medium",
@@ -283,7 +388,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Piper pl_PL gosia (medium), wagi otwarte",
+              "en": "Authors of Piper pl_PL gosia (medium), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Piper pl_PL gosia (medium)",
+              "en": "Local use: Piper pl_PL gosia (medium)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "silero-vad",
@@ -312,7 +432,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+              "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+              "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "smart-turn-v3.2",
@@ -341,7 +476,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Smart Turn v3.2 (koniec wypowiedzi), wagi otwarte",
+              "en": "Authors of Smart Turn v3.2 (koniec wypowiedzi), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Smart Turn v3.2 (koniec wypowiedzi)",
+              "en": "Local use: Smart Turn v3.2 (koniec wypowiedzi)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "openwakeword-features",
@@ -370,7 +520,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu openWakeWord 0.5.1: melspektrogram + embedding, wagi otwarte",
+              "en": "Authors of openWakeWord 0.5.1: melspektrogram + embedding, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: openWakeWord 0.5.1: melspektrogram + embedding",
+              "en": "Local use: openWakeWord 0.5.1: melspektrogram + embedding"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "wespeaker-resnet34",
@@ -399,7 +564,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu WeSpeaker ResNet34 (VoxCeleb), wagi otwarte",
+              "en": "Authors of WeSpeaker ResNet34 (VoxCeleb), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: WeSpeaker ResNet34 (VoxCeleb)",
+              "en": "Local use: WeSpeaker ResNet34 (VoxCeleb)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-vulkan",
@@ -428,7 +608,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-cuda",
@@ -464,7 +659,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-cpu",
@@ -493,7 +703,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-whisper-cpu",
@@ -522,7 +747,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-whisper-cuda",
@@ -551,7 +791,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "onnxruntime-cpu",
@@ -580,7 +835,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-piper",
@@ -609,7 +879,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-pocket-tts",
@@ -630,7 +915,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         }
       ],
       "embedder": {
@@ -691,7 +991,22 @@
         "total": 11534336
       },
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -737,7 +1052,22 @@
         "total": 511705088
       },
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+          "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+          "en": "Local use: Multilingual E5 small (ONNX fp32)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -783,7 +1113,22 @@
         "total": 511705088
       },
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+          "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+          "en": "Local use: Multilingual E5 small (ONNX fp32)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -829,7 +1174,22 @@
         "total": 511705088
       },
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+          "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+          "en": "Local use: Multilingual E5 small (ONNX fp32)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -864,7 +1224,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Bielik 4.5B v3.0 Instruct (Q8_0), wagi otwarte",
+              "en": "Authors of Bielik 4.5B v3.0 Instruct (Q8_0), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Bielik 4.5B v3.0 Instruct (Q8_0)",
+              "en": "Local use: Bielik 4.5B v3.0 Instruct (Q8_0)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "bielik-1.5b-v3.0-instruct-q8_0",
@@ -893,7 +1268,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Bielik 1.5B v3.0 Instruct (Q8_0), wagi otwarte",
+              "en": "Authors of Bielik 1.5B v3.0 Instruct (Q8_0), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Bielik 1.5B v3.0 Instruct (Q8_0)",
+              "en": "Local use: Bielik 1.5B v3.0 Instruct (Q8_0)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "multilingual-e5-small",
@@ -929,7 +1319,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+              "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+              "en": "Local use: Multilingual E5 small (ONNX fp32)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "whisper-large-v3-turbo-q5_0",
@@ -958,7 +1363,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Whisper large-v3-turbo-q5_0, wagi otwarte",
+              "en": "Authors of Whisper large-v3-turbo-q5_0, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Whisper large-v3-turbo-q5_0",
+              "en": "Local use: Whisper large-v3-turbo-q5_0"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "whisper-small-q5_1",
@@ -987,7 +1407,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Whisper small-q5_1, wagi otwarte",
+              "en": "Authors of Whisper small-q5_1, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Whisper small-q5_1",
+              "en": "Local use: Whisper small-q5_1"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "qwen3-asr-1.7b-q8",
@@ -1023,7 +1458,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Qwen3-ASR 1.7B (Q8), wagi otwarte",
+              "en": "Authors of Qwen3-ASR 1.7B (Q8), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Qwen3-ASR 1.7B (Q8)",
+              "en": "Local use: Qwen3-ASR 1.7B (Q8)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "supertonic-3",
@@ -1080,7 +1530,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Supertonic 3, wagi otwarte",
+              "en": "Authors of Supertonic 3, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Supertonic 3",
+              "en": "Local use: Supertonic 3"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "piper-pl_PL-gosia-medium",
@@ -1116,7 +1581,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Piper pl_PL gosia (medium), wagi otwarte",
+              "en": "Authors of Piper pl_PL gosia (medium), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Piper pl_PL gosia (medium)",
+              "en": "Local use: Piper pl_PL gosia (medium)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "silero-vad",
@@ -1145,7 +1625,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+              "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+              "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "smart-turn-v3.2",
@@ -1174,7 +1669,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Smart Turn v3.2 (koniec wypowiedzi), wagi otwarte",
+              "en": "Authors of Smart Turn v3.2 (koniec wypowiedzi), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Smart Turn v3.2 (koniec wypowiedzi)",
+              "en": "Local use: Smart Turn v3.2 (koniec wypowiedzi)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "openwakeword-features",
@@ -1203,7 +1713,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu openWakeWord 0.5.1: melspektrogram + embedding, wagi otwarte",
+              "en": "Authors of openWakeWord 0.5.1: melspektrogram + embedding, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: openWakeWord 0.5.1: melspektrogram + embedding",
+              "en": "Local use: openWakeWord 0.5.1: melspektrogram + embedding"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "wespeaker-resnet34",
@@ -1232,7 +1757,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu WeSpeaker ResNet34 (VoxCeleb), wagi otwarte",
+              "en": "Authors of WeSpeaker ResNet34 (VoxCeleb), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: WeSpeaker ResNet34 (VoxCeleb)",
+              "en": "Local use: WeSpeaker ResNet34 (VoxCeleb)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-vulkan",
@@ -1261,7 +1801,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-cuda",
@@ -1297,7 +1852,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-cpu",
@@ -1326,7 +1896,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-whisper-cpu",
@@ -1355,7 +1940,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-whisper-cuda",
@@ -1384,7 +1984,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "onnxruntime-cpu",
@@ -1413,7 +2028,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-piper",
@@ -1442,7 +2072,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-pocket-tts",
@@ -1463,7 +2108,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         }
       ],
       "embedder": {
@@ -1531,7 +2191,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+          "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+          "en": "Local use: Multilingual E5 small (ONNX fp32)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -1566,7 +2241,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -1675,7 +2365,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -1710,7 +2415,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Bielik 4.5B v3.0 Instruct (Q8_0), wagi otwarte",
+              "en": "Authors of Bielik 4.5B v3.0 Instruct (Q8_0), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Bielik 4.5B v3.0 Instruct (Q8_0)",
+              "en": "Local use: Bielik 4.5B v3.0 Instruct (Q8_0)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "bielik-1.5b-v3.0-instruct-q8_0",
@@ -1739,7 +2459,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Bielik 1.5B v3.0 Instruct (Q8_0), wagi otwarte",
+              "en": "Authors of Bielik 1.5B v3.0 Instruct (Q8_0), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Bielik 1.5B v3.0 Instruct (Q8_0)",
+              "en": "Local use: Bielik 1.5B v3.0 Instruct (Q8_0)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "multilingual-e5-small",
@@ -1775,7 +2510,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Multilingual E5 small (ONNX fp32), wagi otwarte",
+              "en": "Authors of Multilingual E5 small (ONNX fp32), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Multilingual E5 small (ONNX fp32)",
+              "en": "Local use: Multilingual E5 small (ONNX fp32)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "whisper-large-v3-turbo-q5_0",
@@ -1804,7 +2554,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Whisper large-v3-turbo-q5_0, wagi otwarte",
+              "en": "Authors of Whisper large-v3-turbo-q5_0, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Whisper large-v3-turbo-q5_0",
+              "en": "Local use: Whisper large-v3-turbo-q5_0"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "whisper-small-q5_1",
@@ -1833,7 +2598,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Whisper small-q5_1, wagi otwarte",
+              "en": "Authors of Whisper small-q5_1, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Whisper small-q5_1",
+              "en": "Local use: Whisper small-q5_1"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "qwen3-asr-1.7b-q8",
@@ -1869,7 +2649,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Qwen3-ASR 1.7B (Q8), wagi otwarte",
+              "en": "Authors of Qwen3-ASR 1.7B (Q8), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Qwen3-ASR 1.7B (Q8)",
+              "en": "Local use: Qwen3-ASR 1.7B (Q8)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "supertonic-3",
@@ -1926,7 +2721,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Supertonic 3, wagi otwarte",
+              "en": "Authors of Supertonic 3, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Supertonic 3",
+              "en": "Local use: Supertonic 3"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "piper-pl_PL-gosia-medium",
@@ -1962,7 +2772,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Piper pl_PL gosia (medium), wagi otwarte",
+              "en": "Authors of Piper pl_PL gosia (medium), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Piper pl_PL gosia (medium)",
+              "en": "Local use: Piper pl_PL gosia (medium)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": true
+          }
         },
         {
           "id": "silero-vad",
@@ -1991,7 +2816,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+              "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+              "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "smart-turn-v3.2",
@@ -2020,7 +2860,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu Smart Turn v3.2 (koniec wypowiedzi), wagi otwarte",
+              "en": "Authors of Smart Turn v3.2 (koniec wypowiedzi), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: Smart Turn v3.2 (koniec wypowiedzi)",
+              "en": "Local use: Smart Turn v3.2 (koniec wypowiedzi)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "openwakeword-features",
@@ -2049,7 +2904,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu openWakeWord 0.5.1: melspektrogram + embedding, wagi otwarte",
+              "en": "Authors of openWakeWord 0.5.1: melspektrogram + embedding, open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: openWakeWord 0.5.1: melspektrogram + embedding",
+              "en": "Local use: openWakeWord 0.5.1: melspektrogram + embedding"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "wespeaker-resnet34",
@@ -2078,7 +2948,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Autorzy modelu WeSpeaker ResNet34 (VoxCeleb), wagi otwarte",
+              "en": "Authors of WeSpeaker ResNet34 (VoxCeleb), open weights"
+            },
+            "purpose": {
+              "pl": "Lokalne użycie: WeSpeaker ResNet34 (VoxCeleb)",
+              "en": "Local use: WeSpeaker ResNet34 (VoxCeleb)"
+            },
+            "limits": {
+              "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+              "en": "Can be wrong; check important information at the source"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-vulkan",
@@ -2107,7 +2992,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-cuda",
@@ -2143,7 +3043,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-llama-cpu",
@@ -2172,7 +3087,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-whisper-cpu",
@@ -2201,7 +3131,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-whisper-cuda",
@@ -2230,7 +3175,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "onnxruntime-cpu",
@@ -2259,7 +3219,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-piper",
@@ -2288,7 +3263,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         },
         {
           "id": "sidecar-pocket-tts",
@@ -2309,7 +3299,22 @@
           },
           "progress": null,
           "error": null,
-          "active": false
+          "active": false,
+          "card": {
+            "origin": {
+              "pl": "Projekt otwarty (oprogramowanie)",
+              "en": "Open-source project (software)"
+            },
+            "purpose": {
+              "pl": "Silnik uruchamiający modele lokalnie",
+              "en": "Engine that runs models locally"
+            },
+            "limits": {
+              "pl": "To program, nie model — sam niczego nie tworzy",
+              "en": "Software, not a model — creates nothing by itself"
+            },
+            "generative": false
+          }
         }
       ],
       "embedder": {
@@ -3699,7 +4704,22 @@
       },
       "progress": null,
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {
@@ -3738,7 +4758,22 @@
         "total": 11534336
       },
       "error": null,
-      "active": false
+      "active": false,
+      "card": {
+        "origin": {
+          "pl": "Autorzy modelu Silero VAD 6.2.3 (op18, bez If), wagi otwarte",
+          "en": "Authors of Silero VAD 6.2.3 (op18, bez If), open weights"
+        },
+        "purpose": {
+          "pl": "Lokalne użycie: Silero VAD 6.2.3 (op18, bez If)",
+          "en": "Local use: Silero VAD 6.2.3 (op18, bez If)"
+        },
+        "limits": {
+          "pl": "Może się mylić; ważne informacje sprawdzaj u źródła",
+          "en": "Can be wrong; check important information at the source"
+        },
+        "generative": false
+      }
     }
   },
   {

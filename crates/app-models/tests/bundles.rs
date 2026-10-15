@@ -34,6 +34,7 @@ fn model_item(s: &ItemSpec) -> ModelItem {
         progress: None,
         error: None,
         active: false,
+        card: None,
     }
 }
 

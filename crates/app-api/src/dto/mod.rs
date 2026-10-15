@@ -96,8 +96,8 @@ pub use model_routing::{
 };
 pub use models::{
     BundleFit, BundleFitKind, BundleItemView, BundleRequirements, BundleState, EmbedderView,
-    ModelBundle, ModelFileView, ModelItem, ModelItemKind, ModelItemState, ModelProgressView,
-    ModelsView, QualityNote, ReindexView, TrustedHashes,
+    ModelBundle, ModelCard, ModelFileView, ModelItem, ModelItemKind, ModelItemState,
+    ModelProgressView, ModelsView, QualityNote, ReindexView, TrustedHashes,
 };
 pub use modules::{ModuleRow, ModulesView};
 pub use panels::{

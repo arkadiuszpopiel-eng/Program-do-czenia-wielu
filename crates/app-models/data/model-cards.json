@@ -1,0 +1,332 @@
+{
+  "bielik-4.5b-v3.0-instruct-q8_0": {
+    "origin": {
+      "pl": "SpeakLeash (Fundacja Spichlerz) z ACK Cyfronet AGH, Polska; podstawa: Qwen2.5 (Alibaba) rozbudowany i dotrenowany na polskich tekstach",
+      "en": "SpeakLeash (Spichlerz Foundation) with ACK Cyfronet AGH, Poland; based on Qwen2.5 (Alibaba), extended and further trained on Polish text"
+    },
+    "purpose": {
+      "pl": "Rozmowa po polsku na komputerze, bez wysyłania treści do chmury: odpowiedzi, streszczenia, proste wywołania narzędzi",
+      "en": "Polish conversation on this computer without sending content to the cloud: answers, summaries, simple tool calls"
+    },
+    "limits": {
+      "pl": "Może podawać nieprawdę z pewnością w głosie; wiedza kończy się na dacie treningu; słabszy w rachunkach i długich planach niż duże modele w chmurze. Ważne informacje (zdrowie, prawo, pieniądze) sprawdzaj u źródła",
+      "en": "Can state falsehoods confidently; knowledge ends at the training date; weaker at arithmetic and long plans than large cloud models. Check important information (health, law, money) at the source"
+    },
+    "generative": true
+  },
+  "bielik-1.5b-v3.0-instruct-q8_0": {
+    "origin": {
+      "pl": "SpeakLeash (Fundacja Spichlerz) z ACK Cyfronet AGH, Polska; podstawa: Qwen2.5 (Alibaba) dotrenowany na polskich tekstach",
+      "en": "SpeakLeash (Spichlerz Foundation) with ACK Cyfronet AGH, Poland; based on Qwen2.5 (Alibaba), further trained on Polish text"
+    },
+    "purpose": {
+      "pl": "Lekki model rozmowy po polsku na słabszy sprzęt: krótkie odpowiedzi i proste polecenia",
+      "en": "Lightweight Polish chat model for weaker hardware: short answers and simple commands"
+    },
+    "limits": {
+      "pl": "Mały model: częściej się myli i gubi wątek w dłuższej rozmowie; nie nadaje się do porad ani pracy wymagającej precyzji",
+      "en": "Small model: makes mistakes more often and loses track in longer conversations; not suitable for advice or precision work"
+    },
+    "generative": true
+  },
+  "multilingual-e5-small": {
+    "origin": {
+      "pl": "Microsoft Research (projekt intfloat); trening na wielojęzycznych parach tekstów",
+      "en": "Microsoft Research (intfloat project); trained on multilingual text pairs"
+    },
+    "purpose": {
+      "pl": "Zamienia tekst na wektory, żeby pamięć Alfy znajdowała notatki o podobnym znaczeniu",
+      "en": "Turns text into vectors so Alfa's memory can find notes with similar meaning"
+    },
+    "limits": {
+      "pl": "Nie tworzy treści; czyta do ok. 512 tokenów fragmentu — dłuższe teksty są dzielone; trafność zależy od języka i dziedziny",
+      "en": "Does not create content; reads up to about 512 tokens per chunk — longer texts are split; accuracy depends on language and domain"
+    },
+    "generative": false
+  },
+  "paraphrase-multilingual-minilm-l12-v2": {
+    "origin": {
+      "pl": "Projekt sentence-transformers (UKP Lab, TU Darmstadt, Niemcy)",
+      "en": "sentence-transformers project (UKP Lab, TU Darmstadt, Germany)"
+    },
+    "purpose": {
+      "pl": "Lżejszy model wektorów do wyszukiwania podobnych notatek w pamięci",
+      "en": "Lighter vector model for finding similar notes in memory"
+    },
+    "limits": {
+      "pl": "Nie tworzy treści; czyta do ok. 128 tokenów fragmentu; słabszy od E5 w długich i specjalistycznych tekstach",
+      "en": "Does not create content; reads up to about 128 tokens per chunk; weaker than E5 on long and specialised texts"
+    },
+    "generative": false
+  },
+  "whisper-large-v3-turbo-q5_0": {
+    "origin": {
+      "pl": "OpenAI (USA), wagi otwarte; zapis GGML/GGUF z projektu whisper.cpp (ggml-org)",
+      "en": "OpenAI (USA), open weights; GGML/GGUF conversion from the whisper.cpp project (ggml-org)"
+    },
+    "purpose": {
+      "pl": "Zamiana mowy z mikrofonu na tekst, lokalnie na karcie graficznej",
+      "en": "Speech-to-text from the microphone, locally on the graphics card"
+    },
+    "limits": {
+      "pl": "Przy ciszy, muzyce i szumie potrafi „dopisać” zdania, których nikt nie powiedział (Alfa ma na to filtry); gorzej rozpoznaje nazwy własne i mowę kilku osób naraz",
+      "en": "With silence, music or noise it can “add” sentences nobody said (Alfa filters for this); weaker on proper names and overlapping speakers"
+    },
+    "generative": false
+  },
+  "whisper-small-q5_1": {
+    "origin": {
+      "pl": "OpenAI (USA), wagi otwarte; zapis GGML z projektu whisper.cpp (ggml-org)",
+      "en": "OpenAI (USA), open weights; GGML conversion from the whisper.cpp project (ggml-org)"
+    },
+    "purpose": {
+      "pl": "Zamiana mowy na tekst na procesorze, gdy brak mocnej karty graficznej",
+      "en": "Speech-to-text on the processor when there is no strong graphics card"
+    },
+    "limits": {
+      "pl": "Mniejsza dokładność niż large-v3-turbo, zwłaszcza w polskich odmianach i nazwach; te same ryzyka „dopisywania” przy ciszy",
+      "en": "Lower accuracy than large-v3-turbo, especially for Polish inflection and names; same risk of “adding” text in silence"
+    },
+    "generative": false
+  },
+  "qwen3-asr-1.7b-q8": {
+    "origin": {
+      "pl": "Zespół Qwen (Alibaba Cloud, Chiny), wagi otwarte; zapis GGUF z ggml-org",
+      "en": "Qwen team (Alibaba Cloud, China), open weights; GGUF conversion by ggml-org"
+    },
+    "purpose": {
+      "pl": "Rozpoznawanie mowy (także po polsku) jako alternatywa dla Whispera",
+      "en": "Speech recognition (including Polish) as an alternative to Whisper"
+    },
+    "limits": {
+      "pl": "Model rozpoznawania z elementem językowym — przy niewyraźnej mowie może zgadywać słowa; jakość po polsku do zmierzenia na stanowisku głosu",
+      "en": "Recognition model with a language component — may guess words in unclear speech; Polish quality still to be measured on the voice bench"
+    },
+    "generative": false
+  },
+  "supertonic-3": {
+    "origin": {
+      "pl": "Supertone Inc. (Korea Południowa); wagi otwarte na licencji OpenRAIL-M",
+      "en": "Supertone Inc. (South Korea); open weights under OpenRAIL-M"
+    },
+    "purpose": {
+      "pl": "Synteza mowy: Alfa czyta odpowiedzi na głos, lokalnie, w 10 barwach",
+      "en": "Speech synthesis: Alfa reads replies aloud, locally, in 10 voices"
+    },
+    "limits": {
+      "pl": "Mowa jest syntetyczna — nie wolno jej używać do podszywania się pod osoby ani dezinformacji (lista zakazów w licencji); możliwe błędy akcentu i wymowy obcych słów",
+      "en": "Speech is synthetic — must not be used to impersonate people or for disinformation (prohibited uses in the licence); stress and foreign-word errors possible"
+    },
+    "generative": true
+  },
+  "smart-turn-v3.2": {
+    "origin": {
+      "pl": "Projekt Pipecat (Daily, USA), wagi otwarte",
+      "en": "Pipecat project (Daily, USA), open weights"
+    },
+    "purpose": {
+      "pl": "Rozpoznaje, czy wypowiedź się skończyła, żeby Alfa nie wchodziła w słowo",
+      "en": "Detects whether an utterance has ended so Alfa does not interrupt"
+    },
+    "limits": {
+      "pl": "Nie tworzy treści; to tylko sygnał pomocniczy — przy długich pauzach w środku zdania może się pomylić",
+      "en": "Does not create content; only an auxiliary signal — can be wrong on long pauses mid-sentence"
+    },
+    "generative": false
+  },
+  "onnxruntime-cpu": {
+    "origin": {
+      "pl": "Microsoft (USA), oprogramowanie otwarte",
+      "en": "Microsoft (USA), open-source software"
+    },
+    "purpose": {
+      "pl": "Silnik uruchamiający modele ONNX (głos, wektory, wykrywanie mowy) na procesorze",
+      "en": "Engine that runs ONNX models (voice, vectors, speech detection) on the processor"
+    },
+    "limits": {
+      "pl": "To program, nie model — sam niczego nie tworzy",
+      "en": "Software, not a model — creates nothing by itself"
+    },
+    "generative": false
+  },
+  "piper-pl_PL-gosia-medium": {
+    "origin": {
+      "pl": "Głos z zestawu piper-voices (Rhasspy / Open Home Foundation); pochodzenie nagrań i zgoda lektorki — w karcie głosu u źródła, do potwierdzenia",
+      "en": "Voice from the piper-voices set (Rhasspy / Open Home Foundation); recording origin and speaker consent — in the voice card at the source, to be confirmed"
+    },
+    "purpose": {
+      "pl": "Lekka synteza mowy po polsku na słabszy sprzęt",
+      "en": "Lightweight Polish speech synthesis for weaker hardware"
+    },
+    "limits": {
+      "pl": "Mowa syntetyczna, mniej naturalna niż Supertonic; nie wolno jej używać do podszywania się pod lektorkę ani inne osoby",
+      "en": "Synthetic speech, less natural than Supertonic; must not be used to impersonate the speaker or anyone else"
+    },
+    "generative": true
+  },
+  "silero-vad": {
+    "origin": {
+      "pl": "Zespół Silero (projekt snakers4/silero-vad), wagi otwarte",
+      "en": "Silero team (snakers4/silero-vad project), open weights"
+    },
+    "purpose": {
+      "pl": "Wykrywa, kiedy w dźwięku z mikrofonu jest mowa",
+      "en": "Detects when the microphone audio contains speech"
+    },
+    "limits": {
+      "pl": "Nie tworzy treści; przy głośnym tle może brać hałas za mowę albo przegapić cichy głos",
+      "en": "Does not create content; in loud surroundings may mistake noise for speech or miss a quiet voice"
+    },
+    "generative": false
+  },
+  "openwakeword-features": {
+    "origin": {
+      "pl": "Projekt openWakeWord (David Scripka); warstwa cech: model speech_embedding firmy Google (USA)",
+      "en": "openWakeWord project (David Scripka); feature layer: Google's speech_embedding model (USA)"
+    },
+    "purpose": {
+      "pl": "Wykrywanie słowa wywołującego Alfę bez stałego rozpoznawania mowy",
+      "en": "Detects Alfa's wake word without continuous speech recognition"
+    },
+    "limits": {
+      "pl": "Nie tworzy treści; zdarzają się fałszywe wybudzenia i przeoczenia; warunki licencji części Google do sprawdzenia przed dystrybucją",
+      "en": "Does not create content; false wake-ups and misses happen; licence terms of the Google part to be checked before distribution"
+    },
+    "generative": false
+  },
+  "wespeaker-resnet34": {
+    "origin": {
+      "pl": "Projekt WeSpeaker (społeczność WeNet), trening na zbiorze VoxCeleb (Uniwersytet Oksfordzki, Wielka Brytania); paczka z sherpa-onnx (k2-fsa)",
+      "en": "WeSpeaker project (WeNet community), trained on VoxCeleb (University of Oxford, UK); package from sherpa-onnx (k2-fsa)"
+    },
+    "purpose": {
+      "pl": "Rozpoznaje, kto mówi (odcisk głosu domowników) — tylko lokalnie i po zapisaniu osoby przez ciebie",
+      "en": "Recognises who is speaking (household voiceprints) — locally only and after you register the person"
+    },
+    "limits": {
+      "pl": "Nie tworzy treści; to dane biometryczne — Alfa trzyma je tylko na tym komputerze; myli się przy chorobie, szepcie i nagraniach; nie służy do uwierzytelniania",
+      "en": "Does not create content; biometric data — Alfa keeps it on this computer only; errs with illness, whispering and recordings; not for authentication"
+    },
+    "generative": false
+  },
+  "sidecar-llama-vulkan": {
+    "origin": {
+      "pl": "Projekt llama.cpp (ggml-org), oprogramowanie otwarte",
+      "en": "llama.cpp project (ggml-org), open-source software"
+    },
+    "purpose": {
+      "pl": "Serwer uruchamiający lokalne modele rozmowy na kartach graficznych przez Vulkan (AMD, Intel, NVIDIA)",
+      "en": "Server that runs local chat models on graphics cards via Vulkan (AMD, Intel, NVIDIA)"
+    },
+    "limits": {
+      "pl": "To program, nie model — treść tworzy uruchomiony w nim model, oznaczana jako AI",
+      "en": "Software, not a model — content comes from the model it runs and is marked as AI"
+    },
+    "generative": false
+  },
+  "sidecar-llama-cuda": {
+    "origin": {
+      "pl": "Projekt llama.cpp (ggml-org), oprogramowanie otwarte; biblioteki CUDA firmy NVIDIA (USA)",
+      "en": "llama.cpp project (ggml-org), open-source software; NVIDIA CUDA libraries (USA)"
+    },
+    "purpose": {
+      "pl": "Serwer uruchamiający lokalne modele rozmowy na kartach NVIDIA (CUDA)",
+      "en": "Server that runs local chat models on NVIDIA cards (CUDA)"
+    },
+    "limits": {
+      "pl": "To program, nie model; biblioteki NVIDIA mają własną licencję (redystrybucja do potwierdzenia)",
+      "en": "Software, not a model; NVIDIA libraries have their own licence (redistribution to be confirmed)"
+    },
+    "generative": false
+  },
+  "sidecar-llama-cpu": {
+    "origin": {
+      "pl": "Projekt llama.cpp (ggml-org), oprogramowanie otwarte",
+      "en": "llama.cpp project (ggml-org), open-source software"
+    },
+    "purpose": {
+      "pl": "Serwer uruchamiający lokalne modele rozmowy na samym procesorze",
+      "en": "Server that runs local chat models on the processor only"
+    },
+    "limits": {
+      "pl": "To program, nie model; na procesorze odpowiedzi są wyraźnie wolniejsze",
+      "en": "Software, not a model; replies are noticeably slower on the processor"
+    },
+    "generative": false
+  },
+  "sidecar-whisper-cpu": {
+    "origin": {
+      "pl": "Projekt whisper.cpp (ggml-org), oprogramowanie otwarte",
+      "en": "whisper.cpp project (ggml-org), open-source software"
+    },
+    "purpose": {
+      "pl": "Serwer rozpoznawania mowy (modele Whisper) na procesorze",
+      "en": "Speech recognition server (Whisper models) on the processor"
+    },
+    "limits": {
+      "pl": "To program, nie model — sam niczego nie tworzy",
+      "en": "Software, not a model — creates nothing by itself"
+    },
+    "generative": false
+  },
+  "sidecar-whisper-cuda": {
+    "origin": {
+      "pl": "Projekt whisper.cpp (ggml-org), oprogramowanie otwarte; biblioteki CUDA firmy NVIDIA (USA)",
+      "en": "whisper.cpp project (ggml-org), open-source software; NVIDIA CUDA libraries (USA)"
+    },
+    "purpose": {
+      "pl": "Serwer rozpoznawania mowy (modele Whisper) na kartach NVIDIA",
+      "en": "Speech recognition server (Whisper models) on NVIDIA cards"
+    },
+    "limits": {
+      "pl": "To program, nie model; biblioteki NVIDIA mają własną licencję (redystrybucja do potwierdzenia)",
+      "en": "Software, not a model; NVIDIA libraries have their own licence (redistribution to be confirmed)"
+    },
+    "generative": false
+  },
+  "sidecar-piper": {
+    "origin": {
+      "pl": "Projekt Piper (Rhasspy / Open Home Foundation), oprogramowanie otwarte",
+      "en": "Piper project (Rhasspy / Open Home Foundation), open-source software"
+    },
+    "purpose": {
+      "pl": "Program syntezy mowy dla głosów Piper",
+      "en": "Speech synthesis program for Piper voices"
+    },
+    "limits": {
+      "pl": "To program, nie model — mowę tworzy wybrany głos, oznaczana jako syntetyczna",
+      "en": "Software, not a model — speech comes from the selected voice and is marked as synthetic"
+    },
+    "generative": false
+  },
+  "sidecar-pocket-tts": {
+    "origin": {
+      "pl": "Model Pocket TTS w wariancie polskim (licencja CC-BY-4.0, autorstwo wag do potwierdzenia); nakładka Alfy uruchamiająca go bez Pythona",
+      "en": "Pocket TTS model, Polish variant (CC-BY-4.0 licence, weight authorship to be confirmed); Alfa's wrapper that runs it without Python"
+    },
+    "purpose": {
+      "pl": "Synteza mowy po polsku z kilkoma barwami i emocją",
+      "en": "Polish speech synthesis with several voices and emotion"
+    },
+    "limits": {
+      "pl": "Mowa syntetyczna — nie wolno jej używać do podszywania się pod osoby; licencja CC-BY wymaga podania autorów",
+      "en": "Synthetic speech — must not be used to impersonate people; the CC-BY licence requires attribution"
+    },
+    "generative": true
+  },
+  "sidecar-ffmpeg": {
+    "origin": {
+      "pl": "Projekt FFmpeg, oprogramowanie otwarte",
+      "en": "FFmpeg project, open-source software"
+    },
+    "purpose": {
+      "pl": "Konwersja plików dźwięku i obrazu na prośbę agentek (za zgodą)",
+      "en": "Converts audio and video files when agents ask (with approval)"
+    },
+    "limits": {
+      "pl": "To program, nie model AI — przetwarza istniejące pliki, niczego nie generuje",
+      "en": "Software, not an AI model — processes existing files, generates nothing"
+    },
+    "generative": false
+  }
+}

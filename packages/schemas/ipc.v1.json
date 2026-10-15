@@ -7701,6 +7701,34 @@
       ],
       "type": "object"
     },
+    "ModelCard": {
+      "description": "Karta modelu (AI Act art. 50): skąd pochodzi, do czego służy, czego nie umie i czy tworzy\ntreść oznaczaną jako wygenerowaną przez AI.",
+      "properties": {
+        "generative": {
+          "description": "Tworzy treść (tekst albo mowę) oznaczaną jako wygenerowaną przez AI.",
+          "type": "boolean"
+        },
+        "limits": {
+          "$ref": "#/$defs/LocalizedText",
+          "description": "Ograniczenia i ryzyka."
+        },
+        "origin": {
+          "$ref": "#/$defs/LocalizedText",
+          "description": "Autor i kraj pochodzenia, podstawa modelu."
+        },
+        "purpose": {
+          "$ref": "#/$defs/LocalizedText",
+          "description": "Przeznaczenie w Alfie."
+        }
+      },
+      "required": [
+        "origin",
+        "purpose",
+        "limits",
+        "generative"
+      ],
+      "type": "object"
+    },
     "ModelFileView": {
       "description": "Plik pozycji (pobierany albo wynikowy).",
       "properties": {
@@ -7793,6 +7821,17 @@
           "description": "Embedder aktywny w wyszukiwaniu (tylko `embed`).",
           "type": "boolean"
         },
+        "card": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelCard"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Karta modelu (pochodzenie, przeznaczenie, ograniczenia)."
+        },
         "confirmed": {
           "description": "Adresy, rozmiary i licencja potwierdzone przez człowieka (inaczej „do potwierdzenia”).",
           "type": "boolean"
@@ -7876,7 +7915,8 @@
         "note",
         "progress",
         "error",
-        "active"
+        "active",
+        "card"
       ],
       "type": "object"
     },

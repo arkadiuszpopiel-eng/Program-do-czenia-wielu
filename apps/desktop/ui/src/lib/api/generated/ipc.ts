@@ -2048,6 +2048,21 @@ export interface ModelBundle {
   readonly total: number;
 }
 
+/**
+ * Karta modelu (AI Act art. 50): skąd pochodzi, do czego służy, czego nie umie i czy tworzy
+ * treść oznaczaną jako wygenerowaną przez AI.
+ */
+export interface ModelCard {
+  /** Tworzy treść (tekst albo mowę) oznaczaną jako wygenerowaną przez AI. */
+  readonly generative: boolean;
+  /** Ograniczenia i ryzyka. */
+  readonly limits: LocalizedText;
+  /** Autor i kraj pochodzenia, podstawa modelu. */
+  readonly origin: LocalizedText;
+  /** Przeznaczenie w Alfie. */
+  readonly purpose: LocalizedText;
+}
+
 /** Plik pozycji (pobierany albo wynikowy). */
 export interface ModelFileView {
   readonly name: string;
@@ -2080,6 +2095,8 @@ export interface ModelInfo {
 export interface ModelItem {
   /** Embedder aktywny w wyszukiwaniu (tylko `embed`). */
   readonly active: boolean;
+  /** Karta modelu (pochodzenie, przeznaczenie, ograniczenia). */
+  readonly card: ModelCard | null;
   /** Adresy, rozmiary i licencja potwierdzone przez człowieka (inaczej „do potwierdzenia”). */
   readonly confirmed: boolean;
   /** Pozycja do pobrania w aplikacji (inaczej — instalacja ręczna wg opisu). */

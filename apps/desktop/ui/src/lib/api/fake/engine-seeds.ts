@@ -1,6 +1,6 @@
 // Atrapa: pozycje katalogu „Modele lokalne i silniki” (te same identyfikatory, rodzaje i możliwość
 // pobrania co katalog produkcyjny `app_models::builtin` — pakiety 1–6 składają się z nich).
-import type { ModelItem, ModelItemKind } from '../types-models';
+import type { ModelCard, ModelItem, ModelItemKind } from '../types-models';
 
 const MIB = 1024 * 1024;
 
@@ -321,5 +321,30 @@ export function seedItem([
     progress: null,
     error: null,
     active: false,
+    card: seedCard(kind, name),
+  };
+}
+
+/** Karta modelu w atrapie: modele rozmowy i głosy tworzą treść oznaczaną jako AI. */
+export function seedCard(kind: ModelItemKind, name: string): ModelCard {
+  const program = kind === 'sidecar';
+  return {
+    origin: program
+      ? { pl: 'Projekt otwarty (oprogramowanie)', en: 'Open-source project (software)' }
+      : { pl: `Autorzy modelu ${name}, wagi otwarte`, en: `Authors of ${name}, open weights` },
+    purpose: {
+      pl: program ? 'Silnik uruchamiający modele lokalnie' : `Lokalne użycie: ${name}`,
+      en: program ? 'Engine that runs models locally' : `Local use: ${name}`,
+    },
+    limits: program
+      ? {
+          pl: 'To program, nie model — sam niczego nie tworzy',
+          en: 'Software, not a model — creates nothing by itself',
+        }
+      : {
+          pl: 'Może się mylić; ważne informacje sprawdzaj u źródła',
+          en: 'Can be wrong; check important information at the source',
+        },
+    generative: kind === 'llm' || kind === 'tts',
   };
 }

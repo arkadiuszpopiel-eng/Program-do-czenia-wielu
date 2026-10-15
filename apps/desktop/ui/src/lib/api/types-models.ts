@@ -59,6 +59,20 @@ export interface ModelItem {
   readonly error: string | null;
   /** Embedder aktywny w wyszukiwaniu (tylko `embed`). */
   readonly active: boolean;
+  /** Karta modelu (pochodzenie, przeznaczenie, ograniczenia). */
+  readonly card: ModelCard | null;
+}
+
+/** Karta modelu (AI Act art. 50). */
+export interface ModelCard {
+  /** Autor i kraj pochodzenia, podstawa modelu. */
+  readonly origin: LocalizedText;
+  /** Przeznaczenie w Alfie. */
+  readonly purpose: LocalizedText;
+  /** Ograniczenia i ryzyka. */
+  readonly limits: LocalizedText;
+  /** Tworzy treść (tekst albo mowę) oznaczaną jako wygenerowaną przez AI. */
+  readonly generative: boolean;
 }
 
 export interface EmbedderView {

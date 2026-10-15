@@ -9,6 +9,7 @@
   import type { ModelItem } from '../../../api/types-models';
   import { cardFit, groupedHash, itemActions, progressPercent } from '../../../logic/models';
   import { useApp } from '../../../state/context';
+  import ModelCardInfo from './ModelCardInfo.svelte';
 
   interface Props {
     item: ModelItem;
@@ -75,8 +76,10 @@
     {#if item.pinned}<li class="badge">{t('engines.pinned')}</li>{/if}
     {#if !item.confirmed}<li class="badge warn">{t('engines.unconfirmed')}</li>{/if}
     {#if !item.downloadable}<li class="badge">{t('engines.manual')}</li>{/if}
+    {#if item.card?.generative}<li class="badge">{t('engines.card.badge')}</li>{/if}
   </ul>
   <p class="note">{app.i18n.text(item.note)}</p>
+  {#if item.card}<ModelCardInfo card={item.card} license={item.license} source={item.source} />{/if}
   <p
     role="status"
     aria-live="polite"

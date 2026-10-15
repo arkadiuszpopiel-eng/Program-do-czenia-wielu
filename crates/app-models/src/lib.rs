@@ -17,6 +17,7 @@ pub mod bundle_data;
 mod bundle_ops;
 mod bundle_quality;
 pub mod bundles;
+pub mod cards;
 pub mod catalog;
 pub mod data;
 pub mod embed;
