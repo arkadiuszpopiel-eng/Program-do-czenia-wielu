@@ -12,6 +12,32 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.55 — 2026-10-15
+
+Logowanie do narzędzi z kontem (Claude Code, Codex, Google Gemini przez Antigravity) prowadzi teraz
+krok po kroku, po polsku i z dokładnymi klawiszami, a Alfa sama rozpoznaje, że się udało. Antigravity
+nazywa się na karcie „Google Gemini — Antigravity CLI” i wyjaśnia, dlaczego to ono, a nie Gemini CLI.
+
+### Logowanie
+
+- [poważne] Okno logowania startuje w pustym folderze Alfy, a nie w Twoim katalogu domowym. Wcześniej
+  odpowiedź „Yes” wpisana w pole rozmowy Antigravity uruchamiała model, który zaczynał czytać pliki
+  w profilu i prosić o zgodę na polecenia.
+- Instrukcja dla każdego narzędzia osobno: co wybrać strzałkami, kiedy nacisnąć Enter, czego nie
+  wpisywać. Przy Antigravity wyraźne ostrzeżenie: nie wpisuj nic w pole „>” — to rozmowa z modelem.
+- Alfa rozpoznaje zalogowanie w oknie („Login successful”, „Successfully logged in”, nagłówek
+  „(Google AI Pro)”), pokazuje zielony komunikat i podświetla „Gotowe”.
+- Antigravity nie ma polecenia stanu, więc Alfa zapamiętuje zalogowanie wykryte w oknie — plan i dzień,
+  bez adresu e-mail. Stan połączeń pokazuje „Zalogowano · plan Google AI Pro” także po ponownym
+  uruchomieniu.
+- Claude Code: przycisk „Wpisz /login”, gdy narzędzie od razu pokazało pole rozmowy.
+
+### Testy
+
+- Rdzeń: zapamiętanie zalogowania Antigravity (bez e-maila) i stan po ponownym uruchomieniu; folder
+  logowania dla profili logowania. Interfejs: wykrycie zalogowania z wyjścia narzędzia, przebieg
+  „Zaloguj → wykryto → Gotowe → zapamiętano” w przeglądarce.
+
 ## 0.0.54 — 2026-10-15
 
 Krytyczka na lekkim modelu lokalnym czasem pisze werdykt z literówką („WERYFIKCJA: OK”) — Alfa brała
