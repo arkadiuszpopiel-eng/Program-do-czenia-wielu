@@ -116,7 +116,10 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
       await expect(page.getByRole('dialog', { name: 'Tablica' })).toBeVisible();
       await expectAccessible(page, `tablica ${skin} ${theme}`);
       await expectReadable(page, `tablica ${skin} ${theme}`);
-      await page.getByRole('button', { name: 'Zamknij' }).click();
+      await page
+        .getByRole('dialog', { name: 'Tablica' })
+        .getByRole('button', { name: 'Zamknij' })
+        .click();
       await palette(page, 'Otwórz instrukcję');
       await expect(page.getByRole('heading', { name: 'Instrukcja', level: 2 })).toBeVisible();
       await expectAccessible(page, `instrukcja ${skin} ${theme}`);

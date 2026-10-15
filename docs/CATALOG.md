@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 70 |
-| Linie Rust (z testami) | 415 508 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2894 |
+| Linie Rust (z testami) | 417 603 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2909 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -35,7 +35,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `platform` | — | — | — | C · F | 14 390 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 5223 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
 | `platform-windows` | F1, F5, F6 | service | inproc | I | 8457 | 75 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
-| `platform-windows-diag` | F1, F5, F6 | — | — | I | 659 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
+| `platform-windows-diag` | F1, F5, F6 | — | — | I | 664 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2161 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-ocr` | F1, F5, F6 | — | — | I | 266 | 2 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -120,7 +120,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `tools-net` | F6 | tool | inproc | C · I · F | 3072 | 29 | [tools-net](modules/tools-net/SPEC.md) | `net_fetch`/`net_download` tylko https do hostów publicznych, każdy host i przekierowanie przez Brokera, rebinding odrzucany, kwarantanna z SHA-256 i MOTW. |
 | `tools-office` | F6 | tool | inproc | C · I · F | 1703 | 12 | [tools-office](modules/tools-office/SPEC.md) | Word/Excel przez COM: odczyt (niezaufany) i edycja kopii jako nowa wersja z „Cofnij”; makra wyłączone. |
 | `tools-screen` | F6 | tool | inproc | C · I · F | 884 | 8 | [tools-screen](modules/tools-screen/SPEC.md) | Zrzuty na żądanie z maskowaniem okien Alfy/Brokera, deny-listy i pól haseł. |
-| `tools-shell` | F3 | tool | process | C · I · F | 2516 | 29 | [tools-shell](modules/tools-shell/SPEC.md) | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”. |
+| `tools-shell` | F3 | tool | process | C · I · F | 2525 | 29 | [tools-shell](modules/tools-shell/SPEC.md) | Polecenia w zakresie katalogu: snapshot, Job Object, filtrowane środowisko, „uruchom w terminalu”. |
 | `tools-system` | F6 | tool | inproc | C · I · F | 3457 | 26 | [tools-system](modules/tools-system/SPEC.md) | Procesy (zakończenie ze strażnikiem celów i tożsamością), usługi przez `system.admin`, Dziennik zdarzeń, zmienne z cofaniem, stan systemu. |
 | `tools-uia` | F5–F6 | tool | inproc | C · I · F | 1586 | 11 | [tools-uia](modules/tools-uia/SPEC.md) | Drzewo UIA, odczyt `TextPattern`, akcje tylko przez wzorce; wartości haseł nigdy nie wychodzą. |
 | `tools-vision` | F6 | tool | inproc | C · I · F | 2609 | 20 | [tools-vision](modules/tools-vision/SPEC.md) | OCR zrzutu/pliku (`Windows.Media.Ocr`) i opis obrazu przez Router „GUI/wizja”; maskowanie przed OCR i modelem; sesja prywatna tylko lokalnie. |
@@ -148,25 +148,25 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4395 | 30 | — |  |
-| `app-api` | — | — | — | pojedynczy | 7744 | 32 | — |  |
+| `app-api` | — | — | — | pojedynczy | 7890 | 32 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 1190 | 9 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4384 | 24 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 2361 | 6 | — |  |
-| `app-core` | — | — | — | pojedynczy | 17 740 | 122 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 2463 | 7 | — |  |
+| `app-core` | — | — | — | pojedynczy | 18 068 | 125 | — |  |
 | `app-diag` | — | — | — | pojedynczy | 545 | 3 | — |  |
-| `app-files` | — | — | — | pojedynczy | 3315 | 26 | — |  |
+| `app-files` | — | — | — | pojedynczy | 3819 | 31 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
 | `app-health` | — | — | — | pojedynczy | 1482 | 6 | — |  |
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 7619 | 47 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 6396 | 39 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 7067 | 43 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
-| `app-skills` | — | — | — | pojedynczy | 880 | 1 | — |  |
+| `app-skills` | — | — | — | pojedynczy | 1119 | 3 | — |  |
 | `app-store` | — | — | — | pojedynczy | 468 | 0 | — |  |
-| `app-tasks` | — | — | — | pojedynczy | 3660 | 13 | — |  |
+| `app-tasks` | — | — | — | pojedynczy | 3694 | 13 | — |  |
 | `app-terminal` | — | — | — | pojedynczy | 493 | 3 | — |  |
 | `app-updates` | — | — | — | pojedynczy | 1301 | 13 | — |  |
 | `app-voice` | — | — | — | pojedynczy | 6108 | 32 | — |  |
@@ -180,7 +180,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `lib-media` | — | — | — | pojedynczy | 2049 | 17 | — |  |
 | `lib-netguard` | — | — | — | pojedynczy | 649 | 7 | — |  |
 | `lib-openai-compat` | — | — | — | pojedynczy | 1714 | 11 | — |  |
-| `lib-quick` | — | — | — | pojedynczy | 1554 | 14 | — |  |
+| `lib-quick` | — | — | — | pojedynczy | 1611 | 14 | — |  |
 | `lib-sidecar-guard` | — | — | — | pojedynczy | 518 | 4 | — |  |
 | `lib-smart-turn` | — | — | — | pojedynczy | 588 | 7 | — |  |
 | `lib-sqlstore` | — | — | — | pojedynczy | 1321 | 30 | — |  |
