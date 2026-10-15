@@ -14,10 +14,11 @@ na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Hist
 
 ## 0.0.62 — 2026-10-16
 
-Trzecia seria dziesięciu nowości: przeliczanie jednostek i rachunki na datach bez modelu, `F1` z instrukcją,
-podpowiedzi z instrukcji w wyszukiwaniu Ustawień, szablony i polecenia jako JSON, statystyki rozmowy,
-wyszukiwanie na Tablicy, zapamiętany tryb skupienia, zapis wiadomości jako szablonu i układ na wąskie
-okno (od 360 px).
+Seria 3 i 4: dziewiętnaście nowości — nowe polecenia bez modelu (jednostki, daty, lata przestępne, liczby
+słownie i rzymskie, procenty, wybór z listy, liczenie znaków), `F1` z instrukcją, podpowiedzi z instrukcji
+w wyszukiwaniu Ustawień, szablony i polecenia jako JSON, statystyki rozmowy, wyszukiwanie na Tablicy,
+kopiowanie rozmowy, zapamiętany tryb skupienia, zapis wiadomości jako szablonu i układ na wąskie okno (od
+360 px) — oraz poprawki po przeglądzie kodu serii 3.
 
 ### Rozmowa
 
@@ -29,6 +30,14 @@ okno (od 360 px).
   średni czas odpowiedzi, narzędzia, okres, inne wersje i modele — z kopią jako Markdown.
 - Tablica: wyszukiwanie (bez polskich znaków, także po tytule rozmowy i agentce) i „Kopiuj wszystko (Markdown)”.
 - „Zapisz jako szablon promptu” w menu Twojej wiadomości — nazwa z pierwszej linii, bez powtórzeń.
+- Polecenia bez modelu: liczby słownie, także kwoty jak na fakturze („Zapisz 1999,99 zł słownie” → „… złotych
+  99/100”), i liczby rzymskie w obie strony („2026 rzymskimi”, „rzymskie MCMXC”).
+- Polecenia bez modelu: procenty („Ile procent to 25 z 200?”, „O ile procent wzrosło z 80 do 100?”), lata
+  przestępne i długość miesięcy („Ile dni ma luty 2028?”), losowy wybór z podanej listy („Wybierz jedno:
+  pizza, sushi, żurek”) i liczenie znaków i słów („Policz znaki: …”).
+- Pod polem pisania dopisek „Bez modelu: …”, gdy wiadomość dostanie odpowiedź od razu, bez modelu.
+- „Kopiuj rozmowę (Markdown)” w palecie — z oznaczeniem wiadomości wygenerowanych przez AI, jak w eksporcie;
+  „Statystyki rozmowy” także w menu sesji na liście rozmów.
 
 ### Ustawienia i wygląd
 
@@ -38,14 +47,29 @@ okno (od 360 px).
 - Tryb skupienia (`F11`) zostaje włączony po ponownym uruchomieniu programu.
 - Wąskie okno (400 px, ekrany od 360 px): pasek tytułu mieści przyciski okna, nagłówek strony kont się zawija,
   panele i okna dialogowe nie wychodzą poza okno.
+- Ustawienia → Polecenia bez modelu: przykłady wbudowanych poleceń są klikalne — wpisują się do testera.
+
+### Poprawki po przeglądzie kodu serii 3
+
+- Przeliczenia z bardzo małym wynikiem („1 mg w tonach”) pokazują cyfry znaczące zamiast zera; „1 dzień”
+  zamiast „1 dni”.
+- „Ile dni do 29 lutego?” bez roku liczy do najbliższego roku przestępnego.
+- Wyszukiwanie w instrukcji i w Ustawieniach nie pokazuje spóźnionych wyników starszego zapytania.
+- Wklejanie JSON: komunikat o błędzie znika po poprawce, a „pozycja nie jest obiektem” ma własny komunikat
+  (także po angielsku).
+- Nazwa szablonu z wiadomości nie przecina emoji (cięcie po znakach, nie po jednostkach UTF-16).
+- Test terminala nie zależy od stałego czekania 50 ms (jedyny czerwony test bramki 0.0.61 przy obciążonej
+  maszynie).
 
 ### Testy
 
 - Rdzeń: przeliczanie jednostek (w tym °F i K, prędkość, czas) i rachunki na datach (rok domyślny w przód
   i w tył, dzień tygodnia, miesiące, przesunięcia, daty niepoprawne idą do modelu); katalog poleceń.
 - Interfejs: import JSON (kształt, limit, pusty i błędny JSON), statystyki, wyszukiwanie Tablicy, nazwa szablonu,
-  `F1`, zapis trybu skupienia; E2E serii 3 w trzech stylach i dwóch motywach; wąskie okno 400 i 360 px
-  (rozmowa, panele, okna, pasek tytułu, wszystkie strony Ustawień).
+  `F1`, zapis trybu skupienia, kopia rozmowy z notą AI; E2E serii 3 i 4 w trzech stylach i dwóch motywach;
+  wąskie okno 400 i 360 px (rozmowa, panele, okna, pasek tytułu, wszystkie strony Ustawień).
+- Rdzeń (seria 4): liczby słownie do 999 miliardów i rzymskie (tylko postać kanoniczna), procenty i zmiana
+  procentowa, lata przestępne (1900, 2000, 2028), wybór z listy w oryginalnej pisowni, liczenie znaków i słów.
 
 ## 0.0.61 — 2026-10-16
 
