@@ -12,6 +12,54 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.60 — 2026-10-15
+
+Seria dziesięciu nowości: Alfa odpowiada na proste polecenia sama, bez modelu i kosztu (także bez
+internetu), ma szablony promptów, własne polecenia z testerem i quiz z tabliczki mnożenia, oznacza
+treści wygenerowane przez AI zgodnie z AI Act, pokazuje, gdzie trafiają dane, oraz dostała strony
+Moduły i Zaawansowane.
+
+### Rozmowa
+
+- Polecenia bez modelu: rachunki („Ile to jest 7 razy 8?”, procenty, potęgi, pierwiastki, liczby
+  słowami), literowanie słowa, kostka, moneta i liczba losowa, data i godzina — odpowiedź od razu,
+  bez kosztu, także offline (wiadomość nie czeka w kolejce). Pytania podobne z wyglądu („ile kosztuje
+  5 jabłek”, „która godzina w Tokio”) nadal idą do modelu.
+- Quiz z tabliczki mnożenia: „Przepytaj mnie z tabliczki mnożenia przez 7” — 10 pytań, odpowiedź liczbą
+  albo słowami (także głosem), „koniec” przerywa z podsumowaniem.
+- Własne polecenia: nowa strona Ustawienia → Polecenia bez modelu — fraza → stała odpowiedź (cała
+  wiadomość, początek z `{reszta}`, fraza w środku albo wyrażenie regularne), priorytet, tester „kto
+  odpowie na tę wiadomość” i katalog poleceń wbudowanych; tam też wyłączysz polecenia bez modelu.
+- Szablony promptów ze zmiennymi `{{nazwa}}`: Ustawienia → Szablony promptów oraz okno „Wstaw szablon
+  promptu” z palety `Ctrl+K` — pola zmiennych, podgląd i wstawienie do pola wpisywania bez wysyłania.
+- Eksport rozmowy także do JSON (obok Markdown i HTML) — z menu wiadomości, menu sesji i palety.
+
+### Przejrzystość i prywatność
+
+- [poważne] Oznaczanie treści AI (AI Act art. 50): wprowadzenie i stała informacja pod polem wpisywania
+  mówią, że rozmawiasz ze sztuczną inteligencją; w eksporcie MD, HTML i JSON wiadomości agentek mają znak
+  „AI” z modelem i znacznik maszynowy (nagłówek YAML, `meta`, typ źródła IPTC).
+- Karty modeli w Ustawienia → Modele lokalne i silniki: pochodzenie, przeznaczenie, ograniczenia,
+  licencja i znak „Tworzy treść AI” dla każdej pozycji katalogu.
+- „Gdzie trafiają dane” (Ustawienia → Dobór modelu): kraj dostawcy, czy może uczyć modele na twoich
+  danych i czy trasa obsłuży sesję prywatną — z powodem blokady; tylko do odczytu.
+
+### Ustawienia
+
+- Nowa strona Moduły: każdy moduł ze stanem, budżetem pamięci i procesora, zdolnościami i zależnościami;
+  pięć modułów opcjonalnych (model lokalny, głos, synteza mowy, konsolidacja pamięci, przenoszenie)
+  można wyłączyć od następnego uruchomienia, moduły Jądra są chronione.
+- Nowa strona Zaawansowane: surowy edytor plików konfiguracji (wspólny i tego komputera) ze
+  sprawdzaniem składni z numerem wiersza; zapis przechodzi pełną walidację, a klucz Jądra albo zły typ
+  zostawiają poprzednią treść pliku; flaga codziennego zapisu diagnostyki.
+
+### Testy
+
+- Rdzeń: polecenia bez modelu bez wywołania dostawcy (także offline i z wyłączonym ustawieniem), quiz
+  na prawdziwym rdzeniu, własne polecenia i szablony z walidacją, edytor konfiguracji z przywracaniem,
+  wyłączanie modułów przez trzy uruchomienia, trasy zgodności na prawdziwym rejestrze, eksport JSON.
+- Interfejs: każda nowa strona i okno w trzech stylach i dwóch motywach (dostępność i kontrast).
+
 ## 0.0.59 — 2026-10-15
 
 Agentka pisze i sprawdza programy: przeglądarka Alfy obsługuje strony w pełni (przewijanie, klawisze,

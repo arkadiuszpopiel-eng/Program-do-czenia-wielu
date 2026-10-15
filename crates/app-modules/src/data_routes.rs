@@ -108,7 +108,11 @@ mod tests {
         assert_eq!(cn.jurisdiction, vec!["CN".to_owned()]);
         assert_eq!(cn.training, "may_train");
         assert!(cn.standard_allowed && !cn.private_allowed, "{cn:?}");
-        let eu = v.routes.iter().find(|r| r.provider == "przyklad-ue").unwrap();
+        let eu = v
+            .routes
+            .iter()
+            .find(|r| r.provider == "przyklad-ue")
+            .unwrap();
         assert!(eu.private_allowed, "{eu:?}");
         let first_disabled = v.routes.iter().position(|r| !r.enabled);
         let last_enabled = v.routes.iter().rposition(|r| r.enabled);
