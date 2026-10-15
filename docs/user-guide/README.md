@@ -80,3 +80,6 @@ Na polskiej klawiaturze `Ctrl+Alt` działa jak `AltGr`, dlatego Alfa nie pozwoli
 | `%USERPROFILE%\Alfa\Sesje` | Katalogi robocze sesji — tu agentki zapisują pliki                                                            |
 
 Klucze API są wyłącznie w Menedżerze poświadczeń Windows — nigdy w tych katalogach.
+
+Ten przewodnik jest też wbudowany w program: Ustawienia → Instrukcja (albo paleta `Ctrl+K` → **Otwórz
+instrukcję**) — działa bez internetu, z wyszukiwaniem.

@@ -41,7 +41,16 @@ Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
 - **Kontynuuj** — dokończ odpowiedź uciętą limitem długości,
 - **Zapamiętaj** — w tej sesji, w projekcie, globalnie albo u agentki (zobacz [Pamięć](06-pamiec.md)),
 - ocena „Dobra odpowiedź” / „Słaba odpowiedź”, **Szczegóły → Oś czasu**, **Ukryj z widoku**,
-- **Eksportuj wiadomość do Markdown / HTML / JSON** (menu „Więcej akcji”).
+- **Eksportuj wiadomość do Markdown / HTML / JSON** (menu „Więcej akcji”),
+- **Przetłumacz na angielski** / **na polski** — nowa prośba w tej rozmowie z samym przekładem,
+- **Przypnij do tablicy** — kopia odpowiedzi trafia na **Tablicę** (do 40 przypięć z różnych rozmów; paleta
+  `Ctrl+K` → **Pokaż Tablicę**: otwórz rozmowę, kopiuj, odepnij).
+
+Styl odpowiedzi (zwięźle, szczegółowo, prostym językiem, formalnie) i swobodę (precyzyjnie, zrównoważenie, twórczo)
+ustawisz w Ustawienia → Ogólne; „Automatycznie” zostawia to personie agentki i modelowi.
+
+Załączniki DOCX, XLSX i PPTX trafiają do modelu jako wyciągnięty tekst (akapity, slajdy, komórki arkuszy) — jak
+pliki tekstowe, oznaczone jako treść z zewnątrz. Skany i PDF — w planie.
 
 Całą rozmowę (widoczną gałąź, bez wiadomości ukrytych) wyeksportujesz z menu sesji albo z palety `Ctrl+K`:
 **Eksportuj rozmowę do Markdown** / **do HTML** / **do JSON**. Plik HTML jest samodzielny: bez skryptów i zasobów
@@ -63,7 +72,8 @@ zostaje i wrócisz do niej strzałkami „Gałąź 1 z 2”. **Ukryj z widoku** 
 
 ## Sesje
 
-Panel Sesje (`Ctrl+B`) ma grupy: Przypięte, Bez projektu i Archiwum. Kropka przy sesji oznacza, że coś w niej
+Panel Sesje (`Ctrl+B`) ma grupy: Przypięte, Bez projektu i Archiwum. Pole **Pokaż rozmowy** zawęża listę do
+dzisiejszych albo z ostatnich 7 lub 30 dni; podpowiedź przy rozmowie pokazuje liczbę wiadomości i datę założenia. Kropka przy sesji oznacza, że coś w niej
 pracuje w tle; wyróżnienie — nieprzeczytane odpowiedzi. Menu sesji (prawy przycisk albo „…”):
 
 - **Zmień nazwę** (`F2`; nazwa nadaje się też sama z pierwszych wiadomości),

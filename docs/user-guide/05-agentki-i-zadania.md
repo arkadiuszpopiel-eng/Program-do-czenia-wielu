@@ -62,7 +62,9 @@ mostowi CLI ma dopisek „wynik niezweryfikowany przez Alfę”. `Ctrl+Shift+F12
 - **Nowy plik w katalogu** (np. `*.pdf`; jeśli obserwacja katalogów nie jest dostępna, Alfa to napisze),
 - **Ręcznie** („Uruchom teraz”).
 
-Dla każdego wpisujesz, co ma zrobić agentka, i czy szanować „nie przeszkadzać”. Lista ma włącznik, „Uruchom teraz”,
+Dla każdego wpisujesz, co ma zrobić agentka, i czy szanować „nie przeszkadzać”. Możesz też ustawić **tylko gdy
+komputer jest bezczynny** i **budżet zadania**: najwięcej kroków, najdłuższy czas i najwyższy koszt — i tak nie
+przekroczą polityki Marszałka. Lista ma włącznik, „Uruchom teraz”,
 „Usuń” i dziennik uruchomień. Wyzwalacz **nigdy nie uruchomi mostu CLI** bez Twojej zgody na karcie mostu.
 
 ## Marszałek — reguły, które tylko ograniczają
@@ -88,4 +90,5 @@ agentki są w bibliotece „Agentki z Kreatora”.
 czekają w „Do przejrzenia”; umiejętności z zewnątrz trafiają do **kwarantanny** z uwagami skanera. Po **Przejrzyj**
 widzisz zmiany, hash i wymagane narzędzia; instalujesz dokładnie tę wersję, którą przejrzałeś. Zainstalowaną
 uruchomisz przyciskiem **Uruchom** — powstaje zadanie w bieżącej sesji. Są też **Eksportuj paczkę** /
-**Importuj paczkę** i **Własna umiejętność**.
+**Importuj paczkę** (także plik **SKILL.md** w formacie Agent Skills — trafia do kwarantanny jak każda umiejętność
+z zewnątrz; narzędzia z innych programów nie są przenoszone) i **Własna umiejętność**.
