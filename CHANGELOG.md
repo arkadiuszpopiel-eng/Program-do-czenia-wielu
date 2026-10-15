@@ -12,6 +12,41 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.62 — 2026-10-16
+
+Trzecia seria dziesięciu nowości: przeliczanie jednostek i rachunki na datach bez modelu, `F1` z instrukcją,
+podpowiedzi z instrukcji w wyszukiwaniu Ustawień, szablony i polecenia jako JSON, statystyki rozmowy,
+wyszukiwanie na Tablicy, zapamiętany tryb skupienia, zapis wiadomości jako szablonu i układ na wąskie
+okno (od 360 px).
+
+### Rozmowa
+
+- Polecenia bez modelu: przeliczanie jednostek („Ile to 5 km w milach?”, „Zamień 30 stopni Celsjusza na
+  Fahrenheita”, „100 km/h na m/s”) — długość, masa, objętość, temperatura, prędkość i czas.
+- Polecenia bez modelu: rachunki na datach („Ile dni do 24 grudnia?”, „Ile dni minęło od 1 września?”, „Jaki
+  dzień tygodnia był 1 stycznia 2000?”, „Jaka data będzie za 30 dni?”, „Jaki dzień będzie jutro?”).
+- Statystyki rozmowy (paleta `Ctrl+K` → „Statystyki rozmowy”): wiadomości, słowa, czas czytania, tokeny, koszt,
+  średni czas odpowiedzi, narzędzia, okres, inne wersje i modele — z kopią jako Markdown.
+- Tablica: wyszukiwanie (bez polskich znaków, także po tytule rozmowy i agentce) i „Kopiuj wszystko (Markdown)”.
+- „Zapisz jako szablon promptu” w menu Twojej wiadomości — nazwa z pierwszej linii, bez powtórzeń.
+
+### Ustawienia i wygląd
+
+- `F1` otwiera instrukcję; wyszukiwanie w Ustawieniach pokazuje też do trzech trafień z instrukcji.
+- Szablony promptów i własne polecenia: „Kopiuj jako JSON” i „Wklej z JSON…” — bez identyfikatorów, ze
+  sprawdzeniem kształtu przed zapisem (rdzeń sprawdza resztę jak przy ręcznym dodawaniu).
+- Tryb skupienia (`F11`) zostaje włączony po ponownym uruchomieniu programu.
+- Wąskie okno (400 px, ekrany od 360 px): pasek tytułu mieści przyciski okna, nagłówek strony kont się zawija,
+  panele i okna dialogowe nie wychodzą poza okno.
+
+### Testy
+
+- Rdzeń: przeliczanie jednostek (w tym °F i K, prędkość, czas) i rachunki na datach (rok domyślny w przód
+  i w tył, dzień tygodnia, miesiące, przesunięcia, daty niepoprawne idą do modelu); katalog poleceń.
+- Interfejs: import JSON (kształt, limit, pusty i błędny JSON), statystyki, wyszukiwanie Tablicy, nazwa szablonu,
+  `F1`, zapis trybu skupienia; E2E serii 3 w trzech stylach i dwóch motywach; wąskie okno 400 i 360 px
+  (rozmowa, panele, okna, pasek tytułu, wszystkie strony Ustawień).
+
 ## 0.0.61 — 2026-10-16
 
 Druga seria dziesięciu nowości: instrukcja wbudowana w program, Tablica przypiętych odpowiedzi, tekst

@@ -44,7 +44,12 @@ Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
 - **Eksportuj wiadomość do Markdown / HTML / JSON** (menu „Więcej akcji”),
 - **Przetłumacz na angielski** / **na polski** — nowa prośba w tej rozmowie z samym przekładem,
 - **Przypnij do tablicy** — kopia odpowiedzi trafia na **Tablicę** (do 40 przypięć z różnych rozmów; paleta
-  `Ctrl+K` → **Pokaż Tablicę**: otwórz rozmowę, kopiuj, odepnij).
+  `Ctrl+K` → **Pokaż Tablicę**: wyszukiwanie, otwórz rozmowę, kopiuj, odepnij, „Kopiuj wszystko (Markdown)”),
+- **Zapisz jako szablon promptu** (Twoje wiadomości) — treść trafia do szablonów, nazwa z pierwszej linii.
+
+**Statystyki rozmowy** (paleta `Ctrl+K` → „Statystyki rozmowy”) pokazują dla bieżącej ścieżki: liczbę wiadomości
+i słów, czas czytania, tokeny, koszt odpowiedzi, średni czas odpowiedzi, użycia narzędzi, okres, inne wersje
+(gałęzie po „edytuj” i „ponów”) oraz modele — z kopią jako Markdown.
 
 Styl odpowiedzi (zwięźle, szczegółowo, prostym językiem, formalnie) i swobodę (precyzyjnie, zrównoważenie, twórczo)
 ustawisz w Ustawienia → Ogólne; „Automatycznie” zostawia to personie agentki i modelowi.
@@ -90,7 +95,8 @@ Często powtarzane prośby zapiszesz jako szablon w Ustawienia → Szablony prom
 klamrach, np. „Napisz e-mail do {{adresat}} w sprawie {{temat}}”. Paleta `Ctrl+K` → **Wstaw szablon promptu** (albo
 przycisk **Użyj** przy szablonie) otwiera okno: wybierasz szablon, uzupełniasz zmienne, widzisz podgląd i wstawiasz
 tekst do pola wpisywania. Nic nie wysyła się samo — sprawdzasz i wysyłasz. Puste zmienne zostają w tekście
-do poprawienia.
+do poprawienia. **Kopiuj jako JSON** i **Wklej z JSON…** przenoszą szablony (i własne polecenia) między
+komputerami albo do kopii — wklejone pozycje dopisują się do listy po sprawdzeniu.
 
 ## Polecenia bez modelu
 

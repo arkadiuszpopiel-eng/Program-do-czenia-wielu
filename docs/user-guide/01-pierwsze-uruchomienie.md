@@ -43,9 +43,12 @@ Na końcu kliknij **Zaczynamy**.
 - **Rozmowa** na środku i pole wiadomości na dole.
 - **Panel prawy** (`Ctrl+\`) z kartami: Agentki (`Alt+1`), Oś czasu (`Alt+2`), Pliki (`Alt+3`), Pamięć (`Alt+4`),
   Ekran (`Alt+5`), Głos (`Alt+6` — **jeszcze niedostępny**, ustawienia głosu są w Ustawieniach) i Zadania (`Alt+7`).
-- **Tryb skupienia** (`F11`) chowa wszystko poza rozmową; `Esc` albo `F11` przywraca widok.
+- **Tryb skupienia** (`F11`) chowa wszystko poza rozmową; `Esc` albo `F11` przywraca widok. Tryb zostaje
+  włączony po ponownym uruchomieniu.
+- **Instrukcja** (`F1`) — ten przewodnik w programie; wyszukiwanie w Ustawieniach podpowiada też fragmenty
+  instrukcji.
 - **Paleta poleceń** (`Ctrl+K`) — wpisz kilka liter polecenia, nazwy sesji albo ustawienia.
-- W wąskim oknie panele zamieniają się w wysuwane arkusze.
+- W wąskim oknie panele zamieniają się w wysuwane arkusze (układ sprawdzany od 360 px szerokości).
 
 ## Ustawienia
 
