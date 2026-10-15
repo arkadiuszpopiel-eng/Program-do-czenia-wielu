@@ -5,27 +5,22 @@
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "last_updated": "2026-10-12T05:00:00+02:00",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-14T22:10:00+02:00"
+    "updated": "2026-10-15T03:30:00+02:00"
   },
-  "current_state": "Alfa 0.0.52 (2026-10-14): okno Ustawienia → Stan połączeń, bridges_check (polecenie stanu CLI, bez danych konta), sprawdzenie po „Gotowe” w oknie logowania, Antigravity (logowanie agy_login + most agy z ostrzeżeniem, domyślnie wyłączony), blokady .agy/.gemini; regresja próby obowiązków naprawiona (rano 58 s, wieczór 28 s). verify wersja: 17/18 zielone, przeglądarka przy 4 procesach 11, potem 5 czerwonych — 1 prawdziwy (atrapa mostów, naprawiony), reszta niestabilność czasowa (osobno zielone). Wgrane do Alfa-uruchomiona 22:25 (bez uruchamiania).",
+  "current_state": "Alfa 0.0.53 (noc 14/15.10): decyzje z dokumentu 25 rozstrzygnięte na polecenie właściciela — izolacja poleceń powłoki integralnością Low (platform-windows-impl/src/process/win/low.rs, tools-shell-impl isolation.rs; bez profilu/korzenia/systemu, bez cargo/npm…, powrót do Medium gdy niedostępna), Markdown 100 KB 7,8 ms (czyszczenie w wątkach), wasmtime 36.0.18 (RUSTSEC-2026-0363), pokrycie łącza 71,8 % (bramka 70 %, e2e-app/z-commands.spec.ts), poprawki po przeglądzie subagenta. verify wersja 0.0.53 ZIELONY 18/18 o 3:19 (Rust 2753, UI 365, przeglądarka 359, aplikacja 32, łącze 71,8 %); wgrane do Alfa-uruchomiona 3:2x i sprawdzony start (bez uruchamiania na profilu właściciela). Raport: docs/plan/26-raport-nocny-2026-10-15.md. Usunięto 116,6 GB starych plików kompilacji (E: 122 GB wolne).",
   "session_goal": "Uwzględnić audyt z 14.10 w poprawkach, dokładnie sprawdzając (cel właściciela).",
   "in_progress": [
-    "Pokrycie poleceń 52,6 % -> 70 %",
-    "verify sprzet dla 0.0.52",
-    "Niestabilne testy e2e przy 4 procesach"
+    "verify sprzet (bez dźwięku w nocy)"
   ],
   "blocking_issues": [
-    "Decyzja właściciela: AppContainer dla poleceń powłoki — docs/plan/25 §1",
-    "Decyzja właściciela: zmiana wpisu agy-antigravity w rejestrze zgodności — docs/plan/25 §3",
-    "Decyzja właściciela: budżet Markdown 20 ms vs ammonia 4.2.3 (22–24 ms) — docs/plan/25 §4",
-    "Format stream-json prawdziwego agy niepotwierdzony (nie wywoływano modelu na koncie właściciela)",
-    "Dysk E: niestabilny przy dużym obciążeniu"
+    "Test konta Google / Antigravity z właścicielem 15.10 o 10:00 (przypomnienie ustawione: zadanie alfa-przypomnienie-konto-google)",
+    "Format stream-json prawdziwego agy niepotwierdzony",
+    "Dysk E: niestabilny przy dużym obciążeniu; E: 50 GB wolne, C: 41 GB"
   ],
   "next_session": [
-    "Sprawdzić wynik e2e i wgranie 0.0.52",
-    "Testy e2e przy 4 procesach przekraczają 30 s — rozważyć próg/liczbę procesów",
-    "Pokrycie poleceń: testy e2e-app/z-*.spec.ts",
-    "verify sprzet (gdy właściciel nie pracuje)"
+    "10:00: test Antigravity z właścicielem (plan w zadaniu przypomnienia)",
+    "Sprawdzić raport nocny i wynik verify 0.0.53",
+    "Izolacja Low: obserwować polecenia agentek z dopiskiem [izolacja] w prawdziwej pracy"
   ],
   "env_snapshot": {
     "key_paths": {
