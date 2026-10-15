@@ -10,5 +10,6 @@ export const plJson = {
   'json.error.json': 'To nie jest poprawny JSON.',
   'json.error.shape': 'Pozycja {n} nie ma wymaganych pól ({fields}).',
   'json.error.empty': 'Brak pozycji do dodania.',
+  'json.error.notObject': 'Pozycja {n} nie jest obiektem JSON.',
   'json.error.tooMany': 'Za dużo pozycji naraz (najwyżej {max}).',
 };

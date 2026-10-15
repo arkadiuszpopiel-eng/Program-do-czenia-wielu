@@ -73,16 +73,17 @@ fn parse(c: &regex::Captures<'_>, at: usize, today: NaiveDate, lean: Lean) -> Op
     if let Some(y) = year {
         return NaiveDate::from_ymd_opt(i32::try_from(y).ok()?, month, day);
     }
-    let this = NaiveDate::from_ymd_opt(today.year(), month, day);
-    let next = || NaiveDate::from_ymd_opt(today.year() + 1, month, day);
-    let prev = || NaiveDate::from_ymd_opt(today.year() - 1, month, day);
-    match (lean, this) {
-        (Lean::Future, Some(d)) if d < today => next(),
-        (Lean::Past, Some(d)) if d > today => prev(),
-        (_, Some(d)) => Some(d),
-        (Lean::Future, None) => next(),
-        (Lean::Past, None) => prev(),
-        (Lean::Near, None) => None,
+    // Najbliższy rok, w którym data istnieje (29 lutego — do 8 lat w przód albo w tył).
+    let at_year = |y: i32| NaiveDate::from_ymd_opt(y, month, day);
+    let y0 = today.year();
+    match lean {
+        Lean::Near => at_year(y0),
+        Lean::Future => (0..=8)
+            .filter_map(|k| at_year(y0 + k))
+            .find(|d| *d >= today),
+        Lean::Past => (0..=8)
+            .filter_map(|k| at_year(y0 - k))
+            .find(|d| *d <= today),
     }
 }
 

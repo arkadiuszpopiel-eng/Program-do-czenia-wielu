@@ -217,9 +217,47 @@
       {#each view.builtins as b (b.title)}
         <li>
           <strong>{b.title}</strong>
-          <span class="wk-meta">{b.examples.map((e) => `„${e}”`).join(' · ')}</span>
+          <span class="examples">
+            {#each b.examples as example (example)}
+              <button
+                type="button"
+                class="example"
+                aria-label={t('commands.example', { text: example })}
+                onclick={() => {
+                  message = example;
+                  document.getElementById('commands-test')?.scrollIntoView({ block: 'nearest' });
+                }}>„{example}”</button
+              >
+            {/each}
+          </span>
         </li>
       {/each}
     </ul>
   </section>
 {/if}
+
+<style>
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--alfa-space-1);
+  }
+  .example {
+    padding: 0 var(--alfa-space-1);
+    border: 0;
+    border-radius: var(--alfa-radius-control);
+    background: transparent;
+    color: var(--alfa-color-text-muted);
+    font: inherit;
+    font-size: var(--alfa-font-size-sm);
+    text-align: left;
+    text-decoration: underline dotted;
+    cursor: pointer;
+  }
+  .example:hover {
+    color: var(--alfa-color-text);
+  }
+  .example:focus-visible {
+    outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
+  }
+</style>

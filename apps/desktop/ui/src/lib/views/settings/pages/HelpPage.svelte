@@ -55,13 +55,21 @@
       hits = null;
       return;
     }
+    let stale = false;
     const timer = setTimeout(() => {
       app.client.help.search(text).then(
-        (r) => (hits = r),
-        () => (hits = []),
+        (r) => {
+          if (!stale) hits = r;
+        },
+        () => {
+          if (!stale) hits = [];
+        },
       );
     }, 250);
-    return () => clearTimeout(timer);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+    };
   });
 
   function pick(hit: HelpHit) {

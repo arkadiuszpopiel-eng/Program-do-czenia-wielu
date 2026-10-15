@@ -27,8 +27,7 @@ export function appendToDraft(draft: string, text: string): string {
   return draft.trim() ? `${draft.trimEnd()}\n\n${text}` : text;
 }
 
-/** Najdłuższa nazwa i treść szablonu (jak w rdzeniu). */
-export const TEMPLATE_NAME_MAX = 60;
+/** Najdłuższa treść i największa liczba szablonów (jak w rdzeniu). */
 export const TEMPLATE_TEXT_MAX = 8000;
 export const TEMPLATE_COUNT_MAX = 100;
 
@@ -38,7 +37,9 @@ export const TEMPLATE_COUNT_MAX = 100;
  */
 export function templateNameFrom(text: string, taken: readonly string[], fallback: string): string {
   const line = (text.trim().split('\n')[0] ?? '').replace(/\s+/g, ' ').trim();
-  const base = line.length > 40 ? `${line.slice(0, 39).trimEnd()}…` : line || fallback;
+  // Cięcie po znakach (punktach kodowych), nie po jednostkach UTF-16 — emoji zostaje całe.
+  const chars = [...line];
+  const base = chars.length > 40 ? `${chars.slice(0, 39).join('').trimEnd()}…` : line || fallback;
   const used = new Set(taken.map((n) => n.toLowerCase()));
   if (!used.has(base.toLowerCase())) return base;
   for (let i = 2; ; i += 1) {

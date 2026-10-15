@@ -290,6 +290,20 @@ fn significant(x: f64) -> f64 {
     (x * scale).round() / scale
 }
 
+/// Wynik do wyświetlenia: wartości poniżej 0,001 z 6 cyframi znaczącymi (zaokrąglenie do
+/// 6 miejsc po przecinku zrobiłoby z nich zero).
+fn shown(x: f64) -> String {
+    if x == 0.0 || x.abs() >= 1e-3 || !x.is_finite() {
+        return number(x);
+    }
+    let digits =
+        usize::try_from((6 - (x.abs().log10().floor() as i32) - 1).clamp(0, 15)).unwrap_or(6);
+    let text = format!("{x:.digits$}");
+    text.trim_end_matches('0')
+        .trim_end_matches('.')
+        .replace('.', ",")
+}
+
 /// Dwa wzorce: „5 km w milach” i „ile cm ma cal” (budowane raz, z listy jednostek).
 fn patterns() -> Option<&'static (Regex, Regex)> {
     static CELL: OnceLock<Option<(Regex, Regex)>> = OnceLock::new();
@@ -323,7 +337,7 @@ pub fn answer(text: &str) -> Option<String> {
         "{} {} = **{} {}**",
         number(value),
         from.symbol,
-        number(result),
+        shown(result),
         to.symbol
     ))
 }
@@ -355,6 +369,14 @@ mod tests {
             Some("2,5 kg = **5,51156 lb**")
         );
         assert_eq!(answer("0 k na c").as_deref(), Some("0 K = **-273,15 °C**"));
+        assert_eq!(
+            answer("ile to 1 cal w km").as_deref(),
+            Some("1 in = **0,0000254 km**")
+        );
+        assert_eq!(
+            answer("1 mg w tonach").as_deref(),
+            Some("1 mg = **0,000000001 t**")
+        );
         assert_eq!(
             answer("90 minut w godzinach").as_deref(),
             Some("90 min = **1,5 h**")

@@ -40,6 +40,11 @@ fn days_until_and_since() {
         a("ile minelo dni od 14.10.2026").as_deref(),
         Some("Od 14 października 2026 (środa) minęło **1 dzień**.")
     );
+    assert_eq!(
+        a("ile dni do 29 lutego").as_deref(),
+        Some("Do 29 lutego 2028 (wtorek) zostało **502 dni**."),
+        "29 lutego — najbliższy rok przestępny"
+    );
     assert!(
         a("ile dni od 1 stycznia 2030")
             .unwrap_or_default()

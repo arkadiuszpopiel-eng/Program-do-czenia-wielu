@@ -11,6 +11,7 @@ export type ImportError =
   | { readonly kind: 'json' }
   | { readonly kind: 'empty' }
   | { readonly kind: 'tooMany'; readonly max: number }
+  | { readonly kind: 'notObject'; readonly index: number }
   | { readonly kind: 'shape'; readonly index: number; readonly fields: string };
 
 export type ImportResult<T> =
@@ -38,7 +39,7 @@ function records(text: string): ImportResult<Record<string, unknown>> {
   const items: Record<string, unknown>[] = [];
   for (const [i, item] of list.entries()) {
     if (typeof item !== 'object' || item === null || Array.isArray(item)) {
-      return { ok: false, error: { kind: 'shape', index: i + 1, fields: 'obiekt' } };
+      return { ok: false, error: { kind: 'notObject', index: i + 1 } };
     }
     items.push(item as Record<string, unknown>);
   }

@@ -19,13 +19,22 @@
       hits = [];
       return;
     }
+    // Odpowiedź na starsze zapytanie (wolniejsza niż nowsza) nie nadpisuje wyników.
+    let stale = false;
     const timer = setTimeout(() => {
       app.client.help.search(text).then(
-        (r) => (hits = r.slice(0, 3)),
-        () => (hits = []),
+        (r) => {
+          if (!stale) hits = r.slice(0, 3);
+        },
+        () => {
+          if (!stale) hits = [];
+        },
       );
     }, 250);
-    return () => clearTimeout(timer);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+    };
   });
 
   function pick(hit: HelpHit) {

@@ -29,5 +29,7 @@ describe('szablony promptów', () => {
     expect(templateNameFrom(long, [], 'Szablon')).toBe(`${'a'.repeat(39)}…`);
     expect(templateNameFrom('Mail', ['mail', 'Mail (2)'], 'Szablon')).toBe('Mail (3)');
     expect(templateNameFrom('   ', [], 'Szablon')).toBe('Szablon');
+    const emoji = `${'a'.repeat(38)}😀😀😀`;
+    expect(templateNameFrom(emoji, [], 'Szablon')).toBe(`${'a'.repeat(38)}😀…`);
   });
 });

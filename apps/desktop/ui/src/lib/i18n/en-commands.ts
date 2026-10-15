@@ -47,4 +47,5 @@ export const enCommands: Record<keyof typeof plCommands, Message> = {
   'commands.form.save': 'Save',
   'commands.form.cancel': 'Cancel',
   'commands.builtin.title': 'Built-in commands',
+  'commands.example': 'Try in the tester: {text}',
 };

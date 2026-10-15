@@ -13,5 +13,6 @@ export const enJson: Record<keyof typeof plJson, Message> = {
   'json.error.json': 'This is not valid JSON.',
   'json.error.shape': 'Item {n} lacks required fields ({fields}).',
   'json.error.empty': 'Nothing to add.',
+  'json.error.notObject': 'Item {n} is not a JSON object.',
   'json.error.tooMany': 'Too many items at once (at most {max}).',
 };

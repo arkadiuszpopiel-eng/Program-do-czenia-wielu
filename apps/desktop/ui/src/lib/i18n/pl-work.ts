@@ -151,6 +151,8 @@ export const plWork = {
     'Rozmawiasz ze sztuczną inteligencją — sprawdzaj ważne informacje · Enter — wyślij · Shift+Enter — nowa linia',
   'composer.hintCtrl':
     'Rozmawiasz ze sztuczną inteligencją — sprawdzaj ważne informacje · Ctrl+Enter — wyślij · Enter — nowa linia',
+  'composer.local': 'Bez modelu: {name}',
+  'composer.localQuiz': 'quiz',
   'ob.optional': 'opcjonalny',
   'ob.progress': 'Postęp wprowadzenia',
   'ob.voice.A.desc': 'Działa na samym procesorze, bez karty graficznej.',

@@ -44,4 +44,5 @@ export const plCommands = {
   'commands.form.save': 'Zapisz',
   'commands.form.cancel': 'Anuluj',
   'commands.builtin.title': 'Polecenia wbudowane',
+  'commands.example': 'Sprawdź w testerze: {text}',
 };

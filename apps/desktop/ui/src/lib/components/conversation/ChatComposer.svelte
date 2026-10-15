@@ -29,6 +29,7 @@
   import { runCommand } from '../../state/commands';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { AttachmentsState } from '../../state/attachments.svelte';
+  import ComposerHint from './ComposerHint.svelte';
   import { carriesFiles, hintsFrom } from '../../logic/attachments';
   import ComposerAttachments from './ComposerAttachments.svelte';
   import ComposerSuggest, { type Suggestion } from './ComposerSuggest.svelte';
@@ -373,7 +374,7 @@
       <MicButton state={app.micState} showLabel={false} onclick={toggleMic} labels={micLabels} />
     {/snippet}
   </Composer>
-  <p class="hint">{t(sendOnEnter ? 'composer.hint' : 'composer.hintCtrl')}</p>
+  <ComposerHint {draft} {sendOnEnter} attachments={att.items.length} />
 </div>
 
 <style>
@@ -382,11 +383,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-1);
-  }
-  .hint {
-    color: var(--alfa-color-text-subtle);
-    font-size: var(--alfa-font-size-xs);
-    text-align: center;
   }
   .dragging :global(.composer) {
     outline: var(--alfa-size-focus-ring) dashed var(--alfa-color-focus);

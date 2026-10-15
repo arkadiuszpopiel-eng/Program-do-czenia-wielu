@@ -20,7 +20,7 @@ describe('json-transfer', () => {
       ok: false,
       error: { kind: 'shape', index: 1 },
     });
-    expect(parseTemplates('[1]')).toMatchObject({ ok: false, error: { kind: 'shape' } });
+    expect(parseTemplates('[1]')).toEqual({ ok: false, error: { kind: 'notObject', index: 1 } });
     const many = JSON.stringify(
       Array.from({ length: MAX_IMPORT + 1 }, () => ({ name: 'a', text: 'b' })),
     );

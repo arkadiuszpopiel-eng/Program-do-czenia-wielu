@@ -36,6 +36,8 @@
         return t('json.error.tooMany', { max: e.max });
       case 'shape':
         return t('json.error.shape', { n: e.index, fields: e.fields });
+      case 'notObject':
+        return t('json.error.notObject', { n: e.index });
     }
   }
 
@@ -54,6 +56,7 @@
       error = describe(result.error);
       return;
     }
+    error = null;
     busy = true;
     try {
       if (await onadd(result.items)) {

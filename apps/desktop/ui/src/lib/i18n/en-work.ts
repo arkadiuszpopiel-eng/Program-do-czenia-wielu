@@ -149,6 +149,8 @@ export const enWork: Record<keyof typeof plWork, Message> = {
     'You are talking to an AI — check important information · Enter — send · Shift+Enter — new line',
   'composer.hintCtrl':
     'You are talking to an AI — check important information · Ctrl+Enter — send · Enter — new line',
+  'composer.local': 'No model needed: {name}',
+  'composer.localQuiz': 'quiz',
   'ob.optional': 'optional',
   'ob.progress': 'Introduction progress',
   'ob.voice.A.desc': 'Runs on the CPU only, no graphics card needed.',

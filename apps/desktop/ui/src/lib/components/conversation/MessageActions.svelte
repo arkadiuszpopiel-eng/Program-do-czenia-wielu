@@ -10,12 +10,7 @@
   import Ellipsis from '@lucide/svelte/icons/ellipsis';
   import type { RememberScope, Turn } from '../../api/types';
   import { attempt } from '../../state/attempt';
-  import {
-    TEMPLATE_COUNT_MAX,
-    TEMPLATE_NAME_MAX,
-    TEMPLATE_TEXT_MAX,
-    templateNameFrom,
-  } from '../../logic/templates';
+  import { TEMPLATE_COUNT_MAX, TEMPLATE_TEXT_MAX, templateNameFrom } from '../../logic/templates';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { exportConversation } from '../../state/exports';
@@ -73,11 +68,12 @@
       app.toasts.show({ kind: 'warning', message: t('tpl.full', { max: TEMPLATE_COUNT_MAX }) });
       return;
     }
+    // Nazwa ma najwyżej 40 znaków i numer — mieści się w limicie rdzenia (60).
     const name = templateNameFrom(
       text,
       list.map((x) => x.name),
       t('tpl.defaultName'),
-    ).slice(0, TEMPLATE_NAME_MAX);
+    );
     await app.client.templates.save([...list, { id: '', name, text }]);
     app.toasts.show({ kind: 'success', message: t('tpl.savedFrom', { name }) });
   }
