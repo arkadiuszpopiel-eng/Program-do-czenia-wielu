@@ -1,5 +1,5 @@
 //! Polecenia wykonywane bez modelu (plan v6, P5): rachunki, literowanie, losowanie, data
-//! i godzina, rachunki na datach, przeliczanie jednostek. Odpowiedź jest deterministyczna (poza losowaniem), natychmiastowa i działa offline.
+//! i godzina, rachunki na datach, przeliczanie jednostek, liczby słownie i rzymskie. Odpowiedź jest deterministyczna (poza losowaniem), natychmiastowa i działa offline.
 //!
 //! Zasada dopasowania: całe polecenie (po normalizacji) musi pasować do wzorca albo — w rachunkach
 //! — każde słowo musi być liczbą, działaniem albo wypełniaczem. Wszystko inne idzie do modelu,
@@ -20,6 +20,7 @@ pub mod keys {
     pub const CUSTOM: &str = "sessions.custom_commands";
 }
 mod math;
+pub mod numerals;
 pub mod quiz;
 mod random;
 mod spell;
@@ -48,6 +49,8 @@ pub enum Command {
     Dates,
     /// Przeliczanie jednostek.
     Units,
+    /// Liczby słownie (także kwoty w złotych) i rzymskie.
+    Numerals,
 }
 
 impl Command {
@@ -62,6 +65,7 @@ impl Command {
             Self::Custom => "własne polecenie",
             Self::Dates => "rachunek na datach",
             Self::Units => "przeliczanie jednostek",
+            Self::Numerals => "liczby słownie i rzymskie",
         }
     }
 }
@@ -162,6 +166,16 @@ pub const CATALOG: &[Entry] = &[
             "2,5 kg w funtach",
         ],
     },
+    Entry {
+        command: Command::Numerals,
+        title: "Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie",
+        examples: &[
+            "1234 słownie",
+            "zapisz 1999,99 zł słownie",
+            "2026 rzymskimi",
+            "rzymskie MCMXC",
+        ],
+    },
 ];
 
 /// Najdłuższa wiadomość, którą biblioteka w ogóle rozważa (dłuższe idą do modelu).
@@ -196,6 +210,9 @@ pub fn answer(
     }
     if let Some(t) = units::answer(&text) {
         return reply(Command::Units, t);
+    }
+    if let Some(t) = numerals::answer(&text) {
+        return reply(Command::Numerals, t);
     }
     math::answer(&text).and_then(|t| reply(Command::Math, t))
 }

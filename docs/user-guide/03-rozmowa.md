@@ -112,6 +112,8 @@ Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — ta
 - **przeliczanie jednostek** — „Ile to 5 km w milach?”, „Zamień 30 stopni Celsjusza na Fahrenheita”, „Ile cm ma
   cal?”, „100 km/h na m/s”: długość, masa, objętość, temperatura, prędkość i czas (jednostki z różnych grup trafią
   do modelu);
+- **liczby słownie i rzymskie** — „1234 słownie”, „Zapisz 1999,99 zł słownie” (jak na fakturze: „… złotych
+  99/100”), „2026 rzymskimi”, „rzymskie MCMXC”;
 - **quiz z tabliczki mnożenia** — „Przepytaj mnie z tabliczki mnożenia (przez 7)”: 10 pytań, odpowiadasz liczbą
   (także słowami albo głosem), „koniec” przerywa z podsumowaniem; inna wiadomość kończy quiz.
 

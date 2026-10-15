@@ -25,6 +25,10 @@ const BUILTINS: readonly BuiltinCommand[] = [
     title: 'Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas',
     examples: ['Ile to 5 km w milach?', 'ile cm ma cal'],
   },
+  {
+    title: 'Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie',
+    examples: ['1234 słownie', '2026 rzymskimi'],
+  },
 ];
 
 const fold = (s: string): string =>
