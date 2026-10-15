@@ -83,6 +83,7 @@ pub fn prepare_run(
         verify: caller.verify,
         approval_timeout_ms: caller.approval_timeout_ms,
         history: Vec::new(),
+        environment: None,
     };
     let depth = caller_options.depth + u32::from(parent.is_some());
     let options = RunOptions {

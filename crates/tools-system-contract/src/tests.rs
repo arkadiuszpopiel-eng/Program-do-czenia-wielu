@@ -7,7 +7,7 @@ use super::*;
 #[test]
 fn manifests_are_valid_and_least_privilege() {
     let ms = manifests();
-    assert_eq!(ms.len(), 9);
+    assert_eq!(ms.len(), 10);
     for m in &ms {
         m.validate().unwrap();
         assert!(

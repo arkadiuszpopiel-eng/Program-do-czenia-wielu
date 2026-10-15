@@ -145,6 +145,7 @@ impl Engine {
             verify: false,
             approval_timeout_ms: self.cp.spec.approval_timeout_ms,
             history: Vec::new(),
+            environment: None,
         };
         let options = RunOptions {
             parent: Some(self.handle.run.clone()),

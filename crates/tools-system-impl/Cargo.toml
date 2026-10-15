@@ -11,6 +11,7 @@ repository.workspace = true
 [dependencies]
 tools-system-contract = { path = "../tools-system-contract" }
 tools-common-contract = { path = "../tools-common-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
 safety-broker-contract = { path = "../safety-broker-contract" }
 risk-classifier-contract = { path = "../risk-classifier-contract" }
 platform-apps-contract = { path = "../platform-apps-contract" }

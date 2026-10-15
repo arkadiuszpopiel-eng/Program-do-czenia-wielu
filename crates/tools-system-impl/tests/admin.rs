@@ -291,6 +291,7 @@ async fn status_reads_platform_ports() {
         broker: h.broker.clone(),
         config: Default::default(),
         bus: None,
+        software: None,
     });
     let t = tools_common_contract::Toolset::tools(&tools)
         .into_iter()

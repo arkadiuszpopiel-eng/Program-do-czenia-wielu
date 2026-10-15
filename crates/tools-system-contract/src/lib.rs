@@ -14,9 +14,11 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod convert;
+mod software;
 mod types;
 
 pub use convert::{check_args, policy_refusal, sample_args};
+pub use software::*;
 pub use types::*;
 
 use risk_classifier_contract::Reversibility;
@@ -167,6 +169,13 @@ pub fn manifests() -> Vec<ToolManifest> {
             "Stan systemu",
             "Zwraca stan zasilania (sieć/bateria, poziom), monitory (rozdzielczość, DPI) i urządzenia audio.",
             (schema_of::<StatusArgs>(), schema_of::<StatusOut>()),
+            None,
+        ),
+        manifest(
+            "system_software",
+            "Zainstalowane programy",
+            "Zwraca przeglądarki, środowiska (node, python, java, .NET), kompilatory, git, menedżery pakietów (npm, pip, winget…), edytory i kontenery zainstalowane na tym komputerze, z wersją i poleceniem do użycia. Sprawdź przed pisaniem albo uruchamianiem programu, żeby dobrać narzędzia do maszyny. Wynik trzymany kilka minut; `refresh` wykrywa na nowo.",
+            (schema_of::<SoftwareArgs>(), schema_of::<SoftwareOut>()),
             None,
         ),
     ]

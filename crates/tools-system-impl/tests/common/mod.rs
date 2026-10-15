@@ -108,6 +108,7 @@ pub fn harness_with(sys: Arc<FakeSys>, allow: bool) -> H {
         broker: broker.clone(),
         config: SystemToolsConfig::default(),
         bus: Some(bus.clone()),
+        software: None,
     });
     H {
         sys,

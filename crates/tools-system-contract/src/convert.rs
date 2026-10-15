@@ -6,6 +6,7 @@ use platform_apps_contract::{
 };
 use serde::de::DeserializeOwned;
 
+use crate::software::SoftwareArgs;
 use crate::types::{
     EnvArgs, EnvSetArgs, EventsArgs, ProcessInfoArgs, ProcessKillArgs, ProcessesArgs,
     ServiceActionArg, ServiceControlArgs, ServicesArgs, StatusArgs,
@@ -78,6 +79,7 @@ pub fn check_args(tool: &str, args: &serde_json::Value) -> Result<(), String> {
             }
         }
         "system_status" => parse::<StatusArgs>(args).map(|_| ()),
+        "system_software" => parse::<SoftwareArgs>(args).map(|_| ()),
         other => Err(format!("nieznane narzędzie {other}")),
     }
 }
@@ -124,6 +126,7 @@ pub fn sample_args(tool: &str) -> serde_json::Value {
         "system_events" => serde_json::json!({"log": "system", "level": "error", "max": 5}),
         "system_env" => serde_json::json!({"scope": "user"}),
         "system_env_set" => serde_json::json!({"name": "MOJA_ZMIENNA", "value": "1"}),
+        "system_software" => serde_json::json!({"kind": "runtime"}),
         _ => serde_json::json!({}),
     }
 }

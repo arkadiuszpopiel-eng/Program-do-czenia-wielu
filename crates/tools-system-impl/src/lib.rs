@@ -13,6 +13,7 @@
 mod act;
 mod core;
 mod read;
+mod software;
 mod undo;
 
 use std::sync::{Arc, Mutex};
@@ -28,6 +29,7 @@ use tools_common_contract::{
 };
 use tools_system_contract::{SystemToolsConfig, check_args, manifests};
 
+pub use software::CliSoftwareProbe;
 pub use undo::EnvUndoError;
 
 use crate::core::Core;
@@ -58,6 +60,8 @@ pub struct SystemToolsDeps {
     pub config: SystemToolsConfig,
     /// Magistrala (`tool.system.*`, bez wartości zmiennych).
     pub bus: Option<Arc<dyn EventBus>>,
+    /// Wykrywanie zainstalowanych programów (`system_software`; `None` — niedostępne).
+    pub software: Option<Arc<dyn tools_system_contract::SoftwareProbe>>,
 }
 
 /// Zestaw narzędzi systemowych.
@@ -85,7 +89,47 @@ impl SystemTools {
                 config: deps.config,
                 bus: deps.bus,
                 undo: Mutex::new(UndoLog::default()),
+                software: deps.software,
+                software_cache: Mutex::new(None),
             }),
+        }
+    }
+
+    /// Opis zainstalowanych programów dla agentek (z pamięci albo nowe wykrycie; `None` —
+    /// wykrywanie niedostępne). Ten sam wynik co `system_software`.
+    pub async fn software_summary(&self) -> Option<String> {
+        let items = self.core.software_items(false).await?;
+        Some(tools_system_contract::describe(
+            &items,
+            &software::missing(&items),
+        ))
+    }
+
+    /// Opis maszyny bez czekania: wynik z pamięci, a gdy go nie ma — wykrycie rusza w tle
+    /// (następny przebieg dostanie opis) i zwraca `None`.
+    pub fn software_summary_now(&self) -> Option<String> {
+        let cached = self
+            .core
+            .software_cache
+            .lock()
+            .ok()
+            .and_then(|c| c.as_ref().map(|(_, items)| items.clone()));
+        match cached {
+            Some(items) => Some(tools_system_contract::describe(
+                &items,
+                &software::missing(&items),
+            )),
+            None => {
+                if self.core.software.is_some()
+                    && let Ok(handle) = tokio::runtime::Handle::try_current()
+                {
+                    let core = self.core.clone();
+                    handle.spawn(async move {
+                        let _ = core.software_items(false).await;
+                    });
+                }
+                None
+            }
         }
     }
 
@@ -170,6 +214,7 @@ impl Tool for SystemTool {
             "system_events" => core.events(args, ctx, m).await,
             "system_env" => core.env(args, ctx, m).await,
             "system_env_set" => core.env_set(args, ctx, m).await,
+            "system_software" => core.software(args, ctx, m).await,
             _ => core.status(args, ctx, m).await,
         };
         r.unwrap_or_else(|out| *out)

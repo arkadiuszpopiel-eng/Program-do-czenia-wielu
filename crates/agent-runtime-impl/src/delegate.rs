@@ -217,6 +217,7 @@ pub fn plan_delegation(
         verify: false,
         approval_timeout_ms: view.spec.approval_timeout_ms,
         history: Vec::new(),
+        environment: view.spec.environment.clone(),
     };
     let options = RunOptions {
         parent: Some(view.run.clone()),

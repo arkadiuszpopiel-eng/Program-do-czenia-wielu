@@ -95,6 +95,10 @@ pub struct RunSpec {
     /// Wcześniejsza rozmowa (projekcja gałęzi, append-only) — kontekst zadania.
     #[serde(default)]
     pub history: Vec<Message>,
+    /// Programy zainstalowane na komputerze (wykryte przez Alfę) — agentka dobiera do nich
+    /// polecenia zamiast zakładać narzędzia, których nie ma.
+    #[serde(default)]
+    pub environment: Option<String>,
 }
 
 fn yes() -> bool {

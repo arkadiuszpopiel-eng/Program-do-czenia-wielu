@@ -38,6 +38,8 @@ pub struct SysNetDeps {
     /// Korzeń kwarantanny sesji bez katalogu roboczego (`None` — `%USERPROFILE%\Alfa\Kwarantanna`
     /// ze środowiska ścieżek narzędzi).
     pub quarantine_root: Option<PathBuf>,
+    /// Wykrywanie zainstalowanych programów (`system_software`, opis maszyny dla agentek).
+    pub software: Option<Arc<dyn tools_system_contract::SoftwareProbe>>,
 }
 
 impl std::fmt::Debug for SysNetDeps {
@@ -79,6 +81,9 @@ impl SysNetDeps {
             search: None,
             downloads: Arc::new(platform_windows_sys_impl::DiskDownloads),
             quarantine_root: None,
+            software: Some(Arc::new(tools_system_impl::CliSoftwareProbe::new(
+                Arc::new(accounts_hub_impl::SystemCliProbe::from_env()),
+            ))),
         }
     }
 }
@@ -93,6 +98,7 @@ pub(crate) fn sysnet_tools(deps: &ToolsDeps, s: &SysNetDeps) -> (Vec<Arc<dyn Too
         broker: deps.broker.clone(),
         config: SystemToolsConfig::default(),
         bus: deps.bus.clone(),
+        software: s.software.clone(),
     });
     let root = s.quarantine_root.clone().or_else(|| {
         deps.env

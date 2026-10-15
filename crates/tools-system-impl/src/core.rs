@@ -62,7 +62,13 @@ pub(crate) struct Core {
     pub(crate) config: SystemToolsConfig,
     pub(crate) bus: Option<Arc<dyn EventBus>>,
     pub(crate) undo: Mutex<UndoLog>,
+    pub(crate) software: Option<Arc<dyn tools_system_contract::SoftwareProbe>>,
+    pub(crate) software_cache: Mutex<SoftwareCache>,
 }
+
+/// Wynik ostatniego wykrycia programów i jego czas.
+pub(crate) type SoftwareCache =
+    Option<(std::time::Instant, Vec<tools_system_contract::SoftwareItem>)>;
 
 impl Core {
     pub(crate) async fn emit(&self, name: &str, payload: serde_json::Value, ctx: &ToolCtx) {

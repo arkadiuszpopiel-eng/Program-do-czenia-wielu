@@ -57,6 +57,7 @@ fn apps(sys: &Arc<FakeSys>) -> AppsDeps {
             search: None,
             downloads: Arc::new(FakeDownloads::default()),
             quarantine_root: None,
+            software: None,
         }),
     }
 }

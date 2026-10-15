@@ -170,6 +170,7 @@ pub async fn run_task(
             tools: toolset.names(),
             workdir: dir.to_string_lossy().into_owned(),
             history: Vec::new(),
+            environment: None,
         },
         &settings,
         40_000,

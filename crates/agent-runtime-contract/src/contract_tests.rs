@@ -34,6 +34,7 @@ pub fn sample_spec(model: &str, tools: &[&str]) -> RunSpec {
         verify: false,
         approval_timeout_ms: 1000,
         history: Vec::new(),
+        environment: None,
     }
 }
 

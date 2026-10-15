@@ -112,6 +112,8 @@ pub struct SpecInput {
     pub workdir: String,
     /// Wcześniejsza rozmowa (gałąź append-only, bez bieżącej wiadomości).
     pub history: Vec<Message>,
+    /// Opis zainstalowanych programów (`AgentTools::environment`).
+    pub environment: Option<String>,
 }
 
 /// `RunSpec` dla przebiegu.
@@ -135,6 +137,7 @@ pub fn run_spec(
         verify: settings.verify,
         approval_timeout_ms: settings.approval_timeout_ms(broker_window),
         history: input.history,
+        environment: input.environment,
     }
 }
 

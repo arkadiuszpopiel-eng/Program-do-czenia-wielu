@@ -201,6 +201,7 @@ pub(crate) async fn run(
             tools: stack.tools.names(),
             workdir: setup.workdir.clone(),
             history,
+            environment: stack.tools.environment().await,
         },
         &settings,
         rate,

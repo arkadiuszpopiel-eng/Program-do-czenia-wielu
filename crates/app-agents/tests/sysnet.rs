@@ -85,6 +85,7 @@ fn harness() -> H {
             search: None,
             downloads: Arc::new(FakeDownloads::default()),
             quarantine_root: None,
+            software: None,
         }),
     };
     let tools = AgentTools::new(ToolsDeps {

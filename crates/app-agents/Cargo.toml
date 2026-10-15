@@ -36,6 +36,7 @@ tools-system-impl = { path = "../tools-system-impl" }
 tools-net-contract = { path = "../tools-net-contract" }
 tools-net-impl = { path = "../tools-net-impl" }
 platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
+accounts-hub-impl = { path = "../accounts-hub-impl" }
 platform-windows-gui-impl = { path = "../platform-windows-gui-impl" }
 platform-windows-impl = { path = "../platform-windows-impl" }
 # F8: wtyczki Wasm (narzędzia do rejestru agentek, komendy strony „Wtyczki”).

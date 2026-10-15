@@ -228,6 +228,7 @@ pub(crate) async fn run(
                     },
                     workdir: workdir.clone().unwrap_or_default(),
                     history: Vec::new(),
+                    environment: kit.tools.environment().await,
                 },
                 &settings,
                 rate,

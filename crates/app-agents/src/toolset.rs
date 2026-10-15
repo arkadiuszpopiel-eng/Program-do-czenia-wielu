@@ -204,6 +204,12 @@ impl AgentTools {
     }
 
     /// Cofa zapis zmiennej użytkownika przez `system_env_set` (krok `undo_id`); bez narzędzi
+    /// Opis programów zainstalowanych na komputerze dla przebiegu agentki (z pamięci; pierwsze
+    /// wykrycie rusza w tle). `None` — jeszcze nie wykryto albo narzędzi systemowych brak.
+    pub async fn environment(&self) -> Option<String> {
+        self.system.as_ref()?.software_summary_now()
+    }
+
     /// systemowych — nieznany krok. Zwraca opis dla UI.
     pub fn undo_env(&self, id: u64) -> Result<String, tools_system_impl::EnvUndoError> {
         match &self.system {
