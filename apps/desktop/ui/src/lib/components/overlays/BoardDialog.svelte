@@ -1,13 +1,14 @@
 <!--
   „Tablica” (paleta `Ctrl+K`, P4): przypięte odpowiedzi agentek z różnych rozmów — treść (HTML
-  zsanitowany w Rust), rozmowa, agentka i czas; „Otwórz rozmowę”, „Kopiuj”, „Odepnij”.
-  Przypina się z menu wiadomości („Przypnij do tablicy”).
+  zsanitowany w Rust), rozmowa, agentka i czas; „Otwórz rozmowę”, „Kopiuj”, „Odepnij”;
+  wyszukiwanie i „Kopiuj wszystko” (Markdown). Przypina się z menu wiadomości.
 -->
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import { Button, SanitizedHtml, agents as AGENTS } from '@alfa/ui-kit';
+  import { Button, SanitizedHtml, TextField, agents as AGENTS } from '@alfa/ui-kit';
   import { errorText } from '../../api/command-error';
   import type { BoardItem } from '../../api/types-board';
+  import { boardMarkdown, filterBoard } from '../../logic/board';
   import { closeBoard } from '../../state/board-dialog.svelte';
   import { useApp } from '../../state/context';
 
@@ -15,6 +16,8 @@
   const { t } = app.i18n;
   let items = $state<readonly BoardItem[] | null>(null);
   let error = $state<string | null>(null);
+  let query = $state('');
+  const shown = $derived(items ? filterBoard(items, query, agentName) : []);
 
   $effect(() => {
     app.client.board.list().then(
@@ -35,10 +38,10 @@
     }
   }
 
-  async function copy(text: string) {
+  async function copy(text: string, message = t('board.copied')) {
     try {
       await navigator.clipboard.writeText(text);
-      app.toasts.show({ kind: 'success', message: t('board.copied') });
+      app.toasts.show({ kind: 'success', message });
     } catch (e) {
       app.toasts.show({ kind: 'error', message: errorText(e) });
     }
@@ -61,8 +64,12 @@
       {:else if items && items.length === 0}
         <p class="empty">{t('board.empty')}</p>
       {:else if items}
+        <TextField label={t('board.search')} bind:value={query} spellcheck="false" />
+        {#if shown.length === 0}
+          <p class="empty" role="status">{t('board.noMatch', { query: query.trim() })}</p>
+        {/if}
         <ul class="list" aria-label={t('board.list')}>
-          {#each items as item (item.id)}
+          {#each shown as item (item.id)}
             <li>
               <p class="meta">
                 {agentName(item.agent)} · {item.session_title} · {app.i18n.dateTime(item.pinned_at)}
@@ -84,6 +91,16 @@
         </ul>
       {/if}
       <div class="footer">
+        {#if shown.length}
+          <Button
+            variant="secondary"
+            onclick={() =>
+              void copy(
+                boardMarkdown(t('board.title'), shown, agentName, app.i18n.dateTime),
+                t('board.copiedAll', { n: shown.length }),
+              )}>{t('board.copyAll')}</Button
+          >
+        {/if}
         <Button variant="primary" onclick={closeBoard}>{t('board.close')}</Button>
       </div>
     </Dialog.Content>

@@ -216,6 +216,9 @@ pub struct LayoutPrefs {
     pub right_width: u32,
     pub left_collapsed: bool,
     pub sessions: BTreeMap<String, SessionPanels>,
+    /// Tryb skupienia (F11) — przywracany po ponownym uruchomieniu; brak w starszym zapisie = wyłączony.
+    #[serde(default)]
+    pub focus: bool,
 }
 
 /// Dane startowe UI.

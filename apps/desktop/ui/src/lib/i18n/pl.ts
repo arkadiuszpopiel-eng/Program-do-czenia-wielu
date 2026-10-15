@@ -30,6 +30,7 @@ import { plRoutes } from './pl-routes';
 import { plHelp } from './pl-help';
 import { plBoard } from './pl-board';
 import { plJson } from './pl-json';
+import { plStats } from './pl-stats';
 import { plArchive } from './pl-archive';
 
 export const pl = {
@@ -62,6 +63,7 @@ export const pl = {
   ...plHelp,
   ...plBoard,
   ...plJson,
+  ...plStats,
   ...plArchive,
 } as const satisfies Record<string, Message>;
 

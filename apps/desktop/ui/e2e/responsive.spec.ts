@@ -25,7 +25,7 @@ async function overflowing(page: Page): Promise<string[]> {
 
 test.describe.configure({ timeout: 180_000 });
 
-for (const width of [720, 480]) {
+for (const width of [720, 480, 360]) {
   test(`wszystkie strony ustawień mieszczą się w oknie ${width} px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await openApp(page);
@@ -52,7 +52,7 @@ for (const width of [720, 480]) {
   });
 }
 
-for (const width of [1280, 720, 480, 400]) {
+for (const width of [1280, 720, 480, 400, 360]) {
   test(`pasek tytułu w oknie ${width} px: nic nie łamie się ani nie wychodzi poza pasek`, async ({
     page,
   }) => {

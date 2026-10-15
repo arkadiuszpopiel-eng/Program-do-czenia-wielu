@@ -109,6 +109,12 @@
       margin-left: 0;
     }
   }
+  /* Bardzo wąskie okno (ekrany od 360 px, E.1). */
+  @media (max-width: 380px) {
+    .wc {
+      width: 28px;
+    }
+  }
   @media (forced-colors: active) {
     .wc.close:hover {
       background: Highlight;

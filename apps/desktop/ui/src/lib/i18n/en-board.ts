@@ -22,4 +22,8 @@ export const enBoard: Record<keyof typeof plBoard, Message> = {
   'msg.translatePromptPl':
     'Translate the text below into Polish. Reply with the translation only, keep the formatting.\n\n{text}',
   'board.close': 'Close',
+  'board.search': 'Search the Board',
+  'board.noMatch': 'Nothing matches “{query}”.',
+  'board.copyAll': 'Copy all (Markdown)',
+  'board.copiedAll': 'Copied {n} item(s) as Markdown.',
 };

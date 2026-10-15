@@ -86,6 +86,12 @@ export class LayoutState {
     if (this.placement(sessionId).left === 'rail') this.update(sessionId, { right_open: false });
   }
 
+  /** Tryb skupienia (tylko rozmowa) — zapisywany z układem i przywracany po uruchomieniu. */
+  setFocus(on: boolean): void {
+    this.focus = on;
+    this.save();
+  }
+
   setLeftCollapsed(collapsed: boolean): void {
     this.leftCollapsed = collapsed;
     this.save();
@@ -96,6 +102,7 @@ export class LayoutState {
     this.leftWidth = clampLeft(prefs.left_width);
     this.rightWidth = clampRight(prefs.right_width);
     this.leftCollapsed = prefs.left_collapsed;
+    this.focus = prefs.focus ?? false;
     this.panels = { ...prefs.sessions };
   }
 
@@ -105,6 +112,7 @@ export class LayoutState {
       right_width: this.rightWidth,
       left_collapsed: this.leftCollapsed,
       sessions: $state.snapshot(this.panels),
+      focus: this.focus,
     };
   }
 

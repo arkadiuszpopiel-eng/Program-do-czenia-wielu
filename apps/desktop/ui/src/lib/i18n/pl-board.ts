@@ -20,4 +20,8 @@ export const plBoard = {
   'msg.translatePromptPl':
     'Przetłumacz poniższy tekst na polski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.\n\n{text}',
   'board.close': 'Zamknij',
+  'board.search': 'Szukaj na Tablicy',
+  'board.noMatch': 'Nic nie pasuje do „{query}”.',
+  'board.copyAll': 'Kopiuj wszystko (Markdown)',
+  'board.copiedAll': 'Skopiowano {n} poz. jako Markdown.',
 };

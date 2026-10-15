@@ -168,6 +168,7 @@
   }
   .head {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--alfa-space-4);

@@ -11,6 +11,7 @@ import { attempt, showError } from './attempt';
 import { exportConversation } from './exports';
 import { openTemplates } from './template-dialog.svelte';
 import { openBoard } from './board-dialog.svelte';
+import { openStats } from './stats-dialog.svelte';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.agents': 'agents',
@@ -39,6 +40,7 @@ export const EXTRA_COMMANDS = [
   'action.templates',
   'action.help',
   'action.board',
+  'action.stats',
 ] as const;
 
 const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
@@ -133,7 +135,7 @@ export function runCommand(app: AppState, id: string): void {
       else app.openSettings();
       break;
     case 'view.focus':
-      app.layout.focus = !app.layout.focus;
+      app.layout.setFocus(!app.layout.focus);
       break;
     case 'nav.back':
       void app.navigate(-1);
@@ -199,6 +201,9 @@ export function runCommand(app: AppState, id: string): void {
     case 'action.board':
       openBoard();
       break;
+    case 'action.stats':
+      openStats();
+      break;
     case 'action.help':
       app.openSettings('help');
       break;
@@ -246,7 +251,7 @@ export function escapeChain(app: AppState): boolean {
     return true;
   }
   if (app.layout.focus) {
-    app.layout.focus = false;
+    app.layout.setFocus(false);
     return true;
   }
   if (app.micState === 'speaking') {

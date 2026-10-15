@@ -153,6 +153,7 @@ async fn bootstrap_layout_settings_shortcuts_and_cast() {
         left_width: 260,
         right_width: 380,
         left_collapsed: false,
+        focus: true,
         sessions: [(
             sid.clone(),
             SessionPanels {

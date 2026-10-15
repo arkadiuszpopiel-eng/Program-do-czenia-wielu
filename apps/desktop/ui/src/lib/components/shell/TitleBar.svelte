@@ -301,6 +301,12 @@
       padding: 0 var(--alfa-space-1);
     }
   }
+  @media (max-width: 380px) {
+    .titlebar {
+      gap: 2px;
+      padding-left: var(--alfa-space-1);
+    }
+  }
   @media (max-width: 720px) {
     .name {
       display: none;

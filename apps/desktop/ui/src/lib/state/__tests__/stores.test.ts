@@ -104,13 +104,22 @@ describe('LayoutState', () => {
       right_width: 400,
       left_collapsed: true,
       sessions: { s: { left_open: false, right_open: true, right_tab: 'timeline' } },
+      focus: true,
     });
+    expect(l.focus).toBe(true);
     expect(l.toPrefs()).toEqual({
       left_width: 300,
       right_width: 400,
       left_collapsed: true,
       sessions: { s: { left_open: false, right_open: true, right_tab: 'timeline' } },
+      focus: true,
     });
+    const saved: unknown[] = [];
+    const persisted = new LayoutState((p) => saved.push(p));
+    persisted.load({ left_width: 300, right_width: 400, left_collapsed: false, sessions: {} });
+    expect(persisted.focus).toBe(false);
+    persisted.setFocus(true);
+    expect(saved).toEqual([expect.objectContaining({ focus: true })]);
   });
 });
 
