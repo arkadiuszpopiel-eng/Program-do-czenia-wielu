@@ -4096,6 +4096,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "pc-diag-contract"
+version = "0.0.57"
+dependencies = [
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "pc-diag-fake"
+version = "0.0.57"
+dependencies = [
+ "pc-diag-contract",
+]
+
+[[package]]
 name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4224,6 +4241,16 @@ version = "0.0.57"
 dependencies = [
  "platform-contract",
  "proptest",
+]
+
+[[package]]
+name = "platform-windows-diag-impl"
+version = "0.0.57"
+dependencies = [
+ "base64 0.22.1",
+ "chrono",
+ "pc-diag-contract",
+ "serde_json",
 ]
 
 [[package]]

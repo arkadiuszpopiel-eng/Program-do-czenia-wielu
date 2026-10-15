@@ -1,0 +1,24 @@
+[package]
+name = "platform-windows-diag-impl"
+description = "Sonda parametrów komputera dla pc-diag na Windows: jeden skrypt PowerShell (CIM: system, procesor, moduły pamięci, dyski fizyczne z licznikami SMART, woluminy, karty graficzne z VRAM z rejestru, karty sieciowe bez adresów, bateria, temperatury, dziennik zdarzeń awarii 7 dni) bez okna konsoli, z limitem czasu; parser JSON testowalny poza Windows"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Kategoria `platform-windows-*`: kod zależny od systemu. Bez windows-rs — odczyt przez
+# PowerShell/CIM (dane, których nie daje bezpośrednie API bez uprawnień administratora:
+# Storage Reliability Counter, BatteryStaticData, zdarzenia z filtrem dostawców).
+[dependencies]
+pc-diag-contract = { path = "../pc-diag-contract" }
+serde_json.workspace = true
+chrono.workspace = true
+base64 = "0.22.1"
+
+[dev-dependencies]
+pc-diag-contract = { path = "../pc-diag-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true
