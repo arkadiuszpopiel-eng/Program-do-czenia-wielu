@@ -48,6 +48,13 @@
     void attempt(app.toasts, action);
   }
 
+  /** Prośba o tłumaczenie odpowiedzi (P5): nowa wiadomość w tej rozmowie, sam przekład. */
+  function translation(lang: 'en' | 'pl'): string {
+    return t(lang === 'en' ? 'msg.translatePromptEn' : 'msg.translatePromptPl', {
+      text: turn.text,
+    });
+  }
+
   const more = $derived.by((): MenuItem[] => {
     const items: MenuItem[] = [
       { id: 'copy-text', label: t('msg.copyText'), onSelect: () => void copy(true) },
@@ -69,6 +76,20 @@
       );
     }
     if (!isUser) {
+      items.push(
+        {
+          id: 'translate-en',
+          label: t('msg.translateEn'),
+          disabled: !done,
+          onSelect: () => run(() => conv.send(translation('en'), null, null)),
+        },
+        {
+          id: 'translate-pl',
+          label: t('msg.translatePl'),
+          disabled: !done,
+          onSelect: () => run(() => conv.send(translation('pl'), null, null)),
+        },
+      );
       items.push({
         id: 'pin-board',
         label: t('board.pin'),

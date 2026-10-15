@@ -11,5 +11,15 @@ export const plBoard = {
   'board.copy': 'Kopiuj',
   'board.copied': 'Skopiowano do schowka.',
   'board.unpin': 'Odepnij',
+  'msg.translateEn': 'Przetłumacz na angielski',
+  'msg.translatePl': 'Przetłumacz na polski',
+  'msg.translatePromptEn':
+    'Przetłumacz poniższy tekst na angielski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.
+
+{text}',
+  'msg.translatePromptPl':
+    'Przetłumacz poniższy tekst na polski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.
+
+{text}',
   'board.close': 'Zamknij',
 };

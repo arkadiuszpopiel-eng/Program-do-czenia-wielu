@@ -14,5 +14,15 @@ export const enBoard: Record<keyof typeof plBoard, Message> = {
   'board.copy': 'Copy',
   'board.copied': 'Copied to the clipboard.',
   'board.unpin': 'Unpin',
+  'msg.translateEn': 'Translate to English',
+  'msg.translatePl': 'Translate to Polish',
+  'msg.translatePromptEn':
+    'Translate the text below into English. Reply with the translation only, keep the formatting.
+
+{text}',
+  'msg.translatePromptPl':
+    'Translate the text below into Polish. Reply with the translation only, keep the formatting.
+
+{text}',
   'board.close': 'Close',
 };
