@@ -57,7 +57,10 @@ to **0.0.53**; ostatnia zbudowana i wgrana — **0.0.54** (jedna poprawka, spraw
   prawdziwy błąd: Krytyczka napisała „WERYFIkcja: OK”, a Alfa wzięła to za odrzucenie i zleciła poprawkę —
   naprawione w 0.0.54: testy modułu agentek zielone, clippy czysty, budowa i test prawdziwej aplikacji 32 z 32
   (pokrycie łącza 71,8 %), wgrane do `Alfa-uruchomiona` o 4:03 i sprawdzony start (`wersja=0.0.54`, bez błędów).
-  **Pełne `verify wersja` dla 0.0.54 — nie zdążyłem przed 5:00** (trwa ok. 80 min); 0.0.53 przeszła je w całości.
+  Pełne `verify wersja` dla 0.0.54 skończyłem po 5:00: pierwszy bieg znalazł pusty wpis „Co nowego” (poprawiony)
+  i dwa przekroczenia czasu przy przeglądzie wszystkich stron Ustawień (limit 300 s); drugi bieg o 6:00 —
+  wszystkie testy zielone (Rust 2753, interfejs 365, przeglądarka 359, prawdziwa aplikacja 32), dokumentacja
+  odświeżona. Wersja przebudowana i wgrana ponownie po tym biegu.
 
 ## 4. Czego nie sprawdziłem
 
