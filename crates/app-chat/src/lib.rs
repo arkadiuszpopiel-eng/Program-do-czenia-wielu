@@ -17,6 +17,7 @@ mod project;
 mod quick;
 mod routing;
 mod stream;
+mod style;
 mod taint;
 mod undo;
 

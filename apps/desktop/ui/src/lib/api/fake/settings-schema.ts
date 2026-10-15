@@ -3,7 +3,7 @@
 import type { SettingValue, SettingsPageDef } from '../types-system';
 import { SETTINGS_PART_A } from './settings-part-a';
 import { SETTINGS_PART_B } from './settings-part-b';
-import { L, page, toggle } from './settings-helpers';
+import { L, page, select, toggle } from './settings-helpers';
 
 /** Strony dodane po podziale na części (każda część jest u limitu długości pliku). */
 const SETTINGS_LATER: readonly SettingsPageDef[] = [
@@ -48,11 +48,48 @@ const SETTINGS_LATER: readonly SettingsPageDef[] = [
   page('help', L('Instrukcja', 'User guide'), 1, [], { custom: 'help' }),
 ];
 
+/** Ustawienia dopisane do stron z części (części są u limitu długości pliku). */
+const EXTRA: Readonly<Record<string, SettingsPageDef['settings']>> = {
+  general: [
+    select(
+      'chat.reply_style',
+      L('Styl odpowiedzi', 'Reply style'),
+      L(
+        'Jak agentki mają odpowiadać w rozmowie. „Automatycznie” — tak, jak każda agentka ma w swojej personie.',
+        'How the agents reply in conversation. “Automatic” — as each agent’s persona says.',
+      ),
+      [
+        ['auto', L('Automatycznie', 'Automatic')],
+        ['concise', L('Zwięźle', 'Concise')],
+        ['detailed', L('Szczegółowo', 'Detailed')],
+        ['simple', L('Prostym językiem', 'Plain language')],
+        ['formal', L('Formalnie', 'Formal')],
+      ],
+      'auto',
+    ),
+    select(
+      'chat.temperature',
+      L('Swoboda odpowiedzi', 'Reply freedom'),
+      L(
+        'Precyzyjnie — przewidywalne, powtarzalne odpowiedzi; twórczo — więcej pomysłów i różnorodności. Modele, które tego nie obsługują, odpowiadają po swojemu.',
+        'Precise — predictable, repeatable replies; creative — more ideas and variety. Models that do not support it answer their own way.',
+      ),
+      [
+        ['auto', L('Automatycznie (domyślna modelu)', 'Automatic (model default)')],
+        ['precise', L('Precyzyjnie', 'Precise')],
+        ['balanced', L('Zrównoważenie', 'Balanced')],
+        ['creative', L('Twórczo', 'Creative')],
+      ],
+      'auto',
+    ),
+  ],
+};
+
 export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [
   ...SETTINGS_PART_A,
   ...SETTINGS_PART_B,
   ...SETTINGS_LATER,
-];
+].map((p) => (EXTRA[p.id] ? { ...p, settings: [...p.settings, ...(EXTRA[p.id] ?? [])] } : p));
 
 export function defaultValues(): Record<string, SettingValue> {
   const out: Record<string, SettingValue> = {};

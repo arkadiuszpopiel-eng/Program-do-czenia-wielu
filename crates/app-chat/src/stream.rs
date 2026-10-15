@@ -13,6 +13,7 @@ use sessions_contract::{Block as SBlock, PrivacyTag, SessionCatalog};
 use app_api::dto::{self, AlfaEvent, RenderedBlock, TurnError, TurnErrorCode};
 use app_api::ports::{BrainChoice, BrainError, BrainRequest, VoiceChunk};
 
+use crate::style;
 use crate::engine::{ChatEngine, GenHandle};
 use crate::generate::GenRequest;
 use crate::outcome::{Chosen, Outcome, classify, millis, turn_error};
@@ -57,16 +58,27 @@ pub(crate) async fn prepare(
         .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
     let query = messages.last().map(|m| m.visible_text());
     let mut request = ChatRequest::new(router_contract::AUTO_MODEL, messages);
-    if let Ok(system) = core
+    let mut system = None;
+    if let Ok(persona) = core
         .inner
         .personas
         .system_prompt(&req.session, &PersonaId::new(req.agent.as_str()))
     {
         // Zestaw roboczy pamięci agentki (zakresy z obsady i projektu sesji) — jako dane.
         let memory = &core.inner.memory;
-        let system = memory.system_prompt(system, &req.session, &req.agent, query);
+        system = Some(memory.system_prompt(persona, &req.session, &req.agent, query));
+    }
+    // Styl odpowiedzi i temperatura z ustawień (P4).
+    let setting = |v: Option<serde_json::Value>| {
+        v.and_then(|v| v.as_str().map(str::to_owned))
+            .unwrap_or_default()
+    };
+    let style = setting(core.config_value(style::STYLE_KEY).await);
+    if let Some(system) = style::with_style(system, &style) {
         request = request.with_system(system);
     }
+    request.params.temperature =
+        style::temperature(&setting(core.config_value(style::TEMPERATURE_KEY).await));
     request.meta.session = Some(req.session.to_string());
     request.meta.privacy.tag = match privacy {
         PrivacyTag::Normal => providers_contract::PrivacyTag::Normal,
