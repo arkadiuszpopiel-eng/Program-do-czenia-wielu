@@ -2,6 +2,12 @@
 //! wiadomość) jako Markdown albo samodzielny HTML. HTML treści renderuje Rust (`lib-markdown`:
 //! pulldown-cmark + ammonia), dokument ma CSP bez skryptów i sieci, fonty systemowe; tytuł, autorzy
 //! i nazwy załączników są escapowane. Tury systemowe, puste i ukryte z widoku są pomijane.
+//!
+//! Oznaczenie treści AI (AI Act art. 50 ust. 2, zadanie C2.9): wiadomości agentek mają czytelny
+//! znak „AI” (z modelem, jeśli znany) i znacznik maszynowy — w Markdown nagłówek YAML, w HTML
+//! znaczniki `meta` i atrybuty `data-ai-generated` / `data-model`. Typ źródła według słownika IPTC
+//! (`trainedAlgorithmicMedia` albo `compositeWithTrainedAlgorithmicMedia`, gdy są też wiadomości
+//! użytkownika).
 
 use chrono::{DateTime, Local, Utc};
 use sessions_contract::{Author, Role, Turn};
@@ -21,6 +27,31 @@ pub struct ExportMessage {
     pub text: String,
     /// Załączniki: nazwa i opis („image/png, 1,2 KB”).
     pub attachments: Vec<(String, String)>,
+    /// Treść wygenerowana przez AI (agentka, przekazanie, Alfa).
+    pub ai: bool,
+    /// Model, który wytworzył treść (`dostawca/model`), jeśli zapisany w turze.
+    pub model: Option<String>,
+}
+
+const IPTC: &str = "http://cv.iptc.org/newscodes/digitalsourcetype/";
+
+/// Typ źródła IPTC dla zbioru wiadomości (`None`, gdy żadna nie jest z AI).
+pub fn source_type(messages: &[ExportMessage]) -> Option<String> {
+    let ai = messages.iter().filter(|m| m.ai).count();
+    match ai {
+        0 => None,
+        n if n == messages.len() => Some(format!("{IPTC}trainedAlgorithmicMedia")),
+        _ => Some(format!("{IPTC}compositeWithTrainedAlgorithmicMedia")),
+    }
+}
+
+fn model_of(usage: Option<&sessions_contract::ModelUsage>) -> Option<String> {
+    let u = usage?;
+    match (u.provider.trim(), u.model.trim()) {
+        (_, "") => None,
+        ("", m) => Some(m.to_owned()),
+        (p, m) => Some(format!("{p}/{m}")),
+    }
 }
 
 fn capitalize(id: &str) -> String {
@@ -65,6 +96,12 @@ pub fn messages(turns: &[Turn]) -> Vec<ExportMessage> {
                 at: t.created_at,
                 text,
                 attachments,
+                ai: !user,
+                model: if user {
+                    None
+                } else {
+                    model_of(t.usage.as_ref())
+                },
             })
         })
         .collect()
@@ -76,16 +113,48 @@ fn stamp(at: DateTime<Utc>) -> String {
         .to_string()
 }
 
-/// Markdown (CommonMark): nagłówek z tytułem, wiadomości z autorem i czasem, załączniki jako lista.
+/// Liczba wiadomości z AI.
+fn ai_count(messages: &[ExportMessage]) -> usize {
+    messages.iter().filter(|m| m.ai).count()
+}
+
+/// Czytelne oznaczenie wiadomości z AI („AI” albo „AI, dostawca/model”).
+fn ai_label(m: &ExportMessage) -> Option<String> {
+    m.ai.then(|| match &m.model {
+        Some(model) => format!("AI, {model}"),
+        None => "AI".to_owned(),
+    })
+}
+
+const AI_NOTE: &str = "Wiadomości oznaczone „AI” wygenerowała sztuczna inteligencja (modele językowe) — mogą zawierać błędy.";
+
+/// Markdown (CommonMark): nagłówek YAML ze znacznikiem maszynowym, tytuł, wiadomości z autorem,
+/// oznaczeniem AI i czasem, załączniki jako lista.
 pub fn markdown(title: &str, messages: &[ExportMessage], exported: DateTime<Utc>) -> String {
+    let ai = ai_count(messages);
     let mut out = format!(
-        "# {}\n\n_Eksport z Alfy · {} · wiadomości: {}_\n",
+        "---\ngenerator: Alfa\nexported: {}\nmessages: {}\nai_generated_messages: {ai}\n",
+        exported.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+        messages.len()
+    );
+    if let Some(kind) = source_type(messages) {
+        out.push_str(&format!("digital_source_type: {kind}\n"));
+    }
+    out.push_str(&format!(
+        "---\n\n# {}\n\n_Eksport z Alfy · {} · wiadomości: {}_\n",
         title.trim(),
         stamp(exported),
         messages.len()
-    );
+    ));
+    if ai > 0 {
+        out.push_str(&format!("\n> {AI_NOTE}\n"));
+    }
     for m in messages {
-        out.push_str(&format!("\n---\n\n### {} · {}\n\n", m.author, stamp(m.at)));
+        let author = match ai_label(m) {
+            Some(label) => format!("{} · {}", m.author, label.replace('`', "'")),
+            None => m.author.clone(),
+        };
+        out.push_str(&format!("\n---\n\n### {author} · {}\n\n", stamp(m.at)));
         if !m.text.is_empty() {
             out.push_str(&m.text);
             out.push('\n');
@@ -124,6 +193,7 @@ article.user .body{background:#f0f0f0;border-radius:8px;padding:8px 12px}\
 pre,code{font-family:'Cascadia Mono',Consolas,monospace;font-size:13px}\
 pre{background:#f3f3f3;padding:12px;border-radius:6px;overflow:auto}table{border-collapse:collapse}\
 th,td{border:1px solid #d0d0d0;padding:4px 8px}.att{font-size:13px;color:#5f5f5f}\
+.ai{display:inline-block;margin-left:4px;padding:0 5px;border:1px solid currentColor;border-radius:4px;font-size:11px;font-weight:600}\
 @media (prefers-color-scheme:dark){body{background:#1c1c1c;color:#e8e8e8}header strong{color:#e8e8e8}\
 article{border-color:#333}article.user .body,pre{background:#2a2a2a}.meta,header,.att{color:#a8a8a8}}";
 
@@ -133,8 +203,24 @@ pub fn html(title: &str, messages: &[ExportMessage], exported: DateTime<Utc>) ->
     let mut body = String::new();
     for m in messages {
         let class = if m.user { "user" } else { "agent" };
+        let (data, badge) = match ai_label(m) {
+            Some(label) => (
+                format!(
+                    " data-ai-generated=\"true\"{}",
+                    m.model
+                        .as_ref()
+                        .map(|model| format!(" data-model=\"{}\"", escape(model)))
+                        .unwrap_or_default()
+                ),
+                format!(
+                    " <span class=\"ai\" title=\"Wygenerowane przez sztuczną inteligencję\">{}</span>",
+                    escape(&label)
+                ),
+            ),
+            None => (String::new(), String::new()),
+        };
         body.push_str(&format!(
-            "<article class=\"{class}\"><header><strong>{}</strong> · <time datetime=\"{}\">{}</time></header>",
+            "<article class=\"{class}\"{data}><header><strong>{}</strong>{badge} · <time datetime=\"{}\">{}</time></header>",
             escape(&m.author),
             m.at.to_rfc3339(),
             stamp(m.at)
@@ -154,11 +240,22 @@ pub fn html(title: &str, messages: &[ExportMessage], exported: DateTime<Utc>) ->
         }
         body.push_str("</article>\n");
     }
+    let ai = ai_count(messages);
+    let mut marks = format!(
+        "<meta name=\"generator\" content=\"Alfa\">\n<meta name=\"ai-generated-messages\" content=\"{ai}\">\n"
+    );
+    let mut note = String::new();
+    if let Some(kind) = source_type(messages) {
+        marks.push_str(&format!(
+            "<meta name=\"ai-generated\" content=\"true\">\n<meta name=\"digital-source-type\" content=\"{kind}\">\n"
+        ));
+        note = format!("<p class=\"meta\">{}</p>\n", escape(AI_NOTE));
+    }
     format!(
         "<!doctype html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"utf-8\">\n\
 <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; img-src data:\">\n\
-<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>{title}</title>\n\
-<style>{STYLE}</style>\n</head>\n<body>\n<main>\n<h1>{title}</h1>\n<p class=\"meta\">Eksport z Alfy · {} · wiadomości: {}</p>\n{body}</main>\n</body>\n</html>\n",
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n{marks}<title>{title}</title>\n\
+<style>{STYLE}</style>\n</head>\n<body>\n<main>\n<h1>{title}</h1>\n<p class=\"meta\">Eksport z Alfy · {} · wiadomości: {}</p>\n{note}{body}</main>\n</body>\n</html>\n",
         stamp(exported),
         messages.len()
     )

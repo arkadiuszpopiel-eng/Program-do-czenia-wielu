@@ -145,7 +145,12 @@ export const plWork = {
   'hub.region.SG': 'Singapur',
   'hub.region.UK': 'Wielka Brytania',
   'hub.region.JP': 'Japonia',
-  'ob.tagline': 'Kilka kroków i możemy rozmawiać. Każdy wybór zmienisz później w Ustawieniach.',
+  'ob.tagline':
+    'Alfa to asystentka oparta na sztucznej inteligencji (AI): jej odpowiedzi tworzą modele językowe i mogą zawierać błędy. Kilka kroków i możemy rozmawiać. Każdy wybór zmienisz później w Ustawieniach.',
+  'composer.hint':
+    'Rozmawiasz ze sztuczną inteligencją — sprawdzaj ważne informacje · Enter — wyślij · Shift+Enter — nowa linia',
+  'composer.hintCtrl':
+    'Rozmawiasz ze sztuczną inteligencją — sprawdzaj ważne informacje · Ctrl+Enter — wyślij · Enter — nowa linia',
   'ob.optional': 'opcjonalny',
   'ob.progress': 'Postęp wprowadzenia',
   'ob.voice.A.desc': 'Działa na samym procesorze, bez karty graficznej.',

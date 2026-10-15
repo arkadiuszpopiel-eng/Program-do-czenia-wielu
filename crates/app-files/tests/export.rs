@@ -17,13 +17,13 @@ fn conversation(env: &Env) -> sessions_contract::SessionId {
     let a = h
         .append_turn(&s, None, NewTurn::user("Pytanie o **raport**"))
         .unwrap();
-    let b = h
-        .append_turn(
-            &s,
-            Some(a.id),
-            NewTurn::assistant("alfa", "Odpowiedź:\n\n```sql\nSELECT 1;\n```"),
-        )
-        .unwrap();
+    let mut answer = NewTurn::assistant("alfa", "Odpowiedź:\n\n```sql\nSELECT 1;\n```");
+    answer.usage = Some(sessions_contract::ModelUsage {
+        provider: "openai".into(),
+        model: "gpt-5".into(),
+        cost: Default::default(),
+    });
+    let b = h.append_turn(&s, Some(a.id), answer).unwrap();
     let mut hidden = NewTurn::user("ukryta wiadomość");
     hidden.content.text = "ukryta wiadomość".into();
     let c = h.append_turn(&s, Some(b.id), hidden).unwrap();
@@ -69,8 +69,23 @@ async fn markdown_has_visible_branch_only() {
     assert_eq!(files, 1);
     let md = std::fs::read_to_string(&path).unwrap();
     assert_eq!(bytes, md.len() as u64);
-    assert!(md.starts_with("# Raport"));
-    assert!(md.contains("### Ty ·") && md.contains("### Alfa ·") && md.contains("### Delta ·"));
+    assert!(md.starts_with("---\ngenerator: Alfa\n"), "{md}");
+    assert!(md.contains("\nai_generated_messages: 2\n"), "{md}");
+    assert!(
+        md.contains(
+            "digital_source_type: http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia\n"
+        ),
+        "{md}"
+    );
+    assert!(md.contains("---\n\n# Raport"));
+    assert!(md.contains("> Wiadomości oznaczone „AI” wygenerowała sztuczna inteligencja"));
+    let user = md.lines().find(|l| l.starts_with("### Ty ·")).unwrap();
+    assert!(
+        !user.contains("AI"),
+        "wiadomość użytkownika bez znaku AI: {user}"
+    );
+    assert!(md.contains("### Alfa · AI, openai/gpt-5 ·"), "{md}");
+    assert!(md.contains("### Delta · AI ·"), "{md}");
     assert!(md.contains("```sql\nSELECT 1;\n```"));
     assert!(!md.contains("ukryta wiadomość"), "tury ukryte pomijane");
     assert!(!md.contains("komunikat systemowy"));
@@ -104,9 +119,23 @@ async fn html_is_sanitized_standalone_document() {
     );
     assert!(html.contains("&lt;script&gt;alert(3)"));
     assert!(html.contains("<pre"));
-    assert!(
-        !html.contains("http://") && !html.contains("https://"),
-        "bez zasobów zewnętrznych"
+    for external in ["src=\"http", "href=\"http", "url(", "@import"] {
+        assert!(
+            !html.contains(external),
+            "bez zasobów zewnętrznych: {external}"
+        );
+    }
+    assert!(html.contains("<meta name=\"ai-generated\" content=\"true\">"));
+    assert!(html.contains("<meta name=\"ai-generated-messages\" content=\"2\">"));
+    assert!(html.contains("compositeWithTrainedAlgorithmicMedia"));
+    assert!(html.contains("data-ai-generated=\"true\" data-model=\"openai/gpt-5\""));
+    assert!(html.contains(
+        "<span class=\"ai\" title=\"Wygenerowane przez sztuczną inteligencję\">AI, openai/gpt-5</span>"
+    ));
+    assert_eq!(
+        html.matches("data-ai-generated").count(),
+        2,
+        "wiadomość użytkownika bez znaku"
     );
     assert!(!html.contains("@font-face"));
 }
@@ -124,6 +153,11 @@ async fn single_message_cancel_and_errors() {
         .unwrap();
     let md = std::fs::read_to_string(&path).unwrap();
     assert!(md.contains("wiadomości: 1") && md.contains("raport"));
+    assert!(md.contains("ai_generated_messages: 0") && !md.contains("digital_source_type"));
+    assert!(
+        !md.contains("> Wiadomości oznaczone"),
+        "bez treści AI bez noty"
+    );
     assert!(!md.contains("Gotowe"));
     env.shell.answer_dialog(None);
     let cancelled = env

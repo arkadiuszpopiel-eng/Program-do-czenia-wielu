@@ -310,8 +310,6 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'composer.cmd.ustawienia': 'Open settings',
   'composer.cmd.skupienie': 'Focus mode',
   'composer.cmd.nowa': 'New conversation',
-  'composer.hint': 'Enter — send · Shift+Enter — new line',
-  'composer.hintCtrl': 'Ctrl+Enter — send · Enter — new line',
   'composer.editing': 'You are editing the last message — sending creates a new branch.',
   'composer.cancelEdit': 'Cancel editing',
 

@@ -22,8 +22,8 @@ obowiązków jej nie dotyczy — ale projektujemy tak, żeby wydanie nie wymaga�
 
 | Zadanie                                                                                                                  | Etap  | Stan                                      |
 | ------------------------------------------------------------------------------------------------------------------------ | ----- | ----------------------------------------- |
-| Informacja „rozmawiasz z AI” przy pierwszym uruchomieniu i stale w interfejsie                                           | C2.9  | planowane                                 |
-| Etykieta „wygenerowane przez AI” w eksporcie rozmów (MD, HTML), plikach dźwiękowych i obrazach — czytelna i w metadanych | C2.9  | planowane                                 |
+| Informacja „rozmawiasz z AI” przy pierwszym uruchomieniu i stale w interfejsie                                           | C2.9  | zrobione (seria 1, punkt 3) |
+| Etykieta „wygenerowane przez AI” w eksporcie rozmów (MD, HTML), plikach dźwiękowych i obrazach — czytelna i w metadanych | C2.9  | rozmowy: zrobione (seria 1, punkt 3); dźwięku ani obrazów program jeszcze nie zapisuje do plików |
 | Karty modeli w programie: pochodzenie, licencja, przeznaczenie                                                           | C2.9  | planowane                                 |
 | SBOM dla każdego wydania (Rust + npm)                                                                                    | C2.10 | planowane                                 |
 | Polityka zgłaszania podatności, kontakt bezpieczeństwa, plik `SECURITY.md`                                               | C2.10 | planowane                                 |

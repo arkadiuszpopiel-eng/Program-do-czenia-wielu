@@ -326,8 +326,6 @@ export const plApp = {
   'composer.cmd.ustawienia': 'Otwórz ustawienia',
   'composer.cmd.skupienie': 'Tryb skupienia',
   'composer.cmd.nowa': 'Nowa rozmowa',
-  'composer.hint': 'Enter — wyślij · Shift+Enter — nowa linia',
-  'composer.hintCtrl': 'Ctrl+Enter — wyślij · Enter — nowa linia',
   'composer.editing': 'Edytujesz ostatnią wiadomość — wysłanie utworzy nową gałąź.',
   'composer.cancelEdit': 'Anuluj edycję',
 

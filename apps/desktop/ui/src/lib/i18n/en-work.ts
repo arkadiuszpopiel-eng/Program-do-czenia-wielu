@@ -143,7 +143,12 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'hub.region.SG': 'Singapore',
   'hub.region.UK': 'United Kingdom',
   'hub.region.JP': 'Japan',
-  'ob.tagline': 'A few steps and we can talk. You can change every choice later in Settings.',
+  'ob.tagline':
+    'Alfa is an assistant built on artificial intelligence (AI): its replies come from language models and can contain mistakes. A few steps and we can talk. You can change every choice later in Settings.',
+  'composer.hint':
+    'You are talking to an AI — check important information · Enter — send · Shift+Enter — new line',
+  'composer.hintCtrl':
+    'You are talking to an AI — check important information · Ctrl+Enter — send · Enter — new line',
   'ob.optional': 'optional',
   'ob.progress': 'Introduction progress',
   'ob.voice.A.desc': 'Runs on the CPU only, no graphics card needed.',
