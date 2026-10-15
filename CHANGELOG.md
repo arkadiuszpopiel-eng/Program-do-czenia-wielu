@@ -18,6 +18,11 @@ Krytyczka na lekkim modelu lokalnym czasem pisze werdykt z literówką („WERYF
 to za odrzucenie i niepotrzebnie zlecała poprawkę, co przy wolnym modelu wydłużało obowiązki o minuty.
 Teraz werdykt z drobną literówką albo w pogrubieniu jest rozpoznawany.
 
+### Agentki
+
+- Werdykt Krytyczki z literówką („WERYFIKCJA: OK”) albo w pogrubieniu jest rozpoznawany — poprawna
+  odpowiedź nie idzie już do zbędnej poprawki.
+
 ### Testy
 
 - Werdykty z literówkami i w pogrubieniu Markdown; zdanie, które tylko przypomina werdykt, nadal nie

@@ -4,7 +4,8 @@ import { expectAccessible, openApp, waitForChat } from './helpers';
 // Dostępność każdej strony ustawień i każdego panelu w obu motywach (WCAG 2.2 AA: 0 naruszeń
 // critical/serious) — uzupełnienie `a11y.spec.ts`, które sprawdza wybrane ekrany szczegółowo.
 
-test.describe.configure({ timeout: 180_000 });
+// 300 s: ponad 30 stron z axe w dwóch motywach; pod obciążeniem maszyny 180 s nie wystarczało.
+test.describe.configure({ timeout: 300_000 });
 
 for (const theme of ['light', 'dark'] as const) {
   test(`wszystkie strony ustawień — motyw ${theme}`, async ({ page }) => {
