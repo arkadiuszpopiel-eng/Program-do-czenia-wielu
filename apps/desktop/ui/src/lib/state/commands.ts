@@ -125,6 +125,9 @@ export function runCommand(app: AppState, id: string): void {
     case 'cheatsheet.open':
       app.cheatsheetOpen = !app.cheatsheetOpen;
       break;
+    case 'help.open':
+      app.openSettings('help');
+      break;
     case 'settings.open':
       if (app.view === 'settings') app.closeSettings();
       else app.openSettings();

@@ -12,4 +12,5 @@ export const enHelp: Record<keyof typeof plHelp, Message> = {
   'help.results': 'Search results',
   'help.hits': 'Fragments found: {n}',
   'help.noHits': 'Nothing found — try another word.',
+  'help.inGuide': 'In the guide',
 };

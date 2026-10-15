@@ -29,6 +29,7 @@ import { enTemplates } from './en-templates';
 import { enRoutes } from './en-routes';
 import { enHelp } from './en-help';
 import { enBoard } from './en-board';
+import { enJson } from './en-json';
 import { enArchive } from './en-archive';
 import type { MessageKey } from './pl';
 
@@ -61,5 +62,6 @@ export const en: Record<MessageKey, Message> = {
   ...enRoutes,
   ...enHelp,
   ...enBoard,
+  ...enJson,
   ...enArchive,
 };

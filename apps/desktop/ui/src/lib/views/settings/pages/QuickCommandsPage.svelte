@@ -10,7 +10,9 @@
   import type { CustomCommand, QuickCommandsView, QuickTest } from '../../../api/types-quick';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
+  import { exportJson, parseCommands } from '../../../logic/json-transfer';
   import { useApp } from '../../../state/context';
+  import JsonTransfer from './JsonTransfer.svelte';
   import QuickCommandForm from './QuickCommandForm.svelte';
   import './work.css';
 
@@ -190,6 +192,12 @@
           }}>{t('commands.own.add')}</Button
         >
       </div>
+      <JsonTransfer
+        count={view.commands.length}
+        serialize={() => exportJson(view?.commands ?? [])}
+        parse={parseCommands}
+        onadd={(items) => store([...(view?.commands ?? []), ...items])}
+      />
     {/if}
   </section>
 

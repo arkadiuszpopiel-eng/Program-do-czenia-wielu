@@ -231,6 +231,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'shortcut.search.conversation': 'Find in conversation',
   'shortcut.palette.open': 'Command palette',
   'shortcut.cheatsheet.open': 'Shortcut cheat sheet',
+  'shortcut.help.open': 'Guide (user manual)',
   'shortcut.settings.open': 'Settings',
   'shortcut.view.focus': 'Focus mode',
   'shortcut.view.zoomIn': 'Zoom in',

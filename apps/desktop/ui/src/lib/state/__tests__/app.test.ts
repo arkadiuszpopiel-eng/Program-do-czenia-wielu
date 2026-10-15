@@ -92,6 +92,9 @@ describe('AppState', () => {
     app.palette.open = false;
     handleKeydown(app, keyEvent('Escape', 'Escape'));
     expect(app.view).toBe('chat');
+    handleKeydown(app, keyEvent('F1', 'F1'));
+    expect(app.view).toBe('settings');
+    expect(app.settingsPage).toBe('help');
   });
 
   it('Esc zatrzymuje generowanie, gdy nic innego nie jest otwarte', async () => {

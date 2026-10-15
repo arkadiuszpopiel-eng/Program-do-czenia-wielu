@@ -8,9 +8,11 @@
   import type { PromptTemplate } from '../../../api/types-templates';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
+  import { exportJson, parseTemplates } from '../../../logic/json-transfer';
   import { templateVariables } from '../../../logic/templates';
   import { useApp } from '../../../state/context';
   import { openTemplates } from '../../../state/template-dialog.svelte';
+  import JsonTransfer from './JsonTransfer.svelte';
   import './work.css';
 
   const app = useApp();
@@ -134,6 +136,12 @@
           >{t('tpl.add')}</Button
         >
       </div>
+      <JsonTransfer
+        count={list.length}
+        serialize={() => exportJson(list ?? [])}
+        parse={parseTemplates}
+        onadd={(items) => store([...(list ?? []), ...items])}
+      />
     {/if}
   {/if}
 </section>

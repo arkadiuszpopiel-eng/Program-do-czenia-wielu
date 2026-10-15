@@ -9,4 +9,5 @@ export const plHelp = {
   'help.results': 'Wyniki wyszukiwania',
   'help.hits': 'Znalezione fragmenty: {n}',
   'help.noHits': 'Nic nie znaleziono — spróbuj innego słowa.',
+  'help.inGuide': 'W instrukcji',
 };

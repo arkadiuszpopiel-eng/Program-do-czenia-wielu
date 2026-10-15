@@ -13,6 +13,7 @@
   import { load, type Loadable } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import SettingRow from './SettingRow.svelte';
+  import SettingsHelpHits from './SettingsHelpHits.svelte';
   import SettingsNav from './SettingsNav.svelte';
   import BuilderPage from './pages/BuilderPage.svelte';
   import CamerasPage from './pages/CamerasPage.svelte';
@@ -126,6 +127,7 @@
         {#each results as r (r.def.key)}
           <SettingRow def={r.def} page={app.i18n.text(r.page.label)} />
         {/each}
+        <SettingsHelpHits {query} onopen={open} />
       {:else if page}
         <h2 class="h2" id="settings-page-title" tabindex="-1">{app.i18n.text(page.label)}</h2>
         {#if page.wave > 1}

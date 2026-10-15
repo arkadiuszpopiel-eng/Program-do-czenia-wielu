@@ -41,6 +41,7 @@ export const SHORTCUTS: readonly ShortcutDef[] = [
   app('search.conversation', 'conversation', ['Ctrl+F']),
   app('palette.open', 'view', ['Ctrl+K']),
   app('cheatsheet.open', 'view', ['Ctrl+/']),
+  app('help.open', 'view', ['F1']),
   app('settings.open', 'view', ['Ctrl+,']),
   app('view.focus', 'view', ['F11', 'Ctrl+Shift+Enter']),
   app('view.zoomIn', 'view', ['Ctrl+=']),

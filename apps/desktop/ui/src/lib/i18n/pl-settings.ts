@@ -242,6 +242,7 @@ export const plSettings = {
   'shortcut.search.conversation': 'Szukaj w rozmowie',
   'shortcut.palette.open': 'Paleta poleceń',
   'shortcut.cheatsheet.open': 'Ściągawka skrótów',
+  'shortcut.help.open': 'Instrukcja (przewodnik użytkownika)',
   'shortcut.settings.open': 'Ustawienia',
   'shortcut.view.focus': 'Tryb skupienia',
   'shortcut.view.zoomIn': 'Powiększ',

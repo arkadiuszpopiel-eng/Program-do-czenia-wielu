@@ -54,6 +54,7 @@ Wszystkie skróty poza oznaczonymi „stały” zmienisz w **Ustawienia → Skr�
 | `Ctrl+F`, `Ctrl+Shift+F`                     | Szukaj w rozmowie, szukaj we wszystkich sesjach                        |
 | `Ctrl+K`                                     | Paleta poleceń                                                         |
 | `Ctrl+/`                                     | Ściągawka skrótów                                                      |
+| `F1`                                         | Instrukcja (Ustawienia → Instrukcja)                                   |
 | `Ctrl+,`                                     | Ustawienia                                                             |
 | `F11` albo `Ctrl+Shift+Enter`                | Tryb skupienia (tylko rozmowa)                                         |
 | `Ctrl+=`, `Ctrl+-`, `Ctrl+0`                 | Powiększ, pomniejsz, rozmiar domyślny                                  |

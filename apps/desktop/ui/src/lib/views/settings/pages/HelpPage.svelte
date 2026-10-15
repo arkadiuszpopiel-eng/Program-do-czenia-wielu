@@ -10,6 +10,7 @@
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { useApp } from '../../../state/context';
+  import { takeHelpTopic } from '../../../state/help-target.svelte';
   import './work.css';
 
   const app = useApp();
@@ -36,7 +37,9 @@
     try {
       topics = await app.client.help.topics();
       loadError = null;
-      if (topics[0]) await open(topics[0].id);
+      const wanted = takeHelpTopic();
+      const first = topics.find((x) => x.id === wanted) ?? topics[0];
+      if (first) await open(first.id);
     } catch (e) {
       loadError = errorText(e);
     }
