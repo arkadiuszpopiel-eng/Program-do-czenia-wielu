@@ -187,6 +187,16 @@ impl FrameSink for Frames {
     }
 }
 
+/// Czeka do 3 s na warunek: zdarzenia z wątków pod obciążeniem po ponad 50 ms (bramka 0.0.61).
+async fn eventually(check: impl Fn() -> bool) -> bool {
+    let mut left = 60;
+    while !check() && left > 0 {
+        left -= 1;
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+    check()
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn terminal_input_only_by_command_and_never_in_events() {
     let d = desk();
@@ -204,21 +214,11 @@ async fn terminal_input_only_by_command_and_never_in_events() {
     a.h.core.terminal_input(session.id, b64).await.unwrap();
     a.h.core.terminal_resize(session.id, 120, 40).await.unwrap();
     assert_eq!(a.h.core.terminal_list().await.unwrap().len(), 1);
-    tokio::time::sleep(Duration::from_millis(50)).await;
-    assert_eq!(
-        pty.input_of(session.pid),
-        format!("{SECRET}\r").into_bytes()
-    );
+    let typed = format!("{SECRET}\r").into_bytes();
+    assert!(eventually(|| pty.input_of(session.pid) == typed).await);
     a.h.core.terminal_close(session.id).await.unwrap();
-    tokio::time::sleep(Duration::from_millis(50)).await;
-    assert!(
-        frames
-            .0
-            .lock()
-            .unwrap()
-            .iter()
-            .any(|f| matches!(f, TerminalFrame::Exit { .. }))
-    );
+    let exit = |f: &TerminalFrame| matches!(f, TerminalFrame::Exit { .. });
+    assert!(eventually(|| frames.0.lock().unwrap().iter().any(exit)).await);
     assert!(
         a.h.core
             .terminal_input(session.id, "eA==".into())
