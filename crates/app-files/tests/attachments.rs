@@ -233,3 +233,37 @@ async fn image_only_attachments_do_not_taint_and_trashed_sessions_are_refused() 
     assert!(env.app.attachments_list(s.as_str()).is_err());
     assert!(env.app.attachments_list("zły:id").is_err());
 }
+
+/// Minimalny DOCX (ZIP z `word/document.xml`).
+fn docx(text: &str) -> Vec<u8> {
+    use std::io::Write as _;
+    let mut buf = std::io::Cursor::new(Vec::new());
+    {
+        let mut zip = zip::ZipWriter::new(&mut buf);
+        zip.start_file("word/document.xml", zip::write::SimpleFileOptions::default())
+            .unwrap();
+        let xml = format!("<w:document><w:body><w:p><w:r><w:t>{text}</w:t></w:r></w:p></w:body></w:document>");
+        zip.write_all(xml.as_bytes()).unwrap();
+        zip.finish().unwrap();
+    }
+    buf.into_inner()
+}
+
+#[tokio::test]
+async fn office_documents_reach_the_model_as_untrusted_text() {
+    let env = Env::new();
+    let s = env.session("Dokumenty");
+    let path = env.file("umowa.docx", &docx("Termin płatności: 30 dni"));
+    let added = env.app.attachments().add_paths(&s, &[path]).unwrap();
+    let info = &added.added[0];
+    assert_eq!(info.kind, AttachmentKind::Document);
+    assert_eq!(info.delivery, AttachmentDelivery::Full, "tekst dla modelu");
+    let blocks = env.app.prepare(&s, &[info.id.clone()]).unwrap();
+    let model = env.app.provider_blocks(&s, &blocks);
+    let ContentBlock::Text { text } = &model[0] else {
+        panic!("tekst");
+    };
+    assert!(text.contains("tekst wyciągnięty z dokumentu"), "{text}");
+    assert!(text.contains("Termin płatności: 30 dni"), "{text}");
+    assert!(text.contains("<<<NIEZAUFANE"), "treść niezaufana: {text}");
+}

@@ -70,6 +70,21 @@ pub struct Classified {
     pub tokens: u64,
 }
 
+/// Dokument, z którego wyciągnięto tekst (DOCX, XLSX, PPTX): rodzaj — dokument, dostawa
+/// i tokeny jak dla tekstu.
+pub fn extracted(chars: usize, limits: &AttachmentLimits) -> Classified {
+    let sent = chars.min(limits.max_text_chars);
+    Classified {
+        kind: AttachmentKind::Document,
+        delivery: if chars > limits.max_text_chars {
+            AttachmentDelivery::Truncated
+        } else {
+            AttachmentDelivery::Full
+        },
+        tokens: (sent as u64).div_ceil(4) + LABEL_TOKENS,
+    }
+}
+
 /// Klasyfikuje plik po typie MIME, początku treści (`head`, ≥ 8 KiB albo cały plik), rozmiarze
 /// i — dla tekstu — liczbie znaków (`chars`, policzonej przez wywołującego).
 pub fn classify(

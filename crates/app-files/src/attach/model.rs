@@ -1,6 +1,6 @@
 //! Załączniki tury dla modelu i dla UI. Dla modelu: obraz (≤ limit) jako blok `Image` base64,
-//! tekst jako **treść niezaufana** w delimitacji `tools-common` (ucięty do limitu), reszta —
-//! tylko nazwa, typ i rozmiar. Treść czytana z artefaktu sesji i sprawdzana SHA-256 z chwili
+//! tekst jako **treść niezaufana** w delimitacji `tools-common` (ucięty do limitu), DOCX / XLSX /
+//! PPTX — wyciągnięty tekst tak samo (C2.11), reszta — tylko nazwa, typ i rozmiar. Treść czytana z artefaktu sesji i sprawdzana SHA-256 z chwili
 //! wysłania — plik zmieniony później nie podmienia historii (append-only), model dostaje notkę.
 
 use std::path::Path;
@@ -139,6 +139,16 @@ pub fn provider_blocks(
             text.as_ref().map(|t| t.chars().count()),
             limits,
         );
+        if c.kind == AttachmentKind::Document
+            && let Some(doc) = super::office::text(&a.name, &bytes)
+        {
+            let (body, _) = truncate_chars(&doc, limits.max_text_chars);
+            out.push(ContentBlock::text(format!(
+                "{head} — tekst wyciągnięty z dokumentu:\n{}",
+                wrap_untrusted(&body, "załącznik", &a.name)
+            )));
+            continue;
+        }
         match (c.kind, c.delivery, text) {
             (AttachmentKind::Image, AttachmentDelivery::Full, _) => {
                 out.push(ContentBlock::text(head));

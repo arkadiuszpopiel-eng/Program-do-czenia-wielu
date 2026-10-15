@@ -8,6 +8,7 @@
 mod check;
 mod limits;
 mod model;
+mod office;
 
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -23,7 +24,9 @@ use platform_contract::{ClipboardContent, ClipboardPort};
 use sessions_contract::{AttachmentRef, Block, SessionId, Sessions};
 
 pub use check::{PathGuard, safe_name, unique_in};
-pub use limits::{AttachmentLimits, Classified, LABEL_TOKENS, classify, image_magic_matches};
+pub use limits::{
+    AttachmentLimits, Classified, LABEL_TOKENS, classify, extracted, image_magic_matches,
+};
 pub use model::{human_size, provider_blocks, turn_attachments};
 
 /// Podkatalog sesji na kopie załączników.
@@ -263,6 +266,13 @@ impl Attachments {
         let chars = (!artifacts_contract::looks_binary(head))
             .then(|| String::from_utf8_lossy(&bytes).chars().count());
         let c = classify(&mime, head, bytes.len() as u64, chars, &self.limits);
+        // DOCX / XLSX / PPTX: model dostanie wyciągnięty tekst (C2.11).
+        let c = match office::text(&display_name(copy), &bytes) {
+            Some(text) if c.kind == app_api::dto::AttachmentKind::Document => {
+                extracted(text.chars().count(), &self.limits)
+            }
+            _ => c,
+        };
         let info = AttachmentInfo {
             id: self.new_id(),
             session_id: session.to_string(),
