@@ -106,3 +106,15 @@ export const boardApi = (): AlfaClient['board'] => ({
   pin: (sessionId, turnId) => call('board_pin', { sessionId, turnId }),
   unpin: (id) => call('board_unpin', { id }),
 });
+
+export const pluginsApi = (): AlfaClient['plugins'] => ({
+  list: () => call('plugins_list'),
+  inspect: (wasmB64) => call('plugins_inspect', { wasmB64 }),
+  propose: (manifest, wasmB64) => call('plugins_propose', { manifest, wasmB64 }),
+  approve: (pluginId, version, reviewedHash) =>
+    call('plugins_approve', { pluginId, version, reviewedHash }),
+  reject: (pluginId, version) => call('plugins_reject', { pluginId, version }),
+  disable: (pluginId) => call('plugins_disable', { pluginId }),
+  enable: (pluginId, reviewedHash) => call('plugins_enable', { pluginId, reviewedHash }),
+  remove: (pluginId) => call('plugins_remove', { pluginId }),
+});

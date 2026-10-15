@@ -115,15 +115,13 @@
                 size="sm"
                 variant="secondary"
                 disabled={busy || editing !== null}
-                onclick={() => edit(i)}
-                >{t('tpl.edit')}</Button
+                onclick={() => edit(i)}>{t('tpl.edit')}</Button
               >
               <Button
                 size="sm"
                 variant="ghost"
                 disabled={busy || editing !== null}
-                onclick={() => (confirm = item.id)}
-                >{t('tpl.remove')}</Button
+                onclick={() => (confirm = item.id)}>{t('tpl.remove')}</Button
               >
             {/if}
           </div>

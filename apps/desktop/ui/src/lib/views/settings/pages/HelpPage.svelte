@@ -76,12 +76,7 @@
     <div class="wk-grid">
       <div class="wk-field">
         <span id="help-topic">{t('help.topic')}</span>
-        <Select
-          labelledby="help-topic"
-          value={chosen}
-          {options}
-          onchange={(id) => void open(id)}
-        />
+        <Select labelledby="help-topic" value={chosen} {options} onchange={(id) => void open(id)} />
       </div>
       <TextField label={t('help.search')} bind:value={query} spellcheck="false" />
     </div>

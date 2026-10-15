@@ -1,0 +1,55 @@
+[
+  {
+    "command": "board_list",
+    "args": {},
+    "result": [
+      {
+        "id": "pin-1",
+        "session_id": "s-q3",
+        "session_title": "Raport Q3",
+        "turn_id": "q3",
+        "agent": "beta",
+        "text": "Przychody wzrosły o 12 % rok do roku.",
+        "html_sanitized": "<p>Przychody wzrosły o 12 % rok do roku.</p>",
+        "pinned_at": "2026-10-15T09:30:00Z"
+      }
+    ]
+  },
+  {
+    "command": "board_pin",
+    "args": {
+      "sessionId": "s-q3",
+      "turnId": "q3"
+    },
+    "result": [
+      {
+        "id": "pin-1",
+        "session_id": "s-q3",
+        "session_title": "Raport Q3",
+        "turn_id": "q3",
+        "agent": "beta",
+        "text": "Przychody wzrosły o 12 % rok do roku.",
+        "html_sanitized": "<p>Przychody wzrosły o 12 % rok do roku.</p>",
+        "pinned_at": "2026-10-15T09:30:00Z"
+      }
+    ]
+  },
+  {
+    "command": "board_unpin",
+    "args": {
+      "id": "pin-nie-ma"
+    },
+    "result": [
+      {
+        "id": "pin-1",
+        "session_id": "s-q3",
+        "session_title": "Raport Q3",
+        "turn_id": "q3",
+        "agent": "beta",
+        "text": "Przychody wzrosły o 12 % rok do roku.",
+        "html_sanitized": "<p>Przychody wzrosły o 12 % rok do roku.</p>",
+        "pinned_at": "2026-10-15T09:30:00Z"
+      }
+    ]
+  }
+]

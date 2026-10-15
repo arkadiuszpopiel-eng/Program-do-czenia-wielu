@@ -555,6 +555,20 @@ export interface BatteryView {
 /** Rodzaj bloku treści. */
 export type BlockKind = 'text' | 'code';
 
+/** Przypięta odpowiedź (kopia treści z nazwą rozmowy, agentką i czasem przypięcia). */
+export interface BoardItem {
+  readonly agent: string;
+  /** Treść jako HTML zsanitowany w Rust — tylko do `SanitizedHtml`. */
+  readonly html_sanitized: string;
+  readonly id: string;
+  readonly pinned_at: string;
+  readonly session_id: string;
+  readonly session_title: string;
+  /** Treść (Markdown) — do kopiowania. */
+  readonly text: string;
+  readonly turn_id: string;
+}
+
 /** Stan bezpiecznika silnika głównego. */
 export type BreakerStateView = 'closed' | 'open' | 'half_open';
 
@@ -1544,6 +1558,28 @@ export interface HealthView {
   readonly problems: readonly string[];
   readonly repaired: readonly HealthRepair[];
   readonly safe_mode: string | null;
+}
+
+/** Trafienie wyszukiwania: dział i fragment tekstu. */
+export interface HelpHit {
+  readonly id: string;
+  /** Nagłówek sekcji z trafieniem (pusty — przed pierwszym nagłówkiem). */
+  readonly section: string;
+  readonly snippet: string;
+  readonly title: string;
+}
+
+/** Dział z treścią: HTML zsanitowany w Rust (pulldown-cmark + ammonia, ADR 0009). */
+export interface HelpPage {
+  readonly html_sanitized: string;
+  readonly id: string;
+  readonly title: string;
+}
+
+/** Dział instrukcji. */
+export interface HelpTopic {
+  readonly id: string;
+  readonly title: string;
 }
 
 /** Klasa sprzętu. */
@@ -2793,12 +2829,16 @@ export interface SessionSearchHit {
 export interface SessionSummary {
   readonly archived: boolean;
   readonly autonomy: AutonomyLevel;
+  /** Czas założenia rozmowy. */
+  readonly created_at: string;
   readonly id: string;
   readonly pinned: boolean;
   readonly profile: ModelProfile;
   readonly project: ProjectRef | null;
   readonly tags: readonly string[];
   readonly title: string;
+  /** Liczba tur (archiwum: statystyka rozmowy). */
+  readonly turn_count: number;
   readonly unread: boolean;
   readonly updated_at: string;
   readonly working: boolean;
@@ -2879,6 +2919,7 @@ export type SettingsCustomPage =
   | 'advanced'
   | 'commands'
   | 'templates'
+  | 'help'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -3219,7 +3260,15 @@ export interface TriggerDraft {
   readonly bridge: string | null;
   readonly goal: string;
   readonly kind: TriggerKindView;
+  /** Najwyższy koszt zadania (mikro-PLN; `None` — bez limitu zadania). */
+  readonly max_cost_micro_pln: number | null;
+  /** Najdłuższy czas zadania w minutach (`None` — domyślnie). */
+  readonly max_minutes: number | null;
+  /** Najwięcej kroków zadania (`None` — domyślnie; i tak w granicach polityki Marszałka). */
+  readonly max_steps: number | null;
   readonly name: string;
+  /** Tylko, gdy komputer jest bezczynny (C2.7). */
+  readonly only_when_idle: boolean;
   readonly respect_dnd: boolean;
   readonly title: string;
 }
@@ -3236,8 +3285,16 @@ export interface TriggerInfo {
   readonly id: string;
   readonly kind: TriggerKindView;
   readonly last_fire_at: string | null;
+  /** Budżet zadania: najwyższy koszt (mikro-PLN); `None` — bez limitu zadania. */
+  readonly max_cost_micro_pln: number | null;
+  /** Budżet zadania: najdłuższy czas wykonania (minuty). */
+  readonly max_minutes: number;
+  /** Budżet zadania: najwięcej kroków. */
+  readonly max_steps: number;
   readonly name: string;
   readonly next_fire_at: string | null;
+  /** Zadanie startuje tylko, gdy komputer jest bezczynny (C2.7). */
+  readonly only_when_idle: boolean;
   /** `user`, `agent:<persona>`, `system:<usługa>`. */
   readonly owner: string;
   readonly respect_dnd: boolean;
@@ -3772,6 +3829,18 @@ export interface IpcCommands {
     readonly args: { readonly file: string };
     readonly result: BackupCheck;
   };
+  readonly board_list: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly BoardItem[];
+  };
+  readonly board_pin: {
+    readonly args: { readonly sessionId: string; readonly turnId: string };
+    readonly result: readonly BoardItem[];
+  };
+  readonly board_unpin: {
+    readonly args: { readonly id: string };
+    readonly result: readonly BoardItem[];
+  };
   readonly bridges_check: {
     readonly args: { readonly bridge: string };
     readonly result: BridgeCard;
@@ -3971,6 +4040,15 @@ export interface IpcCommands {
   readonly health_undo: {
     readonly args: { readonly repairId: number };
     readonly result: HealthView;
+  };
+  readonly help_page: { readonly args: { readonly id: string }; readonly result: HelpPage };
+  readonly help_search: {
+    readonly args: { readonly query: string };
+    readonly result: readonly HelpHit[];
+  };
+  readonly help_topics: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly HelpTopic[];
   };
   readonly improver_approve: {
     readonly args: { readonly proposalId: number; readonly digest: string };

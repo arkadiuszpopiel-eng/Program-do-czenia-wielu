@@ -3,7 +3,18 @@
 // grupy „other”, żeby nigdy nie zniknęła z nawigacji.
 
 export const SETTINGS_GROUPS = [
-  { id: 'basics', pages: ['general', 'appearance', 'language', 'shortcuts', 'commands', 'templates', 'notifications'] },
+  {
+    id: 'basics',
+    pages: [
+      'general',
+      'appearance',
+      'language',
+      'shortcuts',
+      'commands',
+      'templates',
+      'notifications',
+    ],
+  },
   {
     id: 'models',
     pages: ['connections', 'providers', 'api', 'bridges', 'models', 'costs', 'router'],
@@ -13,7 +24,10 @@ export const SETTINGS_GROUPS = [
   { id: 'safety', pages: ['permissions', 'computer'] },
   { id: 'data', pages: ['memory', 'sessions', 'files', 'transfer', 'logs'] },
   // „Urządzenia” to sprzęt komputera (procesor, karty, bateria) — sprawa systemu, nie głosu.
-  { id: 'system', pages: ['devices', 'diag', 'improve', 'modules', 'updates', 'advanced', 'about', 'help'] },
+  {
+    id: 'system',
+    pages: ['devices', 'diag', 'improve', 'modules', 'updates', 'advanced', 'about', 'help'],
+  },
 ] as const;
 
 export type SettingsGroupId = (typeof SETTINGS_GROUPS)[number]['id'] | 'other';

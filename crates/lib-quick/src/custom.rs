@@ -233,7 +233,8 @@ mod tests {
         let long = format!("powiedz {}", "x".repeat(MAX_MESSAGE));
         assert_eq!(find(&only, &long), None, "za długa wiadomość");
         let many = vec!["echo".to_owned()];
-        let boom = [cmd(&many, Mode::Starts, &"{reszta}".repeat(50), 0)];
+        let template = "{reszta}".repeat(50);
+        let boom = [cmd(&many, Mode::Starts, &template, 0)];
         let out = find(&boom, &format!("echo {}", "y".repeat(500))).unwrap().1;
         assert_eq!(out.chars().count(), MAX_REPLY);
     }

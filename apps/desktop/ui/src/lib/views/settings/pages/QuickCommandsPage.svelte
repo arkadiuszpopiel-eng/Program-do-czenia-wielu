@@ -172,8 +172,7 @@
                 size="sm"
                 variant="ghost"
                 disabled={busy || editing !== null}
-                onclick={() => (confirm = c.id)}
-                >{t('commands.own.remove')}</Button
+                onclick={() => (confirm = c.id)}>{t('commands.own.remove')}</Button
               >
             {/if}
           </div>

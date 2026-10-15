@@ -62,7 +62,7 @@ impl Archive {
 enum Ev<'a> {
     Open(&'a str, &'a str),
     Close(&'a str),
-    Empty(&'a str, &'a str),
+    Empty(&'a str),
     Text(String),
 }
 
@@ -133,7 +133,7 @@ fn scan(xml: &str, mut f: impl FnMut(Ev<'_>)) {
         let body = body.trim_end_matches('/');
         let (name, attrs) = body.split_once(char::is_whitespace).unwrap_or((body, ""));
         if empty {
-            f(Ev::Empty(local(name), attrs));
+            f(Ev::Empty(local(name)));
         } else {
             f(Ev::Open(local(name), attrs));
         }
@@ -155,8 +155,8 @@ fn paragraphs(xml: &str) -> String {
         Ev::Open("t", _) => in_text = true,
         Ev::Close("t") => in_text = false,
         Ev::Text(t) if in_text => out.push_str(&t),
-        Ev::Empty("tab", _) => out.push('\t'),
-        Ev::Empty("br" | "cr", _) | Ev::Close("p") => out.push('\n'),
+        Ev::Empty("tab") => out.push('\t'),
+        Ev::Empty("br" | "cr") | Ev::Close("p") => out.push('\n'),
         _ => {}
     });
     out

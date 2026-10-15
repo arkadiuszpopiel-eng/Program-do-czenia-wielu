@@ -136,7 +136,7 @@ pub fn spec(command: &str) -> Option<Spec> {
         "help_search" => (vec![("query", s)], roundtrip::<Vec<HelpHit>>),
         "board_list" => (vec![], roundtrip::<Vec<BoardItem>>),
         "board_pin" => (
-            vec![("session_id", s), ("turn_id", s)],
+            vec![("sessionId", s), ("turnId", s)],
             roundtrip::<Vec<BoardItem>>,
         ),
         "board_unpin" => (vec![("id", s)], roundtrip::<Vec<BoardItem>>),

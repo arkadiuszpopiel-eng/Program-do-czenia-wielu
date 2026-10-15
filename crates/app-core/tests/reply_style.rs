@@ -42,14 +42,26 @@ async fn style_and_temperature_reach_the_request() {
     ask(&core, &provider, &sid, 0).await;
     let plain = provider.requests()[0].clone();
     assert_eq!(plain.params.temperature, None, "auto — domyślna modelu");
-    assert!(!plain.system.clone().unwrap_or_default().contains("Styl odpowiedzi"));
+    assert!(
+        !plain
+            .system
+            .clone()
+            .unwrap_or_default()
+            .contains("Styl odpowiedzi")
+    );
 
-    core.settings_set("chat.reply_style".into(), SettingValue::Text("concise".into()))
-        .await
-        .unwrap();
-    core.settings_set("chat.temperature".into(), SettingValue::Text("precise".into()))
-        .await
-        .unwrap();
+    core.settings_set(
+        "chat.reply_style".into(),
+        SettingValue::Text("concise".into()),
+    )
+    .await
+    .unwrap();
+    core.settings_set(
+        "chat.temperature".into(),
+        SettingValue::Text("precise".into()),
+    )
+    .await
+    .unwrap();
     ask(&core, &provider, &sid, 1).await;
     let styled = provider.requests()[1].clone();
     assert_eq!(styled.params.temperature, Some(0.2));

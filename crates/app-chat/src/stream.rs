@@ -13,11 +13,11 @@ use sessions_contract::{Block as SBlock, PrivacyTag, SessionCatalog};
 use app_api::dto::{self, AlfaEvent, RenderedBlock, TurnError, TurnErrorCode};
 use app_api::ports::{BrainChoice, BrainError, BrainRequest, VoiceChunk};
 
-use crate::style;
 use crate::engine::{ChatEngine, GenHandle};
 use crate::generate::GenRequest;
 use crate::outcome::{Chosen, Outcome, classify, millis, turn_error};
 use crate::project::block_dto;
+use crate::style;
 
 fn update_blocks(update: StreamUpdate) -> Vec<RenderedBlock> {
     let mut blocks: Vec<RenderedBlock> = update.closed.iter().map(|b| block_dto(b, true)).collect();

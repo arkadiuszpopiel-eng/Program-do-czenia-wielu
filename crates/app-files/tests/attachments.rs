@@ -240,9 +240,14 @@ fn docx(text: &str) -> Vec<u8> {
     let mut buf = std::io::Cursor::new(Vec::new());
     {
         let mut zip = zip::ZipWriter::new(&mut buf);
-        zip.start_file("word/document.xml", zip::write::SimpleFileOptions::default())
-            .unwrap();
-        let xml = format!("<w:document><w:body><w:p><w:r><w:t>{text}</w:t></w:r></w:p></w:body></w:document>");
+        zip.start_file(
+            "word/document.xml",
+            zip::write::SimpleFileOptions::default(),
+        )
+        .unwrap();
+        let xml = format!(
+            "<w:document><w:body><w:p><w:r><w:t>{text}</w:t></w:r></w:p></w:body></w:document>"
+        );
         zip.write_all(xml.as_bytes()).unwrap();
         zip.finish().unwrap();
     }
@@ -258,7 +263,7 @@ async fn office_documents_reach_the_model_as_untrusted_text() {
     let info = &added.added[0];
     assert_eq!(info.kind, AttachmentKind::Document);
     assert_eq!(info.delivery, AttachmentDelivery::Full, "tekst dla modelu");
-    let blocks = env.app.prepare(&s, &[info.id.clone()]).unwrap();
+    let blocks = env.app.prepare(&s, std::slice::from_ref(&info.id)).unwrap();
     let model = env.app.provider_blocks(&s, &blocks);
     let ContentBlock::Text { text } = &model[0] else {
         panic!("tekst");

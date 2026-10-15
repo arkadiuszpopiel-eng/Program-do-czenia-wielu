@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { session } from '../../api/fake/fixtures';
-import { inPeriod } from '../sessions.svelte';
+import { inPeriod } from '../../logic/session-period';
 
 describe('archiwum rozmów: okres', () => {
   const now = new Date(2026, 9, 15, 14, 0).getTime();

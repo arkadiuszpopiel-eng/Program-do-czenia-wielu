@@ -218,7 +218,10 @@ async fn queue_order_and_regenerate_keep_quiz_consistent() {
         .await
         .unwrap();
     assert_eq!(first.assistant_turn_id, None);
-    let second = core.turns_send(sid.clone(), send("2+2", None)).await.unwrap();
+    let second = core
+        .turns_send(sid.clone(), send("2+2", None))
+        .await
+        .unwrap();
     assert_eq!(
         second.assistant_turn_id, None,
         "polecenie czeka za wiadomością w kolejce"
@@ -264,5 +267,9 @@ async fn queue_order_and_regenerate_keep_quiz_consistent() {
     );
     core.turns_stop(quiz.clone()).await.unwrap();
     let (next, _) = reply(&core, &quiz, &(c * d).to_string()).await;
-    assert!(next.text.starts_with("Dobrze!"), "quiz przy tym samym pytaniu: {}", next.text);
+    assert!(
+        next.text.starts_with("Dobrze!"),
+        "quiz przy tym samym pytaniu: {}",
+        next.text
+    );
 }

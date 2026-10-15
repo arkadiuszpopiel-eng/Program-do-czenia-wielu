@@ -56,12 +56,18 @@ pub fn get(store: &FileConfigStore, machine: &str) -> RawConfig {
     let own = path(dir, machine, RawLayer::Machine);
     let (shared_text, own_text) = (read(&shared), read(&own));
     let mut problems: Vec<String> = Vec::new();
-    for (name, text) in [("shared.toml", &shared_text), ("nakładka maszyny", &own_text)] {
+    for (name, text) in [
+        ("shared.toml", &shared_text),
+        ("nakładka maszyny", &own_text),
+    ] {
         if let Err(e) = check(text) {
             problems.push(format!("{name}: {e}"));
         }
     }
-    if problems.is_empty() && !store.load_problems().is_empty() && !edited_since_start(&[&shared, &own]) {
+    if problems.is_empty()
+        && !store.load_problems().is_empty()
+        && !edited_since_start(&[&shared, &own])
+    {
         problems.extend(store.load_problems().iter().cloned());
     }
     RawConfig {

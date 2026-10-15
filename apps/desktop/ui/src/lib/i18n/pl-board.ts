@@ -2,8 +2,10 @@
 export const plBoard = {
   'action.board': 'Pokaż Tablicę (przypięte odpowiedzi)',
   'board.title': 'Tablica',
-  'board.lead': 'Przypięte odpowiedzi agentek z różnych rozmów — do 40. Przypinasz z menu wiadomości.',
-  'board.empty': 'Nic jeszcze nie przypięto. W menu odpowiedzi agentki wybierz „Przypnij do tablicy”.',
+  'board.lead':
+    'Przypięte odpowiedzi agentek z różnych rozmów — do 40. Przypinasz z menu wiadomości.',
+  'board.empty':
+    'Nic jeszcze nie przypięto. W menu odpowiedzi agentki wybierz „Przypnij do tablicy”.',
   'board.list': 'Przypięte odpowiedzi',
   'board.pin': 'Przypnij do tablicy',
   'board.pinned': 'Przypięto do Tablicy (Ctrl+K → „Pokaż Tablicę”).',
@@ -14,12 +16,8 @@ export const plBoard = {
   'msg.translateEn': 'Przetłumacz na angielski',
   'msg.translatePl': 'Przetłumacz na polski',
   'msg.translatePromptEn':
-    'Przetłumacz poniższy tekst na angielski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.
-
-{text}',
+    'Przetłumacz poniższy tekst na angielski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.\n\n{text}',
   'msg.translatePromptPl':
-    'Przetłumacz poniższy tekst na polski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.
-
-{text}',
+    'Przetłumacz poniższy tekst na polski. Odpowiedz samym tłumaczeniem, zachowaj formatowanie.\n\n{text}',
   'board.close': 'Zamknij',
 };

@@ -19,11 +19,17 @@ pub const MAX_TEXT: usize = 4000;
 /// Wpis w pliku.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Pin {
+    /// Identyfikator przypięcia.
     pub id: String,
+    /// Rozmowa.
     pub session_id: String,
+    /// Nazwa rozmowy w chwili przypięcia.
     pub session_title: String,
+    /// Tura.
     pub turn_id: String,
+    /// Agentka.
     pub agent: String,
+    /// Treść (Markdown, do 4000 znaków).
     pub text: String,
     /// Czas przypięcia (RFC 3339).
     pub pinned_at: String,

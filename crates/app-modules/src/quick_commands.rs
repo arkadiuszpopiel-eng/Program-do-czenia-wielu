@@ -258,7 +258,10 @@ mod tests {
         let mut odd = command("Dziwny", &["x"], QuickMatchMode::Exact, "y");
         odd.id = "<script>".into();
         let fixed = parse(Some(&validate(vec![odd]).unwrap()));
-        assert_eq!(fixed[0].id, "dziwny", "identyfikator spoza wzorca nadany od nowa");
+        assert_eq!(
+            fixed[0].id, "dziwny",
+            "identyfikator spoza wzorca nadany od nowa"
+        );
         let many = vec![command("a", &["x"], QuickMatchMode::Exact, "y"); 51];
         assert!(validate(many).is_err());
     }

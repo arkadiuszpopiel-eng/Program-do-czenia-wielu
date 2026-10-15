@@ -1,30 +1,13 @@
 // Lista sesji panelu lewego: grupy (przypięte, projekty, bez projektu, archiwum), sortowanie,
 // „karty" jako lista ostatnio używanych (Ctrl+Tab / Ctrl+1…9 / Ctrl+W / Ctrl+Shift+T).
 import type { ProjectRef, SessionSearchHit, SessionSummary } from '../api/types';
+import { inPeriod, type SessionPeriod } from '../logic/session-period';
 
 export interface SessionGroup {
   readonly id: string;
   readonly kind: 'pinned' | 'project' | 'loose' | 'archived';
   readonly project: ProjectRef | null;
   readonly sessions: readonly SessionSummary[];
-}
-
-/** Okres na liście rozmów (archiwum): wszystkie, dziś, ostatnie 7 albo 30 dni. */
-export type SessionPeriod = 'all' | 'today' | 'week' | 'month';
-
-/** Rozmowy z aktywnością w okresie (po `updated_at`; „dziś” od północy czasu lokalnego). */
-export function inPeriod(
-  list: readonly SessionSummary[],
-  period: SessionPeriod,
-  now: number,
-): SessionSummary[] {
-  if (period === 'all') return [...list];
-  const day = 86_400_000;
-  const midnight = new Date(now);
-  midnight.setHours(0, 0, 0, 0);
-  const since =
-    period === 'today' ? midnight.getTime() : now - (period === 'week' ? 7 : 30) * day;
-  return list.filter((s) => Date.parse(s.updated_at) >= since);
 }
 
 const byUpdated = (a: SessionSummary, b: SessionSummary): number =>

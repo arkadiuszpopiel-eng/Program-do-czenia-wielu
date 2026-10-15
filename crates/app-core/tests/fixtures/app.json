@@ -13,6 +13,8 @@
         "general.destroy_webview_after": 10,
         "general.view_profile": "simple",
         "quick.session_mode": "single",
+        "chat.reply_style": "auto",
+        "chat.temperature": "auto",
         "models.default_profile": "hybrid",
         "models.effort": "medium",
         "accounts.check_interval_hours": 24,

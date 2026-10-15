@@ -134,6 +134,105 @@
                 }
               ]
             }
+          },
+          {
+            "key": "chat.reply_style",
+            "label": {
+              "pl": "Styl odpowiedzi",
+              "en": "Reply style"
+            },
+            "description": {
+              "pl": "Jak agentki mają odpowiadać w rozmowie. „Automatycznie” — tak, jak każda agentka ma w swojej personie.",
+              "en": "How the agents reply in conversation. “Automatic” — as each agent’s persona says."
+            },
+            "default": "auto",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie",
+                    "en": "Automatic"
+                  }
+                },
+                {
+                  "value": "concise",
+                  "label": {
+                    "pl": "Zwięźle",
+                    "en": "Concise"
+                  }
+                },
+                {
+                  "value": "detailed",
+                  "label": {
+                    "pl": "Szczegółowo",
+                    "en": "Detailed"
+                  }
+                },
+                {
+                  "value": "simple",
+                  "label": {
+                    "pl": "Prostym językiem",
+                    "en": "Plain language"
+                  }
+                },
+                {
+                  "value": "formal",
+                  "label": {
+                    "pl": "Formalnie",
+                    "en": "Formal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "chat.temperature",
+            "label": {
+              "pl": "Swoboda odpowiedzi",
+              "en": "Reply freedom"
+            },
+            "description": {
+              "pl": "Precyzyjnie — przewidywalne, powtarzalne odpowiedzi; twórczo — więcej pomysłów i różnorodności. Modele, które tego nie obsługują, odpowiadają po swojemu.",
+              "en": "Precise — predictable, repeatable replies; creative — more ideas and variety. Models that do not support it answer their own way."
+            },
+            "default": "auto",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "auto",
+                  "label": {
+                    "pl": "Automatycznie (domyślna modelu)",
+                    "en": "Automatic (model default)"
+                  }
+                },
+                {
+                  "value": "precise",
+                  "label": {
+                    "pl": "Precyzyjnie",
+                    "en": "Precise"
+                  }
+                },
+                {
+                  "value": "balanced",
+                  "label": {
+                    "pl": "Zrównoważenie",
+                    "en": "Balanced"
+                  }
+                },
+                {
+                  "value": "creative",
+                  "label": {
+                    "pl": "Twórczo",
+                    "en": "Creative"
+                  }
+                }
+              ]
+            }
           }
         ],
         "upcoming": []
@@ -2566,6 +2665,17 @@
         "custom": "templates",
         "settings": [],
         "upcoming": []
+      },
+      {
+        "id": "help",
+        "label": {
+          "pl": "Instrukcja",
+          "en": "User guide"
+        },
+        "wave": 1,
+        "custom": "help",
+        "settings": [],
+        "upcoming": []
       }
     ]
   },
@@ -2578,6 +2688,8 @@
       "general.destroy_webview_after": 10,
       "general.view_profile": "simple",
       "quick.session_mode": "single",
+      "chat.reply_style": "auto",
+      "chat.temperature": "auto",
       "models.default_profile": "hybrid",
       "models.effort": "medium",
       "accounts.check_interval_hours": 24,

@@ -155,6 +155,7 @@ export async function runWork(
   await both('dataRoutes', 'list');
   await both('help', 'topics');
   await both('board', 'list');
+  await both('board', 'pin', 's-q3', 'q3');
   await both('board', 'unpin', 'pin-nie-ma');
   await both('help', 'page', 'rozmowa');
   await both('help', 'search', 'polecenia bez modelu');

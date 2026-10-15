@@ -7,8 +7,8 @@
 #![allow(missing_docs)]
 
 mod advanced;
-mod board;
 mod agents;
+mod board;
 mod bridges;
 mod broker;
 mod cameras;
@@ -19,6 +19,7 @@ mod files;
 mod gpu_live;
 mod gui;
 mod health;
+mod help;
 mod hub;
 mod mcp;
 mod memory;
@@ -28,7 +29,6 @@ mod models;
 mod modules;
 mod panels;
 mod plugins;
-mod help;
 mod quick;
 mod routes;
 mod sessions;
@@ -42,12 +42,12 @@ mod voice_engines;
 mod voice_features;
 
 pub use advanced::RawConfig;
-pub use board::BoardItem;
 pub use agents::{
     AgentRun, AgentRunDetail, IntentKind, ReplayKind, ReplayStatus, ReplayStep, RunBudgetView,
     RunState, RunUsage, SessionWorkdir, ToolIntent, VoiceMode, VoiceSpeaker, VoiceState,
     VoiceStatus, WorkdirChoice,
 };
+pub use board::BoardItem;
 pub use bridges::{BridgeAccount, BridgeAccountState, BridgeCard, BridgeLogin, BridgeSource};
 pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView};
 pub use cameras::{
@@ -78,6 +78,7 @@ pub use health::{
     HealthOverall, HealthProposal, HealthRepair, HealthView, ImproverBlocked, ImproverChange,
     ImproverIssue, ImproverProposalView, ImproverView, ModuleHealth, RiskView,
 };
+pub use help::{HelpHit, HelpPage, HelpTopic};
 pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
     AudioDevice, AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind,
@@ -118,7 +119,6 @@ pub use plugins::{
 pub use quick::{
     BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
 };
-pub use help::{HelpHit, HelpPage, HelpTopic};
 pub use routes::{DataRoute, DataRoutesView};
 pub use sessions::{
     ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,

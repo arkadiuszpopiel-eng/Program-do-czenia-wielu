@@ -1,0 +1,45 @@
+[
+  {
+    "command": "help_topics",
+    "args": {},
+    "result": [
+      {
+        "id": "przewodnik",
+        "title": "Alfa — przewodnik użytkownika"
+      },
+      {
+        "id": "rozmowa",
+        "title": "Rozmowa"
+      },
+      {
+        "id": "bezpieczenstwo",
+        "title": "Bezpieczeństwo"
+      }
+    ]
+  },
+  {
+    "command": "help_page",
+    "args": {
+      "id": "rozmowa"
+    },
+    "result": {
+      "id": "rozmowa",
+      "title": "Rozmowa",
+      "html_sanitized": "<h1>Rozmowa</h1><h2>Polecenia bez modelu</h2><p>Na proste polecenia Alfa odpowiada sama — rachunki, literowanie, losowanie, data i godzina.</p><h2>Brak internetu</h2><p>Wiadomość do modelu w chmurze czeka w kolejce.</p>"
+    }
+  },
+  {
+    "command": "help_search",
+    "args": {
+      "query": "polecenia bez modelu"
+    },
+    "result": [
+      {
+        "id": "rozmowa",
+        "title": "Rozmowa",
+        "section": "Polecenia bez modelu",
+        "snippet": "Polecenia bez modelu"
+      }
+    ]
+  }
+]

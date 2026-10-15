@@ -3,9 +3,9 @@
 pub(crate) mod account_keys;
 mod accounts;
 mod advanced;
-mod board;
 mod agents;
 pub(crate) mod app;
+mod board;
 mod bridges;
 pub(crate) mod cameras;
 mod costs;

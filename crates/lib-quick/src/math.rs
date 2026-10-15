@@ -313,6 +313,7 @@ pub fn answer(text: &str) -> Option<String> {
     let mut parser = Parser {
         toks: &toks,
         pos: 0,
+        percent: false,
     };
     let result = parser.sum();
     if parser.pos != toks.len() {

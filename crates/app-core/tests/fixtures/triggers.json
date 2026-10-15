@@ -23,7 +23,11 @@
         "suppressed": 0,
         "deferred_until": null,
         "respect_dnd": true,
-        "watch_unavailable": false
+        "watch_unavailable": false,
+        "only_when_idle": false,
+        "max_steps": 50,
+        "max_minutes": 60,
+        "max_cost_micro_pln": null
       },
       {
         "id": "pobrane",
@@ -46,7 +50,11 @@
         "suppressed": 0,
         "deferred_until": null,
         "respect_dnd": true,
-        "watch_unavailable": true
+        "watch_unavailable": true,
+        "only_when_idle": false,
+        "max_steps": 50,
+        "max_minutes": 60,
+        "max_cost_micro_pln": null
       },
       {
         "id": "porzadki",
@@ -67,7 +75,11 @@
         "suppressed": 0,
         "deferred_until": null,
         "respect_dnd": true,
-        "watch_unavailable": false
+        "watch_unavailable": false,
+        "only_when_idle": false,
+        "max_steps": 50,
+        "max_minutes": 60,
+        "max_cost_micro_pln": null
       }
     ]
   },
@@ -112,7 +124,11 @@
         "goal": "Zrób kopię notatek ze spotkań",
         "agent": "beta",
         "bridge": null,
-        "respect_dnd": true
+        "respect_dnd": true,
+        "only_when_idle": false,
+        "max_steps": null,
+        "max_minutes": null,
+        "max_cost_micro_pln": null
       }
     },
     "result": {
@@ -135,7 +151,11 @@
       "suppressed": 0,
       "deferred_until": null,
       "respect_dnd": true,
-      "watch_unavailable": false
+      "watch_unavailable": false,
+      "only_when_idle": false,
+      "max_steps": 50,
+      "max_minutes": 60,
+      "max_cost_micro_pln": null
     }
   },
   {

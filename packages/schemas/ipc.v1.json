@@ -2147,6 +2147,48 @@
       ],
       "type": "string"
     },
+    "BoardItem": {
+      "description": "Przypięta odpowiedź (kopia treści z nazwą rozmowy, agentką i czasem przypięcia).",
+      "properties": {
+        "agent": {
+          "type": "string"
+        },
+        "html_sanitized": {
+          "description": "Treść jako HTML zsanitowany w Rust — tylko do `SanitizedHtml`.",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "pinned_at": {
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "session_title": {
+          "type": "string"
+        },
+        "text": {
+          "description": "Treść (Markdown) — do kopiowania.",
+          "type": "string"
+        },
+        "turn_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "session_id",
+        "session_title",
+        "turn_id",
+        "agent",
+        "text",
+        "html_sanitized",
+        "pinned_at"
+      ],
+      "type": "object"
+    },
     "BreakerStateView": {
       "description": "Stan bezpiecznika silnika głównego.",
       "oneOf": [
@@ -5751,6 +5793,67 @@
         "needs_human",
         "pending",
         "problems"
+      ],
+      "type": "object"
+    },
+    "HelpHit": {
+      "description": "Trafienie wyszukiwania: dział i fragment tekstu.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "section": {
+          "description": "Nagłówek sekcji z trafieniem (pusty — przed pierwszym nagłówkiem).",
+          "type": "string"
+        },
+        "snippet": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "section",
+        "snippet"
+      ],
+      "type": "object"
+    },
+    "HelpPage": {
+      "description": "Dział z treścią: HTML zsanitowany w Rust (pulldown-cmark + ammonia, ADR 0009).",
+      "properties": {
+        "html_sanitized": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "html_sanitized"
+      ],
+      "type": "object"
+    },
+    "HelpTopic": {
+      "description": "Dział instrukcji.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
       ],
       "type": "object"
     },
@@ -10213,6 +10316,10 @@
         "autonomy": {
           "$ref": "#/$defs/AutonomyLevel"
         },
+        "created_at": {
+          "description": "Czas założenia rozmowy.",
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
@@ -10241,6 +10348,12 @@
         "title": {
           "type": "string"
         },
+        "turn_count": {
+          "description": "Liczba tur (archiwum: statystyka rozmowy).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
         "unread": {
           "type": "boolean"
         },
@@ -10262,7 +10375,9 @@
         "updated_at",
         "tags",
         "autonomy",
-        "profile"
+        "profile",
+        "turn_count",
+        "created_at"
       ],
       "type": "object"
     },
@@ -10552,6 +10667,11 @@
         {
           "const": "templates",
           "description": "Szablony promptów ze zmiennymi.",
+          "type": "string"
+        },
+        {
+          "const": "help",
+          "description": "Wbudowana instrukcja (przewodnik użytkownika).",
           "type": "string"
         },
         {
@@ -11882,8 +12002,43 @@
         "kind": {
           "$ref": "#/$defs/TriggerKindView"
         },
+        "max_cost_micro_pln": {
+          "default": null,
+          "description": "Najwyższy koszt zadania (mikro-PLN; `None` — bez limitu zadania).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_minutes": {
+          "default": null,
+          "description": "Najdłuższy czas zadania w minutach (`None` — domyślnie).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_steps": {
+          "default": null,
+          "description": "Najwięcej kroków zadania (`None` — domyślnie; i tak w granicach polityki Marszałka).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
         "name": {
           "type": "string"
+        },
+        "only_when_idle": {
+          "default": false,
+          "description": "Tylko, gdy komputer jest bezczynny (C2.7).",
+          "type": "boolean"
         },
         "respect_dnd": {
           "type": "boolean"
@@ -11899,7 +12054,11 @@
         "goal",
         "agent",
         "bridge",
-        "respect_dnd"
+        "respect_dnd",
+        "only_when_idle",
+        "max_steps",
+        "max_minutes",
+        "max_cost_micro_pln"
       ],
       "type": "object"
     },
@@ -11948,6 +12107,27 @@
             "null"
           ]
         },
+        "max_cost_micro_pln": {
+          "description": "Budżet zadania: najwyższy koszt (mikro-PLN); `None` — bez limitu zadania.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_minutes": {
+          "description": "Budżet zadania: najdłuższy czas wykonania (minuty).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_steps": {
+          "description": "Budżet zadania: najwięcej kroków.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
         "name": {
           "type": "string"
         },
@@ -11956,6 +12136,10 @@
             "string",
             "null"
           ]
+        },
+        "only_when_idle": {
+          "description": "Zadanie startuje tylko, gdy komputer jest bezczynny (C2.7).",
+          "type": "boolean"
         },
         "owner": {
           "description": "`user`, `agent:<persona>`, `system:<usługa>`.",
@@ -11997,7 +12181,11 @@
         "suppressed",
         "deferred_until",
         "respect_dnd",
-        "watch_unavailable"
+        "watch_unavailable",
+        "only_when_idle",
+        "max_steps",
+        "max_minutes",
+        "max_cost_micro_pln"
       ],
       "type": "object"
     },
@@ -13911,6 +14099,53 @@
         "$ref": "#/$defs/BackupCheck"
       }
     },
+    "board_list": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/BoardItem"
+        },
+        "type": "array"
+      }
+    },
+    "board_pin": {
+      "args": [
+        {
+          "name": "session_id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "turn_id",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/BoardItem"
+        },
+        "type": "array"
+      }
+    },
+    "board_unpin": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/BoardItem"
+        },
+        "type": "array"
+      }
+    },
     "bridges_check": {
       "args": [
         {
@@ -14579,6 +14814,44 @@
       ],
       "result": {
         "$ref": "#/$defs/HealthView"
+      }
+    },
+    "help_page": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/HelpPage"
+      }
+    },
+    "help_search": {
+      "args": [
+        {
+          "name": "query",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/HelpHit"
+        },
+        "type": "array"
+      }
+    },
+    "help_topics": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/HelpTopic"
+        },
+        "type": "array"
       }
     },
     "improver_approve": {

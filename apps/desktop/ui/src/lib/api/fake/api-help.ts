@@ -26,11 +26,7 @@ const PAGES: readonly HelpPage[] = [
 ];
 
 const fold = (s: string): string =>
-  s
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/ł/g, 'l');
+  s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
 
 function search(query: string): HelpHit[] {
   const words = fold(query)

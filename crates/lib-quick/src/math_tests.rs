@@ -33,11 +33,22 @@ fn computes_and_explains() {
     );
     assert!(answer("5/0").unwrap_or_default().contains("zero"));
     assert!(answer("10^40").unwrap_or_default().contains("za duży"));
-    assert_eq!(answer("100 plus 23%").as_deref(), Some("100 + 23% = **123**"));
+    assert_eq!(
+        answer("100 plus 23%").as_deref(),
+        Some("100 + 23% = **123**")
+    );
     assert_eq!(answer("200 - 10%").as_deref(), Some("200 − 10% = **180**"));
     assert_eq!(answer("20% z 150").as_deref(), Some("20% z 150 = **30**"));
-    assert!(answer("(0-8)^0,5").unwrap_or_default().contains("liczb rzeczywistych"));
-    assert_eq!(answer("12345678901234567890 minus 1"), None, "poza precyzją");
+    assert!(
+        answer("(0-8)^0,5")
+            .unwrap_or_default()
+            .contains("liczb rzeczywistych")
+    );
+    assert_eq!(
+        answer("12345678901234567890 minus 1"),
+        None,
+        "poza precyzją"
+    );
 }
 
 #[test]

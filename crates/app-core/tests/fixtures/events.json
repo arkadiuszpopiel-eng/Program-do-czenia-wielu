@@ -12,7 +12,9 @@
       "updated_at": "2026-09-30T08:45:00.000Z",
       "tags": [],
       "autonomy": "L3",
-      "profile": "hybrid"
+      "profile": "hybrid",
+      "turn_count": 0,
+      "created_at": "2026-09-29T08:45:00.000Z"
     }
   },
   {
@@ -28,7 +30,9 @@
       "updated_at": "2026-09-30T08:45:00.000Z",
       "tags": [],
       "autonomy": "L3",
-      "profile": "hybrid"
+      "profile": "hybrid",
+      "turn_count": 0,
+      "created_at": "2026-09-29T08:45:00.000Z"
     }
   },
   {
@@ -44,7 +48,9 @@
       "updated_at": "2026-09-30T08:45:00.000Z",
       "tags": [],
       "autonomy": "L3",
-      "profile": "hybrid"
+      "profile": "hybrid",
+      "turn_count": 0,
+      "created_at": "2026-09-29T08:45:00.000Z"
     }
   },
   {
