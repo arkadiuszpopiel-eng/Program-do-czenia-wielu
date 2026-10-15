@@ -33,6 +33,10 @@ const BUILTINS: readonly BuiltinCommand[] = [
     title: 'Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie',
     examples: ['1234 słownie', '2026 rzymskimi'],
   },
+  {
+    title: 'Liczenie znaków, liter i słów w podanym tekście (SMS, wpis, tytuł)',
+    examples: ['policz znaki: Ala ma kota'],
+  },
 ];
 
 const fold = (s: string): string =>

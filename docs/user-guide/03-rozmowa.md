@@ -120,10 +120,12 @@ Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — ta
   do modelu);
 - **liczby słownie i rzymskie** — „1234 słownie”, „Zapisz 1999,99 zł słownie” (jak na fakturze: „… złotych
   99/100”), „2026 rzymskimi”, „rzymskie MCMXC”;
+- **liczenie znaków i słów** — „Policz znaki: …”, „Ile słów ma „…”” (długość SMS-a, wpisu, tytułu);
 - **quiz z tabliczki mnożenia** — „Przepytaj mnie z tabliczki mnożenia (przez 7)”: 10 pytań, odpowiadasz liczbą
   (także słowami albo głosem), „koniec” przerywa z podsumowaniem; inna wiadomość kończy quiz.
 
-Polecenie musi być całą wiadomością — „ile kosztuje 5 jabłek” czy „która godzina w Tokio” trafią do modelu.
+Pełną listę z przykładami i testerem otworzysz paletą `Ctrl+K` → **Polecenia bez modelu**. Polecenie musi być
+całą wiadomością — „ile kosztuje 5 jabłek” czy „która godzina w Tokio” trafią do modelu.
 
 **Własne polecenia** dodasz w Ustawienia → Polecenia bez modelu: fraza → stała odpowiedź, np. „dobranoc” →
 „Dobranoc! Do jutra.”. Dopasowanie: cała wiadomość, początek (dalszy tekst wstawisz jako `{reszta}`, np. „Zanotuj:

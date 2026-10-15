@@ -7,6 +7,7 @@
   import { useApp } from '../../state/context';
   import { exportConversation } from '../../state/exports';
   import { duplicateSession } from '../../state/session-actions';
+  import { openStats } from '../../state/stats-dialog.svelte';
 
   interface Props {
     session: SessionSummary;
@@ -64,6 +65,12 @@
       id: 'export-json',
       label: t('exp.json'),
       onSelect: () => void exportConversation(app, session.id, 'json'),
+    },
+    {
+      id: 'stats',
+      label: t('stats.title'),
+      // Statystyki liczą się z otwartej rozmowy — najpierw ją otwieramy.
+      onSelect: () => void app.openSession(session.id).then(openStats),
     },
     {
       id: 'delete',

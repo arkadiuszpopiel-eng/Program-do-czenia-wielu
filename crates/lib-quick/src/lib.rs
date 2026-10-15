@@ -11,6 +11,7 @@
 mod calendar;
 mod choice;
 mod clock;
+mod count;
 pub mod custom;
 mod dates;
 
@@ -54,6 +55,8 @@ pub enum Command {
     Units,
     /// Liczby słownie (także kwoty w złotych) i rzymskie.
     Numerals,
+    /// Liczenie znaków i słów w podanym tekście.
+    Count,
 }
 
 impl Command {
@@ -69,6 +72,7 @@ impl Command {
             Self::Dates => "rachunek na datach",
             Self::Units => "przeliczanie jednostek",
             Self::Numerals => "liczby słownie i rzymskie",
+            Self::Count => "liczenie znaków i słów",
         }
     }
 }
@@ -184,6 +188,14 @@ pub const CATALOG: &[Entry] = &[
             "rzymskie MCMXC",
         ],
     },
+    Entry {
+        command: Command::Count,
+        title: "Liczenie znaków, liter i słów w podanym tekście (SMS, wpis, tytuł)",
+        examples: &[
+            "policz znaki: Ala ma kota",
+            "ile słów ma „Zażółć gęślą jaźń”",
+        ],
+    },
 ];
 
 /// Najdłuższa wiadomość, którą biblioteka w ogóle rozważa (dłuższe idą do modelu).
@@ -212,6 +224,9 @@ pub fn answer(
     }
     if let Some(t) = calendar::answer(&text, now) {
         return reply(Command::Dates, t);
+    }
+    if let Some(t) = count::answer(message) {
+        return reply(Command::Count, t);
     }
     if let Some(t) = spell::answer(message, &text) {
         return reply(Command::Spell, t);

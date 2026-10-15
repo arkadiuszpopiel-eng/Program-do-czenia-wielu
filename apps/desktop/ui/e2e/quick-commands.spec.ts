@@ -58,7 +58,7 @@ test('tester, dodanie, błąd wyrażenia, usunięcie, katalog', async ({ page })
   await expect(own.getByText('Zanotuj', { exact: true })).toHaveCount(0);
 
   const builtin = page.getByRole('region', { name: 'Polecenia wbudowane' });
-  await expect(builtin.getByRole('listitem')).toHaveCount(8);
+  await expect(builtin.getByRole('listitem')).toHaveCount(9);
   await expect(page.getByRole('switch', { name: 'Odpowiadaj bez modelu' })).toBeChecked();
 });
 

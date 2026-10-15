@@ -57,6 +57,25 @@ test('paleta: „Kopiuj rozmowę (Markdown)” z notą o treści AI', async ({ p
   expect(copied).toContain('### Ty · ');
 });
 
+test('menu sesji: „Statystyki rozmowy”; paleta prowadzi do „Polecenia bez modelu”', async ({ page }) => {
+  await open(page);
+  const row = page.getByRole('navigation', { name: /Sesje/ }).getByRole('listitem').first();
+  await row.hover();
+  await row.getByRole('button', { name: /Akcje|Więcej/ }).click();
+  await page.getByRole('menuitem', { name: 'Statystyki rozmowy' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Statystyki rozmowy' });
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('dialog[open] input')).toBeFocused();
+  await page.keyboard.type('Polecenia bez modelu');
+  await expect(page.locator('dialog [role=option][data-selected]')).toContainText(
+    'Polecenia bez modelu',
+  );
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Polecenia bez modelu', level: 2 })).toBeVisible();
+});
+
 for (const skin of ['classic', 'glass', 'next'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`seria 4 — podpowiedź i przykłady: ${skin}, ${theme}`, async ({ page }) => {
