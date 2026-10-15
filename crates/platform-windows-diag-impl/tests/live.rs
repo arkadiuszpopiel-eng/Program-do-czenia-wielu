@@ -9,7 +9,7 @@ use pc_diag_contract::DiagProbe;
 fn live_snapshot() {
     let start = std::time::Instant::now();
     let s = platform_windows_diag_impl::WinDiagProbe::default().snapshot().unwrap();
-    println!("{} ms", start.elapsed().as_millis());
-    println!("{}", pc_diag_contract::report::markdown(&s, None));
-    pc_diag_contract::rating::integrity(&s).notes.iter().for_each(|n| println!("OCENA: {n}"));
+    eprintln!("{} ms", start.elapsed().as_millis());
+    eprintln!("{}", pc_diag_contract::report::markdown(&s, None));
+    pc_diag_contract::rating::integrity(&s).notes.iter().for_each(|n| eprintln!("OCENA: {n}"));
 }

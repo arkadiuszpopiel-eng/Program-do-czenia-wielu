@@ -26,13 +26,13 @@ async fn live_quick_and_system_disk() {
         .await
         .unwrap();
     for r in &run.results {
-        println!("{} {:?} {} ms", r.kind.key(), r.verdict, r.duration_ms);
+        eprintln!("{} {:?} {} ms", r.kind.key(), r.verdict, r.duration_ms);
         for m in &r.metrics {
-            println!("   {} = {:.2} {}", m.label, m.value, m.unit);
+            eprintln!("   {} = {:.2} {}", m.label, m.value, m.unit);
         }
         for n in &r.notes {
-            println!("   - {n}");
+            eprintln!("   - {n}");
         }
     }
-    println!("RAPORT: {}", app.export().await.unwrap());
+    eprintln!("RAPORT: {}", app.export().await.unwrap());
 }
