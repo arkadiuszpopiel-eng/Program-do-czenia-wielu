@@ -66,9 +66,13 @@
     let host: TerminalHost | null = null;
     let id: number | null = null;
     let closed = false;
+    // Wejście po kolei: każde wywołanie czeka na poprzednie. Równoległe wywołania pod obciążeniem
+    // docierały w innej kolejności („Write” → „Witre”, e2e-app 2026-10-15).
+    let queue: Promise<unknown> = Promise.resolve();
     const send = (b64: string) => {
-      if (id !== null && exited === undefined)
-        app.client.terminal.input(id, b64).catch(() => undefined);
+      if (id === null || exited !== undefined) return;
+      const target = id;
+      queue = queue.then(() => app.client.terminal.input(target, b64)).catch(() => undefined);
     };
     const label = untrack(() => t('term.inputLabel', { name: tk(`term.profile.${profile}`) }));
     host = createTerminal(el, {

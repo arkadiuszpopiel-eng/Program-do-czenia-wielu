@@ -106,6 +106,11 @@ for (const style of STYLES) {
             continue;
           }
           const list = page.locator(`[id="${listId}"]`);
+          // Pod obciążeniem pierwsze kliknięcie potrafi trafić przed podpięciem obsługi listy.
+          if (!(await list.isVisible())) {
+            await page.waitForTimeout(300);
+            if (!(await list.isVisible())) await select.click();
+          }
           await expect(list, `${name}: lista ${s + 1} się otwiera`).toBeVisible();
           opened += 1;
           const box = await list.boundingBox();

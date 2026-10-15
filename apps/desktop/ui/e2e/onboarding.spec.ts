@@ -82,7 +82,7 @@ test('konto Claude / ChatGPT: logowanie prowadzi krok po kroku i kończy się �
   const dialog = page.getByRole('dialog', { name: 'Logowanie do Claude Code' });
   await expect(
     dialog.getByRole('list', { name: 'Jak się zalogować' }).getByRole('listitem'),
-  ).toHaveCount(3);
+  ).toHaveCount(4);
   await expect(dialog.getByText(/Proces \d+ działa/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Gotowe' }).click();
   await expect(dialog).toHaveCount(0);

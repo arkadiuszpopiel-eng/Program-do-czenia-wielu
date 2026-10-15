@@ -12,6 +12,21 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.57 — 2026-10-15
+
+Terminal Alfy (także okno logowania) nie przestawia już liter przy szybkim pisaniu: przy obciążonym
+komputerze wpisane „Write-Output” potrafiło dotrzeć jako „Witre-Output”.
+
+### Terminal
+
+- [poważne] Klawisze trafiają do terminala dokładnie w kolejności naciśnięcia — każde wysłanie czeka na
+  poprzednie (wcześniej szły równolegle i pod obciążeniem mogły się wyprzedzić).
+
+### Testy
+
+- Test prawdziwej aplikacji z poleceniem PowerShella wpisywanym znak po znaku; testy logowania
+  w przeglądarce znają 4 kroki instrukcji Claude Code.
+
 ## 0.0.56 — 2026-10-15
 
 Zlecanie zadań przez Google Gemini (Antigravity) działa z prawdziwym narzędziem: Alfa czyta jego
