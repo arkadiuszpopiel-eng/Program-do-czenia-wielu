@@ -106,8 +106,31 @@ pub(crate) fn verdict(answer: &str) -> Option<bool> {
     } else if upper.contains(VERIFY_OK) {
         Some(true)
     } else {
-        None
+        loose_verdict(&upper)
     }
+}
+
+/// Znacznik z literówką lekkiego modelu („WERYFIKCJA: OK”, „WERYFIKACJA : BLAD”): słowo
+/// zaczynające się od `WERYF` na początku którejś linii, dwukropek, `OK` albo `BŁĄD`/`BLAD`.
+/// Bez tego poprawna odpowiedź szła do poprawki (próba obowiązków 2026-10-15).
+fn loose_verdict(upper: &str) -> Option<bool> {
+    upper.lines().find_map(|line| {
+        let line = line.trim_start_matches(|c: char| !c.is_alphabetic());
+        let (word, rest) = line.split_once(':')?;
+        let word = word.trim();
+        if !word.starts_with("WERYF") || word.chars().count() > 14 || word.contains(' ') {
+            return None;
+        }
+        let rest = rest.trim_start();
+        if rest.starts_with("OK") {
+            Some(true)
+        } else if rest.starts_with("BŁĄD") || rest.starts_with("BLAD") || rest.starts_with("BŁAD")
+        {
+            Some(false)
+        } else {
+            None
+        }
+    })
 }
 
 #[cfg(test)]
@@ -136,6 +159,21 @@ mod tests {
         assert_eq!(verdict("weryfikacja: ok — wszystko"), Some(true));
         assert_eq!(verdict("WERYFIKACJA: BŁĄD — brak pliku"), Some(false));
         assert_eq!(verdict("gotowe"), None);
+        // Literówki lekkiego modelu w znaczniku.
+        assert_eq!(
+            verdict(
+                "WERYFIkcja: OK
+
+**Przegląd**"
+            ),
+            Some(true)
+        );
+        assert_eq!(
+            verdict("**Weryfikacja** : błąd — brak kosztów"),
+            Some(false)
+        );
+        assert_eq!(verdict("WERYFIKACIA: BLAD — brak kosztów"), Some(false));
+        assert_eq!(verdict("Weryfikuj to: OK?"), None);
         assert_eq!(
             summary("a\n  b   c sk-ant-api03-ABCDEFGHIJKLMNOPQRS", 100),
             "a b c [ZREDAGOWANO]"

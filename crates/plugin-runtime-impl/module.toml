@@ -3,7 +3,7 @@
 # (komponenty WIT, bez WASI). Moduł nie żąda zdolności: operacje hosta dostają tokeny
 # Brokera wydane dla agentki, która wywołała narzędzie wtyczki.
 id = "plugin-runtime"
-version = "0.0.53"
+version = "0.0.54"
 kind = "service"
 provides = ["plugin-runtime-contract@1", "tools-common-contract@1"]
 requires = ["core-bus-contract@1", "safety-broker-contract@1"]

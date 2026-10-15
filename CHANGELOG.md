@@ -12,6 +12,17 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.54 — 2026-10-15
+
+Krytyczka na lekkim modelu lokalnym czasem pisze werdykt z literówką („WERYFIKCJA: OK”) — Alfa brała
+to za odrzucenie i niepotrzebnie zlecała poprawkę, co przy wolnym modelu wydłużało obowiązki o minuty.
+Teraz werdykt z drobną literówką albo w pogrubieniu jest rozpoznawany.
+
+### Testy
+
+- Werdykty z literówkami i w pogrubieniu Markdown; zdanie, które tylko przypomina werdykt, nadal nie
+  jest werdyktem.
+
 ## 0.0.53 — 2026-10-15
 
 Polecenia powłoki agentek, które według analizy pracują tylko w katalogu roboczym, działają teraz
