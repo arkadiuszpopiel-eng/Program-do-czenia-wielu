@@ -3,6 +3,9 @@
 //!
 //! Typy (wg opisu trybu bez okna Antigravity CLI 1.2; pola kroku do potwierdzenia na przypiętej
 //! wersji — dlatego kilka nazw zastępczych dla tych samych danych):
+//! Kształt z Antigravity CLI 1.2.11 (sprawdzony 2026-10-15 na prawdziwym narzędziu):
+//! `{"event": "<rodzaj>", "<rodzaj>": {…}}`, kroki z `step_index` i `state` (ACTIVE / DONE),
+//! czas w `duration_seconds`. Parser przyjmuje też płaski kształt z polem `type`.
 //! `init` (conversation_id, model), `step_update` (step_id, step_type: agent_response / tool /
 //! plan / thinking, status, text_delta, text, tool { name, input }, items), `result` (status
 //! SUCCESS / ERROR, response, conversation_id, usage, duration_ms).
@@ -89,6 +92,23 @@ fn failed(status: &str) -> bool {
     )
 }
 
+/// Dane zdarzenia: obiekt `value[kind]` (kształt Antigravity CLI 1.2) z dołożonym
+/// `conversation_id` z poziomu zdarzenia; płaski kształt — bez zmian.
+fn flatten(value: &Value, kind: &str) -> Value {
+    let Some(inner) = value.get(kind).and_then(Value::as_object) else {
+        return value.clone();
+    };
+    let mut merged = inner.clone();
+    for key in ["conversation_id", "conversationId"] {
+        if let Some(id) = value.get(key)
+            && !merged.contains_key(key)
+        {
+            merged.insert(key.to_owned(), id.clone());
+        }
+    }
+    Value::Object(merged)
+}
+
 impl AgyParser {
     /// Parser dla katalogu roboczego zadania.
     pub fn new(workdir: &Path) -> Self {
@@ -116,11 +136,13 @@ impl AgyParser {
             return out;
         };
         out.json = true;
-        match value
-            .get("type")
-            .and_then(Value::as_str)
+        // Antigravity CLI 1.2: `{"event": "step_update", "step_update": {…}}` (dane w obiekcie
+        // nazwanym jak zdarzenie; `conversation_id` czasem obok). Starszy kształt: płaskie `type`.
+        let kind = str_of(&value, &["type", "event"])
             .unwrap_or_default()
-        {
+            .to_owned();
+        let value = flatten(&value, &kind);
+        match kind.as_str() {
             "init" => self.init(&value, &mut out.events),
             "step_update" => self.step(&value, &mut out.events),
             "result" => {
@@ -156,9 +178,15 @@ impl AgyParser {
             self.session = Some(session.clone());
             events.push(AgentEvent::SessionStarted { session });
         }
-        let id = str_of(v, &["step_id", "stepId", "id"])
-            .unwrap_or_default()
-            .to_owned();
+        let id = str_of(v, &["step_id", "stepId", "id"]).map_or_else(
+            || {
+                v.get("step_index")
+                    .and_then(Value::as_u64)
+                    .map(|n| n.to_string())
+                    .unwrap_or_default()
+            },
+            str::to_owned,
+        );
         let status = str_of(v, &["status", "state"]).unwrap_or_default();
         match str_of(v, &["step_type", "stepType"]).unwrap_or_default() {
             "agent_response" | "response" | "message" => {
@@ -284,8 +312,16 @@ impl AgyParser {
             is_error: !status.eq_ignore_ascii_case("success"),
             subtype: Some(short(&status.to_ascii_lowercase())),
             session,
-            num_turns: None,
-            duration_ms: v.get("duration_ms").and_then(Value::as_u64),
+            num_turns: v
+                .get("num_turns")
+                .and_then(Value::as_u64)
+                .and_then(|n| u32::try_from(n).ok()),
+            duration_ms: v.get("duration_ms").and_then(Value::as_u64).or_else(|| {
+                v.get("duration_seconds")
+                    .and_then(Value::as_f64)
+                    .filter(|s| s.is_finite() && *s >= 0.0)
+                    .map(|s| (s * 1000.0).round() as u64)
+            }),
         });
     }
 }

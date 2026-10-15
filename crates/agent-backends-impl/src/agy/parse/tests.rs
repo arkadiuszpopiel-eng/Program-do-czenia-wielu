@@ -96,3 +96,72 @@ fn garbage_and_unknown_types_warn_without_failing() {
     assert!(p.line(r#"{"type":"result"}"#).result);
     assert!(!p.last_result().unwrap().is_error, "brak statusu = sukces");
 }
+
+/// Kształt z prawdziwego Antigravity CLI 1.2.11 (2026-10-15): dane w obiekcie zdarzenia,
+/// `step_index`, `state` ACTIVE / DONE, `duration_seconds`; tekst odpowiedzi z kolejnych `text_delta`.
+#[test]
+fn real_agy_1_2_shape() {
+    let (p, events) = parse_all(&[
+        r#"{"event":"init","conversation_id":"c-9","init":{"cwd":"C:\t","tools":["run_command"],"permission_mode":"default"}}"#,
+        r#"{"event":"step_update","step_update":{"conversation_id":"c-9","step_index":0,"state":"DONE","step_type":"user_input"}}"#,
+        r#"{"event":"step_update","step_update":{"conversation_id":"c-9","step_index":1,"state":"ACTIVE","step_type":"agent_response","text_delta":"Tak, "}}"#,
+        r#"{"event":"step_update","step_update":{"conversation_id":"c-9","step_index":1,"state":"DONE","step_type":"agent_response","text_delta":"działam.","duration_seconds":1.5,"usage":{"input_tokens":5,"output_tokens":3}}}"#,
+        r#"{"event":"result","result":{"conversation_id":"c-9","status":"SUCCESS","response":"Tak, działam.","duration_seconds":2.25,"num_turns":1,"usage":{"input_tokens":5,"output_tokens":3,"cache_read_tokens":2}}}"#,
+    ]);
+    assert!(matches!(&events[0], AgentEvent::SessionStarted { session } if session.id == "c-9"));
+    assert!(
+        !events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::Warning { .. })),
+        "{events:?}"
+    );
+    let partial: Vec<&str> = events
+        .iter()
+        .filter_map(|e| match e {
+            AgentEvent::Output {
+                text,
+                partial: true,
+                ..
+            } => Some(text.as_str()),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(partial, ["Tak, ", "działam."]);
+    assert!(events.iter().any(
+        |e| matches!(e, AgentEvent::Output { text, partial: false, .. } if text == "Tak, działam.")
+    ));
+    assert!(events.iter().any(|e| matches!(e, AgentEvent::Usage { usage, .. } if usage.output_tokens == 3 && usage.cache_read_tokens == 2)));
+    let r = p.last_result().unwrap();
+    assert_eq!(r.text, "Tak, działam.");
+    assert!(!r.is_error);
+    assert_eq!(r.duration_ms, Some(2250));
+    assert_eq!(r.num_turns, Some(1));
+    assert_eq!(r.session.as_ref().unwrap().id, "c-9");
+}
+
+/// Prawdziwe wyjście `agy` z pliku (`AGY_SAMPLE=<plik.ndjson>`): uruchamiane ręcznie, bez danych
+/// w repozytorium.
+#[test]
+#[ignore = "wymaga zapisu z prawdziwego agy"]
+fn real_agy_sample_from_file() {
+    let Ok(path) = std::env::var("AGY_SAMPLE") else {
+        return;
+    };
+    let text = std::fs::read_to_string(path).unwrap();
+    let lines: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
+    let (p, events) = parse_all(&lines);
+    assert!(
+        !events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::Warning { .. })),
+        "{events:?}"
+    );
+    let r = p.last_result().expect("wynik");
+    assert!(!r.is_error && !r.text.is_empty());
+    assert!(r.session.is_some());
+    eprintln!(
+        "odpowiedź: {} znaków, {} zdarzeń",
+        r.text.chars().count(),
+        events.len()
+    );
+}

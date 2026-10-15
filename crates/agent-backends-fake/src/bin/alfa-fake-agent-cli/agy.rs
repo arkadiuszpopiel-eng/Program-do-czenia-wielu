@@ -6,7 +6,32 @@ use std::time::Duration;
 use agent_backends_contract::contract_tests::scenario::{Scenario, permission_result};
 use serde_json::{Value, json};
 
-use crate::io::{emit, env_names, now_ms, raw, spawn_grandchild};
+use crate::io::{env_names, now_ms, raw, spawn_grandchild};
+
+/// Zdarzenie w kształcie Antigravity CLI 1.2.11: `{"event": t, t: {…}}` (pole `type` z opisu
+/// przenoszone do `event`, reszta do obiektu zdarzenia; `conversation_id` także obok).
+fn emit(v: &Value) {
+    let mut inner = v.as_object().cloned().unwrap_or_default();
+    let kind = inner
+        .remove("type")
+        .and_then(|t| t.as_str().map(str::to_owned))
+        .unwrap_or_default();
+    let mut outer = serde_json::Map::new();
+    outer.insert("event".into(), Value::String(kind.clone()));
+    if let Some(id) = inner.get("conversation_id").cloned() {
+        outer.insert("conversation_id".into(), id);
+    }
+    if kind == "step_update"
+        && let Some(status) = inner.remove("status")
+    {
+        inner.insert(
+            "state".into(),
+            Value::String(status.as_str().unwrap_or_default().to_uppercase()),
+        );
+    }
+    outer.insert(kind, Value::Object(inner));
+    crate::io::emit(&Value::Object(outer));
+}
 
 fn arg_value<'a>(args: &'a [String], flag: &str) -> Option<&'a str> {
     args.iter()

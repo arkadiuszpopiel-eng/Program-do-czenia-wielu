@@ -12,6 +12,23 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.56 — 2026-10-15
+
+Zlecanie zadań przez Google Gemini (Antigravity) działa z prawdziwym narzędziem: Alfa czyta jego
+odpowiedzi w formacie sprawdzonym na Twoim koncie. Wcześniejsza wersja zakładała inny układ zdarzeń
+i nie odczytałaby wyniku zadania.
+
+### Antigravity
+
+- [poważne] Odczyt odpowiedzi `agy` zgodny z Antigravity CLI 1.2.11 (zdarzenia `init`, `step_update`,
+  `result` w obiektach, kroki z numerem i stanem ACTIVE / DONE, czas w sekundach) — sprawdzony
+  jednym krótkim pytaniem na koncie Google AI Pro, w pustym folderze i w piaskownicy.
+
+### Testy
+
+- Parser na dokładnym kształcie prawdziwego wyjścia i na zapisie z prawdziwego `agy`; fałszywe `agy`
+  w testach mostu wysyła ten sam kształt.
+
 ## 0.0.55 — 2026-10-15
 
 Logowanie do narzędzi z kontem (Claude Code, Codex, Google Gemini przez Antigravity) prowadzi teraz

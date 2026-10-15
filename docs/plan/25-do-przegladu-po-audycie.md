@@ -85,8 +85,8 @@ automatyczne zgody, harmonogram bez zgody, czytanie `~/.agy` i `~/.gemini`. Stat
 Google — ryzyko konta ponosi właściciel; karta to mówi. Rejestr jest polityką bezpieczeństwa — zmiana czeka
 na podpis.
 
-Do potwierdzenia na prawdziwym `agy`: kształt zdarzeń `stream-json` (parser jest tolerancyjny, pola przyjęte
-z opisu trybu bez okna); Alfa nie wywołała modelu na koncie właściciela.
+Kształt zdarzeń `stream-json` potwierdzony na prawdziwym `agy` 1.2.11 (2026-10-15, za zgodą właściciela,
+jedno krótkie pytanie) — parser poprawiony w 0.0.56.
 
 ### 4. Budżet renderowania Markdown (ADR 0009)
 
