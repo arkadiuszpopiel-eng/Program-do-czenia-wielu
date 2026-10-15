@@ -46,6 +46,8 @@ struct Shared {
     closed: AtomicBool,
     filter: Arc<dyn EgressFilter>,
     blocked: Mutex<Vec<String>>,
+    /// Wpisy konsoli i błędy skryptów — osobno od zdarzeń, żeby ruch sieciowy ich nie wypchnął.
+    console: Mutex<VecDeque<Event>>,
 }
 
 fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -138,6 +140,21 @@ impl Shared {
             "Target.attachedToTarget" => self.on_attached(&msg["params"]),
             _ => {}
         }
+        if matches!(
+            method.as_str(),
+            "Runtime.consoleAPICalled" | "Runtime.exceptionThrown" | "Log.entryAdded"
+        ) {
+            let mut c = lock(&self.console);
+            if c.len() >= platform_apps_contract::MAX_CONSOLE_ENTRIES {
+                c.pop_front();
+            }
+            c.push_back(Event {
+                method,
+                params: msg["params"].clone(),
+                session,
+            });
+            return;
+        }
         let mut q = lock(&self.events);
         if q.len() >= MAX_EVENTS {
             q.pop_front();
@@ -221,6 +238,7 @@ impl Cdp {
             closed: AtomicBool::new(false),
             filter,
             blocked: Mutex::new(Vec::new()),
+            console: Mutex::new(VecDeque::new()),
         });
         let s = shared.clone();
         std::thread::Builder::new()
@@ -300,6 +318,22 @@ impl Cdp {
         let (taken, kept): (Vec<Event>, Vec<Event>) = q.drain(..).partition(|e| pred(e));
         q.extend(kept);
         taken
+    }
+
+    /// Wpisy konsoli sesji od ostatniego odczytu (najstarsze pierwsze, najwyżej `max`).
+    pub(crate) fn take_console(&self, session: &str, max: usize) -> Vec<Event> {
+        let mut c = lock(&self.shared.console);
+        let mut out = Vec::new();
+        let mut kept = VecDeque::with_capacity(c.len());
+        for e in c.drain(..) {
+            if out.len() < max && e.session.as_deref() == Some(session) {
+                out.push(e);
+            } else {
+                kept.push_back(e);
+            }
+        }
+        *c = kept;
+        out
     }
 
     /// Hosty zablokowane od ostatniego wywołania.

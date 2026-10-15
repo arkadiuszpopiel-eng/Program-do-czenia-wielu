@@ -7,8 +7,9 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use platform_apps_contract::{
-    BrowserError, BrowserPort, BrowserSessionId, BrowserSpec, DownloadInfo, EgressFilter, PageInfo,
-    PageNode, PageSnapshot, check_navigation_url, chromium_args, request_allowed, url_host,
+    BrowserError, BrowserKey, BrowserPort, BrowserSessionId, BrowserSpec, ConsoleEntry,
+    DownloadInfo, EgressFilter, HistoryNav, PageInfo, PageNode, PageSnapshot, check_navigation_url,
+    chromium_args, request_allowed, url_host,
 };
 
 /// Element strony.
@@ -26,6 +27,8 @@ pub struct FakeNode {
     pub href: Option<String>,
     /// Pobranie po kliknięciu: (adres, nazwa, rozmiar).
     pub download: Option<(String, String, u64)>,
+    /// Opcje listy wyboru (`combobox` / `listbox`).
+    pub options: Vec<String>,
 }
 
 impl FakeNode {
@@ -50,9 +53,19 @@ pub struct FakePage {
     pub nodes: Vec<FakeNode>,
     /// Zasoby ładowane przy otwarciu (skrypty, obrazy, śledzenie).
     pub resources: Vec<String>,
+    /// Wpisy konsoli po otwarciu strony (np. błąd skryptu).
+    pub console: Vec<platform_apps_contract::ConsoleEntry>,
 }
 
+#[path = "browser_ext.rs"]
+mod ext;
+
+pub use ext::ActionLog;
+
 struct Session {
+    back: Vec<String>,
+    forward: Vec<String>,
+    console: Vec<platform_apps_contract::ConsoleEntry>,
     filter: Arc<dyn EgressFilter>,
     spec: BrowserSpec,
     url: String,
@@ -68,6 +81,7 @@ struct State {
     launches: Vec<Vec<String>>,
     network: Vec<(String, bool)>,
     typed: Vec<(u32, String)>,
+    actions: Vec<String>,
     quarantine: Vec<(PathBuf, u64)>,
 }
 
@@ -118,6 +132,11 @@ impl FakeBrowser {
         self.lock().quarantine.clone()
     }
 
+    /// Dziennik nowych operacji (przewinięcia, klawisze, wybory, historia).
+    pub fn actions(&self) -> ActionLog {
+        ActionLog(self.lock().actions.clone())
+    }
+
     /// Otwarte sesje.
     pub fn open_sessions(&self) -> usize {
         self.lock().sessions.len()
@@ -165,7 +184,19 @@ fn go(s: &mut State, id: BrowserSessionId, url: &str) -> Result<(), BrowserError
     if !request(s, id, url)? {
         return Ok(());
     }
+    let sess = session(s, id)?;
+    if sess.url != "about:blank" && sess.url != url {
+        let prev = std::mem::replace(&mut sess.url, url.to_owned());
+        sess.back.push(prev);
+        sess.forward.clear();
+    }
     session(s, id)?.url = url.to_owned();
+    let console = s
+        .pages
+        .get(url)
+        .map(|p| p.console.clone())
+        .unwrap_or_default();
+    session(s, id)?.console.extend(console);
     let resources = s
         .pages
         .get(url)
@@ -205,6 +236,9 @@ impl BrowserPort for FakeBrowser {
         s.sessions.insert(
             id,
             Session {
+                back: Vec::new(),
+                forward: Vec::new(),
+                console: Vec::new(),
                 filter: egress,
                 spec: spec.clone(),
                 url: "about:blank".into(),
@@ -304,6 +338,40 @@ impl BrowserPort for FakeBrowser {
         let mut s = self.lock();
         session(&mut s, id)?;
         Ok(b"\x89PNG\r\n\x1a\nATRAPA".to_vec())
+    }
+
+    fn scroll(
+        &self,
+        id: BrowserSessionId,
+        n: Option<u32>,
+        dy: i32,
+    ) -> Result<PageInfo, BrowserError> {
+        ext::scroll(&mut self.lock(), id, n, dy)
+    }
+
+    fn press_key(&self, id: BrowserSessionId, key: BrowserKey) -> Result<PageInfo, BrowserError> {
+        ext::press_key(&mut self.lock(), id, key)
+    }
+
+    fn select_option(
+        &self,
+        id: BrowserSessionId,
+        n: u32,
+        v: &str,
+    ) -> Result<PageInfo, BrowserError> {
+        ext::select_option(&mut self.lock(), id, n, v)
+    }
+
+    fn history(&self, id: BrowserSessionId, nav: HistoryNav) -> Result<PageInfo, BrowserError> {
+        ext::history(&mut self.lock(), id, nav)
+    }
+
+    fn has_text(&self, id: BrowserSessionId, text: &str) -> Result<bool, BrowserError> {
+        ext::has_text(&mut self.lock(), id, text)
+    }
+
+    fn console(&self, id: BrowserSessionId, max: usize) -> Result<Vec<ConsoleEntry>, BrowserError> {
+        ext::console(&mut self.lock(), id, max)
     }
 
     fn close(&self, id: BrowserSessionId) -> Result<(), BrowserError> {

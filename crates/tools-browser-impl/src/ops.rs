@@ -23,6 +23,9 @@ use crate::session::{Browsing, HostAllow, Sessions};
 /// Wynik pośredni (`Err` = gotowy wynik dla modelu).
 pub(crate) type Step<T> = Result<T, Box<ToolOutcome>>;
 
+#[path = "ops_ext.rs"]
+mod ext;
+
 pub(crate) struct Core {
     pub(crate) browser: Arc<dyn BrowserPort>,
     pub(crate) gate: BrokerGate,

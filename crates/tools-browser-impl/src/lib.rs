@@ -124,10 +124,23 @@ impl Tool for BrowserTool {
             );
         }
         let (core, m) = (&self.core, &self.manifest);
+        // Ta sama walidacja co w atrapie (limity kontraktu), zanim cokolwiek trafi do Brokera.
+        if let Err(e) = tools_browser_contract::check_args(&m.name, &args) {
+            return ToolOutcome::failed(
+                ToolErrorKind::InvalidArgs,
+                format!("Niepoprawne argumenty: {e}. Popraw je zgodnie ze schematem narzędzia."),
+            );
+        }
         let r = match m.name.as_str() {
             "browser_open" => core.open(args, ctx, m).await,
             "browser_read" => core.read(args, ctx).await,
             "browser_screenshot" => core.screenshot(args, ctx).await,
+            "browser_scroll" => core.scroll(args, ctx).await,
+            "browser_key" => core.key(args, ctx, m).await,
+            "browser_select" => core.select(args, ctx, m).await,
+            "browser_nav" => core.nav(args, ctx, m).await,
+            "browser_wait" => core.wait(args, ctx).await,
+            "browser_console" => core.console(args, ctx).await,
             "browser_close" => {
                 match tools_common_contract::parse_args::<tools_browser_contract::CloseArgs>(args) {
                     Ok(_) => Ok(core.close(ctx).await),

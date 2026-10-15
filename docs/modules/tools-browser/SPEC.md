@@ -12,6 +12,9 @@ browser_open { url, extra_hosts? } → PageOut { url, title, blocked_hosts, down
 browser_read { max_nodes?, max_chars? } → ReadOutput { page, nodes: [NodeOut{node,depth,role,name,value?,password}], text, truncated }
 browser_click { node } → PageOut          browser_type { node, text, submit? } → PageOut
 browser_screenshot { max_side? } → obraz PNG     browser_close {} → zamknięcie, zgody hostów wygasają
+browser_scroll { node? | pixels? } → PageOut (odczyt)      browser_wait { text, timeout_ms? ≤ 30 000 } → WaitOut { found, waited_ms }
+browser_key { key: enter|tab|shift_tab|escape|… } → PageOut   browser_select { node, value } → PageOut (`<select>`, wartość albo tekst)
+browser_nav { action: back|forward|reload } → PageOut        browser_console { max?, errors_only? } → ConsoleOut { entries, errors }
 pub struct BrowserTools; impl BrowserTools { pub fn new(BrowserToolsDeps { browser: BrowserPort, broker, spec, deny, env, config, bus });
                                              pub fn close_all(&self) -> usize /* kill-switch */ }
 ```
@@ -51,3 +54,12 @@ RAM ≤ 16 MB w procesie Alfy (przeglądarka osobno); ≤ 32 hosty na sesję; wy
 ## Otwarte pytania
 - Ruch poza domeną `Fetch` (WebRTC, WebTransport) — lokalne proxy egressu w helperze (v2).
 - Sesje zalogowane za zgodą (osobny profil per serwis) i rozszerzenie Alfy — THREAT_MODEL §11.
+
+## C6.4 (2026-10-15) — praca ze stronami i testowanie pisanych stron
+Klawisz, wybór z listy i nawigacja w historii mogą wysłać dane do hosta strony — zgoda Brokera
+`net.egress(host bieżącej strony)` przy każdym wywołaniu (jak kliknięcie). Przewijanie, czekanie na
+tekst i konsola tylko czytają (wynik niezaufany, sekrety redagowane). Konsola: `Runtime.consoleAPICalled`,
+`Runtime.exceptionThrown` (z wierszem), `Log.entryAdded` (błędy zasobów) — osobny bufor 500 wpisów na
+połączenie, odczyt opróżnia. Wybór opcji: funkcja na elemencie `<select>` wskazanym węzłem dostępności
+(zdarzenia `input`/`change`); inne listy — kliknięcie. Wspólna walidacja argumentów (`check_args`) w
+`-impl` i `-fake`. Test na prawdziwym Edge z lokalnym serwerem HTTP: `tests/live_browser_ext.rs`.

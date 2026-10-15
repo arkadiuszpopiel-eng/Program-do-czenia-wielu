@@ -12,6 +12,7 @@ repository.workspace = true
 # limicie 8 000 na crate (AGENTS.md). Implementacja Windows: `platform-windows-office-impl`.
 [dependencies]
 platform-contract.workspace = true
+schemars.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

@@ -59,6 +59,7 @@ fn web() -> Arc<FakeBrowser> {
                 FakeNode { href: Some("https://sklep.pl/szukaj".into()), ..FakeNode::new("textbox", "Szukaj") },
             ],
             resources: vec!["https://cdn.sklep.pl/app.js".into(), "https://tracker.example/t.gif".into()],
+            console: Vec::new(),
         },
     );
     b.add_page(

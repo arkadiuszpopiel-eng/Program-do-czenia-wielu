@@ -26,6 +26,9 @@ const SKIPPED_ROLES: [&str; 6] = [
 /// Role pól tekstowych (sprawdzane pod kątem haseł).
 const TEXT_ROLES: [&str; 4] = ["textbox", "searchbox", "combobox", "spinbutton"];
 
+#[path = "page_ext.rs"]
+mod ext;
+
 /// Strona (jedna karta) z połączeniem.
 pub(crate) struct Page {
     pub(crate) cdp: Cdp,
@@ -90,6 +93,8 @@ impl Page {
         cdp.send("Target.setAutoAttach", auto_attach(), s)?;
         cdp.send("Page.enable", json!({}), s)?;
         let _ = cdp.send("Accessibility.enable", json!({}), s);
+        let _ = cdp.send("Runtime.enable", json!({}), s);
+        let _ = cdp.send("Log.enable", json!({}), s);
         let _ = cdp.send("Runtime.runIfWaitingForDebugger", json!({}), s);
         Ok(Self {
             cdp,

@@ -242,6 +242,7 @@ fn browser_egress_quarantine_and_passwords() {
                 "https://cdn.tracker.net/t.js".into(),
                 "data:image/png,x".into(),
             ],
+            console: Vec::new(),
         },
     );
     // Profil przeglądarki użytkownika (Linux i Windows) — odmowa, zanim cokolwiek się uruchomi.

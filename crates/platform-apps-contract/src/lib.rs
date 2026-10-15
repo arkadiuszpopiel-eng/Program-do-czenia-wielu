@@ -17,6 +17,8 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod browser;
+mod browser_ext;
+mod browser_url;
 mod cells;
 mod edit;
 mod office;
@@ -31,6 +33,10 @@ pub use browser::{
     DownloadInfo, EgressFilter, MAX_TYPE_CHARS, MAX_URL_LEN, PageInfo, PageNode, PageSnapshot,
     check_navigation_url, chromium_args, is_local_url, is_user_browser_profile,
     profile_preferences, request_allowed, url_host,
+};
+pub use browser_ext::{
+    BrowserKey, ConsoleEntry, ConsoleLevel, HistoryNav, MAX_CONSOLE_ENTRIES, MAX_CONSOLE_TEXT,
+    MAX_SCROLL_PX, MAX_WAIT_MS, console_level,
 };
 pub use cells::{
     cell_name, check_formula, check_sheet_name, is_allowed_function, parse_cell, parse_range,

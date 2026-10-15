@@ -218,58 +218,7 @@ pub fn profile_preferences(quarantine: &Path) -> serde_json::Value {
     })
 }
 
-/// Host z adresu sieciowego (`http`, `https`, `ws`, `wss`), małymi literami, bez portu.
-/// `None` dla schematów bez sieci albo niepoprawnych adresów.
-pub fn url_host(url: &str) -> Option<String> {
-    let (scheme, rest) = url.trim().split_once("://")?;
-    if !matches!(
-        scheme.to_ascii_lowercase().as_str(),
-        "http" | "https" | "ws" | "wss"
-    ) {
-        return None;
-    }
-    // Jak WHATWG URL dla schematów specjalnych: `\` to separator ścieżki (ten sam host co Chromium).
-    let rest = rest.replace('\\', "/");
-    let authority = rest.split(['/', '?', '#']).next()?;
-    let host_port = authority.rsplit('@').next()?;
-    let host = if let Some(v6) = host_port.strip_prefix('[') {
-        v6.split(']').next()?.to_owned()
-    } else {
-        host_port.split(':').next()?.to_owned()
-    };
-    let host = host.trim_end_matches('.').to_ascii_lowercase();
-    (!host.is_empty()).then_some(host)
-}
-
-/// Czy żądanie nie wychodzi do sieci (`data:`, `blob:`, `about:blank`).
-pub fn is_local_url(url: &str) -> bool {
-    let u = url.trim().to_ascii_lowercase();
-    u.starts_with("data:") || u.starts_with("blob:") || u == "about:blank"
-}
-
-/// Adres nawigacji od agentki: tylko `http`/`https`, z hostem, bez danych logowania w URL.
-pub fn check_navigation_url(url: &str) -> Result<String, BrowserError> {
-    let u = url.trim();
-    let lower = u.to_ascii_lowercase();
-    if u.len() > MAX_URL_LEN || u.chars().any(char::is_control) {
-        return Err(BrowserError::Policy("niepoprawny adres".into()));
-    }
-    if !(lower.starts_with("http://") || lower.starts_with("https://")) {
-        return Err(BrowserError::Policy(
-            "dozwolone tylko adresy http:// i https://".into(),
-        ));
-    }
-    let normalized = u.replace('\\', "/");
-    let authority = normalized
-        .split_once("://")
-        .map_or("", |(_, r)| r.split(['/', '?', '#']).next().unwrap_or(""));
-    if authority.contains('@') {
-        return Err(BrowserError::Policy(
-            "adres z danymi logowania jest zablokowany".into(),
-        ));
-    }
-    url_host(u).ok_or_else(|| BrowserError::Policy("adres bez hosta".into()))
-}
+pub use crate::browser_url::{check_navigation_url, is_local_url, url_host};
 
 /// Filtr egressu przeglądarki: decyzja dla każdego żądania sieciowego (host zatwierdzony przez
 /// Brokera). Wołany synchronicznie z wątku protokołu — bez blokowania.
@@ -382,4 +331,38 @@ pub trait BrowserPort: Send + Sync {
     -> Result<Vec<u8>, BrowserError>;
     /// Zamyka przeglądarkę (całe drzewo procesów).
     fn close(&self, session: BrowserSessionId) -> Result<(), BrowserError>;
+    /// Przewija stronę o `delta_y` px (dodatnie — w dół) albo do węzła (`node`).
+    fn scroll(
+        &self,
+        session: BrowserSessionId,
+        node: Option<u32>,
+        delta_y: i32,
+    ) -> Result<PageInfo, BrowserError>;
+    /// Naciska klawisz specjalny w elemencie z fokusem.
+    fn press_key(
+        &self,
+        session: BrowserSessionId,
+        key: crate::BrowserKey,
+    ) -> Result<PageInfo, BrowserError>;
+    /// Wybiera opcję listy (`<select>`) po wartości albo widocznym tekście.
+    fn select_option(
+        &self,
+        session: BrowserSessionId,
+        node: u32,
+        value: &str,
+    ) -> Result<PageInfo, BrowserError>;
+    /// Wstecz / dalej / odśwież.
+    fn history(
+        &self,
+        session: BrowserSessionId,
+        nav: crate::HistoryNav,
+    ) -> Result<PageInfo, BrowserError>;
+    /// Czy tekst strony zawiera `text` (bez rozróżniania wielkości liter).
+    fn has_text(&self, session: BrowserSessionId, text: &str) -> Result<bool, BrowserError>;
+    /// Wpisy konsoli i błędy skryptów od ostatniego odczytu (najwyżej `max`, najstarsze pierwsze).
+    fn console(
+        &self,
+        session: BrowserSessionId,
+        max: usize,
+    ) -> Result<Vec<crate::ConsoleEntry>, BrowserError>;
 }

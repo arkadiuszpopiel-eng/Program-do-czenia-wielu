@@ -15,8 +15,9 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
 use platform_apps_contract::{
-    BROWSER_CALL_TIMEOUT_MS, BrowserError, BrowserPort, BrowserSessionId, BrowserSpec,
-    EgressFilter, MAX_TYPE_CHARS, PageInfo, PageSnapshot, check_navigation_url, chromium_args,
+    BROWSER_CALL_TIMEOUT_MS, BrowserError, BrowserKey, BrowserPort, BrowserSessionId, BrowserSpec,
+    ConsoleEntry, EgressFilter, HistoryNav, MAX_TYPE_CHARS, PageInfo, PageSnapshot,
+    check_navigation_url, chromium_args,
 };
 
 #[cfg(windows)]
@@ -230,6 +231,55 @@ impl BrowserPort for CdpBrowser {
         max_side: u32,
     ) -> Result<Vec<u8>, BrowserError> {
         self.session(session)?.page.screenshot(max_side)
+    }
+
+    fn scroll(
+        &self,
+        session: BrowserSessionId,
+        node: Option<u32>,
+        delta_y: i32,
+    ) -> Result<PageInfo, BrowserError> {
+        self.session(session)?.page.scroll(node, delta_y)
+    }
+
+    fn press_key(
+        &self,
+        session: BrowserSessionId,
+        key: BrowserKey,
+    ) -> Result<PageInfo, BrowserError> {
+        self.session(session)?.page.press_key(key)
+    }
+
+    fn select_option(
+        &self,
+        session: BrowserSessionId,
+        node: u32,
+        value: &str,
+    ) -> Result<PageInfo, BrowserError> {
+        if value.trim().is_empty() || value.chars().count() > 500 {
+            return Err(BrowserError::Policy("wartość pusta albo za długa".into()));
+        }
+        self.session(session)?.page.select_option(node, value)
+    }
+
+    fn history(
+        &self,
+        session: BrowserSessionId,
+        nav: HistoryNav,
+    ) -> Result<PageInfo, BrowserError> {
+        self.session(session)?.page.history(nav)
+    }
+
+    fn has_text(&self, session: BrowserSessionId, text: &str) -> Result<bool, BrowserError> {
+        self.session(session)?.page.has_text(text)
+    }
+
+    fn console(
+        &self,
+        session: BrowserSessionId,
+        max: usize,
+    ) -> Result<Vec<ConsoleEntry>, BrowserError> {
+        Ok(self.session(session)?.page.console(max))
     }
 
     fn close(&self, session: BrowserSessionId) -> Result<(), BrowserError> {

@@ -50,7 +50,8 @@ pub fn check_args(tool: &str, args: &serde_json::Value) -> Result<(), String> {
         "browser_close" => serde_json::from_value::<CloseArgs>(v)
             .map(|_| ())
             .map_err(e),
-        other => Err(format!("nieznane narzędzie {other}")),
+        other => crate::ext::check_ext(other, v)
+            .unwrap_or_else(|| Err(format!("nieznane narzędzie {other}"))),
     }
 }
 
@@ -60,7 +61,7 @@ pub fn sample_args(tool: &str) -> serde_json::Value {
         "browser_open" => serde_json::json!({"url": "https://example.com/"}),
         "browser_click" => serde_json::json!({"node": 1}),
         "browser_type" => serde_json::json!({"node": 1, "text": "szukaj"}),
-        _ => serde_json::json!({}),
+        other => crate::ext::sample_ext(other).unwrap_or_else(|| serde_json::json!({})),
     }
 }
 
