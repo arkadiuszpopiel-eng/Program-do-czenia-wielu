@@ -30,7 +30,7 @@ async function palette(page: Page, command: string) {
 }
 
 const agentMessage = (page: Page) =>
-  page.getByRole('article').filter({ hasNot: page.getByText('Twoja wiadomość') }).last();
+  page.getByRole('article', { name: /^Wiadomość agentki/ }).last();
 
 test('instrukcja: działy, treść i wyszukiwanie', async ({ page }) => {
   await open(page);
@@ -47,7 +47,7 @@ test('instrukcja: działy, treść i wyszukiwanie', async ({ page }) => {
 
 test('Tablica: przypięcie z menu wiadomości, kopia, odpięcie', async ({ page }) => {
   await open(page);
-  const message = page.getByRole('article', { name: /^Odpowiedź/ }).last();
+  const message = agentMessage(page);
   await message.hover();
   await message.getByRole('button', { name: 'Więcej akcji' }).click();
   await page.getByRole('menuitem', { name: 'Przypnij do tablicy' }).click();
