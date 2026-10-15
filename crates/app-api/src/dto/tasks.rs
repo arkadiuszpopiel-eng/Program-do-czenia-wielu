@@ -154,6 +154,14 @@ pub struct TriggerInfo {
     pub respect_dnd: bool,
     /// Obserwacja katalogów niedostępna na tej platformie (wyzwalacz plikowy tylko ręcznie).
     pub watch_unavailable: bool,
+    /// Zadanie startuje tylko, gdy komputer jest bezczynny (C2.7).
+    pub only_when_idle: bool,
+    /// Budżet zadania: najwięcej kroków.
+    pub max_steps: u32,
+    /// Budżet zadania: najdłuższy czas wykonania (minuty).
+    pub max_minutes: u32,
+    /// Budżet zadania: najwyższy koszt (mikro-PLN); `None` — bez limitu zadania.
+    pub max_cost_micro_pln: Option<u64>,
 }
 
 /// Nowy wyzwalacz (właściciel = użytkownik).
@@ -166,6 +174,18 @@ pub struct TriggerDraft {
     pub agent: Option<String>,
     pub bridge: Option<String>,
     pub respect_dnd: bool,
+    /// Tylko, gdy komputer jest bezczynny (C2.7).
+    #[serde(default)]
+    pub only_when_idle: bool,
+    /// Najwięcej kroków zadania (`None` — domyślnie; i tak w granicach polityki Marszałka).
+    #[serde(default)]
+    pub max_steps: Option<u32>,
+    /// Najdłuższy czas zadania w minutach (`None` — domyślnie).
+    #[serde(default)]
+    pub max_minutes: Option<u32>,
+    /// Najwyższy koszt zadania (mikro-PLN; `None` — bez limitu zadania).
+    #[serde(default)]
+    pub max_cost_micro_pln: Option<u64>,
 }
 
 /// Wpis dziennika uruchomień.

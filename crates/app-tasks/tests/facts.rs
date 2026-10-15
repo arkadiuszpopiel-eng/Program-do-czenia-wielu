@@ -55,6 +55,10 @@ fn trigger(name: &str, enabled: bool) -> TriggerInfo {
         "tz": "Europe/Warsaw", "next_fire_at": null, "last_fire_at": null, "fired": 0,
         "suppressed": 0, "deferred_until": null, "respect_dnd": false,
         "watch_unavailable": false,
+        "only_when_idle": false,
+        "max_steps": 50,
+        "max_minutes": 60,
+        "max_cost_micro_pln": null,
     });
     serde_json::from_value(value).unwrap_or_else(|e| panic!("wyzwalacz testowy: {e}"))
 }

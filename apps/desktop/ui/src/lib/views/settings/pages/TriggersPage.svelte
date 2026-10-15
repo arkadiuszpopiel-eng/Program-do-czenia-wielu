@@ -90,6 +90,20 @@
   }
 
   const nameOf = (id: string): string => triggers.find((x) => x.id === id)?.name ?? id;
+
+  /** Budżet i warunek bezczynności jednym wierszem. */
+  function budget(trg: TriggerInfo): string {
+    const parts = [
+      t('triggers.budgetSteps', { n: trg.max_steps }),
+      t('triggers.budgetMinutes', { n: trg.max_minutes }),
+    ];
+    if (trg.max_cost_micro_pln !== null) {
+      const minor = Math.round(trg.max_cost_micro_pln / 10_000);
+      parts.push(t('triggers.budgetCost', { cost: app.i18n.money({ minor, currency: 'PLN' }) }));
+    }
+    if (trg.only_when_idle) parts.push(t('triggers.budgetIdle'));
+    return parts.join(' · ');
+  }
 </script>
 
 <section class="card" aria-labelledby="trg-title">
@@ -122,6 +136,7 @@
             · {t('triggers.stats', { fired: trg.fired, suppressed: trg.suppressed })}
           </p>
           <p class="goal">{trg.goal}</p>
+          <p class="meta">{budget(trg)}</p>
           <TriggerLastRun run={last.get(trg.id)} triggerId={trg.id} />
           {#if trg.watch_unavailable}<p class="note">{t('triggers.watchUnavailable')}</p>{/if}
           <div class="actions">

@@ -58,6 +58,10 @@ fn draft(name: &str, kind: TriggerKindView, bridge: Option<&str>) -> TriggerDraf
         agent: None,
         bridge: bridge.map(str::to_owned),
         respect_dnd: false,
+        only_when_idle: false,
+        max_steps: None,
+        max_minutes: None,
+        max_cost_micro_pln: None,
     }
 }
 

@@ -116,6 +116,10 @@ export class FakeTasks {
       deferred_until: null,
       respect_dnd: true,
       watch_unavailable: kind.kind === 'file_in_dir',
+      only_when_idle: false,
+      max_steps: 50,
+      max_minutes: 60,
+      max_cost_micro_pln: null,
     };
   }
 
@@ -281,6 +285,10 @@ export class FakeTasks {
           agent: draft.agent,
           bridge: draft.bridge,
           respect_dnd: draft.respect_dnd,
+          only_when_idle: draft.only_when_idle,
+          max_steps: Math.min(500, Math.max(1, draft.max_steps ?? 50)),
+          max_minutes: Math.min(1440, Math.max(1, draft.max_minutes ?? 60)),
+          max_cost_micro_pln: draft.max_cost_micro_pln,
         };
         this.triggers.push(created);
         return core.reply(created);

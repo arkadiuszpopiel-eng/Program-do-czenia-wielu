@@ -89,6 +89,10 @@ export async function runWork(
     agent: 'beta',
     bridge: null,
     respect_dnd: true,
+    only_when_idle: false,
+    max_steps: null,
+    max_minutes: null,
+    max_cost_micro_pln: null,
   })) as { id: string };
   await both('triggers', 'setEnabled', created.id, false);
   await both('triggers', 'fireNow', 'porzadki');

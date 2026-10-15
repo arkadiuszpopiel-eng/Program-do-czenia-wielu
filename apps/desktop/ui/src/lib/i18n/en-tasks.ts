@@ -82,6 +82,17 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'triggers.agent': 'Agent',
   'triggers.agentAny': 'Any',
   'triggers.dnd': 'Respect “do not disturb”',
+  'triggers.idle': 'Only when the computer is idle',
+  'triggers.budget': 'Task budget',
+  'triggers.budgetHint':
+    'Empty field — default value. Limits never exceed the policy in Settings → Marshal.',
+  'triggers.maxSteps': 'Most steps',
+  'triggers.maxMinutes': 'Longest (minutes)',
+  'triggers.maxCost': 'Highest cost (PLN)',
+  'triggers.budgetSteps': 'up to {n} steps',
+  'triggers.budgetMinutes': 'up to {n} min',
+  'triggers.budgetCost': 'up to {cost}',
+  'triggers.budgetIdle': 'only when idle',
   'triggers.preview': 'Next runs',
   'duty.title': 'Ready-made daily duties',
   'duty.hint':

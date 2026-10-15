@@ -118,6 +118,10 @@ async fn triggers_never_start_a_bridge() {
         agent: Some("delta".into()),
         bridge: Some("claude_code".into()),
         respect_dnd: false,
+        only_when_idle: false,
+        max_steps: None,
+        max_minutes: None,
+        max_cost_micro_pln: None,
     };
     let event = draft(TriggerKindView::FileInDir {
         dir: "C:\\Pobrane".into(),

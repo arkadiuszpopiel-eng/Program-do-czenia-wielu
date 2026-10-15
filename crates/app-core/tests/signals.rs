@@ -79,6 +79,10 @@ async fn new_file_in_watched_dir_fires_file_trigger() {
             agent: Some("beta".into()),
             bridge: None,
             respect_dnd: false,
+            only_when_idle: false,
+            max_steps: None,
+            max_minutes: None,
+            max_cost_micro_pln: None,
         })
         .await
         .unwrap();

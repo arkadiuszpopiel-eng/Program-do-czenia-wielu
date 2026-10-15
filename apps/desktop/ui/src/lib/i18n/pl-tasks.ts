@@ -80,6 +80,17 @@ export const plTasks = {
   'triggers.agent': 'Agentka',
   'triggers.agentAny': 'Dowolna',
   'triggers.dnd': 'Szanuj „nie przeszkadzać"',
+  'triggers.idle': 'Tylko gdy komputer jest bezczynny',
+  'triggers.budget': 'Budżet zadania',
+  'triggers.budgetHint':
+    'Puste pole — wartość domyślna. Limity i tak nie przekroczą polityki z Ustawienia → Marszałek.',
+  'triggers.maxSteps': 'Najwięcej kroków',
+  'triggers.maxMinutes': 'Najdłużej (minuty)',
+  'triggers.maxCost': 'Najwyższy koszt (zł)',
+  'triggers.budgetSteps': 'do {n} kroków',
+  'triggers.budgetMinutes': 'do {n} min',
+  'triggers.budgetCost': 'do {cost}',
+  'triggers.budgetIdle': 'tylko w bezczynności',
   'triggers.preview': 'Najbliższe uruchomienia',
   'duty.title': 'Gotowe obowiązki codzienne',
   'duty.hint':

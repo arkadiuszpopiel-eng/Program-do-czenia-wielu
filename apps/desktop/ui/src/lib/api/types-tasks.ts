@@ -96,6 +96,12 @@ export interface TriggerInfo {
   readonly respect_dnd: boolean;
   /** Obserwacja katalogów niedostępna na tej platformie (tylko „Uruchom teraz"). */
   readonly watch_unavailable: boolean;
+  /** Zadanie tylko, gdy komputer jest bezczynny. */
+  readonly only_when_idle: boolean;
+  readonly max_steps: number;
+  readonly max_minutes: number;
+  /** Mikro-PLN; `null` — bez limitu zadania. */
+  readonly max_cost_micro_pln: number | null;
 }
 
 export interface TriggerDraft {
@@ -106,6 +112,14 @@ export interface TriggerDraft {
   readonly agent: string | null;
   readonly bridge: string | null;
   readonly respect_dnd: boolean;
+  /** Tylko, gdy komputer jest bezczynny. */
+  readonly only_when_idle: boolean;
+  /** Najwięcej kroków (`null` — domyślnie). */
+  readonly max_steps: number | null;
+  /** Najdłuższy czas w minutach (`null` — domyślnie). */
+  readonly max_minutes: number | null;
+  /** Najwyższy koszt w mikro-PLN (`null` — bez limitu zadania). */
+  readonly max_cost_micro_pln: number | null;
 }
 
 export interface TriggerRunInfo {

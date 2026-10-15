@@ -214,6 +214,10 @@ pub fn trigger(v: &TriggerView, watch: bool) -> TriggerInfo {
         deferred_until: v.deferred_until_ms.map(iso_ms),
         respect_dnd: s.respect_dnd,
         watch_unavailable: !watch && matches!(s.kind, TriggerKind::FileInDir { .. }),
+        only_when_idle: s.action.only_when_idle,
+        max_steps: s.action.budget.max_steps,
+        max_minutes: u32::try_from(s.action.budget.max_wall_ms / 60_000).unwrap_or(u32::MAX),
+        max_cost_micro_pln: s.action.budget.max_cost_micro_pln,
     }
 }
 
@@ -235,6 +239,10 @@ fn parse_ms(at: &str) -> Result<u64, AppError> {
         .map_err(|_| AppError::invalid(format!("Nieprawidłowa data „{at}”.")))?;
     u64::try_from(t.timestamp_millis()).map_err(|_| AppError::invalid("Data sprzed 1970 r."))
 }
+
+/// Górne granice budżetu z wyzwalacza (kroki, minuty — doba).
+const MAX_TRIGGER_STEPS: u32 = 500;
+const MAX_TRIGGER_MINUTES: u32 = 24 * 60;
 
 /// Szkic z UI → specyfikacja (właściciel = użytkownik; most tylko w harmonogramie czasowym).
 pub fn spec(id: &str, d: &TriggerDraft) -> Result<TriggerSpec, AppError> {
@@ -279,6 +287,15 @@ pub fn spec(id: &str, d: &TriggerDraft) -> Result<TriggerSpec, AppError> {
             "Wyzwalacz nie może uruchamiać mostu CLI — most startuje tylko na Twoją prośbę.",
         ));
     }
+    // Budżet i bezczynność (C2.7); przy zgłoszeniu zadania budżet i tak przycina polityka.
+    action.only_when_idle = d.only_when_idle;
+    if let Some(steps) = d.max_steps {
+        action.budget.max_steps = steps.clamp(1, MAX_TRIGGER_STEPS);
+    }
+    if let Some(minutes) = d.max_minutes {
+        action.budget.max_wall_ms = u64::from(minutes.clamp(1, MAX_TRIGGER_MINUTES)) * 60_000;
+    }
+    action.budget.max_cost_micro_pln = d.max_cost_micro_pln;
     let mut spec = TriggerSpec::new(id, d.name.trim(), Actor::User, kind, action);
     spec.respect_dnd = d.respect_dnd;
     Ok(spec)
@@ -348,6 +365,10 @@ mod tests {
             agent: Some("beta".into()),
             bridge: Some("claude_code".into()),
             respect_dnd: true,
+            only_when_idle: true,
+            max_steps: Some(10_000),
+            max_minutes: Some(30),
+            max_cost_micro_pln: Some(2_000_000),
         };
         assert!(
             spec("poranny-raport", &draft).is_err(),
@@ -358,6 +379,10 @@ mod tests {
             ..draft
         };
         let s = spec("poranny-raport", &draft).unwrap();
+        assert!(s.action.only_when_idle);
+        assert_eq!(s.action.budget.max_steps, 500, "granica kroków");
+        assert_eq!(s.action.budget.max_wall_ms, 30 * 60_000);
+        assert_eq!(s.action.budget.max_cost_micro_pln, Some(2_000_000));
         assert!(!s.allow_bridges && s.owner == Actor::User);
         assert_eq!(s.action.executor, ExecutorKind::Agent);
         let bad = TriggerDraft {

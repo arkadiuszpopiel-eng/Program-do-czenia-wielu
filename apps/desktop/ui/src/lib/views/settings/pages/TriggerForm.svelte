@@ -33,6 +33,18 @@
   let goal = $state('');
   let agent = $state('');
   let dnd = $state(true);
+  let idle = $state(false);
+  let maxSteps = $state<string | number>('');
+  let maxMinutes = $state<string | number>('');
+  let maxCost = $state<string | number>('');
+
+  /** Pole liczbowe: pusta wartość — domyślnie (`null`). */
+  function limit(value: string | number, scale = 1): number | null {
+    const n = Number(String(value).replace(',', '.'));
+    return String(value).trim() === '' || !Number.isFinite(n) || n <= 0
+      ? null
+      : Math.round(n * scale);
+  }
   let preview = $state<CronPreview | null>(null);
 
   $effect(() => {
@@ -82,6 +94,10 @@
         agent: agent || null,
         bridge: null,
         respect_dnd: dnd,
+        only_when_idle: idle,
+        max_steps: limit(maxSteps),
+        max_minutes: limit(maxMinutes),
+        max_cost_micro_pln: limit(maxCost, 1_000_000),
       });
       app.toasts.show({ kind: 'success', message: t('triggers.created', { name: created.name }) });
       name = '';
@@ -164,6 +180,14 @@
     ]}
   />
   <Checkbox label={t('triggers.dnd')} bind:checked={dnd} />
+  <Checkbox label={t('triggers.idle')} bind:checked={idle} />
+  <fieldset class="budget">
+    <legend>{t('triggers.budget')}</legend>
+    <p class="hint">{t('triggers.budgetHint')}</p>
+    <TextField label={t('triggers.maxSteps')} type="number" min="1" bind:value={maxSteps} />
+    <TextField label={t('triggers.maxMinutes')} type="number" min="1" bind:value={maxMinutes} />
+    <TextField label={t('triggers.maxCost')} inputmode="decimal" bind:value={maxCost} />
+  </fieldset>
   <div>
     <Button type="submit" disabled={!name.trim() || !goal.trim()}>{t('triggers.create')}</Button>
   </div>
@@ -185,6 +209,20 @@
     margin: var(--alfa-space-1) 0 0;
     padding-left: var(--alfa-space-4);
     font-size: var(--alfa-font-size-sm);
+  }
+  .budget {
+    display: flex;
+    flex-direction: column;
+    gap: var(--alfa-space-2);
+    margin: 0;
+    padding: var(--alfa-space-3);
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-control);
+  }
+  .budget legend {
+    padding: 0 var(--alfa-space-1);
+    font-size: var(--alfa-font-size-sm);
+    font-weight: 600;
   }
   .note {
     font-size: var(--alfa-font-size-xs);

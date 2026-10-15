@@ -157,6 +157,10 @@ async fn manual_trigger_submits_a_trigger_task() {
             agent: Some("beta".into()),
             bridge: None,
             respect_dnd: false,
+            only_when_idle: false,
+            max_steps: None,
+            max_minutes: None,
+            max_cost_micro_pln: None,
         })
         .await
         .unwrap();

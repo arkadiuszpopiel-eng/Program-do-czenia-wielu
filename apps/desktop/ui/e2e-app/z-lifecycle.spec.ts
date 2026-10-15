@@ -86,6 +86,10 @@ test('wyzwalacze i zadania: tworzenie, uruchomienie, sterowanie, sprzątanie', a
     agent: 'alfa',
     bridge: null,
     respect_dnd: false,
+    only_when_idle: false,
+    max_steps: null,
+    max_minutes: null,
+    max_cost_micro_pln: null,
   };
   const first = await call<Trigger>(main, 'triggers_create', { draft });
   // Druga o tej samej nazwie dostaje własny identyfikator (błąd naprawiony w 0.0.45).
