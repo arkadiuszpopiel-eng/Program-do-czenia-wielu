@@ -4,6 +4,11 @@ import type { plTemplates } from './pl-templates';
 
 export const enTemplates: Record<keyof typeof plTemplates, Message> = {
   'action.templates': 'Insert prompt template',
+  'tpl.fromMessage': 'Save as prompt template',
+  'tpl.savedFrom': 'Saved template “{name}” (Ctrl+K → “Insert prompt template”).',
+  'tpl.defaultName': 'Template',
+  'tpl.tooLong': 'The message is too long for a template (at most {max} characters).',
+  'tpl.full': 'You already have {max} templates — remove one in Settings → Prompt templates.',
   'tpl.title': 'Prompt templates',
   'tpl.intro':
     'Ready prompts for the agents with variables in double braces, e.g. {{adresat}}. When inserting, Alfa asks for the values and puts the finished text in the message field — you send it yourself. You can also open the window from the Ctrl+K palette: “Insert prompt template”.',

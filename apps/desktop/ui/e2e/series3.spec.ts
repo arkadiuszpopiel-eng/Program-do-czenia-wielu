@@ -118,6 +118,20 @@ test('Tablica: wyszukiwanie i kopia wszystkiego', async ({ page, context }) => {
   expect(copied.startsWith('# Tablica')).toBe(true);
 });
 
+test('wiadomość użytkownika: „Zapisz jako szablon promptu” trafia do Ustawień', async ({
+  page,
+}) => {
+  await open(page);
+  const mine = page.getByRole('article', { name: /^Twoja wiadomość/ }).last();
+  await mine.hover();
+  await mine.getByRole('button', { name: 'Więcej akcji' }).click();
+  await page.getByRole('menuitem', { name: 'Zapisz jako szablon promptu' }).click();
+  await expect(page.getByText(/Zapisano szablon „/)).toBeVisible();
+  await settings(page, 'Szablony promptów');
+  const list = page.getByRole('list', { name: 'Szablony' });
+  await expect(list.getByRole('listitem').last()).toBeVisible();
+});
+
 test('tryb skupienia: F11 włącza, Esc wyłącza', async ({ page }) => {
   await open(page);
   await page.locator('main').click({ position: { x: 5, y: 5 } });

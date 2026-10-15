@@ -10,6 +10,12 @@
   import Ellipsis from '@lucide/svelte/icons/ellipsis';
   import type { RememberScope, Turn } from '../../api/types';
   import { attempt } from '../../state/attempt';
+  import {
+    TEMPLATE_COUNT_MAX,
+    TEMPLATE_NAME_MAX,
+    TEMPLATE_TEXT_MAX,
+    templateNameFrom,
+  } from '../../logic/templates';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { exportConversation } from '../../state/exports';
@@ -53,6 +59,27 @@
     return t(lang === 'en' ? 'msg.translatePromptEn' : 'msg.translatePromptPl', {
       text: turn.text,
     });
+  }
+
+  /** „Zapisz jako szablon” (wiadomość użytkownika): dopisanie do listy szablonów w rdzeniu. */
+  async function saveTemplate(): Promise<void> {
+    const text = turn.text.trim();
+    if (text.length > TEMPLATE_TEXT_MAX) {
+      app.toasts.show({ kind: 'warning', message: t('tpl.tooLong', { max: TEMPLATE_TEXT_MAX }) });
+      return;
+    }
+    const list = await app.client.templates.list();
+    if (list.length >= TEMPLATE_COUNT_MAX) {
+      app.toasts.show({ kind: 'warning', message: t('tpl.full', { max: TEMPLATE_COUNT_MAX }) });
+      return;
+    }
+    const name = templateNameFrom(
+      text,
+      list.map((x) => x.name),
+      t('tpl.defaultName'),
+    ).slice(0, TEMPLATE_NAME_MAX);
+    await app.client.templates.save([...list, { id: '', name, text }]);
+    app.toasts.show({ kind: 'success', message: t('tpl.savedFrom', { name }) });
   }
 
   const more = $derived.by((): MenuItem[] => {
@@ -99,6 +126,14 @@
             await app.client.board.pin(conv.sessionId, turn.id);
             app.toasts.show({ kind: 'success', message: t('board.pinned') });
           }),
+      });
+    }
+    if (isUser) {
+      items.push({
+        id: 'save-template',
+        label: t('tpl.fromMessage'),
+        disabled: !turn.text.trim(),
+        onSelect: () => run(saveTemplate),
       });
     }
     const scopes: RememberScope[] = ['session', 'project', 'global', 'agent'];

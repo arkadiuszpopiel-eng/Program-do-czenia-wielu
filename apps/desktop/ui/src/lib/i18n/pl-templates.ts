@@ -1,6 +1,11 @@
 // Szablony promptów: Ustawienia i okno „Wstaw szablon” (pl — źródło kluczy).
 export const plTemplates = {
   'action.templates': 'Wstaw szablon promptu',
+  'tpl.fromMessage': 'Zapisz jako szablon promptu',
+  'tpl.savedFrom': 'Zapisano szablon „{name}” (Ctrl+K → „Wstaw szablon promptu”).',
+  'tpl.defaultName': 'Szablon',
+  'tpl.tooLong': 'Wiadomość jest za długa na szablon (najwyżej {max} znaków).',
+  'tpl.full': 'Masz już {max} szablonów — usuń któryś w Ustawienia → Szablony promptów.',
   'tpl.title': 'Szablony promptów',
   'tpl.intro':
     'Gotowe polecenia dla agentek ze zmiennymi w podwójnych klamrach, np. {{adresat}}. Przy wstawianiu Alfa pyta o wartości i wkleja gotowy tekst do pola wpisywania — wysyłasz go samodzielnie. Okno otworzysz też z palety Ctrl+K: „Wstaw szablon promptu”.',
