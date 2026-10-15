@@ -12,6 +12,32 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.59 — 2026-10-15
+
+Agentka pisze i sprawdza programy: przeglądarka Alfy obsługuje strony w pełni (przewijanie, klawisze,
+listy wyboru, wstecz i odświeżanie, czekanie na wynik, konsola z błędami skryptów), a nowe narzędzia
+programisty czytają repozytorium Git i uruchamiają testy projektu z czytelnym wynikiem.
+
+### Przeglądarka Alfy
+
+- Nowe narzędzia: przewinięcie strony albo do elementu, klawisz (Enter, Tab, Escape, strzałki…), wybór
+  opcji z listy, wstecz / dalej / odśwież, czekanie na tekst i konsola strony z błędami skryptów
+  (wyjątki z numerem wiersza, `console.error`, błędy ładowania) — do testowania własnych stron
+  pod `http://localhost`.
+- Klawisz, wybór i nawigacja przechodzą przez Brokera jak kliknięcie; konsola i czekanie tylko czytają,
+  treść jest niezaufana, a sekrety w konsoli są zasłaniane.
+
+### Narzędzia programisty
+
+- `dev_git`: stan repozytorium, różnice, historia, gałęzie i pojedyncze zatwierdzenie — tylko odczyt.
+- `dev_test`: rozpoznaje projekt (Rust, Node.js, Python, Go, .NET), uruchamia testy z limitem czasu
+  i podaje liczbę zaliczonych i niezaliczonych testów z nazwami; błąd kompilacji widać od razu.
+
+### Testy
+
+- Przeglądarka na prawdziwym Edge z lokalnym serwerem HTTP (lista, kliknięcie, czekanie, konsola,
+  historia); narzędzia programisty na prawdziwym `git` i `cargo test`.
+
 ## 0.0.58 — 2026-10-15
 
 Alfa poznaje komputer, na którym pracuje: wie, jakie programy są zainstalowane, potrafi podłączyć

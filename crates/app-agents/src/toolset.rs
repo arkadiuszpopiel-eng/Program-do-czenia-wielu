@@ -105,6 +105,15 @@ impl AgentTools {
             config: FsToolsConfig::default(),
             bus: deps.bus.clone(),
         });
+        // Narzędzia programisty (Git, testy) — ten sam port uruchamiania co powłoka.
+        let dev = tools_dev_impl::DevTools::new(tools_dev_impl::DevToolsDeps {
+            exec: deps.exec.clone(),
+            broker: deps.broker.clone(),
+            env: deps.env.clone(),
+            deny: deps.deny.clone(),
+            jobs: deps.jobs.clone(),
+            base_env: deps.base_env.clone(),
+        });
         let shell = ShellTools::new(ShellToolsDeps {
             exec: deps.exec,
             journal: deps.journal,
@@ -128,6 +137,7 @@ impl AgentTools {
         });
         let mut base = fs.tools();
         base.extend(shell.tools());
+        base.extend(dev.tools());
         if let Some(c) = &clipboard {
             base.extend(c.tools());
         }

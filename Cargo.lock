@@ -365,6 +365,7 @@ dependencies = [
  "tools-clipboard-contract",
  "tools-clipboard-impl",
  "tools-common-contract",
+ "tools-dev-impl",
  "tools-fs-contract",
  "tools-fs-impl",
  "tools-media-contract",
@@ -4254,6 +4255,7 @@ version = "0.0.58"
 dependencies = [
  "platform-contract",
  "proptest",
+ "schemars",
  "serde",
  "serde_json",
  "thiserror",
@@ -6369,6 +6371,49 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-util",
+ "watchdog-contract",
+]
+
+[[package]]
+name = "tools-dev-contract"
+version = "0.0.58"
+dependencies = [
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tools-common-contract",
+]
+
+[[package]]
+name = "tools-dev-fake"
+version = "0.0.58"
+dependencies = [
+ "async-trait",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tools-dev-contract",
+]
+
+[[package]]
+name = "tools-dev-impl"
+version = "0.0.58"
+dependencies = [
+ "async-trait",
+ "compliance-contract",
+ "platform-contract",
+ "platform-fake",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tools-common-contract",
+ "tools-dev-contract",
+ "tools-shell-contract",
  "watchdog-contract",
 ]
 

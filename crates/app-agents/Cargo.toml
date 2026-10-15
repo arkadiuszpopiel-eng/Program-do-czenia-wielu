@@ -20,6 +20,7 @@ tools-fs-contract = { path = "../tools-fs-contract" }
 tools-fs-impl = { path = "../tools-fs-impl" }
 tools-shell-contract = { path = "../tools-shell-contract" }
 tools-shell-impl = { path = "../tools-shell-impl" }
+tools-dev-impl = { path = "../tools-dev-impl" }
 tools-clipboard-contract = { path = "../tools-clipboard-contract" }
 tools-clipboard-impl = { path = "../tools-clipboard-impl" }
 # F6: Word/Excel i przeglądarka agentek nad portami `platform-apps` (Windows: COM / CDP przez potok).

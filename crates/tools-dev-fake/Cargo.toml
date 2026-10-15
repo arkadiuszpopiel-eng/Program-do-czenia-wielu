@@ -1,0 +1,23 @@
+[package]
+name = "tools-dev-fake"
+description = "Atrapa tools-dev: prawdziwe manifesty i walidacja argumentów, wynik domyślny albo skryptowany, zapis wywołań — bez uruchamiania git i testów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-dev-contract = { path = "../tools-dev-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-common-contract = { path = "../tools-common-contract", features = ["contract-tests"] }
+tools-dev-contract = { path = "../tools-dev-contract", features = ["contract-tests"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[lints]
+workspace = true
