@@ -10,6 +10,7 @@ import type { AppState } from './app.svelte';
 import { attempt, showError } from './attempt';
 import { exportConversation } from './exports';
 import { openTemplates } from './template-dialog.svelte';
+import { openBoard } from './board-dialog.svelte';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.agents': 'agents',
@@ -37,6 +38,7 @@ export const EXTRA_COMMANDS = [
   'action.exportJson',
   'action.templates',
   'action.help',
+  'action.board',
 ] as const;
 
 const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
@@ -190,6 +192,9 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.stopGeneration':
       void app.stopGeneration();
+      break;
+    case 'action.board':
+      openBoard();
       break;
     case 'action.help':
       app.openSettings('help');

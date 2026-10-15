@@ -11,6 +11,7 @@
   import { focusTrap } from './focus-trap';
   import Lazy from './Lazy.svelte';
   import { templateDialog } from '../../state/template-dialog.svelte';
+  import { boardDialog } from '../../state/board-dialog.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -37,6 +38,7 @@
   const loadPalette = () => import('../overlays/PaletteHost.svelte');
   const loadCheatsheet = () => import('../overlays/Cheatsheet.svelte');
   const loadTemplates = () => import('../overlays/TemplateDialog.svelte');
+  const loadBoard = () => import('../overlays/BoardDialog.svelte');
   const loadSettings = () => import('../../views/settings/SettingsView.svelte');
   let paletteReady = $state(false);
   let cheatsheetReady = $state(false);
@@ -145,6 +147,7 @@
       props={{}}
       label={t('tpl.dialog.title')}
     />{/if}
+  {#if boardDialog.open}<Lazy load={loadBoard} props={{}} label={t('board.title')} />{/if}
 </div>
 
 <style>

@@ -68,6 +68,18 @@
         },
       );
     }
+    if (!isUser) {
+      items.push({
+        id: 'pin-board',
+        label: t('board.pin'),
+        disabled: !done,
+        onSelect: () =>
+          run(async () => {
+            await app.client.board.pin(conv.sessionId, turn.id);
+            app.toasts.show({ kind: 'success', message: t('board.pinned') });
+          }),
+      });
+    }
     const scopes: RememberScope[] = ['session', 'project', 'global', 'agent'];
     scopes.forEach((scope, i) =>
       items.push({

@@ -154,6 +154,8 @@ export async function runWork(
   await both('localCommands', 'test', 'Ile to jest 7 razy 8?');
   await both('dataRoutes', 'list');
   await both('help', 'topics');
+  await both('board', 'list');
+  await both('board', 'unpin', 'pin-nie-ma');
   await both('help', 'page', 'rozmowa');
   await both('help', 'search', 'polecenia bez modelu');
   const templates = (await both('templates', 'list')) as unknown[];

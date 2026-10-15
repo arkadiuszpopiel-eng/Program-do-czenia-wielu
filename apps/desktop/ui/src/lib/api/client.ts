@@ -77,6 +77,7 @@ import type { LocalCommandsApi } from './client-quick';
 import type { TemplatesApi } from './client-templates';
 import type { DataRoutesApi } from './client-routes';
 import type { HelpApi } from './client-help';
+import type { BoardApi } from './client-board';
 import type { EnginesApi } from './client-models';
 import type { AttachmentsApi, BackupsApi, ConversationExportApi } from './client-files';
 import type {
@@ -376,6 +377,7 @@ export interface AlfaClient {
   readonly templates: TemplatesApi;
   readonly dataRoutes: DataRoutesApi;
   readonly help: HelpApi;
+  readonly board: BoardApi;
   /** Modele lokalne i silniki: pobieranie, zgoda TOFU, weryfikacja, embedder wyszukiwania. */
   readonly engines: EnginesApi;
   /** Załączniki composera (kopie w katalogu sesji; podgląd przez protokół zasobów). */

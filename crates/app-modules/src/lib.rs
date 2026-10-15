@@ -18,6 +18,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+pub mod board;
 pub mod broker;
 pub mod cameras;
 pub mod catalog;

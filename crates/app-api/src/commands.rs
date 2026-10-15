@@ -167,6 +167,9 @@ macro_rules! with_commands {
             help_topics() -> Vec<$crate::dto::HelpTopic>;
             help_page(id: String) -> $crate::dto::HelpPage;
             help_search(query: String) -> Vec<$crate::dto::HelpHit>;
+            board_list() -> Vec<$crate::dto::BoardItem>;
+            board_pin(session_id: String, turn_id: String) -> Vec<$crate::dto::BoardItem>;
+            board_unpin(id: String) -> Vec<$crate::dto::BoardItem>;
             prompt_templates_set(templates: Vec<$crate::dto::PromptTemplate>) -> Vec<$crate::dto::PromptTemplate>;
             modules_set_enabled(id: String, enabled: bool) -> $crate::dto::ModulesView;
             diag_snapshot() -> $crate::dto::DiagView;
@@ -295,6 +298,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 262);
+        assert_eq!(super::COMMANDS.len(), 265);
     }
 }

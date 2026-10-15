@@ -100,3 +100,9 @@ export const helpApi = (): AlfaClient['help'] => ({
   page: (id) => call('help_page', { id }),
   search: (query) => call('help_search', { query }),
 });
+
+export const boardApi = (): AlfaClient['board'] => ({
+  list: () => call('board_list'),
+  pin: (sessionId, turnId) => call('board_pin', { sessionId, turnId }),
+  unpin: (id) => call('board_unpin', { id }),
+});

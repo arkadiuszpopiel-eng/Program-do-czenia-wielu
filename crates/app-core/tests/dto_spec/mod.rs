@@ -134,6 +134,12 @@ pub fn spec(command: &str) -> Option<Spec> {
         "help_topics" => (vec![], roundtrip::<Vec<HelpTopic>>),
         "help_page" => (vec![("id", s)], roundtrip::<HelpPage>),
         "help_search" => (vec![("query", s)], roundtrip::<Vec<HelpHit>>),
+        "board_list" => (vec![], roundtrip::<Vec<BoardItem>>),
+        "board_pin" => (
+            vec![("session_id", s), ("turn_id", s)],
+            roundtrip::<Vec<BoardItem>>,
+        ),
+        "board_unpin" => (vec![("id", s)], roundtrip::<Vec<BoardItem>>),
         "prompt_templates_set" => (
             vec![("templates", roundtrip::<Vec<PromptTemplate>>)],
             roundtrip::<Vec<PromptTemplate>>,
