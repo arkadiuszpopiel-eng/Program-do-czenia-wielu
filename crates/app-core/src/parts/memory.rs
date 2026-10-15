@@ -25,6 +25,12 @@ pub(super) async fn setting(kernel: &Kernel, key: &str) -> Option<serde_json::Va
 }
 
 impl Built {
+    /// Moduły opcjonalne wyłączone w konfiguracji (pomijane przy budowie).
+    pub async fn disable_modules(&mut self, kernel: &Kernel) {
+        let value = setting(kernel, app_modules::modules::DISABLED_KEY).await;
+        self.extra.disabled = app_modules::modules::parse_disabled(value.as_ref());
+    }
+
     /// Moduł pamięci F7 (zakres sesji w bazach sesji, reszta w bazach zakresów).
     pub(super) async fn build_memory(
         &mut self,

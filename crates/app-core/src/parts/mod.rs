@@ -77,12 +77,6 @@ fn need<T: ?Sized>(value: &Option<Arc<T>>, what: &str) -> Result<Arc<T>, AppErro
 }
 
 impl Built {
-    /// Moduły opcjonalne wyłączone w konfiguracji (pomijane przy budowie).
-    pub async fn disable_modules(&mut self, kernel: &Kernel) {
-        let value = memory::setting(kernel, app_modules::modules::DISABLED_KEY).await;
-        self.extra.disabled = app_modules::modules::parse_disabled(value.as_ref());
-    }
-
     /// Buduje i uruchamia moduł `id` (zależności są już zbudowane — kolejność z rejestru).
     pub async fn build_module(
         &mut self,
