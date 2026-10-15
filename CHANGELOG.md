@@ -12,6 +12,58 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.61 — 2026-10-16
+
+Druga seria dziesięciu nowości: instrukcja wbudowana w program, Tablica przypiętych odpowiedzi, tekst
+z dokumentów Word, Excel i PowerPoint dla modelu, styl odpowiedzi, budżet zadań z wyzwalaczy, archiwum rozmów,
+tłumaczenie odpowiedzi, import umiejętności SKILL.md i SBOM — oraz poprawki po przeglądzie kodu serii 1.
+
+### Rozmowa
+
+- Instrukcja w programie: Ustawienia → Instrukcja (albo paleta `Ctrl+K` → „Otwórz instrukcję”) — cały
+  przewodnik użytkownika, działa bez internetu, z wyszukiwaniem bez polskich znaków.
+- Tablica: „Przypnij do tablicy” w menu odpowiedzi agentki, a w palecie „Pokaż Tablicę” — do 40 przypiętych
+  odpowiedzi z różnych rozmów z „Otwórz rozmowę”, „Kopiuj” i „Odepnij”.
+- Załączniki DOCX, XLSX i PPTX trafiają do modelu jako tekst (akapity, slajdy po kolei, komórki arkuszy) — jako
+  treść z zewnątrz, z limitami chroniącymi przed złośliwymi plikami.
+- Styl odpowiedzi (zwięźle, szczegółowo, prostym językiem, formalnie) i swoboda (precyzyjnie, zrównoważenie,
+  twórczo) w Ustawienia → Ogólne.
+- „Przetłumacz na angielski” i „Przetłumacz na polski” w menu odpowiedzi agentki.
+- Lista rozmów: pole „Pokaż rozmowy” (dziś, 7 dni, 30 dni) i podpowiedź z liczbą wiadomości i datą założenia.
+
+### Agentki i zadania
+
+- Wyzwalacze: „Tylko gdy komputer jest bezczynny” i budżet zadania (kroki, minuty, koszt) — w granicach
+  polityki Marszałka; lista pokazuje budżet każdego wyzwalacza.
+- Import umiejętności z pliku SKILL.md (format Agent Skills) — przez kwarantannę i zatwierdzenie z hashem,
+  jak każda umiejętność z zewnątrz.
+
+### Bezpieczeństwo i zgodność
+
+- Plik `SECURITY.md`: jak zgłosić podatność i w jakim czasie (CRA: 24 h / 72 h / 14 dni); SBOM wydania
+  w formacie CycloneDX (`node scripts/sbom.mjs`) jako etap bramki wersji. Kontakt bezpieczeństwa czeka na decyzję.
+
+### Poprawki po przeglądzie kodu serii 1
+
+- [poważne] Offline polecenie bez modelu nie wyprzedza już wiadomości czekających w kolejce, a po odzyskaniu
+  sieci odpowiada model — wcześniejsze pytanie nie zostaje bez odpowiedzi; wiadomość z załącznikiem offline
+  czeka w kolejce.
+- [poważne] „Ponów” odpowiedzi w quizie nie ocenia odpowiedzi drugi raz — quiz zostaje przy tym samym pytaniu.
+- [poważne] Edycja własnego polecenia albo szablonu zapisuje właściwą pozycję także wtedy, gdy lista zmieniła się
+  w trakcie (zapis po identyfikatorze; inne wiersze są zablokowane podczas edycji).
+- Rachunki: „100 plus 23%” = 123 jak w kalkulatorze, liczby poza dokładnością obliczeń idą do modelu, wynik
+  nierzeczywisty ma właściwy komunikat.
+- Własne polecenia: dłuższe wiadomości (ponad 2000 znaków) idą do modelu, odpowiedź ma limit długości, pusta
+  odpowiedź nie powstaje; wyrażenia regularne liczone poza blokadą stanu.
+- Edytor konfiguracji pokazuje błędy składni plików na bieżąco; identyfikatory z interfejsu są sprawdzane.
+
+### Testy
+
+- Rdzeń: ekstrakcja DOCX/XLSX/PPTX (polskie znaki, encje, kolejność slajdów, limity), instrukcja (każdy dział,
+  wyszukiwanie), Tablica (limit, powtórki, odpinanie), styl i swoboda w żądaniu do modelu, budżet wyzwalacza,
+  import SKILL.md przez walidację przepisu, regresje z przeglądu (kolejka offline, „ponów” w quizie).
+- Interfejs: nowe okna i strony w trzech stylach i dwóch motywach; prawdziwa aplikacja: instrukcja i Tablica.
+
 ## 0.0.60 — 2026-10-15
 
 Seria dziesięciu nowości: Alfa odpowiada na proste polecenia sama, bez modelu i kosztu (także bez
