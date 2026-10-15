@@ -537,6 +537,16 @@ export interface BackupView {
 }
 
 /** Bateria. */
+export interface BatteryDiag {
+  readonly charge_pct: number | null;
+  readonly cycles: number | null;
+  /** Pojemność fabryczna i bieżąca pełna (mWh). */
+  readonly design_mwh: number | null;
+  readonly full_mwh: number | null;
+  readonly on_ac: boolean | null;
+}
+
+/** Bateria. */
 export interface BatteryView {
   readonly on_ac: boolean;
   readonly percent: number;
@@ -825,6 +835,47 @@ export interface ChangeLogEntry {
 /** Waga pozycji w historii zmian (kolor w interfejsie: czerwony, pomarańczowy, zielony). */
 export type ChangeSeverity = 'critical' | 'serious' | 'normal';
 
+/** Rodzaj testu. */
+export type CheckKind =
+  | {
+      readonly test: 'cpu_single';
+    }
+  | {
+      readonly test: 'cpu_multi';
+    }
+  | {
+      readonly test: 'memory';
+    }
+  | {
+      readonly target: string;
+      readonly test: 'disk';
+    }
+  | {
+      readonly test: 'network';
+    }
+  | {
+      readonly test: 'integrity';
+    };
+
+/** Wynik jednego testu. */
+export interface CheckResult {
+  readonly duration_ms: number;
+  readonly kind: CheckKind;
+  readonly metrics: readonly Metric[];
+  /** Uwagi i powody oceny (po polsku). */
+  readonly notes: readonly string[];
+  readonly verdict: Verdict;
+}
+
+/** Przebieg testów (zapisywany w historii). */
+export interface CheckRun {
+  /** RFC 3339. */
+  readonly at: string;
+  /** Najgorszy wynik (bez pominiętych; same pominięte — `Skipped`). */
+  readonly overall: Verdict;
+  readonly results: readonly CheckResult[];
+}
+
 /** Rozwiązanie kolizji. */
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
@@ -881,6 +932,23 @@ export interface CostSummary {
 }
 
 /** Procesor. */
+export interface CpuDiag {
+  /** Taktowanie bazowe i bieżące (MHz). */
+  readonly base_mhz: number | null;
+  readonly cores: number;
+  readonly current_mhz: number | null;
+  /** Pamięć podręczna L2 / L3 (KB). */
+  readonly l2_kb: number | null;
+  readonly l3_kb: number | null;
+  /** Obciążenie w chwili pomiaru (%). */
+  readonly load_pct: number | null;
+  readonly name: string;
+  readonly threads: number;
+  /** Wirtualizacja włączona w firmware. */
+  readonly virtualization: boolean | null;
+}
+
+/** Procesor. */
 export interface CpuView {
   readonly cores: number;
   readonly model: string;
@@ -905,6 +973,36 @@ export interface DeviceProfile {
   readonly machine: MachineView;
   readonly measured_at: string;
   readonly recommendation: RecommendationView;
+}
+
+/** Postęp trwających testów. */
+export interface DiagProgress {
+  /** Klucz bieżącego testu (`disk:C:`). */
+  readonly current: string;
+  /** Wyniki zakończonych testów tego przebiegu. */
+  readonly done: readonly CheckResult[];
+  /** Numer bieżącego testu (od 0) i liczba testów. */
+  readonly index: number;
+  readonly total: number;
+}
+
+/** Stan diagnostyki. */
+export interface DiagView {
+  /** Klucze dostępnych testów (`cpu_single`, `disk:C:`…). */
+  readonly available: readonly string[];
+  /** Ocena spójności ostatniego zapisu (kondycja, miejsce, zdarzenia, temperatury). */
+  readonly integrity: CheckResult | null;
+  /** Ostatni przebieg testów. */
+  readonly last_run: CheckRun | null;
+  /** Ostatni zapis parametrów. */
+  readonly latest: Snapshot | null;
+  /** Zapis w toku. */
+  readonly recording: boolean;
+  /** Trwające testy. */
+  readonly running: DiagProgress | null;
+  readonly runs: number;
+  /** Liczba zapisów i przebiegów w historii. */
+  readonly snapshots: number;
 }
 
 /** Akcja dyktowania. */
@@ -960,6 +1058,33 @@ export type DiffKind = 'same' | 'added' | 'removed';
 export interface DiffLine {
   readonly kind: DiffKind;
   readonly text: string;
+}
+
+/** Dysk fizyczny. */
+export interface DiskDiag {
+  /** Magistrala (NVMe, SATA, USB…). */
+  readonly bus: string | null;
+  /** Błędy tego dysku w dzienniku zdarzeń (okno [`crate::EVENT_WINDOW_DAYS`]). */
+  readonly event_errors: number;
+  readonly health: Health;
+  readonly media: MediaKind;
+  readonly model: string;
+  /** Numer dysku w systemie (`Harddisk<N>` w dzienniku zdarzeń). */
+  readonly number: number | null;
+  /** Stan operacyjny podany przez system (np. „OK”, „Degraded”). */
+  readonly operational: string | null;
+  readonly power_on_hours: number | null;
+  readonly read_errors: number | null;
+  /** Dysk wymienny (np. USB). */
+  readonly removable: boolean;
+  readonly serial_tail: string | null;
+  readonly size_mb: number;
+  readonly temperature_c: number | null;
+  /** Litery woluminów na tym dysku. */
+  readonly volumes: readonly string[];
+  /** Zużycie (% — SSD), temperatura (°C), godziny pracy, błędy odczytu/zapisu (licznik SMART). */
+  readonly wear_pct: number | null;
+  readonly write_errors: number | null;
 }
 
 /** Dysk. */
@@ -1082,6 +1207,12 @@ export interface EvalsView {
   readonly verdicts: readonly EvalVerdictView[];
 }
 
+/** Liczba zdarzeń rodzaju. */
+export interface EventCount {
+  readonly count: number;
+  readonly kind: EventKind;
+}
+
 /** Ramka zdarzeń `alfa://events`: paczka z numerami kolejnymi (plan v6 B.2, ADR 0019). */
 export interface EventFrame {
   /** Znacznik uruchomienia rdzenia (numery z innego uruchomienia nic nie znaczą). */
@@ -1099,8 +1230,32 @@ export interface EventFrame {
   readonly v: number;
 }
 
+/** Rodzaj zdarzenia awarii. */
+export type EventKind =
+  'unexpected_shutdown' | 'bugcheck' | 'hardware' | 'disk' | 'usb' | 'app_crash' | 'other';
+
 /** Poziom zdarzenia (rosnąco). */
 export type EventLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'audit';
+
+/** Zdarzenie z dziennika (skrót; treść systemowa obcięta). */
+export interface EventLine {
+  /** RFC 3339. */
+  readonly at: string;
+  readonly id: number;
+  /** Rodzaj (klucz `EventKind`). */
+  readonly kind: EventKind;
+  readonly message: string;
+  readonly source: string;
+}
+
+/** Podsumowanie zdarzeń z ostatnich dni. */
+export interface EventSummary {
+  /** Liczba zdarzeń w każdym rodzaju. */
+  readonly counts: readonly EventCount[];
+  /** Najnowsze zdarzenia (≤ 30). */
+  readonly recent: readonly EventLine[];
+  readonly window_days: number;
+}
 
 /** Wynik `events_resume`: brakujące ramki albo informacja, że trzeba wczytać stan od nowa. */
 export interface EventsResume {
@@ -1153,6 +1308,17 @@ export interface FxView {
   readonly date: string;
   readonly stale: boolean;
   readonly usd_pln: number;
+}
+
+/** Karta graficzna. */
+export interface GpuDiag {
+  /** Data sterownika (`RRRR-MM-DD`). */
+  readonly driver_date: string | null;
+  readonly driver_version: string | null;
+  readonly name: string;
+  /** Stan urządzenia (np. „OK”, „Error”). */
+  readonly status: string | null;
+  readonly vram_mb: number | null;
 }
 
 /** Odczyt kart na żywo. */
@@ -1260,6 +1426,9 @@ export interface GuiStatus {
   readonly screenshot: GuiShotInfo | null;
   readonly taken_over: boolean;
 }
+
+/** Kondycja według systemu (Storage Spaces / SMART). */
+export type Health = 'healthy' | 'warning' | 'unhealthy' | 'unknown';
 
 /** Co wymaga człowieka. */
 export interface HealthHumanAction {
@@ -1487,6 +1656,20 @@ export interface LocalizedText {
   readonly pl: string;
 }
 
+/** System operacyjny i komputer. */
+export interface MachineDiag {
+  /** Wersja BIOS/UEFI. */
+  readonly bios: string | null;
+  /** Producent i model komputera. */
+  readonly model: string | null;
+  /** Nazwa systemu (np. „Windows 11 Pro”). */
+  readonly os: string;
+  /** Wersja i kompilacja. */
+  readonly os_version: string;
+  /** Czas od uruchomienia (s). */
+  readonly uptime_s: number;
+}
+
 /** Maszyna. */
 export interface MachineView {
   readonly battery: BatteryView | null;
@@ -1622,6 +1805,28 @@ export interface McpToolView {
 
 /** Poziom zaufania serwera (ustawia wyłącznie użytkownik). */
 export type McpTrust = 'untrusted' | 'reviewed' | 'trusted';
+
+/** Rodzaj nośnika. */
+export type MediaKind = 'ssd' | 'hdd' | 'unknown';
+
+/** Pamięć operacyjna. */
+export interface MemDiag {
+  readonly available_mb: number;
+  readonly modules: readonly MemModule[];
+  /** Plik stronicowania: rozmiar i użycie (MB). */
+  readonly pagefile_mb: number | null;
+  readonly pagefile_used_mb: number | null;
+  readonly total_mb: number;
+}
+
+/** Moduł pamięci. */
+export interface MemModule {
+  readonly capacity_mb: number;
+  readonly manufacturer: string | null;
+  readonly part: string | null;
+  readonly slot: string | null;
+  readonly speed_mhz: number | null;
+}
 
 /** Pozycja podglądu kaskady. */
 export interface MemoryCascadeItem {
@@ -1802,6 +2007,18 @@ export interface MemoryUndoResult {
   readonly skipped: number;
 }
 
+/** Zmierzona wartość. */
+export interface Metric {
+  /** Większa wartość jest lepsza. */
+  readonly higher_is_better: boolean;
+  /** Klucz (`seq_write_mbps`, `latency_ms`…). */
+  readonly key: string;
+  /** Etykieta po polsku. */
+  readonly label: string;
+  readonly unit: string;
+  readonly value: number;
+}
+
 /** Stan mikrofonu (uprawnienie/obecność). */
 export type MicAvailability = 'ok' | 'denied' | 'missing';
 
@@ -1976,6 +2193,18 @@ export interface NameForms {
   readonly nominative: string;
   /** Wołacz („Delto”). */
   readonly vocative: string;
+}
+
+/** Karta sieciowa (bez adresów IP i MAC). */
+export interface NetDiag {
+  readonly description: string | null;
+  /** `wifi`, `ethernet`, `other`. */
+  readonly kind: string;
+  /** Szybkość łącza (Mb/s). */
+  readonly link_mbps: number | null;
+  readonly name: string;
+  /** Połączona. */
+  readonly up: boolean;
 }
 
 /** Nowe zadanie od użytkownika (węzeł DAG: `after` = poprzedniczki, `parent_id` = delegacja). */
@@ -2493,6 +2722,7 @@ export type SettingsCustomPage =
   | 'about'
   | 'plugins'
   | 'mcp'
+  | 'diag'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -2549,6 +2779,24 @@ export interface SkillReview {
 /** Stan wersji umiejętności. */
 export type SkillStateView =
   'proposed' | 'quarantined' | 'installed' | 'rejected' | 'disabled' | 'superseded';
+
+/** Pełny zapis parametrów. */
+export interface Snapshot {
+  /** RFC 3339. */
+  readonly at: string;
+  readonly battery: BatteryDiag | null;
+  readonly cpu: CpuDiag;
+  readonly disks: readonly DiskDiag[];
+  readonly events: EventSummary;
+  /** Części, których nie udało się odczytać (z powodem) — zapis jest wtedy niepełny. */
+  readonly gaps: readonly string[];
+  readonly gpus: readonly GpuDiag[];
+  readonly machine: MachineDiag;
+  readonly memory: MemDiag;
+  readonly network: readonly NetDiag[];
+  readonly thermal: readonly ThermalDiag[];
+  readonly volumes: readonly VolumeDiag[];
+}
 
 /** Akcja kreatora rejestracji i weryfikacji właściciela. */
 export type SpeakerAction =
@@ -2740,6 +2988,12 @@ export interface TestReport {
   readonly reason?: string | null;
   /** Kod HTTP odpowiedzi dostawcy. */
   readonly status?: number | null;
+}
+
+/** Czujnik temperatury. */
+export interface ThermalDiag {
+  readonly celsius: number;
+  readonly name: string;
 }
 
 /** Blok „myślenie" (bez treści). */
@@ -3043,6 +3297,9 @@ export interface UpdatesView {
   readonly restart_blocked: LocalizedText | null;
 }
 
+/** Wynik testu. */
+export type Verdict = 'pass' | 'warn' | 'fail' | 'skipped';
+
 /** Głos v0: mówczyni bazowa wbudowanego silnika + wysokość i tempo (bez kluczy, bez klonów). */
 export interface VoiceDraft {
   /** Mówczyni bazowa (`pl-f1`, `pl-f2`, zapas Piper). */
@@ -3110,6 +3367,18 @@ export interface VoiceStatus {
   readonly muted: boolean;
   readonly reason: LocalizedText | null;
   readonly state: VoiceState;
+}
+
+/** Wolumin (litera dysku). */
+export interface VolumeDiag {
+  readonly file_system: string | null;
+  readonly free_mb: number;
+  readonly label: string | null;
+  /** Litera z dwukropkiem (`C:`). */
+  readonly letter: string;
+  readonly size_mb: number;
+  /** Wolumin systemowy. */
+  readonly system: boolean;
 }
 
 /** Akcja słów wywoławczych. */
@@ -3450,6 +3719,24 @@ export interface IpcCommands {
   readonly device_profile: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: DeviceProfile;
+  };
+  readonly diag_cancel: { readonly args: Readonly<Record<string, never>>; readonly result: null };
+  readonly diag_export: { readonly args: Readonly<Record<string, never>>; readonly result: string };
+  readonly diag_run: {
+    readonly args: { readonly tests: readonly string[] };
+    readonly result: CheckRun;
+  };
+  readonly diag_runs: {
+    readonly args: { readonly limit: number };
+    readonly result: readonly CheckRun[];
+  };
+  readonly diag_snapshot: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: DiagView;
+  };
+  readonly diag_state: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: DiagView;
   };
   readonly embed_model_activate: {
     readonly args: { readonly model: string };

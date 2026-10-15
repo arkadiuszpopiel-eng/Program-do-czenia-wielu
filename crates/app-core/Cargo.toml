@@ -27,6 +27,8 @@ app-memory = { path = "../app-memory" }
 app-tasks = { path = "../app-tasks" }
 app-bridges = { path = "../app-bridges" }
 app-mcp = { path = "../app-mcp" }
+app-diag = { path = "../app-diag" }
+pc-diag-contract = { path = "../pc-diag-contract" }
 # Computer use (panel „Ekran"), terminal, umiejętności + Kreator, „Zdrowie systemu".
 app-gui = { path = "../app-gui" }
 app-terminal = { path = "../app-terminal" }
@@ -127,13 +129,12 @@ serde_json.workspace = true
 tokio = { workspace = true, features = ["rt"] }
 tracing.workspace = true
 uuid.workspace = true
-# Klatka kamery dla interfejsu: PNG (zlib z flate2/miniz_oxide) w base64 — te same wersje co w innych crate'ach.
-base64 = "0.22.1"
-flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 # Klient HTTP kursu NBP dla cost-meter (ta sama wersja i cechy co providers-api-impl: rustls, bez OpenSSL).
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 
 [dev-dependencies]
+base64 = "0.22.1"
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 providers-fake = { path = "../providers-fake" }
 platform-fake = { path = "../platform-fake" }
 voice-pipeline-impl = { path = "../voice-pipeline-impl" }

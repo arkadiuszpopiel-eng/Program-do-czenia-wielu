@@ -259,12 +259,19 @@ impl EventKind {
     }
 }
 
+/// Liczba zdarzeń rodzaju.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct EventCount {
+    pub kind: EventKind,
+    pub count: u32,
+}
+
 /// Podsumowanie zdarzeń z ostatnich dni.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct EventSummary {
     pub window_days: u32,
     /// Liczba zdarzeń w każdym rodzaju.
-    pub counts: Vec<(EventKind, u32)>,
+    pub counts: Vec<EventCount>,
     /// Najnowsze zdarzenia (≤ 30).
     pub recent: Vec<EventLine>,
 }
@@ -274,8 +281,8 @@ impl EventSummary {
     pub fn count(&self, kind: EventKind) -> u32 {
         self.counts
             .iter()
-            .find(|(k, _)| *k == kind)
-            .map_or(0, |(_, n)| *n)
+            .find(|c| c.kind == kind)
+            .map_or(0, |c| c.count)
     }
 }
 

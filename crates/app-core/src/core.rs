@@ -71,6 +71,8 @@ pub(crate) struct Inner {
     pub bridges: Arc<app_bridges::BridgesApp>,
     /// Serwery MCP podłączone przez użytkownika (narzędzia agentek `mcp_tools`/`mcp_call`).
     pub mcp: Arc<app_mcp::McpHub>,
+    /// Diagnostyka komputera (zapis parametrów, testy, narzędzie `system_diagnostics`).
+    pub diag: Arc<app_diag::DiagApp>,
     pub brain: Arc<dyn BrainPort>,
     /// Kiedy ostatnio sprawdzano konto po błędzie w rozmowie (konto zapasowe, C2.15).
     pub retests: crate::parts::backup_account::Retests,

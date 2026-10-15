@@ -123,6 +123,8 @@ pub enum SettingsCustomPage {
     Plugins,
     /// Serwery MCP użytkownika: przepisy, formularz (zmienne tajne w Menedżerze poświadczeń), zgody.
     Mcp,
+    /// Diagnostyka komputera: zapis parametrów, testy podzespołów, historia, raport.
+    Diag,
     /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }

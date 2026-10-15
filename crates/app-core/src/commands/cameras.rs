@@ -1,95 +1,18 @@
 //! Komendy `cameras_*`: lista kamer, przełączniki, nazwy i klatka na żądanie (`camera-hub`).
 //! Klatka wraca do interfejsu jako PNG w base64 — nie trafia na dysk, do logów ani do zdarzeń.
+//! Przekład stanu na DTO, błędy i kodowanie PNG: `app_modules::cameras`.
 
-use std::io::Write;
 use std::sync::atomic::Ordering;
 
-use base64::Engine;
-use camera_hub_contract::{
-    CameraError, CameraId, CameraInfo, CameraKind, CameraState, HubState, RgbaImage,
-};
-use flate2::Compression;
-use flate2::write::ZlibEncoder;
-use platform_contract::{encode_png_with, zlib_stored};
+use app_modules::cameras::{camera_error, cameras_dto, png_base64, zlib_fast};
+use camera_hub_contract::CameraId;
+use platform_contract::encode_png_with;
 
 use crate::core::AppCore;
 use crate::dto::{
-    AttachmentsAdded, CAMERA_FRAME_MAX_SIDE, CAMERA_FRAME_MIN_SIDE, CameraFrame, CameraKindView,
-    CameraStateView, CameraView, CamerasState,
+    AttachmentsAdded, CAMERA_FRAME_MAX_SIDE, CAMERA_FRAME_MIN_SIDE, CameraFrame, CamerasState,
 };
-use crate::error::{AppError, ErrorCode};
-
-fn camera_view(camera: &CameraInfo) -> CameraView {
-    let (state, detail, width, height) = match &camera.state {
-        CameraState::Asleep => (CameraStateView::Asleep, None, 0, 0),
-        CameraState::Opening => (CameraStateView::Opening, None, 0, 0),
-        CameraState::Live { width, height } => (CameraStateView::Live, None, *width, *height),
-        CameraState::Closing => (CameraStateView::Closing, None, 0, 0),
-        CameraState::Failed(text) => (CameraStateView::Failed, Some(text.clone()), 0, 0),
-        CameraState::Unplugged => (CameraStateView::Unplugged, None, 0, 0),
-    };
-    CameraView {
-        id: camera.id.0.clone(),
-        name: camera.name.clone(),
-        kind: match camera.kind {
-            CameraKind::Usb => CameraKindView::Usb,
-            CameraKind::Network => CameraKindView::Network,
-        },
-        enabled: camera.enabled,
-        state,
-        detail,
-        width,
-        height,
-    }
-}
-
-/// Stan huba → DTO.
-pub(crate) fn cameras_dto(state: &HubState) -> CamerasState {
-    CamerasState {
-        enabled: state.enabled,
-        cameras: state.cameras.iter().map(camera_view).collect(),
-    }
-}
-
-fn camera_error(error: CameraError) -> AppError {
-    match error {
-        CameraError::Disabled => AppError::forbidden(
-            "Kamery są wyłączone — włącz przełącznik kamer i przełącznik tej kamery.",
-        )
-        .with("reason", "disabled"),
-        CameraError::UnknownCamera(id) => AppError::missing("camera", id, "Nie ma takiej kamery."),
-        CameraError::Store(text) => AppError::storage(text),
-        CameraError::Unplugged => unavailable("unplugged", "Kamera jest odłączona."),
-        CameraError::Stopped => unavailable("stopped", "Kamera została zatrzymana."),
-        CameraError::Busy => unavailable("busy", "Kamera właśnie się otwiera — spróbuj za chwilę."),
-        CameraError::Timeout => {
-            unavailable("timeout", "Kamera nie odpowiedziała w wyznaczonym czasie.")
-        }
-        CameraError::Platform(text) => {
-            unavailable("platform", format!("Kamera nie działa: {text}"))
-        }
-    }
-}
-
-/// Kamera chwilowo niedostępna; `reason` pozwala interfejsowi rozróżnić przypadki bez czytania tekstu.
-fn unavailable(reason: &str, message: impl Into<String>) -> AppError {
-    AppError::new(ErrorCode::Unavailable, message)
-        .with("kind", "camera")
-        .with("reason", reason)
-}
-
-/// Kompresja zlib dla PNG klatki (poziom szybki — podgląd pobiera klatki kilka razy na sekundę).
-fn zlib_fast(data: &[u8]) -> Vec<u8> {
-    let mut encoder = ZlibEncoder::new(Vec::with_capacity(data.len() / 3), Compression::fast());
-    if encoder.write_all(data).is_err() {
-        return zlib_stored(data);
-    }
-    encoder.finish().unwrap_or_else(|_| zlib_stored(data))
-}
-
-fn png_base64(image: &RgbaImage) -> String {
-    base64::engine::general_purpose::STANDARD.encode(encode_png_with(image, &zlib_fast))
-}
+use crate::error::AppError;
 
 impl AppCore {
     /// `cameras_state`: przełącznik główny i lista kamer. Pierwsze wywołanie wylicza urządzenia

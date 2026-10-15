@@ -22,8 +22,8 @@ mod snapshot;
 
 pub use checks::{CheckKind, CheckResult, CheckRun, Metric, Verdict};
 pub use snapshot::{
-    BatteryDiag, CpuDiag, DiskDiag, EventKind, EventLine, EventSummary, GpuDiag, Health,
-    MachineDiag, MediaKind, MemDiag, MemModule, NetDiag, Snapshot, ThermalDiag, VolumeDiag,
+    BatteryDiag, CpuDiag, DiskDiag, EventCount, EventKind, EventLine, EventSummary, GpuDiag,
+    Health, MachineDiag, MediaKind, MemDiag, MemModule, NetDiag, Snapshot, ThermalDiag, VolumeDiag,
 };
 
 /// Ile dni wstecz liczy się zdarzenia awarii.

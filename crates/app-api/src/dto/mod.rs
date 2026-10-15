@@ -11,6 +11,7 @@ mod bridges;
 mod broker;
 mod cameras;
 mod common;
+mod diag;
 mod events;
 mod files;
 mod gpu_live;
@@ -46,6 +47,11 @@ pub use cameras::{
 };
 pub use common::{
     AutonomyLevel, Currency, Iso8601, Locale, LocalizedText, ModelProfile, Money, iso,
+};
+pub use diag::{
+    BatteryDiag, CheckKind, CheckResult, CheckRun, CpuDiag, DiagProgress, DiagView, DiskDiag,
+    EventCount, EventKind, EventLine, EventSummary, GpuDiag, Health, MachineDiag, MediaKind,
+    MemDiag, MemModule, Metric, NetDiag, Snapshot, ThermalDiag, Verdict, VolumeDiag,
 };
 pub use events::{AlfaEvent, EventFrame, EventsResume, StopReason, ToastKind};
 pub use files::{

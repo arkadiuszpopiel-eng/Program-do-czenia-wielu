@@ -81,6 +81,8 @@ pub(crate) struct Extra {
     pub keep: Vec<Arc<dyn std::any::Any + Send + Sync>>,
     /// Serwery MCP użytkownika (narzędzia agentek składane w `agent_stack`).
     pub mcp: Option<Arc<app_mcp::McpHub>>,
+    /// Diagnostyka komputera (narzędzie agentek w `agent_stack`).
+    pub diag: Option<Arc<app_diag::DiagApp>>,
 }
 
 /// System plików narzędzi i dziennika cofania (ten sam port — cofnięcie widzi te same pliki).

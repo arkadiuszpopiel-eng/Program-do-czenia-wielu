@@ -243,6 +243,8 @@ impl Built {
         let (gui, monitor) = work::gui(&options, &paths, &kernel);
         let mcp = agents::mcp_hub(&options, &paths, &kernel);
         self.extra.mcp = Some(mcp.clone());
+        let diag = agents::diag_app(&options, &paths);
+        self.extra.diag = Some(diag.clone());
         let ports = self.extra.ports(
             &options,
             ports::PortDeps {
@@ -359,6 +361,7 @@ impl Built {
             tasks: stack.tasks,
             bridges: stack.bridges,
             mcp,
+            diag,
             hub,
             sessions,
             device,

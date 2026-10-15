@@ -109,6 +109,17 @@ pub fn spec(command: &str) -> Option<Spec> {
         "bridges_mark_login" => (vec![("bridge", s), ("plan", os)], card),
         "broker_status" => (vec![], roundtrip::<BrokerStatusView>),
         "mcp_list" => (vec![], roundtrip::<Vec<McpServerView>>),
+        "diag_state" | "diag_snapshot" => (vec![], roundtrip::<DiagView>),
+        "diag_run" => (
+            vec![("tests", roundtrip::<Vec<String>>)],
+            roundtrip::<CheckRun>,
+        ),
+        "diag_cancel" => (vec![], roundtrip::<()>),
+        "diag_runs" => (
+            vec![("limit", roundtrip::<u32>)],
+            roundtrip::<Vec<CheckRun>>,
+        ),
+        "diag_export" => (vec![], roundtrip::<String>),
         "mcp_save" => (
             vec![("input", roundtrip::<McpServerInput>)],
             roundtrip::<McpServerView>,

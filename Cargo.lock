@@ -402,6 +402,7 @@ dependencies = [
  "core-config-contract",
  "cost-meter-contract",
  "memory-contract",
+ "pc-diag-contract",
  "personas-contract",
  "providers-contract",
  "schemars",
@@ -522,6 +523,7 @@ dependencies = [
  "app-bridges",
  "app-broker",
  "app-chat",
+ "app-diag",
  "app-files",
  "app-gui",
  "app-health",
@@ -569,6 +571,7 @@ dependencies = [
  "memory-impl",
  "model-residency-contract",
  "model-residency-impl",
+ "pc-diag-contract",
  "personas-contract",
  "personas-impl",
  "platform-contract",
@@ -629,6 +632,28 @@ dependencies = [
  "voice-wake-fake",
  "wat",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-diag"
+version = "0.0.57"
+dependencies = [
+ "app-api",
+ "async-trait",
+ "chrono",
+ "pc-diag-contract",
+ "pc-diag-fake",
+ "pc-diag-impl",
+ "platform-windows-diag-impl",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tools-common-contract",
+ "tracing",
 ]
 
 [[package]]
@@ -833,6 +858,7 @@ dependencies = [
  "app-broker",
  "app-memory",
  "async-trait",
+ "base64 0.22.1",
  "camera-hub-contract",
  "chrono",
  "compliance-contract",
@@ -842,6 +868,7 @@ dependencies = [
  "cost-meter-contract",
  "cost-meter-impl",
  "device-profile-contract",
+ "flate2",
  "futures-util",
  "lib-sqlstore",
  "model-residency-contract",
@@ -4110,6 +4137,20 @@ name = "pc-diag-fake"
 version = "0.0.57"
 dependencies = [
  "pc-diag-contract",
+]
+
+[[package]]
+name = "pc-diag-impl"
+version = "0.0.57"
+dependencies = [
+ "chrono",
+ "pc-diag-contract",
+ "pc-diag-fake",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

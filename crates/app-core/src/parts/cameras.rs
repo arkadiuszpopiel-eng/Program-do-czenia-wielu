@@ -31,7 +31,7 @@ fn spawn_events(hub: &Arc<dyn CameraHub>, events: EventHub) {
     let mut changes = hub.changes();
     tokio::spawn(async move {
         while changes.changed().await.is_ok() {
-            let state = crate::commands::cameras::cameras_dto(&changes.borrow_and_update());
+            let state = app_modules::cameras::cameras_dto(&changes.borrow_and_update());
             events.emit(AlfaEvent::CamerasChanged { state });
         }
     });

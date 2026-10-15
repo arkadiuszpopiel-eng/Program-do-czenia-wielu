@@ -1,0 +1,25 @@
+[package]
+name = "pc-diag-impl"
+description = "pc-diag: testy podzespołów (procesor jeden/wiele wątków, pamięć ze wzorcem i weryfikacją, dysk z zapisem/odczytem bez pamięci podręcznej systemu i weryfikacją sum, odczyt losowy 4 KB, sieć: DNS i połączenia), historia zapisów i testów w JSONL z porównaniem do poprzedniego pomiaru, raport"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+pc-diag-contract = { path = "../pc-diag-contract" }
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+tokio = { workspace = true, features = ["rt", "sync", "time"] }
+tracing.workspace = true
+
+[dev-dependencies]
+pc-diag-fake = { path = "../pc-diag-fake" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true

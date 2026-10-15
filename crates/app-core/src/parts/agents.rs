@@ -61,6 +61,10 @@ impl Extra {
             let mcp_gate = tools_common_contract::BrokerGate::new(gate.clone());
             extra.extend(app_mcp::agent_tools(mcp.clone(), mcp_gate));
         }
+        if let Some(diag) = &self.diag {
+            let gate = tools_common_contract::BrokerGate::new(gate.clone());
+            extra.push(Arc::new(app_diag::DiagTool::new(diag.clone(), gate)));
+        }
         let launch = app_agents::Launch::new(Some(locks), Some(gate), Some(personas));
         // Ta sama instancja, którą Broker zabija procesy (kill-switch, Job Objects).
         let exec = self.exec.clone()?;
@@ -220,4 +224,20 @@ pub(crate) fn mcp_hub(
         probe: Some(probe),
         connector: Arc::new(app_mcp::StdioConnector),
     }))
+}
+
+/// Diagnostyka komputera: historia w danych lokalnych, raporty w `<Alfa>\Diagnostyka`,
+/// codzienny zapis parametrów w tle.
+pub(crate) fn diag_app(options: &AppOptions, paths: &AppPaths) -> Arc<app_diag::DiagApp> {
+    let probe = options
+        .diag_probe
+        .clone()
+        .unwrap_or_else(app_diag::system_probe);
+    let app = Arc::new(app_diag::DiagApp::new(app_diag::DiagAppDeps {
+        probe,
+        local: paths.local.clone(),
+        reports: paths.user_root.join("Diagnostyka"),
+    }));
+    app.spawn_auto();
+    app
 }

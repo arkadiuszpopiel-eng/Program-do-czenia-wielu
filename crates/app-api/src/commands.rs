@@ -154,6 +154,12 @@ macro_rules! with_commands {
             bridges_check(bridge: String) -> $crate::dto::BridgeCard;
             bridges_mark_login(bridge: String, plan: Option<String>) -> $crate::dto::BridgeCard;
             mcp_list() -> Vec<$crate::dto::McpServerView>;
+            diag_state() -> $crate::dto::DiagView;
+            diag_snapshot() -> $crate::dto::DiagView;
+            diag_run(tests: Vec<String>) -> $crate::dto::CheckRun;
+            diag_cancel() -> ();
+            diag_runs(limit: u32) -> Vec<$crate::dto::CheckRun>;
+            diag_export() -> String;
             mcp_save(input: $crate::dto::McpServerInput) -> $crate::dto::McpServerView;
             mcp_remove(id: String) -> ();
             mcp_tools(id: String) -> $crate::dto::McpServerTools;
@@ -275,6 +281,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 242);
+        assert_eq!(super::COMMANDS.len(), 248);
     }
 }

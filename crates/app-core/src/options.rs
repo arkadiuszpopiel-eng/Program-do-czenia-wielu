@@ -72,6 +72,8 @@ pub struct AppOptions {
     pub bridges: Option<BridgeFactory>,
     /// Wykrywanie CLI w PATH (`None` = `PATH`/`PATHEXT` procesu, `--version`).
     pub cli_probe: Option<Arc<dyn CliProbe>>,
+    /// Sonda parametrów komputera (`None` = PowerShell/CIM na Windows).
+    pub diag_probe: Option<Arc<dyn pc_diag_contract::DiagProbe>>,
     /// Porty GUI computer use (`None` = `WinGui` ze strażnikiem okien Alfy; testy: `platform-fake`).
     pub gui: Option<app_gui::GuiPorts>,
     /// Pseudokonsola terminala (`None` = ConPTY; testy: `platform-fake::FakePty`).
@@ -118,6 +120,7 @@ impl Default for AppOptions {
             shell: None,
             bridges: None,
             cli_probe: None,
+            diag_probe: None,
             gui: None,
             pty: None,
             signals: None,

@@ -4,8 +4,9 @@
 
 use chrono::{DateTime, Utc};
 use pc_diag_contract::{
-    BatteryDiag, CpuDiag, DiskDiag, EVENT_WINDOW_DAYS, EventKind, EventLine, EventSummary, GpuDiag,
-    Health, MachineDiag, MediaKind, MemDiag, MemModule, NetDiag, Snapshot, ThermalDiag, VolumeDiag,
+    BatteryDiag, CpuDiag, DiskDiag, EVENT_WINDOW_DAYS, EventCount, EventKind, EventLine,
+    EventSummary, GpuDiag, Health, MachineDiag, MediaKind, MemDiag, MemModule, NetDiag, Snapshot,
+    ThermalDiag, VolumeDiag,
 };
 use serde_json::Value;
 
@@ -323,14 +324,17 @@ pub fn parse(json: &str, now: DateTime<Utc>) -> Result<Snapshot, String> {
             d.event_errors += 1;
         }
     }
-    let mut counts: Vec<(EventKind, u32)> = Vec::new();
+    let mut counts: Vec<EventCount> = Vec::new();
     for e in &recent {
-        match counts.iter_mut().find(|(k, _)| *k == e.kind) {
-            Some((_, n)) => *n += 1,
-            None => counts.push((e.kind, 1)),
+        match counts.iter_mut().find(|c| c.kind == e.kind) {
+            Some(c) => c.count += 1,
+            None => counts.push(EventCount {
+                kind: e.kind,
+                count: 1,
+            }),
         }
     }
-    counts.sort();
+    counts.sort_by_key(|c| c.kind);
     let recent = collapse(recent);
     let mut gaps: Vec<String> = list(&v["gaps"])
         .into_iter()

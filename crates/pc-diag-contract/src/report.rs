@@ -162,8 +162,8 @@ pub fn markdown(s: &Snapshot, run: Option<&CheckRun>) -> String {
         }
     }
     let _ = writeln!(o, "\n## Zdarzenia ({} dni)\n", s.events.window_days);
-    for (k, n) in &s.events.counts {
-        let _ = writeln!(o, "- {}: {n}", k.label());
+    for c in &s.events.counts {
+        let _ = writeln!(o, "- {}: {}", c.kind.label(), c.count);
     }
     for e in s.events.recent.iter().take(15) {
         let _ = writeln!(o, "- {} {} ({}): {}", e.at, e.source, e.id, e.message);

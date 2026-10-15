@@ -7,9 +7,9 @@
 use std::sync::{Mutex, PoisonError};
 
 use pc_diag_contract::{
-    BatteryDiag, CpuDiag, DiagError, DiagProbe, DiskDiag, EventKind, EventLine, EventSummary,
-    GpuDiag, Health, MachineDiag, MediaKind, MemDiag, MemModule, NetDiag, Snapshot, ThermalDiag,
-    VolumeDiag,
+    BatteryDiag, CpuDiag, DiagError, DiagProbe, DiskDiag, EventCount, EventKind, EventLine,
+    EventSummary, GpuDiag, Health, MachineDiag, MediaKind, MemDiag, MemModule, NetDiag, Snapshot,
+    ThermalDiag, VolumeDiag,
 };
 
 /// Przykładowy zapis parametrów.
@@ -135,7 +135,16 @@ pub fn sample() -> Snapshot {
         }],
         events: EventSummary {
             window_days: 7,
-            counts: vec![(EventKind::Disk, 3), (EventKind::Usb, 4)],
+            counts: vec![
+                EventCount {
+                    kind: EventKind::Disk,
+                    count: 3,
+                },
+                EventCount {
+                    kind: EventKind::Usb,
+                    count: 4,
+                },
+            ],
             recent: vec![EventLine {
                 at: "2026-10-14T08:12:00Z".into(),
                 source: "Ntfs".into(),

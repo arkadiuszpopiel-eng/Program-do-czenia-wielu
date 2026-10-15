@@ -117,7 +117,16 @@ fn integrity_reads_health_space_events_battery() {
     });
     s.events = EventSummary {
         window_days: 7,
-        counts: vec![(EventKind::Disk, 4), (EventKind::Usb, 2)],
+        counts: vec![
+            crate::EventCount {
+                kind: EventKind::Disk,
+                count: 4,
+            },
+            crate::EventCount {
+                kind: EventKind::Usb,
+                count: 2,
+            },
+        ],
         recent: Vec::new(),
     };
     s.battery = Some(BatteryDiag {

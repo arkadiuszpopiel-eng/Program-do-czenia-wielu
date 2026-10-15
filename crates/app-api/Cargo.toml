@@ -22,6 +22,7 @@ memory-contract = { path = "../memory-contract" }
 personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }
 search-contract = { path = "../search-contract" }
+pc-diag-contract = { path = "../pc-diag-contract" }
 sessions-contract = { path = "../sessions-contract" }
 async-trait.workspace = true
 chrono.workspace = true

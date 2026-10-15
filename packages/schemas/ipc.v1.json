@@ -2068,6 +2068,58 @@
       ],
       "type": "object"
     },
+    "BatteryDiag": {
+      "description": "Bateria.",
+      "properties": {
+        "charge_pct": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "cycles": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "design_mwh": {
+          "description": "Pojemność fabryczna i bieżąca pełna (mWh).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "full_mwh": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "on_ac": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "charge_pct",
+        "on_ac",
+        "design_mwh",
+        "full_mwh",
+        "cycles"
+      ],
+      "type": "object"
+    },
     "BatteryView": {
       "description": "Bateria.",
       "properties": {
@@ -3127,6 +3179,155 @@
         }
       ]
     },
+    "CheckKind": {
+      "description": "Rodzaj testu.",
+      "oneOf": [
+        {
+          "description": "Procesor: jeden wątek.",
+          "properties": {
+            "test": {
+              "const": "cpu_single",
+              "type": "string"
+            }
+          },
+          "required": [
+            "test"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Procesor: wszystkie wątki (skalowanie).",
+          "properties": {
+            "test": {
+              "const": "cpu_multi",
+              "type": "string"
+            }
+          },
+          "required": [
+            "test"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Pamięć: zapis wzorca z weryfikacją i przepustowość kopiowania.",
+          "properties": {
+            "test": {
+              "const": "memory",
+              "type": "string"
+            }
+          },
+          "required": [
+            "test"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Dysk (litera woluminu, np. `C:`): zapis i odczyt sekwencyjny, odczyt losowy 4 KB.",
+          "properties": {
+            "target": {
+              "type": "string"
+            },
+            "test": {
+              "const": "disk",
+              "type": "string"
+            }
+          },
+          "required": [
+            "test",
+            "target"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Sieć: DNS i czas połączenia z kilkoma serwerami.",
+          "properties": {
+            "test": {
+              "const": "network",
+              "type": "string"
+            }
+          },
+          "required": [
+            "test"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Spójność: kondycja dysków, wolne miejsce, zdarzenia awarii, bateria, temperatury\n(ocena ostatniego zapisu parametrów, bez obciążania sprzętu).",
+          "properties": {
+            "test": {
+              "const": "integrity",
+              "type": "string"
+            }
+          },
+          "required": [
+            "test"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CheckResult": {
+      "description": "Wynik jednego testu.",
+      "properties": {
+        "duration_ms": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/CheckKind"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "type": "array"
+        },
+        "notes": {
+          "description": "Uwagi i powody oceny (po polsku).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "verdict": {
+          "$ref": "#/$defs/Verdict"
+        }
+      },
+      "required": [
+        "kind",
+        "verdict",
+        "metrics",
+        "notes",
+        "duration_ms"
+      ],
+      "type": "object"
+    },
+    "CheckRun": {
+      "description": "Przebieg testów (zapisywany w historii).",
+      "properties": {
+        "at": {
+          "description": "RFC 3339.",
+          "type": "string"
+        },
+        "overall": {
+          "$ref": "#/$defs/Verdict",
+          "description": "Najgorszy wynik (bez pominiętych; same pominięte — `Skipped`)."
+        },
+        "results": {
+          "items": {
+            "$ref": "#/$defs/CheckResult"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "at",
+        "results",
+        "overall"
+      ],
+      "type": "object"
+    },
     "CollisionResolution": {
       "description": "Rozwiązanie kolizji.",
       "enum": [
@@ -3329,6 +3530,85 @@
       ],
       "type": "object"
     },
+    "CpuDiag": {
+      "description": "Procesor.",
+      "properties": {
+        "base_mhz": {
+          "description": "Taktowanie bazowe i bieżące (MHz).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "cores": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "current_mhz": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "l2_kb": {
+          "description": "Pamięć podręczna L2 / L3 (KB).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "l3_kb": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "load_pct": {
+          "description": "Obciążenie w chwili pomiaru (%).",
+          "format": "double",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "threads": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "virtualization": {
+          "description": "Wirtualizacja włączona w firmware.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "cores",
+        "threads",
+        "base_mhz",
+        "current_mhz",
+        "load_pct",
+        "l2_kb",
+        "l3_kb",
+        "virtualization"
+      ],
+      "type": "object"
+    },
     "CpuView": {
       "description": "Procesor.",
       "properties": {
@@ -3423,6 +3703,122 @@
         "machine",
         "recommendation",
         "measured_at"
+      ],
+      "type": "object"
+    },
+    "DiagProgress": {
+      "description": "Postęp trwających testów.",
+      "properties": {
+        "current": {
+          "description": "Klucz bieżącego testu (`disk:C:`).",
+          "type": "string"
+        },
+        "done": {
+          "description": "Wyniki zakończonych testów tego przebiegu.",
+          "items": {
+            "$ref": "#/$defs/CheckResult"
+          },
+          "type": "array"
+        },
+        "index": {
+          "description": "Numer bieżącego testu (od 0) i liczba testów.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "total": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "index",
+        "total",
+        "current",
+        "done"
+      ],
+      "type": "object"
+    },
+    "DiagView": {
+      "description": "Stan diagnostyki.",
+      "properties": {
+        "available": {
+          "description": "Klucze dostępnych testów (`cpu_single`, `disk:C:`…).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "integrity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Ocena spójności ostatniego zapisu (kondycja, miejsce, zdarzenia, temperatury)."
+        },
+        "last_run": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckRun"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Ostatni przebieg testów."
+        },
+        "latest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Snapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Ostatni zapis parametrów."
+        },
+        "recording": {
+          "description": "Zapis w toku.",
+          "type": "boolean"
+        },
+        "running": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DiagProgress"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Trwające testy."
+        },
+        "runs": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "snapshots": {
+          "description": "Liczba zapisów i przebiegów w historii.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "latest",
+        "integrity",
+        "last_run",
+        "available",
+        "running",
+        "snapshots",
+        "runs",
+        "recording"
       ],
       "type": "object"
     },
@@ -3627,6 +4023,131 @@
       "required": [
         "kind",
         "text"
+      ],
+      "type": "object"
+    },
+    "DiskDiag": {
+      "description": "Dysk fizyczny.",
+      "properties": {
+        "bus": {
+          "description": "Magistrala (NVMe, SATA, USB…).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event_errors": {
+          "description": "Błędy tego dysku w dzienniku zdarzeń (okno [`crate::EVENT_WINDOW_DAYS`]).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "health": {
+          "$ref": "#/$defs/Health"
+        },
+        "media": {
+          "$ref": "#/$defs/MediaKind"
+        },
+        "model": {
+          "type": "string"
+        },
+        "number": {
+          "description": "Numer dysku w systemie (`Harddisk<N>` w dzienniku zdarzeń).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "operational": {
+          "description": "Stan operacyjny podany przez system (np. „OK”, „Degraded”).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "power_on_hours": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "read_errors": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "removable": {
+          "description": "Dysk wymienny (np. USB).",
+          "type": "boolean"
+        },
+        "serial_tail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "temperature_c": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "volumes": {
+          "description": "Litery woluminów na tym dysku.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "wear_pct": {
+          "description": "Zużycie (% — SSD), temperatura (°C), godziny pracy, błędy odczytu/zapisu (licznik SMART).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "write_errors": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "number",
+        "model",
+        "serial_tail",
+        "media",
+        "bus",
+        "size_mb",
+        "health",
+        "operational",
+        "wear_pct",
+        "temperature_c",
+        "power_on_hours",
+        "read_errors",
+        "write_errors",
+        "removable",
+        "volumes",
+        "event_errors"
       ],
       "type": "object"
     },
@@ -4040,6 +4561,24 @@
       ],
       "type": "object"
     },
+    "EventCount": {
+      "description": "Liczba zdarzeń rodzaju.",
+      "properties": {
+        "count": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/EventKind"
+        }
+      },
+      "required": [
+        "kind",
+        "count"
+      ],
+      "type": "object"
+    },
     "EventFrame": {
       "description": "Ramka zdarzeń `alfa://events`: paczka z numerami kolejnymi (plan v6 B.2, ADR 0019).",
       "properties": {
@@ -4083,6 +4622,46 @@
       ],
       "type": "object"
     },
+    "EventKind": {
+      "description": "Rodzaj zdarzenia awarii.",
+      "oneOf": [
+        {
+          "const": "unexpected_shutdown",
+          "description": "Nieoczekiwane wyłączenie (Kernel-Power 41, EventLog 6008).",
+          "type": "string"
+        },
+        {
+          "const": "bugcheck",
+          "description": "Niebieski ekran (BugCheck 1001).",
+          "type": "string"
+        },
+        {
+          "const": "hardware",
+          "description": "Błąd sprzętowy WHEA.",
+          "type": "string"
+        },
+        {
+          "const": "disk",
+          "description": "Błąd dysku / systemu plików (disk 7/11/51/153, Ntfs 50/55/98/140).",
+          "type": "string"
+        },
+        {
+          "const": "usb",
+          "description": "Odłączenie/reset kontrolera USB pamięci (UASPStor, USBSTOR).",
+          "type": "string"
+        },
+        {
+          "const": "app_crash",
+          "description": "Awaria aplikacji (Application Error 1000).",
+          "type": "string"
+        },
+        {
+          "const": "other",
+          "description": "Inne ostrzeżenie.",
+          "type": "string"
+        }
+      ]
+    },
     "EventLevel": {
       "description": "Poziom zdarzenia (rosnąco).",
       "enum": [
@@ -4094,6 +4673,68 @@
         "audit"
       ],
       "type": "string"
+    },
+    "EventLine": {
+      "description": "Zdarzenie z dziennika (skrót; treść systemowa obcięta).",
+      "properties": {
+        "at": {
+          "description": "RFC 3339.",
+          "type": "string"
+        },
+        "id": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/EventKind",
+          "description": "Rodzaj (klucz `EventKind`)."
+        },
+        "message": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "at",
+        "source",
+        "id",
+        "kind",
+        "message"
+      ],
+      "type": "object"
+    },
+    "EventSummary": {
+      "description": "Podsumowanie zdarzeń z ostatnich dni.",
+      "properties": {
+        "counts": {
+          "description": "Liczba zdarzeń w każdym rodzaju.",
+          "items": {
+            "$ref": "#/$defs/EventCount"
+          },
+          "type": "array"
+        },
+        "recent": {
+          "description": "Najnowsze zdarzenia (≤ 30).",
+          "items": {
+            "$ref": "#/$defs/EventLine"
+          },
+          "type": "array"
+        },
+        "window_days": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "window_days",
+        "counts",
+        "recent"
+      ],
+      "type": "object"
     },
     "EventsResume": {
       "description": "Wynik `events_resume`: brakujące ramki albo informacja, że trzeba wczytać stan od nowa.",
@@ -4262,6 +4903,50 @@
         "usd_pln",
         "date",
         "stale"
+      ],
+      "type": "object"
+    },
+    "GpuDiag": {
+      "description": "Karta graficzna.",
+      "properties": {
+        "driver_date": {
+          "description": "Data sterownika (`RRRR-MM-DD`).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "driver_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "description": "Stan urządzenia (np. „OK”, „Error”).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vram_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "driver_version",
+        "driver_date",
+        "vram_mb",
+        "status"
       ],
       "type": "object"
     },
@@ -4647,6 +5332,16 @@
         "screenshot"
       ],
       "type": "object"
+    },
+    "Health": {
+      "description": "Kondycja według systemu (Storage Spaces / SMART).",
+      "enum": [
+        "healthy",
+        "warning",
+        "unhealthy",
+        "unknown"
+      ],
+      "type": "string"
     },
     "HealthHumanAction": {
       "description": "Co wymaga człowieka.",
@@ -5471,6 +6166,47 @@
       ],
       "type": "object"
     },
+    "MachineDiag": {
+      "description": "System operacyjny i komputer.",
+      "properties": {
+        "bios": {
+          "description": "Wersja BIOS/UEFI.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model": {
+          "description": "Producent i model komputera.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "os": {
+          "description": "Nazwa systemu (np. „Windows 11 Pro”).",
+          "type": "string"
+        },
+        "os_version": {
+          "description": "Wersja i kompilacja.",
+          "type": "string"
+        },
+        "uptime_s": {
+          "description": "Czas od uruchomienia (s).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "os",
+        "os_version",
+        "model",
+        "bios",
+        "uptime_s"
+      ],
+      "type": "object"
+    },
     "MachineView": {
       "description": "Maszyna.",
       "properties": {
@@ -6025,6 +6761,105 @@
           "type": "string"
         }
       ]
+    },
+    "MediaKind": {
+      "description": "Rodzaj nośnika.",
+      "enum": [
+        "ssd",
+        "hdd",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "MemDiag": {
+      "description": "Pamięć operacyjna.",
+      "properties": {
+        "available_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "modules": {
+          "items": {
+            "$ref": "#/$defs/MemModule"
+          },
+          "type": "array"
+        },
+        "pagefile_mb": {
+          "description": "Plik stronicowania: rozmiar i użycie (MB).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "pagefile_used_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "total_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total_mb",
+        "available_mb",
+        "pagefile_mb",
+        "pagefile_used_mb",
+        "modules"
+      ],
+      "type": "object"
+    },
+    "MemModule": {
+      "description": "Moduł pamięci.",
+      "properties": {
+        "capacity_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "manufacturer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "part": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "slot": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "speed_mhz": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "slot",
+        "capacity_mb",
+        "speed_mhz",
+        "manufacturer",
+        "part"
+      ],
+      "type": "object"
     },
     "MemoryCascadeItem": {
       "description": "Pozycja podglądu kaskady.",
@@ -6727,6 +7562,38 @@
       ],
       "type": "object"
     },
+    "Metric": {
+      "description": "Zmierzona wartość.",
+      "properties": {
+        "higher_is_better": {
+          "description": "Większa wartość jest lepsza.",
+          "type": "boolean"
+        },
+        "key": {
+          "description": "Klucz (`seq_write_mbps`, `latency_ms`…).",
+          "type": "string"
+        },
+        "label": {
+          "description": "Etykieta po polsku.",
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "value": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "value",
+        "unit",
+        "higher_is_better"
+      ],
+      "type": "object"
+    },
     "MicAvailability": {
       "description": "Stan mikrofonu (uprawnienie/obecność).",
       "enum": [
@@ -7276,6 +8143,45 @@
         "instrumental",
         "locative",
         "vocative"
+      ],
+      "type": "object"
+    },
+    "NetDiag": {
+      "description": "Karta sieciowa (bez adresów IP i MAC).",
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "description": "`wifi`, `ethernet`, `other`.",
+          "type": "string"
+        },
+        "link_mbps": {
+          "description": "Szybkość łącza (Mb/s).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "up": {
+          "description": "Połączona.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "up",
+        "link_mbps",
+        "kind"
       ],
       "type": "object"
     },
@@ -9122,6 +10028,11 @@
           "type": "string"
         },
         {
+          "const": "diag",
+          "description": "Diagnostyka komputera: zapis parametrów, testy podzespołów, historia, raport.",
+          "type": "string"
+        },
+        {
           "const": "models",
           "description": "Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.",
           "type": "string"
@@ -9341,6 +10252,89 @@
         "superseded"
       ],
       "type": "string"
+    },
+    "Snapshot": {
+      "description": "Pełny zapis parametrów.",
+      "properties": {
+        "at": {
+          "description": "RFC 3339.",
+          "type": "string"
+        },
+        "battery": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BatteryDiag"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cpu": {
+          "$ref": "#/$defs/CpuDiag"
+        },
+        "disks": {
+          "items": {
+            "$ref": "#/$defs/DiskDiag"
+          },
+          "type": "array"
+        },
+        "events": {
+          "$ref": "#/$defs/EventSummary"
+        },
+        "gaps": {
+          "description": "Części, których nie udało się odczytać (z powodem) — zapis jest wtedy niepełny.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "gpus": {
+          "items": {
+            "$ref": "#/$defs/GpuDiag"
+          },
+          "type": "array"
+        },
+        "machine": {
+          "$ref": "#/$defs/MachineDiag"
+        },
+        "memory": {
+          "$ref": "#/$defs/MemDiag"
+        },
+        "network": {
+          "items": {
+            "$ref": "#/$defs/NetDiag"
+          },
+          "type": "array"
+        },
+        "thermal": {
+          "items": {
+            "$ref": "#/$defs/ThermalDiag"
+          },
+          "type": "array"
+        },
+        "volumes": {
+          "items": {
+            "$ref": "#/$defs/VolumeDiag"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "at",
+        "machine",
+        "cpu",
+        "memory",
+        "disks",
+        "volumes",
+        "gpus",
+        "network",
+        "battery",
+        "thermal",
+        "events",
+        "gaps"
+      ],
+      "type": "object"
     },
     "SpeakerAction": {
       "description": "Akcja kreatora rejestracji i weryfikacji właściciela.",
@@ -10070,6 +11064,23 @@
         "latency_ms",
         "models",
         "error"
+      ],
+      "type": "object"
+    },
+    "ThermalDiag": {
+      "description": "Czujnik temperatury.",
+      "properties": {
+        "celsius": {
+          "format": "double",
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "celsius"
       ],
       "type": "object"
     },
@@ -11240,6 +12251,24 @@
       ],
       "type": "object"
     },
+    "Verdict": {
+      "description": "Wynik testu.",
+      "oneOf": [
+        {
+          "enum": [
+            "pass",
+            "warn",
+            "fail"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "skipped",
+          "description": "Nie wykonano (np. za mało miejsca, brak sieci) — z powodem w `notes`.",
+          "type": "string"
+        }
+      ]
+    },
     "VoiceDraft": {
       "description": "Głos v0: mówczyni bazowa wbudowanego silnika + wysokość i tempo (bez kluczy, bez klonów).",
       "properties": {
@@ -11473,6 +12502,50 @@
         "mode",
         "muted",
         "agent"
+      ],
+      "type": "object"
+    },
+    "VolumeDiag": {
+      "description": "Wolumin (litera dysku).",
+      "properties": {
+        "file_system": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "free_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "letter": {
+          "description": "Litera z dwukropkiem (`C:`).",
+          "type": "string"
+        },
+        "size_mb": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "system": {
+          "description": "Wolumin systemowy.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "letter",
+        "label",
+        "file_system",
+        "size_mb",
+        "free_mb",
+        "system"
       ],
       "type": "object"
     },
@@ -12669,6 +13742,64 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/DeviceProfile"
+      }
+    },
+    "diag_cancel": {
+      "args": [],
+      "result": {
+        "type": "null"
+      }
+    },
+    "diag_export": {
+      "args": [],
+      "result": {
+        "type": "string"
+      }
+    },
+    "diag_run": {
+      "args": [
+        {
+          "name": "tests",
+          "schema": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/CheckRun"
+      }
+    },
+    "diag_runs": {
+      "args": [
+        {
+          "name": "limit",
+          "schema": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/CheckRun"
+        },
+        "type": "array"
+      }
+    },
+    "diag_snapshot": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/DiagView"
+      }
+    },
+    "diag_state": {
+      "args": [],
+      "result": {
+        "$ref": "#/$defs/DiagView"
       }
     },
     "embed_model_activate": {
