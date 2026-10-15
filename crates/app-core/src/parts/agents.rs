@@ -57,6 +57,10 @@ impl Extra {
         let (media_tools, media) =
             media.toolsets(gate.clone(), journal.clone(), platform_fs(options), bus);
         extra.extend(media_tools);
+        if let Some(mcp) = &self.mcp {
+            let mcp_gate = tools_common_contract::BrokerGate::new(gate.clone());
+            extra.extend(app_mcp::agent_tools(mcp.clone(), mcp_gate));
+        }
         let launch = app_agents::Launch::new(Some(locks), Some(gate), Some(personas));
         // Ta sama instancja, którą Broker zabija procesy (kill-switch, Job Objects).
         let exec = self.exec.clone()?;
@@ -196,4 +200,24 @@ fn noise_setting(
         }
     });
     setting
+}
+
+/// Serwery MCP użytkownika (`app-mcp`): lista i zgody w katalogu konfiguracji, wartości tajne
+/// w magazynie sekretów Jądra, programy szukane w PATH (`npx` → `npx.cmd`).
+pub(crate) fn mcp_hub(
+    options: &AppOptions,
+    paths: &AppPaths,
+    kernel: &super::Kernel,
+) -> Arc<app_mcp::McpHub> {
+    let probe = options
+        .cli_probe
+        .clone()
+        .unwrap_or_else(|| Arc::new(accounts_hub_impl::SystemCliProbe::from_env()));
+    Arc::new(app_mcp::McpHub::new(app_mcp::McpHubDeps {
+        config_dir: paths.config.clone(),
+        work_dir: paths.local.join("mcp"),
+        secrets: Some(kernel.secrets.clone()),
+        probe: Some(probe),
+        connector: Arc::new(app_mcp::StdioConnector),
+    }))
 }

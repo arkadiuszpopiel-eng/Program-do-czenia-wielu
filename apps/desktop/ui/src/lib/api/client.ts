@@ -69,6 +69,7 @@ import type { UpdatesApi } from './client-updates';
 import type { BrokerApi } from './client-broker';
 import type { VoiceFeaturesApi } from './client-voice';
 import type { PluginsApi } from './client-plugins';
+import type { McpApi } from './client-mcp';
 import type { EnginesApi } from './client-models';
 import type { AttachmentsApi, BackupsApi, ConversationExportApi } from './client-files';
 import type {
@@ -360,6 +361,7 @@ export interface AlfaClient {
   /** Głos rozszerzony F5: słowa wywoławcze, weryfikacja głosu, dyktowanie, czytanie. */
   readonly voiceFeatures: VoiceFeaturesApi;
   readonly plugins: PluginsApi;
+  readonly mcp: McpApi;
   /** Modele lokalne i silniki: pobieranie, zgoda TOFU, weryfikacja, embedder wyszukiwania. */
   readonly engines: EnginesApi;
   /** Załączniki composera (kopie w katalogu sesji; podgląd przez protokół zasobów). */

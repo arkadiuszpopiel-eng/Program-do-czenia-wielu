@@ -79,6 +79,8 @@ pub(crate) struct Extra {
     pub agents_ready: Arc<std::sync::OnceLock<Result<(), String>>>,
     /// Usługi modułów trzymane przez cały czas życia rdzenia (ich zdrowie czyta rejestr).
     pub keep: Vec<Arc<dyn std::any::Any + Send + Sync>>,
+    /// Serwery MCP użytkownika (narzędzia agentek składane w `agent_stack`).
+    pub mcp: Option<Arc<app_mcp::McpHub>>,
 }
 
 /// System plików narzędzi i dziennika cofania (ten sam port — cofnięcie widzi te same pliki).

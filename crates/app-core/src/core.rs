@@ -69,6 +69,8 @@ pub(crate) struct Inner {
     pub tasks: Arc<app_tasks::TasksApp>,
     /// Mosty CLI (karty zgodności, delegacja, logowanie w terminalu) i serwer MCP na żądanie.
     pub bridges: Arc<app_bridges::BridgesApp>,
+    /// Serwery MCP podłączone przez użytkownika (narzędzia agentek `mcp_tools`/`mcp_call`).
+    pub mcp: Arc<app_mcp::McpHub>,
     pub brain: Arc<dyn BrainPort>,
     /// Kiedy ostatnio sprawdzano konto po błędzie w rozmowie (konto zapasowe, C2.15).
     pub retests: crate::parts::backup_account::Retests,

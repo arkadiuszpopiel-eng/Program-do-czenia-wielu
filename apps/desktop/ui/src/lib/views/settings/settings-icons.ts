@@ -5,6 +5,7 @@ import ArrowLeftRight from '@lucide/svelte/icons/arrow-left-right';
 import Bell from '@lucide/svelte/icons/bell';
 import Blocks from '@lucide/svelte/icons/blocks';
 import Brain from '@lucide/svelte/icons/brain';
+import Cable from '@lucide/svelte/icons/cable';
 import CalendarClock from '@lucide/svelte/icons/calendar-clock';
 import Camera from '@lucide/svelte/icons/camera';
 import Cpu from '@lucide/svelte/icons/cpu';
@@ -57,6 +58,7 @@ const ICONS: Record<string, Icon> = {
   builder: WandSparkles,
   skills: GraduationCap,
   plugins: Puzzle,
+  mcp: Cable,
   triggers: CalendarClock,
   marshal: Network,
   permissions: ShieldCheck,

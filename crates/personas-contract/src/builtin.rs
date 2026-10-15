@@ -182,6 +182,7 @@ const ROLES: [RoleSpec; 9] = [
             "net",
             "vision",
             "media",
+            "mcp",
         ],
         [false, false, true, false],
     ),
@@ -191,7 +192,7 @@ const ROLES: [RoleSpec; 9] = [
         "pisze i uruchamia kod, korzysta z mostów CLI",
         "Jako Koderka piszesz i uruchamiasz kod w wyznaczonym worktree; zmiany są małe, przetestowane i opisane.",
         "code",
-        &["worktree", "shell", "cli-bridge"],
+        &["worktree", "shell", "cli-bridge", "mcp"],
         [false, false, true, false],
     ),
     (

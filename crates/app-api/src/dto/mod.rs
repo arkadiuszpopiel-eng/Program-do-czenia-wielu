@@ -17,6 +17,7 @@ mod gpu_live;
 mod gui;
 mod health;
 mod hub;
+mod mcp;
 mod memory;
 mod model_queues;
 mod model_routing;
@@ -68,6 +69,10 @@ pub use hub::{
     ComplianceStatus, CpuView, DeviceProfile, EnvImportKind, EnvImportResult, GpuView, HwClass,
     LocalDownloadState, LocalModelInfo, MachineView, ModelInfo, ModelKind, PermissionsState,
     ProviderInfo, ProviderKind, RecommendationView, SecretInput, TestReport, VoiceProfileId,
+};
+pub use mcp::{
+    McpConnState, McpEnvVar, McpServerInput, McpServerTools, McpServerView, McpToolState,
+    McpToolView, McpTrust,
 };
 pub use memory::{
     ConsolidationReport, MemoryCascadeItem, MemoryEdit, MemoryExplanation, MemoryForgetPreview,

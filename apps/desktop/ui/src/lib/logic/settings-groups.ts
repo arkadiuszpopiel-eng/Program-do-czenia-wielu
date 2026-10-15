@@ -9,7 +9,7 @@ export const SETTINGS_GROUPS = [
     pages: ['connections', 'providers', 'api', 'bridges', 'models', 'costs', 'router'],
   },
   { id: 'voice', pages: ['voice', 'cameras'] },
-  { id: 'agents', pages: ['agents', 'builder', 'skills', 'plugins', 'triggers', 'marshal'] },
+  { id: 'agents', pages: ['agents', 'builder', 'skills', 'plugins', 'mcp', 'triggers', 'marshal'] },
   { id: 'safety', pages: ['permissions', 'computer'] },
   { id: 'data', pages: ['memory', 'sessions', 'files', 'transfer', 'logs'] },
   // „Urządzenia” to sprzęt komputera (procesor, karty, bateria) — sprawa systemu, nie głosu.

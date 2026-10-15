@@ -26,6 +26,7 @@ accounts-hub-impl = { path = "../accounts-hub-impl" }
 compliance-contract = { path = "../compliance-contract" }
 core-bus-contract.workspace = true
 core-config-contract.workspace = true
+camera-hub-contract = { path = "../camera-hub-contract" }
 core-config-impl = { path = "../core-config-impl" }
 device-profile-contract = { path = "../device-profile-contract" }
 lib-sqlstore = { path = "../lib-sqlstore" }

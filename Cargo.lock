@@ -525,6 +525,7 @@ dependencies = [
  "app-files",
  "app-gui",
  "app-health",
+ "app-mcp",
  "app-memory",
  "app-models",
  "app-modules",
@@ -732,6 +733,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-mcp"
+version = "0.0.57"
+dependencies = [
+ "accounts-hub-contract",
+ "accounts-hub-fake",
+ "app-api",
+ "async-trait",
+ "mcp-contract",
+ "mcp-fake",
+ "mcp-impl",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "safety-broker-fake",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tools-common-contract",
+ "tracing",
+]
+
+[[package]]
 name = "app-memory"
 version = "0.0.57"
 dependencies = [
@@ -811,6 +833,7 @@ dependencies = [
  "app-broker",
  "app-memory",
  "async-trait",
+ "camera-hub-contract",
  "chrono",
  "compliance-contract",
  "core-bus-contract",
@@ -3452,6 +3475,7 @@ version = "0.0.57"
 dependencies = [
  "async-trait",
  "mcp-contract",
+ "mcp-impl",
  "serde_json",
  "tokio",
  "uuid",

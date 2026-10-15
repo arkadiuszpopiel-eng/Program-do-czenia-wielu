@@ -1396,6 +1396,17 @@
   "upcoming": []
  },
  {
+  "id": "mcp",
+  "label": {
+   "pl": "Serwery MCP",
+   "en": "MCP servers"
+  },
+  "wave": 1,
+  "custom": "mcp",
+  "settings": [],
+  "upcoming": []
+ },
+ {
   "id": "builder",
   "label": {
    "pl": "Kreator agentek",

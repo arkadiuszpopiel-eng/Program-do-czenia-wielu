@@ -220,7 +220,7 @@ impl Built {
 
     /// Składa `AppCore` z gotowych modułów i portów.
     pub async fn into_core(
-        self,
+        mut self,
         paths: AppPaths,
         options: AppOptions,
         bus: Arc<dyn EventBus>,
@@ -241,6 +241,8 @@ impl Built {
         let memory = self.memory_app(&kernel).await?;
         let personas = need(&self.personas, "personas")?;
         let (gui, monitor) = work::gui(&options, &paths, &kernel);
+        let mcp = agents::mcp_hub(&options, &paths, &kernel);
+        self.extra.mcp = Some(mcp.clone());
         let ports = self.extra.ports(
             &options,
             ports::PortDeps {
@@ -356,6 +358,7 @@ impl Built {
             cameras,
             tasks: stack.tasks,
             bridges: stack.bridges,
+            mcp,
             hub,
             sessions,
             device,

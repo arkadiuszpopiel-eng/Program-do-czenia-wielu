@@ -26,6 +26,7 @@ app-memory = { path = "../app-memory" }
 # Zadania, wyzwalacze, Marszałek (scheduler-impl zamiast scheduler-lite-impl) i mosty CLI + MCP.
 app-tasks = { path = "../app-tasks" }
 app-bridges = { path = "../app-bridges" }
+app-mcp = { path = "../app-mcp" }
 # Computer use (panel „Ekran"), terminal, umiejętności + Kreator, „Zdrowie systemu".
 app-gui = { path = "../app-gui" }
 app-terminal = { path = "../app-terminal" }

@@ -50,3 +50,12 @@ export const enginesApi = (): AlfaClient['engines'] => ({
   reindexCancel: () => call('search_reindex_cancel'),
   reindexStatus: () => call('search_reindex_status'),
 });
+
+export const mcpApi = (): AlfaClient['mcp'] => ({
+  list: () => call('mcp_list'),
+  save: (input) => call('mcp_save', { input }),
+  remove: (id) => call('mcp_remove', { id }),
+  tools: (id) => call('mcp_tools', { id }),
+  approve: (id, tool, fingerprint) => call('mcp_approve', { id, tool, fingerprint }),
+  revoke: (id, tool) => call('mcp_revoke', { id, tool }),
+});

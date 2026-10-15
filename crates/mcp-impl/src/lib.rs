@@ -14,6 +14,7 @@ mod connection;
 mod host;
 pub mod lines;
 pub mod listener;
+mod stderr;
 mod tools;
 pub mod v1;
 

@@ -108,6 +108,18 @@ pub fn spec(command: &str) -> Option<Spec> {
         "bridges_check" => (vec![("bridge", s)], card),
         "bridges_mark_login" => (vec![("bridge", s), ("plan", os)], card),
         "broker_status" => (vec![], roundtrip::<BrokerStatusView>),
+        "mcp_list" => (vec![], roundtrip::<Vec<McpServerView>>),
+        "mcp_save" => (
+            vec![("input", roundtrip::<McpServerInput>)],
+            roundtrip::<McpServerView>,
+        ),
+        "mcp_remove" => (vec![("id", s)], roundtrip::<()>),
+        "mcp_tools" => (vec![("id", s)], roundtrip::<McpServerTools>),
+        "mcp_revoke" => (vec![("id", s), ("tool", s)], roundtrip::<McpServerTools>),
+        "mcp_approve" => (
+            vec![("id", s), ("tool", s), ("fingerprint", s)],
+            roundtrip::<McpServerTools>,
+        ),
         other => {
             return memory(other)
                 .or_else(|| tasks(other))

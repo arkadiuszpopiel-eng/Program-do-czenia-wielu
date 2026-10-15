@@ -5,6 +5,7 @@ mod accounts;
 mod agents;
 pub(crate) mod app;
 mod bridges;
+mod mcp;
 pub(crate) mod cameras;
 mod costs;
 pub(crate) mod device;

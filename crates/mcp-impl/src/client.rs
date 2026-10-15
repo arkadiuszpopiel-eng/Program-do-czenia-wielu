@@ -19,6 +19,7 @@ use mcp_contract::{
 use serde_json::{Value, json};
 
 use crate::connection::Connection;
+use crate::stderr::StderrTail;
 
 /// Zmienne dziedziczone przez serwer MCP (reszta środowiska Alfy, w tym klucze, nie przechodzi).
 pub const SERVER_ENV_ALLOWLIST: [&str; 14] = [
@@ -60,8 +61,11 @@ impl StdioMcpClient {
             .env_clear()
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::null())
+            .stderr(Stdio::piped())
             .kill_on_drop(true);
+        // Aplikacja okienkowa: serwer konsolowy bez własnego okna konsoli.
+        #[cfg(windows)]
+        cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
         for name in SERVER_ENV_ALLOWLIST {
             if let Some(v) = std::env::var_os(name) {
                 cmd.env(name, v);
@@ -75,8 +79,29 @@ impl StdioMcpClient {
         let (Some(stdin), Some(stdout)) = (child.stdin.take(), child.stdout.take()) else {
             return Err(McpError::Spawn("brak potoków stdio".into()));
         };
+        let tail = child.stderr.take().map(StderrTail::collect);
         let conn = Connection::new(stdout, stdin);
-        Self::initialize(config, conn, Some(child), pins).await
+        let secrets: Vec<String> = config.env.values().cloned().collect();
+        match Self::initialize(config, conn, Some(child), pins).await {
+            Ok(client) => Ok(client),
+            // Serwer zakończył się przed `initialize` — przyczyna z jego stderr.
+            Err(McpError::Closed | McpError::Transport(_)) if tail.is_some() => {
+                let refs: Vec<&str> = secrets.iter().map(String::as_str).collect();
+                let text = match &tail {
+                    Some(t) => t.text(Duration::from_millis(800), &refs).await,
+                    None => String::new(),
+                };
+                Err(McpError::Spawn(if text.is_empty() {
+                    "serwer zakończył działanie przed rozpoczęciem rozmowy".into()
+                } else {
+                    format!(
+                        "serwer zakończył działanie przed rozpoczęciem rozmowy:
+{text}"
+                    )
+                }))
+            }
+            Err(e) => Err(e),
+        }
     }
 
     /// Klient nad gotowym strumieniem (serwer w procesie — testy, serwery wbudowane).

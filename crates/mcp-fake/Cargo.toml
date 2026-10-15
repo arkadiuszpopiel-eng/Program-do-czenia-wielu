@@ -8,14 +8,19 @@ publish.workspace = true
 rust-version.workspace = true
 repository.workspace = true
 
+[[bin]]
+name = "alfa-fake-mcp-server"
+path = "src/bin/alfa-fake-mcp-server.rs"
+
 [dependencies]
 mcp-contract = { path = "../mcp-contract" }
 async-trait.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
-tokio = { workspace = true, features = ["net", "io-util", "rt", "sync"] }
+tokio = { workspace = true, features = ["net", "io-util", "io-std", "rt", "sync", "macros"] }
 
 [dev-dependencies]
+mcp-impl = { path = "../mcp-impl" }
 mcp-contract = { path = "../mcp-contract", features = ["contract-tests"] }
 tokio = { workspace = true, features = ["net", "io-util", "rt-multi-thread", "macros", "time"] }
 

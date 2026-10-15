@@ -5698,6 +5698,334 @@
       ],
       "type": "object"
     },
+    "McpConnState": {
+      "description": "Stan połączenia z serwerem.",
+      "oneOf": [
+        {
+          "const": "disabled",
+          "description": "Wyłączony przez użytkownika.",
+          "type": "string"
+        },
+        {
+          "const": "idle",
+          "description": "Włączony, jeszcze nie uruchomiony (start przy pierwszym użyciu).",
+          "type": "string"
+        },
+        {
+          "const": "connected",
+          "description": "Połączony.",
+          "type": "string"
+        },
+        {
+          "const": "failed",
+          "description": "Ostatnia próba nieudana (`error`).",
+          "type": "string"
+        }
+      ]
+    },
+    "McpEnvVar": {
+      "description": "Zmienna środowiskowa serwera (wartość jawna albo tajna — wtedy tylko nazwa).",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "boolean"
+        },
+        "value": {
+          "description": "Wartość jawna; `None` dla tajnej (w Menedżerze poświadczeń Windows).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "value",
+        "secret"
+      ],
+      "type": "object"
+    },
+    "McpServerInput": {
+      "description": "Dane formularza serwera (dodanie albo zmiana).",
+      "properties": {
+        "args": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "command": {
+          "type": "string"
+        },
+        "cwd": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "env": {
+          "default": [],
+          "description": "Zmienne; tajna z `value: None` zachowuje zapisaną wartość.",
+          "items": {
+            "$ref": "#/$defs/McpEnvVar"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "Pusty — nowy serwer (identyfikator z nazwy).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "timeout_ms": {
+          "default": null,
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "trust": {
+          "$ref": "#/$defs/McpTrust",
+          "default": "untrusted"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "command",
+        "args",
+        "cwd",
+        "env",
+        "trust",
+        "enabled",
+        "timeout_ms"
+      ],
+      "type": "object"
+    },
+    "McpServerTools": {
+      "description": "Wynik sprawdzenia serwera: stan po próbie i lista narzędzi.",
+      "properties": {
+        "server": {
+          "$ref": "#/$defs/McpServerView"
+        },
+        "tools": {
+          "items": {
+            "$ref": "#/$defs/McpToolView"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "server",
+        "tools"
+      ],
+      "type": "object"
+    },
+    "McpServerView": {
+      "description": "Serwer MCP na liście.",
+      "properties": {
+        "args": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "command": {
+          "description": "Polecenie tak, jak wpisał je użytkownik (`npx`, `uvx`, pełna ścieżka).",
+          "type": "string"
+        },
+        "cwd": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "env": {
+          "items": {
+            "$ref": "#/$defs/McpEnvVar"
+          },
+          "type": "array"
+        },
+        "error": {
+          "description": "Czytelny powód ostatniego niepowodzenia.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "resolved": {
+          "description": "Pełna ścieżka znalezionego programu; `None` — nie znaleziono w PATH.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "server_info": {
+          "description": "Nazwa i wersja z `initialize` (niezaufane).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/McpConnState"
+        },
+        "timeout_ms": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "tools_approved": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "tools_total": {
+          "description": "Liczba narzędzi z ostatniej listy i ile z nich ma zgodę.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "trust": {
+          "$ref": "#/$defs/McpTrust"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "command",
+        "resolved",
+        "args",
+        "cwd",
+        "env",
+        "trust",
+        "enabled",
+        "state",
+        "error",
+        "server_info",
+        "tools_total",
+        "tools_approved",
+        "timeout_ms"
+      ],
+      "type": "object"
+    },
+    "McpToolState": {
+      "description": "Stan zgody na narzędzie.",
+      "oneOf": [
+        {
+          "const": "approved",
+          "description": "Zgoda użytkownika — agentka może wywołać.",
+          "type": "string"
+        },
+        {
+          "const": "auto_approved",
+          "description": "Zgoda automatyczna (serwer zaufany, opis bez sygnałów).",
+          "type": "string"
+        },
+        {
+          "const": "new",
+          "description": "Nowe — czeka na zgodę.",
+          "type": "string"
+        },
+        {
+          "const": "changed",
+          "description": "Opis zmienił się po zgodzie — zablokowane do ponownej zgody.",
+          "type": "string"
+        }
+      ]
+    },
+    "McpToolView": {
+      "description": "Narzędzie serwera MCP.",
+      "properties": {
+        "description": {
+          "description": "Opis od serwera (niezaufany, skrócony).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fingerprint": {
+          "description": "Odcisk bieżącej definicji (podawany przy zgodzie).",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "params": {
+          "description": "Nazwy argumentów ze schematu (podgląd).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "state": {
+          "$ref": "#/$defs/McpToolState"
+        },
+        "suspicious": {
+          "description": "Opis zawiera sygnały wstrzyknięcia poleceń.",
+          "type": "boolean"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "title",
+        "description",
+        "state",
+        "fingerprint",
+        "suspicious",
+        "params"
+      ],
+      "type": "object"
+    },
+    "McpTrust": {
+      "description": "Poziom zaufania serwera (ustawia wyłącznie użytkownik).",
+      "oneOf": [
+        {
+          "const": "untrusted",
+          "description": "Każde narzędzie wymaga zgody.",
+          "type": "string"
+        },
+        {
+          "const": "reviewed",
+          "description": "Przejrzany — nadal każde narzędzie wymaga zgody.",
+          "type": "string"
+        },
+        {
+          "const": "trusted",
+          "description": "Zaufany — nowe narzędzia bez sygnałów wstrzyknięcia zatwierdzane automatycznie.",
+          "type": "string"
+        }
+      ]
+    },
     "MemoryCascadeItem": {
       "description": "Pozycja podglądu kaskady.",
       "properties": {
@@ -8786,6 +9114,11 @@
         {
           "const": "plugins",
           "description": "Wtyczki Wasm: propozycje, karta zatwierdzenia (zdolności, limity, hash), stany, problemy.",
+          "type": "string"
+        },
+        {
+          "const": "mcp",
+          "description": "Serwery MCP użytkownika: przepisy, formularz (zmienne tajne w Menedżerze poświadczeń), zgody.",
           "type": "string"
         },
         {
@@ -12691,6 +13024,98 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/MarshalState"
+      }
+    },
+    "mcp_approve": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "tool",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "fingerprint",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/McpServerTools"
+      }
+    },
+    "mcp_list": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/McpServerView"
+        },
+        "type": "array"
+      }
+    },
+    "mcp_remove": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "type": "null"
+      }
+    },
+    "mcp_revoke": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "tool",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/McpServerTools"
+      }
+    },
+    "mcp_save": {
+      "args": [
+        {
+          "name": "input",
+          "schema": {
+            "$ref": "#/$defs/McpServerInput"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/McpServerView"
+      }
+    },
+    "mcp_tools": {
+      "args": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/McpServerTools"
       }
     },
     "memory_approve": {

@@ -3,8 +3,18 @@
 import type { SettingValue, SettingsPageDef } from '../types-system';
 import { SETTINGS_PART_A } from './settings-part-a';
 import { SETTINGS_PART_B } from './settings-part-b';
+import { L, page } from './settings-helpers';
 
-export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [...SETTINGS_PART_A, ...SETTINGS_PART_B];
+/** Strony dodane po podziale na części (każda część jest u limitu długości pliku). */
+const SETTINGS_LATER: readonly SettingsPageDef[] = [
+  page('mcp', L('Serwery MCP', 'MCP servers'), 1, [], { custom: 'mcp' }),
+];
+
+export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [
+  ...SETTINGS_PART_A,
+  ...SETTINGS_PART_B,
+  ...SETTINGS_LATER,
+];
 
 export function defaultValues(): Record<string, SettingValue> {
   const out: Record<string, SettingValue> = {};

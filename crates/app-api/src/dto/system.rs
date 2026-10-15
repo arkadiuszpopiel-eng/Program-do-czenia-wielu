@@ -121,6 +121,8 @@ pub enum SettingsCustomPage {
     About,
     /// Wtyczki Wasm: propozycje, karta zatwierdzenia (zdolności, limity, hash), stany, problemy.
     Plugins,
+    /// Serwery MCP użytkownika: przepisy, formularz (zmienne tajne w Menedżerze poświadczeń), zgody.
+    Mcp,
     /// Modele lokalne i silniki: pobieranie z wznawianiem, SHA-256 / zgoda TOFU, embedder i przebudowa.
     Models,
 }

@@ -121,5 +121,26 @@ export async function runWork(
   await both('bridges', 'check', 'claude_code');
   await both('bridges', 'check', 'antigravity');
   await both('bridges', 'markLogin', 'antigravity', 'Google AI Pro');
+  await both('mcp', 'list');
+  const mcpFiles = (await both('mcp', 'tools', 'pliki')) as {
+    tools: { name: string; fingerprint: string }[];
+  };
+  await both('mcp', 'tools', 'github');
+  await both('mcp', 'save', {
+    id: null,
+    name: 'Przeglądarka (Playwright)',
+    command: 'npx',
+    args: ['-y', '@playwright/mcp@latest'],
+    cwd: null,
+    env: [{ name: 'API_TOKEN', value: 'wartosc', secret: true }],
+    trust: 'untrusted',
+    enabled: true,
+    timeout_ms: 30000,
+  });
+  const writeFile = mcpFiles.tools.find((t) => t.name === 'write_file');
+  if (!writeFile) throw new Error('brak write_file w atrapie MCP');
+  await both('mcp', 'approve', 'pliki', 'write_file', writeFile.fingerprint);
+  await both('mcp', 'revoke', 'pliki', 'write_file');
+  await both('mcp', 'remove', 'przegladarka-playwright');
   await flush();
 }

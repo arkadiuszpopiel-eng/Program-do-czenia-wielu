@@ -1546,6 +1546,83 @@ export interface MarshalState {
   readonly translator: boolean;
 }
 
+/** Stan połączenia z serwerem. */
+export type McpConnState = 'disabled' | 'idle' | 'connected' | 'failed';
+
+/** Zmienna środowiskowa serwera (wartość jawna albo tajna — wtedy tylko nazwa). */
+export interface McpEnvVar {
+  readonly name: string;
+  readonly secret: boolean;
+  /** Wartość jawna; `None` dla tajnej (w Menedżerze poświadczeń Windows). */
+  readonly value: string | null;
+}
+
+/** Dane formularza serwera (dodanie albo zmiana). */
+export interface McpServerInput {
+  readonly args: readonly string[];
+  readonly command: string;
+  readonly cwd: string | null;
+  readonly enabled: boolean;
+  /** Zmienne; tajna z `value: None` zachowuje zapisaną wartość. */
+  readonly env: readonly McpEnvVar[];
+  /** Pusty — nowy serwer (identyfikator z nazwy). */
+  readonly id: string | null;
+  readonly name: string;
+  readonly timeout_ms: number | null;
+  readonly trust: McpTrust;
+}
+
+/** Wynik sprawdzenia serwera: stan po próbie i lista narzędzi. */
+export interface McpServerTools {
+  readonly server: McpServerView;
+  readonly tools: readonly McpToolView[];
+}
+
+/** Serwer MCP na liście. */
+export interface McpServerView {
+  readonly args: readonly string[];
+  /** Polecenie tak, jak wpisał je użytkownik (`npx`, `uvx`, pełna ścieżka). */
+  readonly command: string;
+  readonly cwd: string | null;
+  readonly enabled: boolean;
+  readonly env: readonly McpEnvVar[];
+  /** Czytelny powód ostatniego niepowodzenia. */
+  readonly error: string | null;
+  readonly id: string;
+  readonly name: string;
+  /** Pełna ścieżka znalezionego programu; `None` — nie znaleziono w PATH. */
+  readonly resolved: string | null;
+  /** Nazwa i wersja z `initialize` (niezaufane). */
+  readonly server_info: string | null;
+  readonly state: McpConnState;
+  readonly timeout_ms: number;
+  readonly tools_approved: number;
+  /** Liczba narzędzi z ostatniej listy i ile z nich ma zgodę. */
+  readonly tools_total: number;
+  readonly trust: McpTrust;
+}
+
+/** Stan zgody na narzędzie. */
+export type McpToolState = 'approved' | 'auto_approved' | 'new' | 'changed';
+
+/** Narzędzie serwera MCP. */
+export interface McpToolView {
+  /** Opis od serwera (niezaufany, skrócony). */
+  readonly description: string | null;
+  /** Odcisk bieżącej definicji (podawany przy zgodzie). */
+  readonly fingerprint: string;
+  readonly name: string;
+  /** Nazwy argumentów ze schematu (podgląd). */
+  readonly params: readonly string[];
+  readonly state: McpToolState;
+  /** Opis zawiera sygnały wstrzyknięcia poleceń. */
+  readonly suspicious: boolean;
+  readonly title: string | null;
+}
+
+/** Poziom zaufania serwera (ustawia wyłącznie użytkownik). */
+export type McpTrust = 'untrusted' | 'reviewed' | 'trusted';
+
 /** Pozycja podglądu kaskady. */
 export interface MemoryCascadeItem {
   readonly id: string;
@@ -2415,6 +2492,7 @@ export type SettingsCustomPage =
   | 'updates'
   | 'about'
   | 'plugins'
+  | 'mcp'
   | 'models';
 
 /** Strona ustawień (drzewo §15). */
@@ -3479,6 +3557,24 @@ export interface IpcCommands {
     readonly args: Readonly<Record<string, never>>;
     readonly result: MarshalState;
   };
+  readonly mcp_approve: {
+    readonly args: { readonly id: string; readonly tool: string; readonly fingerprint: string };
+    readonly result: McpServerTools;
+  };
+  readonly mcp_list: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly McpServerView[];
+  };
+  readonly mcp_remove: { readonly args: { readonly id: string }; readonly result: null };
+  readonly mcp_revoke: {
+    readonly args: { readonly id: string; readonly tool: string };
+    readonly result: McpServerTools;
+  };
+  readonly mcp_save: {
+    readonly args: { readonly input: McpServerInput };
+    readonly result: McpServerView;
+  };
+  readonly mcp_tools: { readonly args: { readonly id: string }; readonly result: McpServerTools };
   readonly memory_approve: {
     readonly args: { readonly entryId: string };
     readonly result: MemoryItem;
