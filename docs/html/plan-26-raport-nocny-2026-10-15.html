@@ -358,7 +358,11 @@ wyłącznik <code>tools.shell.low_integrity</code>.</li>
 <li>Przegląd kodu w świeżym kontekście (osobna sesja): 2 ważne i kilka drobnych uwag — wszystkie poprawione tej nocy
 (szczegóły w historii zmian 0.0.53, sekcja „Poprawki po przeglądzie”).</li>
 <li>Test prawdziwej aplikacji: 32 testy, pokrycie łącza <strong>168 z 234 poleceń (71,8 %)</strong>; bramka podniesiona do 70 %.</li>
-<li>Pełne <code>verify wersja</code> 0.0.53: WYNIK_VERIFY.</li>
+<li>Pełne <code>verify wersja</code> 0.0.53 o 3:19: <strong>ZIELONY</strong>, 18 z 18 etapów — Rust 2753 testy (0 czerwonych), interfejs 365,
+przeglądarka 359, prawdziwa aplikacja 32 (pokrycie łącza 71,8 %), zależności i audyt pakietów czyste. Raport:
+<code>target/verify/0.0.53/raport-wersja.md</code>. Wcześniejsze biegi padały na przeciążeniu maszyny (mało pamięci,
+27 GB wolnego na E:) — usunąłem 116,6 GB starych plików kompilacji (do odtworzenia), a testy przeglądarkowe
+dostały limity dopasowane do obciążenia.</li>
 </ul>
 <h2 id="4-czego-nie-sprawdzilem">4. Czego nie sprawdziłem</h2>
 <ul>

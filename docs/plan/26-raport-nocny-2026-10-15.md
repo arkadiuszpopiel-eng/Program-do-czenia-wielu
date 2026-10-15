@@ -44,7 +44,11 @@ wersja to **0.0.53**. Ten dokument mówi, co doszło, jak to sprawdziłem, czego
 - Przegląd kodu w świeżym kontekście (osobna sesja): 2 ważne i kilka drobnych uwag — wszystkie poprawione tej nocy
   (szczegóły w historii zmian 0.0.53, sekcja „Poprawki po przeglądzie”).
 - Test prawdziwej aplikacji: 32 testy, pokrycie łącza **168 z 234 poleceń (71,8 %)**; bramka podniesiona do 70 %.
-- Pełne `verify wersja` 0.0.53: WYNIK_VERIFY.
+- Pełne `verify wersja` 0.0.53 o 3:19: **ZIELONY**, 18 z 18 etapów — Rust 2753 testy (0 czerwonych), interfejs 365,
+  przeglądarka 359, prawdziwa aplikacja 32 (pokrycie łącza 71,8 %), zależności i audyt pakietów czyste. Raport:
+  `target/verify/0.0.53/raport-wersja.md`. Wcześniejsze biegi padały na przeciążeniu maszyny (mało pamięci,
+  27 GB wolnego na E:) — usunąłem 116,6 GB starych plików kompilacji (do odtworzenia), a testy przeglądarkowe
+  dostały limity dopasowane do obciążenia.
 
 ## 4. Czego nie sprawdziłem
 
