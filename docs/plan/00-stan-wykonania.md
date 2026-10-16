@@ -18,7 +18,7 @@ Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 | Miara                               | Wartość                                                                                | Źródło                        |
 | ----------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------- |
 | Kod Rust                            | 257 crate'ów, ok. 3000 plików źródłowych; testy Rust 2871 zielonych (0.0.62)       | verify 0.0.62                 |
-| Interfejs (Svelte 5 + TS)           | vitest 393/393; testy w przeglądarce ok. 460 (3 style × 2 motywy, axe, kontrast) | verify 0.0.62                 |
+| Interfejs (Svelte 5 + TS)           | vitest 393/393; testy w przeglądarce 465 + 1 czasowy (osobno zielony) (3 style × 2 motywy, axe, kontrast) | verify 0.0.62                 |
 | Prawdziwa aplikacja na laptopie     | testy `e2e-app` 38/38 na instancji testowej obok Alfy właściciela; pokrycie łącza 74,6 % (197 z 264) | verify 0.0.62                 |
 | Kryteria akceptacji F0–F9           | 108: 38 ✅ CI · 57 🟡 · 11 ⛔ · 2 do decyzji                                           | STATUS (macierz z 2026-10-06) |
 | Kryteria potwierdzone na sprzęcie   | **0 z 108**                                                                            | STATUS                        |

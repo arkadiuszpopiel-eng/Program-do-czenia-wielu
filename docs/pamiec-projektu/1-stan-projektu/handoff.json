@@ -5,13 +5,11 @@
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "last_updated": "2026-10-12T05:00:00+02:00",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-16T04:46:00+02:00"
+    "updated": "2026-10-16T05:05:00+02:00"
   },
-  "current_state": "0.0.62 (serie 3 i 4) wgrana do Alfa-uruchomiona 04:40, start bez błędów. verify wersja: wszystko zielone poza 1 testem diagnostyki pamięci (zależny od obciążenia — poprawiony) i lintem (separator — poprawiony); przeglądarka: bieg ponowny po wgraniu; prawdziwa aplikacja 38/38, pokrycie 74,6%. verify sprzet NIE uruchomiony (czas). Raport: docs/plan/27-raport-nocny-2026-10-16.md. Kopia na F:\\Alfa\\kopia-<data>.",
+  "current_state": "0.0.62 (serie 3 i 4) wgrana do Alfa-uruchomiona 04:40, start bez błędów. verify wersja: wszystko zielone poza 1 testem diagnostyki pamięci (zależny od obciążenia — poprawiony) i lintem (separator — poprawiony); przeglądarka 465 zielonych + 1 czasowy; prawdziwa aplikacja 38/38, pokrycie 74,6%. verify sprzet NIE uruchomiony (czas). Raport: docs/plan/27-raport-nocny-2026-10-16.md. Kopia: F:\\Alfa\\kopia-2026-10-16_0449 (sprawdzona) + końcowa.",
   "session_goal": "Cel właściciela (noc 15/16.10): kolejne punkty seriami po 10, do 4:30 działająca, przetestowana i zbudowana wersja, plan HTML ze stanem, kopia bezpieczeństwa na F:\\Alfa gotowa na 5:00.",
-  "in_progress": [
-    "wynik ponownego biegu testów przeglądarkowych 0.0.62 (scratchpad pw-062.log) — dopisać do raportu 27"
-  ],
+  "in_progress": [],
   "blocking_issues": [
     "Dysk E: resetuje się przy obciążeniu (UASPStor 129); decyzja właściciela: wszystko zostaje na E:"
   ],
@@ -41,7 +39,7 @@
   "test_results": {
     "0.0.60": "verify wersja 17/19 + 2 techniczne poprawione; e2e-app 36/36; pokrycie łącza 74%",
     "0.0.61": "Rust 2858 zielonych / 1 czerwony (czasowy, poprawiony); UI 381; przeglądarka 437; etap aplikacji pominięty (zastąpiony 0.0.62)",
-    "0.0.62": "Rust 2871/1 (diag pamięci pod obciążeniem — test poprawiony, crate 5/5); powłoka, schematy, tokeny, typy zielone; lint 1 naruszenie poprawione; UI 393; aplikacja 38/38, pokrycie 197/264 (74,6%); deny, audyt npm, SBOM zielone; przeglądarka — bieg ponowny"
+    "0.0.62": "Rust 2871/1 (diag pamięci pod obciążeniem — test poprawiony, crate 5/5); powłoka, schematy, tokeny, typy zielone; lint 1 naruszenie poprawione; UI 393; aplikacja 38/38, pokrycie 197/264 (74,6%); deny, audyt npm, SBOM zielone; przeglądarka 465 + 1 czasowy (api-keys:425, osobno zielony)"
   },
   "decisions_this_session": [
     "Ręczna kolejka modeli ma pierwszeństwo przed doborem według trudności (przełącznik reorder_queues)",

@@ -56,7 +56,9 @@ zmian).
   - lint: 1 naruszenie (separator „·” przyklejony do tekstu w nowej podpowiedzi) — poprawione przed budową
     aplikacji, ponowny pełny lint zielony;
   - testy w przeglądarce: pierwszy bieg przerwałem po 41 min, żeby zdążyć z wersją na 4:30; ponowny pełny bieg —
-    [PW];
+    **465 zielonych, 1 czerwony** (budżet rozmiaru zielony) — czerwony to test kreatora i panelu konta otwartych
+    naraz: w pełnym biegu 16,6 s i przekroczenie czasu, uruchomiony osobno zielony w 7,4 s (obciążenie maszyny,
+    nie błąd; ten plik nie był zmieniany tej nocy);
   - **prawdziwa aplikacja: 38/38 zielonych, pokrycie łącza 197 z 264 poleceń (74,6 %)** — w tym nowy scenariusz
     serii 3 i 4 (polecenia bez modelu na prawdziwym rdzeniu, zapis trybu skupienia);
   - zależności i licencje (`cargo deny`), audyt pakietów JS, SBOM (767 składników) — zielone.
