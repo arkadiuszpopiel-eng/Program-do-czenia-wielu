@@ -41,8 +41,9 @@
 </script>
 
 <p class="hint">
-  {t(sendOnEnter ? 'composer.hint' : 'composer.hintCtrl')}{#if local}
-    · <strong class="local">{t('composer.local', { name: local })}</strong>{/if}
+  {t(sendOnEnter ? 'composer.hint' : 'composer.hintCtrl')}{#if local}<strong class="local"
+      >{` · ${t('composer.local', { name: local })}`}</strong
+    >{/if}
 </p>
 
 <style>
