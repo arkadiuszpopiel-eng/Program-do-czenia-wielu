@@ -26,8 +26,12 @@ export async function pickOption(select: Locator, value: string) {
   }).toPass({ timeout: 15_000 });
 }
 
-/** Start atrapy pod obciążeniem (długi bieg, mało pamięci) bywa dłuższy niż domyślne 5 s. */
-export async function waitForChat(page: Page, timeout = 15_000) {
+/**
+ * Start atrapy pod obciążeniem (długi bieg, mało pamięci) bywa dłuższy niż domyślne 5 s; 2026-10-16
+ * przy równoległej kompilacji przekroczył też 15 s (test duplikatów identyfikatorów padł przed
+ * sprawdzeniem czegokolwiek). Szybkość startu mierzą osobne testy z budżetem czasu.
+ */
+export async function waitForChat(page: Page, timeout = 30_000) {
   await expect(page.locator('#alfa-composer')).toBeVisible({ timeout });
 }
 

@@ -39,7 +39,7 @@ test.describe.configure({ timeout: 180_000 });
 test('strony ustawień pokazują stan ładowania, gdy rdzeń odpowiada wolno', async ({ page }) => {
   await openApp(page, { scenario: 'slow-core' });
   // Start z wolnym rdzeniem to kilka komend po 1,5 s — domyślne 5 s nie wystarcza przy testach równoległych.
-  await waitForChat(page, 20_000);
+  await waitForChat(page, 30_000);
   await page.keyboard.press('Control+,');
   const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
   await expect(nav.locator('button.node').first()).toBeVisible({ timeout: 10_000 });
@@ -59,7 +59,7 @@ test('strony ustawień pokazują stan ładowania, gdy rdzeń odpowiada wolno', a
 test('panele pokazują stan ładowania, gdy rdzeń odpowiada wolno', async ({ page }) => {
   await openApp(page, { scenario: 'slow-core' });
   // Start z wolnym rdzeniem to kilka komend po 1,5 s — domyślne 5 s nie wystarcza przy testach równoległych.
-  await waitForChat(page, 20_000);
+  await waitForChat(page, 30_000);
   await page.waitForTimeout(2_000);
   const report: string[] = [];
   for (const key of ['Alt+1', 'Alt+2', 'Alt+3', 'Alt+4', 'Alt+5', 'Alt+6', 'Alt+7']) {
