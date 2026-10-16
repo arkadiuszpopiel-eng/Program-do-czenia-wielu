@@ -17,6 +17,6 @@ także wtedy, gdy nie wypada próg z [[alfa-budowanie-aplikacji]] (właściciel 
 co się zmieniło; nie chce być w nocy pytany o zgody.
 
 **How to apply:** raport pisać jako dokument planu (`alfa/docs/plan/NN-raport-…md` — trafia do HTML), z rozdziałem
-„czego nie sprawdziłem”; końcową budowę i testy zacząć co najmniej 80 minut przed terminem; nie odtwarzać dźwięku
+„czego nie sprawdziłem”; końcową budowę i testy zacząć co najmniej **3 godziny** przed terminem (2026-10-16: pełne `verify wersja` pod obciążeniem maszyny trwało ok. 2,5 h — sam etap testów Rust 60 min, przeglądarka ponad 40 min; 80 minut nie wystarcza). Przyspieszenie: równolegle z etapami testów zbudować powłokę tym samym poleceniem co `verify-app.sh` (`target/shell`, te same zmienne) — etap aplikacji kończy się wtedy w kilka minut; nie odtwarzać dźwięku
 w nocy (próby głosu robić nagraniem zamiast mikrofonu); pilnować dysku — patrz [[alfa-srodowisko-lokalne]].
 Moja interpretacja: dotyczy sesji nocnych zleconych wprost, nie zwykłej pracy w dzień.
