@@ -400,7 +400,17 @@ wymagają akcji, więc idą przez agentkę i Brokera).</li>
 <li>Kolejne serie po dziesięć punktów według <a href="plan-03-roadmapa.html">roadmapy</a>.</li>
 </ul>
 <h2 id="6-kopia-bezpieczenstwa">6. Kopia bezpieczeństwa</h2>
-<p>[WYNIK — F:\Alfa\kopia-…, rozmiar, SHA256SUMS, ODTWORZENIE.md]</p>
+<p>Katalog <strong><code>F:\Alfa\kopia-2026-10-16_0449</code></strong> (355 MB, 5848 plików), gotowy o 4:51:</p>
+<ul>
+<li><code>alfa.bundle</code> — pełna historia repozytorium, wszystkie gałęzie (<code>git bundle verify</code>: kompletna historia);</li>
+<li><code>alfa/</code> — kopia katalogu roboczego bez plików kompilacji; <code>Alfa-uruchomiona/</code> — wgrany program 0.0.62;</li>
+<li><code>memory/</code>, <code>.remember/</code>, <code>pamiec-claude/</code>, <code>PLAN/</code>, <code>audyt-2026-10-14/</code> — pamięć projektu, notatki, plan, audyt;</li>
+<li><code>SHA256SUMS.txt</code> — sumy wszystkich plików, sprawdzone po zapisie (<code>sha256sum -c</code>: zgodne);</li>
+<li><code>ODTWORZENIE.md</code> — jak odtworzyć projekt z kopii.</li>
+</ul>
+<p>Pierwsza próba (<code>kopia-2026-10-16_0447</code>, 14 MB — tylko paczka git) nie skopiowała katalogów: Git Bash zamieniał
+przełączniki <code>robocopy</code> na ścieżki. Poprawiłem skrypt <code>scripts/backup.sh</code> i powtórzyłem kopię; niepełnego katalogu
+nie usuwałem (decyzja należy do Ciebie). Kolejna kopia: <code>bash scripts/backup.sh</code> (domyślnie <code>F:\Alfa</code>).</p>
 </article>
 <footer>Źródło: <code>docs/plan/27-raport-nocny-2026-10-16.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

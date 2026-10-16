@@ -86,4 +86,14 @@ zmian).
 
 ## 6. Kopia bezpieczeństwa
 
-[WYNIK — F:\Alfa\kopia-…, rozmiar, SHA256SUMS, ODTWORZENIE.md]
+Katalog **`F:\Alfa\kopia-2026-10-16_0449`** (355 MB, 5848 plików), gotowy o 4:51:
+
+- `alfa.bundle` — pełna historia repozytorium, wszystkie gałęzie (`git bundle verify`: kompletna historia);
+- `alfa/` — kopia katalogu roboczego bez plików kompilacji; `Alfa-uruchomiona/` — wgrany program 0.0.62;
+- `memory/`, `.remember/`, `pamiec-claude/`, `PLAN/`, `audyt-2026-10-14/` — pamięć projektu, notatki, plan, audyt;
+- `SHA256SUMS.txt` — sumy wszystkich plików, sprawdzone po zapisie (`sha256sum -c`: zgodne);
+- `ODTWORZENIE.md` — jak odtworzyć projekt z kopii.
+
+Pierwsza próba (`kopia-2026-10-16_0447`, 14 MB — tylko paczka git) nie skopiowała katalogów: Git Bash zamieniał
+przełączniki `robocopy` na ścieżki. Poprawiłem skrypt `scripts/backup.sh` i powtórzyłem kopię; niepełnego katalogu
+nie usuwałem (decyzja należy do Ciebie). Kolejna kopia: `bash scripts/backup.sh` (domyślnie `F:\Alfa`).

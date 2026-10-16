@@ -24,8 +24,9 @@ git -C "$ROOT" status --short >"$DST/niezatwierdzone-zmiany.txt"
 copy_dir() {
   local src="$1" name="$2"
   [ -d "$src" ] || return 0
-  robocopy "$(cygpath -w "$src")" "$(cygpath -w "$DST/$name")" /E /R:1 /W:1 \
-    /XD target node_modules .git /NFL /NDL /NJH /NJS /NP >/dev/null
+  # MSYS_NO_PATHCONV: Git Bash zamieniał przełączniki /E, /R:1 na ścieżki (robocopy kod 16, 2026-10-16).
+  MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' robocopy "$(cygpath -w "$src")" "$(cygpath -w "$DST/$name")" \
+    /E /R:1 /W:1 /XD target node_modules .git /NFL /NDL /NJH /NJS /NP >/dev/null
   local code=$?
   if [ "$code" -lt 8 ]; then echo "$name: ok"; else echo "$name: BŁĄD (robocopy $code)"; fi
 }
