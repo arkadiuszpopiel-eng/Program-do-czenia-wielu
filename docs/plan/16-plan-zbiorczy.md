@@ -1,6 +1,6 @@
 # 16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)
 
-Wersja programu **0.0.53**. Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
+Wersja programu **0.0.62** (stan na 2026-10-16). Ten dokument łączy w jednym miejscu: co jest zrobione, cały dotychczasowy plan v6
 (etapy A–H), nowy etap **P** (przeniesienie funkcji z Delty AI) i nowy etap **U** (wielu użytkowników z kontami
 i logowaniem) oraz cztery cele: **Windows, Linux, panel WWW, Android** z pełnym sterowaniem i komunikacją.
 Szczegóły zadań: [`03-roadmapa.md`](03-roadmapa.md) (dokument żywy). Tu jest obraz całości.
@@ -22,7 +22,7 @@ rozmowy i mowy oraz wszystkie brakujące funkcje.
 
 | Miara | Stan |
 | --- | --- |
-| Wersje | 0.0.1 → 0.0.28 w dniach 2026-10-07 → 11; historia w programie: Ustawienia → Aktualizacje |
+| Wersje | 0.0.1 → 0.0.62 w dniach 2026-10-07 → 16; historia w programie: Ustawienia → Aktualizacje |
 | Kod | Rust ok. 304 tys. linii w 245 modułach, okno Svelte ok. 56 tys. linii, 227 poleceń rdzenia |
 | Testy automatyczne | Rust ok. 2600, okno 311 jednostkowych i 309 w przeglądarce (61 to przegląd układu w 3 stylach × 2 motywach), 17 w prawdziwej aplikacji |
 | **Potwierdzone na sprzęcie** | **0 ze 108 kryteriów.** Działa okno, ustawienia, skalowanie; odpowiedź modelu lokalnego, rozmowa głosowa i Broker poza procesem — niesprawdzone |
@@ -88,8 +88,8 @@ wad bezpieczeństwa Delty.
 | **P1** | **Rozmowa i mowa**: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, Smart Turn, ekran „Rozmowa na żywo” — **w toku, większość zrobiona (0.0.30–0.0.42)**: silniki, strażnik, karta „Silniki rozmowy” z próbą silników, ustawienia rozmowy; zostaje próba z żywą mową, głosy Pipera i Edge | A.5, C1.1, C5 |
 | **P2** | **Modele lokalne**: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, panel System — **w toku (0.0.35–0.0.39)**: karty graficzne na żywo, ocena „mieści się na karcie”, nowe silniki w pakietach | A.4, C2.2 |
 | P3 | Nawigacja: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej — **w toku (0.0.37, 0.0.42)**: Wstecz / Dalej, wyszukiwarka skrótów | — |
-| P4 | Rozmowa: karty, Tablica, Tryb skupienia, Arena, załączniki z czytnikami, eksporty | C2.8 |
-| P5 | Sieć i wiedza: wyszukiwanie, wiadomości, „Naucz”, polecenia bez modelu, tłumaczenie, instrukcja | C2.6, C2.11 |
+| P4 | Rozmowa: karty, Tablica, Tryb skupienia, Arena, załączniki z czytnikami, eksporty — **w toku (0.0.60–0.0.62)**: szablony promptów, eksport JSON i kopia rozmowy z notą AI, Tablica z wyszukiwaniem, statystyki rozmowy, styl odpowiedzi, archiwum rozmów, tekst z DOCX/XLSX/PPTX; zostają karty z profilem i Arena | C2.8 |
+| P5 | Sieć i wiedza: wyszukiwanie, wiadomości, „Naucz”, polecenia bez modelu, tłumaczenie, instrukcja — **w toku (0.0.60–0.0.62)**: polecenia bez modelu (rachunki, procenty, jednostki, daty, liczby słownie i rzymskie, losowanie, liczenie znaków, quiz, własne polecenia), instrukcja z `F1`, tłumaczenie odpowiedzi; zostają wyszukiwanie w sieci, wiadomości, „Naucz” | C2.6, C2.11 |
 | P6 | Osoby: baza osób, rozpoznawanie twarzy i głosu, pamięć per osoba | C3.8–C3.13, **U** |
 | P7 | Komputer: sterowanie do poziomu Delty przez Brokera, procesy, urządzenia | C1.3 |
 | P8 | Twórczość: Studio obrazu, Galeria, Studio opowieści, Audio | — |

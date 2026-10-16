@@ -1,7 +1,7 @@
 - [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — kopia robocza na przenośnym E:, portable-env, pułapki budowy na Windows
 - [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
 - [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie
-- [Alfa — budowanie aplikacji](alfa-budowanie-aplikacji.md) — budować i uruchamiać co pięć dużych ulepszeń albo na polecenie, nie po każdej wersji
+- [Alfa — budowanie aplikacji](alfa-budowanie-aplikacji.md) — wersja i budowa co 10 ukończonych punktów (od 15.10), nie po każdym
 - [Alfa — zgoda na pobrania](alfa-zgoda-na-pobrania.md) — do 3 GB bez pytania, powyżej pytać z rzeczywistym rozmiarem
 - [Alfa — głos lokalnie](alfa-glos-lokalnie.md) — chmura odrzucona z powodu kosztu; najpierw warianty lokalne, pobieranie nadal za zgodą
 - [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”

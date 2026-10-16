@@ -1,37 +1,61 @@
 
-## 20:08 | unknown
-Dodano backend Antigravity (`agy`) w `crates/agent-backends-impl/src/agy/` (parser strumienia, pętla jednorazowego przebiegu) z trybem `agy` w `alfa-fake-agent-cli`; testy mostów zielone, zmiany zacommitowane lokalnie, a logowanie `agy_login` w terminalu Alfy jest w toku (jeszcze niedokończone).
+## 17:38 | unknown
+Dodano bibliotekę quick-commands (`crates/lib-quick`, 11 testów, clippy czysty) podłączoną do `app-chat` jako trzecią drogę obok delegacji i modelu, z ustawieniem `sessions.local_commands` w rdzeniu i testem `crates/app-core/tests/quick_commands.rs`; dokumentacja i testy UI (e2e przegląd dostępności) w toku.
+## 17:49 | unknown
+Dodano moduł własnych poleceń (`crates/lib-quick/src/custom.rs`: dopasowanie dokładne, prefiks z „resztą”, zawiera, regex) oraz quiz z tabliczki mnożenia (`quiz.rs`, podpięty w `app-chat`, test w `app-core/tests/quick_commands.rs`); przeniesiono `device_dto` do `app-modules`, żeby zwolnić miejsce w `app-core` (7846/8000 linii); punkt 6 do commita, README i roadmapa po przerwaniu połączenia w trakcie edycji, a integracja punktu 7 z `app-chat` jeszcze niezrobiona.
+## 17:56 | unknown
+Zaimplementowano własne polecenia bez modelu w silniku rozmowy (`lib-quick/custom.rs`, `app-modules/quick_commands.rs`, cienkie komendy IPC w `app-core`) oraz stronę ustawień „Polecenia bez modelu” z testerem, formularzem i tłumaczeniami pl/en (`QuickCommandsPage.svelte`, `QuickCommandForm.svelte`, `types-quick.ts`, `client-quick.ts`); kompilacja Rust OK, nie uruchamiano UI, a atrapa klienta (`api-local-commands.ts`) wymaga podpięcia do prawdziwego IPC.
+## 18:06 | unknown
+Dodano eksport rozmowy do JSON (P4, punkt 8) ze znacznikami AI jak w MD/HTML: `export::json` w rdzeniu, DTO i pozycje menu (wiadomość, sesja, paleta), testy w `app-files` i `files.spec.ts`; dokumentacja w toku, bez potwierdzonego commita.
+## 18:13 | unknown
+Wdrożono rdzeń szablonów promptów ze zmiennymi (P4, punkt 9): DTO `dto/templates.rs`, moduł `prompt_templates.rs`, warstwa API/logika/testy w `apps/desktop/ui`, okno „Wstaw szablon" i strona ustawień; brak commita, nieuruchomiona weryfikacja C2.3 wymaga sprzętu i jest odłożona.
+## 18:22 | unknown
+Punkt 10 serii (C4.1, widok tylko do odczytu „Gdzie trafiają dane" na stronie „Dobór modelu" z DTO `dto/routes.rs`, `data_routes.rs`, klientem, atrapą, tłumaczeniami pl/en i przełącznikiem `Switch`) jest w toku — brak testów, weryfikacji i commita.
+## 18:33 | unknown
+Seria 1 (punkty 1–10) zakończona i zacommitowana, w toku wersja 0.0.60: wpis CHANGELOG, numer wersji, test e2e-app dla nowych stron, pełny clippy i lint — bez wgrania.
+## 19:01 | unknown
+Seria 1 (10 punktów: moduły, edytor konfiguracji, oznaczanie AI, karty modeli, polecenia bez modelu, quiz, własne polecenia, eksport JSON, szablony promptów, „Gdzie trafiają dane”) zatwierdzona jako commit `3514042c`, wersja 0.0.60 ustawiona; pełne testy Rust w tle, zlecony przegląd kodu i rozpoznanie serii 2, generator SBOM (`scripts/sbom.mjs`) napisany; `verify-app` i wgranie do kopii użytkownika jeszcze nie wykonane (czeka na zakończenie testów i budowę).
+## 19:08 | unknown
+Dodano SECURITY.md (C2.10) i poprawkę testów powłoki (3/3 zielone); seria 2 w worktree `alfa-s2` (gałąź `seria2`): ekstrakcja tekstu DOCX/XLSX/PPTX dla modelu (`crates/app-files/src/attach/office.rs`) zcommitowana, rozpoczęto P5 (wbudowana instrukcja: `app-api/src/dto/help.rs`, `app-modules/src/help.rs`); kompilacja i testy serii 2 niewykonane (czekają na `verify`), `verify-app` i wgranie do kopii użytkownika nadal nie zrobione.
+## 19:15 | unknown
+Dopinanie instrukcji wbudowanej (IPC, interfejs, strona „Instrukcja” z atrapą API i tłumaczeniami) w worktree `alfa-s2`, poprawki przeglądu w `turns.rs` i `lib-quick` (liczby, procent, NaN, limity), walidacja identyfikatorów oraz testy rdzenia kolejności offline; `verify wersja` na `alfa` trwa, jedyny czerwony etap to formatowanie `platform-windows-diag-impl/tests/live.rs` (poprawiane), a kompilacja/testy serii 2 nadal niewykonane (czekają na `verify`).
+## 19:21 | unknown
+W `alfa-s2` dodano styl i temperaturę w `app-chat` (`style.rs`, test rdzenia), pola budżetu i bezczynności triggerów w DTO/formularzu/liście (`TriggersPage.svelte` przywrócony z git po wyczyszczeniu przez skrypt), commit, a moduł Tablicy (`app-modules/src/board.rs`) w toku, bez kompilacji i testów.
+## 19:28 | unknown
+Seria 2 w `alfa-s2`: instrukcja, Tablica (`BoardDialog.svelte`, `api-board.ts`, `board.rs`), archiwum rozmów z filtrem okresu i statystykami (DTO sesji), tłumaczenie odpowiedzi PL/EN, import SKILL.md (`skill_md.rs`), testy przeglądarkowe `series2.spec.ts` i dokumentacja 0.0.61 napisane, commity wykonane; `verify` zielony dla Rust (2848 testów), ale testy e2e i docs niezweryfikowane, a Tablica tylko atrapa.
 ## 20:14 | unknown
-Dokończono profil logowania `agy` w terminalu Alfy, dodano rejestr zgodności, ostrzeżenie na karcie, zlecanie z rozmowy i blokady katalogów `.agy`/`.gemini` (kredencjały Google), kompilacja czysta, testy pakietów w toku; logowanie `agy` nadal wymaga ręcznego potwierdzenia w terminalu.
-## 20:21 | unknown
-Dodano ostrzeżenie na karcie Antigravity i wpis w rejestrze zgodności (szara trasa, domyślnie wyłączona), przeniesiono test Antigravity do osobnego pliku, dopracowano okno „Stan połączeń” (zrzuty we wszystkich stylach OK), testy zgodności zielone; wizualna weryfikacja karty Mostów CLI w toku.
-## 20:26 | unknown
-Karta Claude Code w oknie „Stan połączeń” (Alfa desktop) pokazuje po zalogowaniu „plan Max”; naprawiono pętlę w efekcie podmiany karty po logowaniu (sprzężenie listy zależności) i kolejność sprawdzenia po „Gotowe”, dopisano test `e2e/connections.spec.ts`, który wymaga jeszcze uruchomienia; logowanie Antigravity wymaga ręcznego kroku w terminalu.
-## 22:05 | unknown
-Wersja 0.0.52 ustawiona w plikach (historia zmian, plan, roadmapa, dokument 25), pełne sprawdzenie w tle zakończone, naprawiono dwa błędy testów przeglądarkowych (przypięta wersja Claude Code w atrapie, nowy test `connections.spec.ts`), wgranie do Alfa-uruchomiona i zapis pamięci projektu jeszcze niewykonane.
-## 22:46 | unknown
-Wersja 0.0.52 wgrana do Alfa-uruchomiona (nieuruchomiona, bo Alfa była zamknięta); pełne sprawdzenie 17/18 zielonych (Rust 2745, UI 365/365, e2e 28/28), w przeglądarce 5/359 czerwonych po powtórce (1 realny błąd atrapy mostów naprawiony, reszta to timeouty przy równoległym biegu), dodano okno Ustawienia → Stan połączeń z naprawami sprawdzania po „Gotowe" i pętli odświeżania; ostatni pełny bieg e2e bez potwierdzonego wyniku; blokada: Antigravity niesprawdzony na prawdziwym `agy` i wpis zgodności wymaga zatwierdzenia użytkownika, otwarte decyzje: limit 20 ms i AppContainer.
-## 23:22 | unknown
-Testy listy wyboru motywu (skins.spec) odporne na obciążenie (retry otwarcia), bramka dobiera przeglądarki do RAM (max 4), pełne sprawdzenie 0.0.52 ruszyło od nowa w tle (~1h), trwa AppContainer dla poleceń powłoki i test równoległego czyszczenia lib-markdown; blokada: Antigravity niesprawdzony na prawdziwym `agy`, wymaga konta Google użytkownika (przypomnienie o 10:00).
-## 23:32 | unknown
-Dodano moduł uruchamiania procesów z integralnością Low (`crates/platform-windows-impl/src/process/win/low.rs`) z testami na prawdziwym Windows, podbito wasmtime do 36.0.18 (RUSTSEC-2026-0363, `cargo deny` czysty), w toku poprawka testu powitania kreatora w przeglądarce (1 z 359 czerwony), a weryfikacja Antigravity na prawdziwym `agy` nadal blokowana przez brak konta Google użytkownika.
-## 23:37 | unknown
-Dopisano testy polityki powłoki na atrapie `ExecPort` (integralność Low vs Medium w `crates/tools-shell-impl`), zaktualizowano docs/plan, a w `apps/desktop/ui/e2e-app` powstaje test prawdziwej aplikacji obejmujący konta, mosty, agentki, wtyczki i umiejętności, wraz ze wspólnym modułem wywołań; nic nie zostało jeszcze uruchomione ani zweryfikowane.
-## 23:56 | unknown
-Poprawiano izolację w `crates/platform-windows-impl/src/process/win/low.rs` (zbyt szeroki katalog Low, brak powrotu do Medium przy błędzie oznaczenia, wyścig dziedziczenia uchwytów, pamięć oznaczeń, narzędzia zapisujące w profilu) oraz wydzielono składanie wyniku polecenia w `crates/tools-shell-impl` z zaktualizowanym CHANGELOG/docs/plan pod 0.0.53, bez uruchomienia testów; przegląd kodu wciąż trwa, a wersja nie podbita.
-## 01:14 | unknown
-Wdrożono poprawki z przeglądu (izolacja Low w `low.rs`: zbyt szerokie katalogi, brak powrotu do Medium, pamięć oznaczeń), podbito wersję do 0.0.53 z wpisem w CHANGELOG, pełne sprawdzenie 0.0.53 zakończone exit 0, raport nocny w `docs/plan/26-raport-nocny-2026-10-15.md`; build i wgranie do Alfa-uruchomiona jeszcze niezrobione.
-## 03:31 | unknown
-Drugi pełny bieg sprawdzenia 0.0.53 zakończony exit 0 po wyczyszczeniu 116,6 GB starych plików kompilacji (E: ma 144 GB wolnego), wersja 0.0.53 wgrana do Alfa-uruchomiona i sprawdzona, raport nocny wysłany, a test sprzętowy na modelu lokalnym jeszcze w toku.
-## 05:14 | unknown
-Zamknięto próbną instancję 0.0.54 (wgraną, startuje bez błędów; PID 8424), zmieniono werdykt Krytyki ze zdarzającą się literówką, zbudowano i wgrano 0.0.54, a pełne sprawdzenie 0.0.54 zakończyło się czerwono (1 test Rust, 2 przeglądarkowe), trwa poprawianie — w tym czasie nie ma działającej Alfy-uruchomionej do testu z użytkownikiem o 10:00 (Antigravity na koncie Google, wymaga udziału człowieka).
-## 06:39 | unknown
-Po uwadze, że logowanie do Antigravity jest nieczytelne, okno logowania dostało osobny pusty folder (`%LOCALAPPDATA%\Alfa\logowanie`) zamiast katalogu domowego, instrukcje dla każdego narzędzia, automatyczne wykrywanie zalogowania zapisywane w Stanie połączeń (`bridges_mark_login`) i nazwę „Google Gemini (Antigravity CLI)”; zmiany są w toku, jeszcze niezbudowane i niesprawdzone.
-## 06:47 | unknown
-Dodano e2e test przebiegu logowania Antigravity (`connections.spec.ts`, atrapa `api-gui.ts`), który przechodzi w przeglądarce, a test rdzenia `app-core` na trwałość `bridges_mark_login` jest w toku; zmiany niezcommitowane i niezbudowane, dysk E był odłączony, użytkownik zgłosił ponowne podłączenie.
-## 07:04 | unknown
-Zrobiono wersję 0.0.55 z logowaniem Google Gemini przez Antigravity CLI (osobny pusty folder, auto-wykrycie zalogowania, plan zapisany w Stanie połączeń, przycisk /login w Claude Code), commit roboczy i kopia na C:; build shell 0.0.55 i testy prawdziwej apki zakończone exit 0 (wynik weryfikacji nieodczytany), wgranie do Alfa-uruchomiona czeka na zielony wynik, a po instalacji użytkownik musi otworzyć Mosty CLI → Google Gemini → „Zaloguj się” i kliknąć „Gotowe”.
-## 07:28 | unknown
-Sprawdzono, czy Alfa zapisała zalogowanie Antigravity CLI: przeszukano zapis Alfy, przeczytano parser `agy/parse.rs`, dodano lokalny test na prawdziwym zapisie, poprawiono atrapę `alfa-fake` (pole `status` → `state`) i zatrzymano zadanie tła (TaskStop); status: nieukończone, wynik weryfikacji nieznany.
-## 07:59 | unknown
-Wgrano Alfę 0.0.56 (32 testy prawdziwej apki zielone), ale pełne sprawdzenie przerwało się przez zawieszenia USB dysku E: (UASPStor reset, zdarzenia 129/153/50/140), dysk fizycznie podłączony; przeniesienie `target` na C: czeka na potwierdzenie użytkownika (AskUserQuestion), sprawdzenie niedokończone.
+Seria 2 (`alfa-s2`) rebase'owana na główną gałąź i w trakcie kompilacji oraz poprawek clippy w zmienionych crate'ach Rust; 0.0.60 wgrana do `Alfa-uruchomiona` i startuje bez błędów (`verify` zielony po poprawkach formatowania i `compat.ts`), a kompilacja/testy serii 2 i budowa 0.0.61 jeszcze niezakończone.
+## 20:59 | unknown
+Naprawiono uwagi clippy i formatowania w crate'ach serii 2, regenerowano fixtures (dopisano `board_pin` dla `dto_roundtrip`), poprawiono znaki nowej linii w `pl-board.ts`/`en-board.ts`; `svelte-check` czysty, testy crate'ów 111 zielonych, `app-core` zielony, vitest i testy przeglądarkowe serii 2 jeszcze w toku.
+## 22:09 | unknown
+Seria 2: testy funkcjonalne 5/5 i przeglądarkowe 11/11 zielone, lint/typy czyste, commit wykonany; pełny zestaw przeglądarkowy 436 zaliczonych, 1 czerwony (`voice-orb`, „next dark”, wcześniej niestabilny) — w toku sprawdzanie.
+## 22:32 | unknown
+Seria 3, punkty 1–2 (przeliczanie jednostek i rachunki na datach w `lib-quick`, z testami, clippy czysty, atrapa UI podpięta) zrobione i zacommitowane w `alfa-s3`; weryfikacja 0.0.61 w tle (2/19 etapów zielone), kolejne punkty serii 3 w toku.
+## 22:42 | unknown
+Skrót F1 do przewodnika gotowy; w toku wyszukiwarka Ustawień z trafieniami z instrukcji, eksport/import szablonów i własnych poleceń jako JSON (logika + testy) w `alfa-s3/apps/desktop/ui`.
+## 22:57 | unknown
+Seria 3, punkty 1–5 w `alfa-s3/apps/desktop/ui` gotowe (ostatni: eksport/import szablonów i własnych poleceń jako JSON), commit w `alfa-s3`; okno statystyk rozmowy w toku, bez wykonanych testów jednostkowych UI i sprawdzania typów w tym zapisie.
+## 23:12 | unknown
+Seria 3 w `alfa-s3/apps/desktop/ui`: zapamiętywanie trybu skupienia w `LayoutPrefs` (wstecz-zgodne), testy statystyk, wyszukiwanie i eksport na Tablicy oraz testy E2E wąskiego okna (400/360 px) i nowości serii 3, w toku, bez uruchomionych testów.
+## 23:44 | unknown
+Seria 3 w `alfa-s3/apps/desktop/ui`: dodano `e2e/series3.spec.ts` i poprawki `e2e/narrow.spec.ts`, pasek tytułu dla okien ≤380 px (węższe przyciski, mniejsze odstępy), typy i lint czyste, testy jednostkowe i E2E serii 3 zielone na porcie 4174, w toku: przegląd wszystkich stron Ustawień przy 360 px.
+## 00:09 | unknown
+Seria 3 w `alfa-s3/apps/desktop/ui`: dodano pozycję „Zapisz jako szablon” w menu wiadomości (stała limitu, test w `templates.test.ts`, E2E w `series3.spec.ts`), seria 3 kompletna (10 punktów, 32 testy E2E zielone); w toku: weryfikacja 0.0.61 (etap „testy” długi, przyczyna nieznana) i dokumentacja serii 3 (CHANGELOG, roadmapa, przewodnik).
+## 00:20 | unknown
+Seria 4 w `alfa-s3`: dodano moduły `numerals.rs` (liczby słownie, kwoty w złotych, liczby rzymskie), `percent.rs` (pytania o procenty), podpowiedź w polu pisania o odpowiedzi bez modelu, klikalne przykłady wbudowanych poleceń, testy w `series4.spec.ts` (uruchomione, wynik nieznany); weryfikacja 0.0.61 nadal w etapie testów.
+## 00:42 | unknown
+Seria 4 w `alfa-s3`: dodano `calendar.rs` (rok przestępny, długość miesiąca) i `choice.rs` (losowy wybór z listy) w `lib-quick`, naprawiono czerwony test w `app-core/tests/computer.rs` (wyścig czasowy, stałe czekanie zamienione na odpytywanie do 3 s), wynik ponownego uruchomienia weryfikacji 0.0.61 nieznany, etap testów jeszcze trwa.
+## 00:54 | unknown
+Seria 4 w `alfa-s3`: naprawiono znaki końca linii w poprawce testu, dodano „Kopiuj rozmowę (Markdown)” z oznaczeniem treści AI w `apps/desktop/ui` i `lib-quick`, dodano `count.rs` (liczenie znaków i słów) i poprawiono odmianę „dzień/dni”, a `units.rs` podzielono na osobny plik testów; seria ma już 7+ punktów, wynik testów i weryfikacji nieznany, etap nadal w toku.
+## 01:13 | unknown
+Seria 4 w `alfa-s3` gotowa (9 nowości + poprawki z przeglądu, test menu „Polecenia bez modelu” zostawiony na istniejącej pozycji), wpis 0.0.62 w CHANGELOG aktualizowany, testy przeglądarkowe 0.0.61 zielone (437), weryfikacja 0.0.61 zatrzymana; scalanie serii 3 i 4 oraz schematy IPC/typy TS w toku, raport nocny `docs/plan/27` w przygotowaniu.
+## 01:26 | unknown
+Seria 4 w `alfa-s3`: odświeżono przykłady DTO o pole `focus` (testy rdzenia zielone), wersja 0.0.62 zapisana (d6ff35f9), pełna weryfikacja uruchomiona w tle, a przegląd kodu serii 4 i raport nocny `docs/plan/27` w toku.
+## 01:46 | unknown
+Seria 3/4 w `alfa`: dopisano scenariusz e2e `apps/desktop/ui/e2e-app/z-series3.spec.ts` na prawdziwym rdzeniu, poprawiono testy dat i katalogu w `crates/lib-quick/src/count.rs`, zapisano notatki do memory, zatrzymano proces PID 31536 i uruchomiono ponownie portable-env; weryfikacja 0.0.62 i przegląd serii 4 wciąż w toku, bez wyników.
+## 03:05 | unknown
+Weryfikacja 0.0.62 zrestartowana 02:05 z poprawkami (testy i clippy czyste, dziennik zmian uzupełniony, spis „wkrótce” i tabela „Skrót” w `alfa-s3` odświeżone); testy Rust ruszyły 02:40, koniec szac. ok. 04:10, wgranie, dokumenty i kopia na F: dopiero po weryfikacji, wciąż w toku, bez wyników.
+## 03:56 | unknown
+Weryfikacja 0.0.62 nadal w toku: testy Rust dały 2871 zielonych i 1 czerwony (w trakcie sprawdzania który), etap „lint” czerwony z jednym naruszeniem układu (separator „·” w podpowiedzi `ComposerHint.svelte`), poprawka wprowadzona, ale jeszcze niezweryfikowana, a wgranie, dokumenty i kopia na F: dopiero po zakończeniu weryfikacji, bez wyników.
+## 04:42 | unknown
+Poprawka separatora w `ComposerHint.svelte` zatwierdzona (d9ebcfc5), lint zielony, etap aplikacji 38/38 zielonych, pokrycie łącza 197/264 (74,6 %); wgranie 0.0.62 właścicielowi uruchomione (`deploy-owner`), wynik niepotwierdzony w logach; testy przeglądarkowe przerwane po terminie 4:32 do powtórzenia, dokumenty i kopia na F: nieukończone.

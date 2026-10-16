@@ -1,6 +1,6 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-15**, wersja programu **0.0.53**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+Stan na **2026-10-16**, wersja programu **0.0.62**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
@@ -17,13 +17,13 @@ Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
 | Miara                               | Wartość                                                                                | Źródło                        |
 | ----------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------- |
-| Kod Rust                            | 241 crate'ów, 107 modułów, ok. 373 tys. linii, 2514 testów                             | CATALOG                       |
-| Interfejs (Svelte 5 + TS)           | ok. 46 tys. linii; vitest 257/257; E2E 138 zielonych, 1 czerwony (znany, próg czasowy) | przebieg 2026-10-09           |
-| Prawdziwa aplikacja na laptopie     | uruchamia się; testy dymne `e2e-app` 11/11 na profilu tymczasowym (wersja 0.0.2)       | przebieg 2026-10-09           |
+| Kod Rust                            | 257 crate'ów, ok. 3000 plików źródłowych; testy Rust 2871 zielonych (0.0.62)       | verify 0.0.62                 |
+| Interfejs (Svelte 5 + TS)           | vitest 393/393; testy w przeglądarce ok. 460 (3 style × 2 motywy, axe, kontrast) | verify 0.0.62                 |
+| Prawdziwa aplikacja na laptopie     | testy `e2e-app` 38/38 na instancji testowej obok Alfy właściciela; pokrycie łącza 74,6 % (197 z 264) | verify 0.0.62                 |
 | Kryteria akceptacji F0–F9           | 108: 38 ✅ CI · 57 🟡 · 11 ⛔ · 2 do decyzji                                           | STATUS (macierz z 2026-10-06) |
 | Kryteria potwierdzone na sprzęcie   | **0 z 108**                                                                            | STATUS                        |
-| Model lokalny odpowiada na laptopie | **nie sprawdzone** — brak silnika; czeka na zgodę na pobranie ok. 6 GB                 | —                             |
-| Głos na żywo                        | **nie sprawdzone** — jw.                                                               | —                             |
+| Model lokalny odpowiada na laptopie | **tak** — próby obowiązków na modelu lokalnym (0.0.45, 0.0.52–0.0.53; raport 26)       | raporty nocne 23 i 26         |
+| Głos na żywo                        | silniki zmierzone na laptopie (Supertonic 3: 0,97 s na zdanie); rozmowa żywą mową — do Twojej oceny słuchem | 0.0.30–0.0.42 |
 
 Najważniejsze zdanie tego dokumentu: **kod wszystkich fal F0–F9 istnieje i przechodzi testy automatyczne, ale
 żadna fala nie jest zamknięta na prawdziwej maszynie.** Dlatego etap A roadmapy ma pierwszeństwo przed nowymi
@@ -65,6 +65,10 @@ funkcjami.
 | 0.0.30 | 2026-10-11 | P1: głos Supertonic 3 jako osobny proces w Rust, cztery barwy agentek; zmierzone 0,97 s na zdanie na laptopie (brzmienie — do odsłuchu właściciela) |
 | 0.0.31 | 2026-10-11 | P1: wybór barwy głosu dla każdej agentki (10 barw Supertonic 3) |
 | 0.0.32 | 2026-10-11 | silnik llama.cpp b11559 w katalogu z przypiętymi sumami; pomiar Qwen3-ASR (aplikacja nie budowana) |
+| 0.0.62 | 2026-10-16 | Serie 3 i 4 (19 nowości): polecenia bez modelu — jednostki, daty i lata przestępne, liczby słownie i rzymskie, procenty, wybór z listy, liczenie znaków; podpowiedź „Bez modelu”; `F1` i trafienia z instrukcji w Ustawieniach; szablony i polecenia jako JSON; statystyki rozmowy; wyszukiwanie i eksport Tablicy; kopia rozmowy z notą AI; zapamiętany tryb skupienia; „Zapisz jako szablon”; wąskie okno od 360 px (E.1); poprawki po przeglądzie serii 3 | testy rdzenia i interfejsu, E2E serii 3 i 4 w 3 stylach × 2 motywach, wąskie okno 400/360 px, pełne `verify wersja` — raport nocny [27](27-raport-nocny-2026-10-16.md) |
+| 0.0.61 | 2026-10-16 | Seria 2: instrukcja w programie, Tablica, tekst z DOCX/XLSX/PPTX, styl odpowiedzi, budżet wyzwalaczy, archiwum rozmów, tłumaczenie odpowiedzi, import SKILL.md, SECURITY.md i SBOM; poprawki po przeglądzie serii 1 | `verify` 0.0.61: 15 etapów zielonych do testów przeglądarkowych (437), 1 czerwony test czasowy (naprawiony w 0.0.62); etap aplikacji — w biegu 0.0.62 |
+| 0.0.60 | 2026-10-15 | Seria 1: polecenia bez modelu, quiz, własne polecenia z testerem, szablony promptów, eksport JSON, oznaczanie treści AI (AI Act), mapa przepływu danych, strony Moduły i Zaawansowane | `verify` 0.0.60: 17 z 19 etapów zielonych (2 czerwone — formatowanie i typy, naprawione), prawdziwa aplikacja 36/36, pokrycie łącza 74 % |
+| 0.0.54–0.0.59 | 2026-10-15 | m.in. przeglądarka Alfy (C6.4), narzędzia deweloperskie (C6.5), znajomość programów i serwery MCP (C6.1–C6.2), diagnostyka komputera (C6.3) — szczegóły w historii zmian | jak w historii zmian i raporcie [26](26-raport-nocny-2026-10-15.md) |
 | 0.0.53 | 2026-10-15 | Izolacja poleceń powłoki (integralność Low), Markdown 100 KB w 7,8 ms, wasmtime 36.0.18, pokrycie łącza 71,8 %; decyzje z dokumentu 25 |
 | 0.0.52 | 2026-10-14 | Stan połączeń w Ustawieniach; sprawdzanie logowania mostów po „Gotowe”; Antigravity (konto Google AI Pro) — logowanie i most z ostrzeżeniem; regresja próby obowiązków |
 | 0.0.51 | 2026-10-14 | Dobór modelu według trudności; poprawki audytu zewnętrznego (bezpieczeństwo, bramki, zależności, rozmiary) |

@@ -188,7 +188,9 @@ mod tests {
         let many = cpu_multi(Duration::from_millis(100), Some(s), &cancel);
         assert!(many.metric("scaling").is_some());
         let mem = memory(MEMORY_MIN_MB, &cancel);
-        assert_eq!(mem.verdict, Verdict::Pass, "{:?}", mem.notes);
+        // Szybkość kopiowania zależy od obciążenia maszyny: pod pełną kompilacją wychodzi „wolno”
+        // (Warn, bramka 0.0.62) — to poprawna ocena, nie błąd; błędem byłby zły wzorzec (Fail).
+        assert_ne!(mem.verdict, Verdict::Fail, "{:?}", mem.notes);
         assert_eq!(mem.metric("errors"), Some(0.0));
         assert_eq!(memory_size_mb(1000), Some(250));
         assert_eq!(memory_size_mb(100), None);
