@@ -3,7 +3,8 @@
 Praca od ok. 19:00 do 5:00 na Twoje polecenie: „zacznij dalsze etapy i nie buduj wersji co jeden punkt tylko co 10”,
 a potem: „jak to skończysz i zrobisz testy, zacznij kolejne punkty — i tak do 4:30; o tej godzinie ma być działająca
 wersja, testy, plan HTML ze stanem pracy; kopia bezpieczeństwa na dysku F: gotowa na 5:00”. Ostatnia zbudowana,
-sprawdzona i wgrana wersja to **0.0.62** (stan sprawdzenia — rozdział 3). Ten dokument mówi, co doszło, jak to
+sprawdzona i wgrana wersja to **0.0.62** — pełne `verify wersja` 19/19 i `verify sprzet` zielone (rozdział 3);
+wgrana pierwszy raz o 4:40 (10 min po terminie), końcowa budowa o 5:44. Ten dokument mówi, co doszło, jak to
 sprawdziłem, czego nie sprawdziłem i co zostaje.
 
 ## 1. Najważniejsze w pięciu punktach
@@ -62,7 +63,21 @@ zmian).
   - **prawdziwa aplikacja: 38/38 zielonych, pokrycie łącza 197 z 264 poleceń (74,6 %)** — w tym nowy scenariusz
     serii 3 i 4 (polecenia bez modelu na prawdziwym rdzeniu, zapis trybu skupienia);
   - zależności i licencje (`cargo deny`), audyt pakietów JS, SBOM (767 składników) — zielone.
-- Wgranie do `Alfa-uruchomiona`: **04:40**, dziennik startu: `wersja=0.0.62`, bez błędów (dwa ostrzeżenia znane
+- **Końcowy bieg 0.0.62 jednym przebiegiem** (po poprawkach testu diagnostyki, lintu i czekania na start atrapy;
+  commit `47121474`, maszyna bez dodatkowego obciążenia, 5:07–5:44): **ZIELONY — 19 z 19 etapów**. Testy Rust
+  **2872 zielonych, 0 czerwonych** (40 pominiętych — sprzętowe), interfejs **393/393**, przeglądarka **466/466**,
+  prawdziwa aplikacja **38/38**, pokrycie łącza **197 z 264 (74,6 %)**, zależności, audyt pakietów i SBOM zielone.
+  Raport: `target/verify/0.0.62/raport-wersja.md`. Ten bieg zastępuje opis wcześniejszych, przerywanych biegów
+  powyżej — zostawiam je, bo pokazują, co poprawiłem po drodze.
+- **`verify sprzet` 0.0.62** (5:46–5:57): **ZIELONY** — testy sprzętowe na tym laptopie: wykrywanie mowy,
+  koniec wypowiedzi, rozpoznawanie mowy, rozmowa, mikrofon, rozpoznawanie mówcy, embeddingi, system, rejestr,
+  Markdown, pobieranie (słowo wywoławcze pominięte — brak nagrań kontrolnych); próby obowiązków na **modelu
+  lokalnym** z oceną: poranna (150 s), wieczorna (99 s), porządki (76 s), koszty (22 s) — wszystkie zielone. Bez
+  dźwięku i bez sterowania pulpitem (opcje `--dzwiek` i `--pulpit` wyłączone, jak nakazuje praca nocna).
+- Ostatni czerwony test w przeglądarce padał przed sprawdzeniem czegokolwiek: przy równoległej kompilacji atrapa
+  programu startowała dłużej niż 15 s. Czekanie na start wydłużyłem do 30 s (szybkość startu mierzą osobne testy
+  z budżetem czasu).
+- Wgranie do `Alfa-uruchomiona`: pierwsze **04:40**, końcowej budowy z biegu 19/19 — **5:44**; dziennik startu: `wersja=0.0.62`, bez błędów (dwa ostrzeżenia znane
   z poprzednich dni: skrót `Ctrl+Alt+Space` zajęty, Broker w procesie w kopii właściciela).
 
 ## 4. Czego nie sprawdziłem
@@ -71,11 +86,6 @@ zmian).
   modelu”, wąskie okno) — testy sprawdziły dostępność, kontrast i to, że nic nie wychodzi poza okno, w trzech
   stylach i dwóch motywach; czy się podobają — Twoja ocena.
 - **Kontakt bezpieczeństwa** w `SECURITY.md` — czeka na Twoją decyzję (nie wpisałem adresu).
-- **Testy sprzętowe i próby na modelu lokalnym** (`verify sprzet`) — nie uruchomiłem ich tej nocy. To nie jest
-  żaden z trzech dozwolonych powodów (brak sprzętu, Twoja decyzja, ocena zmysłami): zabrakło czasu, bo pełna
-  weryfikacja wersji szła pod obciążeniem maszyny ok. 2,5 h. Zmiany tej nocy nie dotykają mowy, kamer ani modeli
-  lokalnych (to polecenia bez modelu oraz okna i strony interfejsu), ale bieg „sprzęt” jest pierwszym zadaniem
-  następnej sesji.
 
 ## 5. Co zostaje
 
