@@ -58,6 +58,11 @@ fn answers() {
         a("3,5 slownie").as_deref(),
         Some("3,50 = **trzy i 50/100**")
     );
+    assert!(
+        a("999999999999 slownie")
+            .unwrap_or_default()
+            .starts_with("999 999 999 999 = **dziewięćset")
+    );
     assert_eq!(a("2026 rzymskimi").as_deref(), Some("2026 = **MMXXVI**"));
     assert_eq!(
         a("zamien 1994 na rzymskie").as_deref(),

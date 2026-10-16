@@ -173,6 +173,23 @@ const SPELL: &str = r"^(?:(?:jak )?(?:zapisz|napisz|zapisac|napisac|podaj) )?(?:
 const TO_ROMAN: &str = r"^(?:(?:jak )?(?:zapisz|napisz|zapisac|napisac|zamien|przelicz) )?(?:liczbe )?(\d{1,4}) (?:na rzymskie|na rzymska|rzymskimi|po rzymsku|cyframi rzymskimi|w rzymskich)$";
 const FROM_ROMAN: &str = r"^(?:(?:ile to (?:jest )?|zamien |przelicz |co to (?:jest |za liczba )?)?(?:liczba |liczbe )?rzymsk(?:ie|a|i) ([mdclxvi]{1,16})(?: na arabskie| po arabsku)?|([mdclxvi]{1,16}) (?:na arabskie|po arabsku|rzymskimi to ile))$";
 
+/// Liczba całkowita z odstępami co trzy cyfry (od pięciu cyfr, jak `text::number`) — bez
+/// przechodzenia przez `f64`, które psuło liczby od ok. 576 mld.
+fn grouped(n: u64) -> String {
+    let digits = n.to_string();
+    if digits.len() <= 4 {
+        return digits;
+    }
+    let mut out = String::new();
+    for (i, c) in digits.chars().enumerate() {
+        if i > 0 && (digits.len() - i).is_multiple_of(3) {
+            out.push(' ');
+        }
+        out.push(c);
+    }
+    out
+}
+
 fn amount(whole: &str, cents: Option<&str>, currency: bool) -> Option<String> {
     let n: u64 = whole.replace(' ', "").parse().ok()?;
     if n > MAX {
@@ -184,7 +201,7 @@ fn amount(whole: &str, cents: Option<&str>, currency: bool) -> Option<String> {
         Some(c) => c.to_owned(),
         None => "00".to_owned(),
     };
-    let base = crate::text::number(n as f64);
+    let base = grouped(n);
     let shown = if cents == "00" {
         base
     } else {

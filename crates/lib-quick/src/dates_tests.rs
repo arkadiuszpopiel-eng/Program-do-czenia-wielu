@@ -66,6 +66,10 @@ fn weekday_of_a_date() {
         );
     }
     assert_eq!(
+        a("jaki dzien tygodnia bedzie 29 lutego").as_deref(),
+        Some("29 lutego 2028 to **wtorek**.")
+    );
+    assert_eq!(
         a("jaki dzien tygodnia bedzie 24 grudnia").as_deref(),
         Some("24 grudnia 2026 to **czwartek**.")
     );

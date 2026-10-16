@@ -1,6 +1,7 @@
-//! Losowy wybór z listy podanej w wiadomości: „wybierz jedno: pizza, sushi, żurek”, „wylosuj coś
-//! z: kino albo spacer”. Pozycje w oryginalnej pisowni (z polskimi znakami); 2–20 pozycji. Źródło
-//! losowości podaje wywołujący (`roll(n)` → 0..n).
+//! Losowy wybór z listy podanej w wiadomości po dwukropku: „wybierz jedno: pizza, sushi, żurek”,
+//! „wylosuj coś z: kino albo spacer” („Wybierz coś na obiad, jestem głodny” idzie do modelu).
+//! Pozycje w oryginalnej pisowni (z polskimi znakami); 2–20 pozycji. Źródło losowości podaje
+//! wywołujący (`roll(n)` → 0..n).
 
 use std::sync::OnceLock;
 
@@ -8,7 +9,7 @@ use regex::Regex;
 
 use crate::text::{fold, re};
 
-const CHOICE: &str = r"^(?:(?:hej|czesc)[ ,]+)?(?:alfa[ ,:]+)?(?:prosze[ ,]+)?(?:wybierz|wylosuj|losuj)(?: mi| nam| za mnie)? (?:jedno|jedna|jeden|cos|cokolwiek|ktores|ktoras|ktorys)(?: z| sposrod)?(?: tych| ponizszych| listy)?:? (.+)$";
+const CHOICE: &str = r"^(?:(?:hej|czesc)[ ,]+)?(?:alfa[ ,:]+)?(?:prosze[ ,]+)?(?:wybierz|wylosuj|losuj)(?: mi| nam| za mnie)? (?:jedno|jedna|jeden|cos|cokolwiek|ktores|ktoras|ktorys)(?: (?:z|sposrod)(?: (?:tych|ponizszych|listy|dwoch|trzech|czterech|pieciu))?)?: (.+)$";
 const SEPARATOR: &str = r"(?i)\s*(?:[,;/]|\s(?:albo|czy|lub)\s)\s*";
 const MAX_ITEMS: usize = 20;
 const MAX_ITEM: usize = 60;
@@ -64,7 +65,14 @@ mod tests {
             answer("losuj jedno spośród: Ala; Ola; Łucja", &mut |_| 2).as_deref(),
             Some("Wybieram: **Łucja**.")
         );
+        assert_eq!(
+            answer("wybierz jedno z dwóch: kino czy teatr", &mut |_| 1).as_deref(),
+            Some("Wybieram: **teatr**.")
+        );
         for other in [
+            "Wybierz coś na obiad, jestem głodny",
+            "Wybierz jedno słowo, które rymuje się z kot",
+            "Wylosuj coś ciekawego, np. film albo książkę",
             "wybierz jedno: pizza",
             "wybierz najlepszy laptop do 3000 zł",
             "wybierz jedno: , ,",

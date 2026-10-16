@@ -7,25 +7,44 @@ use regex::Regex;
 
 use crate::text::{fold, plural, re};
 
-const COUNT: &str = r"^(?:policz|zlicz|ile)(?: mi| jest| ma)? (?:znaki i slowa|slowa i znaki|znaki|znakow|slowa|slow|litery|liter)(?: (?:ma|jest|w|w tekscie|w zdaniu|tekst|zdanie))?:? (.+)$";
+/// Początek polecenia; sam tekst musi stać po dwukropku albo w cudzysłowie — „Ile liter ma alfabet
+/// polski?” to pytanie do modelu, nie tekst do policzenia.
+const COUNT: &str = r"^(?:policz|zlicz|ile)(?: mi| jest| ma)? (?:znaki i slowa|slowa i znaki|znakow|znaki|slowa|slow|litery|liter)(?: (?:w tekscie|w zdaniu|ma tekst|ma zdanie|w|ma|jest))?";
+const OPEN: [char; 5] = ['„', '"', '«', '“', '\''];
+const CLOSE: [char; 5] = ['”', '"', '»', '“', '\''];
+
+/// Tekst do policzenia z reszty wiadomości: po dwukropku (dokładnie, z odstępami) albo między
+/// pierwszym otwierającym a ostatnim zamykającym cudzysłowem (dalej najwyżej znaki zapytania itp.).
+fn subject(rest: &str) -> Option<&str> {
+    let rest = rest.trim_start();
+    if let Some(text) = rest.strip_prefix(':') {
+        return Some(text.trim());
+    }
+    let inner = rest.strip_prefix(OPEN)?;
+    let close = inner.rfind(CLOSE)?;
+    let tail = inner.get(close..)?.chars().skip(1);
+    if tail.clone().any(|c| c.is_alphanumeric()) {
+        return None;
+    }
+    inner.get(..close)
+}
 
 /// Odpowiedź albo `None` (`message` — oryginalna wiadomość).
 pub fn answer(message: &str) -> Option<String> {
     static COUNT_RE: OnceLock<Option<Regex>> = OnceLock::new();
-    let joined = message.split_whitespace().collect::<Vec<_>>().join(" ");
+    let original = message.trim();
     // `fold` zamienia znak na znak — pozycje w tekście bez polskich znaków odpowiadają oryginałowi.
-    let folded = fold(&joined);
-    if folded.chars().count() != joined.chars().count() {
+    let folded = fold(original);
+    if folded.chars().count() != original.chars().count() {
         return None;
     }
-    let caps = re(&COUNT_RE, COUNT)?.captures(&folded)?;
-    let list = caps.get(1)?;
-    let start = folded.get(..list.start())?.chars().count();
-    let text: String = joined.chars().skip(start).collect();
-    let text = text
-        .trim()
-        .trim_matches(['"', '„', '”', '«', '»', '\'', '“'])
-        .trim();
+    let found = re(&COUNT_RE, COUNT)?.find(&folded)?;
+    let start = folded.get(..found.end())?.chars().count();
+    let at = original
+        .char_indices()
+        .nth(start)
+        .map_or(original.len(), |(i, _)| i);
+    let text = subject(original.get(at..)?)?;
     if text.is_empty() {
         return None;
     }
@@ -63,7 +82,24 @@ mod tests {
             answer("policz słowa: biało-czerwona flaga, 2 sztuki").as_deref(),
             Some("**30** znaków (27 bez spacji, 24 litery), **4** słowa.")
         );
-        assert_eq!(answer("policz znaki:"), None);
-        assert_eq!(answer("policz mi to"), None);
+        assert_eq!(
+            answer("ile znaków ma „Ala ma kota”?").as_deref(),
+            Some("**11** znaków (9 bez spacji, 9 liter), **3** słowa.")
+        );
+        assert_eq!(
+            answer("policz znaki w tekście: Ala  ma").as_deref(),
+            Some("**7** znaków (5 bez spacji, 5 liter), **2** słowa.")
+        );
+        for other in [
+            "policz znaki:",
+            "policz mi to",
+            "Ile liter ma alfabet polski?",
+            "Ile znaków ma numer PESEL?",
+            "Ile słów ma język polski?",
+            "Ile liter ma słowo kot",
+            "ile słów ma „Pan Tadeusz” Mickiewicza",
+        ] {
+            assert_eq!(answer(other), None, "{other}");
+        }
     }
 }

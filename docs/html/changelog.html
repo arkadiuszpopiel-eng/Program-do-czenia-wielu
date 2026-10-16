@@ -364,17 +364,30 @@ sprawdzeniem kształtu przed zapisem (rdzeń sprawdza resztę jak przy ręcznym 
 panele i okna dialogowe nie wychodzą poza okno.</li>
 <li>Ustawienia → Polecenia bez modelu: przykłady wbudowanych poleceń są klikalne — wpisują się do testera.</li>
 </ul>
-<h3 id="poprawki-po-przegladzie-kodu-serii-3">Poprawki po przeglądzie kodu serii 3</h3>
+<h3 id="poprawki-po-przegladzie-kodu-serii-3-i-4">Poprawki po przeglądzie kodu serii 3 i 4</h3>
 <ul>
-<li>Przeliczenia z bardzo małym wynikiem („1 mg w tonach”) pokazują cyfry znaczące zamiast zera; „1 dzień”
-zamiast „1 dni”.</li>
-<li>„Ile dni do 29 lutego?” bez roku liczy do najbliższego roku przestępnego.</li>
-<li>Wyszukiwanie w instrukcji i w Ustawieniach nie pokazuje spóźnionych wyników starszego zapytania.</li>
-<li>Wklejanie JSON: komunikat o błędzie znika po poprawce, a „pozycja nie jest obiektem” ma własny komunikat
-(także po angielsku).</li>
-<li>Nazwa szablonu z wiadomości nie przecina emoji (cięcie po znakach, nie po jednostkach UTF-16).</li>
-<li>Test terminala nie zależy od stałego czekania 50 ms (jedyny czerwony test bramki 0.0.61 przy obciążonej
-maszynie).</li>
+<li><p>[poważne] Liczenie znaków działa tylko dla tekstu po dwukropku albo w cudzysłowie, a wybór z listy — tylko po
+dwukropku: zwykłe pytania („Ile liter ma alfabet polski?”, „Wybierz coś na obiad, jestem głodny”) idą do modelu
+zamiast dostać odpowiedź bez sensu.</p>
+</li>
+<li><p>Liczby słownie od ok. 576 mld nie mają już błędnych miejsc po przecinku w zapisie cyfrowym; „Jaki dzień tygodnia
+będzie 29 lutego?” bez roku odpowiada dla najbliższego roku przestępnego.</p>
+</li>
+<li><p>Przeliczenia z bardzo małym wynikiem („1 mg w tonach”) pokazują cyfry znaczące zamiast zera; „1 dzień”
+zamiast „1 dni”.</p>
+</li>
+<li><p>„Ile dni do 29 lutego?” bez roku liczy do najbliższego roku przestępnego.</p>
+</li>
+<li><p>Wyszukiwanie w instrukcji i w Ustawieniach nie pokazuje spóźnionych wyników starszego zapytania.</p>
+</li>
+<li><p>Wklejanie JSON: komunikat o błędzie znika po poprawce, a „pozycja nie jest obiektem” ma własny komunikat
+(także po angielsku).</p>
+</li>
+<li><p>Nazwa szablonu z wiadomości nie przecina emoji (cięcie po znakach, nie po jednostkach UTF-16).</p>
+</li>
+<li><p>Test terminala nie zależy od stałego czekania 50 ms (jedyny czerwony test bramki 0.0.61 przy obciążonej
+maszynie).</p>
+</li>
 </ul>
 <h3 id="testy">Testy</h3>
 <ul>

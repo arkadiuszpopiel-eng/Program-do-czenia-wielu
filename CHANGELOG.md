@@ -49,7 +49,13 @@ kopiowanie rozmowy, zapamiętany tryb skupienia, zapis wiadomości jako szablonu
   panele i okna dialogowe nie wychodzą poza okno.
 - Ustawienia → Polecenia bez modelu: przykłady wbudowanych poleceń są klikalne — wpisują się do testera.
 
-### Poprawki po przeglądzie kodu serii 3
+### Poprawki po przeglądzie kodu serii 3 i 4
+
+- [poważne] Liczenie znaków działa tylko dla tekstu po dwukropku albo w cudzysłowie, a wybór z listy — tylko po
+  dwukropku: zwykłe pytania („Ile liter ma alfabet polski?”, „Wybierz coś na obiad, jestem głodny”) idą do modelu
+  zamiast dostać odpowiedź bez sensu.
+- Liczby słownie od ok. 576 mld nie mają już błędnych miejsc po przecinku w zapisie cyfrowym; „Jaki dzień tygodnia
+  będzie 29 lutego?” bez roku odpowiada dla najbliższego roku przestępnego.
 
 - Przeliczenia z bardzo małym wynikiem („1 mg w tonach”) pokazują cyfry znaczące zamiast zera; „1 dzień”
   zamiast „1 dni”.

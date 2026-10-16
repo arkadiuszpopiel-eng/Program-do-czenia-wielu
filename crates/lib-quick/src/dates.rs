@@ -77,7 +77,8 @@ fn parse(c: &regex::Captures<'_>, at: usize, today: NaiveDate, lean: Lean) -> Op
     let at_year = |y: i32| NaiveDate::from_ymd_opt(y, month, day);
     let y0 = today.year();
     match lean {
-        Lean::Near => at_year(y0),
+        // Bez roku: bieżący rok, a gdy data w nim nie istnieje (29 lutego) — najbliższy w przód.
+        Lean::Near => (0..=8).find_map(|k| at_year(y0 + k)),
         Lean::Future => (0..=8)
             .filter_map(|k| at_year(y0 + k))
             .find(|d| *d >= today),
