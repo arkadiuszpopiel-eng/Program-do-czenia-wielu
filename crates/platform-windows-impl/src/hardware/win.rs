@@ -140,6 +140,8 @@ pub(crate) fn gpus() -> Result<Vec<GpuAdapter>, PlatformError> {
     // SAFETY: fabryka DXGI 1.1 (bez inicjalizacji COM).
     let factory: IDXGIFactory1 =
         unsafe { CreateDXGIFactory1() }.map_err(|e| win_error("CreateDXGIFactory1", &e))?;
+    // Szczegóły spoza DXGI (zintegrowana, sterownik) — z DXCore, łączone po LUID.
+    let details = super::gpu_win::details();
     let mut out = Vec::new();
     for index in 0.. {
         // SAFETY: kolejne adaptery aż do DXGI_ERROR_NOT_FOUND.
@@ -150,6 +152,8 @@ pub(crate) fn gpus() -> Result<Vec<GpuAdapter>, PlatformError> {
         };
         // SAFETY: ważny adapter z fabryki.
         let desc = unsafe { adapter.GetDesc1() }.map_err(|e| win_error("GetDesc1", &e))?;
+        let luid = super::gpu_win::luid_u64(desc.AdapterLuid);
+        let found = details.iter().find(|d| d.luid == luid);
         out.push(GpuAdapter {
             name: from_wide(&desc.Description),
             vendor_id: desc.VendorId,
@@ -158,6 +162,9 @@ pub(crate) fn gpus() -> Result<Vec<GpuAdapter>, PlatformError> {
             shared_memory_mb: desc.SharedSystemMemory as u64 / MB,
             software: desc.Flags & (DXGI_ADAPTER_FLAG_SOFTWARE.0 as u32) != 0,
             index,
+            luid,
+            integrated: found.and_then(|d| d.integrated),
+            driver_version: found.and_then(|d| d.driver_version.clone()),
         });
     }
     Ok(out)

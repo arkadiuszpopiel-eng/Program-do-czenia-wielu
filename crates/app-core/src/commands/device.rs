@@ -30,7 +30,7 @@ impl AppCore {
     /// `device_gpu_live`: karty graficzne na żywo (pamięć, obciążenie, temperatura, moc, programy).
     /// Odczyt uruchamia narzędzie sterownika, więc idzie poza wątkiem obsługi poleceń.
     pub async fn device_gpu_live(&self) -> Result<GpuLive, AppError> {
-        let read = tokio::task::spawn_blocking(app_modules::gpu_mem::nvidia_live)
+        let read = tokio::task::spawn_blocking(app_modules::gpu_mem::live)
             .await
             .map_err(|e| AppError::internal(e.to_string()))?;
         Ok(read.map_or_else(GpuLive::default, gpu_live_view))

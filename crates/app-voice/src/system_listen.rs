@@ -96,7 +96,7 @@ impl SystemVoice {
             return Ok(whisper);
         };
         // Pomiar wolnej pamięci karty: gdy zajął ją model rozmowy, wybieramy silnik, który da radę.
-        let free = app_modules::gpu_mem::nvidia_free_mb();
+        let free = app_modules::gpu_mem::free_vram_mb();
         let plan = app_modules::stt::stt_plan(
             config.gpu,
             app_modules::stt::server_cuda(&self.paths).is_some(),

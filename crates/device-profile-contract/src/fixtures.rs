@@ -100,6 +100,99 @@ pub fn laptop_on_battery() -> Profile {
     }
 }
 
+fn machine(hex: &'static str, cpu: (&str, u32, u32), ram_mb: u32, gpus: Vec<GpuInfo>) -> Profile {
+    Profile {
+        machine_id: id(hex),
+        os: windows11(),
+        cpu: CpuInfo {
+            model: cpu.0.into(),
+            physical_cores: cpu.1,
+            logical_cores: cpu.2,
+            l3_cache_mb: None,
+        },
+        ram_mb,
+        gpus,
+        npu: None,
+        battery: None,
+        power: PowerState::Ac,
+        audio: None,
+        emulation: None,
+    }
+}
+
+/// Laptop z procesorem AMD z grafiką (APU): Ryzen 7 7840HS · Radeon 780M z 4 GB zarezerwowanymi
+/// w BIOS-ie (sterownik: „zintegrowana”) · 32 GB.
+pub fn amd_apu() -> Profile {
+    machine(
+        "a0d0a9a0000000000000000000000005",
+        ("AMD Ryzen 7 7840HS w/ Radeon 780M Graphics", 8, 16),
+        32_768,
+        vec![
+            GpuInfo::describe(0, "AMD Radeon 780M Graphics", GpuVendor::Amd, 4_096, 14_000)
+                .with_hardware_flag(Some(true)),
+        ],
+    )
+}
+
+/// Laptop z samą grafiką Intel Arc w procesorze (Core Ultra 7 258V, 32 GB, Arc 140V).
+pub fn intel_igpu() -> Profile {
+    machine(
+        "1a7e1000000000000000000000000006",
+        ("Intel(R) Core(TM) Ultra 7 258V", 8, 8),
+        32_768,
+        vec![
+            GpuInfo::describe(
+                0,
+                "Intel(R) Arc(TM) 140V GPU",
+                GpuVendor::Intel,
+                128,
+                16_000,
+            )
+            .with_hardware_flag(Some(true)),
+        ],
+    )
+}
+
+/// Desktop z osobną kartą Intel Arc A770 16 GB i grafiką UHD 770 w procesorze (i5-12400, 32 GB).
+pub fn intel_arc() -> Profile {
+    machine(
+        "1a7ea770000000000000000000000007",
+        ("12th Gen Intel(R) Core(TM) i5-12400", 6, 12),
+        32_768,
+        vec![
+            gpu("Intel(R) UHD Graphics 770", GpuVendor::Intel, 128),
+            gpu("Intel(R) Arc(TM) A770 Graphics", GpuVendor::Intel, 16_224),
+        ],
+    )
+}
+
+/// Laptop z małą kartą NVIDIA: RTX 3050 4 GB + Iris Xe, 16 GB.
+pub fn small_nvidia() -> Profile {
+    machine(
+        "53a11000000000000000000000000008",
+        ("12th Gen Intel(R) Core(TM) i5-12500H", 12, 16),
+        16_384,
+        vec![
+            gpu("Intel(R) Iris(R) Xe Graphics", GpuVendor::Intel, 128),
+            gpu(
+                "NVIDIA GeForce RTX 3050 Laptop GPU",
+                GpuVendor::Nvidia,
+                3_965,
+            ),
+        ],
+    )
+}
+
+/// Komputer bez karty graficznej (maszyna wirtualna, serwer): sam procesor, 16 GB.
+pub fn no_gpu() -> Profile {
+    machine(
+        "00090000000000000000000000000009",
+        ("Intel(R) Xeon(R) E-2236", 6, 12),
+        16_384,
+        Vec::new(),
+    )
+}
+
 /// Maszyna poniżej baseline: 4c/8t, 8 GB RAM, tylko zintegrowane GPU.
 pub fn below_baseline() -> Profile {
     Profile {

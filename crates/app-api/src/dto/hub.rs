@@ -282,6 +282,8 @@ pub enum HwClass {
     StandardAmd,
     LaptopCuda,
     Strong,
+    /// Tylko karta zintegrowana z procesorem.
+    Integrated,
     Unknown,
 }
 

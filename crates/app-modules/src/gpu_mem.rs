@@ -1,10 +1,14 @@
 //! Karty graficzne na żywo: wolna pamięć przed uruchomieniem silnika, który ma liczyć na karcie,
 //! oraz podgląd dla strony „Urządzenia” (pamięć, obciążenie, temperatura, moc, procesy).
-//! Źródło: `nvidia-smi` (instalowany ze sterownikiem NVIDIA). Bez niego pomiaru nie ma i decyzję
-//! podejmuje wywołujący (dziś: próba na karcie, a po nieudanym starcie — silnik zapasowy).
+//! Źródła: `nvidia-smi` (instalowany ze sterownikiem NVIDIA — daje też temperaturę i moc), a bez
+//! niego liczniki wydajności Windows (`HardwarePort::gpu_usage`: pamięć, obciążenie i procesy dla
+//! każdego producenta — AMD, Intel, NVIDIA). Bez obu pomiaru nie ma i decyzję podejmuje wywołujący
+//! (próba na karcie, a po nieudanym starcie — silnik zapasowy).
 
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
+
+use platform_contract::{GpuAdapter, GpuUsage, HardwarePort};
 
 /// Najdłuższe czekanie na odpowiedź `nvidia-smi`.
 const TIMEOUT: Duration = Duration::from_secs(2);
@@ -162,10 +166,24 @@ pub fn parse_processes(output: &str) -> Vec<GpuProcess> {
             pid,
             name: file.to_owned(),
             used_mb: number(used),
-            alfa: ALFA_PROGRAMS.iter().any(|p| stem.eq_ignore_ascii_case(p)),
+            alfa: is_alfa(stem),
         });
     }
-    // Programy Alfy na górze, potem największe zużycie, potem nazwa — kolejność stała między odczytami.
+    sort_processes(&mut out);
+    out
+}
+
+/// Program uruchomiony przez Alfę (nazwa pliku z rozszerzeniem `.exe` albo bez).
+fn is_alfa(file: &str) -> bool {
+    let stem = file
+        .strip_suffix(".exe")
+        .or_else(|| file.strip_suffix(".EXE"))
+        .unwrap_or(file);
+    ALFA_PROGRAMS.iter().any(|p| stem.eq_ignore_ascii_case(p))
+}
+
+/// Programy Alfy na górze, potem największe zużycie, potem nazwa — kolejność stała między odczytami.
+fn sort_processes(out: &mut [GpuProcess]) {
     out.sort_by(|a, b| {
         b.alfa
             .cmp(&a.alfa)
@@ -173,7 +191,110 @@ pub fn parse_processes(output: &str) -> Vec<GpuProcess> {
             .then_with(|| a.name.to_lowercase().cmp(&b.name.to_lowercase()))
             .then(a.pid.cmp(&b.pid))
     });
-    out
+}
+
+/// Sprzętowa karta (bez adaptera programowego i zdalnego pulpitu Microsoftu 0x1414).
+fn hardware(a: &GpuAdapter) -> bool {
+    !a.software && a.vendor_id != 0x1414
+}
+
+/// Osobna karta: sterownik mówi „niezintegrowana”, a bez tej informacji — ≥ 1 GB własnej pamięci.
+fn discrete(a: &GpuAdapter) -> bool {
+    hardware(a) && a.integrated.map_or(a.dedicated_vram_mb >= 1_024, |i| !i)
+}
+
+fn mb32(value: u64) -> u32 {
+    u32::try_from(value).unwrap_or(u32::MAX)
+}
+
+/// Największa wolna pamięć osobnej karty z odczytu liczników systemu (MiB); `None` — brak
+/// osobnej karty albo odczytu dla niej. Pamięć karty zintegrowanej to RAM — nie jest liczona.
+pub fn free_from(adapters: &[GpuAdapter], usage: &GpuUsage) -> Option<u32> {
+    adapters
+        .iter()
+        .filter(|a| discrete(a))
+        .filter_map(|a| {
+            let used = usage.adapters.iter().find(|u| u.luid == a.luid)?;
+            Some(mb32(
+                a.dedicated_vram_mb.saturating_sub(used.dedicated_used_mb),
+            ))
+        })
+        .max()
+}
+
+/// Karty i procesy z odczytu liczników systemu (bez temperatury i mocy — tych system nie podaje).
+/// Karta zintegrowana pokazuje pamięć współdzieloną z RAM.
+pub fn cards_from(adapters: &[GpuAdapter], usage: &GpuUsage) -> (Vec<GpuCard>, Vec<GpuProcess>) {
+    let cards = adapters
+        .iter()
+        .filter(|a| hardware(a))
+        .filter_map(|a| {
+            let u = usage.adapters.iter().find(|u| u.luid == a.luid)?;
+            let (total, used) = if discrete(a) {
+                (a.dedicated_vram_mb, u.dedicated_used_mb)
+            } else {
+                (
+                    a.dedicated_vram_mb + a.shared_memory_mb,
+                    u.dedicated_used_mb + u.shared_used_mb,
+                )
+            };
+            Some(GpuCard {
+                index: a.index,
+                name: a.name.trim().to_owned(),
+                total_mb: mb32(total),
+                used_mb: mb32(used.min(total)),
+                free_mb: mb32(total.saturating_sub(used)),
+                load_pct: u.load_pct,
+                temp_c: None,
+                power_w: None,
+            })
+        })
+        .collect();
+    let mut processes: Vec<GpuProcess> = Vec::new();
+    for p in &usage.processes {
+        let name = p.name.clone().unwrap_or_else(|| format!("PID {}", p.pid));
+        let used = Some(mb32(p.dedicated_used_mb));
+        if let Some(seen) = processes.iter_mut().find(|q| q.pid == p.pid) {
+            // Ten sam proces na dwóch kartach — jedna pozycja z sumą pamięci.
+            seen.used_mb = seen.used_mb.zip(used).map(|(a, b)| a.saturating_add(b));
+            continue;
+        }
+        processes.push(GpuProcess {
+            pid: p.pid,
+            alfa: is_alfa(&name),
+            name,
+            used_mb: used,
+        });
+    }
+    sort_processes(&mut processes);
+    (cards, processes)
+}
+
+/// Odczyt liczników systemu: karty i zużycie (`None` — platforma bez liczników albo błąd).
+fn system_read() -> Option<(Vec<GpuAdapter>, GpuUsage)> {
+    let hw = platform_windows_impl::WinHardware;
+    let adapters = hw.gpus().ok()?;
+    let usage = hw.gpu_usage().ok()?;
+    Some((adapters, usage))
+}
+
+/// Wolna pamięć karty w MiB dla każdego producenta: `nvidia-smi`, a bez niego liczniki systemu.
+/// `None`, gdy nie da się zmierzyć albo nie ma osobnej karty.
+pub fn free_vram_mb() -> Option<u32> {
+    nvidia_free_mb().or_else(|| {
+        let (adapters, usage) = system_read()?;
+        free_from(&adapters, &usage)
+    })
+}
+
+/// Karty i procesy na żywo dla każdego producenta: `nvidia-smi` (z temperaturą i mocą), a bez
+/// niego liczniki systemu. `None` — pomiaru nie da się zrobić.
+pub fn live() -> Option<(Vec<GpuCard>, Vec<GpuProcess>)> {
+    nvidia_live().or_else(|| {
+        let (adapters, usage) = system_read()?;
+        let (cards, processes) = cards_from(&adapters, &usage);
+        (!cards.is_empty()).then_some((cards, processes))
+    })
 }
 
 /// Karty NVIDIA i procesy, które z nich korzystają; `None`, gdy pomiaru nie da się zrobić
@@ -196,61 +317,5 @@ pub fn nvidia_live() -> Option<(Vec<GpuCard>, Vec<GpuProcess>)> {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn picks_the_card_with_most_free_memory() {
-        assert_eq!(parse_free_mb("5368\n"), Some(5368));
-        assert_eq!(parse_free_mb("  812 \r\n 11240\r\n"), Some(11240));
-        assert_eq!(parse_free_mb(""), None);
-        assert_eq!(parse_free_mb("[N/A]\n"), None);
-        assert_eq!(parse_free_mb("brak karty\n4096\n"), Some(4096));
-    }
-
-    #[test]
-    fn cards_are_read_with_missing_readings_and_commas_in_names() {
-        let out = "0, NVIDIA GeForce RTX 4050 Laptop GPU, 6141, 549, 5372, 0, 48, 2.33\r\n\
-                   1, Karta, z przecinkiem, 16384, 1024, 15360, [N/A], [N/A], [N/A]\n\
-                   zepsuta linia\n2, Bez pamięci, [N/A], 1, 2, 3, 4, 5\n";
-        let cards = parse_cards(out);
-        assert_eq!(cards.len(), 2);
-        assert_eq!(cards[0].name, "NVIDIA GeForce RTX 4050 Laptop GPU");
-        assert_eq!(
-            (cards[0].total_mb, cards[0].used_mb, cards[0].free_mb),
-            (6141, 549, 5372)
-        );
-        assert_eq!(
-            (cards[0].load_pct, cards[0].temp_c, cards[0].power_w),
-            (Some(0), Some(48), Some(2))
-        );
-        assert_eq!(cards[1].name, "Karta, z przecinkiem");
-        assert_eq!(
-            (cards[1].load_pct, cards[1].temp_c, cards[1].power_w),
-            (None, None, None)
-        );
-    }
-
-    #[test]
-    fn processes_are_named_marked_and_ordered() {
-        let out = "17000, C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\CEF\\NVIDIA Overlay.exe, [N/A]\n\
-                   4242, C:\\Users\\x\\AppData\\Local\\Alfa\\sidecars\\llama-cuda\\llama-server.exe, 2610\n\
-                   12696, C:\\Windows\\explorer.exe, 120\n\
-                   4242, C:\\Users\\x\\AppData\\Local\\Alfa\\sidecars\\llama-cuda\\llama-server.exe, 2610\n\
-                   śmieci\n9, , 5\n";
-        let p = parse_processes(out);
-        assert_eq!(p.len(), 3);
-        assert_eq!(
-            (p[0].name.as_str(), p[0].alfa, p[0].used_mb),
-            ("llama-server.exe", true, Some(2610))
-        );
-        assert_eq!(
-            (p[1].name.as_str(), p[1].alfa, p[1].used_mb),
-            ("explorer.exe", false, Some(120))
-        );
-        assert_eq!(
-            (p[2].name.as_str(), p[2].used_mb),
-            ("NVIDIA Overlay.exe", None)
-        );
-    }
-}
+#[path = "gpu_mem_tests.rs"]
+mod tests;

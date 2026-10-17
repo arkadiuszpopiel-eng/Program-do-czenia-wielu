@@ -17,6 +17,8 @@ cost-meter-contract = { path = "../cost-meter-contract" }
 cost-meter-impl = { path = "../cost-meter-impl" }
 app-memory = { path = "../app-memory" }
 platform-windows-sys-impl = { path = "../platform-windows-sys-impl" }
+# Karty graficzne każdego producenta: DXGI/DXCore i liczniki zużycia (`gpu_mem`), gdy nie ma `nvidia-smi`.
+platform-windows-impl = { path = "../platform-windows-impl" }
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 app-api = { path = "../app-api" }
 # Broker poza procesem / w procesie (`BrokerPort` nad `KernelBroker`, ścieżki Brokera).

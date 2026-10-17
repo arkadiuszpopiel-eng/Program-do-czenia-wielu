@@ -153,10 +153,12 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'composer.localQuiz': 'quiz',
   'ob.optional': 'optional',
   'ob.progress': 'Introduction progress',
-  'ob.voice.A.desc': 'Runs on the CPU only, no graphics card needed.',
-  'ob.voice.B.desc': 'For an integrated graphics card.',
-  'ob.voice.C.desc': 'For an NVIDIA card with CUDA.',
-  'ob.voice.D.desc': 'For a strong graphics card.',
+  'ob.voice.A.desc': 'Everything on this computer, no cloud — works even without a graphics card.',
+  'ob.voice.B.desc':
+    'Speech recognised on this computer, conversation through a cloud model. For any card, integrated ones included.',
+  'ob.voice.C.desc':
+    'Best quality through the cloud — when the computer is weak or has no graphics card.',
+  'ob.voice.D.desc': 'Everything local on a strong graphics card: NVIDIA, AMD or Intel.',
   'ob.hw.notes': 'What this means',
   'ob.keys.cloud.title': 'Cloud models',
   'ob.keys.cloud.desc':

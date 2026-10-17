@@ -73,13 +73,17 @@ pub(crate) fn map_gpus(adapters: Vec<GpuAdapter>) -> Vec<GpuInfo> {
         .filter(|a| !a.software && a.vendor_id != MICROSOFT_PCI)
         .filter(|a| seen.insert((a.index, a.vendor_id, a.device_id)))
         .map(|a| {
-            GpuInfo::describe(
+            let mut gpu = GpuInfo::describe(
                 a.index,
                 &a.name,
                 GpuVendor::from_pci(a.vendor_id),
                 mb(a.dedicated_vram_mb),
                 mb(a.shared_memory_mb),
             )
+            .with_hardware_flag(a.integrated);
+            gpu.luid = a.luid;
+            gpu.driver_version = a.driver_version;
+            gpu
         })
         .collect()
 }
@@ -137,7 +141,33 @@ mod tests {
             shared_memory_mb: 8_000,
             software,
             index: 0,
+            luid: 0,
+            integrated: None,
+            driver_version: None,
         }
+    }
+
+    /// Procesor AMD z grafiką (APU): BIOS rezerwuje 4 GB „dedykowanej” pamięci, ale sterownik mówi
+    /// „zintegrowana” — ta flaga wygrywa ze zgadywaniem po pamięci. LUID i sterownik przechodzą
+    /// do profilu.
+    #[test]
+    fn driver_flag_wins_over_memory_guess() {
+        let mut apu = adapter("AMD Radeon 780M Graphics", 0x1002, 4_096, false);
+        apu.integrated = Some(true);
+        apu.luid = 0xD1F2;
+        apu.driver_version = Some("32.0.12033.1030".into());
+        let mut arc = adapter("Intel(R) Arc(TM) A770 Graphics", 0x8086, 16_224, false);
+        arc.index = 1;
+        arc.integrated = Some(false);
+        let mut old = adapter("Intel(R) UHD Graphics 620", 0x8086, 128, false);
+        old.index = 2;
+        let gpus = map_gpus(vec![apu, arc, old]);
+        let kinds: Vec<(bool, u64)> = gpus.iter().map(|g| (g.integrated, g.luid)).collect();
+        assert_eq!(kinds, [(true, 0xD1F2), (false, 0), (true, 0)]);
+        assert_eq!(gpus[0].driver_version.as_deref(), Some("32.0.12033.1030"));
+        // Bez flagi (stary system): 4 GB AMD wyglądałoby na osobną kartę.
+        let guessed = map_gpus(vec![adapter("AMD Radeon 780M", 0x1002, 4_096, false)]);
+        assert!(!guessed[0].integrated);
     }
 
     /// Laptop z dwiema kartami: obie zostają, każda z numerem i typem; dwie identyczne karty

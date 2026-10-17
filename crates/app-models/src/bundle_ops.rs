@@ -32,7 +32,7 @@ impl ModelsApp {
 
     /// Pozycje pakietu obecne w katalogu (warianty silników dla tej maszyny).
     fn bundle_specs(&self, def: &Def, machine: &Machine) -> Vec<ItemSpec> {
-        bundles::members(def, machine.accel())
+        bundles::members_for(def, machine)
             .into_iter()
             .filter_map(|(id, _)| self.catalog.iter().find(|s| s.id == id).cloned())
             .collect()

@@ -4,6 +4,9 @@
 
 #[cfg(windows)]
 mod win;
+/// Nazwa programu procesu — także dla listy programów na karcie graficznej (`hardware`).
+#[cfg(windows)]
+pub(crate) use win::process_name;
 
 use platform_contract::{PlatformError, WindowId, WindowInfo, WindowPort};
 use serde::{Deserialize, Serialize};

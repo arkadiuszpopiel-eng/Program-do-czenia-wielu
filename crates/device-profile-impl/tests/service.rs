@@ -66,6 +66,9 @@ impl HardwarePort for LaptopProbe {
                 shared_memory_mb: 7_900,
                 software: false,
                 index: 0,
+                luid: 0x1_0000_D1F2,
+                integrated: Some(false),
+                driver_version: Some("32.0.15.6094".into()),
             },
             GpuAdapter {
                 name: "Microsoft Basic Render Driver".into(),
@@ -75,6 +78,9 @@ impl HardwarePort for LaptopProbe {
                 shared_memory_mb: 7_900,
                 software: true,
                 index: 1,
+                luid: 0,
+                integrated: None,
+                driver_version: None,
             },
         ])
     }

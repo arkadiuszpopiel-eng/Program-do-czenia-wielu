@@ -1583,7 +1583,8 @@ export interface HelpTopic {
 }
 
 /** Klasa sprzętu. */
-export type HwClass = 'baseline' | 'standard_amd' | 'laptop_cuda' | 'strong' | 'unknown';
+export type HwClass =
+  'baseline' | 'standard_amd' | 'laptop_cuda' | 'strong' | 'unknown' | 'integrated';
 
 /** Tryb importu. */
 export type ImportMode = 'add' | 'merge' | 'replace';

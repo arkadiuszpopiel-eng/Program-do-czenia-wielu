@@ -54,7 +54,8 @@ pub use fs::{
     DirEntry, FsOperation, FsPort, KnownFolder, OpReceipt, UndoToken, is_credential_path,
 };
 pub use hardware::{
-    AudioDirection, AudioEndpoint, CpuSummary, GpuAdapter, HardwarePort, OsSummary, PowerStatus,
+    AudioDirection, AudioEndpoint, CpuSummary, GpuAdapter, GpuAdapterUsage, GpuProcessUsage,
+    GpuUsage, HardwarePort, OsSummary, PowerStatus,
 };
 pub use hotkey::{
     Hotkey, HotkeyEvent, HotkeyId, HotkeyPort, HotkeyPressOrigin, KILL_SWITCH, Key, Modifiers,

@@ -155,10 +155,12 @@ export const plWork = {
   'composer.localQuiz': 'quiz',
   'ob.optional': 'opcjonalny',
   'ob.progress': 'Postęp wprowadzenia',
-  'ob.voice.A.desc': 'Działa na samym procesorze, bez karty graficznej.',
-  'ob.voice.B.desc': 'Dla zintegrowanej karty graficznej.',
-  'ob.voice.C.desc': 'Dla karty NVIDIA z CUDA.',
-  'ob.voice.D.desc': 'Dla mocnej karty graficznej.',
+  'ob.voice.A.desc': 'Wszystko na tym komputerze, bez chmury — działa nawet bez karty graficznej.',
+  'ob.voice.B.desc':
+    'Mowa rozpoznawana na tym komputerze, rozmowa przez model w chmurze. Dla każdej karty — także zintegrowanej.',
+  'ob.voice.C.desc':
+    'Najlepsza jakość przez chmurę — gdy komputer jest słaby albo nie ma karty graficznej.',
+  'ob.voice.D.desc': 'Wszystko lokalnie na mocnej karcie graficznej: NVIDIA, AMD albo Intel.',
   'ob.hw.notes': 'Co z tego wynika',
   'ob.keys.cloud.title': 'Modele w chmurze',
   'ob.keys.cloud.desc':

@@ -5859,14 +5859,23 @@
     },
     "HwClass": {
       "description": "Klasa sprzętu.",
-      "enum": [
-        "baseline",
-        "standard_amd",
-        "laptop_cuda",
-        "strong",
-        "unknown"
-      ],
-      "type": "string"
+      "oneOf": [
+        {
+          "enum": [
+            "baseline",
+            "standard_amd",
+            "laptop_cuda",
+            "strong",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "integrated",
+          "description": "Tylko karta zintegrowana z procesorem.",
+          "type": "string"
+        }
+      ]
     },
     "ImportMode": {
       "description": "Tryb importu.",

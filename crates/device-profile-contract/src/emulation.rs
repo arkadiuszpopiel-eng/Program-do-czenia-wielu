@@ -11,10 +11,13 @@ const FAST_GPU_VRAM_MB: u32 = 12_000;
 const BASELINE_L3_MB: u32 = 32;
 
 impl Profile {
-    /// Główne GPU: największy VRAM (przy remisie NVIDIA — CUDA).
+    /// Główne GPU: osobna karta przed zintegrowaną (procesor AMD z grafiką potrafi mieć w BIOS-ie
+    /// więcej „dedykowanej” pamięci niż mała osobna karta), potem największy VRAM, przy remisie
+    /// NVIDIA — CUDA.
     pub fn primary_gpu(&self) -> Option<&GpuInfo> {
         self.gpus.iter().max_by_key(|g| {
             (
+                u8::from(!g.integrated),
                 g.vram_mb,
                 u8::from(g.vendor == GpuVendor::Nvidia),
                 u8::from(!g.backends.is_empty()),

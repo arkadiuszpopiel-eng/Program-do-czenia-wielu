@@ -98,7 +98,7 @@ impl SystemVoice {
             );
         };
         // Próba nie zabiera karty trwającej rozmowie: na karcie tylko przy wolnej pamięci.
-        let free = tokio::task::spawn_blocking(app_modules::gpu_mem::nvidia_free_mb)
+        let free = tokio::task::spawn_blocking(app_modules::gpu_mem::free_vram_mb)
             .await
             .ok()
             .flatten();

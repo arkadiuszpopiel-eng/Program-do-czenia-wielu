@@ -148,14 +148,23 @@ pub struct GpuInfo {
     /// Pamięć współdzielona z systemem w MB (dla karty zintegrowanej to jej cała pamięć).
     #[serde(default)]
     pub shared_mb: u32,
+    /// LUID adaptera w systemie (łączy kartę z licznikami zużycia); 0 — nieznany.
+    #[serde(default)]
+    pub luid: u64,
+    /// Wersja sterownika, jeśli znana.
+    #[serde(default)]
+    pub driver_version: Option<String>,
 }
 
-/// Najmniejsza dedykowana pamięć, od której kartę Intela albo AMD uznajemy za osobną (MB).
-/// Zintegrowane układy zgłaszają symboliczne 64–512 MB i resztę biorą z RAM.
+/// Najmniejsza dedykowana pamięć, od której kartę Intela albo AMD uznajemy za osobną (MB), gdy
+/// sterownik nie mówi, czy karta jest zintegrowana. Zintegrowane układy zgłaszają zwykle
+/// symboliczne 64–512 MB, ale procesory AMD z grafiką (APU) potrafią mieć w BIOS-ie 2–16 GB —
+/// dlatego pierwszeństwo ma flaga sterownika ([`GpuInfo::with_hardware_flag`]).
 pub const DISCRETE_MIN_VRAM_MB: u32 = 1_024;
 
 impl GpuInfo {
-    /// Czy karta o takim producencie i pamięci dedykowanej jest zintegrowana.
+    /// Czy karta o takim producencie i pamięci dedykowanej jest zintegrowana (zgadywanie, gdy
+    /// sterownik tego nie podał).
     pub fn looks_integrated(vendor: GpuVendor, vram_mb: u32) -> bool {
         matches!(vendor, GpuVendor::Intel | GpuVendor::Amd) && vram_mb < DISCRETE_MIN_VRAM_MB
     }
@@ -170,9 +179,36 @@ impl GpuInfo {
             id,
             integrated: Self::looks_integrated(vendor, vram_mb),
             shared_mb,
+            luid: 0,
+            driver_version: None,
+        }
+    }
+
+    /// Flaga „zintegrowana” od sterownika zastępuje zgadywanie po pamięci (`None` — bez zmian).
+    #[must_use]
+    pub fn with_hardware_flag(mut self, integrated: Option<bool>) -> Self {
+        if let Some(flag) = integrated {
+            self.integrated = flag;
+        }
+        self
+    }
+
+    /// Pamięć, którą karta może realnie dać modelom (MB): osobna karta — dedykowana; zintegrowana —
+    /// część pamięci RAM (dedykowana z BIOS-u + współdzielona, najwyżej `ram_mb / 4` i 4 GB),
+    /// bo resztę RAM potrzebują system i pozostałe modele.
+    pub fn usable_memory_mb(&self, ram_mb: u32) -> u32 {
+        if self.integrated {
+            (self.vram_mb.saturating_add(self.shared_mb))
+                .min(ram_mb / 4)
+                .min(INTEGRATED_MAX_MB)
+        } else {
+            self.vram_mb
         }
     }
 }
+
+/// Najwięcej pamięci, jaką Alfa przeznacza na modele na karcie zintegrowanej (MB).
+pub const INTEGRATED_MAX_MB: u32 = 4_096;
 
 /// NPU (tylko raportowanie w v1).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]

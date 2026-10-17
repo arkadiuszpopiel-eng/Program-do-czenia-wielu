@@ -26,6 +26,7 @@ fn cpu_machine() -> Machine {
         vram_mb: 0,
         ram_mb: 8_192,
         cpu_cores: 4,
+        igpu: false,
     }
 }
 

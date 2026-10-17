@@ -22,6 +22,9 @@ pub struct QwenConfig {
     pub mmproj: PathBuf,
     /// Czy liczyć na karcie graficznej (inaczej procesor).
     pub gpu: bool,
+    /// `server` to kompilacja Vulkan (karta AMD, Intel albo zintegrowana), a nie CUDA — tylko do
+    /// opisu backendu w zdarzeniach i stanie; argumenty są te same.
+    pub vulkan: bool,
     /// Wątki procesora.
     pub threads: usize,
     /// Najdłuższe czekanie na gotowość serwera.
@@ -41,6 +44,7 @@ impl QwenConfig {
             model,
             mmproj,
             gpu,
+            vulkan: false,
             threads: (cores / 2).max(4),
             startup: Duration::from_secs(120),
             request_timeout: Duration::from_secs(90),

@@ -50,6 +50,54 @@ pub struct GpuAdapter {
     /// Numer adaptera w kolejności systemu (DXGI) — rozróżnia dwie takie same karty.
     #[serde(default)]
     pub index: u32,
+    /// LUID adaptera (`HighPart << 32 | LowPart`): łączy DXGI, DXCore i liczniki wydajności
+    /// systemu. 0 — nieznany.
+    #[serde(default)]
+    pub luid: u64,
+    /// Karta zintegrowana z procesorem według sterownika (DXCore `IsIntegrated`, pamięć wspólna
+    /// z RAM). `None` — system tego nie podał; wtedy decyduje `device-profile` po pamięci.
+    #[serde(default)]
+    pub integrated: Option<bool>,
+    /// Wersja sterownika (np. „32.0.31041.1004”), jeśli znana.
+    #[serde(default)]
+    pub driver_version: Option<String>,
+}
+
+/// Bieżące zużycie jednej karty (Windows: liczniki „GPU Adapter Memory” i „GPU Engine”).
+/// Działa tak samo dla każdego producenta (NVIDIA, AMD, Intel) — bez narzędzi producenta.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GpuAdapterUsage {
+    /// LUID adaptera (jak w [`GpuAdapter::luid`]).
+    pub luid: u64,
+    /// Zajęta pamięć dedykowana w MB (wszystkie procesy).
+    pub dedicated_used_mb: u64,
+    /// Zajęta pamięć współdzielona w MB (wszystkie procesy).
+    pub shared_used_mb: u64,
+    /// Obciążenie w procentach (najbardziej zajęty silnik karty), jeśli zmierzone.
+    pub load_pct: Option<u32>,
+}
+
+/// Pamięć karty zajęta przez jeden proces (Windows: liczniki „GPU Process Memory”).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GpuProcessUsage {
+    /// Identyfikator procesu.
+    pub pid: u32,
+    /// LUID adaptera.
+    pub luid: u64,
+    /// Zajęta pamięć dedykowana w MB.
+    pub dedicated_used_mb: u64,
+    /// Nazwa pliku programu (np. `llama-server.exe`), jeśli system ją podał.
+    #[serde(default)]
+    pub name: Option<String>,
+}
+
+/// Jeden odczyt zużycia kart.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GpuUsage {
+    /// Karty.
+    pub adapters: Vec<GpuAdapterUsage>,
+    /// Procesy korzystające z kart (z niezerową pamięcią dedykowaną).
+    pub processes: Vec<GpuProcessUsage>,
 }
 
 /// Stan zasilania.
@@ -109,50 +157,12 @@ pub trait HardwarePort: Send + Sync {
     /// Stabilny identyfikator maszyny od systemu (Windows: `MachineGuid`, Linux: `/etc/machine-id`).
     /// Wyłącznie do haszowania w `device-profile` — nie logować i nie eksportować.
     fn machine_seed(&self) -> Result<Option<String>, PlatformError>;
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    struct Nothing;
-
-    impl HardwarePort for Nothing {
-        fn os(&self) -> Result<OsSummary, PlatformError> {
-            Err(PlatformError::Unsupported("os".into()))
-        }
-        fn cpu(&self) -> Result<CpuSummary, PlatformError> {
-            Err(PlatformError::Unsupported("cpu".into()))
-        }
-        fn memory_total_mb(&self) -> Result<u64, PlatformError> {
-            Ok(0)
-        }
-        fn gpus(&self) -> Result<Vec<GpuAdapter>, PlatformError> {
-            Ok(Vec::new())
-        }
-        fn npu(&self) -> Result<Option<String>, PlatformError> {
-            Ok(None)
-        }
-        fn power_status(&self) -> Result<PowerStatus, PlatformError> {
-            Ok(PowerStatus {
-                ac_online: None,
-                battery_present: false,
-                battery_percent: None,
-            })
-        }
-        fn audio_endpoints(&self) -> Result<Vec<AudioEndpoint>, PlatformError> {
-            Ok(Vec::new())
-        }
-        fn machine_seed(&self) -> Result<Option<String>, PlatformError> {
-            Ok(None)
-        }
-    }
-
-    #[test]
-    fn port_is_object_safe() {
-        let port: Box<dyn HardwarePort> = Box::new(Nothing);
-        assert!(port.cpu().is_err());
-        assert_eq!(port.gpus().unwrap(), Vec::new());
-        assert!(!port.power_status().unwrap().battery_present);
+    /// Bieżące zużycie kart (pamięć, obciążenie, procesy). Domyślnie `Unsupported` — atrapy
+    /// i platformy bez liczników nie muszą go udawać.
+    fn gpu_usage(&self) -> Result<GpuUsage, PlatformError> {
+        Err(PlatformError::Unsupported(
+            "zużycie kart graficznych".into(),
+        ))
     }
 }

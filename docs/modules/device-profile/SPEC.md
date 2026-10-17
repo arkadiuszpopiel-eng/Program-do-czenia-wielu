@@ -1,7 +1,7 @@
 # device-profile — SPEC (szkic v0)
 
 ## Cel
-Autodetekcja sprzętu przy pierwszym uruchomieniu i po zmianie (CPU, RAM, producent i model GPU, VRAM, NPU, bateria, urządzenia audio), klasa sprzętu (baseline / standard-amd / laptop-cuda / mocny), dobór profilu potoku głosu A–D i modułów rezydentnych **per maszyna**, tryb baterii, wykrywanie gry/pełnego ekranu; „Kreator sprzętu" pokazuje kompromis i pozwala nadpisać (PLAN §3.5, §6.3).
+Autodetekcja sprzętu przy pierwszym uruchomieniu i po zmianie (CPU, RAM, producent i model GPU, VRAM, NPU, bateria, urządzenia audio), klasa sprzętu (baseline / standard-amd / laptop-cuda / mocny / zintegrowana), dobór profilu potoku głosu A–D i modułów rezydentnych **per maszyna**, tryb baterii, wykrywanie gry/pełnego ekranu; „Kreator sprzętu" pokazuje kompromis i pozwala nadpisać (PLAN §3.5, §6.3).
 
 ## Fala i priorytet
 F1 (detekcja, id maszyny, klasa, nakładka `config/machine/<id>.toml`, onboarding). F2: profile głosu A–D, tryb baterii/termika. P0.
@@ -11,7 +11,7 @@ F1 (detekcja, id maszyny, klasa, nakładka `config/machine/<id>.toml`, onboardin
 pub struct Profile { machine_id: MachineId /* 32 hex, SHA-256 */, os, cpu: CpuInfo { physical_cores, logical_cores, l3_cache_mb },
     ram_mb, gpus: Vec<GpuInfo { vendor, vram_mb, backends }>, npu: Option<NpuInfo>, battery: Option<BatteryInfo>,
     power: PowerState /* Ac | Battery { percent } | Unknown */, audio: Option<Vec<AudioDevice>>, emulation: Option<Emulation> }
-pub enum HwClass { Baseline, StandardAmd, LaptopCuda, Strong, Unknown }   pub enum VoiceProfile { A, B, C, D }
+pub enum HwClass { Baseline, StandardAmd, LaptopCuda, Strong, Integrated, Unknown }   pub enum VoiceProfile { A, B, C, D }
 pub fn classify(&Profile) -> HwClass; pub fn recommend(&Profile) -> Recommendation;   // czyste, wspólne dla impl/fake
 pub fn apply_overlay(&Profile, &MachineOverlay) -> Recommendation;                     // nadpisania użytkownika
 impl Profile { pub fn emulate_baseline(&self) -> Profile }  // 6c/12t, 16 GB, VRAM 8 GB + korekta GPU ×2,2 / CPU +25%
@@ -22,7 +22,7 @@ pub trait DeviceProfile { fn current(&self) -> Profile; fn recommend(&self) -> R
     fn fullscreen_active(&self) -> bool; fn emulate(&self, Option<ResourceLimits>) -> Result<()>; fn refresh(&self) -> Result<bool>; }
 ```
 Zdarzenia (`DeviceEvent`): `device.detected`, `device.changed` (hot-plug, nowa karta), `device.power.changed`, `device.fullscreen.changed`, `device.thermal.throttled` (F2), `device.override` (użytkownik nadpisał).
-Klasy: NVIDIA ≥ 12 GB + ≥ 32 GB RAM → Mocny; NVIDIA ≥ 6 GB → Laptop-CUDA; AMD/Intel ≥ 20 GB → Mocny; ≥ 12 GB + ≥ 24 GB RAM + ≥ 12 wątków → Standard-AMD; ≥ 8 GB + 16 GB + ≥ 8 wątków → Baseline; reszta Unknown (STT na CPU, rozmowa przez API). Na baterii: bez lokalnego LLM, D → B.
+Klasy (te same progi pamięci dla NVIDIA, AMD i Intel; 2026-10-17): karta ≥ 20 GB + ≥ 32 GB RAM → Mocny (NVIDIA już od 12 GB — ciężki TTS na CUDA); inna niż NVIDIA ≥ 12 GB + ≥ 24 GB RAM → Standard-AMD (nazwa historyczna: każda karta Vulkan); NVIDIA 6–11 GB + 16 GB → Laptop-CUDA; AMD/Intel ≥ 6 GB + 16 GB → Baseline; sama karta zintegrowana + ≥ 16 GB RAM → Integrated (mały LLM na karcie przez Vulkan w części RAM, STT na CPU); reszta Unknown (rozmowa przez API; osobna karta ≥ 3,5 GB liczy STT). Liczba wątków nie zmienia klasy — poniżej 8 wątków kompromis w rekomendacji. „Zintegrowana” — flaga sterownika (DXCore `IsIntegrated`), a bez niej < 1 GB własnej pamięci; główna karta — osobna przed zintegrowaną (APU AMD potrafi mieć 4–16 GB z BIOS-u). Na baterii: bez lokalnego LLM, D → B.
 
 ## Zależności
 `core-bus/registry-contract`, `platform-contract` (`HardwarePort`: DXGI/DXCore/zasilanie/MMDevice/rejestr na Windows; `WindowPort` — pełny ekran). Poza Windows sonda `sysinfo` (CPU/RAM). Konsumenci: `model-residency`, `voice-*`, `providers-local`, `memory` (konsolidacja), `notify` (nie przeszkadzać), `transfer` (`hw_class` w manifeście).

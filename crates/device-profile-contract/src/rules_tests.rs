@@ -113,6 +113,87 @@ fn table_for_reference_machines() {
     }
 }
 
+/// Karty każdego producenta i każdego rodzaju (osobna, zintegrowana, mała, brak) dostają backend
+/// karty tam, gdzie się mieści — nie spadają na procesor tylko dlatego, że to nie NVIDIA.
+#[test]
+fn every_vendor_and_kind_uses_its_card() {
+    let table = [
+        (
+            "APU AMD 780M (4 GB z BIOS-u, zintegrowana) / 32 GB",
+            fixtures::amd_apu(),
+            HwClass::Integrated,
+            Backend::Cpu,
+            (Backend::Vulkan, LocalLlm::Small),
+            4_096,
+        ),
+        (
+            "Intel Arc 140V w procesorze / 32 GB",
+            fixtures::intel_igpu(),
+            HwClass::Integrated,
+            Backend::Cpu,
+            (Backend::Vulkan, LocalLlm::Small),
+            4_096,
+        ),
+        (
+            "Intel Arc A770 16 GB + UHD 770 / 32 GB / 6c12t",
+            fixtures::intel_arc(),
+            HwClass::StandardAmd,
+            Backend::Vulkan,
+            (Backend::Vulkan, LocalLlm::Medium),
+            16_224 - DESKTOP_RESERVE_MB,
+        ),
+        (
+            "RTX 3050 4 GB + Iris Xe / 16 GB",
+            fixtures::small_nvidia(),
+            HwClass::Unknown,
+            Backend::Cuda,
+            (Backend::Cpu, LocalLlm::None),
+            3_965 - DESKTOP_RESERVE_MB,
+        ),
+        (
+            "bez karty / 16 GB",
+            fixtures::no_gpu(),
+            HwClass::Unknown,
+            Backend::Cpu,
+            (Backend::Cpu, LocalLlm::None),
+            0,
+        ),
+    ];
+    for (name, profile, class, stt, llm, vram) in table {
+        let rec = recommend(&profile);
+        assert_eq!(rec.class, class, "{name}");
+        assert_eq!(rec.stt_backend, stt, "{name}");
+        assert_eq!((rec.llm_backend, rec.local_llm), llm, "{name}");
+        assert_eq!(rec.residency.vram_mb, vram, "{name}");
+        assert!(!rec.tradeoffs.is_empty(), "{name}");
+    }
+    // Karta zintegrowana nie jest „główną”, gdy jest osobna — nawet przy większej pamięci z BIOS-u.
+    let mut hybrid = fixtures::amd_apu();
+    hybrid.gpus[0].vram_mb = 8_192;
+    hybrid.gpus.push(GpuInfo::describe(
+        1,
+        "AMD Radeon RX 7600S",
+        GpuVendor::Amd,
+        8_176,
+        16_000,
+    ));
+    assert_eq!(hybrid.primary_gpu().map(|g| g.id), Some(1));
+    assert_eq!(hybrid.light_gpu().map(|g| g.id), Some(0));
+    assert_eq!(classify(&hybrid), HwClass::Baseline);
+    // AMD 6 GB (np. RX 5600 XT) — te same progi co NVIDIA 6 GB.
+    let mut amd6 = fixtures::baseline();
+    amd6.gpus[0].vram_mb = 6_128;
+    assert_eq!(classify(&amd6), HwClass::Baseline);
+    // Mocna karta z procesorem o małej liczbie wątków: klasa z karty, kompromis opisany.
+    let mut few_threads = fixtures::desktop();
+    few_threads.cpu.logical_cores = 6;
+    let rec = recommend(&few_threads);
+    assert_eq!(rec.class, HwClass::StandardAmd);
+    assert!(rec.tradeoffs.iter().any(|t| t.contains("6 wątków")));
+    // Mała karta zintegrowana i 8 GB RAM — poniżej minimum, bez pamięci karty w budżecie.
+    assert_eq!(recommend(&fixtures::below_baseline()).residency.vram_mb, 0);
+}
+
 #[test]
 fn strong_machines_get_full_local_stack() {
     let mut nvidia = fixtures::desktop();

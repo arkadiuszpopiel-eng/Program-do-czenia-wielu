@@ -884,6 +884,7 @@ dependencies = [
  "model-residency-impl",
  "personas-contract",
  "platform-contract",
+ "platform-windows-impl",
  "platform-windows-sys-impl",
  "providers-api-impl",
  "providers-contract",

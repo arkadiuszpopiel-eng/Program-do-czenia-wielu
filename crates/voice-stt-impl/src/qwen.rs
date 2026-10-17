@@ -69,10 +69,10 @@ impl QwenStt {
     }
 
     fn backend(&self) -> Backend {
-        if self.config.gpu {
-            Backend::Cuda
-        } else {
-            Backend::Cpu
+        match (self.config.gpu, self.config.vulkan) {
+            (false, _) => Backend::Cpu,
+            (true, true) => Backend::Vulkan,
+            (true, false) => Backend::Cuda,
         }
     }
 

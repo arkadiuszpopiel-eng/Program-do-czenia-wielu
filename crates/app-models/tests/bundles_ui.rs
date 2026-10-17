@@ -28,6 +28,8 @@ fn fake_machine() -> Machine {
         vram_mb: 4_096,
         ram_mb: 32_768,
         cpu_cores: 8,
+        // Atrapa liczy 780M jak osobną kartę 4 GB (bez karty zintegrowanej obok).
+        igpu: false,
     }
 }
 

@@ -4,10 +4,15 @@
 //! Poza Windows każda metoda zwraca `Unsupported` (`device-profile` ma wtedy własną sondę).
 
 #[cfg(windows)]
+mod gpu_win;
+#[cfg_attr(not(windows), allow(dead_code))]
+mod pdh_names;
+#[cfg(windows)]
 mod win;
 
 use platform_contract::{
-    AudioEndpoint, CpuSummary, GpuAdapter, HardwarePort, OsSummary, PlatformError, PowerStatus,
+    AudioEndpoint, CpuSummary, GpuAdapter, GpuUsage, HardwarePort, OsSummary, PlatformError,
+    PowerStatus,
 };
 
 /// Sonda sprzętu Windows (bezstanowa; każde wywołanie czyta system od nowa).
@@ -65,6 +70,10 @@ impl HardwarePort for WinHardware {
 
     fn machine_seed(&self) -> Result<Option<String>, PlatformError> {
         per_platform!(win::machine_guid(), "identyfikator maszyny")
+    }
+
+    fn gpu_usage(&self) -> Result<GpuUsage, PlatformError> {
+        per_platform!(gpu_win::usage(), "zużycie kart graficznych")
     }
 }
 

@@ -277,7 +277,8 @@ export interface BrokerIntentResult {
 
 // ── Urządzenia (device-profile) ─────────────────────────────────────────────────────────────────
 
-export type HwClass = 'baseline' | 'standard_amd' | 'laptop_cuda' | 'strong' | 'unknown';
+export type HwClass =
+  'baseline' | 'standard_amd' | 'laptop_cuda' | 'strong' | 'integrated' | 'unknown';
 export type VoiceProfileId = 'A' | 'B' | 'C' | 'D';
 
 export interface GpuInfo {

@@ -96,7 +96,8 @@ fn window_pid(hwnd: HWND) -> u32 {
     pid
 }
 
-fn process_name(pid: u32) -> String {
+/// Nazwa pliku programu procesu (bez katalogu); pusto — brak dostępu albo proces już zakończony.
+pub(crate) fn process_name(pid: u32) -> String {
     // SAFETY: minimalne prawo zapytania; uchwyt przejmuje `OwnedHandle`.
     let Ok(raw) = (unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) }) else {
         return String::new();

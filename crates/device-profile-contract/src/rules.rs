@@ -18,6 +18,10 @@ pub enum HwClass {
     LaptopCuda,
     /// Mocna maszyna (NVIDIA ≥ 12 GB lub inne GPU ≥ 20 GB) — pełny lokalny stos.
     Strong,
+    /// Tylko karta zintegrowana z procesorem (Intel Iris Xe / Arc, AMD Radeon 680M–890M), ≥ 16 GB
+    /// RAM: mały model rozmowy na karcie przez Vulkan w pamięci RAM, rozpoznawanie mowy na
+    /// procesorze.
+    Integrated,
     /// Poniżej baseline lub nierozpoznane.
     Unknown,
 }
@@ -128,33 +132,38 @@ const VRAM_6_GB: u32 = 5_500;
 const VRAM_8_GB: u32 = 7_500;
 const VRAM_12_GB: u32 = 11_500;
 const VRAM_20_GB: u32 = 19_500;
+/// Osobna karta od tej pamięci liczy rozpoznawanie mowy, choć na model rozmowy jej za mało
+/// (Qwen3-ASR ≈ 2,6 GB, Whisper turbo ≈ 1,5 GB) — ten sam próg co w pakietach modeli.
+const VRAM_STT_MIN: u32 = 3_500;
+/// Poniżej tylu wątków procesora potok głosu (VAD, koniec wypowiedzi, synteza) zwalnia.
+const THREADS_COMFORT: u32 = 8;
 
-/// Klasa sprzętu z profilu; profil emulowany jest zawsze `Baseline`.
+/// Klasa sprzętu z profilu; profil emulowany jest zawsze `Baseline`. Progi pamięci są te same dla
+/// każdego producenta (NVIDIA — CUDA, AMD i Intel — Vulkan); NVIDIA różni się tylko nazwą klasy
+/// 6–11 GB (wariant głosu D-CUDA) i ciężkim TTS na mocnej karcie.
 pub fn classify(profile: &Profile) -> HwClass {
     if profile.emulation.is_some() {
         return HwClass::Baseline;
     }
-    let Some(gpu) = profile.primary_gpu() else {
+    let Some(gpu) = profile.primary_gpu().filter(|g| !g.backends.is_empty()) else {
         return HwClass::Unknown;
     };
-    let (vram, ram, threads) = (gpu.vram_mb, profile.ram_mb, profile.cpu.logical_cores);
-    match gpu.vendor {
-        GpuVendor::Nvidia if vram >= VRAM_12_GB && ram >= RAM_32_GB => HwClass::Strong,
-        GpuVendor::Nvidia if vram >= VRAM_6_GB && ram >= RAM_16_GB => HwClass::LaptopCuda,
-        GpuVendor::Amd | GpuVendor::Intel if vram >= VRAM_20_GB && ram >= RAM_32_GB => {
-            HwClass::Strong
-        }
-        GpuVendor::Amd | GpuVendor::Intel
-            if vram >= VRAM_12_GB && ram >= RAM_24_GB && threads >= 12 =>
-        {
-            HwClass::StandardAmd
-        }
-        GpuVendor::Amd | GpuVendor::Intel
-            if vram >= VRAM_8_GB && ram >= RAM_16_GB && threads >= 8 =>
-        {
-            HwClass::Baseline
-        }
-        _ => HwClass::Unknown,
+    let (vram, ram) = (gpu.vram_mb, profile.ram_mb);
+    if gpu.integrated {
+        return if ram >= RAM_16_GB {
+            HwClass::Integrated
+        } else {
+            HwClass::Unknown
+        };
+    }
+    let nvidia = gpu.vendor == GpuVendor::Nvidia;
+    match () {
+        () if vram >= VRAM_20_GB && ram >= RAM_32_GB => HwClass::Strong,
+        () if nvidia && vram >= VRAM_12_GB && ram >= RAM_32_GB => HwClass::Strong,
+        () if !nvidia && vram >= VRAM_12_GB && ram >= RAM_24_GB => HwClass::StandardAmd,
+        () if nvidia && vram >= VRAM_6_GB && ram >= RAM_16_GB => HwClass::LaptopCuda,
+        () if vram >= VRAM_6_GB && ram >= RAM_16_GB => HwClass::Baseline,
+        () => HwClass::Unknown,
     }
 }
 
@@ -224,23 +233,69 @@ pub fn recommend_as(profile: &Profile, class: HwClass) -> Recommendation {
             };
             rec.heavy_local_tts = gpu_backend == Backend::Cuda;
         }
-        HwClass::Unknown => {
-            rec.stt_backend = Backend::Cpu;
-            rec.stt_model = SttModel::SmallQ5;
-            rec.llm_backend = Backend::Cpu;
-            rec.local_llm = LocalLlm::None;
-            rec.residency.stt_tts_exclusive = true;
-            rec.tradeoffs.push(
-                "Sprzęt poniżej baseline: STT na CPU (model small), rozmowa przez API; \
-                 rozważ profil C (chmura)."
-                    .into(),
-            );
-        }
+        HwClass::Integrated => apply_integrated(profile, &mut rec),
+        HwClass::Unknown => apply_unknown(profile, gpu_backend, &mut rec),
+    }
+    if profile.cpu.logical_cores < THREADS_COMFORT {
+        rec.tradeoffs.push(format!(
+            "Procesor ma {} wątków (mniej niż {THREADS_COMFORT}): potok głosu może odpowiadać wolniej.",
+            profile.cpu.logical_cores
+        ));
     }
     if profile.on_battery() {
         apply_battery(&mut rec);
     }
     rec
+}
+
+/// Sama karta zintegrowana: mały model rozmowy na karcie (Vulkan) w części pamięci RAM,
+/// rozpoznawanie mowy na procesorze (karta jest za wolna na oba naraz).
+fn apply_integrated(profile: &Profile, rec: &mut Recommendation) {
+    let usable = profile
+        .primary_gpu()
+        .map_or(0, |g| g.usable_memory_mb(profile.ram_mb));
+    rec.stt_backend = Backend::Cpu;
+    rec.stt_model = SttModel::SmallQ5;
+    rec.local_llm = LocalLlm::Small;
+    rec.residency = ResidencyBudget {
+        vram_mb: usable,
+        ram_mb: (profile.ram_mb / 2).saturating_sub(usable),
+        desktop_reserve_mb: 0,
+        stt_tts_exclusive: true,
+    };
+    rec.tradeoffs.push(
+        "Karta zintegrowana: mały model rozmowy na karcie (Vulkan, pamięć RAM), rozpoznawanie \
+         mowy na procesorze; trudniejsze rozmowy przez API (profil B)."
+            .into(),
+    );
+}
+
+/// Poniżej minimum. Osobna karta z ≥ 3,5 GB liczy chociaż rozpoznawanie mowy (na procesorze
+/// byłoby o rząd wolniejsze); model rozmowy — przez API.
+fn apply_unknown(profile: &Profile, gpu_backend: Backend, rec: &mut Recommendation) {
+    let stt_gpu = gpu_backend != Backend::Cpu
+        && profile
+            .primary_gpu()
+            .is_some_and(|g| !g.integrated && g.vram_mb >= VRAM_STT_MIN);
+    if stt_gpu {
+        rec.stt_backend = gpu_backend;
+    } else {
+        rec.stt_backend = Backend::Cpu;
+        rec.stt_model = SttModel::SmallQ5;
+        rec.residency.vram_mb = 0;
+    }
+    rec.llm_backend = Backend::Cpu;
+    rec.local_llm = LocalLlm::None;
+    rec.residency.stt_tts_exclusive = true;
+    rec.tradeoffs.push(if stt_gpu {
+        "Mała karta graficzna: rozpoznawanie mowy na karcie, rozmowa przez API; \
+         na model rozmowy na karcie potrzeba ≥ 6 GB."
+            .into()
+    } else {
+        "Sprzęt poniżej baseline: STT na CPU (model small), rozmowa przez API; \
+         rozważ profil C (chmura)."
+            .into()
+    });
 }
 
 /// Tryb baterii: bez lokalnego LLM i ciężkiego TTS, profil D → B, modele tła wstrzymane.

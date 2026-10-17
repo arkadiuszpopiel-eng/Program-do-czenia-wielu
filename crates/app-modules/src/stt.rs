@@ -69,20 +69,17 @@ pub fn qwen(paths: &AppPaths, free_vram_mb: Option<u32>) -> Option<QwenConfig> {
     if !model.is_file() || !mmproj.is_file() {
         return None;
     }
-    let (server, gpu) = [
-        ("llama-cuda", true),
-        ("llama-vulkan", true),
-        ("llama-cpu", false),
+    let (server, gpu, vulkan) = [
+        ("llama-cuda", true, false),
+        ("llama-vulkan", true, true),
+        ("llama-cpu", false, false),
     ]
     .into_iter()
-    .map(|(engine, gpu)| (paths.sidecar(engine, "llama-server"), gpu))
-    .find(|(path, _)| path.is_file())?;
-    Some(QwenConfig::new(
-        server,
-        model,
-        mmproj,
-        qwen_on_gpu(gpu, free_vram_mb),
-    ))
+    .map(|(engine, gpu, vulkan)| (paths.sidecar(engine, "llama-server"), gpu, vulkan))
+    .find(|(path, _, _)| path.is_file())?;
+    let mut config = QwenConfig::new(server, model, mmproj, qwen_on_gpu(gpu, free_vram_mb));
+    config.vulkan = vulkan;
+    Some(config)
 }
 
 /// Pozycje katalogu, których brakuje do włączenia Qwen3-ASR (pusto — silnik jest gotowy).

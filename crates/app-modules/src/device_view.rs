@@ -76,6 +76,7 @@ pub fn device_dto(p: &Profile, r: &Recommendation, name: String) -> DeviceProfil
                 CoreClass::StandardAmd => HwClass::StandardAmd,
                 CoreClass::LaptopCuda => HwClass::LaptopCuda,
                 CoreClass::Strong => HwClass::Strong,
+                CoreClass::Integrated => HwClass::Integrated,
                 CoreClass::Unknown => HwClass::Unknown,
             },
             voice_profile: match r.voice_profile {
