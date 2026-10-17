@@ -197,8 +197,8 @@ fn sidecars() -> Vec<ItemSpec> {
             },
             false,
             (
-                "Serwer STT (127.0.0.1), wymagany także przy wersji CUDA (zapas). Wersja Vulkan — brak w wydaniach.",
-                "STT server (127.0.0.1), required also with the CUDA build (fallback). No Vulkan build in releases.",
+                "Serwer STT (127.0.0.1), wymagany także przy wersji CUDA (zapas). Wersji Vulkan nie ma w wydaniach (sprawdzone do v1.9.5, 2026-10-17) — na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR.",
+                "STT server (127.0.0.1), required also with the CUDA build (fallback). There is no Vulkan build in the releases (checked up to v1.9.5, 2026-10-17) — on AMD and Intel GPUs Qwen3-ASR recognises speech.",
             ),
         ),
         whisper_cuda(),

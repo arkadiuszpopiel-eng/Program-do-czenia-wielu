@@ -109,7 +109,12 @@ fn voice_tradeoff(voice: VoiceProfile, class: HwClass) -> String {
             "Profil C (ręcznie): audio trafia do chmury (tag prywatności), najniższe opóźnienie."
                 .into()
         }
-        VoiceProfile::D if matches!(class, HwClass::Baseline | HwClass::Unknown) => {
+        VoiceProfile::D
+            if matches!(
+                class,
+                HwClass::Baseline | HwClass::Integrated | HwClass::Unknown
+            ) =>
+        {
             "Profil D (ręcznie) na słabszej maszynie: ryzyko braku VRAM i opóźnień ponad budżet."
                 .into()
         }

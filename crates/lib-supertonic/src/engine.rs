@@ -4,6 +4,7 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
+use ort::execution_providers::DirectMLExecutionProvider;
 use ort::session::Session;
 use ort::value::Tensor;
 use serde::Deserialize;
@@ -125,17 +126,53 @@ pub struct Supertonic {
     noise: Noise,
 }
 
+/// Gdzie liczą sieci Supertonic.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Accel {
+    /// Procesor (domyślnie; działa z każdą biblioteką ONNX Runtime).
+    Cpu,
+    /// Karta graficzna przez DirectML — każdy producent z DirectX 12 (NVIDIA, AMD, Intel, także
+    /// karta zintegrowana). Wymaga biblioteki ONNX Runtime w wersji DirectML; `device` to numer
+    /// adaptera DXGI (ten sam co `GpuInfo::id` w profilu urządzenia).
+    DirectMl {
+        /// Numer adaptera DXGI.
+        device: u32,
+    },
+}
+
 impl Supertonic {
-    /// Wczytuje modele z `onnx_dir`; barwy głosów (`F1.json`…) są w `voices_dir`.
+    /// Wczytuje modele z `onnx_dir` na procesorze; barwy głosów (`F1.json`…) są w `voices_dir`.
     pub fn load(onnx_dir: &Path, voices_dir: &Path, threads: usize) -> Result<Self, EngineError> {
+        Self::load_on(onnx_dir, voices_dir, threads, Accel::Cpu)
+    }
+
+    /// Jak [`Self::load`], na wskazanym urządzeniu. DirectML, który się nie zarejestruje (np.
+    /// biblioteka bez DirectML albo karta bez DirectX 12), daje błąd — wywołujący wraca wtedy
+    /// jawnie na procesor, zamiast żeby ONNX Runtime przełączał się po cichu.
+    pub fn load_on(
+        onnx_dir: &Path,
+        voices_dir: &Path,
+        threads: usize,
+        accel: Accel,
+    ) -> Result<Self, EngineError> {
         let session = |name: &str| -> Result<Session, EngineError> {
             let path = onnx_dir.join(name);
             if !path.is_file() {
                 return Err(EngineError::Missing(path.display().to_string()));
             }
-            Ok(Session::builder()?
-                .with_intra_threads(threads.clamp(1, 16))?
-                .commit_from_file(path)?)
+            let builder = Session::builder()?.with_intra_threads(threads.clamp(1, 16))?;
+            let builder = match accel {
+                Accel::Cpu => builder,
+                // DirectML wymaga wyłączonego wzorca pamięci i wykonania sekwencyjnego.
+                Accel::DirectMl { device } => builder
+                    .with_memory_pattern(false)?
+                    .with_parallel_execution(false)?
+                    .with_execution_providers([DirectMLExecutionProvider::default()
+                        .with_device_id(i32::try_from(device).unwrap_or(0))
+                        .build()
+                        .error_on_failure()])?,
+            };
+            Ok(builder.commit_from_file(path)?)
         };
         Ok(Self {
             cfg: read_json(&onnx_dir.join("tts.json"))?,

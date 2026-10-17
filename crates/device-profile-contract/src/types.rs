@@ -193,11 +193,18 @@ impl GpuInfo {
         self
     }
 
-    /// Pamięć, którą karta może realnie dać modelom (MB): osobna karta — dedykowana; zintegrowana —
-    /// część pamięci RAM (dedykowana z BIOS-u + współdzielona, najwyżej `ram_mb / 4` i 4 GB),
-    /// bo resztę RAM potrzebują system i pozostałe modele.
+    /// Karta z własną pulą pamięci: osobna albo zintegrowana z dużą rezerwą z BIOS-u
+    /// (≥ [`UMA_POOL_MIN_MB`], np. Ryzen AI Max z 64 GB, Radeon 890M z 16 GB). Taka rezerwa jest
+    /// niedostępna dla Windows i działa jak pamięć karty — klasy i pakiety liczą ją jak VRAM.
+    pub fn has_memory_pool(&self) -> bool {
+        has_memory_pool(self.integrated, self.vram_mb)
+    }
+
+    /// Pamięć, którą karta może realnie dać modelom (MB): karta z własną pulą — dedykowana;
+    /// zintegrowana z małą rezerwą — część pamięci RAM (rezerwa z BIOS-u + współdzielona, najwyżej
+    /// `ram_mb / 4` i 4 GB), bo resztę RAM potrzebują system i pozostałe modele.
     pub fn usable_memory_mb(&self, ram_mb: u32) -> u32 {
-        if self.integrated {
+        if !self.has_memory_pool() {
             (self.vram_mb.saturating_add(self.shared_mb))
                 .min(ram_mb / 4)
                 .min(INTEGRATED_MAX_MB)
@@ -207,8 +214,18 @@ impl GpuInfo {
     }
 }
 
-/// Najwięcej pamięci, jaką Alfa przeznacza na modele na karcie zintegrowanej (MB).
+/// Najwięcej pamięci, jaką Alfa przeznacza na modele na karcie zintegrowanej bez dużej rezerwy (MB).
 pub const INTEGRATED_MAX_MB: u32 = 4_096;
+
+/// Rezerwa z BIOS-u (MB), od której karta zintegrowana ma własną pulę pamięci (≈ 6 GB z tolerancją
+/// raportowania — ten sam próg co najmniejsza karta z lokalnym modelem rozmowy).
+pub const UMA_POOL_MIN_MB: u32 = 5_500;
+
+/// Czy karta o tej fladze i pamięci dedykowanej ma własną pulę pamięci (osobna albo zintegrowana
+/// z rezerwą ≥ [`UMA_POOL_MIN_MB`]) — wspólna reguła profilu i pomiaru kart na żywo.
+pub fn has_memory_pool(integrated: bool, dedicated_mb: u32) -> bool {
+    !integrated || dedicated_mb >= UMA_POOL_MIN_MB
+}
 
 /// NPU (tylko raportowanie w v1).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]

@@ -184,7 +184,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'dev.live.resume': 'Resume refreshing',
   'dev.live.loading': 'Reading the cards…',
   'dev.live.unavailable':
-    'Live readings could not be taken on this computer (Windows performance counters are unavailable) — card details are in the section above.',
+    'No live readings: this computer has no graphics card or the Windows performance counters do not respond. Hardware details are in the section above.',
   'dev.live.memory': 'memory: {used} of {total} GB used, {free} GB free',
   'dev.live.memoryLabel': 'Used memory of {name}',
   'dev.live.memoryPct': '{pct}% used',
@@ -201,7 +201,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'dev.measure': 'Measure again',
   'dev.hw.baseline': 'baseline',
   'dev.hw.standard_amd': 'standard (card ≥ 12 GB)',
-  'dev.hw.laptop_cuda': 'NVIDIA card 6–11 GB',
+  'dev.hw.laptop_cuda': 'NVIDIA card (CUDA)',
   'dev.hw.strong': 'strong',
   'dev.hw.integrated': 'integrated graphics',
   'dev.hw.unknown': 'unknown',

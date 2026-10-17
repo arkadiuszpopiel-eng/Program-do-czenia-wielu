@@ -21,13 +21,13 @@ use serde::{Deserialize, Serialize};
 
 pub use overlay::{MachineOverlay, VoiceChoice, apply_overlay};
 pub use rules::{
-    DESKTOP_RESERVE_MB, HwClass, LocalLlm, Recommendation, ResidencyBudget, SttModel, VoiceProfile,
-    VoiceVariant, classify, recommend, recommend_as,
+    DESKTOP_RESERVE_MB, GPU_TTS_MIN_VRAM_MB, HwClass, LocalLlm, Recommendation, ResidencyBudget,
+    SttModel, VoiceProfile, VoiceVariant, classify, recommend, recommend_as,
 };
 pub use types::{
     AudioDevice, AudioDirection, BASELINE_LIMITS, Backend, BatteryInfo, CpuInfo, Emulation,
     EmulationFactors, GpuInfo, GpuVendor, MachineId, NpuInfo, OsInfo, PowerState, Profile,
-    ResourceLimits,
+    ResourceLimits, UMA_POOL_MIN_MB, has_memory_pool,
 };
 
 /// Wykryto sprzęt (pierwsza detekcja w procesie).

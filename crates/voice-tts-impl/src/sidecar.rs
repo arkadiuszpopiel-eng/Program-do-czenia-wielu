@@ -138,10 +138,17 @@ impl PocketSidecar {
             .as_ref()
             .ok_or_else(|| TtsError::NotAvailable("sidecar mowy zakończony".into()))?;
         let mut cmd = tokio::process::Command::new(program);
+        // Supertonic pisze na stderr tylko kilka linii (DirectML albo powrót na procesor) — trafiają
+        // do dziennika Alfy. Pocket TTS bywa gadatliwy, więc jego stderr zostaje odrzucany.
+        let log_stderr = self.engine == TtsEngine::Supertonic;
         cmd.args(args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::null())
+            .stderr(if log_stderr {
+                Stdio::piped()
+            } else {
+                Stdio::null()
+            })
             .kill_on_drop(true);
         #[cfg(windows)]
         cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
@@ -150,6 +157,15 @@ impl PocketSidecar {
             .map_err(|e| TtsError::NotAvailable(format!("{}: {e}", program.display())))?;
         if let Some(pid) = child.id() {
             lib_sidecar_guard::register(pid, program);
+        }
+        if let Some(stderr) = child.stderr.take() {
+            let name = program.display().to_string();
+            tokio::spawn(async move {
+                let mut lines = BufReader::new(stderr).lines();
+                while let Ok(Some(line)) = lines.next_line().await {
+                    tracing::info!(sidecar = %name, "{line}");
+                }
+            });
         }
         let (Some(stdin), Some(stdout)) = (child.stdin.take(), child.stdout.take()) else {
             return Err(engine_err("brak stdio sidecara"));

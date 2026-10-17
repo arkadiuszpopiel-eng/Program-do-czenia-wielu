@@ -3611,8 +3611,8 @@
           "en": "Very good"
         },
         "summary": {
-          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-          "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze. Na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR (Whisper nie ma tam wersji na kartę).",
+          "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies. On AMD and Intel GPUs Qwen3-ASR recognises speech (Whisper has no GPU build there)."
         },
         "requirements": {
           "min_ram_mb": 15000,
@@ -3741,12 +3741,21 @@
             "size_bytes": 23068672,
             "downloadable": true,
             "fallback": false
+          },
+          {
+            "id": "qwen3-asr-1.7b-q8",
+            "name": "Qwen3-ASR 1.7B (Q8)",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 2520776704,
+            "downloadable": true,
+            "fallback": false
           }
         ],
-        "size_bytes": 7013924864,
-        "missing_bytes": 6502219776,
+        "size_bytes": 9534701568,
+        "missing_bytes": 9022996480,
         "installed": 1,
-        "total": 13,
+        "total": 14,
         "state": "partial",
         "fit": {
           "kind": "tight",
@@ -3833,8 +3842,8 @@
           "en": "Good"
         },
         "summary": {
-          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU."
+          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze. Na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR (Whisper nie ma tam wersji na kartę).",
+          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU. On AMD and Intel GPUs Qwen3-ASR recognises speech (Whisper has no GPU build there)."
         },
         "requirements": {
           "min_ram_mb": 11000,
@@ -3963,12 +3972,21 @@
             "size_bytes": 23068672,
             "downloadable": true,
             "fallback": false
+          },
+          {
+            "id": "qwen3-asr-1.7b-q8",
+            "name": "Qwen3-ASR 1.7B (Q8)",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 2520776704,
+            "downloadable": true,
+            "fallback": false
           }
         ],
-        "size_bytes": 3652190208,
-        "missing_bytes": 3140485120,
+        "size_bytes": 6172966912,
+        "missing_bytes": 5661261824,
         "installed": 1,
-        "total": 13,
+        "total": 14,
         "state": "partial",
         "fit": {
           "kind": "fits",
@@ -5048,8 +5066,8 @@
           "en": "Very good"
         },
         "summary": {
-          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-          "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies."
+          "pl": "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze. Na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR (Whisper nie ma tam wersji na kartę).",
+          "en": "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies. On AMD and Intel GPUs Qwen3-ASR recognises speech (Whisper has no GPU build there)."
         },
         "requirements": {
           "min_ram_mb": 15000,
@@ -5178,12 +5196,21 @@
             "size_bytes": 23068672,
             "downloadable": true,
             "fallback": false
+          },
+          {
+            "id": "qwen3-asr-1.7b-q8",
+            "name": "Qwen3-ASR 1.7B (Q8)",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 2520776704,
+            "downloadable": true,
+            "fallback": false
           }
         ],
-        "size_bytes": 7013924864,
-        "missing_bytes": 6406799360,
+        "size_bytes": 9534701568,
+        "missing_bytes": 8927576064,
         "installed": 2,
-        "total": 13,
+        "total": 14,
         "state": "needs_trust",
         "fit": {
           "kind": "tight",
@@ -5270,8 +5297,8 @@
           "en": "Good"
         },
         "summary": {
-          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU."
+          "pl": "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze. Na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR (Whisper nie ma tam wersji na kartę).",
+          "en": "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU. On AMD and Intel GPUs Qwen3-ASR recognises speech (Whisper has no GPU build there)."
         },
         "requirements": {
           "min_ram_mb": 11000,
@@ -5400,12 +5427,21 @@
             "size_bytes": 23068672,
             "downloadable": true,
             "fallback": false
+          },
+          {
+            "id": "qwen3-asr-1.7b-q8",
+            "name": "Qwen3-ASR 1.7B (Q8)",
+            "kind": "stt",
+            "state": "missing",
+            "size_bytes": 2520776704,
+            "downloadable": true,
+            "fallback": false
           }
         ],
-        "size_bytes": 3652190208,
-        "missing_bytes": 1346371584,
+        "size_bytes": 6172966912,
+        "missing_bytes": 3867148288,
         "installed": 2,
-        "total": 13,
+        "total": 14,
         "state": "needs_trust",
         "fit": {
           "kind": "fits",

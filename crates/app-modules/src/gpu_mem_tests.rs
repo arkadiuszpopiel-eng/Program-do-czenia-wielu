@@ -149,3 +149,73 @@ fn system_counters_measure_every_vendor() {
     );
     assert_eq!(processes[1].name, "PID 9");
 }
+
+/// Głos na karcie (DirectML) tylko na osobnej karcie ≥ 12 GB; przy dwóch — większa, przy remisie
+/// — pierwsza w kolejności systemu. Karta zintegrowana i mała karta zostają przy procesorze.
+#[test]
+fn tts_uses_only_a_big_discrete_card() {
+    let apu = adapter(0, "AMD Radeon 780M Graphics", 0x1002, 4_096, Some(true));
+    let rx = adapter(1, "AMD Radeon RX 9070 XT", 0x1002, 16_304, Some(false));
+    let rtx = adapter(
+        2,
+        "NVIDIA GeForce RTX 4050 Laptop GPU",
+        0x10DE,
+        5_921,
+        Some(false),
+    );
+    let soft = adapter(3, "Microsoft Basic Render Driver", 0x1414, 0, None);
+    assert_eq!(
+        tts_dml_device(&[apu.clone(), rx.clone(), soft.clone()]),
+        Some(1)
+    );
+    assert_eq!(tts_dml_device(&[apu.clone(), rtx.clone()]), None);
+    assert_eq!(tts_dml_device(&[apu, soft]), None);
+    let twin = adapter(4, "AMD Radeon RX 9070 XT", 0x1002, 16_304, Some(false));
+    assert_eq!(
+        tts_dml_device(&[twin, rx]),
+        Some(1),
+        "remis — pierwsza karta"
+    );
+    // Próg jest ten sam co w pakietach (`device-profile`).
+    let edge = adapter(
+        5,
+        "karta 12 GB",
+        0x10DE,
+        u64::from(GPU_TTS_MIN_VRAM_MB),
+        Some(false),
+    );
+    assert_eq!(tts_dml_device(&[edge]), Some(5));
+}
+
+/// APU z dużą rezerwą z BIOS-u (sterownik: „zintegrowana”, 16 GB dedykowanej) ma własną pulę pamięci —
+/// liczy się jak osobna karta (wolna pamięć, DirectML); mała rezerwa (4 GB) — nie.
+#[test]
+fn big_uma_reservation_is_measured_like_a_card() {
+    let hx370 = adapter(0, "AMD Radeon 890M Graphics", 0x1002, 16_384, Some(true));
+    let usage = GpuUsage {
+        adapters: vec![usage_of(100, 2_000, 300)],
+        processes: Vec::new(),
+    };
+    assert_eq!(
+        free_from(std::slice::from_ref(&hx370), &usage),
+        Some(16_384 - 2_000)
+    );
+    assert_eq!(tts_dml_device(&[hx370]), Some(0));
+    let apu = adapter(0, "AMD Radeon 780M Graphics", 0x1002, 4_096, Some(true));
+    assert_eq!(free_from(std::slice::from_ref(&apu), &usage), None);
+    assert_eq!(tts_dml_device(&[apu]), None);
+}
+
+/// APU z dużą rezerwą obok osobnej karty: głos na osobnej (jak główna karta profilu), choć APU ma
+/// więcej pamięci.
+#[test]
+fn tts_prefers_the_discrete_card_over_a_big_apu() {
+    let strix = adapter(0, "AMD Radeon 8060S Graphics", 0x1002, 65_536, Some(true));
+    let rx = adapter(1, "AMD Radeon RX 9070 XT", 0x1002, 16_304, Some(false));
+    assert_eq!(tts_dml_device(&[strix.clone(), rx]), Some(1));
+    assert_eq!(
+        tts_dml_device(&[strix]),
+        Some(0),
+        "samo APU z pulą — na nim"
+    );
+}

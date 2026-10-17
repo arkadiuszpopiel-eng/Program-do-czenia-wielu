@@ -15,10 +15,20 @@ DST="$BASE/kopia-$STAMP"
 mkdir -p "$DST" || { echo "nie można utworzyć $DST"; exit 1; }
 echo "kopia do: $DST"
 
-# 1. Historia: paczka git (odtworzenie: git clone alfa.bundle alfa)
-git -C "$ROOT" bundle create "$DST/alfa.bundle" --all >/dev/null 2>&1 && echo "paczka git: ok"
-git -C "$ROOT" log --oneline -1 >"$DST/ostatni-commit.txt"
-git -C "$ROOT" status --short >"$DST/niezatwierdzone-zmiany.txt"
+# 1. Historia: paczka git (odtworzenie: git clone alfa.bundle alfa). Dysk przeniesiony z innej
+# instalacji Windows ma pliki innego właściciela (SID) i git odmawia pracy („dubious ownership”) —
+# wyjątek tylko dla tych poleceń, bez zmiany konfiguracji (2026-10-17: bez niego paczka po cichu
+# się nie tworzyła).
+GIT=(git -c safe.directory='*' -C "$ROOT")
+if "${GIT[@]}" bundle create "$DST/alfa.bundle" --all >/dev/null 2>"$DST/paczka-git.log" \
+  && "${GIT[@]}" bundle verify "$DST/alfa.bundle" >>"$DST/paczka-git.log" 2>&1; then
+  echo "paczka git: ok"
+  rm -f "$DST/paczka-git.log"
+else
+  echo "paczka git: BŁĄD (szczegóły: $DST/paczka-git.log)"
+fi
+"${GIT[@]}" log --oneline -1 >"$DST/ostatni-commit.txt"
+"${GIT[@]}" status --short >"$DST/niezatwierdzone-zmiany.txt"
 
 # 2. Źródła i katalogi projektu (robocopy: kody < 8 = sukces)
 copy_dir() {

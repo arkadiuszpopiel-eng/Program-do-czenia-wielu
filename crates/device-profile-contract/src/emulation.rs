@@ -11,12 +11,15 @@ const FAST_GPU_VRAM_MB: u32 = 12_000;
 const BASELINE_L3_MB: u32 = 32;
 
 impl Profile {
-    /// Główne GPU: osobna karta przed zintegrowaną (procesor AMD z grafiką potrafi mieć w BIOS-ie
-    /// więcej „dedykowanej” pamięci niż mała osobna karta), potem największy VRAM, przy remisie
+    /// Główne GPU: karta z własną pulą pamięci (osobna albo zintegrowana z dużą rezerwą z BIOS-u)
+    /// przed zintegrowaną z małą rezerwą (procesor AMD z grafiką potrafi mieć 2–4 GB „dedykowanej”
+    /// pamięci, więcej niż mała osobna karta); wśród kart z pulą — osobna przed zintegrowaną (własna
+    /// pamięć GDDR jest kilka razy szybsza od współdzielonej); potem największy VRAM, przy remisie
     /// NVIDIA — CUDA.
     pub fn primary_gpu(&self) -> Option<&GpuInfo> {
         self.gpus.iter().max_by_key(|g| {
             (
+                u8::from(g.has_memory_pool()),
                 u8::from(!g.integrated),
                 g.vram_mb,
                 u8::from(g.vendor == GpuVendor::Nvidia),
@@ -30,7 +33,7 @@ impl Profile {
     /// jest kartą główną, a nie „lekką”.
     pub fn light_gpu(&self) -> Option<&GpuInfo> {
         let primary = self.primary_gpu()?;
-        if primary.integrated {
+        if !primary.has_memory_pool() {
             return None;
         }
         self.gpus

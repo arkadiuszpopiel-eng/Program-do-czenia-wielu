@@ -12,6 +12,58 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.63 — 2026-10-17
+
+Alfa korzysta z każdej karty graficznej — NVIDIA, AMD i Intel, osobnej i zintegrowanej — a na komputerze bez
+karty działa na procesorze. Na kartach AMD i Intel z wolną pamięcią mowa jest rozpoznawana na karcie, a na dużej
+karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); karty Intel — niesprawdzone na sprzęcie.
+
+### Karty graficzne
+
+- `[poważne]` Rozpoznawanie mowy na kartach AMD i Intel liczy na karcie: pakiety „Bardzo dobry” i „Dobry” dostają
+  tam Qwen3-ASR (przez `llama-server` Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
+  zdanie rozpoznaje się w 0,16–0,23 s; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie na laptopie). Gdy
+  model rozmowy zajmie kartę (mniej niż 3,2 GB wolnej pamięci), Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie) —
+  karta NVIDIA ma wtedy jeszcze Whisper na karcie.
+- Głos Supertonic liczy na karcie przez DirectML, gdy karta ma własne ≥ 12 GB pamięci i pobrane są pozycje
+  „ONNX Runtime 1.23.0 (DirectML)” i „DirectML 1.15.4” (Ustawienia → Modele lokalne i silniki): na RX 9070 XT
+  0,58 s zamiast 0,95 s na zdanie, 538 MB pamięci karty. Gdy karta nie da rady, głos sam wraca na procesor.
+  Licencja DirectML dopuszcza zbieranie danych diagnostycznych przez Microsoft — pozycja ma znaczek „Do
+  potwierdzenia przez człowieka” (ADR 0028, proponowany).
+- `[poważne]` Procesor AMD z grafiką (APU) z małą rezerwą pamięci w BIOS-ie (typowo 0,5–4 GB) nie udaje już
+  osobnej karty: Alfa bierze „zintegrowana” od sterownika (DXCore), zapisuje identyfikator karty (LUID) i wersję
+  sterownika. Rezerwa od 6 GB (np. Ryzen AI Max z 64 GB, Radeon 890M z 16 GB) jest niedostępna dla Windows, więc
+  liczy się jak pamięć karty — taki komputer dostaje klasę i pakiety jak karta z tą pamięcią.
+- Karty AMD i Intel dostają lokalny model rozmowy od 6 GB, jak NVIDIA (wcześniej od 8 GB i tylko z procesorem
+  ≥ 8 wątków); liczba wątków nie obniża już klasy — tylko opisuje kompromis. Klasa dla AMD/Intel 6–11 GB nazywa się
+  „podstawowa”, dla NVIDIA — „karta NVIDIA (CUDA)”. Bez zmian: „mocna” to NVIDIA od 12 GB albo każda karta od 20 GB
+  (przy 32 GB RAM), bo ciężki lokalny głos wymaga CUDA. Nowa klasa „karta zintegrowana”: mały model rozmowy na karcie
+  przez Vulkan, mowa na procesorze. Mała osobna karta (4–5 GB) liczy przynajmniej rozpoznawanie mowy.
+- Pakiety: karta zintegrowana dostaje silnik Vulkan; laptop z NVIDIA i kartą zintegrowaną — także `llama-vulkan`
+  dla lekkiego modelu.
+- Wolna pamięć karty, obciążenie i programy, które z niej korzystają, są mierzone licznikami Windows dla każdego
+  producenta (wcześniej tylko `nvidia-smi`; temperatura i moc nadal tylko dla NVIDIA): strona Urządzenia pokazuje
+  kartę AMD/Intel na żywo, a rozpoznawanie mowy wybiera silnik według zmierzonej pamięci.
+- Komunikaty głosu Supertonic (karta albo powrót na procesor) trafiają do dziennika Alfy; po instalacji albo
+  usunięciu DirectML głos składa się od nowa z właściwą biblioteką.
+- Opisy profili głosu A–D przy pierwszym uruchomieniu mówią, czym profile naprawdę się różnią (wcześniej B był
+  „dla zintegrowanej karty”, a C „dla NVIDIA z CUDA”).
+
+### Testy
+
+- Rust: wykrywanie (APU, Intel Arc osobna i zintegrowana, mała NVIDIA, brak karty), liczniki PDH, reguły klas,
+  skład pakietów, wybór karty dla DirectML, argumenty `--dml`; clippy czysty.
+- Na RX 9070 XT: odczyt DXCore i liczników (sterownik 32.0.31041.1004, 1189 MB zajęte, 22 programy na karcie);
+  Supertonic procesor/DirectML — 3 przebiegi × 5 zdań; powrót na procesor przy bibliotece bez DirectML i przy
+  nieistniejącej karcie; Qwen3-ASR na Vulkan — 4 zdania z Supertonic, 3 identyczne, w jednym zła forma jednego wyrazu.
+- Przegląd zmian w świeżym kontekście (agenty AI: 5 obszarów, każde znalezisko sprawdzone przez 3 niezależnych
+  sceptyków):
+  15 potwierdzonych usterek poprawionych przed wydaniem — m.in. APU z dużą rezerwą, etykieta klasy NVIDIA,
+  odświeżanie głosu po zmianie DirectML, komunikaty bez karty.
+- Nie sprawdzono na sprzęcie: laptop z kartą zintegrowaną, APU AMD (małe i duże rezerwy) i karty Intel (brak tych
+  maszyn); DirectML na kartach NVIDIA i Intel ≥ 12 GB (włącza się sam, zmierzone tylko na AMD) i na karcie
+  zintegrowanej (wyłączone — niezmierzone).
+
 ## 0.0.62 — 2026-10-16
 
 Seria 3 i 4: dziewiętnaście nowości — nowe polecenia bez modelu (jednostki, daty, lata przestępne, liczby

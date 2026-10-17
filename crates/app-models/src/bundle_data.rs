@@ -25,6 +25,10 @@ pub const TTS_SUPERTONIC: &str = "supertonic-3";
 pub const SMART_TURN: &str = "smart-turn-v3.2";
 /// Biblioteka ONNX Runtime dla procesów pobocznych mowy (Supertonic, Smart Turn).
 pub const ONNX_RUNTIME: &str = "onnxruntime-cpu";
+/// ONNX Runtime z DirectML (głos Supertonic na karcie; dokładane przez [`crate::bundles::members_for`]).
+pub const ONNX_RUNTIME_DML: &str = "onnxruntime-directml";
+/// Biblioteka DirectML (razem z [`ONNX_RUNTIME_DML`]).
+pub const DIRECTML: &str = "directml";
 /// Cechy słów wywoławczych openWakeWord.
 pub const WAKE: &str = "openwakeword-features";
 /// Model mówcy WeSpeaker (weryfikacja właściciela).
@@ -190,8 +194,8 @@ pub const DEFS: [Def; 6] = [
         rating: 5,
         name: ("Bardzo dobry", "Very good"),
         summary: (
-            "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze.",
-            "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies.",
+            "Jak Wzorcowy, ale bez słowa wywoławczego, weryfikacji głosu i modelu Qwen3-ASR (mowę rozpoznaje Whisper turbo, żeby pamięć karty została dla modelu rozmowy). Na karcie 6 GB model 4.5B dzieli się między kartę i procesor — odpowiedzi trochę wolniejsze. Na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR (Whisper nie ma tam wersji na kartę).",
+            "Like Reference, but without the wake word, voice verification and the Qwen3-ASR model (Whisper turbo recognises speech so the GPU memory stays with the chat model). On a 6 GB GPU the 4.5B model is split between the GPU and the CPU — slightly slower replies. On AMD and Intel GPUs Qwen3-ASR recognises speech (Whisper has no GPU build there).",
         ),
         need: need(RAM_16, Some(VRAM_6), None, true),
         tight: Some(Tight {
@@ -220,8 +224,8 @@ pub const DEFS: [Def; 6] = [
         rating: 4,
         name: ("Dobry", "Good"),
         summary: (
-            "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze.",
-            "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU.",
+            "Lżejszy model rozmowy Bielik 1.5B (rozmowa bez narzędzi agentek) z dokładnym rozpoznawaniem mowy Whisper turbo, naturalnym głosem Supertonic 3 (Piper w zapasie), wyczuciem końca wypowiedzi Smart Turn i wyszukiwaniem znaczeniowym. Działa na karcie 4 GB albo na mocnym procesorze. Na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR (Whisper nie ma tam wersji na kartę).",
+            "The lighter chat model Bielik 1.5B (conversation without the agents' tools) with accurate Whisper turbo speech recognition, the natural Supertonic 3 voice (Piper as the fallback), Smart Turn end-of-turn sensing and semantic search. Runs on a 4 GB GPU or a strong CPU. On AMD and Intel GPUs Qwen3-ASR recognises speech (Whisper has no GPU build there).",
         ),
         need: need(RAM_12, Some(VRAM_4), Some(8), false),
         tight: Some(Tight {

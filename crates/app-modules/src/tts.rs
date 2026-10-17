@@ -25,6 +25,9 @@ use crate::voice::NO_TTS;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Installed {
     supertonic: bool,
+    /// Wersja DirectML biblioteki ONNX Runtime — jej instalacja albo usunięcie zmienia argumenty
+    /// `alfa-supertonic` (`--ort`, `--dml`), więc serwis jest wtedy składany od nowa.
+    supertonic_dml: bool,
     pocket: bool,
     piper: bool,
 }
@@ -33,6 +36,7 @@ impl Installed {
     fn detect(paths: &AppPaths) -> Self {
         Self {
             supertonic: supertonic_ready(paths),
+            supertonic_dml: supertonic_dml_runtime(paths).is_some(),
             pocket: paths.sidecar("pocket-tts", "pocket-tts").is_file(),
             // Piper bez modelu głosu (`*.onnx`) nie potrafi nic powiedzieć: sam plik silnika to
             // jeszcze nie „głos gotowy" (wcześniej rozmowa startowała i każde zdanie kończyło się
@@ -48,10 +52,32 @@ fn supertonic_models(paths: &AppPaths) -> std::path::PathBuf {
     paths.models().join("supertonic")
 }
 
-/// Biblioteka ONNX Runtime (obok sidecara albo pobrana z katalogu) — ładuje ją tylko proces
-/// `alfa-supertonic`.
+/// Biblioteka ONNX Runtime w wersji DirectML (`sidecars/onnxruntime-dml/`, razem z `DirectML.dll`
+/// — pozycje katalogu `onnxruntime-directml` i `directml`), jeśli zainstalowana w całości.
+fn supertonic_dml_runtime(paths: &AppPaths) -> Option<std::path::PathBuf> {
+    let dir = paths.sidecars().join("onnxruntime-dml");
+    let dll = dir.join(crate::turn::runtime_file());
+    (dll.is_file() && dir.join("DirectML.dll").is_file()).then_some(dll)
+}
+
+/// Biblioteka ONNX Runtime dla `alfa-supertonic` (ładuje ją tylko ten proces) bez wyboru karty:
+/// CPU obok sidecara albo pobrana z katalogu, a bez niej — wersja DirectML (liczy też na procesorze).
 fn supertonic_runtime(paths: &AppPaths) -> Option<std::path::PathBuf> {
     crate::turn::onnxruntime(paths, &paths.sidecar("supertonic", "alfa-supertonic"))
+        .or_else(|| supertonic_dml_runtime(paths))
+}
+
+/// Biblioteka i karta dla `alfa-supertonic`: `device` — numer karty dla DirectML (osobna karta
+/// ≥ 12 GB, [`crate::gpu_mem::tts_dml_device`]) przy zainstalowanej wersji DirectML; inaczej
+/// [`supertonic_runtime`] na procesorze — tak jak przed dodaniem DirectML.
+pub fn supertonic_runtime_for(
+    paths: &AppPaths,
+    device: Option<u32>,
+) -> Option<(std::path::PathBuf, Option<u32>)> {
+    if let (Some(device), Some(dll)) = (device, supertonic_dml_runtime(paths)) {
+        return Some((dll, Some(device)));
+    }
+    supertonic_runtime(paths).map(|dll| (dll, None))
 }
 
 /// Supertonic jest gotowy, gdy są: sidecar, biblioteka ONNX Runtime, konfiguracja modelu i barwa
@@ -89,19 +115,29 @@ fn build(
     if installed.supertonic {
         let models = supertonic_models(paths);
         let lossy = |p: std::path::PathBuf| p.to_string_lossy().into_owned();
+        // Karta sprawdzana tylko przy składaniu silnika (DXGI, kilka ms), nie przy każdym wykryciu.
+        let (runtime, device) =
+            supertonic_runtime_for(paths, crate::gpu_mem::tts_dml_device_here())
+                .unwrap_or_default();
         // Ustawienia strojone na sprzęcie w Delcie AI: 6 kroków, język polski (tempo — w żądaniu).
-        let args = vec![
+        let mut args = vec![
             "--onnx-dir".to_owned(),
             lossy(models.clone()),
             "--voices-dir".to_owned(),
             lossy(models),
             "--ort".to_owned(),
-            lossy(supertonic_runtime(paths).unwrap_or_default()),
+            lossy(runtime),
             "--steps".to_owned(),
             "6".to_owned(),
             "--lang".to_owned(),
             "pl".to_owned(),
         ];
+        if let Some(device) = device {
+            // Nieudany start na karcie: proces sam liczy na procesorze (komunikat na stderr).
+            args.extend(["--dml".to_owned(), device.to_string()]);
+            // Wynik (karta albo powrót na procesor) proces podaje sam na stderr — trafia do dziennika.
+            tracing::info!(karta = device, "głos Supertonic: uruchamiam z DirectML");
+        }
         backends.push(Arc::new(
             PocketSidecar::process(paths.sidecar("supertonic", "alfa-supertonic"), args)
                 .supertonic()
@@ -297,6 +333,52 @@ mod tests {
             matches!(tts.health(), TtsHealth::Failed(_)),
             "silnik usunięty"
         );
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    /// DirectML tylko z kompletną wersją DirectML i kartą wskazaną przez wywołującego; bez karty
+    /// zostaje biblioteka CPU (jak przed DirectML), a bez niej — wersja DirectML na procesorze.
+    #[test]
+    fn supertonic_runtime_prefers_directml_only_with_a_card() {
+        let dir = std::env::temp_dir().join(format!("alfa-tts-dml-{}", uuid::Uuid::new_v4()));
+        let paths = AppPaths::under(&dir);
+        let touch = |p: std::path::PathBuf| {
+            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+            std::fs::write(&p, b"dll").unwrap();
+            p
+        };
+        assert_eq!(supertonic_runtime_for(&paths, Some(1)), None);
+        let cpu = touch(
+            paths
+                .sidecars()
+                .join("onnxruntime")
+                .join(crate::turn::runtime_file()),
+        );
+        let dml_dir = paths.sidecars().join("onnxruntime-dml");
+        let dml = touch(dml_dir.join(crate::turn::runtime_file()));
+        // Bez DirectML.dll wersja DirectML jest niekompletna — procesor.
+        assert_eq!(
+            supertonic_runtime_for(&paths, Some(1)),
+            Some((cpu.clone(), None))
+        );
+        touch(dml_dir.join("DirectML.dll"));
+        assert_eq!(
+            supertonic_runtime_for(&paths, Some(1)),
+            Some((dml.clone(), Some(1)))
+        );
+        assert_eq!(
+            supertonic_runtime_for(&paths, None),
+            Some((cpu.clone(), None))
+        );
+        std::fs::remove_file(&cpu).unwrap();
+        assert_eq!(
+            supertonic_runtime_for(&paths, None),
+            Some((dml.clone(), None))
+        );
+        // Klucz pamięci podręcznej serwisu widzi wersję DirectML: jej usunięcie przebuduje argumenty.
+        assert!(Installed::detect(&paths).supertonic_dml);
+        std::fs::remove_file(&dml).unwrap();
+        assert!(!Installed::detect(&paths).supertonic_dml);
         let _ = std::fs::remove_dir_all(dir);
     }
 }

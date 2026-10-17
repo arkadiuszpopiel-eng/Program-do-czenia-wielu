@@ -190,7 +190,7 @@ export const plSettings = {
   'dev.live.resume': 'Wznów odświeżanie',
   'dev.live.loading': 'Odczytuję karty…',
   'dev.live.unavailable':
-    'Na tym komputerze nie udało się odczytać kart na żywo (liczniki systemu Windows są niedostępne) — dane o karcie są w sekcji powyżej.',
+    'Brak odczytu na żywo: ten komputer nie ma karty graficznej albo liczniki systemu Windows nie odpowiadają. Dane o sprzęcie są w sekcji powyżej.',
   'dev.live.memory': 'pamięć: {used} z {total} GB zajęte, {free} GB wolne',
   'dev.live.memoryLabel': 'Zajęta pamięć karty {name}',
   'dev.live.memoryPct': '{pct} % zajęte',
@@ -207,7 +207,7 @@ export const plSettings = {
   'dev.measure': 'Zmierz ponownie',
   'dev.hw.baseline': 'podstawowa',
   'dev.hw.standard_amd': 'standard (karta ≥ 12 GB)',
-  'dev.hw.laptop_cuda': 'karta NVIDIA 6–11 GB',
+  'dev.hw.laptop_cuda': 'karta NVIDIA (CUDA)',
   'dev.hw.strong': 'mocna',
   'dev.hw.integrated': 'karta zintegrowana',
   'dev.hw.unknown': 'nieznana',

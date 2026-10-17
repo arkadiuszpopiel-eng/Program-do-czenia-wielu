@@ -135,6 +135,10 @@ const VRAM_20_GB: u32 = 19_500;
 /// Osobna karta od tej pamięci liczy rozpoznawanie mowy, choć na model rozmowy jej za mało
 /// (Qwen3-ASR ≈ 2,6 GB, Whisper turbo ≈ 1,5 GB) — ten sam próg co w pakietach modeli.
 const VRAM_STT_MIN: u32 = 3_500;
+/// Najmniejsza pamięć osobnej karty (MB), od której głos Supertonic liczy na karcie (DirectML)
+/// obok modelu rozmowy i rozpoznawania mowy. Zmierzone 2026-10-17 na RX 9070 XT: ok. 540 MB
+/// pamięci karty; na karcie 8 GB model 4.5B i STT zajmują już 7380 z 7408 MB budżetu.
+pub const GPU_TTS_MIN_VRAM_MB: u32 = VRAM_12_GB;
 /// Poniżej tylu wątków procesora potok głosu (VAD, koniec wypowiedzi, synteza) zwalnia.
 const THREADS_COMFORT: u32 = 8;
 
@@ -149,7 +153,7 @@ pub fn classify(profile: &Profile) -> HwClass {
         return HwClass::Unknown;
     };
     let (vram, ram) = (gpu.vram_mb, profile.ram_mb);
-    if gpu.integrated {
+    if !gpu.has_memory_pool() {
         return if ram >= RAM_16_GB {
             HwClass::Integrated
         } else {
@@ -276,7 +280,7 @@ fn apply_unknown(profile: &Profile, gpu_backend: Backend, rec: &mut Recommendati
     let stt_gpu = gpu_backend != Backend::Cpu
         && profile
             .primary_gpu()
-            .is_some_and(|g| !g.integrated && g.vram_mb >= VRAM_STT_MIN);
+            .is_some_and(|g| g.has_memory_pool() && g.vram_mb >= VRAM_STT_MIN);
     if stt_gpu {
         rec.stt_backend = gpu_backend;
     } else {
@@ -287,7 +291,13 @@ fn apply_unknown(profile: &Profile, gpu_backend: Backend, rec: &mut Recommendati
     rec.llm_backend = Backend::Cpu;
     rec.local_llm = LocalLlm::None;
     rec.residency.stt_tts_exclusive = true;
-    rec.tradeoffs.push(if stt_gpu {
+    let card_ok = profile.primary_vram_mb() >= VRAM_6_GB;
+    rec.tradeoffs.push(if stt_gpu && card_ok {
+        // Karta wystarczy na model rozmowy — klasę obniża za mała pamięć RAM.
+        "Za mało pamięci RAM (poniżej 16 GB) na model rozmowy na tym komputerze: rozpoznawanie \
+         mowy na karcie, rozmowa przez API."
+            .into()
+    } else if stt_gpu {
         "Mała karta graficzna: rozpoznawanie mowy na karcie, rozmowa przez API; \
          na model rozmowy na karcie potrzeba ≥ 6 GB."
             .into()
@@ -315,3 +325,7 @@ fn apply_battery(rec: &mut Recommendation) {
 #[cfg(test)]
 #[path = "rules_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "rules_gpu_tests.rs"]
+mod gpu_tests;

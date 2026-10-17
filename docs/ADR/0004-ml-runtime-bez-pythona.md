@@ -46,3 +46,10 @@ Zasady: formaty modeli tylko safetensors/ONNX/GGUF z hashami; wersje bibliotek i
 - Dodanie opcjonalnego Model Packu z Pythonem jest przewidziane; nie zmienia jądra ani kontraktów `voice-stt`/`voice-tts` (osobny `-impl`).
 - Zmiana backendu STT (np. na Parakeet lub chmurę jako domyślną) to wymiana `-impl` za tym samym kontraktem; wynik spike'u (e) może przestawić domyślne w `device-profile`.
 - Decyzja odwracalna do końca F0.
+
+## Uzupełnienie 2026-10-17
+
+Wydania whisper.cpp dla Windows nie mają kompilacji Vulkan (sprawdzone do v1.9.5) — na kartach AMD/Intel mowę
+rozpoznaje Qwen3-ASR przez `llama-server` Vulkan. DirectML wraca opcjonalnie i wąsko (tylko głos Supertonic, osobna
+karta ≥ 12 GB, jawny powrót na procesor): [ADR 0028](0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md),
+status „Proponowany” — do podpisu właściciela.

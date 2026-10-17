@@ -149,6 +149,36 @@
     },
     "generative": false
   },
+  "onnxruntime-directml": {
+    "origin": {
+      "pl": "Microsoft (USA), oprogramowanie otwarte",
+      "en": "Microsoft (USA), open-source software"
+    },
+    "purpose": {
+      "pl": "Silnik uruchamiający modele ONNX na karcie graficznej przez DirectML (głos Supertonic)",
+      "en": "Engine that runs ONNX models on the graphics card through DirectML (the Supertonic voice)"
+    },
+    "limits": {
+      "pl": "To program, nie model — sam niczego nie tworzy; wymaga karty z DirectX 12",
+      "en": "Software, not a model — creates nothing by itself; needs a DirectX 12 card"
+    },
+    "generative": false
+  },
+  "directml": {
+    "origin": {
+      "pl": "Microsoft (USA), oprogramowanie zamknięte",
+      "en": "Microsoft (USA), proprietary software"
+    },
+    "purpose": {
+      "pl": "Biblioteka obliczeń na karcie graficznej (DirectX 12) dla ONNX Runtime w wersji DirectML",
+      "en": "GPU compute library (DirectX 12) for the DirectML build of ONNX Runtime"
+    },
+    "limits": {
+      "pl": "To biblioteka, nie model — sam niczego nie tworzy; licencja dopuszcza zbieranie danych diagnostycznych przez Microsoft",
+      "en": "A library, not a model — creates nothing by itself; the licence allows Microsoft to collect diagnostic data"
+    },
+    "generative": false
+  },
   "piper-pl_PL-gosia-medium": {
     "origin": {
       "pl": "Głos z zestawu piper-voices (Rhasspy / Open Home Foundation); pochodzenie nagrań i zgoda lektorki — w karcie głosu u źródła, do potwierdzenia",

@@ -8,6 +8,7 @@
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
+use device_profile_contract::{GPU_TTS_MIN_VRAM_MB, has_memory_pool};
 use platform_contract::{GpuAdapter, GpuUsage, HardwarePort};
 
 /// Najdłuższe czekanie na odpowiedź `nvidia-smi`.
@@ -198,9 +199,11 @@ fn hardware(a: &GpuAdapter) -> bool {
     !a.software && a.vendor_id != 0x1414
 }
 
-/// Osobna karta: sterownik mówi „niezintegrowana”, a bez tej informacji — ≥ 1 GB własnej pamięci.
+/// Karta z własną pulą pamięci (`device_profile_contract::has_memory_pool`): osobna albo zintegrowana
+/// z rezerwą z BIOS-u ≥ 6 GB. Bez flagi sterownika „zintegrowana” = mniej niż 1 GB własnej pamięci.
 fn discrete(a: &GpuAdapter) -> bool {
-    hardware(a) && a.integrated.map_or(a.dedicated_vram_mb >= 1_024, |i| !i)
+    let integrated = a.integrated.unwrap_or(a.dedicated_vram_mb < 1_024);
+    hardware(a) && has_memory_pool(integrated, mb32(a.dedicated_vram_mb))
 }
 
 fn mb32(value: u64) -> u32 {
@@ -279,12 +282,42 @@ fn system_read() -> Option<(Vec<GpuAdapter>, GpuUsage)> {
 }
 
 /// Wolna pamięć karty w MiB dla każdego producenta: `nvidia-smi`, a bez niego liczniki systemu.
-/// `None`, gdy nie da się zmierzyć albo nie ma osobnej karty.
+/// Komputer bez osobnej karty (sama zintegrowana albo żadna) daje `Some(0)` — rozpoznawanie mowy
+/// nie zajmuje wtedy karty zintegrowanej, którą profil przeznacza na model rozmowy. `None` — nie da
+/// się zmierzyć (wywołujący próbuje karty, a po nieudanym starcie bierze silnik zapasowy).
 pub fn free_vram_mb() -> Option<u32> {
     nvidia_free_mb().or_else(|| {
-        let (adapters, usage) = system_read()?;
-        free_from(&adapters, &usage)
+        let hw = platform_windows_impl::WinHardware;
+        let adapters = hw.gpus().ok()?;
+        // Lista kart wystarcza, żeby stwierdzić brak osobnej karty — liczniki mogą nie odpowiadać.
+        if !adapters.iter().any(discrete) {
+            return Some(0);
+        }
+        free_from(&adapters, &hw.gpu_usage().ok()?)
     })
+}
+
+/// Karta (numer adaptera DXGI) dla głosu Supertonic przez DirectML: największa karta z własną pulą
+/// pamięci (osobna albo zintegrowana z dużą rezerwą z BIOS-u) z ≥ [`GPU_TTS_MIN_VRAM_MB`]. `None` — głos liczy na procesorze.
+pub fn tts_dml_device(adapters: &[GpuAdapter]) -> Option<u32> {
+    adapters
+        .iter()
+        .filter(|a| discrete(a) && a.dedicated_vram_mb >= u64::from(GPU_TTS_MIN_VRAM_MB))
+        // Jak główna karta profilu: osobna przed zintegrowaną z dużą rezerwą, potem największa.
+        .max_by_key(|a| {
+            (
+                u8::from(a.integrated != Some(true)),
+                a.dedicated_vram_mb,
+                std::cmp::Reverse(a.index),
+            )
+        })
+        .map(|a| a.index)
+}
+
+/// [`tts_dml_device`] dla tej maszyny (DXGI; poza Windows — `None`).
+pub fn tts_dml_device_here() -> Option<u32> {
+    let adapters = HardwarePort::gpus(&platform_windows_impl::WinHardware).ok()?;
+    tts_dml_device(&adapters)
 }
 
 /// Karty i procesy na żywo dla każdego producenta: `nvidia-smi` (z temperaturą i mocą), a bez

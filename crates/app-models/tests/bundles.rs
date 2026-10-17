@@ -266,38 +266,6 @@ fn small_ram_machines_get_light_or_balanced_and_tiny_ones_nothing() {
     assert!(kinds.iter().all(|k| *k == F::TooWeak) && rec.is_none());
 }
 
-/// Karta zintegrowana nie udaje osobnej: APU AMD z 4 GB z BIOS-u i Intel Arc w procesorze dostają
-/// Vulkan (mały model na karcie) przy wymaganiach liczonych jak bez karty; laptop NVIDIA z kartą
-/// zintegrowaną dostaje dodatkowo `llama-vulkan` (lekki model na karcie zintegrowanej).
-#[test]
-fn integrated_cards_use_vulkan_without_counting_as_vram() {
-    for profile in [fixtures::amd_apu(), fixtures::intel_igpu()] {
-        let m = Machine::from_profile(&profile);
-        assert_eq!((m.gpu, m.vram_mb, m.igpu), (None, 0, true), "{m:?}");
-        assert_eq!(m.accel(), Accel::Vulkan);
-        let views = bundles::views(&m, &catalog_items());
-        assert_eq!(
-            views[0].fit.kind,
-            F::TooWeak,
-            "pakiet 6 wymaga osobnej karty ≥ 8 GB"
-        );
-        let four = ids(bundle(&views, 4));
-        assert!(four.contains(&(LLAMA_VULKAN, false)) && four.contains(&(LLAMA_CPU, true)));
-        assert!(!four.iter().any(|(id, _)| *id == LLAMA_CUDA));
-    }
-    // Za mało RAM na model na karcie zintegrowanej: ścieżka procesora.
-    let below = Machine::from_profile(&fixtures::below_baseline());
-    assert!(!below.igpu);
-    let laptop = Machine::from_profile(&fixtures::laptop());
-    assert!(laptop.igpu);
-    let laptop_views = bundles::views(&laptop, &catalog_items());
-    let five = ids(bundle(&laptop_views, 5));
-    assert!(five.contains(&(LLAMA_CUDA, false)) && five.contains(&(LLAMA_VULKAN, true)));
-    let arc = Machine::from_profile(&fixtures::intel_arc());
-    assert_eq!((arc.gpu, arc.vram_mb), (Some(GpuVendor::Intel), 16_224));
-    assert_eq!(bundles::recommended(&arc), Some(6));
-}
-
 #[test]
 fn small_or_unknown_gpus_fall_back_to_the_cpu_path() {
     let gtx = machine(Some((GpuVendor::Nvidia, 4_096)), 16_384, 4);

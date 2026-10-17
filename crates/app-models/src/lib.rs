@@ -14,6 +14,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 pub mod bundle_data;
+mod bundle_machine;
 mod bundle_ops;
 mod bundle_quality;
 pub mod bundles;

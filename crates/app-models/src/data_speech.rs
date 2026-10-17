@@ -66,6 +66,8 @@ pub(super) fn speech() -> Vec<ItemSpec> {
         crate::supertonic::supertonic(),
         crate::voice_runtime::smart_turn(),
         crate::voice_runtime::onnxruntime(),
+        crate::voice_runtime::onnxruntime_directml(),
+        crate::voice_runtime::directml(),
         item(
             "piper-pl_PL-gosia-medium",
             ModelItemKind::Tts,

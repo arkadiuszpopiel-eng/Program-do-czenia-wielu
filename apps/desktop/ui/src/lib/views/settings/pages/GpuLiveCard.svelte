@@ -1,7 +1,8 @@
 <!--
   Karty graficzne na żywo (strona „Urządzenia”): pamięć zajęta i wolna, obciążenie, temperatura,
   moc oraz programy korzystające z karty — z zaznaczeniem silników Alfy. Odświeża się samo co kilka
-  sekund, dopóki strona jest otwarta; pomiar działa dziś dla kart NVIDIA.
+  sekund, dopóki strona jest otwarta. Pamięć, obciążenie i programy — dla każdego producenta (liczniki
+  Windows); temperatura i moc — tylko karty NVIDIA (`nvidia-smi`).
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
