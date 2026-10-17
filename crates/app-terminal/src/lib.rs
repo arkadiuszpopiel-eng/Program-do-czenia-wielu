@@ -18,8 +18,8 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use accounts_hub_contract::CliProbe;
+use app_api::AppError;
 use app_api::dto::{TerminalFrame, TerminalProfileId, TerminalSession};
-use app_api::{AppError, ErrorCode};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use core_bus_contract::EventBus;
@@ -139,14 +139,12 @@ fn error(e: TerminalError) -> AppError {
             "Otwarto już {n} terminale — zamknij któryś, zanim otworzysz kolejny."
         )),
         // Brak programu na komputerze to nie brak modułu: komunikat mówi, czego brakuje i co zrobić
-        // (wcześniej „…funkcja dostępna po podłączeniu modułu ui-terminal”).
-        TerminalError::ProgramMissing(p) => AppError::new(
-            ErrorCode::Unavailable,
-            format!(
-                "Nie znaleziono programu {} na tym komputerze — zainstaluj go i spróbuj ponownie.",
-                program_name(&p)
-            ),
-        )
+        // (wcześniej „…funkcja dostępna po podłączeniu modułu ui-terminal”; kod `Unavailable` dawał
+        // ten sam błędny początek po angielsku).
+        TerminalError::ProgramMissing(p) => AppError::not_found(format!(
+            "Nie znaleziono programu {} na tym komputerze — zainstaluj go i spróbuj ponownie.",
+            program_name(&p)
+        ))
         .with("module", "ui-terminal"),
         TerminalError::InputTooLarge => {
             AppError::invalid(format!("Paczka wejścia większa niż {MAX_INPUT_BYTES} B."))
@@ -340,12 +338,18 @@ fn session(info: &ui_terminal_contract::TerminalInfo) -> TerminalSession {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use app_api::ErrorCode;
 
     /// Brak programu to nie brak modułu: komunikat nazywa narzędzie i mówi, co zrobić.
     #[test]
     fn missing_program_is_named_without_module_hint() {
         let e = error(TerminalError::ProgramMissing("ClaudeLogin".into()));
-        assert_eq!(e.code, ErrorCode::Unavailable);
+        assert_eq!(e.code, ErrorCode::NotFound);
+        assert!(
+            !e.localized("en").contains("module"),
+            "{}",
+            e.localized("en")
+        );
         assert!(e.message.contains("Claude Code (claude)"), "{}", e.message);
         assert!(!e.message.contains("podłączeniu modułu"), "{}", e.message);
         assert!(

@@ -73,9 +73,10 @@ impl SystemVoice {
             (Some(cfg), true) => SttEngineView {
                 engine: SttEngineKind::QwenAsr,
                 // Przed pierwszym złożeniem: bez karty z własną pulą (sama zintegrowana) Qwen3-ASR
-                // liczy na procesorze — tani odczyt listy kart, bez liczników.
-                gpu: plan.map_or(
-                    cfg.gpu && app_modules::gpu_mem::has_main_card() != Some(false),
+                // liczy na procesorze — tani odczyt listy kart, bez liczników. Leniwie: widok
+                // składa się co takt dyktowania (20 ms), a po złożeniu wystarcza ostatni plan.
+                gpu: plan.map_or_else(
+                    || cfg.gpu && app_modules::gpu_mem::has_main_card() != Some(false),
                     |p| p == app_modules::stt::SttPlan::QwenGpu,
                 ),
                 fallback: Some(SttEngineKind::Whisper),

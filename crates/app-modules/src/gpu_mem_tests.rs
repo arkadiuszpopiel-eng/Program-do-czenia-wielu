@@ -4,11 +4,42 @@ use super::*;
 
 #[test]
 fn picks_the_card_with_most_free_memory() {
-    assert_eq!(parse_free_mb("5368\n"), Some(5368));
-    assert_eq!(parse_free_mb("  812 \r\n 11240\r\n"), Some(11240));
-    assert_eq!(parse_free_mb(""), None);
-    assert_eq!(parse_free_mb("[N/A]\n"), None);
-    assert_eq!(parse_free_mb("brak karty\n4096\n"), Some(4096));
+    assert_eq!(parse_free_mb("5368\n", None), Some(5368));
+    assert_eq!(parse_free_mb("  812 \r\n 11240\r\n", None), Some(11240));
+    assert_eq!(parse_free_mb("", None), None);
+    assert_eq!(parse_free_mb("[N/A]\n", None), None);
+    assert_eq!(parse_free_mb("brak karty\n4096\n", None), Some(4096));
+    assert_eq!(
+        parse_free_mb("NVIDIA GeForce RTX 4050 Laptop GPU, 5372\r\n", None),
+        Some(5372)
+    );
+}
+
+/// Dwie karty NVIDIA: model rozmowy zajął główną RTX 4090, druga jest wolna — liczy się wiersz
+/// głównej karty (po nazwie z DXGI), a nie największa wolna pamięć (przegląd 2026-10-17).
+#[test]
+fn several_nvidia_cards_report_the_main_one_by_name() {
+    let out = "NVIDIA GeForce RTX 4090, 1536\nNVIDIA GeForce RTX 3060, 11500\n";
+    assert_eq!(parse_free_mb(out, None), Some(11_500));
+    assert_eq!(
+        parse_free_mb(out, Some("NVIDIA GeForce RTX 4090 ")),
+        Some(1_536)
+    );
+    assert_eq!(
+        parse_free_mb(out, Some("nvidia geforce rtx 3060")),
+        Some(11_500)
+    );
+    // Dwie takie same karty — najmniej wolnej; nazwa nieznana — brak odczytu (liczniki systemu).
+    let twins = "NVIDIA GeForce RTX 3090, 20000\nNVIDIA GeForce RTX 3090, 4000\n";
+    assert_eq!(
+        parse_free_mb(twins, Some("NVIDIA GeForce RTX 3090")),
+        Some(4_000)
+    );
+    assert_eq!(parse_free_mb(out, Some("Inna karta")), None);
+    assert_eq!(
+        parse_free_mb("Karta, z przecinkiem, 2048\n", Some("Karta, z przecinkiem")),
+        Some(2_048)
+    );
 }
 
 #[test]

@@ -172,13 +172,17 @@ export function hasMemoryPool(gpu: {
 }
 
 /**
- * Pamięć karty głównej (największa karta z własną pulą — osobna albo procesor z grafiką z rezerwą
- * ≥ 6 GB w BIOS-ie); `null` — nie ma takiej karty (sama grafika zintegrowana z małą rezerwą).
+ * Pamięć karty głównej — tej, na której Alfa uruchamia model rozmowy (jak `Profile::primary_gpu`
+ * w Rust): karta z własną pulą, osobna przed zintegrowaną (nawet przy większej rezerwie z BIOS-u),
+ * potem największa; procesor z grafiką z rezerwą ≥ 6 GB liczy się tylko bez karty osobnej.
+ * `null` — nie ma takiej karty (sama grafika zintegrowana z małą rezerwą).
  */
 export function mainCardMb(
   gpus: readonly { readonly vram_mb: number; readonly integrated: boolean }[],
 ): number | null {
-  const sizes = gpus.filter(hasMemoryPool).map((g) => g.vram_mb);
+  const pool = gpus.filter(hasMemoryPool);
+  const discrete = pool.filter((g) => !g.integrated);
+  const sizes = (discrete.length > 0 ? discrete : pool).map((g) => g.vram_mb);
   return sizes.length > 0 ? Math.max(...sizes) : null;
 }
 

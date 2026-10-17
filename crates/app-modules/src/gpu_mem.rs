@@ -88,21 +88,33 @@ fn run(args: &[&str]) -> Option<String> {
     Some(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
-/// Największa wolna pamięć spośród kart z wyjścia
-/// `nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits` (MiB na linię).
-pub fn parse_free_mb(output: &str) -> Option<u32> {
-    output
-        .lines()
-        .filter_map(|line| line.trim().parse::<u32>().ok())
-        .max()
+/// Wolna pamięć (MiB) z wyjścia `nvidia-smi --query-gpu=name,memory.free --format=csv,noheader,nounits`
+/// (pasuje też sama liczba w linii): bez `name` — największa z kart, z nazwą — karta o tej nazwie
+/// (przy kilku o tej samej nazwie — najmniej wolnej, bezpieczniej). Nazwa może zawierać przecinek.
+pub fn parse_free_mb(output: &str, name: Option<&str>) -> Option<u32> {
+    let free = output.lines().filter_map(|line| {
+        let (card, free) = line.rsplit_once(',').unwrap_or(("", line));
+        let mb = free.trim().parse::<u32>().ok()?;
+        name.is_none_or(|n| card.trim().eq_ignore_ascii_case(n.trim()))
+            .then_some(mb)
+    });
+    if name.is_some() {
+        free.min()
+    } else {
+        free.max()
+    }
 }
 
-/// Wolna pamięć kart NVIDIA w MiB (największa z kart); `None`, gdy nie da się zmierzyć.
-pub fn nvidia_free_mb() -> Option<u32> {
-    parse_free_mb(&run(&[
-        "--query-gpu=memory.free",
-        "--format=csv,noheader,nounits",
-    ])?)
+/// Wolna pamięć kart NVIDIA w MiB: karty o nazwie `name`, a bez nazwy — największa z kart; `None`,
+/// gdy nie da się zmierzyć albo żadna karta nie ma tej nazwy.
+pub fn nvidia_free_mb(name: Option<&str>) -> Option<u32> {
+    parse_free_mb(
+        &run(&[
+            "--query-gpu=name,memory.free",
+            "--format=csv,noheader,nounits",
+        ])?,
+        name,
+    )
 }
 
 /// Liczba całkowita z pola; ułamek jest zaokrąglany, „[N/A]” i śmieci dają `None`.
@@ -298,25 +310,32 @@ fn system_read() -> Option<(Vec<GpuAdapter>, GpuUsage)> {
     Some((adapters, usage))
 }
 
-/// Wolna pamięć głównej karty w MiB dla każdego producenta: karta NVIDIA — `nvidia-smi`, inne —
-/// liczniki systemu. Komputer bez karty z własną pulą (sama zintegrowana albo żadna) daje `Some(0)` —
+/// Wolna pamięć głównej karty w MiB dla każdego producenta: karta NVIDIA — `nvidia-smi` (przy kilku
+/// kartach NVIDIA — wiersz głównej karty po nazwie), inne albo bez pasującego wiersza — liczniki
+/// systemu. Komputer bez karty z własną pulą (sama zintegrowana albo żadna) daje `Some(0)` —
 /// rozpoznawanie mowy nie zajmuje wtedy karty zintegrowanej, którą profil przeznacza na model
 /// rozmowy. `None` — nie da się zmierzyć (wywołujący próbuje karty, a po nieudanym starcie bierze
 /// silnik zapasowy). Bez listy kart (poza Windows) — jak dawniej: `nvidia-smi` albo `None`.
 pub fn free_vram_mb() -> Option<u32> {
     let hw = platform_windows_impl::WinHardware;
     let Ok(adapters) = hw.gpus() else {
-        return nvidia_free_mb();
+        return nvidia_free_mb(None);
     };
     // Lista kart wystarcza, żeby stwierdzić brak karty z pulą — liczniki mogą nie odpowiadać.
     let Some(main) = main_card(&adapters) else {
         return Some(0);
     };
-    // Mierzymy kartę, na której liczy Qwen3-ASR: przy AMD obok NVIDIA nie bierzemy `nvidia-smi`.
-    if main.vendor_id == 0x10DE
-        && let Some(free) = nvidia_free_mb()
-    {
-        return Some(free);
+    // Mierzymy kartę, na której liczy Qwen3-ASR: przy AMD obok NVIDIA nie bierzemy `nvidia-smi`,
+    // a przy dwóch kartach NVIDIA nie bierzemy wolnej pamięci tej drugiej.
+    if main.vendor_id == 0x10DE {
+        let several = adapters
+            .iter()
+            .filter(|a| hardware(a) && a.vendor_id == 0x10DE)
+            .count()
+            > 1;
+        if let Some(free) = nvidia_free_mb(several.then_some(main.name.as_str())) {
+            return Some(free);
+        }
     }
     free_from(&adapters, &hw.gpu_usage().ok()?)
 }

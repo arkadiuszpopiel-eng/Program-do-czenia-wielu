@@ -58,7 +58,7 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
 
 - Logowanie do narzędzia CLI, którego nie ma na komputerze, mówi wprost: „Nie znaleziono programu Claude Code
   (claude) na tym komputerze — zainstaluj go i spróbuj ponownie” (wcześniej mylące „…po podłączeniu modułu
-  ui-terminal”).
+  ui-terminal”, a po angielsku „…once its module is connected”).
 
 ### Testy
 
@@ -71,7 +71,9 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
   sceptyków):
   15 potwierdzonych usterek poprawionych przed wydaniem — m.in. APU z dużą rezerwą, etykieta klasy NVIDIA,
   odświeżanie głosu po zmianie DirectML, komunikaty bez karty. Drugi przegląd poprawek: 14 kolejnych — m.in.
-  rezerwa APU liczona dwa razy (jako karta i jako RAM), pomiar pamięci nie tej karty, na której liczy mowa.
+  rezerwa APU liczona dwa razy (jako karta i jako RAM), pomiar pamięci nie tej karty, na której liczy mowa. Trzeci
+  przegląd: 4 kolejne — m.in. lista kart odczytywana co 20 ms w trakcie dyktowania, przy dwóch kartach NVIDIA
+  wolna pamięć drugiej karty, ocena „mieści się na karcie” według rezerwy APU zamiast karty osobnej.
 - Nie sprawdzono na sprzęcie: laptop z kartą zintegrowaną, APU AMD (małe i duże rezerwy) i karty Intel (brak tych
   maszyn); DirectML na kartach NVIDIA i Intel ≥ 12 GB i na APU z rezerwą ≥ 12 GB (włącza się sam, zmierzone tylko
   na osobnej karcie AMD); na karcie zintegrowanej z małą rezerwą DirectML jest wyłączony (niezmierzony).
