@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 70 |
-| Linie Rust (z testami) | 417 603 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2909 |
+| Linie Rust (z testami) | 421 570 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2947 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -31,10 +31,10 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `device-profile` | F1 | service | inproc | C · I · F | 2649 | 22 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
-| `platform` | — | — | — | C · F | 14 390 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
+| `device-profile` | F1 | service | inproc | C · I · F | 3089 | 27 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
+| `platform` | — | — | — | C · F | 14 453 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 5223 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
-| `platform-windows` | F1, F5, F6 | service | inproc | I | 8457 | 75 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| `platform-windows` | F1, F5, F6 | service | inproc | I | 9022 | 80 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
 | `platform-windows-diag` | F1, F5, F6 | — | — | I | 664 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2161 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -84,8 +84,8 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `voice-readaloud` | F5 | voice-engine | inproc | C · I · F | 1930 | 7 | [voice-readaloud](modules/voice-readaloud/SPEC.md) | Czytanie zaznaczenia lub okna przez UIA `TextPattern` głosem agentki; treść niezaufana. |
 | `voice-s2s` | F5 | — | — | C · F | 1088 | 6 | [voice-s2s](modules/voice-s2s/SPEC.md) | Kontrakt trybu speech-to-speech w chmurze z obcinaniem odpowiedzi po stronie dostawcy (adapter później). |
 | `voice-speaker` | F5 | voice-engine | inproc | C · I · F | 2780 | 15 | [voice-speaker](modules/voice-speaker/SPEC.md) | Weryfikacja właściciela (ECAPA), profil szyfrowany; ryzyko głosem bez weryfikacji → potwierdzenie nie-głosem. |
-| `voice-stt` | F2 | voice-engine | process | C · I · F | 4500 | 38 | [voice-stt](modules/voice-stt/SPEC.md) | whisper.cpp jako sidecar `whisper-server`: transkrypt częściowy i końcowy, hotwords, fallback GPU → CPU. |
-| `voice-tts` | F2 | voice-engine | process | C · I · F | 3407 | 25 | [voice-tts](modules/voice-tts/SPEC.md) | Pocket TTS i Piper, głosy v0 (wysokość, tempo), łańcuch zapasowy per agentka, cache fraz. |
+| `voice-stt` | F2 | voice-engine | process | C · I · F | 4521 | 38 | [voice-stt](modules/voice-stt/SPEC.md) | whisper.cpp jako sidecar `whisper-server`: transkrypt częściowy i końcowy, hotwords, fallback GPU → CPU. |
+| `voice-tts` | F2 | voice-engine | process | C · I · F | 3423 | 25 | [voice-tts](modules/voice-tts/SPEC.md) | Pocket TTS i Piper, głosy v0 (wysokość, tempo), łańcuch zapasowy per agentka, cache fraz. |
 | `voice-turn` | F2 | voice-engine | inproc | C · I · F | 1979 | 29 | [voice-turn](modules/voice-turn/SPEC.md) | Wykrywanie końca tury z polityką cierpliwości wobec hezytacji. |
 | `voice-vad` | F2 | voice-engine | inproc | C · I · F | 1808 | 12 | [voice-vad](modules/voice-vad/SPEC.md) | Silero VAD przez `tract-onnx` z progiem adaptacyjnym — bramka dla STT i sygnał przerwania. |
 | `voice-wake` | F2, F5 | voice-engine | inproc | C · I · F | 4922 | 27 | [voice-wake](modules/voice-wake/SPEC.md) | PTT, przełącznik, adresowanie po imieniu; v1 — słowa wywoławcze „Hej …” lokalnie, domyślnie wyłączone. |
@@ -148,11 +148,11 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4395 | 30 | — |  |
-| `app-api` | — | — | — | pojedynczy | 7890 | 32 | — |  |
+| `app-api` | — | — | — | pojedynczy | 7895 | 32 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 1190 | 9 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 4384 | 24 | — |  |
 | `app-chat` | — | — | — | pojedynczy | 2463 | 7 | — |  |
-| `app-core` | — | — | — | pojedynczy | 18 068 | 125 | — |  |
+| `app-core` | — | — | — | pojedynczy | 18 069 | 125 | — |  |
 | `app-diag` | — | — | — | pojedynczy | 545 | 3 | — |  |
 | `app-files` | — | — | — | pojedynczy | 3819 | 31 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
@@ -160,16 +160,16 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
-| `app-models` | — | — | — | pojedynczy | 7619 | 47 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 7067 | 43 | — |  |
+| `app-models` | — | — | — | pojedynczy | 8023 | 53 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 7714 | 50 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 1119 | 3 | — |  |
 | `app-store` | — | — | — | pojedynczy | 468 | 0 | — |  |
 | `app-tasks` | — | — | — | pojedynczy | 3694 | 13 | — |  |
-| `app-terminal` | — | — | — | pojedynczy | 493 | 3 | — |  |
+| `app-terminal` | — | — | — | pojedynczy | 534 | 4 | — |  |
 | `app-updates` | — | — | — | pojedynczy | 1301 | 13 | — |  |
-| `app-voice` | — | — | — | pojedynczy | 6108 | 32 | — |  |
+| `app-voice` | — | — | — | pojedynczy | 6127 | 32 | — |  |
 
 ## Biblioteki wspólne (`lib-*`)
 
@@ -180,11 +180,11 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `lib-media` | — | — | — | pojedynczy | 2049 | 17 | — |  |
 | `lib-netguard` | — | — | — | pojedynczy | 649 | 7 | — |  |
 | `lib-openai-compat` | — | — | — | pojedynczy | 1714 | 11 | — |  |
-| `lib-quick` | — | — | — | pojedynczy | 1611 | 14 | — |  |
+| `lib-quick` | — | — | — | pojedynczy | 3267 | 27 | — |  |
 | `lib-sidecar-guard` | — | — | — | pojedynczy | 518 | 4 | — |  |
 | `lib-smart-turn` | — | — | — | pojedynczy | 588 | 7 | — |  |
 | `lib-sqlstore` | — | — | — | pojedynczy | 1321 | 30 | — |  |
-| `lib-supertonic` | — | — | — | pojedynczy | 814 | 11 | — |  |
+| `lib-supertonic` | — | — | — | pojedynczy | 901 | 12 | — |  |
 
 ## Wzorce i spike’i
 
@@ -197,7 +197,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `pc-diag` | — | service | inproc | C · I · F | 2838 | 13 | — |  |
+| `pc-diag` | — | service | inproc | C · I · F | 2840 | 13 | — |  |
 | `tools-dev` | — | tool | inproc | C · I · F | 1495 | 10 | — |  |
 
 ## Niespójności do uporządkowania
