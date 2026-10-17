@@ -28,7 +28,12 @@ Wersji 0.0.63 **nie wgrałam** do `Alfa-uruchomiona` (tam nadal 0.0.62) — to T
 | `55bc0f06` | Qwen3-ASR przypięty do głównej karty przy kilku kartach Vulkan                                             |
 | `d02237bd` | `verify.mjs` na tym komputerze: Git Bash zamiast aliasu WSL                                                |
 | `0011a06b` | 14 poprawek po drugim przeglądzie, raport, poprawka znacznika w dzienniku zmian, `backup.sh`               |
-| (ten)      | Poprawki po trzecim przeglądzie (rozdział 8), uzupełnienie raportu                                         |
+| `c3ec80fb` | Poprawki po trzecim przeglądzie (rozdział 8), uzupełnienie raportu                                         |
+| `87a4a156` | Raport: wynik `verify` (rozdział 9), poprawki po czwartym przeglądzie; zasady pracy przywrócone w pamięci   |
+| `7698da68` | `ammonia` 4.2.4, lista wyboru od pierwszego kliknięcia, testy strony Urządzenia — rozdział 10             |
+| `fce4fa7d` | Raport: końcowa budowa z `7698da68`; pamięć projektu                                                       |
+| `206c3796` | Katalog crate'ów odświeżony (`scripts/catalog.mjs`)                                                        |
+| (ten)      | Poprawki raportu po piątym przeglądzie (liczby budżetu rozmiaru, ta tabela)                                |
 
 Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Decyzja: [ADR 0028](../ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md).
 
@@ -138,8 +143,12 @@ przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności 
     liczyło od zera, a nie od ostatniego zamknięcia) — na szybkim komputerze test archiwum klikał po 190–250 ms
     i lista się nie otwierała. Zmierzone, poprawione w `ui-kit` (`Select.svelte`), nowy test cofa zegar strony do zera
     tuż przed kliknięciem — na starej kompilacji czerwony, po poprawce zielony.
-  - Po poprawkach: **467/467** (5 min), budżet rozmiaru zielony (434,6 KB gzip), vitest 394/394, `svelte-check` 0,
+  - Po poprawkach: **467/467** (5 min), budżet rozmiaru zielony — okno główne JS 145,3 z 150 KB i CSS 13,7 z 30 KB,
+    szybkie pytanie 37,7 z 40 KB, pigułka głosowa 7,9 z 8,0 KB (gzip; pigułka i okno główne blisko granicy), vitest 394/394, `svelte-check` 0,
     lint zielony.
+- **Piąty przegląd** (commit `7698da68`, 2 obszary, każde znalezisko u 3 sceptyków): 5 zgłoszeń, 2 utrzymane —
+  oba w tym raporcie (liczba przy budżecie rozmiaru była sumą modułów leniwych spoza budżetu; tabela commitów
+  w rozdziale 2 bez ostatnich wpisów) — poprawione. Kod bez uwag.
 - **Końcowa zbudowana wersja** (Twoja zasada pracy nocnej): `alfa/target/shell/debug/alfa-desktop.exe` z commitu
   `7698da68` (00:37) — prawdziwa aplikacja jako instancja testowa: **37 zielonych, 1 pominięty** (brak Claude Code),
   pokrycie łącza 198 z 264 (75 %). Do `Alfa-uruchomiona` jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028

@@ -343,7 +343,12 @@ nic nie stracone. Ciężkie zadania od tej pory z ograniczeniem równoległości
 <tr><td><code>55bc0f06</code></td><td>Qwen3-ASR przypięty do głównej karty przy kilku kartach Vulkan</td></tr>
 <tr><td><code>d02237bd</code></td><td><code>verify.mjs</code> na tym komputerze: Git Bash zamiast aliasu WSL</td></tr>
 <tr><td><code>0011a06b</code></td><td>14 poprawek po drugim przeglądzie, raport, poprawka znacznika w dzienniku zmian, <code>backup.sh</code></td></tr>
-<tr><td>(ten)</td><td>Poprawki po trzecim przeglądzie (rozdział 8), uzupełnienie raportu</td></tr></tbody></table></div>
+<tr><td><code>c3ec80fb</code></td><td>Poprawki po trzecim przeglądzie (rozdział 8), uzupełnienie raportu</td></tr>
+<tr><td><code>87a4a156</code></td><td>Raport: wynik <code>verify</code> (rozdział 9), poprawki po czwartym przeglądzie; zasady pracy przywrócone w pamięci</td></tr>
+<tr><td><code>7698da68</code></td><td><code>ammonia</code> 4.2.4, lista wyboru od pierwszego kliknięcia, testy strony Urządzenia — rozdział 10</td></tr>
+<tr><td><code>fce4fa7d</code></td><td>Raport: końcowa budowa z <code>7698da68</code>; pamięć projektu</td></tr>
+<tr><td><code>206c3796</code></td><td>Katalog crate&#39;ów odświeżony (<code>scripts/catalog.mjs</code>)</td></tr>
+<tr><td>(ten)</td><td>Poprawki raportu po piątym przeglądzie (liczby budżetu rozmiaru, ta tabela)</td></tr></tbody></table></div>
 <p>Szczegóły dla użytkownika: <a href="changelog.html">historia zmian</a> (0.0.63). Decyzja: <a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028</a>.</p>
 <h2 id="3-jak-to-sprawdzilam">3. Jak to sprawdziłam</h2>
 <ul>
@@ -443,10 +448,14 @@ w <code>6ff0c311</code> (pomiar działa już dla każdego producenta) — popraw
 liczyło od zera, a nie od ostatniego zamknięcia) — na szybkim komputerze test archiwum klikał po 190–250 ms
 i lista się nie otwierała. Zmierzone, poprawione w <code>ui-kit</code> (<code>Select.svelte</code>), nowy test cofa zegar strony do zera
 tuż przed kliknięciem — na starej kompilacji czerwony, po poprawce zielony.</li>
-<li>Po poprawkach: <strong>467/467</strong> (5 min), budżet rozmiaru zielony (434,6 KB gzip), vitest 394/394, <code>svelte-check</code> 0,
+<li>Po poprawkach: <strong>467/467</strong> (5 min), budżet rozmiaru zielony — okno główne JS 145,3 z 150 KB i CSS 13,7 z 30 KB,
+szybkie pytanie 37,7 z 40 KB, pigułka głosowa 7,9 z 8,0 KB (gzip; pigułka i okno główne blisko granicy), vitest 394/394, <code>svelte-check</code> 0,
 lint zielony.</li>
 </ul>
 </li>
+<li><strong>Piąty przegląd</strong> (commit <code>7698da68</code>, 2 obszary, każde znalezisko u 3 sceptyków): 5 zgłoszeń, 2 utrzymane —
+oba w tym raporcie (liczba przy budżecie rozmiaru była sumą modułów leniwych spoza budżetu; tabela commitów
+w rozdziale 2 bez ostatnich wpisów) — poprawione. Kod bez uwag.</li>
 <li><strong>Końcowa zbudowana wersja</strong> (Twoja zasada pracy nocnej): <code>alfa/target/shell/debug/alfa-desktop.exe</code> z commitu
 <code>7698da68</code> (00:37) — prawdziwa aplikacja jako instancja testowa: <strong>37 zielonych, 1 pominięty</strong> (brak Claude Code),
 pokrycie łącza 198 z 264 (75 %). Do <code>Alfa-uruchomiona</code> jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028
