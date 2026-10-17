@@ -4,22 +4,22 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-17T23:45:00+02:00"
+    "updated": "2026-10-18T00:45:00+02:00"
   },
-  "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana: 6ff0c311, 72c4e1cb, 55bc0f06, d02237bd (verify.mjs: Git Bash), 0011a06b (14 poprawek po 2. przeglądzie), c3ec80fb (4 poprawki po 3. przeglądzie: lista kart co 20 ms, dwie karty NVIDIA, ocena karty przy APU, angielski komunikat terminala). Czwarty przegląd: tylko 2 drobne poprawki raportu 28. ADR 0028 (DirectML dla Supertonic) PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10: praca samodzielna do 3:30, o 3:30 kopia na F:\\Alfa (cel właściciela), potem STOP.",
+  "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana: 6ff0c311, 72c4e1cb, 55bc0f06, d02237bd, 0011a06b, c3ec80fb (3. przegląd), 87a4a156 (raport, pamięć), 7698da68 (ammonia 4.2.4, Select bez pomijania pierwszego kliku, testy w przeglądarce 467/467). Końcowa budowa: alfa/target/shell/debug/alfa-desktop.exe z 7698da68 (e2e-app 37 + 1 pominięty, pokrycie 75 %). ADR 0028 PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10: o 3:30 kopia na F:Alfa, potem STOP.",
   "session_goal": "Właściciel (17.10): Alfa ma działać na kartach NVIDIA, AMD, Intel i zintegrowanych; pobrać potrzebne pliki i zapisać wszystko w dokumentacji; najwyższa precyzja. Noc: pracuj do 3:30, potem kopia F:\\Alfa.",
   "in_progress": [
-    "verify wersja 0.0.63 na c3ec80fb (raport: alfa/target/verify/0.0.63/raport-wersja.md)"
+    "Kopia na F:Alfa o 3:30 (scripts/backup.sh), potem STOP"
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
     "target\\debug rośnie szybko (17.10: 170 GB w kilka godzin — każda zmiana ustawień kompilacji = nowy komplet plików testowych); verify pomija etapy Rust przy małym miejscu. Sprzątanie: starsze duplikaty *.exe/*.pdb w target/debug/deps + target/debug/incremental (zwolnione 130 GB).",
-    "Na tym PC brak jq (etap grafu verify — sprawdzany ręcznie: 1733 krawędzie, 0 naruszeń), gh i Edge (etap E2E verify wymaga Edge: PW_CHANNEL=msedge)."
+    "Na tym PC brak jq (etap grafu verify — sprawdzany ręcznie: 1733 krawędzie, 0 naruszeń), gh i Edge (etap E2E verify wymaga Edge: PW_CHANNEL=msedge; ręcznie: Chromium Playwrighta 1194 w %LOCALAPPDATA%/ms-playwright, w apps/desktop/ui: pnpm build && PW_WORKERS=4 pnpm test:e2e)."
   ],
   "next_session": [
     "Pokazać właścicielowi raport alfa/docs/plan/28-raport-nocny-2026-10-18.md: ADR 0028 do podpisu, licencja DirectML (dane diagnostyczne, §2a), wyniki pomiarów na RX 9070 XT",
-    "Decyzja właściciela: wgrać 0.0.63 do Alfa-uruchomiona (deploy-owner.sh) po verify",
-    "Pobrania za zgodą: ammonia 4.2.4 (RUSTSEC-2026-0373, przed wydaniem); Edge albo Chromium Playwrighta 1194 (ok. 690 MB na dysku)",
+    "Decyzja właściciela: wgrać 0.0.63 do Alfa-uruchomiona (deploy-owner.sh) — wersja zbudowana i sprawdzona (7698da68)",
+    "Zrobione 18.10: ammonia 4.2.4, Chromium Playwrighta 1194. Zostaje: Edge (instalacja w systemie — właściciel), zip 9 (nowa wersja główna, RUSTSEC-2026-0367/0368/0369; Alfa nie woła ZipArchive::extract)",
     "Próby na sprzęcie: laptop z iGPU (RTX 4050 + Iris Xe), APU AMD, karta Intel; DirectML na NVIDIA",
     "C6.6 zostaje: osobny budżet pamięci na kartę (model-residency jedna pula)",
     "Resztki stare-node_modules-acl-2026-10-17 (1447 plików starego SID) — usunąć z uprawnieniami administratora"
@@ -39,13 +39,14 @@
     }
   },
   "test_results": {
-    "0.0.63": "Rust 546/0 (14 crate'ów) + 339/0 (10 crate'ów po 2. przeglądzie) + 86/0 (3 crate'y po 3. przeglądzie), vitest 393/393 (+1 test card-fit), svelte-check 0, lint i rozmiary zielone; prawdziwa aplikacja 37 zielonych + 1 pominięty (brak Claude Code), pokrycie łącza 198/264 (75 %); RX 9070 XT: DXCore/PDH, Supertonic CPU vs DirectML, Qwen3-ASR Vulkan 3/4 zdań identycznych"
+    "0.0.63": "verify wersja c3ec80fb: 16 zielonych / 2 czerwone (Edge, cargo deny zip) / 1 nieuruchomiony (jq); Rust 2897/0; po północy: testy po ammonia 63/0 + 186/0, przeglądarka (Chromium) 467/467, vitest 394/394, svelte-check 0, e2e-app 37 + 1 pominięty, pokrycie 198/264 (75 %); RX 9070 XT: DXCore/PDH, Supertonic CPU vs DirectML, Qwen3-ASR Vulkan"
   },
   "decisions_this_session": [
     "Na AMD/Intel rozpoznaje mowę Qwen3-ASR przez llama-server Vulkan (whisper.cpp nie wydaje wersji Vulkan) — bez budowania whisper.cpp",
     "DirectML tylko dla Supertonic, karta z własną pamięcią >= 12 GB, jawny powrót na procesor; Smart Turn zostaje na CPU",
     "APU z rezerwą z BIOS-u >= 6 GB liczone jak karta; przy dwóch kartach z pulą — osobna przed zintegrowaną (Rust i UI)",
     "Wolna pamięć karty NVIDIA: jedna karta — nvidia-smi jak dawniej; kilka — wiersz głównej karty po nazwie, bez niego liczniki PDH po LUID",
-    "Porządki: właściciel zgodził się tylko na usunięcie starej kompilacji powłoki; PLAN/, alfa-glos-proba, kopie na F: zostają; artefakty kompilacji w target/ to odtwarzalna pamięć podręczna"
+    "Porządki: właściciel zgodził się tylko na usunięcie starej kompilacji powłoki; PLAN/, alfa-glos-proba, kopie na F: zostają; artefakty kompilacji w target/ to odtwarzalna pamięć podręczna",
+    "Zasady pracy z laptopa przywrócone do pamięci asystenta na nowym PC (lustro memory-sync kasowało je z repo); stała zgoda na pobrania do 3 GB obejmuje łatki crates.io i przeglądarkę testową Playwrighta"
   ]
 }

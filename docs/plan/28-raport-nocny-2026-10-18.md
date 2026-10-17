@@ -140,3 +140,8 @@ przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności 
     tuż przed kliknięciem — na starej kompilacji czerwony, po poprawce zielony.
   - Po poprawkach: **467/467** (5 min), budżet rozmiaru zielony (434,6 KB gzip), vitest 394/394, `svelte-check` 0,
     lint zielony.
+- **Końcowa zbudowana wersja** (Twoja zasada pracy nocnej): `alfa/target/shell/debug/alfa-desktop.exe` z commitu
+  `7698da68` (00:37) — prawdziwa aplikacja jako instancja testowa: **37 zielonych, 1 pominięty** (brak Claude Code),
+  pokrycie łącza 198 z 264 (75 %). Do `Alfa-uruchomiona` jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028
+  i licencja DirectML czekają na Ciebie; pakiety z głosem Supertonic na karcie ≥ 12 GB, jak Twój RX 9070 XT,
+  zawierają DirectML).
