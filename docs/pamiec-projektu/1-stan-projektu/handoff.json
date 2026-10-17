@@ -4,7 +4,7 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-18T00:45:00+02:00"
+    "updated": "2026-10-18T00:58:00+02:00"
   },
   "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana: 6ff0c311, 72c4e1cb, 55bc0f06, d02237bd, 0011a06b, c3ec80fb (3. przegląd), 87a4a156 (raport, pamięć), 7698da68 (ammonia 4.2.4, Select bez pomijania pierwszego kliku, testy w przeglądarce 467/467). Końcowa budowa: alfa/target/shell/debug/alfa-desktop.exe z 7698da68 (e2e-app 37 + 1 pominięty, pokrycie 75 %). ADR 0028 PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10: o 3:30 kopia na F:Alfa, potem STOP.",
   "session_goal": "Właściciel (17.10): Alfa ma działać na kartach NVIDIA, AMD, Intel i zintegrowanych; pobrać potrzebne pliki i zapisać wszystko w dokumentacji; najwyższa precyzja. Noc: pracuj do 3:30, potem kopia F:\\Alfa.",
@@ -28,7 +28,7 @@
     "key_paths": {
       "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
       "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia (zawsze . .\\scripts\\portable-env.ps1)",
-      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; ostatnia zweryfikowana 2026-10-17_2115, następna 2026-10-18 3:30)",
+      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; zweryfikowane: 2026-10-17_2115, 2026-10-18_0054 = 7b544ab5; następna 2026-10-18 3:30)",
       "plan": "alfa/docs/plan/03-roadmapa.md (C6.6)",
       "raport": "alfa/docs/plan/28-raport-nocny-2026-10-18.md",
       "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md"

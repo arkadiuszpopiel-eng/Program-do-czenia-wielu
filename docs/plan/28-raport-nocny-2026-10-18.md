@@ -83,6 +83,8 @@ Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Dec
   — zwolnione 130 GB, wolne 138 GB.
 - Kopia zabezpieczająca `F:\Alfa\kopia-2026-10-17_2115` (po commicie 0.0.63): 5837 sum zgodnych, paczka git pełna.
   Kolejna o 3:30. Skrypt `backup.sh` naprawiony (na tym komputerze paczka git po cichu się nie tworzyła).
+- Dodatkowa kopia `F:\Alfa\kopia-2026-10-18_0054` (356 MB, stan `7b544ab5`) — na wypadek ponownej awarii przed
+  3:30: 5853 sumy zgodne, paczka git z pełną historią, gałąź w paczce = bieżący commit.
 
 ## 7. Po poprawkach drugiego przeglądu
 
