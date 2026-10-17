@@ -83,6 +83,9 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
 - Testy w przeglądarce na Chromium Playwrighta (na komputerze stacjonarnym nie ma Edge): 467/467 — w tym nowy test
   pierwszego kliknięcia listy wyboru; wcześniej 2 czerwone (nieaktualny napis w teście strony Urządzenia i lista
   wyboru pomijająca klik w pierwszych 0,3 s).
+- Prawdziwa aplikacja: 37 kolejnych poleceń łącza przećwiczonych na prawdziwym rdzeniu (Kreator agentek, skróty,
+  odmowy dla nieistniejących celów przed oknem systemowym, siecią i magazynem sekretów) — pokrycie 235 z 264 (89 %,
+  wcześniej 75 %); 41 testów zielonych, 1 pominięty (brak Claude Code).
 - Nie sprawdzono na sprzęcie: laptop z kartą zintegrowaną, APU AMD (małe i duże rezerwy) i karty Intel (brak tych
   maszyn); DirectML na kartach NVIDIA i Intel ≥ 12 GB i na APU z rezerwą ≥ 12 GB (włącza się sam, zmierzone tylko
   na osobnej karcie AMD); na karcie zintegrowanej z małą rezerwą DirectML jest wyłączony (niezmierzony).

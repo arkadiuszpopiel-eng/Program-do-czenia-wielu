@@ -151,6 +151,13 @@ przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności 
 - **Piąty przegląd** (commit `7698da68`, 2 obszary, każde znalezisko u 3 sceptyków): 5 zgłoszeń, 2 utrzymane —
   oba w tym raporcie (liczba przy budżecie rozmiaru była sumą modułów leniwych spoza budżetu; tabela commitów
   w rozdziale 2 bez ostatnich wpisów) — poprawione. Kod bez uwag.
+- **Pokrycie łącza w prawdziwej aplikacji: 198 → 235 z 264 (75 % → 89 %)** — nowy plik
+  `e2e-app/z-commands-2.spec.ts` (37 poleceń): Kreator agentek (podgląd, test na sucho, zapis tego samego hasha),
+  nadpisanie skrótu z zakazami AltGr i STOP WSZYSTKIEGO, odmowy dla nieistniejących celów — dla każdego polecenia
+  sprawdziłam w kodzie rdzenia, że odmowa pada przed oknem systemowym, Brokerem, siecią, magazynem sekretów
+  i otwarciem pliku. Nieprzećwiczone 29: dźwięk i mikrofon, kamera, schowek, zrzuty ekranu, okna systemowe,
+  aktualizacje z sieci, model językowy, hasło kopii (Menedżer poświadczeń Windows jest wspólny z Twoim kontem) —
+  tych w nocy celowo nie ruszam.
 - **Końcowa zbudowana wersja** (Twoja zasada pracy nocnej): `alfa/target/shell/debug/alfa-desktop.exe` z commitu
   `7698da68` (00:37) — prawdziwa aplikacja jako instancja testowa: **37 zielonych, 1 pominięty** (brak Claude Code),
   pokrycie łącza 198 z 264 (75 %). Do `Alfa-uruchomiona` jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028
