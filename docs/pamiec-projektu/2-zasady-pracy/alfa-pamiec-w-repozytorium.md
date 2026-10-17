@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 526ab23b-611a-489a-a8a3-7c1153e69825
-  modified: 2026-10-12T13:50:12.479Z
+  modified: 2026-10-17T22:02:29.362Z
 ---
 
 2026-10-12 właściciel (Spopielony): „Pamięć projektu i wszystkiego z nim związane mają być też zapisywane w katalogu
@@ -19,3 +19,7 @@ przeniesieniu albo kopii projektu zostawała na starym komputerze.
 `3-dziennik-sesji`, z `README.md` i datą kopii) i zacommitować. Źródła zostają na miejscu — w repozytorium jest
 lustro, więc nie edytować tam plików ręcznie. Nowy rodzaj notatek o projekcie = nowy opisany podkatalog i wpis
 w `README.md`. Żadnych sekretów w pamięci (skrypt odmawia kopii, gdy znajdzie klucz). Patrz [[alfa-zasady-pracy]].
+Nowy komputer (2026-10-18, [[maszyna-stacjonarna-2026-10-17]]): pamięć asystenta w `~/.claude` była pusta, a lustro
+usunęło z repo 10 plików zasad — przed `memory-sync.sh` na nowej maszynie skopiować zasady z
+`docs/pamiec-projektu/2-zasady-pracy` do `~/.claude/projects/…/memory/` i połączyć spis `MEMORY.md`; po synchronizacji
+sprawdzić `git status docs/pamiec-projektu` (usunięcia `D` = coś zginęło u źródła).

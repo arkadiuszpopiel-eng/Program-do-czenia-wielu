@@ -1,4 +1,6 @@
-- [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — kopia robocza na przenośnym E:, portable-env, pułapki budowy na Windows
+- [Maszyna stacjonarna od 2026-10-17](maszyna-stacjonarna-2026-10-17.md) — inny PC (AMD), uprawnienia NTFS, brak danych Alfy, F: podłączany okresowo
+- [Awaria 2026-10-17 i ciężkie zadania](awaria-2026-10-17-obciazenie.md) — brak pamięci + resety USB; cargo z -j6, bez incremental; backup.sh naprawiony
+- [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — (stan z laptopa) kopia robocza na E:, portable-env, pułapki budowy, sprzątanie target/
 - [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
 - [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie
 - [Alfa — budowanie aplikacji](alfa-budowanie-aplikacji.md) — wersja i budowa co 10 ukończonych punktów (od 15.10), nie po każdym
@@ -7,4 +9,4 @@
 - [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”
 - [Alfa — praca nocna](alfa-praca-nocna.md) — sesja do rana kończy się raportem, planem HTML i zbudowaną wersją; bez dźwięku w nocy
 - [Alfa — samodzielne testowanie](alfa-samodzielne-testowanie.md) — poziomy verify, testy sprzętowe, instancja testowa obok Alfy właściciela; „nie sprawdziłem” tylko z trzech powodów
-- [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji
+- [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo

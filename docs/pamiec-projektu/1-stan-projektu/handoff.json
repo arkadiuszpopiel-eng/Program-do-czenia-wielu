@@ -3,32 +3,35 @@
     "version": "2.1",
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
-    "last_updated": "2026-10-12T05:00:00+02:00",
-    "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-16T06:00:00+02:00"
+    "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
+    "updated": "2026-10-17T23:45:00+02:00"
   },
-  "current_state": "Noc 15/16.10 zakończona (STOP na polecenie właściciela ok. 6:15). 0.0.62 (serie 3 i 4) wgrana: końcowa budowa 5:44 z commita 47121474. verify wersja 0.0.62 jednym biegiem ZIELONY 19/19 (Rust 2872/0, UI 393, przeglądarka 466, aplikacja 38/38, pokrycie 74,6%); verify sprzet ZIELONY (testy sprzętowe + 4 próby obowiązków na modelu lokalnym). Raport: docs/plan/27-raport-nocny-2026-10-16.md. Kopie: F:/Alfa/kopia-2026-10-16_0449, _0505 i końcowa (_0447 niepełna — do decyzji właściciela).",
-  "session_goal": "Cel właściciela (noc 15/16.10): kolejne punkty seriami po 10, do 4:30 działająca, przetestowana i zbudowana wersja, plan HTML ze stanem, kopia bezpieczeństwa na F:\\Alfa gotowa na 5:00.",
-  "in_progress": [],
+  "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana: 6ff0c311, 72c4e1cb, 55bc0f06, d02237bd (verify.mjs: Git Bash), 0011a06b (14 poprawek po 2. przeglądzie), c3ec80fb (4 poprawki po 3. przeglądzie: lista kart co 20 ms, dwie karty NVIDIA, ocena karty przy APU, angielski komunikat terminala). Czwarty przegląd: tylko 2 drobne poprawki raportu 28. ADR 0028 (DirectML dla Supertonic) PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10: praca samodzielna do 3:30, o 3:30 kopia na F:\\Alfa (cel właściciela), potem STOP.",
+  "session_goal": "Właściciel (17.10): Alfa ma działać na kartach NVIDIA, AMD, Intel i zintegrowanych; pobrać potrzebne pliki i zapisać wszystko w dokumentacji; najwyższa precyzja. Noc: pracuj do 3:30, potem kopia F:\\Alfa.",
+  "in_progress": [
+    "verify wersja 0.0.63 na c3ec80fb (raport: alfa/target/verify/0.0.63/raport-wersja.md)"
+  ],
   "blocking_issues": [
-    "Dysk E: resetuje się przy obciążeniu (UASPStor 129); decyzja właściciela: wszystko zostaje na E:"
+    "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
+    "target\\debug rośnie szybko (17.10: 170 GB w kilka godzin — każda zmiana ustawień kompilacji = nowy komplet plików testowych); verify pomija etapy Rust przy małym miejscu. Sprzątanie: starsze duplikaty *.exe/*.pdb w target/debug/deps + target/debug/incremental (zwolnione 130 GB).",
+    "Na tym PC brak jq (etap grafu verify — sprawdzany ręcznie: 1733 krawędzie, 0 naruszeń), gh i Edge (etap E2E verify wymaga Edge: PW_CHANNEL=msedge)."
   ],
   "next_session": [
-    "Pokazać właścicielowi raport 27 i nowości 0.0.62",
-    "C2.10: decyzja o kontakcie bezpieczeństwa w SECURITY.md",
-    "C2.11 PDF: wymaga nowej biblioteki (pobranie + cargo deny)",
-    "P4: karty z profilem, Arena; P5: wyszukiwanie w sieci, wiadomości, Naucz",
-    "Usunąć kopię roboczą alfa-s3: najpierw rmdir dowiązań node_modules (3 szt.), potem git worktree remove"
+    "Pokazać właścicielowi raport alfa/docs/plan/28-raport-nocny-2026-10-18.md: ADR 0028 do podpisu, licencja DirectML (dane diagnostyczne, §2a), wyniki pomiarów na RX 9070 XT",
+    "Decyzja właściciela: wgrać 0.0.63 do Alfa-uruchomiona (deploy-owner.sh) po verify",
+    "Pobrania za zgodą: ammonia 4.2.4 (RUSTSEC-2026-0373, przed wydaniem); Edge albo Chromium Playwrighta 1194 (ok. 690 MB na dysku)",
+    "Próby na sprzęcie: laptop z iGPU (RTX 4050 + Iris Xe), APU AMD, karta Intel; DirectML na NVIDIA",
+    "C6.6 zostaje: osobny budżet pamięci na kartę (model-residency jedna pula)",
+    "Resztki stare-node_modules-acl-2026-10-17 (1447 plików starego SID) — usunąć z uprawnieniami administratora"
   ],
   "env_snapshot": {
     "key_paths": {
       "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
-      "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia",
-      "dane_alfy": "%LOCALAPPDATA%/Alfa",
-      "plan": "alfa/docs/plan/README.md (v6) + alfa/docs/KONTYNUACJA.md (etapy 0–8 = etap A i C1)",
-      "status": "alfa/docs/STATUS.md",
-      "katalog": "alfa/docs/CATALOG.md",
-      "plan_html": "alfa/docs/html/index.html (generowany)"
+      "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia (zawsze . .\\scripts\\portable-env.ps1)",
+      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; ostatnia zweryfikowana 2026-10-17_2115, następna 2026-10-18 3:30)",
+      "plan": "alfa/docs/plan/03-roadmapa.md (C6.6)",
+      "raport": "alfa/docs/plan/28-raport-nocny-2026-10-18.md",
+      "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md"
     },
     "ports": {
       "alfa-ui (atrapa)": 5173,
@@ -36,13 +39,13 @@
     }
   },
   "test_results": {
-    "0.0.60": "verify wersja 17/19 + 2 techniczne poprawione; e2e-app 36/36; pokrycie łącza 74%",
-    "0.0.61": "Rust 2858 zielonych / 1 czerwony (czasowy, poprawiony); UI 381; przeglądarka 437; etap aplikacji pominięty (zastąpiony 0.0.62)",
-    "0.0.62": "verify wersja 19/19 ZIELONY (commit 47121474): Rust 2872/0, UI 393, przeglądarka 466, aplikacja 38/38, pokrycie 197/264 (74,6%); verify sprzet ZIELONY"
+    "0.0.63": "Rust 546/0 (14 crate'ów) + 339/0 (10 crate'ów po 2. przeglądzie) + 86/0 (3 crate'y po 3. przeglądzie), vitest 393/393 (+1 test card-fit), svelte-check 0, lint i rozmiary zielone; prawdziwa aplikacja 37 zielonych + 1 pominięty (brak Claude Code), pokrycie łącza 198/264 (75 %); RX 9070 XT: DXCore/PDH, Supertonic CPU vs DirectML, Qwen3-ASR Vulkan 3/4 zdań identycznych"
   },
   "decisions_this_session": [
-    "Ręczna kolejka modeli ma pierwszeństwo przed doborem według trudności (przełącznik reorder_queues)",
-    "Krytyczka domyślnie na lekkim modelu; poprawka po odrzuceniu szczebel wyżej",
-    "Bramka rozmiaru z jawnymi wyjątkami (testy, atrapy, dane) i sufitem"
+    "Na AMD/Intel rozpoznaje mowę Qwen3-ASR przez llama-server Vulkan (whisper.cpp nie wydaje wersji Vulkan) — bez budowania whisper.cpp",
+    "DirectML tylko dla Supertonic, karta z własną pamięcią >= 12 GB, jawny powrót na procesor; Smart Turn zostaje na CPU",
+    "APU z rezerwą z BIOS-u >= 6 GB liczone jak karta; przy dwóch kartach z pulą — osobna przed zintegrowaną (Rust i UI)",
+    "Wolna pamięć karty NVIDIA: jedna karta — nvidia-smi jak dawniej; kilka — wiersz głównej karty po nazwie, bez niego liczniki PDH po LUID",
+    "Porządki: właściciel zgodził się tylko na usunięcie starej kompilacji powłoki; PLAN/, alfa-glos-proba, kopie na F: zostają; artefakty kompilacji w target/ to odtwarzalna pamięć podręczna"
   ]
 }
