@@ -11,11 +11,13 @@ Wersji 0.0.63 **nie wgrałam** do `Alfa-uruchomiona` (tam nadal 0.0.62) — to T
 - **Karty AMD, Intel i zintegrowane są obsługiwane na równi z NVIDIA**: wykrywanie od sterownika (DXCore), te same
   progi pamięci, klasa „karta zintegrowana”, pakiety z silnikiem Vulkan, pomiar pamięci kart bez `nvidia-smi`.
 - **Mowa na AMD/Intel liczy na karcie**: Qwen3-ASR przez `llama-server` Vulkan — na RX 9070 XT 0,16–0,23 s na zdanie
-  (wcześniej Whisper na procesorze, ok. 54 s na zdanie na laptopie). Whisper nie ma oficjalnej wersji Vulkan.
+  (wcześniej Whisper na procesorze, ok. 54 s na zdanie na laptopie). Whisper nie ma oficjalnej wersji Vulkan. Model
+  rozmowy zostawia na karcie miejsce na Qwen3-ASR (3 GB), żeby oba się zmieściły.
 - **Głos Supertonic na karcie przez DirectML** (pobrane z NuGet Microsoftu, sumy zgodne z katalogiem NuGet):
   0,58 s zamiast 0,95 s na zdanie, 538 MB pamięci karty; włącza się na karcie z ≥ 12 GB. **ADR 0028 do podpisu.**
-- **Trzy niezależne przeglądy kodu** (agenty AI, każde znalezisko sprawdzane przez 3 sceptyków): 15 + 14 + 4 usterki
-  potwierdzone i poprawione, m.in. podwójne liczenie rezerwy pamięci APU.
+- **Siedem przeglądów kodu** (agenty AI, każde znalezisko sprawdzane przez 3 sceptyków), w tym całościowy przegląd
+  wszystkich zmian od 0.0.62: usterki potwierdzone i poprawione, m.in. podwójne liczenie rezerwy pamięci APU
+  i Qwen3-ASR obok modelu rozmowy na karcie AMD/Intel 6–8 GB (rozdziały 8–12).
 - **Awaria komputera o 20:31** (brak pamięci + resety mostka USB dysku E:): dyski, repozytorium i pliki sprawdzone —
   nic nie stracone. Ciężkie zadania od tej pory z ograniczeniem równoległości.
 
@@ -174,9 +176,8 @@ podwójne) — wszystkie poprawione:
 - **[poważne] Qwen3-ASR na karcie AMD/Intel 6–11 GB obok modelu rozmowy** — dwie zmiany 0.0.63 razem: karta AMD/Intel
   od 6 GB dostaje model rozmowy na karcie, a pakiety „Bardzo dobry” i „Dobry” — Qwen3-ASR. Qwen3-ASR (ok. 2,9 GB)
   ładował się pierwszy, a model rozmowy zostawia na mowę tylko 1,5 GB (rozmiar Whispera) — razem ok. 7 GB na karcie
-  6 GB. Teraz na kompilacji Vulkan Qwen3-ASR liczy na karcie dopiero od 12 GB własnej pamięci karty (Twój RX 9070 XT —
-  bez zmian), na mniejszej na procesorze (ok. 2,4 s na zdanie; Whisper na procesorze ok. 54 s) — ta sama reguła
-  w rozmowie, w autoteście i w widoku silników (`stt::qwen_free`).
+  6 GB. Poprawka ostateczna — rozdział 12 (pierwsza wersja, Qwen3-ASR na procesorze na każdej karcie Vulkan poniżej
+  12 GB, została odrzucona w następnym przeglądzie).
 - **250 ms czekania przed startem dyktowania i rozmowy** na kartach AMD/Intel: pomiar wolnej pamięci robił pełny
   odczyt liczników (dwie próbki obciążenia co 250 ms i nazwy procesów) na wątku asynchronicznym. Nowy odczyt samej
   pamięci (`HardwarePort::gpu_memory`) — jedna próbka, bez czekania.
@@ -191,3 +192,22 @@ podwójne) — wszystkie poprawione:
   zintegrowanej — teraz ta sama część pamięci co rdzeń (najwyżej ćwierć RAM i 4 GB).
 - **SPEC modułu `models`** opisywał skład pakietów sprzed 0.0.63 — uzupełniony; także ADR 0028 i SPEC `voice-stt`
   (próg 12 GB dla Qwen3-ASR na Vulkanie).
+
+## 12. Przegląd poprawek całościowego przeglądu (01:40–01:55) i poprawka ostateczna
+
+Przegląd commitu `c24da9ad` (2 obszary, 3 sceptyków): 11 zgłoszeń, 9 utrzymanych. Najważniejsze — **moja pierwsza
+poprawka była za szeroka**: Qwen3-ASR na procesorze na każdej karcie Vulkan poniżej 12 GB spowalniał mowę także tam,
+gdzie model rozmowy w ogóle nie korzysta z karty (klasa „nieznana”: karta AMD/Intel 4–5 GB albo 6–11 GB przy RAM
+poniżej 16 GB, rozmowa przez API), i tam, gdzie oba modele się mieszczą (Bielik 1.5B + Qwen3-ASR na 8 GB). Poprawka
+ostateczna trafia w przyczynę: **gdy Qwen3-ASR liczy przez Vulkan na tej samej karcie, model rozmowy zostawia mu
+3 GB** (`stt::chat_stt_reserve_mb`, `QWEN_VULKAN_RESERVE_MB`) zamiast 1,5 GB na Whispera. Na karcie 6 GB: model 4.5B
+ok. 2,4 GB na karcie + Qwen3-ASR 2,9 GB + zapas 0,8 GB ≈ 6,0 GB z 6,1 GB; na 8 GB — ok. 8,0 GB z 8,2 GB. Mowa zostaje
+szybka (na karcie), a część warstw modelu 4.5B na kartach 6–8 GB liczy procesor (odpowiedzi trochę wolniejsze).
+Laptop z NVIDIA (Qwen3-ASR przez CUDA) — bez zmian; to samo zjawisko na NVIDIA ≥ 8 GB w „Wzorcowym” jest sprzed 0.0.63
+i zostaje w zadaniu „osobny budżet pamięci na kartę”.
+
+Pozostałe utrzymane (dokumenty): komunikat autotestu i opisy w ADR 0028, SPEC-ach i dzienniku zmian po pierwszej
+wersji poprawki (wrócone do stanu zgodnego z kodem), „kilkanaście razy szybciej” niezgodne z liczbami (usunięte),
+pierwsze zdanie pozycji o dwóch kartach ucinane w oknie „Co nowego” na dwukropku (przeredagowane), streszczenie tego
+raportu (rozdział 1) i skład pakietów w SPEC `models` (uzupełniony o Qwen3-ASR, Supertonic, Smart Turn i ONNX Runtime).
+Testy: `app-modules` i `app-voice` 83/0 (nowy test rezerwy: Vulkan — 3 GB, CUDA obok — bez zmian), clippy czysty.

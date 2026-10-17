@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 70 |
-| Linie Rust (z testami) | 421 570 |
-| Testy (`#[test]`, `#[tokio::test]`) | 2947 |
+| Linie Rust (z testami) | 421 693 |
+| Testy (`#[test]`, `#[tokio::test]`) | 2948 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -31,10 +31,10 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `device-profile` | F1 | service | inproc | C · I · F | 3089 | 27 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
-| `platform` | — | — | — | C · F | 14 453 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
+| `device-profile` | F1 | service | inproc | C · I · F | 3098 | 27 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
+| `platform` | — | — | — | C · F | 14 459 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 5223 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
-| `platform-windows` | F1, F5, F6 | service | inproc | I | 9022 | 80 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
+| `platform-windows` | F1, F5, F6 | service | inproc | I | 9044 | 80 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
 | `platform-windows-diag` | F1, F5, F6 | — | — | I | 664 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2161 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -161,7 +161,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 1618 | 7 | — |  |
 | `app-models` | — | — | — | pojedynczy | 8023 | 53 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 7714 | 50 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 7779 | 51 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 1119 | 3 | — |  |
@@ -169,7 +169,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-tasks` | — | — | — | pojedynczy | 3694 | 13 | — |  |
 | `app-terminal` | — | — | — | pojedynczy | 534 | 4 | — |  |
 | `app-updates` | — | — | — | pojedynczy | 1301 | 13 | — |  |
-| `app-voice` | — | — | — | pojedynczy | 6127 | 32 | — |  |
+| `app-voice` | — | — | — | pojedynczy | 6148 | 32 | — |  |
 
 ## Biblioteki wspólne (`lib-*`)
 

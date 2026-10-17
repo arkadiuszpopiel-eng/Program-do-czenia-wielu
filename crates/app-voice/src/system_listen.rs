@@ -96,12 +96,8 @@ impl SystemVoice {
             return Ok(whisper);
         };
         // Pomiar wolnej pamięci karty: gdy zajął ją model rozmowy, wybieramy silnik, który da radę.
-        // Karta AMD/Intel poniżej 12 GB zostaje dla modelu rozmowy (`stt::qwen_free`).
-        let free = app_modules::stt::qwen_free(
-            app_modules::gpu_mem::free_vram_mb(),
-            config.vulkan,
-            app_modules::stt_device::main_card_mb().flatten(),
-        );
+        // (Model rozmowy zostawia na karcie Vulkan miejsce na Qwen3-ASR — `stt::chat_stt_reserve_mb`.)
+        let free = app_modules::gpu_mem::free_vram_mb();
         let plan = app_modules::stt::stt_plan(
             config.gpu,
             app_modules::stt::server_cuda(&self.paths).is_some(),

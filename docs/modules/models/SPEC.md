@@ -145,10 +145,12 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 
 
 ## Pakiety 1–6 i „Napraw” (2026-10-07)
-- **Skala ocen 6 → 1** (`bundle_data.rs`): 6 Wzorcowy (Bielik 4.5B, Whisper turbo, Piper, Silero VAD, openWakeWord,
-  WeSpeaker, e5; karta ≥ 8 GB), 5 Bardzo dobry (bez słowa wywoławczego i mówcy; karta ≥ 6 GB), 4 Dobry (Bielik 1.5B +
-  turbo + Piper + VAD + e5; RAM ≥ 12 GB i karta ≥ 4 GB albo procesor ≥ 8 rdzeni), 3 Zrównoważony (1.5B + small + Piper
-  + VAD), 2 Lekki (1.5B + small + VAD), 1 Minimalny (1.5B). Progi w MB z tolerancją raportowania systemu (16 GB RAM →
+- **Skala ocen 6 → 1** (`bundle_data.rs`, stan 0.0.63): 6 Wzorcowy (Bielik 4.5B, Qwen3-ASR, Whisper turbo i small,
+  Supertonic 3, Piper, Smart Turn, ONNX Runtime, Silero VAD, openWakeWord, WeSpeaker, e5; karta ≥ 8 GB), 5 Bardzo
+  dobry (jak 6 bez Qwen3-ASR, słowa wywoławczego i mówcy; karta ≥ 6 GB), 4 Dobry (Bielik 1.5B + turbo i small +
+  Supertonic 3 + Piper + Smart Turn + ONNX Runtime + VAD + e5; RAM ≥ 12 GB i karta ≥ 4 GB albo procesor ≥ 8 rdzeni),
+  3 Zrównoważony (1.5B + small + Piper + Smart Turn + ONNX Runtime + VAD), 2 Lekki (1.5B + small + VAD), 1 Minimalny
+  (1.5B). Pozycje zależne od karty dokłada `members_for` (niżej). Progi w MB z tolerancją raportowania systemu (16 GB RAM →
   ≥ 15 000 MB, karta 8 GB → ≥ 7 500 MB); próg „na styk” z opisem kompromisu (np. 4.5B częściowo na karcie 6 GB).
 - **Dobór silników do maszyny** (`bundle_machine.rs`, `Machine::from_profile` — główna karta wg
   `Profile::primary_gpu`: karta z własną pulą pamięci, osobna przed zintegrowaną, ≥ 3 500 MB; RAM bez rezerwy APU
@@ -156,7 +158,7 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   w zapasie; AMD/Intel → `llama-server` Vulkan + CPU w zapasie, `whisper-server` CPU; sama karta zintegrowana z Vulkanem
   przy ≥ 16 GB RAM → jak AMD/Intel (lekki model na karcie); laptop NVIDIA z kartą zintegrowaną → dodatkowo
   `llama-vulkan` w zapasie (lekki model); bez karty → CPU. Pozycje zależne od karty (`members_for`): na Vulkanie
-  Qwen3-ASR w pakietach z Whisperem turbo (na karcie liczy od 12 GB — `stt::qwen_free`; na mniejszej na procesorze),
+  Qwen3-ASR w pakietach z Whisperem turbo (model rozmowy zostawia mu wtedy na karcie 3 GB — `stt::chat_stt_reserve_mb`),
   przy karcie z własną pamięcią ≥ 12 GB i głosie Supertonic — `onnxruntime-directml` i `directml` (ADR 0028).
   Dopasowanie `fits` / `tight` / `too_weak` z uzasadnieniem (PL/EN), zalecany = najwyższy `fits`.
 - **Stan pakietu** ze stanów pozycji (pierwszeństwo: pobieranie → uszkodzony → zgoda TOFU → zainstalowany → częściowo);

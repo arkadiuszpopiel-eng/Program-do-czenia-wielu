@@ -98,18 +98,10 @@ impl SystemVoice {
             );
         };
         // Próba nie zabiera karty trwającej rozmowie: na karcie tylko przy wolnej pamięci.
-        // Ta sama reguła co rozmowa: karta AMD/Intel poniżej 12 GB zostaje dla modelu rozmowy.
-        let vulkan = config.vulkan;
-        let free = tokio::task::spawn_blocking(move || {
-            app_modules::stt::qwen_free(
-                app_modules::gpu_mem::free_vram_mb(),
-                vulkan,
-                app_modules::stt_device::main_card_mb().flatten(),
-            )
-        })
-        .await
-        .ok()
-        .flatten();
+        let free = tokio::task::spawn_blocking(app_modules::gpu_mem::free_vram_mb)
+            .await
+            .ok()
+            .flatten();
         config.gpu = app_modules::stt::qwen_on_gpu(config.gpu, free);
         if config.gpu {
             let (server, vulkan) = (config.server.clone(), config.vulkan);

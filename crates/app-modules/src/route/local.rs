@@ -80,6 +80,10 @@ pub fn local_config(paths: &AppPaths) -> LocalConfig {
     config.provider_id = LOCAL_PROVIDER.into();
     // Na maszynie z kilkoma kartami model główny jest przypinany do karty głównej.
     config.pin_device = true;
+    // Qwen3-ASR przez Vulkan na tej samej karcie (AMD, Intel): miejsce na jego rozmiar, nie Whispera.
+    if let Some(reserve) = crate::stt::chat_stt_reserve_mb(paths) {
+        config.stt_reserve_mb = reserve;
+    }
     for key in [BackendKey::Vulkan, BackendKey::Cuda, BackendKey::Cpu] {
         config.server_bin.insert(key, server_for(paths, key).0);
         config.server_candidates.insert(key, candidates(paths, key));
