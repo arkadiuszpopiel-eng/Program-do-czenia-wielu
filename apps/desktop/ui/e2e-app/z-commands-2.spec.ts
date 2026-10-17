@@ -115,3 +115,33 @@ test('kolejne polecenia na nieistniejących celach kończą się czytelną odmow
   // Usunięcie czegoś, czego nie ma, może być bez skutku albo odmową — nigdy błędem bez opisu.
   await settled(main, 'plugins_remove', { pluginId: 'brak' });
 });
+
+test('eksport, paczki, kopie, załączniki i propozycje: odmowa przed oknem systemowym', async ({
+  alfa,
+}) => {
+  const { main } = alfa;
+  // Sprawdzone w kodzie: sesja albo uchwyt są weryfikowane przed oknem zapisu/otwarcia,
+  // a niepoprawny manifest — przed modułem wtyczek i umiejętności.
+  const missing: [string, Record<string, unknown>][] = [
+    ['sessions_export', { sessionId: 'brak-sesji' }],
+    ['sessions_export_conversation', { sessionId: 'brak-sesji', format: 'markdown', turnId: null }],
+    ['transfer_inspect', { password: null, handle: 'brak-uchwytu' }],
+    [
+      'transfer_import',
+      { request: { handle: 'brak-uchwytu', mode: 'add', resolutions: {}, password: null } },
+    ],
+    ['backups_restore', { file: 'brak-kopii.alfa' }],
+    ['attachments_remove', { sessionId: 'brak-sesji', attachmentId: 'brak' }],
+    ['attachments_add_dropped', { sessionId: 'brak-sesji' }],
+    ['permissions_open_approval', { approvalId: 'brak' }],
+    ['skills_propose', { skill: {} }],
+    ['plugins_propose', { manifest: {}, wasmB64: 'AAAA' }],
+  ];
+  for (const [command, args] of missing) {
+    await test.step(command, async () => {
+      await refused(main, command, args);
+    });
+  }
+  // Wyłączenie mikrofonu rozmowy: bez silników głosu odmowa, z nimi — mikrofon wyłączony.
+  await settled(main, 'voice_set_mic_enabled', { enabled: false });
+});
