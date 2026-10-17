@@ -91,11 +91,22 @@ describe('pakiety 1–6: logika strony', () => {
     });
   });
 
-  it('główna karta: największa pamięć', () => {
-    const gpu = (model: string, vram_mb: number) => ({ vendor: 'X', model, vram_mb, backends: [] });
+  it('główna karta: jak Profile::primary_gpu w rdzeniu', () => {
+    const gpu = (model: string, vram_mb: number, integrated = false) => ({
+      vendor: 'X',
+      model,
+      vram_mb,
+      integrated,
+      backends: [],
+    });
     const profile = (gpus: ReturnType<typeof gpu>[]) =>
       ({ machine: { gpus } }) as unknown as DeviceProfile;
-    expect(primaryGpu(profile([gpu('iGPU', 128), gpu('RTX', 5921)]))?.model).toBe('RTX');
+    expect(primaryGpu(profile([gpu('iGPU', 128, true), gpu('RTX', 5921)]))?.model).toBe('RTX');
+    // APU z rezerwą 8 GB obok RTX 8 GB: osobna przed zintegrowaną (rdzeń składa pakiety na RTX).
+    expect(primaryGpu(profile([gpu('780M', 8192, true), gpu('RTX', 8188)]))?.model).toBe('RTX');
+    // Sama zintegrowana z małą rezerwą — nadal ona; dwie takie same — pierwsza.
+    expect(primaryGpu(profile([gpu('780M', 4096, true)]))?.model).toBe('780M');
+    expect(primaryGpu(profile([gpu('A', 16304), gpu('B', 16304)]))?.model).toBe('A');
     expect(primaryGpu(profile([]))).toBeNull();
   });
 });

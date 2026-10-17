@@ -15,6 +15,29 @@ fn count(n: usize) -> u32 {
     u32::try_from(n).unwrap_or(u32::MAX)
 }
 
+/// Czy Qwen3-ASR policzy na karcie przed pierwszym planem — ta sama reguła co rozmowa (karta z pulą
+/// pamięci, przy Vulkanie ≥ 12 GB: `stt::qwen_free`). Lista kart z pamięcią na 30 s: widok silników
+/// składa się co takt czytania na głos (20 ms) także bez planu rozpoznawania, a karty zmieniają się
+/// rzadko (karta zewnętrzna). Karta nieznana (błąd odczytu) — jak dotąd „na karcie”.
+fn qwen_card_ok(vulkan: bool) -> bool {
+    use std::sync::{Mutex, PoisonError};
+    use std::time::{Duration, Instant};
+    static LAST: Mutex<Option<(Instant, Option<Option<u32>>)>> = Mutex::new(None);
+    let mut last = LAST.lock().unwrap_or_else(PoisonError::into_inner);
+    let card = match *last {
+        Some((at, card)) if at.elapsed() < Duration::from_secs(30) => card,
+        _ => {
+            let card = app_modules::stt_device::main_card_mb();
+            *last = Some((Instant::now(), card));
+            card
+        }
+    };
+    match card {
+        None => true,
+        Some(mb) => mb.is_some() && app_modules::stt::qwen_free(None, vulkan, mb) != Some(0),
+    }
+}
+
 /// Stan strażnika w postaci dla okna.
 pub(crate) fn guard_view(status: &GuardStatus) -> SttGuardView {
     let (samples, fallbacks, flagged) = status.counts;
@@ -76,7 +99,7 @@ impl SystemVoice {
                 // liczy na procesorze — tani odczyt listy kart, bez liczników. Leniwie: widok
                 // składa się co takt dyktowania (20 ms), a po złożeniu wystarcza ostatni plan.
                 gpu: plan.map_or_else(
-                    || cfg.gpu && app_modules::gpu_mem::has_main_card() != Some(false),
+                    || cfg.gpu && qwen_card_ok(cfg.vulkan),
                     |p| p == app_modules::stt::SttPlan::QwenGpu,
                 ),
                 fallback: Some(SttEngineKind::Whisper),

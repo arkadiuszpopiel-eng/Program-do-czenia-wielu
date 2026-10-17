@@ -85,7 +85,8 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 
 ## Otwarte pytania
 - Przypięcie SHA-256 i potwierdzenie adresów/licencji pozycji „do potwierdzenia” (bramka ludzka; zmiana `confirmed`).
-- Build Vulkan `whisper-server` — brak w wydaniach whisper.cpp (desktop AMD: STT na CPU); CUDA — od fali 6.
+- Build Vulkan `whisper-server` — brak w wydaniach whisper.cpp (desktop AMD: Whisper na CPU, od 0.0.63 głównym
+  silnikiem jest tam Qwen3-ASR przez `llama-server` Vulkan — ADR 0028); CUDA — od fali 6.
 - Podpisy Authenticode binariów sidecarów (P-08) — dziś tylko SHA-256/TOFU.
 - Przebudowa (`search-impl::reindex_all`) otwiera naraz wszystkie bazy sesji przez `SessionDbProvider` (pamięć
   podręczna `sessions` ich nie zamyka) — przy setkach sesji RAM rośnie; do rozważenia zamykanie baz po kroku.
@@ -149,9 +150,15 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   turbo + Piper + VAD + e5; RAM ≥ 12 GB i karta ≥ 4 GB albo procesor ≥ 8 rdzeni), 3 Zrównoważony (1.5B + small + Piper
   + VAD), 2 Lekki (1.5B + small + VAD), 1 Minimalny (1.5B). Progi w MB z tolerancją raportowania systemu (16 GB RAM →
   ≥ 15 000 MB, karta 8 GB → ≥ 7 500 MB); próg „na styk” z opisem kompromisu (np. 4.5B częściowo na karcie 6 GB).
-- **Dobór silników do maszyny** (`bundles.rs`, `Machine::from_profile` — główna karta ≥ 3 500 MB): NVIDIA → `llama-server`
-  i `whisper-server` CUDA + CPU w zapasie; AMD/Intel → `llama-server` Vulkan + CPU w zapasie, `whisper-server` CPU;
-  bez karty → CPU. Dopasowanie `fits` / `tight` / `too_weak` z uzasadnieniem (PL/EN), zalecany = najwyższy `fits`.
+- **Dobór silników do maszyny** (`bundle_machine.rs`, `Machine::from_profile` — główna karta wg
+  `Profile::primary_gpu`: karta z własną pulą pamięci, osobna przed zintegrowaną, ≥ 3 500 MB; RAM bez rezerwy APU
+  liczonej jako pamięć karty — `Profile::system_ram_mb`): NVIDIA → `llama-server` i `whisper-server` CUDA + CPU
+  w zapasie; AMD/Intel → `llama-server` Vulkan + CPU w zapasie, `whisper-server` CPU; sama karta zintegrowana z Vulkanem
+  przy ≥ 16 GB RAM → jak AMD/Intel (lekki model na karcie); laptop NVIDIA z kartą zintegrowaną → dodatkowo
+  `llama-vulkan` w zapasie (lekki model); bez karty → CPU. Pozycje zależne od karty (`members_for`): na Vulkanie
+  Qwen3-ASR w pakietach z Whisperem turbo (na karcie liczy od 12 GB — `stt::qwen_free`; na mniejszej na procesorze),
+  przy karcie z własną pamięcią ≥ 12 GB i głosie Supertonic — `onnxruntime-directml` i `directml` (ADR 0028).
+  Dopasowanie `fits` / `tight` / `too_weak` z uzasadnieniem (PL/EN), zalecany = najwyższy `fits`.
 - **Stan pakietu** ze stanów pozycji (pierwszeństwo: pobieranie → uszkodzony → zgoda TOFU → zainstalowany → częściowo);
   `missing_bytes` — górne oszacowanie (bez pobranej części bieżącego pliku).
 - **Działania** (`bundle_ops.rs`, z istniejących prymitywów): `models_bundle_download` — brakujące, wstrzymane

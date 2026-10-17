@@ -158,8 +158,36 @@ przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności 
   i otwarciem pliku. Nieprzećwiczone 29: dźwięk i mikrofon, kamera, schowek, zrzuty ekranu, okna systemowe,
   aktualizacje z sieci, model językowy, hasło kopii (Menedżer poświadczeń Windows jest wspólny z Twoim kontem) —
   tych w nocy celowo nie ruszam.
+- **Całościowy przegląd wszystkich zmian od 0.0.62** (rozdział 11).
 - **Końcowa zbudowana wersja** (Twoja zasada pracy nocnej): `alfa/target/shell/debug/alfa-desktop.exe` z commitu
   `7698da68` (00:37) — prawdziwa aplikacja jako instancja testowa: **37 zielonych, 1 pominięty** (brak Claude Code),
   pokrycie łącza 198 z 264 (75 %). Do `Alfa-uruchomiona` jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028
   i licencja DirectML czekają na Ciebie; pakiety z głosem Supertonic na karcie ≥ 12 GB, jak Twój RX 9070 XT,
   zawierają DirectML).
+
+## 11. Całościowy przegląd (wszystkie zmiany od 0.0.62, 01:00–01:30)
+
+Wcześniejsze przeglądy szły commit po commicie; ten patrzył na całość (3 obszary: przepływ kart od wykrycia do
+interfejsu, odporność procesów, kontrakty), każde znalezisko u 3 sceptyków. 13 zgłoszeń, 9 utrzymanych (jedno
+podwójne) — wszystkie poprawione:
+
+- **[poważne] Qwen3-ASR na karcie AMD/Intel 6–11 GB obok modelu rozmowy** — dwie zmiany 0.0.63 razem: karta AMD/Intel
+  od 6 GB dostaje model rozmowy na karcie, a pakiety „Bardzo dobry” i „Dobry” — Qwen3-ASR. Qwen3-ASR (ok. 2,9 GB)
+  ładował się pierwszy, a model rozmowy zostawia na mowę tylko 1,5 GB (rozmiar Whispera) — razem ok. 7 GB na karcie
+  6 GB. Teraz na kompilacji Vulkan Qwen3-ASR liczy na karcie dopiero od 12 GB własnej pamięci karty (Twój RX 9070 XT —
+  bez zmian), na mniejszej na procesorze (ok. 2,4 s na zdanie; Whisper na procesorze ok. 54 s) — ta sama reguła
+  w rozmowie, w autoteście i w widoku silników (`stt::qwen_free`).
+- **250 ms czekania przed startem dyktowania i rozmowy** na kartach AMD/Intel: pomiar wolnej pamięci robił pełny
+  odczyt liczników (dwie próbki obciążenia co 250 ms i nazwy procesów) na wątku asynchronicznym. Nowy odczyt samej
+  pamięci (`HardwarePort::gpu_memory`) — jedna próbka, bez czekania.
+- **Czytanie na głos**: widok silników nadal odczytywał listę kart co 20 ms, gdy plan rozpoznawania mowy jeszcze nie
+  powstał — teraz lista kart z pamięcią na 30 s.
+- **Głos po usunięciu procesorowego ONNX Runtime** (przy zainstalowanym DirectML): argumenty wskazywały usunięty plik
+  i każde zdanie startowało proces od nowa — klucz pamięci podręcznej widzi teraz także wersję procesorową.
+- **Dwie takie same karty**: profil brał ostatnią, pomiar pamięci i głos — pierwszą; teraz wszędzie pierwszą.
+- **Nagłówek pakietów** w Ustawieniach brał największą kartę (np. APU 8 GB zamiast RTX 8 GB, dla którego rdzeń składa
+  pakiety) — teraz ta sama kolejność co rdzeń.
+- **Ocena modeli na samej grafice zintegrowanej**: strona pisała „liczy procesor”, a model rozmowy liczy na karcie
+  zintegrowanej — teraz ta sama część pamięci co rdzeń (najwyżej ćwierć RAM i 4 GB).
+- **SPEC modułu `models`** opisywał skład pakietów sprzed 0.0.63 — uzupełniony; także ADR 0028 i SPEC `voice-stt`
+  (próg 12 GB dla Qwen3-ASR na Vulkanie).

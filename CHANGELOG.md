@@ -15,15 +15,17 @@ na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Hist
 ## 0.0.63 — 2026-10-17
 
 Alfa korzysta z każdej karty graficznej — NVIDIA, AMD i Intel, osobnej i zintegrowanej — a na komputerze bez
-karty działa na procesorze. Na kartach AMD i Intel z wolną pamięcią mowa jest rozpoznawana na karcie, a na dużej
-karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); karty Intel — niesprawdzone na sprzęcie.
+karty działa na procesorze. Na kartach AMD i Intel mowa jest rozpoznawana kilkanaście razy szybciej (na karcie od
+12 GB — na karcie), a na dużej karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); karty
+Intel — niesprawdzone na sprzęcie.
 
 ### Karty graficzne
 
-- [poważne] Rozpoznawanie mowy na kartach AMD i Intel liczy na karcie: pakiety „Bardzo dobry” i „Dobry” dostają
-  tam Qwen3-ASR (przez `llama-server` Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
-  zdanie rozpoznaje się w 0,16–0,23 s; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie na laptopie). Gdy
-  model rozmowy zajmie kartę (mniej niż 3,2 GB wolnej pamięci), Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie) —
+- [poważne] Rozpoznawanie mowy na kartach AMD i Intel jest kilkanaście razy szybsze: pakiety „Bardzo dobry”
+  i „Dobry” dostają tam Qwen3-ASR (przez `llama-server` Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla
+  Windows. Na karcie od 12 GB liczy na karcie (RX 9070 XT: 0,16–0,23 s na zdanie), na mniejszej — na procesorze
+  (ok. 2,4 s), bo obok modelu rozmowy by się nie zmieścił; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie
+  na laptopie). Gdy model rozmowy zajmie kartę (mniej niż 3,2 GB wolnej pamięci), Qwen3-ASR też liczy na procesorze —
   karta NVIDIA ma wtedy jeszcze Whisper na karcie.
 - Komputer z dwiema kartami widocznymi dla Vulkana (np. laptop: grafika zintegrowana i osobna karta): Qwen3-ASR
   liczy na głównej karcie (`--device`), a nie na słabszej albo na obu naraz. Gdy kompilacja widzi jedną kartę
@@ -79,7 +81,10 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
   odświeżanie głosu po zmianie DirectML, komunikaty bez karty. Drugi przegląd poprawek: 14 kolejnych — m.in.
   rezerwa APU liczona dwa razy (jako karta i jako RAM), pomiar pamięci nie tej karty, na której liczy mowa. Trzeci
   przegląd: 4 kolejne — m.in. lista kart odczytywana co 20 ms w trakcie dyktowania, przy dwóch kartach NVIDIA
-  wolna pamięć drugiej karty, ocena „mieści się na karcie” według rezerwy APU zamiast karty osobnej.
+  wolna pamięć drugiej karty, ocena „mieści się na karcie” według rezerwy APU zamiast karty osobnej. Całościowy
+  przegląd wszystkich zmian od 0.0.62: 8 kolejnych — m.in. Qwen3-ASR na karcie AMD/Intel 6–11 GB obok modelu
+  rozmowy (teraz na procesorze), 250 ms czekania na liczniki Windows przed startem dyktowania, nagłówek pakietów
+  i ocena modeli przy grafice zintegrowanej, dwie takie same karty, ponowne starty głosu po usunięciu ONNX Runtime.
 - Testy w przeglądarce na Chromium Playwrighta (na komputerze stacjonarnym nie ma Edge): 467/467 — w tym nowy test
   pierwszego kliknięcia listy wyboru; wcześniej 2 czerwone (nieaktualny napis w teście strony Urządzenia i lista
   wyboru pomijająca klik w pierwszych 0,3 s).

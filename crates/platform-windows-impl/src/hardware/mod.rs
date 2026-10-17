@@ -73,7 +73,11 @@ impl HardwarePort for WinHardware {
     }
 
     fn gpu_usage(&self) -> Result<GpuUsage, PlatformError> {
-        per_platform!(gpu_win::usage(), "zużycie kart graficznych")
+        per_platform!(gpu_win::usage(true), "zużycie kart graficznych")
+    }
+
+    fn gpu_memory(&self) -> Result<GpuUsage, PlatformError> {
+        per_platform!(gpu_win::usage(false), "pamięć kart graficznych")
     }
 }
 

@@ -337,7 +337,8 @@ pub fn free_vram_mb() -> Option<u32> {
             return Some(free);
         }
     }
-    free_from(&adapters, &hw.gpu_usage().ok()?)
+    // Sama pamięć jedną próbką (bez 250 ms na obciążenie) — odczyt jest przed startem dyktowania.
+    free_from(&adapters, &hw.gpu_memory().ok()?)
 }
 
 /// Karta (numer adaptera DXGI) dla głosu Supertonic przez DirectML: największa karta z własną pulą

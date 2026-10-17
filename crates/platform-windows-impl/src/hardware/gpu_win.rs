@@ -180,8 +180,9 @@ fn values(handle: Option<PDH_HCOUNTER>, format: PDH_FMT) -> Vec<(String, f64)> {
         .collect()
 }
 
-/// Bieżące zużycie kart: pamięć (wszystkie procesy), obciążenie i procesy na kartach.
-pub(crate) fn usage() -> Result<GpuUsage, PlatformError> {
+/// Bieżące zużycie kart: pamięć (wszystkie procesy), a z `full` także obciążenie (dwie próbki co
+/// 250 ms) i procesy na kartach; bez `full` — sama pamięć jedną próbką (start silnika mowy).
+pub(crate) fn usage(full: bool) -> Result<GpuUsage, PlatformError> {
     let mut raw = PDH_HQUERY::default();
     // SAFETY: zapytanie na żywych danych (bez pliku dziennika); bufor wyjściowy uchwytu.
     let status = unsafe { PdhOpenQueryW(PCWSTR::null(), 0, &raw mut raw) };
@@ -191,24 +192,30 @@ pub(crate) fn usage() -> Result<GpuUsage, PlatformError> {
     let query = Query(raw);
     let dedicated = counter(&query, w!(r"\GPU Adapter Memory(*)\Dedicated Usage"));
     let shared = counter(&query, w!(r"\GPU Adapter Memory(*)\Shared Usage"));
-    let process = counter(&query, w!(r"\GPU Process Memory(*)\Dedicated Usage"));
-    let engine = counter(&query, w!(r"\GPU Engine(*)\Utilization Percentage"));
+    let process = full
+        .then(|| counter(&query, w!(r"\GPU Process Memory(*)\Dedicated Usage")))
+        .flatten();
+    let engine = full
+        .then(|| counter(&query, w!(r"\GPU Engine(*)\Utilization Percentage")))
+        .flatten();
     if dedicated.is_none() && shared.is_none() {
         return Err(PlatformError::Unsupported(
             "liczniki „GPU Adapter Memory” niedostępne (system starszy niż Windows 10 1709?)"
                 .into(),
         ));
     }
-    // SAFETY: ważne zapytanie; dwa odczyty — licznik obciążenia potrzebuje różnicy.
+    // SAFETY: ważne zapytanie; przy pełnym odczycie dwa — licznik obciążenia potrzebuje różnicy.
     let first = unsafe { PdhCollectQueryData(query.0) };
     if first != 0 {
         return Err(pdh_error("PdhCollectQueryData", first));
     }
-    std::thread::sleep(LOAD_SAMPLE);
-    // SAFETY: jw.
-    let second = unsafe { PdhCollectQueryData(query.0) };
-    if second != 0 {
-        return Err(pdh_error("PdhCollectQueryData", second));
+    if full {
+        std::thread::sleep(LOAD_SAMPLE);
+        // SAFETY: jw.
+        let second = unsafe { PdhCollectQueryData(query.0) };
+        if second != 0 {
+            return Err(pdh_error("PdhCollectQueryData", second));
+        }
     }
     let mut usage = assemble(&Readings {
         adapter_dedicated: values(dedicated, PDH_FMT_LARGE),
@@ -246,13 +253,24 @@ mod tests {
             eprintln!("DXCore: {d:?}");
             assert_ne!(d.luid, 0);
         }
-        match usage() {
+        match usage(true) {
             Ok(usage) => {
                 eprintln!("PDH: {:?}", usage.adapters);
                 eprintln!("PDH procesy: {}", usage.processes.len());
                 assert!(usage.adapters.iter().all(|a| a.luid != 0));
             }
             Err(e) => eprintln!("PDH niedostępne: {e}"),
+        }
+        // Sama pamięć: jedna próbka, bez czekania na obciążenie i bez procesów.
+        let started = std::time::Instant::now();
+        if let Ok(memory) = usage(false) {
+            eprintln!(
+                "PDH pamięć: {:?} w {:?}",
+                memory.adapters,
+                started.elapsed()
+            );
+            assert!(memory.processes.is_empty());
+            assert!(started.elapsed() < LOAD_SAMPLE);
         }
     }
 }

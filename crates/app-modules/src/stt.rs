@@ -23,6 +23,27 @@ pub fn qwen_on_gpu(gpu_build: bool, free_vram_mb: Option<u32>) -> bool {
     gpu_build && free_vram_mb.is_none_or(|free| free >= QWEN_MIN_FREE_VRAM_MB)
 }
 
+/// Najmniejsza pamięć własna głównej karty (MB), od której Qwen3-ASR przez Vulkan (AMD, Intel) liczy
+/// na karcie obok modelu rozmowy. Model rozmowy zostawia na rozpoznawanie mowy 1,5 GB (Whisper
+/// turbo), a Qwen3-ASR zajmuje ok. 2,9 GB i zwykle ładuje się pierwszy — na karcie 6–11 GB obu się nie
+/// zmieści. Tam Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie; Whisper na procesorze ok. 54 s),
+/// a karta zostaje dla modelu rozmowy. Ten sam próg co głos na karcie (12 GB z tolerancją).
+pub const VULKAN_QWEN_CARD_MIN_MB: u32 = device_profile_contract::GPU_TTS_MIN_VRAM_MB;
+
+/// Wolna pamięć do planu Qwen3-ASR: kompilacja Vulkan i główna karta mniejsza niż
+/// [`VULKAN_QWEN_CARD_MIN_MB`] — `Some(0)` (procesor); inaczej pomiar bez zmian (`main_card_mb`
+/// `None` — karta nieznana, decyduje pomiar).
+pub fn qwen_free(
+    free_vram_mb: Option<u32>,
+    vulkan: bool,
+    main_card_mb: Option<u32>,
+) -> Option<u32> {
+    match main_card_mb {
+        Some(mb) if vulkan && mb < VULKAN_QWEN_CARD_MIN_MB => Some(0),
+        _ => free_vram_mb,
+    }
+}
+
 /// Wolna pamięć karty, przy której Whisper turbo zmieści się na karcie obok innych modeli.
 pub const WHISPER_MIN_FREE_VRAM_MB: u32 = 1_600;
 
@@ -255,6 +276,23 @@ mod tests {
         assert!(!qwen_on_gpu(true, Some(QWEN_MIN_FREE_VRAM_MB - 1)));
         assert!(!qwen_on_gpu(false, Some(16_000)));
         assert!(!qwen_on_gpu(false, None));
+    }
+
+    /// Przegląd 2026-10-18: na karcie AMD/Intel 6–11 GB Qwen3-ASR (ok. 2,9 GB, ładowany pierwszy)
+    /// nie mieścił się obok modelu rozmowy, który zostawia na mowę 1,5 GB — tam liczy na procesorze.
+    #[test]
+    fn vulkan_card_below_12_gb_keeps_its_memory_for_the_chat_model() {
+        // RX 9070 XT 16 GB (zmierzone): na karcie.
+        let rx = qwen_free(Some(15_400), true, Some(16_304));
+        assert_eq!(stt_plan(true, false, rx), SttPlan::QwenGpu);
+        // AMD/Intel 8 GB: procesor, mimo wolnej karty przed startem modelu rozmowy.
+        let amd8 = qwen_free(Some(7_900), true, Some(8_176));
+        assert_eq!(stt_plan(true, false, amd8), SttPlan::QwenCpu);
+        // APU z rezerwą 16 GB jako główna karta — na karcie; karta nieznana — decyduje pomiar.
+        assert_eq!(qwen_free(Some(15_000), true, Some(16_384)), Some(15_000));
+        assert_eq!(qwen_free(Some(5_000), true, None), Some(5_000));
+        // CUDA (NVIDIA) bez zmian: próg dotyczy tylko kompilacji Vulkan.
+        assert_eq!(qwen_free(Some(5_300), false, Some(5_921)), Some(5_300));
     }
 
     #[test]

@@ -15,9 +15,10 @@ impl Profile {
     /// przed zintegrowaną z małą rezerwą (procesor AMD z grafiką potrafi mieć 2–4 GB „dedykowanej”
     /// pamięci, więcej niż mała osobna karta); wśród kart z pulą — osobna przed zintegrowaną (własna
     /// pamięć GDDR jest kilka razy szybsza od współdzielonej); potem największy VRAM, przy remisie
-    /// NVIDIA — CUDA.
+    /// NVIDIA — CUDA; przy pełnym remisie (dwie takie same karty) — pierwsza na liście, jak
+    /// `app_modules::gpu_mem::main_card` (`max_by_key` bierze ostatnią z równych, stąd `rev`).
     pub fn primary_gpu(&self) -> Option<&GpuInfo> {
-        self.gpus.iter().max_by_key(|g| {
+        self.gpus.iter().rev().max_by_key(|g| {
             (
                 u8::from(g.has_memory_pool()),
                 u8::from(!g.integrated),

@@ -27,6 +27,9 @@ Właściciel: Alfa ma działać na kartach NVIDIA, AMD i Intel oraz na grafice z
    3–7 s (pierwsze, z rozgrzaniem: 2,2 s), **2878 MB** pamięci karty; 4 zdania z Supertonic (barwa M1): 3 identyczne,
    w jednym zła forma jednego wyrazu („Zapisałem” zamiast „Zapisałam”). Bez osobnej karty (zmierzone liczniki
    systemu: 0 MB wolnej pamięci osobnej karty) Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie na laptopie).
+   Na karcie z własną pamięcią **poniżej 12 GB** (`app_modules::stt::VULKAN_QWEN_CARD_MIN_MB`) Qwen3-ASR też liczy na
+   procesorze (przegląd 2026-10-18): ładuje się przed modelem rozmowy i zajmuje ok. 2,9 GB, a model rozmowy zostawia na
+   rozpoznawanie mowy 1,5 GB (rozmiar Whispera turbo) — na karcie 6–11 GB obu by się nie zmieściło.
 2. **Głos Supertonic na karcie przez DirectML** — opcjonalnie:
    - dwie pozycje katalogu w `sidecars/onnxruntime-dml/`: `onnxruntime-directml` (NuGet
      `Microsoft.ML.OnnxRuntime.DirectML` 1.23.0, MIT) i `directml` (NuGet `Microsoft.AI.DirectML` 1.15.4, licencja

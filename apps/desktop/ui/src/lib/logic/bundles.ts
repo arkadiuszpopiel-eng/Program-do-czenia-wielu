@@ -2,6 +2,7 @@
 // działanie pakietu, postęp w bajtach, działania na elemencie, opis sprzętu tej maszyny.
 import type { DeviceProfile, GpuInfo } from '../api/types-hub';
 import type { BundleItemView, ModelBundle } from '../api/types-models';
+import { hasMemoryPool } from './models';
 
 /** Główne działanie pakietu (`null` — nic do zrobienia albo trwa pobieranie / czeka na zgodę). */
 export type BundleAction = 'download' | 'resume' | 'repair' | null;
@@ -63,11 +64,26 @@ export function bundleItemActions(item: BundleItemView): BundleItemActions {
   };
 }
 
-/** Główna karta: największa pamięć (jak `device-profile::Profile::primary_gpu`). */
+/**
+ * Główna karta — ta sama kolejność co `device-profile::Profile::primary_gpu` (dla niej rdzeń składa
+ * pakiety): karta z własną pulą pamięci, osobna przed zintegrowaną (nawet przy większej rezerwie
+ * z BIOS-u), potem największa pamięć; przy remisie — pierwsza na liście.
+ */
 export function primaryGpu(profile: DeviceProfile): GpuInfo | null {
+  const rank = (g: GpuInfo): [number, number, number] => [
+    hasMemoryPool(g) ? 1 : 0,
+    g.integrated ? 0 : 1,
+    g.vram_mb,
+  ];
   let best: GpuInfo | null = null;
   for (const gpu of profile.machine.gpus) {
-    if (!best || gpu.vram_mb > best.vram_mb) best = gpu;
+    if (!best) {
+      best = gpu;
+      continue;
+    }
+    const [a, b] = [rank(gpu), rank(best)];
+    const i = a.findIndex((v, k) => v !== b[k]);
+    if (i >= 0 && (a[i] ?? 0) > (b[i] ?? 0)) best = gpu;
   }
   return best;
 }

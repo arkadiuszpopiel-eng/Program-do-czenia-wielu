@@ -48,6 +48,13 @@ pub fn device_choice(
     device_for(devices, backend, &card.name).map(|d| d.id.clone())
 }
 
+/// Pamięć własna głównej karty (MB) z listy DXGI (kilka ms, bez liczników): `Some(None)` — brak
+/// karty z własną pulą pamięci, `None` — nie wiadomo (poza Windows albo błąd odczytu).
+pub fn main_card_mb() -> Option<Option<u32>> {
+    let adapters = HardwarePort::gpus(&platform_windows_impl::WinHardware).ok()?;
+    Some(main_card(&adapters).map(|a| u32::try_from(a.dedicated_vram_mb).unwrap_or(u32::MAX)))
+}
+
 /// Lista urządzeń serwera z pamięci (sonda trwa do kilku sekund); pusty wynik nie jest zapamiętywany.
 fn devices_of(server: &Path) -> Vec<EngineDevice> {
     static CACHE: OnceLock<Mutex<HashMap<PathBuf, Vec<EngineDevice>>>> = OnceLock::new();

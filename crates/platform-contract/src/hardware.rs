@@ -165,4 +165,10 @@ pub trait HardwarePort: Send + Sync {
             "zużycie kart graficznych".into(),
         ))
     }
+
+    /// Sama pamięć kart (`adapters`; obciążenie i procesy mogą być puste) — szybki odczyt przed
+    /// startem silnika, bez próbki obciążenia. Domyślnie pełny [`Self::gpu_usage`].
+    fn gpu_memory(&self) -> Result<GpuUsage, PlatformError> {
+        self.gpu_usage()
+    }
 }

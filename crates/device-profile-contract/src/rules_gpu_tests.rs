@@ -73,6 +73,14 @@ fn every_vendor_and_kind_uses_its_card() {
     assert_eq!(hybrid.primary_gpu().map(|g| g.id), Some(1));
     assert_eq!(hybrid.light_gpu().map(|g| g.id), Some(0));
     assert_eq!(classify(&hybrid), HwClass::Baseline);
+    // Dwie takie same karty: główna — pierwsza (jak `gpu_mem::main_card` i karta głosu DirectML).
+    let mut twins = fixtures::desktop();
+    twins.gpus[0].id = 0;
+    twins.gpus.push(GpuInfo {
+        id: 1,
+        ..twins.gpus[0].clone()
+    });
+    assert_eq!(twins.primary_gpu().map(|g| g.id), Some(0));
     // AMD 6 GB (np. RX 5600 XT) — te same progi co NVIDIA 6 GB.
     let mut amd6 = fixtures::baseline();
     amd6.gpus[0].vram_mb = 6_128;

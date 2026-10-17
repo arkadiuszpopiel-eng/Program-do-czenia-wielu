@@ -186,6 +186,35 @@ export function mainCardMb(
   return sizes.length > 0 ? Math.max(...sizes) : null;
 }
 
+/** Najwięcej pamięci na modele na karcie zintegrowanej z małą rezerwą (MB) — `INTEGRATED_MAX_MB` w Rust. */
+export const INTEGRATED_MAX_MB = 4096;
+
+/**
+ * Pamięć, w której liczy model rozmowy: karta główna ({@link mainCardMb}), a na komputerze z samą
+ * grafiką zintegrowaną klasy „karta zintegrowana” — jej część jak `GpuInfo::usable_memory_mb`
+ * w Rust (pamięć karty i współdzielona, najwyżej ćwierć RAM i {@link INTEGRATED_MAX_MB}).
+ * `null` — model rozmowy liczy procesor.
+ */
+export function chatMemoryMb(profile: {
+  readonly machine: {
+    readonly ram_mb: number;
+    readonly gpus: readonly {
+      readonly vram_mb: number;
+      readonly shared_mb: number;
+      readonly integrated: boolean;
+    }[];
+  };
+  readonly recommendation: { readonly hw_class: string };
+}): number | null {
+  const main = mainCardMb(profile.machine.gpus);
+  if (main !== null || profile.recommendation.hw_class !== 'integrated') return main;
+  const quarter = Math.floor(profile.machine.ram_mb / 4);
+  const sizes = profile.machine.gpus
+    .filter((g) => g.integrated)
+    .map((g) => Math.min(g.vram_mb + g.shared_mb, quarter, INTEGRATED_MAX_MB));
+  return sizes.length > 0 ? Math.max(...sizes) : null;
+}
+
 /**
  * Czy model o rozmiarze pliku `sizeBytes` zmieści się na karcie: cały („fits”), tylko część warstw
  * („partly” — reszta liczy się w pamięci RAM, wolniej) albo wcale („cpu”).

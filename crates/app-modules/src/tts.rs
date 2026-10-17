@@ -28,6 +28,9 @@ struct Installed {
     /// Wersja DirectML biblioteki ONNX Runtime — jej instalacja albo usunięcie zmienia argumenty
     /// `alfa-supertonic` (`--ort`, `--dml`), więc serwis jest wtedy składany od nowa.
     supertonic_dml: bool,
+    /// Wersja procesorowa ONNX Runtime — jej usunięcie przy obecnej wersji DirectML zostawia głos
+    /// gotowym, ale `--ort` musi wskazać inny plik (inaczej każde zdanie startowało proces od nowa).
+    supertonic_cpu: bool,
     pocket: bool,
     piper: bool,
 }
@@ -37,6 +40,11 @@ impl Installed {
         Self {
             supertonic: supertonic_ready(paths),
             supertonic_dml: supertonic_dml_runtime(paths).is_some(),
+            supertonic_cpu: crate::turn::onnxruntime(
+                paths,
+                &paths.sidecar("supertonic", "alfa-supertonic"),
+            )
+            .is_some(),
             pocket: paths.sidecar("pocket-tts", "pocket-tts").is_file(),
             // Piper bez modelu głosu (`*.onnx`) nie potrafi nic powiedzieć: sam plik silnika to
             // jeszcze nie „głos gotowy" (wcześniej rozmowa startowała i każde zdanie kończyło się
@@ -372,7 +380,10 @@ mod tests {
             supertonic_runtime_for(&paths, None),
             Some((cpu.clone(), None))
         );
+        // Usunięcie biblioteki CPU zmienia klucz serwisu — `--ort` wskaże wtedy wersję DirectML.
+        let before = Installed::detect(&paths);
         std::fs::remove_file(&cpu).unwrap();
+        assert!(before.supertonic_cpu && !Installed::detect(&paths).supertonic_cpu);
         assert_eq!(
             supertonic_runtime_for(&paths, None),
             Some((dml.clone(), None))

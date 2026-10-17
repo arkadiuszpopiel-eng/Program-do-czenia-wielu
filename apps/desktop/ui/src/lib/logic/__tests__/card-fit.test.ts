@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { CARD_HEADROOM_MB, UMA_POOL_MIN_MB, cardFit, mainCardMb } from '../models';
+import {
+  CARD_HEADROOM_MB,
+  INTEGRATED_MAX_MB,
+  UMA_POOL_MIN_MB,
+  cardFit,
+  chatMemoryMb,
+  mainCardMb,
+} from '../models';
 
 const MIB = 1024 * 1024;
 
@@ -27,6 +34,19 @@ describe('ocena „mieści się na karcie”', () => {
     ];
     expect(mainCardMb(gpus)).toBe(8188);
     expect(cardFit(10 * 1024 * MIB, mainCardMb(gpus))).toBe('partly');
+  });
+
+  it('sama grafika zintegrowana klasy „karta zintegrowana”: model liczy na niej, nie na procesorze', () => {
+    // Core Ultra 7 258V (Arc 140V, 128 MB + 16 GB współdzielonej), 32 GB RAM — budżet jak w Rust.
+    const profile = (hw_class: string, ram_mb = 32_768) => ({
+      machine: { ram_mb, gpus: [{ vram_mb: 128, shared_mb: 16_000, integrated: true }] },
+      recommendation: { hw_class },
+    });
+    expect(chatMemoryMb(profile('integrated'))).toBe(INTEGRATED_MAX_MB);
+    expect(cardFit(1100 * MIB, chatMemoryMb(profile('integrated')))).toBe('fits');
+    // 12 GB RAM: najwyżej ćwierć RAM; inna klasa (np. „nieznana”) — model liczy procesor.
+    expect(chatMemoryMb(profile('integrated', 12_288))).toBe(3072);
+    expect(chatMemoryMb(profile('unknown'))).toBeNull();
   });
 
   it('plik z zapasem 1,5 GB musi zmieścić się w pamięci karty', () => {

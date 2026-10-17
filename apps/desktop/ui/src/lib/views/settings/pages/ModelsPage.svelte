@@ -21,7 +21,7 @@
     upsertItem,
     type KindFilter,
     type StateFilter,
-    mainCardMb,
+    chatMemoryMb,
   } from '../../../logic/models';
   import { useApp } from '../../../state/context';
   import { diskUsage, searchItems, sortItems, type SortOrder } from '../../../logic/model-catalog';
@@ -90,7 +90,7 @@
     void load();
     // Ocena dopasowania modeli do karty jest dodatkiem — błąd odczytu sprzętu nie blokuje strony.
     void app.client.device.profile().then(
-      (profile) => (cardMb = mainCardMb(profile.machine.gpus)),
+      (profile) => (cardMb = chatMemoryMb(profile)),
       () => (cardMb = undefined),
     );
     return app.on((event) => {
