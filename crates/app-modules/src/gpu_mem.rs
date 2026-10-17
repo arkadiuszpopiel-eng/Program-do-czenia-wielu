@@ -210,19 +210,36 @@ fn mb32(value: u64) -> u32 {
     u32::try_from(value).unwrap_or(u32::MAX)
 }
 
-/// Największa wolna pamięć osobnej karty z odczytu liczników systemu (MiB); `None` — brak
-/// osobnej karty albo odczytu dla niej. Pamięć karty zintegrowanej to RAM — nie jest liczona.
+/// Główna karta z listy adapterów: z własną pulą pamięci, osobna przed zintegrowaną (z dużą
+/// rezerwą z BIOS-u), potem największa — jak `Profile::primary_gpu`. Na niej liczą model rozmowy
+/// i Qwen3-ASR (`crate::stt_device`), więc to jej wolną pamięć mierzymy.
+pub fn main_card(adapters: &[GpuAdapter]) -> Option<&GpuAdapter> {
+    adapters.iter().filter(|a| discrete(a)).max_by_key(|a| {
+        (
+            u8::from(a.integrated != Some(true)),
+            a.dedicated_vram_mb,
+            std::cmp::Reverse(a.index),
+        )
+    })
+}
+
+/// Czy komputer ma kartę z własną pulą pamięci (sama lista kart DXGI — kilka ms, bez liczników);
+/// `None` — nie wiadomo (poza Windows albo błąd odczytu).
+pub fn has_main_card() -> Option<bool> {
+    HardwarePort::gpus(&platform_windows_impl::WinHardware)
+        .ok()
+        .map(|a| main_card(&a).is_some())
+}
+
+/// Wolna pamięć głównej karty z odczytu liczników systemu (MiB); `None` — brak karty z pulą albo
+/// odczytu dla niej. Pamięć karty zintegrowanej z małą rezerwą to RAM — nie jest liczona.
 pub fn free_from(adapters: &[GpuAdapter], usage: &GpuUsage) -> Option<u32> {
-    adapters
-        .iter()
-        .filter(|a| discrete(a))
-        .filter_map(|a| {
-            let used = usage.adapters.iter().find(|u| u.luid == a.luid)?;
-            Some(mb32(
-                a.dedicated_vram_mb.saturating_sub(used.dedicated_used_mb),
-            ))
-        })
-        .max()
+    let main = main_card(adapters)?;
+    let used = usage.adapters.iter().find(|u| u.luid == main.luid)?;
+    Some(mb32(
+        main.dedicated_vram_mb
+            .saturating_sub(used.dedicated_used_mb),
+    ))
 }
 
 /// Karty i procesy z odczytu liczników systemu (bez temperatury i mocy — tych system nie podaje).
@@ -281,20 +298,27 @@ fn system_read() -> Option<(Vec<GpuAdapter>, GpuUsage)> {
     Some((adapters, usage))
 }
 
-/// Wolna pamięć karty w MiB dla każdego producenta: `nvidia-smi`, a bez niego liczniki systemu.
-/// Komputer bez osobnej karty (sama zintegrowana albo żadna) daje `Some(0)` — rozpoznawanie mowy
-/// nie zajmuje wtedy karty zintegrowanej, którą profil przeznacza na model rozmowy. `None` — nie da
-/// się zmierzyć (wywołujący próbuje karty, a po nieudanym starcie bierze silnik zapasowy).
+/// Wolna pamięć głównej karty w MiB dla każdego producenta: karta NVIDIA — `nvidia-smi`, inne —
+/// liczniki systemu. Komputer bez karty z własną pulą (sama zintegrowana albo żadna) daje `Some(0)` —
+/// rozpoznawanie mowy nie zajmuje wtedy karty zintegrowanej, którą profil przeznacza na model
+/// rozmowy. `None` — nie da się zmierzyć (wywołujący próbuje karty, a po nieudanym starcie bierze
+/// silnik zapasowy). Bez listy kart (poza Windows) — jak dawniej: `nvidia-smi` albo `None`.
 pub fn free_vram_mb() -> Option<u32> {
-    nvidia_free_mb().or_else(|| {
-        let hw = platform_windows_impl::WinHardware;
-        let adapters = hw.gpus().ok()?;
-        // Lista kart wystarcza, żeby stwierdzić brak osobnej karty — liczniki mogą nie odpowiadać.
-        if !adapters.iter().any(discrete) {
-            return Some(0);
-        }
-        free_from(&adapters, &hw.gpu_usage().ok()?)
-    })
+    let hw = platform_windows_impl::WinHardware;
+    let Ok(adapters) = hw.gpus() else {
+        return nvidia_free_mb();
+    };
+    // Lista kart wystarcza, żeby stwierdzić brak karty z pulą — liczniki mogą nie odpowiadać.
+    let Some(main) = main_card(&adapters) else {
+        return Some(0);
+    };
+    // Mierzymy kartę, na której liczy Qwen3-ASR: przy AMD obok NVIDIA nie bierzemy `nvidia-smi`.
+    if main.vendor_id == 0x10DE
+        && let Some(free) = nvidia_free_mb()
+    {
+        return Some(free);
+    }
+    free_from(&adapters, &hw.gpu_usage().ok()?)
 }
 
 /// Karta (numer adaptera DXGI) dla głosu Supertonic przez DirectML: największa karta z własną pulą

@@ -152,7 +152,8 @@ pub fn classify(profile: &Profile) -> HwClass {
     let Some(gpu) = profile.primary_gpu().filter(|g| !g.backends.is_empty()) else {
         return HwClass::Unknown;
     };
-    let (vram, ram) = (gpu.vram_mb, profile.ram_mb);
+    // RAM bez rezerwy APU liczonej już jako pamięć karty (bez podwójnego liczenia).
+    let (vram, ram) = (gpu.vram_mb, profile.system_ram_mb());
     if !gpu.has_memory_pool() {
         return if ram >= RAM_16_GB {
             HwClass::Integrated
@@ -195,7 +196,7 @@ pub fn recommend_as(profile: &Profile, class: HwClass) -> Recommendation {
         heavy_local_tts: false,
         residency: ResidencyBudget {
             vram_mb: vram.saturating_sub(reserve),
-            ram_mb: profile.ram_mb / 2,
+            ram_mb: profile.system_ram_mb() / 2,
             desktop_reserve_mb: reserve,
             stt_tts_exclusive: vram < VRAM_8_GB,
         },

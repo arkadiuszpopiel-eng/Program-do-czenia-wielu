@@ -89,7 +89,8 @@ fn every_vendor_and_kind_uses_its_card() {
 
 /// APU z dużą rezerwą pamięci w BIOS-ie (niedostępną dla Windows) liczy się jak karta z tą pamięcią:
 /// Ryzen AI Max+ 395 (Radeon 8060S, 64 GB z 128 GB) — mocna; Ryzen AI 9 HX 370 (890M, 16 GB
-/// z 32 GB) — standard. Mała rezerwa (780M, 4 GB) zostaje klasą „zintegrowana”.
+/// z 32 GB) — podstawowa, bo systemowi zostaje 16 GB RAM. Mała rezerwa (780M, 4 GB) zostaje klasą
+/// „zintegrowana”.
 #[test]
 fn big_uma_reservation_counts_as_card_memory() {
     let apu = |vram, ram| {
@@ -104,11 +105,22 @@ fn big_uma_reservation_counts_as_card_memory() {
         (HwClass::Strong, LocalLlm::Large)
     );
     assert_eq!(strix_halo.residency.vram_mb, 65_536 - DESKTOP_RESERVE_MB);
+    // 32 GB zainstalowane, 16 GB rezerwy: system widzi 16 GB — klasa z karty 16 GB i RAM 16 GB
+    // (bez podwójnego liczenia rezerwy jako RAM), budżet RAM z pamięci widocznej dla systemu.
     let hx370 = recommend(&apu(16_384, 32_768));
     assert_eq!(
         (hx370.class, hx370.local_llm),
-        (HwClass::StandardAmd, LocalLlm::Medium)
+        (HwClass::Baseline, LocalLlm::Small)
     );
+    assert_eq!(hx370.residency.ram_mb, 16_384 / 2);
+    assert_eq!(apu(16_384, 32_768).system_ram_mb(), 16_384);
+    // 16 GB z 8 GB rezerwy: dla systemu zostaje 8 GB — poniżej minimum na lokalny model.
+    let small = recommend(&apu(8_192, 16_384));
+    assert_eq!(
+        (small.class, small.local_llm),
+        (HwClass::Unknown, LocalLlm::None)
+    );
+    assert_eq!(strix_halo.residency.ram_mb, (131_072 - 65_536) / 2);
     assert_eq!(recommend(&apu(4_096, 32_768)).class, HwClass::Integrated);
     assert!(apu(65_536, 131_072).gpus[0].has_memory_pool());
     assert!(!fixtures::amd_apu().gpus[0].has_memory_pool());

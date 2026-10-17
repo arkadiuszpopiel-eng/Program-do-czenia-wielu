@@ -85,12 +85,23 @@ test('logowanie do Claude Code: okno z instrukcją otwiera się i zamyka, progra
     .filter({ hasText: 'Claude Code (CLI)' });
   await expect(card).toBeVisible({ timeout: 30_000 });
   const login = card.getByRole('button', { name: 'Zaloguj się' });
-  // Karta wczytuje się z rdzenia — przycisk dostaje chwilę, zanim uznamy, że narzędzia nie ma.
-  await login.waitFor({ timeout: 10_000 }).catch(() => undefined);
-  test.skip(
-    !(await login.isVisible()) || !(await login.isEnabled()),
-    'narzędzie Claude Code nie jest zainstalowane na tym komputerze',
-  );
+  // Przycisk logowania jest zawsze widoczny (most ma polecenie logowania) — czy narzędzie jest na tym
+  // komputerze, mówi rdzeń (`detected`). Bez Claude Code test nie ma czego sprawdzać (2026-10-17:
+  // komputer stacjonarny bez CLI — wcześniejszy warunek „przycisk widoczny” dawał fałszywy błąd).
+  const detected = await main.evaluate(async () => {
+    const ipc = window as unknown as {
+      __TAURI_INTERNALS__: {
+        invoke: (
+          cmd: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ bridge: string | null; detected: boolean }[]>;
+      };
+    };
+    const cards = await ipc.__TAURI_INTERNALS__.invoke('bridges_list', { refresh: false });
+    return cards.some((c) => c.bridge === 'claude_code' && c.detected);
+  });
+  test.skip(!detected, 'narzędzie Claude Code nie jest zainstalowane na tym komputerze');
+  await login.waitFor({ timeout: 10_000 });
   await login.click();
   const dialog = main.getByRole('dialog', { name: 'Logowanie do Claude Code' });
   await expect(dialog).toBeVisible();

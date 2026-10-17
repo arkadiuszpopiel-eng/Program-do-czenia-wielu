@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CARD_HEADROOM_MB, cardFit, mainCardMb } from '../models';
+import { CARD_HEADROOM_MB, UMA_POOL_MIN_MB, cardFit, mainCardMb } from '../models';
 
 const MIB = 1024 * 1024;
 
@@ -12,7 +12,10 @@ describe('ocena „mieści się na karcie”', () => {
         { vram_mb: 16384, integrated: false },
       ]),
     ).toBe(16384);
-    expect(mainCardMb([{ vram_mb: 8000, integrated: true }])).toBeNull();
+    // Procesor z grafiką: mała rezerwa z BIOS-u to RAM, duża (≥ 6 GB) — własna pula jak karta.
+    expect(mainCardMb([{ vram_mb: 4096, integrated: true }])).toBeNull();
+    expect(mainCardMb([{ vram_mb: 16384, integrated: true }])).toBe(16384);
+    expect(mainCardMb([{ vram_mb: UMA_POOL_MIN_MB - 1, integrated: true }])).toBeNull();
     expect(mainCardMb([])).toBeNull();
   });
 

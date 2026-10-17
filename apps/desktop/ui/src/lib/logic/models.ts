@@ -157,11 +157,28 @@ export const CARD_HEADROOM_MB = 1536;
 /** Poniżej tylu MiB pamięci karty model rozmowy liczy procesor. */
 export const CARD_MIN_MB = 2000;
 
-/** Pamięć karty głównej (największa karta niezintegrowana); `null` — nie ma takiej karty. */
+/**
+ * Rezerwa z BIOS-u (MiB), od której karta zintegrowana ma własną pulę pamięci i liczy się jak karta
+ * z tą pamięcią — ta sama wartość co `UMA_POOL_MIN_MB` w `device-profile-contract` (Rust).
+ */
+export const UMA_POOL_MIN_MB = 5500;
+
+/** Karta z własną pulą pamięci: osobna albo zintegrowana z dużą rezerwą z BIOS-u. */
+export function hasMemoryPool(gpu: {
+  readonly vram_mb: number;
+  readonly integrated: boolean;
+}): boolean {
+  return !gpu.integrated || gpu.vram_mb >= UMA_POOL_MIN_MB;
+}
+
+/**
+ * Pamięć karty głównej (największa karta z własną pulą — osobna albo procesor z grafiką z rezerwą
+ * ≥ 6 GB w BIOS-ie); `null` — nie ma takiej karty (sama grafika zintegrowana z małą rezerwą).
+ */
 export function mainCardMb(
   gpus: readonly { readonly vram_mb: number; readonly integrated: boolean }[],
 ): number | null {
-  const sizes = gpus.filter((g) => !g.integrated).map((g) => g.vram_mb);
+  const sizes = gpus.filter(hasMemoryPool).map((g) => g.vram_mb);
   return sizes.length > 0 ? Math.max(...sizes) : null;
 }
 

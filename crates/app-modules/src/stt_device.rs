@@ -3,7 +3,8 @@
 //! słabszą albo rozłożyć model na obie. Wybieramy główną kartę tą samą regułą co profil urządzenia
 //! (karta z własną pulą pamięci, osobna przed zintegrowaną, największa) i dopasowujemy ją po nazwie
 //! do listy `--list-devices` (ta sama logika co model rozmowy: `providers_local_impl::device_for`).
-//! Przy jednej karcie serwer nie jest w ogóle odpytywany — zero kosztu na typowym komputerze.
+//! Gdy kompilacja widzi jedną kartę (jedna karta w komputerze albo CUDA przy NVIDIA + karta
+//! zintegrowana), serwer nie jest w ogóle odpytywany — zero kosztu na typowym komputerze.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -12,18 +13,20 @@ use std::sync::{Mutex, OnceLock, PoisonError};
 use platform_contract::{GpuAdapter, HardwarePort};
 use providers_local_impl::{BackendKey, EngineDevice, PROBE_TIMEOUT, device_for, probe};
 
-use crate::gpu_mem::{discrete, hardware};
+use crate::gpu_mem::{hardware, main_card};
 
-/// Główna karta z listy adapterów: z własną pulą pamięci, osobna przed zintegrowaną (z dużą
-/// rezerwą z BIOS-u), potem największa — jak `Profile::primary_gpu`.
-pub fn main_card(adapters: &[GpuAdapter]) -> Option<&GpuAdapter> {
-    adapters.iter().filter(|a| discrete(a)).max_by_key(|a| {
-        (
-            u8::from(a.integrated != Some(true)),
-            a.dedicated_vram_mb,
-            std::cmp::Reverse(a.index),
-        )
-    })
+/// Ile kart może zobaczyć kompilacja: CUDA — tylko karty NVIDIA, Vulkan — NVIDIA, AMD i Intel. Przy
+/// mniej niż dwóch serwer nie ma czego wybierać (np. laptop NVIDIA z Iris Xe i kompilacją CUDA).
+fn visible_cards(adapters: &[GpuAdapter], vulkan: bool) -> usize {
+    adapters
+        .iter()
+        .filter(|a| hardware(a))
+        .filter(|a| match a.vendor_id {
+            0x10DE => true,
+            0x1002 | 0x1022 | 0x8086 => vulkan,
+            _ => false,
+        })
+        .count()
 }
 
 /// Urządzenie serwera dla głównej karty; `None` — jedna karta (nie ma czego wybierać), serwer widzi
@@ -33,7 +36,7 @@ pub fn device_choice(
     devices: &[EngineDevice],
     vulkan: bool,
 ) -> Option<String> {
-    if adapters.iter().filter(|a| hardware(a)).count() < 2 || devices.len() < 2 {
+    if visible_cards(adapters, vulkan) < 2 || devices.len() < 2 {
         return None;
     }
     let card = main_card(adapters)?;
@@ -76,7 +79,8 @@ fn devices_of(server: &Path) -> Vec<EngineDevice> {
 /// `--device` dla Qwen3-ASR na tym komputerze (DXGI + `--list-devices`); `None` — bez wskazania.
 pub fn qwen_device(server: &Path, vulkan: bool) -> Option<String> {
     let adapters = HardwarePort::gpus(&platform_windows_impl::WinHardware).ok()?;
-    if adapters.iter().filter(|a| hardware(a)).count() < 2 {
+    // Bez sondy (start procesu, do kilku sekund), gdy kompilacja i tak widzi jedną kartę.
+    if visible_cards(&adapters, vulkan) < 2 {
         return None;
     }
     let devices = devices_of(server);

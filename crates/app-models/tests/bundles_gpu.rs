@@ -182,3 +182,18 @@ fn hybrid_apu_laptop_uses_the_discrete_card() {
         (Some(GpuVendor::Amd), 8_176, true)
     );
 }
+
+/// Rezerwa APU liczona jako pamięć karty nie jest drugi raz liczona jako RAM: 16 GB z 8 GB rezerwy
+/// to dla pakietów 8 GB RAM — „Wzorcowy” (16 GB RAM) jest za słaby, jak dla osobnej karty 8 GB z 8 GB RAM.
+#[test]
+fn apu_reservation_is_not_counted_twice() {
+    let mut apu = fixtures::amd_apu();
+    apu.gpus[0].vram_mb = 8_192;
+    apu.ram_mb = 16_384;
+    let m = Machine::from_profile(&apu);
+    assert_eq!(
+        (m.gpu, m.vram_mb, m.ram_mb),
+        (Some(GpuVendor::Amd), 8_192, 8_192)
+    );
+    assert_eq!(bundles::views(&m, &catalog_items())[0].fit.kind, F::TooWeak);
+}

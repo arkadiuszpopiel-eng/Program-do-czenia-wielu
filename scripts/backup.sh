@@ -11,8 +11,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$(cd "$ROOT/.." && pwd)"
 BASE="${1:-/f/Alfa}"
 STAMP="$(date +%Y-%m-%d_%H%M)"
-DST="$BASE/kopia-$STAMP"
-mkdir -p "$DST" || { echo "nie można utworzyć $DST"; exit 1; }
+mkdir -p "$BASE/kopia-$STAMP" || { echo "nie można utworzyć $BASE/kopia-$STAMP"; exit 1; }
+# Ścieżka bezwzględna: `git -C "$ROOT"` liczyłby względny katalog docelowy od repozytorium,
+# a `mkdir` i przekierowania — od bieżącego katalogu (paczka git trafiłaby w złe miejsce).
+DST="$(cd "$BASE/kopia-$STAMP" && pwd)"
 echo "kopia do: $DST"
 
 # 1. Historia: paczka git (odtworzenie: git clone alfa.bundle alfa). Dysk przeniesiony z innej

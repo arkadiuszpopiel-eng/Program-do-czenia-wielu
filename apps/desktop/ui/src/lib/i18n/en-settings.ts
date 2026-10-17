@@ -165,7 +165,8 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'dev.gpuRole.light': 'light tasks',
   'dev.gpuRole.spare': 'not used',
   'dev.gpuShared': 'shared memory up to {size}',
-  'dev.gpuHint.heavy': 'The chat model and speech recognition — Alfa pins them to this card.',
+  'dev.gpuHint.heavy':
+    'The chat model — Alfa pins it to this card; speech recognition too when the card has its own memory (integrated graphics with a small reservation recognises speech on the processor).',
   'dev.gpuHint.light':
     'A helper model for summaries, titles and memory housekeeping, so the main card stays free. Needs the “llama.cpp Vulkan” engine from “Local models and engines”; without it these tasks run as before.',
   'dev.gpuHint.spare': 'Alfa does not use this card.',

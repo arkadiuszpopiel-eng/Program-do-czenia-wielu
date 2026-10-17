@@ -171,7 +171,8 @@ export const plSettings = {
   'dev.gpuRole.light': 'lekkie zadania',
   'dev.gpuRole.spare': 'nieużywana',
   'dev.gpuShared': 'pamięć współdzielona do {size}',
-  'dev.gpuHint.heavy': 'Model rozmowy i rozpoznawanie mowy — Alfa przypina je do tej karty.',
+  'dev.gpuHint.heavy':
+    'Model rozmowy — Alfa przypina go do tej karty; rozpoznawanie mowy też, gdy karta ma własną pamięć (sama grafika zintegrowana z małą rezerwą rozpoznaje mowę na procesorze).',
   'dev.gpuHint.light':
     'Model pomocniczy do streszczeń, tytułów i porządków pamięci, żeby nie zajmować karty głównej. Wymaga silnika „llama.cpp Vulkan” z „Modele lokalne i silniki”; bez niego te zadania idą jak dotąd.',
   'dev.gpuHint.spare': 'Alfa nie korzysta z tej karty.',

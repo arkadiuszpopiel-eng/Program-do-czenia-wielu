@@ -18,8 +18,8 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use accounts_hub_contract::CliProbe;
-use app_api::AppError;
 use app_api::dto::{TerminalFrame, TerminalProfileId, TerminalSession};
+use app_api::{AppError, ErrorCode};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use core_bus_contract::EventBus;
@@ -122,16 +122,32 @@ fn profile_id(p: TerminalProfile) -> TerminalProfileId {
     }
 }
 
+/// Nazwa narzędzia dla profilu terminala logowania (kontrakt podaje profil, np. `ClaudeLogin`).
+fn program_name(profile: &str) -> &str {
+    match profile {
+        "ClaudeLogin" => "Claude Code (claude)",
+        "CodexLogin" => "Codex CLI (codex)",
+        "AgyLogin" => "Antigravity (agy)",
+        other => other,
+    }
+}
+
 fn error(e: TerminalError) -> AppError {
     match e {
         TerminalError::NotFound(id) => AppError::not_found(format!("Terminal {id} nie istnieje.")),
         TerminalError::Limit(n) => AppError::invalid(format!(
             "Otwarto już {n} terminale — zamknij któryś, zanim otworzysz kolejny."
         )),
-        TerminalError::ProgramMissing(p) => AppError::unavailable(
-            &format!("Terminal ({p}) — program nie jest zainstalowany"),
-            "ui-terminal",
-        ),
+        // Brak programu na komputerze to nie brak modułu: komunikat mówi, czego brakuje i co zrobić
+        // (wcześniej „…funkcja dostępna po podłączeniu modułu ui-terminal”).
+        TerminalError::ProgramMissing(p) => AppError::new(
+            ErrorCode::Unavailable,
+            format!(
+                "Nie znaleziono programu {} na tym komputerze — zainstaluj go i spróbuj ponownie.",
+                program_name(&p)
+            ),
+        )
+        .with("module", "ui-terminal"),
         TerminalError::InputTooLarge => {
             AppError::invalid(format!("Paczka wejścia większa niż {MAX_INPUT_BYTES} B."))
         }
@@ -318,5 +334,24 @@ fn session(info: &ui_terminal_contract::TerminalInfo) -> TerminalSession {
         profile: profile_id(info.profile),
         pid: info.pid,
         alive: info.alive,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Brak programu to nie brak modułu: komunikat nazywa narzędzie i mówi, co zrobić.
+    #[test]
+    fn missing_program_is_named_without_module_hint() {
+        let e = error(TerminalError::ProgramMissing("ClaudeLogin".into()));
+        assert_eq!(e.code, ErrorCode::Unavailable);
+        assert!(e.message.contains("Claude Code (claude)"), "{}", e.message);
+        assert!(!e.message.contains("podłączeniu modułu"), "{}", e.message);
+        assert!(
+            error(TerminalError::ProgramMissing("Cmd".into()))
+                .message
+                .contains("Cmd")
+        );
     }
 }

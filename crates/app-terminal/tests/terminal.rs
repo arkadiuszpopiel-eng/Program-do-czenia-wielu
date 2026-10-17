@@ -133,7 +133,9 @@ async fn exit_is_reported_and_bad_input_is_rejected() {
         .open(TerminalProfileId::ClaudeLogin, 80, 24, None, sink.clone())
         .unwrap_err();
     assert!(
-        missing.message.contains("nie jest zainstalowany"),
+        missing
+            .message
+            .contains("Nie znaleziono programu Claude Code"),
         "{missing:?}"
     );
     assert!(

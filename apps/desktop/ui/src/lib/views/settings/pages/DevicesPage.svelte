@@ -3,6 +3,7 @@
   import { Button } from '@alfa/ui-kit';
   import type { DeviceProfile } from '../../../api/types-hub';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { hasMemoryPool } from '../../../logic/models';
   import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
@@ -67,7 +68,7 @@
               <span class="gpu-name">{gpu.vendor} {gpu.model}</span>
               <span class="gpu-role {gpu.role}">{tk(`dev.gpuRole.${gpu.role}`)}</span>
               <span class="gpu-meta">
-                {gpu.integrated
+                {!hasMemoryPool(gpu)
                   ? t('dev.gpuShared', { size: app.i18n.bytes(gpu.shared_mb * 1024 * 1024) })
                   : app.i18n.bytes(gpu.vram_mb * 1024 * 1024)} · {gpu.backends.join(', ')}
               </span>

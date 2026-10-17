@@ -42,6 +42,20 @@ impl Profile {
             .max_by_key(|g| g.shared_mb)
     }
 
+    /// RAM dostępna dla systemu (MB): zainstalowana (`ram_mb` z SMBIOS) bez rezerwy z BIOS-u kart
+    /// zintegrowanych z własną pulą pamięci — tę rezerwę Alfa liczy już jako pamięć karty, a Windows
+    /// jej nie widzi (np. 16 GB z 8 GB rezerwy → ok. 8 GB dla systemu). Mała rezerwa (0,5–4 GB)
+    /// zostaje w RAM, bo karta zintegrowana z nią liczy w pamięci współdzielonej.
+    pub fn system_ram_mb(&self) -> u32 {
+        let reserved: u32 = self
+            .gpus
+            .iter()
+            .filter(|g| g.integrated && g.has_memory_pool())
+            .map(|g| g.vram_mb)
+            .sum();
+        self.ram_mb.saturating_sub(reserved)
+    }
+
     /// VRAM głównego GPU w MB (0 = brak GPU).
     pub fn primary_vram_mb(&self) -> u32 {
         self.primary_gpu().map_or(0, |g| g.vram_mb)

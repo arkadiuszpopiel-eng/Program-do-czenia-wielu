@@ -65,11 +65,12 @@ impl Machine {
             g.integrated
                 && g.backends.contains(&Backend::Vulkan)
                 && gpu.is_none_or(|main| main.id != g.id)
-        }) && (gpu.is_some() || u64::from(p.ram_mb) >= IGPU_MIN_RAM_MB);
+        }) && (gpu.is_some() || u64::from(p.system_ram_mb()) >= IGPU_MIN_RAM_MB);
         Self {
             gpu: gpu.map(|g| g.vendor),
             vram_mb: gpu.map_or(0, |g| u64::from(g.vram_mb)),
-            ram_mb: u64::from(p.ram_mb),
+            // Bez rezerwy APU liczonej jako pamięć karty (`Profile::system_ram_mb`).
+            ram_mb: u64::from(p.system_ram_mb()),
             cpu_cores: p.cpu.physical_cores,
             igpu,
         }

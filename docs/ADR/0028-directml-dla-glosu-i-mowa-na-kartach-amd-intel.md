@@ -34,7 +34,7 @@ Właściciel: Alfa ma działać na kartach NVIDIA, AMD i Intel oraz na grafice z
    - `alfa-supertonic --dml <numer karty DXGI>`; rejestracja DirectML z `error_on_failure` — nieudana daje komunikat
      na stderr i **jawny** powrót na procesor (sprawdzone: biblioteka bez DirectML, nieistniejąca karta);
    - Alfa przekazuje `--dml` tylko przy zainstalowanych obu pozycjach i karcie z własną pamięcią ≥ 12 GB
-     (`GPU_TTS_MIN_VRAM_MB`; największa taka karta). Pakiety dokładają te pozycje tylko z głosem Supertonic i taką
+     (`GPU_TTS_MIN_VRAM_MB`; osobna przed zintegrowaną z taką rezerwą, potem największa). Pakiety dokładają te pozycje tylko z głosem Supertonic i taką
      kartą. Smart Turn zostaje na procesorze (ok. 25 ms — nie mierzyłam zysku na karcie).
    - Pomiar 2026-10-17 na RX 9070 XT (Ryzen 7 5700X3D), 3 przebiegi × 5 zdań (30,7 s mowy), stan ustalony: procesor
      RTF 0,154–0,159 (średnio 0,95 s na zdanie), DirectML RTF 0,094–0,108 (0,58 s na zdanie, prawie niezależnie od
@@ -52,6 +52,10 @@ Właściciel: Alfa ma działać na kartach NVIDIA, AMD i Intel oraz na grafice z
   człowieka”) i jest pobierana przez użytkownika z NuGet, nie dołączana do instalatora.
 - Ryzyko: DirectML w trybie podtrzymania; następcą jest Windows ML. Przy kolejnej wersji ONNX Runtime trzeba
   sprawdzić, czy wariant DirectML nadal jest wydawany — inaczej głos wraca na procesor (bez utraty funkcji).
+- Numer karty dla DirectML to kolejność adapterów DXGI w procesie Alfy przy składaniu głosu; `alfa-supertonic`
+  wylicza ją po swojemu przy starcie. Zwykle są takie same — różnić je może preferencja karty ustawiona w Windows
+  osobno dla `alfa-supertonic.exe` (Ustawienia → Ekran → Grafika); wtedy głos liczy na innej karcie, a przy
+  nieistniejącym numerze — na procesorze. Niesprawdzone na maszynie z kilkoma kartami.
 - Pamięć karty: Supertonic (538 MB) nie ma dzierżawy w `model-residency` — dlatego próg 12 GB. Na kartach NVIDIA i
   Intel ≥ 12 GB DirectML włącza się tak samo, ale nie był mierzony (tylko AMD).
 - Karta zintegrowana z rezerwą z BIOS-u ≥ 6 GB liczy się jak karta z tą pamięcią (`GpuInfo::has_memory_pool`), więc

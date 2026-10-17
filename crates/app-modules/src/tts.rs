@@ -116,6 +116,8 @@ fn build(
         let models = supertonic_models(paths);
         let lossy = |p: std::path::PathBuf| p.to_string_lossy().into_owned();
         // Karta sprawdzana tylko przy składaniu silnika (DXGI, kilka ms), nie przy każdym wykryciu.
+        // Numer to kolejność DXGI w tym procesie; `alfa-supertonic` liczy ją po swojemu — różnić je może
+        // tylko osobna preferencja karty w Windows dla `alfa-supertonic.exe` (ADR 0028, „Konsekwencje”).
         let (runtime, device) =
             supertonic_runtime_for(paths, crate::gpu_mem::tts_dml_device_here())
                 .unwrap_or_default();

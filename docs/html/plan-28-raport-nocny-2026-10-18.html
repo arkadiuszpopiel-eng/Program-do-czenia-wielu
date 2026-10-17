@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna) — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/28-raport-nocny-2026-10-18.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html" aria-current="page">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-najwazniejsze-w-pieciu-punktach">1. Najważniejsze w pięciu punktach</a></li><li><a href="#2-co-doszlo-commity-na-galezi-ccr-af4b63c6-3fyzaj-niewypchniete">2. Co doszło (commity na gałęzi ccr-af4b63c6-3fyzaj, niewypchnięte)</a></li><li><a href="#3-jak-to-sprawdzilam">3. Jak to sprawdziłam</a></li><li><a href="#4-czego-nie-sprawdzilam-albo-nie-przeszlo-i-dlaczego">4. Czego nie sprawdziłam albo nie przeszło (i dlaczego)</a></li><li><a href="#5-decyzje-dla-ciebie">5. Decyzje dla Ciebie</a></li><li><a href="#6-porzadki-i-kopie">6. Porządki i kopie</a></li><li><a href="#7-po-poprawkach-drugiego-przegladu">7. Po poprawkach drugiego przeglądu</a></li></ul></aside><article><h1 id="raport-z-dnia-i-nocy-2026-10-17-18-wersja-0-0-63-kazda-karta-graficzna">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</h1>
+<p>Polecenia: „Alfa ma działać na kartach AMD i Nvidia i iGPU różnego typu, więc musi być to dopracowane”, potem
+„pobierz to, co potrzeba, i dodaj do programu, i zapisz odpowiednio wszystko w dokumentacji”, „najwyższa precyzja”,
+a na noc: „pracuj dalej do 3:30, potem kopia bezpieczeństwa na dysk F: (katalog Alfa)”. Praca na <strong>nowym
+komputerze</strong>: Ryzen 7 5700X3D, Radeon RX 9070 XT 16 GB, 32 GB RAM (dysk E: z projektem przeniesiony z laptopa).
+Wersji 0.0.63 <strong>nie wgrałam</strong> do <code>Alfa-uruchomiona</code> (tam nadal 0.0.62) — to Twoja decyzja po lekturze.</p>
+<h2 id="1-najwazniejsze-w-pieciu-punktach">1. Najważniejsze w pięciu punktach</h2>
+<ul>
+<li><strong>Karty AMD, Intel i zintegrowane są obsługiwane na równi z NVIDIA</strong>: wykrywanie od sterownika (DXCore), te same
+progi pamięci, klasa „karta zintegrowana”, pakiety z silnikiem Vulkan, pomiar pamięci kart bez <code>nvidia-smi</code>.</li>
+<li><strong>Mowa na AMD/Intel liczy na karcie</strong>: Qwen3-ASR przez <code>llama-server</code> Vulkan — na RX 9070 XT 0,16–0,23 s na zdanie
+(wcześniej Whisper na procesorze, ok. 54 s na zdanie na laptopie). Whisper nie ma oficjalnej wersji Vulkan.</li>
+<li><strong>Głos Supertonic na karcie przez DirectML</strong> (pobrane z NuGet Microsoftu, sumy zgodne z katalogiem NuGet):
+0,58 s zamiast 0,95 s na zdanie, 538 MB pamięci karty; włącza się na karcie z ≥ 12 GB. <strong>ADR 0028 do podpisu.</strong></li>
+<li><strong>Dwa niezależne przeglądy kodu</strong> (agenty AI, każde znalezisko sprawdzane przez 3 sceptyków): 15 + 14 usterek
+potwierdzonych i poprawionych, m.in. podwójne liczenie rezerwy pamięci APU.</li>
+<li><strong>Awaria komputera o 20:31</strong> (brak pamięci + resety mostka USB dysku E:): dyski, repozytorium i pliki sprawdzone —
+nic nie stracone. Ciężkie zadania od tej pory z ograniczeniem równoległości.</li>
+</ul>
+<h2 id="2-co-doszlo-commity-na-galezi-ccr-af4b63c6-3fyzaj-niewypchniete">2. Co doszło (commity na gałęzi <code>ccr-af4b63c6-3fyzaj</code>, niewypchnięte)</h2>
+<div class="tbl"><table><thead><tr><th>Commit</th><th>Co</th></tr></thead><tbody><tr><td><code>6ff0c311</code></td><td>Wykrywanie (LUID, zintegrowana, sterownik), klasy niezależne od producenta, klasa Integrated, PDH, pakiety</td></tr>
+<tr><td><code>72c4e1cb</code></td><td>0.0.63: DirectML dla Supertonic, Qwen3-ASR na AMD/Intel, APU z dużą rezerwą, 15 poprawek po przeglądzie</td></tr>
+<tr><td><code>55bc0f06</code></td><td>Qwen3-ASR przypięty do głównej karty przy kilku kartach Vulkan</td></tr>
+<tr><td><code>d02237bd</code></td><td><code>verify.mjs</code> na tym komputerze: Git Bash zamiast aliasu WSL</td></tr>
+<tr><td>(ten)</td><td>14 poprawek po drugim przeglądzie, raport, poprawka znacznika w dzienniku zmian, <code>backup.sh</code></td></tr></tbody></table></div>
+<p>Szczegóły dla użytkownika: <a href="changelog.html">historia zmian</a> (0.0.63). Decyzja: <a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028</a>.</p>
+<h2 id="3-jak-to-sprawdzilam">3. Jak to sprawdziłam</h2>
+<ul>
+<li><strong>Na RX 9070 XT</strong>: odczyt DXCore (sterownik 32.0.31041.1004) i liczników PDH (1189 MB zajęte, 22 programy);
+Supertonic procesor kontra DirectML — 3 przebiegi × 5 zdań (30,7 s mowy), stan ustalony RTF 0,154–0,159 kontra
+0,094–0,108; powrót na procesor przy bibliotece bez DirectML i przy nieistniejącej karcie; Qwen3-ASR na Vulkan —
+4 zdania wypowiedziane przez Supertonic: 3 identyczne, w jednym zła forma wyrazu („Zapisałem” zamiast „Zapisałam”
+— mówiła barwa męska); <code>llama-server --list-devices</code> widzi kartę pod tą samą nazwą co DXGI.</li>
+<li><strong>Testy</strong>: Rust w 14 zmienionych crate&#39;ach 546/0, cały workspace w <code>verify wersja</code> 2893/1 (ten jeden — mój błąd
+formatu w dzienniku zmian, poprawiony, test zielony); vitest 393/393; svelte-check 0 błędów; clippy czysty.</li>
+<li><strong><code>verify wersja</code> 0.0.63</strong> (commit <code>d02237bd</code>, 61 min): 13 zielonych, 5 czerwonych, 1 nieuruchomiony — rozdział 4.</li>
+</ul>
+<h2 id="4-czego-nie-sprawdzilam-albo-nie-przeszlo-i-dlaczego">4. Czego nie sprawdziłam albo nie przeszło (i dlaczego)</h2>
+<div class="tbl"><table><thead><tr><th>Etap / sprawa</th><th>Stan</th><th>Co dalej</th></tr></thead><tbody><tr><td>Testy w przeglądarce (E2E)</td><td>nie wystartowały: <strong>na tym komputerze nie ma Edge</strong>, a Chromium Playwrighta jest w złej wersji (1228 zamiast 1194)</td><td>Twoja zgoda na <code>pnpm exec playwright install chromium</code> (ok. 150 MB) albo instalacja Edge</td></tr>
+<tr><td>Prawdziwa aplikacja</td><td><strong>37 z 38</strong>, pokrycie łącza 75 %; czerwony test okna logowania Claude Code (34 s)</td><td>zbadane: na tym komputerze <strong>nie ma Claude Code</strong>, a test zakładał, że jest (przycisk logowania pokazuje się zawsze). Test sprawdza teraz wykrycie narzędzia przez rdzeń; komunikat programu mówi wprost „Nie znaleziono programu Claude Code (claude) na tym komputerze — zainstaluj go…” zamiast mylącego „…po podłączeniu modułu ui-terminal”. Wynik ponownego biegu — rozdział 7</td></tr>
+<tr><td><code>cargo deny</code></td><td>czerwony: <strong>nowe ostrzeżenia bezpieczeństwa</strong> <code>ammonia 4.2.3</code> (RUSTSEC-2026-0373) i <code>zip 8.6.0</code> (RUSTSEC-2026-0367/0368/0369), opublikowane po 16.10</td><td>zgoda na pobranie <code>ammonia 4.2.4</code> (zgodna łatka — <strong>przed wydaniem</strong>); <code>zip 9</code> to nowa wersja główna — Alfa nie używa podatnych funkcji (własne rozpakowywanie odrzuca dowiązania i nie przenosi SUID), więc to osobne zadanie</td></tr>
+<tr><td>Graf zależności</td><td><code>jq</code> nie ma na tym komputerze</td><td>sprawdziłam tymi samymi regułami bez <code>jq</code>: 1733 krawędzie, 0 naruszeń</td></tr>
+<tr><td>Sprzęt</td><td>laptop z grafiką zintegrowaną, APU AMD, karty Intel, DirectML na NVIDIA — brak tych maszyn</td><td>próby na sprzęcie</td></tr></tbody></table></div>
+<h2 id="5-decyzje-dla-ciebie">5. Decyzje dla Ciebie</h2>
+<ol>
+<li><strong>ADR 0028</strong> — DirectML dla głosu (opcjonalnie, karta ≥ 12 GB) i Qwen3-ASR przez Vulkan na AMD/Intel: podpis.</li>
+<li><strong>Licencja DirectML</strong> — dopuszcza zbieranie danych diagnostycznych przez Microsoft (§2a); pozycja ma znaczek
+„Do potwierdzenia przez człowieka”.</li>
+<li><strong>Pobrania</strong>: <code>ammonia 4.2.4</code> (bezpieczeństwo), Chromium dla testów w przeglądarce (albo Edge).</li>
+<li><strong>Wgranie 0.0.63</strong> do <code>Alfa-uruchomiona</code> (<code>scripts/deploy-owner.sh</code>).</li>
+<li><strong>Resztki starego <code>node_modules</code></strong> w <code>Alfa AI Program\stare-node_modules-acl-2026-10-17</code> (1447 plików starej
+instalacji Windows) — usunąć z uprawnieniami administratora (<code>takeown /f … /r</code> i usunięcie), jeśli chcesz.</li>
+</ol>
+<h2 id="6-porzadki-i-kopie">6. Porządki i kopie</h2>
+<ul>
+<li>Usunięte (odtwarzalne): stare artefakty kompilacji ok. 97 GB (E: był pełny — 0 GB), w tym 5,5 GB starej kompilacji
+powłoki (za Twoją zgodą), moje pliki testowe; scalona gałąź <code>seria3</code>. <code>PLAN/</code>, próby głosu i kopie na F: zostały.</li>
+<li>Kopia zabezpieczająca <code>F:\Alfa\kopia-2026-10-17_2115</code> (po commicie 0.0.63): 5837 sum zgodnych, paczka git pełna.
+Kolejna o 3:30. Skrypt <code>backup.sh</code> naprawiony (na tym komputerze paczka git po cichu się nie tworzyła).</li>
+</ul>
+<h2 id="7-po-poprawkach-drugiego-przegladu">7. Po poprawkach drugiego przeglądu</h2>
+<ul>
+<li>Rust w 10 dotkniętych crate&#39;ach 339/0 i <code>app-terminal</code> zielone; clippy workspace i powłoki czysty; vitest 393/393;
+lint, rozmiary i typy interfejsu zielone.</li>
+<li>Prawdziwa aplikacja (<code>scripts/verify-app.sh</code>, zbudowana od nowa): <strong>37 zielonych, test logowania Claude Code
+pominięty</strong> (brak narzędzia), pokrycie łącza 198 z 264 (75 %), kod wyjścia 0. Skrypt etapu kopiuje bibliotekę
+ONNX Runtime z <code>%LOCALAPPDATA%/Alfa/sidecars/onnxruntime</code> — na tym komputerze jej nie ma (brak danych Alfy), więc
+instancja testowa działała bez niej; bez wpływu na wynik.</li>
+</ul>
+</article>
+<footer>Źródło: <code>docs/plan/28-raport-nocny-2026-10-18.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

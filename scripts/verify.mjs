@@ -17,6 +17,8 @@ import { cpus, freemem, totalmem } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { gitBash, stageEnv } from './verify-shell.mjs';
+
 /**
  * Ile przeglądarek testowych naraz: każda zajmuje ok. 1,5 GB. Przy małej wolnej pamięci (inne programy
  * otwarte obok) cztery naraz dławią maszynę i testy padają na przekroczeniu czasu w losowych
@@ -28,41 +30,7 @@ function e2eWorkers() {
   return String(Math.max(1, Math.min(4, Math.floor(freeGb / 1.5))));
 }
 
-/**
- * Powłoka etapów. Na Windows samo `bash` trafia najpierw na `C:\Windows\System32\bash.exe` (launcher
- * WSL) — bez dystrybucji WSL każdy etap kończył się w 0 s (2026-10-17, komputer stacjonarny). Bierzemy
- * Git Bash: `ALFA_BASH` z otoczenia albo `usr\bin\bash.exe` z instalacji Git for Windows — ten nie
- * przestawia PATH. `bin\bash.exe` dokleja na początek `/usr/bin` i budowa OpenSSL brała okrojony perl
- * z Git zamiast Strawberry Perl z `alfa-narzedzia` (`portable-env`).
- */
-function gitBash() {
-  if (process.env.ALFA_BASH) return process.env.ALFA_BASH;
-  if (process.platform !== 'win32') return 'bash';
-  const roots = [process.env.ProgramFiles, 'C:\\Program Files'].filter(Boolean);
-  const found = roots
-    .flatMap((r) => [join(r, 'Git', 'usr', 'bin', 'bash.exe'), join(r, 'Git', 'bin', 'bash.exe')])
-    .find((p) => existsSync(p));
-  return found ?? 'bash';
-}
 const BASH = gitBash();
-
-/**
- * Otoczenie etapów: katalog Git Bash (`bash`, `xargs`, `sed`…) wstawiony do PATH tuż przed
- * `System32` — za przenośnymi programami z `portable-env` (Strawberry Perl, cargo, node mają
- * pierwszeństwo), ale przed launcherem WSL (`#!/usr/bin/env bash` w `npx` trafiał na
- * `System32\bash.exe`). Na Windows klucz bywa `Path`.
- */
-function stageEnv() {
-  const env = { ...process.env, ...cargoEnv };
-  if (process.platform === 'win32' && BASH !== 'bash') {
-    const key = Object.keys(env).find((k) => k.toUpperCase() === 'PATH') ?? 'PATH';
-    const parts = (env[key] ?? '').split(';').filter(Boolean);
-    const system = parts.findIndex((p) => /\\system32\\?$/i.test(p));
-    parts.splice(system < 0 ? parts.length : system, 0, dirname(BASH));
-    env[key] = parts.join(';');
-  }
-  return env;
-}
 
 // Kody kolorów terminala (ESC[…m) — bez znaku sterującego w literale wyrażenia.
 const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
@@ -316,7 +284,7 @@ for (const [id, title, command, cwd, needGb] of STAGES) {
   const started = Date.now();
   const run = spawnSync(BASH, ['-c', command], {
     cwd,
-    env: stageEnv(),
+    env: stageEnv(BASH, cargoEnv),
     encoding: 'utf8',
     maxBuffer: 256 * 1024 * 1024,
   });

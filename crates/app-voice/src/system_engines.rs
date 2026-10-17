@@ -72,7 +72,12 @@ impl SystemVoice {
         let stt = match (&qwen, whisper) {
             (Some(cfg), true) => SttEngineView {
                 engine: SttEngineKind::QwenAsr,
-                gpu: plan.map_or(cfg.gpu, |p| p == app_modules::stt::SttPlan::QwenGpu),
+                // Przed pierwszym złożeniem: bez karty z własną pulą (sama zintegrowana) Qwen3-ASR
+                // liczy na procesorze — tani odczyt listy kart, bez liczników.
+                gpu: plan.map_or(
+                    cfg.gpu && app_modules::gpu_mem::has_main_card() != Some(false),
+                    |p| p == app_modules::stt::SttPlan::QwenGpu,
+                ),
                 fallback: Some(SttEngineKind::Whisper),
                 missing: Vec::new(),
                 guard,
