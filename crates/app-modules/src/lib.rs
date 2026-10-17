@@ -40,6 +40,7 @@ pub mod secrets;
 pub mod settings;
 pub mod speech_meter;
 pub mod stt;
+pub mod stt_device;
 pub mod system_signals;
 pub mod transfer;
 pub mod tts;

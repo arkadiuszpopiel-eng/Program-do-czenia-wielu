@@ -111,6 +111,10 @@ impl SystemVoice {
             return Ok(whisper);
         }
         config.gpu = plan == app_modules::stt::SttPlan::QwenGpu;
+        if config.gpu {
+            // Kilka kart widocznych dla Vulkana: Qwen3-ASR na głównej (przy jednej karcie bez kosztu).
+            config.device = app_modules::stt_device::qwen_device(&config.server, config.vulkan);
+        }
         match QwenStt::new(config, Arc::new(ProcessLauncher)) {
             Ok(qwen) => {
                 let qwen = Arc::new(qwen);

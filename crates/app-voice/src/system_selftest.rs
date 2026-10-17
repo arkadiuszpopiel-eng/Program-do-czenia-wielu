@@ -103,6 +103,15 @@ impl SystemVoice {
             .ok()
             .flatten();
         config.gpu = app_modules::stt::qwen_on_gpu(config.gpu, free);
+        if config.gpu {
+            let (server, vulkan) = (config.server.clone(), config.vulkan);
+            config.device = tokio::task::spawn_blocking(move || {
+                app_modules::stt_device::qwen_device(&server, vulkan)
+            })
+            .await
+            .ok()
+            .flatten();
+        }
         let on_card = config.gpu;
         let engine = match QwenStt::new(config, Arc::new(ProcessLauncher)) {
             Ok(engine) => engine,

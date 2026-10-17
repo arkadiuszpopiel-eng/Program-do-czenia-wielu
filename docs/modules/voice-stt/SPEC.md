@@ -1,7 +1,7 @@
 # voice-stt — SPEC (v0, zaimplementowany w F2)
 
 ## Cel
-Rozpoznawanie mowy jako osobny proces: whisper.cpp (large-v3-turbo Q5_0 z bramką VAD; Vulkan/CUDA/CPU; fallback small Q5 / CPU), Parakeet v3 (ONNX) jako opcja, chmura (ElevenLabs Scribe v2 RT, Soniox, gpt-4o-transcribe, Qwen3-ASR) przez `ModelProvider`; tryb dwuprzebiegowy (szybki partial + dokładny final), biasing/hotwords, auto PL/EN, pewność per słowo (PLAN §6.2, §6.3, §1.2).
+Rozpoznawanie mowy jako osobny proces: whisper.cpp (large-v3-turbo Q5_0 z bramką VAD; Vulkan/CUDA/CPU; fallback small Q5 / CPU), Parakeet v3 (ONNX) jako opcja, chmura (ElevenLabs Scribe v2 RT, Soniox, gpt-4o-transcribe, Qwen3-ASR) przez `ModelProvider`; tryb dwuprzebiegowy (szybki partial + dokładny final), biasing/hotwords, auto PL/EN, pewność per słowo (PLAN §6.2, §6.3, §1.2). Lokalnie od 0.0.63 (ADR 0028 — proponowany): Qwen3-ASR przez `llama-server` (CUDA, Vulkan albo CPU) jest głównym silnikiem także na kartach AMD/Intel — wydania whisper.cpp dla Windows nie mają wersji Vulkan (sprawdzone do v1.9.5); przy co najmniej dwóch kartach widocznych dla kompilacji Qwen3-ASR dostaje `--device` głównej karty (`app_modules::stt_device`, dopasowanie po nazwie jak model rozmowy), przy jednej karcie serwer nie jest odpytywany.
 
 ## Fala i priorytet
 F0: spike (a)(h) pomiary; F2: moduł (lokalny + chmura po kluczu). P0.

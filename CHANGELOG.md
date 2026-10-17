@@ -25,6 +25,8 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
   zdanie rozpoznaje się w 0,16–0,23 s; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie na laptopie). Gdy
   model rozmowy zajmie kartę (mniej niż 3,2 GB wolnej pamięci), Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie) —
   karta NVIDIA ma wtedy jeszcze Whisper na karcie.
+- Komputer z dwiema kartami widocznymi dla Vulkana (np. laptop: grafika zintegrowana i osobna karta): Qwen3-ASR
+  liczy na głównej karcie (`--device`), a nie na słabszej albo na obu naraz. Przy jednej karcie bez zmian.
 - Głos Supertonic liczy na karcie przez DirectML, gdy karta ma własne ≥ 12 GB pamięci i pobrane są pozycje
   „ONNX Runtime 1.23.0 (DirectML)” i „DirectML 1.15.4” (Ustawienia → Modele lokalne i silniki): na RX 9070 XT
   0,58 s zamiast 0,95 s na zdanie, 538 MB pamięci karty. Gdy karta nie da rady, głos sam wraca na procesor.

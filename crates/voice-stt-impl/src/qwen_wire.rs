@@ -25,6 +25,9 @@ pub struct QwenConfig {
     /// `server` to kompilacja Vulkan (karta AMD, Intel albo zintegrowana), a nie CUDA — tylko do
     /// opisu backendu w zdarzeniach i stanie; argumenty są te same.
     pub vulkan: bool,
+    /// Urządzenie serwera (`--device`, np. `Vulkan1`) przy kilku kartach widocznych dla kompilacji —
+    /// bez tego Vulkan potrafi wybrać słabszą kartę albo rozłożyć model na dwie. `None` — bez wskazania.
+    pub device: Option<String>,
     /// Wątki procesora.
     pub threads: usize,
     /// Najdłuższe czekanie na gotowość serwera.
@@ -45,6 +48,7 @@ impl QwenConfig {
             mmproj,
             gpu,
             vulkan: false,
+            device: None,
             threads: (cores / 2).max(4),
             startup: Duration::from_secs(120),
             request_timeout: Duration::from_secs(90),
@@ -78,6 +82,9 @@ pub fn build_args(cfg: &QwenConfig, port: u16) -> Vec<String> {
     ];
     if !cfg.gpu {
         args.push("--no-mmproj-offload".to_owned());
+    }
+    if let Some(device) = cfg.device.as_ref().filter(|_| cfg.gpu) {
+        args.extend(["--device".to_owned(), device.clone()]);
     }
     args
 }
@@ -161,6 +168,16 @@ mod tests {
         assert_eq!(at(&cpu, "--n-gpu-layers").as_deref(), Some("0"));
         assert!(cpu.contains(&"--no-mmproj-offload".to_owned()));
         assert!(config(true).threads >= 4);
+        assert!(!gpu.contains(&"--device".to_owned()), "bez wskazania karty");
+        // Wskazana karta tylko przy liczeniu na karcie.
+        let mut pinned = config(true);
+        pinned.device = Some("Vulkan1".into());
+        assert_eq!(
+            at(&build_args(&pinned, 1), "--device").as_deref(),
+            Some("Vulkan1")
+        );
+        pinned.gpu = false;
+        assert!(!build_args(&pinned, 1).contains(&"--device".to_owned()));
     }
 
     #[test]

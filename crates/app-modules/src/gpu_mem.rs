@@ -195,13 +195,13 @@ fn sort_processes(out: &mut [GpuProcess]) {
 }
 
 /// Sprzętowa karta (bez adaptera programowego i zdalnego pulpitu Microsoftu 0x1414).
-fn hardware(a: &GpuAdapter) -> bool {
+pub(crate) fn hardware(a: &GpuAdapter) -> bool {
     !a.software && a.vendor_id != 0x1414
 }
 
 /// Karta z własną pulą pamięci (`device_profile_contract::has_memory_pool`): osobna albo zintegrowana
 /// z rezerwą z BIOS-u ≥ 6 GB. Bez flagi sterownika „zintegrowana” = mniej niż 1 GB własnej pamięci.
-fn discrete(a: &GpuAdapter) -> bool {
+pub(crate) fn discrete(a: &GpuAdapter) -> bool {
     let integrated = a.integrated.unwrap_or(a.dedicated_vram_mb < 1_024);
     hardware(a) && has_memory_pool(integrated, mb32(a.dedicated_vram_mb))
 }
