@@ -604,12 +604,12 @@ test('Ustawienia → Głos i Urządzenia: silniki rozmowy i karty graficzne z pr
   const live = main.getByTestId('gpu-live');
   await live.scrollIntoViewIfNeeded();
   await expect(live.getByRole('heading', { name: 'Karty graficzne na żywo' })).toBeVisible();
-  // Z kartą NVIDIA jest miernik pamięci; bez niej — wyjaśnienie. Nigdy pusta karta.
+  // Z kartą (NVIDIA, AMD, Intel) jest miernik pamięci; bez pomiaru — wyjaśnienie. Nigdy pusta karta.
   await expect(
     live
       .getByRole('meter')
       .first()
-      .or(live.getByText(/Odczyt na żywo działa dziś dla kart NVIDIA/)),
+      .or(live.getByText(/Brak odczytu na żywo/)),
   ).toBeVisible({ timeout: 15_000 });
   await shot(alfa, '16-karty-na-zywo');
 });

@@ -46,8 +46,11 @@
   let upward = $state(false);
   let alignEnd = $state(false);
   let list = $state<HTMLElement | null>(null);
-  /** Chwila zamknięcia kliknięciem poza listą — klik etykiety nie może jej zaraz otworzyć. */
-  let closedAt = 0;
+  /**
+   * Chwila zamknięcia kliknięciem poza listą — klik etykiety nie może jej zaraz otworzyć. Na starcie
+   * „nigdy”: przy 0 klik w pierwszych 300 ms po wczytaniu strony był ignorowany (szybki komputer).
+   */
+  let closedAt = Number.NEGATIVE_INFINITY;
   let active = $state(-1);
   let typed = '';
   let typedAt = 0;

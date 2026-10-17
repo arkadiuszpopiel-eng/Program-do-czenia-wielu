@@ -46,6 +46,9 @@ test('Urządzenia: bez pomiaru na żywo jest wyjaśnienie zamiast pustej karty',
   await openApp(page, { scenario: 'no-mic' });
   await waitForChat(page);
   const card = await devices(page);
-  await expect(card.getByText(/Odczyt na żywo działa dziś dla kart NVIDIA/)).toBeVisible();
+  // Od 0.0.63 pomiar działa dla każdego producenta (liczniki Windows) — wyjaśnienie mówi, czemu go nie ma.
+  await expect(
+    card.getByText(/Brak odczytu na żywo: ten komputer nie ma karty graficznej/),
+  ).toBeVisible();
   await expect(card.getByRole('meter')).toHaveCount(0);
 });

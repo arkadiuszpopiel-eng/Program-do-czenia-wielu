@@ -114,6 +114,27 @@ test('lista wyboru: klik etykiety i utrata fokusu zamykają ją na stałe', asyn
   await expect(list).toHaveCount(0);
 });
 
+test('lista wyboru: pierwszy klik zaraz po wczytaniu strony otwiera listę', async ({ page }) => {
+  // Zegar strony cofnięty do zera tuż przed kliknięciem — jak na szybkim komputerze, gdzie klik pada
+  // w pierwszych 300 ms po wczytaniu (2026-10-18: lista okresu rozmów nie otwierała się wcale).
+  await page.addInitScript(() => {
+    const real = performance.now.bind(performance);
+    let base = 0;
+    performance.now = () => real() - base;
+    (window as unknown as { clockZero: () => void }).clockZero = () => {
+      base = real();
+    };
+  });
+  await openApp(page);
+  await waitForChat(page);
+  const period = page
+    .getByRole('navigation', { name: 'Sesje' })
+    .getByRole('combobox', { name: 'Pokaż rozmowy' });
+  await page.evaluate(() => (window as unknown as { clockZero: () => void }).clockZero());
+  await period.click();
+  await expect(page.getByRole('listbox', { name: 'Pokaż rozmowy' })).toBeVisible();
+});
+
 test('lista wyboru przy skali 150 %: w dolnej części okna otwiera się w górę', async ({ page }) => {
   await page.setViewportSize({ width: 1500, height: 760 });
   await openApp(page);

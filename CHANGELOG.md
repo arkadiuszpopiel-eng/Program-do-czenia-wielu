@@ -56,6 +56,12 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
 
 ### Inne
 
+- [poważne] Czyszczenie odpowiedzi modeli z niebezpiecznego HTML (biblioteka `ammonia`) w wersji z poprawką
+  bezpieczeństwa RUSTSEC-2026-0373: funkcja `url()` w stylach CSS jest rozpoznawana bez względu na wielkość liter.
+  Ostrzeżenia dla biblioteki `zip` (RUSTSEC-2026-0367/0368/0369) zostają — dotyczą funkcji rozpakowywania, z których
+  Alfa nie korzysta; przejście na `zip` 9 to osobne zadanie.
+- Lista wyboru (np. „Pokaż rozmowy”) otwiera się przy pierwszym kliknięciu także zaraz po wczytaniu okna — klik
+  w pierwszych 0,3 s był pomijany (widać to było na szybkim komputerze, w testach w przeglądarce).
 - Logowanie do narzędzia CLI, którego nie ma na komputerze, mówi wprost: „Nie znaleziono programu Claude Code
   (claude) na tym komputerze — zainstaluj go i spróbuj ponownie” (wcześniej mylące „…po podłączeniu modułu
   ui-terminal”, a po angielsku „…once its module is connected”).
@@ -74,6 +80,9 @@ karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); ka
   rezerwa APU liczona dwa razy (jako karta i jako RAM), pomiar pamięci nie tej karty, na której liczy mowa. Trzeci
   przegląd: 4 kolejne — m.in. lista kart odczytywana co 20 ms w trakcie dyktowania, przy dwóch kartach NVIDIA
   wolna pamięć drugiej karty, ocena „mieści się na karcie” według rezerwy APU zamiast karty osobnej.
+- Testy w przeglądarce na Chromium Playwrighta (na komputerze stacjonarnym nie ma Edge): 467/467 — w tym nowy test
+  pierwszego kliknięcia listy wyboru; wcześniej 2 czerwone (nieaktualny napis w teście strony Urządzenia i lista
+  wyboru pomijająca klik w pierwszych 0,3 s).
 - Nie sprawdzono na sprzęcie: laptop z kartą zintegrowaną, APU AMD (małe i duże rezerwy) i karty Intel (brak tych
   maszyn); DirectML na kartach NVIDIA i Intel ≥ 12 GB i na APU z rezerwą ≥ 12 GB (włącza się sam, zmierzone tylko
   na osobnej karcie AMD); na karcie zintegrowanej z małą rezerwą DirectML jest wyłączony (niezmierzony).

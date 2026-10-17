@@ -49,9 +49,9 @@ Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Dec
 | Etap / sprawa              | Stan                                                                                                                                                                       | Co dalej                                                                                                                                                                                                                                                                                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Lint interfejsu i skryptów | czerwony: mój commit `d02237bd` wydłużył `scripts/verify.mjs` do 409 linii (limit 400)                                                                                     | poprawione w następnym commicie — wybór powłoki i otoczenia etapów przeniesiony do nowego `scripts/verify-shell.mjs` (37 linii), `verify.mjs` ma teraz 377 linii; lint zielony (rozdział 7)                                                                                                                                                                                          |
-| Testy w przeglądarce (E2E) | nie wystartowały: `verify` uruchamia je w **Edge** (`PW_CHANNEL=msedge`), a **na tym komputerze nie ma Edge**; Chromium Playwrighta jest w złej wersji (1228 zamiast 1194) | etap `verify` odblokuje tylko instalacja Edge; zgoda na `pnpm exec playwright install chromium` w `apps/desktop/ui` (dwa archiwa — Chromium i jego wersja bez okna; obecny zestaw 1228 zajmuje 416 + 271 MB, więc ok. 690 MB na dysku) pozwoli uruchomić te same testy ręcznie: tamże `pnpm build`, potem `pnpm test:e2e`                                                            |
+| Testy w przeglądarce (E2E) | nie wystartowały: `verify` uruchamia je w **Edge** (`PW_CHANNEL=msedge`), a **na tym komputerze nie ma Edge**; Chromium Playwrighta jest w złej wersji (1228 zamiast 1194) | etap `verify` odblokuje tylko instalacja Edge; te same testy uruchomiłam ręcznie na Chromium Playwrighta (`pnpm exec playwright install chromium` w `apps/desktop/ui`, potem `pnpm build` i `pnpm test:e2e`): **467/467** po dwóch poprawkach — rozdział 10                                                                                                                          |
 | Prawdziwa aplikacja        | **37 z 38**, pokrycie łącza 75 %; czerwony test okna logowania Claude Code (34 s)                                                                                          | zbadane: na tym komputerze **nie ma Claude Code**, a test zakładał, że jest (przycisk logowania pokazuje się zawsze). Test sprawdza teraz wykrycie narzędzia przez rdzeń; komunikat programu mówi wprost „Nie znaleziono programu Claude Code (claude) na tym komputerze — zainstaluj go…” zamiast mylącego „…po podłączeniu modułu ui-terminal”. Wynik ponownego biegu — rozdział 7 |
-| `cargo deny`               | czerwony: **nowe ostrzeżenia bezpieczeństwa** `ammonia 4.2.3` (RUSTSEC-2026-0373) i `zip 8.6.0` (RUSTSEC-2026-0367/0368/0369), opublikowane po 16.10                       | zgoda na pobranie `ammonia 4.2.4` (zgodna łatka — **przed wydaniem**); `zip 9` to nowa wersja główna — Alfa nie używa podatnych funkcji (własne rozpakowywanie odrzuca dowiązania i nie przenosi SUID), więc to osobne zadanie                                                                                                                                                       |
+| `cargo deny`               | czerwony: **nowe ostrzeżenia bezpieczeństwa** `ammonia 4.2.3` (RUSTSEC-2026-0373) i `zip 8.6.0` (RUSTSEC-2026-0367/0368/0369), opublikowane po 16.10                       | `ammonia 4.2.4` (zgodna łatka) — **zrobione** po północy, rozdział 10; `zip 9` to nowa wersja główna — Alfa nie używa podatnych funkcji (własne rozpakowywanie odrzuca dowiązania i nie przenosi SUID), więc to osobne zadanie                                                                                                                                                       |
 | Graf zależności            | `jq` nie ma na tym komputerze                                                                                                                                              | sprawdziłam tymi samymi regułami bez `jq`: 1733 krawędzie, 0 naruszeń                                                                                                                                                                                                                                                                                                                |
 | Sprzęt                     | laptop z grafiką zintegrowaną, APU AMD, karty Intel, DirectML na NVIDIA — brak tych maszyn                                                                                 | próby na sprzęcie                                                                                                                                                                                                                                                                                                                                                                    |
 
@@ -60,8 +60,9 @@ Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Dec
 1. **ADR 0028** — DirectML dla głosu (opcjonalnie, karta ≥ 12 GB) i Qwen3-ASR przez Vulkan na AMD/Intel: podpis.
 2. **Licencja DirectML** — dopuszcza zbieranie danych diagnostycznych przez Microsoft (§2a); pozycja ma znaczek
    „Do potwierdzenia przez człowieka”.
-3. **Pobrania**: `ammonia 4.2.4` (bezpieczeństwo); Edge (etap `verify` testów w przeglądarce) albo Chromium
-   Playwrighta (te same testy uruchamiane ręcznie).
+3. **Pobrania**: `ammonia 4.2.4` — zrobione po północy w ramach Twojej stałej zgody na pobrania do 3 GB (rozdział 10);
+   Edge (etap `verify` testów w przeglądarce) — instalacja programu w systemie należy do Ciebie; `zip` 9 (nowa wersja
+   główna) — osobne zadanie.
 4. **Wgranie 0.0.63** do `Alfa-uruchomiona` (`scripts/deploy-owner.sh`).
 5. **Resztki starego `node_modules`** w `Alfa AI Program\stare-node_modules-acl-2026-10-17` (1447 plików starej
    instalacji Windows) — usunąć z uprawnieniami administratora (`takeown /f … /r` i usunięcie), jeśli chcesz.
@@ -117,3 +118,25 @@ pliku, zaniżony rozmiar pobrania Chromium) — wprowadzone.
 pominięty), pokrycie łącza 198 z 264 (75 %); formatowanie, lintery, schematy, typy, plan HTML, `pnpm audit`, SBOM —
 zielone. Czerwone — te same przyczyny co w rozdziale 4: testy w przeglądarce (brak Edge; budowa i budżet rozmiaru
 przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności (brak `jq`).
+
+## 10. Po północy (18.10)
+
+- **Twoje zasady pracy z laptopa** (zgody na pobrania, praca nocna, weryfikacja UI i inne) nie były w pamięci asystenta
+  na tym komputerze — `memory-sync.sh` jako lustro skasowałby je z kopii w repozytorium. Przywróciłam je u źródła
+  z kopii w `docs/pamiec-projektu/2-zasady-pracy` i zapisałam, jak to sprawdzać na nowej maszynie.
+- **`ammonia` 4.2.4** (łatka RUSTSEC-2026-0373) — pobrana z crates.io w ramach Twojej stałej zgody na pobrania do 3 GB,
+  oba pliki `Cargo.lock`; w pliku powłoki cargo przy okazji ujednolicił zależność `cssparser-macros` z `syn` 3 na już
+  obecny `syn` 2 (żaden nowy crate). `cargo deny`: zostały tylko 3 ostrzeżenia `zip`; sprawdziłam w kodzie, że Alfa nie
+  woła podatnego `ZipArchive::extract` (własne rozpakowywanie w `app-models` i `updater-impl` odrzuca dowiązania).
+  Testy `lib-markdown`, `app-chat`, `app-files` 63/0, `app-updates`, `app-modules`, `app-core` 186/0, clippy czysty.
+- **Testy w przeglądarce na Chromium Playwrighta** (pobrany: wersja 1194 z `cdn.playwright.dev`, ok. 530 MB na C:,
+  poza repozytorium — także w ramach stałej zgody): pierwszy bieg 464/466. Dwa czerwone — dwa prawdziwe błędy:
+  - test strony Urządzenia szukał starego napisu „Odczyt na żywo działa dziś dla kart NVIDIA…”, który sama zmieniłam
+    w `6ff0c311` (pomiar działa już dla każdego producenta) — poprawiony test w przeglądarce i w prawdziwej aplikacji
+    (tam nie było go widać, bo karta RX 9070 XT daje miernik);
+  - **lista wyboru pomijała klik w pierwszych 0,3 s po wczytaniu okna** (zabezpieczenie przed ponownym otwarciem
+    liczyło od zera, a nie od ostatniego zamknięcia) — na szybkim komputerze test archiwum klikał po 190–250 ms
+    i lista się nie otwierała. Zmierzone, poprawione w `ui-kit` (`Select.svelte`), nowy test cofa zegar strony do zera
+    tuż przed kliknięciem — na starej kompilacji czerwony, po poprawce zielony.
+  - Po poprawkach: **467/467** (5 min), budżet rozmiaru zielony (434,6 KB gzip), vitest 394/394, `svelte-check` 0,
+    lint zielony.
