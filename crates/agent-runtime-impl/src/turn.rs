@@ -1,6 +1,8 @@
 //! Tura modelu (plan/decyzja/weryfikacja): tool use z IR, zużycie i koszt, odpowiedź końcowa
 //! → weryfikacja (Krytyczka z obsady, a gdy jej brak — samoweryfikacja v0).
 
+use std::collections::BTreeMap;
+
 use agent_runtime_contract::{RunEvent, RunOutcome, StepKind, StepStatus};
 use futures_util::StreamExt;
 use providers_contract::{ChatRequest, ContentBlock, Role, StopReason, ToolUse, TurnAccumulator};
@@ -66,7 +68,9 @@ impl Engine {
         let provider = self.shared.provider.clone();
         let mut stream = provider.stream(self.request(), self.handle.cancel.child_token());
         let mut acc = TurnAccumulator::new(provider.id().clone());
+        let mut invalid = BTreeMap::new();
         while let Some(ev) = stream.next().await {
+            crate::invalid::note(&ev, &mut invalid);
             acc.push(&ev);
         }
         let turn = acc.finish();
@@ -166,6 +170,7 @@ impl Engine {
         if uses.is_empty() {
             return self.final_answer(text).await;
         }
+        self.invalid_args = invalid;
         self.run_tools(uses).await
     }
 

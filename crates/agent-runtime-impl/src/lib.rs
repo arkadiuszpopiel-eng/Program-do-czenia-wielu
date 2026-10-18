@@ -29,6 +29,7 @@ mod engine;
 mod executor;
 mod flow;
 mod handle;
+mod invalid;
 mod locks;
 mod prompt;
 mod registry;

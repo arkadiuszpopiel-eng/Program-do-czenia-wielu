@@ -1,8 +1,8 @@
 // Atrapa drzewa §15: ustawienia silników na stronie „Modele lokalne i silniki” — te same klucze, teksty
 // i zakresy co `crates/app-core/data/settings-pages.json` (silnik `llama-server`, kontekst, wątki,
-// zwalnianie po bezczynności, równoległe pobierania).
+// zwalnianie po bezczynności, poprawne wywołania narzędzi, równoległe pobierania).
 import type { SettingDef } from '../types-system';
-import { L, number, select } from './settings-helpers';
+import { L, number, select, toggle } from './settings-helpers';
 
 export const ENGINE_SETTINGS: SettingDef[] = [
   select(
@@ -62,6 +62,16 @@ export const ENGINE_SETTINGS: SettingDef[] = [
     120,
     1,
     'min',
+    'machine',
+  ),
+  toggle(
+    'engines.llm.tool_schema',
+    L('Poprawne wywołania narzędzi (model lokalny)', 'Valid tool calls (local model)'),
+    L(
+      'W zadaniach agentek lokalny model odpowiada jednym obiektem JSON zgodnym ze schematem narzędzi — silnik llama.cpp dopuszcza tylko taki tekst (gramatyka), więc wywołanie nie może mieć zepsutych ani niepasujących argumentów. Wyłącz, gdy model w zadaniach agentek odpowiada wyraźnie gorzej albo silnik zgłasza błąd schematu — wtedy narzędzia idą w formacie szablonu czatu modelu, bez tej gwarancji. Zalecenie: włączone. Zmiana po ponownym uruchomieniu.',
+      "In agent tasks the local model answers with a single JSON object that matches the tool schemas — the llama.cpp engine only allows such text (a grammar), so a tool call cannot have broken or mismatched arguments. Turn it off when the model clearly answers worse in agent tasks or the engine reports a schema error — tools then use the model's chat template format, without this guarantee. Recommended: on. Takes effect after a restart.",
+    ),
+    true,
     'machine',
   ),
   number(

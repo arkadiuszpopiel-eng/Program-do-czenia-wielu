@@ -11,6 +11,9 @@
 //!   [`MODELS_TOML`] (Bielik 4.5B i 1.5B v3.0 Q8_0 z oficjalnych repozytoriów), bez kwantów IQ;
 //! - rozliczenie pamięci z KV cache i częściowym odciążeniem ([`ModelEntry::vram_for`]);
 //! - okno rozmowy ([`fit`]) — do serwera najnowsze tury mieszczące się w kontekście uruchomienia;
+//! - wywołania narzędzi w kopercie JSON ze schematem (`response_format` → gramatyka serwera,
+//!   C2.3): argumenty zawsze zgodne ze schematem narzędzia, błędne — `ToolArguments::Invalid`;
+//!   wyłączane przez [`LocalConfig::tool_schema`];
 //! - [`LocalModule`] — moduł rejestru, zdarzenia `local.*`.
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -19,6 +22,7 @@ mod codec;
 mod config;
 mod devices;
 mod download;
+mod envelope;
 mod error;
 mod leak;
 mod manifest;
@@ -26,6 +30,7 @@ mod module;
 mod placement;
 mod process;
 mod provider;
+mod schema;
 mod sidecar;
 mod window;
 

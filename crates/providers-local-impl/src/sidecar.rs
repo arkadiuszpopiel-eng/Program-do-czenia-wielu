@@ -309,7 +309,7 @@ impl Sidecar {
             self.profile(entry, plan.ctx),
             self.http(port),
             Arc::new(StaticKey::new(key)),
-            LlamaCodec::new(entry, plan.ctx),
+            LlamaCodec::new(entry, plan.ctx).with_tool_schema(self.config.tool_schema),
         )
         .map_err(|e| LocalError::Spawn(e.to_string()))?;
         let startup_ms = ms(t0.elapsed());

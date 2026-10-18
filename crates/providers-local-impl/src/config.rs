@@ -85,6 +85,9 @@ pub struct LocalConfig {
     pub timeouts: Timeouts,
     /// Profil prywatności (domyślnie `local`/`local`: dane nie opuszczają maszyny).
     pub privacy: ProviderPrivacy,
+    /// Wymuszanie poprawnego JSON wywołań narzędzi schematem (C2.3, koperta `response_format`
+    /// → gramatyka `llama-server`); `false` — natywne pole `tools` szablonu czatu.
+    pub tool_schema: bool,
 }
 
 /// Klucz backendu (porządek dla mapy).
@@ -151,6 +154,7 @@ impl LocalConfig {
                 idle: Duration::from_secs(30),
             },
             privacy: ProviderPrivacy::new("local", "local"),
+            tool_schema: true,
         }
     }
 

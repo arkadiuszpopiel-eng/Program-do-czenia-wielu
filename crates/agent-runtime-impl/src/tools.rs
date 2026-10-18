@@ -88,7 +88,7 @@ impl Engine {
         ctx
     }
 
-    /// Kontrola przed wywołaniem: anulowanie, limit na turę, budżet, pętla.
+    /// Kontrola przed wywołaniem: anulowanie, limit na turę, budżet, argumenty, pętla.
     async fn gate_call(&mut self, index: usize, tu: &ToolUse) -> Option<(String, Option<Next>)> {
         if self.handle.cancel.is_cancelled() {
             return Some((
@@ -108,6 +108,9 @@ impl Engine {
                 format!("przekroczony budżet {}", budget.label_pl()),
                 Some(Next::Finish(RunOutcome::BudgetExceeded { budget })),
             ));
+        }
+        if let Some(why) = self.reject_invalid(tu).await {
+            return Some((why, None));
         }
         let fp = fingerprint(&tu.name, &tu.input);
         let n = repeats(&self.cp.recent_calls, &fp);

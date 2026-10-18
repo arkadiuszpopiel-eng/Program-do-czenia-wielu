@@ -4826,6 +4826,7 @@ dependencies = [
  "device-profile-fake",
  "futures-util",
  "getrandom 0.4.3",
+ "jsonschema",
  "lib-openai-compat",
  "lib-sidecar-guard",
  "model-residency-contract",

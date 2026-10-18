@@ -36,6 +36,8 @@ futures-util.workspace = true
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots", "stream", "http2"] }
 sha2 = "0.10.9"
 getrandom = "0.4.3"
+# Walidacja argumentów wywołań narzędzi schematem (koperta C2.3); ta sama wersja co core-config-impl.
+jsonschema = { version = "0.58.3", default-features = false }
 
 [dev-dependencies]
 providers-contract = { path = "../providers-contract", features = ["contract-tests"] }
