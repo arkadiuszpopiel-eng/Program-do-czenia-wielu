@@ -73,9 +73,8 @@ impl Reader {
     fn names(&mut self) -> Result<Vec<String>, Unsafe> {
         (0..self.archive.len())
             .map(|i| {
-                Ok(normalized(
-                    self.archive.by_index_raw(i).map_err(bad)?.name(),
-                ))
+                let entry = self.archive.by_index_raw(i).map_err(bad)?;
+                Ok(normalized(&entry.name().map_err(bad)?))
             })
             .collect()
     }
@@ -83,7 +82,7 @@ impl Reader {
     /// Sprawdza nagłówek wpisu `i`; zwraca jego nazwę, czy to katalog i rozmiar.
     fn check(&mut self, i: usize) -> Result<(String, bool, u64), Unsafe> {
         let entry = self.archive.by_index_raw(i).map_err(bad)?;
-        let name = normalized(entry.name());
+        let name = normalized(&entry.name().map_err(bad)?);
         validate_package_path(&name).map_err(bad)?;
         if !self.seen.insert(name.trim_end_matches('/').to_lowercase()) {
             return Err(bad(format!("powtórzony wpis „{name}”")));

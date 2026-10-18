@@ -36,6 +36,10 @@ proptest = "1.11.0"
 # Dane (ADR 0008, spike i): SQLCipher w pakiecie z OpenSSL (vendored) + FTS5 w bundlu; sqlite-vec statycznie.
 rusqlite = { version = "0.40.2", default-features = false, features = ["cache", "bundled-sqlcipher-vendored-openssl"] }
 sqlite-vec = "0.1.9"
+# Archiwa ZIP (tekst z DOCX/XLSX/PPTX, archiwa silników i modeli, kontener .alfa, paczki aktualizacji):
+# tylko deflate przez flate2 (backend wybierają crate'y — miniz_oxide, czysty Rust), bez AES/bzip2/zstd/lzma (MIT).
+# 9.x: RUSTSEC-2026-0367/0368/0369 (SUID i dowiązania w `extract`) — Alfa i tak rozpakowuje własnym kodem.
+zip = { version = "9.0.5", default-features = false, features = ["deflate-flate2"] }
 
 # Crate'y workspace (moduły zależą wyłącznie od `*-contract`; sprawdza scripts/check-deps.sh)
 core-bus-contract = { path = "crates/core-bus-contract" }

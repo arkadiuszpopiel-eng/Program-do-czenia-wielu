@@ -121,7 +121,7 @@ impl Harness for H {
                 let mut f = zip.by_index(i).unwrap();
                 let mut bytes = Vec::new();
                 f.read_to_end(&mut bytes).unwrap();
-                (f.name().to_owned(), bytes)
+                (f.name().unwrap().into_owned(), bytes)
             })
             .collect()
     }

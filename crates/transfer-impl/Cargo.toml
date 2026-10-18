@@ -21,8 +21,8 @@ tokio.workspace = true
 chrono.workspace = true
 # UUIDv7 dla kopii sesji (ta sama wersja co w workspace, dodatkowy feature).
 uuid = { workspace = true, features = ["v7"] }
-# Kontener ZIP: tylko deflate (miniz_oxide, czysty Rust), bez AES/bzip2/zstd/lzma (MIT).
-zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+# Kontener ZIP: tylko deflate (miniz_oxide, czysty Rust), bez AES/bzip2/zstd/lzma (MIT) — wersja z workspace.
+zip.workspace = true
 # Backend deflate dla `zip`: miniz_oxide (czysty Rust) — `zip` bierze flate2 bez domyślnych funkcji.
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 # Szyfrowanie paczki: XChaCha20-Poly1305 w konstrukcji STREAM (nonce BE32) (Apache-2.0 OR MIT).

@@ -194,7 +194,7 @@ fn read_manifest(
     limits: &Limits,
 ) -> Result<serde_json::Value, TransferError> {
     let file = archive.by_index(0).map_err(zip_err)?;
-    if file.name() != MANIFEST_PATH {
+    if file.name().map_err(zip_err)? != MANIFEST_PATH {
         return Err(TransferError::corrupt(
             "pierwszym wpisem nie jest manifest.json",
         ));
@@ -223,7 +223,7 @@ fn index_entries(
     let mut index = BTreeMap::new();
     for i in 1..archive.len() {
         let file = archive.by_index_raw(i).map_err(zip_err)?;
-        let name = file.name().to_owned();
+        let name = file.name().map_err(zip_err)?.into_owned();
         validate_entry_path(&name).map_err(|reason| TransferError::UnsafePath {
             path: name.clone(),
             reason,

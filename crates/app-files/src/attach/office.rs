@@ -38,7 +38,11 @@ impl Archive {
     }
 
     fn names(&self) -> Vec<String> {
-        self.zip.file_names().map(str::to_owned).collect()
+        // Nazwy nieczytelne (zły zapis znaków) pomijane — dokument i tak ich nie potrzebuje.
+        self.zip
+            .file_names()
+            .filter_map(|n| n.ok().map(|n| n.into_owned()))
+            .collect()
     }
 
     /// Wpis jako tekst w ramach wspólnego limitu rozpakowanych bajtów.
@@ -351,5 +355,23 @@ mod tests {
         big.push_str("</w:t></w:p>");
         let doc = archive(&[("word/document.xml", &big)]);
         assert_eq!(text("a.docx", &doc).map(|t| t.len()), Some(1024));
+    }
+
+    /// Regresja klasy RUSTSEC-2026-0368/0369 (dowiązania w archiwum): wpis-dowiązanie nie jest
+    /// rozwiązywany — dokument czytany jest tylko z pamięci, nigdy z pliku spoza archiwum.
+    #[test]
+    fn symlink_entry_is_never_followed() {
+        let dir = tempfile::tempdir().unwrap();
+        let secret = dir.path().join("tajne.xml");
+        std::fs::write(&secret, "<w:p><w:t>tajne</w:t></w:p>").unwrap();
+        let mut buf = Cursor::new(Vec::new());
+        {
+            let mut zip = zip::ZipWriter::new(&mut buf);
+            let opts = zip::write::SimpleFileOptions::default();
+            zip.add_symlink("word/document.xml", secret.to_string_lossy(), opts)
+                .unwrap();
+            zip.finish().unwrap();
+        }
+        assert_eq!(text("link.docx", &buf.into_inner()), None);
     }
 }
