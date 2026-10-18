@@ -171,6 +171,7 @@ pub fn stt_lease() -> LeaseRequest {
         ram_mb: 600,
         cpu_ram_mb: 1_500,
         idle_unload_ms: 600_000,
+        gpu: None,
     }
 }
 
@@ -186,5 +187,6 @@ pub fn heavy_tts_lease() -> LeaseRequest {
         ram_mb: 600,
         cpu_ram_mb: 1_500,
         idle_unload_ms: 0,
+        gpu: None,
     }
 }

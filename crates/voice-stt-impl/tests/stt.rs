@@ -226,6 +226,7 @@ async fn stt_never_evicts_the_conversation_model_on_a_6_gb_laptop() {
                 ram_mb: 3_146,
                 cpu_ram_mb: 6_080,
                 idle_unload_ms: 600_000,
+                gpu: None,
             })
             .unwrap()
             .lease;

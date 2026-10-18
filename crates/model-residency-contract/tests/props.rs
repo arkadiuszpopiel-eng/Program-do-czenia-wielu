@@ -70,6 +70,7 @@ fn request() -> impl Strategy<Value = LeaseRequest> {
                 ram_mb: ram,
                 cpu_ram_mb: cpu_ram,
                 idle_unload_ms: idle,
+                gpu: None,
             },
         )
 }

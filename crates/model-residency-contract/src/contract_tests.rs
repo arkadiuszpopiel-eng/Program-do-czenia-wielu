@@ -3,8 +3,9 @@
 use std::sync::{Arc, Mutex};
 
 use crate::{
-    Budget, Change, Device, Lease, LeaseListener, LeaseRequest, ModeSource, ModelRole, Placement,
-    Priority, Residency, ResidencyError, Revocation, RevokeReason, fits,
+    Budget, Change, Device, GpuId, GpuLayout, GpuPool, Lease, LeaseListener, LeaseRequest,
+    ModeSource, ModelRole, Placement, Priority, Residency, ResidencyError, Revocation,
+    RevokeReason, fits,
 };
 
 /// Uchwyt testowy: świeży zarządca z budżetem i sterowany zegar.
@@ -13,6 +14,8 @@ pub trait Harness {
     type R: Residency;
     /// Nowy zarządca z budżetem (zegar od 0 ms).
     fn residency(&self, budget: Budget) -> Self::R;
+    /// Nowy zarządca z budżetem karty głównej i pulami pozostałych kart (zegar od 0 ms).
+    fn residency_with_gpus(&self, budget: Budget, gpus: GpuLayout) -> Self::R;
     /// Przesuwa zegar ostatnio utworzonego zarządcy.
     fn advance_ms(&self, ms: u64);
 }
@@ -72,6 +75,7 @@ pub fn request(owner: &str, priority: Priority, vram_mb: u32) -> LeaseRequest {
         ram_mb: 100,
         cpu_ram_mb: 1_000,
         idle_unload_ms: 1_000,
+        gpu: None,
     }
 }
 
@@ -194,6 +198,55 @@ pub fn gpu_if_free_does_not_preempt<H: Harness>(h: &H) {
     assert!(r.snapshot().used.vram_mb <= 5_153);
 }
 
+/// Osobny budżet pamięci na kartę (C6.6): model rozmowy zajmuje kartę główną, mowa wskazująca
+/// drugą kartę dostaje ją bez wypierania; bez wskazania — karta główna (pełna → procesor); po
+/// zniknięciu karty jej dzierżawa jest odbierana z powiadomieniem właściciela.
+pub fn gpus_have_separate_budgets<H: Harness>(h: &H) {
+    let second = GpuId(0);
+    let r = h.residency_with_gpus(
+        budget(),
+        GpuLayout {
+            primary: GpuId(1),
+            others: vec![GpuPool {
+                gpu: second,
+                vram_mb: 5_373,
+                desktop_reserve_mb: 768,
+                stt_tts_exclusive: true,
+                shared: false,
+            }],
+        },
+    );
+    let rec = Arc::new(Recorder::default());
+    r.listen("stt", rec.clone());
+    let llm = ok(r.acquire(request("llm", Priority::Conversation, 7_300)));
+    assert_eq!(llm.lease.gpu, Some(GpuId(1)));
+    let mut stt = request("stt", Priority::VoiceRt, 2_900);
+    stt.role = ModelRole::Stt;
+    stt.placement = Placement::GpuIfFree;
+    let cpu = ok(r.acquire(stt.clone()));
+    assert_eq!(
+        cpu.lease.device,
+        Device::Cpu,
+        "karta główna pełna → procesor"
+    );
+    ok(r.release(cpu.lease.id));
+    stt.gpu = Some(second);
+    let g = ok(r.acquire(stt));
+    assert_eq!((g.lease.device, g.lease.gpu), (Device::Gpu, Some(second)));
+    assert!(g.evicted.is_empty(), "{:?}", g.evicted);
+    let s = r.snapshot();
+    assert_eq!(s.used.vram_mb, 7_300, "`used` — karta główna");
+    assert_eq!(s.gpu(second).map(|c| c.used_mb), Some(2_900));
+    assert!(s.within_budget());
+    let changes = r.set_gpus(GpuLayout::single(GpuId(1)));
+    assert!(matches!(&changes[..], [Change::Revoked(x)] if x.lease.id == g.lease.id));
+    assert_eq!(
+        rec.revoked.lock().unwrap_or_else(|p| p.into_inner()).len(),
+        1
+    );
+    assert!(r.lease(llm.lease.id).is_some());
+}
+
 /// Deterministyczna seria 300 operacji: budżet nigdy nieprzekroczony, `Wait` tylko na wyższy/równy.
 pub fn never_exceeds_budget<H: Harness>(h: &H) {
     let r = h.residency(budget());
@@ -235,6 +288,7 @@ pub fn never_exceeds_budget<H: Harness>(h: &H) {
         }
         let s = r.snapshot();
         assert!(fits(s.used, s.budget), "{:?} > {:?}", s.used, s.budget);
+        assert!(s.within_budget(), "{:?}", s.gpus);
     }
 }
 
@@ -245,5 +299,6 @@ pub fn run_all<H: Harness>(h: &H) {
     fullscreen_moves_models_to_cpu(h);
     idle_reaping_follows_clock(h);
     gpu_if_free_does_not_preempt(h);
+    gpus_have_separate_budgets(h);
     never_exceeds_budget(h);
 }

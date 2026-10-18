@@ -12,7 +12,8 @@ use device_profile_contract::{DeviceProfile, PowerState};
 use device_profile_fake::FakeDeviceProfile;
 use model_residency_contract::contract_tests::{self, Harness, request};
 use model_residency_contract::{
-    Budget, Device, ManualClock, Mode, ModelRole, Placement, Priority, Residency, event_kind,
+    Budget, Device, GpuId, GpuLayout, ManualClock, Mode, ModelRole, Placement, Priority, Residency,
+    event_kind,
 };
 use model_residency_impl::{
     Auto, DeviceSignals, MODULE_TOML, ResidencyConfig, ResidencyManager, ResidencyModule, Switch,
@@ -31,6 +32,12 @@ impl Harness for ImplHarness {
         let clock = Arc::new(ManualClock::new());
         *self.clock.lock().unwrap() = Some(Arc::clone(&clock));
         ResidencyManager::new(budget, clock)
+    }
+
+    fn residency_with_gpus(&self, budget: Budget, gpus: GpuLayout) -> ResidencyManager {
+        let clock = Arc::new(ManualClock::new());
+        *self.clock.lock().unwrap() = Some(Arc::clone(&clock));
+        ResidencyManager::with_gpus(budget, gpus, clock)
     }
 
     fn advance_ms(&self, ms: u64) {
@@ -77,6 +84,41 @@ fn budgets_follow_device_profile() {
     assert_eq!(cb.ram_mb, 4_000);
     assert_eq!(cb.desktop_reserve_mb, 1_024);
     assert_eq!(cb.vram_mb + 1_024, rec.vram_mb + rec.desktop_reserve_mb);
+}
+
+/// Laptop (RTX 4050 + karta zintegrowana): pula karty głównej z rekomendacji jak dotąd, karta
+/// zintegrowana — osobna pula w pamięci RAM; desktop z jedną kartą — tylko karta główna.
+#[test]
+fn every_card_gets_its_own_pool_from_device_profile() {
+    let config = ResidencyConfig::default();
+    let laptop = ResidencyManager::from_device(Arc::new(FakeDeviceProfile::laptop()), &config);
+    let s = laptop.snapshot();
+    let ids: Vec<(GpuId, bool, bool)> = s
+        .gpus
+        .iter()
+        .map(|g| (g.pool.gpu, g.primary, g.pool.shared))
+        .collect();
+    assert_eq!(ids, [(GpuId(1), true, false), (GpuId(0), false, true)]);
+    assert_eq!(s.gpus[0].pool.vram_mb, s.budget.vram_mb);
+    let stt = laptop.acquire(voice_stt()).unwrap();
+    let mut light = request("providers-local-light", Priority::Conversation, 2_000);
+    light.gpu = Some(GpuId(0));
+    light.placement = Placement::GpuOnly;
+    let light = laptop.acquire(light).unwrap();
+    assert_eq!(
+        (stt.lease.gpu, light.lease.gpu),
+        (Some(GpuId(1)), Some(GpuId(0)))
+    );
+    assert!(light.evicted.is_empty());
+    let s = laptop.snapshot();
+    assert_eq!(
+        s.used.vram_mb, 1_500,
+        "karta główna bez modelu z karty zintegrowanej"
+    );
+    assert_eq!(s.gpu(GpuId(0)).map(|g| g.used_mb), Some(2_000));
+    assert!(s.within_budget());
+    let desktop = ResidencyManager::from_device(Arc::new(FakeDeviceProfile::desktop()), &config);
+    assert_eq!(desktop.snapshot().gpus.len(), 1);
 }
 
 fn voice_stt() -> model_residency_contract::LeaseRequest {

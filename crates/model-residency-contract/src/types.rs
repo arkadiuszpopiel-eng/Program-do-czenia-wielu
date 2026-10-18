@@ -6,6 +6,8 @@ use device_profile_contract::ResidencyBudget;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::gpus::{GpuId, GpuState};
+
 /// Rodzaj modelu (PLAN §3.4: STT, TTS, LLM, embedder, VAD).
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
@@ -65,7 +67,8 @@ pub enum Device {
     Cpu,
 }
 
-/// Budżet maszyny do rozdania między modele (po odjęciu rezerwy pulpitu).
+/// Budżet maszyny do rozdania między modele (po odjęciu rezerwy pulpitu): pamięć **karty głównej**
+/// i RAM. Pozostałe karty mają własne pule ([`crate::GpuLayout`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 pub struct Budget {
     /// VRAM dla modeli (MB).
@@ -110,6 +113,13 @@ pub struct Usage {
     pub ram_mb: u32,
 }
 
+impl Usage {
+    /// Czy zużycie mieści się w limicie (oba wymiary).
+    pub fn within(self, limit: Usage) -> bool {
+        self.vram_mb <= limit.vram_mb && self.ram_mb <= limit.ram_mb
+    }
+}
+
 /// Identyfikator dzierżawy (monotoniczny w instancji zarządcy).
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
@@ -144,6 +154,11 @@ pub struct LeaseRequest {
     pub cpu_ram_mb: u32,
     /// Zwolnienie po bezczynności (ms); 0 = nigdy.
     pub idle_unload_ms: u64,
+    /// Karta docelowa (`GpuInfo::id` z `device-profile`), gdy model ma liczyć na karcie: silnik jest
+    /// przypięty do tej karty, więc dzierżawa zajmuje jej pulę. `None` albo karta nieznana — karta
+    /// główna. Bez przenoszenia na inną kartę: gdy tej zabraknie miejsca, zostaje procesor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gpu: Option<GpuId>,
 }
 
 impl LeaseRequest {
@@ -177,6 +192,9 @@ pub struct Lease {
     pub last_used_ms: u64,
     /// Czy model jest właśnie używany (np. tura głosu) — nie jest wtedy eksmitowany przez równy priorytet.
     pub in_use: bool,
+    /// Karta, której pulę zajmuje dzierżawa na GPU (`None` na procesorze).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gpu: Option<GpuId>,
 }
 
 impl Lease {
@@ -254,14 +272,29 @@ impl Mode {
 /// Migawka stanu (UI: co jest gdzie, ile wolne).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct ResidencyState {
-    /// Budżet obowiązujący (po emulacji).
+    /// Budżet obowiązujący (po emulacji): karta główna i RAM.
     pub budget: Budget,
-    /// Zajęte.
+    /// Zajęte: pamięć karty głównej i RAM (z pamięcią kart współdzielonych).
     pub used: Usage,
     /// Tryb.
     pub mode: Mode,
     /// Dzierżawy (rosnąco po id).
     pub leases: Vec<Lease>,
+    /// Pule wszystkich kart (główna pierwsza; maszyna bez kart — sama pula karty głównej).
+    #[serde(default)]
+    pub gpus: Vec<GpuState>,
+}
+
+impl ResidencyState {
+    /// Stan karty (`None` — karta bez puli).
+    pub fn gpu(&self, gpu: GpuId) -> Option<&GpuState> {
+        self.gpus.iter().find(|g| g.pool.gpu == gpu)
+    }
+
+    /// Czy karta główna, RAM i każda karta mieszczą się w swoich pulach.
+    pub fn within_budget(&self) -> bool {
+        crate::fits(self.used, self.budget) && self.gpus.iter().all(|g| g.used_mb <= g.pool.vram_mb)
+    }
 }
 
 /// Błędy zarządcy.
@@ -276,12 +309,12 @@ pub enum ResidencyError {
         /// Dzierżawy blokujące (nigdy o niższym priorytecie niż żądanie).
         blockers: Vec<LeaseId>,
     },
-    /// Model większy niż cały budżet maszyny.
+    /// Model większy niż cały budżet maszyny (pamięć karty docelowej, RAM).
     #[error("model `{model}` nie mieści się w budżecie (VRAM {vram_mb} MB, RAM {ram_mb} MB)")]
     TooLarge {
         /// Model.
         model: String,
-        /// Budżet VRAM.
+        /// Budżet VRAM karty docelowej.
         vram_mb: u32,
         /// Budżet RAM.
         ram_mb: u32,

@@ -242,6 +242,7 @@ async fn voice_models_are_pinned_in_residency_while_talking() {
         ram_mb: 0,
         cpu_ram_mb: 300,
         idle_unload_ms: 60_000,
+        gpu: None,
     };
     let stt = residency
         .acquire(req("voice-stt", ModelRole::Stt))

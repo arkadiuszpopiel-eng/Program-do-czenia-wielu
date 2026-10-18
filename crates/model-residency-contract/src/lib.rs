@@ -3,6 +3,9 @@
 //!
 //! - dzierżawy ([`Lease`]) dla STT/TTS/LLM/embeddera/VAD z szacowanym zużyciem;
 //! - budżet z `device-profile` ([`Budget::from_device`]; baseline 8 GB: pulpit 0,5–1 GB rezerwy);
+//! - osobna pula pamięci każdej karty ([`GpuLayout::from_profile`], C6.6): dzierżawa wskazuje kartę
+//!   ([`LeaseRequest::gpu`]; brak albo nieznana — główna), model na karcie A nie blokuje karty B,
+//!   a maszyna z jedną kartą działa jak dotąd;
 //! - „STT+TTS+LLM nie zawsze naraz": wymiana **LRU z priorytetami** (głos > rozmowa > tło),
 //!   wykluczenie STT/ciężki TTS na GPU przy ciasnym VRAM;
 //! - tryb gry (pełny ekran, sygnał z zewnątrz — [`ModeSource`]) → przeniesienie na CPU albo
@@ -18,6 +21,8 @@
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
 mod events;
+mod gpus;
+mod pools;
 mod select;
 mod table;
 mod types;
@@ -28,6 +33,8 @@ pub use events::{
     EVENT_BUDGET_EXCEEDED, EVENT_EVICTED, EVENT_GRANTED, EVENT_MODE_CHANGED, EVENT_MOVED,
     EVENT_OOM_AVOIDED, EVENT_RELEASED, ResidencyEvent, event_kind,
 };
+pub use gpus::{GpuId, GpuLayout, GpuPool, GpuState};
+pub use pools::Pools;
 pub use select::{Plan, exclusive_conflicts, fits, plan, shrink_victims, total, yields_to};
 pub use table::{Change, LeaseTable};
 pub use types::{
@@ -103,8 +110,25 @@ pub trait Residency: Send + Sync {
     /// Ustawia tryb (gra/bateria/emulacja); zwraca wywołane zmiany.
     fn set_mode(&self, mode: Mode) -> Vec<Change>;
 
-    /// Zmienia budżet maszyny (np. po zmianie sprzętu).
+    /// Zmienia budżet karty głównej i RAM (np. po zmianie sprzętu).
     fn set_budget(&self, budget: Budget) -> Vec<Change>;
+
+    /// Zmienia karty maszyny i pule pozostałych kart (np. po zmianie sprzętu); dzierżawy na
+    /// kartach, których już nie ma, są odbierane. Domyślnie bez zmian (zarządca jednej karty) —
+    /// metoda dodana bez łamania dotychczasowych implementacji.
+    fn set_gpus(&self, gpus: GpuLayout) -> Vec<Change> {
+        let _ = gpus;
+        Vec::new()
+    }
+
+    /// Zmienia naraz budżet karty głównej i RAM oraz karty (zmiana sprzętu). Domyślnie
+    /// [`Residency::set_budget`], potem [`Residency::set_gpus`]; implementacje na [`LeaseTable`]
+    /// robią to atomowo ([`LeaseTable::set_hardware`] — budżet egzekwowany raz).
+    fn set_hardware(&self, budget: Budget, gpus: GpuLayout) -> Vec<Change> {
+        let mut changes = self.set_budget(budget);
+        changes.extend(self.set_gpus(gpus));
+        changes
+    }
 
     /// Eksmituje dzierżawy bezczynne dłużej niż ich limit.
     fn reap_idle(&self) -> Vec<Revocation>;
@@ -140,3 +164,7 @@ pub fn event_schema() -> serde_json::Value {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+#[path = "tests_gpus.rs"]
+mod tests_gpus;

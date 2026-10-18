@@ -28,6 +28,7 @@ pub fn lease_request(manifest: &EmbedManifest) -> LeaseRequest {
         ram_mb: 0,
         cpu_ram_mb: manifest.ram_mb,
         idle_unload_ms: manifest.idle_unload_s.saturating_mul(1000),
+        gpu: None,
     }
 }
 

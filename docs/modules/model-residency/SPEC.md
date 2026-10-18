@@ -8,11 +8,15 @@ F2. P0. (W F1 `providers-local` używa prostego limitu; migracja do lease w F2.)
 
 ## Kontrakt (v1 — `crates/model-residency-contract`)
 ```rust
-pub struct Budget { pub vram_mb: u32 /* po rezerwie pulpitu */, pub ram_mb: u32, pub desktop_reserve_mb: u32, pub stt_tts_exclusive: bool }
+pub struct Budget { pub vram_mb: u32 /* karta główna, po rezerwie pulpitu */, pub ram_mb: u32, pub desktop_reserve_mb: u32, pub stt_tts_exclusive: bool }
+pub struct GpuId(pub u32);                 // = GpuInfo::id z device-profile (kolejność adapterów, stała w obrębie maszyny)
+pub struct GpuPool { pub gpu: GpuId, pub vram_mb: u32, pub desktop_reserve_mb: u32, pub stt_tts_exclusive: bool, pub shared: bool /* pamięć z RAM */ }
+pub struct GpuLayout { pub primary: GpuId, pub others: Vec<GpuPool> }   // GpuLayout::from_profile(&Profile)
 pub struct LeaseRequest { pub owner: String, pub model: String, pub role: ModelRole /* Stt|Tts|Llm|Embedder|Vad */,
                           pub priority: Priority /* VoiceRt > Conversation > Background */, pub placement: Placement /* GpuOnly|GpuPreferred|GpuIfFree|CpuOnly */,
-                          pub vram_mb: u32, pub ram_mb: u32 /* na GPU */, pub cpu_ram_mb: u32 /* na CPU */, pub idle_unload_ms: u64 }
-pub struct Grant { pub lease: Lease /* id, device Gpu|Cpu, in_use, last_used */, pub evicted: Vec<Revocation> }
+                          pub vram_mb: u32, pub ram_mb: u32 /* na GPU */, pub cpu_ram_mb: u32 /* na CPU */, pub idle_unload_ms: u64,
+                          pub gpu: Option<GpuId> /* karta docelowa; None albo nieznana — główna */ }
+pub struct Grant { pub lease: Lease /* id, device Gpu|Cpu, gpu: Option<GpuId>, in_use, last_used */, pub evicted: Vec<Revocation> }
 pub trait Residency: Send + Sync {
     fn acquire(&self, r: LeaseRequest) -> Result<Grant, ResidencyError /* Wait{blockers} | TooLarge | Gaming | Battery | Invalid */>;
     fn release(&self, id: LeaseId) -> Result<(), ResidencyError>;
@@ -21,7 +25,9 @@ pub trait Residency: Send + Sync {
     fn lease(&self, id: LeaseId) -> Option<Lease>;
     fn snapshot(&self) -> ResidencyState;
     fn set_mode(&self, m: Mode /* { gaming, battery, emulated: Option<Budget> } */) -> Vec<Change>;
-    fn set_budget(&self, b: Budget) -> Vec<Change>;
+    fn set_budget(&self, b: Budget) -> Vec<Change>;   // karta główna + RAM
+    fn set_gpus(&self, g: GpuLayout) -> Vec<Change>;  // karty maszyny; dzierżawy na zniknętych kartach odbierane
+    fn set_hardware(&self, b: Budget, g: GpuLayout) -> Vec<Change>;  // zmiana sprzętu naraz (budżet egzekwowany raz)
     fn reap_idle(&self) -> Vec<Revocation>;
     fn listen(&self, owner: &str, l: Arc<dyn LeaseListener /* revoked, moved */>);
     fn refresh_mode(&self, source: &dyn ModeSource /* fullscreen_active, on_battery */) -> Vec<Change>;
@@ -32,8 +38,21 @@ ustępujących — **LRU z priorytetami**: dzierżawa ustępuje, gdy ma niższy 
 (`in_use`); `GpuPreferred`: GPU bez eksmisji → GPU z eksmisją → CPU; `GpuIfFree`: GPU bez wypierania (dozwolona
 tylko wymiana STT ↔ ciężki TTS) → CPU (bez eksmisji, potem z eksmisją) → GPU z wypieraniem (ostatnia możliwość — głos
 nie czeka na niższy priorytet); `Wait` tylko na blokery o priorytecie ≥ żądania.
-Tryb (flagi łączą się): gra → nowe `GpuOnly` odrzucane, `GpuPreferred` na CPU, istniejące dzierżawy GPU przenoszone na CPU
-(`moved`) albo eksmitowane; bateria → tło eksmitowane i odrzucane; emulacja → budżet = min(rzeczywisty, emulowany).
+Tryb (flagi łączą się): gra → nowe `GpuOnly` odrzucane, `GpuPreferred` na CPU, istniejące dzierżawy GPU (każda karta)
+przenoszone na CPU (`moved`) albo eksmitowane; bateria → tło eksmitowane i odrzucane; emulacja → budżet = min(rzeczywisty,
+emulowany), pozostałe karty też najwyżej tyle co emulowana (jak `Profile::emulate`).
+
+**Pule kart (C6.6).** RAM jest jedną pulą maszyny, każda karta ma własną pulę pamięci: karta główna — `Budget` (rekomendacja
+`device-profile` z nakładką `[machine.residency]`, bez zmian), pozostałe karty z obsługiwanym backendem —
+`GpuPool::from_gpu`: karta z własną pamięcią (osobna albo APU z rezerwą z BIOS-u ≥ 5,5 GB) — pamięć minus 768 MB rezerwy
+pulpitu, STT/ciężki TTS na zmianę poniżej 8 GB; zintegrowana z małą rezerwą — `GpuInfo::usable_memory_mb` (≤ ¼ RAM, ≤ 4 GB),
+`shared` (dzierżawa na niej zajmuje też RAM), STT/TTS na zmianę. Dzierżawa na GPU zajmuje pulę karty z
+`LeaseRequest::gpu` (brak albo karta bez puli — główna); bez przenoszenia na inną kartę (silnik jest przypięty do karty) —
+gdy jej zabraknie miejsca, zostaje procesor albo `Wait`. Planowanie i eksmisje liczą zużycie „widziane z karty”: żądanie
+na karcie B wypiera tylko dzierżawy z karty B albo — gdy brakuje RAM — zajmujące RAM; model rozmowy na karcie A nie
+blokuje rozpoznawania mowy na karcie B. Wykluczenie STT/ciężki TTS dotyczy jednej karty. `ResidencyState.budget`/`used`
+opisują nadal kartę główną i RAM (zgodność wstecz), `ResidencyState.gpus` — każdą kartę (`GpuState`: pula, zajęte, wolne).
+Klucz karty to `GpuInfo::id`, nie LUID (LUID zmienia się po ponownym uruchomieniu systemu).
 
 Zdarzenia: `residency.granted/released/evicted/moved`, `residency.mode_changed`, `residency.oom_avoided`, `residency.budget_exceeded`.
 
@@ -41,7 +60,10 @@ Zdarzenia: `residency.granted/released/evicted/moved`, `residency.mode_changed`,
 `core-bus/config/log-contract`, `device-profile-contract` (VRAM, bateria, pełny ekran), `platform-windows-contract` (pomiar użycia VRAM/RAM). Klienci: `voice-stt/tts/vad/turn`, `providers-local`, `search` (embedder).
 
 ## Niezmienniki
-- Suma dzierżaw ≤ budżet maszyny minus rezerwa pulpitu; przekroczenie = `Wait`/`Evictable`, nigdy cichy OOM.
+- Suma dzierżaw ≤ budżet maszyny minus rezerwa pulpitu — w **każdej** puli (RAM, każda karta); przekroczenie =
+  `Wait`/`Evictable`, nigdy cichy OOM.
+- Maszyna z jedną kartą (albo żądania bez wskazania karty) działa dokładnie jak przed podziałem na pule (test własności
+  `requests_without_card_behave_like_single_card`).
 - Eksmisja wg priorytetu i bezczynności: nigdy nie eksmituje `VoiceRt` w trakcie tury na rzecz `Background`.
 - Tryb `Gaming` (pełny ekran): nowe dzierżawy GPU odrzucane, istniejące STT/LLM przenoszone na CPU/chmurę przy najbliższej okazji.
 - Tryb `Battery`: modele tła nie ładowane; konsolidacja/Ulepszacz wstrzymane.
@@ -64,7 +86,8 @@ Per maszyna: `[machine.residency] vram_mb = "auto"`, `ram_mb = "auto"`, `desktop
 Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU OOM" (§14.4), Zdrowie systemu (F8).
 
 ## Testy akceptacyjne
-- `ACC-F2-model-residency-01`: property-based — dowolna sekwencja acquire/release nie przekracza budżetu; brak zakleszczeń (1000 losowych scenariuszy).
+- `ACC-F2-model-residency-01`: property-based — dowolna sekwencja acquire/release nie przekracza budżetu; brak zakleszczeń (1000 losowych scenariuszy);
+  także na maszynie z trzema kartami (`tests/props_gpus.rs`, 500 scenariuszy: każda pula, brak wypierania z innej karty).
 - `ACC-F2-model-residency-02`: laptop (6 GB): STT + TTS ciężki → wymiana bez crashu, rozmowa trwa (runner laptop).
 - `ACC-F2-model-residency-03`: pełny ekran (gra) → 0 nowych dzierżaw GPU, STT na CPU ≤ 5 s.
 
@@ -87,3 +110,20 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
   `gpu_if_free_swaps_tts_and_preempts_only_when_cpu_is_impossible`, scenariusz laptopa w
   `providers-local-impl/tests/laptop_voice.rs` i `voice-stt-impl/tests/stt.rs`.
 
+## Zmiany — osobny budżet pamięci na kartę (C6.6, 2026-10-18)
+- Problem: jedna pula VRAM dla całej maszyny — model rozmowy na karcie A blokował (albo wypierał) rozpoznawanie mowy
+  przypięte do karty B. Teraz każda karta ma własną pulę (`GpuLayout::from_profile`, `ResidencyManager::from_device`),
+  RAM jest wspólny, a dzierżawa wskazuje kartę (`LeaseRequest::gpu`). Kontrakt zgodny wstecz dla klientów: brak karty =
+  karta główna; nowe pole w literałach żądania (`gpu: None`), nowe metody traitu `set_gpus` i `set_hardware` z
+  implementacją domyślną (dodatek bez łamania implementacji; `-impl` i `-fake` robią to atomowo na `LeaseTable`).
+  Dzierżawy bez wskazanej karty idą za kartą główną, gdy `set_gpus` zmienia kartę główną (np. umowna `GpuId(0)` z
+  `LeaseTable::new` → RTX `GpuId(1)` na laptopie), zamiast zostać na karcie o starym numerze. Zmienione sygnatury pomocników `plan`/`shrink_victims`/`exclusive_conflicts`
+  (miejsce `Option<GpuId>` i `&Pools` zamiast `Device` i `Budget`) — poza kontraktem nikt ich nie używał.
+- Klienci nie wskazują jeszcze kart (`gpu: None` wszędzie) — zachowanie Alfy bez zmian. Następne kroki (po próbie na
+  sprzęcie): Qwen3-ASR na karcie AMD/Intel poniżej 12 GB z dzierżawą na karcie, gdy model rozmowy z niej nie korzysta
+  (dziś reguła `VULKAN_QWEN_CARD_MIN_MB` w `app-modules::stt` — procesor); model pomocniczy na karcie zintegrowanej
+  (`providers-local`, `shared_memory`) z dzierżawą w puli tej karty zamiast „na procesorze”; rezerwa 1,5 GB na mowę obok
+  modelu rozmowy niepotrzebna, gdy mowa liczy na innej karcie.
+- Testy: `gpus_tests.rs` (pule z profili: dwie osobne karty, laptop Intel UHD + RTX 4050, APU z małą i dużą rezerwą,
+  karta bez backendu), `tests_gpus.rs` (scenariusze), kontraktowy `gpus_have_separate_budgets` (na `-impl` i `-fake`),
+  `props_gpus.rs` (własności, w tym równoważność z jedną kartą).

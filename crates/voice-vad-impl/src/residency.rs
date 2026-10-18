@@ -21,6 +21,7 @@ pub fn vad_lease_request(model: &str) -> LeaseRequest {
         ram_mb: 0,
         cpu_ram_mb: SILERO_RAM_MB,
         idle_unload_ms: 0,
+        gpu: None,
     }
 }
 

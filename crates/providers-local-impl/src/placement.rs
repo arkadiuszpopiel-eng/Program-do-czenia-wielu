@@ -50,6 +50,7 @@ impl Sidecar {
             },
             cpu_ram_mb: entry.ram_need(ctx),
             idle_unload_ms: ms(self.config.idle_unload),
+            gpu: None,
         };
         res.acquire(req)
             .map(|g| Some(g.lease))
