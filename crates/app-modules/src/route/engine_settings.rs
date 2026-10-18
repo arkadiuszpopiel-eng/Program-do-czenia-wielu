@@ -1,6 +1,6 @@
 //! Ustawienia silnika rozmowy (Ustawienia → Modele lokalne i silniki, klucze `engines.llm.*`, nakładka
 //! maszyny): backend `llama-server`, najdłuższy kontekst, wątki procesora, zwalnianie modelu po
-//! bezczynności. Czytane przy budowie modułu `providers-local` — zmiana działa od następnego
+//! bezczynności, wymuszanie poprawnego JSON wywołań narzędzi schematem (C2.3). Czytane przy budowie modułu `providers-local` — zmiana działa od następnego
 //! uruchomienia Alfy. Wartość nieznana albo spoza zakresu = ustawienie domyślne (bez błędu).
 
 use std::time::Duration;
@@ -19,8 +19,10 @@ pub mod keys {
     pub const THREADS: &str = "engines.llm.threads";
     /// Minuty bezczynności do zwolnienia modelu z pamięci.
     pub const IDLE_UNLOAD_MIN: &str = "engines.llm.idle_unload_min";
+    /// Wywołania narzędzi w kopercie JSON ze schematem (`true` domyślnie).
+    pub const TOOL_SCHEMA: &str = "engines.llm.tool_schema";
     /// Wszystkie klucze (odczyt przy starcie).
-    pub const ALL: [&str; 4] = [BACKEND, CONTEXT, THREADS, IDLE_UNLOAD_MIN];
+    pub const ALL: [&str; 5] = [BACKEND, CONTEXT, THREADS, IDLE_UNLOAD_MIN, TOOL_SCHEMA];
 }
 
 /// Najwięcej wątków przyjmowanych z ustawień.
@@ -39,6 +41,8 @@ pub struct LlmSettings {
     pub threads: Option<u32>,
     /// Zwolnienie po bezczynności (`None` — 10 minut).
     pub idle_unload_min: Option<u32>,
+    /// Wymuszanie schematu wywołań narzędzi (`None` — włączone).
+    pub tool_schema: Option<bool>,
 }
 
 fn number(value: Option<&Value>) -> Option<u64> {
@@ -72,6 +76,7 @@ impl LlmSettings {
             context,
             threads,
             idle_unload_min,
+            tool_schema: get(keys::TOOL_SCHEMA).as_ref().and_then(Value::as_bool),
         }
     }
 
@@ -88,6 +93,9 @@ impl LlmSettings {
         }
         if let Some(min) = self.idle_unload_min {
             config.idle_unload = Duration::from_secs(u64::from(min) * 60);
+        }
+        if let Some(on) = self.tool_schema {
+            config.tool_schema = on;
         }
     }
 }
@@ -124,6 +132,7 @@ mod tests {
                 (keys::CONTEXT, json!("1000")),
                 (keys::THREADS, json!(500)),
                 (keys::IDLE_UNLOAD_MIN, json!(true)),
+                (keys::TOOL_SCHEMA, json!("tak")),
             ]),
         ] {
             assert_eq!(settings, LlmSettings::default());
@@ -140,9 +149,12 @@ mod tests {
             (keys::CONTEXT, json!("2048")),
             (keys::THREADS, json!(6)),
             (keys::IDLE_UNLOAD_MIN, json!("5")),
+            (keys::TOOL_SCHEMA, json!(false)),
         ]);
         let mut config = LocalConfig::new("m", "s");
+        assert!(config.tool_schema, "domyślnie włączone");
         settings.apply(&mut config);
+        assert!(!config.tool_schema);
         assert_eq!(config.backend, BackendChoice::Fixed(Backend::Cpu));
         assert_eq!(
             (config.ctx, config.threads, config.idle_unload),

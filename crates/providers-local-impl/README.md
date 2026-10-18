@@ -20,6 +20,11 @@ Lokalny `ModelProvider` (docs/modules/providers-local/SPEC.md, ADR 0014): llama.
 - **Strumień**: wspólny silnik `lib-openai-compat` (Chat Completions); `Started` od razu po przyjęciu
   żądania (zimny start modelu nie jest „milczeniem" dla Routera); koszt 0, tokeny raportowane; sesje
   prywatne i dowolna jurysdykcja dozwolone (dane nie opuszczają maszyny).
+- **Wywołania narzędzi (C2.3)**: żądanie z narzędziami idzie w kopercie JSON ze schematem (`response_format` →
+  gramatyka `llama-server`; `schema.rs`, `envelope.rs`): model odpowiada `{"response": "…"}` z opcjonalnym
+  `"tool_call": {"name", "parameters"}`, argumenty zawsze zgodne ze schematem narzędzia; dekoder
+  `EnvelopeGuard` oddaje tekst na bieżąco i składa wywołanie, argumenty niezgodne/ucięte → `ToolArguments::Invalid`.
+  Wyłączane przez `LocalConfig::tool_schema` (ustawienie `engines.llm.tool_schema`) — wtedy natywne `tools`.
 - **Modele** (`models.toml`, tylko oficjalne repozytoria speakleash): Bielik 4.5B v3.0 Instruct Q8_0 (domyślny,
   4,8 GB) i Bielik 1.5B v3.0 Instruct Q8_0 (lekki, 1,6 GB, bez narzędzi); walidacja: tylko `.gguf`, **bez kwantów IQ**,
   https, SHA-256 64 hex albo pusty. **Pobieranie** (`Downloader`): wznawianie HTTP Range z `.part`
@@ -32,4 +37,5 @@ Testy (bez modelu, GPU i internetu): binarny cel `fake-llama-server` (tylko test
 pełny zestaw kontraktowy `ModelProvider` na prawdziwym procesie, cykl życia (start na żądanie, port/klucz,
 restart po awarii z limitem, fallback GPU → CPU ≤ 5 s, dzierżawy, bezczynność, zdarzenia), anulowanie
 ≤ 100 ms; pobieranie z przerwaniem i wznowieniem, zły hash, pierwszy hash, anulowanie (lokalny serwer HTTP);
-profil laptopa właściciela (`tests/laptop.rs`, `tests/laptop_voice.rs` — kolejne tury głosowe bez przeładowań).
+profil laptopa właściciela (`tests/laptop.rs`, `tests/laptop_voice.rs` — kolejne tury głosowe bez przeładowań);
+koperta narzędzi (`tests/tool_schema.rs` — ciało żądania ze schematem / bez, argumenty niezgodne i ucięte).

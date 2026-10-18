@@ -5688,6 +5688,7 @@ dependencies = [
  "device-profile-contract",
  "futures-util",
  "getrandom 0.4.3",
+ "jsonschema",
  "lib-openai-compat",
  "lib-sidecar-guard",
  "model-residency-contract",

@@ -2,6 +2,7 @@
 //! budżety, checkpoint) → tura modelu → narzędzia → … → weryfikacja (Krytyczka albo
 //! samoweryfikacja) → wynik. Każdy krok jest zdarzeniem.
 
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use agent_runtime_contract::{BudgetKind, Checkpoint, RunEvent, RunOutcome, Steer};
@@ -39,6 +40,8 @@ pub(crate) struct Engine {
     pub(crate) yield_requested: bool,
     /// Scheduler zatrzymał zadanie (`StepDirective::Stop`).
     pub(crate) gate_stopped: bool,
+    /// Wywołania bieżącej tury z niepoprawnymi argumentami (id → błąd) — `invalid.rs`.
+    pub(crate) invalid_args: BTreeMap<String, String>,
 }
 
 impl Engine {
@@ -65,6 +68,7 @@ impl Engine {
             last_fingerprint: None,
             yield_requested: false,
             gate_stopped: false,
+            invalid_args: BTreeMap::new(),
         }
     }
 

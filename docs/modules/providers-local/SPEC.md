@@ -25,6 +25,12 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
   i usunięcie `.part`. Hash nieznany w manifeście (`sha256 = ""`) → zapis przy pierwszym pobraniu (`<plik>.sha256`,
   zaufanie przy pierwszym użyciu) + ostrzeżenie w logach; model bez zapisanego hasha = niezainstalowany.
 - Bez pobranego modelu dostawca jest `Unconfigured` (Router go pomija).
+- **Wywołania narzędzi w kopercie ze schematem (C2.3):** żądanie z narzędziami (wybór ≠ `None`) idzie do
+  `llama-server` z `response_format: {type: "json_schema", json_schema: {schema}}` zamiast pola `tools`. Schemat koperty:
+  `{"response": string, "tool_call"?: {"name": <const nazwa>, "parameters": <schemat parametrów narzędzia>}}` —
+  tekst (odpowiedź albo plan przed akcją) i opcjonalnie jedno wywołanie (przy `Required`/`Tool` obowiązkowe; `Tool` —
+  tylko wskazane narzędzie). Serwer zamienia schemat na gramatykę, więc argumenty zawsze są poprawnym JSON-em zgodnym
+  ze schematem — także gdy szablon czatu modelu nie zna formatu narzędzi. Szczegóły w sekcji „Zmiany — C2.3” na końcu.
 
 Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/unloaded`, `local.backend.fallback`
 (GPU → CPU), `local.sidecar.crashed` — bez treści rozmowy i bez klucza.
@@ -52,7 +58,8 @@ Baseline: model 3–4,5B Q4 ≈ 2,5–3,5 GB VRAM (Vulkan) obok STT 1–2,5 GB; 
 Wspólne: `[providers.local] default_model = "bielik-4.5b-v3.0-instruct-q8_0"`, `ctx = 8192`, `min_ctx = 4096`, `stt_reserve_mb = 1500`. Per maszyna: `[providers.local.machine] backend = "auto" | "vulkan" | "cuda" | "cpu"`, `gpu_layers = "auto"`, `idle_unload = "10m"`, `max_vram_mb`.
 W aplikacji (Ustawienia → Modele i silniki, nakładka maszyny, od następnego uruchomienia; `app_modules::route::engine_settings`):
 `engines.llm.backend` (`auto` | `cuda` | `vulkan` | `cpu` → `BackendChoice`), `engines.llm.context` (`auto` | `4096` | `2048` → `ctx`),
-`engines.llm.threads` (0 = rdzenie fizyczne), `engines.llm.idle_unload_min` (1–120 min); wartość spoza zakresu = domyślna.
+`engines.llm.threads` (0 = rdzenie fizyczne), `engines.llm.idle_unload_min` (1–120 min), `engines.llm.tool_schema`
+(przełącznik, domyślnie włączony → `LocalConfig::tool_schema`); wartość spoza zakresu = domyślna.
 
 ## Wkład do UI
 Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dostawcy → Lokalne (modele, backend, benchmark); stany GPU OOM / przerwane pobieranie (§14.4).
@@ -151,3 +158,39 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   parametrów, KV 480 MiB przy `-c 8192`; 1.5B — 32 warstwy, 2 głowice KV, `n_ctx_train` 8192, KV 256 MiB. CPU 4 vCPU:
   4.5B 6,8 tok/s, 1.5B 21 tok/s; żądanie z narzędziem (4.5B, `--jinja`) — wywołanie narzędzia.
 - **Kilka kart (0.0.11):** `pin_device` — identyfikator urządzenia z `llama-server --list-devices` dopasowany po nazwie karty i przekazany w `--device` (tylko gdy serwer widzi więcej niż jedno urządzenie albo karta jest wskazana wprost). `shared_memory` — dzierżawa modelu na karcie zintegrowanej liczona jako RAM, bez budżetu VRAM karty głównej. Drugi egzemplarz dostawcy (`local-light`, tylko Vulkan, Bielik 1.5B) obsługuje lekkie zadania; bez silnika Vulkan zgłasza „nieskonfigurowany”.
+
+## Zmiany — C2.3: poprawny JSON wywołań narzędzi (seria 5, 0.0.64)
+- **Co obsługuje przypięty `llama-server` b11559** (sprawdzone w źródłach wydania, `docs/vendor/llama-cpp.md`): przy
+  `tools` i `--jinja` serwer sam buduje gramatykę argumentów ze schematów narzędzi, ale tylko gdy analiza szablonu czatu
+  rozpozna format narzędzi — przy `tool_choice: "auto"` gramatyka jest „leniwa” (od znacznika wywołania), a szablon bez
+  formatu narzędzi oznacza brak gramatyki i brak parsowania wywołań. `response_format` (`json_schema`) daje gramatykę
+  na całą odpowiedź i ma pierwszeństwo przed narzędziami; własne `grammar` razem z `tools` serwer odrzuca. Natywne
+  wywoływanie narzędzi Bielika v3 nie jest potwierdzone (plan 11) — dlatego koperta przez `response_format`,
+  niezależna od szablonu.
+- **Koperta = jeden obiekt, nie alternatywa:** `response` (wymagane, może być puste) przed opcjonalnym `tool_call` —
+  pętla agentki prosi o plan przed akcją, a przy kopercie „albo tekst, albo wywołanie” sam plan kończyłby przebieg
+  (tura bez wywołania = odpowiedź końcowa). Konwerter gramatyki stawia pola wymagane przed opcjonalnymi, więc model
+  pisze najpierw tekst, potem decyduje o wywołaniu.
+- **Żądanie** (`envelope::wire_request`, `schema::envelope`): narzędzia opisane w prompcie systemowym (nazwa, opis,
+  schemat parametrów) z zasadami formatu; wcześniejsze wywołania w historii jako tekst koperty asystentki, wyniki jako
+  „[Wynik narzędzia <nazwa>]” w turze użytkownika (bez ról `tool` i pól `tool_calls`). Schemat parametrów: lokalne
+  `$ref` rozwinięte (gramatyka koperty nie widzi `$defs` narzędzia), obiekty z `properties` bez `additionalProperties`
+  domknięte (`false`; składniki `allOf` otwarte). Klucz `parameters` (nie `arguments`), bo `serde_json` układa klucze
+  alfabetycznie, a gramatyka zachowuje ich kolejność — model najpierw wybiera nazwę narzędzia. Okno rozmowy rezerwuje
+  dodatkowo narzut zasad koperty.
+- **Odpowiedź** (`envelope::EnvelopeGuard` nad `LeakGuard<ChatDecoder>`): `response` płynie na bieżąco (sekwencje
+  ucieczki `\n`, `\uXXXX` i pary surogatów pocięte w dowolnym miejscu), `tool_call` składane do końca →
+  `ToolCallStart/Delta/End` w bloku po tekście i `Stop` = `ToolUse`. Argumenty sprawdzane schematem narzędzia (`jsonschema`); niezgodne,
+  ucięte (`MaxTokens`) albo niepoprawny JSON → `ToolArguments::Invalid` z opisem (nazwa narzędzia odzyskana z uciętego
+  tekstu) — `agent-runtime` nie uruchamia narzędzia i odsyła modelowi błąd z prośbą o ponowienie. Tekst, który nie
+  jest kopertą (serwer zignorował `response_format`), przechodzi bez zmian. W dzienniku `warn` tylko nazwa narzędzia,
+  bez treści błędu (opis walidacji cytuje argumenty).
+- **Wyłączenie:** `LocalConfig::tool_schema = false` (ustawienie `engines.llm.tool_schema`) — natywne `tools` jak
+  wcześniej. Dostawcy chmurowi bez zmian (koperta tylko w kodeku `llama-server`).
+- Testy: `src/schema_tests.rs` (domykanie, `$ref`, koperta, wybór wymuszony, opis błędów), `src/envelope/tests.rs`
+  (strumień pocięty w każdym miejscu, ucieczki, ucięcie, tekst spoza koperty, historia jako tekst),
+  `tests/tool_schema.rs` (fałszywy `llama-server` zapisuje ciało żądania: schemat przy narzędziach, brak bez narzędzi
+  i po wyłączeniu ustawienia, argumenty niezgodne i ucięte → `Invalid`).
+- **Niesprawdzone na sprzęcie:** jakość odpowiedzi Bielika 4.5B w kopercie i gramatyka b11559 z prawdziwym modelem
+  (próba: `crates/app-models/tests/live_catalog.rs::tool_request` na runnerze). Schemat MCP, którego konwerter gramatyki
+  serwera nie obsłuży, kończy się błędem żądania (HTTP 400) — wtedy wyłączyć ustawienie.
