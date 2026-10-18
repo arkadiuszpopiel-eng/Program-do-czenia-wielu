@@ -35,7 +35,14 @@ Wersji 0.0.63 **nie wgrałam** do `Alfa-uruchomiona` (tam nadal 0.0.62) — to T
 | `7698da68` | `ammonia` 4.2.4, lista wyboru od pierwszego kliknięcia, testy strony Urządzenia — rozdział 10             |
 | `fce4fa7d` | Raport: końcowa budowa z `7698da68`; pamięć projektu                                                       |
 | `206c3796` | Katalog crate'ów odświeżony (`scripts/catalog.mjs`)                                                        |
-| (ten)      | Poprawki raportu po piątym przeglądzie (liczby budżetu rozmiaru, ta tabela)                                |
+| `7b544ab5` | Poprawki raportu po piątym przeglądzie (liczby budżetu rozmiaru, ta tabela)                                |
+| `03d45dd0` | Dodatkowa kopia na F: o 0:54 (raport, pamięć)                                                              |
+| `e91b1ef3`, `059b9283` | Prawdziwa aplikacja: 37 kolejnych poleceń łącza — pokrycie 198 → 235 z 264 (89 %)              |
+| `cf6c2212`, `eaa08262` | Dziennik zmian, stan wykonania, raport, dziennik roadmapy                                       |
+| `c24da9ad` | Poprawki po całościowym przeglądzie (rozdział 11)                                                          |
+| `ba880bcf` | Druga wersja poprawki Qwen3-ASR — rezerwa 3 GB (rozdział 12, odrzucona)                                    |
+| `96588e5b` | Decyzja końcowa: reguła 12 GB, teksty kompromisu i autotestu (rozdział 13) — **wersja zbudowana**          |
+| `b41325ed`, (ten) | Raport: końcowy `verify` (rozdział 14), pamięć projektu                                             |
 
 Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Decyzja: [ADR 0028](../ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md).
 
@@ -70,9 +77,12 @@ Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Dec
 3. **Pobrania**: `ammonia 4.2.4` — zrobione po północy w ramach Twojej stałej zgody na pobrania do 3 GB (rozdział 10);
    Edge (etap `verify` testów w przeglądarce) — instalacja programu w systemie należy do Ciebie; `zip` 9 (nowa wersja
    główna) — osobne zadanie.
-4. **Wgranie 0.0.63** do `Alfa-uruchomiona` (`scripts/deploy-owner.sh`).
+4. **Wgranie 0.0.63** do `Alfa-uruchomiona` (`scripts/deploy-owner.sh`) — zbudowana i sprawdzona z `96588e5b`
+   (rozdział 14).
 5. **Resztki starego `node_modules`** w `Alfa AI Program\stare-node_modules-acl-2026-10-17` (1447 plików starej
    instalacji Windows) — usunąć z uprawnieniami administratora (`takeown /f … /r` i usunięcie), jeśli chcesz.
+6. **Osobny budżet pamięci na kartę** (C6.6) — dopiero on pozwoli liczyć mowę na małej karcie AMD/Intel obok modelu
+   rozmowy albo wtedy, gdy model rozmowy z karty nie korzysta (rozdział 13); potrzebna próba na karcie 6–8 GB.
 
 ## 6. Porządki i kopie
 
@@ -120,7 +130,7 @@ Po poprawkach (`c3ec80fb`): clippy i testy trzech dotkniętych crate'ów 86/0, v
 Czwarty przegląd tego commitu (2 obszary): kod bez uwag; 2 drobne poprawki tego raportu (liczba linii przy złym
 pliku, zaniżony rozmiar pobrania Chromium) — wprowadzone.
 
-## 9. Ostatni `verify wersja` przed kopią (commit `c3ec80fb`, 23:26–23:59)
+## 9. `verify wersja` po trzecim przeglądzie (commit `c3ec80fb`, 23:26–23:59; końcowy — rozdział 14)
 
 **16 zielonych, 2 czerwone, 1 nieuruchomiony.** Testy całego projektu: 1003 programy, **2897 zielonych, 0 czerwonych**,
 40 pominiętych; powłoka Tauri zielona; interfejs 394/394; prawdziwa aplikacja 37 zielonych (test logowania Claude Code
@@ -161,8 +171,8 @@ przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności 
   aktualizacje z sieci, model językowy, hasło kopii (Menedżer poświadczeń Windows jest wspólny z Twoim kontem) —
   tych w nocy celowo nie ruszam.
 - **Całościowy przegląd wszystkich zmian od 0.0.62** (rozdział 11).
-- **Końcowa zbudowana wersja** (Twoja zasada pracy nocnej): `alfa/target/shell/debug/alfa-desktop.exe` z commitu
-  `7698da68` (00:37) — prawdziwa aplikacja jako instancja testowa: **37 zielonych, 1 pominięty** (brak Claude Code),
+- **Zbudowana wersja** (Twoja zasada pracy nocnej; o 00:37 z commitu `7698da68`, a na koniec z `96588e5b` —
+  rozdział 14): prawdziwa aplikacja jako instancja testowa wtedy 37 zielonych, 1 pominięty (brak Claude Code),
   pokrycie łącza 198 z 264 (75 %). Do `Alfa-uruchomiona` jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028
   i licencja DirectML czekają na Ciebie; pakiety z głosem Supertonic na karcie ≥ 12 GB, jak Twój RX 9070 XT,
   zawierają DirectML).
