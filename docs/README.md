@@ -67,4 +67,8 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 - Po zakończonym zadaniu: stan w `plan/03-roadmapa.md` (i w `STATUS.md`, jeśli zamyka kryterium). Po zakończonym
   etapie: `plan/00-stan-wykonania.md`, wyższa wersja z wpisem w `CHANGELOG.md`, potem `node scripts/docs-html.mjs`.
 - Pamięć projektu (stan prac, zasady ustalone z właścicielem, dziennik sesji) ma kopię w
-  [`pamiec-projektu/`](pamiec-projektu/README.md); odświeża ją `bash scripts/memory-sync.sh` na końcu każdej sesji.
+  [`pamiec-projektu/`](pamiec-projektu/README.md); odświeża ją `bash scripts/memory-sync.sh` na końcu każdej sesji
+  (plików, których nie ma u źródła, nie usuwa — `--prune` usuwa; ostatni wiersz `WYNIK: …`).
+- Kopia bezpieczeństwa całego projektu na inny dysk: najpierw `bash scripts/backup.sh --dry-run <katalog>` (same
+  sprawdzenia: dysk, etykieta, wolne miejsce), potem to samo bez `--dry-run`; celu domyślnego nie ma
+  (opis w [`../scripts/README.md`](../scripts/README.md)).
