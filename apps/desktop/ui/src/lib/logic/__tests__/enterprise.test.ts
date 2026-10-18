@@ -46,9 +46,12 @@ describe('checkEnterprise — wspólna tabela z rdzeniem', () => {
     expect(coreMessage('duplicate', 'gpt-4o')).toBe(
       'niepoprawne dane: model `gpt-4o` ma dwa wdrożenia — zostaw jedno',
     );
-    const codes = new Set(CASES.map((c) => c.problem).filter(Boolean));
+    const codes = new Set(
+      CASES.map((c) => c.problem).filter((p): p is NonNullable<typeof p> => p !== null),
+    );
     for (const dict of [pl, en] as Record<string, unknown>[]) {
-      for (const code of [...codes, 'too_many']) expect(dict[`ent.err.${code}`], code).toBeTruthy();
+      for (const code of [...codes, 'too_many'])
+        expect(dict[`ent.err.${code}`], String(code)).toBeTruthy();
     }
   });
 });
