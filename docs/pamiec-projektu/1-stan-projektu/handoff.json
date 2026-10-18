@@ -4,9 +4,9 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-18T02:55:00+02:00"
+    "updated": "2026-10-18T02:58:00+02:00"
   },
-  "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana (6ff0c311 … 96588e5b): 8 przeglądów w świeżym kontekście, w tym całościowy zmian od 0.0.62. Końcowa reguła: na Vulkanie i głównej karcie < 12 GB Qwen3-ASR liczy na procesorze (stt::qwen_free; rezerwa 3 GB sprawdzona i odrzucona); HardwarePort::gpu_memory bez 250 ms; ammonia 4.2.4; Select bez pomijania pierwszego kliku. Testy w przeglądarce 467/467 (Chromium Playwrighta), e2e-app 41 + 1 pominięty, pokrycie łącza 235/264 (89 %). Raport: alfa/docs/plan/28-raport-nocny-2026-10-18.md (13 rozdziałów). ADR 0028 PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10: o 3:30 kopia na F:Alfa, potem STOP.",
+  "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana (6ff0c311 … 21897bf0): 8 przeglądów w świeżym kontekście, w tym całościowy zmian od 0.0.62. Końcowa reguła: na Vulkanie i głównej karcie < 12 GB Qwen3-ASR liczy na procesorze (stt::qwen_free; rezerwa 3 GB sprawdzona i odrzucona); HardwarePort::gpu_memory bez 250 ms; ammonia 4.2.4; Select bez pomijania pierwszego kliku. Testy w przeglądarce 467/467 (Chromium Playwrighta), e2e-app 41 + 1 pominięty, pokrycie łącza 235/264 (89 %). Raport: alfa/docs/plan/28-raport-nocny-2026-10-18.md (13 rozdziałów). ADR 0028 PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10: o 3:30 kopia na F:Alfa, potem STOP.",
   "session_goal": "Właściciel (17.10): Alfa ma działać na kartach NVIDIA, AMD, Intel i zintegrowanych; pobrać potrzebne pliki i zapisać wszystko w dokumentacji; najwyższa precyzja. Noc: pracuj do 3:30, potem kopia F:\\Alfa.",
   "in_progress": [
     "Kopia F:Alfa o 3:30 (scripts/backup.sh), potem STOP"
@@ -32,7 +32,7 @@
       "plan": "alfa/docs/plan/03-roadmapa.md (C6.6)",
       "raport": "alfa/docs/plan/28-raport-nocny-2026-10-18.md",
       "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md",
-      "zbudowana": "alfa/target/shell/debug/alfa-desktop.exe z 96588e5b (do wgrania: scripts/deploy-owner.sh — decyzja właściciela)"
+      "zbudowana": "alfa/target/shell/debug/alfa-desktop.exe z 21897bf0 (02:55; e2e-app 41 zielonych, pokrycie 235/264) — do wgrania: scripts/deploy-owner.sh, decyzja właściciela"
     },
     "ports": {
       "alfa-ui (atrapa)": 5173,

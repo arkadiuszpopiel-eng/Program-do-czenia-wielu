@@ -77,7 +77,7 @@ Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Dec
 3. **Pobrania**: `ammonia 4.2.4` — zrobione po północy w ramach Twojej stałej zgody na pobrania do 3 GB (rozdział 10);
    Edge (etap `verify` testów w przeglądarce) — instalacja programu w systemie należy do Ciebie; `zip` 9 (nowa wersja
    główna) — osobne zadanie.
-4. **Wgranie 0.0.63** do `Alfa-uruchomiona` (`scripts/deploy-owner.sh`) — zbudowana i sprawdzona z `96588e5b`
+4. **Wgranie 0.0.63** do `Alfa-uruchomiona` (`scripts/deploy-owner.sh`) — zbudowana i sprawdzona z `21897bf0`
    (rozdział 14).
 5. **Resztki starego `node_modules`** w `Alfa AI Program\stare-node_modules-acl-2026-10-17` (1447 plików starej
    instalacji Windows) — usunąć z uprawnieniami administratora (`takeown /f … /r` i usunięcie), jeśli chcesz.
@@ -250,4 +250,6 @@ i `app-voice` 83/0, `device-profile-contract` 12/0, clippy czysty.
 schematy, typy, plan HTML, `pnpm audit`, SBOM — zielone. Czerwone — znane przyczyny: testy w przeglądarce w etapie
 `verify` (brak Edge; budowa i budżet rozmiaru przeszły) i `cargo deny` (już tylko 3 ostrzeżenia `zip`). Nieuruchomiony:
 graf zależności (brak `jq`). Te same testy w przeglądarce uruchomione zaraz potem na Chromium Playwrighta:
-**467/467** (4,9 min). Zbudowana wersja do wgrania: `alfa/target/shell/debug/alfa-desktop.exe` z `96588e5b`.
+**467/467** (4,9 min). Na koniec (02:55) dwa zdania dziennika zmian poprawione pod regułę 12 GB (`21897bf0`, testy
+dziennika 13/0) i aplikacja zbudowana od nowa: **41 zielonych**, pokrycie 235 z 264. Wersja do wgrania:
+`alfa/target/shell/debug/alfa-desktop.exe` z `21897bf0` (kod jak w `96588e5b`, inny tylko tekst „Co nowego”).
