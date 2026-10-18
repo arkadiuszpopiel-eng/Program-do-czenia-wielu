@@ -181,12 +181,12 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 ## Karty licencji (C5.7, 0.0.64)
 - **Dane:** `crates/app-models/data/license-cards.json` (identyfikator pozycji → karta), ładowane przez
   `licenses.rs` i dołączane do `ModelItem::license_card` (pole z `serde(default)` — starsze ładunki bez niego
-  wczytują się jako `null`). Karta: identyfikator licencji (SPDX albo nazwa umowna), pełna nazwa, adres tekstu,
+  wczytują się jako `null`). Karta: identyfikator licencji (SPDX albo nazwa umowna), pełna nazwa, źródło licencji (adres tekstu albo strony autora),
   autor, użycie komercyjne (`yes` / `no` / `conditional` / `unknown`), wymóg wskazania autora, uwagi PL/EN,
-  `confirmed` i głosy pozycji (`VoiceLicense`: barwy Supertonic 3 F1–F5 i M1–M5, Gosia z Pipera, mówczynie
+  `confirmed` (licencja ma zapis sprawdzenia w dokumentacji projektu — odnośnik „Zapis licencji:” w uwagach) i głosy pozycji (`VoiceLicense`: barwy Supertonic 3 F1–F5 i M1–M5, Gosia z Pipera, mówczynie
   Pocket TTS). To zapis faktów do pokazania, nie opinia prawna.
 - **Niezmienniki (testy `licenses_tests.rs`):** każda pozycja katalogu ma kartę i żadna karta nie wisi bez pozycji;
-  karta potwierdzona tylko przy potwierdzonej pozycji; karta niepotwierdzona ma w uwagach „Do potwierdzenia przez
+  karta potwierdzona tylko przy potwierdzonej pozycji i z odnośnikiem „Zapis licencji:” / „Licence record:”; karta niepotwierdzona ma w uwagach „Do potwierdzenia przez
   człowieka” (EN: „To be confirmed by a human”); użycie komercyjne `unknown` nigdy potwierdzone; każdy głos
   z `voice-tts-contract` (`SUPERTONIC_ALL`, `PIPER_BASE`, `POCKET_BASE`) i każda pobierana barwa Supertonic mają
   wpis; karty pozycji mówiących opisują znak wodny mowy syntetycznej jako decyzję właściciela w toku.

@@ -19,6 +19,7 @@ const ORT = 'https://github.com/microsoft/onnxruntime/blob/main/LICENSE';
 
 type Row = [
   id: string,
+  license: string,
   name: string,
   url: string,
   author: LocalizedText,
@@ -28,6 +29,11 @@ type Row = [
   extra?: { speech?: boolean; voices?: readonly VoiceLicense[] },
 ];
 
+/** Odnośnik do zapisu sprawdzenia licencji — ma go każda karta „potwierdzona”. */
+const RECORD = L(
+  ' Zapis licencji: dokumentacja projektu (docs/).',
+  ' Licence record: project documentation (docs/).',
+);
 const PERMISSIVE = L(
   'Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.',
   'May be used and redistributed, also commercially, with a copy of the licence.',
@@ -85,6 +91,7 @@ const SUPERTONIC_VOICES = SUPERTONIC_NAMES.map(([id, pl, en]) =>
 const ROWS: readonly Row[] = [
   [
     'bielik-4.5b-v3.0-instruct-q8_0',
+    'Apache-2.0',
     'Apache License 2.0',
     APACHE,
     SPEAKLEASH,
@@ -97,6 +104,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'bielik-1.5b-v3.0-instruct-q8_0',
+    'Apache-2.0',
     'Apache License 2.0',
     APACHE,
     SPEAKLEASH,
@@ -106,6 +114,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'multilingual-e5-small',
+    'MIT',
     'MIT License',
     MIT_ORG,
     L('Microsoft (intfloat)', 'Microsoft (intfloat)'),
@@ -113,10 +122,11 @@ const ROWS: readonly Row[] = [
     false,
     PERMISSIVE,
   ],
-  ['whisper-large-v3-turbo-q5_0', 'MIT License', WHISPER, OPENAI, 'yes', false, PERMISSIVE],
-  ['whisper-small-q5_1', 'MIT License', WHISPER, OPENAI, 'yes', false, PERMISSIVE],
+  ['whisper-large-v3-turbo-q5_0', 'MIT', 'MIT License', WHISPER, OPENAI, 'yes', false, PERMISSIVE],
+  ['whisper-small-q5_1', 'MIT', 'MIT License', WHISPER, OPENAI, 'yes', false, PERMISSIVE],
   [
     'qwen3-asr-1.7b-q8',
+    'Apache-2.0',
     'Apache License 2.0',
     APACHE,
     L('Zespół Qwen (Alibaba Cloud)', 'Qwen team (Alibaba Cloud)'),
@@ -129,6 +139,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'supertonic-3',
+    'OpenRAIL-M AND MIT',
     'OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)',
     'https://huggingface.co/supertone-oss-archive/supertonic-3',
     L('Supertone Inc. (Korea Południowa)', 'Supertone Inc. (South Korea)'),
@@ -142,6 +153,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'piper-pl_PL-gosia-medium',
+    'MIT',
     'MIT (repozytorium piper-voices); licencja nagrań — według MODEL_CARD',
     'https://huggingface.co/rhasspy/piper-voices/blob/v1.0.0/pl/pl_PL/gosia/medium/MODEL_CARD',
     L('Projekt Piper (rhasspy/piper-voices)', 'Piper project (rhasspy/piper-voices)'),
@@ -173,15 +185,17 @@ const ROWS: readonly Row[] = [
   ],
   [
     'silero-vad',
+    'MIT',
     'MIT License',
     'https://github.com/snakers4/silero-vad/blob/master/LICENSE',
     L('Silero Team (snakers4)', 'Silero Team (snakers4)'),
     'yes',
-    true,
+    false,
     PERMISSIVE,
   ],
   [
     'smart-turn-v3.2',
+    'BSD-2-Clause',
     'BSD 2-Clause License',
     'https://opensource.org/license/bsd-2-clause',
     L('Daily — projekt Pipecat', 'Daily — Pipecat project'),
@@ -191,6 +205,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'openwakeword-features',
+    'Apache-2.0',
     'Apache License 2.0 (kod); licencja modeli cech — do potwierdzenia',
     'https://github.com/dscripka/openWakeWord/blob/main/LICENSE',
     L('David Scripka (openWakeWord)', 'David Scripka (openWakeWord)'),
@@ -203,6 +218,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'wespeaker-resnet34',
+    'Apache-2.0',
     'Apache License 2.0 (WeSpeaker); warunki zbioru VoxCeleb — do sprawdzenia',
     'https://github.com/wenet-e2e/wespeaker/blob/master/LICENSE',
     L('Projekt WeSpeaker (WeNet)', 'WeSpeaker project (WeNet)'),
@@ -213,9 +229,10 @@ const ROWS: readonly Row[] = [
       'Whether the VoxCeleb terms limit commercial use:',
     ),
   ],
-  ['sidecar-llama-vulkan', 'MIT License', LLAMA, GGML, 'yes', true, PERMISSIVE],
+  ['sidecar-llama-vulkan', 'MIT', 'MIT License', LLAMA, GGML, 'yes', false, PERMISSIVE],
   [
     'sidecar-llama-cuda',
+    'MIT AND LicenseRef-NVIDIA-CUDA-EULA',
     'MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)',
     CUDA,
     GGML,
@@ -223,9 +240,10 @@ const ROWS: readonly Row[] = [
     false,
     NVIDIA,
   ],
-  ['sidecar-llama-cpu', 'MIT License', LLAMA, GGML, 'yes', true, PERMISSIVE],
+  ['sidecar-llama-cpu', 'MIT', 'MIT License', LLAMA, GGML, 'yes', false, PERMISSIVE],
   [
     'sidecar-whisper-cpu',
+    'MIT',
     'MIT License',
     'https://github.com/ggml-org/whisper.cpp/blob/master/LICENSE',
     GGML,
@@ -235,6 +253,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'sidecar-whisper-cuda',
+    'MIT AND LicenseRef-NVIDIA-CUDA-EULA',
     'MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)',
     CUDA,
     GGML,
@@ -242,9 +261,19 @@ const ROWS: readonly Row[] = [
     false,
     NVIDIA,
   ],
-  ['onnxruntime-cpu', 'MIT License', ORT, L('Microsoft', 'Microsoft'), 'yes', true, PERMISSIVE],
+  [
+    'onnxruntime-cpu',
+    'MIT',
+    'MIT License',
+    ORT,
+    L('Microsoft', 'Microsoft'),
+    'yes',
+    true,
+    PERMISSIVE,
+  ],
   [
     'sidecar-piper',
+    'MIT AND GPL-3.0-or-later',
     'MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)',
     'https://github.com/rhasspy/piper/blob/master/LICENSE.md',
     L('Michael Hansen (rhasspy/piper)', 'Michael Hansen (rhasspy/piper)'),
@@ -258,6 +287,7 @@ const ROWS: readonly Row[] = [
   ],
   [
     'sidecar-pocket-tts',
+    'CC-BY-4.0',
     'CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy',
     'https://creativecommons.org/licenses/by/4.0/',
     L(
@@ -292,35 +322,31 @@ const ROWS: readonly Row[] = [
   ],
 ];
 
-/** Identyfikator SPDX po początku nazwy licencji (reszta — pierwszy człon nazwy). */
-const SPDX: Readonly<Record<string, string>> = {
-  'Apache License 2.0': 'Apache-2.0',
-  'MIT License': 'MIT',
-  'BSD 2-Clause License': 'BSD-2-Clause',
-};
-
-function card([, name, url, author, commercial, confirmed, notes, extra]: Row): LicenseCard {
+function card(
+  [, license, name, url, author, commercial, confirmed, notes, extra]: Row,
+  itemConfirmed: boolean,
+): LicenseCard {
+  // Jak w Rust: karta potwierdzona tylko przy potwierdzonej pozycji.
+  const sure = confirmed && itemConfirmed;
   const tail = (lang: 'pl' | 'en') =>
-    notes[lang] + (confirmed ? '' : CONFIRM[lang]) + (extra?.speech ? WATERMARK[lang] : '');
+    notes[lang] + (sure ? RECORD[lang] : CONFIRM[lang]) + (extra?.speech ? WATERMARK[lang] : '');
   return {
-    id:
-      Object.entries(SPDX).find(([prefix]) => name.startsWith(prefix))?.[1] ??
-      name.split(' ')[0] ??
-      name,
+    id: license,
     name,
     url,
     author,
     commercial,
     attribution: true,
     notes: L(tail('pl'), tail('en')),
-    confirmed,
+    confirmed: sure,
     voices: extra?.voices ?? [],
   };
 }
 
-const CARDS = new Map(ROWS.map((row) => [row[0], card(row)]));
+const ROW_BY_ID = new Map<string, Row>(ROWS.map((row) => [row[0], row]));
 
 /** Karta licencji pozycji atrapy (`null` — pozycja spoza katalogu kart). */
-export function seedLicense(id: string): LicenseCard | null {
-  return CARDS.get(id) ?? null;
+export function seedLicense(id: string, itemConfirmed: boolean): LicenseCard | null {
+  const row = ROW_BY_ID.get(id);
+  return row ? card(row, itemConfirmed) : null;
 }

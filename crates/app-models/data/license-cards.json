@@ -106,8 +106,8 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "Apache-2.0: wolno używać, zmieniać i rozpowszechniać, także komercyjnie, z kopią licencji. Uruchamia go llama-server (llama.cpp, MIT) z tego katalogu — silnik ma osobną kartę licencji.",
-      "en": "Apache-2.0: may be used, modified and redistributed, also commercially, with a copy of the licence. It runs on llama-server (llama.cpp, MIT) from this catalogue — the engine has its own licence card."
+      "pl": "Apache-2.0: wolno używać, zmieniać i rozpowszechniać, także komercyjnie, z kopią licencji. Uruchamia go llama-server (llama.cpp, MIT) z tego katalogu — silnik ma osobną kartę licencji. Zapis licencji: docs/plan/19-specyfikacja-glosu-delty.md (pliki Qwen3-ASR, ggml-org/Qwen3-ASR-1.7B-GGUF).",
+      "en": "Apache-2.0: may be used, modified and redistributed, also commercially, with a copy of the licence. It runs on llama-server (llama.cpp, MIT) from this catalogue — the engine has its own licence card. Licence record: docs/plan/19-specyfikacja-glosu-delty.md (Qwen3-ASR files, ggml-org/Qwen3-ASR-1.7B-GGUF)."
     },
     "confirmed": true
   },
@@ -122,8 +122,8 @@
     "commercial": "conditional",
     "attribution": true,
     "notes": {
-      "pl": "OpenRAIL-M pozwala używać i rozpowszechniać model także komercyjnie, pod warunkiem przekazania dalej kopii licencji i listy zakazanych zastosowań. Lista zakazuje m.in. podszywania się pod osoby bez ich zgody, treści bez oznaczenia, że pochodzą od maszyny, i udzielania porad medycznych — to ostatnie czeka na decyzję właściciela, bo agentka może przeczytać na głos odpowiedź o zdrowiu. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
-      "en": "OpenRAIL-M allows using and redistributing the model, also commercially, provided a copy of the licence and the list of prohibited uses is passed on. The list forbids, among others, impersonating people without consent, content not disclosed as machine-generated, and giving medical advice — the last point awaits the owner's decision, as an agent may read a health answer aloud. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+      "pl": "OpenRAIL-M pozwala używać i rozpowszechniać model także komercyjnie, pod warunkiem przekazania dalej kopii licencji i listy zakazanych zastosowań. Lista zakazuje m.in. podszywania się pod osoby bez ich zgody, treści bez oznaczenia, że pochodzą od maszyny, i udzielania porad medycznych — to ostatnie czeka na decyzję właściciela, bo agentka może przeczytać na głos odpowiedź o zdrowiu. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje. Zapis licencji: docs/plan/15-glos-lokalny.md (licencja wag OpenRAIL-M przeczytana) i docs/ADR/0024-licencja-silnika-mowy.md (kod MIT).",
+      "en": "OpenRAIL-M allows using and redistributing the model, also commercially, provided a copy of the licence and the list of prohibited uses is passed on. The list forbids, among others, impersonating people without consent, content not disclosed as machine-generated, and giving medical advice — the last point awaits the owner's decision, as an agent may read a health answer aloud. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today. Licence record: docs/plan/15-glos-lokalny.md (OpenRAIL-M weights licence read) and docs/ADR/0024-licencja-silnika-mowy.md (MIT code)."
     },
     "confirmed": true,
     "voices": [
@@ -220,8 +220,8 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "BSD-2-Clause: wolno używać i rozpowszechniać, także komercyjnie, z zachowaniem informacji o prawach autorskich i tekstu licencji. Liczy przez ONNX Runtime (osobna karta).",
-      "en": "BSD-2-Clause: may be used and redistributed, also commercially, keeping the copyright notice and licence text. Computed through ONNX Runtime (separate card)."
+      "pl": "BSD-2-Clause: wolno używać i rozpowszechniać, także komercyjnie, z zachowaniem informacji o prawach autorskich i tekstu licencji. Liczy przez ONNX Runtime (osobna karta). Zapis licencji: docs/plan/19-specyfikacja-glosu-delty.md (model pipecat-ai/smart-turn-v3).",
+      "en": "BSD-2-Clause: may be used and redistributed, also commercially, keeping the copyright notice and licence text. Computed through ONNX Runtime (separate card). Licence record: docs/plan/19-specyfikacja-glosu-delty.md (model pipecat-ai/smart-turn-v3)."
     },
     "confirmed": true
   },
@@ -236,8 +236,8 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Alfa instaluje obok biblioteki jej LICENSE i ThirdPartyNotices.txt (sumy przypięte). Działa tylko w procesach pobocznych mowy, nie w samym programie.",
-      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. Alfa installs its LICENSE and ThirdPartyNotices.txt next to the library (pinned checksums). Runs only in the speech helper processes, not in the app itself."
+      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Alfa instaluje obok biblioteki jej LICENSE i ThirdPartyNotices.txt (sumy przypięte). Działa tylko w procesach pobocznych mowy, nie w samym programie. Zapis licencji: plik LICENSE z paczki z przypiętą sumą (crates/app-models/src/voice_runtime.rs).",
+      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. Alfa installs its LICENSE and ThirdPartyNotices.txt next to the library (pinned checksums). Runs only in the speech helper processes, not in the app itself. Licence record: the LICENSE file from the package with a pinned checksum (crates/app-models/src/voice_runtime.rs)."
     },
     "confirmed": true
   },
@@ -252,8 +252,8 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "Ta sama licencja co wersja na procesor (LICENSE i ThirdPartyNotices.txt instalowane obok). Do pracy potrzebuje biblioteki DirectML, która ma własną licencję Microsoftu — osobna karta.",
-      "en": "Same licence as the CPU build (LICENSE and ThirdPartyNotices.txt installed alongside). It needs the DirectML library, which has its own Microsoft licence — separate card."
+      "pl": "Ta sama licencja co wersja na procesor (LICENSE i ThirdPartyNotices.txt instalowane obok). Do pracy potrzebuje biblioteki DirectML, która ma własną licencję Microsoftu — osobna karta. Zapis licencji: docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md (NuGet Microsoft.ML.OnnxRuntime.DirectML, MIT) i plik LICENSE z przypiętą sumą (crates/app-models/src/voice_runtime.rs).",
+      "en": "Same licence as the CPU build (LICENSE and ThirdPartyNotices.txt installed alongside). It needs the DirectML library, which has its own Microsoft licence — separate card. Licence record: docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md (NuGet Microsoft.ML.OnnxRuntime.DirectML, MIT) and the LICENSE file with a pinned checksum (crates/app-models/src/voice_runtime.rs)."
     },
     "confirmed": true
   },
@@ -310,10 +310,10 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Model z oficjalnej paczki PyPI (sumy przypięte).",
-      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. Model from the official PyPI package (pinned checksums)."
+      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Model z oficjalnej paczki PyPI (sumy przypięte). Licencja według repozytorium projektu, bez zapisu sprawdzenia w dokumentacji Alfy — Do potwierdzenia przez człowieka.",
+      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. Model from the official PyPI package (pinned checksums). Licence taken from the project repository, with no recorded check in Alfa's documentation — To be confirmed by a human."
     },
-    "confirmed": true
+    "confirmed": false
   },
   "openwakeword-features": {
     "id": "Apache-2.0",
@@ -358,10 +358,10 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Ten sam serwer uruchamia rozpoznawanie mowy Qwen3-ASR. Wersja Vulkan korzysta ze sterownika karty, który nie jest częścią archiwum.",
-      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. The same server runs Qwen3-ASR speech recognition. The Vulkan build uses the graphics driver, which is not part of the archive."
+      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Ten sam serwer uruchamia rozpoznawanie mowy Qwen3-ASR. Wersja Vulkan korzysta ze sterownika karty, który nie jest częścią archiwum. Licencja według repozytorium projektu, bez zapisu sprawdzenia w dokumentacji Alfy — Do potwierdzenia przez człowieka.",
+      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. The same server runs Qwen3-ASR speech recognition. The Vulkan build uses the graphics driver, which is not part of the archive. Licence taken from the project repository, with no recorded check in Alfa's documentation — To be confirmed by a human."
     },
-    "confirmed": true
+    "confirmed": false
   },
   "sidecar-llama-cuda": {
     "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
@@ -390,10 +390,10 @@
     "commercial": "yes",
     "attribution": true,
     "notes": {
-      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Ten sam serwer uruchamia rozpoznawanie mowy Qwen3-ASR.",
-      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. The same server runs Qwen3-ASR speech recognition."
+      "pl": "MIT: wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Ten sam serwer uruchamia rozpoznawanie mowy Qwen3-ASR. Licencja według repozytorium projektu, bez zapisu sprawdzenia w dokumentacji Alfy — Do potwierdzenia przez człowieka.",
+      "en": "MIT: may be used and redistributed, also commercially, with a copy of the licence. The same server runs Qwen3-ASR speech recognition. Licence taken from the project repository, with no recorded check in Alfa's documentation — To be confirmed by a human."
     },
-    "confirmed": true
+    "confirmed": false
   },
   "sidecar-whisper-cpu": {
     "id": "MIT",

@@ -13,6 +13,7 @@
   import { useApp } from '../../../state/context';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Lazy from '../../../components/shell/Lazy.svelte';
+  import VoiceLicenses from './VoiceLicenses.svelte';
 
   interface Props {
     /** Ustawienia strojenia mowy (`voice.tts_*`) — pokazywane przy głosach agentek. */
@@ -192,6 +193,8 @@
     {/each}
   </ul>
 </section>
+
+<VoiceLicenses />
 
 <style>
   .card {

@@ -31,7 +31,10 @@ for (const style of ['classic', 'glass', 'next'] as const) {
       for (const label of ['Licencja', 'Identyfikator', 'Autor i źródło', 'Użycie komercyjne']) {
         await expect(voice.getByText(label, { exact: true })).toBeVisible();
       }
-      await expect(voice.getByText('Sprawdzone u źródła')).toBeVisible();
+      await expect(
+        voice.getByText('Licencja z zapisem sprawdzenia w dokumentacji projektu'),
+      ).toBeVisible();
+      await expect(voice.getByText('Źródło licencji', { exact: true })).toBeVisible();
       await expect(voice.getByText('Tak, pod warunkami', { exact: true })).toBeVisible();
       await expect(voice.getByText(/udzielanie porad medycznych/)).toBeVisible();
       await expect(
@@ -78,4 +81,26 @@ test('karta licencji po angielsku', async ({ page }) => {
   await expect(voice.getByRole('heading', { name: 'Voices (10)', level: 5 })).toBeVisible();
   await expect(voice.getByText(/Synthetic-speech watermark: owner decision pending/)).toBeVisible();
   await expectAccessible(page, 'karta licencji EN');
+});
+
+test('karta licencji na stronie „Głos”: modele mowy i ich barwy', async ({ page }) => {
+  await openApp(page);
+  await waitForChat(page);
+  await page.keyboard.press('Control+,');
+  await page
+    .getByRole('navigation', { name: 'Sekcje ustawień' })
+    .getByRole('button', { name: 'Głos', exact: true })
+    .click();
+  const licenses = page.locator('section[aria-labelledby="voice-licenses"]');
+  await expect(licenses.getByRole('heading', { name: 'Licencje głosów' })).toBeVisible();
+  await licenses
+    .getByRole('listitem')
+    .filter({ hasText: 'Supertonic 3' })
+    .first()
+    .getByRole('button', { name: 'Karta licencji' })
+    .click();
+  const card = page.getByRole('region', { name: 'Karta licencji: Supertonic 3' });
+  await expect(card.getByRole('heading', { name: 'Głosy (10)', level: 5 })).toBeVisible();
+  await expect(card.getByText('Tak, pod warunkami', { exact: true })).toBeVisible();
+  await expectAccessible(page, 'licencje głosów');
 });

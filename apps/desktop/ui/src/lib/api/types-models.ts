@@ -87,7 +87,7 @@ export interface LicenseCard {
   readonly id: string;
   /** Pełna nazwa licencji (albo kilku — silnik i dołączone biblioteki). */
   readonly name: string;
-  /** Adres tekstu licencji. */
+  /** Źródło licencji: adres jej tekstu albo strony, na której autor ją podaje. */
   readonly url: string;
   /** Autor albo właściciel praw i źródło. */
   readonly author: LocalizedText;
@@ -96,7 +96,7 @@ export interface LicenseCard {
   readonly attribution: boolean;
   /** Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej). */
   readonly notes: LocalizedText;
-  /** Fakty sprawdzone u źródła (inaczej — „do potwierdzenia przez człowieka”). */
+  /** Licencja ma zapis sprawdzenia w dokumentacji projektu („Zapis licencji:” w uwagach); inaczej — „do potwierdzenia przez człowieka”. */
   readonly confirmed: boolean;
   /** Głosy w tej pozycji (pusto — pozycja nie mówi albo nie ma osobnych głosów). */
   readonly voices: readonly VoiceLicense[];

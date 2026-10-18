@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SEEDS, seedItem } from '../fake/engine-seeds';
+// Dane produkcyjne kart — atrapa nie może się od nich odkleić.
+import cards from '../../../../../../../crates/app-models/data/license-cards.json';
 
 describe('atrapa: karty licencji (C5.7)', () => {
   it('każda pozycja atrapy ma kartę licencji z adresem i uwagami', () => {
@@ -10,6 +12,20 @@ describe('atrapa: karty licencji (C5.7)', () => {
       expect(card?.notes.pl.length ?? 0, seed[0]).toBeGreaterThan(20);
       if (card && !card.confirmed)
         expect(card.notes.pl).toContain('Do potwierdzenia przez człowieka');
+    }
+  });
+
+  it('identyfikator licencji, użycie komercyjne i potwierdzenie jak w danych produkcyjnych', () => {
+    const prod: Record<string, { id: string; commercial: string; confirmed: boolean }> = cards;
+    for (const seed of SEEDS) {
+      const card = seedItem(seed).license_card;
+      const real = prod[seed[0]];
+      expect(real, seed[0]).toBeDefined();
+      expect(card?.id, seed[0]).toBe(real?.id);
+      expect(card?.commercial, seed[0]).toBe(real?.commercial);
+      expect(card?.confirmed, seed[0]).toBe(real?.confirmed);
+      // Jak w Rust: karta potwierdzona tylko przy potwierdzonej pozycji.
+      if (card?.confirmed) expect(seed[7], seed[0]).toBe(true);
     }
   });
 

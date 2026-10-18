@@ -39,7 +39,13 @@ fn every_catalog_item_has_a_complete_license_card() {
             !c.confirmed || item.confirmed,
             "{id}: potwierdzona bez pozycji"
         );
-        if !c.confirmed {
+        // „Potwierdzona” = jest zapis sprawdzenia licencji w dokumentacji projektu (odnośnik w uwagach).
+        if c.confirmed {
+            assert!(
+                c.notes.pl.contains("Zapis licencji:") && c.notes.en.contains("Licence record:"),
+                "{id}: potwierdzona bez odnośnika do zapisu sprawdzenia"
+            );
+        } else {
             assert!(
                 c.notes.pl.contains(TO_CONFIRM_PL) && c.notes.en.contains(TO_CONFIRM_EN),
                 "{id}: sprawa otwarta bez „do potwierdzenia przez człowieka”"

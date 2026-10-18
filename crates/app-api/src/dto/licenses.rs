@@ -38,7 +38,7 @@ pub struct LicenseCard {
     pub id: String,
     /// Pełna nazwa licencji (albo kilku — silnik i dołączone biblioteki).
     pub name: String,
-    /// Adres tekstu licencji.
+    /// Źródło licencji: adres jej tekstu albo strony, na której autor ją podaje.
     pub url: String,
     /// Autor albo właściciel praw i źródło.
     pub author: LocalizedText,
@@ -47,7 +47,7 @@ pub struct LicenseCard {
     pub attribution: bool,
     /// Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej).
     pub notes: LocalizedText,
-    /// Fakty licencyjne sprawdzone u źródła (inaczej — „do potwierdzenia przez człowieka”).
+    /// Licencja ma zapis sprawdzenia w dokumentacji projektu („Zapis licencji:” w uwagach); inaczej — „do potwierdzenia przez człowieka”.
     pub confirmed: bool,
     /// Głosy w tej pozycji (pusto — pozycja nie mówi albo nie ma osobnych głosów).
     #[serde(default)]

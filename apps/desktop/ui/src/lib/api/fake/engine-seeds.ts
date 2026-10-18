@@ -323,7 +323,7 @@ export function seedItem([
     error: null,
     active: false,
     card: seedCard(kind, name),
-    license_card: seedLicense(id),
+    license_card: seedLicense(id, confirmed),
   };
 }
 

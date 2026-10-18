@@ -6310,7 +6310,7 @@
           "$ref": "#/$defs/CommercialUse"
         },
         "confirmed": {
-          "description": "Fakty licencyjne sprawdzone u źródła (inaczej — „do potwierdzenia przez człowieka”).",
+          "description": "Licencja ma zapis sprawdzenia w dokumentacji projektu („Zapis licencji:” w uwagach); inaczej — „do potwierdzenia przez człowieka”.",
           "type": "boolean"
         },
         "id": {
@@ -6326,7 +6326,7 @@
           "description": "Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej)."
         },
         "url": {
-          "description": "Adres tekstu licencji.",
+          "description": "Źródło licencji: adres jej tekstu albo strony, na której autor ją podaje.",
           "type": "string"
         },
         "voices": {

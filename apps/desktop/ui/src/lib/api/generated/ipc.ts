@@ -1707,7 +1707,7 @@ export interface LicenseCard {
   /** Autor albo właściciel praw i źródło. */
   readonly author: LocalizedText;
   readonly commercial: CommercialUse;
-  /** Fakty licencyjne sprawdzone u źródła (inaczej — „do potwierdzenia przez człowieka”). */
+  /** Licencja ma zapis sprawdzenia w dokumentacji projektu („Zapis licencji:” w uwagach); inaczej — „do potwierdzenia przez człowieka”. */
   readonly confirmed: boolean;
   /** Identyfikator licencji (SPDX, gdy istnieje; inaczej nazwa umowna, np. `OpenRAIL-M`). */
   readonly id: string;
@@ -1715,7 +1715,7 @@ export interface LicenseCard {
   readonly name: string;
   /** Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej). */
   readonly notes: LocalizedText;
-  /** Adres tekstu licencji. */
+  /** Źródło licencji: adres jej tekstu albo strony, na której autor ją podaje. */
   readonly url: string;
   /** Głosy w tej pozycji (pusto — pozycja nie mówi albo nie ma osobnych głosów). */
   readonly voices: readonly VoiceLicense[];
