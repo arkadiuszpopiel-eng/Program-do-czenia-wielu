@@ -2,7 +2,7 @@
 //! sprawdzane przy zapisie konta i w kreatorze — tak samo w `-impl` i w `-fake`.
 
 use super::KEY_OK;
-use super::flows::{new_account, ok};
+use super::flows::{new_account, ok, pid};
 use crate::{AccountsError, AccountsHub, AzureDeployment, EnterpriseSettings, Wizard, WizardError};
 
 /// Organizacja, projekt i wdrożenia tylko u dostawców, których dotyczą; puste pola znikają.
@@ -47,6 +47,27 @@ pub async fn enterprise_settings_only_where_they_apply<H: AccountsHub>(hub: &H) 
     ));
     ok(wizard.enter_enterprise(EnterpriseSettings::default()));
     assert!(wizard.enterprise().is_empty());
+}
+
+/// Ten sam klucz w innym projekcie OpenAI to osobne konto (`OpenAI-Project` rozdziela budżety
+/// tego samego klucza); w tym samym projekcie — duplikat. Hub musi znać dostawcę `openai`.
+pub async fn same_key_in_other_openai_project_is_not_a_duplicate<H: AccountsHub>(hub: &H) {
+    let mut first = new_account("openai", KEY_OK);
+    first.enterprise.project = Some("proj_budget_a".into());
+    let id = ok(hub.add_account(first).await);
+    let scope = |project: Option<&str>| EnterpriseSettings {
+        project: project.map(str::to_owned),
+        ..EnterpriseSettings::default()
+    };
+    let key = crate::SecretString::from(KEY_OK);
+    let twin = |project| hub.find_by_secret(&pid("openai"), None, &scope(project), &key);
+    assert_eq!(twin(Some(" proj_budget_a ")), Some(id), "ten sam projekt");
+    assert_eq!(twin(Some("proj_budget_b")), None, "inny projekt");
+    assert_eq!(twin(None), None, "projekt domyślny klucza");
+    assert_eq!(
+        hub.find_by_secret(&pid("acme"), None, &scope(None), &key),
+        None
+    );
 }
 
 fn id_of<H: AccountsHub>(hub: &H, id: &crate::AccountId) -> crate::ProviderId {

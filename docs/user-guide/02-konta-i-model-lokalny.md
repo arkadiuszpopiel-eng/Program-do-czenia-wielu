@@ -68,6 +68,7 @@ osobno dla każdego projektu), w kroku **Klucz** zaznacz „Klucz należy do org
 Oba pola są opcjonalne — puste znaczy „domyślna organizacja i projekt klucza”. Alfa dołącza je do każdego zapytania
 tego konta (nagłówki `OpenAI-Organization` i `OpenAI-Project`), także do testu połączenia. To nie są sekrety, ale
 w dziennikach Alfa pokazuje je skrócone (`org-…1234`). Na karcie konta widzisz je w linii „Konto firmowe”.
+Ten sam klucz możesz dodać kilka razy z różnymi projektami — każdy projekt to osobne konto z osobnym budżetem.
 
 **Azure OpenAI** — dla firm, które korzystają z modeli OpenAI przez własny zasób w Microsoft Azure. Wybierz dostawcę
 **Azure OpenAI** i podaj:
@@ -87,6 +88,12 @@ Test połączenia sprawdza klucz i adres listą modeli zasobu (bez zużycia toke
 Twoje wdrożenia. Region i zasady przetwarzania danych zależą od zasobu i umowy z Microsoft — w Alfie dostawca ma
 oznaczenie prywatności „nieznane”, dopóki nie zostanie sprawdzony. Organizacji i projektu nie podaje się przy Azure,
 a wdrożeń — przy innych dostawcach; kreator odmówi zapisu z wyjaśnieniem.
+
+Test połączenia **nie sprawdza nazw wdrożeń** — literówka wyjdzie dopiero przy pierwszej rozmowie: Alfa pokaże wtedy
+komunikat „Zasób Azure OpenAI nie ma wdrożenia o tej nazwie” z listą wdrożeń konta.
+
+**Ograniczenie:** organizacji, projektu, wersji API i wdrożeń nie można jeszcze zmienić w istniejącym koncie. Aby
+poprawić literówkę, usuń konto i dodaj je ponownie (klucz trzeba wkleić jeszcze raz).
 
 ## Koszty i limity
 

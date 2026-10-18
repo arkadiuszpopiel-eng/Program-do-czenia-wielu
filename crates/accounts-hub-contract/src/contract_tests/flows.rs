@@ -7,7 +7,7 @@ use crate::{
     ProviderId, SecretString, TaskClass, TestOutcome, VoiceRole, Wizard, WizardStep,
 };
 
-fn pid(s: &str) -> ProviderId {
+pub(super) fn pid(s: &str) -> ProviderId {
     ProviderId::new(s).unwrap_or_else(|e| panic!("{e}"))
 }
 

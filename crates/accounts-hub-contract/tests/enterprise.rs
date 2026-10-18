@@ -35,6 +35,8 @@ fn identifiers_are_checked_loosely() {
     assert!(!is_azure_api_version("2024-1-21"));
     assert!(!is_azure_api_version("2024-10-21-beta"));
     assert!(!is_azure_api_version("latest"));
+    assert!(!is_azure_api_version("2024-10-2é"));
+    assert!(!is_azure_api_version("é"));
     assert!(is_deployment_name("gpt-4o.prod_1"));
     assert!(!is_deployment_name(".hidden"));
     assert!(!is_deployment_name("a/b"));

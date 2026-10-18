@@ -264,10 +264,9 @@ impl AppCore {
             .as_deref()
             .map(str::trim)
             .filter(|u| !u.is_empty());
-        if let Some(existing) = self.inner.hub.find_by_secret(&provider, base, &secret) {
-            let label = self
-                .inner
-                .hub
+        let hub = &self.inner.hub;
+        if let Some(existing) = hub.find_by_secret(&provider, base, &input.enterprise, &secret) {
+            let label = hub
                 .account(&existing)
                 .map_or_else(|| existing.to_string(), |a| a.label);
             return Err(AppError::invalid(format!(

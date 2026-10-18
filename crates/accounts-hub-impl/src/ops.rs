@@ -263,9 +263,10 @@ impl AccountsHub for AccountsHubService {
         &self,
         provider: &ProviderId,
         base_url: Option<&str>,
+        enterprise: &EnterpriseSettings,
         secret: &SecretString,
     ) -> Option<AccountId> {
-        self.find_same_key(provider, base_url, secret)
+        self.find_same_key(provider, base_url, enterprise, secret)
     }
 
     fn resolve_secret(&self, id: &AccountId, caller: &str) -> Result<SecretString, AccountsError> {

@@ -52,6 +52,9 @@ const plain = (id: string, extra = '') =>
 export const isOrganization = (id: string): boolean =>
   id.startsWith('org-') && id.length > 4 && plain(id);
 export const isProject = (id: string): boolean => /^proj[_-]./.test(id) && plain(id);
+/** Projekt OpenAI konta (pusty = brak); ten sam klucz w innym projekcie to osobne konto. */
+export const billingProject = (e?: EnterpriseSettings | null): string | null =>
+  e?.project?.trim() || null;
 export const isApiVersion = (v: string): boolean => /^\d{4}-\d{2}-\d{2}(-preview)?$/.test(v);
 export const isDeploymentName = (n: string): boolean => plain(n, '.') && !n.startsWith('.');
 

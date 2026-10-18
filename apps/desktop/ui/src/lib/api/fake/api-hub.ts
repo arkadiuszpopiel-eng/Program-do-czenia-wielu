@@ -2,9 +2,9 @@
 // (kształt) i odrzucany — atrapa, tak jak rdzeń, nigdy nie oddaje go z powrotem do UI.
 import type { AlfaClient } from '../client';
 import { cleanKey, isPlausibleKey, rotateStores, verdictOf } from '../../logic/api-key';
-import { AZURE_OPENAI, checkEnterprise, coreMessage } from '../../logic/enterprise';
+import { AZURE_OPENAI, billingProject, checkEnterprise, coreMessage } from '../../logic/enterprise';
 import { CommandError } from '../command-error';
-import type { Account, DryRunItem, ModelInfo, TestReport } from '../types-hub';
+import type { Account, DryRunItem, EnterpriseSettings, ModelInfo, TestReport } from '../types-hub';
 import {
   MAX_QUEUE,
   TASK_CLASSES,
@@ -178,13 +178,14 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     };
     return { ok, stored, report };
   };
-  /** Konto tego dostawcy pod tym samym adresem z tym samym kluczem (jak `find_by_secret`). */
-  const twin = (providerId: string, baseUrl: string | null, key: string, except?: string) =>
+  /** Konto dostawcy pod tym adresem, w tym projekcie OpenAI, z tym kluczem (jak `find_by_secret`). */
+  const twin = (key: string, id: string, url: string | null, e?: EnterpriseSettings, ex?: string) =>
     core.accounts.find(
       (a) =>
-        a.id !== except &&
-        a.provider_id === providerId &&
-        sameUrl(urls.get(a.id) ?? '', baseUrl ?? '') &&
+        a.id !== ex &&
+        a.provider_id === id &&
+        sameUrl(urls.get(a.id) ?? '', url ?? '') &&
+        billingProject(a.enterprise) === billingProject(e) &&
         keys.get(a.id) === key,
     );
   const urls = new Map<string, string>();
@@ -200,7 +201,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (rejected) return Promise.reject(new CommandError('invalid_input', rejected));
       if (!isPlausibleKey(key)) return Promise.reject(new CommandError('invalid_input', NOT_A_KEY));
       const url = input.base_url?.trim() || null;
-      const same = twin(input.provider_id, url, key);
+      const same = twin(key, input.provider_id, url, input.enterprise);
       if (same)
         return Promise.reject(
           new CommandError(
@@ -246,7 +247,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (!account) return missing();
       const key = cleanKey(secret);
       if (!isPlausibleKey(key)) return Promise.reject(new CommandError('invalid_input', NOT_A_KEY));
-      const same = twin(account.provider_id, urls.get(id) || null, key, id);
+      const same = twin(key, account.provider_id, urls.get(id) || null, account.enterprise, id);
       if (same)
         return Promise.reject(
           new CommandError(

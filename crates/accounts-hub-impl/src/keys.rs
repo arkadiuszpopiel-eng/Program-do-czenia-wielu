@@ -7,7 +7,7 @@
 
 use accounts_hub_contract::{
     Account, AccountId, AccountState, AccountsError, AuthKind, EVENT_KEY_ROTATED, EVENT_KEY_TESTED,
-    ModelId, ModelInfo, ProviderId, SecretString, TestSummary,
+    EnterpriseSettings, ModelId, ModelInfo, ProviderId, SecretString, TestSummary,
 };
 use core_bus_contract::Level;
 
@@ -268,6 +268,7 @@ impl AccountsHubService {
         &self,
         provider: &ProviderId,
         base_url: Option<&str>,
+        enterprise: &EnterpriseSettings,
         secret: &SecretString,
     ) -> Option<AccountId> {
         if secret.is_empty() {
@@ -284,6 +285,7 @@ impl AccountsHubService {
         accounts
             .into_iter()
             .filter(|acc| &acc.provider == provider && effective(acc.base_url.as_deref()) == wanted)
+            .filter(|acc| acc.enterprise.billing_project() == enterprise.billing_project())
             .find(|acc| matches!(self.secret_of(acc), Ok(Some(stored)) if stored.ct_eq(secret)))
             .map(|acc| acc.id)
     }

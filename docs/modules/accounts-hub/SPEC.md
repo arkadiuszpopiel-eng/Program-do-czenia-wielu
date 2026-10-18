@@ -78,8 +78,9 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
 - `set_disabled(id, false)` przywraca stan z ostatniego testu (konto z odrzuconym kluczem nie staje się aktywne).
 - `set_manual_model(id, model)`: model podany ręcznie dla konta bez listy modeli od dostawcy; udany, niepusty odczyt
   listy go zastępuje, pusta lista niczego nie kasuje.
-- `find_by_secret(provider, base_url, secret)`: ten sam klucz u tego samego dostawcy pod tym samym adresem = odmowa
-  z nazwą istniejącego konta.
+- `find_by_secret(provider, base_url, enterprise, secret)`: ten sam klucz u tego samego dostawcy pod tym samym
+  adresem i w tym samym projekcie OpenAI (`EnterpriseSettings::billing_project`, puste = projekt domyślny klucza)
+  = odmowa z nazwą istniejącego konta. Ten sam klucz w innym projekcie to osobne konto (osobny budżet).
 - Wynik testu jest scalany z bieżącym wpisem konta (zmiany przypisań i limitu z czasu testu nie giną).
 - Testy całej ścieżki: `app-core/tests/accounts_keys.rs`, `accounts_rotate.rs` (lokalny serwer udający dostawcę).
 

@@ -108,6 +108,10 @@ pub fn is_openai_project(id: &str) -> bool {
 
 /// Czy wersja API Azure ma postać `RRRR-MM-DD` albo `RRRR-MM-DD-preview`.
 pub fn is_azure_api_version(version: &str) -> bool {
+    // Tylko ASCII: dzielenie po bajcie 10 nie może wypaść w środku znaku.
+    if !version.is_ascii() {
+        return false;
+    }
     let (date, suffix) = version.split_at(version.len().min(10));
     let shape = date.len() == 10
         && date.char_indices().all(|(i, c)| match i {
@@ -154,6 +158,15 @@ impl EnterpriseSettings {
     /// Czy nic nie ustawiono (zwykłe konto).
     pub fn is_empty(&self) -> bool {
         *self == Self::default()
+    }
+
+    /// Projekt OpenAI, na który idą koszty (brak = projekt domyślny klucza). Ten sam klucz
+    /// w dwóch projektach to dwa osobne konta (`OpenAI-Project` rozdziela budżety).
+    pub fn billing_project(&self) -> Option<&str> {
+        self.project
+            .as_deref()
+            .map(str::trim)
+            .filter(|p| !p.is_empty())
     }
 
     /// Wersja API Azure (podana albo domyślna).

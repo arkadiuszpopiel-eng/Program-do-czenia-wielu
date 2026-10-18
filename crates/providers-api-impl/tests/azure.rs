@@ -204,6 +204,40 @@ async fn models_are_the_account_deployments_after_a_key_check() {
     assert!(!err.message.contains("azure-key-123"));
 }
 
+/// Literówka w nazwie wdrożenia przechodzi test klucza; przy rozmowie 404 `DeploymentNotFound`
+/// ma dać polski komunikat z nazwami wdrożeń konta, nie surowe „HTTP 404”.
+#[tokio::test]
+async fn missing_deployment_gets_a_clear_message() {
+    let server = FixtureServer::start().await;
+    server.reset(Reply::json(
+        404,
+        &json!({"error": {"code": "DeploymentNotFound", "message": "The API deployment for this resource does not exist."}}),
+    ));
+    let p = build_provider(&entry(), account(Some(&server))).unwrap();
+    let events: Vec<ProviderEvent> = p
+        .stream(
+            ChatRequest::new(MODEL, vec![Message::user_text("hej")]),
+            CancellationToken::new(),
+        )
+        .collect()
+        .await;
+    let err = events
+        .iter()
+        .find_map(|e| match e {
+            ProviderEvent::Error(error) => Some(error.clone()),
+            _ => None,
+        })
+        .unwrap_or_else(|| panic!("brak błędu: {events:?}"));
+    assert_eq!(err.kind, ProviderErrorKind::InvalidRequest);
+    assert_eq!(err.status, Some(404));
+    assert!(
+        err.message.contains("DeploymentNotFound"),
+        "{}",
+        err.message
+    );
+    assert!(err.message.contains(DEPLOYMENT), "{}", err.message);
+}
+
 #[tokio::test]
 async fn embeddings_use_the_deployment_path() {
     let server = FixtureServer::start().await;

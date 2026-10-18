@@ -172,6 +172,7 @@ impl FakeAccountsHub {
         &self,
         provider: &ProviderId,
         base_url: Option<&str>,
+        enterprise: &EnterpriseSettings,
         secret: &SecretString,
     ) -> Option<AccountId> {
         if secret.is_empty() {
@@ -187,6 +188,7 @@ impl FakeAccountsHub {
         self.accounts_snapshot()
             .into_iter()
             .filter(|acc| &acc.provider == provider && effective(acc.base_url.as_deref()) == wanted)
+            .filter(|acc| acc.enterprise.billing_project() == enterprise.billing_project())
             .find(|acc| {
                 matches!(self.secrets.get(&acc.secret), Ok(Some(stored)) if stored.ct_eq(secret))
             })

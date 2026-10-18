@@ -58,6 +58,19 @@ impl AzureOptions {
             encode(&self.api_version)
         )
     }
+
+    /// Komunikat dla `404 DeploymentNotFound`: literówka w nazwie wdrożenia przechodzi test
+    /// połączenia (lista modeli zasobu sprawdza tylko klucz i zasób), więc mówimy wprost, co poprawić.
+    pub fn missing_deployment(&self) -> String {
+        let names: Vec<&str> = self.deployments.values().map(String::as_str).collect();
+        let known = match names.as_slice() {
+            [] => "brak wdrożeń w koncie".to_owned(),
+            list => format!("wdrożenia w koncie: {}", list.join(", ")),
+        };
+        format!(
+            "Zasób Azure OpenAI nie ma wdrożenia o tej nazwie (DeploymentNotFound; {known}).              Sprawdź nazwę wdrożenia w portalu Azure (nowe wdrożenie bywa dostępne po kilku minutach)              albo usuń konto i dodaj je ponownie z poprawną nazwą."
+        )
+    }
 }
 
 /// Kodowanie procentowe wszystkiego poza znakami niezastrzeżonymi (RFC 3986).
@@ -105,7 +118,11 @@ impl WireCodec for AzureCodec {
     }
 
     fn classify(&self, status: u16, headers: &HeaderMap, body: &str) -> ProviderError {
-        lib_openai_compat::common::classify(status, headers, body)
+        let mut err = lib_openai_compat::common::classify(status, headers, body);
+        if status == 404 && body.contains("DeploymentNotFound") {
+            err.message = self.options.missing_deployment();
+        }
+        err
     }
 }
 

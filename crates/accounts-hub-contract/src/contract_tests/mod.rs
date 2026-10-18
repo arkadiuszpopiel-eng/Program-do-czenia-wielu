@@ -189,4 +189,17 @@ where
     pricing_and_models_in_catalog(&fresh().await).await;
     secrets_never_in_debug(&fresh().await).await;
     enterprise_settings_only_where_they_apply(&fresh().await).await;
+    same_key_in_other_openai_project_is_not_a_duplicate(&factory(with_openai()).await).await;
+}
+
+/// Katalog-fixture z dodanym dostawcą `openai` (projekty OpenAI).
+fn with_openai() -> Vec<ProviderCatalogEntry> {
+    let text = ACME
+        .replace("\"acme\"", "\"openai\"")
+        .replace("ACME_", "OPENAI_");
+    let mut catalog = fixture_catalog();
+    catalog.push(
+        ProviderCatalogEntry::from_toml(&text, "openai").unwrap_or_else(|e| panic!("fixture: {e}")),
+    );
+    catalog
 }
