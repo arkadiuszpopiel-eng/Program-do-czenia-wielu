@@ -36,6 +36,10 @@ tracing.workspace = true
 
 # Tekst z DOCX / XLSX / PPTX dla modelu (C2.11) — ta sama wersja co w app-models i app-updates.
 zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+# Tekst z PDF dla modelu (C2.11): struktura pliku, strumienie z limitem rozpakowania i odszyfrowanie
+# z pustym hasłem; treść stron, czcionki i ToUnicode interpretujemy sami (`attach/pdf`). Bez domyślnych
+# funkcji (bez rayon i chrono) — docs/vendor/lopdf.md.
+lopdf = { version = "0.45.0", default-features = false }
 
 [dev-dependencies]
 accounts-hub-fake = { path = "../accounts-hub-fake" }

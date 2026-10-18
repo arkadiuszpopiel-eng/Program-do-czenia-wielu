@@ -1,7 +1,8 @@
 //! Załączniki tury dla modelu i dla UI. Dla modelu: obraz (≤ limit) jako blok `Image` base64,
 //! tekst jako **treść niezaufana** w delimitacji `tools-common` (ucięty do limitu), DOCX / XLSX /
-//! PPTX — wyciągnięty tekst tak samo (C2.11), reszta — tylko nazwa, typ i rozmiar. Treść czytana z artefaktu sesji i sprawdzana SHA-256 z chwili
-//! wysłania — plik zmieniony później nie podmienia historii (append-only), model dostaje notkę.
+//! PPTX / PDF — wyciągnięty tekst tak samo albo notka (PDF z hasłem, skan; C2.11), reszta — tylko
+//! nazwa, typ i rozmiar. Treść czytana z artefaktu sesji i sprawdzana SHA-256 z chwili wysłania —
+//! plik zmieniony później nie podmienia historii (append-only), model dostaje notkę.
 
 use std::path::Path;
 
@@ -12,6 +13,7 @@ use providers_contract::{ContentBlock, ImageSource};
 use sessions_contract::{AttachmentRef, Block, SessionId};
 use tools_common_contract::text::{truncate_chars, wrap_untrusted};
 
+use super::extract::Extracted;
 use super::limits::{AttachmentLimits, classify};
 
 /// Rozmiar czytelny dla człowieka (PL: przecinek dziesiętny).
@@ -140,13 +142,18 @@ pub fn provider_blocks(
             limits,
         );
         if c.kind == AttachmentKind::Document
-            && let Some(doc) = super::office::text(&a.name, &bytes)
+            && let Some(doc) = super::extract::document(&a.name, &bytes, limits.max_text_chars)
         {
-            let (body, _) = truncate_chars(&doc, limits.max_text_chars);
-            out.push(ContentBlock::text(format!(
-                "{head} — tekst wyciągnięty z dokumentu:\n{}",
-                wrap_untrusted(&body, "załącznik", &a.name)
-            )));
+            out.push(ContentBlock::text(match doc {
+                Extracted::Text { text, .. } => {
+                    let (body, _) = truncate_chars(&text, limits.max_text_chars);
+                    format!(
+                        "{head} — tekst wyciągnięty z dokumentu:\n{}",
+                        wrap_untrusted(&body, "załącznik", &a.name)
+                    )
+                }
+                Extracted::Note(note) => format!("{head} — {note}"),
+            }));
             continue;
         }
         match (c.kind, c.delivery, text) {
