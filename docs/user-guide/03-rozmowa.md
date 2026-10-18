@@ -16,7 +16,8 @@
   plików na okno. Alfa kopiuje je do katalogu sesji (`…\Alfa\Sesje\<nazwa>\in`) i pokazuje jako chipy z rozmiarem
   i szacunkiem tokenów; przy dużych załącznikach — także udziałem w oknie kontekstu i szacunkiem kosztu. Limity:
   10 plików w wiadomości, 25 MB na plik, 100 MB razem. Obraz do 5 MB model widzi w całości, tekst (do 100 000 znaków)
-  jako dane, nie polecenia; z innych plików (PDF, archiwa) model dostaje tylko nazwę, typ i rozmiar. Pliki z danych
+  jako dane, nie polecenia; z dokumentów DOCX, XLSX, PPTX i PDF — wyciągnięty tekst (niżej); z innych plików
+  (np. archiwa) model dostaje tylko nazwę, typ i rozmiar. Pliki z danych
   Alfy i katalogów z poświadczeniami (np. `.claude`, `.codex`, profile przeglądarek) są odrzucane. Po wysłaniu
   załączniki są w panelu **Pliki**. Wiadomość może składać się z samych załączników.
 - Zrzut ekranu prosto z pola wiadomości — **jeszcze niedostępny**.
@@ -58,8 +59,20 @@ wiadomości wygenerowanych przez AI, jak w eksporcie.
 Styl odpowiedzi (zwięźle, szczegółowo, prostym językiem, formalnie) i swobodę (precyzyjnie, zrównoważenie, twórczo)
 ustawisz w Ustawienia → Ogólne; „Automatycznie” zostawia to personie agentki i modelowi.
 
-Załączniki DOCX, XLSX i PPTX trafiają do modelu jako wyciągnięty tekst (akapity, slajdy, komórki arkuszy) — jak
-pliki tekstowe, oznaczone jako treść z zewnątrz. Skany i PDF — w planie.
+Załączniki DOCX, XLSX, PPTX i PDF trafiają do modelu jako wyciągnięty tekst (akapity, slajdy, komórki arkuszy,
+strony PDF po kolei z nagłówkami „--- Strona N ---”) — jak pliki tekstowe, oznaczone jako treść z zewnątrz; chip
+załącznika pokazuje, czy tekst idzie w całości, czy ucięty. Z PDF Alfa czyta tekst z polskimi znakami, odstępami
+między słowami i podziałem na wiersze (tabele — jako wiersze tekstu). Limity na plik PDF: 100 000 znaków,
+1000 stron i 10 sekund; dłuższy tekst kończy się dopiskiem, do której strony udało się dojść. Wyjątki:
+
+- **PDF zabezpieczony hasłem** — model dostaje tylko wyjaśnienie. Otwórz plik z hasłem, zapisz kopię bez
+  zabezpieczenia i załącz ją ponownie. PDF z samymi ograniczeniami właściciela (np. zakaz drukowania), który
+  otwiera się bez hasła, Alfa czyta normalnie.
+- **Skan bez warstwy tekstowej** (same obrazy stron) — model dostaje tylko wyjaśnienie; rozpoznawanie tekstu
+  ze skanów (OCR) będzie osobnym, opcjonalnym dodatkiem. W PDF mieszanym strony-obrazy są oznaczone
+  „[strona bez tekstu — obraz albo skan]”.
+- **PDF uszkodzony albo zbyt złożony** (bardzo dużo obiektów, ogromne strumienie) — wyjaśnienie zamiast tekstu,
+  żeby wrogi plik nie zablokował Alfy.
 
 Całą rozmowę (widoczną gałąź, bez wiadomości ukrytych) wyeksportujesz z menu sesji albo z palety `Ctrl+K`:
 **Eksportuj rozmowę do Markdown** / **do HTML** / **do JSON**. Plik HTML jest samodzielny: bez skryptów i zasobów

@@ -6,9 +6,11 @@
 //! artefaktami sesji (`Origin::User`), a tura dostaje bloki `Attachment`.
 
 mod check;
+mod extract;
 mod limits;
 mod model;
 mod office;
+mod pdf;
 
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -16,7 +18,10 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
-use app_api::dto::{AttachmentInfo, AttachmentRejectReason, AttachmentRejection, AttachmentsAdded};
+use app_api::dto::{
+    AttachmentDelivery, AttachmentInfo, AttachmentKind, AttachmentRejectReason,
+    AttachmentRejection, AttachmentsAdded,
+};
 use app_api::error::AppError;
 use app_api::paths::AppPaths;
 use artifacts_contract::{Artifacts, Origin};
@@ -24,6 +29,7 @@ use platform_contract::{ClipboardContent, ClipboardPort};
 use sessions_contract::{AttachmentRef, Block, SessionId, Sessions};
 
 pub use check::{PathGuard, safe_name, unique_in};
+pub use extract::{Extracted, document};
 pub use limits::{
     AttachmentLimits, Classified, LABEL_TOKENS, classify, extracted, image_magic_matches,
 };
@@ -266,10 +272,14 @@ impl Attachments {
         let chars = (!artifacts_contract::looks_binary(head))
             .then(|| String::from_utf8_lossy(&bytes).chars().count());
         let c = classify(&mime, head, bytes.len() as u64, chars, &self.limits);
-        // DOCX / XLSX / PPTX: model dostanie wyciągnięty tekst (C2.11).
-        let c = match office::text(&display_name(copy), &bytes) {
-            Some(text) if c.kind == app_api::dto::AttachmentKind::Document => {
-                extracted(text.chars().count(), &self.limits)
+        // DOCX / XLSX / PPTX / PDF: model dostanie wyciągnięty tekst (C2.11); notka — tylko opis.
+        let c = match document(&display_name(copy), &bytes, self.limits.max_text_chars) {
+            Some(Extracted::Text { text, truncated }) if c.kind == AttachmentKind::Document => {
+                let mut e = extracted(text.chars().count(), &self.limits);
+                if truncated {
+                    e.delivery = AttachmentDelivery::Truncated;
+                }
+                e
             }
             _ => c,
         };

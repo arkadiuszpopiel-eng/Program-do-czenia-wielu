@@ -53,9 +53,15 @@ pub(crate) async fn prepare(
         .session(&req.session)
         .map(|m| m.privacy)
         .unwrap_or_default();
-    let messages = core
-        .branch_messages(&req.session, req.history_leaf, req.continues.is_some())
-        .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
+    // Projekcja historii czyta załączniki i wyciąga z nich tekst (PDF spoza pamięci podręcznej:
+    // do ~11 s na plik) — poza wątkami runtime, żeby nie blokować innych zadań.
+    let (engine, session, leaf) = (core.clone(), req.session.clone(), req.history_leaf);
+    let continues = req.continues.is_some();
+    let messages =
+        tokio::task::spawn_blocking(move || engine.branch_messages(&session, leaf, continues))
+            .await
+            .map_err(|e| turn_error(TurnErrorCode::Provider, e.to_string(), None))?
+            .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
     let query = messages.last().map(|m| m.visible_text());
     let mut request = ChatRequest::new(router_contract::AUTO_MODEL, messages);
     let mut system = None;
