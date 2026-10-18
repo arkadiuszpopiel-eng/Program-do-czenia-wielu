@@ -4,23 +4,23 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-18T03:32:00+02:00"
+    "updated": "2026-10-18T17:15:00+02:00"
   },
-  "current_state": "Komputer stacjonarny (Ryzen 7 5700X3D, RX 9070 XT, 32 GB RAM, Windows 11) zamiast laptopa. Seria 0.0.63 / C6.6 „każda karta graficzna” zacommitowana (6ff0c311 … 21897bf0): 8 przeglądów w świeżym kontekście, w tym całościowy zmian od 0.0.62. Końcowa reguła: na Vulkanie i głównej karcie < 12 GB Qwen3-ASR liczy na procesorze (stt::qwen_free; rezerwa 3 GB sprawdzona i odrzucona); HardwarePort::gpu_memory bez 250 ms; ammonia 4.2.4; Select bez pomijania pierwszego kliku. Testy w przeglądarce 467/467 (Chromium Playwrighta), e2e-app 41 + 1 pominięty, pokrycie łącza 235/264 (89 %). Raport: alfa/docs/plan/28-raport-nocny-2026-10-18.md (13 rozdziałów). ADR 0028 PROPONOWANY. 0.0.63 NIE wgrana do Alfa-uruchomiona (tam 0.0.62). Noc 17/18.10 ZAKOŃCZONA 3:32: kopia F:/Alfa/kopia-2026-10-18_0330 (stan 678e7b2a) zweryfikowana — 5854 sumy SHA-256 zgodne, paczka git z pełną historią; praca zatrzymana.",
-  "session_goal": "Właściciel (17.10): Alfa ma działać na kartach NVIDIA, AMD, Intel i zintegrowanych; pobrać potrzebne pliki i zapisać wszystko w dokumentacji; najwyższa precyzja. Noc: pracuj do 3:30, potem kopia F:\\Alfa.",
+  "current_state": "Laptop (i7-13620H, 16 GB, RTX 4050 6 GB + Intel UHD Graphics) od 18.10 po południu, po pracy na PC stacjonarnym (0.0.63, C6.6, ostatni commit c096d02e). U właściciela wgrana 0.0.62; zbudowany kandydat 0.0.63 = target/shell/debug/alfa-desktop.exe z 21897bf0. Pauza na polecenie właściciela po przeglądzie stanu. Cel: wszystko porządnie do wersji 0.0.65 (serie po 10 punktów), kopia bezpieczeństwa dopiero po 0.0.65 na nowym dysku.",
+  "session_goal": "Cel właściciela 18.10: wykonać wszystko porządnie do wersji 0.0.65, z większą liczbą agentów; kopia dopiero po 0.0.65 (właściciel podłączy nowy dysk).",
   "in_progress": [],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
     "target\\debug rośnie szybko (17.10: 170 GB w kilka godzin — każda zmiana ustawień kompilacji = nowy komplet plików testowych); verify pomija etapy Rust przy małym miejscu. Sprzątanie: starsze duplikaty *.exe/*.pdb w target/debug/deps + target/debug/incremental (zwolnione 130 GB).",
-    "Na tym PC brak jq (etap grafu verify — sprawdzany ręcznie: 1733 krawędzie, 0 naruszeń), gh i Edge (etap E2E verify wymaga Edge: PW_CHANNEL=msedge; ręcznie: Chromium Playwrighta 1194 w %LOCALAPPDATA%/ms-playwright, w apps/desktop/ui: pnpm build && PW_WORKERS=4 pnpm test:e2e)."
+    "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
-    "Pokazać właścicielowi raport alfa/docs/plan/28-raport-nocny-2026-10-18.md: ADR 0028 do podpisu, licencja DirectML (dane diagnostyczne, §2a), wyniki pomiarów na RX 9070 XT",
-    "Decyzja właściciela: wgrać 0.0.63 do Alfa-uruchomiona (deploy-owner.sh) — wersja zbudowana i sprawdzona (7698da68)",
-    "Zrobione 18.10: ammonia 4.2.4, Chromium Playwrighta 1194. Zostaje: Edge (instalacja w systemie — właściciel), zip 9 (nowa wersja główna, RUSTSEC-2026-0367/0368/0369; Alfa nie woła ZipArchive::extract)",
-    "Próby na sprzęcie: laptop z iGPU (RTX 4050 + Iris Xe), APU AMD, karta Intel; DirectML na NVIDIA",
-    "C6.6 zostaje: osobny budżet pamięci na kartę (model-residency jedna pula) — także Qwen3-ASR na karcie AMD/Intel < 12 GB, gdy model rozmowy z niej nie korzysta",
-    "Resztki stare-node_modules-acl-2026-10-17 (1447 plików starego SID) — usunąć z uprawnieniami administratora"
+    "Na laptopie najpierw: sprawdzić, czy wtyczka „remember” jest wyłączona (brak procesów post-tool-hook.sh) — inaczej każde polecenie i każdy agent zwalnia maszynę.",
+    "C6.6 na laptopie (Intel UHD zintegrowana + RTX 4050 6 GB — przypadek niesprawdzony na PC): wykrywanie DXCore/PDH, główna karta = NVIDIA, klasa Integrated dla UHD, Qwen3-ASR/whisper na CUDA bez regresji, DirectML wyłączony (6 GB < 12 GB); testy sprzętowe i verify sprzet.",
+    "verify wersja na laptopie (są Edge i jq) — etapy przeglądarki i grafu po raz pierwszy dla 0.0.63; cargo deny czerwony do czasu zip 9 (RUSTSEC-2026-0367/0368/0369).",
+    "Seria 0.0.64 (10 punktów) i 0.0.65 (10 punktów) — m.in.: zip 9, memory-sync bez kasowania (lustro skasowało już raz zasady), backup.sh — cel jako parametr i sprawdzenie miejsca, osobny budżet pamięci na kartę (C6.6), test logowania Claude Code w prawdziwej aplikacji (Claude Code jest na laptopie), porządek dokumentów (00-stan, roadmapa: ADR 0028 w tabeli decyzji, decisions.md od 12.10), dalsze punkty roadmapy P4/P5/C2.11.",
+    "Decyzje właściciela: podpis ADR 0028 i licencja DirectML; wgranie 0.0.63 (albo od razu 0.0.64/0.0.65); usunięcie stare-node_modules-acl-2026-10-17 (24 MB, na laptopie bez administratora); dysk na kopie.",
+    "Po 0.0.65: kopia bezpieczeństwa na nowy dysk wskazany przez właściciela (backup.sh z jawnym celem, sprawdzić sumy)."
   ],
   "env_snapshot": {
     "key_paths": {

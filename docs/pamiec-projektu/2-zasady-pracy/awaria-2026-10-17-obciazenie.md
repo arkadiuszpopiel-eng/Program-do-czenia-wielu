@@ -17,7 +17,8 @@ wszystkie niezacommitowane pliki całe.
 
 **Why:** ten PC (32 GB RAM, dyski projektu na USB) nie wytrzymuje domyślnej równoległości cargo przy
 pełnych testach.
-**How to apply:** ciężkie biegi z `CARGO_BUILD_JOBS=6` i `CARGO_INCREMENTAL=0`; nie łączyć cargo z testami
+**How to apply:** na PC stacjonarnym (32 GB) ciężkie biegi z `CARGO_BUILD_JOBS=6`, na laptopie (16 GB) nadal `-j 3`
+(zob. [[alfa-srodowisko-lokalne]]); zawsze `CARGO_INCREMENTAL=0`; nie łączyć cargo z testami
 w przeglądarce; pilnować miejsca na E: (stare `target/debug/deps` sprzed doby usuwać regułą z status.md;
 ten sam wieczór `target\debug` znów urósł do 170 GB — każda zmiana ustawień cargo tworzy nowy komplet
 plików testowych; bezpiecznie usuwać starsze duplikaty `*.exe`+`*.pdb`+`*.d` tej samej nazwy w `deps`

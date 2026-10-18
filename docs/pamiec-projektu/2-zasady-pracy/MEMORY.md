@@ -1,5 +1,5 @@
-- [Maszyna stacjonarna od 2026-10-17](maszyna-stacjonarna-2026-10-17.md) — inny PC (AMD), uprawnienia NTFS, brak danych Alfy, F: podłączany okresowo
-- [Awaria 2026-10-17 i ciężkie zadania](awaria-2026-10-17-obciazenie.md) — brak pamięci + resety USB; cargo z -j6, bez incremental; backup.sh naprawiony
+- [Dwa komputery: PC i laptop](maszyna-stacjonarna-2026-10-17.md) — E: przenoszony między PC (AMD, 32 GB) i laptopem (NVIDIA + Intel UHD, 16 GB); różne F:, reguły maszyny
+- [Awaria 2026-10-17 i ciężkie zadania](awaria-2026-10-17-obciazenie.md) — brak pamięci + resety USB; PC -j6, laptop -j3, bez incremental; backup.sh naprawiony
 - [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — (stan z laptopa) kopia robocza na E:, portable-env, pułapki budowy, sprzątanie target/
 - [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
 - [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie

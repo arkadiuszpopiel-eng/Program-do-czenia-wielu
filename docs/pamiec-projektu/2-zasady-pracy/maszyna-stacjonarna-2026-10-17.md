@@ -1,6 +1,6 @@
 ---
 name: maszyna-stacjonarna-2026-10-17
-description: "Od 2026-10-17 projekt Alfa działa na stacjonarnym PC (Ryzen 5700X3D, RX 9070 XT), nie na laptopie — skutki dla git, node_modules, głosu"
+description: "Projekt Alfa działa na zmianę na dwóch komputerach (dysk E: przenoszony): stacjonarny PC (Ryzen 5700X3D, RX 9070 XT, 32 GB) od 17.10 i laptop (i7-13620H, RTX 4050 + Intel UHD, 16 GB) znów od 18.10 — różnice i skutki"
 metadata:
   node_type: memory
   type: project
@@ -26,5 +26,15 @@ node_modules zainstalowane z lockfile (właściciel zgodził się na pobranie br
 Pamięć asystenta na tym PC była pusta — zasady pracy z laptopa (alfa-*.md) przywrócone 2026-10-18 z kopii
 w repozytorium (`alfa/docs/pamiec-projektu/2-zasady-pracy`), bo `memory-sync.sh` jest lustrem i skasowałby je z repo.
 
-**Why:** cała dotychczasowa pamięć i raporty (status.md, raport 27) zakładają laptopa z NVIDIA.
-**How to apply:** przed testami sprzętowymi / `verify sprzet` ustal z właścicielem, czy ta maszyna jest docelowa; nie porównuj czasów z laptopem.
+2026-10-18 po południu dysk E: wrócił do laptopa DESKTOP-BHEJQ2D (i7-13620H, 16 GB, RTX 4050 6 GB + Intel UHD
+Graphics). Na laptopie: git działa bez `safe.directory`, są `jq`, `gh`, Edge i `%LOCALAPPDATA%\Alfa` (modele, silniki
+CUDA), cargo z `-j 3` (16 GB RAM). Dysk F: na laptopie to teraz INNY dysk („Dane”, 1,9 TB, zapełniony plikami
+testu pojemności CAPACITYTESTER) — kopie `F:\Alfa\kopia-…` z PC stacjonarnego są na tamtejszym F: („Kopie Plików”)
+i stąd nieosiągalne; `scripts/backup.sh` z domyślnym celem `/f/Alfa` NIE uruchamiać, dopóki właściciel nie wskaże
+dysku na kopie. Laptop z iGPU + NVIDIA to dokładnie przypadek C6.6 niesprawdzony na PC (raport 28).
+
+**Why:** pamięć i raporty były pisane raz na laptopie, raz na PC — reguły jednej maszyny (np. `-j 6`, brak `jq`,
+WSL jako `bash`) na drugiej są błędne albo groźne (16 GB RAM).
+**How to apply:** na początku sesji sprawdź maszynę (procesor, karty: `Get-CimInstance Win32_Processor,
+Win32_VideoController`) i stosuj jej reguły; przed `verify sprzet` ustal z właścicielem, czy ta maszyna jest
+docelowa; nie porównuj czasów między maszynami.
