@@ -28,7 +28,7 @@ core-config-fake = { path = "../core-config-fake" }
 tempfile = "3.27.0"
 sha2 = "0.10.9"
 minisign = "0.10.0"
-zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+zip.workspace = true
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
 
 [lints]

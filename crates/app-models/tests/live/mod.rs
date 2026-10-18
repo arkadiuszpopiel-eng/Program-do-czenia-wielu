@@ -230,7 +230,10 @@ fn staged_files(store: &Store, spec: &ItemSpec) -> serde_json::Map<String, Value
             .and_then(|file| zip::ZipArchive::new(std::io::BufReader::new(file)).ok())
             .map(|mut zip| {
                 let names: Vec<String> = (0..zip.len())
-                    .filter_map(|i| zip.by_index_raw(i).ok().map(|e| e.name().to_owned()))
+                    .filter_map(|i| {
+                        let entry = zip.by_index_raw(i).ok()?;
+                        entry.name().ok().map(|n| n.into_owned())
+                    })
                     .collect();
                 let mut top: Vec<String> = names
                     .iter()

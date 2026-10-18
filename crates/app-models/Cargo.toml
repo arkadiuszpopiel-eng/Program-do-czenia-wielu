@@ -36,8 +36,8 @@ tokio-util = { version = "0.7.19", default-features = false }
 # Ta sama wersja i cechy co providers-local-impl / updater-impl (rustls, bez OpenSSL; MIT OR Apache-2.0).
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots", "stream", "http2"] }
 sha2 = "0.10.9"
-# Archiwa sidecarów i paczek PyPI (ZIP) — ta sama wersja i cechy co updater-impl / transfer-impl.
-zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+# Archiwa sidecarów i paczek PyPI (ZIP) — wersja i cechy z workspace (jak transfer-impl).
+zip.workspace = true
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 
 [dev-dependencies]

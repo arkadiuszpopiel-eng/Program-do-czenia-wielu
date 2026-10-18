@@ -34,8 +34,8 @@ serde_json.workspace = true
 tokio = { workspace = true, features = ["rt", "time", "sync"] }
 tracing.workspace = true
 
-# Tekst z DOCX / XLSX / PPTX dla modelu (C2.11) — ta sama wersja co w app-models i app-updates.
-zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
+# Tekst z DOCX / XLSX / PPTX dla modelu (C2.11) — wersja i cechy z workspace (jak app-models, transfer-impl).
+zip.workspace = true
 
 [dev-dependencies]
 accounts-hub-fake = { path = "../accounts-hub-fake" }

@@ -30,7 +30,7 @@ fn manifest_first_stored_and_encrypted_file_is_opaque() {
         .unwrap();
     let mut zip = zip::ZipArchive::new(std::fs::File::open(&plain).unwrap()).unwrap();
     let first = zip.by_index(0).unwrap();
-    assert_eq!(first.name(), "manifest.json");
+    assert_eq!(first.name().unwrap(), "manifest.json");
     assert_eq!(first.compression(), zip::CompressionMethod::Stored);
     drop(first);
     let enc = h.path("szyfr.alfa");

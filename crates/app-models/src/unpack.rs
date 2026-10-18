@@ -73,9 +73,8 @@ impl Reader {
     fn names(&mut self) -> Result<Vec<String>, Unsafe> {
         (0..self.archive.len())
             .map(|i| {
-                Ok(normalized(
-                    self.archive.by_index_raw(i).map_err(bad)?.name(),
-                ))
+                let entry = self.archive.by_index_raw(i).map_err(bad)?;
+                Ok(normalized(&entry.name().map_err(bad)?))
             })
             .collect()
     }
@@ -83,12 +82,14 @@ impl Reader {
     /// Sprawdza nagłówek wpisu `i`; zwraca jego nazwę, czy to katalog i rozmiar.
     fn check(&mut self, i: usize) -> Result<(String, bool, u64), Unsafe> {
         let entry = self.archive.by_index_raw(i).map_err(bad)?;
-        let name = normalized(entry.name());
+        let name = normalized(&entry.name().map_err(bad)?);
         validate_package_path(&name).map_err(bad)?;
         if !self.seen.insert(name.trim_end_matches('/').to_lowercase()) {
             return Err(bad(format!("powtórzony wpis „{name}”")));
         }
-        if entry.unix_mode().is_some_and(|m| m & S_IFMT == S_IFLNK) {
+        // zip 9 ignoruje tryb Unix we wpisach z hostem DOS — bity surowe sprawdzamy niezależnie.
+        let raw = entry.external_attributes() >> 16;
+        if raw & S_IFMT == S_IFLNK || entry.unix_mode().is_some_and(|m| m & S_IFMT == S_IFLNK) {
             return Err(bad(format!("dowiązanie „{name}”")));
         }
         let (dir, size) = (entry.is_dir() || name.ends_with('/'), entry.size());
@@ -106,7 +107,8 @@ impl Reader {
         let entry = self.archive.by_index(i).map_err(bad)?;
         // Poza Windows (programistki, CI): bit wykonywania z archiwum — zawsze 0o755, bez setuid.
         #[cfg(unix)]
-        let executable = entry.unix_mode().is_some_and(|m| m & 0o111 != 0);
+        let executable = (entry.external_attributes() >> 16) & 0o111 != 0
+            || entry.unix_mode().is_some_and(|m| m & 0o111 != 0);
         if let Some(parent) = out.parent() {
             std::fs::create_dir_all(parent)
                 .map_err(|e| bad(format!("{}: {e}", parent.display())))?;

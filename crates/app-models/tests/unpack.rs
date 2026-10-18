@@ -2,7 +2,9 @@
 //! `\`, strumień NTFS, nazwa urządzenia, kropka na końcu, dowiązanie, duplikat różniący się
 //! wielkością liter, zip-bomb, za dużo wpisów, za duży wpis, za dużo łącznie, zły hash wpisu)
 //! — żaden nie zostawia plików poza celem, a poprzednia instalacja zostaje nietknięta;
-//! poprawne archiwa: drzewo bez prefiksu i wybrane wpisy (paczka PyPI) z przypiętym hashem.
+//! poprawne archiwa: drzewo bez prefiksu i wybrane wpisy (paczka PyPI) z przypiętym hashem;
+//! regresja klas ostrzeżeń `zip` RUSTSEC-2026-0367/0368/0369 (SUID, dowiązania poza cel, prawa
+//! nadawane przez dowiązanie).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -26,6 +28,11 @@ enum Entry<'a> {
     File(&'a str, &'a [u8]),
     Deflated(&'a str, Vec<u8>),
     Link(&'a str, &'a str),
+    /// Dowiązanie z hostem DOS (`S_IFLNK` w górnych bitach atrybutów) — `add_symlink` zawsze
+    /// zapisuje host Unix, a zip 9 nie czyta trybu Unix z wpisów DOS.
+    DosLink(&'a str, &'a str),
+    /// Plik z pełnym trybem Unix (także bity SUID/SGID/sticky) w atrybutach zewnętrznych.
+    Mode(&'a str, &'a [u8], u32),
 }
 
 fn archive(dir: &Path, name: &str, entries: &[Entry<'_>]) -> std::path::PathBuf {
@@ -43,6 +50,20 @@ fn archive(dir: &Path, name: &str, entries: &[Entry<'_>]) -> std::path::PathBuf 
                 zip.write_all(b).unwrap();
             }
             Entry::Link(n, to) => zip.add_symlink(*n, *to, stored).unwrap(),
+            Entry::DosLink(n, to) => {
+                let dos = stored
+                    .system(zip::System::Dos)
+                    .external_attributes(0o120_777 << 16);
+                zip.start_file(*n, dos).unwrap();
+                zip.write_all(to.as_bytes()).unwrap();
+            }
+            Entry::Mode(n, b, mode) => {
+                let unix = stored
+                    .system(zip::System::Unix)
+                    .external_attributes(mode << 16);
+                zip.start_file(*n, unix).unwrap();
+                zip.write_all(b).unwrap();
+            }
         }
     }
     zip.finish().unwrap();
@@ -222,4 +243,66 @@ fn valid_archives_extract_tree_and_picks() {
         b"model"
     );
     assert_eq!(tree(&models), ["silero_vad.onnx"]);
+}
+
+/// Regresja klas RUSTSEC-2026-0367/0368/0369 (`zip` < 9: bity SUID/SGID przenoszone z archiwum,
+/// dowiązania wskazujące poza katalog docelowy, prawa nadawane przez dowiązanie). Alfa rozpakowuje
+/// własnym kodem (nie `ZipArchive::extract`): bity specjalne nigdy nie trafiają na dysk, a każde
+/// dowiązanie — także względne, katalogowe, wskazujące do wnętrza i z hostem DOS — odrzuca całe
+/// archiwum.
+#[test]
+fn zip_advisory_classes_stay_closed() {
+    let dir = tempfile::tempdir().unwrap();
+    let target = dir.path().join("sidecars").join("engine");
+    let outside = dir.path().join("poza");
+    std::fs::create_dir_all(&outside).unwrap();
+    let require = ["engine".to_owned()];
+    // S_IFREG | SUID | SGID | sticky | 0o755 → plik rozpakowany, bez bitów specjalnych.
+    let suid = archive(
+        dir.path(),
+        "suid.zip",
+        &[Entry::Mode("engine", b"elf", 0o107_755)],
+    );
+    let hashes = extract_tree(&suid, &target, "", &require, tight()).unwrap();
+    assert_eq!(hashes.get("engine"), Some(&sha(b"elf")));
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mode = std::fs::metadata(target.join("engine"))
+            .unwrap()
+            .permissions()
+            .mode();
+        assert_eq!(mode & 0o7777, 0o755, "{mode:o}");
+    }
+    let cases: Vec<(&str, Vec<Entry<'_>>)> = vec![
+        ("link-up", vec![Entry::Link("engine", "../../poza/engine")]),
+        (
+            "link-dos",
+            vec![Entry::DosLink("engine", "../../poza/engine")],
+        ),
+        (
+            "link-dir",
+            vec![
+                Entry::Link("lib", "../../poza"),
+                Entry::File("lib/evil.dll", b"x"),
+            ],
+        ),
+        (
+            "link-inside",
+            vec![Entry::File("engine", b"elf"), Entry::Link("run", "engine")],
+        ),
+    ];
+    for (name, entries) in cases {
+        let zip = archive(dir.path(), &format!("{name}.zip"), &entries);
+        assert!(
+            extract_tree(&zip, &target, "", &require, tight()).is_err(),
+            "{name}: przyjęte"
+        );
+        assert_eq!(tree(&target), ["engine"], "{name}: poprzednia instalacja");
+        assert!(
+            std::fs::read_dir(&outside).unwrap().next().is_none(),
+            "{name}: zapis poza celem"
+        );
+        assert!(!staging_dir(&target).exists(), "{name}: katalog roboczy");
+    }
 }
