@@ -1,6 +1,7 @@
 // Atrapa: pozycje katalogu „Modele lokalne i silniki” (te same identyfikatory, rodzaje i możliwość
 // pobrania co katalog produkcyjny `app_models::builtin` — pakiety 1–6 składają się z nich).
 import type { ModelCard, ModelItem, ModelItemKind } from '../types-models';
+import { seedLicense } from './license-seeds';
 
 const MIB = 1024 * 1024;
 
@@ -322,6 +323,7 @@ export function seedItem([
     error: null,
     active: false,
     card: seedCard(kind, name),
+    license_card: seedLicense(id),
   };
 }
 

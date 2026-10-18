@@ -21,6 +21,7 @@ mod gui;
 mod health;
 mod help;
 mod hub;
+mod licenses;
 mod mcp;
 mod memory;
 mod model_queues;
@@ -86,6 +87,7 @@ pub use hub::{
     LocalDownloadState, LocalModelInfo, MachineView, ModelInfo, ModelKind, PermissionsState,
     ProviderInfo, ProviderKind, RecommendationView, SecretInput, TestReport, VoiceProfileId,
 };
+pub use licenses::{CommercialUse, LicenseCard, VoiceLicense};
 pub use mcp::{
     McpConnState, McpEnvVar, McpServerInput, McpServerTools, McpServerView, McpToolState,
     McpToolView, McpTrust,

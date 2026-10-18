@@ -899,6 +899,9 @@ export interface CheckRun {
 /** Rozwiązanie kolizji. */
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
+/** Czy licencja pozwala na użycie komercyjne. */
+export type CommercialUse = 'yes' | 'no' | 'conditional' | 'unknown';
+
 /** Zgodność protokołu. */
 export type CompatKind = 'openai' | 'anthropic' | 'native';
 
@@ -1697,6 +1700,27 @@ export interface LayoutPrefs {
   readonly sessions: Readonly<Record<string, SessionPanels>>;
 }
 
+/** Karta licencji pozycji katalogu. */
+export interface LicenseCard {
+  /** Licencja wymaga wskazania autora albo dołączenia jej tekstu przy rozpowszechnianiu. */
+  readonly attribution: boolean;
+  /** Autor albo właściciel praw i źródło. */
+  readonly author: LocalizedText;
+  readonly commercial: CommercialUse;
+  /** Fakty licencyjne sprawdzone u źródła (inaczej — „do potwierdzenia przez człowieka”). */
+  readonly confirmed: boolean;
+  /** Identyfikator licencji (SPDX, gdy istnieje; inaczej nazwa umowna, np. `OpenRAIL-M`). */
+  readonly id: string;
+  /** Pełna nazwa licencji (albo kilku — silnik i dołączone biblioteki). */
+  readonly name: string;
+  /** Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej). */
+  readonly notes: LocalizedText;
+  /** Adres tekstu licencji. */
+  readonly url: string;
+  /** Głosy w tej pozycji (pusto — pozycja nie mówi albo nie ma osobnych głosów). */
+  readonly voices: readonly VoiceLicense[];
+}
+
 /** Licencja zależności. */
 export interface LicenseEntry {
   /** Wyrażenie SPDX (np. `MIT OR Apache-2.0`). */
@@ -2198,6 +2222,8 @@ export interface ModelItem {
   readonly kind: ModelItemKind;
   /** Licencja (SPDX albo opis warunków). */
   readonly license: string;
+  /** Karta licencji silnika, modelu i jego głosów (C5.7). */
+  readonly license_card: LicenseCard | null;
   readonly name: string;
   readonly note: LocalizedText;
   /** Wszystkie pliki mają przypięty SHA-256 (bez karty TOFU). */
@@ -3550,6 +3576,19 @@ export interface VoiceFeatures {
   readonly s2s: S2sView;
   readonly speaker: SpeakerView;
   readonly wake: WakeWordsView;
+}
+
+/** Głos (barwa modelu mowy) z jego warunkami. */
+export interface VoiceLicense {
+  readonly commercial: CommercialUse;
+  /** Identyfikator głosu w silniku (np. `F1`, `pl_PL-gosia-medium`). */
+  readonly id: string;
+  /** Licencja głosu (zwykle ta sama co wag modelu). */
+  readonly license: string;
+  readonly name: LocalizedText;
+  readonly notes: LocalizedText;
+  /** Skąd pochodzi głos (barwa wbudowana, nagrania wzorcowe). */
+  readonly origin: LocalizedText;
 }
 
 /** Sposób włączania mikrofonu. */

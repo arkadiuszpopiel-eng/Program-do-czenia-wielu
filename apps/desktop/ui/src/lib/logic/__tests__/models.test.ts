@@ -46,6 +46,7 @@ const base: ModelItem = {
   error: null,
   active: false,
   card: null,
+  license_card: null,
 };
 const item = (patch: Partial<ModelItem>): ModelItem => ({ ...base, ...patch });
 

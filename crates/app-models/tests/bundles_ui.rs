@@ -52,6 +52,7 @@ fn catalog_items() -> Vec<ModelItem> {
         error: None,
         active: false,
         card: None,
+        license_card: None,
     };
     builtin().iter().map(item).collect()
 }

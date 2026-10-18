@@ -20,6 +20,7 @@ const item = (patch: Partial<ModelItem>): ModelItem => ({
   error: null,
   active: false,
   card: null,
+  license_card: null,
   ...patch,
 });
 

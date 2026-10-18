@@ -46,6 +46,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "SpeakLeash i ACK Cyfronet AGH, Polska",
+              "en": "SpeakLeash and ACK Cyfronet AGH, Poland"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Apache-2.0 według autorów; model bazowy Qwen2.5-3B ma licencję badawczą Alibaba — czy jej warunki przechodzą na Bielika: Do potwierdzenia przez człowieka.",
+              "en": "Apache-2.0 per the authors; the Qwen2.5-3B base model has an Alibaba research licence — whether its terms carry over: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -90,6 +107,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "SpeakLeash i ACK Cyfronet AGH, Polska",
+              "en": "SpeakLeash and ACK Cyfronet AGH, Poland"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -141,6 +175,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://opensource.org/license/mit",
+            "author": {
+              "pl": "Microsoft (intfloat)",
+              "en": "Microsoft (intfloat)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -185,6 +236,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/openai/whisper/blob/main/LICENSE",
+            "author": {
+              "pl": "OpenAI (wagi); ggml-org (zapis GGML)",
+              "en": "OpenAI (weights); ggml-org (GGML conversion)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -229,6 +297,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/openai/whisper/blob/main/LICENSE",
+            "author": {
+              "pl": "OpenAI (wagi); ggml-org (zapis GGML)",
+              "en": "OpenAI (weights); ggml-org (GGML conversion)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -280,6 +365,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "Zespół Qwen (Alibaba Cloud)",
+              "en": "Qwen team (Alibaba Cloud)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta).",
+              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card)."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -352,6 +454,194 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "OpenRAIL-M",
+            "name": "OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)",
+            "url": "https://huggingface.co/supertone-oss-archive/supertonic-3",
+            "author": {
+              "pl": "Supertone Inc. (Korea Południowa)",
+              "en": "Supertone Inc. (South Korea)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": true,
+            "voices": [
+              {
+                "id": "F1",
+                "name": {
+                  "pl": "F1 — kobiecy, ciepły (domyślnie: Alfa)",
+                  "en": "F1 — female, warm (default: Alfa)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F2",
+                "name": {
+                  "pl": "F2 — kobiecy (domyślnie: Beta)",
+                  "en": "F2 — female (default: Beta)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F3",
+                "name": {
+                  "pl": "F3 — kobiecy",
+                  "en": "F3 — female"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F4",
+                "name": {
+                  "pl": "F4 — kobiecy (domyślnie: Gama)",
+                  "en": "F4 — female (default: Gama)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F5",
+                "name": {
+                  "pl": "F5 — kobiecy, wyrazisty (domyślnie: Delta)",
+                  "en": "F5 — female, expressive (default: Delta)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M1",
+                "name": {
+                  "pl": "M1 — męski",
+                  "en": "M1 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M2",
+                "name": {
+                  "pl": "M2 — męski",
+                  "en": "M2 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M3",
+                "name": {
+                  "pl": "M3 — męski",
+                  "en": "M3 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M4",
+                "name": {
+                  "pl": "M4 — męski",
+                  "en": "M4 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M5",
+                "name": {
+                  "pl": "M5 — męski",
+                  "en": "M5 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              }
+            ]
           }
         },
         {
@@ -403,6 +693,41 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (repozytorium piper-voices); licencja nagrań — według MODEL_CARD",
+            "url": "https://huggingface.co/rhasspy/piper-voices/blob/v1.0.0/pl/pl_PL/gosia/medium/MODEL_CARD",
+            "author": {
+              "pl": "Projekt Piper (rhasspy/piper-voices)",
+              "en": "Piper project (rhasspy/piper-voices)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Licencja zbioru nagrań głosu „gosia” — według karty głosu. Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "Licence of the “gosia” recording set — per the voice card. To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": [
+              {
+                "id": "pl_PL-gosia-medium",
+                "name": {
+                  "pl": "Gosia (pl_PL, medium) — głos zapasowy agentek",
+                  "en": "Gosia (pl_PL, medium) — the agents’ fallback voice"
+                },
+                "license": "do potwierdzenia — MODEL_CARD",
+                "origin": {
+                  "pl": "Model głosu Pipera",
+                  "en": "Piper voice model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja nagrań — do potwierdzenia przez człowieka.",
+                  "en": "Recording licence — to be confirmed by a human."
+                }
+              }
+            ]
           }
         },
         {
@@ -447,6 +772,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+            "author": {
+              "pl": "Silero Team (snakers4)",
+              "en": "Silero Team (snakers4)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -491,6 +833,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "BSD-2-Clause",
+            "name": "BSD 2-Clause License",
+            "url": "https://opensource.org/license/bsd-2-clause",
+            "author": {
+              "pl": "Daily — projekt Pipecat",
+              "en": "Daily — Pipecat project"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -535,6 +894,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0 (kod); licencja modeli cech — do potwierdzenia",
+            "url": "https://github.com/dscripka/openWakeWord/blob/main/LICENSE",
+            "author": {
+              "pl": "David Scripka (openWakeWord)",
+              "en": "David Scripka (openWakeWord)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Według README wytrenowane modele są na CC BY-NC-SA 4.0 — czy dotyczy to modeli cech: Do potwierdzenia przez człowieka.",
+              "en": "Per the README the pre-trained models are CC BY-NC-SA 4.0 — whether this covers the feature models: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -579,6 +955,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0 (WeSpeaker); warunki zbioru VoxCeleb — do sprawdzenia",
+            "url": "https://github.com/wenet-e2e/wespeaker/blob/master/LICENSE",
+            "author": {
+              "pl": "Projekt WeSpeaker (WeNet)",
+              "en": "WeSpeaker project (WeNet)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Czy warunki zbioru VoxCeleb ograniczają użycie komercyjne: Do potwierdzenia przez człowieka.",
+              "en": "Whether the VoxCeleb terms limit commercial use: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -623,6 +1016,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/llama.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -674,6 +1084,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
+            "url": "https://docs.nvidia.com/cuda/eula/index.html",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Serwer na MIT; biblioteki cudart i cuBLAS — umowa licencyjna NVIDIA (rozpowszechnianie pod jej warunkami). Do potwierdzenia przez człowieka.",
+              "en": "Server is MIT; cudart and cuBLAS — NVIDIA licence agreement (shipping under its terms). To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -718,6 +1145,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/llama.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -762,6 +1206,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/whisper.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -806,6 +1267,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
+            "url": "https://docs.nvidia.com/cuda/eula/index.html",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Serwer na MIT; biblioteki cudart i cuBLAS — umowa licencyjna NVIDIA (rozpowszechnianie pod jej warunkami). Do potwierdzenia przez człowieka.",
+              "en": "Server is MIT; cudart and cuBLAS — NVIDIA licence agreement (shipping under its terms). To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -850,6 +1328,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE",
+            "author": {
+              "pl": "Microsoft",
+              "en": "Microsoft"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -894,6 +1389,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)",
+            "url": "https://github.com/rhasspy/piper/blob/master/LICENSE.md",
+            "author": {
+              "pl": "Michael Hansen (rhasspy/piper)",
+              "en": "Michael Hansen (rhasspy/piper)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Archiwum zawiera espeak-ng na GPL-3.0 — rozpowszechnianie pod warunkami GPL. Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "The archive contains espeak-ng under GPL-3.0 — shipping under GPL terms. To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -930,6 +1442,58 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "CC",
+            "name": "CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy",
+            "url": "https://creativecommons.org/licenses/by/4.0/",
+            "author": {
+              "pl": "Kyutai (model bazowy); wariant polski — do wyjaśnienia (C5.1)",
+              "en": "Kyutai (base model); Polish variant — to be clarified (C5.1)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Skąd pochodzi model „Pocket TTS PL” i na jakiej licencji: Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "Where the “Pocket TTS PL” model comes from and under which licence: To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": [
+              {
+                "id": "pl-f1",
+                "name": {
+                  "pl": "pl-f1 — mówczyni bazowa",
+                  "en": "pl-f1 — base speaker"
+                },
+                "license": "CC-BY-4.0 (do potwierdzenia)",
+                "origin": {
+                  "pl": "Głos modelu społeczności „Pocket TTS PL”",
+                  "en": "Voice of the community “Pocket TTS PL” model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+                  "en": "Licence and origin — to be confirmed by a human."
+                }
+              },
+              {
+                "id": "pl-f2",
+                "name": {
+                  "pl": "pl-f2 — mówczyni bazowa",
+                  "en": "pl-f2 — base speaker"
+                },
+                "license": "CC-BY-4.0 (do potwierdzenia)",
+                "origin": {
+                  "pl": "Głos modelu społeczności „Pocket TTS PL”",
+                  "en": "Voice of the community “Pocket TTS PL” model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+                  "en": "Licence and origin — to be confirmed by a human."
+                }
+              }
+            ]
           }
         }
       ],
@@ -1006,6 +1570,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },
@@ -1067,6 +1648,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://opensource.org/license/mit",
+        "author": {
+          "pl": "Microsoft (intfloat)",
+          "en": "Microsoft (intfloat)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+        },
+        "confirmed": false,
+        "voices": []
       }
     }
   },
@@ -1128,6 +1726,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://opensource.org/license/mit",
+        "author": {
+          "pl": "Microsoft (intfloat)",
+          "en": "Microsoft (intfloat)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+        },
+        "confirmed": false,
+        "voices": []
       }
     }
   },
@@ -1189,6 +1804,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://opensource.org/license/mit",
+        "author": {
+          "pl": "Microsoft (intfloat)",
+          "en": "Microsoft (intfloat)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+        },
+        "confirmed": false,
+        "voices": []
       }
     }
   },
@@ -1239,6 +1871,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "SpeakLeash i ACK Cyfronet AGH, Polska",
+              "en": "SpeakLeash and ACK Cyfronet AGH, Poland"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Apache-2.0 według autorów; model bazowy Qwen2.5-3B ma licencję badawczą Alibaba — czy jej warunki przechodzą na Bielika: Do potwierdzenia przez człowieka.",
+              "en": "Apache-2.0 per the authors; the Qwen2.5-3B base model has an Alibaba research licence — whether its terms carry over: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1283,6 +1932,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "SpeakLeash i ACK Cyfronet AGH, Polska",
+              "en": "SpeakLeash and ACK Cyfronet AGH, Poland"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1334,6 +2000,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://opensource.org/license/mit",
+            "author": {
+              "pl": "Microsoft (intfloat)",
+              "en": "Microsoft (intfloat)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1378,6 +2061,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/openai/whisper/blob/main/LICENSE",
+            "author": {
+              "pl": "OpenAI (wagi); ggml-org (zapis GGML)",
+              "en": "OpenAI (weights); ggml-org (GGML conversion)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1422,6 +2122,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/openai/whisper/blob/main/LICENSE",
+            "author": {
+              "pl": "OpenAI (wagi); ggml-org (zapis GGML)",
+              "en": "OpenAI (weights); ggml-org (GGML conversion)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1473,6 +2190,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "Zespół Qwen (Alibaba Cloud)",
+              "en": "Qwen team (Alibaba Cloud)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta).",
+              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card)."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -1545,6 +2279,194 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "OpenRAIL-M",
+            "name": "OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)",
+            "url": "https://huggingface.co/supertone-oss-archive/supertonic-3",
+            "author": {
+              "pl": "Supertone Inc. (Korea Południowa)",
+              "en": "Supertone Inc. (South Korea)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": true,
+            "voices": [
+              {
+                "id": "F1",
+                "name": {
+                  "pl": "F1 — kobiecy, ciepły (domyślnie: Alfa)",
+                  "en": "F1 — female, warm (default: Alfa)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F2",
+                "name": {
+                  "pl": "F2 — kobiecy (domyślnie: Beta)",
+                  "en": "F2 — female (default: Beta)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F3",
+                "name": {
+                  "pl": "F3 — kobiecy",
+                  "en": "F3 — female"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F4",
+                "name": {
+                  "pl": "F4 — kobiecy (domyślnie: Gama)",
+                  "en": "F4 — female (default: Gama)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F5",
+                "name": {
+                  "pl": "F5 — kobiecy, wyrazisty (domyślnie: Delta)",
+                  "en": "F5 — female, expressive (default: Delta)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M1",
+                "name": {
+                  "pl": "M1 — męski",
+                  "en": "M1 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M2",
+                "name": {
+                  "pl": "M2 — męski",
+                  "en": "M2 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M3",
+                "name": {
+                  "pl": "M3 — męski",
+                  "en": "M3 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M4",
+                "name": {
+                  "pl": "M4 — męski",
+                  "en": "M4 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M5",
+                "name": {
+                  "pl": "M5 — męski",
+                  "en": "M5 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              }
+            ]
           }
         },
         {
@@ -1596,6 +2518,41 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (repozytorium piper-voices); licencja nagrań — według MODEL_CARD",
+            "url": "https://huggingface.co/rhasspy/piper-voices/blob/v1.0.0/pl/pl_PL/gosia/medium/MODEL_CARD",
+            "author": {
+              "pl": "Projekt Piper (rhasspy/piper-voices)",
+              "en": "Piper project (rhasspy/piper-voices)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Licencja zbioru nagrań głosu „gosia” — według karty głosu. Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "Licence of the “gosia” recording set — per the voice card. To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": [
+              {
+                "id": "pl_PL-gosia-medium",
+                "name": {
+                  "pl": "Gosia (pl_PL, medium) — głos zapasowy agentek",
+                  "en": "Gosia (pl_PL, medium) — the agents’ fallback voice"
+                },
+                "license": "do potwierdzenia — MODEL_CARD",
+                "origin": {
+                  "pl": "Model głosu Pipera",
+                  "en": "Piper voice model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja nagrań — do potwierdzenia przez człowieka.",
+                  "en": "Recording licence — to be confirmed by a human."
+                }
+              }
+            ]
           }
         },
         {
@@ -1640,6 +2597,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+            "author": {
+              "pl": "Silero Team (snakers4)",
+              "en": "Silero Team (snakers4)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -1684,6 +2658,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "BSD-2-Clause",
+            "name": "BSD 2-Clause License",
+            "url": "https://opensource.org/license/bsd-2-clause",
+            "author": {
+              "pl": "Daily — projekt Pipecat",
+              "en": "Daily — Pipecat project"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -1728,6 +2719,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0 (kod); licencja modeli cech — do potwierdzenia",
+            "url": "https://github.com/dscripka/openWakeWord/blob/main/LICENSE",
+            "author": {
+              "pl": "David Scripka (openWakeWord)",
+              "en": "David Scripka (openWakeWord)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Według README wytrenowane modele są na CC BY-NC-SA 4.0 — czy dotyczy to modeli cech: Do potwierdzenia przez człowieka.",
+              "en": "Per the README the pre-trained models are CC BY-NC-SA 4.0 — whether this covers the feature models: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1772,6 +2780,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0 (WeSpeaker); warunki zbioru VoxCeleb — do sprawdzenia",
+            "url": "https://github.com/wenet-e2e/wespeaker/blob/master/LICENSE",
+            "author": {
+              "pl": "Projekt WeSpeaker (WeNet)",
+              "en": "WeSpeaker project (WeNet)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Czy warunki zbioru VoxCeleb ograniczają użycie komercyjne: Do potwierdzenia przez człowieka.",
+              "en": "Whether the VoxCeleb terms limit commercial use: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1816,6 +2841,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/llama.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -1867,6 +2909,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
+            "url": "https://docs.nvidia.com/cuda/eula/index.html",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Serwer na MIT; biblioteki cudart i cuBLAS — umowa licencyjna NVIDIA (rozpowszechnianie pod jej warunkami). Do potwierdzenia przez człowieka.",
+              "en": "Server is MIT; cudart and cuBLAS — NVIDIA licence agreement (shipping under its terms). To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1911,6 +2970,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/llama.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -1955,6 +3031,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/whisper.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -1999,6 +3092,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
+            "url": "https://docs.nvidia.com/cuda/eula/index.html",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Serwer na MIT; biblioteki cudart i cuBLAS — umowa licencyjna NVIDIA (rozpowszechnianie pod jej warunkami). Do potwierdzenia przez człowieka.",
+              "en": "Server is MIT; cudart and cuBLAS — NVIDIA licence agreement (shipping under its terms). To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2043,6 +3153,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE",
+            "author": {
+              "pl": "Microsoft",
+              "en": "Microsoft"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -2087,6 +3214,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)",
+            "url": "https://github.com/rhasspy/piper/blob/master/LICENSE.md",
+            "author": {
+              "pl": "Michael Hansen (rhasspy/piper)",
+              "en": "Michael Hansen (rhasspy/piper)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Archiwum zawiera espeak-ng na GPL-3.0 — rozpowszechnianie pod warunkami GPL. Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "The archive contains espeak-ng under GPL-3.0 — shipping under GPL terms. To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2123,6 +3267,58 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "CC",
+            "name": "CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy",
+            "url": "https://creativecommons.org/licenses/by/4.0/",
+            "author": {
+              "pl": "Kyutai (model bazowy); wariant polski — do wyjaśnienia (C5.1)",
+              "en": "Kyutai (base model); Polish variant — to be clarified (C5.1)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Skąd pochodzi model „Pocket TTS PL” i na jakiej licencji: Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "Where the “Pocket TTS PL” model comes from and under which licence: To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": [
+              {
+                "id": "pl-f1",
+                "name": {
+                  "pl": "pl-f1 — mówczyni bazowa",
+                  "en": "pl-f1 — base speaker"
+                },
+                "license": "CC-BY-4.0 (do potwierdzenia)",
+                "origin": {
+                  "pl": "Głos modelu społeczności „Pocket TTS PL”",
+                  "en": "Voice of the community “Pocket TTS PL” model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+                  "en": "Licence and origin — to be confirmed by a human."
+                }
+              },
+              {
+                "id": "pl-f2",
+                "name": {
+                  "pl": "pl-f2 — mówczyni bazowa",
+                  "en": "pl-f2 — base speaker"
+                },
+                "license": "CC-BY-4.0 (do potwierdzenia)",
+                "origin": {
+                  "pl": "Głos modelu społeczności „Pocket TTS PL”",
+                  "en": "Voice of the community “Pocket TTS PL” model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+                  "en": "Licence and origin — to be confirmed by a human."
+                }
+              }
+            ]
           }
         }
       ],
@@ -2206,6 +3402,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://opensource.org/license/mit",
+        "author": {
+          "pl": "Microsoft (intfloat)",
+          "en": "Microsoft (intfloat)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+        },
+        "confirmed": false,
+        "voices": []
       }
     }
   },
@@ -2256,6 +3469,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },
@@ -2380,6 +3610,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },
@@ -2430,6 +3677,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "SpeakLeash i ACK Cyfronet AGH, Polska",
+              "en": "SpeakLeash and ACK Cyfronet AGH, Poland"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Apache-2.0 według autorów; model bazowy Qwen2.5-3B ma licencję badawczą Alibaba — czy jej warunki przechodzą na Bielika: Do potwierdzenia przez człowieka.",
+              "en": "Apache-2.0 per the authors; the Qwen2.5-3B base model has an Alibaba research licence — whether its terms carry over: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2474,6 +3738,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "SpeakLeash i ACK Cyfronet AGH, Polska",
+              "en": "SpeakLeash and ACK Cyfronet AGH, Poland"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2525,6 +3806,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://opensource.org/license/mit",
+            "author": {
+              "pl": "Microsoft (intfloat)",
+              "en": "Microsoft (intfloat)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2569,6 +3867,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/openai/whisper/blob/main/LICENSE",
+            "author": {
+              "pl": "OpenAI (wagi); ggml-org (zapis GGML)",
+              "en": "OpenAI (weights); ggml-org (GGML conversion)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2613,6 +3928,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/openai/whisper/blob/main/LICENSE",
+            "author": {
+              "pl": "OpenAI (wagi); ggml-org (zapis GGML)",
+              "en": "OpenAI (weights); ggml-org (GGML conversion)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2664,6 +3996,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "pl": "Zespół Qwen (Alibaba Cloud)",
+              "en": "Qwen team (Alibaba Cloud)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta).",
+              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card)."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -2736,6 +4085,194 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "OpenRAIL-M",
+            "name": "OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)",
+            "url": "https://huggingface.co/supertone-oss-archive/supertonic-3",
+            "author": {
+              "pl": "Supertone Inc. (Korea Południowa)",
+              "en": "Supertone Inc. (South Korea)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": true,
+            "voices": [
+              {
+                "id": "F1",
+                "name": {
+                  "pl": "F1 — kobiecy, ciepły (domyślnie: Alfa)",
+                  "en": "F1 — female, warm (default: Alfa)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F2",
+                "name": {
+                  "pl": "F2 — kobiecy (domyślnie: Beta)",
+                  "en": "F2 — female (default: Beta)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F3",
+                "name": {
+                  "pl": "F3 — kobiecy",
+                  "en": "F3 — female"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F4",
+                "name": {
+                  "pl": "F4 — kobiecy (domyślnie: Gama)",
+                  "en": "F4 — female (default: Gama)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "F5",
+                "name": {
+                  "pl": "F5 — kobiecy, wyrazisty (domyślnie: Delta)",
+                  "en": "F5 — female, expressive (default: Delta)"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M1",
+                "name": {
+                  "pl": "M1 — męski",
+                  "en": "M1 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M2",
+                "name": {
+                  "pl": "M2 — męski",
+                  "en": "M2 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M3",
+                "name": {
+                  "pl": "M3 — męski",
+                  "en": "M3 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M4",
+                "name": {
+                  "pl": "M4 — męski",
+                  "en": "M4 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              },
+              {
+                "id": "M5",
+                "name": {
+                  "pl": "M5 — męski",
+                  "en": "M5 — male"
+                },
+                "license": "OpenRAIL-M",
+                "origin": {
+                  "pl": "Barwa wbudowana w model Supertonic 3",
+                  "en": "Timbre built into the Supertonic 3 model"
+                },
+                "commercial": "conditional",
+                "notes": {
+                  "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych — do potwierdzenia przez człowieka (C5.6).",
+                  "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings — to be confirmed by a human (C5.6)."
+                }
+              }
+            ]
           }
         },
         {
@@ -2787,6 +4324,41 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": true
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (repozytorium piper-voices); licencja nagrań — według MODEL_CARD",
+            "url": "https://huggingface.co/rhasspy/piper-voices/blob/v1.0.0/pl/pl_PL/gosia/medium/MODEL_CARD",
+            "author": {
+              "pl": "Projekt Piper (rhasspy/piper-voices)",
+              "en": "Piper project (rhasspy/piper-voices)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Licencja zbioru nagrań głosu „gosia” — według karty głosu. Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "Licence of the “gosia” recording set — per the voice card. To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": [
+              {
+                "id": "pl_PL-gosia-medium",
+                "name": {
+                  "pl": "Gosia (pl_PL, medium) — głos zapasowy agentek",
+                  "en": "Gosia (pl_PL, medium) — the agents’ fallback voice"
+                },
+                "license": "do potwierdzenia — MODEL_CARD",
+                "origin": {
+                  "pl": "Model głosu Pipera",
+                  "en": "Piper voice model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja nagrań — do potwierdzenia przez człowieka.",
+                  "en": "Recording licence — to be confirmed by a human."
+                }
+              }
+            ]
           }
         },
         {
@@ -2831,6 +4403,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+            "author": {
+              "pl": "Silero Team (snakers4)",
+              "en": "Silero Team (snakers4)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -2875,6 +4464,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "BSD-2-Clause",
+            "name": "BSD 2-Clause License",
+            "url": "https://opensource.org/license/bsd-2-clause",
+            "author": {
+              "pl": "Daily — projekt Pipecat",
+              "en": "Daily — Pipecat project"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -2919,6 +4525,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0 (kod); licencja modeli cech — do potwierdzenia",
+            "url": "https://github.com/dscripka/openWakeWord/blob/main/LICENSE",
+            "author": {
+              "pl": "David Scripka (openWakeWord)",
+              "en": "David Scripka (openWakeWord)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Według README wytrenowane modele są na CC BY-NC-SA 4.0 — czy dotyczy to modeli cech: Do potwierdzenia przez człowieka.",
+              "en": "Per the README the pre-trained models are CC BY-NC-SA 4.0 — whether this covers the feature models: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -2963,6 +4586,23 @@
               "en": "Can be wrong; check important information at the source"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0 (WeSpeaker); warunki zbioru VoxCeleb — do sprawdzenia",
+            "url": "https://github.com/wenet-e2e/wespeaker/blob/master/LICENSE",
+            "author": {
+              "pl": "Projekt WeSpeaker (WeNet)",
+              "en": "WeSpeaker project (WeNet)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Czy warunki zbioru VoxCeleb ograniczają użycie komercyjne: Do potwierdzenia przez człowieka.",
+              "en": "Whether the VoxCeleb terms limit commercial use: To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -3007,6 +4647,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/llama.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -3058,6 +4715,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
+            "url": "https://docs.nvidia.com/cuda/eula/index.html",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Serwer na MIT; biblioteki cudart i cuBLAS — umowa licencyjna NVIDIA (rozpowszechnianie pod jej warunkami). Do potwierdzenia przez człowieka.",
+              "en": "Server is MIT; cudart and cuBLAS — NVIDIA licence agreement (shipping under its terms). To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -3102,6 +4776,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/llama.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -3146,6 +4837,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/ggml-org/whisper.cpp/blob/master/LICENSE",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -3190,6 +4898,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
+            "url": "https://docs.nvidia.com/cuda/eula/index.html",
+            "author": {
+              "pl": "ggml-org (llama.cpp, whisper.cpp)",
+              "en": "ggml-org (llama.cpp, whisper.cpp)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Serwer na MIT; biblioteki cudart i cuBLAS — umowa licencyjna NVIDIA (rozpowszechnianie pod jej warunkami). Do potwierdzenia przez człowieka.",
+              "en": "Server is MIT; cudart and cuBLAS — NVIDIA licence agreement (shipping under its terms). To be confirmed by a human."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -3234,6 +4959,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE",
+            "author": {
+              "pl": "Microsoft",
+              "en": "Microsoft"
+            },
+            "commercial": "yes",
+            "attribution": true,
+            "notes": {
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+            },
+            "confirmed": true,
+            "voices": []
           }
         },
         {
@@ -3278,6 +5020,23 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "MIT",
+            "name": "MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)",
+            "url": "https://github.com/rhasspy/piper/blob/master/LICENSE.md",
+            "author": {
+              "pl": "Michael Hansen (rhasspy/piper)",
+              "en": "Michael Hansen (rhasspy/piper)"
+            },
+            "commercial": "conditional",
+            "attribution": true,
+            "notes": {
+              "pl": "Archiwum zawiera espeak-ng na GPL-3.0 — rozpowszechnianie pod warunkami GPL. Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "The archive contains espeak-ng under GPL-3.0 — shipping under GPL terms. To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": []
           }
         },
         {
@@ -3314,6 +5073,58 @@
               "en": "Software, not a model — creates nothing by itself"
             },
             "generative": false
+          },
+          "license_card": {
+            "id": "CC",
+            "name": "CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy",
+            "url": "https://creativecommons.org/licenses/by/4.0/",
+            "author": {
+              "pl": "Kyutai (model bazowy); wariant polski — do wyjaśnienia (C5.1)",
+              "en": "Kyutai (base model); Polish variant — to be clarified (C5.1)"
+            },
+            "commercial": "unknown",
+            "attribution": true,
+            "notes": {
+              "pl": "Skąd pochodzi model „Pocket TTS PL” i na jakiej licencji: Do potwierdzenia przez człowieka. Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "Where the “Pocket TTS PL” model comes from and under which licence: To be confirmed by a human. Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+            },
+            "confirmed": false,
+            "voices": [
+              {
+                "id": "pl-f1",
+                "name": {
+                  "pl": "pl-f1 — mówczyni bazowa",
+                  "en": "pl-f1 — base speaker"
+                },
+                "license": "CC-BY-4.0 (do potwierdzenia)",
+                "origin": {
+                  "pl": "Głos modelu społeczności „Pocket TTS PL”",
+                  "en": "Voice of the community “Pocket TTS PL” model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+                  "en": "Licence and origin — to be confirmed by a human."
+                }
+              },
+              {
+                "id": "pl-f2",
+                "name": {
+                  "pl": "pl-f2 — mówczyni bazowa",
+                  "en": "pl-f2 — base speaker"
+                },
+                "license": "CC-BY-4.0 (do potwierdzenia)",
+                "origin": {
+                  "pl": "Głos modelu społeczności „Pocket TTS PL”",
+                  "en": "Voice of the community “Pocket TTS PL” model"
+                },
+                "commercial": "unknown",
+                "notes": {
+                  "pl": "Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+                  "en": "Licence and origin — to be confirmed by a human."
+                }
+              }
+            ]
           }
         }
       ],
@@ -4737,6 +6548,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },
@@ -4791,6 +6619,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },

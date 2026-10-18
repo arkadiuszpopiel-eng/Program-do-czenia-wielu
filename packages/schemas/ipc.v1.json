@@ -3398,6 +3398,28 @@
       ],
       "type": "string"
     },
+    "CommercialUse": {
+      "description": "Czy licencja pozwala na użycie komercyjne.",
+      "oneOf": [
+        {
+          "enum": [
+            "yes",
+            "no"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "conditional",
+          "description": "Tak, ale pod warunkami (lista zakazanych zastosowań, copyleft, warunki producenta).",
+          "type": "string"
+        },
+        {
+          "const": "unknown",
+          "description": "Nieustalone — do potwierdzenia przez człowieka.",
+          "type": "string"
+        }
+      ]
+    },
     "CompatKind": {
       "description": "Zgodność protokołu.",
       "enum": [
@@ -6273,6 +6295,62 @@
       ],
       "type": "object"
     },
+    "LicenseCard": {
+      "description": "Karta licencji pozycji katalogu.",
+      "properties": {
+        "attribution": {
+          "description": "Licencja wymaga wskazania autora albo dołączenia jej tekstu przy rozpowszechnianiu.",
+          "type": "boolean"
+        },
+        "author": {
+          "$ref": "#/$defs/LocalizedText",
+          "description": "Autor albo właściciel praw i źródło."
+        },
+        "commercial": {
+          "$ref": "#/$defs/CommercialUse"
+        },
+        "confirmed": {
+          "description": "Fakty licencyjne sprawdzone u źródła (inaczej — „do potwierdzenia przez człowieka”).",
+          "type": "boolean"
+        },
+        "id": {
+          "description": "Identyfikator licencji (SPDX, gdy istnieje; inaczej nazwa umowna, np. `OpenRAIL-M`).",
+          "type": "string"
+        },
+        "name": {
+          "description": "Pełna nazwa licencji (albo kilku — silnik i dołączone biblioteki).",
+          "type": "string"
+        },
+        "notes": {
+          "$ref": "#/$defs/LocalizedText",
+          "description": "Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej)."
+        },
+        "url": {
+          "description": "Adres tekstu licencji.",
+          "type": "string"
+        },
+        "voices": {
+          "default": [],
+          "description": "Głosy w tej pozycji (pusto — pozycja nie mówi albo nie ma osobnych głosów).",
+          "items": {
+            "$ref": "#/$defs/VoiceLicense"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "url",
+        "author",
+        "commercial",
+        "attribution",
+        "notes",
+        "confirmed",
+        "voices"
+      ],
+      "type": "object"
+    },
     "LicenseEntry": {
       "description": "Licencja zależności.",
       "properties": {
@@ -8142,6 +8220,18 @@
           "description": "Licencja (SPDX albo opis warunków).",
           "type": "string"
         },
+        "license_card": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LicenseCard"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Karta licencji silnika, modelu i jego głosów (C5.7)."
+        },
         "name": {
           "type": "string"
         },
@@ -8196,7 +8286,8 @@
         "progress",
         "error",
         "active",
-        "card"
+        "card",
+        "license_card"
       ],
       "type": "object"
     },
@@ -13102,6 +13193,41 @@
         "read",
         "s2s",
         "engines"
+      ],
+      "type": "object"
+    },
+    "VoiceLicense": {
+      "description": "Głos (barwa modelu mowy) z jego warunkami.",
+      "properties": {
+        "commercial": {
+          "$ref": "#/$defs/CommercialUse"
+        },
+        "id": {
+          "description": "Identyfikator głosu w silniku (np. `F1`, `pl_PL-gosia-medium`).",
+          "type": "string"
+        },
+        "license": {
+          "description": "Licencja głosu (zwykle ta sama co wag modelu).",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/LocalizedText"
+        },
+        "notes": {
+          "$ref": "#/$defs/LocalizedText"
+        },
+        "origin": {
+          "$ref": "#/$defs/LocalizedText",
+          "description": "Skąd pochodzi głos (barwa wbudowana, nagrania wzorcowe)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "license",
+        "origin",
+        "commercial",
+        "notes"
       ],
       "type": "object"
     },
