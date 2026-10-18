@@ -27,6 +27,7 @@ pub trait Residency: Send + Sync {
     fn set_mode(&self, m: Mode /* { gaming, battery, emulated: Option<Budget> } */) -> Vec<Change>;
     fn set_budget(&self, b: Budget) -> Vec<Change>;   // karta główna + RAM
     fn set_gpus(&self, g: GpuLayout) -> Vec<Change>;  // karty maszyny; dzierżawy na zniknętych kartach odbierane
+    fn set_hardware(&self, b: Budget, g: GpuLayout) -> Vec<Change>;  // zmiana sprzętu naraz (budżet egzekwowany raz)
     fn reap_idle(&self) -> Vec<Revocation>;
     fn listen(&self, owner: &str, l: Arc<dyn LeaseListener /* revoked, moved */>);
     fn refresh_mode(&self, source: &dyn ModeSource /* fullscreen_active, on_battery */) -> Vec<Change>;
@@ -113,8 +114,10 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
 - Problem: jedna pula VRAM dla całej maszyny — model rozmowy na karcie A blokował (albo wypierał) rozpoznawanie mowy
   przypięte do karty B. Teraz każda karta ma własną pulę (`GpuLayout::from_profile`, `ResidencyManager::from_device`),
   RAM jest wspólny, a dzierżawa wskazuje kartę (`LeaseRequest::gpu`). Kontrakt zgodny wstecz dla klientów: brak karty =
-  karta główna; nowe pole w literałach żądania (`gpu: None`), nowa metoda traitu `set_gpus` (implementują `-impl`, `-fake`
-  i atrapa w testach `lib-embed`). Zmienione sygnatury pomocników `plan`/`shrink_victims`/`exclusive_conflicts`
+  karta główna; nowe pole w literałach żądania (`gpu: None`), nowe metody traitu `set_gpus` i `set_hardware` z
+  implementacją domyślną (dodatek bez łamania implementacji; `-impl` i `-fake` robią to atomowo na `LeaseTable`).
+  Dzierżawy bez wskazanej karty idą za kartą główną, gdy `set_gpus` zmienia kartę główną (np. umowna `GpuId(0)` z
+  `LeaseTable::new` → RTX `GpuId(1)` na laptopie), zamiast zostać na karcie o starym numerze. Zmienione sygnatury pomocników `plan`/`shrink_victims`/`exclusive_conflicts`
   (miejsce `Option<GpuId>` i `&Pools` zamiast `Device` i `Budget`) — poza kontraktem nikt ich nie używał.
 - Klienci nie wskazują jeszcze kart (`gpu: None` wszędzie) — zachowanie Alfy bez zmian. Następne kroki (po próbie na
   sprzęcie): Qwen3-ASR na karcie AMD/Intel poniżej 12 GB z dzierżawą na karcie, gdy model rozmowy z niej nie korzysta

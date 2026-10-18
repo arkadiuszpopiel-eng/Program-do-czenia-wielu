@@ -187,3 +187,46 @@ fn emulation_limits_every_card_and_state_reports_free_memory() {
     assert_eq!(GpuId(2).to_string(), "gpu-2");
     assert_eq!(serde_json::to_string(&GpuId(2)).unwrap_or_default(), "2");
 }
+
+/// Pula pozostałej karty liczona jak budżet karty głównej w `device-profile` (rezerwa pulpitu,
+/// próg 8 GB wykluczenia STT/TTS): ta sama karta jako główna daje tę samą pulę. Pilnuje, by
+/// zmiana reguły w `device-profile` nie rozjechała karty głównej i pozostałych.
+#[test]
+fn other_card_pool_matches_primary_budget_rule() {
+    let mut profiles = vec![
+        fixtures::baseline(),
+        fixtures::desktop(),
+        fixtures::laptop(),
+        fixtures::intel_arc(),
+        fixtures::small_nvidia(),
+        fixtures::amd_apu(),
+    ];
+    for vram in [5_600, 7_400, 7_499, 7_500, 7_600, 8_176, 12_288, 24_576] {
+        for vendor in [GpuVendor::Nvidia, GpuVendor::Amd] {
+            let gpu = card(0, "Karta testowa", vendor, vram, false);
+            profiles.push(with_gpus(fixtures::desktop(), vec![gpu]));
+        }
+    }
+    let mut compared = 0;
+    for profile in profiles {
+        let Some(primary) = profile.primary_gpu() else {
+            continue;
+        };
+        let class = device_profile_contract::classify(&profile);
+        if !primary.has_memory_pool() || class == device_profile_contract::HwClass::Unknown {
+            continue;
+        }
+        let rec = device_profile_contract::recommend(&profile);
+        let budget = Budget::from_device(&rec.residency);
+        let from_rule = GpuPool::primary(GpuId::of(primary), budget);
+        assert_eq!(
+            GpuPool::from_gpu(primary, profile.ram_mb),
+            from_rule,
+            "{} {}",
+            primary.name,
+            primary.vram_mb
+        );
+        compared += 1;
+    }
+    assert!(compared >= 12, "porównano tylko {compared}");
+}

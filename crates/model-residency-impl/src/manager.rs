@@ -216,6 +216,12 @@ impl Residency for ResidencyManager {
         changes
     }
 
+    fn set_hardware(&self, budget: Budget, gpus: GpuLayout) -> Vec<Change> {
+        let changes = self.table().set_hardware(budget, gpus);
+        self.notify(&changes);
+        changes
+    }
+
     fn reap_idle(&self) -> Vec<Revocation> {
         let now = self.clock.now_ms();
         let reaped = self.table().reap_idle(now);

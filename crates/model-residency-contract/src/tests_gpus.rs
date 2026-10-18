@@ -256,3 +256,35 @@ fn removed_card_revokes_its_leases_and_unknown_card_falls_back() {
         Err(ResidencyError::TooLarge { vram_mb: 2_000, .. })
     ));
 }
+
+/// Tablica bez kart z profilu (`new`: karta główna to umowna `GpuId(0)`), potem prawdziwe karty
+/// laptopa: dzierżawa „na karcie głównej” idzie za kartą główną (RTX, adapter 1), nie zostaje
+/// na Intel UHD (adapter 0); wskazana wprost karta 0 zostaje na niej.
+#[test]
+fn leases_on_primary_follow_it_when_real_cards_arrive() {
+    let laptop_layout = || laptop().gpus().clone();
+    let laptop_budget = laptop().budget();
+    let mut t = LeaseTable::new(laptop_budget);
+    let g = t.acquire(&chat(5_000), 0).unwrap().lease;
+    assert_eq!((g.device, g.gpu), (Device::Gpu, Some(GpuId(0))));
+    let changes = t.set_gpus(laptop_layout());
+    assert!(changes.is_empty(), "{changes:?}");
+    assert_eq!(t.lease(g.id).and_then(|l| l.gpu), Some(A));
+    assert_eq!((t.used_on(A), t.used_on(IGPU)), (5_000, 0));
+    assert!(t.within_budget());
+    let mut t = LeaseTable::new(laptop_budget);
+    let pinned = t.acquire(&on(speech(), GpuId(0)), 0).unwrap().lease;
+    t.set_gpus(laptop_layout());
+    assert_eq!(t.lease(pinned.id).and_then(|l| l.gpu), Some(IGPU));
+    // Zmiana sprzętu naraz: mniejszy budżet tymczasowy nie odbiera dzierżawy, która mieści się
+    // w nowym budżecie i na nowych kartach.
+    let small = Budget {
+        vram_mb: 5_000,
+        ..laptop_budget
+    };
+    let mut t = LeaseTable::new(small);
+    let g = t.acquire(&chat(5_000), 0).unwrap().lease;
+    assert!(t.set_hardware(laptop_budget, laptop_layout()).is_empty());
+    assert_eq!(t.lease(g.id).and_then(|l| l.gpu), Some(A));
+    assert_eq!(t.budget(), laptop_budget);
+}

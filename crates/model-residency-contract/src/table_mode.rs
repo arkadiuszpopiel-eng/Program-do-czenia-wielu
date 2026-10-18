@@ -18,9 +18,40 @@ impl LeaseTable {
     }
 
     /// Zmienia karty maszyny (zmiana sprzętu): dzierżawy na kartach, których już nie ma, są
-    /// odbierane; nadmiar w pulach — jak przy zmianie budżetu.
+    /// odbierane; nadmiar w pulach — jak przy zmianie budżetu. Dzierżawy bez wskazanej karty
+    /// (albo ze wskazaniem nieznanej) są na karcie głównej i idą za nią, gdy główną zostaje inna.
     pub fn set_gpus(&mut self, gpus: GpuLayout) -> Vec<Change> {
+        self.set_hardware(self.base, gpus)
+    }
+
+    /// Zmienia naraz budżet karty głównej i RAM oraz karty maszyny (zmiana sprzętu) — budżet
+    /// egzekwowany raz, już przy zgodnych budżecie i kartach.
+    pub fn set_hardware(&mut self, budget: Budget, gpus: GpuLayout) -> Vec<Change> {
+        self.base = budget;
+        self.replace_gpus(gpus);
+        let mut changes = self.revoke_orphans();
+        changes.extend(self.enforce_budget());
+        changes
+    }
+
+    /// Nowe karty; dzierżawy „na karcie głównej” (bez trafnego wskazania karty) przechodzą na
+    /// nową kartę główną.
+    fn replace_gpus(&mut self, gpus: GpuLayout) {
+        let old = self.pools();
         self.gpus = gpus.normalized();
+        let primary = self.gpus.primary;
+        for lease in self.leases.values_mut() {
+            let on_primary = lease.device == Device::Gpu
+                && lease.gpu.is_none_or(|g| g == old.primary.gpu)
+                && old.resolve(lease.request.gpu) == old.primary.gpu
+                && lease.request.gpu != Some(old.primary.gpu);
+            if on_primary {
+                lease.gpu = Some(primary);
+            }
+        }
+    }
+
+    fn revoke_orphans(&mut self) -> Vec<Change> {
         let pools = self.pools();
         let orphans: Vec<LeaseId> = self
             .leases
@@ -28,9 +59,7 @@ impl LeaseTable {
             .filter(|l| l.device == Device::Gpu && l.gpu.is_some_and(|g| pools.card(g).is_none()))
             .map(|l| l.id)
             .collect();
-        let mut changes = self.revoke_all(&orphans, &RevokeReason::BudgetShrunk);
-        changes.extend(self.enforce_budget());
-        changes
+        self.revoke_all(&orphans, &RevokeReason::BudgetShrunk)
     }
 
     fn enforce_budget(&mut self) -> Vec<Change> {

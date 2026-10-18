@@ -114,8 +114,21 @@ pub trait Residency: Send + Sync {
     fn set_budget(&self, budget: Budget) -> Vec<Change>;
 
     /// Zmienia karty maszyny i pule pozostałych kart (np. po zmianie sprzętu); dzierżawy na
-    /// kartach, których już nie ma, są odbierane.
-    fn set_gpus(&self, gpus: GpuLayout) -> Vec<Change>;
+    /// kartach, których już nie ma, są odbierane. Domyślnie bez zmian (zarządca jednej karty) —
+    /// metoda dodana bez łamania dotychczasowych implementacji.
+    fn set_gpus(&self, gpus: GpuLayout) -> Vec<Change> {
+        let _ = gpus;
+        Vec::new()
+    }
+
+    /// Zmienia naraz budżet karty głównej i RAM oraz karty (zmiana sprzętu). Domyślnie
+    /// [`Residency::set_budget`], potem [`Residency::set_gpus`]; implementacje na [`LeaseTable`]
+    /// robią to atomowo ([`LeaseTable::set_hardware`] — budżet egzekwowany raz).
+    fn set_hardware(&self, budget: Budget, gpus: GpuLayout) -> Vec<Change> {
+        let mut changes = self.set_budget(budget);
+        changes.extend(self.set_gpus(gpus));
+        changes
+    }
 
     /// Eksmituje dzierżawy bezczynne dłużej niż ich limit.
     fn reap_idle(&self) -> Vec<Revocation>;

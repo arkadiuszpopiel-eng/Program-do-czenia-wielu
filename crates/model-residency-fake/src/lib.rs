@@ -192,6 +192,12 @@ impl Residency for FakeResidency {
         changes
     }
 
+    fn set_hardware(&self, budget: Budget, gpus: GpuLayout) -> Vec<Change> {
+        let changes = self.with_table(|t, _| t.set_hardware(budget, gpus));
+        self.notify(&changes);
+        changes
+    }
+
     fn reap_idle(&self) -> Vec<Revocation> {
         let reaped = self.with_table(|t, now| t.reap_idle(now));
         let changes: Vec<Change> = reaped.iter().cloned().map(Change::Revoked).collect();
