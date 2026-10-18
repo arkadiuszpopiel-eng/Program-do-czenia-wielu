@@ -1,7 +1,8 @@
 //! Regresja klas ostrzeżeń `zip` RUSTSEC-2026-0367/0368/0369 (bity SUID/SGID przenoszone
 //! z archiwum, dowiązania wskazujące poza katalog docelowy, prawa nadawane przez dowiązanie):
-//! kontener `.alfa` odrzuca każdy wpis-dowiązanie bez żadnego zapisu, a tryb pliku z archiwum
-//! nigdy nie trafia na dysk (wpisy czytane do pamięci, zapis przez magazyn dokumentów).
+//! kontener `.alfa` odrzuca każdy wpis-dowiązanie (także z hostem DOS) bez żadnego zapisu,
+//! a tryb pliku z archiwum nigdy nie trafia na dysk (wpisy czytane do pamięci, zapis przez
+//! magazyn dokumentów).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -19,6 +20,9 @@ use zip::write::SimpleFileOptions;
 enum Kind {
     /// Dowiązanie symboliczne (treść = cel dowiązania).
     Link,
+    /// Dowiązanie z hostem DOS (`S_IFLNK` w górnych bitach atrybutów) — `add_symlink` zawsze
+    /// zapisuje host Unix, a zip 9 nie czyta trybu Unix z wpisów DOS.
+    DosLink,
     /// Plik z pełnym trybem Unix (także bity specjalne) w atrybutach zewnętrznych.
     Mode(u32),
 }
@@ -43,6 +47,13 @@ fn rebuild(path: &Path, entries: &[(&str, &[u8])], kind: &Kind) {
             Kind::Link => {
                 let to = std::str::from_utf8(bytes).unwrap();
                 zip.add_symlink(*name, to, stored).unwrap();
+            }
+            Kind::DosLink => {
+                let dos = stored
+                    .system(zip::System::Dos)
+                    .external_attributes(0o120_777 << 16);
+                zip.start_file(*name, dos).unwrap();
+                zip.write_all(bytes).unwrap();
             }
             Kind::Mode(mode) => {
                 let unix = stored
@@ -71,16 +82,14 @@ fn link_entries_are_rejected_without_writes() {
     std::fs::write(outside.join("tajne.toml"), b"klucz = 1\n").unwrap();
     let before = written(h.dir.path());
     let absolute = outside.join("tajne.toml").to_string_lossy().into_owned();
-    for (i, to) in [absolute.as_str(), "../../poza/tajne.toml", "shared.toml"]
-        .into_iter()
-        .enumerate()
-    {
+    let targets = [absolute.as_str(), "../../poza/tajne.toml", "shared.toml"];
+    let cases = targets
+        .iter()
+        .map(|to| (*to, Kind::Link))
+        .chain(targets.iter().map(|to| (*to, Kind::DosLink)));
+    for (i, (to, kind)) in cases.enumerate() {
         let pkg = h.path(&format!("dowiazanie-{i}.alfa"));
-        rebuild(
-            &pkg,
-            &[("config/common/a.toml", to.as_bytes())],
-            &Kind::Link,
-        );
+        rebuild(&pkg, &[("config/common/a.toml", to.as_bytes())], &kind);
         let err = h
             .transfer
             .import(&pkg, &ImportOptions::default())

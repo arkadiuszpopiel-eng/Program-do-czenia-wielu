@@ -28,6 +28,9 @@ enum Entry<'a> {
     File(&'a str, &'a [u8]),
     Deflated(&'a str, Vec<u8>),
     Link(&'a str, &'a str),
+    /// Dowiązanie z hostem DOS (`S_IFLNK` w górnych bitach atrybutów) — `add_symlink` zawsze
+    /// zapisuje host Unix, a zip 9 nie czyta trybu Unix z wpisów DOS.
+    DosLink(&'a str, &'a str),
     /// Plik z pełnym trybem Unix (także bity SUID/SGID/sticky) w atrybutach zewnętrznych.
     Mode(&'a str, &'a [u8], u32),
 }
@@ -47,6 +50,13 @@ fn archive(dir: &Path, name: &str, entries: &[Entry<'_>]) -> std::path::PathBuf 
                 zip.write_all(b).unwrap();
             }
             Entry::Link(n, to) => zip.add_symlink(*n, *to, stored).unwrap(),
+            Entry::DosLink(n, to) => {
+                let dos = stored
+                    .system(zip::System::Dos)
+                    .external_attributes(0o120_777 << 16);
+                zip.start_file(*n, dos).unwrap();
+                zip.write_all(to.as_bytes()).unwrap();
+            }
             Entry::Mode(n, b, mode) => {
                 let unix = stored
                     .system(zip::System::Unix)
@@ -238,7 +248,8 @@ fn valid_archives_extract_tree_and_picks() {
 /// Regresja klas RUSTSEC-2026-0367/0368/0369 (`zip` < 9: bity SUID/SGID przenoszone z archiwum,
 /// dowiązania wskazujące poza katalog docelowy, prawa nadawane przez dowiązanie). Alfa rozpakowuje
 /// własnym kodem (nie `ZipArchive::extract`): bity specjalne nigdy nie trafiają na dysk, a każde
-/// dowiązanie — także względne, katalogowe i wskazujące do wnętrza — odrzuca całe archiwum.
+/// dowiązanie — także względne, katalogowe, wskazujące do wnętrza i z hostem DOS — odrzuca całe
+/// archiwum.
 #[test]
 fn zip_advisory_classes_stay_closed() {
     let dir = tempfile::tempdir().unwrap();
@@ -265,6 +276,10 @@ fn zip_advisory_classes_stay_closed() {
     }
     let cases: Vec<(&str, Vec<Entry<'_>>)> = vec![
         ("link-up", vec![Entry::Link("engine", "../../poza/engine")]),
+        (
+            "link-dos",
+            vec![Entry::DosLink("engine", "../../poza/engine")],
+        ),
         (
             "link-dir",
             vec![

@@ -228,7 +228,9 @@ fn index_entries(
             path: name.clone(),
             reason,
         })?;
-        if file.is_symlink() || file.is_dir() || file.encrypted() {
+        // zip 9 ignoruje tryb Unix we wpisach z hostem DOS — bity surowe sprawdzamy niezależnie.
+        let raw_link = (file.external_attributes() >> 16) & 0o170_000 == 0o120_000;
+        if raw_link || file.is_symlink() || file.is_dir() || file.encrypted() {
             return Err(TransferError::corrupt(format!(
                 "niedozwolony rodzaj wpisu `{name}`"
             )));

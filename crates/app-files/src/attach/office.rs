@@ -48,7 +48,9 @@ impl Archive {
     /// Wpis jako tekst w ramach wspólnego limitu rozpakowanych bajtów.
     fn read(&mut self, name: &str) -> Option<String> {
         let file = self.zip.by_name(name).ok()?;
-        if file.size() > self.budget {
+        // Dowiązania pomijane (także z hostem DOS, którego trybu Unix zip 9 nie czyta).
+        let raw_link = (file.external_attributes() >> 16) & 0o170_000 == 0o120_000;
+        if raw_link || file.is_symlink() || file.size() > self.budget {
             return None;
         }
         let mut out = String::new();
@@ -357,21 +359,28 @@ mod tests {
         assert_eq!(text("a.docx", &doc).map(|t| t.len()), Some(1024));
     }
 
-    /// Regresja klasy RUSTSEC-2026-0368/0369 (dowiązania w archiwum): wpis-dowiązanie nie jest
-    /// rozwiązywany — dokument czytany jest tylko z pamięci, nigdy z pliku spoza archiwum.
+    /// Wpis-dowiązanie (host Unix i DOS) jest pomijany — także gdy jego treść (cel dowiązania)
+    /// wygląda jak poprawny XML dokumentu.
     #[test]
-    fn symlink_entry_is_never_followed() {
-        let dir = tempfile::tempdir().unwrap();
-        let secret = dir.path().join("tajne.xml");
-        std::fs::write(&secret, "<w:p><w:t>tajne</w:t></w:p>").unwrap();
-        let mut buf = Cursor::new(Vec::new());
-        {
-            let mut zip = zip::ZipWriter::new(&mut buf);
-            let opts = zip::write::SimpleFileOptions::default();
-            zip.add_symlink("word/document.xml", secret.to_string_lossy(), opts)
-                .unwrap();
-            zip.finish().unwrap();
+    fn link_entries_are_skipped() {
+        let target = "<w:p><w:t>tajne</w:t></w:p>";
+        for dos in [false, true] {
+            let mut buf = Cursor::new(Vec::new());
+            {
+                let mut zip = zip::ZipWriter::new(&mut buf);
+                let opts = zip::write::SimpleFileOptions::default();
+                if dos {
+                    let opts = opts
+                        .system(zip::System::Dos)
+                        .external_attributes(0o120_777 << 16);
+                    zip.start_file("word/document.xml", opts).unwrap();
+                    zip.write_all(target.as_bytes()).unwrap();
+                } else {
+                    zip.add_symlink("word/document.xml", target, opts).unwrap();
+                }
+                zip.finish().unwrap();
+            }
+            assert_eq!(text("link.docx", &buf.into_inner()), None, "dos={dos}");
         }
-        assert_eq!(text("link.docx", &buf.into_inner()), None);
     }
 }
