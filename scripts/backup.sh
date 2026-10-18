@@ -12,10 +12,12 @@
 #
 # Celu domyślnego nie ma: 2026-10-18 litera F: na laptopie wskazywała inny, pełny dysk niż na PC.
 # Przed zapisem skrypt sprawdza: dysk celu istnieje (litera dysku, bez ścieżek sieciowych \\serwer),
-# NIE jest tym samym woluminem co projekt (także przez `subst` — porównuje numery seryjne), wypisuje
-# etykietę i wolne miejsce, szacuje rozmiar kopii (`du` kopiowanych katalogów bez target/node_modules/.git
-# + historia git) i odmawia, gdy wolnego miejsca jest mniej niż 2 × szacunek.
-# Kody wyjścia: 0 — gotowe (z --dry-run: sprawdzenia zaliczone), 1 — odmowa po sprawdzeniu, 2 — zły argument.
+# NIE jest tym samym woluminem co projekt (także przez `subst` — porównuje numery seryjne) ani inną partycją
+# tego samego dysku fizycznego (`Get-Partition`), wypisuje etykietę i wolne miejsce, szacuje rozmiar kopii
+# (`du` kopiowanych katalogów bez target/node_modules/.git + historia git) i odmawia, gdy wolnego miejsca
+# jest mniej niż 2 × szacunek.
+# Kody wyjścia: 0 — kopia kompletna (z --dry-run: sprawdzenia zaliczone), 1 — odmowa po sprawdzeniu,
+# 2 — zły argument, 3 — kopia NIEPEŁNA: któryś krok się nie udał (paczka git, robocopy, sumy; lista na końcu).
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$(cd "$ROOT/.." && pwd)"
@@ -72,11 +74,15 @@ human() { # KiB → czytelnie, z przecinkiem dziesiętnym
 }
 # Numer seryjny woluminu (np. 1EB6-F45B); `vol` pokazuje wolumin pod spodem także dla dysku z `subst`.
 vol_serial() { cmd //c "vol $1" 2>/dev/null | tr -d '\r' | grep -oE '[0-9A-F]{4}-[0-9A-F]{4}' | head -1; }
-vol_label() {
-  powershell.exe -NoProfile -NonInteractive -Command \
-    "[Console]::OutputEncoding = [Text.Encoding]::UTF8; [IO.DriveInfo]::new('$1\').VolumeLabel" 2>/dev/null \
-    | tr -d '\r'
+# Jedno wywołanie PowerShell (start trwa sekundy): wiersze `label=` (etykieta celu), `disk=` i `project_disk=`
+# (numery dysków fizycznych celu i projektu; puste dla `subst`, dysków sieciowych i przy błędzie).
+drive_facts() { # <litera celu> <litera projektu>, np. F: E:
+  powershell.exe -NoProfile -NonInteractive -Command "[Console]::OutputEncoding = [Text.Encoding]::UTF8; \
+    function Disk(\$l) { try { (Get-Partition -DriveLetter \$l -ErrorAction Stop).DiskNumber } catch { '' } }; \
+    try { 'label=' + [IO.DriveInfo]::new('$1\').VolumeLabel } catch { 'label=' }; \
+    'disk=' + (Disk '${1:0:1}'); 'project_disk=' + (Disk '${2:0:1}')" 2>/dev/null | tr -d '\r'
 }
+fact() { sed -n "s/^$1=//p" <<<"$FACTS" | head -1; } # <klucz> — wartość z wyniku drive_facts
 
 # --- Sprawdzenia przed zapisem (z --dry-run tylko one) ---
 case "$BASE" in
@@ -100,14 +106,22 @@ PROJECT_SERIAL="$(vol_serial "$PROJECT_DRIVE")"
 if [ -n "$SERIAL" ] && [ "$SERIAL" = "$PROJECT_SERIAL" ]; then
   refuse "$DRIVE to ten sam wolumin co $PROJECT_DRIVE (numer seryjny $SERIAL, np. dysk z subst)"
 fi
+FACTS="$(drive_facts "$DRIVE" "$PROJECT_DRIVE")"
+DISK="$(fact disk)"
+PROJECT_DISK="$(fact project_disk)"
+if [[ "$DISK" =~ ^[0-9]+$ ]] && [ "$DISK" = "$PROJECT_DISK" ]; then
+  refuse "$DRIVE i $PROJECT_DRIVE to partycje tego samego dysku fizycznego (dysk $DISK) —" \
+    "kopia nie przetrwałaby awarii dysku"
+fi
 
 if [ -e "$BASE" ] && [ ! -d "$BASE" ]; then refuse "$TARGET_WIN istnieje i nie jest katalogiem"; fi
 [ -d "$BASE" ] || echo "katalog docelowy nie istnieje — zostanie utworzony"
 
-LABEL="$(vol_label "$DRIVE")"
+LABEL="$(fact label)"
 read -r FREE_KB TOTAL_KB < <(df -Pk "$DRIVE_ROOT" 2>/dev/null | awk 'NR == 2 { print $4, $2 }')
 [[ "${FREE_KB:-}" =~ ^[0-9]+$ ]] || refuse "nie udało się odczytać wolnego miejsca na $DRIVE"
 echo "dysk $DRIVE — etykieta „${LABEL:-(brak)}”, numer seryjny ${SERIAL:-(nieznany)}," \
+  "dysk fizyczny ${DISK:-(nieznany)} (projekt: ${PROJECT_DISK:-(nieznany)})," \
   "wolne $(human "$FREE_KB") z $(human "${TOTAL_KB:-0}")"
 
 SOURCES=()
@@ -134,6 +148,8 @@ if [ "$DRY_RUN" -eq 1 ]; then
 fi
 
 # --- Kopia ---
+FAILED=() # kroki, które się nie udały — kopia jest wtedy niepełna (kod 3)
+fail() { FAILED+=("$1"); echo "$1: BŁĄD${2:+ ($2)}"; } # <krok> [szczegóły]
 STAMP="$(date +%Y-%m-%d_%H%M)"
 mkdir -p "$BASE/kopia-$STAMP" || { echo "nie można utworzyć $BASE/kopia-$STAMP"; exit 1; }
 # Ścieżka bezwzględna: `git -C "$ROOT"` liczyłby względny katalog docelowy od repozytorium,
@@ -147,10 +163,10 @@ if "${GIT[@]}" bundle create "$DST/alfa.bundle" --all >/dev/null 2>"$DST/paczka-
   echo "paczka git: ok"
   rm -f "$DST/paczka-git.log"
 else
-  echo "paczka git: BŁĄD (szczegóły: $DST/paczka-git.log)"
+  fail "paczka git" "szczegóły: $DST/paczka-git.log"
 fi
-"${GIT[@]}" log --oneline -1 >"$DST/ostatni-commit.txt"
-"${GIT[@]}" status --short >"$DST/niezatwierdzone-zmiany.txt"
+"${GIT[@]}" log --oneline -1 >"$DST/ostatni-commit.txt" || fail "ostatni-commit.txt"
+"${GIT[@]}" status --short >"$DST/niezatwierdzone-zmiany.txt" || fail "niezatwierdzone-zmiany.txt"
 
 # 2. Źródła i katalogi projektu (robocopy: kody < 8 = sukces)
 copy_dir() {
@@ -160,16 +176,17 @@ copy_dir() {
   MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' robocopy "$(cygpath -w "$src")" "$(cygpath -w "$DST/$name")" \
     /E /R:1 /W:1 /XD target node_modules .git /NFL /NDL /NJH /NJS /NP >/dev/null
   local code=$?
-  if [ "$code" -lt 8 ]; then echo "$name: ok"; else echo "$name: BŁĄD (robocopy $code)"; fi
+  if [ "$code" -lt 8 ]; then echo "$name: ok"; else fail "$name" "robocopy $code"; fi
 }
 for entry in "${DIRS[@]}"; do copy_dir "${entry%%|*}" "${entry#*|}"; done
 for f in "${FILES[@]}"; do
-  [ -f "$f" ] && cp -f "$f" "$DST/"
+  [ ! -f "$f" ] || cp -f -- "$f" "$DST/" || fail "${f##*/}"
 done
 
 # 3. Sumy i instrukcja odtworzenia
-(cd "$DST" && find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum >SHA256SUMS.txt)
-cat >"$DST/ODTWORZENIE.md" <<EOF
+(cd "$DST" && find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 -r sha256sum >SHA256SUMS.txt) \
+  || fail "SHA256SUMS.txt"
+cat >"$DST/ODTWORZENIE.md" <<EOF || fail "ODTWORZENIE.md"
 # Kopia bezpieczeństwa Alfy — $STAMP
 
 - \`alfa.bundle\` — pełna historia repozytorium (wszystkie gałęzie):
@@ -181,4 +198,8 @@ cat >"$DST/ODTWORZENIE.md" <<EOF
 - \`SHA256SUMS.txt\` — sumy kontrolne: \`sha256sum -c SHA256SUMS.txt\`.
 EOF
 du -sh "$DST" 2>/dev/null | tail -1
+if [ "${#FAILED[@]}" -gt 0 ]; then
+  echo "KOPIA NIEPEŁNA: nie udało się: ${FAILED[*]} — $DST (kod 3)"
+  exit 3
+fi
 echo "gotowe: $DST"

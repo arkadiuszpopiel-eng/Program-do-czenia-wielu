@@ -23,16 +23,21 @@ Plan i historia zmian są osobno: [`../plan/`](../plan/README.md), [`../../CHANG
 
 - Plików w podkatalogach nie edytuj tutaj — przy następnej kopii zastąpi je wersja ze źródła. Edytuj źródło
   i uruchom `bash scripts/memory-sync.sh`.
-- Skrypt dodaje nowe i aktualizuje zmienione pliki, ale **z kopii niczego nie usuwa**. Plik, którego nie ma
-  u źródła (np. zasady zapisane na drugim komputerze albo pusta pamięć asystenta na nowej maszynie), zostaje
+- Skrypt dodaje nowe i aktualizuje zmienione pliki (sama zmiana końców wierszy CRLF/LF nie jest zmianą), ale
+  **plików, których nie ma u źródła, nie usuwa**. Taki plik (np. zasady zapisane na drugim komputerze) zostaje
   tutaj i trafia na listę `OSTRZEŻENIE` z gotowymi poleceniami przywrócenia go do źródła (`mkdir -p …`,
-  `cp -n …`). W katalogu, którego źródło wygląda tak na niepełne, skrypt nie nadpisuje też plików różniących
-  się od źródła (np. spisu `MEMORY.md`) — wypisuje polecenia `diff -u` do porównania. Po przywróceniu
-  (i połączeniu spisu `MEMORY.md`) uruchom skrypt ponownie.
-- `bash scripts/memory-sync.sh --prune` — lustro: usuwa z kopii pliki, których nie ma u źródła, i nadpisuje
-  różniące się. Tylko wtedy, gdy pliki usunięto u źródła celowo (2026-10-17/18 lustro jako zachowanie
-  domyślne skasowało stąd zasady pracy, gdy dysk przeszedł na komputer z pustą pamięcią asystenta).
-- Na nowym komputerze najpierw przywróć zasady z `2-zasady-pracy/` do pamięci asystenta (polecenia z ostrzeżenia),
-  a po kopii sprawdź `git status docs/pamiec-projektu`.
-- Żadnych sekretów: skrypt odmawia kopii, gdy znajdzie coś, co wygląda na klucz.
+  `cp -n …` — niczego u źródła nie nadpisuje). Wyjątek: notatka dziennika `today-RRRR-MM-DD.md`, którą
+  wtyczka zamknęła u źródła jako `today-RRRR-MM-DD.done.md`, znika stąd od razu.
+- `bash scripts/memory-sync.sh --prune` — usuwa z kopii pliki, których nie ma u źródła. Tylko wtedy, gdy
+  usunięto je u źródła celowo (2026-10-17/18 lustro jako zachowanie domyślne skasowało stąd zasady pracy, gdy
+  dysk przeszedł na komputer z pustą pamięcią asystenta).
+- Ochrona przed nowym komputerem: gdy źródło **zasad pracy** wygląda na nowe (nie ma go, nie ma w nim spisu
+  `MEMORY.md` albo brakuje w nim co najmniej połowy plików z `2-zasady-pracy/`), skrypt nie nadpisuje tam
+  plików różniących się od źródła (wypisuje polecenia `diff -u`), `--prune` niczego tam nie usuwa,
+  `OSTATNIA-KOPIA.txt` się nie zmienia, a skrypt kończy się kodem 3 (`WYNIK: KOPIA NIEPEŁNA`). Najpierw
+  przywróć zasady poleceniami z ostrzeżenia, połącz spis `MEMORY.md` i uruchom skrypt ponownie; po kopii
+  sprawdź `git status docs/pamiec-projektu`. Stan projektu i dziennik sesji są aktualizowane zawsze.
+- Żadnych sekretów: plik źródłowy z czymś, co wygląda na klucz, nie trafia do kopii (kod 1, skrypt wskazuje
+  plik u źródła); plik z kluczem, który już jest w kopii, zastępuje czysta wersja ze źródła, a bez niej skrypt
+  podaje polecenie usunięcia go stąd.
 - Test skryptu (piaskownica, niczego tu nie zmienia): `bash scripts/tests/memory-sync.test.sh`.
