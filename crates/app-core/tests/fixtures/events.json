@@ -2932,6 +2932,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },
@@ -2979,6 +2996,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://github.com/snakers4/silero-vad/blob/master/LICENSE",
+        "author": {
+          "pl": "Silero Team (snakers4)",
+          "en": "Silero Team (snakers4)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+        },
+        "confirmed": true,
+        "voices": []
       }
     }
   },
@@ -3040,6 +3074,23 @@
           "en": "Can be wrong; check important information at the source"
         },
         "generative": false
+      },
+      "license_card": {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://opensource.org/license/mit",
+        "author": {
+          "pl": "Microsoft (intfloat)",
+          "en": "Microsoft (intfloat)"
+        },
+        "commercial": "yes",
+        "attribution": true,
+        "notes": {
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
+        },
+        "confirmed": false,
+        "voices": []
       }
     }
   },

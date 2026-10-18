@@ -91,6 +91,9 @@ pub struct ModelItem {
     pub active: bool,
     /// Karta modelu (pochodzenie, przeznaczenie, ograniczenia).
     pub card: Option<ModelCard>,
+    /// Karta licencji silnika, modelu i jego głosów (C5.7).
+    #[serde(default)]
+    pub license_card: Option<super::LicenseCard>,
 }
 
 /// Karta modelu (AI Act art. 50): skąd pochodzi, do czego służy, czego nie umie i czy tworzy

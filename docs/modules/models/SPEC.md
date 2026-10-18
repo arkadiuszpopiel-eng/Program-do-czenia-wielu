@@ -177,3 +177,22 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   (`ALFA_UPDATE_FIXTURES=1`) dla maszyny atrapy (Radeon 780M 4 GB, 32 GB, 8 rdzeni: 6 za słaby, 5 na styk, 4 zalecany);
   stan liczy atrapa ze swoich pozycji. Testy: `tests/bundles.rs` (maszyny referencyjne, warianty silników, stan,
   normy), `tests/bundle_ops.rs` (lokalny serwer HTTP: pobranie, weryfikacja, naprawa, TOFU, pozycje ręczne).
+
+## Karty licencji (C5.7, 0.0.64)
+- **Dane:** `crates/app-models/data/license-cards.json` (identyfikator pozycji → karta), ładowane przez
+  `licenses.rs` i dołączane do `ModelItem::license_card` (pole z `serde(default)` — starsze ładunki bez niego
+  wczytują się jako `null`). Karta: identyfikator licencji (SPDX albo nazwa umowna), pełna nazwa, źródło licencji (adres tekstu albo strony autora),
+  autor, użycie komercyjne (`yes` / `no` / `conditional` / `unknown`), wymóg wskazania autora, uwagi PL/EN,
+  `confirmed` (licencja ma zapis sprawdzenia w dokumentacji projektu — odnośnik „Zapis licencji:” w uwagach) i głosy pozycji (`VoiceLicense`: barwy Supertonic 3 F1–F5 i M1–M5, Gosia z Pipera, mówczynie
+  Pocket TTS). To zapis faktów do pokazania, nie opinia prawna.
+- **Niezmienniki (testy `licenses_tests.rs`):** każda pozycja katalogu ma kartę i żadna karta nie wisi bez pozycji;
+  karta potwierdzona tylko przy potwierdzonej pozycji i z odnośnikiem „Zapis licencji:” / „Licence record:”; karta niepotwierdzona ma w uwagach „Do potwierdzenia przez
+  człowieka” (EN: „To be confirmed by a human”); użycie komercyjne `unknown` nigdy potwierdzone; każdy głos
+  z `voice-tts-contract` (`SUPERTONIC_ALL`, `PIPER_BASE`, `POCKET_BASE`) i każda pobierana barwa Supertonic mają
+  wpis; karty pozycji mówiących opisują znak wodny mowy syntetycznej jako decyzję właściciela w toku.
+- **Sprawy otwarte zapisane w kartach:** DirectML (dane diagnostyczne, §2a), biblioteki NVIDIA CUDA, espeak-ng
+  (GPL-3.0) w archiwum Pipera, licencja nagrań głosu Gosia, modele cech openWakeWord (CC BY-NC-SA według README),
+  VoxCeleb (WeSpeaker), pochodzenie „Pocket TTS PL” (C5.1), model bazowy Bielika 4.5B (Qwen2.5-3B), build ffmpeg,
+  zakaz porad medycznych w OpenRAIL-M (Supertonic 3) — decyzje człowieka.
+- **UI:** rozwijana „Karta licencji” w wierszu pozycji (`LicenseCardInfo.svelte`, przycisk z `aria-expanded`),
+  atrapa `fake/license-seeds.ts`, e2e `e2e/license-cards.spec.ts`.

@@ -61,6 +61,45 @@ export interface ModelItem {
   readonly active: boolean;
   /** Karta modelu (pochodzenie, przeznaczenie, ograniczenia). */
   readonly card: ModelCard | null;
+  /** Karta licencji silnika, modelu i jego głosów (C5.7). */
+  readonly license_card: LicenseCard | null;
+}
+
+/** Czy licencja pozwala na użycie komercyjne (`unknown` — do potwierdzenia przez człowieka). */
+export type CommercialUse = 'yes' | 'no' | 'conditional' | 'unknown';
+
+/** Głos (barwa modelu mowy) z jego warunkami. */
+export interface VoiceLicense {
+  /** Identyfikator głosu w silniku (np. `F1`, `pl_PL-gosia-medium`). */
+  readonly id: string;
+  readonly name: LocalizedText;
+  /** Licencja głosu (zwykle ta sama co wag modelu). */
+  readonly license: string;
+  /** Skąd pochodzi głos (barwa wbudowana, nagrania wzorcowe). */
+  readonly origin: LocalizedText;
+  readonly commercial: CommercialUse;
+  readonly notes: LocalizedText;
+}
+
+/** Karta licencji pozycji katalogu (zapis faktów, nie opinia prawna). */
+export interface LicenseCard {
+  /** Identyfikator licencji (SPDX, gdy istnieje; inaczej nazwa umowna, np. `OpenRAIL-M`). */
+  readonly id: string;
+  /** Pełna nazwa licencji (albo kilku — silnik i dołączone biblioteki). */
+  readonly name: string;
+  /** Źródło licencji: adres jej tekstu albo strony, na której autor ją podaje. */
+  readonly url: string;
+  /** Autor albo właściciel praw i źródło. */
+  readonly author: LocalizedText;
+  readonly commercial: CommercialUse;
+  /** Licencja wymaga wskazania autora albo dołączenia jej tekstu przy rozpowszechnianiu. */
+  readonly attribution: boolean;
+  /** Warunki, ograniczenia użycia i sprawy otwarte (także znak wodny mowy syntetycznej). */
+  readonly notes: LocalizedText;
+  /** Licencja ma zapis sprawdzenia w dokumentacji projektu („Zapis licencji:” w uwagach); inaczej — „do potwierdzenia przez człowieka”. */
+  readonly confirmed: boolean;
+  /** Głosy w tej pozycji (pusto — pozycja nie mówi albo nie ma osobnych głosów). */
+  readonly voices: readonly VoiceLicense[];
 }
 
 /** Karta modelu (AI Act art. 50). */

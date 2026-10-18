@@ -2,13 +2,14 @@
   Pozycja katalogu „Modele lokalne i silniki": nazwa, rodzaj, rozmiar, licencja, stan (aria-live), uwagi
   („do potwierdzenia przez człowieka”, SHA-256 przypięty, instalacja ręczna), postęp pobierania,
   akcje (pobierz / wznów / przerwij / sprawdź / napraw / usuń / używaj do wyszukiwania) i karta zgody TOFU
-  z policzonym SHA-256 każdego pliku bez przypiętej sumy.
+  z policzonym SHA-256 każdego pliku bez przypiętej sumy; rozwijane karty modelu i licencji (C2.9, C5.7).
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
   import type { ModelItem } from '../../../api/types-models';
   import { cardFit, groupedHash, itemActions, progressPercent } from '../../../logic/models';
   import { useApp } from '../../../state/context';
+  import LicenseCardInfo from './LicenseCardInfo.svelte';
   import ModelCardInfo from './ModelCardInfo.svelte';
 
   interface Props {
@@ -80,6 +81,9 @@
   </ul>
   <p class="note">{app.i18n.text(item.note)}</p>
   {#if item.card}<ModelCardInfo card={item.card} license={item.license} source={item.source} />{/if}
+  {#if item.license_card}
+    <LicenseCardInfo card={item.license_card} itemId={item.id} itemName={item.name} />
+  {/if}
   <p
     role="status"
     aria-live="polite"

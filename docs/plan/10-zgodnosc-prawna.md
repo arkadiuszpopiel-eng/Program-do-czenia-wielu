@@ -25,6 +25,7 @@ obowiązków jej nie dotyczy — ale projektujemy tak, żeby wydanie nie wymaga�
 | Informacja „rozmawiasz z AI” przy pierwszym uruchomieniu i stale w interfejsie                                           | C2.9  | zrobione (seria 1, punkt 3) |
 | Etykieta „wygenerowane przez AI” w eksporcie rozmów (MD, HTML), plikach dźwiękowych i obrazach — czytelna i w metadanych | C2.9  | rozmowy: zrobione (seria 1, punkt 3); dźwięku ani obrazów program jeszcze nie zapisuje do plików |
 | Karty modeli w programie: pochodzenie, licencja, przeznaczenie                                                           | C2.9  | zrobione (seria 1, punkt 4): katalog lokalny, `app-models/data/model-cards.json` |
+| Karty licencji silników i głosów: licencja, autor, użycie komercyjne, wskazanie autora, sprawy otwarte                   | C5.7  | zrobione (seria 5, 0.0.64): `app-models/data/license-cards.json`; znak wodny mowy — decyzja właściciela |
 | SBOM dla każdego wydania (Rust + npm)                                                                                    | C2.10 | zrobione (seria 2, punkt 1): `scripts/sbom.mjs`, etap `sbom` w bramce wersji |
 | Polityka zgłaszania podatności, kontakt bezpieczeństwa, plik `SECURITY.md`                                               | C2.10 | w toku: `SECURITY.md` gotowy, kontakt czeka na właściciela |
 | Procedura zgłoszeń z art. 14 CRA (kto, w jakim czasie, jakim kanałem)                                                    | C2.10 | planowane                                 |

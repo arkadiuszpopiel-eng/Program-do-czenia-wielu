@@ -31,7 +31,7 @@ import type * as H22 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 337 typów wspólnych, 655 sprawdzeń. */
+/** 340 typów wspólnych, 661 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H20.AboutInfo>>,
   Expect<Fits<H20.AboutInfo, G.AboutInfo>>,
@@ -157,6 +157,8 @@ export type IpcCompat = [
   Expect<Fits<H6.CheckRun, G.CheckRun>>,
   Expect<Fits<G.CollisionResolution, H9.CollisionResolution>>,
   Expect<Fits<H9.CollisionResolution, G.CollisionResolution>>,
+  Expect<Fits<G.CommercialUse, H12.CommercialUse>>,
+  Expect<Fits<H12.CommercialUse, G.CommercialUse>>,
   Expect<Fits<G.ComplianceStatus, H9.ComplianceStatus>>,
   Expect<Fits<H9.ComplianceStatus, G.ComplianceStatus>>,
   Expect<Fits<G.ConsolidationReport, H11.ConsolidationReport>>,
@@ -300,6 +302,8 @@ export type IpcCompat = [
   Expect<Fits<H9.ItemDiff, G.ItemDiff>>,
   Expect<Fits<G.LayoutPrefs, H17.LayoutPrefs>>,
   Expect<Fits<H17.LayoutPrefs, G.LayoutPrefs>>,
+  Expect<Fits<G.LicenseCard, H12.LicenseCard>>,
+  Expect<Fits<H12.LicenseCard, G.LicenseCard>>,
   Expect<Fits<G.LicenseEntry, H20.LicenseEntry>>,
   Expect<Fits<H20.LicenseEntry, G.LicenseEntry>>,
   Expect<Fits<G.LicenseSource, H20.LicenseSource>>,
@@ -662,6 +666,8 @@ export type IpcCompat = [
   Expect<Fits<H21.VoiceEnginesView, G.VoiceEnginesView>>,
   Expect<Fits<G.VoiceFeatures, H21.VoiceFeatures>>,
   Expect<Fits<H21.VoiceFeatures, G.VoiceFeatures>>,
+  Expect<Fits<G.VoiceLicense, H12.VoiceLicense>>,
+  Expect<Fits<H12.VoiceLicense, G.VoiceLicense>>,
   Expect<Fits<G.VoiceMode, H2.VoiceMode>>,
   Expect<Fits<H2.VoiceMode, G.VoiceMode>>,
   Expect<Fits<H17.VoicePillState, G.VoicePillState>>,

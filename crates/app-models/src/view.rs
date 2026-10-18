@@ -124,5 +124,6 @@ pub fn item(spec: &ItemSpec, store: &Store, live: &Live, active: bool) -> ModelI
         error: live.error.clone(),
         active,
         card: crate::cards::card(&spec.id),
+        license_card: crate::licenses::card(&spec.id),
     }
 }

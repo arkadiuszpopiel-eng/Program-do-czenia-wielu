@@ -31,6 +31,7 @@ fn model_item(s: &ItemSpec) -> ModelItem {
         error: None,
         active: false,
         card: None,
+        license_card: None,
     }
 }
 
