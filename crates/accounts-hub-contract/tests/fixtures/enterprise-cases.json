@@ -1,0 +1,31 @@
+{
+  "_opis": "Wspólna tabela przypadków ustawień konta firmowego (C2.12): sprawdza ją rdzeń (tests/enterprise.rs, EnterpriseSettings::checked) i interfejs (logic/__tests__/enterprise.test.ts, checkEnterprise). `problem` = kod odmowy interfejsu; `expected` = ustawienia po oczyszczeniu.",
+  "cases": [
+    { "provider": "openai", "base_url": null, "settings": { "organization": " org-Acme1 ", "project": "proj_X1" }, "problem": null, "expected": { "organization": "org-Acme1", "project": "proj_X1" } },
+    { "provider": "openai", "base_url": null, "settings": { "organization": "  ", "project": "" }, "problem": null, "expected": {} },
+    { "provider": "openai", "base_url": null, "settings": { "project": "proj-legacy9" }, "problem": null, "expected": { "project": "proj-legacy9" } },
+    { "provider": "openai", "base_url": null, "settings": { "organization": "acme" }, "problem": "org_format" },
+    { "provider": "openai", "base_url": null, "settings": { "organization": "org-ab cd" }, "problem": "org_format" },
+    { "provider": "openai", "base_url": null, "settings": { "project": "proj" }, "problem": "project_format" },
+    { "provider": "xai", "base_url": null, "settings": { "organization": "org-a1" }, "problem": "org_only_openai" },
+    { "provider": "openai", "base_url": null, "settings": { "deployments": [{ "name": "x" }] }, "problem": "azure_only" },
+    { "provider": "custom-openai-compatible", "base_url": "https://llm.example", "settings": { "api_version": "2024-10-21" }, "problem": "azure_only" },
+    { "provider": "anthropic", "base_url": null, "settings": {}, "problem": null, "expected": {} },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "deployments": [{ "name": " prod-4o ", "model": " gpt-4o " }, { "name": "emb", "model": "" }] }, "problem": null, "expected": { "api_version": "2024-10-21", "deployments": [{ "name": "emb" }, { "name": "prod-4o", "model": "gpt-4o" }] } },
+    { "provider": "azure-openai", "base_url": "https://Contoso-AI.openai.azure.com/", "settings": { "api_version": "2025-04-01-preview", "deployments": [{ "name": "o3" }] }, "problem": null, "expected": { "api_version": "2025-04-01-preview", "deployments": [{ "name": "o3" }] } },
+    { "provider": "azure-openai", "base_url": "https://foundry.cognitiveservices.azure.com", "settings": { "deployments": [{ "name": "gpt-4.1" }] }, "problem": null, "expected": { "api_version": "2024-10-21", "deployments": [{ "name": "gpt-4.1" }] } },
+    { "provider": "azure-openai", "base_url": "http://127.0.0.1:8080", "settings": { "deployments": [{ "name": "x" }] }, "problem": null, "expected": { "api_version": "2024-10-21", "deployments": [{ "name": "x" }] } },
+    { "provider": "azure-openai", "base_url": "https://api.openai.com/v1", "settings": { "deployments": [{ "name": "x" }] }, "problem": "endpoint" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com/openai/deployments/x", "settings": { "deployments": [{ "name": "x" }] }, "problem": "endpoint" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com.evil.example", "settings": { "deployments": [{ "name": "x" }] }, "problem": "endpoint" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com:8443", "settings": { "deployments": [{ "name": "x" }] }, "problem": "endpoint" },
+    { "provider": "azure-openai", "base_url": null, "settings": { "deployments": [{ "name": "x" }] }, "problem": "endpoint" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "api_version": "v1", "deployments": [{ "name": "x" }] }, "problem": "api_version" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": {}, "problem": "no_deployments" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "deployments": [{ "name": "a/b" }] }, "problem": "deployment_name" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "deployments": [{ "name": ".x" }] }, "problem": "deployment_name" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "deployments": [{ "name": "x", "model": "gpt 4o" }] }, "problem": "model_name" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "deployments": [{ "name": "a", "model": "gpt-4o" }, { "name": "gpt-4o" }] }, "problem": "duplicate" },
+    { "provider": "azure-openai", "base_url": "https://contoso.openai.azure.com", "settings": { "organization": "org-x1", "deployments": [{ "name": "x" }] }, "problem": "org_only_openai" }
+  ]
+}

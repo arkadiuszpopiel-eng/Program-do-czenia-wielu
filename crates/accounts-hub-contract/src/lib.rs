@@ -10,6 +10,7 @@
 mod account;
 mod api;
 mod catalog;
+mod enterprise;
 mod ids;
 mod model_use;
 mod probe;
@@ -33,6 +34,11 @@ pub use api::{
 pub use catalog::{
     AuthKind, CATALOG_PLACEHOLDER, Capabilities, CatalogError, Compat, ModelInfo, ModelPrice,
     PriceTable, ProviderCatalogEntry, ProviderKind, Tribool, is_env_var_name, validate_base_url,
+};
+pub use enterprise::{
+    AZURE_DEFAULT_API_VERSION, AZURE_HOST_SUFFIXES, AZURE_OPENAI, AzureDeployment,
+    EnterpriseSettings, MAX_DEPLOYMENTS, OPENAI, is_azure_api_version, is_deployment_name,
+    is_openai_organization, is_openai_project, mask_id, validate_azure_endpoint,
 };
 pub use ids::{AccountId, ModelId, ProviderId, SecretName};
 pub use model_use::{ModelUse, best_chat_model, chat_rank, is_snapshot, model_use};

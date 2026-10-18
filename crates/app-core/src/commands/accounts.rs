@@ -183,6 +183,7 @@ pub fn account_dto(a: &CoreAccount) -> Account {
             .collect(),
         auto_model: accounts_hub_contract::best_chat_model(a.models.iter().map(|m| m.id.as_str()))
             .map(str::to_owned),
+        enterprise: a.enterprise.clone(),
     }
 }
 
@@ -284,10 +285,8 @@ impl AppCore {
                 provider,
                 label,
                 secret,
-                base_url: input
-                    .base_url
-                    .map(|u| u.trim().to_owned())
-                    .filter(|u| !u.is_empty()),
+                base_url: base.map(str::to_owned),
+                enterprise: input.enterprise,
                 assignments: Assignments {
                     task_classes: [TaskClass::Conversation].into(),
                     ..Assignments::default()

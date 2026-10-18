@@ -30,15 +30,18 @@ struct State {
 pub struct FakeAccountsHub {
     state: Mutex<State>,
     pub(crate) secrets: Arc<MemorySecretStore>,
-    tester: Arc<ScriptedConnectionTester>,
-    lister: Arc<ScriptedModelLister>,
+    pub(crate) tester: Arc<ScriptedConnectionTester>,
+    pub(crate) lister: Arc<ScriptedModelLister>,
 }
 
 fn invalid(msg: &str) -> AccountsError {
     AccountsError::InvalidInput(msg.to_owned())
 }
 
-fn redact(mut report: ConnectionReport, secret: Option<&SecretString>) -> ConnectionReport {
+pub(crate) fn redact(
+    mut report: ConnectionReport,
+    secret: Option<&SecretString>,
+) -> ConnectionReport {
     if let (TestOutcome::Network { message }, Some(s)) = (&mut report.outcome, secret) {
         *message = s.redact_in(message);
     }
@@ -125,27 +128,6 @@ impl FakeAccountsHub {
     pub(crate) fn put(&self, acc: Account) {
         self.lock().accounts.insert(acc.id.clone(), acc);
     }
-
-    pub(crate) async fn test_and_list(
-        &self,
-        entry: &ProviderCatalogEntry,
-        base_url: Option<&str>,
-        secret: Option<&SecretString>,
-    ) -> (ConnectionReport, Option<Vec<ModelInfo>>) {
-        let req = ConnectionRequest {
-            provider: entry,
-            base_url,
-            secret,
-        };
-        let report = redact(self.tester.test(req).await, secret);
-        let models = if report.outcome.may_list_models() {
-            let found = self.lister.list_models(req).await.ok();
-            found.filter(|found| !found.is_empty())
-        } else {
-            None
-        };
-        (report, models)
-    }
 }
 
 #[async_trait]
@@ -206,6 +188,9 @@ impl AccountsHub for FakeAccountsHub {
             (None, None) => return Err(invalid("brak endpointu")),
             (None, Some(_)) => {}
         }
+        let base_url = new.base_url.as_deref().or(entry.base_url.as_deref());
+        let enterprise = (new.enterprise.clone().checked(entry.id.as_str(), base_url))
+            .map_err(AccountsError::InvalidInput)?;
         let (id, now) = {
             let mut st = self.lock();
             st.next_id += 1;
@@ -232,6 +217,7 @@ impl AccountsHub for FakeAccountsHub {
             source: new.source,
             models: Vec::new(),
             queues: Default::default(),
+            enterprise,
         });
         Ok(id)
     }
@@ -376,6 +362,7 @@ impl AccountsHub for FakeAccountsHub {
             provider: &entry,
             base_url: wizard.base_url(),
             secret: secret.as_ref(),
+            enterprise: wizard.enterprise(),
         };
         let report = redact(self.tester.test(req).await, secret.as_ref());
         Ok(wizard.record_test(report)?)
@@ -395,6 +382,7 @@ impl AccountsHub for FakeAccountsHub {
             provider: &entry,
             base_url: wizard.base_url(),
             secret: secret.as_ref(),
+            enterprise: wizard.enterprise(),
         };
         let result: Result<Vec<ModelInfo>, ModelListError> = self.lister.list_models(req).await;
         Ok(wizard.record_models(result)?)

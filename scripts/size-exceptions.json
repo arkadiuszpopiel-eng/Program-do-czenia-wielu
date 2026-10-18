@@ -26,7 +26,7 @@
       "reason": "słownik tłumaczeń (dane)"
     },
     "crates/accounts-hub-fake/src/hub.rs": {
-      "max": 419,
+      "max": 407,
       "reason": "atrapa huba kont"
     },
     "crates/app-core/tests/dto_roundtrip.rs": {
@@ -34,7 +34,7 @@
       "reason": "test — tabela wszystkich komend"
     },
     "crates/providers-local-impl/tests/lifecycle.rs": {
-      "max": 404,
+      "max": 407,
       "reason": "test cyklu życia silnika"
     },
     "crates/router-impl/tests/decisions.rs": {

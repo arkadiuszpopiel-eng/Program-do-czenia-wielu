@@ -45,6 +45,7 @@ fn acme(label: &str) -> NewAccount {
         assignments: Assignments::default(),
         cost_limit: None,
         source: AccountSource::Manual,
+        enterprise: Default::default(),
     }
 }
 

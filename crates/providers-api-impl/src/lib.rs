@@ -5,7 +5,9 @@
 //!   429 `retry-after`, 529 overloaded) oraz „endpoint zgodny z Anthropic";
 //! - [`OpenAiProvider`] — Chat Completions i Responses API oraz „endpoint zgodny z OpenAI"
 //!   (xAI, DeepSeek, Kimi, Qwen, Z.ai, MiniMax, OpenRouter, Mistral, Ollama, LM Studio…);
-//! - [`build_provider`] — adapter generyczny z wpisu `providers-catalog/<id>.toml` + konta;
+//! - [`AzureOpenAiProvider`] — Azure OpenAI (zasób firmy, wdrożenia, `api-key`, `api-version`);
+//! - [`build_provider`] — adapter generyczny z wpisu `providers-catalog/<id>.toml` + konta
+//!   (także nagłówki konta firmowego OpenAI: `OpenAI-Organization`, `OpenAI-Project`);
 //! - wspólny silnik (`lib-openai-compat`, dzielony z `providers-local-impl`): ponawianie z backoffem i jitterem **tylko przed pierwszym tokenem**
 //!   i tylko dla odrzuceń idempotentnych, limity czasu connect/first-token/idle, anulowanie
 //!   zrywające połączenie ≤ 100 ms, koszt z tabeli cen konfiguracji, Models API;
@@ -31,6 +33,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 pub mod anthropic;
+pub mod azure;
 mod catalog;
 mod module;
 mod observe;
@@ -41,9 +44,10 @@ mod registry;
 pub use lib_openai_compat::sse;
 
 pub use anthropic::{AnthropicOptions, AnthropicProvider, PrefixMismatch};
+pub use azure::{AZURE_API_VERSION, AzureOpenAiProvider, AzureOptions};
 pub use catalog::{
-    AccountProfile, CatalogAuth, CatalogCapabilities, CatalogCompat, CatalogEntry, CatalogKind,
-    Tribool, build_provider,
+    AZURE_OPENAI, AccountProfile, CatalogAuth, CatalogCapabilities, CatalogCompat, CatalogEntry,
+    CatalogKind, Tribool, build_provider,
 };
 pub use lib_openai_compat::{
     AuthScheme, ConfigError, HttpConfig, ProviderProfile, RetryPolicy, Timeouts,

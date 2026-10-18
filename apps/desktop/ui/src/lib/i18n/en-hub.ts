@@ -168,4 +168,45 @@ export const enHub = {
     one: '{n} variable is not set:',
     other: '{n} variables are not set:',
   },
+  'ent.openaiTitle': 'Company account (optional)',
+  'ent.openaiToggle': 'The key belongs to an OpenAI organization or project',
+  'ent.organization': 'Organization ID',
+  'ent.organizationHint':
+    'Starts with “org-”. You will find it in the organization settings on platform.openai.com. Empty — the key’s default organization.',
+  'ent.project': 'Project ID',
+  'ent.projectHint':
+    'Starts with “proj_”. Costs and rate limits go to this project. Empty — the key’s default project.',
+  'ent.azureTitle': 'Azure OpenAI resource',
+  'ent.azureWhere':
+    'The resource address and key are in the Azure portal: resource → Keys and Endpoint. Deployment names — in Azure AI Foundry → Deployments.',
+  'ent.azureUrl': 'Azure OpenAI resource address',
+  'ent.azureUrlHint':
+    'For example https://company.openai.azure.com — the resource address only, no further path. The key is sent only to this address.',
+  'ent.target':
+    'A deployment address was pasted. Alfa needs the resource address and the deployment name separately.',
+  'ent.targetUse': 'Split automatically',
+  'ent.apiVersion': 'API version',
+  'ent.apiVersionHint': 'Empty — {version}.',
+  'ent.deployments': 'Model deployments',
+  'ent.deploymentsHint':
+    'The deployment name and the model it serves. Alfa picks the model and calls its deployment. Without a model — the model is named like the deployment.',
+  'ent.deploymentName': 'Deployment name',
+  'ent.deploymentModel': 'Model (e.g. gpt-4o)',
+  'ent.deploymentAdd': 'Add deployment',
+  'ent.deploymentRemove': 'Remove deployment {name}',
+  'ent.summary': 'Company account: {summary}',
+  'ent.err.org_only_openai': 'Organization and project apply to OpenAI accounts only.',
+  'ent.err.org_format': 'The organization ID starts with “org-” (entered {subject}).',
+  'ent.err.project_format': 'The project ID starts with “proj_” (entered {subject}).',
+  'ent.err.azure_only': 'Deployments and API version apply to Azure OpenAI accounts only.',
+  'ent.err.endpoint':
+    'The resource address looks like https://<resource>.openai.azure.com, with no further path.',
+  'ent.err.api_version': 'The API version looks like YYYY-MM-DD, e.g. {version}.',
+  'ent.err.no_deployments': 'Enter at least one model deployment.',
+  'ent.err.too_many': 'At most {subject} deployments in one account.',
+  'ent.err.deployment_name':
+    'Deployment name “{subject}” may contain only letters, digits, “-”, “_” and “.”.',
+  'ent.err.model_name':
+    'The model of deployment “{subject}” may contain only letters, digits, “-”, “_”, “.” and “:”.',
+  'ent.err.duplicate': 'Model {subject} has two deployments — keep one.',
 } as const;

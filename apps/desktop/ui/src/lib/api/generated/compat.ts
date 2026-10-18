@@ -31,7 +31,7 @@ import type * as H22 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 337 typów wspólnych, 655 sprawdzeń. */
+/** 339 typów wspólnych, 659 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H20.AboutInfo>>,
   Expect<Fits<H20.AboutInfo, G.AboutInfo>>,
@@ -77,6 +77,8 @@ export type IpcCompat = [
   Expect<Fits<H9.AudioDevice, G.AudioDevice>>,
   Expect<Fits<G.AutonomyLevel, H0.AutonomyLevel>>,
   Expect<Fits<H0.AutonomyLevel, G.AutonomyLevel>>,
+  Expect<Fits<G.AzureDeployment, H9.AzureDeployment>>,
+  Expect<Fits<H9.AzureDeployment, G.AzureDeployment>>,
   Expect<Fits<G.BackupCheck, H7.BackupCheck>>,
   Expect<Fits<H7.BackupCheck, G.BackupCheck>>,
   Expect<Fits<G.BackupConfig, H7.BackupConfig>>,
@@ -206,6 +208,8 @@ export type IpcCompat = [
   Expect<Fits<H21.EnginesAction, G.EnginesAction>>,
   Expect<Fits<G.EnrollSampleView, H21.EnrollSampleView>>,
   Expect<Fits<H21.EnrollSampleView, G.EnrollSampleView>>,
+  Expect<Fits<G.EnterpriseSettings, H9.EnterpriseSettings>>,
+  Expect<Fits<H9.EnterpriseSettings, G.EnterpriseSettings>>,
   Expect<Fits<G.EnvImportResult, H9.EnvImportResult>>,
   Expect<Fits<H9.EnvImportResult, G.EnvImportResult>>,
   Expect<Fits<G.EvalSuiteView, H22.EvalSuiteView>>,

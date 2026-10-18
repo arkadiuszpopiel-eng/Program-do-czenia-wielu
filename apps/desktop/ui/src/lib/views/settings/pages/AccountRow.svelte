@@ -15,6 +15,7 @@
     rotateStores,
     verdictOf,
   } from '../../../logic/api-key';
+  import { enterpriseSummary } from '../../../logic/enterprise';
   import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import WizardKeyStep from './WizardKeyStep.svelte';
@@ -61,6 +62,8 @@
   const disabled = $derived(account.state === 'disabled');
   /** Wiek klucza w dniach i przypomnienie o wymianie (ustawienie `accounts.key_max_age_days`). */
   const keyAge = $derived(keyAgeDays(account.key_saved_at, Date.now()));
+  /** Konto firmowe: organizacja i projekt (skrócone) albo wdrożenia Azure. */
+  const company = $derived(enterpriseSummary(account.enterprise));
   const keyOld = $derived(keyRotationDue(keyAge, app.num('accounts.key_max_age_days', 180)));
   const busy = $derived(testing || account.state === 'testing');
   /** Konto bez klucza w magazynie: ostatni test niczego już nie opisuje. */
@@ -167,6 +170,9 @@
           })}{/if}
         {#if keyAge !== null && !keyOld}· {t('hub.keyAge', { n: keyAge })}{/if}
       </span>
+      {#if company}
+        <span class="meta">{t('ent.summary', { summary: company })}</span>
+      {/if}
       {#if keyOld && keyAge !== null}
         <span class="meta old">{t('hub.keyOld', { n: keyAge })}</span>
       {/if}

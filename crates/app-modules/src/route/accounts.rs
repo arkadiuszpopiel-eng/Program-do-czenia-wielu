@@ -10,7 +10,7 @@ use accounts_hub_contract::{
     Account, AccountsHub, ProviderCatalogEntry, ProviderKind, best_chat_model, model_use,
 };
 use accounts_hub_impl::AccountsHubService;
-use providers_api_impl::{AccountProfile, CatalogEntry, build_provider};
+use providers_api_impl::{CatalogEntry, build_provider};
 use providers_contract::{ModelKind, ModelProvider, ProviderId};
 use router_contract::{Candidate, RouteKind, TaskClass};
 use router_impl::{GlobalQueues, ProviderQueues, RouterCore};
@@ -233,8 +233,9 @@ impl AccountRoutes {
     fn build(&self, account: &Account, model: Option<String>) -> Option<Arc<dyn ModelProvider>> {
         let entry = self.catalog.get(account.provider.as_str())?;
         let hub: Arc<dyn AccountsHub> = self.hub.clone();
-        let mut profile = AccountProfile::new(Arc::new(HubKeySource::new(hub, account.id.clone())));
-        profile.base_url.clone_from(&account.base_url);
+        let key = Arc::new(HubKeySource::new(hub, account.id.clone()));
+        let base_url = account.base_url.as_deref();
+        let mut profile = crate::probe::account_profile(key, base_url, &account.enterprise);
         profile.default_model = model;
         match build_provider(entry, profile) {
             Ok(p) => Some(p),
@@ -311,13 +312,16 @@ impl AccountRoutes {
         let fingerprint: Vec<String> = chosen
             .values()
             .map(|a| {
+                // Ustawienia firmowe w całości (nie `Debug`, który je skraca): zmiana wdrożeń albo
+                // projektu przebudowuje adapter bez restartu.
                 format!(
-                    "{}|{}|{:?}|{:?}|{:?}",
+                    "{}|{}|{:?}|{:?}|{:?}|{}",
                     a.provider,
                     a.id,
                     a.base_url,
                     self.model_of(a),
-                    a.queues
+                    a.queues,
+                    serde_json::to_string(&a.enterprise).unwrap_or_default()
                 )
             })
             .chain(std::iter::once(format!("{shared:?}")))

@@ -3,17 +3,41 @@
 //! nowy dopiero po udanym teście, a włączenie przywraca stan z ostatniego testu.
 
 use accounts_hub_contract::{
-    Account, AccountId, AccountState, AccountsError, AuthKind, ModelId, ModelInfo, ProviderId,
-    SecretStore, SecretString, TestSummary,
+    Account, AccountId, AccountState, AccountsError, AuthKind, ConnectionReport, ConnectionRequest,
+    ConnectionTester, EnterpriseSettings, ModelId, ModelInfo, ModelLister, ProviderCatalogEntry,
+    ProviderId, SecretStore, SecretString, TestSummary,
 };
 
-use crate::hub::FakeAccountsHub;
+use crate::hub::{FakeAccountsHub, redact};
 
 fn invalid(message: &str) -> AccountsError {
     AccountsError::InvalidInput(message.to_owned())
 }
 
 impl FakeAccountsHub {
+    async fn test_and_list(
+        &self,
+        entry: &ProviderCatalogEntry,
+        base_url: Option<&str>,
+        secret: Option<&SecretString>,
+        enterprise: &EnterpriseSettings,
+    ) -> (ConnectionReport, Option<Vec<ModelInfo>>) {
+        let req = ConnectionRequest {
+            provider: entry,
+            base_url,
+            secret,
+            enterprise,
+        };
+        let report = redact(self.tester.test(req).await, secret);
+        let models = if report.outcome.may_list_models() {
+            let found = self.lister.list_models(req).await.ok();
+            found.filter(|found| !found.is_empty())
+        } else {
+            None
+        };
+        (report, models)
+    }
+
     async fn probe(
         &self,
         acc: &Account,
@@ -21,7 +45,9 @@ impl FakeAccountsHub {
     ) -> Result<(TestSummary, Option<Vec<ModelInfo>>), AccountsError> {
         let entry = self.entry(&acc.provider)?;
         let base = acc.base_url.clone().or_else(|| entry.base_url.clone());
-        let (report, models) = self.test_and_list(&entry, base.as_deref(), secret).await;
+        let (report, models) = self
+            .test_and_list(&entry, base.as_deref(), secret, &acc.enterprise)
+            .await;
         let summary = TestSummary {
             at: self.now(),
             outcome: report.outcome,

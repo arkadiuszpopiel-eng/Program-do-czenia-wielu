@@ -29,4 +29,6 @@ Zasady:
 - Walidacja lokalna: `python3 -c "import tomllib,glob;[tomllib.load(open(f,'rb')) for f in glob.glob('providers-catalog/*.toml')]"`.
 
 ## Wpisy
-anthropic, openai, google, xai, deepseek, kimi, qwen, zai, minimax, openrouter, mistral, elevenlabs, cartesia, azure-speech, soniox, custom-openai-compatible, custom-anthropic-compatible.
+anthropic, openai, azure-openai, google, xai, deepseek, kimi, qwen, zai, minimax, openrouter, mistral, elevenlabs, cartesia, azure-speech, soniox, custom-openai-compatible, custom-anthropic-compatible.
+
+Konta firmowe (C2.12): konto `openai` może mieć identyfikator organizacji i projektu (nagłówki `OpenAI-Organization`, `OpenAI-Project`), a konto `azure-openai` — adres zasobu, wersję API i wdrożenia modeli. To ustawienia konta (`Account.enterprise`), nie katalogu.

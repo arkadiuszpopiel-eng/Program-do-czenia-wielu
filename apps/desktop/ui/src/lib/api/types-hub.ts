@@ -78,6 +78,28 @@ export interface Account {
   readonly queues?: Readonly<Record<string, readonly string[]>>;
   /** Model, którego Alfa użyje do rozmowy bez kolejki. */
   readonly auto_model?: string | null;
+  /** Konto firmowe: organizacja i projekt OpenAI albo wersja API i wdrożenia Azure OpenAI. */
+  readonly enterprise?: EnterpriseSettings;
+}
+
+/** Wdrożenie modelu w zasobie Azure OpenAI: Alfa wybiera model, żądanie idzie na wdrożenie. */
+export interface AzureDeployment {
+  /** Nazwa wdrożenia w zasobie (część adresu `/openai/deployments/{name}/…`). */
+  readonly name: string;
+  /** Model udostępniany przez wdrożenie (np. `gpt-4o`); brak — model nazywa się jak wdrożenie. */
+  readonly model?: string | null;
+}
+
+/** Konto firmowe (C2.12). Nie są to sekrety — klucz zostaje w Menedżerze poświadczeń. */
+export interface EnterpriseSettings {
+  /** OpenAI: identyfikator organizacji (`org-…`) — nagłówek `OpenAI-Organization`. */
+  readonly organization?: string | null;
+  /** OpenAI: identyfikator projektu (`proj_…`) — nagłówek `OpenAI-Project`. */
+  readonly project?: string | null;
+  /** Azure OpenAI: wersja API (`api-version`, np. `2024-10-21`). */
+  readonly api_version?: string | null;
+  /** Azure OpenAI: wdrożenia modeli w zasobie. */
+  readonly deployments?: readonly AzureDeployment[];
 }
 
 /** Ostatni test konta w skrócie (te same pola co w `TestReport`, bez listy modeli). */
@@ -97,6 +119,8 @@ export interface AddAccountInput {
   readonly label: string;
   readonly secret: string;
   readonly base_url: string | null;
+  /** Konto firmowe (OpenAI: organizacja i projekt; Azure OpenAI: wersja API i wdrożenia). */
+  readonly enterprise?: EnterpriseSettings;
 }
 
 /** Pozycja wspólnej kolejki wszystkich kont: model wybranego konta. */

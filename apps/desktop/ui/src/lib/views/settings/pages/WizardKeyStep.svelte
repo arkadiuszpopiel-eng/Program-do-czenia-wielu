@@ -5,6 +5,7 @@
   dopiero test u dostawcy; tu blokujemy tylko to, co kluczem na pewno nie jest.
 -->
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { Button, Checkbox, TextField } from '@alfa/ui-kit';
   import CircleAlert from '@lucide/svelte/icons/circle-alert';
   import CircleCheck from '@lucide/svelte/icons/circle-check';
@@ -32,6 +33,10 @@
     rotate?: boolean;
     title?: string;
     submitLabel?: string;
+    /** Pola konta firmowego (organizacja/projekt OpenAI, wdrożenia Azure) pod adresem. */
+    extra?: Snippet;
+    /** Pola dodatkowe mają błąd — zapis zablokowany (powód pokazują same pola). */
+    blocked?: boolean;
   }
 
   let {
@@ -45,6 +50,8 @@
     rotate = false,
     title,
     submitLabel,
+    extra,
+    blocked = false,
   }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
@@ -61,7 +68,8 @@
   /** Własny endpoint jest obowiązkowy — bez niego rdzeń i tak odmówi. */
   const needsUrl = $derived(provider.needs_base_url && !rotate);
   const urlMissing = $derived(needsUrl && !/^https?:\/\/\S+/.test(baseUrl.trim()));
-  const ready = $derived(!blocksSubmit(check) && !urlMissing && !saving);
+  const ready = $derived(!blocksSubmit(check) && !urlMissing && !blocked && !saving);
+  const azure = $derived(provider.id === 'azure-openai');
   const providerName = (id: string) => PROVIDER_NAMES[id] ?? id;
 
   // Po wejściu na krok fokus trafia do pola klucza (przycisk poprzedniego kroku już nie istnieje).
@@ -172,14 +180,15 @@
 
   {#if needsUrl}
     <TextField
-      label={t('wiz.baseUrl')}
+      label={azure ? t('ent.azureUrl') : t('wiz.baseUrl')}
       type="url"
       bind:value={baseUrl}
-      placeholder="https://"
-      hint={t('wiz.baseUrlHint')}
+      placeholder={azure ? 'https://…openai.azure.com' : 'https://'}
+      hint={azure ? t('ent.azureUrlHint') : t('wiz.baseUrlHint')}
       required
     />
   {/if}
+  {#if !rotate}{@render extra?.()}{/if}
   {#if !rotate}
     <TextField
       label={t('wiz.label')}

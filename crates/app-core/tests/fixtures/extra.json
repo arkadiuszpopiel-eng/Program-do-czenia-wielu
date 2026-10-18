@@ -2,6 +2,39 @@
   "_comment": "Warianty typów z types*.ts, których atrapa UI nie emituje (pisane ręcznie, zgodne z typami TS).",
   "events": [
     {
+      "type": "AccountChanged",
+      "account": {
+        "id": "acc-azure-1",
+        "provider_id": "azure-openai",
+        "label": "Azure — firma",
+        "state": "ok",
+        "key_stored": true,
+        "models": [],
+        "assignments": { "task_classes": ["chat"], "agents": [], "voice_stt": false, "voice_tts": false },
+        "cost_limit": { "enabled": false, "monthly": { "minor": 0, "currency": "PLN" } },
+        "last_tested_at": null,
+        "enterprise": {
+          "api_version": "2024-10-21",
+          "deployments": [{ "name": "prod-4o", "model": "gpt-4o" }, { "name": "o3-mini" }]
+        }
+      }
+    },
+    {
+      "type": "AccountChanged",
+      "account": {
+        "id": "acc-org-1",
+        "provider_id": "openai",
+        "label": "OpenAI — projekt",
+        "state": "ok",
+        "key_stored": true,
+        "models": [],
+        "assignments": { "task_classes": ["chat"], "agents": [], "voice_stt": false, "voice_tts": false },
+        "cost_limit": { "enabled": false, "monthly": { "minor": 0, "currency": "PLN" } },
+        "last_tested_at": null,
+        "enterprise": { "organization": "org-Acme123", "project": "proj_Budget42" }
+      }
+    },
+    {
       "type": "VoicePill",
       "state": { "agent": "gama", "mic": "hearing", "level": 0.42, "speaker": "user", "partial": "Co mam" }
     },

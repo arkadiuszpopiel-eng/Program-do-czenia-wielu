@@ -1,4 +1,4 @@
-// Katalog dostawców w atrapie — odwzorowanie `providers-catalog/*.toml` (stan z 30.09.2026).
+// Katalog dostawców w atrapie — odwzorowanie `providers-catalog/*.toml` (stan z 18.10.2026).
 // W buildzie z Tauri katalog czyta rdzeń (accounts-hub); UI dostaje go komendą `accounts_catalog`.
 import type { ProviderInfo } from '../types-hub';
 
@@ -15,6 +15,7 @@ type Row = [
 const ROWS: readonly Row[] = [
   ['anthropic', 'Anthropic (Claude)', 'chat', 'native', 'unknown', 'unknown', 'unverified'],
   ['openai', 'OpenAI', 'multi', 'native', 'unknown', 'unknown', 'unverified'],
+  ['azure-openai', 'Azure OpenAI', 'chat', 'native', 'unknown', 'unknown', 'unverified'],
   ['google', 'Google (Gemini)', 'multi', 'openai', 'google-paid-eea-no-train', 'unknown', 'gray'],
   ['xai', 'xAI (Grok)', 'multi', 'openai', 'xai-retention-30d', 'unknown', 'unverified'],
   ['deepseek', 'DeepSeek', 'chat', 'openai', 'cn-may-train', 'CN', 'unverified'],

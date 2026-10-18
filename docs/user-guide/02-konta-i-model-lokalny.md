@@ -40,11 +40,11 @@ przełącza się na inną trasę i nie gubi wiadomości. Przy każdej odpowiedzi
 
 **Ustawienia → Konta i klucze API → Dodaj dostawcę.** Kreator ma 6 kroków:
 
-1. **Dostawca** — z listy: Anthropic (Claude), OpenAI, Google (Gemini), xAI (Grok), Mistral, DeepSeek, Kimi, Qwen,
-   Z.ai, MiniMax, OpenRouter albo własny endpoint zgodny z OpenAI lub Anthropic (np. Ollama, LM Studio). Na liście są
+1. **Dostawca** — z listy: Anthropic (Claude), OpenAI, Azure OpenAI, Google (Gemini), xAI (Grok), Mistral, DeepSeek,
+   Kimi, Qwen, Z.ai, MiniMax, OpenRouter albo własny endpoint zgodny z OpenAI lub Anthropic (np. Ollama, LM Studio). Na liście są
    też usługi mowy (ElevenLabs, Azure Speech, Cartesia, Soniox) — ich klucze zapiszesz, ale głos w chmurze jest
    **jeszcze niedostępny**.
-2. **Klucz** — wklej klucz API (przy własnym endpoincie także adres).
+2. **Klucz** — wklej klucz API (przy własnym endpoincie także adres; przy koncie firmowym — zobacz niżej).
 3. **Test** — Alfa sprawdza połączenie.
 4. **Modele** — lista wykrytych modeli.
 5. **Przypisanie** — do czego używać konta: rozmowa, kod, zadania w tle, agentki, rozpoznawanie i synteza mowy.
@@ -56,6 +56,37 @@ pokazuje go już w interfejsie. Nowe konto działa od razu, bez restartu.
 Na karcie konta widzisz stan (działa, klucz odrzucony, limit zapytań, wyłączone), liczbę modeli, ostatni test,
 oznaczenie prywatności i jurysdykcji dostawcy oraz stan zgodności z regulaminem. Przyciski: **Testuj połączenie**
 i **Usuń konto** (usuwa też klucz z Menedżera poświadczeń).
+
+## Konto firmowe: organizacja i projekt OpenAI, Azure OpenAI
+
+**Organizacja i projekt OpenAI.** Jeśli klucz należy do organizacji albo projektu (koszty i limity firmy liczą się
+osobno dla każdego projektu), w kroku **Klucz** zaznacz „Klucz należy do organizacji albo projektu w OpenAI” i wpisz:
+
+- **Identyfikator organizacji** — zaczyna się od `org-` (platform.openai.com → ustawienia organizacji),
+- **Identyfikator projektu** — zaczyna się od `proj_` (ustawienia projektu).
+
+Oba pola są opcjonalne — puste znaczy „domyślna organizacja i projekt klucza”. Alfa dołącza je do każdego zapytania
+tego konta (nagłówki `OpenAI-Organization` i `OpenAI-Project`), także do testu połączenia. To nie są sekrety, ale
+w dziennikach Alfa pokazuje je skrócone (`org-…1234`). Na karcie konta widzisz je w linii „Konto firmowe”.
+
+**Azure OpenAI** — dla firm, które korzystają z modeli OpenAI przez własny zasób w Microsoft Azure. Wybierz dostawcę
+**Azure OpenAI** i podaj:
+
+1. **Klucz** — z portalu Azure: zasób → **Klucze i punkt końcowy** (KEY 1 albo KEY 2). Trafia do Menedżera
+   poświadczeń Windows jak każdy inny klucz; Alfa wysyła go w nagłówku `api-key`.
+2. **Adres zasobu** — np. `https://firma.openai.azure.com` (sam adres, bez dalszej ścieżki; przyjmowane są też
+   adresy `*.cognitiveservices.azure.com`). Jeśli wkleisz cały adres wdrożenia z portalu
+   (`…/openai/deployments/…/chat/completions?api-version=…`), przycisk **Rozdziel automatycznie** wpisze osobno
+   adres zasobu, nazwę wdrożenia i wersję API.
+3. **Wersja API** — puste pole oznacza `2024-10-21`; wersje próbne mają końcówkę `-preview`.
+4. **Wdrożenia modeli** — nazwa wdrożenia (Azure AI Foundry → Wdrożenia) i model, który udostępnia (np. wdrożenie
+   `prod-4o` z modelem `gpt-4o`). Alfa wybiera model, a zapytanie trafia na adres jego wdrożenia. Bez modelu — model
+   nazywa się jak wdrożenie. Co najmniej jedno wdrożenie, najwyżej 32.
+
+Test połączenia sprawdza klucz i adres listą modeli zasobu (bez zużycia tokenów); jako modele konta pokazują się
+Twoje wdrożenia. Region i zasady przetwarzania danych zależą od zasobu i umowy z Microsoft — w Alfie dostawca ma
+oznaczenie prywatności „nieznane”, dopóki nie zostanie sprawdzony. Organizacji i projektu nie podaje się przy Azure,
+a wdrożeń — przy innych dostawcach; kreator odmówi zapisu z wyjaśnieniem.
 
 ## Koszty i limity
 

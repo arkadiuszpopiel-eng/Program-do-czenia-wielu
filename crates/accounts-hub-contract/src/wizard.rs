@@ -9,6 +9,7 @@ use compliance_contract::ProviderApiStatus;
 
 use crate::account::{AccountSource, Assignments, ConnectionReport, CostLimit, NewAccount};
 use crate::catalog::{AuthKind, ModelInfo, ProviderCatalogEntry, validate_base_url};
+use crate::enterprise::EnterpriseSettings;
 use crate::ids::ProviderId;
 use crate::probe::ModelListError;
 use crate::secret::SecretString;
@@ -74,6 +75,9 @@ pub enum WizardError {
     /// Test klucza nie przeszedł.
     #[error("test połączenia nie przeszedł — popraw klucz")]
     TestNotPassed,
+    /// Złe ustawienia konta firmowego (organizacja, projekt, wdrożenia Azure).
+    #[error("{0}")]
+    InvalidEnterprise(String),
 }
 
 /// Wynik kreatora gotowy do zapisu przez hub.
@@ -95,6 +99,7 @@ pub struct Wizard {
     label: String,
     secret: Option<SecretString>,
     base_url: Option<String>,
+    enterprise: EnterpriseSettings,
     last_test: Option<ConnectionReport>,
     models: Vec<ModelInfo>,
     assignments: Assignments,
@@ -117,6 +122,7 @@ impl Wizard {
             label: String::new(),
             secret: None,
             base_url: None,
+            enterprise: EnterpriseSettings::default(),
             last_test: None,
             models: Vec::new(),
             assignments: Assignments::default(),
@@ -145,6 +151,11 @@ impl Wizard {
         self.base_url
             .as_deref()
             .or_else(|| self.provider.as_ref().and_then(|p| p.base_url.as_deref()))
+    }
+
+    /// Ustawienia konta firmowego (organizacja/projekt OpenAI, wdrożenia Azure OpenAI).
+    pub fn enterprise(&self) -> &EnterpriseSettings {
+        &self.enterprise
     }
 
     /// Ostatni raport testu.
@@ -224,8 +235,26 @@ impl Wizard {
         }
         self.secret = Some(secret);
         self.base_url = base_url;
+        // Ustawienia firmowe dotyczą tego adresu i klucza — podaje się je od nowa po każdej zmianie.
+        self.enterprise = EnterpriseSettings::default();
         self.last_test = None;
         self.step = WizardStep::TestConnection;
+        Ok(())
+    }
+
+    /// Ustawienia konta firmowego (w kroku klucza, po `enter_key` — przed testem). Sprawdzane
+    /// i oczyszczane tak jak przy zapisie konta; zmiana unieważnia wcześniejszy test.
+    pub fn enter_enterprise(&mut self, settings: EnterpriseSettings) -> Result<(), WizardError> {
+        self.require_step(WizardStep::TestConnection)?;
+        let provider = self
+            .provider
+            .as_ref()
+            .map(|p| p.id.as_str())
+            .unwrap_or_default();
+        self.enterprise = settings
+            .checked(provider, self.base_url())
+            .map_err(WizardError::InvalidEnterprise)?;
+        self.last_test = None;
         Ok(())
     }
 
@@ -311,6 +340,7 @@ impl Wizard {
                 assignments: self.assignments,
                 cost_limit: self.cost_limit,
                 source: AccountSource::Wizard,
+                enterprise: self.enterprise,
             },
             models: self.models,
             test,

@@ -26,11 +26,13 @@ impl AccountsHubService {
     ) -> Result<(TestSummary, Option<Vec<ModelInfo>>), AccountsError> {
         let entry = self.provider_entry(&acc.provider)?;
         let base_url = acc.base_url.clone().or_else(|| entry.base_url.clone());
-        let report = self.run_test(&entry, base_url.as_deref(), secret).await;
+        let report = self
+            .run_test(&entry, base_url.as_deref(), secret, &acc.enterprise)
+            .await;
         // Klucz bez prawa do listy modeli: drugie zapytanie dałoby tę samą odmowę. Pusta lista
         // nie kasuje tego, co konto już zna (np. model wpisany ręcznie).
         let models = if report.outcome.may_list_models() {
-            self.run_listing(&entry, base_url.as_deref(), secret)
+            self.run_listing(&entry, base_url.as_deref(), secret, &acc.enterprise)
                 .await
                 .ok()
                 .filter(|found| !found.is_empty())

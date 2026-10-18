@@ -7,6 +7,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::ModelInfo;
+use crate::enterprise::EnterpriseSettings;
 use crate::ids::{AccountId, ModelId, ProviderId, SecretName};
 use crate::secret::SecretString;
 
@@ -300,6 +301,9 @@ pub struct Account {
     /// [`crate::MAX_QUEUE`]). Brak wpisu = wybór automatyczny.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub queues: BTreeMap<TaskClass, Vec<ModelId>>,
+    /// Konto firmowe: organizacja i projekt OpenAI albo wdrożenia Azure OpenAI.
+    #[serde(default, skip_serializing_if = "EnterpriseSettings::is_empty")]
+    pub enterprise: EnterpriseSettings,
 }
 
 /// Dane nowego konta.
@@ -319,6 +323,8 @@ pub struct NewAccount {
     pub cost_limit: Option<CostLimit>,
     /// Pochodzenie.
     pub source: AccountSource,
+    /// Konto firmowe (puste = zwykłe konto).
+    pub enterprise: EnterpriseSettings,
 }
 
 /// Stan dostawcy wyliczony z jego kont: aktywne > błąd > wyłączone > nieskonfigurowane.

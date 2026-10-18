@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::account::ConnectionReport;
 use crate::catalog::{ModelInfo, ProviderCatalogEntry};
+use crate::enterprise::EnterpriseSettings;
 use crate::secret::SecretString;
 
 /// Parametry testu połączenia / wykrywania modeli.
@@ -20,6 +21,8 @@ pub struct ConnectionRequest<'a> {
     pub base_url: Option<&'a str>,
     /// Klucz (brak dla `auth = none`).
     pub secret: Option<&'a SecretString>,
+    /// Konto firmowe: nagłówki organizacji i projektu OpenAI, wdrożenia Azure OpenAI.
+    pub enterprise: &'a EnterpriseSettings,
 }
 
 /// Test połączenia z dostawcą (produkcyjnie adapter z `providers-*`; tu tylko kontrakt).

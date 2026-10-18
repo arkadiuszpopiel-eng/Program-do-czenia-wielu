@@ -28,6 +28,18 @@
         "needs_base_url": false
       },
       {
+        "id": "azure-openai",
+        "display_name": "Azure OpenAI",
+        "kind": "chat",
+        "auth": "api_key",
+        "compat": "native",
+        "privacy_tag": "unknown",
+        "jurisdiction": "unknown",
+        "compliance_status": "unverified",
+        "terms_url": null,
+        "needs_base_url": true
+      },
+      {
         "id": "google",
         "display_name": "Google (Gemini)",
         "kind": "multi",

@@ -2,10 +2,10 @@
 
 use accounts_hub_contract::{
     Account, AccountId, AccountSource, AccountState, AccountsError, AccountsHub, Assignments,
-    AuthKind, CostLimit, EVENT_KEY_ADDED, EVENT_KEY_REMOVED, EVENT_KEY_ROTATED, EnvImport,
-    EnvImportOutcome, EnvSource, ModelId, NewAccount, PriceTable, ProviderCatalogEntry, ProviderId,
-    SECRET_READER_PREFIX, SecretName, SecretString, TestSummary, Wizard, WizardError, WizardStep,
-    provider_state, validate_base_url,
+    AuthKind, CostLimit, EVENT_KEY_ADDED, EVENT_KEY_REMOVED, EVENT_KEY_ROTATED, EnterpriseSettings,
+    EnvImport, EnvImportOutcome, EnvSource, ModelId, NewAccount, PriceTable, ProviderCatalogEntry,
+    ProviderId, SECRET_READER_PREFIX, SecretName, SecretString, TestSummary, Wizard, WizardError,
+    WizardStep, provider_state, validate_base_url,
 };
 use async_trait::async_trait;
 use core_bus_contract::Level;
@@ -34,6 +34,18 @@ fn check_new(entry: &ProviderCatalogEntry, new: &NewAccount) -> Result<(), Accou
         )),
         (None, Some(_)) => Ok(()),
     }
+}
+
+/// Ustawienia konta firmowego po sprawdzeniu (organizacja/projekt OpenAI, wdrożenia Azure).
+fn checked_enterprise(
+    entry: &ProviderCatalogEntry,
+    new: &NewAccount,
+) -> Result<EnterpriseSettings, AccountsError> {
+    let base_url = new.base_url.as_deref().or(entry.base_url.as_deref());
+    new.enterprise
+        .clone()
+        .checked(entry.id.as_str(), base_url)
+        .map_err(AccountsError::InvalidInput)
 }
 
 impl AccountsHubService {
@@ -104,6 +116,7 @@ impl AccountsHub for AccountsHubService {
         let entry = self.provider_entry(&new.provider)?;
         self.ensure_allowed(&entry)?;
         check_new(&entry, &new)?;
+        let enterprise = checked_enterprise(&entry, &new)?;
         let id = self.new_id()?;
         let secret = SecretName::for_account(&id);
         if entry.auth == AuthKind::ApiKey {
@@ -128,6 +141,7 @@ impl AccountsHub for AccountsHubService {
             source: new.source,
             models: Vec::new(),
             queues: Default::default(),
+            enterprise,
         };
         let payload = serde_json::json!({
             "account": acc.id, "provider": acc.provider, "label": acc.label, "source": acc.source,
@@ -284,8 +298,9 @@ impl AccountsHub for AccountsHubService {
         self.ensure_allowed(&entry)?;
         let secret = wizard.secret().cloned();
         let base_url = wizard.base_url().map(str::to_owned);
+        let enterprise = wizard.enterprise().clone();
         let report = self
-            .run_test(&entry, base_url.as_deref(), secret.as_ref())
+            .run_test(&entry, base_url.as_deref(), secret.as_ref(), &enterprise)
             .await;
         Ok(wizard.record_test(report)?)
     }
@@ -304,8 +319,9 @@ impl AccountsHub for AccountsHubService {
             .ok_or(WizardError::TestNotPassed)?;
         let secret = wizard.secret().cloned();
         let base_url = wizard.base_url().map(str::to_owned);
+        let enterprise = wizard.enterprise().clone();
         let result = self
-            .run_listing(&entry, base_url.as_deref(), secret.as_ref())
+            .run_listing(&entry, base_url.as_deref(), secret.as_ref(), &enterprise)
             .await;
         Ok(wizard.record_models(result)?)
     }
@@ -358,6 +374,7 @@ impl AccountsHubService {
                 source: AccountSource::Env {
                     var: var.to_owned(),
                 },
+                enterprise: EnterpriseSettings::default(),
             })
             .await?;
         Ok(EnvImportOutcome::Imported { account })

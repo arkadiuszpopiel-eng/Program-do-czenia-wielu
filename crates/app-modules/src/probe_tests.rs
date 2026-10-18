@@ -159,3 +159,74 @@ fn provider_messages_never_carry_key_fragments() {
     let long = error(401, "", &"x".repeat(5000));
     assert_eq!(detail(&long).message.chars().count(), DETAIL_CHARS);
 }
+
+/// Konto firmowe (C2.12): organizacja i projekt trafiają do profilu adaptera, wdrożenia Azure —
+/// jako mapa „model Alfy → wdrożenie” z wersją API; zwykłe konto nie ma żadnego z nich.
+#[test]
+fn enterprise_settings_reach_the_adapter_profile() {
+    use accounts_hub_contract::AzureDeployment;
+    let key: Arc<dyn providers_contract::SecretSource> = Arc::new(StaticKey::new("k"));
+    let plain = account_profile(Arc::clone(&key), None, &EnterpriseSettings::default());
+    assert!(plain.organization.is_none() && plain.project.is_none() && plain.azure.is_none());
+
+    let openai = EnterpriseSettings {
+        organization: Some("org-Acme".into()),
+        project: Some("proj_Budget".into()),
+        ..EnterpriseSettings::default()
+    };
+    let p = account_profile(Arc::clone(&key), None, &openai);
+    assert_eq!(p.organization.as_deref(), Some("org-Acme"));
+    assert_eq!(p.project.as_deref(), Some("proj_Budget"));
+
+    let azure = EnterpriseSettings {
+        deployments: vec![
+            AzureDeployment {
+                name: "prod-4o".into(),
+                model: Some("gpt-4o".into()),
+            },
+            AzureDeployment {
+                name: "o3-mini".into(),
+                model: None,
+            },
+        ],
+        ..EnterpriseSettings::default()
+    };
+    let p = account_profile(key, Some("https://contoso.openai.azure.com"), &azure);
+    assert_eq!(
+        p.base_url.as_deref(),
+        Some("https://contoso.openai.azure.com")
+    );
+    let options = p.azure.unwrap();
+    assert_eq!(
+        options.api_version,
+        accounts_hub_contract::AZURE_DEFAULT_API_VERSION
+    );
+    assert_eq!(options.deployment("gpt-4o"), "prod-4o");
+    assert_eq!(options.deployment("o3-mini"), "o3-mini");
+}
+
+/// Wbudowany katalog zna Azure OpenAI w obu widokach; bez adresu zasobu adaptera nie ma.
+#[test]
+fn builtin_catalog_has_azure_openai() {
+    let catalog = crate::catalog::ProviderCatalog::builtin();
+    let hub = catalog
+        .hub
+        .iter()
+        .find(|e| e.id.as_str() == "azure-openai")
+        .unwrap();
+    assert!(hub.base_url.is_none(), "adres podaje konto");
+    assert!(
+        hub.env_vars.is_empty(),
+        "import ze zmiennych nie zna wdrożeń"
+    );
+    let probe = ProviderProbe::new(Arc::new(catalog.api));
+    let enterprise = EnterpriseSettings::default();
+    let request = ConnectionRequest {
+        provider: hub,
+        base_url: None,
+        secret: None,
+        enterprise: &enterprise,
+    };
+    let error = probe.provider(&request).err().unwrap();
+    assert!(error.contains("base_url"), "{error}");
+}
