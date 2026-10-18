@@ -11,13 +11,13 @@ Wersji 0.0.63 **nie wgrałam** do `Alfa-uruchomiona` (tam nadal 0.0.62) — to T
 - **Karty AMD, Intel i zintegrowane są obsługiwane na równi z NVIDIA**: wykrywanie od sterownika (DXCore), te same
   progi pamięci, klasa „karta zintegrowana”, pakiety z silnikiem Vulkan, pomiar pamięci kart bez `nvidia-smi`.
 - **Mowa na AMD/Intel liczy na karcie**: Qwen3-ASR przez `llama-server` Vulkan — na RX 9070 XT 0,16–0,23 s na zdanie
-  (wcześniej Whisper na procesorze, ok. 54 s na zdanie na laptopie). Whisper nie ma oficjalnej wersji Vulkan. Model
-  rozmowy zostawia na karcie miejsce na Qwen3-ASR (3 GB), żeby oba się zmieściły.
+  (wcześniej Whisper na procesorze, ok. 54 s na zdanie na laptopie). Whisper nie ma oficjalnej wersji Vulkan. Na karcie
+  AMD/Intel poniżej 12 GB Qwen3-ASR liczy na procesorze (ok. 2,4 s), a karta zostaje dla modelu rozmowy.
 - **Głos Supertonic na karcie przez DirectML** (pobrane z NuGet Microsoftu, sumy zgodne z katalogiem NuGet):
   0,58 s zamiast 0,95 s na zdanie, 538 MB pamięci karty; włącza się na karcie z ≥ 12 GB. **ADR 0028 do podpisu.**
-- **Siedem przeglądów kodu** (agenty AI, każde znalezisko sprawdzane przez 3 sceptyków), w tym całościowy przegląd
+- **Osiem przeglądów kodu** (agenty AI, każde znalezisko sprawdzane przez 3 sceptyków), w tym całościowy przegląd
   wszystkich zmian od 0.0.62: usterki potwierdzone i poprawione, m.in. podwójne liczenie rezerwy pamięci APU
-  i Qwen3-ASR obok modelu rozmowy na karcie AMD/Intel 6–8 GB (rozdziały 8–12).
+  i Qwen3-ASR obok modelu rozmowy na karcie AMD/Intel 6–11 GB (rozdziały 8–13).
 - **Awaria komputera o 20:31** (brak pamięci + resety mostka USB dysku E:): dyski, repozytorium i pliki sprawdzone —
   nic nie stracone. Ciężkie zadania od tej pory z ograniczeniem równoległości.
 
@@ -176,8 +176,8 @@ podwójne) — wszystkie poprawione:
 - **[poważne] Qwen3-ASR na karcie AMD/Intel 6–11 GB obok modelu rozmowy** — dwie zmiany 0.0.63 razem: karta AMD/Intel
   od 6 GB dostaje model rozmowy na karcie, a pakiety „Bardzo dobry” i „Dobry” — Qwen3-ASR. Qwen3-ASR (ok. 2,9 GB)
   ładował się pierwszy, a model rozmowy zostawia na mowę tylko 1,5 GB (rozmiar Whispera) — razem ok. 7 GB na karcie
-  6 GB. Poprawka ostateczna — rozdział 12 (pierwsza wersja, Qwen3-ASR na procesorze na każdej karcie Vulkan poniżej
-  12 GB, została odrzucona w następnym przeglądzie).
+  6 GB. Poprawka: na karcie Vulkan poniżej 12 GB Qwen3-ASR liczy na procesorze (`stt::qwen_free`). Jej losy
+  w kolejnych przeglądach — rozdziały 12 i 13 (zostaje ta reguła).
 - **250 ms czekania przed startem dyktowania i rozmowy** na kartach AMD/Intel: pomiar wolnej pamięci robił pełny
   odczyt liczników (dwie próbki obciążenia co 250 ms i nazwy procesów) na wątku asynchronicznym. Nowy odczyt samej
   pamięci (`HardwarePort::gpu_memory`) — jedna próbka, bez czekania.
@@ -193,13 +193,13 @@ podwójne) — wszystkie poprawione:
 - **SPEC modułu `models`** opisywał skład pakietów sprzed 0.0.63 — uzupełniony; także ADR 0028 i SPEC `voice-stt`
   (próg 12 GB dla Qwen3-ASR na Vulkanie).
 
-## 12. Przegląd poprawek całościowego przeglądu (01:40–01:55) i poprawka ostateczna
+## 12. Przegląd poprawek całościowego przeglądu (01:40–01:55) i druga wersja (odrzucona — rozdział 13)
 
 Przegląd commitu `c24da9ad` (2 obszary, 3 sceptyków): 11 zgłoszeń, 9 utrzymanych. Najważniejsze — **moja pierwsza
 poprawka była za szeroka**: Qwen3-ASR na procesorze na każdej karcie Vulkan poniżej 12 GB spowalniał mowę także tam,
 gdzie model rozmowy w ogóle nie korzysta z karty (klasa „nieznana”: karta AMD/Intel 4–5 GB albo 6–11 GB przy RAM
-poniżej 16 GB, rozmowa przez API), i tam, gdzie oba modele się mieszczą (Bielik 1.5B + Qwen3-ASR na 8 GB). Poprawka
-ostateczna trafia w przyczynę: **gdy Qwen3-ASR liczy przez Vulkan na tej samej karcie, model rozmowy zostawia mu
+poniżej 16 GB, rozmowa przez API), i tam, gdzie oba modele się mieszczą (Bielik 1.5B + Qwen3-ASR na 8 GB). Druga
+wersja miała trafić w przyczynę: **gdy Qwen3-ASR liczy przez Vulkan na tej samej karcie, model rozmowy zostawia mu
 3 GB** (`stt::chat_stt_reserve_mb`, `QWEN_VULKAN_RESERVE_MB`) zamiast 1,5 GB na Whispera. Na karcie 6 GB: model 4.5B
 ok. 2,4 GB na karcie + Qwen3-ASR 2,9 GB + zapas 0,8 GB ≈ 6,0 GB z 6,1 GB; na 8 GB — ok. 8,0 GB z 8,2 GB. Mowa zostaje
 szybka (na karcie), a część warstw modelu 4.5B na kartach 6–8 GB liczy procesor (odpowiedzi trochę wolniejsze).
@@ -211,3 +211,21 @@ wersji poprawki (wrócone do stanu zgodnego z kodem), „kilkanaście razy szybc
 pierwsze zdanie pozycji o dwóch kartach ucinane w oknie „Co nowego” na dwukropku (przeredagowane), streszczenie tego
 raportu (rozdział 1) i skład pakietów w SPEC `models` (uzupełniony o Qwen3-ASR, Supertonic, Smart Turn i ONNX Runtime).
 Testy: `app-modules` i `app-voice` 83/0 (nowy test rezerwy: Vulkan — 3 GB, CUDA obok — bez zmian), clippy czysty.
+
+## 13. Ósmy przegląd i decyzja końcowa (02:00–02:25)
+
+Przegląd drugiej wersji (rezerwa 3 GB, commit `ba880bcf`): 5 zgłoszeń, 4 utrzymane, w tym trzy poważne — rezerwa
+(3000 MB) jest mniejsza niż próg Qwen3-ASR (3200 MB wolnej pamięci), więc gdy model rozmowy wczyta się pierwszy, mowa
+i tak trafia na procesor, a model rozmowy traci 17–40 warstw na karcie bez żadnej korzyści; rezerwa liczy się raz przy
+starcie programu (pakiet zainstalowany w trakcie sesji — stara rezerwa 1,5 GB); nie widzi ustawienia „tylko Whisper”.
+Na kartach 6–8 GB dzielenie karty przez dwa modele bez osobnego budżetu pamięci na kartę jest za kruche, a takiej karty
+nie mam do pomiaru. **Decyzja: zostaje reguła z rozdziału 11** — na karcie Vulkan poniżej 12 GB Qwen3-ASR liczy na
+procesorze (ok. 2,4 s na zdanie, ponad 20 razy szybciej niż Whisper na procesorze w 0.0.62), karta w całości dla
+modelu rozmowy — bez przepełnienia pamięci karty i bez spowolnienia rozmowy. Ograniczenie zapisane w kodzie, ADR 0028
+i SPEC `voice-stt`: na małej karcie, z której model rozmowy nie korzysta (klasa „nieznana”, rozmowa przez API), mowa
+mogłaby liczyć na karcie — do zadania „osobny budżet pamięci na kartę” (C6.6).
+
+Przy okazji poprawione teksty widoczne dla Ciebie: kompromis klasy „nieznana” mówił „rozpoznawanie mowy na karcie”
+także dla AMD/Intel (Whisper nie ma tam wersji Vulkan, a Qwen3-ASR liczy na karcie od 12 GB) — teraz zależnie od
+producenta; komunikat autotestu podaje regułę 12 GB jako możliwą przyczynę mowy na procesorze. Testy: `app-modules`
+i `app-voice` 83/0, `device-profile-contract` 12/0, clippy czysty.

@@ -342,11 +342,12 @@ RX 9070 XT (llama.cpp b11559 Vulkan, te same argumenty co <code>qwen_wire::build
 3–7 s (pierwsze, z rozgrzaniem: 2,2 s), <strong>2878 MB</strong> pamięci karty; 4 zdania z Supertonic (barwa M1): 3 identyczne,
 w jednym zła forma jednego wyrazu („Zapisałem” zamiast „Zapisałam”). Bez osobnej karty (zmierzone liczniki
 systemu: 0 MB wolnej pamięci osobnej karty) Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie na laptopie).
-Gdy Qwen3-ASR liczy przez Vulkan na tej samej karcie co model rozmowy, model rozmowy zostawia na mowę <strong>3 GB</strong>
-(<code>app_modules::stt::QWEN_VULKAN_RESERVE_MB</code>) zamiast 1,5 GB na Whispera turbo (przegląd 2026-10-18): Qwen3-ASR
-zajmuje ok. 2,9 GB i zwykle ładuje się pierwszy, a na karcie 6–8 GB przy rezerwie 1,5 GB oba modele się nie
-mieściły. Na takiej karcie część warstw modelu 4.5B liczy wtedy procesor; gdy model rozmowy nie korzysta z karty
-(klasa „nieznana”, rozmowa przez API), mowa liczy na karcie bez zmian.</li>
+Na karcie z własną pamięcią <strong>poniżej 12 GB</strong> (<code>app_modules::stt::VULKAN_QWEN_CARD_MIN_MB</code>) Qwen3-ASR liczy na
+procesorze (przegląd 2026-10-18): ładuje się przed modelem rozmowy i zajmuje ok. 2,9 GB, a model rozmowy zostawia na
+mowę 1,5 GB (rozmiar Whispera turbo) — na karcie 6–11 GB obu by się pewnie nie zmieściło. Rezerwa 3 GB w budżecie
+modelu rozmowy została sprawdzona i odrzucona (po starcie modelu rozmowy wolna pamięć i tak spadała poniżej progu
+3,2 GB Qwen3-ASR). Ograniczenie: reguła działa także wtedy, gdy model rozmowy nie korzysta z karty (klasa
+„nieznana”, rozmowa przez API) — wtedy mowa mogłaby liczyć na karcie; do osobnego budżetu pamięci na kartę (C6.6).</li>
 <li><strong>Głos Supertonic na karcie przez DirectML</strong> — opcjonalnie:<ul>
 <li>dwie pozycje katalogu w <code>sidecars/onnxruntime-dml/</code>: <code>onnxruntime-directml</code> (NuGet
 <code>Microsoft.ML.OnnxRuntime.DirectML</code> 1.23.0, MIT) i <code>directml</code> (NuGet <code>Microsoft.AI.DirectML</code> 1.15.4, licencja
@@ -366,12 +367,12 @@ Próg 12 GB: na karcie 8 GB model 4.5B i STT zajmują już 7380 z 7408 MB budże
 </ol>
 <h2 id="konsekwencje">Konsekwencje</h2>
 <ul>
-<li>Na wolnej karcie AMD (≥ 3,2 GB wolnej pamięci) mowa jest rozpoznawana na karcie — zmierzone na RX 9070 XT, bez
+<li>Na wolnej karcie AMD od 12 GB (≥ 3,2 GB wolnej pamięci) mowa jest rozpoznawana na karcie — zmierzone na RX 9070 XT, bez
 kompilowania whisper.cpp i bez binariów spoza oficjalnych wydań. Gdy model rozmowy zajmie kartę, Qwen3-ASR liczy na
 procesorze (ok. 2,4 s na zdanie), a NVIDIA ma wtedy jeszcze Whisper na karcie. Karty Intel — niesprawdzone.
-Na karcie AMD/Intel 6–8 GB model rozmowy 4.5B ma przez rezerwę 3 GB mniej warstw na karcie (odpowiedzi trochę
-wolniejsze, mowa szybka). Na NVIDIA ≥ 8 GB w pakiecie „Wzorcowy” (Qwen3-ASR przez CUDA) rezerwa zostaje 1,5 GB —
-stan sprzed 0.0.63, do rozwiązania osobnym budżetem pamięci na kartę (C6.6).</li>
+Na karcie AMD/Intel poniżej 12 GB mowa liczy na procesorze (ok. 2,4 s na zdanie — ponad 20 razy szybciej niż
+Whisper na procesorze w 0.0.62). Na NVIDIA ≥ 8 GB w pakiecie „Wzorcowy” (Qwen3-ASR przez CUDA) obok modelu rozmowy
+zostaje rezerwa 1,5 GB — stan sprzed 0.0.63, do rozwiązania osobnym budżetem pamięci na kartę (C6.6).</li>
 <li>Licencja DirectML pozwala rozpowszechniać bibliotekę w aplikacjach (§1a), ale <strong>dopuszcza zbieranie danych
 diagnostycznych przez Microsoft (§2a)</strong>. Pozycja <code>directml</code> ma <code>confirmed: false</code> (znaczek „Do potwierdzenia przez
 człowieka”) i jest pobierana przez użytkownika z NuGet, nie dołączana do instalatora.</li>

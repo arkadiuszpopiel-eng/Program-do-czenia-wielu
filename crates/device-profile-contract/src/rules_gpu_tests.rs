@@ -150,8 +150,15 @@ fn unknown_tradeoff_names_the_real_limit() {
             .any(|t| t.contains("Za mało pamięci RAM"))
     );
     assert!(!rec.tradeoffs.iter().any(|t| t.contains("Mała karta")));
+    // AMD/Intel: bez obietnicy „mowa na karcie” (Whisper nie ma wersji Vulkan, Qwen3-ASR — od 12 GB).
+    assert!(
+        rec.tradeoffs
+            .iter()
+            .any(|t| t.contains("Qwen3-ASR (na karcie od 12 GB)"))
+    );
     let small = recommend(&fixtures::small_nvidia());
     assert!(small.tradeoffs.iter().any(|t| t.contains("Mała karta")));
+    assert!(small.tradeoffs.iter().any(|t| t.contains("mowy na karcie")));
 }
 
 /// Ręczny profil D na samej karcie zintegrowanej ostrzega o ryzyku jak na słabszej maszynie.

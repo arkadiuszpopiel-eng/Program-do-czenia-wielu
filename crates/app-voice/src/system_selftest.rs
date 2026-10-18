@@ -98,10 +98,18 @@ impl SystemVoice {
             );
         };
         // Próba nie zabiera karty trwającej rozmowie: na karcie tylko przy wolnej pamięci.
-        let free = tokio::task::spawn_blocking(app_modules::gpu_mem::free_vram_mb)
-            .await
-            .ok()
-            .flatten();
+        // Ta sama reguła co rozmowa: karta AMD/Intel poniżej 12 GB zostaje dla modelu rozmowy.
+        let vulkan = config.vulkan;
+        let free = tokio::task::spawn_blocking(move || {
+            app_modules::stt::qwen_free(
+                app_modules::gpu_mem::free_vram_mb(),
+                vulkan,
+                app_modules::stt_device::main_card_mb().flatten(),
+            )
+        })
+        .await
+        .ok()
+        .flatten();
         config.gpu = app_modules::stt::qwen_on_gpu(config.gpu, free);
         if config.gpu {
             let (server, vulkan) = (config.server.clone(), config.vulkan);
@@ -124,7 +132,7 @@ impl SystemVoice {
                 Some(if on_card {
                     "Qwen3-ASR wczytany na karcie graficznej"
                 } else {
-                    "Qwen3-ASR wczytany na procesorze (karta zajęta albo brak karty)"
+                    "Qwen3-ASR wczytany na procesorze (karta zajęta, karta AMD/Intel poniżej 12 GB zostawiona dla modelu rozmowy albo brak karty)"
                 }),
             ),
             Err(e) => failed(started, e),

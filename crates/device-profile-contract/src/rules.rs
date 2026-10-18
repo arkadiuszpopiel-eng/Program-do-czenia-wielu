@@ -293,15 +293,24 @@ fn apply_unknown(profile: &Profile, gpu_backend: Backend, rec: &mut Recommendati
     rec.local_llm = LocalLlm::None;
     rec.residency.stt_tts_exclusive = true;
     let card_ok = profile.primary_vram_mb() >= VRAM_6_GB;
+    // NVIDIA: mowa na karcie (CUDA). AMD/Intel: Whisper nie ma wersji Vulkan, a Qwen3-ASR liczy na
+    // karcie od 12 GB, na mniejszej — na procesorze (`app_modules::stt::qwen_free`).
+    let speech = if gpu_backend == Backend::Cuda {
+        "rozpoznawanie mowy na karcie"
+    } else {
+        "szybkie rozpoznawanie mowy Qwen3-ASR (na karcie od 12 GB)"
+    };
     rec.tradeoffs.push(if stt_gpu && card_ok {
         // Karta wystarczy na model rozmowy — klasę obniża za mała pamięć RAM.
-        "Za mało pamięci RAM (poniżej 16 GB) na model rozmowy na tym komputerze: rozpoznawanie \
-         mowy na karcie, rozmowa przez API."
-            .into()
+        format!(
+            "Za mało pamięci RAM (poniżej 16 GB) na model rozmowy na tym komputerze: {speech}, \
+             rozmowa przez API."
+        )
     } else if stt_gpu {
-        "Mała karta graficzna: rozpoznawanie mowy na karcie, rozmowa przez API; \
-         na model rozmowy na karcie potrzeba ≥ 6 GB."
-            .into()
+        format!(
+            "Mała karta graficzna: {speech}, rozmowa przez API; na model rozmowy na karcie \
+             potrzeba ≥ 6 GB."
+        )
     } else {
         "Sprzęt poniżej baseline: STT na CPU (model small), rozmowa przez API; \
          rozważ profil C (chmura)."

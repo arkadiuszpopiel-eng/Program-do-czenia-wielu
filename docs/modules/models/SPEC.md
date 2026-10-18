@@ -158,7 +158,7 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   w zapasie; AMD/Intel → `llama-server` Vulkan + CPU w zapasie, `whisper-server` CPU; sama karta zintegrowana z Vulkanem
   przy ≥ 16 GB RAM → jak AMD/Intel (lekki model na karcie); laptop NVIDIA z kartą zintegrowaną → dodatkowo
   `llama-vulkan` w zapasie (lekki model); bez karty → CPU. Pozycje zależne od karty (`members_for`): na Vulkanie
-  Qwen3-ASR w pakietach z Whisperem turbo (model rozmowy zostawia mu wtedy na karcie 3 GB — `stt::chat_stt_reserve_mb`),
+  Qwen3-ASR w pakietach z Whisperem turbo (na karcie liczy od 12 GB — `stt::qwen_free`; na mniejszej na procesorze),
   przy karcie z własną pamięcią ≥ 12 GB i głosie Supertonic — `onnxruntime-directml` i `directml` (ADR 0028).
   Dopasowanie `fits` / `tight` / `too_weak` z uzasadnieniem (PL/EN), zalecany = najwyższy `fits`.
 - **Stan pakietu** ze stanów pozycji (pierwszeństwo: pobieranie → uszkodzony → zgoda TOFU → zainstalowany → częściowo);

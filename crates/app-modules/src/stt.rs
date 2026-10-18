@@ -23,19 +23,29 @@ pub fn qwen_on_gpu(gpu_build: bool, free_vram_mb: Option<u32>) -> bool {
     gpu_build && free_vram_mb.is_none_or(|free| free >= QWEN_MIN_FREE_VRAM_MB)
 }
 
-/// Rezerwa pamięci karty na rozpoznawanie mowy (MB), którą model rozmowy zostawia, gdy Qwen3-ASR
-/// liczy przez Vulkan na tej samej karcie (AMD, Intel): model z projektorem zajmuje ok. 2,9 GB
-/// (zmierzone 2878 MB na RX 9070 XT) i zwykle ładuje się pierwszy, a domyślna rezerwa
-/// (`providers_local_impl::STT_VRAM_RESERVE_MB`, 1,5 GB) to rozmiar Whispera turbo — na karcie
-/// 6–8 GB oba modele się wtedy nie mieściły (przegląd 2026-10-18).
-pub const QWEN_VULKAN_RESERVE_MB: u32 = 3_000;
+/// Najmniejsza pamięć własna głównej karty (MB), od której Qwen3-ASR przez Vulkan (AMD, Intel) liczy
+/// na karcie obok modelu rozmowy. Model rozmowy zostawia na rozpoznawanie mowy 1,5 GB (Whisper
+/// turbo), a Qwen3-ASR zajmuje ok. 2,9 GB i zwykle ładuje się pierwszy — na karcie 6–11 GB obu się nie
+/// zmieści pewnie (rezerwa 3 GB dla modelu rozmowy też nie wystarczała: pomiar wolnej pamięci po jego
+/// starcie i tak spadał poniżej progu Qwen3-ASR — przegląd 2026-10-18). Tam Qwen3-ASR liczy na
+/// procesorze (ok. 2,4 s na zdanie; Whisper na procesorze ok. 54 s), a karta zostaje dla modelu
+/// rozmowy. Reguła nie sprawdza, czy model rozmowy liczy na karcie (klasa „nieznana”, rozmowa przez
+/// API) — wtedy mowa mogłaby liczyć na karcie; to zostaje do osobnego budżetu pamięci na kartę (C6.6).
+/// Ten sam próg co głos na karcie (12 GB z tolerancją).
+pub const VULKAN_QWEN_CARD_MIN_MB: u32 = device_profile_contract::GPU_TTS_MIN_VRAM_MB;
 
-/// Rezerwa na mowę dla modelu rozmowy, gdy zainstalowany Qwen3-ASR policzy przez Vulkan (bez
-/// kompilacji CUDA, która ma pierwszeństwo); `None` — zostaje domyślna (Whisper albo CUDA).
-pub fn chat_stt_reserve_mb(paths: &AppPaths) -> Option<u32> {
-    qwen(paths, None)
-        .filter(|cfg| cfg.gpu && cfg.vulkan)
-        .map(|_| QWEN_VULKAN_RESERVE_MB)
+/// Wolna pamięć do planu Qwen3-ASR: kompilacja Vulkan i główna karta mniejsza niż
+/// [`VULKAN_QWEN_CARD_MIN_MB`] — `Some(0)` (procesor); inaczej pomiar bez zmian (`main_card_mb`
+/// `None` — karta nieznana, decyduje pomiar).
+pub fn qwen_free(
+    free_vram_mb: Option<u32>,
+    vulkan: bool,
+    main_card_mb: Option<u32>,
+) -> Option<u32> {
+    match main_card_mb {
+        Some(mb) if vulkan && mb < VULKAN_QWEN_CARD_MIN_MB => Some(0),
+        _ => free_vram_mb,
+    }
 }
 
 /// Wolna pamięć karty, przy której Whisper turbo zmieści się na karcie obok innych modeli.
@@ -272,31 +282,21 @@ mod tests {
         assert!(!qwen_on_gpu(false, None));
     }
 
-    /// Przegląd 2026-10-18: na karcie AMD/Intel 6–8 GB Qwen3-ASR (ok. 2,9 GB, ładowany pierwszy)
-    /// nie mieścił się obok modelu rozmowy, który zostawiał na mowę 1,5 GB — rezerwa w rozmiarze
-    /// Qwen3-ASR tylko wtedy, gdy liczy on przez Vulkan (kompilacja CUDA ma pierwszeństwo).
+    /// Przegląd 2026-10-18: na karcie AMD/Intel 6–11 GB Qwen3-ASR (ok. 2,9 GB, ładowany pierwszy)
+    /// nie mieścił się obok modelu rozmowy, który zostawia na mowę 1,5 GB — tam liczy na procesorze.
     #[test]
-    fn chat_model_leaves_room_for_qwen_only_on_vulkan() {
-        let dir = std::env::temp_dir().join(format!("alfa-stt-res-{}", uuid::Uuid::new_v4()));
-        let paths = AppPaths::under(&dir);
-        let touch = |p: PathBuf| {
-            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
-            std::fs::write(&p, b"x").unwrap();
-        };
-        let qwen_dir = paths.models().join("qwen3-asr");
-        touch(qwen_dir.join("Qwen3-ASR-1.7B-Q8_0.gguf"));
-        touch(qwen_dir.join("mmproj-Qwen3-ASR-1.7B-Q8_0.gguf"));
-        // Bez kompilacji na kartę i z samą wersją CPU — domyślna rezerwa.
-        assert_eq!(chat_stt_reserve_mb(&paths), None);
-        touch(paths.sidecar("llama-cpu", "llama-server"));
-        assert_eq!(chat_stt_reserve_mb(&paths), None);
-        // Vulkan (AMD, Intel): rezerwa w rozmiarze Qwen3-ASR.
-        touch(paths.sidecar("llama-vulkan", "llama-server"));
-        assert_eq!(chat_stt_reserve_mb(&paths), Some(QWEN_VULKAN_RESERVE_MB));
-        // CUDA obok (laptop z NVIDIA i kartą zintegrowaną): Qwen3-ASR na CUDA — bez zmian.
-        touch(paths.sidecar("llama-cuda", "llama-server"));
-        assert_eq!(chat_stt_reserve_mb(&paths), None);
-        let _ = std::fs::remove_dir_all(dir);
+    fn vulkan_card_below_12_gb_keeps_its_memory_for_the_chat_model() {
+        // RX 9070 XT 16 GB (zmierzone): na karcie.
+        let rx = qwen_free(Some(15_400), true, Some(16_304));
+        assert_eq!(stt_plan(true, false, rx), SttPlan::QwenGpu);
+        // AMD/Intel 8 GB: procesor, mimo wolnej karty przed startem modelu rozmowy.
+        let amd8 = qwen_free(Some(7_900), true, Some(8_176));
+        assert_eq!(stt_plan(true, false, amd8), SttPlan::QwenCpu);
+        // APU z rezerwą 16 GB jako główna karta — na karcie; karta nieznana — decyduje pomiar.
+        assert_eq!(qwen_free(Some(15_000), true, Some(16_384)), Some(15_000));
+        assert_eq!(qwen_free(Some(5_000), true, None), Some(5_000));
+        // CUDA (NVIDIA) bez zmian: próg dotyczy tylko kompilacji Vulkan.
+        assert_eq!(qwen_free(Some(5_300), false, Some(5_921)), Some(5_300));
     }
 
     #[test]

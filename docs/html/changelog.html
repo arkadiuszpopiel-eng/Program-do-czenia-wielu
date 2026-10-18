@@ -331,17 +331,16 @@ wyłącznie skrypt: <code>node scripts/set-version.mjs &lt;numer&gt;</code>; sp�
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.</p>
 <h2 id="0-0-63-2026-10-17">0.0.63 — 2026-10-17</h2>
 <p>Alfa korzysta z każdej karty graficznej — NVIDIA, AMD i Intel, osobnej i zintegrowanej — a na komputerze bez
-karty działa na procesorze. Na kartach AMD i Intel z wolną pamięcią mowa jest rozpoznawana na karcie, a na dużej
-karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); karty Intel — niesprawdzone na sprzęcie.</p>
+karty działa na procesorze. Na kartach AMD i Intel mowa jest rozpoznawana ponad 20 razy szybciej (na karcie od
+12 GB — na karcie), a na dużej karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); karty Intel — niesprawdzone na sprzęcie.</p>
 <h3 id="karty-graficzne">Karty graficzne</h3>
 <ul>
 <li>[poważne] Rozpoznawanie mowy na kartach AMD i Intel liczy na karcie: pakiety „Bardzo dobry” i „Dobry” dostają
 tam Qwen3-ASR (przez <code>llama-server</code> Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
 zdanie rozpoznaje się w 0,16–0,23 s; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie na laptopie).
-Model rozmowy zostawia wtedy na karcie miejsce na Qwen3-ASR (3 GB zamiast 1,5 GB na Whispera), żeby oba się
-zmieściły — na karcie 6–8 GB z modelem 4.5B część warstw modelu rozmowy liczy procesor. Gdy model rozmowy zajmie
-kartę (mniej niż 3,2 GB wolnej pamięci), Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie) — karta NVIDIA ma
-wtedy jeszcze Whisper na karcie.</li>
+Na karcie AMD/Intel poniżej 12 GB Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie), a karta zostaje dla modelu
+rozmowy — obok niego Qwen3-ASR (ok. 2,9 GB) by się pewnie nie zmieścił. Gdy model rozmowy zajmie kartę (mniej niż
+3,2 GB wolnej pamięci), Qwen3-ASR też liczy na procesorze — karta NVIDIA ma wtedy jeszcze Whisper na karcie.</li>
 <li>Komputer z dwiema kartami widocznymi dla Vulkana (np. laptop z grafiką zintegrowaną i osobną kartą) rozpoznaje
 mowę na głównej karcie: Qwen3-ASR dostaje <code>--device</code> głównej karty, a nie liczy na słabszej albo na obu naraz. Gdy kompilacja widzi jedną kartę
 (jedna karta albo CUDA przy NVIDIA i grafice zintegrowanej) — bez zmian i bez sprawdzania listy urządzeń.</li>
@@ -397,11 +396,13 @@ odświeżanie głosu po zmianie DirectML, komunikaty bez karty. Drugi przegląd 
 rezerwa APU liczona dwa razy (jako karta i jako RAM), pomiar pamięci nie tej karty, na której liczy mowa. Trzeci
 przegląd: 4 kolejne — m.in. lista kart odczytywana co 20 ms w trakcie dyktowania, przy dwóch kartach NVIDIA
 wolna pamięć drugiej karty, ocena „mieści się na karcie” według rezerwy APU zamiast karty osobnej. Całościowy
-przegląd wszystkich zmian od 0.0.62: 8 kolejnych — m.in. Qwen3-ASR obok modelu rozmowy na karcie AMD/Intel 6–8 GB
-(teraz model rozmowy zostawia mu miejsce), 250 ms czekania na liczniki Windows przed startem dyktowania, nagłówek
-pakietów i ocena modeli przy grafice zintegrowanej, dwie takie same karty, ponowne starty głosu po usunięciu ONNX
-Runtime. Przegląd tych poprawek odrzucił pierwszą wersję (Qwen3-ASR na procesorze na każdej karcie poniżej 12 GB —
-także tam, gdzie model rozmowy nie korzysta z karty).</li>
+przegląd wszystkich zmian od 0.0.62: 8 kolejnych — m.in. Qwen3-ASR obok modelu rozmowy na karcie AMD/Intel
+6–11 GB (teraz na procesorze), 250 ms czekania na liczniki Windows przed startem dyktowania, nagłówek pakietów
+i ocena modeli przy grafice zintegrowanej, dwie takie same karty, ponowne starty głosu po usunięciu ONNX Runtime.
+Sprawdzona i odrzucona w kolejnym przeglądzie: rezerwa 3 GB dla Qwen3-ASR w budżecie modelu rozmowy (pomiar wolnej
+pamięci po starcie modelu rozmowy i tak spadał poniżej progu Qwen3-ASR). Zostaje ograniczenie: na karcie AMD/Intel
+poniżej 12 GB mowa liczy na procesorze także wtedy, gdy model rozmowy nie korzysta z karty — do osobnego budżetu
+pamięci na kartę.</li>
 <li>Testy w przeglądarce na Chromium Playwrighta (na komputerze stacjonarnym nie ma Edge): 467/467 — w tym nowy test
 pierwszego kliknięcia listy wyboru; wcześniej 2 czerwone (nieaktualny napis w teście strony Urządzenia i lista
 wyboru pomijająca klik w pierwszych 0,3 s).</li>
