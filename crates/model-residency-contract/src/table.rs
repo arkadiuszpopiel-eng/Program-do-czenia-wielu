@@ -1,13 +1,19 @@
 //! Tablica dzierżaw — czysta maszyna stanów wspólna dla `-impl` i `-fake` (bez zegara i I/O;
-//! czas podaje wywołujący). Niezmiennik: po każdej operacji suma dzierżaw ≤ budżet obowiązujący.
+//! czas podaje wywołujący). Niezmiennik: po każdej operacji każda pula (RAM, karta główna, każda
+//! pozostała karta) mieści swoje dzierżawy.
 
 use std::collections::BTreeMap;
 
-use crate::select::{Plan, fits, plan, shrink_victims, total};
+use crate::gpus::{GpuId, GpuLayout};
+use crate::pools::Pools;
+use crate::select::{Plan, plan};
 use crate::types::{
     Budget, Device, Grant, Lease, LeaseId, LeaseRequest, Mode, Placement, Priority, ResidencyError,
     ResidencyState, Revocation, RevokeReason, Usage,
 };
+
+#[path = "table_mode.rs"]
+mod mode;
 
 /// Zmiana wywołana trybem/budżetem/bezczynnością.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -22,23 +28,31 @@ pub enum Change {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LeaseTable {
     base: Budget,
+    gpus: GpuLayout,
     mode: Mode,
     leases: BTreeMap<LeaseId, Lease>,
     next_id: u64,
 }
 
 impl LeaseTable {
-    /// Pusta tablica z budżetem maszyny.
+    /// Pusta tablica z budżetem maszyny z jedną kartą (wszystkie dzierżawy GPU w budżecie karty
+    /// głównej — [`GpuLayout::default`]).
     pub fn new(budget: Budget) -> Self {
+        Self::with_gpus(budget, GpuLayout::default())
+    }
+
+    /// Pusta tablica z budżetem karty głównej i RAM oraz pulami pozostałych kart.
+    pub fn with_gpus(budget: Budget, gpus: GpuLayout) -> Self {
         Self {
             base: budget,
+            gpus: gpus.normalized(),
             mode: Mode::normal(),
             leases: BTreeMap::new(),
             next_id: 1,
         }
     }
 
-    /// Budżet obowiązujący (po emulacji).
+    /// Budżet obowiązujący karty głównej i RAM (po emulacji).
     pub fn budget(&self) -> Budget {
         match self.mode.emulated {
             Some(e) => self.base.min(e),
@@ -46,14 +60,34 @@ impl LeaseTable {
         }
     }
 
+    /// Karty maszyny (bez emulacji).
+    pub fn gpus(&self) -> &GpuLayout {
+        &self.gpus
+    }
+
+    /// Pule obowiązujące (po emulacji).
+    pub fn pools(&self) -> Pools {
+        Pools::new(self.budget(), &self.gpus, self.mode.emulated)
+    }
+
     /// Tryb.
     pub fn mode(&self) -> Mode {
         self.mode
     }
 
-    /// Zajęte zasoby.
+    /// Zajęte: pamięć karty głównej i RAM (z pamięcią kart współdzielonych).
     pub fn used(&self) -> Usage {
-        total(&self.leases)
+        let pools = self.pools();
+        pools.used(self.leases.values(), Some(pools.primary.gpu))
+    }
+
+    /// Pamięć karty zajęta przez dzierżawy (MB); karta nieznana — 0.
+    pub fn used_on(&self, gpu: GpuId) -> u32 {
+        let pools = self.pools();
+        if pools.card(gpu).is_none() {
+            return 0;
+        }
+        pools.used(self.leases.values(), Some(gpu)).vram_mb
     }
 
     /// Dzierżawa (jeśli aktywna).
@@ -68,12 +102,13 @@ impl LeaseTable {
             used: self.used(),
             mode: self.mode,
             leases: self.leases.values().cloned().collect(),
+            gpus: self.pools().states(&self.leases),
         }
     }
 
-    /// Czy niezmiennik budżetu jest spełniony.
+    /// Czy niezmiennik budżetu jest spełniony (wszystkie pule).
     pub fn within_budget(&self) -> bool {
-        fits(self.used(), self.budget())
+        self.pools().fit(&self.leases)
     }
 
     fn validate(request: &LeaseRequest) -> Result<(), ResidencyError> {
@@ -125,34 +160,39 @@ impl LeaseTable {
 
     /// Przydziela dzierżawę: najpierw wolne miejsce, potem eksmisja ustępujących (niższy priorytet
     /// albo równy i nieużywany, LRU); GPU przed CPU dla `GpuPreferred`; `GpuIfFree` — GPU tylko
-    /// bez wypierania, inaczej CPU ([`Placement::GpuIfFree`]).
+    /// bez wypierania, inaczej CPU ([`Placement::GpuIfFree`]). Na GPU — karta z żądania
+    /// ([`LeaseRequest::gpu`]; brak albo nieznana — główna) i tylko jej pula; bez przenoszenia na
+    /// inną kartę.
     pub fn acquire(
         &mut self,
         request: &LeaseRequest,
         now_ms: u64,
     ) -> Result<Grant, ResidencyError> {
         Self::validate(request)?;
-        let budget = self.budget();
+        let pools = self.pools();
+        let card = pools.resolve(request.gpu);
+        let at = |d: Device| (d == Device::Gpu).then_some(card);
         let devices = self.devices(request)?;
         let feasible: Vec<Device> = devices
             .into_iter()
-            .filter(|d| fits(request.need(*d), budget))
+            .filter(|d| pools.need(request, at(*d)).within(pools.limit(at(*d))))
             .collect();
         if feasible.is_empty() {
             return Err(ResidencyError::TooLarge {
                 model: request.model.clone(),
-                vram_mb: budget.vram_mb,
-                ram_mb: budget.ram_mb,
+                vram_mb: pools.limit(Some(card)).vram_mb,
+                ram_mb: pools.ram_mb,
             });
         }
         let mut blockers = Vec::new();
         for (device, allow_evict, preempt) in Self::attempts(&feasible, request.placement) {
-            match plan(&self.leases, request, device, budget, allow_evict) {
+            match plan(&self.leases, request, at(device), &pools, allow_evict) {
                 Plan::Fits {
                     exclusive,
                     preempted,
                 } if preempt || preempted.is_empty() => {
-                    return Ok(self.grant(request, device, &exclusive, &preempted, now_ms));
+                    let place = (device, at(device));
+                    return Ok(self.grant(request, place, &exclusive, &preempted, now_ms));
                 }
                 Plan::Fits { .. } => {}
                 Plan::Blocked(b) => blockers.extend(b),
@@ -166,7 +206,7 @@ impl LeaseTable {
     fn grant(
         &mut self,
         request: &LeaseRequest,
-        device: Device,
+        (device, gpu): (Device, Option<GpuId>),
         exclusive: &[LeaseId],
         preempted: &[LeaseId],
         now_ms: u64,
@@ -194,6 +234,7 @@ impl LeaseTable {
             granted_at_ms: now_ms,
             last_used_ms: now_ms,
             in_use: false,
+            gpu,
         };
         self.leases.insert(id, lease.clone());
         Grant { lease, evicted }
@@ -228,132 +269,5 @@ impl LeaseTable {
             lease.in_use = in_use;
         }
         Ok(())
-    }
-
-    /// Zmienia budżet maszyny (zmiana sprzętu); nadmiar eksmitowany od najniższego priorytetu.
-    pub fn set_budget(&mut self, budget: Budget) -> Vec<Change> {
-        self.base = budget;
-        self.enforce_budget()
-    }
-
-    fn enforce_budget(&mut self) -> Vec<Change> {
-        let mut victims = self.exclusive_violations();
-        let mut changes = self.revoke_all(&victims, &RevokeReason::BudgetShrunk);
-        victims = shrink_victims(&self.leases, self.budget());
-        changes.extend(self.revoke_all(&victims, &RevokeReason::BudgetShrunk));
-        changes
-    }
-
-    /// Po włączeniu wykluczenia STT/TTS: zostaje rola najsilniejszej dzierżawy na GPU
-    /// (priorytet, użycie, świeżość), dzierżawy GPU drugiej roli są odbierane.
-    fn exclusive_violations(&self) -> Vec<LeaseId> {
-        use crate::types::ModelRole;
-        if !self.budget().stt_tts_exclusive {
-            return Vec::new();
-        }
-        let voice: Vec<&Lease> = self
-            .leases
-            .values()
-            .filter(|l| {
-                l.device == Device::Gpu && matches!(l.request.role, ModelRole::Stt | ModelRole::Tts)
-            })
-            .collect();
-        let keep = voice
-            .iter()
-            .max_by_key(|l| {
-                (
-                    l.priority(),
-                    l.in_use,
-                    l.last_used_ms,
-                    std::cmp::Reverse(l.id),
-                )
-            })
-            .map(|l| l.request.role);
-        voice
-            .iter()
-            .filter(|l| Some(l.request.role) != keep)
-            .map(|l| l.id)
-            .collect()
-    }
-
-    fn revoke_all(&mut self, ids: &[LeaseId], reason: &RevokeReason) -> Vec<Change> {
-        ids.iter()
-            .filter_map(|id| self.leases.remove(id))
-            .map(|lease| {
-                Change::Revoked(Revocation {
-                    lease,
-                    reason: reason.clone(),
-                })
-            })
-            .collect()
-    }
-
-    /// Zmienia tryb: gra → dzierżawy GPU na CPU (gdy pozwala umiejscowienie i RAM) albo eksmisja;
-    /// bateria → eksmisja tła; emulacja → egzekwowanie mniejszego budżetu.
-    pub fn set_mode(&mut self, mode: Mode) -> Vec<Change> {
-        self.mode = mode;
-        let mut changes = Vec::new();
-        if mode.battery {
-            let background: Vec<LeaseId> = self
-                .leases
-                .values()
-                .filter(|l| l.priority() == Priority::Background)
-                .map(|l| l.id)
-                .collect();
-            changes.extend(self.revoke_all(&background, &RevokeReason::Battery));
-        }
-        if mode.gaming {
-            changes.extend(self.leave_gpu());
-        }
-        changes.extend(self.enforce_budget());
-        changes
-    }
-
-    fn leave_gpu(&mut self) -> Vec<Change> {
-        let mut on_gpu: Vec<Lease> = self
-            .leases
-            .values()
-            .filter(|l| l.device == Device::Gpu)
-            .cloned()
-            .collect();
-        // Wyższy priorytet dostaje RAM pierwszy.
-        on_gpu.sort_by_key(|l| (std::cmp::Reverse(l.priority()), l.id));
-        let budget = self.budget();
-        let mut changes = Vec::new();
-        for lease in on_gpu {
-            let mut used = self.used();
-            used.vram_mb = used.vram_mb.saturating_sub(lease.request.vram_mb);
-            used.ram_mb = used.ram_mb.saturating_sub(lease.request.ram_mb);
-            let after = used.ram_mb.saturating_add(lease.request.cpu_ram_mb);
-            let movable = lease.request.placement != Placement::GpuOnly && after <= budget.ram_mb;
-            if movable && let Some(l) = self.leases.get_mut(&lease.id) {
-                l.device = Device::Cpu;
-                changes.push(Change::Moved(l.clone()));
-            } else {
-                changes.extend(self.revoke_all(&[lease.id], &RevokeReason::Gaming));
-            }
-        }
-        changes
-    }
-
-    /// Eksmituje dzierżawy bezczynne dłużej niż ich `idle_unload_ms` (tylko nieużywane).
-    pub fn reap_idle(&mut self, now_ms: u64) -> Vec<Revocation> {
-        let idle: Vec<LeaseId> = self
-            .leases
-            .values()
-            .filter(|l| {
-                !l.in_use
-                    && l.request.idle_unload_ms > 0
-                    && now_ms.saturating_sub(l.last_used_ms) >= l.request.idle_unload_ms
-            })
-            .map(|l| l.id)
-            .collect();
-        self.revoke_all(&idle, &RevokeReason::Idle)
-            .into_iter()
-            .filter_map(|c| match c {
-                Change::Revoked(r) => Some(r),
-                Change::Moved(_) => None,
-            })
-            .collect()
     }
 }

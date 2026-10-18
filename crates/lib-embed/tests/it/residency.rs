@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex};
 
 use model_residency_contract::{
-    Budget, Change, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable, ManualClock,
-    Mode, Residency, ResidencyClock, ResidencyError, ResidencyState, Revocation,
+    Budget, Change, GpuLayout, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable,
+    ManualClock, Mode, Residency, ResidencyClock, ResidencyError, ResidencyState, Revocation,
 };
 
 /// Zarządca testowy.
@@ -86,6 +86,12 @@ impl Residency for TableResidency {
 
     fn set_budget(&self, budget: Budget) -> Vec<Change> {
         let changes = self.table.lock().unwrap().set_budget(budget);
+        self.notify(&changes);
+        changes
+    }
+
+    fn set_gpus(&self, gpus: GpuLayout) -> Vec<Change> {
+        let changes = self.table.lock().unwrap().set_gpus(gpus);
         self.notify(&changes);
         changes
     }

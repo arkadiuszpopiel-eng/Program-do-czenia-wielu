@@ -7,8 +7,8 @@ use std::time::Instant;
 
 use device_profile_contract::{DeviceProfile, PowerState};
 use model_residency_contract::{
-    Budget, Change, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable, Mode,
-    ModeSource, Placement, Residency, ResidencyClock, ResidencyError, ResidencyEvent,
+    Budget, Change, GpuLayout, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable,
+    Mode, ModeSource, Placement, Residency, ResidencyClock, ResidencyError, ResidencyEvent,
     ResidencyState, Revocation,
 };
 use tokio::sync::mpsc::UnboundedSender;
@@ -64,21 +64,31 @@ fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
 }
 
 impl ResidencyManager {
-    /// Zarządca z budżetem i zegarem.
+    /// Zarządca z budżetem maszyny z jedną kartą i zegarem.
     pub fn new(budget: Budget, clock: Arc<dyn ResidencyClock>) -> Self {
+        Self::with_gpus(budget, GpuLayout::default(), clock)
+    }
+
+    /// Zarządca z budżetem karty głównej i RAM, pulami pozostałych kart i zegarem.
+    pub fn with_gpus(budget: Budget, gpus: GpuLayout, clock: Arc<dyn ResidencyClock>) -> Self {
         Self {
-            table: Mutex::new(LeaseTable::new(budget)),
+            table: Mutex::new(LeaseTable::with_gpus(budget, gpus)),
             clock,
             listeners: Mutex::new(BTreeMap::new()),
             sink: Mutex::new(None),
         }
     }
 
-    /// Zarządca z budżetem z rekomendacji `device-profile` (z nakładką konfiguracji maszyny)
-    /// i trybem z bieżących sygnałów (pełny ekran, bateria).
+    /// Zarządca z budżetem z rekomendacji `device-profile` (z nakładką konfiguracji maszyny —
+    /// dotyczy karty głównej i RAM), osobnymi pulami pozostałych kart z profilu
+    /// ([`GpuLayout::from_profile`]) i trybem z bieżących sygnałów (pełny ekran, bateria).
     pub fn from_device(device: Arc<dyn DeviceProfile>, config: &ResidencyConfig) -> Self {
         let budget = config.budget(&device.recommend().residency);
-        let manager = Self::new(budget, Arc::new(MonotonicClock::new()));
+        let gpus = GpuLayout::from_profile(&device.current());
+        if !gpus.others.is_empty() {
+            tracing::info!(główna = %gpus.primary, pozostałe = ?gpus.others, "osobne pule pamięci kart");
+        }
+        let manager = Self::with_gpus(budget, gpus, Arc::new(MonotonicClock::new()));
         manager.refresh_mode(&config.signals(DeviceSignals(device)));
         manager
     }
@@ -140,7 +150,7 @@ impl Residency for ResidencyManager {
                 let preferred_gpu = request.placement != Placement::CpuOnly;
                 self.emit(ResidencyEvent::from_grant(grant, preferred_gpu));
                 tracing::debug!(model = %grant.lease.request.model, device = ?grant.lease.device,
-                    evicted = grant.evicted.len(), "przyznano dzierżawę");
+                    gpu = ?grant.lease.gpu, evicted = grant.evicted.len(), "przyznano dzierżawę");
             }
             Err(ResidencyError::TooLarge {
                 model,
@@ -196,6 +206,12 @@ impl Residency for ResidencyManager {
 
     fn set_budget(&self, budget: Budget) -> Vec<Change> {
         let changes = self.table().set_budget(budget);
+        self.notify(&changes);
+        changes
+    }
+
+    fn set_gpus(&self, gpus: GpuLayout) -> Vec<Change> {
+        let changes = self.table().set_gpus(gpus);
         self.notify(&changes);
         changes
     }

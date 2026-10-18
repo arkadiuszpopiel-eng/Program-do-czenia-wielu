@@ -5,7 +5,9 @@
 use std::sync::{Arc, Mutex};
 
 use model_residency_contract::contract_tests::{self, Harness, request};
-use model_residency_contract::{Budget, Mode, Priority, Residency, ResidencyError, ResidencyEvent};
+use model_residency_contract::{
+    Budget, GpuLayout, Mode, Priority, Residency, ResidencyError, ResidencyEvent,
+};
 use model_residency_fake::{Call, FakeResidency};
 
 #[derive(Default)]
@@ -18,6 +20,12 @@ impl Harness for FakeHarness {
 
     fn residency(&self, budget: Budget) -> FakeResidency {
         let fake = FakeResidency::new(budget);
+        *self.last.lock().unwrap() = Some(fake.clone());
+        fake
+    }
+
+    fn residency_with_gpus(&self, budget: Budget, gpus: GpuLayout) -> FakeResidency {
+        let fake = FakeResidency::with_gpus(budget, gpus);
         *self.last.lock().unwrap() = Some(fake.clone());
         fake
     }

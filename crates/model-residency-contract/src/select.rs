@@ -2,10 +2,14 @@
 //!
 //! Dzierżawa `l` może ustąpić żądaniu `r`, gdy `l` ma **niższy** priorytet, albo **równy** i nie jest
 //! w użyciu (`in_use`). Dzięki temu żądanie o wyższym priorytecie nigdy nie czeka na niższy.
+//! Rachunki idą przez [`Pools`]: żądanie na karcie B może wyprzeć tylko dzierżawy z karty B albo
+//! zajmujące RAM (gdy go brakuje) — model na karcie A nie ustępuje miejsca na karcie B.
 
 use std::collections::BTreeMap;
 
-use crate::types::{Budget, Device, Lease, LeaseId, LeaseRequest, ModelRole, Usage};
+use crate::gpus::GpuId;
+use crate::pools::Pools;
+use crate::types::{Budget, Lease, LeaseId, LeaseRequest, ModelRole, Usage};
 
 /// Czy dzierżawa może ustąpić żądaniu.
 pub fn yields_to(lease: &Lease, request: &LeaseRequest) -> bool {
@@ -18,20 +22,20 @@ fn eviction_key(l: &Lease) -> (crate::types::Priority, bool, u64, LeaseId) {
     (l.priority(), l.in_use, l.last_used_ms, l.id)
 }
 
-/// Suma zużycia.
+/// Suma surowa zużycia (pamięć wszystkich kart razem i RAM bez pamięci kart współdzielonych);
+/// budżet sprawdzają [`Pools`].
 pub fn total(leases: &BTreeMap<LeaseId, Lease>) -> Usage {
-    leases.values().fold(Usage::default(), |acc, l| {
-        let u = l.usage();
-        Usage {
-            vram_mb: acc.vram_mb.saturating_add(u.vram_mb),
-            ram_mb: acc.ram_mb.saturating_add(u.ram_mb),
-        }
-    })
+    leases
+        .values()
+        .fold(Usage::default(), |acc, l| plus(acc, l.usage()))
 }
 
-/// Czy zużycie mieści się w budżecie.
+/// Czy zużycie mieści się w budżecie (karta główna i RAM).
 pub fn fits(used: Usage, budget: Budget) -> bool {
-    used.vram_mb <= budget.vram_mb && used.ram_mb <= budget.ram_mb
+    used.within(Usage {
+        vram_mb: budget.vram_mb,
+        ram_mb: budget.ram_mb,
+    })
 }
 
 fn plus(a: Usage, b: Usage) -> Usage {
@@ -48,24 +52,28 @@ fn minus(a: Usage, b: Usage) -> Usage {
     }
 }
 
-/// Dzierżawy, które muszą zejść z GPU, gdy STT i ciężki TTS są wzajemnie wykluczające.
+/// Dzierżawy, które muszą zejść z karty `on`, gdy STT i ciężki TTS są na niej wzajemnie
+/// wykluczające (procesor — nigdy).
 pub fn exclusive_conflicts<'a>(
     leases: &'a BTreeMap<LeaseId, Lease>,
     request: &LeaseRequest,
-    device: Device,
-    budget: Budget,
+    on: Option<GpuId>,
+    pools: &Pools,
 ) -> Vec<&'a Lease> {
     let other = match request.role {
         ModelRole::Stt => ModelRole::Tts,
         ModelRole::Tts => ModelRole::Stt,
         _ => return Vec::new(),
     };
-    if !budget.stt_tts_exclusive || device != Device::Gpu {
+    let Some(card) = on else {
+        return Vec::new();
+    };
+    if !pools.card(card).is_some_and(|p| p.stt_tts_exclusive) {
         return Vec::new();
     }
     leases
         .values()
-        .filter(|l| l.device == Device::Gpu && l.request.role == other)
+        .filter(|l| pools.card_of(l) == Some(card) && l.request.role == other)
         .collect()
 }
 
@@ -83,16 +91,18 @@ pub enum Plan {
     Blocked(Vec<LeaseId>),
 }
 
-/// Planuje umiejscowienie żądania na urządzeniu (`allow_evict = false` → tylko wolne miejsce).
+/// Planuje umiejscowienie żądania w miejscu `on` — karta albo `None` (procesor);
+/// `allow_evict = false` → tylko wolne miejsce.
 pub fn plan(
     leases: &BTreeMap<LeaseId, Lease>,
     request: &LeaseRequest,
-    device: Device,
-    budget: Budget,
+    on: Option<GpuId>,
+    pools: &Pools,
     allow_evict: bool,
 ) -> Plan {
-    let need = request.need(device);
-    let conflicts = exclusive_conflicts(leases, request, device, budget);
+    let need = pools.need(request, on);
+    let limit = pools.limit(on);
+    let conflicts = exclusive_conflicts(leases, request, on, pools);
     let blocking: Vec<LeaseId> = conflicts
         .iter()
         .filter(|l| !yields_to(l, request))
@@ -107,9 +117,11 @@ pub fn plan(
     let exclusive: Vec<LeaseId> = conflicts.iter().map(|l| l.id).collect();
     let mut used = conflicts
         .iter()
-        .fold(total(leases), |acc, l| minus(acc, l.usage()));
+        .fold(pools.used(leases.values(), on), |acc, l| {
+            minus(acc, pools.load(l, on))
+        });
     let mut preempted = Vec::new();
-    if fits(plus(used, need), budget) {
+    if plus(used, need).within(limit) {
         return Plan::Fits {
             exclusive,
             preempted,
@@ -125,16 +137,16 @@ pub fn plan(
     candidates.sort_by_key(|l| eviction_key(l));
     for victim in candidates {
         let after = plus(used, need);
-        let vram_short = after.vram_mb > budget.vram_mb;
-        let ram_short = after.ram_mb > budget.ram_mb;
-        let u = victim.usage();
+        let vram_short = after.vram_mb > limit.vram_mb;
+        let ram_short = after.ram_mb > limit.ram_mb;
+        let u = pools.load(victim, on);
         let helps = (vram_short && u.vram_mb > 0) || (ram_short && u.ram_mb > 0);
         if !helps {
             continue;
         }
         used = minus(used, u);
         preempted.push(victim.id);
-        if fits(plus(used, need), budget) {
+        if plus(used, need).within(limit) {
             return Plan::Fits {
                 exclusive,
                 preempted,
@@ -143,27 +155,29 @@ pub fn plan(
     }
     let blockers = leases
         .values()
-        .filter(|l| !yields_to(l, request) && l.usage() != Usage::default())
+        .filter(|l| !yields_to(l, request) && pools.load(l, on) != Usage::default())
         .map(|l| l.id)
         .collect();
     Plan::Blocked(blockers)
 }
 
-/// Ofiary przywracające budżet po jego zmniejszeniu (najpierw najniższy priorytet / LRU).
-pub fn shrink_victims(leases: &BTreeMap<LeaseId, Lease>, budget: Budget) -> Vec<LeaseId> {
-    let mut used = total(leases);
+/// Ofiary przywracające wszystkie pule po zmniejszeniu budżetu (najpierw najniższy priorytet /
+/// LRU; dzierżawa odpada tylko wtedy, gdy zwalnia przepełnioną pulę).
+pub fn shrink_victims(leases: &BTreeMap<LeaseId, Lease>, pools: &Pools) -> Vec<LeaseId> {
     let mut order: Vec<&Lease> = leases.values().collect();
     order.sort_by_key(|l| eviction_key(l));
-    let mut out = Vec::new();
+    let mut out: Vec<LeaseId> = Vec::new();
     for l in order {
-        if fits(used, budget) {
+        let rest = leases.values().filter(|x| !out.contains(&x.id));
+        let (ram_over, cards_over) = pools.overflow(rest);
+        if !ram_over && cards_over.is_empty() {
             break;
         }
-        let u = l.usage();
-        let helps = (used.vram_mb > budget.vram_mb && u.vram_mb > 0)
-            || (used.ram_mb > budget.ram_mb && u.ram_mb > 0);
+        let ram = pools.load(l, None).ram_mb;
+        let card = pools.card_of(l);
+        let helps = (ram_over && ram > 0)
+            || card.is_some_and(|c| cards_over.contains(&c) && l.usage().vram_mb > 0);
         if helps {
-            used = minus(used, u);
             out.push(l.id);
         }
     }

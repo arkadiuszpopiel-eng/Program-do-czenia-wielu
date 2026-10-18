@@ -10,8 +10,9 @@ use std::collections::{BTreeMap, VecDeque};
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use model_residency_contract::{
-    Budget, Change, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable, ManualClock,
-    Mode, Residency, ResidencyClock, ResidencyError, ResidencyEvent, ResidencyState, Revocation,
+    Budget, Change, GpuLayout, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable,
+    ManualClock, Mode, Residency, ResidencyClock, ResidencyError, ResidencyEvent, ResidencyState,
+    Revocation,
 };
 
 /// Wywołanie zarejestrowane przez atrapę.
@@ -41,10 +42,15 @@ pub struct FakeResidency {
 }
 
 impl FakeResidency {
-    /// Atrapa z budżetem i zegarem od 0 ms.
+    /// Atrapa z budżetem maszyny z jedną kartą i zegarem od 0 ms.
     pub fn new(budget: Budget) -> Self {
+        Self::with_gpus(budget, GpuLayout::default())
+    }
+
+    /// Atrapa z budżetem karty głównej i RAM oraz pulami pozostałych kart, zegar od 0 ms.
+    pub fn with_gpus(budget: Budget, gpus: GpuLayout) -> Self {
         let state = State {
-            table: LeaseTable::new(budget),
+            table: LeaseTable::with_gpus(budget, gpus),
             listeners: BTreeMap::new(),
             fail_next: VecDeque::new(),
             calls: Vec::new(),
@@ -176,6 +182,12 @@ impl Residency for FakeResidency {
 
     fn set_budget(&self, budget: Budget) -> Vec<Change> {
         let changes = self.with_table(|t, _| t.set_budget(budget));
+        self.notify(&changes);
+        changes
+    }
+
+    fn set_gpus(&self, gpus: GpuLayout) -> Vec<Change> {
+        let changes = self.with_table(|t, _| t.set_gpus(gpus));
         self.notify(&changes);
         changes
     }

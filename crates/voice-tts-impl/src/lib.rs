@@ -52,6 +52,7 @@ impl TtsLease {
             ram_mb: 0,
             cpu_ram_mb: ram_mb,
             idle_unload_ms,
+            gpu: None,
         };
         let grant = residency.acquire(request)?;
         Ok(Self {

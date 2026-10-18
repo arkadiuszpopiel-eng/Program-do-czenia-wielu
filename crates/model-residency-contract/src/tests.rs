@@ -20,6 +20,7 @@ pub(crate) fn req(
         ram_mb: 200,
         cpu_ram_mb,
         idle_unload_ms: 600_000,
+        gpu: None,
     }
 }
 

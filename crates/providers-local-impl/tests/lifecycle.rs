@@ -248,6 +248,7 @@ async fn device_profile_and_residency_drive_arguments() {
         ram_mb: 200,
         cpu_ram_mb: 0,
         idle_unload_ms: 0,
+        gpu: None,
     };
     let grant = residency.acquire(stt).unwrap();
     assert_eq!(grant.evicted.len(), 1);

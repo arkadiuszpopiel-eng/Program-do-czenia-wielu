@@ -31,6 +31,7 @@ impl WhisperStt {
             ram_mb: 600,
             cpu_ram_mb: 1_500,
             idle_unload_ms: self.config.idle_unload_ms,
+            gpu: None,
         }
     }
 

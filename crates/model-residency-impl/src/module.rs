@@ -8,7 +8,7 @@ use core_bus_contract::{Event, EventBus, Level};
 use core_registry_contract::{
     HealthStatus, ManifestError, Module, ModuleContext, ModuleError, ModuleManifest,
 };
-use model_residency_contract::{ModeSource, Residency, ResidencyEvent, event_kind, fits};
+use model_residency_contract::{ModeSource, Residency, ResidencyEvent, event_kind};
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
@@ -122,12 +122,12 @@ impl Module for ResidencyModule {
             return HealthStatus::NotStarted;
         }
         let s = self.manager.snapshot();
-        if fits(s.used, s.budget) {
+        if s.within_budget() {
             HealthStatus::Healthy
         } else {
             HealthStatus::Unhealthy(format!(
-                "przekroczony budżet: {:?} > {:?}",
-                s.used, s.budget
+                "przekroczony budżet: {:?} > {:?}, karty: {:?}",
+                s.used, s.budget, s.gpus
             ))
         }
     }
