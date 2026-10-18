@@ -21,6 +21,18 @@ Plan i historia zmian są osobno: [`../plan/`](../plan/README.md), [`../../CHANG
 
 ## Zasady
 
-- Plików w podkatalogach nie edytuj tutaj — zmiana zniknie przy następnej kopii. Edytuj źródło i uruchom
-  `bash scripts/memory-sync.sh`.
+- Plików w podkatalogach nie edytuj tutaj — przy następnej kopii zastąpi je wersja ze źródła. Edytuj źródło
+  i uruchom `bash scripts/memory-sync.sh`.
+- Skrypt dodaje nowe i aktualizuje zmienione pliki, ale **z kopii niczego nie usuwa**. Plik, którego nie ma
+  u źródła (np. zasady zapisane na drugim komputerze albo pusta pamięć asystenta na nowej maszynie), zostaje
+  tutaj i trafia na listę `OSTRZEŻENIE` z gotowymi poleceniami przywrócenia go do źródła (`mkdir -p …`,
+  `cp -n …`). W katalogu, którego źródło wygląda tak na niepełne, skrypt nie nadpisuje też plików różniących
+  się od źródła (np. spisu `MEMORY.md`) — wypisuje polecenia `diff -u` do porównania. Po przywróceniu
+  (i połączeniu spisu `MEMORY.md`) uruchom skrypt ponownie.
+- `bash scripts/memory-sync.sh --prune` — lustro: usuwa z kopii pliki, których nie ma u źródła, i nadpisuje
+  różniące się. Tylko wtedy, gdy pliki usunięto u źródła celowo (2026-10-17/18 lustro jako zachowanie
+  domyślne skasowało stąd zasady pracy, gdy dysk przeszedł na komputer z pustą pamięcią asystenta).
+- Na nowym komputerze najpierw przywróć zasady z `2-zasady-pracy/` do pamięci asystenta (polecenia z ostrzeżenia),
+  a po kopii sprawdź `git status docs/pamiec-projektu`.
 - Żadnych sekretów: skrypt odmawia kopii, gdy znajdzie coś, co wygląda na klucz.
+- Test skryptu (piaskownica, niczego tu nie zmienia): `bash scripts/tests/memory-sync.test.sh`.
