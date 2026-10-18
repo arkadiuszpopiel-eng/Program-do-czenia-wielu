@@ -229,3 +229,13 @@ Przy okazji poprawione teksty widoczne dla Ciebie: kompromis klasy „nieznana�
 także dla AMD/Intel (Whisper nie ma tam wersji Vulkan, a Qwen3-ASR liczy na karcie od 12 GB) — teraz zależnie od
 producenta; komunikat autotestu podaje regułę 12 GB jako możliwą przyczynę mowy na procesorze. Testy: `app-modules`
 i `app-voice` 83/0, `device-profile-contract` 12/0, clippy czysty.
+
+## 14. Końcowy `verify wersja` (commit `96588e5b`, 02:20–02:44) i testy w przeglądarce
+
+**16 zielonych, 2 czerwone, 1 nieuruchomiony.** Testy całego projektu: 1003 programy, **2898 zielonych, 0 czerwonych**,
+40 pominiętych; powłoka Tauri zielona; interfejs 395/395; prawdziwa aplikacja (zbudowana od nowa z `96588e5b`)
+**41 zielonych** (test logowania Claude Code pominięty), pokrycie łącza **235 z 264 (89 %)**; formatowanie, lintery,
+schematy, typy, plan HTML, `pnpm audit`, SBOM — zielone. Czerwone — znane przyczyny: testy w przeglądarce w etapie
+`verify` (brak Edge; budowa i budżet rozmiaru przeszły) i `cargo deny` (już tylko 3 ostrzeżenia `zip`). Nieuruchomiony:
+graf zależności (brak `jq`). Te same testy w przeglądarce uruchomione zaraz potem na Chromium Playwrighta:
+**467/467** (4,9 min). Zbudowana wersja do wgrania: `alfa/target/shell/debug/alfa-desktop.exe` z `96588e5b`.
