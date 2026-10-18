@@ -20,8 +20,8 @@ karty działa na procesorze. Na kartach AMD i Intel mowa jest rozpoznawana ponad
 
 ### Karty graficzne
 
-- [poważne] Rozpoznawanie mowy na kartach AMD i Intel liczy na karcie: pakiety „Bardzo dobry” i „Dobry” dostają
-  tam Qwen3-ASR (przez `llama-server` Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
+- [poważne] Rozpoznawanie mowy na kartach AMD i Intel jest ponad 20 razy szybsze: pakiety „Bardzo dobry” i „Dobry”
+  dostają tam Qwen3-ASR (przez `llama-server` Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
   zdanie rozpoznaje się w 0,16–0,23 s; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie na laptopie).
   Na karcie AMD/Intel poniżej 12 GB Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie), a karta zostaje dla modelu
   rozmowy — obok niego Qwen3-ASR (ok. 2,9 GB) by się pewnie nie zmieścił. Gdy model rozmowy zajmie kartę (mniej niż
@@ -43,7 +43,7 @@ karty działa na procesorze. Na kartach AMD i Intel mowa jest rozpoznawana ponad
   ≥ 8 wątków); liczba wątków nie obniża już klasy — tylko opisuje kompromis. Klasa dla AMD/Intel 6–11 GB nazywa się
   „podstawowa”, dla NVIDIA — „karta NVIDIA (CUDA)”. Bez zmian: „mocna” to NVIDIA od 12 GB albo każda karta od 20 GB
   (przy 32 GB RAM), bo ciężki lokalny głos wymaga CUDA. Nowa klasa „karta zintegrowana”: mały model rozmowy na karcie
-  przez Vulkan, mowa na procesorze. Mała osobna karta (4–5 GB) liczy przynajmniej rozpoznawanie mowy.
+  przez Vulkan, mowa na procesorze. Mała osobna karta NVIDIA (4–5 GB) liczy przynajmniej rozpoznawanie mowy.
 - Pakiety: karta zintegrowana dostaje silnik Vulkan; laptop z NVIDIA i kartą zintegrowaną — także `llama-vulkan`
   dla lekkiego modelu.
 - Wolna pamięć karty, obciążenie i programy, które z niej korzystają, są mierzone licznikami Windows dla każdego

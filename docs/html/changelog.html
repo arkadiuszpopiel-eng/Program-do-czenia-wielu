@@ -335,8 +335,8 @@ karty działa na procesorze. Na kartach AMD i Intel mowa jest rozpoznawana ponad
 12 GB — na karcie), a na dużej karcie także głos liczy na karcie. Sprawdzone na Radeonie RX 9070 XT (AMD); karty Intel — niesprawdzone na sprzęcie.</p>
 <h3 id="karty-graficzne">Karty graficzne</h3>
 <ul>
-<li>[poważne] Rozpoznawanie mowy na kartach AMD i Intel liczy na karcie: pakiety „Bardzo dobry” i „Dobry” dostają
-tam Qwen3-ASR (przez <code>llama-server</code> Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
+<li>[poważne] Rozpoznawanie mowy na kartach AMD i Intel jest ponad 20 razy szybsze: pakiety „Bardzo dobry” i „Dobry”
+dostają tam Qwen3-ASR (przez <code>llama-server</code> Vulkan), bo whisper.cpp nie wydaje wersji Vulkan dla Windows. Na RX 9070 XT
 zdanie rozpoznaje się w 0,16–0,23 s; wcześniej Whisper liczył na procesorze (ok. 54 s na zdanie na laptopie).
 Na karcie AMD/Intel poniżej 12 GB Qwen3-ASR liczy na procesorze (ok. 2,4 s na zdanie), a karta zostaje dla modelu
 rozmowy — obok niego Qwen3-ASR (ok. 2,9 GB) by się pewnie nie zmieścił. Gdy model rozmowy zajmie kartę (mniej niż
@@ -358,7 +358,7 @@ się bez tej rezerwy (np. 32 GB z 16 GB rezerwy to 16 GB RAM dla systemu).</li>
 ≥ 8 wątków); liczba wątków nie obniża już klasy — tylko opisuje kompromis. Klasa dla AMD/Intel 6–11 GB nazywa się
 „podstawowa”, dla NVIDIA — „karta NVIDIA (CUDA)”. Bez zmian: „mocna” to NVIDIA od 12 GB albo każda karta od 20 GB
 (przy 32 GB RAM), bo ciężki lokalny głos wymaga CUDA. Nowa klasa „karta zintegrowana”: mały model rozmowy na karcie
-przez Vulkan, mowa na procesorze. Mała osobna karta (4–5 GB) liczy przynajmniej rozpoznawanie mowy.</li>
+przez Vulkan, mowa na procesorze. Mała osobna karta NVIDIA (4–5 GB) liczy przynajmniej rozpoznawanie mowy.</li>
 <li>Pakiety: karta zintegrowana dostaje silnik Vulkan; laptop z NVIDIA i kartą zintegrowaną — także <code>llama-vulkan</code>
 dla lekkiego modelu.</li>
 <li>Wolna pamięć karty, obciążenie i programy, które z niej korzystają, są mierzone licznikami Windows dla każdego
