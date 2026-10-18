@@ -1,36 +1,32 @@
-//! Tekst z PDF dla modelu (C2.11). `lopdf` czyta strukturę pliku (xref, strumienie obiektów,
-//! odszyfrowanie pustym hasłem użytkownika), a treść stron, czcionki i mapy `ToUnicode`
-//! interpretujemy sami — strumieniowo i z limitami: rozmiar wejścia, liczba obiektów i stron,
-//! rozpakowane bajty, operacje treści, głębokość formularzy, znaki wyniku i czas. Ekstrakcja idzie
-//! w osobnym wątku z terminem — wrogi plik nie zawiesi wywołującego; wynik trzymamy w małej
-//! pamięci podręcznej (po SHA-256), bo projekcja historii pyta o te same pliki co turę.
-//! PDF z hasłem i skany (bez warstwy tekstowej) dają notkę po polsku zamiast tekstu; OCR skanów
-//! to osobny, opcjonalny dodatek (roadmapa C2.11).
+//! Tekst z PDF dla modelu (C2.11). `lopdf` czyta strukturę pliku (xref, obiekty), a strumienie
+//! obiektów, odszyfrowanie pustym hasłem użytkownika, treść stron, czcionki i mapy `ToUnicode`
+//! obsługujemy sami — strumieniowo i z limitami: rozmiar wejścia, liczba obiektów i stron,
+//! rozpakowane bajty, operacje treści, głębokość formularzy, znaki wyniku i czas (ścieżki `lopdf`
+//! bez limitów omijamy — `docs/vendor/lopdf.md`). Ekstrakcja idzie w osobnym wątku z terminem,
+//! a wynik trafia do pamięci podręcznej po SHA-256 (`isolate`), bo projekcja historii pyta o te
+//! same pliki co turę. PDF z hasłem i skany (bez warstwy tekstowej) dają notkę po polsku zamiast
+//! tekstu; OCR skanów to osobny, opcjonalny dodatek (roadmapa C2.11).
 
 mod cmap;
 mod encoding;
 mod fonts;
+mod isolate;
 mod lexer;
 mod load;
+mod objstm;
+mod prepare;
 mod sink;
 mod state;
+mod streams;
 mod walk;
 
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::{Mutex, PoisonError, mpsc};
 use std::time::{Duration, Instant};
 
 use super::extract::Extracted;
 use load::LoadError;
 
 const MIB: usize = 1024 * 1024;
-/// Ile wyników trzymamy w pamięci podręcznej.
-const CACHE_ENTRIES: usize = 16;
-/// Najwięcej jednoczesnych wątków ekstrakcji (także tych, które przekroczyły termin).
-const MAX_RUNNING: usize = 3;
-/// Stos wątku ekstrakcji.
-const STACK: usize = 16 * MIB;
-/// Zapas na notkę o uciętym tekście (znaki).
+/// Zapas na notkę o uciętym tekście (znaki; notka ma ich najwyżej ok. 110).
 const NOTE_RESERVE: usize = 200;
 
 const ENCRYPTED: &str = "PDF jest zabezpieczony hasłem, więc Alfa nie odczyta jego tekstu. Otwórz go z hasłem, \
@@ -42,8 +38,6 @@ const NO_TEXT: &str =
 const BROKEN: &str = "PDF jest uszkodzony albo niepełny — nie udało się odczytać jego struktury.";
 const TOO_COMPLEX: &str = "PDF jest zbyt złożony (limit obiektów albo rozpakowanych danych) — tekstu nie \
      wyciągnięto, żeby nie obciążać Alfy.";
-const BUSY: &str = "Wyciąganie tekstu z PDF jest chwilowo niedostępne (trwają inne ekstrakcje) — spróbuj ponownie \
-     za chwilę.";
 
 /// Limity ekstrakcji.
 #[derive(Debug, Clone, Copy)]
@@ -135,77 +129,16 @@ pub fn text(name: &str, bytes: &[u8], max_chars: usize) -> Option<Extracted> {
         )));
     }
     let key = (artifacts_contract::sha256_hex(bytes), max_chars);
-    if let Some(hit) = cache_get(&key) {
+    if let Some(hit) = isolate::cache_get(&key) {
         return Some(hit);
     }
-    let (out, cacheable) = isolated(bytes.to_vec(), limits);
-    if cacheable {
-        cache_put(key, out.clone());
-    }
-    Some(out)
-}
-
-type Key = (String, usize);
-static CACHE: Mutex<Vec<(Key, Extracted)>> = Mutex::new(Vec::new());
-static RUNNING: AtomicUsize = AtomicUsize::new(0);
-
-fn cache_get(key: &Key) -> Option<Extracted> {
-    let mut cache = CACHE.lock().unwrap_or_else(PoisonError::into_inner);
-    let at = cache.iter().position(|(k, _)| k == key)?;
-    let entry = cache.remove(at);
-    let value = entry.1.clone();
-    cache.push(entry);
-    Some(value)
-}
-
-fn cache_put(key: Key, value: Extracted) {
-    let mut cache = CACHE.lock().unwrap_or_else(PoisonError::into_inner);
-    cache.retain(|(k, _)| k != &key);
-    if cache.len() >= CACHE_ENTRIES {
-        cache.remove(0);
-    }
-    cache.push((key, value));
-}
-
-/// Zmniejsza licznik wątków także po panice w ekstrakcji.
-struct Running;
-
-impl Drop for Running {
-    fn drop(&mut self) {
-        RUNNING.fetch_sub(1, Ordering::SeqCst);
-    }
-}
-
-/// Ekstrakcja w osobnym wątku z terminem; `bool` — czy wynik można zapamiętać.
-fn isolated(bytes: Vec<u8>, limits: Limits) -> (Extracted, bool) {
-    if RUNNING.fetch_add(1, Ordering::SeqCst) >= MAX_RUNNING {
-        RUNNING.fetch_sub(1, Ordering::SeqCst);
-        return (Extracted::Note(BUSY.into()), false);
-    }
-    let guard = Running;
-    let (tx, rx) = mpsc::sync_channel(1);
+    let bytes = bytes.to_vec();
     let deadline = Instant::now() + limits.time;
-    let spawned = std::thread::Builder::new()
-        .name("alfa-pdf".into())
-        .stack_size(STACK)
-        .spawn(move || {
-            let _guard = guard;
-            let _ = tx.send(extract(&bytes, &limits, deadline));
-        });
-    if spawned.is_err() {
-        return (Extracted::Note(BUSY.into()), false);
-    }
-    match rx.recv_timeout(limits.time + Duration::from_secs(1)) {
-        Ok(out) => (out, true),
-        Err(mpsc::RecvTimeoutError::Timeout) => (
-            Extracted::Note(format!(
-                "Wyciąganie tekstu z PDF przekroczyło limit czasu ({} s) i zostało przerwane.",
-                limits.time.as_secs()
-            )),
-            true,
-        ),
-        Err(mpsc::RecvTimeoutError::Disconnected) => (Extracted::Note(BROKEN.into()), true),
-    }
+    let (out, keep) = isolate::run(&isolate::RUNNING, limits.time, move || {
+        extract(&bytes, &limits, deadline)
+    });
+    isolate::cache_put(key, out.clone(), keep);
+    Some(out)
 }
 
 /// Czy w pierwszym KiB jest nagłówek `%PDF-`.
@@ -226,20 +159,34 @@ pub(super) fn extract(bytes: &[u8], limits: &Limits, deadline: Instant) -> Extra
         Err(LoadError::TooComplex) => return Extracted::Note(TOO_COMPLEX.into()),
         Err(LoadError::Broken) => return Extracted::Note(BROKEN.into()),
     };
-    let pages = doc.get_pages();
-    let total = pages.len();
-    if total == 0 {
-        return Extracted::Note(BROKEN.into());
-    }
-    let reserve = NOTE_RESERVE.min(limits.max_chars / 4);
-    let mut walker = walk::Walker::new(&doc, limits, deadline, limits.max_chars - reserve);
-    let mut read = 0usize;
-    let mut saw_image = false;
-    for (&number, &page) in &pages {
-        if read >= limits.max_pages {
-            walker.stop = Some(Stop::Pages);
+    // Bez `get_pages()`: zbiera iterator, którego `size_hint` sumuje `/Count` z pliku — wrogi
+    // `/Count` rezerwował terabajty (koniec procesu). Pętla woła tylko `next()`.
+    let mut pages = Vec::new();
+    let mut more = false;
+    for page in doc.page_iter() {
+        if pages.len() >= limits.max_pages {
+            more = true;
             break;
         }
+        pages.push(page);
+    }
+    if pages.is_empty() {
+        return Extracted::Note(BROKEN.into());
+    }
+    let total = if more {
+        format!("ponad {}", pages.len())
+    } else {
+        pages.len().to_string()
+    };
+    let mut walker = walk::Walker::new(
+        &doc,
+        limits,
+        deadline,
+        limits.max_chars.saturating_sub(NOTE_RESERVE),
+    );
+    let mut read = 0usize;
+    let mut saw_image = false;
+    for (number, &page) in (1u32..).zip(&pages) {
         if Instant::now() >= deadline {
             walker.stop = Some(Stop::Time);
             break;
@@ -253,9 +200,12 @@ pub(super) fn extract(bytes: &[u8], limits: &Limits, deadline: Instant) -> Extra
             break;
         }
     }
+    if more && walker.stop.is_none() {
+        walker.stop = Some(Stop::Pages);
+    }
     let (stop, skipped) = (walker.stop, walker.skipped);
     let any_text = walker.sink.any_text;
-    let mut text = walker.sink.finish();
+    let text = walker.sink.finish();
     match (any_text, stop) {
         (false, Some(stop)) => Extracted::Note(format!(
             "Nie udało się wyciągnąć tekstu z PDF — {}.",
@@ -264,14 +214,22 @@ pub(super) fn extract(bytes: &[u8], limits: &Limits, deadline: Instant) -> Extra
         (false, None) if skipped > 0 => Extracted::Note(TOO_COMPLEX.into()),
         (false, None) => Extracted::Note(if saw_image { SCAN } else { NO_TEXT }.into()),
         (true, Some(stop)) => {
-            text.push_str(&format!(
-                "\n\n[… tekst niepełny — {}; przeczytane strony: {read} z {total}]",
+            let note = format!(
+                "
+
+[… tekst niepełny — {}; przeczytane strony: {read} z {total}]",
                 stop.reason(limits)
-            ));
-            Extracted::Text {
-                text,
-                truncated: true,
-            }
+            );
+            with_note(text, &note, limits.max_chars)
+        }
+        (true, None) if text.chars().count() > limits.max_chars => {
+            let note = format!(
+                "
+
+[… tekst niepełny — {}]",
+                Stop::Chars.reason(limits)
+            );
+            with_note(text, &note, limits.max_chars)
         }
         (true, None) => Extracted::Text {
             text,
@@ -280,7 +238,24 @@ pub(super) fn extract(bytes: &[u8], limits: &Limits, deadline: Instant) -> Extra
     }
 }
 
+/// Tekst z notką końcową, razem najwyżej `max` znaków (treść skracana, gdy trzeba).
+fn with_note(mut text: String, note: &str, max: usize) -> Extracted {
+    let Some(room) = max.checked_sub(note.chars().count()) else {
+        return Extracted::Note(note.trim().to_owned());
+    };
+    if let Some((cut, _)) = text.char_indices().nth(room) {
+        text.truncate(cut);
+    }
+    text.push_str(note);
+    Extracted::Text {
+        text,
+        truncated: true,
+    }
+}
+
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
 mod tests_build;
+#[cfg(test)]
+mod tests_hostile;

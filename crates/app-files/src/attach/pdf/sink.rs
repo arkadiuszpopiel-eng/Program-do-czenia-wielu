@@ -1,6 +1,6 @@
 //! Składanie tekstu stron: odstępy i nowe wiersze z położenia kolejnych napisów (w układzie
 //! kierunku pisma — działa też dla obróconych stron), ligatury rozkładane, znaki sterujące
-//! pomijane, nagłówki `--- Strona N ---`, limit znaków wyniku.
+//! pomijane, nagłówki `--- Strona N ---`, limit znaków wyniku (liczone są też nagłówki i notki).
 
 /// Koniec ostatniego napisu: punkt (układ urządzenia), kierunek pisma (wektor jednostkowy)
 /// i rozmiar czcionki w układzie urządzenia.
@@ -19,6 +19,10 @@ const NEW_LINE: f64 = 0.6;
 const WORD_GAP: f64 = 0.2;
 /// Cofnięcie wzdłuż wiersza (w rozmiarach czcionki), które też rozdziela słowa (np. kolumny).
 const BACK_GAP: f64 = 1.5;
+/// Zapas na nagłówek bieżącej strony, notkę o stronie bez tekstu i odstępy (znaki).
+const PAGE_EXTRA: usize = 72;
+const NO_TEXT_PAGE: &str = "[strona bez tekstu — obraz albo skan]";
+const EMPTY_PAGE: &str = "[pusta strona]";
 
 /// Tekst dokumentu w budowie.
 pub(super) struct Sink {
@@ -93,7 +97,7 @@ impl Sink {
         if c == ' ' && (self.page.is_empty() || self.page.ends_with([' ', '\n'])) {
             return;
         }
-        if self.chars >= self.limit {
+        if self.chars + PAGE_EXTRA >= self.limit {
             self.full = true;
             return;
         }
@@ -112,25 +116,40 @@ impl Sink {
         }
     }
 
-    /// Notka w tekście strony (np. pominięta treść) — poza limitem znaków.
+    /// Notka w tekście strony (np. pominięta treść) — liczona w limicie znaków.
     pub(super) fn note(&mut self, text: &str) {
+        let len = text.chars().count() + 2;
+        if self.chars + len + PAGE_EXTRA > self.limit {
+            self.full = true;
+            return;
+        }
         self.newline();
         self.page.push_str(text);
         self.page.push('\n');
+        self.chars += len;
     }
 
     /// Zamyka stronę `number`: nagłówek i tekst (albo notka o stronie bez tekstu).
     pub(super) fn page_done(&mut self, number: u32, had_image: bool) {
         let body = self.page.trim();
-        let body = if !body.is_empty() {
+        let placeholder = body.is_empty();
+        let body = if !placeholder {
             body
         } else if had_image {
-            "[strona bez tekstu — obraz albo skan]"
+            NO_TEXT_PAGE
         } else {
-            "[pusta strona]"
+            EMPTY_PAGE
         };
         let header = format!("--- Strona {number} ---\n");
-        self.chars += header.chars().count() + 2;
+        let extra = header.chars().count() + 2 + if placeholder { body.chars().count() } else { 0 };
+        // Tekst strony mieści się dzięki zapasowi `PAGE_EXTRA`; pusta strona może się nie zmieścić.
+        if self.chars + extra > self.limit {
+            self.full = true;
+            self.page.clear();
+            self.pen = None;
+            return;
+        }
+        self.chars += extra;
         self.out.push_str(&header);
         self.out.push_str(body);
         self.out.push_str("\n\n");

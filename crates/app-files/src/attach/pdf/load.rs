@@ -1,12 +1,17 @@
-//! Wczytanie PDF przez `lopdf` z limitami i dostęp do obiektów. Strumienie obiektów (`ObjStm`)
-//! rozpakowujemy sami w filtrze wczytywania — ze wspólnym budżetem bajtów i licznikiem obiektów
-//! (stan w `thread_local`, bo filtr `lopdf` to zwykły wskaźnik funkcji; ekstrakcja ma własny wątek).
+//! Wczytanie PDF przez `lopdf` z limitami i dostęp do obiektów. Bajty najpierw przygotowujemy
+//! (`prepare`: ukryte `/Encrypt` i pośrednie `/Length`), żeby `lopdf` szedł tylko ścieżką z naszym
+//! filtrem. Filtr liczy obiekty i surowe bajty strumieni, a strumienie obiektów (`ObjStm`) odkłada —
+//! parsujemy je sami (`objstm`) po odszyfrowaniu (`streams`). Stan filtra w `thread_local`, bo filtr
+//! `lopdf` to zwykły wskaźnik funkcji; ekstrakcja ma własny wątek.
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 
 use lopdf::{DecompressError, Dictionary, Document, Error, LoadOptions, Object, ObjectId};
 
 use super::Limits;
+use super::objstm::{self, Budget};
+use super::prepare;
+use super::streams::{self, Layout};
 
 /// Dlaczego PDF nie został wczytany.
 #[derive(Debug, PartialEq, Eq)]
@@ -19,83 +24,94 @@ pub(super) enum LoadError {
     Broken,
 }
 
-#[derive(Debug, Clone, Copy)]
-struct Budget {
-    objects: usize,
-    max_objects: usize,
-    left: usize,
-    per_stream: usize,
-    exceeded: bool,
-}
+const EMPTY: Budget = Budget {
+    objects: 0,
+    max_objects: 0,
+    left: 0,
+    per_stream: 0,
+    raw_left: 0,
+    exceeded: false,
+};
 
 thread_local! {
-    static BUDGET: Cell<Budget> = const {
-        Cell::new(Budget { objects: 0, max_objects: 0, left: 0, per_stream: 0, exceeded: false })
-    };
+    static BUDGET: Cell<Budget> = const { Cell::new(EMPTY) };
+    static PENDING: RefCell<Vec<(ObjectId, Object)>> = const { RefCell::new(Vec::new()) };
 }
 
-/// Filtr wczytywania: limit liczby obiektów i budżet rozpakowania strumieni obiektów.
+/// Filtr wczytywania: limit obiektów i surowych bajtów strumieni; strumienie obiektów odkłada.
 fn guard(id: ObjectId, object: &mut Object) -> Option<(ObjectId, Object)> {
     let mut b = BUDGET.with(Cell::get);
-    b.objects += 1;
-    let mut keep = b.objects <= b.max_objects;
-    if keep
-        && let Object::Stream(stream) = object
-        && stream.dict.has_type(b"ObjStm")
-    {
-        let cap = b.left.min(b.per_stream);
-        let unpacked = if stream.is_compressed() {
-            stream.decompress_with_limit(cap)
-        } else {
-            Ok(())
-        };
-        keep = match unpacked {
-            Ok(()) if stream.content.len() <= cap => {
-                b.left -= stream.content.len();
-                true
+    let mut keep = b.object();
+    let mut pending = false;
+    if keep && let Object::Stream(stream) = object {
+        match b.raw_left.checked_sub(stream.content.len()) {
+            Some(left) => b.raw_left = left,
+            None => {
+                b.exceeded = true;
+                keep = false;
             }
-            Ok(()) | Err(Error::Decompress(DecompressError::MemoryLimitExceeded { .. })) => false,
-            // Inny błąd rozpakowania: `lopdf` sam pominie wadliwy strumień.
-            Err(_) => true,
-        };
-    }
-    if !keep {
-        b.exceeded = true;
+        }
+        pending = keep && stream.dict.has_type(b"ObjStm");
     }
     BUDGET.with(|c| c.set(b));
+    if pending {
+        let taken = std::mem::replace(object, Object::Null);
+        PENDING.with(|p| p.borrow_mut().push((id, taken)));
+        return None;
+    }
     keep.then(|| (id, object.clone()))
 }
 
 /// Wczytuje dokument (z pustym hasłem, jeśli zaszyfrowany) albo podaje powód odmowy.
 pub(super) fn load(bytes: &[u8], limits: &Limits) -> Result<Document, LoadError> {
+    let prepared = prepare::prepare(bytes);
+    // Dane strumieni nakładające się na siebie (zagnieżdżone strumienie) — każdy byłby kopią.
+    if prepared.direct_lengths > (bytes.len() as u64).saturating_mul(2) {
+        return Err(LoadError::TooComplex);
+    }
     BUDGET.with(|c| {
         c.set(Budget {
-            objects: 0,
             max_objects: limits.max_objects,
             left: limits.load_total,
             per_stream: limits.load_stream,
-            exceeded: false,
+            raw_left: bytes.len(),
+            ..EMPTY
         });
     });
+    PENDING.with(|p| p.borrow_mut().clear());
     let options = LoadOptions {
         password: None,
         filter: Some(guard),
         strict: false,
         max_decompressed_size: Some(limits.load_stream),
     };
-    let result = Document::load_mem_with_options(bytes, options);
-    let exceeded = BUDGET.with(Cell::get).exceeded;
-    match result {
-        Ok(doc) if doc.is_encrypted() => Err(LoadError::Encrypted),
-        Ok(_) if exceeded => Err(LoadError::TooComplex),
-        Ok(doc) => Ok(doc),
+    let result = Document::load_mem_with_options(&prepared.bytes, options);
+    let mut pending = PENDING.with(|p| std::mem::take(&mut *p.borrow_mut()));
+    let mut budget = BUDGET.with(Cell::get);
+    let mut doc = match result {
+        Ok(doc) if doc.is_encrypted() => return Err(LoadError::Encrypted),
+        Ok(_) if budget.exceeded => return Err(LoadError::TooComplex),
+        Ok(doc) => doc,
         Err(Error::Decompress(DecompressError::MemoryLimitExceeded { .. })) => {
-            Err(LoadError::TooComplex)
+            return Err(LoadError::TooComplex);
         }
-        Err(_) if exceeded => Err(LoadError::TooComplex),
-        Err(Error::InvalidPassword | Error::Decryption(_)) => Err(LoadError::Encrypted),
-        Err(_) => Err(LoadError::Broken),
+        Err(_) if budget.exceeded => return Err(LoadError::TooComplex),
+        Err(Error::InvalidPassword | Error::Decryption(_)) => return Err(LoadError::Encrypted),
+        Err(_) => return Err(LoadError::Broken),
+    };
+    let start = prepare::pdf_start(&prepared.bytes);
+    let layout = Layout::new(&doc, &prepared.bytes[start..]);
+    streams::fill_all(&mut doc, &mut pending, &layout, &mut budget);
+    let state = streams::unlock(&mut doc, &mut pending).map_err(|()| LoadError::Encrypted)?;
+    objstm::unpack(&mut doc, pending, &mut budget);
+    let late = streams::fill_all(&mut doc, &mut [], &layout, &mut budget);
+    if let Some(state) = &state {
+        streams::decrypt_contents(&mut doc, state, &late);
     }
+    if budget.exceeded {
+        return Err(LoadError::TooComplex);
+    }
+    Ok(doc)
 }
 
 /// Obiekt po rozwinięciu referencji (z identyfikatorem ostatniej referencji).

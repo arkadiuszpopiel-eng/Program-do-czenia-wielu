@@ -109,7 +109,9 @@ fn read_capped(path: &Path, max: u64) -> Option<Vec<u8>> {
 }
 
 /// Bloki dla dostawcy z załączników tury (kolejność jak w turze; bloki inne niż `Attachment`
-/// są pomijane — tekst tury dokłada wywołujący).
+/// są pomijane — tekst tury dokłada wywołujący). Blokuje wątek: PDF spoza pamięci podręcznej
+/// (64 wyniki w procesie) to do ~11 s na plik przy każdej projekcji historii — wywołujący z kodu
+/// asynchronicznego używa `spawn_blocking` (`app-chat`: przygotowanie tury).
 pub fn provider_blocks(
     artifacts: &dyn Artifacts,
     session: &SessionId,
