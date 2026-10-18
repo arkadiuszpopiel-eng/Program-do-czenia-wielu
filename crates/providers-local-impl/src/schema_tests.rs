@@ -76,8 +76,8 @@ fn parameters_are_closed_and_refs_inlined() {
         json!([{"properties": {}}]),
         "wartości bez zmian"
     );
-    // Odwołanie do korzenia (rekurencja) rozwija się do limitu głębokości, bez zawieszenia.
-    assert!(props["petla"].is_object());
+    // Odwołanie do korzenia to rekurencja: dowolna wartość, bez rozwijania.
+    assert_eq!(props["petla"], json!({}));
     assert!(jsonschema::validator_for(&p).is_ok());
 }
 
@@ -105,7 +105,7 @@ fn envelope_has_text_and_an_optional_named_call() {
     ];
     let offered = offered(&tools, &ToolChoice::Auto);
     assert_eq!(offered[0].name, "alfa", "kolejność nazw");
-    let schema = envelope(&offered, false);
+    let schema = envelope(&parameters_of(&offered), false);
     assert_eq!(schema["required"], json!(["response"]));
     assert_eq!(schema["additionalProperties"], json!(false));
     let keys: Vec<&String> = schema["properties"].as_object().unwrap().keys().collect();
@@ -156,7 +156,7 @@ fn forced_choice_requires_the_call() {
     assert_eq!(only.len(), 1);
     assert!(must_call(&named) && must_call(&ToolChoice::Required));
     assert!(!must_call(&ToolChoice::Auto));
-    let schema = envelope(&only, true);
+    let schema = envelope(&parameters_of(&only), true);
     assert_eq!(schema["required"], json!(["response", "tool_call"]));
     assert_eq!(
         schema["properties"]["tool_call"]["properties"]["name"],
@@ -190,4 +190,108 @@ fn argument_errors_are_short_and_located() {
     assert!(err.chars().count() <= MAX_ERROR_CHARS + 1, "{}", err.len());
     // Schemat, którego walidator nie zbuduje, nie blokuje wywołania.
     assert!(check_arguments(&json!({"type": 12}), &json!({})).is_ok());
+}
+
+fn nodes(v: &Value) -> usize {
+    match v {
+        Value::Object(obj) => 1 + obj.values().map(nodes).sum::<usize>(),
+        Value::Array(items) => 1 + items.iter().map(nodes).sum::<usize>(),
+        _ => 1,
+    }
+}
+
+#[test]
+fn branching_recursion_stays_small() {
+    // Wartość w stylu JSON: definicja odwołuje się do siebie wielokrotnie (rozgałęzienie 6).
+    let refs: Vec<Value> = (0..6)
+        .map(|i| json!({"type": "array", "items": {"$ref": "#/$defs/W"}, "minItems": i}))
+        .collect();
+    let s = spec(
+        "mcp_drzewo",
+        json!({
+            "type": "object",
+            "properties": {"w": {"$ref": "#/$defs/W"}, "x": {"$ref": "#/$defs/W"}},
+            "$defs": {"W": {"anyOf": refs}}
+        }),
+    );
+    let p = tool_parameters(&s);
+    assert!(nodes(&p) < 1_000, "{} węzłów", nodes(&p));
+    let first = &p["properties"]["w"]["anyOf"][0];
+    assert_eq!(
+        first["items"],
+        json!({}),
+        "rekurencja zatrzymana na pierwszym powtórzeniu"
+    );
+    // Łańcuch niezależnych definicji z rozgałęzieniem też ma twardy limit (budżet węzłów).
+    let mut defs = Map::new();
+    for i in 0..30 {
+        let next = format!("#/$defs/D{}", i + 1);
+        defs.insert(
+            format!("D{i}"),
+            json!({"type": "object", "properties": {
+                "a": {"$ref": next}, "b": {"$ref": next}, "c": {"$ref": next}}}),
+        );
+    }
+    defs.insert("D30".into(), json!({"type": "string"}));
+    let s = spec(
+        "mcp_lancuch",
+        json!({"type": "object", "properties": {"d": {"$ref": "#/$defs/D0"}}, "$defs": defs}),
+    );
+    let p = tool_parameters(&s);
+    assert!(nodes(&p) < 2 * MAX_NODES, "{} węzłów", nodes(&p));
+    assert!(jsonschema::validator_for(&p).is_ok());
+}
+
+#[test]
+fn objects_extended_by_branches_stay_open() {
+    let p = tool_parameters(&spec(
+        "t",
+        json!({"type": "object", "properties": {"a": {"type": "string"}},
+               "oneOf": [{"properties": {"b": {"type": "integer"}}, "required": ["b"]},
+                         {"required": ["z"]}]}),
+    ));
+    assert!(
+        p.get("additionalProperties").is_none(),
+        "gałąź dokłada pole"
+    );
+    assert!(p["oneOf"][0].get("additionalProperties").is_none());
+    assert!(check_arguments(&p, &json!({"a": "x", "b": 1})).is_ok());
+    // Alternatywy pod obiektem bez własnych pól są domykane (unie z dyskryminatorem).
+    let p = tool_parameters(&spec(
+        "t",
+        json!({"type": "object", "anyOf": [
+            {"properties": {"k": {"const": "a"}, "x": {"type": "string"}}},
+            {"properties": {"k": {"const": "b"}, "y": {"type": "integer"}}}]}),
+    ));
+    assert_eq!(p["anyOf"][0]["additionalProperties"], json!(false));
+    assert!(check_arguments(&p, &json!({"k": "a", "y": 1})).is_err());
+    // Warunek `if` nie jest domykany; `required` w gałęziach nie otwiera rodzica.
+    let p = tool_parameters(&spec(
+        "t",
+        json!({"type": "object", "properties": {"k": {"type": "string"}, "n": {}},
+               "if": {"properties": {"k": {"const": "a"}}}, "then": {"required": ["n"]}}),
+    ));
+    assert_eq!(p["additionalProperties"], json!(false));
+    assert!(p["if"].get("additionalProperties").is_none());
+    assert!(check_arguments(&p, &json!({"k": "b"})).is_ok());
+    assert!(check_arguments(&p, &json!({"k": "a"})).is_err());
+}
+
+#[test]
+fn ref_siblings_are_merged() {
+    let p = tool_parameters(&spec(
+        "t",
+        json!({"type": "object",
+               "properties": {"o": {"$ref": "#/$defs/O", "description": "Opcje",
+                                    "properties": {"extra": {"type": "integer"}},
+                                    "required": ["extra"]}},
+               "$defs": {"O": {"type": "object", "properties": {"a": {"type": "string"}},
+                               "required": ["a"]}}}),
+    ));
+    let o = &p["properties"]["o"];
+    assert_eq!(o["description"], "Opcje");
+    assert_eq!(o["required"], json!(["a", "extra"]));
+    assert_eq!(o["additionalProperties"], json!(false));
+    assert!(check_arguments(&p, &json!({"o": {"a": "x", "extra": 1}})).is_ok());
+    assert!(check_arguments(&p, &json!({"o": {"a": "x", "extra": 1, "z": 0}})).is_err());
 }

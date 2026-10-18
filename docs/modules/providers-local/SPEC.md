@@ -171,15 +171,20 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   pętla agentki prosi o plan przed akcją, a przy kopercie „albo tekst, albo wywołanie” sam plan kończyłby przebieg
   (tura bez wywołania = odpowiedź końcowa). Konwerter gramatyki stawia pola wymagane przed opcjonalnymi, więc model
   pisze najpierw tekst, potem decyduje o wywołaniu.
-- **Żądanie** (`envelope::wire_request`, `schema::envelope`): narzędzia opisane w prompcie systemowym (nazwa, opis,
-  schemat parametrów) z zasadami formatu; wcześniejsze wywołania w historii jako tekst koperty asystentki, wyniki jako
-  „[Wynik narzędzia <nazwa>]” w turze użytkownika (bez ról `tool` i pól `tool_calls`). Schemat parametrów: lokalne
-  `$ref` rozwinięte (gramatyka koperty nie widzi `$defs` narzędzia), obiekty z `properties` bez `additionalProperties`
-  domknięte (`false`; składniki `allOf` otwarte). Klucz `parameters` (nie `arguments`), bo `serde_json` układa klucze
+- **Żądanie** (`envelope::Prepared` — liczone raz na żądanie, `schema::envelope`): narzędzia opisane w prompcie
+  systemowym (nazwa, opis, schemat parametrów) z zasadami formatu; wcześniejsze wywołania w historii jako tekst koperty
+  asystentki, wyniki jako „[Wynik narzędzia <nazwa>]” w turze użytkownika (bez ról `tool` i pól `tool_calls`). Schemat
+  parametrów: lokalne `$ref` rozwinięte (gramatyka koperty nie widzi `$defs` narzędzia) i scalone ze słowami kluczowymi
+  obok odwołania; odwołanie rekurencyjne (definicja już na ścieżce), głębsze niż 8 albo po budżecie 4096 węzłów → `{}`
+  (schematy z niezaufanych serwerów MCP nie rosną wykładniczo). Obiekty z `properties` bez `additionalProperties`
+  domknięte (`false`), chyba że pola dokładają podschematy tej samej instancji (`allOf`, `anyOf`, `oneOf`,
+  `then`/`else`, `dependentSchemas`) — wtedy otwarte; składniki `allOf` otwarte, alternatywy domykane tylko pod obiektem
+  bez własnych pól, `if`/`not` bez zmian. Klucz `parameters` (nie `arguments`), bo `serde_json` układa klucze
   alfabetycznie, a gramatyka zachowuje ich kolejność — model najpierw wybiera nazwę narzędzia. Okno rozmowy rezerwuje
-  dodatkowo narzut zasad koperty.
+  dodatkowo narzut koperty liczony z faktycznego promptu (zasady z rozwiniętymi schematami minus surowe `tools`).
 - **Odpowiedź** (`envelope::EnvelopeGuard` nad `LeakGuard<ChatDecoder>`): `response` płynie na bieżąco (sekwencje
-  ucieczki `\n`, `\uXXXX` i pary surogatów pocięte w dowolnym miejscu), `tool_call` składane do końca →
+  ucieczki `\n`, `\uXXXX` i pary surogatów pocięte w dowolnym miejscu; samotny surogat → `U+FFFD` i nie gubi
+  wywołania), `tool_call` składane do końca →
   `ToolCallStart/Delta/End` w bloku po tekście i `Stop` = `ToolUse`. Argumenty sprawdzane schematem narzędzia (`jsonschema`); niezgodne,
   ucięte (`MaxTokens`) albo niepoprawny JSON → `ToolArguments::Invalid` z opisem (nazwa narzędzia odzyskana z uciętego
   tekstu) — `agent-runtime` nie uruchamia narzędzia i odsyła modelowi błąd z prośbą o ponowienie. Tekst, który nie

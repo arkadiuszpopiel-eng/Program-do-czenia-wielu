@@ -13,7 +13,7 @@ use lib_openai_compat::sse::SseEvent;
 use providers_contract::{ProviderEvent, StopReason, ToolArguments};
 use serde_json::Value;
 
-use super::scan::{Prefix, classify, decode, name_hint, string_scan};
+use super::scan::{Prefix, classify, decode, lossy_surrogates, name_hint, string_scan};
 use crate::schema::check_arguments;
 
 /// Najdłuższy początek odpowiedzi, po którym nadal nie wiadomo, czy to koperta (bajty).
@@ -140,7 +140,11 @@ impl Envelope {
         // użytkownika nie myli wyszukiwania nazwy narzędzia.
         let tail = self.buf.get(self.emitted..).unwrap_or_default().to_owned();
         let mut out = Vec::new();
-        match serde_json::from_str::<Value>(&self.buf) {
+        // Samotny surogat w tekście (gramatyka go dopuszcza) nie gubi wywołania.
+        let parsed = serde_json::from_str::<Value>(&self.buf).or_else(|e| {
+            serde_json::from_str::<Value>(&lossy_surrogates(&self.buf)).map_err(|_| e)
+        });
+        match parsed {
             Ok(value) => {
                 if self.mode == Mode::ToolCall
                     && let Some(text) = value["response"].as_str().filter(|t| !t.is_empty())

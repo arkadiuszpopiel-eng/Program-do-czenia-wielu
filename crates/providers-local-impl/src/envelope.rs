@@ -40,62 +40,89 @@ Narzędzia:"#;
 const RULES_MUST_CALL: &str = r#"- "tool_call" — obowiązkowe: wywołanie jednego narzędzia z listy poniżej; "parameters" muszą pasować do jego schematu.
 Narzędzia:"#;
 
-/// Narzut koperty na prompt (zasady formatu i znaczniki wyników), doliczany do rezerwy okna
-/// rozmowy — opisy narzędzi okno liczy już jako narzędzia żądania.
-pub(crate) fn overhead_tokens() -> u32 {
-    estimate_tokens(FORMAT)
-        .saturating_add(estimate_tokens(RULES))
-        .saturating_add(64)
-}
-
 /// Czy żądanie idzie w kopercie: narzędzia w żądaniu i wybór inny niż `ToolChoice::None`.
 pub(crate) fn applies(req: &ChatRequest) -> bool {
     !req.tools.is_empty() && req.tool_choice != ToolChoice::None
 }
 
-/// Żądanie do serwera w kopercie (bez `tools`) i jego pole `response_format`.
-pub(crate) fn wire_request(req: &ChatRequest) -> (ChatRequest, Value) {
-    let offered = schema::offered(&req.tools, &req.tool_choice);
-    let must_call = schema::must_call(&req.tool_choice);
-    let format = schema::response_format(schema::envelope(&offered, must_call));
-    let names: HashMap<&str, &str> = req
-        .messages
-        .iter()
-        .flat_map(|m| m.tool_uses())
-        .map(|t| (t.id.as_str(), t.name.as_str()))
-        .collect();
-    let wire = ChatRequest {
-        system: Some(system(req.system.as_deref(), &offered, must_call)),
-        messages: req.messages.iter().map(|m| as_text(m, &names)).collect(),
-        tools: Vec::new(),
-        tool_choice: ToolChoice::Auto,
-        ..req.clone()
-    };
-    (wire, format)
+/// Koperta jednego żądania, liczona raz (rozwijanie schematów bywa kosztowne): wspólna dla
+/// rezerwy okna rozmowy, promptu systemowego i `response_format`.
+pub(crate) struct Prepared {
+    /// Zasady formatu i lista narzędzi z rozwiniętymi schematami (dopisywane do promptu).
+    rules: String,
+    /// Pole `response_format` żądania.
+    format: Value,
+}
+
+impl Prepared {
+    pub(crate) fn new(req: &ChatRequest) -> Self {
+        let offered = schema::offered(&req.tools, &req.tool_choice);
+        let must_call = schema::must_call(&req.tool_choice);
+        let parameters = schema::parameters_of(&offered);
+        let format = schema::response_format(schema::envelope(&parameters, must_call));
+        Self {
+            rules: rules(&offered, &parameters, must_call),
+            format,
+        }
+    }
+
+    /// Narzut koperty na prompt ponad to, co okno rozmowy liczy już jako narzędzia żądania:
+    /// zasady z rozwiniętymi i domkniętymi schematami (zamiast pola `tools`) i znaczniki wyników.
+    pub(crate) fn overhead_tokens(&self, req: &ChatRequest) -> u32 {
+        let counted = serde_json::to_string(&req.tools).map_or(0, |s| estimate_tokens(&s));
+        estimate_tokens(&self.rules)
+            .saturating_add(64)
+            .saturating_sub(counted)
+    }
+
+    /// Żądanie do serwera w kopercie (bez `tools`) i jego pole `response_format`.
+    pub(crate) fn wire_request(&self, req: &ChatRequest) -> (ChatRequest, Value) {
+        let names: HashMap<&str, &str> = req
+            .messages
+            .iter()
+            .flat_map(|m| m.tool_uses())
+            .map(|t| (t.id.as_str(), t.name.as_str()))
+            .collect();
+        let mut system = String::new();
+        if let Some(base) = req.system.as_deref().filter(|b| !b.trim().is_empty()) {
+            system.push_str(base);
+            system.push_str(
+                "
+
+",
+            );
+        }
+        system.push_str(&self.rules);
+        let wire = ChatRequest {
+            system: Some(system),
+            messages: req.messages.iter().map(|m| as_text(m, &names)).collect(),
+            tools: Vec::new(),
+            tool_choice: ToolChoice::Auto,
+            ..req.clone()
+        };
+        (wire, self.format.clone())
+    }
 }
 
 /// Schematy parametrów narzędzi, które model może wywołać (walidacja w [`EnvelopeGuard`]).
 pub(crate) fn schemas(req: &ChatRequest) -> BTreeMap<String, Value> {
-    schema::offered(&req.tools, &req.tool_choice)
-        .into_iter()
-        .map(|t| (t.name.clone(), schema::tool_parameters(t)))
-        .collect()
+    schema::parameters_of(&schema::offered(&req.tools, &req.tool_choice))
 }
 
-/// Prompt systemowy: prompt wywołującego, zasady formatu i lista narzędzi ze schematami.
-fn system(base: Option<&str>, tools: &[&ToolSpec], must_call: bool) -> String {
-    let mut out = String::new();
-    if let Some(base) = base.filter(|b| !b.trim().is_empty()) {
-        out.push_str(base);
-        out.push_str("\n\n");
-    }
-    out.push_str(FORMAT);
+/// Zasady formatu i lista narzędzi ze schematami.
+fn rules(tools: &[&ToolSpec], parameters: &BTreeMap<String, Value>, must_call: bool) -> String {
+    let mut out = String::from(FORMAT);
     out.push_str(if must_call { RULES_MUST_CALL } else { RULES });
     for t in tools {
-        let params = serde_json::to_string(&schema::tool_parameters(t)).unwrap_or_default();
+        let params = parameters
+            .get(&t.name)
+            .and_then(|p| serde_json::to_string(p).ok())
+            .unwrap_or_default();
         let _ = write!(
             out,
-            "\n- {}: {}\n  Parametry (JSON Schema): {params}",
+            "
+- {}: {}
+  Parametry (JSON Schema): {params}",
             t.name,
             t.description.trim()
         );

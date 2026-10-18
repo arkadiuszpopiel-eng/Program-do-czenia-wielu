@@ -3,6 +3,8 @@
 //! fragmentu i nazwa narzędzia z uciętego wywołania. Wszystko bez paniki (tylko `get`, nigdy
 //! indeksowanie z możliwym wyjściem poza granicę znaku).
 
+use std::borrow::Cow;
+
 /// Rozpoznany początek odpowiedzi.
 pub(super) enum Prefix {
     /// Za mało tekstu, żeby rozstrzygnąć.
@@ -72,9 +74,14 @@ pub(super) fn string_scan(raw: &str) -> (usize, bool) {
                             return (safe, false);
                         };
                         let code = u32::from_str_radix(hex, 16).unwrap_or(0);
-                        // Wysoki surogat: dekodujemy dopiero z parą `\uDCxx`.
+                        // Wysoki surogat: dekodujemy razem z parą `\uDCxx`; samotny (gramatyka
+                        // serwera go dopuszcza) to zwykła 6-bajtowa sekwencja.
                         if (0xD800..0xDC00).contains(&code) {
-                            12
+                            match low_surrogate(bytes.get(at + 6..).unwrap_or_default()) {
+                                Some(true) => 12,
+                                Some(false) => 6,
+                                None => return (safe, false),
+                            }
                         } else {
                             6
                         }
@@ -95,13 +102,77 @@ pub(super) fn string_scan(raw: &str) -> (usize, bool) {
     (safe, false)
 }
 
+/// Czy tekst zaczyna się od niskiego surogatu `\uDCxx`–`\uDFxx`; `None` — za mało tekstu, by
+/// rozstrzygnąć (dotychczasowe bajty pasują do początku pary).
+fn low_surrogate(rest: &[u8]) -> Option<bool> {
+    let fits = |i: usize, b: u8| match i {
+        0 => b == b'\\',
+        1 => b == b'u',
+        2 => b.eq_ignore_ascii_case(&b'd'),
+        3 => matches!(b.to_ascii_lowercase(), b'c'..=b'f'),
+        _ => b.is_ascii_hexdigit(),
+    };
+    for i in 0..6 {
+        match rest.get(i) {
+            None => return None,
+            Some(&b) if !fits(i, b) => return Some(false),
+            Some(_) => {}
+        }
+    }
+    Some(true)
+}
+
+/// Zastępuje samotne surogaty (`\uD800`–`\uDFFF` bez pary) znakiem `�` — gramatyka serwera
+/// je dopuszcza, a `serde_json` odrzuca cały tekst.
+pub(super) fn lossy_surrogates(raw: &str) -> Cow<'_, str> {
+    if !raw.contains("\\u") {
+        return Cow::Borrowed(raw);
+    }
+    let bytes = raw.as_bytes();
+    let mut out = String::new();
+    let (mut at, mut copied) = (0usize, 0usize);
+    while let Some(&b) = bytes.get(at) {
+        if b != b'\\' {
+            at += 1;
+            continue;
+        }
+        let code = match bytes.get(at + 1) {
+            Some(b'u') => raw
+                .get(at + 2..at + 6)
+                .and_then(|h| u32::from_str_radix(h, 16).ok()),
+            _ => None,
+        };
+        match code {
+            Some(c)
+                if (0xD800..0xDC00).contains(&c)
+                    && low_surrogate(bytes.get(at + 6..).unwrap_or_default()) == Some(true) =>
+            {
+                at += 12;
+            }
+            Some(c) if (0xD800..0xE000).contains(&c) => {
+                out.push_str(raw.get(copied..at).unwrap_or_default());
+                out.push_str("\\ufffd");
+                at += 6;
+                copied = at;
+            }
+            Some(_) => at += 6,
+            None => at += 2,
+        }
+    }
+    if copied == 0 {
+        return Cow::Borrowed(raw);
+    }
+    out.push_str(raw.get(copied..).unwrap_or_default());
+    Cow::Owned(out)
+}
+
 /// Dekoduje kompletny fragment treści napisu JSON; surowe znaki sterujące (niepoprawne w JSON)
 /// są dopuszczane, a fragment nie do zdekodowania wraca bez zmian.
 pub(super) fn decode(raw: &str) -> String {
     if !raw.contains('\\') && !raw.contains(char::is_control) {
         return raw.to_owned();
     }
-    let lenient = raw
+    let lenient = lossy_surrogates(raw)
         .replace('\n', "\\n")
         .replace('\r', "\\r")
         .replace('\t', "\\t");

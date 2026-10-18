@@ -6,16 +6,28 @@
 //! które ją spełniają — dlatego schemat musi być samowystarczalny (bez `$defs` poza korzeniem
 //! koperty) i jawnie domknięty: gramatyka serwera i walidacja w Alfie oceniają wtedy to samo,
 //! niezależnie od tego, jak dana wersja serwera traktuje brak `additionalProperties`.
+//!
+//! Schematy pochodzą też od niezaufanych serwerów MCP, więc rozwijanie `$ref` ma twarde granice:
+//! odwołanie rekurencyjne (definicja już rozwijana na bieżącej ścieżce) i każde odwołanie po
+//! wyczerpaniu budżetu węzłów albo głębokości → `{}` (dowolna wartość).
+
+use std::collections::BTreeMap;
 
 use providers_contract::{ToolChoice, ToolSpec};
 use serde_json::{Map, Value, json};
 
-/// Najgłębsze rozwijanie `$ref` — schematy rekurencyjne dalej przyjmują dowolną wartość.
+/// Najgłębsze zagnieżdżenie rozwijanych `$ref` na jednej ścieżce.
 const MAX_REF_DEPTH: usize = 8;
+/// Budżet węzłów schematu jednego narzędzia: po jego wyczerpaniu kolejne `$ref` → `{}`.
+const MAX_NODES: usize = 4096;
 /// Najdłuższy opis błędów walidacji odsyłany modelowi (znaki).
 const MAX_ERROR_CHARS: usize = 400;
 /// Najwięcej błędów walidacji w jednym opisie.
 const MAX_ERRORS: usize = 3;
+/// Słowa kluczowe dokumentu, zbędne w schemacie rozwiniętym.
+const DOCUMENT_KEYS: [&str; 4] = ["$schema", "$id", "$defs", "definitions"];
+/// Słowa kluczowe z wartościami (nie schematami) — bez rozwijania i domykania.
+const VALUE_KEYS: [&str; 5] = ["enum", "const", "default", "examples", "required"];
 
 /// Schemat parametrów narzędzia gotowy do gramatyki i walidacji. Brak schematu obiektu (albo
 /// schemat innego typu) → dowolny obiekt.
@@ -24,47 +36,177 @@ pub(crate) fn tool_parameters(spec: &ToolSpec) -> Value {
     if !root.is_object() {
         return json!({"type": "object"});
     }
-    let mut schema = inline(root, root, 0);
+    let mut inliner = Inliner {
+        root,
+        // Korzeń jest rozwijany od początku: odwołanie `#` to już rekurencja.
+        path: vec![""],
+        nodes: 0,
+    };
+    let mut schema = inliner.value(root);
     if let Some(obj) = schema.as_object_mut() {
-        for key in ["$schema", "$id", "$defs", "definitions", "title"] {
-            obj.remove(key);
+        for key in DOCUMENT_KEYS.iter().chain(&["title"]) {
+            obj.remove(*key);
         }
     }
     close_objects(&mut schema, true);
     schema
 }
 
-/// Rozwija lokalne odwołania (`#/$defs/…`, `#/definitions/…`); nierozwiązywalne → `{}`.
-fn inline(value: &Value, root: &Value, depth: usize) -> Value {
-    match value {
-        Value::Object(obj) => {
-            if let Some(Value::String(pointer)) = obj.get("$ref") {
-                let target = pointer.strip_prefix('#').and_then(|p| root.pointer(p));
-                let Some(target) = target.filter(|_| depth < MAX_REF_DEPTH) else {
-                    return json!({});
+/// Parametry oferowanych narzędzi wg nazwy (liczone raz na żądanie).
+pub(crate) fn parameters_of(tools: &[&ToolSpec]) -> BTreeMap<String, Value> {
+    tools
+        .iter()
+        .map(|t| (t.name.clone(), tool_parameters(t)))
+        .collect()
+}
+
+/// Rozwijanie lokalnych odwołań (`#`, `#/$defs/…`, `#/definitions/…`) z granicami.
+struct Inliner<'a> {
+    root: &'a Value,
+    /// Wskaźniki definicji rozwijanych na bieżącej ścieżce.
+    path: Vec<&'a str>,
+    /// Węzły już skopiowane.
+    nodes: usize,
+}
+
+impl<'a> Inliner<'a> {
+    fn value(&mut self, value: &'a Value) -> Value {
+        self.nodes = self.nodes.saturating_add(1);
+        match value {
+            Value::Object(obj) => match obj.get("$ref") {
+                Some(Value::String(pointer)) => self.reference(pointer, obj),
+                _ => Value::Object(self.members(obj)),
+            },
+            Value::Array(items) => Value::Array(items.iter().map(|v| self.value(v)).collect()),
+            other => other.clone(),
+        }
+    }
+
+    /// Pola obiektu schematu (bez `$ref`); wartości słów kluczowych z danymi — bez zmian.
+    fn members(&mut self, obj: &'a Map<String, Value>) -> Map<String, Value> {
+        obj.iter()
+            .filter(|(k, _)| k.as_str() != "$ref")
+            .map(|(k, v)| {
+                let v = if VALUE_KEYS.contains(&k.as_str()) {
+                    v.clone()
+                } else {
+                    self.value(v)
                 };
-                let mut resolved = inline(target, root, depth + 1);
+                (k.clone(), v)
+            })
+            .collect()
+    }
+
+    /// Odwołanie: cel rozwinięty (rekurencja, brak celu, wyczerpany budżet → `{}`) i scalony
+    /// z pozostałymi słowami kluczowymi obiektu z `$ref`.
+    fn reference(&mut self, pointer: &'a str, obj: &'a Map<String, Value>) -> Value {
+        let target = pointer
+            .strip_prefix('#')
+            .and_then(|k| self.root.pointer(k).map(|t| (k, t)));
+        let resolved = match target {
+            Some((key, target))
+                if !self.path.contains(&key)
+                    && self.path.len() <= MAX_REF_DEPTH
+                    && self.nodes < MAX_NODES =>
+            {
+                self.path.push(key);
+                let mut resolved = self.value(target);
+                self.path.pop();
                 if let Some(obj) = resolved.as_object_mut() {
-                    // Kopia korzenia (odwołanie `#`) nie przenosi metadanych dokumentu.
-                    for key in ["$schema", "$id", "$defs", "definitions"] {
+                    for key in DOCUMENT_KEYS {
                         obj.remove(key);
                     }
                 }
-                return resolved;
+                resolved
             }
-            Value::Object(
-                obj.iter()
-                    .map(|(k, v)| (k.clone(), inline(v, root, depth)))
-                    .collect(),
-            )
-        }
-        Value::Array(items) => Value::Array(items.iter().map(|v| inline(v, root, depth)).collect()),
-        other => other.clone(),
+            _ => json!({}),
+        };
+        let siblings = self.members(obj);
+        merge(resolved, siblings)
     }
 }
 
-/// Domyka obiekty z `properties` bez `additionalProperties`/`patternProperties`. Składniki
-/// `allOf` zostają otwarte (domknięte wykluczałyby się nawzajem), ich pola — już nie.
+/// Scala cel `$ref` ze słowami kluczowymi obok odwołania: pola i wymagane — sumą, reszta
+/// (opisy, ograniczenia) — wartością obok odwołania.
+fn merge(resolved: Value, siblings: Map<String, Value>) -> Value {
+    if siblings.is_empty() {
+        return resolved;
+    }
+    let mut base = match resolved {
+        Value::Object(obj) => obj,
+        Value::Bool(false) => return Value::Bool(false),
+        _ => Map::new(),
+    };
+    for (key, value) in siblings {
+        let rest = match (key.as_str(), base.get_mut(&key), value) {
+            ("properties", Some(Value::Object(into)), Value::Object(add)) => {
+                into.extend(add);
+                None
+            }
+            ("required", Some(Value::Array(into)), Value::Array(add)) => {
+                for name in add {
+                    if !into.contains(&name) {
+                        into.push(name);
+                    }
+                }
+                None
+            }
+            (_, _, value) => Some(value),
+        };
+        if let Some(value) = rest {
+            base.insert(key, value);
+        }
+    }
+    Value::Object(base)
+}
+
+/// Grupy słów kluczowych stosujących podschematy do tej samej instancji: składniki grupy są
+/// alternatywami (`anyOf`, `oneOf`, `then`/`else`) albo obowiązują razem (`allOf`,
+/// `dependentSchemas`); grupy obowiązują razem.
+const IN_PLACE: [&[&str]; 5] = [
+    &["allOf"],
+    &["anyOf"],
+    &["oneOf"],
+    &["then", "else"],
+    &["dependentSchemas"],
+];
+
+/// Podschematy wartości słowa kluczowego (tablica, mapa `dependentSchemas` albo schemat).
+fn subschemas<'a>(key: &str, value: &'a Value) -> Vec<&'a Value> {
+    match (key, value) {
+        (_, Value::Array(items)) => items.iter().collect(),
+        ("dependentSchemas", Value::Object(map)) => map.values().collect(),
+        (_, other) => vec![other],
+    }
+}
+
+/// Czy podschematy grupy dokładają pola tej samej instancji.
+fn group_adds(obj: &Map<String, Value>, group: &[&str]) -> bool {
+    group.iter().any(|k| {
+        obj.get(*k)
+            .is_some_and(|v| subschemas(k, v).into_iter().any(adds_properties))
+    })
+}
+
+/// Czy schemat dopuszcza pola (własne albo przez podschematy tej samej instancji).
+fn adds_properties(value: &Value) -> bool {
+    let Value::Object(obj) = value else {
+        return false;
+    };
+    obj.contains_key("properties")
+        || obj.contains_key("patternProperties")
+        || obj
+            .get("additionalProperties")
+            .is_some_and(|v| v != &Value::Bool(false))
+        || IN_PLACE.iter().any(|group| group_adds(obj, group))
+}
+
+/// Domyka obiekty z `properties` bez `additionalProperties`/`patternProperties`, gdy żaden
+/// podschemat tej samej instancji (`allOf`, `anyOf`, `oneOf`, `then`/`else`, `dependentSchemas`)
+/// nie dokłada pól — inaczej obiekt zostaje otwarty (domknięte części wykluczałyby się nawzajem).
+/// Składniki `allOf` i `dependentSchemas` zostają otwarte; alternatywy (`anyOf`, `oneOf`,
+/// `then`/`else`) są domykane tylko pod obiektem bez własnych pól, gdy pola dokłada jedna grupa.
+/// Warunki (`if`) i zaprzeczenia (`not`) zostają bez zmian — domknięcie odwróciłoby ich sens.
 fn close_objects(value: &mut Value, close_here: bool) {
     let obj = match value {
         Value::Object(obj) => obj,
@@ -74,29 +216,41 @@ fn close_objects(value: &mut Value, close_here: bool) {
         }
         _ => return,
     };
+    let adding = IN_PLACE
+        .iter()
+        .filter(|group| group_adds(obj, group))
+        .count();
+    let own = obj.contains_key("properties") || obj.contains_key("patternProperties");
     if close_here
         && obj.contains_key("properties")
         && !obj.contains_key("additionalProperties")
         && !obj.contains_key("patternProperties")
+        && adding == 0
     {
         obj.insert("additionalProperties".into(), Value::Bool(false));
     }
+    let close_branches = close_here && !own && adding <= 1;
     for (key, child) in obj.iter_mut() {
         match key.as_str() {
             // Mapy „nazwa → schemat": domykamy schematy, nie samą mapę.
-            "properties" | "patternProperties" | "dependentSchemas" | "$defs" | "definitions" => {
+            "properties" | "patternProperties" | "$defs" | "definitions" => {
                 if let Value::Object(map) = child {
                     map.values_mut().for_each(|v| close_objects(v, true));
                 }
             }
+            "dependentSchemas" => {
+                if let Value::Object(map) = child {
+                    map.values_mut().for_each(|v| close_objects(v, false));
+                }
+            }
             "allOf" => close_objects(child, false),
-            // Wartości, nie schematy.
-            "enum" | "const" | "default" | "examples" | "required" => {}
+            "anyOf" | "oneOf" | "then" | "else" => close_objects(child, close_branches),
+            "if" | "not" => {}
+            k if VALUE_KEYS.contains(&k) => {}
             _ => close_objects(child, true),
         }
     }
 }
-
 /// Narzędzia, które model może wywołać: przy `ToolChoice::Tool` tylko wskazane (gdy istnieje),
 /// inaczej wszystkie — w stałej kolejności nazw (powtarzalny prompt i gramatyka).
 pub(crate) fn offered<'a>(tools: &'a [ToolSpec], choice: &ToolChoice) -> Vec<&'a ToolSpec> {
@@ -129,13 +283,13 @@ fn closed_object(properties: Value, required: &[&str]) -> Value {
 /// wywołanie (`must_call` — obowiązkowe). Gramatyka zachowuje kolejność pól, więc model pisze
 /// najpierw tekst, potem wywołanie; nazwa jest stałą (`const`), więc argumenty idą zawsze wg
 /// schematu wybranego narzędzia.
-pub(crate) fn envelope(tools: &[&ToolSpec], must_call: bool) -> Value {
-    let mut calls: Vec<Value> = tools
+pub(crate) fn envelope(parameters: &BTreeMap<String, Value>, must_call: bool) -> Value {
+    let mut calls: Vec<Value> = parameters
         .iter()
-        .map(|t| {
+        .map(|(name, params)| {
             let mut properties = Map::new();
-            properties.insert("name".into(), json!({"const": t.name}));
-            properties.insert("parameters".into(), tool_parameters(t));
+            properties.insert("name".into(), json!({"const": name}));
+            properties.insert("parameters".into(), params.clone());
             closed_object(Value::Object(properties), &["name", "parameters"])
         })
         .collect();

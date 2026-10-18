@@ -247,7 +247,13 @@ fn string_scan_waits_for_whole_escapes() {
     assert_eq!(string_scan("\\ud83d"), (0, false));
     assert_eq!(string_scan("\\ud83d\\ude00x"), (13, false));
     assert_eq!(string_scan("ż\\\"ó"), (6, false));
+    // Samotny wysoki surogat nie połyka zamykającego cudzysłowu.
+    assert_eq!(string_scan("\\ud83d\"x"), (6, true));
+    assert_eq!(string_scan("\\ud83d\\"), (0, false));
+    assert_eq!(string_scan("\\ud83d\\n\""), (8, true));
     assert_eq!(string_scan(""), (0, false));
+    assert_eq!(decode("a\\ud83d"), "a\u{fffd}", "samotny surogat");
+    assert_eq!(decode("\\ud83d\\ude00"), "\u{1f600}");
     assert_eq!(decode("a\\nb\\u0105"), "a\nbą");
     assert_eq!(decode("surowy\nwiersz\t"), "surowy\nwiersz\t");
     assert_eq!(decode("zła \\x sekwencja"), "zła \\x sekwencja");
@@ -293,7 +299,7 @@ fn tool_history() -> ChatRequest {
 fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
     let req = tool_history();
     assert!(applies(&req));
-    let (wire, format) = wire_request(&req);
+    let (wire, format) = Prepared::new(&req).wire_request(&req);
     assert!(wire.tools.is_empty());
     let system = wire.system.clone().unwrap();
     assert!(
@@ -335,7 +341,7 @@ fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
     // Wywołanie wymagane: `tool_call` obowiązkowe i inne zasady.
     let mut forced = req.clone();
     forced.tool_choice = ToolChoice::Required;
-    let (wire, format) = wire_request(&forced);
+    let (wire, format) = Prepared::new(&forced).wire_request(&forced);
     assert_eq!(
         format["json_schema"]["schema"]["required"],
         json!(["response", "tool_call"])
@@ -349,5 +355,30 @@ fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
         "m",
         vec![Message::user_text("x")]
     )));
-    assert!(overhead_tokens() > 64);
+    // Rezerwa okna liczy rozwinięte schematy w prompcie, nie surowe `tools` żądania.
+    let prepared = Prepared::new(&req);
+    let counted = estimate_tokens(&serde_json::to_string(&req.tools).unwrap());
+    assert!(prepared.overhead_tokens(&req) > 64);
+    assert!(
+        prepared.overhead_tokens(&req) + counted
+            >= estimate_tokens(&prepared.wire_request(&req).0.system.unwrap())
+                - estimate_tokens(
+                    "Jesteś Alfa.
+
+"
+                )
+    );
+}
+
+#[test]
+fn lone_surrogate_before_a_call_keeps_the_call_however_chunked() {
+    let reply = r#"{"response": "Ok \ud83d", "tool_call": {"name": "pogoda", "parameters": {"miasto": "Kraków"}}}"#;
+    for chunks in cuts(reply) {
+        let refs: Vec<&str> = chunks.iter().map(String::as_str).collect();
+        let events = run(&refs, "stop");
+        let shown = text(&events);
+        assert!(shown.starts_with("Ok"), "{refs:?}: {shown}");
+        assert!(!shown.contains("tool_call"), "{refs:?}: {shown}");
+        assert_eq!(call(&events), Some(("pogoda".into(), parsed("Kraków"))));
+    }
 }

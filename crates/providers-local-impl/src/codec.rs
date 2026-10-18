@@ -57,15 +57,16 @@ impl WireCodec for LlamaCodec {
             max_tokens_field: MaxTokensField::MaxTokens,
             stream_usage: true,
         };
-        let enveloped = self.envelope(req);
+        // Koperta liczona raz: rezerwa okna, prompt i `response_format` z tych samych schematów.
+        let prepared = self.envelope(req).then(|| envelope::Prepared::new(req));
         // Okno rozmowy w kontekście uruchomienia (`-c`): starsze tury nie idą do serwera.
         let max_out = req
             .params
             .max_tokens
             .unwrap_or(self.profile.default_max_tokens);
         let mut reserve = window::reply_reserve(self.ctx, max_out);
-        if enveloped {
-            reserve = reserve.saturating_add(envelope::overhead_tokens());
+        if let Some(prepared) = &prepared {
+            reserve = reserve.saturating_add(prepared.overhead_tokens(req));
         }
         let fitted = window::fit(req, self.ctx, reserve);
         if fitted.dropped > 0 {
@@ -76,8 +77,8 @@ impl WireCodec for LlamaCodec {
                 "okno rozmowy: najstarsze wiadomości pominięte w żądaniu do llama-server"
             );
         }
-        let body = if enveloped {
-            let (wire, format) = envelope::wire_request(&fitted.request);
+        let body = if let Some(prepared) = &prepared {
+            let (wire, format) = prepared.wire_request(&fitted.request);
             let mut body = chat::build_body(&wire, &self.caps, &self.profile, &options)?;
             if let Some(obj) = body.as_object_mut() {
                 obj.insert("response_format".into(), format);
