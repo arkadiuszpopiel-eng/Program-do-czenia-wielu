@@ -242,7 +242,6 @@
   "providers": [
     { "id": "anthropic", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie potwierdza tagu prywatności API; do weryfikacji." },
     { "id": "openai", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Plan nie potwierdza tagu prywatności API; do weryfikacji." },
-    { "id": "azure-openai", "jurisdiction": "unknown", "privacy_tags": ["unknown"], "confidence": "?", "notes": "Zasób Azure OpenAI firmy (C2.12); region i zasady danych zależą od zasobu i umowy z Microsoft — do weryfikacji." },
     { "id": "google", "jurisdiction": "unknown", "privacy_tags": ["google-personal-may-train", "google-paid-eea-no-train"], "confidence": "V", "notes": "Konto osobiste może trenować; klucz płatny / EOG nie trenuje (PLAN.md §5.5). Tag zależy od typu konta/klucza." },
     { "id": "xai", "jurisdiction": "unknown", "privacy_tags": ["xai-retention-30d"], "confidence": "W", "notes": "API: retencja 30 dni (PLAN.md §5.5)." },
     { "id": "deepseek", "jurisdiction": "CN", "privacy_tags": ["cn-may-train"], "confidence": "W", "notes": "Dane w Chinach/Singapurze, może trenować (PLAN.md §5.5)." },
