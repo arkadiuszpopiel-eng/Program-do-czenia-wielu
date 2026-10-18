@@ -14,7 +14,7 @@ use core_registry_contract::{HealthStatus, Module, ModuleContext, ModuleError};
 use device_profile_contract::DeviceProfile;
 use device_profile_fake::FakeDeviceProfile;
 use futures_util::StreamExt;
-use model_residency_contract::{LeaseRequest, ModelRole, Placement, Priority, Residency};
+use model_residency_contract::{LeaseRequest, Placement, Residency};
 use model_residency_fake::FakeResidency;
 use providers_contract::{
     CancellationToken, ChatRequest, HealthState, Message, ModelProvider, PrivacyTag,
@@ -239,16 +239,13 @@ async fn device_profile_and_residency_drive_arguments() {
     );
     // Głos (wyższy priorytet) potrzebuje VRAM → dzierżawa LLM odebrana, sidecar zatrzymany.
     let stt = LeaseRequest {
-        owner: "voice-stt".into(),
         model: "whisper-large".into(),
-        role: ModelRole::Stt,
-        priority: Priority::VoiceRt,
         placement: Placement::GpuOnly,
         vram_mb: 6_000,
         ram_mb: 200,
         cpu_ram_mb: 0,
         idle_unload_ms: 0,
-        gpu: None,
+        ..support::laptop::stt_lease()
     };
     let grant = residency.acquire(stt).unwrap();
     assert_eq!(grant.evicted.len(), 1);
