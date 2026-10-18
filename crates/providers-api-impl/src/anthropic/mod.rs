@@ -115,7 +115,7 @@ impl WireCodec for AnthropicCodec {
             headers.push(("anthropic-beta", betas.join(",")));
         }
         Ok(WireRequest {
-            path: "/v1/messages",
+            path: "/v1/messages".into(),
             body,
             headers,
         })

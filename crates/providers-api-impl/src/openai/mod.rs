@@ -129,7 +129,7 @@ impl WireCodec for OpenAiCodec {
             ),
         };
         Ok(WireRequest {
-            path,
+            path: path.into(),
             body,
             headers: Vec::new(),
         })
@@ -151,7 +151,7 @@ impl WireCodec for OpenAiCodec {
 
 /// Ostrożne możliwości nieznanego modelu oficjalnego OpenAI (narzędzia tak; bez próbkowania —
 /// modele rozumujące odrzucają `temperature`).
-fn unknown_openai() -> ModelCapabilities {
+pub(crate) fn unknown_openai() -> ModelCapabilities {
     ModelCapabilities {
         tools: true,
         strict_tools: true,
@@ -291,34 +291,42 @@ impl ModelProvider for OpenAiProvider {
         }
         let body = json!({"model": request.model, "input": request.input});
         let resp = self.engine.request_json("/embeddings", Some(&body)).await?;
-        let mut rows: Vec<(u64, Vec<f32>)> = resp["data"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .map(|d| {
-                let v: Vec<f32> = d["embedding"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .filter_map(Value::as_f64)
-                    .map(|x| x as f32)
-                    .collect();
-                (d["index"].as_u64().unwrap_or(0), v)
-            })
-            .collect();
-        rows.sort_by_key(|(i, _)| *i);
-        if rows.len() != request.input.len() {
-            return Err(ProviderError::new(
-                ProviderErrorKind::Protocol,
-                "liczba osadzeń różna od liczby wejść",
-            ));
-        }
-        Ok(EmbeddingResponse {
-            vectors: rows.into_iter().map(|(_, v)| v).collect(),
-            usage: Usage {
-                input_tokens: resp["usage"]["prompt_tokens"].as_u64().unwrap_or(0),
-                ..Usage::default()
-            },
-        })
+        embeddings_from(&resp, request.input.len())
     }
+}
+
+/// Odpowiedź `embeddings` (OpenAI i Azure OpenAI) → wektory w kolejności wejść.
+pub(crate) fn embeddings_from(
+    resp: &Value,
+    inputs: usize,
+) -> Result<EmbeddingResponse, ProviderError> {
+    let mut rows: Vec<(u64, Vec<f32>)> = resp["data"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|d| {
+            let v: Vec<f32> = d["embedding"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_f64)
+                .map(|x| x as f32)
+                .collect();
+            (d["index"].as_u64().unwrap_or(0), v)
+        })
+        .collect();
+    rows.sort_by_key(|(i, _)| *i);
+    if rows.len() != inputs {
+        return Err(ProviderError::new(
+            ProviderErrorKind::Protocol,
+            "liczba osadzeń różna od liczby wejść",
+        ));
+    }
+    Ok(EmbeddingResponse {
+        vectors: rows.into_iter().map(|(_, v)| v).collect(),
+        usage: Usage {
+            input_tokens: resp["usage"]["prompt_tokens"].as_u64().unwrap_or(0),
+            ..Usage::default()
+        },
+    })
 }

@@ -6,12 +6,36 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use accounts_hub_contract::{
-    ConnectionReport, ConnectionRequest, ConnectionTester, ModelId, ModelInfo, ModelListError,
-    ModelLister, ProbeDetail, TestOutcome,
+    ConnectionReport, ConnectionRequest, ConnectionTester, EnterpriseSettings, ModelId, ModelInfo,
+    ModelListError, ModelLister, ProbeDetail, TestOutcome,
 };
 use async_trait::async_trait;
-use providers_api_impl::{AccountProfile, CatalogEntry, build_provider};
-use providers_contract::{ApiKey, ModelProvider, ProviderError, ProviderErrorKind, StaticKey};
+use providers_api_impl::{AccountProfile, AzureOptions, CatalogEntry, build_provider};
+use providers_contract::{
+    ApiKey, ModelProvider, ProviderError, ProviderErrorKind, SecretSource, StaticKey,
+};
+
+/// Profil adaptera dla konta: klucz, adres i ustawienia konta firmowego — nagłówki organizacji
+/// i projektu OpenAI, wersja API i wdrożenia Azure OpenAI (model Alfy → wdrożenie).
+pub(crate) fn account_profile(
+    key: Arc<dyn SecretSource>,
+    base_url: Option<&str>,
+    enterprise: &EnterpriseSettings,
+) -> AccountProfile {
+    let mut profile = AccountProfile::new(key);
+    profile.base_url = base_url.map(str::to_owned);
+    profile.organization.clone_from(&enterprise.organization);
+    profile.project.clone_from(&enterprise.project);
+    if !enterprise.deployments.is_empty() {
+        profile.azure = Some(AzureOptions {
+            api_version: enterprise.azure_api_version().to_owned(),
+            deployments: (enterprise.deployments.iter())
+                .map(|d| (d.alias().to_owned(), d.name.clone()))
+                .collect(),
+        });
+    }
+    profile
+}
 
 /// Sonda dostawców na wpisach katalogu.
 pub struct ProviderProbe {
@@ -31,8 +55,7 @@ impl ProviderProbe {
             .get(id)
             .ok_or_else(|| format!("brak adaptera dla dostawcy `{id}`"))?;
         let key = StaticKey(request.secret.map(|s| ApiKey::new(s.expose_secret())));
-        let mut profile = AccountProfile::new(Arc::new(key));
-        profile.base_url = request.base_url.map(str::to_owned);
+        let profile = account_profile(Arc::new(key), request.base_url, request.enterprise);
         build_provider(entry, profile).map_err(|e| e.to_string())
     }
 }

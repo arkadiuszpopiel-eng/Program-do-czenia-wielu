@@ -2,6 +2,7 @@
 
 use std::fmt;
 
+pub use accounts_hub_contract::{AzureDeployment, EnterpriseSettings};
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
 
@@ -162,6 +163,10 @@ pub struct Account {
     /// Model, którego Alfa użyje do rozmowy bez kolejki (wybór automatyczny).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auto_model: Option<String>,
+    /// Konto firmowe: organizacja i projekt OpenAI albo wersja API i wdrożenia Azure OpenAI
+    /// (nie sekrety; klucz zostaje w Menedżerze poświadczeń).
+    #[serde(default, skip_serializing_if = "EnterpriseSettings::is_empty")]
+    pub enterprise: EnterpriseSettings,
 }
 
 /// Ostatni test konta w skrócie (te same pola co w [`TestReport`], bez listy modeli).
@@ -225,6 +230,10 @@ pub struct AddAccountInput {
     pub label: String,
     pub secret: SecretInput,
     pub base_url: Option<String>,
+    /// Konto firmowe (OpenAI: organizacja i projekt; Azure OpenAI: wersja API i wdrożenia).
+    /// Rdzeń sprawdza i oczyszcza je przy zapisie konta. Pole opcjonalne (zwykłe konto).
+    #[serde(default, skip_serializing_if = "EnterpriseSettings::is_empty")]
+    pub enterprise: EnterpriseSettings,
 }
 
 /// Raport testu konta.

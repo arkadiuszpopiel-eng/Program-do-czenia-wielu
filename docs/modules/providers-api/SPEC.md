@@ -69,3 +69,15 @@ Chip profilu modelu, szczegóły wiadomości (model, tokeny, koszt, TTFT), stany
   połączenia, limit czasu po pierwszym tokenie) przechodzą przez `Engine::scrub` — redakcja klucza API i limit
   500 znaków — jak błędy HTTP przed strumieniem (`run.rs::Run::fail`). Dotyczy wszystkich adapterów na wspólnym
   silniku (OpenAI Chat/Responses, Anthropic, `providers-local-impl`). Test: `providers-api-impl/tests/stream_error_scrub.rs`.
+
+## Konta firmowe (wersja 0.0.64, C2.12)
+- `AccountProfile.organization` / `.project` → nagłówki `OpenAI-Organization` / `OpenAI-Project` w każdym żądaniu
+  adaptera zgodnego z OpenAI (rozmowa, lista modeli, osadzenia). Test: `tests/catalog.rs`.
+- `AzureOpenAiProvider` (wpis `azure-openai`, `compat = "native"`): adres zasobu z konta, klucz w nagłówku `api-key`
+  (bez `Authorization`), rozmowa `POST /openai/deployments/{wdrożenie}/chat/completions?api-version=…` (format Chat
+  Completions, `max_completion_tokens`, `stream_options.include_usage`), osadzenia `…/embeddings?api-version=…`.
+  `AzureOptions.deployments`: model Alfy → wdrożenie (bez wpisu — wdrożenie nazwane jak model). Test klucza:
+  `GET /openai/models?api-version=…` (bez tokenów); lista modeli konta = jego wdrożenia. Nazwy wdrożeń i wersja API
+  są kodowane w adresie. `WireRequest.path` jest teraz `Cow<'static, str>` (ścieżka zależna od modelu).
+- Testy: `tests/azure.rs` — pełny zestaw kontraktowy `ModelProvider` na serwerze fixture, adres i nagłówki,
+  wdrożenia, osadzenia, błąd 401 Azure → `Auth`. Nie sprawdzone na prawdziwym zasobie Azure.

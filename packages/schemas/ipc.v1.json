@@ -71,6 +71,10 @@
         "cost_limit": {
           "$ref": "#/$defs/AccountCostLimit"
         },
+        "enterprise": {
+          "$ref": "#/$defs/EnterpriseSettings",
+          "description": "Konto firmowe: organizacja i projekt OpenAI albo wersja API i wdrożenia Azure OpenAI\n(nie sekrety; klucz zostaje w Menedżerze poświadczeń)."
+        },
         "id": {
           "type": "string"
         },
@@ -289,6 +293,10 @@
             "string",
             "null"
           ]
+        },
+        "enterprise": {
+          "$ref": "#/$defs/EnterpriseSettings",
+          "description": "Konto firmowe (OpenAI: organizacja i projekt; Azure OpenAI: wersja API i wdrożenia).\nRdzeń sprawdza i oczyszcza je przy zapisie konta. Pole opcjonalne (zwykłe konto)."
         },
         "label": {
           "type": "string"
@@ -1897,6 +1905,26 @@
           "type": "string"
         }
       ]
+    },
+    "AzureDeployment": {
+      "description": "Wdrożenie modelu w zasobie Azure OpenAI: Alfa wybiera model (`model`), a żądanie idzie na\nadres wdrożenia (`name`).",
+      "properties": {
+        "model": {
+          "description": "Model, który wdrożenie udostępnia (np. `gpt-4o`); brak — model nazywa się jak wdrożenie.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "Nazwa wdrożenia w zasobie (część adresu `/openai/deployments/{name}/…`).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
     },
     "BackupCheck": {
       "description": "Wynik próby przywrócenia (otwarcie, sumy kontrolne, dry-run — nic nie zapisuje).",
@@ -4583,6 +4611,40 @@
         "duration_ms",
         "message"
       ],
+      "type": "object"
+    },
+    "EnterpriseSettings": {
+      "description": "Ustawienia konta firmowego. Puste = zwykłe konto (pole pomijane w zapisie).",
+      "properties": {
+        "api_version": {
+          "description": "Azure OpenAI: wersja API (`api-version`, np. `2024-10-21`).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "deployments": {
+          "description": "Azure OpenAI: wdrożenia modeli w zasobie.",
+          "items": {
+            "$ref": "#/$defs/AzureDeployment"
+          },
+          "type": "array"
+        },
+        "organization": {
+          "description": "OpenAI: identyfikator organizacji (`org-…`) — nagłówek `OpenAI-Organization`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "project": {
+          "description": "OpenAI: identyfikator projektu (`proj_…`) — nagłówek `OpenAI-Project`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
       "type": "object"
     },
     "EnvImportKind": {

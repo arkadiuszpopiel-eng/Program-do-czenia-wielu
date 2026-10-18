@@ -38,6 +38,7 @@ impl FakeAccountsHub {
                 source: AccountSource::Env {
                     var: var.to_owned(),
                 },
+                enterprise: Default::default(),
             })
             .await?;
         Ok(EnvImportOutcome::Imported { account })

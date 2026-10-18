@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::account::{Account, AccountState, Assignments, CostLimit, NewAccount, TestSummary};
 use crate::catalog::{CatalogError, PriceTable, ProviderCatalogEntry};
+use crate::enterprise::EnterpriseSettings;
 use crate::ids::{AccountId, ModelId, ProviderId};
 use crate::probe::EnvSource;
 use crate::secret::{SecretStoreError, SecretString};
@@ -157,10 +158,12 @@ pub trait AccountsHub: Send + Sync {
 
     /// Konto tego dostawcy, które ma już dokładnie ten klucz (porównanie w stałym czasie, wewnątrz
     /// huba — klucz nie opuszcza magazynu). Chroni przed dodaniem tego samego klucza drugi raz.
+    /// Konto w innym projekcie OpenAI ([`EnterpriseSettings::billing_project`]) nie jest duplikatem.
     fn find_by_secret(
         &self,
         provider: &ProviderId,
         base_url: Option<&str>,
+        enterprise: &EnterpriseSettings,
         secret: &SecretString,
     ) -> Option<AccountId>;
 

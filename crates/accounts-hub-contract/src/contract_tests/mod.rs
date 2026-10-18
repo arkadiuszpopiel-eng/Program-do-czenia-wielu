@@ -6,12 +6,14 @@
 //! `sk-bad` → `InvalidKey`; `sk-rate` → `RateLimited`; `sk-net` → `Network` z komunikatem
 //! zawierającym klucz (sprawdza redakcję); brak klucza → `Ok` bez modeli (`Unsupported`).
 
+mod enterprise;
 mod flows;
 
 use std::collections::BTreeSet;
 use std::future::Future;
 use std::sync::Mutex;
 
+pub use enterprise::*;
 pub use flows::*;
 
 use crate::{AccountsHub, EnvSource, ProviderCatalogEntry, SecretString};
@@ -186,4 +188,18 @@ where
     env_import_reads_only_catalog_vars(&fresh().await).await;
     pricing_and_models_in_catalog(&fresh().await).await;
     secrets_never_in_debug(&fresh().await).await;
+    enterprise_settings_only_where_they_apply(&fresh().await).await;
+    same_key_in_other_openai_project_is_not_a_duplicate(&factory(with_openai()).await).await;
+}
+
+/// Katalog-fixture z dodanym dostawcą `openai` (projekty OpenAI).
+fn with_openai() -> Vec<ProviderCatalogEntry> {
+    let text = ACME
+        .replace("\"acme\"", "\"openai\"")
+        .replace("ACME_", "OPENAI_");
+    let mut catalog = fixture_catalog();
+    catalog.push(
+        ProviderCatalogEntry::from_toml(&text, "openai").unwrap_or_else(|e| panic!("fixture: {e}")),
+    );
+    catalog
 }

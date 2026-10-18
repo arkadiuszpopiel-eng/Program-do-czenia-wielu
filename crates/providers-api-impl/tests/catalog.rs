@@ -160,3 +160,50 @@ async fn anthropic_compatible_entry_uses_messages_api_without_betas() {
     assert_eq!(rec.header("x-api-key"), Some("key-123"));
     assert!(rec.header("anthropic-beta").is_none());
 }
+
+/// Konto firmowe OpenAI (C2.12): organizacja i projekt w każdym żądaniu konta — rozmowa i lista
+/// modeli; bez nich żadnego z tych nagłówków.
+#[tokio::test]
+async fn openai_organization_and_project_headers_on_every_request() {
+    let server = FixtureServer::start().await;
+    server.reset(Reply::sse(openai_sse::resp_text("gpt-6-sol", &["ok"])));
+    let mut a = account(Some(&server), "gpt-6-sol");
+    a.organization = Some(" org-Acme123 ".into());
+    a.project = Some("proj_Budget42".into());
+    let p = build_provider(&entry("openai"), a).unwrap();
+    let events = run(
+        &p,
+        ChatRequest::new("gpt-6-sol", vec![Message::user_text("hej")]),
+    )
+    .await;
+    assert_eq!(
+        events.last(),
+        Some(&ProviderEvent::stop(StopReason::EndTurn))
+    );
+    let chat = server.requests().pop().unwrap();
+    assert_eq!(chat.path, "/responses");
+    server.reset(Reply::json(
+        200,
+        &serde_json::json!({"data": [{"id": "gpt-6-sol"}]}),
+    ));
+    assert_eq!(p.list_models().await.unwrap().len(), 1);
+    let models = server.requests().pop().unwrap();
+    assert_eq!(models.path, "/models");
+    for rec in [&chat, &models] {
+        assert_eq!(rec.header("openai-organization"), Some("org-Acme123"));
+        assert_eq!(rec.header("openai-project"), Some("proj_Budget42"));
+        assert_eq!(rec.header("authorization"), Some("Bearer key-123"));
+    }
+
+    server.reset(Reply::sse(openai_sse::resp_text("gpt-6-sol", &["ok"])));
+    let plain = build_provider(&entry("openai"), account(Some(&server), "gpt-6-sol")).unwrap();
+    let _ = run(
+        &plain,
+        ChatRequest::new("gpt-6-sol", vec![Message::user_text("hej")]),
+    )
+    .await;
+    let rec = server.requests().pop().unwrap();
+    assert_eq!(rec.path, "/responses");
+    assert!(rec.header("openai-organization").is_none());
+    assert!(rec.header("openai-project").is_none());
+}

@@ -78,8 +78,9 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
 - `set_disabled(id, false)` przywraca stan z ostatniego testu (konto z odrzuconym kluczem nie staje się aktywne).
 - `set_manual_model(id, model)`: model podany ręcznie dla konta bez listy modeli od dostawcy; udany, niepusty odczyt
   listy go zastępuje, pusta lista niczego nie kasuje.
-- `find_by_secret(provider, base_url, secret)`: ten sam klucz u tego samego dostawcy pod tym samym adresem = odmowa
-  z nazwą istniejącego konta.
+- `find_by_secret(provider, base_url, enterprise, secret)`: ten sam klucz u tego samego dostawcy pod tym samym
+  adresem i w tym samym projekcie OpenAI (`EnterpriseSettings::billing_project`, puste = projekt domyślny klucza)
+  = odmowa z nazwą istniejącego konta. Ten sam klucz w innym projekcie to osobne konto (osobny budżet).
 - Wynik testu jest scalany z bieżącym wpisem konta (zmiany przypisań i limitu z czasu testu nie giną).
 - Testy całej ścieżki: `app-core/tests/accounts_keys.rs`, `accounts_rotate.rs` (lokalny serwer udający dostawcę).
 
@@ -97,3 +98,18 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
 - **0.0.20 (C2.14):** `Account.key_saved_at` — chwila zapisania obecnego klucza (`add_account`, `rotate`, `try_rotate`);
   brak pola w starych danych = `created_at`. Okresowe sprawdzanie kont i przypomnienie o wymianie żyją w kompozycji
   (`app-core/src/parts/key_watch.rs`) i w interfejsie — hub tylko przechowuje datę i wykonuje test.
+
+## Konta firmowe (wersja 0.0.64, C2.12)
+- `Account.enterprise: EnterpriseSettings` (pole pomijane, gdy puste; stare dane wczytują się bez zmian) i to samo pole
+  w `NewAccount` i `ConnectionRequest` — test i lista modeli idą z ustawieniami konta.
+- OpenAI (`openai`): opcjonalne `organization` (`org-…`) i `project` (`proj_…`, dopuszczalnie `proj-…`) → nagłówki
+  `OpenAI-Organization` i `OpenAI-Project` w każdym żądaniu konta. To nie sekrety, ale `Debug` pokazuje je skrócone
+  (`mask_id`: `org-…wxyz`), a silnik HTTP oznacza te nagłówki jako wrażliwe.
+- Azure OpenAI (`azure-openai`, wpis katalogu bez adresu): `base_url` = adres zasobu `https://<zasób>.openai.azure.com`
+  (także `*.cognitiveservices.azure.com`; host lokalny dla bramek i testów), `api_version` (domyślnie `2024-10-21`),
+  `deployments: [{ name, model? }]` — model Alfy → wdrożenie (1–32, bez powtórzeń modelu). Klucz jak każdy inny —
+  wyłącznie w Menedżerze poświadczeń.
+- `EnterpriseSettings::checked(dostawca, adres)` oczyszcza (odstępy, puste pola) i odrzuca to, co nie pasuje do
+  dostawcy (`AccountsError::InvalidInput`, w kreatorze `WizardError::InvalidEnterprise`). Te same reguły w interfejsie:
+  `logic/enterprise.ts`, wspólna tabela przypadków `accounts-hub-contract/tests/fixtures/enterprise-cases.json`.
+- Kontrakt: `contract_tests::enterprise_settings_only_where_they_apply` (impl i fake).

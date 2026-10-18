@@ -25,6 +25,11 @@ export interface Account {
   /** Model, którego Alfa użyje do rozmowy bez kolejki (wybór automatyczny). */
   readonly auto_model?: string | null;
   readonly cost_limit: AccountCostLimit;
+  /**
+   * Konto firmowe: organizacja i projekt OpenAI albo wersja API i wdrożenia Azure OpenAI
+   * (nie sekrety; klucz zostaje w Menedżerze poświadczeń).
+   */
+  readonly enterprise?: EnterpriseSettings;
   readonly id: string;
   /**
    * Kiedy zapisano obecny klucz (dodanie konta albo ostatnia wymiana) — wiek klucza
@@ -88,6 +93,11 @@ export interface ActivityInfo {
 /** Dane kreatora konta. Sekret trafia wyłącznie do Credential Managera. */
 export interface AddAccountInput {
   readonly base_url: string | null;
+  /**
+   * Konto firmowe (OpenAI: organizacja i projekt; Azure OpenAI: wersja API i wdrożenia).
+   * Rdzeń sprawdza i oczyszcza je przy zapisie konta. Pole opcjonalne (zwykłe konto).
+   */
+  readonly enterprise?: EnterpriseSettings;
   readonly label: string;
   readonly provider_id: string;
   readonly secret: SecretInput;
@@ -493,6 +503,17 @@ export type AutonomyLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4';
 
 /** Poziom autonomii (PLAN §8.3). Porządek rosnący: L0 < L1 < L2 < L3 < L4; domyślnie L3. */
 export type AutonomyLevel2 = 'L0' | 'L1' | 'L2' | 'L3' | 'L4';
+
+/**
+ * Wdrożenie modelu w zasobie Azure OpenAI: Alfa wybiera model (`model`), a żądanie idzie na
+ * adres wdrożenia (`name`).
+ */
+export interface AzureDeployment {
+  /** Model, który wdrożenie udostępnia (np. `gpt-4o`); brak — model nazywa się jak wdrożenie. */
+  readonly model?: string | null;
+  /** Nazwa wdrożenia w zasobie (część adresu `/openai/deployments/{name}/…`). */
+  readonly name: string;
+}
 
 /** Wynik próby przywrócenia (otwarcie, sumy kontrolne, dry-run — nic nie zapisuje). */
 export interface BackupCheck {
@@ -1217,6 +1238,18 @@ export interface EnrollSampleView {
   readonly level_db: number;
   readonly message: LocalizedText | null;
   readonly quality: SampleQuality;
+}
+
+/** Ustawienia konta firmowego. Puste = zwykłe konto (pole pomijane w zapisie). */
+export interface EnterpriseSettings {
+  /** Azure OpenAI: wersja API (`api-version`, np. `2024-10-21`). */
+  readonly api_version?: string | null;
+  /** Azure OpenAI: wdrożenia modeli w zasobie. */
+  readonly deployments?: readonly AzureDeployment[];
+  /** OpenAI: identyfikator organizacji (`org-…`) — nagłówek `OpenAI-Organization`. */
+  readonly organization?: string | null;
+  /** OpenAI: identyfikator projektu (`proj_…`) — nagłówek `OpenAI-Project`. */
+  readonly project?: string | null;
 }
 
 /** Co stało się ze zmienną. */

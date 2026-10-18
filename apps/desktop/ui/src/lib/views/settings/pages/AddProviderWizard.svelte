@@ -18,10 +18,17 @@
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
   import { cleanKey } from '../../../logic/api-key';
+  import {
+    checkEnterprise,
+    emptyEnterpriseForm,
+    formToSettings,
+    type EnterpriseForm,
+  } from '../../../logic/enterprise';
   import type { Account, ProviderInfo, TestReport } from '../../../api/types-hub';
   import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import ProviderPicker from './ProviderPicker.svelte';
+  import WizardEnterpriseFields from './WizardEnterpriseFields.svelte';
   import WizardKeyStep from './WizardKeyStep.svelte';
   import WizardTestResult from './WizardTestResult.svelte';
 
@@ -42,6 +49,11 @@
   let label = $state('');
   let secret = $state('');
   let baseUrl = $state('');
+  /** Konto firmowe: organizacja/projekt OpenAI albo wdrożenia Azure OpenAI. */
+  let enterprise = $state<EnterpriseForm>(emptyEnterpriseForm());
+  const enterpriseCheck = $derived(
+    checkEnterprise(provider?.id ?? '', baseUrl.trim() || null, formToSettings(enterprise)),
+  );
   let account = $state<Account | null>(null);
   let report = $state<TestReport | null>(null);
   let testing = $state(false);
@@ -61,6 +73,7 @@
     if (provider?.id !== p.id) {
       baseUrl = '';
       secret = '';
+      enterprise = emptyEnterpriseForm(p.id);
     }
     provider = p;
     label = p.display_name;
@@ -81,6 +94,8 @@
         secret: key,
         // Adres tylko wtedy, gdy kreator o niego pytał (dostawca bez adresu w katalogu).
         base_url: provider.needs_base_url ? baseUrl.trim() || null : null,
+        // Rdzeń sprawdza je jeszcze raz; tu idą już oczyszczone (bez pustych pól).
+        ...(enterpriseCheck.ok ? { enterprise: enterpriseCheck.value } : {}),
       });
     } catch (error) {
       keyError = errorText(error);
@@ -196,7 +211,14 @@
         {saving}
         error={keyError}
         onsubmit={saveKey}
-      />
+        blocked={!enterpriseCheck.ok}
+      >
+        {#snippet extra()}
+          {#if provider}
+            <WizardEnterpriseFields {provider} bind:form={enterprise} bind:baseUrl />
+          {/if}
+        {/snippet}
+      </WizardKeyStep>
     {:else if step === 2}
       <WizardTestResult
         {report}

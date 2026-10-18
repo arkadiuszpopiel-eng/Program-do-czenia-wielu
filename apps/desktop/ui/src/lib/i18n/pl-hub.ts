@@ -179,4 +179,44 @@ export const plHub = {
     many: 'Nieustawionych {n} zmiennych:',
     other: 'Nieustawione {n} zmiennej:',
   },
+  'ent.openaiTitle': 'Konto firmowe (opcjonalnie)',
+  'ent.openaiToggle': 'Klucz należy do organizacji albo projektu w OpenAI',
+  'ent.organization': 'Identyfikator organizacji',
+  'ent.organizationHint':
+    'Zaczyna się od „org-”. Znajdziesz go w ustawieniach organizacji na platform.openai.com. Puste — organizacja domyślna klucza.',
+  'ent.project': 'Identyfikator projektu',
+  'ent.projectHint':
+    'Zaczyna się od „proj_”. Koszty i limity zapytań trafią do tego projektu. Puste — projekt domyślny klucza.',
+  'ent.azureTitle': 'Zasób Azure OpenAI',
+  'ent.azureWhere':
+    'Adres zasobu i klucz znajdziesz w portalu Azure: zasób → Klucze i punkt końcowy. Nazwy wdrożeń — w Azure AI Foundry → Wdrożenia.',
+  'ent.azureUrl': 'Adres zasobu Azure OpenAI',
+  'ent.azureUrlHint':
+    'Na przykład https://firma.openai.azure.com — sam adres zasobu, bez dalszej ścieżki. Klucz zostanie wysłany tylko pod ten adres.',
+  'ent.target': 'Wklejono adres wdrożenia. Alfa potrzebuje osobno adresu zasobu i nazwy wdrożenia.',
+  'ent.targetUse': 'Rozdziel automatycznie',
+  'ent.apiVersion': 'Wersja API',
+  'ent.apiVersionHint': 'Puste — {version}.',
+  'ent.deployments': 'Wdrożenia modeli',
+  'ent.deploymentsHint':
+    'Nazwa wdrożenia i model, który udostępnia. Alfa wybiera model, a pyta jego wdrożenie. Bez modelu — model nazywa się jak wdrożenie.',
+  'ent.deploymentName': 'Nazwa wdrożenia',
+  'ent.deploymentModel': 'Model (np. gpt-4o)',
+  'ent.deploymentAdd': 'Dodaj wdrożenie',
+  'ent.deploymentRemove': 'Usuń wdrożenie {name}',
+  'ent.summary': 'Konto firmowe: {summary}',
+  'ent.err.org_only_openai': 'Organizacja i projekt dotyczą tylko kont OpenAI.',
+  'ent.err.org_format': 'Identyfikator organizacji zaczyna się od „org-” (wpisano {subject}).',
+  'ent.err.project_format': 'Identyfikator projektu zaczyna się od „proj_” (wpisano {subject}).',
+  'ent.err.azure_only': 'Wdrożenia i wersja API dotyczą tylko kont Azure OpenAI.',
+  'ent.err.endpoint':
+    'Adres zasobu ma postać https://<zasób>.openai.azure.com, bez dalszej ścieżki.',
+  'ent.err.api_version': 'Wersja API ma postać RRRR-MM-DD, np. {version}.',
+  'ent.err.no_deployments': 'Podaj co najmniej jedno wdrożenie modelu.',
+  'ent.err.too_many': 'Najwyżej {subject} wdrożeń w jednym koncie.',
+  'ent.err.deployment_name':
+    'Nazwa wdrożenia „{subject}” może mieć tylko litery, cyfry, „-”, „_” i „.”.',
+  'ent.err.model_name':
+    'Model wdrożenia „{subject}” może mieć tylko litery, cyfry, „-”, „_”, „.” i „:”.',
+  'ent.err.duplicate': 'Model {subject} ma dwa wdrożenia — zostaw jedno.',
 } as const;

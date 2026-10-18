@@ -31,6 +31,7 @@ async fn controls_and_spy() {
             assignments: Assignments::default(),
             cost_limit: None,
             source: AccountSource::Manual,
+            enterprise: Default::default(),
         })
         .await
         .unwrap();

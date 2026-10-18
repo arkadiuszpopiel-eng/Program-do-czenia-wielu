@@ -6,9 +6,9 @@ use std::time::{Duration, Instant};
 
 use accounts_hub_contract::{
     Account, AccountId, AccountState, AccountsError, AccountsRepository, AuthKind,
-    ConnectionReport, ConnectionRequest, ConnectionTester, EVENT_STATE_CHANGED, ModelInfo,
-    ModelListError, ModelLister, ProviderCatalogEntry, ProviderId, SecretStore, SecretString,
-    TestOutcome, event_kind,
+    ConnectionReport, ConnectionRequest, ConnectionTester, EVENT_STATE_CHANGED, EnterpriseSettings,
+    ModelInfo, ModelListError, ModelLister, ProviderCatalogEntry, ProviderId, SecretStore,
+    SecretString, TestOutcome, event_kind,
 };
 use chrono::{DateTime, Utc};
 use compliance_contract::{Compliance, RouteId, RouteStatus};
@@ -251,11 +251,13 @@ impl AccountsHubService {
         entry: &ProviderCatalogEntry,
         base_url: Option<&str>,
         secret: Option<&SecretString>,
+        enterprise: &EnterpriseSettings,
     ) -> ConnectionReport {
         let request = ConnectionRequest {
             provider: entry,
             base_url,
             secret,
+            enterprise,
         };
         let started = Instant::now();
         let report = match tokio::time::timeout(self.timeout, self.tester.test(request)).await {
@@ -275,11 +277,13 @@ impl AccountsHubService {
         entry: &ProviderCatalogEntry,
         base_url: Option<&str>,
         secret: Option<&SecretString>,
+        enterprise: &EnterpriseSettings,
     ) -> Result<Vec<ModelInfo>, ModelListError> {
         let request = ConnectionRequest {
             provider: entry,
             base_url,
             secret,
+            enterprise,
         };
         match tokio::time::timeout(self.timeout, self.lister.list_models(request)).await {
             Ok(Err(ModelListError::Network { message })) => Err(ModelListError::Network {

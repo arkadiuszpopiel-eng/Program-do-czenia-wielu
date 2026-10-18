@@ -82,10 +82,11 @@ pub use health::{
 pub use help::{HelpHit, HelpPage, HelpTopic};
 pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
-    AudioDevice, AuthKind, BatteryView, BrokerIntentResult, BrokerIntentStatus, CompatKind,
-    ComplianceStatus, CpuView, DeviceProfile, EnvImportKind, EnvImportResult, GpuView, HwClass,
-    LocalDownloadState, LocalModelInfo, MachineView, ModelInfo, ModelKind, PermissionsState,
-    ProviderInfo, ProviderKind, RecommendationView, SecretInput, TestReport, VoiceProfileId,
+    AudioDevice, AuthKind, AzureDeployment, BatteryView, BrokerIntentResult, BrokerIntentStatus,
+    CompatKind, ComplianceStatus, CpuView, DeviceProfile, EnterpriseSettings, EnvImportKind,
+    EnvImportResult, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView, ModelInfo,
+    ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView, SecretInput,
+    TestReport, VoiceProfileId,
 };
 pub use licenses::{CommercialUse, LicenseCard, VoiceLicense};
 pub use mcp::{

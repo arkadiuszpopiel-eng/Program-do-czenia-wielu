@@ -57,14 +57,10 @@ impl AppCore {
         if !secret.is_plausible_key() {
             return Err(AppError::invalid(NOT_A_KEY));
         }
-        let twin =
-            self.inner
-                .hub
-                .find_by_secret(&current.provider, current.base_url.as_deref(), &secret);
+        let (hub, url) = (&self.inner.hub, current.base_url.as_deref());
+        let twin = hub.find_by_secret(&current.provider, url, &current.enterprise, &secret);
         if let Some(existing) = twin.filter(|existing| *existing != id) {
-            let label = self
-                .inner
-                .hub
+            let label = hub
                 .account(&existing)
                 .map_or_else(|| existing.to_string(), |a| a.label);
             return Err(AppError::invalid(format!(

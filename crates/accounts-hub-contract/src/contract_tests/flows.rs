@@ -3,15 +3,15 @@
 use super::{KEY_INVALID, KEY_NET, KEY_OK, KEY_OK_2, KEY_RATE, MODEL_A, MODEL_B, SpyEnv};
 use crate::{
     AccountErrorKind, AccountSource, AccountState, AccountsError, AccountsHub, Assignments,
-    CostLimit, EnvImportOutcome, ModelId, ModelPrice, NewAccount, PriceTable, ProviderId,
-    SecretString, TaskClass, TestOutcome, VoiceRole, Wizard, WizardStep,
+    CostLimit, EnterpriseSettings, EnvImportOutcome, ModelId, ModelPrice, NewAccount, PriceTable,
+    ProviderId, SecretString, TaskClass, TestOutcome, VoiceRole, Wizard, WizardStep,
 };
 
-fn pid(s: &str) -> ProviderId {
+pub(super) fn pid(s: &str) -> ProviderId {
     ProviderId::new(s).unwrap_or_else(|e| panic!("{e}"))
 }
 
-fn new_account(provider: &str, key: &str) -> NewAccount {
+pub(super) fn new_account(provider: &str, key: &str) -> NewAccount {
     NewAccount {
         provider: pid(provider),
         label: format!("konto {provider}"),
@@ -20,10 +20,11 @@ fn new_account(provider: &str, key: &str) -> NewAccount {
         assignments: Assignments::default(),
         cost_limit: None,
         source: AccountSource::Manual,
+        enterprise: EnterpriseSettings::default(),
     }
 }
 
-fn ok<T, E: std::fmt::Display>(r: Result<T, E>) -> T {
+pub(super) fn ok<T, E: std::fmt::Display>(r: Result<T, E>) -> T {
     r.unwrap_or_else(|e| panic!("{e}"))
 }
 

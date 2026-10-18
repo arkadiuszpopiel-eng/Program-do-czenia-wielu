@@ -10,6 +10,7 @@ use providers_contract::{
 use serde::Deserialize;
 
 use crate::anthropic::{ANTHROPIC_BASE_URL, AnthropicOptions, AnthropicProvider};
+use crate::azure::{AzureOpenAiProvider, AzureOptions};
 use crate::openai::{OPENAI_BASE_URL, OpenAiApi, OpenAiOptions, OpenAiProvider};
 use lib_openai_compat::{
     AuthScheme, ConfigError, HttpConfig, ProviderProfile, RetryPolicy, Timeouts,
@@ -161,7 +162,16 @@ pub struct AccountProfile {
     pub retry: Option<RetryPolicy>,
     /// Format API dla natywnego OpenAI (domyślnie Responses).
     pub openai_api: Option<OpenAiApi>,
+    /// Konto firmowe OpenAI: organizacja (`OpenAI-Organization` w każdym żądaniu konta).
+    pub organization: Option<String>,
+    /// Konto firmowe OpenAI: projekt (`OpenAI-Project` w każdym żądaniu konta).
+    pub project: Option<String>,
+    /// Azure OpenAI: wersja API i wdrożenia modeli (wpis katalogu [`AZURE_OPENAI`]).
+    pub azure: Option<AzureOptions>,
 }
+
+/// Identyfikator wpisu katalogu Azure OpenAI (adapter natywny bez domyślnego adresu).
+pub const AZURE_OPENAI: &str = "azure-openai";
 
 impl AccountProfile {
     /// Konto z samym kluczem.
@@ -175,6 +185,9 @@ impl AccountProfile {
             timeouts: None,
             retry: None,
             openai_api: None,
+            organization: None,
+            project: None,
+            azure: None,
         }
     }
 }
@@ -202,6 +215,8 @@ pub fn build_provider(
     let native_default = match (entry.compat, entry.id.as_str()) {
         (CatalogCompat::Native, "anthropic") => Some(ANTHROPIC_BASE_URL),
         (CatalogCompat::Native, "openai") => Some(OPENAI_BASE_URL),
+        // Adres zasobu Azure podaje zawsze konto — katalog go nie zna.
+        (CatalogCompat::Native, AZURE_OPENAI) => None,
         (CatalogCompat::Native, _) => return Err(unsupported("brak adaptera natywnego")),
         _ => None,
     };
@@ -232,14 +247,37 @@ pub fn build_provider(
     }
     let anthropic_like = matches!(entry.compat, CatalogCompat::Anthropic)
         || native_default == Some(ANTHROPIC_BASE_URL);
+    let azure = entry.id == AZURE_OPENAI;
     let auth = match (entry.auth, anthropic_like) {
         (CatalogAuth::None, _) => AuthScheme::None,
         (_, true) => AuthScheme::XApiKey,
+        (_, false) if azure => AuthScheme::Header("api-key".into()),
         (_, false) => AuthScheme::Bearer,
     };
     let mut http = HttpConfig::new(base_url, auth);
     http.timeouts = account.timeouts.unwrap_or_default();
     http.retry = account.retry.unwrap_or_default();
+    if !anthropic_like {
+        let ids = [
+            ("OpenAI-Organization", &account.organization),
+            ("OpenAI-Project", &account.project),
+        ];
+        for (name, value) in ids {
+            if let Some(value) = value.as_ref().filter(|v| !v.trim().is_empty()) {
+                http.extra_headers
+                    .push((name.to_owned(), value.trim().to_owned()));
+            }
+        }
+    }
+    if azure {
+        let options = account.azure.unwrap_or_default();
+        return Ok(Arc::new(AzureOpenAiProvider::new(
+            profile,
+            http,
+            account.key,
+            options,
+        )?));
+    }
 
     let provider: Arc<dyn ModelProvider> = match (entry.compat, anthropic_like) {
         (CatalogCompat::Native, true) => Arc::new(AnthropicProvider::new(

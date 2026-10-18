@@ -183,6 +183,7 @@ pub fn account_dto(a: &CoreAccount) -> Account {
             .collect(),
         auto_model: accounts_hub_contract::best_chat_model(a.models.iter().map(|m| m.id.as_str()))
             .map(str::to_owned),
+        enterprise: a.enterprise.clone(),
     }
 }
 
@@ -263,10 +264,9 @@ impl AppCore {
             .as_deref()
             .map(str::trim)
             .filter(|u| !u.is_empty());
-        if let Some(existing) = self.inner.hub.find_by_secret(&provider, base, &secret) {
-            let label = self
-                .inner
-                .hub
+        let hub = &self.inner.hub;
+        if let Some(existing) = hub.find_by_secret(&provider, base, &input.enterprise, &secret) {
+            let label = hub
                 .account(&existing)
                 .map_or_else(|| existing.to_string(), |a| a.label);
             return Err(AppError::invalid(format!(
@@ -284,10 +284,8 @@ impl AppCore {
                 provider,
                 label,
                 secret,
-                base_url: input
-                    .base_url
-                    .map(|u| u.trim().to_owned())
-                    .filter(|u| !u.is_empty()),
+                base_url: base.map(str::to_owned),
+                enterprise: input.enterprise,
                 assignments: Assignments {
                     task_classes: [TaskClass::Conversation].into(),
                     ..Assignments::default()

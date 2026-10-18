@@ -28,8 +28,8 @@ pub struct BuildOptions {
 /// Żądanie w formacie dostawcy.
 #[derive(Debug, Clone)]
 pub struct WireRequest {
-    /// Ścieżka względem `base_url`.
-    pub path: &'static str,
+    /// Ścieżka względem `base_url` (z zapytaniem, np. `?api-version=…` w Azure OpenAI).
+    pub path: std::borrow::Cow<'static, str>,
     /// Ciało JSON.
     pub body: serde_json::Value,
     /// Nagłówki specyficzne dla żądania (np. `anthropic-beta`).
@@ -97,6 +97,9 @@ pub fn cancelled() -> ProviderEvent {
 
 /// Maksymalna długość komunikatu błędu dostawcy przekazywanego dalej.
 const MAX_ERROR_MESSAGE: usize = 500;
+
+/// Identyfikatory konta firmowego OpenAI: nie sekrety, ale bez pełnej wartości w `Debug`.
+const QUIET_HEADERS: [&str; 2] = ["openai-organization", "openai-project"];
 
 impl<C: WireCodec> Engine<C> {
     /// Silnik z klientem HTTP (limit połączenia z `http.timeouts.connect`).
@@ -205,9 +208,10 @@ impl<C: WireCodec> Engine<C> {
             let name = HeaderName::from_bytes(name.as_bytes()).map_err(|_| {
                 ProviderError::invalid_request(format!("zła nazwa nagłówka `{name}`"))
             })?;
-            let value = HeaderValue::from_str(&value).map_err(|_| {
+            let mut value = HeaderValue::from_str(&value).map_err(|_| {
                 ProviderError::invalid_request(format!("zła wartość nagłówka `{name}`"))
             })?;
+            value.set_sensitive(QUIET_HEADERS.contains(&name.as_str()));
             headers.insert(name, value);
         }
         Ok(headers)
@@ -347,9 +351,12 @@ mod tests {
 
     #[test]
     fn headers_scrub_and_no_runtime() {
-        let e = engine(vec![("x-title".into(), "Alfa".into())]);
+        let e = engine(vec![
+            ("x-title".into(), "Alfa".into()),
+            ("OpenAI-Project".into(), "proj_x9".into()),
+        ]);
         let h = e.headers(&[("anthropic-beta", "b1".into())]).unwrap();
-        assert_eq!(h.get("x-title").and_then(|v| v.to_str().ok()), Some("Alfa"));
+        assert!(h.contains_key("x-title") && !format!("{h:?}").contains("proj_x9"));
         assert_eq!(
             h.get("anthropic-beta").and_then(|v| v.to_str().ok()),
             Some("b1")

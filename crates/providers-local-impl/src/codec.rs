@@ -88,7 +88,7 @@ impl WireCodec for LlamaCodec {
             chat::build_body(&fitted.request, &self.caps, &self.profile, &options)?
         };
         Ok(WireRequest {
-            path: "/chat/completions",
+            path: "/chat/completions".into(),
             body,
             headers: Vec::new(),
         })

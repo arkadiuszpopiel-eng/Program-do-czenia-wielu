@@ -7,7 +7,7 @@
 
 use accounts_hub_contract::{
     Account, AccountId, AccountState, AccountsError, AuthKind, EVENT_KEY_ROTATED, EVENT_KEY_TESTED,
-    ModelId, ModelInfo, ProviderId, SecretString, TestSummary,
+    EnterpriseSettings, ModelId, ModelInfo, ProviderId, SecretString, TestSummary,
 };
 use core_bus_contract::Level;
 
@@ -26,11 +26,13 @@ impl AccountsHubService {
     ) -> Result<(TestSummary, Option<Vec<ModelInfo>>), AccountsError> {
         let entry = self.provider_entry(&acc.provider)?;
         let base_url = acc.base_url.clone().or_else(|| entry.base_url.clone());
-        let report = self.run_test(&entry, base_url.as_deref(), secret).await;
+        let report = self
+            .run_test(&entry, base_url.as_deref(), secret, &acc.enterprise)
+            .await;
         // Klucz bez prawa do listy modeli: drugie zapytanie dałoby tę samą odmowę. Pusta lista
         // nie kasuje tego, co konto już zna (np. model wpisany ręcznie).
         let models = if report.outcome.may_list_models() {
-            self.run_listing(&entry, base_url.as_deref(), secret)
+            self.run_listing(&entry, base_url.as_deref(), secret, &acc.enterprise)
                 .await
                 .ok()
                 .filter(|found| !found.is_empty())
@@ -266,6 +268,7 @@ impl AccountsHubService {
         &self,
         provider: &ProviderId,
         base_url: Option<&str>,
+        enterprise: &EnterpriseSettings,
         secret: &SecretString,
     ) -> Option<AccountId> {
         if secret.is_empty() {
@@ -282,6 +285,7 @@ impl AccountsHubService {
         accounts
             .into_iter()
             .filter(|acc| &acc.provider == provider && effective(acc.base_url.as_deref()) == wanted)
+            .filter(|acc| acc.enterprise.billing_project() == enterprise.billing_project())
             .find(|acc| matches!(self.secret_of(acc), Ok(Some(stored)) if stored.ct_eq(secret)))
             .map(|acc| acc.id)
     }

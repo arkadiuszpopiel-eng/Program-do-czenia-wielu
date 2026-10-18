@@ -2,8 +2,9 @@
 // (kształt) i odrzucany — atrapa, tak jak rdzeń, nigdy nie oddaje go z powrotem do UI.
 import type { AlfaClient } from '../client';
 import { cleanKey, isPlausibleKey, rotateStores, verdictOf } from '../../logic/api-key';
+import { AZURE_OPENAI, billingProject, checkEnterprise, coreMessage } from '../../logic/enterprise';
 import { CommandError } from '../command-error';
-import type { Account, DryRunItem, ModelInfo, TestReport } from '../types-hub';
+import type { Account, DryRunItem, EnterpriseSettings, ModelInfo, TestReport } from '../types-hub';
 import {
   MAX_QUEUE,
   TASK_CLASSES,
@@ -34,6 +35,11 @@ const MODELS: Readonly<Record<string, readonly ModelInfo[]>> = {
 
 const genericModels = (providerId: string): readonly ModelInfo[] =>
   MODELS[providerId] ?? [fakeModel(`${providerId}-default`, `${providerId} — model domyślny`)];
+/** Modele konta po udanym teście; Azure OpenAI — wdrożenia z konta (jak adapter w rdzeniu). */
+const modelsOf = (a: Account): readonly ModelInfo[] =>
+  a.provider_id === AZURE_OPENAI
+    ? (a.enterprise?.deployments ?? []).map((d) => fakeModel(d.model ?? d.name, d.name))
+    : genericModels(a.provider_id);
 
 /** Model rozmowy wybierany automatycznie (jak `best_chat_model` w rdzeniu). */
 const autoModel = (models: readonly ModelInfo[]): string | null =>
@@ -152,7 +158,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
         : {}),
     };
     // Lista modeli zmienia się tylko po jej udanym odczycie (jak w rdzeniu).
-    const models = outcome === 'ok' ? genericModels(account.provider_id) : account.models;
+    const models = outcome === 'ok' ? modelsOf(account) : account.models;
     const state: Account['state'] =
       outcome === 'unsupported' ? account.state : ok ? 'ok' : 'invalid';
     const stored: Partial<Account> = {
@@ -172,13 +178,14 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     };
     return { ok, stored, report };
   };
-  /** Konto tego dostawcy pod tym samym adresem z tym samym kluczem (jak `find_by_secret`). */
-  const twin = (providerId: string, baseUrl: string | null, key: string, except?: string) =>
+  /** Konto dostawcy pod tym adresem, w tym projekcie OpenAI, z tym kluczem (jak `find_by_secret`). */
+  const twin = (key: string, id: string, url: string | null, e?: EnterpriseSettings, ex?: string) =>
     core.accounts.find(
       (a) =>
-        a.id !== except &&
-        a.provider_id === providerId &&
-        sameUrl(urls.get(a.id) ?? '', baseUrl ?? '') &&
+        a.id !== ex &&
+        a.provider_id === id &&
+        sameUrl(urls.get(a.id) ?? '', url ?? '') &&
+        billingProject(a.enterprise) === billingProject(e) &&
         keys.get(a.id) === key,
     );
   const urls = new Map<string, string>();
@@ -194,13 +201,19 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (rejected) return Promise.reject(new CommandError('invalid_input', rejected));
       if (!isPlausibleKey(key)) return Promise.reject(new CommandError('invalid_input', NOT_A_KEY));
       const url = input.base_url?.trim() || null;
-      const same = twin(input.provider_id, url, key);
+      const same = twin(key, input.provider_id, url, input.enterprise);
       if (same)
         return Promise.reject(
           new CommandError(
             'invalid_input',
             `Ten klucz jest już dodany jako konto „${same.label}”. Jeśli chcesz go sprawdzić, użyj „Testuj połączenie” przy tym koncie.`,
           ),
+        );
+      // Konto firmowe sprawdza hub przy zapisie (`EnterpriseSettings::checked`) — po duplikacie.
+      const firm = checkEnterprise(input.provider_id, url, input.enterprise);
+      if (!firm.ok)
+        return Promise.reject(
+          new CommandError('invalid_input', coreMessage(firm.problem, firm.subject)),
         );
       const account: Account = {
         id: core.nextId('acc'),
@@ -213,6 +226,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
         cost_limit: { enabled: false, monthly: { minor: 0, currency: 'PLN' } },
         last_tested_at: null,
         key_saved_at: core.isoNow(),
+        ...(Object.keys(firm.value).length ? { enterprise: firm.value } : {}),
       };
       keys.set(account.id, key);
       urls.set(account.id, url ?? '');
@@ -233,7 +247,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (!account) return missing();
       const key = cleanKey(secret);
       if (!isPlausibleKey(key)) return Promise.reject(new CommandError('invalid_input', NOT_A_KEY));
-      const same = twin(account.provider_id, urls.get(id) || null, key, id);
+      const same = twin(key, account.provider_id, urls.get(id) || null, account.enterprise, id);
       if (same)
         return Promise.reject(
           new CommandError(

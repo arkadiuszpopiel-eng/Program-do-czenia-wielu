@@ -111,7 +111,7 @@ impl<'a, C: WireCodec> Run<'a, C> {
         let body = to_bytes(&wire.body).map_err(Failure::Failed)?;
         let send = engine
             .client
-            .post(engine.http.url(wire.path))
+            .post(engine.http.url(&wire.path))
             .headers(headers)
             .body(body)
             .send();
