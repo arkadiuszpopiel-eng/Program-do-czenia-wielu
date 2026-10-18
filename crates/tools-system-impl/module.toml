@@ -2,7 +2,7 @@
 # Zdolności z tokenów Brokera: odczyty `gui.control(system-info.exe)`, zakończenie procesu
 # `gui.control(<obraz>)` (Broker blokuje procesy Jądra), usługi i zapis zmiennej `system.admin`.
 id = "tools-system"
-version = "0.0.63"
+version = "0.0.64"
 kind = "tool"
 provides = ["tools-system-contract@1"]
 requires = ["tools-common-contract@1", "platform-apps-contract@1", "safety-broker-contract@1", "platform-contract@1", "core-bus-contract@1"]

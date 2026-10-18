@@ -12,6 +12,53 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.64 — 2026-10-18
+
+Seria 5 (10 punktów, praca na laptopie): tekst z PDF dla modelu, poprawny JSON wywołań narzędzi w modelu lokalnym,
+karty licencji silników i głosów, nagłówki organizacji i projektu dla kont OpenAI, osobny budżet pamięci każdej
+karty graficznej, `zip` 9, bezpieczniejsze skrypty pamięci i kopii, sprawdzenie kart na laptopie z kartą
+zintegrowaną Intel i NVIDIA.
+
+### Rozmowa i modele
+
+- Załączniki PDF trafiają do modelu jako tekst stron po kolei (polskie znaki, kolejność stron) — z limitami
+  chroniącymi przed złośliwymi plikami (rozmiar, strony, obiekty, czas w osobnym wątku); PDF z hasłem, skan
+  i plik uszkodzony dają modelowi krótką notkę zamiast tekstu.
+- Model lokalny (llama-server) odpowiada na wywołania narzędzi poprawnym JSON zgodnym ze schematem narzędzia;
+  ustawienie pozwala to wyłączyć, gdy model działa gorzej.
+- Karty licencji: przy silnikach, modelach i głosach — licencja, źródło, użycie komercyjne, wymóg wzmianki
+  i uwagi (np. DirectML: dane diagnostyczne — do potwierdzenia przez Ciebie; znak wodny mowy — decyzja właściciela).
+
+### Konta i klucze
+
+- Konta OpenAI: opcjonalne identyfikatory organizacji i projektu (nagłówki `OpenAI-Organization`, `OpenAI-Project`);
+  ten sam klucz w innym projekcie nie jest duplikatem.
+- Azure OpenAI: adapter gotowy i przetestowany, ale wpis w katalogu dostawców czeka na Twoją decyzję o rejestrze
+  zgodności (`providers-catalog/czeka-na-wlasciciela/`).
+
+### Karty graficzne
+
+- Każda karta ma osobny budżet pamięci (pula karty głównej, karty zintegrowanej i każdej osobnej) — mowa na jednej
+  karcie nie blokuje modelu na drugiej; na komputerze z jedną kartą bez zmian.
+- Sprawdzone na laptopie z kartą zintegrowaną Intel UHD i RTX 4050: główna karta NVIDIA, klasa LaptopCuda,
+  rozpoznawanie mowy i model na CUDA, karta zintegrowana z własną pulą (pamięć współdzielona) — bez regresji.
+
+### Bezpieczeństwo i porządek
+
+- [poważne] `zip` 9.0.5 (RUSTSEC-2026-0367/0368/0369) w załącznikach, rozpakowywaniu silników i eksporcie `.alfa`;
+  dowiązania w archiwum (także zapisane systemem DOS) zawsze odrzucane. Moduł aktualizacji przechodzi na `zip` 9
+  po Twoim przeglądzie — do tego czasu `cargo deny` zgłasza `zip` 8.6.0 tylko tam.
+- `scripts/memory-sync.sh` nie kasuje już plików, których nie ma u źródła (opcja `--prune`); `scripts/backup.sh`
+  wymaga jawnego celu i sprawdza dysk, wolumin i wolne miejsce przed zapisem (`--dry-run`).
+- Dokumenty: stan pracy na dwóch komputerach, decyzje właściciela w roadmapie i dzienniku decyzji.
+
+### Testy
+
+- Rdzeń: PDF (wrogie liczniki stron, strumienie, hasło, uszkodzenia), schemat JSON narzędzi (żądanie do
+  llama-server), budżety pamięci na kartę (testy własności na trzech kartach), `zip` 9 (klasy porad i dowiązania
+  DOS), nagłówki OpenAI i adapter Azure na sztucznym serwerze, kompletność kart licencji.
+- Interfejs: karty licencji w trzech stylach i dwóch motywach, formularz kont dla firm.
+
 ## 0.0.63 — 2026-10-17
 
 Alfa korzysta z każdej karty graficznej — NVIDIA, AMD i Intel, osobnej i zintegrowanej — a na komputerze bez
