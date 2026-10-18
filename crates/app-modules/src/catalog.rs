@@ -14,10 +14,6 @@ pub const CATALOG_FILES: &[(&str, &str)] = &[
         include_str!("../../../providers-catalog/anthropic.toml"),
     ),
     (
-        "azure-openai",
-        include_str!("../../../providers-catalog/azure-openai.toml"),
-    ),
-    (
         "azure-speech",
         include_str!("../../../providers-catalog/azure-speech.toml"),
     ),

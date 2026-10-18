@@ -36,7 +36,7 @@ fn options() -> AzureOptions {
 
 fn entry() -> CatalogEntry {
     let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../providers-catalog/azure-openai.toml");
+        .join("../../providers-catalog/czeka-na-wlasciciela/azure-openai.toml");
     CatalogEntry::parse_toml(&std::fs::read_to_string(path).unwrap()).unwrap()
 }
 
