@@ -97,6 +97,8 @@ Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Dec
   Kolejna o 3:30. Skrypt `backup.sh` naprawiony (na tym komputerze paczka git po cichu się nie tworzyła).
 - Dodatkowa kopia `F:\Alfa\kopia-2026-10-18_0054` (356 MB, stan `7b544ab5`) — na wypadek ponownej awarii przed
   3:30: 5853 sumy zgodne, paczka git z pełną historią, gałąź w paczce = bieżący commit.
+- Po końcowym `verify` (02:52) ta sama reguła sprzątania: 495 starszych duplikatów programów testowych z symbolami —
+  zwolnione 52,9 GB, na E: wolne 140,8 GB (Twoja zasada: po wersji sprzątać `target/debug/deps`, `build` zostaje).
 
 ## 7. Po poprawkach drugiego przeglądu
 
