@@ -1,31 +1,42 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-18**, wersja programu **0.0.63** (zbudowana i sprawdzona; do `Alfa-uruchomiona` niewgrana — tam
-0.0.62, decyzja właściciela), gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte). Od 2026-10-17 praca na
-komputerze stacjonarnym (Ryzen 7 5700X3D, Radeon RX 9070 XT 16 GB, 32 GB RAM), nie na laptopie.
+Stan na **2026-10-18**, wersja programu **0.0.63** (zbudowana z `21897bf0` i sprawdzona; do `Alfa-uruchomiona`
+niewgrana — tam 0.0.62, wgranie czeka na decyzję właściciela), gałąź `ccr-af4b63c6-3fyzaj` (317 commitów lokalnych
+ponad `origin` przy `c8791fdd`, niewypchniętych).
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
+Projekt jest prowadzony na zmianę na dwóch komputerach — dysk E: z repozytorium przechodzi między nimi. Przy każdej
+liczbie ze sprzętu podana jest maszyna; czasów z dwóch maszyn nie porównujemy.
+
+| Komputer             | Podzespoły                                                                 | Kiedy                                                          | Co jest na maszynie (ważne dla testów)                                                                                  |
+| -------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Laptop               | Intel i7-13620H, 16 GB RAM, GeForce RTX 4050 6 GB + Intel UHD Graphics      | do 2026-10-17 i znów od 2026-10-18 po południu (bieżąca)        | Edge, `jq`, `gh`, Claude Code, modele i silniki w `%LOCALAPPDATA%\Alfa` (wariant CUDA); ciężkie biegi cargo z `-j 3` |
+| Komputer stacjonarny | AMD Ryzen 7 5700X3D, 32 GB RAM, Radeon RX 9070 XT 16 GB                     | 2026-10-17 – 18 (seria 0.0.63, zadanie C6.6)                    | bez Edge, `jq`, `gh`, Claude Code i bez danych Alfy (`%LOCALAPPDATA%\Alfa`); ciężkie biegi cargo z `-j 6`              |
+
+Wersja 0.0.63 była budowana i sprawdzana na komputerze stacjonarnym; na laptopie (karta zintegrowana obok NVIDIA —
+przypadek C6.6 niesprawdzony na PC) czeka na `verify wersja` i próby sprzętowe.
+
 ## Jak czytać ten dokument
 
-| Oznaczenie | Znaczenie                                                                                           |
-| ---------- | --------------------------------------------------------------------------------------------------- |
-| ✅ CI      | przechodzi w testach automatycznych, na atrapach — **nie** dowodzi działania na prawdziwej maszynie |
-| ✅ sprzęt  | zmierzone albo sprawdzone w działającym programie na laptopie właściciela                           |
-| 🟡         | zbudowane, czeka na pomiar na sprzęcie, korpus nagrań albo klucz                                    |
-| ⛔         | brak implementacji albo brak zestawu testowego                                                      |
+| Oznaczenie | Znaczenie                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| ✅ CI      | przechodzi w testach automatycznych, na atrapach — **nie** dowodzi działania na prawdziwej maszynie                             |
+| ✅ sprzęt  | zmierzone albo sprawdzone w działającym programie na komputerze właściciela (laptop albo komputer stacjonarny — maszyna podana) |
+| 🟡         | zbudowane, czeka na pomiar na sprzęcie, korpus nagrań albo klucz                                                                |
+| ⛔         | brak implementacji albo brak zestawu testowego                                                                                  |
 
 ## Skrót
 
-| Miara                               | Wartość                                                                                                                                                                | Źródło                        |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| Kod Rust                            | 257 crate'ów, ok. 3000 plików źródłowych; testy Rust 2898 zielonych, 0 czerwonych (0.0.63)                                                                             | verify 0.0.63                 |
-| Interfejs (Svelte 5 + TS)           | vitest 395/395; testy w przeglądarce 467/467 (3 style × 2 motywy, axe, kontrast) na Chromium Playwrighta — etap `verify` wymaga Edge, którego na tym komputerze nie ma | 0.0.63, raport 28             |
-| Prawdziwa aplikacja                 | testy `e2e-app` 41 zielonych + 1 pominięty (brak Claude Code na komputerze stacjonarnym); pokrycie łącza 89 % (235 z 264)                                              | verify 0.0.63                 |
-| Kryteria akceptacji F0–F9           | 108: 38 ✅ CI · 57 🟡 · 11 ⛔ · 2 do decyzji                                                                                                                           | STATUS (macierz z 2026-10-06) |
-| Kryteria potwierdzone na sprzęcie   | **0 z 108**                                                                                                                                                            | STATUS                        |
-| Model lokalny odpowiada na laptopie | **tak** — próby obowiązków na modelu lokalnym (0.0.45, 0.0.52–0.0.53; raport 26)                                                                                       | raporty nocne 23 i 26         |
-| Głos na żywo                        | silniki zmierzone na laptopie (Supertonic 3: 0,97 s na zdanie); rozmowa żywą mową — do Twojej oceny słuchem                                                            | 0.0.30–0.0.42                 |
+| Miara                               | Wartość                                                                                                                                                                                                         | Źródło                                      |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Kod Rust                            | 257 crate'ów, ok. 3000 plików źródłowych; testy Rust 2898 zielonych, 0 czerwonych (0.0.63)                                                                                                                      | verify 0.0.63 (komputer stacjonarny)        |
+| Interfejs (Svelte 5 + TS)           | vitest 395/395; testy w przeglądarce 467/467 (3 style × 2 motywy, axe, kontrast) na Chromium Playwrighta — na komputerze stacjonarnym nie ma Edge, którego wymaga etap `verify`; na laptopie Edge jest           | 0.0.63, raport 28                           |
+| Prawdziwa aplikacja                 | testy `e2e-app` 41 zielonych + 1 pominięty (test logowania Claude Code — na komputerze stacjonarnym nie ma Claude Code, na laptopie jest); pokrycie łącza 89 % (235 z 264)                                       | verify 0.0.63 (komputer stacjonarny)        |
+| Kryteria akceptacji F0–F9           | 108: 38 ✅ CI · 57 🟡 · 11 ⛔ · 2 do decyzji                                                                                                                                                                    | STATUS (macierz z 2026-10-06)               |
+| Kryteria potwierdzone na sprzęcie   | **0 z 108**                                                                                                                                                                                                     | STATUS                                      |
+| Model lokalny odpowiada na laptopie | **tak** — próby obowiązków na modelu lokalnym (0.0.45, 0.0.52–0.0.53; raport 26; `verify sprzet` 0.0.62 — raport 27)                                                                                            | raporty nocne 23, 26 i 27                   |
+| Głos na żywo                        | laptop: Supertonic 3 0,97 s na zdanie (procesor); komputer stacjonarny (RX 9070 XT): Supertonic 0,95 s na procesorze, 0,58 s przez DirectML, Qwen3-ASR przez Vulkan 0,16–0,23 s; rozmowa żywą mową — do Twojej oceny słuchem | 0.0.30–0.0.42; ADR 0028, raport 28          |
 
 Najważniejsze zdanie tego dokumentu: **kod wszystkich fal F0–F9 istnieje i przechodzi testy automatyczne, ale
 żadna fala nie jest zamknięta na prawdziwej maszynie.** Dlatego etap A roadmapy ma pierwszeństwo przed nowymi
@@ -94,7 +105,7 @@ funkcjami.
 | 0.0.34        | 2026-10-11 | P1: koniec wypowiedzi modelem Smart Turn v3.2 (sidecar `alfa-smart-turn`), model i ONNX Runtime w katalogu pobrań; próba na prawdziwym modelu zgodna ze wzorcem (aplikacja nie budowana)                                                                                                                                                                                                                                                                     |
 | 0.0.33        | 2026-10-11 | P1: rozpoznawanie Qwen3-ASR ze strażnikiem, bezpiecznikiem i Whisperem jako zapasem; test na prawdziwym modelu (aplikacja nie budowana)                                                                                                                                                                                                                                                                                                                      |
 
-## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB, Windows 11)
+## Sprawdzone na laptopie (i7-13620H, RTX 4050 6 GB + Intel UHD Graphics, Windows 11)
 
 Tylko to, co naprawdę uruchomiono w zbudowanym programie:
 
@@ -164,10 +175,10 @@ Poza tym gotowe są dokumenty tego katalogu, projekty ADR 0017–0026, szkice SP
 
 | Problem                                                                         | Waga    | Stan                               |
 | ------------------------------------------------------------------------------- | ------- | ---------------------------------- |
-| Model lokalny i głos niesprawdzone na żywo                                      | wysoka  | czeka na zgodę na pobranie pakietu |
+| Rozmowa żywą mową nieoceniona słuchem (model lokalny już odpowiada — raporty 26 i 27) | wysoka  | ocena właściciela                  |
 | Jądro poza procesem niesprawdzone na żadnej maszynie                            | wysoka  | etap A.6                           |
 | Analizator poleceń powłoki nie widzi poleceń w cudzysłowie (S-01, S-03)         | wysoka  | decyzja właściciela                |
 | Zmiany Jądra bez przeglądu człowieka                                            | wysoka  | etap A.8                           |
 | Build wydaniowy ma `panic = "abort"` — strażnik paniki generacji tam nie działa | średnia | decyzja właściciela                |
 | Test E2E „strumień 100 tok/s” na granicy progu; test czasowy palety niestabilny | niska   | decyzja o progu                    |
-| Ponad 70 commitów lokalnych niewypchniętych                                     | —       | `gh auth login` (właściciel)       |
+| 317 commitów lokalnych niewypchniętych (przy `c8791fdd`, 2026-10-18)            | —       | `gh auth login` (właściciel)       |

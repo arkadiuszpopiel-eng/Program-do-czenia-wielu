@@ -1,6 +1,6 @@
 # 03 — Roadmapa (dokument żywy)
 
-Ostatnia aktualizacja: **2026-10-12** (wersja programu 0.0.43; raport z nocy: [`23-raport-nocny-2026-10-12.md`](23-raport-nocny-2026-10-12.md)). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-10-18** (wersja programu 0.0.63; raport z nocy: [`28-raport-nocny-2026-10-18.md`](28-raport-nocny-2026-10-18.md)). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -318,6 +318,9 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | Czy obraz z kamery może iść do modelu w chmurze    | C3.7 (droga chmurowa)                 |
 | Zgoda na pobranie modelu widzącego i modeli twarzy | C3.6, C3.8                            |
 | Zakres widoku „co poszło do chmury” (czyta audyt i tagi prywatności) | C4.2 |
+| Podpis ADR 0028 — DirectML opcjonalnie dla głosu Supertonic (karta z własną pamięcią ≥ 12 GB, jawny powrót na procesor) i Qwen3-ASR przez Vulkan na AMD/Intel; przy „nie” pozycje DirectML i flaga `--dml` są usuwane | zakończenie C6.6 — część DirectML (kod w 0.0.63, ADR [0028](../ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md) proponowany) |
+| Licencja DirectML — §2a dopuszcza zbieranie danych diagnostycznych przez Microsoft; pozycja katalogu `directml` ma `confirmed: false` | zakończenie C6.6 — część DirectML (pozycja w pakietach głosu bez znaczka „Do potwierdzenia przez człowieka”) |
+| DirectML na karcie zintegrowanej obok osobnej (ADR 0028, pytanie 3) — dziś wyłączone, bo niezmierzone | C6.6 — pomiar na laptopie z Intel UHD Graphics |
 | Progi liczbowe zestawu `evals/V6/pl-core` (zestaw zaakceptowany do pracy 2026-10-11) | C2.1 (bramka w CI) |
 | Progi nowych kryteriów w `ACCEPTANCE.md`           | wyjście z C, D, E, F, G               |
 
