@@ -4,9 +4,9 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-19T05:15:00+02:00"
+    "updated": "2026-10-19T05:30:00+02:00"
   },
-  "current_state": "0.0.64 (seria 5) zbudowana i sprawdzona (verify 18/19, jedyny czerwony cargo deny przez zip 8.6.0 w updater-impl — do przeglądu), wgrana do Alfa-uruchomiona 19.10 5:13 (start bez błędów). Kopia na F:\\Alfa. Przerwa na polecenie właściciela.",
+  "current_state": "Sesja na laptopie zakończona. 0.0.64 wgrana (19.10 5:13). Dalej praca na PC stacjonarnym — opis: E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/PRZEKAZANIE-NA-PC-2026-10-19.md (kopia w alfa/docs/plan/30-przekazanie-na-pc-2026-10-19.md). verify sprzet 0.0.64 przerwany — bez wyniku.",
   "session_goal": "Kolejna sesja: decyzje właściciela, wgranie, seria 0.0.65.",
   "in_progress": [],
   "blocking_issues": [
@@ -15,6 +15,7 @@
     "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
+    "Przeczytaj PRZEKAZANIE-NA-PC-2026-10-19.md (pierwsze kroki na PC, decyzje właściciela).",
     "Decyzje właściciela: przegląd gałęzi do-przegladu-updater-zip9 (zip 9 w updater-impl → cargo deny zielony); wpis azure-openai w rejestrze zgodności (providers-catalog/czeka-na-wlasciciela/README.md); podpis ADR 0028 i licencja DirectML.",
     "verify sprzet dla 0.0.64 na laptopie (PDF i JSON narzędzi na prawdziwym modelu lokalnym).",
     "Seria 0.0.65 (10 punktów) — agenci w kopiach roboczych utworzonych ręcznie z HEAD (git worktree add ../wt-<seria>/<punkt>), NIE isolation: worktree (tworzy z origin, stary commit 75fee0d9).",
