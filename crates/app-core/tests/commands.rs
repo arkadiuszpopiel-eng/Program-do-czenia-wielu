@@ -42,7 +42,8 @@ async fn accounts_store_key_in_vault_and_never_return_it() {
         .unwrap();
     let mut rx = core.subscribe_events();
 
-    assert_eq!(core.accounts_catalog().await.unwrap().len(), 18);
+    // 17: Azure OpenAI czeka poza katalogiem na decyzję właściciela (providers-catalog/czeka-na-wlasciciela).
+    assert_eq!(core.accounts_catalog().await.unwrap().len(), 17);
     assert!(!core.system_status().await.unwrap().keys_configured);
     let account = core
         .accounts_add(add_input(

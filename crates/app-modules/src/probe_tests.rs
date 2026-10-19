@@ -205,8 +205,16 @@ fn enterprise_settings_reach_the_adapter_profile() {
     assert_eq!(options.deployment("o3-mini"), "o3-mini");
 }
 
+/// Azure OpenAI czeka na decyzję właściciela (rejestr zgodności) — nie ma go w katalogu wbudowanym.
+#[test]
+fn azure_openai_waits_outside_builtin_catalog() {
+    let catalog = crate::catalog::ProviderCatalog::builtin();
+    assert!(!catalog.hub.iter().any(|e| e.id.as_str() == "azure-openai"));
+}
+
 /// Wbudowany katalog zna Azure OpenAI w obu widokach; bez adresu zasobu adaptera nie ma.
 #[test]
+#[ignore = "Azure OpenAI czeka na decyzję właściciela o rejestrze zgodności — wraca po przeniesieniu wpisu do katalogu"]
 fn builtin_catalog_has_azure_openai() {
     let catalog = crate::catalog::ProviderCatalog::builtin();
     let hub = catalog

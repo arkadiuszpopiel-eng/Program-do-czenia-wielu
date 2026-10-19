@@ -28,7 +28,7 @@
 <div class="license">
   <Button
     size="sm"
-    variant="ghost"
+    variant="secondary"
     aria-expanded={open}
     aria-controls={panelId}
     onclick={() => (open = !open)}
