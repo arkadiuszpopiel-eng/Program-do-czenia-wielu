@@ -37,6 +37,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`26-raport-nocny-2026-10-15.md`](26-raport-nocny-2026-10-15.md) | Raport z nocy 2026-10-14 / 15: izolacja poleceń powłoki, decyzje z dokumentu 25, Markdown, pokrycie łącza, czego nie sprawdziłem | jednorazowy |
 | [`27-raport-nocny-2026-10-16.md`](27-raport-nocny-2026-10-16.md) | Raport z nocy 2026-10-15 / 16: wersje 0.0.60–0.0.62 (cztery serie po dziesięć punktów), testy, czego nie sprawdziłem, co zostaje, kopia na F: | jednorazowy |
 | [`28-raport-nocny-2026-10-18.md`](28-raport-nocny-2026-10-18.md) | Raport z 2026-10-17 / 18: wersja 0.0.63 — każda karta graficzna (AMD, Intel, zintegrowana), DirectML dla głosu, Qwen3-ASR na Vulkan, pomiary na RX 9070 XT, dwa przeglądy, awaria komputera, decyzje do podjęcia | jednorazowy |
+| [`29-raport-2026-10-18.md`](29-raport-2026-10-18.md) | Raport z 18.10 (laptop): wersja 0.0.64 — seria 5 (PDF, JSON narzędzi, licencje, klucze dla firm, budżet pamięci na kartę, laptop iGPU + NVIDIA, zip 9), testy, decyzje właściciela, kopia na F: | jednorazowy |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).
