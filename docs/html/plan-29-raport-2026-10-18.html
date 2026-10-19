@@ -332,7 +332,7 @@ mógł sprawdzić: Intel UHD rozpoznany jako zintegrowany, główna karta RTX 40
 CUDA, DirectML nieużywany (6 GB &lt; 12 GB), karta zintegrowana z własną pulą pamięci — bez regresji.</li>
 <li><strong>Czeka na Ciebie:</strong> podpis ADR 0028 i licencja DirectML; wpis Azure OpenAI w rejestrze zgodności; przegląd
 gałęzi <code>do-przegladu-updater-zip9</code> (do tego czasu <code>cargo deny</code> czerwony przez <code>zip</code> 8.6.0 w module aktualizacji);
-wgranie wersji (u Ciebie nadal 0.0.62).</li>
+wgranie wersji — zrobione 19.10 o 5:13.</li>
 </ul>
 <h2 id="2-co-doszlo-w-0-0-64">2. Co doszło w 0.0.64</h2>
 <div class="tbl"><table><thead><tr><th>Punkt</th><th>Co doszło</th></tr></thead><tbody><tr><td>C2.11</td><td>PDF → tekst dla modelu (<code>lopdf</code> + własny interpreter treści, <code>ToUnicode</code>, limity: 25 MB, 1000 stron, 500 tys. obiektów, 100 000 znaków, 10 s w osobnym wątku; PDF z hasłem, skan, uszkodzony → notka)</td></tr>
@@ -358,7 +358,7 @@ w <code>updater-impl</code>). Poprawione i sprawdzone (testy, 25 testów w przeg
 (41 pominiętych — sprzętowe i Azure do decyzji), interfejs 406/406, przeglądarka 475/475, prawdziwa aplikacja 42/42
 (w tym logowanie Claude Code), pokrycie łącza 234 z 264 (88,6 %); jedyny czerwony — <code>cargo deny</code>: wyłącznie
 RUSTSEC-2026-0367/0368/0369 dla <code>zip</code> 8.6.0 w <code>updater-impl</code> (gałąź do Twojego przeglądu). Zbudowana wersja:
-<code>target/shell/debug/alfa-desktop.exe</code> (0.0.64), <strong>niewgrana</strong> — u Ciebie nadal 0.0.62.</li>
+<code>target/shell/debug/alfa-desktop.exe</code> (0.0.64) — <strong>wgrana do <code>Alfa-uruchomiona</code> 2026-10-19 o 5:13</strong>, start bez błędów (<code>wersja=0.0.64</code>).</li>
 </ul>
 <h2 id="4-czego-nie-sprawdzilem">4. Czego nie sprawdziłem</h2>
 <ul>
