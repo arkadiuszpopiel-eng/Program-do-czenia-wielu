@@ -28,6 +28,9 @@ ręcznego wyboru katalogu, Alfa wie, kto działa na komputerze.
 - [poważne] Poziom podniesiony za zgodą w oknie Brokera (np. L4) wracał po kilku sekundach do wcześniej
   zapamiętanego obniżenia (L2). Teraz zatwierdzone podniesienie staje się nowym zapamiętanym poziomem.
 - Krzyżyk i Alt+F4 w oknie zatwierdzeń zamykają je (odmowa) — tak jak przycisk „Odmów” i Esc.
+- Okno zatwierdzeń Brokera w wyglądzie Alfy: karta jak w programie (obramowanie i pasek ryzyka), etykiety
+  i wartości w dwóch kolumnach, przyciski i kolory z systemu wyglądu Alfy w motywie jasnym i ciemnym, zaokrąglone
+  rogi i ciemny pasek tytułu; czcionki skalowane do powiększenia ekranu. Szybkie podwójne kliknięcie też działa.
 - [poważne] Koszty odpowiedzi pokazywały zawsze 0,00 zł: żaden model nie miał ceny. Alfa ma teraz cennik 89 modeli 11
   dostawców (OpenAI, Anthropic, OpenRouter, Google, xAI, DeepSeek, Mistral, Kimi, Qwen, Z.ai, MiniMax), sprawdzony
   20.10 na ich oficjalnych stronach, z datą i źródłem każdej ceny — Ustawienia → Koszty i limity → Cennik modeli.

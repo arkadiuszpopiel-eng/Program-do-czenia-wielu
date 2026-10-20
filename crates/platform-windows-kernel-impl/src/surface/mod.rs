@@ -5,6 +5,10 @@
 #[cfg(windows)]
 mod input;
 #[cfg(windows)]
+mod paint;
+#[cfg(windows)]
+mod theme;
+#[cfg(windows)]
 mod thread;
 #[cfg(windows)]
 mod win;

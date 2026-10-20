@@ -11,13 +11,9 @@ use std::ffi::c_void;
 use std::sync::Arc;
 use std::sync::mpsc::{Receiver, SyncSender};
 
-use platform_contract::{MIN_BUTTON_ID, PixelRect, SurfaceEvent, SurfaceTone, SurfaceView};
-use windows::Win32::Foundation::{COLORREF, HINSTANCE, HWND, LPARAM, LRESULT, WPARAM};
-use windows::Win32::Graphics::Gdi::{
-    CLEARTYPE_QUALITY, CLIP_DEFAULT_PRECIS, COLOR_WINDOW, CreateFontW, DEFAULT_CHARSET,
-    DeleteObject, FW_NORMAL, FW_SEMIBOLD, GetSysColorBrush, HDC, HFONT, OUT_DEFAULT_PRECIS,
-    SetBkMode, SetTextColor, TRANSPARENT,
-};
+use platform_contract::{MIN_BUTTON_ID, PixelRect, SurfaceEvent, SurfaceView};
+use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, RECT, WPARAM};
+use windows::Win32::Graphics::Gdi::{COLOR_WINDOW, GetSysColorBrush, HDC, HFONT, InvalidateRect};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::UI::HiDpi::GetDpiForWindow;
@@ -28,6 +24,7 @@ use windows::core::{PCWSTR, w};
 use super::input::{
     begin_dispatch, decision_sample, end_dispatch, install_hooks, occluded, remove_hooks,
 };
+use super::paint::{DrawItem, Look};
 use super::thread::{Request, WM_REQUEST};
 use super::{EventQueue, now_ms};
 use crate::win::{pcwstr, wide};
@@ -40,10 +37,9 @@ struct Ui {
     events: Arc<EventQueue>,
     hwnd: Option<HWND>,
     controls: Vec<HWND>,
-    badge: Option<HWND>,
-    tone: SurfaceTone,
+    /// Wygląd (motyw, kolor ryzyka, przyciski rysowane samodzielnie) — moduł `paint`.
+    look: Look,
     focus: Option<HWND>,
-    fonts: [HFONT; 2],
     module: Option<HINSTANCE>,
 }
 
@@ -68,7 +64,10 @@ fn focus_initial() {
 
 unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     let low = u16::try_from(wparam.0 & 0xFFFF).unwrap_or(0);
-    let clicked = (wparam.0 >> 16) & 0xFFFF == BN_CLICKED as usize;
+    // Przycisk rysowany samodzielnie zgłasza szybkie drugie kliknięcie jako `BN_DOUBLECLICKED` —
+    // to też naciśnięcie (ta sama próbka wejścia i te same reguły), inaczej by „ginęło”.
+    let code = (wparam.0 >> 16) & 0xFFFF;
+    let clicked = code == BN_CLICKED as usize || code == BN_DOUBLECLICKED as usize;
     match msg {
         WM_ACTIVATE if u32::from(low) == WA_INACTIVE => {
             push(SurfaceEvent::Deactivated { at_ms: now_ms() });
@@ -100,22 +99,27 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             push(SurfaceEvent::Closed);
             with_ui(|ui| ui.hwnd = None);
         }
-        WM_CTLCOLORSTATIC => {
-            if let Some((Some(badge), tone)) = with_ui(|ui| (ui.badge, ui.tone))
-                && badge.0 as isize == lparam.0
-            {
-                let (r, g, b) = tone.rgb();
-                let color = COLORREF(u32::from(r) | (u32::from(g) << 8) | (u32::from(b) << 16));
-                let hdc = HDC(wparam.0 as *mut c_void);
-                // SAFETY: kontekst urządzenia od systemu na czas komunikatu; pędzel systemowy.
-                return unsafe {
-                    SetTextColor(hdc, color);
-                    SetBkMode(hdc, TRANSPARENT);
-                    LRESULT(GetSysColorBrush(COLOR_WINDOW).0 as isize)
-                };
+        WM_CTLCOLORSTATIC | WM_CTLCOLORBTN => {
+            let hdc = HDC(wparam.0 as *mut c_void);
+            if let Some(brush) = with_ui(|ui| ui.look.control_colors(hdc, lparam.0)) {
+                return LRESULT(brush.0 as isize);
             }
-            // SAFETY: domyślna obsługa.
+            // SAFETY: domyślna obsługa (stan okna zajęty w trakcie układania).
             return unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) };
+        }
+        WM_ERASEBKGND => {
+            let hdc = HDC(wparam.0 as *mut c_void);
+            let mut client = RECT::default();
+            // SAFETY: obszar klienta naszego okna do zmiennej lokalnej.
+            let _ = unsafe { GetClientRect(hwnd, &raw mut client) };
+            with_ui(|ui| ui.look.erase(hdc, client));
+            return LRESULT(1);
+        }
+        WM_DRAWITEM if lparam.0 != 0 => {
+            // SAFETY: dla `WM_DRAWITEM` `lparam` wskazuje na `DRAWITEMSTRUCT` na czas komunikatu.
+            let dis = unsafe { &*(lparam.0 as *const DrawItem) };
+            with_ui(|ui| ui.look.draw(dis));
+            return LRESULT(1);
         }
         // SAFETY: domyślna obsługa pozostałych komunikatów.
         _ => return unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) },
@@ -180,37 +184,43 @@ fn layout(ui: &mut Ui, view: &SurfaceView) -> Option<HWND> {
     };
     let l = view.layout(dpi);
     let text = WS_CHILD | WS_VISIBLE | WINDOW_STYLE(STATIC_PLAIN);
-    let push_style = WINDOW_STYLE(u32::try_from(BS_PUSHBUTTON).unwrap_or(0));
+    // Przyciski rysowane samodzielnie (`paint`); kliknięcie, Spacja i fokus działają jak w zwykłych.
+    let push_style = WINDOW_STYLE(u32::try_from(BS_OWNERDRAW).unwrap_or(0));
     let button = WS_CHILD | WS_VISIBLE | WS_TABSTOP | push_style;
-    let [big, normal] = ui.fonts;
-    let statics = [
-        (view.title.as_str(), l.title, big),
-        (view.badge.as_str(), l.badge, big),
-        (l.details_text.as_str(), l.details, normal),
-        (view.status.as_str(), l.status, normal),
-    ];
-    let mut made: Vec<(Option<HWND>, HFONT)> = statics
-        .iter()
-        .map(|(t, r, font)| {
-            (
-                create(ui, Some(hwnd), (w!("STATIC"), t, text, 0), *r),
-                *font,
-            )
-        })
-        .collect();
-    ui.badge = made.get(1).and_then(|m| m.0);
+    let fonts = ui.look.prepare(hwnd, dpi);
+    let (f_title, f_badge, f_body) = (fonts.title, fonts.badge, fonts.body);
+    let (f_hint, f_button) = (fonts.hint, fonts.button);
+    let stat =
+        |ui: &Ui, t: &str, r: PixelRect| create(ui, Some(hwnd), (w!("STATIC"), t, text, 0), r);
+    let mut made: Vec<(Option<HWND>, HFONT)> = Vec::new();
+    let title_c = stat(ui, &view.title, l.title);
+    made.push((title_c, f_title));
+    ui.look.badge = stat(ui, &view.badge, l.badge);
+    made.push((ui.look.badge, f_badge));
+    // Siatka „etykieta / wartość” jak w karcie zgody `ui-kit` (etykiety przygaszone).
+    for ((k, v), (lr, vr)) in view.details.iter().zip(&l.rows) {
+        let label = stat(ui, k, *lr);
+        ui.look.muted.extend(label);
+        made.push((label, f_body));
+        made.push((stat(ui, v, *vr), f_body));
+    }
+    ui.look.status = stat(ui, &view.status, l.status);
+    made.push((ui.look.status, f_hint));
     ui.focus = None;
     for (b, (id, r)) in view.buttons.iter().zip(l.buttons) {
+        ui.look.labels.push((id, b.label.encode_utf16().collect()));
         let c = create(ui, Some(hwnd), (w!("BUTTON"), &b.label, button, id), r);
         if id == view.initial_focus {
             ui.focus = c;
         }
-        made.push((c, normal));
+        made.push((c, f_button));
     }
-    ui.tone = view.tone;
+    ui.look.card = l.card;
+    ui.look.tone = view.tone;
+    ui.look.safe = view.initial_focus;
     for (c, font) in made {
         let Some(c) = c else { continue };
-        // SAFETY: nasza kontrolka; czcionka żyje do końca wątku okna.
+        // SAFETY: nasza kontrolka; czcionka żyje do następnego ułożenia (`Look::prepare`).
         unsafe {
             SendMessageW(
                 c,
@@ -227,6 +237,7 @@ fn layout(ui: &mut Ui, view: &SurfaceView) -> Option<HWND> {
     unsafe {
         let _ = SetWindowTextW(hwnd, pcwstr(&title));
         let _ = MoveWindow(hwnd, (sw - w) / 2, (sh - h) / 3, w, h, true);
+        let _ = InvalidateRect(Some(hwnd), None, true);
     }
     Some(hwnd)
 }
@@ -271,31 +282,6 @@ fn on_request(request: Request) {
     }
 }
 
-fn font(height: i32, weight: u32) -> HFONT {
-    let weight = i32::try_from(weight).unwrap_or(400);
-    let (charset, out, clip) = (DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS);
-    let face = w!("Segoe UI Variable Text");
-    // SAFETY: czcionka systemowa (bez fontów webowych); zwalniana na końcu wątku.
-    unsafe {
-        CreateFontW(
-            -height,
-            0,
-            0,
-            0,
-            weight,
-            0,
-            0,
-            0,
-            charset,
-            out,
-            clip,
-            CLEARTYPE_QUALITY,
-            0,
-            face,
-        )
-    }
-}
-
 fn register_class(module: Option<HINSTANCE>) {
     let class = WNDCLASSEXW {
         cbSize: u32::try_from(size_of::<WNDCLASSEXW>()).unwrap_or(0),
@@ -320,16 +306,12 @@ pub(super) fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &Sy
     let module: Option<HINSTANCE> = unsafe { GetModuleHandleW(None) }.ok().map(Into::into);
     register_class(module);
     let hooks = install_hooks(module);
-    let fonts = [font(22, FW_SEMIBOLD.0), font(16, FW_NORMAL.0)];
-    let (tone, controls) = (SurfaceTone::Neutral, Vec::new());
     let ui = Ui {
         events,
         hwnd: None,
-        controls,
-        badge: None,
-        tone,
+        controls: Vec::new(),
+        look: Look::new(),
         focus: None,
-        fonts,
         module,
     };
     UI.with(|c| *c.borrow_mut() = Some(ui));
@@ -354,15 +336,11 @@ pub(super) fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &Sy
         }
         end_dispatch();
     }
-    let hwnd = UI.with(|c| c.borrow_mut().take()).and_then(|s| s.hwnd);
+    let ui = UI.with(|c| c.borrow_mut().take());
     remove_hooks(hooks);
-    // SAFETY: sprzątanie zasobów tego wątku.
-    unsafe {
-        if let Some(h) = hwnd {
-            let _ = DestroyWindow(h);
-        }
-        for f in fonts {
-            let _ = DeleteObject(f.into());
-        }
+    if let Some(h) = ui.as_ref().and_then(|s| s.hwnd) {
+        // SAFETY: nasze okno; niszczone przed zwolnieniem czcionek i pędzli (`Look::drop`).
+        let _ = unsafe { DestroyWindow(h) };
     }
+    drop(ui);
 }

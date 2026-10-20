@@ -150,18 +150,20 @@ impl SurfaceTone {
 /// Prostokąt w pikselach: (x, y, szerokość, wysokość).
 pub type PixelRect = (i32, i32, i32, i32);
 
-/// Układ okna w pikselach dla danego DPI (liczony przenośnie, rysowany przez Win32).
+/// Układ okna w pikselach dla danego DPI (liczony przenośnie, rysowany przez Win32). Wzór: karta
+/// zgody z `ui-kit` (`ApprovalCard`): karta z obramowaniem i paskiem ryzyka po lewej na tle okna,
+/// nagłówek, siatka „etykieta / wartość”, podpowiedź i przyciski w stopce karty.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SurfaceLayout {
+    /// Karta (tło `surface`, obramowanie, pasek ryzyka po lewej).
+    pub card: PixelRect,
     /// Tytuł.
     pub title: PixelRect,
     /// Plakietka ryzyka.
     pub badge: PixelRect,
-    /// Szczegóły (jeden blok tekstu `etykieta: wartość` w wierszach).
-    pub details: PixelRect,
-    /// Tekst szczegółów.
-    pub details_text: String,
-    /// Wiersz stanu.
+    /// Wiersze szczegółów: (etykieta, wartość) — w kolejności `details`.
+    pub rows: Vec<(PixelRect, PixelRect)>,
+    /// Wiersz stanu (podpowiedź klawiatury albo powód odrzucenia).
     pub status: PixelRect,
     /// Przyciski (id, prostokąt) w kolejności `Tab`.
     pub buttons: Vec<(u16, PixelRect)>,
@@ -169,57 +171,68 @@ pub struct SurfaceLayout {
     pub size: (i32, i32),
 }
 
-fn rows(text: &str) -> i32 {
-    let lines = text.chars().count().div_ceil(64).max(1) + text.matches('\n').count();
-    i32::try_from(lines).unwrap_or(1)
+/// Liczba linii tekstu przy `per_line` znakach w linii (z jawnymi znakami nowej linii).
+fn lines(text: &str, per_line: usize) -> i32 {
+    let count: usize = text
+        .split('\n')
+        .map(|l| l.chars().count().div_ceil(per_line).max(1))
+        .sum();
+    i32::try_from(count.max(1)).unwrap_or(1)
 }
 
+/// Szerokość kolumny etykiet (px przy 96 DPI) — jak siatka `ApprovalCard` (`max-content`).
+const LABEL_WIDTH: i32 = 150;
+
 impl SurfaceView {
-    /// Układ: szerokość 600 px przy 96 DPI, duże przyciski (48 px) w jednym rzędzie.
+    /// Układ: okno 600 px szerokości przy 96 DPI; odstępy z tokenów `ui-kit` (4/8/12/16/24 px),
+    /// przyciski 36 px w jednym rzędzie w stopce karty.
     pub fn layout(&self, dpi: u32) -> SurfaceLayout {
         let dpi = i32::try_from(dpi.clamp(96, 960)).unwrap_or(96);
         let s = |v: i32| v * dpi / 96;
-        let (w, m, gap) = (s(600), s(16), s(6));
-        let inner = w - 2 * m;
-        let mut y = m;
-        let mut next = |h: i32| {
-            let r = (m, y, inner, h);
-            y += h + gap;
-            r
-        };
-        let title = next(s(30) * rows(&self.title));
-        // Odznaka ma tę samą dużą czcionkę co tytuł — niższe pole ucinało dolne części liter
-        // („Rvzvko: wvsokie” zamiast „Ryzyko: wysokie”, zgłoszenie 20.10).
-        let badge = next(s(30));
-        let details_text: String = self
+        // Okno: ramka systemu ok. 16 px; margines tła 16; karta: pasek 3 + wcięcie 16.
+        let w = s(600);
+        let (margin, pad, stripe) = (s(16), s(16), s(3));
+        let card_w = w - s(16) - 2 * margin;
+        let x = margin + stripe + pad;
+        let inner = card_w - stripe - 2 * pad;
+        let mut y = margin + pad;
+        let title = (x, y, inner, s(28) * lines(&self.title, 40));
+        y += title.3 + s(4);
+        let badge = (x, y, inner, s(22));
+        y += badge.3 + s(12);
+        let value_x = x + s(LABEL_WIDTH) + s(12);
+        let value_w = inner - s(LABEL_WIDTH) - s(12);
+        let rows = self
             .details
             .iter()
-            .map(|(k, v)| format!("{k}: {v}"))
-            .collect::<Vec<_>>()
-            .join("\n");
-        let detail_rows: i32 = self
-            .details
-            .iter()
-            .map(|(k, v)| rows(&format!("{k}: {v}")))
-            .sum();
-        let details = next(s(22) * detail_rows.max(1));
-        let status = next(s(22) * rows(&self.status));
+            .map(|(k, v)| {
+                let h = s(20) * lines(v, 46).max(lines(k, 18));
+                let row = ((x, y, s(LABEL_WIDTH), h), (value_x, y, value_w, h));
+                y += h + s(4);
+                row
+            })
+            .collect();
+        y += s(8);
+        let status = (x, y, inner, s(18) * lines(&self.status, 80));
+        y += status.3 + s(16);
         let n = i32::try_from(self.buttons.len()).unwrap_or(1).max(1);
         let bw = (inner - (n - 1) * s(8)) / n;
         let buttons = self
             .buttons
             .iter()
             .zip(0..)
-            .map(|(b, i)| (b.id, (m + i * (bw + s(8)), y, bw, s(48))))
+            .map(|(b, i)| (b.id, (x + i * (bw + s(8)), y, bw, s(36))))
             .collect();
+        y += s(36) + pad;
+        let card = (margin, margin, card_w, y - margin);
         SurfaceLayout {
+            card,
             title,
             badge,
-            details,
-            details_text,
+            rows,
             status,
             buttons,
-            size: (w, y + s(48) + m + s(40)),
+            size: (w, y + margin + s(40)),
         }
     }
 }
@@ -302,12 +315,31 @@ mod tests {
             [100, 101]
         );
         assert!(l.buttons[0].1.0 < l.buttons[1].1.0, "przyciski w rzędzie");
-        assert!(l.title.1 < l.badge.1 && l.badge.1 < l.details.1 && l.details.1 < l.status.1);
-        assert_eq!(l.details_text, "Co: usuń 14 plików");
+        let row = l.rows[0];
+        assert!(l.title.1 < l.badge.1 && l.badge.1 < row.0.1 && row.0.1 < l.status.1);
+        assert_eq!(row.0.1, row.1.1, "etykieta i wartość w jednym wierszu");
+        assert!(row.0.0 + row.0.2 < row.1.0, "wartość na prawo od etykiety");
+        let (cx, cy, cw, ch) = l.card;
+        for (_, (bx, by, bw, bh)) in &l.buttons {
+            assert!(
+                *bx >= cx && bx + bw <= cx + cw && *by >= cy && by + bh <= cy + ch,
+                "przyciski w karcie"
+            );
+        }
         let big = v.layout(192);
         assert_eq!(big.size.0, 1200);
-        assert_eq!(big.buttons[0].1.3, 96);
+        assert_eq!(big.buttons[0].1.3, 72);
         assert_eq!(v.layout(10).size.0, 600, "DPI poniżej 96 przycinane");
         assert_eq!(SurfaceTone::High.rgb(), (0xB3, 0x26, 0x1E));
+    }
+
+    #[test]
+    fn long_values_get_more_lines() {
+        let mut v = view();
+        let short = v.layout(96).rows[0].1.3;
+        v.details[0].1 = "x".repeat(200);
+        assert!(v.layout(96).rows[0].1.3 > short);
+        v.details[0].1 = "a\nb\nc".into();
+        assert_eq!(v.layout(96).rows[0].1.3, 3 * short);
     }
 }
