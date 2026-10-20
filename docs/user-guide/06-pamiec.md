@@ -22,6 +22,31 @@ Warstwy: **robocza** (przypięte wpisy, zawsze w kontekście), **epizodyczna** (
 - Treść z zewnątrz (strona, plik, mail, schowek) jest **niezaufana**: zostaje tylko w zakresie sesji, nigdy nie jest
   zapisywana automatycznie i nie da się jej awansować do szerszego zakresu.
 
+## Naucz Alfę
+
+**Naucz Alfę** (paleta `Ctrl+K` albo przycisk w panelu **Pamięć**) dodaje do pamięci wiedzę, do której Alfa i agentki
+sięgną później. Wybierz źródło:
+
+- **Tekst** — wklej notatkę, fragment instrukcji, listę zasad;
+- **Plik** — `.txt`, `.md`, `.pdf` albo `.docx` (do 25 MB; chronionych katalogów, danych Alfy i katalogów
+  z poświadczeniami nie czytam). Przed zapisem widzisz nazwę pliku i liczbę znaków;
+- **Ta rozmowa** — bieżąca gałąź rozmowy: Twoje wiadomości i odpowiedzi agentek (bez ukrytych wiadomości i wyników
+  narzędzi).
+
+Treść dzielę na krótkie fakty (akapity, potem zdania; do 800 znaków na fakt, najwyżej 128 faktów i 100 000 znaków
+treści — dłuższa zostaje ucięta, powtórzenia pomijam). Okno pokazuje, ile faktów zapiszę. Opcjonalny **tytuł** trafia
+na początek każdego faktu (np. „[Wyjazd · 1/3] …”), a przy faktach zostaje **źródło**: nazwa pliku albo „wklejony tekst”
+ze skrótem treści (SHA-256) albo identyfikator rozmowy. Wpisy są dodane przez Ciebie, więc od razu aktywne.
+
+**Tekst i plik to treść z zewnątrz** — traktuję je jak załączniki: jako dane, nigdy jako polecenia. Zapisuję je tylko
+w pamięci tej rozmowy z oznaczeniem „niezaufane” (agentki widzą to oznaczenie), bez awansu do szerszego zakresu.
+**Rozmowę** możesz zapisać w tej rozmowie, w projekcie albo globalnie — z wyjątkiem rozmowy prywatnej, która nie
+zasila szerszych zakresów.
+
+Po zapisie okno pokazuje wynik (liczba faktów, zakres, źródło) i ma **Cofnij naukę** — zapisane fakty znikają
+kaskadowo. Pojedyncze fakty usuniesz też później w Inspektorze (**Zapomnij**), a usunięcie rozmowy zabiera wiedzę
+z niej zapisaną.
+
 ## Inspektor pamięci (`Alt+4`)
 
 Panel **Pamięć** to Inspektor:

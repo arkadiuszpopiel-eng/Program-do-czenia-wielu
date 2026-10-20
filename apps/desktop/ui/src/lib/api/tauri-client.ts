@@ -165,6 +165,8 @@ export class TauriAlfaClient implements AlfaClient {
     journal: (scope) => call('memory_journal', { scope }),
     undo: (scope, changeId) => call('memory_undo', { scope, changeId }),
     consolidateNow: () => call('memory_consolidate_now'),
+    teach: (request) => call('memory_teach', { request }),
+    teachPickFile: () => call('memory_teach_pick_file'),
   };
 
   readonly tasks: AlfaClient['tasks'] = {

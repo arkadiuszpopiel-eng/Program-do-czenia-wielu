@@ -90,6 +90,11 @@ impl Attachments {
         }
     }
 
+    /// Strażnik ścieżek (ten sam dla plików „Naucz Alfę”).
+    pub fn guard(&self) -> &PathGuard {
+        &self.guard
+    }
+
     /// Limity.
     pub fn limits(&self) -> &AttachmentLimits {
         &self.limits

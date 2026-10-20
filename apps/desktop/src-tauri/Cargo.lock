@@ -716,6 +716,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sessions-contract",
+ "sha2 0.10.9",
  "tokio",
  "tools-common-contract",
  "tracing",

@@ -56,7 +56,7 @@ pub struct MemoryAppParts {
 
 /// Pamięć w aplikacji.
 pub struct MemoryApp {
-    p: MemoryAppParts,
+    pub(crate) p: MemoryAppParts,
 }
 
 impl MemoryApp {
@@ -75,7 +75,7 @@ impl MemoryApp {
         crate::tools::memory_tools(self.p.service.clone(), self.p.access.clone())
     }
 
-    fn changed(&self, scope: Option<&MemoryScope>) {
+    pub(crate) fn changed(&self, scope: Option<&MemoryScope>) {
         self.p.events.emit(AlfaEvent::MemoryChanged {
             scope_key: scope.map(scope_key),
         });

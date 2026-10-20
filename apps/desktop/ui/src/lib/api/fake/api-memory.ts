@@ -1,6 +1,7 @@
 // Atrapa: Inspektor pamięci (F7) — wpisy w czterech zakresach z proweniencją, wersje (edycja =
 // nowa wersja), propozycje do zatwierdzenia, zapomnienie kaskadowe z podglądem, dziennik
-// z cofaniem i porządkowanie „teraz". Zdarzenie `MemoryChanged` po każdej zmianie.
+// z cofaniem, porządkowanie „teraz" i „Naucz Alfę" (`api-memory-teach`). Zdarzenie `MemoryChanged`
+// po każdej zmianie.
 import type { AlfaClient } from '../client';
 import type {
   MemoryCascadeItem,
@@ -10,6 +11,7 @@ import type {
   MemoryScopeInfo,
   MemoryScopeRef,
 } from '../types-memory';
+import { teachApi } from './api-memory-teach';
 import type { FakeCore } from './core';
 
 interface Entry extends MemoryItem {
@@ -154,7 +156,13 @@ export function memoryApi(core: FakeCore): AlfaClient['memory'] {
     ];
   };
 
+  const teach = teachApi(core, (items) => {
+    entries.push(...items.map((x) => ({ ...x, chain: x.id, derivedFrom: [] })));
+    changed(items[0]?.scope_key ?? null);
+  });
+
   return {
+    ...teach,
     status: () =>
       core.reply({
         consolidation_enabled: core.settings['memory.consolidation_enabled'] !== false,

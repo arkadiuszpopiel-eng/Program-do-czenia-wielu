@@ -32,11 +32,15 @@ chrono.workspace = true
 futures-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+# Skrót treści „Naucz Alfę” (źródło faktów: ten sam plik/tekst = ten sam skrót).
+sha2 = "0.10.9"
 tokio.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
 memory-fake = { path = "../memory-fake" }
+personas-fake = { path = "../personas-fake" }
+sessions-fake = { path = "../sessions-fake" }
 tokio = { workspace = true, features = ["test-util"] }
 
 [lints]

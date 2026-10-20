@@ -12,6 +12,7 @@ import { copyConversation, exportConversation } from './exports';
 import { openTemplates } from './template-dialog.svelte';
 import { openBoard } from './board-dialog.svelte';
 import { openStats } from './stats-dialog.svelte';
+import { openTeach } from './teach-dialog.svelte';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.agents': 'agents',
@@ -42,6 +43,7 @@ export const EXTRA_COMMANDS = [
   'action.board',
   'action.stats',
   'action.copyConversation',
+  'action.teach',
 ] as const;
 
 const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
@@ -204,6 +206,9 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.stats':
       openStats();
+      break;
+    case 'action.teach':
+      openTeach();
       break;
     case 'action.copyConversation':
       void copyConversation(app);

@@ -6,7 +6,8 @@
 //!   historii dla modelu (obraz base64, tekst jako treść niezaufana),
 //! - [`export`] — eksport rozmowy (aktywna gałąź albo jedna wiadomość) do Markdown / HTML,
 //! - [`backup`] — kopie zapasowe `.alfa` z harmonogramem, rotacją i testem przywracania,
-//! - [`docs`] — artefakty sesji jako kategoria paczek `.alfa`.
+//! - [`docs`] — artefakty sesji jako kategoria paczek `.alfa`,
+//! - [`teach`] — plik do „Naucz Alfę” (wybór, ochrona ścieżki, tekst txt/md/pdf/docx).
 //!
 //! [`FilesApp`] spina je dla komend `attachments_*`, `sessions_export_conversation`, `backups_*`.
 
@@ -16,6 +17,7 @@ pub mod attach;
 pub mod backup;
 pub mod docs;
 pub mod export;
+pub mod teach;
 
 use std::path::PathBuf;
 use std::sync::Arc;

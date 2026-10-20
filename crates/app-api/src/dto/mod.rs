@@ -24,6 +24,7 @@ mod hub;
 mod licenses;
 mod mcp;
 mod memory;
+mod memory_teach;
 mod model_queues;
 mod model_routing;
 mod models;
@@ -99,6 +100,7 @@ pub use memory::{
     MemoryPage, MemoryQuery, MemoryScopeInfo, MemoryScopeKind, MemoryScopeRef, MemorySourceKind,
     MemorySourceLink, MemoryState, MemoryStatus, MemoryUndoResult,
 };
+pub use memory_teach::{TeachFile, TeachReport, TeachRequest, TeachSource};
 pub use model_queues::{SharedQueueEntry, SharedQueues};
 pub use model_routing::{
     ModelRouting, ModelRoutingSettings, RoutingLevel, RoutingModel, RoutingPreview, RoutingRung,
