@@ -4,9 +4,9 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-20T15:30:00+02:00"
+    "updated": "2026-10-20T18:00:00+02:00"
   },
-  "current_state": "0.0.65 (seria 6, laptop) zbudowana, sprawdzona, wgrana do Alfa-uruchomiona 20.10. verify wersja: wszystko zielone poza cargo deny (zip w updater-impl, gałąź do-przegladu-updater-zip9). Próba obowiązków na Bieliku 4.5B: 4/4 zielone — regresja delegate_task z 0.0.64 naprawiona. Raport: alfa/docs/plan/31-raport-2026-10-20.md.",
+  "current_state": "0.0.66 wgrana 20.10 17:45 do Alfa-uruchomiona: Broker w trybie przenośnym z oknem zatwierdzeń i watchdogiem (deploy-owner buduje app-safety do target/safety), domyślny katalog roboczy rozmowy, Dyrygentka wie, że na komputerze działa Delta, błędy dostawcy w przebiegach agentek. Raport: alfa/docs/plan/32-raport-2026-10-20-0066.md.",
   "session_goal": "Następna sesja: seria 7 (0.0.66) — pierwszy punkt: poziom autonomii „Pełny dostęp” (decyzja właściciela 20.10) na gałęzi do przeglądu.",
   "in_progress": [],
   "blocking_issues": [
@@ -15,11 +15,12 @@
     "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
-    "Seria 7 / punkt 1: poziom „Pełny dostęp” w Ustawieniach (włącza właściciel): agentki bez pytań o zgodę; zostają wyłącznik Ctrl+Shift+F12, dziennik działań i blokada poleceń z obcych treści. Dotyka Brokera/polityk → gałąź do-przegladu-pelny-dostep, scalenie dopiero po akceptacji właściciela.",
-    "Budżet startowy okna 149,6/150 KB — przed serią 7 ładowanie słowników PL częściami (Ustawienia, zadania, głos), nie pojedyncze przeniesienia.",
-    "Decyzje właściciela: do-przegladu-updater-zip9 (cargo deny), Azure w rejestrze zgodności, ADR 0028 + licencja DirectML, znak wodny mowy.",
-    "Serie mniejsze (5–6 punktów, mniej agentów), ciężkie budowy najlepiej na PC stacjonarnym (32 GB); nowa sesja Claude (stara ~350 MB zapisu spowalniała pracę).",
-    "Kopie robocze agentów: git worktree add -b <gałąź> ../wt-<seria>/<punkt> HEAD (nie isolation: worktree); wspólny target/agents usuwać po serii (62 GB)."
+    "Sprawdzić z właścicielem: „Zmień na L4” → okno Brokera → potwierdzenie (wymaga kliknięcia człowieka).",
+    "Seria 7 / punkt 1: poziom „Pełny dostęp” (decyzja 20.10) na gałęzi do przeglądu; tryb przenośny Brokera w e2e-app.",
+    "„Porządki” bez katalogu roboczego: stała odpowiedź programu zamiast modelu (Bielik zmyśla albo „przekazuje Delcie”).",
+    "Przebieg agentki: styl i temperatura z ustawień (dziś tylko zwykły czat).",
+    "Budżet startowy okna 149,6/150 KB — słowniki PL częściami.",
+    "Decyzje właściciela: do-przegladu-updater-zip9 (cargo deny), Azure w rejestrze zgodności, ADR 0028 + DirectML, znak wodny mowy."
   ],
   "env_snapshot": {
     "key_paths": {
@@ -38,12 +39,14 @@
   },
   "test_results": {
     "0.0.63": "verify wersja 96588e5b: 16 zielonych / 2 czerwone (brak Edge, cargo deny: zip) / 1 nieuruchomiony (jq); Rust 2898/0/40, interfejs 395/395, prawdziwa aplikacja 41 + 1 pominięty, pokrycie łącza 235/264 (89 %); przeglądarka na Chromium Playwrighta 467/467; RX 9070 XT: DXCore/PDH (odczyt samej pamięci 89 µs), Supertonic CPU vs DirectML, Qwen3-ASR Vulkan",
-    "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone."
+    "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone.",
+    "0.0.66": "verify wersja 5e7baed4: Rust 3065 (1 czerwony app-broker portable_mode pod obciążeniem, osobno 3× zielony), UI 473, przeglądarka 549/549; po poprawkach 08c80c91: lint zielony, aplikacja 48/48, pokrycie 259/271; duty Bielik: morning/evening/costs zielone, tidy niestabilny bez katalogu."
   },
   "decisions_this_session": [
     "Właściciel 20.10: poziom „Pełny dostęp” AI (bez zgód), z wyłącznikiem, dziennikiem i ochroną przed wstrzyknięciem; odrzucony wariant „zero ograniczeń”.",
     "Właściciel 20.10: przełącznik baneru „Tryb deweloperski” — zrobiony (ui.broker_dev_banner).",
     "Wgranie 0.0.65 po próbie obowiązków (wybór właściciela).",
-    "Usunięto target/agents (62 GB) i scalone kopie robocze wt-s6, gałęzie s5-*/s6-*."
+    "Usunięto target/agents (62 GB) i scalone kopie robocze wt-s6, gałęzie s5-*/s6-*.",
+    "0.0.66: każda rozmowa z Dyrygentką przez przebieg agentki — wycofane (14 testów: styl, głos, anulowanie, załączniki, 429); zamiast tego informacja o obsadzie w prompcie."
   ]
 }

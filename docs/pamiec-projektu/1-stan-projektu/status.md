@@ -6,7 +6,7 @@
 
 ## Aktualny cel
 
-**Bieżący (2026-10-20):** 0.0.65 gotowa i wgrana. Dalej seria 7 (0.0.66) — punkt 1: poziom „Pełny dostęp” AI
+**Bieżący (2026-10-20 wieczór):** 0.0.66 gotowa i wgrana (okno Brokera, narzędzia agentek). Wcześniej 0.0.65. Dalej seria 7 (0.0.66) — punkt 1: poziom „Pełny dostęp” AI
 (decyzja właściciela 20.10, gałąź do przeglądu). Lista zadań: `handoff.json` → `next_session`.
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);
@@ -22,6 +22,7 @@ Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KO
   (bieżąca od 18.10 po południu; Edge, `jq`, `gh`, Claude Code, dane Alfy; cargo `-j 3`) i komputer stacjonarny
   Ryzen 7 5700X3D, RX 9070 XT 16 GB, 32 GB (17–18.10, seria 0.0.63; bez Edge, `jq`, Claude Code i danych Alfy;
   `CARGO_BUILD_JOBS=6`). Opis: `alfa/docs/plan/00-stan-wykonania.md`, pamięć `maszyna-stacjonarna-2026-10-17`.
+- **2026-10-20 po południu — WERSJA 0.0.66:** po zrzutach właściciela („Zmień na L4” odrzucane, Alfa „nie mam dostępu”): deploy-owner buduje app-safety do target/safety i kopiuje Broker/Broker-UI/watchdog (tryb przenośny), domyślny katalog roboczy rozmowy (app-store workdir_choice), Dyrygentka z informacją o Delcie w prompcie (zwykły czat bez zmian — wariant „wszystko przez przebieg agentki” wycofany po 14 testach), RunOutcome::Failed z ProviderError (429/offline w przebiegach). Wgrana 17:45, start bez błędów. Raport `docs/plan/32-raport-2026-10-20-0066.md`.
 - **2026-10-20 — WERSJA 0.0.65 (seria 6, laptop):** kanwa artefaktów, Arena, karty rozmów, „Naucz Alfę”, edycja kont firm, karty w mowie; naprawa [poważne] regresji obowiązków (delegate_task w zadaniach z arkuszem faktów + walidacja schematem narzędzia) — próba na Bieliku 4/4 zielone. verify: Rust 3063/0, UI 473, przeglądarka 547/547, aplikacja 48/48, pokrycie 95,6 %; czerwony tylko cargo deny (zip). Budżet startowy 149,6/150 KB (leniwe karty, okienka stanu/kosztu, baner aktualizacji, błąd tury). Przełącznik baneru trybu deweloperskiego (ui.broker_dev_banner). Decyzja właściciela: poziom „Pełny dostęp” w serii 7. Usunięto target/agents (62 GB), wt-s6/*, gałęzie s5-*/s6-*. Raport `docs/plan/31-raport-2026-10-20.md`. Kopia F:\Alfa — patrz raport §6.
 - **2026-10-19 rano — KONIEC SESJI NA LAPTOPIE, dalej PC:** opis przekazania `PRZEKAZANIE-NA-PC-2026-10-19.md` (obok repo) i `alfa/docs/plan/30-przekazanie-na-pc-2026-10-19.md`. `verify sprzet` 0.0.64 przerwany na polecenie właściciela (bez wyniku).
 - **2026-10-18/19 — WERSJA 0.0.64 (seria 5, laptop):** 8 punktów przez agentów w kopiach roboczych `wt-s5/<punkt>` (gałęzie s5-*, scalone), + sprawdzenie laptopa iGPU + NVIDIA (bez regresji) i test Claude Code. Końcowy `verify wersja` na `728558d2`: 18/19 (Rust 2983/0, UI 406, przeglądarka 475, aplikacja 42/42, pokrycie 88,6 %); czerwony tylko `cargo deny` — `zip` 8.6.0 w `updater-impl` → gałąź `do-przegladu-updater-zip9` (nie scalać bez przeglądu). Azure OpenAI w `providers-catalog/czeka-na-wlasciciela/` (rejestr zgodności). Zbudowana 0.0.64 w `target/shell/debug`, wgrana do Alfa-uruchomiona 19.10 5:13. Raport `docs/plan/29-raport-2026-10-18.md`. Kopia na F:\Alfa (nowy pusty dysk „Dane”).
