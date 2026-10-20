@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::Duration;
 
-use agent_runtime_contract::{AgentTaskPayload, DELEGATE_GROUP, MemCheckpointStore, RunId};
+use agent_runtime_contract::{AgentTaskPayload, MemCheckpointStore, RunId};
 use agent_runtime_impl::{Runtime, RuntimeExecutor, task_run_id};
 use app_agents::{FamilyProjector, RunContext, RunFamily, SkillCall, SpecInput, run_spec};
 use app_api::ports::{BrainError, BrainRequest};
@@ -114,18 +114,6 @@ fn roles_of(deps: &ExecDeps, session: &SessionId, agent: &PersonaId) -> Vec<Role
         .collect()
 }
 
-/// Role bez grupy `delegate` — przebieg nie dostaje `delegate_task`. Dla zadań w tle z arkuszem
-/// faktów: ich forma ([`crate::facts::REPORT_FORM`]) zabrania przekazywania zadania innej
-/// agentce, a próba 0.0.64 pokazała, że mały model lokalny w kopercie JSON (C2.3) wywołuje jedyne
-/// podane narzędzie — delegację — w każdej turze mimo gotowego raportu, aż do `LoopDetected`.
-/// Krytyczka zostaje (obsada w opcjach przebiegu się nie zmienia).
-pub(crate) fn without_delegation(mut roles: Vec<Role>) -> Vec<Role> {
-    for role in &mut roles {
-        role.tools.retain(|group| group != DELEGATE_GROUP);
-    }
-    roles
-}
-
 /// Zadanie tokio: dziennik przebiegu i podprzebiegów (delegacja, Krytyczka) → Replay w sesji.
 fn spawn_projection(
     deps: &ExecDeps,
@@ -218,17 +206,7 @@ pub(crate) async fn run(
                 true => deps.host.facts(&session, d.task.as_str()).await,
                 false => None,
             };
-            let (brief, run_roles) = match sheet {
-                Some(sheet) => (
-                    format!(
-                        "{goal}
-
-{sheet}"
-                    ),
-                    without_delegation(roles.clone()),
-                ),
-                None => (goal.clone(), roles.clone()),
-            };
+            let (brief, run_roles) = crate::brief::brief_and_roles(&goal, sheet, &roles);
             let mut spec = run_spec(
                 SpecInput {
                     session: session.clone(),
@@ -348,38 +326,5 @@ mod tests {
         });
         assert_eq!(origin_of(&t), CommandOrigin::Agent);
         assert!(TaskRuntimes::default().is_empty());
-    }
-
-    #[test]
-    fn report_tasks_lose_only_the_delegate_group() {
-        let roles: Vec<Role> = personas_contract::builtin_roles()
-            .into_iter()
-            .filter(|r| ["conductor", "speaker", "writer"].contains(&r.id.as_str()))
-            .collect();
-        assert!(
-            roles
-                .iter()
-                .any(|r| r.tools.iter().any(|g| g == DELEGATE_GROUP))
-        );
-        let stripped = without_delegation(roles.clone());
-        assert_eq!(
-            stripped.len(),
-            roles.len(),
-            "role zostają (prompt i Krytyczka)"
-        );
-        assert!(
-            stripped
-                .iter()
-                .all(|r| !r.tools.iter().any(|g| g == DELEGATE_GROUP))
-        );
-        let writer = stripped.iter().find(|r| r.id.as_str() == "writer");
-        assert_eq!(
-            writer.map(|r| r.tools.clone()),
-            roles
-                .iter()
-                .find(|r| r.id.as_str() == "writer")
-                .map(|r| r.tools.clone()),
-            "inne grupy narzędzi bez zmian"
-        );
     }
 }
