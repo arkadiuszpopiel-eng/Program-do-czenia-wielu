@@ -295,3 +295,28 @@ fn ref_siblings_are_merged() {
     assert!(check_arguments(&p, &json!({"o": {"a": "x", "extra": 1}})).is_ok());
     assert!(check_arguments(&p, &json!({"o": {"a": "x", "extra": 1, "z": 0}})).is_err());
 }
+
+#[test]
+fn validation_uses_the_tool_schema_not_the_closed_grammar() {
+    // Regresja 0.0.64: domknięcie dla gramatyki nie może odrzucać pól, których narzędzie nie
+    // zabrania; narzędzie z `additionalProperties: false` (np. `deny_unknown_fields`) — tak.
+    let open = spec(
+        "t",
+        json!({"type": "object", "properties": {"o": {"$ref": "#/$defs/O"}}, "required": ["o"],
+               "$defs": {"O": {"type": "object", "properties": {"a": {"type": "string"}}}}}),
+    );
+    let extra = json!({"o": {"a": "x", "b": 1}, "c": true});
+    assert!(check_arguments(&tool_parameters(&open), &extra).is_err());
+    let loose = validation_parameters(&open);
+    assert!(loose.get("$defs").is_none(), "odwołania rozwinięte");
+    assert!(check_arguments(&loose, &extra).is_ok());
+    assert!(check_arguments(&loose, &json!({"o": {"a": 5}})).is_err());
+    let strict = spec(
+        "s",
+        json!({"type": "object", "properties": {"a": {"type": "string"}},
+               "additionalProperties": false}),
+    );
+    let map = validation_of(&[&open, &strict]);
+    assert_eq!(map.len(), 2);
+    assert!(check_arguments(&map["s"], &json!({"a": "x", "b": 1})).is_err());
+}

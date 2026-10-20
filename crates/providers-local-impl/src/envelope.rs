@@ -104,9 +104,10 @@ impl Prepared {
     }
 }
 
-/// Schematy parametrów narzędzi, które model może wywołać (walidacja w [`EnvelopeGuard`]).
+/// Schematy parametrów narzędzi, które model może wywołać (walidacja w [`EnvelopeGuard`]):
+/// oryginalne schematy narzędzi (rozwinięte), nie domknięte wersje gramatyki.
 pub(crate) fn schemas(req: &ChatRequest) -> BTreeMap<String, Value> {
-    schema::parameters_of(&schema::offered(&req.tools, &req.tool_choice))
+    schema::validation_of(&schema::offered(&req.tools, &req.tool_choice))
 }
 
 /// Zasady formatu i lista narzędzi ze schematami.

@@ -185,7 +185,9 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 - **Odpowiedź** (`envelope::EnvelopeGuard` nad `LeakGuard<ChatDecoder>`): `response` płynie na bieżąco (sekwencje
   ucieczki `\n`, `\uXXXX` i pary surogatów pocięte w dowolnym miejscu; samotny surogat → `U+FFFD` i nie gubi
   wywołania), `tool_call` składane do końca →
-  `ToolCallStart/Delta/End` w bloku po tekście i `Stop` = `ToolUse`. Argumenty sprawdzane schematem narzędzia (`jsonschema`); niezgodne,
+  `ToolCallStart/Delta/End` w bloku po tekście i `Stop` = `ToolUse`. Argumenty sprawdzane schematem narzędzia (`jsonschema`) —
+  rozwiniętym, ale bez domykania gramatyki: dodatkowe pole odrzuca tylko narzędzie, którego schemat sam je zabrania
+  (`schema::validation_parameters`, regresja próby obowiązków 0.0.64); niezgodne,
   ucięte (`MaxTokens`) albo niepoprawny JSON → `ToolArguments::Invalid` z opisem (nazwa narzędzia odzyskana z uciętego
   tekstu) — `agent-runtime` nie uruchamia narzędzia i odsyła modelowi błąd z prośbą o ponowienie. Tekst, który nie
   jest kopertą (serwer zignorował `response_format`), przechodzi bez zmian. W dzienniku `warn` tylko nazwa narzędzia,

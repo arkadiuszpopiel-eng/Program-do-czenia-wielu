@@ -4,8 +4,9 @@
 //!
 //! `llama-server` zamienia schemat z `response_format` na gramatykę GBNF i próbkuje tylko tokeny,
 //! które ją spełniają — dlatego schemat musi być samowystarczalny (bez `$defs` poza korzeniem
-//! koperty) i jawnie domknięty: gramatyka serwera i walidacja w Alfie oceniają wtedy to samo,
-//! niezależnie od tego, jak dana wersja serwera traktuje brak `additionalProperties`.
+//! koperty) i jawnie domknięty, niezależnie od tego, jak dana wersja serwera traktuje brak
+//! `additionalProperties`. Walidacja argumentów w Alfie używa schematu narzędzia bez domykania
+//! ([`validation_parameters`]): dodatkowe pole odrzuca tylko narzędzie, które samo tego chce.
 //!
 //! Schematy pochodzą też od niezaufanych serwerów MCP, więc rozwijanie `$ref` ma twarde granice:
 //! odwołanie rekurencyjne (definicja już rozwijana na bieżącej ścieżce) i każde odwołanie po
@@ -29,9 +30,32 @@ const DOCUMENT_KEYS: [&str; 4] = ["$schema", "$id", "$defs", "definitions"];
 /// Słowa kluczowe z wartościami (nie schematami) — bez rozwijania i domykania.
 const VALUE_KEYS: [&str; 5] = ["enum", "const", "default", "examples", "required"];
 
-/// Schemat parametrów narzędzia gotowy do gramatyki i walidacji. Brak schematu obiektu (albo
-/// schemat innego typu) → dowolny obiekt.
+/// Schemat parametrów narzędzia gotowy do gramatyki: rozwinięty i domknięty. Brak schematu
+/// obiektu (albo schemat innego typu) → dowolny obiekt.
 pub(crate) fn tool_parameters(spec: &ToolSpec) -> Value {
+    let mut schema = inlined_parameters(spec);
+    close_objects(&mut schema, true);
+    schema
+}
+
+/// Schemat parametrów do walidacji argumentów: rozwinięty, ale NIE domknięty — dodatkowe pole
+/// odrzuca tylko schemat, który sam tego chce (`additionalProperties: false` narzędzia).
+/// Gramatyka i tak nie pozwala modelowi dopisać pól; gdy serwer gramatyki nie zastosuje,
+/// nieszkodliwe dodatkowe pole nie może zablokować wywołania (regresja próby obowiązków 0.0.64).
+pub(crate) fn validation_parameters(spec: &ToolSpec) -> Value {
+    inlined_parameters(spec)
+}
+
+/// Parametry do walidacji wg nazwy narzędzia ([`validation_parameters`]).
+pub(crate) fn validation_of(tools: &[&ToolSpec]) -> BTreeMap<String, Value> {
+    tools
+        .iter()
+        .map(|t| (t.name.clone(), validation_parameters(t)))
+        .collect()
+}
+
+/// Schemat parametrów z rozwiniętymi odwołaniami, bez słów kluczowych dokumentu.
+fn inlined_parameters(spec: &ToolSpec) -> Value {
     let root = &spec.input_schema;
     if !root.is_object() {
         return json!({"type": "object"});
@@ -48,7 +72,6 @@ pub(crate) fn tool_parameters(spec: &ToolSpec) -> Value {
             obj.remove(*key);
         }
     }
-    close_objects(&mut schema, true);
     schema
 }
 
