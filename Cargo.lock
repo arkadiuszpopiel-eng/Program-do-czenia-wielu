@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "accounts-hub-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -22,7 +22,7 @@ dependencies = [
 
 [[package]]
 name = "accounts-hub-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -33,7 +33,7 @@ dependencies = [
 
 [[package]]
 name = "accounts-hub-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-fake",
@@ -94,7 +94,7 @@ dependencies = [
 
 [[package]]
 name = "agent-backends-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -111,7 +111,7 @@ dependencies = [
 
 [[package]]
 name = "agent-backends-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-backends-contract",
  "agent-backends-impl",
@@ -129,7 +129,7 @@ dependencies = [
 
 [[package]]
 name = "agent-backends-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "agent-backends-contract",
@@ -149,7 +149,7 @@ dependencies = [
 
 [[package]]
 name = "agent-builder-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-runtime-contract",
  "async-trait",
@@ -169,7 +169,7 @@ dependencies = [
 
 [[package]]
 name = "agent-builder-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-builder-contract",
  "async-trait",
@@ -183,7 +183,7 @@ dependencies = [
 
 [[package]]
 name = "agent-builder-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-builder-contract",
  "async-trait",
@@ -202,7 +202,7 @@ dependencies = [
 
 [[package]]
 name = "agent-runtime-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -221,7 +221,7 @@ dependencies = [
 
 [[package]]
 name = "agent-runtime-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-runtime-contract",
  "async-trait",
@@ -232,7 +232,7 @@ dependencies = [
 
 [[package]]
 name = "agent-runtime-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-runtime-contract",
  "async-trait",
@@ -339,7 +339,7 @@ checksum = "fb5dfbc6d8d2675589ccbe4d0fd61df2419075625f8c1a62325e718e2b0049f9"
 
 [[package]]
 name = "app-agents"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-impl",
  "agent-runtime-contract",
@@ -419,7 +419,7 @@ dependencies = [
 
 [[package]]
 name = "app-api"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "agent-builder-contract",
@@ -445,7 +445,7 @@ dependencies = [
 
 [[package]]
 name = "app-bridges"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "agent-backends-contract",
@@ -475,7 +475,7 @@ dependencies = [
 
 [[package]]
 name = "app-broker"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "async-trait",
@@ -505,7 +505,7 @@ dependencies = [
 
 [[package]]
 name = "app-chat"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "agent-backends-contract",
@@ -541,7 +541,7 @@ dependencies = [
 
 [[package]]
 name = "app-core"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-impl",
@@ -667,7 +667,7 @@ dependencies = [
 
 [[package]]
 name = "app-diag"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "async-trait",
@@ -689,7 +689,7 @@ dependencies = [
 
 [[package]]
 name = "app-files"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-fake",
@@ -721,7 +721,7 @@ dependencies = [
 
 [[package]]
 name = "app-gui"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "async-trait",
@@ -753,7 +753,7 @@ dependencies = [
 
 [[package]]
 name = "app-health"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "async-trait",
@@ -781,7 +781,7 @@ dependencies = [
 
 [[package]]
 name = "app-logs"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "core-log-contract",
@@ -792,7 +792,7 @@ dependencies = [
 
 [[package]]
 name = "app-mcp"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-fake",
@@ -813,7 +813,7 @@ dependencies = [
 
 [[package]]
 name = "app-memory"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "async-trait",
@@ -845,7 +845,7 @@ dependencies = [
 
 [[package]]
 name = "app-models"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-fake",
@@ -890,7 +890,7 @@ dependencies = [
 
 [[package]]
 name = "app-modules"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-impl",
@@ -956,7 +956,7 @@ dependencies = [
 
 [[package]]
 name = "app-plugins"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "async-trait",
@@ -987,7 +987,7 @@ dependencies = [
 
 [[package]]
 name = "app-safety"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-broker",
  "app-logs",
@@ -1013,7 +1013,7 @@ dependencies = [
 
 [[package]]
 name = "app-skills"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-builder-contract",
  "agent-builder-impl",
@@ -1038,7 +1038,7 @@ dependencies = [
 
 [[package]]
 name = "app-store"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "lib-sqlstore",
@@ -1049,7 +1049,7 @@ dependencies = [
 
 [[package]]
 name = "app-tasks"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-backends-contract",
  "agent-runtime-contract",
@@ -1088,7 +1088,7 @@ dependencies = [
 
 [[package]]
 name = "app-terminal"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "app-api",
@@ -1106,7 +1106,7 @@ dependencies = [
 
 [[package]]
 name = "app-updates"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "chrono",
@@ -1128,7 +1128,7 @@ dependencies = [
 
 [[package]]
 name = "app-voice"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "app-api",
  "app-modules",
@@ -1212,7 +1212,7 @@ checksum = "3d62b7694a562cdf5a74227903507c56ab2cc8bdd1f781ed5cb4cf9c9f810bfc"
 
 [[package]]
 name = "artifacts-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "core-bus-contract",
@@ -1229,7 +1229,7 @@ dependencies = [
 
 [[package]]
 name = "artifacts-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "artifacts-contract",
  "chrono",
@@ -1238,7 +1238,7 @@ dependencies = [
 
 [[package]]
 name = "artifacts-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "artifacts-contract",
  "async-trait",
@@ -1404,7 +1404,7 @@ dependencies = [
 
 [[package]]
 name = "broker-ui-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "platform-contract",
@@ -1417,7 +1417,7 @@ dependencies = [
 
 [[package]]
 name = "broker-ui-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "broker-ui-contract",
  "safety-broker-contract",
@@ -1425,7 +1425,7 @@ dependencies = [
 
 [[package]]
 name = "broker-ui-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "broker-ui-contract",
  "compliance-contract",
@@ -1509,7 +1509,7 @@ checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 
 [[package]]
 name = "camera-hub-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "platform-contract",
@@ -1521,7 +1521,7 @@ dependencies = [
 
 [[package]]
 name = "camera-hub-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "camera-hub-contract",
@@ -1530,7 +1530,7 @@ dependencies = [
 
 [[package]]
 name = "camera-hub-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "camera-hub-contract",
@@ -1652,7 +1652,7 @@ dependencies = [
 
 [[package]]
 name = "compliance-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1668,7 +1668,7 @@ dependencies = [
 
 [[package]]
 name = "compliance-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1678,7 +1678,7 @@ dependencies = [
 
 [[package]]
 name = "compliance-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1700,7 +1700,7 @@ checksum = "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c"
 
 [[package]]
 name = "core-bus-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1716,7 +1716,7 @@ dependencies = [
 
 [[package]]
 name = "core-bus-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1731,7 +1731,7 @@ dependencies = [
 
 [[package]]
 name = "core-bus-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -1744,7 +1744,7 @@ dependencies = [
 
 [[package]]
 name = "core-config-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -1758,7 +1758,7 @@ dependencies = [
 
 [[package]]
 name = "core-config-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-config-contract",
@@ -1771,7 +1771,7 @@ dependencies = [
 
 [[package]]
 name = "core-config-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1811,7 +1811,7 @@ checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
 name = "core-log-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1825,7 +1825,7 @@ dependencies = [
 
 [[package]]
 name = "core-log-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -1836,7 +1836,7 @@ dependencies = [
 
 [[package]]
 name = "core-log-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1857,7 +1857,7 @@ dependencies = [
 
 [[package]]
 name = "core-registry-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -1873,7 +1873,7 @@ dependencies = [
 
 [[package]]
 name = "core-registry-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -1885,7 +1885,7 @@ dependencies = [
 
 [[package]]
 name = "core-registry-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -1906,7 +1906,7 @@ checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
 
 [[package]]
 name = "cost-meter-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -1921,7 +1921,7 @@ dependencies = [
 
 [[package]]
 name = "cost-meter-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -1932,7 +1932,7 @@ dependencies = [
 
 [[package]]
 name = "cost-meter-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -2226,7 +2226,7 @@ dependencies = [
 
 [[package]]
 name = "device-profile-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "schemars",
@@ -2237,14 +2237,14 @@ dependencies = [
 
 [[package]]
 name = "device-profile-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "device-profile-contract",
 ]
 
 [[package]]
 name = "device-profile-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2262,7 +2262,7 @@ dependencies = [
 
 [[package]]
 name = "diagnostician-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2277,7 +2277,7 @@ dependencies = [
 
 [[package]]
 name = "diagnostician-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2291,7 +2291,7 @@ dependencies = [
 
 [[package]]
 name = "diagnostician-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2468,7 +2468,7 @@ dependencies = [
 
 [[package]]
 name = "evals-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2483,7 +2483,7 @@ dependencies = [
 
 [[package]]
 name = "evals-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "evals-contract",
@@ -2492,7 +2492,7 @@ dependencies = [
 
 [[package]]
 name = "evals-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2506,7 +2506,7 @@ dependencies = [
 
 [[package]]
 name = "example-module-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -2518,7 +2518,7 @@ dependencies = [
 
 [[package]]
 name = "example-module-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "example-module-contract",
@@ -2527,7 +2527,7 @@ dependencies = [
 
 [[package]]
 name = "example-module-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -3130,7 +3130,7 @@ dependencies = [
 
 [[package]]
 name = "improver-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -3147,7 +3147,7 @@ dependencies = [
 
 [[package]]
 name = "improver-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "core-config-contract",
@@ -3160,7 +3160,7 @@ dependencies = [
 
 [[package]]
 name = "improver-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -3374,7 +3374,7 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 
 [[package]]
 name = "lib-embed"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "flate2",
  "lib-embed",
@@ -3394,7 +3394,7 @@ dependencies = [
 
 [[package]]
 name = "lib-markdown"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "ammonia",
  "proptest",
@@ -3405,7 +3405,7 @@ dependencies = [
 
 [[package]]
 name = "lib-media"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "proptest",
@@ -3417,7 +3417,7 @@ dependencies = [
 
 [[package]]
 name = "lib-netguard"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "proptest",
  "reqwest",
@@ -3428,7 +3428,7 @@ dependencies = [
 
 [[package]]
 name = "lib-openai-compat"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "futures-util",
  "providers-contract",
@@ -3442,7 +3442,7 @@ dependencies = [
 
 [[package]]
 name = "lib-quick"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "regex",
@@ -3450,7 +3450,7 @@ dependencies = [
 
 [[package]]
 name = "lib-sidecar-guard"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "tempfile",
  "tracing",
@@ -3458,7 +3458,7 @@ dependencies = [
 
 [[package]]
 name = "lib-smart-turn"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "base64 0.22.1",
  "ort",
@@ -3470,7 +3470,7 @@ dependencies = [
 
 [[package]]
 name = "lib-sqlstore"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "getrandom 0.4.3",
  "proptest",
@@ -3484,7 +3484,7 @@ dependencies = [
 
 [[package]]
 name = "lib-supertonic"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "base64 0.22.1",
  "ort",
@@ -3616,7 +3616,7 @@ dependencies = [
 
 [[package]]
 name = "marshal-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -3633,7 +3633,7 @@ dependencies = [
 
 [[package]]
 name = "marshal-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -3648,7 +3648,7 @@ dependencies = [
 
 [[package]]
 name = "marshal-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -3674,7 +3674,7 @@ dependencies = [
 
 [[package]]
 name = "mcp-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "schemars",
@@ -3687,7 +3687,7 @@ dependencies = [
 
 [[package]]
 name = "mcp-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "mcp-contract",
@@ -3699,7 +3699,7 @@ dependencies = [
 
 [[package]]
 name = "mcp-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -3771,7 +3771,7 @@ checksum = "5449c8c750f1a07ea702bbd212bd999fceece9b3d1508b17023b3e174583124b"
 
 [[package]]
 name = "memory-consolidation-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -3789,7 +3789,7 @@ dependencies = [
 
 [[package]]
 name = "memory-consolidation-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -3800,7 +3800,7 @@ dependencies = [
 
 [[package]]
 name = "memory-consolidation-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -3826,7 +3826,7 @@ dependencies = [
 
 [[package]]
 name = "memory-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "core-bus-contract",
@@ -3840,7 +3840,7 @@ dependencies = [
 
 [[package]]
 name = "memory-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "lib-sqlstore",
@@ -3849,7 +3849,7 @@ dependencies = [
 
 [[package]]
 name = "memory-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -3950,7 +3950,7 @@ dependencies = [
 
 [[package]]
 name = "model-residency-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "device-profile-contract",
@@ -3963,14 +3963,14 @@ dependencies = [
 
 [[package]]
 name = "model-residency-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "model-residency-contract",
 ]
 
 [[package]]
 name = "model-residency-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4336,7 +4336,7 @@ dependencies = [
 
 [[package]]
 name = "pc-diag-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "schemars",
  "serde",
@@ -4346,14 +4346,14 @@ dependencies = [
 
 [[package]]
 name = "pc-diag-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "pc-diag-contract",
 ]
 
 [[package]]
 name = "pc-diag-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "pc-diag-contract",
@@ -4373,7 +4373,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 
 [[package]]
 name = "personas-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4387,7 +4387,7 @@ dependencies = [
 
 [[package]]
 name = "personas-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4397,7 +4397,7 @@ dependencies = [
 
 [[package]]
 name = "personas-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4461,7 +4461,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 
 [[package]]
 name = "platform-apps-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "proptest",
@@ -4473,7 +4473,7 @@ dependencies = [
 
 [[package]]
 name = "platform-apps-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-apps-contract",
  "platform-contract",
@@ -4482,7 +4482,7 @@ dependencies = [
 
 [[package]]
 name = "platform-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "schemars",
  "serde",
@@ -4491,7 +4491,7 @@ dependencies = [
 
 [[package]]
 name = "platform-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "proptest",
@@ -4499,7 +4499,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-diag-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "base64 0.22.1",
  "chrono",
@@ -4509,7 +4509,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-gui-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "flate2",
  "platform-contract",
@@ -4519,7 +4519,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "compliance-contract",
  "core-registry-contract",
@@ -4535,7 +4535,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-kernel-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "windows",
@@ -4543,7 +4543,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-ocr-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "tools-vision-contract",
  "windows",
@@ -4551,7 +4551,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-office-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "base64 0.22.1",
  "platform-apps-contract",
@@ -4563,7 +4563,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-pty-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "windows",
@@ -4571,7 +4571,7 @@ dependencies = [
 
 [[package]]
 name = "platform-windows-sys-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "compliance-contract",
  "platform-apps-contract",
@@ -4582,7 +4582,7 @@ dependencies = [
 
 [[package]]
 name = "plugin-runtime-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -4603,7 +4603,7 @@ dependencies = [
 
 [[package]]
 name = "plugin-runtime-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4617,7 +4617,7 @@ dependencies = [
 
 [[package]]
 name = "plugin-runtime-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4774,7 +4774,7 @@ dependencies = [
 
 [[package]]
 name = "providers-api-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -4796,7 +4796,7 @@ dependencies = [
 
 [[package]]
 name = "providers-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "futures-core",
@@ -4813,7 +4813,7 @@ dependencies = [
 
 [[package]]
 name = "providers-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "futures-util",
@@ -4826,7 +4826,7 @@ dependencies = [
 
 [[package]]
 name = "providers-local-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -5239,7 +5239,7 @@ dependencies = [
 
 [[package]]
 name = "risk-classifier-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "proptest",
@@ -5250,14 +5250,14 @@ dependencies = [
 
 [[package]]
 name = "risk-classifier-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "risk-classifier-contract",
 ]
 
 [[package]]
 name = "risk-classifier-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -5272,7 +5272,7 @@ dependencies = [
 
 [[package]]
 name = "router-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "compliance-contract",
@@ -5289,7 +5289,7 @@ dependencies = [
 
 [[package]]
 name = "router-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "providers-contract",
  "router-contract",
@@ -5297,7 +5297,7 @@ dependencies = [
 
 [[package]]
 name = "router-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -5476,7 +5476,7 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "safety-broker-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -5494,7 +5494,7 @@ dependencies = [
 
 [[package]]
 name = "safety-broker-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -5509,7 +5509,7 @@ dependencies = [
 
 [[package]]
 name = "safety-broker-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -5562,7 +5562,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-backends-contract",
  "async-trait",
@@ -5580,7 +5580,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-backends-contract",
  "async-trait",
@@ -5596,7 +5596,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -5612,7 +5612,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler-lite-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -5627,7 +5627,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler-lite-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -5638,7 +5638,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler-lite-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -5695,7 +5695,7 @@ dependencies = [
 
 [[package]]
 name = "search-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "core-bus-contract",
@@ -5709,7 +5709,7 @@ dependencies = [
 
 [[package]]
 name = "search-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "lib-sqlstore",
  "proptest",
@@ -5718,7 +5718,7 @@ dependencies = [
 
 [[package]]
 name = "search-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -5846,7 +5846,7 @@ dependencies = [
 
 [[package]]
 name = "sessions-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "core-bus-contract",
@@ -5860,7 +5860,7 @@ dependencies = [
 
 [[package]]
 name = "sessions-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "chrono",
  "lib-sqlstore",
@@ -5871,7 +5871,7 @@ dependencies = [
 
 [[package]]
 name = "sessions-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -5958,7 +5958,7 @@ checksum = "33f4fe9184a62d842c9ef383018f3306d8ba224fd9d836f56d7288308847c256"
 
 [[package]]
 name = "skills-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-runtime-contract",
  "async-trait",
@@ -5980,7 +5980,7 @@ dependencies = [
 
 [[package]]
 name = "skills-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -5994,7 +5994,7 @@ dependencies = [
 
 [[package]]
 name = "skills-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-runtime-contract",
  "agent-runtime-fake",
@@ -6118,7 +6118,7 @@ dependencies = [
 
 [[package]]
 name = "spike-data"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "rusqlite",
  "sqlite-vec",
@@ -6500,7 +6500,7 @@ checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
 name = "tools-browser-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-apps-contract",
  "risk-classifier-contract",
@@ -6513,7 +6513,7 @@ dependencies = [
 
 [[package]]
 name = "tools-browser-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6524,7 +6524,7 @@ dependencies = [
 
 [[package]]
 name = "tools-browser-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -6546,7 +6546,7 @@ dependencies = [
 
 [[package]]
 name = "tools-clipboard-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "risk-classifier-contract",
  "safety-broker-contract",
@@ -6559,7 +6559,7 @@ dependencies = [
 
 [[package]]
 name = "tools-clipboard-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -6571,7 +6571,7 @@ dependencies = [
 
 [[package]]
 name = "tools-clipboard-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -6592,7 +6592,7 @@ dependencies = [
 
 [[package]]
 name = "tools-common-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6615,7 +6615,7 @@ dependencies = [
 
 [[package]]
 name = "tools-dev-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "risk-classifier-contract",
  "safety-broker-contract",
@@ -6627,7 +6627,7 @@ dependencies = [
 
 [[package]]
 name = "tools-dev-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6638,7 +6638,7 @@ dependencies = [
 
 [[package]]
 name = "tools-dev-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6658,7 +6658,7 @@ dependencies = [
 
 [[package]]
 name = "tools-fs-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "proptest",
  "risk-classifier-contract",
@@ -6671,7 +6671,7 @@ dependencies = [
 
 [[package]]
 name = "tools-fs-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -6683,7 +6683,7 @@ dependencies = [
 
 [[package]]
 name = "tools-fs-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6707,7 +6707,7 @@ dependencies = [
 
 [[package]]
 name = "tools-input-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "risk-classifier-contract",
@@ -6720,7 +6720,7 @@ dependencies = [
 
 [[package]]
 name = "tools-input-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -6732,7 +6732,7 @@ dependencies = [
 
 [[package]]
 name = "tools-input-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6755,7 +6755,7 @@ dependencies = [
 
 [[package]]
 name = "tools-media-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "lib-media",
@@ -6770,7 +6770,7 @@ dependencies = [
 
 [[package]]
 name = "tools-media-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "lib-media",
@@ -6783,7 +6783,7 @@ dependencies = [
 
 [[package]]
 name = "tools-media-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6813,7 +6813,7 @@ dependencies = [
 
 [[package]]
 name = "tools-net-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "lib-netguard",
@@ -6828,7 +6828,7 @@ dependencies = [
 
 [[package]]
 name = "tools-net-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "lib-netguard",
@@ -6840,7 +6840,7 @@ dependencies = [
 
 [[package]]
 name = "tools-net-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6866,7 +6866,7 @@ dependencies = [
 
 [[package]]
 name = "tools-office-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-apps-contract",
  "risk-classifier-contract",
@@ -6879,7 +6879,7 @@ dependencies = [
 
 [[package]]
 name = "tools-office-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6890,7 +6890,7 @@ dependencies = [
 
 [[package]]
 name = "tools-office-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -6914,7 +6914,7 @@ dependencies = [
 
 [[package]]
 name = "tools-screen-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "risk-classifier-contract",
@@ -6927,7 +6927,7 @@ dependencies = [
 
 [[package]]
 name = "tools-screen-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -6939,7 +6939,7 @@ dependencies = [
 
 [[package]]
 name = "tools-screen-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -6963,7 +6963,7 @@ dependencies = [
 
 [[package]]
 name = "tools-shell-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "proptest",
@@ -6977,7 +6977,7 @@ dependencies = [
 
 [[package]]
 name = "tools-shell-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -6989,7 +6989,7 @@ dependencies = [
 
 [[package]]
 name = "tools-shell-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -7013,7 +7013,7 @@ dependencies = [
 
 [[package]]
 name = "tools-system-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-apps-contract",
  "risk-classifier-contract",
@@ -7026,7 +7026,7 @@ dependencies = [
 
 [[package]]
 name = "tools-system-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -7037,7 +7037,7 @@ dependencies = [
 
 [[package]]
 name = "tools-system-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "async-trait",
@@ -7064,7 +7064,7 @@ dependencies = [
 
 [[package]]
 name = "tools-uia-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "risk-classifier-contract",
@@ -7077,7 +7077,7 @@ dependencies = [
 
 [[package]]
 name = "tools-uia-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -7089,7 +7089,7 @@ dependencies = [
 
 [[package]]
 name = "tools-uia-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -7112,7 +7112,7 @@ dependencies = [
 
 [[package]]
 name = "tools-vision-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "providers-contract",
@@ -7128,7 +7128,7 @@ dependencies = [
 
 [[package]]
 name = "tools-vision-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "providers-contract",
@@ -7141,7 +7141,7 @@ dependencies = [
 
 [[package]]
 name = "tools-vision-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -7169,7 +7169,7 @@ dependencies = [
 
 [[package]]
 name = "tools-window-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "platform-contract",
@@ -7185,7 +7185,7 @@ dependencies = [
 
 [[package]]
 name = "tools-window-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "safety-broker-contract",
@@ -7197,7 +7197,7 @@ dependencies = [
 
 [[package]]
 name = "tools-window-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "compliance-contract",
@@ -7463,7 +7463,7 @@ dependencies = [
 
 [[package]]
 name = "transfer-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "chrono",
@@ -7485,7 +7485,7 @@ dependencies = [
 
 [[package]]
 name = "transfer-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-fake",
@@ -7500,7 +7500,7 @@ dependencies = [
 
 [[package]]
 name = "transfer-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "accounts-hub-contract",
  "accounts-hub-fake",
@@ -7539,7 +7539,7 @@ dependencies = [
 
 [[package]]
 name = "triggers-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7555,7 +7555,7 @@ dependencies = [
 
 [[package]]
 name = "triggers-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7569,7 +7569,7 @@ dependencies = [
 
 [[package]]
 name = "triggers-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "agent-backends-contract",
  "agent-backends-fake",
@@ -7613,7 +7613,7 @@ checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 
 [[package]]
 name = "ui-terminal-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "serde",
@@ -7622,7 +7622,7 @@ dependencies = [
 
 [[package]]
 name = "ui-terminal-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "ui-terminal-contract",
@@ -7630,7 +7630,7 @@ dependencies = [
 
 [[package]]
 name = "ui-terminal-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "core-bus-fake",
@@ -7650,7 +7650,7 @@ checksum = "eaea85b334db583fe3274d12b4cd1880032beab409c0d774be044d4480ab9a94"
 
 [[package]]
 name = "undo-journal-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "platform-contract",
@@ -7664,7 +7664,7 @@ dependencies = [
 
 [[package]]
 name = "undo-journal-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "platform-contract",
@@ -7674,7 +7674,7 @@ dependencies = [
 
 [[package]]
 name = "undo-journal-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -7764,7 +7764,7 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "updater-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7777,7 +7777,7 @@ dependencies = [
 
 [[package]]
 name = "updater-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7790,7 +7790,7 @@ dependencies = [
 
 [[package]]
 name = "updater-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7869,7 +7869,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "voice-audio-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "personas-contract",
@@ -7883,7 +7883,7 @@ dependencies = [
 
 [[package]]
 name = "voice-audio-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "personas-contract",
  "voice-audio-contract",
@@ -7891,7 +7891,7 @@ dependencies = [
 
 [[package]]
 name = "voice-audio-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -7906,7 +7906,7 @@ dependencies = [
 
 [[package]]
 name = "voice-cmd-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "personas-contract",
@@ -7918,14 +7918,14 @@ dependencies = [
 
 [[package]]
 name = "voice-cmd-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "voice-cmd-contract",
 ]
 
 [[package]]
 name = "voice-cmd-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-registry-contract",
  "personas-contract",
@@ -7935,7 +7935,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dialog-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "personas-contract",
@@ -7948,7 +7948,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dialog-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "personas-contract",
  "voice-cmd-contract",
@@ -7957,7 +7957,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dialog-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-registry-contract",
  "personas-contract",
@@ -7969,7 +7969,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dictation-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "personas-contract",
@@ -7982,7 +7982,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dictation-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "platform-contract",
  "voice-dictation-contract",
@@ -7990,7 +7990,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dictation-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8014,7 +8014,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dsp-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "schemars",
@@ -8026,7 +8026,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dsp-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "voice-audio-contract",
  "voice-dsp-contract",
@@ -8034,7 +8034,7 @@ dependencies = [
 
 [[package]]
 name = "voice-dsp-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8051,7 +8051,7 @@ dependencies = [
 
 [[package]]
 name = "voice-persona-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "personas-contract",
@@ -8063,14 +8063,14 @@ dependencies = [
 
 [[package]]
 name = "voice-persona-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "voice-persona-contract",
 ]
 
 [[package]]
 name = "voice-persona-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-registry-contract",
  "proptest",
@@ -8079,7 +8079,7 @@ dependencies = [
 
 [[package]]
 name = "voice-pipeline-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8099,7 +8099,7 @@ dependencies = [
 
 [[package]]
 name = "voice-pipeline-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8112,7 +8112,7 @@ dependencies = [
 
 [[package]]
 name = "voice-pipeline-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8160,7 +8160,7 @@ dependencies = [
 
 [[package]]
 name = "voice-readaloud-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8175,7 +8175,7 @@ dependencies = [
 
 [[package]]
 name = "voice-readaloud-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "personas-contract",
@@ -8186,7 +8186,7 @@ dependencies = [
 
 [[package]]
 name = "voice-readaloud-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8208,7 +8208,7 @@ dependencies = [
 
 [[package]]
 name = "voice-s2s-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8223,7 +8223,7 @@ dependencies = [
 
 [[package]]
 name = "voice-s2s-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "personas-contract",
@@ -8235,7 +8235,7 @@ dependencies = [
 
 [[package]]
 name = "voice-speaker-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "risk-classifier-contract",
@@ -8247,7 +8247,7 @@ dependencies = [
 
 [[package]]
 name = "voice-speaker-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "risk-classifier-contract",
  "voice-audio-contract",
@@ -8256,7 +8256,7 @@ dependencies = [
 
 [[package]]
 name = "voice-speaker-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "chacha20poly1305",
@@ -8284,7 +8284,7 @@ dependencies = [
 
 [[package]]
 name = "voice-stt-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8300,7 +8300,7 @@ dependencies = [
 
 [[package]]
 name = "voice-stt-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "device-profile-contract",
@@ -8311,7 +8311,7 @@ dependencies = [
 
 [[package]]
 name = "voice-stt-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -8333,7 +8333,7 @@ dependencies = [
 
 [[package]]
 name = "voice-tts-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8349,7 +8349,7 @@ dependencies = [
 
 [[package]]
 name = "voice-tts-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "personas-contract",
@@ -8360,7 +8360,7 @@ dependencies = [
 
 [[package]]
 name = "voice-tts-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -8383,7 +8383,7 @@ dependencies = [
 
 [[package]]
 name = "voice-turn-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "schemars",
@@ -8394,14 +8394,14 @@ dependencies = [
 
 [[package]]
 name = "voice-turn-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "voice-turn-contract",
 ]
 
 [[package]]
 name = "voice-turn-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "base64 0.22.1",
  "core-registry-contract",
@@ -8414,7 +8414,7 @@ dependencies = [
 
 [[package]]
 name = "voice-vad-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "schemars",
@@ -8427,7 +8427,7 @@ dependencies = [
 
 [[package]]
 name = "voice-vad-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "voice-audio-contract",
  "voice-dsp-contract",
@@ -8437,7 +8437,7 @@ dependencies = [
 
 [[package]]
 name = "voice-vad-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8455,7 +8455,7 @@ dependencies = [
 
 [[package]]
 name = "voice-wake-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "core-bus-contract",
  "personas-contract",
@@ -8471,7 +8471,7 @@ dependencies = [
 
 [[package]]
 name = "voice-wake-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "personas-contract",
  "platform-contract",
@@ -8480,7 +8480,7 @@ dependencies = [
 
 [[package]]
 name = "voice-wake-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8929,7 +8929,7 @@ dependencies = [
 
 [[package]]
 name = "watchdog-contract"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",
@@ -8943,7 +8943,7 @@ dependencies = [
 
 [[package]]
 name = "watchdog-fake"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "platform-contract",
@@ -8953,7 +8953,7 @@ dependencies = [
 
 [[package]]
 name = "watchdog-impl"
-version = "0.0.64"
+version = "0.0.65"
 dependencies = [
  "async-trait",
  "core-bus-contract",

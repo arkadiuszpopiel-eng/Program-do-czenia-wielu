@@ -12,6 +12,41 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.65 — 2026-10-20
+
+Seria 6: kanwa artefaktów, Arena (dwa modele obok siebie), „Naucz Alfę”, karty rozmów, edycja ustawień kont dla
+firm, karty graficzne w modułach głosu — oraz naprawa regresji obowiązków agentek na modelu lokalnym z 0.0.64.
+
+### Rozmowa
+
+- Kanwa artefaktów: Markdown, HTML i SVG z odpowiedzi otwierasz obok rozmowy („Otwórz w kanwie”) — podgląd
+  i źródło, kopia, zapis; HTML i SVG w izolowanej ramce bez skryptów i bez dostępu do programu.
+- Arena: ta sama prośba do dwóch modeli naraz, odpowiedzi obok siebie z czasem, tokenami i kosztem; „Wybierz tę
+  odpowiedź” ustawia wybraną gałąź (historia się nie zmienia).
+- „Naucz Alfę”: wiedza z tekstu, pliku (txt, md, pdf, docx) albo tej rozmowy trafia do pamięci ze źródłem;
+  treść z zewnątrz jest danymi, nigdy poleceniami.
+- Karty rozmów: w panelu Sesje widok kart (obsada, ostatnia wiadomość, model, koszt) obok listy.
+
+### Konta i karty graficzne
+
+- Konta dla firm: organizację, projekt (OpenAI) i wdrożenia (Azure) zmienisz na istniejącym koncie.
+- Moduły mowy zajmują pamięć tej karty, na której naprawdę pracują (budżet pamięci na kartę z 0.0.64).
+
+### Poprawki
+
+- [poważne] Obowiązki agentek na modelu lokalnym kończyły się „wykryciem pętli”: zadania z arkuszem faktów
+  dostawały narzędzie przekazania zadania, choć ich polecenie tego zabrania, a koperta JSON z 0.0.64 kazała małemu
+  modelowi wypełniać je w każdej turze. Takie zadania nie dostają już narzędzia przekazania; argumenty narzędzi są
+  sprawdzane schematem samego narzędzia (nadmiarowe pole od modelu nie odrzuca wywołania).
+- Zmiana nazwy aktywnej rozmowy nie znika już przez dwa pola edycji naraz; kontrast przycisków w stylach „next”
+  i „szkło” (jasne); pasek tytułu w wąskim oknie bez nachodzących przycisków.
+
+### Testy
+
+- Rdzeń: przyczyna regresji obowiązków potwierdzona na prawdziwym modelu (Bielik 4.5B), testy regresji
+  w zadaniach, schemacie narzędzi i wykrywaniu pętli; Arena, karty, „Naucz”, kanwa, ustawienia firm, karty mowy.
+- Interfejs: nowe okna i widoki w trzech stylach i dwóch motywach; prawdziwa aplikacja — kolejne polecenia rdzenia.
+
 ## 0.0.64 — 2026-10-18
 
 Seria 5 (10 punktów, praca na laptopie): tekst z PDF dla modelu, poprawny JSON wywołań narzędzi w modelu lokalnym,
