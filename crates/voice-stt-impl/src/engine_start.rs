@@ -31,7 +31,12 @@ impl WhisperStt {
             ram_mb: 600,
             cpu_ram_mb: 1_500,
             idle_unload_ms: self.config.idle_unload_ms,
-            gpu: None,
+            // Na procesorze bez karty; na GPU — karta backendu (C6.6).
+            gpu: if backend == Backend::Cpu {
+                None
+            } else {
+                self.card(backend)
+            },
         }
     }
 

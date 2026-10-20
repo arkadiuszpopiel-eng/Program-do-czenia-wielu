@@ -20,7 +20,7 @@ use core_registry_contract::{
     HealthStatus, ManifestError, Module, ModuleContext, ModuleError, ModuleManifest,
 };
 use model_residency_contract::{
-    LeaseId, LeaseRequest, ModelRole, Placement, Priority, Residency, ResidencyError,
+    GpuId, LeaseId, LeaseRequest, ModelRole, Placement, Priority, Residency, ResidencyError,
 };
 pub use service::TtsService;
 use voice_tts_contract::TtsEvent;
@@ -28,7 +28,36 @@ use voice_tts_contract::TtsEvent;
 /// Treść `module.toml`.
 pub const MODULE_TOML: &str = include_str!("../module.toml");
 
-/// Dzierżawa modelu TTS na CPU (Pocket TTS PL ≈ 0,5–1,5 GB RAM), zwalniana przy `drop`.
+/// Żądanie dzierżawy głosu (priorytet głosu, wyładowanie po bezczynności). `dml` — numer adaptera
+/// DXGI, na którym Supertonic liczy przez DirectML (`--dml <n>`, ten sam co `GpuInfo::id`): wtedy
+/// dzierżawa zajmuje `vram_mb` w puli tej karty (C6.6) i tylko z wolnego miejsca (`GpuIfFree`);
+/// `None` — procesor (`ram_mb` w RAM), bez karty.
+pub fn tts_lease_request(
+    model: &str,
+    ram_mb: u32,
+    idle_unload_ms: u64,
+    dml: Option<u32>,
+    vram_mb: u32,
+) -> LeaseRequest {
+    LeaseRequest {
+        owner: "voice-tts".into(),
+        model: model.into(),
+        role: ModelRole::Tts,
+        priority: Priority::VoiceRt,
+        placement: if dml.is_some() {
+            Placement::GpuIfFree
+        } else {
+            Placement::CpuOnly
+        },
+        vram_mb: if dml.is_some() { vram_mb } else { 0 },
+        ram_mb: 0,
+        cpu_ram_mb: ram_mb,
+        idle_unload_ms,
+        gpu: dml.map(GpuId),
+    }
+}
+
+/// Dzierżawa modelu TTS (Pocket TTS PL ≈ 0,5–1,5 GB RAM), zwalniana przy `drop`.
 pub struct TtsLease {
     residency: Arc<dyn Residency>,
     id: LeaseId,
@@ -42,18 +71,17 @@ impl TtsLease {
         ram_mb: u32,
         idle_unload_ms: u64,
     ) -> Result<Self, ResidencyError> {
-        let request = LeaseRequest {
-            owner: "voice-tts".into(),
-            model: model.into(),
-            role: ModelRole::Tts,
-            priority: Priority::VoiceRt,
-            placement: Placement::CpuOnly,
-            vram_mb: 0,
-            ram_mb: 0,
-            cpu_ram_mb: ram_mb,
-            idle_unload_ms,
-            gpu: None,
-        };
+        Self::acquire_request(
+            residency,
+            tts_lease_request(model, ram_mb, idle_unload_ms, None, 0),
+        )
+    }
+
+    /// Zgłasza model z gotowego żądania ([`tts_lease_request`], np. głos na karcie przez DirectML).
+    pub fn acquire_request(
+        residency: Arc<dyn Residency>,
+        request: LeaseRequest,
+    ) -> Result<Self, ResidencyError> {
         let grant = residency.acquire(request)?;
         Ok(Self {
             residency,

@@ -12,7 +12,7 @@ use device_profile_contract::DeviceProfile;
 use device_profile_fake::FakeDeviceProfile;
 use futures_util::StreamExt;
 use model_residency_contract::{
-    Budget, LeaseId, LeaseRequest, ModelRole, Placement, Priority, Residency,
+    Budget, GpuId, GpuLayout, LeaseId, LeaseRequest, ModelRole, Placement, Priority, Residency,
 };
 use model_residency_fake::FakeResidency;
 use providers_contract::{CancellationToken, ChatRequest, Message, ModelProvider, ProviderEvent};
@@ -83,7 +83,9 @@ pub fn laptop_with(
     let device = Arc::new(FakeDeviceProfile::laptop());
     let budget = Budget::from_device(&device.recommend().residency);
     assert_eq!(budget.vram_mb, VRAM_BUDGET);
-    let residency = Arc::new(FakeResidency::new(budget));
+    // Pule kart jak w aplikacji (C6.6): RTX 4050 (karta 1) główna, Iris Xe (karta 0) w RAM.
+    let gpus = GpuLayout::from_profile(&device.current());
+    let residency = Arc::new(FakeResidency::with_gpus(budget, gpus));
     let model = bielik(model);
     super::install(&env.models(), &model);
     for dir in installed {
@@ -159,7 +161,11 @@ impl Laptop {
     }
 }
 
-/// Żądanie dzierżawy STT `whisper-server` CUDA (`voice-stt-impl::WhisperStt::lease_request`).
+/// Karta RTX 4050 laptopa (`GpuInfo::id` z profilu).
+pub const RTX: GpuId = GpuId(1);
+
+/// Żądanie dzierżawy STT `whisper-server` CUDA (`voice-stt-impl::WhisperStt::lease_request`,
+/// karta CUDA z profilu — RTX).
 pub fn stt_lease() -> LeaseRequest {
     LeaseRequest {
         owner: "voice-stt".into(),
@@ -171,7 +177,7 @@ pub fn stt_lease() -> LeaseRequest {
         ram_mb: 600,
         cpu_ram_mb: 1_500,
         idle_unload_ms: 600_000,
-        gpu: None,
+        gpu: Some(RTX),
     }
 }
 

@@ -9,7 +9,7 @@
 
 use std::fmt;
 
-use device_profile_contract::{DESKTOP_RESERVE_MB, GpuInfo, Profile};
+use device_profile_contract::{Backend, DESKTOP_RESERVE_MB, GpuInfo, Profile};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -170,6 +170,44 @@ impl GpuLayout {
         });
         self
     }
+}
+
+/// Karta, na której liczy silnik z backendem `backend` — klucz [`crate::LeaseRequest::gpu`]
+/// (C6.6). Ta sama decyzja, która wybiera kartę silnika: karta przypięta po nazwie (`--device`
+/// `llama-server` dopasowany po nazwie, karta z konfiguracji), inaczej karta główna profilu, gdy
+/// obsługuje backend (Qwen3-ASR i model rozmowy na głównej, CUDA na laptopie z RTX), inaczej
+/// największa karta z tym backendem (np. CUDA przy karcie głównej AMD). Procesor albo maszyna bez
+/// kart — `None` (dzierżawa na CPU albo na karcie głównej, jak dotąd).
+pub fn card_for(profile: &Profile, backend: Backend, name: Option<&str>) -> Option<GpuId> {
+    if backend == Backend::Cpu {
+        return None;
+    }
+    let named = name.map(str::trim).filter(|n| !n.is_empty()).and_then(|n| {
+        profile
+            .gpus
+            .iter()
+            .find(|g| g.name.trim().eq_ignore_ascii_case(n))
+    });
+    if let Some(gpu) = named {
+        return Some(GpuId::of(gpu));
+    }
+    let primary = profile.primary_gpu();
+    if let Some(gpu) = primary.filter(|g| g.backends.contains(&backend)) {
+        return Some(GpuId::of(gpu));
+    }
+    profile
+        .gpus
+        .iter()
+        .filter(|g| g.backends.contains(&backend))
+        .max_by_key(|g| {
+            (
+                u8::from(g.has_memory_pool()),
+                g.vram_mb,
+                std::cmp::Reverse(g.id),
+            )
+        })
+        .or(primary)
+        .map(GpuId::of)
 }
 
 /// Stan jednej karty w migawce.

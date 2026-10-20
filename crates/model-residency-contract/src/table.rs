@@ -60,6 +60,11 @@ impl LeaseTable {
         }
     }
 
+    /// Budżet karty głównej i RAM ze sprzętu (bez emulacji) — do porównania przy zmianie sprzętu.
+    pub fn base_budget(&self) -> Budget {
+        self.base
+    }
+
     /// Karty maszyny (bez emulacji).
     pub fn gpus(&self) -> &GpuLayout {
         &self.gpus

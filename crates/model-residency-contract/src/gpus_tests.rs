@@ -1,7 +1,7 @@
 //! Pule kart z profilu urządzenia: jedna karta, dwie osobne, karta zintegrowana obok osobnej
 //! (laptop), APU z małą i z dużą rezerwą z BIOS-u, karta bez backendu.
 
-use device_profile_contract::{GpuInfo, GpuVendor, Profile, fixtures};
+use device_profile_contract::{Backend, GpuInfo, GpuVendor, Profile, fixtures};
 
 use super::*;
 
@@ -229,4 +229,57 @@ fn other_card_pool_matches_primary_budget_rule() {
         compared += 1;
     }
     assert!(compared >= 12, "porównano tylko {compared}");
+}
+
+/// Karta silnika (C6.6): laptop (Intel UHD 0 + RTX 4050 1) — CUDA i Vulkan na RTX, nazwa karty
+/// przypiętej wygrywa; dwie karty AMD + NVIDIA — CUDA na NVIDIA, Vulkan na głównej; procesor
+/// i maszyna bez kart — bez karty.
+#[test]
+fn engine_card_follows_the_engine_choice() {
+    let laptop = with_gpus(
+        fixtures::laptop(),
+        vec![
+            card(0, "Intel(R) UHD Graphics", GpuVendor::Intel, 128, true),
+            card(
+                1,
+                "NVIDIA GeForce RTX 4050 Laptop GPU",
+                GpuVendor::Nvidia,
+                6_141,
+                false,
+            ),
+        ],
+    );
+    assert_eq!(card_for(&laptop, Backend::Cuda, None), Some(GpuId(1)));
+    assert_eq!(card_for(&laptop, Backend::Vulkan, None), Some(GpuId(1)));
+    assert_eq!(card_for(&laptop, Backend::Cpu, None), None);
+    assert_eq!(
+        card_for(&laptop, Backend::Vulkan, Some(" intel(r) uhd graphics ")),
+        Some(GpuId(0))
+    );
+    // Nazwa nieznana — jak bez przypięcia.
+    assert_eq!(
+        card_for(&laptop, Backend::Vulkan, Some("Inna karta")),
+        Some(GpuId(1))
+    );
+    let mixed = with_gpus(
+        fixtures::desktop(),
+        vec![
+            card(0, "AMD Radeon RX 9070 XT", GpuVendor::Amd, 16_304, false),
+            card(
+                1,
+                "NVIDIA GeForce RTX 3060",
+                GpuVendor::Nvidia,
+                12_288,
+                false,
+            ),
+        ],
+    );
+    assert_eq!(card_for(&mixed, Backend::Vulkan, None), Some(GpuId(0)));
+    assert_eq!(card_for(&mixed, Backend::Cuda, None), Some(GpuId(1)));
+    // Jedna karta: zawsze ona (także backend, którego nie ma — wtedy i tak karta główna).
+    let desktop = fixtures::desktop();
+    let primary = desktop.primary_gpu().map(GpuId::of);
+    assert_eq!(card_for(&desktop, Backend::Vulkan, None), primary);
+    assert_eq!(card_for(&desktop, Backend::Cuda, None), primary);
+    assert_eq!(card_for(&fixtures::no_gpu(), Backend::Cuda, None), None);
 }

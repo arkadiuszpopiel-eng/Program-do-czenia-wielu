@@ -83,14 +83,34 @@ impl ResidencyManager {
     /// dotyczy karty głównej i RAM), osobnymi pulami pozostałych kart z profilu
     /// ([`GpuLayout::from_profile`]) i trybem z bieżących sygnałów (pełny ekran, bateria).
     pub fn from_device(device: Arc<dyn DeviceProfile>, config: &ResidencyConfig) -> Self {
-        let budget = config.budget(&device.recommend().residency);
-        let gpus = GpuLayout::from_profile(&device.current());
+        let (budget, gpus) = config.hardware(device.as_ref());
         if !gpus.others.is_empty() {
             tracing::info!(główna = %gpus.primary, pozostałe = ?gpus.others, "osobne pule pamięci kart");
         }
         let manager = Self::with_gpus(budget, gpus, Arc::new(MonotonicClock::new()));
         manager.refresh_mode(&config.signals(DeviceSignals(device)));
         manager
+    }
+
+    /// Zmiana sprzętu (C6.6): budżet karty głównej i RAM oraz karty z profilu urządzenia; gdy
+    /// różnią się od obowiązujących — [`Residency::set_hardware`] (pule przeliczone, dzierżawy na
+    /// kartach, których już nie ma, odebrane). `None` — sprzęt bez zmian (nic nie robi).
+    pub fn sync_hardware(
+        &self,
+        device: &dyn DeviceProfile,
+        config: &ResidencyConfig,
+    ) -> Option<Vec<Change>> {
+        let (budget, gpus) = config.hardware(device);
+        let gpus = gpus.normalized();
+        {
+            let t = self.table();
+            if t.base_budget() == budget && *t.gpus() == gpus {
+                return None;
+            }
+        }
+        tracing::info!(?budget, główna = %gpus.primary, pozostałe = ?gpus.others,
+            "zmiana sprzętu: nowe pule pamięci kart");
+        Some(self.set_hardware(budget, gpus))
     }
 
     /// Podłącza kolejkę zdarzeń (moduł przekazuje je na magistralę w kolejności).

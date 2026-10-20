@@ -33,7 +33,7 @@ pub use events::{
     EVENT_BUDGET_EXCEEDED, EVENT_EVICTED, EVENT_GRANTED, EVENT_MODE_CHANGED, EVENT_MOVED,
     EVENT_OOM_AVOIDED, EVENT_RELEASED, ResidencyEvent, event_kind,
 };
-pub use gpus::{GpuId, GpuLayout, GpuPool, GpuState};
+pub use gpus::{GpuId, GpuLayout, GpuPool, GpuState, card_for};
 pub use pools::Pools;
 pub use select::{Plan, exclusive_conflicts, fits, plan, shrink_victims, total, yields_to};
 pub use table::{Change, LeaseTable};

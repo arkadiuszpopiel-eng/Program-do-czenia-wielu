@@ -14,6 +14,7 @@ device-profile-contract = { path = "../device-profile-contract" }
 core-bus-contract.workspace = true
 core-registry-contract.workspace = true
 async-trait.workspace = true
+futures-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true
