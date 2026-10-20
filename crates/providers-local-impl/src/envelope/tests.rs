@@ -50,8 +50,10 @@ fn run_with(
 }
 
 fn run(chunks: &[&str], reason: &str) -> Vec<ProviderEvent> {
-    let schemas = BTreeMap::from([("pogoda".to_owned(), schema::tool_parameters(&weather()))]);
-    run_with(Some(schemas), chunks, reason)
+    // Jak w aplikacji: walidacja schematem narzędzia (bez domykania gramatyki).
+    let mut req = ChatRequest::new("m", Vec::new());
+    req.tools = vec![weather()];
+    run_with(Some(schemas(&req)), chunks, reason)
 }
 
 fn text(events: &[ProviderEvent]) -> String {
@@ -178,6 +180,17 @@ fn schema_violation_and_broken_json_become_invalid_arguments() {
     assert!(
         error.contains("schematem") && error.contains("miasto"),
         "{error}"
+    );
+    // Nieszkodliwe dodatkowe pole (schemat narzędzia go nie zabrania) — wywołanie przechodzi.
+    let events = run(
+        &[
+            r#"{"response": "", "tool_call": {"name": "pogoda", "parameters": {"miasto": "Ełk", "kraj": "PL"}}}"#,
+        ],
+        "stop",
+    );
+    assert!(
+        matches!(call(&events), Some((_, ToolArguments::Parsed { .. }))),
+        "{events:?}"
     );
     // Ucięte limitem tokenów w wywołaniu: tekst wyszedł, nazwa odzyskana, argumenty niepoprawne.
     let events = run(

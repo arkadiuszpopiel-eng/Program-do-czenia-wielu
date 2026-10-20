@@ -15,6 +15,7 @@
 mod app;
 pub mod bridge;
 pub mod bridge_view;
+mod brief;
 mod delegate;
 mod exec_agent;
 mod exec_bridge;

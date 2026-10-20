@@ -67,6 +67,9 @@ komputer jest bezczynny** i **budżet zadania**: najwięcej kroków, najdłuższ
 przekroczą polityki Marszałka. Lista ma włącznik, „Uruchom teraz”,
 „Usuń” i dziennik uruchomień. Wyzwalacz **nigdy nie uruchomi mostu CLI** bez Twojej zgody na karcie mostu.
 
+Zadanie uruchomione wyzwalaczem albo harmonogramem dostaje aktualne dane z programu (zadania, wyzwalacze, koszty,
+katalog roboczy) i wykonuje je jedna agentka — **bez przekazywania innym agentkom**. Wynikiem jest gotowy raport.
+
 ## Marszałek — reguły, które tylko ograniczają
 
 **Ustawienia → Reguły Marszałka.** Opisz słowami, czego agentkom nie wolno, np. „po 22:00 bez poleceń w terminalu”.

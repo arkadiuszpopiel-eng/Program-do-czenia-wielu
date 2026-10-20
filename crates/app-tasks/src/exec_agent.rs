@@ -202,22 +202,16 @@ pub(crate) async fn run(
             };
             let goal = goal_of(&d);
             // Zadanie w tle dostaje stan programu razem z poleceniem — bez niego zmyśla dane.
-            let brief = match crate::facts::wants_facts(&d) {
-                true => match deps.host.facts(&session, d.task.as_str()).await {
-                    Some(sheet) => format!(
-                        "{goal}
-
-{sheet}"
-                    ),
-                    None => goal.clone(),
-                },
-                false => goal.clone(),
+            let sheet = match crate::facts::wants_facts(&d) {
+                true => deps.host.facts(&session, d.task.as_str()).await,
+                false => None,
             };
+            let (brief, run_roles) = crate::brief::brief_and_roles(&goal, sheet, &roles);
             let mut spec = run_spec(
                 SpecInput {
                     session: session.clone(),
                     persona,
-                    roles: roles.clone(),
+                    roles: run_roles,
                     goal: brief,
                     origin: origin_of(&d),
                     model: choice.model.clone(),

@@ -143,3 +143,34 @@ async fn valid_calls_of_the_same_turn_still_run() {
     assert!(got[1].is_error && got[1].tool_use_id == "b");
     assert!(result_text(&got[1]).contains("is not of type"));
 }
+
+/// Regresja 0.0.64 (próba obowiązków): odrzucone wywołania nie liczą się do wykrywania pętli —
+/// model, który kilka razy z rzędu poda te same złe argumenty, nadal może się poprawić.
+#[tokio::test(start_paused = true)]
+async fn rejected_calls_do_not_count_as_loop_repeats() {
+    let w = world();
+    for id in ["z1", "z2", "z3", "z4"] {
+        let broken = ToolArguments::from_raw("{\"path\": \"/Users/ala/Documents/a.txt\", \"conte");
+        w.provider.push_script(turn(&[(id, "fs_write", broken)]));
+    }
+    w.provider.push_script(call(
+        "ok",
+        "fs_write",
+        json!({"path": "/Users/ala/Documents/a.txt", "content": "x"}),
+    ));
+    w.provider.push_script(answer("Zapisałam."));
+    let run = w.runtime.start(spec()).await.unwrap();
+    let outcome = w.runtime.wait(&run).await.unwrap();
+    assert!(
+        matches!(outcome, RunOutcome::Completed { .. }),
+        "{outcome:?}"
+    );
+    assert_eq!(w.fs.calls(FsToolKind::Write).len(), 1);
+    let events = w.runtime.events(&run).unwrap();
+    assert!(
+        !events
+            .iter()
+            .any(|e| matches!(&e.event, RunEvent::LoopDetected { .. })),
+        "odrzucenia nie są powtórzeniami"
+    );
+}

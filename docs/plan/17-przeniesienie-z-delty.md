@@ -240,6 +240,13 @@ w 3 min 8 s — raporty zgodne z danymi; „Kontrola kosztów” po doprecyzowan
 zgodne z danymi. Próba ujawniła i pozwoliła naprawić błąd tworzenia drugiego wyzwalacza o tej samej nazwie po
 restarcie programu.
 
+Od 0.0.64 zadanie w tle z arkuszem faktów (każde nieskażone zadanie z wyzwalacza albo harmonogramu, nie tylko
+gotowe obowiązki) biegnie **bez delegacji**: role zostają, ale bez grupy narzędzi `delegate`, a polecenie mówi
+wprost, że delegowanie jest niedostępne (`crates/app-tasks/src/brief.rs`). Powód: próba 0.0.64 — mały model
+lokalny w kopercie JSON wywoływał delegację w każdej turze aż do `LoopDetected`; forma raportu i tak zabrania
+przekazywania zadania. Gdy przebieg nie ma żadnych narzędzi, koperta JSON jest wyłączona. Obowiązek wymagający
+delegacji (np. „co poniedziałek niech Beta zbada X”) wymaga osobnej decyzji.
+
 Zostaje w P14: koszty z poszczególnych dni (do porównań tygodni), krótszy krok sprawdzania odpowiedzi przez drugą
 agentkę na lokalnym modelu (dziś to większość czasu obowiązku), ekran „Obowiązki”, poczta, kalendarz, budżet
 obowiązku i raport z wykonania. Zmiana poleceń wzorów wymaga powtórzenia próby na modelu
