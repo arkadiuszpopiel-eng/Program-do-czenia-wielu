@@ -78,6 +78,7 @@ import type { TemplatesApi } from './client-templates';
 import type { DataRoutesApi } from './client-routes';
 import type { HelpApi } from './client-help';
 import type { BoardApi } from './client-board';
+import type { SessionCardsApi } from './client-session-cards';
 import type { EnginesApi } from './client-models';
 import type { AttachmentsApi, BackupsApi, ConversationExportApi } from './client-files';
 import type {
@@ -103,7 +104,7 @@ export interface AppApi {
   setActiveSession(sessionId: string | null): Promise<void>;
 }
 
-export interface SessionsApi {
+export interface SessionsApi extends SessionCardsApi {
   list(): Promise<readonly SessionSummary[]>;
   create(template: SessionTemplate): Promise<SessionSummary>;
   rename(sessionId: string, title: string): Promise<void>;

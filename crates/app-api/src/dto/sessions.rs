@@ -73,6 +73,23 @@ pub struct SessionSearchHit {
     pub turn_id: Option<String>,
 }
 
+/// Karta rozmowy z profilem (P4, widok „Karty” panelu Sesje): dane spoza [`SessionSummary`]
+/// liczone z historii — agentki, ostatnia wiadomość jako czysty tekst, model i koszt.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct SessionCard {
+    pub session_id: String,
+    /// Agentki, które odpowiadały (bez odpowiedzi — obsada sesji); bez powtórzeń, do 4.
+    pub agents: Vec<String>,
+    /// Ostatnia widoczna wiadomość jako czysty tekst (bez Markdownu i HTML, do 160 znaków).
+    pub snippet: Option<String>,
+    /// Autor ostatniej wiadomości: `user` albo identyfikator agentki.
+    pub snippet_author: Option<String>,
+    /// Model ostatniej odpowiedzi.
+    pub model: Option<String>,
+    /// Łączny koszt rozmowy (USD, centy w górę); `None` — brak kosztu (np. model lokalny).
+    pub cost: Option<Money>,
+}
+
 /// Stan tury w widoku.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]

@@ -926,6 +926,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sessions-contract",
+ "sessions-fake",
  "tempfile",
  "tokio",
  "toml",

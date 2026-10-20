@@ -37,6 +37,7 @@ export class TauriAlfaClient implements AlfaClient {
     duplicateAsTemplate: (sessionId) => call('sessions_duplicate_as_template', { sessionId }),
     exportSession: (sessionId) => call('sessions_export', { sessionId }),
     search: (query) => call('sessions_search', { query }),
+    cards: (sessionIds) => call('sessions_cards', { sessionIds }),
     markRead: (sessionId) => call('sessions_mark_read', { sessionId }),
     getDraft: (sessionId) => call('sessions_get_draft', { sessionId }),
     saveDraft: (sessionId, text) => call('sessions_save_draft', { sessionId, text }),

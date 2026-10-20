@@ -5,10 +5,14 @@
   import Search from '@lucide/svelte/icons/search';
   import PanelLeftClose from '@lucide/svelte/icons/panel-left-close';
   import Archive from '@lucide/svelte/icons/archive';
+  import List from '@lucide/svelte/icons/list';
+  import LayoutGrid from '@lucide/svelte/icons/layout-grid';
   import { load } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import type { SessionGroup } from '../../state/sessions.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import SessionRow from './SessionRow.svelte';
+  import SessionCards from './SessionCards.svelte';
 
   interface Props {
     /** Panel jako szuflada / arkusz — bez przycisku zwijania do paska ikon. */
@@ -49,6 +53,8 @@
     return () => clearTimeout(handle);
   });
 
+  const cardsTitle = (group: SessionGroup) => groupTitle(group.kind, group.project?.name);
+
   function groupTitle(kind: string, name: string | undefined): string {
     if (kind === 'pinned') return t('sessions.pinned');
     if (kind === 'archived') return t('sessions.archived');
@@ -60,6 +66,24 @@
 <nav class="sessions" aria-label={t('sessions.title')}>
   <div class="head">
     <h2 class="title">{t('sessions.title')}</h2>
+    <div class="view" role="group" aria-label={t('sessions.view')}>
+      <IconButton
+        label={t('sessions.view.list')}
+        size="sm"
+        pressed={sessions.view === 'list'}
+        onclick={() => sessions.setView('list')}
+      >
+        <List size={16} strokeWidth={1.5} />
+      </IconButton>
+      <IconButton
+        label={t('sessions.view.cards')}
+        size="sm"
+        pressed={sessions.view === 'cards'}
+        onclick={() => sessions.setView('cards')}
+      >
+        <LayoutGrid size={16} strokeWidth={1.5} />
+      </IconButton>
+    </div>
     <IconButton
       label={t('sessions.new')}
       size="sm"
@@ -129,6 +153,8 @@
       <p class="meta">{t('sessions.empty')}</p>
     {:else if sessions.groups.length === 0}
       <p class="meta">{t('sessions.periodEmpty')}</p>
+    {:else if sessions.view === 'cards'}
+      <SessionCards groups={sessions.groups} title={cardsTitle} />
     {:else}
       {#each sessions.groups as group (group.id)}
         <section class="group" aria-labelledby="grp-{group.id}">
@@ -179,6 +205,10 @@
     align-items: center;
     gap: var(--alfa-space-1);
     padding: var(--alfa-space-2) var(--alfa-space-2) var(--alfa-space-1) var(--alfa-space-3);
+  }
+  .view {
+    display: flex;
+    gap: 2px;
   }
   .title {
     flex: 1;

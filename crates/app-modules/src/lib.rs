@@ -13,6 +13,7 @@
 //! - [`secrets`] — sejf kluczy baz (`KeyVault`) i źródło kluczy API na magazynie `accounts-hub`;
 //! - [`late`] — późne wiązanie bazy sesji i indeksera (`sessions` ↔ `search`), [`embedder`] —
 //!   lokalny osadzacz leksykalny dla `search`;
+//! - [`session_cards`] — karty rozmów z profilem (obsada, ostatnia wiadomość, model, koszt);
 //! - [`workdir`] — sprawdzenie katalogu roboczego agentek i deny-listy narzędzi z katalogami
 //!   danych Alfy (po rozwiązaniu dowiązań).
 
@@ -37,6 +38,7 @@ pub mod quick_commands;
 pub mod raw_config;
 pub mod route;
 pub mod secrets;
+pub mod session_cards;
 pub mod settings;
 pub mod speech_meter;
 pub mod stt;

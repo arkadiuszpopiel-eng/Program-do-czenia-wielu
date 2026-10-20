@@ -65,6 +65,21 @@ export interface SessionSearchHit {
   readonly turn_id: string | null;
 }
 
+/** Karta rozmowy z profilem (widok „Karty” panelu Sesje; komenda `sessions_cards`). */
+export interface SessionCard {
+  readonly session_id: string;
+  /** Agentki, które odpowiadały (bez odpowiedzi — obsada sesji); do 4. */
+  readonly agents: readonly string[];
+  /** Ostatnia wiadomość jako czysty tekst (zwykły tekst, nie HTML; do 160 znaków). */
+  readonly snippet: string | null;
+  /** `user` albo identyfikator agentki. */
+  readonly snippet_author: string | null;
+  /** Model ostatniej odpowiedzi. */
+  readonly model: string | null;
+  /** Łączny koszt rozmowy; `null` — brak kosztu (np. model lokalny). */
+  readonly cost: Money | null;
+}
+
 // ── Tury (append-only, drzewo gałęzi) ────────────────────────────────────────────────────────────
 
 export type Author = 'user' | AgentId;

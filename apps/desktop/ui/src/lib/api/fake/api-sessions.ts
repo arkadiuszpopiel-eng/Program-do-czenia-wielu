@@ -1,7 +1,8 @@
 // Atrapa: sesje (lista, tworzenie, zmiana nazwy, przypięcie, archiwum, usunięcie z cofnięciem
 // przez 10 s, duplikat, eksport, wyszukiwanie, szkice).
 import type { AlfaClient } from '../client';
-import type { SessionSearchHit, SessionSummary, SessionTemplate } from '../types';
+import { plainSnippet } from '../../logic/session-cards';
+import type { SessionCard, SessionSearchHit, SessionSummary, SessionTemplate } from '../types';
 import type { FakeCore } from './core';
 import { session as makeSession } from './fixtures';
 
@@ -12,6 +13,24 @@ export const TEMPLATE_TITLES: Readonly<Record<SessionTemplate, string>> = {
   voice: 'Asystent głosowy',
   admin: 'Administracja PC',
 };
+
+/** Karta jak w rdzeniu: agentki, które odpowiadały, ostatnia wiadomość, model, łączny koszt. */
+export function fakeCard(core: FakeCore, id: string): SessionCard {
+  const turns = core.turnsOf(id);
+  const agents = [...new Set(turns.flatMap((t) => (t.author === 'user' ? [] : [t.author])))];
+  const last = [...turns].reverse().find((t) => plainSnippet(t.text) !== '');
+  const usage = turns.flatMap((t) => (t.usage ? [t.usage] : []));
+  const minor = usage.reduce((sum, u) => sum + u.cost.minor, 0);
+  const currency = usage[0]?.cost.currency ?? 'USD';
+  return {
+    session_id: id,
+    agents: (agents.length ? agents : ['alfa']).slice(0, 4),
+    snippet: last ? plainSnippet(last.text) : null,
+    snippet_author: last?.author ?? null,
+    model: usage.at(-1)?.model ?? null,
+    cost: minor > 0 ? { minor, currency } : null,
+  };
+}
 
 export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
   const trash = new Map<string, { session: SessionSummary; timer: number }>();
@@ -98,6 +117,13 @@ export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
         : [];
       return core.reply(hits);
     },
+    cards: (ids) =>
+      core.reply(
+        [...new Set(ids)]
+          .filter((id) => core.session(id))
+          .slice(0, 200)
+          .map((id) => fakeCard(core, id)),
+      ),
     markRead: (id) => core.reply(void core.updateSession(id, { unread: false })),
     getDraft: (id) => core.reply(core.drafts[id] ?? ''),
     saveDraft: (id, text) => {

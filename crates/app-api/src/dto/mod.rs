@@ -125,9 +125,9 @@ pub use quick::{
 pub use routes::{DataRoute, DataRoutesView};
 pub use sessions::{
     ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,
-    RiskLevel, SendOptions, SendResult, SessionSearchHit, SessionSummary, SessionTemplate,
-    ThinkingInfo, ToolIcon, ToolStatus, ToolStep, Turn, TurnAnnotation, TurnError, TurnErrorCode,
-    TurnStatus, TurnUsage, TurnsSnapshot, UndoTicket,
+    RiskLevel, SendOptions, SendResult, SessionCard, SessionSearchHit, SessionSummary,
+    SessionTemplate, ThinkingInfo, ToolIcon, ToolStatus, ToolStep, Turn, TurnAnnotation, TurnError,
+    TurnErrorCode, TurnStatus, TurnUsage, TurnsSnapshot, UndoTicket,
 };
 pub use skills::{
     AgentDraft, BuilderAgentInfo, BuilderDryRun, BuilderDryStep, BuilderPolicyView, BuilderPreview,

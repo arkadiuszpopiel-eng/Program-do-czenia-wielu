@@ -106,6 +106,19 @@ pracuje w tle; wyróżnienie — nieprzeczytane odpowiedzi. Menu sesji (prawy pr
 
 Każda sesja ma osobną, zaszyfrowaną bazę i osobną pamięć — agentka w jednej sesji nie widzi treści innej.
 
+### Karty rozmów
+
+Przyciski **Lista** i **Karty** w nagłówku panelu Sesje przełączają widok. Wybór zostaje na tym komputerze — po
+ponownym uruchomieniu panel otwiera się tak, jak go zostawiłeś. Karta pokazuje nazwę rozmowy, awatary agentek,
+które w niej odpowiadały (w nowej rozmowie — obsadę), profil (Lokalny / Hybryda / Chmura) i model ostatniej
+odpowiedzi, początek ostatniej wiadomości jako zwykły tekst (bez formatowania i kodu), czas ostatniej aktywności,
+koszt rozmowy, jeśli był (model lokalny nic nie kosztuje), oraz znaczniki **Przypięta** i **Archiwum**. Menu „…” na
+karcie ma te same pozycje co na liście.
+
+Klawiatura: strzałki przechodzą między kartami (w wąskim oknie karty stoją w jednej kolumnie), `Home` i `End` —
+pierwsza i ostatnia karta, `Enter` otwiera rozmowę, `F2` zmienia nazwę, `Delete` usuwa (z „Cofnij”). Gdy szczegóły
+kart nie dadzą się wczytać, nad kartami pojawia się komunikat z **Ponów**, a karty pokazują to, co jest na liście.
+
 ## Szablony promptów
 
 Często powtarzane prośby zapiszesz jako szablon w Ustawienia → Szablony promptów, ze zmiennymi w podwójnych

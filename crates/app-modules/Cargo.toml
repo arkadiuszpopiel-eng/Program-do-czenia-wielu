@@ -81,6 +81,8 @@ workspace = true
 
 [dev-dependencies]
 compliance-fake = { path = "../compliance-fake" }
+# Karty rozmów (`session_cards`) liczone na atrapie bazy sesji.
+sessions-fake = { path = "../sessions-fake" }
 # Wirtualny zegar w testach miernika poziomu mowy.
 tokio = { workspace = true, features = ["test-util", "macros"] }
 tempfile = "3.27.0"
