@@ -195,6 +195,16 @@ export const enHub = {
   'ent.deploymentAdd': 'Add deployment',
   'ent.deploymentRemove': 'Remove deployment {name}',
   'ent.summary': 'Company account: {summary}',
+  'ent.edit': 'Company settings',
+  'ent.editTitle': 'Company settings — {label}',
+  'ent.editOpenai':
+    'The OpenAI organization and project the key belongs to. Empty field — the key default.',
+  'ent.endpointFixed':
+    'Resource address: {url}. It does not change — add a new account for another resource.',
+  'ent.endpointKept':
+    'The resource address stays the same — add a new account for another resource.',
+  'ent.save': 'Save settings',
+  'ent.saved': 'Saved. Test the connection to confirm the new settings.',
   'ent.err.org_only_openai': 'Organization and project apply to OpenAI accounts only.',
   'ent.err.org_format': 'The organization ID starts with “org-” (entered {subject}).',
   'ent.err.project_format': 'The project ID starts with “proj_” (entered {subject}).',

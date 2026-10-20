@@ -80,6 +80,8 @@ export interface Account {
   readonly auto_model?: string | null;
   /** Konto firmowe: organizacja i projekt OpenAI albo wersja API i wdrożenia Azure OpenAI. */
   readonly enterprise?: EnterpriseSettings;
+  /** Adres konta (Azure: zasób), gdy rdzeń go podaje; brak — adres domyślny dostawcy. */
+  readonly base_url?: string | null;
 }
 
 /** Wdrożenie modelu w zasobie Azure OpenAI: Alfa wybiera model, żądanie idzie na wdrożenie. */

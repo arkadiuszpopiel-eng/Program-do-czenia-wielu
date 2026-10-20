@@ -11,6 +11,7 @@ import {
   isAzureEndpoint,
   maskId,
   parseAzureTarget,
+  settingsToForm,
   type EnterpriseProblem,
 } from '../enterprise';
 import { en } from '../../i18n/en';
@@ -133,5 +134,72 @@ describe('maskowanie i skrót', () => {
     ).toBe('gpt-4o → prod-4o · o3-mini');
     expect(enterpriseSummary({})).toBeNull();
     expect(enterpriseSummary(undefined)).toBeNull();
+  });
+});
+
+describe('edycja istniejącego konta (0.0.65)', () => {
+  it('formularz z ustawień konta, Azure bez wdrożeń dostaje pusty wiersz', () => {
+    expect(settingsToForm('openai', { organization: 'org-A1', project: 'proj_B2' })).toEqual({
+      organization: 'org-A1',
+      project: 'proj_B2',
+      apiVersion: '',
+      deployments: [],
+    });
+    expect(
+      settingsToForm('azure-openai', {
+        api_version: '2025-04-01-preview',
+        deployments: [{ name: 'prod-4o', model: 'gpt-4o' }, { name: 'o3-mini' }],
+      }),
+    ).toEqual({
+      organization: '',
+      project: '',
+      apiVersion: '2025-04-01-preview',
+      deployments: [
+        { name: 'prod-4o', model: 'gpt-4o' },
+        { name: 'o3-mini', model: '' },
+      ],
+    });
+    expect(settingsToForm('azure-openai').deployments).toEqual([{ name: '', model: '' }]);
+    // Formularz → ustawienia → formularz: bez zmian (zapis nie gubi pól).
+    const form = settingsToForm('openai', { organization: 'org-A1' });
+    expect(settingsToForm('openai', formToSettings(form))).toEqual(form);
+  });
+
+  it('adres zasobu stały: bez adresu nie ma błędu adresu, reszta reguł bez zmian', () => {
+    const settings = { deployments: [{ name: 'prod-mini', model: 'gpt-4o-mini' }] };
+    expect(checkEnterprise('azure-openai', null, settings)).toMatchObject({
+      ok: false,
+      problem: 'endpoint',
+    });
+    expect(checkEnterprise('azure-openai', null, settings, true)).toEqual({
+      ok: true,
+      value: {
+        api_version: AZURE_DEFAULT_API_VERSION,
+        deployments: [{ name: 'prod-mini', model: 'gpt-4o-mini' }],
+      },
+    });
+    expect(checkEnterprise('azure-openai', null, { deployments: [] }, true)).toMatchObject({
+      ok: false,
+      problem: 'no_deployments',
+    });
+    expect(checkEnterprise('openai', null, { organization: 'acme' }, true)).toMatchObject({
+      ok: false,
+      problem: 'org_format',
+    });
+  });
+
+  it('każdy nowy tekst formularza ma tłumaczenie pl i en', () => {
+    const keys = [
+      'ent.edit',
+      'ent.editTitle',
+      'ent.editOpenai',
+      'ent.endpointFixed',
+      'ent.endpointKept',
+      'ent.save',
+      'ent.saved',
+    ];
+    for (const dict of [pl, en] as Record<string, unknown>[]) {
+      for (const key of keys) expect(dict[key], key).toBeTruthy();
+    }
   });
 });

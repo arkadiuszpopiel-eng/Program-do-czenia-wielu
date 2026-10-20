@@ -123,11 +123,34 @@ export function formToSettings(form: EnterpriseForm): EnterpriseSettings {
   };
 }
 
-/** Oczyszczenie i sprawdzenie jak `EnterpriseSettings::checked` w rdzeniu. */
+/**
+ * Formularz z ustawień zapisanych przy koncie (edycja istniejącego konta). Azure bez wdrożeń
+ * dostaje jeden pusty wiersz, jak w kreatorze.
+ */
+export function settingsToForm(providerId: string, settings?: EnterpriseSettings): EnterpriseForm {
+  const deployments = (settings?.deployments ?? []).map((d) => ({
+    name: d.name,
+    model: d.model ?? '',
+  }));
+  return {
+    ...emptyEnterpriseForm(providerId),
+    organization: settings?.organization ?? '',
+    project: settings?.project ?? '',
+    apiVersion: settings?.api_version ?? '',
+    ...(deployments.length ? { deployments } : {}),
+  };
+}
+
+/**
+ * Oczyszczenie i sprawdzenie jak `EnterpriseSettings::checked` w rdzeniu. `endpointFixed` — edycja
+ * istniejącego konta: adres zasobu się nie zmienia (rdzeń sprawdza go z adresem zapisanym przy
+ * koncie), więc interfejs nie musi go znać.
+ */
 export function checkEnterprise(
   providerId: string,
   baseUrl: string | null,
   settings: EnterpriseSettings | undefined,
+  endpointFixed = false,
 ): EnterpriseCheck {
   const text = (v: string | null | undefined) => v?.trim() || null;
   const organization = text(settings?.organization);
@@ -152,7 +175,7 @@ export function checkEnterprise(
   if (providerId !== AZURE_OPENAI) {
     return apiVersion || deployments.length ? fail('azure_only') : clean({});
   }
-  if (!isAzureEndpoint(baseUrl ?? '')) return fail('endpoint', baseUrl ?? '');
+  if (!endpointFixed && !isAzureEndpoint(baseUrl ?? '')) return fail('endpoint', baseUrl ?? '');
   apiVersion ??= AZURE_DEFAULT_API_VERSION;
   if (!isApiVersion(apiVersion)) return fail('api_version', apiVersion);
   if (!deployments.length) return fail('no_deployments');

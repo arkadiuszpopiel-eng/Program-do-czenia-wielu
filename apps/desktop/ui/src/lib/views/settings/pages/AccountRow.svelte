@@ -15,9 +15,10 @@
     rotateStores,
     verdictOf,
   } from '../../../logic/api-key';
-  import { enterpriseSummary } from '../../../logic/enterprise';
+  import { AZURE_OPENAI, OPENAI, enterpriseSummary } from '../../../logic/enterprise';
   import { attempt, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import AccountEnterpriseEdit from './AccountEnterpriseEdit.svelte';
   import WizardKeyStep from './WizardKeyStep.svelte';
   import WizardTestResult from './WizardTestResult.svelte';
 
@@ -32,8 +33,8 @@
   const app = useApp();
   const { t, tk } = app.i18n;
 
-  /** Rozwinięty panel pod wierszem: wyjaśnienie ostatniego testu albo wymiana klucza. */
-  let panel = $state<'none' | 'why' | 'rotate'>('none');
+  /** Rozwinięty panel pod wierszem: wyjaśnienie testu, wymiana klucza albo ustawienia dla firm. */
+  let panel = $state<'none' | 'why' | 'rotate' | 'enterprise'>('none');
   let testing = $state(false);
   let saving = $state(false);
   let toggling = $state(false);
@@ -64,6 +65,8 @@
   const keyAge = $derived(keyAgeDays(account.key_saved_at, Date.now()));
   /** Konto firmowe: organizacja i projekt (skrócone) albo wdrożenia Azure. */
   const company = $derived(enterpriseSummary(account.enterprise));
+  /** Ustawienia dla firm mają tylko konta OpenAI i Azure OpenAI. */
+  const firm = $derived(account.provider_id === OPENAI || account.provider_id === AZURE_OPENAI);
   const keyOld = $derived(keyRotationDue(keyAge, app.num('accounts.key_max_age_days', 180)));
   const busy = $derived(testing || account.state === 'testing');
   /** Konto bez klucza w magazynie: ostatni test niczego już nie opisuje. */
@@ -146,7 +149,7 @@
     await onchange();
   }
 
-  function show(next: 'why' | 'rotate') {
+  function show(next: 'why' | 'rotate' | 'enterprise') {
     panel = panel === next ? 'none' : next;
     rotated = null;
     rotateError = '';
@@ -206,6 +209,14 @@
           onclick={() => show('rotate')}>{t('hub.rotate')}</Button
         >
       {/if}
+      {#if firm}
+        <Button
+          size="sm"
+          variant="ghost"
+          aria-expanded={panel === 'enterprise'}
+          onclick={() => show('enterprise')}>{t('ent.edit')}</Button
+        >
+      {/if}
       <Button size="sm" variant="ghost" loading={toggling} onclick={toggle}
         >{disabled ? t('hub.enable') : t('hub.disable')}</Button
       >
@@ -227,6 +238,10 @@
         onfix={() => show('rotate')}
         onmodel={setModel}
       />
+    </div>
+  {:else if panel === 'enterprise' && firm}
+    <div class="panel">
+      <AccountEnterpriseEdit {account} onsaved={onchange} onclose={() => (panel = 'none')} />
     </div>
   {:else if panel === 'rotate' && provider}
     <div class="panel">

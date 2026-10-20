@@ -92,8 +92,13 @@ a wdrożeń — przy innych dostawcach; kreator odmówi zapisu z wyjaśnieniem.
 Test połączenia **nie sprawdza nazw wdrożeń** — literówka wyjdzie dopiero przy pierwszej rozmowie: Alfa pokaże wtedy
 komunikat „Zasób Azure OpenAI nie ma wdrożenia o tej nazwie” z listą wdrożeń konta.
 
-**Ograniczenie:** organizacji, projektu, wersji API i wdrożeń nie można jeszcze zmienić w istniejącym koncie. Aby
-poprawić literówkę, usuń konto i dodaj je ponownie (klucz trzeba wkleić jeszcze raz).
+**Zmiana ustawień istniejącego konta** (od wersji 0.0.65): na karcie konta OpenAI albo Azure OpenAI kliknij
+**Ustawienia dla firm**. Przy OpenAI zmienisz organizację i projekt (puste pole — wartość domyślna klucza), przy
+Azure OpenAI — wersję API i listę wdrożeń (dodawanie, usuwanie, zmiana nazwy i modelu). Adres zasobu Azure się nie
+zmienia — dla innego zasobu dodaj nowe konto. Klucza nie trzeba wklejać ponownie. Alfa sprawdza wpisy tak samo jak
+przy dodawaniu konta i odmówi zapisu, gdy ten sam klucz w tym samym projekcie OpenAI ma już inne konto. Po zapisie
+lista modeli konta Azure od razu pokazuje nowe wdrożenia (kolejki tracą modele, których wdrożeń już nie ma); kliknij
+**Testuj połączenie**, żeby potwierdzić nowe ustawienia u dostawcy.
 
 ## Koszty i limity
 

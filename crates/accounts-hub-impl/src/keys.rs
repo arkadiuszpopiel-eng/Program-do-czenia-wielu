@@ -6,8 +6,9 @@
 //! a wymiana klucza niszczyła działający klucz, zanim okazało się, że nowy jest błędny.
 
 use accounts_hub_contract::{
-    Account, AccountId, AccountState, AccountsError, AuthKind, EVENT_KEY_ROTATED, EVENT_KEY_TESTED,
-    EnterpriseSettings, ModelId, ModelInfo, ProviderId, SecretString, TestSummary,
+    Account, AccountId, AccountState, AccountsError, AuthKind, EVENT_ENTERPRISE_CHANGED,
+    EVENT_KEY_ROTATED, EVENT_KEY_TESTED, EnterpriseSettings, ModelId, ModelInfo, ProviderId,
+    SecretString, TestSummary, apply_enterprise, duplicate_in_project, enterprise_payload,
 };
 use core_bus_contract::Level;
 
@@ -260,6 +261,41 @@ impl AccountsHubService {
         })?;
         // Router przelicza trasy po zmianie stanu konta — ten sam sygnał niesie nową kolejkę.
         self.publish_state(&changed, &changed.state).await;
+        Ok(())
+    }
+
+    /// Ustawienia firmowe istniejącego konta: sprawdzenie dla dostawcy i adresu konta, odmowa
+    /// duplikatu (ten sam klucz w tym samym projekcie OpenAI), zmiana bieżącego wpisu po zapisie.
+    pub(crate) async fn set_enterprise_now(
+        &self,
+        id: &AccountId,
+        enterprise: EnterpriseSettings,
+    ) -> Result<(), AccountsError> {
+        let acc = self.account_or_err(id)?;
+        let entry = self.provider_entry(&acc.provider)?;
+        let base_url = acc.base_url.as_deref().or(entry.base_url.as_deref());
+        let checked = enterprise
+            .checked(entry.id.as_str(), base_url)
+            .map_err(AccountsError::InvalidInput)?;
+        if let Some(secret) = self.secret_of(&acc)? {
+            let url = acc.base_url.as_deref();
+            let twin = self.find_same_key(&acc.provider, url, &checked, &secret);
+            if let Some(other) = twin.filter(|other| other != id) {
+                let label = self.accounts_read().get(&other).map(|a| a.label.clone());
+                let label = label.unwrap_or_else(|| other.to_string());
+                return Err(duplicate_in_project(&label));
+            }
+        }
+        let changed = self.update_accounts(|accounts| {
+            let current = accounts
+                .get_mut(id)
+                .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))?;
+            apply_enterprise(current, checked)?;
+            Ok(current.clone())
+        })?;
+        let payload = enterprise_payload(&changed);
+        self.publish(EVENT_ENTERPRISE_CHANGED, Level::Info, payload)
+            .await;
         Ok(())
     }
 

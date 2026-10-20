@@ -7,6 +7,7 @@
 //! zawierającym klucz (sprawdza redakcję); brak klucza → `Ok` bez modeli (`Unsupported`).
 
 mod enterprise;
+mod enterprise_edit;
 mod flows;
 
 use std::collections::BTreeSet;
@@ -14,6 +15,7 @@ use std::future::Future;
 use std::sync::Mutex;
 
 pub use enterprise::*;
+pub use enterprise_edit::*;
 pub use flows::*;
 
 use crate::{AccountsHub, EnvSource, ProviderCatalogEntry, SecretString};
@@ -189,17 +191,25 @@ where
     pricing_and_models_in_catalog(&fresh().await).await;
     secrets_never_in_debug(&fresh().await).await;
     enterprise_settings_only_where_they_apply(&fresh().await).await;
-    same_key_in_other_openai_project_is_not_a_duplicate(&factory(with_openai()).await).await;
+    let firms = || factory(with_enterprise());
+    same_key_in_other_openai_project_is_not_a_duplicate(&firms().await).await;
+    set_enterprise_on_openai_account(&firms().await).await;
+    set_enterprise_respects_duplicate_key_rule(&firms().await).await;
+    set_enterprise_on_azure_account(&firms().await).await;
 }
 
-/// Katalog-fixture z dodanym dostawcą `openai` (projekty OpenAI).
-fn with_openai() -> Vec<ProviderCatalogEntry> {
-    let text = ACME
+/// Katalog-fixture z dostawcami kont firmowych: `openai` (projekty OpenAI) i `azure-openai`
+/// (bez adresu w katalogu — adres zasobu podaje konto).
+fn with_enterprise() -> Vec<ProviderCatalogEntry> {
+    let openai = ACME
         .replace("\"acme\"", "\"openai\"")
         .replace("ACME_", "OPENAI_");
+    let azure = SELFHOST.replace("\"selfhost\"", "\"azure-openai\"");
     let mut catalog = fixture_catalog();
-    catalog.push(
-        ProviderCatalogEntry::from_toml(&text, "openai").unwrap_or_else(|e| panic!("fixture: {e}")),
-    );
+    for (text, stem) in [(openai, "openai"), (azure, "azure-openai")] {
+        catalog.push(
+            ProviderCatalogEntry::from_toml(&text, stem).unwrap_or_else(|e| panic!("fixture: {e}")),
+        );
+    }
     catalog
 }

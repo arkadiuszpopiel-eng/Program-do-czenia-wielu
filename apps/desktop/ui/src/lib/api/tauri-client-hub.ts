@@ -15,6 +15,8 @@ export const accountsApi = (): AlfaClient['accounts'] => ({
   rotate: (accountId, secret) => call('accounts_rotate', { accountId, secret }),
   setDisabled: (accountId, disabled) => call('accounts_set_disabled', { accountId, disabled }),
   setModel: (accountId, model) => call('accounts_set_model', { accountId, model }),
+  setEnterprise: (accountId, enterprise) =>
+    call('accounts_set_enterprise', { accountId, enterprise }),
   setQueue: (accountId, taskClass, models) =>
     call('accounts_set_queue', { accountId, taskClass, models }),
   suggestQueue: (accountId, taskClass, strategy) =>

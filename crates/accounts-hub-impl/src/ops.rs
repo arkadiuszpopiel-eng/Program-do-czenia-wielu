@@ -221,6 +221,14 @@ impl AccountsHub for AccountsHubService {
         self.set_disabled_now(id, disabled).await
     }
 
+    async fn set_enterprise(
+        &self,
+        id: &AccountId,
+        enterprise: EnterpriseSettings,
+    ) -> Result<(), AccountsError> {
+        self.set_enterprise_now(id, enterprise).await
+    }
+
     async fn update_settings(
         &self,
         id: &AccountId,

@@ -144,6 +144,18 @@ pub trait AccountsHub: Send + Sync {
     /// Wyłącza/włącza konto.
     async fn set_disabled(&self, id: &AccountId, disabled: bool) -> Result<(), AccountsError>;
 
+    /// Zmienia ustawienia firmowe konta (organizacja i projekt OpenAI; wersja API i wdrożenia
+    /// Azure OpenAI — adres zasobu zostaje). Sprawdzenie jak przy dodaniu
+    /// ([`EnterpriseSettings::checked`]); odmowa, gdy ten sam klucz w tym samym projekcie OpenAI
+    /// ma już inne konto. Konto Azure dostaje modele z wdrożeń
+    /// ([`crate::apply_enterprise`]); zapis metadanych i zdarzenie
+    /// [`crate::EVENT_ENTERPRISE_CHANGED`].
+    async fn set_enterprise(
+        &self,
+        id: &AccountId,
+        enterprise: EnterpriseSettings,
+    ) -> Result<(), AccountsError>;
+
     /// Zmienia etykietę, przypisania i limit kosztów.
     async fn update_settings(
         &self,
