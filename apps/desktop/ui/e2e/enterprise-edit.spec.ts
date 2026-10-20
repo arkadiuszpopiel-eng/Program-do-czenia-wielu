@@ -83,41 +83,99 @@ test('ustawienia dla firm są tylko przy kontach OpenAI i Azure OpenAI', async (
   await expect(account).not.toContainText('Konto firmowe');
 });
 
-test('Azure OpenAI: adres zasobu stały, wdrożenia i wersja API zmieniane', async ({ page }) => {
-  await openProviders(page);
+/** Kreator: dodaje konto z kluczem (opcjonalnie projekt OpenAI) i zamyka kreator po sprawdzeniu. */
+async function addAccount(
+  page: Page,
+  provider: RegExp,
+  fill: () => Promise<void>,
+  key: string,
+  label?: string,
+) {
   await page.getByRole('button', { name: 'Dodaj dostawcę' }).click();
-  await page
-    .getByRole('button', { name: /^Azure OpenAI/ })
-    .first()
-    .click();
-  await page.getByLabel('Adres zasobu Azure OpenAI').fill('https://firma.openai.azure.com');
-  await page.getByLabel('Klucz API').fill(fakeKey('azure-'));
-  await page.getByLabel('Nazwa wdrożenia').fill('prod-4o');
-  await page.getByLabel('Model (np. gpt-4o)').fill('gpt-4o');
+  await page.getByRole('button', { name: provider }).first().click();
+  await page.getByLabel('Klucz API').fill(key);
+  if (label) await page.getByLabel('Nazwa konta').fill(label);
+  await fill();
   await page.getByRole('button', { name: 'Sprawdź klucz' }).click();
   await expect(page.locator('[data-verdict]').first()).toHaveAttribute('data-verdict', 'ok');
   await page.getByRole('button', { name: 'Dalej' }).click();
   await page.getByRole('button', { name: /Zamknij — resztę/ }).click();
+}
 
-  const account = await openForm(page, 'Azure OpenAI');
-  const panel = form(account);
-  await expect(panel).toContainText('Adres zasobu: https://firma.openai.azure.com.');
-  await expect(panel.getByLabel('Identyfikator organizacji')).toHaveCount(0);
-  await expectAccessible(page, 'firmy — Azure');
-  await expectReadable(page, 'section.content');
+for (const skin of SKINS) {
+  for (const theme of THEMES) {
+    test(`Azure OpenAI: adres zasobu stały, wdrożenia i wersja API — ${skin}/${theme}`, async ({
+      page,
+    }) => {
+      await openProviders(page, `?style=${skin}&theme=${theme}`);
+      await addAccount(
+        page,
+        /^Azure OpenAI/,
+        async () => {
+          await page.getByLabel('Adres zasobu Azure OpenAI').fill('https://firma.openai.azure.com');
+          await page.getByLabel('Nazwa wdrożenia').fill('prod-4o');
+          await page.getByLabel('Model (np. gpt-4o)').fill('gpt-4o');
+        },
+        fakeKey('azure-'),
+      );
 
-  // Bez wdrożenia konto Azure nie działa — zapis zablokowany z powodem.
-  await panel.getByRole('button', { name: 'Usuń wdrożenie prod-4o' }).click();
-  await expect(panel.getByRole('alert')).toContainText('co najmniej jedno wdrożenie');
-  await expect(panel.getByRole('button', { name: 'Zapisz ustawienia' })).toBeDisabled();
-  await expectReadable(page, 'section.content');
+      const account = await openForm(page, 'Azure OpenAI');
+      const panel = form(account);
+      await expect(panel).toContainText('Adres zasobu: https://firma.openai.azure.com.');
+      await expect(panel.getByLabel('Identyfikator organizacji')).toHaveCount(0);
+      await expectAccessible(page, `firmy — Azure ${skin}/${theme}`);
+      await expectReadable(page, 'section.content');
 
-  await panel.getByRole('button', { name: 'Dodaj wdrożenie' }).click();
-  await panel.getByLabel('Nazwa wdrożenia').fill('prod-mini');
-  await panel.getByLabel('Model (np. gpt-4o)').fill('gpt-4o-mini');
-  await panel.getByLabel('Wersja API').fill('2025-04-01-preview');
-  await panel.getByRole('button', { name: 'Zapisz ustawienia' }).click();
-  await expect(panel.getByRole('status')).toContainText('Zapisano');
-  await expect(account).toContainText('Konto firmowe: gpt-4o-mini → prod-mini');
-  await expectAccessible(page, 'firmy — Azure zapisano');
-});
+      // Bez wdrożenia konto Azure nie działa — zapis zablokowany z powodem.
+      await panel.getByRole('button', { name: 'Usuń wdrożenie prod-4o' }).click();
+      await expect(panel.getByRole('alert')).toContainText('co najmniej jedno wdrożenie');
+      await expect(panel.getByRole('button', { name: 'Zapisz ustawienia' })).toBeDisabled();
+      await expectAccessible(page, `firmy — Azure bez wdrożeń ${skin}/${theme}`);
+      await expectReadable(page, 'section.content');
+
+      await panel.getByRole('button', { name: 'Dodaj wdrożenie' }).click();
+      await panel.getByLabel('Nazwa wdrożenia').fill('prod-mini');
+      await panel.getByLabel('Model (np. gpt-4o)').fill('gpt-4o-mini');
+      await panel.getByLabel('Wersja API').fill('2025-04-01-preview');
+      await panel.getByRole('button', { name: 'Zapisz ustawienia' }).click();
+      await expect(panel.getByRole('status')).toContainText('Zapisano');
+      await expect(account).toContainText('Konto firmowe: gpt-4o-mini → prod-mini');
+      await expectAccessible(page, `firmy — Azure zapisano ${skin}/${theme}`);
+      await expectReadable(page, 'section.content');
+    });
+
+    test(`odmowa huba: ten sam klucz w tym samym projekcie OpenAI — ${skin}/${theme}`, async ({
+      page,
+    }) => {
+      await openProviders(page, `?style=${skin}&theme=${theme}`);
+      const key = fakeKey('sk-');
+      const project = 'proj_teambmarketing5678';
+      await addAccount(page, /^OpenAI/, async () => {}, key, 'Zespół A');
+      // Ten sam klucz, inny projekt — to osobne konto (osobne rozliczenie), hub je przyjmuje.
+      await addAccount(
+        page,
+        /^OpenAI/,
+        async () => {
+          await page
+            .getByRole('checkbox', { name: 'Klucz należy do organizacji albo projektu w OpenAI' })
+            .check();
+          await page.getByLabel('Identyfikator projektu').fill(project);
+        },
+        key,
+        'Zespół B',
+      );
+
+      // Przeniesienie „Zespół A” do projektu „Zespół B” zrobiłoby z nich jedno konto — odmowa.
+      const account = await openForm(page, 'Zespół A');
+      const panel = form(account);
+      await panel.getByLabel('Identyfikator projektu').fill(project);
+      await panel.getByRole('button', { name: 'Zapisz ustawienia' }).click();
+      await expect(panel.getByRole('alert')).toContainText(
+        'Ten klucz w tym projekcie OpenAI jest już kontem „Zespół B” — wybierz inny projekt.',
+      );
+      await expect(account).not.toContainText('Konto firmowe');
+      await expectAccessible(page, `firmy — odmowa huba ${skin}/${theme}`);
+      await expectReadable(page, 'section.content');
+    });
+  }
+}
