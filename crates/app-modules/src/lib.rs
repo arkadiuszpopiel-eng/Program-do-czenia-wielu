@@ -13,14 +13,11 @@
 //! - [`secrets`] — sejf kluczy baz (`KeyVault`) i źródło kluczy API na magazynie `accounts-hub`;
 //! - [`late`] — późne wiązanie bazy sesji i indeksera (`sessions` ↔ `search`), [`embedder`] —
 //!   lokalny osadzacz leksykalny dla `search`;
-//! - [`accounts_enterprise`] — zmiana ustawień firmowych istniejącego konta (C2.12);
-//! - [`session_cards`] — karty rozmów z profilem (obsada, ostatnia wiadomość, model, koszt);
 //! - [`workdir`] — sprawdzenie katalogu roboczego agentek i deny-listy narzędzi z katalogami
 //!   danych Alfy (po rozwiązaniu dowiązań).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
-pub mod accounts_enterprise;
 pub mod board;
 pub mod broker;
 pub mod cameras;
@@ -40,7 +37,6 @@ pub mod quick_commands;
 pub mod raw_config;
 pub mod route;
 pub mod secrets;
-pub mod session_cards;
 pub mod settings;
 pub mod speech_meter;
 pub mod stt;

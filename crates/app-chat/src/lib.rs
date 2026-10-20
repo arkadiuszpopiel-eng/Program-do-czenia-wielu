@@ -18,6 +18,7 @@ mod outcome;
 mod project;
 mod quick;
 mod routing;
+pub mod session_cards;
 mod stream;
 mod style;
 mod taint;

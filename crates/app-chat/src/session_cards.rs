@@ -7,7 +7,7 @@
 //! co w szczegółach kosztów) na grosze; bez kursu (0) — centy USD.
 //!
 //! Pamięć i dysk: każda czytana rozmowa otwiera swoją zaszyfrowaną bazę. Po odczycie wywołujemy
-//! `release(id)` — integrator zamyka tam bazę, której nie było otwartej przed wywołaniem
+//! `release(id)` — `app-core` zamyka tam bazę, której nie było otwartej przed wywołaniem
 //! (`SqliteSessions::close_session`), żeby widok „Karty” nie trzymał otwartych wszystkich baz.
 //! UI prosi tylko o rozmowy nowe albo zmienione (`updated_at`), partiami po [`MAX_CARDS`].
 //! Wywołanie jest synchroniczne — komenda IPC uruchamia je w `spawn_blocking`.

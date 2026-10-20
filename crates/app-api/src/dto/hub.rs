@@ -167,6 +167,9 @@ pub struct Account {
     /// (nie sekrety; klucz zostaje w Menedżerze poświadczeń).
     #[serde(default, skip_serializing_if = "EnterpriseSettings::is_empty")]
     pub enterprise: EnterpriseSettings,
+    /// Własny adres API konta (np. zasób Azure OpenAI — formularz firmowy pokazuje go bez edycji).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub base_url: Option<String>,
 }
 
 /// Ostatni test konta w skrócie (te same pola co w [`TestReport`], bez listy modeli).

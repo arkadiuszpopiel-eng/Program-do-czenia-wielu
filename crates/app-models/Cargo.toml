@@ -45,6 +45,8 @@ zip.workspace = true
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 
 [dev-dependencies]
+# Hub kont w pamięci w testach `accounts_enterprise`.
+accounts-hub-fake = { path = "../accounts-hub-fake" }
 lib-embed = { path = "../lib-embed", features = ["testkit"] }
 sessions-fake = { path = "../sessions-fake" }
 sessions-contract = { path = "../sessions-contract" }

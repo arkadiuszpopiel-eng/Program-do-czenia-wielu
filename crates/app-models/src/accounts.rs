@@ -2,6 +2,10 @@
 //! odwzorowanie wpisów katalogu dostawców i kont huba na DTO (bez sekretu), klasy zadań po
 //! nazwach z interfejsu i termin okresowego sprawdzenia klucza (plan v6, C2.14).
 
+/// Zmiana ustawień firmowych istniejącego konta (`accounts_set_enterprise`, C2.12).
+#[path = "accounts_enterprise.rs"]
+pub mod enterprise;
+
 use std::collections::BTreeSet;
 
 use accounts_hub_contract::{
@@ -184,6 +188,7 @@ pub fn account_dto(a: &CoreAccount) -> Account {
         auto_model: accounts_hub_contract::best_chat_model(a.models.iter().map(|m| m.id.as_str()))
             .map(str::to_owned),
         enterprise: a.enterprise.clone(),
+        base_url: a.base_url.clone(),
     }
 }
 

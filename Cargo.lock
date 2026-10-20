@@ -848,6 +848,7 @@ name = "app-models"
 version = "0.0.64"
 dependencies = [
  "accounts-hub-contract",
+ "accounts-hub-fake",
  "app-api",
  "app-modules",
  "chrono",
@@ -892,7 +893,6 @@ name = "app-modules"
 version = "0.0.64"
 dependencies = [
  "accounts-hub-contract",
- "accounts-hub-fake",
  "accounts-hub-impl",
  "app-api",
  "app-broker",
@@ -934,7 +934,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sessions-contract",
- "sessions-fake",
  "tempfile",
  "tokio",
  "toml",
