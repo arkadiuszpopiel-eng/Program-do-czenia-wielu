@@ -25,7 +25,9 @@ use windows::Win32::UI::Input::KeyboardAndMouse::SetFocus;
 use windows::Win32::UI::WindowsAndMessaging::*;
 use windows::core::{PCWSTR, w};
 
-use super::input::{install_hooks, occluded, remove_hooks, sample};
+use super::input::{
+    begin_dispatch, decision_sample, end_dispatch, install_hooks, occluded, remove_hooks, sample,
+};
 use super::thread::{Request, WM_REQUEST};
 use super::{EventQueue, now_ms};
 use crate::win::{pcwstr, wide};
@@ -76,10 +78,12 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             focus_initial();
         }
         WM_COMMAND if i32::from(low) == IDCANCEL.0 => {
-            push(SurfaceEvent::Cancel { input: sample() });
+            push(SurfaceEvent::Cancel {
+                input: decision_sample(),
+            });
         }
         WM_COMMAND if low >= MIN_BUTTON_ID && clicked => {
-            let (input, occluded) = (sample(), occluded(hwnd));
+            let (input, occluded) = (decision_sample(), occluded(hwnd));
             push(SurfaceEvent::Button {
                 id: low,
                 input,
@@ -336,6 +340,7 @@ pub(super) fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &Sy
             continue;
         }
         let dialog = with_ui(|ui| ui.hwnd).flatten();
+        begin_dispatch(msg.message);
         // SAFETY: jw.
         unsafe {
             if !dialog.is_some_and(|h| IsDialogMessageW(h, &raw const msg).as_bool()) {
@@ -343,6 +348,7 @@ pub(super) fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &Sy
                 DispatchMessageW(&raw const msg);
             }
         }
+        end_dispatch();
     }
     let hwnd = UI.with(|c| c.borrow_mut().take()).and_then(|s| s.hwnd);
     remove_hooks(hooks);

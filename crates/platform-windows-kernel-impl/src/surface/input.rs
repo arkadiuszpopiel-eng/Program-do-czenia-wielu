@@ -17,8 +17,9 @@ use windows::Win32::UI::Input::{GetCurrentInputMessageSource, INPUT_MESSAGE_SOUR
 use windows::Win32::UI::WindowsAndMessaging::{
     CallNextHookEx, GW_HWNDPREV, GetWindow, GetWindowRect, GetWindowThreadProcessId, HC_ACTION,
     HHOOK, IsWindowVisible, KBDLLHOOKSTRUCT, MSLLHOOKSTRUCT, SetWindowsHookExW,
-    UnhookWindowsHookEx, WH_KEYBOARD_LL, WH_MOUSE_LL, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_RBUTTONDOWN,
-    WM_RBUTTONUP,
+    UnhookWindowsHookEx, WH_KEYBOARD_LL, WH_MOUSE_LL, WM_KEYDOWN, WM_KEYUP, WM_LBUTTONDOWN,
+    WM_LBUTTONUP, WM_NCLBUTTONDOWN, WM_NCLBUTTONUP, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_SYSKEYDOWN,
+    WM_SYSKEYUP,
 };
 
 use super::now_ms;
@@ -26,6 +27,45 @@ use super::now_ms;
 thread_local! {
     static LAST_KEY: Cell<Option<HookObservation>> = const { Cell::new(None) };
     static LAST_MOUSE: Cell<Option<HookObservation>> = const { Cell::new(None) };
+    /// Próbka komunikatu wejścia, który właśnie jest obsługiwany (zapisana w pętli komunikatów).
+    static IN_DISPATCH: Cell<Option<InputSample>> = const { Cell::new(None) };
+}
+
+/// Czy komunikat jest wejściem, z którego może wyniknąć decyzja (przycisk myszy w oknie albo na
+/// ramce — krzyżyk, klawisz — Tab/Spacja/Esc przez `IsDialogMessageW`).
+pub(super) fn is_input_message(message: u32) -> bool {
+    matches!(
+        message,
+        WM_LBUTTONDOWN
+            | WM_LBUTTONUP
+            | WM_RBUTTONDOWN
+            | WM_RBUTTONUP
+            | WM_NCLBUTTONDOWN
+            | WM_NCLBUTTONUP
+            | WM_KEYDOWN
+            | WM_KEYUP
+            | WM_SYSKEYDOWN
+            | WM_SYSKEYUP
+    )
+}
+
+/// Pętla komunikatów: próbka dla komunikatu wejścia tuż po `GetMessageW`, zanim trafi do okna.
+/// `WM_COMMAND`/`WM_CLOSE` przychodzą potem przez `SendMessage`, a wtedy Windows nie podaje
+/// źródła (`IMDT_UNAVAILABLE` do powrotu z `SendMessage` — dokumentacja
+/// `GetCurrentInputMessageSource`), więc próbka w ich obsłudze była zawsze „wstrzyknięta”.
+pub(super) fn begin_dispatch(message: u32) {
+    IN_DISPATCH.set(is_input_message(message).then(sample));
+}
+
+/// Koniec obsługi komunikatu z pętli.
+pub(super) fn end_dispatch() {
+    IN_DISPATCH.set(None);
+}
+
+/// Próbka dla decyzji: z komunikatu wejścia w obsłudze (pętla), inaczej bieżąca (fail-closed —
+/// komunikat spoza wejścia daje `IMDT_UNAVAILABLE` i bez świeżego hooka jest odrzucany).
+pub(super) fn decision_sample() -> InputSample {
+    IN_DISPATCH.get().unwrap_or_else(sample)
 }
 
 fn observe(cell: &'static std::thread::LocalKey<Cell<Option<HookObservation>>>, o: HookOrigin) {
