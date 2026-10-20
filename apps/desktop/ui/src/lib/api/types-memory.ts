@@ -2,7 +2,7 @@
 // wpisy z proweniencją, „dlaczego to pamiętam", edycja = nowa wersja, zapomnienie z podglądem
 // kaskady, dziennik zmian z cofaniem, porządkowanie (Strażniczka pamięci).
 // Identyfikator wpisu: `"<klucz zakresu>#<id>"` (np. `session:s-1#mem-1`, `global#mem-2`).
-import type { Iso8601 } from './types';
+import type { Iso8601, RememberScope } from './types';
 
 export type MemoryScopeKind = 'session' | 'project' | 'agent' | 'global';
 
@@ -178,4 +178,46 @@ export interface MemoryStatus {
   readonly window: string;
   readonly pending: number;
   readonly last: ConsolidationReport | null;
+}
+
+/** Źródło „Naucz Alfę” (P5): tekst i plik to treść z zewnątrz — niezaufana, tylko zakres sesji. */
+export type TeachSource =
+  | { readonly kind: 'text'; readonly text: string }
+  | { readonly kind: 'file'; readonly name: string; readonly text: string }
+  | { readonly kind: 'conversation' };
+
+export interface TeachRequest {
+  readonly session_id: string;
+  readonly source: TeachSource;
+  readonly scope: RememberScope;
+  /** Puste — nazwa pliku, tytuł rozmowy albo „Wklejony tekst”. */
+  readonly title: string | null;
+}
+
+/** Wynik nauki: identyfikatory faktów (cofnięcie przez `forget`). */
+export interface TeachReport {
+  readonly facts: number;
+  readonly ids: readonly string[];
+  readonly scope_key: string;
+  /** Źródło zapisane przy faktach (np. `naucz: plik „a.pdf” · sha256:…`, `rozmowa:<sesja>`). */
+  readonly source: string;
+  readonly trusted: boolean;
+  readonly truncated: boolean;
+  readonly duplicates: number;
+}
+
+/** Plik wybrany do nauki (tekst wyciągnięty w rdzeniu — podgląd przed zapisem). */
+export interface TeachFile {
+  readonly name: string;
+  readonly text: string;
+  readonly chars: number;
+  readonly truncated: boolean;
+}
+
+/** „Naucz Alfę” (część `MemoryApi`). */
+export interface MemoryTeachApi {
+  /** Fakty z tekstu, pliku albo rozmowy (jako właściciel; od razu aktywne). */
+  teach(request: TeachRequest): Promise<TeachReport>;
+  /** Natywny dialog wyboru pliku i jego tekst (`null` — anulowano). */
+  teachPickFile(): Promise<TeachFile | null>;
 }

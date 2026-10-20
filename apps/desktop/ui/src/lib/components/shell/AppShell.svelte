@@ -24,6 +24,7 @@
   import { statsDialog } from '../../state/stats-dialog.svelte';
   import { canvas, closeCanvas, syncCanvas } from '../../state/canvas.svelte';
   import { arenaDialog } from '../../state/arena.svelte';
+  import { teachDialog } from '../../state/teach-dialog.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -78,6 +79,7 @@
   const loadBoard = () => import('../overlays/BoardDialog.svelte');
   const loadStats = () => import('../overlays/SessionStatsDialog.svelte');
   const loadArena = () => import('../overlays/ArenaDialog.svelte');
+  const loadTeach = () => import('../overlays/TeachDialog.svelte');
   const loadSettings = () => import('../../views/settings/SettingsView.svelte');
   const loadCanvas = () => import('../canvas/ArtifactCanvas.svelte');
   let paletteReady = $state(false);
@@ -219,6 +221,7 @@
   {#if boardDialog.open}<Lazy load={loadBoard} props={{}} label={t('board.title')} />{/if}
   {#if statsDialog.open}<Lazy load={loadStats} props={{}} label={t('stats.title')} />{/if}
   {#if arenaDialog.open}<Lazy load={loadArena} props={{}} label={t('arena.title')} />{/if}
+  {#if teachDialog.open}<Lazy load={loadTeach} props={{}} label={t('teach.title')} />{/if}
 </div>
 
 <style>

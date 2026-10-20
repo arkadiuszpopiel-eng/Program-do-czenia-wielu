@@ -8,6 +8,7 @@
 //! - [`backup`] — kopie zapasowe `.alfa` z harmonogramem, rotacją i testem przywracania,
 //! - [`docs`] — artefakty sesji jako kategoria paczek `.alfa`,
 //! - [`canvas`] — podgląd artefaktu w kanwie obok rozmowy (C2.8, ADR 0009).
+//! - [`teach`] — plik do „Naucz Alfę” (wybór, ochrona ścieżki, tekst txt/md/pdf/docx).
 //!
 //! [`FilesApp`] spina je dla komend `attachments_*`, `sessions_export_conversation`, `backups_*`.
 
@@ -18,6 +19,7 @@ pub mod backup;
 pub mod canvas;
 pub mod docs;
 pub mod export;
+pub mod teach;
 
 use std::path::PathBuf;
 use std::sync::Arc;

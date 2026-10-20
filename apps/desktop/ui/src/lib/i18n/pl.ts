@@ -34,6 +34,7 @@ import { plStats } from './pl-stats';
 import { plArchive } from './pl-archive';
 import { plCanvas } from './pl-canvas';
 import { plArena } from './pl-arena';
+import { plTeach } from './pl-teach';
 
 export const pl = {
   ...plApp,
@@ -69,6 +70,7 @@ export const pl = {
   ...plArchive,
   ...plCanvas,
   ...plArena,
+  ...plTeach,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

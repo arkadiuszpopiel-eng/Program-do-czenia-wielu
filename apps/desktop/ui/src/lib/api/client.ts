@@ -47,6 +47,7 @@ import type {
   MemoryScopeInfo,
   MemoryScopeRef,
   MemoryStatus,
+  MemoryTeachApi,
   MemoryUndoResult,
 } from './types-memory';
 import type {
@@ -263,7 +264,7 @@ export interface QuickApi {
 }
 
 /** Inspektor pamięci (F7): operacje jako właściciel; edycja = nowa wersja. */
-export interface MemoryApi {
+export interface MemoryApi extends MemoryTeachApi {
   status(): Promise<MemoryStatus>;
   scopes(): Promise<readonly MemoryScopeInfo[]>;
   inspect(query: MemoryQuery): Promise<MemoryPage>;

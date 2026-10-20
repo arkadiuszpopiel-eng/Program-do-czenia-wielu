@@ -1,10 +1,11 @@
 <!--
   Inspektor pamięci (makieta 9, F7): lista wpisów z filtrami (warstwa, zakres, zaufanie, stan)
-  i wyszukiwaniem; szczegóły wpisu („dlaczego to pamiętam", wersje, edycja = nowa wersja,
-  przypięcie, zatwierdzenie, awans, zapomnienie z podglądem kaskady) i dziennik zakresu z cofaniem.
+  i wyszukiwaniem; „Naucz Alfę” (okno nauki z tekstu, pliku albo rozmowy); szczegóły wpisu
+  („dlaczego to pamiętam", wersje, edycja = nowa wersja, przypięcie, zatwierdzenie, awans,
+  zapomnienie z podglądem kaskady) i dziennik zakresu z cofaniem.
 -->
 <script lang="ts">
-  import { EmptyState, Select, TextField } from '@alfa/ui-kit';
+  import { Button, EmptyState, Select, TextField } from '@alfa/ui-kit';
   import Brain from '@lucide/svelte/icons/brain';
   import Pin from '@lucide/svelte/icons/pin';
   import type {
@@ -16,6 +17,7 @@
   import { load } from '../../state/attempt';
   import { scopeTitle } from '../../logic/memory-scope';
   import { useApp } from '../../state/context';
+  import { openTeach } from '../../state/teach-dialog.svelte';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import Loading from '../shell/Loading.svelte';
   import MemoryDetail from './MemoryDetail.svelte';
@@ -103,6 +105,9 @@
 </script>
 
 <div class="memory">
+  <div class="toolbar">
+    <Button size="sm" variant="secondary" onclick={openTeach}>{t('teach.open')}</Button>
+  </div>
   <div class="filters" role="group" aria-label={t('memory.filters')}>
     <TextField label={t('memory.search')} type="search" bind:value={text} />
     <Select label={t('memory.scope')} size="sm" bind:value={scope} options={scopeOptions} />
@@ -190,6 +195,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--alfa-space-2);
+  }
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
   }
   .filters {
     display: grid;

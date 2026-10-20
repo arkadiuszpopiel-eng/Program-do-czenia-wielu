@@ -8,17 +8,25 @@
 //! - [`tools`] — narzędzia `memory_recall` / `memory_remember` dla agentek (`Accessor::Agent`
 //!   z ról obsady i projektu sesji — [`RoleAccess`]);
 //! - [`guardian`] — Strażniczka pamięci (`ConsolidationModule`: model lokalny przez Router,
-//!   budżet tła, stan maszyny; licznik bezczynności — port z atrapą „nigdy bezczynny").
+//!   budżet tła, stan maszyny; licznik bezczynności — port z atrapą „nigdy bezczynny");
+//! - [`teach`] — „Naucz Alfę” (P5): tekst, plik albo rozmowa → fakty ze źródłem ([`chunk`]).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod access;
 mod app;
+pub mod chunk;
 pub mod forget;
 pub mod guardian;
 pub mod ids;
 pub mod map;
+pub mod teach;
 pub mod tools;
+
+#[cfg(test)]
+mod chunk_tests;
+#[cfg(test)]
+mod teach_tests;
 
 use std::path::PathBuf;
 use std::sync::Arc;
