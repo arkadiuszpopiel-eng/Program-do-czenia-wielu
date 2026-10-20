@@ -528,6 +528,15 @@ export const SETTINGS_PART_A: readonly SettingsPageDef[] = [
         false,
         'machine',
       ),
+      toggle(
+        'ui.broker_dev_banner',
+        L('Pokazuj baner trybu deweloperskiego', 'Show the developer mode banner'),
+        L(
+          'Baner „Tryb deweloperski: Broker w procesie aplikacji” to tylko informacja. Wyłącz, żeby nie pokazywał się przy każdym uruchomieniu — tryb pracy się nie zmienia. Banery bezpiecznego stanu (brak Brokera, zerwane połączenie) pokazują się zawsze.',
+          'The “Developer mode: Broker inside the app process” banner is information only. Turn off so it no longer shows on every start — the mode itself does not change. Safe-state banners (no Broker, lost connection) always show.',
+        ),
+        true,
+      ),
     ],
     {
       custom: 'permissions',

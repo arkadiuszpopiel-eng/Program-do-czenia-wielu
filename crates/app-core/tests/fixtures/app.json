@@ -52,6 +52,7 @@
         "agents.verify_before_done": true,
         "scheduler.max_parallel": 4,
         "ui.hide_from_capture": false,
+        "ui.broker_dev_banner": true,
         "memory.consolidation_enabled": true,
         "memory.consolidation_window": "02:00-05:00",
         "memory.auto_extract": "ask",

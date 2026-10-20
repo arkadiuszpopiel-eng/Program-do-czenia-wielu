@@ -1571,6 +1571,22 @@
             },
             "default": false,
             "scope": "machine"
+          },
+          {
+            "key": "ui.broker_dev_banner",
+            "label": {
+              "pl": "Pokazuj baner trybu deweloperskiego",
+              "en": "Show the developer mode banner"
+            },
+            "description": {
+              "pl": "Baner „Tryb deweloperski: Broker w procesie aplikacji” to tylko informacja. Wyłącz, żeby nie pokazywał się przy każdym uruchomieniu — tryb pracy się nie zmienia. Banery bezpiecznego stanu (brak Brokera, zerwane połączenie) pokazują się zawsze.",
+              "en": "The “Developer mode: Broker inside the app process” banner is information only. Turn off so it no longer shows on every start — the mode itself does not change. Safe-state banners (no Broker, lost connection) always show."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "global"
           }
         ],
         "upcoming": []
@@ -2743,6 +2759,7 @@
       "agents.verify_before_done": true,
       "scheduler.max_parallel": 4,
       "ui.hide_from_capture": false,
+      "ui.broker_dev_banner": true,
       "memory.consolidation_enabled": true,
       "memory.consolidation_window": "02:00-05:00",
       "memory.auto_extract": "ask",

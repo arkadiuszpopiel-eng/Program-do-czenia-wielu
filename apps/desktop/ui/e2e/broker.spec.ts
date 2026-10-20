@@ -77,5 +77,21 @@ for (const theme of ['light', 'dark'] as const) {
       await region.getByRole('button', { name: 'Ukryj komunikat' }).click();
       await expect(region).toHaveCount(0);
     });
+
+    test('tryb deweloperski: baner informacyjny wyłączany w Ustawieniach', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'broker-dev' });
+      await waitForChat(page);
+      const region = page.getByRole('region', { name: 'Stan Brokera' });
+      await expect(region).toContainText('Tryb deweloperski');
+      await openPermissions(page);
+      const toggle = page.getByRole('switch', { name: 'Pokazuj baner trybu deweloperskiego' });
+      await expect(toggle).toBeChecked();
+      await expectAccessible(page, `Broker dev — ustawienie ${theme}`);
+      await toggle.click();
+      await expect(toggle).not.toBeChecked();
+      await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();
+      await waitForChat(page);
+      await expect(region).toHaveCount(0);
+    });
   });
 }

@@ -20,6 +20,12 @@
   const retryQueue = () => void attempt(app.toasts, () => app.client.system.retryQueue());
   const openSettings = (uri: 'ms-settings:privacy-microphone' | 'ms-settings:storagesense') => () =>
     void attempt(app.toasts, () => app.client.app.openSystemSettings(uri));
+  // Baner trybu deweloperskiego (tylko informacja) można wyłączyć w Ustawieniach → Uprawnienia;
+  // banery bezpiecznego stanu pokazują się zawsze.
+  const brokerShown = $derived(
+    app.broker.banner !== null &&
+      (app.broker.banner !== 'dev' || app.bool('ui.broker_dev_banner', true)),
+  );
   const any = $derived(
     status !== null &&
       (!status.online ||
@@ -30,7 +36,7 @@
   );
 </script>
 
-{#if app.broker.banner}
+{#if brokerShown}
   <div class="banners" role="region" aria-label={t('broker.region')}>
     <BrokerBanner />
   </div>

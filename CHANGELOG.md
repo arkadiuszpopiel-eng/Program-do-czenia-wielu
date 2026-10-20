@@ -40,6 +40,10 @@ firm, karty graficzne w modułach głosu — oraz naprawa regresji obowiązków 
   sprawdzane schematem samego narzędzia (nadmiarowe pole od modelu nie odrzuca wywołania).
 - Zmiana nazwy aktywnej rozmowy nie znika już przez dwa pola edycji naraz; kontrast przycisków w stylach „next”
   i „szkło” (jasne); pasek tytułu w wąskim oknie bez nachodzących przycisków.
+- Baner „Tryb deweloperski: Broker w procesie aplikacji” wyłączysz na stałe przełącznikiem w Ustawieniach →
+  Uprawnienia i bezpieczeństwo (banery bezpiecznego stanu pokazują się zawsze).
+- Okno startuje z mniejszym pakietem: widok kart, okienka stanu i kosztu, baner aktualizacji i błąd odpowiedzi
+  wczytują się dopiero, gdy są potrzebne (start znów w budżecie 150 KB).
 
 ### Testy
 
