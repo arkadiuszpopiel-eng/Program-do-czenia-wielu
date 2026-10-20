@@ -12,7 +12,7 @@
   import type { SessionGroup } from '../../state/sessions.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import SessionRow from './SessionRow.svelte';
-  import SessionCards from './SessionCards.svelte';
+  import Lazy from './Lazy.svelte';
 
   interface Props {
     /** Panel jako szuflada / arkusz — bez przycisku zwijania do paska ikon. */
@@ -23,6 +23,8 @@
   const app = useApp();
   const { t } = app.i18n;
   const sessions = app.sessions;
+  // Widok kart (seria 6) jest opcjonalny — ładowany leniwie, poza budżetem startowym okna.
+  const loadCards = () => import('./SessionCards.svelte');
   let searching = $state(false);
   let searchError = $state<string | null>(null);
   /** Numer ostatniego wyszukiwania — spóźniona odpowiedź na stare zapytanie jest pomijana. */
@@ -154,7 +156,11 @@
     {:else if sessions.groups.length === 0}
       <p class="meta">{t('sessions.periodEmpty')}</p>
     {:else if sessions.view === 'cards'}
-      <SessionCards groups={sessions.groups} title={cardsTitle} />
+      <Lazy
+        load={loadCards}
+        props={{ groups: sessions.groups, title: cardsTitle }}
+        label={t('common.loading')}
+      />
     {:else}
       {#each sessions.groups as group (group.id)}
         <section class="group" aria-labelledby="grp-{group.id}">

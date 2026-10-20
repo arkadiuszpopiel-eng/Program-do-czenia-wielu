@@ -3,28 +3,11 @@
 // fragment liczy rdzeń, `app_modules::session_cards`).
 import { agentIds, type AgentId } from '@alfa/ui-kit/tokens';
 
-export type SessionsView = 'list' | 'cards';
+// Zapamiętany widok jest w osobnym module: stan sesji ładuje go przy starcie, resztę — widok kart.
+export { readSessionsView, writeSessionsView, type SessionsView } from './sessions-view';
 
-const VIEW_KEY = 'alfa.sessions.view';
 /** Najdłuższy fragment ostatniej wiadomości (znaki) — jak w rdzeniu. */
 export const SNIPPET_CHARS = 160;
-
-/** Widok z poprzedniego uruchomienia (pamięć tego komputera); brak albo błąd — lista. */
-export function readSessionsView(storage: Pick<Storage, 'getItem'> | null): SessionsView {
-  try {
-    return storage?.getItem(VIEW_KEY) === 'cards' ? 'cards' : 'list';
-  } catch {
-    return 'list';
-  }
-}
-
-export function writeSessionsView(storage: Pick<Storage, 'setItem'> | null, view: SessionsView) {
-  try {
-    storage?.setItem(VIEW_KEY, view);
-  } catch {
-    // Pamięć przeglądarki niedostępna — widok działa do zamknięcia okna.
-  }
-}
 
 /**
  * Indeks karty po naciśnięciu klawisza w siatce `columns` kolumn i `count` kart; `null` — klawisz

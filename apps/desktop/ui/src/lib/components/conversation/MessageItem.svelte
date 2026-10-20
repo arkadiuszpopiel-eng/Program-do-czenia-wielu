@@ -22,7 +22,7 @@
   import type { ConversationState } from '../../state/conversation.svelte';
   import CodeBlock from './CodeBlock.svelte';
   import MessageApproval from './MessageApproval.svelte';
-  import MessageError from './MessageError.svelte';
+  import Lazy from '../shell/Lazy.svelte';
   import { isContinued } from '../../logic/turn-tree';
   import MessageActions from './MessageActions.svelte';
   import MessageAttachments from './MessageAttachments.svelte';
@@ -99,6 +99,8 @@
     node.setSelectionRange(node.value.length, node.value.length);
   }
   import HiddenMessage from './HiddenMessage.svelte';
+  // Błąd tury jest rzadki — jego widok ładowany leniwie, poza budżetem startowym okna.
+  const loadError = () => import('./MessageError.svelte');
 </script>
 
 {#if annotation?.hidden}
@@ -227,7 +229,13 @@
     {#if agent && turn.tools.length}<div class="indent"><AgentCards {turn} /></div>{/if}
 
     {#if turn.error}
-      <div class="indent"><MessageError {turn} error={turn.error} {conv} /></div>
+      <div class="indent">
+        <Lazy
+          load={loadError}
+          props={{ turn, error: turn.error, conv }}
+          label={t('common.loading')}
+        />
+      </div>
     {/if}
 
     {#if turn.usage && agent && !streaming && app.bool('ui.reply_details', true)}

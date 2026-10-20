@@ -13,11 +13,13 @@
   import Shield from '@lucide/svelte/icons/shield';
   import WifiOff from '@lucide/svelte/icons/wifi-off';
   import { useApp } from '../../state/context';
-  import CostDetails from './CostDetails.svelte';
-  import StatusDetails from './StatusDetails.svelte';
+  import Lazy from './Lazy.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
+  // Treść okienek ładowana dopiero po otwarciu — poza budżetem startowym okna.
+  const loadStatus = () => import('./StatusDetails.svelte');
+  const loadCosts = () => import('./CostDetails.svelte');
   const session = $derived(app.sessions.active);
   const profileId = $derived(app.system?.profile ?? session?.profile ?? 'hybrid');
   const profile = $derived(t(`profile.${profileId}`));
@@ -62,7 +64,11 @@
         </span>
       </button>
     {/snippet}
-    <StatusDetails onnavigate={() => (stateOpen = false)} />
+    <Lazy
+      load={loadStatus}
+      props={{ onnavigate: () => (stateOpen = false) }}
+      label={t('common.loading')}
+    />
   </Popover>
   <span class="rule" aria-hidden="true"></span>
   <Popover label={t('costs.title')} bind:open={costOpen}>
@@ -79,7 +85,7 @@
         <span class="num">{cost}</span>
       </button>
     {/snippet}
-    <CostDetails />
+    <Lazy load={loadCosts} props={{}} label={t('common.loading')} />
   </Popover>
 </div>
 

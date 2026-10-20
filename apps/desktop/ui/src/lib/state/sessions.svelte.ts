@@ -1,7 +1,7 @@
 // Lista sesji panelu lewego: grupy (przypięte, projekty, bez projektu, archiwum), sortowanie,
 // „karty" jako lista ostatnio używanych (Ctrl+Tab / Ctrl+1…9 / Ctrl+W / Ctrl+Shift+T).
 import type { ProjectRef, SessionSearchHit, SessionSummary } from '../api/types';
-import { readSessionsView, writeSessionsView, type SessionsView } from '../logic/session-cards';
+import { readSessionsView, writeSessionsView, type SessionsView } from '../logic/sessions-view';
 import { inPeriod, type SessionPeriod } from '../logic/session-period';
 
 /** Pamięć przeglądarki tego komputera; niedostępna (testy, zablokowana) — `null`. */

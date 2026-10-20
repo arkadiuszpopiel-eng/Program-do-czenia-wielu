@@ -5,12 +5,15 @@
   import { Banner, Button } from '@alfa/ui-kit';
   import { attempt } from '../../state/attempt';
   import { now } from '../../state/clock.svelte';
-  import UpdateBanner from '../shell/UpdateBanner.svelte';
+  import Lazy from '../shell/Lazy.svelte';
   import BrokerBanner from '../shell/BrokerBanner.svelte';
   import { useApp } from '../../state/context';
 
   const app = useApp();
   const { t } = app.i18n;
+  // Baner aktualizacji pojawia się rzadko — ładowany leniwie, poza budżetem startowym okna.
+  // Baner Brokera zostaje w pakiecie startowym (stan bezpieczeństwa bez opóźnienia).
+  const loadUpdate = () => import('../shell/UpdateBanner.svelte');
   const status = $derived(app.system);
   const dismiss = (id: string) => () => (app.dismissed[id] = true);
   // Przyciski banerów: odrzucona komenda (kolejka, ustawienia Windows) = toast z powodem.
@@ -34,7 +37,7 @@
 {/if}
 {#if app.updates.showBanner}
   <div class="banners" role="region" aria-label={t('updates.title')}>
-    <UpdateBanner />
+    <Lazy load={loadUpdate} props={{}} label={t('updates.title')} />
   </div>
 {/if}
 {#if status && any}
