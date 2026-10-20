@@ -29,7 +29,9 @@
   const app = useApp();
   const { t } = app.i18n;
   const active = $derived(app.activeId === session.id);
-  const renaming = $derived(app.sessions.renamingId === session.id);
+  const renaming = $derived(
+    app.sessions.renamingId === session.id && !app.sessions.renamingInTitle,
+  );
   const items = $derived<MenuItem[]>(sessionMenuItems(app, session));
   const project = $derived(showProject ? (session.project?.name ?? '') : '');
   const cast = $derived(knownAgents(card?.agents ?? []));
@@ -62,6 +64,7 @@
     if (event.key === 'F2') {
       event.preventDefault();
       event.stopPropagation();
+      app.sessions.renamingInTitle = false;
       app.sessions.renamingId = session.id;
     } else if (event.key === 'Delete') {
       event.preventDefault();
@@ -169,10 +172,8 @@
         </span>
         <span class="foot">
           <span title={app.i18n.dateTime(session.updated_at)}
-            ><span class="alfa-visually-hidden">{t('sessions.card.updated')}&nbsp;</span>{app.i18n.relative(
-              session.updated_at,
-              now(),
-            )}</span
+            ><span class="alfa-visually-hidden">{t('sessions.card.updated')}&nbsp;</span
+            >{app.i18n.relative(session.updated_at, now())}</span
           >
           {#if card?.cost}
             <span class="cost">{t('sessions.card.cost', { cost: app.i18n.money(card.cost) })}</span>

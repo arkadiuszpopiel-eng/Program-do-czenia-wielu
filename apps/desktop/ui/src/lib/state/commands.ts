@@ -109,7 +109,10 @@ export function runCommand(app: AppState, id: string): void {
       void open(app, app.sessions.cycle(-1));
       break;
     case 'session.rename':
-      if (sid) app.sessions.renamingId = sid;
+      if (sid) {
+        app.sessions.renamingInTitle = true;
+        app.sessions.renamingId = sid;
+      }
       break;
     case 'search.everywhere':
       app.view = 'chat';

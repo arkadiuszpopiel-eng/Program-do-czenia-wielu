@@ -5,7 +5,7 @@ import { expectAccessible, pickOption, waitForChat } from './helpers';
 // Arena (P4, 0.0.65): ta sama wiadomość do dwóch modeli obok siebie — wybór modeli, dwie
 // odpowiedzi jako nowe gałęzie (po kolei), czas / tokeny / koszt, „Wybierz tę odpowiedź”, błąd
 // tury (limit kosztów), za mało modeli — każdy stan w każdym stylu i motywie.
-// Atrapa: Anthropic · claude-opus-5-5 odpowiada dłużej (wolniej i drożej), OpenAI · gpt-6-sol krócej.
+// Atrapa: Anthropic (Claude) · claude-opus-5-5 odpowiada dłużej (wolniej i drożej), OpenAI · gpt-6-sol krócej.
 
 const LONG_START = 'Rozpisałam to krok po kroku.';
 const SHORT_START = 'W skrócie:';
@@ -49,7 +49,7 @@ test('paleta → Arena: dwie odpowiedzi obok siebie, miary, wybór gałęzi', as
   await expect(statuses.nth(0)).toHaveText('Gotowe', { timeout: 15_000 });
   await expect(statuses.nth(1)).toHaveText('Gotowe', { timeout: 15_000 });
   const first = dialog.getByRole('region', {
-    name: 'Odpowiedź modelu Anthropic · claude-opus-5-5',
+    name: 'Odpowiedź modelu Anthropic (Claude) · claude-opus-5-5',
   });
   const second = dialog.getByRole('region', { name: 'Odpowiedź modelu OpenAI · gpt-6-sol' });
   await expect(first).toContainText(LONG_START);
@@ -60,11 +60,11 @@ test('paleta → Arena: dwie odpowiedzi obok siebie, miary, wybór gałęzi', as
   await expect(dialog.getByText('Tańsza')).toHaveCount(1);
 
   await dialog
-    .getByRole('button', { name: 'Wybierz odpowiedź modelu Anthropic · claude-opus-5-5' })
+    .getByRole('button', { name: 'Wybierz odpowiedź modelu Anthropic (Claude) · claude-opus-5-5' })
     .click();
   await expect(dialog).toBeHidden();
   await expect(
-    page.getByText('Wybrano odpowiedź modelu Anthropic · claude-opus-5-5.'),
+    page.getByText('Wybrano odpowiedź modelu Anthropic (Claude) · claude-opus-5-5.'),
   ).toBeVisible();
   await expect(page.locator('article').last()).toContainText(LONG_START);
 });
@@ -117,7 +117,9 @@ test('Arena: Zatrzymaj w trakcie A — A zatrzymana, B nie startuje, bez „Szyb
   await expect(dialog.getByText('Szybsza')).toHaveCount(0);
   await expect(dialog.getByText('Tańsza')).toHaveCount(0);
   await expect(
-    dialog.getByRole('button', { name: 'Wybierz odpowiedź modelu Anthropic · claude-opus-5-5' }),
+    dialog.getByRole('button', {
+      name: 'Wybierz odpowiedź modelu Anthropic (Claude) · claude-opus-5-5',
+    }),
   ).toBeDisabled();
 });
 

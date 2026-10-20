@@ -37,6 +37,12 @@
     void import('../../highlight/highlight').then((m) => m.highlightElement(code, block.lang));
   });
 
+  // Kod przewijany w poziomie (wąskie okno, długie linie) — dostępny z klawiatury (strzałki).
+  $effect(() => {
+    void block.html_sanitized;
+    host?.querySelector('pre')?.setAttribute('tabindex', '0');
+  });
+
   async function copy() {
     const text = host?.querySelector('pre')?.textContent ?? '';
     try {
@@ -114,6 +120,10 @@
   }
   .tools {
     display: inline-flex;
+  }
+  .code :global(pre:focus-visible) {
+    outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);
+    outline-offset: -2px;
   }
   .wrap :global(pre) {
     white-space: pre-wrap;

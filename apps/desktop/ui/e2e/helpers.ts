@@ -48,8 +48,11 @@ export async function expectAccessible(page: Page, label: string) {
   await page.evaluate(
     () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
   );
+  // Ramka kanwy (`sandbox=""`, bez skryptów): axe nie może się do niej wstrzyknąć, a próba
+  // zawieszała analizę do końca limitu testu. Nazwę ramki sprawdzają testy kanwy.
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .exclude('iframe[sandbox=""]')
     .analyze();
   const blocking = results.violations.filter(
     (v) => v.impact === 'critical' || v.impact === 'serious',

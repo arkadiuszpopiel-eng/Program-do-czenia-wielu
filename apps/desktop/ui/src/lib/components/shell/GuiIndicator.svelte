@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
   import MousePointer from '@lucide/svelte/icons/mouse-pointer-2';
+  import Square from '@lucide/svelte/icons/square';
   import { agentName } from '../../logic/work';
   import { useApp } from '../../state/context';
 
@@ -46,7 +47,9 @@
       <span class="text">{t('gui.controlling', { name })}</span>
     </button>
     <button type="button" class="act stop" onclick={() => act(() => app.client.gui.stop())}
-      >{t('gui.stopShort')}</button
+      ><Square size={12} strokeWidth={2} aria-hidden="true" class="stop-icon" /><span
+        class="stop-text">{t('gui.stopShort')}</span
+      ></button
     >
   </div>
 {/if}
@@ -105,12 +108,30 @@
       display: none;
     }
   }
-  @media (max-width: 520px) {
+  .live :global(.stop-icon) {
+    display: none;
+  }
+  /* Poniżej 900 px pasek tytułu nie mieści pełnej kapsuły: ściśnięta wsuwała „Zatrzymaj” pod
+     przycisk mikrofonu (cel kliknięcia przykryty). Zostaje kwadrat „Zatrzymaj” (nazwa przycisku
+     ukryta tylko wizualnie). */
+  @media (max-width: 900px) {
     .live {
+      flex: none;
       padding-left: 3px;
     }
     .live .label {
       display: none;
+    }
+    .live :global(.stop-icon) {
+      display: block;
+    }
+    .stop-text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
   .stop {

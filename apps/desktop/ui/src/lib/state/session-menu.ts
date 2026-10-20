@@ -12,7 +12,10 @@ export function sessionMenuItems(app: AppState, session: SessionSummary): MenuIt
     {
       id: 'rename',
       label: t('sessions.rename'),
-      onSelect: () => (app.sessions.renamingId = session.id),
+      onSelect: () => {
+        app.sessions.renamingInTitle = false;
+        app.sessions.renamingId = session.id;
+      },
     },
     {
       id: 'pin',

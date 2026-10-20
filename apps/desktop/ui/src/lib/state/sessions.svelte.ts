@@ -74,6 +74,8 @@ export class SessionsState {
   query = $state('');
   hits = $state<SessionSearchHit[]>([]);
   renamingId = $state<string | null>(null);
+  /** Pole nazwy w pasku tytułu (`true`) albo w panelu Sesje — jedno pole naraz, bez walki o fokus. */
+  renamingInTitle = $state(false);
   readonly active: SessionSummary | null = $derived(
     this.list.find((s) => s.id === this.activeId) ?? null,
   );

@@ -25,7 +25,7 @@
     --alfa-color-text-muted: light-dark(#465163, #a3aab6);
     --alfa-color-text-subtle: light-dark(#566274, #8b94a3);
     --alfa-color-text-on-accent: light-dark(#ffffff, #031015);
-    --alfa-color-focus: light-dark(#0a7791, oklch(83% 0.105 196));
+    --alfa-color-focus: light-dark(#0a7490, oklch(83% 0.105 196));
     --alfa-color-scrim: light-dark(rgba(15, 22, 32, 0.36), rgba(3, 7, 11, 0.75));
     --alfa-color-success: light-dark(#0e7a44, oklch(80% 0.15 158));
     --alfa-color-warning: light-dark(#875600, oklch(85% 0.14 85));
@@ -38,7 +38,7 @@
     --alfa-shadow-2: 0 4px 14px light-dark(rgba(15, 22, 32, 0.09), rgba(0, 0, 0, 0.28));
     --alfa-shadow-3: 0 30px 90px light-dark(rgba(15, 22, 32, 0.2), rgba(0, 0, 0, 0.65));
     /* Akcent stylu: przyciski główne, wybrane pozycje. */
-    --alfa-color-accent: light-dark(#0a7791, oklch(75% 0.13 200));
+    --alfa-color-accent: light-dark(#0a7490, oklch(75% 0.13 200));
     --alfa-accent-fill: linear-gradient(
       135deg,
       light-dark(#0b819c, oklch(83% 0.105 196)),
@@ -87,6 +87,8 @@
     --alfa-shadow-3:
       0 24px 60px light-dark(rgba(31, 41, 99, 0.22), rgba(0, 0, 0, 0.55)),
       inset 0 1px 0 var(--alfa-skin-sheen);
+    /* Kolor Alfy o ton ciemniejszy w wersji jasnej: #c63d2f na tle #e9edfb ma 4,37 (< 4,5). */
+    --alfa-agent-alfa: light-dark(#bf3a2d, #f59a84);
     --alfa-color-accent: light-dark(#4458e6, #c9d5ff);
     --alfa-accent-fill: linear-gradient(
       135deg,

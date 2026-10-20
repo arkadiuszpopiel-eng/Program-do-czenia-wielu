@@ -176,7 +176,9 @@
             {t('canvas.truncated', { limit: app.i18n.bytes(CANVAS_MAX_BYTES) })}
           </p>
         {/if}
-        <pre class="source">{shown.text}</pre>
+        <!-- tabindex: przewijane źródło dostępne z klawiatury (strzałki / PgDn). -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <pre class="source" tabindex="0">{shown.text}</pre>
       {:else if big}
         <p class="notice" role="status">
           {t('canvas.tooLarge', {
@@ -195,6 +197,7 @@
           sandbox=""
           referrerpolicy="no-referrer"
           title={t('canvas.frameTitle', { title })}
+          aria-label={t('canvas.frameTitle', { title })}
         ></iframe>
         <p class="isolated">{t('canvas.isolated')}</p>
       {:else}

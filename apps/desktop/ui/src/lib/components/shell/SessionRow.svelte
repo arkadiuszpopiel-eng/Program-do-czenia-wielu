@@ -16,7 +16,9 @@
   const app = useApp();
   const { t } = app.i18n;
   const active = $derived(app.activeId === session.id);
-  const renaming = $derived(app.sessions.renamingId === session.id);
+  const renaming = $derived(
+    app.sessions.renamingId === session.id && !app.sessions.renamingInTitle,
+  );
   let draft = $state('');
 
   $effect(() => {
@@ -29,6 +31,7 @@
     if (event.key === 'F2') {
       event.preventDefault();
       event.stopPropagation();
+      app.sessions.renamingInTitle = false;
       app.sessions.renamingId = session.id;
     } else if (event.key === 'Delete') {
       event.preventDefault();

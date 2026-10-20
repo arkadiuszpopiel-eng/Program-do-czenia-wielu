@@ -52,7 +52,8 @@ test('HTML: izolowana ramka bez skryptów i bez dostępu do Alfy', async ({ page
   await expect(region.getByRole('tab', { name: 'Podgląd', selected: true })).toBeVisible();
   const frame = region.locator('iframe');
   await expect(frame).toHaveAttribute('sandbox', '');
-  await expect(frame).toHaveAttribute('title', 'Podgląd: Karta projektu');
+  // Nazwa ramki także w `aria-label` — `title` zdejmują podpowiedzi Alfy (ui-kit `installTooltips`).
+  await expect(frame).toHaveAttribute('aria-label', 'Podgląd: Karta projektu');
   await expect(region.getByText(/izolowanej ramce: bez skryptów/)).toBeVisible();
   const probe = await frame.evaluate((el: HTMLIFrameElement) => {
     let internals: unknown;

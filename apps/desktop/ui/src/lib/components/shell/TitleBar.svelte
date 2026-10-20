@@ -26,7 +26,9 @@
   const panels = $derived(app.layout.current(app.activeId));
   const place = $derived(app.layout.placement(app.activeId));
   const agentStates = $derived(app.activeId ? (app.agents[app.activeId] ?? []) : []);
-  const renaming = $derived(session !== null && app.sessions.renamingId === session.id);
+  const renaming = $derived(
+    session !== null && app.sessions.renamingId === session.id && app.sessions.renamingInTitle,
+  );
   const title = $derived(session?.title ?? t('titlebar.noSession'));
   const crumbs = $derived(session?.project ? `${session.project.name} ▸ ${title}` : title);
   const busy = $derived(
@@ -93,7 +95,11 @@
       aria-label={t('titlebar.session', { path: crumbs })}
       aria-keyshortcuts="F2"
       disabled={!session}
-      onclick={() => session && (app.sessions.renamingId = session.id)}
+      onclick={() => {
+        if (!session) return;
+        app.sessions.renamingInTitle = true;
+        app.sessions.renamingId = session.id;
+      }}
     >
       {#if session?.project}
         <span class="project">{session.project.name}</span>
