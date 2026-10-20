@@ -50,6 +50,17 @@ impl AppCore {
             .broker
             .request_level(level, session.as_ref())
             .await?;
+        if result.status == BrokerIntentStatus::OpenedBroker {
+            // Podniesienie czeka na zgodę w oknie Brokera: strażnik przyjmie ten poziom, gdy
+            // Broker go zgłosi (w ciągu `RAISE_TTL_MS`), zamiast cofać do zapamiętanego obniżenia.
+            let mut raises = self.pending_raises().await;
+            let scope = session.as_ref().map_or(GLOBAL_SCOPE, SessionId::as_str);
+            raises.insert(
+                scope.to_owned(),
+                (level, chrono::Utc::now().timestamp_millis()),
+            );
+            self.store_pending_raises(&raises).await?;
+        }
         if result.status == BrokerIntentStatus::Applied {
             match &session {
                 // Zapamiętany poziom wraca po restarcie (obniżenie nie wymaga zgody).
@@ -132,9 +143,16 @@ impl AppCore {
             return false;
         };
         let (global, sessions) = self.remembered_levels().await;
+        let mut raises = self.pending_raises().await;
         if let Some(level) = global
             && level < view.global
         {
+            // Podniesienie zatwierdzone w oknie Brokera — nowy zapamiętany poziom, nie „restart
+            // Brokera z poziomem domyślnym” (zgłoszenie 20.10: L4 po zgodzie wracało do L2).
+            if raises.remove(GLOBAL_SCOPE).map(|(l, _)| l) == Some(view.global) {
+                self.adopt_raise(None, view.global, &raises).await;
+                return true;
+            }
             match self.inner.broker.request_level(level, None).await {
                 Ok(_) => tracing::info!(?level, "przywrócono zapamiętany poziom autonomii"),
                 Err(e) => {
@@ -155,6 +173,13 @@ impl AppCore {
                 .levels(Some(&session))
                 .await
                 .map(|v| v.session.unwrap_or(v.global));
+            if let Some(c) = current
+                && level < c
+                && raises.remove(id.as_str()).map(|(l, _)| l) == Some(c)
+            {
+                self.adopt_raise(Some(&session), c, &raises).await;
+                continue;
+            }
             if current.is_some_and(|c| level < c)
                 && let Err(e) = self.inner.broker.request_level(level, Some(&session)).await
             {
@@ -162,6 +187,69 @@ impl AppCore {
             }
         }
         true
+    }
+
+    /// Oczekujące podniesienia (zakres → poziom, chwila prośby), bez przeterminowanych.
+    async fn pending_raises(&self) -> BTreeMap<String, (AutonomyLevel, i64)> {
+        let now = chrono::Utc::now().timestamp_millis();
+        self.config_value(PENDING_RAISES)
+            .await
+            .and_then(|v| serde_json::from_value::<Vec<String>>(v).ok())
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|entry| {
+                let mut parts = entry.rsplitn(3, ':');
+                let at: i64 = parts.next()?.parse().ok()?;
+                let level = parts.next()?;
+                let scope = parts.next()?;
+                let level = serde_json::from_value(serde_json::Value::String(level.into())).ok()?;
+                (now.saturating_sub(at) <= RAISE_TTL_MS).then(|| (scope.to_owned(), (level, at)))
+            })
+            .collect()
+    }
+
+    /// Zapis oczekujących podniesień (wpisy `zakres:poziom:chwila`).
+    async fn store_pending_raises(
+        &self,
+        raises: &BTreeMap<String, (AutonomyLevel, i64)>,
+    ) -> Result<(), AppError> {
+        let entries: Vec<String> = raises
+            .iter()
+            .filter_map(|(scope, (level, at))| {
+                let level = serde_json::to_value(level).ok()?;
+                Some(format!("{scope}:{}:{at}", level.as_str()?))
+            })
+            .collect();
+        let value = serde_json::to_value(entries).map_err(AppError::internal)?;
+        self.config_set(PENDING_RAISES, Some(value), false).await
+    }
+
+    /// Zatwierdzone podniesienie staje się zapamiętanym poziomem (globalnym albo sesji).
+    async fn adopt_raise(
+        &self,
+        session: Option<&SessionId>,
+        level: AutonomyLevel,
+        rest: &BTreeMap<String, (AutonomyLevel, i64)>,
+    ) {
+        let saved = match session {
+            None => match serde_json::to_value(level) {
+                Ok(value) => self.config_set(keys::AUTONOMY, Some(value), false).await,
+                Err(e) => Err(AppError::internal(e)),
+            },
+            Some(id) => self.remember_session_level(id, level).await,
+        };
+        if let Err(e) = saved.and(self.store_pending_raises(rest).await) {
+            tracing::warn!(error = %e, "zapis zatwierdzonego poziomu autonomii nie powiódł się");
+            return;
+        }
+        tracing::info!(
+            ?level,
+            "przyjęto podniesienie poziomu zatwierdzone w oknie Brokera"
+        );
+        match session {
+            Some(id) => self.announce_session(id).await,
+            None => self.announce_all_sessions().await,
+        }
     }
 
     /// Strażnik autonomii: zapamiętane obniżenia nakładane przy starcie i stale pilnowane — Broker
@@ -181,6 +269,12 @@ impl AppCore {
 
 /// Poziomy sesji obniżone przez właściciela: wpisy `identyfikator-sesji:poziom`.
 const SESSION_LEVELS: &str = "permissions.session_levels";
+/// Podniesienia czekające na zgodę w oknie Brokera: wpisy `zakres:poziom:chwila` (`*` — globalny).
+const PENDING_RAISES: &str = "permissions.pending_raises";
+/// Zakres globalny w [`PENDING_RAISES`].
+const GLOBAL_SCOPE: &str = "*";
+/// Jak długo oczekujące podniesienie jest ważne (karta Brokera wygasa po 10 min).
+const RAISE_TTL_MS: i64 = 15 * 60_000;
 /// Odstęp sprawdzeń, gdy Broker jeszcze nie odpowiedział (opóźniony start).
 const GUARD_RETRY: std::time::Duration = std::time::Duration::from_secs(2);
 /// Odstęp sprawdzeń po połączeniu (restart Brokera przywraca poziom domyślny).

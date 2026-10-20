@@ -1,6 +1,7 @@
 //! Zapamiętane obniżenia autonomii a Broker startujący później albo ponownie (audyt 2026-10-14,
 //! A-04): obniżenie globalne i obniżenie sesji wracają po ponownym uruchomieniu aplikacji, także
-//! gdy Broker odpowiada dopiero po chwili z poziomem domyślnym. Podniesień strażnik nie przywraca.
+//! gdy Broker odpowiada dopiero po chwili z poziomem domyślnym. Podniesień strażnik nie przywraca,
+//! ale podniesienia zatwierdzonego w oknie Brokera też nie cofa (zgłoszenie 2026-10-20).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -24,6 +25,8 @@ use sessions_contract::SessionId;
 #[derive(Default)]
 struct Broker {
     ready: AtomicBool,
+    /// Podniesienie czeka na zgodę w oknie Brokera (jak prawdziwy Broker).
+    window: AtomicBool,
     global: Mutex<AutonomyLevel>,
     sessions: Mutex<BTreeMap<String, AutonomyLevel>>,
     requests: Mutex<Vec<(AutonomyLevel, Option<String>)>>,
@@ -49,6 +52,12 @@ impl BrokerPort for Broker {
             .lock()
             .unwrap()
             .push((level, session.map(|s| s.as_str().to_owned())));
+        if self.window.load(Ordering::SeqCst) && level > *self.global.lock().unwrap() {
+            return Ok(BrokerIntentResult {
+                status: BrokerIntentStatus::OpenedBroker,
+                request_id: "okno".into(),
+            });
+        }
         match session {
             Some(s) => {
                 self.sessions
@@ -145,5 +154,52 @@ async fn lowered_levels_come_back_when_a_late_broker_starts_with_defaults() {
     late.requests.lock().unwrap().clear();
     tokio::time::sleep(Duration::from_millis(2_500)).await;
     assert!(late.requests.lock().unwrap().is_empty());
+    drop(core);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn raise_approved_in_broker_window_is_kept() {
+    let dir = tempfile::tempdir().unwrap();
+    let secrets = Arc::new(MemorySecretStore::default());
+    let broker = Arc::new(Broker::default());
+    broker.ready.store(true, Ordering::SeqCst);
+    broker.window.store(true, Ordering::SeqCst);
+    *broker.global.lock().unwrap() = AutonomyLevel::L3;
+    let core = start(dir.path(), broker.clone(), &secrets).await;
+    // Obniżenie do L2 (zapamiętane), potem prośba o L4 — karta w oknie Brokera.
+    core.permissions_request_level(AutonomyLevel::L2, None)
+        .await
+        .unwrap();
+    let asked = core
+        .permissions_request_level(AutonomyLevel::L4, None)
+        .await
+        .unwrap();
+    assert_eq!(asked.status, BrokerIntentStatus::OpenedBroker);
+    // Właściciel zatwierdza w oknie: Broker ma L4.
+    *broker.global.lock().unwrap() = AutonomyLevel::L4;
+    drop(core);
+    broker.requests.lock().unwrap().clear();
+
+    // Strażnik (start aplikacji) przyjmuje L4 zamiast cofać do zapamiętanego L2.
+    let core = start(dir.path(), broker.clone(), &secrets).await;
+    tokio::time::sleep(Duration::from_millis(500)).await;
+    assert!(
+        broker.requests.lock().unwrap().is_empty(),
+        "{:?}",
+        broker.requests.lock().unwrap()
+    );
+    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L4);
+    drop(core);
+
+    // Restart Brokera z poziomem domyślnym (L3) po przyjęciu L4 — L4 jest teraz zapamiętane,
+    // więc strażnik niczego nie obniża; obniżenia nadal działają.
+    *broker.global.lock().unwrap() = AutonomyLevel::L3;
+    let core = start(dir.path(), broker.clone(), &secrets).await;
+    tokio::time::sleep(Duration::from_millis(500)).await;
+    assert!(broker.requests.lock().unwrap().is_empty());
+    core.permissions_request_level(AutonomyLevel::L1, None)
+        .await
+        .unwrap();
+    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L1);
     drop(core);
 }
