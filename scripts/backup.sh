@@ -76,8 +76,10 @@ human() { # KiB → czytelnie, z przecinkiem dziesiętnym
 vol_serial() { cmd //c "vol $1" 2>/dev/null | tr -d '\r' | grep -oE '[0-9A-F]{4}-[0-9A-F]{4}' | head -1; }
 # Jedno wywołanie PowerShell (start trwa sekundy): wiersze `label=` (etykieta celu), `disk=` i `project_disk=`
 # (numery dysków fizycznych celu i projektu; puste dla `subst`, dysków sieciowych i przy błędzie).
+# Limit 40 s: gdy usługa WMI w Windows stoi (2026-10-20), `Get-Partition` czekał bez końca — po limicie
+# numery dysków są nieznane (jak dla `subst`), a kontrola „ten sam wolumin” (`vol`) i tak obowiązuje.
 drive_facts() { # <litera celu> <litera projektu>, np. F: E:
-  powershell.exe -NoProfile -NonInteractive -Command "[Console]::OutputEncoding = [Text.Encoding]::UTF8; \
+  timeout 40 powershell.exe -NoProfile -NonInteractive -Command "[Console]::OutputEncoding = [Text.Encoding]::UTF8; \
     function Disk(\$l) { try { (Get-Partition -DriveLetter \$l -ErrorAction Stop).DiskNumber } catch { '' } }; \
     try { 'label=' + [IO.DriveInfo]::new('$1\').VolumeLabel } catch { 'label=' }; \
     'disk=' + (Disk '${1:0:1}'); 'project_disk=' + (Disk '${2:0:1}')" 2>/dev/null | tr -d '\r'
@@ -107,6 +109,7 @@ if [ -n "$SERIAL" ] && [ "$SERIAL" = "$PROJECT_SERIAL" ]; then
   refuse "$DRIVE to ten sam wolumin co $PROJECT_DRIVE (numer seryjny $SERIAL, np. dysk z subst)"
 fi
 FACTS="$(drive_facts "$DRIVE" "$PROJECT_DRIVE")"
+[ -n "$FACTS" ] || echo "uwaga: brak odpowiedzi PowerShell/WMI w 40 s — numer dysku fizycznego nieznany"
 DISK="$(fact disk)"
 PROJECT_DISK="$(fact project_disk)"
 if [[ "$DISK" =~ ^[0-9]+$ ]] && [ "$DISK" = "$PROJECT_DISK" ]; then
