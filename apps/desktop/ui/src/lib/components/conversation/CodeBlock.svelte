@@ -62,7 +62,13 @@
     <span class="lang">{block.lang ?? 'text'}</span>
     <span class="tools">
       {#if artifact}
-        <IconButton label={t('canvas.open')} size="sm" onclick={() => openCanvas(artifact)}>
+        <IconButton
+          label={t('canvas.openNamed', {
+            title: artifact.title ?? t(`canvas.kind.${artifact.kind}`),
+          })}
+          size="sm"
+          onclick={() => openCanvas(artifact)}
+        >
           <PanelRightOpen size={14} strokeWidth={1.5} />
         </IconButton>
       {/if}

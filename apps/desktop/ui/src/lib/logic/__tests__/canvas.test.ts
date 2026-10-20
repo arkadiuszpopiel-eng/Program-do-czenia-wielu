@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { RenderedBlock } from '../../api/types';
 import {
+  CANVAS_CHAT_MIN,
   CANVAS_MAX_BYTES,
   blockArtifact,
   byteSize,
+  canvasDock,
+  clipBytes,
   codeSource,
   decodeEntities,
   detectArtifacts,
@@ -137,5 +140,48 @@ describe('kanwa: wykrywanie w odpowiedzi', () => {
     expect(detectArtifacts(turn(html, { status: 'streaming', text: longDoc }))).toEqual([]);
     expect(detectArtifacts(turn([code(0, 'python', 'print(1)')]))).toEqual([]);
     expect(blockArtifact('t', text(0, '<p>html</p>'))).toBeNull();
+  });
+});
+
+describe('ucięcie źródła do limitu bajtów', () => {
+  it('liczy bajty UTF-8 i nie rozdziela znaków ani par zastępczych', () => {
+    expect(clipBytes('abc', 10)).toEqual({ text: 'abc', clipped: false });
+    expect(clipBytes('ąę', 3)).toEqual({ text: 'ą', clipped: true });
+    expect(clipBytes('a😊b', 4)).toEqual({ text: 'a', clipped: true });
+    expect(clipBytes('a😊b', 5)).toEqual({ text: 'a😊', clipped: true });
+    const big = 'ż'.repeat(CANVAS_MAX_BYTES);
+    const clipped = clipBytes(big, CANVAS_MAX_BYTES);
+    expect(clipped.clipped).toBe(true);
+    expect(byteSize(clipped.text)).toBe(CANVAS_MAX_BYTES);
+  });
+});
+
+describe('kanwa obok rozmowy', () => {
+  const left = { width: 264, rail: 48 };
+  const chat = (body: number, l: number, r: number, w: number) => body - l - r - w;
+
+  it('szerokie okno 1440 z oboma panelami: lewy zwija się do paska, rozmowa ≥ 480', () => {
+    const dock = canvasDock(1440, left, 460);
+    expect(dock).not.toBeNull();
+    expect(dock?.railLeft).toBe(true);
+    expect(dock?.hideRight).toBe(false);
+    expect(chat(1440, 48, 460, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
+  });
+
+  it('1600 z oboma panelami mieści się bez zwijania', () => {
+    const dock = canvasDock(1600, left, 460);
+    expect(dock).toMatchObject({ railLeft: false, hideRight: false });
+    expect(chat(1600, 264, 460, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
+  });
+
+  it('średnie okno z prawym panelem: prawy chowa się na czas kanwy', () => {
+    const dock = canvasDock(1100, { width: 48, rail: 48 }, 360);
+    expect(dock?.hideRight).toBe(true);
+    expect(chat(1100, 48, 0, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
+  });
+
+  it('duże okno bez paneli: kanwa najwyżej 760 px; za ciasno — arkusz', () => {
+    expect(canvasDock(2560, null, 0)?.width).toBe(760);
+    expect(canvasDock(700, null, 0)).toBeNull();
   });
 });

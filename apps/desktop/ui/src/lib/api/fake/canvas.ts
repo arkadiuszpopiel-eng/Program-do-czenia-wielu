@@ -23,8 +23,14 @@ function roughSanitize(source: string): string {
     .replace(/@import/gi, '@blocked');
 }
 
-export function fakeCanvasRender(kind: CanvasKind, source: string): string {
+/** Znacznik w źródle, przy którym atrapa odrzuca render (stan błędu kanwy w testach E2E). */
+export const FAKE_RENDER_FAILURE = 'data-atrapa-blad-renderu';
+
+export function fakeCanvasRender(kind: CanvasKind, source: string, lang = 'pl'): string {
   if (!source.trim()) throw new Error('Artefakt jest pusty.');
+  if (source.includes(FAKE_RENDER_FAILURE)) {
+    throw new Error('Atrapa: rdzeń nie przygotował podglądu artefaktu.');
+  }
   if (byteSize(source) > CANVAS_MAX_BYTES) {
     throw new Error(
       `Artefakt jest za duży do podglądu w kanwie (limit ${CANVAS_MAX_BYTES / 1024} KB).`,
@@ -36,7 +42,8 @@ export function fakeCanvasRender(kind: CanvasKind, source: string): string {
       .join('\n');
   }
   return (
-    '<!doctype html><html lang="pl"><head><meta charset="utf-8">' +
+    `<!doctype html><html lang="${/^[a-z0-9-]{1,35}$/i.test(lang) ? lang : 'pl'}">` +
+    '<head><meta charset="utf-8">' +
     `<style>${BASE_STYLE}</style></head><body>${roughSanitize(source)}</body></html>`
   );
 }

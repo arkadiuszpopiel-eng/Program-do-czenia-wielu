@@ -55,3 +55,23 @@ export const CANVAS_DOCUMENT_REPLY = [
   '',
   PARAGRAPH,
 ].join('\n');
+
+/** Rozmiar rysunku ponad limit kanwy (512 KB) — stan „za duży do podglądu”. */
+const EDGE_SVG_BYTES = 530 * 1024;
+
+/**
+ * Stany graniczne kanwy: rysunek SVG ponad limit podglądu i strona, której render atrapa odrzuca
+ * (znacznik `data-atrapa-blad-renderu` — stan błędu z „Ponów”). Porcje strumienia zamiast
+ * tokenów, żeby ponad pół megabajta nie płynęło kilkanaście minut.
+ */
+export function canvasEdgeTokens(): string[] {
+  const shape = '<circle cx="5" cy="5" r="4" fill="#0e7490"/>\n';
+  const shapes = shape.repeat(Math.ceil(EDGE_SVG_BYTES / shape.length));
+  return [
+    'Przygotowałam bardzo duży rysunek i stronę, której podgląd się nie uda.\n\n',
+    '```svg\n<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">\n',
+    shapes,
+    '</svg>\n```\n\n',
+    '```html\n<h1 data-atrapa-blad-renderu>Strona testowa</h1>\n<p>Treść.</p>\n```',
+  ];
+}

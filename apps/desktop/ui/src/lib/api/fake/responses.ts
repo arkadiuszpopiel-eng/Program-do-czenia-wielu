@@ -1,7 +1,7 @@
 // Skrypty odpowiedzi atrapy — deterministyczne (zależne tylko od treści i numeru wariantu).
 import type { AgentId } from '@alfa/ui-kit';
 import type { ApprovalPending, ToolIcon } from '../types';
-import { CANVAS_ARTIFACTS_REPLY, CANVAS_DOCUMENT_REPLY } from './canvas-replies';
+import { CANVAS_ARTIFACTS_REPLY, CANVAS_DOCUMENT_REPLY, canvasEdgeTokens } from './canvas-replies';
 
 export interface ScriptTool {
   readonly icon: ToolIcon;
@@ -23,6 +23,8 @@ export interface ResponseScript {
   readonly approval: Omit<ApprovalPending, 'id' | 'status' | 'broker_window' | 'expires_at'> | null;
   /** Odpowiedź ucięta (StopReason MaxTokens) → akcja „Kontynuuj". */
   readonly truncated: boolean;
+  /** Własny podział tekstu na porcje strumienia (np. bardzo długi artefakt w kilku porcjach). */
+  readonly tokens?: readonly string[];
 }
 
 const base = (agent: AgentId, role_id: string, text: string): ResponseScript => ({
@@ -44,6 +46,10 @@ export function pickResponse(
   variant: number,
 ): ResponseScript {
   const v = variant % 2;
+  if (has(input, 'kanw') && has(input, 'graniczn')) {
+    const tokens = canvasEdgeTokens();
+    return { ...base(addressed ?? 'gama', 'coder', tokens.join('')), tokens };
+  }
   if (has(input, 'kanw')) {
     const doc = has(input, 'dokument');
     const text = doc ? CANVAS_DOCUMENT_REPLY : CANVAS_ARTIFACTS_REPLY;

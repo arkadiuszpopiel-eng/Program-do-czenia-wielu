@@ -23,8 +23,12 @@ function block(page: Page, lang: string): Locator {
   return page.getByRole('figure', { name: `Blok kodu ${lang}`, exact: true }).last();
 }
 
+/** Przycisk kanwy bloku — nazwa z tytułem artefaktu („Otwórz w kanwie: Karta projektu”). */
+const openButton = (page: Page, lang: string): Locator =>
+  block(page, lang).getByRole('button', { name: /^Otwórz w kanwie: / });
+
 async function openBlock(page: Page, lang: string) {
-  const button = block(page, lang).getByRole('button', { name: 'Otwórz w kanwie' });
+  const button = openButton(page, lang);
   await expect(button).toBeVisible({ timeout: 20_000 });
   await button.click();
 }
@@ -41,7 +45,10 @@ test('HTML: izolowana ramka bez skryptów i bez dostępu do Alfy', async ({ page
   await ask(page, 'Przygotuj do kanwy stronę i rysunek');
   await openBlock(page, 'html');
   const region = canvas(page);
-  await expect(region.getByRole('heading', { name: 'Karta projektu', level: 2 })).toBeVisible();
+  await expect(openButton(page, 'html')).toHaveAccessibleName('Otwórz w kanwie: Karta projektu');
+  await expect(openButton(page, 'svg')).toHaveAccessibleName('Otwórz w kanwie: Rysunek SVG');
+  // Otwarcie przenosi fokus na nagłówek kanwy (czytnik ekranu ogłasza region).
+  await expect(region.getByRole('heading', { name: 'Karta projektu', level: 2 })).toBeFocused();
   await expect(region.getByRole('tab', { name: 'Podgląd', selected: true })).toBeVisible();
   const frame = region.locator('iframe');
   await expect(frame).toHaveAttribute('sandbox', '');
@@ -96,7 +103,7 @@ test('SVG i Markdown; karta Źródło, kopiowanie, Esc wraca do przycisku', asyn
 
   await page.keyboard.press('Escape');
   await expect(region).toHaveCount(0);
-  await expect(block(page, 'svg').getByRole('button', { name: 'Otwórz w kanwie' })).toBeFocused();
+  await expect(openButton(page, 'svg')).toBeFocused();
 
   // Markdown z bloku: HTML z renderera (bez ramki), nagłówek jako zwykły DOM.
   await openBlock(page, 'markdown');
@@ -132,6 +139,39 @@ test('panel Pliki: plik Markdown sesji w kanwie', async ({ page }) => {
   await expect(region.getByRole('document')).toContainText('sprawdzić kurs EUR');
 });
 
+/** Szerokość kolumny rozmowy i kanwy przy otwartej kanwie. */
+async function widths(page: Page) {
+  const chat = await page.locator('main.center').boundingBox();
+  const dock = await page.locator('aside.canvas-dock').boundingBox();
+  return { chat: chat?.width ?? 0, dock: dock?.width ?? 0 };
+}
+
+for (const width of [1440, 1600, 1100] as const) {
+  test(`kanwa obok rozmowy zostawia jej co najmniej 480 px: ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await open(page);
+    // Oba panele otwarte (najciaśniejszy układ): Sesje i panel boczny z kartą Pliki.
+    await page.keyboard.press('Alt+3');
+    await ask(page, 'Przygotuj do kanwy stronę i rysunek');
+    await openBlock(page, 'html');
+    await expect(canvas(page)).toBeVisible();
+    const size = await widths(page);
+    expect(size.chat).toBeGreaterThanOrEqual(480);
+    expect(size.dock).toBeGreaterThanOrEqual(320);
+    await page.keyboard.press('Escape');
+    await expect(canvas(page)).toHaveCount(0);
+  });
+}
+
+test('zmiana sesji zamyka kanwę', async ({ page }) => {
+  await open(page);
+  await ask(page, 'Przygotuj do kanwy stronę i rysunek');
+  await openBlock(page, 'svg');
+  await expect(canvas(page)).toBeVisible();
+  await page.getByRole('button', { name: 'Nowa rozmowa' }).first().click();
+  await expect(canvas(page)).toHaveCount(0);
+});
+
 test('wąskie okno: kanwa jako arkusz z pułapką fokusu, Esc zamyka', async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 700 });
   await open(page);
@@ -139,12 +179,28 @@ test('wąskie okno: kanwa jako arkusz z pułapką fokusu, Esc zamyka', async ({ 
   await openBlock(page, 'html');
   const dialog = page.getByRole('dialog', { name: 'Kanwa artefaktu' });
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Karta projektu', level: 2 })).toBeFocused();
   await expect(dialog.locator('iframe')).toHaveAttribute('sandbox', '');
   const box = await dialog.boundingBox();
   expect(box && box.width <= 820).toBe(true);
   await expectAccessible(page, 'kanwa w wąskim oknie');
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
+});
+
+test('wąskie okno: kanwa z panelu Pliki zastępuje szufladę (jeden dialog)', async ({ page }) => {
+  await page.setViewportSize({ width: 820, height: 700 });
+  await open(page);
+  await page.keyboard.press('Alt+3');
+  const drawer = page.getByRole('dialog', { name: 'Panel boczny' });
+  await drawer.getByRole('button', { name: /notatki\.md/ }).click();
+  await drawer.getByRole('button', { name: 'Otwórz w kanwie', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Kanwa artefaktu' });
+  await expect(dialog.getByRole('heading', { name: 'notatki.md', level: 2 })).toBeFocused();
+  await expect(page.getByRole('dialog')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('dialog', { name: 'Panel boczny' })).toBeVisible();
 });
 
 for (const skin of ['classic', 'glass', 'next'] as const) {
@@ -165,6 +221,36 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
       await expect(region.getByRole('document')).toContainText('Notatka ze spotkania');
       await expectAccessible(page, `kanwa markdown ${skin} ${theme}`);
       await expectReadable(page, `kanwa markdown ${skin} ${theme}`);
+    });
+  }
+}
+
+// Stany graniczne: artefakt ponad limit podglądu (uwaga + ucięte źródło) i błąd renderu z „Ponów”.
+for (const skin of ['classic', 'glass', 'next'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`kanwa — za duży artefakt i błąd podglądu: ${skin}, ${theme}`, async ({ page }) => {
+      await open(page, skin, theme);
+      await ask(page, 'Pokaż w kanwie stany graniczne');
+      await openBlock(page, 'svg');
+      const region = canvas(page);
+      await expect(region.getByText(/więcej niż limit podglądu/)).toBeVisible();
+      await expect(region.locator('iframe')).toHaveCount(0);
+      await expectAccessible(page, `kanwa za duza ${skin} ${theme}`);
+      await expectReadable(page, `kanwa za duza ${skin} ${theme}`);
+      await region.getByRole('tab', { name: 'Źródło' }).click();
+      await expect(region.getByText(/^Pokazano pierwsze/)).toBeVisible();
+      await expectAccessible(page, `kanwa ucieta ${skin} ${theme}`);
+      await expectReadable(page, `kanwa ucieta ${skin} ${theme}`);
+
+      await openBlock(page, 'html');
+      await expect(region.getByRole('heading', { name: 'Strona testowa', level: 2 })).toBeVisible();
+      const retry = region.getByRole('button', { name: 'Ponów' });
+      await expect(retry).toBeVisible();
+      await expect(region.locator('iframe')).toHaveCount(0);
+      await expectAccessible(page, `kanwa blad ${skin} ${theme}`);
+      await expectReadable(page, `kanwa blad ${skin} ${theme}`);
+      await retry.click();
+      await expect(region.getByRole('button', { name: 'Ponów' })).toBeVisible();
     });
   }
 }

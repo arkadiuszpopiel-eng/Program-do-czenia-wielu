@@ -204,9 +204,9 @@ export class FakeFiles {
         };
         return core.reply(result);
       },
-      renderArtifact: (kind, source) => {
+      renderArtifact: (kind, source, lang) => {
         try {
-          return this.core.reply(fakeCanvasRender(kind, source));
+          return this.core.reply(fakeCanvasRender(kind, source, lang));
         } catch (error) {
           return Promise.reject(error instanceof Error ? error : new Error(String(error)));
         }

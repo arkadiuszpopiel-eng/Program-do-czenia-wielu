@@ -147,7 +147,7 @@ fn links_keep_only_in_document_anchors() {
 
 #[test]
 fn document_wraps_clean_body() {
-    let doc = artifact_document("<p>x</p><script>y</script>");
+    let doc = artifact_document("<p>x</p><script>y</script>", "pl");
     assert!(doc.starts_with("<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\">"));
     assert!(doc.ends_with("<body><p>x</p></body></html>"), "{doc}");
     assert!(!doc.contains("script"));
@@ -160,4 +160,71 @@ fn non_ascii_text_is_preserved() {
         "<p>Zażółć gęślą jaźń — 😊</p>"
     );
     assert_eq!(neutralize_css_fetches("ąurl(#a)ę"), "ąurl(#a)ę");
+}
+
+#[test]
+fn css_escapes_cannot_smuggle_fetches() {
+    let clean = sanitize_artifact(
+        r#"<p style="background:\75rl(https://zly.pl/a.png)">a</p><style>@\69mport "https://zly.pl/b.css";</style><svg><style>p{background:u&#114;l(https://zly.pl/c.png)}</style></svg><svg><rect fill="\75rl(https://zly.pl/d.svg#a)"/></svg>"#,
+    );
+    let lower = clean.to_ascii_lowercase();
+    assert!(!lower.contains("url(http"), "{clean}");
+    assert!(!lower.contains("@import"), "{clean}");
+    assert!(!clean.contains('\\'), "{clean}");
+    assert!(clean.contains("blocked(https://zly.pl/c.png)"), "{clean}");
+    assert!(clean.contains("<p>a</p>"), "{clean}");
+    assert!(clean.contains("<style></style>"), "{clean}");
+}
+
+#[test]
+fn other_fetching_css_functions_are_neutralized() {
+    let clean = sanitize_artifact(
+        "<style>a{background:image-set(\"https://zly.pl/x.png\" 1x)}\
+         b{background:src(\"https://zly.pl/y.png\")}</style>\
+         <p style=\"background:-webkit-image-set('x.png' 1x)\">p</p>",
+    );
+    assert!(clean.contains("blocked-set(\"https"), "{clean}");
+    assert!(clean.contains("blocked-src(\"https"), "{clean}");
+    assert!(clean.contains("<p>p</p>"), "{clean}");
+}
+
+#[test]
+fn document_text_mentioning_css_is_not_changed() {
+    let html = "<h1>Kurs CSS</h1><p>Funkcja url(obrazek.png) i reguła @import.</p>\
+                <pre>body { background: url(tlo.png); } \\ ukośnik</pre>\
+                <p title=\"C:\\Alfa\">ścieżka</p>";
+    let clean = sanitize_artifact(html);
+    assert!(
+        clean.contains("<p>Funkcja url(obrazek.png) i reguła @import.</p>"),
+        "{clean}"
+    );
+    assert!(
+        clean.contains("<pre>body { background: url(tlo.png); } \\ ukośnik</pre>"),
+        "{clean}"
+    );
+    assert!(clean.contains("title=\"C:\\Alfa\""), "{clean}");
+}
+
+#[test]
+fn document_language_follows_artifact_then_interface() {
+    let own = artifact_document(
+        "<html lang=\"de-AT\"><body><p>Hallo</p></body></html>",
+        "pl",
+    );
+    assert!(
+        own.starts_with("<!doctype html><html lang=\"de-AT\">"),
+        "{own}"
+    );
+    let ui = artifact_document("<p>Hello</p>", "en");
+    assert!(ui.starts_with("<!doctype html><html lang=\"en\">"), "{ui}");
+    let evil = artifact_document("<html lang='x\" onload=\"a'><p>x</p></html>", "\"><script>");
+    assert!(
+        evil.starts_with("<!doctype html><html lang=\"x\">"),
+        "{evil}"
+    );
+    let bad = artifact_document("<p>x</p>", "\"><script>");
+    assert!(
+        bad.starts_with("<!doctype html><html lang=\"pl\">"),
+        "{bad}"
+    );
 }

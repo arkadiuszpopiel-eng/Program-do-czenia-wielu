@@ -22,5 +22,7 @@ export const enCanvas: Record<keyof typeof plCanvas, Message> = {
     'Preview in an isolated frame: no scripts, no access to Alfa and no downloads from the network.',
   'canvas.tooLarge':
     'The artifact is {size} — more than the preview limit ({limit}). You can copy the source or save it as a file.',
+  'canvas.truncated':
+    'Showing the first {limit} of the source — copy it or save it as a file to get all of it.',
   'canvas.loading': 'Preparing preview…',
 };

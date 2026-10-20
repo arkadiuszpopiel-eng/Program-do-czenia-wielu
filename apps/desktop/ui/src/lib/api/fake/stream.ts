@@ -46,7 +46,7 @@ export class FakeStreamer {
     const sid = turn.session_id;
     const tid = turn.id;
     const started = scheduler.now();
-    const tokens = tokenize(script.text);
+    const tokens = script.tokens ?? tokenize(script.text);
     let tokenIndex = 0;
     let blocks: RenderedBlock[] = [];
     let phase: 'thinking' | 'tools' | 'text' | 'done' = 'thinking';

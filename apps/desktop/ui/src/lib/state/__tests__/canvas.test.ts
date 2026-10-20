@@ -1,7 +1,7 @@
 // Kanwa artefaktów (C2.8): otwarcie, powrót do karty Podgląd przy innym artefakcie, Esc z okna.
 import { afterEach, describe, expect, it } from 'vitest';
 import type { CanvasItem } from '../../logic/canvas';
-import { canvas, closeCanvas, openCanvas } from '../canvas.svelte';
+import { canvas, closeCanvas, openCanvas, syncCanvas } from '../canvas.svelte';
 import { escapeChain } from '../commands';
 import { setupApp } from './helpers';
 
@@ -33,6 +33,25 @@ describe('stan kanwy', () => {
     await app.start();
     openCanvas(item('a'));
     expect(escapeChain(app)).toBe(true);
+    expect(canvas.item).toBeNull();
+  });
+
+  it('zmiana sesji i zniknięcie tury z widocznej ścieżki zamykają kanwę', () => {
+    syncCanvas('s1', null);
+    openCanvas(item('a'));
+    syncCanvas('s1', (id) => id === 's1:t1');
+    expect(canvas.item?.key).toBe('a');
+    // Ponowienie / usunięcie: tury źródłowej nie ma już na ścieżce.
+    syncCanvas('s1', () => false);
+    expect(canvas.item).toBeNull();
+    openCanvas(item('b'));
+    syncCanvas('s2', null);
+    expect(canvas.item).toBeNull();
+    // Plik sesji nie zależy od tur, ale od sesji — tak.
+    openCanvas({ ...item('c'), origin: { type: 'file', artifactId: 'a3' } });
+    syncCanvas('s2', () => false);
+    expect(canvas.item?.key).toBe('c');
+    syncCanvas(null, null);
     expect(canvas.item).toBeNull();
   });
 });

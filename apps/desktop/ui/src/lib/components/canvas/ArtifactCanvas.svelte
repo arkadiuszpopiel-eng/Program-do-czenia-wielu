@@ -10,7 +10,7 @@
   import Copy from '@lucide/svelte/icons/copy';
   import Download from '@lucide/svelte/icons/download';
   import X from '@lucide/svelte/icons/x';
-  import { CANVAS_MAX_BYTES, byteSize, tooLarge } from '../../logic/canvas';
+  import { CANVAS_MAX_BYTES, byteSize, clipBytes, tooLarge } from '../../logic/canvas';
   import { attempt, load } from '../../state/attempt';
   import { canvas, closeCanvas, type CanvasTab } from '../../state/canvas.svelte';
   import { useApp } from '../../state/context';
@@ -24,13 +24,15 @@
   const title = $derived(item ? (item.title ?? t(`canvas.kind.${item.kind}`)) : '');
   const size = $derived(item ? byteSize(item.source) : 0);
   const big = $derived(item ? tooLarge(item) : false);
-  // Źródło ponad limit pokazujemy ucięte (cały tekst idzie do schowka i do pliku).
-  const shown = $derived(item ? item.source.slice(0, CANVAS_MAX_BYTES) : '');
+  // Źródło ponad limit pokazujemy ucięte do limitu bajtów na granicy znaku, z uwagą (cały
+  // tekst idzie do schowka i do pliku).
+  const shown = $derived(clipBytes(item?.source ?? '', CANVAS_MAX_BYTES));
   const framed = $derived(item?.kind === 'html' || item?.kind === 'svg');
   let html = $state<string | null>(null);
   let error = $state<string | null>(null);
   let frame = $state<HTMLIFrameElement | null>(null);
   let root = $state<HTMLElement | null>(null);
+  let heading = $state<HTMLElement | null>(null);
   const TABS: readonly CanvasTab[] = ['preview', 'source'];
 
   async function render() {
@@ -43,7 +45,7 @@
       return;
     }
     const result = await load(() =>
-      app.client.conversation.renderArtifact(current.kind, current.source),
+      app.client.conversation.renderArtifact(current.kind, current.source, app.i18n.locale),
     );
     if (canvas.item !== current) return;
     if (result.status === 'ready') html = result.value;
@@ -59,6 +61,17 @@
   // `alfa-sanitized-html`), przypisany właściwości — bez parsowania HTML w oknie głównym.
   $effect(() => {
     if (frame && html !== null) frame.srcdoc = sanitizedHtml(html);
+  });
+
+  // Otwarcie (albo inny artefakt) przenosi fokus na nagłówek kanwy: czytnik ekranu ogłasza region,
+  // a w wąskim oknie fokus trafia do arkusza (moduł ładuje się po otwarciu dialogu).
+  let focusedKey: string | null = null;
+  $effect(() => {
+    const key = item?.key ?? null;
+    const node = heading;
+    if (!key || !node || key === focusedKey) return;
+    focusedKey = key;
+    requestAnimationFrame(() => node.focus());
   });
 
   function selectTab(tab: CanvasTab, focus = false) {
@@ -122,7 +135,7 @@
   >
     <header class="head">
       <div class="names">
-        <h2 id="{uid}-title" class="title">{title}</h2>
+        <h2 id="{uid}-title" class="title" tabindex="-1" bind:this={heading}>{title}</h2>
         <p class="meta">
           {t(`canvas.kind.${item.kind}`)} · {app.i18n.bytes(size)}
         </p>
@@ -158,7 +171,12 @@
 
     <div class="panel" id="{uid}-panel" role="tabpanel" aria-labelledby="{uid}-tab-{canvas.tab}">
       {#if canvas.tab === 'source'}
-        <pre class="source">{shown}</pre>
+        {#if shown.clipped}
+          <p class="notice" role="status">
+            {t('canvas.truncated', { limit: app.i18n.bytes(CANVAS_MAX_BYTES) })}
+          </p>
+        {/if}
+        <pre class="source">{shown.text}</pre>
       {:else if big}
         <p class="notice" role="status">
           {t('canvas.tooLarge', {
@@ -272,6 +290,7 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
+  .title:focus-visible,
   .source:focus-visible,
   .doc:focus-visible {
     outline: 2px solid var(--alfa-color-focus, var(--alfa-color-accent));

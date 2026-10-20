@@ -10,7 +10,8 @@ use app_api::error::AppError;
 pub use lib_markdown::ARTIFACT_MAX_BYTES;
 
 /// `canvas_render` ⟶ HTML do podglądu w kanwie; źródło ponad limit albo puste — błąd z powodem.
-pub fn render_canvas(kind: CanvasKind, source: &str) -> Result<String, AppError> {
+/// `lang` — język interfejsu: dokument ramki go dostaje, gdy artefakt nie ma `<html lang>`.
+pub fn render_canvas(kind: CanvasKind, source: &str, lang: &str) -> Result<String, AppError> {
     if source.trim().is_empty() {
         return Err(AppError::invalid("Artefakt jest pusty."));
     }
@@ -22,7 +23,7 @@ pub fn render_canvas(kind: CanvasKind, source: &str) -> Result<String, AppError>
     }
     Ok(match kind {
         CanvasKind::Markdown => lib_markdown::render(source),
-        CanvasKind::Html | CanvasKind::Svg => lib_markdown::artifact_document(source),
+        CanvasKind::Html | CanvasKind::Svg => lib_markdown::artifact_document(source, lang),
     })
 }
 
@@ -32,7 +33,7 @@ mod tests {
 
     #[test]
     fn markdown_is_rendered_like_messages() {
-        let html = render_canvas(CanvasKind::Markdown, "# Plan\n\n<b>x</b>").unwrap();
+        let html = render_canvas(CanvasKind::Markdown, "# Plan\n\n<b>x</b>", "pl").unwrap();
         assert_eq!(html, "<h1>Plan</h1>\n<p>&lt;b&gt;x&lt;/b&gt;</p>\n");
     }
 
@@ -41,11 +42,20 @@ mod tests {
         let html = render_canvas(
             CanvasKind::Html,
             "<h1 onclick=\"x\">A</h1><script>1</script>",
+            "en",
         )
         .unwrap();
-        assert!(html.starts_with("<!doctype html>"));
+        assert!(
+            html.starts_with("<!doctype html><html lang=\"en\">"),
+            "{html}"
+        );
         assert!(html.contains("<body><h1>A</h1></body>"), "{html}");
-        let svg = render_canvas(CanvasKind::Svg, "<svg viewBox=\"0 0 1 1\"><rect/></svg>").unwrap();
+        let svg = render_canvas(
+            CanvasKind::Svg,
+            "<svg viewBox=\"0 0 1 1\"><rect/></svg>",
+            "pl",
+        )
+        .unwrap();
         assert!(
             svg.contains("<svg viewBox=\"0 0 1 1\"><rect></rect></svg>"),
             "{svg}"
@@ -54,10 +64,10 @@ mod tests {
 
     #[test]
     fn empty_and_oversized_sources_are_refused() {
-        assert!(render_canvas(CanvasKind::Html, "  \n").is_err());
+        assert!(render_canvas(CanvasKind::Html, "  \n", "pl").is_err());
         let big = "a".repeat(ARTIFACT_MAX_BYTES + 1);
-        let err = render_canvas(CanvasKind::Markdown, &big).unwrap_err();
+        let err = render_canvas(CanvasKind::Markdown, &big, "pl").unwrap_err();
         assert!(err.message.contains("512 KB"), "{}", err.message);
-        assert!(render_canvas(CanvasKind::Markdown, &big[1..]).is_ok());
+        assert!(render_canvas(CanvasKind::Markdown, &big[1..], "pl").is_ok());
     }
 }

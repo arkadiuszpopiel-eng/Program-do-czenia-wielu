@@ -19,5 +19,7 @@ export const plCanvas = {
     'Podgląd w izolowanej ramce: bez skryptów, bez dostępu do Alfy i bez pobierania z sieci.',
   'canvas.tooLarge':
     'Artefakt ma {size} — więcej niż limit podglądu ({limit}). Źródło możesz skopiować albo zapisać jako plik.',
+  'canvas.truncated':
+    'Pokazano pierwsze {limit} źródła — całość skopiujesz albo zapiszesz jako plik.',
   'canvas.loading': 'Przygotowuję podgląd…',
 };

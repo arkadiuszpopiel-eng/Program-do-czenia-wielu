@@ -1,11 +1,13 @@
 //! Artefakty HTML/SVG do podglądu w kanwie (C2.8, ADR 0009): dokument dla izolowanej ramki.
 //!
 //! Ramka kanwy ma `sandbox` bez `allow-scripts` i bez `allow-same-origin`, a dokument dziedziczy
-//! CSP okna. To pierwsza warstwa. Druga jest tutaj: `ammonia` z szeroką białą listą znaczników
-//! układu i rysunku SVG, ale bez skryptów, formularzy, ramek, obiektów i handlerów zdarzeń.
-//! Adresy zostają tylko jako kotwice `#…` i obrazy `data:image/(png|jpeg|webp)`; odwołania
-//! `url(…)` do zasobów spoza dokumentu i `@import` w stylach są neutralizowane (wyciek danych
-//! przez pobranie obrazka). Wynik to pełny dokument dla `srcdoc` — UI tylko go wstawia.
+//! CSP okna — to ona jest główną kontrolą pobrań z sieci. Druga warstwa jest tutaj: `ammonia`
+//! z szeroką białą listą znaczników układu i rysunku SVG, ale bez skryptów, formularzy, ramek,
+//! obiektów i handlerów zdarzeń. Adresy zostają tylko jako kotwice `#…` i obrazy
+//! `data:image/(png|jpeg|webp)`. W CSS (atrybut `style`, atrybuty prezentacji SVG, treść
+//! `<style>`) pobrania spoza dokumentu (`url(…)`, `@import`, `image-set(`, `src(`) są
+//! neutralizowane, a wartości z ucieczkami CSS (np. `\75rl(`) odrzucane; tekst dokumentu zostaje
+//! bez zmian. Wynik to pełny dokument dla `srcdoc` — UI tylko go wstawia.
 
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
@@ -45,6 +47,10 @@ const GENERIC_ATTRS: &str = "class id style title lang dir role aria-label aria-
     result mode values type operator k1 k2 k3 k4 flood-color flood-opacity vector-effect \
     paint-order pathLength textLength lengthAdjust";
 
+/// Atrybuty będące zwykłym tekstem, nie wartością CSS (ukośnik wsteczny i `url(` dozwolone).
+const TEXT_ATTRS: &str = "class id title lang dir role alt aria-label aria-describedby \
+    aria-labelledby datetime value";
+
 /// Znaczniki usuwane razem z treścią.
 const CLEAN_CONTENT_TAGS: &str = "script iframe object embed noscript template textarea title \
     xmp noembed noframes plaintext math select foreignObject frameset frame";
@@ -56,31 +62,55 @@ body{margin:0;padding:16px;font:15px/1.5 system-ui,'Segoe UI',sans-serif;overflo
 img,svg{max-width:100%;height:auto}\
 table{border-collapse:collapse}";
 
-/// Neutralizuje odwołania do zasobów spoza dokumentu w CSS (`url(…)` poza kotwicą `#…`,
-/// `@import`, `image-set(`). Działa na całym źródle — także na treści elementów `<style>`, której
-/// `ammonia` nie filtruje.
-pub fn neutralize_css_fetches(source: &str) -> String {
-    let lower = source.to_ascii_lowercase();
-    let mut out = String::with_capacity(source.len());
+/// Konstrukcje CSS, które pobierają zasób (oprócz `url(…)`), i ich zneutralizowana postać.
+const CSS_FETCHES: [(&str, &str); 3] = [
+    ("@import", "@blocked"),
+    ("image-set(", "blocked-set("),
+    ("src(", "blocked-src("),
+];
+
+/// Neutralizuje odwołania do zasobów spoza dokumentu w tekście CSS: `url(…)` poza kotwicą `#…`,
+/// `@import`, `image-set(`, `src(`. Przyjmuje sam CSS — nie treść dokumentu.
+pub fn neutralize_css_fetches(css: &str) -> String {
+    let lower = css.to_ascii_lowercase();
+    let mut out = String::with_capacity(css.len());
     let mut i = 0;
-    while i < source.len() {
+    'scan: while i < css.len() {
         let rest = &lower[i..];
         if rest.starts_with("url(") && !local_ref(&rest[4..]) {
             out.push_str("blocked(");
             i += 4;
-        } else if rest.starts_with("@import") {
-            out.push_str("@blocked");
-            i += 7;
-        } else if rest.starts_with("image-set(") {
-            out.push_str("blocked-set(");
-            i += 10;
-        } else {
-            let ch = source[i..].chars().next().unwrap_or(' ');
-            out.push(ch);
-            i += ch.len_utf8().max(1);
+            continue;
         }
+        for (needle, replacement) in CSS_FETCHES {
+            if rest.starts_with(needle) {
+                out.push_str(replacement);
+                i += needle.len();
+                continue 'scan;
+            }
+        }
+        let ch = css[i..].chars().next().unwrap_or(' ');
+        out.push(ch);
+        i += ch.len_utf8().max(1);
     }
     out
+}
+
+/// Czy wartość CSS (małymi literami) pobiera coś spoza dokumentu.
+fn fetches(lower: &str) -> bool {
+    CSS_FETCHES.iter().any(|(needle, _)| lower.contains(needle))
+        || lower
+            .match_indices("url(")
+            .any(|(at, _)| !local_ref(&lower[at + 4..]))
+}
+
+/// Tekst arkusza `<style>`. Z ucieczką CSS (`\75rl(`, `@\69mport`) — odrzucony w całości, bo
+/// ucieczki omijają każde porównanie tekstu; w pozostałych pobrania są zneutralizowane.
+fn clean_stylesheet(css: &str) -> String {
+    if css.contains('\\') {
+        return String::new();
+    }
+    neutralize_css_fetches(css)
 }
 
 /// `url(` z kotwicą w tym samym dokumencie (`url(#gradient)`, `url('#a')`).
@@ -95,13 +125,14 @@ fn filter_attr<'u>(element: &str, attribute: &str, value: &'u str) -> Option<Cow
     let keep = match attribute {
         "src" => element == "img" && is_safe_data_image(value.trim()),
         "href" | "xlink:href" => value.trim_start().starts_with('#'),
+        _ if TEXT_ATTRS.split_whitespace().any(|a| a == attribute) => true,
+        // `style` i atrybuty prezentacji SVG są parsowane jako CSS: bez ucieczek i bez pobrań.
         _ => {
             let lower = value.to_ascii_lowercase();
-            !lower.contains("javascript:")
+            !lower.contains('\\')
+                && !lower.contains("javascript:")
                 && !lower.contains("expression(")
-                && lower
-                    .match_indices("url(")
-                    .all(|(at, _)| local_ref(&lower[at + 4..]))
+                && !fetches(&lower)
         }
     };
     keep.then_some(Cow::Borrowed(value))
@@ -110,6 +141,54 @@ fn filter_attr<'u>(element: &str, attribute: &str, value: &'u str) -> Option<Cow
 /// Względne adresy: wyłącznie kotwice w tym samym dokumencie.
 fn anchor_only(url: &str) -> Option<Cow<'_, str>> {
     url.starts_with('#').then_some(Cow::Borrowed(url))
+}
+
+/// Długość znacznika zaczynającego się od `<` (do `>` poza cudzysłowami włącznie).
+fn tag_len(tag: &str) -> usize {
+    let mut quote = None;
+    for (i, c) in tag.char_indices().skip(1) {
+        match quote {
+            Some(q) if c == q => quote = None,
+            Some(_) => {}
+            None if c == '"' || c == '\'' => quote = Some(c),
+            None if c == '>' => return i + 1,
+            None => {}
+        }
+    }
+    tag.len()
+}
+
+fn is_style_open(tag: &str) -> bool {
+    let bytes = tag.as_bytes();
+    bytes.len() > 6
+        && bytes[..6].eq_ignore_ascii_case(b"<style")
+        && matches!(bytes[6], b'>' | b' ' | b'\t' | b'\n' | b'/')
+}
+
+/// Czyści treść elementów `<style>` (HTML i SVG) w wyniku `ammonia`. Serializacja zamienia `<`
+/// w tekście na encję, więc każdy `<` to znacznik, a arkusz kończy się na pierwszym `</style`.
+/// Tekst z encjami (`u&#114;l(` w SVG) parser już zdekodował — sprawdzamy tekst po dekodowaniu.
+fn clean_style_elements(html: &str) -> String {
+    let mut out = String::with_capacity(html.len());
+    let mut rest = html;
+    while let Some(lt) = rest.find('<') {
+        out.push_str(&rest[..lt]);
+        rest = &rest[lt..];
+        let end = tag_len(rest);
+        let tag = &rest[..end];
+        out.push_str(tag);
+        rest = &rest[end..];
+        if is_style_open(tag) {
+            let close = rest
+                .to_ascii_lowercase()
+                .find("</style")
+                .unwrap_or(rest.len());
+            out.push_str(&clean_stylesheet(&rest[..close]));
+            rest = &rest[close..];
+        }
+    }
+    out.push_str(rest);
+    out
 }
 
 fn builder() -> &'static Builder<'static> {
@@ -137,13 +216,33 @@ fn builder() -> &'static Builder<'static> {
 /// Sanitizuje źródło artefaktu HTML albo SVG (fragment albo cały dokument — `<html>`, `<head>`
 /// i `<body>` parser pomija, zostaje ich treść).
 pub fn sanitize_artifact(source: &str) -> String {
-    builder().clean(&neutralize_css_fetches(source)).to_string()
+    clean_style_elements(&builder().clean(source).to_string())
 }
 
-/// Pełny dokument dla `srcdoc` izolowanej ramki kanwy.
-pub fn artifact_document(source: &str) -> String {
+/// Znacznik języka w bezpiecznej postaci BCP 47 (litery, cyfry, `-`; do 35 znaków).
+fn valid_lang(lang: &str) -> bool {
+    !lang.is_empty()
+        && lang.len() <= 35
+        && lang.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
+}
+
+/// Język z `<html lang="…">` artefaktu, jeśli jest i ma poprawną postać.
+fn own_lang(source: &str) -> Option<&str> {
+    let at = source.to_ascii_lowercase().find("<html")?;
+    let tag = &source[at..at + tag_len(&source[at..])];
+    let pos = tag.to_ascii_lowercase().find(" lang=")?;
+    let value = tag[pos + 6..].trim_start_matches(['"', '\'']);
+    let lang = value.split(['"', '\'', ' ', '>', '/']).next()?;
+    valid_lang(lang).then_some(lang)
+}
+
+/// Pełny dokument dla `srcdoc` izolowanej ramki kanwy. Język: z `<html lang>` artefaktu, bez
+/// niego — `ui_lang` (język interfejsu); znacznik o niepoprawnej postaci zastępuje `pl`.
+pub fn artifact_document(source: &str, ui_lang: &str) -> String {
+    let fallback = if valid_lang(ui_lang) { ui_lang } else { "pl" };
+    let lang = own_lang(source).unwrap_or(fallback);
     format!(
-        "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\">\
+        "<!doctype html><html lang=\"{lang}\"><head><meta charset=\"utf-8\">\
          <style>{BASE_STYLE}</style></head><body>{}</body></html>",
         sanitize_artifact(source)
     )

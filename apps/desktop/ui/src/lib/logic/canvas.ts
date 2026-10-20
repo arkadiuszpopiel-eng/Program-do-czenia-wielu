@@ -163,3 +163,63 @@ export function detectArtifacts(turn: TurnLike): CanvasItem[] {
     .filter((a): a is CanvasItem => a !== null);
   return doc ? [doc, ...blocks] : blocks;
 }
+
+/**
+ * Początek tekstu mieszczący się w `maxBytes` bajtach UTF-8, ucięty na granicy znaku (bez
+ * rozdzielania par zastępczych); `clipped` — czy coś ucięto.
+ */
+export function clipBytes(text: string, maxBytes: number): { text: string; clipped: boolean } {
+  let bytes = 0;
+  let end = 0;
+  for (const ch of text) {
+    const cp = ch.codePointAt(0) ?? 0;
+    const size = cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4;
+    if (bytes + size > maxBytes) return { text: text.slice(0, end), clipped: true };
+    bytes += size;
+    end += ch.length;
+  }
+  return { text, clipped: false };
+}
+
+/** Najwęższa kolumna rozmowy obok zadokowanej kanwy (px). */
+export const CANVAS_CHAT_MIN = 480;
+export const CANVAS_DOCK_MIN = 320;
+export const CANVAS_DOCK_MAX = 760;
+/** Udział kanwy w miejscu, które zostaje po panelach (reszta — rozmowa). */
+const CANVAS_SHARE = 0.45;
+
+export interface CanvasDock {
+  /** Szerokość kanwy (px). */
+  readonly width: number;
+  /** Lewy panel zwinięty do paska ikon, dopóki kanwa jest otwarta. */
+  readonly railLeft: boolean;
+  /** Prawy panel schowany, dopóki kanwa jest otwarta. */
+  readonly hideRight: boolean;
+}
+
+/**
+ * Kanwa obok rozmowy: szerokość z miejsca po zadokowanych panelach, przy zachowaniu kolumny
+ * rozmowy ≥ `CANVAS_CHAT_MIN`. Gdy miejsca brak — najpierw lewy panel zwija się do paska ikon,
+ * potem prawy się chowa; `null` — kanwa nie mieści się obok rozmowy (arkusz nad treścią).
+ */
+export function canvasDock(
+  body: number,
+  left: { readonly width: number; readonly rail: number } | null,
+  right: number,
+): CanvasDock | null {
+  const attempts = [
+    { leftWidth: left?.width ?? 0, railLeft: false, hideRight: false },
+    { leftWidth: left?.rail ?? 0, railLeft: left !== null, hideRight: false },
+    { leftWidth: left?.rail ?? 0, railLeft: left !== null, hideRight: right > 0 },
+  ];
+  for (const a of attempts) {
+    const free = body - a.leftWidth - (a.hideRight ? 0 : right);
+    const width = Math.min(
+      CANVAS_DOCK_MAX,
+      free - CANVAS_CHAT_MIN,
+      Math.max(CANVAS_DOCK_MIN, Math.round(free * CANVAS_SHARE)),
+    );
+    if (width >= CANVAS_DOCK_MIN) return { width, railLeft: a.railLeft, hideRight: a.hideRight };
+  }
+  return null;
+}

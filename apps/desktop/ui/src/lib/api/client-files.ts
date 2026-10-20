@@ -47,8 +47,9 @@ export interface ConversationExportApi {
   /**
    * Kanwa (C2.8, ADR 0009): HTML podglądu z rdzenia — Markdown jak w wiadomościach (zwykły DOM),
    * HTML/SVG jako dokument po sanitizacji wyłącznie dla izolowanej ramki. Ponad limit — błąd.
+   * `lang` — język interfejsu dla dokumentu ramki, gdy artefakt nie ma własnego `<html lang>`.
    */
-  renderArtifact(kind: CanvasKind, source: string): Promise<string>;
+  renderArtifact(kind: CanvasKind, source: string, lang: string): Promise<string>;
 }
 
 /** Kopie zapasowe `.alfa` z harmonogramem i rotacją (sekrety nigdy w paczce). */
