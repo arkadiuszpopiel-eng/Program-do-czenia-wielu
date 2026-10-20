@@ -168,6 +168,8 @@
                   <p class="problem" role="alert">{slot.error ?? turn?.error?.message ?? ''}</p>
                 {/if}
                 {#if turn && turn.blocks.length > 0}
+                  <!-- tabindex: przewijana odpowiedź dostępna z klawiatury (strzałki / PgDn). -->
+                  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
                   <div
                     class="body"
                     tabindex="0"

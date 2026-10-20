@@ -65,7 +65,7 @@ import type {
   TriggerRunInfo,
 } from './types-tasks';
 import type { BuilderApi, GuiApi, HealthApi, SkillsApi, TerminalApi } from './client-work';
-import type { CameraFrame, CamerasState } from './types-cameras';
+import type { CamerasApi } from './types-cameras';
 import type { UpdatesApi } from './client-updates';
 import type { BrokerApi } from './client-broker';
 import type { VoiceFeaturesApi } from './client-voice';
@@ -212,18 +212,6 @@ export interface ModelsApi {
   localDownload(modelId: string | null): Promise<void>;
   /** Anulowanie pobierania (`null` = wszystkich). */
   localCancel(modelId: string | null): Promise<void>;
-}
-
-export interface CamerasApi {
-  state(): Promise<CamerasState>;
-  /** Przełącznik główny (to samo co ustawienie `camera.enabled`). */
-  setMaster(enabled: boolean): Promise<CamerasState>;
-  setEnabled(id: string, enabled: boolean): Promise<CamerasState>;
-  rename(id: string, name: string): Promise<CamerasState>;
-  /** Ponowne wyszukanie kamer (podłączone / odłączone). */
-  refresh(): Promise<CamerasState>;
-  /** Jedna bieżąca klatka; budzi kamerę, jeśli śpi. `maxSide`: dłuższy bok w pikselach. */
-  frame(id: string, maxSide: number): Promise<CameraFrame>;
 }
 
 export interface DeviceApi {

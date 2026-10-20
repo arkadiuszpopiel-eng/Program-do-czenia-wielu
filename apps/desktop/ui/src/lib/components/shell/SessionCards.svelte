@@ -27,7 +27,7 @@
   let failed = $state<string | null>(null);
   let root = $state<HTMLElement | null>(null);
   /** `updated_at` rozmów, dla których karta jest pobrana (bez reaktywności — tylko porównanie). */
-  const fetched = new Map<string, string>();
+  let fetched: Record<string, string> = {};
   /** Numer ostatniego zapytania — spóźniona odpowiedź na starą listę jest pomijana. */
   let latest = 0;
 
@@ -37,12 +37,12 @@
 
   /** Rozmowy bez karty albo zmienione od ostatniego pobrania. */
   function stale(): { id: string; updated: string }[] {
-    const seen = new Set<string>();
+    const seen: Record<string, true> = {};
     const out: { id: string; updated: string }[] = [];
     for (const s of untrack(() => sessionsNow)) {
-      if (seen.has(s.id)) continue;
-      seen.add(s.id);
-      if (fetched.get(s.id) !== s.updated_at) out.push({ id: s.id, updated: s.updated_at });
+      if (seen[s.id]) continue;
+      seen[s.id] = true;
+      if (fetched[s.id] !== s.updated_at) out.push({ id: s.id, updated: s.updated_at });
     }
     return out;
   }
@@ -56,8 +56,8 @@
     for (const batch of inBatches(todo, MAX_CARDS)) {
       const result = await load(() => app.client.sessions.cards(batch.map((b) => b.id)));
       if (token !== latest) return;
-      if (result.status === 'failed') {
-        failed = result.error;
+      if (result.status !== 'ready') {
+        if (result.status === 'failed') failed = result.error;
         break;
       }
       for (const card of result.value) next[card.session_id] = card;
@@ -65,12 +65,12 @@
     }
     if (token !== latest) return;
     if (done.length === todo.length) failed = null;
-    for (const item of done) fetched.set(item.id, item.updated);
+    for (const item of done) fetched[item.id] = item.updated;
     if (done.length) cards = { ...cards, ...next };
   }
 
   function retry() {
-    fetched.clear();
+    fetched = {};
     void fetchCards();
   }
 

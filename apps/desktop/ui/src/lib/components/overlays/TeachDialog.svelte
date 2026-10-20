@@ -193,7 +193,7 @@
         {#if estimate && estimate.pieces.length > 0}
           <p class="muted" aria-live="polite" data-testid="teach-estimate">
             {t('teach.estimate', { n: estimate.pieces.length })}{#if estimate.truncated}
-              {' '}{t('teach.estimateTruncated')}{/if}
+              {` ${t('teach.estimateTruncated')}`}{/if}
           </p>
         {/if}
       {/if}

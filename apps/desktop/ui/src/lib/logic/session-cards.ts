@@ -59,7 +59,7 @@ export function moveInGrid(
 
 /**
  * Ruch po kartach podzielonych na grupy (`sizes` — liczba kart w każdej grupie, `at` — indeks w
- * całości). Strzałki działają w obrębie grupy; ArrowDown z ostatniego rzędu przechodzi do pierwszej
+ * całości). Strzałki działają w obrębie grupy (w bok — w obrębie rzędu); ArrowDown z ostatniego rzędu przechodzi do pierwszej
  * karty następnej grupy, ArrowUp z pierwszego rzędu — do ostatniej karty poprzedniej. Z rzędu nad
  * niepełnym ostatnim ArrowDown trafia na ostatnią kartę grupy. Home/End — pierwsza/ostatnia karta
  * wszystkich grup. `null` — klawisz nie przesuwa.
@@ -87,9 +87,9 @@ export function moveInGroups(
   const lastRow = Math.floor((size - 1) / cols);
   switch (key) {
     case 'ArrowRight':
-      return local + 1 < size ? at + 1 : at;
+      return local + 1 < size && (local + 1) % cols !== 0 ? at + 1 : at;
     case 'ArrowLeft':
-      return local > 0 ? at - 1 : at;
+      return local % cols !== 0 ? at - 1 : at;
     case 'ArrowDown':
       if (row < lastRow) return start + Math.min(local + cols, size - 1);
       return start + size < total ? start + size : at;
