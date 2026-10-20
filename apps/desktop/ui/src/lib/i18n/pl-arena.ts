@@ -1,0 +1,41 @@
+// Arena — porównanie dwóch modeli (pl — źródło kluczy).
+export const plArena = {
+  'action.arena': 'Porównaj modele (Arena)',
+  'arena.title': 'Porównaj modele (Arena)',
+  'arena.lead':
+    'Ta sama wiadomość trafia do dwóch modeli. Każda odpowiedź to nowa wersja (gałąź) rozmowy — nic nie jest nadpisywane.',
+  'arena.prompt': 'Wiadomość',
+  'arena.modelA': 'Model A',
+  'arena.modelB': 'Model B',
+  'arena.same': 'Wybierz dwa różne modele.',
+  'arena.costNote':
+    'Obie odpowiedzi liczą się do kosztów i limitów jak zwykłe wiadomości; Broker działa jak zawsze. Odpowiedzi powstają po kolei.',
+  'arena.start': 'Porównaj',
+  'arena.cancel': 'Anuluj',
+  'arena.close': 'Zamknij',
+  'arena.stop': 'Zatrzymaj',
+  'arena.loading': 'Wczytywanie listy modeli…',
+  'arena.noTarget':
+    'Najpierw wyślij wiadomość — Arena porównuje odpowiedzi na wiadomość użytkownika.',
+  'arena.fewModels':
+    'Potrzebne są co najmniej dwa modele: dodaj konto API (Ustawienia → Konta i klucze API) albo pobierz model lokalny.',
+  'arena.results': 'Odpowiedzi modeli',
+  'arena.status.waiting': 'Czeka na swoją kolej',
+  'arena.status.streaming': 'Odpowiada…',
+  'arena.status.complete': 'Gotowe',
+  'arena.status.cancelled': 'Zatrzymano',
+  'arena.status.error': 'Błąd',
+  'arena.status.skipped': 'Nie uruchomiono',
+  'arena.latency': 'Czas odpowiedzi',
+  'arena.tokens': 'Tokeny (wejście / wyjście)',
+  'arena.tokensValue': '{input} / {output}',
+  'arena.cost': 'Koszt',
+  'arena.free': 'bez kosztu',
+  'arena.faster': 'Szybsza',
+  'arena.cheaper': 'Tańsza',
+  'arena.fallback': 'Odpowiedział model zastępczy: {model}',
+  'arena.choose': 'Wybierz tę odpowiedź',
+  'arena.chooseLabel': 'Wybierz odpowiedź modelu {model}',
+  'arena.chosen': 'Wybrano odpowiedź modelu {model}.',
+  'arena.answerLabel': 'Odpowiedź modelu {model}',
+};

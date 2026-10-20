@@ -22,25 +22,7 @@ impl ChatEngine {
         parent: Option<TurnId>,
         turn: NewTurn,
     ) -> Result<Turn, AppError> {
-        let history = &self.inner.sessions;
-        let parent = match parent {
-            Some(p) => Some(p),
-            None => history.active_leaf(session)?,
-        };
-        let Some(parent) = parent else {
-            return Ok(history.append_turn(session, None, turn)?);
-        };
-        let leaf = history.latest_leaf(session, parent)?;
-        if leaf == parent {
-            return Ok(history.append_turn(session, Some(parent), turn)?);
-        }
-        let path = history.branch_projection(session, leaf)?;
-        let child = path
-            .iter()
-            .skip_while(|t| t.id != parent)
-            .nth(1)
-            .ok_or_else(|| AppError::internal("brak dziecka tury w projekcji gałęzi"))?;
-        Ok(history.fork_from(session, child.id, turn)?)
+        append_child_in(&*self.inner.sessions, session, parent, turn)
     }
 
     /// Wiadomości dla dostawcy: gałąź od korzenia do `leaf` (bez tur-błędów i komunikatów
@@ -89,4 +71,31 @@ impl ChatEngine {
         }
         Ok(out)
     }
+}
+
+/// [`ChatEngine::append_child`] nad dowolną historią (testy gałęzi bez składania silnika).
+pub(crate) fn append_child_in(
+    history: &dyn SessionHistory,
+    session: &SessionId,
+    parent: Option<TurnId>,
+    turn: NewTurn,
+) -> Result<Turn, AppError> {
+    let parent = match parent {
+        Some(p) => Some(p),
+        None => history.active_leaf(session)?,
+    };
+    let Some(parent) = parent else {
+        return Ok(history.append_turn(session, None, turn)?);
+    };
+    let leaf = history.latest_leaf(session, parent)?;
+    if leaf == parent {
+        return Ok(history.append_turn(session, Some(parent), turn)?);
+    }
+    let path = history.branch_projection(session, leaf)?;
+    let child = path
+        .iter()
+        .skip_while(|t| t.id != parent)
+        .nth(1)
+        .ok_or_else(|| AppError::internal("brak dziecka tury w projekcji gałęzi"))?;
+    Ok(history.fork_from(session, child.id, turn)?)
 }

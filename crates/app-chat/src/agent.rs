@@ -180,7 +180,7 @@ pub(crate) async fn run(
     let Some(stack) = core.inner.agents.clone() else {
         return failed("Narzędzia agentek niepodłączone (Broker albo dziennik cofania).".into());
     };
-    let (choice, request) = match crate::stream::prepare(core, req).await {
+    let (choice, request) = match crate::stream::prepare(core, req, None).await {
         Ok(x) => x,
         Err(e) => return Outcome::failed(e),
     };

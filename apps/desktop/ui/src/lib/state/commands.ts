@@ -12,6 +12,7 @@ import { copyConversation, exportConversation } from './exports';
 import { openTemplates } from './template-dialog.svelte';
 import { openBoard } from './board-dialog.svelte';
 import { openStats } from './stats-dialog.svelte';
+import { openArena } from './arena.svelte';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.agents': 'agents',
@@ -41,6 +42,7 @@ export const EXTRA_COMMANDS = [
   'action.help',
   'action.board',
   'action.stats',
+  'action.arena',
   'action.copyConversation',
 ] as const;
 
@@ -204,6 +206,9 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.stats':
       openStats();
+      break;
+    case 'action.arena':
+      openArena(null);
       break;
     case 'action.copyConversation':
       void copyConversation(app);

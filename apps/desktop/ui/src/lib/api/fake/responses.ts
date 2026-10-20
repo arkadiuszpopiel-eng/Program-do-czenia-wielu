@@ -22,6 +22,8 @@ export interface ResponseScript {
   readonly approval: Omit<ApprovalPending, 'id' | 'status' | 'broker_window' | 'expires_at'> | null;
   /** Odpowiedź ucięta (StopReason MaxTokens) → akcja „Kontynuuj". */
   readonly truncated: boolean;
+  /** Model w `Usage` (Arena); brak — domyślny model atrapy. */
+  readonly model?: { readonly provider: string; readonly model: string };
 }
 
 const base = (agent: AgentId, role_id: string, text: string): ResponseScript => ({

@@ -134,6 +134,13 @@ export interface TurnsApi {
   send(sessionId: string, options: SendOptions): Promise<SendResult>;
   /** Ponów → nowy wariant obok (rodzeństwo tury agentki). */
   regenerate(sessionId: string, turnId: string, profile: string | null): Promise<string>;
+  /**
+   * Arena: odpowiedź modelu `model` (`dostawca:model`, przypięty w Routerze) jako nowa gałąź —
+   * wiadomość użytkownika → nowe dziecko, odpowiedź agentki → jej rodzeństwo. Zwraca id tury.
+   */
+  arenaAnswer(sessionId: string, turnId: string, model: string): Promise<string>;
+  /** Wybór gałęzi: aktywna ścieżka sesji prowadzi przez tę turę (dalsza rozmowa, głos). */
+  selectBranch(sessionId: string, turnId: string): Promise<void>;
   /** Edytuj i wyślij ponownie → nowa gałąź od tego miejsca (rodzeństwo tury użytkownika). */
   editAndResend(sessionId: string, turnId: string, text: string): Promise<SendResult>;
   /** Kontynuuj uciętą odpowiedź → nowa tura-dziecko. */

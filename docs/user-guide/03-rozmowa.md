@@ -47,6 +47,7 @@ Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
 - **Przypnij do tablicy** — kopia odpowiedzi trafia na **Tablicę** (do 40 przypięć z różnych rozmów; paleta
   `Ctrl+K` → **Pokaż Tablicę**: wyszukiwanie, otwórz rozmowę, kopiuj, odepnij, „Kopiuj wszystko (Markdown)”),
 - **Zapisz jako szablon promptu** (Twoje wiadomości) — treść trafia do szablonów, nazwa z pierwszej linii.
+- **Porównaj modele (Arena)** (Twoje wiadomości i odpowiedzi na nie) — zobacz „Arena: porównanie dwóch modeli” niżej.
 
 Pod polem pisania pojawia się dopisek **„Bez modelu: …”**, gdy wpisana wiadomość dostanie odpowiedź od razu,
 bez modelu (polecenie wbudowane, własne albo quiz).
@@ -85,6 +86,21 @@ przez sztuczną inteligencję — czytelnie i w metadanych.
 Historia rozmowy jest tylko dopisywana. Gdy klikniesz **Ponów**, nowa odpowiedź staje obok starej — przełączasz je
 strzałkami „Wariant 2 z 3”. Gdy **edytujesz** swoją wiadomość, powstaje nowa gałąź rozmowy od tego miejsca; poprzednia
 zostaje i wrócisz do niej strzałkami „Gałąź 1 z 2”. **Ukryj z widoku** tylko chowa wiadomość — w dzienniku zostaje.
+
+## Arena: porównanie dwóch modeli
+
+Paleta `Ctrl+K` → **Porównaj modele (Arena)** (ostatnia Twoja wiadomość) albo „Więcej akcji” przy wiadomości →
+**Porównaj modele (Arena)**. Wybierasz dwa modele z listy, którą zna Router: modele z kont API i modele lokalne
+(domyślnie jeden lokalny i jeden z chmury, jeśli masz oba). **Porównaj** wysyła tę samą wiadomość do obu modeli —
+odpowiedzi powstają po kolei (najpierw model A, potem B) i stają obok siebie z **czasem odpowiedzi**, **tokenami**
+(wejście / wyjście) i **kosztem**; szybsza i tańsza dostają oznaczenie. Nic nie ocenia odpowiedzi za Ciebie.
+
+Każda odpowiedź to nowa wersja (gałąź) pod Twoją wiadomością — wcześniejsze odpowiedzi zostają. **Wybierz tę
+odpowiedź** ustawia jej gałąź jako bieżącą: dalsza rozmowa idzie od niej, a pozostałe wersje przełączysz strzałkami.
+Obie odpowiedzi liczą się do kosztów i limitów jak zwykłe wiadomości; prywatność sesji, Broker i limity działają
+tak samo. Jeśli wybrany model nie może odpowiedzieć (limit kosztów, sesja tylko lokalna, awaria), przy nim pojawia
+się błąd albo dopisek „Odpowiedział model zastępczy”. **Zatrzymaj** przerywa bieżącą odpowiedź i nie uruchamia
+kolejnej. Arena porównuje same modele — bez narzędzi agentek i bez mostów CLI.
 
 ## Wyszukiwanie
 

@@ -154,6 +154,16 @@ impl ChatEngine {
     /// Skażona sesja (załączniki, wcześniejsze uruchomienia) najpierw trafia do Brokera — błąd
     /// Brokera = tura nie startuje (fail-closed).
     pub async fn start_generation(&self, req: GenRequest) -> Result<String, AppError> {
+        self.start(req, None).await
+    }
+
+    /// Start generacji; `pin` (Arena) — zwykły strumień przypiętego modelu: bez delegacji do
+    /// mostu, poleceń bez modelu i przebiegu agentki z narzędziami (porównujemy same modele).
+    pub(crate) async fn start(
+        &self,
+        req: GenRequest,
+        pin: Option<String>,
+    ) -> Result<String, AppError> {
         self.sync_taint(&req.session).await?;
         let sessions = &self.inner.sessions;
         let reserved = TurnId(sessions.turn_count(&req.session)? + 1);
@@ -199,13 +209,16 @@ impl ChatEngine {
         self.announce_agents(&req.session);
         self.announce_session(&req.session).await;
         let core = self.clone();
-        let delegation = self.delegation(&req);
-        let local = match delegation {
-            None => self.quick(&req).await,
+        let delegation = match pin {
+            None => self.delegation(&req),
             Some(_) => None,
         };
-        let setup = match (req.continues, &delegation, &local) {
-            (None, None, None) => self.agent_setup(&req.session, &req.agent),
+        let local = match (&delegation, &pin) {
+            (None, None) => self.quick(&req).await,
+            _ => None,
+        };
+        let setup = match (req.continues, &delegation, &local, &pin) {
+            (None, None, None, None) => self.agent_setup(&req.session, &req.agent),
             _ => None,
         };
         tokio::spawn(async move {
@@ -214,7 +227,9 @@ impl ChatEngine {
                     (Some(d), _, _) => delegate::run(&core, &req, &handle, d).await,
                     (None, Some(reply), _) => quick::run(&core, &req, &handle, reply),
                     (None, None, Some(setup)) => agent::run(&core, &req, &handle, setup).await,
-                    (None, None, None) => stream::generate(&core, &req, &handle).await,
+                    (None, None, None) => {
+                        stream::generate(&core, &req, &handle, pin.as_deref()).await
+                    }
                 }
             })
             .await;

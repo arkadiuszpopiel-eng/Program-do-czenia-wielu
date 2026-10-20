@@ -13,6 +13,7 @@
   import { templateDialog } from '../../state/template-dialog.svelte';
   import { boardDialog } from '../../state/board-dialog.svelte';
   import { statsDialog } from '../../state/stats-dialog.svelte';
+  import { arenaDialog } from '../../state/arena.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -41,6 +42,7 @@
   const loadTemplates = () => import('../overlays/TemplateDialog.svelte');
   const loadBoard = () => import('../overlays/BoardDialog.svelte');
   const loadStats = () => import('../overlays/SessionStatsDialog.svelte');
+  const loadArena = () => import('../overlays/ArenaDialog.svelte');
   const loadSettings = () => import('../../views/settings/SettingsView.svelte');
   let paletteReady = $state(false);
   let cheatsheetReady = $state(false);
@@ -151,6 +153,7 @@
     />{/if}
   {#if boardDialog.open}<Lazy load={loadBoard} props={{}} label={t('board.title')} />{/if}
   {#if statsDialog.open}<Lazy load={loadStats} props={{}} label={t('stats.title')} />{/if}
+  {#if arenaDialog.open}<Lazy load={loadArena} props={{}} label={t('arena.title')} />{/if}
 </div>
 
 <style>

@@ -8,6 +8,7 @@ import { session as makeSession, turn as makeTurn } from './fixtures';
 import { pickResponse, quickResponse, type ResponseScript } from './responses';
 import { FakeStreamer } from './stream';
 import { takeStaged } from './api-files';
+import { arenaTurnsApi } from './api-arena';
 import type { TurnAttachment } from '../types-files';
 
 export class FakeChat {
@@ -101,6 +102,7 @@ export class FakeChat {
     parentId: string,
     script: ResponseScript,
     continues: string | null = null,
+    failure: TurnError | null = this.failure(),
   ): string {
     const { core } = this;
     const turn = makeTurn(
@@ -121,7 +123,7 @@ export class FakeChat {
     core.emit([{ type: 'TurnAppended', session_id: sessionId, turn }]);
     core.setAgent(sessionId, script.agent, { status: 'speaking', activity: null });
     core.updateSession(sessionId, { working: true });
-    this.streamer.start(turn, script, this.failure());
+    this.streamer.start(turn, script, failure);
     return turn.id;
   }
 
@@ -247,6 +249,7 @@ export class FakeChat {
         core.runs.markUndone(token);
         return core.reply(undefined);
       },
+      ...arenaTurnsApi(core, this),
     };
   }
 

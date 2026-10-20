@@ -44,5 +44,8 @@ serde_json.workspace = true
 tokio = { workspace = true, features = ["rt", "sync", "time", "macros"] }
 tracing.workspace = true
 
+[dev-dependencies]
+sessions-fake = { path = "../sessions-fake" }
+
 [lints]
 workspace = true

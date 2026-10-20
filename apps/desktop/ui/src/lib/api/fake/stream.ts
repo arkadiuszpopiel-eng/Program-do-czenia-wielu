@@ -124,8 +124,8 @@ export class FakeStreamer {
           output_tokens: out,
           cost: { minor: Math.max(1, Math.round(out / 20)), currency: 'PLN' },
           latency_ms: scheduler.now() - started,
-          provider: 'Anthropic',
-          model: 'claude-opus-5-5',
+          provider: script.model?.provider ?? 'Anthropic',
+          model: script.model?.model ?? 'claude-opus-5-5',
         };
         turn.usage = usage;
         emit({ type: 'Usage', session_id: sid, turn_id: tid, usage });

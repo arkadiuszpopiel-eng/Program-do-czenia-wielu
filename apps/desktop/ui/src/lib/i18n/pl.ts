@@ -32,6 +32,7 @@ import { plBoard } from './pl-board';
 import { plJson } from './pl-json';
 import { plStats } from './pl-stats';
 import { plArchive } from './pl-archive';
+import { plArena } from './pl-arena';
 
 export const pl = {
   ...plApp,
@@ -65,6 +66,7 @@ export const pl = {
   ...plJson,
   ...plStats,
   ...plArchive,
+  ...plArena,
 } as const satisfies Record<string, Message>;
 
 export type MessageKey = keyof typeof pl;

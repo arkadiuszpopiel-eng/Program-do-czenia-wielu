@@ -46,7 +46,9 @@ export type FakeScenario =
   /** Każda komenda poza startem odrzuca błąd rdzenia — audyt obsługi błędów w widokach. */
   | 'core-errors'
   /** Rdzeń odpowiada po 1,5 s — audyt stanów ładowania (rejestr wywołań w `fault.ts`). */
-  | 'slow-core';
+  | 'slow-core'
+  /** Arena: odpowiedź modeli OpenAI kończy się limitem kosztów konta (błąd tury). */
+  | 'arena-budget';
 
 /** Opóźnienie odpowiedzi w scenariuszu „slow-core”. */
 export const SLOW_CORE_MS = 1_500;
@@ -68,6 +70,7 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'broker-dev',
   'core-errors',
   'slow-core',
+  'arena-budget',
 ];
 
 const CAST_STATES = ['idle', 'speaking', 'working', 'waiting_approval'] as const;
