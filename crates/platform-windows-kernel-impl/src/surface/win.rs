@@ -26,7 +26,7 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 use windows::core::{PCWSTR, w};
 
 use super::input::{
-    begin_dispatch, decision_sample, end_dispatch, install_hooks, occluded, remove_hooks, sample,
+    begin_dispatch, decision_sample, end_dispatch, install_hooks, occluded, remove_hooks,
 };
 use super::thread::{Request, WM_REQUEST};
 use super::{EventQueue, now_ms};
@@ -91,7 +91,11 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             });
         }
         WM_COMMAND => {}
-        WM_CLOSE => push(SurfaceEvent::Cancel { input: sample() }),
+        // Krzyżyk (WM_NCLBUTTONUP → WM_SYSCOMMAND → WM_CLOSE przez SendMessage) i Alt+F4: próbka
+        // z komunikatu wejścia jak przy „Odmów” — w samym WM_CLOSE Windows nie podaje źródła.
+        WM_CLOSE => push(SurfaceEvent::Cancel {
+            input: decision_sample(),
+        }),
         WM_DESTROY => {
             push(SurfaceEvent::Closed);
             with_ui(|ui| ui.hwnd = None);
