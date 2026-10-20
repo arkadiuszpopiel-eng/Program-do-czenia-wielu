@@ -256,6 +256,21 @@ fn engine_card_follows_the_engine_choice() {
         card_for(&laptop, Backend::Vulkan, Some(" intel(r) uhd graphics ")),
         Some(GpuId(0))
     );
+    // Nazwa dopasowana jak w `llama-server` (część nazwy, bez `(R)`) — ta sama karta.
+    assert_eq!(
+        card_for(&laptop, Backend::Vulkan, Some("Intel UHD Graphics")),
+        Some(GpuId(0))
+    );
+    assert_eq!(
+        card_for(&laptop, Backend::Vulkan, Some("GeForce RTX 4050")),
+        Some(GpuId(1))
+    );
+    // Karta przypięta bez backendu silnika (Intel bez CUDA) — serwer startuje bez przypięcia,
+    // więc dzierżawa idzie za kartą silnika, nie za nazwą.
+    assert_eq!(
+        card_for(&laptop, Backend::Cuda, Some("Intel(R) UHD Graphics")),
+        Some(GpuId(1))
+    );
     // Nazwa nieznana — jak bez przypięcia.
     assert_eq!(
         card_for(&laptop, Backend::Vulkan, Some("Inna karta")),
@@ -282,4 +297,22 @@ fn engine_card_follows_the_engine_choice() {
     assert_eq!(card_for(&desktop, Backend::Vulkan, None), primary);
     assert_eq!(card_for(&desktop, Backend::Cuda, None), primary);
     assert_eq!(card_for(&fixtures::no_gpu(), Backend::Cuda, None), None);
+}
+
+#[test]
+fn card_names_match_like_the_engine_does() {
+    assert!(same_card_name(
+        "Intel(R) Iris(R) Xe Graphics",
+        " intel iris xe graphics "
+    ));
+    assert!(same_card_name(
+        "NVIDIA GeForce RTX 4050 Laptop GPU",
+        "RTX 4050"
+    ));
+    assert!(!same_card_name(
+        "AMD Radeon RX 9070 XT",
+        "AMD Radeon RX 7800 XT"
+    ));
+    assert!(!same_card_name("AMD Radeon RX 9070 XT", "  "));
+    assert!(!same_card_name("", ""));
 }

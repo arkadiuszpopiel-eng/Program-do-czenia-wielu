@@ -130,9 +130,11 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
 
 ## Zmiany — klienci wskazują kartę, zmiana sprzętu przelicza pule (C6.6, 0.0.65)
 - Karta silnika: `card_for(&Profile, Backend, Option<&str>) -> Option<GpuId>` (kontrakt, czysta funkcja) — ta sama
-  decyzja co wybór karty silnika: karta przypięta po nazwie (`--device` `llama-server`, `LocalConfig::gpu_name`),
-  inaczej karta główna, gdy obsługuje backend, inaczej największa karta z tym backendem (CUDA przy głównej AMD);
-  `Backend::Cpu` i maszyna bez kart — `None`.
+  decyzja co wybór karty silnika: karta przypięta po nazwie (`--device` `llama-server`, `LocalConfig::gpu_name`,
+  tylko przy `pin_device` i karcie obsługującej backend — inaczej serwer startuje bez przypięcia; nazwy porównuje
+  wspólne `same_card_name`, którego używa też `providers-local::devices::device_for`), inaczej karta główna, gdy
+  obsługuje backend, inaczej największa karta z tym backendem (CUDA przy głównej AMD); `Backend::Cpu` i maszyna bez
+  kart — `None`.
 - Klienci: `providers-local` — dzierżawa LLM na karcie serwera (`target_gpu`: CUDA/Vulkan → `card_for` z `gpu_name`),
   budżet warstw z puli tej karty (`ResidencyState::gpu`), model pomocniczy na karcie zintegrowanej (`shared_memory`)
   nadal w RAM bez karty; `voice-stt` — `WhisperStt::with_cards(&Profile)`: CUDA i Vulkan → `card_for`, procesor —
@@ -145,6 +147,16 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
   inaczej `None`), `ResidencyModule::with_hardware(device, config)`: po każdym zdarzeniu `device.*` z magistrali
   (`device.changed`, `device.override`, …) i w każdym kroku zadania tła (zapas dla zmian bez zdarzenia, np. emulacji).
   Kompozycja: `app_modules::route::local::residency`.
+- Numer karty (`GpuId` = `GpuInfo::id`) to pozycja adaptera DXGI, nie tożsamość. `sync_hardware` pamięta nazwę i LUID
+  karty pod każdym numerem; gdy pod tym samym numerem jest inna karta (zmiana kolejności adapterów, np. po zmianie
+  wyświetlacza w laptopie hybrydowym albo resecie sterownika — LUID się zmienia), najpierw przelicza pule bez
+  podmienionych numerów (dzierżawy wskazujące je są odbierane jako „na karcie, której nie ma”; podmieniona karta
+  główna — numer zastępczy), potem z nowym układem (dzierżawy idące za kartą główną przechodzą na nią). Bez tego
+  dzierżawa z jawną kartą zostałaby pod starym numerem, czyli na obcej karcie. Test:
+  `hardware.rs::reordered_adapters_revoke_leases_pinned_by_number`. Ograniczenia: zarządca bez profilu
+  (`with_gpus`) nie zna tożsamości kart; dwie karty o tej samej nazwie bez znanego LUID zamienione miejscami nie są
+  rozpoznawane; reset sterownika ze zmianą LUID odbiera dzierżawy także wtedy, gdy kolejność się nie zmieniła
+  (ostrożnie — klienci zakładają je ponownie).
 - Testy: `gpus_tests.rs::engine_card_follows_the_engine_choice`, `model-residency-impl/tests/hardware.rs` (laptop
   Intel UHD 0 + RTX 4050 1: STT na CUDA i model rozmowy na karcie 1, VAD na CPU; dwie karty AMD: mowa na karcie B nie
   blokuje rozmowy na karcie A; zmiana sprzętu odbiera dzierżawę z karty, której nie ma; moduł po `device.changed`),

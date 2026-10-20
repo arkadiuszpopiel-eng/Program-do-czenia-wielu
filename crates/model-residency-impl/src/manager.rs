@@ -5,11 +5,11 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Instant;
 
-use device_profile_contract::{DeviceProfile, PowerState};
+use device_profile_contract::{DeviceProfile, PowerState, Profile};
 use model_residency_contract::{
-    Budget, Change, GpuLayout, Grant, Lease, LeaseId, LeaseListener, LeaseRequest, LeaseTable,
-    Mode, ModeSource, Placement, Residency, ResidencyClock, ResidencyError, ResidencyEvent,
-    ResidencyState, Revocation,
+    Budget, Change, GpuId, GpuLayout, Grant, Lease, LeaseId, LeaseListener, LeaseRequest,
+    LeaseTable, Mode, ModeSource, Placement, Residency, ResidencyClock, ResidencyError,
+    ResidencyEvent, ResidencyState, Revocation,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -51,9 +51,74 @@ impl ModeSource for DeviceSignals {
     }
 }
 
+/// Tożsamość karty pod danym [`GpuId`] (numer adaptera to pozycja, nie tożsamość): nazwa i LUID
+/// (0 — nieznany). Służy do wykrycia, że pod tym samym numerem jest już inna karta.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct CardIdentity {
+    name: String,
+    luid: u64,
+}
+
+impl CardIdentity {
+    fn of_profile(profile: &Profile) -> BTreeMap<GpuId, Self> {
+        profile
+            .gpus
+            .iter()
+            .map(|g| {
+                let identity = Self {
+                    name: g.name.trim().to_owned(),
+                    luid: g.luid,
+                };
+                (GpuId::of(g), identity)
+            })
+            .collect()
+    }
+
+    /// Inna karta: inna nazwa albo (gdy oba znane) inny LUID — LUID zmienia się tylko po ponownym
+    /// uruchomieniu systemu albo resecie sterownika, wtedy ostrożnie traktujemy kartę jako nową.
+    fn differs(&self, other: &Self) -> bool {
+        self.name != other.name || (self.luid != 0 && other.luid != 0 && self.luid != other.luid)
+    }
+}
+
+/// Numery kart, pod którymi w nowym profilu jest inna karta niż dotąd (zmiana kolejności
+/// adapterów, np. po zmianie wyświetlacza w laptopie hybrydowym albo resecie sterownika).
+fn swapped_cards(
+    old: &BTreeMap<GpuId, CardIdentity>,
+    new: &BTreeMap<GpuId, CardIdentity>,
+) -> Vec<GpuId> {
+    new.iter()
+        .filter(|(id, card)| old.get(id).is_some_and(|o| o.differs(card)))
+        .map(|(id, _)| *id)
+        .collect()
+}
+
+/// Karty bez kart podmienionych: dzierżawy wskazujące numer podmienionej karty tracą kartę
+/// ([`LeaseTable::set_hardware`] odbiera dzierżawy na kartach, których nie ma), a dzierżawy idące
+/// za kartą główną przechodzą na nią w drugim kroku. Podmieniona karta główna — numer
+/// zastępczy, którego nie ma żadna karta.
+fn without_swapped(gpus: &GpuLayout, swapped: &[GpuId]) -> GpuLayout {
+    let primary = if swapped.contains(&gpus.primary) {
+        GpuId(u32::MAX)
+    } else {
+        gpus.primary
+    };
+    GpuLayout {
+        primary,
+        others: gpus
+            .others
+            .iter()
+            .filter(|p| !swapped.contains(&p.gpu))
+            .copied()
+            .collect(),
+    }
+}
+
 /// Zarządca rezydencji.
 pub struct ResidencyManager {
     table: Mutex<LeaseTable>,
+    /// Tożsamość kart przy ostatnim przeliczeniu pul (pusta — nieznana, np. zarządca bez profilu).
+    cards: Mutex<BTreeMap<GpuId, CardIdentity>>,
     clock: Arc<dyn ResidencyClock>,
     listeners: Mutex<BTreeMap<String, Arc<dyn LeaseListener>>>,
     sink: Mutex<Option<UnboundedSender<ResidencyEvent>>>,
@@ -73,6 +138,7 @@ impl ResidencyManager {
     pub fn with_gpus(budget: Budget, gpus: GpuLayout, clock: Arc<dyn ResidencyClock>) -> Self {
         Self {
             table: Mutex::new(LeaseTable::with_gpus(budget, gpus)),
+            cards: Mutex::new(BTreeMap::new()),
             clock,
             listeners: Mutex::new(BTreeMap::new()),
             sink: Mutex::new(None),
@@ -88,13 +154,16 @@ impl ResidencyManager {
             tracing::info!(główna = %gpus.primary, pozostałe = ?gpus.others, "osobne pule pamięci kart");
         }
         let manager = Self::with_gpus(budget, gpus, Arc::new(MonotonicClock::new()));
+        *lock(&manager.cards) = CardIdentity::of_profile(&device.current());
         manager.refresh_mode(&config.signals(DeviceSignals(device)));
         manager
     }
 
     /// Zmiana sprzętu (C6.6): budżet karty głównej i RAM oraz karty z profilu urządzenia; gdy
     /// różnią się od obowiązujących — [`Residency::set_hardware`] (pule przeliczone, dzierżawy na
-    /// kartach, których już nie ma, odebrane). `None` — sprzęt bez zmian (nic nie robi).
+    /// kartach, których już nie ma, odebrane). Numer karty to pozycja adaptera, więc gdy pod tym
+    /// samym numerem jest już inna karta (inna nazwa albo LUID), dzierżawy wskazujące ten numer są
+    /// odbierane, a nie przenoszone na obcą kartę. `None` — sprzęt bez zmian (nic nie robi).
     pub fn sync_hardware(
         &self,
         device: &dyn DeviceProfile,
@@ -102,15 +171,30 @@ impl ResidencyManager {
     ) -> Option<Vec<Change>> {
         let (budget, gpus) = config.hardware(device);
         let gpus = gpus.normalized();
-        {
-            let t = self.table();
-            if t.base_budget() == budget && *t.gpus() == gpus {
+        let identities = CardIdentity::of_profile(&device.current());
+        let swapped = {
+            let mut cards = lock(&self.cards);
+            let swapped = swapped_cards(&cards, &identities);
+            *cards = identities;
+            swapped
+        };
+        let changes = {
+            let mut t = self.table();
+            if swapped.is_empty() && t.base_budget() == budget && *t.gpus() == gpus {
                 return None;
             }
-        }
-        tracing::info!(?budget, główna = %gpus.primary, pozostałe = ?gpus.others,
-            "zmiana sprzętu: nowe pule pamięci kart");
-        Some(self.set_hardware(budget, gpus))
+            tracing::info!(?budget, główna = %gpus.primary, pozostałe = ?gpus.others,
+                podmienione = ?swapped, "zmiana sprzętu: nowe pule pamięci kart");
+            let mut changes = if swapped.is_empty() {
+                Vec::new()
+            } else {
+                t.set_hardware(budget, without_swapped(&gpus, &swapped))
+            };
+            changes.extend(t.set_hardware(budget, gpus));
+            changes
+        };
+        self.notify(&changes);
+        Some(changes)
     }
 
     /// Podłącza kolejkę zdarzeń (moduł przekazuje je na magistralę w kolejności).

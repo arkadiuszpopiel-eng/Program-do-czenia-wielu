@@ -174,19 +174,21 @@ impl GpuLayout {
 
 /// Karta, na której liczy silnik z backendem `backend` — klucz [`crate::LeaseRequest::gpu`]
 /// (C6.6). Ta sama decyzja, która wybiera kartę silnika: karta przypięta po nazwie (`--device`
-/// `llama-server` dopasowany po nazwie, karta z konfiguracji), inaczej karta główna profilu, gdy
-/// obsługuje backend (Qwen3-ASR i model rozmowy na głównej, CUDA na laptopie z RTX), inaczej
-/// największa karta z tym backendem (np. CUDA przy karcie głównej AMD). Procesor albo maszyna bez
-/// kart — `None` (dzierżawa na CPU albo na karcie głównej, jak dotąd).
+/// `llama-server`: nazwa dopasowana jak w [`same_card_name`], tylko karta obsługująca backend —
+/// inaczej serwer startuje bez przypięcia), inaczej karta główna profilu, gdy obsługuje backend
+/// (Qwen3-ASR i model rozmowy na głównej, CUDA na laptopie z RTX), inaczej największa karta z tym
+/// backendem (np. CUDA przy karcie głównej AMD). Procesor albo maszyna bez kart — `None`
+/// (dzierżawa na CPU albo na karcie głównej, jak dotąd).
 pub fn card_for(profile: &Profile, backend: Backend, name: Option<&str>) -> Option<GpuId> {
     if backend == Backend::Cpu {
         return None;
     }
-    let named = name.map(str::trim).filter(|n| !n.is_empty()).and_then(|n| {
+    let named = name.and_then(|n| {
         profile
             .gpus
             .iter()
-            .find(|g| g.name.trim().eq_ignore_ascii_case(n))
+            .filter(|g| g.backends.contains(&backend))
+            .find(|g| same_card_name(&g.name, n))
     });
     if let Some(gpu) = named {
         return Some(GpuId::of(gpu));
@@ -208,6 +210,25 @@ pub fn card_for(profile: &Profile, backend: Backend, name: Option<&str>) -> Opti
         })
         .or(primary)
         .map(GpuId::of)
+}
+
+/// Nazwa karty bez wielkości liter, znaków `(R)`/`(TM)` i nadmiarowych odstępów.
+fn normalized_name(name: &str) -> String {
+    name.to_ascii_lowercase()
+        .replace("(r)", "")
+        .replace("(tm)", "")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// Czy dwie nazwy wskazują tę samą kartę: po ujednoliceniu (wielkość liter, `(R)`, `(TM)`,
+/// odstępy) jedna zawiera drugą. Jedna reguła dla [`card_for`] i dopasowania urządzeń
+/// `llama-server` (`--list-devices`), żeby obie strony wybierały tę samą kartę. Pusta nazwa nie
+/// pasuje do niczego.
+pub fn same_card_name(a: &str, b: &str) -> bool {
+    let (a, b) = (normalized_name(a), normalized_name(b));
+    !a.is_empty() && !b.is_empty() && (a.contains(&b) || b.contains(&a))
 }
 
 /// Stan jednej karty w migawce.

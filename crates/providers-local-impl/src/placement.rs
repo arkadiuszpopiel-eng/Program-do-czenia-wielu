@@ -91,8 +91,9 @@ impl Sidecar {
         }
     }
 
-    /// Karta, na której policzy serwer (C6.6): przypięta z konfiguracji albo główna z profilu —
-    /// ta sama, którą wskazuje `--device` ([`Self::pinned_device`]); CPU — bez karty.
+    /// Karta, na której policzy serwer (C6.6): przypięta z konfiguracji (tylko przy włączonym
+    /// przypinaniu i karcie z tym backendem) albo główna z profilu — ta sama, którą wskazuje
+    /// `--device` ([`Self::pinned_device`]); CPU — bez karty.
     fn target_gpu(&self, backend: BackendKey) -> Option<GpuId> {
         let backend = match backend {
             BackendKey::Cpu => return None,
@@ -100,7 +101,12 @@ impl Sidecar {
             BackendKey::Vulkan => Backend::Vulkan,
         };
         let profile = self.device.as_ref()?.current();
-        card_for(&profile, backend, self.config.gpu_name.as_deref())
+        let name = self
+            .config
+            .gpu_name
+            .as_deref()
+            .filter(|_| self.config.pin_device);
+        card_for(&profile, backend, name)
     }
 
     /// Budżet VRAM: limit z konfiguracji, pula karty docelowej w zarządcy rezydencji (z emulacją;

@@ -1,6 +1,7 @@
 //! Pule kart w praktyce (C6.6): laptop właściciela (Intel UHD — karta 0, RTX 4050 — karta 1,
 //! główna) z kartami wybranymi tak jak silniki, dwie karty AMD (mowa na karcie B nie blokuje
-//! rozmowy na karcie A), zmiana sprzętu przelicza pule (wprost i przez zdarzenie `device.changed`).
+//! rozmowy na karcie A), zmiana sprzętu przelicza pule (wprost i przez zdarzenie `device.changed`),
+//! zmiana kolejności adapterów odbiera dzierżawy wskazujące numer karty.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -241,6 +242,60 @@ fn device_change_relayouts_the_pools() {
         m.sync_hardware(device.as_ref(), &config).is_none(),
         "drugi raz bez zmian"
     );
+}
+
+/// Kolejność adapterów zmieniona w trakcie pracy (RTX teraz 0, UHD 1): numer karty to pozycja,
+/// więc dzierżawy wskazujące numer są odbierane (nie zostają na obcej karcie), a dzierżawa idąca
+/// za kartą główną zostaje na RTX.
+#[test]
+fn reordered_adapters_revoke_leases_pinned_by_number() {
+    let config = ResidencyConfig::default();
+    let device = Arc::new(FakeDeviceProfile::new(laptop()));
+    let m = manager(&device);
+    let acquire = |owner: &str, role, gpu| {
+        m.acquire(lease(
+            owner,
+            role,
+            Priority::Background,
+            Placement::GpuPreferred,
+            1_000,
+            gpu,
+        ))
+        .unwrap()
+        .lease
+    };
+    let light = acquire("local-light", ModelRole::Llm, Some(UHD));
+    let stt = acquire("voice-stt", ModelRole::Stt, Some(RTX));
+    let chat = acquire("providers-local", ModelRole::Llm, None);
+    assert_eq!(chat.gpu, Some(RTX));
+    let mut next = laptop();
+    for gpu in &mut next.gpus {
+        gpu.id = 1 - gpu.id;
+    }
+    next.gpus.reverse();
+    device.hot_plug(next);
+    assert!(device.refresh().unwrap());
+    let changes = m.sync_hardware(device.as_ref(), &config).unwrap();
+    let mut revoked: Vec<_> = changes
+        .iter()
+        .filter_map(|c| match c {
+            Change::Revoked(r) => Some(r.lease.id),
+            Change::Moved(_) => None,
+        })
+        .collect();
+    revoked.sort();
+    let mut expected = vec![light.id, stt.id];
+    expected.sort();
+    assert_eq!(revoked, expected);
+    let state = m.snapshot();
+    assert_eq!(state.gpus.first().map(|g| g.pool.gpu), Some(GpuId(0)));
+    assert!(
+        state.gpu(GpuId(1)).is_some_and(|g| g.pool.shared),
+        "UHD — 1"
+    );
+    assert!(m.lease(chat.id).is_some_and(|l| l.gpu == Some(GpuId(0))));
+    assert_eq!(state.gpu(GpuId(0)).map(|g| g.used_mb), Some(1_000));
+    assert!(m.sync_hardware(device.as_ref(), &config).is_none());
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
