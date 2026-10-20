@@ -25,6 +25,8 @@ export interface ResponseScript {
   readonly truncated: boolean;
   /** Własny podział tekstu na porcje strumienia (np. bardzo długi artefakt w kilku porcjach). */
   readonly tokens?: readonly string[];
+  /** Model w `Usage` (Arena); brak — domyślny model atrapy. */
+  readonly model?: { readonly provider: string; readonly model: string };
 }
 
 const base = (agent: AgentId, role_id: string, text: string): ResponseScript => ({

@@ -7,6 +7,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod agent;
+mod arena;
 mod delegate;
 mod engine;
 mod finish;
@@ -22,6 +23,7 @@ mod style;
 mod taint;
 mod undo;
 
+pub use arena::{ARENA_MODELS, arena_model, arena_placement};
 pub use engine::{AgentStack, ChatDeps, ChatEngine, ChatHost, GenHandle, RunCtl};
 pub use generate::{GenRequest, Placement};
 pub use history::CONTINUE_HINT;

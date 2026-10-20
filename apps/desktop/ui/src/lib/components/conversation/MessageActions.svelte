@@ -17,6 +17,7 @@
   import { exportConversation } from '../../state/exports';
   import { documentArtifact } from '../../logic/canvas';
   import { openCanvas } from '../../state/canvas.svelte';
+  import { openArena } from '../../state/arena.svelte';
 
   interface Props {
     turn: Turn;
@@ -102,6 +103,15 @@
           onSelect: () => run(() => conv.regenerate(turn, 'cloud')),
         },
       );
+    }
+    // Arena: wiadomość użytkownika albo odpowiedź na nią (porównanie dotyczy tej wiadomości).
+    if (isUser || conv.turn(turn.parent_id ?? '')?.author === 'user') {
+      items.push({
+        id: 'arena',
+        label: t('action.arena'),
+        disabled: !done || conv.streaming !== undefined,
+        onSelect: () => openArena(turn.id),
+      });
     }
     if (!isUser) {
       items.push(

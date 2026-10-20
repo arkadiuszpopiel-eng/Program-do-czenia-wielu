@@ -533,6 +533,7 @@ dependencies = [
  "safety-broker-contract",
  "serde_json",
  "sessions-contract",
+ "sessions-fake",
  "sessions-impl",
  "tokio",
  "tracing",

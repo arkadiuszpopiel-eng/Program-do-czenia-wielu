@@ -224,6 +224,11 @@ pub fn task_class(policy: Option<&str>) -> TaskClass {
         .unwrap_or(TaskClass::Conversation)
 }
 
+/// Przypięcie trasy: model wskazany w żądaniu ma pierwszeństwo przed kontem agentki.
+fn pinned_first(requested: Option<Candidate>, assigned: Option<Candidate>) -> Option<Candidate> {
+    requested.or(assigned)
+}
+
 fn note(decision: &RouteDecision) -> RouteNote {
     RouteNote {
         chosen: decision.chosen.qualified(),
@@ -266,11 +271,14 @@ impl BrainPort for RouterBrain {
             PrivacyTag::Normal => SessionTag::Standard,
             PrivacyTag::Private | PrivacyTag::LocalOnly => SessionTag::Private,
         };
-        // Konto przypisane agentce jest próbowane pierwsze (przypięcie), reszta jako zapas.
-        constraints.pinned = (!local_only)
+        // Model wybrany przez użytkownika (Arena: `dostawca:model` w żądaniu) jest próbowany
+        // pierwszy; bez niego — konto przypisane agentce. Reszta jako zapas; kontrole prywatności,
+        // zgodności i budżetu obowiązują także przypięty model.
+        let assigned = (!local_only)
             .then(|| self.accounts.assigned_to(&request.agent))
             .flatten()
             .and_then(|(provider, r)| r.first_model(class).map(|m| Candidate::new(provider, m)));
+        constraints.pinned = pinned_first(constraints.pinned.take(), assigned);
         let decision = core
             .decide(class, &constraints, request.chat.as_ref())
             .map_err(|e| self.no_route(&e, local_only))?;
@@ -356,5 +364,22 @@ impl BrainPort for RouterBrain {
             model: c.model,
             local: false,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn requested_model_wins_over_agent_account() {
+        let arena = Candidate::new("openai", "gpt-6-sol");
+        let agent = Candidate::new("anthropic", "claude-opus-5-5");
+        assert_eq!(
+            pinned_first(Some(arena.clone()), Some(agent.clone())),
+            Some(arena)
+        );
+        assert_eq!(pinned_first(None, Some(agent.clone())), Some(agent));
+        assert_eq!(pinned_first(None, None), None);
     }
 }

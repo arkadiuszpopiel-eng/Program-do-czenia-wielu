@@ -43,9 +43,12 @@ fn utf16_len(text: &str) -> u64 {
 }
 
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
+/// `pin` — model przypięty przez użytkownika (`dostawca:model`, Arena): Router próbuje go
+/// pierwszego, z tymi samymi kontrolami prywatności, zgodności i budżetu co trasa automatyczna.
 pub(crate) async fn prepare(
     core: &ChatEngine,
     req: &GenRequest,
+    pin: Option<&str>,
 ) -> Result<(BrainChoice, ChatRequest), TurnError> {
     let privacy = core
         .inner
@@ -63,7 +66,7 @@ pub(crate) async fn prepare(
             .map_err(|e| turn_error(TurnErrorCode::Provider, e.to_string(), None))?
             .map_err(|e| turn_error(TurnErrorCode::Provider, e.message, None))?;
     let query = messages.last().map(|m| m.visible_text());
-    let mut request = ChatRequest::new(router_contract::AUTO_MODEL, messages);
+    let mut request = ChatRequest::new(pin.unwrap_or(router_contract::AUTO_MODEL), messages);
     let mut system = None;
     if let Ok(persona) = core
         .inner
@@ -148,8 +151,13 @@ async fn budget_gate(
 }
 
 /// Pełny przebieg generacji.
-pub(crate) async fn generate(core: &ChatEngine, req: &GenRequest, handle: &GenHandle) -> Outcome {
-    let (choice, request) = match prepare(core, req).await {
+pub(crate) async fn generate(
+    core: &ChatEngine,
+    req: &GenRequest,
+    handle: &GenHandle,
+    pin: Option<&str>,
+) -> Outcome {
+    let (choice, request) = match prepare(core, req, pin).await {
         Ok(x) => x,
         Err(e) => return Outcome::failed(e),
     };

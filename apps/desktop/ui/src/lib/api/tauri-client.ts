@@ -50,6 +50,9 @@ export class TauriAlfaClient implements AlfaClient {
     send: (sessionId, options) => call('turns_send', { sessionId, options }),
     regenerate: (sessionId, turnId, profile) =>
       call('turns_regenerate', { sessionId, turnId, profile }),
+    arenaAnswer: (sessionId, turnId, model) =>
+      call('turns_arena_answer', { sessionId, turnId, model }),
+    selectBranch: (sessionId, turnId) => call('turns_select_branch', { sessionId, turnId }),
     editAndResend: (sessionId, turnId, text) =>
       call('turns_edit_and_resend', { sessionId, turnId, text }),
     continueTurn: (sessionId, turnId) => call('turns_continue', { sessionId, turnId }),

@@ -91,6 +91,19 @@ export class ConversationState {
     selectSibling(this.tree, turn, delta);
   }
 
+  /** Wybiera turę na jej rozwidleniu (Arena: „Wybierz tę odpowiedź”). `false` — brak tury. */
+  selectTurnById(turnId: string): boolean {
+    const turn = this.tree.turns[turnId];
+    if (!turn) return false;
+    selectTurn(this.tree, turn);
+    return true;
+  }
+
+  /** Arena: odpowiedź przypiętego modelu jako nowa gałąź. Odrzuca przy błędzie (stanowisko areny). */
+  arenaAnswer(turnId: string, model: string): Promise<string> {
+    return this.client.turns.arenaAnswer(this.sessionId, turnId, model);
+  }
+
   apply(event: ChatStreamEvent): void {
     this.duringLoad?.push(event);
     if (event.type === 'TurnAppended') {

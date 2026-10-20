@@ -74,6 +74,7 @@ import type { DiagApi } from './client-diag';
 import type { ModulesApi } from './client-modules';
 import type { AdvancedApi } from './client-advanced';
 import type { LocalCommandsApi } from './client-quick';
+import type { ArenaTurnsApi } from './client-arena';
 import type { TemplatesApi } from './client-templates';
 import type { DataRoutesApi } from './client-routes';
 import type { HelpApi } from './client-help';
@@ -128,7 +129,7 @@ export interface SessionsApi {
   chooseWorkdir(sessionId: string, choice: WorkdirChoice): Promise<SessionWorkdir>;
 }
 
-export interface TurnsApi {
+export interface TurnsApi extends ArenaTurnsApi {
   /** Całe drzewo gałęzi sesji (append-only) + adnotacje widoku. */
   list(sessionId: string): Promise<TurnsSnapshot>;
   send(sessionId: string, options: SendOptions): Promise<SendResult>;
