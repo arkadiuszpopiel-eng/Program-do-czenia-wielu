@@ -5,6 +5,7 @@ mod accounts;
 mod advanced;
 mod agents;
 pub(crate) mod app;
+mod arena;
 mod board;
 mod bridges;
 pub(crate) mod cameras;

@@ -68,6 +68,13 @@
             "null"
           ]
         },
+        "base_url": {
+          "description": "Własny adres API konta (np. zasób Azure OpenAI — formularz firmowy pokazuje go bez edycji).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "cost_limit": {
           "$ref": "#/$defs/AccountCostLimit"
         },
@@ -3183,6 +3190,15 @@
         "cameras"
       ],
       "type": "object"
+    },
+    "CanvasKind": {
+      "description": "Rodzaj artefaktu w kanwie (C2.8): Markdown jako zwykły DOM, HTML i SVG w izolowanej ramce.",
+      "enum": [
+        "markdown",
+        "html",
+        "svg"
+      ],
+      "type": "string"
     },
     "CastTemplateId": {
       "description": "Szablon obsady.",
@@ -10428,6 +10444,62 @@
       ],
       "type": "object"
     },
+    "SessionCard": {
+      "description": "Karta rozmowy z profilem (P4, widok „Karty” panelu Sesje): dane spoza [`SessionSummary`]\nliczone z historii — agentki, ostatnia wiadomość jako czysty tekst, model i koszt.",
+      "properties": {
+        "agents": {
+          "description": "Agentki, które odpowiadały (bez odpowiedzi — obsada sesji); bez powtórzeń, do 4.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "cost": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Łączny koszt rozmowy (USD, centy w górę); `None` — brak kosztu (np. model lokalny)."
+        },
+        "model": {
+          "description": "Model ostatniej odpowiedzi.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "snippet": {
+          "description": "Ostatnia widoczna wiadomość jako czysty tekst (bez Markdownu i HTML, do 160 znaków).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snippet_author": {
+          "description": "Autor ostatniej wiadomości: `user` albo identyfikator agentki.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "session_id",
+        "agents",
+        "snippet",
+        "snippet_author",
+        "model",
+        "cost"
+      ],
+      "type": "object"
+    },
     "SessionPanels": {
       "description": "Otwarte panele sesji.",
       "properties": {
@@ -11771,6 +11843,158 @@
         "done"
       ],
       "type": "string"
+    },
+    "TeachFile": {
+      "description": "Plik wybrany do nauki: wyciągnięty tekst (podgląd przed zapisem).",
+      "properties": {
+        "chars": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "text",
+        "chars",
+        "truncated"
+      ],
+      "type": "object"
+    },
+    "TeachReport": {
+      "description": "Wynik: ile faktów zapisano (identyfikatory do cofnięcia przez `memory_forget`).",
+      "properties": {
+        "duplicates": {
+          "description": "Powtórzone fragmenty pominięte.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "facts": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scope_key": {
+          "type": "string"
+        },
+        "source": {
+          "description": "Źródło zapisane przy faktach (np. `naucz:plik:raport.pdf#3f2a…`, `rozmowa:<sesja>`).",
+          "type": "string"
+        },
+        "truncated": {
+          "description": "Treść ucięta limitem znaków albo liczby faktów.",
+          "type": "boolean"
+        },
+        "trusted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "facts",
+        "ids",
+        "scope_key",
+        "source",
+        "trusted",
+        "truncated",
+        "duplicates"
+      ],
+      "type": "object"
+    },
+    "TeachRequest": {
+      "description": "Żądanie „Naucz Alfę” (`title` puste — nazwa pliku, tytuł rozmowy albo „Wklejony tekst”).",
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/RememberScope"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/TeachSource"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "session_id",
+        "source",
+        "scope",
+        "title"
+      ],
+      "type": "object"
+    },
+    "TeachSource": {
+      "description": "Źródło wiedzy.",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "text",
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "file",
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name",
+            "text"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "conversation",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
     },
     "TerminalProfileId": {
       "description": "Profil terminala.",
@@ -13811,6 +14035,25 @@
         "$ref": "#/$defs/Account"
       }
     },
+    "accounts_set_enterprise": {
+      "args": [
+        {
+          "name": "account_id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "enterprise",
+          "schema": {
+            "$ref": "#/$defs/EnterpriseSettings"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/Account"
+      }
+    },
     "accounts_set_limit": {
       "args": [
         {
@@ -14651,6 +14894,31 @@
         "$ref": "#/$defs/CamerasState"
       }
     },
+    "canvas_render": {
+      "args": [
+        {
+          "name": "kind",
+          "schema": {
+            "$ref": "#/$defs/CanvasKind"
+          }
+        },
+        {
+          "name": "source",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "lang",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "type": "string"
+      }
+    },
     "compliance_routes": {
       "args": [],
       "result": {
@@ -15452,6 +15720,32 @@
         "$ref": "#/$defs/MemoryStatus"
       }
     },
+    "memory_teach": {
+      "args": [
+        {
+          "name": "request",
+          "schema": {
+            "$ref": "#/$defs/TeachRequest"
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/TeachReport"
+      }
+    },
+    "memory_teach_pick_file": {
+      "args": [],
+      "result": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/TeachFile"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
     "memory_undo": {
       "args": [
         {
@@ -15990,6 +16284,25 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/ReindexView"
+      }
+    },
+    "sessions_cards": {
+      "args": [
+        {
+          "name": "session_ids",
+          "schema": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/SessionCard"
+        },
+        "type": "array"
       }
     },
     "sessions_choose_workdir": {
@@ -16887,6 +17200,31 @@
         "type": "null"
       }
     },
+    "turns_arena_answer": {
+      "args": [
+        {
+          "name": "session_id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "turn_id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "model",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "type": "string"
+      }
+    },
     "turns_continue": {
       "args": [
         {
@@ -17065,6 +17403,25 @@
             "format": "uint64",
             "minimum": 0,
             "type": "integer"
+          }
+        }
+      ],
+      "result": {
+        "type": "null"
+      }
+    },
+    "turns_select_branch": {
+      "args": [
+        {
+          "name": "session_id",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "turn_id",
+          "schema": {
+            "type": "string"
           }
         }
       ],

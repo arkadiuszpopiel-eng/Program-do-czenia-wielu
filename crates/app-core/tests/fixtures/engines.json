@@ -377,8 +377,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta).",
-              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card)."
+              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta). Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card). Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -456,7 +456,7 @@
             "generative": true
           },
           "license_card": {
-            "id": "OpenRAIL-M",
+            "id": "OpenRAIL-M AND MIT",
             "name": "OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)",
             "url": "https://huggingface.co/supertone-oss-archive/supertonic-3",
             "author": {
@@ -466,8 +466,8 @@
             "commercial": "conditional",
             "attribution": true,
             "notes": {
-              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
-              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Zapis licencji: dokumentacja projektu (docs/). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Licence record: project documentation (docs/). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
             },
             "confirmed": true,
             "voices": [
@@ -784,10 +784,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -845,8 +845,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -1028,10 +1028,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -1086,7 +1086,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
             "name": "MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
             "url": "https://docs.nvidia.com/cuda/eula/index.html",
             "author": {
@@ -1157,10 +1157,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -1269,7 +1269,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
             "name": "MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
             "url": "https://docs.nvidia.com/cuda/eula/index.html",
             "author": {
@@ -1340,8 +1340,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -1391,7 +1391,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND GPL-3.0-or-later",
             "name": "MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)",
             "url": "https://github.com/rhasspy/piper/blob/master/LICENSE.md",
             "author": {
@@ -1444,7 +1444,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "CC",
+            "id": "CC-BY-4.0",
             "name": "CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy",
             "url": "https://creativecommons.org/licenses/by/4.0/",
             "author": {
@@ -1582,10 +1582,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }
@@ -2202,8 +2202,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta).",
-              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card)."
+              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta). Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card). Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -2281,7 +2281,7 @@
             "generative": true
           },
           "license_card": {
-            "id": "OpenRAIL-M",
+            "id": "OpenRAIL-M AND MIT",
             "name": "OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)",
             "url": "https://huggingface.co/supertone-oss-archive/supertonic-3",
             "author": {
@@ -2291,8 +2291,8 @@
             "commercial": "conditional",
             "attribution": true,
             "notes": {
-              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
-              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Zapis licencji: dokumentacja projektu (docs/). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Licence record: project documentation (docs/). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
             },
             "confirmed": true,
             "voices": [
@@ -2609,10 +2609,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -2670,8 +2670,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -2853,10 +2853,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -2911,7 +2911,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
             "name": "MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
             "url": "https://docs.nvidia.com/cuda/eula/index.html",
             "author": {
@@ -2982,10 +2982,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -3094,7 +3094,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
             "name": "MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
             "url": "https://docs.nvidia.com/cuda/eula/index.html",
             "author": {
@@ -3165,8 +3165,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -3216,7 +3216,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND GPL-3.0-or-later",
             "name": "MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)",
             "url": "https://github.com/rhasspy/piper/blob/master/LICENSE.md",
             "author": {
@@ -3269,7 +3269,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "CC",
+            "id": "CC-BY-4.0",
             "name": "CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy",
             "url": "https://creativecommons.org/licenses/by/4.0/",
             "author": {
@@ -3481,10 +3481,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }
@@ -3622,10 +3622,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }
@@ -4008,8 +4008,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta).",
-              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card)."
+              "pl": "Wolno używać, zmieniać i rozpowszechniać, także komercyjnie. Uruchamia go llama-server (osobna karta). Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used, modified and redistributed, also commercially. Runs on llama-server (separate card). Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -4087,7 +4087,7 @@
             "generative": true
           },
           "license_card": {
-            "id": "OpenRAIL-M",
+            "id": "OpenRAIL-M AND MIT",
             "name": "OpenRAIL-M (wagi modelu i barwy głosów); MIT (kod przykładowy)",
             "url": "https://huggingface.co/supertone-oss-archive/supertonic-3",
             "author": {
@@ -4097,8 +4097,8 @@
             "commercial": "conditional",
             "attribution": true,
             "notes": {
-              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
-              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
+              "pl": "OpenRAIL-M: użycie komercyjne z kopią licencji i listą zakazanych zastosowań (m.in. podszywanie się pod osoby, treści bez oznaczenia AI, udzielanie porad medycznych — to ostatnie czeka na decyzję właściciela). Zapis licencji: dokumentacja projektu (docs/). Znak wodny w mowie syntetycznej: decyzja właściciela w toku (C5.7) — Alfa go dziś nie dodaje.",
+              "en": "OpenRAIL-M: commercial use with a copy of the licence and the list of prohibited uses (impersonation, content not disclosed as AI, giving medical advice — the last awaits the owner). Licence record: project documentation (docs/). Synthetic-speech watermark: owner decision pending (C5.7) — Alfa does not add one today."
             },
             "confirmed": true,
             "voices": [
@@ -4415,10 +4415,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -4476,8 +4476,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -4659,10 +4659,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -4717,7 +4717,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
             "name": "MIT (llama.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
             "url": "https://docs.nvidia.com/cuda/eula/index.html",
             "author": {
@@ -4788,10 +4788,10 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
             },
-            "confirmed": true,
+            "confirmed": false,
             "voices": []
           }
         },
@@ -4900,7 +4900,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND LicenseRef-NVIDIA-CUDA-EULA",
             "name": "MIT (whisper.cpp); NVIDIA CUDA Toolkit EULA (cudart, cuBLAS)",
             "url": "https://docs.nvidia.com/cuda/eula/index.html",
             "author": {
@@ -4971,8 +4971,8 @@
             "commercial": "yes",
             "attribution": true,
             "notes": {
-              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-              "en": "May be used and redistributed, also commercially, with a copy of the licence."
+              "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Zapis licencji: dokumentacja projektu (docs/).",
+              "en": "May be used and redistributed, also commercially, with a copy of the licence. Licence record: project documentation (docs/)."
             },
             "confirmed": true,
             "voices": []
@@ -5022,7 +5022,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "MIT",
+            "id": "MIT AND GPL-3.0-or-later",
             "name": "MIT (Piper 2023.11.14-2); GPL-3.0 (espeak-ng w archiwum)",
             "url": "https://github.com/rhasspy/piper/blob/master/LICENSE.md",
             "author": {
@@ -5075,7 +5075,7 @@
             "generative": false
           },
           "license_card": {
-            "id": "CC",
+            "id": "CC-BY-4.0",
             "name": "CC BY 4.0 (model Pocket TTS); wrapper — kod Alfy",
             "url": "https://creativecommons.org/licenses/by/4.0/",
             "author": {
@@ -6560,10 +6560,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }
@@ -6631,10 +6631,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }

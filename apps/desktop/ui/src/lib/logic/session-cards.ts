@@ -1,7 +1,7 @@
 // Karty rozmów z profilem (P4): widok panelu Sesje zapamiętany na tym komputerze, ruch strzałkami
 // po siatce kart i czysty tekst ostatniej wiadomości (atrapa i zabezpieczenie widoku — właściwy
 // fragment liczy rdzeń, `app_modules::session_cards`).
-import { agentIds, type AgentId } from '@alfa/ui-kit';
+import { agentIds, type AgentId } from '@alfa/ui-kit/tokens';
 
 export type SessionsView = 'list' | 'cards';
 

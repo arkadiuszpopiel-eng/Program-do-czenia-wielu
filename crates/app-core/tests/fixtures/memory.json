@@ -670,5 +670,68 @@
       "budget_denied": false,
       "errors": []
     }
+  },
+  {
+    "command": "memory_teach_pick_file",
+    "args": {},
+    "result": {
+      "name": "wyjazd-zakopane.md",
+      "text": "# Wyjazd\n\nHotel Pod Giewontem: zameldowanie od 15:00, parking w cenie.\n\nPociąg z Krakowa o 7:12, peron 3.",
+      "chars": 105,
+      "truncated": false
+    }
+  },
+  {
+    "command": "memory_teach",
+    "args": {
+      "request": {
+        "session_id": "s-q3",
+        "source": {
+          "kind": "text",
+          "text": "Raport Q3 wysyłamy do 10. dnia miesiąca.\n\nZarząd czyta skrót."
+        },
+        "scope": "session",
+        "title": null
+      }
+    },
+    "result": {
+      "facts": 1,
+      "ids": [
+        "session:s-q3#mem-muomw3ys-46"
+      ],
+      "scope_key": "session:s-q3",
+      "source": "naucz: wklejony tekst · sha256:f7642070f7642070",
+      "trusted": false,
+      "truncated": false,
+      "duplicates": 0
+    }
+  },
+  {
+    "command": "memory_teach",
+    "args": {
+      "request": {
+        "session_id": "s-q3",
+        "source": {
+          "kind": "conversation"
+        },
+        "scope": "project",
+        "title": "Raport Q3"
+      }
+    },
+    "result": {
+      "facts": 5,
+      "ids": [
+        "project:p-x#mem-muomw3ys-47",
+        "project:p-x#mem-muomw3ys-48",
+        "project:p-x#mem-muomw3ys-49",
+        "project:p-x#mem-muomw3ys-50",
+        "project:p-x#mem-muomw3ys-51"
+      ],
+      "scope_key": "project:p-x",
+      "source": "rozmowa:s-q3",
+      "trusted": true,
+      "truncated": false,
+      "duplicates": 0
+    }
   }
 ]

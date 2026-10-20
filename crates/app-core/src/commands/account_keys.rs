@@ -123,6 +123,23 @@ impl AppCore {
         Ok(account_dto(&self.account(&id)?))
     }
 
+    /// `accounts_set_enterprise`: ustawienia dla firm istniejącego konta (organizacja i projekt
+    /// OpenAI albo wersja API i wdrożenia Azure OpenAI; adres zasobu Azure bez zmian).
+    pub async fn accounts_set_enterprise(
+        &self,
+        account_id: String,
+        enterprise: crate::dto::EnterpriseSettings,
+    ) -> Result<Account, AppError> {
+        let account = app_models::accounts::enterprise::set_enterprise(
+            self.inner.hub.as_ref(),
+            &account_id,
+            enterprise,
+        )
+        .await?;
+        self.announce_account(&account.id).await;
+        Ok(account_dto(&account))
+    }
+
     /// `accounts_suggest_queue`: propozycja kolejki z modeli konta dla klasy zadań i strategii
     /// (`quality`, `balanced`, `economy`). Niczego nie zapisuje.
     pub async fn accounts_suggest_queue(

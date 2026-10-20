@@ -535,6 +535,22 @@
             }
           },
           {
+            "key": "engines.llm.tool_schema",
+            "label": {
+              "pl": "Poprawne wywołania narzędzi (model lokalny)",
+              "en": "Valid tool calls (local model)"
+            },
+            "description": {
+              "pl": "W zadaniach agentek lokalny model odpowiada jednym obiektem JSON zgodnym ze schematem narzędzi — silnik llama.cpp dopuszcza tylko taki tekst (gramatyka), więc wywołanie nie może mieć zepsutych ani niepasujących argumentów. Wyłącz, gdy model w zadaniach agentek odpowiada wyraźnie gorzej albo silnik zgłasza błąd schematu — wtedy narzędzia idą w formacie szablonu czatu modelu, bez tej gwarancji. Zalecenie: włączone. Zmiana po ponownym uruchomieniu.",
+              "en": "In agent tasks the local model answers with a single JSON object that matches the tool schemas — the llama.cpp engine only allows such text (a grammar), so a tool call cannot have broken or mismatched arguments. Turn it off when the model clearly answers worse in agent tasks or the engine reports a schema error — tools then use the model's chat template format, without this guarantee. Recommended: on. Takes effect after a restart."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": true,
+            "scope": "machine"
+          },
+          {
             "key": "models.parallel_downloads",
             "label": {
               "pl": "Pobierania naraz",
@@ -2698,6 +2714,7 @@
       "engines.llm.context": "auto",
       "engines.llm.threads": 0,
       "engines.llm.idle_unload_min": 10,
+      "engines.llm.tool_schema": true,
       "models.parallel_downloads": 2,
       "costs.warn_at": 80,
       "costs.background_local_only": true,

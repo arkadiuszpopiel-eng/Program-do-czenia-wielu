@@ -121,7 +121,7 @@ impl Extra {
         let factory: Option<Arc<dyn VoiceEngineFactory>> =
             match (&options.voice_engine, &self.audio) {
                 (Some(f), _) => Some(f.clone()),
-                (None, Some(audio)) => Some(Arc::new(
+                (None, Some(audio)) => Some(Arc::new(with_device(
                     SystemVoice::new(
                         paths.clone(),
                         audio.io(),
@@ -136,7 +136,8 @@ impl Extra {
                     .with_noise(noise)
                     .with_talk(talk)
                     .with_speech_meter(app_modules::speech_meter::SpeechMeter::new(events.clone())),
-                )),
+                    kernel.device.as_ref(),
+                ))),
                 (None, None) => None,
             };
         // F5: dyktowanie i czytanie przez porty computer use (strażnik okien Alfy/Brokera).
@@ -248,4 +249,16 @@ pub(crate) async fn diag_app(
         app.spawn_auto();
     }
     app
+}
+
+/// Profil sprzętu dla głosu: dzierżawa Whispera wskazuje kartę z profilu (laptop z dwiema
+/// kartami); bez profilu — karta główna, jak wcześniej.
+fn with_device(
+    voice: SystemVoice,
+    device: Option<&Arc<dyn device_profile_contract::DeviceProfile>>,
+) -> SystemVoice {
+    match device {
+        Some(d) => voice.with_device(d.clone()),
+        None => voice,
+    }
 }

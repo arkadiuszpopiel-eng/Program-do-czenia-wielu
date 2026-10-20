@@ -5,7 +5,7 @@ use crate::core::AppCore;
 use crate::dto::{
     ConsolidationReport, MemoryEdit, MemoryExplanation, MemoryForgetPreview, MemoryForgetReport,
     MemoryForgetTarget, MemoryItem, MemoryJournalEntry, MemoryPage, MemoryQuery, MemoryScopeInfo,
-    MemoryScopeRef, MemoryStatus, MemoryUndoResult,
+    MemoryScopeRef, MemoryStatus, MemoryUndoResult, TeachFile, TeachReport, TeachRequest,
 };
 use crate::error::AppError;
 
@@ -76,6 +76,22 @@ impl AppCore {
         target: MemoryForgetTarget,
     ) -> Result<MemoryForgetReport, AppError> {
         self.inner.memory.forget(&target)
+    }
+
+    /// `memory_teach`: „Naucz Alfę” — tekst, plik albo rozmowa jako fakty w pamięci (zapis
+    /// blokujący, osobny wątek; wszystko albo nic).
+    pub async fn memory_teach(&self, request: TeachRequest) -> Result<TeachReport, AppError> {
+        let memory = self.inner.memory.clone();
+        let sessions = self.inner.sessions.clone();
+        tokio::task::spawn_blocking(move || memory.teach(request, sessions.as_ref()))
+            .await
+            .map_err(|e| AppError::internal(format!("Naucz Alfę: {e}")))?
+    }
+
+    /// `memory_teach_pick_file`: systemowe okno wyboru pliku (.txt, .md, .pdf, .docx) i tekst
+    /// do podglądu; `None` — użytkownik anulował.
+    pub async fn memory_teach_pick_file(&self) -> Result<Option<TeachFile>, AppError> {
+        self.inner.work.files.teach_pick_file().await
     }
 
     /// `memory_journal`: dziennik zmian zakresu.

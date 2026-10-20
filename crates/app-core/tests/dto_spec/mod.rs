@@ -10,6 +10,7 @@ mod computer;
 mod files;
 mod models;
 mod plugins;
+mod series6;
 mod updates;
 mod voice;
 
@@ -169,7 +170,8 @@ pub fn spec(command: &str) -> Option<Spec> {
                 .or_else(|| plugins::spec(other))
                 .or_else(|| models::spec(other))
                 .or_else(|| files::spec(other))
-                .or_else(|| cameras::spec(other));
+                .or_else(|| cameras::spec(other))
+                .or_else(|| series6::spec(other));
         }
     };
     Some(found)

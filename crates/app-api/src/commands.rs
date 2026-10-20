@@ -25,6 +25,7 @@ macro_rules! with_commands {
             sessions_duplicate_as_template(session_id: String) -> $crate::dto::SessionSummary;
             sessions_export(session_id: String) -> $crate::dto::ExportResult;
             sessions_search(query: String) -> Vec<$crate::dto::SessionSearchHit>;
+            sessions_cards(session_ids: Vec<String>) -> Vec<$crate::dto::SessionCard>;
             sessions_mark_read(session_id: String) -> ();
             sessions_get_draft(session_id: String) -> String;
             sessions_save_draft(session_id: String, text: String) -> ();
@@ -33,6 +34,8 @@ macro_rules! with_commands {
             turns_list(session_id: String) -> $crate::dto::TurnsSnapshot;
             turns_send(session_id: String, options: $crate::dto::SendOptions) -> $crate::dto::SendResult;
             turns_regenerate(session_id: String, turn_id: String, profile: Option<String>) -> String;
+            turns_arena_answer(session_id: String, turn_id: String, model: String) -> String;
+            turns_select_branch(session_id: String, turn_id: String) -> ();
             turns_edit_and_resend(session_id: String, turn_id: String, text: String) -> $crate::dto::SendResult;
             turns_continue(session_id: String, turn_id: String) -> String;
             turns_stop(session_id: String) -> ();
@@ -71,6 +74,7 @@ macro_rules! with_commands {
             accounts_set_disabled(account_id: String, disabled: bool) -> $crate::dto::Account;
             accounts_set_model(account_id: String, model: String) -> $crate::dto::Account;
             accounts_set_queue(account_id: String, task_class: String, models: Vec<String>) -> $crate::dto::Account;
+            accounts_set_enterprise(account_id: String, enterprise: $crate::dto::EnterpriseSettings) -> $crate::dto::Account;
             accounts_suggest_queue(account_id: String, task_class: String, strategy: String) -> Vec<String>;
             accounts_shared_queues() -> $crate::dto::SharedQueues;
             accounts_set_shared_queue(task_class: String, entries: Vec<$crate::dto::SharedQueueEntry>) -> $crate::dto::SharedQueues;
@@ -123,6 +127,8 @@ macro_rules! with_commands {
             memory_promote(entry_id: String, to: $crate::dto::MemoryScopeRef) -> $crate::dto::MemoryItem;
             memory_forget_preview(target: $crate::dto::MemoryForgetTarget) -> $crate::dto::MemoryForgetPreview;
             memory_forget(target: $crate::dto::MemoryForgetTarget) -> $crate::dto::MemoryForgetReport;
+            memory_teach(request: $crate::dto::TeachRequest) -> $crate::dto::TeachReport;
+            memory_teach_pick_file() -> Option<$crate::dto::TeachFile>;
             memory_journal(scope: String) -> Vec<$crate::dto::MemoryJournalEntry>;
             memory_undo(scope: String, change_id: String) -> $crate::dto::MemoryUndoResult;
             memory_consolidate_now() -> $crate::dto::ConsolidationReport;
@@ -258,6 +264,7 @@ macro_rules! with_commands {
             attachments_list(session_id: String) -> Vec<$crate::dto::AttachmentInfo>;
             attachments_remove(session_id: String, attachment_id: String) -> Vec<$crate::dto::AttachmentInfo>;
             sessions_export_conversation(session_id: String, format: $crate::dto::ConversationFormat, turn_id: Option<String>) -> $crate::dto::ExportResult;
+            canvas_render(kind: $crate::dto::CanvasKind, source: String, lang: String) -> String;
             backups_status() -> $crate::dto::BackupView;
             backups_configure(config: $crate::dto::BackupConfig) -> $crate::dto::BackupView;
             backups_choose_dir() -> $crate::dto::BackupView;
@@ -298,6 +305,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 265);
+        assert_eq!(super::COMMANDS.len(), 272);
     }
 }

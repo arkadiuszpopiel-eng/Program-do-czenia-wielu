@@ -14,6 +14,19 @@ use crate::ids;
 const PREVIEW_BYTES: usize = 64 * 1024;
 
 impl AppCore {
+    /// `canvas_render`: dokument kanwy artefaktu (Markdown, HTML, SVG) oczyszczony w Rust —
+    /// UI wstawia go do ramki `sandbox` bez skryptów i bez IPC.
+    pub async fn canvas_render(
+        &self,
+        kind: dto::CanvasKind,
+        source: String,
+        lang: String,
+    ) -> Result<String, AppError> {
+        tokio::task::spawn_blocking(move || app_files::canvas::render_canvas(kind, &source, &lang))
+            .await
+            .map_err(|e| AppError::internal(format!("Kanwa: {e}")))?
+    }
+
     /// `files_list`.
     pub async fn files_list(&self, session_id: String) -> Result<Vec<ArtifactInfo>, AppError> {
         let id = ids::session(&session_id)?;

@@ -12,6 +12,7 @@ import { runComputer } from './generate-computer';
 import { runPlugins } from './generate-plugins';
 import { runModels } from './generate-models';
 import { runFiles } from './generate-files';
+import { runSeries6 } from './generate-series6';
 import { runBroker } from './generate-broker';
 import { runUpdates } from './generate-updates';
 import { runVoice } from './generate-voice';
@@ -304,6 +305,7 @@ async function run(): Promise<void> {
   await runVoice(both, scheduler, flush);
   await runModels(both, scheduler, flush);
   await runFiles(both, scheduler, flush);
+  await runSeries6(both, scheduler, flush);
 }
 
 function sampleEvents(all: readonly AlfaEvent[]): AlfaEvent[] {

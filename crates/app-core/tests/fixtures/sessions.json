@@ -317,5 +317,45 @@
       "project": null
     },
     "result": null
+  },
+  {
+    "command": "sessions_cards",
+    "args": {
+      "sessionIds": [
+        "s-q3",
+        "s-trip",
+        "s-nieznana"
+      ]
+    },
+    "result": [
+      {
+        "session_id": "s-q3",
+        "agents": [
+          "gama",
+          "delta",
+          "alfa"
+        ],
+        "snippet": "W skrócie: tak, warto. Najpierw zrób listę zadań na tydzień, potem przypisz im godziny.",
+        "snippet_author": "alfa",
+        "model": "gpt-4o-mini",
+        "cost": {
+          "minor": 115,
+          "currency": "PLN"
+        }
+      },
+      {
+        "session_id": "s-trip",
+        "agents": [
+          "alfa"
+        ],
+        "snippet": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam…",
+        "snippet_author": "alfa",
+        "model": "claude-opus-5-5",
+        "cost": {
+          "minor": 2,
+          "currency": "PLN"
+        }
+      }
+    ]
   }
 ]

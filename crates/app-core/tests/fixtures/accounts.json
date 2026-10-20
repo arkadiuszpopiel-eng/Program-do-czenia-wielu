@@ -2388,5 +2388,385 @@
       "accountId": "acc-muo1g480-15"
     },
     "result": null
+  },
+  {
+    "command": "accounts_set_enterprise",
+    "args": {
+      "accountId": "acc-openai",
+      "enterprise": {
+        "organization": "org-alfa",
+        "project": "proj_raporty"
+      }
+    },
+    "result": {
+      "id": "acc-openai",
+      "provider_id": "openai",
+      "label": "Praca — OpenAI",
+      "state": "ok",
+      "key_stored": true,
+      "models": [
+        {
+          "id": "tts-1",
+          "name": "TTS 1",
+          "kinds": [
+            "tts"
+          ],
+          "context_tokens": null,
+          "purpose": "speech",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "tts-1-hd",
+          "name": "TTS 1 HD",
+          "kinds": [
+            "tts"
+          ],
+          "context_tokens": null,
+          "purpose": "speech",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "whisper-1",
+          "name": "Whisper 1",
+          "kinds": [
+            "stt"
+          ],
+          "context_tokens": null,
+          "purpose": "transcription",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "text-embedding-3-small",
+          "name": "Embedding 3 Small",
+          "kinds": [
+            "embeddings"
+          ],
+          "context_tokens": null,
+          "purpose": "embedding",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "text-embedding-3-large",
+          "name": "Embedding 3 Large",
+          "kinds": [
+            "embeddings"
+          ],
+          "context_tokens": null,
+          "purpose": "embedding",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "dall-e-3",
+          "name": "DALL·E 3",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "image",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-image-1",
+          "name": "GPT Image 1",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "image",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "omni-moderation-latest",
+          "name": "Moderation",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "moderation",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-6-realtime",
+          "name": "GPT-6 Realtime",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "realtime",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 400000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-6-sol-2026-08-06",
+          "name": "GPT-6 Sol (2026-08-06)",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 400000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": true
+        },
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "chat",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-6-nano",
+          "name": "GPT-6 Nano",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "chat",
+          "tier": "tiny",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-6-pro",
+          "name": "GPT-6 Pro",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 400000,
+          "purpose": "chat",
+          "tier": "premium",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-5.5",
+          "name": "GPT-5.5",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 400000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-5.5-mini",
+          "name": "GPT-5.5 mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "chat",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-5",
+          "name": "GPT-5",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 400000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-5-mini",
+          "name": "GPT-5 mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "chat",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-5-nano",
+          "name": "GPT-5 nano",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "chat",
+          "tier": "tiny",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4.1",
+          "name": "GPT-4.1",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 1000000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4.1-mini",
+          "name": "GPT-4.1 mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 1000000,
+          "purpose": "chat",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4o",
+          "name": "GPT-4o",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 128000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4o-2024-08-06",
+          "name": "GPT-4o (2024-08-06)",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 128000,
+          "purpose": "chat",
+          "tier": "standard",
+          "snapshot": true
+        },
+        {
+          "id": "gpt-4o-mini",
+          "name": "GPT-4o mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 128000,
+          "purpose": "chat",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4o-mini-tts",
+          "name": "GPT-4o mini TTS",
+          "kinds": [
+            "tts"
+          ],
+          "context_tokens": null,
+          "purpose": "speech",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4o-transcribe",
+          "name": "GPT-4o Transcribe",
+          "kinds": [
+            "stt"
+          ],
+          "context_tokens": null,
+          "purpose": "transcription",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-4o-search-preview",
+          "name": "GPT-4o Search (preview)",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "other",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "o3",
+          "name": "o3",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "reasoning",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "o4-mini",
+          "name": "o4-mini",
+          "kinds": [
+            "chat"
+          ],
+          "context_tokens": 200000,
+          "purpose": "reasoning",
+          "tier": "small",
+          "snapshot": false
+        },
+        {
+          "id": "gpt-3.5-turbo-instruct",
+          "name": "GPT-3.5 Turbo Instruct",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "other",
+          "tier": "standard",
+          "snapshot": false
+        },
+        {
+          "id": "babbage-002",
+          "name": "Babbage 002",
+          "kinds": [],
+          "context_tokens": null,
+          "purpose": "other",
+          "tier": "standard",
+          "snapshot": false
+        }
+      ],
+      "auto_model": "gpt-6-sol",
+      "queues": {
+        "chat": [
+          "gpt-6-sol",
+          "gpt-6-luna",
+          "gpt-5.5"
+        ]
+      },
+      "assignments": {
+        "task_classes": [
+          "chat"
+        ],
+        "agents": [],
+        "voice_stt": false,
+        "voice_tts": false
+      },
+      "cost_limit": {
+        "enabled": true,
+        "monthly": {
+          "minor": 5000,
+          "currency": "PLN"
+        }
+      },
+      "last_tested_at": "2026-09-30T08:33:00.000Z",
+      "key_saved_at": "2026-09-18T08:45:00.000Z",
+      "last_test": {
+        "ok": true,
+        "reason": "ok",
+        "latency_ms": 298
+      },
+      "enterprise": {
+        "organization": "org-alfa",
+        "project": "proj_raporty"
+      }
+    }
   }
 ]

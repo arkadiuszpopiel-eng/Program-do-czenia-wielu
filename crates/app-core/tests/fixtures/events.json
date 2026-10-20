@@ -2944,10 +2944,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }
@@ -3008,10 +3008,10 @@
         "commercial": "yes",
         "attribution": true,
         "notes": {
-          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji.",
-          "en": "May be used and redistributed, also commercially, with a copy of the licence."
+          "pl": "Wolno używać i rozpowszechniać, także komercyjnie, z kopią licencji. Do potwierdzenia przez człowieka.",
+          "en": "May be used and redistributed, also commercially, with a copy of the licence. To be confirmed by a human."
         },
-        "confirmed": true,
+        "confirmed": false,
         "voices": []
       }
     }

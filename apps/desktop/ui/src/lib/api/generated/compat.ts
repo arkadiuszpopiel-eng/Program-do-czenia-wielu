@@ -31,7 +31,7 @@ import type * as H22 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 342 typów wspólnych, 665 sprawdzeń. */
+/** 348 typów wspólnych, 677 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H20.AboutInfo>>,
   Expect<Fits<H20.AboutInfo, G.AboutInfo>>,
@@ -143,6 +143,8 @@ export type IpcCompat = [
   Expect<Fits<H5.CameraView, G.CameraView>>,
   Expect<Fits<G.CamerasState, H5.CamerasState>>,
   Expect<Fits<H5.CamerasState, G.CamerasState>>,
+  Expect<Fits<G.CanvasKind, H7.CanvasKind>>,
+  Expect<Fits<H7.CanvasKind, G.CanvasKind>>,
   Expect<Fits<G.CastTemplateId, H0.CastTemplateId>>,
   Expect<Fits<H0.CastTemplateId, G.CastTemplateId>>,
   Expect<Fits<G.ChangeItem, H20.ChangeItem>>,
@@ -534,6 +536,8 @@ export type IpcCompat = [
   Expect<Fits<H0.SendOptions, G.SendOptions>>,
   Expect<Fits<G.SendResult, H0.SendResult>>,
   Expect<Fits<H0.SendResult, G.SendResult>>,
+  Expect<Fits<G.SessionCard, H0.SessionCard>>,
+  Expect<Fits<H0.SessionCard, G.SessionCard>>,
   Expect<Fits<G.SessionPanels, H17.SessionPanels>>,
   Expect<Fits<H17.SessionPanels, G.SessionPanels>>,
   Expect<Fits<G.SessionSearchHit, H0.SessionSearchHit>>,
@@ -600,6 +604,14 @@ export type IpcCompat = [
   Expect<Fits<H18.TaskResultKind, G.TaskResultKind>>,
   Expect<Fits<G.TaskStateKind, H18.TaskStateKind>>,
   Expect<Fits<H18.TaskStateKind, G.TaskStateKind>>,
+  Expect<Fits<G.TeachFile, H11.TeachFile>>,
+  Expect<Fits<H11.TeachFile, G.TeachFile>>,
+  Expect<Fits<G.TeachReport, H11.TeachReport>>,
+  Expect<Fits<H11.TeachReport, G.TeachReport>>,
+  Expect<Fits<G.TeachRequest, H11.TeachRequest>>,
+  Expect<Fits<H11.TeachRequest, G.TeachRequest>>,
+  Expect<Fits<G.TeachSource, H11.TeachSource>>,
+  Expect<Fits<H11.TeachSource, G.TeachSource>>,
   Expect<Fits<G.TerminalProfileId, H22.TerminalProfileId>>,
   Expect<Fits<H22.TerminalProfileId, G.TerminalProfileId>>,
   Expect<Fits<G.TerminalSession, H22.TerminalSession>>,

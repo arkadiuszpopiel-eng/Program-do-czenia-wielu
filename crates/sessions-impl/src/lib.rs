@@ -113,6 +113,12 @@ impl SqliteSessions {
         lock(&self.open).len()
     }
 
+    /// Czy baza sesji jest teraz otwarta (np. karty rozmów zamykają tylko bazy, które same
+    /// otworzyły).
+    pub fn is_open(&self, id: &SessionId) -> bool {
+        lock(&self.open).contains_key(id)
+    }
+
     /// Zamyka bazę sesji (np. po zamknięciu karty); ponowne użycie otworzy ją znowu.
     pub fn close_session(&self, id: &SessionId) {
         let db = lock(&self.open).remove(id);

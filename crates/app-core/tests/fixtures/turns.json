@@ -1314,5 +1314,22 @@
         }
       }
     }
+  },
+  {
+    "command": "turns_arena_answer",
+    "args": {
+      "sessionId": "s-q3",
+      "turnId": "q3",
+      "model": "openai:gpt-4o-mini"
+    },
+    "result": "t-muokqy6s-44"
+  },
+  {
+    "command": "turns_select_branch",
+    "args": {
+      "sessionId": "s-q3",
+      "turnId": "t-muokqy6s-44"
+    },
+    "result": null
   }
 ]

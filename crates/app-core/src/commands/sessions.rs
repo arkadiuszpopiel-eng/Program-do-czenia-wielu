@@ -1,9 +1,10 @@
 //! Komendy `sessions_*`: lista, tworzenie, metadane, usuwanie z cofnięciem (potem
 //! crypto-shredding), duplikat, eksport (⟶ transfer), wyszukiwanie FTS, szkice.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::time::Duration;
 
+use cost_meter_contract::CostMeter;
 use search_contract::{Caller, DocKind, Mode, Query, Search, SessionSet};
 use sessions_contract::{
     NewSession, SessionCatalog, SessionHistory, SessionId, SessionPatch, SessionQuery,
@@ -12,7 +13,8 @@ use sessions_contract::{
 
 use crate::core::AppCore;
 use crate::dto::{
-    self, AlfaEvent, ExportResult, SessionSearchHit, SessionSummary, SessionTemplate, UndoTicket,
+    self, AlfaEvent, ExportResult, SessionCard, SessionSearchHit, SessionSummary, SessionTemplate,
+    UndoTicket,
 };
 use crate::error::AppError;
 use crate::ids;
@@ -286,6 +288,37 @@ impl AppCore {
             }
         }
         Ok(out)
+    }
+
+    /// `sessions_cards`: dane kart rozmów (agentki, ostatnia wiadomość, model, koszt w PLN).
+    /// Czyta bazy sesji (blokująco, osobny wątek); bazy, które otworzyło dopiero to wywołanie,
+    /// zamyka po odczycie — widok kart nie trzyma otwartych wszystkich rozmów.
+    pub async fn sessions_cards(
+        &self,
+        session_ids: Vec<String>,
+    ) -> Result<Vec<SessionCard>, AppError> {
+        let sessions = self.inner.sessions.clone();
+        let rate = self.inner.costs.current_rate().rate_e4;
+        tokio::task::spawn_blocking(move || {
+            let was_open: BTreeSet<String> = session_ids
+                .iter()
+                .filter(|raw| ids::session(raw).is_ok_and(|id| sessions.is_open(&id)))
+                .cloned()
+                .collect();
+            let release = |id: &SessionId| {
+                if !was_open.contains(id.as_str()) {
+                    sessions.close_session(id);
+                }
+            };
+            app_chat::session_cards::session_cards(
+                &*sessions,
+                &session_ids,
+                u64::from(rate),
+                &release,
+            )
+        })
+        .await
+        .map_err(|e| AppError::internal(format!("Karty rozmów: {e}")))
     }
 
     /// `sessions_mark_read`.

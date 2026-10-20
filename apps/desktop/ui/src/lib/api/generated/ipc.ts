@@ -24,6 +24,8 @@ export interface Account {
   readonly assignments: AccountAssignment;
   /** Model, którego Alfa użyje do rozmowy bez kolejki (wybór automatyczny). */
   readonly auto_model?: string | null;
+  /** Własny adres API konta (np. zasób Azure OpenAI — formularz firmowy pokazuje go bez edycji). */
+  readonly base_url?: string | null;
   readonly cost_limit: AccountCostLimit;
   /**
    * Konto firmowe: organizacja i projekt OpenAI albo wersja API i wdrożenia Azure OpenAI
@@ -850,6 +852,9 @@ export interface CamerasState {
   readonly cameras: readonly CameraView[];
   readonly enabled: boolean;
 }
+
+/** Rodzaj artefaktu w kanwie (C2.8): Markdown jako zwykły DOM, HTML i SVG w izolowanej ramce. */
+export type CanvasKind = 'markdown' | 'html' | 'svg';
 
 /** Szablon obsady. */
 export type CastTemplateId = 'standard' | 'solo' | 'coding' | 'research';
@@ -2872,6 +2877,24 @@ export interface SendResult {
   readonly user_turn_id: string;
 }
 
+/**
+ * Karta rozmowy z profilem (P4, widok „Karty” panelu Sesje): dane spoza [`SessionSummary`]
+ * liczone z historii — agentki, ostatnia wiadomość jako czysty tekst, model i koszt.
+ */
+export interface SessionCard {
+  /** Agentki, które odpowiadały (bez odpowiedzi — obsada sesji); bez powtórzeń, do 4. */
+  readonly agents: readonly string[];
+  /** Łączny koszt rozmowy (USD, centy w górę); `None` — brak kosztu (np. model lokalny). */
+  readonly cost: Money | null;
+  /** Model ostatniej odpowiedzi. */
+  readonly model: string | null;
+  readonly session_id: string;
+  /** Ostatnia widoczna wiadomość jako czysty tekst (bez Markdownu i HTML, do 160 znaków). */
+  readonly snippet: string | null;
+  /** Autor ostatniej wiadomości: `user` albo identyfikator agentki. */
+  readonly snippet_author: string | null;
+}
+
 /** Otwarte panele sesji. */
 export interface SessionPanels {
   readonly left_open: boolean;
@@ -3217,6 +3240,51 @@ export type TaskResultKind =
 
 /** Stan zadania. */
 export type TaskStateKind = 'pending' | 'ready' | 'running' | 'retry_wait' | 'paused' | 'done';
+
+/** Plik wybrany do nauki: wyciągnięty tekst (podgląd przed zapisem). */
+export interface TeachFile {
+  readonly chars: number;
+  readonly name: string;
+  readonly text: string;
+  readonly truncated: boolean;
+}
+
+/** Wynik: ile faktów zapisano (identyfikatory do cofnięcia przez `memory_forget`). */
+export interface TeachReport {
+  /** Powtórzone fragmenty pominięte. */
+  readonly duplicates: number;
+  readonly facts: number;
+  readonly ids: readonly string[];
+  readonly scope_key: string;
+  /** Źródło zapisane przy faktach (np. `naucz:plik:raport.pdf#3f2a…`, `rozmowa:<sesja>`). */
+  readonly source: string;
+  /** Treść ucięta limitem znaków albo liczby faktów. */
+  readonly truncated: boolean;
+  readonly trusted: boolean;
+}
+
+/** Żądanie „Naucz Alfę” (`title` puste — nazwa pliku, tytuł rozmowy albo „Wklejony tekst”). */
+export interface TeachRequest {
+  readonly scope: RememberScope;
+  readonly session_id: string;
+  readonly source: TeachSource;
+  readonly title: string | null;
+}
+
+/** Źródło wiedzy. */
+export type TeachSource =
+  | {
+      readonly kind: 'text';
+      readonly text: string;
+    }
+  | {
+      readonly kind: 'file';
+      readonly name: string;
+      readonly text: string;
+    }
+  | {
+      readonly kind: 'conversation';
+    };
 
 /** Profil terminala. */
 export type TerminalProfileId = 'shell' | 'cmd' | 'claude_login' | 'codex_login' | 'agy_login';
@@ -3767,6 +3835,10 @@ export interface IpcCommands {
     readonly args: { readonly accountId: string; readonly disabled: boolean };
     readonly result: Account;
   };
+  readonly accounts_set_enterprise: {
+    readonly args: { readonly accountId: string; readonly enterprise: EnterpriseSettings };
+    readonly result: Account;
+  };
   readonly accounts_set_limit: {
     readonly args: {
       readonly accountId: string;
@@ -4000,6 +4072,10 @@ export interface IpcCommands {
     readonly args: Readonly<Record<string, never>>;
     readonly result: CamerasState;
   };
+  readonly canvas_render: {
+    readonly args: { readonly kind: CanvasKind; readonly source: string; readonly lang: string };
+    readonly result: string;
+  };
   readonly compliance_routes: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: DataRoutesView;
@@ -4232,6 +4308,14 @@ export interface IpcCommands {
     readonly args: Readonly<Record<string, never>>;
     readonly result: MemoryStatus;
   };
+  readonly memory_teach: {
+    readonly args: { readonly request: TeachRequest };
+    readonly result: TeachReport;
+  };
+  readonly memory_teach_pick_file: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: TeachFile | null;
+  };
   readonly memory_undo: {
     readonly args: { readonly scope: string; readonly changeId: string };
     readonly result: MemoryUndoResult;
@@ -4393,6 +4477,10 @@ export interface IpcCommands {
   readonly search_reindex_status: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: ReindexView;
+  };
+  readonly sessions_cards: {
+    readonly args: { readonly sessionIds: readonly string[] };
+    readonly result: readonly SessionCard[];
   };
   readonly sessions_choose_workdir: {
     readonly args: { readonly sessionId: string; readonly choice: WorkdirChoice };
@@ -4623,6 +4711,10 @@ export interface IpcCommands {
     readonly args: { readonly triggerId: string; readonly enabled: boolean };
     readonly result: null;
   };
+  readonly turns_arena_answer: {
+    readonly args: { readonly sessionId: string; readonly turnId: string; readonly model: string };
+    readonly result: string;
+  };
   readonly turns_continue: {
     readonly args: { readonly sessionId: string; readonly turnId: string };
     readonly result: string;
@@ -4658,6 +4750,10 @@ export interface IpcCommands {
   };
   readonly turns_save_code: {
     readonly args: { readonly turnId: string; readonly blockIndex: number };
+    readonly result: null;
+  };
+  readonly turns_select_branch: {
+    readonly args: { readonly sessionId: string; readonly turnId: string };
     readonly result: null;
   };
   readonly turns_send: {

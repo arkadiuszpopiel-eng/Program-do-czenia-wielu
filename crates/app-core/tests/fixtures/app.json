@@ -23,6 +23,7 @@
         "engines.llm.context": "auto",
         "engines.llm.threads": 0,
         "engines.llm.idle_unload_min": 10,
+        "engines.llm.tool_schema": true,
         "models.parallel_downloads": 2,
         "costs.warn_at": 80,
         "costs.background_local_only": true,
