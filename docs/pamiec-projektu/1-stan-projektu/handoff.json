@@ -4,9 +4,9 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-20T18:00:00+02:00"
+    "updated": "2026-10-20T18:40:00+02:00"
   },
-  "current_state": "0.0.66 wgrana 20.10 17:45 do Alfa-uruchomiona: Broker w trybie przenośnym z oknem zatwierdzeń i watchdogiem (deploy-owner buduje app-safety do target/safety), domyślny katalog roboczy rozmowy, Dyrygentka wie, że na komputerze działa Delta, błędy dostawcy w przebiegach agentek. Raport: alfa/docs/plan/32-raport-2026-10-20-0066.md.",
+  "current_state": "0.0.66 wgrana 18:26 (c688e97e): okno Brokera przyjmuje fizyczne kliknięcia (próbka z komunikatu wejścia), L4 zatwierdzone przez właściciela 18:34 i przyjęte przez strażnika autonomii (nie wraca do L2). Raport alfa/docs/plan/32-raport-2026-10-20-0066.md §7.",
   "session_goal": "Następna sesja: seria 7 (0.0.66) — pierwszy punkt: poziom autonomii „Pełny dostęp” (decyzja właściciela 20.10) na gałęzi do przeglądu.",
   "in_progress": [],
   "blocking_issues": [
@@ -15,12 +15,11 @@
     "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
-    "Sprawdzić z właścicielem: „Zmień na L4” → okno Brokera → potwierdzenie (wymaga kliknięcia człowieka).",
-    "Seria 7 / punkt 1: poziom „Pełny dostęp” (decyzja 20.10) na gałęzi do przeglądu; tryb przenośny Brokera w e2e-app.",
-    "„Porządki” bez katalogu roboczego: stała odpowiedź programu zamiast modelu (Bielik zmyśla albo „przekazuje Delcie”).",
-    "Przebieg agentki: styl i temperatura z ustawień (dziś tylko zwykły czat).",
-    "Budżet startowy okna 149,6/150 KB — słowniki PL częściami.",
-    "Decyzje właściciela: do-przegladu-updater-zip9 (cargo deny), Azure w rejestrze zgodności, ADR 0028 + DirectML, znak wodny mowy."
+    "Krzyżyk okna Brokera (WM_CLOSE) — próbka jak dla WM_COMMAND (narzędzie zablokowało zmianę; zamykanie przez Odmów/Esc działa).",
+    "Decyzja właściciela: odmowa w oknie Brokera bez dowodu fizycznego (testy props traktują to jako niezmiennik).",
+    "Po restarcie Alfy L4 wymaga ponownej zgody (z założenia) — zmiana tylko na wyraźne polecenie właściciela.",
+    "Seria 7: poziom „Pełny dostęp”; tryb przenośny Brokera w e2e-app; „porządki” bez katalogu — stała odpowiedź programu.",
+    "Decyzje właściciela: do-przegladu-updater-zip9, Azure, ADR 0028, znak wodny mowy."
   ],
   "env_snapshot": {
     "key_paths": {
