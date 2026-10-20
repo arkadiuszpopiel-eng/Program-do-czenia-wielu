@@ -1,7 +1,17 @@
 // Lista sesji panelu lewego: grupy (przypięte, projekty, bez projektu, archiwum), sortowanie,
 // „karty" jako lista ostatnio używanych (Ctrl+Tab / Ctrl+1…9 / Ctrl+W / Ctrl+Shift+T).
 import type { ProjectRef, SessionSearchHit, SessionSummary } from '../api/types';
+import { readSessionsView, writeSessionsView, type SessionsView } from '../logic/session-cards';
 import { inPeriod, type SessionPeriod } from '../logic/session-period';
+
+/** Pamięć przeglądarki tego komputera; niedostępna (testy, zablokowana) — `null`. */
+function viewStorage(): Storage | null {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage;
+  } catch {
+    return null;
+  }
+}
 
 export interface SessionGroup {
   readonly id: string;
@@ -68,12 +78,19 @@ export class SessionsState {
     this.list.find((s) => s.id === this.activeId) ?? null,
   );
   period = $state<SessionPeriod>('all');
+  /** Widok panelu: lista albo karty z profilem — zapamiętany na tym komputerze. */
+  view = $state<SessionsView>(readSessionsView(viewStorage()));
   readonly groups: SessionGroup[] = $derived(
     groupSessions(inPeriod(this.list, this.period, Date.now()), this.showArchived),
   );
   /** Ostatnio używane (najnowsza na początku) i zamknięte „karty". */
   private mru: string[] = [];
   private closed: string[] = [];
+
+  setView(view: SessionsView): void {
+    this.view = view;
+    writeSessionsView(viewStorage(), view);
+  }
 
   upsert(session: SessionSummary): void {
     const index = this.list.findIndex((s) => s.id === session.id);

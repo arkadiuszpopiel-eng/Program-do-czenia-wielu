@@ -5,9 +5,7 @@
   import Pin from '@lucide/svelte/icons/pin';
   import type { SessionSummary } from '../../api/types';
   import { useApp } from '../../state/context';
-  import { exportConversation } from '../../state/exports';
-  import { duplicateSession } from '../../state/session-actions';
-  import { openStats } from '../../state/stats-dialog.svelte';
+  import { sessionMenuItems } from '../../state/session-menu';
 
   interface Props {
     session: SessionSummary;
@@ -25,61 +23,7 @@
     if (renaming) draft = session.title;
   });
 
-  const items = $derived<MenuItem[]>([
-    {
-      id: 'rename',
-      label: t('sessions.rename'),
-      onSelect: () => (app.sessions.renamingId = session.id),
-    },
-    {
-      id: 'pin',
-      label: t(session.pinned ? 'sessions.unpin' : 'sessions.pin'),
-      onSelect: () => void app.setPinned(session.id, !session.pinned),
-    },
-    {
-      id: 'archive',
-      label: t(session.archived ? 'sessions.unarchive' : 'sessions.archive'),
-      onSelect: () => void app.setArchived(session.id, !session.archived),
-    },
-    {
-      id: 'duplicate',
-      label: t('sessions.duplicate'),
-      onSelect: () => void duplicateSession(app, session.id),
-    },
-    {
-      id: 'export',
-      label: t('sessions.export'),
-      onSelect: () => void app.exportSession(session.id),
-    },
-    {
-      id: 'export-md',
-      label: t('exp.markdown'),
-      onSelect: () => void exportConversation(app, session.id, 'markdown'),
-    },
-    {
-      id: 'export-html',
-      label: t('exp.html'),
-      onSelect: () => void exportConversation(app, session.id, 'html'),
-    },
-    {
-      id: 'export-json',
-      label: t('exp.json'),
-      onSelect: () => void exportConversation(app, session.id, 'json'),
-    },
-    {
-      id: 'stats',
-      label: t('stats.title'),
-      // Statystyki liczą się z otwartej rozmowy — najpierw ją otwieramy.
-      onSelect: () => void app.openSession(session.id).then(openStats),
-    },
-    {
-      id: 'delete',
-      label: t('sessions.delete'),
-      danger: true,
-      separatorBefore: true,
-      onSelect: () => void app.deleteSession(session.id),
-    },
-  ]);
+  const items = $derived<MenuItem[]>(sessionMenuItems(app, session));
 
   function rowKey(event: KeyboardEvent) {
     if (event.key === 'F2') {

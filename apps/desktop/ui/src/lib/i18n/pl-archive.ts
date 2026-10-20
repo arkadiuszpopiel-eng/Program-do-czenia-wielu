@@ -1,4 +1,4 @@
-// Archiwum rozmów na liście sesji: okres i statystyka (pl — źródło kluczy).
+// Archiwum rozmów na liście sesji: okres, statystyka i karty z profilem (pl — źródło kluczy).
 export const plArchive = {
   'sessions.period': 'Pokaż rozmowy',
   'sessions.period.all': 'Wszystkie',
@@ -7,4 +7,14 @@ export const plArchive = {
   'sessions.period.month': 'Z ostatnich 30 dni',
   'sessions.periodEmpty': 'Brak rozmów w tym okresie.',
   'sessions.stats': 'Wiadomości: {n} · założona {date}',
+  'sessions.view': 'Widok listy rozmów',
+  'sessions.view.list': 'Lista',
+  'sessions.view.cards': 'Karty',
+  'sessions.cards': 'Karty rozmów (strzałki — wybór, Enter — otwórz)',
+  'sessions.card.pinned': 'Przypięta',
+  'sessions.card.agents': 'Agentki: {names}',
+  'sessions.card.model': 'Model: {model}',
+  'sessions.card.cost': 'Koszt: {cost}',
+  'sessions.card.empty': 'Jeszcze bez wiadomości',
+  'sessions.card.updated': 'Ostatnia aktywność:',
 };

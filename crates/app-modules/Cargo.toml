@@ -83,6 +83,8 @@ workspace = true
 compliance-fake = { path = "../compliance-fake" }
 # Hub kont w pamięci w testach `accounts_enterprise`.
 accounts-hub-fake = { path = "../accounts-hub-fake" }
+# Karty rozmów (`session_cards`) liczone na atrapie bazy sesji.
+sessions-fake = { path = "../sessions-fake" }
 # Wirtualny zegar w testach miernika poziomu mowy.
 tokio = { workspace = true, features = ["test-util", "macros"] }
 tempfile = "3.27.0"
