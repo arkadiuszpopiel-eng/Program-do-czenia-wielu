@@ -4,9 +4,9 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-20T18:40:00+02:00"
+    "updated": "2026-10-20T19:05:00+02:00"
   },
-  "current_state": "0.0.66 wgrana 18:26 (c688e97e): okno Brokera przyjmuje fizyczne kliknięcia (próbka z komunikatu wejścia), L4 zatwierdzone przez właściciela 18:34 i przyjęte przez strażnika autonomii (nie wraca do L2). Raport alfa/docs/plan/32-raport-2026-10-20-0066.md §7.",
+  "current_state": "0.0.66 wgrana 18:57 (1e96cc03): okno Brokera działa w każdej ścieżce — zgoda (18:59), odmowa krzyżykiem (19:00:43, jedna próbka z ramki) i „Odmów”/Esc; L4 utrzymuje się po zgodzie; po restarcie Alfy podniesienie wymaga ponownej zgody (z założenia).",
   "session_goal": "Następna sesja: seria 7 (0.0.66) — pierwszy punkt: poziom autonomii „Pełny dostęp” (decyzja właściciela 20.10) na gałęzi do przeglądu.",
   "in_progress": [],
   "blocking_issues": [
@@ -15,7 +15,7 @@
     "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
-    "Krzyżyk okna Brokera (WM_CLOSE) — próbka jak dla WM_COMMAND (narzędzie zablokowało zmianę; zamykanie przez Odmów/Esc działa).",
+    "Prompt Dyrygentki (crew_note): na L4 nie pisać, że Broker zatwierdza każdą akcję — zależnie od poziomu autonomii.",
     "Decyzja właściciela: odmowa w oknie Brokera bez dowodu fizycznego (testy props traktują to jako niezmiennik).",
     "Po restarcie Alfy L4 wymaga ponownej zgody (z założenia) — zmiana tylko na wyraźne polecenie właściciela.",
     "Seria 7: poziom „Pełny dostęp”; tryb przenośny Brokera w e2e-app; „porządki” bez katalogu — stała odpowiedź programu.",
