@@ -96,9 +96,21 @@ pub(super) fn sample() -> InputSample {
         InputDevice::Mouse | InputDevice::Touch | InputDevice::Pen => LAST_MOUSE.get(),
         InputDevice::Unknown => None,
     };
+    let injected = input_is_injected(origin, hook, at_ms);
+    // Diagnostyka (bez wpływu na decyzję): surowe dane Windows dla każdej próbki — pozwala
+    // odróżnić błędne rozpoznanie od wejścia naprawdę wstrzykniętego (np. pulpit zdalny).
+    tracing::info!(
+        imdt = src.deviceType.0,
+        imo = src.originId.0,
+        source_ok = ok,
+        key = ?LAST_KEY.get().map(|h| (h.origin, at_ms.saturating_sub(h.at_ms))),
+        mouse = ?LAST_MOUSE.get().map(|h| (h.origin, at_ms.saturating_sub(h.at_ms))),
+        injected,
+        "broker_ui.input_sample"
+    );
     InputSample {
         device,
-        injected: input_is_injected(origin, hook, at_ms),
+        injected,
         at_ms,
     }
 }

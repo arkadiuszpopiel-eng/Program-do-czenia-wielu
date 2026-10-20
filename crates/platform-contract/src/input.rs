@@ -37,11 +37,11 @@ pub enum InputDevice {
 }
 
 impl InputDevice {
-    /// Z `INPUT_MESSAGE_DEVICE_TYPE` (`IMDT_*`).
+    /// Z `INPUT_MESSAGE_DEVICE_TYPE` (`IMDT_*`); touchpad (`IMDT_TOUCHPAD` = 0x10, laptopy) jak mysz.
     pub fn from_imdt(device_type: u32) -> Self {
         match device_type {
             1 => Self::Keyboard,
-            2 => Self::Mouse,
+            2 | 0x10 => Self::Mouse,
             4 => Self::Touch,
             8 => Self::Pen,
             _ => Self::Unknown,

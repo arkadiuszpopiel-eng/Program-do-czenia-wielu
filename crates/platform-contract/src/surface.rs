@@ -188,7 +188,9 @@ impl SurfaceView {
             r
         };
         let title = next(s(30) * rows(&self.title));
-        let badge = next(s(24));
+        // Odznaka ma tę samą dużą czcionkę co tytuł — niższe pole ucinało dolne części liter
+        // („Rvzvko: wvsokie” zamiast „Ryzyko: wysokie”, zgłoszenie 20.10).
+        let badge = next(s(30));
         let details_text: String = self
             .details
             .iter()

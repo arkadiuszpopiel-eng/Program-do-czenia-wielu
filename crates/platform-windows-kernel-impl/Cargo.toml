@@ -14,6 +14,7 @@ repository.workspace = true
 # (zakaz `-impl` → cudzy `-impl`); wspólne narzędzia FFI są tu w `win.rs`/`error.rs`.
 [dependencies]
 platform-contract.workspace = true
+tracing.workspace = true
 
 # Ta sama wersja windows-rs co w `platform-windows-impl` (AGENTS.md: jeden crate, jedna wersja).
 [target.'cfg(windows)'.dependencies]
