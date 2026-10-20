@@ -6,7 +6,7 @@
 
 ## Aktualny cel
 
-**Bieżący (2026-10-20 wieczór):** 0.0.66 wgrana 18:26 — okno Brokera działa (fizyczna zgoda przechodzi), L4 utrzymuje się po zgodzie. Wcześniej 0.0.65. Dalej seria 7 (0.0.66) — punkt 1: poziom „Pełny dostęp” AI
+**Bieżący (2026-10-20 wieczór):** 0.0.66 wgrana 20:02 — okno Brokera działa, L4 trwa po zgodzie, cennik 89 modeli + „Kontrola cenników” (raport 32 §7–8). Wcześniej 0.0.65. Dalej seria 7 (0.0.66) — punkt 1: poziom „Pełny dostęp” AI
 (decyzja właściciela 20.10, gałąź do przeglądu). Lista zadań: `handoff.json` → `next_session`.
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);

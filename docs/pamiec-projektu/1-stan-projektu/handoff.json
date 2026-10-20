@@ -4,9 +4,9 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-20T19:05:00+02:00"
+    "updated": "2026-10-20T20:10:00+02:00"
   },
-  "current_state": "0.0.66 wgrana 18:57 (1e96cc03): okno Brokera działa w każdej ścieżce — zgoda (18:59), odmowa krzyżykiem (19:00:43, jedna próbka z ramki) i „Odmów”/Esc; L4 utrzymuje się po zgodzie; po restarcie Alfy podniesienie wymaga ponownej zgody (z założenia).",
+  "current_state": "0.0.66 wgrana 20:02: okno Brokera działa (zgoda, odmowa, krzyżyk), L4 po zgodzie trwa; cennik 89 modeli 11 dostawców (providers-catalog/ceny/cennik.toml + plik użytkownika), koszt nieznany/< 0,01 zł, obowiązek „Kontrola cenników”. WMI na laptopie zablokowane (test diagnostyki czerwony) — restart komputera.",
   "session_goal": "Następna sesja: seria 7 (0.0.66) — pierwszy punkt: poziom autonomii „Pełny dostęp” (decyzja właściciela 20.10) na gałęzi do przeglądu.",
   "in_progress": [],
   "blocking_issues": [
@@ -15,6 +15,8 @@
     "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
+    "Sprawdzić u właściciela koszt w wierszu odpowiedzi (Haiku 5.5: „< 0,01 zł”, GPT-6.1 Sol: kwota) i stronę Ustawienia → Koszty i limity → Cennik modeli.",
+    "Po restarcie laptopa: verify-app (test diagnostyki — WMI było zablokowane 20.10 wieczorem).",
     "Prompt Dyrygentki (crew_note): na L4 nie pisać, że Broker zatwierdza każdą akcję — zależnie od poziomu autonomii.",
     "Decyzja właściciela: odmowa w oknie Brokera bez dowodu fizycznego (testy props traktują to jako niezmiennik).",
     "Po restarcie Alfy L4 wymaga ponownej zgody (z założenia) — zmiana tylko na wyraźne polecenie właściciela.",
