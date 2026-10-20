@@ -6,9 +6,13 @@
 //!   ze źródłem `naucz: … · sha256:…` (dane, nie polecenia; w kontekście czatu oznaczone
 //!   „[niezaufane]”). Kontrakt pamięci wpuszcza treść niezaufaną wyłącznie do zakresu sesji
 //!   (bez awansu), więc inny zakres → odmowa z wyjaśnieniem;
-//! - **rozmowa** (aktywna gałąź: tury użytkownika i agentek, bez ukrytych, narzędzi
-//!   i komunikatów systemowych) — jak „Zapamiętaj” na turze: `Provenance::User` z pochodzeniem
-//!   z tury (sesja prywatna nie zasila zakresów szerszych — reguła kontraktu).
+//! - **rozmowa** (aktywna gałąź bez ukrytych tur, narzędzi i komunikatów systemowych):
+//!   tury użytkownika — jak „Zapamiętaj” na turze: `Provenance::User` z pochodzeniem z tury
+//!   (sesja prywatna nie zasila zakresów szerszych — reguła kontraktu). Odpowiedzi agentek
+//!   często powtarzają treść z zewnątrz (strony, wyniki narzędzi, załączniki), a nauka zapisuje
+//!   je hurtem, bez przeczytania przez właściciela — dlatego trafiają **tylko do zakresu sesji**
+//!   jako `Provenance::UntrustedContent` (źródło `rozmowa:… · odpowiedź agentki`); przy zakresie
+//!   projektu albo globalnym nauka bierze wyłącznie tury użytkownika.
 //!
 //! Każdy fakt: `[tytuł · i/n] fragment`, encja = tytuł, zapis jawny właściciela (od razu
 //! aktywny). Błąd w połowie → zapisane fakty są zapominane (wszystko albo nic). Cofnięcie:
@@ -31,6 +35,11 @@ use crate::ids::entry_dto;
 pub const TITLE_CHARS: usize = 80;
 /// Pewność faktów z treści niezaufanej.
 pub const UNTRUSTED_CONFIDENCE: f32 = 0.7;
+/// Najwięcej bajtów tekstu w żądaniu (wklejony tekst, plik) — więcej → odmowa bez przetwarzania.
+pub const MAX_REQUEST_BYTES: usize = 4 * 1024 * 1024;
+/// Zapas znaków ponad limit wejścia przy wstępnym ucięciu surowego tekstu (białe znaki
+/// zwijane przy podziale).
+const RAW_MARGIN_CHARS: usize = 20_000;
 
 /// Plan nauki: źródło, zaufanie i fragmenty.
 #[derive(Debug, Clone, PartialEq)]
@@ -43,12 +52,32 @@ pub struct TeachPlan {
     pub source: String,
     /// Fragmenty.
     pub chunks: Chunks,
+    /// Tury agentek (rozmowa, tylko zakres sesji) — ich fragmenty zapisywane jako niezaufane.
+    pub agent_turns: Vec<u64>,
 }
 
 impl TeachPlan {
-    /// Czy treść jest zaufana (rozmowa) — inaczej tylko zakres sesji.
+    /// Czy cała treść jest zaufana (rozmowa bez odpowiedzi agentek).
     pub fn trusted(&self) -> bool {
-        self.provenance.is_trusted()
+        (0..self.chunks.pieces.len()).all(|i| self.provenance_of(i).is_trusted())
+            && self.provenance.is_trusted()
+    }
+
+    /// Pochodzenie faktu `i`: fragment z tury agentki → treść niezaufana.
+    pub fn provenance_of(&self, i: usize) -> Provenance {
+        let agent = self
+            .chunks
+            .pieces
+            .get(i)
+            .and_then(|p| p.turn)
+            .is_some_and(|t| self.agent_turns.contains(&t));
+        if agent {
+            Provenance::UntrustedContent {
+                source: format!("{} · odpowiedź agentki", self.source),
+            }
+        } else {
+            self.provenance.clone()
+        }
     }
 
     /// Treść faktu `i` (od zera): `[tytuł · i/n] fragment`.
@@ -97,29 +126,42 @@ pub fn external_plan(source: &TeachSource, title: Option<&str>, limits: Limits) 
         ),
         TeachSource::Conversation => ("", "rozmowa".to_owned(), "Rozmowa".to_owned()),
     };
+    // Wstępne ucięcie surowego tekstu: podział i skrót nie przechodzą całego, bardzo długiego
+    // wejścia, skoro i tak liczy się tylko początek (limit znaków wejścia).
+    let raw = take_chars(
+        text,
+        limits.max_input_chars.saturating_add(RAW_MARGIN_CHARS),
+    );
+    let cut = raw.len() < text.len();
     let segments: Vec<(Option<u64>, String)> =
-        paragraphs(text).into_iter().map(|p| (None, p)).collect();
-    let source = format!("naucz: {label} · sha256:{}", content_hash(text));
+        paragraphs(raw).into_iter().map(|p| (None, p)).collect();
+    let source = format!("naucz: {label} · sha256:{}", content_hash(raw));
+    let mut chunks = chunk(&segments, limits);
+    chunks.truncated |= cut;
     TeachPlan {
         title: clean_title(title, &fallback),
         provenance: Provenance::UntrustedContent {
             source: source.clone(),
         },
         source,
-        chunks: chunk(&segments, limits),
+        chunks,
+        agent_turns: Vec::new(),
     }
 }
 
-/// Plan dla rozmowy: aktywna gałąź bez tur ukrytych, narzędzi i systemowych.
+/// Plan dla rozmowy: aktywna gałąź bez tur ukrytych, narzędzi i systemowych. Odpowiedzi
+/// agentek tylko przy `with_agents` (zakres sesji) — jako treść niezaufana.
 pub fn conversation_plan(
     history: &dyn SessionHistory,
     session: &SessionId,
     title: String,
     limits: Limits,
+    with_agents: bool,
 ) -> Result<TeachPlan, AppError> {
     let leaf = history
         .active_leaf(session)?
         .ok_or_else(|| AppError::invalid("Ta rozmowa nie ma jeszcze wiadomości."))?;
+    let mut agent_turns = Vec::new();
     let segments: Vec<(Option<u64>, String)> = history
         .branch_projection(session, leaf)?
         .into_iter()
@@ -127,8 +169,11 @@ pub fn conversation_plan(
         .filter_map(|t| {
             let who = match t.role {
                 Role::User => "Użytkownik",
-                Role::Assistant => "Agentka",
-                Role::System | Role::Tool => return None,
+                Role::Assistant if with_agents => {
+                    agent_turns.push(t.id.0);
+                    "Agentka"
+                }
+                Role::Assistant | Role::System | Role::Tool => return None,
             };
             Some((Some(t.id.0), format!("{who}: {}", t.content.text)))
         })
@@ -138,6 +183,7 @@ pub fn conversation_plan(
         provenance: Provenance::User,
         source: format!("rozmowa:{session}"),
         chunks: chunk(&segments, limits),
+        agent_turns,
     })
 }
 
@@ -162,22 +208,31 @@ impl MemoryApp {
         if id.is_empty() {
             return Err(AppError::invalid("Brak rozmowy, do której należy nauka."));
         }
+        if let TeachSource::Text { text } | TeachSource::File { text, .. } = &request.source
+            && text.len() > MAX_REQUEST_BYTES
+        {
+            return Err(AppError::invalid(
+                "Tekst jest za długi do nauki (najwyżej 4 MB) — podziel go na części.",
+            ));
+        }
         let session = SessionId::new(id);
         let meta = self.p.catalog.session(&session)?;
         let title = request.title.as_deref();
+        let conversation = matches!(request.source, TeachSource::Conversation);
+        let scope = self.teach_scope(&session, request.scope, conversation)?;
         let plan = match &request.source {
             TeachSource::Conversation => conversation_plan(
                 history,
                 &session,
                 clean_title(title, &format!("Rozmowa „{}”", meta.title)),
                 limits,
+                matches!(scope, MemoryScope::Session(_)),
             )?,
             external => external_plan(external, title, limits),
         };
         if plan.chunks.pieces.is_empty() {
             return Err(AppError::invalid("Nie ma treści do nauki."));
         }
-        let scope = self.teach_scope(&session, request.scope, plan.trusted())?;
         let stored = self.store(&plan, &scope, &session)?;
         self.changed(Some(&scope));
         Ok(TeachReport {
@@ -228,14 +283,11 @@ impl MemoryApp {
         let mut stored = Vec::new();
         for (i, piece) in plan.chunks.pieces.iter().enumerate() {
             let text = plan.fact_text(i).unwrap_or_default();
-            let mut new = NewMemory::new(
-                scope.clone(),
-                Layer::Semantic,
-                text,
-                plan.provenance.clone(),
-            );
+            let provenance = plan.provenance_of(i);
+            let trusted = provenance.is_trusted();
+            let mut new = NewMemory::new(scope.clone(), Layer::Semantic, text, provenance);
             new.entities = vec![plan.title.clone()];
-            if !plan.trusted() {
+            if !trusted {
                 new.confidence = UNTRUSTED_CONFIDENCE;
             }
             if let Some(turn) = piece.turn {

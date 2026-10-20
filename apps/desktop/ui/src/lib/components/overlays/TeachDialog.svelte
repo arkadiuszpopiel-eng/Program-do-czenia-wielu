@@ -79,6 +79,7 @@
   async function teach() {
     if (!sessionId || !ready) return;
     error = null;
+    note = null;
     busy = true;
     try {
       report = await app.client.memory.teach({
@@ -94,18 +95,26 @@
     }
   }
 
+  // Niepowodzenie części → wynik zostaje z identyfikatorami nieudanych („Cofnij naukę” ponawia);
+  // pełne cofnięcie → formularz pusty (bez ponownej nauki tej samej treści jednym kliknięciem).
   async function undo() {
     if (!report) return;
     busy = true;
-    const ids = report.ids;
-    const result = await undoTeach(ids, (id) =>
+    const done = report;
+    const result = await undoTeach(done.ids, (id) =>
       app.client.memory.forget({ target: 'entry', id }),
     );
     busy = false;
-    note = result.failed
-      ? t('teach.undoFailed', { n: result.failed })
-      : t('teach.undone', { n: result.removed });
+    if (result.failed) {
+      report = { ...done, ids: result.left };
+      note = t('teach.undoFailed', { n: result.failed });
+      return;
+    }
+    note = t('teach.undone', { n: done.facts });
     report = null;
+    text = '';
+    file = null;
+    title = '';
   }
 
   function show() {
@@ -136,6 +145,7 @@
           {#if report.duplicates}
             <p class="muted">{t('teach.doneDuplicates', { n: report.duplicates })}</p>
           {/if}
+          {#if note}<p class="note" role="status">{note}</p>{/if}
         </section>
       {:else}
         {#if note}<p class="muted" role="status">{note}</p>{/if}

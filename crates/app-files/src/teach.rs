@@ -4,7 +4,7 @@
 //! do podglądu; zapis faktów (jako treść niezaufana) robi `app-memory`.
 
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use app_api::dto::{AttachmentRejectReason, TeachFile};
@@ -43,6 +43,19 @@ fn cap(text: String, max: usize) -> (String, bool) {
         Some((i, _)) => (text[..i].to_owned(), true),
         None => (text, false),
     }
+}
+
+/// Jeden wybrany plik (dialog załączników pozwala zaznaczyć kilka — nauka bierze jeden, więc
+/// wybór wielu to wyraźna odmowa zamiast cichego pominięcia reszty); pusto → anulowano.
+fn single(paths: Vec<PathBuf>) -> Result<Option<PathBuf>, AppError> {
+    let mut paths = paths.into_iter();
+    let first = paths.next();
+    if paths.next().is_some() {
+        return Err(AppError::invalid(
+            "Wybierz jeden plik — naukę robię z jednego pliku naraz.",
+        ));
+    }
+    Ok(first)
 }
 
 /// Tekst pliku po nazwie i treści (txt/md jako UTF-8, pdf/docx — ekstraktory załączników).
@@ -85,11 +98,9 @@ impl FilesApp {
     /// anulowano).
     pub async fn teach_pick_file(self: &Arc<Self>) -> Result<Option<TeachFile>, AppError> {
         let me = self.clone();
-        blocking(move || {
-            let Some(path) = me.shell.pick_files()?.into_iter().next() else {
-                return Ok(None);
-            };
-            me.teach_read(&path).map(Some)
+        blocking(move || match single(me.shell.pick_files()?)? {
+            Some(path) => me.teach_read(&path).map(Some),
+            None => Ok(None),
         })
         .await
     }
@@ -130,6 +141,14 @@ mod tests {
         assert!(!f.truncated);
         let f = teach_text("a.txt", "ąąąąą".as_bytes(), 3).unwrap();
         assert_eq!((f.text.as_str(), f.truncated, f.chars), ("ąąą", true, 3));
+    }
+
+    #[test]
+    fn picker_takes_exactly_one_file() {
+        assert_eq!(single(Vec::new()).unwrap(), None);
+        let one = PathBuf::from("a.md");
+        assert_eq!(single(vec![one.clone()]).unwrap(), Some(one.clone()));
+        assert!(single(vec![one, PathBuf::from("b.md")]).is_err());
     }
 
     #[test]

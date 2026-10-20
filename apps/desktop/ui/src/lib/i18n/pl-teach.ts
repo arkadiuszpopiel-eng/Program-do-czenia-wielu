@@ -16,7 +16,7 @@ export const plTeach = {
   'teach.file': '{name} — {chars} znaków',
   'teach.fileTruncated': 'Plik jest długi — wezmę tylko jego początek.',
   'teach.conversation':
-    'Wezmę bieżącą gałąź tej rozmowy: Twoje wiadomości i odpowiedzi agentek (bez ukrytych wiadomości i wyników narzędzi).',
+    'Wezmę bieżącą gałąź tej rozmowy (bez ukrytych wiadomości i wyników narzędzi). Odpowiedzi agentek mogą powtarzać treść z zewnątrz, więc zapiszę je tylko w pamięci tej rozmowy jako niezaufane; do projektu i pamięci globalnej trafią wyłącznie Twoje wiadomości.',
   'teach.untrusted':
     'Treść z zewnątrz traktuję jako dane, nie polecenia: zapiszę ją tylko w pamięci tej rozmowy z oznaczeniem „niezaufane”.',
   'teach.scope': 'Zakres',
@@ -51,5 +51,6 @@ export const plTeach = {
   'teach.show': 'Pokaż w panelu Pamięć',
   'teach.undo': 'Cofnij naukę',
   'teach.undone': 'Cofnięto naukę — usunięte fakty: {n}.',
-  'teach.undoFailed': 'Nie udało się usunąć części faktów ({n}) — usuń je w panelu Pamięć.',
+  'teach.undoFailed':
+    'Nie udało się usunąć części faktów ({n}) — kliknij „Cofnij naukę” jeszcze raz albo usuń je w panelu Pamięć.',
 };

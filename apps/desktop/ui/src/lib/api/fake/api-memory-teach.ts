@@ -1,6 +1,7 @@
 // Atrapa „Naucz Alfę” (P5): podział jak w rdzeniu (`logic/memory-teach`), tekst i plik jako treść
-// niezaufana (tylko zakres sesji), rozmowa jako wiedza użytkownika (tury bez ukrytych); wybór
-// pliku zwraca notatkę. Rozmowa bez wiadomości → błąd „Nie ma treści do nauki.” (jak rdzeń).
+// niezaufana (tylko zakres sesji), rozmowa: tury użytkownika jako wiedza użytkownika, odpowiedzi
+// agentek tylko w zakresie sesji i jako niezaufane (tury bez ukrytych; każda tura dzielona osobno);
+// wybór pliku zwraca notatkę. Rozmowa bez wiadomości → błąd „Nie ma treści do nauki.” (jak rdzeń).
 import type { MemoryItem, MemoryScopeRef, MemoryTeachApi, TeachFile } from '../types-memory';
 import { chunkText, isExternal, oneLine } from '../../logic/memory-teach';
 import type { FakeCore } from './core';
@@ -12,9 +13,6 @@ export const FAKE_TEACH_FILE: TeachFile = {
   chars: 105,
   truncated: false,
 };
-
-/** Granica akapitów (każda tura rozmowy to osobny akapit). */
-const PARAGRAPH = '\n\n';
 
 /** Wpis atrapy pamięci (bez pól łańcucha wersji — dokłada je `api-memory`). */
 export type TaughtItem = MemoryItem;
@@ -41,16 +39,24 @@ export function teachApi(
           ),
         );
       const session = core.session(request.session_id);
-      const text =
+      const text = source.kind === 'conversation' ? '' : source.text;
+      // Segmenty: [treść, czy niezaufana]; odpowiedzi agentek tylko w zakresie sesji.
+      const segments: [string, boolean][] =
         source.kind === 'conversation'
           ? core
               .turnsOf(request.session_id)
               .filter((t) => !core.annotations[t.id]?.hidden && t.text.trim())
-              .map((t) => `${t.author === 'user' ? 'Użytkownik' : 'Agentka'}: ${t.text}`)
-              .join(PARAGRAPH)
-          : source.text;
-      const chunks = chunkText(text);
-      if (chunks.pieces.length === 0) return Promise.reject(new Error('Nie ma treści do nauki.'));
+              .filter((t) => t.author === 'user' || request.scope === 'session')
+              .map((t): [string, boolean] => [
+                `${t.author === 'user' ? 'Użytkownik' : 'Agentka'}: ${t.text}`,
+                t.author !== 'user',
+              ])
+          : [[text, true]];
+      const parts = segments.map(([raw, untrusted]) => ({ chunks: chunkText(raw), untrusted }));
+      const pieces = parts.flatMap((p) =>
+        p.chunks.pieces.map((piece) => ({ piece, untrusted: p.untrusted })),
+      );
+      if (pieces.length === 0) return Promise.reject(new Error('Nie ma treści do nauki.'));
       const fallback =
         source.kind === 'file'
           ? source.name
@@ -78,8 +84,8 @@ export function teachApi(
       const origin = external
         ? `naucz: ${label} · sha256:${hash(text)}`
         : `rozmowa:${request.session_id}`;
-      const n = chunks.pieces.length;
-      const items: TaughtItem[] = chunks.pieces.map((piece, i) => ({
+      const n = pieces.length;
+      const items: TaughtItem[] = pieces.map(({ piece, untrusted }, i) => ({
         id: `${key}#${core.nextId('mem')}`,
         scope,
         scope_key: key,
@@ -88,10 +94,10 @@ export function teachApi(
         text: n === 1 ? `[${title}] ${piece}` : `[${title} · ${i + 1}/${n}] ${piece}`,
         subject: null,
         entities: [title],
-        source: external ? 'untrusted' : 'user',
-        source_detail: external ? origin : null,
-        trusted: !external,
-        confidence: external ? 0.7 : 1,
+        source: untrusted ? 'untrusted' : 'user',
+        source_detail: untrusted ? (external ? origin : `${origin} · odpowiedź agentki`) : null,
+        trusted: !untrusted,
+        confidence: untrusted ? 0.7 : 1,
         pinned: false,
         version: 1,
         created_at: core.isoNow(),
@@ -107,9 +113,9 @@ export function teachApi(
         ids: items.map((x) => x.id),
         scope_key: key,
         source: origin,
-        trusted: !external,
-        truncated: chunks.truncated,
-        duplicates: chunks.duplicates,
+        trusted: pieces.every((p) => !p.untrusted),
+        truncated: parts.some((p) => p.chunks.truncated),
+        duplicates: parts.reduce((sum, p) => sum + p.chunks.duplicates, 0),
       });
     },
   };

@@ -62,6 +62,7 @@ test('plik z panelu Pamięć: wybór, zapis i cofnięcie nauki', async ({ page }
   await expect(dialog.getByTestId('teach-result')).toContainText('plik „wyjazd-zakopane.md”');
   await dialog.getByRole('button', { name: 'Cofnij naukę' }).click();
   await expect(dialog.getByText('Cofnięto naukę — usunięte fakty: 1.')).toBeVisible();
+  await expect(dialog.getByTestId('teach-file')).toHaveCount(0);
   await dialog.getByRole('button', { name: 'Anuluj' }).click();
   await expect(dialog).toHaveCount(0);
   const list = page.getByRole('list', { name: 'Wpisy pamięci' });

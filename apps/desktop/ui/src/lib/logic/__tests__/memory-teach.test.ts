@@ -8,6 +8,7 @@ import {
   scopeOfKey,
   teachScopes,
   undoTeach,
+  capInput,
 } from '../memory-teach';
 
 const limits = (chunkChars: number, maxInputChars = 100_000, maxFacts = 1_000) => ({
@@ -82,7 +83,21 @@ describe('Naucz Alfę — zakresy i cofnięcie', () => {
     const forget = vi.fn((id: string) =>
       id === 'b' ? Promise.reject(new Error('nie ma')) : Promise.resolve(),
     );
-    expect(await undoTeach(['a', 'b', 'c'], forget)).toEqual({ removed: 2, failed: 1 });
+    expect(await undoTeach(['a', 'b', 'c'], forget)).toEqual({
+      removed: 2,
+      failed: 1,
+      left: ['b'],
+    });
     expect(forget).toHaveBeenCalledTimes(3);
+  });
+
+  it('bardzo długi tekst ucinany przed podziałem', () => {
+    const lim = limits(50, 100, 10);
+    const raw = `${'a '.repeat(30)}${'b'.repeat(1_000_000)}`;
+    expect(capInput(raw, lim).length).toBe(2 * (100 + 20_000));
+    const out = chunkText(raw, lim);
+    expect(out.truncated).toBe(true);
+    expect(out.pieces.every((p) => Array.from(p).length <= 50)).toBe(true);
+    expect(capInput('krótki', lim)).toBe('krótki');
   });
 });

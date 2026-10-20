@@ -129,3 +129,28 @@ fn empty_input_gives_no_pieces() {
     let c = chunk(&text_segments(""), Limits::default());
     assert!(c.pieces.is_empty() && !c.truncated);
 }
+
+#[test]
+fn external_plan_caps_raw_input_before_splitting() {
+    use crate::teach::external_plan;
+    use app_api::dto::TeachSource;
+    let source = TeachSource::Text {
+        text: format!("{}{}", "a ".repeat(30), "b".repeat(1_000_000)),
+    };
+    let plan = external_plan(&source, None, limits(50, 100, 10));
+    assert!(plan.chunks.truncated);
+    assert!(
+        plan.chunks
+            .pieces
+            .iter()
+            .all(|p| p.text.chars().count() <= 50)
+    );
+    let total: usize = plan
+        .chunks
+        .pieces
+        .iter()
+        .map(|p| p.text.chars().count())
+        .sum();
+    assert!(total <= 100);
+    assert!(plan.agent_turns.is_empty() && !plan.trusted());
+}

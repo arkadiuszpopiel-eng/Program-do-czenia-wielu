@@ -78,13 +78,27 @@ function splitLine(line: string, max: number): string[] {
     .flatMap((s) => (count(s) <= max ? [s] : byWords(s, max)));
 }
 
+/** Zapas znaków ponad limit wejścia przy wstępnym ucięciu surowego tekstu (jak rdzeń). */
+const RAW_MARGIN_CHARS = 20_000;
+
+/**
+ * Wstępne ucięcie surowego tekstu: podział nie przechodzi całego, bardzo długiego wejścia (podgląd
+ * liczony przy każdym naciśnięciu klawisza), skoro i tak liczy się tylko początek. Jednostki
+ * UTF-16 ×2 — co najmniej tyle znaków, ile bierze rdzeń.
+ */
+export function capInput(text: string, limits: TeachLimits = TEACH_LIMITS): string {
+  const units = 2 * (limits.maxInputChars + RAW_MARGIN_CHARS);
+  return text.length > units ? text.slice(0, units) : text;
+}
+
 /** Fragmenty-fakty tekstu (akapity → zdania → słowa), z limitami i bez powtórzeń. */
 export function chunkText(text: string, limits: TeachLimits = TEACH_LIMITS): TeachChunks {
   const max = Math.max(1, limits.chunkChars);
   let budget = limits.maxInputChars;
-  let truncated = false;
+  const raw = capInput(text, limits);
+  let truncated = raw.length < text.length;
   const parts: string[] = [];
-  for (const paragraph of paragraphs(text)) {
+  for (const paragraph of paragraphs(raw)) {
     if (budget <= 0) {
       truncated = true;
       break;
@@ -121,22 +135,25 @@ export function teachScopes(kind: TeachSource['kind']): readonly RememberScope[]
   return isExternal(kind) ? ['session'] : ['session', 'project', 'global'];
 }
 
-/** Cofnięcie nauki: zapomina zapisane fakty po kolei; zwraca liczbę usuniętych i nieudanych. */
+/**
+ * Cofnięcie nauki: zapomina zapisane fakty po kolei; zwraca liczbę usuniętych, nieudanych
+ * i identyfikatory nieudanych (do ponowienia).
+ */
 export async function undoTeach(
   ids: readonly string[],
   forget: (id: string) => Promise<unknown>,
-): Promise<{ removed: number; failed: number }> {
+): Promise<{ removed: number; failed: number; left: string[] }> {
   let removed = 0;
-  let failed = 0;
+  const left: string[] = [];
   for (const id of ids) {
     try {
       await forget(id);
       removed++;
     } catch {
-      failed++;
+      left.push(id);
     }
   }
-  return { removed, failed };
+  return { removed, failed: left.length, left };
 }
 
 /** Rodzaj zakresu z klucza rdzenia (`session:<id>`, `project:<id>`, `agent:<id>`, `global`). */

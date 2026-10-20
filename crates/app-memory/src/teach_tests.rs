@@ -162,7 +162,7 @@ async fn external_content_never_reaches_broader_scopes() {
 }
 
 #[tokio::test]
-async fn conversation_is_trusted_with_turn_origin_and_skips_hidden_and_tools() {
+async fn conversation_user_turns_trusted_agent_turns_untrusted_session_only() {
     let h = harness();
     let s = session(&h, Some("Wyjazd"));
     let u1 = h
@@ -192,34 +192,55 @@ async fn conversation_is_trusted_with_turn_origin_and_skips_hidden_and_tools() {
             h.sessions.as_ref(),
         )
         .unwrap();
+    let entries = |ids: &[String]| -> Vec<_> {
+        ids.iter()
+            .map(|id| {
+                h.service
+                    .get_as(&Accessor::Owner, &parse_entry(id).unwrap())
+                    .unwrap()
+            })
+            .collect()
+    };
+    // Zakres projektu: tylko tury użytkownika (odpowiedzi agentek mogą powtarzać treść z zewnątrz).
     assert!(report.trusted);
     assert_eq!(report.scope_key, "project:wyjazd");
     assert_eq!(report.source, format!("rozmowa:{s}"));
-    assert_eq!(report.facts, 2);
-    let entries: Vec<_> = report
-        .ids
-        .iter()
-        .map(|id| {
-            h.service
-                .get_as(&Accessor::Owner, &parse_entry(id).unwrap())
-                .unwrap()
-        })
-        .collect();
-    assert!(entries.iter().all(|e| e.provenance == Provenance::User));
-    assert_eq!(entries[0].origin.turn, Some(u1.id.0));
-    assert_eq!(entries[1].origin.turn, Some(a.id.0));
-    assert!(entries[0].text.contains("Użytkownik: Jadę do Zakopanego"));
-    assert!(entries[1].text.contains("Agentka: Zapamiętam"));
-    let all: String = entries.iter().map(|e| e.text.clone()).collect();
-    assert!(!all.contains("tajny token") && !all.contains("Ukryta"));
+    assert_eq!(report.facts, 1);
+    let wide = entries(&report.ids);
+    assert_eq!(wide[0].provenance, Provenance::User);
+    assert_eq!(wide[0].origin.turn, Some(u1.id.0));
     assert!(
-        entries[0]
+        wide[0]
             .text
-            .starts_with("[Rozmowa „Plan wyjazdu” · 1/2]")
+            .starts_with("[Rozmowa „Plan wyjazdu”] Użytkownik: Jadę do Zakopanego")
     );
+    // Zakres sesji: także agentki, ale jako treść niezaufana.
+    let report = h
+        .app
+        .teach(
+            request(&s, TeachSource::Conversation, RememberScope::Session),
+            h.sessions.as_ref(),
+        )
+        .unwrap();
+    assert!(!report.trusted);
+    assert_eq!(report.facts, 2);
+    let local = entries(&report.ids);
+    assert_eq!(local[0].provenance, Provenance::User);
+    assert_eq!(local[0].confidence, 1.0);
+    assert_eq!(
+        local[1].provenance,
+        Provenance::UntrustedContent {
+            source: format!("rozmowa:{s} · odpowiedź agentki")
+        }
+    );
+    assert_eq!(local[1].origin.turn, Some(a.id.0));
+    assert!(local[1].text.contains("Agentka: Zapamiętam"));
+    assert!(local[1].text.starts_with("[Rozmowa „Plan wyjazdu” · 2/2]"));
+    let all: String = local.iter().map(|e| e.text.clone()).collect();
+    assert!(!all.contains("tajny token") && !all.contains("Ukryta"));
     // Zapomnienie sesji zabiera też wiedzę z niej (kaskada po pochodzeniu).
     let report = h.app.forget_session(&s).unwrap();
-    assert_eq!(report.removed.len(), 2);
+    assert_eq!(report.removed.len(), 3);
 }
 
 #[tokio::test]
@@ -296,6 +317,17 @@ async fn limits_duplicates_and_errors() {
             )
             .is_err()
     );
+    let huge = TeachSource::Text {
+        text: "x".repeat(crate::teach::MAX_REQUEST_BYTES + 1),
+    };
+    let err = h
+        .app
+        .teach(
+            request(&s, huge, RememberScope::Session),
+            h.sessions.as_ref(),
+        )
+        .unwrap_err();
+    assert!(err.to_string().contains("za długi"));
     let unknown = SessionId::new("nie-ma");
     let text = TeachSource::Text { text: "x".into() };
     assert!(

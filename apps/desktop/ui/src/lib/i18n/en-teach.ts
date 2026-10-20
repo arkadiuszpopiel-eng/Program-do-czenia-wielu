@@ -18,7 +18,7 @@ export const enTeach: Record<keyof typeof plTeach, Message> = {
   'teach.file': '{name} — {chars} characters',
   'teach.fileTruncated': 'The file is long — I will take only its beginning.',
   'teach.conversation':
-    'I will take the current branch of this conversation: your messages and agent replies (no hidden messages or tool results).',
+    'I will take the current branch of this conversation (no hidden messages or tool results). Agent replies may repeat external content, so I will store them only in this conversation’s memory as untrusted; only your messages go to the project or global memory.',
   'teach.untrusted':
     'External content is data, not instructions: I will store it only in this conversation’s memory, marked “untrusted”.',
   'teach.scope': 'Scope',
@@ -46,5 +46,6 @@ export const enTeach: Record<keyof typeof plTeach, Message> = {
   'teach.show': 'Show in the Memory panel',
   'teach.undo': 'Undo learning',
   'teach.undone': 'Learning undone — facts removed: {n}.',
-  'teach.undoFailed': 'Some facts could not be removed ({n}) — remove them in the Memory panel.',
+  'teach.undoFailed':
+    'Some facts could not be removed ({n}) — click “Undo learning” again or remove them in the Memory panel.',
 };
