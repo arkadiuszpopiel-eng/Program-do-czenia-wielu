@@ -5,6 +5,8 @@
 // terminalem (`agents_open_terminal`, `bridges_open_login`), Brokerem (`gui_desktop_grant`,
 // `permissions_request_level`), ustawieniami Windows (`app_open_system_settings`), siecią i
 // restartem (`updates_*` tylko przy stanie, w którym rdzeń odmawia) i głośnikiem (`voice_preview`).
+// Wyjątek: `quick_expand_to_main` najpierw chowa okno Szybkiego pytania, a dopiero potem odmawia
+// dla nieznanej sesji — na instancji testowej to bez znaczenia (okno i tak jest ukryte).
 // Polecenia z wynikiem zmieniają wyłącznie profil instancji testowej: konfiguracja kopii (z powrotem
 // do stanu wyjściowego), hasło kopii (sejf `Alfa/test/…`), ustawienia głosu na wartości domyślne,
 // Szybkie pytanie bez modelu (tura kończy się błędem „brak mózgu”, jak w teście dymnym).
@@ -15,6 +17,11 @@ import { loadIpcSchema, schemaErrors } from './ipc';
 import { call, raw, refused } from './ipc-call';
 
 const schema = loadIpcSchema();
+
+// Uwagi z konsoli (np. z tury „brak mózgu” Szybkiego pytania) trafiają pod nazwę tego testu.
+test.beforeEach(({ alfa }, info) => {
+  alfa.log.phase = info.title;
+});
 
 /**
  * Wywołanie, którego wynik zależy od silników głosu w profilu (bez modeli — odmowa): sukces musi
@@ -71,10 +78,14 @@ test('kopie zapasowe: katalog tylko z okna wyboru, za krótkie hasło, kopia bez
       include_logs: !original.include_logs,
     },
   });
-  expect(changed.config.dir).toBe(original.dir);
-  expect(changed.config.include_logs).toBe(!original.include_logs);
-  const restored = await call<BackupView>(main, 'backups_configure', { config: original });
-  expect(restored.config).toEqual(original);
+  try {
+    expect(changed.config.dir).toBe(original.dir);
+    expect(changed.config.include_logs).toBe(!original.include_logs);
+  } finally {
+    // Przywrócenie także po nieudanym sprawdzeniu — profil jest wspólny dla kolejnych plików.
+    const restored = await call<BackupView>(main, 'backups_configure', { config: original });
+    expect(restored.config).toEqual(original);
+  }
 
   // Hasło krótsze niż 8 znaków — odmowa przed sejfem; brak hasła — kopie bez szyfrowania.
   await refused(main, 'backups_set_password', { password: 'krotkie' });
