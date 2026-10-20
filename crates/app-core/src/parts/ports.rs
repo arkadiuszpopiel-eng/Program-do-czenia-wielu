@@ -70,6 +70,7 @@ impl Extra {
                 paths
                     .config
                     .join(app_modules::route::routing_settings::FILE),
+                paths.config.join(crate::commands::pricing::FILE),
             )),
             (None, None) => Arc::new(RouterUnavailable),
         };

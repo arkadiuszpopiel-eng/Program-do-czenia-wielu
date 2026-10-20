@@ -113,6 +113,8 @@ pub(crate) struct AccountRoutes {
     cores: Vec<Arc<RouterCore>>,
     /// Wspólna kolejka wszystkich kont (`model-queues.json`).
     shared: QueueFile,
+    /// Księga cen (wbudowana + `cennik.toml` użytkownika) — cennik profilu każdego dostawcy.
+    prices: providers_api_impl::PriceFile,
     state: Mutex<State>,
 }
 
@@ -122,12 +124,14 @@ impl AccountRoutes {
         catalog: Arc<BTreeMap<String, CatalogEntry>>,
         cores: Vec<Arc<RouterCore>>,
         shared: std::path::PathBuf,
+        prices: std::path::PathBuf,
     ) -> Self {
         Self {
             hub,
             catalog,
             cores,
             shared: QueueFile::new(shared),
+            prices: providers_api_impl::PriceFile::new(prices),
             state: Mutex::new(State::default()),
         }
     }
@@ -237,6 +241,7 @@ impl AccountRoutes {
         let base_url = account.base_url.as_deref();
         let mut profile = crate::probe::account_profile(key, base_url, &account.enterprise);
         profile.default_model = model;
+        profile.pricing = self.prices.current().table_for(account.provider.as_str());
         match build_provider(entry, profile) {
             Ok(p) => Some(p),
             Err(e) => {
@@ -325,6 +330,8 @@ impl AccountRoutes {
                 )
             })
             .chain(std::iter::once(format!("{shared:?}")))
+            // Zmiana cennika przebudowuje adaptery (nowe ceny bez restartu).
+            .chain(self.prices.current().to_toml().ok())
             .collect();
         if self.lock().fingerprint == fingerprint {
             return;

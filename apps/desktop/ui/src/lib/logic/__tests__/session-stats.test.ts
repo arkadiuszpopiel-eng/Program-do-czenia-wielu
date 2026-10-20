@@ -6,6 +6,7 @@ const usage = (model: string, minor: number, latency: number) => ({
   input_tokens: 100,
   output_tokens: 40,
   cost: { minor, currency: 'PLN' as const },
+  cost_micro_pln: minor * 10_000,
   latency_ms: latency,
   provider: 'anthropic',
   model,

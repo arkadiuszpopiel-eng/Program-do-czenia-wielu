@@ -284,6 +284,7 @@ export const plApp = {
   'msg.more': 'Więcej akcji',
   'msg.reading': '{name} czyta na głos.',
   'msg.usage': '{model} · {input} → {output} tok. · {cost} · {latency}',
+  'msg.costUnknown': 'koszt nieznany (brak ceny modelu)',
   'msg.code': 'Blok kodu {lang}',
   'msg.codeCopy': 'Kopiuj kod',
   'msg.codeSave': 'Zapisz jako plik',

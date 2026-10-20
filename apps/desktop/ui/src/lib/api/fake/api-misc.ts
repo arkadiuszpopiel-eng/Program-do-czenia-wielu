@@ -1,10 +1,12 @@
 // Atrapa: aplikacja, agentki, koszty, ustawienia, oś czasu, pliki, uprawnienia, urządzenia, głos, system.
+import { CommandError } from '../command-error';
 import type { AlfaClient } from '../client';
 import type { AutonomyLevel, EventLevel } from '../types';
 import type { FakeChat } from './api-chat';
 import type { FakeCore } from './core';
 import { seedDevice } from './fixtures';
 export { voiceApi } from './api-voice';
+import { fakePricing, parsePriceUpdate } from './pricing';
 import { SETTINGS_SCHEMA, defaultValues } from './settings-schema';
 
 const LEVELS: readonly EventLevel[] = ['trace', 'debug', 'info', 'warn', 'error', 'audit'];
@@ -75,6 +77,15 @@ export function costsApi(core: FakeCore, chat: FakeChat): AlfaClient['costs'] {
       const sid = core.activeSession;
       core.emit([{ type: 'CostsChanged', session_id: sid ?? '', costs: chat.costs(sid) }]);
       return core.reply(undefined);
+    },
+    pricing: () => core.reply(fakePricing.view([], false)),
+    applyPricing: (text, save) => {
+      const update = parsePriceUpdate(text);
+      if (!update) {
+        const msg = 'cennik: tekst nie zawiera żadnej poprawnej ceny ([[price]])';
+        return Promise.reject(new CommandError('invalid_input', msg));
+      }
+      return core.reply(fakePricing.apply(update, save));
     },
   };
 }

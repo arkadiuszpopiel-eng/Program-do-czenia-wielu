@@ -268,6 +268,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'msg.more': 'More actions',
   'msg.reading': '{name} is reading aloud.',
   'msg.usage': '{model} · {input} → {output} tok. · {cost} · {latency}',
+  'msg.costUnknown': 'cost unknown (no model price)',
   'msg.code': 'Code block {lang}',
   'msg.codeCopy': 'Copy code',
   'msg.codeSave': 'Save as file',

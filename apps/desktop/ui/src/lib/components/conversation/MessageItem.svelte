@@ -16,6 +16,7 @@
   import Brain from '@lucide/svelte/icons/brain';
   import Clock from '@lucide/svelte/icons/clock';
   import type { Turn } from '../../api/types';
+  import { costText } from '../../logic/turn-cost';
   import { attempt } from '../../state/attempt';
   import { now } from '../../state/clock.svelte';
   import { useApp } from '../../state/context';
@@ -26,7 +27,6 @@
   import { isContinued } from '../../logic/turn-tree';
   import MessageActions from './MessageActions.svelte';
   import MessageAttachments from './MessageAttachments.svelte';
-  import AgentCards from './AgentCards.svelte';
   import ToolSteps from './ToolSteps.svelte';
 
   interface Props {
@@ -101,6 +101,8 @@
   import HiddenMessage from './HiddenMessage.svelte';
   // Błąd tury jest rzadki — jego widok ładowany leniwie, poza budżetem startowym okna.
   const loadError = () => import('./MessageError.svelte');
+  // Karty kroków agentki (intencje, „Cofnij”) — tylko pod odpowiedziami z narzędziami.
+  const loadAgentCards = () => import('./AgentCards.svelte');
 </script>
 
 {#if annotation?.hidden}
@@ -226,7 +228,11 @@
       <div class="indent"><MessageApproval {agent} approval={turn.approval} /></div>
     {/if}
 
-    {#if agent && turn.tools.length}<div class="indent"><AgentCards {turn} /></div>{/if}
+    {#if agent && turn.tools.length}
+      <div class="indent">
+        <Lazy load={loadAgentCards} props={{ turn }} label={t('common.loading')} />
+      </div>
+    {/if}
 
     {#if turn.error}
       <div class="indent">
@@ -244,7 +250,7 @@
           model: turn.usage.model,
           input: app.i18n.int(turn.usage.input_tokens),
           output: app.i18n.int(turn.usage.output_tokens),
-          cost: app.i18n.money(turn.usage.cost),
+          cost: costText(turn.usage, app.i18n.money, t('msg.costUnknown')),
           latency: app.i18n.duration(turn.usage.latency_ms),
         })}
       </p>

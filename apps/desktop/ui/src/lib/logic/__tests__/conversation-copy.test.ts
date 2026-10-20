@@ -18,6 +18,7 @@ describe('conversation-copy', () => {
           input_tokens: 1,
           output_tokens: 1,
           cost: { minor: 0, currency: 'PLN' },
+          cost_micro_pln: 0,
           latency_ms: 10,
           provider: 'local',
           model: 'qwen3',

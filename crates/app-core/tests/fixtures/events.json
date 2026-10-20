@@ -441,6 +441,7 @@
         "minor": 1,
         "currency": "PLN"
       },
+      "cost_micro_pln": 10000,
       "latency_ms": 2250,
       "provider": "Anthropic",
       "model": "claude-opus-5-5"
@@ -648,6 +649,7 @@
         "minor": 2,
         "currency": "PLN"
       },
+      "cost_micro_pln": 20000,
       "latency_ms": 1210,
       "provider": "Anthropic",
       "model": "claude-opus-5-5"
@@ -724,6 +726,7 @@
         "minor": 2,
         "currency": "PLN"
       },
+      "cost_micro_pln": 20000,
       "latency_ms": 1210,
       "provider": "Anthropic",
       "model": "claude-opus-5-5"

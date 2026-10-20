@@ -2535,6 +2535,38 @@ export interface PluginsView {
   readonly unavailable_reason: string | null;
 }
 
+/** Zmiana ceny: nowa pozycja i cena sprzed zmiany (`None` — nowy model). */
+export interface PriceChangeRow {
+  readonly after: PriceRow;
+  readonly before: PriceRow | null;
+}
+
+/** Cena modelu (USD za 1 mln tokenów). */
+export interface PriceRow {
+  readonly cache_read: number | null;
+  readonly cache_write: number | null;
+  readonly input: number;
+  readonly model: string;
+  readonly note: string | null;
+  readonly output: number;
+  readonly provider: string;
+  readonly source: string;
+  /** Cena z pliku użytkownika (zatwierdzona aktualizacja), nie z wydania. */
+  readonly user: boolean;
+}
+
+/** Cennik obowiązujący i — po `pricing_apply` — zmiany (podgląd albo zapisane). */
+export interface PricingView {
+  readonly changes: readonly PriceChangeRow[];
+  /** Dzień ostatniego sprawdzenia cen. */
+  readonly checked: string;
+  /** Plik cennika użytkownika. */
+  readonly file: string;
+  readonly rows: readonly PriceRow[];
+  /** Czy zmiany zapisano (`false` — tylko podgląd). */
+  readonly saved: boolean;
+}
+
 /** Projekt (folder sesji). */
 export interface ProjectRef {
   readonly id: string;
@@ -3570,6 +3602,12 @@ export type TurnStatus = 'queued' | 'streaming' | 'complete' | 'cancelled' | 'er
 /** Zużycie i koszt tury. */
 export interface TurnUsage {
   readonly cost: Money;
+  /**
+   * Koszt dokładny (mikro-PLN): tania tura kosztuje ułamek grosza, a `cost` jest w groszach
+   * (0) — interfejs pokazuje wtedy „< 0,01 zł”. `None` — brak ceny modelu w cenniku: koszt
+   * nieznany (interfejs nie udaje „0,00 zł”).
+   */
+  readonly cost_micro_pln: number | null;
   readonly input_tokens: number;
   readonly latency_ms: number;
   readonly model: string;
@@ -4427,6 +4465,14 @@ export interface IpcCommands {
   readonly plugins_remove: {
     readonly args: { readonly pluginId: string };
     readonly result: PluginsView;
+  };
+  readonly pricing_apply: {
+    readonly args: { readonly text: string; readonly save: boolean };
+    readonly result: PricingView;
+  };
+  readonly pricing_get: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: PricingView;
   };
   readonly prompt_templates_get: {
     readonly args: Readonly<Record<string, never>>;

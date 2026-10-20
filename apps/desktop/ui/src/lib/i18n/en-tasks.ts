@@ -114,6 +114,10 @@ export const enTasks: Record<keyof typeof plTasks, Message> = {
   'duty.costs.when': 'Mondays at 9:00',
   'duty.costs.goal':
     'Using the program data, check model costs: the cost for today, the cost for the current month, what share of the monthly limit that is, and whether the last 7 days cost more than the 7 days before. If the limit is off or costs are zero, say so plainly. Do not give amounts that are not in the data. Answer in four short points, without describing your steps.',
+  'duty.prices.name': 'Price check',
+  'duty.prices.when': 'on the first day of the month at 10:00',
+  'duty.prices.goal':
+    'Check current model prices on the providers’ official pages and prepare an update of Alfa’s price list. Sources: OpenAI https://developers.openai.com/api/docs/pricing, Anthropic https://platform.claude.com/docs/en/about-claude/pricing, OpenRouter https://openrouter.ai/api/v1/models, Google https://ai.google.dev/gemini-api/docs/pricing, xAI https://docs.x.ai/docs/models, DeepSeek https://api-docs.deepseek.com/quick_start/pricing, Mistral https://docs.mistral.ai/inference/pricing (in OpenRouter, pricing.prompt, pricing.completion and pricing.input_cache_read are USD per token — multiply by 1,000,000). Use only prices you read from these pages in this task: do not guess or quote from memory; if a page cannot be opened or has no price for a model, skip it and say so in the report. Give prices in USD per 1M tokens, standard tier, short context. Do not write or change any files. Output: a short report in points (what you checked, what you could not), then one toml code block: a line checked = "YYYY-MM-DD" with today’s date and [[price]] entries with the fields provider, model, input, output, cache_read, cache_write (the last two only if the page gives them) and source (the page address). Provider ids: openai, anthropic, openrouter, google, xai, deepseek, mistral. The owner will paste this block into Settings → Costs → Model prices → Update prices, check the changes and apply them.',
   'triggers.create': 'Create trigger',
   'triggers.created': 'Trigger “{name}” created.',
   'triggers.last.never': 'Not run yet.',

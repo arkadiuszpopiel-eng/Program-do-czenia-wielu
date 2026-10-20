@@ -5,6 +5,7 @@
   import Loading from '../../../components/shell/Loading.svelte';
   import { attempt, load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import PricingSection from './PricingSection.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -104,6 +105,8 @@
     <p class="desc">{t('costsPage.perProvider')}</p>
   </section>
 {/if}
+
+<PricingSection />
 
 <style>
   .card {

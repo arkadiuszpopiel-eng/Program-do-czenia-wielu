@@ -16,7 +16,7 @@ Stan: **szkice** z 30.09.2026. Wartości, których plan nie potwierdza, mają `"
 | `capabilities` | tabela | `vision`, `tools`, `streaming`, `long_context` — `true`/`false`/`"unknown"` |
 | `privacy_tag` | string | tag z rejestru zgodności (`google-personal-may-train`, `google-paid-eea-no-train`, `xai-retention-30d`, `cn-may-train`, `sg`, `eu`, `unknown`) |
 | `jurisdiction` | string | kod (`CN`, `SG`, `EU`, `US`…) lub `"unknown"` |
-| `[pricing]` | tabela | **pusta w katalogu** — cennik uzupełniany w konfiguracji użytkownika (`%APPDATA%\Alfa\config`), nie w kodzie; Router liczy koszt z konfiguracji (§5.5) |
+| `[pricing]` | tabela | **pusta w katalogu** — ceny są w osobnym pliku `ceny/cennik.toml` (podkatalog; USD/1M tokenów, źródło i data każdej ceny), nakładanym przez plik użytkownika `%APPDATA%\Alfa\config\cennik.toml` (Ustawienia → Koszty i limity → Cennik modeli); cennik konta wygrywa z oboma |
 | `terms_url` | string | link do regulaminu lub `"TODO"` |
 | `compliance_status` | `green` / `gray` / `forbidden` / `unverified` | status API-dostawcy (nie mostu CLI; mosty są w rejestrze zgodności) |
 | `notes` | string | uwagi, w tym oznaczenia [V]/[W]/[?] |
@@ -32,3 +32,10 @@ Zasady:
 anthropic, openai, azure-openai, google, xai, deepseek, kimi, qwen, zai, minimax, openrouter, mistral, elevenlabs, cartesia, azure-speech, soniox, custom-openai-compatible, custom-anthropic-compatible.
 
 Konta firmowe (C2.12): konto `openai` może mieć identyfikator organizacji i projektu (nagłówki `OpenAI-Organization`, `OpenAI-Project`), a konto `azure-openai` — adres zasobu, wersję API i wdrożenia modeli. To ustawienia konta (`Account.enterprise`), nie katalogu.
+
+## Cennik (`ceny/cennik.toml`)
+
+Ceny modeli przez API sprawdzone na oficjalnych stronach dostawców (pole `source`), stan z pola `checked`. Wczytywany
+przy budowie (`providers_api_impl::PriceBook`); aktualizacje zatwierdza właściciel w Ustawieniach (podgląd zmian, potem
+„Zastosuj”) — tekst przygotowuje obowiązek „Kontrola cenników”. Przy zmianie cen w repozytorium: nowa data `checked`,
+źródło każdej pozycji, test `price_book::builtin_book_parses_and_covers_owner_models`.

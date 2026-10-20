@@ -3,6 +3,30 @@ import type { Message } from './core';
 import type { plSettings } from './pl-settings';
 
 export const enSettings: Record<keyof typeof plSettings, Message> = {
+  'pricing.title': 'Model prices',
+  'pricing.table': 'Price table',
+  'pricing.desc':
+    'Every reply is costed from these prices (USD per 1M tokens, converted to PLN at the NBP rate). A model without a price shows an “unknown” cost, not 0.',
+  'pricing.checked': 'Prices checked {date} · {n} models',
+  'pricing.provider': 'Provider',
+  'pricing.allProviders': 'All',
+  'pricing.model': 'Model',
+  'pricing.price': 'Input / output',
+  'pricing.inOut': '{input} / {output}',
+  'pricing.cache': 'Cache read',
+  'pricing.source': 'Source',
+  'pricing.yours': 'updated',
+  'pricing.update': 'Update prices',
+  'pricing.paste': 'Paste a price update ([[price]] blocks)',
+  'pricing.pasteHint':
+    'The “Price check” duty (Background tasks) prepares the text. Check the changes first — nothing is saved until “Apply”.',
+  'pricing.check': 'Check changes',
+  'pricing.apply': 'Apply',
+  'pricing.cancel': 'Cancel',
+  'pricing.noChanges': 'No changes — prices are current.',
+  'pricing.changes': 'Changes ({n}):',
+  'pricing.new': 'new model:',
+  'pricing.saved': 'Prices saved — changed prices: {n}.',
   'settings.title': 'Settings',
   'settings.back': 'Back to conversation',
   'settings.search': 'Search settings',

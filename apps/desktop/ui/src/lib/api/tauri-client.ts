@@ -80,6 +80,8 @@ export class TauriAlfaClient implements AlfaClient {
   readonly costs: AlfaClient['costs'] = {
     summary: (sessionId) => call('costs_summary', { sessionId }),
     setMonthlyLimit: (enabled, monthly) => call('costs_set_monthly_limit', { enabled, monthly }),
+    pricing: () => call('pricing_get'),
+    applyPricing: (text, save) => call('pricing_apply', { text, save }),
   };
 
   readonly settings: AlfaClient['settings'] = {

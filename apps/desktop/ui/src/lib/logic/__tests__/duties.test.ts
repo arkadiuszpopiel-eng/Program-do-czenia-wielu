@@ -7,10 +7,21 @@ describe('gotowe obowiązki codzienne', () => {
   it('wzory są pokazywane, a każde polecenie odwołuje się do danych z programu', () => {
     // Rdzeń dokleja arkusz faktów do zadania w tle; polecenie bez odwołania do niego zachęca do zmyślania.
     expect(DUTIES_ENABLED).toBe(true);
-    for (const duty of DUTY_TEMPLATES) {
+    // „Kontrola cenników” czyta strony dostawców (narzędzia sieci), nie arkusz faktów — jej polecenie
+    // zabrania zgadywania i zapisu plików, a wynik zatwierdza właściciel w Ustawieniach.
+    for (const duty of DUTY_TEMPLATES.filter((d) => d.id !== 'prices')) {
       expect(String(pl[duty.goal]), duty.id).toMatch(/dan(ych|e) z programu/);
       expect(String(en[duty.goal]), duty.id).toMatch(/program data/);
     }
+  });
+
+  it('kontrola cenników: tylko ceny ze stron, bez zgadywania i zapisu, wynik do zatwierdzenia', () => {
+    const goal = String(pl['duty.prices.goal']);
+    expect(goal).toMatch(/niczego nie zgaduj/);
+    expect(goal).toMatch(/Nie zapisuj ani nie zmieniaj żadnych plików/);
+    expect(goal).toMatch(/\[\[price\]\]/);
+    expect(goal).toMatch(/https:\/\/developers\.openai\.com/);
+    expect(String(en['duty.prices.goal'])).toMatch(/do not guess/);
   });
 
   it('każdy szablon ma harmonogram, agentkę i teksty w obu językach', () => {

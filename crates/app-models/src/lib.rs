@@ -8,7 +8,6 @@
 //!   (pozycje bez przypiętego hasha), weryfikacja, usuwanie;
 //! - [`embed`] — embedder wyszukiwania (`[search.embedder] model`) i przebudowa wektorów;
 //! - [`bundles`] — pakiety 1–6 (komplety pozycji dobrane do sprzętu) i naprawa pojedynczej pozycji.
-//!
 //! Bez sekretów w plikach i bez telemetrii (stały `User-Agent`, bez ciasteczek).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
@@ -27,6 +26,7 @@ pub mod fetch;
 pub mod install;
 mod jobs;
 pub mod licenses;
+pub mod pricing;
 pub mod qwen_asr;
 pub mod store;
 pub mod supertonic;

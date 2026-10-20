@@ -55,6 +55,8 @@
     "allow-agents-open-terminal",
     "allow-costs-summary",
     "allow-costs-set-monthly-limit",
+    "allow-pricing-get",
+    "allow-pricing-apply",
     "allow-settings-schema",
     "allow-settings-values",
     "allow-settings-set",

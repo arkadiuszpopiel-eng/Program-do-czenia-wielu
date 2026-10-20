@@ -31,6 +31,7 @@ mod models;
 mod modules;
 mod panels;
 mod plugins;
+mod pricing;
 mod quick;
 mod routes;
 mod sessions;
@@ -50,6 +51,7 @@ pub use agents::{
     VoiceStatus, WorkdirChoice,
 };
 pub use board::BoardItem;
+pub use pricing::{PriceChangeRow, PriceRow, PricingView};
 pub use bridges::{BridgeAccount, BridgeAccountState, BridgeCard, BridgeLogin, BridgeSource};
 pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView};
 pub use cameras::{

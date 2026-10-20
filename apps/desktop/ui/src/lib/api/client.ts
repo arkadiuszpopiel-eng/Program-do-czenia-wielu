@@ -11,6 +11,7 @@ import type {
   AutonomyLevel,
   CastTemplateId,
   CostSummary,
+  PricingView,
   Money,
   RememberScope,
   SendOptions,
@@ -173,6 +174,10 @@ export interface CostsApi {
   summary(sessionId: string | null): Promise<CostSummary>;
   /** Limit miesięczny w PLN — z możliwością całkowitego wyłączenia (PLAN §14.6). */
   setMonthlyLimit(enabled: boolean, monthly: Money): Promise<void>;
+  /** Cennik modeli (wbudowany + zatwierdzone aktualizacje). */
+  pricing(): Promise<PricingView>;
+  /** Aktualizacja cennika z tekstu TOML: `save = false` — podgląd zmian, `true` — zapis. */
+  applyPricing(text: string, save: boolean): Promise<PricingView>;
 }
 
 export interface SettingsApi {

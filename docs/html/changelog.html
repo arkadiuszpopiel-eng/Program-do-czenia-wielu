@@ -343,6 +343,15 @@ Teraz jest odczytywane z samego kliknięcia albo klawisza; odznaka ryzyka nie uc
 <li>[poważne] Poziom podniesiony za zgodą w oknie Brokera (np. L4) wracał po kilku sekundach do wcześniej
 zapamiętanego obniżenia (L2). Teraz zatwierdzone podniesienie staje się nowym zapamiętanym poziomem.</li>
 <li>Krzyżyk i Alt+F4 w oknie zatwierdzeń zamykają je (odmowa) — tak jak przycisk „Odmów” i Esc.</li>
+<li>[poważne] Koszty odpowiedzi pokazywały zawsze 0,00 zł: żaden model nie miał ceny. Alfa ma teraz cennik 89 modeli 11
+dostawców (OpenAI, Anthropic, OpenRouter, Google, xAI, DeepSeek, Mistral, Kimi, Qwen, Z.ai, MiniMax), sprawdzony
+20.10 na ich oficjalnych stronach, z datą i źródłem każdej ceny — Ustawienia → Koszty i limity → Cennik modeli.</li>
+<li>Model bez ceny pokazuje „koszt nieznany”, a bardzo tania odpowiedź „&lt; 0,01 zł” — zamiast mylącego „0,00 zł”.</li>
+<li>Nowy obowiązek „Kontrola cenników” (Delta, raz w miesiącu): sprawdza ceny na stronach dostawców i przygotowuje
+aktualizację; w Ustawieniach wklejasz ją, widzisz zmiany i zatwierdzasz „Zastosuj” — agentka sama cennika nie
+zmienia.</li>
+<li>Zadania w tle bez wybranego katalogu roboczego dostają domyślny katalog rozmowy (narzędzia, np. sieć dla kontroli
+cenników; „porządki” widzą pusty katalog zamiast zmyślać pliki).</li>
 <li>[poważne] Agentki z narzędziami (np. Delta) odpowiadały „bez narzędzi”, dopóki nie wybrałeś katalogu roboczego
 rozmowy. Teraz bez wyboru używają domyślnego katalogu rozmowy; „Bez katalogu” w oknie rozmowy nadal je wyłącza.</li>
 <li>Alfa jako Dyrygentka nie mówi już, że nikt nie ma dostępu do komputera — wie, która agentka obsady (Delta)

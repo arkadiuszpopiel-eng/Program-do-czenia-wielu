@@ -131,6 +131,8 @@ export interface TurnUsage {
   readonly input_tokens: number;
   readonly output_tokens: number;
   readonly cost: Money;
+  /** Koszt dokładny (mikro-PLN); `null` — model bez ceny w cenniku (koszt nieznany). */
+  readonly cost_micro_pln: number | null;
   readonly latency_ms: number;
   readonly provider: string;
   readonly model: string;
@@ -237,6 +239,33 @@ export interface CostSummary {
     readonly compacted: boolean;
   };
   readonly fx: { readonly usd_pln: number; readonly date: string; readonly stale: boolean };
+}
+
+/** Cena modelu (USD za 1 mln tokenów) — Ustawienia → Koszty → Cennik modeli. */
+export interface PriceRow {
+  readonly provider: string;
+  readonly model: string;
+  readonly input: number;
+  readonly output: number;
+  readonly cache_read: number | null;
+  readonly cache_write: number | null;
+  readonly source: string;
+  readonly note: string | null;
+  /** Cena z pliku użytkownika (zatwierdzona aktualizacja), nie z wydania. */
+  readonly user: boolean;
+}
+
+export interface PriceChangeRow {
+  readonly after: PriceRow;
+  readonly before: PriceRow | null;
+}
+
+export interface PricingView {
+  readonly checked: string;
+  readonly file: string;
+  readonly rows: readonly PriceRow[];
+  readonly changes: readonly PriceChangeRow[];
+  readonly saved: boolean;
 }
 
 // ── Oś czasu ────────────────────────────────────────────────────────────────────────────────────

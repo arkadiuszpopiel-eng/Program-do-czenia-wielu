@@ -54,6 +54,8 @@ macro_rules! with_commands {
             agents_open_terminal(step_id: String) -> ();
             costs_summary(session_id: Option<String>) -> $crate::dto::CostSummary;
             costs_set_monthly_limit(enabled: bool, monthly: $crate::dto::Money) -> ();
+            pricing_get() -> $crate::dto::PricingView;
+            pricing_apply(text: String, save: bool) -> $crate::dto::PricingView;
             settings_schema() -> Vec<$crate::dto::SettingsPageDef>;
             settings_values() -> std::collections::BTreeMap<String, $crate::dto::SettingValue>;
             settings_set(key: String, value: $crate::dto::SettingValue) -> ();
@@ -305,6 +307,6 @@ mod tests {
         for c in super::CHANNEL_COMMANDS {
             assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
         }
-        assert_eq!(super::COMMANDS.len(), 272);
+        assert_eq!(super::COMMANDS.len(), 274);
     }
 }

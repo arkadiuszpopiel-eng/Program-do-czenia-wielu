@@ -121,12 +121,14 @@ impl RouterBrain {
         catalog: Arc<BTreeMap<String, CatalogEntry>>,
         shared_queues: std::path::PathBuf,
         routing: std::path::PathBuf,
+        prices: std::path::PathBuf,
     ) -> Self {
         let accounts = AccountRoutes::new(
             hub,
             catalog,
             vec![routers.hybrid.clone(), routers.cloud.clone()],
             shared_queues,
+            prices,
         );
         Self {
             routers,

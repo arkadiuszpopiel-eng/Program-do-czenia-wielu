@@ -21,6 +21,7 @@ mod model_routing;
 mod models;
 mod modules;
 mod permissions;
+pub(crate) mod pricing;
 mod queue;
 mod quick;
 mod sessions;

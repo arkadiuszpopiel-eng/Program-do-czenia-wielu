@@ -30,6 +30,7 @@ providers-contract = { path = "../providers-contract", features = ["contract-tes
 providers-fake = { path = "../providers-fake" }
 core-bus-fake = { path = "../core-bus-fake" }
 tokio = { workspace = true, features = ["net", "io-util", "rt-multi-thread", "macros", "time"] }
+tempfile = "3.27.0"
 
 [lints]
 workspace = true

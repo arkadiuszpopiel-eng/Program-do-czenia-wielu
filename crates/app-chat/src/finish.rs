@@ -100,16 +100,17 @@ impl ChatEngine {
             background: false,
         };
         let micro_pln = match self.inner.costs.record(input).await {
-            Ok(record) => record.micro_pln.unwrap_or(0),
+            Ok(record) => record.micro_pln,
             Err(e) => {
                 tracing::warn!(error = %e, "zapis kosztu nie powiódł się");
-                0
+                None
             }
         };
         Some(TurnUsage {
             input_tokens: usage.input_tokens,
             output_tokens: usage.output_tokens,
-            cost: Money::from_micro_pln(micro_pln),
+            cost: Money::from_micro_pln(micro_pln.unwrap_or(0)),
+            cost_micro_pln: micro_pln,
             latency_ms: outcome.latency_ms,
             provider: chosen.provider_name.clone(),
             model: chosen.model.clone(),

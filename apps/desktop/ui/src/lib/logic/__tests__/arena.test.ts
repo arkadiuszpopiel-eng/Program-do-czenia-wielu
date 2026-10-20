@@ -28,6 +28,7 @@ const usage = (latency: number, cost: number, name = 'claude-opus-5-5') => ({
   input_tokens: 1200,
   output_tokens: 80,
   cost: { minor: cost, currency: 'PLN' as const },
+  cost_micro_pln: cost * 10_000,
   latency_ms: latency,
   provider: 'Anthropic',
   model: name,

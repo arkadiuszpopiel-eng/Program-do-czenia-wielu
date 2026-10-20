@@ -123,6 +123,7 @@ export class FakeStreamer {
           input_tokens: 1200 + turn.text.length,
           output_tokens: out,
           cost: { minor: Math.max(1, Math.round(out / 20)), currency: 'PLN' },
+          cost_micro_pln: Math.max(1, Math.round(out / 20)) * 10_000,
           latency_ms: scheduler.now() - started,
           provider: script.model?.provider ?? 'Anthropic',
           model: script.model?.model ?? 'claude-opus-5-5',

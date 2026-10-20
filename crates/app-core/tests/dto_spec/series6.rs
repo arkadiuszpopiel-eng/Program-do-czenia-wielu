@@ -1,6 +1,7 @@
 //! Specyfikacje komend serii 6 dla `dto_roundtrip.rs`: Arena (`turns_arena_answer`,
 //! `turns_select_branch`), karty rozmów (`sessions_cards`), ustawienia dla firm
-//! (`accounts_set_enterprise`), „Naucz Alfę” (`memory_teach*`) i kanwa (`canvas_render`).
+//! (`accounts_set_enterprise`), „Naucz Alfę” (`memory_teach*`), kanwa (`canvas_render`) i cennik
+//! modeli (`pricing_*`, 0.0.66).
 
 use app_core::dto::*;
 
@@ -37,6 +38,11 @@ pub fn spec(command: &str) -> Option<Spec> {
                 ("lang", s),
             ],
             s,
+        ),
+        "pricing_get" => (vec![], roundtrip::<PricingView>),
+        "pricing_apply" => (
+            vec![("text", s), ("save", roundtrip::<bool>)],
+            roundtrip::<PricingView>,
         ),
         _ => return None,
     })

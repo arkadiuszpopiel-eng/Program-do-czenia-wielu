@@ -38,6 +38,7 @@ mod catalog;
 mod module;
 mod observe;
 pub mod openai;
+mod price_book;
 mod registry;
 
 /// Parser SSE (wspólny, `lib-openai-compat`).
@@ -55,3 +56,4 @@ pub use lib_openai_compat::{
 pub use module::{MODULE_TOML, ProvidersApiModule};
 pub use observe::ObservedProvider;
 pub use openai::{MaxTokensField, OpenAiApi, OpenAiOptions, OpenAiProvider, openrouter_key_note};
+pub use price_book::{BUILTIN_PRICES, PriceBook, PriceChange, PriceEntry, PriceFile};

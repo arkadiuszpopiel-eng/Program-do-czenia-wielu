@@ -83,11 +83,11 @@ const usage = (inTok: number, outTok: number, minor: number, ms: number) => ({
   input_tokens: inTok,
   output_tokens: outTok,
   cost: pln(minor),
+  cost_micro_pln: minor * 10_000,
   latency_ms: ms,
   provider: 'Anthropic',
   model: 'claude-opus-5-5',
 });
-
 export function seedSessions(now: number): SessionSummary[] {
   const projectX = { id: 'p-x', name: 'Projekt X' };
   const shop = { id: 'p-shop', name: 'Sklep' };

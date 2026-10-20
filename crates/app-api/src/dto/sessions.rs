@@ -197,6 +197,11 @@ pub struct TurnUsage {
     pub input_tokens: u64,
     pub output_tokens: u64,
     pub cost: Money,
+    /// Koszt dokładny (mikro-PLN): tania tura kosztuje ułamek grosza, a `cost` jest w groszach
+    /// (0) — interfejs pokazuje wtedy „< 0,01 zł”. `None` — brak ceny modelu w cenniku: koszt
+    /// nieznany (interfejs nie udaje „0,00 zł”).
+    #[serde(default)]
+    pub cost_micro_pln: Option<u64>,
     pub latency_ms: u64,
     pub provider: String,
     pub model: String,

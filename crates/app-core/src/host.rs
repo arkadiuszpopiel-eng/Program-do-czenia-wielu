@@ -71,8 +71,18 @@ impl TaskHost for CoreHost {
         ids::session(&created.id).map_err(|e| e.message)
     }
 
+    /// Katalog roboczy zadania; nigdy niewybrany — katalog sesji (jak w rozmowie: bez niego zadanie
+    /// w tle nie ma narzędzi, np. sieci dla „Kontroli cenników”). Jawne „bez katalogu” — `None`.
     fn workdir(&self, session: &SessionId) -> Option<String> {
-        self.core()?.inner.store.workdir(session).ok().flatten()
+        let core = self.core()?;
+        match core.inner.store.workdir_choice(session).ok()? {
+            Some(choice) => choice,
+            None => {
+                let dir = core.inner.sessions.session(session).ok()?.workdir;
+                std::fs::create_dir_all(&dir).ok()?;
+                Some(dir.to_string_lossy().into_owned())
+            }
+        }
     }
 
     fn privacy(&self, session: &SessionId) -> PrivacyTag {
