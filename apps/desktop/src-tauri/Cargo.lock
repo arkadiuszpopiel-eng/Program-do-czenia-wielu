@@ -5543,6 +5543,7 @@ name = "platform-windows-kernel-impl"
 version = "0.0.66"
 dependencies = [
  "platform-contract",
+ "tracing",
  "windows",
 ]
 
