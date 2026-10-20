@@ -8,12 +8,15 @@
   import ThumbsUp from '@lucide/svelte/icons/thumbs-up';
   import ThumbsDown from '@lucide/svelte/icons/thumbs-down';
   import Ellipsis from '@lucide/svelte/icons/ellipsis';
+  import PanelRightOpen from '@lucide/svelte/icons/panel-right-open';
   import type { RememberScope, Turn } from '../../api/types';
   import { attempt } from '../../state/attempt';
   import { TEMPLATE_COUNT_MAX, TEMPLATE_TEXT_MAX, templateNameFrom } from '../../logic/templates';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { exportConversation } from '../../state/exports';
+  import { documentArtifact } from '../../logic/canvas';
+  import { openCanvas } from '../../state/canvas.svelte';
 
   interface Props {
     turn: Turn;
@@ -28,6 +31,8 @@
   const { t } = app.i18n;
   const isUser = $derived(turn.author === 'user');
   const done = $derived(turn.status !== 'streaming');
+  // Długa odpowiedź z nagłówkami → „Otwórz odpowiedź w kanwie” (C2.8).
+  const doc = $derived(isUser ? null : documentArtifact(turn));
 
   async function copy(plain: boolean) {
     const text = plain ? (bodyEl?.innerText ?? turn.text) : turn.text;
@@ -209,6 +214,11 @@
       onclick={() => run(() => conv.rate(turn, 'down'))}
     >
       <ThumbsDown size={14} strokeWidth={1.5} />
+    </IconButton>
+  {/if}
+  {#if doc}
+    <IconButton label={t('canvas.openDoc')} size="sm" onclick={() => openCanvas(doc)}>
+      <PanelRightOpen size={14} strokeWidth={1.5} />
     </IconButton>
   {/if}
   <Menu items={more} label={t('msg.more')}>

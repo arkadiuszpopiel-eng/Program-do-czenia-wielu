@@ -343,6 +343,7 @@ export class TauriAlfaClient implements AlfaClient {
   readonly conversation: AlfaClient['conversation'] = {
     exportConversation: (sessionId, format, turnId) =>
       call('sessions_export_conversation', { sessionId, format, turnId }),
+    renderArtifact: (kind, source) => call('canvas_render', { kind, source }),
   };
 
   readonly backups: AlfaClient['backups'] = {

@@ -1,11 +1,17 @@
-<!-- Blok kodu z paska akcji: kopiuj, zapisz jako plik, uruchom w terminalu (przez Brokera), zawijanie. -->
+<!--
+  Blok kodu z paska akcji: kopiuj, zapisz jako plik, uruchom w terminalu (przez Brokera), zawijanie;
+  dla HTML, SVG i Markdown — „Otwórz w kanwie” (C2.8).
+-->
 <script lang="ts">
   import { IconButton, SanitizedHtml } from '@alfa/ui-kit';
   import Copy from '@lucide/svelte/icons/copy';
   import Download from '@lucide/svelte/icons/download';
+  import PanelRightOpen from '@lucide/svelte/icons/panel-right-open';
   import SquareTerminal from '@lucide/svelte/icons/square-terminal';
   import WrapText from '@lucide/svelte/icons/wrap-text';
   import type { RenderedBlock } from '../../api/types';
+  import { blockArtifact } from '../../logic/canvas';
+  import { openCanvas } from '../../state/canvas.svelte';
   import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
 
@@ -21,6 +27,8 @@
   const { t } = app.i18n;
   let wrap = $state(false);
   let host = $state<HTMLElement | null>(null);
+  // Artefakt dopiero po końcu strumienia (pełne źródło); zwykły kod — bez akcji kanwy.
+  const artifact = $derived(settled ? blockArtifact(turnId, block) : null);
 
   $effect(() => {
     if (!settled || !block.closed || !host) return;
@@ -53,6 +61,11 @@
   <figcaption class="bar">
     <span class="lang">{block.lang ?? 'text'}</span>
     <span class="tools">
+      {#if artifact}
+        <IconButton label={t('canvas.open')} size="sm" onclick={() => openCanvas(artifact)}>
+          <PanelRightOpen size={14} strokeWidth={1.5} />
+        </IconButton>
+      {/if}
       <IconButton label={t('msg.codeWrap')} size="sm" pressed={wrap} onclick={() => (wrap = !wrap)}>
         <WrapText size={14} strokeWidth={1.5} />
       </IconButton>

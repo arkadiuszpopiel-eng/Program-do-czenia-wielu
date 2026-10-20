@@ -7,6 +7,7 @@ import type {
   BackupCheck,
   BackupConfig,
   BackupView,
+  CanvasKind,
   ConversationFormat,
   DroppedFileHint,
 } from './types-files';
@@ -43,6 +44,11 @@ export interface ConversationExportApi {
     format: ConversationFormat,
     turnId: string | null,
   ): Promise<ExportResult>;
+  /**
+   * Kanwa (C2.8, ADR 0009): HTML podglądu z rdzenia — Markdown jak w wiadomościach (zwykły DOM),
+   * HTML/SVG jako dokument po sanitizacji wyłącznie dla izolowanej ramki. Ponad limit — błąd.
+   */
+  renderArtifact(kind: CanvasKind, source: string): Promise<string>;
 }
 
 /** Kopie zapasowe `.alfa` z harmonogramem i rotacją (sekrety nigdy w paczce). */

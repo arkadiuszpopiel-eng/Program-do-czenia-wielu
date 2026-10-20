@@ -6,7 +6,8 @@
 //!   historii dla modelu (obraz base64, tekst jako treść niezaufana),
 //! - [`export`] — eksport rozmowy (aktywna gałąź albo jedna wiadomość) do Markdown / HTML,
 //! - [`backup`] — kopie zapasowe `.alfa` z harmonogramem, rotacją i testem przywracania,
-//! - [`docs`] — artefakty sesji jako kategoria paczek `.alfa`.
+//! - [`docs`] — artefakty sesji jako kategoria paczek `.alfa`,
+//! - [`canvas`] — podgląd artefaktu w kanwie obok rozmowy (C2.8, ADR 0009).
 //!
 //! [`FilesApp`] spina je dla komend `attachments_*`, `sessions_export_conversation`, `backups_*`.
 
@@ -14,6 +15,7 @@
 
 pub mod attach;
 pub mod backup;
+pub mod canvas;
 pub mod docs;
 pub mod export;
 

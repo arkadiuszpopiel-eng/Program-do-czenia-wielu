@@ -89,6 +89,15 @@ pub enum ConversationFormat {
     Json,
 }
 
+/// Rodzaj artefaktu w kanwie (C2.8): Markdown jako zwykły DOM, HTML i SVG w izolowanej ramce.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum CanvasKind {
+    Markdown,
+    Html,
+    Svg,
+}
+
 /// Ustawienia kopii zapasowych (per maszyna, `%LOCALAPPDATA%\Alfa\state\backup.json`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct BackupConfig {

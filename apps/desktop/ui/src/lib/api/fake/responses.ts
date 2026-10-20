@@ -1,6 +1,7 @@
 // Skrypty odpowiedzi atrapy — deterministyczne (zależne tylko od treści i numeru wariantu).
 import type { AgentId } from '@alfa/ui-kit';
 import type { ApprovalPending, ToolIcon } from '../types';
+import { CANVAS_ARTIFACTS_REPLY, CANVAS_DOCUMENT_REPLY } from './canvas-replies';
 
 export interface ScriptTool {
   readonly icon: ToolIcon;
@@ -43,6 +44,11 @@ export function pickResponse(
   variant: number,
 ): ResponseScript {
   const v = variant % 2;
+  if (has(input, 'kanw')) {
+    const doc = has(input, 'dokument');
+    const text = doc ? CANVAS_DOCUMENT_REPLY : CANVAS_ARTIFACTS_REPLY;
+    return base(addressed ?? 'gama', doc ? 'researcher' : 'coder', text);
+  }
   if (has(input, 'kod', 'code', 'funkcj', 'skrypt')) {
     return {
       ...base(

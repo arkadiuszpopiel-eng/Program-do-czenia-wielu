@@ -67,7 +67,7 @@ pub use events::{AlfaEvent, EventFrame, EventsResume, StopReason, ToastKind};
 pub use files::{
     AttachmentDelivery, AttachmentInfo, AttachmentKind, AttachmentRejectReason,
     AttachmentRejection, AttachmentsAdded, BackupCheck, BackupConfig, BackupEntry, BackupView,
-    ConversationFormat, TurnAttachment,
+    CanvasKind, ConversationFormat, TurnAttachment,
 };
 pub use gpu_live::{GpuLive, GpuLiveCard, GpuLiveProcess};
 pub use gui::{

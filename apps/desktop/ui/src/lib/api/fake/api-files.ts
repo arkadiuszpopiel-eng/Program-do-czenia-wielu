@@ -18,6 +18,7 @@ import type {
 } from '../types-files';
 import type { FakeCore } from './core';
 import { RESTORE_HANDLE_TTL_MS, issueHandle } from './transfer-handles';
+import { fakeCanvasRender } from './canvas';
 
 const MB = 1024 * 1024;
 export const ATTACHMENT_LIMITS = {
@@ -202,6 +203,13 @@ export class FakeFiles {
           bytes: turns.reduce((sum, t) => sum + t.text.length, format === 'html' ? 1_400 : 80),
         };
         return core.reply(result);
+      },
+      renderArtifact: (kind, source) => {
+        try {
+          return this.core.reply(fakeCanvasRender(kind, source));
+        } catch (error) {
+          return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+        }
       },
     };
   }

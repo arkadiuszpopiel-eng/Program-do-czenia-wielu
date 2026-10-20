@@ -12,6 +12,7 @@ import { copyConversation, exportConversation } from './exports';
 import { openTemplates } from './template-dialog.svelte';
 import { openBoard } from './board-dialog.svelte';
 import { openStats } from './stats-dialog.svelte';
+import { canvas, closeCanvas } from './canvas.svelte';
 
 const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
   'panel.agents': 'agents',
@@ -242,6 +243,11 @@ export function escapeChain(app: AppState): boolean {
   }
   if (app.view === 'settings') {
     app.closeSettings();
+    return true;
+  }
+  // Kanwa artefaktów (C2.8): Esc także spoza kanwy (np. z pola pisania) zamyka ją przed panelami.
+  if (canvas.item) {
+    closeCanvas();
     return true;
   }
   const sid = app.activeId;

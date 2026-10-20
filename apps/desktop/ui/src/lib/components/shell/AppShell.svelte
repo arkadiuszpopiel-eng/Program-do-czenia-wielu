@@ -13,6 +13,7 @@
   import { templateDialog } from '../../state/template-dialog.svelte';
   import { boardDialog } from '../../state/board-dialog.svelte';
   import { statsDialog } from '../../state/stats-dialog.svelte';
+  import { canvas, closeCanvas } from '../../state/canvas.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -42,6 +43,10 @@
   const loadBoard = () => import('../overlays/BoardDialog.svelte');
   const loadStats = () => import('../overlays/SessionStatsDialog.svelte');
   const loadSettings = () => import('../../views/settings/SettingsView.svelte');
+  const loadCanvas = () => import('../canvas/ArtifactCanvas.svelte');
+  // Kanwa (C2.8): obok rozmowy na szerokim i średnim oknie, w wąskim — arkusz nad treścią.
+  const canvasOpen = $derived(canvas.item !== null && !inSettings);
+  const canvasDocked = $derived(app.layout.mode === 'wide' || app.layout.mode === 'medium');
   let paletteReady = $state(false);
   let cheatsheetReady = $state(false);
 
@@ -92,6 +97,11 @@
         <ConversationView />
       {/if}
     </main>
+    {#if canvasOpen && canvasDocked}
+      <aside class="canvas-dock" aria-label={t('canvas.title')}>
+        <Lazy load={loadCanvas} props={{}} label={t('canvas.loading')} />
+      </aside>
+    {/if}
     {#if right === 'docked'}
       <aside class="right" style:width="{rightWidth}px">
         <ResizeHandle
@@ -132,6 +142,20 @@
       use:focusTrap
     >
       <RightPanel />
+    </div>
+  {/if}
+
+  {#if canvasOpen && !canvasDocked}
+    <button type="button" class="scrim" tabindex="-1" aria-hidden="true" onclick={closeCanvas}
+    ></button>
+    <div
+      class="drawer from-right canvas-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('canvas.title')}
+      use:focusTrap
+    >
+      <Lazy load={loadCanvas} props={{}} label={t('canvas.loading')} />
     </div>
   {/if}
 
@@ -193,6 +217,16 @@
     flex: 1;
     min-width: 0;
     min-height: 0;
+  }
+  .canvas-dock {
+    flex: none;
+    width: clamp(320px, 40%, 760px);
+    min-height: 0;
+    border-left: 1px solid var(--alfa-color-border);
+  }
+  .drawer.canvas-sheet {
+    width: min(720px, 100%);
+    max-width: 100%;
   }
   .scrim {
     position: fixed;
