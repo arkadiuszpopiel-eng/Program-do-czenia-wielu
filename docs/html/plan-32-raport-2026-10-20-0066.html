@@ -386,8 +386,9 @@ bo mały model ignoruje polecenie „napisz to i zakończ”.</li>
 <tr><td>L4 po zgodzie wracało do L2 po 9 s</td><td>strażnik autonomii przywracał zapamiętane obniżenie</td><td>oczekujące podniesienie (15 min) przyjmowane, gdy Broker zgłosi ten poziom; test <code>raise_approved_in_broker_window_is_kept</code></td></tr></tbody></table></div>
 <p>Sprawdzone: zgoda właściciela fizycznym kliknięciem przeszła (<code>broker_ui.decided: Allow</code>, 16:08:19). Testy Jądra 107/0,
 app-core 125/0, prawdziwa aplikacja 48/48. Wgrane 18:26.</p>
-<p>Nie zrobione (narzędzie Claude Code zablokowało zmiany w logice zabezpieczeń): krzyżyk okna (<code>WM_CLOSE</code>) korzysta
-jeszcze ze starej próbki — zamykanie przez „Odmów”/Esc; odmowa bez dowodu fizycznego — decyzja właściciela.
+<p>Krzyżyk i Alt+F4 (<code>WM_CLOSE</code>) — ta sama próbka co „Odmów” (<code>4beb9dcb</code>, po zmianie trybu uprawnień przez właściciela);
+wgrane 18:57. <code>deploy-owner.sh</code>: <code>Stop-Process</code> zamiast <code>taskkill /T</code> (przekraczał czas). Odmowa bez dowodu
+fizycznego — decyzja właściciela.
 Podniesienia poziomu po restarcie Alfy nie wracają same (z założenia — wymagają zgody w oknie).</p>
 </article>
 <footer>Źródło: <code>docs/plan/32-raport-2026-10-20-0066.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>

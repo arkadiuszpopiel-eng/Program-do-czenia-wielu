@@ -27,6 +27,7 @@ ręcznego wyboru katalogu, Alfa wie, kto działa na komputerze.
   Teraz jest odczytywane z samego kliknięcia albo klawisza; odznaka ryzyka nie ucina już liter („Ryzyko: wysokie”).
 - [poważne] Poziom podniesiony za zgodą w oknie Brokera (np. L4) wracał po kilku sekundach do wcześniej
   zapamiętanego obniżenia (L2). Teraz zatwierdzone podniesienie staje się nowym zapamiętanym poziomem.
+- Krzyżyk i Alt+F4 w oknie zatwierdzeń zamykają je (odmowa) — tak jak przycisk „Odmów” i Esc.
 - [poważne] Agentki z narzędziami (np. Delta) odpowiadały „bez narzędzi”, dopóki nie wybrałeś katalogu roboczego
   rozmowy. Teraz bez wyboru używają domyślnego katalogu rozmowy; „Bez katalogu” w oknie rozmowy nadal je wyłącza.
 - Alfa jako Dyrygentka nie mówi już, że nikt nie ma dostępu do komputera — wie, która agentka obsady (Delta)
