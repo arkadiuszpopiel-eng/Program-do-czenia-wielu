@@ -739,6 +739,7 @@ dependencies = [
  "memory-contract",
  "memory-impl",
  "model-residency-contract",
+ "providers-api-impl",
  "providers-local-impl",
  "reqwest 0.12.28",
  "search-contract",
