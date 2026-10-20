@@ -32,6 +32,7 @@ import { enBoard } from './en-board';
 import { enJson } from './en-json';
 import { enStats } from './en-stats';
 import { enArchive } from './en-archive';
+import { enCanvas } from './en-canvas';
 import type { MessageKey } from './pl';
 
 export const en: Record<MessageKey, Message> = {
@@ -66,4 +67,5 @@ export const en: Record<MessageKey, Message> = {
   ...enJson,
   ...enStats,
   ...enArchive,
+  ...enCanvas,
 };

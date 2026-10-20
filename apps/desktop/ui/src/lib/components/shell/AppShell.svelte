@@ -4,8 +4,17 @@
   i nakładki ładowane leniwie (paleta, ściągawka). Tryb skupienia chowa wszystko poza rozmową.
 -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { ResizeHandle } from '@alfa/ui-kit';
-  import { LEFT_MAX, LEFT_MIN, RIGHT_MAX, RIGHT_MIN, dockedRightWidth } from '../../logic/layout';
+  import { canvasDock } from '../../logic/canvas';
+  import {
+    LEFT_MAX,
+    LEFT_MIN,
+    LEFT_RAIL,
+    RIGHT_MAX,
+    RIGHT_MIN,
+    dockedRightWidth,
+  } from '../../logic/layout';
   import { useApp } from '../../state/context';
   import ConversationView from '../conversation/ConversationView.svelte';
   import { focusTrap } from './focus-trap';
@@ -13,6 +22,7 @@
   import { templateDialog } from '../../state/template-dialog.svelte';
   import { boardDialog } from '../../state/board-dialog.svelte';
   import { statsDialog } from '../../state/stats-dialog.svelte';
+  import { canvas, closeCanvas, syncCanvas } from '../../state/canvas.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -24,10 +34,35 @@
   const sid = $derived(app.activeId);
   const inSettings = $derived(app.view === 'settings');
   const place = $derived(app.layout.placement(sid));
-  const left = $derived(inSettings ? 'hidden' : place.left);
-  const right = $derived(inSettings ? 'hidden' : place.right);
+  const baseLeft = $derived(inSettings ? 'hidden' : place.left);
+  const baseRight = $derived(inSettings ? 'hidden' : place.right);
   const rightWidth = $derived(dockedRightWidth(app.layout.rightWidth, app.layout.mode));
-  const rail = $derived(left === 'rail' || (left === 'docked' && app.layout.leftCollapsed));
+  const baseRail = $derived(
+    baseLeft === 'rail' || (baseLeft === 'docked' && app.layout.leftCollapsed),
+  );
+  // Kanwa (C2.8): obok rozmowy na szerokim i średnim oknie — szerokość z miejsca po panelach,
+  // rozmowa zachowuje ≥ 480 px (lewy panel zwija się do paska, a w razie potrzeby prawy się
+  // chowa, dopóki kanwa jest otwarta); gdy się nie mieści albo okno jest wąskie — arkusz.
+  const canvasOpen = $derived(canvas.item !== null && !inSettings);
+  let bodyWidth = $state(0);
+  const dock = $derived.by(() => {
+    if (!canvasOpen || (app.layout.mode !== 'wide' && app.layout.mode !== 'medium')) return null;
+    const leftDock =
+      baseRail || baseLeft === 'docked'
+        ? { width: baseRail ? LEFT_RAIL : app.layout.leftWidth, rail: LEFT_RAIL }
+        : null;
+    const body = bodyWidth || window.innerWidth;
+    return canvasDock(body, leftDock, baseRight === 'docked' ? rightWidth : 0);
+  });
+  const canvasDocked = $derived(dock !== null);
+  // Arkusz kanwy jest jedynym oknem modalnym: szuflady paneli chowają się, dopóki jest otwarty.
+  const overlay = (p: string) => p === 'drawer' || p === 'sheet';
+  const sheetOpen = $derived(canvasOpen && !canvasDocked);
+  const left = $derived(sheetOpen && overlay(baseLeft) ? 'hidden' : baseLeft);
+  const right = $derived(
+    (sheetOpen && overlay(baseRight)) || dock?.hideRight ? 'hidden' : baseRight,
+  );
+  const rail = $derived(baseRail || (left === 'docked' && dock?.railLeft === true));
   // „Dopasowana”: kolumna rośnie z oknem — od wąskiej (72 znaki) do ok. 110 znaków, potem margines.
   const COLUMNS: Record<string, string> = {
     auto: 'clamp(var(--alfa-size-reading-column), 68%, 1000px)',
@@ -42,6 +77,7 @@
   const loadBoard = () => import('../overlays/BoardDialog.svelte');
   const loadStats = () => import('../overlays/SessionStatsDialog.svelte');
   const loadSettings = () => import('../../views/settings/SettingsView.svelte');
+  const loadCanvas = () => import('../canvas/ArtifactCanvas.svelte');
   let paletteReady = $state(false);
   let cheatsheetReady = $state(false);
 
@@ -53,6 +89,15 @@
   $effect(() => {
     if (app.palette.open) paletteReady = true;
     if (app.cheatsheetOpen) cheatsheetReady = true;
+  });
+
+  // Kanwa należy do sesji i tury, z której ją otwarto (zmiana sesji / ścieżki rozmowy ją zamyka).
+  $effect(() => {
+    const id = sid;
+    const conv = app.conversation;
+    const ids =
+      conv?.loaded && conv.sessionId === id ? new Set(conv.path.map((t) => t.id)) : null;
+    untrack(() => syncCanvas(id, ids ? (turnId) => ids.has(turnId) : null));
   });
 
   const closeLeft = () => app.layout.update(sid, { left_open: false });
@@ -69,7 +114,7 @@
   <div class="titlebar-wrap">
     <TitleBar />
   </div>
-  <div class="body">
+  <div class="body" bind:clientWidth={bodyWidth}>
     {#if rail}
       <SessionsRail />
     {:else if left === 'docked'}
@@ -92,6 +137,11 @@
         <ConversationView />
       {/if}
     </main>
+    {#if dock}
+      <aside class="canvas-dock" style:width="{dock.width}px" aria-label={t('canvas.title')}>
+        <Lazy load={loadCanvas} props={{}} label={t('canvas.loading')} />
+      </aside>
+    {/if}
     {#if right === 'docked'}
       <aside class="right" style:width="{rightWidth}px">
         <ResizeHandle
@@ -132,6 +182,21 @@
       use:focusTrap
     >
       <RightPanel />
+    </div>
+  {/if}
+
+  {#if sheetOpen}
+    <button type="button" class="scrim" tabindex="-1" aria-hidden="true" onclick={closeCanvas}
+    ></button>
+    <div
+      class="drawer from-right canvas-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('canvas.title')}
+      tabindex="-1"
+      use:focusTrap
+    >
+      <Lazy load={loadCanvas} props={{}} label={t('canvas.loading')} />
     </div>
   {/if}
 
@@ -193,6 +258,15 @@
     flex: 1;
     min-width: 0;
     min-height: 0;
+  }
+  .canvas-dock {
+    flex: none;
+    min-height: 0;
+    border-left: 1px solid var(--alfa-color-border);
+  }
+  .drawer.canvas-sheet {
+    width: min(720px, 100%);
+    max-width: 100%;
   }
   .scrim {
     position: fixed;

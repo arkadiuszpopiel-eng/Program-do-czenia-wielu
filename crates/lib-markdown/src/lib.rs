@@ -6,10 +6,12 @@
 //!
 //! - [`render`] / [`render_with`] / [`render_blocks`] — cały dokument,
 //! - [`IncrementalRenderer`] — strumień: zamknięte bloki (stabilne) + bieżący otwarty,
-//! - [`to_spoken_text`] — kanał mówiony (PLAN §6.7).
+//! - [`to_spoken_text`] — kanał mówiony (PLAN §6.7),
+//! - [`artifact_document`] — artefakt HTML/SVG jako dokument izolowanej ramki kanwy (C2.8).
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod artifact;
 mod blocks;
 mod sanitize;
 mod spoken;
@@ -18,6 +20,9 @@ mod writer;
 
 use serde::{Deserialize, Serialize};
 
+pub use artifact::{
+    ARTIFACT_MAX_BYTES, artifact_document, neutralize_css_fetches, sanitize_artifact,
+};
 pub use blocks::{Block, IncrementalRenderer, StreamUpdate, render_blocks};
 pub use sanitize::{ALLOWED_TAGS, LINK_REL};
 pub use spoken::{MAX_SPOKEN_INLINE_CODE, SPOKEN_CODE, SPOKEN_TABLE, to_spoken_text};

@@ -1,10 +1,15 @@
-<!-- Pliki / artefakty sesji (makieta 8): karta pliku, podgląd tekstu (zwykły tekst), akcje-intencje. -->
+<!--
+  Pliki / artefakty sesji (makieta 8): karta pliku, podgląd tekstu (zwykły tekst), akcje-intencje;
+  pliki HTML, SVG i Markdown z pełnym podglądem tekstu — „Otwórz w kanwie” (C2.8).
+-->
 <script lang="ts">
   import { Avatar, Button, EmptyState } from '@alfa/ui-kit';
   import FileText from '@lucide/svelte/icons/file-text';
   import FolderOpen from '@lucide/svelte/icons/folder-open';
   import type { ArtifactAction, ArtifactInfo, ArtifactPreview } from '../../api/types';
+  import { kindOfFile, type CanvasItem } from '../../logic/canvas';
   import { attempt, load } from '../../state/attempt';
+  import { openCanvas } from '../../state/canvas.svelte';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import Loading from '../shell/Loading.svelte';
@@ -66,6 +71,13 @@
   });
 
   const current = $derived(files.find((f) => f.id === selected) ?? null);
+  const canvasItem = $derived.by((): CanvasItem | null => {
+    if (!current || preview?.kind !== 'text' || preview.truncated) return null;
+    const kind = kindOfFile(current.name, current.mime);
+    if (!kind) return null;
+    const origin = { type: 'file', artifactId: current.id } as const;
+    return { key: `file:${current.id}`, kind, title: current.name, source: preview.text, origin };
+  });
   const ACTIONS: readonly {
     action: ArtifactAction;
     key: 'files.open' | 'files.reveal' | 'files.copy' | 'files.saveAs';
@@ -120,6 +132,13 @@
               >{t(a.key)}</Button
             >
           {/each}
+          {#if canvasItem}
+            <Button
+              size="sm"
+              variant="secondary"
+              onclick={() => canvasItem && openCanvas(canvasItem)}>{t('canvas.open')}</Button
+            >
+          {/if}
         </div>
         {#if preview?.kind === 'text'}
           <pre class="preview" data-selectable>{preview.text}</pre>

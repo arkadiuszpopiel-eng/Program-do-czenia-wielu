@@ -31,6 +31,27 @@ widać model, liczbę tokenów, koszt i czas.
 Bloki kodu mają przyciski: **Kopiuj kod**, **Zapisz jako plik**, **Zawijaj wiersze**. Przycisk **Uruchom w
 terminalu (przez Brokera)** w tej wersji nie wykonuje kodu — skopiuj go i uruchom samodzielnie.
 
+## Kanwa artefaktów
+
+Gdy agentka odda stronę HTML, rysunek SVG albo notatkę Markdown (blok kodu `html`, `svg`, `markdown`), na pasku
+bloku jest przycisk **Otwórz w kanwie**. Długą odpowiedź z nagłówkami (dokument) otworzysz w kanwie przyciskiem
+**Otwórz odpowiedź w kanwie** na pasku akcji wiadomości, a plik HTML, SVG albo Markdown z panelu **Pliki** —
+przyciskiem **Otwórz w kanwie** na karcie pliku.
+
+Kanwa stoi obok rozmowy (w wąskim oknie — jako arkusz nad treścią). Rozmowa zachowuje czytelną szerokość:
+gdy brakuje miejsca, panel Sesje zwija się do paska ikon, a w razie potrzeby panel boczny chowa się, dopóki
+kanwa jest otwarta. Przejście do innej rozmowy albo ponowienie odpowiedzi, z której pochodzi artefakt, zamyka
+kanwę. Kanwa ma dwie karty:
+
+- **Podgląd** — Markdown jak w wiadomościach; strona HTML i rysunek SVG w izolowanej ramce: bez skryptów, bez
+  dostępu do Alfy i bez pobierania czegokolwiek z sieci (obrazki tylko wbudowane w plik, linki tylko wewnątrz
+  dokumentu). Przyciski, animacje i skrypty strony w podglądzie nie działają — to świadome zabezpieczenie.
+- **Źródło** — tekst artefaktu (ponad limit — jego początek z uwagą o ucięciu).
+
+Przyciski: **Kopiuj źródło**, **Zapisz jako plik** (to samo okno zapisu co przy bloku kodu, eksporcie wiadomości
+albo w panelu Pliki) i **Zamknij kanwę**. Klawiatura: strzałki przełączają karty, `Esc` zamyka kanwę i wraca do
+przycisku, którym ją otwarto. Podgląd ma limit 512 KB — większy artefakt skopiujesz albo zapiszesz jako plik.
+
 ## Akcje wiadomości
 
 Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
@@ -154,7 +175,7 @@ połączenia”), a model lokalny odpowiada dalej. Polecenia bez modelu (rachunk
 ## Panele Pliki i Oś czasu
 
 - **Pliki** (`Alt+3`) — pliki oddane przez agentki w tej sesji, z wersjami i podglądem. Akcje: Otwórz, Pokaż
-  w Eksploratorze, Kopiuj plik, Zapisz jako.
+  w Eksploratorze, Kopiuj plik, Zapisz jako; pliki HTML, SVG i Markdown — także Otwórz w kanwie.
 - **Oś czasu** (`Alt+2`) — zdarzenia sesji (modele, narzędzia, audyt, głos, diagnostyka) z filtrami rodzaju
   i poziomu. Przełącznik **Replay** pokazuje pracę agentek krok po kroku (zobacz
   [Agentki i zadania](05-agentki-i-zadania.md)).

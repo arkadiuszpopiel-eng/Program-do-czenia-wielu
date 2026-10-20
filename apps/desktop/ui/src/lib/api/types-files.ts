@@ -56,6 +56,9 @@ export interface TurnAttachment {
 
 export type ConversationFormat = 'markdown' | 'html' | 'json';
 
+/** Rodzaj artefaktu w kanwie (C2.8): Markdown jako zwykły DOM, HTML i SVG w izolowanej ramce. */
+export type CanvasKind = 'markdown' | 'html' | 'svg';
+
 /** Ustawienia kopii (per maszyna). `dir` zmienia wyłącznie natywny dialog (`backups_choose_dir`). */
 export interface BackupConfig {
   readonly enabled: boolean;
