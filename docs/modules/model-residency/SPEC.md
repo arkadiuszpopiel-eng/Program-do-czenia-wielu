@@ -119,7 +119,7 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
   Dzierżawy bez wskazanej karty idą za kartą główną, gdy `set_gpus` zmienia kartę główną (np. umowna `GpuId(0)` z
   `LeaseTable::new` → RTX `GpuId(1)` na laptopie), zamiast zostać na karcie o starym numerze. Zmienione sygnatury pomocników `plan`/`shrink_victims`/`exclusive_conflicts`
   (miejsce `Option<GpuId>` i `&Pools` zamiast `Device` i `Budget`) — poza kontraktem nikt ich nie używał.
-- Klienci nie wskazują jeszcze kart (`gpu: None` wszędzie) — zachowanie Alfy bez zmian. Następne kroki (po próbie na
+- (Do 0.0.64 klienci nie wskazywali kart — `gpu: None` wszędzie; od 0.0.65 — niżej.) Następne kroki (po próbie na
   sprzęcie): Qwen3-ASR na karcie AMD/Intel poniżej 12 GB z dzierżawą na karcie, gdy model rozmowy z niej nie korzysta
   (dziś reguła `VULKAN_QWEN_CARD_MIN_MB` w `app-modules::stt` — procesor); model pomocniczy na karcie zintegrowanej
   (`providers-local`, `shared_memory`) z dzierżawą w puli tej karty zamiast „na procesorze”; rezerwa 1,5 GB na mowę obok
@@ -127,3 +127,42 @@ Ustawienia → Urządzenia/Moduły (co jest załadowane, ile VRAM), stan „GPU 
 - Testy: `gpus_tests.rs` (pule z profili: dwie osobne karty, laptop Intel UHD + RTX 4050, APU z małą i dużą rezerwą,
   karta bez backendu), `tests_gpus.rs` (scenariusze), kontraktowy `gpus_have_separate_budgets` (na `-impl` i `-fake`),
   `props_gpus.rs` (własności, w tym równoważność z jedną kartą).
+
+## Zmiany — klienci wskazują kartę, zmiana sprzętu przelicza pule (C6.6, 0.0.65)
+- Karta silnika: `card_for(&Profile, Backend, Option<&str>) -> Option<GpuId>` (kontrakt, czysta funkcja) — ta sama
+  decyzja co wybór karty silnika: karta przypięta po nazwie (`--device` `llama-server`, `LocalConfig::gpu_name`,
+  tylko przy `pin_device` i karcie obsługującej backend — inaczej serwer startuje bez przypięcia; nazwy porównuje
+  wspólne `same_card_name`, którego używa też `providers-local::devices::device_for`), inaczej karta główna, gdy
+  obsługuje backend, inaczej największa karta z tym backendem (CUDA przy głównej AMD); `Backend::Cpu` i maszyna bez
+  kart — `None`.
+- Klienci: `providers-local` — dzierżawa LLM na karcie serwera (`target_gpu`: CUDA/Vulkan → `card_for` z `gpu_name`),
+  budżet warstw z puli tej karty (`ResidencyState::gpu`), model pomocniczy na karcie zintegrowanej (`shared_memory`)
+  nadal w RAM bez karty; `voice-stt` — `WhisperStt::with_cards(&Profile)`: CUDA i Vulkan → `card_for`, procesor —
+  bez karty (`app-voice` `SystemVoice::with_device`); `voice-tts` — `tts_lease_request(…, dml: Option<u32>, vram_mb)`:
+  numer adaptera DXGI Supertonic (`--dml n`) = `GpuInfo::id` → `GpuId(n)`, `GpuIfFree`, bez karty — CPU;
+  `voice-vad` i embedder (`lib-embed`) liczą na procesorze — `gpu: None` bez zmian. Maszyna z jedną kartą: karta
+  wskazana = główna, zachowanie identyczne.
+- Zmiana sprzętu: `ResidencyConfig::hardware(&dyn DeviceProfile)` (budżet z nakładką + `GpuLayout::from_profile`),
+  `ResidencyManager::sync_hardware` (porównuje z `LeaseTable::base_budget`/`gpus`; różnica → `set_hardware`,
+  inaczej `None`), `ResidencyModule::with_hardware(device, config)`: po każdym zdarzeniu `device.*` z magistrali
+  (`device.changed`, `device.override`, …) i w każdym kroku zadania tła (zapas dla zmian bez zdarzenia, np. emulacji).
+  Kompozycja: `app_modules::route::local::residency`.
+- Numer karty (`GpuId` = `GpuInfo::id`) to pozycja adaptera DXGI, nie tożsamość. `sync_hardware` pamięta nazwę i LUID
+  karty pod każdym numerem; gdy pod tym samym numerem jest inna karta (zmiana kolejności adapterów, np. po zmianie
+  wyświetlacza w laptopie hybrydowym albo resecie sterownika — LUID się zmienia), najpierw przelicza pule bez
+  podmienionych numerów (dzierżawy wskazujące je są odbierane jako „na karcie, której nie ma”; podmieniona karta
+  główna — numer zastępczy), potem z nowym układem (dzierżawy idące za kartą główną przechodzą na nią). Bez tego
+  dzierżawa z jawną kartą zostałaby pod starym numerem, czyli na obcej karcie. Test:
+  `hardware.rs::reordered_adapters_revoke_leases_pinned_by_number`. Ograniczenia: zarządca bez profilu
+  (`with_gpus`) nie zna tożsamości kart; dwie karty o tej samej nazwie bez znanego LUID zamienione miejscami nie są
+  rozpoznawane; reset sterownika ze zmianą LUID odbiera dzierżawy także wtedy, gdy kolejność się nie zmieniła
+  (ostrożnie — klienci zakładają je ponownie).
+- Testy: `gpus_tests.rs::engine_card_follows_the_engine_choice`, `model-residency-impl/tests/hardware.rs` (laptop
+  Intel UHD 0 + RTX 4050 1: STT na CUDA i model rozmowy na karcie 1, VAD na CPU; dwie karty AMD: mowa na karcie B nie
+  blokuje rozmowy na karcie A; zmiana sprzętu odbiera dzierżawę z karty, której nie ma; moduł po `device.changed`),
+  `voice-stt-impl/tests/stt_cards.rs`, `voice-tts-impl/tests/tts_cards.rs`, `voice-vad-impl/tests/vad.rs`,
+  `providers-local-impl/tests/laptop.rs` (dzierżawa LLM i STT na RTX).
+- Poza zakresem: Qwen3-ASR (`QwenStt`) i Supertonic w aplikacji nie zakładają dzierżaw (zajmują kartę poza zarządcą) —
+  dzierżawa z kartą `main_card`/`tts_dml_device` po próbie na sprzęcie; `device-profile` kolejkuje `device.changed`
+  w `refresh()`, ale publikuje je dopiero `poll_changes()`, którego aplikacja nie wywołuje — do tego czasu zmianę
+  łapie krok zadania tła (co `tick`, domyślnie 30 s).

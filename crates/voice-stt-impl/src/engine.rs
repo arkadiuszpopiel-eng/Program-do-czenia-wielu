@@ -9,7 +9,9 @@ use std::time::Instant;
 
 use async_trait::async_trait;
 use device_profile_contract::Backend;
-use model_residency_contract::{Lease, LeaseId, LeaseListener, Residency, Revocation};
+use model_residency_contract::{
+    GpuId, Lease, LeaseId, LeaseListener, Residency, Revocation, card_for,
+};
 use voice_audio_contract::Frame;
 use voice_stt_contract::{
     Health, Stt, SttCfg, SttEngine, SttError, SttEvent, Transcript, UtteranceAudio, UtteranceId,
@@ -61,6 +63,8 @@ pub struct WhisperStt {
     launcher: Arc<dyn SidecarLauncher>,
     client: WhisperClient,
     residency: Option<Arc<dyn Residency>>,
+    /// Karta każdego backendu GPU w dzierżawie (C6.6); pusta — karta główna.
+    cards: Vec<(Backend, GpuId)>,
     preferred: Backend,
     revoked: Arc<AtomicBool>,
     server: tokio::sync::Mutex<Option<Server>>,
@@ -80,6 +84,7 @@ impl WhisperStt {
             launcher,
             client,
             residency: None,
+            cards: Vec::new(),
             preferred,
             revoked: Arc::default(),
             server: tokio::sync::Mutex::new(None),
@@ -93,6 +98,26 @@ impl WhisperStt {
         residency.listen(OWNER, Arc::new(Revoked(Arc::clone(&self.revoked))));
         self.residency = Some(residency);
         self
+    }
+
+    /// Karty z profilu urządzenia (C6.6): dzierżawa na GPU zajmuje pulę karty, na której liczy
+    /// `whisper-server` z danym backendem (CUDA — karta NVIDIA, Vulkan — karta główna;
+    /// [`card_for`]). Bez profilu — karta główna, jak dotąd.
+    #[must_use]
+    pub fn with_cards(mut self, profile: &device_profile_contract::Profile) -> Self {
+        self.cards = [Backend::Cuda, Backend::Vulkan]
+            .into_iter()
+            .filter_map(|b| card_for(profile, b, None).map(|g| (b, g)))
+            .collect();
+        self
+    }
+
+    /// Karta dzierżawy dla backendu (`None` — procesor albo karta główna).
+    pub(crate) fn card(&self, backend: Backend) -> Option<GpuId> {
+        self.cards
+            .iter()
+            .find(|(b, _)| *b == backend)
+            .map(|(_, g)| *g)
     }
 
     fn lock(&self) -> MutexGuard<'_, State> {

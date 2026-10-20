@@ -15,7 +15,7 @@ use model_residency_contract::{Device, Residency};
 use providers_local_impl::{BackendKey, STT_VRAM_RESERVE_MB};
 use support::arg;
 use support::laptop::{
-    VRAM_BUDGET, heavy_tts_lease, install_server, laptop, laptop_with, server_path, stt_lease,
+    RTX, VRAM_BUDGET, heavy_tts_lease, install_server, laptop, laptop_with, server_path, stt_lease,
 };
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -73,11 +73,13 @@ async fn on_ac_power_bielik_q8_is_split_on_cuda_and_stt_fits_in_6_gb() {
         "26 warstw na CPU: wagi i KV w RAM"
     );
     assert_eq!(llm.request.cpu_ram_mb, 5_600 + 480);
+    // C6.6: model rozmowy na CUDA zajmuje pulę RTX 4050 (karta 1), nie karty Iris Xe (0).
+    assert_eq!((llm.request.gpu, llm.gpu), (Some(RTX), Some(RTX)));
 
     // STT whisper turbo na CUDA obok LLM: 3570 + 1500 = 5070 ≤ 5153 MB — bez eksmisji (poza
     // rozmową, bez przypięcia przez potok głosu).
     let stt = l.residency.acquire(stt_lease()).unwrap();
-    assert_eq!(stt.lease.device, Device::Gpu);
+    assert_eq!((stt.lease.device, stt.lease.gpu), (Device::Gpu, Some(RTX)));
     assert!(stt.evicted.is_empty(), "{:?}", stt.evicted);
     let state = l.residency.snapshot();
     assert_eq!(state.used.vram_mb, 3_570 + 1_500);

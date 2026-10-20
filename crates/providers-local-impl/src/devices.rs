@@ -96,17 +96,9 @@ pub fn probe(program: &Path, timeout: Duration) -> Vec<EngineDevice> {
     parse_devices(&text)
 }
 
-fn normalized(name: &str) -> String {
-    name.to_ascii_lowercase()
-        .replace("(r)", "")
-        .replace("(tm)", "")
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
 /// Urządzenie serwera odpowiadające karcie o nazwie `gpu_name` dla danego backendu: identyfikator
-/// zaczyna się od nazwy backendu (`CUDA…`, `Vulkan…`), a nazwy kart zawierają się w sobie.
+/// zaczyna się od nazwy backendu (`CUDA…`, `Vulkan…`), a nazwy kart pasują do siebie tak samo
+/// jak w wyborze karty dzierżawy ([`model_residency_contract::same_card_name`]).
 pub fn device_for<'a>(
     devices: &'a [EngineDevice],
     backend: BackendKey,
@@ -117,17 +109,10 @@ pub fn device_for<'a>(
         BackendKey::Vulkan => "vulkan",
         BackendKey::Cpu => return None,
     };
-    let wanted = normalized(gpu_name);
-    if wanted.is_empty() {
-        return None;
-    }
     devices
         .iter()
         .filter(|d| d.id.to_ascii_lowercase().starts_with(prefix))
-        .find(|d| {
-            let seen = normalized(&d.name);
-            seen.contains(&wanted) || wanted.contains(&seen)
-        })
+        .find(|d| model_residency_contract::same_card_name(&d.name, gpu_name))
 }
 
 #[cfg(test)]

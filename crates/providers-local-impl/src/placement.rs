@@ -6,7 +6,7 @@
 
 use device_profile_contract::{Backend, Recommendation};
 use model_residency_contract::{
-    Device, Lease, LeaseId, LeaseRequest, ModelRole, Placement, Priority,
+    Device, GpuId, Lease, LeaseId, LeaseRequest, ModelRole, Placement, Priority, card_for,
 };
 
 use crate::config::{BackendKey, GpuLayers, LaunchPlan, layers_for};
@@ -21,6 +21,7 @@ impl Sidecar {
         placement: Placement,
         ctx: u32,
         gpu_layers: u32,
+        gpu: Option<GpuId>,
     ) -> Result<Option<Lease>, LocalError> {
         let Some(res) = &self.residency else {
             return Ok(None);
@@ -50,7 +51,8 @@ impl Sidecar {
             },
             cpu_ram_mb: entry.ram_need(ctx),
             idle_unload_ms: ms(self.config.idle_unload),
-            gpu: None,
+            // Karta zintegrowana liczona w RAM (wyżej) — bez puli karty.
+            gpu: if shared { None } else { gpu },
         };
         res.acquire(req)
             .map(|g| Some(g.lease))
@@ -89,11 +91,36 @@ impl Sidecar {
         }
     }
 
-    /// Budżet VRAM: limit z konfiguracji, budżet zarządcy rezydencji (z emulacją), rekomendacja.
-    fn vram_budget(&self, rec: Option<&Recommendation>) -> u32 {
+    /// Karta, na której policzy serwer (C6.6): przypięta z konfiguracji (tylko przy włączonym
+    /// przypinaniu i karcie z tym backendem) albo główna z profilu — ta sama, którą wskazuje
+    /// `--device` ([`Self::pinned_device`]); CPU — bez karty.
+    fn target_gpu(&self, backend: BackendKey) -> Option<GpuId> {
+        let backend = match backend {
+            BackendKey::Cpu => return None,
+            BackendKey::Cuda => Backend::Cuda,
+            BackendKey::Vulkan => Backend::Vulkan,
+        };
+        let profile = self.device.as_ref()?.current();
+        let name = self
+            .config
+            .gpu_name
+            .as_deref()
+            .filter(|_| self.config.pin_device);
+        card_for(&profile, backend, name)
+    }
+
+    /// Budżet VRAM: limit z konfiguracji, pula karty docelowej w zarządcy rezydencji (z emulacją;
+    /// karta główna albo nieznana — budżet karty głównej), rekomendacja.
+    fn vram_budget(&self, rec: Option<&Recommendation>, gpu: Option<GpuId>) -> u32 {
         self.config
             .max_vram_mb
-            .or_else(|| self.residency.as_ref().map(|r| r.snapshot().budget.vram_mb))
+            .or_else(|| {
+                self.residency.as_ref().map(|r| {
+                    let state = r.snapshot();
+                    gpu.and_then(|g| state.gpu(g))
+                        .map_or(state.budget.vram_mb, |g| g.pool.vram_mb)
+                })
+            })
             .or_else(|| rec.map(|r| r.residency.vram_mb))
             .unwrap_or(0)
     }
@@ -185,14 +212,15 @@ impl Sidecar {
         let mut backend = rec
             .as_ref()
             .map_or(BackendKey::Cpu, |r| self.config.backend_for(r));
-        let budget = self.vram_budget(rec.as_ref());
+        let gpu = self.target_gpu(backend);
+        let budget = self.vram_budget(rec.as_ref(), gpu);
         let (ctx, wanted) = self.ctx_and_layers(entry, backend, budget, rec.as_ref());
         let placement = if wanted == 0 {
             Placement::CpuOnly
         } else {
             Placement::GpuPreferred
         };
-        let lease = self.acquire(entry, placement, ctx, wanted)?;
+        let lease = self.acquire(entry, placement, ctx, wanted, gpu)?;
         let gpu_layers = match &lease {
             // Dzierżawa karty zintegrowanej jest z założenia „w RAM” — warstwy zostają na karcie.
             Some(l) if l.device == Device::Cpu && !self.config.shared_memory => 0,

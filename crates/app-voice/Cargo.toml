@@ -38,6 +38,7 @@ voice-readaloud-impl = { path = "../voice-readaloud-impl" }
 voice-persona-impl = { path = "../voice-persona-impl" }
 voice-tts-contract = { path = "../voice-tts-contract" }
 scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+device-profile-contract = { path = "../device-profile-contract" }
 model-residency-contract = { path = "../model-residency-contract" }
 personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }

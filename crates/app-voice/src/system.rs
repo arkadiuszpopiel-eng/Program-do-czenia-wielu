@@ -66,6 +66,8 @@ pub struct SystemVoice {
     pub(crate) tts: Option<Arc<dyn Tts>>,
     pub(crate) scheduler: Arc<dyn SchedulerLite>,
     residency: Option<Arc<dyn Residency>>,
+    /// Profil urządzenia — karta dzierżaw silników głosu na GPU (C6.6); bez niego karta główna.
+    device: Option<Arc<dyn device_profile_contract::DeviceProfile>>,
     pub(crate) vault: Option<Arc<dyn KeyVault>>,
     /// Zegar potoku — w produkcji zegar urządzenia audio (ta sama podstawa co znaczniki ramek).
     pub(crate) clock: Arc<dyn voice_audio_contract::MediaClock>,
@@ -135,6 +137,7 @@ impl SystemVoice {
             tts,
             scheduler,
             residency,
+            device: None,
             vault: None,
             clock: Arc::new(MonotonicClock::new()),
             noise: NoiseSetting::default(),
@@ -153,6 +156,14 @@ impl SystemVoice {
     #[must_use]
     pub fn with_clock(mut self, clock: Arc<dyn voice_audio_contract::MediaClock>) -> Self {
         self.clock = clock;
+        self
+    }
+
+    /// Profil urządzenia: dzierżawa Whispera na GPU zajmuje pulę karty, na której liczy jego
+    /// backend (C6.6; na komputerze z jedną kartą bez zmian).
+    #[must_use]
+    pub fn with_device(mut self, device: Arc<dyn device_profile_contract::DeviceProfile>) -> Self {
+        self.device = Some(device);
         self
     }
 
@@ -202,6 +213,9 @@ impl SystemVoice {
             .map_err(|e| component("stt", e))?;
         if let Some(r) = &self.residency {
             stt = stt.with_residency(r.clone());
+        }
+        if let Some(device) = &self.device {
+            stt = stt.with_cards(&device.current());
         }
         Ok(stt)
     }

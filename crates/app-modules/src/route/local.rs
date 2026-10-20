@@ -107,12 +107,14 @@ fn warn_substitute(
     used
 }
 
-/// Zarządca rezydencji z budżetem z rekomendacji `device-profile` (konfiguracja domyślna „auto").
+/// Zarządca rezydencji z budżetem z rekomendacji `device-profile` (konfiguracja domyślna „auto")
+/// i osobnymi pulami kart; zmiana sprzętu (`device.*`, krok zadania tła) przelicza budżet i pule.
 pub fn residency(device: &Arc<dyn DeviceProfile>) -> Result<ResidencyModule, AppError> {
     let config = ResidencyConfig::default();
     let manager = Arc::new(ResidencyManager::from_device(device.clone(), &config));
     let signals = Arc::new(config.signals(DeviceSignals(device.clone())));
     ResidencyModule::new(manager, Some(signals), config.tick)
+        .map(|module| module.with_hardware(device.clone(), config))
         .map_err(|e| AppError::internal(format!("model-residency: {e}")))
 }
 

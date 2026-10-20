@@ -186,3 +186,38 @@ async fn silero_real_model() {
         "dzierżawa zwolniona"
     );
 }
+
+/// C6.6: VAD liczy na procesorze także na laptopie z dwiema kartami (Intel UHD — karta 0, pamięć
+/// z RAM; RTX 4050 — karta 1, główna): dzierżawa w RAM, bez karty, pule obu kart puste.
+#[test]
+fn vad_lease_stays_on_cpu_next_to_two_cards() {
+    use model_residency_contract::{Device, GpuId, GpuLayout, GpuPool};
+    use voice_vad_impl::residency::{LeaseGuard, SILERO_RAM_MB, vad_lease_request};
+    let uhd = GpuPool {
+        gpu: GpuId(0),
+        vram_mb: 4_096,
+        desktop_reserve_mb: 0,
+        stt_tts_exclusive: true,
+        shared: true,
+    };
+    let residency = Arc::new(model_residency_fake::FakeResidency::with_gpus(
+        Budget {
+            vram_mb: 6_141 - 768,
+            ram_mb: 8_192,
+            desktop_reserve_mb: 768,
+            stt_tts_exclusive: true,
+        },
+        GpuLayout {
+            primary: GpuId(1),
+            others: vec![uhd],
+        },
+    ));
+    let request = vad_lease_request("silero_vad.onnx");
+    assert_eq!(request.gpu, None);
+    let guard = LeaseGuard::acquire(residency.clone(), request).unwrap();
+    let snap = residency.snapshot();
+    let lease = snap.leases.iter().find(|l| l.id == guard.id()).unwrap();
+    assert_eq!((lease.device, lease.gpu), (Device::Cpu, None));
+    assert_eq!(snap.used.ram_mb, SILERO_RAM_MB);
+    assert!(snap.gpus.iter().all(|g| g.used_mb == 0), "{:?}", snap.gpus);
+}

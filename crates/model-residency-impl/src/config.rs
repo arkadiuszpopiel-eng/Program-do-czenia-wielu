@@ -3,8 +3,8 @@
 
 use std::time::Duration;
 
-use device_profile_contract::ResidencyBudget;
-use model_residency_contract::{Budget, ModeSource};
+use device_profile_contract::{DeviceProfile, ResidencyBudget};
+use model_residency_contract::{Budget, GpuLayout, ModeSource};
 use serde::Deserialize;
 
 /// Wartość liczbowa albo `"auto"` (z rekomendacji `device-profile`).
@@ -142,6 +142,15 @@ impl ResidencyConfig {
             desktop_reserve_mb: reserve,
             stt_tts_exclusive: rec.stt_tts_exclusive,
         }
+    }
+
+    /// Sprzęt z profilu urządzenia: budżet karty głównej i RAM (rekomendacja z nadpisaniami)
+    /// i pule pozostałych kart ([`GpuLayout::from_profile`]) — przy starcie i po zmianie sprzętu.
+    pub fn hardware(&self, device: &dyn DeviceProfile) -> (Budget, GpuLayout) {
+        (
+            self.budget(&device.recommend().residency),
+            GpuLayout::from_profile(&device.current()),
+        )
     }
 
     /// Sygnały trybu z uwzględnieniem przełączników.

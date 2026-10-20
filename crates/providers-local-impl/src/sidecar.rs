@@ -227,7 +227,7 @@ impl Sidecar {
                 });
                 self.release_lease(plan.1);
                 let lease = self
-                    .acquire(entry, Placement::CpuOnly, cpu.ctx, 0)?
+                    .acquire(entry, Placement::CpuOnly, cpu.ctx, 0, None)?
                     .map(|l| l.id);
                 // Nieudany start na procesorze nie może zostawić dzierżawy pamięci.
                 match self.start(entry, model_path, cpu, lease).await {
