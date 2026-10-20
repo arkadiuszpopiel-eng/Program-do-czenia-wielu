@@ -13,6 +13,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+pub mod accounts;
 pub mod bundle_data;
 mod bundle_machine;
 mod bundle_ops;

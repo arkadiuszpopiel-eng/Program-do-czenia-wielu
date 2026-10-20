@@ -843,8 +843,11 @@ dependencies = [
 name = "app-models"
 version = "0.0.64"
 dependencies = [
+ "accounts-hub-contract",
  "app-api",
  "app-modules",
+ "chrono",
+ "compliance-contract",
  "core-config-contract",
  "core-config-fake",
  "device-profile-contract",

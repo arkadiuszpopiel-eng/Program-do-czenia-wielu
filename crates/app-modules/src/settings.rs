@@ -43,6 +43,35 @@ pub mod keys {
     pub const AUTONOMY: &str = "permissions.global_level";
 }
 
+/// Litery, których nie wolno łączyć z `Ctrl+Alt(+Shift)` (polski AltGr, PLAN §8.6).
+const ALTGR_LETTERS: [char; 9] = ['a', 'c', 'e', 'l', 'n', 'o', 's', 'x', 'z'];
+
+/// Kombinacja zarezerwowana dla kill-switcha.
+pub const KILL_SWITCH_CHORD: &str = "Ctrl+Shift+F12";
+
+/// Sprawdza kombinację skrótu: reguła AltGr i zarezerwowany kill-switch.
+pub fn validate_chord(chord: &str) -> Result<(), AppError> {
+    let parts: Vec<String> = chord.split('+').map(|p| p.trim().to_lowercase()).collect();
+    let has = |m: &str| parts.iter().any(|p| p == m);
+    if has("ctrl")
+        && has("alt")
+        && let Some(key) = parts.last()
+        && key.chars().count() == 1
+        && key.chars().all(|c| ALTGR_LETTERS.contains(&c))
+    {
+        return Err(AppError::forbidden(format!(
+            "Skrót „{chord}” koliduje z polskim AltGr (Ctrl+Alt+{}).",
+            key.to_uppercase()
+        )));
+    }
+    if chord.eq_ignore_ascii_case(KILL_SWITCH_CHORD) {
+        return Err(AppError::forbidden(
+            "Ctrl+Shift+F12 jest zarezerwowany dla STOP WSZYSTKIEGO.",
+        ));
+    }
+    Ok(())
+}
+
 /// Katalog ustawień.
 pub struct SettingsCatalog {
     pages: Vec<SettingsPageDef>,

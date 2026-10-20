@@ -41,6 +41,22 @@ pub use attach::{AttachmentLimits, Attachments, PathGuard};
 pub use backup::{BackupDeps, BackupService};
 pub use docs::ArtifactDocuments;
 
+/// URL protokołu zasobów Tauri dla ścieżki (`asset://localhost/<ścieżka zakodowana>`; podgląd
+/// obrazu artefaktu, `files_preview`).
+pub fn asset_url(path: &std::path::Path) -> String {
+    let raw = path.to_string_lossy();
+    let mut out = String::from("asset://localhost/");
+    for b in raw.as_bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(char::from(*b));
+            }
+            other => out.push_str(&format!("%{other:02X}")),
+        }
+    }
+    out
+}
+
 /// Zależności złożenia.
 pub struct FilesDeps {
     /// Katalogi aplikacji.
@@ -323,5 +339,16 @@ impl FilesApp {
     /// `backups_verify`.
     pub async fn backups_verify(&self, file: &str) -> Result<BackupCheck, AppError> {
         self.backups.verify(file).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn asset_urls_are_percent_encoded() {
+        let url = asset_url(std::path::Path::new("C:\\Users\\Ty\\obraz 1.png"));
+        assert_eq!(url, "asset://localhost/C%3A%5CUsers%5CTy%5Cobraz%201.png");
     }
 }

@@ -725,7 +725,10 @@ dependencies = [
 name = "app-models"
 version = "0.0.64"
 dependencies = [
+ "accounts-hub-contract",
  "app-api",
+ "chrono",
+ "compliance-contract",
  "core-config-contract",
  "device-profile-contract",
  "flate2",

@@ -3,6 +3,8 @@
 
 use artifacts_contract::{ArtifactAction as CoreAction, Artifacts, Origin, Preview};
 
+use app_files::asset_url;
+
 use crate::core::AppCore;
 use crate::dto::{self, ArtifactAction, ArtifactInfo, ArtifactPreview};
 use crate::error::AppError;
@@ -10,21 +12,6 @@ use crate::ids;
 
 /// Limit podglądu tekstu (bajty).
 const PREVIEW_BYTES: usize = 64 * 1024;
-
-/// URL protokołu zasobów Tauri dla ścieżki (`asset://localhost/<ścieżka zakodowana>`).
-pub fn asset_url(path: &std::path::Path) -> String {
-    let raw = path.to_string_lossy();
-    let mut out = String::from("asset://localhost/");
-    for b in raw.as_bytes() {
-        match b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
-                out.push(char::from(*b));
-            }
-            other => out.push_str(&format!("%{other:02X}")),
-        }
-    }
-    out
-}
 
 impl AppCore {
     /// `files_list`.
@@ -120,16 +107,5 @@ impl AppCore {
             ));
         }
         self.inner.shell.artifact_action(&intent)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn asset_urls_are_percent_encoded() {
-        let url = asset_url(std::path::Path::new("C:\\Users\\Ty\\obraz 1.png"));
-        assert_eq!(url, "asset://localhost/C%3A%5CUsers%5CTy%5Cobraz%201.png");
     }
 }
