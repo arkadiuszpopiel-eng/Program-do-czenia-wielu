@@ -20,8 +20,13 @@ DST="$(cd "$ROOT/.." && pwd)/Alfa-uruchomiona"
 ) || { echo "budowa programów Jądra: błąd (target/safety-build.log)"; exit 1; }
 WDST="$(cygpath -w "$DST")"
 # Zamknięcie tylko procesu uruchomionego z katalogu docelowego albo z katalogu budowy (stary sposób).
-powershell -NoProfile -Command "Get-Process alfa-desktop -ErrorAction SilentlyContinue | Where-Object { \$_.Path -and (\$_.Path.StartsWith('$WDST') -or \$_.Path.StartsWith('$(cygpath -w "$SRC")')) -and -not \$_.Path.Contains('trial-profile') } | ForEach-Object { taskkill.exe /PID \$_.Id /T /F | Out-Null }"
-sleep 2
+# `Stop-Process` po PID: `taskkill /T` przekraczał czas przy procesach Jądra w zadaniu watchdoga
+# (2026-10-20), a stara Alfa zostawała uruchomiona. Broker i watchdog kończą się z aplikacją.
+powershell -NoProfile -Command "Get-Process alfa-desktop -ErrorAction SilentlyContinue | Where-Object { \$_.Path -and (\$_.Path.StartsWith('$WDST') -or \$_.Path.StartsWith('$(cygpath -w "$SRC")')) -and -not \$_.Path.Contains('trial-profile') } | ForEach-Object { Stop-Process -Id \$_.Id -Force }"
+sleep 4
+# Procesy Jądra z katalogu docelowego, które przeżyły aplikację, blokowałyby kopiowanie plików.
+powershell -NoProfile -Command "Get-Process alfa-broker,alfa-broker-ui,alfa-watchdog -ErrorAction SilentlyContinue | Where-Object { \$_.Path -and \$_.Path.StartsWith('$WDST') } | ForEach-Object { Stop-Process -Id \$_.Id -Force }"
+sleep 1
 mkdir -p "$DST"
 cp -f "$SRC/alfa-desktop.exe" "$DST/"
 [ -f "$SRC/alfa_desktop_lib.dll" ] && cp -f "$SRC/alfa_desktop_lib.dll" "$DST/"
