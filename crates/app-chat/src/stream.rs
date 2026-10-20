@@ -42,6 +42,18 @@ fn utf16_len(text: &str) -> u64 {
     text.encode_utf16().count() as u64
 }
 
+/// Informacja w prompcie: kto w obsadzie działa na komputerze i jak go wywołać.
+fn crew_note(crew: &[String]) -> String {
+    let names = crew.join(", ");
+    let first = crew.first().map_or("Delta", String::as_str);
+    format!(
+        "W tej rozmowie na komputerze użytkownika działa: {names} — pliki, programy, polecenia, \
+         system, mysz i klawiatura, przez Brokera. Gdy prośba wymaga takiej pracy, a sama nie masz \
+         narzędzi, nie mów, że nikt nie ma dostępu: powiedz, że zrobi to {first}, i podpowiedz, \
+         żeby użytkownik napisał „{first}, …” albo wybrał ją w polu adresatki."
+    )
+}
+
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
 /// `pin` — model przypięty przez użytkownika (`dostawca:model`, Arena): Router próbuje go
 /// pierwszego, z tymi samymi kontrolami prywatności, zgodności i budżetu co trasa automatyczna.
@@ -76,6 +88,16 @@ pub(crate) async fn prepare(
         // Zestaw roboczy pamięci agentki (zakresy z obsady i projektu sesji) — jako dane.
         let memory = &core.inner.memory;
         system = Some(memory.system_prompt(persona, &req.session, &req.agent, query));
+    }
+    // Agentka bez narzędzi (Dyrygentka) wie, kto w obsadzie działa na komputerze — zamiast
+    // odpowiadać, że dostępu nie ma (zgłoszenie właściciela 2026-10-20).
+    let crew = core.crew_with_tools(&req.session, &req.agent);
+    if !crew.is_empty() {
+        let note = crew_note(&crew);
+        system = Some(match system {
+            Some(s) => format!("{s}\n\n{note}"),
+            None => note,
+        });
     }
     // Styl odpowiedzi i temperatura z ustawień (P4).
     let setting = |v: Option<serde_json::Value>| {

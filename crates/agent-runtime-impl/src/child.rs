@@ -92,6 +92,7 @@ impl Engine {
         self.handle.add_child(&child);
         let exit = join.await.unwrap_or(Exit::Finished(RunOutcome::Failed {
             error: "podprzebieg przerwany".into(),
+            provider: None,
         }));
         self.handle.clear_active_child();
         let yielded = exit == Exit::Yielded;

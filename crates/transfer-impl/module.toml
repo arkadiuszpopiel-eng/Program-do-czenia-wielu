@@ -1,6 +1,6 @@
 # Manifest modułu `transfer` (docs/modules/transfer/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "transfer"
-version = "0.0.65"
+version = "0.0.66"
 kind = "service"
 provides = ["transfer-contract@1"]
 requires = ["core-bus-contract@1", "sessions-contract@1", "accounts-hub-contract@1"]

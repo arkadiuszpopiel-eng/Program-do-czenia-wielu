@@ -69,6 +69,10 @@ pub enum RunOutcome {
     Failed {
         /// Opis.
         error: String,
+        /// Błąd dostawcy, gdy to on przerwał przebieg (limit zapytań, sieć, klucz) — pozwala
+        /// pokazać ten sam komunikat i stan co zwykła rozmowa (ponów o…, kolejka offline).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        provider: Option<providers_contract::ProviderError>,
     },
 }
 

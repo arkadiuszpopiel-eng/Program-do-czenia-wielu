@@ -105,6 +105,7 @@ impl Engine {
                 .await;
             return Next::Finish(RunOutcome::Failed {
                 error: err.to_string(),
+                provider: Some(err.clone()),
             });
         }
         match turn.stop {
@@ -123,6 +124,7 @@ impl Engine {
                     .await;
                 return Next::Finish(RunOutcome::Failed {
                     error: "przekroczone okno kontekstu modelu".into(),
+                    provider: None,
                 });
             }
             _ => {}

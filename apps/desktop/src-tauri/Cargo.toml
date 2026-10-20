@@ -1,6 +1,6 @@
 [package]
 name = "alfa-desktop"
-version = "0.0.65"
+version = "0.0.66"
 description = "Alfa — cienka powłoka Tauri 2 (WebView2): okna, zasobnik, skróty globalne, powiadomienia; komendy deleguje do app-core."
 edition = "2024"
 rust-version = "1.94"

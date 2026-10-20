@@ -55,15 +55,20 @@ impl AppStore {
 
     /// Katalog roboczy sesji.
     pub fn workdir(&self, session: &SessionId) -> Result<Option<String>, AppError> {
-        let row: Option<Option<String>> = self.with(session, |c| {
+        Ok(self.workdir_choice(session)?.flatten())
+    }
+
+    /// Wybór katalogu roboczego: `None` — nigdy nie wybrano, `Some(None)` — jawnie wyłączony
+    /// („bez katalogu”), `Some(Some(ścieżka))` — wybrany.
+    pub fn workdir_choice(&self, session: &SessionId) -> Result<Option<Option<String>>, AppError> {
+        self.with(session, |c| {
             c.query_row(
                 "SELECT path FROM app_workdir ORDER BY seq DESC LIMIT 1",
                 [],
                 |r| r.get(0),
             )
             .optional()
-        })?;
-        Ok(row.flatten())
+        })
     }
 
     /// Dopisuje nagłówek przebiegu.

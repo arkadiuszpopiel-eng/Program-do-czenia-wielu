@@ -16,14 +16,14 @@ use app_agents::{
 };
 use personas_contract::{Persona, PersonaId, Role};
 use providers_contract::Usage;
-use sessions_contract::SessionId;
+use sessions_contract::{SessionCatalog, SessionId};
 
 use app_api::dto::{AgentRun, AlfaEvent, TurnError, TurnErrorCode};
 use app_api::ids::{self, UndoKind};
 
 use crate::engine::{ChatEngine, GenHandle, RunCtl};
 use crate::generate::GenRequest;
-use crate::outcome::{Chosen, Outcome};
+use crate::outcome::{Chosen, Outcome, provider_error};
 use crate::project::render_closed;
 
 /// Agentka z narzędziami w sesji.
@@ -34,20 +34,31 @@ pub(crate) struct AgentSetup {
 }
 
 impl ChatEngine {
-    /// Przebieg agentki zamiast czatu, gdy sesja ma katalog roboczy, a role agentki w obsadzie
-    /// dają narzędzia (rola bez narzędzi albo sesja bez katalogu — zwykła odpowiedź).
-    pub(crate) fn agent_setup(&self, session: &SessionId, agent: &str) -> Option<AgentSetup> {
-        let stack = self.inner.agents.as_ref()?;
-        let workdir = self.inner.store.workdir(session).ok().flatten()?;
-        let id = PersonaId::new(agent);
-        let personas = &self.inner.personas;
-        let persona = personas.personas().into_iter().find(|p| p.id == id)?;
-        let role_ids = personas.cast(session).roles_of(&id);
-        let roles: Vec<Role> = personas
+    /// Role agentki w obsadzie sesji.
+    fn cast_roles(&self, session: &SessionId, who: &PersonaId) -> Vec<Role> {
+        let ids = self.inner.personas.cast(session).roles_of(who);
+        self.inner
+            .personas
             .roles()
             .into_iter()
-            .filter(|r| role_ids.contains(&r.id))
-            .collect();
+            .filter(|r| ids.contains(&r.id))
+            .collect()
+    }
+
+    /// Przebieg agentki zamiast czatu, gdy sesja ma katalog roboczy, a role agentki w obsadzie
+    /// dają narzędzia (rola bez narzędzi albo sesja z jawnie wyłączonym katalogiem — zwykła
+    /// odpowiedź).
+    pub(crate) fn agent_setup(&self, session: &SessionId, agent: &str) -> Option<AgentSetup> {
+        let stack = self.inner.agents.as_ref()?;
+        let workdir = self.session_workdir(session)?;
+        let id = PersonaId::new(agent);
+        let persona = self
+            .inner
+            .personas
+            .personas()
+            .into_iter()
+            .find(|p| p.id == id)?;
+        let roles = self.cast_roles(session, &id);
         if stack.tools.allowed_for(&roles).is_empty() {
             return None;
         }
@@ -56,6 +67,49 @@ impl ChatEngine {
             persona,
             roles,
         })
+    }
+
+    /// Imiona innych agentek obsady, które działają na komputerze (role z poleceniami albo
+    /// sterowaniem GUI, np. Wykonawczyni) — dla agentki bez narzędzi (Dyrygentka): wie, komu
+    /// przekazać pracę, zamiast odpowiadać, że dostępu nie ma. Pusta lista, gdy narzędzia są
+    /// niepodłączone albo katalog wyłączony.
+    pub(crate) fn crew_with_tools(&self, session: &SessionId, agent: &str) -> Vec<String> {
+        let Some(stack) = self.inner.agents.as_ref() else {
+            return Vec::new();
+        };
+        if self.session_workdir(session).is_none() {
+            return Vec::new();
+        }
+        let id = PersonaId::new(agent);
+        let personas = self.inner.personas.personas();
+        self.inner
+            .personas
+            .cast(session)
+            .personas()
+            .into_iter()
+            .filter(|p| *p != id)
+            .filter(|p| {
+                let roles = self.cast_roles(session, p);
+                let computer = roles
+                    .iter()
+                    .any(|r| r.tools.iter().any(|g| g == "shell" || g == "gui.control"));
+                computer && !stack.tools.allowed_for(&roles).is_empty()
+            })
+            .filter_map(|p| personas.iter().find(|x| x.id == p).map(|x| x.name.clone()))
+            .collect()
+    }
+
+    /// Katalog roboczy sesji; gdy nigdy go nie wybrano — katalog sesji (jak „Domyślny” w oknie
+    /// rozmowy), żeby agentki nie traciły narzędzi po cichu. Jawne „bez katalogu” — `None`.
+    fn session_workdir(&self, session: &SessionId) -> Option<String> {
+        match self.inner.store.workdir_choice(session).ok()? {
+            Some(choice) => choice,
+            None => {
+                let dir = self.inner.sessions.session(session).ok()?.workdir;
+                std::fs::create_dir_all(&dir).ok()?;
+                Some(dir.to_string_lossy().into_owned())
+            }
+        }
     }
 
     /// Ustawienia agentek (Ustawienia → Agentki).
@@ -288,7 +342,15 @@ pub(crate) async fn run(
         .outcome()
         .cloned()
         .unwrap_or(RunOutcome::Cancelled);
-    let fin = final_text(&outcome);
+    let mut fin = final_text(&outcome);
+    // Błąd dostawcy przerywający przebieg — ten sam komunikat i stan co w zwykłej rozmowie
+    // (limit zapytań z „ponów o…”, brak sieci → kolejka offline, odrzucony klucz).
+    if let RunOutcome::Failed {
+        provider: Some(e), ..
+    } = &outcome
+    {
+        fin.error = Some(provider_error(e, &choice.provider_name));
+    }
     if !fin.text.is_empty() {
         let blocks = render_closed(&fin.text);
         if let Ok(mut live) = handle.live.lock() {

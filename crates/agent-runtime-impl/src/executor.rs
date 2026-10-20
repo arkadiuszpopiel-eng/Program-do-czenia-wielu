@@ -140,7 +140,7 @@ pub(crate) fn worker_result(run: &RunId, exit: Exit) -> WorkerResult {
                 .with("verified", serde_json::json!(verified)),
         },
         RunOutcome::Cancelled => WorkerResult::Stopped,
-        RunOutcome::Failed { error } => WorkerResult::Failed {
+        RunOutcome::Failed { error, .. } => WorkerResult::Failed {
             error,
             retryable: true,
         },
@@ -209,6 +209,7 @@ impl TaskExecutor for RuntimeExecutor {
         let mut guard = CancelOnDrop(Some(handle));
         let exit = join.await.unwrap_or(Exit::Finished(RunOutcome::Failed {
             error: "pętla przebiegu przerwana".into(),
+            provider: None,
         }));
         guard.0 = None;
         worker_result(&run, exit)

@@ -182,7 +182,7 @@ pub fn final_text(outcome: &RunOutcome) -> FinalText {
         ),
         RunOutcome::Cancelled => stop(String::new(), StopReason::Cancelled),
         RunOutcome::Refused => stop(String::new(), StopReason::Refusal),
-        RunOutcome::Failed { error } => FinalText {
+        RunOutcome::Failed { error, .. } => FinalText {
             text: String::new(),
             status: TurnStatus::Error,
             stop: None,
@@ -266,9 +266,12 @@ mod tests {
             TurnStatus::Cancelled
         );
         assert!(
-            final_text(&RunOutcome::Failed { error: "x".into() })
-                .error
-                .is_some()
+            final_text(&RunOutcome::Failed {
+                error: "x".into(),
+                provider: None
+            })
+            .error
+            .is_some()
         );
         assert_eq!(run_state(&RunOutcome::Refused), RunState::Refused);
     }

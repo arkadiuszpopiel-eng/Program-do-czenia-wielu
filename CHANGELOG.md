@@ -12,6 +12,28 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.66 — 2026-10-20
+
+Poprawki po pierwszym dniu z 0.0.65: działające okno Brokera (podnoszenie poziomu autonomii), narzędzia agentek bez
+ręcznego wyboru katalogu, Alfa wie, kto działa na komputerze.
+
+### Poprawki
+
+- [poważne] Podniesienie poziomu autonomii (np. na L4) było zawsze odrzucane: wgrana Alfa nie miała obok siebie
+  programów Jądra bezpieczeństwa, więc Broker działał w procesie bez okna zatwierdzeń. Teraz Broker, okno
+  zatwierdzeń i watchdog (Ctrl+Shift+F12) są wgrywane razem z Alfą — zmianę poziomu potwierdzasz w oknie Brokera.
+- [poważne] Agentki z narzędziami (np. Delta) odpowiadały „bez narzędzi”, dopóki nie wybrałeś katalogu roboczego
+  rozmowy. Teraz bez wyboru używają domyślnego katalogu rozmowy; „Bez katalogu” w oknie rozmowy nadal je wyłącza.
+- Alfa jako Dyrygentka nie mówi już, że nikt nie ma dostępu do komputera — wie, która agentka obsady (Delta)
+  działa na plikach, programach i systemie, i podpowiada, jak ją wywołać („Delta, …”).
+- Błąd dostawcy w zadaniu agentki (limit zapytań, brak sieci, odrzucony klucz) daje ten sam komunikat co zwykła
+  rozmowa — z godziną ponowienia i kolejką offline — zamiast ogólnego „zadanie przerwane”.
+
+### Testy
+
+- Rdzeń: rozmowa bez wybranego katalogu, Dyrygentka z informacją o obsadzie, jawne „bez katalogu”; limit zapytań
+  i brak sieci w zwykłej rozmowie bez zmian.
+
 ## 0.0.65 — 2026-10-20
 
 Seria 6: kanwa artefaktów, Arena (dwa modele obok siebie), „Naucz Alfę”, karty rozmów, edycja ustawień kont dla

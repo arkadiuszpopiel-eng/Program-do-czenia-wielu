@@ -89,7 +89,7 @@ pub fn outcome(o: &RunOutcome) -> (&'static str, Option<String>, Option<String>)
         RunOutcome::Submitted { task } => ("submitted", Some(task.to_string()), None),
         RunOutcome::Suppressed { reason } => ("suppressed", None, Some(suppressed(*reason).into())),
         RunOutcome::Deferred { .. } => ("deferred", None, Some("odłożone do końca ciszy".into())),
-        RunOutcome::Failed { error } => ("failed", None, Some(error.clone())),
+        RunOutcome::Failed { error, .. } => ("failed", None, Some(error.clone())),
     }
 }
 
