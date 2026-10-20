@@ -111,11 +111,13 @@ Każda sesja ma osobną, zaszyfrowaną bazę i osobną pamięć — agentka w je
 Przyciski **Lista** i **Karty** w nagłówku panelu Sesje przełączają widok. Wybór zostaje na tym komputerze — po
 ponownym uruchomieniu panel otwiera się tak, jak go zostawiłeś. Karta pokazuje nazwę rozmowy, awatary agentek,
 które w niej odpowiadały (w nowej rozmowie — obsadę), profil (Lokalny / Hybryda / Chmura) i model ostatniej
-odpowiedzi, początek ostatniej wiadomości jako zwykły tekst (bez formatowania i kodu), czas ostatniej aktywności,
-koszt rozmowy, jeśli był (model lokalny nic nie kosztuje), oraz znaczniki **Przypięta** i **Archiwum**. Menu „…” na
-karcie ma te same pozycje co na liście.
+wybranej odpowiedzi, początek ostatniej wiadomości jako zwykły tekst (bez formatowania i kodu), czas ostatniej aktywności,
+łączny koszt rozmowy w złotych (po tym samym kursie co w szczegółach kosztów; model lokalny nic nie kosztuje),
+znaczniki **Przypięta** i **Archiwum**, a w tych dwóch grupach także nazwę projektu. Menu „…” na karcie ma te same
+pozycje co na liście.
 
-Klawiatura: strzałki przechodzą między kartami (w wąskim oknie karty stoją w jednej kolumnie), `Home` i `End` —
+Klawiatura: strzałki przechodzą między kartami w grupie (w wąskim oknie karty stoją w jednej kolumnie); strzałka
+w dół z ostatniego rzędu przechodzi do następnej grupy, w górę z pierwszego — do poprzedniej. `Home` i `End` —
 pierwsza i ostatnia karta, `Enter` otwiera rozmowę, `F2` zmienia nazwę, `Delete` usuwa (z „Cofnij”). Gdy szczegóły
 kart nie dadzą się wczytać, nad kartami pojawia się komunikat z **Ponów**, a karty pokazują to, co jest na liście.
 

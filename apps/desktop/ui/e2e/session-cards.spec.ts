@@ -34,6 +34,8 @@ test('karty: profil rozmowy, przypięcie i koszt; widok zostaje po ponownym uruc
   await showCards(page);
   const q3 = panel(page).getByRole('listitem').filter({ hasText: 'Raport Q3' }).first();
   await expect(q3).toContainText('Przypięta');
+  // Grupa „Przypięte” — nazwa projektu na karcie, jak w wierszu listy.
+  await expect(q3).toContainText('Projekt X');
   await expect(q3).toContainText('claude-opus-5-5');
   await expect(q3).toContainText('Delta:');
   await expect(q3).toContainText('Utworzyłam szkic raport-Q3.docx');

@@ -19,16 +19,19 @@
     session: SessionSummary;
     /** Dane z historii (`sessions_cards`); brak — karta bez agentek, fragmentu i kosztu. */
     card?: SessionCard;
+    /** Nazwa projektu na karcie (grupy „Przypięte” i „Archiwum”, jak w wierszu listy). */
+    showProject?: boolean;
     /** Strzałki, Home, End — ruch po siatce kart. */
     onmove: (event: KeyboardEvent) => void;
   }
 
-  let { session, card, onmove }: Props = $props();
+  let { session, card, showProject = false, onmove }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
   const active = $derived(app.activeId === session.id);
   const renaming = $derived(app.sessions.renamingId === session.id);
   const items = $derived<MenuItem[]>(sessionMenuItems(app, session));
+  const project = $derived(showProject ? (session.project?.name ?? '') : '');
   const cast = $derived(knownAgents(card?.agents ?? []));
   // Rdzeń oddaje już czysty tekst; ponowne czyszczenie chroni widok przed starszym rdzeniem.
   const snippet = $derived(card?.snippet ? plainSnippet(card.snippet) : '');
@@ -120,7 +123,7 @@
         <span class="name">{session.title}</span>
       </span>
       <span class="info" id="card-{session.id}-info">
-        {#if session.pinned || session.archived}
+        {#if session.pinned || session.archived || project}
           <span class="badges">
             {#if session.pinned}
               <span class="badge"
@@ -135,6 +138,9 @@
                   'sessions.archived',
                 )}</span
               >
+            {/if}
+            {#if project}
+              <span class="badge project" title={project}>{project}</span>
             {/if}
           </span>
         {/if}
@@ -266,6 +272,12 @@
     border-radius: var(--alfa-radius-full);
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-xs);
+  }
+  .project {
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .cast {
     display: inline-flex;

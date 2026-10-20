@@ -3,6 +3,15 @@
 //! model ostatniej odpowiedzi i łączny koszt. Dane liczone z historii sesji (`SessionHistory`) —
 //! `SessionSummary` zostaje bez zmian.
 //!
+//! Koszt: suma mikro-USD wszystkich gałęzi przeliczona kursem `usd_pln_e4` (USD→PLN × 10⁴, ten sam
+//! co w szczegółach kosztów) na grosze; bez kursu (0) — centy USD.
+//!
+//! Pamięć i dysk: każda czytana rozmowa otwiera swoją zaszyfrowaną bazę. Po odczycie wywołujemy
+//! `release(id)` — integrator zamyka tam bazę, której nie było otwartej przed wywołaniem
+//! (`SqliteSessions::close_session`), żeby widok „Karty” nie trzymał otwartych wszystkich baz.
+//! UI prosi tylko o rozmowy nowe albo zmienione (`updated_at`), partiami po [`MAX_CARDS`].
+//! Wywołanie jest synchroniczne — komenda IPC uruchamia je w `spawn_blocking`.
+//!
 //! Treść ostatniej wiadomości przechodzi przez `lib_markdown::to_spoken_text` (bez znaczników,
 //! kod i tabele jako krótka fraza), a potem traci znaki sterujące i nadmiar spacji — UI wstawia ją
 //! jako zwykły tekst, nigdy jako HTML.
@@ -21,8 +30,14 @@ pub const MAX_AGENTS: usize = 4;
 
 /// Karty dla podanych rozmów, w kolejności identyfikatorów (bez powtórzeń, do [`MAX_CARDS`]).
 /// Rozmowa nieistniejąca albo w koszu jest pomijana; nieczytelna historia daje kartę bez
-/// fragmentu, modelu i kosztu (obsada z metadanych zostaje).
-pub fn session_cards(store: &dyn Sessions, ids: &[String]) -> Vec<SessionCard> {
+/// fragmentu, modelu i kosztu (obsada z metadanych zostaje). `usd_pln_e4` — kurs USD→PLN × 10⁴
+/// (0 — koszt w USD); `release` — wołane po odczycie historii każdej rozmowy (zamknięcie bazy).
+pub fn session_cards(
+    store: &dyn Sessions,
+    ids: &[String],
+    usd_pln_e4: u64,
+    release: &dyn Fn(&SessionId),
+) -> Vec<SessionCard> {
     let mut seen = BTreeSet::new();
     let mut out = Vec::new();
     for raw in ids {
@@ -49,9 +64,10 @@ pub fn session_cards(store: &dyn Sessions, ids: &[String]) -> Vec<SessionCard> {
             model: None,
             cost: None,
         };
+        let visible = visible_line(store, &id);
         match store.all_turns(&id) {
             Ok(all) => {
-                fill_usage(&mut card, &all);
+                card.cost = total_cost(&all, usd_pln_e4);
                 for turn in &all {
                     if let Author::Agent { agent } = &turn.author {
                         push_agent(&mut agents, agent.as_str());
@@ -66,7 +82,8 @@ pub fn session_cards(store: &dyn Sessions, ids: &[String]) -> Vec<SessionCard> {
                 push_agent(&mut agents, agent.as_str());
             }
         }
-        let visible = visible_line(store, &id);
+        release(&id);
+        card.model = last_model(&visible);
         if let Some((text, author)) = last_message(&visible) {
             card.snippet = Some(text);
             card.snippet_author = Some(author);
@@ -95,25 +112,36 @@ fn visible_line(store: &dyn Sessions, id: &SessionId) -> Vec<Turn> {
         .unwrap_or_default()
 }
 
-/// Model ostatniej odpowiedzi i suma kosztów wszystkich gałęzi (wydane pieniądze nie znikają
-/// po wybraniu innego wariantu odpowiedzi).
-fn fill_usage(card: &mut SessionCard, all: &[Turn]) {
-    let mut micro_usd: u64 = 0;
-    for turn in all {
-        if let Some(usage) = &turn.usage {
-            micro_usd = micro_usd.saturating_add(usage.cost.micro_usd);
-            let model = usage.model.trim();
-            if !model.is_empty() {
-                card.model = Some(model.to_owned());
-            }
-        }
+/// Model ostatniej odpowiedzi na aktywnej linii (wybrany wariant odpowiedzi, nie najnowsza gałąź).
+fn last_model(line: &[Turn]) -> Option<String> {
+    line.iter().rev().find_map(|turn| {
+        let model = turn.usage.as_ref()?.model.trim();
+        (turn.role == Role::Assistant && !model.is_empty()).then(|| model.to_owned())
+    })
+}
+
+/// Suma kosztów wszystkich gałęzi (wydane pieniądze nie znikają po wybraniu innego wariantu
+/// odpowiedzi), w groszach po kursie `usd_pln_e4` albo — bez kursu — w centach USD; zaokrąglona
+/// w górę.
+fn total_cost(all: &[Turn], usd_pln_e4: u64) -> Option<Money> {
+    let micro_usd: u64 = all
+        .iter()
+        .filter_map(|turn| turn.usage.as_ref())
+        .fold(0, |sum, usage| sum.saturating_add(usage.cost.micro_usd));
+    if micro_usd == 0 {
+        return None;
     }
-    if micro_usd > 0 {
-        card.cost = Some(Money {
-            minor: i64::try_from(micro_usd.div_ceil(10_000)).unwrap_or(i64::MAX),
-            currency: Currency::Usd,
-        });
-    }
+    let (minor, currency) = if usd_pln_e4 > 0 {
+        // mikro-PLN = mikro-USD × kurs × 10⁴ / 10⁴; grosz = 10⁴ mikro-PLN.
+        let micro_pln = u128::from(micro_usd) * u128::from(usd_pln_e4) / 10_000;
+        (micro_pln.div_ceil(10_000), Currency::Pln)
+    } else {
+        (u128::from(micro_usd).div_ceil(10_000), Currency::Usd)
+    };
+    Some(Money {
+        minor: i64::try_from(minor).unwrap_or(i64::MAX),
+        currency,
+    })
 }
 
 /// Ostatnia wiadomość użytkownika albo agentki z niepustym tekstem.

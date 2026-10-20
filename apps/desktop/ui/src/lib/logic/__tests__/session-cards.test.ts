@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   SNIPPET_CHARS,
   columnsOf,
+  inBatches,
   knownAgents,
   moveInGrid,
+  moveInGroups,
   plainSnippet,
   readSessionsView,
   writeSessionsView,
@@ -114,5 +116,50 @@ describe('czysty tekst ostatniej wiadomości', () => {
     expect(Array.from(out)).toHaveLength(SNIPPET_CHARS);
     expect(out.endsWith('…')).toBe(true);
     expect(plainSnippet('krótki', 3)).toBe('kr…');
+  });
+});
+
+describe('ruch po kartach w grupach', () => {
+  // Grupa 1: karty 0, 1 (pierwszy rząd) i 2 (niepełny drugi); grupa 2: karty 3, 4, 5.
+  const sizes = [3, 3];
+
+  it('ArrowDown nad niepełnym rzędem zostaje w grupie (ostatnia karta)', () => {
+    expect(moveInGroups(sizes, 1, 'ArrowDown', 2)).toBe(2);
+    expect(moveInGroups(sizes, 0, 'ArrowDown', 2)).toBe(2);
+  });
+
+  it('z ostatniego rzędu — pierwsza karta następnej grupy; z pierwszego — ostatnia poprzedniej', () => {
+    expect(moveInGroups(sizes, 2, 'ArrowDown', 2)).toBe(3);
+    expect(moveInGroups(sizes, 4, 'ArrowUp', 2)).toBe(2);
+    expect(moveInGroups(sizes, 5, 'ArrowUp', 2)).toBe(3);
+    expect(moveInGroups(sizes, 2, 'ArrowUp', 2)).toBe(0);
+  });
+
+  it('brzegi całości, strzałki w bok w grupie, Home/End po wszystkich', () => {
+    expect(moveInGroups(sizes, 0, 'ArrowUp', 2)).toBe(0);
+    expect(moveInGroups(sizes, 5, 'ArrowDown', 2)).toBe(5);
+    expect(moveInGroups(sizes, 2, 'ArrowRight', 2)).toBe(2);
+    expect(moveInGroups(sizes, 3, 'ArrowLeft', 2)).toBe(3);
+    expect(moveInGroups(sizes, 1, 'ArrowRight', 2)).toBe(1);
+    expect(moveInGroups(sizes, 3, 'Home', 2)).toBe(0);
+    expect(moveInGroups(sizes, 0, 'End', 2)).toBe(5);
+    expect(moveInGroups(sizes, 0, 'Enter', 2)).toBeNull();
+    expect(moveInGroups([], 0, 'ArrowDown', 2)).toBeNull();
+  });
+
+  it('jedna kolumna — jak lista', () => {
+    expect(moveInGroups(sizes, 2, 'ArrowDown', 1)).toBe(3);
+    expect(moveInGroups(sizes, 3, 'ArrowUp', 1)).toBe(2);
+    expect(moveInGroups(sizes, 0, 'ArrowDown', 1)).toBe(1);
+  });
+});
+
+describe('partie identyfikatorów', () => {
+  it('dzieli po rozmiarze, reszta w ostatniej partii', () => {
+    const ids = Array.from({ length: 450 }, (_, i) => `s${i}`);
+    const batches = inBatches(ids, 200);
+    expect(batches.map((b) => b.length)).toEqual([200, 200, 50]);
+    expect(batches.flat()).toEqual(ids);
+    expect(inBatches([], 200)).toEqual([]);
   });
 });

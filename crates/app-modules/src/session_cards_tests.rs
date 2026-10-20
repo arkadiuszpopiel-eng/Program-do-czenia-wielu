@@ -21,6 +21,11 @@ fn usage(model: &str, micro_usd: u64) -> Option<ModelUsage> {
     })
 }
 
+/// Karty bez kursu (koszt w USD) i bez zamykania baz.
+fn cards(store: &FakeSessions, ids: &[String]) -> Vec<SessionCard> {
+    session_cards(store, ids, 0, &|_| {})
+}
+
 fn session(store: &FakeSessions, agents: &[&str]) -> SessionId {
     store
         .create_session(NewSession {
@@ -43,7 +48,7 @@ fn card_has_agents_snippet_model_and_cost() {
     answer.usage = usage("claude-test", 12_345);
     store.append_turn(&id, Some(q.id), answer).unwrap();
 
-    let cards = session_cards(&store, &[id.to_string()]);
+    let cards = cards(&store, &[id.to_string()]);
     assert_eq!(cards.len(), 1);
     let card = &cards[0];
     assert_eq!(card.session_id, id.to_string());
@@ -78,11 +83,48 @@ fn cost_counts_every_branch_and_snippet_follows_active_line() {
     second.usage = usage("m2", 20_000);
     store.fork_from(&id, first.id, second).unwrap();
 
-    let card = &session_cards(&store, &[id.to_string()])[0];
+    let card = &cards(&store, &[id.to_string()])[0];
     assert_eq!(card.snippet.as_deref(), Some("Druga odpowiedź"));
     assert_eq!(card.model.as_deref(), Some("m2"));
     assert_eq!(card.cost.map(|m| m.minor), Some(3));
     assert_eq!(card.agents, vec!["alfa".to_owned(), "gama".to_owned()]);
+
+    // Powrót do starszego wariantu: model i fragment z aktywnej linii, koszt nadal z obu gałęzi.
+    store.set_active_leaf(&id, first.id).unwrap();
+    let card = &cards(&store, &[id.to_string()])[0];
+    assert_eq!(card.snippet.as_deref(), Some("Pierwsza odpowiedź"));
+    assert_eq!(card.model.as_deref(), Some("m1"));
+    assert_eq!(card.cost.map(|m| m.minor), Some(3));
+}
+
+#[test]
+fn cost_in_pln_by_rate_and_release_after_each_read() {
+    let store = FakeSessions::new();
+    let id = session(&store, &[]);
+    let q = store
+        .append_turn(&id, None, NewTurn::user("Pytanie"))
+        .unwrap();
+    let mut a = NewTurn::assistant("alfa", "Odpowiedź");
+    a.usage = usage("m", 12_345);
+    store.append_turn(&id, Some(q.id), a).unwrap();
+    let trashed = session(&store, &[]);
+    store.trash_session(&trashed).unwrap();
+
+    let released = std::cell::RefCell::new(Vec::new());
+    let ids = vec![id.to_string(), trashed.to_string(), "nie-ma".into()];
+    let out = session_cards(&store, &ids, 36_400, &|s| {
+        released.borrow_mut().push(s.to_string());
+    });
+    // 0,012345 USD × 3,64 = 0,0449 PLN → 5 groszy (w górę).
+    assert_eq!(
+        out[0].cost,
+        Some(Money {
+            minor: 5,
+            currency: Currency::Pln
+        })
+    );
+    // Zamykana tylko baza rozmowy, której historię czytano.
+    assert_eq!(released.into_inner(), vec![id.to_string()]);
 }
 
 #[test]
@@ -97,7 +139,7 @@ fn local_model_and_empty_session_have_no_cost_or_snippet() {
     a.usage = usage("qwen-local", 0);
     store.append_turn(&local, Some(q.id), a).unwrap();
 
-    let cards = session_cards(&store, &[empty.to_string(), local.to_string()]);
+    let cards = cards(&store, &[empty.to_string(), local.to_string()]);
     assert_eq!(cards[0].snippet, None);
     assert_eq!(cards[0].agents, vec!["delta".to_owned()]);
     assert_eq!(cards[0].cost, None);
@@ -118,7 +160,7 @@ fn hidden_turns_are_skipped() {
         .append_turn(&id, Some(q.id), NewTurn::assistant("alfa", "Ukryte"))
         .unwrap();
     store.set_hidden(&id, a.id, true).unwrap();
-    let card = &session_cards(&store, &[id.to_string()])[0];
+    let card = &cards(&store, &[id.to_string()])[0];
     assert_eq!(card.snippet.as_deref(), Some("Widoczne"));
     assert_eq!(card.snippet_author.as_deref(), Some("user"));
 }
@@ -136,7 +178,7 @@ fn unknown_trashed_and_duplicate_ids_are_skipped() {
         trashed.to_string(),
         kept.to_string(),
     ];
-    let cards = session_cards(&store, &ids);
+    let cards = cards(&store, &ids);
     assert_eq!(cards.len(), 1);
     assert_eq!(cards[0].session_id, kept.to_string());
 }
@@ -147,7 +189,7 @@ fn at_most_max_cards() {
     let ids: Vec<String> = (0..MAX_CARDS + 3)
         .map(|_| session(&store, &[]).to_string())
         .collect();
-    assert_eq!(session_cards(&store, &ids).len(), MAX_CARDS);
+    assert_eq!(cards(&store, &ids).len(), MAX_CARDS);
 }
 
 #[test]
@@ -172,6 +214,6 @@ fn snippet_is_plain_single_line_and_bounded() {
 fn agents_are_capped_and_deduplicated() {
     let store = FakeSessions::new();
     let id = session(&store, &["alfa", "alfa", "beta", "gama", "delta", "inna"]);
-    let card = &session_cards(&store, &[id.to_string()])[0];
+    let card = &cards(&store, &[id.to_string()])[0];
     assert_eq!(card.agents, vec!["alfa", "beta", "gama", "delta"]);
 }

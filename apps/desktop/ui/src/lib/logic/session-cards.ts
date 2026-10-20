@@ -57,6 +57,61 @@ export function moveInGrid(
   return next;
 }
 
+/**
+ * Ruch po kartach podzielonych na grupy (`sizes` — liczba kart w każdej grupie, `at` — indeks w
+ * całości). Strzałki działają w obrębie grupy; ArrowDown z ostatniego rzędu przechodzi do pierwszej
+ * karty następnej grupy, ArrowUp z pierwszego rzędu — do ostatniej karty poprzedniej. Z rzędu nad
+ * niepełnym ostatnim ArrowDown trafia na ostatnią kartę grupy. Home/End — pierwsza/ostatnia karta
+ * wszystkich grup. `null` — klawisz nie przesuwa.
+ */
+export function moveInGroups(
+  sizes: readonly number[],
+  at: number,
+  key: string,
+  columns: number,
+): number | null {
+  const total = sizes.reduce((sum, n) => sum + Math.max(0, n), 0);
+  if (total <= 0 || at < 0 || at >= total) return null;
+  if (key === 'Home') return 0;
+  if (key === 'End') return total - 1;
+  const cols = Math.max(1, Math.floor(columns));
+  let start = 0;
+  let group = 0;
+  while (group < sizes.length && at >= start + Math.max(0, sizes[group] ?? 0)) {
+    start += Math.max(0, sizes[group] ?? 0);
+    group++;
+  }
+  const size = Math.max(0, sizes[group] ?? 0);
+  const local = at - start;
+  const row = Math.floor(local / cols);
+  const lastRow = Math.floor((size - 1) / cols);
+  switch (key) {
+    case 'ArrowRight':
+      return local + 1 < size ? at + 1 : at;
+    case 'ArrowLeft':
+      return local > 0 ? at - 1 : at;
+    case 'ArrowDown':
+      if (row < lastRow) return start + Math.min(local + cols, size - 1);
+      return start + size < total ? start + size : at;
+    case 'ArrowUp':
+      if (row > 0) return at - cols;
+      return start > 0 ? start - 1 : at;
+    default:
+      return null;
+  }
+}
+
+/** Identyfikatory w partiach po `size` (limit jednego wywołania `sessions_cards`). */
+export function inBatches<T>(items: readonly T[], size: number): T[][] {
+  const step = Math.max(1, Math.floor(size));
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += step) out.push(items.slice(i, i + step));
+  return out;
+}
+
+/** Najwięcej kart w jednym wywołaniu — jak `MAX_CARDS` w rdzeniu. */
+export const MAX_CARDS = 200;
+
 /** Liczba kolumn siatki: karty w pierwszym rzędzie (ta sama górna krawędź co pierwsza). */
 export function columnsOf(tops: readonly number[]): number {
   const first = tops[0];
