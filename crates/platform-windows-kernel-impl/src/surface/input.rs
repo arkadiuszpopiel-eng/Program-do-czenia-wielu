@@ -9,7 +9,8 @@ use std::cell::Cell;
 use std::ffi::c_void;
 
 use platform_contract::{
-    HookObservation, HookOrigin, InputDevice, InputSample, MessageOrigin, input_is_injected,
+    HOOK_WINDOW_MS, HookObservation, HookOrigin, InputDevice, InputSample, MessageOrigin,
+    input_is_injected,
 };
 use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, RECT, WPARAM};
 use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
@@ -54,18 +55,24 @@ pub(super) fn is_input_message(message: u32) -> bool {
 /// źródła (`IMDT_UNAVAILABLE` do powrotu z `SendMessage` — dokumentacja
 /// `GetCurrentInputMessageSource`), więc próbka w ich obsłudze była zawsze „wstrzyknięta”.
 pub(super) fn begin_dispatch(message: u32) {
-    IN_DISPATCH.set(is_input_message(message).then(sample));
+    if is_input_message(message) {
+        IN_DISPATCH.set(Some(sample()));
+    }
 }
 
-/// Koniec obsługi komunikatu z pętli.
-pub(super) fn end_dispatch() {
-    IN_DISPATCH.set(None);
-}
+/// Koniec obsługi komunikatu z pętli (próbka zostaje: `WM_COMMAND` przycisku przychodzi
+/// osobnym komunikatem ok. 70–100 ms po zwolnieniu przycisku — dziennik z 2026-10-20).
+pub(super) fn end_dispatch() {}
 
-/// Próbka dla decyzji: z komunikatu wejścia w obsłudze (pętla), inaczej bieżąca (fail-closed —
-/// komunikat spoza wejścia daje `IMDT_UNAVAILABLE` i bez świeżego hooka jest odrzucany).
+/// Próbka dla decyzji: ostatniego komunikatu wejścia, jeśli świeża (≤ `HOOK_WINDOW_MS`) —
+/// zużywana raz; inaczej bieżąca (fail-closed — komunikat spoza wejścia daje
+/// `IMDT_UNAVAILABLE` i bez świeżego hooka jest odrzucany).
 pub(super) fn decision_sample() -> InputSample {
-    IN_DISPATCH.get().unwrap_or_else(sample)
+    let now = now_ms();
+    IN_DISPATCH
+        .take()
+        .filter(|s| now.saturating_sub(s.at_ms) <= HOOK_WINDOW_MS)
+        .unwrap_or_else(sample)
 }
 
 fn observe(cell: &'static std::thread::LocalKey<Cell<Option<HookObservation>>>, o: HookOrigin) {
