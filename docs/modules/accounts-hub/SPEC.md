@@ -13,7 +13,7 @@ F1 (katalog, kreator, Credential Manager, stany, import ze zmiennych, wykrywanie
 - `Wizard` — maszyna stanów: `ChooseProvider → EnterKey → TestConnection → DiscoverModels → Assign → CostLimit → Confirm`; zabroniony dostawca / `oauth_cli` odrzucone; `finish` tylko po udanym teście bieżącego klucza.
 - Porty: `ConnectionTester`, `ModelLister`, `EnvSource`, `CliProbe` (+ `detect_cli_bridges_with`, `parse_version`).
 - `trait AccountsHub`: `catalog`, `provider`, `provider_state`, `accounts`, `account`, `set_pricing`, `add_account`, `test_account`, `rotate`, `remove`, `set_disabled`, `update_settings`, `import_from_env`, `resolve_secret(id, caller)` (tylko `providers-*`), `wizard_test`, `wizard_discover`, `wizard_finish`; `AccountsRepository` (metadane bez sekretów).
-Zdarzenia (bez wartości kluczy): `accounts.key.added`, `accounts.key.removed`, `accounts.key.tested`, `accounts.key.rotated`, `accounts.state_changed`.
+Zdarzenia (bez wartości kluczy): `accounts.key.added`, `accounts.key.removed`, `accounts.key.tested`, `accounts.key.rotated`, `accounts.state_changed`, `accounts.enterprise.changed`.
 
 ## Zależności
 `compliance-contract` (tagi, status API, opcjonalnie trasa `<provider>.api` zabroniona), `core-bus-contract`, `core-registry-contract`. **Kierunek z `cost-meter`:** to `cost-meter-contract` zależy od `accounts-hub-contract` (ceny, `CostLimit`), nie odwrotnie. Test połączenia przez adaptery `providers-*` (kompozycja wstrzykuje `ConnectionTester`/`ModelLister`).
@@ -113,3 +113,10 @@ Ustawienia → Modele i dostawcy → Hub kont i kluczy (makieta 12): lista, krea
   dostawcy (`AccountsError::InvalidInput`, w kreatorze `WizardError::InvalidEnterprise`). Te same reguły w interfejsie:
   `logic/enterprise.ts`, wspólna tabela przypadków `accounts-hub-contract/tests/fixtures/enterprise-cases.json`.
 - Kontrakt: `contract_tests::enterprise_settings_only_where_they_apply` (impl i fake).
+- **0.0.65:** `set_enterprise(id, ustawienia)` — zmiana istniejącego konta: `checked` z dostawcą i adresem konta
+  (adres zasobu Azure się nie zmienia), odmowa, gdy ten sam klucz w tym samym projekcie OpenAI ma już inne konto
+  (`duplicate_in_project`), `apply_enterprise` na bieżącym wpisie (Azure: modele = wdrożenia, kolejki bez modeli
+  spoza wdrożeń), zapis metadanych przed zmianą w pamięci i zdarzenie `accounts.enterprise.changed` (organizacja
+  i projekt skrócone `mask_id`, z wdrożeń tylko liczba). Stan i ostatni test konta zostają — potwierdza je test.
+  Kontrakt: `set_enterprise_on_openai_account`, `set_enterprise_respects_duplicate_key_rule`,
+  `set_enterprise_on_azure_account`; impl: `tests/enterprise_edit.rs` (zdarzenie, trwałość, błąd zapisu).

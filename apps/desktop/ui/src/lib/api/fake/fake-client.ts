@@ -7,7 +7,8 @@ import type { AlfaEvent } from '../types-system';
 import { FakeChat } from './api-chat';
 import { FakeGui } from './api-gui';
 import { FakeHealth } from './api-health';
-import { accountsApi, transferApi } from './api-hub';
+import { accountsApi } from './api-hub';
+import { transferApi } from './api-transfer';
 import { sessionsApi } from './api-sessions';
 import {
   agentsApi,

@@ -5,7 +5,8 @@
 use accounts_hub_contract::{
     Account, AccountId, AccountState, AccountsError, AuthKind, ConnectionReport, ConnectionRequest,
     ConnectionTester, EnterpriseSettings, ModelId, ModelInfo, ModelLister, ProviderCatalogEntry,
-    ProviderId, SecretStore, SecretString, TestSummary,
+    ProviderId, SecretStore, SecretString, TaskClass, TestSummary, apply_enterprise,
+    duplicate_in_project,
 };
 
 use crate::hub::{FakeAccountsHub, redact};
@@ -164,6 +165,52 @@ impl FakeAccountsHub {
             capabilities: None,
             context_window: None,
         }];
+        self.put(acc);
+        Ok(())
+    }
+
+    pub(crate) fn set_model_queue_now(
+        &self,
+        id: &AccountId,
+        class: TaskClass,
+        models: Vec<ModelId>,
+    ) -> Result<(), AccountsError> {
+        let names: Vec<String> = models.iter().map(ToString::to_string).collect();
+        accounts_hub_contract::validate_queue(class, &names)
+            .map_err(AccountsError::InvalidInput)?;
+        let mut acc = self.get(id)?;
+        if models.is_empty() {
+            acc.queues.remove(&class);
+        } else {
+            acc.queues.insert(class, models);
+        }
+        self.put(acc);
+        Ok(())
+    }
+
+    /// Ustawienia firmowe istniejącego konta — te same reguły co `-impl` (bez magistrali).
+    pub(crate) fn set_enterprise_now(
+        &self,
+        id: &AccountId,
+        enterprise: EnterpriseSettings,
+    ) -> Result<(), AccountsError> {
+        let mut acc = self.get(id)?;
+        let entry = self.entry(&acc.provider)?;
+        let base_url = acc.base_url.as_deref().or(entry.base_url.as_deref());
+        let checked = enterprise
+            .checked(entry.id.as_str(), base_url)
+            .map_err(AccountsError::InvalidInput)?;
+        if let Some(secret) = self.secrets.get(&acc.secret)? {
+            let url = acc.base_url.as_deref();
+            let twin = self.find_same_key(&acc.provider, url, &checked, &secret);
+            if let Some(other) = twin.filter(|other| other != id) {
+                let label = self
+                    .get(&other)
+                    .map_or_else(|_| other.to_string(), |a| a.label);
+                return Err(duplicate_in_project(&label));
+            }
+        }
+        apply_enterprise(&mut acc, checked)?;
         self.put(acc);
         Ok(())
     }

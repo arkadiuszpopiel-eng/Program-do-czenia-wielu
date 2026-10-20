@@ -244,17 +244,15 @@ impl AccountsHub for FakeAccountsHub {
         class: accounts_hub_contract::TaskClass,
         models: Vec<ModelId>,
     ) -> Result<(), AccountsError> {
-        let names: Vec<String> = models.iter().map(ToString::to_string).collect();
-        accounts_hub_contract::validate_queue(class, &names)
-            .map_err(AccountsError::InvalidInput)?;
-        let mut acc = self.get(id)?;
-        if models.is_empty() {
-            acc.queues.remove(&class);
-        } else {
-            acc.queues.insert(class, models);
-        }
-        self.put(acc);
-        Ok(())
+        self.set_model_queue_now(id, class, models)
+    }
+
+    async fn set_enterprise(
+        &self,
+        id: &AccountId,
+        enterprise: accounts_hub_contract::EnterpriseSettings,
+    ) -> Result<(), AccountsError> {
+        self.set_enterprise_now(id, enterprise)
     }
 
     async fn rotate(&self, id: &AccountId, secret: SecretString) -> Result<(), AccountsError> {

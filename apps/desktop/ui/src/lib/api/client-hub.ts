@@ -5,6 +5,7 @@ import type {
   Account,
   AccountAssignment,
   AddAccountInput,
+  EnterpriseSettings,
   EnvImportResult,
   ExportRequest,
   ExportResult,
@@ -35,6 +36,12 @@ export interface AccountsApi {
   rotate(accountId: string, secret: string): Promise<TestReport>;
   /** Wyłączone konto zostaje na liście z kluczem, ale router go nie używa. */
   setDisabled(accountId: string, disabled: boolean): Promise<Account>;
+  /**
+   * Ustawienia dla firm istniejącego konta: organizacja i projekt OpenAI albo wersja API
+   * i wdrożenia Azure OpenAI (adres zasobu zostaje). Ten sam klucz w tym samym projekcie OpenAI
+   * co inne konto — odmowa.
+   */
+  setEnterprise(accountId: string, enterprise: EnterpriseSettings): Promise<Account>;
   /** Model wpisany ręcznie — dla klucza, który nie ma prawa do listy modeli. */
   setModel(accountId: string, model: string): Promise<Account>;
   /**
