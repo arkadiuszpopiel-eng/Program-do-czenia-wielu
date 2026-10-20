@@ -13,6 +13,10 @@ repository.workspace = true
 # (manifest GGUF) i `lib-embed`; używa jej `app-core` (komendy, wybór embeddera przy starcie).
 [dependencies]
 app-api = { path = "../app-api" }
+# Konta i klucze API → DTO (`accounts`, wydzielone z app-core).
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+compliance-contract = { path = "../compliance-contract" }
+chrono.workspace = true
 lib-embed = { path = "../lib-embed" }
 lib-sqlstore = { path = "../lib-sqlstore" }
 search-contract = { path = "../search-contract" }

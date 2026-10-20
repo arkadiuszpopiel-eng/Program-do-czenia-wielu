@@ -8,6 +8,7 @@ use std::time::Duration;
 use accounts_hub_contract::{
     Account as CoreAccount, AccountId, AccountState as CoreState, AccountsHub,
 };
+use app_models::accounts::{MAX_INTERVAL_HOURS, is_due};
 use chrono::{DateTime, Utc};
 
 use crate::core::AppCore;
@@ -17,26 +18,10 @@ use crate::dto::{AlfaEvent, LocalizedText, ToastKind};
 pub(crate) const INTERVAL_KEY: &str = "accounts.check_interval_hours";
 /// Wartość zalecana odstępu.
 pub(crate) const DEFAULT_INTERVAL_HOURS: u64 = 24;
-/// Najdłuższy odstęp (tydzień).
-const MAX_INTERVAL_HOURS: u64 = 168;
 /// Pierwsze sprawdzenie po starcie (program ma najpierw wstać).
 const FIRST_TICK: Duration = Duration::from_secs(120);
 /// Jak często pętla patrzy, czy któreś konto jest już do sprawdzenia.
 const TICK: Duration = Duration::from_secs(600);
-
-/// Czy konto jest do sprawdzenia: ma klucz, nie jest wyłączone, a ostatni test jest starszy niż
-/// odstęp (albo nie było go wcale).
-pub(crate) fn is_due(account: &CoreAccount, now: DateTime<Utc>, interval_hours: u64) -> bool {
-    if interval_hours == 0 || matches!(account.state, CoreState::Disabled | CoreState::Unconfigured)
-    {
-        return false;
-    }
-    let hours = i64::try_from(interval_hours.min(MAX_INTERVAL_HOURS)).unwrap_or(24);
-    account
-        .last_test
-        .as_ref()
-        .is_none_or(|test| now.signed_duration_since(test.at) >= chrono::Duration::hours(hours))
-}
 
 /// Wynik jednego przebiegu sprawdzania.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
