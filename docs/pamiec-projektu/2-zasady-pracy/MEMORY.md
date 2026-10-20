@@ -9,4 +9,5 @@
 - [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”
 - [Alfa — praca nocna](alfa-praca-nocna.md) — sesja do rana kończy się raportem, planem HTML i zbudowaną wersją; bez dźwięku w nocy
 - [Alfa — samodzielne testowanie](alfa-samodzielne-testowanie.md) — poziomy verify, testy sprzętowe, instancja testowa obok Alfy właściciela; „nie sprawdziłem” tylko z trzech powodów
+- [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — decyzja 20.10: poziom „Pełny dostęp” bez zgód; zostają wyłącznik, audyt, ochrona przed wstrzyknięciem; do przeglądu właściciela
 - [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo

@@ -6,9 +6,8 @@
 
 ## Aktualny cel
 
-**Bieżący (właściciel, 2026-10-18, /goal):** wszystko porządnie do wersji **0.0.65** — 0.0.64 i 0.0.65 to serie po
-10 punktów, więcej agentów; kopia bezpieczeństwa dopiero po 0.0.65 na nowym dysku. Lista zadań: `handoff.json` →
-`next_session`.
+**Bieżący (2026-10-20):** 0.0.65 gotowa i wgrana. Dalej seria 7 (0.0.66) — punkt 1: poziom „Pełny dostęp” AI
+(decyzja właściciela 20.10, gałąź do przeglądu). Lista zadań: `handoff.json` → `next_session`.
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);
 (2) plan v6 prowadzony na bieżąco w `alfa/docs/plan/` (MD) i `alfa/docs/html/` (HTML, generowany).
@@ -23,6 +22,7 @@ Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KO
   (bieżąca od 18.10 po południu; Edge, `jq`, `gh`, Claude Code, dane Alfy; cargo `-j 3`) i komputer stacjonarny
   Ryzen 7 5700X3D, RX 9070 XT 16 GB, 32 GB (17–18.10, seria 0.0.63; bez Edge, `jq`, Claude Code i danych Alfy;
   `CARGO_BUILD_JOBS=6`). Opis: `alfa/docs/plan/00-stan-wykonania.md`, pamięć `maszyna-stacjonarna-2026-10-17`.
+- **2026-10-20 — WERSJA 0.0.65 (seria 6, laptop):** kanwa artefaktów, Arena, karty rozmów, „Naucz Alfę”, edycja kont firm, karty w mowie; naprawa [poważne] regresji obowiązków (delegate_task w zadaniach z arkuszem faktów + walidacja schematem narzędzia) — próba na Bieliku 4/4 zielone. verify: Rust 3063/0, UI 473, przeglądarka 547/547, aplikacja 48/48, pokrycie 95,6 %; czerwony tylko cargo deny (zip). Budżet startowy 149,6/150 KB (leniwe karty, okienka stanu/kosztu, baner aktualizacji, błąd tury). Przełącznik baneru trybu deweloperskiego (ui.broker_dev_banner). Decyzja właściciela: poziom „Pełny dostęp” w serii 7. Usunięto target/agents (62 GB), wt-s6/*, gałęzie s5-*/s6-*. Raport `docs/plan/31-raport-2026-10-20.md`. Kopia F:\Alfa — patrz raport §6.
 - **2026-10-19 rano — KONIEC SESJI NA LAPTOPIE, dalej PC:** opis przekazania `PRZEKAZANIE-NA-PC-2026-10-19.md` (obok repo) i `alfa/docs/plan/30-przekazanie-na-pc-2026-10-19.md`. `verify sprzet` 0.0.64 przerwany na polecenie właściciela (bez wyniku).
 - **2026-10-18/19 — WERSJA 0.0.64 (seria 5, laptop):** 8 punktów przez agentów w kopiach roboczych `wt-s5/<punkt>` (gałęzie s5-*, scalone), + sprawdzenie laptopa iGPU + NVIDIA (bez regresji) i test Claude Code. Końcowy `verify wersja` na `728558d2`: 18/19 (Rust 2983/0, UI 406, przeglądarka 475, aplikacja 42/42, pokrycie 88,6 %); czerwony tylko `cargo deny` — `zip` 8.6.0 w `updater-impl` → gałąź `do-przegladu-updater-zip9` (nie scalać bez przeglądu). Azure OpenAI w `providers-catalog/czeka-na-wlasciciela/` (rejestr zgodności). Zbudowana 0.0.64 w `target/shell/debug`, wgrana do Alfa-uruchomiona 19.10 5:13. Raport `docs/plan/29-raport-2026-10-18.md`. Kopia na F:\Alfa (nowy pusty dysk „Dane”).
 - **2026-10-18 po południu — POWRÓT NA LAPTOP (i7-13620H, 16 GB, RTX 4050 6 GB + Intel UHD Graphics):** przegląd stanu po PC stacjonarnym (25 commitów 0.0.63, ostatni `c096d02e`, drzewo czyste, 316 commitów ponad origin). Wgrana u właściciela nadal **0.0.62**; kandydat 0.0.63 = `target/shell/debug/alfa-desktop.exe` z `21897bf0` (każda budowa na laptopie go nadpisze). Pamięć zasad laptopa uzupełniona z repo (2 notatki z PC + nowsze MEMORY.md i alfa-pamiec-w-repozytorium.md) i opisana z perspektywy dwóch maszyn (laptop `-j 3`). F: na laptopie = inny dysk „Dane” 1,9 TB pełny plików CAPACITYTESTER — NIE uruchamiać `backup.sh` z domyślnym `/f/Alfa`. Spowolnienie sesji: wtyczka „remember” (post-tool-hook liczy linie zapisu sesji ~350 MB przy każdym poleceniu — dziesiątki procesów po 500 s CPU); właściciel ją wyłączył, zawieszone procesy zatrzymane. **CEL właściciela (/goal):** wszystko porządnie do wersji **0.0.65** (0.0.64 i 0.0.65 = serie po 10 punktów), więcej agentów; kopia bezpieczeństwa dopiero po 0.0.65 na nowym dysku, który podłączy właściciel. Praca wstrzymana na polecenie właściciela (pauza).

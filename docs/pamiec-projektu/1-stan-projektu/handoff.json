@@ -3,11 +3,11 @@
     "version": "2.1",
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
-    "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-19T05:30:00+02:00"
+    "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
+    "updated": "2026-10-20T15:30:00+02:00"
   },
-  "current_state": "Sesja na laptopie zakończona. 0.0.64 wgrana (19.10 5:13). Dalej praca na PC stacjonarnym — opis: E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/PRZEKAZANIE-NA-PC-2026-10-19.md (kopia w alfa/docs/plan/30-przekazanie-na-pc-2026-10-19.md). verify sprzet 0.0.64 przerwany — bez wyniku.",
-  "session_goal": "Kolejna sesja: decyzje właściciela, wgranie, seria 0.0.65.",
+  "current_state": "0.0.65 (seria 6, laptop) zbudowana, sprawdzona, wgrana do Alfa-uruchomiona 20.10. verify wersja: wszystko zielone poza cargo deny (zip w updater-impl, gałąź do-przegladu-updater-zip9). Próba obowiązków na Bieliku 4.5B: 4/4 zielone — regresja delegate_task z 0.0.64 naprawiona. Raport: alfa/docs/plan/31-raport-2026-10-20.md.",
+  "session_goal": "Następna sesja: seria 7 (0.0.66) — pierwszy punkt: poziom autonomii „Pełny dostęp” (decyzja właściciela 20.10) na gałęzi do przeglądu.",
   "in_progress": [],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
@@ -15,11 +15,11 @@
     "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku."
   ],
   "next_session": [
-    "Przeczytaj PRZEKAZANIE-NA-PC-2026-10-19.md (pierwsze kroki na PC, decyzje właściciela).",
-    "Decyzje właściciela: przegląd gałęzi do-przegladu-updater-zip9 (zip 9 w updater-impl → cargo deny zielony); wpis azure-openai w rejestrze zgodności (providers-catalog/czeka-na-wlasciciela/README.md); podpis ADR 0028 i licencja DirectML.",
-    "verify sprzet dla 0.0.64 na laptopie (PDF i JSON narzędzi na prawdziwym modelu lokalnym).",
-    "Seria 0.0.65 (10 punktów) — agenci w kopiach roboczych utworzonych ręcznie z HEAD (git worktree add ../wt-<seria>/<punkt>), NIE isolation: worktree (tworzy z origin, stary commit 75fee0d9).",
-    "Kopie robocze wt-s5/* do usunięcia po scaleniu (gałęzie s5-* scalone)."
+    "Seria 7 / punkt 1: poziom „Pełny dostęp” w Ustawieniach (włącza właściciel): agentki bez pytań o zgodę; zostają wyłącznik Ctrl+Shift+F12, dziennik działań i blokada poleceń z obcych treści. Dotyka Brokera/polityk → gałąź do-przegladu-pelny-dostep, scalenie dopiero po akceptacji właściciela.",
+    "Budżet startowy okna 149,6/150 KB — przed serią 7 ładowanie słowników PL częściami (Ustawienia, zadania, głos), nie pojedyncze przeniesienia.",
+    "Decyzje właściciela: do-przegladu-updater-zip9 (cargo deny), Azure w rejestrze zgodności, ADR 0028 + licencja DirectML, znak wodny mowy.",
+    "Serie mniejsze (5–6 punktów, mniej agentów), ciężkie budowy najlepiej na PC stacjonarnym (32 GB); nowa sesja Claude (stara ~350 MB zapisu spowalniała pracę).",
+    "Kopie robocze agentów: git worktree add -b <gałąź> ../wt-<seria>/<punkt> HEAD (nie isolation: worktree); wspólny target/agents usuwać po serii (62 GB)."
   ],
   "env_snapshot": {
     "key_paths": {
@@ -37,15 +37,13 @@
     }
   },
   "test_results": {
-    "0.0.63": "verify wersja 96588e5b: 16 zielonych / 2 czerwone (brak Edge, cargo deny: zip) / 1 nieuruchomiony (jq); Rust 2898/0/40, interfejs 395/395, prawdziwa aplikacja 41 + 1 pominięty, pokrycie łącza 235/264 (89 %); przeglądarka na Chromium Playwrighta 467/467; RX 9070 XT: DXCore/PDH (odczyt samej pamięci 89 µs), Supertonic CPU vs DirectML, Qwen3-ASR Vulkan"
+    "0.0.63": "verify wersja 96588e5b: 16 zielonych / 2 czerwone (brak Edge, cargo deny: zip) / 1 nieuruchomiony (jq); Rust 2898/0/40, interfejs 395/395, prawdziwa aplikacja 41 + 1 pominięty, pokrycie łącza 235/264 (89 %); przeglądarka na Chromium Playwrighta 467/467; RX 9070 XT: DXCore/PDH (odczyt samej pamięci 89 µs), Supertonic CPU vs DirectML, Qwen3-ASR Vulkan",
+    "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone."
   },
   "decisions_this_session": [
-    "Na AMD/Intel rozpoznaje mowę Qwen3-ASR przez llama-server Vulkan (whisper.cpp nie wydaje wersji Vulkan) — bez budowania whisper.cpp",
-    "DirectML tylko dla Supertonic, karta z własną pamięcią >= 12 GB, jawny powrót na procesor; Smart Turn zostaje na CPU",
-    "APU z rezerwą z BIOS-u >= 6 GB liczone jak karta; przy dwóch kartach z pulą — osobna przed zintegrowaną (Rust i UI)",
-    "Wolna pamięć karty NVIDIA: jedna karta — nvidia-smi jak dawniej; kilka — wiersz głównej karty po nazwie, bez niego liczniki PDH po LUID",
-    "Porządki: właściciel zgodził się tylko na usunięcie starej kompilacji powłoki; PLAN/, alfa-glos-proba, kopie na F: zostają; artefakty kompilacji w target/ to odtwarzalna pamięć podręczna",
-    "Zasady pracy z laptopa przywrócone do pamięci asystenta na nowym PC (lustro memory-sync kasowało je z repo); stała zgoda na pobrania do 3 GB obejmuje łatki crates.io i przeglądarkę testową Playwrighta",
-    "Qwen3-ASR przez Vulkan: na głównej karcie < 12 GB na procesorze (2,4 s/zdanie), karta dla modelu rozmowy; rezerwa 3 GB w budżecie modelu rozmowy odrzucona (próg 3200 > rezerwa, liczona raz przy starcie). Ograniczenie (klasa „nieznana”) → C6.6 budżet na kartę"
+    "Właściciel 20.10: poziom „Pełny dostęp” AI (bez zgód), z wyłącznikiem, dziennikiem i ochroną przed wstrzyknięciem; odrzucony wariant „zero ograniczeń”.",
+    "Właściciel 20.10: przełącznik baneru „Tryb deweloperski” — zrobiony (ui.broker_dev_banner).",
+    "Wgranie 0.0.65 po próbie obowiązków (wybór właściciela).",
+    "Usunięto target/agents (62 GB) i scalone kopie robocze wt-s6, gałęzie s5-*/s6-*."
   ]
 }

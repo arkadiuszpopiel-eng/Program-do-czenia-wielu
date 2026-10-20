@@ -39,6 +39,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`28-raport-nocny-2026-10-18.md`](28-raport-nocny-2026-10-18.md) | Raport z 2026-10-17 / 18: wersja 0.0.63 — każda karta graficzna (AMD, Intel, zintegrowana), DirectML dla głosu, Qwen3-ASR na Vulkan, pomiary na RX 9070 XT, dwa przeglądy, awaria komputera, decyzje do podjęcia | jednorazowy |
 | [`29-raport-2026-10-18.md`](29-raport-2026-10-18.md) | Raport z 18.10 (laptop): wersja 0.0.64 — seria 5 (PDF, JSON narzędzi, licencje, klucze dla firm, budżet pamięci na kartę, laptop iGPU + NVIDIA, zip 9), testy, decyzje właściciela, kopia na F: | jednorazowy |
 | [`30-przekazanie-na-pc-2026-10-19.md`](30-przekazanie-na-pc-2026-10-19.md) | Przekazanie pracy z laptopa na komputer stacjonarny: stan 0.0.64, decyzje właściciela, pierwsze kroki na PC, dalsze zadania | jednorazowy |
+| [`31-raport-2026-10-20.md`](31-raport-2026-10-20.md) | Raport z 20.10 (laptop): wersja 0.0.65 — seria 6 (kanwa, Arena, karty rozmów, „Naucz”, konta firm, karty w mowie), naprawa regresji obowiązków, budżet startowy, testy, kopia | jednorazowy |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md) | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru | z postępem grupy C5 |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).
