@@ -134,4 +134,13 @@ describe('Arena — miary i porównanie', () => {
     expect(arenaBest([a, a])).toEqual({ faster: null, cheaper: null });
     expect(arenaBest([a, null])).toEqual({ faster: null, cheaper: null });
   });
+
+  it('odpowiedź zatrzymana (niedokończona) nie wygrywa porównania', () => {
+    const a = arenaMetrics(answer(usage(900, 9)), 'p:claude-opus-5-5');
+    const stopped: Turn = { ...answer(usage(200, 1)), status: 'cancelled' };
+    const b = arenaMetrics(stopped, 'p:claude-opus-5-5');
+    expect(a?.complete).toBe(true);
+    expect(b).toMatchObject({ latencyMs: 200, complete: false });
+    expect(arenaBest([a, b])).toEqual({ faster: null, cheaper: null });
+  });
 });

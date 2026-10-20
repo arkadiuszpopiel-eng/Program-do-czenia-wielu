@@ -14,6 +14,7 @@ export const enArena: Record<keyof typeof plArena, Message> = {
   'arena.costNote':
     'Both replies count towards costs and limits like ordinary messages; the Broker works as always. Replies are generated one after another.',
   'arena.start': 'Compare',
+  'arena.busy': 'Wait for the current reply to finish — comparing now would interrupt it.',
   'arena.cancel': 'Cancel',
   'arena.close': 'Close',
   'arena.stop': 'Stop',

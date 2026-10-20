@@ -48,7 +48,9 @@ export type FakeScenario =
   /** Rdzeń odpowiada po 1,5 s — audyt stanów ładowania (rejestr wywołań w `fault.ts`). */
   | 'slow-core'
   /** Arena: odpowiedź modeli OpenAI kończy się limitem kosztów konta (błąd tury). */
-  | 'arena-budget';
+  | 'arena-budget'
+  /** Strumień ~5 tokenów/s — odpowiedź trwa, gdy test ją zatrzymuje albo otwiera okna. */
+  | 'slow-stream';
 
 /** Opóźnienie odpowiedzi w scenariuszu „slow-core”. */
 export const SLOW_CORE_MS = 1_500;
@@ -71,6 +73,7 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'core-errors',
   'slow-core',
   'arena-budget',
+  'slow-stream',
 ];
 
 const CAST_STATES = ['idle', 'speaking', 'working', 'waiting_approval'] as const;
@@ -142,7 +145,7 @@ export class FakeCore {
     this.scheduler = options.scheduler ?? realScheduler;
     this.scenario = options.scenario ?? 'default';
     this.cast = options.cast ?? [];
-    this.tokensPerSecond = options.tokensPerSecond ?? 100;
+    this.tokensPerSecond = options.tokensPerSecond ?? (this.scenario === 'slow-stream' ? 5 : 100);
     this.latencyMs = options.latencyMs ?? (this.scenario === 'slow-core' ? SLOW_CORE_MS : 0);
     const now = this.scheduler.now();
     const empty = this.scenario === 'empty' || this.scenario === 'first-run';

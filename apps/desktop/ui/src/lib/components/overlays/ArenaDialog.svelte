@@ -4,6 +4,8 @@
   (append-only; rdzeń prowadzi jedną generację na sesję, więc druga startuje po pierwszej), obok
   siebie z czasem, tokenami i kosztem. „Wybierz tę odpowiedź” ustawia gałąź jako bieżącą ścieżkę.
   Bez automatycznej oceny przez model. Zamknięcie okna nie startuje kolejnych odpowiedzi.
+  Gdy w rozmowie trwa zwykła odpowiedź, „Porównaj” czeka — start areny przerwałby ją (rdzeń kończy
+  poprzednią generację sesji).
 -->
 <script lang="ts">
   import { Dialog } from 'bits-ui';
@@ -47,6 +49,8 @@
     slot.turnId ? conv?.turn(slot.turnId) : undefined;
   const step = $derived(arenaStep(slots, (id) => conv?.turn(id)?.status, stopped));
   const running = $derived(slots.length > 0 && step.kind !== 'done');
+  // Zwykła odpowiedź w toku (przed startem areny) — start by ją anulował.
+  const busy = $derived(slots.length === 0 && conv?.streaming !== undefined);
   const metrics = $derived(slots.map((slot) => arenaMetrics(turnOf(slot), slot.model)));
   const best = $derived(
     step.kind === 'done' ? arenaBest(metrics) : { faster: null, cheaper: null },
@@ -70,6 +74,8 @@
       (id) => {
         launching = false;
         slot.turnId = id;
+        // „Zatrzymaj” w trakcie startu: generacja ruszyła już po zatrzymaniu — przerwij i ją.
+        if (stopped) void conv.stop();
       },
       (error: unknown) => {
         launching = false;
@@ -84,7 +90,7 @@
   }
 
   function start() {
-    if (!modelA || !modelB || same) return;
+    if (!modelA || !modelB || same || busy) return;
     stopped = false;
     slots = [modelA, modelB].map((model) => ({ model, turnId: null, error: null }));
   }
@@ -139,6 +145,7 @@
           </div>
           {#if same}<p class="problem" role="alert">{t('arena.same')}</p>{/if}
           <p class="note">{t('arena.costNote')}</p>
+          {#if busy}<p class="note" role="status">{t('arena.busy')}</p>{/if}
         {:else}
           <div class="results" role="group" aria-label={t('arena.results')}>
             {#each slots as slot, i (slot.model)}
@@ -215,7 +222,7 @@
         {/if}
         {#if conv && target && slots.length === 0 && list.length >= 2}
           <Button variant="secondary" onclick={closeArena}>{t('arena.cancel')}</Button>
-          <Button variant="primary" disabled={!modelA || !modelB || same} onclick={start}
+          <Button variant="primary" disabled={!modelA || !modelB || same || busy} onclick={start}
             >{t('arena.start')}</Button
           >
         {:else}

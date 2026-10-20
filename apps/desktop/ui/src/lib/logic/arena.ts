@@ -82,6 +82,8 @@ export interface ArenaMetrics {
   readonly model: string;
   /** Odpowiedział inny model niż wybrany (zapas Routera: limit, prywatność, awaria). */
   readonly fallback: boolean;
+  /** Odpowiedź dokończona (`complete`) — tylko takie biorą udział w porównaniu. */
+  readonly complete: boolean;
 }
 
 export function arenaMetrics(turn: Turn | undefined, requested: string): ArenaMetrics | null {
@@ -96,16 +98,20 @@ export function arenaMetrics(turn: Turn | undefined, requested: string): ArenaMe
     provider: usage.provider,
     model: usage.model,
     fallback: usage.model !== wanted && usage.model !== requested,
+    complete: turn.status === 'complete',
   };
 }
 
-/** Która odpowiedź była szybsza i tańsza (`null` — remis albo brak danych). */
+/**
+ * Która odpowiedź była szybsza i tańsza (`null` — remis, brak danych albo odpowiedź niedokończona:
+ * zatrzymana czy przerwana błędem jest krótsza i tańsza, ale to nie wygrana).
+ */
 export function arenaBest(metrics: readonly (ArenaMetrics | null)[]): {
   readonly faster: number | null;
   readonly cheaper: number | null;
 } {
   const [a, b] = metrics;
-  if (!a || !b) return { faster: null, cheaper: null };
+  if (!a?.complete || !b?.complete) return { faster: null, cheaper: null };
   const pick = (x: number, y: number) => (x === y ? null : x < y ? 0 : 1);
   const comparable = a.cost.currency === b.cost.currency;
   return {

@@ -74,6 +74,7 @@ import type { DiagApi } from './client-diag';
 import type { ModulesApi } from './client-modules';
 import type { AdvancedApi } from './client-advanced';
 import type { LocalCommandsApi } from './client-quick';
+import type { ArenaTurnsApi } from './client-arena';
 import type { TemplatesApi } from './client-templates';
 import type { DataRoutesApi } from './client-routes';
 import type { HelpApi } from './client-help';
@@ -128,19 +129,12 @@ export interface SessionsApi {
   chooseWorkdir(sessionId: string, choice: WorkdirChoice): Promise<SessionWorkdir>;
 }
 
-export interface TurnsApi {
+export interface TurnsApi extends ArenaTurnsApi {
   /** Całe drzewo gałęzi sesji (append-only) + adnotacje widoku. */
   list(sessionId: string): Promise<TurnsSnapshot>;
   send(sessionId: string, options: SendOptions): Promise<SendResult>;
   /** Ponów → nowy wariant obok (rodzeństwo tury agentki). */
   regenerate(sessionId: string, turnId: string, profile: string | null): Promise<string>;
-  /**
-   * Arena: odpowiedź modelu `model` (`dostawca:model`, przypięty w Routerze) jako nowa gałąź —
-   * wiadomość użytkownika → nowe dziecko, odpowiedź agentki → jej rodzeństwo. Zwraca id tury.
-   */
-  arenaAnswer(sessionId: string, turnId: string, model: string): Promise<string>;
-  /** Wybór gałęzi: aktywna ścieżka sesji prowadzi przez tę turę (dalsza rozmowa, głos). */
-  selectBranch(sessionId: string, turnId: string): Promise<void>;
   /** Edytuj i wyślij ponownie → nowa gałąź od tego miejsca (rodzeństwo tury użytkownika). */
   editAndResend(sessionId: string, turnId: string, text: string): Promise<SendResult>;
   /** Kontynuuj uciętą odpowiedź → nowa tura-dziecko. */

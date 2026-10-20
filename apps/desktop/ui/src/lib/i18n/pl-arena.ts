@@ -11,6 +11,7 @@ export const plArena = {
   'arena.costNote':
     'Obie odpowiedzi liczą się do kosztów i limitów jak zwykłe wiadomości; Broker działa jak zawsze. Odpowiedzi powstają po kolei.',
   'arena.start': 'Porównaj',
+  'arena.busy': 'Poczekaj na koniec bieżącej odpowiedzi — porównanie przerwałoby ją.',
   'arena.cancel': 'Anuluj',
   'arena.close': 'Zamknij',
   'arena.stop': 'Zatrzymaj',

@@ -100,22 +100,45 @@ test('Arena: limit kosztów jednego modelu — błąd przy nim, drugi odpowiada'
   ).toBeDisabled();
 });
 
-test('Arena: Zatrzymaj nie uruchamia kolejnych odpowiedzi; brak modeli i brak wiadomości', async ({
+test('Arena: Zatrzymaj w trakcie A — A zatrzymana, B nie startuje, bez „Szybsza”', async ({
   page,
 }) => {
-  await open(page);
-  let dialog = await openFromPalette(page);
+  await open(page, { scenario: 'slow-stream' });
+  const dialog = await openFromPalette(page);
   await dialog.getByRole('button', { name: 'Porównaj' }).click();
+  const statuses = dialog.getByTestId('arena-status');
+  await expect(statuses.nth(0)).toHaveText('Odpowiada…');
+  await expect(statuses.nth(1)).toHaveText('Czeka na swoją kolej');
   const stop = dialog.getByRole('button', { name: 'Zatrzymaj' });
-  if (await stop.isVisible()) await stop.click();
+  await stop.click();
   await expect(stop).toBeHidden({ timeout: 15_000 });
-  await expect(dialog.getByTestId('arena-status').nth(1)).toHaveText(
-    /Zatrzymano|Nie uruchomiono|Gotowe/,
-  );
-  await dialog.getByRole('button', { name: 'Zamknij' }).click();
+  await expect(statuses.nth(0)).toHaveText('Zatrzymano');
+  await expect(statuses.nth(1)).toHaveText('Nie uruchomiono');
+  await expect(dialog.getByText('Szybsza')).toHaveCount(0);
+  await expect(dialog.getByText('Tańsza')).toHaveCount(0);
+  await expect(
+    dialog.getByRole('button', { name: 'Wybierz odpowiedź modelu Anthropic · claude-opus-5-5' }),
+  ).toBeDisabled();
+});
 
+test('Arena: zwykła odpowiedź w toku — „Porównaj” czeka, nie przerywa jej', async ({ page }) => {
+  await open(page, { scenario: 'slow-stream' });
+  await page.locator('#alfa-composer').fill('Zaplanuj mi tydzień pracy.');
+  await page.keyboard.press('Enter');
+  const dialog = await openFromPalette(page);
+  await expect(dialog.getByRole('status')).toHaveText(
+    'Poczekaj na koniec bieżącej odpowiedzi — porównanie przerwałoby ją.',
+  );
+  await expect(dialog.getByRole('button', { name: 'Porównaj' })).toBeDisabled();
+  await expectAccessible(page, 'arena odpowiedz w toku');
+  await expectReadable(page, 'arena odpowiedz w toku');
+  await dialog.getByRole('button', { name: 'Anuluj' }).click();
+  await expect(dialog).toBeHidden();
+});
+
+test('Arena: brak modeli i brak wiadomości', async ({ page }) => {
   await open(page, { scenario: 'no-keys' });
-  dialog = await openFromPalette(page);
+  let dialog = await openFromPalette(page);
   await expect(dialog.getByText(/co najmniej dwa modele/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Zamknij' }).click();
 
