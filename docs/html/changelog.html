@@ -337,6 +337,9 @@ ręcznego wyboru katalogu, Alfa wie, kto działa na komputerze.</p>
 <li>[poważne] Podniesienie poziomu autonomii (np. na L4) było zawsze odrzucane: wgrana Alfa nie miała obok siebie
 programów Jądra bezpieczeństwa, więc Broker działał w procesie bez okna zatwierdzeń. Teraz Broker, okno
 zatwierdzeń i watchdog (Ctrl+Shift+F12) są wgrywane razem z Alfą — zmianę poziomu potwierdzasz w oknie Brokera.</li>
+<li>[krytyczne] Okno zatwierdzeń odrzucało każde fizyczne kliknięcie i klawisz jako „wejście wstrzyknięte”, więc
+nie dało się ani zezwolić, ani odmówić: źródło wejścia było sprawdzane w chwili, w której Windows go nie podaje.
+Teraz jest odczytywane z samego kliknięcia albo klawisza; odznaka ryzyka nie ucina już liter („Ryzyko: wysokie”).</li>
 <li>[poważne] Agentki z narzędziami (np. Delta) odpowiadały „bez narzędzi”, dopóki nie wybrałeś katalogu roboczego
 rozmowy. Teraz bez wyboru używają domyślnego katalogu rozmowy; „Bez katalogu” w oknie rozmowy nadal je wyłącza.</li>
 <li>Alfa jako Dyrygentka nie mówi już, że nikt nie ma dostępu do komputera — wie, która agentka obsady (Delta)
