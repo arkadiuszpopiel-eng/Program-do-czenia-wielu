@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 70 |
-| Linie Rust (z testami) | 437 999 |
-| Testy (`#[test]`, `#[tokio::test]`) | 3135 |
+| Linie Rust (z testami) | 438 199 |
+| Testy (`#[test]`, `#[tokio::test]`) | 3138 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -67,7 +67,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `model-residency` | F2 | service | inproc | C · I · F | 5077 | 45 | [model-residency](modules/model-residency/SPEC.md) | Zarządca RAM/VRAM: dzierżawy modeli, wymiana wg priorytetów, tryb gry i baterii. |
 | `providers` | — | — | — | C · F | 5392 | 55 | kontrakt wspólny: providers-api, providers-local |  |
 | `providers-api` | F1 | provider | inproc | I | 6079 | 55 | [providers-api](modules/providers-api/SPEC.md) | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem. |
-| `providers-local` | F1 | provider | process | I | 7393 | 71 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
+| `providers-local` | F1 | provider | process | I | 7406 | 71 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
 | `router` | F1 | service | inproc | C · I · F | 5546 | 43 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
 
 ## Głos
@@ -160,7 +160,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 2687 | 24 | — |  |
-| `app-models` | — | — | — | pojedynczy | 8908 | 69 | — |  |
+| `app-models` | — | — | — | pojedynczy | 9066 | 72 | — |  |
 | `app-modules` | — | — | — | pojedynczy | 7962 | 55 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
@@ -175,16 +175,16 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| `lib-embed` | — | — | — | pojedynczy | 4579 | 44 | — |  |
+| `lib-embed` | — | — | — | pojedynczy | 4590 | 44 | — |  |
 | `lib-markdown` | — | — | — | pojedynczy | 2538 | 41 | — |  |
 | `lib-media` | — | — | — | pojedynczy | 2049 | 17 | — |  |
 | `lib-netguard` | — | — | — | pojedynczy | 649 | 7 | — |  |
 | `lib-openai-compat` | — | — | — | pojedynczy | 1721 | 11 | — |  |
 | `lib-quick` | — | — | — | pojedynczy | 3267 | 27 | — |  |
 | `lib-sidecar-guard` | — | — | — | pojedynczy | 518 | 4 | — |  |
-| `lib-smart-turn` | — | — | — | pojedynczy | 588 | 7 | — |  |
+| `lib-smart-turn` | — | — | — | pojedynczy | 597 | 7 | — |  |
 | `lib-sqlstore` | — | — | — | pojedynczy | 1321 | 30 | — |  |
-| `lib-supertonic` | — | — | — | pojedynczy | 901 | 12 | — |  |
+| `lib-supertonic` | — | — | — | pojedynczy | 910 | 12 | — |  |
 
 ## Wzorce i spike’i
 

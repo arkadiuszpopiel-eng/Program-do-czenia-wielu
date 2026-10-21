@@ -12,6 +12,57 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.68 — 2026-10-21
+
+Agentki przy pracy na komputerze trzymają się wybranego stylu odpowiedzi, Dyrygentka mówi o zgodach zgodnie
+z poziomem autonomii, a modele i silniki pobierają się tylko w sprawdzonej wersji.
+
+### Poprawki
+
+- [poważne] Procesy poboczne mowy (głos Supertonic, wykrywanie końca wypowiedzi) jawnie włączały telemetrię
+  ONNX Runtime — oficjalne wydania Microsoftu mogą wtedy wysyłać zdarzenia diagnostyczne (zależnie od ustawień
+  diagnostyki Windows). Teraz ją wyłączają zaraz po starcie. Oficjalna biblioteka i tak zapisuje jedno zdarzenie
+  startowe, a Windows może ponownie włączyć jej zbieranie — pełne wyłączenie wymaga biblioteki bez telemetrii
+  (do Twojej decyzji, dokument licencji).
+- [poważne] Modele i silniki pobierają się tylko w sprawdzonej wersji: Bielik, Whisper, modele pamięci (e5,
+  MiniLM), głos Gosia, rozpoznawanie mówcy i archiwa silników mają przypiętą wersję i sumę SHA-256 — wcześniej
+  część pobierała się z bieżącej wersji repozytorium, a sumę zapisywano dopiero po pierwszym pobraniu (albo
+  pobranie wymagało Twojej zgody). Już pobrane, identyczne pliki zostają zainstalowane; zgoda udzielona przed
+  przypięciem nie zainstaluje pliku innego niż przypięty, a menedżer modeli ocenia Bielika tym samym kryterium co
+  rozmowa (zgodna suma).
+- [poważne] Rozmowa z Claude Opus 4.6 albo Sonnet 4.6 przy ustawionej swobodzie odpowiedzi (inna niż „auto”)
+  mogła kończyć się błędem: API Anthropic nie przyjmuje temperatury razem z myśleniem. Temperatura idzie teraz
+  tylko przy myśleniu wyłączonym.
+- Styl odpowiedzi i swoboda z Ustawienia → Ogólne działają też wtedy, gdy agentka pracuje z narzędziami
+  (rozmowa z Deltą, zadania w tle, umiejętności) — wcześniej tylko w zwykłej rozmowie. Sprawdzenie wyniku
+  i Krytyczka zostają bez stylu, żeby ocena miała stałą formę.
+- Dyrygentka mówi o zgodach zgodnie z poziomem autonomii rozmowy — z tej samej tabeli reguł, którą stosuje
+  Broker: na L4 nie zapowiada już zatwierdzania każdej akcji, ale też nie obiecuje, że zgody nie będzie
+  (Broker pyta np. o operacje administracyjne i wysyłkę po niezaufanej treści na każdym poziomie).
+- Supertonic 3: obok modelu instaluje się tekst jego licencji (Open RAIL-M wymaga przekazania kopii) — przy nowej
+  instalacji; wcześniejsze instalacje nie zmieniają stanu (plik towarzyszący nie decyduje o „zainstalowano”).
+
+### Dokumenty
+
+- Licencje 24 modeli i silników sprawdzone u wydawców (`docs/vendor/licencje-modeli-i-silnikow.md`), z listą
+  spraw do Twojej decyzji: Regulamin bielik.ai (m.in. zakaz przetwarzania danych osobowych), licencja modelu
+  bazowego Bielika 4.5B (Qwen Research License), DirectML (licencja Microsoftu), FFmpeg (kompilacje GPL),
+  WeSpeaker i openWakeWord (użycie komercyjne nieustalone). Pochodzenie „Pocket TTS PL”: model społeczności,
+  nie wydanie Kyutai.
+
+### Testy
+
+- Strażnik katalogu: każda pozycja do pobrania ma przypięte sumy; test manifestu Bielika (rewizja, suma);
+  stan GGUF przy rekordzie innym niż przypięty, licencja jako plik towarzyszący, zgoda sprzed przypięcia
+  (`tests/pinned.rs`).
+- Styl i temperatura w przebiegu agentki (test nie przechodzi bez temperatury w żądaniu — sprawdzone celowo),
+  notatka Dyrygentki na L3 i po obniżeniu do L1, adapter Anthropic bez temperatury przy myśleniu (nie przechodzi
+  na starym adapterze — sprawdzone celowo).
+- Wywłaszczenie mowy przez użytkownika: 95. percentyl < 5 ms i pojedyncza próbka < 50 ms zamiast najgorszego
+  przypadku czasu ściennego (czerwony pod obciążeniem w `verify` 0.0.67); decyzja w pierwszym odpytaniu
+  sprawdzana w każdej próbie.
+- `verify wersja`: wyniki w raporcie 34.
+
 ## 0.0.67 — 2026-10-21
 
 Zmianę poziomu autonomii zatwierdzoną w oknie Brokera widać od razu, a niezatwierdzona nie przejdzie już po ponownym

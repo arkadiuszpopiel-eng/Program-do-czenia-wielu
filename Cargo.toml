@@ -9,7 +9,7 @@ exclude = ["apps/desktop/src-tauri"]
 members = ["crates/*"]
 
 [workspace.package]
-version = "0.0.67"
+version = "0.0.68"
 edition = "2024"
 license = "UNLICENSED" # do ustalenia (nie-SPDX; crate'y są prywatne: publish = false)
 publish = false
