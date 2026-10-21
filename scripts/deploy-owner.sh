@@ -13,6 +13,11 @@ SRC="$ROOT/target/shell/debug"
 KERNEL="$ROOT/target/safety/debug"
 DST="$(cd "$ROOT/.." && pwd)/Alfa-uruchomiona"
 [ -f "$SRC/alfa-desktop.exe" ] || { echo "Brak zbudowanej powłoki w $SRC"; exit 2; }
+# Procesy poboczne mowy zastępują kopię właściciela w całości — niepełny komplet (21.10: bez
+# onnxruntime.dll i bez smart-turn) odebrałby mu głos. Sprawdzenie przed zamknięciem jego Alfy.
+for part in supertonic/alfa-supertonic.exe supertonic/onnxruntime.dll smart-turn/alfa-smart-turn.exe smart-turn/onnxruntime.dll; do
+  [ -f "$SRC/sidecars/$part" ] || { echo "Niepełne procesy poboczne mowy: brak $SRC/sidecars/$part (scripts/verify-app.sh)"; exit 2; }
+done
 (
   cd "$ROOT" && source scripts/portable-env.sh >/dev/null 2>&1
   CARGO_TARGET_DIR="$(cygpath -w "$ROOT/target/safety")" CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 \

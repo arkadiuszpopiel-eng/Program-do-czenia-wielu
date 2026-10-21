@@ -12,6 +12,11 @@ ext=""
 case "$(uname -s)" in MINGW* | MSYS* | CYGWIN*) ext=".exe" ;; esac
 
 cd "$root"
+# Brak podanej biblioteki = błąd przed kopiowaniem: po przerwaniu w połowie zostawał komplet niepełny.
+if [ -n "${ALFA_ORT_DLL:-}" ] && [ ! -f "$ALFA_ORT_DLL" ]; then
+  echo "brak ALFA_ORT_DLL: $ALFA_ORT_DLL" >&2
+  exit 1
+fi
 cargo build --release -j "${ALFA_JOBS:-3}" -p lib-supertonic -p lib-smart-turn
 
 stage() {

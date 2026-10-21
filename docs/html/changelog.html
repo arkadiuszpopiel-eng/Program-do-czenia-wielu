@@ -346,6 +346,11 @@ odświeżany przy każdym wgraniu; skrótu zainstalowanej Alfy (instalator) nie 
 RUSTSEC-2026-0382 — odrzuca łańcuchy z wycofanymi certyfikatami emSign), silnik wtyczek (<code>wasmtime</code> 36.0.19,
 RUSTSEC-2026-0379/0380) i narzędzie budowy interfejsu (<code>vite</code> 7.3.7 — tylko serwer deweloperski). Ostrzeżenia
 dla <code>zip</code> zostają (Alfa nie korzysta z podatnych funkcji; przejście na <code>zip</code> 9 to osobne zadanie).</li>
+<li>[średnie] Wgranie nowej wersji mogło odebrać głos: na komputerze bez pobranego ONNX Runtime budowa zostawiała
+niepełne procesy poboczne mowy (bez biblioteki i bez <code>smart-turn</code>), a wgranie zastępowało nimi komplet
+właściciela. Teraz budowa testowa bierze bibliotekę z przypiętą sumą (z „Modeli lokalnych i silników” albo
+z kopii właściciela), a wgranie odmawia przy niepełnym komplecie, zanim zamknie Alfę. Opis wersji w kopii
+testowej znów podaje commit (git odmawiał na dysku z innego komputera).</li>
 </ul>
 <h3 id="testy">Testy</h3>
 <ul>

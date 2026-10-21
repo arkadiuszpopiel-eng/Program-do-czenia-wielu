@@ -31,6 +31,11 @@ Zmiana poziomu autonomii zatwierdzona w oknie Brokera widać od razu, a Alfę z 
   RUSTSEC-2026-0382 — odrzuca łańcuchy z wycofanymi certyfikatami emSign), silnik wtyczek (`wasmtime` 36.0.19,
   RUSTSEC-2026-0379/0380) i narzędzie budowy interfejsu (`vite` 7.3.7 — tylko serwer deweloperski). Ostrzeżenia
   dla `zip` zostają (Alfa nie korzysta z podatnych funkcji; przejście na `zip` 9 to osobne zadanie).
+- [średnie] Wgranie nowej wersji mogło odebrać głos: na komputerze bez pobranego ONNX Runtime budowa zostawiała
+  niepełne procesy poboczne mowy (bez biblioteki i bez `smart-turn`), a wgranie zastępowało nimi komplet
+  właściciela. Teraz budowa testowa bierze bibliotekę z przypiętą sumą (z „Modeli lokalnych i silników” albo
+  z kopii właściciela), a wgranie odmawia przy niepełnym komplecie, zanim zamknie Alfę. Opis wersji w kopii
+  testowej znów podaje commit (git odmawiał na dysku z innego komputera).
 
 ### Testy
 
