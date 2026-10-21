@@ -4,7 +4,9 @@
 # `sha256 = ""` oznacza hash jeszcze nieznany w repozytorium: menedżer pobierania liczy go
 # przy pierwszym pobraniu, zapisuje obok pliku (`<plik>.sha256`, zaufanie przy pierwszym
 # użyciu) i ostrzega w logach; kolejne ładowania sprawdzają rozmiar i zapisany hash.
-# Wpisanie hasha tutaj włącza pełną weryfikację łańcucha dostaw (PLAN §8.7).
+# Wpisanie hasha tutaj włącza pełną weryfikację łańcucha dostaw (PLAN §8.7). Od 2026-10-21 oba Bieliki
+# mają hash z API Hugging Face (LFS oid) i adres przypięty do rewizji repozytorium, z której pochodzi
+# (licencje u źródła, C5.1: `docs/vendor/licencje-modeli-i-silnikow.md`).
 #
 # Pamięć (MB = MiB): `vram_mb`/`ram_mb` BEZ KV cache. `vram_mb` = wagi na GPU (≈ rozmiar pliku;
 # przy osadzeniach wspólnych z wyjściem llama.cpp trzyma kopię warstwy wyjściowej na GPU)
@@ -23,10 +25,10 @@ schema_version = 1
 [[model]]
 id = "bielik-4.5b-v3.0-instruct-q8_0"
 name = "Bielik 4.5B v3.0 Instruct (Q8_0)"
-url = "https://huggingface.co/speakleash/Bielik-4.5B-v3.0-Instruct-GGUF/resolve/main/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf"
+url = "https://huggingface.co/speakleash/Bielik-4.5B-v3.0-Instruct-GGUF/resolve/3ee7b47bcd0ad7bc6a4c45bb7bad3e0b2fe066ad/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf"
 file = "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf"
 size_mb = 4826
-sha256 = ""
+sha256 = "562f2291de257890adf2b4a914da8b194affe6a7a838a6b7ef3d342f306c1b7f"
 params_b = 4.8
 quant = "Q8_0"
 layers = 60
@@ -48,10 +50,10 @@ license = "Apache-2.0"
 [[model]]
 id = "bielik-1.5b-v3.0-instruct-q8_0"
 name = "Bielik 1.5B v3.0 Instruct (Q8_0)"
-url = "https://huggingface.co/speakleash/Bielik-1.5B-v3.0-Instruct-GGUF/resolve/main/Bielik-1.5B-v3.0-Instruct.Q8_0.gguf"
+url = "https://huggingface.co/speakleash/Bielik-1.5B-v3.0-Instruct-GGUF/resolve/99d72cc757be4f8b958018f12d6898bad5c19c9e/Bielik-1.5B-v3.0-Instruct.Q8_0.gguf"
 file = "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf"
 size_mb = 1620
-sha256 = ""
+sha256 = "e206ebbd9ee00cc8f14af5a096ad3f193a59608c63905316e8dc680c96655a60"
 params_b = 1.6
 quant = "Q8_0"
 layers = 32

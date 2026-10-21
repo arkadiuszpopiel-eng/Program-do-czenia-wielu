@@ -266,14 +266,21 @@ fn manifest_validation_rejects_iq_quants_and_bad_entries() {
     assert_eq!(models[1].quant, "Q8_0");
     assert!(models[1].params_b < 2.0 && models[1].size_mb < bielik.size_mb);
     for m in &models {
-        // Tylko oficjalne repozytorium autorów (speakleash), plik z nazwy wpisu.
+        // Tylko oficjalne repozytorium autorów (speakleash), plik z nazwy wpisu, adres przypięty
+        // do rewizji i hash z repozytorium — pełna weryfikacja łańcucha dostaw (C5.1, 2026-10-21).
         let repo = "https://huggingface.co/speakleash/Bielik-";
         assert!(m.url.starts_with(repo), "{}", m.url);
+        let revision = m
+            .url
+            .rsplit_once("/resolve/")
+            .and_then(|(_, rest)| rest.strip_suffix(&format!("/{}", m.file)))
+            .unwrap_or_default();
         assert!(
-            m.url.ends_with(&format!("/resolve/main/{}", m.file)),
-            "{}",
+            revision.len() == 40 && revision.chars().all(|c| c.is_ascii_hexdigit()),
+            "rewizja przypięta: {}",
             m.url
         );
+        assert_eq!(m.sha256.len(), 64, "hash pliku z repozytorium: {}", m.id);
         assert!(m.id.ends_with("-q8_0") && m.file.ends_with(".Q8_0.gguf"));
     }
     for q in ["IQ4_XS", "iq3_m", "model.IQ2_XXS.gguf"] {

@@ -40,11 +40,20 @@ fn parse(mut argv: impl Iterator<Item = String>) -> Result<Args, String> {
 
 fn run() -> Result<(), String> {
     let args = parse(std::env::args().skip(1))?;
-    if let Some(dll) = &args.ort {
-        ort::init_from(dll.display().to_string())
-            .commit()
-            .map_err(|e| format!("ONNX Runtime ({}): {e}", dll.display()))?;
-    }
+    // Telemetria ONNX Runtime wyłączona zawsze, także bez `--ort` (środowisko domyślne): oficjalne
+    // buildy Microsoftu na Windows wysyłają zdarzenia, a `ort` domyślnie je włącza
+    // (`EnableTelemetryEvents`; licencje u źródła, C5.1, 2026-10-21).
+    let (builder, from) = match &args.ort {
+        Some(dll) => (
+            ort::init_from(dll.display().to_string()),
+            dll.display().to_string(),
+        ),
+        None => (ort::init(), "domyślna biblioteka".to_owned()),
+    };
+    builder
+        .with_telemetry(false)
+        .commit()
+        .map_err(|e| format!("ONNX Runtime ({from}): {e}"))?;
     let mut engine = SmartTurn::load(&args.model, args.threads).map_err(|e| e.to_string())?;
     let stdin = std::io::stdin();
     let mut stdout = std::io::stdout().lock();

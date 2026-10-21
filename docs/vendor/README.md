@@ -5,7 +5,13 @@ Wiedza modeli budujących projekt kończy się w IV–VI 2026. Biblioteki, któr
 której API nie jest oczywiste, trzymamy tu **skrót ≤ 2 strony**: dokładnie te wywołania, których używamy,
 zweryfikowane kompilacją.
 
+## Licencje u źródła
+
+- [`licencje-modeli-i-silnikow.md`](licencje-modeli-i-silnikow.md) — 24 modele i silniki z katalogu (C5.1, 2026-10-21):
+  licencja u wydawcy, rozbieżności z kartami w programie, znak wodny mowy, sprawy do decyzji właściciela.
+
 ## Zasady
+
 - Jeden plik na crate/pakiet: `docs/vendor/<nazwa>.md`.
 - Nagłówek: przypięta wersja, link do docs.rs / repo, data weryfikacji.
 - Treść: tylko używane typy i funkcje z minimalnymi przykładami, znane pułapki, co NIE działa (np. `cpal` a loopback WASAPI).
@@ -13,14 +19,15 @@ zweryfikowane kompilacją.
 - `windows-rs`: jeden crate, jedna wersja w całym workspace (§4.3 planu).
 
 ## Do napisania w F0 (kolejność wg pierwszego użycia)
-| Zależność | Powód |
-|---|---|
-| `tauri` 2.x | okna, IPC, capabilities per okno, tray, efekty okna (Mica) |
-| `windows-rs` (przypięta) | UIA (MTA), SendInput, Job Objects, hooki, Credential Manager |
-| `wasapi` | loopback, tryb zdarzeniowy, `GetStreamLatency` |
-| `whisper.cpp` (FFI/sidecar) | Vulkan/CUDA, VAD, streaming |
-| `wasmtime` + `wit-bindgen` | wtyczki Wasm, `wasip2`, limity fuel/epoch |
-| `tauri-specta` / `ts-rs` | generowanie typów TS |
-| `rusqlite` + SQLCipher + `sqlite-vec` + FTS5 | dane |
-| `pulldown-cmark` + `ammonia` | markdown renderowany w Rust |
-| Svelte 5 (runes) + Bits UI | UI; zakaz składni Svelte 4 |
+
+| Zależność                                    | Powód                                                        |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| `tauri` 2.x                                  | okna, IPC, capabilities per okno, tray, efekty okna (Mica)   |
+| `windows-rs` (przypięta)                     | UIA (MTA), SendInput, Job Objects, hooki, Credential Manager |
+| `wasapi`                                     | loopback, tryb zdarzeniowy, `GetStreamLatency`               |
+| `whisper.cpp` (FFI/sidecar)                  | Vulkan/CUDA, VAD, streaming                                  |
+| `wasmtime` + `wit-bindgen`                   | wtyczki Wasm, `wasip2`, limity fuel/epoch                    |
+| `tauri-specta` / `ts-rs`                     | generowanie typów TS                                         |
+| `rusqlite` + SQLCipher + `sqlite-vec` + FTS5 | dane                                                         |
+| `pulldown-cmark` + `ammonia`                 | markdown renderowany w Rust                                  |
+| Svelte 5 (runes) + Bits UI                   | UI; zakaz składni Svelte 4                                   |

@@ -42,12 +42,18 @@ pub fn entry(url: &str) -> ModelEntry {
     }
 }
 
-/// „Instaluje" model: plik + zapisany hash (jak po pobraniu).
+/// „Instaluje" model: plik + zapisany hash (jak po pobraniu — przy hashu w manifeście ten sam,
+/// bo pobranie z innym kończy się błędem).
 pub fn install(dir: &Path, entry: &ModelEntry) {
     std::fs::create_dir_all(dir).unwrap();
     let path = dir.join(&entry.file);
     std::fs::write(&path, b"GGUF-fake").unwrap();
-    std::fs::write(hash_path(&path), format!("{}\n", "a".repeat(64))).unwrap();
+    let hash = if entry.sha256.is_empty() {
+        "a".repeat(64)
+    } else {
+        entry.sha256.clone()
+    };
+    std::fs::write(hash_path(&path), format!("{hash}\n")).unwrap();
 }
 
 pub struct Env {

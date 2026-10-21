@@ -2,6 +2,9 @@
 
 Stan na **2026-10-21**, wersja programu **0.0.67** (komputer stacjonarny; w `Alfa-uruchomiona` nadal 0.0.66 do
 czasu wgrania; Alfę uruchamia skrót „Alfa” na pulpicie i w menu Start), gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne ponad `origin` przy `c8791fdd`, niewypchnięte).
+Do wgrania gotowa 0.0.67 z `0e54f5b9` (`verify wersja`, raport 33). Po niej seria 8 (punkty bez nowej wersji, zasada „wersja co 10 punktów”):
+styl i temperatura w przebiegach agentek, poziom autonomii w notatce Dyrygentki, adapter Anthropic bez temperatury przy myśleniu,
+test wywłaszczenia odporny na obciążenie (`418459ab`) — wejdą do następnej wersji.
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
