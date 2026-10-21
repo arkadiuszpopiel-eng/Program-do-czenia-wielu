@@ -272,7 +272,6 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'msg.code': 'Code block {lang}',
   'msg.codeCopy': 'Copy code',
   'msg.codeSave': 'Save as file',
-  'msg.codeRun': 'Run in terminal (via the Broker)',
   'msg.codeWrap': 'Wrap lines',
   'msg.brokerOpened': 'Moved to the Broker window — approve the action there.',
 

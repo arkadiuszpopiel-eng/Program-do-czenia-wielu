@@ -288,7 +288,6 @@ export const plApp = {
   'msg.code': 'Blok kodu {lang}',
   'msg.codeCopy': 'Kopiuj kod',
   'msg.codeSave': 'Zapisz jako plik',
-  'msg.codeRun': 'Uruchom w terminalu (przez Brokera)',
   'msg.codeWrap': 'Zawijaj wiersze',
   'msg.brokerOpened': 'Przeniesiono do okna Brokera — tam zatwierdzisz akcję.',
 

@@ -1,13 +1,14 @@
 <!--
-  Blok kodu z paska akcji: kopiuj, zapisz jako plik, uruchom w terminalu (przez Brokera), zawijanie;
-  dla HTML, SVG i Markdown — „Otwórz w kanwie” (C2.8).
+  Blok kodu z paska akcji: kopiuj, zapisz jako plik, zawijanie; dla HTML, SVG i Markdown — „Otwórz
+  w kanwie” (C2.8). Bez „Uruchom w terminalu”: rdzeń nie ma wykonawcy kodu z rozmowy, więc zgoda Brokera
+  była cofana i przycisk nigdy niczego nie uruchamiał (przegląd 2026-10-22) — kod uruchamia agentka
+  narzędziem powłoki albo właściciel po skopiowaniu.
 -->
 <script lang="ts">
   import { IconButton, SanitizedHtml } from '@alfa/ui-kit';
   import Copy from '@lucide/svelte/icons/copy';
   import Download from '@lucide/svelte/icons/download';
   import PanelRightOpen from '@lucide/svelte/icons/panel-right-open';
-  import SquareTerminal from '@lucide/svelte/icons/square-terminal';
   import WrapText from '@lucide/svelte/icons/wrap-text';
   import type { RenderedBlock } from '../../api/types';
   import { blockArtifact } from '../../logic/canvas';
@@ -53,11 +54,6 @@
     }
   }
 
-  async function run() {
-    const ok = await attempt(app.toasts, () => app.client.turns.runCode(turnId, block.index));
-    if (ok) app.toasts.show({ kind: 'info', message: t('msg.brokerOpened') });
-  }
-
   async function save() {
     await attempt(app.toasts, () => app.client.turns.saveCode(turnId, block.index));
   }
@@ -86,9 +82,6 @@
       </IconButton>
       <IconButton label={t('msg.codeSave')} size="sm" onclick={() => void save()}>
         <Download size={14} strokeWidth={1.5} />
-      </IconButton>
-      <IconButton label={t('msg.codeRun')} size="sm" onclick={run}>
-        <SquareTerminal size={14} strokeWidth={1.5} />
       </IconButton>
     </span>
   </figcaption>
