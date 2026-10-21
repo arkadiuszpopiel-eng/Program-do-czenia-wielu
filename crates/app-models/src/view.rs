@@ -44,8 +44,7 @@ fn state_of(spec: &ItemSpec, store: &Store, live: &Live) -> (ModelItemState, Opt
         // lokalny. Bez tej zgodności interfejs pokazywał „Zainstalowano", a rozmowa kończyła się
         // błędem „model nie jest pobrany".
         let recorded = |rel: &String| {
-            !matches!(spec.install, Install::Gguf)
-                || providers_local_impl::hash_path(&target.join(rel)).is_file()
+            !matches!(spec.install, Install::Gguf) || gguf_recorded(spec, &target, rel)
         };
         let ok = receipt.corrupt.is_none()
             && receipt
@@ -70,7 +69,7 @@ fn state_of(spec: &ItemSpec, store: &Store, live: &Live) -> (ModelItemState, Opt
             && spec
                 .files
                 .iter()
-                .all(|f| providers_local_impl::hash_path(&target.join(&f.name)).is_file());
+                .all(|f| gguf_recorded(spec, &target, &f.name));
         let state = if llm_recorded {
             // Pobrany przez `providers-local` (onboarding) — hash zapisany obok pliku.
             ModelItemState::Installed
@@ -80,6 +79,23 @@ fn state_of(spec: &ItemSpec, store: &Store, live: &Live) -> (ModelItemState, Opt
         return (state, None);
     }
     (ModelItemState::Missing, None)
+}
+
+/// Model GGUF z rekordem `<plik>.sha256` (64 znaki) zgodnym z przypiętą sumą, jeśli ją ma —
+/// to samo kryterium co `providers_local_impl::installed` (inaczej menedżer pokazywał
+/// „Zainstalowano”, a rozmowa — „model nie jest pobrany”; przegląd 21.10).
+fn gguf_recorded(spec: &ItemSpec, target: &std::path::Path, rel: &str) -> bool {
+    let Ok(recorded) = std::fs::read_to_string(providers_local_impl::hash_path(&target.join(rel)))
+    else {
+        return false;
+    };
+    let recorded = recorded.trim();
+    let pinned = spec
+        .files
+        .iter()
+        .find(|f| f.name == rel)
+        .and_then(|f| f.sha256.as_deref());
+    recorded.len() == 64 && pinned.is_none_or(|p| p.eq_ignore_ascii_case(recorded))
 }
 
 /// Widok pozycji.

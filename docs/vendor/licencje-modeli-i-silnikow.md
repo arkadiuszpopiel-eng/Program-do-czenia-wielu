@@ -15,8 +15,10 @@ Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe �
    redystrybucji obok programu.
 3. **Supertonic 3** — wagi na BigScience Open RAIL-M (ograniczenia użycia); licencja wymaga przekazania jej kopii — **naprawione**:
    katalog instaluje `LICENSE` (15 007 B, z tej samej rewizji, z sumą SHA-256) obok modelu przy nowej instalacji.
-4. **ONNX Runtime — telemetria:** biblioteka `ort` domyślnie włączała telemetrię oficjalnych buildów Microsoftu w procesach
-   pobocznych mowy — **naprawione** (`with_telemetry(false)` w `lib-supertonic` i `lib-smart-turn`).
+4. **ONNX Runtime — telemetria:** biblioteka `ort` jawnie włączała telemetrię oficjalnych buildów Microsoftu w procesach
+   pobocznych mowy — **ograniczone**: procesy wyłączają ją zaraz po utworzeniu środowiska (`with_telemetry(false)`). Zostaje
+   zdarzenie startowe „ProcessInfo” (wysyłane w `CreateEnv`, przed wyłączeniem), a wywołanie zwrotne ETW może ją włączyć
+   ponownie. Pełne wyłączenie — biblioteka ONNX Runtime zbudowana bez telemetrii (np. od pyke albo własna) — do decyzji.
 5. **Bielik — integralność pobrania:** manifest miał pusty `sha256` i adres `/resolve/main` — **naprawione**: hash z API Hugging Face
    (LFS oid) i adres przypięty do rewizji (`providers-local-impl/models.toml`).
 6. **„Pocket TTS PL”** — katalog Alfy nie podaje adresu pobrania polskich wag; jedyny znaleziony kandydat to model społeczności
@@ -57,6 +59,10 @@ Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe �
 | `sidecar-ffmpeg`                        | Kod FFmpeg: domyślnie LGPL-2.1-or-later. Z --enable-gpl: GPL-2.0-or-later. Z …              | **nie**        | warunkowo   | tak              | wysoka  |
 
 ## Szczegóły
+
+Opisy pozycji to stan **w chwili badania**. Poprawki z 21.10 (przypięte rewizje i sumy SHA-256 wszystkich pozycji do
+pobrania, `LICENSE` obok Supertonic 3, telemetria ONNX Runtime) opisuje sekcja „Najważniejsze dla właściciela” — wzmianki
+poniżej o `/resolve/main`, pustych sumach albo rozmiarze tokenizera MiniLM dotyczą stanu sprzed tych poprawek.
 
 ### `bielik-4.5b-v3.0-instruct-q8_0`
 

@@ -125,7 +125,7 @@
         "name": "Multilingual E5 small (ONNX fp32)",
         "kind": "embed",
         "state": "missing",
-        "size_bytes": 511705088,
+        "size_bytes": 488636416,
         "downloadable": true,
         "fallback": false
       },
@@ -152,7 +152,7 @@
         "name": "whisper-server (CPU, whisper.cpp v1.8.1)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 8388608,
+        "size_bytes": 4194304,
         "downloadable": true,
         "fallback": false
       },
@@ -166,8 +166,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 9546566518,
-    "missing_bytes": 9546566518,
+    "size_bytes": 9519303542,
+    "missing_bytes": 9519303542,
     "installed": 0,
     "total": 16,
     "state": "not_installed",
@@ -358,7 +358,7 @@
         "name": "Multilingual E5 small (ONNX fp32)",
         "kind": "embed",
         "state": "missing",
-        "size_bytes": 511705088,
+        "size_bytes": 488636416,
         "downloadable": true,
         "fallback": false
       },
@@ -385,7 +385,7 @@
         "name": "whisper-server (CPU, whisper.cpp v1.8.1)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 8388608,
+        "size_bytes": 4194304,
         "downloadable": true,
         "fallback": false
       },
@@ -408,8 +408,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 9502634205,
-    "missing_bytes": 9502634205,
+    "size_bytes": 9475371229,
+    "missing_bytes": 9475371229,
     "installed": 0,
     "total": 14,
     "state": "not_installed",
@@ -589,7 +589,7 @@
         "name": "Multilingual E5 small (ONNX fp32)",
         "kind": "embed",
         "state": "missing",
-        "size_bytes": 511705088,
+        "size_bytes": 488636416,
         "downloadable": true,
         "fallback": false
       },
@@ -616,7 +616,7 @@
         "name": "whisper-server (CPU, whisper.cpp v1.8.1)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 8388608,
+        "size_bytes": 4194304,
         "downloadable": true,
         "fallback": false
       },
@@ -639,8 +639,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6140899549,
-    "missing_bytes": 6140899549,
+    "size_bytes": 6113636573,
+    "missing_bytes": 6113636573,
     "installed": 0,
     "total": 14,
     "state": "not_installed",
@@ -817,7 +817,7 @@
         "name": "whisper-server (CPU, whisper.cpp v1.8.1)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 8388608,
+        "size_bytes": 4194304,
         "downloadable": true,
         "fallback": false
       },
@@ -831,8 +831,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 2133587350,
-    "missing_bytes": 2133587350,
+    "size_bytes": 2129393046,
+    "missing_bytes": 2129393046,
     "installed": 0,
     "total": 10,
     "state": "not_installed",
@@ -982,13 +982,13 @@
         "name": "whisper-server (CPU, whisper.cpp v1.8.1)",
         "kind": "sidecar",
         "state": "missing",
-        "size_bytes": 8388608,
+        "size_bytes": 4194304,
         "downloadable": true,
         "fallback": false
       }
     ],
-    "size_bytes": 1959776968,
-    "missing_bytes": 1959776968,
+    "size_bytes": 1955582664,
+    "missing_bytes": 1955582664,
     "installed": 0,
     "total": 6,
     "state": "not_installed",

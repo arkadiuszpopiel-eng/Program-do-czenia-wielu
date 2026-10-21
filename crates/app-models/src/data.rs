@@ -4,10 +4,10 @@
 //! (2026-10-04) — adres, rozmiar i SHA-256 archiwum z API PyPI, SHA-256 wybranych wpisów policzony
 //! lokalnie (Silero VAD = `voice_vad_impl::KNOWN_MODELS`).
 //!
-//! **Do potwierdzenia przez człowieka** (`confirmed: false`, bez przypiętego SHA-256): HuggingFace
-//! i GitHub były zablokowane z sesji tworzącej katalog — adresy, rozmiary, układ archiwów i licencje
-//! pochodzą z wiedzy o repozytoriach. Przed wydaniem człowiek sprawdza adres, wpisuje SHA-256
-//! (`sha256sum`) i zmienia `confirmed`; do tego czasu UI wymaga zgody TOFU z policzonym hashem.
+//! **Do potwierdzenia przez człowieka** (`confirmed: false`): adresy, rozmiary, układ archiwów
+//! i licencje sprawdza człowiek (licencje u źródła: `docs/vendor/licencje-modeli-i-silnikow.md`).
+//! Sumy SHA-256 i rewizje są przypięte od 2026-10-21 (API Hugging Face/GitHub albo policzone
+//! z pobranego pliku) — pobranie jest weryfikowane bez zgody TOFU, ale `confirmed` zmienia człowiek.
 
 use app_api::dto::ModelItemKind;
 
@@ -189,7 +189,7 @@ fn sidecars() -> Vec<ItemSpec> {
                 &format!(
                     "https://github.com/ggml-org/whisper.cpp/releases/download/{WHISPER_TAG}/whisper-bin-x64.zip"
                 ),
-                8,
+                4,
                 Some("cc5d6126e025ef463524ed74c94d4b6a40bb67c2d1c3cb5aca02c773c388bdad"),
             )],
             Install::Tree {

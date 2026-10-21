@@ -19,7 +19,7 @@ pub struct CatalogFile {
     pub url: &'static str,
     /// Przypięty SHA-256 (hex); `None` = do przypięcia przed wydaniem.
     pub sha256: Option<&'static str>,
-    /// Przybliżony rozmiar (MB) — komunikat w UI i górny limit pobierania (×2).
+    /// Przybliżony rozmiar (MiB, w górę) — komunikat w UI i górny limit pobierania (×2).
     pub size_mb: u32,
 }
 
@@ -68,7 +68,7 @@ pub const CATALOG: &[CatalogEntry] = &[
             path: "onnx/model.onnx",
             url: "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/onnx/model.onnx",
             sha256: Some("ca456c06b3a9505ddfd9131408916dd79290368331e7d76bb621f1cba6bc8665"),
-            size_mb: 471,
+            size_mb: 449,
         },
         tokenizer: CatalogFile {
             path: "tokenizer.json",
@@ -94,7 +94,7 @@ pub const CATALOG: &[CatalogEntry] = &[
             path: "onnx/model.onnx",
             url: "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/onnx/model.onnx",
             sha256: Some("10f7a088420252b26caf819236ca2c9d2987afd0fc06fec7553b542a5655a05a"),
-            size_mb: 471,
+            size_mb: 449,
         },
         tokenizer: CatalogFile {
             path: "tokenizer.json",

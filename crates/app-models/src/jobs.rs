@@ -230,7 +230,8 @@ impl ModelsApp {
                 .await
                 .map_err(|e| e.to_string())?
                 .map_err(|e| e.to_string())?;
-            let want = accepted.get(&f.name).or(f.sha256.as_ref());
+            // Przypięta suma ma pierwszeństwo przed zgodą TOFU sprzed aktualizacji katalogu.
+            let want = f.sha256.as_ref().or(accepted.get(&f.name));
             if want.is_none_or(|w| !w.eq_ignore_ascii_case(&sha)) {
                 let _ = self.store.clear_staging(&spec.id);
                 return Err(format!(

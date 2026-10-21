@@ -117,6 +117,14 @@ pub struct ItemSpec {
     pub note: LocalizedText,
 }
 
+/// Pliki towarzyszące (tekst licencji wag) — pobierane z pozycją, nie liczą się do jej stanu.
+pub const COMPANIONS: &[&str] = &["LICENSE"];
+
+/// Czy plik jest towarzyszący ([`COMPANIONS`]).
+pub fn is_companion(name: &str) -> bool {
+    COMPANIONS.contains(&name)
+}
+
 /// Nazwa pliku wykonywalnego dla systemu.
 pub fn exe(name: &str) -> String {
     if cfg!(windows) {
@@ -182,9 +190,12 @@ impl ItemSpec {
 
     /// Pliki wynikowe (względne w katalogu pozycji) — ich obecność = pozycja zainstalowana.
     pub fn outputs(&self) -> Vec<String> {
+        // Plik towarzyszący (tekst licencji) pobiera się razem z pozycją, ale nie decyduje o jej
+        // stanie: kopie zainstalowane przed jego dodaniem nie wyglądają na brakujące (przegląd 21.10).
         let files = || {
             self.files
                 .iter()
+                .filter(|f| !is_companion(&f.name))
                 .map(|f| f.name.clone())
                 .collect::<Vec<_>>()
         };
@@ -238,7 +249,9 @@ pub fn builtin() -> Vec<ItemSpec> {
                 sha256: (!m.sha256.is_empty()).then(|| m.sha256.to_ascii_lowercase()),
             }],
             install: Install::Gguf,
-            confirmed: !m.sha256.is_empty(),
+            // Potwierdzenie adresu, rozmiaru i licencji przez człowieka — nie wynika z przypiętego
+            // hasha (Bielik: Regulamin bielik.ai i licencja modelu bazowego czekają na właściciela).
+            confirmed: false,
             note: note(
                 "Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.",
                 "Local chat model (llama.cpp). Requires the llama-server sidecar.",
@@ -269,7 +282,8 @@ pub fn embed_item(entry: &lib_embed::CatalogEntry) -> ItemSpec {
         dir: format!("embed/{}", entry.id),
         files: vec![file(&entry.model), file(&entry.tokenizer)],
         install: Install::Embed(Box::new(template)),
-        confirmed: entry.files().iter().all(|f| f.sha256.is_some()),
+        // Jak wyżej: sumy przypięte (2026-10-21), potwierdzenie przez człowieka osobno.
+        confirmed: false,
         note: note(
             &format!(
                 "Embedder wyszukiwania semantycznego (pamięć F7): {}",
