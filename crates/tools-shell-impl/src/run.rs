@@ -215,7 +215,11 @@ impl Core {
                 memory_limit_mb: Some(self.config.memory_limit_mb),
             },
             raw_args: raw,
-            env: filter_env(self.base_env.iter().cloned(), &allow),
+            // `cargo` z powłoki też z limitem równoległych zadań (awaria 2026-10-17).
+            env: platform_contract::with_build_defaults(
+                filter_env(self.base_env.iter().cloned(), &allow),
+                std::thread::available_parallelism().map_or(2, std::num::NonZero::get),
+            ),
             timeout_ms: u64::from(timeout_s) * 1000,
             max_output_bytes: self.config.output_max_bytes,
         }

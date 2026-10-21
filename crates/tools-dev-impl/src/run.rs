@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use platform_contract::{
-    DEFAULT_ENV_ALLOWLIST, ExecControl, ExecOutput, ExecSpec, ExecTermination, Integrity,
-    PlatformError, ProcessSpec, filter_env,
+    BUILD_ENV_ALLOWLIST, DEFAULT_ENV_ALLOWLIST, ExecControl, ExecOutput, ExecSpec, ExecTermination,
+    Integrity, PlatformError, ProcessSpec, filter_env, with_build_defaults,
 };
 use safety_broker_contract::{Capability, PathScope, TaintSource};
 use tools_common_contract::{
@@ -102,8 +102,10 @@ impl Core {
         let allow: Vec<&str> = DEFAULT_ENV_ALLOWLIST
             .iter()
             .chain(DEV_ENV.iter())
+            .chain(BUILD_ENV_ALLOWLIST.iter())
             .copied()
             .collect();
+        let threads = std::thread::available_parallelism().map_or(2, std::num::NonZero::get);
         let spec = ExecSpec {
             process: ProcessSpec {
                 cmd: PathBuf::from(program),
@@ -113,7 +115,7 @@ impl Core {
                 memory_limit_mb: None,
             },
             raw_args: raw,
-            env: filter_env(self.base_env.iter().cloned(), &allow),
+            env: with_build_defaults(filter_env(self.base_env.iter().cloned(), &allow), threads),
             timeout_ms: timeout_s * 1000,
             max_output_bytes: MAX_OUTPUT,
         };

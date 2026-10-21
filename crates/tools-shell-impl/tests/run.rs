@@ -37,8 +37,8 @@ async fn runs_with_clean_env_and_untrusted_output() {
     let names: Vec<&str> = run.env.iter().map(|(k, _)| k.as_str()).collect();
     assert_eq!(
         names,
-        vec!["PATH", "TEMP"],
-        "bez sekretów i spoza allowlisty"
+        vec!["PATH", "TEMP", "CARGO_BUILD_JOBS"],
+        "bez sekretów i spoza allowlisty (plus domyślny limit zadań cargo)"
     );
     assert_eq!(run.timeout_ms, 120_000);
     assert_eq!(run.process.memory_limit_mb, Some(2048));
