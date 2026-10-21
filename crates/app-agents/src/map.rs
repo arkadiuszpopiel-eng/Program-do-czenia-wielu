@@ -1,7 +1,7 @@
 //! Mapowania kontraktu `agent-runtime`/`tools-*` na DTO UI: rodzaje i stany kroków, ikony,
 //! intencje („uruchom w terminalu", trwałe usunięcie), tokeny cofania, tekst końcowy tury.
 
-use agent_runtime_contract::{RunOutcome, StepKind, StepStatus};
+use agent_runtime_contract::{BudgetKind, RunOutcome, StepKind, StepStatus};
 use app_api::dto::{
     IntentKind, ReplayKind, ReplayStatus, RiskLevel, RunState, StopReason, ToolIcon, ToolIntent,
     ToolStatus as UiToolStatus, TurnError, TurnErrorCode, TurnStatus,
@@ -167,13 +167,20 @@ pub fn final_text(outcome: &RunOutcome) -> FinalText {
             };
             stop(format!("{}{note}", summary.trim()), StopReason::End)
         }
-        RunOutcome::BudgetExceeded { budget } => stop(
-            format!(
-                "Zatrzymałam się: przekroczony budżet {} (Ustawienia → Agentki). Kroki są w Replay na Osi czasu.",
-                budget.label_pl()
-            ),
-            StopReason::End,
-        ),
+        RunOutcome::BudgetExceeded { budget } => {
+            // Budżet tokenów nie ma własnego pola — rośnie z „Limitem kroków zadania”.
+            let setting = match budget {
+                BudgetKind::Tokens => "rośnie z „Limitem kroków zadania” w Ustawieniach → Agentki",
+                _ => "Ustawienia → Agentki",
+            };
+            stop(
+                format!(
+                    "Zatrzymałam się: przekroczony budżet {} ({setting}). Kroki są w Replay na Osi czasu.",
+                    budget.label_pl()
+                ),
+                StopReason::End,
+            )
+        }
         RunOutcome::LoopDetected { tool } => stop(
             format!(
                 "Zatrzymałam się: to samo wywołanie `{tool}` powtarzało się (wykryta pętla). Doprecyzuj, proszę, zadanie."
@@ -261,6 +268,10 @@ mod tests {
             budget: BudgetKind::Steps,
         });
         assert!(budget.text.contains("kroków"));
+        let tokens = final_text(&RunOutcome::BudgetExceeded {
+            budget: BudgetKind::Tokens,
+        });
+        assert!(tokens.text.contains("rośnie z „Limitem kroków zadania”"));
         assert_eq!(
             final_text(&RunOutcome::Cancelled).status,
             TurnStatus::Cancelled

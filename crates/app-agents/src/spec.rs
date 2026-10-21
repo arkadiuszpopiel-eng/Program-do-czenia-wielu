@@ -27,6 +27,11 @@ pub mod keys {
 /// się zatwierdzić, więc agentka dostaje odmowę szybciej.
 pub const NO_WINDOW_APPROVAL_CAP_S: u32 = 60;
 
+/// Budżet tokenów przebiegu na jeden krok z „Limitu kroków zadania”. Każda tura wysyła cały
+/// kontekst (z cache), więc stałe 200 tys. kończyło przebieg po 5–7 turach przy kontekście
+/// 30–40 tys., choć limit kroków to 40 (przegląd 2026-10-21). Koszt pilnuje „Limit kosztu zadania”.
+pub const TOKENS_PER_STEP: u64 = 50_000;
+
 /// Ustawienia agentek.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct AgentSettings {
@@ -70,6 +75,7 @@ impl AgentSettings {
         });
         RunBudget {
             max_steps: self.max_steps.max(1),
+            max_tokens: u64::from(self.max_steps.max(1)).saturating_mul(TOKENS_PER_STEP),
             max_wall_ms: u64::from(self.max_minutes.max(1)) * 60_000,
             max_cost_micro_usd,
             ..RunBudget::default()
@@ -161,6 +167,7 @@ mod tests {
         };
         let b = s.budget(40_000);
         assert_eq!(b.max_steps, 40);
+        assert_eq!(b.max_tokens, 40 * TOKENS_PER_STEP);
         assert_eq!(b.max_wall_ms, 15 * 60_000);
         // 4 zł przy kursie 4,00 = 1 USD = 1 000 000 mikro-USD.
         assert_eq!(b.max_cost_micro_usd, Some(1_000_000));
