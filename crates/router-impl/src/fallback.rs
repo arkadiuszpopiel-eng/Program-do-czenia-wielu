@@ -42,6 +42,12 @@ pub(crate) fn model_unavailable(e: &providers_contract::ProviderError) -> bool {
             || text.contains("do not have access")
             || text.contains("is not supported")
             || text.contains("deprecated")))
+        // Model bez narzędzi (OpenRouter: „No endpoints found that support tool use”) — następny
+        // model z kolejki może je mieć; katalog zakłada narzędzia u dostawcy (przegląd 2026-10-21).
+        || ((text.contains("tool") || text.contains("function call"))
+            && (text.contains("not support")
+                || text.contains("support tool")
+                || text.contains("unsupported")))
 }
 
 fn ms(d: Duration) -> u64 {
@@ -154,10 +160,13 @@ impl Run {
             let next = match waited {
                 Ok(ev) => ev,
                 Err(d) => {
-                    // Termin Routera to decyzja polityki, nie awaria dostawcy: neutralny dla
-                    // obwodu jak anulowanie (wolny start długiego promptu otwierał obwód i odcinał
-                    // dostawcę; przegląd 2026-10-21). Własne limity czasu adapterów liczą się dalej.
-                    self.core.report(cand, Outcome::Cancelled);
+                    // Liczy się do obwodu: dostawca, który stale milczy, ma zostać odcięty. Wolny
+                    // start długiego promptu nie przekracza terminu — ten rośnie z długością
+                    // kontekstu (`first_event_deadline_for`; przegląd 2026-10-21).
+                    let kind = ProviderErrorKind::Timeout {
+                        phase: providers_contract::TimeoutPhase::FirstToken,
+                    };
+                    self.core.report(cand, Outcome::Failed { kind });
                     return Attempt::Next(FallbackCause::Deadline { deadline_ms: ms(d) });
                 }
             };
@@ -251,7 +260,9 @@ impl Run {
             let started = buffered
                 .iter()
                 .any(|b| matches!(b, ProviderEvent::Started { .. }));
-            if matches!(ev, ProviderEvent::Error(_)) && !started {
+            // Odmowa prywatności: żądanie nie wyszło z Alfy — bez „odpowiada …” na osi czasu.
+            let sent = !matches!(&ev, ProviderEvent::Error(e) if e.kind == ProviderErrorKind::PrivacyBlocked);
+            if matches!(ev, ProviderEvent::Error(_)) && !started && sent {
                 let origin = ProviderEvent::Started {
                     model: cand.qualified(),
                     response_id: None,

@@ -35,12 +35,12 @@ Zdarzenia (bez treści): `router.decision`, `router.fallback` (z → na, przyczy
 
 ### Fallback i obwody (v1)
 - Błąd z `should_fallback()` **przed pierwszą treścią** albo brak pierwszego zdarzenia w terminie klasy (głos 1,2 s,
-  interaktywne 1,5 s, tło 5 s, plus 250 ms na 1000 tokenów wejścia, najwyżej 30 s — od 0.0.69; nie dla ostatniego celu)
+  interaktywne 1,5 s, tło 5 s, plus 250 ms na 1000 tokenów wejścia ponad 8 tys., najwyżej 30 s — od 0.0.69; nie dla ostatniego celu)
   → natychmiast następny cel z tą samą historią; zdarzenia przed
   treścią buforowane (jedno `Started`). Błąd **po** treści (`after_output`) — bez cichego przełączenia: konsument dostaje
   błąd, a tura zawiera częściową odpowiedź.
 - Obwód per dostawca: `failures` błędów w `window` → otwarty na `cooldown`, potem jedna próba half-open. Nie liczą się:
-  `InvalidRequest`, `PrivacyBlocked`, `Unsupported`, anulowanie, przekroczony termin Routera (od 0.0.69); 429 → osobne okno (reaktywnie: `retry-after`, bez nagłówka
+  `InvalidRequest`, `PrivacyBlocked`, `Unsupported`, anulowanie; 429 → osobne okno (reaktywnie: `retry-after`, bez nagłówka
   30 s × 2ⁿ ≤ 1 h).
 - Polityka domyślna (automatyczna z zarejestrowanych dostawców): bez kluczy API wszystko na model lokalny (profil A);
   z kluczem — rozmowa/kod/planowanie/wizja/streszczanie przez API (lokalny jako fallback/offline), głos-szybka i embeddingi

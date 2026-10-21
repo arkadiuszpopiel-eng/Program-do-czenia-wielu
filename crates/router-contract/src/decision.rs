@@ -206,8 +206,7 @@ pub enum Outcome {
         /// Czas całkowity (ms).
         latency_ms: u64,
     },
-    /// Błąd dostawcy (przekroczony termin pierwszego zdarzenia Routera zgłaszany jest od 0.0.69
-    /// jako [`Outcome::Cancelled`] — neutralny dla obwodu).
+    /// Błąd dostawcy (także przekroczony termin pierwszego zdarzenia Routera).
     Failed {
         /// Rodzaj.
         kind: ProviderErrorKind,

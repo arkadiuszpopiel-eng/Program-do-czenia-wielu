@@ -79,10 +79,14 @@ pub struct RoutePolicy {
     pub duo: DuoConfig,
 }
 
-/// Dodatek do terminu pierwszego zdarzenia na 1000 tokenów wejścia (ms): adaptery zgodne
-/// z OpenAI emitują `Started` z pierwszą porcją SSE, czyli po przetworzeniu promptu — duży
-/// kontekst agentki przekraczał 1,5 s i przebieg spadał na model lokalny (przegląd 2026-10-21).
+/// Dodatek do terminu pierwszego zdarzenia na 1000 tokenów wejścia ponad
+/// [`DEADLINE_FREE_TOKENS`] (ms): adaptery zgodne z OpenAI emitują `Started` z pierwszą porcją
+/// SSE, czyli po przetworzeniu promptu — duży kontekst agentki przekraczał 1,5 s i przebieg spadał
+/// na model lokalny (przegląd 2026-10-21).
 pub const DEADLINE_MS_PER_KTOK: u64 = 250;
+/// Kontekst bez dodatku do terminu — zwykła rozmowa (prompt systemowy, pamięć, narzędzia)
+/// zostaje przy terminie klasy, więc przełączenie po awarii trzyma ACC F1-04 (≤ 2 s).
+pub const DEADLINE_FREE_TOKENS: u64 = 8_000;
 /// Najdłuższy termin pierwszego zdarzenia po dodatku za długi prompt (ms).
 pub const MAX_FIRST_EVENT_MS: u64 = 30_000;
 
@@ -140,15 +144,19 @@ impl RoutePolicy {
     }
 
     /// Termin pierwszego zdarzenia dla żądania z `input_tokens` tokenami wejścia: termin klasy
-    /// plus [`DEADLINE_MS_PER_KTOK`] na 1000 tokenów, najwyżej [`MAX_FIRST_EVENT_MS`] (albo
-    /// termin klasy, gdy jest dłuższy). Krótkie żądania — bez zmian (ACC F1-04: ≤ 2 s).
+    /// plus [`DEADLINE_MS_PER_KTOK`] na 1000 tokenów ponad [`DEADLINE_FREE_TOKENS`], najwyżej
+    /// [`MAX_FIRST_EVENT_MS`] (albo termin klasy, gdy jest dłuższy). Zwykła rozmowa — bez zmian
+    /// (ACC F1-04: ≤ 2 s).
     pub fn first_event_deadline_for(
         &self,
         class: TaskClass,
         input_tokens: u64,
     ) -> Option<Duration> {
         self.first_event_ms.get(&class).map(|ms| {
-            let extra = input_tokens.saturating_mul(DEADLINE_MS_PER_KTOK) / 1000;
+            let extra = input_tokens
+                .saturating_sub(DEADLINE_FREE_TOKENS)
+                .saturating_mul(DEADLINE_MS_PER_KTOK)
+                / 1000;
             let ms = ms.saturating_add(extra).min(MAX_FIRST_EVENT_MS.max(*ms));
             Duration::from_millis(ms)
         })
