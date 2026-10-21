@@ -8,6 +8,7 @@
   import type { AutonomyLevel } from '../../../api/types';
   import type { PermissionsState } from '../../../api/types-hub';
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
+  import { watchRaise } from '../../../logic/raise-watch';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BrokerStatusCard from './BrokerStatusCard.svelte';
@@ -41,18 +42,35 @@
     perms ? (scope === 'session' && perms.session ? perms.session : perms.global) : null,
   );
 
+  // Prośba czekająca na zgodę w oknie Brokera (`logic/raise-watch`): po zatwierdzeniu strona sama
+  // pokazuje nowy poziom; czekanie kończy się przy opuszczeniu strony albo nowej prośbie.
+  let stopWatch: (() => void) | null = null;
+  $effect(() => () => stopWatch?.());
+
   async function request() {
     const level = wanted as AutonomyLevel;
+    const sessionId = scope === 'session' ? app.activeId : null;
     try {
-      const result = await app.client.permissions.requestLevel(
-        level,
-        scope === 'session' ? app.activeId : null,
-      );
+      const result = await app.client.permissions.requestLevel(level, sessionId);
       if (result.status === 'applied') {
         perms = await app.client.permissions.get(app.activeId);
         app.toasts.show({ kind: 'success', message: t('perm.applied', { level }) });
       } else {
         app.toasts.show({ kind: 'info', message: t('perm.requested', { level }) });
+        stopWatch?.();
+        stopWatch = watchRaise({
+          level,
+          read: async () => {
+            const next = await app.client.permissions.get(app.activeId);
+            perms = next;
+            return sessionId ? next.session : next.global;
+          },
+          onApplied: () => {
+            stopWatch = null;
+            wanted = level;
+            app.toasts.show({ kind: 'success', message: t('perm.applied', { level }) });
+          },
+        });
       }
     } catch (error) {
       showError(app.toasts, error);

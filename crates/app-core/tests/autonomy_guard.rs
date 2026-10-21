@@ -203,3 +203,63 @@ async fn raise_approved_in_broker_window_is_kept() {
     assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L1);
     drop(core);
 }
+
+/// Zgłoszenie 2026-10-21: nowy profil (nic wcześniej nie obniżono), L4 zatwierdzone w oknie
+/// Brokera — strażnik ma je odnotować i ogłosić (wcześniej przechodziło bez śladu i strona
+/// Uprawnień pokazywała stary poziom). Tak samo podniesienie jednej sesji.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn raise_approved_without_earlier_lowering_is_adopted_and_announced() {
+    let dir = tempfile::tempdir().unwrap();
+    let secrets = Arc::new(MemorySecretStore::default());
+    let broker = Arc::new(Broker::default());
+    broker.ready.store(true, Ordering::SeqCst);
+    broker.window.store(true, Ordering::SeqCst);
+    *broker.global.lock().unwrap() = AutonomyLevel::L3;
+    let core = start(dir.path(), broker.clone(), &secrets).await;
+    let session = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    for scope in [None, Some(session.clone())] {
+        let asked = core
+            .permissions_request_level(AutonomyLevel::L4, scope)
+            .await
+            .unwrap();
+        assert_eq!(asked.status, BrokerIntentStatus::OpenedBroker);
+    }
+    // Właściciel zatwierdza obie karty: Broker ma L4 globalnie i dla sesji.
+    *broker.global.lock().unwrap() = AutonomyLevel::L4;
+    broker
+        .sessions
+        .lock()
+        .unwrap()
+        .insert(session.clone(), AutonomyLevel::L4);
+    drop(core);
+    broker.requests.lock().unwrap().clear();
+
+    let core = start(dir.path(), broker.clone(), &secrets).await;
+    let mut announced = 0;
+    let mut waited = Duration::ZERO;
+    while announced < 2 && waited < Duration::from_secs(10) {
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        waited += Duration::from_millis(100);
+        announced = core
+            .events_resume(0, None)
+            .await
+            .unwrap()
+            .frames
+            .iter()
+            .flat_map(|f| f.events.iter())
+            .filter(|e| matches!(e, app_core::dto::AlfaEvent::SessionUpdated { .. }))
+            .count();
+    }
+    assert!(
+        announced >= 2,
+        "ogłoszenia po przyjęciu podniesień: {announced}"
+    );
+    // Nic nie cofnięto — Broker zostaje na zatwierdzonym L4.
+    assert!(broker.requests.lock().unwrap().is_empty());
+    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L4);
+    drop(core);
+}
