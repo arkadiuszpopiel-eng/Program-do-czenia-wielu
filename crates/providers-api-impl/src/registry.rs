@@ -103,10 +103,14 @@ pub(crate) fn cost(profile: &ProviderProfile, model: &str, usage: &Usage) -> Opt
 /// zwraca w odpowiedzi (`gpt-5-2025-08-07`, `claude-haiku-4-5-20251001`), przy cenniku
 /// z aliasami (przegląd 2026-10-21: koszt agentki liczony z modelu z odpowiedzi wychodził 0).
 fn price<'a>(profile: &'a ProviderProfile, model: &str) -> Option<&'a Pricing> {
-    profile
-        .pricing
-        .get(model)
-        .or_else(|| profile.pricing.get(undated(model)?))
+    // Lista modeli Google podaje identyfikatory z przedrostkiem `models/`, cennik — bez niego.
+    let bare = model.strip_prefix("models/").unwrap_or(model);
+    [model, bare].into_iter().find_map(|m| {
+        profile
+            .pricing
+            .get(m)
+            .or_else(|| profile.pricing.get(undated(m)?))
+    })
 }
 
 /// Nazwa bez przyrostka `-RRRRMMDD` albo `-RRRR-MM-DD`.
@@ -152,7 +156,12 @@ mod tests {
             input_tokens: 1_000_000,
             ..Usage::default()
         };
-        for model in ["gpt-5", "gpt-5-2025-08-07", "claude-haiku-4-5-20251001"] {
+        for model in [
+            "gpt-5",
+            "gpt-5-2025-08-07",
+            "claude-haiku-4-5-20251001",
+            "models/gpt-5",
+        ] {
             assert_eq!(
                 cost(&profile, model, &usage).map(|c| c.nano_usd),
                 Some(1_000_000_000),

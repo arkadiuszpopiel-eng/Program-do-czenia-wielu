@@ -215,7 +215,21 @@ impl ChatDecoder {
     }
 
     fn tool_delta(&mut self, tc: &Value, out: &mut Vec<ProviderEvent>) {
-        let key = tc["index"].as_u64().unwrap_or(0);
+        // Bez `index` (Gemini przez endpoint zgodny): nowe `id` = nowe wywołanie, brak `id` = ciąg
+        // ostatniego — wcześniej wszystkie trafiały pod klucz 0 i argumenty się sklejały.
+        let key = match (tc["index"].as_u64(), tc["id"].as_str()) {
+            (Some(i), _) => i,
+            (None, Some(id)) => self
+                .tools
+                .iter()
+                .find(|(_, s)| s.id == id)
+                .map_or(u64::from(u32::MAX) + self.tools.len() as u64, |(k, _)| *k),
+            (None, None) => self
+                .tools
+                .iter()
+                .max_by_key(|(_, s)| s.index)
+                .map_or(0, |(k, _)| *k),
+        };
         let f = &tc["function"];
         if !self.tools.contains_key(&key) {
             let index = self.next_index;
