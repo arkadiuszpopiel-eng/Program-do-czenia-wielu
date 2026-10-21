@@ -164,7 +164,9 @@
     try {
       await app.client.accounts.assign(created.id, {
         task_classes: tasks,
-        agents: assigned,
+        // Wszystkie agentki = bez przypięcia: przypięte konto idzie przed doborem trudności, więc
+        // każde krótkie pytanie trafiało do pierwszego (najdroższego) modelu konta (przegląd 2026-10-22).
+        agents: assigned.length === agentIds.length ? [] : assigned,
         voice_stt: stt,
         voice_tts: tts,
       });
