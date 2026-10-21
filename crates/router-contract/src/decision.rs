@@ -3,7 +3,7 @@
 use std::fmt;
 
 use compliance_contract::DecisionReason;
-use cost_meter_contract::BudgetNotice;
+use cost_meter_contract::{BudgetNotice, BudgetScope};
 use providers_contract::{ProviderError, ProviderErrorKind};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -78,11 +78,18 @@ impl fmt::Display for RejectReason {
                 write!(f, "jurysdykcja {jurisdiction} niedozwolona w tej sesji")
             }
             Self::Capability { missing } => write!(f, "model nie obsługuje: {missing:?}"),
-            Self::Budget { notice } => write!(
-                f,
-                "limit kosztów ({:?}) — {} % po zadaniu",
-                notice.scope, notice.pct_after
-            ),
+            Self::Budget { notice } => {
+                let scope = match &notice.scope {
+                    BudgetScope::Monthly => "miesięczny".to_owned(),
+                    BudgetScope::Background => "zadań w tle".to_owned(),
+                    BudgetScope::Provider(p) => format!("dostawcy {p}"),
+                };
+                write!(
+                    f,
+                    "limit kosztów {scope} — {} % po zadaniu",
+                    notice.pct_after
+                )
+            }
             Self::CircuitOpen { retry_in_ms } => {
                 write!(f, "obwód otwarty po błędach (próba za {retry_in_ms} ms)")
             }
