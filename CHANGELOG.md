@@ -12,6 +12,31 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.67 — 2026-10-21
+
+Zmiana poziomu autonomii zatwierdzona w oknie Brokera widać od razu, a Alfę z oknem zgód uruchamia skrót „Alfa”.
+
+### Poprawki
+
+- [poważne] Po zatwierdzeniu L4 w oknie Brokera strona Uprawnień dalej pokazywała stary poziom, choć Broker
+  przyjął L4: strona nie sprawdzała poziomu po zgodzie, a rdzeń odnotowywał zgodę tylko wtedy, gdy poziom był
+  wcześniej obniżany. Teraz strona sama pokazuje nowy poziom kilka sekund po zgodzie (czeka do 10 minut — tyle żyje
+  karta w oknie Brokera), a zgoda jest zapisywana i ogłaszana także na nowym profilu.
+- [poważne] Na komputerze stacjonarnym nie było skrótu do Alfy, więc uruchomiona była kopia testowa z katalogu
+  budowy — bez programów Jądra obok, z Brokerem w procesie i bez okna zgód (każde podniesienie poziomu odrzucane).
+  Teraz skrót „Alfa” na pulpicie i w menu Start uruchamia kopię z oknem zgód (`Alfa-uruchomiona`) i jest
+  odświeżany przy każdym wgraniu; skrótu zainstalowanej Alfy (instalator) nie zmienia. Kopia testowa mówi wprost,
+  że nią jest i co uruchomić.
+
+### Testy
+
+- Rust: strażnik autonomii przyjmuje zgodę bez wcześniejszego obniżenia (test czerwony na starym kodzie), zapis
+  poziomów w konfiguracji (`app_broker::levels`); clippy czysty.
+- Interfejs: czekanie na zgodę (vitest), testy w przeglądarce stron Uprawnień i Brokera 100/100; prawdziwa aplikacja
+  47 zielonych, pokrycie łącza 259 z 273 (94,9 %).
+- Na komputerze stacjonarnym: Alfa ze skrótu — tryb przenośny Brokera (Broker, okno zgód, watchdog); L4 zatwierdzone
+  przez właściciela, Broker potwierdza L4.
+
 ## 0.0.66 — 2026-10-20
 
 Poprawki po pierwszym dniu z 0.0.65: działające okno Brokera (podnoszenie poziomu autonomii), narzędzia agentek bez
