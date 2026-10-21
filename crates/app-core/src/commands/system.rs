@@ -66,15 +66,11 @@ impl AppCore {
         })
     }
 
-    /// `system_retry_queue`: offline → komunikat; online → wysłanie kolejki.
+    /// `system_retry_queue`: „Ponów” zawsze próbuje wysłać kolejkę — „offline” wraca dopiero
+    /// z kolejnego błędu sieci (wcześniej zdejmowała go tylko udana odpowiedź, więc po jednym
+    /// błędzie Alfa zostawała offline do restartu; przegląd 2026-10-21).
     pub async fn system_retry_queue(&self) -> Result<(), AppError> {
-        if !self.rt().online {
-            self.emit(AlfaEvent::Toast {
-                kind: ToastKind::Warning,
-                message: LocalizedText::new("Nadal brak połączenia.", "Still offline."),
-            });
-            return Ok(());
-        }
+        self.rt().online = true;
         self.flush_queue().await?;
         let status = self.status_snapshot().await;
         self.emit(AlfaEvent::SystemStatusChanged { status });

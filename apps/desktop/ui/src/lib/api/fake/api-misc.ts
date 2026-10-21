@@ -216,16 +216,10 @@ export function systemApi(core: FakeCore, chat: FakeChat): AlfaClient['system'] 
       typeof navigator !== 'undefined' && navigator.clipboard
         ? navigator.clipboard.readText().then((text) => text || null)
         : Promise.resolve(null),
+    // Jak rdzeń (0.0.69): „Ponów” zawsze próbuje wysłać kolejkę; offline wraca z błędu sieci.
     retryQueue: () => {
-      if (core.status.online) chat.flushQueue();
-      else
-        core.emit([
-          {
-            type: 'Toast',
-            kind: 'warning',
-            message: { pl: 'Nadal brak połączenia.', en: 'Still offline.' },
-          },
-        ]);
+      core.setStatus({ online: true });
+      chat.flushQueue();
       return core.reply(undefined);
     },
   };

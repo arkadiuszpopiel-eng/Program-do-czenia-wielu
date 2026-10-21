@@ -136,10 +136,8 @@ async fn offline_messages_queue_and_flush_on_retry() {
     assert_eq!(snap.turns[0].status, TurnStatus::Queued);
     assert_eq!(core.system_status().await.unwrap().queued_messages, 1);
 
-    core.system_retry_queue().await.unwrap();
-    until(&mut h.rx, |e| matches!(e, AlfaEvent::Toast { .. })).await;
-
-    core.set_online(true).await;
+    // Przegląd 2026-10-21: „Ponów” wysyła kolejkę bez zewnętrznego `set_online(true)` — nikt
+    // poza testami go nie woła, więc wcześniej Alfa zostawała offline do restartu.
     core.system_retry_queue().await.unwrap();
     let events = until(&mut h.rx, |e| matches!(e, AlfaEvent::Stop { .. })).await;
     assert!(events.iter().any(|e| matches!(e,
@@ -148,6 +146,7 @@ async fn offline_messages_queue_and_flush_on_retry() {
     assert_eq!(snap.turns.len(), 2);
     assert_eq!(snap.turns[0].status, TurnStatus::Complete);
     assert_eq!(core.system_status().await.unwrap().queued_messages, 0);
+    assert!(core.system_status().await.unwrap().online);
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
