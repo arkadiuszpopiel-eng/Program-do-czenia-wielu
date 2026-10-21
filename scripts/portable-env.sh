@@ -24,6 +24,11 @@ if [ -x "$_alfa_tools/nodejs/node.exe" ]; then
   PATH="$_alfa_tools/nodejs:$PATH"
 fi
 
+# Drobne narzędzia z oficjalnych wydań (np. `jq` dla etapu `graf` w verify), sprawdzone sumą przy pobraniu.
+if [ -d "$_alfa_tools/bin" ]; then
+  PATH="$_alfa_tools/bin:$PATH"
+fi
+
 # Bez `cygpath` (np. WSL) zmienne byłyby puste i npm pisałby do katalogu bieżącego.
 if [ -d "$_alfa_tools" ] && command -v cygpath >/dev/null 2>&1; then
   npm_config_cache="$(cygpath -w "$_alfa_tools/npm-cache")"

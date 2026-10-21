@@ -48,6 +48,13 @@ if (Test-Path -LiteralPath (Join-Path $node 'node.exe')) {
     $alfaReport += "Node.js: $node"
 } else { $alfaReport += 'Node.js: systemowy (brak na dysku przenośnym)' }
 
+# Drobne narzędzia z oficjalnych wydań (np. `jq` dla etapu `graf` w verify), sprawdzone sumą przy pobraniu.
+$bin = Join-Path $alfaTools 'bin'
+if (Test-Path -LiteralPath $bin) {
+    Add-AlfaPath $bin
+    $alfaReport += "Narzędzia: $bin"
+}
+
 if (Test-Path -LiteralPath $alfaTools) {
     $env:npm_config_cache = Join-Path $alfaTools 'npm-cache'
     $env:npm_config_store_dir = Join-Path $alfaTools 'pnpm-store'
