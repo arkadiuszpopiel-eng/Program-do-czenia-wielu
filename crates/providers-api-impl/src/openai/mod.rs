@@ -160,6 +160,28 @@ pub(crate) fn unknown_openai() -> ModelCapabilities {
     }
 }
 
+/// Znane limity wyjścia rodzin modeli oficjalnego OpenAI (dokumentacja modeli, stan 2026). Bez nich
+/// zadania agentek dostawały domyślne 8 192 tokeny, a rozumowanie modeli `o`/`gpt-5` zjada część
+/// limitu — duży `fs_write` dalej się ucinał (przegląd 2026-10-22). Nieznana rodzina — bez limitu.
+pub(crate) fn known_openai(model: &str) -> Option<ModelCapabilities> {
+    let m = model.to_ascii_lowercase();
+    let max: u32 = if m.starts_with("gpt-5") {
+        128_000
+    } else if ["o1", "o3", "o4"].iter().any(|p| m.starts_with(p)) {
+        100_000
+    } else if m.starts_with("gpt-4.1") {
+        32_768
+    } else if m.starts_with("gpt-4o") && m != "gpt-4o-2024-05-13" {
+        16_384
+    } else {
+        return None;
+    };
+    Some(ModelCapabilities {
+        max_output_tokens: Some(max),
+        ..unknown_openai()
+    })
+}
+
 /// Identyfikator OpenRoutera w katalogu dostawców.
 const OPENROUTER: &str = "openrouter";
 
@@ -209,11 +231,12 @@ impl OpenAiProvider {
         options: OpenAiOptions,
         fallback: ModelCapabilities,
     ) -> Result<Self, ConfigError> {
-        let registry = Arc::new(ModelRegistry::new(
-            profile.models.clone(),
-            |_| None,
-            fallback,
-        ));
+        let known: crate::registry::KnownModels = if options.native {
+            known_openai
+        } else {
+            |_| None
+        };
+        let registry = Arc::new(ModelRegistry::new(profile.models.clone(), known, fallback));
         let codec = OpenAiCodec {
             options,
             profile: profile.clone(),
