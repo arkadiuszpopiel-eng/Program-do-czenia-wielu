@@ -29,13 +29,17 @@ z poziomem autonomii, a modele i silniki pobierają się tylko w sprawdzonej wer
   część pobierała się z bieżącej wersji repozytorium, a sumę zapisywano dopiero po pierwszym pobraniu (albo
   pobranie wymagało Twojej zgody). Już pobrane, identyczne pliki zostają zainstalowane; zgoda udzielona przed
   przypięciem nie zainstaluje pliku innego niż przypięty, a menedżer modeli ocenia Bielika tym samym kryterium co
-  rozmowa (zgodna suma).
+  rozmowa (zgodna suma). Dla archiwum Piper, modelu rozpoznawania mówcy i pliku konfiguracji głosu Gosia wydawca
+  nie publikuje sumy — przypięta suma pochodzi z pliku pobranego 21.10 (każde kolejne pobranie musi być identyczne).
+  Rozmiary w menedżerze modeli poprawione według wydawców (modele pamięci 449 MiB, tokenizer MiniLM 9 MiB,
+  archiwum whisper.cpp 4 MiB).
 - [poważne] Rozmowa z Claude Opus 4.6 albo Sonnet 4.6 przy ustawionej swobodzie odpowiedzi (inna niż „auto”)
   mogła kończyć się błędem: API Anthropic nie przyjmuje temperatury razem z myśleniem. Temperatura idzie teraz
   tylko przy myśleniu wyłączonym.
 - Styl odpowiedzi i swoboda z Ustawienia → Ogólne działają też wtedy, gdy agentka pracuje z narzędziami
   (rozmowa z Deltą, zadania w tle, umiejętności) — wcześniej tylko w zwykłej rozmowie. Sprawdzenie wyniku
-  i Krytyczka zostają bez stylu, żeby ocena miała stałą formę.
+  i Krytyczka zostają bez stylu i z temperaturą modelu, żeby ocena miała stałą formę; podzadanie przekazane innej
+  agentce idzie bez stylu (jego wynik czyta agentka, która je zleciła).
 - Dyrygentka mówi o zgodach zgodnie z poziomem autonomii rozmowy — z tej samej tabeli reguł, którą stosuje
   Broker: na L4 nie zapowiada już zatwierdzania każdej akcji, ale też nie obiecuje, że zgody nie będzie
   (Broker pyta np. o operacje administracyjne i wysyłkę po niezaufanej treści na każdym poziomie).
@@ -46,9 +50,10 @@ z poziomem autonomii, a modele i silniki pobierają się tylko w sprawdzonej wer
 
 - Licencje 24 modeli i silników sprawdzone u wydawców (`docs/vendor/licencje-modeli-i-silnikow.md`), z listą
   spraw do Twojej decyzji: Regulamin bielik.ai (m.in. zakaz przetwarzania danych osobowych), licencja modelu
-  bazowego Bielika 4.5B (Qwen Research License), DirectML (licencja Microsoftu), FFmpeg (kompilacje GPL),
-  WeSpeaker i openWakeWord (użycie komercyjne nieustalone). Pochodzenie „Pocket TTS PL”: model społeczności,
-  nie wydanie Kyutai.
+  bazowego Bielika 4.5B (Qwen Research License), DirectML (licencja Microsoftu), zakazy Open RAIL-M (Supertonic 3)
+  w licencji Alfy, FFmpeg (kompilacje GPL), WeSpeaker, openWakeWord i głos Gosia (użycie komercyjne nieustalone),
+  biblioteka ONNX Runtime bez telemetrii. Pochodzenie „Pocket TTS PL”: katalog nie podaje źródła wag; jedyny
+  znaleziony kandydat to model społeczności (nie wydanie Kyutai).
 
 ### Testy
 
@@ -61,7 +66,7 @@ z poziomem autonomii, a modele i silniki pobierają się tylko w sprawdzonej wer
 - Wywłaszczenie mowy przez użytkownika: 95. percentyl < 5 ms i pojedyncza próbka < 50 ms zamiast najgorszego
   przypadku czasu ściennego (czerwony pod obciążeniem w `verify` 0.0.67); decyzja w pierwszym odpytaniu
   sprawdzana w każdej próbie.
-- `verify wersja`: wyniki w raporcie 34.
+- `verify wersja` na `77d5403c`: 16 zielonych etapów, 2 czerwone, 1 nieuruchomiony (`graf` — brak `jq`). Rust 3086 zielonych, 0 czerwonych; interfejs 478; prawdziwa aplikacja 47 + 1 pominięty, pokrycie łącza 259 z 273 (94,9 %); przeglądarka (Chromium, brak Edge) 551 + 1 — połączenie z serwerem podglądu zerwane (osobno 17/17); `cargo deny` — tylko `zip`.
 
 ## 0.0.67 — 2026-10-21
 
@@ -105,12 +110,13 @@ uruchomieniu; Alfę z oknem zgód uruchamia skrót „Alfa”.
   oknem zgód: czeka, zatwierdzona, odrzucona, nieznana, zerwane łącze.
 - Interfejs: vitest 478 (czekanie na zgodę, odczyt po przerwaniu), przeglądarka na Chromium 551 + 1 (aplikacja nie
   wczytała się w 30 s pod obciążeniem; osobno zielony); prawdziwa aplikacja 47 zielonych i 1 pominięty, pokrycie
-  łącza 259 z 273 (94,9 %). `verify wersja`: 15 zielonych etapów, `cargo deny` — tylko `zip`.
+  łącza 259 z 273 (94,9 %). `verify wersja`: 15 zielonych etapów, 3 czerwone (opisane wyżej testy pod obciążeniem
+  i `cargo deny` — tylko `zip`), 1 nieuruchomiony (`graf` — brak `jq`).
 - Skrypty: `memory-sync` 85/85 (stara pamięć drugiego komputera wstrzymana, celowy powrót do dawnej treści
   przechodzi), skrót „Alfa” zapisany na pulpicie i w menu Start. `verify` bez Edge uruchamia testy w przeglądarce na
   Chromium Playwrighta (adnotacja w raporcie) zamiast zawsze czerwonego etapu.
-- Na komputerze stacjonarnym: Alfa ze skrótu — tryb przenośny Brokera (Broker, okno zgód, watchdog); L4 zatwierdzone
-  przez właściciela, Broker potwierdza L4.
+- Na komputerze stacjonarnym (kopia 0.0.66 w `Alfa-uruchomiona`; 0.0.67 nie była wgrana): skrót „Alfa” uruchamia tryb
+  przenośny Brokera (Broker, okno zgód, watchdog); L4 zatwierdzone przez właściciela, Broker potwierdza L4.
 
 ## 0.0.66 — 2026-10-20
 

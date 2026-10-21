@@ -3,7 +3,8 @@
 Stan na **2026-10-21**. Badanie: 5 agentów (strony wydawców, pliki LICENSE w repozytoriach autorów, karty modeli
 Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe źródła. Porównanie z kartami licencji w programie
 (`crates/app-models/data/license-cards.json`, 24 pozycje). **To nie jest opinia prawna** — pole `confirmed` w kartach zostaje
-`false`, dopóki właściciel nie potwierdzi pozycji. Cytaty ≤ 15 słów; niczego nie pobierano poza stronami i plikami tekstowymi.
+`false`, dopóki właściciel nie potwierdzi pozycji. Cytaty ≤ 15 słów; badanie niczego nie pobierało poza stronami i plikami tekstowymi; do przypięcia sum (21.10, punkt 10 serii 8) pobrano tylko model
+WeSpeaker i archiwum Piper (osobne katalogi, bez rozpakowania i uruchamiania).
 
 ## Najważniejsze dla właściciela
 
@@ -13,8 +14,9 @@ Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe �
    Alibaba Cloud); SpeakLeash przypisuje Qwen2.5 licencję Apache-2.0 — źródła są niespójne. Bielik 1.5B (z Qwen2.5-1.5B) — Apache-2.0.
 2. **DirectML** (`Microsoft.AI.DirectML`) ma własną licencję Microsoftu (MICROSOFT SOFTWARE LICENSE TERMS), nie MIT — warunki
    redystrybucji obok programu.
-3. **Supertonic 3** — wagi na BigScience Open RAIL-M (ograniczenia użycia); licencja wymaga przekazania jej kopii — **naprawione**:
-   katalog instaluje `LICENSE` (15 007 B, z tej samej rewizji, z sumą SHA-256) obok modelu przy nowej instalacji.
+3. **Supertonic 3** — wagi na BigScience Open RAIL-M (ograniczenia użycia); licencja wymaga przekazania jej kopii — **naprawione
+   w części**: katalog instaluje `LICENSE` (15 007 B, z tej samej rewizji, z sumą SHA-256) obok modelu przy nowej instalacji; do
+   decyzji: zakazy z Załącznika A jako postanowienie licencji Alfy (pkt 4a i 5 Open RAIL-M).
 4. **ONNX Runtime — telemetria:** biblioteka `ort` jawnie włączała telemetrię oficjalnych buildów Microsoftu w procesach
    pobocznych mowy — **ograniczone**: procesy wyłączają ją zaraz po utworzeniu środowiska (`with_telemetry(false)`). Zostaje
    zdarzenie startowe „ProcessInfo” (wysyłane w `CreateEnv`, przed wyłączeniem), a wywołanie zwrotne ETW może ją włączyć
@@ -26,8 +28,8 @@ Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe �
    z dostępem po akceptacji warunków (zakaz klonowania głosu bez zgody i in.). Pocket TTS nie dodaje znaku wodnego.
 7. **FFmpeg** — Alfa go nie pobiera (instalacja ręczna); licencja zależy od kompilacji: dokumenty repozytorium zalecają
    `winget install Gyan.FFmpeg`, a kompilacje gyan.dev są na GPL-3.0 — karta podaje „LGPL-2.1+ albo GPL-2.0+”.
-8. **WeSpeaker (VoxCeleb)** i **openWakeWord (modele)** — warunki użycia komercyjnego nieustalone u źródła (dane badawcze, pytania
-   do autora bez odpowiedzi).
+8. **WeSpeaker (VoxCeleb)**, **openWakeWord (modele)** i **głos Piper Gosia** (dostrojony z en_US lessac — zbiór Blizzard 2013,
+   według źródła pośredniego tylko niekomercyjnie) — warunki użycia komercyjnego nieustalone u źródła.
 
 ## Zestawienie
 
@@ -61,8 +63,9 @@ Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe �
 ## Szczegóły
 
 Opisy pozycji to stan **w chwili badania**. Poprawki z 21.10 (przypięte rewizje i sumy SHA-256 wszystkich pozycji do
-pobrania, `LICENSE` obok Supertonic 3, telemetria ONNX Runtime) opisuje sekcja „Najważniejsze dla właściciela” — wzmianki
-poniżej o `/resolve/main`, pustych sumach albo rozmiarze tokenizera MiniLM dotyczą stanu sprzed tych poprawek.
+pobrania, `LICENSE` obok Supertonic 3, telemetria ONNX Runtime) opisują sekcje „Najważniejsze dla właściciela” i „Co dalej” — wzmianki poniżej
+o `/resolve/main`, pustych sumach i rozmiarach (tokenizer MiniLM 17 → 9 MiB, modele e5 i MiniLM 471 → 449 MiB,
+whisper-bin-x64 8 → 4 MiB) dotyczą stanu sprzed tych poprawek.
 
 ### `bielik-4.5b-v3.0-instruct-q8_0`
 
@@ -747,8 +750,8 @@ Wynik obejmuje wszystkie 24 pozycje z license-cards.json, żadnej nie brakuje. P
 ## Co dalej
 
 - Właściciel: decyzje z listy „Najważniejsze” (Regulamin bielik.ai, Qwen Research License dla Bielika 4.5B, DirectML,
-  Open RAIL-M Supertonic, FFmpeg, WeSpeaker/openWakeWord) i potwierdzenie kart (`confirmed`).
+  zakazy Open RAIL-M w licencji Alfy, ONNX Runtime bez telemetrii, FFmpeg, WeSpeaker/openWakeWord/Gosia) i potwierdzenie kart (`confirmed`).
 - Kod: przypięte też rewizje i sumy SHA-256 (LFS oid z API Hugging Face) modeli Whisper (`ggml-large-v3-turbo-q5_0`,
   `ggml-small-q5_1`), `multilingual-e5-small` i `paraphrase-multilingual-MiniLM-L12-v2` (model i `tokenizer.json`; rozmiar
-  tokenizera MiniLM poprawiony z 17 na 9 MB), a także głosu Piper Gosia, modelu WeSpeaker i archiwów whisper.cpp i Piper —
+  tokenizera MiniLM poprawiony z 17 na 9 MiB, modeli e5 i MiniLM z 471 na 449 MiB, whisper-bin-x64 z 8 na 4 MiB), a także głosu Piper Gosia, modelu WeSpeaker i archiwów whisper.cpp i Piper —
   każda pozycja do pobrania ma przypięte sumy (test katalogu); zrobione 2026-10-21.

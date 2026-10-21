@@ -5,11 +5,11 @@ pracy i dziennik sesji. Leży w repozytorium, żeby wędrowała razem z projekte
 z 2026-10-12). **To kopia** — pliki źródłowe są tam, gdzie czytają je narzędzia; odświeża ją
 `bash scripts/memory-sync.sh` na końcu każdej sesji. Data ostatniej kopii: `OSTATNIA-KOPIA.txt`.
 
-| Katalog              | Co zawiera                                                                                                                                                                         | Źródło                                                  |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `1-stan-projektu/`   | `status.md` — bieżący stan i wersja; `handoff.json` — przekazanie między sesjami (`current_state` z ostatnim commitem, `next_session` — lista zadań, `blocking_issues`, `test_results`); `decisions.md` — decyzje właściciela | `../memory/` obok repozytorium                          |
-| `2-zasady-pracy/`    | Zasady, które właściciel ustalił z asystentem (budowanie, testowanie, pobrania, głos, przeglądy interfejsu); `MEMORY.md` to spis treści                                            | `~/.claude/projects/<projekt>/memory/` na komputerze    |
-| `3-dziennik-sesji/`  | Notatki z kolejnych dni pracy (`today-RRRR-MM-DD.md`), skrót ostatniego tygodnia (`recent.md`), archiwum                                                                           | `../.remember/` obok repozytorium                       |
+| Katalog             | Co zawiera                                                                                                                                                                                                                    | Źródło                                               |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `1-stan-projektu/`  | `status.md` — bieżący stan i wersja; `handoff.json` — przekazanie między sesjami (`current_state` z ostatnim commitem, `next_session` — lista zadań, `blocking_issues`, `test_results`); `decisions.md` — decyzje właściciela | `../memory/` obok repozytorium                       |
+| `2-zasady-pracy/`   | Zasady, które właściciel ustalił z asystentem (budowanie, testowanie, pobrania, głos, przeglądy interfejsu); `MEMORY.md` to spis treści                                                                                       | `~/.claude/projects/<projekt>/memory/` na komputerze |
+| `3-dziennik-sesji/` | Notatki z kolejnych dni pracy (`today-RRRR-MM-DD.md`), skrót ostatniego tygodnia (`recent.md`), archiwum (źródło nieaktywne od 2026-10-16 — wtyczka wyłączona 18.10; bieżący stan w `1-stan-projektu/status.md`)              | `../.remember/` obok repozytorium                    |
 
 ## Od czego zacząć
 

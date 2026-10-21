@@ -4,13 +4,11 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-21T15:20:00+02:00"
+    "updated": "2026-10-21T21:00:00+02:00"
   },
-  "current_state": "Komputer stacjonarny (RX 9070 XT). W Alfa-uruchomiona działa 0.0.66 (tryb przenośny Brokera, L4 zatwierdzone przez właściciela 21.10). Wersja 0.0.67 zatwierdzona lokalnie (HEAD 0e54f5b9, niewypchnięta): skrót „Alfa”, odświeżanie L4 po zgodzie, łatki bibliotek, poprawka bezpieczeństwa strażnika autonomii (przegląd 16 recenzentów: prośba o L3 bez zgody + restart nadpisywały obniżenie — teraz przyjęcie tylko po stanie prośby Approved z Brokera, prośby w pamięci procesu), wgranie nie zastępuje głosu niepełnym kompletem, memory-sync wstrzymuje starą pamięć drugiego komputera. 0.0.67 NIE wgrana — decyzja właściciela (wgranie zamyka Alfę, L4 potwierdzić ponownie).",
-  "session_goal": "Właściciel 21.10 ~14:00 wyszedł na kilka godzin: /goal „pracuj dalej nad poprawkami, ulepszeniami i nowymi wersjami”. Po verify 0.0.67: styl i temperatura w przebiegach agentek, „porządki” bez katalogu — stała odpowiedź programu.",
-  "in_progress": [
-    "verify wersja na 0e54f5b9 (target/verify/wersja-0067.log); raport 33 (szkic w scratchpad sesji — dokończyć i dodać do docs/plan/README.md)"
-  ],
+  "current_state": "Komputer stacjonarny (RX 9070 XT). W Alfa-uruchomiona działa 0.0.66 (tryb przenośny Brokera, L4 zatwierdzone 21.10). Wersja 0.0.68 zatwierdzona lokalnie (gałąź ccr-af4b63c6-3fyzaj, niewypchnięta; HEAD po dokumentach — patrz git log): 0.0.67 (skrót „Alfa”, odświeżanie L4, łatki bibliotek, strażnik autonomii przyjmuje podniesienie tylko po zgodzie potwierdzonej przez Brokera) + seria 8 (styl i swoboda w przebiegach agentek, Dyrygentka mówi o zgodach według tabeli reguł Brokera, Claude 4.6 bez temperatury przy myśleniu, test wywłaszczenia, C5.1 licencje u źródła, telemetria ONNX Runtime ograniczona, przypięte sumy całego katalogu, LICENSE Supertonic). target/shell/debug = 0.0.68 gotowa do wgrania (deploy-owner.sh) — NIE wgrana, decyzja właściciela (zamyka Alfę, L4 ponownie w oknie Brokera).",
+  "session_goal": "Właściciel 21.10 ok. 14:00 wyszedł na kilka godzin (/goal: poprawki, ulepszenia, nowe wersje). Następna sesja: decyzja o wgraniu 0.0.68 i priorytety 0.0.69.",
+  "in_progress": [],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
     "target\\debug rośnie szybko (17.10: 170 GB w kilka godzin — każda zmiana ustawień kompilacji = nowy komplet plików testowych); verify pomija etapy Rust przy małym miejscu. Sprzątanie: starsze duplikaty *.exe/*.pdb w target/debug/deps + target/debug/incremental (zwolnione 130 GB).",
@@ -18,24 +16,21 @@
     "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
   ],
   "next_session": [
-    "Właściciel: decyzja o wgraniu 0.0.67 (scripts/deploy-owner.sh — zamyka Alfę, potem L4 ponownie w oknie Brokera). Po wgraniu sprawdzić: zgoda w oknie Brokera → strona Uprawnień sama pokazuje L4 w ~2 s.",
-    "Sprawdzić u właściciela koszt w wierszu odpowiedzi (Haiku 5.5: „< 0,01 zł”, GPT-6.1 Sol: kwota) i stronę Ustawienia → Koszty i limity → Cennik modeli.",
-    "Po restarcie laptopa: verify-app (test diagnostyki — WMI było zablokowane 20.10 wieczorem).",
-    "Prompt Dyrygentki (crew_note): na L4 nie pisać, że Broker zatwierdza każdą akcję — zależnie od poziomu autonomii.",
-    "Decyzja właściciela: odmowa w oknie Brokera bez dowodu fizycznego (testy props traktują to jako niezmiennik).",
-    "Po restarcie Alfy L4 wymaga ponownej zgody (z założenia) — zmiana tylko na wyraźne polecenie właściciela.",
-    "Seria 7: poziom „Pełny dostęp”; tryb przenośny Brokera w e2e-app; „porządki” bez katalogu — stała odpowiedź programu.",
-    "Decyzje właściciela: do-przegladu-updater-zip9, Azure, ADR 0028, znak wodny mowy."
+    "Właściciel: decyzja o wgraniu 0.0.68 (bash scripts/deploy-owner.sh — zamyka Alfę; potem L4 ponownie w oknie Brokera i sprawdzić, że strona Uprawnień sama pokazuje L4 w ~2 s).",
+    "Decyzje licencyjne z alfa/docs/vendor/licencje-modeli-i-silnikow.md: Regulamin bielik.ai (zakaz danych osobowych), Qwen Research License (Bielik 4.5B), DirectML, zakazy Open RAIL-M w licencji Alfy, FFmpeg GPL, WeSpeaker/openWakeWord/Gosia, potwierdzenie kart (confirmed).",
+    "ONNX Runtime bez telemetrii (pyke albo własna kompilacja) — decyzja i pobranie za zgodą.",
+    "Propozycja 0.0.69 (seria 9, 10 punktów, przedstawiona właścicielowi 21.10 wieczorem): 1 licencje → zmiany w programie, 2 „Pełny dostęp” (seria 7, gałąź do-przegladu-pelny-dostep, przegląd człowieka), 3 tryb usługi: zgoda po restarcie Alfy przypięta do instancji Brokera, 4 komunikat zgody dla nieaktywnej rozmowy + atrapa bez okna zgód, 5 memory-sync: zasada usunięta w repo nie wraca, 6 P4 karty z profilem, 7 C2.8 historia wersji artefaktu, 8 C5.5 automatyczny poziom głosu, 9 B.5/B.6, 10 test prawdziwej aplikacji z Brokerem przenośnym (osobna instancja).",
+    "Na tym PC: Edge (testy przeglądarki na WebView2) i jq (etap graf verify) — decyzja właściciela; zip 9 (do-przegladu-updater-zip9), ADR 0028, znak wodny mowy."
   ],
   "env_snapshot": {
     "key_paths": {
       "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
       "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia (zawsze . .\\scripts\\portable-env.ps1)",
-      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; zweryfikowane 2026-10-17_2115, 2026-10-18_0054, 2026-10-18_0330 = 678e7b2a)",
-      "plan": "alfa/docs/plan/03-roadmapa.md (C6.6)",
-      "raport": "alfa/docs/plan/28-raport-nocny-2026-10-18.md",
+      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; Seagate Backup Plus; ostatnie: kopia-2026-10-21_1625 = b39aa279, następna po 0.0.68)",
+      "plan": "alfa/docs/plan/03-roadmapa.md (C5.1 zrobione, P4)",
+      "raport": "alfa/docs/plan/34-raport-2026-10-21-0068.md (wcześniej 33 — 0.0.67)",
       "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md",
-      "zbudowana": "alfa/target/shell/debug/alfa-desktop.exe z 21897bf0 (02:55; e2e-app 41 zielonych, pokrycie 235/264) — do wgrania: scripts/deploy-owner.sh, decyzja właściciela"
+      "zbudowana": "alfa/target/shell/debug/alfa-desktop.exe — 0.0.68 (commit w opisie wersji), komplet sidecarów mowy; do wgrania: scripts/deploy-owner.sh, decyzja właściciela"
     },
     "ports": {
       "alfa-ui (atrapa)": 5173,
@@ -46,7 +41,8 @@
     "0.0.63": "verify wersja 96588e5b: 16 zielonych / 2 czerwone (brak Edge, cargo deny: zip) / 1 nieuruchomiony (jq); Rust 2898/0/40, interfejs 395/395, prawdziwa aplikacja 41 + 1 pominięty, pokrycie łącza 235/264 (89 %); przeglądarka na Chromium Playwrighta 467/467; RX 9070 XT: DXCore/PDH (odczyt samej pamięci 89 µs), Supertonic CPU vs DirectML, Qwen3-ASR Vulkan",
     "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone.",
     "0.0.66": "verify wersja 5e7baed4: Rust 3065 (1 czerwony app-broker portable_mode pod obciążeniem, osobno 3× zielony), UI 473, przeglądarka 549/549; po poprawkach 08c80c91: lint zielony, aplikacja 48/48, pokrycie 259/271; duty Bielik: morning/evening/costs zielone, tidy niestabilny bez katalogu.",
-    "0.0.67": "verify wersja 376b21d0: Rust 3076/0; czerwone format (dto/mod.rs — poprawione), pnpm audit (vite — 7.3.7), cargo deny (nowe RUSTSEC rustls-webpki/wasmtime — poprawione; zip zostaje), przeglądarka (brak Edge). Po 39965c0c: deny tylko zip, audit czysty, crate'y wasmtime/TLS 227/0, vitest 477/477, budżet JS 149,8/150 KB."
+    "0.0.67": "verify wersja 0e54f5b9: 15 zielonych / 3 czerwone (test wywłaszczenia pod obciążeniem — osobno zielony; start przeglądarki — osobno 3/3; cargo deny — zip) / 1 nieuruchomiony (graf, brak jq); Rust 3079 + 1, vitest 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %).",
+    "0.0.68": "verify wersja 77d5403c: 16 zielonych / 2 czerwone (przeglądarka: zerwane połączenie z serwerem podglądu w updates.spec — osobno 17/17; cargo deny — zip) / 1 nieuruchomiony (graf); Rust 3086/0, interfejs 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Przeglądy: 16 + 9 (0.0.67), 5 + 4 (seria 8), spójność dokumentów 2."
   },
   "decisions_this_session": [
     "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",

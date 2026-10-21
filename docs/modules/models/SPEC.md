@@ -1,6 +1,7 @@
 # models — SPEC (v1, menedżer modeli i silników, `app-models`)
 
 ## Cel
+
 Jedno miejsce w aplikacji do pobrania, sprawdzenia i usunięcia wszystkiego, czego Alfa potrzebuje lokalnie: modele
 rozmowy (GGUF z `providers-local`), STT (whisper GGML), głosy TTS (Piper; Pocket — ręcznie), VAD (Silero), cechy
 słów wywoławczych (openWakeWord), model mówcy (ECAPA/WeSpeaker), embeddingi (`lib_embed::CATALOG`) i sidecary
@@ -8,10 +9,12 @@ słów wywoławczych (openWakeWord), model mówcy (ECAPA/WeSpeaker), embeddingi 
 Odblokowuje F3-12 (instalator modeli/sidecarów) i pomiary głosu w aplikacji (PLAN §1.2, §8.7, §10).
 
 ## Fala i priorytet
+
 F3 (MVP bez kluczy) + F7 (embedder). P0. Kategoria `app-*` (korzeń kompozycji): crate `app-models`, bez trójki
 `-contract/-impl/-fake` — kontraktem dla UI są DTO `app-api` (`dto/models.rs`) i komendy z `COMMANDS.md`.
 
 ## Kontrakt
+
 ```rust
 // app-models
 pub struct ItemSpec { id, kind: ModelItemKind, name, license, source, root: Root /* Models | Sidecars */, dir,
@@ -24,18 +27,21 @@ impl ModelsApp { list, download, cancel, verify, remove, trust_hash, activate_em
                  reindex_start, reindex_cancel, reindex_status }
 pub fn startup_embedder(models, setting, lexical) -> Arc<dyn Embedder>;   // wybór przy budowie `search`
 ```
+
 Komendy: `models_list`, `models_download {itemId}`, `models_cancel`, `models_verify`, `models_remove`,
 `models_trust_hash {itemId, hashes}`, `embed_model_activate {model}`, `search_reindex_start/cancel/status`.
 Zdarzenia UI: `ModelProgress {item_id, file, done, total}` (co ≥ 200 ms), `ModelChanged {item}`,
 `ReindexStatus {status}`; magistrala: `search.reindex.{started,progress,done}` z `search-impl` (tylko liczniki).
 
 ## Stany pozycji
+
 `missing → queued → downloading → (needs_trust) → installing → installed`; `paused` (plik `.part` czeka na
 wznowienie), `failed` (ostatni błąd), `corrupt` (weryfikacja), `external` (pliki skopiowane ręcznie, bez rekordu).
 Stan wykrywany tanio (bez hashowania): zadanie w toku → błąd → rekord `state\models\<id>.json` →
 `downloads\<id>\pending.json` → plik `.part` → obecność plików wynikowych.
 
 ## Niezmienniki
+
 - Tylko `https://` (przekierowania też); `http://127.0.0.1` wyłącznie w testach (`loopback_http`). Stały
   `User-Agent` bez wersji, bez ciasteczek, bez telemetrii; żadnych sekretów w plikach stanu.
 - Pobieranie do katalogu roboczego `%LOCALAPPDATA%\Alfa\downloads\<id>\` (`.part`, `Range: bytes=n-`, ≤ 3
@@ -50,15 +56,17 @@ Stan wykrywany tanio (bez hashowania): zadanie w toku → błąd → rekord `sta
   poprzedniej instalacji. Wpis wybrany z paczki (PyPI) sprawdzany przypiętym SHA-256.
 - Limit równoległych pobrań (domyślnie 2), anulowanie czeka na koniec zadania (bez dwóch piszących do `.part`).
 - Aktywnego embeddera nie można usunąć; zmiana embeddera = `SqliteSearch::set_embedder` (migawka na operację)
-  + przebudowa wektorów w tle (bazy sesji + bazy zakresów pamięci); w trakcie wyszukiwanie wektorowe działa jak FTS.
+  - przebudowa wektorów w tle (bazy sesji + bazy zakresów pamięci); w trakcie wyszukiwanie wektorowe działa jak FTS.
 
 ## Zależności
+
 `app-api` (DTO, `EventHub`, `AppPaths`), `search-impl` (`set_embedder`, `spawn_reindex`), `memory-impl`
 (`ScopeDbs`, `index_label`), `lib-embed` (katalog, `OnnxEmbedder`, manifest), `providers-local-impl` (manifest
 GGUF, rekord `.sha256`), `updater-contract` (reguły ścieżek, limity), `model-residency-contract`, `core-config-contract`.
 Zewnętrzne (już w `Cargo.lock`): `reqwest` (rustls), `zip`, `flate2`, `sha2`, `tokio-util`.
 
 ## Konfiguracja
+
 `[search.embedder] model = "multilingual-e5-small" | "lexical"` (warstwa wspólna; brak = model domyślny, używany,
 gdy jest zainstalowany). Katalogi: `%LOCALAPPDATA%\Alfa\{models,sidecars,downloads,state\models}`. Opcje kompozycji
 (`ModelsOptions`): `parallel = 2` (ustawienie `models.parallel_downloads` 1–4, nakładka maszyny, od następnego
@@ -67,6 +75,7 @@ gdy ostatni bezbłędny był dla innego embeddera albo ponad 7 dni temu (`state\
 embeddera i czas — przebieg otwiera wszystkie bazy sesji, które zostają w pamięci podręcznej `sessions`).
 
 ## Katalog — stan danych (2026-10-04)
+
 Potwierdzone (PyPI, hash archiwum z API i hash wpisu policzony lokalnie): Silero VAD 6.2.3 (`silero_vad_op18_ifless.onnx`
 = `voice_vad_impl::KNOWN_MODELS`), openWakeWord 0.5.1 (`melspectrogram.onnx`, `embedding_model.onnx`).
 **Do potwierdzenia przez człowieka** (HF/GitHub zablokowane w sesji, SHA-256 nieprzypięte): Bielik GGUF, e5-small
@@ -75,6 +84,7 @@ głosu), WeSpeaker ResNet34 (warunki VoxCeleb; okno 200 ramek), `llama-server` (
 przypięcia, układ ZIP), `whisper-server` 1.8.1 (`Release/`), `piper` 2023.11.14-2. Pocket TTS — instalacja ręczna.
 
 ## Testy
+
 `crates/app-models/tests/`: `download.rs` (lokalny serwer HTTP: pobranie z postępem, zerwanie → `Range`, anulowanie
 → wznowienie, zły hash → usunięcie, TOFU: zły/pusty/zmieniony hash odrzucony, limit równoległości, limit rozmiaru,
 tylko HTTPS, GGUF widoczny dla `providers-local`, weryfikacja i usuwanie, drzewo ZIP sidecara), `unpack.rs` (13
@@ -84,6 +94,7 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
 `fake-engines.test.ts`, `logic/models.test.ts`, E2E `e2e/models.spec.ts` (axe w obu motywach).
 
 ## Otwarte pytania
+
 - Przypięcie SHA-256 i potwierdzenie adresów/licencji pozycji „do potwierdzenia” (bramka ludzka; zmiana `confirmed`).
 - Build Vulkan `whisper-server` — brak w wydaniach whisper.cpp (desktop AMD: Whisper na CPU, od 0.0.63 głównym
   silnikiem jest tam Qwen3-ASR przez `llama-server` Vulkan — ADR 0028); CUDA — od fali 6.
@@ -94,9 +105,11 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   czy wyłączyć (onboarding korzysta już z menedżera).
 
 ## Przegląd bezpieczeństwa #3 (2026-10, `docs/reviews/2026-10-security-review-3.md`) — decyzja człowieka
-- **P3-04:** sidecary wykonywalne (`llama-server`, `whisper-server`, `piper`) pobierane bez przypiętego SHA-256 (tylko TOFU) — przypiąć skróty potwierdzonych wydań albo zablokować pobieranie nieprzypiętych plików wykonywalnych (THREAT_MODEL S23). Test `tests/review.rs` (`#[ignore]`).
+
+- **P3-04:** zrealizowane 2026-10-21 (0.0.68) — archiwa sidecarów (`llama-server`, `whisper-server`, `piper`) i wszystkie modele mają przypięte SHA-256; test `tests/review.rs` bez `#[ignore]`; `confirmed` (potwierdzenie przez człowieka) bez zmian.
 
 ## Fala 5: `llama-server` CUDA i zastępstwo backendu
+
 - **Pozycja `sidecar-llama-cuda`** (`data.rs`, „do potwierdzenia przez człowieka”, bez SHA-256 — wzór pozycji Vulkan/CPU):
   dwa archiwa wydania `b6710` — `llama-b6710-bin-win-cuda-12.4-x64.zip` i `cudart-llama-bin-win-cuda-12.4-x64.zip`
   (biblioteki `cudart`/cuBLAS) — rozpakowywane do jednego drzewa `sidecars/llama-cuda/`; wymagane `llama-server.exe`
@@ -115,13 +128,14 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   odrzucenie powtórzonego pliku), `crates/app-modules/src/route/local.rs` (testy zastępstwa).
 
 ## Fala 6: próba generalna przed testem na laptopie (2026-10-06)
+
 - **Układ archiwów z GitHuba sprawdzony** (pobranie / lista wpisów przez HTTP Range, `sha256sum`): `llama-server` b6710
   cpu/vulkan/cuda — pliki w korzeniu (`llama-server.exe`, `ggml-*.dll`, `LICENSE-*`), `cudart-llama-bin-…` — 3 biblioteki
   w korzeniu (bez powtórzeń z archiwum serwera), `whisper-bin-x64.zip` — `Release/` (21 plików, w tym
   `whisper-server.exe`), `piper_windows_amd64.zip` — `piper/` (363 wpisy, katalogi z `/`). Flagi CLI używane przez Alfę
   są w binariach (`--api-key`, `--alias`, `--jinja`, `-np`, `-ngl`; `-nlp`, `-sns`, `-ng`, `-fa`; `--output_raw`,
   `--quiet`). Sumy i rozmiary: `docs/user-guide/11-pierwszy-test-na-pc.md` („Jutro na laptopie”) — do przypięcia przez
-  człowieka (bramka P3-04); `confirmed` bez zmian.
+  człowieka (bramka P3-04 — zamknięta w 0.0.68); `confirmed` bez zmian.
 - **Pozycja `sidecar-whisper-cuda`**: `whisper-cublas-12.4.0-bin-x64.zip` (430 MiB; `Release/` z `cudart`/cuBLAS,
   ~0,7 GB po rozpakowaniu) → `sidecars/whisper-cuda/`, wymagane `whisper-server.exe` i `cudart64_12.dll`. Zainstalowana
   ma pierwszeństwo przed CPU (`app_modules::stt`), nieudany start → CPU (`voice-stt-impl`).
@@ -143,8 +157,8 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   narzędzi). Wpis Q4_K_M wskazywał plik nieobecny w `speakleash/Bielik-4.5B-v3.0-Instruct-GGUF` (HTTP 404). Próba na
   żywo pobiera teraz najmniejszy — 1.5B (żądanie z narzędziem pomijane: `tools = false`).
 
-
 ## Pakiety 1–6 i „Napraw” (2026-10-07)
+
 - **Skala ocen 6 → 1** (`bundle_data.rs`, stan 0.0.63): 6 Wzorcowy (Bielik 4.5B, Qwen3-ASR, Whisper turbo i small,
   Supertonic 3, Piper, Smart Turn, ONNX Runtime, Silero VAD, openWakeWord, WeSpeaker, e5; karta ≥ 8 GB), 5 Bardzo
   dobry (jak 6 bez Qwen3-ASR, słowa wywoławczego i mówcy; karta ≥ 6 GB), 4 Dobry (Bielik 1.5B + turbo i small +
@@ -179,6 +193,7 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   normy), `tests/bundle_ops.rs` (lokalny serwer HTTP: pobranie, weryfikacja, naprawa, TOFU, pozycje ręczne).
 
 ## Karty licencji (C5.7, 0.0.64)
+
 - **Dane:** `crates/app-models/data/license-cards.json` (identyfikator pozycji → karta), ładowane przez
   `licenses.rs` i dołączane do `ModelItem::license_card` (pole z `serde(default)` — starsze ładunki bez niego
   wczytują się jako `null`). Karta: identyfikator licencji (SPDX albo nazwa umowna), pełna nazwa, źródło licencji (adres tekstu albo strony autora),

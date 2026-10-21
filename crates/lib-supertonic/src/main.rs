@@ -58,9 +58,10 @@ fn parse(mut argv: impl Iterator<Item = String>) -> Result<Args, String> {
 
 fn run() -> Result<(), String> {
     let args = parse(std::env::args().skip(1))?;
-    // Telemetria ONNX Runtime wyłączona zawsze, także bez `--ort` (środowisko domyślne): oficjalne
+    // Telemetria ONNX Runtime wyłączana zaraz po utworzeniu środowiska, także bez `--ort`: oficjalne
     // buildy Microsoftu na Windows wysyłają zdarzenia, a `ort` domyślnie je włącza
-    // (`EnableTelemetryEvents`; licencje u źródła, C5.1, 2026-10-21).
+    // (`EnableTelemetryEvents`). Zdarzenie startowe z `CreateEnv` i tak wychodzi — pełne wyłączenie
+    // wymaga biblioteki bez telemetrii (licencje u źródła, C5.1, 2026-10-21).
     let (builder, from) = match &args.ort {
         Some(dll) => (
             ort::init_from(dll.display().to_string()),

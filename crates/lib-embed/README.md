@@ -5,16 +5,16 @@ ADR 0004, ACCEPTANCE F7-02). Zależy tylko od `search-contract` (trait `Embedder
 (dzierżawa RAM) — moduły (`memory-impl` w testach, `app-*` w kompozycji) mogą od niej zależeć bez łamania
 `scripts/check-deps.sh`.
 
-| Element | Opis |
-|---|---|
-| `EmbedManifest` (`embed.json`, `alfa-embed-v1`) | pliki ONNX i `tokenizer.json` z **SHA-256** (plik o innym hashu nie jest ładowany), `dims` (= wymiar `vec0`), `max_tokens`, `pooling` (`mean`/`cls`/`pooled`), `query_prefix`/`passage_prefix` (E5), `output`, `batch_size`, `ram_mb`, `idle_unload_s`; `model_id()` = `id@<12 hex>` z odcisku plików i ustawień (każda zmiana → przebudowa wektorów w `search`) |
-| `TextTokenizer` | własny tokenizer `tokenizer.json` dla **SentencePiece Unigram** (XLM-R: `multilingual-e5-*`, `paraphrase-multilingual-*`): tokeny dodane (`lstrip`/`rstrip`), normalizatory `Precompiled` (Darts + grafemy), `Replace`, `Strip`, `NFC/NFD/NFKC/NFKD`, `Lowercase`; pre-tokenizery `Metaspace` (`prepend_scheme` i dawne `add_prefix_space`), `WhitespaceSplit`; Viterbi z `fuse_unk`; `TemplateProcessing`/`RobertaProcessing`/`BertProcessing`; obcięcie jak HF. Nieznany element → błąd ładowania (nigdy cicha, inna tokenizacja). |
-| `OnnxModel` | `tract-onnx` 0.23.8 (czysty Rust): wejścia `input_ids` + opcjonalnie `attention_mask`, `token_type_ids` (zera), wymiary symboliczne `B×S` (jeden plan), adnotacje kształtów z eksportu czyszczone, wybór wyjścia po nazwie |
-| `Engine` | tokenizacja → wsady ≤ `batch_size` posortowane po długości (mniej wypełnienia) → pooling z maską → L2; kontrola kształtu wyjścia |
-| `OnnxEmbedder` | `search_contract::Embedder`: **wątek tła** `alfa-embedder` (jedyny właściciel modelu), ładowanie leniwe albo `preload()`, zwolnienie po bezczynności / `unload()` / odebraniu dzierżawy, dzierżawa `model-residency` (`ModelRole::Embedder`, CPU, `Priority::Conversation`, `cpu_ram_mb = ram_mb`) **przed** ładowaniem; błąd ładowania pamiętany `retry_after` (domyślnie 30 s); panika w `tract` → błąd + wyładowanie; wywołanie dzielone na zlecenia ≤ 64 tekstów (zapytanie nie czeka za całą reindeksacją); tekst przycinany do `max_tokens × 64` B |
-| `catalog` | znane modele: `multilingual-e5-small` (domyślny), `paraphrase-multilingual-minilm-l12-v2` — URL, rozmiar, licencja, ustawienia manifestu; **SHA-256 nieprzypięte** (HF niedostępny przy tworzeniu) |
-| `install` | instalator przez port `Fetcher` (HTTP `Range` w `app-*`): wznawianie z `.part`, SHA-256 w locie, ≤ 3 automatyczne wznowienia, limit 2× rozmiar z katalogu, anulowanie, atomowe `rename`, na końcu `embed.json`; `HashPolicy::PinnedOnly` (domyślnie) odmawia pliku bez przypiętego hasha, `TrustOnFirstUse` (jawna zgoda w UI) zapisuje hash pierwszego pobrania |
-| `testkit` (feature) | zabawkowe enkodery ONNX (wagi deterministyczne; także o budowie eksportu HF XLM-R: `CumSum` pozycji, uwaga wielogłowicowa, `Erf`, rozłożona `LayerNorm`; kształt `e5_small()` do pomiarów) + tokenizer zabawkowy + manifest |
+| Element                                         | Opis                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EmbedManifest` (`embed.json`, `alfa-embed-v1`) | pliki ONNX i `tokenizer.json` z **SHA-256** (plik o innym hashu nie jest ładowany), `dims` (= wymiar `vec0`), `max_tokens`, `pooling` (`mean`/`cls`/`pooled`), `query_prefix`/`passage_prefix` (E5), `output`, `batch_size`, `ram_mb`, `idle_unload_s`; `model_id()` = `id@<12 hex>` z odcisku plików i ustawień (każda zmiana → przebudowa wektorów w `search`)                                                                                                                                                                                         |
+| `TextTokenizer`                                 | własny tokenizer `tokenizer.json` dla **SentencePiece Unigram** (XLM-R: `multilingual-e5-*`, `paraphrase-multilingual-*`): tokeny dodane (`lstrip`/`rstrip`), normalizatory `Precompiled` (Darts + grafemy), `Replace`, `Strip`, `NFC/NFD/NFKC/NFKD`, `Lowercase`; pre-tokenizery `Metaspace` (`prepend_scheme` i dawne `add_prefix_space`), `WhitespaceSplit`; Viterbi z `fuse_unk`; `TemplateProcessing`/`RobertaProcessing`/`BertProcessing`; obcięcie jak HF. Nieznany element → błąd ładowania (nigdy cicha, inna tokenizacja).                     |
+| `OnnxModel`                                     | `tract-onnx` 0.23.8 (czysty Rust): wejścia `input_ids` + opcjonalnie `attention_mask`, `token_type_ids` (zera), wymiary symboliczne `B×S` (jeden plan), adnotacje kształtów z eksportu czyszczone, wybór wyjścia po nazwie                                                                                                                                                                                                                                                                                                                               |
+| `Engine`                                        | tokenizacja → wsady ≤ `batch_size` posortowane po długości (mniej wypełnienia) → pooling z maską → L2; kontrola kształtu wyjścia                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `OnnxEmbedder`                                  | `search_contract::Embedder`: **wątek tła** `alfa-embedder` (jedyny właściciel modelu), ładowanie leniwe albo `preload()`, zwolnienie po bezczynności / `unload()` / odebraniu dzierżawy, dzierżawa `model-residency` (`ModelRole::Embedder`, CPU, `Priority::Conversation`, `cpu_ram_mb = ram_mb`) **przed** ładowaniem; błąd ładowania pamiętany `retry_after` (domyślnie 30 s); panika w `tract` → błąd + wyładowanie; wywołanie dzielone na zlecenia ≤ 64 tekstów (zapytanie nie czeka za całą reindeksacją); tekst przycinany do `max_tokens × 64` B |
+| `catalog`                                       | znane modele: `multilingual-e5-small` (domyślny), `paraphrase-multilingual-minilm-l12-v2` — URL, rozmiar, licencja, ustawienia manifestu; **SHA-256 nieprzypięte** (HF niedostępny przy tworzeniu)                                                                                                                                                                                                                                                                                                                                                       |
+| `install`                                       | instalator przez port `Fetcher` (HTTP `Range` w `app-*`): wznawianie z `.part`, SHA-256 w locie, ≤ 3 automatyczne wznowienia, limit 2× rozmiar z katalogu, anulowanie, atomowe `rename`, na końcu `embed.json`; `HashPolicy::PinnedOnly` (domyślnie) odmawia pliku bez przypiętego hasha, `TrustOnFirstUse` (jawna zgoda w UI) zapisuje hash pierwszego pobrania                                                                                                                                                                                         |
+| `testkit` (feature)                             | zabawkowe enkodery ONNX (wagi deterministyczne; także o budowie eksportu HF XLM-R: `CumSum` pozycji, uwaga wielogłowicowa, `Erf`, rozłożona `LayerNorm`; kształt `e5_small()` do pomiarów) + tokenizer zabawkowy + manifest                                                                                                                                                                                                                                                                                                                              |
 
 Crate `tokenizers` (HF) odrzucony: nie przechodzi `cargo deny` (RUSTSEC-2024-0436 — nieutrzymywany `paste`) i ciągnie
 ~30 zależności (rayon, derive_builder…). Własny tokenizer jest zgodny z HF `tokenizers` 0.23.2 na wektorach
@@ -26,15 +26,15 @@ tokeny specjalne w tekście, obcięcie) na tokenizerze w stylu XLM-R z pełnymi 
 Domyślny: **`intfloat/multilingual-e5-small`** — licencja **MIT**, 118 M parametrów, 384 wym., ~100 języków (w tym
 polski), max 512 tokenów, pooling średni, prefiksy `query: ` / `passage: `. Pliki (HuggingFace):
 
-| Plik | URL | Rozmiar |
-|---|---|---|
-| `onnx/model.onnx` (fp32) | `https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/onnx/model.onnx` | ~471 MB |
-| `tokenizer.json` | `https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/tokenizer.json` | ~17 MB |
+| Plik                     | URL                                                                                                                      | Rozmiar |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `onnx/model.onnx` (fp32) | `https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/onnx/model.onnx` | 449 MiB |
+| `tokenizer.json`         | `https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/tokenizer.json`  | 17 MiB  |
 
 Tylko **`onnx/model.onnx`** (operatory standardowe ONNX): warianty `model_O2…O4.onnx` z `optimum` zawierają operatory
 ONNX Runtime `com.microsoft` (`Attention`, `SkipLayerNormalization`, `FastGelu`…), których `tract` nie wykonuje.
-Ścieżki i rozmiary pochodzą z wiedzy o repozytoriach HF (sieć HF była zablokowana) — **do potwierdzenia przy
-przypinaniu SHA-256**; ten sam model w ONNX jest też w `Xenova/multilingual-e5-small` (`onnx/model.onnx`).
+Rewizje i sumy SHA-256 przypięte 2026-10-21 z metadanych LFS w API Hugging Face (`catalog.rs`); ten sam model w ONNX
+jest też w `Xenova/multilingual-e5-small` (`onnx/model.onnx`).
 
 Zapasowy: `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (Apache-2.0, 384 wym., ≤ 128 tokenów, bez
 prefiksów; te same ścieżki `onnx/model.onnx`, `tokenizer.json`). Wariant int8 (`onnx/model_qint8_avx512_vnni.onnx`,
@@ -53,12 +53,19 @@ z `onnx/model.onnx`, `tokenizer.json` i `embed.json`:
 
 ```json
 {
-  "format": "alfa-embed-v1", "id": "multilingual-e5-small", "license": "MIT",
-  "model": {"path": "onnx/model.onnx", "sha256": "<sha256sum onnx/model.onnx>"},
-  "tokenizer": {"path": "tokenizer.json", "sha256": "<sha256sum tokenizer.json>"},
-  "dims": 384, "max_tokens": 512, "pooling": "mean",
-  "query_prefix": "query: ", "passage_prefix": "passage: ",
-  "batch_size": 8, "ram_mb": 640, "idle_unload_s": 300
+  "format": "alfa-embed-v1",
+  "id": "multilingual-e5-small",
+  "license": "MIT",
+  "model": { "path": "onnx/model.onnx", "sha256": "<sha256sum onnx/model.onnx>" },
+  "tokenizer": { "path": "tokenizer.json", "sha256": "<sha256sum tokenizer.json>" },
+  "dims": 384,
+  "max_tokens": 512,
+  "pooling": "mean",
+  "query_prefix": "query: ",
+  "passage_prefix": "passage: ",
+  "batch_size": 8,
+  "ram_mb": 640,
+  "idle_unload_s": 300
 }
 ```
 
@@ -86,13 +93,13 @@ i `embed.json` przez `CatalogEntry::manifest`), a nie przez `install`/`Fetcher`;
 1. **Zależność:** `app-modules` (albo `app-core`) → `lib-embed = { path = "../lib-embed" }` (bez `testkit`).
 2. **Wybór embeddera przy budowie `search`** (`app-core/src/parts/mod.rs`, gałąź `"search"`): jeśli
    `installed(<models>/embed/<id>)` zwraca manifest → `OnnxEmbedder::from_manifest_file(&path)?.residency(residency
-   .clone()).spawn()?` (dzierżawa w tym samym `Arc<dyn Residency>` co `providers-local`/głos) i `Arc` jako `Arc<dyn
-   Embedder>` do `SqliteSearch::new`; inaczej dotychczasowy `LexicalEmbedder` (bez modelu = bez regresji). Ustawienie
+.clone()).spawn()?` (dzierżawa w tym samym `Arc<dyn Residency>` co `providers-local`/głos) i `Arc` jako `Arc<dyn
+Embedder>` do `SqliteSearch::new`; inaczej dotychczasowy `LexicalEmbedder` (bez modelu = bez regresji). Ustawienie
    `[search.embedder] model = "multilingual-e5-small" | "lexical"` w `core-config`.
 3. **`LateIndexer`** (`app-modules/src/late.rs`) musi przekazywać nowe metody `TxIndexer`: `vector_status_in`,
    `reindex_step` (i brakujące dziś `compact_in`) — inaczej trafią w domyślne „nic do zrobienia”.
 4. **Przebudowa po zmianie embeddera:** po starcie `search` (i po przełączeniu w UI) `search.spawn_reindex(extra,
-   ReindexOptions::default(), Some(progress))`, gdzie `extra` = `ReindexSource` z bazami zakresów pamięci
+ReindexOptions::default(), Some(progress))`, gdzie `extra` = `ReindexSource` z bazami zakresów pamięci
    (`app-memory`: `VaultScopeDbs::known()` → `db(scope, false)` → `(index_label(scope), Arc<Db>)`). Uchwyt trzymać
    w stanie aplikacji (`drop` = anuluj). Przebudowa wznawia się po restarcie (kursor w bazie). Zdarzenia
    `search.reindex.{started,progress,done}`, `search.vector.missing` — tylko liczniki.
@@ -102,8 +109,8 @@ i `embed.json` przez `CatalogEntry::manifest`), a nie przez `install`/`Fetcher`;
    `EmbedError::Fetch` dla błędów przejściowych — wznawiane, inne bez ponawiania). **Przed wydaniem człowiek przypina
    SHA-256** w `catalog.rs`; do tego czasu UI pyta o zgodę (`HashPolicy::TrustOnFirstUse`) i pokazuje policzony hash.
 6. **Komendy UI** (`app-api`, `COMMANDS.md`): `embed_models_list` (katalog + zainstalowane + aktywny), `embed_model_
-   download {id}` (postęp `embed.download.progress {file, done, total}`, anulowanie), `embed_model_activate {id|
-   "lexical"}` (zapis konfiguracji → przebudowa `SqliteSearch` z nowym embedderem → `preload()` → `spawn_reindex`),
+download {id}` (postęp `embed.download.progress {file, done, total}`, anulowanie), `embed_model_activate {id|
+"lexical"}` (zapis konfiguracji → przebudowa `SqliteSearch` z nowym embedderem → `preload()` → `spawn_reindex`),
    `search_reindex_start/cancel/status` (z `ReindexHandle::snapshot()` i `SqliteSearch::vector_status(session)`:
    „Przebudowa wektorów 1234/5000 — wyszukiwanie działa pełnotekstowo”), `embed_model_remove {id}` (tylko
    nieaktywny).
