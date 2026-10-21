@@ -187,11 +187,7 @@ pub(crate) fn build_body(
     }
     let cache = req.cache.enabled && caps.prompt_cache;
     let mut betas = Vec::new();
-    let max_tokens = req
-        .params
-        .max_tokens
-        .or(caps.max_output_tokens)
-        .unwrap_or(profile.default_max_tokens);
+    let max_tokens = profile.output_limit(req.params.max_tokens, caps);
     let mut body = Map::new();
     body.insert("model".into(), json!(req.model));
     body.insert("max_tokens".into(), json!(max_tokens));

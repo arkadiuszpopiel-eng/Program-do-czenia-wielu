@@ -102,7 +102,9 @@ impl Default for RuntimeConfig {
         Self {
             loop_max_repeats: 3,
             loop_window: 12,
-            max_output_tokens: Some(4096),
+            // 4096 ucinało każdy `fs_write` pliku powyżej ok. 12 KB (brak narzędzia edycji
+            // fragmentu), a u modeli z myśleniem — także myślenie. Adapter przycina do limitu modelu.
+            max_output_tokens: Some(16_384),
             tool_result_max_chars: 24_000,
             metadata_tools: vec!["fs_list".into(), "fs_stat".into(), "fs_search".into()],
             provenance_cap: 256 * 1024,

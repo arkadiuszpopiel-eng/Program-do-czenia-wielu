@@ -99,11 +99,7 @@ pub(crate) fn build_body(
     if let Some(system) = &req.system {
         body.insert("instructions".into(), json!(system));
     }
-    let max = req
-        .params
-        .max_tokens
-        .or(caps.max_output_tokens)
-        .unwrap_or(profile.default_max_tokens);
+    let max = profile.output_limit(req.params.max_tokens, caps);
     body.insert("max_output_tokens".into(), json!(max));
     if !req.tools.is_empty() {
         let mut tools: Vec<_> = req.tools.iter().collect();

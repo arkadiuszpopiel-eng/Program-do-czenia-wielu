@@ -89,11 +89,7 @@ impl ModelRegistry {
         req: &ChatRequest,
     ) -> Option<CostEstimate> {
         let pricing = profile.pricing.get(&req.model)?;
-        let max_out = req
-            .params
-            .max_tokens
-            .or(self.caps(&req.model).max_output_tokens)
-            .unwrap_or(profile.default_max_tokens);
+        let max_out = profile.output_limit(req.params.max_tokens, &self.caps(&req.model));
         Some(pricing.estimate(req, u64::from(max_out)))
     }
 }

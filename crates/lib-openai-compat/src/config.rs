@@ -188,6 +188,14 @@ impl ProviderProfile {
             default_effort: Effort::Medium,
         }
     }
+
+    /// `max_tokens` wysyłany do endpointu: żądany, ale nie wyższy niż limit modelu, a gdy ten
+    /// nie jest znany — niż domyślny profilu (wartość używana w rozmowie). Większą liczbę część
+    /// endpointów odrzuca błędem 400, a przebiegi agentek proszą o więcej (przegląd 2026-10-21).
+    pub fn output_limit(&self, requested: Option<u32>, caps: &ModelCapabilities) -> u32 {
+        let cap = caps.max_output_tokens.unwrap_or(self.default_max_tokens);
+        requested.map_or(cap, |m| m.min(cap))
+    }
 }
 
 /// Błąd konfiguracji adaptera.
@@ -237,6 +245,28 @@ mod tests {
                 .apply(&mut HeaderMap::new(), Some(&key))
                 .is_err()
         );
+    }
+
+    /// Przegląd 2026-10-21: przebieg agentki prosi o 16 tys. tokenów wyjścia — endpoint bez
+    /// znanego limitu modelu dostaje domyślny profilu, a model ze znanym limitem — nie więcej.
+    #[test]
+    fn output_limit_never_exceeds_the_model_or_the_profile_default() {
+        let p = ProviderProfile::new("x");
+        let unknown = ModelCapabilities::default();
+        assert_eq!(p.output_limit(Some(16_384), &unknown), 8_192);
+        assert_eq!(p.output_limit(Some(1_500), &unknown), 1_500);
+        assert_eq!(p.output_limit(None, &unknown), 8_192);
+        let known = ModelCapabilities {
+            max_output_tokens: Some(64_000),
+            ..ModelCapabilities::default()
+        };
+        assert_eq!(p.output_limit(Some(16_384), &known), 16_384);
+        assert_eq!(p.output_limit(None, &known), 64_000);
+        let small = ModelCapabilities {
+            max_output_tokens: Some(4_096),
+            ..ModelCapabilities::default()
+        };
+        assert_eq!(p.output_limit(Some(16_384), &small), 4_096);
     }
 
     #[test]

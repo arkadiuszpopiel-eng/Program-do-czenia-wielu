@@ -128,11 +128,7 @@ pub fn build_body(
     if o.stream_usage {
         body.insert("stream_options".into(), json!({"include_usage": true}));
     }
-    let max = req
-        .params
-        .max_tokens
-        .or(caps.max_output_tokens)
-        .unwrap_or(profile.default_max_tokens);
+    let max = profile.output_limit(req.params.max_tokens, caps);
     body.insert(o.max_tokens_field.as_str().into(), json!(max));
     if !req.tools.is_empty() {
         let mut tools: Vec<_> = req.tools.iter().collect();
