@@ -26,6 +26,14 @@ $dirs = @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath(
 foreach ($dir in $dirs) {
   $path = Join-Path $dir 'Alfa.lnk'
   $link = $shell.CreateShortcut($path)
+  # Ten sam plik tworzy instalator NSIS (`$SMPROGRAMS\Alfa.lnk`, `$DESKTOP\Alfa.lnk` → zainstalowany
+  # program uruchamiający, też z oknem zgód) — jego skrótu nie przejmujemy. Nadpisujemy tylko skrót
+  # do tej kopii albo do buildu testowego (`\target\`), który właściciel mógł uruchomić przez pomyłkę.
+  $old = $link.TargetPath
+  if ($old -and ($old -ne $Target) -and ($old -notlike '*\Alfa-uruchomiona\*') -and ($old -notlike '*\target\*')) {
+    Write-Output "zostawiam $path → $old (zainstalowana Alfa)"
+    continue
+  }
   $link.TargetPath = $Target
   $link.WorkingDirectory = Split-Path $Target -Parent
   $link.IconLocation = "$Target,0"

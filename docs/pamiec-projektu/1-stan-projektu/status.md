@@ -14,6 +14,7 @@ Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KO
 
 ## Stan projektu
 
+- **2026-10-21 (PC stacjonarny):** właściciel uruchomił ręcznie build testowy `alfa\target\shell\debug\alfa-desktop.exe` (bez programów Jądra obok → Broker w procesie, „Zmień na L4” odrzucane) — na tym PC nie było skrótu do Alfy. Naprawa `4a5662b7`: skrót **„Alfa”** na pulpicie i w menu Start → `Alfa-uruchomiona\alfa-desktop.exe` (`scripts/owner-shortcut.ps1`, odświeżany przez `deploy-owner.sh`), tekst w buildzie testowym mówi, że to build testowy i co uruchomić. Sprawdzone: Alfa ze skrótu = tryb przenośny (alfa-broker, okno zgód alfa-broker-ui, watchdog z Ctrl+Shift+F12). verify-app na `dc0590d2`: 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Usunięte stare kompilacje (target/debug/deps, shell, trial-profile, release, src-tauri/target): 229 GB, E: 268 GB wolne. **Właścicielowi podawać tylko skrót „Alfa”, nigdy ścieżki do target/shell.**
 - **Kopia robocza:** `E:\PROGRAMY W CZASIE PRAC\Alfa AI Program\alfa` (dysk przenośny)
 - **Narzędzia:** `alfa-narzedzia` obok repo; przed pracą `source scripts/portable-env.sh` albo `. .\scripts\portable-env.ps1`
 - **Branch:** `ccr-af4b63c6-3fyzaj`; 317 commitów lokalnych ponad `origin` przy `c8791fdd` (18.10; liczba rośnie —
