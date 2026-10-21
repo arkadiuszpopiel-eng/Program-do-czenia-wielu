@@ -7,6 +7,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod account_limits;
 mod api;
 mod budget;
 mod fx;
@@ -17,6 +18,7 @@ mod record;
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
 
+pub use account_limits::{apply_account_limits, provider_limits};
 pub use api::{
     CostClock, CostError, CostMeter, EVENT_COST_RECORDED, EVENT_FX_STALE, EVENT_FX_UPDATED,
     EVENT_LIMIT_BLOCKED, EVENT_LIMIT_WARNING, LedgerStore, LoadedLedger, event_kind,

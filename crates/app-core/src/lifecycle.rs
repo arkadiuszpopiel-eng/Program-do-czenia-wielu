@@ -30,6 +30,7 @@ impl AppCore {
         tokio::spawn(async move {
             costs.refresh_fx().await;
         });
+        self.apply_account_limits().await;
         // Zapamiętane obniżenia autonomii — od razu i pilnowane dalej (A-04).
         self.enforce_autonomy().await;
         self.spawn_autonomy_guard();

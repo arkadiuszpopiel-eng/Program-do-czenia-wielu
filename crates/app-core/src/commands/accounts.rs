@@ -31,6 +31,7 @@ impl AppCore {
     }
 
     pub(crate) async fn announce_account(&self, id: &AccountId) {
+        self.apply_account_limits().await;
         if let Some(a) = self.inner.hub.account(id) {
             self.emit(AlfaEvent::AccountChanged {
                 account: account_dto(&a),
@@ -38,6 +39,12 @@ impl AppCore {
         }
         let status = self.status_snapshot().await;
         self.emit(AlfaEvent::SystemStatusChanged { status });
+    }
+
+    /// Limity kont (kreator) → limity dostawców w budżecie (przegląd 2026-10-22: nie działały).
+    pub(crate) async fn apply_account_limits(&self) {
+        let accounts = self.inner.hub.accounts();
+        let _ = cost_meter_contract::apply_account_limits(&*self.inner.costs, &accounts).await;
     }
 
     /// `accounts_catalog`.
@@ -165,6 +172,7 @@ impl AppCore {
     pub async fn accounts_remove(&self, account_id: String) -> Result<(), AppError> {
         let id = self::account_id(&account_id)?;
         self.inner.hub.remove(&id).await?;
+        self.apply_account_limits().await;
         let status = self.status_snapshot().await;
         self.emit(AlfaEvent::SystemStatusChanged { status });
         Ok(())

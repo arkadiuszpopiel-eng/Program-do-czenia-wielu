@@ -88,8 +88,7 @@ impl AppCore {
                 {
                     return;
                 }
-                // Ten sam test co przycisk „Testuj”: odrzucony klucz albo brak środków zmienia stan
-                // konta i Router bierze następne. Komunikat według stanu po teście, nie wyniku.
+                // Test jak „Testuj”; komunikat według stanu konta po teście (zły klucz, brak środków).
                 let core = self.clone();
                 let label = before.label.clone();
                 tokio::spawn(async move {

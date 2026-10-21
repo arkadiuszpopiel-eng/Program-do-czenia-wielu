@@ -144,8 +144,7 @@ impl AppCore {
         }
         let held = self.adopt_approved_raises().await;
         let (global, sessions) = self.remembered_levels().await;
-        // Zapamiętane L4 przy Brokerze na domyślnym L3 (restart): informacja raz, przy trzecim takim
-        // przebiegu z rzędu (ok. 15 s — okno słucha, stan nie przejściowy), bez prośby w oknie Brokera.
+        // Zapamiętane L4, Broker na L3 (restart): informacja raz, przy 3. przebiegu z rzędu (ok. 15 s).
         let waiting = global == Some(AutonomyLevel::L4)
             && view.global == AutonomyLevel::L3
             && held.is_empty()

@@ -66,9 +66,7 @@ impl AppCore {
         })
     }
 
-    /// `system_retry_queue`: „Ponów” zawsze próbuje wysłać kolejkę — „offline” wraca dopiero
-    /// z kolejnego błędu sieci (wcześniej zdejmowała go tylko udana odpowiedź, więc po jednym
-    /// błędzie Alfa zostawała offline do restartu; przegląd 2026-10-21).
+    /// `system_retry_queue`: „Ponów” zawsze wysyła kolejkę; „offline” wraca z błędu sieci (21.10).
     pub async fn system_retry_queue(&self) -> Result<(), AppError> {
         self.rt().online = true;
         // Stan łączności i kolejki także po błędzie startu sesji (baner offline nie zostaje).
