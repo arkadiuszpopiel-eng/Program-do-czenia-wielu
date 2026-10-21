@@ -15,6 +15,7 @@ mod engine;
 mod lifecycle;
 mod restore;
 mod snapshot;
+pub use snapshot::{SNAPSHOT_CARGO_TARGET, SNAPSHOT_SKIPPED_DIRS, snapshot_skips};
 mod store;
 mod types;
 

@@ -51,7 +51,7 @@ impl Core {
             _ => "Polecenie anulowane — zabito całe drzewo procesów.".to_owned(),
         };
         let undo_note = if undo.is_some() {
-            " Zmiany w katalogu roboczym można cofnąć."
+            " Zmiany w katalogu roboczym można cofnąć (bez katalogów zależności i wyników budowania:              node_modules, __pycache__, .venv, target obok Cargo.toml)."
         } else {
             ""
         };

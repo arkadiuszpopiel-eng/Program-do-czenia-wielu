@@ -34,7 +34,7 @@ Zdarzenia: `undo.recorded`, `undo.undone {ok, partial}`, `undo.snapshot.created`
 - Cofnięcie: najpierw kontrola konfliktów całego kroku (stan bieżący = stan „po” ostatniej operacji kroku; dla snapshotu — manifest „po” z zatwierdzenia); konflikt → czytelny błąd, nic nie jest ruszane. Potem odwrotna kolejność: token platformy z tego uruchomienia, inaczej pre-image (także po restarcie).
 - Częściowe niepowodzenie → `UndoError::Partial` z listą tego, co nie wróciło; pre-image zostają.
 - Trwałe usunięcie i nadpisanie bez pre-image (za duże / pełny magazyn) wymagają `allow_irreversible` (po zgodzie Brokera); usunięcie do Kosza ma pre-image jako zapas.
-- Snapshot zakresu = kopia plików z limitem (decyzja: prostsze i bezpieczniejsze niż shadow-git — bez zewnętrznego narzędzia, przywracanie przez `FsPort`); za duży zakres → `SnapshotTooLarge` (shell poza snapshotem = `reversible: no` → potwierdzenie).
+- Snapshot zakresu = kopia plików z limitem (decyzja: prostsze i bezpieczniejsze niż shadow-git — bez zewnętrznego narzędzia, przywracanie przez `FsPort`); za duży zakres → `SnapshotTooLarge` (shell poza snapshotem = `reversible: no` → potwierdzenie). Snapshot pomija katalogi zależności i pamięci podręcznej (`node_modules`, `__pycache__`, `.venv`) oraz `target` obok `Cargo.toml` (`SNAPSHOT_SKIPPED_DIRS`; od 0.0.69) — są odtwarzalne z projektu, a bez tego polecenie z korzenia repozytorium zawsze przekraczało limit; cofnięcie ich nie obejmuje i wynik `shell_run` mówi o tym wprost.
 - Retencja i limit magazynu wypierają najstarsze kroki (stają się `Expired`); pre-image współdzielone (dedup SHA-256) usuwane dopiero, gdy nieużywane.
 - Dziennik obowiązuje także na L4.
 

@@ -201,6 +201,45 @@ async fn module_lifecycle_and_events() {
     s.stop().await.unwrap();
 }
 
+/// Przegląd 2026-10-21: polecenie z korzenia repozytorium (`cargo build`, `pnpm install`) nie może
+/// kończyć się odmową przez `target/` i `node_modules/` — snapshot je pomija, resztę cofa jak dotąd;
+/// `target` bez `Cargo.toml` obok to zwykły folder i zostaje w snapshocie.
+#[test]
+fn snapshot_skips_dependency_and_cargo_build_dirs() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut files = vec![
+        (p("/repo/Cargo.toml"), b"[workspace]".to_vec()),
+        (p("/repo/src/lib.rs"), b"stare".to_vec()),
+        (p("/repo/docs/target/plan.md"), b"plan".to_vec()),
+    ];
+    for i in 0..30 {
+        files.push((p(&format!("/repo/target/debug/o{i}")), vec![b'x'; 64]));
+        files.push((p(&format!("/repo/node_modules/m/f{i}.js")), vec![b'y'; 64]));
+    }
+    let fs = Arc::new(FakeFs::with_files(files));
+    let limits = UndoLimits {
+        snapshot_max_files: 10,
+        ..UndoLimits::default()
+    };
+    let s = service(fs.clone(), dir.path(), limits, 1);
+    let step = s
+        .begin_step(StepCtx::new("s1", Some("Delta"), "cargo build"))
+        .unwrap();
+    s.snapshot_scope(step, &p("/repo")).unwrap();
+    // „Polecenie”: zmiana źródła, wynik budowania, nowy plik w docs/target.
+    fs.write_atomic(&p("/repo/src/lib.rs"), b"nowe").unwrap();
+    fs.write_atomic(&p("/repo/target/debug/o0"), b"zbudowane")
+        .unwrap();
+    fs.write_atomic(&p("/repo/docs/target/nowy.md"), b"n")
+        .unwrap();
+    s.commit_step(step).unwrap();
+    s.undo(step).unwrap();
+    assert_eq!(fs.read(&p("/repo/src/lib.rs")).unwrap(), b"stare");
+    assert!(!fs.exists(&p("/repo/docs/target/nowy.md")));
+    // Katalog wyników budowania poza snapshotem — zostaje jak po poleceniu.
+    assert_eq!(fs.read(&p("/repo/target/debug/o0")).unwrap(), b"zbudowane");
+}
+
 mod props {
     use super::*;
     use proptest::prelude::*;

@@ -11,8 +11,29 @@ use crate::engine::Journal;
 use crate::store::sha256_hex;
 use crate::types::{Manifest, StepId, UndoError, UndoOp};
 
+/// Katalogi zależności i pamięci podręcznej pomijane w snapshocie zakresu (zawsze odtwarzalne
+/// z projektu). Bez tego `cargo build`, `git` czy `pnpm install` z korzenia repozytorium
+/// zawsze przekraczały limit i polecenie kończyło się odmową (przegląd 2026-10-21).
+pub const SNAPSHOT_SKIPPED_DIRS: &[&str] = &["node_modules", "__pycache__", ".venv"];
+
+/// Katalog wyników `cargo` — pomijany tylko obok `Cargo.toml` (gdzie indziej `target` może
+/// być zwykłym folderem użytkownika).
+pub const SNAPSHOT_CARGO_TARGET: &str = "target";
+
+/// Czy katalog pominąć w snapshocie ([`SNAPSHOT_SKIPPED_DIRS`], `target` obok `Cargo.toml`).
+pub fn snapshot_skips(dir: &Path, cargo_project: bool) -> bool {
+    let Some(name) = dir.file_name().and_then(|n| n.to_str()) else {
+        return false;
+    };
+    SNAPSHOT_SKIPPED_DIRS
+        .iter()
+        .any(|s| s.eq_ignore_ascii_case(name))
+        || (cargo_project && name.eq_ignore_ascii_case(SNAPSHOT_CARGO_TARGET))
+}
+
 impl Journal {
-    /// Wszystkie pliki pod `root` (rekurencyjnie): ścieżka → treść. Brak katalogu = pusto.
+    /// Pliki pod `root` (rekurencyjnie, bez katalogów z [`snapshot_skips`]): ścieżka → treść.
+    /// Brak katalogu = pusto.
     pub(crate) fn scan(&self, root: &Path) -> Result<BTreeMap<PathBuf, Vec<u8>>, UndoError> {
         let mut out = BTreeMap::new();
         let mut stack = vec![root.to_path_buf()];
@@ -23,9 +44,17 @@ impl Journal {
                 Err(PlatformError::NotFound(_)) => continue,
                 Err(e) => return Err(UndoError::Platform(e)),
             };
+            let cargo_project = entries.iter().any(|e| {
+                !e.is_dir
+                    && e.path
+                        .file_name()
+                        .is_some_and(|n| n.eq_ignore_ascii_case("Cargo.toml"))
+            });
             for e in entries {
                 if e.is_dir {
-                    stack.push(e.path);
+                    if !snapshot_skips(&e.path, cargo_project) {
+                        stack.push(e.path);
+                    }
                     continue;
                 }
                 let data = self.fs.read(&e.path).map_err(UndoError::Platform)?;
