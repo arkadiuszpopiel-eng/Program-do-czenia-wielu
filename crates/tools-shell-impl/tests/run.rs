@@ -351,3 +351,36 @@ async fn isolation_falls_back_and_skips_profile_toolchains() {
     );
     assert!(!cargo.text.contains("[izolacja]"));
 }
+
+/// Przegląd 2026-10-21: snapshot pomija `node_modules`, `target`… — ich usunięcia cofanie nie
+/// obejmuje, więc idzie jako trwałe i nieodwracalne, nie „odwracalne w zakresie”: w skażonej sesji
+/// (po wyniku polecenia) wymaga zgody, a zwykły plik w katalogu — jak dotąd nie.
+#[tokio::test]
+async fn deleting_a_directory_skipped_by_the_snapshot_is_permanent() {
+    let h = harness(&[
+        ("/Users/ala/Projekt/a.txt", "a"),
+        ("/Users/ala/Projekt/b.txt", "b"),
+        ("/Users/ala/Projekt/node_modules/m/i.js", "x"),
+    ]);
+    h.exec.set_default(FakeRun::exit(0, "ok", ""));
+    assert!(h.sh("Get-ChildItem").await.is_ok());
+    assert!(h.broker.session_security(&"s1".into()).tainted);
+    let runs = h.exec.runs().len();
+    for cmd in [
+        r"Remove-Item -Recurse -Force node_modules",
+        r"Remove-Item -Recurse target\debug",
+    ] {
+        let out = h.sh(cmd).await;
+        assert!(
+            matches!(
+                out.status,
+                ToolStatus::Denied {
+                    reason: DenialReason::ApprovalTimeout { .. }
+                }
+            ),
+            "{cmd}: {out:?}"
+        );
+    }
+    assert_eq!(h.exec.runs().len(), runs);
+    assert!(h.sh("Remove-Item b.txt").await.is_ok());
+}

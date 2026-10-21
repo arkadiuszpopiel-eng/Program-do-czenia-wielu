@@ -238,6 +238,23 @@ fn snapshot_skips_dependency_and_cargo_build_dirs() {
     assert!(!fs.exists(&p("/repo/docs/target/nowy.md")));
     // Katalog wyników budowania poza snapshotem — zostaje jak po poleceniu.
     assert_eq!(fs.read(&p("/repo/target/debug/o0")).unwrap(), b"zbudowane");
+
+    // `target` ze znacznikiem cargo bez `Cargo.toml` obok (np. polecenie je usunęło) — też pominięty.
+    let mut files = vec![(p("/w/target/CACHEDIR.TAG"), b"Signature".to_vec())];
+    for i in 0..30 {
+        files.push((p(&format!("/w/target/o{i}")), vec![b'x'; 64]));
+    }
+    let fs = Arc::new(FakeFs::with_files(files));
+    let dir = tempfile::tempdir().unwrap();
+    let small = UndoLimits {
+        snapshot_max_files: 10,
+        ..UndoLimits::default()
+    };
+    let s = service(fs, dir.path(), small, 1);
+    let step = s
+        .begin_step(StepCtx::new("s1", Some("Delta"), "x"))
+        .unwrap();
+    s.snapshot_scope(step, &p("/w")).unwrap();
 }
 
 mod props {

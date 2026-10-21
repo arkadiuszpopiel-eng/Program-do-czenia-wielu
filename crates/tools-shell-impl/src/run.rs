@@ -41,6 +41,35 @@ fn target_path(raw: &str, cwd: &str, env: &compliance_contract::PathEnv) -> Opti
     paths::resolve_path_dots(dir, Some(cwd), env).ok()
 }
 
+/// Czy nazwa to katalog pomijany przez snapshot zakresu (`node_modules`, `target`… — ostrożnie
+/// po samej nazwie).
+fn skipped_by_snapshot(name: &str) -> bool {
+    undo_journal_contract::SNAPSHOT_SKIPPED_DIRS
+        .iter()
+        .chain(std::iter::once(
+            &undo_journal_contract::SNAPSHOT_CARGO_TARGET,
+        ))
+        .any(|s| s.eq_ignore_ascii_case(name))
+}
+
+/// Cel w katalogu pomijanym przez snapshot zakresu: cofanie go nie obejmuje, więc jego usunięcie
+/// nie jest „odwracalne” i idzie jak trwałe (przegląd 2026-10-21).
+fn outside_snapshot(resolved: &str, cwd: &str) -> bool {
+    let path = std::path::Path::new(resolved);
+    let inner = path.strip_prefix(cwd).unwrap_or(path);
+    inner
+        .components()
+        .any(|part| skipped_by_snapshot(&part.as_os_str().to_string_lossy()))
+}
+
+/// Czy któreś słowo polecenia wskazuje katalog pomijany przez snapshot — analiza nie zwraca
+/// gołych nazw względnych (`Remove-Item node_modules`) jako ścieżek.
+fn names_skipped_dir(command: &str) -> bool {
+    tools_shell_contract::tokens(command)
+        .iter()
+        .any(|t| t.split(['/', '\\']).any(skipped_by_snapshot))
+}
+
 impl Core {
     async fn deny(
         &self,
@@ -101,11 +130,13 @@ impl Core {
         })?;
         let mut outside = Vec::new();
         let mut unresolved = false;
+        let mut unsnapshotted = a.deletes && names_skipped_dir(command);
         for raw in &a.paths {
             let Some(resolved) = target_path(raw, cwd, &self.env) else {
                 unresolved = true;
                 continue;
             };
+            unsnapshotted |= outside_snapshot(&resolved, cwd);
             if self.denied(&resolved) {
                 return Err(self
                     .deny(
@@ -123,11 +154,15 @@ impl Core {
             }
         }
         let mut facts = base_facts(m, ctx);
-        facts.destructive = a.destructiveness(outside.is_empty() && !unresolved);
+        facts.destructive = a.destructiveness(outside.is_empty() && !unresolved && !unsnapshotted);
         if a.deletes && (a.opaque_targets || unresolved) {
             // Cel usuwania nieustalony: najgorszy przypadek — trwałe i masowe (zgoda do L3).
             facts.reversible = Reversibility::No;
             facts.bulk = u32::MAX;
+        } else if a.deletes && unsnapshotted {
+            // Katalog spoza snapshotu: usunięcie trwałe i bez cofania (w zakresie — na L3 pyta przy
+            // skażonej sesji, na L2 zawsze).
+            facts.reversible = Reversibility::No;
         }
         facts.install = a.install;
         facts.command = Some(command.to_owned());
@@ -201,6 +236,7 @@ impl Core {
             .env_allowlist
             .iter()
             .map(String::as_str)
+            .chain(["CARGO_BUILD_JOBS"]) // limit zadań właściciela wygrywa z domyślnym
             .collect();
         let timeout_s = args
             .timeout_s

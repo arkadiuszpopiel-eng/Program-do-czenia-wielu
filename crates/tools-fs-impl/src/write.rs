@@ -174,7 +174,10 @@ impl Core {
             let out = ToolOutcome::failed(
                 ToolErrorKind::InvalidArgs,
                 format!(
-                    "Nie wykonano: {action} — treść zawiera znacznik {} z odczytu pliku. Odczyt ukrył                      w tym miejscu wartość (możliwy sekret), więc zapis wstawiłby znacznik zamiast niej.                      Nie przepisuj tych linii: zmień inny plik, dopisz zmiany trybem `append` albo                      poproś właściciela o tę zmianę.",
+                    "Nie wykonano: {action} — treść zawiera znacznik {} z odczytu pliku. Odczyt ukrył \
+                     w tym miejscu wartość (możliwy sekret), więc zapis wstawiłby znacznik zamiast \
+                     niej. Nie przepisuj tych linii: zmień inny plik, dopisz zmiany trybem `append` \
+                     albo poproś właściciela o tę zmianę.",
                     text::REDACTED
                 ),
             );

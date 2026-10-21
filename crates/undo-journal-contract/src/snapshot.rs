@@ -16,19 +16,24 @@ use crate::types::{Manifest, StepId, UndoError, UndoOp};
 /// zawsze przekraczały limit i polecenie kończyło się odmową (przegląd 2026-10-21).
 pub const SNAPSHOT_SKIPPED_DIRS: &[&str] = &["node_modules", "__pycache__", ".venv"];
 
-/// Katalog wyników `cargo` — pomijany tylko obok `Cargo.toml` (gdzie indziej `target` może
-/// być zwykłym folderem użytkownika).
+/// Katalog wyników `cargo` — pomijany obok `Cargo.toml` albo gdy ma znacznik
+/// [`SNAPSHOT_CACHE_TAG`] (gdzie indziej `target` może być zwykłym folderem użytkownika).
 pub const SNAPSHOT_CARGO_TARGET: &str = "target";
 
-/// Czy katalog pominąć w snapshocie ([`SNAPSHOT_SKIPPED_DIRS`], `target` obok `Cargo.toml`).
-pub fn snapshot_skips(dir: &Path, cargo_project: bool) -> bool {
+/// Znacznik katalogu pamięci podręcznej, który `cargo` zapisuje w katalogu wyników — trwa także
+/// wtedy, gdy polecenie usunie `Cargo.toml` (przegląd 2026-10-21).
+pub const SNAPSHOT_CACHE_TAG: &str = "CACHEDIR.TAG";
+
+/// Czy katalog pominąć w snapshocie: [`SNAPSHOT_SKIPPED_DIRS`] albo `target` obok `Cargo.toml`
+/// (`cargo_project`) lub ze znacznikiem (`tagged` — sprawdzane tylko dla `target`).
+pub fn snapshot_skips(dir: &Path, cargo_project: bool, tagged: impl FnOnce() -> bool) -> bool {
     let Some(name) = dir.file_name().and_then(|n| n.to_str()) else {
         return false;
     };
     SNAPSHOT_SKIPPED_DIRS
         .iter()
         .any(|s| s.eq_ignore_ascii_case(name))
-        || (cargo_project && name.eq_ignore_ascii_case(SNAPSHOT_CARGO_TARGET))
+        || (name.eq_ignore_ascii_case(SNAPSHOT_CARGO_TARGET) && (cargo_project || tagged()))
 }
 
 impl Journal {
@@ -52,7 +57,8 @@ impl Journal {
             });
             for e in entries {
                 if e.is_dir {
-                    if !snapshot_skips(&e.path, cargo_project) {
+                    let tag = e.path.join(SNAPSHOT_CACHE_TAG);
+                    if !snapshot_skips(&e.path, cargo_project, || self.fs.exists(&tag)) {
                         stack.push(e.path);
                     }
                     continue;
