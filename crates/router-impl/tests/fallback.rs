@@ -232,3 +232,36 @@ async fn thinking_origin_survives_router_round_trip() {
     );
     assert_eq!(back.model, FAKE_MODEL);
 }
+
+/// Przegląd 2026-10-21: długi prompt (kontekst agentki) dostaje dłuższy termin pierwszego
+/// zdarzenia — adapter zgłasza `Started` dopiero po przetworzeniu promptu — a przekroczony termin
+/// Routera nie otwiera obwodu dostawcy (wcześniej trzy wolne starty odcinały go od rozmów).
+#[tokio::test(start_paused = true)]
+async fn long_prompt_waits_longer_and_deadline_does_not_open_the_breaker() {
+    let (core, primary, backup, routed) = setup();
+    // ~40 tys. tokenów: termin 1,5 s + 10 s; odpowiedź po 5 s zostaje u głównego celu.
+    primary.push_script(
+        Script::text(FAKE_MODEL, &["alpha odpowiada"]).delayed(Duration::from_secs(5)),
+    );
+    let long = req(&"słowo ".repeat(26_000));
+    let (_, events) = first_content(&routed, long).await;
+    assert_eq!(text(&events), "alpha odpowiada");
+    assert!(backup.requests().is_empty(), "bez przełączenia na zapas");
+    // Krótkie żądania: termin bez zmian, przełączenie — ale obwód głównego celu zostaje zamknięty.
+    for trial in 0..4 {
+        primary.push_script(Script::stall());
+        let (elapsed, events) = first_content(&routed, req("krótko")).await;
+        assert!(
+            elapsed <= Duration::from_secs(2),
+            "próba {trial}: {elapsed:?}"
+        );
+        assert_switched(&events, trial);
+    }
+    assert_eq!(
+        router_contract::Router::breaker_state(
+            &*core,
+            &providers_contract::ProviderId::new("alpha")
+        ),
+        router_contract::BreakerState::Closed
+    );
+}

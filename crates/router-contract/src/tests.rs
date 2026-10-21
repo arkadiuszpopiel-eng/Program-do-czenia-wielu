@@ -195,6 +195,14 @@ fn default_policy_follows_plan() {
     assert!(
         b.first_event_deadline(TaskClass::Conversation) <= Some(std::time::Duration::from_secs(2))
     );
+    // Termin rośnie z długością promptu (250 ms na 1000 tokenów), najwyżej 30 s.
+    let ms = |t| {
+        b.first_event_deadline_for(TaskClass::Conversation, t)
+            .map(|d| d.as_millis())
+    };
+    assert_eq!(ms(0), Some(1_500));
+    assert_eq!(ms(40_000), Some(11_500));
+    assert_eq!(ms(1_000_000), Some(30_000));
     let duo = DuoConfig::default();
     assert_eq!(duo.class_for(Tempo::Fast), TaskClass::VoiceFast);
     assert_eq!(duo.class_for(Tempo::Deep), TaskClass::Planning);

@@ -15,7 +15,7 @@ use std::time::Duration;
 use futures_util::StreamExt;
 use providers_contract::{
     CancellationToken, ChatRequest, ProviderError, ProviderErrorKind, ProviderEvent, ProviderId,
-    ProviderStream, StopReason, TimeoutPhase,
+    ProviderStream, StopReason,
 };
 use router_contract::{
     Candidate, FallbackCause, Outcome, RouteDecision, Router, RouterEvent, TaskClass,
@@ -70,7 +70,10 @@ impl Run {
     pub(crate) async fn execute(self) {
         let started = Instant::now();
         let targets: Vec<Candidate> = self.decision.targets().cloned().collect();
-        let deadline = self.core.policy().first_event_deadline(self.class);
+        let deadline = self.core.policy().first_event_deadline_for(
+            self.class,
+            providers_contract::estimate_input_tokens(&self.request),
+        );
         let history = localize_history(&self.request.messages, &self.router_id);
         for (i, cand) in targets.iter().enumerate() {
             if self.cancel.is_cancelled() {
@@ -151,10 +154,10 @@ impl Run {
             let next = match waited {
                 Ok(ev) => ev,
                 Err(d) => {
-                    let kind = ProviderErrorKind::Timeout {
-                        phase: TimeoutPhase::FirstToken,
-                    };
-                    self.core.report(cand, Outcome::Failed { kind });
+                    // Termin Routera to decyzja polityki, nie awaria dostawcy: neutralny dla
+                    // obwodu jak anulowanie (wolny start długiego promptu otwierał obwód i odcinał
+                    // dostawcę; przegląd 2026-10-21). Własne limity czasu adapterów liczą się dalej.
+                    self.core.report(cand, Outcome::Cancelled);
                     return Attempt::Next(FallbackCause::Deadline { deadline_ms: ms(d) });
                 }
             };
