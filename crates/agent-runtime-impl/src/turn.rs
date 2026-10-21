@@ -78,7 +78,10 @@ impl Engine {
         let turn = acc.finish();
         self.cp.usage.input_tokens += turn.usage.total_input();
         self.cp.usage.output_tokens += turn.usage.output_tokens;
-        if let Some(cost) = provider.cost(&self.cp.spec.model, &turn.usage) {
+        // Cena modelu, który faktycznie odpowiedział (`Started`/`ModelSwitched`; u Routera
+        // `dostawca:model`) — bez przypięcia `spec.model` to „auto” i koszt wychodził 0.
+        let priced = turn.model.as_deref().unwrap_or(&self.cp.spec.model);
+        if let Some(cost) = provider.cost(priced, &turn.usage) {
             self.cp.usage.cost_nano_usd = self.cp.usage.cost_nano_usd.saturating_add(cost.nano_usd);
         }
         self.cp.usage.elapsed_ms = self.elapsed_ms();
