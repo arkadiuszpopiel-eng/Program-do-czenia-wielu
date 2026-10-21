@@ -10,8 +10,8 @@ use crate::catalog::{FileSpec, Install, ItemSpec, Pick, Root};
 /// 2026-10-21 — licencje u źródła, C5.1).
 const HF_WHISPER: &str =
     "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1";
-const HF_PIPER: &str =
-    "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/pl/pl_PL/gosia/medium";
+/// Tag v1.0.0 repozytorium `rhasspy/piper-voices` przypięty do jego commitu (2026-10-21).
+const HF_PIPER: &str = "https://huggingface.co/rhasspy/piper-voices/resolve/375a0fe641dea077c2a47b4e9a056d6da521eed3/pl/pl_PL/gosia/medium";
 
 fn whisper(id: &str, file: &str, mib: u64, sha256: &str, (pl, en): (&str, &str)) -> ItemSpec {
     item(
@@ -81,8 +81,8 @@ pub(super) fn speech() -> Vec<ItemSpec> {
             "https://huggingface.co/rhasspy/piper-voices",
             (Root::Models, "piper"),
             vec![
-                FileSpec::new("pl_PL-gosia-medium.onnx", &format!("{HF_PIPER}/pl_PL-gosia-medium.onnx"), 61, None),
-                FileSpec::new("pl_PL-gosia-medium.onnx.json", &format!("{HF_PIPER}/pl_PL-gosia-medium.onnx.json"), 0, None),
+                FileSpec::new("pl_PL-gosia-medium.onnx", &format!("{HF_PIPER}/pl_PL-gosia-medium.onnx"), 61, Some("38f66464240ed74f186e6b7dc13c6e3b22e023426299f25c2b3cc9dfa9373fbc")),
+                FileSpec::new("pl_PL-gosia-medium.onnx.json", &format!("{HF_PIPER}/pl_PL-gosia-medium.onnx.json"), 0, Some("1aefb31a9d53ffe44a8163ff73ec833acb7a6253848f6bb0403d8a66f9c7510d")),
             ],
             Install::Files,
             false,
@@ -145,7 +145,8 @@ pub(super) fn speech() -> Vec<ItemSpec> {
                 "wespeaker_en_voxceleb_resnet34.onnx",
                 "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/wespeaker_en_voxceleb_resnet34.onnx",
                 26,
-                None,
+                // Zasób wydania z 2024 bez digestu w API — suma z pobranego pliku (26 534 365 B).
+                Some("5ef208a9da1453335308a6b6f4e6dfbd7e183a38b604de0a57664f45d257fe94"),
             )],
             Install::Speaker { manifest: "wespeaker-resnet34.speaker.json".into(), template: speaker_template },
             false,

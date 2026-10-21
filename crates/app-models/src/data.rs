@@ -157,7 +157,8 @@ fn whisper_cuda() -> ItemSpec {
                 "https://github.com/ggml-org/whisper.cpp/releases/download/{WHISPER_TAG}/whisper-cublas-12.4.0-bin-x64.zip"
             ),
             430,
-            None,
+            // Suma z API GitHub (digest zasobu wydania), 2026-10-21.
+            Some("66638830959008de552de41223e718351abcf4e1b5c59188d1ae04ec20047c6b"),
         )],
         Install::Tree {
             strip: "Release/".into(),
@@ -189,7 +190,7 @@ fn sidecars() -> Vec<ItemSpec> {
                     "https://github.com/ggml-org/whisper.cpp/releases/download/{WHISPER_TAG}/whisper-bin-x64.zip"
                 ),
                 8,
-                None,
+                Some("cc5d6126e025ef463524ed74c94d4b6a40bb67c2d1c3cb5aca02c773c388bdad"),
             )],
             Install::Tree {
                 strip: "Release/".into(),
@@ -213,7 +214,8 @@ fn sidecars() -> Vec<ItemSpec> {
                 "piper_windows_amd64.zip",
                 "https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_windows_amd64.zip",
                 22,
-                None,
+                // Wydanie z 2023 bez digestu w API — suma policzona z pobranego archiwum (22 477 236 B).
+                Some("f3c58906402b24f3a96d92145f58acba6d86c9b5db896d207f78dc80811efcea"),
             )],
             Install::Tree {
                 strip: "piper/".into(),

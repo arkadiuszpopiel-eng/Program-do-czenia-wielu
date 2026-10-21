@@ -302,6 +302,9 @@ mod tests {
             }
             // Potwierdzone = wszystkie hashe przypięte (bez zgody TOFU).
             assert!(!item.confirmed || item.pinned(), "{}", item.id);
+            // Każda pozycja do pobrania w aplikacji ma przypięte sumy (C5.1, 2026-10-21) — bez
+            // zaufania przy pierwszym użyciu; potwierdzenie przez człowieka (`confirmed`) to osobna sprawa.
+            assert!(!item.downloadable() || item.pinned(), "bez sumy: {}", item.id);
             if let Install::Embed(template) = &item.install {
                 let mut m = (**template).clone();
                 m.model.sha256 = "a".repeat(64);

@@ -744,4 +744,5 @@ Wynik obejmuje wszystkie 24 pozycje z license-cards.json, żadnej nie brakuje. P
   Open RAIL-M Supertonic, FFmpeg, WeSpeaker/openWakeWord) i potwierdzenie kart (`confirmed`).
 - Kod: przypięte też rewizje i sumy SHA-256 (LFS oid z API Hugging Face) modeli Whisper (`ggml-large-v3-turbo-q5_0`,
   `ggml-small-q5_1`), `multilingual-e5-small` i `paraphrase-multilingual-MiniLM-L12-v2` (model i `tokenizer.json`; rozmiar
-  tokenizera MiniLM poprawiony z 17 na 9 MB) — zrobione 2026-10-21.
+  tokenizera MiniLM poprawiony z 17 na 9 MB), a także głosu Piper Gosia, modelu WeSpeaker i archiwów whisper.cpp i Piper —
+  każda pozycja do pobrania ma przypięte sumy (test katalogu); zrobione 2026-10-21.
