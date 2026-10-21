@@ -71,10 +71,11 @@ impl AppCore {
     /// błędzie Alfa zostawała offline do restartu; przegląd 2026-10-21).
     pub async fn system_retry_queue(&self) -> Result<(), AppError> {
         self.rt().online = true;
-        self.flush_queue().await?;
+        // Stan łączności i kolejki także po błędzie startu sesji (baner offline nie zostaje).
+        let flushed = self.flush_queue().await;
         let status = self.status_snapshot().await;
         self.emit(AlfaEvent::SystemStatusChanged { status });
-        Ok(())
+        flushed
     }
 
     /// STOP WSZYSTKIEGO (`Ctrl+Shift+F12`, zasobnik): anuluje generacje we wszystkich sesjach

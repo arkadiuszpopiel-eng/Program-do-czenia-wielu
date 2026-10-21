@@ -89,13 +89,16 @@ impl AppCore {
                     return;
                 }
                 // Ten sam test co przycisk „Testuj” (lista modeli, bez tokenów): odrzucony klucz
-                // albo brak środków zmienia stan konta i Router sam bierze następne.
+                // albo brak środków zmienia stan konta i Router sam bierze następne. Brak sieci
+                // i limit czasu niczego nie rozstrzygają — działające konto zostaje aktywne.
                 let core = self.clone();
                 let label = before.label.clone();
                 tokio::spawn(async move {
                     let tested = core.inner.hub.test_account(&id).await;
                     core.announce_account(&id).await;
-                    let broken = tested.is_ok_and(|t| !t.outcome.key_works());
+                    let broken = tested.is_ok_and(|t| {
+                        !t.outcome.key_works() && !matches!(t.outcome.code(), "network" | "timeout")
+                    });
                     let backup = core.inner.brain.backup_for(id.as_str());
                     if let (true, Some(backup)) = (broken, backup) {
                         tracing::info!(konto = %id, "konto odrzuca zapytania — konto zapasowe przejmuje");

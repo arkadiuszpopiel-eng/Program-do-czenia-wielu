@@ -109,7 +109,11 @@ fn sentence(text: &str) -> String {
 /// Brak środków na koncie (402, `insufficient_quota`, „credit balance is too low”) — dostawcy
 /// zgłaszają go jako błąd klucza albo żądania, a to nie jest odrzucony klucz (przegląd 2026-10-21).
 fn no_credit(e: &ProviderError) -> bool {
-    let code = e.provider_code.as_deref().unwrap_or_default();
+    let code = e
+        .provider_code
+        .as_deref()
+        .unwrap_or_default()
+        .to_lowercase();
     let message = e.message.to_lowercase();
     e.status == Some(402)
         || ["insufficient_quota", "billing", "credit"]
@@ -128,6 +132,20 @@ fn no_credit(e: &ProviderError) -> bool {
 pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
     let now = chrono::Utc::now();
     match &e.kind {
+        // Brak środków przed limitem zapytań: 429 `billing_not_active` (OpenAI) to nie chwilowy limit.
+        ProviderErrorKind::Auth
+        | ProviderErrorKind::InvalidRequest
+        | ProviderErrorKind::RateLimited { .. }
+            if no_credit(e) =>
+        {
+            turn_error(
+                TurnErrorCode::Provider,
+                format!(
+                    "Brak środków na koncie u dostawcy {provider} — doładuj konto albo wybierz inne w Ustawieniach."
+                ),
+                Some(provider),
+            )
+        }
         ProviderErrorKind::RateLimited { retry_after_ms } => {
             let wait = retry_after_ms.unwrap_or(60_000);
             let at = now + chrono::Duration::milliseconds(i64::try_from(wait).unwrap_or(60_000));
@@ -144,13 +162,6 @@ pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
         } => turn_error(
             TurnErrorCode::Offline,
             format!("Brak połączenia z dostawcą {provider}. Wiadomość możesz ponowić."),
-            Some(provider),
-        ),
-        ProviderErrorKind::Auth | ProviderErrorKind::InvalidRequest if no_credit(e) => turn_error(
-            TurnErrorCode::Provider,
-            format!(
-                "Brak środków na koncie u dostawcy {provider} — doładuj konto albo wybierz inne w Ustawieniach."
-            ),
             Some(provider),
         ),
         ProviderErrorKind::Auth => turn_error(
@@ -283,7 +294,14 @@ mod tests {
             )
             .with_status(400),
         ];
-        for e in cases {
+        let billing = ProviderError::new(
+            ProviderErrorKind::RateLimited {
+                retry_after_ms: None,
+            },
+            "billing",
+        )
+        .with_provider_code("Billing_Not_Active");
+        for e in cases.into_iter().chain([billing]) {
             let turn = provider_error(&e, "deepseek");
             assert!(
                 turn.message
