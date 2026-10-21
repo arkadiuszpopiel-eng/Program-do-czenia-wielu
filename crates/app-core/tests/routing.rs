@@ -250,3 +250,38 @@ async fn local_profile_with_api_keys_needs_local_model() {
         .unwrap_err();
     assert_eq!(unknown.code, app_core::ErrorCode::InvalidInput);
 }
+
+/// Przegląd 2026-10-21: błąd przed pierwszą treścią (429) przez Router nazywa dostawcę, który
+/// zawiódł — wcześniej komunikat i baner mówiły „Limit zapytań u dostawcy Router.”.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn routed_error_names_the_provider_that_failed() {
+    let openai = fake("openai", "Nie powinno się pokazać.");
+    openai.push_script(Script::http_error(429, Some(30)));
+    let mut r = routed(vec![openai.clone()]).await;
+    let core = &r.core;
+    let sid = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    let sent = core
+        .turns_send(sid.clone(), send("Cześć", None))
+        .await
+        .unwrap();
+    let turn = sent.assistant_turn_id.unwrap();
+    let events = until(&mut r.rx, ends(&turn)).await;
+    let error = events
+        .iter()
+        .find_map(|e| match e {
+            AlfaEvent::Error { turn_id, error, .. } if *turn_id == turn => Some(error.clone()),
+            _ => None,
+        })
+        .expect("zdarzenie Error");
+    assert_eq!(error.code, TurnErrorCode::RateLimited);
+    assert!(!error.message.contains("Router"), "{}", error.message);
+    assert!(
+        error.message.to_lowercase().contains("openai"),
+        "{}",
+        error.message
+    );
+}

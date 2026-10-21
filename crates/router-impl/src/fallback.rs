@@ -245,6 +245,21 @@ impl Run {
             other => other,
         };
         if !content {
+            // Błąd przed `Started`: konsument dowiaduje się, który cel zawiódł (komunikat
+            // „limit zapytań u dostawcy …”, konto z problemem) — wcześniej widział „Router”
+            // i obwiniał konto z pierwszego wyboru, choć zawiódł zapas (przegląd 2026-10-21).
+            let started = buffered
+                .iter()
+                .any(|b| matches!(b, ProviderEvent::Started { .. }));
+            if matches!(ev, ProviderEvent::Error(_)) && !started {
+                let origin = ProviderEvent::Started {
+                    model: cand.qualified(),
+                    response_id: None,
+                };
+                if self.tx.send(origin).await.is_err() {
+                    return Attempt::Done;
+                }
+            }
             for b in buffered {
                 if self.tx.send(b).await.is_err() {
                     return Attempt::Done;

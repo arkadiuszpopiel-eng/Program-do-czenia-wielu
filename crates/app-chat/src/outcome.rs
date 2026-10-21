@@ -106,6 +106,24 @@ fn sentence(text: &str) -> String {
     out
 }
 
+/// Brak środków na koncie (402, `insufficient_quota`, „credit balance is too low”) — dostawcy
+/// zgłaszają go jako błąd klucza albo żądania, a to nie jest odrzucony klucz (przegląd 2026-10-21).
+fn no_credit(e: &ProviderError) -> bool {
+    let code = e.provider_code.as_deref().unwrap_or_default();
+    let message = e.message.to_lowercase();
+    e.status == Some(402)
+        || ["insufficient_quota", "billing", "credit"]
+            .iter()
+            .any(|c| code.contains(c))
+        || [
+            "credit balance",
+            "insufficient balance",
+            "insufficient_quota",
+        ]
+        .iter()
+        .any(|m| message.contains(m))
+}
+
 /// Błąd dostawcy → błąd tury (komunikat PL bez sekretów).
 pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
     let now = chrono::Utc::now();
@@ -126,6 +144,13 @@ pub(crate) fn provider_error(e: &ProviderError, provider: &str) -> TurnError {
         } => turn_error(
             TurnErrorCode::Offline,
             format!("Brak połączenia z dostawcą {provider}. Wiadomość możesz ponowić."),
+            Some(provider),
+        ),
+        ProviderErrorKind::Auth | ProviderErrorKind::InvalidRequest if no_credit(e) => turn_error(
+            TurnErrorCode::Provider,
+            format!(
+                "Brak środków na koncie u dostawcy {provider} — doładuj konto albo wybierz inne w Ustawieniach."
+            ),
             Some(provider),
         ),
         ProviderErrorKind::Auth => turn_error(
@@ -243,6 +268,35 @@ mod tests {
             turn.message.starts_with("Błąd dostawcy anthropic:"),
             "{}",
             turn.message
+        );
+    }
+
+    #[test]
+    fn missing_credit_is_not_reported_as_a_rejected_key() {
+        let cases = [
+            ProviderError::new(ProviderErrorKind::Auth, "Insufficient Balance").with_status(402),
+            ProviderError::new(ProviderErrorKind::Auth, "quota")
+                .with_provider_code("insufficient_quota"),
+            ProviderError::new(
+                ProviderErrorKind::InvalidRequest,
+                "Your credit balance is too low to access the API",
+            )
+            .with_status(400),
+        ];
+        for e in cases {
+            let turn = provider_error(&e, "deepseek");
+            assert!(
+                turn.message
+                    .starts_with("Brak środków na koncie u dostawcy deepseek"),
+                "{}",
+                turn.message
+            );
+        }
+        let key = ProviderError::new(ProviderErrorKind::Auth, "invalid x-api-key").with_status(401);
+        assert!(
+            provider_error(&key, "anthropic")
+                .message
+                .contains("odrzucił klucz")
         );
     }
 
