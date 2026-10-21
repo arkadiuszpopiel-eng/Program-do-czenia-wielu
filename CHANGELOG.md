@@ -54,9 +54,9 @@ z trybu offline, a kopia Alfy uruchamiana skrótem nie ma już testowego portu d
 - `cargo test` zlecony agentce idzie z ograniczoną liczbą równoległych zadań (połowa wątków procesora, najwyżej 8),
   chyba że ustawisz własną (`CARGO_BUILD_JOBS`); narzędzia programisty dostają też zmienne katalogu wyników
   i magazynów npm/pnpm.
-- Opis poziomu L4 w Ustawienia → Uprawnienia mówi, o co Broker nadal pyta: operacje administracyjne, polecenia
-  głosowe od nierozpoznanego mówcy i wysyłka na zewnątrz po kontakcie z niezaufaną treścią; twarde blokady
-  obowiązują zawsze.
+- Opis poziomu L4 w Ustawienia → Uprawnienia mówi, o co Broker nadal pyta: operacje administracyjne, destrukcja
+  zlecona głosem, ryzykowne polecenia głosowe bez rozpoznanego mówcy i wysyłka na zewnątrz po kontakcie
+  z niezaufaną treścią; twarde blokady obowiązują zawsze.
 
 ### Testy
 
