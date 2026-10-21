@@ -172,7 +172,7 @@ export const plSettings = {
     'Działa sama w całym Twoim profilu i we wskazanych aplikacjach; pyta tylko przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).',
   'perm.L4.name': 'Maks',
   'perm.L4.desc':
-    'Nie pyta o nic poza twardymi blokadami Jądra i potwierdzeniem destrukcji zleconej głosem.',
+    'Nie pyta o zakres ani odwracalność. Pyta tylko przy twardych blokadach Jądra, operacjach administracyjnych, destrukcji zleconej głosem i wysyłce danych na zewnątrz, gdy sesja czytała plik, mail albo stronę (niezaufana treść).',
   'perm.current': 'obecny',
   'perm.request': 'Zmień na {level}',
   'perm.applied': 'Poziom zmieniony na {level} — obniżenie nie wymaga potwierdzenia.',

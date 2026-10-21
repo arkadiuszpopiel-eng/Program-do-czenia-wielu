@@ -166,7 +166,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
     'Works on her own across your profile and selected apps; asks only for irreversible things outside the scope or when acting on untrusted content (mail, web page, file).',
   'perm.L4.name': 'Max',
   'perm.L4.desc':
-    'Asks about nothing except the Kernel’s hard blocks and confirming destruction ordered by voice.',
+    'Doesn’t ask about scope or reversibility. Asks only at the Kernel’s hard blocks, for administrative operations, destruction ordered by voice and for sending data out after the session read a file, mail or web page (untrusted content).',
   'perm.current': 'current',
   'perm.request': 'Change to {level}',
   'perm.applied': 'Level changed to {level} — lowering needs no confirmation.',
