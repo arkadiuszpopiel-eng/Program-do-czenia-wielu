@@ -35,6 +35,8 @@ pub fn sample_spec(model: &str, tools: &[&str]) -> RunSpec {
         approval_timeout_ms: 1000,
         history: Vec::new(),
         environment: None,
+        reply_style: None,
+        temperature: None,
     }
 }
 

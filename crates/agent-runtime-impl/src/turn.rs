@@ -8,15 +8,17 @@ use futures_util::StreamExt;
 use providers_contract::{ChatRequest, ContentBlock, Role, StopReason, ToolUse, TurnAccumulator};
 
 use crate::engine::{Engine, Next};
-use crate::prompt::{VERIFY_PROMPT, skipped, summary, system_prompt, verdict};
+use crate::prompt::{VERIFY_PROMPT, skipped, summary, system_prompt_for, verdict};
 
 impl Engine {
     fn request(&self) -> ChatRequest {
         let spec = &self.cp.spec;
         let mut req = ChatRequest::new(spec.model.clone(), self.cp.messages.clone())
-            .with_system(system_prompt(spec));
+            .with_system(system_prompt_for(spec, self.cp.verifying));
         req.tools = self.registry.specs(self.cp.verifying);
         req.params.max_tokens = self.shared.config.max_output_tokens;
+        // Weryfikacja z temperaturą modelu — stały format odpowiedzi kontrolnej.
+        req.params.temperature = spec.temperature.filter(|_| !self.cp.verifying);
         req.meta.session = Some(spec.session.as_str().to_owned());
         // Trudność oceniana z celu przebiegu, nie z ostatniej wiadomości (wyniki narzędzi).
         let mut hint = self.cp.route.clone();

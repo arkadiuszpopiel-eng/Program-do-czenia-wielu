@@ -117,6 +117,29 @@ async fn conductor_knows_who_works_on_the_computer() {
         "{system}"
     );
     assert!(system.contains("„Delta, …”"), "{system}");
+    // Poziom autonomii rozmowy (Broker w procesie: domyślne L3) — bez zapowiadania zgód na wszystko.
+    // Opis z tabeli reguł Brokera: na L3 pyta m.in. o host spoza listy, nie o każdą zmianę.
+    assert!(
+        system.contains("Poziom autonomii tej rozmowy: L3")
+            && system.contains("host spoza egress-allowlisty")
+            && system.contains("operacja administracyjna")
+            && !system.contains("każda zmiana wymaga"),
+        "{system}"
+    );
+    s.core
+        .permissions_request_level(app_core::dto::AutonomyLevel::L1, Some(s.sid.clone()))
+        .await
+        .unwrap();
+    s.provider
+        .push(Script::text(FAKE_MODEL, &["Delta zapyta o zgodę."]));
+    ask(&mut s, "A teraz?", None).await;
+    let system = s.provider.requests().last().cloned().unwrap().system;
+    assert!(
+        system
+            .unwrap_or_default()
+            .contains("Poziom autonomii tej rozmowy: L1 — Broker pyta właściciela o zgodę"),
+        "poziom sesji po obniżeniu"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]

@@ -99,6 +99,13 @@ pub struct RunSpec {
     /// polecenia zamiast zakładać narzędzia, których nie ma.
     #[serde(default)]
     pub environment: Option<String>,
+    /// Styl odpowiedzi wybrany przez właściciela (zdanie dopisywane do promptu systemowego,
+    /// Ustawienia → Ogólne); `None` — „auto”.
+    #[serde(default)]
+    pub reply_style: Option<String>,
+    /// Temperatura wybrana przez właściciela; `None` — domyślna modelu.
+    #[serde(default)]
+    pub temperature: Option<f32>,
 }
 
 fn yes() -> bool {

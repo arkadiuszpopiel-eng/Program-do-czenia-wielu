@@ -245,14 +245,18 @@ pub(crate) fn build_body(
     }
     body.insert("messages".into(), Value::Array(messages));
 
-    if let Some(t) = thinking(req, caps, o, &mut betas) {
+    let thinking = thinking(req, caps, o, &mut betas);
+    // API nie przyjmuje zmiany temperatury razem z myśleniem (Claude 4.6: myślenie opcjonalne,
+    // domyślnie włączone) — temperatura tylko przy myśleniu wyłączonym albo nieobsługiwanym.
+    let thinks = thinking.as_ref().is_some_and(|t| t["type"] != "disabled");
+    if let Some(t) = thinking {
         body.insert("thinking".into(), t);
     }
     if caps.effort {
         let effort = req.params.effort.unwrap_or(profile.default_effort);
         body.insert("output_config".into(), json!({"effort": effort.as_str()}));
     }
-    if let (true, Some(t)) = (caps.sampling, req.params.temperature) {
+    if let (true, false, Some(t)) = (caps.sampling, thinks, req.params.temperature) {
         body.insert("temperature".into(), json!(t.clamp(0.0, 1.0)));
     }
     if !req.params.stop.is_empty() {

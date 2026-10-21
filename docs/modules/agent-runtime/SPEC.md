@@ -8,7 +8,7 @@ F3: v0. F5: v1 (ten dokument). P0.
 
 ## Kontrakt (`agent-runtime-contract`; zmiany v1 wyłącznie addytywne)
 ```rust
-pub struct RunSpec { session, agent, persona, roles, goal, origin, model, tools, budget: RunBudget, workdir, verify, approval_timeout_ms, history }
+pub struct RunSpec { session, agent, persona, roles, goal, origin, model, tools, budget: RunBudget, workdir, verify, approval_timeout_ms, history, environment, reply_style, temperature }
 pub enum Steer { Message(String), PauseAfterCurrent, Resume, ChangeGoal(String), Cancel }
 pub enum RunOutcome { Completed { summary, verified }, BudgetExceeded { budget }, Cancelled, LoopDetected { tool }, Refused, Failed { error } }
 // v1

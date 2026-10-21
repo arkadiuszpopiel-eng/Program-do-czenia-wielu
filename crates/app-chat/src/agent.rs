@@ -11,8 +11,8 @@ use std::time::Instant;
 
 use agent_runtime_contract::{RunEvent, RunOutcome, UsageTotals};
 use app_agents::{
-    AgentSettings, FamilyProjector, Projection, RunContext, RunHandle, RunProjector, SpecInput,
-    final_text, keys, run_spec,
+    FamilyProjector, Projection, RunContext, RunHandle, RunProjector, SpecInput, final_text,
+    run_spec,
 };
 use personas_contract::{Persona, PersonaId, Role};
 use providers_contract::Usage;
@@ -109,36 +109,6 @@ impl ChatEngine {
                 std::fs::create_dir_all(&dir).ok()?;
                 Some(dir.to_string_lossy().into_owned())
             }
-        }
-    }
-
-    /// Ustawienia agentek (Ustawienia → Agentki).
-    pub async fn agent_settings(&self) -> AgentSettings {
-        let d = AgentSettings::default();
-        let num = |v: Option<serde_json::Value>, default: u64| {
-            v.and_then(|v| v.as_f64())
-                .filter(|n| n.is_finite() && *n >= 0.0)
-                .map_or(default, |n| n.round() as u64)
-        };
-        let u32_of = |n: u64| u32::try_from(n).unwrap_or(u32::MAX);
-        AgentSettings {
-            max_steps: u32_of(num(
-                self.config_value(keys::MAX_STEPS).await,
-                d.max_steps.into(),
-            )),
-            max_minutes: u32_of(num(
-                self.config_value(keys::MAX_MINUTES).await,
-                d.max_minutes.into(),
-            )),
-            max_cost_grosze: num(self.config_value(keys::MAX_COST_PLN).await, 0) * 100,
-            approval_timeout_s: match self.inner.approval_timeout {
-                Some(limit) => u32_of(limit.as_secs().max(1)),
-                None => u32_of(num(
-                    self.config_value(keys::APPROVAL_TIMEOUT_S).await,
-                    d.approval_timeout_s.into(),
-                )),
-            },
-            verify: self.config_bool(keys::VERIFY, d.verify).await,
         }
     }
 

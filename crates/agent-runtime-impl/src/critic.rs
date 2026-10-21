@@ -146,6 +146,9 @@ impl Engine {
             approval_timeout_ms: self.cp.spec.approval_timeout_ms,
             history: Vec::new(),
             environment: None,
+            // Werdykt Krytyczki bez stylu i z temperaturą modelu — ten sam format „WERYFIKACJA: …”.
+            reply_style: None,
+            temperature: None,
         };
         let options = RunOptions {
             parent: Some(self.handle.run.clone()),

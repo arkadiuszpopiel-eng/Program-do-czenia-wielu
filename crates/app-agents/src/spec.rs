@@ -28,7 +28,7 @@ pub mod keys {
 pub const NO_WINDOW_APPROVAL_CAP_S: u32 = 60;
 
 /// Ustawienia agentek.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct AgentSettings {
     /// Kroki.
     pub max_steps: u32,
@@ -40,6 +40,10 @@ pub struct AgentSettings {
     pub approval_timeout_s: u32,
     /// Samoweryfikacja.
     pub verify: bool,
+    /// Zdanie stylu odpowiedzi (Ustawienia → Ogólne); `None` — „auto”.
+    pub reply_style: Option<&'static str>,
+    /// Temperatura (Ustawienia → Ogólne); `None` — domyślna modelu.
+    pub temperature: Option<f32>,
 }
 
 impl Default for AgentSettings {
@@ -50,6 +54,8 @@ impl Default for AgentSettings {
             max_cost_grosze: 0,
             approval_timeout_s: 300,
             verify: true,
+            reply_style: None,
+            temperature: None,
         }
     }
 }
@@ -138,6 +144,8 @@ pub fn run_spec(
         approval_timeout_ms: settings.approval_timeout_ms(broker_window),
         history: input.history,
         environment: input.environment,
+        reply_style: settings.reply_style.map(str::to_owned),
+        temperature: settings.temperature,
     }
 }
 

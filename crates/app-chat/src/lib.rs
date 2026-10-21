@@ -19,6 +19,7 @@ mod project;
 mod quick;
 mod routing;
 pub mod session_cards;
+mod settings;
 mod stream;
 mod style;
 mod taint;

@@ -10,7 +10,7 @@ use personas_contract::PersonaId;
 use providers_contract::{ChatRequest, ProviderEvent, TurnAccumulator, Usage};
 use sessions_contract::{Block as SBlock, PrivacyTag, SessionCatalog};
 
-use app_api::dto::{self, AlfaEvent, RenderedBlock, TurnError, TurnErrorCode};
+use app_api::dto::{self, AlfaEvent, AutonomyLevel, RenderedBlock, TurnError, TurnErrorCode};
 use app_api::ports::{BrainChoice, BrainError, BrainRequest, VoiceChunk};
 
 use crate::engine::{ChatEngine, GenHandle};
@@ -42,16 +42,51 @@ fn utf16_len(text: &str) -> u64 {
     text.encode_utf16().count() as u64
 }
 
-/// Informacja w prompcie: kto w obsadzie działa na komputerze i jak go wywołać.
-fn crew_note(crew: &[String]) -> String {
+/// Kiedy Broker pyta właściciela o zgodę na danym poziomie — z tej samej tabeli reguł, którą
+/// stosuje Broker (`risk_classifier_contract::RULES`; przegląd 21.10: skróty ze strony Uprawnień
+/// pomijały m.in. operacje administracyjne i wysyłkę po niezaufanej treści na L4).
+fn autonomy_note(level: AutonomyLevel) -> String {
+    use risk_classifier_contract::{AutonomyLevel as Level, RULES, RuleId};
+    let at = match level {
+        AutonomyLevel::L0 => {
+            return "L0 — agentka tylko czyta i podpowiada, nic nie zmienia".into();
+        }
+        AutonomyLevel::L1 => Level::L1,
+        AutonomyLevel::L2 => Level::L2,
+        AutonomyLevel::L3 => Level::L3,
+        AutonomyLevel::L4 => Level::L4,
+    };
+    let asks: Vec<&str> = RULES
+        .iter()
+        .filter(|r| r.id != RuleId::KernelBlock && r.applies_at(at))
+        .map(|r| r.description_pl)
+        .collect();
+    format!(
+        "{at:?} — Broker pyta właściciela o zgodę, gdy: {}; twarde blokady Jądra obowiązują zawsze",
+        asks.join("; ")
+    )
+}
+
+/// Informacja w prompcie: kto w obsadzie działa na komputerze, jak go wywołać i kiedy Broker
+/// pyta o zgodę (handoff 20.10: na L4 model zapowiadał zatwierdzanie każdej akcji).
+fn crew_note(crew: &[String], level: Option<AutonomyLevel>) -> String {
     let names = crew.join(", ");
     let first = crew.first().map_or("Delta", String::as_str);
-    format!(
+    let mut note = format!(
         "W tej rozmowie na komputerze użytkownika działa: {names} — pliki, programy, polecenia, \
          system, mysz i klawiatura, przez Brokera. Gdy prośba wymaga takiej pracy, a sama nie masz \
          narzędzi, nie mów, że nikt nie ma dostępu: powiedz, że zrobi to {first}, i podpowiedz, \
          żeby użytkownik napisał „{first}, …” albo wybrał ją w polu adresatki."
-    )
+    );
+    if let Some(level) = level {
+        note.push_str(&format!(
+            " Poziom autonomii tej rozmowy: {}. Mówiąc o zgodach, trzymaj się tego opisu: nie \
+             zapowiadaj zgody na każdą akcję, ale też nie obiecuj, że jej nie będzie — o każdej \
+             akcji decyduje Broker.",
+            autonomy_note(level)
+        ));
+    }
+    note
 }
 
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
@@ -93,7 +128,18 @@ pub(crate) async fn prepare(
     // odpowiadać, że dostępu nie ma (zgłoszenie właściciela 2026-10-20).
     let crew = core.crew_with_tools(&req.session, &req.agent);
     if !crew.is_empty() {
-        let note = crew_note(&crew);
+        // Poziom tylko przy działającym łączu: zerwane daje bezpieczne L0 (odmowa wszystkiego),
+        // które nie jest poziomem rozmowy (przegląd 21.10).
+        let level = match core.inner.broker.status().state {
+            dto::BrokerLinkState::Connected => core
+                .inner
+                .broker
+                .levels(Some(&req.session))
+                .await
+                .map(|v| v.session.unwrap_or(v.global)),
+            _ => None,
+        };
+        let note = crew_note(&crew, level);
         system = Some(match system {
             Some(s) => format!("{s}\n\n{note}"),
             None => note,

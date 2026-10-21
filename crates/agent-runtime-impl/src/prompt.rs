@@ -39,17 +39,36 @@ fn loop_rules(spec: &RunSpec) -> Vec<String> {
     rules
 }
 
+/// Prompt systemowy przebiegu; w turze weryfikacji (`verifying`) bez stylu odpowiedzi — znaczniki
+/// „WERYFIKACJA: …” mają wyjść w stałej formie, jak u Krytyczki.
+pub(crate) fn system_prompt_for(spec: &RunSpec, verifying: bool) -> String {
+    if verifying {
+        return base_prompt(spec);
+    }
+    system_prompt(spec)
+}
+
 /// Prompt systemowy przebiegu.
 pub(crate) fn system_prompt(spec: &RunSpec) -> String {
+    let prompt = base_prompt(spec);
+    // Styl odpowiedzi z ustawień — jak w zwykłej rozmowie (raport 32: przebieg go pomijał).
+    match spec.reply_style.as_deref().filter(|s| !s.trim().is_empty()) {
+        Some(style) => format!("{prompt}\n\n{style}"),
+        None => prompt,
+    }
+}
+
+fn base_prompt(spec: &RunSpec) -> String {
     let roles: Vec<&Role> = spec.roles.iter().collect();
     let rules = loop_rules(spec);
-    render_system_prompt(DEFAULT_PROMPT_TEMPLATE, &spec.persona, &roles, &rules).unwrap_or_else(|_| {
-        format!(
-            "Jesteś {} — agentką programu Alfa. Piszesz po polsku w rodzaju żeńskim.\nZasady:\n- {}",
-            spec.persona.name,
-            rules.join("\n- ")
-        )
-    })
+    render_system_prompt(DEFAULT_PROMPT_TEMPLATE, &spec.persona, &roles, &rules)
+        .unwrap_or_else(|_| {
+            format!(
+                "Jesteś {} — agentką programu Alfa. Piszesz po polsku w rodzaju żeńskim.\nZasady:\n- {}",
+                spec.persona.name,
+                rules.join("\n- ")
+            )
+        })
 }
 
 /// Wiadomość z celem. Cel podprzebiegu napisał model rodzica — nie jest poleceniem właściciela
@@ -163,6 +182,24 @@ Brak: docker"
         let mut talker = talker;
         talker.environment = spec.environment.clone();
         assert!(!system_prompt(&talker).contains("Programy na tym komputerze"));
+    }
+
+    #[test]
+    fn reply_style_from_settings_ends_the_prompt() {
+        let mut spec = sample_spec("m", &[]);
+        assert!(!system_prompt(&spec).contains("Styl odpowiedzi"));
+        spec.reply_style = Some("Styl odpowiedzi wybrany przez użytkownika: zwięźle.".into());
+        assert!(system_prompt(&spec).ends_with(
+            "
+
+Styl odpowiedzi wybrany przez użytkownika: zwięźle."
+        ));
+        assert!(
+            !system_prompt_for(&spec, true).contains("Styl odpowiedzi"),
+            "tura weryfikacji bez stylu"
+        );
+        spec.reply_style = Some("  ".into());
+        assert!(!system_prompt(&spec).ends_with("  "));
     }
 
     #[test]

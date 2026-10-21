@@ -84,6 +84,8 @@ pub fn prepare_run(
         approval_timeout_ms: caller.approval_timeout_ms,
         history: Vec::new(),
         environment: None,
+        reply_style: caller.reply_style.clone(),
+        temperature: caller.temperature,
     };
     let depth = caller_options.depth + u32::from(parent.is_some());
     let options = RunOptions {

@@ -218,6 +218,9 @@ pub fn plan_delegation(
         approval_timeout_ms: view.spec.approval_timeout_ms,
         history: Vec::new(),
         environment: view.spec.environment.clone(),
+        // Wynik czyta agentka-rodzic, nie właściciel: bez stylu odpowiedzi (stosuje go rodzic).
+        reply_style: None,
+        temperature: view.spec.temperature,
     };
     let options = RunOptions {
         parent: Some(view.run.clone()),
