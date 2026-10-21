@@ -1,6 +1,6 @@
 # Plan Alfy — wersja 6 (rozszerzona)
 
-Stan na 2026-10-21 (wersja 0.0.68; co doszło ostatnio — [`34-raport-2026-10-21-0068.md`](34-raport-2026-10-21-0068.md),
+Stan na 2026-10-22 (wersja 0.0.69; co doszło ostatnio — [`35-raport-2026-10-22-0069.md`](35-raport-2026-10-22-0069.md),
 całość na jednej stronie — [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md)). Ten katalog jest **rozszerzeniem** zatwierdzonego planu [`../PLAN.md`](../PLAN.md) (wersja 5):
 niczego w nim nie kasuje, tylko dopisuje nowe cele — kolejne systemy, sterowanie przez Internet i nowe funkcje —
 oraz pokazuje, co z planu v5 jest już wykonane i sprawdzone.
@@ -43,6 +43,7 @@ Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (
 | [`32-raport-2026-10-20-0066.md`](32-raport-2026-10-20-0066.md)                                                             | Raport z 20.10 po południu: wersja 0.0.66 — okno Brokera u właściciela (L3/L4), narzędzia agentek bez ręcznego katalogu, Dyrygentka wie, kto działa na komputerze, błędy dostawcy w zadaniach agentek                                                                                     | jednorazowy                                      |
 | [`33-raport-2026-10-21-0067.md`](33-raport-2026-10-21-0067.md)                                                             | Raport z 21.10: wersja 0.0.67 — skrót „Alfa” do kopii z oknem zgód, L4 widać od razu po zgodzie, strażnik autonomii przyjmuje podniesienie tylko po zgodzie potwierdzonej przez Brokera (luka z przeglądu), wgranie bez utraty głosu, pamięć projektu przywrócona, `verify wersja`        | jednorazowy                                      |
 | [`34-raport-2026-10-21-0068.md`](34-raport-2026-10-21-0068.md)                                                             | Raport z 21.10 wieczorem: wersja 0.0.68 — seria 8 (10 punktów): styl w przebiegach agentek, Dyrygentka i poziom autonomii, Claude 4.6 bez temperatury przy myśleniu, licencje u źródła (C5.1), telemetria ONNX Runtime ograniczona (wyłączana po starcie), przypięte sumy katalogu modeli | jednorazowy                                      |
+| [`35-raport-2026-10-22-0069.md`](35-raport-2026-10-22-0069.md) | Raport z nocy 21/22.10: wersja 0.0.69 — seria 9 (14 punktów dla pełnej pracy przez API i lokalnie): narzędzia agentek u dostawców zgodnych z OpenAI, zapis bez psucia plików, limit wyjścia i budżet tokenów, koszt, snapshot powłoki, offline i test kluczy, termin Routera, kopia właściciela bez portu CDP, informacja o L4 | jednorazowy |
 | [`15-glos-lokalny.md`](15-glos-lokalny.md)                                                                                 | Głos lokalny wysokiej jakości: koszty chmury, konkurencja, porównanie silników, rekomendacja, kryteria wyboru                                                                                                                                                                             | z postępem grupy C5                              |
 
 Projekty decyzji do tego planu: [`../ADR/`](../ADR/README.md), numery 0017–0027 (status „Proponowany”, poza przyjętym 0025).

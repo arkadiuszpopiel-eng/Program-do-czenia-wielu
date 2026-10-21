@@ -1,6 +1,6 @@
 - [Dwa komputery: PC i laptop](maszyna-stacjonarna-2026-10-17.md) — E: przenoszony między PC (AMD, 32 GB) i laptopem (NVIDIA + Intel UHD, 16 GB); różne F:, reguły maszyny
 - [Awaria 2026-10-17 i ciężkie zadania](awaria-2026-10-17-obciazenie.md) — brak pamięci + resety USB; PC -j6, laptop -j3, bez incremental; backup.sh naprawiony
-- [Alfa — uruchamianie u właściciela](alfa-uruchamianie-wlasciciela.md) — tylko skrót „Alfa” (Alfa-uruchomiona z oknem zgód); target/shell to build testowy bez Jądra
+- [Alfa — uruchamianie u właściciela](alfa-uruchamianie-wlasciciela.md) — tylko skrót „Alfa” (Alfa-uruchomiona z oknem zgód); target/shell to build testowy (e2e, CDP), kopia właściciela z target/owner
 - [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — (stan z laptopa) kopia robocza na E:, portable-env, pułapki budowy, sprzątanie target/
 - [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
 - [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie
@@ -12,3 +12,4 @@
 - [Alfa — samodzielne testowanie](alfa-samodzielne-testowanie.md) — poziomy verify, testy sprzętowe, instancja testowa obok Alfy właściciela; „nie sprawdziłem” tylko z trzech powodów
 - [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — decyzja 20.10: poziom „Pełny dostęp” bez zgód; zostają wyłącznik, audyt, ochrona przed wstrzyknięciem; do przeglądu właściciela
 - [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo
+- [Ukośniki w heredoc](narzedzia-ukosniki-heredoc.md) — Bash na tym PC zamienia podwójny ukośnik odwrotny w heredoc na pojedynczy; kod z ukośnikami edytować narzędziem Edit
