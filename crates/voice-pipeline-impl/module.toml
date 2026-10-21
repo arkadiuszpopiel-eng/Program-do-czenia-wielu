@@ -1,6 +1,6 @@
 # Manifest modułu voice-pipeline (docs/modules/voice-pipeline/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "voice-pipeline"
-version = "0.0.68"
+version = "0.0.69"
 kind = "service"
 provides = ["voice-pipeline-contract@1"]
 requires = [

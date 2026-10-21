@@ -12,6 +12,63 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.69 — 2026-10-22
+
+Agentki pracują przez API u wszystkich obsługiwanych dostawców i na większych plikach, rozmowa sama wychodzi
+z trybu offline, a kopia Alfy uruchamiana skrótem nie ma już testowego portu debugowania.
+
+### Poprawki
+
+- [krytyczne] Kopia Alfy uruchamiana skrótem „Alfa” nie otwiera już portu debugowania okna (CDP 9222). Wgranie
+  brało plik z buildu testowego, przez który każdy program na tym komputerze — także polecenie agentki na L4 —
+  mógł sterować oknem Alfy. Wgranie buduje teraz osobną kopię bez funkcji testowych z bieżącej wersji (razem
+  z Jądrem) i przerywa, zanim zamknie Twoją Alfę, gdy plik ma port debugowania.
+- [krytyczne] Agentka nie psuje już plików przy zapisie: odczyt ukrywa wartości podobne do sekretów (także zwykły
+  kod, np. `secret: SecretName`) jako „[ZREDAGOWANO]”, a przepisanie pliku wstawiało ten znacznik zamiast kodu.
+  Zapis, w którym przybywa znaczników, kończy się odmową z wyjaśnieniem dla agentki.
+- [poważne] Agentki z narzędziami działają u dostawców zgodnych z OpenAI — DeepSeek, OpenRouter, Gemini, xAI,
+  Mistral, Kimi, Qwen, MiniMax i Z.ai. Wcześniej Router odrzucał tam każde zadanie z narzędziami i pracowały
+  tylko konta Anthropic i OpenAI. Model bez narzędzi (np. część modeli OpenRouter) przełącza na następny model.
+- [poważne] Po jednym błędzie sieci Alfa nie zostaje już „offline” do restartu: „Ponów” zawsze próbuje wysłać
+  wiadomości z kolejki (wcześniej odpowiadało „Nadal brak połączenia.”, a sprawdzanie kluczy w tle stało). Gdy
+  sieci nadal nie ma, wiadomości dostają błąd z możliwością ponowienia.
+- [poważne] Chwilowy brak sieci albo wolna odpowiedź przy ponownym sprawdzaniu działającego klucza nie wyłącza już
+  konta z rozmów na dobę — wynik testu jest zapisany, konto zostaje aktywne (nowe konto i nowy klucz — jak dotąd).
+- [poważne] Długa rozmowa z agentką nie przeskakuje już na model lokalny: termin pierwszej odpowiedzi rośnie
+  z długością kontekstu powyżej 8 tys. tokenów (zwykła rozmowa bez zmian — przełączenie na zapas nadal w 2 s).
+- [poważne] Agentka może zapisać większy plik w jednym kroku: limit odpowiedzi modelu w zadaniu wzrósł z 4 096
+  do 16 384 tokenów, nie więcej niż pozwala model (u dostawców bez podanego limitu — 8 192, jak w rozmowie).
+- [poważne] Zadanie agentki nie kończy się już po kilku krokach „przekroczonym budżetem tokenów”: budżet rośnie
+  z „Limitem kroków zadania” (50 tys. na krok, przy 40 krokach 2 mln), a komunikat wskazuje to ustawienie.
+- [poważne] Koszt zadań agentki bez przypiętego modelu jest liczony — wcześniej wychodził 0, więc limit miesięczny
+  i „Limit kosztu zadania” nie widziały tych wydatków. Nazwy modeli z datą wydania (np. `gpt-5-2025-08-07`) biorą
+  cenę z cennika modelu bez daty.
+- [poważne] Polecenia powłoki agentki (`cargo build`, `git`, `pnpm install`) działają z katalogu projektu: kopia
+  do cofania pomija katalogi zależności i wyników budowania (`node_modules`, `target` cargo, `.venv`,
+  `__pycache__`), które wcześniej zawsze przekraczały limit i kończyły się odmową. Cofanie ich nie obejmuje —
+  wynik polecenia mówi o tym wprost, a ich usunięcie przez agentkę jest traktowane jak trwałe.
+- Komunikaty błędów API nazywają dostawcę, który zawiódł (wcześniej „Limit zapytań u dostawcy Router”), a brak
+  środków na koncie ma własny komunikat zamiast „odrzucił klucz” albo „limit zapytań”.
+- Po ponownym uruchomieniu Alfa mówi, że zapamiętany poziom L4 czeka na ponowne potwierdzenie (Ustawienia →
+  Uprawnienia) — wcześniej wracała do L3 bez słowa.
+- `cargo test` zlecony agentce idzie z ograniczoną liczbą równoległych zadań (połowa wątków procesora, najwyżej 8),
+  chyba że ustawisz własną (`CARGO_BUILD_JOBS`); narzędzia programisty dostają też zmienne katalogu wyników
+  i magazynów npm/pnpm.
+- Opis poziomu L4 w Ustawienia → Uprawnienia mówi, o co Broker nadal pyta: operacje administracyjne, polecenia
+  głosowe od nierozpoznanego mówcy i wysyłka na zewnątrz po kontakcie z niezaufaną treścią; twarde blokady
+  obowiązują zawsze.
+
+### Testy
+
+- Regresje: zapis ze znacznikiem redakcji (nadpisanie, dopisanie, nowy plik), limit wyjścia modelu (znany
+  i nieznany limit), budżet tokenów, koszt tury bez przypięcia (na starym kodzie 0) i z nazwą spoza cennika,
+  cennik dla nazw z datą, snapshot z `target/` i `node_modules/`, usunięcie pomijanego katalogu w skażonej sesji,
+  domyślne `CARGO_BUILD_JOBS`, „Ponów” bez zewnętrznego przełączenia, stan konta po teście bez rozstrzygnięcia,
+  termin dla długiego promptu i zwykłej rozmowy (na starym kodzie przełączenie na zapas), model bez narzędzi,
+  narzędzia u DeepSeek i OpenRouter, nazwa dostawcy w błędzie przez Router (na starym kodzie „Router”), brak
+  środków, informacja o poziomie po restarcie.
+- Przeglądy w świeżym kontekście: 3 recenzentów poprawek i druga runda po poprawkach przeglądu.
+
 ## 0.0.68 — 2026-10-21
 
 Agentki przy pracy na komputerze trzymają się wybranego stylu odpowiedzi, Dyrygentka mówi o zgodach zgodnie
