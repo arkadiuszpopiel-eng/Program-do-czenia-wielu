@@ -144,21 +144,15 @@ impl AppCore {
         }
         let held = self.adopt_approved_raises().await;
         let (global, sessions) = self.remembered_levels().await;
-        // Zapamiętane L4, a Broker na domyślnym L3 (restart, wgranie wersji): poziom wracał do L3
-        // bez słowa. Informacja dopiero przy trzecim takim przebiegu z rzędu (ok. 15 s po starcie:
-        // okno słucha zdarzeń, stan nie jest przejściowy jak łączenie z Brokerem), bez prośby
-        // czekającej w oknie Brokera — raz, do zmiany stanu.
+        // Zapamiętane L4 przy Brokerze na domyślnym L3 (restart): informacja raz, przy trzecim takim
+        // przebiegu z rzędu (ok. 15 s — okno słucha, stan nie przejściowy), bez prośby w oknie Brokera.
         let waiting = global == Some(AutonomyLevel::L4)
             && view.global == AutonomyLevel::L3
             && held.is_empty()
             && self.inner.raises.is_empty();
         let passes = {
             let mut rt = self.rt();
-            rt.level_notice = if waiting {
-                rt.level_notice.saturating_add(1)
-            } else {
-                0
-            };
+            rt.level_notice = rt.level_notice.saturating_add(1) * u8::from(waiting);
             rt.level_notice
         };
         if passes == 3 {

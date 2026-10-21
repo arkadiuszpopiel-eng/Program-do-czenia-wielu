@@ -88,9 +88,8 @@ impl AppCore {
                 {
                     return;
                 }
-                // Ten sam test co przycisk „Testuj” (lista modeli, bez tokenów): odrzucony klucz
-                // albo brak środków zmienia stan konta i Router sam bierze następne. Komunikat według
-                // stanu po teście: brak sieci, limit czasu i „nieobsługiwane” zostawiają konto aktywne.
+                // Ten sam test co przycisk „Testuj”: odrzucony klucz albo brak środków zmienia stan
+                // konta i Router bierze następne. Komunikat według stanu po teście, nie wyniku.
                 let core = self.clone();
                 let label = before.label.clone();
                 tokio::spawn(async move {
