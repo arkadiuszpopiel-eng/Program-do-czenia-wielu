@@ -131,3 +131,44 @@ async fn append_respects_limit_and_other_modes_ignore_old_content() {
     assert!(replaced.is_ok(), "{:?}", replaced.status);
     assert_eq!(h.file(DOC).as_deref(), Some("nowa"));
 }
+
+/// Przegląd 2026-10-21: `fs_read` redaguje zwykły kod (`secret: SecretName`), a model bez
+/// narzędzia edycji przepisywał cały plik i wstawiał `[ZREDAGOWANO]` do źródeł.
+#[tokio::test]
+async fn write_refuses_redaction_markers_taken_from_a_read() {
+    const SRC: &str = "/Users/ala/Documents/konto.rs";
+    let code = "pub struct K {\n    pub secret: SecretName,\n}\n";
+    let h = harness(&[(SRC, code)]);
+    let read = h.call(K::Read, json!({ "path": SRC })).await;
+    let shown = read.data["content"].as_str().unwrap().to_owned();
+    assert!(shown.contains("[ZREDAGOWANO]"), "{shown}");
+    for (path, mode) in [(SRC, "overwrite"), (SRC, "append"), ("kopia.rs", "create")] {
+        let out = h
+            .call(
+                K::Write,
+                json!({ "path": path, "content": shown.replace("K {", "K2 {"), "mode": mode }),
+            )
+            .await;
+        assert!(!out.is_ok(), "{mode}: {:?}", out.status);
+        assert!(out.text.contains("znacznik [ZREDAGOWANO]"), "{}", out.text);
+    }
+    assert_eq!(h.file(SRC).as_deref(), Some(code));
+    assert!(h.file("/Users/ala/Documents/kopia.rs").is_none());
+    // Plik, który już zawiera znacznik (np. dokumentacja), można przepisać bez nowych znaczników.
+    const DOC: &str = "/Users/ala/Documents/opis.md";
+    let h = harness(&[(DOC, "Wynik: [ZREDAGOWANO]\n")]);
+    let same = h
+        .call(
+            K::Write,
+            json!({ "path": DOC, "content": "Opis: [ZREDAGOWANO]\n", "mode": "overwrite" }),
+        )
+        .await;
+    assert!(same.is_ok(), "{:?}", same.status);
+    let plain = h
+        .call(
+            K::Write,
+            json!({ "path": DOC, "content": "bez znacznika", "mode": "append" }),
+        )
+        .await;
+    assert!(plain.is_ok(), "{:?}", plain.status);
+}

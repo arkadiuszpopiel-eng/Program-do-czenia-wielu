@@ -5,7 +5,7 @@
 use risk_classifier_contract::Destructiveness;
 use safety_broker_contract::Capability;
 use tools_common_contract::{
-    Authorization, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, parse_args,
+    Authorization, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, parse_args, text,
 };
 use tools_fs_contract::{FromToArgs, MutationOutput, PathArgs, RenameArgs, WriteArgs, WriteMode};
 use undo_journal_contract::UndoError;
@@ -29,6 +29,13 @@ pub(crate) fn out_value(
         exists,
     })
     .unwrap_or_default()
+}
+
+/// Liczba znaczników redakcji w treści.
+fn redactions(data: &[u8]) -> usize {
+    String::from_utf8_lossy(data)
+        .matches(text::REDACTED)
+        .count()
 }
 
 impl Core {
@@ -111,11 +118,14 @@ impl Core {
             )
             .await?;
         let p = Core::path_buf(&path);
-        // Stara treść jest potrzebna tylko przy dopisywaniu — i tylko gdy wynik zmieści się
-        // w limicie; w pozostałych trybach wystarczy wiedzieć, czy plik istnieje (zakres pusty).
+        // Stara treść jest potrzebna przy dopisywaniu i przy treści ze znacznikiem redakcji —
+        // i tylko gdy wynik zmieści się w limicie; w pozostałych przypadkach wystarczy wiedzieć,
+        // czy plik istnieje (zakres pusty).
         let limit = self.config.write_max_bytes;
+        let marked = a.content.contains(text::REDACTED);
         let wanted = match a.mode {
             WriteMode::Append => limit,
+            _ if marked => limit,
             _ => 0,
         };
         let existing = match self.fs.read_range(&p, 0, wanted) {
@@ -127,6 +137,7 @@ impl Core {
                     .await);
             }
         };
+        let had = existing.as_ref().map_or(0, |(d, _)| redactions(d));
         let data = match (a.mode, existing) {
             (WriteMode::Create, Some(_)) => {
                 let out = ToolOutcome::failed(
@@ -156,6 +167,19 @@ impl Core {
             }
             _ => a.content.into_bytes(),
         };
+        // `fs_read` pokazuje modelowi `[ZREDAGOWANO]` w miejscu wartości podobnych do sekretów
+        // (także zwykłego kodu, np. `secret: SecretName`). Przepisanie pliku z odczytu wstawiałoby
+        // znacznik zamiast prawdziwej treści i psuło źródła — nowy znacznik oznacza odmowę.
+        if marked && redactions(&data) > had {
+            let out = ToolOutcome::failed(
+                ToolErrorKind::InvalidArgs,
+                format!(
+                    "Nie wykonano: {action} — treść zawiera znacznik {} z odczytu pliku. Odczyt ukrył                      w tym miejscu wartość (możliwy sekret), więc zapis wstawiłby znacznik zamiast niej.                      Nie przepisuj tych linii: zmień inny plik, dopisz zmiany trybem `append` albo                      poproś właściciela o tę zmianę.",
+                    text::REDACTED
+                ),
+            );
+            return Ok(self.done(ctx, m, &auths, out).await);
+        }
         let bytes = data.len() as u64;
         let journal = self.journal.clone();
         let out = self
