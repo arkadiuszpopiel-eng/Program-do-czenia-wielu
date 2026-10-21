@@ -79,7 +79,8 @@ impl FakeAccountsHub {
         if !same_key {
             return Ok(false);
         }
-        current.state = summary.outcome.next_state(&current.state);
+        let previous = current.last_test.as_ref().map(|t| &t.outcome);
+        current.state = summary.outcome.next_state_after(&current.state, previous);
         current.last_test = Some(summary.clone());
         if let Some(models) = models {
             current.models = models;

@@ -122,6 +122,25 @@ impl TestOutcome {
         )
     }
 
+    /// Stan po ponownym teście tego samego klucza: brak sieci albo limit czasu nie dowodzi
+    /// złego klucza, więc konto aktywne, którego poprzedni test potwierdził klucz, zostaje
+    /// aktywne (wynik jest w `last_test`). Wcześniej jedna wolna odpowiedź testu w tle wyłączała
+    /// konto z Routera do następnego testu, domyślnie na dobę (przegląd 2026-10-21).
+    pub fn next_state_after(
+        &self,
+        current: &AccountState,
+        previous: Option<&TestOutcome>,
+    ) -> AccountState {
+        let inconclusive = matches!(self, TestOutcome::Network { .. } | TestOutcome::Timeout);
+        if inconclusive
+            && *current == AccountState::Active
+            && previous.is_some_and(TestOutcome::key_works)
+        {
+            return AccountState::Active;
+        }
+        self.next_state(current)
+    }
+
     /// Stan konta po teście (wyłączone konto zostaje wyłączone; `Unsupported` nie zmienia stanu).
     pub fn next_state(&self, current: &AccountState) -> AccountState {
         if *current == AccountState::Disabled {
