@@ -6,11 +6,14 @@ use app_api::dto::ModelItemKind;
 use super::item;
 use crate::catalog::{FileSpec, Install, ItemSpec, Pick, Root};
 
-const HF_WHISPER: &str = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main";
+/// Przypięta rewizja `ggerganov/whisper.cpp`; sumy SHA-256 plików z API Hugging Face (LFS oid,
+/// 2026-10-21 — licencje u źródła, C5.1).
+const HF_WHISPER: &str =
+    "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1";
 const HF_PIPER: &str =
     "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/pl/pl_PL/gosia/medium";
 
-fn whisper(id: &str, file: &str, mib: u64, (pl, en): (&str, &str)) -> ItemSpec {
+fn whisper(id: &str, file: &str, mib: u64, sha256: &str, (pl, en): (&str, &str)) -> ItemSpec {
     item(
         id,
         ModelItemKind::Stt,
@@ -25,7 +28,7 @@ fn whisper(id: &str, file: &str, mib: u64, (pl, en): (&str, &str)) -> ItemSpec {
             file,
             &format!("{HF_WHISPER}/{file}"),
             mib,
-            None,
+            Some(sha256),
         )],
         Install::Files,
         false,
@@ -52,6 +55,7 @@ pub(super) fn speech() -> Vec<ItemSpec> {
             "whisper-large-v3-turbo-q5_0",
             "ggml-large-v3-turbo-q5_0.bin",
             547,
+            "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
             ("Rozpoznawanie mowy (profil A, GPU/CPU). Wymaga sidecara whisper-server.",
              "Speech recognition (profile A, GPU/CPU). Requires the whisper-server sidecar."),
         ),
@@ -59,6 +63,7 @@ pub(super) fn speech() -> Vec<ItemSpec> {
             "whisper-small-q5_1",
             "ggml-small-q5_1.bin",
             181,
+            "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
             ("Lżejszy model STT na CPU (zapas). Aplikacja bierze pierwszy model ggml-* alfabetycznie.",
              "Lighter CPU speech model (fallback). The app uses the first ggml-* model alphabetically."),
         ),

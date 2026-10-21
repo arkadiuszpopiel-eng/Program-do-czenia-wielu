@@ -742,4 +742,6 @@ Wynik obejmuje wszystkie 24 pozycje z license-cards.json, żadnej nie brakuje. P
 
 - Właściciel: decyzje z listy „Najważniejsze” (Regulamin bielik.ai, Qwen Research License dla Bielika 4.5B, DirectML,
   Open RAIL-M Supertonic, FFmpeg, WeSpeaker/openWakeWord) i potwierdzenie kart (`confirmed`).
-- Kod (osobne zadanie): przypięcie rewizji pozostałych modeli z `/resolve/main` (Whisper, e5, MiniLM) i hashy tam, gdzie ich brak.
+- Kod: przypięte też rewizje i sumy SHA-256 (LFS oid z API Hugging Face) modeli Whisper (`ggml-large-v3-turbo-q5_0`,
+  `ggml-small-q5_1`), `multilingual-e5-small` i `paraphrase-multilingual-MiniLM-L12-v2` (model i `tokenizer.json`; rozmiar
+  tokenizera MiniLM poprawiony z 17 na 9 MB) — zrobione 2026-10-21.

@@ -1,12 +1,11 @@
 //! Katalog znanych modeli embeddingu (wpisy dla menedżera modeli w `app-*`): skąd pobrać pliki,
 //! rozmiar, licencja i ustawienia manifestu. Domyślny: `multilingual-e5-small` (MIT, 384 wym.).
 //!
-//! **SHA-256:** HuggingFace był niedostępny przy tworzeniu katalogu, więc hashe nie są przypięte
-//! (`sha256: None`). Instalator domyślnie ([`crate::install::HashPolicy::PinnedOnly`]) odmawia
-//! pobrania takiego pliku; człowiek przypina hash (strona pliku na HF → „SHA256” w metadanych LFS)
-//! przed wydaniem. `TrustOnFirstUse` (jawna zgoda użytkownika w UI) zapisuje hash pierwszego
-//! pobrania w manifeście — każde późniejsze ładowanie go weryfikuje. Adresy i rozmiary — do
-//! potwierdzenia przy przypinaniu (ten sam model ONNX jest też w `Xenova/multilingual-e5-small`).
+//! **SHA-256:** od 2026-10-21 każdy plik ma hash z metadanych LFS w API Hugging Face, a adres jest
+//! przypięty do rewizji repozytorium (licencje u źródła, C5.1). Instalator domyślnie
+//! ([`crate::install::HashPolicy::PinnedOnly`]) odmawia pobrania pliku bez przypiętego hasha;
+//! `TrustOnFirstUse` (jawna zgoda użytkownika w UI) zapisuje hash pierwszego pobrania w manifeście —
+//! każde późniejsze ładowanie go weryfikuje.
 
 use crate::manifest::{EMBED_MANIFEST_FORMAT, EmbedManifest, FileRef};
 use crate::pool::Pooling;
@@ -67,14 +66,14 @@ pub const CATALOG: &[CatalogEntry] = &[
         homepage: "https://huggingface.co/intfloat/multilingual-e5-small",
         model: CatalogFile {
             path: "onnx/model.onnx",
-            url: "https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/onnx/model.onnx",
-            sha256: None,
+            url: "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/onnx/model.onnx",
+            sha256: Some("ca456c06b3a9505ddfd9131408916dd79290368331e7d76bb621f1cba6bc8665"),
             size_mb: 471,
         },
         tokenizer: CatalogFile {
             path: "tokenizer.json",
-            url: "https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/tokenizer.json",
-            sha256: None,
+            url: "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/tokenizer.json",
+            sha256: Some("0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39"),
             size_mb: 17,
         },
         dims: 384,
@@ -93,15 +92,15 @@ pub const CATALOG: &[CatalogEntry] = &[
         homepage: "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         model: CatalogFile {
             path: "onnx/model.onnx",
-            url: "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/onnx/model.onnx",
-            sha256: None,
+            url: "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/onnx/model.onnx",
+            sha256: Some("10f7a088420252b26caf819236ca2c9d2987afd0fc06fec7553b542a5655a05a"),
             size_mb: 471,
         },
         tokenizer: CatalogFile {
             path: "tokenizer.json",
-            url: "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json",
-            sha256: None,
-            size_mb: 17,
+            url: "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer.json",
+            sha256: Some("2c3387be76557bd40970cec13153b3bbf80407865484b209e655e5e4729076b8"),
+            size_mb: 9,
         },
         dims: 384,
         max_tokens: 128,
@@ -171,7 +170,19 @@ mod tests {
                 assert!(f.url.starts_with("https://huggingface.co/"), "{}", f.url);
                 assert!(f.url.ends_with(f.path), "{}", f.url);
                 assert!(is_safe_relative(f.path));
-                assert!(f.sha256.is_none_or(is_sha256));
+                // Hash i rewizja przypięte (C5.1, 2026-10-21).
+                assert!(f.sha256.is_some_and(is_sha256), "{}", f.url);
+                let revision = f
+                    .url
+                    .split("/resolve/")
+                    .nth(1)
+                    .and_then(|r| r.split('/').next());
+                assert!(
+                    revision
+                        .is_some_and(|r| r.len() == 40 && r.chars().all(|c| c.is_ascii_hexdigit())),
+                    "{}",
+                    f.url
+                );
             }
             let m = e.manifest(&"A".repeat(64), &"b".repeat(64));
             m.validate().unwrap();
