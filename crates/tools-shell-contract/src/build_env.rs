@@ -38,7 +38,7 @@ pub fn with_build_defaults(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::exec::filter_env;
+    use platform_contract::filter_env;
 
     /// Przegląd 2026-10-21: `cargo test` zlecony agentce szedł z pełnym `-j`.
     #[test]

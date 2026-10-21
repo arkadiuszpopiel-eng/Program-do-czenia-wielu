@@ -5,7 +5,6 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
-mod build_env;
 mod camera;
 mod capture;
 mod capture_check;
@@ -44,7 +43,6 @@ mod uia;
 mod uia_action;
 mod window;
 
-pub use build_env::{BUILD_ENV_ALLOWLIST, default_build_jobs, with_build_defaults};
 pub use camera::{CameraDevice, CameraPort, CameraStream};
 pub use clipboard::{ClipboardContent, ClipboardPort};
 pub use error::PlatformError;

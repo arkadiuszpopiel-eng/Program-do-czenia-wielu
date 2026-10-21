@@ -9,9 +9,11 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod analysis;
+mod build_env;
 mod effects;
 
 pub use analysis::{CommandAnalysis, analyze, tokens};
+pub use build_env::{BUILD_ENV_ALLOWLIST, default_build_jobs, with_build_defaults};
 
 use risk_classifier_contract::Reversibility;
 use safety_broker_contract::TaintSource;

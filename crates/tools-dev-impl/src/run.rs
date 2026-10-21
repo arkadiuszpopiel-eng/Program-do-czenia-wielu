@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use platform_contract::{
-    BUILD_ENV_ALLOWLIST, DEFAULT_ENV_ALLOWLIST, ExecControl, ExecOutput, ExecSpec, ExecTermination,
-    Integrity, PlatformError, ProcessSpec, filter_env, with_build_defaults,
+    DEFAULT_ENV_ALLOWLIST, ExecControl, ExecOutput, ExecSpec, ExecTermination, Integrity,
+    PlatformError, ProcessSpec, filter_env,
 };
 use safety_broker_contract::{Capability, PathScope, TaintSource};
 use tools_common_contract::{
@@ -17,7 +17,7 @@ use tools_dev_contract::{
     GitAction, GitArgs, Runner, TEST_TIMEOUT_DEFAULT_S, TEST_TIMEOUT_MAX_S, TestArgs, TestSummary,
     detect_runner, git_command, git_status, test_command, test_counts,
 };
-use tools_shell_contract::{ShellKind, ShellToolsConfig};
+use tools_shell_contract::{BUILD_ENV_ALLOWLIST, ShellKind, ShellToolsConfig, with_build_defaults};
 use watchdog_contract::ProcessRole;
 
 use crate::Core;
