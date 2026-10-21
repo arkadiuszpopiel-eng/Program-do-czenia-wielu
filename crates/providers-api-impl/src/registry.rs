@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use std::sync::RwLock;
 
 use providers_contract::{
-    ChatRequest, Cost, CostEstimate, InterruptionRendering, ModelCapabilities, ModelInfo,
+    ChatRequest, Cost, CostEstimate, InterruptionRendering, ModelCapabilities, ModelInfo, Pricing,
     ProviderCapabilities, Usage,
 };
 
@@ -88,7 +88,7 @@ impl ModelRegistry {
         profile: &ProviderProfile,
         req: &ChatRequest,
     ) -> Option<CostEstimate> {
-        let pricing = profile.pricing.get(&req.model)?;
+        let pricing = price(profile, &req.model)?;
         let max_out = profile.output_limit(req.params.max_tokens, &self.caps(&req.model));
         Some(pricing.estimate(req, u64::from(max_out)))
     }
@@ -96,7 +96,30 @@ impl ModelRegistry {
 
 /// Koszt z cennika profilu.
 pub(crate) fn cost(profile: &ProviderProfile, model: &str, usage: &Usage) -> Option<Cost> {
-    profile.pricing.get(model).map(|p| p.cost(usage))
+    price(profile, model).map(|p| p.cost(usage))
+}
+
+/// Cennik modelu: dokładna nazwa, a gdy jej nie ma — bez przyrostka daty wydania, który API
+/// zwraca w odpowiedzi (`gpt-5-2025-08-07`, `claude-haiku-4-5-20251001`), przy cenniku
+/// z aliasami (przegląd 2026-10-21: koszt agentki liczony z modelu z odpowiedzi wychodził 0).
+fn price<'a>(profile: &'a ProviderProfile, model: &str) -> Option<&'a Pricing> {
+    profile
+        .pricing
+        .get(model)
+        .or_else(|| profile.pricing.get(undated(model)?))
+}
+
+/// Nazwa bez przyrostka `-RRRRMMDD` albo `-RRRR-MM-DD`.
+fn undated(model: &str) -> Option<&str> {
+    let digits = |s: &str, n: usize| s.len() == n && s.bytes().all(|c| c.is_ascii_digit());
+    if let Some((head, day)) = model.rsplit_once('-')
+        && digits(day, 8)
+    {
+        return Some(head);
+    }
+    let mut parts = model.rsplitn(4, '-');
+    let (day, month, year, head) = (parts.next()?, parts.next()?, parts.next()?, parts.next()?);
+    (digits(day, 2) && digits(month, 2) && digits(year, 4)).then_some(head)
 }
 
 #[cfg(test)]
@@ -109,6 +132,35 @@ mod tests {
             thinking: ThinkingSupport::AlwaysOn,
             ..ModelCapabilities::default()
         })
+    }
+
+    #[test]
+    fn dated_model_ids_use_the_alias_price() {
+        let mut profile = ProviderProfile::new("p");
+        for alias in ["gpt-5", "claude-haiku-4-5"] {
+            profile.pricing.insert(
+                alias.into(),
+                Pricing {
+                    input_per_mtok_usd: 1.0,
+                    output_per_mtok_usd: 2.0,
+                    cache_read_per_mtok_usd: None,
+                    cache_write_per_mtok_usd: None,
+                },
+            );
+        }
+        let usage = Usage {
+            input_tokens: 1_000_000,
+            ..Usage::default()
+        };
+        for model in ["gpt-5", "gpt-5-2025-08-07", "claude-haiku-4-5-20251001"] {
+            assert_eq!(
+                cost(&profile, model, &usage).map(|c| c.nano_usd),
+                Some(1_000_000_000),
+                "{model}"
+            );
+        }
+        assert!(cost(&profile, "gpt-5-mini", &usage).is_none());
+        assert!(cost(&profile, "gpt-5-2025", &usage).is_none());
     }
 
     #[test]

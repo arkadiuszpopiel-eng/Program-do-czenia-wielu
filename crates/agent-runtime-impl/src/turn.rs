@@ -79,9 +79,14 @@ impl Engine {
         self.cp.usage.input_tokens += turn.usage.total_input();
         self.cp.usage.output_tokens += turn.usage.output_tokens;
         // Cena modelu, który faktycznie odpowiedział (`Started`/`ModelSwitched`; u Routera
-        // `dostawca:model`) — bez przypięcia `spec.model` to „auto” i koszt wychodził 0.
-        let priced = turn.model.as_deref().unwrap_or(&self.cp.spec.model);
-        if let Some(cost) = provider.cost(priced, &turn.usage) {
+        // `dostawca:model`) — bez przypięcia `spec.model` to „auto” i koszt wychodził 0; potem
+        // model przypięty (odpowiedź bywa z nazwą spoza cennika), jak w zwykłej rozmowie.
+        let cost = turn
+            .model
+            .as_deref()
+            .and_then(|m| provider.cost(m, &turn.usage))
+            .or_else(|| provider.cost(&self.cp.spec.model, &turn.usage));
+        if let Some(cost) = cost {
             self.cp.usage.cost_nano_usd = self.cp.usage.cost_nano_usd.saturating_add(cost.nano_usd);
         }
         self.cp.usage.elapsed_ms = self.elapsed_ms();

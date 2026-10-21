@@ -64,3 +64,56 @@ async fn turn_cost_uses_the_model_that_answered() {
     // 1 mln tokenów wejścia po 3 USD = 3 USD.
     assert_eq!(cost, 3_000_000_000);
 }
+
+/// Model przypięty, a odpowiedź z nazwą spoza cennika (np. z datą wydania): cena modelu
+/// przypiętego — jak w zwykłej rozmowie (przegląd poprawki: wcześniej koszt znikał).
+#[tokio::test(start_paused = true)]
+async fn pinned_model_price_is_the_fallback() {
+    let provider = FakeProvider::new("anthropic").with_pricing(
+        "claude-x",
+        Pricing {
+            input_per_mtok_usd: 3.0,
+            output_per_mtok_usd: 15.0,
+            cache_read_per_mtok_usd: None,
+            cache_write_per_mtok_usd: None,
+        },
+    );
+    provider.push_script(Script::new(vec![
+        Step::Emit(ProviderEvent::Started {
+            model: "claude-x-20260101".into(),
+            response_id: None,
+        }),
+        Step::Emit(ProviderEvent::TextDelta {
+            index: 0,
+            text: "Gotowe.".into(),
+        }),
+        Step::Emit(ProviderEvent::Usage(Usage {
+            input_tokens: 1_000_000,
+            output_tokens: 0,
+            ..Usage::default()
+        })),
+        Step::Emit(ProviderEvent::stop(StopReason::EndTurn)),
+    ]));
+    let runtime = Runtime::new(RuntimeDeps {
+        provider: Arc::new(provider.clone()),
+        tools: Vec::new(),
+        checkpoints: Arc::new(MemCheckpointStore::default()),
+        bus: None,
+        config: RuntimeConfig::default(),
+    });
+    let mut spec = contract_tests::sample_spec("claude-x", &[]);
+    spec.verify = false;
+    let run = runtime.start(spec).await.unwrap();
+    runtime.wait(&run).await.unwrap();
+    let cost = runtime
+        .events(&run)
+        .unwrap()
+        .iter()
+        .filter_map(|e| match &e.event {
+            RunEvent::Usage(u) => Some(u.cost_nano_usd),
+            _ => None,
+        })
+        .max()
+        .unwrap_or(0);
+    assert_eq!(cost, 3_000_000_000);
+}
