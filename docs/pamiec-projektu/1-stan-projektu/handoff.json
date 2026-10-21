@@ -3,12 +3,14 @@
     "version": "2.1",
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
-    "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-21T10:40:00+02:00"
+    "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
+    "updated": "2026-10-21T15:20:00+02:00"
   },
-  "current_state": "Komputer stacjonarny (RX 9070 XT). 0.0.66 w Alfa-uruchomiona (tryb przenośny Brokera: alfa-broker + okno zgód alfa-broker-ui + watchdog — sprawdzone 21.10 10:12). 21.10: właściciel uruchomił ręcznie build testowy z target/shell/debug (bez programów Jądra → Broker w procesie, L4 odrzucane) — na tym PC nie było skrótu. Naprawa 4a5662b7: skrót „Alfa” (pulpit, menu Start) do Alfa-uruchomiona\\alfa-desktop.exe (scripts/owner-shortcut.ps1, odświeżany przez deploy-owner.sh), jasny tekst w buildzie testowym. verify-app 21.10 na dc0590d2: 47 zielonych + 1 pominięty, pokrycie łącza 259/273 (94,9 %). Sprzątanie 21.10: usunięte target/debug/deps, target/shell, trial-profile, release, src-tauri/target — 229 GB, E: 268 GB wolne.",
-  "session_goal": "Następna sesja: seria 7 (0.0.66) — pierwszy punkt: poziom autonomii „Pełny dostęp” (decyzja właściciela 20.10) na gałęzi do przeglądu.",
-  "in_progress": [],
+  "current_state": "Komputer stacjonarny (RX 9070 XT). W Alfa-uruchomiona działa 0.0.66 (tryb przenośny Brokera, L4 zatwierdzone przez właściciela 21.10). Wersja 0.0.67 zatwierdzona lokalnie (HEAD 0e54f5b9, niewypchnięta): skrót „Alfa”, odświeżanie L4 po zgodzie, łatki bibliotek, poprawka bezpieczeństwa strażnika autonomii (przegląd 16 recenzentów: prośba o L3 bez zgody + restart nadpisywały obniżenie — teraz przyjęcie tylko po stanie prośby Approved z Brokera, prośby w pamięci procesu), wgranie nie zastępuje głosu niepełnym kompletem, memory-sync wstrzymuje starą pamięć drugiego komputera. 0.0.67 NIE wgrana — decyzja właściciela (wgranie zamyka Alfę, L4 potwierdzić ponownie).",
+  "session_goal": "Właściciel 21.10 ~14:00 wyszedł na kilka godzin: /goal „pracuj dalej nad poprawkami, ulepszeniami i nowymi wersjami”. Po verify 0.0.67: styl i temperatura w przebiegach agentek, „porządki” bez katalogu — stała odpowiedź programu.",
+  "in_progress": [
+    "verify wersja na 0e54f5b9 (target/verify/wersja-0067.log); raport 33 (szkic w scratchpad sesji — dokończyć i dodać do docs/plan/README.md)"
+  ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
     "target\\debug rośnie szybko (17.10: 170 GB w kilka godzin — każda zmiana ustawień kompilacji = nowy komplet plików testowych); verify pomija etapy Rust przy małym miejscu. Sprzątanie: starsze duplikaty *.exe/*.pdb w target/debug/deps + target/debug/incremental (zwolnione 130 GB).",
@@ -16,7 +18,7 @@
     "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
   ],
   "next_session": [
-    "Właściciel: potwierdzić L4 w oknie Brokera w Alfie uruchomionej skrótem „Alfa” (21.10 tryb przenośny działa). Po sprzątaniu 21.10 pierwsza kompilacja testów i powłoki od zera (ok. 20–30 min).",
+    "Właściciel: decyzja o wgraniu 0.0.67 (scripts/deploy-owner.sh — zamyka Alfę, potem L4 ponownie w oknie Brokera). Po wgraniu sprawdzić: zgoda w oknie Brokera → strona Uprawnień sama pokazuje L4 w ~2 s.",
     "Sprawdzić u właściciela koszt w wierszu odpowiedzi (Haiku 5.5: „< 0,01 zł”, GPT-6.1 Sol: kwota) i stronę Ustawienia → Koszty i limity → Cennik modeli.",
     "Po restarcie laptopa: verify-app (test diagnostyki — WMI było zablokowane 20.10 wieczorem).",
     "Prompt Dyrygentki (crew_note): na L4 nie pisać, że Broker zatwierdza każdą akcję — zależnie od poziomu autonomii.",
@@ -43,9 +45,14 @@
   "test_results": {
     "0.0.63": "verify wersja 96588e5b: 16 zielonych / 2 czerwone (brak Edge, cargo deny: zip) / 1 nieuruchomiony (jq); Rust 2898/0/40, interfejs 395/395, prawdziwa aplikacja 41 + 1 pominięty, pokrycie łącza 235/264 (89 %); przeglądarka na Chromium Playwrighta 467/467; RX 9070 XT: DXCore/PDH (odczyt samej pamięci 89 µs), Supertonic CPU vs DirectML, Qwen3-ASR Vulkan",
     "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone.",
-    "0.0.66": "verify wersja 5e7baed4: Rust 3065 (1 czerwony app-broker portable_mode pod obciążeniem, osobno 3× zielony), UI 473, przeglądarka 549/549; po poprawkach 08c80c91: lint zielony, aplikacja 48/48, pokrycie 259/271; duty Bielik: morning/evening/costs zielone, tidy niestabilny bez katalogu."
+    "0.0.66": "verify wersja 5e7baed4: Rust 3065 (1 czerwony app-broker portable_mode pod obciążeniem, osobno 3× zielony), UI 473, przeglądarka 549/549; po poprawkach 08c80c91: lint zielony, aplikacja 48/48, pokrycie 259/271; duty Bielik: morning/evening/costs zielone, tidy niestabilny bez katalogu.",
+    "0.0.67": "verify wersja 376b21d0: Rust 3076/0; czerwone format (dto/mod.rs — poprawione), pnpm audit (vite — 7.3.7), cargo deny (nowe RUSTSEC rustls-webpki/wasmtime — poprawione; zip zostaje), przeglądarka (brak Edge). Po 39965c0c: deny tylko zip, audit czysty, crate'y wasmtime/TLS 227/0, vitest 477/477, budżet JS 149,8/150 KB."
   },
   "decisions_this_session": [
+    "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
+    "Właściciel 21.10: usunąć stare kompilacje — zwolnione 229 GB (target/debug/deps, .fingerprint, incremental, shell, trial-profile, release, src-tauri/target).",
+    "Łatki bezpieczeństwa w 0.0.67 (wersje poprawkowe, bez ADR); zip 9 (wersja główna) nadal do decyzji właściciela.",
+    "Przegląd 21.10: strażnik autonomii — przyjęcie podniesienia tylko po approval_outcome=Approved z Brokera; prośby tylko w pamięci (tryb usługi: karta zatwierdzona po restarcie Alfy jest cofana — kierunek bezpieczny, do decyzji przy trybie usługi).",
     "Właściciel 20.10: poziom „Pełny dostęp” AI (bez zgód), z wyłącznikiem, dziennikiem i ochroną przed wstrzyknięciem; odrzucony wariant „zero ograniczeń”.",
     "Właściciel 20.10: przełącznik baneru „Tryb deweloperski” — zrobiony (ui.broker_dev_banner).",
     "Wgranie 0.0.65 po próbie obowiązków (wybór właściciela).",

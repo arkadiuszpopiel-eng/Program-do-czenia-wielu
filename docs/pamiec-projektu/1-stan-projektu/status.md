@@ -6,8 +6,7 @@
 
 ## Aktualny cel
 
-**Bieżący (2026-10-20 wieczór):** 0.0.66 wgrana 20:02 — okno Brokera działa, L4 trwa po zgodzie, cennik 89 modeli + „Kontrola cenników” (raport 32 §7–8). Wcześniej 0.0.65. Dalej seria 7 (0.0.66) — punkt 1: poziom „Pełny dostęp” AI
-(decyzja właściciela 20.10, gałąź do przeglądu). Lista zadań: `handoff.json` → `next_session`.
+**Bieżący (2026-10-21, 15:20):** w Alfa-uruchomiona działa 0.0.66 (L4 zatwierdzone). 0.0.67 zatwierdzona lokalnie (`0e54f5b9`): skrót „Alfa”, odświeżanie L4 po zgodzie, łatki bibliotek, poprawka bezpieczeństwa strażnika autonomii po przeglądzie — wgranie czeka na decyzję właściciela. Właściciel poza domem kilka godzin (/goal: poprawki, ulepszenia, nowe wersje). Lista zadań: `handoff.json` → `next_session`.
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);
 (2) plan v6 prowadzony na bieżąco w `alfa/docs/plan/` (MD) i `alfa/docs/html/` (HTML, generowany).
@@ -15,6 +14,8 @@ Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KO
 ## Stan projektu
 
 - **2026-10-21 (PC stacjonarny):** właściciel uruchomił ręcznie build testowy `alfa\target\shell\debug\alfa-desktop.exe` (bez programów Jądra obok → Broker w procesie, „Zmień na L4” odrzucane) — na tym PC nie było skrótu do Alfy. Naprawa `4a5662b7`: skrót **„Alfa”** na pulpicie i w menu Start → `Alfa-uruchomiona\alfa-desktop.exe` (`scripts/owner-shortcut.ps1`, odświeżany przez `deploy-owner.sh`), tekst w buildzie testowym mówi, że to build testowy i co uruchomić. Sprawdzone: Alfa ze skrótu = tryb przenośny (alfa-broker, okno zgód alfa-broker-ui, watchdog z Ctrl+Shift+F12). verify-app na `dc0590d2`: 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Usunięte stare kompilacje (target/debug/deps, shell, trial-profile, release, src-tauri/target): 229 GB, E: 268 GB wolne. **Właścicielowi podawać tylko skrót „Alfa”, nigdy ścieżki do target/shell.**
+- **2026-10-21 popołudnie:** zgłoszenie „zatwierdziłem L4 w oknie, a zmiany nie ma” — Broker miał L4 (odczyt przez CDP), rdzeń nie przyjmował podniesienia bez wcześniejszego obniżenia i nie ogłaszał zmiany. Naprawa `7889e282` + `015a1a98`: strażnik autonomii przyjmuje zatwierdzone podniesienie (globalne i sesji) i wysyła SessionUpdated; strona Uprawnień odpytuje poziom co 2 s (do 10 min) po otwarciu okna Brokera; poziomy/podniesienia w `app-broker::levels` (test regresji red→green). Wersja **0.0.67** `376b21d0`; łatki `39965c0c`: rustls-webpki 0.103.16, wasmtime 36.0.19, vite 7.3.7 (zip zostaje — wersja główna).
+- **2026-10-21 po południu (przeglądy):** przegląd 0.0.67 (16 recenzentów) — luka strażnika: zgodność poziomu brana za zgodę, nowy Broker startuje z L3 → prośba o L3 bez zgody + restart Alfy w 15 min nadpisywały obniżenie. Naprawa `0e54f5b9`: `BrokerPort::approval_outcome` (stan prośby z Brokera, przez IPC), prośby tylko w pamięci (`app_broker::levels::PendingRaises`, Notify), drugi przegląd (9 agentów) — 5 potwierdzonych, poprawione. Też: test obowiązków (5), sidecary/wgranie, `memory-sync` wstrzymuje starą pamięć PC (przywrócone zasady dwóch maszyn), `verify` bez Edge → Chromium. Rust 3079/0, zmienione crate'y 240/0, vitest 478.
 - **Kopia robocza:** `E:\PROGRAMY W CZASIE PRAC\Alfa AI Program\alfa` (dysk przenośny)
 - **Narzędzia:** `alfa-narzedzia` obok repo; przed pracą `source scripts/portable-env.sh` albo `. .\scripts\portable-env.ps1`
 - **Branch:** `ccr-af4b63c6-3fyzaj`; 317 commitów lokalnych ponad `origin` przy `c8791fdd` (18.10; liczba rośnie —

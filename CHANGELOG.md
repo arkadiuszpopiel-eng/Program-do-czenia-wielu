@@ -47,13 +47,14 @@ uruchomieniu; Alfę z oknem zgód uruchamia skrót „Alfa”.
 
 ### Testy
 
-- Rust: cały projekt 3079 zielonych, 0 czerwonych; clippy czysty. Strażnik autonomii: zgoda przyjęta i ogłoszona
+- Rust: cały projekt 3079 zielonych (w `verify wersja` 1 czerwony test czasu decyzji pod obciążeniem — osobno zielony); clippy czysty. Strażnik autonomii: zgoda przyjęta i ogłoszona
   (także na nowym profilu), dwie karty dla jednego zakresu, prośba bez zgody nie nadpisuje obniżenia ani po
   ponownym uruchomieniu Brokera, ani aplikacji — ten test nie przechodzi na atrapie Brokera, która każdą prośbę
   uznaje za zatwierdzoną (sprawdzone celowo). Stan prośby przez IPC z prawdziwą usługą Brokera i skryptowanym
   oknem zgód: czeka, zatwierdzona, odrzucona, nieznana, zerwane łącze.
-- Interfejs: vitest 478 (czekanie na zgodę, odczyt po przerwaniu), przeglądarka na Chromium 552/552; prawdziwa
-  aplikacja 47 zielonych i 1 pominięty, pokrycie łącza 259 z 273 (94,9 %).
+- Interfejs: vitest 478 (czekanie na zgodę, odczyt po przerwaniu), przeglądarka na Chromium 551 + 1 (aplikacja nie
+  wczytała się w 30 s pod obciążeniem; osobno zielony); prawdziwa aplikacja 47 zielonych i 1 pominięty, pokrycie
+  łącza 259 z 273 (94,9 %). `verify wersja`: 15 zielonych etapów, `cargo deny` — tylko `zip`.
 - Skrypty: `memory-sync` 85/85 (stara pamięć drugiego komputera wstrzymana, celowy powrót do dawnej treści
   przechodzi), skrót „Alfa” zapisany na pulpicie i w menu Start. `verify` bez Edge uruchamia testy w przeglądarce na
   Chromium Playwrighta (adnotacja w raporcie) zamiast zawsze czerwonego etapu.
