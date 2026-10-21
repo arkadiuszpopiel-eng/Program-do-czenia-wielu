@@ -51,7 +51,6 @@ pub use agents::{
     VoiceStatus, WorkdirChoice,
 };
 pub use board::BoardItem;
-pub use pricing::{PriceChangeRow, PriceRow, PricingView};
 pub use bridges::{BridgeAccount, BridgeAccountState, BridgeCard, BridgeLogin, BridgeSource};
 pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView};
 pub use cameras::{
@@ -123,6 +122,7 @@ pub use plugins::{
     PluginCapabilityView, PluginInfo, PluginInspection, PluginLimitsView, PluginOrigin,
     PluginProblem, PluginProblemKind, PluginR2View, PluginStateView, PluginToolView, PluginsView,
 };
+pub use pricing::{PriceChangeRow, PriceRow, PricingView};
 pub use quick::{
     BuiltinCommand, CustomCommand, QuickCommandsView, QuickMatchMode, QuickSource, QuickTest,
 };

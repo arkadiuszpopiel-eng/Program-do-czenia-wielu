@@ -342,6 +342,10 @@ budowy — bez programów Jądra obok, z Brokerem w procesie i bez okna zgód (k
 Teraz skrót „Alfa” na pulpicie i w menu Start uruchamia kopię z oknem zgód (<code>Alfa-uruchomiona</code>) i jest
 odświeżany przy każdym wgraniu; skrótu zainstalowanej Alfy (instalator) nie zmienia. Kopia testowa mówi wprost,
 że nią jest i co uruchomić.</li>
+<li>[poważne] Biblioteki z poprawkami bezpieczeństwa: weryfikacja certyfikatów TLS (<code>rustls-webpki</code> 0.103.16,
+RUSTSEC-2026-0382 — odrzuca łańcuchy z wycofanymi certyfikatami emSign), silnik wtyczek (<code>wasmtime</code> 36.0.19,
+RUSTSEC-2026-0379/0380) i narzędzie budowy interfejsu (<code>vite</code> 7.3.7 — tylko serwer deweloperski). Ostrzeżenia
+dla <code>zip</code> zostają (Alfa nie korzysta z podatnych funkcji; przejście na <code>zip</code> 9 to osobne zadanie).</li>
 </ul>
 <h3 id="testy">Testy</h3>
 <ul>

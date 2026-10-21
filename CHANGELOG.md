@@ -27,6 +27,10 @@ Zmiana poziomu autonomii zatwierdzona w oknie Brokera widać od razu, a Alfę z 
   Teraz skrót „Alfa” na pulpicie i w menu Start uruchamia kopię z oknem zgód (`Alfa-uruchomiona`) i jest
   odświeżany przy każdym wgraniu; skrótu zainstalowanej Alfy (instalator) nie zmienia. Kopia testowa mówi wprost,
   że nią jest i co uruchomić.
+- [poważne] Biblioteki z poprawkami bezpieczeństwa: weryfikacja certyfikatów TLS (`rustls-webpki` 0.103.16,
+  RUSTSEC-2026-0382 — odrzuca łańcuchy z wycofanymi certyfikatami emSign), silnik wtyczek (`wasmtime` 36.0.19,
+  RUSTSEC-2026-0379/0380) i narzędzie budowy interfejsu (`vite` 7.3.7 — tylko serwer deweloperski). Ostrzeżenia
+  dla `zip` zostają (Alfa nie korzysta z podatnych funkcji; przejście na `zip` 9 to osobne zadanie).
 
 ### Testy
 
