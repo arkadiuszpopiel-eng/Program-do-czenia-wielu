@@ -4,10 +4,10 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-21T21:00:00+02:00"
+    "updated": "2026-10-22T01:20:00+02:00"
   },
-  "current_state": "Komputer stacjonarny (RX 9070 XT). W Alfa-uruchomiona działa 0.0.66 (tryb przenośny Brokera, L4 zatwierdzone 21.10). Wersja 0.0.68 zatwierdzona lokalnie (gałąź ccr-af4b63c6-3fyzaj, niewypchnięta; HEAD po dokumentach — patrz git log): 0.0.67 (skrót „Alfa”, odświeżanie L4, łatki bibliotek, strażnik autonomii przyjmuje podniesienie tylko po zgodzie potwierdzonej przez Brokera) + seria 8 (styl i swoboda w przebiegach agentek, Dyrygentka mówi o zgodach według tabeli reguł Brokera, Claude 4.6 bez temperatury przy myśleniu, test wywłaszczenia, C5.1 licencje u źródła, telemetria ONNX Runtime ograniczona, przypięte sumy całego katalogu, LICENSE Supertonic). target/shell/debug = 0.0.68 gotowa do wgrania (deploy-owner.sh) — NIE wgrana, decyzja właściciela (zamyka Alfę, L4 ponownie w oknie Brokera).",
-  "session_goal": "Właściciel 21.10 ok. 14:00 wyszedł na kilka godzin (/goal: poprawki, ulepszenia, nowe wersje). Następna sesja: decyzja o wgraniu 0.0.68 i priorytety 0.0.69.",
+  "current_state": "Komputer stacjonarny (RX 9070 XT). Wersja 0.0.69 (seria 9: 14 punktów dla pełnej pracy przez API i lokalnie + dwie rundy przeglądu; raport alfa/docs/plan/35-raport-2026-10-22-0069.md). W Alfa-uruchomiona wgrana 0.0.69 (22.10 1:10, deploy-owner --no-start: Alfa zamknięta, uruchomić skrótem „Alfa”; próbny start na tymczasowym profilu: Broker, okno zgód, watchdog, 0 WebView2 z portem CDP). Kopia właściciela budowana bez cechy e2e w target/owner (deploy-owner.sh z HEAD; bez portu CDP 9222), build testowy z e2e zostaje w target/shell. Gałąź ccr-af4b63c6-3fyzaj, niewypchnięta.",
+  "session_goal": "Właściciel 21.10 wieczorem: zamknąć otwarte tematy, pełna działająca wersja do pracy przez API i lokalnie, zapisać wszystko i pauza (/goal do 7:00). Nowe funkcje dopiero po tej wersji.",
   "in_progress": [],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
@@ -16,11 +16,10 @@
     "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
   ],
   "next_session": [
-    "Właściciel: decyzja o wgraniu 0.0.68 (bash scripts/deploy-owner.sh — zamyka Alfę; potem L4 ponownie w oknie Brokera i sprawdzić, że strona Uprawnień sama pokazuje L4 w ~2 s).",
-    "Decyzje licencyjne z alfa/docs/vendor/licencje-modeli-i-silnikow.md: Regulamin bielik.ai (zakaz danych osobowych), Qwen Research License (Bielik 4.5B), DirectML, zakazy Open RAIL-M w licencji Alfy, FFmpeg GPL, WeSpeaker/openWakeWord/Gosia, potwierdzenie kart (confirmed).",
-    "ONNX Runtime bez telemetrii (pyke albo własna kompilacja) — decyzja i pobranie za zgodą.",
-    "Propozycja 0.0.69 (seria 9, 10 punktów, przedstawiona właścicielowi 21.10 wieczorem): 1 licencje → zmiany w programie, 2 „Pełny dostęp” (seria 7, gałąź do-przegladu-pelny-dostep, przegląd człowieka), 3 tryb usługi: zgoda po restarcie Alfy przypięta do instancji Brokera, 4 komunikat zgody dla nieaktywnej rozmowy + atrapa bez okna zgód, 5 memory-sync: zasada usunięta w repo nie wraca, 6 P4 karty z profilem, 7 C2.8 historia wersji artefaktu, 8 C5.5 automatyczny poziom głosu, 9 B.5/B.6, 10 test prawdziwej aplikacji z Brokerem przenośnym (osobna instancja).",
-    "Na tym PC: Edge (testy przeglądarki na WebView2) i jq (etap graf verify) — decyzja właściciela; zip 9 (do-przegladu-updater-zip9), ADR 0028, znak wodny mowy."
+    "Właściciel: po wgraniu 0.0.69 potwierdzić L4 w oknie Brokera (Ustawienia → Uprawnienia → „Zmień na L4”); nowa wersja przypomina o tym ok. 15 s po starcie.",
+    "Decyzja: agentki z narzędziami w zwykłych sesjach mogą teraz iść do dostawców „może trenować” (DeepSeek, Kimi) — zostawić czy zawęzić regułą.",
+    "Znane ograniczenia 0.0.69 (raport 35 §5): termin Routera liczy się do obwodu dostawcy (jak wcześniej), F1-04 > 2 s przy kontekście > ~10 tys. tokenów, błędy przebiegów agentek nadal „dostawca Router”, 8192 tokeny wyjścia u dostawców bez podanego limitu, „Limit kosztu zadania” domyślnie wyłączony, stare kroki cofania z __pycache__/node_modules mogą zgłosić konflikt.",
+    "Decyzje bez zmian: licencje C5.1 (alfa/docs/vendor/licencje-modeli-i-silnikow.md), ONNX Runtime bez telemetrii, zip 9 w aktualizatorze, Edge na PC, seria 7 „Pełny dostęp”, punkty analizatora powłoki i Brokera, push."
   ],
   "env_snapshot": {
     "key_paths": {
@@ -42,7 +41,8 @@
     "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone.",
     "0.0.66": "verify wersja 5e7baed4: Rust 3065 (1 czerwony app-broker portable_mode pod obciążeniem, osobno 3× zielony), UI 473, przeglądarka 549/549; po poprawkach 08c80c91: lint zielony, aplikacja 48/48, pokrycie 259/271; duty Bielik: morning/evening/costs zielone, tidy niestabilny bez katalogu.",
     "0.0.67": "verify wersja 0e54f5b9: 15 zielonych / 3 czerwone (test wywłaszczenia pod obciążeniem — osobno zielony; start przeglądarki — osobno 3/3; cargo deny — zip) / 1 nieuruchomiony (graf, brak jq); Rust 3079 + 1, vitest 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %).",
-    "0.0.68": "verify wersja 77d5403c: 16 zielonych / 2 czerwone (przeglądarka: zerwane połączenie z serwerem podglądu w updates.spec — osobno 17/17; cargo deny — zip) / 1 nieuruchomiony (graf); Rust 3086/0, interfejs 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Przeglądy: 16 + 9 (0.0.67), 5 + 4 (seria 8), spójność dokumentów 2."
+    "0.0.68": "verify wersja 77d5403c: 16 zielonych / 2 czerwone (przeglądarka: zerwane połączenie z serwerem podglądu w updates.spec — osobno 17/17; cargo deny — zip) / 1 nieuruchomiony (graf); Rust 3086/0, interfejs 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Przeglądy: 16 + 9 (0.0.67), 5 + 4 (seria 8), spójność dokumentów 2.",
+    "0.0.69": "verify wersja 7c1445a3: 15 zielonych / 4 czerwone (lint — app-core 8002 linii, poprawione 7a656482; dokumenty — HTML, aa10fb85; audyt-npm — @vitest/mocker 4.1.12, 077ae005; zaleznosci — zip 8.6, decyzja właściciela); Rust 3103/0/41, interfejs 478, przeglądarka 552 (Chromium), aplikacja 47, pokrycie łącza 259/273 (94,9 %), graf zielony (jq)."
   },
   "decisions_this_session": [
     "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
@@ -53,6 +53,7 @@
     "Właściciel 20.10: przełącznik baneru „Tryb deweloperski” — zrobiony (ui.broker_dev_banner).",
     "Wgranie 0.0.65 po próbie obowiązków (wybór właściciela).",
     "Usunięto target/agents (62 GB) i scalone kopie robocze wt-s6, gałęzie s5-*/s6-*.",
-    "0.0.66: każda rozmowa z Dyrygentką przez przebieg agentki — wycofane (14 testów: styl, głos, anulowanie, załączniki, 429); zamiast tego informacja o obsadzie w prompcie."
+    "0.0.66: każda rozmowa z Dyrygentką przez przebieg agentki — wycofane (14 testów: styl, głos, anulowanie, załączniki, 429); zamiast tego informacja o obsadzie w prompcie.",
+    "Właściciel 21.10 ~20:40: „Zamknij wszystkie otwarte tematy, wykonaj pełną działającą wersję… potem wszystko zapisz i zrób pauzę”; wgranie: „To co napisałem wcześniej ma być zrobione”; /goal do 7:00."
   ]
 }
