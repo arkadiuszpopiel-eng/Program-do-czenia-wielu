@@ -13,7 +13,9 @@
 # Ochrona przed nową maszyną dotyczy tylko zasad pracy: gdy ich źródło wygląda na nowe (nie istnieje, nie ma
 # w nim spisu MEMORY.md, który jest w kopii, albo brakuje co najmniej połowy plików kopii), pliki różniące się od źródła
 # nie są nadpisywane, `--prune` niczego tam nie usuwa, a skrypt kończy się kodem 3. 2026-10-17/18 lustro
-# skasowało z repozytorium zasady pracy, gdy dysk przeszedł na komputer z pustą pamięcią asystenta. Stan
+# skasowało z repozytorium zasady pracy, gdy dysk przeszedł na komputer z pustą pamięcią asystenta. Zasada,
+# której treść u źródła jest wcześniejszą zatwierdzoną wersją pliku w kopii (stara pamięć drugiego komputera),
+# też nie nadpisuje nowszej — 2026-10-21 PC cofnął tak w repozytorium zasady dwóch maszyn; kod 3. Stan
 # projektu i dziennik sesji są aktualizowane zawsze. Pliki są porównywane bez znaków CR (źródła mają CRLF,
 # repozytorium LF), więc sama zmiana końców wierszy nie jest zmianą.
 #
@@ -24,7 +26,8 @@
 # Sekrety nie mają prawa się tu znaleźć: plik źródłowy z czymś, co wygląda na klucz, nie trafia do kopii;
 # plik z kluczem w kopii jest zastępowany czystą wersją ze źródła, a bez niej skrypt podaje polecenie usunięcia.
 # Kody wyjścia: 0 — kopia zrobiona (także z ostrzeżeniami), 1 — coś jak klucz, 2 — zły argument,
-# 3 — kopia niepełna: źródło zasad pracy wygląda na nowe (OSTATNIA-KOPIA.txt bez zmian).
+# 3 — kopia niepełna: źródło zasad pracy wygląda na nowe albo ma starsze wersje zasad niż repozytorium
+# (OSTATNIA-KOPIA.txt bez zmian).
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PARENT="$(cd "$ROOT/.." && pwd)"
@@ -60,6 +63,8 @@ REPO_ONLY=0               # ile takich plików
 RULES_ONLY_IN_REPO=0      # 1 = któraś zasada pracy jest tylko w kopii (trzeba uzupełnić też spis MEMORY.md)
 FRESH=""                  # katalog kopii, którego źródło wygląda na nowe (tylko zasady pracy)
 HELD=()                   # polecenia porównania plików, których kopii nie nadpisano
+STALE=()                  # polecenia przywrócenia nowszej zasady z kopii do źródła (u źródła starsza wersja)
+STALE_INDEX=""            # polecenie porównania spisu MEMORY.md wstrzymanego razem ze starszymi zasadami
 PRUNE_RM=()               # pliki, których --prune nie usunął, bo źródło wygląda na nowe
 KEY_SRC=()                # pliki źródłowe z czymś jak klucz (nie skopiowane)
 declare -A NEEDS_MKDIR=() # brakujące katalogi źródłowe, dla których jest już `mkdir -p`
@@ -88,6 +93,33 @@ looks_fresh() { # <źródło> <cel>
     [ -f "$src/${f##*/}" ] || missing=$((missing + 1))
   done < <(copy_files "$dst")
   [ "$total" -gt 0 ] && [ $((2 * missing)) -ge "$total" ]
+}
+
+# Plik źródłowy to stara pamięć drugiego komputera: jego treść to któraś wcześniej zatwierdzona wersja
+# pliku kopii (inna niż obecna kopia, także niezatwierdzona), a zmieniono go u źródła przed ostatnim
+# commitem tego pliku w repozytorium. Celowy powrót do dawnej treści ma świeżą datę zmiany i przechodzi.
+# Bez repozytorium git nie da się tego stwierdzić (`1`).
+older_version() { # <plik źródłowy> <plik kopii względem repozytorium>
+  local src="$1" rel="$2" commit last mtime
+  git_root rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 1
+  last="$(git_root log -1 --format=%ct -- "$rel" 2>/dev/null)"
+  mtime="$(stat -c %Y -- "$src" 2>/dev/null)"
+  { [ -n "$last" ] && [ -n "$mtime" ] && [ "$mtime" -lt "$last" ]; } || return 1
+  while IFS= read -r commit; do
+    cmp -s <(git_root show "$commit:$rel" 2>/dev/null | tr -d '\r') <(tr -d '\r' <"$ROOT/$rel") && continue
+    cmp -s <(tr -d '\r' <"$src") <(git_root show "$commit:$rel" 2>/dev/null | tr -d '\r') && return 0
+  done < <(git_root log --format=%H -- "$rel" 2>/dev/null)
+  return 1
+}
+
+# Spis MEMORY.md na końcu: wstrzymywany, gdy któraś zasada u źródła okazała się starsza (STALE).
+memory_last() {
+  local f memo="" list=()
+  while IFS= read -r -d '' f; do
+    if [ "${f##*/}" = MEMORY.md ]; then memo="$f"; else list+=("$f"); fi
+  done
+  [ -z "$memo" ] || list+=("$memo")
+  [ "${#list[@]}" -eq 0 ] || printf '%s\0' "${list[@]}"
 }
 
 copy_dir() { # <źródło> <cel> <wzorzec> [1 = chronić kopię przed źródłem, które wygląda na nowe]
@@ -138,12 +170,16 @@ copy_dir() { # <źródło> <cel> <wzorzec> [1 = chronić kopię przed źródłem
     has_key "$dst/$name" && had_key=1
     if [ "$fresh" -eq 1 ] && [ "$had_key" -eq 0 ]; then
       HELD+=("diff -u --strip-trailing-cr $(shq "$dst/$name") $(shq "$f")")
+    elif [ "$guard" -eq 1 ] && [ "$had_key" -eq 0 ] && older_version "$f" "$rel/$name"; then
+      STALE+=("cp $(shq "$dst/$name") $(shq "$f")")
+    elif [ "$guard" -eq 1 ] && [ "$had_key" -eq 0 ] && [ "$name" = MEMORY.md ] && [ "${#STALE[@]}" -gt 0 ]; then
+      STALE_INDEX="diff -u --strip-trailing-cr $(shq "$dst/$name") $(shq "$f")"
     elif cp -f -- "$f" "$dst/"; then
       echo "zaktualizowany: $rel/$name"
       [ "$had_key" -eq 0 ] \
         || echo "  (w poprzedniej wersji było coś jak klucz — jeśli była zatwierdzona, unieważnij ten klucz)"
     fi
-  done < <(find "$src" -maxdepth 1 -type f -name "$pattern" -print0 | sort -z)
+  done < <(find "$src" -maxdepth 1 -type f -name "$pattern" -print0 | sort -z | memory_last)
 }
 
 # Zatwierdzona wersja pliku istnieje i nie ma w niej nic jak klucz.
@@ -171,7 +207,7 @@ done < <(grep -rlZE -- "$KEY_RE" "$DST" 2>/dev/null | sort -z)
 KEY_FOUND=0
 [ "${#KEY_SRC[@]}" -eq 0 ] && [ "${#KEY_FIX[@]}" -eq 0 ] || KEY_FOUND=1
 
-if [ "$KEY_FOUND" -eq 0 ] && [ -z "$FRESH" ]; then
+if [ "$KEY_FOUND" -eq 0 ] && [ -z "$FRESH" ] && [ "${#STALE[@]}" -eq 0 ]; then
   date +"%Y-%m-%d %H:%M" >"$DST/OSTATNIA-KOPIA.txt"
   echo "pamięć projektu skopiowana do $DST"
 fi
@@ -209,6 +245,20 @@ if [ -n "$FRESH" ]; then
   fi
 fi
 
+if [ "${#STALE[@]}" -gt 0 ]; then
+  echo
+  echo "STARSZE ZASADY U ŹRÓDŁA: ${#STALE[@]} plik(ów) w $ASSISTANT ma treść wcześniejszej wersji"
+  echo "z repozytorium (pamięć z drugiego komputera) — nowszej kopii nie nadpisano. Przywróć ją do źródła,"
+  echo "uzupełnij u źródła spis MEMORY.md (git log -p -- docs/pamiec-projektu/2-zasady-pracy/MEMORY.md)"
+  echo "i uruchom skrypt ponownie:"
+  printf '  %s\n' "${STALE[@]}"
+  if [ -n "$STALE_INDEX" ]; then
+    echo "Spisu MEMORY.md też nie nadpisano — połącz go u źródła z kopią (pozycje z obu):"
+    echo "  $STALE_INDEX"
+  fi
+  echo "Jeśli treść u źródła jest celowo dawną wersją, zapisz plik u źródła ponownie (nowa data zmiany)."
+fi
+
 if [ "$KEY_FOUND" -eq 1 ]; then
   echo
   echo "BŁĄD: coś, co wygląda na klucz (sk-… albo klucz prywatny)."
@@ -234,6 +284,10 @@ if [ "$KEY_FOUND" -eq 1 ]; then
   exit 1
 elif [ -n "$FRESH" ]; then
   echo "WYNIK: KOPIA NIEPEŁNA — wstrzymano ${#HELD[@]} plik(ów), $REPO_ONLY plik(ów) tylko w kopii (kod 3)," \
+    "OSTATNIA-KOPIA.txt bez zmian."
+  exit 3
+elif [ "${#STALE[@]}" -gt 0 ]; then
+  echo "WYNIK: KOPIA NIEPEŁNA — ${#STALE[@]} zasad(y) u źródła starsze niż w repozytorium (kod 3)," \
     "OSTATNIA-KOPIA.txt bez zmian."
   exit 3
 elif [ "$REPO_ONLY" -gt 0 ]; then

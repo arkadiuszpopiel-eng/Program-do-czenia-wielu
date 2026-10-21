@@ -25,8 +25,10 @@ export function watchRaise(watch: RaiseWatch): () => void {
   const every = watch.everyMs ?? RAISE_POLL_MS;
   let left = Math.ceil((watch.forMs ?? RAISE_WATCH_MS) / every);
   let busy = false;
+  // Odczyt w locie po przerwaniu (nowa prośba, opuszczenie strony) nie może już niczego zgłosić.
+  let stopped = false;
   const timer = setInterval(() => {
-    if (busy) return;
+    if (busy || stopped) return;
     if (left <= 0) {
       clearInterval(timer);
       return;
@@ -36,7 +38,7 @@ export function watchRaise(watch: RaiseWatch): () => void {
     watch
       .read()
       .then((level) => {
-        if (level === watch.level) {
+        if (!stopped && level === watch.level) {
           clearInterval(timer);
           left = 0;
           watch.onApplied();
@@ -48,5 +50,8 @@ export function watchRaise(watch: RaiseWatch): () => void {
         busy = false;
       });
   }, every);
-  return () => clearInterval(timer);
+  return () => {
+    stopped = true;
+    clearInterval(timer);
+  };
 }

@@ -19,9 +19,10 @@ for (const theme of ['light', 'dark'] as const) {
     await triggers(page);
     const duties = page.getByRole('group', { name: 'Gotowe obowiązki codzienne' });
     await duties.scrollIntoViewIfNeeded();
-    await expect(duties.getByRole('button')).toHaveCount(4);
+    await expect(duties.getByRole('button')).toHaveCount(5);
     await expect(duties.getByText('dni robocze o 8:00 · Alfa')).toBeVisible();
     await expect(duties.getByText('w soboty o 12:00 · Gama')).toBeVisible();
+    await expect(duties.getByText('w pierwszy dzień miesiąca o 10:00 · Delta')).toBeVisible();
     await expectAccessible(page, `obowiązki ${theme}`);
 
     // Wybór z klawiatury wypełnia formularz, ale niczego jeszcze nie tworzy.

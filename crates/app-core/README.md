@@ -9,26 +9,27 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
 `*-impl`; od `*-fake` tylko w `dev-dependencies`; `app-*` mogą zależeć od siebie nawzajem, ale od żadnego
 `app-*` nie zależy crate spoza tej kategorii. Ze względu na limit 8 000 linii korzeń jest rozcięty:
 
-| Crate | Zawartość |
-|---|---|
-| `app-api` | kontrakt IPC: DTO (`dto/*`), lista komend `with_commands!` / `COMMANDS` / `CHANNEL_COMMANDS` (`commands.rs`), `AppError`, identyfikatory DTO (`ids`), `EventHub`, porty (`ports/*`), `AppPaths`, protokół `alfa://`, powiadomienia; zależy tylko od `*-contract` |
-| `app-modules` | adaptery portów na modułach `-impl`: `TransferAdapter`, `InprocBroker`, `VoiceAdapter`, `tts::engines`, katalog dostawców (`catalog`), sonda kont (`probe`), Router (`route/*`), sejf kluczy (`secrets`), późne wiązanie `sessions ↔ search` (`late`), osadzacz leksykalny (`embedder`) |
-| `app-memory` | pamięć F7: `MemoryModule` (bazy zakresów w `%LOCALAPPDATA%\Alfa\memory`, klucze w sejfie), dostęp agentek z ról i projektu sesji (`RoleAccess`), narzędzia `memory_recall`/`memory_remember`, Strażniczka pamięci (`guardian`), `MemoryApp` (komendy Inspektora, kontekst czatu, zapomnienie sesji) |
-| `app-tasks` | `scheduler-impl` (zamiast `scheduler-lite-impl`), `triggers-impl`, `marshal-impl`; wykonawczyni zadań (agentka przez `RuntimeExecutor`, most CLI przez `agent-backends`), Replay zadań, mosty zdarzeń, `TasksApp` (komendy `tasks_*`/`triggers_*`/`marshal_*`), delegacja z czatu |
-| `app-bridges` | mosty CLI: karty zgodności (`compliance`), wykrywanie CLI, przypięcia wersji i zgody na harmonogram (`agent_backends.*`), „Zaloguj w terminalu", backend `agent-backends-impl`, serwer MCP Alfy na żądanie (`LazyMcpHost`), rozpoznanie delegacji |
-| `app-agents` | agentki z narzędziami: zestaw `tools-fs/shell/clipboard` (+ GUI z `app-gui`) (`AgentTools`), `RunSpec` z obsady i ustawień, `Launch` (`start_with` z `Crew`: delegacja, Krytyczka, umiejętności jako podprzebiegi), `RunHandle` + `RunFamily` (przebieg z podprzebiegami), projekcja `agent.*` → Replay/karty UI (`RunProjector`, `FamilyProjector`), `TicketLog`, eval narzędzi F3 (`eval`) |
-| `app-gui` | computer use: porty `WinGui` ze strażnikiem okien Alfy, narzędzia `tools-window/uia/input/screen` (`WatchedTool`), panel „Ekran" (`GuiMonitor`: akcje bez treści, zrzut tylko w pamięci, przejęcie), „zawsze zezwalaj na podgląd pulpitu" przez Brokera |
-| `app-terminal` | wbudowany terminal: `TerminalApp` (komendy `terminal_*`, gest tylko z UI), strumień do `FrameSink` (w powłoce `Channel`) |
-| `app-skills` | umiejętności (`SkillsApp`: przegląd z diffem i hashem, kwarantanna, uruchomienie = zadanie) i Kreator agentek (`BuilderApp`: podgląd, test na sucho, zapis) |
-| `app-health` | „Zdrowie systemu": Diagnosta, Ulepszacz, evale (`HealthApp`, `HealthChanged`) |
-| `app-updates` | aktualizacje i „O programie” (`UpdatesApp`, `updates_*`, `UpdateStatus`, `mark_good`, restart przez launcher) |
-| `app-models` | menedżer modeli i silników (`ModelsApp`: katalog, pobieranie z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP; komendy `models_*`), embedder wyszukiwania (`startup_embedder` przy budowie `search`, `embed_model_activate`, przebudowa wektorów `search_reindex_*`, `ReindexStatus`) |
-| `app-store` | tabele aplikacji w bazach sesji (`AppStore`: fakty tur, oś czasu, katalog roboczy, przebiegi agentek) |
-| `app-voice` | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów) |
-| `app-chat` | silnik tury czatu (`ChatEngine`): generacja (strumień, przebieg agentki, delegacja do mostu — `generate.rs`, `stream.rs`, `agent.rs`, `delegate.rs`), zapis tury i koszt (`finish.rs`), historia gałęzi (`history.rs`), projekcja tur do DTO (`project.rs`), aktywne generacje i przebiegi per sesja (`engine.rs`), cofanie kroków schowka/zmiennych tej sesji (`undo.rs`), skażenie sesji z katalogu (`meta.tainted`) → Broker przed każdą turą i przy otwarciu sesji (`taint.rs`, fail-closed); rdzeń przez `ChatHost` (`app-core/src/chat_host.rs`) |
-| `app-core` | kompozycja (`AppOptions` → `parts`), komendy, `ChatHost` i `TaskHost` rdzenia (`chat_host.rs`, `host.rs`), STOP WSZYSTKIEGO (`commands/system.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …) |
+| Crate          | Zawartość                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app-api`      | kontrakt IPC: DTO (`dto/*`), lista komend `with_commands!` / `COMMANDS` / `CHANNEL_COMMANDS` (`commands.rs`), `AppError`, identyfikatory DTO (`ids`), `EventHub`, porty (`ports/*`), `AppPaths`, protokół `alfa://`, powiadomienia; zależy tylko od `*-contract`                                                                                                                                                                                                                                                                                       |
+| `app-modules`  | adaptery portów na modułach `-impl`: `TransferAdapter`, `InprocBroker`, `VoiceAdapter`, `tts::engines`, katalog dostawców (`catalog`), sonda kont (`probe`), Router (`route/*`), sejf kluczy (`secrets`), późne wiązanie `sessions ↔ search` (`late`), osadzacz leksykalny (`embedder`)                                                                                                                                                                                                                                                                |
+| `app-memory`   | pamięć F7: `MemoryModule` (bazy zakresów w `%LOCALAPPDATA%\Alfa\memory`, klucze w sejfie), dostęp agentek z ról i projektu sesji (`RoleAccess`), narzędzia `memory_recall`/`memory_remember`, Strażniczka pamięci (`guardian`), `MemoryApp` (komendy Inspektora, kontekst czatu, zapomnienie sesji)                                                                                                                                                                                                                                                    |
+| `app-tasks`    | `scheduler-impl` (zamiast `scheduler-lite-impl`), `triggers-impl`, `marshal-impl`; wykonawczyni zadań (agentka przez `RuntimeExecutor`, most CLI przez `agent-backends`), Replay zadań, mosty zdarzeń, `TasksApp` (komendy `tasks_*`/`triggers_*`/`marshal_*`), delegacja z czatu                                                                                                                                                                                                                                                                      |
+| `app-bridges`  | mosty CLI: karty zgodności (`compliance`), wykrywanie CLI, przypięcia wersji i zgody na harmonogram (`agent_backends.*`), „Zaloguj w terminalu", backend `agent-backends-impl`, serwer MCP Alfy na żądanie (`LazyMcpHost`), rozpoznanie delegacji                                                                                                                                                                                                                                                                                                      |
+| `app-agents`   | agentki z narzędziami: zestaw `tools-fs/shell/clipboard` (+ GUI z `app-gui`) (`AgentTools`), `RunSpec` z obsady i ustawień, `Launch` (`start_with` z `Crew`: delegacja, Krytyczka, umiejętności jako podprzebiegi), `RunHandle` + `RunFamily` (przebieg z podprzebiegami), projekcja `agent.*` → Replay/karty UI (`RunProjector`, `FamilyProjector`), `TicketLog`, eval narzędzi F3 (`eval`)                                                                                                                                                           |
+| `app-gui`      | computer use: porty `WinGui` ze strażnikiem okien Alfy, narzędzia `tools-window/uia/input/screen` (`WatchedTool`), panel „Ekran" (`GuiMonitor`: akcje bez treści, zrzut tylko w pamięci, przejęcie), „zawsze zezwalaj na podgląd pulpitu" przez Brokera                                                                                                                                                                                                                                                                                                |
+| `app-terminal` | wbudowany terminal: `TerminalApp` (komendy `terminal_*`, gest tylko z UI), strumień do `FrameSink` (w powłoce `Channel`)                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `app-skills`   | umiejętności (`SkillsApp`: przegląd z diffem i hashem, kwarantanna, uruchomienie = zadanie) i Kreator agentek (`BuilderApp`: podgląd, test na sucho, zapis)                                                                                                                                                                                                                                                                                                                                                                                            |
+| `app-health`   | „Zdrowie systemu": Diagnosta, Ulepszacz, evale (`HealthApp`, `HealthChanged`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `app-updates`  | aktualizacje i „O programie” (`UpdatesApp`, `updates_*`, `UpdateStatus`, `mark_good`, restart przez launcher)                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `app-models`   | menedżer modeli i silników (`ModelsApp`: katalog, pobieranie z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP; komendy `models_*`), embedder wyszukiwania (`startup_embedder` przy budowie `search`, `embed_model_activate`, przebudowa wektorów `search_reindex_*`, `ReindexStatus`)                                                                                                                                                                                                                                                               |
+| `app-store`    | tabele aplikacji w bazach sesji (`AppStore`: fakty tur, oś czasu, katalog roboczy, przebiegi agentek)                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `app-voice`    | tryb głosowy: `PipelineVoice` (port głosu z pętlą `voice-pipeline`), `ChatReply` (`ReplySource` na czacie sesji), pigułka, `SystemVoice` (produkcyjna fabryka potoku z modeli i sidecarów)                                                                                                                                                                                                                                                                                                                                                             |
+| `app-chat`     | silnik tury czatu (`ChatEngine`): generacja (strumień, przebieg agentki, delegacja do mostu — `generate.rs`, `stream.rs`, `agent.rs`, `delegate.rs`), zapis tury i koszt (`finish.rs`), historia gałęzi (`history.rs`), projekcja tur do DTO (`project.rs`), aktywne generacje i przebiegi per sesja (`engine.rs`), cofanie kroków schowka/zmiennych tej sesji (`undo.rs`), skażenie sesji z katalogu (`meta.tainted`) → Broker przed każdą turą i przy otwarciu sesji (`taint.rs`, fail-closed); rdzeń przez `ChatHost` (`app-core/src/chat_host.rs`) |
+| `app-core`     | kompozycja (`AppOptions` → `parts`), komendy, `ChatHost` i `TaskHost` rdzenia (`chat_host.rs`, `host.rs`), STOP WSZYSTKIEGO (`commands/system.rs`); reeksportuje moduły `app-api` pod starymi ścieżkami (`app_core::dto`, `app_core::ports`, …)                                                                                                                                                                                                                                                                                                        |
 
 ## Kompozycja (`AppCore::build(AppPaths, AppOptions)`) — jedno miejsce: `parts/`
+
 1. Jądro (`parts/kernel.rs`): magistrala (`core-bus-impl`), rejestr (`core-registry-impl`), sekrety
    (`SecretStore`: Windows Credential Manager; poza Windows — pamięć procesu), profil urządzenia →
    `MachineId`, konfiguracja (`core-config-impl`, JSON Schema stron ustawień z
@@ -70,6 +71,7 @@ Kategoria `app-*` (crates/README.md, `scripts/check-deps.sh`): jedyne crate'y, k
    trzymane przez cały czas życia rdzenia. Błędy HTTP dostawcy tury (bez Routera) → `diagnostics.symptom`.
 
 ## Agentki z narzędziami (`app-chat/src/agent.rs`, `app-store`, `commands/workdir.rs`)
+
 Wiadomość do agentki idzie przez `agent-runtime`, gdy sesja ma katalog roboczy (`sessions_choose_workdir`:
 dialog powłoki / katalog sesji / brak; katalogi danych Alfy, deny-lista i segmenty poświadczeń
 odrzucane) i role agentki dają narzędzia; inaczej zwykły czat. Budżety z Ustawień → Agentki
@@ -82,6 +84,7 @@ odrzucane) i role agentki dają narzędzia; inaczej zwykły czat. Budżety z Ust
 z przebiegu tej sesji). Stop/Esc i kill-switch anulują przebieg i polecenia.
 
 ## Pamięć, zadania, mosty CLI (`parts/memory.rs`, `parts/tasks.rs`, `host.rs`, `app-chat/src/delegate.rs`)
+
 - Pamięć: `turns_remember` → zakres sesji/projektu/agentki/globalny (z sesji prywatnej — tylko sesja);
   kontekst czatu = zestaw roboczy agentki (dostęp z ról obsady i projektu sesji); narzędzia
   `memory_recall`/`memory_remember` w zestawie agentek; `memory_*` — Inspektor; usunięcie sesji:
@@ -104,6 +107,7 @@ z przebiegu tej sesji). Stop/Esc i kill-switch anulują przebieg i polecenia.
   `AppOptions::bridges` (fabryka nad kanałem zatwierdzeń) i `AppOptions::cli_probe` — testy.
 
 ## Tryb głosowy (`voice_chat.rs`, `app-voice`)
+
 `voice_set_mic_enabled/ptt/set_muted/stop_speech/status/preview`; wypowiedź → tura użytkownika w
 aktywnej sesji (albo nowej sesji „Asystent głosowy"), odpowiedź strumieniuje się do UI i do TTS;
 barge-in → `record_heard_prefix` (tura agentki ma `heard_prefix`, kolejne żądanie widzi, co
@@ -111,6 +115,7 @@ użytkownik usłyszał). Pigułka (`VoicePill`: kto mówi, poziom, transkrypt cz
 `VoiceStatusChanged`; „stop wszystko" głosem = kill-switch, „anuluj" = Stop aktywnej sesji.
 
 ## Router (`route/`)
+
 Trzy rdzenie `router-impl`: **hybryda** (API + lokalne), **chmura** (tylko API) i **lokalny** (tylko
 lokalne — profil `Local` albo sesja z tagiem `LocalOnly`). Kandydaci = konta z `accounts-hub`
 (`providers-api-impl`, przypisane agentce najpierw) + modele lokalne (`providers-local-impl`);
@@ -123,24 +128,26 @@ ma żadnego kandydata; w profilu lokalnym bez modelu — `NO_LOCAL`. Pobieranie 
 `models_local_list/download/cancel` + zdarzenie `LocalModelProgress`.
 
 ## Porty (`app-api::ports`) — podmiana w `AppOptions`
+
 Kolejność: nadpisanie z `AppOptions` → adapter na module → „moduł niepodłączony" (błąd z nazwą modułu).
 
-| Port | Adapter | Bez modułu / czego brakuje |
-|---|---|---|
-| `BrainPort` | `RouterBrain` (Router + konta hubu + dostawcy lokalni; `AppOptions::providers` dokłada dostawców testowych) | `RouterUnavailable` |
-| `TransferPort` | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; plik importu tylko jednorazowym uchwytem — `app_modules::handles`: z dialogu/podglądu 10 min, z listy kopii `backups_restore` 15 s; sekretów nie eksportuje nigdy — CX-a; sesji prywatnej nie eksportuje) | `TransferUnavailable` |
-| `VoicePort` | `PipelineVoice` (`app-voice`): rozmowa, PTT, wyciszenie, pigułka — `voice-pipeline`; lista wejść, test mikrofonu (`MicLevel` ≤ 30/s) i czytanie na głos — `VoiceAdapter` (`voice-audio`, `voice-tts`; bez silnika — `NO_TTS`) | bez modeli/sidecarów: `VoiceStatus::Unavailable` z listą braków |
-| `BrokerPort` | `InprocBroker` (poziomy autonomii, `request_level`, `run_code`, `undo_step`, `kill_all`) | podniesienie poziomu wymaga `ApprovalWindow`; bez Broker-UI — `NEEDS_BROKER_WINDOW` (odmowa); dozwolone `run_code` — brak wykonawcy `tools-shell` |
-| `ShellPort` | powłoka Tauri (dialogi `tauri-plugin-dialog` w tym wybór katalogu, terminal w katalogu bez wykonania, okna, zasobnik) | `HeadlessShell` (testy; kolejka odpowiedzi dialogów) |
-| GUI (`AppOptions::gui`) | `GuiPorts::system` — `WinGui` ze strażnikiem okien Alfy (WebView2, Broker-UI, watchdog, `%LOCALAPPDATA%\Alfa`) | poza Windows: panel „Ekran" z powodem niedostępności |
-| `PseudoConsolePort` (`AppOptions::pty`) | ConPTY (`platform-windows-pty-impl`) | terminal: „niedostępny na tej platformie" |
-| `SystemSignalsPort` / `DirWatchPort` (`AppOptions::signals`, `dir_watch`) | `WinSignals` / `WinDirWatch` (`platform-windows-sys-impl`) | „nigdy bezczynny", wyzwalacze plikowe tylko przez `file_created` |
+| Port                                                                      | Adapter                                                                                                                                                                                                                                                                              | Bez modułu / czego brakuje                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BrainPort`                                                               | `RouterBrain` (Router + konta hubu + dostawcy lokalni; `AppOptions::providers` dokłada dostawców testowych)                                                                                                                                                                          | `RouterUnavailable`                                                                                                                                                                                                                                                                           |
+| `TransferPort`                                                            | `TransferAdapter` (`transfer-impl`; dialogi zapisu/otwarcia z `ShellPort`; plik importu tylko jednorazowym uchwytem — `app_modules::handles`: z dialogu/podglądu 10 min, z listy kopii `backups_restore` 15 s; sekretów nie eksportuje nigdy — CX-a; sesji prywatnej nie eksportuje) | `TransferUnavailable`                                                                                                                                                                                                                                                                         |
+| `VoicePort`                                                               | `PipelineVoice` (`app-voice`): rozmowa, PTT, wyciszenie, pigułka — `voice-pipeline`; lista wejść, test mikrofonu (`MicLevel` ≤ 30/s) i czytanie na głos — `VoiceAdapter` (`voice-audio`, `voice-tts`; bez silnika — `NO_TTS`)                                                        | bez modeli/sidecarów: `VoiceStatus::Unavailable` z listą braków                                                                                                                                                                                                                               |
+| `BrokerPort`                                                              | `InprocBroker` (poziomy autonomii, `request_level`, `approval_outcome`, `run_code`, `undo_step`, `kill_all`)                                                                                                                                                                         | podniesienie poziomu wymaga `ApprovalWindow`; bez Broker-UI — `NEEDS_BROKER_WINDOW` (odmowa); strażnik autonomii przyjmuje podniesienie tylko po stanie prośby „zatwierdzona” z Brokera (prośby w pamięci procesu, `app_broker::levels`); dozwolone `run_code` — brak wykonawcy `tools-shell` |
+| `ShellPort`                                                               | powłoka Tauri (dialogi `tauri-plugin-dialog` w tym wybór katalogu, terminal w katalogu bez wykonania, okna, zasobnik)                                                                                                                                                                | `HeadlessShell` (testy; kolejka odpowiedzi dialogów)                                                                                                                                                                                                                                          |
+| GUI (`AppOptions::gui`)                                                   | `GuiPorts::system` — `WinGui` ze strażnikiem okien Alfy (WebView2, Broker-UI, watchdog, `%LOCALAPPDATA%\Alfa`)                                                                                                                                                                       | poza Windows: panel „Ekran" z powodem niedostępności                                                                                                                                                                                                                                          |
+| `PseudoConsolePort` (`AppOptions::pty`)                                   | ConPTY (`platform-windows-pty-impl`)                                                                                                                                                                                                                                                 | terminal: „niedostępny na tej platformie"                                                                                                                                                                                                                                                     |
+| `SystemSignalsPort` / `DirWatchPort` (`AppOptions::signals`, `dir_watch`) | `WinSignals` / `WinDirWatch` (`platform-windows-sys-impl`)                                                                                                                                                                                                                           | „nigdy bezczynny", wyzwalacze plikowe tylko przez `file_created`                                                                                                                                                                                                                              |
 
 Kill-switch (`system_kill_all`, `Ctrl+Shift+F12`, zasobnik): anulowanie generacji i przebiegów (`ChatEngine::cancel_all`)
 i pobierań → zadania schedulera → przeglądarki agentek i odtwarzanie `media_play` (`AgentTools::kill_switch`) →
 `BrokerPort::kill_all` (audyt `broker.kill_switch`) → zatrzymanie mowy → toast.
 
 ## Czat (append-only; silnik w `app-chat`)
+
 `turns_send` → tura użytkownika → rezerwacja numeru tury agentki (numery są kolejne; wszystkie zapisy
 historii sesji idą przez blokadę sesji i czekają na zapis aktywnej generacji) → `ModelProvider::stream`
 z `CancellationToken` → `TextDelta` z blokami HTML z `lib-markdown::IncrementalRenderer` → zapis tury
@@ -152,6 +159,7 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
 `"<sesja>:u<krok>"` (`turns_undo_step` → `undo-journal` przez Brokera, wpis „Cofnięto: …" na osi czasu).
 
 ## Testy
+
 - `tests/dto_roundtrip.rs` (+ `tests/dto_spec/`) — każdy ładunek atrapy UI (162 komendy, 32 typy zdarzeń) deserializuje się
   do DTO i wraca bez strat; zbiór komend = COMMANDS.md = `app_core::COMMANDS`.
 - `tests/ipc_signatures.rs` — sygnatury z `with_commands!` istnieją w `AppCore`, przyszłości `Send + 'static`
@@ -194,8 +202,10 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
 - Progi czasu ścisłe tylko przy `ALFA_PERF_BUDGETS=1` (inaczej ×10).
 
 ## Fixture'y z atrapy UI
+
 `tests/fixtures/*.json` generuje `tests/fixtures/gen/generate.ts` (atrapa `FakeAlfaClient` na wirtualnym
 zegarze + `TauriAlfaClient` z atrapą `invoke`, żeby argumenty miały dokładnie kształt IPC):
+
 ```bash
 ES=node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/bin/esbuild
 $ES crates/app-core/tests/fixtures/gen/generate.ts --bundle --platform=node --format=esm \
@@ -203,11 +213,13 @@ $ES crates/app-core/tests/fixtures/gen/generate.ts --bundle --platform=node --fo
   --alias:@tauri-apps/api/event=./crates/app-core/tests/fixtures/gen/tauri-mock.ts --outfile="$TMPDIR/gen.mjs"
 node "$TMPDIR/gen.mjs" crates/app-core/tests/fixtures   # F5–F7: gen/generate-work.ts, F8: gen/generate-computer.ts
 ```
+
 `tests/fixtures/extra.json` — ręcznie: warianty, których atrapa nie emituje (np. `VoicePill`,
 `OpenSession`, `LocalModelProgress`, kody błędów). Regeneracja nadpisuje pozostałe pliki — dopisuj
 zmiany w `extra.json` ręcznie, bez formatowania całego pliku.
 
 ## Komendy
+
 ```bash
 CARGO_INCREMENTAL=0 cargo fmt -p app-api -p app-modules -p app-core
 CARGO_INCREMENTAL=0 cargo clippy -p app-api -p app-modules -p app-core --all-targets --all-features --no-deps -- -D warnings

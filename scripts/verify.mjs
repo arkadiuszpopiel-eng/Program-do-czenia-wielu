@@ -30,6 +30,18 @@ function e2eWorkers() {
   return String(Math.max(1, Math.min(4, Math.floor(freeGb / 1.5))));
 }
 
+// Testy w przeglądarce celują w Edge (silnik WebView2). Komputer bez Edge (stacjonarny, 2026-10-21)
+// dostaje Chromium Playwrighta zamiast zawsze czerwonego etapu — z adnotacją w raporcie.
+// `PW_CHANNEL` z otoczenia ma pierwszeństwo (pusty = Chromium).
+function e2eChannel() {
+  if (process.env.PW_CHANNEL !== undefined) return process.env.PW_CHANNEL;
+  if (process.platform !== 'win32') return 'msedge';
+  const edge = ['C:\\Program Files (x86)', 'C:\\Program Files'].map((dir) =>
+    join(dir, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+  );
+  return edge.some((path) => existsSync(path)) ? 'msedge' : '';
+}
+
 const BASH = gitBash();
 
 // Kody kolorów terminala (ESC[…m) — bez znaku sterującego w literale wyrażenia.
@@ -160,7 +172,7 @@ const STAGES = {
     [
       'przegladarka',
       'Budowa, budżet rozmiaru i testy w przeglądarce',
-      `pnpm build && node scripts/bundle-size.mjs && PW_WORKERS=${e2eWorkers()} PW_CHANNEL=msedge pnpm test:e2e`,
+      `pnpm build && node scripts/bundle-size.mjs && PW_WORKERS=${e2eWorkers()} PW_CHANNEL=${e2eChannel()} pnpm test:e2e`,
       ui,
       0,
     ],
@@ -314,7 +326,10 @@ function numbersFrom(id, output) {
     return `${rows.length} programów testowych, ${sum(1)} zielonych, ${sum(2)} czerwonych, ${sum(3)} pominiętych`;
   }
   if (id === 'interfejs') return output.match(/Tests\s+(.+)/)?.[1]?.trim() ?? '';
-  if (id === 'przegladarka') return output.match(/^\s*(\d+ passed.*)$/m)?.[1]?.trim() ?? '';
+  if (id === 'przegladarka') {
+    const passed = output.match(/^\s*(\d+ passed.*)$/m)?.[1]?.trim() ?? '';
+    return e2eChannel() ? passed : `${passed} (Chromium Playwrighta — brak Edge)`;
+  }
   if (id === 'aplikacja') {
     const passed = output.match(/^\s*(\d+ passed.*)$/m)?.[1]?.trim() ?? '';
     const coverage = output.match(/przećwiczone w prawdziwej aplikacji: (.+)/)?.[1] ?? '';

@@ -71,6 +71,17 @@ pub struct AutonomyView {
     pub session: Option<AutonomyLevel>,
 }
 
+/// Stan prośby o zmianę poziomu autonomii w Brokerze (identyfikator z `request_level`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApprovalOutcome {
+    /// Karta czeka na decyzję w oknie Brokera.
+    Pending,
+    /// Właściciel zatwierdził kartę w oknie Brokera.
+    Approved,
+    /// Odrzucona, wygasła albo nieznana temu Brokerowi (np. Broker uruchomiony od nowa).
+    Rejected,
+}
+
 /// Skąd przyszło „STOP WSZYSTKIEGO".
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KillOrigin {
@@ -99,6 +110,11 @@ pub trait BrokerPort: Send + Sync {
     ) -> Result<BrokerIntentResult, AppError>;
     /// Przeniesienie do karty zatwierdzenia w oknie Brokera.
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError>;
+    /// Stan prośby o zmianę poziomu; `None` — Broker nieosiągalny albo stan nieznany (strażnik
+    /// autonomii spróbuje później i niczego nie przyjmuje).
+    async fn approval_outcome(&self, _approval: &str) -> Option<ApprovalOutcome> {
+        None
+    }
     /// Uruchomienie bloku kodu w terminalu (zawsze decyzja Brokera).
     async fn run_code(
         &self,

@@ -1,107 +1,18 @@
 //! Zapamiętane obniżenia autonomii a Broker startujący później albo ponownie (audyt 2026-10-14,
 //! A-04): obniżenie globalne i obniżenie sesji wracają po ponownym uruchomieniu aplikacji, także
-//! gdy Broker odpowiada dopiero po chwili z poziomem domyślnym. Podniesień strażnik nie przywraca,
-//! ale podniesienia zatwierdzonego w oknie Brokera też nie cofa (zgłoszenie 2026-10-20).
+//! gdy Broker odpowiada dopiero po chwili z poziomem domyślnym. Podniesienia — `autonomy_raises.rs`.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 mod common;
 
-use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use std::sync::atomic::Ordering;
 use std::time::Duration;
 
-use app_core::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, SessionTemplate,
-};
-use app_core::ports::{AutonomyView, BrokerPort, HeadlessShell};
-use app_core::{AppCore, AppError, AppPaths, MemorySecretStore};
-use async_trait::async_trait;
-use common::options;
-use sessions_contract::SessionId;
-
-/// Broker w pamięci: poziom globalny i sesji; `ready = false` — jeszcze nie odpowiada.
-#[derive(Default)]
-struct Broker {
-    ready: AtomicBool,
-    /// Podniesienie czeka na zgodę w oknie Brokera (jak prawdziwy Broker).
-    window: AtomicBool,
-    global: Mutex<AutonomyLevel>,
-    sessions: Mutex<BTreeMap<String, AutonomyLevel>>,
-    requests: Mutex<Vec<(AutonomyLevel, Option<String>)>>,
-}
-
-#[async_trait]
-impl BrokerPort for Broker {
-    async fn levels(&self, session: Option<&SessionId>) -> Option<AutonomyView> {
-        if !self.ready.load(Ordering::SeqCst) {
-            return None;
-        }
-        Some(AutonomyView {
-            global: *self.global.lock().unwrap(),
-            session: session.and_then(|s| self.sessions.lock().unwrap().get(s.as_str()).copied()),
-        })
-    }
-    async fn request_level(
-        &self,
-        level: AutonomyLevel,
-        session: Option<&SessionId>,
-    ) -> Result<BrokerIntentResult, AppError> {
-        self.requests
-            .lock()
-            .unwrap()
-            .push((level, session.map(|s| s.as_str().to_owned())));
-        if self.window.load(Ordering::SeqCst) && level > *self.global.lock().unwrap() {
-            return Ok(BrokerIntentResult {
-                status: BrokerIntentStatus::OpenedBroker,
-                request_id: "okno".into(),
-            });
-        }
-        match session {
-            Some(s) => {
-                self.sessions
-                    .lock()
-                    .unwrap()
-                    .insert(s.as_str().to_owned(), level);
-            }
-            None => *self.global.lock().unwrap() = level,
-        }
-        Ok(BrokerIntentResult {
-            status: BrokerIntentStatus::Applied,
-            request_id: "test".into(),
-        })
-    }
-    async fn open_approval(&self, _approval: &str) -> Result<BrokerIntentResult, AppError> {
-        Err(AppError::invalid("nieużywane"))
-    }
-    async fn run_code(
-        &self,
-        _session: &SessionId,
-        _lang: Option<&str>,
-        _code: &str,
-    ) -> Result<BrokerIntentResult, AppError> {
-        Err(AppError::invalid("nieużywane"))
-    }
-    async fn undo_step(&self, _session: &SessionId, _step: u64) -> Result<String, AppError> {
-        Err(AppError::invalid("nieużywane"))
-    }
-    fn status(&self) -> BrokerStatusView {
-        BrokerStatusView::unavailable()
-    }
-}
-
-/// Ten sam magazyn sekretów w obu uruchomieniach (klucz bazy danych jak w prawdziwej aplikacji).
-async fn start(
-    dir: &std::path::Path,
-    broker: Arc<Broker>,
-    secrets: &Arc<MemorySecretStore>,
-) -> AppCore {
-    let mut opts = options(None, Arc::new(HeadlessShell::default()));
-    opts.broker = Some(broker);
-    opts.secrets = Some(secrets.clone());
-    AppCore::build(AppPaths::under(dir), opts).await.unwrap()
-}
+use app_core::MemorySecretStore;
+use app_core::dto::{AutonomyLevel, SessionTemplate};
+use common::broker::{Broker, passes, start};
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn lowered_levels_come_back_when_a_late_broker_starts_with_defaults() {
@@ -152,114 +63,7 @@ async fn lowered_levels_come_back_when_a_late_broker_starts_with_defaults() {
 
     // Kolejne sprawdzenie nic nie zmienia — Broker ma już poziomy niższe albo równe.
     late.requests.lock().unwrap().clear();
-    tokio::time::sleep(Duration::from_millis(2_500)).await;
+    passes(&late, 1).await;
     assert!(late.requests.lock().unwrap().is_empty());
-    drop(core);
-}
-
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn raise_approved_in_broker_window_is_kept() {
-    let dir = tempfile::tempdir().unwrap();
-    let secrets = Arc::new(MemorySecretStore::default());
-    let broker = Arc::new(Broker::default());
-    broker.ready.store(true, Ordering::SeqCst);
-    broker.window.store(true, Ordering::SeqCst);
-    *broker.global.lock().unwrap() = AutonomyLevel::L3;
-    let core = start(dir.path(), broker.clone(), &secrets).await;
-    // Obniżenie do L2 (zapamiętane), potem prośba o L4 — karta w oknie Brokera.
-    core.permissions_request_level(AutonomyLevel::L2, None)
-        .await
-        .unwrap();
-    let asked = core
-        .permissions_request_level(AutonomyLevel::L4, None)
-        .await
-        .unwrap();
-    assert_eq!(asked.status, BrokerIntentStatus::OpenedBroker);
-    // Właściciel zatwierdza w oknie: Broker ma L4.
-    *broker.global.lock().unwrap() = AutonomyLevel::L4;
-    drop(core);
-    broker.requests.lock().unwrap().clear();
-
-    // Strażnik (start aplikacji) przyjmuje L4 zamiast cofać do zapamiętanego L2.
-    let core = start(dir.path(), broker.clone(), &secrets).await;
-    tokio::time::sleep(Duration::from_millis(500)).await;
-    assert!(
-        broker.requests.lock().unwrap().is_empty(),
-        "{:?}",
-        broker.requests.lock().unwrap()
-    );
-    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L4);
-    drop(core);
-
-    // Restart Brokera z poziomem domyślnym (L3) po przyjęciu L4 — L4 jest teraz zapamiętane,
-    // więc strażnik niczego nie obniża; obniżenia nadal działają.
-    *broker.global.lock().unwrap() = AutonomyLevel::L3;
-    let core = start(dir.path(), broker.clone(), &secrets).await;
-    tokio::time::sleep(Duration::from_millis(500)).await;
-    assert!(broker.requests.lock().unwrap().is_empty());
-    core.permissions_request_level(AutonomyLevel::L1, None)
-        .await
-        .unwrap();
-    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L1);
-    drop(core);
-}
-
-/// Zgłoszenie 2026-10-21: nowy profil (nic wcześniej nie obniżono), L4 zatwierdzone w oknie
-/// Brokera — strażnik ma je odnotować i ogłosić (wcześniej przechodziło bez śladu i strona
-/// Uprawnień pokazywała stary poziom). Tak samo podniesienie jednej sesji.
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn raise_approved_without_earlier_lowering_is_adopted_and_announced() {
-    let dir = tempfile::tempdir().unwrap();
-    let secrets = Arc::new(MemorySecretStore::default());
-    let broker = Arc::new(Broker::default());
-    broker.ready.store(true, Ordering::SeqCst);
-    broker.window.store(true, Ordering::SeqCst);
-    *broker.global.lock().unwrap() = AutonomyLevel::L3;
-    let core = start(dir.path(), broker.clone(), &secrets).await;
-    let session = core
-        .sessions_create(SessionTemplate::Empty)
-        .await
-        .unwrap()
-        .id;
-    for scope in [None, Some(session.clone())] {
-        let asked = core
-            .permissions_request_level(AutonomyLevel::L4, scope)
-            .await
-            .unwrap();
-        assert_eq!(asked.status, BrokerIntentStatus::OpenedBroker);
-    }
-    // Właściciel zatwierdza obie karty: Broker ma L4 globalnie i dla sesji.
-    *broker.global.lock().unwrap() = AutonomyLevel::L4;
-    broker
-        .sessions
-        .lock()
-        .unwrap()
-        .insert(session.clone(), AutonomyLevel::L4);
-    drop(core);
-    broker.requests.lock().unwrap().clear();
-
-    let core = start(dir.path(), broker.clone(), &secrets).await;
-    let mut announced = 0;
-    let mut waited = Duration::ZERO;
-    while announced < 2 && waited < Duration::from_secs(10) {
-        tokio::time::sleep(Duration::from_millis(100)).await;
-        waited += Duration::from_millis(100);
-        announced = core
-            .events_resume(0, None)
-            .await
-            .unwrap()
-            .frames
-            .iter()
-            .flat_map(|f| f.events.iter())
-            .filter(|e| matches!(e, app_core::dto::AlfaEvent::SessionUpdated { .. }))
-            .count();
-    }
-    assert!(
-        announced >= 2,
-        "ogłoszenia po przyjęciu podniesień: {announced}"
-    );
-    // Nic nie cofnięto — Broker zostaje na zatwierdzonym L4.
-    assert!(broker.requests.lock().unwrap().is_empty());
-    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L4);
     drop(core);
 }

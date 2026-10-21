@@ -1,11 +1,11 @@
 ---
 name: maszyna-stacjonarna-2026-10-17
-description: "Od 2026-10-17 projekt Alfa działa na stacjonarnym PC (Ryzen 5700X3D, RX 9070 XT), nie na laptopie — skutki dla git, node_modules, głosu"
+description: "Projekt Alfa działa na zmianę na dwóch komputerach (dysk E: przenoszony): stacjonarny PC (Ryzen 5700X3D, RX 9070 XT, 32 GB) od 17.10 i laptop (i7-13620H, RTX 4050 + Intel UHD, 16 GB) znów od 18.10 — różnice i skutki"
 metadata:
   node_type: memory
   type: project
   originSessionId: 8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8
-  modified: 2026-10-17T22:02:25.660Z
+  modified: 2026-10-21T14:40:00.000Z
 ---
 
 Od 2026-10-17 dysk E: (ADATA SX8200 na USB) z projektem jest podpięty do stacjonarnego PC DESKTOP-S02O9OH
@@ -26,5 +26,22 @@ node_modules zainstalowane z lockfile (właściciel zgodził się na pobranie br
 Pamięć asystenta na tym PC była pusta — zasady pracy z laptopa (alfa-*.md) przywrócone 2026-10-18 z kopii
 w repozytorium (`alfa/docs/pamiec-projektu/2-zasady-pracy`), bo `memory-sync.sh` jest lustrem i skasowałby je z repo.
 
-**Why:** cała dotychczasowa pamięć i raporty (status.md, raport 27) zakładają laptopa z NVIDIA.
-**How to apply:** przed testami sprzętowymi / `verify sprzet` ustal z właścicielem, czy ta maszyna jest docelowa; nie porównuj czasów z laptopem.
+2026-10-18 po południu dysk E: wrócił do laptopa DESKTOP-BHEJQ2D (i7-13620H, 16 GB, RTX 4050 6 GB + Intel UHD
+Graphics). Na laptopie: git działa bez `safe.directory`, są `jq`, `gh`, Edge i `%LOCALAPPDATA%\Alfa` (modele, silniki
+CUDA), cargo z `-j 3` (16 GB RAM). Dysk F: na laptopie to teraz INNY dysk („Dane”, 1,9 TB, zapełniony plikami
+testu pojemności CAPACITYTESTER) — kopie `F:\Alfa\kopia-…` z PC stacjonarnego są na tamtejszym F: („Kopie Plików”)
+i stąd nieosiągalne; `scripts/backup.sh` z domyślnym celem `/f/Alfa` NIE uruchamiać, dopóki właściciel nie wskaże
+dysku na kopie. Laptop z iGPU + NVIDIA to dokładnie przypadek C6.6 niesprawdzony na PC (raport 28).
+
+2026-10-19 dysk E: znów na PC stacjonarnym (przekazanie: `PRZEKAZANIE-NA-PC-2026-10-19.md`). Na PC: git tylko
+z `safe.directory` (także skrypty node — `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0=*`),
+brak Edge (testy w przeglądarce bez `PW_CHANNEL`, na Chromium Playwrighta), brak pobranego ONNX Runtime w
+`%LOCALAPPDATA%\Alfa` (verify-app bierze bibliotekę z przypiętą sumą z kopii właściciela), F: = „Kopie Plików” z
+`F:\Alfa\kopia-…`. 2026-10-21 `memory-sync.sh` nadpisał w repozytorium ten plik i zasadę -j6/-j3 starszymi
+wersjami z pamięci asystenta na PC — przywrócone; skrypt od 21.10 wstrzymuje taką kopię (kod 3).
+
+**Why:** pamięć i raporty były pisane raz na laptopie, raz na PC — reguły jednej maszyny (np. `-j 6`, brak `jq`,
+WSL jako `bash`) na drugiej są błędne albo groźne (16 GB RAM).
+**How to apply:** na początku sesji sprawdź maszynę (procesor, karty: `Get-CimInstance Win32_Processor,
+Win32_VideoController`) i stosuj jej reguły; przed `verify sprzet` ustal z właścicielem, czy ta maszyna jest
+docelowa; nie porównuj czasów między maszynami.

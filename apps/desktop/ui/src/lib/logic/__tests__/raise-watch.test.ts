@@ -43,4 +43,23 @@ describe('czekanie na podniesienie zatwierdzone w oknie Brokera', () => {
     await vi.advanceTimersByTimeAsync(1_000);
     expect(later.mock.calls.length).toBe(calls);
   });
+
+  it('odczyt w locie po przerwaniu niczego nie zgłasza (nowa prośba, opuszczenie strony)', async () => {
+    let answer: (level: AutonomyLevel | null) => void = () => undefined;
+    const read = vi.fn(
+      () =>
+        new Promise<AutonomyLevel | null>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    const onApplied = vi.fn();
+    const stop = watchRaise({ level: 'L4', read, onApplied, everyMs: 100 });
+    await vi.advanceTimersByTimeAsync(100);
+    expect(read).toHaveBeenCalledTimes(1);
+    stop();
+    answer('L4');
+    await vi.advanceTimersByTimeAsync(500);
+    expect(onApplied).not.toHaveBeenCalled();
+    expect(read).toHaveBeenCalledTimes(1);
+  });
 });

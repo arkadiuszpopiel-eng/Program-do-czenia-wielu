@@ -177,6 +177,7 @@ export const plSettings = {
   'perm.request': 'Zmień na {level}',
   'perm.applied': 'Poziom zmieniony na {level} — obniżenie nie wymaga potwierdzenia.',
   'perm.requested': 'Otworzono okno Brokera — potwierdź tam zmianę na {level}.',
+  'perm.raised': 'Poziom zmieniony na {level} — zatwierdzony w oknie Brokera.',
   'perm.scope': 'Zakres zmiany',
   'perm.scope.global': 'Globalnie',
   'perm.scope.session': 'Tylko ta sesja',

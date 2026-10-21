@@ -43,15 +43,24 @@
   );
 
   // Prośba czekająca na zgodę w oknie Brokera (`logic/raise-watch`): po zatwierdzeniu strona sama
-  // pokazuje nowy poziom; czekanie kończy się przy opuszczeniu strony albo nowej prośbie.
+  // pokazuje nowy poziom; czekanie kończy się przy opuszczeniu strony albo nowej prośbie o
+  // podniesienie. Obniżenie go nie kończy — karta poprzedniej prośby nadal żyje w oknie Brokera.
   let stopWatch: (() => void) | null = null;
-  $effect(() => () => stopWatch?.());
+  let asked = 0;
+  let left = false;
+  $effect(() => () => {
+    left = true;
+    stopWatch?.();
+  });
 
   async function request() {
     const level = wanted as AutonomyLevel;
     const sessionId = scope === 'session' ? app.activeId : null;
+    const mine = ++asked;
     try {
       const result = await app.client.permissions.requestLevel(level, sessionId);
+      // Nowsza prośba albo opuszczenie strony w trakcie — ta odpowiedź niczego już nie zmienia.
+      if (mine !== asked || left) return;
       if (result.status === 'applied') {
         perms = await app.client.permissions.get(app.activeId);
         app.toasts.show({ kind: 'success', message: t('perm.applied', { level }) });
@@ -60,15 +69,18 @@
         stopWatch?.();
         stopWatch = watchRaise({
           level,
+          // Poziom zakresu z prośby, nie aktywnej sesji (można ją zmienić w trakcie czekania);
+          // Broker nie podaje poziomu sesji równego globalnemu — wtedy obowiązuje globalny.
           read: async () => {
-            const next = await app.client.permissions.get(app.activeId);
-            perms = next;
-            return sessionId ? next.session : next.global;
+            const asked = sessionId ?? app.activeId;
+            const next = await app.client.permissions.get(asked);
+            if (asked === app.activeId) perms = next;
+            return sessionId ? (next.session ?? next.global) : next.global;
           },
           onApplied: () => {
             stopWatch = null;
-            wanted = level;
-            app.toasts.show({ kind: 'success', message: t('perm.applied', { level }) });
+            if (sessionId === null || sessionId === app.activeId) wanted = level;
+            app.toasts.show({ kind: 'success', message: t('perm.raised', { level }) });
           },
         });
       }

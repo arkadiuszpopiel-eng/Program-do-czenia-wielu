@@ -281,3 +281,63 @@ async fn app_kill_switch_kills_tool_trees_silences_audio_and_revokes_tokens() {
         "{refused:?}"
     );
 }
+
+/// Strażnik autonomii przyjmuje podniesienie tylko po zgodzie potwierdzonej przez Brokera dla tej
+/// prośby (przegląd 2026-10-21): przez IPC, z podmiotem, z którym Broker zapisuje prośby z
+/// interfejsu — „czeka”, potem „zatwierdzona” albo „odrzucona”; nieznana prośba — „odrzucona”.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn autonomy_approval_outcome_follows_the_owner_in_broker_ui() {
+    use app_api::ports::ApprovalOutcome;
+    use app_broker::levels::approval_outcome;
+    use safety_broker_contract::{AutonomyChangeRequest, AutonomyTarget, ChangeOrigin};
+
+    for (script, want) in [
+        (Script::Allow, ApprovalOutcome::Approved),
+        (Script::Deny, ApprovalOutcome::Rejected),
+    ] {
+        let r = rig(Script::Ignore);
+        let broker = r.kernel.broker.clone();
+        let change = |level| AutonomyChangeRequest {
+            target: AutonomyTarget::Global,
+            level,
+            until_ms: None,
+            origin: ChangeOrigin::UserInterface,
+        };
+        // Obniżenie od razu, podniesienie — prośba do Broker-UI.
+        assert!(
+            broker
+                .request_autonomy_change(change(AutonomyLevel::L1))
+                .await
+                .unwrap()
+                .is_none()
+        );
+        let id = broker
+            .request_autonomy_change(change(AutonomyLevel::L2))
+            .await
+            .unwrap()
+            .unwrap()
+            .0
+            .to_string();
+        assert_eq!(
+            approval_outcome(&*broker, &id),
+            Some(ApprovalOutcome::Pending)
+        );
+        r.ui.set_script(script);
+        common::wait_until("decyzja właściciela w Broker-UI", || {
+            approval_outcome(&*broker, &id) != Some(ApprovalOutcome::Pending)
+        });
+        assert_eq!(approval_outcome(&*broker, &id), Some(want));
+        assert_eq!(
+            approval_outcome(&*broker, "999"),
+            Some(ApprovalOutcome::Rejected)
+        );
+        assert_eq!(
+            approval_outcome(&*broker, "nie-liczba"),
+            Some(ApprovalOutcome::Rejected)
+        );
+        // Bez Brokera stan jest nieznany — strażnik niczego nie przyjmuje ani nie usuwa.
+        r.breaker.break_all();
+        r.link.disconnect("test");
+        assert_eq!(approval_outcome(&*broker, &id), None);
+    }
+}

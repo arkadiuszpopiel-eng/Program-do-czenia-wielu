@@ -1,14 +1,15 @@
-//! Zapis poziomów autonomii po stronie aplikacji (konfiguracja rdzenia, nie Broker): obniżenia
-//! sesji (`identyfikator-sesji:poziom`) i podniesienia czekające na zgodę w oknie Brokera
-//! (`zakres:poziom:chwila`, `*` — globalny). Konfiguracja nie przyjmuje obiektów jako wartości —
-//! stąd listy napisów. Wydzielone z `app-core` (strażnik autonomii; limit 8000 linii crate'a).
+//! Poziomy autonomii po stronie aplikacji (strażnik autonomii w `app-core`; wydzielone stąd ze
+//! względu na limit 8000 linii crate'a): zapis obniżeń sesji w konfiguracji
+//! (`identyfikator-sesji:poziom` — konfiguracja nie przyjmuje obiektów, stąd listy napisów),
+//! podniesienia czekające na zgodę w oknie Brokera i odczyt stanu takiej prośby z Brokera.
 
 use std::collections::BTreeMap;
+use std::sync::{Mutex, MutexGuard};
+use std::time::{Duration, Instant};
 
 use app_api::dto::AutonomyLevel;
-
-/// Podniesienia czekające na zgodę: zakres → (poziom, chwila prośby w ms).
-pub type PendingRaises = BTreeMap<String, (AutonomyLevel, i64)>;
+use app_api::ports::ApprovalOutcome;
+use safety_broker_contract::{ApprovalId, ApprovalStatus, Broker, BrokerError, Holder};
 
 fn level_text(level: AutonomyLevel) -> Option<String> {
     serde_json::to_value(level)
@@ -40,26 +41,111 @@ pub fn format_session_levels(levels: &BTreeMap<String, AutonomyLevel>) -> Vec<St
         .collect()
 }
 
-/// Oczekujące podniesienia z wpisów `zakres:poziom:chwila`, bez starszych niż `ttl_ms` od `now_ms`.
-pub fn parse_raises(entries: Vec<String>, now_ms: i64, ttl_ms: i64) -> PendingRaises {
-    entries
-        .into_iter()
-        .filter_map(|entry| {
-            let mut parts = entry.rsplitn(3, ':');
-            let at: i64 = parts.next()?.parse().ok()?;
-            let level = level_of(parts.next()?)?;
-            let scope = parts.next()?;
-            (now_ms.saturating_sub(at) <= ttl_ms).then(|| (scope.to_owned(), (level, at)))
-        })
-        .collect()
+/// Jak długo prośba o podniesienie czeka na stan z Brokera (karta Brokera wygasa po 10 min).
+pub const RAISE_TTL: Duration = Duration::from_secs(15 * 60);
+
+/// Podniesienie czekające na zgodę w oknie Brokera.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PendingRaise {
+    /// Sesja; `None` — poziom globalny.
+    pub session: Option<String>,
+    /// Poziom, o który poproszono.
+    pub level: AutonomyLevel,
+    /// Identyfikator prośby w Brokerze (`request_id` z `request_level`).
+    pub approval: String,
+    at: Instant,
 }
 
-/// Wpisy `zakres:poziom:chwila`.
-pub fn format_raises(raises: &PendingRaises) -> Vec<String> {
-    raises
-        .iter()
-        .filter_map(|(scope, (level, at))| Some(format!("{scope}:{}:{at}", level_text(*level)?)))
-        .collect()
+/// Podniesienia czekające na zgodę — tylko w pamięci procesu aplikacji, nie w konfiguracji, a do
+/// przyjęcia potrzebna jest zgoda potwierdzona przez Brokera (przegląd 2026-10-21: sama zgodność
+/// poziomu nie odróżniała zgody od nowego Brokera z poziomem domyślnym L3 — prośba odrzucona albo
+/// bez decyzji i ponowne uruchomienie w ciągu 15 min nadpisywały obniżenie właściciela).
+#[derive(Debug, Default)]
+pub struct PendingRaises {
+    items: Mutex<Vec<PendingRaise>>,
+    /// Budzi strażnika przy nowej prośbie (śpi do 15 s, gdy nic nie czeka).
+    wake: tokio::sync::Notify,
+}
+
+impl PendingRaises {
+    fn lock(&self) -> MutexGuard<'_, Vec<PendingRaise>> {
+        self.items.lock().unwrap_or_else(|p| p.into_inner())
+    }
+
+    /// Czeka na nową prośbę (prośba dodana, gdy nikt nie czekał, budzi od razu następne czekanie).
+    pub async fn added(&self) {
+        self.wake.notified().await;
+    }
+
+    /// Nowa prośba. Ten sam identyfikator zastępuje starszy wpis: Broker uruchomiony od nowa
+    /// numeruje prośby od początku, więc stary wpis dotyczyłby cudzej prośby.
+    pub fn add(&self, session: Option<&str>, level: AutonomyLevel, approval: &str) {
+        self.add_at(session, level, approval, Instant::now());
+    }
+
+    fn add_at(&self, session: Option<&str>, level: AutonomyLevel, approval: &str, now: Instant) {
+        let mut items = self.lock();
+        items.retain(|r| r.approval != approval && now.duration_since(r.at) < RAISE_TTL);
+        items.push(PendingRaise {
+            session: session.map(str::to_owned),
+            level,
+            approval: approval.to_owned(),
+            at: now,
+        });
+        drop(items);
+        self.wake.notify_one();
+    }
+
+    /// Wpisy ważne teraz (przeterminowane są usuwane).
+    pub fn current(&self) -> Vec<PendingRaise> {
+        self.current_at(Instant::now())
+    }
+
+    fn current_at(&self, now: Instant) -> Vec<PendingRaise> {
+        let mut items = self.lock();
+        items.retain(|r| now.duration_since(r.at) < RAISE_TTL);
+        items.clone()
+    }
+
+    /// Usuwa prośbę (rozstrzygniętą w Brokerze).
+    pub fn remove(&self, approval: &str) {
+        self.lock().retain(|r| r.approval != approval);
+    }
+
+    /// Czy coś czeka (strażnik sprawdza wtedy częściej).
+    pub fn is_empty(&self) -> bool {
+        self.lock().is_empty()
+    }
+}
+
+/// Podmiot prośby o zmianę poziomu: Broker zapisuje prośby z interfejsu jako prośby Jądra
+/// (`system_holder` w `safety-broker-impl/src/apply.rs`), a stan pokazuje tylko proszącemu.
+fn owner() -> Holder {
+    Holder {
+        session: core_bus_contract::SessionId::new("kernel"),
+        agent: None,
+        role: Some("owner".into()),
+    }
+}
+
+/// Stan prośby o zmianę poziomu w Brokerze. Nieznana prośba (np. Broker uruchomiony od nowa)
+/// i prośba innego podmiotu — `Rejected`; Broker nieosiągalny — `None` (bez decyzji).
+pub fn approval_outcome(broker: &dyn Broker, approval: &str) -> Option<ApprovalOutcome> {
+    let Ok(id) = approval.parse::<u64>() else {
+        return Some(ApprovalOutcome::Rejected);
+    };
+    match broker.approval_status(ApprovalId(id), &owner()) {
+        Ok(ApprovalStatus::Pending) => Some(ApprovalOutcome::Pending),
+        Ok(ApprovalStatus::Approved { .. }) => Some(ApprovalOutcome::Approved),
+        Ok(ApprovalStatus::Denied | ApprovalStatus::Expired)
+        | Err(BrokerError::UnknownApproval(_) | BrokerError::Unauthorized(_)) => {
+            Some(ApprovalOutcome::Rejected)
+        }
+        Err(e) => {
+            tracing::debug!(error = %e, "stan prośby o zmianę poziomu nieznany");
+            None
+        }
+    }
 }
 
 #[cfg(test)]
@@ -67,7 +153,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn entries_round_trip_and_bad_or_stale_ones_are_skipped() {
+    fn session_entries_round_trip_and_bad_ones_are_skipped() {
         let sessions: BTreeMap<String, AutonomyLevel> = [
             ("s-1".to_owned(), AutonomyLevel::L0),
             ("a:b".to_owned(), AutonomyLevel::L2),
@@ -77,13 +163,29 @@ mod tests {
         assert_eq!(text, vec!["a:b:L2".to_owned(), "s-1:L0".to_owned()]);
         assert_eq!(parse_session_levels(text), sessions);
         assert!(parse_session_levels(vec!["bez-poziomu".into(), "s:L9".into()]).is_empty());
+    }
 
-        let raises: PendingRaises = [("*".to_owned(), (AutonomyLevel::L4, 1_000))].into();
-        let text = format_raises(&raises);
-        assert_eq!(text, vec!["*:L4:1000".to_owned()]);
-        assert_eq!(parse_raises(text.clone(), 2_000, 5_000), raises);
-        // Przeterminowane (karta Brokera wygasła) i nieczytelne — pomijane.
-        assert!(parse_raises(text, 10_000, 5_000).is_empty());
-        assert!(parse_raises(vec!["*:L4".into(), "*:X:1".into()], 0, 5_000).is_empty());
+    #[test]
+    fn pending_raises_expire_and_a_reused_id_replaces_the_old_entry() {
+        let raises = PendingRaises::default();
+        let t0 = Instant::now();
+        raises.add_at(None, AutonomyLevel::L4, "1", t0);
+        raises.add_at(Some("s"), AutonomyLevel::L3, "2", t0);
+        // Druga prośba o ten sam zakres nie usuwa pierwszej (dwie karty w oknie Brokera).
+        raises.add_at(None, AutonomyLevel::L2, "3", t0);
+        assert_eq!(raises.current_at(t0).len(), 3);
+        // Ten sam identyfikator od nowego Brokera — stary wpis znika.
+        raises.add_at(Some("x"), AutonomyLevel::L1, "1", t0);
+        let now = raises.current_at(t0);
+        assert_eq!(now.len(), 3);
+        assert!(
+            now.iter()
+                .any(|r| r.approval == "1" && r.session.as_deref() == Some("x"))
+        );
+        raises.remove("2");
+        assert_eq!(raises.current_at(t0).len(), 2);
+        assert!(!raises.is_empty());
+        assert!(raises.current_at(t0 + RAISE_TTL).is_empty());
+        assert!(raises.is_empty());
     }
 }

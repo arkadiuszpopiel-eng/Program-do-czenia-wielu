@@ -30,6 +30,9 @@ if [ "${1:-}" != "--no-build" ]; then
   ORT_SUM="$(grep -A3 'member: format!("{folder}/lib/{ORT_FILE}")' crates/app-models/src/voice_runtime.rs |
     grep -o '[0-9a-f]\{64\}' | head -1)"
   ORT="${ALFA_ORT_DLL:-}"
+  if [ -n "$ORT" ] && [ -f "$ORT" ] && [ "$(sha256sum "$ORT" | cut -d' ' -f1)" != "$ORT_SUM" ]; then
+    echo "uwaga: ALFA_ORT_DLL ma inną sumę niż przypięta w katalogu modeli ($ORT)"
+  fi
   if [ -z "$ORT" ]; then
     for c in "$LOCALAPPDATA/Alfa/sidecars/onnxruntime/onnxruntime.dll" \
       "$ROOT/../Alfa-uruchomiona/sidecars/supertonic/onnxruntime.dll"; do
@@ -42,7 +45,9 @@ if [ "${1:-}" != "--no-build" ]; then
   if [ -n "$ORT" ] && ALFA_ORT_DLL="$ORT" bash scripts/stage-sidecars.sh >"$OUT/stage.log" 2>&1; then
     echo "sidecary: $(tail -1 "$OUT/stage.log") (ONNX Runtime: $ORT)"
   else
-    echo "sidecary: NIEPEŁNE (${ORT:-brak onnxruntime.dll z przypiętą sumą}) — wgranie (deploy-owner.sh) odmówi; $OUT/stage.log"
+    # Bez kompletu z tej budowy nie zostawiamy starego: wgranie ma odmówić, a nie wgrać stare procesy.
+    rm -rf "$ROOT/target/shell/debug/sidecars"
+    echo "sidecary: NIEPEŁNE (${ORT:-brak onnxruntime.dll z przypiętą sumą}) — usunięte, wgranie (deploy-owner.sh) odmówi; $OUT/stage.log"
   fi
 fi
 PROFILE="$OUT/profil-$(date +%H%M%S)"

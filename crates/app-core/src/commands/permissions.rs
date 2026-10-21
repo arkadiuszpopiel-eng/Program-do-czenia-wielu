@@ -7,11 +7,12 @@ use crate::dto::{
 };
 use std::collections::BTreeMap;
 
-use app_broker::levels::{self, PendingRaises};
+use app_broker::levels;
 use sessions_contract::SessionId;
 
 use crate::error::AppError;
 use crate::ids;
+use crate::ports::ApprovalOutcome;
 use crate::settings::keys;
 
 impl AppCore {
@@ -53,14 +54,9 @@ impl AppCore {
             .await?;
         if result.status == BrokerIntentStatus::OpenedBroker {
             // Podniesienie czeka na zgodę w oknie Brokera: strażnik przyjmie ten poziom, gdy
-            // Broker go zgłosi (w ciągu `RAISE_TTL_MS`), zamiast cofać do zapamiętanego obniżenia.
-            let mut raises = self.pending_raises().await;
-            let scope = session.as_ref().map_or(GLOBAL_SCOPE, SessionId::as_str);
-            raises.insert(
-                scope.to_owned(),
-                (level, chrono::Utc::now().timestamp_millis()),
-            );
-            self.store_pending_raises(&raises).await?;
+            // Broker potwierdzi zgodę na tę prośbę, zamiast cofać do zapamiętanego obniżenia.
+            let scope = session.as_ref().map(SessionId::as_str);
+            self.inner.raises.add(scope, level, &result.request_id);
         }
         if result.status == BrokerIntentStatus::Applied {
             match &session {
@@ -127,31 +123,30 @@ impl AppCore {
     /// Nakłada zapamiętane obniżenia na Brokera, gdy ma on poziom wyższy (np. po jego restarcie
     /// albo opóźnionym starcie — audyt 2026-10-14, A-04). `false` — Broker nieosiągalny, stan
     /// nieznany (próba zostanie powtórzona). Podniesień nie przywraca: te wymagają zgody w oknie
-    /// Brokera.
+    /// Brokera — zatwierdzone tam najpierw przyjmuje jako nowe zapamiętane poziomy.
     pub(crate) async fn enforce_autonomy(&self) -> bool {
         let Some(view) = self.inner.broker.levels(None).await else {
             return false;
         };
-        let (global, sessions) = self.remembered_levels().await;
-        let mut raises = self.pending_raises().await;
-        // Podniesienie zatwierdzone w oknie Brokera — Broker ma już ten poziom: nowy zapamiętany
-        // poziom, nie „restart Brokera z poziomem domyślnym” (zgłoszenie 20.10: L4 po zgodzie wracało
-        // do L2). Także bez wcześniejszego obniżenia (zgłoszenie 21.10: nowy profil, zgoda przyjęta
-        // przez Brokera, a rdzeń jej nie odnotował ani nie ogłosił — strona pokazywała stary poziom).
-        if raises.get(GLOBAL_SCOPE).map(|(l, _)| *l) == Some(view.global)
-            && global.is_none_or(|level| level < view.global)
-        {
-            raises.remove(GLOBAL_SCOPE);
-            self.adopt_raise(None, view.global, &raises).await;
-            return true;
+        // Poziomy sesji odczytane przed sprawdzeniem zgód, jak `view.global`: zgoda udzielona
+        // w trakcie przebiegu nie jest w nim cofana — przyjmie ją następny (przegląd 2026-10-21).
+        let mut before = Vec::new();
+        for id in self.remembered_levels().await.1.into_keys() {
+            let Ok(session) = ids::session(&id) else {
+                continue;
+            };
+            if self.ensure_session(&session).is_err() {
+                continue;
+            }
+            if let Some(current) = self.session_level(&session).await {
+                before.push((id, session, current));
+            }
         }
-        let unremembered: Vec<(String, AutonomyLevel)> = raises
-            .iter()
-            .filter(|(scope, _)| *scope != GLOBAL_SCOPE && !sessions.contains_key(*scope))
-            .map(|(scope, (level, _))| (scope.clone(), *level))
-            .collect();
+        let held = self.adopt_approved_raises().await;
+        let (global, sessions) = self.remembered_levels().await;
         if let Some(level) = global
             && level < view.global
+            && !held.contains(&None)
         {
             match self.inner.broker.request_level(level, None).await {
                 Ok(_) => tracing::info!(?level, "przywrócono zapamiętany poziom autonomii"),
@@ -160,82 +155,73 @@ impl AppCore {
                 }
             }
         }
-        for (id, level) in sessions {
-            let Ok(session) = ids::session(&id) else {
-                continue;
-            };
-            if self.ensure_session(&session).is_err() {
-                continue;
-            }
-            let current = self
-                .inner
-                .broker
-                .levels(Some(&session))
-                .await
-                .map(|v| v.session.unwrap_or(v.global));
-            if let Some(c) = current
-                && level < c
-                && raises.remove(id.as_str()).map(|(l, _)| l) == Some(c)
-            {
-                self.adopt_raise(Some(&session), c, &raises).await;
-                continue;
-            }
-            if current.is_some_and(|c| level < c)
+        for (id, session, current) in before {
+            if let Some(level) = sessions.get(&id).copied()
+                && level < current
+                && !held.contains(&Some(id.clone()))
                 && let Err(e) = self.inner.broker.request_level(level, Some(&session)).await
             {
                 tracing::warn!(error = %e, sesja = %id, "przywrócenie poziomu sesji nie powiodło się");
             }
         }
-        self.adopt_session_raises(unremembered, &mut raises).await;
         true
     }
 
-    /// Zatwierdzone podniesienia sesji bez zapamiętanego obniżenia: Broker ma już ten poziom sesji.
-    async fn adopt_session_raises(
-        &self,
-        pending: Vec<(String, AutonomyLevel)>,
-        raises: &mut PendingRaises,
-    ) {
-        for (id, level) in pending {
-            let Ok(session) = ids::session(&id) else {
+    /// Poziom obowiązujący sesję w Brokerze (`None` — Broker nieosiągalny).
+    async fn session_level(&self, session: &SessionId) -> Option<AutonomyLevel> {
+        self.inner
+            .broker
+            .levels(Some(session))
+            .await
+            .map(|v| v.session.unwrap_or(v.global))
+    }
+
+    /// Podniesienia zatwierdzone w oknie Brokera stają się zapamiętanymi poziomami i są ogłaszane
+    /// (zgłoszenia 20.10 i 21.10: L4 po zgodzie wracało do L2, strona pokazywała stary poziom).
+    /// Zgodę potwierdza Broker dla tej prośby — sama zgodność poziomu nie wystarcza, bo nowy Broker
+    /// startuje z L3 (przegląd 2026-10-21). Odrzucone, wygasłe i nieznane Brokerowi — usuwane.
+    /// Zwraca zakresy zatwierdzone, ale niezapisane (błąd zapisu): tych strażnik teraz nie obniża.
+    async fn adopt_approved_raises(&self) -> Vec<Option<String>> {
+        let mut held = Vec::new();
+        for raise in self.inner.raises.current() {
+            match self.inner.broker.approval_outcome(&raise.approval).await {
+                Some(ApprovalOutcome::Approved) => {}
+                Some(ApprovalOutcome::Rejected) => {
+                    self.inner.raises.remove(&raise.approval);
+                    continue;
+                }
+                Some(ApprovalOutcome::Pending) | None => continue,
+            }
+            let session = match raise.session.as_deref().map(ids::session) {
+                None => None,
+                Some(Ok(s)) if self.ensure_session(&s).is_ok() => Some(s),
+                Some(_) => {
+                    self.inner.raises.remove(&raise.approval);
+                    continue;
+                }
+            };
+            // Poziom czytany po stanie prośby: Broker zmienia oba pod jedną blokadą.
+            let current = match &session {
+                None => self.inner.broker.levels(None).await.map(|v| v.global),
+                Some(s) => self.session_level(s).await,
+            };
+            let Some(current) = current else {
                 continue;
             };
-            if self.ensure_session(&session).is_err() {
-                continue;
-            }
-            let current = self
-                .inner
-                .broker
-                .levels(Some(&session))
-                .await
-                .and_then(|v| v.session);
-            if current == Some(level) {
-                raises.remove(id.as_str());
-                self.adopt_raise(Some(&session), level, raises).await;
+            // Zgoda na starszą prośbę, a Broker ma już inny poziom (późniejsza zmiana) — zostaje
+            // zapamiętany poziom.
+            if current != raise.level || self.adopt_raise(session.as_ref(), raise.level).await {
+                self.inner.raises.remove(&raise.approval);
+            } else {
+                held.push(raise.session.clone());
             }
         }
+        held
     }
 
-    /// Oczekujące podniesienia (zakres → poziom, chwila prośby), bez przeterminowanych.
-    async fn pending_raises(&self) -> PendingRaises {
-        let now = chrono::Utc::now().timestamp_millis();
-        levels::parse_raises(self.config_list(PENDING_RAISES).await, now, RAISE_TTL_MS)
-    }
-
-    /// Zapis oczekujących podniesień (wpisy `zakres:poziom:chwila`).
-    async fn store_pending_raises(&self, raises: &PendingRaises) -> Result<(), AppError> {
-        let entries = levels::format_raises(raises);
-        let value = serde_json::to_value(entries).map_err(AppError::internal)?;
-        self.config_set(PENDING_RAISES, Some(value), false).await
-    }
-
-    /// Zatwierdzone podniesienie staje się zapamiętanym poziomem (globalnym albo sesji).
-    async fn adopt_raise(
-        &self,
-        session: Option<&SessionId>,
-        level: AutonomyLevel,
-        rest: &PendingRaises,
-    ) {
+    /// Zatwierdzone podniesienie staje się zapamiętanym poziomem (globalnym albo sesji); `false` —
+    /// zapis się nie powiódł (prośba zostaje do następnego przebiegu).
+    async fn adopt_raise(&self, session: Option<&SessionId>, level: AutonomyLevel) -> bool {
         let saved = match session {
             None => match serde_json::to_value(level) {
                 Ok(value) => self.config_set(keys::AUTONOMY, Some(value), false).await,
@@ -243,9 +229,9 @@ impl AppCore {
             },
             Some(id) => self.remember_session_level(id, level).await,
         };
-        if let Err(e) = saved.and(self.store_pending_raises(rest).await) {
+        if let Err(e) = saved {
             tracing::warn!(error = %e, "zapis zatwierdzonego poziomu autonomii nie powiódł się");
-            return;
+            return false;
         }
         tracing::info!(
             ?level,
@@ -255,6 +241,7 @@ impl AppCore {
             Some(id) => self.announce_session(id).await,
             None => self.announce_all_sessions().await,
         }
+        true
     }
 
     /// Strażnik autonomii: zapamiętane obniżenia nakładane przy starcie i stale pilnowane — Broker
@@ -262,11 +249,26 @@ impl AppCore {
     pub(crate) fn spawn_autonomy_guard(&self) {
         let core = self.clone();
         tokio::spawn(async move {
+            // Podniesienia zapisywane w konfiguracji przez 0.0.66–0.0.67 — już nieczytane.
+            if core.config_value(OLD_PENDING_RAISES).await.is_some()
+                && let Err(e) = core.config_set(OLD_PENDING_RAISES, None, false).await
+            {
+                tracing::debug!(error = %e, "usunięcie starych podniesień nie powiodło się");
+            }
             let mut known = false;
             loop {
                 known = core.enforce_autonomy().await || known;
-                let pause = if known { GUARD_TICK } else { GUARD_RETRY };
-                tokio::time::sleep(pause).await;
+                // Prośba czeka na zgodę — częściej, żeby zgoda w oknie Brokera była szybko przyjęta;
+                // nowa prośba budzi strażnika od razu.
+                let pause = if known && core.inner.raises.is_empty() {
+                    GUARD_TICK
+                } else {
+                    GUARD_RETRY
+                };
+                tokio::select! {
+                    () = tokio::time::sleep(pause) => {}
+                    () = core.inner.raises.added() => {}
+                }
             }
         });
     }
@@ -274,13 +276,9 @@ impl AppCore {
 
 /// Poziomy sesji obniżone przez właściciela: wpisy `identyfikator-sesji:poziom`.
 const SESSION_LEVELS: &str = "permissions.session_levels";
-/// Podniesienia czekające na zgodę w oknie Brokera: wpisy `zakres:poziom:chwila` (`*` — globalny).
-const PENDING_RAISES: &str = "permissions.pending_raises";
-/// Zakres globalny w [`PENDING_RAISES`].
-const GLOBAL_SCOPE: &str = "*";
-/// Jak długo oczekujące podniesienie jest ważne (karta Brokera wygasa po 10 min).
-const RAISE_TTL_MS: i64 = 15 * 60_000;
-/// Odstęp sprawdzeń, gdy Broker jeszcze nie odpowiedział (opóźniony start).
+/// Dawny zapis podniesień czekających na zgodę (0.0.66–0.0.67) — usuwany przy starcie.
+const OLD_PENDING_RAISES: &str = "permissions.pending_raises";
+/// Odstęp sprawdzeń, gdy Broker jeszcze nie odpowiedział (opóźniony start) albo prośba czeka.
 const GUARD_RETRY: std::time::Duration = std::time::Duration::from_secs(2);
 /// Odstęp sprawdzeń po połączeniu (restart Brokera przywraca poziom domyślny).
 const GUARD_TICK: std::time::Duration = std::time::Duration::from_secs(15);

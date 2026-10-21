@@ -203,6 +203,51 @@ if command -v git >/dev/null; then
   sync
   check "po checkout HEAD: kod 0, kopia bez klucza" eval 'rc_is 0 && no_key_in_copy'
 fi
+# Pamięć drugiego komputera: zasada u źródła to wcześniejsza zatwierdzona wersja z repozytorium
+# (2026-10-21 PC cofnął tak zasady dwóch maszyn) — nowsza kopia zostaje, kod 3, polecenie przywrócenia.
+if command -v git >/dev/null; then
+  setup
+  rules "$ASSISTANT" a b c
+  echo "zasada a, wersja 1" >"$ASSISTANT/a.md"
+  sync
+  commit_copy() { (cd "$SB/projekt/alfa" && git add -A && git -c user.name=test -c user.email=test@example.invalid commit -qm "$1"); }
+  (cd "$SB/projekt/alfa" && git init -q && git config core.autocrlf false)
+  commit_copy "wersja 1"
+  echo "zasada a, wersja 2 (laptop)" >"$RULES/a.md"
+  commit_copy "wersja 2"
+  # Stara pamięć: treść wersji 1 i data zmiany sprzed commitu wersji 2; spis u źródła — stary plus nowa pozycja.
+  printf 'zasada a, wersja 1\r\n' >"$ASSISTANT/a.md"
+  touch -d '2026-01-01 00:00' "$ASSISTANT/a.md"
+  echo "zasada b, nowa" >"$ASSISTANT/b.md"
+  echo "- [nowa](nowa.md)" >>"$ASSISTANT/MEMORY.md"
+  echo "zasada nowa" >"$ASSISTANT/nowa.md"
+  rm -f "$COPY/OSTATNIA-KOPIA.txt"
+  sync
+  check "starsza zasada u źródła: kod 3" eval 'rc_is 3 && out_has "STARSZE ZASADY U ŹRÓDŁA"'
+  check "starsza zasada u źródła: nowsza kopia zostaje" grep -q "wersja 2" "$RULES/a.md"
+  check "starsza zasada u źródła: inne zmiany i tak trafiają do kopii" same "$ASSISTANT/b.md" "$RULES/b.md"
+  check "starsza zasada u źródła: spis MEMORY.md wstrzymany" eval '! grep -q nowa.md "$RULES/MEMORY.md" && out_has "Spisu MEMORY.md też nie nadpisano"'
+  check "starsza zasada u źródła: data kopii nie zapisana" test ! -e "$COPY/OSTATNIA-KOPIA.txt"
+  check "starsza zasada u źródła: polecenie przywrócenia działa" run_listed "  cp "
+  check "po przywróceniu: źródło ma nowszą wersję" grep -q "wersja 2" "$ASSISTANT/a.md"
+  sync
+  check "po przywróceniu: kod 0, spis zaktualizowany" eval 'rc_is 0 && grep -q nowa.md "$RULES/MEMORY.md"'
+  echo "zasada a, wersja 3" >"$ASSISTANT/a.md"
+  sync
+  check "nowa wersja u źródła: nadpisuje kopię" eval 'rc_is 0 && same "$ASSISTANT/a.md" "$RULES/a.md"'
+  # Celowy powrót do dawnej treści (świeża data zmiany) przechodzi.
+  commit_copy "wersja 3"
+  echo "zasada a, wersja 1" >"$ASSISTANT/a.md"
+  sync
+  check "celowy powrót do wersji 1: kopia nadpisana, kod 0" eval 'rc_is 0 && same "$ASSISTANT/a.md" "$RULES/a.md"'
+  # Kopia z niezatwierdzoną nowszą treścią, u źródła stara wersja z HEAD — też wstrzymana.
+  commit_copy "wersja 1 znów"
+  echo "zasada a, wersja 4 (niezatwierdzona)" >"$RULES/a.md"
+  echo "zasada a, wersja 1" >"$ASSISTANT/a.md"
+  touch -d '2026-01-01 00:00' "$ASSISTANT/a.md"
+  sync
+  check "niezatwierdzona nowsza kopia: nie nadpisana, kod 3" eval 'rc_is 3 && grep -q "wersja 4" "$RULES/a.md"'
+fi
 # Klucz w kopii, gdy źródło wygląda na nowe — i tak zastąpiony czystą wersją.
 setup
 rules "$RULES" a b c d

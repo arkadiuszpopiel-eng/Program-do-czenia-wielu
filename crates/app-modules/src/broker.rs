@@ -23,7 +23,7 @@ use watchdog_contract::{KillReason, KillSwitch};
 
 use app_api::dto::{AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView};
 use app_api::error::{AppError, ErrorCode};
-use app_api::ports::{ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
+use app_api::ports::{ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
 
 /// Sesja-sonda poziomu globalnego (identyfikatory sesji to UUIDv7 — brak kolizji).
 const GLOBAL_PROBE: &str = "__alfa_global__";
@@ -192,6 +192,10 @@ impl BrokerPort for InprocBroker {
             .parse()
             .map_err(|_| AppError::invalid(format!("Nieznana prośba „{approval}”.")))?;
         self.present(id)
+    }
+
+    async fn approval_outcome(&self, approval: &str) -> Option<ApprovalOutcome> {
+        app_broker::levels::approval_outcome(&*self.engine, approval)
     }
 
     async fn run_code(

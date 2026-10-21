@@ -14,8 +14,8 @@ use providers_contract::{ChatRequest, ModelProvider};
 use sessions_contract::{PrivacyTag, SessionId};
 
 pub use modules::{
-    ApprovalWindow, AutonomyView, BrokerPort, BrokerUnavailable, KillOrigin, NEEDS_BROKER_WINDOW,
-    NoApprovalWindow, TransferPort, TransferUnavailable,
+    ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, BrokerUnavailable, KillOrigin,
+    NEEDS_BROKER_WINDOW, NoApprovalWindow, TransferPort, TransferUnavailable,
 };
 pub use shell::{HeadlessShell, ShellPort};
 pub use voice::{

@@ -14,14 +14,22 @@ na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Hist
 
 ## 0.0.67 — 2026-10-21
 
-Zmiana poziomu autonomii zatwierdzona w oknie Brokera widać od razu, a Alfę z oknem zgód uruchamia skrót „Alfa”.
+Zmianę poziomu autonomii zatwierdzoną w oknie Brokera widać od razu, a niezatwierdzona nie przejdzie już po ponownym
+uruchomieniu; Alfę z oknem zgód uruchamia skrót „Alfa”.
 
 ### Poprawki
 
+- [krytyczne] Prośba o podniesienie poziomu autonomii do L3, odrzucona w oknie Brokera albo pozostawiona bez decyzji,
+  mogła zostać przyjęta jak zatwierdzona: po ponownym uruchomieniu Alfy w ciągu 15 minut nowy Broker startował
+  z poziomem domyślnym L3, a strażnik autonomii brał zgodność poziomu za zgodę i trwale zastępował nim obniżenie
+  właściciela (także L0). Teraz strażnik przyjmuje podniesienie tylko wtedy, gdy Broker potwierdzi zgodę na tę
+  konkretną prośbę, a prośby czekające na zgodę nie przetrwają ponownego uruchomienia. Dwie karty dla tego samego
+  zakresu są pamiętane osobno, a zgoda jest przyjmowana w ciągu 2 sekund (wcześniej do 15).
 - [poważne] Po zatwierdzeniu L4 w oknie Brokera strona Uprawnień dalej pokazywała stary poziom, choć Broker
   przyjął L4: strona nie sprawdzała poziomu po zgodzie, a rdzeń odnotowywał zgodę tylko wtedy, gdy poziom był
   wcześniej obniżany. Teraz strona sama pokazuje nowy poziom kilka sekund po zgodzie (czeka do 10 minut — tyle żyje
-  karta w oknie Brokera), a zgoda jest zapisywana i ogłaszana także na nowym profilu.
+  karta w oknie Brokera), a zgoda jest zapisywana i ogłaszana także na nowym profilu. Komunikat po zgodzie mówi, że
+  zmianę zatwierdzono w oknie Brokera; przy prośbie dla sesji strona sprawdza tę sesję, nie aktywną.
 - [poważne] Na komputerze stacjonarnym nie było skrótu do Alfy, więc uruchomiona była kopia testowa z katalogu
   budowy — bez programów Jądra obok, z Brokerem w procesie i bez okna zgód (każde podniesienie poziomu odrzucane).
   Teraz skrót „Alfa” na pulpicie i w menu Start uruchamia kopię z oknem zgód (`Alfa-uruchomiona`) i jest
@@ -31,7 +39,7 @@ Zmiana poziomu autonomii zatwierdzona w oknie Brokera widać od razu, a Alfę z 
   RUSTSEC-2026-0382 — odrzuca łańcuchy z wycofanymi certyfikatami emSign), silnik wtyczek (`wasmtime` 36.0.19,
   RUSTSEC-2026-0379/0380) i narzędzie budowy interfejsu (`vite` 7.3.7 — tylko serwer deweloperski). Ostrzeżenia
   dla `zip` zostają (Alfa nie korzysta z podatnych funkcji; przejście na `zip` 9 to osobne zadanie).
-- [średnie] Wgranie nowej wersji mogło odebrać głos: na komputerze bez pobranego ONNX Runtime budowa zostawiała
+- [poważne] Wgranie nowej wersji mogło odebrać głos: na komputerze bez pobranego ONNX Runtime budowa zostawiała
   niepełne procesy poboczne mowy (bez biblioteki i bez `smart-turn`), a wgranie zastępowało nimi komplet
   właściciela. Teraz budowa testowa bierze bibliotekę z przypiętą sumą (z „Modeli lokalnych i silników” albo
   z kopii właściciela), a wgranie odmawia przy niepełnym komplecie, zanim zamknie Alfę. Opis wersji w kopii
@@ -39,10 +47,16 @@ Zmiana poziomu autonomii zatwierdzona w oknie Brokera widać od razu, a Alfę z 
 
 ### Testy
 
-- Rust: strażnik autonomii przyjmuje zgodę bez wcześniejszego obniżenia (test czerwony na starym kodzie), zapis
-  poziomów w konfiguracji (`app_broker::levels`); clippy czysty.
-- Interfejs: czekanie na zgodę (vitest), testy w przeglądarce stron Uprawnień i Brokera 100/100; prawdziwa aplikacja
-  47 zielonych, pokrycie łącza 259 z 273 (94,9 %).
+- Rust: cały projekt 3079 zielonych, 0 czerwonych; clippy czysty. Strażnik autonomii: zgoda przyjęta i ogłoszona
+  (także na nowym profilu), dwie karty dla jednego zakresu, prośba bez zgody nie nadpisuje obniżenia ani po
+  ponownym uruchomieniu Brokera, ani aplikacji — ten test nie przechodzi na atrapie Brokera, która każdą prośbę
+  uznaje za zatwierdzoną (sprawdzone celowo). Stan prośby przez IPC z prawdziwą usługą Brokera i skryptowanym
+  oknem zgód: czeka, zatwierdzona, odrzucona, nieznana, zerwane łącze.
+- Interfejs: vitest 478 (czekanie na zgodę, odczyt po przerwaniu), przeglądarka na Chromium 552/552; prawdziwa
+  aplikacja 47 zielonych i 1 pominięty, pokrycie łącza 259 z 273 (94,9 %).
+- Skrypty: `memory-sync` 85/85 (stara pamięć drugiego komputera wstrzymana, celowy powrót do dawnej treści
+  przechodzi), skrót „Alfa” zapisany na pulpicie i w menu Start. `verify` bez Edge uruchamia testy w przeglądarce na
+  Chromium Playwrighta (adnotacja w raporcie) zamiast zawsze czerwonego etapu.
 - Na komputerze stacjonarnym: Alfa ze skrótu — tryb przenośny Brokera (Broker, okno zgód, watchdog); L4 zatwierdzone
   przez właściciela, Broker potwierdza L4.
 

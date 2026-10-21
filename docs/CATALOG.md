@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 117 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 70 |
-| Linie Rust (z testami) | 436 633 |
-| Testy (`#[test]`, `#[tokio::test]`) | 3124 |
+| Linie Rust (z testami) | 437 735 |
+| Testy (`#[test]`, `#[tokio::test]`) | 3132 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -32,12 +32,12 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `device-profile` | F1 | service | inproc | C · I · F | 3114 | 27 | [device-profile](modules/device-profile/SPEC.md) | Autodetekcja sprzętu, klasa maszyny, rekomendacja profilu głosu A–D i budżetów, tryb baterii i gry. |
-| `platform` | — | — | — | C · F | 14 461 | 112 | kontrakt wspólny: platform-windows, platform-apps |  |
+| `platform` | — | — | — | C · F | 14 519 | 113 | kontrakt wspólny: platform-windows, platform-apps |  |
 | `platform-apps` | F6 | — | — | C · F | 5223 | 25 | [platform-apps](modules/platform-apps/SPEC.md) | Porty Office COM, izolowanej przeglądarki (CDP przez potok, filtr egressu) i rejestru tylko do odczytu z deny-listą sekretów. |
 | `platform-windows` | F1, F5, F6 | service | inproc | I | 9044 | 80 | [platform-windows](modules/platform-windows/SPEC.md) | Jedyne miejsce z windows-rs za `SystemPort`: pliki, procesy, schowek, okna, skróty, UIA, wejście, zrzuty, ConPTY, sygnały systemowe. |
 | `platform-windows-diag` | F1, F5, F6 | — | — | I | 664 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-gui` | F1, F5, F6 | — | — | I | 3008 | 7 | [platform-windows](modules/platform-windows/SPEC.md) |  |
-| `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2230 | 5 | [platform-windows](modules/platform-windows/SPEC.md) |  |
+| `platform-windows-kernel` | F1, F5, F6 | — | — | I | 2712 | 6 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-ocr` | F1, F5, F6 | — | — | I | 266 | 2 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-office` | F1, F5, F6 | — | — | I | 4003 | 12 | [platform-windows](modules/platform-windows/SPEC.md) |  |
 | `platform-windows-pty` | F1, F5, F6 | — | — | I | 694 | 8 | [platform-windows](modules/platform-windows/SPEC.md) |  |
@@ -148,11 +148,11 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Moduł | Fala | Rodzaj | Izolacja | Crate’y | Linie | Testy | SPEC | Opis |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
 | `app-agents` | — | — | — | pojedynczy | 4398 | 30 | — |  |
-| `app-api` | — | — | — | pojedynczy | 8149 | 34 | — |  |
+| `app-api` | — | — | — | pojedynczy | 8171 | 34 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 1190 | 9 | — |  |
-| `app-broker` | — | — | — | pojedynczy | 4384 | 24 | — |  |
+| `app-broker` | — | — | — | pojedynczy | 4636 | 27 | — |  |
 | `app-chat` | — | — | — | pojedynczy | 3237 | 21 | — |  |
-| `app-core` | — | — | — | pojedynczy | 18 288 | 127 | — |  |
+| `app-core` | — | — | — | pojedynczy | 18 573 | 130 | — |  |
 | `app-diag` | — | — | — | pojedynczy | 545 | 3 | — |  |
 | `app-files` | — | — | — | pojedynczy | 7575 | 57 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1177 | 8 | — |  |
@@ -160,8 +160,8 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-logs` | — | — | — | pojedynczy | 1671 | 22 | — |  |
 | `app-mcp` | — | — | — | pojedynczy | 1952 | 19 | — |  |
 | `app-memory` | — | — | — | pojedynczy | 2687 | 24 | — |  |
-| `app-models` | — | — | — | pojedynczy | 8909 | 69 | — |  |
-| `app-modules` | — | — | — | pojedynczy | 7958 | 55 | — |  |
+| `app-models` | — | — | — | pojedynczy | 8908 | 69 | — |  |
+| `app-modules` | — | — | — | pojedynczy | 7962 | 55 | — |  |
 | `app-plugins` | — | — | — | pojedynczy | 1683 | 19 | — |  |
 | `app-safety` | — | — | — | pojedynczy | 1212 | 10 | — |  |
 | `app-skills` | — | — | — | pojedynczy | 1119 | 3 | — |  |
@@ -210,5 +210,5 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | Crate `-impl` bez `module.toml` | 1 | `core-bus-impl` |
 | Części modułów wielocrate’owych (manifest w crate’cie głównym — nie niespójność) | 7 | `platform-windows-diag-impl`, `platform-windows-gui-impl`, `platform-windows-kernel-impl`, `platform-windows-ocr-impl`, `platform-windows-office-impl`, `platform-windows-pty-impl`, `platform-windows-sys-impl` |
 | Crate bez `README.md` | 7 | `app-diag`, `app-mcp`, `pc-diag-contract`, `pc-diag-fake`, `platform-windows-diag-impl`, `tools-dev-contract`, `tools-dev-fake` |
-| Plik Rust powyżej 400 linii | 6 | `crates/router-impl/tests/decisions.rs` (437), `crates/voice-tts-impl/tests/tts.rs` (412), `crates/accounts-hub-fake/src/hub.rs` (406), `crates/app-core/tests/dto_roundtrip.rs` (406), `crates/providers-local-impl/tests/lifecycle.rs` (402), `crates/app-models/src/lib.rs` (401) |
+| Plik Rust powyżej 400 linii | 5 | `crates/router-impl/tests/decisions.rs` (437), `crates/voice-tts-impl/tests/tts.rs` (412), `crates/accounts-hub-fake/src/hub.rs` (406), `crates/app-core/tests/dto_roundtrip.rs` (406), `crates/providers-local-impl/tests/lifecycle.rs` (402) |
 | Crate powyżej 8000 linii w `src/` | 0 | brak |

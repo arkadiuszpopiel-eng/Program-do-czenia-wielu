@@ -3,7 +3,8 @@
 # programu, w katalogu `sidecars/<nazwa>/`. Użycie:
 #   scripts/stage-sidecars.sh [katalog programu]        (domyślnie target/shell/debug)
 # Bibliotekę ONNX Runtime kopiuje, gdy podano ją w zmiennej ALFA_ORT_DLL; bez niej program użyje
-# biblioteki pobranej z katalogu „Modele lokalne i silniki” (sidecars/onnxruntime/).
+# biblioteki pobranej z katalogu „Modele lokalne i silniki” (sidecars/onnxruntime/), ale wgranie
+# u właściciela (deploy-owner.sh) wymaga kompletu z biblioteką obok obu procesów.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"

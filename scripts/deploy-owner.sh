@@ -25,24 +25,32 @@ done
 ) || { echo "budowa programów Jądra: błąd (target/safety-build.log)"; exit 1; }
 WDST="$(cygpath -w "$DST")"
 # Zamknięcie tylko procesu uruchomionego z katalogu docelowego albo z katalogu budowy (stary sposób).
-# `Stop-Process` po PID: `taskkill /T` przekraczał czas przy procesach Jądra w zadaniu watchdoga
-# (2026-10-20), a stara Alfa zostawała uruchomiona. Broker i watchdog kończą się z aplikacją.
-powershell -NoProfile -Command "Get-Process alfa-desktop -ErrorAction SilentlyContinue | Where-Object { \$_.Path -and (\$_.Path.StartsWith('$WDST') -or \$_.Path.StartsWith('$(cygpath -w "$SRC")')) -and -not \$_.Path.Contains('trial-profile') } | ForEach-Object { Stop-Process -Id \$_.Id -Force }"
+# Zamyka też instancję testową `verify-app.sh` (ten sam plik w `target/shell`, inny profil) — nie
+# wgrywać w trakcie testu prawdziwej aplikacji. `Stop-Process` po PID: `taskkill /T` przekraczał czas
+# przy procesach Jądra w zadaniu watchdoga (2026-10-20), a stara Alfa zostawała uruchomiona. Broker
+# i watchdog kończą się z aplikacją.
+powershell -NoProfile -Command "Get-Process alfa-desktop -ErrorAction SilentlyContinue | Where-Object { \$_.Path -and (\$_.Path.StartsWith('$WDST') -or \$_.Path.StartsWith('$(cygpath -w "$SRC")')) } | ForEach-Object { Stop-Process -Id \$_.Id -Force }"
 sleep 4
 # Procesy Jądra z katalogu docelowego, które przeżyły aplikację, blokowałyby kopiowanie plików.
 powershell -NoProfile -Command "Get-Process alfa-broker,alfa-broker-ui,alfa-watchdog -ErrorAction SilentlyContinue | Where-Object { \$_.Path -and \$_.Path.StartsWith('$WDST') } | ForEach-Object { Stop-Process -Id \$_.Id -Force }"
 sleep 1
+# Błąd kopiowania nie kończy skryptu przed uruchomieniem: właściciel nie może zostać bez Alfy
+# (jego kopia jest już zamknięta). Wynik niepełny — kod 1 na końcu.
+fail=0
 mkdir -p "$DST"
-cp -f "$SRC/alfa-desktop.exe" "$DST/"
-[ -f "$SRC/alfa_desktop_lib.dll" ] && cp -f "$SRC/alfa_desktop_lib.dll" "$DST/"
+cp -f "$SRC/alfa-desktop.exe" "$DST/" || { echo "nie skopiowano alfa-desktop.exe"; fail=1; }
+if [ -f "$SRC/alfa_desktop_lib.dll" ]; then
+  cp -f "$SRC/alfa_desktop_lib.dll" "$DST/" || { echo "nie skopiowano alfa_desktop_lib.dll"; fail=1; }
+fi
 # Jądro bezpieczeństwa w trybie przenośnym (ADR 0003, `app_broker::mode`): Broker, okno zatwierdzeń
 # i watchdog obok aplikacji. Bez nich Broker działa w procesie, bez okna — podniesienia poziomu
 # autonomii są wtedy zawsze odrzucane, a kill-switch obsługuje sama aplikacja.
 for bin in alfa-broker alfa-broker-ui alfa-watchdog; do
-  cp -f "$KERNEL/$bin.exe" "$DST/" || { echo "brak $KERNEL/$bin.exe"; exit 1; }
+  cp -f "$KERNEL/$bin.exe" "$DST/" || { echo "nie skopiowano $KERNEL/$bin.exe"; fail=1; }
 done
-rm -rf "$DST/sidecars.nowe" && cp -r "$SRC/sidecars" "$DST/sidecars.nowe" && rm -rf "$DST/sidecars" && mv "$DST/sidecars.nowe" "$DST/sidecars"
-echo "skopiowano do $DST"
+rm -rf "$DST/sidecars.nowe" && cp -r "$SRC/sidecars" "$DST/sidecars.nowe" && rm -rf "$DST/sidecars" &&
+  mv "$DST/sidecars.nowe" "$DST/sidecars" || { echo "nie podmieniono procesów pobocznych mowy"; fail=1; }
+[ "$fail" -eq 0 ] && echo "skopiowano do $DST" || echo "WGRANIE NIEPEŁNE — uruchamiam to, co jest w $DST"
 # Skrót „Alfa” (pulpit, menu Start) zawsze do tej kopii — nie do buildu testowego w `target/shell`.
 powershell -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$ROOT/scripts/owner-shortcut.ps1")" \
   -Target "$WDST\\alfa-desktop.exe" || echo "skrót „Alfa”: nie utworzony"
@@ -50,3 +58,4 @@ if [ "${1:-}" != "--no-start" ]; then
   (cd "$DST" && (./alfa-desktop.exe >/dev/null 2>&1 &))
   echo "uruchomiono na profilu właściciela"
 fi
+exit "$fail"

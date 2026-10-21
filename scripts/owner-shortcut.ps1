@@ -23,7 +23,16 @@ if (-not (Test-Path -LiteralPath $broker)) {
 }
 $shell = New-Object -ComObject WScript.Shell
 $dirs = @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))
+$failed = 0
 foreach ($dir in $dirs) {
+  # Błąd jednego miejsca (np. pulpit w OneDrive bez dostępu, folder, którego nie ma) nie może
+  # zablokować drugiego.
+  if (-not $dir) {
+    Write-Output 'brak folderu na skrót (pulpit albo menu Start) — pominięty'
+    $failed += 1
+    continue
+  }
+  try {
   $path = Join-Path $dir 'Alfa.lnk'
   $link = $shell.CreateShortcut($path)
   # Ten sam plik tworzy instalator NSIS (`$SMPROGRAMS\Alfa.lnk`, `$DESKTOP\Alfa.lnk` → zainstalowany
@@ -40,4 +49,9 @@ foreach ($dir in $dirs) {
   $link.Description = 'Alfa (z oknem zgód Brokera, folder Alfa-uruchomiona)'
   $link.Save()
   Write-Output "skrót: $path"
+  } catch {
+    Write-Output "skrót $path nie zapisany: $($_.Exception.Message)"
+    $failed += 1
+  }
 }
+if ($failed -gt 0) { exit 4 }

@@ -171,6 +171,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'perm.request': 'Change to {level}',
   'perm.applied': 'Level changed to {level} — lowering needs no confirmation.',
   'perm.requested': 'The Broker window is open — confirm the change to {level} there.',
+  'perm.raised': 'Level changed to {level} — approved in the Broker window.',
   'perm.scope': 'Scope of change',
   'perm.scope.global': 'Globally',
   'perm.scope.session': 'This session only',

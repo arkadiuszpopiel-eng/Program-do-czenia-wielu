@@ -88,6 +88,8 @@ pub(crate) struct Inner {
     pub transfer: Arc<dyn TransferPort>,
     pub voice: Arc<dyn VoicePort>,
     pub broker: Arc<dyn BrokerPort>,
+    /// Podniesienia poziomu czekające na zgodę w oknie Brokera (tylko w pamięci — strażnik).
+    pub raises: app_broker::levels::PendingRaises,
     /// Narzędzia agentek (`None` — Broker albo dziennik cofania niepodłączony: bez narzędzi).
     pub agents: Option<crate::parts::AgentStack>,
     /// Silnik tury czatu (generacje, przebiegi agentek — `app-chat`).
