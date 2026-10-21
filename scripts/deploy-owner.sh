@@ -38,6 +38,9 @@ for bin in alfa-broker alfa-broker-ui alfa-watchdog; do
 done
 rm -rf "$DST/sidecars.nowe" && cp -r "$SRC/sidecars" "$DST/sidecars.nowe" && rm -rf "$DST/sidecars" && mv "$DST/sidecars.nowe" "$DST/sidecars"
 echo "skopiowano do $DST"
+# Skrót „Alfa” (pulpit, menu Start) zawsze do tej kopii — nie do buildu testowego w `target/shell`.
+powershell -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$ROOT/scripts/owner-shortcut.ps1")" \
+  -Target "$WDST\\alfa-desktop.exe" || echo "skrót „Alfa”: nie utworzony"
 if [ "${1:-}" != "--no-start" ]; then
   (cd "$DST" && (./alfa-desktop.exe >/dev/null 2>&1 &))
   echo "uruchomiono na profilu właściciela"

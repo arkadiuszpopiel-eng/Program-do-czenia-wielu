@@ -52,8 +52,8 @@ const DEV: BrokerStatusView = {
   watchdog: false,
   isolated: false,
   detail: {
-    pl: 'Broker działa w procesie aplikacji bez okna zatwierdzeń (tryb deweloperski): każda prośba o zgodę jest odrzucana.',
-    en: 'The Broker runs inside the app process without the approval window (developer mode): every approval request is denied.',
+    pl: 'Broker działa w procesie aplikacji bez okna zatwierdzeń (tryb deweloperski): każda prośba o zgodę jest odrzucana. To kopia Alfy bez programów Jądra obok (build testowy) — Alfę z oknem zgód uruchamia skrót „Alfa” na pulpicie albo w menu Start (folder Alfa-uruchomiona).',
+    en: 'The Broker runs inside the app process without the approval window (developer mode): every approval request is denied. This copy of Alfa has no Kernel programs next to it (a test build) — the “Alfa” shortcut on the desktop or in the Start menu (folder Alfa-uruchomiona) starts Alfa with the approval window.',
   },
 };
 
