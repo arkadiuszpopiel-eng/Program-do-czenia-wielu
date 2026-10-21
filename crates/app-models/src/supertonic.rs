@@ -1,6 +1,8 @@
 //! Supertonic 3 — głos główny (zadanie P1): model z przypiętej wersji oficjalnego archiwum,
 //! każdy plik z rozmiarem i sumą SHA-256. Pliki trafiają płasko do `models/supertonic/`
-//! (sieci, konfiguracja i barwy głosów F1–F5, M1–M5). Wagi: licencja OpenRAIL-M.
+//! (sieci, konfiguracja i barwy głosów F1–F5, M1–M5). Wagi: licencja OpenRAIL-M — jej tekst
+//! (`LICENSE` z tej samej rewizji) trafia obok modelu, bo licencja wymaga przekazania kopii
+//! (licencje u źródła, C5.1: `docs/vendor/licencje-modeli-i-silnikow.md`).
 
 use app_api::dto::ModelItemKind;
 
@@ -9,8 +11,14 @@ use crate::catalog::{FileSpec, Install, ItemSpec, Root, note};
 /// Przypięta wersja repozytorium `supertone-oss-archive/supertonic-3`.
 const HF_SUPERTONIC: &str = "https://huggingface.co/supertone-oss-archive/supertonic-3/resolve/aafc6e32416a594460b32413efc49d7fe4ce6d46";
 
-/// (katalog w repozytorium, plik, rozmiar w bajtach, SHA-256).
+/// (katalog w repozytorium — pusty dla korzenia, plik, rozmiar w bajtach, SHA-256).
 const FILES: &[(&str, &str, u64, &str)] = &[
+    (
+        "",
+        "LICENSE",
+        15_007,
+        "0d944a9110fed9a9602d60e0423a272903e7bd21ab060490774efc77c2275e9f",
+    ),
     (
         "onnx",
         "duration_predictor.onnx",
@@ -123,7 +131,11 @@ pub fn supertonic() -> ItemSpec {
             .iter()
             .map(|(dir, name, size, sha)| FileSpec {
                 name: (*name).into(),
-                url: format!("{HF_SUPERTONIC}/{dir}/{name}"),
+                url: if dir.is_empty() {
+                    format!("{HF_SUPERTONIC}/{name}")
+                } else {
+                    format!("{HF_SUPERTONIC}/{dir}/{name}")
+                },
                 size: *size,
                 sha256: Some((*sha).into()),
             })
@@ -144,7 +156,13 @@ mod tests {
     #[test]
     fn every_file_is_pinned_and_flat() {
         let item = supertonic();
-        assert_eq!(item.files.len(), 16);
+        assert_eq!(item.files.len(), 17);
+        // Tekst licencji wag (Open RAIL-M wymaga przekazania kopii) z tej samej rewizji.
+        assert!(
+            item.files
+                .iter()
+                .any(|f| f.name == "LICENSE" && f.url == format!("{HF_SUPERTONIC}/LICENSE"))
+        );
         assert!(item.confirmed);
         for f in &item.files {
             assert!(f.url.starts_with(HF_SUPERTONIC), "{}", f.url);

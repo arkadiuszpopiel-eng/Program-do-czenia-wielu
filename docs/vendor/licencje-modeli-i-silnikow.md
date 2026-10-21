@@ -13,8 +13,8 @@ Hugging Face, NuGet) + krytyk, który ponownie otworzył najbardziej wątpliwe �
    Alibaba Cloud); SpeakLeash przypisuje Qwen2.5 licencję Apache-2.0 — źródła są niespójne. Bielik 1.5B (z Qwen2.5-1.5B) — Apache-2.0.
 2. **DirectML** (`Microsoft.AI.DirectML`) ma własną licencję Microsoftu (MICROSOFT SOFTWARE LICENSE TERMS), nie MIT — warunki
    redystrybucji obok programu.
-3. **Supertonic 3** — wagi na BigScience Open RAIL-M (ograniczenia użycia); licencja wymaga przekazania jej kopii, a katalog Alfy
-   nie instaluje pliku LICENSE obok modelu.
+3. **Supertonic 3** — wagi na BigScience Open RAIL-M (ograniczenia użycia); licencja wymaga przekazania jej kopii — **naprawione**:
+   katalog instaluje `LICENSE` (15 007 B, z tej samej rewizji, z sumą SHA-256) obok modelu przy nowej instalacji.
 4. **ONNX Runtime — telemetria:** biblioteka `ort` domyślnie włączała telemetrię oficjalnych buildów Microsoftu w procesach
    pobocznych mowy — **naprawione** (`with_telemetry(false)` w `lib-supertonic` i `lib-smart-turn`).
 5. **Bielik — integralność pobrania:** manifest miał pusty `sha256` i adres `/resolve/main` — **naprawione**: hash z API Hugging Face
@@ -742,5 +742,4 @@ Wynik obejmuje wszystkie 24 pozycje z license-cards.json, żadnej nie brakuje. P
 
 - Właściciel: decyzje z listy „Najważniejsze” (Regulamin bielik.ai, Qwen Research License dla Bielika 4.5B, DirectML,
   Open RAIL-M Supertonic, FFmpeg, WeSpeaker/openWakeWord) i potwierdzenie kart (`confirmed`).
-- Kod (osobne zadania): plik LICENSE Open RAIL-M instalowany obok Supertonic 3; przypięcie rewizji pozostałych modeli z `/resolve/main`
-  (Whisper, e5, MiniLM) i hashy tam, gdzie ich brak.
+- Kod (osobne zadanie): przypięcie rewizji pozostałych modeli z `/resolve/main` (Whisper, e5, MiniLM) i hashy tam, gdzie ich brak.

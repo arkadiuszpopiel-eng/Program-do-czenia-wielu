@@ -62,7 +62,7 @@
         "name": "Supertonic 3 (31 języków, 10 barw)",
         "kind": "tts",
         "state": "missing",
-        "size_bytes": 401276744,
+        "size_bytes": 401291751,
         "downloadable": true,
         "fallback": false
       },
@@ -166,8 +166,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 9546551511,
-    "missing_bytes": 9546551511,
+    "size_bytes": 9546566518,
+    "missing_bytes": 9546566518,
     "installed": 0,
     "total": 16,
     "state": "not_installed",
@@ -313,7 +313,7 @@
         "name": "Supertonic 3 (31 języków, 10 barw)",
         "kind": "tts",
         "state": "missing",
-        "size_bytes": 401276744,
+        "size_bytes": 401291751,
         "downloadable": true,
         "fallback": false
       },
@@ -408,8 +408,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 9502619198,
-    "missing_bytes": 9502619198,
+    "size_bytes": 9502634205,
+    "missing_bytes": 9502634205,
     "installed": 0,
     "total": 14,
     "state": "not_installed",
@@ -544,7 +544,7 @@
         "name": "Supertonic 3 (31 języków, 10 barw)",
         "kind": "tts",
         "state": "missing",
-        "size_bytes": 401276744,
+        "size_bytes": 401291751,
         "downloadable": true,
         "fallback": false
       },
@@ -639,8 +639,8 @@
         "fallback": false
       }
     ],
-    "size_bytes": 6140884542,
-    "missing_bytes": 6140884542,
+    "size_bytes": 6140899549,
+    "missing_bytes": 6140899549,
     "installed": 0,
     "total": 14,
     "state": "not_installed",
