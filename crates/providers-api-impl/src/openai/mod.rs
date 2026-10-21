@@ -196,6 +196,19 @@ impl OpenAiProvider {
         } else {
             ModelCapabilities::default()
         };
+        Self::with_fallback(profile, http, key, options, fallback)
+    }
+
+    /// Adapter z możliwościami modeli spoza konfiguracji i Models API (`fallback`) — dla
+    /// endpointu zgodnego: możliwości z wpisu katalogu (np. `tools = true`), inaczej każdy
+    /// model poza domyślnym był „bez narzędzi” i adapter odrzucał żądania agentek.
+    pub fn with_fallback(
+        profile: ProviderProfile,
+        http: HttpConfig,
+        key: Arc<dyn SecretSource>,
+        options: OpenAiOptions,
+        fallback: ModelCapabilities,
+    ) -> Result<Self, ConfigError> {
         let registry = Arc::new(ModelRegistry::new(
             profile.models.clone(),
             |_| None,

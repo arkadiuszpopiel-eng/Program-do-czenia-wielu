@@ -16,7 +16,7 @@ env_vars = ["MISTRAL_API_KEY"]
 
 [capabilities]
 vision = "unknown"
-tools = "unknown"
+tools = true  # udokumentowane wywołania funkcji w API zgodnym z OpenAI (przegląd 2026-10-21)
 streaming = "unknown"
 long_context = "unknown"
 

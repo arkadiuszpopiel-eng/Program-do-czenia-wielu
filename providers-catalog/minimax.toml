@@ -15,7 +15,7 @@ notes = "Adapter generyczny (chat). MiniMax Speech 2.8: TTS z polskim i klonowan
 
 [capabilities]
 vision = "unknown"
-tools = "unknown"
+tools = true  # udokumentowane wywołania funkcji w API zgodnym z OpenAI (przegląd 2026-10-21)
 streaming = "unknown"
 long_context = "unknown"
 

@@ -207,3 +207,39 @@ async fn openai_organization_and_project_headers_on_every_request() {
     assert!(rec.header("openai-organization").is_none());
     assert!(rec.header("openai-project").is_none());
 }
+
+/// Przegląd 2026-10-21: agentka z narzędziami u dostawcy zgodnego z OpenAI — `tools = true`
+/// w katalogu obowiązuje dla modelu domyślnego i dla innych modeli konta (wcześniej każdy model
+/// spoza konfiguracji był „bez narzędzi” i adapter odrzucał żądanie jako nieobsługiwane).
+#[tokio::test]
+async fn openai_compatible_entries_send_tools_for_any_model() {
+    let tool = providers_contract::ToolSpec {
+        name: "fs_read".into(),
+        description: "Czyta plik.".into(),
+        input_schema: serde_json::json!({"type": "object", "properties": {}}),
+        strict: false,
+    };
+    for (id, default, other) in [
+        ("deepseek", "deepseek-chat", "deepseek-reasoner"),
+        ("openrouter", "openai/gpt-x", "anthropic/claude-x"),
+    ] {
+        let server = FixtureServer::start().await;
+        let p = build_provider(&entry(id), account(Some(&server), default)).unwrap();
+        for model in [default, other] {
+            server.reset(Reply::sse(openai_sse::chat_text(model, &["ok"], "stop")));
+            let mut req = ChatRequest::new(model, vec![Message::user_text("hej")]);
+            req.tools = vec![tool.clone()];
+            let events = run(&p, req).await;
+            assert_eq!(
+                events.last(),
+                Some(&ProviderEvent::stop(StopReason::EndTurn)),
+                "{id}/{model}: {events:?}"
+            );
+            let body = server.requests().pop().unwrap().json();
+            assert_eq!(
+                body["tools"][0]["function"]["name"], "fs_read",
+                "{id}/{model}"
+            );
+        }
+    }
+}

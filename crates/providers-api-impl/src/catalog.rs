@@ -299,11 +299,12 @@ pub fn build_provider(
             account.key,
             AnthropicOptions::compatible(),
         )?),
-        (CatalogCompat::Openai, _) => Arc::new(OpenAiProvider::new(
+        (CatalogCompat::Openai, _) => Arc::new(OpenAiProvider::with_fallback(
             profile,
             http,
             account.key,
             OpenAiOptions::compatible(),
+            entry.default_capabilities(),
         )?),
     };
     Ok(provider)

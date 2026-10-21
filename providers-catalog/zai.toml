@@ -15,7 +15,7 @@ notes = "Endpointy OpenAI-compat i Anthropic-compat (drugi profil z compat=anthr
 
 [capabilities]
 vision = "unknown"
-tools = "unknown"
+tools = true  # udokumentowane wywołania funkcji w API zgodnym z OpenAI (przegląd 2026-10-21)
 streaming = "unknown"
 long_context = "unknown"
 
