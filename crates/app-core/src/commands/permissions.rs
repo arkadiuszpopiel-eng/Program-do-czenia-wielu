@@ -7,6 +7,7 @@ use crate::dto::{
 };
 use std::collections::BTreeMap;
 
+use app_broker::levels::{self, PendingRaises};
 use sessions_contract::SessionId;
 
 use crate::error::AppError;
@@ -96,20 +97,18 @@ impl AppCore {
         let global = self.config_str(keys::AUTONOMY).await.and_then(|s| {
             serde_json::from_value::<AutonomyLevel>(serde_json::Value::String(s)).ok()
         });
-        // Lista wpisów `sesja:poziom` (konfiguracja nie przyjmuje obiektów jako wartości).
-        let sessions = self
-            .config_value(SESSION_LEVELS)
+        (
+            global,
+            levels::parse_session_levels(self.config_list(SESSION_LEVELS).await),
+        )
+    }
+
+    /// Lista napisów z konfiguracji (brak albo inny typ — pusta).
+    async fn config_list(&self, key: &str) -> Vec<String> {
+        self.config_value(key)
             .await
-            .and_then(|v| serde_json::from_value::<Vec<String>>(v).ok())
+            .and_then(|v| serde_json::from_value(v).ok())
             .unwrap_or_default()
-            .into_iter()
-            .filter_map(|entry| {
-                let (id, level) = entry.rsplit_once(':')?;
-                let level = serde_json::from_value(serde_json::Value::String(level.into())).ok()?;
-                Some((id.to_owned(), level))
-            })
-            .collect();
-        (global, sessions)
     }
 
     /// Zapisuje obniżenie poziomu sesji (wraca po restarcie aplikacji i Brokera).
@@ -120,16 +119,7 @@ impl AppCore {
     ) -> Result<(), AppError> {
         let (_, mut sessions) = self.remembered_levels().await;
         sessions.insert(session.as_str().to_owned(), level);
-        let entries: Vec<String> = sessions
-            .iter()
-            .map(|(id, level)| {
-                let level = serde_json::to_value(level)
-                    .ok()
-                    .and_then(|v| v.as_str().map(str::to_owned))
-                    .unwrap_or_default();
-                format!("{id}:{level}")
-            })
-            .collect();
+        let entries = levels::format_session_levels(&sessions);
         let value = serde_json::to_value(entries).map_err(AppError::internal)?;
         self.config_set(SESSION_LEVELS, Some(value), false).await
     }
@@ -204,7 +194,7 @@ impl AppCore {
     async fn adopt_session_raises(
         &self,
         pending: Vec<(String, AutonomyLevel)>,
-        raises: &mut BTreeMap<String, (AutonomyLevel, i64)>,
+        raises: &mut PendingRaises,
     ) {
         for (id, level) in pending {
             let Ok(session) = ids::session(&id) else {
@@ -227,36 +217,14 @@ impl AppCore {
     }
 
     /// Oczekujące podniesienia (zakres → poziom, chwila prośby), bez przeterminowanych.
-    async fn pending_raises(&self) -> BTreeMap<String, (AutonomyLevel, i64)> {
+    async fn pending_raises(&self) -> PendingRaises {
         let now = chrono::Utc::now().timestamp_millis();
-        self.config_value(PENDING_RAISES)
-            .await
-            .and_then(|v| serde_json::from_value::<Vec<String>>(v).ok())
-            .unwrap_or_default()
-            .into_iter()
-            .filter_map(|entry| {
-                let mut parts = entry.rsplitn(3, ':');
-                let at: i64 = parts.next()?.parse().ok()?;
-                let level = parts.next()?;
-                let scope = parts.next()?;
-                let level = serde_json::from_value(serde_json::Value::String(level.into())).ok()?;
-                (now.saturating_sub(at) <= RAISE_TTL_MS).then(|| (scope.to_owned(), (level, at)))
-            })
-            .collect()
+        levels::parse_raises(self.config_list(PENDING_RAISES).await, now, RAISE_TTL_MS)
     }
 
     /// Zapis oczekujących podniesień (wpisy `zakres:poziom:chwila`).
-    async fn store_pending_raises(
-        &self,
-        raises: &BTreeMap<String, (AutonomyLevel, i64)>,
-    ) -> Result<(), AppError> {
-        let entries: Vec<String> = raises
-            .iter()
-            .filter_map(|(scope, (level, at))| {
-                let level = serde_json::to_value(level).ok()?;
-                Some(format!("{scope}:{}:{at}", level.as_str()?))
-            })
-            .collect();
+    async fn store_pending_raises(&self, raises: &PendingRaises) -> Result<(), AppError> {
+        let entries = levels::format_raises(raises);
         let value = serde_json::to_value(entries).map_err(AppError::internal)?;
         self.config_set(PENDING_RAISES, Some(value), false).await
     }
@@ -266,7 +234,7 @@ impl AppCore {
         &self,
         session: Option<&SessionId>,
         level: AutonomyLevel,
-        rest: &BTreeMap<String, (AutonomyLevel, i64)>,
+        rest: &PendingRaises,
     ) {
         let saved = match session {
             None => match serde_json::to_value(level) {

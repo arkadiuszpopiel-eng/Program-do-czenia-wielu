@@ -4,8 +4,7 @@
 //!   SHA-256 (gdzie przypięty) i miejscem docelowym; pozycje niepotwierdzone — „do potwierdzenia”;
 //! - [`fetch`] — HTTPS z `Range` i wznawianiem, SHA-256 w locie, limit rozmiaru, anulowanie;
 //! - [`unpack`] — bezpieczne rozpakowanie ZIP (path traversal, dowiązania, duplikaty, zip-bomb);
-//! - zadania: limit równoległości, postęp `{file, done, total}`, zgoda TOFU z policzonym hashem
-//!   (pozycje bez przypiętego hasha), weryfikacja, usuwanie;
+//! - zadania: limit równoległości, postęp, zgoda TOFU dla pozycji bez hasha, weryfikacja, usuwanie;
 //! - [`embed`] — embedder wyszukiwania (`[search.embedder] model`) i przebudowa wektorów;
 //! - [`bundles`] — pakiety 1–6 (komplety pozycji dobrane do sprzętu) i naprawa pojedynczej pozycji.
 //!

@@ -16,6 +16,7 @@
 pub mod children;
 pub mod inproc;
 pub mod kernel;
+pub mod levels;
 pub mod link;
 pub mod mode;
 pub mod notice;
