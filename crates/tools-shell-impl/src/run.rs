@@ -41,35 +41,6 @@ fn target_path(raw: &str, cwd: &str, env: &compliance_contract::PathEnv) -> Opti
     paths::resolve_path_dots(dir, Some(cwd), env).ok()
 }
 
-/// Czy nazwa to katalog pomijany przez snapshot zakresu (`node_modules`, `target`… — ostrożnie
-/// po samej nazwie).
-fn skipped_by_snapshot(name: &str) -> bool {
-    undo_journal_contract::SNAPSHOT_SKIPPED_DIRS
-        .iter()
-        .chain(std::iter::once(
-            &undo_journal_contract::SNAPSHOT_CARGO_TARGET,
-        ))
-        .any(|s| s.eq_ignore_ascii_case(name))
-}
-
-/// Cel w katalogu pomijanym przez snapshot zakresu: cofanie go nie obejmuje, więc jego usunięcie
-/// nie jest „odwracalne” i idzie jak trwałe (przegląd 2026-10-21).
-fn outside_snapshot(resolved: &str, cwd: &str) -> bool {
-    let path = std::path::Path::new(resolved);
-    let inner = path.strip_prefix(cwd).unwrap_or(path);
-    inner
-        .components()
-        .any(|part| skipped_by_snapshot(&part.as_os_str().to_string_lossy()))
-}
-
-/// Czy któreś słowo polecenia wskazuje katalog pomijany przez snapshot — analiza nie zwraca
-/// gołych nazw względnych (`Remove-Item node_modules`) jako ścieżek.
-fn names_skipped_dir(command: &str) -> bool {
-    tools_shell_contract::tokens(command)
-        .iter()
-        .any(|t| t.split(['/', '\\']).any(skipped_by_snapshot))
-}
-
 impl Core {
     async fn deny(
         &self,
@@ -130,13 +101,12 @@ impl Core {
         })?;
         let mut outside = Vec::new();
         let mut unresolved = false;
-        let mut unsnapshotted = a.deletes && names_skipped_dir(command);
+        let unsnapshotted = a.deletes && crate::skipped::deletes_unsnapshotted(command);
         for raw in &a.paths {
             let Some(resolved) = target_path(raw, cwd, &self.env) else {
                 unresolved = true;
                 continue;
             };
-            unsnapshotted |= outside_snapshot(&resolved, cwd);
             if self.denied(&resolved) {
                 return Err(self
                     .deny(

@@ -11,6 +11,7 @@
 mod isolation;
 mod outcome;
 mod run;
+mod skipped;
 
 use std::sync::Arc;
 

@@ -45,7 +45,7 @@ async fn remembered_raise_missing_after_restart_is_announced_once() {
     drop(core);
 
     // Restart: nowy Broker na L3, zapamiętane L4 — informacja dopiero przy trzecim przebiegu
-    // (okno już słucha), potem już nie.
+    // z rzędu (okno już słucha), potem już nie.
     let fresh = Broker::with_window(AutonomyLevel::L3);
     let core = start(dir.path(), fresh.clone(), &secrets).await;
     assert_eq!(
@@ -53,8 +53,16 @@ async fn remembered_raise_missing_after_restart_is_announced_once() {
         0,
         "nie przy starcie — okno jeszcze nie słucha"
     );
-    passes(&fresh, 3).await;
-    assert!(eventually(|| async { notices(&core).await == 1 }).await);
+    // Trzeci przebieg: ok. 15 s po starcie (dwa od razu, potem co 15 s) — czekamy do 60 s.
+    let mut shown = false;
+    for _ in 0..600 {
+        if notices(&core).await == 1 {
+            shown = true;
+            break;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
+    assert!(shown, "brak informacji po trzecim przebiegu");
     passes(&fresh, 1).await;
     assert_eq!(notices(&core).await, 1);
     assert_eq!(
