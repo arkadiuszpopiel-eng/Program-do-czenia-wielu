@@ -43,9 +43,10 @@ done
       cargo build --locked -j "${CARGO_BUILD_JOBS:-3}" --features "tauri/custom-protocol" >>"$ROOT/target/owner-build.log" 2>&1
 ) || { echo "budowa powłoki właściciela: błąd (target/owner-build.log)"; exit 1; }
 [ -f "$OWNER/alfa-desktop.exe" ] || { echo "Brak powłoki właściciela w $OWNER"; exit 2; }
-# Kontrola przed zamknięciem Alfy właściciela: w buildzie bez `e2e` nie ma flagi portu CDP.
+# Kontrola przed zamknięciem Alfy właściciela: w buildzie bez `e2e` nie ma flagi portu CDP z wartością
+# (`…-port=`; sam napis bez `=` występuje w kodzie, który takiej flagi odmawia).
 for f in "$OWNER/alfa-desktop.exe" "$OWNER/alfa_desktop_lib.dll"; do
-  if [ -f "$f" ] && grep -aq -- "--remote-debugging-port" "$f"; then
+  if [ -f "$f" ] && grep -aq -- "--remote-debugging-port=" "$f"; then
     echo "$f zawiera flagę portu CDP — to nie jest build właściciela; wgranie przerwane"
     exit 2
   fi

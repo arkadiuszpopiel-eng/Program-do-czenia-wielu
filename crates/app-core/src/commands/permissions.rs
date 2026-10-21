@@ -144,6 +144,19 @@ impl AppCore {
         }
         let held = self.adopt_approved_raises().await;
         let (global, sessions) = self.remembered_levels().await;
+        // Zapamiętane podniesienie, którego Broker nie ma (restart, wgranie wersji): poziom wracał
+        // do L3 bez słowa, a zadania w tle dostawały odmowy — informacja raz na uruchomienie.
+        if let Some(level) = global.filter(|l| *l > view.global)
+            && !std::mem::replace(&mut self.rt().level_notice, true)
+        {
+            self.emit(crate::dto::AlfaEvent::Toast {
+                kind: crate::dto::ToastKind::Warning,
+                message: crate::dto::LocalizedText::new(
+                    format!("Po uruchomieniu obowiązuje {:?} — zapamiętany {level:?} wymaga ponownego potwierdzenia: Ustawienia → Uprawnienia.", view.global),
+                    format!("After the restart {:?} applies — the remembered {level:?} needs confirming again: Settings → Permissions.", view.global),
+                ),
+            });
+        }
         if let Some(level) = global
             && level < view.global
             && !held.contains(&None)
