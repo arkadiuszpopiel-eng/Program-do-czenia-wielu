@@ -316,10 +316,15 @@ pub(crate) async fn run(
     // Błąd dostawcy przerywający przebieg — ten sam komunikat i stan co w zwykłej rozmowie
     // (limit zapytań z „ponów o…”, brak sieci → kolejka offline, odrzucony klucz).
     if let RunOutcome::Failed {
-        provider: Some(e), ..
+        provider: Some(e),
+        model,
+        ..
     } = &outcome
     {
-        fin.error = Some(provider_error(e, &choice.provider_name));
+        // Model z `Started` przed błędem (Router: `dostawca:model`) — nazwa dostawcy, nie „Router”.
+        let target = model.as_deref().and_then(|m| core.inner.brain.target(m));
+        let name = target.map_or_else(|| choice.provider_name.clone(), |t| t.provider_name);
+        fin.error = Some(provider_error(e, &name));
     }
     if !fin.text.is_empty() {
         let blocks = render_closed(&fin.text);

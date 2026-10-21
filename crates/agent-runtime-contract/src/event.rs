@@ -73,6 +73,10 @@ pub enum RunOutcome {
         /// pokazać ten sam komunikat i stan co zwykła rozmowa (ponów o…, kolejka offline).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         provider: Option<providers_contract::ProviderError>,
+        /// Model, który zawiódł (`Started` przed błędem; u Routera `dostawca:model`) — komunikat
+        /// nazywa dostawcę zamiast „Router” (przegląd 2026-10-22).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        model: Option<String>,
     },
 }
 

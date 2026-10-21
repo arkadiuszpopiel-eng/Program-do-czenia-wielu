@@ -210,6 +210,7 @@ impl TaskExecutor for RuntimeExecutor {
         let exit = join.await.unwrap_or(Exit::Finished(RunOutcome::Failed {
             error: "pętla przebiegu przerwana".into(),
             provider: None,
+            model: None,
         }));
         guard.0 = None;
         worker_result(&run, exit)

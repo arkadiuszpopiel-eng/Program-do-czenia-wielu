@@ -93,6 +93,7 @@ impl Engine {
         let exit = join.await.unwrap_or(Exit::Finished(RunOutcome::Failed {
             error: "podprzebieg przerwany".into(),
             provider: None,
+            model: None,
         }));
         self.handle.clear_active_child();
         let yielded = exit == Exit::Yielded;

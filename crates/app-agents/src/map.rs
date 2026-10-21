@@ -279,7 +279,8 @@ mod tests {
         assert!(
             final_text(&RunOutcome::Failed {
                 error: "x".into(),
-                provider: None
+                provider: None,
+                model: None,
             })
             .error
             .is_some()
