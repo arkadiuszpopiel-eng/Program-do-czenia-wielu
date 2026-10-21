@@ -361,18 +361,24 @@ cofania); na L3 pyta o nie tylko w sesji, która widziała niezaufaną treść (
 </ul>
 <h2 id="3-jak-to-sprawdzilem">3. Jak to sprawdziłem</h2>
 <ul>
-<li><code>verify wersja</code> na <code>7c1445a3</code> (23:49–00:59): 19 etapów, 15 zielonych, 4 czerwone. Rust 3103 zielonych, 0 czerwonych,
+<li><p><code>verify wersja</code> na <code>7c1445a3</code> (23:49–00:59): 19 etapów, 15 zielonych, 4 czerwone. Rust 3103 zielonych, 0 czerwonych,
 41 pominiętych (1026 programów testowych); interfejs 478; przeglądarka (Chromium, brak Edge) 552; prawdziwa aplikacja 47,
 pokrycie łącza 259 z 273 (94,9 %); graf zależności zielony (po raz pierwszy na tym PC — <code>jq</code>). Czerwone: <code>lint</code> — app-core
 8002 linie przy limicie 8000 (poprawione w <code>7a656482</code>, ponownie zielony); <code>dokumenty</code> — HTML planu po zmianie dziennika
 (wygenerowany w <code>aa10fb85</code>, <code>--verify</code> bez problemów); <code>audyt-npm</code> — dwa umiarkowane alerty <code>@vitest/mocker</code> 4.1.11
 w Storybooku (nadpisanie 4.1.12 w <code>077ae005</code>, <code>pnpm audit</code> czysty); <code>zaleznosci</code> — tylko <code>zip</code> 8.6 w aktualizatorze
-(3 alerty, bez zmian — Twoja decyzja). Po poprawkach ponownie: <code>pnpm lint</code>, clippy i testy autonomii app-core zielone.</li>
-<li>Testy celowe każdej poprawki, w większości sprawdzone na starym kodzie (bez poprawki nie przechodzą): koszt tury
-(0 zamiast 3 USD), termin długiego promptu (przełączenie na zapas), nazwa dostawcy w błędzie („dostawcy Router”).</li>
-<li>Powłoka właściciela zbudowana bez <code>e2e</code>: plik nie zawiera flagi <code>--remote-debugging-port=</code> (build testowy ją ma); próbny
+(3 alerty, bez zmian — Twoja decyzja). Po poprawkach ponownie: <code>pnpm lint</code>, clippy i testy autonomii app-core zielone.</p>
+</li>
+<li><p>Testy celowe każdej poprawki, w większości sprawdzone na starym kodzie (bez poprawki nie przechodzą): koszt tury
+(0 zamiast 3 USD), termin długiego promptu (przełączenie na zapas), nazwa dostawcy w błędzie („dostawcy Router”).</p>
+</li>
+<li><p>Powłoka właściciela zbudowana bez <code>e2e</code>: plik nie zawiera flagi <code>--remote-debugging-port=</code> (build testowy ją ma); próbny
 start kopii po wgraniu na tymczasowym profilu (25 s): aplikacja działa, Broker, okno zgód i watchdog uruchomione, 0 procesów
-WebView2 z portem debugowania; zamknięta, nic nie zostało.</li>
+WebView2 z portem debugowania; zamknięta, nic nie zostało.</p>
+</li>
+<li><p>Kopia bezpieczeństwa: <code>F:\Alfa\kopia-2026-10-22_0115</code> (392 MB; paczka git z pełną historią sprawdzona, sumy SHA-256,
+kopia <code>Alfa-uruchomiona</code> z wersją 0.0.69, pamięć projektu i plan).</p>
+</li>
 </ul>
 <h2 id="4-czego-nie-sprawdzilem">4. Czego nie sprawdziłem</h2>
 <ul>

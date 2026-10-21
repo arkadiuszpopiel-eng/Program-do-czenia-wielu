@@ -25,7 +25,7 @@
     "key_paths": {
       "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
       "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia (zawsze . .\\scripts\\portable-env.ps1)",
-      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; Seagate Backup Plus; ostatnie: kopia-2026-10-21_1625 = b39aa279, następna po 0.0.68)",
+      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; Seagate Backup Plus; ostatnia: kopia-2026-10-22_0115 — 0.0.69, stan 8fa13f1c)",
       "plan": "alfa/docs/plan/03-roadmapa.md (C5.1 zrobione, P4)",
       "raport": "alfa/docs/plan/34-raport-2026-10-21-0068.md (wcześniej 33 — 0.0.67)",
       "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md",
