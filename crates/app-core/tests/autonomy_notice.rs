@@ -44,11 +44,18 @@ async fn remembered_raise_missing_after_restart_is_announced_once() {
     assert_eq!(notices(&core).await, 0, "Broker ma zapamiętany poziom");
     drop(core);
 
-    // Restart: nowy Broker na L3, zapamiętane L4 — jedna informacja mimo kilku przebiegów.
+    // Restart: nowy Broker na L3, zapamiętane L4 — informacja dopiero przy trzecim przebiegu
+    // (okno już słucha), potem już nie.
     let fresh = Broker::with_window(AutonomyLevel::L3);
     let core = start(dir.path(), fresh.clone(), &secrets).await;
+    assert_eq!(
+        notices(&core).await,
+        0,
+        "nie przy starcie — okno jeszcze nie słucha"
+    );
+    passes(&fresh, 3).await;
     assert!(eventually(|| async { notices(&core).await == 1 }).await);
-    passes(&fresh, 2).await;
+    passes(&fresh, 1).await;
     assert_eq!(notices(&core).await, 1);
     assert_eq!(
         *fresh.global.lock().unwrap(),

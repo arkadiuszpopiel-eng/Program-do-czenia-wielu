@@ -144,16 +144,27 @@ impl AppCore {
         }
         let held = self.adopt_approved_raises().await;
         let (global, sessions) = self.remembered_levels().await;
-        // Zapamiętane podniesienie, którego Broker nie ma (restart, wgranie wersji): poziom wracał
-        // do L3 bez słowa, a zadania w tle dostawały odmowy — informacja raz na uruchomienie.
-        if let Some(level) = global.filter(|l| *l > view.global)
-            && !std::mem::replace(&mut self.rt().level_notice, true)
-        {
+        // Zapamiętane L4, a Broker na domyślnym L3 (restart, wgranie wersji): poziom wracał do L3
+        // bez słowa. Informacja dopiero przy trzecim takim przebiegu z rzędu (≥ 30 s: okno słucha
+        // zdarzeń, stan nie jest przejściowy jak łączenie z Brokerem) — raz, do zmiany stanu.
+        let waiting = global == Some(AutonomyLevel::L4)
+            && view.global == AutonomyLevel::L3
+            && held.is_empty();
+        let passes = {
+            let mut rt = self.rt();
+            rt.level_notice = if waiting {
+                rt.level_notice.saturating_add(1)
+            } else {
+                0
+            };
+            rt.level_notice
+        };
+        if passes == 3 {
             self.emit(crate::dto::AlfaEvent::Toast {
                 kind: crate::dto::ToastKind::Warning,
                 message: crate::dto::LocalizedText::new(
-                    format!("Po uruchomieniu obowiązuje {:?} — zapamiętany {level:?} wymaga ponownego potwierdzenia: Ustawienia → Uprawnienia.", view.global),
-                    format!("After the restart {:?} applies — the remembered {level:?} needs confirming again: Settings → Permissions.", view.global),
+                    "Po uruchomieniu obowiązuje L3 — zapamiętany L4 wymaga ponownego potwierdzenia: Ustawienia → Uprawnienia.",
+                    "After the restart L3 applies — the remembered L4 needs confirming again: Settings → Permissions.",
                 ),
             });
         }

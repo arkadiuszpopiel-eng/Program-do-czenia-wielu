@@ -39,8 +39,8 @@ pub(crate) struct Runtime {
     pub trash: HashMap<String, (SessionId, tokio::task::AbortHandle)>,
     /// Trwające pobierania modeli lokalnych (model → anulowanie).
     pub downloads: HashMap<String, CancellationToken>,
-    /// Pokazano już informację, że zapamiętany wyższy poziom autonomii czeka na potwierdzenie.
-    pub level_notice: bool,
+    /// Kolejne przebiegi strażnika z zapamiętanym L4 przy Brokerze na L3 (informacja przy trzecim).
+    pub level_notice: u8,
 }
 
 /// Współdzielony stan kompozycji.
