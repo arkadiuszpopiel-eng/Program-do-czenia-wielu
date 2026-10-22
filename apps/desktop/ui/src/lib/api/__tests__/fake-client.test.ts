@@ -140,6 +140,22 @@ describe('FakeAlfaClient — scenariusze', () => {
     expect((await client.system.status()).keys_configured).toBe(true);
   });
 
+  it('klucz zniknął z magazynu: test odmawia jak rdzeń, nowy klucz przywraca konto', async () => {
+    const { client } = setup({ scenario: 'key-missing' });
+    const before = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
+    expect(before).toMatchObject({ state: 'ok', key_stored: true });
+    await expect(client.accounts.test('acc-anthropic')).rejects.toMatchObject({ code: 'secrets' });
+    const after = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
+    expect(after).toMatchObject({ state: 'unconfigured', key_stored: false, key_saved_at: null });
+    // Inne konta mają klucze.
+    await expect(client.accounts.test('acc-openai')).resolves.toMatchObject({ ok: true });
+    const report = await client.accounts.rotate('acc-anthropic', 'sk-ant-nowy');
+    expect(report.ok).toBe(true);
+    await expect(client.accounts.test('acc-anthropic')).resolves.toMatchObject({ ok: true });
+    const fixed = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
+    expect(fixed).toMatchObject({ state: 'ok', key_stored: true });
+  });
+
   it('dodanie konta: te same odmowy co rdzeń (endpoint, klucz) jako Error z komunikatem', async () => {
     const { client } = setup({ scenario: 'no-keys' });
     const add = (provider_id: string, secret: string, base_url: string | null) =>

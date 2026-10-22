@@ -123,6 +123,8 @@ const works = (outcome: string) =>
 export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
   /** Klucze kont tej atrapy (tylko w pamięci karty) — od nich zależy wynik testu. */
   const keys = new Map<string, string>();
+  /** Konta, których klucza nie ma już w magazynie (rdzeń dowiaduje się o tym dopiero przy teście). */
+  const lost = new Set(core.scenario === 'key-missing' ? ['acc-anthropic'] : []);
   const update = (id: string, patch: Partial<Account>): Account | undefined => {
     const index = core.accounts.findIndex((a) => a.id === id);
     const current = core.accounts[index];
@@ -239,7 +241,15 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     test: (id) => {
       const account = core.accounts.find((a) => a.id === id);
       if (!account) return missing();
-      const { stored, report } = probe(account, keys.get(id) ?? (account.key_stored ? '' : 'bad'));
+      // Jak rdzeń (`test_account_now`): bez klucza w magazynie nie ma testu, a konto (o ile nie
+      // jest wyłączone) czeka na nowy klucz.
+      if (lost.has(id) || !account.key_stored) {
+        if (account.state !== 'disabled')
+          update(id, { state: 'unconfigured', key_stored: false, key_saved_at: null });
+        const text = `brak klucza konta \`${id}\` w magazynie sekretów`;
+        return Promise.reject(new CommandError('secrets', text));
+      }
+      const { stored, report } = probe(account, keys.get(id) ?? '');
       update(id, stored);
       return core.reply(report);
     },
@@ -261,6 +271,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       const { stored, report } = probe(account, key);
       if (rotateStores(verdictOf(report))) {
         keys.set(id, key);
+        lost.delete(id);
         update(id, { ...stored, key_stored: true, key_saved_at: core.isoNow() });
       }
       return core.reply(report);

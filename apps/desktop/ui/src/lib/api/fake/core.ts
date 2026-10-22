@@ -49,6 +49,8 @@ export type FakeScenario =
   | 'slow-core'
   /** Arena: odpowiedź modeli OpenAI kończy się limitem kosztów konta (błąd tury). */
   | 'arena-budget'
+  /** Klucza konta Anthropic nie ma już w Credential Managerze — test odmawia jak rdzeń. */
+  | 'key-missing'
   /** Strumień ~5 tokenów/s — odpowiedź trwa, gdy test ją zatrzymuje albo otwiera okna. */
   | 'slow-stream';
 
@@ -73,6 +75,7 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'core-errors',
   'slow-core',
   'arena-budget',
+  'key-missing',
   'slow-stream',
 ];
 
