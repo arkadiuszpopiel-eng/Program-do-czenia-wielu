@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: reference
   originSessionId: 526ab23b-611a-489a-a8a3-7c1153e69825
-  modified: 2026-10-15T05:59:58.577Z
+  modified: 2026-10-22T00:47:12.024Z
 ---
 
 Stan z 2026-10-08 (laptop i7-13620H, RTX 4050 6 GB) — sprawdź, czy nadal aktualne.
@@ -92,6 +92,12 @@ ok. 15 GB do `target/debug/deps` (121 GB po 8 wersjach). Zasady: (1) przed każd
 `df -h /e`; (2) sprzątać **tylko** `target/debug/deps` i `incremental` — katalog `build` zostawić, bo trzyma
 zbudowany OpenSSL (jego ponowna budowa to ok. 20 min); (3) przy pracy seriami podbijać wersję rzadziej (kilka zmian
 na wersję); (4) nie edytować źródeł Rust, gdy w tle kompiluje się `cargo` — bierze stan mieszany.
+**PC stacjonarny, 2026-10-22 2:30:** po dniu z trzema `verify wersja` `target/debug` miał 230 GB, na E: zostało
+14 GB i `verify` oznaczył linter i testy jako NIEURUCHOMIONE (próg ok. 30 GB) — bez czerwonego wyniku, łatwo przeoczyć.
+Przed każdym `verify` sprawdzić `df -h /e`; sprzątanie bez pełnej przebudowy: usunąć z `target/debug/deps` tylko
+`.exe` i `.pdb` starsze niż ostatni pełny bieg testów (152 GB) oraz `incremental`. Ukośniki: tej nocy heredoc zepsuł
+też literały `'\\'` i kontynuacje wiersza w napisach Rust (ciągi spacji w komunikatach) — tylko Edit/Write.
+
 Skrypty poprawek w katalogu roboczym sesji zapisywać pod nowymi nazwami (podkatalog na daną noc): plik o starej
 nazwie nie daje się nadpisać bez odczytu, a uruchomiony przez pomyłkę stary skrypt wprowadza obce zmiany.
 
