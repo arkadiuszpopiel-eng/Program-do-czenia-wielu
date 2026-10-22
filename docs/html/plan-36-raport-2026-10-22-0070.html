@@ -396,6 +396,14 @@ odmawia jak rdzeń (komunikat „brak klucza konta … w magazynie sekretów”)
 klucza je przywraca (<code>29d30387</code>; zamyka ustalenie 17 przeglądu kluczy). Przy okazji komunikat rdzenia przy braku klucza
 mówi teraz, co zrobić — „Klucza tego konta nie ma w Menedżerze poświadczeń Windows — wpisz go ponownie („Zmień klucz”).” —
 zamiast pokazywać wewnętrzny identyfikator konta (ten jest w szczegółach błędu; <code>290febb6</code>, w kodzie, do następnej wersji).</p>
+<p>Przegląd tych trzech zmian (6:33–6:41, 3 recenzentów + weryfikacja każdego ustalenia): 6 ustaleń, 3 obalone, 3 potwierdzone.
+Poprawione w <code>11198384</code>: memory-sync wskazywał do usunięcia u źródła także treść, której repozytorium nigdy nie widziało
+(teraz tylko treść kiedyś zatwierdzona; inna wraca do kopii); atrapa włączała konto bez klucza jako działające (teraz
+„nieskonfigurowane”, jak rdzeń). <strong>Otwarte (rdzeń, błąd sprzed tej nocy):</strong> konto „nieskonfigurowane” (klucz zniknął
+z magazynu) u dostawcy, którego klucza nie da się sprawdzić z góry (własny adres zgodny z OpenAI, gdy <code>/models</code> zwraca
+404/405), po „Zmień klucz” zapisuje klucz, ale zostaje „nieskonfigurowane” i Router go nie używa — <code>try_rotate_now</code> liczy
+stan przez <code>next_state</code> od bieżącego stanu, a dla „nie da się sprawdzić” to zostawia <code>Unconfigured</code>. Obejście: Wyłącz,
+potem Włącz. Poprawka do następnej wersji (<code>crates/accounts-hub-impl/src/keys.rs</code>, z testem).</p>
 <h2 id="5-co-zostaje">5. Co zostaje</h2>
 <ul>
 <li>Z serii 9 i 10 (niska waga): koszt przebiegów agentek przez Router zapisuje się pod „Router”, więc limit konta (dostawcy)
