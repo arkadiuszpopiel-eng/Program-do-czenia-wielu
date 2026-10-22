@@ -182,8 +182,8 @@ impl AppCore {
                     ),
                     EVENT_LIMIT_WARNING => (
                         ToastKind::Warning,
-                        "Zbliżasz się do miesięcznego limitu kosztów.",
-                        "You are approaching the monthly cost limit.",
+                        "Zbliżasz się do limitu kosztów (miesięcznego albo konta).",
+                        "You are approaching a cost limit (monthly or account).",
                     ),
                     _ => continue,
                 };
