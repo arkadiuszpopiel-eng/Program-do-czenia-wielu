@@ -188,6 +188,21 @@ pub enum RunEvent {
     },
     /// Zużycie (po każdej turze modelu).
     Usage(UsageTotals),
+    /// Zużycie jednej tury modelu (przed [`RunEvent::Usage`]): model, który faktycznie odpowiedział
+    /// (u Routera `dostawca:model`), żeby koszt trafił do faktycznego dostawcy i jego limitu,
+    /// a nie pod „router” (przegląd 2026-10-22).
+    ModelUsage {
+        /// Model z `Started`/`ModelSwitched` dostawcy (brak — dostawca go nie podał).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        model: Option<String>,
+        /// Tokeny wejścia (z cache).
+        input_tokens: u64,
+        /// Tokeny wyjścia.
+        output_tokens: u64,
+        /// Koszt tury (nano-USD); brak — model bez cennika (model lokalny ma cenę 0).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cost_nano_usd: Option<u64>,
+    },
     /// Przekroczony budżet.
     BudgetExceeded {
         /// Który.
@@ -229,6 +244,7 @@ impl RunEvent {
             Self::Checkpoint { .. } => "agent.run.checkpoint",
             Self::Tainted { .. } => "agent.session.tainted",
             Self::Usage(_) => "agent.run.usage",
+            Self::ModelUsage { .. } => "agent.run.model_usage",
             Self::BudgetExceeded { .. } => "agent.run.budget_exceeded",
             Self::LoopDetected { .. } => "agent.run.loop_detected",
             Self::Verified { .. } => "agent.run.verified",

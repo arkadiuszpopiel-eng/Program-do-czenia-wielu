@@ -3,11 +3,13 @@
 
 use app_api::dto::{self, ActivityInfo, AlfaEvent, EventLevel, TimelineEvent, TimelineKind};
 use app_api::ids;
-use app_api::ports::{BrainChoice, BrainTarget};
+use std::collections::BTreeMap;
+
+use app_api::ports::{BrainChoice, BrainPort, BrainTarget};
 
 use crate::engine::ChatEngine;
 use crate::generate::GenRequest;
-use crate::outcome::Chosen;
+use crate::outcome::{Chosen, CostPart};
 
 /// Wybór dostawcy do kosztów i statystyk.
 pub(crate) fn chosen_of(target: &BrainTarget) -> Chosen {
@@ -17,6 +19,26 @@ pub(crate) fn chosen_of(target: &BrainTarget) -> Chosen {
         account: target.account.clone(),
         model: target.model.clone(),
     }
+}
+
+/// Koszt przebiegu agentki pod faktycznym dostawcą i kontem (`dostawca:model` z tur → cel trasy),
+/// nie pod „router”. Model bez dostawcy w nazwie zostaje w reszcie pod `chosen` (przegląd 2026-10-22).
+pub(crate) fn cost_parts(
+    brain: &dyn BrainPort,
+    by_model: BTreeMap<String, (u64, u64, Option<u64>)>,
+) -> Vec<CostPart> {
+    by_model
+        .into_iter()
+        .filter_map(|(model, (input_tokens, output_tokens, cost_nano_usd))| {
+            let target = brain.target(&model)?;
+            Some(CostPart {
+                chosen: chosen_of(&target),
+                input_tokens,
+                output_tokens,
+                cost_nano_usd,
+            })
+        })
+        .collect()
 }
 
 /// Uzasadnienie trasy (bez treści rozmowy).

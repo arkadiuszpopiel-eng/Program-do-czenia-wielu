@@ -86,9 +86,16 @@ impl Engine {
             .as_deref()
             .and_then(|m| provider.cost(m, &turn.usage))
             .or_else(|| provider.cost(&self.cp.spec.model, &turn.usage));
-        if let Some(cost) = cost {
-            self.cp.usage.cost_nano_usd = self.cp.usage.cost_nano_usd.saturating_add(cost.nano_usd);
-        }
+        let nano = cost.map_or(0, |c| c.nano_usd);
+        self.cp.usage.cost_nano_usd = self.cp.usage.cost_nano_usd.saturating_add(nano);
+        self.handle
+            .emit(RunEvent::ModelUsage {
+                model: turn.model.clone(),
+                input_tokens: turn.usage.total_input(),
+                output_tokens: turn.usage.output_tokens,
+                cost_nano_usd: cost.map(|c| c.nano_usd),
+            })
+            .await;
         self.cp.usage.elapsed_ms = self.elapsed_ms();
         self.handle.emit(RunEvent::Usage(self.cp.usage)).await;
         let finished = |status, output: String| RunEvent::StepFinished {

@@ -341,7 +341,8 @@ impl RunProjector {
                 self.run.state = RunState::Running;
                 self.push_run(&mut out);
             }
-            RunEvent::Checkpoint { .. } => {}
+            // Rozbicie kosztu na modele czyta zapis kosztów (`app-chat`); widok bierze sumę z `Usage`.
+            RunEvent::Checkpoint { .. } | RunEvent::ModelUsage { .. } => {}
             RunEvent::Tainted { source } => {
                 let title = format!(
                     "Sesja widziała niezaufaną treść ({source:?}) — ryzykowne akcje wymagają potwierdzenia"

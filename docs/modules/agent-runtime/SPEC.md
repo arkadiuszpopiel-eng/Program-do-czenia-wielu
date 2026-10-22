@@ -23,6 +23,11 @@ pub fn steps_before_delivery(events, sent_after_seq, message) -> Option<u32>  //
     async fn start_with(spec, RunOptions); fn children(&RunId); fn report(&RunId) -> RunReport }   // v1: metody z domyślną implementacją
 ```
 Zdarzenia `agent.*` **bez nowych wariantów** (UI/Replay v0 działa): delegacja = krok narzędzia `delegate_task` (wynik niesie id podprzebiegu), Krytyczka = krok `Verify` + `Verified{note: "Gama (Krytyczka): …"}`, oddanie zadania schedulerowi = `Paused` → `Resumed`. Checkpoint niesie `options`, `taint_source`, `delegated` (serde default — stare checkpointy się wczytują).
+Jedyny dodany później wariant (2026-10-22, addytywnie): `ModelUsage { model, input_tokens, output_tokens, cost_nano_usd }`
+(`agent.run.model_usage`) przed `Usage` po każdej turze modelu — koszt tury pod modelem, który odpowiedział (u Routera
+`dostawca:model`); zapis kosztów (`app-chat`) liczy go do faktycznego dostawcy i konta (ich limitów), nie pod „router”.
+Projekcja UI/Replay go pomija (sumy dalej z `Usage`); zdarzeń nie odczytuje się z dziennika z powrotem, więc starsza wersja
+po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają). Test: `tests/cost.rs`, `app-core/tests/agent_costs.rs`.
 
 ## Model v1 (`agent-runtime-impl`)
 - **Równoległość:** każdy przebieg = własny uchwyt (dziennik, kolejka sterowania, token anulowania, budżet, taint). Narzędzia zmieniające stan biorą dzierżawy `scheduler-lite` (`RuntimeExt::locks`: pliki ze ścieżek argumentów, katalog powłoki, `ScreenInput` dla `gui.control`) w porządku kanonicznym, z limitem `lease_wait_ms` i anulowaniem; `AlreadyHeld` (zasób zadania schedulera) = bez nowej dzierżawy.

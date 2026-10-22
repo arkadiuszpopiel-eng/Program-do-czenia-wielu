@@ -19,6 +19,16 @@ pub(crate) struct Chosen {
     pub model: String,
 }
 
+/// Część kosztu przebiegu agentki pod faktycznym dostawcą (tury jednego modelu, `RunEvent::ModelUsage`).
+#[derive(Debug, Clone)]
+pub(crate) struct CostPart {
+    pub chosen: Chosen,
+    pub input_tokens: u64,
+    pub output_tokens: u64,
+    /// Brak — model bez cennika (lokalny ma cenę 0, jak w zwykłej rozmowie).
+    pub cost_nano_usd: Option<u64>,
+}
+
 /// Wynik generacji (do zapisu w historii i zdarzeń końcowych).
 #[derive(Debug, Clone)]
 pub(crate) struct Outcome {
@@ -30,6 +40,8 @@ pub(crate) struct Outcome {
     pub usage: Option<Usage>,
     pub cost_nano_usd: Option<u64>,
     pub chosen: Option<Chosen>,
+    /// Koszt przebiegu agentki rozbity na faktycznych dostawców; reszta (i rozmowa) — pod `chosen`.
+    pub parts: Vec<CostPart>,
     pub latency_ms: u64,
     pub thinking_ms: Option<u64>,
     /// Kroki narzędzi (przebieg agentki).
@@ -51,6 +63,7 @@ impl Outcome {
             usage: None,
             cost_nano_usd: None,
             chosen: None,
+            parts: Vec::new(),
             latency_ms: 0,
             thinking_ms: None,
             tools: Vec::new(),

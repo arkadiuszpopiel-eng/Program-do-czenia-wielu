@@ -18,7 +18,7 @@ use app_store::TurnMeta;
 
 use crate::engine::{ChatEngine, GenHandle};
 use crate::generate::{GenRequest, Placement};
-use crate::outcome::Outcome;
+use crate::outcome::{Chosen, Outcome};
 
 /// Tekst tury-komunikatu, gdy odpowiedź nie powstała.
 const NO_ANSWER: &str = "Odpowiedź przerwana przed pierwszym słowem.";
@@ -73,9 +73,14 @@ impl ChatEngine {
         }
     }
 
-    async fn record_cost(&self, req: &GenRequest, outcome: &Outcome) -> Option<TurnUsage> {
-        let chosen = outcome.chosen.as_ref()?;
-        let usage = outcome.usage?;
+    /// Jeden wpis kosztu; `None`, gdy identyfikatora dostawcy albo modelu nie da się zapisać.
+    async fn record_one(
+        &self,
+        req: &GenRequest,
+        chosen: &Chosen,
+        usage: CostUsage,
+        nano: Option<u64>,
+    ) -> Option<Option<u64>> {
         let input = CostInput {
             session: Some(req.session.clone()),
             agent: Some(AgentId::new(req.agent.as_str())),
@@ -85,13 +90,8 @@ impl ChatEngine {
                 .as_deref()
                 .and_then(|a| AccountId::new(a).ok()),
             model: ModelId::new(chosen.model.as_str()).ok()?,
-            usage: CostUsage {
-                input_tokens: usage.input_tokens,
-                output_tokens: usage.output_tokens,
-                cache_read_tokens: usage.cache_read_tokens,
-                cache_write_tokens: usage.cache_write_tokens,
-            },
-            pricing: match outcome.cost_nano_usd {
+            usage,
+            pricing: match nano {
                 Some(nano) => Pricing::Reported {
                     micro_usd: nano.div_ceil(1000),
                 },
@@ -99,12 +99,62 @@ impl ChatEngine {
             },
             background: false,
         };
-        let micro_pln = match self.inner.costs.record(input).await {
+        Some(match self.inner.costs.record(input).await {
             Ok(record) => record.micro_pln,
             Err(e) => {
                 tracing::warn!(error = %e, "zapis kosztu nie powiódł się");
                 None
             }
+        })
+    }
+
+    async fn record_cost(&self, req: &GenRequest, outcome: &Outcome) -> Option<TurnUsage> {
+        let chosen = outcome.chosen.as_ref()?;
+        let usage = outcome.usage?;
+        // Przebieg agentki: tury pod faktycznymi dostawcami (limit konta je widzi), reszta pod `chosen`.
+        let mut rest = CostUsage {
+            input_tokens: usage.input_tokens,
+            output_tokens: usage.output_tokens,
+            cache_read_tokens: usage.cache_read_tokens,
+            cache_write_tokens: usage.cache_write_tokens,
+        };
+        let mut rest_nano = outcome.cost_nano_usd;
+        let mut micro_pln: Option<u64> = None;
+        let mut add = |m: Option<u64>| {
+            if let Some(m) = m {
+                micro_pln = Some(micro_pln.unwrap_or(0).saturating_add(m));
+            }
+        };
+        for part in &outcome.parts {
+            let part_usage = CostUsage {
+                input_tokens: part.input_tokens,
+                output_tokens: part.output_tokens,
+                ..CostUsage::default()
+            };
+            if let Some(m) = self
+                .record_one(req, &part.chosen, part_usage, part.cost_nano_usd)
+                .await
+            {
+                add(m);
+                rest.input_tokens = rest.input_tokens.saturating_sub(part.input_tokens);
+                rest.output_tokens = rest.output_tokens.saturating_sub(part.output_tokens);
+                rest_nano = rest_nano
+                    .map(|n| n.saturating_sub(part.cost_nano_usd.unwrap_or(0)))
+                    .filter(|n| *n > 0);
+            }
+        }
+        let rest_left = rest.input_tokens + rest.output_tokens > 0 || rest_nano.is_some();
+        if outcome.parts.is_empty() || rest_left {
+            match self.record_one(req, chosen, rest, rest_nano).await {
+                Some(m) => add(m),
+                None if outcome.parts.is_empty() => return None,
+                None => {}
+            }
+        }
+        // Jeden faktyczny dostawca bez reszty — tura pokazuje jego, nie „Router · auto”.
+        let shown = match outcome.parts.as_slice() {
+            [only] if !rest_left => &only.chosen,
+            _ => chosen,
         };
         Some(TurnUsage {
             input_tokens: usage.input_tokens,
@@ -112,8 +162,8 @@ impl ChatEngine {
             cost: Money::from_micro_pln(micro_pln.unwrap_or(0)),
             cost_micro_pln: micro_pln,
             latency_ms: outcome.latency_ms,
-            provider: chosen.provider_name.clone(),
-            model: chosen.model.clone(),
+            provider: shown.provider_name.clone(),
+            model: shown.model.clone(),
         })
     }
 

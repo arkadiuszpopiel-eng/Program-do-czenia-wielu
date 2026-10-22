@@ -285,14 +285,31 @@ pub(crate) async fn run(
     };
     let mut family_view = FamilyProjector::new(ctx, titles, Some(stack.tickets.clone()));
     let mut totals = UsageTotals::default();
+    // Tury przebiegu głównego wg modelu, który faktycznie odpowiedział: (wejście, wyjście, nano-USD).
+    let mut by_model = std::collections::BTreeMap::<String, (u64, u64, Option<u64>)>::new();
     while let Some(env) = family.next().await {
         let (head, projection, main) = family_view.apply(&family, &env);
         if !main {
             core.project_task(&req.session, &head, projection);
             continue;
         }
-        if let RunEvent::Usage(u) = &env.event {
-            totals = *u;
+        match &env.event {
+            RunEvent::Usage(u) => totals = *u,
+            // Tura bez zużycia (błąd przed treścią, anulowanie) nie robi pustego wpisu kosztu.
+            RunEvent::ModelUsage {
+                model: Some(model),
+                input_tokens,
+                output_tokens,
+                cost_nano_usd,
+            } if input_tokens + output_tokens > 0 || cost_nano_usd.is_some_and(|c| c > 0) => {
+                let part = by_model.entry(model.clone()).or_default();
+                part.0 += input_tokens;
+                part.1 += output_tokens;
+                if let Some(c) = cost_nano_usd {
+                    part.2 = Some(part.2.unwrap_or(0).saturating_add(*c));
+                }
+            }
+            _ => {}
         }
         core.apply_projection(&req.session, handle, &ctl, family_view.main(), projection);
     }
@@ -344,6 +361,7 @@ pub(crate) async fn run(
         });
     }
     let tokens = totals.input_tokens + totals.output_tokens;
+    let parts = crate::routing::cost_parts(core.inner.brain.as_ref(), by_model);
     Outcome {
         text: fin.text,
         thinking: Vec::new(),
@@ -362,6 +380,7 @@ pub(crate) async fn run(
             account: choice.account.clone(),
             model: choice.model.clone(),
         }),
+        parts,
         latency_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
         thinking_ms: None,
         tools: projector.tool_steps().to_vec(),

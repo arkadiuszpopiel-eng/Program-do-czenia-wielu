@@ -373,6 +373,7 @@ pub(crate) async fn generate(
         usage: (turn.usage != Usage::default()).then_some(turn.usage),
         cost_nano_usd: cost.map(|c| c.nano_usd),
         chosen: Some(chosen),
+        parts: Vec::new(),
         latency_ms: millis(started.elapsed()),
         thinking_ms: thinking_ms.or_else(|| thinking.map(|(s, _)| millis(s.elapsed()))),
         tools: Vec::new(),
