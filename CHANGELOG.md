@@ -12,6 +12,36 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.71 — 2026-10-22
+
+Koszt zadań agentek liczy się do limitu właściwego konta, konto po wymianie klucza wraca do pracy, a wywołania
+narzędzi od serwerów bez numeracji się nie sklejają.
+
+### Poprawki
+
+- [poważne] Koszt zadań agentek trafia do dostawcy (i konta), który faktycznie odpowiadał — wcześniej zapisywał się
+  pod „Router”, więc limit kosztów konta go nie widział (limit miesięczny tak). Tura agentki pokazuje faktycznego
+  dostawcę i model, gdy odpowiadał jeden.
+- [poważne] Konto, którego klucz zniknął z Menedżera poświadczeń albo którego ostatni test się nie udał, po „Zmień
+  klucz” wraca do pracy także u dostawcy, którego klucza nie da się sprawdzić z góry (własny adres zgodny z OpenAI)
+  — wcześniej zostawało „nieskonfigurowane” albo w błędzie z nowym kluczem i Router je pomijał.
+- Gdy klucza konta nie ma w Menedżerze poświadczeń, komunikat mówi, co zrobić („wpisz go ponownie — Zmień klucz”),
+  zamiast pokazywać wewnętrzny identyfikator konta.
+- Wywołania narzędzi od serwerów zgodnych z OpenAI, które nie numerują wywołań albo wysyłają pusty identyfikator,
+  nie sklejają się w jedno — kolejne wywołanie zaczyna się po kompletnych argumentach poprzedniego.
+- Ostrzeżenie przed limitem kosztów nazywa właściwy limit (konta, miesięczny albo zadań w tle) i nie gubi limitu
+  innego zakresu, który przekroczyłoby dopiero pełne maksimum odpowiedzi.
+- Cofanie kroków powłoki nie przegląda już tysięcy plików przy każdym cofnięciu (znaczniki katalogu wyników cargo
+  sprawdzane tylko dla katalogów `target`); zachowanie bez zmian.
+
+### Testy
+
+- Regresje (sprawdzone na starym kodzie): koszt tury agentki pod faktycznym dostawcą (`app-core/tests/agent_costs.rs`
+  — wcześniej `provider: "router"`), koszt i model każdej tury przebiegu, wymiana klucza konta bez klucza i w błędzie
+  (rdzeń i obie atrapy), pusty `id` wywołań narzędzi. Scenariusz atrapy interfejsu `?scenario=key-missing`. Testy
+  mostów CLI z dłuższym limitem odczytu wersji atrapy (losowe czerwone w pełnym biegu). Przeglądy w świeżym
+  kontekście z weryfikacją każdego ustalenia — potwierdzone poprawione przed wydaniem.
+
 ## 0.0.70 — 2026-10-22
 
 Limity kosztów kont działają, Router nie blokuje rozmowy na długo przed limitem, a Gemini i modele OpenAI
