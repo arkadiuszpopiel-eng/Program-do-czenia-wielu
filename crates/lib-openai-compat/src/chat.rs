@@ -222,10 +222,6 @@ impl ChatDecoder {
         let id = tc["id"].as_str().filter(|s| !s.is_empty());
         let named = f["name"].as_str().is_some_and(|n| !n.is_empty());
         let fresh = u64::from(u32::MAX) + self.tools.len() as u64;
-        let latest = self.tools.iter().max_by_key(|(_, s)| s.index);
-        // Nazwa po kompletnych argumentach poprzedniego = następne wywołanie; w trakcie fragmentów
-        // (powtórzona nazwa) — ciąg tego samego.
-        let done = latest.is_none_or(|(_, s)| serde_json::from_str::<Value>(&s.json).is_ok());
         let key = match (tc["index"].as_u64(), id) {
             (Some(i), _) => i,
             (None, Some(id)) => self
@@ -233,8 +229,19 @@ impl ChatDecoder {
                 .iter()
                 .find(|(_, s)| s.id == id)
                 .map_or(fresh, |(k, _)| *k),
-            (None, None) if named && done => fresh,
-            (None, None) => latest.map_or(0, |(k, _)| *k),
+            (None, None) => {
+                // Nazwa po kompletnych argumentach poprzedniego = następne wywołanie; w trakcie
+                // fragmentów (powtórzona nazwa) — ciąg tego samego. Parsowanie tylko tutaj: ścieżka
+                // z `index` nie płaci za nie przy każdym fragmencie (przegląd serii 11).
+                let latest = self.tools.iter().max_by_key(|(_, s)| s.index);
+                let done =
+                    || latest.is_none_or(|(_, s)| serde_json::from_str::<Value>(&s.json).is_ok());
+                if named && done() {
+                    fresh
+                } else {
+                    latest.map_or(0, |(k, _)| *k)
+                }
+            }
         };
         if !self.tools.contains_key(&key) {
             let index = self.next_index;

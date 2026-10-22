@@ -238,7 +238,7 @@ Dziennik zdarzeń jest append-only, a widoczna rozmowa to projekcja drzewa gał�
 
 - Awatar z pierścieniem koloru + imię + chip roli (np. „Delta · Wykonawczyni").
 - Kroki narzędzi zwinięte do jednej linii statusu (ikona, opis, czas) z rozwinięciem.
-- Bloki kodu: kopiuj, zapisz jako plik, zawijanie (bez „uruchom w terminalu” od 0.0.70 — kod uruchamia agentka
+- Bloki kodu: kopiuj, zapisz jako plik, zawijanie, dla HTML/SVG/Markdown „Otwórz w kanwie” (bez „uruchom w terminalu” od 0.0.70 — kod uruchamia agentka
   narzędziem powłoki za zgodą Brokera albo użytkownik po skopiowaniu).
 - Linki do plików otwierają podgląd.
 - **Karta „czeka na zatwierdzenie"** z przyciskiem przenoszącym do okna Brokera (samo zatwierdzenie tylko tam).
