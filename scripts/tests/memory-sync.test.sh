@@ -247,6 +247,30 @@ if command -v git >/dev/null; then
   touch -d '2026-01-01 00:00' "$ASSISTANT/a.md"
   sync
   check "niezatwierdzona nowsza kopia: nie nadpisana, kod 3" eval 'rc_is 3 && grep -q "wersja 4" "$RULES/a.md"'
+  # Zasada usunięta w repozytorium wraca ze starej pamięci drugiego komputera — nie powinna (inwentaryzacja 21.10).
+  echo "zasada a, wersja 5" >"$ASSISTANT/a.md"
+  echo "zasada z" >"$ASSISTANT/z.md"
+  echo "- [z](z.md)" >>"$ASSISTANT/MEMORY.md"
+  sync
+  check "nowa zasada z: skopiowana, kod 0" eval 'rc_is 0 && test -f "$RULES/z.md"'
+  commit_copy "z dodana"
+  rm -f "$RULES/z.md"
+  grep -v "z.md" "$RULES/MEMORY.md" >"$RULES/MEMORY.tmp" && mv "$RULES/MEMORY.tmp" "$RULES/MEMORY.md"
+  commit_copy "z usunięta"
+  touch -d '2026-01-01 00:00' "$ASSISTANT/z.md" "$ASSISTANT/MEMORY.md"
+  rm -f "$COPY/OSTATNIA-KOPIA.txt"
+  sync
+  check "usunięta w repozytorium: nie wraca, kod 3" eval 'rc_is 3 && test ! -e "$RULES/z.md" && out_has "ZASADY USUNIĘTE W REPOZYTORIUM"'
+  check "usunięta w repozytorium: spis MEMORY.md wstrzymany" eval '! grep -q z.md "$RULES/MEMORY.md"'
+  check "usunięta w repozytorium: data kopii nie zapisana" test ! -e "$COPY/OSTATNIA-KOPIA.txt"
+  check "usunięta w repozytorium: polecenie usunięcia u źródła działa" run_listed "  rm -- "
+  grep -v "z.md" "$ASSISTANT/MEMORY.md" >"$ASSISTANT/MEMORY.tmp" && mv "$ASSISTANT/MEMORY.tmp" "$ASSISTANT/MEMORY.md"
+  sync
+  check "po usunięciu u źródła: kod 0" eval 'rc_is 0 && test ! -e "$RULES/z.md"'
+  # Zasada odtworzona celowo (nowa data zmiany) wraca.
+  echo "zasada z, odtworzona" >"$ASSISTANT/z.md"
+  sync
+  check "odtworzona celowo: wraca do kopii" eval 'rc_is 0 && same "$ASSISTANT/z.md" "$RULES/z.md"'
 fi
 # Klucz w kopii, gdy źródło wygląda na nowe — i tak zastąpiony czystą wersją.
 setup

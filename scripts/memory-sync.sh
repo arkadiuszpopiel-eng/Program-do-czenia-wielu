@@ -15,7 +15,9 @@
 # nie są nadpisywane, `--prune` niczego tam nie usuwa, a skrypt kończy się kodem 3. 2026-10-17/18 lustro
 # skasowało z repozytorium zasady pracy, gdy dysk przeszedł na komputer z pustą pamięcią asystenta. Zasada,
 # której treść u źródła jest wcześniejszą zatwierdzoną wersją pliku w kopii (stara pamięć drugiego komputera),
-# też nie nadpisuje nowszej — 2026-10-21 PC cofnął tak w repozytorium zasady dwóch maszyn; kod 3. Stan
+# też nie nadpisuje nowszej — 2026-10-21 PC cofnął tak w repozytorium zasady dwóch maszyn; kod 3. Tak samo
+# zasada usunięta w repozytorium (zatwierdzone usunięcie), której plik u źródła jest starszy niż to usunięcie,
+# nie wraca do kopii — skrypt podaje polecenie usunięcia jej u źródła; kod 3. Stan
 # projektu i dziennik sesji są aktualizowane zawsze. Pliki są porównywane bez znaków CR (źródła mają CRLF,
 # repozytorium LF), więc sama zmiana końców wierszy nie jest zmianą.
 #
@@ -64,6 +66,7 @@ RULES_ONLY_IN_REPO=0      # 1 = któraś zasada pracy jest tylko w kopii (trzeba
 FRESH=""                  # katalog kopii, którego źródło wygląda na nowe (tylko zasady pracy)
 HELD=()                   # polecenia porównania plików, których kopii nie nadpisano
 STALE=()                  # polecenia przywrócenia nowszej zasady z kopii do źródła (u źródła starsza wersja)
+DELETED=()                # polecenia usunięcia u źródła zasad usuniętych w repozytorium (u źródła kopia sprzed)
 STALE_INDEX=""            # polecenie porównania spisu MEMORY.md wstrzymanego razem ze starszymi zasadami
 PRUNE_RM=()               # pliki, których --prune nie usunął, bo źródło wygląda na nowe
 KEY_SRC=()                # pliki źródłowe z czymś jak klucz (nie skopiowane)
@@ -110,6 +113,16 @@ older_version() { # <plik źródłowy> <plik kopii względem repozytorium>
     cmp -s <(tr -d '\r' <"$src") <(git_root show "$commit:$rel" 2>/dev/null | tr -d '\r') && return 0
   done < <(git_root log --format=%H -- "$rel" 2>/dev/null)
   return 1
+}
+
+# Zasada usunięta w repozytorium (zatwierdzone usunięcie), a u źródła plik sprzed usunięcia — pamięć drugiego
+# komputera. Bez tego usunięta zasada wracała przy pierwszej synchronizacji na tamtej maszynie (inwentaryzacja 21.10).
+deleted_in_repo() { # <plik źródłowy> <plik kopii względem repozytorium>
+  local src="$1" rel="$2" gone mtime
+  git_root rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 1
+  gone="$(git_root log -1 --diff-filter=D --format=%ct -- "$rel" 2>/dev/null)"
+  mtime="$(stat -c %Y -- "$src" 2>/dev/null)"
+  [ -n "$gone" ] && [ -n "$mtime" ] && [ "$mtime" -lt "$gone" ]
 }
 
 # Spis MEMORY.md na końcu: wstrzymywany, gdy któraś zasada u źródła okazała się starsza (STALE).
@@ -162,6 +175,10 @@ copy_dir() { # <źródło> <cel> <wzorzec> [1 = chronić kopię przed źródłem
       continue
     fi
     if [ ! -e "$dst/$name" ]; then
+      if [ "$guard" -eq 1 ] && deleted_in_repo "$f" "$rel/$name"; then
+        DELETED+=("rm -- $(shq "$f")")
+        continue
+      fi
       cp -f -- "$f" "$dst/" && echo "nowy: $rel/$name"
       continue
     fi
@@ -172,7 +189,7 @@ copy_dir() { # <źródło> <cel> <wzorzec> [1 = chronić kopię przed źródłem
       HELD+=("diff -u --strip-trailing-cr $(shq "$dst/$name") $(shq "$f")")
     elif [ "$guard" -eq 1 ] && [ "$had_key" -eq 0 ] && older_version "$f" "$rel/$name"; then
       STALE+=("cp $(shq "$dst/$name") $(shq "$f")")
-    elif [ "$guard" -eq 1 ] && [ "$had_key" -eq 0 ] && [ "$name" = MEMORY.md ] && [ "${#STALE[@]}" -gt 0 ]; then
+    elif [ "$guard" -eq 1 ] && [ "$had_key" -eq 0 ] && [ "$name" = MEMORY.md ] && [ $((${#STALE[@]} + ${#DELETED[@]})) -gt 0 ]; then
       STALE_INDEX="diff -u --strip-trailing-cr $(shq "$dst/$name") $(shq "$f")"
     elif cp -f -- "$f" "$dst/"; then
       echo "zaktualizowany: $rel/$name"
@@ -207,7 +224,7 @@ done < <(grep -rlZE -- "$KEY_RE" "$DST" 2>/dev/null | sort -z)
 KEY_FOUND=0
 [ "${#KEY_SRC[@]}" -eq 0 ] && [ "${#KEY_FIX[@]}" -eq 0 ] || KEY_FOUND=1
 
-if [ "$KEY_FOUND" -eq 0 ] && [ -z "$FRESH" ] && [ "${#STALE[@]}" -eq 0 ]; then
+if [ "$KEY_FOUND" -eq 0 ] && [ -z "$FRESH" ] && [ "${#STALE[@]}" -eq 0 ] && [ "${#DELETED[@]}" -eq 0 ]; then
   date +"%Y-%m-%d %H:%M" >"$DST/OSTATNIA-KOPIA.txt"
   echo "pamięć projektu skopiowana do $DST"
 fi
@@ -259,6 +276,19 @@ if [ "${#STALE[@]}" -gt 0 ]; then
   echo "Jeśli treść u źródła jest celowo dawną wersją, zapisz plik u źródła ponownie (nowa data zmiany)."
 fi
 
+if [ "${#DELETED[@]}" -gt 0 ]; then
+  echo
+  echo "ZASADY USUNIĘTE W REPOZYTORIUM: ${#DELETED[@]} plik(ów) w $ASSISTANT jest sprzed ich usunięcia"
+  echo "w repozytorium (pamięć z drugiego komputera) — nie wróciły do kopii. Usuń je u źródła, popraw u źródła"
+  echo "spis MEMORY.md i uruchom skrypt ponownie:"
+  printf '  %s\n' "${DELETED[@]}"
+  if [ -n "$STALE_INDEX" ] && [ "${#STALE[@]}" -eq 0 ]; then
+    echo "Spisu MEMORY.md nie nadpisano — porównaj go u źródła z kopią:"
+    echo "  $STALE_INDEX"
+  fi
+  echo "Jeśli zasada ma wrócić, zapisz plik u źródła ponownie (nowa data zmiany)."
+fi
+
 if [ "$KEY_FOUND" -eq 1 ]; then
   echo
   echo "BŁĄD: coś, co wygląda na klucz (sk-… albo klucz prywatny)."
@@ -288,6 +318,10 @@ elif [ -n "$FRESH" ]; then
   exit 3
 elif [ "${#STALE[@]}" -gt 0 ]; then
   echo "WYNIK: KOPIA NIEPEŁNA — ${#STALE[@]} zasad(y) u źródła starsze niż w repozytorium (kod 3)," \
+    "OSTATNIA-KOPIA.txt bez zmian."
+  exit 3
+elif [ "${#DELETED[@]}" -gt 0 ]; then
+  echo "WYNIK: KOPIA NIEPEŁNA — ${#DELETED[@]} zasad(y) usuniętych w repozytorium jest jeszcze u źródła (kod 3)," \
     "OSTATNIA-KOPIA.txt bez zmian."
   exit 3
 elif [ "$REPO_ONLY" -gt 0 ]; then
