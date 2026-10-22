@@ -117,7 +117,13 @@ impl WireCodec for OpenAiCodec {
     type Decoder = OpenAiDecoder;
 
     fn build(&self, req: &ChatRequest, _opts: BuildOptions) -> Result<WireRequest, ProviderError> {
-        let caps = self.registry.caps(&req.model);
+        let mut caps = self.registry.caps(&req.model);
+        if self.options.native
+            && req.params.max_tokens.is_some()
+            && caps.max_output_tokens.is_none()
+        {
+            caps.max_output_tokens = openai_output_ceiling(&req.model);
+        }
         let (path, body) = match self.options.api {
             OpenAiApi::ChatCompletions => (
                 "/chat/completions",
@@ -160,10 +166,12 @@ pub(crate) fn unknown_openai() -> ModelCapabilities {
     }
 }
 
-/// Znane limity wyjścia rodzin modeli oficjalnego OpenAI (dokumentacja modeli, stan 2026). Bez nich
-/// zadania agentek dostawały domyślne 8 192 tokeny, a rozumowanie modeli `o`/`gpt-5` zjada część
-/// limitu — duży `fs_write` dalej się ucinał (przegląd 2026-10-22). Nieznana rodzina — bez limitu.
-pub(crate) fn known_openai(model: &str) -> Option<ModelCapabilities> {
+/// Sufit limitu wyjścia rodzin modeli oficjalnego OpenAI (dokumentacja modeli, stan 2026) — tylko dla
+/// jawnie żądanego `max_tokens` (zadania agentek: 16 384 zamiast domyślnych 8 192; rozumowanie modeli
+/// `o`/`gpt-5` zjada część limitu). Rozmowa bez żądanego limitu zostaje przy domyślnym profilu: sufit
+/// jako domyślna wartość wysyłał np. 128 tys. (błąd 400 dla `gpt-5-chat-latest`, odrzucenie przy
+/// niskim limicie TPM; przegląd 2026-10-22). Nieznana rodzina — bez sufitu.
+pub(crate) fn openai_output_ceiling(model: &str) -> Option<u32> {
     let m = model.to_ascii_lowercase();
     let max: u32 = if m.starts_with("gpt-5") {
         128_000
@@ -180,10 +188,7 @@ pub(crate) fn known_openai(model: &str) -> Option<ModelCapabilities> {
     } else {
         return None;
     };
-    Some(ModelCapabilities {
-        max_output_tokens: Some(max),
-        ..unknown_openai()
-    })
+    Some(max)
 }
 
 /// Identyfikator OpenRoutera w katalogu dostawców.
@@ -235,12 +240,11 @@ impl OpenAiProvider {
         options: OpenAiOptions,
         fallback: ModelCapabilities,
     ) -> Result<Self, ConfigError> {
-        let known: crate::registry::KnownModels = if options.native {
-            known_openai
-        } else {
-            |_| None
-        };
-        let registry = Arc::new(ModelRegistry::new(profile.models.clone(), known, fallback));
+        let registry = Arc::new(ModelRegistry::new(
+            profile.models.clone(),
+            |_| None,
+            fallback,
+        ));
         let codec = OpenAiCodec {
             options,
             profile: profile.clone(),

@@ -1,65 +1,53 @@
-//! Przegląd 2026-10-22: oficjalne OpenAI zna limity wyjścia rodzin modeli — zadanie agentki
-//! dostaje 16 384 tokeny (wcześniej 8 192 dla każdego modelu bez limitu w konfiguracji).
+//! Przegląd 2026-10-22: oficjalne OpenAI zna sufit limitu wyjścia rodzin modeli — zadanie agentki
+//! (jawne `max_tokens`) dostaje 16 384 tokeny zamiast 8 192, a rozmowa bez żądanego limitu zostaje
+//! przy domyślnych 8 192 (sufit jako wartość domyślna dawał 400 dla `gpt-5-chat-latest`).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+mod support;
+
 use std::sync::Arc;
 
+use futures_util::StreamExt;
 use providers_api_impl::{AuthScheme, OpenAiOptions, OpenAiProvider, ProviderProfile};
-use providers_contract::{ChatRequest, Message, ModelProvider, Pricing, StaticKey};
+use providers_contract::{CancellationToken, ChatRequest, Message, ModelProvider, StaticKey};
+use support::openai_sse as sse;
+use support::{FixtureServer, Reply, http};
 
-fn provider(models: &[&str]) -> OpenAiProvider {
-    let mut profile = ProviderProfile::new("openai");
-    for m in models {
-        profile.pricing.insert(
-            (*m).to_owned(),
-            Pricing {
-                input_per_mtok_usd: 1.0,
-                output_per_mtok_usd: 8.0,
-                cache_read_per_mtok_usd: None,
-                cache_write_per_mtok_usd: None,
-            },
-        );
-    }
-    let http = lib_openai_compat::HttpConfig::new("http://127.0.0.1:9", AuthScheme::Bearer);
-    OpenAiProvider::new(
-        profile,
-        http,
-        Arc::new(StaticKey::new("k")),
+async fn sent(server: &FixtureServer, model: &str, requested: Option<u32>) -> u64 {
+    let p = OpenAiProvider::new(
+        ProviderProfile::new("openai"),
+        http(server, AuthScheme::Bearer),
+        Arc::new(StaticKey::new("sk-oai")),
         OpenAiOptions::native(),
     )
-    .unwrap()
-}
-
-fn limit(p: &OpenAiProvider, model: &str, requested: Option<u32>) -> u64 {
+    .unwrap();
+    server.reset(Reply::sse(
+        sse::resp_created(model) + &sse::resp_completed(model),
+    ));
     let mut req = ChatRequest::new(model, vec![Message::user_text("x")]);
     req.params.max_tokens = requested;
-    p.estimate_cost(&req).unwrap().max_output_tokens
+    let _: Vec<_> = p.stream(req, CancellationToken::new()).collect().await;
+    server.requests().pop().unwrap().json()["max_output_tokens"]
+        .as_u64()
+        .unwrap()
 }
 
-#[test]
-fn known_families_get_their_output_limit() {
-    let models = [
-        "gpt-5",
-        "gpt-5-mini",
-        "o3",
-        "gpt-4.1",
-        "gpt-4o",
-        "gpt-4o-2024-05-13",
-        "gpt-x",
-        "o1-mini",
-        "o1-preview",
-    ];
-    let p = provider(&models);
-    for m in ["gpt-5", "gpt-5-mini", "o3", "gpt-4.1", "gpt-4o"] {
-        assert_eq!(limit(&p, m, Some(16_384)), 16_384, "{m}");
+#[tokio::test]
+async fn family_ceiling_applies_only_to_requested_limits() {
+    let server = FixtureServer::start().await;
+    for m in ["gpt-5", "gpt-5-chat-latest", "o3", "gpt-4.1", "gpt-4o"] {
+        assert_eq!(sent(&server, m, Some(16_384)).await, 16_384, "{m}");
+        // Rozmowa bez żądanego limitu — jak wcześniej, domyślny profilu.
+        assert_eq!(sent(&server, m, None).await, 8_192, "{m}");
     }
-    // Rozmowa bez żądanego limitu — limit rodziny modelu.
-    assert_eq!(limit(&p, "gpt-5", None), 128_000);
-    assert_eq!(limit(&p, "gpt-4o", None), 16_384);
-    assert_eq!(limit(&p, "o1-mini", None), 65_536);
-    assert_eq!(limit(&p, "o1-preview", None), 32_768);
-    // Stary snapshot (4 096) i nieznana rodzina — domyślny profilu, jak wcześniej.
-    assert_eq!(limit(&p, "gpt-4o-2024-05-13", Some(16_384)), 8_192);
-    assert_eq!(limit(&p, "gpt-x", Some(16_384)), 8_192);
+    // Sufit rodziny ogranicza większą prośbę.
+    assert_eq!(sent(&server, "gpt-4o", Some(32_768)).await, 16_384);
+    assert_eq!(sent(&server, "o1-preview", Some(65_536)).await, 32_768);
+    // Nieznana rodzina i stary snapshot — domyślny profilu, jak wcześniej.
+    assert_eq!(sent(&server, "gpt-x", Some(16_384)).await, 8_192);
+    assert_eq!(
+        sent(&server, "gpt-4o-2024-05-13", Some(16_384)).await,
+        8_192
+    );
 }
