@@ -5,6 +5,7 @@
 //! subskrybuje stan (zdarzenie `BrokerStatus`) i kill-switch watchdoga („STOP WSZYSTKIEGO”).
 
 use std::path::PathBuf;
+use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
@@ -74,7 +75,7 @@ pub struct KernelProcesses {
     link: Arc<BrokerLink>,
     kills: Arc<watch::Sender<u64>>,
     stop: StopSignal,
-    watchdog: Arc<Mutex<Option<Box<dyn ChildProc>>>>,
+    watchdog: Arc<Mutex<Option<Watchdog>>>,
     supervisor: Option<JoinHandle<()>>,
 }
 
@@ -196,11 +197,12 @@ impl KernelProcesses {
             if !broker && !dog {
                 break;
             }
-            let wait = if broker {
-                sup.step(true).min(Duration::from_millis(100))
+            // Nadzór Brokera kroczy także w czasie czekania na watchdoga (awaria tuż po połączeniu).
+            let wait = sup.step(true).min(if broker {
+                Duration::from_millis(100)
             } else {
                 Duration::from_millis(10)
-            };
+            });
             std::thread::sleep(wait.max(Duration::from_millis(10)));
         }
         if status.link() == LinkState::Connecting {
@@ -210,10 +212,13 @@ impl KernelProcesses {
             )));
         }
         if !status.watchdog() && running(&watchdog) {
+            // Aplikacja NIE zajmuje skrótu: watchdog rejestruje go raz i przy zajętym kończy działanie
+            // (przegląd 2026-10-22). Skrót przejmuje aplikacja dopiero, gdy watchdog naprawdę padnie.
             tracing::warn!(
                 limit_s = setup.timing.watchdog_ready.as_secs(),
-                "alfa-watchdog jeszcze nie gotowy — skrót Ctrl+Shift+F12 tymczasowo obsługuje aplikacja"
+                "alfa-watchdog jeszcze nie gotowy — skrót Ctrl+Shift+F12 zostaje dla niego"
             );
+            status.set_watchdog(true);
         }
         let stop = StopSignal::new();
         let thread_stop = stop.clone();
@@ -284,7 +289,7 @@ impl Drop for KernelProcesses {
             .unwrap_or_else(|p| p.into_inner())
             .take()
         {
-            w.kill();
+            w.stop();
         }
         if let Some(t) = self.supervisor.take() {
             let _ = t.join();
@@ -293,14 +298,10 @@ impl Drop for KernelProcesses {
 }
 
 /// Kończy watchdoga z poprzednią tożsamością Brokera i uruchamia nowego.
-fn restart_watchdog(
-    starter: &WatchdogStarter,
-    slot: &Mutex<Option<Box<dyn ChildProc>>>,
-    pid: Option<u32>,
-) {
+fn restart_watchdog(starter: &WatchdogStarter, slot: &Mutex<Option<Watchdog>>, pid: Option<u32>) {
     let mut slot = slot.lock().unwrap_or_else(|p| p.into_inner());
     if let Some(mut old) = slot.take() {
-        old.kill();
+        old.stop();
     }
     tracing::warn!(
         ?pid,
@@ -311,7 +312,7 @@ fn restart_watchdog(
 
 /// Uruchamia `alfa-watchdog` (jeśli jest obok aplikacji); gotowość (skrót zarejestrowany) przychodzi
 /// komunikatem na stdout (`notice::attach`) — bez blokowania wątku (start, nadzór Brokera).
-fn start_watchdog(starter: &WatchdogStarter, mut args: Vec<String>) -> Option<Box<dyn ChildProc>> {
+fn start_watchdog(starter: &WatchdogStarter, mut args: Vec<String>) -> Option<Watchdog> {
     let image = mode::watchdog_image(&starter.exe_dir)?;
     args.push("--lifeline".into());
     let started = Instant::now();
@@ -322,16 +323,38 @@ fn start_watchdog(starter: &WatchdogStarter, mut args: Vec<String>) -> Option<Bo
             return None;
         }
     };
-    notice::attach(child.as_mut(), &starter.status, &starter.kills, started);
-    Some(child)
+    let replaced = Arc::new(AtomicBool::new(false));
+    notice::attach(
+        child.as_mut(),
+        &starter.status,
+        &starter.kills,
+        started,
+        replaced.clone(),
+    );
+    Some(Watchdog { child, replaced })
+}
+
+/// Proces watchdoga i znacznik celowego zakończenia (restart Brokera, zamknięcie aplikacji).
+struct Watchdog {
+    child: Box<dyn ChildProc>,
+    replaced: Arc<AtomicBool>,
+}
+
+impl Watchdog {
+    /// Celowe zakończenie: koniec strumienia nie oddaje skrótu aplikacji i nie jest błędem.
+    fn stop(&mut self) {
+        self.replaced
+            .store(true, std::sync::atomic::Ordering::SeqCst);
+        self.child.kill();
+    }
 }
 
 /// Czy proces watchdoga działa.
-fn running(slot: &Mutex<Option<Box<dyn ChildProc>>>) -> bool {
+fn running(slot: &Mutex<Option<Watchdog>>) -> bool {
     slot.lock()
         .unwrap_or_else(|p| p.into_inner())
         .as_mut()
-        .is_some_and(|c| c.running())
+        .is_some_and(|w| w.child.running())
 }
 
 #[cfg(test)]

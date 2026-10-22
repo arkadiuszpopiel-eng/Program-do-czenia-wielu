@@ -13,6 +13,8 @@ use crate::subscriber::lock;
 
 /// Najwięcej linii w dzienniku rozruchu (dalsze tylko liczone).
 pub const MAX_BOOT_LINES: usize = 500;
+/// Najdłuższa linia w dzienniku rozruchu (znaki; pełna treść jest w pliku).
+pub const MAX_BOOT_LINE_CHARS: usize = 2048;
 
 /// Linia dziennika rozruchu.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -42,7 +44,8 @@ pub struct BootReport {
     pub started_at: String,
     /// Okno rozruchu zamknięte (raport już się nie zmieni).
     pub finished: bool,
-    /// Czas rozruchu (ms): do zamknięcia okna, a przed nim — dotychczasowy.
+    /// Czas rozruchu (ms): do gotowości programu ([`crate::LogHandle::boot_ready`]), bez niej — do zamknięcia
+    /// okna albo dotychczasowy.
     pub elapsed_ms: u64,
     /// Werdykt.
     pub verdict: BootVerdict,
@@ -60,6 +63,7 @@ pub struct BootReport {
 
 #[derive(Default)]
 struct State {
+    ready_ms: Option<u64>,
     finished_ms: Option<u64>,
     warnings: u32,
     errors: u32,
@@ -105,7 +109,11 @@ impl BootJournal {
             _ => {}
         }
         if s.lines.len() < MAX_BOOT_LINES {
-            let text = line.trim_end_matches(['\r', '\n']).to_owned();
+            let line = line.trim_end_matches(['\r', '\n']);
+            let text = match line.char_indices().nth(MAX_BOOT_LINE_CHARS) {
+                Some((cut, _)) => format!("{}…", &line[..cut]),
+                None => line.to_owned(),
+            };
             s.lines.push(BootLine {
                 level: level_name(level),
                 text,
@@ -117,6 +125,15 @@ impl BootJournal {
 
     fn elapsed_ms(&self) -> u64 {
         u64::try_from(self.started.elapsed().as_millis()).unwrap_or(u64::MAX)
+    }
+
+    /// Program gotowy (okna i rdzeń złożone) — czas rozruchu w raporcie; okno zbierania trwa dalej.
+    pub fn ready(&self) {
+        let ms = self.elapsed_ms();
+        let mut s = lock(&self.state);
+        if s.ready_ms.is_none() {
+            s.ready_ms = Some(ms);
+        }
     }
 
     /// Zamyka okno rozruchu (kolejne wywołania nic nie zmieniają).
@@ -141,7 +158,7 @@ impl BootJournal {
         BootReport {
             started_at: self.started_at.to_rfc3339_opts(SecondsFormat::Secs, true),
             finished: s.finished_ms.is_some(),
-            elapsed_ms: s.finished_ms.unwrap_or(now),
+            elapsed_ms: s.ready_ms.or(s.finished_ms).unwrap_or(now),
             verdict,
             warnings: s.warnings,
             errors: s.errors,
@@ -181,6 +198,25 @@ mod tests {
         j.record(Level::ERROR, "po rozruchu");
         let r = j.report(None);
         assert!(r.finished && r.errors == 1 && r.lines.len() == 3);
+    }
+
+    #[test]
+    fn elapsed_is_time_to_ready_and_long_lines_are_cut() {
+        let j = BootJournal::new(Utc::now());
+        j.ready();
+        let ready = j.report(None).elapsed_ms;
+        std::thread::sleep(std::time::Duration::from_millis(30));
+        j.finish();
+        assert_eq!(
+            j.report(None).elapsed_ms,
+            ready,
+            "czas do gotowości, nie do końca okna"
+        );
+        let j = BootJournal::new(Utc::now());
+        j.record(Level::INFO, &"ż".repeat(MAX_BOOT_LINE_CHARS + 10));
+        let text = &j.report(None).lines[0].text;
+        assert_eq!(text.chars().count(), MAX_BOOT_LINE_CHARS + 1);
+        assert!(text.ends_with('…'));
     }
 
     #[test]

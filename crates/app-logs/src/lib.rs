@@ -28,7 +28,7 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 
-pub use boot::{BootLine, BootReport, BootVerdict, MAX_BOOT_LINES};
+pub use boot::{BootLine, BootReport, BootVerdict, MAX_BOOT_LINE_CHARS, MAX_BOOT_LINES};
 pub use file::{
     Clock, DEFAULT_MAX_FILE_BYTES, DEFAULT_MAX_FILES, DEFAULT_RETENTION_DAYS, LogFile, Rotation,
     file_name, list as list_files, parse_name,
@@ -196,6 +196,11 @@ impl LogHandle {
     pub fn boot_report(&self) -> BootReport {
         let file = self.current_file().map(|f| f.display().to_string());
         self.0.boot.report(file)
+    }
+
+    /// Program gotowy — czas rozruchu w raporcie (okno zbierania linii trwa dalej).
+    pub fn boot_ready(&self) {
+        self.0.boot.ready();
     }
 
     /// Zamyka okno rozruchu (dalsze linie idą już tylko do pliku).

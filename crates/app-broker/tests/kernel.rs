@@ -126,6 +126,24 @@ async fn portable_mode_starts_kernel_processes_and_recovers_from_broker_crash() 
 
     // Awaria Brokera: bezpieczny stan, potem nowy proces i ponowne połączenie.
     let mut status = procs.subscribe();
+    // Przegląd 2026-10-22: przy restarcie watchdoga (nowy Broker) stan „watchdog obsługuje skrót” nie może
+    // spaść — aplikacja zajęłaby Ctrl+Shift+F12 i nowy watchdog dostałby odmowę rejestracji.
+    let dropped = Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let probing = Arc::new(std::sync::atomic::AtomicBool::new(true));
+    let mut watch_status = procs.subscribe();
+    let watcher = {
+        let (dropped, probing) = (dropped.clone(), probing.clone());
+        std::thread::spawn(move || {
+            while probing.load(std::sync::atomic::Ordering::SeqCst) {
+                if !watch_status.borrow_and_update().watchdog {
+                    dropped.store(true, std::sync::atomic::Ordering::SeqCst);
+                }
+                std::thread::sleep(Duration::from_millis(1));
+            }
+        })
+    };
+    // Nowy watchdog zgłasza gotowość po chwili (jak prawdziwy start procesu).
+    *fake.ready_delay.lock().unwrap() = Some(Duration::from_millis(200));
     fake.crash_broker();
     common::wait_until("stan „zerwane”", || {
         status.borrow_and_update().state == BrokerLinkState::Lost
@@ -158,6 +176,12 @@ async fn portable_mode_starts_kernel_processes_and_recovers_from_broker_crash() 
         restarted.args
     );
     assert!(procs.watchdog_active());
+    probing.store(false, std::sync::atomic::Ordering::SeqCst);
+    watcher.join().unwrap();
+    assert!(
+        !dropped.load(std::sync::atomic::Ordering::SeqCst),
+        "restart watchdoga bez oddania skrótu aplikacji"
+    );
 
     // Koniec watchdoga → aplikacja przejmuje skrót (stan dla banera).
     fake.watchdog_exits();
@@ -362,10 +386,15 @@ async fn late_watchdog_is_awaited_and_not_reported_as_error() {
     );
     assert!(!dog.iter().any(bad), "{dog:?}");
     drop(procs);
-    // Spóźnienie ponad limit: ostrzeżenie, nie błąd; potem skrót przejmuje watchdog.
+    // Spóźnienie ponad limit: ostrzeżenie, nie błąd; aplikacja NIE zajmuje skrótu (watchdog rejestruje
+    // go raz i przy zajętym kończy działanie) — zostaje dla watchdoga, który potem się zgłasza.
     let (procs, dog, _fake, _dir) = start(600, 100);
-    assert!(!procs.watchdog_active());
+    assert!(
+        procs.watchdog_active(),
+        "skrót zostaje dla startującego watchdoga"
+    );
     assert!(dog.contains(&tracing::Level::WARN), "{dog:?}");
     assert!(!dog.contains(&tracing::Level::ERROR), "{dog:?}");
-    common::wait_until("watchdog gotowy po limicie", || procs.view().watchdog);
+    std::thread::sleep(Duration::from_millis(700));
+    assert!(procs.view().watchdog);
 }

@@ -30,6 +30,10 @@ const CHILD_ENV_ALLOWLIST: [&str; 12] = [
     "LOCALAPPDATA",
 ];
 
+/// `CREATE_NO_WINDOW` — proces konsolowy bez widocznego okna.
+#[cfg(windows)]
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
 /// Maksymalna liczba bajtów czytanych z wyjścia `--version`.
 const MAX_VERSION_OUTPUT: u64 = 4096;
 
@@ -121,7 +125,7 @@ impl SystemCliProbe {
         let mut cmd = Command::new(path);
         // Aplikacja bez konsoli: `--version` programu konsolowego nie otwiera okna.
         #[cfg(windows)]
-        std::os::windows::process::CommandExt::creation_flags(&mut cmd, 0x0800_0000);
+        std::os::windows::process::CommandExt::creation_flags(&mut cmd, CREATE_NO_WINDOW);
         cmd.args(args)
             .env_clear()
             .stdin(Stdio::null())

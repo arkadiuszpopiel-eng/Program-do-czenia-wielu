@@ -14,13 +14,7 @@ fn commands_from_md(text: &str) -> Vec<String> {
     let shell = text
         .split("## Polecenia powłoki")
         .nth(1)
-        .and_then(|s| {
-            s.split(
-                "
-## ",
-            )
-            .next()
-        })
+        .and_then(|s| s.split("\n## ").next())
         .unwrap_or_default();
     let mut out = Vec::new();
     for line in section

@@ -50,6 +50,7 @@ pub fn mark_failed(why: &str) {
 /// Po starcie: zamyka okno rozruchu po [`WINDOW_AFTER_SETUP`] (wątek, bez blokowania UI).
 pub fn finish_later(handle: Option<LogHandle>) {
     let Some(handle) = handle else { return };
+    handle.boot_ready();
     let spawned = std::thread::Builder::new()
         .name("alfa-boot".into())
         .spawn(move || {

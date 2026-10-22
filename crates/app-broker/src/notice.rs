@@ -34,12 +34,14 @@ pub fn parse(line: &str) -> Option<Notice> {
 }
 
 /// Podłącza wyjście watchdoga: gotowość i koniec → stan, kill-switch → licznik `kills`.
-/// `started` — chwila uruchomienia procesu (czas gotowości w dzienniku).
+/// `started` — chwila uruchomienia procesu (czas gotowości w dzienniku); `replaced` — aplikacja kończy
+/// proces celowo (restart Brokera, zamknięcie): koniec strumienia nie oddaje wtedy skrótu aplikacji.
 pub fn attach(
     child: &mut dyn ChildProc,
     status: &Arc<KernelStatus>,
     kills: &Arc<watch::Sender<u64>>,
     started: Instant,
+    replaced: Arc<AtomicBool>,
 ) -> LastLine {
     let last = LastLine::default();
     if let Some(err) = child.take_stderr() {
@@ -56,6 +58,7 @@ pub fn attach(
         status: status.clone(),
         seen: seen.clone(),
         last: last.clone(),
+        replaced,
     };
     pump_lines("watchdog", out, last.clone(), move |line| {
         let _keep = &ended;
@@ -79,16 +82,22 @@ pub fn attach(
     last
 }
 
-/// Koniec strumienia (watchdog zakończony) → aplikacja przejmuje skrót. Koniec przed gotowością
-/// to prawdziwy błąd (np. skrót zajęty przez inny program); po gotowości — zwykłe zamknięcie.
+/// Koniec strumienia (watchdog zakończony sam) → aplikacja przejmuje skrót. Koniec przed gotowością
+/// to prawdziwy błąd (np. skrót zajęty przez inny program); po gotowości — awaria procesu.
 struct EndGuard {
     status: Arc<KernelStatus>,
     seen: Arc<AtomicBool>,
     last: LastLine,
+    replaced: Arc<AtomicBool>,
 }
 
 impl Drop for EndGuard {
     fn drop(&mut self) {
+        // Celowe zakończenie: nowy watchdog (restart Brokera) rejestruje skrót sam — aplikacja go nie
+        // zajmuje, bo wtedy nowy watchdog dostałby odmowę i zakończył się (przegląd 2026-10-22).
+        if self.replaced.load(Ordering::SeqCst) {
+            return;
+        }
         if !self.seen.load(Ordering::SeqCst) {
             tracing::error!(
                 ostatnia_linia = ?self.last.get(),
