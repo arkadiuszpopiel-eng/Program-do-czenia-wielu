@@ -54,7 +54,8 @@ impl Journal {
         }
         for e in entries {
             if let UndoOp::ScopeSnapshot { root, .. } = &e.op {
-                let post = posts.get(&e.seq).cloned().unwrap_or_default();
+                let mut post = posts.get(&e.seq).cloned().unwrap_or_default();
+                post.retain(|p, _| !self.in_skipped_dir(root, p));
                 let now = self.hashes(root)?;
                 if now != post {
                     let path = now

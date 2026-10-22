@@ -257,6 +257,37 @@ fn snapshot_skips_dependency_and_cargo_build_dirs() {
     s.snapshot_scope(step, &p("/w")).unwrap();
 }
 
+/// Przegląd 2026-10-22: wpisy manifestu w katalogu, który skan pomija w chwili cofania (stare
+/// kroki sprzed 0.0.69 albo `target`, któremu polecenie dopisało znacznik cargo), nie wracają
+/// starą treścią i nie blokują cofnięcia reszty.
+#[test]
+fn undo_leaves_files_in_dirs_skipped_at_undo_time() {
+    let dir = tempfile::tempdir().unwrap();
+    let fs = Arc::new(FakeFs::with_files([
+        (p("/w/a.txt"), b"stare".to_vec()),
+        (p("/w/target/o.bin"), b"v1".to_vec()),
+    ]));
+    let s = service(fs.clone(), dir.path(), UndoLimits::default(), 1);
+    let step = s
+        .begin_step(StepCtx::new("s1", Some("Delta"), "cargo build"))
+        .unwrap();
+    // `target` bez znacznika i bez Cargo.toml — zwykły folder, w snapshocie.
+    s.snapshot_scope(step, &p("/w")).unwrap();
+    // „Polecenie”: zmiana pliku i budowanie, które oznacza `target` znacznikiem cargo.
+    fs.write_atomic(&p("/w/a.txt"), b"nowe").unwrap();
+    fs.write_atomic(&p("/w/target/o.bin"), b"v2").unwrap();
+    fs.write_atomic(&p("/w/target/CACHEDIR.TAG"), b"Signature")
+        .unwrap();
+    s.commit_step(step).unwrap();
+    s.undo(step).unwrap();
+    assert_eq!(fs.read(&p("/w/a.txt")).unwrap(), b"stare");
+    assert_eq!(
+        fs.read(&p("/w/target/o.bin")).unwrap(),
+        b"v2",
+        "bez starej treści"
+    );
+}
+
 mod props {
     use super::*;
     use proptest::prelude::*;

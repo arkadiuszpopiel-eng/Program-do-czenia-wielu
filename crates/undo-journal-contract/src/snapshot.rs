@@ -80,6 +80,28 @@ impl Journal {
         Ok(out)
     }
 
+    /// Czy plik leży w katalogu, który skan pomija ([`snapshot_skips`]) — wpisy starszych kroków
+    /// (sprzed 0.0.69) mają takie pliki w manifeście; bez tego każde cofnięcie zgłaszało konflikt,
+    /// a przywracanie nadpisywało zależności starą treścią (przegląd 2026-10-22).
+    pub(crate) fn in_skipped_dir(&self, root: &Path, file: &Path) -> bool {
+        let Ok(inner) = file.strip_prefix(root) else {
+            return false;
+        };
+        let mut dir = root.to_path_buf();
+        let parts: Vec<_> = inner.components().collect();
+        for part in parts.iter().take(parts.len().saturating_sub(1)) {
+            let parent = dir.clone();
+            dir.push(part);
+            let cargo = self.fs.exists(&parent.join("Cargo.toml"));
+            if snapshot_skips(&dir, cargo, || {
+                self.fs.exists(&dir.join(SNAPSHOT_CACHE_TAG))
+            }) {
+                return true;
+            }
+        }
+        false
+    }
+
     /// Manifest stanu zakresu (ścieżka → hash) — stan „po” do wykrywania konfliktów.
     pub(crate) fn hashes(&self, root: &Path) -> Result<BTreeMap<PathBuf, String>, UndoError> {
         Ok(self
@@ -134,7 +156,7 @@ impl Journal {
             }
         }
         for (path, (hash, blob)) in files {
-            if now.get(path) == Some(hash) {
+            if now.get(path) == Some(hash) || self.in_skipped_dir(root, path) {
                 continue;
             }
             let res = self
