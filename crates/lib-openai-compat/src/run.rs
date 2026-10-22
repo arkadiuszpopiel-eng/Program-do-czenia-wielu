@@ -32,6 +32,8 @@ pub(crate) struct Run<'a, C> {
     started: Instant,
     first_deadline: Instant,
     emitted: bool,
+    /// Model z `Started` wysłanego po przyjęciu żądania ([`WireCodec::starts_on_accept`]).
+    accepted: Option<String>,
     pub(crate) ttft: Option<Duration>,
 }
 
@@ -49,6 +51,7 @@ impl<'a, C: WireCodec> Run<'a, C> {
             started: now,
             first_deadline: now + engine.http.timeouts.first_token,
             emitted: false,
+            accepted: None,
             ttft: None,
         }
     }
@@ -56,7 +59,20 @@ impl<'a, C: WireCodec> Run<'a, C> {
     /// Zwraca zdarzenie końcowe albo `None`, gdy odbiorca zniknął.
     pub(crate) async fn execute(&mut self, req: &ChatRequest) -> Option<ProviderEvent> {
         match self.connect(req).await {
-            Ok(resp) => self.pump(resp, req).await,
+            Ok(resp) => {
+                if self.engine.codec.starts_on_accept() {
+                    let started = ProviderEvent::Started {
+                        model: req.model.clone(),
+                        response_id: None,
+                    };
+                    match self.forward(started).await {
+                        Forward::Continue => self.accepted = Some(req.model.clone()),
+                        Forward::Terminal(t) => return Some(t),
+                        Forward::Gone => return None,
+                    }
+                }
+                self.pump(resp, req).await
+            }
             Err(Failure::Cancelled) => Some(cancelled()),
             Err(Failure::Gone) => None,
             Err(Failure::Failed(e)) => Some(ProviderEvent::Error(e)),
@@ -205,6 +221,20 @@ impl<'a, C: WireCodec> Run<'a, C> {
     }
 
     async fn forward(&mut self, ev: ProviderEvent) -> Forward {
+        // `Started` z dekodera po wczesnym: inny model (np. OpenRouter wybrał konkretny) przychodzi
+        // jako zmiana modelu — koszt i trasa idą za modelem, który faktycznie odpowiada.
+        let ev = match (ev, &self.accepted) {
+            (ProviderEvent::Started { model, .. }, Some(from)) => {
+                if model.is_empty() || model == *from {
+                    return Forward::Continue;
+                }
+                ProviderEvent::ModelSwitched {
+                    from: from.clone(),
+                    to: model,
+                }
+            }
+            (ev, _) => ev,
+        };
         if let ProviderEvent::Error(e) = ev {
             return Forward::Terminal(self.fail(e));
         }

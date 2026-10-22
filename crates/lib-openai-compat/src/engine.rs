@@ -62,6 +62,13 @@ pub trait WireCodec: Send + Sync + 'static {
     fn recover(&self, _err: &ProviderError, _opts: BuildOptions) -> Option<BuildOptions> {
         None
     }
+    /// `Started` (model z żądania) zaraz po przyjęciu żądania (HTTP 2xx), nie z pierwszą porcją
+    /// strumienia — w Chat Completions model z myśleniem (Gemini 2.5, Grok, o-series) wysyła pierwszą
+    /// porcję po myśleniu, a Router mierzy termin do pierwszego zdarzenia i przełączał je na model
+    /// lokalny. `Started` z dekodera jest wtedy pomijany (przegląd 2026-10-22).
+    fn starts_on_accept(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Debug, Default)]
