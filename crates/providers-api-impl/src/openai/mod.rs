@@ -167,6 +167,10 @@ pub(crate) fn known_openai(model: &str) -> Option<ModelCapabilities> {
     let m = model.to_ascii_lowercase();
     let max: u32 = if m.starts_with("gpt-5") {
         128_000
+    } else if m.starts_with("o1-preview") {
+        32_768
+    } else if m.starts_with("o1-mini") {
+        65_536
     } else if ["o1", "o3", "o4"].iter().any(|p| m.starts_with(p)) {
         100_000
     } else if m.starts_with("gpt-4.1") {

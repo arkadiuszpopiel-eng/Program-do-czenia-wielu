@@ -47,6 +47,8 @@ fn known_families_get_their_output_limit() {
         "gpt-4o",
         "gpt-4o-2024-05-13",
         "gpt-x",
+        "o1-mini",
+        "o1-preview",
     ];
     let p = provider(&models);
     for m in ["gpt-5", "gpt-5-mini", "o3", "gpt-4.1", "gpt-4o"] {
@@ -55,6 +57,8 @@ fn known_families_get_their_output_limit() {
     // Rozmowa bez żądanego limitu — limit rodziny modelu.
     assert_eq!(limit(&p, "gpt-5", None), 128_000);
     assert_eq!(limit(&p, "gpt-4o", None), 16_384);
+    assert_eq!(limit(&p, "o1-mini", None), 65_536);
+    assert_eq!(limit(&p, "o1-preview", None), 32_768);
     // Stary snapshot (4 096) i nieznana rodzina — domyślny profilu, jak wcześniej.
     assert_eq!(limit(&p, "gpt-4o-2024-05-13", Some(16_384)), 8_192);
     assert_eq!(limit(&p, "gpt-x", Some(16_384)), 8_192);
