@@ -153,12 +153,6 @@ impl WireCodec for OpenAiCodec {
     fn classify(&self, status: u16, headers: &HeaderMap, body: &str) -> ProviderError {
         lib_openai_compat::common::classify(status, headers, body)
     }
-
-    /// Chat Completions: pierwsza porcja przychodzi po myśleniu modelu — `Started` po przyjęciu
-    /// żądania. Responses API zgłasza `response.created` od razu.
-    fn starts_on_accept(&self) -> bool {
-        matches!(self.options.api, OpenAiApi::ChatCompletions)
-    }
 }
 
 /// Ostrożne możliwości nieznanego modelu oficjalnego OpenAI (narzędzia tak; bez próbkowania —
