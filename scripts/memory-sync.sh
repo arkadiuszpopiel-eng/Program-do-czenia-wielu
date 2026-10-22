@@ -118,11 +118,17 @@ older_version() { # <plik źródłowy> <plik kopii względem repozytorium>
 # Zasada usunięta w repozytorium (zatwierdzone usunięcie), a u źródła plik sprzed usunięcia — pamięć drugiego
 # komputera. Bez tego usunięta zasada wracała przy pierwszej synchronizacji na tamtej maszynie (inwentaryzacja 21.10).
 deleted_in_repo() { # <plik źródłowy> <plik kopii względem repozytorium>
-  local src="$1" rel="$2" gone mtime
+  local src="$1" rel="$2" gone mtime commit
   git_root rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 1
   gone="$(git_root log -1 --diff-filter=D --format=%ct -- "$rel" 2>/dev/null)"
   mtime="$(stat -c %Y -- "$src" 2>/dev/null)"
-  [ -n "$gone" ] && [ -n "$mtime" ] && [ "$mtime" -lt "$gone" ]
+  { [ -n "$gone" ] && [ -n "$mtime" ] && [ "$mtime" -lt "$gone" ]; } || return 1
+  # Tylko treść, którą repozytorium kiedyś zatwierdziło. Inna (zmiana, która nie zdążyła się zsynchronizować)
+  # to jedyna kopia — wraca do repozytorium jak nowa zasada, a nie do usunięcia (przegląd 22.10).
+  while IFS= read -r commit; do
+    cmp -s <(tr -d '\r' <"$src") <(git_root show "$commit:$rel" 2>/dev/null | tr -d '\r') && return 0
+  done < <(git_root log --format=%H -- "$rel" 2>/dev/null)
+  return 1
 }
 
 # Spis MEMORY.md na końcu: wstrzymywany, gdy któraś zasada u źródła okazała się starsza (STALE).

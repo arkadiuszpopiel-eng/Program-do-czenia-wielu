@@ -151,6 +151,12 @@ describe('FakeAlfaClient — scenariusze', () => {
     });
     const after = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
     expect(after).toMatchObject({ state: 'unconfigured', key_stored: false, key_saved_at: null });
+    // Wyłączenie i włączenie bez klucza w magazynie — nadal nieskonfigurowane (jak `set_disabled_now`).
+    await client.accounts.setDisabled('acc-anthropic', true);
+    await expect(client.accounts.setDisabled('acc-anthropic', false)).resolves.toMatchObject({
+      state: 'unconfigured',
+      key_stored: false,
+    });
     // Inne konta mają klucze.
     await expect(client.accounts.test('acc-openai')).resolves.toMatchObject({ ok: true });
     const report = await client.accounts.rotate('acc-anthropic', 'sk-ant-nowy');

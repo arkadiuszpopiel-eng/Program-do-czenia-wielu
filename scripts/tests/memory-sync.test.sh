@@ -271,6 +271,15 @@ if command -v git >/dev/null; then
   echo "zasada z, odtworzona" >"$ASSISTANT/z.md"
   sync
   check "odtworzona celowo: wraca do kopii" eval 'rc_is 0 && same "$ASSISTANT/z.md" "$RULES/z.md"'
+  # Treść, której repozytorium nigdy nie widziało (zmiana sprzed usunięcia, niezsynchronizowana) — jedyna kopia,
+  # więc wraca do repozytorium zamiast trafić do usunięcia u źródła (przegląd 22.10).
+  commit_copy "z odtworzona"
+  rm -f "$RULES/z.md"
+  commit_copy "z usunięta drugi raz"
+  echo "zasada z, zmiana nigdy niezatwierdzona" >"$ASSISTANT/z.md"
+  touch -d '2026-01-01 00:00' "$ASSISTANT/z.md"
+  sync
+  check "nigdy niezatwierdzona treść usuniętej zasady: wraca, nie do usunięcia" eval '! out_has "ZASADY USUNIĘTE W REPOZYTORIUM" && same "$ASSISTANT/z.md" "$RULES/z.md"'
 fi
 # Klucz w kopii, gdy źródło wygląda na nowe — i tak zastąpiony czystą wersją.
 setup

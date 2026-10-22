@@ -284,6 +284,11 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (disabled) return core.reply(update(id, { state: 'disabled' }) ?? account);
       // Włączenie przywraca stan z ostatniego testu; konto niewyłączone zostaje, jakie było.
       if (account.state !== 'disabled') return core.reply(account);
+      // Jak rdzeń (`set_disabled_now`): bez klucza w magazynie konto wraca jako nieskonfigurowane.
+      if (lost.has(id))
+        return core.reply(
+          update(id, { state: 'unconfigured', key_stored: false, key_saved_at: null }) ?? account,
+        );
       const last = account.last_test;
       const state = !last || last.ok || last.reason === 'unsupported' ? 'ok' : 'invalid';
       return core.reply(update(id, { state }) ?? account);
