@@ -6,12 +6,14 @@
 <script lang="ts">
   import { Button, Checkbox } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
+  import { bootText, type BootTextKey } from '../../../logic/boot-texts';
   import { boot, bootSeconds } from '../../../state/boot.svelte';
   import { useApp } from '../../../state/context';
   import './work.css';
 
   const app = useApp();
-  const { t } = app.i18n;
+  const t = (key: BootTextKey, p: Readonly<Record<string, string | number>> = {}) =>
+    bootText(app.i18n.locale, key, p);
   let onlyProblems = $state(true);
   let loadError = $state<string | null>(null);
 
@@ -38,7 +40,7 @@
     const text = (report?.lines ?? []).map((l) => l.text).join('\n');
     try {
       await navigator.clipboard.writeText(text);
-      app.toasts.show({ kind: 'success', message: t('boot.copied') });
+      app.toasts.show({ kind: 'success', message: t('copied') });
     } catch (error) {
       app.toasts.show({ kind: 'error', message: errorText(error) });
     }
@@ -50,10 +52,10 @@
 </script>
 
 <section class="wk-card" aria-labelledby="hl-boot">
-  <h3 id="hl-boot">{t('boot.title')}</h3>
-  <p class="wk-meta">{t('boot.intro')}</p>
+  <h3 id="hl-boot">{t('title')}</h3>
+  <p class="wk-meta">{t('intro')}</p>
   {#if loadError}
-    <p class="wk-error" role="alert">{t('boot.loadFailed', { error: loadError })}</p>
+    <p class="wk-error" role="alert">{t('loadFailed', { error: loadError })}</p>
   {/if}
   {#if report}
     <p
@@ -63,14 +65,14 @@
       class:wk-warn={report.verdict === 'warnings'}
       class:wk-error={report.verdict === 'errors'}
     >
-      <strong>{t(`boot.verdict.${report.verdict}`)}</strong> · {t('boot.summary', params)}
+      <strong>{t(`verdict.${report.verdict}`)}</strong> · {t('summary', params)}
     </p>
-    {#if !report.finished}<p class="wk-note">{t('boot.running')}</p>{/if}
-    <Checkbox bind:checked={onlyProblems} label={t('boot.onlyProblems')} />
+    {#if !report.finished}<p class="wk-note">{t('running')}</p>{/if}
+    <Checkbox bind:checked={onlyProblems} label={t('onlyProblems')} />
     {#if lines.length === 0}
-      <p class="wk-meta">{t('boot.empty')}</p>
+      <p class="wk-meta">{t('empty')}</p>
     {:else}
-      <div class="wk-diff boot-log" role="log" aria-label={t('boot.title')}>
+      <div class="wk-diff boot-log" role="log" aria-label={t('title')}>
         {#each lines as l, i (i)}
           <span
             class="boot-line"
@@ -80,14 +82,13 @@
         {/each}
       </div>
     {/if}
-    {#if report.dropped > 0}<p class="wk-meta">{t('boot.dropped', { n: report.dropped })}</p>{/if}
-    {#if report.log_file}<p class="wk-meta">{t('boot.file', { path: report.log_file })}</p>{/if}
+    {#if report.dropped > 0}<p class="wk-meta">{t('dropped', { n: report.dropped })}</p>{/if}
+    {#if report.log_file}<p class="wk-meta">{t('file', { path: report.log_file })}</p>{/if}
   {/if}
   <div class="wk-actions">
-    <Button size="sm" variant="secondary" onclick={() => void refresh()}>{t('boot.refresh')}</Button
-    >
+    <Button size="sm" variant="secondary" onclick={() => void refresh()}>{t('refresh')}</Button>
     <Button size="sm" variant="secondary" disabled={!report} onclick={() => void copy()}
-      >{t('boot.copy')}</Button
+      >{t('copy')}</Button
     >
   </div>
 </section>

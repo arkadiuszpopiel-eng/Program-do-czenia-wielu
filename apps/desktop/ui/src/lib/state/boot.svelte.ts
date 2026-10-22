@@ -2,6 +2,7 @@
 // ok. 10 s po złożeniu rdzenia) i pokazujemy werdykt — „Rozruch OK”, „z uwagami” albo „z problemem”
 // (ten ostatni zostaje, z przyciskiem „Pokaż dziennik” → Ustawienia → Zdrowie systemu).
 import type { BootReport } from '../api/types-boot';
+import { bootText } from '../logic/boot-texts';
 import type { AppState } from './app.svelte';
 
 /** Odstęp pytań o raport, dopóki okno rozruchu jest otwarte. */
@@ -41,28 +42,28 @@ export async function watchBoot(app: AppState, sleep = wait): Promise<void> {
   const r = boot.report;
   // Werdykt tylko po zamkniętym oknie rozruchu (w programie zawsze po ok. 10 s).
   if (!r?.finished) return;
-  const { t } = app.i18n;
+  const t = (key: Parameters<typeof bootText>[1], p = {}) => bootText(app.i18n.locale, key, p);
   const params = {
     s: bootSeconds(app.i18n.locale, r.elapsed_ms),
     w: r.warnings,
     e: r.errors,
   };
-  const showLog = { actionLabel: t('boot.showLog'), onAction: () => app.openSettings(BOOT_PAGE) };
+  const showLog = { actionLabel: t('showLog'), onAction: () => app.openSettings(BOOT_PAGE) };
   if (r.verdict === 'errors') {
     app.toasts.show({
       kind: 'error',
-      message: t('boot.toast.errors', params),
+      message: t('toast.errors', params),
       timeoutMs: 0,
       ...showLog,
     });
   } else if (r.verdict === 'warnings') {
     app.toasts.show({
       kind: 'info',
-      message: t('boot.toast.warnings', params),
+      message: t('toast.warnings', params),
       timeoutMs: 6000,
       ...showLog,
     });
   } else {
-    app.toasts.show({ kind: 'success', message: t('boot.toast.ok', params), timeoutMs: 4000 });
+    app.toasts.show({ kind: 'success', message: t('toast.ok', params), timeoutMs: 4000 });
   }
 }
