@@ -1,4 +1,4 @@
-- [Dwa komputery: PC i laptop](maszyna-stacjonarna-2026-10-17.md) — E: przenoszony między PC (AMD, 32 GB) i laptopem (NVIDIA + Intel UHD, 16 GB); różne F:, reguły maszyny
+- [Dwa komputery: PC i laptop](maszyna-stacjonarna-2026-10-17.md) — E: przenoszony między PC (AMD, 32 GB) i laptopem (NVIDIA + Intel UHD, 16 GB); różne F:, reguły maszyny; AppData tej sesji (MSIX) zwirtualizowane — instalacje przez Eksplorator
 - [Awaria 2026-10-17 i ciężkie zadania](awaria-2026-10-17-obciazenie.md) — brak pamięci + resety USB; PC -j6, laptop -j3, bez incremental; backup.sh naprawiony
 - [Alfa — uruchamianie u właściciela](alfa-uruchamianie-wlasciciela.md) — tylko skrót „Alfa” (Alfa-uruchomiona z oknem zgód); target/shell to build testowy (e2e, CDP), kopia właściciela z target/owner
 - [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — kopia robocza na E:, portable-env, pułapki budowy (ukośniki w heredoc), sprzątanie target/ i miejsce przed verify

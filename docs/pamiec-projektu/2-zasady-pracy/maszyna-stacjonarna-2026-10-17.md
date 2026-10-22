@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8
-  modified: 2026-10-21T14:40:00.000Z
+  modified: 2026-10-22T09:23:38.764Z
 ---
 
 Od 2026-10-17 dysk E: (ADATA SX8200 na USB) z projektem jest podpięty do stacjonarnego PC DESKTOP-S02O9OH
@@ -48,7 +48,19 @@ docelowa; nie porównuj czasów między maszynami.
 
 **Mosty CLI na PC (2026-10-22):** aplikacje okienkowe Claude i OpenAI Codex (Sklep, MSIX) noszą własne `claude.exe`/`codex.exe`
 poza PATH (`%APPDATA%\Claude\claude-code\<wersja>\…`, `WindowsApps\OpenAI.Codex_…\app\resources`), więc Alfa (szuka tylko
-w PATH + PATHEXT) pokazywała „nie zainstalowane”. Na prośbę właściciela zainstalowane oficjalne CLI: `npm install -g
-@anthropic-ai/claude-code@2.1.308 @openai/codex@0.163.0` → `%APPDATA%\npm\claude.cmd`, `codex.cmd` (w PATH użytkownika;
-restart Alfy niepotrzebny). Antigravity odinstalowane (zostały `.antigravity`, pusty `D:\Antigravity`). Właściciel nie dał
-dostępu computer-use do okna Alfy — wykrywanie sprawdzone emulacją `SystemCliProbe` (PATH z rejestru, lista zmiennych).
+w PATH + PATHEXT) pokazywała „nie zainstalowane”. Na prośbę właściciela zainstalowane oficjalne CLI
+`@anthropic-ai/claude-code@2.1.308` i `@openai/codex@0.163.0` → `%APPDATA%\npm\claude.cmd`, `codex.cmd` (w PATH użytkownika).
+Antigravity odinstalowane (zostały `.antigravity`, pusty `D:\Antigravity`).
+
+**PUŁAPKA — sesja Claude Code w aplikacji Claude (MSIX) ma zwirtualizowane `%APPDATA%`/`%LOCALAPPDATA%`:** pierwszy
+`npm install -g` z tej sesji trafił do prywatnej kopii pakietu (`%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\
+Roaming\npm`) — widoczny tylko wewnątrz aplikacji Claude; Alfa ze skrótu (i Eksplorator) go nie widziała, a emulacja z tej
+sesji błędnie mówiła „działa”. Instalacje i zapisy do AppData dla właściciela uruchamiać POZA kontenerem:
+`Start-Process explorer.exe -ArgumentList '"<skrypt>.cmd"'` (Eksplorator uruchamia skrypt w zwykłym środowisku); tak samo
+sprawdzać, co widzi Alfa ze skrótu (instancja testowa przez `.cmd` z Eksploratora). Pliki poza AppData (E:, F:, `~\.claude`)
+nie są wirtualizowane. Druga instalacja (11:20, przez Eksplorator) — Alfa uruchomiona przez Eksplorator wykrywa oba CLI
+i otwiera okna logowania (sprawdzone przez CDP na instancji testowej).
+
+**Why:** przez wirtualizację właściciel dostał „zainstalowane, działa”, a w Alfie dalej było „nie zainstalowane”.
+**How to apply:** każda zmiana w `%APPDATA%`/`%LOCALAPPDATA%` dla programów właściciela i każda weryfikacja „co widzi Alfa”
+— przez proces uruchomiony z Eksploratora, nie bezpośrednio z tej sesji.
