@@ -201,6 +201,7 @@
     "allow-terminal-input",
     "allow-terminal-resize",
     "allow-terminal-close",
+    "allow-boot-report",
     "allow-terminal-list",
     "allow-skills-list",
     "allow-skills-review",

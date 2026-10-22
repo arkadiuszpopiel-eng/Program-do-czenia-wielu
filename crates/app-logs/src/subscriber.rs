@@ -29,6 +29,8 @@ pub(crate) struct Shared {
     pub problem: Mutex<Option<String>>,
     pub failed_writes: AtomicU64,
     pub filter_from_env: bool,
+    /// Linie rozruchu (podgląd w programie).
+    pub boot: crate::boot::BootJournal,
 }
 
 pub(crate) fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -64,6 +66,7 @@ impl Shared {
         };
         event.record(&mut collector);
         let line = collector.line((self.clock)(), meta.level(), meta.target());
+        self.boot.record(*meta.level(), &line);
         if self.stderr {
             let _ = std::io::stderr().lock().write_all(line.as_bytes());
         }

@@ -371,3 +371,12 @@ z `types*.ts` zostaną zastąpione wygenerowanymi 1:1 — nazwy pól są już w 
 Skróty obsługiwane przez rdzeń (nie przez WebView): `Ctrl+Alt+Space` (Szybkie pytanie),
 `Ctrl+Shift+F12` (STOP WSZYSTKIEGO), przytrzymanie `Spacji` (PTT, hook `WH_KEYBOARD_LL`).
 UI blokuje `F5` / `Ctrl+R` / `Ctrl+Shift+R`.
+
+## Polecenia powłoki
+
+Komendy zarejestrowane w powłoce Tauri poza `app_core::COMMANDS` (bez metody w `AppCore`); `build.rs` nadaje
+im uprawnienia `allow-<komenda>` tak samo jak komendom rdzenia.
+
+| Komenda       | Argumenty | Wynik        | Uwagi                                                                                                       |
+| ------------- | --------- | ------------ | ----------------------------------------------------------------------------------------------------------- |
+| `boot_report` | —         | `BootReport` | dziennik rozruchu (`app-logs`): linie od startu procesu po redakcji, werdykt `ok \| warnings \| errors`, plik |

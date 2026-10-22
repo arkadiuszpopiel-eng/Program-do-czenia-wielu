@@ -785,6 +785,7 @@ version = "0.0.71"
 dependencies = [
  "chrono",
  "core-log-contract",
+ "serde",
  "tempfile",
  "tracing",
  "tracing-core",

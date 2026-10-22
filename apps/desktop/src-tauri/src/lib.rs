@@ -3,6 +3,7 @@
 //! zasobnik, skróty globalne, powiadomienia, jedną instancję i protokół `alfa://`.
 //! Logika aplikacji jest w `app-core`; tu tylko kleje systemowe.
 
+mod boot;
 mod cdp;
 mod commands;
 mod kernel;
@@ -20,9 +21,11 @@ use tauri::{Manager, WindowEvent};
 pub fn run() {
     // Dziennik przed wszystkim innym — błędy startu Brokera i rdzenia też trafiają do pliku.
     let log_handle = logs::start();
+    boot::report_previous_failure();
     if let Some(why) = cdp::environment_violation(|name| std::env::var(name).ok()) {
         tracing::error!(powod = %why, "start wstrzymany: środowisko WebView2 (F3-13)");
         eprintln!("alfa-desktop: {why}");
+        boot::mark_failed(&format!("środowisko WebView2: {why}"));
         std::process::exit(1);
     }
     let mut builder = tauri::Builder::default();
@@ -59,6 +62,7 @@ pub fn run() {
         })
         .setup(move |app| {
             tracing::info!(wersja = %app.package_info().version, "start powłoki Alfy");
+            app.manage(boot::BootLog(log_handle.clone()));
             let mut paths = AppPaths::from_env().map_err(|e| e.message)?;
             // Instancja testowa: katalogi robocze sesji zostają w profilu testu, nie w katalogu
             // `Alfa` właściciela (`%USERPROFILE%` jest wspólny dla całego konta Windows).
@@ -110,6 +114,7 @@ pub fn run() {
             app.manage(kernel_processes);
             pump::spawn(handle.clone(), core);
             shell::handle_args(&handle, std::env::args().collect());
+            boot::finish_later(log_handle.clone());
             Ok(())
         })
         .build(tauri::generate_context!())
@@ -126,6 +131,7 @@ pub fn run() {
     if let Err(error) = result {
         tracing::error!(error = %error, "błąd uruchomienia Tauri");
         eprintln!("alfa-desktop: błąd uruchomienia Tauri: {error}");
+        boot::mark_failed(&error.to_string());
         std::process::exit(1);
     }
 }

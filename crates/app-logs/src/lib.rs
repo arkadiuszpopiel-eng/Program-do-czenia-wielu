@@ -18,6 +18,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod boot;
 mod file;
 mod filter;
 mod redact;
@@ -27,6 +28,7 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 
+pub use boot::{BootLine, BootReport, BootVerdict, MAX_BOOT_LINES};
 pub use file::{
     Clock, DEFAULT_MAX_FILE_BYTES, DEFAULT_MAX_FILES, DEFAULT_RETENTION_DAYS, LogFile, Rotation,
     file_name, list as list_files, parse_name,
@@ -189,6 +191,17 @@ impl LogHandle {
     pub fn failed_writes(&self) -> u64 {
         self.0.failed_writes.load(Ordering::Relaxed)
     }
+
+    /// Dziennik rozruchu: linie od startu procesu, werdykt, plik pełnego dziennika.
+    pub fn boot_report(&self) -> BootReport {
+        let file = self.current_file().map(|f| f.display().to_string());
+        self.0.boot.report(file)
+    }
+
+    /// Zamyka okno rozruchu (dalsze linie idą już tylko do pliku).
+    pub fn boot_finish(&self) {
+        self.0.boot.finish();
+    }
 }
 
 /// Subskrybent i uchwyt bez instalacji globalnej (testy: `tracing::subscriber::with_default`).
@@ -207,6 +220,7 @@ pub fn build(config: LogConfig) -> (FileSubscriber, LogHandle) {
             .ok()
     });
     let problem = (!problems.is_empty()).then(|| problems.join("; "));
+    let boot = crate::boot::BootJournal::new((config.clock)());
     let shared = Arc::new(Shared {
         filter: std::sync::RwLock::new(filter),
         file: Mutex::new(file),
@@ -217,6 +231,7 @@ pub fn build(config: LogConfig) -> (FileSubscriber, LogHandle) {
         problem: Mutex::new(problem),
         failed_writes: AtomicU64::new(0),
         filter_from_env: config.filter_from_env,
+        boot,
     });
     (FileSubscriber(shared.clone()), LogHandle(shared))
 }

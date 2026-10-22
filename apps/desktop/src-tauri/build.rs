@@ -10,8 +10,24 @@ fn commands_from_md(text: &str) -> Vec<String> {
         return Vec::new();
     };
     let section = section.split("## Zdarzenia").next().unwrap_or_default();
+    // Polecenia powłoki (poza `app_core::COMMANDS`, np. `boot_report`) — te same uprawnienia.
+    let shell = text
+        .split("## Polecenia powłoki")
+        .nth(1)
+        .and_then(|s| {
+            s.split(
+                "
+## ",
+            )
+            .next()
+        })
+        .unwrap_or_default();
     let mut out = Vec::new();
-    for line in section.lines().filter(|l| l.starts_with("| `")) {
+    for line in section
+        .lines()
+        .chain(shell.lines())
+        .filter(|l| l.starts_with("| `"))
+    {
         if let Some(first) = line.split('|').nth(1) {
             out.extend(first.split('`').skip(1).step_by(2).map(str::to_owned));
         }

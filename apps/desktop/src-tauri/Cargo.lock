@@ -671,6 +671,7 @@ version = "0.0.71"
 dependencies = [
  "chrono",
  "core-log-contract",
+ "serde",
  "tracing",
  "tracing-core",
 ]
