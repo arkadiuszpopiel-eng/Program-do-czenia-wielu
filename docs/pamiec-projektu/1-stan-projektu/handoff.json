@@ -4,12 +4,12 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-22T07:40:00+02:00"
+    "updated": "2026-10-22T09:45:00+02:00"
   },
   "current_state": "Komputer stacjonarny (RX 9070 XT). Wersja 0.0.70 = 0.0.69 (seria 9, raport 35) + seria 10 (10 punktów, raport alfa/docs/plan/36-raport-2026-10-22-0070.md): limity kosztów kont, Router blokuje według kosztu minimalnego, Gemini (narzędzia równoległe, cennik models/), sufit wyjścia OpenAI dla zadań agentek, błędy agentek z nazwą dostawcy, konto przypisane wszystkim agentkom = bez przypięcia, panel Pliki, blok kodu, cofanie starych kroków powłoki. W Alfa-uruchomiona wgrana 0.0.70 (22.10 3:49, deploy-owner --no-start: Alfa zamknięta, uruchomić skrótem „Alfa”; próbny start na tymczasowym profilu: Broker, okno zgód, watchdog, 0 WebView2 z portem CDP). Kopia właściciela budowana bez e2e w target/owner. Gałąź ccr-af4b63c6-3fyzaj, niewypchnięta.",
   "session_goal": "Właściciel 21.10 wieczorem: zamknąć otwarte tematy, pełna działająca wersja do pracy przez API i lokalnie, zapisać wszystko i pauza (/goal do 7:00). Nowe funkcje dopiero po tej wersji.",
   "in_progress": [
-    "Seria 11 po 0.0.70 (w kodzie, NIE wgrana): narzędzia bez index (4bc2bb49, 6865d72d), cofanie (ccc1f1f0), ostrzeżenia budżetu (dbb3d40d), toast limitu (545de81e, 6865d72d), atrapa kont (5666f63d), stabilny test mostów (6203afe8); Started po HTTP 2xx wycofany (6ff2474e). Drugi bieg na `6203afe8` (5:35–6:03): 18 z 19 zielonych, czerwony tylko `zip`; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji. Narzędzia: memory-sync nie przywraca zasady usuniętej w repozytorium ze starszej pamięci drugiego komputera (sekcja „ZASADY USUNIĘTE W REPOZYTORIUM”, kod 3; 3f347b5e, testy 92/92). Atrapa: scenariusz key-missing (brak klucza w magazynie — odmowa testu jak rdzeń; 29d30387, ustalenie 17 przeglądu kluczy zamknięte). Komunikat braku klucza mówi, co zrobić („Zmień klucz”), bez identyfikatora konta (290febb6, app-api; w kodzie, do następnej wersji). Przegląd końcówki nocy: 3 potwierdzone, 2 poprawione w 11198384 (memory-sync tylko treść kiedyś zatwierdzona; atrapa włącza konto bez klucza jako nieskonfigurowane). Po 7:00: wymiana klucza liczy stan od nowa (79c2bf3c) — konto Unconfigured/Error po „Zmień klucz” z wynikiem Unsupported wraca do użytku (rdzeń, atrapa Rust i UI); komunikat braku klucza w AccountsError::SecretMissing (290febb6 przekraczał limit app-api 8007/8000 — naprawione). 619/0 w 23 pakietach, vitest 479."
+    "WERSJA 0.0.71 wgrana 22.10 9:38 (deploy-owner --no-start; Alfa zamknięta — właściciel otwiera skrótem „Alfa” i potwierdza L4). Seria 11 + poprawki poranne (raport 37): koszt zadań agentek pod faktycznym dostawcą i kontem (RunEvent::ModelUsage, 73bf4083), „Zmień klucz” przywraca konto Unconfigured/Error (79c2bf3c), komunikat braku klucza, narzędzia bez index, ostrzeżenie limitu min+max, szybsze cofanie. verify wersja 18/19 (czerwony tylko zip), Rust 3117/0/41, interfejs 479, przeglądarka 552, aplikacja 47 (94,9 %); próbny start: brak CDP, Broker/okno zgód/watchdog działają. Właściciel 8:38: „Wykonaj wersję 71, sprawdź, zbuduj i na tym skończ dziś” — sesja zakończona."
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
@@ -18,9 +18,12 @@
     "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
   ],
   "next_session": [
+    "Koszt podprzebiegów (delegacja, Krytyczka) poza dziennikiem kosztów — ich tury emitują już ModelUsage; doliczyć w app-chat agent.rs (gałąź !main) pod faktycznym dostawcą, reszta liczona tylko z części przebiegu głównego (raport 37 §2).",
+    "Zadania agentek w tle (app-tasks exec_agent, RuntimeExecutor) nie zapisują kosztu w cost-meter — limit ich nie widzi.",
+    "Koszt przebiegu agentki zapisuje się dopiero po jego końcu — limit dostawcy nie zatrzyma długiego przebiegu w trakcie (chroni „Limit kosztu zadania”); rozważyć zapis po każdej turze.",
+    "Ctrl+Alt+Space zajęty przez inny program na PC stacjonarnym (ostrzeżenie przy starcie 0.0.71) — sprawdzić, czy UI mówi o tym właścicielowi.",
     "Właściciel: otworzyć Alfę skrótem „Alfa” i potwierdzić L4 w oknie Brokera (Ustawienia → Uprawnienia → „Zmień na L4”); przypomnienie ok. 15 s po starcie.",
     "Sprawdzić limity kont (Ustawienia → Konta i klucze API): od 0.0.70 limit z kreatora (domyślnie 100 zł/mies.) blokuje płatne zapytania do dostawcy; konto bez limitu znosi limit dostawcy.",
-    "Następna wersja: seria 11 (raport 36 §4) — pełne `verify wersja`, potem wgranie. Modele z myśleniem przez Chat Completions (Gemini 2.5, Grok) nadal przechodzą na lokalny po 1,5 s — plan w raporcie 36 §4 (termin pierwszej treści w Routerze, decyzja właściciela, ile czekać).",
     "Po każdej zmianie w crate bliskim limitu (app-core 8000, app-api ~8000) uruchomić check-size z GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*' — bez tego skrypt pada na git.",
     "Drobne (sprzed 22.10): wyłączone konto bez klucza — rdzeń pokazuje wiek starego klucza (account_dto liczy key_stored ze stanu), atrapa UI brak klucza.",
     "Decyzja: agentki z narzędziami w zwykłych sesjach mogą iść do dostawców „może trenować” (DeepSeek, Kimi).",
@@ -50,7 +53,8 @@
     "0.0.68": "verify wersja 77d5403c: 16 zielonych / 2 czerwone (przeglądarka: zerwane połączenie z serwerem podglądu w updates.spec — osobno 17/17; cargo deny — zip) / 1 nieuruchomiony (graf); Rust 3086/0, interfejs 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Przeglądy: 16 + 9 (0.0.67), 5 + 4 (seria 8), spójność dokumentów 2.",
     "0.0.69": "verify wersja 7c1445a3: 15 zielonych / 4 czerwone (lint — app-core 8002 linii, poprawione 7a656482; dokumenty — HTML, aa10fb85; audyt-npm — @vitest/mocker 4.1.12, 077ae005; zaleznosci — zip 8.6, decyzja właściciela); Rust 3103/0/41, interfejs 478, przeglądarka 552 (Chromium), aplikacja 47, pokrycie łącza 259/273 (94,9 %), graf zielony (jq).",
     "0.0.70": "verify wersja 9a5b4d56: 18 zielonych / 1 czerwony (zaleznosci — zip 8.6, decyzja właściciela); Rust 3110/0/41, interfejs 478, przeglądarka 552 (Chromium), aplikacja 47, pokrycie łącza 259/273 (94,9 %).",
-    "seria 11": "Drugi bieg na `6203afe8` (5:35–6:03): 18 z 19 zielonych, czerwony tylko `zip`; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji."
+    "seria 11": "Drugi bieg na `6203afe8` (5:35–6:03): 18 z 19 zielonych, czerwony tylko `zip`; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji.",
+    "0.0.71": "verify wersja 18/19 (zip); Rust 3117/0/41; interfejs 479; przeglądarka 552; aplikacja 47 (94,9 %); wgrana 9:38, próbny start bez CDP"
   },
   "decisions_this_session": [
     "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
