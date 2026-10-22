@@ -119,6 +119,9 @@ impl SystemCliProbe {
     /// limit czasu, wyjście ograniczone do [`MAX_VERSION_OUTPUT`] bajtów na strumień.
     fn run(&self, path: &Path, args: &[&str]) -> Option<(bool, Vec<u8>, Vec<u8>)> {
         let mut cmd = Command::new(path);
+        // Aplikacja bez konsoli: `--version` programu konsolowego nie otwiera okna.
+        #[cfg(windows)]
+        std::os::windows::process::CommandExt::creation_flags(&mut cmd, 0x0800_0000);
         cmd.args(args)
             .env_clear()
             .stdin(Stdio::null())

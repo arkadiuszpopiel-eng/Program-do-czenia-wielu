@@ -72,7 +72,10 @@ impl GitWorkspace {
     }
 
     async fn git(&self, cwd: &Path, args: &[&str]) -> Result<String, BackendError> {
-        let out = tokio::process::Command::new(&self.git)
+        let mut cmd = tokio::process::Command::new(&self.git);
+        #[cfg(windows)]
+        cmd.creation_flags(crate::process::CREATE_NO_WINDOW);
+        let out = cmd
             .args(args)
             .current_dir(cwd)
             .env_clear()

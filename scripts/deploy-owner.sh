@@ -40,7 +40,7 @@ done
     cd apps/desktop/src-tauri &&
     CARGO_TARGET_DIR="$(cygpath -w "$ROOT/target/owner")" CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 \
       ALFA_BUILD_DATE="$(date +%F)" ALFA_BUILD_COMMIT="$(git_ rev-parse --short HEAD)" \
-      cargo build --locked -j "${CARGO_BUILD_JOBS:-3}" --features "tauri/custom-protocol" >>"$ROOT/target/owner-build.log" 2>&1
+      cargo build --locked -j "${CARGO_BUILD_JOBS:-3}" --features "tauri/custom-protocol no-console" >>"$ROOT/target/owner-build.log" 2>&1
 ) || { echo "budowa powłoki właściciela: błąd (target/owner-build.log)"; exit 1; }
 [ -f "$OWNER/alfa-desktop.exe" ] || { echo "Brak powłoki właściciela w $OWNER"; exit 2; }
 # Kontrola przed zamknięciem Alfy właściciela: w buildzie bez `e2e` nie ma flagi portu CDP z wartością

@@ -19,6 +19,9 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [features]
 # Build testowy (Playwright przez CDP): port debugowania WebView2. W produkcji wyłączony (PLAN §8.2).
 e2e = []
+# Kopia właściciela (`scripts/deploy-owner.sh`): program okienkowy bez okna konsoli także w buildzie debug;
+# dziennik rozruchu jest w programie i w %LOCALAPPDATA%\Alfa\logs.
+no-console = []
 
 [build-dependencies]
 tauri-build = { version = "=2.7.0", features = [] }

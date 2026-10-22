@@ -49,7 +49,9 @@ impl TreeKiller for SystemTreeKiller {
     fn kill_tree(&self, pid: u32) -> Result<(), String> {
         let root = std::env::var_os("SystemRoot").unwrap_or_else(|| "C:\\Windows".into());
         let taskkill = PathBuf::from(root).join("System32").join("taskkill.exe");
-        let status = std::process::Command::new(taskkill)
+        let mut kill = std::process::Command::new(taskkill);
+        std::os::windows::process::CommandExt::creation_flags(&mut kill, CREATE_NO_WINDOW);
+        let status = kill
             .args(["/PID", &pid.to_string(), "/T", "/F"])
             .stdin(Stdio::null())
             .stdout(Stdio::null())
@@ -79,8 +81,15 @@ pub fn command(program: &Path, args: &[String], cwd: &Path) -> tokio::process::C
         .kill_on_drop(true);
     #[cfg(unix)]
     cmd.process_group(0);
+    // Aplikacja bez konsoli (program okienkowy): CLI w podsystemie konsoli otwierałoby własne okno.
+    #[cfg(windows)]
+    cmd.creation_flags(CREATE_NO_WINDOW);
     cmd
 }
+
+/// `CREATE_NO_WINDOW` — proces konsolowy bez widocznego okna.
+#[cfg(windows)]
+pub const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
 /// Uruchamia CLI z potokami stdin/stdout/stderr.
 pub fn spawn_piped(
