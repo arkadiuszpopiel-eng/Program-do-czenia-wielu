@@ -22,6 +22,7 @@ import { plRouting } from './pl-routing';
 import { plConnections } from './pl-connections';
 import { plMcp } from './pl-mcp';
 import { plDiag } from './pl-diag';
+import { plBoot } from './pl-boot';
 import { plModules } from './pl-modules';
 import { plAdvanced } from './pl-advanced';
 import { plCommands } from './pl-commands';
@@ -58,6 +59,7 @@ export const pl = {
   ...plConnections,
   ...plMcp,
   ...plDiag,
+  ...plBoot,
   ...plModules,
   ...plAdvanced,
   ...plCommands,

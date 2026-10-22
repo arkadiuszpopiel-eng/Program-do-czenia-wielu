@@ -22,6 +22,7 @@ import { enRouting } from './en-routing';
 import { enConnections } from './en-connections';
 import { enMcp } from './en-mcp';
 import { enDiag } from './en-diag';
+import { enBoot } from './en-boot';
 import { enModules } from './en-modules';
 import { enAdvanced } from './en-advanced';
 import { enCommands } from './en-commands';
@@ -59,6 +60,7 @@ export const en: Record<MessageKey, Message> = {
   ...enConnections,
   ...enMcp,
   ...enDiag,
+  ...enBoot,
   ...enModules,
   ...enAdvanced,
   ...enCommands,

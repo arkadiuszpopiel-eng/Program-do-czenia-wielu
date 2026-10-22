@@ -7,6 +7,7 @@ import type { AlfaClient } from './client';
 import { toError } from './command-error';
 import { EventSequencer } from './event-sequencer';
 import { call } from './tauri-call';
+import { systemTauri } from './tauri-client-system';
 import * as hub from './tauri-client-hub';
 import type { AlfaEvent, EventFrame } from './types-system';
 import type { TerminalFrame, TerminalSession } from './types-work';
@@ -145,11 +146,7 @@ export class TauriAlfaClient implements AlfaClient {
     preview: (agent) => call('voice_preview', { agent }),
   };
 
-  readonly system: AlfaClient['system'] = {
-    status: () => call('system_status'),
-    retryQueue: () => call('system_retry_queue'),
-    clipboardText: () => call('system_clipboard_text'),
-  };
+  readonly system: AlfaClient['system'] = systemTauri();
 
   readonly quick: AlfaClient['quick'] = {
     ask: (text) => call('quick_ask', { text }),

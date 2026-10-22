@@ -10,6 +10,7 @@
   import Loading from '../../../components/shell/Loading.svelte';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import BootSection from './BootSection.svelte';
   import ImproverSection from './ImproverSection.svelte';
   import PluginR2Section from './PluginR2Section.svelte';
   import './work.css';
@@ -88,6 +89,8 @@
     >
   </div>
 </section>
+
+<BootSection />
 
 {#if view}
   {#if view.pending.length}

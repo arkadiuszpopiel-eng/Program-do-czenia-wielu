@@ -3,6 +3,7 @@
 // jednym wierszem; tu mają dostęp do jej pól `@internal`.
 import type { SessionSummary } from '../api/types';
 import type { AppBootstrap } from '../api/types-system';
+import { watchBoot } from './boot.svelte';
 import { errorText } from '../api/command-error';
 import type { AppState } from './app.svelte';
 import { attempt } from './attempt';
@@ -44,6 +45,7 @@ export async function start(app: AppState): Promise<void> {
   void app.client.cameras.state().then((c) => (app.cameras = c), logFailure('cameras'));
   void app.updates.load(app.client.updates);
   void app.broker.load(app.client.broker);
+  void watchBoot(app);
   const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;
   if (first) await app.openSession(first);
   else await app.refreshCosts().catch((error: unknown) => app.loadFailed(error));

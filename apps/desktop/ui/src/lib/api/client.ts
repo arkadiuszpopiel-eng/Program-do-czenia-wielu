@@ -25,6 +25,7 @@ import type {
   UndoTicket,
 } from './types';
 import type { AgentRunDetail, SessionWorkdir, VoiceStatus, WorkdirChoice } from './types-agents';
+import type { BootReport } from './types-boot';
 import type {
   AudioDevice,
   BrokerIntentResult,
@@ -248,6 +249,8 @@ export interface SystemApi {
   retryQueue(): Promise<void>;
   /** Tekst ze schowka systemu — dla „Wklej” z menu Alfy (`null`: pusty albo nie tekst). */
   clipboardText(): Promise<string | null>;
+  /** Dziennik rozruchu: linie od startu procesu, werdykt (Ustawienia → Zdrowie systemu). */
+  bootReport(): Promise<BootReport>;
 }
 
 export interface QuickApi {

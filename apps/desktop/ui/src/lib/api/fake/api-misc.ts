@@ -3,6 +3,7 @@ import { CommandError } from '../command-error';
 import type { AlfaClient } from '../client';
 import type { AutonomyLevel, EventLevel } from '../types';
 import type { FakeChat } from './api-chat';
+import { bootReport } from './api-boot';
 import type { FakeCore } from './core';
 import { seedDevice } from './fixtures';
 export { voiceApi } from './api-voice';
@@ -211,6 +212,7 @@ export function deviceApi(core: FakeCore): AlfaClient['device'] {
 export function systemApi(core: FakeCore, chat: FakeChat): AlfaClient['system'] {
   return {
     status: () => core.reply(core.status),
+    bootReport: () => core.reply(bootReport(core)),
     // Przeglądarka z atrapą ma własny schowek (w programie czyta go rdzeń).
     clipboardText: () =>
       typeof navigator !== 'undefined' && navigator.clipboard

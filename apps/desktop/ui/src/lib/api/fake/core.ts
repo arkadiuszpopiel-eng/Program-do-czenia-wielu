@@ -52,7 +52,11 @@ export type FakeScenario =
   /** Klucza konta Anthropic nie ma już w Credential Managerze — test odmawia jak rdzeń. */
   | 'key-missing'
   /** Strumień ~5 tokenów/s — odpowiedź trwa, gdy test ją zatrzymuje albo otwiera okna. */
-  | 'slow-stream';
+  | 'slow-stream'
+  /** Dziennik rozruchu z ostrzeżeniami / z błędem (sygnał po starcie, Zdrowie systemu). */
+  | 'boot-ok'
+  | 'boot-warnings'
+  | 'boot-errors';
 
 /** Opóźnienie odpowiedzi w scenariuszu „slow-core”. */
 export const SLOW_CORE_MS = 1_500;
@@ -77,6 +81,9 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'arena-budget',
   'key-missing',
   'slow-stream',
+  'boot-ok',
+  'boot-warnings',
+  'boot-errors',
 ];
 
 const CAST_STATES = ['idle', 'speaking', 'working', 'waiting_approval'] as const;
