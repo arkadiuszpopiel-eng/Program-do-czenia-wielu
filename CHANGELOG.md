@@ -12,6 +12,30 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.72 — 2026-10-22
+
+Wydanie „0.0.71B”: Alfa startuje bez okna konsoli, rozruch sygnalizuje się w programie („Rozruch OK” albo
+„z problemem”) z dziennikiem do podejrzenia, a przy wolniejszym starcie nie ma już fałszywego błędu watchdoga.
+
+### Poprawki
+
+- Kopia uruchamiana skrótem „Alfa” nie otwiera już okna konsoli z dziennikiem — programy pomocnicze (CLI
+  agentek, git, sprawdzanie wersji narzędzi) też nie migają oknami.
+- Po starcie Alfa pokazuje „Rozruch OK” z czasem rozruchu, „Rozruch z uwagami” albo „Rozruch z problemem”
+  (ten zostaje na ekranie) z przyciskiem „Pokaż dziennik”. Dziennik rozruchu — wpisy od startu programu
+  (procesy Jądra, Broker, watchdog, moduły, głos; bez treści rozmów, sekrety zamazane) — jest w Ustawienia →
+  Zdrowie systemu, z filtrem ostrzeżeń i błędów i kopiowaniem. Start, który się nie powiódł, zgłasza się przy
+  następnym uruchomieniu.
+- Wolniejszy start nie daje już błędu „alfa-watchdog nie zgłosił gotowości” — Alfa czeka na watchdoga równolegle
+  z łączeniem z Brokerem; skrót Ctrl+Shift+F12 działa jak dotąd.
+
+### Testy
+
+- Regresje: watchdog gotowy po limicie (ostrzeżenie zamiast błędu, czerwony na starym kodzie), dziennik rozruchu
+  (werdykt, okno, limit 500 linii), sygnał w UI (werdykty, czekanie na koniec rozruchu). Mosty CLI: przyczyną
+  „nie zainstalowane” była instalacja z wnętrza zwirtualizowanej aplikacji Claude — CLI zainstalowane ponownie
+  i sprawdzone w Alfie uruchomionej przez Eksplorator.
+
 ## 0.0.71 — 2026-10-22
 
 Koszt zadań agentek liczy się do limitu właściwego konta, konto po wymianie klucza wraca do pracy, a wywołania
