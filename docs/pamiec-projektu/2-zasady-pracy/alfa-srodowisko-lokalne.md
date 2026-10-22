@@ -109,3 +109,9 @@ nazwie nie daje się nadpisać bez odczytu, a uruchomiony przez pomyłkę stary 
 dawały raport z wymyślonymi danymi — funkcji, której wynik pisze model, nie wypuszczać bez takiej próby.
 Po próbie zabić `alfa-desktop.exe` i `llama-server.exe`, usunąć profil, uruchomić aplikację z powrotem na profilu
 właściciela. Okno „Co nowego” zasłania interfejs po zmianie wersji — nie zamykać go właścicielowi.
+
+**Limity rozmiaru po każdej zmianie w Rust (2026-10-22):** `node scripts/check-size.mjs` woła `git ls-files` i bez
+wyjątku `safe.directory` pada (dysk E: ma innego właściciela). Uruchamiać z
+`GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*'` (bez zmiany konfiguracji globalnej) i nie przez
+`| tail`, które ukrywa kod wyjścia. Crate'y przy samym limicie 8000 linii: app-core, app-api — każda dopisana linia
+w `src` wymaga sprawdzenia; 22.10 zmiana komunikatu w app-api przeszła testy, a przekroczyła limit (8007).
