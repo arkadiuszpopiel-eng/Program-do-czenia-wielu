@@ -92,7 +92,13 @@ impl Journal {
         for part in parts.iter().take(parts.len().saturating_sub(1)) {
             let parent = dir.clone();
             dir.push(part);
-            let cargo = self.fs.exists(&parent.join("Cargo.toml"));
+            // Zapytania o pliki tylko dla `target` — przy tysiącach plików manifestu każde
+            // `exists` na przodka było zbędnym kosztem (przegląd 0.0.70).
+            let target = part
+                .as_os_str()
+                .to_string_lossy()
+                .eq_ignore_ascii_case(SNAPSHOT_CARGO_TARGET);
+            let cargo = target && self.fs.exists(&parent.join("Cargo.toml"));
             if snapshot_skips(&dir, cargo, || {
                 self.fs.exists(&dir.join(SNAPSHOT_CACHE_TAG))
             }) {
