@@ -110,20 +110,25 @@ fn budget(
     // Blokada według kosztu minimalnego (jak budżet rozmowy poza Routerem): oszacowanie maksymalne
     // liczy pełne `max_tokens` modelu (dla Claude 128 tys. — ok. 10 zł na wiadomość), więc przy
     // limicie 100 zł rozmowa stawała przy ok. 90 zł. Maksimum — tylko ostrzeżenie (przegląd 2026-10-22).
-    match gate.check(&cand.provider, estimate.min.micro_usd_ceil(), c.background) {
+    let min = estimate.min.micro_usd_ceil();
+    let mut notices = match gate.check(&cand.provider, min, c.background) {
         BudgetDecision::Block { notice } => return Err(RejectReason::Budget { notice }),
-        BudgetDecision::Warn { notices } => {
-            warnings.push(RouteWarning::Budget { notices });
-            return Ok(());
+        BudgetDecision::Warn { notices } => notices,
+        BudgetDecision::Allow => Vec::new(),
+    };
+    // Maksimum dokłada progi zakresów, których minimum nie przekroczyło (np. limit konta).
+    let more = match gate.check(&cand.provider, estimate.max.micro_usd_ceil(), c.background) {
+        BudgetDecision::Allow => Vec::new(),
+        BudgetDecision::Warn { notices } => notices,
+        BudgetDecision::Block { notice } => vec![notice],
+    };
+    for n in more {
+        if !notices.iter().any(|m| m.scope == n.scope) {
+            notices.push(n);
         }
-        BudgetDecision::Allow => {}
     }
-    match gate.check(&cand.provider, estimate.max.micro_usd_ceil(), c.background) {
-        BudgetDecision::Allow => {}
-        BudgetDecision::Warn { notices } => warnings.push(RouteWarning::Budget { notices }),
-        BudgetDecision::Block { notice } => warnings.push(RouteWarning::Budget {
-            notices: vec![notice],
-        }),
+    if !notices.is_empty() {
+        warnings.push(RouteWarning::Budget { notices });
     }
     Ok(())
 }
