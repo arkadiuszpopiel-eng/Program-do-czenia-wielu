@@ -144,7 +144,11 @@ describe('FakeAlfaClient — scenariusze', () => {
     const { client } = setup({ scenario: 'key-missing' });
     const before = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
     expect(before).toMatchObject({ state: 'ok', key_stored: true });
-    await expect(client.accounts.test('acc-anthropic')).rejects.toMatchObject({ code: 'secrets' });
+    await expect(client.accounts.test('acc-anthropic')).rejects.toMatchObject({
+      code: 'secrets',
+      message: expect.stringContaining('Zmień klucz'),
+      details: { id: 'acc-anthropic', reason: 'secret_missing' },
+    });
     const after = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
     expect(after).toMatchObject({ state: 'unconfigured', key_stored: false, key_saved_at: null });
     // Inne konta mają klucze.

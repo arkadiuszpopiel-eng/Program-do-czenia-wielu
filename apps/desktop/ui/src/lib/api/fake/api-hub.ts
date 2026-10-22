@@ -246,8 +246,10 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (lost.has(id) || !account.key_stored) {
         if (account.state !== 'disabled')
           update(id, { state: 'unconfigured', key_stored: false, key_saved_at: null });
-        const text = `brak klucza konta \`${id}\` w magazynie sekretów`;
-        return Promise.reject(new CommandError('secrets', text));
+        const text =
+          'Klucza tego konta nie ma w Menedżerze poświadczeń Windows — wpisz go ponownie („Zmień klucz”).';
+        const details = { kind: 'account', id, reason: 'secret_missing' };
+        return Promise.reject(new CommandError('secrets', text, details));
       }
       const { stored, report } = probe(account, keys.get(id) ?? '');
       update(id, stored);

@@ -74,6 +74,17 @@ fn constructors_fill_details() {
 }
 
 #[test]
+fn missing_key_says_what_to_do_without_internal_id() {
+    let id = accounts_hub_contract::AccountId::new("acc-7f3a").unwrap();
+    let e: AppError = accounts_hub_contract::AccountsError::SecretMissing(id).into();
+    assert_eq!(e.code, ErrorCode::Secrets);
+    assert!(e.message.contains("Zmień klucz"), "{}", e.message);
+    assert!(!e.message.contains("acc-7f3a"), "{}", e.message);
+    assert_eq!(e.details.text("id"), Some("acc-7f3a"));
+    assert_eq!(e.details.text("reason"), Some("secret_missing"));
+}
+
+#[test]
 fn details_never_carry_secrets() {
     // Wszystkie konstruktory idą przez `with`, a ten przez filtr z `details.rs`.
     let e = AppError::invalid("x")
