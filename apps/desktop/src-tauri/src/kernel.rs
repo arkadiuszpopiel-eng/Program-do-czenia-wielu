@@ -56,8 +56,11 @@ pub fn watch(app: &AppHandle, core: &AppCore, kernel: &Kernel) {
         shortcuts::set_kill_switch(app, core, true);
         return;
     };
-    shortcuts::set_kill_switch(app, core, !procs.watchdog_active());
+    // Najpierw subskrypcja, potem odczyt: gotowość watchdoga w szczelinie między nimi przepadłaby
+    // (subskrypcja oznacza bieżący stan jako widziany), a aplikacja zajęłaby skrót przed watchdogiem.
     let mut status = procs.subscribe();
+    let ready = status.borrow_and_update().watchdog;
+    shortcuts::set_kill_switch(app, core, !ready);
     let (app_s, core_s) = (app.clone(), core.clone());
     tauri::async_runtime::spawn(async move {
         while status.changed().await.is_ok() {

@@ -288,3 +288,84 @@ fn no_kernel_binaries_means_in_process_and_unavailable_is_fail_closed() {
     ));
     assert!(kernel.window.unwrap().present("1").is_err());
 }
+
+/// Zdarzenia `tracing` (poziom, treść) z wątku testu (start Jądra czeka na tym wątku).
+#[derive(Clone, Default)]
+struct Events(Arc<std::sync::Mutex<Vec<(tracing::Level, String)>>>);
+
+struct Message(String);
+
+impl tracing::field::Visit for Message {
+    fn record_debug(&mut self, field: &tracing::field::Field, value: &dyn std::fmt::Debug) {
+        if field.name() == "message" {
+            self.0 = format!("{value:?}");
+        }
+    }
+}
+
+impl tracing::Subscriber for Events {
+    fn enabled(&self, _: &tracing::Metadata<'_>) -> bool {
+        true
+    }
+    fn new_span(&self, _: &tracing::span::Attributes<'_>) -> tracing::span::Id {
+        tracing::span::Id::from_u64(1)
+    }
+    fn record(&self, _: &tracing::span::Id, _: &tracing::span::Record<'_>) {}
+    fn record_follows_from(&self, _: &tracing::span::Id, _: &tracing::span::Id) {}
+    fn event(&self, event: &tracing::Event<'_>) {
+        let mut message = Message(String::new());
+        event.record(&mut message);
+        self.0
+            .lock()
+            .unwrap()
+            .push((*event.metadata().level(), message.0));
+    }
+    fn enter(&self, _: &tracing::span::Id) {}
+    fn exit(&self, _: &tracing::span::Id) {}
+}
+
+/// Przegląd 2026-10-22 (dziennik właściciela: watchdog gotowy 0,2 s po limicie 2 s → ERROR przy każdym
+/// starcie): aplikacja czeka na watchdoga równolegle z Brokerem, a spóźnienie ponad limit to ostrzeżenie
+/// (skrót tymczasowo w aplikacji, potem przejmuje go watchdog), nie błąd.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn late_watchdog_is_awaited_and_not_reported_as_error() {
+    let start = |delay_ms: u64, limit_ms: u64| {
+        let dir = tempfile::tempdir().unwrap();
+        touch(
+            dir.path(),
+            &["alfa-broker", "alfa-broker-ui", "alfa-watchdog"],
+        );
+        let sys = base();
+        let fake = FakeSystem::new(sys.clone());
+        *fake.ready_delay.lock().unwrap() = Some(Duration::from_millis(delay_ms));
+        let mut s = setup(dir.path(), &sys, fake.clone(), None);
+        s.timing.watchdog_ready = Duration::from_millis(limit_ms);
+        let events = Events::default();
+        let procs =
+            tracing::subscriber::with_default(events.clone(), || remote(KernelProcesses::start(s)));
+        let dog: Vec<tracing::Level> = events
+            .0
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|(_, m)| m.contains("watchdog"))
+            .map(|(l, _)| *l)
+            .collect();
+        (procs, dog, fake, dir)
+    };
+    let bad = |l: &tracing::Level| *l == tracing::Level::ERROR || *l == tracing::Level::WARN;
+    // Spóźnienie w limicie: start czeka, skrót od razu u watchdoga, bez ostrzeżeń i błędów.
+    let (procs, dog, _fake, _dir) = start(300, 2_000);
+    assert!(
+        procs.watchdog_active(),
+        "gotowość w limicie — skrót u watchdoga"
+    );
+    assert!(!dog.iter().any(bad), "{dog:?}");
+    drop(procs);
+    // Spóźnienie ponad limit: ostrzeżenie, nie błąd; potem skrót przejmuje watchdog.
+    let (procs, dog, _fake, _dir) = start(600, 100);
+    assert!(!procs.watchdog_active());
+    assert!(dog.contains(&tracing::Level::WARN), "{dog:?}");
+    assert!(!dog.contains(&tracing::Level::ERROR), "{dog:?}");
+    common::wait_until("watchdog gotowy po limicie", || procs.view().watchdog);
+}

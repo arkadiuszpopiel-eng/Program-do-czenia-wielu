@@ -60,6 +60,8 @@ pub struct FakeSystem {
     pub brokers: Mutex<Vec<BrokerProc>>,
     pub watchdog: Mutex<Option<std::io::PipeWriter>>,
     pub killed: Arc<Mutex<Vec<u32>>>,
+    /// Watchdog zgłasza gotowość dopiero po tym czasie (`None` — od razu).
+    pub ready_delay: Mutex<Option<std::time::Duration>>,
 }
 
 impl FakeSystem {
@@ -72,6 +74,7 @@ impl FakeSystem {
             brokers: Mutex::new(Vec::new()),
             watchdog: Mutex::new(None),
             killed: Arc::new(Mutex::new(Vec::new())),
+            ready_delay: Mutex::new(None),
         })
     }
 
@@ -152,7 +155,17 @@ impl Spawner for FakeSystem {
         }
         let (reader, mut writer) = std::io::pipe().unwrap();
         writeln!(writer, "[alfa-watchdog] kill-switch Ctrl+Shift+F12 aktywny").unwrap();
-        writeln!(writer, r#"{{"event":"ready","hotkey":"Ctrl+Shift+F12"}}"#).unwrap();
+        let ready = r#"{"event":"ready","hotkey":"Ctrl+Shift+F12"}"#;
+        match *self.ready_delay.lock().unwrap() {
+            None => writeln!(writer, "{ready}").unwrap(),
+            Some(delay) => {
+                let mut late = writer.try_clone().unwrap();
+                std::thread::spawn(move || {
+                    std::thread::sleep(delay);
+                    let _ = writeln!(late, "{ready}");
+                });
+            }
+        }
         *self.watchdog.lock().unwrap() = Some(writer);
         Ok(Box::new(FakeChild {
             pid,

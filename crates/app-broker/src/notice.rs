@@ -5,6 +5,8 @@
 //! Kanał to anonimowy potok stdout procesu potomnego — tylko aplikacja ma jego koniec do odczytu.
 
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Instant;
 
 use serde::Deserialize;
 use tokio::sync::watch;
@@ -32,10 +34,12 @@ pub fn parse(line: &str) -> Option<Notice> {
 }
 
 /// Podłącza wyjście watchdoga: gotowość i koniec → stan, kill-switch → licznik `kills`.
+/// `started` — chwila uruchomienia procesu (czas gotowości w dzienniku).
 pub fn attach(
     child: &mut dyn ChildProc,
     status: &Arc<KernelStatus>,
     kills: &Arc<watch::Sender<u64>>,
+    started: Instant,
 ) -> LastLine {
     let last = LastLine::default();
     if let Some(err) = child.take_stderr() {
@@ -47,11 +51,24 @@ pub fn attach(
         return last;
     };
     let (status_line, kills) = (status.clone(), kills.clone());
-    let ended = EndGuard(status.clone());
+    let seen = Arc::new(AtomicBool::new(false));
+    let ended = EndGuard {
+        status: status.clone(),
+        seen: seen.clone(),
+        last: last.clone(),
+    };
     pump_lines("watchdog", out, last.clone(), move |line| {
         let _keep = &ended;
         match parse(line) {
-            Some(Notice::Ready) => status_line.set_watchdog(true),
+            Some(Notice::Ready) => {
+                seen.store(true, Ordering::SeqCst);
+                let gotowy_po_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
+                tracing::info!(
+                    gotowy_po_ms,
+                    "alfa-watchdog gotowy — skrót Ctrl+Shift+F12 obsługuje watchdog"
+                );
+                status_line.set_watchdog(true);
+            }
             Some(Notice::KillSwitch { latency_us }) => {
                 tracing::warn!(latency_us, "kill-switch watchdoga (Ctrl+Shift+F12)");
                 kills.send_modify(|n| *n = n.wrapping_add(1));
@@ -62,12 +79,23 @@ pub fn attach(
     last
 }
 
-/// Koniec strumienia (watchdog zakończony) → aplikacja przejmuje skrót.
-struct EndGuard(Arc<KernelStatus>);
+/// Koniec strumienia (watchdog zakończony) → aplikacja przejmuje skrót. Koniec przed gotowością
+/// to prawdziwy błąd (np. skrót zajęty przez inny program); po gotowości — zwykłe zamknięcie.
+struct EndGuard {
+    status: Arc<KernelStatus>,
+    seen: Arc<AtomicBool>,
+    last: LastLine,
+}
 
 impl Drop for EndGuard {
     fn drop(&mut self) {
-        self.0.set_watchdog(false);
+        if !self.seen.load(Ordering::SeqCst) {
+            tracing::error!(
+                ostatnia_linia = ?self.last.get(),
+                "alfa-watchdog zakończył działanie przed gotowością — skrót Ctrl+Shift+F12 obsługuje aplikacja"
+            );
+        }
+        self.status.set_watchdog(false);
     }
 }
 

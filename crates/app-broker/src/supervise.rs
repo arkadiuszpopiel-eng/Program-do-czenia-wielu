@@ -21,7 +21,8 @@ pub struct Timing {
     pub retry: Duration,
     /// Odstęp heartbeatu przy połączeniu.
     pub heartbeat: Duration,
-    /// Ile czekać na gotowość watchdoga (rejestracja skrótu).
+    /// Ile przy starcie czekać na gotowość watchdoga (rejestracja skrótu) — równolegle z pierwszym
+    /// połączeniem z Brokerem; potem skrót tymczasowo obsługuje aplikacja.
     pub watchdog_ready: Duration,
     /// Początkowa przerwa przed ponownym uruchomieniem Brokera (rośnie do 30 s).
     pub relaunch: Duration,
@@ -33,7 +34,8 @@ impl Default for Timing {
             first_connect: Duration::from_secs(5),
             retry: Duration::from_millis(250),
             heartbeat: Duration::from_secs(1),
-            watchdog_ready: Duration::from_secs(2),
+            // 2 s nie starczały przy zimnym starcie (dziennik właściciela 22.10: gotowość po 2,2 s).
+            watchdog_ready: Duration::from_secs(5),
             relaunch: Duration::from_secs(1),
         }
     }

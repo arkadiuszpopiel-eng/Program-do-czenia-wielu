@@ -82,7 +82,6 @@ pub struct KernelProcesses {
 struct WatchdogStarter {
     exe_dir: PathBuf,
     spawner: Arc<dyn Spawner>,
-    ready: Duration,
     /// Argumenty bez `--broker-pid` (potok Brokera).
     base_args: Vec<String>,
     status: Arc<KernelStatus>,
@@ -179,17 +178,29 @@ impl KernelProcesses {
         let starter = WatchdogStarter {
             exe_dir: setup.exe_dir.clone(),
             spawner: setup.spawner.clone(),
-            ready: setup.timing.watchdog_ready,
             base_args: plan.watchdog_args,
             status: status.clone(),
             kills: kills.clone(),
         };
         let mut watched = sup.broker_pid();
         let watchdog = Arc::new(Mutex::new(start_watchdog(&starter, starter.args(watched))));
-        // Czekamy tylko na błędy przejściowe (potok jeszcze nie istnieje); odmowa serwera albo
-        // uszkodzona konfiguracja usługi kończą czekanie od razu (stan „zerwane” z powodem).
-        while status.link() == LinkState::Connecting && Instant::now() < deadline {
-            let wait = sup.step(true).min(Duration::from_millis(100));
+        // Czekamy równolegle na pierwsze połączenie z Brokerem (tylko błędy przejściowe — odmowa
+        // serwera albo uszkodzona konfiguracja usługi kończą czekanie od razu) i na gotowość
+        // watchdoga, żeby aplikacja nie zajęła Ctrl+Shift+F12 przed nim. Wcześniej oba czekania szły
+        // jedno po drugim, a 2 s na watchdoga kończyły się fałszywym błędem przy wolniejszym starcie.
+        let dog_deadline = Instant::now() + setup.timing.watchdog_ready;
+        loop {
+            let now = Instant::now();
+            let broker = status.link() == LinkState::Connecting && now < deadline;
+            let dog = !status.watchdog() && now < dog_deadline && running(&watchdog);
+            if !broker && !dog {
+                break;
+            }
+            let wait = if broker {
+                sup.step(true).min(Duration::from_millis(100))
+            } else {
+                Duration::from_millis(10)
+            };
             std::thread::sleep(wait.max(Duration::from_millis(10)));
         }
         if status.link() == LinkState::Connecting {
@@ -197,6 +208,12 @@ impl KernelProcesses {
                 "Broker nie odpowiedział w ciągu {} s od startu",
                 setup.timing.first_connect.as_secs()
             )));
+        }
+        if !status.watchdog() && running(&watchdog) {
+            tracing::warn!(
+                limit_s = setup.timing.watchdog_ready.as_secs(),
+                "alfa-watchdog jeszcze nie gotowy — skrót Ctrl+Shift+F12 tymczasowo obsługuje aplikacja"
+            );
         }
         let stop = StopSignal::new();
         let thread_stop = stop.clone();
@@ -292,11 +309,12 @@ fn restart_watchdog(
     *slot = start_watchdog(starter, starter.args(pid));
 }
 
-/// Uruchamia `alfa-watchdog` (jeśli jest obok aplikacji) i czeka na gotowość (skrót zarejestrowany).
+/// Uruchamia `alfa-watchdog` (jeśli jest obok aplikacji); gotowość (skrót zarejestrowany) przychodzi
+/// komunikatem na stdout (`notice::attach`) — bez blokowania wątku (start, nadzór Brokera).
 fn start_watchdog(starter: &WatchdogStarter, mut args: Vec<String>) -> Option<Box<dyn ChildProc>> {
-    let (status, kills) = (&starter.status, &starter.kills);
     let image = mode::watchdog_image(&starter.exe_dir)?;
     args.push("--lifeline".into());
+    let started = Instant::now();
     let mut child = match starter.spawner.spawn(&ChildSpec { image, args }) {
         Ok(child) => child,
         Err(e) => {
@@ -304,18 +322,16 @@ fn start_watchdog(starter: &WatchdogStarter, mut args: Vec<String>) -> Option<Bo
             return None;
         }
     };
-    let last = notice::attach(child.as_mut(), status, kills);
-    let deadline = Instant::now() + starter.ready;
-    while !status.watchdog() && child.running() && Instant::now() < deadline {
-        std::thread::sleep(Duration::from_millis(10));
-    }
-    if !status.watchdog() {
-        tracing::error!(
-            ostatnia_linia = ?last.get(),
-            "alfa-watchdog nie zgłosił gotowości — skrót Ctrl+Shift+F12 obsłuży aplikacja"
-        );
-    }
+    notice::attach(child.as_mut(), &starter.status, &starter.kills, started);
     Some(child)
+}
+
+/// Czy proces watchdoga działa.
+fn running(slot: &Mutex<Option<Box<dyn ChildProc>>>) -> bool {
+    slot.lock()
+        .unwrap_or_else(|p| p.into_inner())
+        .as_mut()
+        .is_some_and(|c| c.running())
 }
 
 #[cfg(test)]
