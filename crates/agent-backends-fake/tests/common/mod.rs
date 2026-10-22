@@ -117,6 +117,9 @@ pub fn config(base: &Path) -> BridgeConfig {
         .with_bridge(BridgeKind::Codex, fake_cli(), pin.clone())
         .with_bridge(BridgeKind::Antigravity, fake_cli(), pin);
     cfg.max_line_bytes = 1024 * 1024;
+    // Pełny bieg testów (ponad 1000 programów naraz) potrafi uruchamiać atrapę CLI dłużej niż
+    // domyślne 5 s — odczyt wersji wychodził pusty i 3 testy zgodności padały losowo (verify 22.10).
+    cfg.version_timeout = std::time::Duration::from_secs(30);
     cfg
 }
 
