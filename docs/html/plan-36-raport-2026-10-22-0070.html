@@ -393,8 +393,9 @@ i data synchronizacji czekają, a skrypt kończy się kodem 3 (<code>3f347b5e</c
 starej wersji).</p>
 <p>Atrapa interfejsu: nowy scenariusz <code>?scenario=key-missing</code> — klucza konta Anthropic nie ma w Credential Managerze; test
 odmawia jak rdzeń (komunikat „brak klucza konta … w magazynie sekretów”), konto przechodzi w „nieskonfigurowane”, wymiana
-klucza je przywraca (<code>29d30387</code>; zamyka ustalenie 17 przeglądu kluczy). Uwaga przy okazji: ten komunikat rdzenia pokazuje
-wewnętrzny identyfikator konta zamiast jego nazwy — do poprawy w następnej wersji (drobne, tekst błędu).</p>
+klucza je przywraca (<code>29d30387</code>; zamyka ustalenie 17 przeglądu kluczy). Przy okazji komunikat rdzenia przy braku klucza
+mówi teraz, co zrobić — „Klucza tego konta nie ma w Menedżerze poświadczeń Windows — wpisz go ponownie („Zmień klucz”).” —
+zamiast pokazywać wewnętrzny identyfikator konta (ten jest w szczegółach błędu; <code>290febb6</code>, w kodzie, do następnej wersji).</p>
 <h2 id="5-co-zostaje">5. Co zostaje</h2>
 <ul>
 <li>Z serii 9 i 10 (niska waga): koszt przebiegów agentek przez Router zapisuje się pod „Router”, więc limit konta (dostawcy)
