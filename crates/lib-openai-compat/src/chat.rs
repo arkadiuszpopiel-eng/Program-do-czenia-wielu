@@ -215,28 +215,31 @@ impl ChatDecoder {
     }
 
     fn tool_delta(&mut self, tc: &Value, out: &mut Vec<ProviderEvent>) {
-        // Bez `index` (Gemini przez endpoint zgodny): nowe `id` = nowe wywołanie, brak `id` = ciąg
-        // ostatniego — wcześniej wszystkie trafiały pod klucz 0 i argumenty się sklejały.
-        let key = match (tc["index"].as_u64(), tc["id"].as_str()) {
+        // Bez `index` (Gemini przez endpoint zgodny): nowe `id` albo nowa nazwa funkcji = nowe
+        // wywołanie, poza tym ciąg ostatniego — wcześniej wszystkie trafiały pod klucz 0 i argumenty
+        // się sklejały. Puste `id` (część serwerów zgodnych) traktowane jak brak.
+        let f = &tc["function"];
+        let id = tc["id"].as_str().filter(|s| !s.is_empty());
+        let named = f["name"].as_str().is_some_and(|n| !n.is_empty());
+        let fresh = u64::from(u32::MAX) + self.tools.len() as u64;
+        let latest = self.tools.iter().max_by_key(|(_, s)| s.index);
+        // Nazwa po kompletnych argumentach poprzedniego = następne wywołanie; w trakcie fragmentów
+        // (powtórzona nazwa) — ciąg tego samego.
+        let done = latest.is_none_or(|(_, s)| serde_json::from_str::<Value>(&s.json).is_ok());
+        let key = match (tc["index"].as_u64(), id) {
             (Some(i), _) => i,
             (None, Some(id)) => self
                 .tools
                 .iter()
                 .find(|(_, s)| s.id == id)
-                .map_or(u64::from(u32::MAX) + self.tools.len() as u64, |(k, _)| *k),
-            (None, None) => self
-                .tools
-                .iter()
-                .max_by_key(|(_, s)| s.index)
-                .map_or(0, |(k, _)| *k),
+                .map_or(fresh, |(k, _)| *k),
+            (None, None) if named && done => fresh,
+            (None, None) => latest.map_or(0, |(k, _)| *k),
         };
-        let f = &tc["function"];
         if !self.tools.contains_key(&key) {
             let index = self.next_index;
             self.next_index += 1;
-            let id = tc["id"]
-                .as_str()
-                .map_or_else(|| format!("call_{index}"), str::to_owned);
+            let id = id.map_or_else(|| format!("call_{index}"), str::to_owned);
             let name = f["name"].as_str().unwrap_or_default().to_owned();
             out.push(ProviderEvent::ToolCallStart {
                 index,

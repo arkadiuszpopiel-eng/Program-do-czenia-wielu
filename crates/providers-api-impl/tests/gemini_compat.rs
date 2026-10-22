@@ -72,6 +72,51 @@ async fn parallel_tool_calls_without_index_stay_separate() {
     assert_eq!(paths, ["a.txt", "b.txt"]);
 }
 
+/// Ścieżki z wywołań narzędzi dla porcji `tool_calls` (każda porcja osobnym zdarzeniem SSE).
+async fn paths_for(chunks: &[serde_json::Value]) -> Vec<String> {
+    let server = FixtureServer::start().await;
+    let mut body = sse::chat_role(MODEL);
+    for c in chunks {
+        body += &sse::data(&json!({"id": "c", "model": MODEL, "choices": [{"index": 0,
+            "delta": {"tool_calls": c}, "finish_reason": null}]}));
+    }
+    server.reset(Reply::sse(body + &sse::chat_finish(MODEL, "stop")));
+    let p = provider(&server);
+    let mut req = ChatRequest::new(MODEL, vec![Message::user_text("x")]);
+    req.tools = vec![ToolSpec {
+        name: "fs_read".into(),
+        description: "Czyta plik.".into(),
+        input_schema: json!({"type": "object", "properties": {"path": {"type": "string"}}}),
+        strict: false,
+    }];
+    let events: Vec<ProviderEvent> = p.stream(req, CancellationToken::new()).collect().await;
+    let mut acc = TurnAccumulator::new(p.id().clone());
+    events.iter().for_each(|e| acc.push(e));
+    acc.finish()
+        .message
+        .tool_uses()
+        .map(|t| t.input["path"].as_str().unwrap_or_default().to_owned())
+        .collect()
+}
+
+/// Przegląd 0.0.70: puste `id` jak brak; nazwa po kompletnych argumentach = następne wywołanie,
+/// a argumenty we fragmentach (bez `id`, z powtórzoną nazwą) zostają jednym wywołaniem.
+#[tokio::test]
+async fn empty_ids_and_fragmented_arguments_without_index() {
+    let two = paths_for(&[json!([
+        {"id": "", "type": "function", "function": {"name": "fs_read", "arguments": "{\"path\":\"a.txt\"}"}},
+        {"id": "", "type": "function", "function": {"name": "fs_read", "arguments": "{\"path\":\"b.txt\"}"}}
+    ])])
+    .await;
+    assert_eq!(two, ["a.txt", "b.txt"]);
+    let one = paths_for(&[
+        json!([{"type": "function", "function": {"name": "fs_read", "arguments": "{\"pa"}}]),
+        json!([{"function": {"name": "fs_read", "arguments": "th\":\"c.txt\"}"}}]),
+    ])
+    .await;
+    assert_eq!(one, ["c.txt"]);
+}
+
 #[test]
 fn models_prefix_hits_the_price_list() {
     let server_url = "http://127.0.0.1:9".to_owned();
