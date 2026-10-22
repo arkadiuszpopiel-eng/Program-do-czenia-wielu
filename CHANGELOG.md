@@ -12,6 +12,41 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.70 — 2026-10-22
+
+Limity kosztów kont działają, Router nie blokuje rozmowy na długo przed limitem, a Gemini i modele OpenAI
+dostają poprawne wywołania narzędzi i limity odpowiedzi.
+
+### Poprawki
+
+- [poważne] Limit kosztów konta z kreatora (domyślnie 100 zł/mies.) jest egzekwowany — wcześniej wiersz konta go
+  pokazywał, ale nic go nie sprawdzało (ani ostrzeżenia, ani blokady). Konta jednego dostawcy sumują się; dostawca
+  ma limit, gdy każde jego konto go ma.
+- [poważne] Rozmowa przez Router nie staje już przy ok. 90 % limitu kosztów: blokada liczy koszt minimalny
+  wiadomości, a pełne maksimum odpowiedzi (np. 128 tys. tokenów) daje tylko ostrzeżenie. Komunikat mówi, który
+  limit (miesięczny, zadań w tle, dostawcy), zamiast „Monthly”.
+- [poważne] Gemini przez endpoint zgodny z OpenAI: kilka wywołań narzędzi naraz nie skleja się w jedno (agentka
+  czyta kilka plików jednocześnie), a koszt modeli o nazwach `models/…` jest liczony.
+- [poważne] Oficjalne OpenAI zna limity odpowiedzi modeli (gpt-5 128 tys., o3/o4 100 tys., gpt-4.1 32 tys., gpt-4o
+  16 tys.) — zadania agentek nie ucinają się na 8 192 tokenach, a rozmowa dostaje limit modelu.
+- Błędy w zadaniach agentek nazywają dostawcę, który zawiódł (jak zwykła rozmowa), zamiast „Router”.
+- Kreator konta: zaznaczone wszystkie agentki nie przypinają już konta każdej z nich — Router dobiera model do
+  pytania (wcześniej każde krótkie pytanie szło do pierwszego, zwykle najdroższego modelu konta). Wybór części
+  agentek przypina konto jak dotąd.
+- Panel Pliki: „Zapisz jako…” tylko dla plików z podglądem tekstowym — dla docx, xlsx i obrazów kończyło się
+  błędem; zostają Otwórz, Pokaż w Eksploratorze i Kopiuj plik.
+- Blok kodu w rozmowie nie ma już przycisku „Uruchom w terminalu (przez Brokera)”, który nigdy niczego nie
+  uruchamiał; kod uruchamia agentka narzędziem powłoki albo Ty po skopiowaniu.
+- Cofanie poleceń powłoki zapisanych przed 0.0.69 nie zgłasza fałszywego konfliktu i nie przywraca starych plików
+  w `node_modules`, `__pycache__` ani w katalogu wyników cargo.
+
+### Testy
+
+- Regresje (większość sprawdzona na starym kodzie): wywołania narzędzi Gemini bez `index` i cena `models/…`,
+  blokada według kosztu minimalnego z ostrzeżeniem według maksimum, sumowanie limitów kont, model w błędzie
+  przebiegu agentki, limity wyjścia rodzin OpenAI, cofanie z katalogiem oznaczonym znacznikiem cargo; panel Plików
+  sprawdzony w podglądzie interfejsu.
+
 ## 0.0.69 — 2026-10-22
 
 Agentki pracują przez API u wszystkich obsługiwanych dostawców i na większych plikach, rozmowa sama wychodzi
