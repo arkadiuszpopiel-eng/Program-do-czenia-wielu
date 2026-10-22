@@ -45,3 +45,10 @@ WSL jako `bash`) na drugiej są błędne albo groźne (16 GB RAM).
 **How to apply:** na początku sesji sprawdź maszynę (procesor, karty: `Get-CimInstance Win32_Processor,
 Win32_VideoController`) i stosuj jej reguły; przed `verify sprzet` ustal z właścicielem, czy ta maszyna jest
 docelowa; nie porównuj czasów między maszynami.
+
+**Mosty CLI na PC (2026-10-22):** aplikacje okienkowe Claude i OpenAI Codex (Sklep, MSIX) noszą własne `claude.exe`/`codex.exe`
+poza PATH (`%APPDATA%\Claude\claude-code\<wersja>\…`, `WindowsApps\OpenAI.Codex_…\app\resources`), więc Alfa (szuka tylko
+w PATH + PATHEXT) pokazywała „nie zainstalowane”. Na prośbę właściciela zainstalowane oficjalne CLI: `npm install -g
+@anthropic-ai/claude-code@2.1.308 @openai/codex@0.163.0` → `%APPDATA%\npm\claude.cmd`, `codex.cmd` (w PATH użytkownika;
+restart Alfy niepotrzebny). Antigravity odinstalowane (zostały `.antigravity`, pusty `D:\Antigravity`). Właściciel nie dał
+dostępu computer-use do okna Alfy — wykrywanie sprawdzone emulacją `SystemCliProbe` (PATH z rejestru, lista zmiennych).

@@ -4,7 +4,7 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-22T09:45:00+02:00"
+    "updated": "2026-10-22T11:00:00+02:00"
   },
   "current_state": "Komputer stacjonarny (RX 9070 XT). Wersja 0.0.70 = 0.0.69 (seria 9, raport 35) + seria 10 (10 punktów, raport alfa/docs/plan/36-raport-2026-10-22-0070.md): limity kosztów kont, Router blokuje według kosztu minimalnego, Gemini (narzędzia równoległe, cennik models/), sufit wyjścia OpenAI dla zadań agentek, błędy agentek z nazwą dostawcy, konto przypisane wszystkim agentkom = bez przypięcia, panel Pliki, blok kodu, cofanie starych kroków powłoki. W Alfa-uruchomiona wgrana 0.0.70 (22.10 3:49, deploy-owner --no-start: Alfa zamknięta, uruchomić skrótem „Alfa”; próbny start na tymczasowym profilu: Broker, okno zgód, watchdog, 0 WebView2 z portem CDP). Kopia właściciela budowana bez e2e w target/owner. Gałąź ccr-af4b63c6-3fyzaj, niewypchnięta.",
   "session_goal": "Właściciel 21.10 wieczorem: zamknąć otwarte tematy, pełna działająca wersja do pracy przez API i lokalnie, zapisać wszystko i pauza (/goal do 7:00). Nowe funkcje dopiero po tej wersji.",
@@ -18,6 +18,7 @@
     "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
   ],
   "next_session": [
+    "Mosty CLI: komunikat „Narzędzie nie jest zainstalowane” myli, gdy jest aplikacja okienkowa (Claude, Codex ze Sklepu) bez CLI w PATH — pokazać „jest aplikacja, brak narzędzia wiersza poleceń” z poleceniem instalacji (22.10 zainstalowano npm -g claude-code 2.1.308 i codex 0.163.0).",
     "Koszt podprzebiegów (delegacja, Krytyczka) poza dziennikiem kosztów — ich tury emitują już ModelUsage; doliczyć w app-chat agent.rs (gałąź !main) pod faktycznym dostawcą, reszta liczona tylko z części przebiegu głównego (raport 37 §2).",
     "Zadania agentek w tle (app-tasks exec_agent, RuntimeExecutor) nie zapisują kosztu w cost-meter — limit ich nie widzi.",
     "Koszt przebiegu agentki zapisuje się dopiero po jego końcu — limit dostawcy nie zatrzyma długiego przebiegu w trakcie (chroni „Limit kosztu zadania”); rozważyć zapis po każdej turze.",
