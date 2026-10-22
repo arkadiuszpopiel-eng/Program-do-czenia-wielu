@@ -40,7 +40,7 @@ pub struct RenderOptions {
     pub allow_remote_images: bool,
 }
 
-/// Metadane bloku kodu dla akcji „kopiuj / zapisz jako plik / uruchom w terminalu” (PLAN §14.8).
+/// Metadane bloku kodu dla akcji „kopiuj / zapisz jako plik” (PLAN §14.8; „uruchom w terminalu” usunięte w 0.0.70).
 /// Podświetlanie składni robi UI w Web Workerze po zamknięciu bloku.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CodeBlockMeta {

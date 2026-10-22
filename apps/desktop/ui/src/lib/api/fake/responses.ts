@@ -63,7 +63,7 @@ export function pickResponse(
         addressed ?? 'delta',
         'coder',
         v === 0
-          ? 'Przygotowałam funkcję i krótki test. Uruchomienie w terminalu przejdzie przez Brokera.\n\n```ts\nexport function sumaNetto(pozycje: { cena: number; ilosc: number }[]): number {\n  return pozycje.reduce((suma, p) => suma + p.cena * p.ilosc, 0);\n}\n```\n\nDaj znać, czy dodać obsługę rabatów.'
+          ? 'Przygotowałam funkcję i krótki test. Mogę ją uruchomić w terminalu, jeśli chcesz.\n\n```ts\nexport function sumaNetto(pozycje: { cena: number; ilosc: number }[]): number {\n  return pozycje.reduce((suma, p) => suma + p.cena * p.ilosc, 0);\n}\n```\n\nDaj znać, czy dodać obsługę rabatów.'
           : 'Oto wersja z walidacją danych wejściowych.\n\n```ts\nexport function sumaNetto(pozycje: { cena: number; ilosc: number }[]): number {\n  if (pozycje.some((p) => p.ilosc < 0)) throw new Error("ujemna ilość");\n  return pozycje.reduce((suma, p) => suma + p.cena * p.ilosc, 0);\n}\n```',
       ),
       thinkingMs: 900,

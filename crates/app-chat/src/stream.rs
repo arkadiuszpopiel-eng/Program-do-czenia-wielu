@@ -206,10 +206,17 @@ async fn budget_gate(
         .check_budget(usd_to_pln(estimate, rate), false, provider_id.as_ref())
         .await;
     if let BudgetDecision::Block { notice } = decision {
+        // Limit konta (od 0.0.70 egzekwowany) zmienia się przy koncie, nie w „Kosztach”.
+        let place = match notice.scope {
+            cost_meter_contract::BudgetScope::Provider(_) => {
+                "limit konta w Ustawieniach → Konta i klucze API"
+            }
+            _ => "limit w Ustawieniach → Koszty",
+        };
         return Err(turn_error(
             TurnErrorCode::BudgetBlocked,
             format!(
-                "Limit kosztów osiągnięty ({} %) — zmień limit w Ustawieniach → Koszty.",
+                "Limit kosztów osiągnięty ({} %) — zmień {place}.",
                 notice.pct_after
             ),
             Some(&choice.provider_name),

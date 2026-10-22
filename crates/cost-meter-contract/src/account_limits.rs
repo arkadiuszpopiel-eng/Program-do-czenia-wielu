@@ -19,7 +19,13 @@ pub fn provider_limits<'a>(
         accounts
             .into_iter()
             .filter(|a| a.state != AccountState::Disabled)
-            .map(|a| (a.provider.clone(), a.cost_limit)),
+            .map(|a| {
+                // Wyłączony limit 0 zł to brak limitu (inaczej każdy wydatek przekraczał progi alertów).
+                let limit = a
+                    .cost_limit
+                    .filter(|l| l.enabled || l.monthly_limit_grosze > 0);
+                (a.provider.clone(), limit)
+            }),
     )
 }
 

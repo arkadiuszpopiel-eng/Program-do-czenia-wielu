@@ -166,7 +166,7 @@
         task_classes: tasks,
         // Wszystkie agentki = bez przypięcia: przypięte konto idzie przed doborem trudności, więc
         // każde krótkie pytanie trafiało do pierwszego (najdroższego) modelu konta (przegląd 2026-10-22).
-        agents: assigned.length === agentIds.length ? [] : assigned,
+        agents: agentIds.every((id) => assigned.includes(id)) ? [] : assigned,
         voice_stt: stt,
         voice_tts: tts,
       });

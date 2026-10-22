@@ -196,8 +196,17 @@ impl AccountRoutes {
         // Lista kont przed zamkiem stanu: `eligible` sama z niego korzysta.
         let eligible = self.eligible();
         let state = self.lock();
+        // Konto przypięte do wszystkich wbudowanych agentek to domyślny zapis kreatora sprzed 0.0.70
+        // („wszystkie” = bez przypięcia) — inaczej każde krótkie pytanie szło do pierwszego,
+        // najdroższego modelu konta (przegląd 2026-10-22).
+        let all = |agents: &std::collections::BTreeSet<String>| {
+            personas_contract::builtin_personas()
+                .iter()
+                .all(|p| agents.contains(p.id.as_str()))
+        };
         eligible
             .into_iter()
+            .filter(|a| !all(&a.assignments.agents))
             .find(|a| a.assignments.agents.iter().any(|x| x == agent))
             .and_then(|a| {
                 state

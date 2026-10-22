@@ -14,7 +14,7 @@ dziennika Audytu, którego nie da się po cichu poprawić.
 | L1 Pytaj o wszystko         | Każda zmiana wymaga Twojego „tak”.                                                                                                                                              |
 | L2 Pytaj o ryzykowne        | Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji.                                                                                             |
 | L3 Bardzo wysoka (domyślny) | Działa sama w Twoim profilu i we wskazanych aplikacjach; pyta przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik). |
-| L4 Maks | Nie pyta o zakres ani odwracalność. Twarde blokady Jądra obowiązują zawsze; pyta przy operacjach administracyjnych, destrukcji zleconej głosem, ryzykownych poleceniach głosowych bez rozpoznanego mówcy i wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (plik, mail, strona, wynik polecenia, schowek). |
+| L4 Maks | Nie pyta o zakres ani odwracalność. Twarde blokady Jądra obowiązują zawsze; pyta przy operacjach administracyjnych, destrukcji zleconej głosem, poleceniach głosowych bez rozpoznanego mówcy albo niepewnie rozpoznanych i wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek). |
 
 **Ustawienia → Uprawnienia i bezpieczeństwo**: wybierz poziom i zakres zmiany (globalnie albo tylko ta sesja).
 **Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie Brokera (gdy okna nie ma — patrz

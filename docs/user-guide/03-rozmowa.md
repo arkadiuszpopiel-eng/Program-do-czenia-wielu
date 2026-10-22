@@ -28,8 +28,8 @@ Odpowiedź pojawia się na bieżąco. Zwinięty blok „Myślenie · czas” ozn
 Kroki narzędzi (gdy agentka działa na plikach) są zwinięte do jednej linii — kliknij, żeby rozwinąć. Pod odpowiedzią
 widać model, liczbę tokenów, koszt i czas.
 
-Bloki kodu mają przyciski: **Kopiuj kod**, **Zapisz jako plik**, **Zawijaj wiersze**. Przycisk **Uruchom w
-terminalu (przez Brokera)** w tej wersji nie wykonuje kodu — skopiuj go i uruchom samodzielnie.
+Bloki kodu mają przyciski: **Kopiuj kod**, **Zapisz jako plik**, **Zawijaj wiersze**. Kodu z rozmowy Alfa nie
+uruchamia sama — skopiuj go i uruchom w terminalu albo zleć to agentce (narzędzie powłoki, za zgodą według poziomu).
 
 ## Kanwa artefaktów
 
@@ -206,7 +206,8 @@ połączenia”), a model lokalny odpowiada dalej. Polecenia bez modelu (rachunk
 ## Panele Pliki i Oś czasu
 
 - **Pliki** (`Alt+3`) — pliki oddane przez agentki w tej sesji, z wersjami i podglądem. Akcje: Otwórz, Pokaż
-  w Eksploratorze, Kopiuj plik, Zapisz jako; pliki HTML, SVG i Markdown — także Otwórz w kanwie.
+  w Eksploratorze, Kopiuj plik; dla plików tekstowych (także SVG) — Zapisz jako; pliki HTML, SVG i Markdown — także
+  Otwórz w kanwie.
 - **Oś czasu** (`Alt+2`) — zdarzenia sesji (modele, narzędzia, audyt, głos, diagnostyka) z filtrami rodzaju
   i poziomu. Przełącznik **Replay** pokazuje pracę agentek krok po kroku (zobacz
   [Agentki i zadania](05-agentki-i-zadania.md)).

@@ -127,9 +127,9 @@
         <h3 class="card-title">{current.name}</h3>
         <p class="path" data-selectable>{current.path}</p>
         <div class="actions">
-          <!-- „Zapisz jako…” tylko dla tekstu: zapis kopii pliku binarnego (docx, xlsx, png) nie jest
-               jeszcze obsługiwany i kończył się błędem — zostaje „Pokaż w folderze”. -->
-          {#each ACTIONS.filter((a) => a.action !== 'save_as' || preview?.kind === 'text') as a (a.action)}
+          <!-- „Zapisz jako…” tylko dla tekstu (także SVG): zapis kopii pliku binarnego (docx, xlsx, png)
+               nie jest jeszcze obsługiwany i kończył się błędem — zostaje „Pokaż w Eksploratorze”. -->
+          {#each ACTIONS.filter((a) => a.action !== 'save_as' || preview?.kind === 'text' || current.mime === 'image/svg+xml') as a (a.action)}
             <Button size="sm" variant="secondary" onclick={() => void act(current.id, a.action)}
               >{t(a.key)}</Button
             >
