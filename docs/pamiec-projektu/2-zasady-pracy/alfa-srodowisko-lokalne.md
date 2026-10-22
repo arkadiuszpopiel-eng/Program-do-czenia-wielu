@@ -115,3 +115,7 @@ wyjątku `safe.directory` pada (dysk E: ma innego właściciela). Uruchamiać z
 `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*'` (bez zmiany konfiguracji globalnej) i nie przez
 `| tail`, które ukrywa kod wyjścia. Crate'y przy samym limicie 8000 linii: app-core, app-api — każda dopisana linia
 w `src` wymaga sprawdzenia; 22.10 zmiana komunikatu w app-api przeszła testy, a przekroczyła limit (8007).
+**2026-10-22 11:50 — właściciel znowu musiał prosić o sprzątanie** (E: 437/477 GB, `target/debug/deps` 197 GB).
+OBOWIĄZEK bez przypominania: po każdym `verify`, wgraniu i na końcu sesji `df -h /e` + `du -sh target/debug/deps`;
+przy deps > 40 GB albo wolnym < 80 GB — `find target/debug/deps target/shell/debug/deps -maxdepth 1 -type f \( -name
+'*.exe' -o -name '*.pdb' \) -mmin +120 -delete` (gdy nie działa cargo/rustc). Tym razem odzyskane 164 GB (41 → 205 GB).
