@@ -57,8 +57,7 @@ fn route_class(class: accounts_hub_contract::TaskClass) -> TaskClass {
 }
 
 /// Wspólna kolejka → kandydaci Routera. Pozycja konta, które nie jest trasą swojego dostawcy
-/// (wyłączone, bez klucza, drugie konto tego samego dostawcy), jest pomijana — Router zna tylko
-/// jedną trasę na dostawcę.
+/// (wyłączone, bez klucza, drugie konto dostawcy), jest pomijana — Router zna jedną trasę na dostawcę.
 fn global_candidates(shared: &SharedQueues, chosen: &BTreeMap<String, Account>) -> GlobalQueues {
     shared
         .iter()
@@ -196,18 +195,14 @@ impl AccountRoutes {
         // Lista kont przed zamkiem stanu: `eligible` sama z niego korzysta.
         let eligible = self.eligible();
         let state = self.lock();
-        // Konto przypięte do wszystkich wbudowanych agentek to domyślny zapis kreatora sprzed 0.0.70
-        // („wszystkie” = bez przypięcia) — inaczej każde krótkie pytanie szło do pierwszego,
-        // najdroższego modelu konta (przegląd 2026-10-22).
-        let all = |agents: &std::collections::BTreeSet<String>| {
-            personas_contract::builtin_personas()
-                .iter()
-                .all(|p| agents.contains(p.id.as_str()))
-        };
+        // Wszystkie wbudowane agentki = domyślny zapis kreatora sprzed 0.0.70, czyli bez przypięcia (22.10).
+        let builtin = personas_contract::builtin_personas();
         eligible
             .into_iter()
-            .filter(|a| !all(&a.assignments.agents))
-            .find(|a| a.assignments.agents.iter().any(|x| x == agent))
+            .find(|a| {
+                let pinned = &a.assignments.agents;
+                pinned.contains(agent) && !builtin.iter().all(|p| pinned.contains(p.id.as_str()))
+            })
             .and_then(|a| {
                 state
                     .registered
@@ -234,9 +229,8 @@ impl AccountRoutes {
         self.lock().registered.get(provider).cloned()
     }
 
-    /// Model domyślny konta: najlepszy model **rozmowy** z listy dostawcy. Lista miesza rozmowę
-    /// z syntezą mowy, transkrypcją i obrazami — pierwszy z brzegu bywał `tts-1` i każda
-    /// wiadomość kończyła się błędem dostawcy (zgłoszenie właściciela, 2026-10-09).
+    /// Model domyślny konta: najlepszy model **rozmowy** z listy dostawcy (pierwszy z brzegu bywał
+    /// `tts-1` i każda wiadomość kończyła się błędem dostawcy; zgłoszenie właściciela, 2026-10-09).
     fn model_of(&self, account: &Account) -> Option<String> {
         best_chat_model(account.models.iter().map(|m| m.id.as_str()))
             .map(str::to_owned)
