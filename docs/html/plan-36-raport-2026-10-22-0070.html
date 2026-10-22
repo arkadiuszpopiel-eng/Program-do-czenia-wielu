@@ -387,6 +387,10 @@ przy zawieszeniu po nagłówkach, komentarze podtrzymujące). Pozostałe uwagi p
 <p>Weryfikacja serii 11 (bez wgrania): pierwszy bieg <code>verify wersja</code> (4:34–5:33) — 3 czerwone testy zgodności mostów CLI
 (<code>agent-backends-fake/tests/compliance.rs</code>: odczyt wersji atrapy CLI przekroczył 5 s w pełnym biegu; osobno 3/3 zielone
 w 0,8 s) — limit w konfiguracji testów podniesiony do 30 s (<code>6203afe8</code>). Drugi bieg na <code>6203afe8</code> (5:35–6:03): 18 z 19 zielonych, czerwony tylko <code>zip</code>; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji.</p>
+<p>Narzędzia (poza aplikacją): <code>scripts/memory-sync.sh</code> nie przywraca już zasady usuniętej w repozytorium ze starszej pamięci
+drugiego komputera — taki plik trafia do sekcji „ZASADY USUNIĘTE W REPOZYTORIUM” z gotowym poleceniem, indeks <code>MEMORY.md</code>
+i data synchronizacji czekają, a skrypt kończy się kodem 3 (<code>3f347b5e</code>; testy skryptu 92/92, nowe przypadki czerwone na
+starej wersji).</p>
 <h2 id="5-co-zostaje">5. Co zostaje</h2>
 <ul>
 <li>Z serii 9 i 10 (niska waga): koszt przebiegów agentek przez Router zapisuje się pod „Router”, więc limit konta (dostawcy)
