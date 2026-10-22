@@ -21,19 +21,20 @@ dostają poprawne wywołania narzędzi i limity odpowiedzi.
 
 - [poważne] Limit kosztów konta z kreatora (domyślnie 100 zł/mies.) jest egzekwowany — wcześniej wiersz konta go
   pokazywał, ale nic go nie sprawdzało (ani ostrzeżenia, ani blokady). Konta jednego dostawcy sumują się; dostawca
-  ma limit, gdy każde jego konto go ma.
+  ma limit, gdy każde jego konto go ma. Komunikat blokady mówi, że limit konta zmienia się w Ustawieniach → Konta
+  i klucze API.
 - [poważne] Rozmowa przez Router nie staje już przy ok. 90 % limitu kosztów: blokada liczy koszt minimalny
   wiadomości, a pełne maksimum odpowiedzi (np. 128 tys. tokenów) daje tylko ostrzeżenie. Komunikat mówi, który
   limit (miesięczny, zadań w tle, dostawcy), zamiast „Monthly”.
 - [poważne] Gemini przez endpoint zgodny z OpenAI: kilka wywołań narzędzi naraz nie skleja się w jedno (agentka
   czyta kilka plików jednocześnie), a koszt modeli o nazwach `models/…` jest liczony.
-- [poważne] Oficjalne OpenAI zna limity odpowiedzi modeli (gpt-5 128 tys., o3/o4 100 tys., gpt-4.1 32 tys., gpt-4o
-  16 tys.) — zadania agentek nie ucinają się na 8 192 tokenach, a rozmowa dostaje limit modelu.
+- [poważne] Zadania agentek u oficjalnego OpenAI dostają 16 384 tokeny odpowiedzi (nie więcej, niż pozwala rodzina
+  modelu) zamiast 8 192 — duże pliki nie ucinają się. Zwykła rozmowa zostaje przy 8 192.
 - Błędy w zadaniach agentek nazywają dostawcę, który zawiódł (jak zwykła rozmowa), zamiast „Router”.
-- Kreator konta: zaznaczone wszystkie agentki nie przypinają już konta każdej z nich — Router dobiera model do
-  pytania (wcześniej każde krótkie pytanie szło do pierwszego, zwykle najdroższego modelu konta). Wybór części
-  agentek przypina konto jak dotąd.
-- Panel Pliki: „Zapisz jako…” tylko dla plików z podglądem tekstowym — dla docx, xlsx i obrazów kończyło się
+- Konto przypisane wszystkim agentkom (domyślne ustawienie kreatora) nie jest już przypięte — Router dobiera model
+  do pytania (wcześniej każde krótkie pytanie szło do pierwszego, zwykle najdroższego modelu konta). Dotyczy też
+  kont dodanych wcześniej; wybór części agentek przypina konto jak dotąd.
+- Panel Pliki: „Zapisz jako…” tylko dla plików tekstowych (także SVG) — dla docx, xlsx i obrazów kończyło się
   błędem; zostają Otwórz, Pokaż w Eksploratorze i Kopiuj plik.
 - Blok kodu w rozmowie nie ma już przycisku „Uruchom w terminalu (przez Brokera)”, który nigdy niczego nie
   uruchamiał; kod uruchamia agentka narzędziem powłoki albo Ty po skopiowaniu.
@@ -44,8 +45,9 @@ dostają poprawne wywołania narzędzi i limity odpowiedzi.
 
 - Regresje (większość sprawdzona na starym kodzie): wywołania narzędzi Gemini bez `index` i cena `models/…`,
   blokada według kosztu minimalnego z ostrzeżeniem według maksimum, sumowanie limitów kont, model w błędzie
-  przebiegu agentki, limity wyjścia rodzin OpenAI, cofanie z katalogiem oznaczonym znacznikiem cargo; panel Plików
-  sprawdzony w podglądzie interfejsu.
+  przebiegu agentki, limit wyjścia OpenAI w ciele żądania (zadanie i rozmowa), cofanie z katalogiem oznaczonym
+  znacznikiem cargo; panel Plików sprawdzony w podglądzie interfejsu. Przegląd w świeżym kontekście (2 agentów)
+  — poprawki w `858c90e3` i `3834ff1d`.
 
 ## 0.0.69 — 2026-10-22
 
