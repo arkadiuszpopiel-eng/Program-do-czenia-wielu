@@ -4,12 +4,12 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-22T06:20:00+02:00"
+    "updated": "2026-10-22T06:30:00+02:00"
   },
   "current_state": "Komputer stacjonarny (RX 9070 XT). Wersja 0.0.70 = 0.0.69 (seria 9, raport 35) + seria 10 (10 punktów, raport alfa/docs/plan/36-raport-2026-10-22-0070.md): limity kosztów kont, Router blokuje według kosztu minimalnego, Gemini (narzędzia równoległe, cennik models/), sufit wyjścia OpenAI dla zadań agentek, błędy agentek z nazwą dostawcy, konto przypisane wszystkim agentkom = bez przypięcia, panel Pliki, blok kodu, cofanie starych kroków powłoki. W Alfa-uruchomiona wgrana 0.0.70 (22.10 3:49, deploy-owner --no-start: Alfa zamknięta, uruchomić skrótem „Alfa”; próbny start na tymczasowym profilu: Broker, okno zgód, watchdog, 0 WebView2 z portem CDP). Kopia właściciela budowana bez e2e w target/owner. Gałąź ccr-af4b63c6-3fyzaj, niewypchnięta.",
   "session_goal": "Właściciel 21.10 wieczorem: zamknąć otwarte tematy, pełna działająca wersja do pracy przez API i lokalnie, zapisać wszystko i pauza (/goal do 7:00). Nowe funkcje dopiero po tej wersji.",
   "in_progress": [
-    "Seria 11 po 0.0.70 (w kodzie, NIE wgrana): narzędzia bez index (4bc2bb49, 6865d72d), cofanie (ccc1f1f0), ostrzeżenia budżetu (dbb3d40d), toast limitu (545de81e, 6865d72d), atrapa kont (5666f63d), stabilny test mostów (6203afe8); Started po HTTP 2xx wycofany (6ff2474e). Drugi bieg na `6203afe8` (5:35–6:03): 18 z 19 zielonych, czerwony tylko `zip`; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji. Narzędzia: memory-sync nie przywraca zasady usuniętej w repozytorium ze starszej pamięci drugiego komputera (sekcja „ZASADY USUNIĘTE W REPOZYTORIUM”, kod 3; 3f347b5e, testy 92/92)."
+    "Seria 11 po 0.0.70 (w kodzie, NIE wgrana): narzędzia bez index (4bc2bb49, 6865d72d), cofanie (ccc1f1f0), ostrzeżenia budżetu (dbb3d40d), toast limitu (545de81e, 6865d72d), atrapa kont (5666f63d), stabilny test mostów (6203afe8); Started po HTTP 2xx wycofany (6ff2474e). Drugi bieg na `6203afe8` (5:35–6:03): 18 z 19 zielonych, czerwony tylko `zip`; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji. Narzędzia: memory-sync nie przywraca zasady usuniętej w repozytorium ze starszej pamięci drugiego komputera (sekcja „ZASADY USUNIĘTE W REPOZYTORIUM”, kod 3; 3f347b5e, testy 92/92). Atrapa: scenariusz key-missing (brak klucza w magazynie — odmowa testu jak rdzeń; 29d30387, ustalenie 17 przeglądu kluczy zamknięte)."
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
@@ -21,6 +21,7 @@
     "Właściciel: otworzyć Alfę skrótem „Alfa” i potwierdzić L4 w oknie Brokera (Ustawienia → Uprawnienia → „Zmień na L4”); przypomnienie ok. 15 s po starcie.",
     "Sprawdzić limity kont (Ustawienia → Konta i klucze API): od 0.0.70 limit z kreatora (domyślnie 100 zł/mies.) blokuje płatne zapytania do dostawcy; konto bez limitu znosi limit dostawcy.",
     "Następna wersja: seria 11 (raport 36 §4) — pełne `verify wersja`, potem wgranie. Modele z myśleniem przez Chat Completions (Gemini 2.5, Grok) nadal przechodzą na lokalny po 1,5 s — plan w raporcie 36 §4 (termin pierwszej treści w Routerze, decyzja właściciela, ile czekać).",
+    "Drobne do następnej wersji: komunikat „brak klucza konta … w magazynie sekretów” pokazuje identyfikator konta zamiast nazwy (AccountsError::SecretMissing → AppError).",
     "Decyzja: agentki z narzędziami w zwykłych sesjach mogą iść do dostawców „może trenować” (DeepSeek, Kimi).",
     "Znane ograniczenia (raporty 35 i 36): termin Routera liczy się do obwodu dostawcy, F1-04 > 2 s przy kontekście > ~10 tys. tokenów, koszt przebiegów agentek zapisywany pod „Router” (limit konta go nie widzi), „Limit kosztu zadania” domyślnie wyłączony.",
     "Decyzje bez zmian: licencje C5.1, ONNX Runtime bez telemetrii, zip 9, Edge na PC, seria 7 „Pełny dostęp”, analizator powłoki, Broker, push."

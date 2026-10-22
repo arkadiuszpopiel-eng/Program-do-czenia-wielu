@@ -391,6 +391,10 @@ w 0,8 s) — limit w konfiguracji testów podniesiony do 30 s (<code>6203afe8</c
 drugiego komputera — taki plik trafia do sekcji „ZASADY USUNIĘTE W REPOZYTORIUM” z gotowym poleceniem, indeks <code>MEMORY.md</code>
 i data synchronizacji czekają, a skrypt kończy się kodem 3 (<code>3f347b5e</code>; testy skryptu 92/92, nowe przypadki czerwone na
 starej wersji).</p>
+<p>Atrapa interfejsu: nowy scenariusz <code>?scenario=key-missing</code> — klucza konta Anthropic nie ma w Credential Managerze; test
+odmawia jak rdzeń (komunikat „brak klucza konta … w magazynie sekretów”), konto przechodzi w „nieskonfigurowane”, wymiana
+klucza je przywraca (<code>29d30387</code>; zamyka ustalenie 17 przeglądu kluczy). Uwaga przy okazji: ten komunikat rdzenia pokazuje
+wewnętrzny identyfikator konta zamiast jego nazwy — do poprawy w następnej wersji (drobne, tekst błędu).</p>
 <h2 id="5-co-zostaje">5. Co zostaje</h2>
 <ul>
 <li>Z serii 9 i 10 (niska waga): koszt przebiegów agentek przez Router zapisuje się pod „Router”, więc limit konta (dostawcy)
