@@ -153,8 +153,14 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
     };
     // Lista modeli zmienia się tylko po jej udanym odczycie (jak w rdzeniu).
     const models = outcome === 'ok' ? modelsOf(account) : account.models;
+    // Jak rdzeń (0.0.69): brak sieci albo limit czasu nie wyłącza konta, którego poprzedni test
+    // potwierdził klucz.
+    const kept =
+      (outcome === 'network' || outcome === 'timeout') &&
+      account.state === 'ok' &&
+      account.last_test?.ok === true;
     const state: Account['state'] =
-      outcome === 'unsupported' ? account.state : ok ? 'ok' : 'invalid';
+      outcome === 'unsupported' || kept ? account.state : ok ? 'ok' : 'invalid';
     const stored: Partial<Account> = {
       state: account.state === 'disabled' ? 'disabled' : state,
       models,
