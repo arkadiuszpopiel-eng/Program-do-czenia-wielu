@@ -47,8 +47,10 @@ pub enum AccountsError {
     /// Niepoprawne dane wejściowe.
     #[error("niepoprawne dane: {0}")]
     InvalidInput(String),
-    /// Brak sekretu w magazynie.
-    #[error("brak klucza konta `{0}` w magazynie sekretów")]
+    /// Brak sekretu w magazynie (tekst: co zrobić, bez wewnętrznego identyfikatora konta).
+    #[error(
+        "Klucza tego konta nie ma w Menedżerze poświadczeń Windows — wpisz go ponownie („Zmień klucz”)."
+    )]
     SecretMissing(AccountId),
     /// Moduł nie może odczytać wartości klucza.
     #[error("moduł `{0}` nie może odczytać kluczy")]

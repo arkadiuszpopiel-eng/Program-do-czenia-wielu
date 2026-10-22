@@ -176,16 +176,7 @@ impl From<accounts_hub_contract::AccountsError> for AppError {
                 .with("id", id.to_string())
                 .with("reason", "disabled"),
             E::NotPermitted(_) => Self::forbidden(text),
-            E::Secret(_) => Self::new(ErrorCode::Secrets, text),
-            // Dla człowieka: co zrobić, bez wewnętrznego identyfikatora konta (ten jest w szczegółach).
-            E::SecretMissing(id) => Self::new(
-                ErrorCode::Secrets,
-                "Klucza tego konta nie ma w Menedżerze poświadczeń Windows — wpisz go ponownie \
-                 („Zmień klucz”).",
-            )
-            .with("kind", "account")
-            .with("id", id.to_string())
-            .with("reason", "secret_missing"),
+            E::Secret(_) | E::SecretMissing(_) => Self::new(ErrorCode::Secrets, e.to_string()),
             E::Persist(_) => Self::storage(e),
             E::InvalidInput(_) | E::Wizard(_) | E::Catalog(_) => Self::invalid(e.to_string()),
         }

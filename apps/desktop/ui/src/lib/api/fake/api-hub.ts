@@ -248,8 +248,7 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
           update(id, { state: 'unconfigured', key_stored: false, key_saved_at: null });
         const text =
           'Klucza tego konta nie ma w Menedżerze poświadczeń Windows — wpisz go ponownie („Zmień klucz”).';
-        const details = { kind: 'account', id, reason: 'secret_missing' };
-        return Promise.reject(new CommandError('secrets', text, details));
+        return Promise.reject(new CommandError('secrets', text));
       }
       const { stored, report } = probe(account, keys.get(id) ?? '');
       update(id, stored);
@@ -274,7 +273,11 @@ export function accountsApi(core: FakeCore): AlfaClient['accounts'] {
       if (rotateStores(verdictOf(report))) {
         keys.set(id, key);
         lost.delete(id);
-        update(id, { ...stored, key_stored: true, key_saved_at: core.isoNow() });
+        // Jak `try_rotate_now`: stan starego klucza (brak klucza, błąd) liczony od nowa — klucz, którego
+        // nie da się sprawdzić z góry, też przywraca konto; wyłączone zostaje wyłączone.
+        const state =
+          stored.state !== 'disabled' && report.reason === 'unsupported' ? 'ok' : stored.state;
+        update(id, { ...stored, state, key_stored: true, key_saved_at: core.isoNow() });
       }
       return core.reply(report);
     },

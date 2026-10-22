@@ -1,6 +1,7 @@
 //! Atrapa: operacje na kluczu istniejącego konta — te same reguły co implementacja
 //! (`accounts-hub-impl/src/keys.rs`): wynik testu trafia do bieżącego wpisu, wymiana klucza zapisuje
-//! nowy dopiero po udanym teście, a włączenie przywraca stan z ostatniego testu.
+//! nowy dopiero po teście (rozpoznany albo niesprawdzalny z góry — `accepts_new_key`; stan od nowa),
+//! test bez klucza API w magazynie odmawia, a włączenie przywraca stan z ostatniego testu.
 
 use accounts_hub_contract::{
     Account, AccountId, AccountState, AccountsError, AuthKind, ConnectionReport, ConnectionRequest,
@@ -95,6 +96,14 @@ impl FakeAccountsHub {
     ) -> Result<TestSummary, AccountsError> {
         let acc = self.get(id)?;
         let secret = self.secrets.get(&acc.secret)?;
+        // Jak rdzeń (`test_account_now`): konto z kluczem API bez klucza w magazynie nie jest testowane,
+        // tylko (o ile nie jest wyłączone) czeka na klucz.
+        if secret.is_none() && self.entry(&acc.provider)?.auth == AuthKind::ApiKey {
+            if acc.state != AccountState::Disabled {
+                self.set_state(id, AccountState::Unconfigured);
+            }
+            return Err(AccountsError::SecretMissing(id.clone()));
+        }
         let (summary, models) = self.probe(&acc, secret.as_ref()).await?;
         self.store_test(id, secret.as_ref(), &summary, models)?;
         Ok(summary)
@@ -117,6 +126,12 @@ impl FakeAccountsHub {
             return Ok(summary);
         }
         self.secrets.put(&acc.secret, &secret)?;
+        // Jak `try_rotate_now` w `accounts-hub-impl`: stan ze starego klucza (brak klucza, błąd) liczony od nowa
+        // od „działa”, także gdy nowego klucza nie da się sprawdzić; wyłączone zostaje wyłączone. Bieżący wpis,
+        // nie kopia sprzed testu (w czasie testu konto mogło zostać wyłączone).
+        if self.get(id)?.state != AccountState::Disabled {
+            self.set_state(id, AccountState::Active);
+        }
         self.store_test(id, Some(&secret), &summary, models)?;
         let mut saved = self.get(id)?;
         saved.key_saved_at = Some(self.now());

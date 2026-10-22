@@ -1,7 +1,8 @@
 //! Operacje na kluczu istniejącego konta: test, wymiana, ponowne włączenie, model wpisany ręcznie.
 //!
 //! Wspólna zasada: wynik operacji sieciowej trafia do **bieżącego** wpisu konta (nie do kopii sprzed
-//! wywołania), a klucz w magazynie zmienia się dopiero wtedy, gdy nowy został sprawdzony. Wcześniej
+//! wywołania), a klucz w magazynie zmienia się dopiero po teście nowego: gdy dostawca go rozpoznał albo
+//! nie da się go sprawdzić z góry (`accepts_new_key`; stan konta liczony wtedy od nowa). Wcześniej
 //! test zapisywał z powrotem kopię sprzed kilkunastu sekund — usunięte w tym czasie konto wracało,
 //! a wymiana klucza niszczyła działający klucz, zanim okazało się, że nowy jest błędny.
 
@@ -152,7 +153,15 @@ impl AccountsHubService {
                 .get_mut(id)
                 .ok_or_else(|| AccountsError::UnknownAccount(id.clone()))?;
             let from = current.state.clone();
-            current.state = summary.outcome.next_state(&current.state);
+            // Stan wynikał ze starego klucza (brak klucza w magazynie, błąd testu), więc nowy, zapisany klucz liczy
+            // go od nowa — także wtedy, gdy nie da się go sprawdzić z góry (`Unsupported` zostawia stan bazowy).
+            // Jak `rotate` i włączenie konta (`set_disabled_now`); wyłączone zostaje wyłączone.
+            let base = if current.state == AccountState::Disabled {
+                AccountState::Disabled
+            } else {
+                AccountState::Active
+            };
+            current.state = summary.outcome.next_state(&base);
             current.last_test = Some(summary.clone());
             current.key_saved_at = Some(saved_at);
             if let Some(models) = &models {

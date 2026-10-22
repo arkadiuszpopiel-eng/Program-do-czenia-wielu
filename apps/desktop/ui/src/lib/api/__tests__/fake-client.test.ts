@@ -147,7 +147,6 @@ describe('FakeAlfaClient — scenariusze', () => {
     await expect(client.accounts.test('acc-anthropic')).rejects.toMatchObject({
       code: 'secrets',
       message: expect.stringContaining('Zmień klucz'),
-      details: { id: 'acc-anthropic', reason: 'secret_missing' },
     });
     const after = (await client.accounts.list()).find((a) => a.id === 'acc-anthropic');
     expect(after).toMatchObject({ state: 'unconfigured', key_stored: false, key_saved_at: null });
@@ -159,6 +158,13 @@ describe('FakeAlfaClient — scenariusze', () => {
     });
     // Inne konta mają klucze.
     await expect(client.accounts.test('acc-openai')).resolves.toMatchObject({ ok: true });
+    // Nowy klucz, którego nie da się sprawdzić z góry, też kończy „nieskonfigurowane” (jak rdzeń).
+    const unchecked = await client.accounts.rotate('acc-anthropic', 'sk-ant-unsupported-nowy');
+    expect(unchecked.reason).toBe('unsupported');
+    expect((await client.accounts.list()).find((a) => a.id === 'acc-anthropic')).toMatchObject({
+      state: 'ok',
+      key_stored: true,
+    });
     const report = await client.accounts.rotate('acc-anthropic', 'sk-ant-nowy');
     expect(report.ok).toBe(true);
     await expect(client.accounts.test('acc-anthropic')).resolves.toMatchObject({ ok: true });

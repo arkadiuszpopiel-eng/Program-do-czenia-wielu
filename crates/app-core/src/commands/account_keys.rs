@@ -43,9 +43,9 @@ impl AppCore {
         }
     }
 
-    /// `accounts_rotate`: wymiana klucza istniejącego konta. Nowy klucz jest najpierw sprawdzany
-    /// u dostawcy i trafia do Credential Managera tylko wtedy, gdy działa — przy nieudanym teście
-    /// (`ok: false`) konto i stary klucz zostają bez zmian. Przypisania, limit i koszty zostają.
+    /// `accounts_rotate`: wymiana klucza (najpierw test u dostawcy). Zapis tylko dla klucza rozpoznanego
+    /// albo niesprawdzalnego z góry (`accepts_new_key`, także przy `ok: false`: brak środków, „unsupported”);
+    /// inaczej konto i stary klucz zostają. Przypisania, limit i koszty zostają zawsze.
     pub async fn accounts_rotate(
         &self,
         account_id: String,

@@ -80,8 +80,6 @@ fn missing_key_says_what_to_do_without_internal_id() {
     assert_eq!(e.code, ErrorCode::Secrets);
     assert!(e.message.contains("Zmień klucz"), "{}", e.message);
     assert!(!e.message.contains("acc-7f3a"), "{}", e.message);
-    assert_eq!(e.details.text("id"), Some("acc-7f3a"));
-    assert_eq!(e.details.text("reason"), Some("secret_missing"));
 }
 
 #[test]

@@ -140,7 +140,8 @@ fn outcome(error: &ProviderError) -> TestOutcome {
         ProviderErrorKind::Timeout { .. } => TestOutcome::Timeout,
         ProviderErrorKind::Unsupported => TestOutcome::Unsupported { message: message() },
         // Adres bez listy modeli (własny serwer zgodny z OpenAI): nie ma jak sprawdzić klucza,
-        // ale to nie błąd połączenia — konto zostaje w dotychczasowym stanie.
+        // ale to nie błąd połączenia — test zostawia konto w dotychczasowym stanie (wymiana na nowy
+        // klucz liczy stan od nowa, od „działa” — `try_rotate_now` w `accounts-hub-impl`).
         ProviderErrorKind::InvalidRequest if matches!(error.status, Some(404 | 405)) => {
             TestOutcome::Unsupported {
                 message:

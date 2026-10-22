@@ -64,6 +64,65 @@ async fn controls_and_spy() {
     );
 }
 
+/// Jak `accounts-hub-impl/tests/rotate_missing_key.rs`: klucz, którego nie da się sprawdzić z góry, kończy
+/// „nieskonfigurowane” po utracie klucza (przegląd 2026-10-22).
+#[tokio::test]
+async fn uncheckable_new_key_ends_the_missing_key_state() {
+    let hub = FakeAccountsHub::new(fixture_catalog());
+    let id = hub
+        .add_account(NewAccount {
+            provider: ProviderId::new("acme").unwrap(),
+            label: String::new(),
+            secret: SecretString::from(KEY_OK),
+            base_url: None,
+            assignments: Assignments::default(),
+            cost_limit: None,
+            source: AccountSource::Manual,
+            enterprise: Default::default(),
+        })
+        .await
+        .unwrap();
+    hub.secrets()
+        .delete(&hub.account(&id).unwrap().secret)
+        .unwrap();
+    assert!(matches!(
+        hub.test_account(&id).await,
+        Err(accounts_hub_contract::AccountsError::SecretMissing(_))
+    ));
+    assert_eq!(hub.account(&id).unwrap().state, AccountState::Unconfigured);
+    let unsupported = || ConnectionReport {
+        outcome: TestOutcome::Unsupported {
+            message: "brak listy modeli".into(),
+        },
+        latency_ms: None,
+        detail: None,
+    };
+    hub.tester().push(unsupported());
+    hub.try_rotate(&id, SecretString::from(KEY_OK))
+        .await
+        .unwrap();
+    assert_eq!(hub.account(&id).unwrap().state, AccountState::Active);
+    hub.set_disabled(&id, true).await.unwrap();
+    hub.tester().push(unsupported());
+    hub.try_rotate(&id, SecretString::from(KEY_OK))
+        .await
+        .unwrap();
+    assert_eq!(hub.account(&id).unwrap().state, AccountState::Disabled);
+    // Błąd testu starego klucza też nie zostaje po zapisaniu nowego (jak rdzeń).
+    hub.set_disabled(&id, false).await.unwrap();
+    assert!(hub.set_state(
+        &id,
+        AccountState::Error {
+            kind: accounts_hub_contract::AccountErrorKind::InvalidKey
+        }
+    ));
+    hub.tester().push(unsupported());
+    hub.try_rotate(&id, SecretString::from(KEY_OK))
+        .await
+        .unwrap();
+    assert_eq!(hub.account(&id).unwrap().state, AccountState::Active);
+}
+
 #[test]
 fn memory_store_fail_injection() {
     let store = MemorySecretStore::new();
