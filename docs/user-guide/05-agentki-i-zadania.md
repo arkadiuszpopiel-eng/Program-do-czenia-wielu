@@ -46,6 +46,18 @@ i wynik, stan, czas. Przyciski: Od początku, Poprzedni, Następny, Wszystkie kr
 terminal**. Wynik z treścią z zewnątrz (strona, plik, mail) jest oznaczony — agentka traktuje go jako dane, nie
 polecenia. Pracę pomocniczą (zlecenie innej agentce, sprawdzenie przez Krytyczkę, umiejętność) widać jako podprzebiegi.
 
+## Pipeline'y — modele pracujące po kolei
+
+Przycisk **Pipeline'y** w pasku pisania (albo w panelu Sesje) otwiera bibliotekę łańcuchów, w których kolejne modele
+przekazują sobie wynik bez Twojego pośrednictwa — np. szkic → styl → architektura → kod. Po lewej lista: trzy wzorce
+wbudowane (projekt interfejsu, przegląd kodu, raport z badania) i Twoje; **+ Nowy pipeline** tworzy pusty. Etapy (do
+6) są połączone strzałkami; w każdym wybierasz rolę, agentkę obsady (albo „według roli”), model (**Auto** — dobiera
+Router, model z listy albo **Inny…** w postaci `dostawca:model`) i zadanie etapu. Przyciski **+ zadanie** i **+ wynik
+poprzedniego** wstawiają do zadania miejsce na Twoje wejście (`{{input}}`) i na wynik etapu wcześniejszego
+(`{{prev}}`). **Zapisz** zachowuje zmiany; zmieniony wzorzec wbudowany przywrócisz przyciskiem **Przywróć domyślny**.
+Na dole wpisz zadanie i kliknij **Uruchom w rozmowie** (albo `Enter`) — pipeline rusza w bieżącej rozmowie
+i tam pojawia się jego wynik.
+
 ## Zadania (`Alt+7`)
 
 Panel **Zadania** pokazuje drzewo zadań: podzadania, kolejność („Po: …”), stan, wynik, postęp, pochodzenie (od Ciebie,
