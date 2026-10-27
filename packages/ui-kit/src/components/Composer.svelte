@@ -159,6 +159,7 @@
 <style>
   .wrap {
     position: relative;
+    container-type: inline-size;
   }
   /* Jeden wiersz o wysokości kontrolki (--row): spinacz, pole, chipy, mikrofon i „Wyślij” mają
      wspólny środek; przy kilku liniach tekstu kontrolki zostają na dole (właściciel 27.10:
@@ -212,6 +213,33 @@
     flex: none;
     width: var(--row);
     height: var(--row);
+  }
+  /* Wąskie pole (np. obok panelu prawego): tekst ma cały górny wiersz, a kontrolki schodzą niżej —
+     spinacz po lewej, wybory, mikrofon i „Wyślij” po prawej (jak w aplikacjach Claude i ChatGPT);
+     podpowiedź nie łamie się wtedy na dwie linie. */
+  @container (max-width: 640px) {
+    .composer {
+      flex-wrap: wrap;
+      row-gap: 2px;
+    }
+    .field {
+      flex-basis: 100%;
+      order: -1;
+    }
+    .field + :global(*) {
+      margin-left: auto;
+    }
+  }
+  /* Telefon: wybory mają własny, ostatni wiersz, a spinacz, mikrofon i „Wyślij” zostają razem. */
+  @container (max-width: 420px) {
+    .chips {
+      order: 1;
+      flex-basis: 100%;
+      margin-left: 0;
+    }
+    .chips + :global(*) {
+      margin-left: auto;
+    }
   }
   /* Telefon i wąskie okno: ciaśniej, żeby „Wyślij” mieścił się przy 360 px. */
   @media (max-width: 480px) {

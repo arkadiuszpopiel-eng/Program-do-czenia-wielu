@@ -75,7 +75,10 @@
         onnavigate: () => (stateOpen = false),
         onmode: () => {
           stateOpen = false;
-          modeOpen = true;
+          // W bardzo wąskim oknie przycisk trybu jest schowany — wtedy strona Uprawnienia.
+          const anchor = document.querySelector<HTMLElement>('.cluster .seg.mode');
+          if (anchor?.checkVisibility()) modeOpen = true;
+          else app.openSettings('permissions');
         },
       }}
       label={t('common.loading')}

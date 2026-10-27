@@ -24,6 +24,19 @@
   );
   const PROFILES = ['local', 'hybrid', 'cloud'] as const;
   const noKeys = $derived(app.system?.keys_configured === false);
+  // Grupa wyboru wg wzorca ARIA: jeden przystanek Tab, strzałki przesuwają wybór (bez wyłączonych).
+  const usable = $derived(PROFILES.filter((p) => p === 'local' || !noKeys));
+  const stop = $derived(usable.find((p) => p === profileId) ?? usable[0]);
+  function arrows(event: KeyboardEvent) {
+    const dir = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+    if (!dir) return;
+    event.preventDefault();
+    const at = usable.indexOf(stop ?? 'local');
+    const next = usable[(at + dir + usable.length) % usable.length] ?? 'local';
+    void app.setSetting('models.default_profile', next);
+    const group = (event.currentTarget as HTMLElement).parentElement;
+    group?.querySelector<HTMLElement>(`[data-profile="${next}"]`)?.focus();
+  }
   const level = $derived(session?.autonomy ?? 'L3');
   const offline = $derived(app.system?.online === false);
   const queued = $derived(app.system?.queued_messages ?? 0);
@@ -52,7 +65,10 @@
             type="button"
             role="radio"
             aria-checked={profileId === p}
+            tabindex={p === stop ? 0 : -1}
+            data-profile={p}
             disabled={p !== 'local' && noKeys}
+            onkeydown={arrows}
             onclick={() => void app.setSetting('models.default_profile', p)}
             >{tk(`profile.${p}`)}</button
           >

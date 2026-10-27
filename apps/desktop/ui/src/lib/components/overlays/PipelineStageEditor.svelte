@@ -47,7 +47,11 @@
   // Jedno pole modelu (właściciel 27.10: okno „bardzo mieszane”): Auto, modele Routera
   // z podpowiedziami i „Inny…”, który dopiero wtedy pokazuje pole `dostawca:model`.
   const OTHER = '__other__';
-  let custom = $state(false);
+  // „Inny…” dotyczy tego etapu i wpisanej wartości: po zmianie etapu (usunięcie, inny wzorzec)
+  // pole tekstowe nie zostaje przy znanym modelu.
+  let customFor = $state<string | null>(null);
+  const here = $derived(`${index}/${total}/${stage.model ?? ''}`);
+  const custom = $derived(customFor === here);
   const known = $derived(!stage.model || allModelChoices.some((m) => m.candidate === stage.model));
   const typed = $derived(custom || !known);
   const modelOptions = $derived([
@@ -56,8 +60,8 @@
     { value: OTHER, label: en ? 'Other (provider:model)…' : 'Inny (dostawca:model)…' },
   ]);
   const pickModel = (v: string): void => {
-    custom = v === OTHER;
-    if (!custom) set({ model: v || null });
+    customFor = v === OTHER ? here : null;
+    if (v !== OTHER) set({ model: v || null });
   };
 </script>
 
@@ -149,7 +153,11 @@
           aria-label={en ? 'Model (provider:model)' : 'Model (dostawca:model)'}
           placeholder={en ? 'e.g. openai:gpt-6-astra' : 'np. openai:gpt-6-astra'}
           aria-invalid={modelBad}
-          oninput={(e) => set({ model: e.currentTarget.value.trim() || null })}
+          oninput={(e) => {
+            const model = e.currentTarget.value.trim() || null;
+            customFor = `${index}/${total}/${model ?? ''}`;
+            set({ model });
+          }}
         />
       {/if}
     </div>

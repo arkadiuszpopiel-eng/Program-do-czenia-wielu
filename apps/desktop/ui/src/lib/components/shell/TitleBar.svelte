@@ -34,14 +34,26 @@
 
   // Wskaźniki sterowania ekranem i kamery: osobny moduł (budżet startu), pobierany zaraz po starcie
   // w bezczynności (najpóźniej po 500 ms) — gotowy, zanim agentka sięgnie po ekran albo kamerę.
+  // Nieudane pobranie ponawia co 2 s; gdy agentka już steruje ekranem albo kamera działa — od razu.
   let live = $state<{ gui: Component; camera: Component } | null>(null);
+  let loading = false;
+  const loadLive = (): void => {
+    if (live || loading) return;
+    loading = true;
+    Promise.all([import('./GuiIndicator.svelte'), import('./CameraIndicator.svelte')])
+      .then(([gui, camera]) => (live = { gui: gui.default, camera: camera.default }))
+      .catch(() => window.setTimeout(loadLive, 2000))
+      .finally(() => (loading = false));
+  };
   $effect(() => {
-    const load = () =>
-      void Promise.all([import('./GuiIndicator.svelte'), import('./CameraIndicator.svelte')]).then(
-        ([gui, camera]) => (live = { gui: gui.default, camera: camera.default }),
-      );
-    if (window.requestIdleCallback) window.requestIdleCallback(load, { timeout: 500 });
-    else window.setTimeout(load, 0);
+    if (window.requestIdleCallback) window.requestIdleCallback(loadLive, { timeout: 500 });
+    else window.setTimeout(loadLive, 0);
+  });
+  $effect(() => {
+    const camera = app.cameras?.cameras.some((c) =>
+      ['live', 'opening', 'closing'].includes(c.state),
+    );
+    if (app.work.gui || camera) loadLive();
   });
 
   $effect(() => {

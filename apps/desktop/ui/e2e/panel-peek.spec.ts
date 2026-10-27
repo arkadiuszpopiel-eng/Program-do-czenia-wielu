@@ -105,6 +105,26 @@ test('paleta (Ctrl+K): „Chowaj panele boczne automatycznie” włącza i wył�
   await expect(page.getByRole('button', { name: 'Ukryj panel Sesje' })).toBeVisible();
 });
 
+test('klawiatura: Enter na znaczniku przenosi fokus do panelu, Esc oddaje go znacznikowi', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await openApp(page, { path: '/?panels=autohide' });
+  await waitForChat(page);
+  await tab(page, SESSIONS).focus();
+  await page.keyboard.press('Enter');
+  const peek = page.getByRole('complementary', { name: 'Sesje' });
+  await expect(peek).toBeVisible();
+  await expect(peek.locator(':focus')).toHaveCount(1);
+  // Fokus klawiatury w panelu: ruch myszy obok go nie chowa.
+  await page.mouse.move(800, 400);
+  await page.waitForTimeout(700);
+  await expect(peek).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(peek).toHaveCount(0);
+  await expect(tab(page, SESSIONS)).toBeFocused();
+});
+
 test('wąskie okno: znacznik otwiera szufladę kliknięciem', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 800 });
   await openApp(page);

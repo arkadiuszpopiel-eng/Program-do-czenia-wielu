@@ -201,7 +201,12 @@ for (const skin of SKINS) {
       const local = details.getByRole('radio', { name: 'Lokalny' });
       await local.click();
       await expect(local).toHaveAttribute('aria-checked', 'true');
-      await details.getByRole('radio', { name: 'Hybryda' }).click();
+      // Strzałki przesuwają wybór (wzorzec ARIA grupy wyboru): jeden przystanek Tab.
+      await local.press('ArrowRight');
+      const hybrid = details.getByRole('radio', { name: 'Hybryda' });
+      await expect(hybrid).toHaveAttribute('aria-checked', 'true');
+      await expect(hybrid).toBeFocused();
+      await expect(local).toHaveAttribute('tabindex', '-1');
       // „Zmień tryb pracy” otwiera menu trybów zamiast stron Ustawień.
       await details.getByRole('button', { name: 'Zmień tryb pracy' }).click();
       await expect(details).toHaveCount(0);

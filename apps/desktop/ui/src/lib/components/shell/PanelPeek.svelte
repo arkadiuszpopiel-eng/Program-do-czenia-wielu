@@ -42,10 +42,33 @@
     if (app.layout.peekable) showTimer = window.setTimeout(() => (app.layout.peek = s), 160);
   };
   const leaveTab = () => window.clearTimeout(showTimer);
+  $effect(() => () => window.clearTimeout(showTimer));
+
+  // Klawiatura: znacznik otwarty Enterem przenosi fokus do panelu, a po schowaniu wraca na znacznik.
+  let focusIn = false;
+  let focusedSide: PanelSide | null = null;
+  const fromTab = (s: PanelSide, open: () => void) => {
+    focusIn = true;
+    open();
+    if (!app.layout.peek) focusIn = false;
+    focusedSide = s;
+  };
+  $effect(() => {
+    if (!side || !peekEl || !focusIn) return;
+    focusIn = false;
+    peekEl.querySelector<HTMLElement>('button, [href], input, [tabindex="0"]')?.focus();
+  });
+  $effect(() => {
+    if (side || !focusedSide) return;
+    const s = focusedSide;
+    focusedSide = null;
+    if (document.activeElement === document.body)
+      requestAnimationFrame(() => document.querySelector<HTMLElement>(`.edge-tab.${s}`)?.focus());
+  });
   // Panel zostaje, gdy w nim piszesz albo gdy otwarte jest menu (np. menu sesji).
   // Ukryta lista palety (Ctrl+K) stale jest w drzewie — liczą się tylko widoczne menu.
   const busy = () =>
-    peekEl?.querySelector('input:focus, textarea:focus') ||
+    peekEl?.querySelector('input:focus, textarea:focus, :focus-visible') ||
     [...document.querySelectorAll('[role="menu"], [role="listbox"]')].some((el) =>
       el.checkVisibility(),
     );
@@ -61,7 +84,11 @@
     }, 450);
   };
   const pin = (s: PanelSide) => {
-    if (app.layout.autohide) void app.setSetting('ui.panels_autohide', false);
+    // Najpierw stan układu (synchronicznie), żeby `update` nie wysunął panelu z powrotem.
+    if (app.layout.autohide) {
+      app.layout.autohide = false;
+      void app.setSetting('ui.panels_autohide', false);
+    }
     app.layout.peek = null;
     app.layout.update(sid, s === 'left' ? { left_open: true } : { right_open: true });
   };
@@ -98,7 +125,7 @@
     label={t('edge.sessions')}
     onenter={() => enter('left')}
     onleave={leaveTab}
-    onclick={() => app.layout.toggleLeft(sid)}
+    onclick={() => fromTab('left', () => app.layout.toggleLeft(sid))}
   />
 {/if}
 {#if show && right === 'hidden'}
@@ -107,7 +134,7 @@
     label={t('edge.panel')}
     onenter={() => enter('right')}
     onleave={leaveTab}
-    onclick={() => app.layout.toggleRight(sid)}
+    onclick={() => fromTab('right', () => app.layout.toggleRight(sid))}
   />
 {/if}
 {#if show && side}

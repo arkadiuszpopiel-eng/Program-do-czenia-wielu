@@ -45,3 +45,28 @@ test('model lokalny bez silnika: zrozumiały błąd i przejście do „Modele lo
     page.getByRole('heading', { level: 2, name: 'Modele lokalne i silniki' }),
   ).toBeVisible();
 });
+
+// Właściciel 27.10: „dolny pasek — wyrównanie i symetria”. W wąskim polu (obok panelu prawego,
+// telefon) tekst ma cały górny wiersz, a „Wyślij” zostaje przy prawej krawędzi ramki.
+for (const width of [1440, 360]) {
+  test(`wąskie pole rozmowy: tekst w górnym wierszu, „Wyślij” po prawej — ${width} px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await openApp(page);
+    await waitForChat(page);
+    const field = page.locator('#alfa-composer');
+    const form = page.locator('form.composer');
+    const send = form.getByRole('button', { name: 'Wyślij' });
+    const [f, b, s] = await Promise.all([
+      field.boundingBox(),
+      form.boundingBox(),
+      send.boundingBox(),
+    ]);
+    if (!f || !b || !s) throw new Error('brak pola rozmowy');
+    // Podpowiedź w jednej linii, kontrolki pod polem, „Wyślij” przy prawej krawędzi ramki.
+    expect(f.height).toBeLessThanOrEqual(40);
+    expect(s.y).toBeGreaterThanOrEqual(f.y + f.height - 1);
+    expect(b.x + b.width - (s.x + s.width)).toBeLessThanOrEqual(12);
+  });
+}

@@ -278,10 +278,12 @@ export function escapeChain(app: AppState): boolean {
     app.layout.update(sid, { left_open: false });
     return true;
   }
-  if (app.layout.peek) {
+  // Tylko naprawdę wysunięty panel; pozostałość `peek` (np. po zwężeniu okna) nie połyka Esc.
+  if (place.left === 'peek' || place.right === 'peek') {
     app.layout.peek = null;
     return true;
   }
+  app.layout.peek = null;
   if (app.layout.focus) {
     app.layout.setFocus(false);
     return true;
