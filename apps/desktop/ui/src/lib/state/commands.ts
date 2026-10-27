@@ -203,9 +203,15 @@ export function runCommand(app: AppState, id: string): void {
     case 'action.accounts':
       app.openSettings('providers');
       break;
-    case 'action.autonomy':
-      app.openSettings('permissions');
+    case 'action.autonomy': {
+      // Menu „Tryb pracy” w belce (właściciel 27.10); w Ustawieniach albo przy schowanym
+      // przycisku (bardzo wąskie okno) — strona Uprawnienia.
+      const anchor = document.querySelector<HTMLElement>('.cluster .seg.mode');
+      if (app.view === 'chat' && anchor?.checkVisibility())
+        requestAnimationFrame(() => anchor.click());
+      else app.openSettings('permissions');
       break;
+    }
     case 'action.cast':
       app.openPanel('agents');
       break;

@@ -36,10 +36,16 @@ Na końcu kliknij **Zaczynamy**.
 
 ## Okno główne
 
-- **Pasek tytułu** — przełącznik panelu Sesje, nazwa sesji (kliknij albo `F2`, żeby zmienić), awatary agentek
-  α β γ δ (świeci ta, która mówi albo pracuje), stan: profil modelu, poziom autonomii i koszt sesji (kliknij, żeby
-  zobaczyć szczegóły kosztów), wskaźnik mikrofonu i przycisk ustawień.
+- **Pasek tytułu** w trzech strefach — po lewej przełącznik panelu Sesje i nazwa sesji (kliknij albo `F2`, żeby
+  zmienić); na środku awatary agentek α β γ δ (ta, która mówi, porusza ustami, a z ust wylatują litery właśnie
+  pisanej odpowiedzi); po prawej stan: połączenie i profil modeli (kliknij — profil zmienisz od razu), **Tryb pracy**
+  (menu z czterema trybami, zobacz [Bezpieczeństwo](07-bezpieczenstwo.md)) i koszt sesji, potem wskaźnik mikrofonu
+  i przycisk ustawień.
 - **Panel Sesje** po lewej — lista rozmów (`Ctrl+B` chowa i pokazuje).
+- **Panele chowane:** schowany panel zostawia przy krawędzi świecący znacznik; najechanie wysuwa panel nad
+  rozmowę, zjechanie myszą, kliknięcie obok albo `Esc` go chowa, a **Przypnij panel** dokuje go z powrotem.
+  Z klawiatury: `Tab` do znacznika i `Enter`. Żeby oba panele chowały się same, włącz **Wygląd → Panele chowają
+  się same** albo wpisz w palecie „Chowaj panele”.
 - **Rozmowa** na środku i pole wiadomości na dole.
 - **Panel prawy** (`Ctrl+\`) z kartami: Agentki (`Alt+1`), Oś czasu (`Alt+2`), Pliki (`Alt+3`), Pamięć (`Alt+4`),
   Ekran (`Alt+5`), Głos (`Alt+6` — **jeszcze niedostępny**, ustawienia głosu są w Ustawieniach) i Zadania (`Alt+7`).

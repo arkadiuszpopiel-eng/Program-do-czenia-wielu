@@ -300,7 +300,7 @@ export const plSettings = {
   'action.language': 'Zmień język na angielski',
   'action.transfer': 'Import i eksport .alfa',
   'action.accounts': 'Konta i klucze',
-  'action.autonomy': 'Poziom autonomii',
+  'action.autonomy': 'Tryb pracy (poziom autonomii)',
   'action.cast': 'Zmień obsadę agentek',
   'action.column': 'Przełącz szerokość kolumny rozmowy',
   'action.panels': 'Chowaj panele boczne automatycznie (włącz/wyłącz)',

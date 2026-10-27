@@ -4,21 +4,24 @@ Nad wszystkim, co robią agentki, czuwa **Broker** — część Alfy, której ag
 (odczyt pliku, polecenie, kliknięcie w oknie) dostaje od niego jednorazową zgodę albo odmowę, a decyzja trafia do
 dziennika Audytu, którego nie da się po cichu poprawić.
 
-## Poziomy autonomii L0–L4
+## Tryb pracy (poziomy autonomii L0–L4)
 
-„Jak bardzo agentka działa sama”. Domyślnie **L3**.
+„Jak bardzo agentka działa sama”. Domyślnie **Automatycznie (L3)**.
 
-| Poziom                      | Co to znaczy                                                                                                                                                                    |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| L0 Podgląd                  | Agentka tylko czyta i podpowiada, nic nie zmienia.                                                                                                                              |
-| L1 Pytaj o wszystko         | Każda zmiana wymaga Twojego „tak”.                                                                                                                                              |
-| L2 Pytaj o ryzykowne        | Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji.                                                                                             |
-| L3 Bardzo wysoka (domyślny) | Działa sama w Twoim profilu i we wskazanych aplikacjach; pyta przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik). |
-| L4 Maks | Nie pyta o zakres ani odwracalność. Twarde blokady Jądra obowiązują zawsze; pyta przy operacjach administracyjnych, destrukcji zleconej głosem, poleceniach głosowych bez rozpoznanego mówcy albo niepewnie rozpoznanych i wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek). |
+| Tryb                           | Co to znaczy                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L0 Tylko podgląd               | Agentka tylko czyta i podpowiada, nic nie zmienia.                                                                                                                                                                                                                                                 |
+| L1 Pytaj o wszystko            | Każda zmiana wymaga Twojego „tak”.                                                                                                                                                                                                                                                                 |
+| L2 Pytaj o ryzykowne           | Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji (tylko w Ustawieniach).                                                                                                                                                                                         |
+| L3 Automatycznie (domyślny)    | Działa sama w Twoim profilu i we wskazanych aplikacjach; pyta przy rzeczach nieodwracalnych poza zakresem, operacjach administracyjnych, destrukcji zleconej głosem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).                                                         |
+| L4 Pełna automatyka            | Bez pytań o zakres, odwracalność i operacje administracyjne; wybrana raz zostaje po restarcie. Twarde blokady Jądra obowiązują zawsze; pyta tylko, gdy polecenie głosowe może nie być Twoje (obcy albo niepewnie rozpoznany głos) i przy wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek). |
 
-**Ustawienia → Uprawnienia i bezpieczeństwo**: wybierz poziom i zakres zmiany (globalnie albo tylko ta sesja).
-**Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie Brokera (gdy okna nie ma — patrz
-niżej — kończy się odmową). Agentka nigdy nie podniesie poziomu sama.
+**Menu „Tryb pracy” w pasku tytułu** (tarcza z nazwą trybu): cztery tryby z opisem, klawisze `1`–`4` wybierają
+tryb, `Esc` zamyka menu. To samo otworzysz z palety (`Ctrl+K` → „Tryb pracy”) i z okienka stanu (kropka
+połączenia → „Zmień tryb pracy”). Pełne ustawienia, także L2 i zmiana tylko dla jednej sesji, są w **Ustawienia →
+Uprawnienia i bezpieczeństwo**. **Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie
+Brokera, jeden raz, bez odliczania (gdy okna nie ma — patrz niżej — kończy się odmową). Agentka nigdy nie podniesie
+poziomu sama.
 
 ## Czego nie da się zrobić na żadnym poziomie (także L4)
 

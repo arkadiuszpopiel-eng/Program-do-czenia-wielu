@@ -289,7 +289,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'action.language': 'Switch language to Polish',
   'action.transfer': 'Import and export .alfa',
   'action.accounts': 'Accounts and keys',
-  'action.autonomy': 'Autonomy level',
+  'action.autonomy': 'Work mode (autonomy level)',
   'action.cast': 'Change the agent cast',
   'action.column': 'Toggle conversation column width',
   'action.panels': 'Auto-hide side panels (on/off)',

@@ -49,3 +49,28 @@ for (const style of ['classic', 'glass', 'next'] as const) {
     });
   }
 }
+
+test('paleta (Ctrl+K): „Tryb pracy” otwiera menu w belce, a w Ustawieniach — stronę Uprawnienia', async ({
+  page,
+}) => {
+  await openApp(page);
+  await waitForChat(page);
+  const run = async () => {
+    await page.keyboard.press('Control+k');
+    await expect(page.locator('dialog[open] input')).toBeFocused();
+    await page.keyboard.type('tryb pracy');
+    await expect(page.locator('dialog [role=option][data-selected]')).toContainText('Tryb pracy');
+    await page.keyboard.press('Enter');
+  };
+  await run();
+  const menu = page.getByRole('menu', { name: 'Tryb pracy' });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitemradio', { checked: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+
+  await page.keyboard.press('Control+,');
+  await run();
+  await expect(menu).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Poziom autonomii' })).toBeVisible();
+});
