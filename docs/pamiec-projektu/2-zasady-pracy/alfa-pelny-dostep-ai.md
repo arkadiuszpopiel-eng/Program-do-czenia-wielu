@@ -20,3 +20,12 @@ a ochrona przed wstrzyknięciem chroni przed obcymi sterującymi komputerem prze
 **How to apply:** realizacja po wydaniu 0.0.65 (seria 7). Zmiany w `safety-broker`/politykach wymagają przeglądu
 człowieka (AGENTS.md) — przygotować na osobnej gałęzi `do-przegladu-pelny-dostep` z opisem, nie scalać bez
 akceptacji właściciela; każdy krok w kodzie zabezpieczeń potwierdzać z właścicielem w bieżącej sesji. Powiązane: [[alfa-zasady-pracy]], [[alfa-samodzielne-testowanie]].
+
+**Decyzje 2026-10-27 (menu trybów jak w Claude Code, po polsku):** właściciela drażni ciągłe potwierdzanie L4
+(dziś: Broker trzyma poziom w pamięci, po każdym starcie wraca L3; każde podniesienie = karta w oknie Brokera).
+Wybrał: (1) „Pełna automatyka” potwierdzana **raz** w oknie zgód Brokera i pamiętana po restarcie Alfy/komputera,
+aż sam obniży; (2) na „Pełnej automatyce” pyta **tylko** o wysyłkę po kontakcie z obcą treścią (TaintedEgress;
+pokrewna Trifecta też zostaje) — operacje administratora i niepewne polecenia głosowe już bez pytań; blokada Jądra
+zostaje; (3) tryb **globalny** dla wszystkich rozmów; (4) menu 4 trybów: „Tylko podgląd” (L0), „Pytaj o wszystko”
+(L1), „Automatycznie” (L3, domyślny), „Pełna automatyka” (L4). Bez trybów „Akceptuj edycje” i „Najpierw plan”.
+Kod Brokera/polityk: osobna gałąź do przeglądu właściciela.
