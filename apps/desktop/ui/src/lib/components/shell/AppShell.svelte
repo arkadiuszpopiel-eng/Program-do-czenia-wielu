@@ -25,7 +25,6 @@
   import { canvas, closeCanvas, syncCanvas } from '../../state/canvas.svelte';
   import { arenaDialog } from '../../state/arena.svelte';
   import { teachDialog } from '../../state/teach-dialog.svelte';
-  import PanelPeek from './PanelPeek.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -85,7 +84,12 @@
   const loadTeach = () => import('../overlays/TeachDialog.svelte');
   const loadSettings = () => import('../../views/settings/SettingsView.svelte');
   const loadCanvas = () => import('../canvas/ArtifactCanvas.svelte');
+  // Znaczniki i wysuwanie paneli — ładowane dopiero, gdy któryś panel jest schowany (budżet startu).
+  const loadPeek = () => import('./PanelPeek.svelte');
   let paletteReady = $state(false);
+  $effect(() => {
+    app.layout.autohide = app.bool('ui.panels_autohide', false);
+  });
   let cheatsheetReady = $state(false);
 
   // Paleta: moduł pobierany w bezczynności po starcie, żeby otwarcie mieściło się w 50 ms.
@@ -148,7 +152,13 @@
         <Lazy load={loadCanvas} props={{}} label={t('canvas.loading')} />
       </aside>
     {/if}
-    <PanelPeek {left} {right} {rightWidth} show={!inSettings && !app.layout.focus} />
+    {#if [left, right].some((p) => p === 'hidden' || p === 'peek')}
+      <Lazy
+        load={loadPeek}
+        props={{ left, right, rightWidth, show: !inSettings && !app.layout.focus }}
+        label={t('common.loading')}
+      />
+    {/if}
     {#if right === 'docked'}
       <aside class="right" style:width="{rightWidth}px">
         <ResizeHandle

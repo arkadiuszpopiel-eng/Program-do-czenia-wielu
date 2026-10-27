@@ -200,10 +200,15 @@ impl ChatEngine {
         use crate::Placement;
         use app_api::AppError;
         use sessions_contract::SessionHistory;
-        if self.generation(&id).is_some() {
-            return Err(AppError::invalid(
-                "Zadanie już pracuje. Poczekaj na jego wynik.",
-            ));
+        if let Some(running) = self.generation(&id) {
+            // Zdarzenie końca tury wychodzi chwilę przed zwolnieniem sesji: prośba o kontynuację
+            // wysłana zaraz po nim nie może dostać fałszywego „już pracuje” (verify 0.0.75).
+            running.wait(std::time::Duration::from_millis(500)).await;
+            if self.generation(&id).is_some() {
+                return Err(AppError::invalid(
+                    "Zadanie już pracuje. Poczekaj na jego wynik.",
+                ));
+            }
         }
         let target = self.resolve_continuation(&id, target)?;
         let expected = self.validate_recovery(&id, target)?;

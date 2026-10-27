@@ -6,6 +6,7 @@
   biegnie pasek LED (`TitleLed`).
 -->
 <script lang="ts">
+  import type { Component } from 'svelte';
   import { IconButton } from '@alfa/ui-kit';
   import Menu from '@lucide/svelte/icons/menu';
   import Settings from '@lucide/svelte/icons/settings';
@@ -13,9 +14,7 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import { useApp } from '../../state/context';
   import AlfaMark from './AlfaMark.svelte';
-  import CameraIndicator from './CameraIndicator.svelte';
   import CastStrip from './CastStrip.svelte';
-  import GuiIndicator from './GuiIndicator.svelte';
   import MicIndicator from './MicIndicator.svelte';
   import StatusCluster from './StatusCluster.svelte';
   import TitleLed from './TitleLed.svelte';
@@ -32,6 +31,18 @@
   const title = $derived(session?.title ?? t('titlebar.noSession'));
   const crumbs = $derived(session?.project ? `${session.project.name} ▸ ${title}` : title);
   let draft = $state('');
+
+  // Wskaźniki sterowania ekranem i kamery: osobny moduł (budżet startu), pobierany zaraz po starcie
+  // w bezczynności (najpóźniej po 500 ms) — gotowy, zanim agentka sięgnie po ekran albo kamerę.
+  let live = $state<{ gui: Component; camera: Component } | null>(null);
+  $effect(() => {
+    const load = () =>
+      void Promise.all([import('./GuiIndicator.svelte'), import('./CameraIndicator.svelte')]).then(
+        ([gui, camera]) => (live = { gui: gui.default, camera: camera.default }),
+      );
+    if (window.requestIdleCallback) window.requestIdleCallback(load, { timeout: 500 });
+    else window.setTimeout(load, 0);
+  });
 
   $effect(() => {
     if (renaming) draft = title;
@@ -112,8 +123,7 @@
   <div class="zone right" data-tauri-drag-region>
     <div class="drag" data-tauri-drag-region></div>
     <div class="group live-group">
-      <GuiIndicator />
-      <CameraIndicator />
+      {#if live}<live.gui /><live.camera />{/if}
       <MicIndicator />
     </div>
     <StatusCluster />

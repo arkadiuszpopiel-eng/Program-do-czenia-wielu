@@ -133,7 +133,7 @@
     width: 100%;
     padding: var(--alfa-space-2);
     border: 0;
-    border-radius: var(--alfa-radius-md);
+    border-radius: var(--alfa-radius-control);
     background: transparent;
     color: var(--alfa-color-text);
     text-align: left;

@@ -54,6 +54,11 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
 - W stylu klasycznym numer aktywnego etapu pipeline'u i pasek LED są znowu widoczne (styl nie ma koloru
   akcentu).
 - Kliknięcie obsady na środku belki nie przesuwa już okna (obsada była w obszarze przeciągania).
+- „Kontynuuj” zaraz po zakończeniu odpowiedzi nie kończy się już fałszywym „Zadanie już pracuje”: koniec tury
+  był ogłaszany chwilę przed zwolnieniem sesji; kontynuacja czeka teraz do pół sekundy na to zwolnienie.
+- Okno uruchamia się lżej: znaczniki chowanych paneli oraz wskaźniki sterowania ekranem i kamery są osobnymi
+  modułami (wskaźniki pobierane zaraz po starcie, zanim będą potrzebne), więc pakiet startowy mieści się w
+  budżecie 150 KB.
 
 ### Testy
 

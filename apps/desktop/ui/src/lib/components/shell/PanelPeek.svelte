@@ -31,9 +31,6 @@
   );
 
   $effect(() => {
-    app.layout.autohide = app.bool('ui.panels_autohide', false);
-  });
-  $effect(() => {
     if (!show) untrack(() => (app.layout.peek = null));
   });
 
