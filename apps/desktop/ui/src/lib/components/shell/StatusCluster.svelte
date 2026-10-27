@@ -22,7 +22,10 @@
   const loadCosts = () => import('./CostDetails.svelte');
   const loadModes = () => import('./ModeMenu.svelte');
   const session = $derived(app.sessions.active);
-  const profileId = $derived(app.system?.profile ?? session?.profile ?? 'hybrid');
+  // Ten sam profil co w okienku stanu i w polu rozmowy — wybór widać od razu wszędzie.
+  const profileId = $derived(
+    app.str('models.default_profile', app.system?.profile ?? session?.profile ?? 'hybrid'),
+  );
   const profile = $derived(t(`profile.${profileId}`));
   const level = $derived(session?.autonomy ?? 'L3');
   const offline = $derived(app.system?.online === false);

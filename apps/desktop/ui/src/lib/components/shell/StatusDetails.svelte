@@ -63,7 +63,7 @@
         <span class="desc warn">{t('status.noKeys')}</span>
       {/if}
     </dd>
-    <dt>{t('status.autonomy')}</dt>
+    <dt>{t('mode.title')}</dt>
     <dd>
       <strong>{tk(`mode.${level}.name`)} <span class="lvl">({level})</span></strong>
       <span class="desc">{tk(`mode.${level}.desc`)}</span>

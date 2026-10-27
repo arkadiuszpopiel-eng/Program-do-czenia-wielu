@@ -73,7 +73,6 @@ export const enApp: Record<keyof typeof plApp, Message> = {
     'This computer handles simple things, cloud models from your accounts the harder ones.',
   'status.profileDesc.cloud': 'Cloud models from your accounts answer.',
   'status.noKeys': 'No API key added — only the local model works.',
-  'status.autonomy': 'Autonomy',
   'status.openPermissions': 'Permissions',
   'status.openAccounts': 'API accounts and keys',
   'titlebar.settings': 'Settings (Ctrl+,)',

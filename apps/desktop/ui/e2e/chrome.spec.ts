@@ -188,7 +188,7 @@ for (const skin of SKINS) {
         await expect(cast.getByRole('button', { name: new RegExp(`^${name} · `) })).toBeVisible();
       }
 
-      // Stan: połączenie + profil + autonomia; klik otwiera objaśnienie z przejściem do ustawień.
+      // Stan: połączenie + profil + tryb pracy; klik otwiera objaśnienie, w którym profil zmienia się od razu.
       const state = page.getByRole('button', {
         name: /^Stan: połączono, profil Hybryda, autonomia L\d/,
       });

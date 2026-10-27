@@ -69,7 +69,6 @@ export const plApp = {
     'Proste rzeczy liczy ten komputer, trudniejsze — modele w chmurze z Twoich kont.',
   'status.profileDesc.cloud': 'Odpowiadają modele w chmurze z Twoich kont.',
   'status.noKeys': 'Nie dodano żadnego klucza API — działa tylko model lokalny.',
-  'status.autonomy': 'Autonomia',
   'status.openPermissions': 'Uprawnienia',
   'status.openAccounts': 'Konta i klucze API',
   'titlebar.settings': 'Ustawienia (Ctrl+,)',
