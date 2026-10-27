@@ -44,7 +44,8 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
 - Okno Brokera przy zmianie trybu pracy nie odlicza już czasu i nie pyta dwa razy; pokazuje nazwy trybów jak w
   menu i przycisk „Włącz: …”.
 - Belka tytułu ma trzy równe strefy (marka i ścieżka, obsada na środku, stan i przyciski okna) i jedną wysokość
-  wszystkich kontrolek; w wąskim oknie strefy zbliżają się zamiast nachodzić.
+  wszystkich kontrolek; w wąskim oknie strefy zbliżają się zamiast nachodzić. Nazwa trybu i profilu są widoczne
+  od 1280 px (np. na laptopie 1366 px); skrót „L3” zostaje w węższym oknie albo przy kapsule sterowania ekranem.
 - Pasek pisania: przyciski i wybory w jednym rzędzie z równymi odstępami i wysokościami; gdy pole rozmowy jest
   wąskie, tekst ma cały górny wiersz, a przyciski schodzą do dolnego („Wyślij” zawsze po prawej).
 - Podpowiedź pod polem pisania łamie się całymi fragmentami („Shift+Enter — nowa linia” nie rozpada się na dwa

@@ -360,6 +360,11 @@ przeskakuje na inny etap.</li>
 górny wiersz, przyciski schodzą niżej, „Wyślij” zawsze po prawej.</li>
 <li><strong>Paleta Ctrl+K → „Tryb pracy”</strong> otwiera menu trybów w belce (wcześniej przenosiła do Ustawień — tak jak
 okienko stanu, o którym pisał właściciel w punkcie 4).</li>
+<li><strong>Belka na laptopie 1366 px:</strong> nazwa trybu („Automatycznie”) i profilu były schowane do 1400 px, choć miejsca
+brakowało tylko przy kapsule sterowania ekranem albo kamery. Teraz skrót „L3” zostaje do 1279 px, a w 1280–1400 px
+tylko przy tej kapsule; przegląd nachodzenia sprawdza też 1366 i 1536 px.</li>
+<li><strong>Test w prawdziwym oknie</strong> (<code>e2e-app/z-night</code>, WebView2): menu trybu, panele chowane i każda strona Ustawień bez
+surowych kluczy tekstów — aplikacja 50/50.</li>
 <li><strong>Instrukcja w programie (F1):</strong> nowe opisy belki w trzech strefach, menu „Tryb pracy” (tabela trybów z nazwami
 z menu), paneli chowanych i okna Pipeline&#39;ów.</li>
 <li><strong>Podpowiedź pod polem pisania</strong> łamie się całymi fragmentami („Shift+Enter — nowa linia” nie rozpada się).</li>
@@ -439,8 +444,10 @@ w 3 stylach × 2 motywach, polecenie palety, okienko stanu (profil na miejscu, �
 w pisanej odpowiedzi i ich brak przy ograniczonym ruchu.</p>
 <h2 id="5-czego-nie-sprawdzilam">5. Czego nie sprawdziłam</h2>
 <ul>
-<li><strong>Wyglądu na prawdziwym oknie programu</strong> (WebView2 z Mica) dla wysuwanych paneli i liter z ust — sprawdzone
-w przeglądarce testowej (Edge) na atrapie, we wszystkich stylach i motywach.</li>
+<li><strong>Liter z ust w prawdziwym oknie programu</strong> — sprawdzone w przeglądarce testowej (Edge) na atrapie, we
+wszystkich stylach i motywach. Menu trybu, panele chowane (znacznik, wysunięcie, schowanie) i teksty wszystkich
+stron Ustawień sprawdziłam już w prawdziwym oknie (WebView2, instancja testowa, test <code>e2e-app/z-night</code>, zrzuty
+<code>42a</code>–<code>42c</code>), ale tylko w stylu domyślnym.</li>
 <li><strong>Liter z ust w rytm prawdziwego głosu</strong> (pomiar poziomu mowy z syntezy) — sprawdzony tylko tryb bez
 pomiaru (pisana odpowiedź); w nocy bez dźwięku.</li>
 <li><strong>Okna Brokera przy zmianie trybu na żywo</strong> z prawdziwym Brokerem — sprawdzone testami kontraktu karty
