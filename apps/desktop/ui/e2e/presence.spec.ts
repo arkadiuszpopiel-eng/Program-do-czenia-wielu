@@ -103,6 +103,32 @@ test('awatary: mówiąca i pracująca agentka dostają twarz, gotowa zostaje lit
   await expect(cast(page).getByRole('button').nth(0).locator('.avatar')).toHaveClass(/speaking/);
 });
 
+// Właściciel 27.10: „z ust mogą wylatywać literki”. Litery biorą się z końcówki pisanej
+// odpowiedzi; są ozdobą (poza drzewem dostępności) i znikają przy ograniczonym ruchu.
+test('awatary: z ust piszącej agentki wylatują litery jej odpowiedzi', async ({ page }) => {
+  await open(page, '?scenario=slow-stream', 'no-preference');
+  const feed = page.getByRole('feed', { name: 'Wiadomości' });
+  const composer = page.locator('#alfa-composer');
+  await composer.fill('Opowiedz bajkę o smoku.');
+  await composer.press('Enter');
+  const speaking = feed.locator('.avatar.speaking').last();
+  await expect(speaking).toBeVisible();
+  const fly = speaking.locator('.fly');
+  await expect(fly.first()).toBeAttached({ timeout: 5_000 });
+  await expect(fly.first()).toHaveAttribute('aria-hidden', 'true');
+  // Odpowiedź atrapy zaczyna się od „Jasne. Rozpisałam…” — litery pochodzą z jej tekstu.
+  const text = (await feed.locator('article').last().innerText()).toLowerCase();
+  const ch = await fly.first().getAttribute('data-ch');
+  expect(ch && text.includes(ch)).toBe(true);
+
+  await open(page, '?scenario=slow-stream', 'reduce');
+  await composer.fill('Jeszcze raz.');
+  await composer.press('Enter');
+  await expect(feed.locator('.avatar.speaking').last()).toBeVisible();
+  await page.waitForTimeout(1_000);
+  await expect(feed.locator('.fly')).toHaveCount(0);
+});
+
 test('głos: strojenie mowy przy głosach agentek, odsłuch rusza ustami w rytm poziomu', async ({
   page,
 }) => {

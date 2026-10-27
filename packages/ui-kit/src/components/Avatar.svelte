@@ -62,9 +62,11 @@
   // Litery z ust: co ~420 ms (przy pomiarze — gdy usta są otwarte) wylatuje kolejna litera
   // z końcówki mówionego tekstu; każda żyje 1,2 s. Tekst w pseudoelemencie, poza drzewem dostępności.
   const FALLBACK = 'aoeiu';
+  // Z tekstem (wiadomość) litery lecą dopiero, gdy coś już powiedziała — nie w czasie myślenia.
   const pool = $derived.by(() => {
     const tail = (words ?? '').slice(-48).match(/\p{L}/gu) ?? [];
-    return tail.length ? tail.slice(-12).map((c) => c.toLowerCase()) : [...FALLBACK];
+    if (tail.length) return tail.slice(-12).map((c) => c.toLowerCase());
+    return words === undefined ? [...FALLBACK] : [];
   });
   let flying = $state<{ id: number; ch: string; at: number; rise: number }[]>([]);
   let spawned = 0;
@@ -79,7 +81,7 @@
       return;
     }
     const alive = untrack(() => flying).filter((p) => t - p.at < 1200);
-    const ready = t - lastSpawn > 420 && (!measured || open > 0.3) && !still();
+    const ready = pool.length > 0 && t - lastSpawn > 420 && (!measured || open > 0.3) && !still();
     if (ready) {
       lastSpawn = t;
       spawned += 1;
