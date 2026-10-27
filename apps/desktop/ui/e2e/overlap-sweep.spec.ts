@@ -11,7 +11,7 @@ import { overlapDefects } from './overlap';
 
 test.describe.configure({ timeout: 300_000 });
 
-const WIDTHS = [1920, 1600, 1400, 1280, 1100, 1000, 900, 800, 720] as const;
+const WIDTHS = [1920, 1600, 1536, 1400, 1366, 1280, 1100, 1000, 900, 800, 720] as const;
 
 async function defects(page: Page, label: string, found: string[]) {
   await page.waitForTimeout(200);
@@ -92,4 +92,29 @@ for (const style of STYLES) {
       expect(errors, 'błędy w konsoli').toEqual([]);
     });
   }
+}
+
+// Bez kapsuły sterowania ekranem belka ma miejsce na słowa także w 1280–1400 px (laptop 1366 px):
+// profil i nazwa trybu zamiast samego „L3”, bez nachodzenia na obsadę.
+for (const style of STYLES) {
+  test(`belka bez kapsuły sterowania: słowa od 1280 px — ${style}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 860 });
+    await openApp(page, { path: `/?style=${style}` });
+    await waitForChat(page);
+    await page.keyboard.press('Alt+5');
+    await page.getByRole('button', { name: 'Zatrzymaj sterowanie' }).click();
+    await page.getByRole('button', { name: 'Oddaj sterowanie' }).first().click();
+    await expect(page.getByText('Sterujesz Ty', { exact: true })).toHaveCount(0);
+    await expect(page.locator('.live-group .gui, .live-group .cam')).toHaveCount(0);
+    const found: string[] = [];
+    for (const width of [1400, 1366, 1280]) {
+      await page.setViewportSize({ width, height: 860 });
+      await expect(page.locator('.cluster .mode-name'), `${width} px`).toBeVisible();
+      await expect(page.locator('.cluster .word'), `${width} px`).toBeVisible();
+      await defects(page, `belka ${width} px`, found);
+    }
+    await page.setViewportSize({ width: 1279, height: 860 });
+    await expect(page.locator('.cluster .mode-short')).toBeVisible();
+    expect(found).toEqual([]);
+  });
 }

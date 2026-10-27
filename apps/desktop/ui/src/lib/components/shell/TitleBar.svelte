@@ -255,16 +255,27 @@
       display: block;
     }
   }
-  @media (min-width: 721px) and (max-width: 1400px) {
-    .titlebar :global(.cluster .word) {
-      display: none;
-    }
-    /* Tryb pracy skrótem „L3” jak reszta kapsuły bez słów: pełna nazwa przesuwała kapsułę
-       sterowania ekranem pod obsadę na środku (axe: target-size). Nazwa — w etykiecie przycisku. */
+  /* Tryb pracy skrótem „L3” jak reszta kapsuły bez słów: pełna nazwa przesuwała stan pod obsadę
+     na środku (axe: target-size). Nazwa — w etykiecie przycisku. Do 1279 px zawsze, do 1400 px tylko
+     przy kapsule sterowania ekranem albo kamery (bez niej słowa mieszczą się, np. na 1366 px). */
+  @media (min-width: 721px) and (max-width: 1279px) {
+    .titlebar :global(.cluster .word),
     .titlebar :global(.cluster .mode-name) {
       display: none;
     }
     .titlebar :global(.cluster .mode-short) {
+      display: inline;
+    }
+  }
+  @media (min-width: 1280px) and (max-width: 1400px) {
+    .titlebar:has(.live-group :global(.gui)) :global(.cluster .word),
+    .titlebar:has(.live-group :global(.gui)) :global(.cluster .mode-name),
+    .titlebar:has(.live-group :global(.cam)) :global(.cluster .word),
+    .titlebar:has(.live-group :global(.cam)) :global(.cluster .mode-name) {
+      display: none;
+    }
+    .titlebar:has(.live-group :global(.gui)) :global(.cluster .mode-short),
+    .titlebar:has(.live-group :global(.cam)) :global(.cluster .mode-short) {
       display: inline;
     }
   }
