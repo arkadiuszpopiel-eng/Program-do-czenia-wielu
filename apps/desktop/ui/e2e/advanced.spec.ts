@@ -69,3 +69,17 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
     });
   }
 }
+
+test('katalog silnika gier NextGO.Gray: pole tekstowe zapisuje ścieżkę', async ({ page }) => {
+  await openAdvanced(page);
+  const field = page.getByRole('textbox', { name: 'Katalog silnika gier NextGO.Gray' });
+  await expect(field).toHaveValue('');
+  await expect(page.getByText('target\\release\\engine-server.exe')).toBeVisible();
+  await field.fill('E:\\Gry\\NextGO.Gray');
+  await field.press('Tab');
+  const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
+  await nav.getByRole('button', { name: 'Ogólne' }).click();
+  await nav.getByRole('button', { name: 'Zaawansowane' }).click();
+  await expect(field).toHaveValue('E:\\Gry\\NextGO.Gray');
+  await expectAccessible(page, 'zaawansowane: katalog silnika');
+});

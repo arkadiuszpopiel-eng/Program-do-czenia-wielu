@@ -50,6 +50,10 @@ wyłącza narzędzia. Narzędzia mają agentki z dostępem do powłoki (grupa `s
     odczyt sceny;
   - wyczyszczenie pola wyłącza narzędzia;
   - ten test znalazł zły komunikat („Ustawienia → Silnik gier” zamiast „Zaawansowane”) — poprawiony;
+- prawdziwa aplikacja (instancja testowa obok Twojej Alfy, osobny profil):
+  - pole w Ustawienia → Zaawansowane zapisuje ścieżkę w rdzeniu;
+  - „Przywróć domyślne” ją usuwa;
+  - zestaw aplikacji 49/49;
 - po testach w katalogu silnika nie powstał żaden plik;
 - clippy bez ostrzeżeń, 345 testów zmienionych pakietów, `cargo deny` (bans, sources);
 - pełny zestaw przeglądarkowy 559/559, interfejs (vitest) 491.
