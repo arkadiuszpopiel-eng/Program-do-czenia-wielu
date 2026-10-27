@@ -1,6 +1,7 @@
 <!--
   Objaśnienie stanu z paska tytułu: połączenie (i kolejka wiadomości bez sieci), profil modeli,
-  poziom autonomii — po ludzku, z przejściem do ustawień, w których się to zmienia.
+  tryb pracy — po ludzku. Profil zmienia się tu na miejscu, tryb — w menu „Tryb pracy”
+  (właściciel 27.10: klik, który tylko przenosi do Ustawień, „nie ma sensu”).
 -->
 <script lang="ts">
   import { Button } from '@alfa/ui-kit';
@@ -9,13 +10,20 @@
   interface Props {
     /** Wywoływane przed przejściem do Ustawień (zamyka okienko). */
     onnavigate: () => void;
+    /** Otwiera menu „Tryb pracy” zamiast tego okienka. */
+    onmode?: () => void;
   }
-  let { onnavigate }: Props = $props();
+  let { onnavigate, onmode }: Props = $props();
 
   const app = useApp();
   const { t, tk } = app.i18n;
   const session = $derived(app.sessions.active);
-  const profileId = $derived(app.system?.profile ?? session?.profile ?? 'hybrid');
+  // Wybór z tego okienka widać od razu, zanim rdzeń odświeży stan.
+  const profileId = $derived(
+    app.str('models.default_profile', app.system?.profile ?? session?.profile ?? 'hybrid'),
+  );
+  const PROFILES = ['local', 'hybrid', 'cloud'] as const;
+  const noKeys = $derived(app.system?.keys_configured === false);
   const level = $derived(session?.autonomy ?? 'L3');
   const offline = $derived(app.system?.online === false);
   const queued = $derived(app.system?.queued_messages ?? 0);
@@ -38,7 +46,18 @@
     </dd>
     <dt>{t('status.profile')}</dt>
     <dd>
-      <strong>{tk(`profile.${profileId}`)}</strong>
+      <div class="seg" role="radiogroup" aria-label={t('status.profile')}>
+        {#each PROFILES as p (p)}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={profileId === p}
+            disabled={p !== 'local' && noKeys}
+            onclick={() => void app.setSetting('models.default_profile', p)}
+            >{tk(`profile.${p}`)}</button
+          >
+        {/each}
+      </div>
       <span class="desc">{tk(`status.profileDesc.${profileId}`)}</span>
       {#if app.system && !app.system.keys_configured && profileId !== 'local'}
         <span class="desc warn">{t('status.noKeys')}</span>
@@ -46,14 +65,18 @@
     </dd>
     <dt>{t('status.autonomy')}</dt>
     <dd>
-      <strong>{level} — {tk(`perm.${level}.name`)}</strong>
-      <span class="desc">{tk(`perm.${level}.desc`)}</span>
+      <strong>{tk(`mode.${level}.name`)} <span class="lvl">({level})</span></strong>
+      <span class="desc">{tk(`mode.${level}.desc`)}</span>
     </dd>
   </dl>
   <div class="actions">
-    <Button size="sm" variant="secondary" onclick={() => go('permissions')}
-      >{t('status.openPermissions')}</Button
-    >
+    {#if onmode}
+      <Button size="sm" variant="secondary" onclick={onmode}>{t('status.changeMode')}</Button>
+    {:else}
+      <Button size="sm" variant="secondary" onclick={() => go('permissions')}
+        >{t('status.openPermissions')}</Button
+      >
+    {/if}
     <Button size="sm" variant="secondary" onclick={() => go('providers')}
       >{t('status.openAccounts')}</Button
     >
@@ -95,6 +118,44 @@
   }
   .warn {
     color: var(--alfa-color-warning);
+  }
+  .lvl {
+    color: var(--alfa-color-text-muted);
+    font-weight: normal;
+  }
+  /* Profil jako trzy przyciski obok siebie — wybór od razu, bez przechodzenia do Ustawień. */
+  .seg {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 2px;
+    border: 1px solid var(--alfa-color-border);
+    border-radius: var(--alfa-radius-control);
+    background: var(--alfa-color-surface2);
+  }
+  .seg button {
+    min-height: 26px;
+    padding: 0 var(--alfa-space-2);
+    border: 0;
+    border-radius: calc(var(--alfa-radius-control) - 2px);
+    background: transparent;
+    color: var(--alfa-color-text-muted);
+    font: inherit;
+    font-size: var(--alfa-font-size-xs);
+    cursor: pointer;
+  }
+  .seg button[aria-checked='true'] {
+    background: var(--alfa-color-surface);
+    color: var(--alfa-color-text);
+    font-weight: var(--alfa-weight-semibold);
+    box-shadow: var(--alfa-shadow-1);
+  }
+  .seg button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .seg button:focus-visible {
+    outline: 2px solid var(--alfa-color-focus);
+    outline-offset: 1px;
   }
   .actions {
     display: flex;

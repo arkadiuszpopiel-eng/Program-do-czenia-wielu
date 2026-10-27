@@ -41,6 +41,7 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'titlebar.mode': 'Work mode: {mode}. Change mode',
   'titlebar.modeTip': 'Agents’ work mode — click to change (1–4)',
   'mode.title': 'Work mode',
+  'status.changeMode': 'Change work mode',
   'mode.L0.name': 'Preview only',
   'mode.L0.desc': 'The agent only reads and suggests; she changes nothing.',
   'mode.L1.name': 'Ask about everything',

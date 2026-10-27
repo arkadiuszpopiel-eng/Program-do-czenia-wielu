@@ -39,6 +39,7 @@ export const plBroker = {
   'titlebar.mode': 'Tryb pracy: {mode}. Zmień tryb',
   'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–4)',
   'mode.title': 'Tryb pracy',
+  'status.changeMode': 'Zmień tryb pracy',
   'mode.L0.name': 'Tylko podgląd',
   'mode.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
   'mode.L1.name': 'Pytaj o wszystko',

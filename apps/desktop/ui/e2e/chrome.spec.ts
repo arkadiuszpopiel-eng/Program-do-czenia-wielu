@@ -195,11 +195,17 @@ for (const skin of SKINS) {
       await state.click();
       const details = page.getByRole('dialog', { name: 'Stan Alfy' });
       await expect(details).toContainText('Proste rzeczy liczy ten komputer');
-      await expect(details).toContainText(/L\d — /);
+      await expect(details).toContainText(/Automatycznie \(L3\)/);
       await expectReadable(page, 'header.titlebar');
-      await details.getByRole('button', { name: 'Uprawnienia' }).click();
+      // Profil zmienia się na miejscu (właściciel 27.10: bez przenoszenia do Ustawień).
+      const local = details.getByRole('radio', { name: 'Lokalny' });
+      await local.click();
+      await expect(local).toHaveAttribute('aria-checked', 'true');
+      await details.getByRole('radio', { name: 'Hybryda' }).click();
+      // „Zmień tryb pracy” otwiera menu trybów zamiast stron Ustawień.
+      await details.getByRole('button', { name: 'Zmień tryb pracy' }).click();
       await expect(details).toHaveCount(0);
-      await expect(page.getByRole('heading', { level: 2, name: /Uprawnienia/ })).toBeVisible();
+      await expect(page.getByRole('menu', { name: 'Tryb pracy' })).toBeVisible();
       await page.keyboard.press('Escape');
 
       // Koszt ma własną część i własne okienko.

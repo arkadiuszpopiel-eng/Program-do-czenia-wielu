@@ -64,7 +64,13 @@
     {/snippet}
     <Lazy
       load={loadStatus}
-      props={{ onnavigate: () => (stateOpen = false) }}
+      props={{
+        onnavigate: () => (stateOpen = false),
+        onmode: () => {
+          stateOpen = false;
+          modeOpen = true;
+        },
+      }}
       label={t('common.loading')}
     />
   </Popover>
