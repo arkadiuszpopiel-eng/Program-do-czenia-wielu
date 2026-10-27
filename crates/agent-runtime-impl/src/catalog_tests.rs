@@ -59,3 +59,14 @@ fn local_index_lookup_measurement() {
         "LOCAL_CATALOG_BENCHMARK dataset=synthetic_80_tools build=debug exact_us={exact_us:.2} description_us={query_us:.2}"
     );
 }
+
+#[test]
+fn game_engine_question_finds_engine_tools() {
+    let mut engine = manifest(FsToolKind::Read);
+    engine.name = "engine_inspect".into();
+    engine.title = "Odczyt sceny".into();
+    engine.groups = vec!["engine".into(), "shell".into()];
+    let entries = [manifest(FsToolKind::Read), engine];
+    let found = Catalog::new(entries.iter()).rank("co jest w silniku gry", false, 8);
+    assert_eq!(found.first().map(String::as_str), Some("engine_inspect"));
+}

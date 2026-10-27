@@ -147,6 +147,10 @@ impl Catalog {
                 ],
                 "shell",
             ),
+            (
+                &["silnik", "nextgo", "engine", "game", "shader", "raycast"],
+                "engine",
+            ),
             (&["stron", "przeglad", "browser", "website"], "browser"),
             (
                 &["http", "pobierz", "fetch", "download", "internet", "siec"],

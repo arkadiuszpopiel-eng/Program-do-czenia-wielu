@@ -1,0 +1,22 @@
+[package]
+name = "tools-engine-fake"
+description = "Atrapa tools-engine: świat w pamięci z rewizjami, idempotentnymi transakcjami, konfliktem rewizji i cofaniem, zrzuty PNG 1×1 — bez uruchamiania silnika"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-engine-contract = { path = "../tools-engine-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-engine-contract = { path = "../tools-engine-contract", features = ["contract-tests"] }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[lints]
+workspace = true

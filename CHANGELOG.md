@@ -12,6 +12,33 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.74 — 2026-10-27
+
+Alfa łączy się z silnikiem gier właściciela NextGO.Gray: agentki uruchamiają jego serwer, budują i zmieniają
+świat, oglądają scenę i zrzuty, czytają dokumentację silnika — bez zmian w katalogu silnika.
+
+### Nowe
+
+- Katalog silnika ustawia się w Ustawienia → Zaawansowane → „Katalog silnika gier NextGO.Gray” (pełna ścieżka do
+  zbudowanego silnika); puste pole wyłącza narzędzia silnika.
+- 15 narzędzi agentek (grupa „engine”): stan instalacji, dokumentacja, start i zatrzymanie serwera, odczyt sceny,
+  transakcje z cofaniem, krok symulacji, strumieniowanie świata, raycast, wysokość terenu, zaznaczenie, podmiana
+  shadera, zrzut okna i podgląd PNG. Każde wywołanie przechodzi przez Brokera; zmiany świata są akcjami
+  zmieniającymi stan, a ponowienie tego samego wywołania nie dubluje zmiany.
+- Serwer silnika działa tylko na pętli zwrotnej, z losowym portem, bez kluczy w środowisku i kończy się z
+  kill-switchem; zrzuty i podglądy trafiają do danych Alfy, nie do katalogu silnika.
+
+### Poprawki
+
+- Przycisk „Zatrzymaj” sterowania ekranem w średnio szerokim oknie ma znowu ikonę i nazwę dla czytników ekranu
+  (był pusty i za mały do kliknięcia).
+
+### Testy
+
+- Testy kontraktowe na atrapie i na prawdziwym silniku (scenariusz: start → transakcja → odczyt → cofnięcie →
+  zatrzymanie, podgląd GPU i zrzut okna); po testach katalog silnika bez zmian.
+- Pliki ponad limit długości (app-api, app-core) podzielone; pełny zestaw przeglądarkowy 559/559.
+
 ## 0.0.73 — 2026-10-27
 
 Zadania agentek przetrwają przerwę i limit (zapis postępu, kontynuacja od zapisanego miejsca), Dyrygentka zna

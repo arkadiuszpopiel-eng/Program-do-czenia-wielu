@@ -108,12 +108,14 @@ impl Extra {
             }
             (None, None) => Arc::new(BrokerUnavailable),
         };
+        // Katalog silnika gier z Ustawień (`engine.nextgo.root`), odświeżany po zmianie.
+        let engine = app_agents::engine::watch_root(kernel.config.clone());
         Ok(Ports {
             brain,
             transfer,
             voice,
             broker,
-            agents: self.agent_stack(options, paths, bus, tools, gui, launch),
+            agents: self.agent_stack((options, paths), bus, tools, gui, launch, engine),
         })
     }
 }

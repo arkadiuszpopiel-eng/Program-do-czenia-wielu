@@ -23,6 +23,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod apps;
+pub mod engine;
 pub mod eval;
 mod family;
 mod launch;

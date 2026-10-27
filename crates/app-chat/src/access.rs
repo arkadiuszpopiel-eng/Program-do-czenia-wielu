@@ -7,6 +7,7 @@ const FULL_GROUPS: &[&str] = &[
     "fs",
     "worktree",
     "shell",
+    "engine",
     "cli-bridge",
     "gui.control",
     "office",

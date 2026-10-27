@@ -71,6 +71,7 @@ pub struct AgentTools {
     plugins: Option<Arc<PluginsApp>>,
     system: Option<tools_system_impl::SystemTools>,
     media: Option<tools_media_impl::MediaTools>,
+    engine: Option<tools_engine_impl::EngineTools>,
 }
 
 impl std::fmt::Debug for AgentTools {
@@ -150,7 +151,16 @@ impl AgentTools {
             plugins,
             system,
             media: deps.media,
+            engine: None,
         }
+    }
+
+    /// Dokłada narzędzia silnika gier (`engine_*`); kill-switch kończy też serwer silnika.
+    #[must_use]
+    pub fn with_engine(mut self, engine: tools_engine_impl::EngineTools) -> Self {
+        self.tools.extend(engine.tools());
+        self.engine = Some(engine);
+        self
     }
 
     /// Wszystkie narzędzia (z bieżącymi narzędziami aktywnych wtyczek).
@@ -188,16 +198,20 @@ impl AgentTools {
         })
     }
 
-    /// Kill-switch: zamyka wszystkie przeglądarki agentek (zgody hostów wygasają) i zatrzymuje
-    /// odtwarzanie multimediów (`media_play`). Zwraca liczbę zamkniętych sesji przeglądarki
-    /// i zatrzymanych odtworzeń.
+    /// Kill-switch: zamyka wszystkie przeglądarki agentek (zgody hostów wygasają), zatrzymuje
+    /// odtwarzanie multimediów (`media_play`) i kończy serwer silnika gier. Zwraca liczbę
+    /// zamkniętych sesji przeglądarki, zatrzymanych odtworzeń i procesów silnika.
     pub fn kill_switch(&self) -> usize {
         let browsers = self.browser.as_ref().map_or(0, BrowserTools::close_all);
         let playing = self
             .media
             .as_ref()
             .map_or(0, tools_media_impl::MediaTools::stop_all);
-        browsers + playing
+        let engine = self
+            .engine
+            .as_ref()
+            .map_or(0, tools_engine_impl::EngineTools::kill_switch);
+        browsers + playing + engine
     }
 
     /// Narzędzia, które przysługują agentce o tych rolach (grupy narzędzi ról; rola tylko do

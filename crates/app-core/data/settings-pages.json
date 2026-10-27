@@ -3053,6 +3053,22 @@
   "custom": "advanced",
   "settings": [
    {
+    "key": "engine.nextgo.root",
+    "label": {
+     "pl": "Katalog silnika gier NextGO.Gray",
+     "en": "NextGO.Gray game engine folder"
+    },
+    "description": {
+     "pl": "Pełna ścieżka do katalogu silnika (z plikiem target\\release\\engine-server.exe). Agentki uruchamiają z niego serwer silnika i czytają dokumentację; w katalogu niczego nie zmieniają. Puste — narzędzia silnika wyłączone.",
+     "en": "Full path to the engine folder (containing target\\release\\engine-server.exe). Agents start the engine server from it and read its documentation; they never change anything in the folder. Empty — engine tools are off."
+    },
+    "default": "",
+    "scope": "machine",
+    "control": {
+     "kind": "text"
+    }
+   },
+   {
     "key": "experimental.diag_daily",
     "label": {
      "pl": "Codzienny zapis parametrów komputera",

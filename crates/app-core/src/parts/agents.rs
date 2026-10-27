@@ -31,12 +31,12 @@ impl Extra {
     /// bez narzędzi; żadna akcja nie omija Brokera).
     pub(crate) fn agent_stack(
         &self,
-        options: &AppOptions,
-        paths: &AppPaths,
+        (options, paths): (&AppOptions, &AppPaths),
         bus: &Arc<dyn EventBus>,
         mut extra: Vec<Arc<dyn tools_common_contract::Tool>>,
         (gui, monitor): (&app_gui::GuiPorts, &Arc<app_gui::GuiMonitor>),
         (locks, personas, sessions): Launchers,
+        engine: app_agents::engine::EngineRoot,
     ) -> Option<AgentStack> {
         let kernel = self.broker.clone()?;
         let journal = self.undo.clone()?;
@@ -87,7 +87,14 @@ impl Extra {
             extra,
             apps: Some(app_agents::AppsDeps::system(&paths.local)),
             media: Some(media),
-        });
+        })
+        .with_engine(app_agents::engine::engine_tools(
+            engine,
+            &paths.local,
+            tickets.clone(),
+            path_env_for(&paths.user_root).1,
+            app_modules::workdir::tool_deny_lists(paths),
+        ));
         Some(AgentStack {
             tools: Arc::new(tools),
             tickets,

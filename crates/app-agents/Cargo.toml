@@ -21,6 +21,10 @@ tools-fs-impl = { path = "../tools-fs-impl" }
 tools-shell-contract = { path = "../tools-shell-contract" }
 tools-shell-impl = { path = "../tools-shell-impl" }
 tools-dev-impl = { path = "../tools-dev-impl" }
+# Silnik gier NextGO.Gray właściciela (serwer jako proces poboczny, JSON-RPC przez WebSocket).
+tools-engine-contract = { path = "../tools-engine-contract" }
+tools-engine-impl = { path = "../tools-engine-impl" }
+core-config-contract.workspace = true
 tools-clipboard-contract = { path = "../tools-clipboard-contract" }
 tools-clipboard-impl = { path = "../tools-clipboard-impl" }
 # F6: Word/Excel i przeglądarka agentek nad portami `platform-apps` (Windows: COM / CDP przez potok).

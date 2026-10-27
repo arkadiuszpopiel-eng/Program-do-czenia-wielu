@@ -1,0 +1,40 @@
+[package]
+name = "tools-engine-impl"
+description = "tools-engine: serwer silnika NextGO.Gray jako proces poboczny (tylko lokalnie, bez okna konsoli, rejestr procesów), własny klient WebSocket JSON-RPC, zrzuty i podgląd w danych Alfy, narzędzia agentek przez Brokera"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-engine-contract = { path = "../tools-engine-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+compliance-contract = { path = "../compliance-contract" }
+# Rejestr procesów pobocznych: zamykane przy wyjściu z programu, sprzątane po awarii.
+lib-sidecar-guard = { path = "../lib-sidecar-guard" }
+platform-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tokio = { workspace = true, features = ["rt", "time", "sync", "process", "io-util", "net"] }
+# Te same wersje co w Cargo.lock (providers-local-impl, lib-sqlstore).
+base64 = "0.22.1"
+getrandom = "0.4.3"
+sha2 = "0.10.9"
+
+[dev-dependencies]
+tools-engine-contract = { path = "../tools-engine-contract", features = ["contract-tests"] }
+tools-common-contract = { path = "../tools-common-contract", features = ["contract-tests"] }
+tools-engine-fake = { path = "../tools-engine-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+
+[lints]
+workspace = true

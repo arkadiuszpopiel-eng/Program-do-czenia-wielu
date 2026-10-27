@@ -5,7 +5,7 @@ import { SETTINGS_PART_A } from './settings-part-a';
 import { SETTINGS_PART_B } from './settings-part-b';
 import { AGENT_ACCESS_SETTINGS } from './settings-agent-access';
 import { withContinuation } from './settings-continuation';
-import { L, page, select, toggle } from './settings-helpers';
+import { L, page, select, text, toggle } from './settings-helpers';
 
 /** Strony dodane po podziale na części (każda część jest u limitu długości pliku). */
 const SETTINGS_LATER: readonly SettingsPageDef[] = [
@@ -16,6 +16,16 @@ const SETTINGS_LATER: readonly SettingsPageDef[] = [
     L('Zaawansowane', 'Advanced'),
     1,
     [
+      text(
+        'engine.nextgo.root',
+        L('Katalog silnika gier NextGO.Gray', 'NextGO.Gray game engine folder'),
+        L(
+          'Pełna ścieżka do katalogu silnika (z plikiem target\\release\\engine-server.exe). Agentki uruchamiają z niego serwer silnika i czytają dokumentację; w katalogu niczego nie zmieniają. Puste — narzędzia silnika wyłączone.',
+          'Full path to the engine folder (containing target\\release\\engine-server.exe). Agents start the engine server from it and read its documentation; they never change anything in the folder. Empty — engine tools are off.',
+        ),
+        '',
+        'machine',
+      ),
       toggle(
         'experimental.diag_daily',
         L('Codzienny zapis parametrów komputera', 'Daily computer parameter record'),
