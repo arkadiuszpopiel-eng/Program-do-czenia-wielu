@@ -14,6 +14,7 @@
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Lazy from '../../../components/shell/Lazy.svelte';
   import VoiceLicenses from './VoiceLicenses.svelte';
+  import { agentNavigation } from '../../../state/agent-navigation.svelte';
 
   interface Props {
     /** Ustawienia strojenia mowy (`voice.tts_*`) — pokazywane przy głosach agentek. */
@@ -22,6 +23,14 @@
   let { settings = [] }: Props = $props();
 
   const app = useApp();
+  $effect(() => {
+    const id = agentNavigation.voice;
+    if (id)
+      requestAnimationFrame(() => {
+        document.getElementById(`voice-agent-${id}`)?.scrollIntoView({ block: 'center' });
+        agentNavigation.voice = null;
+      });
+  });
   const { t } = app.i18n;
   let devices = $state<AudioDevice[]>([]);
   let devicesLoaded = $state(false);
@@ -182,7 +191,7 @@
   {/if}
   <ul class="voices">
     {#each agentIds as id (id)}
-      <li class="voice">
+      <li class="voice" id="voice-agent-{id}" class:selected={app.selectedAgent === id}>
         <Avatar agent={id} size={40} speaking={app.speechAgent === id} decorative />
         <span class="name">{agents[id].name}</span>
         <span class="muted">{t(`voice.bible.${id}`)}</span>
@@ -197,6 +206,11 @@
 <VoiceLicenses />
 
 <style>
+  .voice.selected {
+    outline: 1px solid var(--alfa-color-focus);
+    outline-offset: 3px;
+    border-radius: var(--alfa-radius-card);
+  }
   .card {
     display: flex;
     flex-direction: column;

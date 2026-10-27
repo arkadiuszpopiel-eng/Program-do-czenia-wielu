@@ -47,6 +47,8 @@ pub struct ToolCtx {
     pub cancel: CancellationToken,
     /// Limit czekania na zatwierdzenie.
     pub approval_timeout: Duration,
+    /// Zgoda właściciela na dłuższe oczekiwanie, nigdy zgoda na samą akcję.
+    pub auto_extend_approval: bool,
     /// Obserwator (zdarzenia kroków).
     pub observer: Option<Arc<dyn ToolObserver>>,
 }
@@ -77,6 +79,7 @@ impl ToolCtx {
             untrusted_args: false,
             cancel: CancellationToken::new(),
             approval_timeout: DEFAULT_APPROVAL_TIMEOUT,
+            auto_extend_approval: false,
             observer: None,
         }
     }

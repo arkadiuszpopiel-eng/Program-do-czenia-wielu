@@ -103,3 +103,6 @@ pub fn event_schema() -> serde_json::Value {
 
 #[cfg(test)]
 mod tests;
+
+mod pin;
+pub use pin::select_pin;

@@ -12,7 +12,7 @@ mod analysis;
 mod build_env;
 mod effects;
 
-pub use analysis::{CommandAnalysis, analyze, tokens};
+pub use analysis::{CommandAnalysis, analyze, analyze_powershell, tokens};
 pub use build_env::{BUILD_ENV_ALLOWLIST, default_build_jobs, with_build_defaults};
 
 use risk_classifier_contract::Reversibility;
@@ -383,3 +383,5 @@ mod tests {
         assert!(c.env_allowlist.iter().any(|v| v == "PATH"));
     }
 }
+
+mod lex;

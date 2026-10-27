@@ -95,7 +95,6 @@
     {/if}
   </div>
 {/if}
-<p class="alfa-visually-hidden" role="status">{att.status}</p>
 
 <style>
   .attachments {

@@ -114,6 +114,12 @@ impl ModelProvider for RoutedProvider {
         }
     }
 
+    fn model_capabilities(&self, model: &str) -> Option<providers_contract::ModelCapabilities> {
+        let candidate = Candidate::parse(model)?;
+        self.provider_of(&candidate)?
+            .model_capabilities(&candidate.model)
+    }
+
     fn stream(&self, request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
         if cancel.is_cancelled() {
             return single(ProviderEvent::stop(StopReason::Cancelled));
@@ -187,14 +193,26 @@ impl ModelProvider for RoutedProvider {
     /// Czy w kolejce klasy jest model wyższego szczebla niż `from` (zarejestrowany, inny niż
     /// `from`) — bez tego podniesienie po odrzuceniu tylko powtórzyłoby ten sam model.
     fn can_escalate(&self, from: &str) -> bool {
+        self.can_escalate_for(from, None)
+    }
+    fn can_escalate_for(&self, from: &str, class: Option<&str>) -> bool {
+        let class = class
+            .and_then(router_contract::class_from_policy)
+            .unwrap_or(self.class);
         let Some(from) = Candidate::parse(from) else {
             return false;
         };
         if !self.core.difficulty_policy().escalate {
             return false;
         }
+        if let Some(queue) = self.core.shared_queue(class) {
+            return queue
+                .iter()
+                .position(|c| *c == from)
+                .is_some_and(|i| i + 1 < queue.len());
+        }
         let floor = self.core.rung_of(&from);
-        self.core.policy().candidates(self.class).iter().any(|c| {
+        self.core.policy().candidates(class).iter().any(|c| {
             *c != from
                 && self.core.registered(&c.provider).is_some()
                 && self.core.rung_of(c) > floor

@@ -105,6 +105,24 @@ impl BrokerGate {
         request: ActionRequest,
         ctx: &ToolCtx,
     ) -> Result<Authorization, GateError> {
+        loop {
+            let result = self.authorize_once(request.clone(), ctx).await;
+            if ctx.auto_extend_approval
+                && matches!(
+                    result,
+                    Err(GateError::Denied(DenialReason::ApprovalExpired { .. }))
+                )
+            {
+                continue;
+            }
+            return result;
+        }
+    }
+    async fn authorize_once(
+        &self,
+        request: ActionRequest,
+        ctx: &ToolCtx,
+    ) -> Result<Authorization, GateError> {
         if ctx.cancel.is_cancelled() {
             return Err(GateError::Cancelled);
         }
@@ -139,7 +157,7 @@ impl BrokerGate {
         holder: &Holder,
         ctx: &ToolCtx,
     ) -> Result<Authorization, GateError> {
-        let deadline = tokio::time::Instant::now() + ctx.approval_timeout;
+        let mut deadline = tokio::time::Instant::now() + ctx.approval_timeout;
         loop {
             match self
                 .broker
@@ -170,6 +188,13 @@ impl BrokerGate {
                 }
             }
             if tokio::time::Instant::now() >= deadline {
+                if ctx.auto_extend_approval {
+                    deadline = tokio::time::Instant::now()
+                        + ctx
+                            .approval_timeout
+                            .max(std::time::Duration::from_millis(1));
+                    continue;
+                }
                 return Err(GateError::Denied(DenialReason::ApprovalTimeout {
                     approval: id,
                 }));

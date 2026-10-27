@@ -165,6 +165,7 @@ pub enum JournalRecord {
         /// Czas (ms).
         at_ms: u64,
         /// Stany „po” snapshotów zakresu.
+        #[serde(deserialize_with = "crate::serde_posts::deserialize")]
         posts: BTreeMap<u32, BTreeMap<PathBuf, String>>,
     },
     /// Operacja kroku przywrócona przy cofaniu (ponowienie po cofnięciu częściowym pomija ją).

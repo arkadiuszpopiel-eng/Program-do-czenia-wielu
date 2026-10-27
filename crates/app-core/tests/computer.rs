@@ -103,25 +103,23 @@ async fn world(d: &Desk, pty: Arc<FakePty>) -> Agents {
 async fn delta_on_virtual_desktop_never_touches_alfa_windows() {
     let d = desk();
     let mut a = world(&d, Arc::new(FakePty::default())).await;
-    let call = |id: &str, tool: &str, args: serde_json::Value| {
-        Script::tool_call(FAKE_MODEL, id, tool, &args)
-    };
-    a.h.provider.push(call("c1", "window_list", json!({})));
-    a.h.provider
-        .push(call("c2", "window_focus", json!({ "window": d.alfa[0].0 })));
-    a.h.provider.push(call(
-        "c3",
-        "input_type_text",
-        json!({ "window": d.alfa[1].0, "text": "x" }),
-    ));
-    // Wpisywanie w cudzym oknie wymaga zgody właściciela (okno Brokera) — bez decyzji: odmowa.
-    a.h.provider.push(call(
-        "c4",
-        "input_type_text",
-        json!({ "window": d.notepad.0, "text": SECRET }),
-    ));
-    a.h.provider.push(Script::text(FAKE_MODEL, &["Gotowe."]));
-    let (_turn, events) = run_turn(&mut a, "Delta, wpisz listę zakupów w Notatniku.").await;
+    // Twarda odmowa (blokada Jądra) kończy przebieg, a brak zgody go wstrzymuje — każda próba
+    // w osobnej turze. Wpisywanie w Notatniku wymaga zgody właściciela — bez decyzji: odmowa.
+    let (mut kernel, mut events) = (0, Vec::new());
+    let (alfa, web, pad, ty) = (d.alfa[0].0, d.alfa[1].0, d.notepad.0, "input_type_text");
+    for (id, tool, args) in [
+        ("c2", "window_focus", json!({ "window": alfa })),
+        ("c3", ty, json!({ "window": web, "text": "x" })),
+        ("c4", ty, json!({ "window": pad, "text": SECRET })),
+    ] {
+        let script = Script::tool_call(FAKE_MODEL, id, tool, &args);
+        a.h.provider.push(script);
+        events = run_turn(&mut a, "Delta, wpisz listę w Notatniku.").await.1;
+        let steps = last_run(&a).await.steps;
+        let blocked = steps.iter().filter(|x| x.output.contains("blokada Jądra"));
+        kernel += blocked.count();
+    }
+    assert_eq!(kernel, 2, "okna Alfy: blokada Jądra w Replay");
     let run = last_run(&a).await;
     assert_eq!(
         d.desktop.typed_text(d.notepad),
@@ -145,7 +143,7 @@ async fn delta_on_virtual_desktop_never_touches_alfa_windows() {
     assert!(status.available);
     // Sterowanie GUI bez zgody właściciela (okno Brokera / „zawsze zezwalaj”) — odmowa po czasie;
     // wobec okien Alfy — blokada Jądra niezależnie od zgód. Ścieżkę zgody pokrywa `app-gui`.
-    assert_eq!(status.actions.len(), 4, "{status:#?}");
+    assert_eq!(status.actions.len(), 3, "{status:#?}");
     assert!(
         status
             .actions
@@ -153,12 +151,6 @@ async fn delta_on_virtual_desktop_never_touches_alfa_windows() {
             .all(|x| x.status == GuiActionStatus::Denied),
         "{status:#?}"
     );
-    let kernel = run
-        .steps
-        .iter()
-        .filter(|x| x.output.contains("blokada Jądra"))
-        .count();
-    assert_eq!(kernel, 2, "okna Alfy: blokada Jądra w Replay");
     let shown = serde_json::to_string(&status).unwrap();
     assert!(!shown.contains("mleko"), "panel bez wpisywanej treści");
     let gui_events: Vec<&AlfaEvent> = events

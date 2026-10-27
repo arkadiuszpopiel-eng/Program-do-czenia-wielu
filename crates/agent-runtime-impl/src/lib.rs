@@ -22,9 +22,15 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod boundary;
+mod catalog;
+mod context;
+mod continuation;
+mod waiting;
+pub use waiting::ApprovalClock;
 mod child;
 mod critic;
 mod delegate;
+mod discovery;
 mod engine;
 mod executor;
 mod flow;
@@ -64,6 +70,16 @@ use shared::{Hooks, Shared};
 
 /// Treść `module.toml` tego modułu.
 pub const MODULE_TOML: &str = include_str!("../module.toml");
+
+/// Ten sam mały pakiet definicji dla preflight Routera i pierwszej tury runtime.
+/// Wywołująca warstwa aplikacji najpierw filtruje manifesty profilem i zakresem przebiegu.
+pub fn model_tool_specs(
+    manifests: &[tools_common_contract::ToolManifest],
+    goal: &str,
+) -> Vec<providers_contract::ToolSpec> {
+    let index = catalog::Catalog::new(manifests.iter());
+    catalog::select_specs(manifests.iter().collect(), &index, goal, &[], false)
+}
 
 /// Manifest modułu (rejestr).
 pub fn module_manifest() -> Result<ModuleManifest, ManifestError> {
@@ -291,3 +307,9 @@ mod tests {
         assert!(c.max_delegation_depth >= 1 && c.max_parallel_reads >= 2);
     }
 }
+
+mod tool_gate;
+
+mod approval_observer;
+
+mod checkpoint_guard;

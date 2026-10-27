@@ -357,5 +357,408 @@
         }
       }
     ]
+  },
+  {
+    "command": "projects_list",
+    "args": {},
+    "result": [
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "projects_pick_dir",
+    "args": {},
+    "result": "C:\\Users\\Ty\\Dokumenty\\Projekt"
+  },
+  {
+    "command": "projects_save",
+    "args": {
+      "name": "Nowy Projekt",
+      "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt"
+    },
+    "result": [
+      {
+        "name": "Nowy Projekt",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt",
+        "session_count": 0
+      },
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "projects_rename",
+    "args": {
+      "oldName": "Nowy Projekt",
+      "newName": "Projekt Alfa"
+    },
+    "result": [
+      {
+        "name": "Projekt Alfa",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt",
+        "session_count": 0
+      },
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "projects_remove",
+    "args": {
+      "name": "Projekt Alfa"
+    },
+    "result": [
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "pipelines_list",
+    "args": {},
+    "result": [
+      {
+        "name": "ui-design",
+        "description": "Szkic/opis → wytyczne wizualne → architektura komponentów → kod React/Tailwind.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Styl i typografia",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Dobierz styl, kolory i typografię.\n\n{{input}}"
+          },
+          {
+            "title": "Architektura komponentów",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Zaprojektuj komponenty, stany i dostępność.\n\n{{prev}}"
+          },
+          {
+            "title": "Kod React/Tailwind",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wygeneruj finalny kod.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "code-review",
+        "description": "Implementacja → krytyczny przegląd → poprawki z testami.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Implementacja",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Przegląd",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "Zrób przegląd zmian.\n\n{{prev}}"
+          },
+          {
+            "title": "Poprawki",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wprowadź poprawki.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "research-report",
+        "description": "Badanie tematu → weryfikacja wiarygodności → zwięzły raport.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Badanie",
+            "role": "researcher",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Weryfikacja",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          },
+          {
+            "title": "Raport",
+            "role": "writer",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "command": "pipelines_save",
+    "args": {
+      "pipeline": {
+        "name": "Szkic do UI",
+        "description": "Styl → kod",
+        "builtin": false,
+        "stages": [
+          {
+            "title": "Styl",
+            "role": "thinker",
+            "persona": null,
+            "model": "openai:gpt-4o-mini",
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Kod",
+            "role": "coder",
+            "persona": "delta",
+            "model": null,
+            "goal": "Kod z: {{prev}}"
+          }
+        ]
+      },
+      "previousName": null
+    },
+    "result": [
+      {
+        "name": "Szkic do UI",
+        "description": "Styl → kod",
+        "builtin": false,
+        "stages": [
+          {
+            "title": "Styl",
+            "role": "thinker",
+            "persona": null,
+            "model": "openai:gpt-4o-mini",
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Kod",
+            "role": "coder",
+            "persona": "delta",
+            "model": null,
+            "goal": "Kod z: {{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "ui-design",
+        "description": "Szkic/opis → wytyczne wizualne → architektura komponentów → kod React/Tailwind.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Styl i typografia",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Dobierz styl, kolory i typografię.\n\n{{input}}"
+          },
+          {
+            "title": "Architektura komponentów",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Zaprojektuj komponenty, stany i dostępność.\n\n{{prev}}"
+          },
+          {
+            "title": "Kod React/Tailwind",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wygeneruj finalny kod.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "code-review",
+        "description": "Implementacja → krytyczny przegląd → poprawki z testami.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Implementacja",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Przegląd",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "Zrób przegląd zmian.\n\n{{prev}}"
+          },
+          {
+            "title": "Poprawki",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wprowadź poprawki.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "research-report",
+        "description": "Badanie tematu → weryfikacja wiarygodności → zwięzły raport.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Badanie",
+            "role": "researcher",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Weryfikacja",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          },
+          {
+            "title": "Raport",
+            "role": "writer",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "command": "pipelines_remove",
+    "args": {
+      "name": "Szkic do UI"
+    },
+    "result": [
+      {
+        "name": "ui-design",
+        "description": "Szkic/opis → wytyczne wizualne → architektura komponentów → kod React/Tailwind.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Styl i typografia",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Dobierz styl, kolory i typografię.\n\n{{input}}"
+          },
+          {
+            "title": "Architektura komponentów",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Zaprojektuj komponenty, stany i dostępność.\n\n{{prev}}"
+          },
+          {
+            "title": "Kod React/Tailwind",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wygeneruj finalny kod.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "code-review",
+        "description": "Implementacja → krytyczny przegląd → poprawki z testami.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Implementacja",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Przegląd",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "Zrób przegląd zmian.\n\n{{prev}}"
+          },
+          {
+            "title": "Poprawki",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wprowadź poprawki.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "research-report",
+        "description": "Badanie tematu → weryfikacja wiarygodności → zwięzły raport.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Badanie",
+            "role": "researcher",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Weryfikacja",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          },
+          {
+            "title": "Raport",
+            "role": "writer",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          }
+        ]
+      }
+    ]
   }
 ]

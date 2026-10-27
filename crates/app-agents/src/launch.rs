@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, OnceLock};
 
 use agent_runtime_contract::{
-    AgentRuntime, Crew, MemCheckpointStore, RunError, RunId, RunOptions, RunSpec,
+    AgentRuntime, CheckpointStore, Crew, MemCheckpointStore, RunError, RunId, RunOptions, RunSpec,
 };
 use agent_runtime_contract::{MemorySessionTaint, SessionTaint};
 use agent_runtime_impl::{
@@ -39,7 +39,9 @@ pub struct Launch {
     taint: Option<Arc<dyn SessionTaint>>,
     personas: Option<Arc<dyn Personas>>,
     skills: Arc<OnceLock<Arc<dyn Skills>>>,
+    checkpoints: Arc<OnceLock<Arc<CheckpointFactory>>>,
 }
+type CheckpointFactory = dyn Fn(&SessionId) -> Arc<dyn CheckpointStore> + Send + Sync;
 
 impl std::fmt::Debug for Launch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -69,12 +71,20 @@ impl Launch {
             taint,
             personas,
             skills: Arc::default(),
+            checkpoints: Arc::default(),
         }
     }
 
     /// Biblioteka umiejętności (wiązana po złożeniu modułów; drugi raz — bez zmiany).
     pub fn bind_skills(&self, skills: Arc<dyn Skills>) {
         let _ = self.skills.set(skills);
+    }
+    /// Wspólny trwały magazyn czatu i zadań; wiązany po złożeniu szyfrowanego store.
+    pub fn bind_checkpoints(
+        &self,
+        make: impl Fn(&SessionId) -> Arc<dyn CheckpointStore> + Send + Sync + 'static,
+    ) {
+        let _ = self.checkpoints.set(Arc::new(make));
     }
 
     /// Obsada sesji dla delegacji i Krytyczki (`None` — bez usługi person).
@@ -85,6 +95,7 @@ impl Launch {
             personas: personas.personas(),
             roles: personas.roles(),
             models: BTreeMap::new(),
+            persona_roles: BTreeMap::new(),
         })
     }
 
@@ -100,11 +111,15 @@ impl Launch {
     /// Runtime v1 nad dostawcą i narzędziami (+ magazyn checkpointów dla [`crate::RunFamily`]).
     pub fn runtime(
         &self,
+        session: &SessionId,
         provider: Arc<dyn ModelProvider>,
         tools: Vec<Arc<dyn Tool>>,
         bus: Option<Arc<dyn EventBus>>,
-    ) -> (Arc<Runtime>, MemCheckpointStore) {
-        let store = MemCheckpointStore::default();
+    ) -> (Arc<Runtime>, Arc<dyn CheckpointStore>) {
+        let store = self.checkpoints.get().map_or_else(
+            || Arc::new(MemCheckpointStore::default()) as Arc<dyn CheckpointStore>,
+            |make| make(session),
+        );
         let taint = self
             .taint
             .clone()
@@ -113,7 +128,7 @@ impl Launch {
             RuntimeDeps {
                 provider,
                 tools,
-                checkpoints: Arc::new(store.clone()),
+                checkpoints: store.clone(),
                 bus,
                 config: RuntimeConfig::default(),
             },

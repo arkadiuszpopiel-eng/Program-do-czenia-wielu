@@ -32,3 +32,22 @@ fn saved_schema_matches_rust_types() {
          node scripts/gen-ipc-types.mjs"
     );
 }
+
+#[test]
+fn channel_commands_are_listed_once() {
+    for c in app_api::CHANNEL_COMMANDS {
+        assert_eq!(app_api::COMMANDS.iter().filter(|x| *x == c).count(), 1);
+    }
+    assert_eq!(app_api::COMMANDS.len(), 282);
+}
+
+#[test]
+fn paths_under_root_follow_layout() {
+    let p = app_api::AppPaths::under(std::path::Path::new("/x"));
+    assert_eq!(p.sessions(), std::path::Path::new("/x/local/sessions"));
+    assert_eq!(
+        p.webview_data(),
+        std::path::Path::new("/x/local/webview-data")
+    );
+    assert_eq!(p.workdirs(), std::path::Path::new("/x/user/Sesje"));
+}

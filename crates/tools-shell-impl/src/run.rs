@@ -16,7 +16,9 @@ use tools_common_contract::{
     Authorization, DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, UndoRef,
     UndoService, base_facts, parse_args, paths, text,
 };
-use tools_shell_contract::{EVENT_DENIED, EVENT_STARTED, MAX_COMMAND_CHARS, RunArgs, analyze};
+use tools_shell_contract::{
+    EVENT_DENIED, EVENT_STARTED, MAX_COMMAND_CHARS, RunArgs, ShellKind, analyze, analyze_powershell,
+};
 use undo_journal_contract::{StepCtx, StepId, UndoError};
 use watchdog_contract::ProcessRole;
 
@@ -65,9 +67,14 @@ impl Core {
         m: &ToolManifest,
         cwd: &str,
         command: &str,
+        shell: ShellKind,
     ) -> Step<(Vec<Authorization>, bool)> {
         let action = format!("polecenie „{}”", text::truncate_chars(command, 80).0);
-        let a = analyze(command);
+        // Wyjątek dla wzorców `-match '…'` tylko w PowerShell — w `cmd` to zwykłe argumenty.
+        let a = match shell {
+            ShellKind::Pwsh | ShellKind::Powershell => analyze_powershell(command),
+            _ => analyze(command),
+        };
         if a.credential_path {
             return Err(self
                 .deny(ctx, DenialReason::DenyList, &action, "ścieżka poświadczeń")
@@ -185,10 +192,12 @@ impl Core {
             Ok(()) => Ok(step),
             Err(e) => {
                 let _ = self.journal.abort_step(step);
-                let mut out = ToolOutcome::denied(DenialReason::Policy, "polecenie powłoki");
+                let mut out =
+                    ToolOutcome::failed(ToolErrorKind::Internal, "Nie wykonano polecenia powłoki");
+                out.data = serde_json::json!({"not_executed":true,"snapshot_failure":true});
                 out.text = match e {
                     UndoError::SnapshotTooLarge { .. } => format!(
-                        "{} — {e}; zawęź katalog roboczy (snapshot zakresu jest obowiązkowy).",
+                        "{} — {e}. To limit kopii bezpieczeństwa, nie brak uprawnień. Do edycji pojedynczego pliku użyj fs_write albo narzędzia edycji pliku (z kopią tylko tego pliku); dla polecenia powłoki wybierz węższy cwd. Kopia zakresu pozostaje obowiązkowa.",
                         out.text
                     ),
                     other => format!("{} — brak snapshotu zakresu: {other}.", out.text),
@@ -281,7 +290,8 @@ impl Core {
             ));
         }
         let cwd = self.cwd(a.cwd.as_deref(), ctx).await?;
-        let (auths, isolate) = self.capabilities(ctx, m, &cwd, command).await?;
+        let shell = a.shell.unwrap_or(self.config.default_shell);
+        let (auths, isolate) = self.capabilities(ctx, m, &cwd, command, shell).await?;
         if ctx.cancel.is_cancelled() {
             self.release(&auths).await;
             return Ok(ToolOutcome::cancelled("polecenie powłoki"));

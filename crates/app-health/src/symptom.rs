@@ -54,6 +54,9 @@ impl ModelProvider for Tap {
     fn capabilities(&self) -> ProviderCapabilities {
         self.inner.capabilities()
     }
+    fn model_capabilities(&self, model: &str) -> Option<providers_contract::ModelCapabilities> {
+        self.inner.model_capabilities(model)
+    }
     fn stream(&self, request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
         let (bus, target) = (self.bus.clone(), self.target.clone());
         Box::pin(self.inner.stream(request, cancel).inspect(move |event| {

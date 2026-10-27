@@ -2,7 +2,7 @@
 //! budżety, checkpoint) → tura modelu → narzędzia → … → weryfikacja (Krytyczka albo
 //! samoweryfikacja) → wynik. Każdy krok jest zdarzeniem.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use agent_runtime_contract::{BudgetKind, Checkpoint, RunEvent, RunOutcome, Steer};
@@ -42,6 +42,11 @@ pub(crate) struct Engine {
     pub(crate) gate_stopped: bool,
     /// Wywołania bieżącej tury z niepoprawnymi argumentami (id → błąd) — `invalid.rs`.
     pub(crate) invalid_args: BTreeMap<String, String>,
+    /// Błędy lokalnego skrótu ze znanym pełnym wejściem (mogą zasilać detektor pętli).
+    pub(crate) rejected_commands: BTreeSet<String>,
+    pub(crate) storage_error: Option<String>,
+    pub(crate) approval_clock: Arc<crate::ApprovalClock>,
+    waited_at_start: u64,
 }
 
 impl Engine {
@@ -52,6 +57,8 @@ impl Engine {
         registry: ToolRegistry,
         hooks: Hooks,
     ) -> Self {
+        let approval_clock = shared.approval_clock.clone();
+        let waited_at_start = approval_clock.waited_ms();
         let base_elapsed = cp.usage.elapsed_ms;
         let boundary_at = cp.usage.steps;
         let cost_at_boundary = cp.usage.cost_nano_usd;
@@ -69,12 +76,21 @@ impl Engine {
             yield_requested: false,
             gate_stopped: false,
             invalid_args: BTreeMap::new(),
+            rejected_commands: BTreeSet::new(),
+            storage_error: None,
+            approval_clock,
+            waited_at_start,
         }
     }
 
     pub(crate) fn elapsed_ms(&self) -> u64 {
         self.base_elapsed
             .saturating_add(u64::try_from(self.started.elapsed().as_millis()).unwrap_or(u64::MAX))
+            .saturating_sub(
+                self.approval_clock
+                    .waited_ms()
+                    .saturating_sub(self.waited_at_start),
+            )
     }
 
     pub(crate) fn push(&mut self, role: Role, blocks: Vec<ContentBlock>) {
@@ -90,7 +106,9 @@ impl Engine {
     pub(crate) async fn checkpoint(&mut self) {
         self.cp.usage.elapsed_ms = self.elapsed_ms();
         self.cp.seq += 1;
-        if self.shared.store.save(&self.cp).is_ok() {
+        if let Err(error) = self.shared.store.save(&self.cp) {
+            self.storage_error = Some(error.to_string());
+        } else {
             let (seq, step) = (self.cp.seq, self.cp.usage.steps);
             self.handle.emit(RunEvent::Checkpoint { seq, step }).await;
         }
@@ -118,18 +136,21 @@ impl Engine {
 
     /// Start świeży albo po restarcie/oddaniu: wiadomość celu, wyniki dla przerwanych wywołań.
     async fn prepare(&mut self) {
+        let delegated = self.cp.options.parent.is_some()
+            || self.cp.options.depth > 0
+            || self.cp.options.owner_call.is_some();
         if self.cp.messages.is_empty() {
             let spec = self.cp.spec.clone();
             self.cp.messages.extend(spec.history.iter().cloned());
             self.push(
                 Role::User,
-                vec![ContentBlock::text(goal_message(
-                    &spec.goal,
-                    self.cp.options.parent.is_some(),
-                ))],
+                vec![ContentBlock::text(goal_message(&spec.goal, delegated))],
             );
-            if self.cp.options.parent.is_none() {
-                // Cel od właściciela jest zaufany; cel podprzebiegu napisał model rodzica.
+            // Cel od właściciela jest zaufany; cel podprzebiegu napisał model rodzica, a cel zadania
+            // z wyzwalacza niesie niezaufaną treść (mail, plik) — ta nie może trafić do zaufanych.
+            if !delegated
+                && spec.origin != risk_classifier_contract::CommandOrigin::UntrustedContent
+            {
                 self.trust(&spec.goal);
             }
             if let Some(dir) = &spec.workdir {
@@ -153,13 +174,25 @@ impl Engine {
             let results = std::mem::take(&mut self.cp.pending)
                 .iter()
                 .map(|tu| {
-                    ContentBlock::ToolResult(skipped(
-                        &tu.id,
-                        "przerwane przez restart — stan nieznany, sprawdź przed ponowieniem",
-                    ))
+                    if let Some(result) = self.cp.completed_pending.remove(&tu.id) {
+                        ContentBlock::ToolResult(result)
+                    } else {
+                        ContentBlock::ToolResult(skipped(
+                            &tu.id,
+                            if self.cp.journal_version == 0
+                                || self.cp.started_pending.contains(&tu.id)
+                            {
+                                "przerwane przez restart — stan nieznany, sprawdź przed ponowieniem"
+                            } else {
+                                "nie rozpoczęto przed zatrzymaniem; zaplanuj pozostałą operację"
+                            },
+                        ))
+                    }
                 })
                 .collect();
             self.push(Role::User, results);
+            self.cp.started_pending.clear();
+            self.cp.completed_pending.clear();
         }
     }
 
@@ -186,6 +219,15 @@ impl Engine {
 
     /// Punkt atomowy przed turą modelu: granica schedulera, sterowanie, pauza, anulowanie, budżety.
     async fn atomic_point(&mut self) -> Next {
+        if let Some(error) = &self.storage_error {
+            return Next::Finish(RunOutcome::Failed {
+                error: format!(
+                    "Nie można zapisać postępu lokalnie: {error}; nie wykonuję kolejnych operacji."
+                ),
+                provider: None,
+                model: None,
+            });
+        }
         match self.gate_boundary().await {
             Next::Continue => {}
             other => return other,
@@ -213,6 +255,7 @@ impl Engine {
                 () = self.handle.cancel.cancelled() => {}
             }
         }
+        self.auto_extend().await;
         if let Some(budget) = self.exceeded() {
             self.handle.emit(RunEvent::BudgetExceeded { budget }).await;
             return Next::Finish(RunOutcome::BudgetExceeded { budget });
@@ -259,6 +302,7 @@ impl Engine {
         self.cp.finished = Some(outcome.clone());
         self.cp.pending.clear();
         self.checkpoint().await;
+        self.handle.emit(RunEvent::Usage(self.cp.usage)).await;
         self.handle
             .emit(RunEvent::Finished {
                 outcome: outcome.clone(),

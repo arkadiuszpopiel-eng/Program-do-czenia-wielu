@@ -3,12 +3,11 @@
 //! narzędzi. Katalogi danych Alfy i deny-listy poświadczeń są odrzucane — także przez dowiązania
 //! (`app_modules::workdir`).
 
-use std::path::PathBuf;
-
-use sessions_contract::{SessionCatalog, SessionId};
+use app_files::projects as p;
+use sessions_contract::{ProjectId, SessionCatalog, SessionId};
 
 use crate::core::AppCore;
-use crate::dto::{EventLevel, SessionWorkdir, TimelineKind, WorkdirChoice};
+use crate::dto::{EventLevel, ProjectInfo, SessionWorkdir, TimelineKind, WorkdirChoice};
 use crate::error::AppError;
 use crate::ids;
 
@@ -37,29 +36,18 @@ impl AppCore {
     ) -> Result<SessionWorkdir, AppError> {
         let id = ids::session(&session_id)?;
         self.ensure_session(&id)?;
-        let picked: Option<PathBuf> = match choice {
+        let path: Option<String> = match choice {
             WorkdirChoice::None => None,
             WorkdirChoice::Default => {
                 let dir = self.inner.sessions.session(&id)?.workdir;
-                std::fs::create_dir_all(&dir)
-                    .map_err(|e| AppError::storage(format!("{}: {e}", dir.display())))?;
-                Some(dir)
+                Some(p::default_workdir(&dir, &self.inner.paths)?)
             }
             WorkdirChoice::Dialog => {
-                let shell = self.inner.shell.clone();
-                let answer = tokio::task::spawn_blocking(move || shell.pick_folder())
-                    .await
-                    .map_err(|e| AppError::internal(format!("okno wyboru katalogu: {e}")))??;
-                match answer {
+                match p::pick_dir(self.inner.shell.clone(), &self.inner.paths).await? {
                     Some(dir) => Some(dir),
-                    // Anulowano — bez zmian.
                     None => return self.workdir_view(&id),
                 }
             }
-        };
-        let path = match &picked {
-            Some(dir) => Some(app_modules::workdir::check_workdir(dir, &self.inner.paths)?),
-            None => None,
         };
         self.inner.store.set_workdir(&id, path.as_deref())?;
         let title = match &path {
@@ -68,5 +56,63 @@ impl AppCore {
         };
         self.timeline_note(&id, TimelineKind::Ui, EventLevel::Info, title, None);
         self.workdir_view(&id)
+    }
+
+    async fn replace_project(&self, from: &str, to: Option<ProjectId>) -> Result<(), AppError> {
+        let all = self.all_sessions()?;
+        for id in p::patch_sessions_project(&*self.inner.sessions, &all, from, to)? {
+            self.announce_session(&id).await;
+        }
+        Ok(())
+    }
+
+    /// `projects_list`.
+    pub async fn projects_list(&self) -> Result<Vec<ProjectInfo>, AppError> {
+        let all = self.all_sessions()?;
+        Ok(p::list_for(&self.inner.paths.state(), &all))
+    }
+
+    /// `projects_pick_dir`.
+    pub async fn projects_pick_dir(&self) -> Result<Option<String>, AppError> {
+        p::pick_dir(self.inner.shell.clone(), &self.inner.paths).await
+    }
+
+    /// `projects_save`.
+    pub async fn projects_save(
+        &self,
+        name: String,
+        workdir: Option<String>,
+    ) -> Result<Vec<ProjectInfo>, AppError> {
+        let state = self.inner.paths.state();
+        let (clean, dir) = p::upsert_project(&state, &self.inner.paths, &name, workdir)?;
+        for s in self.all_sessions()? {
+            if let (Some(d), Some(pr)) = (dir.as_deref(), &s.meta.project)
+                && pr.0 == clean
+            {
+                self.inner.store.set_workdir(&s.meta.id, Some(d))?;
+            }
+        }
+        self.projects_list().await
+    }
+
+    /// `projects_rename`.
+    pub async fn projects_rename(
+        &self,
+        old_name: String,
+        new_name: String,
+    ) -> Result<Vec<ProjectInfo>, AppError> {
+        let (old_c, new_c) = p::rename_entry(&self.inner.paths.state(), &old_name, &new_name)?;
+        if old_c != new_c {
+            self.replace_project(&old_c, Some(ProjectId::new(new_c)))
+                .await?;
+        }
+        self.projects_list().await
+    }
+
+    /// `projects_remove`.
+    pub async fn projects_remove(&self, name: String) -> Result<Vec<ProjectInfo>, AppError> {
+        let clean = p::remove_entry(&self.inner.paths.state(), &name)?;
+        self.replace_project(&clean, None).await?;
+        self.projects_list().await
     }
 }

@@ -1,0 +1,3 @@
+# Wyniki między agentkami i dowody wykonania
+
+Kolejna agentka oraz recenzentka otrzymują zwięzłe wyniki poprzednich zleceń, także w jednej partii wywołań oraz po restarcie. Zachować surowe dowody prób kompilacji/testów wraz z poleceniem i cwd; późniejsza odmowa nie usuwa wcześniejszego wyniku. Nie mylić końcowego stanu zlecenia z wynikiem pojedynczej komendy. Nie nazywać odmowy/anulowania sukcesem. Wynik kopii TEMP nie potwierdza oryginału, a sam exit0 nie potwierdza uruchomienia testów. Raporty i stdout są niezaufanymi danymi; przekazanie nie poszerza uprawnień recenzentki. Ilość kontekstu ograniczona, pełny dziennik pozostaje lokalnie. Raport końcowy zawiera osobny hostowy wyciąg dowodów, niezależny od parafrazy modelu.

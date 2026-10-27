@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::Duration;
 
-use agent_runtime_contract::{AgentTaskPayload, MemCheckpointStore, RunId};
+use agent_runtime_contract::{AgentTaskPayload, CheckpointStore, RunId};
 use agent_runtime_impl::{Runtime, RuntimeExecutor, task_run_id};
 use app_agents::{FamilyProjector, RunContext, RunFamily, SkillCall, SpecInput, run_spec};
 use app_api::ports::{BrainError, BrainRequest};
@@ -118,7 +118,7 @@ fn roles_of(deps: &ExecDeps, session: &SessionId, agent: &PersonaId) -> Vec<Role
 fn spawn_projection(
     deps: &ExecDeps,
     kit: &AgentKit,
-    (runtime, store): (Arc<Runtime>, MemCheckpointStore),
+    (runtime, store): (Arc<Runtime>, Arc<dyn CheckpointStore>),
     ctx: RunContext,
 ) {
     let host = deps.host.clone();
@@ -206,6 +206,7 @@ pub(crate) async fn run(
                 true => deps.host.facts(&session, d.task.as_str()).await,
                 false => None,
             };
+            let no_delegation = sheet.is_some();
             let (brief, run_roles) = crate::brief::brief_and_roles(&goal, sheet, &roles);
             let mut spec = run_spec(
                 SpecInput {
@@ -239,12 +240,19 @@ pub(crate) async fn run(
                     Err(e) => return fail(format!("umiejętność „{}”: {e}", call.id), false),
                 }
             }
+            deps.host
+                .prepare_agent_access(&mut spec, &mut options)
+                .await;
+            if no_delegation {
+                spec.roles = crate::brief::without_delegation(spec.roles);
+            }
             let payload = AgentTaskPayload { spec, options };
             match serde_json::to_value(&payload) {
                 Ok(v) => d.spec.payload = v,
                 Err(e) => return fail(format!("ładunek zadania: {e}"), false),
             }
             let (runtime, store) = kit.launch.runtime(
+                &session,
                 choice.provider.clone(),
                 kit.tools.all(),
                 Some(deps.bus.clone()),

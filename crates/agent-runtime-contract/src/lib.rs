@@ -16,6 +16,8 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod checkpoint;
+mod continuation;
+pub use continuation::ContinuationPolicy;
 mod event;
 mod grant;
 mod options;

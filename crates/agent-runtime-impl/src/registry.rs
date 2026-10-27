@@ -21,6 +21,7 @@ pub(crate) struct ToolRegistry {
     /// Koperta przebiegu: narzędzia z `spec.tools` w kopercie v1 — przed filtrem ról agentki
     /// (sufit dla delegacji i Krytyczki: potomek ≤ rodzic).
     envelope: Vec<Arc<dyn Tool>>,
+    catalog: crate::catalog::Catalog,
 }
 
 /// Czy koperta (jeśli jest) dopuszcza narzędzie.
@@ -107,6 +108,8 @@ impl ToolRegistry {
                 reg.order.push(DELEGATE_TOOL.to_owned());
             }
         }
+        reg.catalog =
+            crate::catalog::Catalog::new(reg.order.iter().filter_map(|n| reg.manifest(n)));
         Ok(reg)
     }
 
@@ -142,12 +145,22 @@ impl ToolRegistry {
     }
 
     /// Definicje dla modelu; w fazie weryfikacji tylko narzędzia niezmieniające stanu.
-    pub(crate) fn specs(&self, read_only: bool) -> Vec<ToolSpec> {
-        self.order
+    pub(crate) fn specs(
+        &self,
+        read_only: bool,
+        goal: &str,
+        discovered: &[String],
+    ) -> Vec<ToolSpec> {
+        let available: Vec<_> = self
+            .order
             .iter()
             .filter_map(|n| self.manifest(n))
             .filter(|m| !read_only || !m.mutating)
-            .map(ToolManifest::to_spec)
-            .collect()
+            .collect();
+        crate::catalog::select_specs(available, &self.catalog, goal, discovered, read_only)
+    }
+    pub(crate) fn find(&self, query: &str, read_only: bool) -> Vec<String> {
+        self.catalog
+            .rank(query, read_only, crate::catalog::SEARCH_LIMIT)
     }
 }

@@ -213,6 +213,19 @@ impl AgentTools {
             .collect()
     }
 
+    /// Pakiet startowy po filtrze ról, wspólny z rejestrem runtime (estymacja trasy).
+    pub fn model_specs_for(&self, roles: &[Role], goal: &str) -> Vec<providers_contract::ToolSpec> {
+        let groups: Vec<_> = roles.iter().flat_map(|r| r.tools.clone()).collect();
+        let read_only = !roles.is_empty() && roles.iter().all(|r| r.read_only);
+        let manifests = self
+            .all()
+            .into_iter()
+            .map(|t| t.manifest().clone())
+            .filter(|m| m.allowed_for(&groups, read_only))
+            .collect::<Vec<_>>();
+        agent_runtime_impl::model_tool_specs(&manifests, goal)
+    }
+
     /// Cofa zapis zmiennej użytkownika przez `system_env_set` (krok `undo_id`); bez narzędzi
     /// Opis programów zainstalowanych na komputerze dla przebiegu agentki (z pamięci; pierwsze
     /// wykrycie rusza w tle). `None` — jeszcze nie wykryto albo narzędzi systemowych brak.

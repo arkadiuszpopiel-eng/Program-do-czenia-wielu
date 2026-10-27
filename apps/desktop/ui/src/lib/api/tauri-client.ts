@@ -7,7 +7,7 @@ import type { AlfaClient } from './client';
 import { toError } from './command-error';
 import { EventSequencer } from './event-sequencer';
 import { call } from './tauri-call';
-import { systemTauri } from './tauri-client-system';
+import { sessionsTauri, systemTauri } from './tauri-client-system';
 import * as hub from './tauri-client-hub';
 import type { AlfaEvent, EventFrame } from './types-system';
 import type { TerminalFrame, TerminalSession } from './types-work';
@@ -27,25 +27,7 @@ export class TauriAlfaClient implements AlfaClient {
     setActiveSession: (sessionId) => call('app_set_active_session', { sessionId }),
   };
 
-  readonly sessions: AlfaClient['sessions'] = {
-    list: () => call('sessions_list'),
-    create: (template) => call('sessions_create', { template }),
-    rename: (sessionId, title) => call('sessions_rename', { sessionId, title }),
-    setPinned: (sessionId, pinned) => call('sessions_set_pinned', { sessionId, pinned }),
-    setArchived: (sessionId, archived) => call('sessions_set_archived', { sessionId, archived }),
-    remove: (sessionId) => call('sessions_remove', { sessionId }),
-    undoRemove: (token) => call('sessions_undo_remove', { token }),
-    duplicateAsTemplate: (sessionId) => call('sessions_duplicate_as_template', { sessionId }),
-    exportSession: (sessionId) => call('sessions_export', { sessionId }),
-    search: (query) => call('sessions_search', { query }),
-    cards: (sessionIds) => call('sessions_cards', { sessionIds }),
-    markRead: (sessionId) => call('sessions_mark_read', { sessionId }),
-    getDraft: (sessionId) => call('sessions_get_draft', { sessionId }),
-    saveDraft: (sessionId, text) => call('sessions_save_draft', { sessionId, text }),
-    setProject: (sessionId, project) => call('sessions_set_project', { sessionId, project }),
-    workdir: (sessionId) => call('sessions_workdir', { sessionId }),
-    chooseWorkdir: (sessionId, choice) => call('sessions_choose_workdir', { sessionId, choice }),
-  };
+  readonly sessions: AlfaClient['sessions'] = sessionsTauri();
 
   readonly turns: AlfaClient['turns'] = {
     list: (sessionId) => call('turns_list', { sessionId }),

@@ -151,3 +151,5 @@ mod tests {
         assert_eq!(files_pl(0), "0 plików");
     }
 }
+
+mod serde_posts;

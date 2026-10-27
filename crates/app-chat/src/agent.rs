@@ -6,194 +6,22 @@
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
-use std::sync::atomic::Ordering;
 use std::time::Instant;
 
 use agent_runtime_contract::{RunEvent, RunOutcome, UsageTotals};
-use app_agents::{
-    FamilyProjector, Projection, RunContext, RunHandle, RunProjector, SpecInput, final_text,
-    run_spec,
-};
-use personas_contract::{Persona, PersonaId, Role};
+use app_agents::{FamilyProjector, RunContext, RunHandle, SpecInput, final_text, run_spec};
 use providers_contract::Usage;
-use sessions_contract::{SessionCatalog, SessionId};
 
-use app_api::dto::{AgentRun, AlfaEvent, TurnError, TurnErrorCode};
-use app_api::ids::{self, UndoKind};
+use app_api::dto::{AlfaEvent, TurnError, TurnErrorCode};
+use app_api::ids::{self};
 
 use crate::engine::{ChatEngine, GenHandle, RunCtl};
 use crate::generate::GenRequest;
 use crate::outcome::{Chosen, Outcome, provider_error};
 use crate::project::render_closed;
 
-/// Agentka z narzędziami w sesji.
-pub(crate) struct AgentSetup {
-    workdir: String,
-    persona: Persona,
-    roles: Vec<Role>,
-}
+use crate::agent_setup::{AgentSetup, failed};
 
-impl ChatEngine {
-    /// Role agentki w obsadzie sesji.
-    fn cast_roles(&self, session: &SessionId, who: &PersonaId) -> Vec<Role> {
-        let ids = self.inner.personas.cast(session).roles_of(who);
-        self.inner
-            .personas
-            .roles()
-            .into_iter()
-            .filter(|r| ids.contains(&r.id))
-            .collect()
-    }
-
-    /// Przebieg agentki zamiast czatu, gdy sesja ma katalog roboczy, a role agentki w obsadzie
-    /// dają narzędzia (rola bez narzędzi albo sesja z jawnie wyłączonym katalogiem — zwykła
-    /// odpowiedź).
-    pub(crate) fn agent_setup(&self, session: &SessionId, agent: &str) -> Option<AgentSetup> {
-        let stack = self.inner.agents.as_ref()?;
-        let workdir = self.session_workdir(session)?;
-        let id = PersonaId::new(agent);
-        let persona = self
-            .inner
-            .personas
-            .personas()
-            .into_iter()
-            .find(|p| p.id == id)?;
-        let roles = self.cast_roles(session, &id);
-        if stack.tools.allowed_for(&roles).is_empty() {
-            return None;
-        }
-        Some(AgentSetup {
-            workdir,
-            persona,
-            roles,
-        })
-    }
-
-    /// Imiona innych agentek obsady, które działają na komputerze (role z poleceniami albo
-    /// sterowaniem GUI, np. Wykonawczyni) — dla agentki bez narzędzi (Dyrygentka): wie, komu
-    /// przekazać pracę, zamiast odpowiadać, że dostępu nie ma. Pusta lista, gdy narzędzia są
-    /// niepodłączone albo katalog wyłączony.
-    pub(crate) fn crew_with_tools(&self, session: &SessionId, agent: &str) -> Vec<String> {
-        let Some(stack) = self.inner.agents.as_ref() else {
-            return Vec::new();
-        };
-        if self.session_workdir(session).is_none() {
-            return Vec::new();
-        }
-        let id = PersonaId::new(agent);
-        let personas = self.inner.personas.personas();
-        self.inner
-            .personas
-            .cast(session)
-            .personas()
-            .into_iter()
-            .filter(|p| *p != id)
-            .filter(|p| {
-                let roles = self.cast_roles(session, p);
-                let computer = roles
-                    .iter()
-                    .any(|r| r.tools.iter().any(|g| g == "shell" || g == "gui.control"));
-                computer && !stack.tools.allowed_for(&roles).is_empty()
-            })
-            .filter_map(|p| personas.iter().find(|x| x.id == p).map(|x| x.name.clone()))
-            .collect()
-    }
-
-    /// Katalog roboczy sesji; gdy nigdy go nie wybrano — katalog sesji (jak „Domyślny” w oknie
-    /// rozmowy), żeby agentki nie traciły narzędzi po cichu. Jawne „bez katalogu” — `None`.
-    fn session_workdir(&self, session: &SessionId) -> Option<String> {
-        match self.inner.store.workdir_choice(session).ok()? {
-            Some(choice) => choice,
-            None => {
-                let dir = self.inner.sessions.session(session).ok()?.workdir;
-                std::fs::create_dir_all(&dir).ok()?;
-                Some(dir.to_string_lossy().into_owned())
-            }
-        }
-    }
-
-    /// Stosuje projekcję: zdarzenia UI, tura na żywo, zapis Replay i Osi czasu, stan agentki.
-    fn apply_projection(
-        &self,
-        session: &SessionId,
-        handle: &GenHandle,
-        ctl: &RunCtl,
-        projector: &RunProjector,
-        p: Projection,
-    ) {
-        if let Ok(mut live) = handle.live.lock() {
-            live.tools = projector.tool_steps().to_vec();
-            live.approval = projector.approval().cloned();
-        }
-        let store = &self.inner.store;
-        let run_id = projector.run().id.clone();
-        for step in &p.steps {
-            if let Err(e) = store.push_step(session, &run_id, step) {
-                tracing::warn!(error = %e, "zapis kroku przebiegu nie powiódł się");
-            }
-            // Kroki cofane poza dziennikiem (schowek, zmienne) należą do sesji przebiegu.
-            if let Some(Ok((_, kind @ (UndoKind::Clipboard | UndoKind::System), id))) =
-                step.undo_token.as_deref().map(ids::parse_any_undo)
-            {
-                self.rt()
-                    .owned_undo
-                    .entry(session.clone())
-                    .or_default()
-                    .insert((kind, id));
-            }
-        }
-        if p.run_changed
-            && let Err(e) = store.push_run(session, projector.run())
-        {
-            tracing::warn!(error = %e, "zapis przebiegu nie powiódł się");
-        }
-        self.inner.events.emit_all(p.events);
-        for event in p.timeline {
-            if let Err(e) = store.push_timeline(session, &event) {
-                tracing::warn!(error = %e, "zapis osi czasu nie powiódł się");
-            }
-            self.emit(AlfaEvent::TimelineAppended { event });
-        }
-        let waiting = projector.waiting();
-        if ctl.waiting.swap(waiting, Ordering::SeqCst) != waiting {
-            self.announce_agents(session);
-        }
-    }
-
-    /// Projekcja przebiegu zadania (wykonawczyni zadań): kroki i nagłówek do Replay, zdarzenia
-    /// UI, Oś czasu.
-    pub fn project_task(&self, session: &SessionId, run: &AgentRun, p: Projection) {
-        let store = &self.inner.store;
-        for step in &p.steps {
-            if let Err(e) = store.push_step(session, &run.id, step) {
-                tracing::warn!(error = %e, "zapis kroku zadania nie powiódł się");
-            }
-        }
-        if p.run_changed
-            && let Err(e) = store.push_run(session, run)
-        {
-            tracing::warn!(error = %e, "zapis przebiegu zadania nie powiódł się");
-        }
-        self.inner.events.emit_all(p.events);
-        for event in p.timeline {
-            if let Err(e) = store.push_timeline(session, &event) {
-                tracing::warn!(error = %e, "zapis osi czasu nie powiódł się");
-            }
-            self.emit(AlfaEvent::TimelineAppended { event });
-        }
-    }
-}
-
-fn failed(message: String) -> Outcome {
-    Outcome::failed(TurnError {
-        code: TurnErrorCode::Provider,
-        message,
-        retry_at: None,
-        provider: None,
-    })
-}
-
-/// Przebieg agentki jako odpowiedź na turę.
 pub(crate) async fn run(
     core: &ChatEngine,
     req: &GenRequest,
@@ -210,6 +38,29 @@ pub(crate) async fn run(
     };
     let mut history = request.messages.clone();
     let goal = history.pop().map(|m| m.visible_text()).unwrap_or_default();
+    let history = match crate::project_context::history(core, &req.session, &setup.workdir, history)
+    {
+        Ok(history) => history,
+        Err(error) => return Outcome::failed(error),
+    };
+    let models_before = if crate::conductor_state::billed(core, req) {
+        setup
+            .recovery
+            .as_ref()
+            .map(|cp| cp.model_usage.clone())
+            .unwrap_or_default()
+    } else {
+        Default::default()
+    };
+    let billed_before = if crate::conductor_state::billed(core, req) {
+        setup
+            .recovery
+            .as_ref()
+            .map(crate::conductor_state::total)
+            .unwrap_or_default()
+    } else {
+        Default::default()
+    };
     let settings = core.agent_settings().await;
     let rate = u64::from(core.inner.costs.current_rate().rate_e4);
     let window = core.inner.broker.approval_window();
@@ -233,16 +84,45 @@ pub(crate) async fn run(
     );
     let approval_timeout_ms = spec.approval_timeout_ms;
     // v1: obsada sesji → delegacja (`delegate_task`) i Krytyczka jako podprzebiegi w Replay.
-    let options = stack.launch.options(&req.session, None);
-    let started_run = RunHandle::launch(
-        &stack.launch,
-        choice.provider.clone(),
-        &stack.tools,
-        Some(core.inner.bus.clone()),
-        spec,
-        options,
-    )
-    .await;
+    let mut options = stack.launch.options(&req.session, None);
+    options.owner_turn = Some(ids::turn_dto(&req.session, handle.turn));
+    core.apply_crew_access(&req.session, &mut options).await;
+    let started_run = if let Some(mut cp) = setup.recovery {
+        let budget = crate::resume::next_budget(settings.budget(rate), &cp);
+        cp.options.crew = options.crew.clone();
+        cp.options.owner_turn = options.owner_turn.clone();
+        cp.spec.roles = core
+            .agent_access(
+                &req.session,
+                cp.spec.agent.as_str(),
+                core.cast_roles(
+                    &req.session,
+                    &personas_contract::PersonaId::new(cp.spec.agent.as_str()),
+                ),
+            )
+            .await;
+        cp.options.continuation = options.continuation.clone();
+        cp.options.request_privacy = options.request_privacy;
+        RunHandle::resume_saved(
+            &stack.launch,
+            choice.provider.clone(),
+            &stack.tools,
+            Some(core.inner.bus.clone()),
+            cp,
+            budget,
+        )
+        .await
+    } else {
+        RunHandle::launch(
+            &stack.launch,
+            choice.provider.clone(),
+            &stack.tools,
+            Some(core.inner.bus.clone()),
+            spec,
+            options,
+        )
+        .await
+    };
     let (run, mut family) = match started_run {
         Ok(x) => x,
         Err(e) => return failed(format!("Nie udało się uruchomić zadania agentki: {e}")),
@@ -289,10 +169,6 @@ pub(crate) async fn run(
     let mut by_model = std::collections::BTreeMap::<String, (u64, u64, Option<u64>)>::new();
     while let Some(env) = family.next().await {
         let (head, projection, main) = family_view.apply(&family, &env);
-        if !main {
-            core.project_task(&req.session, &head, projection);
-            continue;
-        }
         match &env.event {
             RunEvent::Usage(u) => totals = *u,
             // Tura bez zużycia (błąd przed treścią, anulowanie) nie robi pustego wpisu kosztu.
@@ -311,7 +187,28 @@ pub(crate) async fn run(
             }
             _ => {}
         }
-        core.apply_projection(&req.session, handle, &ctl, family_view.main(), projection);
+        if !main {
+            let next_agent = if head.finished_at.is_none() {
+                &head.agent
+            } else {
+                &req.agent
+            };
+            if let Some(r) = core.rt().runs.get_mut(&req.session) {
+                next_agent.clone_into(&mut r.agent);
+            }
+            core.announce_agents(&req.session);
+            core.project_task(&req.session, &head, projection);
+            continue;
+        }
+        let steps = family_view.main().tool_steps();
+        core.apply_projection_with_tools(
+            &req.session,
+            handle,
+            &ctl,
+            family_view.main(),
+            projection,
+            steps,
+        );
     }
     let projector = family_view.main();
     linker.abort();
@@ -330,6 +227,22 @@ pub(crate) async fn run(
         .cloned()
         .unwrap_or(RunOutcome::Cancelled);
     let mut fin = final_text(&outcome);
+    if matches!(
+        outcome,
+        RunOutcome::BudgetExceeded {
+            budget: agent_runtime_contract::BudgetKind::Steps
+                | agent_runtime_contract::BudgetKind::Wall
+                | agent_runtime_contract::BudgetKind::Tokens
+                | agent_runtime_contract::BudgetKind::ApprovalWait
+        }
+    ) && core
+        .inner
+        .store
+        .work_for_turn(&req.session, &ids::turn_dto(&req.session, handle.turn))
+        .is_ok_and(|v| !v.is_empty())
+    {
+        fin.error=Some(TurnError{code:TurnErrorCode::TaskPaused,message:"Osiągnięto miękki limit zadania. Postęp i wyniki operacji są zapisane lokalnie. Zatwierdź kolejną pulę, aby wznowić pracę od zapisanego miejsca.".into(),retry_at:None,provider:None});
+    }
     // Błąd dostawcy przerywający przebieg — ten sam komunikat i stan co w zwykłej rozmowie
     // (limit zapytań z „ponów o…”, brak sieci → kolejka offline, odrzucony klucz).
     if let RunOutcome::Failed {
@@ -342,6 +255,19 @@ pub(crate) async fn run(
         let target = model.as_deref().and_then(|m| core.inner.brain.target(m));
         let name = target.map_or_else(|| choice.provider_name.clone(), |t| t.provider_name);
         fin.error = Some(provider_error(e, &name));
+    }
+    // Twarda odmowa kroku kończy przebieg bez odpowiedzi modelu — powód mówi host, nie pusta tura.
+    if matches!(outcome, RunOutcome::Refused) && fin.text.is_empty() {
+        let blocked = projector
+            .tool_steps()
+            .last()
+            .filter(|s| s.status == app_api::dto::ToolStatus::Error);
+        if let Some(step) = blocked {
+            fin.text = format!(
+                "Zatrzymałam zadanie: krok „{}” został zablokowany (odmowa Brokera, Jądra albo brak zgody). Powód jest w krokach zadania; nie próbuję obejść tej blokady.",
+                step.label
+            );
+        }
     }
     if !fin.text.is_empty() {
         let blocks = render_closed(&fin.text);
@@ -360,6 +286,18 @@ pub(crate) async fn run(
             offset: 0,
         });
     }
+    if let Some(value) = core
+        .inner
+        .store
+        .work(&req.session, run.id().as_str())
+        .ok()
+        .flatten()
+        && let Ok(cp) = serde_json::from_value::<agent_runtime_contract::Checkpoint>(value)
+    {
+        totals = crate::conductor_state::total(&cp);
+        by_model = crate::conductor_state::parts_delta(cp.model_usage, &models_before);
+    }
+    totals = crate::conductor_state::delta(totals, billed_before);
     let tokens = totals.input_tokens + totals.output_tokens;
     let parts = crate::routing::cost_parts(core.inner.brain.as_ref(), by_model);
     Outcome {

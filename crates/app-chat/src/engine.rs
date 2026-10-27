@@ -160,6 +160,7 @@ pub struct ChatEngine {
 impl ChatEngine {
     /// Silnik nad złożonymi modułami (rdzeń wiąże się później: `bind_host`).
     pub fn new(deps: ChatDeps) -> Self {
+        crate::checkpoints::bind(&deps);
         Self {
             inner: Arc::new(Engine {
                 deps,

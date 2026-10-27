@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 
 use agent_runtime_contract::{RunEvent, RunOutcome, StepKind, StepStatus};
 use futures_util::StreamExt;
-use providers_contract::{ChatRequest, ContentBlock, Role, StopReason, ToolUse, TurnAccumulator};
+use providers_contract::{ChatRequest, ContentBlock, Role, StopReason, TurnAccumulator};
 
 use crate::engine::{Engine, Next};
 use crate::prompt::{VERIFY_PROMPT, skipped, summary, system_prompt_for, verdict};
@@ -13,19 +13,48 @@ use crate::prompt::{VERIFY_PROMPT, skipped, summary, system_prompt_for, verdict}
 impl Engine {
     fn request(&self) -> ChatRequest {
         let spec = &self.cp.spec;
-        let mut req = ChatRequest::new(spec.model.clone(), self.cp.messages.clone())
+        let (messages, shortened) = if self.registry.names().is_empty() {
+            (self.cp.messages.clone(), false)
+        } else {
+            crate::context::view(&self.cp.messages)
+        };
+        let mut req = ChatRequest::new(spec.model.clone(), messages)
             .with_system(system_prompt_for(spec, self.cp.verifying));
-        req.tools = self.registry.specs(self.cp.verifying);
+        req.tools = self
+            .registry
+            .specs(self.cp.verifying, &spec.goal, &self.cp.discovered_tools);
+        if req.tools.iter().any(|t| t.name == crate::catalog::FIND) {
+            req.system
+                .get_or_insert_with(String::new)
+                .push_str(crate::catalog::QUICK_GUIDE);
+        }
+        if shortened {
+            if req.tools.len() >= crate::catalog::VISIBLE_LIMIT
+                && let Some(index) = req
+                    .tools
+                    .iter()
+                    .rposition(|t| t.name != crate::catalog::FIND && t.name != crate::catalog::CALL)
+            {
+                req.tools.remove(index);
+            }
+            req.tools.push(crate::context::spec());
+            req.system.get_or_insert_with(String::new).push_str("\nStarsze wyniki narzędzi mogą być skrócone; pełny lokalny zapis odczytaj przez task_recall. Zachowaj wszystkie instrukcje właściciela.");
+        }
         req.params.max_tokens = self.shared.config.max_output_tokens;
         // Weryfikacja z temperaturą modelu — stały format odpowiedzi kontrolnej.
         req.params.temperature = spec.temperature.filter(|_| !self.cp.verifying);
         req.meta.session = Some(spec.session.as_str().to_owned());
+        req.meta.privacy.tag = self.cp.options.request_privacy;
         // Trudność oceniana z celu przebiegu, nie z ostatniej wiadomości (wyniki narzędzi).
         let mut hint = self.cp.route.clone();
         if !hint.review && hint.difficulty.is_none() && hint.task.is_none() {
             hint.set_task(&spec.goal);
         }
         req.meta.route = hint;
+        if req.meta.route.escalate_from.is_some() && self.shared.provider.id().as_str() == "router"
+        {
+            req.model = "auto".into();
+        }
         req
     }
 
@@ -71,7 +100,19 @@ impl Engine {
         let mut stream = provider.stream(self.request(), self.handle.cancel.child_token());
         let mut acc = TurnAccumulator::new(provider.id().clone());
         let mut invalid = BTreeMap::new();
-        while let Some(ev) = stream.next().await {
+        let mut time_limited = false;
+        loop {
+            let remaining = self
+                .cp
+                .spec
+                .budget
+                .max_wall_ms
+                .saturating_sub(self.elapsed_ms())
+                .max(1);
+            let next = tokio::select! {next=stream.next()=>next,()=tokio::time::sleep(std::time::Duration::from_millis(remaining))=>{if self.auto_extend().await {continue;}time_limited=true;break;}};
+            let Some(ev) = next else {
+                break;
+            };
             crate::invalid::note(&ev, &mut invalid);
             acc.push(&ev);
         }
@@ -88,6 +129,14 @@ impl Engine {
             .or_else(|| provider.cost(&self.cp.spec.model, &turn.usage));
         let nano = cost.map_or(0, |c| c.nano_usd);
         self.cp.usage.cost_nano_usd = self.cp.usage.cost_nano_usd.saturating_add(nano);
+        if let Some(model) = turn.model.as_ref() {
+            let p = self.cp.model_usage.entry(model.clone()).or_default();
+            p.0 = p.0.saturating_add(turn.usage.total_input());
+            p.1 = p.1.saturating_add(turn.usage.output_tokens);
+            if let Some(c) = cost {
+                p.2 = Some(p.2.unwrap_or(0).saturating_add(c.nano_usd));
+            }
+        }
         self.handle
             .emit(RunEvent::ModelUsage {
                 model: turn.model.clone(),
@@ -110,6 +159,26 @@ impl Engine {
             intent: None,
             approval: None,
         };
+        if time_limited {
+            let text = turn.message.visible_text();
+            if !text.is_empty() {
+                self.push(Role::Assistant, vec![ContentBlock::text(text)]);
+            }
+            self.handle
+                .emit(finished(
+                    StepStatus::Failed,
+                    "Limit czasu aktywnego; częściowy wynik zapisany lokalnie.".into(),
+                ))
+                .await;
+            self.handle
+                .emit(RunEvent::BudgetExceeded {
+                    budget: agent_runtime_contract::BudgetKind::Wall,
+                })
+                .await;
+            return Next::Finish(RunOutcome::BudgetExceeded {
+                budget: agent_runtime_contract::BudgetKind::Wall,
+            });
+        }
         if self.handle.cancel.is_cancelled() || turn.stop == Some(StopReason::Cancelled) {
             self.handle
                 .emit(finished(StepStatus::Cancelled, String::new()))
@@ -154,7 +223,8 @@ impl Engine {
             self.cp.answer_model = Some(model);
         }
         let text = turn.message.visible_text();
-        let uses: Vec<ToolUse> = turn.message.tool_uses().cloned().collect();
+        self.invalid_args = invalid;
+        let uses = self.normalize_calls(turn.message.tool_uses().cloned().collect());
         if !turn.message.content.is_empty() {
             self.cp.messages.push(turn.message.clone());
         }
@@ -191,7 +261,6 @@ impl Engine {
         if uses.is_empty() {
             return self.final_answer(text).await;
         }
-        self.invalid_args = invalid;
         self.run_tools(uses).await
     }
 

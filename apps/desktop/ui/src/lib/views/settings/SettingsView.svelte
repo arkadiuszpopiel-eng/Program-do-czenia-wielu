@@ -45,6 +45,7 @@
   import AboutPage from './pages/AboutPage.svelte';
   import VoicePage from './pages/VoicePage.svelte';
   import Lazy from '../../components/shell/Lazy.svelte';
+  import AgentAccessPage from './pages/AgentAccessPage.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -92,7 +93,7 @@
   const rest = $derived(
     !page || page.custom === 'cameras'
       ? []
-      : page.settings.filter((def) => page.custom !== 'voice' || !isSpeechTuning(def)),
+      : page.settings.filter((def) => (page.custom !== 'voice' || !isSpeechTuning(def)) && !/^agents\.(alfa|beta|gama|delta)\./.test(def.key)),
   );
 
   function open(id: string) {
@@ -138,6 +139,7 @@
             </ul>
           </EmptyState>
         {:else}
+          {#if page.id === 'agents'}<AgentAccessPage />{/if}
           {#if page.custom === 'connections'}<ConnectionsPage />
           {:else if page.custom === 'providers'}<ProvidersPage />
           {:else if page.custom === 'api'}<ApiPage />
@@ -190,6 +192,7 @@
 <style>
   .settings {
     display: flex;
+    flex-direction: row-reverse;
     height: 100%;
     min-height: 0;
   }

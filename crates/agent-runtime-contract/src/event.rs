@@ -172,6 +172,11 @@ pub enum RunEvent {
     },
     /// Pauza w punkcie atomowym.
     Paused,
+    /// Zakończenie oczekiwania na zgodę (nie oznacza jej udzielenia).
+    ApprovalResolved {
+        /// Rozstrzygnięta prośba.
+        approval: ApprovalId,
+    },
     /// Wznowienie.
     Resumed,
     /// Checkpoint zapisany.
@@ -249,6 +254,7 @@ impl RunEvent {
             Self::LoopDetected { .. } => "agent.run.loop_detected",
             Self::Verified { .. } => "agent.run.verified",
             Self::Finished { .. } => "agent.run.finished",
+            Self::ApprovalResolved { .. } => "agent.approval.resolved",
         }
     }
 }
@@ -333,6 +339,7 @@ impl RunStatus {
                 approval: *approval,
             },
             RunEvent::StepFinished { step, .. } => Self::Running { step: *step },
+            RunEvent::ApprovalResolved { .. } => Self::Running { step },
             RunEvent::Paused => Self::Paused { step },
             RunEvent::Resumed => Self::Running { step },
             RunEvent::Finished { outcome } => Self::Finished {

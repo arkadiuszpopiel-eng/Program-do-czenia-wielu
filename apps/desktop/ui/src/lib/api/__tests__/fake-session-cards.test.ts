@@ -35,3 +35,36 @@ describe('atrapa: karty rozmów (sessions.cards)', () => {
     expect(card?.agents).toEqual(['alfa']);
   });
 });
+
+describe('atrapa: projekty i katalogi projektów (sessions.projects*)', () => {
+  it('dodaje projekt ze wskazaniem katalogu, ustawia katalog rozmowy, zmienia nazwę i usuwa', async () => {
+    const fake = client();
+    const initial = await fake.sessions.projectsList();
+    expect(initial.map((p) => p.name)).toEqual(['Projekt X', 'Sklep']);
+
+    const picked = await fake.sessions.projectsPickDir();
+    expect(picked).toBe('C:\\Users\\Ty\\Dokumenty\\Projekt');
+
+    const afterSave = await fake.sessions.projectsSave('', picked);
+    const added = afterSave.find((p) => p.name === 'Projekt');
+    expect(added).toEqual({
+      name: 'Projekt',
+      workdir: 'C:\\Users\\Ty\\Dokumenty\\Projekt',
+      session_count: 0,
+    });
+
+    await fake.sessions.setProject('s-trip', 'Projekt');
+    const workdir = await fake.sessions.workdir('s-trip');
+    expect(workdir.path).toBe('C:\\Users\\Ty\\Dokumenty\\Projekt');
+
+    const afterRename = await fake.sessions.projectsRename('Projekt', 'Projekt Alfa');
+    expect(afterRename.find((p) => p.name === 'Projekt Alfa')?.session_count).toBe(1);
+    const sessions = await fake.sessions.list();
+    expect(sessions.find((s) => s.id === 's-trip')?.project?.name).toBe('Projekt Alfa');
+
+    const afterRemove = await fake.sessions.projectsRemove('Projekt Alfa');
+    expect(afterRemove.find((p) => p.name === 'Projekt Alfa')).toBeUndefined();
+    const afterSessions = await fake.sessions.list();
+    expect(afterSessions.find((s) => s.id === 's-trip')?.project).toBeNull();
+  });
+});

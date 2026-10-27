@@ -7,17 +7,14 @@ use std::sync::atomic::AtomicBool;
 
 use camera_hub_contract::CameraHub;
 use camera_hub_impl::{CameraHubService, HubConfig};
-use core_config_contract::{ConfigKey, ConfigStore, Scope};
-use core_config_impl::FileConfigStore;
-use futures_util::StreamExt;
 
 use super::Kernel;
 use crate::dto::{AlfaEvent, SettingScope};
 use crate::events::EventHub;
 use crate::options::AppOptions;
 
-use app_modules::cameras::ConfigCameraStore;
 pub(crate) use app_modules::cameras::MASTER_KEY;
+use app_modules::cameras::{ConfigCameraStore, spawn_master_watch};
 
 /// Hub kamer w rdzeniu.
 pub(crate) struct Cameras {
@@ -33,27 +30,6 @@ fn spawn_events(hub: &Arc<dyn CameraHub>, events: EventHub) {
         while changes.changed().await.is_ok() {
             let state = app_modules::cameras::cameras_dto(&changes.borrow_and_update());
             events.emit(AlfaEvent::CamerasChanged { state });
-        }
-    });
-}
-
-/// Zmiana `camera.enabled` spoza huba (strona Ustawień, reset, import) → przełącznik główny.
-fn spawn_master_watch(hub: &Arc<dyn CameraHub>, config: Arc<FileConfigStore>) {
-    let hub = Arc::downgrade(hub);
-    tokio::spawn(async move {
-        let Ok(key) = ConfigKey::new(MASTER_KEY) else {
-            return;
-        };
-        let mut changes = config.watch(MASTER_KEY);
-        while changes.next().await.is_some() {
-            let Some(hub) = hub.upgrade() else {
-                break;
-            };
-            let value = config.get(&key, &Scope::Global).await.ok().flatten();
-            let enabled = value.and_then(|v| v.as_bool()).unwrap_or(false);
-            if let Err(e) = hub.set_master(enabled).await {
-                tracing::warn!(error = %e, "przełącznik kamer z ustawień nie został zastosowany");
-            }
         }
     });
 }

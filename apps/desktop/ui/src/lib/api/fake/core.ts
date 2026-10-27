@@ -22,6 +22,7 @@ import {
   seedTimeline,
 } from './fixtures';
 import { FakeRuns } from './api-agents';
+import { FakePipelines } from './api-pipelines';
 import { realScheduler, type Scheduler } from './scheduler';
 import { defaultValues } from './settings-schema';
 
@@ -38,6 +39,7 @@ export type FakeScenario =
   | 'send-error'
   /** Model lokalny pobrany, ale bez silnika `llama-server` — błąd tury z drogą do „Modele lokalne i silniki”. */
   | 'no-engine'
+  | 'task-paused'
   /** Broker: tryb przenośny, zerwanie łącza, kill-switch bez watchdoga, Broker w procesie. */
   | 'broker-portable'
   | 'broker-lost'
@@ -72,6 +74,7 @@ export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'disk-low',
   'send-error',
   'no-engine',
+  'task-paused',
   'broker-portable',
   'broker-lost',
   'broker-no-watchdog',
@@ -150,6 +153,10 @@ export class FakeCore {
   voice = { active: false, muted: false, mode: 'toggle' as 'toggle' | 'ptt' };
   /** Załączniki przygotowane w composerach (per sesja; `api-files.ts`). */
   readonly staged = new Map<string, AttachmentInfo[]>();
+  /** Zapisane katalogi robocze projektów (`projects.json`). */
+  readonly projectWorkdirs = new Map<string, string | null>();
+  /** Biblioteka pipeline'ów modeli (`api-pipelines.ts`). */
+  readonly pipelines = new FakePipelines();
 
   constructor(options: FakeOptions = {}) {
     this.scheduler = options.scheduler ?? realScheduler;
@@ -160,6 +167,10 @@ export class FakeCore {
     const now = this.scheduler.now();
     const empty = this.scenario === 'empty' || this.scenario === 'first-run';
     this.sessions = empty ? [] : seedSessions(now);
+    if (!empty) {
+      this.projectWorkdirs.set('Projekt X', 'C:\\Users\\Ty\\Dokumenty\\Projekt X');
+      this.projectWorkdirs.set('Sklep', 'C:\\Users\\Ty\\Dokumenty\\Sklep');
+    }
     this.timeline = empty ? [] : seedTimeline(now);
     this.artifacts = empty ? [] : seedArtifacts(now);
     const noKeys = this.scenario === 'no-keys' || this.scenario === 'first-run';

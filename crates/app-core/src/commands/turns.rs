@@ -337,21 +337,7 @@ impl AppCore {
         let id = ids::session(&session_id)?;
         let target = ids::parse_turn_in(&id, &turn_id)?;
         let _guard = self.lock_session(&id).await;
-        self.chat().finalize_generation(&id).await;
-        let turn = self.inner.sessions.turn(&id, target)?;
-        let agent = self.agent_of(&id, &turn);
-        self.chat()
-            .start_generation(GenRequest {
-                session: id,
-                placement: Placement::Child(target),
-                history_leaf: target,
-                agent,
-                profile: None,
-                continues: Some(target),
-                origin: risk_classifier_contract::CommandOrigin::UserText,
-                tap: None,
-            })
-            .await
+        self.chat().continue_saved(id, target).await
     }
 
     /// `turns_stop`: anulowanie ≤ 100 ms → `Stop { reason: cancelled }`.

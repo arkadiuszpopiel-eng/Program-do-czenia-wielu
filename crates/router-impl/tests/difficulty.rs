@@ -87,6 +87,19 @@ fn order(core: &RouterCore, class: TaskClass, r: &ChatRequest) -> Vec<String> {
     d.targets().map(|t| t.model.clone()).collect()
 }
 
+#[test]
+fn escalation_in_shared_queue_skips_failed_prefix_instead_of_repinning_it() {
+    let s = setup();
+    s.core.set_global_queues(BTreeMap::from([(
+        TaskClass::Conversation,
+        vec![c("openai", LUNA), c("anthropic", OPUS), c("openai", SOL)],
+    )]));
+    let mut req = ask("Zadanie wymaga mocniejszego modelu");
+    req.model = format!("openai:{LUNA}");
+    req.meta.route.escalate_from = Some(format!("openai:{LUNA}"));
+    assert_eq!(order(&s.core, TaskClass::Conversation, &req), [OPUS, SOL]);
+}
+
 const EASY: &str = "Która jest godzina?";
 const HARD: &str = "Zaprojektuj architekturę usługi kolejkowej: najpierw opisz wymagania, \
                     następnie model danych, a potem plan wdrożenia. Uzasadnij wybory.";

@@ -12,7 +12,19 @@ use super::Spec;
 /// Specyfikacja komendy serii 6 (`None` — komenda spoza tej części).
 pub fn spec(command: &str) -> Option<Spec> {
     let s: Check = roundtrip::<String>;
+    let os: Check = roundtrip::<Option<String>>;
+    let projs: Check = roundtrip::<Vec<ProjectInfo>>;
+    let pipes: Check = roundtrip::<Vec<PipelineDef>>;
+    let pipe: Check = roundtrip::<PipelineDef>;
     Some(match command {
+        "pipelines_list" => (vec![], pipes),
+        "pipelines_save" => (vec![("pipeline", pipe), ("previousName", os)], pipes),
+        "pipelines_remove" => (vec![("name", s)], pipes),
+        "projects_list" => (vec![], projs),
+        "projects_pick_dir" => (vec![], os),
+        "projects_save" => (vec![("name", s), ("workdir", os)], projs),
+        "projects_rename" => (vec![("oldName", s), ("newName", s)], projs),
+        "projects_remove" => (vec![("name", s)], projs),
         "turns_arena_answer" => (vec![("sessionId", s), ("turnId", s), ("model", s)], s),
         "turns_select_branch" => (vec![("sessionId", s), ("turnId", s)], roundtrip::<()>),
         "sessions_cards" => (

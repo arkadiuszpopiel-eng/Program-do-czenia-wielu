@@ -34,6 +34,9 @@ pub struct Checkpoint {
     pub messages: Vec<Message>,
     /// Zużycie (kroki, tokeny, koszt, czas).
     pub usage: UsageTotals,
+    /// Cumulative actual routed model usage; retained across restart for account attribution.
+    #[serde(default)]
+    pub model_usage: BTreeMap<String, (u64, u64, Option<u64>)>,
     /// Sesja widziała niezaufaną treść.
     pub tainted: bool,
     /// Treść zaufana (cel, wiadomości właściciela) — małymi literami, z limitem.
@@ -42,6 +45,21 @@ pub struct Checkpoint {
     pub untrusted_text: String,
     /// Wywołania narzędzi zlecone, ale bez zapisanego wyniku (restart w trakcie).
     pub pending: Vec<ToolUse>,
+    /// Wersja dziennika operacji (0 w starszych zapisach).
+    #[serde(default)]
+    pub journal_version: u8,
+    /// Rozpoczęte operacje; brak wyniku oznacza stan wymagający sprawdzenia.
+    #[serde(default)]
+    pub started_pending: std::collections::BTreeSet<String>,
+    /// Wyniki utrwalone po każdej operacji, zanim zakończy się cała paczka.
+    #[serde(default)]
+    pub completed_pending: BTreeMap<String, providers_contract::ToolResult>,
+    /// Pre-execution failures which require a narrower call before retrying.
+    #[serde(default)]
+    pub failed_preflight: std::collections::BTreeSet<String>,
+    /// Denied operations cannot be retried through model escalation.
+    #[serde(default)]
+    pub denied_calls: std::collections::BTreeSet<String>,
     /// Odciski ostatnich wywołań (detektor pętli).
     pub recent_calls: Vec<String>,
     /// Faza weryfikacji.
@@ -69,6 +87,9 @@ pub struct Checkpoint {
     /// Model (`dostawca:model`), który napisał ostatnią odpowiedź przebiegu.
     #[serde(default)]
     pub answer_model: Option<String>,
+    /// Definicje odnalezione w katalogu, zachowane po wznowieniu przebiegu.
+    #[serde(default)]
+    pub discovered_tools: Vec<String>,
 }
 
 impl Checkpoint {
@@ -89,10 +110,16 @@ impl Checkpoint {
             spec,
             messages: Vec::new(),
             usage: UsageTotals::default(),
+            model_usage: BTreeMap::new(),
             tainted: taint_source.is_some(),
             trusted_text,
             untrusted_text,
             pending: Vec::new(),
+            journal_version: 1,
+            started_pending: Default::default(),
+            completed_pending: Default::default(),
+            failed_preflight: Default::default(),
+            denied_calls: Default::default(),
             recent_calls: Vec::new(),
             verifying: false,
             verify_rounds: 0,
@@ -104,6 +131,7 @@ impl Checkpoint {
             delegated: UsageTotals::default(),
             route: RouteHint::default(),
             answer_model: None,
+            discovered_tools: Vec::new(),
         }
     }
 }

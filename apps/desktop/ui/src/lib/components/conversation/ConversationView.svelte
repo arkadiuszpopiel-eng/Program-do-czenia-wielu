@@ -4,8 +4,8 @@
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import ChatComposer from './ChatComposer.svelte';
-  import VoiceLiveStrip from '../voice/VoiceLiveStrip.svelte';
-  import FindBar from './FindBar.svelte';
+  import { liveStripVisible } from '../../logic/voice-orb';
+  import Lazy from '../shell/Lazy.svelte';
   import MessageList from './MessageList.svelte';
   import StartState from './StartState.svelte';
   import SystemBanners from './SystemBanners.svelte';
@@ -26,12 +26,18 @@
   const elapsed = $derived(
     activity ? Math.max(0, Math.round((tick - new Date(activity.started_at).getTime()) / 1000)) : 0,
   );
+  // Pasek „rozmowa na żywo” — tylko gdy tor głosu pracuje; poza budżetem startowym okna.
+  const loadLive = () => import('../voice/VoiceLiveStrip.svelte');
+  const loadFind = () => import('./FindBar.svelte'); // tylko po Ctrl+F
 </script>
 
 <section class="conv" data-surface="app" aria-label={t('conv.label')}>
   <div class="top">
     <SystemBanners />
-    {#if app.findOpen && conv}<FindBar path={conv.path} bind:focusTurn />{/if}
+    {#if app.findOpen && conv}
+      <Lazy load={loadFind} label={t('common.loading')}
+        props={{ path: conv.path, onfocus: (id: string | null) => (focusTurn = id) }} />
+    {/if}
   </div>
   {#if conv && conv.loaded && conv.path.length > 0}
     {#key conv.sessionId}
@@ -66,7 +72,9 @@
         />
       </div>
     {/if}
-    <VoiceLiveStrip />
+    {#if liveStripVisible(app.micState)}
+      <Lazy load={loadLive} props={{}} label={t('common.loading')} />
+    {/if}
     <ChatComposer {conv} />
   </div>
 </section>

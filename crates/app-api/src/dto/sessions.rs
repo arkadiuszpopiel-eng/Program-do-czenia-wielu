@@ -14,6 +14,14 @@ pub struct ProjectRef {
     pub name: String,
 }
 
+/// Projekt z katalogiem roboczym i liczbą rozmów.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct ProjectInfo {
+    pub name: String,
+    pub workdir: Option<String>,
+    pub session_count: u64,
+}
+
 /// Pozycja listy sesji.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SessionSummary {
@@ -217,6 +225,7 @@ pub enum TurnErrorCode {
     Provider,
     ContextOverflow,
     BudgetBlocked,
+    TaskPaused,
 }
 
 /// Błąd tury.

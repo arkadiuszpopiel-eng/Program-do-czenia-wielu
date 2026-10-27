@@ -31,6 +31,27 @@ export interface ProjectRef {
   readonly name: string;
 }
 
+export interface ProjectInfo {
+  readonly name: string;
+  readonly workdir: string | null;
+  readonly session_count: number;
+}
+
+export interface PipelineStage {
+  readonly title: string;
+  readonly role: string;
+  readonly persona: string | null;
+  readonly model: string | null;
+  readonly goal: string;
+}
+
+export interface PipelineDef {
+  readonly name: string;
+  readonly description: string;
+  readonly stages: readonly PipelineStage[];
+  readonly builtin: boolean;
+}
+
 export interface SessionSummary {
   readonly id: string;
   readonly title: string;
@@ -139,7 +160,7 @@ export interface TurnUsage {
 }
 
 export type TurnErrorCode =
-  'offline' | 'rate_limited' | 'no_keys' | 'provider' | 'context_overflow' | 'budget_blocked';
+  'offline' | 'rate_limited' | 'no_keys' | 'provider' | 'context_overflow' | 'budget_blocked' | 'task_paused';
 
 export interface TurnError {
   readonly code: TurnErrorCode;

@@ -112,29 +112,7 @@ impl CommandAnalysis {
 
 /// Tokeny polecenia (małe litery; cudzysłowy grupują, znaki ucieczki `^` i `` ` `` usunięte).
 pub fn tokens(command: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut cur = String::new();
-    let mut quote: Option<char> = None;
-    for c in command.chars() {
-        match (c, quote) {
-            ('^' | '`', _) => {}
-            ('"' | '\'', None) => quote = Some(c),
-            (q, Some(open)) if q == open => quote = None,
-            (c, None)
-                if c.is_whitespace()
-                    || matches!(c, ';' | '&' | '|' | '(' | ')' | ',' | '{' | '}' | '<' | '>') =>
-            {
-                if !cur.is_empty() {
-                    out.push(std::mem::take(&mut cur));
-                }
-            }
-            (c, _) => cur.push(c),
-        }
-    }
-    if !cur.is_empty() {
-        out.push(cur);
-    }
-    out
+    crate::lex::scan(command).words
 }
 
 fn verb(t: &str) -> String {
@@ -213,9 +191,18 @@ fn opaque_delete_targets(command: &str, toks: &[String]) -> bool {
 /// Najgłębsze zagnieżdżenie analizowane (`powershell -Command "cmd /c \"…\""`), jak w Jądrze.
 const MAX_DEPTH: u8 = 3;
 
-/// Analizuje polecenie (z poleceniami zagnieżdżonymi w `powershell -Command` / `cmd /c`).
+/// Analizuje polecenie (z poleceniami zagnieżdżonymi w `powershell -Command` / `cmd /c`) bez
+/// wiedzy o powłoce — najostrzej: cytowany wzorzec po `-match` też może być ścieżką UNC.
 pub fn analyze(command: &str) -> CommandAnalysis {
-    analyze_at(command, 0)
+    analyze_at(command, 0, false)
+}
+
+/// Jak [`analyze`], ale dla polecenia wykonywanego przez PowerShell: cytowany literał po
+/// `-match`/`-replace` to wzorzec, nie host. W `cmd` `;` i `"…"` znaczą co innego
+/// (`type ; $x -match "\\host\share"` otwiera udział), dlatego polecenie zagnieżdżone
+/// korzysta z wyjątku tylko, gdy też uruchamia je PowerShell.
+pub fn analyze_powershell(command: &str) -> CommandAnalysis {
+    analyze_at(command, 0, true)
 }
 
 fn merge(a: &mut CommandAnalysis, b: CommandAnalysis) {
@@ -244,8 +231,9 @@ fn is_switch(t: &str) -> bool {
     })
 }
 
-fn analyze_at(command: &str, depth: u8) -> CommandAnalysis {
-    let toks = tokens(command);
+fn analyze_at(command: &str, depth: u8, regex_literals: bool) -> CommandAnalysis {
+    let parsed = crate::lex::scan(command);
+    let toks = &parsed.words;
     let verbs: Vec<String> = toks.iter().map(|t| verb(t)).collect();
     let lower = command.to_lowercase();
     let has = |w: &str| verbs.iter().any(|v| v == w);
@@ -258,7 +246,7 @@ fn analyze_at(command: &str, depth: u8) -> CommandAnalysis {
         interactive: INTERACTIVE.iter().any(|v| has(v)),
         ..CommandAnalysis::default()
     };
-    a.opaque_targets = a.deletes && opaque_delete_targets(command, &toks);
+    a.opaque_targets = a.deletes && opaque_delete_targets(command, toks);
     let net_verb = NETWORK_VERBS.iter().any(|v| {
         has(v)
             && match *v {
@@ -271,13 +259,14 @@ fn analyze_at(command: &str, depth: u8) -> CommandAnalysis {
             }
     });
     a.network = net_verb || NETWORK_MARKERS.iter().any(|m| lower.contains(m));
-    for t in &toks {
+    for (index, t) in toks.iter().enumerate() {
+        let regex_data = regex_literals && parsed.literal_regex(command, index);
         if let Some(h) = host_of_url(t) {
             a.network = true;
             push_unique(&mut a.hosts, h);
         } else if let Some(unc) = t
             .strip_prefix("\\\\")
-            .filter(|_| !t.starts_with("\\\\?\\") && !t.starts_with("\\\\.\\"))
+            .filter(|_| !regex_data && !t.starts_with("\\\\?\\") && !t.starts_with("\\\\.\\"))
         {
             if let Some(server) = unc.split(['\\', '/']).next().filter(|s| !s.is_empty()) {
                 a.network = true;
@@ -289,7 +278,8 @@ fn analyze_at(command: &str, depth: u8) -> CommandAnalysis {
             push_unique(&mut a.hosts, t.trim_end_matches('.').to_lowercase());
         }
         let path_like = t.trim_start_matches('@');
-        if (is_abs_path(path_like) || climbs_up(path_like))
+        if !regex_data
+            && (is_abs_path(path_like) || climbs_up(path_like))
             && host_of_url(t).is_none()
             && !is_switch(path_like)
         {
@@ -299,7 +289,7 @@ fn analyze_at(command: &str, depth: u8) -> CommandAnalysis {
             a.credential_path = true;
         }
     }
-    let fx = crate::effects::scan(command, &toks, verb);
+    let fx = crate::effects::scan(command, toks, verb);
     a.deletes |= fx.deletes;
     a.network |= fx.network;
     a.opaque_targets |= fx.opaque;
@@ -311,9 +301,12 @@ fn analyze_at(command: &str, depth: u8) -> CommandAnalysis {
             a.credential_path = true;
         }
     }
-    for inner in fx.inner {
+    for (inner, powershell) in fx.inner {
         if depth < MAX_DEPTH {
-            merge(&mut a, analyze_at(&inner, depth + 1));
+            merge(
+                &mut a,
+                analyze_at(&inner, depth + 1, regex_literals && powershell),
+            );
         } else {
             // Głębiej niż Jądro sprawdza — treść nieznana, najostrzej.
             a.deletes = true;

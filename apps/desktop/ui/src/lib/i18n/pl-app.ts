@@ -242,6 +242,7 @@ export const plApp = {
   'conv.error.provider': '{message}',
   'conv.error.context_overflow': 'Rozmowa przekroczyła okno kontekstu.',
   'conv.error.budget_blocked': 'Przekroczono limit kosztów.',
+  'conv.error.task_paused': 'Zadanie zapisane — oczekuje na zgodę na kontynuację.',
   'conv.retry': 'Ponów',
   'conv.otherModel': 'Inny model',
   'conv.openModels': 'Modele lokalne i silniki',

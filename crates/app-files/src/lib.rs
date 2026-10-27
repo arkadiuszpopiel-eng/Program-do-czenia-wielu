@@ -19,6 +19,7 @@ pub mod backup;
 pub mod canvas;
 pub mod docs;
 pub mod export;
+pub mod projects;
 pub mod teach;
 
 use std::path::PathBuf;

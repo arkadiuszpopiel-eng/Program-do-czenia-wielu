@@ -31,7 +31,7 @@ enum Partial {
 }
 
 /// Wynik złożenia tury.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AssistantTurn {
     /// Wiadomość asystentki (bloki w kolejności indeksów; myślenie z podpisem i pochodzeniem).
     pub message: Message,

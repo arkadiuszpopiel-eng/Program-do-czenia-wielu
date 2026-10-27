@@ -8,6 +8,7 @@
   import List from '@lucide/svelte/icons/list';
   import LayoutGrid from '@lucide/svelte/icons/layout-grid';
   import { load } from '../../state/attempt';
+  import { openPipelines, openProjects } from '../../state/board-dialog.svelte';
   import { useApp } from '../../state/context';
   import type { SessionGroup } from '../../state/sessions.svelte';
   import LoadFailed from './LoadFailed.svelte';
@@ -165,7 +166,17 @@
       {#each sessions.groups as group (group.id)}
         <section class="group" aria-labelledby="grp-{group.id}">
           <h3 class="group-title" id="grp-{group.id}">
-            {groupTitle(group.kind, group.project?.name)}
+            {#if group.kind === 'project' && group.project}
+              <button
+                type="button"
+                class="proj-btn"
+                onclick={() => openProjects({ projectName: group.project?.name ?? null })}
+              >
+                {groupTitle(group.kind, group.project.name)}
+              </button>
+            {:else}
+              {groupTitle(group.kind, group.project?.name)}
+            {/if}
           </h3>
           <ul class="list">
             {#each group.sessions as session (session.id)}
@@ -180,18 +191,38 @@
     {/if}
   </div>
   <div class="foot">
-    <button type="button" class="new" onclick={() => void app.newSession()}>
-      <Plus size={14} strokeWidth={1.5} aria-hidden="true" />
-      {t('sessions.new')}
-    </button>
-    <IconButton
-      label={t(sessions.showArchived ? 'sessions.hideArchived' : 'sessions.showArchived')}
-      size="sm"
-      pressed={sessions.showArchived}
-      onclick={() => (sessions.showArchived = !sessions.showArchived)}
-    >
-      <Archive size={14} strokeWidth={1.5} />
-    </IconButton>
+    <div class="foot-top">
+      <button type="button" class="new" onclick={() => void app.newSession()}>
+        <Plus size={14} strokeWidth={1.5} aria-hidden="true" />
+        {t('sessions.new')}
+      </button>
+      <IconButton
+        label={t(sessions.showArchived ? 'sessions.hideArchived' : 'sessions.showArchived')}
+        size="sm"
+        pressed={sessions.showArchived}
+        onclick={() => (sessions.showArchived = !sessions.showArchived)}
+      >
+        <Archive size={14} strokeWidth={1.5} />
+      </IconButton>
+    </div>
+    <div class="foot-grid">
+      <button
+        type="button"
+        class="proj"
+        data-testid="open-projects-btn"
+        onclick={() => openProjects()}
+      >
+        {t('sessions.addProject')}
+      </button>
+      <button
+        type="button"
+        class="proj"
+        data-testid="open-pipelines-btn"
+        onclick={() => openPipelines()}
+      >
+        {t('sessions.pipelinesBtn')}
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -304,28 +335,19 @@
     color: var(--alfa-color-text-muted);
     font-size: var(--alfa-font-size-xs);
   }
-  .foot {
-    display: flex;
-    align-items: center;
-    gap: var(--alfa-space-1);
-    padding: var(--alfa-space-2);
-    border-top: 1px solid var(--alfa-color-border);
-  }
+  .foot { display: flex; flex-direction: column; gap: var(--alfa-space-1); padding: var(--alfa-space-2); border-top: 1px solid var(--alfa-color-border); }
+  .foot-top { display: flex; align-items: center; gap: var(--alfa-space-1); }
+  .foot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--alfa-space-1); }
   .new {
-    display: flex;
-    align-items: center;
-    gap: var(--alfa-space-2);
-    flex: 1;
-    min-height: 32px;
-    padding: 0 var(--alfa-space-3);
-    border: 1px dashed var(--alfa-color-border-strong);
-    border-radius: var(--alfa-radius-control);
-    background: transparent;
-    color: var(--alfa-color-text-muted);
-    font-size: var(--alfa-font-size-sm);
+    display: flex; align-items: center; gap: var(--alfa-space-2); flex: 1; min-width: 0; min-height: 32px;
+    padding: 0 var(--alfa-space-3); border: 1px dashed var(--alfa-color-border-strong); border-radius: var(--alfa-radius-control);
+    background: transparent; color: var(--alfa-color-text-muted); font-size: var(--alfa-font-size-sm); white-space: nowrap;
   }
-  .new:hover {
-    background: var(--alfa-color-surface2);
-    color: var(--alfa-color-text);
+  .new:hover, .proj:hover, .proj-btn:hover { background: var(--alfa-color-surface2); color: var(--alfa-color-text); }
+  .proj {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 0; height: 30px; padding: 0 var(--alfa-space-2);
+    border: 1px solid var(--alfa-color-border); border-radius: var(--alfa-radius-control); background: var(--alfa-color-bg);
+    color: var(--alfa-color-text-muted); font-size: var(--alfa-font-size-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;
   }
+  .proj-btn { padding: 2px 4px; border: 0; border-radius: var(--alfa-radius-control); background: transparent; color: inherit; font: inherit; cursor: pointer; }
 </style>

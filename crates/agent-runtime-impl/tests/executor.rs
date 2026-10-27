@@ -285,3 +285,46 @@ async fn dropped_execution_cancels_the_run() {
             .any(|e| matches!(e.event, RunEvent::Finished { .. }))
     );
 }
+
+#[tokio::test(start_paused = true)]
+async fn explicit_retry_after_budget_uses_previous_history() {
+    let w = world();
+    let mut spec = delta();
+    spec.budget.max_steps = 2;
+    spec.verify = false;
+    w.p.model("m-delta").push_script(call(
+        "once",
+        "fs_write",
+        json!({"path":"/u/once.md","content":"x"}),
+    ));
+    let exec = RuntimeExecutor::new(&w.rt, 40_000);
+    let d = dispatch(
+        "saved",
+        1,
+        spec.clone(),
+        RunOptions::default(),
+        TaskOrigin::User,
+    );
+    assert!(matches!(
+        exec.execute(d, TestGate::new()).await,
+        WorkerResult::Failed {
+            retryable: false,
+            ..
+        }
+    ));
+    w.p.model("m-delta")
+        .push_script(answer("Dokończono bez powtórki."));
+    let d = dispatch("saved", 2, spec, RunOptions::default(), TaskOrigin::User);
+    assert!(matches!(
+        exec.execute(d, TestGate::new()).await,
+        WorkerResult::Succeeded { .. }
+    ));
+    let cp = w
+        .store
+        .latest(&task_run_id(&TaskId::new("saved"), 2))
+        .unwrap()
+        .unwrap();
+    assert!(cp.messages.iter().any(|m| m.content.iter().any(
+        |b| matches!(b,providers_contract::ContentBlock::ToolResult(r) if r.tool_use_id=="once")
+    )));
+}

@@ -35,6 +35,8 @@ mod sysnet;
 mod tickets;
 mod toolset;
 
+pub use agent_runtime_contract::{RunOptions, RunSpec};
+pub use agent_runtime_impl::ApprovalClock;
 pub use apps::{AppsDeps, browser_spec};
 pub use family::{ChildInfo, FamilyProjector, RunFamily};
 pub use launch::{Launch, SkillCall};

@@ -25,6 +25,7 @@
   import { attempt, load } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import ContinuationCard from '../conversation/ContinuationCard.svelte';
 
   interface Props {
     sessionId: string;
@@ -154,6 +155,9 @@
           {/if}
         </div>
       </header>
+      {#if run.state === 'paused' && run.turn_id && !run.parent_id && !run.task_id}
+        <ContinuationCard oncontinue={() => void attempt(app.toasts, async () => {await app.client.turns.continueTurn(sessionId, run.turn_id!); await loadRuns();})}/>
+      {/if}
       {#if children.length}
         <ul class="subruns" aria-label={t('replay.subruns')}>
           {#each children as c (c.run.id)}

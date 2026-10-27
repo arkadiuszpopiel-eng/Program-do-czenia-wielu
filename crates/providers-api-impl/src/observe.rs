@@ -152,6 +152,9 @@ impl ModelProvider for ObservedProvider {
         self.inner.capabilities()
     }
 
+    fn model_capabilities(&self, model: &str) -> Option<providers_contract::ModelCapabilities> {
+        self.inner.model_capabilities(model)
+    }
     fn stream(&self, request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
         let meta = Meta {
             provider: self.inner.id().to_string(),

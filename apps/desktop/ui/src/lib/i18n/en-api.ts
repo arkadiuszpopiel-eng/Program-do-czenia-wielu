@@ -32,7 +32,7 @@ export const enApi: Record<keyof typeof plApi, Message> = {
   'api.shared.composeEmpty': 'No account has a queue for this task class.',
   'api.shared.cleared': 'Shared queue “{name}” cleared — account queues apply.',
   'api.shared.oneRoute':
-    'Of several accounts of the same provider Alfa uses one (the oldest working one) — models of the other accounts of that provider are skipped.',
+    'Each enabled account is a separate route with its own limits. The shared queue controls attempt order, including accounts of the same provider.',
   'api.shared.add': 'Add a model to the shared queue',
   'api.shared.fromAccount': 'Account',
   'api.shared.gone': 'account removed',

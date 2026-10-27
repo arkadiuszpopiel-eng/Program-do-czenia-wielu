@@ -228,7 +228,7 @@ impl ChatEngine {
                     agent: Some(req.agent.clone()),
                     role_id: self.role_of(&req.session, &req.agent),
                     addressed_to: None,
-                    continues: req.continues.map(|c| c.0),
+                    continues: self.continuation_link(req, turn.id).map(|c| c.0),
                     truncated: outcome.stop == Some(dto::StopReason::MaxTokens),
                     thinking_ms: outcome.thinking_ms,
                     usage: usage.clone(),

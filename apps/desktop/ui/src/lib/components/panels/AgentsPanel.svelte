@@ -35,7 +35,7 @@
   ];
   const TEMPLATES: readonly CastTemplateId[] = ['standard', 'solo', 'coding', 'research'];
   let template = $state<string>('standard');
-  let editing = $state<AgentId | null>(null);
+  let editing = $derived<AgentId | null>(app.selectedAgent);
   /** Po odrzuconej zmianie ról pola wyboru odtwarzają stan z rdzenia (same przełączyły się już). */
   let rolesRev = $state(0);
 

@@ -26,8 +26,8 @@ pub(crate) struct Effects {
     pub network: bool,
     /// Cele nadpisania (np. za `>`).
     pub paths: Vec<String>,
-    /// Polecenia zagnieżdżone do osobnej analizy.
-    pub inner: Vec<String>,
+    /// Polecenia zagnieżdżone do osobnej analizy (`true` — uruchamia je PowerShell).
+    pub inner: Vec<(String, bool)>,
 }
 
 fn lower(t: &str) -> String {
@@ -48,7 +48,7 @@ pub(crate) fn scan(command: &str, toks: &[String], verb: impl Fn(&str) -> String
             {
                 let inner = toks[i + 1 + at + 1..].join(" ");
                 if !inner.trim().is_empty() {
-                    fx.inner.push(inner);
+                    fx.inner.push((inner, v != "cmd"));
                 }
             } else if rest.iter().any(|f| ENCODED_FLAGS.contains(&f.as_str())) {
                 fx.deletes = true;

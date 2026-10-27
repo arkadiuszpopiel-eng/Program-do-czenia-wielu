@@ -24,4 +24,10 @@ export const plBoard = {
   'board.noMatch': 'Nic nie pasuje do „{query}”.',
   'board.copyAll': 'Kopiuj wszystko (Markdown)',
   'board.copiedAll': 'Skopiowano {n} poz. jako Markdown.',
+  'sessions.projects': 'Projekty…',
+  'sessions.addProject': '+ Dodaj projekt',
+  'sessions.assignProject': 'Projekt…',
+  'sessions.unsetProject': 'Usuń z projektu',
+  'sessions.pipelines': 'Pipeline’y modeli',
+  'sessions.pipelinesBtn': 'Pipeline’y',
 };

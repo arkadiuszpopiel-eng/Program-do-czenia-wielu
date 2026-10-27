@@ -47,4 +47,26 @@ export async function runSeries6(
   ].join('\n');
   await both('costs', 'applyPricing', update, false);
   await both('costs', 'applyPricing', update, true);
+  await both('sessions', 'projectsList');
+  await both('sessions', 'projectsPickDir');
+  await both('sessions', 'projectsSave', 'Nowy Projekt', 'C:\\Users\\Ty\\Dokumenty\\Projekt');
+  await both('sessions', 'projectsRename', 'Nowy Projekt', 'Projekt Alfa');
+  await both('sessions', 'projectsRemove', 'Projekt Alfa');
+  // Pipeline'y modeli: biblioteka (wzorce wbudowane), zapis własnego i usunięcie.
+  await both('sessions', 'pipelinesList');
+  await both(
+    'sessions',
+    'pipelinesSave',
+    {
+      name: 'Szkic do UI',
+      description: 'Styl → kod',
+      builtin: false,
+      stages: [
+        { title: 'Styl', role: 'thinker', persona: null, model: 'openai:gpt-4o-mini', goal: '{{input}}' },
+        { title: 'Kod', role: 'coder', persona: 'delta', model: null, goal: 'Kod z: {{prev}}' },
+      ],
+    },
+    null,
+  );
+  await both('sessions', 'pipelinesRemove', 'Szkic do UI');
 }

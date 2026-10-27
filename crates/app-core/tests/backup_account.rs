@@ -215,10 +215,11 @@ async fn rate_limited_account_hands_over_to_the_backup() {
     assert_eq!(answer, "Odpowiada pierwsze.");
     assert_eq!(r.chats(), (1, 0));
 
-    // Limit zapytań na pierwszym koncie: ta tura kończy się błędem, jest komunikat.
+    // Limit zapytań na pierwszym koncie: Router kończy turę na zapasowym, jest komunikat.
     r.first.mode.store(LIMITED, Ordering::SeqCst);
-    let (events, _) = r.ask(&mut rx, "Drugie pytanie").await;
-    assert_eq!(error_code(&events), Some(TurnErrorCode::RateLimited));
+    let (events, answer) = r.ask(&mut rx, "Drugie pytanie").await;
+    assert_eq!(error_code(&events), None);
+    assert_eq!(answer, "Odpowiada zapasowe.");
     let notice = switch_notice(&mut rx, &events).await;
     assert!(
         notice.contains("Pierwsze") && notice.contains("Zapasowe"),
@@ -242,8 +243,9 @@ async fn rejected_key_is_rechecked_and_the_backup_takes_over() {
     let mut rx = r.core.subscribe_events();
     r.first.mode.store(REVOKED, Ordering::SeqCst);
 
-    let (events, _) = r.ask(&mut rx, "Pytanie").await;
-    assert_eq!(error_code(&events), Some(TurnErrorCode::Provider));
+    let (events, answer) = r.ask(&mut rx, "Pytanie").await;
+    assert_eq!(error_code(&events), None);
+    assert_eq!(answer, "Odpowiada zapasowe.");
     let notice = switch_notice(&mut rx, &events).await;
     assert!(
         notice.contains("Pierwsze") && notice.contains("Zapasowe"),

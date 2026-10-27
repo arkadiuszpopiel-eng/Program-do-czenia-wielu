@@ -4,8 +4,8 @@
 
 use std::sync::{Arc, Weak};
 
-use app_agents::{AgentSettings, Projection};
-use app_tasks::{FactInput, FileFact, TaskHost, WorkdirFacts};
+use app_agents::{AgentSettings, Projection, RunOptions, RunSpec};
+use app_tasks::{FactInput, TaskHost};
 use async_trait::async_trait;
 use core_config_contract::{ConfigKey, ConfigLayer, ConfigStore, Origin, Scope};
 use cost_meter_contract::CostMeter;
@@ -74,15 +74,7 @@ impl TaskHost for CoreHost {
     /// Katalog roboczy zadania; nigdy niewybrany — katalog sesji (jak w rozmowie: bez niego zadanie
     /// w tle nie ma narzędzi, np. sieci dla „Kontroli cenników”). Jawne „bez katalogu” — `None`.
     fn workdir(&self, session: &SessionId) -> Option<String> {
-        let core = self.core()?;
-        match core.inner.store.workdir_choice(session).ok()? {
-            Some(choice) => choice,
-            None => {
-                let dir = core.inner.sessions.session(session).ok()?.workdir;
-                std::fs::create_dir_all(&dir).ok()?;
-                Some(dir.to_string_lossy().into_owned())
-            }
-        }
+        self.core()?.chat().session_workdir(session)
     }
 
     fn privacy(&self, session: &SessionId) -> PrivacyTag {
@@ -103,6 +95,15 @@ impl TaskHost for CoreHost {
             .map_or(0, |c| u64::from(c.inner.costs.current_rate().rate_e4))
     }
 
+    async fn prepare_agent_access(&self, spec: &mut RunSpec, options: &mut RunOptions) {
+        if let Some(core) = self.core() {
+            core.chat().prepare_agent_access(spec, options).await;
+        } else {
+            spec.tools.clear();
+            options.crew = None;
+        }
+    }
+
     fn broker_window(&self) -> bool {
         self.core()
             .is_some_and(|c| c.inner.broker.approval_window())
@@ -121,13 +122,7 @@ impl TaskHost for CoreHost {
         let tasks = app_tasks::visible_tasks(core.inner.tasks.tasks(), own_private, |s| {
             ids::session(s).map_or(true, |id| self.privacy(&id) == PrivacyTag::Private)
         });
-        let workdir = match self.workdir(session) {
-            Some(path) => tokio::task::spawn_blocking(move || list_workdir(path))
-                .await
-                .ok()
-                .flatten(),
-            None => None,
-        };
+        let workdir = app_tasks::read_workdir_facts(self.workdir(session)).await;
         Some(app_tasks::fact_sheet(&FactInput {
             now: chrono::Local::now().naive_local(),
             own_task: own_task.to_owned(),
@@ -144,28 +139,4 @@ impl TaskHost for CoreHost {
             core.chat().project_task(session, run, projection);
         }
     }
-}
-
-/// Poziom główny katalogu roboczego do arkusza faktów (nazwy i rozmiary; katalogi najpierw).
-fn list_workdir(path: String) -> Option<WorkdirFacts> {
-    let mut all: Vec<FileFact> = std::fs::read_dir(&path)
-        .ok()?
-        .filter_map(Result::ok)
-        .map(|entry| {
-            let meta = entry.metadata().ok();
-            FileFact {
-                name: entry.file_name().to_string_lossy().into_owned(),
-                dir: meta.as_ref().is_some_and(std::fs::Metadata::is_dir),
-                bytes: meta.map_or(0, |m| m.len()),
-            }
-        })
-        .collect();
-    all.sort_by(|a, b| b.dir.cmp(&a.dir).then_with(|| a.name.cmp(&b.name)));
-    let total = all.len();
-    all.truncate(app_tasks::MAX_FILES);
-    Some(WorkdirFacts {
-        path,
-        entries: all,
-        total,
-    })
 }

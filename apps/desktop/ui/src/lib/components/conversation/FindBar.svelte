@@ -11,9 +11,11 @@
   interface Props {
     path: readonly Turn[];
     focusTurn?: string | null;
+    /** Wywoływane przy zmianie trafienia (pasek ładowany leniwie nie przenosi `bind:`). */
+    onfocus?: (turn: string | null) => void;
   }
 
-  let { path, focusTurn = $bindable(null) }: Props = $props();
+  let { path, focusTurn = $bindable(null), onfocus }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
   let query = $state('');
@@ -26,6 +28,7 @@
 
   $effect(() => {
     focusTurn = matches[Math.min(index, matches.length - 1)] ?? null;
+    onfocus?.(focusTurn);
   });
 
   function step(delta: number) {
@@ -47,6 +50,7 @@
   function close() {
     app.findOpen = false;
     focusTurn = null;
+    onfocus?.(null);
   }
 </script>
 

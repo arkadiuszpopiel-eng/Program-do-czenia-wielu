@@ -103,7 +103,7 @@ async fn broker_denial_reason_reaches_the_agent() {
     ));
     a.h.provider
         .push(Script::text(FAKE_MODEL, &["Nie mogę tego zrobić."]));
-    let _ = run_turn(&mut a, "Delta, włącz tryb awaryjny.").await;
+    let (_, events) = run_turn(&mut a, "Delta, włącz tryb awaryjny.").await;
     assert!(
         a.exec.runs().is_empty(),
         "polecenie nie zostało uruchomione"
@@ -115,12 +115,19 @@ async fn broker_denial_reason_reaches_the_agent() {
         .find(|s| s.tool.as_deref() == Some("shell_run"))
         .unwrap();
     assert_eq!(step.status, ReplayStatus::Denied, "{step:#?}");
-    let requests = a.h.provider.requests();
-    let seen = tool_results(requests.last().unwrap());
-    assert!(seen.contains("Odmowa"), "{seen}");
     assert!(
-        seen.contains("Jądr"),
-        "powód blokady w wyniku narzędzia: {seen}"
+        step.output.contains("Jądr"),
+        "powód blokady w kroku: {step:#?}"
+    );
+    // Twarda odmowa kończy zadanie (bez obchodzenia innym modelem); właściciel dostaje powód
+    // od hosta zamiast pustej tury.
+    assert_eq!(a.h.provider.requests().len(), 1, "bez kolejnej tury modelu");
+    assert!(
+        events.iter().any(|e| matches!(
+            e,
+            AlfaEvent::TextDelta { text, .. } if text.contains("zablokowany")
+        )),
+        "komunikat o zablokowanym kroku"
     );
 }
 
@@ -158,9 +165,16 @@ async fn approval_without_decision_times_out_as_denial() {
     assert_ne!(last, Some(ApprovalStatus::Pending), "karta rozstrzygnięta");
     assert!(waited >= Duration::from_millis(900), "{waited:?}");
     assert!(a.exec.runs().is_empty());
-    let requests = a.h.provider.requests();
-    let seen = tool_results(requests.last().unwrap());
-    assert!(seen.contains("Odmowa"), "{seen}");
+    // Brak decyzji wstrzymuje zadanie (limit czekania na zgodę, postęp zapisany) — model nie
+    // dostaje kolejnej tury, w której mógłby spróbować innej drogi bez zgody właściciela.
+    assert_eq!(a.h.provider.requests().len(), 1);
+    let run = last_run(&a).await;
+    assert!(
+        run.steps
+            .iter()
+            .any(|s| s.tool.as_deref() == Some("shell_run") && s.status == ReplayStatus::Denied),
+        "{run:#?}"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]

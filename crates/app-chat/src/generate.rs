@@ -171,6 +171,7 @@ impl ChatEngine {
             Placement::Child(p) => Some(p),
             Placement::Sibling(t) => sessions.turn(&req.session, t)?.parent,
         };
+        self.claim_continuation(&req, reserved)?;
         let id = ids::turn_dto(&req.session, reserved);
         let live = dto::Turn {
             id: id.clone(),
@@ -187,7 +188,9 @@ impl ChatEngine {
             approval: None,
             usage: None,
             error: None,
-            continues: req.continues.map(|c| ids::turn_dto(&req.session, c)),
+            continues: self
+                .continuation_link(&req, reserved)
+                .map(|c| ids::turn_dto(&req.session, c)),
             addressed_to: None,
             truncated: false,
             heard_prefix: None,
@@ -217,12 +220,39 @@ impl ChatEngine {
             (None, None) => self.quick(&req).await,
             _ => None,
         };
-        let setup = match (req.continues, &delegation, &local, &pin) {
-            (None, None, None, None) => self.agent_setup(&req.session, &req.agent),
-            _ => None,
-        };
+        let conductor_saved = crate::conductor_state::load(self, &req);
+        let mut setup =
+            self.recovery_setup(&req)
+                .or(match (req.continues, &delegation, &local, &pin) {
+                    (None, None, None, None) => self.agent_setup(&req.session, &req.agent).await,
+                    _ => None,
+                });
+        if conductor_saved.is_some() {
+            setup = None;
+        }
+        let recovery_error =
+            req.continues
+                .and_then(|old| match self.validate_recovery(&req.session, old) {
+                    Err(e) => Some(e.message),
+                    Ok(true) if conductor_saved.is_none() && setup.is_none() => Some(
+                        "Nie można odtworzyć lokalnego zapisu. Nie rozpoczynam zadania ponownie."
+                            .into(),
+                    ),
+                    _ => None,
+                });
         tokio::spawn(async move {
             let outcome = guarded(async {
+                if let Some(message) = recovery_error {
+                    return crate::outcome::Outcome::failed(app_api::dto::TurnError {
+                        code: app_api::dto::TurnErrorCode::Provider,
+                        message,
+                        retry_at: None,
+                        provider: None,
+                    });
+                }
+                if let Some(saved) = conductor_saved {
+                    return crate::conductor_state::resume(&core, &req, &handle, saved).await;
+                }
                 match (delegation, local, setup) {
                     (Some(d), _, _) => delegate::run(&core, &req, &handle, d).await,
                     (None, Some(reply), _) => quick::run(&core, &req, &handle, reply),

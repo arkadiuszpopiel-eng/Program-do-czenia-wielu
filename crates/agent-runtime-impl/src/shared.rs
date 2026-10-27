@@ -118,6 +118,7 @@ pub(crate) struct Shared {
     pub(crate) tools: Vec<Arc<dyn Tool>>,
     pub(crate) store: Arc<dyn CheckpointStore>,
     pub(crate) config: RuntimeConfig,
+    pub(crate) approval_clock: Arc<crate::ApprovalClock>,
     pub(crate) bus: Option<Arc<dyn EventBus>>,
     pub(crate) ext: RuntimeExt,
     /// Skażenie sesji (P2-07): domyślnie rejestr w pamięci procesu.
@@ -138,6 +139,7 @@ impl Shared {
             tools,
             store,
             config,
+            approval_clock: Arc::default(),
             bus,
             ext: RuntimeExt::default(),
             taint: Arc::new(MemorySessionTaint::default()),

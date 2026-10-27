@@ -74,8 +74,8 @@ impl AgentSettings {
             u64::try_from(micro_usd).unwrap_or(u64::MAX).max(1)
         });
         RunBudget {
-            max_steps: self.max_steps.max(1),
-            max_tokens: u64::from(self.max_steps.max(1)).saturating_mul(TOKENS_PER_STEP),
+            max_steps: self.max_steps.clamp(1, 500),
+            max_tokens: u64::from(self.max_steps.clamp(1, 500)).saturating_mul(TOKENS_PER_STEP),
             max_wall_ms: u64::from(self.max_minutes.max(1)) * 60_000,
             max_cost_micro_usd,
             ..RunBudget::default()
@@ -85,7 +85,7 @@ impl AgentSettings {
     /// Widok budżetu w UI.
     pub fn view(&self) -> RunBudgetView {
         RunBudgetView {
-            max_steps: self.max_steps.max(1),
+            max_steps: self.max_steps.clamp(1, 500),
             max_minutes: self.max_minutes.max(1),
             max_cost: (self.max_cost_grosze > 0)
                 .then(|| Money::pln(i64::try_from(self.max_cost_grosze).unwrap_or(i64::MAX))),
@@ -186,5 +186,17 @@ mod tests {
         };
         assert_eq!(zero.budget(1).max_steps, 1);
         assert_eq!(zero.approval_timeout_ms(true), 1000);
+    }
+
+    #[test]
+    fn step_budget_accepts_500_and_caps_invalid_stored_values() {
+        let mut s = AgentSettings {
+            max_steps: 500,
+            ..AgentSettings::default()
+        };
+        assert_eq!(s.budget(1).max_steps, 500);
+        s.max_steps = 501;
+        assert_eq!(s.budget(1).max_steps, 500);
+        assert_eq!(s.budget(1).max_tokens, 500 * TOKENS_PER_STEP);
     }
 }

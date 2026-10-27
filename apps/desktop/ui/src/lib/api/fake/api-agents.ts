@@ -303,4 +303,8 @@ export class FakeRuns {
     this.workdirs.set(sessionId, next);
     return this.workdir(sessionId);
   }
+
+  setWorkdirPath(sessionId: string, path: string | null): void {
+    this.workdirs.set(sessionId, path);
+  }
 }

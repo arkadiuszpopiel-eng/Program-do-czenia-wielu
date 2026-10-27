@@ -90,7 +90,7 @@ impl AppCore {
     pub async fn agents_runs(&self, session_id: String) -> Result<Vec<AgentRunDetail>, AppError> {
         let id = ids::session(&session_id)?;
         self.ensure_session(&id)?;
-        self.inner.store.runs(&id)
+        self.chat().recovery_runs(&id)
     }
 
     /// `agents_steer`: wiadomość właściciela w trakcie zadania — agentka uwzględnia ją w następnym

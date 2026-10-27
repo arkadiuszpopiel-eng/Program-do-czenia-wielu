@@ -20,7 +20,7 @@
   import { focusTrap } from './focus-trap';
   import Lazy from './Lazy.svelte';
   import { templateDialog } from '../../state/template-dialog.svelte';
-  import { boardDialog } from '../../state/board-dialog.svelte';
+  import { boardDialog, pipelinesDialog, projectsDialog } from '../../state/board-dialog.svelte';
   import { statsDialog } from '../../state/stats-dialog.svelte';
   import { canvas, closeCanvas, syncCanvas } from '../../state/canvas.svelte';
   import { arenaDialog } from '../../state/arena.svelte';
@@ -77,6 +77,8 @@
   const loadCheatsheet = () => import('../overlays/Cheatsheet.svelte');
   const loadTemplates = () => import('../overlays/TemplateDialog.svelte');
   const loadBoard = () => import('../overlays/BoardDialog.svelte');
+  const loadProjects = () => import('../overlays/ProjectsDialog.svelte');
+const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
   const loadStats = () => import('../overlays/SessionStatsDialog.svelte');
   const loadArena = () => import('../overlays/ArenaDialog.svelte');
   const loadTeach = () => import('../overlays/TeachDialog.svelte');
@@ -219,6 +221,8 @@
       label={t('tpl.dialog.title')}
     />{/if}
   {#if boardDialog.open}<Lazy load={loadBoard} props={{}} label={t('board.title')} />{/if}
+  {#if projectsDialog.open}<Lazy load={loadProjects} props={{}} label={t('sessions.projects')} />{/if}
+{#if pipelinesDialog.open}<Lazy load={loadPipelines} props={{}} label={t('sessions.pipelines')} />{/if}
   {#if statsDialog.open}<Lazy load={loadStats} props={{}} label={t('stats.title')} />{/if}
   {#if arenaDialog.open}<Lazy load={loadArena} props={{}} label={t('arena.title')} />{/if}
   {#if teachDialog.open}<Lazy load={loadTeach} props={{}} label={t('teach.title')} />{/if}

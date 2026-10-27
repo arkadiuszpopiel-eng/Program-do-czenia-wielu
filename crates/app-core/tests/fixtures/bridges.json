@@ -520,7 +520,7 @@
       "account": {
         "plan": "Max",
         "method": "konto claude.ai",
-        "checked_at": "2026-10-15T04:50:12.584Z",
+        "checked_at": "2026-10-24T05:14:07.313Z",
         "state": "logged_in",
         "detail": "Zalogowano — plan Max. Alfa może zlecać zadania Claude Code."
       },
@@ -559,7 +559,7 @@
       "account": {
         "plan": null,
         "method": null,
-        "checked_at": "2026-10-15T04:50:12.584Z",
+        "checked_at": "2026-10-24T05:14:07.313Z",
         "state": "unknown",
         "detail": "Narzędzie nie ma polecenia stanu logowania."
       },
@@ -601,7 +601,7 @@
         "plan": "Google AI Pro",
         "method": "konto Google",
         "detail": "Zalogowano (wykryte w oknie logowania).",
-        "checked_at": "2026-10-15T04:50:12.584Z"
+        "checked_at": "2026-10-24T05:14:07.313Z"
       },
       "route_id": "agy-antigravity",
       "name": "Google Gemini — Antigravity CLI (agy)"

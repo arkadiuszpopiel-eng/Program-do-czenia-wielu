@@ -3,6 +3,7 @@ import type { MenuItem } from '@alfa/ui-kit';
 import type { SessionSummary } from '../api/types';
 import type { AppState } from './app.svelte';
 import { exportConversation } from './exports';
+import { openProjects } from './board-dialog.svelte';
 import { duplicateSession } from './session-actions';
 import { openStats } from './stats-dialog.svelte';
 
@@ -17,6 +18,21 @@ export function sessionMenuItems(app: AppState, session: SessionSummary): MenuIt
         app.sessions.renamingId = session.id;
       },
     },
+    {
+      id: 'project',
+      label: t('sessions.assignProject'),
+      onSelect: () =>
+        openProjects({ sessionId: session.id, projectName: session.project?.name ?? null }),
+    },
+    ...(session.project
+      ? [
+          {
+            id: 'unset-project',
+            label: t('sessions.unsetProject'),
+            onSelect: () => void app.client.sessions.setProject(session.id, null),
+          },
+        ]
+      : []),
     {
       id: 'pin',
       label: t(session.pinned ? 'sessions.unpin' : 'sessions.pin'),

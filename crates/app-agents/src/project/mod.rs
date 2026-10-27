@@ -341,6 +341,10 @@ impl RunProjector {
                 self.run.state = RunState::Running;
                 self.push_run(&mut out);
             }
+            RunEvent::ApprovalResolved { .. } => {
+                self.run.state = RunState::Running;
+                self.push_run(&mut out);
+            }
             // Rozbicie kosztu na modele czyta zapis kosztów (`app-chat`); widok bierze sumę z `Usage`.
             RunEvent::Checkpoint { .. } | RunEvent::ModelUsage { .. } => {}
             RunEvent::Tainted { source } => {

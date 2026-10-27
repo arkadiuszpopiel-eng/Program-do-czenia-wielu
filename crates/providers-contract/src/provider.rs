@@ -8,7 +8,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use tokio_util::sync::CancellationToken;
 
-use crate::capabilities::{ModelInfo, ProviderCapabilities};
+use crate::capabilities::{ModelCapabilities, ModelInfo, ProviderCapabilities};
 use crate::error::{ProviderError, ProviderErrorKind};
 use crate::event::{ProviderEvent, Usage};
 use crate::message::ProviderId;
@@ -127,9 +127,19 @@ pub struct EmbeddingResponse {
 pub trait ModelProvider: Send + Sync {
     /// Identyfikator dostawcy (wpis katalogu).
     fn id(&self) -> &ProviderId;
+    /// Identyfikator polityki dostawcy; trasy wielu kont mogą mieć osobne identyfikatory techniczne.
+    fn policy_id(&self) -> &ProviderId {
+        self.id()
+    }
 
     /// Możliwości dostawcy i znanych modeli.
     fn capabilities(&self) -> ProviderCapabilities;
+
+    /// Effective capabilities of one model, including adapter defaults for models not enumerated.
+    /// A missing catalog entry is not equivalent to a confirmed unsupported feature.
+    fn model_capabilities(&self, model: &str) -> Option<ModelCapabilities> {
+        self.capabilities().models.get(model).cloned()
+    }
 
     /// Strumień odpowiedzi. Nie blokuje: błędy walidacji, prywatności i sieci przychodzą jako
     /// zdarzenie `Error`. Anulowanie `cancel` kończy strumień zdarzeniem
@@ -153,6 +163,10 @@ pub trait ModelProvider: Send + Sync {
     /// dostawca odpowiada jednym modelem, więc ponowienie dałoby ten sam wynik.
     fn can_escalate(&self, _from: &str) -> bool {
         false
+    }
+    /// Eskalacja w klasie roli potomka; domyślnie jak dla własnej klasy dostawcy.
+    fn can_escalate_for(&self, from: &str, _class: Option<&str>) -> bool {
+        self.can_escalate(from)
     }
 
     /// Sprawdzenie samego klucza tam, gdzie lista modeli go nie sprawdza (OpenRouter oddaje
@@ -184,12 +198,21 @@ pub trait ModelProvider: Send + Sync {
 /// `Arc<P>` jest dostawcą (rejestr trzyma `Arc<dyn ModelProvider>`).
 #[async_trait]
 impl<P: ModelProvider + ?Sized> ModelProvider for std::sync::Arc<P> {
+    fn can_escalate_for(&self, from: &str, class: Option<&str>) -> bool {
+        (**self).can_escalate_for(from, class)
+    }
+    fn policy_id(&self) -> &ProviderId {
+        (**self).policy_id()
+    }
     fn id(&self) -> &ProviderId {
         (**self).id()
     }
 
     fn capabilities(&self) -> ProviderCapabilities {
         (**self).capabilities()
+    }
+    fn model_capabilities(&self, model: &str) -> Option<ModelCapabilities> {
+        (**self).model_capabilities(model)
     }
 
     fn stream(&self, request: ChatRequest, cancel: CancellationToken) -> ProviderStream {

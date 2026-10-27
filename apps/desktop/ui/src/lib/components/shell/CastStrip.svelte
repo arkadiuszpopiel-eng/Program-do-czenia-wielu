@@ -5,12 +5,64 @@
   Agentki.
 -->
 <script lang="ts">
-  import { Avatar, agentIds, agents } from '@alfa/ui-kit';
+  import { Avatar, Menu, agentIds, agents, type AgentId } from '@alfa/ui-kit';
   import { useApp } from '../../state/context';
+  import { agentNavigation } from '../../state/agent-navigation.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
   const states = $derived(app.activeId ? (app.agents[app.activeId] ?? []) : []);
+  const en = $derived(app.i18n.locale === 'en');
+  function items(id: AgentId) {
+    const name = agents[id].name;
+    const configure = () => {
+      app.selectedAgent = id;
+      app.openSettings('agents');
+    };
+    return [
+      {
+        id: 'settings',
+        label: en ? `Settings for ${name}` : `Ustawienia agentki ${name}`,
+        onSelect: configure,
+      },
+      {
+        id: 'roles',
+        label: en ? `Session roles · ${name}` : `Role w sesji · ${name}`,
+        disabled: !app.activeId,
+        onSelect: () => {
+          app.selectedAgent = id;
+          app.closeSettings();
+          app.openPanel('agents');
+        },
+      },
+      {
+        id: 'chat',
+        label: en ? `Write to ${name}` : `Napisz do ${name}`,
+        disabled: !app.activeId,
+        onSelect: () => {
+          app.closeSettings();
+          const draft = app.sessions.drafts[app.activeId ?? ''] ?? '';
+          app.setDraft(`@${name} ${draft.replace(/^@(Alfa|Beta|Gama|Delta)\s*/i, '')}`);
+          requestAnimationFrame(() => document.getElementById('alfa-composer')?.focus());
+        },
+      },
+      {
+        id: 'voice',
+        label: en ? `Voice · ${name}` : `Głos · ${name}`,
+        onSelect: () => {
+          app.selectedAgent = id;
+          agentNavigation.voice = id;
+          app.openSettings('voice');
+        },
+      },
+      {
+        id: 'permissions',
+        label: en ? 'Broker and autonomy' : 'Broker i autonomia',
+        separatorBefore: true,
+        onSelect: () => app.openSettings('permissions'),
+      },
+    ];
+  }
 
   function describe(id: (typeof agentIds)[number]) {
     const state = states.find((a) => a.id === id);
@@ -29,22 +81,26 @@
 <div class="cast" role="group" aria-label={t('titlebar.cast')}>
   {#each agentIds as id (id)}
     {@const info = describe(id)}
-    <button
-      type="button"
-      class="cast-btn {info.status}"
-      aria-label={info.label}
-      title={info.label}
-      onclick={() => app.openPanel('agents')}
-    >
-      <Avatar
-        agent={id}
-        size={28}
-        speaking={info.status === 'speaking'}
-        working={info.status === 'working' || info.status === 'waiting_approval'}
-        decorative
-      />
-      {#if info.status !== 'idle'}<span class="flag" aria-hidden="true"></span>{/if}
-    </button>
+    <Menu items={items(id)} label={info.label} align="start">
+      {#snippet trigger(props)}
+        <button
+          type="button"
+          class="cast-btn {info.status}"
+          aria-label={info.label}
+          title={info.label}
+          {...props}
+        >
+          <Avatar
+            agent={id}
+            size={28}
+            speaking={info.status === 'speaking'}
+            working={info.status === 'working' || info.status === 'waiting_approval'}
+            decorative
+          />
+          {#if info.status !== 'idle'}<span class="flag" aria-hidden="true"></span>{/if}
+        </button>
+      {/snippet}
+    </Menu>
   {/each}
 </div>
 
@@ -71,6 +127,9 @@
     border-radius: var(--alfa-radius-full);
     background: transparent;
     transition: transform var(--alfa-duration-fast) var(--alfa-ease-out);
+  }
+  .cast-btn[aria-expanded='true'] {
+    background: var(--alfa-color-surface2);
   }
   /* Gotowa agentka jest spokojniejsza, żeby pracująca od razu rzucała się w oczy. */
   .cast-btn.idle :global(.avatar) {

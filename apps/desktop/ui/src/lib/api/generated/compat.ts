@@ -31,7 +31,7 @@ import type * as H22 from '../types-work';
 type Fits<A, B> = [A] extends [B] ? true : false;
 type Expect<T extends true> = T;
 
-/** 351 typów wspólnych, 683 sprawdzeń. */
+/** 354 typów wspólnych, 689 sprawdzeń. */
 export type IpcCompat = [
   Expect<Fits<G.AboutInfo, H20.AboutInfo>>,
   Expect<Fits<H20.AboutInfo, G.AboutInfo>>,
@@ -441,6 +441,10 @@ export type IpcCompat = [
   Expect<Fits<H17.PanelId, G.PanelId>>,
   Expect<Fits<G.PermissionsState, H9.PermissionsState>>,
   Expect<Fits<H9.PermissionsState, G.PermissionsState>>,
+  Expect<Fits<G.PipelineDef, H0.PipelineDef>>,
+  Expect<Fits<H0.PipelineDef, G.PipelineDef>>,
+  Expect<Fits<G.PipelineStage, H0.PipelineStage>>,
+  Expect<Fits<H0.PipelineStage, G.PipelineStage>>,
   Expect<Fits<G.PluginCapabilityView, H14.PluginCapabilityView>>,
   Expect<Fits<H14.PluginCapabilityView, G.PluginCapabilityView>>,
   Expect<Fits<G.PluginInfo, H14.PluginInfo>>,
@@ -469,6 +473,8 @@ export type IpcCompat = [
   Expect<Fits<H0.PriceRow, G.PriceRow>>,
   Expect<Fits<G.PricingView, H0.PricingView>>,
   Expect<Fits<H0.PricingView, G.PricingView>>,
+  Expect<Fits<G.ProjectInfo, H0.ProjectInfo>>,
+  Expect<Fits<H0.ProjectInfo, G.ProjectInfo>>,
   Expect<Fits<G.ProjectRef, H0.ProjectRef>>,
   Expect<Fits<H0.ProjectRef, G.ProjectRef>>,
   Expect<Fits<G.PromptTemplate, H19.PromptTemplate>>,

@@ -33,7 +33,7 @@ fn core_template(t: SessionTemplate) -> CoreTemplate {
 const BUILTIN_AGENTS: [&str; 4] = ["alfa", "beta", "gama", "delta"];
 
 impl AppCore {
-    fn all_sessions(&self) -> Result<Vec<sessions_contract::SessionSummary>, AppError> {
+    pub(crate) fn all_sessions(&self) -> Result<Vec<sessions_contract::SessionSummary>, AppError> {
         Ok(self.inner.sessions.list_sessions(&SessionQuery {
             include_archived: true,
             ..SessionQuery::default()
@@ -110,10 +110,17 @@ impl AppCore {
             ));
         }
         let patch = SessionPatch {
-            project: Some(project.map(sessions_contract::ProjectId::new)),
+            project: Some(project.clone().map(sessions_contract::ProjectId::new)),
             ..SessionPatch::default()
         };
-        self.patch_session(&session_id, patch).await
+        self.patch_session(&session_id, patch).await?;
+        if let Some(name) = project.as_deref()
+            && let Some(dir) = app_files::projects::project_workdir(&self.inner.paths.state(), name)
+        {
+            let id = ids::session(&session_id)?;
+            self.inner.store.set_workdir(&id, Some(&dir))?;
+        }
+        Ok(())
     }
 
     /// `sessions_set_pinned`.

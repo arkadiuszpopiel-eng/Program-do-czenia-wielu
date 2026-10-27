@@ -1,5 +1,5 @@
 //! Dostawcy API z kont `accounts-hub` → rejestracja w Routerze. Na dostawcę katalogu przypada
-//! jedno konto (najstarsze używalne — trasa `<dostawca>.api` w rejestrze zgodności); model domyślny
+//! osobna trasa każdego używalnego konta; model domyślny
 //! z wykrytych przy teście konta albo z Models API przy pierwszym użyciu. Zmiana kont (nowy klucz,
 //! usunięcie, test) jest widoczna bez restartu: przy każdym wyborze trasy porównywany jest odcisk.
 
@@ -12,16 +12,18 @@ use accounts_hub_contract::{
 use accounts_hub_impl::AccountsHubService;
 use providers_api_impl::{CatalogEntry, build_provider};
 use providers_contract::{ModelKind, ModelProvider, ProviderId};
-use router_contract::{Candidate, RouteKind, TaskClass};
-use router_impl::{GlobalQueues, ProviderQueues, RouterCore};
+use router_contract::{RouteKind, TaskClass};
+use router_impl::{ProviderQueues, RouterCore};
 
-use super::global_queue::{QueueFile, SharedQueues, class_of};
+use super::global_queue::QueueFile;
 
 use crate::secrets::HubKeySource;
 
 /// Konto zarejestrowane jako trasa API.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Registered {
+    /// Vendor for billing and compliance, separate from the technical account route.
+    pub provider: String,
     /// Konto.
     pub account: String,
     /// Nazwa dostawcy do UI.
@@ -42,54 +44,7 @@ impl Registered {
     }
 }
 
-/// Klasa zadań huba → klasa Routera (te same nazwy; osobne typy dwóch kontraktów).
-fn route_class(class: accounts_hub_contract::TaskClass) -> TaskClass {
-    use accounts_hub_contract::TaskClass as Hub;
-    match class {
-        Hub::VoiceFast => TaskClass::VoiceFast,
-        Hub::Conversation => TaskClass::Conversation,
-        Hub::Code => TaskClass::Code,
-        Hub::Planning => TaskClass::Planning,
-        Hub::GuiVision => TaskClass::GuiVision,
-        Hub::Summarize => TaskClass::Summarize,
-        Hub::Embeddings => TaskClass::Embeddings,
-    }
-}
-
-/// Wspólna kolejka → kandydaci Routera. Pozycja konta, które nie jest trasą swojego dostawcy
-/// (wyłączone, bez klucza, drugie konto dostawcy), jest pomijana — Router zna jedną trasę na dostawcę.
-fn global_candidates(shared: &SharedQueues, chosen: &BTreeMap<String, Account>) -> GlobalQueues {
-    shared
-        .iter()
-        .filter_map(|(name, entries)| {
-            let class = class_of(name)?;
-            let list: Vec<Candidate> = entries
-                .iter()
-                .filter_map(|entry| {
-                    let (provider, _) = chosen
-                        .iter()
-                        .find(|(_, account)| account.id.as_str() == entry.account_id)?;
-                    Some(Candidate::new(provider.as_str(), entry.model.clone()))
-                })
-                .collect();
-            (!list.is_empty()).then_some((class, list))
-        })
-        .collect()
-}
-
-fn queues_of(account: &Account) -> BTreeMap<TaskClass, Vec<String>> {
-    account
-        .queues
-        .iter()
-        .filter(|(_, models)| !models.is_empty())
-        .map(|(class, models)| {
-            (
-                route_class(*class),
-                models.iter().map(|m| m.as_str().to_owned()).collect(),
-            )
-        })
-        .collect()
-}
+use super::account_queues::{global_candidates, queues_of};
 
 #[derive(Default)]
 struct State {
@@ -204,11 +159,12 @@ impl AccountRoutes {
                 pinned.contains(agent) && !builtin.iter().all(|p| pinned.contains(p.id.as_str()))
             })
             .and_then(|a| {
+                // Trasa konta, nie dostawcy: drugie konto dostawcy ma trasę `<dostawca>--<konto>`.
                 state
                     .registered
-                    .get(a.provider.as_str())
-                    .filter(|r| r.account == a.id.as_str())
-                    .map(|r| (a.provider.to_string(), r.clone()))
+                    .iter()
+                    .find(|(_, r)| r.account == a.id.as_str())
+                    .map(|(route, r)| (route.clone(), r.clone()))
             })
     }
 
@@ -313,9 +269,13 @@ impl AccountRoutes {
         let shared = self.shared.current();
         let mut chosen: BTreeMap<String, Account> = BTreeMap::new();
         for account in self.eligible() {
-            chosen
-                .entry(account.provider.as_str().to_owned())
-                .or_insert(account);
+            let vendor = account.provider.as_str();
+            let route = if chosen.contains_key(vendor) {
+                format!("{vendor}--{}", account.id.as_str())
+            } else {
+                vendor.to_owned()
+            };
+            chosen.insert(route, account);
         }
         let fingerprint: Vec<String> = chosen
             .values()
@@ -346,6 +306,7 @@ impl AccountRoutes {
             let Some(provider) = self.build(account, model.clone()) else {
                 continue;
             };
+            let provider = providers_contract::ProviderAlias::wrap(provider_id, provider);
             // Inne konto pod tym samym dostawcą ma własne limity — pamięć Routera o limicie
             // poprzedniego konta nie może go blokować.
             let switched = self
@@ -365,6 +326,7 @@ impl AccountRoutes {
             registered.insert(
                 provider_id.clone(),
                 Registered {
+                    provider: account.provider.to_string(),
                     account: account.id.as_str().to_owned(),
                     name,
                     model,

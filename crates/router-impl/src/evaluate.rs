@@ -46,12 +46,12 @@ fn session_privacy(c: &Constraints) -> RequestPrivacy {
 fn compliance(
     inputs: &Inputs<'_>,
     reg: &Registered,
-    cand: &Candidate,
+    _cand: &Candidate,
     c: &Constraints,
     warnings: &mut Vec<RouteWarning>,
 ) -> Result<(), RejectReason> {
     if let Some(comp) = inputs.compliance {
-        let Some(route) = RouteId::api(cand.provider.as_str()) else {
+        let Some(route) = RouteId::api(reg.provider.policy_id().as_str()) else {
             return Err(RejectReason::Compliance {
                 reason: DecisionReason::UnknownRoute,
             });
@@ -111,13 +111,17 @@ fn budget(
     // liczy pełne `max_tokens` modelu (dla Claude 128 tys. — ok. 10 zł na wiadomość), więc przy
     // limicie 100 zł rozmowa stawała przy ok. 90 zł. Maksimum — tylko ostrzeżenie (przegląd 2026-10-22).
     let min = estimate.min.micro_usd_ceil();
-    let mut notices = match gate.check(&cand.provider, min, c.background) {
+    let mut notices = match gate.check(reg.provider.policy_id(), min, c.background) {
         BudgetDecision::Block { notice } => return Err(RejectReason::Budget { notice }),
         BudgetDecision::Warn { notices } => notices,
         BudgetDecision::Allow => Vec::new(),
     };
     // Maksimum dokłada progi zakresów, których minimum nie przekroczyło (np. limit konta).
-    let more = match gate.check(&cand.provider, estimate.max.micro_usd_ceil(), c.background) {
+    let more = match gate.check(
+        reg.provider.policy_id(),
+        estimate.max.micro_usd_ceil(),
+        c.background,
+    ) {
         BudgetDecision::Allow => Vec::new(),
         BudgetDecision::Warn { notices } => notices,
         BudgetDecision::Block { notice } => vec![notice],
@@ -167,11 +171,10 @@ fn evaluate(
     if reg.kind == RouteKind::Api {
         compliance(inputs, reg, cand, c, &mut warnings)?;
     }
-    let caps = reg.provider.capabilities();
-    match caps.models.get(&cand.model) {
+    match reg.provider.model_capabilities(&cand.model) {
         Some(model) => c
             .needs
-            .check(model)
+            .check(&model)
             .map_err(|missing| RejectReason::Capability { missing })?,
         None => warnings.push(RouteWarning::UnknownCapabilities),
     }

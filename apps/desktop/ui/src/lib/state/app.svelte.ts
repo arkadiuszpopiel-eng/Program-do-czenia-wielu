@@ -83,7 +83,7 @@ export class AppState {
   cheatsheetOpen = $state(false);
   findOpen = $state(false);
   settingsPage = $state('general');
-  /** Odwiedzone miejsca dla „Wstecz / Dalej” (Alt+←, Alt+→, boczne przyciski myszy). */
+  selectedAgent = $state<'alfa' | 'beta' | 'gama' | 'delta'>('alfa');
   readonly nav = new NavHistory();
   /** Trwa przejście po historii — pośrednie stany nie są zapisywane jako nowe miejsca. */
   navBusy = false;

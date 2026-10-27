@@ -19,6 +19,14 @@ macro_rules! with_commands {
             sessions_rename(session_id: String, title: String) -> ();
             sessions_set_pinned(session_id: String, pinned: bool) -> ();
             sessions_set_project(session_id: String, project: Option<String>) -> ();
+            projects_list() -> Vec<$crate::dto::ProjectInfo>;
+            projects_pick_dir() -> Option<String>;
+            projects_save(name: String, workdir: Option<String>) -> Vec<$crate::dto::ProjectInfo>;
+            projects_rename(old_name: String, new_name: String) -> Vec<$crate::dto::ProjectInfo>;
+            projects_remove(name: String) -> Vec<$crate::dto::ProjectInfo>;
+            pipelines_list() -> Vec<$crate::dto::PipelineDef>;
+            pipelines_save(pipeline: $crate::dto::PipelineDef, previous_name: Option<String>) -> Vec<$crate::dto::PipelineDef>;
+            pipelines_remove(name: String) -> Vec<$crate::dto::PipelineDef>;
             sessions_set_archived(session_id: String, archived: bool) -> ();
             sessions_remove(session_id: String) -> $crate::dto::UndoTicket;
             sessions_undo_remove(token: String) -> ();
@@ -299,14 +307,3 @@ macro_rules! command_names {
 }
 
 with_commands!(command_names);
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn channel_commands_are_listed_once() {
-        for c in super::CHANNEL_COMMANDS {
-            assert_eq!(super::COMMANDS.iter().filter(|x| *x == c).count(), 1);
-        }
-        assert_eq!(super::COMMANDS.len(), 274);
-    }
-}

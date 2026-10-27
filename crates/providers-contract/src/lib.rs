@@ -81,3 +81,6 @@ pub use schema::{IR_SCHEMA_VERSION, chat_request_schema, provider_event_schema};
 pub use secret::{ApiKey, REDACTED_KEY, SecretSource, StaticKey};
 /// Token anulowania używany w [`ModelProvider::stream`] (re-eksport `tokio-util`).
 pub use tokio_util::sync::CancellationToken;
+
+mod alias;
+pub use alias::ProviderAlias;

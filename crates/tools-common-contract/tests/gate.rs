@@ -189,3 +189,25 @@ async fn authorize_all_revokes_on_failure() {
     assert!(format!("{gate:?}").contains("BrokerGate"));
     assert!(!b.session_security(&c.holder.session).tainted);
 }
+
+#[tokio::test(start_paused = true)]
+async fn extended_wait_keeps_requesting_real_owner_approval() {
+    let b = broker();
+    b.script("t.ask", ScriptedDecision::NeedsApproval);
+    let gate = BrokerGate::new(b.clone()).with_poll(Duration::from_millis(10));
+    let mut c = ctx();
+    c.auto_extend_approval = true;
+    c.approval_timeout = Duration::from_millis(20);
+    let owner = b.clone();
+    tokio::spawn(async move {
+        tokio::time::sleep(Duration::from_millis(90)).await;
+        owner.auto_approve(ApprovalDecision::Allow).await;
+    });
+    let result = gate
+        .authorize(
+            action_request(&c, read_cap("/Users/ala/a.txt"), facts("t.ask")),
+            &c,
+        )
+        .await;
+    assert!(result.is_ok());
+}

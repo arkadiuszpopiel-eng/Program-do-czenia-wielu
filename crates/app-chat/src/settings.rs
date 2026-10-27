@@ -8,6 +8,16 @@ use crate::engine::ChatEngine;
 use crate::style;
 
 impl ChatEngine {
+    pub(crate) async fn continuation_policy(&self) -> agent_runtime_contract::ContinuationPolicy {
+        let settings = self.agent_settings().await;
+        agent_runtime_contract::ContinuationPolicy {
+            auto_steps: self.config_bool("agents.auto_extend_steps", false).await,
+            auto_time: self.config_bool("agents.auto_extend_time", false).await,
+            auto_approval: self.config_bool("agents.auto_extend_approval", false).await,
+            step_chunk: settings.max_steps.clamp(1, 500),
+            time_chunk_ms: u64::from(settings.max_minutes.max(1)) * 60_000,
+        }
+    }
     /// Ustawienia agentek (Ustawienia → Agentki) ze stylem i temperaturą (Ustawienia → Ogólne).
     pub async fn agent_settings(&self) -> AgentSettings {
         let d = AgentSettings::default();

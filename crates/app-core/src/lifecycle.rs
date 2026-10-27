@@ -40,6 +40,7 @@ impl AppCore {
                 self,
             )));
         self.spawn_bus_bridge().await;
+        self.spawn_fallback_bridge().await;
         self.spawn_download_bridge().await;
         app_memory::spawn_bridge(self.inner.bus.clone(), self.inner.events.clone()).await;
         self.spawn_task_bridges().await;

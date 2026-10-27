@@ -68,7 +68,7 @@ impl Engine {
             Verifier::SelfCheck(_) => return None,
         };
         let persona = crew.persona(&who)?.clone();
-        let mut role = crew.role(&RoleId::critic())?.clone();
+        let mut role = crew.role_for(&who, &RoleId::critic())?.clone();
         role.read_only = true;
         let model = crew
             .models
@@ -151,6 +151,10 @@ impl Engine {
             temperature: None,
         };
         let options = RunOptions {
+            continuation: self.cp.options.continuation.clone(),
+            request_privacy: self.cp.options.request_privacy,
+            owner_turn: self.cp.options.owner_turn.clone(),
+            owner_call: self.cp.options.owner_call.clone(),
             parent: Some(self.handle.run.clone()),
             depth: self.cp.options.depth.saturating_add(1),
             grant: Some(grant),

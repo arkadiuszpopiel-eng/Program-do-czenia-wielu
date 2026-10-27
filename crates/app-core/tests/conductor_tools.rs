@@ -107,16 +107,27 @@ async fn conductor_knows_who_works_on_the_computer() {
         .push(Script::text(FAKE_MODEL, &["Zrobi to Delta."]));
     let reply = ask(&mut s, "Jak teraz z dostępem do komputera?", None).await;
     assert_eq!(reply, "Zrobi to Delta.");
-    // Rozmowa z Dyrygentką zostaje zwykłym czatem (strumień, głos, styl) — bez przebiegu.
+    // Zwykłe pytanie bez wywołania delegate_task zostaje czatem bez przebiegu w Replay.
     assert!(s.core.agents_runs(s.sid.clone()).await.unwrap().is_empty());
     let request = s.provider.requests().last().cloned().unwrap();
-    assert!(request.tools.is_empty());
+    assert_eq!(
+        request
+            .tools
+            .iter()
+            .map(|t| t.name.as_str())
+            .collect::<Vec<_>>(),
+        vec!["delegate_task", "run_pipeline"],
+        "Dyrygentka ma narzędzia delegate_task i run_pipeline do rozdzielania pracy"
+    );
     let system = request.system.unwrap_or_default();
     assert!(
         system.contains("na komputerze użytkownika działa: Delta"),
         "{system}"
     );
-    assert!(system.contains("„Delta, …”"), "{system}");
+    assert!(
+        system.contains("delegate_task") && !system.contains("„Delta, …”"),
+        "{system}"
+    );
     // Poziom autonomii rozmowy (Broker w procesie: domyślne L3) — bez zapowiadania zgód na wszystko.
     // Opis z tabeli reguł Brokera: na L3 pyta m.in. o host spoza listy, nie o każdą zmianę.
     assert!(
@@ -143,22 +154,179 @@ async fn conductor_knows_who_works_on_the_computer() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-async fn explicit_no_workdir_keeps_plain_chat() {
+async fn conductor_dispatches_tasks_across_agents_and_switches_as_needed() {
     let mut s = setup().await;
-    let none = s
+    let chosen = s
         .core
-        .sessions_choose_workdir(s.sid.clone(), WorkdirChoice::None)
+        .sessions_choose_workdir(s.sid.clone(), WorkdirChoice::Default)
         .await
         .unwrap();
-    assert_eq!(none.path, None);
-    let reply = ask(&mut s, "Co słychać?", None).await;
-    assert!(reply.starts_with("Echo:"), "{reply}");
-    assert!(s.core.agents_runs(s.sid.clone()).await.unwrap().is_empty());
-    let system = s.provider.requests().last().cloned().unwrap().system;
+    let workdir = std::path::PathBuf::from(chosen.path.unwrap());
+    let target_file = workdir.join("wynik.txt");
+
+    // 1. Alfa (Dyrygentka) zleca analizę Gamie (researcher).
+    s.provider.push(Script::tool_call(
+        FAKE_MODEL,
+        "d1",
+        "delegate_task",
+        &serde_json::json!({
+            "role": "researcher",
+            "persona": "gama",
+            "goal": "Check project structure"
+        }),
+    ));
+    // 2. Gama wykonuje swoje zadanie i raportuje wynik.
+    s.provider
+        .push(Script::text(FAKE_MODEL, &["Struktura sprawdzona."]));
+    // 3. Alfa przełącza zadanie na Deltę (coder), żeby wykonała zapis w repozytorium.
+    s.provider.push(Script::tool_call(
+        FAKE_MODEL,
+        "d2",
+        "delegate_task",
+        &serde_json::json!({
+            "role": "coder",
+            "persona": "delta",
+            "goal": "Write wynik.txt"
+        }),
+    ));
+    // 4. Delta (jako Koderka z dostępem do narzędzi fs_*) zapisuje plik wynik.txt.
+    s.provider.push(Script::tool_call(
+        FAKE_MODEL,
+        "w1",
+        "fs_write",
+        &serde_json::json!({
+            "path": target_file.to_string_lossy(),
+            "content": "plan-ok",
+            "mode": "create"
+        }),
+    ));
+    s.provider
+        .push(Script::text(FAKE_MODEL, &["Plik wynik.txt zapisany."]));
+    // 5. Alfa podsumowuje pracę obu agentek właścicielowi.
+    s.provider.push(Script::text(
+        FAKE_MODEL,
+        &["Plan wykonany: Gama przeanalizowała projekt, a Delta zapisała wynik.txt."],
+    ));
+
+    let reply = ask(&mut s, "Wykonaj plan", None).await;
+    assert_eq!(
+        reply,
+        "Plan wykonany: Gama przeanalizowała projekt, a Delta zapisała wynik.txt."
+    );
+    assert_eq!(
+        std::fs::read_to_string(&target_file).unwrap(),
+        "plan-ok",
+        "Delta wykonała zapis pliku w katalogu roboczym"
+    );
+    let runs = s.core.agents_runs(s.sid.clone()).await.unwrap();
+    let agents: Vec<&str> = runs.iter().map(|r| r.run.agent.as_str()).collect();
     assert!(
-        !system
-            .unwrap_or_default()
-            .contains("na komputerze użytkownika"),
-        "bez katalogu nikt nie działa na komputerze"
+        agents.contains(&"alfa") && agents.contains(&"gama") && agents.contains(&"delta"),
+        "przebiegi Alfy, Gamy i Delty w Replay: {agents:?}"
+    );
+    let turns = s.core.turns_list(s.sid.clone()).await.unwrap().turns;
+    let last_turn = turns.last().unwrap();
+    let labels: Vec<&str> = last_turn.tools.iter().map(|t| t.label.as_str()).collect();
+    assert!(
+        labels.iter().any(|l| l.contains("Zlecenie → Gama"))
+            && labels.iter().any(|l| l.contains("Zlecenie → Delta"))
+            && labels.iter().any(|l| l.contains("delta: zapisano 1 plik")),
+        "kroki delegacji i narzędzi podrzędnych agentek w turze: {labels:?}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn conductor_auto_delegates_when_model_replies_with_manual_handoff_text() {
+    let mut s = setup().await;
+    // Nawet jeśli w starej sesji model odruchowo odpisze dawną formułką odsyłającą użytkownika
+    // do ręcznego wpisania „Delta, …”, Dyrygentka automatycznie zamienia to w delegację dla Delty.
+    s.provider.push(Script::text(
+        FAKE_MODEL,
+        &[
+            "Jasne — to wymaga pracy w repozytorium: pomiarów, zmian, testów i weryfikacji. ",
+            "Zrobi to Delta. Napisz „Delta, wykonaj pięciopunktowy plan ulepszeń aplikacji” ",
+            "albo wybierz Deltę w polu adresatki.",
+        ],
+    ));
+    // Delta wykonuje zadanie.
+    s.provider.push(Script::text(
+        FAKE_MODEL,
+        &["Wykonałam wszystkie 5 punktów planu."],
+    ));
+    // Alfa podsumowuje wykonanie zamiast odsyłać użytkownika.
+    s.provider.push(Script::text(
+        FAKE_MODEL,
+        &["Gotowe — Delta wykonała cały plan."],
+    ));
+
+    let reply = ask(&mut s, "wykonaj plan", None).await;
+    assert_eq!(reply, "Gotowe — Delta wykonała cały plan.");
+    let runs = s.core.agents_runs(s.sid.clone()).await.unwrap();
+    let agents: Vec<&str> = runs.iter().map(|r| r.run.agent.as_str()).collect();
+    assert!(
+        agents.contains(&"alfa") && agents.contains(&"delta"),
+        "automatyczna delegacja uruchomiła Deltę: {agents:?}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn conductor_runs_model_pipeline_without_user_in_between() {
+    let mut s = setup().await;
+    s.core
+        .sessions_choose_workdir(s.sid.clone(), WorkdirChoice::Default)
+        .await
+        .unwrap();
+    // Dyrygentka uruchamia pipeline: styl → architektura → kod (każdy etap na innym modelu).
+    s.provider.push(Script::tool_call(
+        FAKE_MODEL,
+        "p1",
+        "run_pipeline",
+        &serde_json::json!({
+            "preset": "ui-design",
+            "input": "Szkic: formularz logowania",
+            "models": ["fake:astra", "fake:opus", "fake:sol"]
+        }),
+    ));
+    s.provider
+        .push(Script::text(FAKE_MODEL, &["WYTYCZNE-WIZUALNE"]));
+    s.provider
+        .push(Script::text(FAKE_MODEL, &["ARCHITEKTURA-KOMPONENTOW"]));
+    s.provider.push(Script::text(FAKE_MODEL, &["KOD-TAILWIND"]));
+    s.provider.push(Script::text(
+        FAKE_MODEL,
+        &["Pipeline gotowy: KOD-TAILWIND."],
+    ));
+
+    let reply = ask(&mut s, "Zrób UI z tego szkicu przez pipeline", None).await;
+    assert_eq!(reply, "Pipeline gotowy: KOD-TAILWIND.");
+    let requests = s.provider.requests();
+    let text_of = |i: usize| {
+        requests[i]
+            .messages
+            .iter()
+            .map(|m| m.visible_text())
+            .collect::<Vec<_>>()
+            .join("\n")
+    };
+    assert!(
+        text_of(2).contains("WYTYCZNE-WIZUALNE"),
+        "etap 2 dostał wynik etapu 1"
+    );
+    assert!(
+        text_of(3).contains("ARCHITEKTURA-KOMPONENTOW"),
+        "etap 3 dostał wynik etapu 2"
+    );
+    let turns = s.core.turns_list(s.sid.clone()).await.unwrap().turns;
+    let labels: Vec<&str> = turns
+        .last()
+        .unwrap()
+        .tools
+        .iter()
+        .map(|t| t.label.as_str())
+        .collect();
+    assert!(
+        labels.iter().any(|l| l.contains("Pipeline 1/3"))
+            && labels.iter().any(|l| l.contains("Pipeline 3/3")),
+        "etapy pipeline'u widoczne w turze: {labels:?}"
     );
 }

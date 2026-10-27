@@ -8928,6 +8928,76 @@
       ],
       "type": "object"
     },
+    "PipelineDef": {
+      "description": "Zapisany lub wbudowany pipeline.",
+      "properties": {
+        "builtin": {
+          "description": "Wbudowany wzorzec (nieedytowalny; zapis pod tą samą nazwą tworzy własną wersję).",
+          "type": "boolean"
+        },
+        "description": {
+          "description": "Krótki opis do czego służy.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Unikalna nazwa (klucz).",
+          "type": "string"
+        },
+        "stages": {
+          "description": "Etapy wykonywane po kolei (1–6).",
+          "items": {
+            "$ref": "#/$defs/PipelineStage"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "stages",
+        "builtin"
+      ],
+      "type": "object"
+    },
+    "PipelineStage": {
+      "description": "Etap pipeline'u.",
+      "properties": {
+        "goal": {
+          "description": "Zadanie etapu; może zawierać `{{input}}` (wejście) i `{{prev}}` (wynik poprzedniego etapu).",
+          "type": "string"
+        },
+        "model": {
+          "description": "Opcjonalny model `dostawca:model`; pusty — dobór Routera.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "persona": {
+          "description": "Opcjonalna agentka (`delta`, `gama`, `beta`); pusta — według roli.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "role": {
+          "description": "Rola wykonawcza (`coder`, `operator`, `researcher`, `critic`, `thinker`, `writer`, `keeper`).",
+          "type": "string"
+        },
+        "title": {
+          "description": "Krótka nazwa etapu pokazywana w turze i w Replay (pusta = z roli).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "role",
+        "persona",
+        "model",
+        "goal"
+      ],
+      "type": "object"
+    },
     "PluginCapabilityView": {
       "description": "Zadeklarowana zdolność (`fs.read`, `fs.write`, `net.egress`) z zakresem.",
       "properties": {
@@ -9385,6 +9455,31 @@
         "rows",
         "changes",
         "saved"
+      ],
+      "type": "object"
+    },
+    "ProjectInfo": {
+      "description": "Projekt z katalogiem roboczym i liczbą rozmów.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "session_count": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "workdir": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "workdir",
+        "session_count"
       ],
       "type": "object"
     },
@@ -13172,7 +13267,8 @@
         "no_keys",
         "provider",
         "context_overflow",
-        "budget_blocked"
+        "budget_blocked",
+        "task_paused"
       ],
       "type": "string"
     },
@@ -16139,6 +16235,56 @@
         "$ref": "#/$defs/BrokerIntentResult"
       }
     },
+    "pipelines_list": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/PipelineDef"
+        },
+        "type": "array"
+      }
+    },
+    "pipelines_remove": {
+      "args": [
+        {
+          "name": "name",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/PipelineDef"
+        },
+        "type": "array"
+      }
+    },
+    "pipelines_save": {
+      "args": [
+        {
+          "name": "pipeline",
+          "schema": {
+            "$ref": "#/$defs/PipelineDef"
+          }
+        },
+        {
+          "name": "previous_name",
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/PipelineDef"
+        },
+        "type": "array"
+      }
+    },
     "plugins_approve": {
       "args": [
         {
@@ -16287,6 +16433,87 @@
       "args": [],
       "result": {
         "$ref": "#/$defs/PricingView"
+      }
+    },
+    "projects_list": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/ProjectInfo"
+        },
+        "type": "array"
+      }
+    },
+    "projects_pick_dir": {
+      "args": [],
+      "result": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "projects_remove": {
+      "args": [
+        {
+          "name": "name",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/ProjectInfo"
+        },
+        "type": "array"
+      }
+    },
+    "projects_rename": {
+      "args": [
+        {
+          "name": "old_name",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "new_name",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/ProjectInfo"
+        },
+        "type": "array"
+      }
+    },
+    "projects_save": {
+      "args": [
+        {
+          "name": "name",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "workdir",
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/ProjectInfo"
+        },
+        "type": "array"
       }
     },
     "prompt_templates_get": {

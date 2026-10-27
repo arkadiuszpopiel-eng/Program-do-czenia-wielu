@@ -1388,7 +1388,7 @@
             "control": {
               "kind": "number",
               "min": 5,
-              "max": 200,
+              "max": 500,
               "step": 1,
               "unit": null
             }
@@ -1488,6 +1488,346 @@
               "step": 1,
               "unit": null
             }
+          },
+          {
+            "key": "agents.alfa.access",
+            "label": {
+              "pl": "Alfa — Profil dostępu",
+              "en": "Alfa — Access profile"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "full",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "roles",
+                  "label": {
+                    "pl": "Według ról",
+                    "en": "By role"
+                  }
+                },
+                {
+                  "value": "read",
+                  "label": {
+                    "pl": "Tylko odczyt",
+                    "en": "Read only"
+                  }
+                },
+                {
+                  "value": "full",
+                  "label": {
+                    "pl": "Pełny dostęp",
+                    "en": "Full access"
+                  }
+                },
+                {
+                  "value": "custom",
+                  "label": {
+                    "pl": "Własny",
+                    "en": "Custom"
+                  }
+                },
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Bez narzędzi",
+                    "en": "No tools"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "agents.alfa.groups",
+            "label": {
+              "pl": "Alfa — Grupy narzędzi",
+              "en": "Alfa — Tool groups"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "",
+            "scope": "global",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "agents.alfa.read_only",
+            "label": {
+              "pl": "Alfa — Własny profil: tylko odczyt",
+              "en": "Alfa — Custom profile: read only"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": false,
+            "scope": "global"
+          },
+          {
+            "key": "agents.beta.access",
+            "label": {
+              "pl": "Beta — Profil dostępu",
+              "en": "Beta — Access profile"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "roles",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "roles",
+                  "label": {
+                    "pl": "Według ról",
+                    "en": "By role"
+                  }
+                },
+                {
+                  "value": "read",
+                  "label": {
+                    "pl": "Tylko odczyt",
+                    "en": "Read only"
+                  }
+                },
+                {
+                  "value": "full",
+                  "label": {
+                    "pl": "Pełny dostęp",
+                    "en": "Full access"
+                  }
+                },
+                {
+                  "value": "custom",
+                  "label": {
+                    "pl": "Własny",
+                    "en": "Custom"
+                  }
+                },
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Bez narzędzi",
+                    "en": "No tools"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "agents.beta.groups",
+            "label": {
+              "pl": "Beta — Grupy narzędzi",
+              "en": "Beta — Tool groups"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "",
+            "scope": "global",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "agents.beta.read_only",
+            "label": {
+              "pl": "Beta — Własny profil: tylko odczyt",
+              "en": "Beta — Custom profile: read only"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": false,
+            "scope": "global"
+          },
+          {
+            "key": "agents.gama.access",
+            "label": {
+              "pl": "Gama — Profil dostępu",
+              "en": "Gama — Access profile"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "roles",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "roles",
+                  "label": {
+                    "pl": "Według ról",
+                    "en": "By role"
+                  }
+                },
+                {
+                  "value": "read",
+                  "label": {
+                    "pl": "Tylko odczyt",
+                    "en": "Read only"
+                  }
+                },
+                {
+                  "value": "full",
+                  "label": {
+                    "pl": "Pełny dostęp",
+                    "en": "Full access"
+                  }
+                },
+                {
+                  "value": "custom",
+                  "label": {
+                    "pl": "Własny",
+                    "en": "Custom"
+                  }
+                },
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Bez narzędzi",
+                    "en": "No tools"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "agents.gama.groups",
+            "label": {
+              "pl": "Gama — Grupy narzędzi",
+              "en": "Gama — Tool groups"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "",
+            "scope": "global",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "agents.gama.read_only",
+            "label": {
+              "pl": "Gama — Własny profil: tylko odczyt",
+              "en": "Gama — Custom profile: read only"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": false,
+            "scope": "global"
+          },
+          {
+            "key": "agents.delta.access",
+            "label": {
+              "pl": "Delta — Profil dostępu",
+              "en": "Delta — Access profile"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "roles",
+            "scope": "global",
+            "control": {
+              "kind": "select",
+              "options": [
+                {
+                  "value": "roles",
+                  "label": {
+                    "pl": "Według ról",
+                    "en": "By role"
+                  }
+                },
+                {
+                  "value": "read",
+                  "label": {
+                    "pl": "Tylko odczyt",
+                    "en": "Read only"
+                  }
+                },
+                {
+                  "value": "full",
+                  "label": {
+                    "pl": "Pełny dostęp",
+                    "en": "Full access"
+                  }
+                },
+                {
+                  "value": "custom",
+                  "label": {
+                    "pl": "Własny",
+                    "en": "Custom"
+                  }
+                },
+                {
+                  "value": "off",
+                  "label": {
+                    "pl": "Bez narzędzi",
+                    "en": "No tools"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "agents.delta.groups",
+            "label": {
+              "pl": "Delta — Grupy narzędzi",
+              "en": "Delta — Tool groups"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "default": "",
+            "scope": "global",
+            "control": {
+              "kind": "text"
+            }
+          },
+          {
+            "key": "agents.delta.read_only",
+            "label": {
+              "pl": "Delta — Własny profil: tylko odczyt",
+              "en": "Delta — Custom profile: read only"
+            },
+            "description": {
+              "pl": "Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.",
+              "en": "Tool access is subject to the Broker. Applies to the next task."
+            },
+            "control": {
+              "kind": "toggle"
+            },
+            "default": false,
+            "scope": "global"
           }
         ],
         "upcoming": []
@@ -2758,6 +3098,18 @@
       "agents.approval_timeout_s": 300,
       "agents.verify_before_done": true,
       "scheduler.max_parallel": 4,
+      "agents.alfa.access": "full",
+      "agents.alfa.groups": "",
+      "agents.alfa.read_only": false,
+      "agents.beta.access": "roles",
+      "agents.beta.groups": "",
+      "agents.beta.read_only": false,
+      "agents.gama.access": "roles",
+      "agents.gama.groups": "",
+      "agents.gama.read_only": false,
+      "agents.delta.access": "roles",
+      "agents.delta.groups": "",
+      "agents.delta.read_only": false,
       "ui.hide_from_capture": false,
       "ui.broker_dev_banner": true,
       "memory.consolidation_enabled": true,

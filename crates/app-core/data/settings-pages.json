@@ -1376,17 +1376,33 @@
      "en": "Task step limit"
     },
     "description": {
-     "pl": "Agentka zatrzyma się po tylu krokach (tura modelu albo narzędzie) i pokaże raport.",
-     "en": "The agent stops after this many steps (model turn or tool) and shows a report."
+     "pl": "Wielkość puli kroków (tury modeli i narzędzia). Po limicie zapis lokalny i zgoda na kolejną pulę, chyba że włączysz automatyczne przedłużanie.",
+     "en": "Allowance of model and tool steps. At the limit: local save and permission for another allowance unless automatic extension is enabled."
     },
     "default": 40,
     "scope": "global",
     "control": {
      "kind": "number",
      "min": 5,
-     "max": 200,
+     "max": 500,
      "step": 1,
      "unit": null
+    }
+   },
+   {
+    "key": "agents.auto_extend_steps",
+    "label": {
+     "pl": "Zgoda na automatyczne przedłużanie kroków",
+     "en": "Allow automatic step extensions"
+    },
+    "description": {
+     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Brokera i nie zwiększa limitu kosztów.",
+     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Broker actions or raise cost limits."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
     }
    },
    {
@@ -1396,8 +1412,8 @@
      "en": "Task time limit"
     },
     "description": {
-     "pl": "Najdłuższy czas jednego zadania agentki.",
-     "en": "The longest time of a single agent task."
+     "pl": "Pula czasu aktywnej pracy. Oczekiwanie na zgodę nie zużywa tej puli. Limit wstrzymuje pracę z zapisem; automatyczne przedłużanie pozwala pracować dłużej.",
+     "en": "Active work allowance. Approval waiting is excluded. The limit pauses saved work; automatic extension allows longer tasks."
     },
     "default": 15,
     "scope": "global",
@@ -1407,6 +1423,22 @@
      "max": 120,
      "step": 1,
      "unit": "min"
+    }
+   },
+   {
+    "key": "agents.auto_extend_time",
+    "label": {
+     "pl": "Zgoda na automatyczne przedłużanie czasu",
+     "en": "Allow automatic active-time extensions"
+    },
+    "description": {
+     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Brokera i nie zwiększa limitu kosztów.",
+     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Broker actions or raise cost limits."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
     }
    },
    {
@@ -1436,8 +1468,8 @@
      "en": "Waiting for approval"
     },
     "description": {
-     "pl": "Po tym czasie bez decyzji w oknie Brokera agentka dostaje odmowę.",
-     "en": "Without a decision in the Broker window after this time, the agent is denied."
+     "pl": "Bez decyzji: zapis i wstrzymanie zadania lub dalsze oczekiwanie, jeśli włączysz przedłużanie. Przedłużanie nie udziela zgody za Ciebie.",
+     "en": "Without a decision: save and pause, or keep waiting if extension is enabled. Extension never approves the action for you."
     },
     "default": 300,
     "scope": "global",
@@ -1447,6 +1479,22 @@
      "max": 1800,
      "step": 30,
      "unit": "s"
+    }
+   },
+   {
+    "key": "agents.auto_extend_approval",
+    "label": {
+     "pl": "Automatycznie przedłużaj oczekiwanie na zatwierdzenie",
+     "en": "Automatically extend approval waiting"
+    },
+    "description": {
+     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Brokera i nie zwiększa limitu kosztów.",
+     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Broker actions or raise cost limits."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
     }
    },
    {
@@ -1484,6 +1532,346 @@
     },
     "default": 4,
     "scope": "machine"
+   },
+   {
+    "key": "agents.alfa.access",
+    "label": {
+     "pl": "Alfa — Profil dostępu",
+     "en": "Alfa — Access profile"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "full",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "roles",
+       "label": {
+        "pl": "Według ról",
+        "en": "By role"
+       }
+      },
+      {
+       "value": "read",
+       "label": {
+        "pl": "Tylko odczyt",
+        "en": "Read only"
+       }
+      },
+      {
+       "value": "full",
+       "label": {
+        "pl": "Pełny dostęp",
+        "en": "Full access"
+       }
+      },
+      {
+       "value": "custom",
+       "label": {
+        "pl": "Własny",
+        "en": "Custom"
+       }
+      },
+      {
+       "value": "off",
+       "label": {
+        "pl": "Bez narzędzi",
+        "en": "No tools"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "key": "agents.alfa.groups",
+    "label": {
+     "pl": "Alfa — Grupy narzędzi",
+     "en": "Alfa — Tool groups"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "",
+    "scope": "global",
+    "control": {
+     "kind": "text"
+    }
+   },
+   {
+    "key": "agents.alfa.read_only",
+    "label": {
+     "pl": "Alfa — Własny profil: tylko odczyt",
+     "en": "Alfa — Custom profile: read only"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
+    }
+   },
+   {
+    "key": "agents.beta.access",
+    "label": {
+     "pl": "Beta — Profil dostępu",
+     "en": "Beta — Access profile"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "roles",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "roles",
+       "label": {
+        "pl": "Według ról",
+        "en": "By role"
+       }
+      },
+      {
+       "value": "read",
+       "label": {
+        "pl": "Tylko odczyt",
+        "en": "Read only"
+       }
+      },
+      {
+       "value": "full",
+       "label": {
+        "pl": "Pełny dostęp",
+        "en": "Full access"
+       }
+      },
+      {
+       "value": "custom",
+       "label": {
+        "pl": "Własny",
+        "en": "Custom"
+       }
+      },
+      {
+       "value": "off",
+       "label": {
+        "pl": "Bez narzędzi",
+        "en": "No tools"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "key": "agents.beta.groups",
+    "label": {
+     "pl": "Beta — Grupy narzędzi",
+     "en": "Beta — Tool groups"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "",
+    "scope": "global",
+    "control": {
+     "kind": "text"
+    }
+   },
+   {
+    "key": "agents.beta.read_only",
+    "label": {
+     "pl": "Beta — Własny profil: tylko odczyt",
+     "en": "Beta — Custom profile: read only"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
+    }
+   },
+   {
+    "key": "agents.gama.access",
+    "label": {
+     "pl": "Gama — Profil dostępu",
+     "en": "Gama — Access profile"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "roles",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "roles",
+       "label": {
+        "pl": "Według ról",
+        "en": "By role"
+       }
+      },
+      {
+       "value": "read",
+       "label": {
+        "pl": "Tylko odczyt",
+        "en": "Read only"
+       }
+      },
+      {
+       "value": "full",
+       "label": {
+        "pl": "Pełny dostęp",
+        "en": "Full access"
+       }
+      },
+      {
+       "value": "custom",
+       "label": {
+        "pl": "Własny",
+        "en": "Custom"
+       }
+      },
+      {
+       "value": "off",
+       "label": {
+        "pl": "Bez narzędzi",
+        "en": "No tools"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "key": "agents.gama.groups",
+    "label": {
+     "pl": "Gama — Grupy narzędzi",
+     "en": "Gama — Tool groups"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "",
+    "scope": "global",
+    "control": {
+     "kind": "text"
+    }
+   },
+   {
+    "key": "agents.gama.read_only",
+    "label": {
+     "pl": "Gama — Własny profil: tylko odczyt",
+     "en": "Gama — Custom profile: read only"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
+    }
+   },
+   {
+    "key": "agents.delta.access",
+    "label": {
+     "pl": "Delta — Profil dostępu",
+     "en": "Delta — Access profile"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "roles",
+    "scope": "global",
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "roles",
+       "label": {
+        "pl": "Według ról",
+        "en": "By role"
+       }
+      },
+      {
+       "value": "read",
+       "label": {
+        "pl": "Tylko odczyt",
+        "en": "Read only"
+       }
+      },
+      {
+       "value": "full",
+       "label": {
+        "pl": "Pełny dostęp",
+        "en": "Full access"
+       }
+      },
+      {
+       "value": "custom",
+       "label": {
+        "pl": "Własny",
+        "en": "Custom"
+       }
+      },
+      {
+       "value": "off",
+       "label": {
+        "pl": "Bez narzędzi",
+        "en": "No tools"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "key": "agents.delta.groups",
+    "label": {
+     "pl": "Delta — Grupy narzędzi",
+     "en": "Delta — Tool groups"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": "",
+    "scope": "global",
+    "control": {
+     "kind": "text"
+    }
+   },
+   {
+    "key": "agents.delta.read_only",
+    "label": {
+     "pl": "Delta — Własny profil: tylko odczyt",
+     "en": "Delta — Custom profile: read only"
+    },
+    "description": {
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+    },
+    "default": false,
+    "scope": "global",
+    "control": {
+     "kind": "toggle"
+    }
    }
   ],
   "upcoming": []

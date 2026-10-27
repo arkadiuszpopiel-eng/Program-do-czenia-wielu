@@ -183,9 +183,60 @@ impl TaskExecutor for RuntimeExecutor {
         let cp = match self.shared.store.latest(&run) {
             Ok(Some(cp)) => match cp.finished.clone() {
                 Some(o) => return worker_result(&run, Exit::Finished(o)),
-                None => cp,
+                None => {
+                    let mut cp = cp;
+                    cp.spec.roles = spec.roles.clone();
+                    cp.options.crew = options.crew.clone();
+                    cp.options.continuation = options.continuation.clone();
+                    cp.options.request_privacy = options.request_privacy;
+                    cp
+                }
             },
-            _ => Checkpoint::with_options(run.clone(), spec, options),
+            Ok(None) => {
+                let previous = dispatch
+                    .attempt
+                    .checked_sub(1)
+                    .filter(|a| *a > 0)
+                    .and_then(|a| {
+                        self.shared
+                            .store
+                            .latest(&task_run_id(&dispatch.task, a))
+                            .ok()
+                            .flatten()
+                    });
+                if let Some(mut cp) = previous.filter(|c| {
+                    c.spec.session == spec.session
+                        && c.spec.agent == spec.agent
+                        && matches!(c.finished, Some(RunOutcome::BudgetExceeded { .. }))
+                }) {
+                    let mut budget = spec.budget;
+                    budget.max_steps = budget
+                        .max_steps
+                        .saturating_add(cp.usage.steps)
+                        .saturating_add(cp.delegated.steps);
+                    budget.max_tokens = budget
+                        .max_tokens
+                        .saturating_add(cp.usage.tokens())
+                        .saturating_add(cp.delegated.tokens());
+                    budget.max_wall_ms = budget.max_wall_ms.saturating_add(cp.usage.elapsed_ms);
+                    cp.run = run.clone();
+                    cp.finished = None;
+                    cp.paused = false;
+                    cp.spec.budget = budget;
+                    cp.spec.roles = spec.roles;
+                    cp.options = options;
+                    cp.messages.push(providers_contract::Message::user_text("Właściciel ponowił zapisane zadanie po limicie. Kontynuuj od zachowanej historii; nie powtarzaj ukończonych operacji."));
+                    cp
+                } else {
+                    Checkpoint::with_options(run.clone(), spec, options)
+                }
+            }
+            Err(error) => {
+                return WorkerResult::Failed {
+                    error: format!("Nie odczytano zapisanego postępu: {error}"),
+                    retryable: false,
+                };
+            }
         };
         let holder = match &dispatch.agent {
             Some(p) => LockHolder::Persona(p.clone()),

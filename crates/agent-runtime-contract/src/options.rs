@@ -28,12 +28,23 @@ pub struct Crew {
     pub personas: Vec<Persona>,
     /// Role (wbudowane i własne).
     pub roles: Vec<Role>,
+    /// Profile narzędzi person, przypięte przez właściciela przy starcie przebiegu.
+    /// Pusta mapa zachowuje zachowanie starszych checkpointów.
+    #[serde(default)]
+    pub persona_roles: BTreeMap<PersonaId, Vec<Role>>,
     /// Model per rola (brak = model przebiegu-rodzica).
     #[serde(default)]
     pub models: BTreeMap<RoleId, String>,
 }
 
 impl Crew {
+    /// Rola z uwzględnieniem profilu dostępu konkretnej persony.
+    pub fn role_for(&self, persona: &PersonaId, id: &RoleId) -> Option<&Role> {
+        match self.persona_roles.get(persona) {
+            Some(roles) => roles.iter().find(|r| &r.id == id),
+            None => self.role(id),
+        }
+    }
     /// Persona po identyfikatorze.
     pub fn persona(&self, id: &PersonaId) -> Option<&Persona> {
         self.personas.iter().find(|p| &p.id == id)
@@ -48,6 +59,18 @@ impl Crew {
 /// Opcje przebiegu v1 (wszystkie domyślne = zachowanie v0).
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunOptions {
+    /// Jawne zgody właściciela dotyczące miękkich limitów.
+    #[serde(default)]
+    pub continuation: crate::ContinuationPolicy,
+    /// Prywatność żądań, także odtwarzanych z lokalnego punktu.
+    #[serde(default)]
+    pub request_privacy: providers_contract::PrivacyTag,
+    /// Tura rozmowy, z której uruchomiono zadanie (punkt wznowienia po limicie).
+    #[serde(default)]
+    pub owner_turn: Option<String>,
+    /// Zlecenie nadrzędne, pozwala powiązać checkpoint z konkretnym etapem.
+    #[serde(default)]
+    pub owner_call: Option<String>,
     /// Przebieg-rodzic (delegacja, Krytyczka, umiejętność uruchomiona przez agentkę).
     #[serde(default)]
     pub parent: Option<RunId>,

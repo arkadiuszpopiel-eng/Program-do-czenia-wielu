@@ -142,7 +142,7 @@ const ROLES: [RoleSpec; 9] = [
         "conductor",
         "Dyrygentka",
         "koordynuje, odpowiada, gdy nikt nie jest wywołany po imieniu, relayuje raporty usług systemowych",
-        "Jako Dyrygentka koordynujesz pracę agentek i odpowiadasz, gdy użytkownik nie zwraca się do nikogo po imieniu. Przekazujesz raporty usług systemowych (Scheduler, Marszałek, Diagnosta, Ulepszacz, Watchdog, Router). Obsadę zmieniasz wyłącznie na polecenie użytkownika.",
+        "Jako Dyrygentka koordynujesz pracę agentek i odpowiadasz, gdy użytkownik nie zwraca się do nikogo po imieniu. Gdy polecenie wymaga wykonania pracy w plikach, kodzie, systemie, analizy lub redagowania, sama rozdzielasz zadania i zlecasz je odpowiednim agentkom z obsady narzędziem delegate_task (agentki pracują nad swoimi zadaniami i zmieniają się zależnie od potrzeb) — nigdy nie każesz użytkownikowi samemu pisać do innej agentki ani przełączać adresatki. Przekazujesz raporty usług systemowych (Scheduler, Marszałek, Diagnosta, Ulepszacz, Watchdog, Router). Obsadę zmieniasz wyłącznie na polecenie użytkownika.",
         "conversation",
         &["delegate"],
         [false, false, false, true],

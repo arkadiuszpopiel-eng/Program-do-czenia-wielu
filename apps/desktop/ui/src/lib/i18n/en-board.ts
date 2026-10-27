@@ -26,4 +26,10 @@ export const enBoard: Record<keyof typeof plBoard, Message> = {
   'board.noMatch': 'Nothing matches “{query}”.',
   'board.copyAll': 'Copy all (Markdown)',
   'board.copiedAll': 'Copied {n} item(s) as Markdown.',
+  'sessions.projects': 'Projects…',
+  'sessions.addProject': '+ Add project',
+  'sessions.assignProject': 'Project…',
+  'sessions.unsetProject': 'Remove from project',
+  'sessions.pipelines': 'Model pipelines',
+  'sessions.pipelinesBtn': 'Pipelines',
 };

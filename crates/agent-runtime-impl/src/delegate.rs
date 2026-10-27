@@ -111,6 +111,33 @@ pub fn parent_grant(view: &ParentView<'_>) -> RunGrant {
     }
 }
 
+/// Rozwiązuje identyfikator roli po `id`, polskiej nazwie roli lub (gdy model podał w `role`
+/// imię agentki, np. `"delta"` / `"Delta"`) głównej roli tej agentki w obsadzie.
+fn resolve_role_id(crew: &Crew, raw: &str) -> Option<RoleId> {
+    let wanted = raw.trim();
+    if wanted.is_empty() {
+        return None;
+    }
+    if let Some(r) = crew.roles.iter().find(|r| {
+        r.id.as_str().eq_ignore_ascii_case(wanted)
+            || r.name.eq_ignore_ascii_case(wanted)
+            || r.name
+                .split('/')
+                .any(|part| part.trim().eq_ignore_ascii_case(wanted))
+    }) {
+        return Some(r.id.clone());
+    }
+    let persona = crew.personas.iter().find(|p| {
+        p.id.as_str().eq_ignore_ascii_case(wanted) || p.name.eq_ignore_ascii_case(wanted)
+    })?;
+    let assigned = crew.cast.roles_of(&persona.id);
+    assigned
+        .iter()
+        .find(|r| r.as_str() != "conductor" && r.as_str() != "speaker")
+        .or_else(|| assigned.iter().next())
+        .cloned()
+}
+
 /// Wykonawczyni podzadania: wskazana agentka (identyfikator przycięty) albo pierwsza z obsady
 /// grająca rolę, inna niż zlecająca. Jedyne miejsce wyboru — ta sama agentka trafia do planu
 /// i do zapytania o jej poziom autonomii (przegląd #2, SR2-01).
@@ -119,10 +146,19 @@ pub fn delegation_target(
     args: &DelegateArgs,
     parent_agent: &str,
 ) -> Option<PersonaId> {
-    let holders = crew.cast.holders(&RoleId::new(args.role.trim()));
+    let role_id = resolve_role_id(crew, &args.role)?;
+    let holders = crew.cast.holders(&role_id);
     match &args.persona {
-        Some(p) => holders.into_iter().find(|h| h.as_str() == p.trim()),
-        None => holders
+        Some(p) if !p.trim().is_empty() => {
+            let wanted = p.trim();
+            holders.into_iter().find(|h| {
+                h.as_str().eq_ignore_ascii_case(wanted)
+                    || crew
+                        .persona(h)
+                        .is_some_and(|x| x.name.eq_ignore_ascii_case(wanted))
+            })
+        }
+        _ => holders
             .iter()
             .find(|h| h.as_str() != parent_agent)
             .or(holders.first())
@@ -145,12 +181,13 @@ pub fn plan_delegation(
     if goal.is_empty() || goal.chars().count() > MAX_CHILD_GOAL {
         return Err(DelegationError::Goal);
     }
-    let role_id = RoleId::new(args.role.trim());
-    let role = crew
-        .role(&role_id)
+    let role_id = resolve_role_id(crew, &args.role)
         .ok_or_else(|| DelegationError::UnknownRole(args.role.clone()))?;
     let persona_id = delegation_target(crew, args, view.spec.agent.as_str())
         .ok_or_else(|| DelegationError::NotInCast(args.role.clone()))?;
+    let role = crew
+        .role_for(&persona_id, &role_id)
+        .ok_or_else(|| DelegationError::UnknownRole(args.role.clone()))?;
     let persona = crew
         .persona(&persona_id)
         .ok_or_else(|| DelegationError::NotInCast(args.role.clone()))?;
@@ -223,6 +260,10 @@ pub fn plan_delegation(
         temperature: view.spec.temperature,
     };
     let options = RunOptions {
+        continuation: view.options.continuation.clone(),
+        request_privacy: view.options.request_privacy,
+        owner_turn: view.options.owner_turn.clone(),
+        owner_call: view.options.owner_call.clone(),
         parent: Some(view.run.clone()),
         depth,
         grant: Some(grant),

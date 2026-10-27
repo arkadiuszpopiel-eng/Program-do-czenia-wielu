@@ -44,7 +44,7 @@ export const plApi = {
   'api.shared.composeEmpty': 'Żadne konto nie ma kolejki dla tej klasy zadań.',
   'api.shared.cleared': 'Wspólna kolejka „{name}” wyczyszczona — działają kolejki kont.',
   'api.shared.oneRoute':
-    'Z kilku kont tego samego dostawcy Alfa korzysta z jednego (najstarszego działającego) — modele pozostałych kont tego dostawcy są wtedy pomijane.',
+    'Każde włączone konto jest oddzielną trasą z własnymi limitami. Wspólna kolejka określa kolejność prób także między kontami tego samego dostawcy.',
   'api.shared.add': 'Dodaj model do wspólnej kolejki',
   'api.shared.fromAccount': 'Konto',
   'api.shared.gone': 'konto usunięte',

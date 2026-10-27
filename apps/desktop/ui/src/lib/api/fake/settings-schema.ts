@@ -3,6 +3,8 @@
 import type { SettingValue, SettingsPageDef } from '../types-system';
 import { SETTINGS_PART_A } from './settings-part-a';
 import { SETTINGS_PART_B } from './settings-part-b';
+import { AGENT_ACCESS_SETTINGS } from './settings-agent-access';
+import { withContinuation } from './settings-continuation';
 import { L, page, select, toggle } from './settings-helpers';
 
 /** Strony dodane po podziale na części (każda część jest u limitu długości pliku). */
@@ -89,7 +91,14 @@ export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [
   ...SETTINGS_PART_A,
   ...SETTINGS_PART_B,
   ...SETTINGS_LATER,
-].map((p) => (EXTRA[p.id] ? { ...p, settings: [...p.settings, ...(EXTRA[p.id] ?? [])] } : p));
+].map((p) => ({
+  ...p,
+  settings: withContinuation([
+    ...p.settings,
+    ...(EXTRA[p.id] ?? []),
+    ...(p.id === 'agents' ? AGENT_ACCESS_SETTINGS : []),
+  ]),
+}));
 
 export function defaultValues(): Record<string, SettingValue> {
   const out: Record<string, SettingValue> = {};

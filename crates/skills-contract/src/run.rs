@@ -89,6 +89,10 @@ pub fn prepare_run(
     };
     let depth = caller_options.depth + u32::from(parent.is_some());
     let options = RunOptions {
+        continuation: caller_options.continuation.clone(),
+        request_privacy: caller_options.request_privacy,
+        owner_turn: caller_options.owner_turn.clone(),
+        owner_call: caller_options.owner_call.clone(),
         parent,
         depth,
         grant: Some(grant),

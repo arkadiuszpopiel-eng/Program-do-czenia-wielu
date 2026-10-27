@@ -98,6 +98,30 @@ async fn token_and_wall_budgets() {
 }
 
 #[tokio::test(start_paused = true)]
+async fn final_usage_includes_tool_step_when_budget_ends_immediately_after_it() {
+    let w = world();
+    lists(&w, 1);
+    let mut s = spec();
+    s.budget.max_steps = 2;
+    let run = w.runtime.start(s).await.unwrap();
+    w.runtime.wait(&run).await.unwrap();
+    let latest = w
+        .runtime
+        .events(&run)
+        .unwrap()
+        .into_iter()
+        .filter_map(|e| match e.event {
+            RunEvent::Usage(u) => Some(u),
+            _ => None,
+        })
+        .next_back()
+        .unwrap();
+    let cp = w.store.latest(&run).unwrap().unwrap();
+    assert_eq!(latest.steps, cp.usage.steps);
+    assert_eq!(latest.tool_calls, 1);
+}
+
+#[tokio::test(start_paused = true)]
 async fn loop_detector_stops_repeated_calls() {
     let w = world();
     for i in 0..10 {

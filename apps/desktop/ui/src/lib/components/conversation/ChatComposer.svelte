@@ -4,16 +4,7 @@
   Załączniki: spinacz, wklejenie (czyta rdzeń), przeciągnięcie, zdjęcie z kamery — artefakty sesji.
 -->
 <script lang="ts">
-  import {
-    Chip,
-    Composer,
-    Menu,
-    MicButton,
-    agentIds,
-    agents,
-    type AgentId,
-    type MenuItem,
-  } from '@alfa/ui-kit';
+  import { Chip, Composer, Menu, MicButton, agentIds, agents, type AgentId, type MenuItem } from '@alfa/ui-kit';
   import CameraSnapButton from './CameraSnapButton.svelte';
   import type { ModelProfile } from '../../api/types';
   import {
@@ -26,13 +17,16 @@
   import { fuzzyRank } from '../../logic/fuzzy';
   import { lastUserTurn } from '../../logic/turn-tree';
   import { useApp } from '../../state/context';
+  import { openPipelines } from '../../state/board-dialog.svelte';
   import { runCommand } from '../../state/commands';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { AttachmentsState } from '../../state/attachments.svelte';
   import ComposerHint from './ComposerHint.svelte';
   import { carriesFiles, hintsFrom } from '../../logic/attachments';
-  import ComposerAttachments from './ComposerAttachments.svelte';
+  import Lazy from '../shell/Lazy.svelte';
   import ComposerSuggest, { type Suggestion } from './ComposerSuggest.svelte';
+
+  const loadAttachments = () => import('./ComposerAttachments.svelte');
 
   interface Props {
     conv: ConversationState | null;
@@ -319,7 +313,8 @@
     onstop={() => void conv?.stop()}
   >
     {#snippet above()}
-      <ComposerAttachments {att} profile={effectiveProfile} turns={conv?.path ?? []} />
+      {#if att.items.length > 0}<Lazy load={loadAttachments} props={{ att, profile: effectiveProfile, turns: conv?.path ?? [] }} label={t('common.loading')} />{/if}
+      <p class="alfa-visually-hidden" role="status">{att.status}</p>
       {#if open}
         <ComposerSuggest
           {suggestions}
@@ -332,6 +327,7 @@
     {/snippet}
     {#snippet chips()}
       <CameraSnapButton {att} />
+      <Chip size="sm" onclick={() => openPipelines()} label={t('sessions.pipelines')}>{t('sessions.pipelinesBtn')}</Chip>
       <Menu
         items={agentItems}
         label={t('composer.agent', {

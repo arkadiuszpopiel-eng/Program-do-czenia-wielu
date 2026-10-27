@@ -187,6 +187,7 @@ pub fn standard_crew(models: &[(&str, &str)]) -> Crew {
     })
     .collect();
     Crew {
+        persona_roles: BTreeMap::new(),
         cast: Cast::new(None, false, assignments),
         personas: builtin_personas(),
         roles: builtin_roles(),

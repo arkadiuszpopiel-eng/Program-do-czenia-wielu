@@ -119,3 +119,41 @@ async fn shared_queue_refuses_bad_entries_with_a_clear_message() {
     assert!(refused(too_many).contains("najwyżej 10"));
     assert!(core.accounts_shared_queues().await.unwrap().is_empty());
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn shared_queue_uses_second_account_of_same_vendor() {
+    let (base_a, asked_a) = chat_stub();
+    let (base_b, asked_b) = chat_stub();
+    let (core, _dir) = core().await;
+    let a = core
+        .accounts_add(input(KEY, &base_a, "pierwsze"))
+        .await
+        .unwrap();
+    let b = core
+        .accounts_add(input("test-inne-XXXXXXXXXXXXXXXXXXXX", &base_b, "drugie"))
+        .await
+        .unwrap();
+    assert!(core.accounts_test(a.id.clone()).await.unwrap().ok);
+    assert!(core.accounts_test(b.id.clone()).await.unwrap().ok);
+    core.accounts_set_shared_queue(
+        "chat".into(),
+        vec![entry(&b.id, "gpt-4o-mini"), entry(&a.id, "gpt-4o")],
+    )
+    .await
+    .unwrap();
+    let sid = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    let mut rx = core.subscribe_events();
+    let turn = core
+        .turns_send(sid.clone(), send("Odpowiedz według wspólnej kolejki", None))
+        .await
+        .unwrap()
+        .assistant_turn_id
+        .unwrap();
+    until(&mut rx, ends(&turn)).await;
+    assert!(asked_a.lock().unwrap().is_empty());
+    assert_eq!(*asked_b.lock().unwrap(), ["gpt-4o-mini"]);
+}

@@ -22,13 +22,12 @@
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
   import CodeBlock from './CodeBlock.svelte';
-  import MessageApproval from './MessageApproval.svelte';
+  const loadApproval = () => import('./MessageApproval.svelte'); // tylko przy oczekującej zgodzie
   import Lazy from '../shell/Lazy.svelte';
   import { isContinued } from '../../logic/turn-tree';
   import MessageActions from './MessageActions.svelte';
   import MessageAttachments from './MessageAttachments.svelte';
   import ToolSteps from './ToolSteps.svelte';
-
   interface Props {
     turn: Turn;
     conv: ConversationState;
@@ -36,11 +35,9 @@
     count: number;
     highlighted?: boolean;
   }
-
   let { turn, conv, position, count, highlighted = false }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
-
   const agent = $derived(turn.author === 'user' ? null : turn.author);
   const name = $derived(agent ? agents[agent].name : t('conv.you'));
   const siblings = $derived(conv.siblings(turn));
@@ -103,6 +100,7 @@
   const loadError = () => import('./MessageError.svelte');
   // Karty kroków agentki (intencje, „Cofnij”) — tylko pod odpowiedziami z narzędziami.
   const loadAgentCards = () => import('./AgentCards.svelte');
+  const loadContinuation = () => import('./ContinuationCard.svelte'); // rzadka, z dialogiem
 </script>
 
 {#if annotation?.hidden}
@@ -225,7 +223,7 @@
     {/if}
 
     {#if turn.approval && agent}
-      <div class="indent"><MessageApproval {agent} approval={turn.approval} /></div>
+      <div class="indent"><Lazy load={loadApproval} label={t('common.loading')} props={{ agent, approval: turn.approval }} /></div>
     {/if}
 
     {#if agent && turn.tools.length}
@@ -234,7 +232,10 @@
       </div>
     {/if}
 
-    {#if turn.error}
+    {#if turn.error?.code === 'task_paused' && !isContinued(conv.tree,turn)}
+      <Lazy load={loadContinuation} label={t('common.loading')}
+        props={{ oncontinue: () => void act(() => conv.continueTurn(turn)) }} />
+    {:else if turn.error}
       <div class="indent">
         <Lazy
           load={loadError}

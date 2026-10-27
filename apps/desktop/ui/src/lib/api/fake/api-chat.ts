@@ -93,6 +93,7 @@ export class FakeChat {
         provider: 'local',
       };
     }
+    if(this.core.scenario==='task-paused'){return {code:'task_paused',message:'Osiągnięto limit; stan zapisany lokalnie.',retry_at:null,provider:null};}
     return null;
   }
 

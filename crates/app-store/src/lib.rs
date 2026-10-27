@@ -10,6 +10,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod agents;
+mod recovery;
 
 use std::collections::{BTreeMap, HashSet};
 use std::sync::{Arc, Mutex, PoisonError};
@@ -47,6 +48,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
          BEGIN SELECT RAISE(ABORT, 'app_timeline: append-only'); END;",
     ),
     ("0002", crate::agents::MIGRATION_0002),
+    ("0003", crate::recovery::MIGRATION),
 ];
 
 /// Fakty o turze zapisywane raz, razem z turą.

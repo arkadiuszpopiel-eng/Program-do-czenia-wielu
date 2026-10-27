@@ -28,6 +28,36 @@ impl std::fmt::Debug for RunHandle {
 }
 
 impl RunHandle {
+    /// Wznawia zapisany miękki limit z nową pulą, bez powtarzania ukończonych operacji.
+    pub async fn resume_saved(
+        launch: &crate::Launch,
+        provider: Arc<dyn ModelProvider>,
+        tools: &AgentTools,
+        bus: Option<Arc<dyn EventBus>>,
+        checkpoint: agent_runtime_contract::Checkpoint,
+        budget: agent_runtime_contract::RunBudget,
+    ) -> Result<(Self, crate::RunFamily), RunError> {
+        let (runtime, store) = launch.runtime(&checkpoint.spec.session, provider, tools.all(), bus);
+        let run = checkpoint.run.clone();
+        store
+            .save(&checkpoint)
+            .map_err(|e| RunError::Store(e.to_string()))?;
+        if checkpoint.finished.is_none() {
+            let mut cp = checkpoint;
+            cp.spec.budget = budget;
+            if let Some(grant) = cp.options.grant.as_mut() {
+                grant.budget = budget;
+            }
+            store
+                .save(&cp)
+                .map_err(|e| RunError::Store(e.to_string()))?;
+            runtime.resume(&run).await?;
+        } else {
+            runtime.extend_and_resume(&run, budget).await?;
+        }
+        let family = crate::RunFamily::attach(runtime.clone(), store, run.clone())?;
+        Ok((Self { runtime, run }, family))
+    }
     /// Startuje przebieg (pętla w tle).
     pub async fn start(
         provider: Arc<dyn ModelProvider>,
@@ -67,7 +97,7 @@ impl RunHandle {
         spec: RunSpec,
         options: agent_runtime_contract::RunOptions,
     ) -> Result<(Self, crate::RunFamily), RunError> {
-        let (runtime, store) = launch.runtime(provider, tools.all(), bus);
+        let (runtime, store) = launch.runtime(&spec.session, provider, tools.all(), bus);
         let run = crate::Launch::start(&runtime, spec, options).await?;
         let family = crate::RunFamily::attach(runtime.clone(), store, run.clone())?;
         Ok((Self { runtime, run }, family))

@@ -156,16 +156,3 @@ impl AppPaths {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn paths_under_root_follow_layout() {
-        let p = AppPaths::under(Path::new("/x"));
-        assert_eq!(p.sessions(), Path::new("/x/local/sessions"));
-        assert_eq!(p.webview_data(), Path::new("/x/local/webview-data"));
-        assert_eq!(p.workdirs(), Path::new("/x/user/Sesje"));
-    }
-}

@@ -226,6 +226,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'conv.error.provider': '{message}',
   'conv.error.context_overflow': 'The conversation exceeded the context window.',
   'conv.error.budget_blocked': 'Cost limit exceeded.',
+  'conv.error.task_paused': 'Task saved — waiting for continuation approval.',
   'conv.retry': 'Retry',
   'conv.otherModel': 'Other model',
   'conv.openModels': 'Local models and engines',

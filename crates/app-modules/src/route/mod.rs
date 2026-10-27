@@ -226,11 +226,6 @@ pub fn task_class(policy: Option<&str>) -> TaskClass {
         .unwrap_or(TaskClass::Conversation)
 }
 
-/// Przypięcie trasy: model wskazany w żądaniu ma pierwszeństwo przed kontem agentki.
-fn pinned_first(requested: Option<Candidate>, assigned: Option<Candidate>) -> Option<Candidate> {
-    requested.or(assigned)
-}
-
 fn note(decision: &RouteDecision) -> RouteNote {
     RouteNote {
         chosen: decision.chosen.qualified(),
@@ -280,7 +275,11 @@ impl BrainPort for RouterBrain {
             .then(|| self.accounts.assigned_to(&request.agent))
             .flatten()
             .and_then(|(provider, r)| r.first_model(class).map(|m| Candidate::new(provider, m)));
-        constraints.pinned = pinned_first(constraints.pinned.take(), assigned);
+        constraints.pinned = router_contract::select_pin(
+            constraints.pinned.take(),
+            assigned,
+            core.manual_queue(class),
+        );
         let decision = core
             .decide(class, &constraints, request.chat.as_ref())
             .map_err(|e| self.no_route(&e, local_only))?;
@@ -361,27 +360,14 @@ impl BrainPort for RouterBrain {
             provider_name: registered
                 .as_ref()
                 .map_or_else(|| provider.clone(), |r| r.name.clone()),
+            provider_id: registered
+                .as_ref()
+                .map_or_else(|| provider.clone(), |r| r.provider.clone()),
             account: registered.map(|r| r.account),
-            provider_id: provider,
             model: c.model,
             local: false,
         })
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn requested_model_wins_over_agent_account() {
-        let arena = Candidate::new("openai", "gpt-6-sol");
-        let agent = Candidate::new("anthropic", "claude-opus-5-5");
-        assert_eq!(
-            pinned_first(Some(arena.clone()), Some(agent.clone())),
-            Some(arena)
-        );
-        assert_eq!(pinned_first(None, Some(agent.clone())), Some(agent));
-        assert_eq!(pinned_first(None, None), None);
-    }
-}
+mod account_queues;

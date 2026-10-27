@@ -3,7 +3,9 @@
 use lib_markdown::{Block, RenderOptions, render_blocks};
 use sessions_contract::{Author, Role, SessionId, Turn};
 
+use app_agents::Projection;
 use app_api::dto::{self, BlockKind, RenderedBlock, ThinkingInfo, TurnStatus};
+use app_api::dto::{AgentRun, AlfaEvent};
 use app_api::ids;
 use app_store::TurnMeta;
 
@@ -91,6 +93,30 @@ pub fn turn_dto(
             .heard_prefix
             .map(|h| turn.content.text.chars().take(h.chars).collect()),
         attachments: app_files::attach::turn_attachments(&turn.content.blocks),
+    }
+}
+
+impl crate::engine::ChatEngine {
+    /// UI, Oś czasu.
+    pub fn project_task(&self, session: &SessionId, run: &AgentRun, p: Projection) {
+        let store = &self.inner.store;
+        for step in &p.steps {
+            if let Err(e) = store.push_step(session, &run.id, step) {
+                tracing::warn!(error = %e, "zapis kroku zadania nie powiódł się");
+            }
+        }
+        if p.run_changed
+            && let Err(e) = store.push_run(session, run)
+        {
+            tracing::warn!(error = %e, "zapis przebiegu zadania nie powiódł się");
+        }
+        self.inner.events.emit_all(p.events);
+        for event in p.timeline {
+            if let Err(e) = store.push_timeline(session, &event) {
+                tracing::warn!(error = %e, "zapis osi czasu nie powiódł się");
+            }
+            self.emit(AlfaEvent::TimelineAppended { event });
+        }
     }
 }
 

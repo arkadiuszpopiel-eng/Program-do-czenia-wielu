@@ -2447,6 +2447,32 @@ export interface PermissionsState {
   readonly session: AutonomyLevel | null;
 }
 
+/** Zapisany lub wbudowany pipeline. */
+export interface PipelineDef {
+  /** Wbudowany wzorzec (nieedytowalny; zapis pod tą samą nazwą tworzy własną wersję). */
+  readonly builtin: boolean;
+  /** Krótki opis do czego służy. */
+  readonly description: string;
+  /** Unikalna nazwa (klucz). */
+  readonly name: string;
+  /** Etapy wykonywane po kolei (1–6). */
+  readonly stages: readonly PipelineStage[];
+}
+
+/** Etap pipeline'u. */
+export interface PipelineStage {
+  /** Zadanie etapu; może zawierać `{{input}}` (wejście) i `{{prev}}` (wynik poprzedniego etapu). */
+  readonly goal: string;
+  /** Opcjonalny model `dostawca:model`; pusty — dobór Routera. */
+  readonly model: string | null;
+  /** Opcjonalna agentka (`delta`, `gama`, `beta`); pusta — według roli. */
+  readonly persona: string | null;
+  /** Rola wykonawcza (`coder`, `operator`, `researcher`, `critic`, `thinker`, `writer`, `keeper`). */
+  readonly role: string;
+  /** Krótka nazwa etapu pokazywana w turze i w Replay (pusta = z roli). */
+  readonly title: string;
+}
+
 /** Zadeklarowana zdolność (`fs.read`, `fs.write`, `net.egress`) z zakresem. */
 export interface PluginCapabilityView {
   readonly family: string;
@@ -2565,6 +2591,13 @@ export interface PricingView {
   readonly rows: readonly PriceRow[];
   /** Czy zmiany zapisano (`false` — tylko podgląd). */
   readonly saved: boolean;
+}
+
+/** Projekt z katalogiem roboczym i liczbą rozmów. */
+export interface ProjectInfo {
+  readonly name: string;
+  readonly session_count: number;
+  readonly workdir: string | null;
 }
 
 /** Projekt (folder sesji). */
@@ -3582,7 +3615,13 @@ export interface TurnError {
 
 /** Kod błędu tury. */
 export type TurnErrorCode =
-  'offline' | 'rate_limited' | 'no_keys' | 'provider' | 'context_overflow' | 'budget_blocked';
+  | 'offline'
+  | 'rate_limited'
+  | 'no_keys'
+  | 'provider'
+  | 'context_overflow'
+  | 'budget_blocked'
+  | 'task_paused';
 
 /** Praca modelu końca wypowiedzi od startu programu. */
 export interface TurnStatsView {
@@ -4430,6 +4469,18 @@ export interface IpcCommands {
     readonly args: { readonly level: AutonomyLevel; readonly sessionId: string | null };
     readonly result: BrokerIntentResult;
   };
+  readonly pipelines_list: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly PipelineDef[];
+  };
+  readonly pipelines_remove: {
+    readonly args: { readonly name: string };
+    readonly result: readonly PipelineDef[];
+  };
+  readonly pipelines_save: {
+    readonly args: { readonly pipeline: PipelineDef; readonly previousName: string | null };
+    readonly result: readonly PipelineDef[];
+  };
   readonly plugins_approve: {
     readonly args: {
       readonly pluginId: string;
@@ -4473,6 +4524,26 @@ export interface IpcCommands {
   readonly pricing_get: {
     readonly args: Readonly<Record<string, never>>;
     readonly result: PricingView;
+  };
+  readonly projects_list: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly ProjectInfo[];
+  };
+  readonly projects_pick_dir: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: string | null;
+  };
+  readonly projects_remove: {
+    readonly args: { readonly name: string };
+    readonly result: readonly ProjectInfo[];
+  };
+  readonly projects_rename: {
+    readonly args: { readonly oldName: string; readonly newName: string };
+    readonly result: readonly ProjectInfo[];
+  };
+  readonly projects_save: {
+    readonly args: { readonly name: string; readonly workdir: string | null };
+    readonly result: readonly ProjectInfo[];
   };
   readonly prompt_templates_get: {
     readonly args: Readonly<Record<string, never>>;

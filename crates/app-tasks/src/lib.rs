@@ -21,6 +21,7 @@ mod exec_agent;
 mod exec_bridge;
 mod executor;
 mod facts;
+mod facts_fs;
 mod host;
 mod late;
 pub mod map;
@@ -52,6 +53,7 @@ pub use facts::{
     CostHistory, FactInput, FileFact, MAX_FILES, REPORT_FORM, WorkdirFacts, fact_sheet,
     visible_tasks, wants_facts,
 };
+pub use facts_fs::read_workdir_facts;
 pub use host::{AgentKit, ExecDeps, TaskHost};
 pub use late::{BIND_WAIT, LateExecutor};
 pub use marshal_impl::MarshalModule;

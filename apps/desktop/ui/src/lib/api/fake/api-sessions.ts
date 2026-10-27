@@ -2,7 +2,13 @@
 // przez 10 s, duplikat, eksport, wyszukiwanie, szkice).
 import type { AlfaClient } from '../client';
 import { plainSnippet } from '../../logic/session-cards';
-import type { SessionCard, SessionSearchHit, SessionSummary, SessionTemplate } from '../types';
+import type {
+  ProjectInfo,
+  SessionCard,
+  SessionSearchHit,
+  SessionSummary,
+  SessionTemplate,
+} from '../types';
 import type { FakeCore } from './core';
 import { session as makeSession } from './fixtures';
 
@@ -30,6 +36,22 @@ export function fakeCard(core: FakeCore, id: string): SessionCard {
     model: usage.at(-1)?.model ?? null,
     cost: minor > 0 ? { minor, currency } : null,
   };
+}
+
+function fakeProjects(core: FakeCore): ProjectInfo[] {
+  const counts = new Map<string, number>();
+  for (const s of core.sessions) {
+    const name = s.project?.name.trim();
+    if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  const names = new Set<string>([...core.projectWorkdirs.keys(), ...counts.keys()]);
+  return [...names]
+    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()) || (a < b ? -1 : a > b ? 1 : 0))
+    .map((name) => ({
+      name,
+      workdir: core.projectWorkdirs.get(name) ?? null,
+      session_count: counts.get(name) ?? 0,
+    }));
 }
 
 export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
@@ -133,8 +155,53 @@ export function sessionsApi(core: FakeCore): AlfaClient['sessions'] {
     setProject: (id, project) => {
       const name = project?.trim() ?? '';
       const next = name ? { id: name.toLowerCase().replace(/\s+/g, '-'), name } : null;
-      return core.reply(void core.updateSession(id, { project: next }));
+      core.updateSession(id, { project: next });
+      const dir = name ? (core.projectWorkdirs.get(name) ?? null) : null;
+      if (dir) core.runs.setWorkdirPath(id, dir);
+      return core.reply(undefined);
     },
+    projectsList: () => core.reply(fakeProjects(core)),
+    projectsPickDir: () => core.reply('C:\\Users\\Ty\\Dokumenty\\Projekt'),
+    projectsSave: (name, workdir) => {
+      const dir = workdir?.trim() || null;
+      const derived = dir ? (dir.split(/[\\/]/).filter(Boolean).at(-1) ?? '') : '';
+      const clean = (name.trim() || derived).slice(0, 80).trim();
+      if (!clean) throw new Error('Nazwa projektu musi mieć od 1 do 80 znaków.');
+      core.projectWorkdirs.set(clean, dir);
+      if (dir) {
+        for (const s of core.sessions) {
+          if (s.project?.name === clean) core.runs.setWorkdirPath(s.id, dir);
+        }
+      }
+      return core.reply(fakeProjects(core));
+    },
+    projectsRename: (oldName, newName) => {
+      const from = oldName.trim();
+      const to = newName.trim().slice(0, 80).trim();
+      if (!from || !to) throw new Error('Nazwa projektu musi mieć od 1 do 80 znaków.');
+      if (from !== to) {
+        const dir = core.projectWorkdirs.get(from) ?? null;
+        core.projectWorkdirs.delete(from);
+        if (!core.projectWorkdirs.get(to)) core.projectWorkdirs.set(to, dir);
+        const ref = { id: to.toLowerCase().replace(/\s+/g, '-'), name: to };
+        for (const s of core.sessions) {
+          if (s.project?.name === from) core.updateSession(s.id, { project: ref });
+        }
+      }
+      return core.reply(fakeProjects(core));
+    },
+    projectsRemove: (name) => {
+      const clean = name.trim();
+      core.projectWorkdirs.delete(clean);
+      for (const s of core.sessions) {
+        if (s.project?.name === clean) core.updateSession(s.id, { project: null });
+      }
+      return core.reply(fakeProjects(core));
+    },
+    pipelinesList: () => core.reply(core.pipelines.list()),
+    pipelinesSave: (pipeline, previousName) =>
+      core.reply(core.pipelines.save(pipeline, previousName)),
+    pipelinesRemove: (name) => core.reply(core.pipelines.remove(name)),
     workdir: (id) => core.reply(core.runs.workdir(id)),
     chooseWorkdir: (id, choice) => core.reply(core.runs.chooseWorkdir(id, choice)),
   };

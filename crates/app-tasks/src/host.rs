@@ -23,6 +23,13 @@ pub trait TaskHost: Send + Sync {
     fn privacy(&self, session: &SessionId) -> PrivacyTag;
     /// Ustawienia agentek (budżety, limit czekania na zatwierdzenie).
     async fn agent_settings(&self) -> AgentSettings;
+    /// Przypina wybrany przez właściciela profil narzędzi do nowego zadania i potomków.
+    async fn prepare_agent_access(
+        &self,
+        _spec: &mut agent_runtime_contract::RunSpec,
+        _options: &mut agent_runtime_contract::RunOptions,
+    ) {
+    }
     /// Kurs USD→PLN × 10⁴.
     fn usd_pln_e4(&self) -> u64;
     /// Czy działa okno Brokera (Broker-UI).

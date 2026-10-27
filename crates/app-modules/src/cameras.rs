@@ -177,3 +177,28 @@ pub fn zlib_fast(data: &[u8]) -> Vec<u8> {
 pub fn png_base64(image: &RgbaImage) -> String {
     base64::engine::general_purpose::STANDARD.encode(encode_png_with(image, &zlib_fast))
 }
+
+/// Zmiana `camera.enabled` spoza huba (strona Ustawień, reset, import) → przełącznik główny.
+pub fn spawn_master_watch(
+    hub: &Arc<dyn camera_hub_contract::CameraHub>,
+    config: Arc<FileConfigStore>,
+) {
+    use futures_util::StreamExt;
+    let hub = Arc::downgrade(hub);
+    tokio::spawn(async move {
+        let Ok(key) = ConfigKey::new(MASTER_KEY) else {
+            return;
+        };
+        let mut changes = config.watch(MASTER_KEY);
+        while changes.next().await.is_some() {
+            let Some(hub) = hub.upgrade() else {
+                break;
+            };
+            let value = config.get(&key, &Scope::Global).await.ok().flatten();
+            let enabled = value.and_then(|v| v.as_bool()).unwrap_or(false);
+            if let Err(e) = hub.set_master(enabled).await {
+                tracing::warn!(error = %e, "przełącznik kamer z ustawień nie został zastosowany");
+            }
+        }
+    });
+}

@@ -195,6 +195,9 @@ impl ModelProvider for AnthropicProvider {
     fn capabilities(&self) -> ProviderCapabilities {
         self.registry.provider_capabilities(&self.engine.profile)
     }
+    fn model_capabilities(&self, model: &str) -> Option<providers_contract::ModelCapabilities> {
+        Some(self.registry.caps(model))
+    }
 
     fn stream(&self, request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
         self.engine.stream(request, cancel)

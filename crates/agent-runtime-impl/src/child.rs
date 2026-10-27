@@ -75,8 +75,17 @@ impl Engine {
         options: RunOptions,
         route: RouteHint,
     ) -> Result<ChildResult, String> {
-        let n = self.handle.children().len() + 1;
-        let run = RunId::new(format!("{}-c{n}", self.handle.run));
+        // Po wznowieniu lista dzieci w pamięci jest pusta — numer musi ominąć zapisane checkpointy
+        // wcześniejszych dzieci, inaczej nowe dziecko nadpisałoby ukończone (Replay, zużycie).
+        let saved = self.shared.store.runs().unwrap_or_default();
+        let mut n = self.handle.children().len() + 1;
+        let run = loop {
+            let id = RunId::new(format!("{}-c{n}", self.handle.run));
+            if !saved.contains(&id) {
+                break id;
+            }
+            n += 1;
+        };
         let mut cp = Checkpoint::with_options(run.clone(), spec, options);
         cp.route = route;
         let hooks = Hooks {
@@ -124,6 +133,16 @@ impl Engine {
                         RunEvent::Tainted { source } => taint = taint.or(Some(source)),
                         _ => {}
                     }
+                }
+            }
+        }
+        if let Some(c) = saved.as_ref() {
+            for (m, (a, b, cost)) in &c.model_usage {
+                let p = self.cp.model_usage.entry(m.clone()).or_default();
+                p.0 = p.0.saturating_add(*a);
+                p.1 = p.1.saturating_add(*b);
+                if let Some(cost) = cost {
+                    p.2 = Some(p.2.unwrap_or(0).saturating_add(*cost));
                 }
             }
         }

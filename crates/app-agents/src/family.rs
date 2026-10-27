@@ -9,7 +9,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use agent_runtime_contract::{
-    AgentRuntime, CheckpointStore, MemCheckpointStore, RunError, RunEvent, RunEventEnvelope, RunId,
+    AgentRuntime, CheckpointStore, RunError, RunEvent, RunEventEnvelope, RunId,
 };
 use agent_runtime_impl::Runtime;
 use app_api::dto::AgentRun;
@@ -34,7 +34,7 @@ pub struct ChildInfo {
 /// Dzienniki przebiegu głównego i podprzebiegów na żywo.
 pub struct RunFamily {
     runtime: Arc<Runtime>,
-    store: MemCheckpointStore,
+    store: Arc<dyn CheckpointStore>,
     feeds: Vec<(RunId, RunFeed)>,
     parents: BTreeMap<RunId, RunId>,
     known: BTreeSet<RunId>,
@@ -49,7 +49,7 @@ impl RunFamily {
     /// Rodzina istniejącego przebiegu (dziennik od początku, potem na żywo).
     pub fn attach(
         runtime: Arc<Runtime>,
-        store: MemCheckpointStore,
+        store: Arc<dyn CheckpointStore>,
         main: RunId,
     ) -> Result<Self, RunError> {
         let feed = RunFeed::attach(runtime.clone(), main.clone())?;
@@ -160,6 +160,14 @@ impl FamilyProjector {
     /// Projektor przebiegu głównego (stan tury, wynik).
     pub fn main(&self) -> &RunProjector {
         &self.main
+    }
+
+    /// Ustawia przebieg-rodzica i etykietę dla głównego przebiegu tej rodziny (np. podzadanie
+    /// zlecone przez Dyrygentkę w czacie).
+    #[must_use]
+    pub fn with_main_parent(mut self, parent: String, label: Option<String>) -> Self {
+        self.main = self.main.with_parent(parent, label);
+        self
     }
 
     /// Stosuje zdarzenie; zwraca nagłówek przebiegu, którego dotyczy, i jego projekcję.

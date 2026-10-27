@@ -10,7 +10,7 @@ use personas_contract::PersonaId;
 use providers_contract::{ChatRequest, ProviderEvent, TurnAccumulator, Usage};
 use sessions_contract::{Block as SBlock, PrivacyTag, SessionCatalog};
 
-use app_api::dto::{self, AlfaEvent, AutonomyLevel, RenderedBlock, TurnError, TurnErrorCode};
+use app_api::dto::{self, AlfaEvent, RenderedBlock, TurnError, TurnErrorCode};
 use app_api::ports::{BrainChoice, BrainError, BrainRequest, VoiceChunk};
 
 use crate::engine::{ChatEngine, GenHandle};
@@ -19,7 +19,7 @@ use crate::outcome::{Chosen, Outcome, classify, millis, turn_error};
 use crate::project::block_dto;
 use crate::style;
 
-fn update_blocks(update: StreamUpdate) -> Vec<RenderedBlock> {
+pub(crate) fn update_blocks(update: StreamUpdate) -> Vec<RenderedBlock> {
     let mut blocks: Vec<RenderedBlock> = update.closed.iter().map(|b| block_dto(b, true)).collect();
     if let Some(open) = &update.open {
         blocks.push(block_dto(open, false));
@@ -27,7 +27,7 @@ fn update_blocks(update: StreamUpdate) -> Vec<RenderedBlock> {
     blocks
 }
 
-fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
+pub(crate) fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
     live.text.push_str(text);
     for b in blocks {
         match live.blocks.iter_mut().find(|x| x.index == b.index) {
@@ -38,55 +38,8 @@ fn merge_live(live: &mut dto::Turn, text: &str, blocks: &[RenderedBlock]) {
 }
 
 /// Długość tekstu w jednostkach UTF-16 (tak liczy ją interfejs: `String.length`).
-fn utf16_len(text: &str) -> u64 {
+pub(crate) fn utf16_len(text: &str) -> u64 {
     text.encode_utf16().count() as u64
-}
-
-/// Kiedy Broker pyta właściciela o zgodę na danym poziomie — z tej samej tabeli reguł, którą
-/// stosuje Broker (`risk_classifier_contract::RULES`; przegląd 21.10: skróty ze strony Uprawnień
-/// pomijały m.in. operacje administracyjne i wysyłkę po niezaufanej treści na L4).
-fn autonomy_note(level: AutonomyLevel) -> String {
-    use risk_classifier_contract::{AutonomyLevel as Level, RULES, RuleId};
-    let at = match level {
-        AutonomyLevel::L0 => {
-            return "L0 — agentka tylko czyta i podpowiada, nic nie zmienia".into();
-        }
-        AutonomyLevel::L1 => Level::L1,
-        AutonomyLevel::L2 => Level::L2,
-        AutonomyLevel::L3 => Level::L3,
-        AutonomyLevel::L4 => Level::L4,
-    };
-    let asks: Vec<&str> = RULES
-        .iter()
-        .filter(|r| r.id != RuleId::KernelBlock && r.applies_at(at))
-        .map(|r| r.description_pl)
-        .collect();
-    format!(
-        "{at:?} — Broker pyta właściciela o zgodę, gdy: {}; twarde blokady Jądra obowiązują zawsze",
-        asks.join("; ")
-    )
-}
-
-/// Informacja w prompcie: kto w obsadzie działa na komputerze, jak go wywołać i kiedy Broker
-/// pyta o zgodę (handoff 20.10: na L4 model zapowiadał zatwierdzanie każdej akcji).
-fn crew_note(crew: &[String], level: Option<AutonomyLevel>) -> String {
-    let names = crew.join(", ");
-    let first = crew.first().map_or("Delta", String::as_str);
-    let mut note = format!(
-        "W tej rozmowie na komputerze użytkownika działa: {names} — pliki, programy, polecenia, \
-         system, mysz i klawiatura, przez Brokera. Gdy prośba wymaga takiej pracy, a sama nie masz \
-         narzędzi, nie mów, że nikt nie ma dostępu: powiedz, że zrobi to {first}, i podpowiedz, \
-         żeby użytkownik napisał „{first}, …” albo wybrał ją w polu adresatki."
-    );
-    if let Some(level) = level {
-        note.push_str(&format!(
-            " Poziom autonomii tej rozmowy: {}. Mówiąc o zgodach, trzymaj się tego opisu: nie \
-             zapowiadaj zgody na każdą akcję, ale też nie obiecuj, że jej nie będzie — o każdej \
-             akcji decyduje Broker.",
-            autonomy_note(level)
-        ));
-    }
-    note
 }
 
 /// Przygotowanie żądania (historia gałęzi, prompt agentki, prywatność) i wybór trasy.
@@ -139,12 +92,13 @@ pub(crate) async fn prepare(
                 .map(|v| v.session.unwrap_or(v.global)),
             _ => None,
         };
-        let note = crew_note(&crew, level);
+        let note = crate::conductor::crew_note(core, &req.session, &req.agent, &crew, level);
         system = Some(match system {
             Some(s) => format!("{s}\n\n{note}"),
             None => note,
         });
     }
+    system = crate::project_context::system(core, &req.session, system)?;
     // Styl odpowiedzi i temperatura z ustawień (P4).
     let setting = |v: Option<serde_json::Value>| {
         v.and_then(|v| v.as_str().map(str::to_owned))
@@ -182,6 +136,38 @@ pub(crate) async fn prepare(
     request.model.clone_from(&choice.model);
     // Symptomy dostawcy dla Diagnosty (błąd HTTP → `diagnostics.symptom` bez treści rozmowy).
     let choice = app_health::symptom_tap(choice, &core.inner.bus);
+    let chosen_id = choice
+        .route
+        .as_ref()
+        .map_or(choice.model.as_str(), |r| r.chosen.as_str());
+    // Include allowed fallbacks: the router will skip confirmed text-only models once
+    // the request carries the delegation requirement. Unknown is not a confirmed denial.
+    let supports_tools = std::iter::once(chosen_id)
+        .chain(
+            choice
+                .route
+                .iter()
+                .flat_map(|r| r.fallbacks.iter().map(String::as_str)),
+        )
+        .any(|model| {
+            choice
+                .provider
+                .model_capabilities(model)
+                .is_none_or(|m| m.tools)
+        });
+    if pin.is_none()
+        && supports_tools
+        && core.can_orchestrate(&req.agent).await
+        && let Some(spec) = crate::conductor::delegate_tool_spec(core, &req.session, &req.agent)
+    {
+        request.tools.push(spec);
+        request.tools.push(crate::conductor::pipeline_tool_spec(
+            &core.pipeline_library().await,
+        ));
+    }
+    if !supports_tools && !crew.is_empty() {
+        request.system.get_or_insert_with(String::new).push_str("\nW bieżącej kolejce modeli nie ma obsługi narzędzi. Nie zapowiadaj delegacji ani wykonanego przeglądu. Wyjaśnij, że potrzebny jest model obsługujący narzędzia; to nie jest brak uprawnień Brokera.");
+    }
     if !choice.routed {
         budget_gate(core, &choice, &request).await?;
     }
@@ -249,7 +235,9 @@ pub(crate) async fn generate(
     let sid = req.session.to_string();
     let tid = handle.live.lock().map(|l| l.id.clone()).unwrap_or_default();
     let started = Instant::now();
-    let mut stream = choice.provider.stream(request, handle.cancel.clone());
+    let mut stream = choice
+        .provider
+        .stream(request.clone(), handle.cancel.clone());
     let mut acc = TurnAccumulator::new(choice.provider.id().clone());
     let mut renderer = IncrementalRenderer::new(RenderOptions::default());
     let mut thinking: Option<(Instant, Instant)> = None;
@@ -317,6 +305,34 @@ pub(crate) async fn generate(
         }
     }
     drop(stream);
+    let mut turn = acc.finish();
+    let had_explicit_delegate = crate::conductor::has_delegate_calls(&turn.message);
+    let last_user = request
+        .messages
+        .last()
+        .map(|m| m.visible_text())
+        .unwrap_or_default();
+    if !cancelled
+        && pin.is_none()
+        && !request.tools.is_empty()
+        && (had_explicit_delegate
+            || crate::conductor::ensure_delegate_call_if_handoff(&mut turn.message, &last_user))
+    {
+        return crate::conductor::run_delegated(
+            core,
+            req,
+            handle,
+            choice,
+            request,
+            turn,
+            chosen,
+            started,
+            renderer,
+            sent_units,
+            !had_explicit_delegate,
+        )
+        .await;
+    }
     let source = renderer.source().to_owned();
     let closing = update_blocks(renderer.finish());
     if !closing.is_empty() {
@@ -328,7 +344,6 @@ pub(crate) async fn generate(
             offset: sent_units,
         });
     }
-    let turn = acc.finish();
     let mut text = turn.message.visible_text();
     if text.is_empty() {
         text = source;

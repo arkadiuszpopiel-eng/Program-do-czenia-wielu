@@ -30,6 +30,7 @@ mod model_routing;
 mod models;
 mod modules;
 mod panels;
+mod pipelines;
 mod plugins;
 mod pricing;
 mod quick;
@@ -118,6 +119,7 @@ pub use panels::{
     CastTemplateId, ContextUsage, CostLimitView, CostSummary, EventLevel, FxView, TimelineEvent,
     TimelineFilter, TimelineKind,
 };
+pub use pipelines::{PipelineDef, PipelineStage};
 pub use plugins::{
     PluginCapabilityView, PluginInfo, PluginInspection, PluginLimitsView, PluginOrigin,
     PluginProblem, PluginProblemKind, PluginR2View, PluginStateView, PluginToolView, PluginsView,
@@ -128,10 +130,10 @@ pub use quick::{
 };
 pub use routes::{DataRoute, DataRoutesView};
 pub use sessions::{
-    ApprovalPending, ApprovalStatus, BlockKind, ProjectRef, Rating, RememberScope, RenderedBlock,
-    RiskLevel, SendOptions, SendResult, SessionCard, SessionSearchHit, SessionSummary,
-    SessionTemplate, ThinkingInfo, ToolIcon, ToolStatus, ToolStep, Turn, TurnAnnotation, TurnError,
-    TurnErrorCode, TurnStatus, TurnUsage, TurnsSnapshot, UndoTicket,
+    ApprovalPending, ApprovalStatus, BlockKind, ProjectInfo, ProjectRef, Rating, RememberScope,
+    RenderedBlock, RiskLevel, SendOptions, SendResult, SessionCard, SessionSearchHit,
+    SessionSummary, SessionTemplate, ThinkingInfo, ToolIcon, ToolStatus, ToolStep, Turn,
+    TurnAnnotation, TurnError, TurnErrorCode, TurnStatus, TurnUsage, TurnsSnapshot, UndoTicket,
 };
 pub use skills::{
     AgentDraft, BuilderAgentInfo, BuilderDryRun, BuilderDryStep, BuilderPolicyView, BuilderPreview,

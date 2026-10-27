@@ -209,7 +209,12 @@ pub fn manifest(kind: FsToolKind) -> ToolManifest {
         output_schema,
         reversible: kind.reversible(),
         capabilities: kind.capabilities(),
-        groups: vec!["fs".to_owned(), family.to_owned()],
+        groups: vec![
+            "fs".to_owned(),
+            family.to_owned(),
+            "worktree".to_owned(),
+            "fs.session".to_owned(),
+        ],
         mutating: kind.mutating(),
         untrusted_output: kind.untrusted_output(),
     }

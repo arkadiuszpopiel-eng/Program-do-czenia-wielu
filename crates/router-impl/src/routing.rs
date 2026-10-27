@@ -169,6 +169,15 @@ impl RouterCore {
     pub fn set_global_queues(&self, queues: GlobalQueues) {
         *self.global.write().unwrap_or_else(|p| p.into_inner()) = queues;
     }
+    /// Jawna wspólna kolejka klasy; jej porządek nie jest zastępowany rankingiem automatycznym.
+    pub fn shared_queue(&self, class: TaskClass) -> Option<Vec<Candidate>> {
+        self.global
+            .read()
+            .unwrap_or_else(|p| p.into_inner())
+            .get(&class)
+            .filter(|q| !q.is_empty())
+            .cloned()
+    }
 
     /// Wskazuje lekkiego dostawcę lokalnego (zarejestrowanego jak każdy inny, rodzaj `Local`).
     /// W klasach [`LIGHT_CLASSES`] jest próbowany pierwszy; w pozostałych nie występuje, a rolę
@@ -266,16 +275,31 @@ impl RouterCore {
         request: Option<&ChatRequest>,
     ) -> Result<RouteDecision, RouteError> {
         let policy = self.policy();
-        let pinned: Vec<Candidate> = constraints.pinned.iter().cloned().collect();
+        let manual = self.shared_queue(class);
+        let failed = constraints.hint.escalate_from.as_ref();
+        let advancing = manual
+            .as_ref()
+            .and_then(|q| failed.and_then(|f| q.iter().position(|c| c.qualified() == *f)));
+        let pinned: Vec<Candidate> = if advancing.is_some() {
+            Vec::new()
+        } else {
+            constraints.pinned.iter().cloned().collect()
+        };
         let mut rest: Vec<Candidate> = Vec::new();
-        for c in policy.candidates(class) {
+        let ordered = manual
+            .clone()
+            .unwrap_or_else(|| policy.candidates(class).to_vec());
+        for c in ordered.iter().skip(advancing.map_or(0, |i| i + 1)) {
             if !pinned.contains(c) && !rest.contains(c) {
                 rest.push(c.clone());
             }
         }
         // Przypięty model zostaje pierwszy; reszta według trudności zadania.
         let difficulty = self.judge(class, constraints, request);
-        if let Some(note) = difficulty.as_ref().filter(|n| n.reorders()) {
+        if let Some(note) = difficulty
+            .as_ref()
+            .filter(|n| n.reorders() && manual.is_none())
+        {
             rest = self.arrange(rest, note);
         }
         let list = pinned.into_iter().chain(rest);

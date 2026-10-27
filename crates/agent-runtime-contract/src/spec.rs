@@ -47,6 +47,8 @@ pub enum BudgetKind {
     Wall,
     /// Koszt.
     Cost,
+    /// Oczekiwanie na zgodę wymaga kolejnej decyzji właściciela.
+    ApprovalWait,
 }
 
 impl BudgetKind {
@@ -57,6 +59,7 @@ impl BudgetKind {
             Self::Tokens => "tokenów",
             Self::Wall => "czasu",
             Self::Cost => "kosztu",
+            Self::ApprovalWait => "oczekiwania na zatwierdzenie",
         }
     }
 }

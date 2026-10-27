@@ -1,51 +1,23 @@
 //! Wykonanie narzędzi tury: granica kroku przed każdym wywołaniem, kolejne wywołania tylko do
 //! odczytu równolegle (jedna paczka), zapisy i delegacja szeregowo z dzierżawami zasobów,
-//! obserwacja (taint, proweniencja), zdarzenia kroków.
 
 use std::sync::Arc;
 
-use agent_runtime_contract::{RunEvent, RunOutcome, StepKind, StepStatus};
+use agent_runtime_contract::{RunEvent, RunOutcome, StepKind};
 use futures_util::future::join_all;
 use providers_contract::{ContentBlock, Role, ToolUse};
-use safety_broker_contract::{ApprovalId, ApprovalTicket, Holder};
-use tools_common_contract::{Tool, ToolCtx, ToolErrorKind, ToolObserver, ToolOutcome, ToolStatus};
+use safety_broker_contract::Holder;
+use tools_common_contract::{Tool, ToolCtx, ToolErrorKind, ToolOutcome, ToolStatus};
 
-use crate::boundary::{Boundary, SKIP_YIELDED, fnv};
+use crate::boundary::{Boundary, SKIP_YIELDED};
 use crate::engine::{Engine, Next};
-use crate::flow::{append_capped, args_untrusted, fingerprint, repeats};
-use crate::handle::RunHandle;
+use crate::flow::{append_capped, args_untrusted, fingerprint};
 use crate::prompt::{skipped, summary, tool_result};
 
 /// Rodziny zdolności utrwalające treść poza przebiegiem (pamięć długoterminowa).
 const PERSISTENT_WRITE_CAPS: [&str; 1] = ["memory.write"];
 
-/// Obserwator wywołania: karta „czeka na zatwierdzenie” w UI.
-struct StepObserver {
-    handle: Arc<RunHandle>,
-    step: u32,
-}
-
-impl ToolObserver for StepObserver {
-    fn approval_requested(&self, ticket: &ApprovalTicket) {
-        self.handle.emit_detached(RunEvent::WaitingApproval {
-            step: self.step,
-            approval: ticket.id,
-            explanation: ticket.explanation.clone(),
-        });
-    }
-
-    fn approval_resolved(&self, _id: ApprovalId, _approved: bool) {}
-}
-
-fn step_status(s: &ToolStatus) -> StepStatus {
-    match s {
-        ToolStatus::Ok => StepStatus::Ok,
-        ToolStatus::Denied { .. } => StepStatus::Denied,
-        ToolStatus::NeedsConfirmation => StepStatus::NeedsConfirmation,
-        ToolStatus::Failed { .. } => StepStatus::Failed,
-        ToolStatus::Cancelled => StepStatus::Cancelled,
-    }
-}
+use crate::approval_observer::{StepObserver, step_status};
 
 /// Wywołanie przygotowane (krok rozpoczęty).
 struct Prepared {
@@ -81,62 +53,13 @@ impl Engine {
         ctx.untrusted_args = args_untrusted(args, &self.cp.trusted_text, &self.cp.untrusted_text);
         ctx.cancel = self.handle.cancel.child_token();
         ctx.approval_timeout = std::time::Duration::from_millis(spec.approval_timeout_ms);
+        ctx.auto_extend_approval = self.cp.options.continuation.auto_approval;
         ctx.observer = Some(Arc::new(StepObserver {
             handle: self.handle.clone(),
             step,
+            clock: self.approval_clock.clone(),
         }));
         ctx
-    }
-
-    /// Kontrola przed wywołaniem: anulowanie, limit na turę, budżet, argumenty, pętla.
-    async fn gate_call(&mut self, index: usize, tu: &ToolUse) -> Option<(String, Option<Next>)> {
-        if self.handle.cancel.is_cancelled() {
-            return Some((
-                "anulowano".into(),
-                Some(Next::Finish(RunOutcome::Cancelled)),
-            ));
-        }
-        if index >= self.cp.spec.budget.max_tool_calls_per_turn as usize {
-            return Some((
-                "limit wywołań w jednej turze — wywołaj ponownie w następnej".into(),
-                None,
-            ));
-        }
-        if let Some(budget) = self.exceeded() {
-            self.handle.emit(RunEvent::BudgetExceeded { budget }).await;
-            return Some((
-                format!("przekroczony budżet {}", budget.label_pl()),
-                Some(Next::Finish(RunOutcome::BudgetExceeded { budget })),
-            ));
-        }
-        if let Some(why) = self.reject_invalid(tu).await {
-            return Some((why, None));
-        }
-        let fp = fingerprint(&tu.name, &tu.input);
-        let n = repeats(&self.cp.recent_calls, &fp);
-        if n + 1 >= self.shared.config.loop_max_repeats {
-            self.handle
-                .emit(RunEvent::LoopDetected {
-                    tool: tu.name.clone(),
-                    repeats: n + 1,
-                })
-                .await;
-            return Some((
-                "wykryto pętlę (to samo wywołanie powtarza się)".into(),
-                Some(Next::Finish(RunOutcome::LoopDetected {
-                    tool: tu.name.clone(),
-                })),
-            ));
-        }
-        self.last_fingerprint = Some(fnv(&fp));
-        self.cp.recent_calls.push(fp);
-        let excess = self
-            .cp
-            .recent_calls
-            .len()
-            .saturating_sub(self.shared.config.loop_window);
-        self.cp.recent_calls.drain(..excess);
-        None
     }
 
     /// Rozpoczyna krok narzędzia (numer, zdarzenie, kontekst).
@@ -144,6 +67,8 @@ impl Engine {
         self.cp.usage.steps += 1;
         self.cp.usage.tool_calls += 1;
         let step = self.cp.usage.steps;
+        self.cp.started_pending.insert(tu.id.clone());
+        self.checkpoint().await;
         let input = summary(&tu.input.to_string(), 200);
         self.handle
             .emit(RunEvent::StepStarted {
@@ -185,16 +110,6 @@ impl Engine {
         }
     }
 
-    fn unknown(&self, name: &str) -> ToolOutcome {
-        ToolOutcome::failed(
-            ToolErrorKind::InvalidArgs,
-            format!(
-                "Nieznane albo niedostępne narzędzie `{name}`. Dostępne: {}.",
-                self.registry.names().join(", ")
-            ),
-        )
-    }
-
     /// Obserwacja: taint, proweniencja, zdarzenie końca kroku, wynik dla modelu.
     pub(crate) async fn observe(
         &mut self,
@@ -203,6 +118,7 @@ impl Engine {
         input: String,
         outcome: &ToolOutcome,
     ) -> ContentBlock {
+        self.note_snapshot_failure(tu, outcome);
         if let Some(source) = outcome.untrusted.clone() {
             if !self.cp.tainted {
                 self.cp.tainted = true;
@@ -230,13 +146,40 @@ impl Engine {
             .await;
         let block_id = format!("{step}-{}", tu.id);
         let max = self.shared.config.tool_result_max_chars;
-        ContentBlock::ToolResult(tool_result(&tu.id, &tu.name, outcome, &block_id, max))
+        let result = tool_result(&tu.id, &tu.name, outcome, &block_id, max);
+        self.cp
+            .completed_pending
+            .insert(tu.id.clone(), result.clone());
+        self.checkpoint().await;
+        ContentBlock::ToolResult(result)
     }
 
     /// Jedno wywołanie szeregowo (zapis z dzierżawami albo delegacja).
     async fn call_one(&mut self, index: usize, tu: &ToolUse) -> (ContentBlock, ToolOutcome) {
+        if tu.name == crate::context::RECALL && !self.registry.names().is_empty() {
+            let (step, input) = self.begin_call(tu).await;
+            let outcome = crate::context::recall(&self.cp.messages, &tu.input);
+            let block = self.observe(tu, step, input, &outcome).await;
+            return (block, outcome);
+        }
+        if tu.name == crate::catalog::FIND {
+            let (step, input) = self.begin_call(tu).await;
+            let outcome = self.find_tools(&tu.input);
+            let block = self.observe(tu, step, input, &outcome).await;
+            return (block, outcome);
+        }
         if self.registry.is_delegate(&tu.name) {
             let (step, input) = self.begin_call(tu).await;
+            if let Some(error) = &self.storage_error {
+                let outcome = ToolOutcome::failed(
+                    ToolErrorKind::Io,
+                    format!("Nie zapisano postępu: {error}"),
+                );
+                return (
+                    ContentBlock::ToolResult(skipped(&tu.id, &outcome.text)),
+                    outcome,
+                );
+            }
             let outcome = self.delegate(tu, step).await;
             let block = self.observe(tu, step, input, &outcome).await;
             return (block, outcome);
@@ -253,6 +196,14 @@ impl Engine {
             None => Vec::new(),
         };
         let p = self.prepare_call(index, tu).await;
+        if let Some(error) = &self.storage_error {
+            let outcome =
+                ToolOutcome::failed(ToolErrorKind::Io, format!("Nie zapisano postępu: {error}"));
+            return (
+                ContentBlock::ToolResult(skipped(&tu.id, &outcome.text)),
+                outcome,
+            );
+        }
         let outcome = match &p.tool {
             Some(t) => t.call(tu.input.clone(), &p.ctx).await,
             None => self.unknown(&tu.name),
@@ -328,7 +279,15 @@ impl Engine {
             let mut end = i + 1;
             if self.registry.is_parallel_read(&uses[i].name) {
                 while end < uses.len()
-                    && end - i < max_par
+                    && end - i
+                        < max_par.min(
+                            self.cp
+                                .spec
+                                .budget
+                                .max_steps
+                                .saturating_sub(self.cp.usage.steps)
+                                .max(1) as usize,
+                        )
                     && self.registry.is_parallel_read(&uses[end].name)
                 {
                     end += 1;
@@ -363,7 +322,44 @@ impl Engine {
                 Vec::new()
             };
             for (k, block, outcome) in done {
+                if matches!(
+                    outcome.status,
+                    ToolStatus::Denied {
+                        reason: tools_common_contract::DenialReason::Policy
+                    }
+                ) {
+                    self.cp
+                        .denied_calls
+                        .insert(fingerprint(&uses[k].name, &uses[k].input));
+                }
+                if matches!(outcome.status, ToolStatus::Denied { .. })
+                    && !matches!(
+                        outcome.status,
+                        ToolStatus::Denied {
+                            reason: tools_common_contract::DenialReason::Policy
+                                | tools_common_contract::DenialReason::ApprovalTimeout { .. }
+                                | tools_common_contract::DenialReason::ApprovalExpired { .. }
+                        }
+                    )
+                {
+                    skip = Some(
+                        "Odmowa uprawnień lub właściciela. Nie ponawiaj przez inny model.".into(),
+                    );
+                    stop = Some(Next::Finish(RunOutcome::Refused));
+                }
                 results[k] = Some(block);
+                if matches!(
+                    outcome.status,
+                    ToolStatus::Denied {
+                        reason: tools_common_contract::DenialReason::ApprovalTimeout { .. }
+                            | tools_common_contract::DenialReason::ApprovalExpired { .. }
+                    }
+                ) {
+                    skip = Some("oczekiwanie na zgodę zakończyło limit; postęp zapisany".into());
+                    stop = Some(Next::Finish(RunOutcome::BudgetExceeded {
+                        budget: agent_runtime_contract::BudgetKind::ApprovalWait,
+                    }));
+                }
                 if outcome.status == ToolStatus::Cancelled && self.handle.cancel.is_cancelled() {
                     skip = Some("anulowano".to_owned());
                     stop = Some(Next::Finish(RunOutcome::Cancelled));
@@ -388,6 +384,8 @@ impl Engine {
             .collect();
         self.push(Role::User, blocks);
         self.cp.pending.clear();
+        self.cp.started_pending.clear();
+        self.cp.completed_pending.clear();
         stop.unwrap_or(Next::Continue)
     }
 }

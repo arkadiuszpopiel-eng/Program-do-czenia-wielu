@@ -2125,14 +2125,6 @@
     }
   },
   {
-    "type": "Toast",
-    "kind": "warning",
-    "message": {
-      "pl": "Nadal brak połączenia.",
-      "en": "Still offline."
-    }
-  },
-  {
     "type": "SystemStatusChanged",
     "status": {
       "online": true,

@@ -59,7 +59,7 @@
   }
 </script>
 
-<header class="titlebar" data-tauri-drag-region>
+<header class="titlebar">
   <div class="brand" data-tauri-drag-region>
     <AlfaMark size={18} />
     <span class="name" data-tauri-drag-region>Alfa</span>
@@ -110,7 +110,7 @@
     </button>
   {/if}
   <div class="drag" data-tauri-drag-region></div>
-  <CastStrip />
+  <div class="cast-center"><CastStrip /></div>
   <GuiIndicator />
   <CameraIndicator />
   <MicIndicator />
@@ -173,6 +173,47 @@
     flex: 1;
     align-self: stretch;
     min-width: var(--alfa-space-4);
+  }
+  .cast-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .crumbs {
+    max-width: calc(50vw - 210px);
+  }
+  @media (min-width: 721px) and (max-width: 1400px) {
+    .titlebar :global(.gui .text),
+    .titlebar :global(.gui .stop-text),
+    .titlebar :global(.cluster .word) {
+      display: none;
+    }
+  }
+  @media (min-width: 721px) and (max-width: 1100px) {
+    .titlebar {
+      gap: var(--alfa-space-1);
+    }
+    .titlebar :global(.cluster > .anchor:last-child),
+    .titlebar :global(.cluster .rule),
+    .titlebar :global(.mic .text) {
+      display: none;
+    }
+    .crumbs {
+      max-width: calc(50vw - 165px);
+    }
+  }
+  @media (min-width: 721px) and (max-width: 900px) {
+    .titlebar :global(.cluster) {
+      display: none;
+    }
+    .titlebar :global(.cluster .seg) {
+      padding: 0 var(--alfa-space-1);
+    }
+    .titlebar :global(.cluster .state .ico),
+    .titlebar :global(.cluster .level svg) {
+      display: none;
+    }
   }
   /* Pasek LED ma własny tor pod elementami belki (`--led-lane`): listwa w barwach agentek i jasne
      światło jadące od lewej do prawej. Nic z paska nie wchodzi na przyciski i kapsuły. */
@@ -269,7 +310,7 @@
   }
   .crumbs {
     min-width: 0;
-    max-width: 40vw;
+    max-width: max(60px, calc(50vw - 210px));
     font-weight: var(--alfa-weight-semibold);
   }
   .session {

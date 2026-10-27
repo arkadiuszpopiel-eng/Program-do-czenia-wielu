@@ -41,8 +41,10 @@ async-trait.workspace = true
 chrono.workspace = true
 futures-util.workspace = true
 serde_json.workspace = true
+serde.workspace = true
 tokio = { workspace = true, features = ["rt", "sync", "time", "macros"] }
 tracing.workspace = true
+tools-common-contract = { path = "../tools-common-contract" }
 
 [dev-dependencies]
 sessions-fake = { path = "../sessions-fake" }
