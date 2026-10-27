@@ -12,6 +12,7 @@
   import Laptop from '@lucide/svelte/icons/laptop';
   import Shield from '@lucide/svelte/icons/shield';
   import WifiOff from '@lucide/svelte/icons/wifi-off';
+  import type { ModelProfile } from '../../api/types';
   import { useApp } from '../../state/context';
   import Lazy from './Lazy.svelte';
 
@@ -24,7 +25,10 @@
   const session = $derived(app.sessions.active);
   // Ten sam profil co w okienku stanu i w polu rozmowy — wybór widać od razu wszędzie.
   const profileId = $derived(
-    app.str('models.default_profile', app.system?.profile ?? session?.profile ?? 'hybrid'),
+    app.str(
+      'models.default_profile',
+      app.system?.profile ?? session?.profile ?? 'hybrid',
+    ) as ModelProfile,
   );
   const profile = $derived(t(`profile.${profileId}`));
   const level = $derived(session?.autonomy ?? 'L3');
