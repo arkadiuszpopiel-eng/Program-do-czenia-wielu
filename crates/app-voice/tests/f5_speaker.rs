@@ -1,7 +1,7 @@
 //! Weryfikacja właściciela w aplikacji (F5): kreator rejestracji (nagrania z mikrofonu, wskaźnik
 //! jakości, profil po ≥ 3 frazach), a w rozmowie — wynik weryfikacji trafia do pochodzenia tury
 //! (`CommandOrigin::UserVoice`): obcy głos przy akcji ryzykownej → potwierdzenie nie-głosem,
-//! właściciel → zgodnie z poziomem autonomii; destrukcja głosem zawsze pyta nie-głosem (Jądro).
+//! właściciel → zgodnie z poziomem autonomii; destrukcja głosem pyta nie-głosem do L3.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -110,7 +110,7 @@ async fn stranger_voice_is_rejected_for_risky_actions() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-async fn owner_voice_follows_autonomy_but_destruction_still_asks_non_voice() {
+async fn owner_voice_follows_autonomy_and_destruction_asks_below_full_automation() {
     let a = app(World::new());
     enroll(&a).await;
     let origin = voice_turn(&a, OWNER_F0).await;
@@ -124,7 +124,7 @@ async fn owner_voice_follows_autonomy_but_destruction_still_asks_non_voice() {
             confidence: SttConfidence::from_permille(900),
             speaker_verified: true,
         });
-    let verdict = evaluate(&delete, AutonomyLevel::L4, &RiskPolicy::default());
+    let verdict = evaluate(&delete, AutonomyLevel::L3, &RiskPolicy::default());
     assert!(matches!(
         verdict.verdict,
         Verdict::Ask {
@@ -132,6 +132,10 @@ async fn owner_voice_follows_autonomy_but_destruction_still_asks_non_voice() {
             ..
         }
     ));
+    // „Pełna automatyka” (L4): zweryfikowany właściciel, pewne rozpoznanie — bez pytania
+    // (decyzja właściciela 27.10); obcy głos i niska pewność pytają na każdym poziomie.
+    let verdict = evaluate(&delete, AutonomyLevel::L4, &RiskPolicy::default());
+    assert_eq!(verdict.verdict, Verdict::Proceed, "{verdict:?}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]

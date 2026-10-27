@@ -114,7 +114,7 @@ mod tests {
         assert!(bad_bulk.validate().is_err());
         assert_eq!(AutonomyLevel::default(), AutonomyLevel::L3);
         assert_eq!(RiskLevel::Critical.bumped(), RiskLevel::Critical);
-        assert!(AutonomyLevel::L4.to_string().contains("Maks"));
+        assert!(AutonomyLevel::L4.to_string().contains("Pełna automatyka"));
     }
 
     #[test]
@@ -125,7 +125,7 @@ mod tests {
                 confidence: SttConfidence::from_permille(950),
                 speaker_verified: true,
             });
-        let v = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default());
+        let v = evaluate(&f, AutonomyLevel::L3, &RiskPolicy::default());
         assert!(
             v.explanation.starts_with("Ryzyko średnie"),
             "{}",

@@ -5,7 +5,7 @@
 ## 1. Założenia
 
 - Użytek osobisty: jeden użytkownik (właściciel), jego maszyny, brak dystrybucji. Nie chronimy przed właścicielem; chronimy właściciela przed skutkami błędu modelu, wstrzykniętego polecenia i złośliwej treści.
-- Agentki mają domyślnie **bardzo wysoką autonomię (L3)**, opcjonalnie **L4 „Maks"**. Model zagrożeń musi działać także na L4 — dlatego kluczowe kontrole są w Jądrze, poza zasięgiem agentek.
+- Agentki mają domyślnie **bardzo wysoką autonomię (L3)**, opcjonalnie **L4 „Pełna automatyka”** (wybierana raz w oknie Brokera i pamiętana przez Brokera po restarcie; na L4 bez pytań także operacje administratora i polecenia zweryfikowanym, pewnie rozpoznanym głosem właściciela; obcy głos i niska pewność pytają zawsze — decyzja właściciela 2026-10-27). Model zagrożeń musi działać także na L4 — dlatego kluczowe kontrole są w Jądrze, poza zasięgiem agentek.
 - Kod programu powstaje w całości przez modele AI i jest automatycznie mergowany → sam proces budowy jest w zakresie modelu zagrożeń (runner, łańcuch dostaw).
 - Uczciwie: na L4 bez izolacji audyt jest „best effort"; DPAPI chroni sekrety przed kradzieżą offline, nie przed procesem tego samego użytkownika.
 

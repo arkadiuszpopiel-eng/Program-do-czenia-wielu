@@ -35,4 +35,24 @@ export const plBroker = {
   'broker.banner.details': 'Szczegóły',
   'broker.approval.lost':
     'Broker jest niedostępny — tej prośby nie da się teraz zatwierdzić; agentka dostanie odmowę.',
+  // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
+  'titlebar.mode': 'Tryb pracy: {mode}. Zmień tryb',
+  'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–4)',
+  'mode.title': 'Tryb pracy',
+  'mode.L0.name': 'Tylko podgląd',
+  'mode.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
+  'mode.L1.name': 'Pytaj o wszystko',
+  'mode.L1.desc': 'Każda zmiana wymaga Twojego „tak”.',
+  'mode.L2.name': 'Pytaj o ryzykowne',
+  'mode.L2.desc': 'Pyta przy usuwaniu, wysyłaniu danych i instalacji.',
+  'mode.L3.name': 'Automatycznie',
+  'mode.L3.desc': 'Działa sama; pyta tylko o rzeczy nieodwracalne poza zakresem.',
+  'mode.L4.name': 'Pełna automatyka',
+  'mode.L4.desc': 'Bez pytań. Wybierasz raz — zostaje po restarcie.',
+  'mode.note':
+    'Dotyczy wszystkich rozmów. Podniesienie potwierdzasz raz w oknie Brokera. Zawsze zostają: Ctrl+Shift+F12, dziennik i pytanie przed wysyłką po obcej treści i przy poleceniu obcym albo niepewnie rozpoznanym głosem.',
+  'mode.more': 'Więcej w Ustawieniach → Uprawnienia',
+  'mode.applied': 'Tryb pracy: {mode}.',
+  'mode.requested': 'Potwierdź „{mode}” w oknie Brokera — wystarczy raz.',
+  'mode.raised': 'Tryb pracy: {mode} — zatwierdzony i zapamiętany.',
 } as const satisfies Record<string, Message>;

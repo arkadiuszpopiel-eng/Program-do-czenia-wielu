@@ -108,10 +108,11 @@ proptest! {
     }
 
     #[test]
-    fn voice_destruction_never_proceeds(f in facts()) {
+    fn voice_destruction_never_proceeds_below_l4(f in facts()) {
         let p = RiskPolicy::default();
         if f.origin.is_voice() && f.destructive != Destructiveness::None && f.kernel_rule.is_none() {
-            for a in AutonomyLevel::ALL {
+            // Na L4 („Pełna automatyka”) reguły głosu nie pytają — decyzja właściciela 27.10.
+            for a in AutonomyLevel::ALL.into_iter().filter(|a| *a != AutonomyLevel::L4) {
                 let v = evaluate(&f, a, &p).verdict;
                 prop_assert!(matches!(v, Verdict::Ask { non_voice: true, grantable: false }), "{:?}", v);
             }

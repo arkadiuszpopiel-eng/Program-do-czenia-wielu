@@ -23,10 +23,11 @@ Zdarzenia: `risk.classified` (przy `Ask`/`HardBlock`), `risk.trifecta_detected`,
 | Reguła | Zasięg | Warunek |
 |---|---|---|
 | KernelBlock | każdy (blokada) | `kernel_rule` ustawione przez Brokera |
-| VoiceDestructive | każdy, nie-głosem | głos + destrukcja (także do Kosza — bezpieczniejsza interpretacja §6.10) |
+| VoiceDestructive | ≤ L3, nie-głosem | głos + destrukcja (także do Kosza — bezpieczniejsza interpretacja §6.10) |
 | VoiceLowConfidence | każdy, nie-głosem | głos + zmiana stanu + pewność < `stt_confidence_min` (800‰) |
 | VoiceUnverifiedRisky | każdy, nie-głosem | głos bez weryfikacji mówcy + ryzyko ≥ średnie (do F5) |
-| AdminConsent / Trifecta / TaintedEgress | każdy | `system.admin`; dane prywatne + niezaufane + egress; egress z sesji tainted |
+| AdminConsent | ≤ L3 | `system.admin` |
+| Trifecta / TaintedEgress | każdy | dane prywatne + niezaufane + egress; egress z sesji tainted |
 | MutationNeedsYes | ≤ L1 | każda zmiana |
 | RiskyAtL2 | ≤ L2 | usuwanie, egress, instalacja, sekrety, admin, nieodwracalne |
 | TaintedHighRisk / UntrustedSource / CriticalRisk | ≤ L3 | tainted + ≥ wysokie; polecenie z niezaufanej treści; krytyczne (np. masowe trwałe usunięcie) |
@@ -35,7 +36,7 @@ Klasa ryzyka: baza wg klasy akcji, podniesienia (destrukcja, masowość ≥ `bul
 
 ## Niezmienniki
 - Deterministyczny; monotoniczny w poziomie autonomii z konstrukcji (każda reguła „do poziomu X” albo „każdy”) i w czynnikach ryzyka (taint, niezaufane, dane prywatne, instalacja, masowość, niższa pewność STT nigdy nie luzują) — testy własności.
-- Twarde blokady i destrukcja głosem pytają/blokują na L4; L4 poza nimi pyta tylko o egress z taintem, trifectę, admina i głos.
+- Twarde blokady blokują na L4; L4 („Pełna automatyka”) poza nimi pyta tylko o egress z taintem, trifectę, obcy głos i niską pewność rozpoznania. Admin i destrukcja głosem działają do L3 (decyzja właściciela 2026-10-27).
 
 ## Zależności
 `core-bus-contract`; wywoływany przez `safety-broker` (in-proc), podglądowo przez `agent-runtime`.

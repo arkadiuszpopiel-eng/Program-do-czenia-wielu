@@ -153,20 +153,20 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
 
   'perm.title': 'Autonomy level',
   'perm.intro':
-    'How much an agent acts on her own. You confirm changes in the Broker window — an agent cannot raise her own level.',
-  'perm.L0.name': 'Preview',
+    'How much an agent acts on her own. You confirm a raise once in the Broker window — it stays after a restart until you lower it. An agent cannot raise her own level.',
+  'perm.L0.name': 'Preview only',
   'perm.L0.desc': 'The agent only reads and suggests; she changes nothing.',
   'perm.L1.name': 'Ask about everything',
   'perm.L1.desc': 'Every change needs your "yes".',
   'perm.L2.name': 'Ask about risky things',
   'perm.L2.desc':
     'Small things she does herself; she asks before deleting, sending data out and installing.',
-  'perm.L3.name': 'Very high — the default level',
+  'perm.L3.name': 'Automatic — the default level',
   'perm.L3.desc':
     'Works on her own across your profile and selected apps; asks only for irreversible things outside the scope or when acting on untrusted content (mail, web page, file).',
-  'perm.L4.name': 'Max',
+  'perm.L4.name': 'Full automation',
   'perm.L4.desc':
-    'Doesn’t ask about scope or reversibility. The Kernel’s hard blocks always apply; asks for administrative operations, destruction ordered by voice, voice commands without a recognised speaker or recognised with low confidence and sending data out after the session touched untrusted content (e.g. file, mail, web page, screen, command output, clipboard).',
+    'Works on her own without asking — administrative operations and commands in your voice included. Asks only before sending data out after the session touched untrusted content (e.g. file, mail, web page, screen, command output, clipboard) and when a voice command may not be yours (another voice or uncertain recognition). The Kernel’s hard blocks always apply. Choose once — it stays after a restart.',
   'perm.current': 'current',
   'perm.request': 'Change to {level}',
   'perm.applied': 'Level changed to {level} — lowering needs no confirmation.',
@@ -176,7 +176,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'perm.scope.global': 'Globally',
   'perm.scope.session': 'This session only',
   'perm.kept':
-    'Even at L4 these stay: kill switch (Ctrl+Shift+F12), undo journal, audit and the Kernel’s hard blocks.',
+    'Even with full automation these stay: kill switch (Ctrl+Shift+F12), undo journal, audit and the Kernel’s hard blocks.',
   'perm.hello': 'Windows Hello when raising to L4: {state}. Change it in the Broker window.',
 
   'dev.machine': 'This machine',

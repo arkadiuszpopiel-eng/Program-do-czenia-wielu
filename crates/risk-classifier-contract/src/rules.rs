@@ -11,13 +11,13 @@ use crate::types::{AutonomyLevel, SttConfidence};
 pub enum RuleId {
     /// Twarda blokada Jądra (każdy poziom).
     KernelBlock,
-    /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (każdy poziom, §6.10).
+    /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (≤ L3; „Pełna automatyka” — decyzja 27.10).
     VoiceDestructive,
-    /// Zmiana stanu zlecona głosem przy niskiej pewności STT (każdy poziom).
+    /// Zmiana stanu zlecona głosem przy niskiej pewności STT (każdy poziom: nie wiadomo, co powiedziano).
     VoiceLowConfidence,
-    /// Ryzykowna akcja głosem bez weryfikacji mówcy (każdy poziom, do F5).
+    /// Ryzykowna akcja głosem bez weryfikacji mówcy (każdy poziom: to może nie być właściciel).
     VoiceUnverifiedRisky,
-    /// Operacja administracyjna → zgoda per eskalacja (§8.4, każdy poziom).
+    /// Operacja administracyjna → zgoda per eskalacja (§8.4, ≤ L3; L4 — bez pytania, decyzja 27.10).
     AdminConsent,
     /// Dane prywatne + niezaufana treść + kanał wyjścia (każdy poziom).
     Trifecta,
@@ -90,7 +90,7 @@ pub const RULES: [RuleDescription; 15] = [
     ),
     rule(
         RuleId::VoiceDestructive,
-        None,
+        Some(AutonomyLevel::L3),
         false,
         true,
         "destrukcja zlecona głosem wymaga potwierdzenia kliknięciem lub klawiszem",
@@ -111,10 +111,10 @@ pub const RULES: [RuleDescription; 15] = [
     ),
     rule(
         RuleId::AdminConsent,
-        None,
+        Some(AutonomyLevel::L3),
         false,
         false,
-        "operacja administracyjna wymaga zgody przy każdej eskalacji",
+        "operacja administracyjna wymaga zgody przy każdej eskalacji (do L3)",
     ),
     rule(
         RuleId::Trifecta,

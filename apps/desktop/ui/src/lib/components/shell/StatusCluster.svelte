@@ -1,8 +1,8 @@
 <!--
-  Stan w pasku tytułu jako jedna kapsuła z dwiema częściami. Lewa: połączenie, profil modeli
-  i poziom autonomii (z ikonami) — klik otwiera objaśnienie z przejściem do właściwych ustawień.
-  Prawa: koszt sesji — klik otwiera szczegóły kosztów; przy 80 % limitu miesięcznego część
-  kosztu jest oznaczona ostrzeżeniem.
+  Stan w pasku tytułu jako jedna kapsuła z trzema częściami. Lewa: połączenie i profil modeli —
+  klik otwiera objaśnienie z przejściem do właściwych ustawień. Środkowa: tryb pracy (poziom
+  autonomii) — klik otwiera menu trybów (`ModeMenu`). Prawa: koszt sesji — klik otwiera szczegóły
+  kosztów; przy 80 % limitu miesięcznego część kosztu jest oznaczona ostrzeżeniem.
 -->
 <script lang="ts">
   import { Popover } from '@alfa/ui-kit';
@@ -16,10 +16,11 @@
   import Lazy from './Lazy.svelte';
 
   const app = useApp();
-  const { t } = app.i18n;
+  const { t, tk } = app.i18n;
   // Treść okienek ładowana dopiero po otwarciu — poza budżetem startowym okna.
   const loadStatus = () => import('./StatusDetails.svelte');
   const loadCosts = () => import('./CostDetails.svelte');
+  const loadModes = () => import('./ModeMenu.svelte');
   const session = $derived(app.sessions.active);
   const profileId = $derived(app.system?.profile ?? session?.profile ?? 'hybrid');
   const profile = $derived(t(`profile.${profileId}`));
@@ -36,6 +37,7 @@
   );
   let stateOpen = $state(false);
   let costOpen = $state(false);
+  let modeOpen = $state(false);
 </script>
 
 <div class="cluster">
@@ -58,15 +60,34 @@
         </span>
         <span class="ico" aria-hidden="true"><ProfileIcon size={14} strokeWidth={1.75} /></span>
         <span class="word">{profile}</span>
-        <span class="level">
-          <Shield size={13} strokeWidth={1.75} aria-hidden="true" />
-          <span>{level}</span>
-        </span>
       </button>
     {/snippet}
     <Lazy
       load={loadStatus}
       props={{ onnavigate: () => (stateOpen = false) }}
+      label={t('common.loading')}
+    />
+  </Popover>
+  <Popover label={t('mode.title')} bind:open={modeOpen} width={340}>
+    {#snippet trigger(props)}
+      <button
+        type="button"
+        class="seg mode"
+        class:full={level === 'L4'}
+        {...props}
+        aria-label={t('titlebar.mode', { mode: tk(`mode.${level}.name`) })}
+        title={t('titlebar.modeTip')}
+      >
+        <span class="level">
+          <Shield size={13} strokeWidth={1.75} aria-hidden="true" />
+          <span class="mode-name">{tk(`mode.${level}.name`)}</span>
+          <span class="mode-short">{level}</span>
+        </span>
+      </button>
+    {/snippet}
+    <Lazy
+      load={loadModes}
+      props={{ current: level, onclose: () => (modeOpen = false) }}
       label={t('common.loading')}
     />
   </Popover>
@@ -163,6 +184,16 @@
     font-weight: var(--alfa-weight-semibold);
     line-height: 18px;
   }
+  .seg.mode {
+    padding: 0 var(--alfa-space-2);
+  }
+  .mode-short {
+    display: none;
+  }
+  .full .level {
+    border-color: var(--alfa-color-warning);
+    color: var(--alfa-color-warning);
+  }
   .cost.warn {
     color: var(--alfa-color-text);
     box-shadow: inset 0 -2px 0 var(--alfa-color-warning);
@@ -170,9 +201,14 @@
   .cost.warn .ico {
     color: var(--alfa-color-warning);
   }
+  /* Wąskie okno: zamiast nazwy trybu skrót „L3” (pełna nazwa zostaje w etykiecie przycisku). */
   @media (max-width: 900px) {
-    .word {
+    .word,
+    .mode-name {
       display: none;
+    }
+    .mode-short {
+      display: inline;
     }
   }
   @media (max-width: 720px) {
@@ -187,7 +223,7 @@
   }
   /* Bardzo wąskie okno: zostaje sam znak połączenia — reszta jest w objaśnieniu po kliknięciu. */
   @media (max-width: 520px) {
-    .level,
+    .cluster > :global(.anchor:nth-child(2)),
     .rule,
     .cluster > :global(.anchor:last-child) {
       display: none;

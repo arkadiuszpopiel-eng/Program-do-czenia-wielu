@@ -118,8 +118,10 @@ pub fn build_engine(
         env: PathEnv::windows_profile(&config.user_profile),
         key_mode: KeyMode::Random,
     };
+    // Poziom globalny zatwierdzony przez właściciela przetrwa restart (decyzja 27.10).
+    let standing = config.data_dir.join("autonomy-standing.json");
     BrokerEngine::new(broker, clock, audit, processes)
-        .map(Arc::new)
+        .map(|engine| Arc::new(engine.with_standing_level(standing)))
         .map_err(|e| e.to_string())
 }
 

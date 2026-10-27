@@ -183,16 +183,31 @@
   .crumbs {
     max-width: calc(50vw - 210px);
   }
-  @media (min-width: 721px) and (max-width: 1400px) {
-    .titlebar :global(.gui .text),
-    .titlebar :global(.gui .stop-text),
-    .titlebar :global(.cluster .word) {
+  /* Kapsuła sterowania ekranem bez słów do 1700 px: pełna („Delta steruje ekranem · Zatrzymaj”)
+     wchodziła pod obsadę na środku belki (pozycja bezwzględna) i zasłaniała przyciski. Stan
+     „Sterujesz Ty” zostaje ze słowami — bez nich przycisk etykiety byłby pusty. */
+  @media (min-width: 721px) and (max-width: 1700px) {
+    .titlebar :global(.live .text),
+    .titlebar :global(.live .stop-text) {
       display: none;
     }
     /* Bez napisu „Zatrzymaj” zostaje kwadrat (nazwa przycisku w aria-label) — pusty przycisk
        nie miał nazwy ani rozmiaru celu (axe: button-name, target-size). */
     .titlebar :global(.live .stop-icon) {
       display: block;
+    }
+  }
+  @media (min-width: 721px) and (max-width: 1400px) {
+    .titlebar :global(.cluster .word) {
+      display: none;
+    }
+    /* Tryb pracy skrótem „L3” jak reszta kapsuły bez słów: pełna nazwa przesuwała kapsułę
+       sterowania ekranem pod obsadę na środku (axe: target-size). Nazwa — w etykiecie przycisku. */
+    .titlebar :global(.cluster .mode-name) {
+      display: none;
+    }
+    .titlebar :global(.cluster .mode-short) {
+      display: inline;
     }
   }
   @media (min-width: 721px) and (max-width: 1100px) {
@@ -203,6 +218,10 @@
     .titlebar :global(.cluster .rule),
     .titlebar :global(.mic .text) {
       display: none;
+    }
+    /* Segment trybu pracy węższy — kapsuła sterowania ekranem nie wchodzi pod obsadę. */
+    .titlebar :global(.cluster .seg.mode) {
+      padding: 0 2px;
     }
     .crumbs {
       max-width: calc(50vw - 165px);

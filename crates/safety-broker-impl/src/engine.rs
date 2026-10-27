@@ -8,13 +8,14 @@ use platform_contract::ProcessPort;
 use risk_classifier_contract::{ActionFacts, AutonomyLevel, RiskClassifier, RiskVerdict};
 use safety_broker_contract::ipc::{ClientCredential, ClientRole};
 use safety_broker_contract::{
-    BrokerError, CapToken, Capability, EVENT_KEY_ROTATED, Holder, KernelGuard, KernelPolicy,
-    TokenId, event_kind, hex,
+    AutonomyEntry, AutonomyTarget, BrokerError, CapToken, Capability, EVENT_AUTONOMY_CHANGED,
+    EVENT_KEY_ROTATED, Holder, KernelGuard, KernelPolicy, TokenId, event_kind, hex,
 };
 use watchdog_contract::{Clock, JobTable};
 
 use crate::audit::AuditSink;
 use crate::keys::{KeyMode, KeyRing, mac};
+use crate::standing::StandingStore;
 use crate::state::{State, TokenMeta};
 
 /// Konfiguracja Brokera.
@@ -38,6 +39,8 @@ pub struct BrokerEngine {
     pub(crate) bus: Option<Arc<dyn EventBus>>,
     pub(crate) classifier: Option<Arc<dyn RiskClassifier>>,
     pub(crate) env: PathEnv,
+    /// Zapamiętany poziom globalny (`None` — bez zapisu, np. Broker w procesie testów).
+    pub(crate) standing: Option<StandingStore>,
 }
 
 /// Maksymalne długości pól podmiotu.
@@ -66,6 +69,7 @@ impl BrokerEngine {
             bus: None,
             classifier: None,
             env: config.env,
+            standing: None,
         })
     }
 
@@ -81,6 +85,35 @@ impl BrokerEngine {
     pub fn with_classifier(mut self, classifier: Arc<dyn RiskClassifier>) -> Self {
         self.classifier = Some(classifier);
         self
+    }
+
+    /// Zapamiętany poziom globalny w pliku `path` (prywatny katalog danych Brokera): wczytany
+    /// przy starcie — poziom zatwierdzony kiedyś przez właściciela obowiązuje bez nowej karty.
+    #[must_use]
+    pub fn with_standing_level(mut self, path: std::path::PathBuf) -> Self {
+        let store = StandingStore::new(path);
+        if let Some(level) = store.load() {
+            let entry = AutonomyEntry {
+                level,
+                until_ms: None,
+            };
+            self.lock().autonomy.set(AutonomyTarget::Global, entry);
+            let payload = serde_json::json!({ "target": AutonomyTarget::Global, "level": level, "origin": "restored" });
+            // Audyt niedostępny przy starcie — poziom i tak obowiązuje (zatwierdził go właściciel).
+            let _ = self.audit(EVENT_AUTONOMY_CHANGED, None, payload);
+        }
+        self.standing = Some(store);
+        self
+    }
+
+    /// Utrwala poziom globalny bez terminu (błąd zapisu → wpis w Audycie; poziom w pamięci obowiązuje).
+    pub(crate) fn remember_global(&self, level: AutonomyLevel) {
+        if let Some(store) = &self.standing
+            && let Err(e) = store.save(level)
+        {
+            let payload = serde_json::json!({ "target": AutonomyTarget::Global, "level": level, "persist_error": e.to_string() });
+            let _ = self.audit(EVENT_AUTONOMY_CHANGED, None, payload);
+        }
     }
 
     pub(crate) fn lock(&self) -> MutexGuard<'_, State> {
