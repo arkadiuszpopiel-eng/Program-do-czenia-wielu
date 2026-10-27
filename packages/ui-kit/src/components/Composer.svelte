@@ -160,11 +160,15 @@
   .wrap {
     position: relative;
   }
+  /* Jeden wiersz o wysokości kontrolki (--row): spinacz, pole, chipy, mikrofon i „Wyślij” mają
+     wspólny środek; przy kilku liniach tekstu kontrolki zostają na dole (właściciel 27.10:
+     „wyrównanie i symetria”). Odstęp od ramki taki sam z każdej strony. */
   .composer {
+    --row: var(--alfa-size-control);
     display: flex;
     align-items: flex-end;
-    gap: var(--alfa-space-1);
-    padding: var(--alfa-space-1);
+    gap: 6px;
+    padding: 6px;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-card);
     background: var(--alfa-color-surface);
@@ -182,8 +186,8 @@
   }
   textarea {
     flex: 1;
-    min-height: 32px;
-    padding: 8px 8px;
+    min-height: var(--row);
+    padding: calc((var(--row) - 21px) / 2) 8px;
     border: 0;
     resize: none;
     background: transparent;
@@ -200,8 +204,14 @@
   .chips {
     display: flex;
     align-items: center;
-    gap: var(--alfa-space-1);
-    padding-bottom: 2px;
+    gap: 6px;
+    height: var(--row);
+  }
+  .composer > :global(.icon-btn),
+  .composer > :global(.mic) {
+    flex: none;
+    width: var(--row);
+    height: var(--row);
   }
   :global(.composer .send:not(:disabled)),
   :global(.composer .stop) {

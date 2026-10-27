@@ -60,95 +60,109 @@
 </script>
 
 <header class="titlebar">
-  <div class="brand" data-tauri-drag-region>
-    <AlfaMark size={18} />
-    <span class="name" data-tauri-drag-region>Alfa</span>
+  <div class="zone left" data-tauri-drag-region>
+    <div class="brand" data-tauri-drag-region>
+      <AlfaMark size={18} />
+      <span class="name" data-tauri-drag-region>Alfa</span>
+    </div>
+    {#if app.view !== 'settings'}
+      <IconButton
+        label={place.left === 'hidden' ? t('titlebar.showSessions') : t('titlebar.hideSessions')}
+        size="sm"
+        pressed={place.left !== 'hidden'}
+        onclick={() =>
+          app.layout.leftCollapsed
+            ? app.layout.setLeftCollapsed(false)
+            : app.layout.toggleLeft(app.activeId)}
+        aria-keyshortcuts="Control+B"
+      >
+        <Menu size={16} strokeWidth={1.5} />
+      </IconButton>
+    {/if}
+    {#if renaming && session}
+      <label class="alfa-visually-hidden" for="alfa-rename">{t('titlebar.renameLabel')}</label>
+      <input
+        id="alfa-rename"
+        class="rename"
+        bind:value={draft}
+        onkeydown={renameKey}
+        onblur={() => void app.renameSession(session.id, draft)}
+        use:focusSelect
+      />
+    {:else}
+      <button
+        type="button"
+        class="crumbs"
+        aria-label={t('titlebar.session', { path: crumbs })}
+        aria-keyshortcuts="F2"
+        disabled={!session}
+        onclick={() => {
+          if (!session) return;
+          app.sessions.renamingInTitle = true;
+          app.sessions.renamingId = session.id;
+        }}
+      >
+        {#if session?.project}
+          <span class="project">{session.project.name}</span>
+          <span class="sep" aria-hidden="true">▸</span>
+        {/if}
+        <span class="session">{title}</span>
+        {#if session}<ChevronDown size={14} strokeWidth={1.5} aria-hidden="true" />{/if}
+      </button>
+    {/if}
+    <div class="drag" data-tauri-drag-region></div>
   </div>
-  {#if app.view !== 'settings'}
-    <IconButton
-      label={place.left === 'hidden' ? t('titlebar.showSessions') : t('titlebar.hideSessions')}
-      size="sm"
-      pressed={place.left !== 'hidden'}
-      onclick={() =>
-        app.layout.leftCollapsed
-          ? app.layout.setLeftCollapsed(false)
-          : app.layout.toggleLeft(app.activeId)}
-      aria-keyshortcuts="Control+B"
-    >
-      <Menu size={16} strokeWidth={1.5} />
-    </IconButton>
-  {/if}
-  {#if renaming && session}
-    <label class="alfa-visually-hidden" for="alfa-rename">{t('titlebar.renameLabel')}</label>
-    <input
-      id="alfa-rename"
-      class="rename"
-      bind:value={draft}
-      onkeydown={renameKey}
-      onblur={() => void app.renameSession(session.id, draft)}
-      use:focusSelect
-    />
-  {:else}
-    <button
-      type="button"
-      class="crumbs"
-      aria-label={t('titlebar.session', { path: crumbs })}
-      aria-keyshortcuts="F2"
-      disabled={!session}
-      onclick={() => {
-        if (!session) return;
-        app.sessions.renamingInTitle = true;
-        app.sessions.renamingId = session.id;
-      }}
-    >
-      {#if session?.project}
-        <span class="project">{session.project.name}</span>
-        <span class="sep" aria-hidden="true">▸</span>
+  <div class="cast-center" data-tauri-drag-region><CastStrip /></div>
+  <div class="zone right" data-tauri-drag-region>
+    <div class="drag" data-tauri-drag-region></div>
+    <div class="group live-group">
+      <GuiIndicator />
+      <CameraIndicator />
+      <MicIndicator />
+    </div>
+    <StatusCluster />
+    <div class="group tools">
+      {#if app.view !== 'settings'}
+        <IconButton
+          label={place.right === 'hidden' ? t('titlebar.showRight') : t('titlebar.hideRight')}
+          size="sm"
+          pressed={panels.right_open && place.right !== 'hidden'}
+          onclick={() => app.layout.toggleRight(app.activeId)}
+          aria-keyshortcuts="Control+\\"
+        >
+          <PanelRight size={16} strokeWidth={1.5} />
+        </IconButton>
       {/if}
-      <span class="session">{title}</span>
-      {#if session}<ChevronDown size={14} strokeWidth={1.5} aria-hidden="true" />{/if}
-    </button>
-  {/if}
-  <div class="drag" data-tauri-drag-region></div>
-  <div class="cast-center"><CastStrip /></div>
-  <GuiIndicator />
-  <CameraIndicator />
-  <MicIndicator />
-  <StatusCluster />
-  {#if app.view !== 'settings'}
-    <IconButton
-      label={place.right === 'hidden' ? t('titlebar.showRight') : t('titlebar.hideRight')}
-      size="sm"
-      pressed={panels.right_open && place.right !== 'hidden'}
-      onclick={() => app.layout.toggleRight(app.activeId)}
-      aria-keyshortcuts="Control+\\"
-    >
-      <PanelRight size={16} strokeWidth={1.5} />
-    </IconButton>
-  {/if}
-  <IconButton
-    label={t('titlebar.settings')}
-    size="sm"
-    pressed={app.view === 'settings'}
-    onclick={() => (app.view === 'settings' ? app.closeSettings() : app.openSettings())}
-    aria-keyshortcuts="Control+,"
-  >
-    <Settings size={16} strokeWidth={1.5} />
-  </IconButton>
-  <WindowControls />
+      <IconButton
+        label={t('titlebar.settings')}
+        size="sm"
+        pressed={app.view === 'settings'}
+        onclick={() => (app.view === 'settings' ? app.closeSettings() : app.openSettings())}
+        aria-keyshortcuts="Control+,"
+      >
+        <Settings size={16} strokeWidth={1.5} />
+      </IconButton>
+    </div>
+    <WindowControls />
+  </div>
   <div class="led" class:busy class:offline={app.system?.online === false} aria-hidden="true"></div>
 </header>
 
 <style>
+  /* Trzy strefy jak w aplikacjach ChatGPT i Claude na komputer (właściciel 27.10: „ładna
+     i symetryczna”): lewa i prawa po równo (1fr), obsada dokładnie na środku — nic na nią nie
+     wchodzi, bo nie leży już nad innymi elementami. Wszystkie kontrolki mają jedną wysokość. */
   .titlebar {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    gap: var(--alfa-space-2);
+    column-gap: var(--alfa-space-3);
+    --bar-h: 32px;
     --led-lane: 5px;
     height: var(--alfa-size-titlebar);
     /* Elementy są wyśrodkowane w części nad torem paska LED. */
-    padding: 0 var(--alfa-space-2) var(--led-lane) var(--alfa-space-3);
+    padding: 0 var(--alfa-space-2) var(--led-lane);
     border-bottom: 1px solid var(--alfa-color-border);
     background: var(--alfa-color-surface);
     font-size: var(--alfa-font-size-sm);
@@ -174,14 +188,38 @@
     align-self: stretch;
     min-width: var(--alfa-space-4);
   }
-  .cast-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
+  .zone {
+    display: flex;
+    align-items: center;
+    gap: var(--alfa-space-2);
+    min-width: 0;
+    height: 100%;
   }
+  .zone.right {
+    justify-content: flex-end;
+  }
+  .group {
+    display: flex;
+    align-items: center;
+    gap: var(--alfa-space-1);
+  }
+  .group:empty {
+    display: none;
+  }
+  .live-group:not(:has(*)) {
+    display: none;
+  }
+  .titlebar :global(.icon-btn.sm),
   .crumbs {
-    max-width: calc(50vw - 210px);
+    height: var(--bar-h);
+    min-height: var(--bar-h);
+  }
+  .titlebar :global(.icon-btn.sm) {
+    width: var(--bar-h);
+  }
+  .cast-center {
+    display: flex;
+    justify-content: center;
   }
   /* Kapsuła sterowania ekranem bez słów do 1700 px: pełna („Delta steruje ekranem · Zatrzymaj”)
      wchodziła pod obsadę na środku belki (pozycja bezwzględna) i zasłaniała przyciski. Stan
@@ -222,9 +260,6 @@
     /* Segment trybu pracy węższy — kapsuła sterowania ekranem nie wchodzi pod obsadę. */
     .titlebar :global(.cluster .seg.mode) {
       padding: 0 2px;
-    }
-    .crumbs {
-      max-width: calc(50vw - 165px);
     }
   }
   @media (min-width: 721px) and (max-width: 900px) {
@@ -334,7 +369,7 @@
   }
   .crumbs {
     min-width: 0;
-    max-width: max(60px, calc(50vw - 210px));
+    max-width: 100%;
     font-weight: var(--alfa-weight-semibold);
   }
   .session {

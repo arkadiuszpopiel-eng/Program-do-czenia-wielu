@@ -38,8 +38,8 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
-    min-width: 34px;
-    height: 34px;
+    min-width: var(--bar-h, 32px);
+    height: var(--bar-h, 32px);
     padding: 0 var(--alfa-space-2);
     border: 1px solid var(--alfa-color-error);
     border-radius: var(--alfa-radius-full);

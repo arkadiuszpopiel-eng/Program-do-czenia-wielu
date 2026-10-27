@@ -109,7 +109,7 @@
     display: flex;
     align-items: center;
     gap: 3px;
-    height: 34px;
+    height: var(--bar-h, 32px);
     padding: 0 3px;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-full);

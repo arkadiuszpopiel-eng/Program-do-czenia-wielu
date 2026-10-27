@@ -68,7 +68,7 @@
     align-items: center;
     min-width: 0;
     gap: 2px;
-    height: 34px;
+    height: var(--bar-h, 32px);
     padding: 0 3px 0 var(--alfa-space-2);
     border: 1px solid var(--alfa-color-border);
     background: var(--alfa-color-bg);

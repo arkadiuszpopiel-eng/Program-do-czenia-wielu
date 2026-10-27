@@ -114,7 +114,7 @@
   .cluster {
     display: inline-flex;
     align-items: center;
-    height: 34px;
+    height: var(--bar-h, 32px);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-full);
     background: var(--alfa-color-bg);
