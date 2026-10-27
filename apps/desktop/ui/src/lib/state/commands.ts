@@ -31,6 +31,7 @@ export const EXTRA_COMMANDS = [
   'action.theme',
   'action.language',
   'action.column',
+  'action.panels',
   'action.transfer',
   'action.accounts',
   'action.autonomy',
@@ -191,6 +192,10 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.column':
       void app.setSetting('ui.column', nextColumn(app.str('ui.column', 'auto')));
+      break;
+    case 'action.panels':
+      // Panele chowane przy krawędziach (właściciel 27.10) — włączane jednym poleceniem z palety.
+      void app.setSetting('ui.panels_autohide', !app.bool('ui.panels_autohide', false));
       break;
     case 'action.transfer':
       app.openSettings('transfer');

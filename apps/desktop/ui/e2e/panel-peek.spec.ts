@@ -84,6 +84,27 @@ test('„Panele chowają się same”: oba schowane, przełącznik w pasku i Esc
   expect(errors, 'błędy w konsoli').toEqual([]);
 });
 
+test('paleta (Ctrl+K): „Chowaj panele boczne automatycznie” włącza i wyłącza', async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await openApp(page);
+  await waitForChat(page);
+  const toggle = async () => {
+    await page.keyboard.press('Control+k');
+    await expect(page.locator('dialog[open] input')).toBeFocused();
+    await page.keyboard.type('chowaj panele');
+    await expect(page.locator('dialog [role=option][data-selected]')).toContainText(
+      'Chowaj panele boczne automatycznie',
+    );
+    await page.keyboard.press('Enter');
+  };
+  await toggle();
+  await expect(tab(page, SESSIONS)).toBeVisible();
+  await expect(tab(page, RIGHT)).toBeVisible();
+  await toggle();
+  await expect(tab(page, SESSIONS)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Ukryj panel Sesje' })).toBeVisible();
+});
+
 test('wąskie okno: znacznik otwiera szufladę kliknięciem', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 800 });
   await openApp(page);

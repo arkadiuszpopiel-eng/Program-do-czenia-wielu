@@ -303,6 +303,7 @@ export const plSettings = {
   'action.autonomy': 'Poziom autonomii',
   'action.cast': 'Zmień obsadę agentek',
   'action.column': 'Przełącz szerokość kolumny rozmowy',
+  'action.panels': 'Chowaj panele boczne automatycznie (włącz/wyłącz)',
   'action.onboarding': 'Uruchom ponownie wprowadzenie',
   'action.stopGeneration': 'Zatrzymaj generowanie',
 

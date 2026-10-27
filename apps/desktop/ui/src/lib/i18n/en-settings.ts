@@ -292,6 +292,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'action.autonomy': 'Autonomy level',
   'action.cast': 'Change the agent cast',
   'action.column': 'Toggle conversation column width',
+  'action.panels': 'Auto-hide side panels (on/off)',
   'action.onboarding': 'Restart the introduction',
   'action.stopGeneration': 'Stop generating',
 
