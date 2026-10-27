@@ -32,6 +32,8 @@ Alfa łączy się z silnikiem gier właściciela NextGO.Gray: agentki uruchamiaj
 
 - Przycisk „Zatrzymaj” sterowania ekranem w średnio szerokim oknie ma znowu ikonę i nazwę dla czytników ekranu
   (był pusty i za mały do kliknięcia).
+- Kapsuła „Delta steruje ekranem” w oknie do 1700 px szerokości nie wchodzi już pod obsadę agentek na środku
+  belki — pokazuje ikonę i kwadrat „Zatrzymaj”; stan „Sterujesz Ty” zachowuje napis.
 
 ### Testy
 
