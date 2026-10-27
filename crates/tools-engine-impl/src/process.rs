@@ -200,19 +200,67 @@ pub(crate) fn exited(child: &mut Child) -> Option<Option<i32>> {
     }
 }
 
-/// Katalog z datą w danych Alfy (`<dane>/engine/<rodzaj>/<data>-<n>`).
+/// Ile ostatnich katalogów zrzutów albo podglądów zostaje w danych Alfy (po 8 MiB na obraz).
+const KEEP_DIRS: usize = 50;
+
+/// Nowy katalog w danych Alfy (`<dane>/engine/<rodzaj>/<czas w ms>-<n>`): `n` rozróżnia dwa
+/// wywołania w tej samej milisekundzie, a najstarsze katalogi ponad [`KEEP_DIRS`] są usuwane,
+/// żeby dane nie rosły bez końca (przegląd 2026-10-27).
 pub(crate) fn fresh_dir(base: &Path, kind: &str) -> Result<PathBuf, EngineError> {
+    let io = |dir: &Path, e: std::io::Error| EngineError::Io(format!("{}: {e}", dir.display()));
+    let parent = base.join(kind);
+    std::fs::create_dir_all(&parent).map_err(|e| io(&parent, e))?;
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_millis());
-    let dir = base.join(kind).join(format!("{stamp}"));
-    std::fs::create_dir_all(&dir)
-        .map_err(|e| EngineError::Io(format!("{}: {e}", dir.display())))?;
+    let mut n = 0u32;
+    let dir = loop {
+        let dir = parent.join(format!("{stamp:015}-{n}"));
+        match std::fs::create_dir(&dir) {
+            Ok(()) => break dir,
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists && n < 1000 => n += 1,
+            Err(e) => return Err(io(&dir, e)),
+        }
+    };
+    prune(&parent, &dir);
     Ok(dir)
+}
+
+/// Usuwa najstarsze katalogi ponad limit; błąd sprzątania nie przerywa zrzutu.
+fn prune(parent: &Path, keep: &Path) {
+    let Ok(entries) = std::fs::read_dir(parent) else {
+        return;
+    };
+    let mut dirs: Vec<PathBuf> = entries
+        .filter_map(Result::ok)
+        .filter(|e| e.file_type().is_ok_and(|t| t.is_dir()))
+        .map(|e| e.path())
+        .collect();
+    // Nazwy z czasem dopełnionym zerami: kolejność alfabetyczna = kolejność utworzenia.
+    dirs.sort();
+    let excess = dirs.len().saturating_sub(KEEP_DIRS);
+    for old in dirs.into_iter().take(excess).filter(|d| d != keep) {
+        if let Err(e) = std::fs::remove_dir_all(&old) {
+            tracing::warn!("sprzątanie {}: {e}", old.display());
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn fresh_dirs_are_unique_and_pruned() {
+        let base = tempfile::tempdir().unwrap();
+        let made: Vec<_> = (0..super::KEEP_DIRS + 5)
+            .map(|_| super::fresh_dir(base.path(), "previews").unwrap())
+            .collect();
+        let left = std::fs::read_dir(base.path().join("previews"))
+            .unwrap()
+            .count();
+        assert_eq!(left, super::KEEP_DIRS);
+        assert!(made.last().unwrap().is_dir() && !made[0].exists());
+    }
+
     use super::*;
 
     #[test]

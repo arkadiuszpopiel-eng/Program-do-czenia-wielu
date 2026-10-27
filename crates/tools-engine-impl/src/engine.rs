@@ -1,6 +1,7 @@
 //! [`ProcessEngine`] — port silnika nad prawdziwym `engine-server.exe`.
 
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError, RwLock};
 use std::time::Duration;
 
@@ -41,6 +42,9 @@ struct Inner {
     live: Mutex<Option<Live>>,
     conn: tokio::sync::Mutex<Option<Connection>>,
     previews: Mutex<Vec<Child>>,
+    /// Licznik użyć kill-switcha: start, który czekał na adres serwera, gdy kill-switch zadziałał,
+    /// nie zapisuje procesu jako działającego, tylko go kończy (przegląd 2026-10-27).
+    kills: AtomicU64,
 }
 
 /// Port silnika nad procesem serwera.
@@ -65,6 +69,7 @@ impl ProcessEngine {
                 live: Mutex::new(None),
                 conn: tokio::sync::Mutex::new(None),
                 previews: Mutex::new(Vec::new()),
+                kills: AtomicU64::new(0),
             }),
         }
     }
@@ -171,6 +176,7 @@ impl EnginePort for ProcessEngine {
             None
         };
         let args = process::server_args(&options, captures.as_deref());
+        let kills = self.inner.kills.load(Ordering::SeqCst);
         let spawned = process::spawn(&program, &args, &workdir, &self.inner.base_env)?;
         let (mut child, tail) = (spawned.child, spawned.tail);
         let opened = async {
@@ -180,6 +186,15 @@ impl EnginePort for ProcessEngine {
             Ok::<_, EngineError>((listening, c))
         }
         .await;
+        let opened = opened.and_then(|v| {
+            if self.inner.kills.load(Ordering::SeqCst) == kills {
+                Ok(v)
+            } else {
+                Err(EngineError::Spawn(
+                    "przerwane wyłącznikiem awaryjnym".into(),
+                ))
+            }
+        });
         let (listening, c) = match opened {
             Ok(v) => v,
             Err(e) => {
@@ -327,6 +342,7 @@ impl EnginePort for ProcessEngine {
     }
 
     fn kill_all(&self) -> usize {
+        self.inner.kills.fetch_add(1, Ordering::SeqCst);
         let mut killed = 0;
         if let Some(mut live) = lock(&self.inner.live).take() {
             process::kill(&mut live.child);

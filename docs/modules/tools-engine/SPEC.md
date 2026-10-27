@@ -49,8 +49,10 @@ engine_rollback {} · engine_step {frames 1–10000} · engine_stream {budget?, 
 engine_select {entity_id|null} · engine_shader {shader_name, wgsl_code, transaction_id?, expected_revision?}
 ```
 
-Bez `transaction_id` Alfa nadaje stały identyfikator `alfa-<sha256(sesja, przebieg, krok, treść)>`
-— ponowienie tego samego wywołania nie zdubluje zmiany.
+Bez `transaction_id` Alfa nadaje stały identyfikator `alfa-<sha256(sesja, przebieg, treść)>`
+— bez numeru kroku, więc ponowienie tego samego wywołania (także w następnym kroku, po upływie
+terminu) nie zdubluje zmiany. Celowe powtórzenie tej samej zmiany w jednym przebiegu: nowa
+`expected_revision` albo własny `transaction_id`.
 
 ## Implementacja (`crates/tools-engine-impl`)
 

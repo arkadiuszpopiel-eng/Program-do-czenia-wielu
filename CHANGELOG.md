@@ -34,6 +34,12 @@ Alfa łączy się z silnikiem gier właściciela NextGO.Gray: agentki uruchamiaj
   (był pusty i za mały do kliknięcia).
 - Kapsuła „Delta steruje ekranem” w oknie do 1700 px szerokości nie wchodzi już pod obsadę agentek na środku
   belki — pokazuje ikonę i kwadrat „Zatrzymaj”; stan „Sterujesz Ty” zachowuje napis.
+- Silnik gier — po niezależnym przeglądzie modułu (poważne): anulowanie zadania w trakcie wywołania silnika nie
+  zostawia już połączenia w połowie wiadomości (następne wywołanie łączy się od nowa zamiast zgłaszać fałszywy
+  błąd); ponowienie transakcji po przekroczeniu czasu w następnym kroku nie stosuje zmiany drugi raz.
+- Silnik gier (drobne): kill-switch kończy także serwer, który dopiero się uruchamia; ramki sterujące
+  WebSocket sprawdzane według RFC 6455; każdy zrzut i podgląd ma własny katalog, a w danych Alfy zostaje 50
+  ostatnich.
 
 ### Testy
 

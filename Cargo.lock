@@ -6699,6 +6699,7 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "compliance-contract",
+ "core-bus-contract",
  "getrandom 0.4.3",
  "lib-sidecar-guard",
  "platform-contract",

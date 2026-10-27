@@ -82,9 +82,13 @@ impl Connection {
         if self.ws.is_none() || self.last_used.elapsed().as_secs() >= IDLE_RECONNECT_SECS {
             self.reconnect().await?;
         }
-        let ws = self
+        // Gniazdo wyjęte na czas wymiany: wraca tylko po pełnej odpowiedzi. Przerwanie w połowie
+        // ramki (anulowanie przebiegu porzuca ten future, upływ terminu, błąd łącza) zostawia
+        // `ws = None`, więc następne wywołanie łączy się od nowa zamiast czytać resztki starej
+        // ramki (przegląd 2026-10-27).
+        let mut ws = self
             .ws
-            .as_mut()
+            .take()
             .ok_or_else(|| EngineError::Transport("brak połączenia".into()))?;
         let exchange = async {
             ws.send_text(&text).await.map_err(transport)?;
@@ -100,12 +104,8 @@ impl Connection {
             Err(_) => Err(EngineError::Timeout(limit.as_secs())),
         };
         self.last_used = Instant::now();
-        // Po błędzie łącza gniazdo jest w nieznanym stanie — następne wywołanie połączy się od nowa.
-        if matches!(
-            result,
-            Err(EngineError::Transport(_) | EngineError::Protocol(_))
-        ) {
-            self.ws = None;
+        if matches!(result, Ok(_) | Err(EngineError::Rpc { .. })) {
+            self.ws = Some(ws);
         }
         result
     }

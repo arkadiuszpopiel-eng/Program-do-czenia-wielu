@@ -20,12 +20,14 @@ pub(crate) const TEXT_MAX: usize = 30_000;
 /// Największy obraz zwracany modelowi.
 const IMAGE_MAX_BYTES: u64 = 8 * 1024 * 1024;
 
-/// Stały identyfikator transakcji z przebiegu, kroku i treści: ponowienie tego samego wywołania
-/// trafia w ten sam identyfikator, więc silnik niczego nie zdubluje.
+/// Stały identyfikator transakcji z rozmowy, przebiegu i treści — bez numeru kroku: model, który
+/// po upływie terminu ponawia to samo wywołanie w następnym kroku, trafia w ten sam identyfikator,
+/// a silnik oddaje wynik pierwszego wykonania zamiast stosować zmianę drugi raz (przegląd
+/// 2026-10-27). Celowe powtórzenie w tym samym przebiegu: nowa `expected_revision` albo własny id.
 pub(crate) fn derived_id(ctx: &ToolCtx, kind: &str, body: &Value) -> String {
     let mut h = Sha256::new();
     h.update(ctx.holder.session.as_str().as_bytes());
-    h.update(format!("{:?}|{}|{kind}|", ctx.run, ctx.step).as_bytes());
+    h.update(format!("{:?}|{kind}|", ctx.run).as_bytes());
     h.update(body.to_string().as_bytes());
     let hex: String = h.finalize()[..12]
         .iter()
@@ -298,5 +300,36 @@ impl Core {
                 "czekanie na silnik (krok mógł się jeszcze wykonać)",
             ))),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use core_bus_contract::RunId;
+    use safety_broker_contract::Holder;
+    use serde_json::json;
+    use tools_common_contract::ToolCtx;
+
+    use super::derived_id;
+
+    fn ctx(run: &str, step: u32) -> ToolCtx {
+        let mut ctx = ToolCtx::new(Holder::agent("s1", "delta"));
+        ctx.run = Some(RunId::new(run));
+        ctx.step = step;
+        ctx
+    }
+
+    /// Ponowienie po upływie terminu w następnym kroku trafia w ten sam identyfikator
+    /// (przegląd 2026-10-27: numer kroku zmieniał id i zmiana stosowała się drugi raz).
+    #[test]
+    fn retry_in_next_step_keeps_the_transaction_id() {
+        let body = json!([[{"op": "entity.spawn"}], null]);
+        let id =
+            |run, step, kind, body: &serde_json::Value| derived_id(&ctx(run, step), kind, body);
+        assert_eq!(id("r1", 3, "tx", &body), id("r1", 4, "tx", &body));
+        assert_ne!(id("r1", 3, "tx", &body), id("r2", 3, "tx", &body));
+        let other = json!([[{"op": "entity.spawn"}], 7]);
+        assert_ne!(id("r1", 3, "tx", &body), id("r1", 3, "tx", &other));
+        assert_ne!(id("r1", 3, "tx", &body), id("r1", 3, "shader", &body));
     }
 }

@@ -71,8 +71,9 @@ pub struct TransactionArgs {
     /// Operacje (1–1024) w formacie silnika: obiekty z polem `op`, np.
     /// `{"op":"entity.spawn","entity":{…}}` — opis w `engine_docs`.
     pub operations: Vec<Value>,
-    /// Identyfikator (1–128 znaków). Bez niego Alfa nadaje stały identyfikator z treści i kroku,
-    /// więc ponowienie tego samego wywołania niczego nie zdubluje.
+    /// Identyfikator (1–128 znaków). Bez niego Alfa nadaje stały identyfikator z treści w obrębie
+    /// przebiegu: ponowienie tego samego wywołania niczego nie zdubluje, a celowe powtórzenie tej
+    /// samej zmiany wymaga nowej `expected_revision` albo własnego identyfikatora.
     #[serde(default)]
     pub transaction_id: Option<String>,
     /// Rewizja, na której opiera się zmiana (konflikt, gdy świat się zmienił).
@@ -154,7 +155,7 @@ pub struct ShaderArgs {
     pub shader_name: String,
     /// Kod WGSL.
     pub wgsl_code: String,
-    /// Identyfikator transakcji (domyślnie stały z treści i kroku).
+    /// Identyfikator transakcji (domyślnie stały z treści w obrębie przebiegu).
     #[serde(default)]
     pub transaction_id: Option<String>,
     /// Rewizja, na której opiera się zmiana.

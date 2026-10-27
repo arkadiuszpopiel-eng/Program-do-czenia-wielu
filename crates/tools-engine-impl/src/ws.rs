@@ -128,7 +128,8 @@ impl<S: AsyncRead + AsyncWrite + Unpin> WsStream<S> {
                     let _ = self.send_frame(0x8, &payload).await;
                     return Err(WsError::Closed);
                 }
-                0x0..=0x2 => {
+                // Serwer silnika wysyła tylko tekst; ramka binarna to błąd protokołu.
+                0x0 | 0x1 => {
                     if (opcode == 0x0) != in_message {
                         return Err(WsError::Protocol("nieoczekiwany fragment".into()));
                     }
@@ -171,6 +172,13 @@ impl<S: AsyncRead + AsyncWrite + Unpin> WsStream<S> {
             }
             n => u64::from(n),
         };
+        // RFC 6455 §5.5: ramki sterujące niepodzielone i do 125 bajtów — sprawdzane przed odczytem
+        // treści, więc ping z 1 MiB nie wraca w całości jako pong (przegląd 2026-10-27).
+        if opcode >= 0x8 && (!fin || len > 125) {
+            return Err(WsError::Protocol(format!(
+                "ramka sterująca {opcode:#x} niezgodna z RFC 6455"
+            )));
+        }
         let len = usize::try_from(len)
             .ok()
             .filter(|l| *l <= self.max_message)
@@ -284,31 +292,74 @@ mod tests {
         srv.await.unwrap();
     }
 
-    #[tokio::test]
-    async fn oversized_and_masked_server_frames_are_errors() {
+    /// Serwer testowy bez sprawdzania nagłówków: poprawne uzgodnienie, potem podane bajty ramek.
+    async fn raw_server(listener: TcpListener, frames: &'static [u8]) {
+        let (mut s, _) = listener.accept().await.unwrap();
+        let mut head = Vec::new();
+        let mut b = [0u8; 1];
+        while !head.ends_with(b"\r\n\r\n") {
+            s.read_exact(&mut b).await.unwrap();
+            head.push(b[0]);
+        }
+        let head = String::from_utf8(head).unwrap();
+        let key = head
+            .lines()
+            .find_map(|l| l.strip_prefix("Sec-WebSocket-Key: "))
+            .unwrap()
+            .trim()
+            .to_owned();
+        let accept = base64::engine::general_purpose::STANDARD
+            .encode(sha1(format!("{key}{GUID}").as_bytes()));
+        let reply = format!("HTTP/1.1 101 OK\r\nSec-WebSocket-Accept: {accept}\r\n\r\n");
+        s.write_all(reply.as_bytes()).await.unwrap();
+        s.write_all(frames).await.unwrap();
+        // Gniazdo otwarte do rozłączenia klienta: wcześniejsze zamknięcie na Windows (RST) gubi
+        // jeszcze nieodczytane ramki.
+        let _ = s.read(&mut b).await;
+    }
+
+    async fn first_reply(frames: &'static [u8], limit: usize) -> Result<String, WsError> {
         let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
         let addr = listener.local_addr().unwrap().to_string();
-        let srv = tokio::spawn(async move {
-            let (mut s, _) = listener.accept().await.unwrap();
-            let mut buf = [0u8; 1024];
-            let n = s.read(&mut buf).await.unwrap();
-            let head = String::from_utf8_lossy(&buf[..n]).into_owned();
-            let key = head
-                .lines()
-                .find_map(|l| l.strip_prefix("Sec-WebSocket-Key: "))
-                .unwrap()
-                .trim()
-                .to_owned();
-            let accept = base64::engine::general_purpose::STANDARD
-                .encode(sha1(format!("{key}{GUID}").as_bytes()));
-            let reply = format!("HTTP/1.1 101 OK\r\nSec-WebSocket-Accept: {accept}\r\n\r\n");
-            s.write_all(reply.as_bytes()).await.unwrap();
-            // Długość 200 przy limicie 64.
-            s.write_all(&[0x81, 126, 0x00, 200]).await.unwrap();
-        });
+        let srv = tokio::spawn(raw_server(listener, frames));
         let tcp = TcpStream::connect(&addr).await.unwrap();
-        let mut ws = WsStream::handshake(tcp, &addr, "/", 64).await.unwrap();
-        assert_eq!(ws.recv_text().await, Err(WsError::TooLarge(64)));
+        let mut ws = WsStream::handshake(tcp, &addr, "/", limit).await.unwrap();
+        let reply = ws.recv_text().await;
+        drop(ws);
         srv.await.unwrap();
+        reply
+    }
+
+    #[tokio::test]
+    async fn oversized_and_masked_server_frames_are_errors() {
+        // Długość 200 przy limicie 64.
+        assert_eq!(
+            first_reply(&[0x81, 126, 0x00, 200], 64).await,
+            Err(WsError::TooLarge(64))
+        );
+        assert!(matches!(
+            first_reply(&[0x81, 0x81, 0, 0, 0, 0, b'x'], 64).await,
+            Err(WsError::Protocol(_))
+        ));
+    }
+
+    /// Przegląd 2026-10-27: podzielony ping, ping ponad 125 bajtów i ramka binarna to błędy.
+    #[tokio::test]
+    async fn control_frames_follow_rfc_6455() {
+        let fragmented_ping: &[u8] = &[0x09, 0x01, b'p'];
+        assert!(matches!(
+            first_reply(fragmented_ping, 1024).await,
+            Err(WsError::Protocol(_))
+        ));
+        let long_ping: &[u8] = &[0x89, 126, 0x00, 126];
+        assert!(matches!(
+            first_reply(long_ping, 1024).await,
+            Err(WsError::Protocol(_))
+        ));
+        let binary: &[u8] = &[0x82, 0x01, b'x'];
+        assert!(matches!(
+            first_reply(binary, 1024).await,
+            Err(WsError::Protocol(_))
+        ));
     }
 }
