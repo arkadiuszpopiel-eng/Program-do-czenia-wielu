@@ -92,8 +92,13 @@
     font: inherit;
     cursor: pointer;
   }
+  /* Najmniej 24 px (WCAG 2.5.8): w ciasnej belce kapsuła może się kurczyć, ale przycisk nie spada
+     poniżej celu kliknięcia — pełny przebieg 27.10 złapał chwilowo ściśnięty napis (axe target-size). */
   .label {
-    min-width: 0;
+    min-width: 24px;
+  }
+  .act {
+    min-width: 24px;
   }
   .text {
     overflow: hidden;

@@ -40,6 +40,8 @@ Alfa łączy się z silnikiem gier właściciela NextGO.Gray: agentki uruchamiaj
 - Silnik gier (drobne): kill-switch kończy także serwer, który dopiero się uruchamia; ramki sterujące
   WebSocket sprawdzane według RFC 6455; każdy zrzut i podgląd ma własny katalog, a w danych Alfy zostaje 50
   ostatnich.
+- Przyciski kapsuły sterowania ekranem nie zmniejszają się poniżej 24 px w ciasnym pasku tytułu (cel
+  kliknięcia według WCAG 2.5.8).
 
 ### Testy
 
