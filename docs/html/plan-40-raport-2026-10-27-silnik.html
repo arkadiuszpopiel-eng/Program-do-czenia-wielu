@@ -368,6 +368,14 @@ wyłącza narzędzia. Narzędzia mają agentki z dostępem do powłoki (grupa <c
 <li>podgląd GPU i zrzut okna z <code>--capture-revisions</code>;</li>
 </ul>
 </li>
+<li>ścieżka w aplikacji (<code>app-agents/tests/engine_setting.rs</code>):<ul>
+<li>ustawienie zapisane jak z Ustawień trafia do narzędzi;</li>
+<li>na prawdziwym silniku: stan „0.1.0 gotowy, sprawdzenie: passed”, start serwera na losowym porcie i
+odczyt sceny;</li>
+<li>wyczyszczenie pola wyłącza narzędzia;</li>
+<li>ten test znalazł zły komunikat („Ustawienia → Silnik gier” zamiast „Zaawansowane”) — poprawiony;</li>
+</ul>
+</li>
 <li>po testach w katalogu silnika nie powstał żaden plik;</li>
 <li>clippy bez ostrzeżeń, 345 testów zmienionych pakietów, <code>cargo deny</code> (bans, sources);</li>
 <li>pełny zestaw przeglądarkowy 559/559, interfejs (vitest) 491.</li>

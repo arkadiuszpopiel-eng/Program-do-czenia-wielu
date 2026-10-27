@@ -87,6 +87,7 @@ providers-local-impl = { path = "../providers-local-impl" }
 platform-fake = { path = "../platform-fake" }
 platform-windows-impl = { path = "../platform-windows-impl" }
 safety-broker-fake = { path = "../safety-broker-fake" }
+core-config-fake = { path = "../core-config-fake" }
 undo-journal-fake = { path = "../undo-journal-fake" }
 platform-apps-fake = { path = "../platform-apps-fake" }
 tools-net-fake = { path = "../tools-net-fake" }

@@ -355,6 +355,7 @@ dependencies = [
  "core-bus-contract",
  "core-bus-fake",
  "core-config-contract",
+ "core-config-fake",
  "futures-util",
  "lib-media",
  "personas-contract",

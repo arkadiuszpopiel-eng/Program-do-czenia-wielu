@@ -14,7 +14,9 @@ use crate::EngineMethod;
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum EngineError {
     /// Nie wskazano katalogu silnika w Ustawieniach.
-    #[error("nie wskazano katalogu silnika (Ustawienia → Silnik gier)")]
+    #[error(
+        "nie wskazano katalogu silnika (Ustawienia → Zaawansowane → Katalog silnika gier NextGO.Gray)"
+    )]
     NotConfigured,
     /// Brak zbudowanego programu.
     #[error("brak programu silnika: {0} — zbuduj silnik (cargo build --release) w jego katalogu")]

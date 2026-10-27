@@ -44,6 +44,12 @@ wyłącza narzędzia. Narzędzia mają agentki z dostępem do powłoki (grupa `s
   - scenariusz start → transakcja → odczyt → cofnięcie → zatrzymanie;
   - kill-switch;
   - podgląd GPU i zrzut okna z `--capture-revisions`;
+- ścieżka w aplikacji (`app-agents/tests/engine_setting.rs`):
+  - ustawienie zapisane jak z Ustawień trafia do narzędzi;
+  - na prawdziwym silniku: stan „0.1.0 gotowy, sprawdzenie: passed”, start serwera na losowym porcie i
+    odczyt sceny;
+  - wyczyszczenie pola wyłącza narzędzia;
+  - ten test znalazł zły komunikat („Ustawienia → Silnik gier” zamiast „Zaawansowane”) — poprawiony;
 - po testach w katalogu silnika nie powstał żaden plik;
 - clippy bez ostrzeżeń, 345 testów zmienionych pakietów, `cargo deny` (bans, sources);
 - pełny zestaw przeglądarkowy 559/559, interfejs (vitest) 491.
