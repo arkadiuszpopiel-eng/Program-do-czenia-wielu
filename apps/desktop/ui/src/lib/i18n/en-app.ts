@@ -56,7 +56,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'titlebar.cast': 'Agent cast',
   'titlebar.agent': '{name} · {role} · {status}. Details and role change',
   'titlebar.state':
-    'State: {connection}, profile {profile}, autonomy {level}. Show the explanation',
+    'State: {connection}, profile {profile}, work mode {level}. Show the explanation',
   'titlebar.stateTip': 'Connection, model profile and autonomy — click for an explanation',
   'titlebar.cost': 'Session cost {cost}. Cost details',
   'titlebar.costTip': 'Cost of this session — click for details and the limit',

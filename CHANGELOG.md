@@ -12,6 +12,54 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.75 — 2026-10-28
+
+Porządki interfejsu według uwag właściciela z 27.10: tryb pracy wybierany prosto z belki, okno Brokera bez
+odliczania, symetryczna belka tytułu i wyrównany pasek pisania, panele boczne chowane ze świecącymi znacznikami,
+mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'ów.
+
+### Nowe
+
+- Tryb pracy wybierasz z prostej listy w belce: Tylko podgląd, Pytaj o wszystko, Automatycznie, Pełna
+  automatyka. Podniesienie zatwierdzasz raz w oknie Brokera, a wybrany tryb zostaje po restarcie; w każdym trybie
+  zostają kill-switch Ctrl+Shift+F12, dziennik i pytanie przed wysyłką po obcej treści albo po poleceniu obcym lub
+  niepewnie rozpoznanym głosem.
+- Panele boczne mogą chować się same (Ustawienia → Wygląd → „Panele chowają się same” albo polecenie „Chowaj
+  panele boczne automatycznie” w palecie Ctrl+K). Przy krawędzi okna świeci znacznik; po najechaniu panel wysuwa
+  się nad rozmowę, a po zjechaniu myszą, kliknięciu obok albo Esc chowa się. „Przypnij panel” przywraca stały
+  układ.
+- Ręcznie schowany panel też zostawia znacznik przy krawędzi i wysuwa się po najechaniu.
+- Gdy agentka pisze odpowiedź, jej awatar mówi, a z ust wylatują litery z właśnie pisanego tekstu (przy
+  wyłączonych animacjach i ograniczonym ruchu — bez liter).
+- Okienko stanu w belce działa na miejscu: profil modeli (Lokalny, Hybryda, Chmura) zmieniasz od razu, a „Zmień
+  tryb pracy” otwiera menu trybów zamiast przenosić do Ustawień.
+- Plan Alfy dla dzieci (etap K): nauka i zabawa głosem, styl „Junior”, limity czasu i podgląd rodzica z telefonu —
+  dokument `docs/plan/41`, z pytaniami do właściciela.
+
+### Zmiany
+
+- Okno Brokera przy zmianie trybu pracy nie odlicza już czasu i nie pyta dwa razy; pokazuje nazwy trybów jak w
+  menu i przycisk „Włącz: …”.
+- Belka tytułu ma trzy równe strefy (marka i ścieżka, obsada na środku, stan i przyciski okna) i jedną wysokość
+  wszystkich kontrolek; w wąskim oknie strefy zbliżają się zamiast nachodzić.
+- Pasek pisania: przyciski i wybory w jednym rzędzie, równe odstępy i wysokości, także w wąskim oknie.
+- Okno Pipeline'ów: krótszy opis po polsku, „×” do zamknięcia jak w innych oknach, etapy połączone strzałkami
+  przepływu, jedno pole wyboru modelu (Auto, modele, „Inny…”), przyciski „+ zadanie” i „+ wynik poprzedniego”
+  oraz pasek „Uruchom w rozmowie” na całą szerokość.
+
+### Poprawki
+
+- W oknie szerokim na 1000 px kapsuła sterowania ekranem nie wchodzi już na obsadę agentek; przy 360 px
+  belka i pasek pisania nie wystają poza okno.
+- W stylu klasycznym numer aktywnego etapu pipeline'u i pasek LED są znowu widoczne (styl nie ma koloru
+  akcentu).
+- Kliknięcie obsady na środku belki nie przesuwa już okna (obsada była w obszarze przeciągania).
+
+### Testy
+
+- Nowe testy przeglądarkowe: panele chowane we wszystkich stylach i motywach, polecenie palety, menu trybu,
+  okienko stanu, litery z ust w pisanej odpowiedzi; testy jednostkowe układu paneli. Interfejs 499/499.
+
 ## 0.0.74 — 2026-10-27
 
 Alfa łączy się z silnikiem gier właściciela NextGO.Gray: agentki uruchamiają jego serwer, budują i zmieniają

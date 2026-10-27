@@ -190,7 +190,7 @@ for (const skin of SKINS) {
 
       // Stan: połączenie + profil + tryb pracy; klik otwiera objaśnienie, w którym profil zmienia się od razu.
       const state = page.getByRole('button', {
-        name: /^Stan: połączono, profil Hybryda, autonomia L\d/,
+        name: /^Stan: połączono, profil Hybryda, tryb pracy Automatycznie \(L3\)/,
       });
       await state.click();
       const details = page.getByRole('dialog', { name: 'Stan Alfy' });

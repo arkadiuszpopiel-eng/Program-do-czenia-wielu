@@ -52,7 +52,7 @@ export const plApp = {
   'titlebar.renameLabel': 'Nowa nazwa sesji',
   'titlebar.cast': 'Obsada agentek',
   'titlebar.agent': '{name} · {role} · {status}. Szczegóły i zmiana roli',
-  'titlebar.state': 'Stan: {connection}, profil {profile}, autonomia {level}. Pokaż objaśnienie',
+  'titlebar.state': 'Stan: {connection}, profil {profile}, tryb pracy {level}. Pokaż objaśnienie',
   'titlebar.stateTip': 'Połączenie, profil modeli i autonomia — kliknij po objaśnienie',
   'titlebar.cost': 'Koszt sesji {cost}. Szczegóły kosztów',
   'titlebar.costTip': 'Koszt tej sesji — kliknij po szczegóły i limit',

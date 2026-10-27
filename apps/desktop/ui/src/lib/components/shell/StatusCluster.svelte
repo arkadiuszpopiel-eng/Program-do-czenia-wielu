@@ -58,7 +58,7 @@
         aria-label={t('titlebar.state', {
           connection: t(offline ? 'status.offline' : 'status.online'),
           profile,
-          level,
+          level: `${tk(`mode.${level}.name`)} (${level})`,
         })}
         title={t('titlebar.stateTip')}
       >
