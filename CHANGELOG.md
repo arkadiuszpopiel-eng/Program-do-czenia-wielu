@@ -12,6 +12,44 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.73 — 2026-10-27
+
+Zadania agentek przetrwają przerwę i limit (zapis postępu, kontynuacja od zapisanego miejsca), Dyrygentka zna
+wybrany projekt i przekazuje wyniki między agentkami, a konto zapasowe przejmuje rozmowę od razu — z komunikatem.
+Wersja zawiera też poprawki z przeglądu 27.10 (raport 39).
+
+### Poprawki
+
+- [krytyczne] Polecenie w `cmd` nie może już ominąć wykrywania dostępu do sieci wzorcem tekstowym (np.
+  `$x -match "\\host\share"`) — wyjątek dla wzorców obejmuje tylko PowerShell, także w poleceniach zagnieżdżonych.
+- [poważne] Cel zadania uruchomionego przez wyzwalacz z treścią spoza zaufania (np. z poczty) nie jest już
+  traktowany jak polecenie właściciela.
+- [poważne] Po wznowieniu zadania nowa pomocnica nie nadpisuje zapisu wcześniejszej (Replay i koszty zostają).
+- [poważne] Zaktualizowane biblioteki `zip` (aktualizator: 9.0.5 — rozpakowanie bez bitów SUID i bez dowiązań poza
+  katalog) i `tokio` 1.54.1 (ostrzeżenie RUSTSEC-2026-0386).
+- Gdy konto ma limit zapytań albo odrzuca klucz, Router kończy bieżącą odpowiedź przez konto zapasowe tego samego
+  dostawcy, a Alfa mówi o przełączeniu; kolejne wiadomości idą od razu przez konto zapasowe.
+- Zadanie agentki po wyczerpaniu kroków albo czasu zapisuje postęp i pyta o kolejną pulę; kontynuacja rusza od
+  zapisanego miejsca, także po restarcie. Czekanie na zgodę nie zużywa czasu pracy. Trzy przełączniki
+  automatycznego przedłużania w Ustawienia → Agentki (domyślnie wyłączone); limity kosztów obowiązują dalej.
+- Twarda odmowa kroku (Broker, Jądro) kończy zadanie z jasnym komunikatem, który krok zablokowano — agentka nie
+  próbuje obejść blokady.
+- Dyrygentka i agentki wiedzą, którego projektu i katalogu dotyczy rozmowa; wyłączony dostęp do katalogu nadal
+  wyłącza też historię projektu.
+- Kolejna agentka dostaje wyniki poprzedniej (wyciąg z faktycznych poleceń i wyników testów), a raport końcowy nie
+  twierdzi, że czegoś nie uruchomiono, gdy było uruchomione.
+- Pipeline'y Dyrygentki: biblioteka zapisanych pipeline'ów, edytor etapów; wynik poprzedniego etapu trafia do
+  następnego także w szablonie z samym `{{input}}`.
+- Profile dostępu agentek (według ról, pełny, odczyt, własny, bez narzędzi) w Ustawienia → Dostęp agentek.
+- Agentki dostają mały zestaw narzędzi dobrany do zadania i wyszukiwarkę pozostałych — krótsze zapytania.
+- Filtr katalogów w PowerShellu (`-notmatch '\\(obj|bin)\\'`) nie wywołuje już fałszywej prośby o dostęp do sieci.
+
+### Testy
+
+- Regresje: analiza powłoki `cmd`/PowerShell, cel wyzwalacza, numer pomocnicy po wznowieniu (czerwony na starym
+  kodzie), przełączenie konta po `router.fallback`, szablony pipeline. Pakiet startowy interfejsu 148,9 KB gzip
+  (limit 150).
+
 ## 0.0.72 — 2026-10-22
 
 Wydanie „0.0.71B”: Alfa startuje bez okna konsoli, rozruch sygnalizuje się w programie („Rozruch OK” albo

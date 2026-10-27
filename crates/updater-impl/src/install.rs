@@ -85,7 +85,7 @@ fn extract(package: &Path, dest: &Path, limits: &PackageLimits) -> Result<(), Up
     let mut total = 0u64;
     for i in 0..archive.len() {
         let mut entry = archive.by_index(i).map_err(zip_err)?;
-        let name = entry.name().to_owned();
+        let name = entry.name().map_err(zip_err)?.into_owned();
         validate_package_path(&name)?;
         if !seen.insert(name.trim_end_matches('/').to_lowercase()) {
             return Err(UpdaterError::unsafe_package(format!(

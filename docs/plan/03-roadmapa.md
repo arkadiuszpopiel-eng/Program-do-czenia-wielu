@@ -1,5 +1,14 @@
 # 03 — Roadmapa (dokument żywy)
 
+**24.10.2026 — poprawki lokalne 0.0.72:** limit 500 kroków i wspólny budżet
+orkiestracji, profile narzędzi każdej agentki, przebudowa Pipeline z doborem modeli
+etapów, menu obsady i ustawienia po prawej. Wgrane do kopii właściciela;
+testy i natywna weryfikacja: [raport](../repairs-2026-10-24/REPORT.md).
+
+**24.10.2026 — dostęp do narzędzi:** mały pakiet startowy, `tools_find`,
+krótkie komendy `tool_call`, odtwarzanie odkrytych schematów i wspólny selektor
+estymacji Routera/runtime: [raport i pomiary](../tool-routing-2026-10-24/REPORT.md).
+
 Ostatnia aktualizacja: **2026-10-22** (wersja programu 0.0.72; ostatni raport: [`38-raport-2026-10-22-0072.md`](38-raport-2026-10-22-0072.md)). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
@@ -329,6 +338,7 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | Data       | Zmiana                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-10-22 | Wersja 0.0.72 („0.0.71B”; raport [38](38-raport-2026-10-22-0072.md)): start bez okna konsoli, dziennik rozruchu w programie z sygnałem, watchdog bez fałszywego błędu i bez utraty skrótu przy restarcie Brokera. |
+| 2026-10-27 | Przegląd zmian z 23–24.10 (raport [39](39-przeglad-2026-10-27.md)): 11 poprawek, w tym obejście wykrycia sieci w `cmd`; decyzje dla właściciela (konto zapasowe, commit i 0.0.73). |
 | 2026-10-22 | Wersja 0.0.71 (seria 11 i poprawki poranne; raport [37](37-raport-2026-10-22-0071.md)): koszt zadań agentek pod faktycznym dostawcą i kontem, „Zmień klucz” przywraca konto, komunikat braku klucza, wywołania narzędzi bez numeracji, ostrzeżenie limitu z właściwym zakresem, szybsze cofanie.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | 2026-10-22 | Wersja 0.0.70 (seria 10 — 10 punktów; raport [36](36-raport-2026-10-22-0070.md)): limity kosztów kont, blokada Routera według kosztu minimalnego, Gemini (narzędzia równoległe, cennik), limity wyjścia OpenAI, błędy agentek z nazwą dostawcy, kreator bez przypinania, panel Pliki, blok kodu, cofanie starych kroków powłoki.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | 2026-10-22 | Wersja 0.0.69 (seria 9 — 14 punktów; raport [35](35-raport-2026-10-22-0069.md)): pełna praca przez API (narzędzia u dostawców zgodnych z OpenAI, offline, test kluczy, termin Routera, nazwy dostawców i brak środków w błędach) i lokalnie (zapis bez psucia plików, limit wyjścia, budżet tokenów, koszt, snapshot powłoki, limit zadań cargo); kopia właściciela bez portu CDP 9222; informacja o L4 po restarcie.                                                                                                                                                                                                                                                                                                                                                        |
@@ -388,3 +398,28 @@ działa przez model chmurowy i po powrocie pojawia się w historii na komputerze
 | 2026-10-09 | Wersja 0.0.6: naprawy po przeglądzie zmian 0.0.1–0.0.5 (A.3c); numer wersji zmienia skrypt.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | 2026-10-09 | Wersja 0.0.4: listy wyboru i inne kontrolki rysowane przez Alfę (A.3a).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 2026-10-09 | Powstanie planu v6. Etapy A.1–A.3 wpisane jako zrobione (wersje 0.0.2 i 0.0.3). Cztery decyzje właściciela o dostępie zdalnym.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+
+
+### 2026-10-24 — trwała kontynuacja zadań i kolejki wszystkich kont
+
+Wdrożenie lokalne z zapisami szyfrowanych checkpointów, zgodą na kolejne pule kroków/czasu/oczekiwania, odtwarzaniem Dyrygentki i pipeline oraz poprawionym routingiem i ograniczaniem kontekstu narzędzi. Dowody, rollback i granice weryfikacji: [raport](../task-continuity-2026-10-24/REPORT.md). Testy deterministyczne i HTTP lokalne, bez pomiaru płatnych API i godzinnej sesji na rzeczywistych modelach.
+
+
+### 2026-10-24 — regresja delegate_task dla modelu spoza mapy możliwości
+
+Naprawiono rozstrzyganie efektywnych możliwości modeli i wybór narzędzi Dyrygentki także przez dozwolone fallbacki. Nowe testy pełnego rdzenia, Routera i HTTP potwierdzają Alfa → Delta → fs_list → Alfa. [Dowody i podmiana programu](../conductor-capabilities-2026-10-24/REPORT.md).
+
+
+### 2026-10-24 — kontekst wybranego projektu w żądaniach modeli
+
+Naprawiono brak nazwy projektu i aktywnego katalogu w żądaniu Dyrygentki oraz przekazanie kontekstu do wykonawczyń. Potwierdzono kontekst Alfy i Delty w HTTP, odczyt treści README z wybranego katalogu, zmianę projektu i wyłączenie dostępu. [Dowody i wdrożenie](../project-context-2026-10-24/REPORT.md).
+
+
+### 2026-10-24 — fałszywa prośba o wysyłkę z regexu obj|bin
+
+Naprawiono klasyfikację literalnego wzorca PowerShell jako hosta UNC. Zachowane są rzeczywiste UNC, URL i kontrole L4. 40 testów parsera/narzędzia, w tym sesja tainted na L4 bez dodatkowej zgody dla lokalnego filtra oraz wymagana zgoda dla realnego uploadu. [Dowody i wdrożenie](../shell-regex-2026-10-24/REPORT.md).
+
+
+### 2026-10-24 — przekazywanie wyników, logi i wznowienie po komendzie powłoki
+
+Naprawiono utratę raportu Delty u kolejnej agentki, rozpoznawanie odmowy/anulowania i hostowy wyciąg komend. Poprawiono proweniencję celu custom-child oraz zgodny wstecznie odczyt Commit.posts, który blokował dziennik i narzędzia po restarcie. 148 testów pakietów i 25 rdzenia, w tym pełny restart z zachowanym wynikiem i bez powtórzenia Delty. [Raport, zakres potwierdzenia i wdrożenie](../conductor-handoff-2026-10-24/REPORT.md).

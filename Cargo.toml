@@ -9,7 +9,7 @@ exclude = ["apps/desktop/src-tauri"]
 members = ["crates/*"]
 
 [workspace.package]
-version = "0.0.72"
+version = "0.0.73"
 edition = "2024"
 license = "UNLICENSED" # do ustalenia (nie-SPDX; crate'y są prywatne: publish = false)
 publish = false
@@ -20,7 +20,7 @@ repository = "https://github.com/arkadiuszpopiel/Program-do-czenia-wielu"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 thiserror = "2.0.21"
-tokio = { version = "1.53.1", features = ["rt-multi-thread", "sync", "time", "macros"] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "sync", "time", "macros"] }
 tracing = "0.1.44"
 schemars = { version = "1.2.2", features = ["chrono04", "uuid1"] }
 uuid = { version = "1.26.1", features = ["v4", "serde"] }

@@ -3,10 +3,10 @@
     "version": "2.1",
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
-    "session_id": "8c1892ed-2987-4f4f-91ab-0abe9bb3c4b8",
-    "updated": "2026-10-22T14:45:00+02:00"
+    "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
+    "updated": "2026-10-27T00:00:00+01:00"
   },
-  "current_state": "Komputer stacjonarny (RX 9070 XT). Wersja 0.0.70 = 0.0.69 (seria 9, raport 35) + seria 10 (10 punktów, raport alfa/docs/plan/36-raport-2026-10-22-0070.md): limity kosztów kont, Router blokuje według kosztu minimalnego, Gemini (narzędzia równoległe, cennik models/), sufit wyjścia OpenAI dla zadań agentek, błędy agentek z nazwą dostawcy, konto przypisane wszystkim agentkom = bez przypięcia, panel Pliki, blok kodu, cofanie starych kroków powłoki. W Alfa-uruchomiona wgrana 0.0.70 (22.10 3:49, deploy-owner --no-start: Alfa zamknięta, uruchomić skrótem „Alfa”; próbny start na tymczasowym profilu: Broker, okno zgód, watchdog, 0 WebView2 z portem CDP). Kopia właściciela budowana bez e2e w target/owner. Gałąź ccr-af4b63c6-3fyzaj, niewypchnięta.",
+  "current_state": "Laptop. Przegląd 27.10 zmian z 23–24.10 zakończony (raport alfa/docs/plan/39-przeglad-2026-10-27.md); poprawki w drzewie roboczym bez commita. Komputer stacjonarny (RX 9070 XT). Wersja 0.0.70 = 0.0.69 (seria 9, raport 35) + seria 10 (10 punktów, raport alfa/docs/plan/36-raport-2026-10-22-0070.md): limity kosztów kont, Router blokuje według kosztu minimalnego, Gemini (narzędzia równoległe, cennik models/), sufit wyjścia OpenAI dla zadań agentek, błędy agentek z nazwą dostawcy, konto przypisane wszystkim agentkom = bez przypięcia, panel Pliki, blok kodu, cofanie starych kroków powłoki. W Alfa-uruchomiona wgrana 0.0.70 (22.10 3:49, deploy-owner --no-start: Alfa zamknięta, uruchomić skrótem „Alfa”; próbny start na tymczasowym profilu: Broker, okno zgód, watchdog, 0 WebView2 z portem CDP). Kopia właściciela budowana bez e2e w target/owner. Gałąź ccr-af4b63c6-3fyzaj, niewypchnięta.",
   "session_goal": "Właściciel 21.10 wieczorem: zamknąć otwarte tematy, pełna działająca wersja do pracy przez API i lokalnie, zapisać wszystko i pauza (/goal do 7:00). Nowe funkcje dopiero po tej wersji.",
   "in_progress": [
     "WERSJA 0.0.72 („0.0.71B”) wgrana 22.10 ok. 14:35 (raport 38): bez okna konsoli (cecha no-console), dziennik rozruchu w programie (boot_report, toast Rozruch OK/z uwagami/z problemem, Zdrowie systemu), watchdog bez fałszywego ERROR i bez utraty skrótu przy restarcie Brokera; CLI claude/codex zainstalowane przez Eksplorator (AppData sesji MSIX zwirtualizowane). Próbny start: bez konsoli i CDP, rozruch 1044 ms, 2 ostrzeżenia (tryb przenośny, Ctrl+Alt+Space zajęty)."
@@ -70,5 +70,9 @@
     "Usunięto target/agents (62 GB) i scalone kopie robocze wt-s6, gałęzie s5-*/s6-*.",
     "0.0.66: każda rozmowa z Dyrygentką przez przebieg agentki — wycofane (14 testów: styl, głos, anulowanie, załączniki, 429); zamiast tego informacja o obsadzie w prompcie.",
     "Właściciel 21.10 ~20:40: „Zamknij wszystkie otwarte tematy, wykonaj pełną działającą wersję… potem wszystko zapisz i zrób pauzę”; wgranie: „To co napisałem wcześniej ma być zrobione”; /goal do 7:00."
+  ],
+  "next_steps": [
+    "Decyzje właściciela z raportu 39 §2 (konto zapasowe: ciche vs z powiadomieniem — 2 testy backup_account czerwone; commit + 0.0.73).",
+    "Ustalenia otwarte z raportu 39 §3 (podwójne naliczenie kosztu, extend_and_resume, checkpointy bez limitu)."
   ]
 }
