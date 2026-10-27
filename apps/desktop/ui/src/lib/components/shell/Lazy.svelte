@@ -2,6 +2,7 @@
 <script lang="ts" generics="P extends Record<string, unknown>">
   import type { Component } from 'svelte';
   import { Skeleton } from '@alfa/ui-kit';
+  import { restReady } from '../../i18n/i18n.svelte';
 
   interface Props {
     load: () => Promise<{ default: Component<P> }>;
@@ -10,7 +11,8 @@
   }
 
   let { load, props, label }: Props = $props();
-  const promise = $derived(load());
+  // Okna leniwe używają działów słownika spoza paczki startowej — czekają na nie.
+  const promise = $derived(Promise.all([load(), restReady]).then(([module]) => module));
   let slow = $state(false);
 
   $effect(() => {

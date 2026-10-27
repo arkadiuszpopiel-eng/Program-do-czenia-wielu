@@ -33,6 +33,9 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
   wyłączonych animacjach i ograniczonym ruchu — bez liter).
 - Okienko stanu w belce działa na miejscu: profil modeli (Lokalny, Hybryda, Chmura) zmieniasz od razu, a „Zmień
   tryb pracy” otwiera menu trybów zamiast przenosić do Ustawień.
+- Polecenie palety Ctrl+K „Tryb pracy” też otwiera menu trybów w belce (w Ustawieniach — stronę Uprawnienia).
+- Instrukcja w programie (F1) opisuje belkę w trzech strefach, menu „Tryb pracy”, panele chowane i okno
+  Pipeline'ów.
 - Plan Alfy dla dzieci (etap K): nauka i zabawa głosem, styl „Junior”, limity czasu i podgląd rodzica z telefonu —
   dokument `docs/plan/41`, z pytaniami do właściciela.
 
@@ -42,7 +45,10 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
   menu i przycisk „Włącz: …”.
 - Belka tytułu ma trzy równe strefy (marka i ścieżka, obsada na środku, stan i przyciski okna) i jedną wysokość
   wszystkich kontrolek; w wąskim oknie strefy zbliżają się zamiast nachodzić.
-- Pasek pisania: przyciski i wybory w jednym rzędzie, równe odstępy i wysokości, także w wąskim oknie.
+- Pasek pisania: przyciski i wybory w jednym rzędzie z równymi odstępami i wysokościami; gdy pole rozmowy jest
+  wąskie, tekst ma cały górny wiersz, a przyciski schodzą do dolnego („Wyślij” zawsze po prawej).
+- Podpowiedź pod polem pisania łamie się całymi fragmentami („Shift+Enter — nowa linia” nie rozpada się na dwa
+  wiersze).
 - Okno Pipeline'ów: krótszy opis po polsku, „×” do zamknięcia jak w innych oknach, etapy połączone strzałkami
   przepływu, jedno pole wyboru modelu (Auto, modele, „Inny…”), przyciski „+ zadanie” i „+ wynik poprzedniego”
   oraz pasek „Uruchom w rozmowie” na całą szerokość.
@@ -56,14 +62,23 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
 - Kliknięcie obsady na środku belki nie przesuwa już okna (obsada była w obszarze przeciągania).
 - „Kontynuuj” zaraz po zakończeniu odpowiedzi nie kończy się już fałszywym „Zadanie już pracuje”: koniec tury
   był ogłaszany chwilę przed zwolnieniem sesji; kontynuacja czeka teraz do pół sekundy na to zwolnienie.
-- Okno uruchamia się lżej: znaczniki chowanych paneli oraz wskaźniki sterowania ekranem i kamery są osobnymi
-  modułami (wskaźniki pobierane zaraz po starcie, zanim będą potrzebne), więc pakiet startowy mieści się w
-  budżecie 150 KB.
+- Okno uruchamia się lżej: pakiet startowy zmalał ze 151 do 125 KB. Teksty okien otwieranych później (Hub,
+  modele, głos, wtyczki, MCP, diagnostyka i inne) są osobną częścią słownika pobieraną równolegle ze startem,
+  a znaczniki chowanych paneli oraz wskaźniki sterowania ekranem i kamery — osobnymi modułami.
+- Wskaźniki „Zatrzymaj” (sterowanie ekranem) i kamery pobierają się ponownie po błędzie, a od razu, gdy agentka
+  już steruje ekranem albo kamera działa.
+- „Przypnij panel” nie zostawia wysuniętego panelu, a Esc nie przepada, gdy panel już się schował.
+- Klawiatura: Enter na znaczniku schowanego panelu przenosi fokus do panelu, a po schowaniu wraca na znacznik;
+  wybór profilu w okienku stanu działa strzałkami, z jednym przystankiem Tab.
+- „Zmień tryb pracy” w bardzo wąskim oknie (bez przycisku trybu w belce) otwiera stronę Uprawnienia.
+- Pipeline'y: wybór „Inny…” w polu modelu nie przeskakuje na inny etap.
 
 ### Testy
 
 - Nowe testy przeglądarkowe: panele chowane we wszystkich stylach i motywach, polecenie palety, menu trybu,
-  okienko stanu, litery z ust w pisanej odpowiedzi; testy jednostkowe układu paneli. Interfejs 499/499.
+  okienko stanu, litery z ust w pisanej odpowiedzi, klawiatura znaczników, pasek pisania w dwóch wierszach,
+  polecenie palety „Tryb pracy”; testy jednostkowe układu paneli i test pilnujący, że kod startowy nie używa
+  tekstów z drugiej części słownika.
 
 ## 0.0.74 — 2026-10-27
 

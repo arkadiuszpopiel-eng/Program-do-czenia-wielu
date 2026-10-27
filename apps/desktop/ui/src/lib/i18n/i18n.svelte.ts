@@ -1,22 +1,38 @@
 // Stan języka (runy): `t()` czyta `locale`, więc szablony przerysowują się po zmianie języka.
-// Słownik EN jest ładowany leniwie — nie obciąża paczki startowej.
+// Słownik EN jest ładowany leniwie — nie obciąża paczki startowej. Polski jest w dwóch częściach:
+// startowa (`pl-core`) i działy okien otwieranych później (`pl-rest`), pobierane równolegle ze
+// startem; okna leniwe (`Lazy`) czekają na `restReady`.
 import type { Locale, LocalizedText, Money } from '../api/types';
 import { translate, type Dictionary, type Params } from './core';
 import * as fmt from './format';
-import { pl, type MessageKey } from './pl';
+import type { MessageKey } from './pl';
+import { plCore } from './pl-core';
 
 export type { MessageKey } from './pl';
 
+let rest: Dictionary | null = null;
+/** Druga część słownika polskiego (raz na okno; zaczyna się pobierać przy starcie). */
+export const restReady: Promise<void> = import('./pl-rest').then((m) => {
+  rest = m.plRest;
+});
+const fullPl = (): Dictionary => (rest ? { ...plCore, ...rest } : plCore);
+
 export class I18n {
   locale = $state<Locale>('pl');
-  #dicts = $state.raw<Partial<Record<Locale, Dictionary>>>({ pl });
+  #dicts = $state.raw<Partial<Record<Locale, Dictionary>>>({ pl: fullPl() });
 
-  readonly t = (key: MessageKey, params?: Params): string =>
-    translate(this.#dicts[this.locale] ?? pl, pl, this.locale, key, params);
+  constructor() {
+    // Po dojściu drugiej części szablony przerysowują się same (`#dicts` jest stanem).
+    if (!rest) void restReady.then(() => (this.#dicts = { ...this.#dicts, pl: fullPl() }));
+  }
+
+  readonly t = (key: MessageKey, params?: Params): string => this.tk(key, params);
 
   /** Klucz budowany dynamicznie (np. `role.${id}`); brak klucza → sam klucz. */
-  readonly tk = (key: string, params?: Params): string =>
-    translate(this.#dicts[this.locale] ?? pl, pl, this.locale, key, params);
+  readonly tk = (key: string, params?: Params): string => {
+    const pl = this.#dicts.pl ?? plCore;
+    return translate(this.#dicts[this.locale] ?? pl, pl, this.locale, key, params);
+  };
 
   readonly text = (value: LocalizedText): string => value[this.locale];
   readonly money = (value: Money): string => fmt.formatMoney(this.locale, value);

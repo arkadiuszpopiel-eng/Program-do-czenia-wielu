@@ -350,6 +350,25 @@ i przycisk wysyłania nie wystają poza okno.</li>
 <li><strong>Pliki w limicie 400 linii:</strong> pasek LED wydzielony z belki (<code>TitleLed</code>), wysuwany panel wydzielony z powłoki
 (<code>PanelPeek</code>).</li>
 </ul>
+<p>Po pierwszym wgraniu (27.10 ok. 23:55) pracowałam dalej do rana:</p>
+<ul>
+<li><strong>Przegląd interfejsu w świeżym kontekście</strong> i poprawki: wskaźniki „Zatrzymaj” i kamery pobierają się ponownie
+po błędzie; „Przypnij panel” nie zostawia wysuniętego stanu; Esc nie przepada; z klawiatury Enter na znaczniku
+przenosi fokus do panelu i z powrotem; profil w okienku stanu obsługuje strzałki; „Inny…” w Pipeline&#39;ach nie
+przeskakuje na inny etap.</li>
+<li><strong>Pasek pisania w dwóch wierszach</strong>, gdy pole rozmowy jest wąskie (otwarte oba panele, małe okno): tekst ma cały
+górny wiersz, przyciski schodzą niżej, „Wyślij” zawsze po prawej.</li>
+<li><strong>Paleta Ctrl+K → „Tryb pracy”</strong> otwiera menu trybów w belce (wcześniej przenosiła do Ustawień — tak jak
+okienko stanu, o którym pisał właściciel w punkcie 4).</li>
+<li><strong>Instrukcja w programie (F1):</strong> nowe opisy belki w trzech strefach, menu „Tryb pracy” (tabela trybów z nazwami
+z menu), paneli chowanych i okna Pipeline&#39;ów.</li>
+<li><strong>Podpowiedź pod polem pisania</strong> łamie się całymi fragmentami („Shift+Enter — nowa linia” nie rozpada się).</li>
+<li><strong>Lżejszy start okna: 149,7 → 124,7 KB</strong> (limit 150 KB, który był prawie wyczerpany). Prawie połowę pakietu
+startowego zajmowały polskie teksty wszystkich okien. Teksty 17 działów otwieranych później (Hub, modele, głos,
+wtyczki, MCP, diagnostyka…) są teraz osobną częścią słownika, pobieraną równolegle ze startem; okna leniwe czekają
+na nią. Nowy test pilnuje, żeby kod startowy nie użył tekstu z tej części (sprawdziłam, że łapie celowo
+wstawiony błąd).</li>
+</ul>
 <h3 id="propozycje-na-kolejne-kroki-nie-wprowadzone-wymagaja-decyzji">Propozycje na kolejne kroki (nie wprowadzone — wymagają decyzji)</h3>
 <ol>
 <li><strong>Panele chowane domyślnie włączone?</strong> Jeśli tak ma wyglądać Alfa od pierwszego uruchomienia, zmienię
@@ -358,18 +377,43 @@ wartość domyślną (teraz: wyłączone).</li>
 mowy); można dodać wyróżnianie czytanego zdania — przyda się w etapie K do nauki czytania.</li>
 <li><strong>Etap K:</strong> odpowiedzi na 4 pytania z dokumentu <a href="plan-41-tryb-dla-dzieci.html"><code>41</code></a> (wiek, czytanie rozmów przez
 rodzica, chmura, odznaki) odblokowują K.1.</li>
-<li><strong>Przegląd w świeżym kontekście</strong> zmian Brokera z 27.10 (sekcja 3) — wymóg <code>AGENTS.md</code>.</li>
+<li><strong>Przegląd poprawek Brokera</strong> na gałęzi <code>do-przegladu-broker-2026-10-28</code> (sekcja 3) i decyzja o scaleniu.</li>
+<li><strong>Operacje administracyjne na „Pełnej automatyce”:</strong> od 27.10 L4 nie pyta o nie (decyzja właściciela); czy tak
+ma zostać, czy L4 ma pytać o operacje administracyjne (np. instalacja usług, zmiany systemowe)?</li>
 </ol>
 <h2 id="3-bezpieczenstwo-i-zasady">3. Bezpieczeństwo i zasady</h2>
 <ul>
-<li>Zmiany w <code>safety-broker-impl</code> (poziom pamiętany po restarcie: <code>standing.rs</code>), <code>risk-classifier-contract</code>
+<li><p>Zmiany w <code>safety-broker-impl</code> (poziom pamiętany po restarcie: <code>standing.rs</code>), <code>risk-classifier-contract</code>
 i <code>broker-ui</code> weszły do 0.0.75 po zatwierdzeniu przez właściciela 27.10 („Uprawnienia ma być prostą listą
 w pasku”, „znowu to stare okno z limitem czasu”). <code>AGENTS.md</code> wymaga dla nich przeglądu człowieka — właściciel
-zatwierdził zachowanie, ale kod tych zmian nie miał jeszcze osobnego przeglądu w świeżym kontekście.</li>
-<li>Odstępstwo od wyboru właściciela nadal do decyzji (raport 40 §3): na każdym poziomie, także na „Pełnej
+zatwierdził zachowanie; przegląd kodu w świeżym kontekście — niżej.</p>
+</li>
+<li><p>Odstępstwo od wyboru właściciela nadal do decyzji (raport 40 §3): na każdym poziomie, także na „Pełnej
 automatyce”, Alfa pyta przy poleceniu obcym albo niepewnie rozpoznanym głosem, bo może to nie być
-polecenie właściciela.</li>
-<li>W katalogu silnika NextGO.Gray nic nie zmieniałam; nie używałam portu 9001.</li>
+polecenie właściciela.</p>
+</li>
+<li><p><strong>Przegląd w świeżym kontekście</strong> zmian Brokera z 27.10 zrobiłam w nocy. Znalazł dwa poważne przypadki, oba
+w kierunku „wyższy poziom niż chciał właściciel”, i kilka drobnych:</p>
+<ol>
+<li>obniżenie z „Pełnej automatyki”, gdy pliku zapamiętanego poziomu nie da się usunąć (np. trzyma go skaner),
+kończyło się błędem — po restarcie wracała „Pełna automatyka”;</li>
+<li>zatwierdzenie podniesienia kasowało w dzienniku łącza także obniżenie wykonane, gdy karta czekała
+(np. „panika” L0 w tym czasie), a po restarcie Brokera numery kart zaczynają się od nowa — stara karta
+mogła skasować obniżenie.</li>
+</ol>
+<p>Poprawki są na <strong>osobnej gałęzi <code>do-przegladu-broker-2026-10-28</code></strong> (katalog <code>alfa-broker-przeglad</code>, commity
+<code>6dec9083</code> i <code>c3566dbe</code>), <strong>nie w wgrywanej wersji</strong> — <code>AGENTS.md</code> wymaga przeglądu człowieka dla Brokera. Na
+gałęzi: nadpisanie pliku niższym poziomem, gdy usunięcie się nie uda; dziennik z numerami kolejnymi (zatwierdzone
+podniesienie kasuje tylko obniżenia starsze od prośby, a podniesienie do poziomu poniżej L3 zastępuje obniżenie);
+nowe połączenie z Brokerem unieważnia czekające karty; karta podniesienia sesji bez terminu mówi „Bez terminu: do
+zmiany albo ponownego uruchomienia Alfy” zamiast „Na stałe … zostaje po restarcie”; test własności, że na L4
+obcy albo niepewnie rozpoznany głos nadal pyta; SPEC klasyfikatora zgodny z decyzją 27.10. Testy <code>app-broker</code>,
+<code>safety-broker-impl</code>, <code>broker-ui-contract</code>, <code>risk-classifier-contract</code> zielone, clippy i fmt czyste. Drobne
+ustalenie bez poprawki: karta podniesienia, która czekała, gdy poziom zmieniono inną drogą, nadal pokazuje stary
+poziom „z”.</p>
+</li>
+<li><p>W katalogu silnika NextGO.Gray nic nie zmieniałam; nie używałam portu 9001.</p>
+</li>
 </ul>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
 <p>Pełne sprawdzenie <code>node scripts/verify.mjs wersja</code> na 0.0.75 (commit <code>9a0debd5</code>, 27.10 23:51): <strong>zielone, 19 z
@@ -408,6 +452,11 @@ i atrapą; zatwierdzenie podniesienia wymaga człowieka przy oknie Brokera.</li>
 zmieniała torów audio ani modeli.</li>
 <li><strong>Kontynuacji zadania z prawdziwym modelem</strong> po poprawce wyścigu — sprawdzona testami rdzenia na atrapie
 dostawcy.</li>
+<li><strong>Poprawek Brokera z gałęzi do przeglądu w działającej Alfie</strong> — tylko testy jednostkowe i integracyjne crate&#39;ów;
+nie są w wgranej wersji.</li>
+<li><strong>Słownika w dwóch częściach na wolnym dysku</strong> — w programie pliki są lokalne, a druga część przychodzi
+w milisekundach; okna leniwe czekają na nią, więc najwyżej otwierają się o tyle później. Sprawdzone pełnym
+przebiegiem przeglądarkowym i testem kluczy startowych, nie pomiarem na prawdziwym oknie.</li>
 </ul>
 <h2 id="6-wgranie-i-kopia">6. Wgranie i kopia</h2>
 <ul>
