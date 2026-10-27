@@ -372,7 +372,27 @@ polecenie właściciela.</li>
 <li>W katalogu silnika NextGO.Gray nic nie zmieniałam; nie używałam portu 9001.</li>
 </ul>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p>WYNIKI_WERYFIKACJI</p>
+<p>Pełne sprawdzenie <code>node scripts/verify.mjs wersja</code> na 0.0.75 (commit <code>9a0debd5</code>, 27.10 23:51): <strong>zielone, 19 z
+19 kroków</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs 499/499, przeglądarka (Edge)
+594/594, prawdziwa aplikacja 49/49 z pokryciem łącza 259 z 281 (92,2 %), linter, typy, lint CSS, dokumenty,
+zależności, audyt npm, SBOM.</p>
+<p>Pierwszy bieg (23:02) był czerwony w trzech miejscach — wszystkie poprawione przed drugim biegiem:</p>
+<ul>
+<li><strong>Budżet startu interfejsu:</strong> 151,4 KB przy limicie 150 KB. Znaczniki chowanych paneli są teraz osobnym
+modułem (ładowanym, gdy któryś panel jest schowany), a wskaźniki sterowania ekranem i kamery — modułem
+pobieranym zaraz po starcie w bezczynności (najpóźniej po 500 ms), żeby „Zatrzymaj” było gotowe, zanim agentka
+sięgnie po ekran. Po zmianie: 149,4 KB.</li>
+<li><strong>Lint CSS:</strong> menu trybu używało niezdefiniowanego tokenu <code>--alfa-radius-md</code> (zaokrąglenia pozycji mogły nie
+działać) — teraz <code>--alfa-radius-control</code>.</li>
+<li><strong>Test scenariusza rozmowy (<code>app-core/tests/scenario.rs</code>):</strong> pod obciążeniem „Kontynuuj” zaraz po końcu
+odpowiedzi dostawało „Zadanie już pracuje”. Przyczyna w kodzie z 23–24.10: koniec tury był ogłaszany
+(zdarzenie <code>Stop</code>), zanim sesja zwolniła generację. Kontynuacja czeka teraz do 0,5 s na zwolnienie
+(<code>app-chat/src/resume.rs</code>); w samotnym biegu test przechodził 5 razy na 5, w drugim pełnym biegu też zielony.</li>
+</ul>
+<p>Wcześniej w nocy: dwa pełne biegi przeglądarkowe 594/594 (przed i po zmianach ładowania), testy jednostkowe
+interfejsu 499/499, <code>svelte-check</code> bez błędów, limity rozmiaru plików bez naruszeń. Nowe testy: panele chowane
+w 3 stylach × 2 motywach, polecenie palety, okienko stanu (profil na miejscu, „Zmień tryb pracy”), litery z ust
+w pisanej odpowiedzi i ich brak przy ograniczonym ruchu.</p>
 <h2 id="5-czego-nie-sprawdzilam">5. Czego nie sprawdziłam</h2>
 <ul>
 <li><strong>Wyglądu na prawdziwym oknie programu</strong> (WebView2 z Mica) dla wysuwanych paneli i liter z ust — sprawdzone
@@ -384,9 +404,23 @@ i atrapą; zatwierdzenie podniesienia wymaga człowieka przy oknie Brokera.</li>
 <li><strong>Alfy właściciela po wgraniu</strong> — wgrałam bez uruchamiania (<code>--no-start</code>); pierwsze uruchomienie skrótem
 „Alfa” należy do właściciela.</li>
 <li><strong>Trybu dla dzieci</strong> — to na razie plan, bez kodu.</li>
+<li><strong>Testów sprzętowych</strong> (<code>verify sprzet</code>: mikrofon, głośnik, kamera, GPU) — w nocy bez dźwięku; ta wersja nie
+zmieniała torów audio ani modeli.</li>
+<li><strong>Kontynuacji zadania z prawdziwym modelem</strong> po poprawce wyścigu — sprawdzona testami rdzenia na atrapie
+dostawcy.</li>
 </ul>
 <h2 id="6-wgranie-i-kopia">6. Wgranie i kopia</h2>
-<p>WGRANIE_I_KOPIA</p>
+<ul>
+<li><strong>Wgranie:</strong> <code>scripts/deploy-owner.sh --no-start</code> — kopia właściciela <code>Alfa-uruchomiona</code> zbudowana z tego
+samego commitu, bez portu debugowania; Alfy nie uruchamiałam (otwiera ją właściciel skrótem „Alfa”; po
+starcie pokaże „Co nowego” dla 0.0.75).</li>
+<li><strong>Kopia bezpieczeństwa:</strong> <code>scripts/backup.sh /f/Alfa</code> — na dysk F: (Seagate Backup Plus) do katalogu programu
+<code>F:\Alfa\kopia-2026-10-28_…</code>: paczka git z pełną historią, źródła <strong>bez plików kompilacji</strong> (<code>target</code>,
+<code>node_modules</code>), zbudowany program, pamięć projektu, sumy SHA-256 i instrukcja odtworzenia. Próba
+(<code>--dry-run</code>): ok. 421 MB, na F: 1,5 TB wolnego. Starszych kopii na F: nie ruszałam.</li>
+<li><strong>Sprzątanie dysku E: przed sprawdzeniem:</strong> usunięte stare programy testowe (<code>.exe</code>, <code>.pdb</code> starsze niż 2 h)
+z <code>target/*/deps</code> — wolne miejsce wzrosło z 53 do 186 GB.</li>
+</ul>
 </article>
 <footer>Źródło: <code>docs/plan/42-raport-2026-10-28-noc.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>
