@@ -46,7 +46,12 @@
       <MousePointer size={14} strokeWidth={1.5} aria-hidden="true" />
       <span class="text">{t('gui.controlling', { name })}</span>
     </button>
-    <button type="button" class="act stop" onclick={() => act(() => app.client.gui.stop())}
+    <button
+      type="button"
+      class="act stop"
+      aria-label={t('gui.stopShort')}
+      title={t('gui.stopShort')}
+      onclick={() => act(() => app.client.gui.stop())}
       ><Square size={12} strokeWidth={2} aria-hidden="true" class="stop-icon" /><span
         class="stop-text">{t('gui.stopShort')}</span
       ></button

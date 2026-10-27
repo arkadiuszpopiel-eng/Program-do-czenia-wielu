@@ -189,6 +189,11 @@
     .titlebar :global(.cluster .word) {
       display: none;
     }
+    /* Bez napisu „Zatrzymaj” zostaje kwadrat (nazwa przycisku w aria-label) — pusty przycisk
+       nie miał nazwy ani rozmiaru celu (axe: button-name, target-size). */
+    .titlebar :global(.live .stop-icon) {
+      display: block;
+    }
   }
   @media (min-width: 721px) and (max-width: 1100px) {
     .titlebar {

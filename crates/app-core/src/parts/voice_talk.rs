@@ -27,26 +27,6 @@ const KEYS: [&str; 5] = [
     LANGUAGE_KEY,
 ];
 
-/// Wpisuje wartości ustawień do uchwytu (brak albo zły typ wartości → bez zmiany).
-pub(crate) fn apply(talk: &TalkSettings, values: &[Option<serde_json::Value>]) {
-    let at = |i: usize| values.get(i).and_then(Option::as_ref);
-    if let Some(on) = at(0).and_then(serde_json::Value::as_bool) {
-        talk.set_smart_turn(on);
-    }
-    if let Some(pct) = at(1).and_then(serde_json::Value::as_f64) {
-        talk.set_threshold_pct(pct);
-    }
-    if let Some(ms) = at(2).and_then(serde_json::Value::as_f64) {
-        talk.set_max_silence_ms(ms);
-    }
-    if let Some(engine) = at(3).and_then(serde_json::Value::as_str) {
-        talk.set_stt_engine(engine);
-    }
-    if let Some(language) = at(4).and_then(serde_json::Value::as_str) {
-        talk.set_language(language);
-    }
-}
-
 /// Ustawienia rozmowy śledzące konfigurację.
 pub(crate) fn talk_settings(config: &Arc<core_config_impl::FileConfigStore>) -> TalkSettings {
     let shared = TalkSettings::default();
@@ -62,7 +42,7 @@ pub(crate) fn talk_settings(config: &Arc<core_config_impl::FileConfigStore>) -> 
                 };
                 values.push(value);
             }
-            apply(&handle, &values);
+            handle.apply_values(&values);
             if changes.next().await.is_none() {
                 break;
             }
@@ -73,48 +53,10 @@ pub(crate) fn talk_settings(config: &Arc<core_config_impl::FileConfigStore>) -> 
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
-
-    use super::*;
-
-    #[test]
-    fn values_reach_the_handle_and_bad_types_are_ignored() {
-        let talk = TalkSettings::default();
-        apply(
-            &talk,
-            &[
-                Some(json!(false)),
-                Some(json!(65)),
-                Some(json!(3200)),
-                Some(json!("whisper")),
-            ],
-        );
-        assert!(!talk.smart_turn() && talk.whisper_only());
-        assert_eq!((talk.threshold_pct(), talk.max_silence_ms()), (65, 3_200));
-        apply(
-            &talk,
-            &[
-                Some(json!("tak")),
-                None,
-                Some(json!("dużo")),
-                Some(json!(7)),
-            ],
-        );
-        assert!(!talk.smart_turn() && talk.whisper_only());
-        assert_eq!((talk.threshold_pct(), talk.max_silence_ms()), (65, 3_200));
-        apply(&talk, &[Some(json!(true)), None, None, Some(json!("auto"))]);
-        assert!(talk.smart_turn() && !talk.whisper_only());
-        assert_eq!(talk.language().code(), "pl");
-        apply(&talk, &[None, None, None, None, Some(json!("en"))]);
-        assert_eq!(talk.language().code(), "en");
-        apply(&talk, &[None, None, None, None, Some(json!(12))]);
-        assert_eq!(talk.language().code(), "en", "zły typ — bez zmiany");
-    }
-
     #[test]
     fn keys_exist_in_the_settings_tree() {
         let pages = include_str!("../../data/settings-pages.json");
-        for key in KEYS {
+        for key in super::KEYS {
             assert!(pages.contains(&format!("\"{key}\"")), "{key}");
         }
     }
