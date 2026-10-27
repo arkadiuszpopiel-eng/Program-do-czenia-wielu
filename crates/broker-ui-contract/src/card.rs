@@ -82,6 +82,10 @@ pub struct ApprovalCard {
     pub created_at_ms: u64,
     /// Wygasa (ms).
     pub expires_at_ms: u64,
+    /// Zmiana trybu pracy: tryb docelowy. Okno pokazuje wtedy nazwę trybu z menu w pasku Alfy,
+    /// przycisk „Włącz: …” i nie odlicza czasu — wybór zostaje zapamiętany (właściciel 27.10).
+    #[serde(default)]
+    pub mode_change: Option<AutonomyLevel>,
 }
 
 fn invisible(c: char) -> bool {
@@ -172,8 +176,28 @@ fn reversible_pl(r: Reversibility) -> &'static str {
     }
 }
 
-fn level_pl(l: AutonomyLevel) -> String {
-    format!("{l:?} „{}”", l.name_pl())
+/// Nazwa trybu pracy taka jak w menu „Tryb pracy” w pasku Alfy.
+pub fn mode_name_pl(l: AutonomyLevel) -> &'static str {
+    match l {
+        AutonomyLevel::L0 => "Tylko podgląd",
+        AutonomyLevel::L1 => "Pytaj o wszystko",
+        AutonomyLevel::L2 => "Pytaj o ryzykowne",
+        AutonomyLevel::L3 => "Automatycznie",
+        AutonomyLevel::L4 => "Pełna automatyka",
+    }
+}
+
+/// Co zmienia tryb — jedno zdanie do okna zgody.
+fn mode_note_pl(l: AutonomyLevel) -> &'static str {
+    match l {
+        AutonomyLevel::L0 => "agentki tylko czytają i podpowiadają, nic nie zmieniają",
+        AutonomyLevel::L1 => "każda zmiana czeka na Twoje „tak”",
+        AutonomyLevel::L2 => "drobne rzeczy same; pytają przy usuwaniu, wysyłce i instalacji",
+        AutonomyLevel::L3 => "pracują same; pytają przy nieodwracalnych i po niezaufanej treści",
+        AutonomyLevel::L4 => {
+            "pracują same bez pytania; pytają tylko o wysyłkę po niezaufanej treści i obce polecenia głosowe"
+        }
+    }
 }
 
 fn target_pl(t: &AutonomyTarget) -> String {
@@ -268,35 +292,60 @@ impl ApprovalCard {
                 to,
                 until_ms,
             } => {
-                details.push(("Dotyczy".into(), target_pl(target)));
+                // Prośbę zgłasza Jądro w imieniu właściciela — „Kto” nic tu nie mówi.
+                details.clear();
                 details.push((
-                    "Zmiana".into(),
-                    format!("{} → {}", level_pl(*from), level_pl(*to)),
+                    "Tryb".into(),
+                    format!("{} → {}", mode_name_pl(*from), mode_name_pl(*to)),
                 ));
-                if let Some(until) = until_ms {
-                    let left = time_left_pl(until.saturating_sub(now_ms));
-                    details.push(("Na czas".into(), left));
+                details.push(("Dotyczy".into(), target_pl(target)));
+                details.push(("Co się zmieni".into(), mode_note_pl(*to).into()));
+                if *to == AutonomyLevel::L4 {
+                    details.push((
+                        "Zawsze zostaje".into(),
+                        "STOP (Ctrl+Shift+F12), dziennik cofania i twarde blokady Jądra".into(),
+                    ));
                 }
-                "Zmiana poziomu autonomii".to_owned()
+                match until_ms {
+                    Some(until) => {
+                        let left = time_left_pl(until.saturating_sub(now_ms));
+                        details.push(("Na czas".into(), left));
+                    }
+                    None => details.push((
+                        "Na stałe".into(),
+                        "zostaje po restarcie; zmienisz w menu „Tryb pracy”".into(),
+                    )),
+                }
+                format!("Zmiana trybu pracy: {}", mode_name_pl(*to))
             }
             ApprovalSubject::Policy { policy } => {
                 details.push(("Nowa polityka".into(), v(&policy_pl(policy))));
                 "Zmiana polityk Jądra".to_owned()
             }
         };
-        let risk_line = format!(
-            "{} — {}",
-            req.risk.label_pl(),
-            reversible_pl(req.reversible)
-        );
-        details.push(("Ryzyko".into(), risk_line));
+        let mode_change = match &req.subject {
+            ApprovalSubject::Autonomy { to, .. } => Some(*to),
+            _ => None,
+        };
+        if mode_change.is_none() {
+            let risk_line = format!(
+                "{} — {}",
+                req.risk.label_pl(),
+                reversible_pl(req.reversible)
+            );
+            details.push(("Ryzyko".into(), risk_line));
+        }
         details.push(("Źródło polecenia".into(), origin_pl(&req.origin).into()));
         if req.tainted {
             details.push(("Uwaga".into(), "sesja widziała niezaufaną treść".into()));
         }
-        details.push(("Dlaczego pytam".into(), v(&req.explanation)));
-        let left = time_left_pl(req.expires_at_ms.saturating_sub(now_ms));
-        details.push(("Wygasa za".into(), left));
+        // Zmiana trybu: bez „Dlaczego pytam” (powtarzało wiersz „Tryb”) i bez odliczania — prośba
+        // nadal wygasa w Brokerze, ale okno nie pogania (właściciel 27.10: „stare okno z limitem”).
+        if mode_change.is_none() {
+            details.push(("Dlaczego pytam".into(), v(&req.explanation)));
+            let left = time_left_pl(req.expires_at_ms.saturating_sub(now_ms));
+            details.push(("Wygasa za".into(), left));
+        }
         let read_aloud = req.origin.is_voice().then(|| {
             format!(
                 "{}. Potwierdź w oknie Brokera kliknięciem.",
@@ -318,6 +367,7 @@ impl ApprovalCard {
             hello_required: req.hello_required,
             created_at_ms: req.created_at_ms,
             expires_at_ms: req.expires_at_ms,
+            mode_change,
         }
     }
 }

@@ -2,14 +2,14 @@
 //! kolor ryzyka zawsze z ikoną i tekstem; przy wysokim ryzyku okno może przejąć fokus
 //! (alertdialog), inaczej pokazuje się bez kradzieży fokusu.
 
-use broker_ui_contract::{ApprovalCard, DecisionOption, time_left_pl};
+use broker_ui_contract::{ApprovalCard, DecisionOption, mode_name_pl, time_left_pl};
 use platform_contract::{SurfaceButton, SurfaceTone, SurfaceView};
 use risk_classifier_contract::RiskLevel;
 use safety_broker_contract::ApprovalDecision;
 
 /// Przycisk „Odmów” (fokus startowy; `Esc` działa tak samo).
 pub const BTN_DENY: u16 = 100;
-/// Przycisk „Zezwól tylko teraz”.
+/// Przycisk „Zezwól tylko teraz” (przy zmianie trybu: „Włącz: <tryb>”).
 pub const BTN_ONCE: u16 = 101;
 /// Przycisk „Zawsze w tym zakresie”.
 pub const BTN_SCOPED: u16 = 102;
@@ -57,7 +57,14 @@ fn icon(risk: RiskLevel) -> &'static str {
 
 /// Widok karty z wierszem stanu; „Wygasa za” liczone na chwilę `now_ms`.
 pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
-    let mut badge = format!("{} Ryzyko: {}", icon(card.risk), card.risk.label_pl());
+    let mut badge = match card.mode_change {
+        Some(_) => format!(
+            "{} Tryb pracy · ryzyko {}",
+            icon(card.risk),
+            card.risk.label_pl()
+        ),
+        None => format!("{} Ryzyko: {}", icon(card.risk), card.risk.label_pl()),
+    };
     if card.voice_origin {
         badge.push_str(" · zlecone głosem");
     }
@@ -89,7 +96,10 @@ pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
             id: button_of(o),
             label: match o {
                 DecisionOption::Deny => "Odmów (Esc)".to_owned(),
-                DecisionOption::AllowOnce => format!("Zezwól tylko teraz{hello}"),
+                DecisionOption::AllowOnce => match card.mode_change {
+                    Some(mode) => format!("Włącz: {}{hello}", mode_name_pl(mode)),
+                    None => format!("Zezwól tylko teraz{hello}"),
+                },
                 DecisionOption::AllowInScope { until_ms, .. } => {
                     let hours = until_ms.saturating_sub(now_ms).div_ceil(3_600_000);
                     format!("Zawsze w tym zakresie ({hours} h){hello}")

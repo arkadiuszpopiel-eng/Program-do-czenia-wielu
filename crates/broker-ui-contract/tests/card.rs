@@ -125,11 +125,26 @@ fn voice_plan_autonomy_and_policy_cards() {
         until_ms: Some(1_000 + 90_000),
     });
     let card = ApprovalCard::from_request(&auto, 1_000, CardOptions::default());
-    assert_eq!(card.title, "Zmiana poziomu autonomii");
+    assert_eq!(card.title, "Zmiana trybu pracy: Pełna automatyka");
     assert_eq!(detail(&card, "Dotyczy"), "agentka delta w sesji s1");
-    assert!(detail(&card, "Zmiana").starts_with("L3"));
+    assert_eq!(detail(&card, "Tryb"), "Automatycznie → Pełna automatyka");
     assert_eq!(detail(&card, "Na czas"), "1 min 30 s");
+    assert!(detail(&card, "Zawsze zostaje").contains("Ctrl+Shift+F12"));
+    assert_eq!(card.mode_change, Some(AutonomyLevel::L4));
     assert_eq!(card.options.len(), 2);
+    // Właściciel 27.10: okno zmiany trybu bez odliczania i bez powtórzonych wierszy.
+    for gone in ["Wygasa za", "Dlaczego pytam", "Ryzyko", "Kto"] {
+        assert!(card.details.iter().all(|(k, _)| k != gone), "{gone}");
+    }
+    let global = request(ApprovalSubject::Autonomy {
+        target: AutonomyTarget::Global,
+        from: AutonomyLevel::L3,
+        to: AutonomyLevel::L4,
+        until_ms: None,
+    });
+    let card = ApprovalCard::from_request(&global, 1_000, CardOptions::default());
+    assert_eq!(detail(&card, "Dotyczy"), "cała aplikacja");
+    assert!(detail(&card, "Na stałe").contains("zostaje po restarcie"));
 
     let policy = KernelPolicy::baseline(r"C:\Users\ala", r"C:\ProgramData\Alfa\broker").unwrap();
     let pol = request(ApprovalSubject::Policy {

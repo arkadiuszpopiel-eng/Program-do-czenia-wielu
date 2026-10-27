@@ -22,6 +22,6 @@ pub use api::{
 };
 pub use card::{
     ApprovalCard, CardOptions, DecisionOption, GRANT_MAX_MS, MAX_PLAN_LINES, MAX_VALUE_CHARS,
-    PersonaDisplay, PlanLine, persona_of, sanitize, time_left_pl,
+    PersonaDisplay, PlanLine, mode_name_pl, persona_of, sanitize, time_left_pl,
 };
 pub use guard::{ForegroundTracker, MIN_FOREGROUND_MS, RejectReason, check_input, source_for};
