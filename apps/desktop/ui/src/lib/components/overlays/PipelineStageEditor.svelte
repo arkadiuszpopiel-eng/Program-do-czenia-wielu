@@ -44,11 +44,21 @@
     { value: '', label: en ? 'Auto (by role)' : 'Automatycznie (wg roli)' },
     ...STAGE_PERSONAS.map((p) => ({ value: p.id, label: p.label })),
   ]);
-  // Lista podpowiedzi rysowana przez ui-kit (natywny <datalist> rysuje system, poza motywami).
+  // Jedno pole modelu (właściciel 27.10: okno „bardzo mieszane”): Auto, modele Routera
+  // z podpowiedziami i „Inny…”, który dopiero wtedy pokazuje pole `dostawca:model`.
+  const OTHER = '__other__';
+  let custom = $state(false);
+  const known = $derived(!stage.model || allModelChoices.some((m) => m.candidate === stage.model));
+  const typed = $derived(custom || !known);
   const modelOptions = $derived([
-    { value: '', label: en ? 'Pick from list…' : 'Wybierz z listy…' },
+    { value: '', label: en ? 'Auto (Router picks)' : 'Auto (dobiera Router)' },
     ...allModelChoices.map((m) => ({ value: m.candidate, label: m.label })),
+    { value: OTHER, label: en ? 'Other (provider:model)…' : 'Inny (dostawca:model)…' },
   ]);
+  const pickModel = (v: string): void => {
+    custom = v === OTHER;
+    if (!custom) set({ model: v || null });
+  };
 </script>
 
 <section
@@ -121,40 +131,27 @@
     </div>
 
     <div class="field">
-      <div class="field-head">
-        <label class="field-label" for="{uid}-model">
-          {en ? 'Stage model (provider:model)' : 'Model etapu (dostawca:model)'}
-        </label>
-        {#if stage.model}
-          <button
-            type="button"
-            class="tag-btn"
-            onclick={() => set({ model: null })}
-            title={en ? 'Reset to Router selection' : 'Przywróć automatyczny dobór Routera'}
-          >
-            {en ? '× Auto (Router)' : '× Auto (Router)'}
-          </button>
-        {/if}
-      </div>
-      <input
-        id="{uid}-model"
-        type="text"
-        class="ctl"
-        class:bad={modelBad}
-        value={stage.model ?? ''}
-        placeholder={en
-          ? 'Auto (Router) or e.g. openai:gpt-6-astra'
-          : 'Auto (Router) lub np. openai:gpt-6-astra'}
-        aria-invalid={modelBad}
-        oninput={(e) => set({ model: e.currentTarget.value.trim() || null })}
-      />
+      <span class="field-label" id="{uid}-model-label">{en ? 'Model' : 'Model etapu'}</span>
       <Select
         size="sm"
-        label={en ? 'Suggested models' : 'Podpowiedzi modeli'}
-        value=""
+        labelledby="{uid}-model-label"
+        value={typed ? OTHER : (stage.model ?? '')}
         options={modelOptions}
-        onchange={(v) => v && set({ model: v })}
+        onchange={pickModel}
       />
+      {#if typed}
+        <input
+          id="{uid}-model"
+          type="text"
+          class="ctl"
+          class:bad={modelBad}
+          value={stage.model ?? ''}
+          aria-label={en ? 'Model (provider:model)' : 'Model (dostawca:model)'}
+          placeholder={en ? 'e.g. openai:gpt-6-astra' : 'np. openai:gpt-6-astra'}
+          aria-invalid={modelBad}
+          oninput={(e) => set({ model: e.currentTarget.value.trim() || null })}
+        />
+      {/if}
     </div>
   </div>
 
@@ -169,9 +166,11 @@
           type="button"
           class="tag-btn"
           onclick={() => set({ goal: insertGoalToken(stage.goal, '{{input}}') })}
-          title={en ? 'Insert initial user input' : 'Wstaw pierwotny szkic / wejście użytkownika'}
+          title={en
+            ? 'Inserts {{input}} — your original task'
+            : 'Wstawia {{input}} — pierwotną treść zadania'}
         >
-          + {'{{input}}'}
+          {en ? '+ task' : '+ zadanie'}
         </button>
         {#if index > 0}
           <button
@@ -179,10 +178,10 @@
             class="tag-btn"
             onclick={() => set({ goal: insertGoalToken(stage.goal, '{{prev}}') })}
             title={en
-              ? 'Insert output from previous stage'
-              : 'Wstaw wynik wygenerowany przez poprzedni etap'}
+              ? 'Inserts {{prev}} — the previous stage result'
+              : 'Wstawia {{prev}} — wynik poprzedniego etapu'}
           >
-            + {'{{prev}}'}
+            {en ? '+ previous result' : '+ wynik poprzedniego'}
           </button>
         {/if}
       </div>
@@ -277,14 +276,13 @@
     font-size: var(--alfa-font-size-xs);
   }
   .tag-btn {
-    height: 20px;
+    height: 22px;
     padding: 0 6px;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-control);
     background: var(--alfa-color-surface);
     color: var(--alfa-color-text-muted);
     font-size: 11px;
-    font-family: var(--alfa-font-mono);
     cursor: pointer;
   }
   .tag-btn:hover {
@@ -294,7 +292,7 @@
   .ctl {
     box-sizing: border-box;
     width: 100%;
-    height: 34px;
+    height: var(--alfa-size-control);
     padding: 0 var(--alfa-space-2);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-control);

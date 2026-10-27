@@ -213,6 +213,16 @@
     width: var(--row);
     height: var(--row);
   }
+  /* Telefon i wąskie okno: ciaśniej, żeby „Wyślij” mieścił się przy 360 px. */
+  @media (max-width: 480px) {
+    .composer,
+    .chips {
+      gap: var(--alfa-space-1);
+    }
+    .composer {
+      padding: var(--alfa-space-1);
+    }
+  }
   :global(.composer .send:not(:disabled)),
   :global(.composer .stop) {
     color: var(--alfa-color-text);

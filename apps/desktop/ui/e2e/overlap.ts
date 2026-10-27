@@ -18,7 +18,9 @@ export async function overlapDefects(page: Page, scope = 'body'): Promise<string
     const ownText = (el: Element): boolean =>
       [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim());
     // Warstwa: element w menu, liście, oknie dialogowym albo podpowiedzi leży NAD resztą z założenia.
-    const LAYER = '[role="dialog"],[role="menu"],[role="listbox"],[role="tooltip"],[popover]';
+    // `data-layer` — wysunięty panel nad rozmową (panele chowane).
+    const LAYER =
+      '[role="dialog"],[role="menu"],[role="listbox"],[role="tooltip"],[popover],[data-layer]';
     /** Prostokąt elementu przycięty przez przodków, którzy przycinają zawartość. */
     const visibleRect = (el: Element): DOMRect | null => {
       // Treść zwiniętego <details> ma wymiary, choć nie jest rysowana — `checkVisibility` ją pomija.

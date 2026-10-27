@@ -232,6 +232,22 @@ Opis: [`18-wielu-uzytkownikow.md`](18-wielu-uzytkownikow.md). Zlecenie właścic
 **Wyjście z U:** dwie osoby korzystają z jednej Alfy na komputerze i z dwóch telefonów, nie widząc swoich danych;
 dziecko nie uruchomi działania w systemie; właściciel odbiera dostęp jednym kliknięciem.
 
+## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
+
+Plan: [`41-tryb-dla-dzieci.md`](41-tryb-dla-dzieci.md) (zlecenie właściciela 27.10).
+
+| ID  | Zadanie                                                                              | Stan  | Data | Uwagi                       |
+| --- | ------------------------------------------------------------------------------------ | ----- | ---- | --------------------------- |
+| K.0 | Decyzje właściciela: przedziały wieku, czytanie rozmów, chmura; ADR „Konta dzieci”   | czeka | —    | 4 pytania w dokumencie 41   |
+| K.1 | Rola Dziecko w Jądrze i Brokerze, twarde blokady, testy ataków                       | czeka | —    | po U.1, U.4, U.6            |
+| K.2 | Lokalny filtr treści (wejście i wyjście), progi według wieku, zamrożony zestaw testów | czeka | —    | po K.1                      |
+| K.3 | Styl „Junior”: wygląd, głos, wyróżnianie czytanego zdania, dźwięki                   | czeka | —    | awatary mówiące już są      |
+| K.4 | Nauka: ścieżki, ćwiczenia do poziomu, odznaki, raport dla rodzica                    | czeka | —    | po K.2, K.3                 |
+| K.5 | Zabawa i twórczość: zagadki, opowieści, piaskownica silnika gier                     | czeka | —    | po K.2 i `tools-engine`     |
+| K.6 | Strona „Dzieci” w Ustawieniach: limity czasu i kosztów, chmura, czytanie rozmów      | czeka | —    | po K.1                      |
+| K.7 | Podgląd z telefonu i panelu WWW: aktywność, alerty, „Zawołaj rodzica”, zgody         | czeka | —    | po K.6, D.2, E.3, F.2, U.8  |
+| K.8 | Zgodność RODO, przegląd prawny i przegląd w świeżym kontekście                       | czeka | —    | po K.1–K.7                  |
+
 ## Etap D — Host bez okna i protokół zdalny
 
 | ID  | Zadanie                                                                   | Stan  | Data | Uwagi                                            |

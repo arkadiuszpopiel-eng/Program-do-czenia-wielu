@@ -273,6 +273,10 @@ export function escapeChain(app: AppState): boolean {
     app.layout.update(sid, { left_open: false });
     return true;
   }
+  if (app.layout.peek) {
+    app.layout.peek = null;
+    return true;
+  }
   if (app.layout.focus) {
     app.layout.setFocus(false);
     return true;

@@ -128,6 +128,9 @@
     background: transparent;
     transition: transform var(--alfa-duration-fast) var(--alfa-ease-out);
   }
+  .cast-btn.speaking {
+    z-index: 2;
+  }
   .cast-btn[aria-expanded='true'] {
     background: var(--alfa-color-surface2);
   }

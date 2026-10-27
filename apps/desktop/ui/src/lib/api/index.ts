@@ -22,13 +22,15 @@ export async function createClient(): Promise<AlfaClient> {
   const scenario = FAKE_SCENARIOS.find((s) => s === wanted) ?? 'default';
   // Podgląd wyglądu bez klikania w ustawieniach: `?style=glass|next&theme=light|dark`.
   const params = new URLSearchParams(location.search);
-  const settings: Record<string, string> = {};
+  const settings: Record<string, string | boolean> = {};
   const style = params.get('style');
   const theme = params.get('theme');
   if (style) settings['ui.style'] = style;
   if (theme) settings['ui.theme'] = theme;
   const avatars = params.get('avatars');
   if (avatars) settings['ui.avatars'] = avatars;
+  // Panele chowane od startu: `?panels=autohide`.
+  if (params.get('panels') === 'autohide') settings['ui.panels_autohide'] = true;
   // Podgląd stanów obsady: `?cast=speaking,working,waiting_approval,idle`.
   const cast = params.get('cast')?.split(',') ?? [];
   return new FakeAlfaClient({ scenario, settings, cast });

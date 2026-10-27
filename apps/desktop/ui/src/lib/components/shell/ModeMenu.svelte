@@ -71,7 +71,6 @@
 
 <div class="menu">
   <h3 class="h" id="mode-title">{t('mode.title')}</h3>
-  <!-- svelte-ignore a11y_interactive_supports_focus -->
   <div
     class="list"
     role="menu"

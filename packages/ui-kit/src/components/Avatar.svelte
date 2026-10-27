@@ -3,10 +3,12 @@
   awatar ożywa: pokazuje twarz, która mruga, mówiąc rusza ustami w rytm mowy (poziom z głośnika,
   a bez pomiaru — własny rytm sylab), pracując rozgląda się, a wokół krąży łuk. Duże awatary
   (od 40 px) mają twarz zawsze i literę na plakietce. Styl „same litery” wyłącza twarze —
-  zostaje pulsujący pierścień. Ruch tylko transform/opacity; przy wyłączonych animacjach stan
-  pokazują pierścień i kształt ust.
+  zostaje pulsujący pierścień. Mówiąca agentka „wypuszcza” z ust litery tego, co mówi albo pisze
+  (właściciel 27.10). Ruch tylko transform/opacity; przy wyłączonych animacjach stan pokazują
+  pierścień i kształt ust, a litery nie lecą.
 -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { SPEECH_LEVEL_FRESH_MS, avatarState, mouthOpen } from '../avatar-state.svelte';
   import { agents, type AgentId } from '../tokens';
 
@@ -22,6 +24,8 @@
     label?: string;
     /** Awatar wewnątrz elementu, który sam ma nazwę (np. przycisku) — ukryty dla czytników. */
     decorative?: boolean;
+    /** Tekst, który agentka właśnie mówi albo pisze — jego litery wylatują z ust. */
+    words?: string;
   }
 
   let {
@@ -31,6 +35,7 @@
     working = false,
     label,
     decorative = false,
+    words,
   }: Props = $props();
   const meta = $derived(agents[agent]);
   const status = $derived(speaking ? 'mówi' : working ? 'pracuje' : undefined);
@@ -53,6 +58,36 @@
     speaking && avatarState.levelAt > 0 && now - avatarState.levelAt < SPEECH_LEVEL_FRESH_MS,
   );
   const open = $derived(measured ? mouthOpen(avatarState.level) : 0);
+
+  // Litery z ust: co ~420 ms (przy pomiarze — gdy usta są otwarte) wylatuje kolejna litera
+  // z końcówki mówionego tekstu; każda żyje 1,2 s. Tekst w pseudoelemencie, poza drzewem dostępności.
+  const FALLBACK = 'aoeiu';
+  const pool = $derived.by(() => {
+    const tail = (words ?? '').slice(-48).match(/\p{L}/gu) ?? [];
+    return tail.length ? tail.slice(-12).map((c) => c.toLowerCase()) : [...FALLBACK];
+  });
+  let flying = $state<{ id: number; ch: string; at: number; rise: number }[]>([]);
+  let spawned = 0;
+  let lastSpawn = 0;
+  const still = () =>
+    document.documentElement.dataset['motion'] === 'off' ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $effect(() => {
+    const t = now;
+    if (!speaking || !face || size < 24) {
+      if (untrack(() => flying.length)) flying = [];
+      return;
+    }
+    const alive = untrack(() => flying).filter((p) => t - p.at < 1200);
+    const ready = t - lastSpawn > 420 && (!measured || open > 0.3) && !still();
+    if (ready) {
+      lastSpawn = t;
+      spawned += 1;
+      const ch = pool[spawned % pool.length] ?? 'a';
+      alive.push({ id: spawned, ch, at: t, rise: (spawned % 3) - 1 });
+    }
+    if (ready || alive.length !== flying.length) flying = alive;
+  });
 </script>
 
 <span
@@ -88,6 +123,9 @@
       {/if}
     </svg>
     {#if large}<span class="badge" aria-hidden="true">{meta.glyph}</span>{/if}
+    {#each flying as p (p.id)}
+      <span class="fly" data-ch={p.ch} style:--rise={p.rise} aria-hidden="true"></span>
+    {/each}
   {:else}
     <span class="glyph" aria-hidden="true">{meta.glyph}</span>
   {/if}
@@ -118,6 +156,10 @@
     border: var(--ring) solid var(--accent);
     opacity: 0.55;
     transition: opacity var(--alfa-duration-fast) var(--alfa-ease-out);
+  }
+  /* Mówiąca nad sąsiadkami — litery z ust nie chowają się pod następnym awatarem. */
+  .speaking {
+    z-index: 2;
   }
   .working .ring,
   .speaking .ring {
@@ -267,6 +309,41 @@
       transform: scaleY(0.9);
     }
   }
+  /* Litera z ust: wylatuje w bok i lekko w górę, rośnie i gaśnie. */
+  .fly {
+    position: absolute;
+    left: 50%;
+    top: 62%;
+    z-index: 3;
+    pointer-events: none;
+    animation: fly 1.2s var(--alfa-ease-out) forwards;
+  }
+  .fly::before {
+    content: attr(data-ch);
+    display: block;
+    color: var(--accent);
+    font-size: max(11px, calc(var(--size) * 0.5));
+    font-weight: var(--alfa-weight-semibold);
+    line-height: 1;
+    text-shadow:
+      0 0 3px var(--alfa-color-bg),
+      0 0 6px var(--soft);
+  }
+  @keyframes fly {
+    from {
+      transform: translate(-50%, -50%) scale(0.4);
+      opacity: 0;
+    }
+    15%,
+    60% {
+      opacity: 1;
+    }
+    to {
+      transform: translate(calc(var(--size) * 0.8), calc(var(--size) * (-0.3 + var(--rise) * 0.22)))
+        scale(1.1);
+      opacity: 0;
+    }
+  }
   .badge {
     position: absolute;
     right: -6%;
@@ -287,14 +364,16 @@
   :global(:root[data-motion='off']) .avatar :is(.ring, .ring::after, .orbit, .eyes, .mouth) {
     animation: none;
   }
-  :global(:root[data-motion='off']) .speaking .ring::after {
+  :global(:root[data-motion='off']) .speaking .ring::after,
+  :global(:root[data-motion='off']) .fly {
     display: none;
   }
   @media (prefers-reduced-motion: reduce) {
     .avatar :is(.ring, .orbit, .eyes, .mouth) {
       animation: none;
     }
-    .speaking .ring::after {
+    .speaking .ring::after,
+    .fly {
       display: none;
     }
   }

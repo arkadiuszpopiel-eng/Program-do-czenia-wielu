@@ -76,19 +76,22 @@
 <style>
   .workspace {
     display: grid;
-    grid-template-columns: minmax(150px, 0.7fr) minmax(0, 2fr);
+    grid-template-columns: minmax(200px, 0.8fr) minmax(0, 2fr);
     flex: 1;
     min-height: 0;
     gap: var(--alfa-space-3);
   }
+  /* Etapy połączone strzałkami przepływu: wynik jednego trafia do następnego. */
   .stage-nav {
     display: flex;
     flex-direction: column;
-    gap: var(--alfa-space-2);
+    gap: 22px;
     overflow: auto;
     min-width: 0;
+    padding-bottom: 2px;
   }
   button {
+    position: relative;
     display: flex;
     gap: var(--alfa-space-2);
     align-items: flex-start;
@@ -101,9 +104,27 @@
     color: var(--alfa-color-text);
     text-align: left;
   }
-  button.active {
-    border-color: var(--alfa-color-focus);
+  button:hover {
     background: var(--alfa-color-surface2);
+  }
+  button.active {
+    border-color: var(--alfa-color-accent, var(--alfa-color-text));
+    background: var(--alfa-color-surface2);
+  }
+  button:not(:last-child)::after {
+    content: '↓';
+    position: absolute;
+    left: 50%;
+    bottom: -20px;
+    transform: translateX(-50%);
+    color: var(--alfa-color-text-subtle);
+    font-size: var(--alfa-font-size-sm);
+    line-height: 18px;
+    pointer-events: none;
+  }
+  button.active .number {
+    background: var(--alfa-accent-fill, var(--alfa-color-accent, var(--alfa-color-text)));
+    color: var(--alfa-color-text-on-accent);
   }
   button:focus-visible {
     outline: 2px solid var(--alfa-color-focus);
@@ -150,6 +171,14 @@
       flex-direction: row;
       flex: none;
       max-height: 94px;
+    }
+    button:not(:last-child)::after {
+      content: '→';
+      left: auto;
+      right: -18px;
+      bottom: auto;
+      top: 50%;
+      transform: translateY(-50%);
     }
     button {
       width: 180px;

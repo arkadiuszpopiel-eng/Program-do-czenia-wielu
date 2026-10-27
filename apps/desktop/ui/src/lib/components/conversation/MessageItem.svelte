@@ -125,7 +125,7 @@
   >
     <header class="head">
       {#if agent}
-        <Avatar {agent} size={24} speaking={streaming} />
+        <Avatar {agent} size={24} speaking={streaming} words={streaming ? turn.text : undefined} />
         <span class="name agent-name">{name}</span>
         {#if turn.role_id}<Chip size="sm" {agent}>{app.i18n.tk(`role.${turn.role_id}`)}</Chip>{/if}
       {:else}

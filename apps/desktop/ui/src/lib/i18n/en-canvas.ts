@@ -25,4 +25,8 @@ export const enCanvas: Record<keyof typeof plCanvas, Message> = {
   'canvas.truncated':
     'Showing the first {limit} of the source — copy it or save it as a file to get all of it.',
   'canvas.loading': 'Preparing preview…',
+  // Panele chowane: znacznik przy krawędzi okna i wysunięty panel.
+  'edge.sessions': 'Sessions panel — hover to slide out',
+  'edge.panel': 'Side panel — hover to slide out',
+  'edge.pin': 'Pin panel',
 };

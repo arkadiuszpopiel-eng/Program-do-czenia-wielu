@@ -25,6 +25,7 @@
   import { canvas, closeCanvas, syncCanvas } from '../../state/canvas.svelte';
   import { arenaDialog } from '../../state/arena.svelte';
   import { teachDialog } from '../../state/teach-dialog.svelte';
+  import PanelPeek from './PanelPeek.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
   import SessionsRail from './SessionsRail.svelte';
@@ -78,7 +79,7 @@
   const loadTemplates = () => import('../overlays/TemplateDialog.svelte');
   const loadBoard = () => import('../overlays/BoardDialog.svelte');
   const loadProjects = () => import('../overlays/ProjectsDialog.svelte');
-const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
+  const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
   const loadStats = () => import('../overlays/SessionStatsDialog.svelte');
   const loadArena = () => import('../overlays/ArenaDialog.svelte');
   const loadTeach = () => import('../overlays/TeachDialog.svelte');
@@ -101,8 +102,7 @@ const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
   $effect(() => {
     const id = sid;
     const conv = app.conversation;
-    const ids =
-      conv?.loaded && conv.sessionId === id ? new Set(conv.path.map((t) => t.id)) : null;
+    const ids = conv?.loaded && conv.sessionId === id ? new Set(conv.path.map((t) => t.id)) : null;
     untrack(() => syncCanvas(id, ids ? (turnId) => ids.has(turnId) : null));
   });
 
@@ -148,6 +148,7 @@ const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
         <Lazy load={loadCanvas} props={{}} label={t('canvas.loading')} />
       </aside>
     {/if}
+    <PanelPeek {left} {right} {rightWidth} show={!inSettings && !app.layout.focus} />
     {#if right === 'docked'}
       <aside class="right" style:width="{rightWidth}px">
         <ResizeHandle
@@ -221,8 +222,16 @@ const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
       label={t('tpl.dialog.title')}
     />{/if}
   {#if boardDialog.open}<Lazy load={loadBoard} props={{}} label={t('board.title')} />{/if}
-  {#if projectsDialog.open}<Lazy load={loadProjects} props={{}} label={t('sessions.projects')} />{/if}
-{#if pipelinesDialog.open}<Lazy load={loadPipelines} props={{}} label={t('sessions.pipelines')} />{/if}
+  {#if projectsDialog.open}<Lazy
+      load={loadProjects}
+      props={{}}
+      label={t('sessions.projects')}
+    />{/if}
+  {#if pipelinesDialog.open}<Lazy
+      load={loadPipelines}
+      props={{}}
+      label={t('sessions.pipelines')}
+    />{/if}
   {#if statsDialog.open}<Lazy load={loadStats} props={{}} label={t('stats.title')} />{/if}
   {#if arenaDialog.open}<Lazy load={loadArena} props={{}} label={t('arena.title')} />{/if}
   {#if teachDialog.open}<Lazy load={loadTeach} props={{}} label={t('teach.title')} />{/if}
@@ -251,6 +260,7 @@ const loadPipelines = () => import('../overlays/PipelinesDialog.svelte');
     top: var(--alfa-space-2);
   }
   .body {
+    position: relative;
     flex: 1;
     display: flex;
     min-height: 0;

@@ -3,7 +3,7 @@
   nazwę), obsada α β γ δ z pierścieniem koloru (świeci mówiąca / pracująca), stan (profil · L · koszt),
   panel prawy, ustawienia. Puste obszary to region przeciągania okna (Tauri); natywne przyciski
   okna (`WindowControls`) rysuje interfejs — okno nie ma belki systemowej. Wzdłuż dolnej krawędzi
-  biegnie pasek LED: światło jedzie od lewej do prawej, szybciej, gdy któraś agentka pracuje.
+  biegnie pasek LED (`TitleLed`).
 -->
 <script lang="ts">
   import { IconButton } from '@alfa/ui-kit';
@@ -18,6 +18,7 @@
   import GuiIndicator from './GuiIndicator.svelte';
   import MicIndicator from './MicIndicator.svelte';
   import StatusCluster from './StatusCluster.svelte';
+  import TitleLed from './TitleLed.svelte';
   import WindowControls from './WindowControls.svelte';
 
   const app = useApp();
@@ -25,16 +26,11 @@
   const session = $derived(app.sessions.active);
   const panels = $derived(app.layout.current(app.activeId));
   const place = $derived(app.layout.placement(app.activeId));
-  const agentStates = $derived(app.activeId ? (app.agents[app.activeId] ?? []) : []);
   const renaming = $derived(
     session !== null && app.sessions.renamingId === session.id && app.sessions.renamingInTitle,
   );
   const title = $derived(session?.title ?? t('titlebar.noSession'));
   const crumbs = $derived(session?.project ? `${session.project.name} ▸ ${title}` : title);
-  const busy = $derived(
-    agentStates.some((a) => a.status === 'working' || a.status === 'speaking') ||
-      app.conversation?.streaming !== undefined,
-  );
   let draft = $state('');
 
   $effect(() => {
@@ -71,7 +67,7 @@
         size="sm"
         pressed={place.left !== 'hidden'}
         onclick={() =>
-          app.layout.leftCollapsed
+          app.layout.leftCollapsed && !app.layout.autohide
             ? app.layout.setLeftCollapsed(false)
             : app.layout.toggleLeft(app.activeId)}
         aria-keyshortcuts="Control+B"
@@ -112,7 +108,7 @@
     {/if}
     <div class="drag" data-tauri-drag-region></div>
   </div>
-  <div class="cast-center" data-tauri-drag-region><CastStrip /></div>
+  <div class="cast-center"><CastStrip /></div>
   <div class="zone right" data-tauri-drag-region>
     <div class="drag" data-tauri-drag-region></div>
     <div class="group live-group">
@@ -145,7 +141,7 @@
     </div>
     <WindowControls />
   </div>
-  <div class="led" class:busy class:offline={app.system?.online === false} aria-hidden="true"></div>
+  <TitleLed />
 </header>
 
 <style>
@@ -155,7 +151,9 @@
   .titlebar {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    /* Prawa strona nie kurczy się poniżej treści: gdy jest szersza niż połowa, obsada przesuwa
+       się w lewo zamiast wchodzić pod kapsuły (lewa strona skraca okruszki). */
+    grid-template-columns: minmax(0, 1fr) auto minmax(max-content, 1fr);
     align-items: center;
     column-gap: var(--alfa-space-3);
     --bar-h: 32px;
@@ -249,7 +247,8 @@
     }
   }
   @media (min-width: 721px) and (max-width: 1100px) {
-    .titlebar {
+    .titlebar,
+    .zone {
       gap: var(--alfa-space-1);
     }
     .titlebar :global(.cluster > .anchor:last-child),
@@ -271,85 +270,6 @@
     }
     .titlebar :global(.cluster .state .ico),
     .titlebar :global(.cluster .level svg) {
-      display: none;
-    }
-  }
-  /* Pasek LED ma własny tor pod elementami belki (`--led-lane`): listwa w barwach agentek i jasne
-     światło jadące od lewej do prawej. Nic z paska nie wchodzi na przyciski i kapsuły. */
-  .led {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 3px;
-    overflow: hidden;
-    pointer-events: none;
-    /* Barwy agentek rozjaśnione do świecących — czytelne na jasnej i ciemnej belce. */
-    --led-a: oklch(66% 0.23 27);
-    --led-b: oklch(66% 0.22 292);
-    --led-c: oklch(72% 0.15 215);
-    --led-d: oklch(72% 0.17 162);
-  }
-  .led::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, var(--led-a), var(--led-b), var(--led-c), var(--led-d));
-    opacity: 0.38;
-  }
-  .led::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 28%;
-    background:
-      linear-gradient(90deg, transparent 55%, #ffffff 82%, transparent 97%) center / 100% 1px
-        no-repeat,
-      linear-gradient(
-        90deg,
-        transparent,
-        var(--led-a) 22%,
-        var(--led-b) 50%,
-        var(--led-c) 76%,
-        var(--led-d) 92%,
-        transparent
-      );
-    transform: translateX(-100%);
-    animation: led-run 3.2s linear infinite;
-  }
-  .led.busy::after {
-    animation-duration: 1.4s;
-  }
-  .led.offline {
-    --led-a: var(--alfa-color-warning);
-    --led-b: var(--alfa-color-warning);
-    --led-c: var(--alfa-color-warning);
-    --led-d: var(--alfa-color-warning);
-  }
-  @keyframes led-run {
-    to {
-      transform: translateX(358%);
-    }
-  }
-  /* Animacje wyłączone: światło stoi — zostaje równa, jaśniejsza listwa. */
-  :global(:root[data-motion='off']) .led::after {
-    display: none;
-  }
-  :global(:root[data-motion='off']) .led::before {
-    opacity: 0.85;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .led::after {
-      display: none;
-    }
-    .led::before {
-      opacity: 0.85;
-    }
-  }
-  @media (forced-colors: active) {
-    .led {
       display: none;
     }
   }
@@ -393,8 +313,18 @@
   .sep {
     color: var(--alfa-color-text-subtle);
   }
+  /* Wąskie okno: obsady nie ma na środku, więc zamiast trzech stref jeden rząd jak dawniej —
+     siatka nie mieściła przycisków okna przy 360 px. */
   @media (max-width: 520px) {
     .titlebar {
+      display: flex;
+      align-items: center;
+    }
+    .zone {
+      display: contents;
+    }
+    .titlebar,
+    .zone {
       gap: var(--alfa-space-1);
     }
     .brand {
@@ -408,6 +338,9 @@
     }
   }
   @media (max-width: 380px) {
+    .zone {
+      gap: 2px;
+    }
     .titlebar {
       gap: 2px;
       padding-left: var(--alfa-space-1);

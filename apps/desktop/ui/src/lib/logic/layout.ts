@@ -1,7 +1,9 @@
 // Responsywność okna (PLAN §14.2) i ograniczenia szerokości paneli.
 
 export type LayoutMode = 'wide' | 'medium' | 'narrow' | 'compact';
-export type PanelPlacement = 'docked' | 'rail' | 'drawer' | 'sheet' | 'hidden';
+/** `peek` — panel wysunięty chwilowo nad rozmową (najechanie na znacznik przy krawędzi okna). */
+export type PanelPlacement = 'docked' | 'rail' | 'drawer' | 'sheet' | 'peek' | 'hidden';
+export type PanelSide = 'left' | 'right';
 
 export const LEFT_MIN = 240;
 export const LEFT_MAX = 320;
@@ -63,6 +65,27 @@ export function resolvePanels(
         right: hide(rightOpen, 'sheet'),
       };
   }
+}
+
+/**
+ * Panele chowane (właściciel 27.10: „mają się chować, wysuwać i mieć znaczniki, że tam są”). Na
+ * szerokim i średnim oknie schowany panel wysuwa się nad rozmowę po najechaniu na znacznik przy
+ * krawędzi; z `autohide` panele są zawsze schowane i tylko się wysuwają. Szuflady i arkusze
+ * węższych okien zostają bez zmian.
+ */
+export function withPeek(
+  base: PanelLayout,
+  mode: LayoutMode,
+  focus: boolean,
+  autohide: boolean,
+  peek: PanelSide | null,
+): PanelLayout {
+  if (focus || (mode !== 'wide' && mode !== 'medium')) return base;
+  const side = (s: PanelSide, placement: PanelPlacement): PanelPlacement => {
+    if (peek === s && (autohide || placement === 'hidden')) return 'peek';
+    return autohide ? 'hidden' : placement;
+  };
+  return { left: side('left', base.left), right: side('right', base.right) };
 }
 
 export const clamp = (value: number, min: number, max: number): number =>

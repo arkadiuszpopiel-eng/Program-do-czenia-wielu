@@ -6,8 +6,10 @@ import {
   clampRight,
   layoutMode,
   resolvePanels,
+  withPeek,
   type LayoutMode,
   type PanelLayout,
+  type PanelSide,
   RIGHT_DEFAULT,
 } from '../logic/layout';
 
@@ -19,6 +21,10 @@ export class LayoutState {
   leftCollapsed = $state(false);
   focus = $state(false);
   panels = $state<Record<string, SessionPanels>>({});
+  /** Ustawienie `ui.panels_autohide` (nie zapisuje się z układem). */
+  autohide = $state(false);
+  /** Panel wysunięty chwilowo nad rozmową (znacznik przy krawędzi). */
+  peek = $state<PanelSide | null>(null);
   readonly mode: LayoutMode = $derived(layoutMode(this.width));
 
   constructor(private readonly persist: (prefs: LayoutPrefs) => void = () => undefined) {}
@@ -37,11 +43,25 @@ export class LayoutState {
 
   placement(sessionId: string | null): PanelLayout {
     const p = this.current(sessionId);
-    return resolvePanels(this.mode, p.left_open, p.right_open, this.focus);
+    const base = resolvePanels(this.mode, p.left_open, p.right_open, this.focus);
+    return withPeek(base, this.mode, this.focus, this.autohide, this.peek);
+  }
+
+  /** Czy panele wysuwają się nad rozmowę (szerokie i średnie okno poza trybem skupienia). */
+  get peekable(): boolean {
+    return !this.focus && (this.mode === 'wide' || this.mode === 'medium');
   }
 
   update(sessionId: string | null, patch: Partial<SessionPanels>): void {
     const key = sessionId ?? '$none';
+    // Panele chowane: „otwórz” (skrót, karta z belki, szukanie) wysuwa panel nad rozmowę.
+    if (this.autohide && this.peekable) {
+      if (patch.left_open) this.peek = 'left';
+      if (patch.right_open) this.peek = 'right';
+    }
+    // „Zamknij” w wysuniętym panelu chowa go.
+    if (patch.left_open === false && this.peek === 'left') this.peek = null;
+    if (patch.right_open === false && this.peek === 'right') this.peek = null;
     const next = { ...this.current(sessionId), ...patch };
     // Na wąskich ekranach naraz tylko jedna szuflada/arkusz.
     if (this.mode === 'narrow' || this.mode === 'compact') {
@@ -53,11 +73,17 @@ export class LayoutState {
   }
 
   toggleLeft(sessionId: string | null): void {
+    if (this.autohide && this.peekable) return this.togglePeek('left');
     this.update(sessionId, { left_open: !this.current(sessionId).left_open });
   }
 
   toggleRight(sessionId: string | null): void {
+    if (this.autohide && this.peekable) return this.togglePeek('right');
     this.update(sessionId, { right_open: !this.current(sessionId).right_open });
+  }
+
+  togglePeek(side: PanelSide): void {
+    this.peek = this.peek === side ? null : side;
   }
 
   openTab(sessionId: string | null, tab: PanelId): void {

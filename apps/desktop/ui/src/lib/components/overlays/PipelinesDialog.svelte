@@ -1,13 +1,16 @@
 <!--
   Okno „Pipeline'y modeli”: biblioteka łańcuchów, w których kolejne modele współpracują bez
   Twojego pośrednictwa (np. szkic → styl i typografia → architektura komponentów → kod React/Tailwind).
-  Stały pasek górny (nazwa, opis, akcje), przewijana lista etapów pośrodku ze strzałkami przepływu
-  oraz stały pasek dolny do natychmiastowego uruchomienia pipeline'u w rozmowie.
+  Nagłówek z „×” jak w innych oknach Alfy, biblioteka po lewej, etapy połączone strzałkami
+  przepływu i edytor etapu, a na dole na całą szerokość pasek uruchomienia w rozmowie
+  (właściciel 27.10: okno „niedopracowane, nie pasuje do systemu, bardzo mieszane”).
 -->
 <script lang="ts">
   import './pipelines-dialog.css';
   import { Dialog } from 'bits-ui';
-  import { Button } from '@alfa/ui-kit';
+  import { Button, IconButton } from '@alfa/ui-kit';
+  import Play from '@lucide/svelte/icons/play';
+  import X from '@lucide/svelte/icons/x';
   import { untrack } from 'svelte';
   import { errorText } from '../../api/command-error';
   import type { PipelineDef, PipelineStage } from '../../api/types';
@@ -237,19 +240,17 @@
       <header class="top-head">
         <div>
           <Dialog.Title class="alfa-pipes-title">
-            {en
-              ? 'Model pipelines — multi-model workflows'
-              : 'Pipeline’y modeli — łańcuchy współpracy'}
+            {en ? 'Pipelines — model chains' : 'Pipeline’y — łańcuchy modeli'}
           </Dialog.Title>
           <Dialog.Description class="alfa-pipes-lead">
             {en
-              ? 'Assign specific models and roles to each stage: every stage automatically passes its output ({{prev}}) to the next.'
-              : 'Przypisz modele i role do kolejnych etapów: wynik każdego etapu ({{prev}}) automatycznie trafia do następnego bez Twojego pośrednictwa.'}
+              ? 'Stages run one after another: each gets the previous result and passes its own on — no need to step in.'
+              : 'Etapy wykonują się po kolei: każdy dostaje wynik poprzedniego i przekazuje swój dalej — bez Twojego udziału.'}
           </Dialog.Description>
         </div>
-        <Button size="sm" variant="ghost" disabled={busy} onclick={close}>
-          {en ? 'Close' : 'Zamknij'}
-        </Button>
+        <IconButton label={en ? 'Close' : 'Zamknij'} size="sm" disabled={busy} onclick={close}>
+          <X size={16} strokeWidth={1.5} />
+        </IconButton>
       </header>
 
       {#if loading}
@@ -344,35 +345,35 @@
             {#key original ?? draft.builtin}
               <PipelineStages stages={draft.stages} {models} {en} onchange={patchStages} />
             {/key}
-
-            <div class="run-bar">
-              <div class="run-input-wrap">
-                <input
-                  type="text"
-                  class="ctl run-input"
-                  bind:value={runInput}
-                  data-testid="pipeline-input"
-                  aria-label={en ? 'Pipeline input' : 'Wejście pipeline’u'}
-                  placeholder={en
-                    ? 'Enter sketch, description or task to run through this pipeline now…'
-                    : 'Wpisz lub wklej szkic / opis zadania, aby od razu uruchomić ten pipeline w rozmowie…'}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      void run();
-                    }
-                  }}
-                />
-                <Button
-                  variant="primary"
-                  disabled={busy || !runInput.trim() || !!problem}
-                  data-testid="pipeline-run"
-                  onclick={() => void run()}
-                >
-                  {en ? '▶ Run pipeline in chat' : '▶ Uruchom w rozmowie'}
-                </Button>
-              </div>
-            </div>
+          </div>
+        </div>
+        <div class="run-bar" inert={busy}>
+          <div class="run-input-wrap">
+            <input
+              type="text"
+              class="ctl run-input"
+              bind:value={runInput}
+              data-testid="pipeline-input"
+              aria-label={en ? 'Pipeline input' : 'Wejście pipeline’u'}
+              placeholder={en
+                ? 'Task for this pipeline — a description or a sketch to work on…'
+                : 'Zadanie dla tego pipeline’u — opis albo szkic do przerobienia…'}
+              onkeydown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void run();
+                }
+              }}
+            />
+            <Button
+              variant="primary"
+              disabled={busy || !runInput.trim() || !!problem}
+              data-testid="pipeline-run"
+              onclick={() => void run()}
+            >
+              <Play size={14} strokeWidth={1.5} aria-hidden="true" />
+              {en ? 'Run in chat' : 'Uruchom w rozmowie'}
+            </Button>
           </div>
         </div>
       {/if}

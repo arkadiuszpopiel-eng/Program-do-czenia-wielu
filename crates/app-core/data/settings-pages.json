@@ -2703,6 +2703,22 @@
     }
    },
    {
+    "key": "ui.panels_autohide",
+    "label": {
+     "pl": "Panele chowają się same",
+     "en": "Panels hide themselves"
+    },
+    "description": {
+     "pl": "Panel Sesje i panel prawy chowają się, a przy krawędzi okna świeci znacznik — najedź na niego, a panel wysunie się nad rozmowę. „Przypnij panel” w wysuniętym panelu przywraca stały układ.",
+     "en": "The Sessions panel and the side panel hide, and a marker glows at the window edge — hover it and the panel slides out over the conversation. “Pin panel” in the slid-out panel restores the fixed layout."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": false,
+    "scope": "global"
+   },
+   {
     "key": "ui.avatars",
     "label": {
      "pl": "Awatary agentek",

@@ -22,4 +22,8 @@ export const plCanvas = {
   'canvas.truncated':
     'Pokazano pierwsze {limit} źródła — całość skopiujesz albo zapiszesz jako plik.',
   'canvas.loading': 'Przygotowuję podgląd…',
+  // Panele chowane: znacznik przy krawędzi okna i wysunięty panel.
+  'edge.sessions': 'Panel Sesje — najedź, aby wysunąć',
+  'edge.panel': 'Panel prawy — najedź, aby wysunąć',
+  'edge.pin': 'Przypnij panel',
 };
