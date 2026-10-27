@@ -5,8 +5,8 @@ use risk_classifier_contract::{
 };
 use safety_broker_contract::{
     ApprovalDecision, ApprovalId, ApprovalSubject, AutonomyChangeRequest, AutonomyEntry,
-    BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK, EVENT_POLICY_CHANGED,
-    EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy,
+    AutonomyTarget, BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK,
+    EVENT_POLICY_CHANGED, EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy,
 };
 use serde_json::json;
 
@@ -111,6 +111,10 @@ impl BrokerEngine {
             } => {
                 let payload = json!({ "target": target, "level": level, "until_ms": until_ms, "approval": id });
                 self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
+                // Podniesienie globalne bez terminu zostaje po restarcie (decyzja właściciela 27.10).
+                if target == AutonomyTarget::Global && until_ms.is_none() {
+                    self.remember_global(level);
+                }
                 st.autonomy.set(target, AutonomyEntry { level, until_ms });
                 Ok(PendStatus::Approved(None))
             }
@@ -168,6 +172,9 @@ impl BrokerEngine {
                 level: req.level,
                 until_ms,
             };
+            if req.target == AutonomyTarget::Global && until_ms.is_none() {
+                self.remember_global(req.level);
+            }
             st.autonomy.set(req.target.clone(), entry);
             let payload = json!({ "target": req.target, "from": current, "level": req.level, "origin": req.origin });
             self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;

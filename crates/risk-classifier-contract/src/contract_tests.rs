@@ -60,7 +60,8 @@ pub fn kernel_rules_block_everywhere<C: RiskClassifier + ?Sized>(c: &C) {
     }
 }
 
-/// Destrukcja głosem i egress z sesji `tainted` pytają także na L4.
+/// Egress z sesji `tainted` pyta także na L4; destrukcja głosem pyta do L3 (na L4 — bez pytania,
+/// decyzja właściciela 27.10).
 pub fn l4_still_asks<C: RiskClassifier + ?Sized>(c: &C) {
     let voice_delete = ActionFacts::new("tools-fs.delete", ActionClass::Write)
         .destructive(Destructiveness::Recoverable)
@@ -69,12 +70,16 @@ pub fn l4_still_asks<C: RiskClassifier + ?Sized>(c: &C) {
             speaker_verified: true,
         });
     assert!(matches!(
-        c.evaluate(&voice_delete, AutonomyLevel::L4).verdict,
+        c.evaluate(&voice_delete, AutonomyLevel::L3).verdict,
         Verdict::Ask {
             non_voice: true,
             grantable: false
         }
     ));
+    assert_eq!(
+        c.evaluate(&voice_delete, AutonomyLevel::L4).verdict,
+        Verdict::Proceed
+    );
     let tainted_egress = ActionFacts::new("tools-net.post", ActionClass::Egress)
         .egress("example.com", true)
         .tainted();

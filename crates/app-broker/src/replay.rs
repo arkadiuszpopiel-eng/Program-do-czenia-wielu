@@ -9,8 +9,9 @@
 //! Dziennik zapamiętuje wyłącznie to, co **zawęża**: skażenie sesji (monotoniczne) i obniżenia
 //! poziomu przez właściciela poniżej domyślnego L3. Łącze odtwarza go na każdym nowym połączeniu
 //! **przed** udostępnieniem połączenia wołającym (żadna decyzja nie wyprzedzi odtworzenia).
-//! Podniesienia nie są odtwarzane (wymagają zgody w Broker-UI); obniżenie odtworzone po
-//! późniejszym podniesieniu daje stan ostrzejszy niż przed restartem — kierunek bezpieczny.
+//! Podniesienia nie są odtwarzane (wymagają zgody w Broker-UI). Zatwierdzone podniesienie usuwa
+//! wcześniejsze obniżenie celu — globalny poziom zatwierdzony bez terminu Broker zapamiętuje sam
+//! (`autonomy-standing.json`, decyzja właściciela 27.10), a stare obniżenie by go nadpisało.
 
 use std::collections::BTreeMap;
 use std::sync::{Mutex, MutexGuard};
@@ -90,6 +91,12 @@ impl Journal {
         );
     }
 
+    /// Właściciel zatwierdził w oknie Brokera podniesienie celu: wcześniejsze obniżenie przestaje
+    /// obowiązywać i nie może po restarcie Brokera nadpisać zapamiętanego poziomu (decyzja 27.10).
+    pub fn raised(&self, target: &AutonomyTarget) {
+        self.lock().lowered.remove(target);
+    }
+
     /// Żądania odtwarzające stan (skażenia, potem obniżenia).
     pub fn requests(&self) -> Vec<Request> {
         let e = self.lock();
@@ -145,7 +152,7 @@ mod tests {
         assert_eq!(
             requests.last(),
             Some(&Request::RequestAutonomy {
-                target,
+                target: target.clone(),
                 level: AutonomyLevel::L0,
                 until_ms: Some(9),
                 via: UserChannel::UserVoice,
@@ -153,5 +160,11 @@ mod tests {
         );
         assert_eq!(j.len(), 2);
         assert!(!j.is_empty());
+        j.raised(&target);
+        assert_eq!(
+            j.requests().len(),
+            2,
+            "zatwierdzone podniesienie kasuje obniżenie celu"
+        );
     }
 }

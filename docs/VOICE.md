@@ -199,7 +199,7 @@ Kryterium F2: ≥ 90% na **każdą klasę** (nie średnia), ≥ 50 przykładów 
 |---|---|
 | Pewność STT jest wejściem klasyfikatora ryzyka | niska pewność podnosi klasę ryzyka akcji |
 | Weryfikacja właściciela (`voice-speaker`, F5) | wymagana dla akcji ryzykownych; progi zależne od ryzyka; EER ≤ 3% (obce głosy: Common Voice PL + TTS; dla FAR ≤ 0,1% ≥ 3000 prób obcych) |
-| Destrukcyjne akcje zlecone głosem | potwierdzenie **nie-głosem na każdym poziomie autonomii, także L4** (odczytane: „Usuwam 14 plików z X — potwierdź", odpowiedź kliknięciem/klawiszem w Broker-UI); wyjątek tylko ręcznie w Broker-UI; reguła Jądra |
+| Destrukcyjne akcje zlecone głosem | potwierdzenie **nie-głosem do L3** (odczytane: „Usuwam 14 plików z X — potwierdź", odpowiedź kliknięciem/klawiszem w Broker-UI); na L4 („Pełna automatyka”, decyzja właściciela 2026-10-27) bez pytania tylko dla zweryfikowanego, pewnie rozpoznanego głosu właściciela; reguła Jądra |
 | Do czasu `voice-speaker` | każda ryzykowna akcja z głosu potwierdzana w Broker-UI fizycznym wejściem |
 | Adresat | komendy z TV / YouTube / rozmowy obok nie wyzwalają akcji: wake-phrase lub PTT + właściciel; dźwięk z otoczenia jest niezaufaną treścią (model zagrożeń, PLAN §8.0) |
 | Prywatność | tag sesji decyduje, czy audio może iść do chmurowego STT/TTS/S2S; ekran „co poszło do chmury"; wskaźnik prywatności w zasobniku, gdy mikrofon jest otwarty |

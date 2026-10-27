@@ -21,6 +21,7 @@ mod decide;
 mod engine;
 mod keys;
 mod kill;
+mod standing;
 mod state;
 mod tokens;
 

@@ -30,7 +30,7 @@ Zdarzenia: `broker_ui.shown`, `broker_ui.decided`, `broker_ui.injection_rejected
 - Poziom integralności wyższy niż procesy agentek; test odrzucenia SendInput z procesu agentki w CI sprzętowym.
 - Zatwierdzenie tylko z wejścia niewstrzykniętego (fizyczne kliknięcie/klawisz); `PhysicalInputProof` z nonce.
 - Brak WebView, brak renderowania HTML/markdown z LLM; tekst z LLM tylko jako zwykły tekst z obcięciem.
-- Destrukcja zlecona głosem: potwierdzenie wyłącznie tu, kliknięciem/klawiszem, na każdym poziomie autonomii; treść odczytana na głos przez `voice-tts` (zlecenie, nie zatwierdzenie).
+- Destrukcja zlecona głosem: potwierdzenie wyłącznie tu, kliknięciem/klawiszem, do L3 (na L4 „Pełna automatyka” — tylko obcy głos albo niepewne rozpoznanie; decyzja właściciela 2026-10-27); treść odczytana na głos przez `voice-tts` (zlecenie, nie zatwierdzenie).
 - Okno nie kradnie fokusu w trakcie pisania (focus-stealing prevention) — plakietka + dźwięk; przy wysokim ryzyku alertdialog z pułapką fokusu.
 - Kolor ryzyka zawsze z ikoną i tekstem; obsługa klawiaturą; PL/EN.
 - Nigdy w toaście, nigdy w oknie głównym.

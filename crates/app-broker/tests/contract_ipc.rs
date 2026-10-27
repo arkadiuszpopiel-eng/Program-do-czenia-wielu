@@ -209,7 +209,7 @@ async fn flows_contract_over_ipc() {
     let (b, c) = fresh();
     flows::kernel_blocks_on_l4(&b, &c).await;
     let (b, c) = fresh();
-    flows::voice_destruction_asks_on_l4(&b, &c).await;
+    flows::voice_destruction_asks_below_l4(&b, &c).await;
     let (b, c) = fresh();
     flows::tainted_egress_asks_on_l4(&b, &c).await;
     let (b, c) = fresh();

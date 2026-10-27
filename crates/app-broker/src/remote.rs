@@ -19,9 +19,10 @@ use platform_contract::{ProcessHandle, ProcessPort};
 use risk_classifier_contract::{AutonomyLevel, CommandOrigin, KernelRule};
 use safety_broker_contract::ipc::{Request, Response, UserChannel};
 use safety_broker_contract::{
-    ActionRequest, ApprovalId, ApprovalStatus, AttenuateRequest, AutonomyChangeRequest, Broker,
-    BrokerError, BrokerMetrics, CapToken, Capability, ChangeOrigin, Decision, Holder, KernelPolicy,
-    PlanDecision, PlanRequest, SessionSecurity, TaintSource, TokenId, event_kind,
+    ActionRequest, ApprovalId, ApprovalStatus, AttenuateRequest, AutonomyChangeRequest,
+    AutonomyTarget, Broker, BrokerError, BrokerMetrics, CapToken, Capability, ChangeOrigin,
+    Decision, Holder, KernelPolicy, PlanDecision, PlanRequest, SessionSecurity, TaintSource,
+    TokenId, event_kind,
 };
 use serde_json::json;
 use watchdog_contract::{
@@ -78,12 +79,18 @@ fn fail_closed_security() -> SessionSecurity {
 #[derive(Debug, Clone)]
 pub struct RemoteBroker {
     link: Arc<BrokerLink>,
+    /// Karty podniesień poziomu czekające na decyzję (identyfikator → cel) — po zatwierdzeniu
+    /// dziennik zapomina wcześniejsze obniżenie celu.
+    raises: Arc<std::sync::Mutex<std::collections::BTreeMap<u64, AutonomyTarget>>>,
 }
 
 impl RemoteBroker {
     /// Broker nad łączem.
     pub fn new(link: Arc<BrokerLink>) -> Self {
-        Self { link }
+        Self {
+            link,
+            raises: Arc::default(),
+        }
     }
 }
 
@@ -200,10 +207,18 @@ impl Broker for RemoteBroker {
             id,
             requester: requester.clone(),
         };
-        answer(self.link.call(req), |r| match r {
+        let status = answer(self.link.call(req), |r| match r {
             Response::Status(s) => Some(s),
             _ => None,
-        })
+        })?;
+        if !matches!(status, ApprovalStatus::Pending) {
+            let mut raises = self.raises.lock().unwrap_or_else(|p| p.into_inner());
+            let target = raises.remove(&id.0);
+            if let (Some(target), ApprovalStatus::Approved { .. }) = (target, &status) {
+                self.link.journal().raised(&target);
+            }
+        }
+        Ok(status)
     }
 
     async fn request_autonomy_change(
@@ -232,8 +247,16 @@ impl Broker for RemoteBroker {
             _ => None,
         })?;
         // Zastosowane bez zgody = obniżenie właściciela (dziennik pamięta tylko poniżej L3).
-        if applied.is_none() {
-            self.link.journal().lowered(&target, level, until_ms, via);
+        match applied {
+            None => self.link.journal().lowered(&target, level, until_ms, via),
+            Some(id) => {
+                let mut raises = self.raises.lock().unwrap_or_else(|p| p.into_inner());
+                // Karty żyją 10 min; niesprawdzane wpisy nie rosną bez końca.
+                if raises.len() >= 256 {
+                    raises.pop_first();
+                }
+                raises.insert(id.0, target);
+            }
         }
         Ok(applied)
     }

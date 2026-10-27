@@ -41,11 +41,11 @@ impl AutonomyLevel {
     /// Nazwa po polsku (do UI i audytu).
     pub fn name_pl(self) -> &'static str {
         match self {
-            Self::L0 => "Podgląd",
+            Self::L0 => "Tylko podgląd",
             Self::L1 => "Pytaj o wszystko",
             Self::L2 => "Pytaj o ryzykowne",
-            Self::L3 => "Bardzo wysoka",
-            Self::L4 => "Maks",
+            Self::L3 => "Automatycznie",
+            Self::L4 => "Pełna automatyka",
         }
     }
 }

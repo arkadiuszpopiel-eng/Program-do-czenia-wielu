@@ -156,6 +156,8 @@ export function filesApi(core: FakeCore): AlfaClient['files'] {
 export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
   // Jak Broker: obniżenie działa od razu (`applied`), podniesienie czeka w oknie Brokera.
   let global: AutonomyLevel = 'L3';
+  // Sesje z własnym poziomem; pozostałe pokazują poziom globalny (jak `session_autonomy` w rdzeniu).
+  const own = new Set<string>();
   return {
     get: (sid) =>
       core.reply({
@@ -168,8 +170,15 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
       if (ORDER.indexOf(level) > ORDER.indexOf(current)) {
         return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
       }
-      if (sid) core.updateSession(sid, { autonomy: level });
-      else global = level;
+      if (sid) {
+        own.add(sid);
+        core.updateSession(sid, { autonomy: level });
+      } else {
+        global = level;
+        for (const s of core.sessions) {
+          if (!own.has(s.id)) core.updateSession(s.id, { autonomy: level });
+        }
+      }
       return core.reply({ status: 'applied' as const, request_id: '' });
     },
     openApproval: () =>

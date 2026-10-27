@@ -159,20 +159,20 @@ export const plSettings = {
 
   'perm.title': 'Poziom autonomii',
   'perm.intro':
-    'Jak bardzo agentka działa sama. Zmianę potwierdzasz w oknie Brokera — agentka nie może sama podnieść sobie poziomu.',
-  'perm.L0.name': 'Podgląd',
+    'Jak bardzo agentka działa sama. Podniesienie potwierdzasz raz w oknie Brokera — zostaje także po restarcie, aż sam obniżysz. Agentka nie może sama podnieść sobie poziomu.',
+  'perm.L0.name': 'Tylko podgląd',
   'perm.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
   'perm.L1.name': 'Pytaj o wszystko',
   'perm.L1.desc': 'Każda zmiana wymaga Twojego „tak".',
   'perm.L2.name': 'Pytaj o ryzykowne',
   'perm.L2.desc':
     'Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji.',
-  'perm.L3.name': 'Bardzo wysoka — poziom domyślny',
+  'perm.L3.name': 'Automatycznie — poziom domyślny',
   'perm.L3.desc':
     'Działa sama w całym Twoim profilu i we wskazanych aplikacjach; pyta tylko przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).',
-  'perm.L4.name': 'Maks',
+  'perm.L4.name': 'Pełna automatyka',
   'perm.L4.desc':
-    'Nie pyta o zakres ani odwracalność. Twarde blokady Jądra obowiązują zawsze; pyta przy operacjach administracyjnych, destrukcji zleconej głosem, poleceniach głosowych bez rozpoznanego mówcy albo niepewnie rozpoznanych i wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek).',
+    'Działa sama bez pytań — także operacje administratora i polecenia Twoim głosem. Pyta tylko przed wysłaniem danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek) i gdy polecenie głosowe mogło nie pochodzić od Ciebie (obcy głos albo niepewne rozpoznanie). Twarde blokady Jądra obowiązują zawsze. Wybierasz raz — zostaje po restarcie.',
   'perm.current': 'obecny',
   'perm.request': 'Zmień na {level}',
   'perm.applied': 'Poziom zmieniony na {level} — obniżenie nie wymaga potwierdzenia.',
@@ -182,7 +182,7 @@ export const plSettings = {
   'perm.scope.global': 'Globalnie',
   'perm.scope.session': 'Tylko ta sesja',
   'perm.kept':
-    'Nawet na L4 zostają: kill-switch (Ctrl+Shift+F12), dziennik cofania, audyt i twarde blokady Jądra.',
+    'Nawet przy pełnej automatyce zostają: kill-switch (Ctrl+Shift+F12), dziennik cofania, audyt i twarde blokady Jądra.',
   'perm.hello': 'Windows Hello przy podnoszeniu do L4: {state}. Zmienisz to w oknie Brokera.',
 
   'dev.machine': 'Ta maszyna',

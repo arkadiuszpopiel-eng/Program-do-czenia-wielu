@@ -37,4 +37,24 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'broker.banner.details': 'Details',
   'broker.approval.lost':
     'The Broker is unavailable — this request cannot be approved now; the agent will be denied.',
+  // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
+  'titlebar.mode': 'Work mode: {mode}. Change mode',
+  'titlebar.modeTip': 'Agents’ work mode — click to change (1–4)',
+  'mode.title': 'Work mode',
+  'mode.L0.name': 'Preview only',
+  'mode.L0.desc': 'The agent only reads and suggests; she changes nothing.',
+  'mode.L1.name': 'Ask about everything',
+  'mode.L1.desc': 'Every change needs your "yes".',
+  'mode.L2.name': 'Ask about risky things',
+  'mode.L2.desc': 'Asks before deleting, sending data out and installing.',
+  'mode.L3.name': 'Automatic',
+  'mode.L3.desc': 'Works on her own; asks only about irreversible things outside the scope.',
+  'mode.L4.name': 'Full automation',
+  'mode.L4.desc': 'No questions. Choose once — it stays after a restart.',
+  'mode.note':
+    'Applies to all conversations. You confirm a raise once in the Broker window. Always kept: Ctrl+Shift+F12, the journal and a question before sending data out after untrusted content and for a voice command in another voice or recognised with low confidence.',
+  'mode.more': 'More in Settings → Permissions',
+  'mode.applied': 'Work mode: {mode}.',
+  'mode.requested': 'Confirm "{mode}" in the Broker window — once is enough.',
+  'mode.raised': 'Work mode: {mode} — approved and remembered.',
 };

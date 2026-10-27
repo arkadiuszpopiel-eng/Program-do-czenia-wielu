@@ -60,24 +60,22 @@ pub async fn kernel_blocks_on_l4<B: FullBroker>(b: &B, clock: &ManualClock) {
     assert!(b.metrics().kernel_blocks >= 5);
 }
 
-/// Destrukcja zlecona głosem wymaga potwierdzenia nie-głosem także na L4.
-pub async fn voice_destruction_asks_on_l4<B: FullBroker>(b: &B, clock: &ManualClock) {
-    session_l4(b, clock).await;
+/// Destrukcja zlecona głosem wymaga potwierdzenia nie-głosem do L3; na L4 („Pełna automatyka”)
+/// przechodzi bez pytania (decyzja właściciela 27.10).
+pub async fn voice_destruction_asks_below_l4<B: FullBroker>(b: &B, clock: &ManualClock) {
     let voice = CommandOrigin::UserVoice {
         confidence: SttConfidence::from_permille(990),
         speaker_verified: true,
     };
-    let ticket = needs_approval(
-        b.decide(delete_request(&delta(), r"C:\Users\ala\Docs\x.txt", voice))
+    let path = r"C:\Users\ala\Docs\x.txt";
+    let ticket = needs_approval(b.decide(delete_request(&delta(), path, voice)).await);
+    assert!(ticket.non_voice);
+    session_l4(b, clock).await;
+    allowed(b.decide(delete_request(&delta(), path, voice)).await);
+    allowed(
+        b.decide(delete_request(&delta(), path, CommandOrigin::UserText))
             .await,
     );
-    assert!(ticket.non_voice);
-    let text = delete_request(
-        &delta(),
-        r"C:\Users\ala\Docs\x.txt",
-        CommandOrigin::UserText,
-    );
-    allowed(b.decide(text).await);
 }
 
 /// Sesja `tainted`: egress wymaga potwierdzenia także na L4; taint jest monotoniczny.
@@ -267,7 +265,7 @@ where
     let (b, c) = fresh();
     kernel_blocks_on_l4(&b, &c).await;
     let (b, c) = fresh();
-    voice_destruction_asks_on_l4(&b, &c).await;
+    voice_destruction_asks_below_l4(&b, &c).await;
     let (b, c) = fresh();
     tainted_egress_asks_on_l4(&b, &c).await;
     agent_cannot_raise_own_level(&fresh().0).await;
