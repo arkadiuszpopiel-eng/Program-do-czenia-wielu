@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: reference
   originSessionId: 526ab23b-611a-489a-a8a3-7c1153e69825
-  modified: 2026-10-22T00:47:12.024Z
+  modified: 2026-10-27T22:11:48.680Z
 ---
 
 Stan z 2026-10-08 (laptop i7-13620H, RTX 4050 6 GB) — sprawdź, czy nadal aktualne.
@@ -77,6 +77,15 @@ Uruchamianie prawdziwej aplikacji bez ruszania danych właściciela (sprawdzone 
   nadawane elementom (`style:` w Svelte); wyłapuje to tylko test CSP w `e2e-app`. Style startowe: `ui/public/boot.css`.
 - Nowe polecenie rdzenia trzeba dopisać także do `ui/src/lib/api/COMMANDS.md` — `build.rs` powłoki generuje z niego
   uprawnienia `allow-*`, a `dto_roundtrip` porównuje z nim przykłady danych.
+
+**2026-10-27 noc:** `npx svelte-check … | tail -1 && git commit` przepuścił commit z błędem typu (tail zwraca 0) —
+czytać liczbę ERRORS w wypisanym wierszu. Podgląd w panelu przeglądarki aplikacji (`preview_start alfa-ui`, port
+5173): gdy panel jest ukryty, `requestAnimationFrame` stoi (0 klatek/s) — animacje oparte na rAF (litery z ust
+awatarów) sprawdzać testem Playwright, nie w ukrytym panelu. Atrapa pisze 100 tokenów/s; do obserwacji strumienia
+`?scenario=slow-stream`. Przed commitem zmian interfejsu uruchamiać główne `pnpm lint` (w `alfa/`: eslint +
+`check-css` — niezdefiniowane tokeny `--alfa-*` — + `check-size`) i `node apps/desktop/ui/scripts/bundle-size.mjs`
+(budżet startu JS 150 KB gzip; 0.0.75 przekroczyło po dodaniu paneli — nowe rzadko widoczne elementy ładować
+leniwie, wskaźniki bezpieczeństwa pobierać w bezczynności zaraz po starcie).
 
 Podgląd interfejsu (`vite preview`) odpowiada pod `http://localhost:4173`, nie pod `127.0.0.1` — skryptom zrzutów podawać `--url http://localhost:4173`. Nie zatrzymywać go przez `taskkill /IM node.exe` (zabija wszystkie procesy Node na maszynie, także cudze) — tylko po PID albo po porcie. Po `find target/... -mmin +180 -delete` pierwsza kompilacja trwa ok. 10 min (pełna przebudowa).
 
