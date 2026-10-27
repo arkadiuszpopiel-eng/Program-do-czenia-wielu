@@ -58,6 +58,18 @@ wyłącza narzędzia. Narzędzia mają agentki z dostępem do powłoki (grupa `s
 - clippy bez ostrzeżeń, 345 testów zmienionych pakietów, `cargo deny` (bans, sources);
 - pełny zestaw przeglądarkowy 559/559, interfejs (vitest) 491.
 
+**Pełne sprawdzenie wersji i niezależny przegląd (27.10 wieczorem):**
+
+- niezależny przegląd modułu silnika w świeżym kontekście: bez ustaleń krytycznych; poprawione 2 poważne
+  (połączenie w połowie wiadomości po anulowaniu, podwójna transakcja po ponowieniu w następnym kroku) i 3
+  drobne (kill-switch w trakcie startu, ramki sterujące według RFC 6455, osobne katalogi zrzutów z limitem 50);
+- `verify wersja`: Rust 3252 zielonych / 0 czerwonych / 41 pominiętych, interfejs 491, aplikacja 49 (pokrycie
+  łącza 259 z 281), lint, typy, dokumenty, zależności, audyt — zielone; przeglądarka 577 + 1 czerwony
+  (axe target-size kapsuły sterowania ekranem w ciasnej belce) → poprawione (przyciski ≥ 24 px), ponowny pełny
+  bieg przeglądarki 578/578;
+- nowy przegląd interfejsu `overlap-sweep`: nachodzenie elementów i tekst ucięty w pionie w 3 stylach × 2
+  motywach, okno 720–1920 px, wszystkie strony Ustawień, panele i trzy profile modelu — 18/18.
+
 **Poza zakresem v0:** zapis i eksport świata oraz zrzut bez okna. Silnik nie ma jeszcze tych metod (to jego
 etap 6). Most MCP silnika (`engine-mcp-bridge.exe`) działa niezależnie i można go dodać w Ustawienia →
 Serwery MCP.
