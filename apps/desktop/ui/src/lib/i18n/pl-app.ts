@@ -61,6 +61,7 @@ export const plApp = {
   'status.online': 'połączono',
   'status.offline': 'brak sieci',
   'status.onlineDesc': 'Modele w chmurze są osiągalne.',
+  'status.onlineNoKeysDesc': 'Sieć działa; modele w chmurze wymagają klucza API.',
   'status.offlineDesc':
     'Działa tylko model lokalny. Wiadomości w kolejce: {n} — wyślę je po powrocie sieci.',
   'status.profile': 'Profil modeli',

@@ -75,7 +75,7 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
 - Menu „Tryb pracy” w stylu Szkło ma jednolite tło (lista trybów nie odcina się prostokątem innego koloru).
 - Bez kluczy API belka i okienko stanu pokazują profil „Lokalny” — ten, który naprawdę działa (jak pasek
   pisania), zamiast zapisanej „Hybrydy” z wyglądem wyłączonego przycisku; wybrany profil ma obwódkę widoczną
-  także w jasnym stylu Szkło.
+  także w jasnym stylu Szkło, a opis połączenia mówi, że modele w chmurze wymagają klucza.
 - Pipeline'y: wybór „Inny…” w polu modelu nie przeskakuje na inny etap.
 
 ### Testy

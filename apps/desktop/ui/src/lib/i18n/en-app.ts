@@ -65,6 +65,7 @@ export const enApp: Record<keyof typeof plApp, Message> = {
   'status.online': 'connected',
   'status.offline': 'no network',
   'status.onlineDesc': 'Cloud models are reachable.',
+  'status.onlineNoKeysDesc': 'Network is up; cloud models need an API key.',
   'status.offlineDesc':
     'Only the local model works. Queued messages: {n} — I will send them when the network returns.',
   'status.profile': 'Model profile',

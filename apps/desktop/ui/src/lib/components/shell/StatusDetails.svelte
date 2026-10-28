@@ -56,7 +56,9 @@
     <dd>
       <strong class:warn={offline}>{t(offline ? 'status.offline' : 'status.online')}</strong>
       <span class="desc">
-        {offline ? t('status.offlineDesc', { n: queued }) : t('status.onlineDesc')}
+        {offline
+          ? t('status.offlineDesc', { n: queued })
+          : t(noKeys ? 'status.onlineNoKeysDesc' : 'status.onlineDesc')}
       </span>
     </dd>
     <dt>{t('status.profile')}</dt>

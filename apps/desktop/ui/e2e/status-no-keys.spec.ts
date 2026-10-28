@@ -15,6 +15,7 @@ for (const style of ['classic', 'glass', 'next'] as const) {
       await waitForChat(page);
       await page.getByRole('button', { name: /^Stan: .*profil Lokalny/ }).click();
       const details = page.getByRole('dialog', { name: 'Stan Alfy' });
+      await expect(details).toContainText('Sieć działa; modele w chmurze wymagają klucza API.');
       const local = details.getByRole('radio', { name: 'Lokalny' });
       await expect(local).toHaveAttribute('aria-checked', 'true');
       await expect(local).toHaveAttribute('tabindex', '0');
