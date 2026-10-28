@@ -56,7 +56,8 @@ describe('podział słownika PL', () => {
       for (const m of text.matchAll(/['"`]([a-zA-Z][\w-]*(?:\.[\w-]+)+)['"`]/g)) {
         if (m[1]! in plRest) problems.push(`${file}: ${m[1]}`);
       }
-      for (const m of text.matchAll(/`([a-zA-Z][\w-]*(?:\.[\w-]+)*\.)\$\{/g)) {
+      // Przedrostki z kropką, także bez kropki na końcu (np. `conv.start.s${n}`).
+      for (const m of text.matchAll(/`([a-zA-Z][\w-]*\.[\w.-]*)\$\{/g)) {
         const hit = restKeys.find((k) => k.startsWith(m[1]!));
         if (hit) problems.push(`${file}: ${m[1]}… (np. ${hit})`);
       }

@@ -11,10 +11,14 @@ import { plCore } from './pl-core';
 export type { MessageKey } from './pl';
 
 let rest: Dictionary | null = null;
-/** Druga część słownika polskiego (raz na okno; zaczyna się pobierać przy starcie). */
-export const restReady: Promise<void> = import('./pl-rest').then((m) => {
-  rest = m.plRest;
-});
+/** Druga część słownika polskiego (raz na okno; zaczyna się pobierać przy starcie). Błąd
+ *  pobrania nie blokuje okien leniwych — otwierają się z kluczami zamiast tekstów tej części. */
+export const restReady: Promise<void> = import('./pl-rest').then(
+  (m) => {
+    rest = m.plRest;
+  },
+  (error: unknown) => console.error('Słownik PL (druga część) nie wczytał się', error),
+);
 const fullPl = (): Dictionary => (rest ? { ...plCore, ...rest } : plCore);
 
 export class I18n {
