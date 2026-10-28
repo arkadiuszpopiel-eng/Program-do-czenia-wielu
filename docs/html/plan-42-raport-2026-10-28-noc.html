@@ -506,13 +506,15 @@ przebiegiem przeglądarkowym i testem kluczy startowych, nie pomiarem na prawdzi
 </ul>
 <h2 id="6-wgranie-i-kopia">6. Wgranie i kopia</h2>
 <ul>
-<li><strong>Wgranie:</strong> <code>scripts/deploy-owner.sh --no-start</code> — kopia właściciela <code>Alfa-uruchomiona</code> zbudowana z tego
-samego commitu, bez portu debugowania; Alfy nie uruchamiałam (otwiera ją właściciel skrótem „Alfa”; po
+<li><strong>Wgranie:</strong> <code>scripts/deploy-owner.sh --no-start</code> — ostatnie 28.10 o 03:07 z <code>d4da052c</code> (sprawdzony kod
+<code>8850c4a2</code> + raport); kopia właściciela <code>Alfa-uruchomiona</code>, wersja programu 0.0.75, bez portu debugowania; Alfy nie uruchamiałam (otwiera ją właściciel skrótem „Alfa”; po
 starcie pokaże „Co nowego” dla 0.0.75).</li>
 <li><strong>Kopia bezpieczeństwa:</strong> <code>scripts/backup.sh /f/Alfa</code> — na dysk F: (Seagate Backup Plus) do katalogu programu
-<code>F:\Alfa\kopia-&lt;data&gt;_&lt;godzina&gt;</code>: paczka git z pełną historią, źródła <strong>bez plików kompilacji</strong> (<code>target</code>,
-<code>node_modules</code>), zbudowany program, pamięć projektu, sumy SHA-256 i instrukcja odtworzenia. Próba
-(<code>--dry-run</code>): ok. 421 MB, na F: 1,5 TB wolnego. Starszych kopii na F: nie ruszałam.</li>
+<strong><code>F:\Alfa\kopia-2026-10-28_0351</code></strong> (28.10, 03:51–03:59, commit <code>1f3a9c49</code>): paczka git z pełną historią
+(także gałąź Brokera do przeglądu <code>3d8e838f</code>), źródła <strong>bez plików kompilacji</strong> (w kopii 0 katalogów <code>target</code>
+i <code>node_modules</code>), zbudowany program, pamięć projektu, sumy SHA-256 (6299 plików sprawdzonych po zapisie —
+0 błędów) i instrukcja odtworzenia; rozmiar 400 MB, na F: 1,4 TB wolnego. Starszych kopii na F: nie ruszałam.
+W kopii nie ma tylko ostatniego commitu z nazwą kopii (sam raport i pamięć).</li>
 <li><strong>Sprzątanie dysku E: przed sprawdzeniem:</strong> usunięte stare programy testowe (<code>.exe</code>, <code>.pdb</code> starsze niż 2 h)
 z <code>target/*/deps</code> — wolne miejsce wzrosło z 53 do 186 GB.</li>
 </ul>
