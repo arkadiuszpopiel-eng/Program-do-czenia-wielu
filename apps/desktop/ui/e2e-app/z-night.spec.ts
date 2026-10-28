@@ -3,7 +3,7 @@
 // częściach — okna leniwe (każda sekcja Ustawień, panele) nie pokazują surowych kluczy tekstów.
 import type { Page } from '@playwright/test';
 import { plRest } from '../src/lib/i18n/pl-rest';
-import { expect, shot, test } from './alfa';
+import { expect, inEverySkin, shot, test } from './alfa';
 
 const REST_KEYS = Object.keys(plRest);
 
@@ -57,13 +57,16 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
   try {
     await expect(edge).toBeVisible();
     await shot(alfa, '42b-panele-schowane');
-    await edge.hover();
     const peek = main.getByRole('complementary', { name: 'Sesje' });
-    await expect(peek).toBeVisible();
-    await shot(alfa, '42c-panel-wysuniety');
     const [w, h] = await main.evaluate(() => [window.innerWidth, window.innerHeight]);
-    await main.mouse.move(w! / 2, h! / 2);
-    await expect(peek).toHaveCount(0);
+    // Wysunięty panel nad rozmową w każdym stylu i motywie (kryjące tło warstwy, cień, znacznik).
+    await inEverySkin(main, async (skin, theme) => {
+      await edge.hover();
+      await expect(peek).toBeVisible();
+      await shot(alfa, `42c-panel-wysuniety-${skin}-${theme}`);
+      await main.mouse.move(w! / 2, h! / 2);
+      await expect(peek).toHaveCount(0);
+    });
   } finally {
     await toggle();
   }
