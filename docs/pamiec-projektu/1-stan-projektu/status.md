@@ -6,7 +6,7 @@
 
 ## Aktualny cel
 
-**Bieżący (2026-10-28):** wersja **0.0.75** (raport 42), wgrana do Alfa-uruchomiona ponownie 28.10 03:07 z `d4da052c` (deploy-owner --no-start; Alfa zamknięta — otwiera ją właściciel skrótem „Alfa”). Gałąź `do-przegladu-broker-2026-10-28` (worktree alfa-broker-przeglad, 4 commity do 3d8e838f; drugi przegląd w świeżym kontekście zrobiony, testy workspace 3263/0/41) czeka na przegląd człowieka. Projekt wyróżniania czytanego zdania: docs/plan/43 (do decyzji).
+**Bieżący (2026-10-28):** wersja **0.0.75** (raport 42), wgrana do Alfa-uruchomiona ponownie 28.10 03:07 z `d4da052c` (deploy-owner --no-start; Alfa zamknięta — otwiera ją właściciel skrótem „Alfa”). Gałąź `do-przegladu-broker-2026-10-28` (worktree alfa-broker-przeglad, 5 commitów do 8755fc60; drugi przegląd w świeżym kontekście zrobiony i poprawiony, testy workspace 3265/0/41) czeka na przegląd człowieka. Projekt wyróżniania czytanego zdania: docs/plan/43 (do decyzji).
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);
 (2) plan v6 prowadzony na bieżąco w `alfa/docs/plan/` (MD) i `alfa/docs/html/` (HTML, generowany).

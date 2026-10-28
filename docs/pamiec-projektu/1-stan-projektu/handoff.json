@@ -4,13 +4,13 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-28T04:02:00+01:00"
+    "updated": "2026-10-28T04:17:00+01:00"
   },
   "current_state": "Laptop. Wersja 0.0.75 wgrana ponownie 28.10 03:07 z d4da052c (deploy-owner --no-start); verify wersja na 8850c4a2 zielone 19/19. Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/42-raport-2026-10-28-noc.md. Kopia bezpieczeństwa F:\\Alfa\\kopia-2026-10-28_0351 (1f3a9c49, backup.sh, bez target/node_modules, sumy SHA-256 sprawdzone).",
   "session_goal": "Właściciel 27.10 (/goal): 9 uwag do UI (Pipeline'y, Broker bez limitu czasu, tryb pracy w pasku, okienko stanu, symetryczna belka i pasek pisania, panele chowane z LED, awatary z literami, dzieci) + własne usprawnienia do 5:00, potem kopia na F: w katalogu programu bez plików kompilacji.",
   "in_progress": [
     "Do decyzji właściciela: panele chowane domyślnie włączone?; odpowiedzi na 4 pytania etapu K (docs/plan/41); L4 a operacje administracyjne (raport 42 propozycja 5); wyróżnianie czytanego zdania (docs/plan/43).",
-    "Gałąź do-przegladu-broker-2026-10-28 (worktree alfa-broker-przeglad, commity 6dec9083, c3566dbe, 50872adb, 3d8e838f): poprawki ustaleń dwóch przeglądów Brokera — czeka na przegląd człowieka, NIE w wgranej wersji. Ryzyko otwarte: plik zapamiętanego poziomu zablokowany nawet do zapisu → obniżenie do L3 nie przetrwa restartu Brokera (P3-01)."
+    "Gałąź do-przegladu-broker-2026-10-28 (worktree alfa-broker-przeglad, commity 6dec9083, c3566dbe, 50872adb, 3d8e838f, 8755fc60): poprawki ustaleń dwóch przeglądów Brokera, testy workspace 3265/0/41 — czeka na przegląd człowieka, NIE w wgranej wersji."
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
@@ -19,13 +19,13 @@
     "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
   ],
   "next_session": [
-    "Ctrl+Alt+Space zajęty przez inny program na PC (Szybkie pytanie Alfy) — właściciel może zmienić skrót; test laptop_voice losowy pod obciążeniem.",
+    "Po decyzji właściciela: przegląd człowieka i scalenie gałęzi do-przegladu-broker-2026-10-28 (do 8755fc60; scalenie = nowa wersja z verify); ewentualnie wdrożenie docs/plan/43 (wyróżnianie czytanego zdania) i zmiana domyślnych paneli chowanych.",
+    "Ctrl+Alt+Space zajęty przez inny program na PC (Szybkie pytanie Alfy) — właściciel może zmienić skrót; test laptop_voice losowy pod obciążeniem; sprawdzić też, czy UI mówi o tym właścicielowi (ostrzeżenie przy starcie od 0.0.71).",
     "Mosty CLI: komunikat „Narzędzie nie jest zainstalowane” myli, gdy jest aplikacja okienkowa (Claude, Codex ze Sklepu) bez CLI w PATH — pokazać „jest aplikacja, brak narzędzia wiersza poleceń” z poleceniem instalacji (22.10 zainstalowano npm -g claude-code 2.1.308 i codex 0.163.0).",
     "Koszt podprzebiegów (delegacja, Krytyczka) poza dziennikiem kosztów — ich tury emitują już ModelUsage; doliczyć w app-chat agent.rs (gałąź !main) pod faktycznym dostawcą, reszta liczona tylko z części przebiegu głównego (raport 37 §2).",
     "Zadania agentek w tle (app-tasks exec_agent, RuntimeExecutor) nie zapisują kosztu w cost-meter — limit ich nie widzi.",
     "Koszt przebiegu agentki zapisuje się dopiero po jego końcu — limit dostawcy nie zatrzyma długiego przebiegu w trakcie (chroni „Limit kosztu zadania”); rozważyć zapis po każdej turze.",
-    "Ctrl+Alt+Space zajęty przez inny program na PC stacjonarnym (ostrzeżenie przy starcie 0.0.71) — sprawdzić, czy UI mówi o tym właścicielowi.",
-    "Właściciel: otworzyć Alfę skrótem „Alfa” i potwierdzić L4 w oknie Brokera (Ustawienia → Uprawnienia → „Zmień na L4”); przypomnienie ok. 15 s po starcie.",
+    "Właściciel: otworzyć Alfę skrótem „Alfa” (0.0.75); „Pełną automatykę” wybiera się w belce → menu „Tryb pracy” i potwierdza raz w oknie Brokera — zostaje po restarcie.",
     "Sprawdzić limity kont (Ustawienia → Konta i klucze API): od 0.0.70 limit z kreatora (domyślnie 100 zł/mies.) blokuje płatne zapytania do dostawcy; konto bez limitu znosi limit dostawcy.",
     "Po każdej zmianie w crate bliskim limitu (app-core 8000, app-api ~8000) uruchomić check-size z GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*' — bez tego skrypt pada na git.",
     "Drobne (sprzed 22.10): wyłączone konto bez klucza — rdzeń pokazuje wiek starego klucza (account_dto liczy key_stored ze stanu), atrapa UI brak klucza.",

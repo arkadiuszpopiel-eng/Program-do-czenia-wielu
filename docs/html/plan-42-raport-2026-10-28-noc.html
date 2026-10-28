@@ -412,14 +412,15 @@ kończyło się błędem — po restarcie wracała „Pełna automatyka”;</li>
 mogła skasować obniżenie.</li>
 </ol>
 <p>Poprawki są na <strong>osobnej gałęzi <code>do-przegladu-broker-2026-10-28</code></strong> (katalog <code>alfa-broker-przeglad</code>, commity
-<code>6dec9083</code>, <code>c3566dbe</code>, <code>50872adb</code> i <code>3d8e838f</code>), <strong>nie w wgrywanej wersji</strong> — <code>AGENTS.md</code> wymaga przeglądu
-człowieka dla Brokera. Na gałęzi: nadpisanie pliku niższym poziomem, gdy usunięcie się nie uda; dziennik
-z numerami kolejnymi (zatwierdzone podniesienie kasuje tylko obniżenia starsze od prośby, a podniesienie do poziomu poniżej L3 zastępuje obniżenie);
+<code>6dec9083</code>, <code>c3566dbe</code>, <code>50872adb</code>, <code>3d8e838f</code> i <code>8755fc60</code>), <strong>nie w wgrywanej wersji</strong> — <code>AGENTS.md</code>
+wymaga przeglądu człowieka dla Brokera. Na gałęzi: nadpisanie pliku niższym poziomem, gdy usunięcie się nie
+uda; dziennik z numerami kolejnymi (zatwierdzone podniesienie kasuje tylko obniżenia starsze od prośby,
+a podniesienie do poziomu poniżej L3 zastępuje obniżenie);
 nowe połączenie z Brokerem unieważnia czekające karty; karta podniesienia sesji bez terminu mówi „Bez terminu: do
 zmiany albo ponownego uruchomienia Alfy” zamiast „Na stałe … zostaje po restarcie”; test własności, że na L4
 obcy albo niepewnie rozpoznany głos nadal pyta; SPEC klasyfikatora zgodny z decyzją 27.10. Testy <code>app-broker</code>,
 <code>safety-broker-impl</code>, <code>broker-ui-contract</code>, <code>risk-classifier-contract</code> zielone, clippy i fmt czyste; pełne
-testy Rusta całego workspace na gałęzi (<code>3d8e838f</code>, 28.10 03:51): 3263 zielonych, 0 czerwonych, 41 pominiętych.
+testy Rusta całego workspace na gałęzi (<code>8755fc60</code>, 28.10 04:16): 3265 zielonych, 0 czerwonych, 41 pominiętych.
 Ostatnie drobne ustalenie też poprawiłam na tej gałęzi (commit <code>50872adb</code>): karta podniesienia, która czekała,
 gdy właściciel obniżył poziom tego samego celu (np. „panika” L0), pokazywała stary poziom „z” — teraz wygasa,
 a nowa prośba pokazuje bieżący poziom.</p>
@@ -427,10 +428,11 @@ a nowa prośba pokazuje bieżący poziom.</p>
 zostawiają poziomu wyższego, niż wybrał właściciel. Trzy ustalenia poprawiłam (commit <code>3d8e838f</code>):
 obniżenie globalne „na czas” kasuje zapamiętaną „Pełną automatykę” (wcześniej po wygaśnięciu w pamięci był
 poziom domyślny, a restart przywracał L4 z pliku); gdy pliku nie da się usunąć ani zamienić, zapis w miejscu;
-obniżenie zgłoszone przez agentkę nie zamyka czekających kart właściciela. <strong>Zostaje do decyzji:</strong> jeśli inny
-program trzyma plik tak, że nie da się go nawet nadpisać, obniżenie dokładnie do L3 nie przetrwa restartu
-Brokera (niższe poziomy odtwarza dziennik aplikacji). Pełne rozwiązanie to trwały stan Brokera w katalogu
-usługi (P3-01 w SPEC).</p>
+obniżenie zgłoszone przez agentkę nie zamyka czekających kart właściciela. Ostatnie ryzyko z tego
+przeglądu zamknęłam o 4:00 (commit <code>8755fc60</code>): gdy inny program trzyma plik tak, że nie da się go ani usunąć,
+ani nadpisać, obok powstaje znacznik obniżenia, który przy starcie Brokera unieważnia zapisane L4 (test na
+Windows z plikiem zablokowanym bez współdzielenia). Pełne rozwiązanie na przyszłość to trwały stan Brokera
+w katalogu usługi (P3-01 w SPEC).</p>
 </li>
 <li><p>W katalogu silnika NextGO.Gray nic nie zmieniałam; nie używałam portu 9001.</p>
 </li>
@@ -507,8 +509,8 @@ przebiegiem przeglądarkowym i testem kluczy startowych, nie pomiarem na prawdzi
 <h2 id="6-wgranie-i-kopia">6. Wgranie i kopia</h2>
 <ul>
 <li><strong>Wgranie:</strong> <code>scripts/deploy-owner.sh --no-start</code> — ostatnie 28.10 o 03:07 z <code>d4da052c</code> (sprawdzony kod
-<code>8850c4a2</code> + raport); kopia właściciela <code>Alfa-uruchomiona</code>, wersja programu 0.0.75, bez portu debugowania; Alfy nie uruchamiałam (otwiera ją właściciel skrótem „Alfa”; po
-starcie pokaże „Co nowego” dla 0.0.75).</li>
+<code>8850c4a2</code> + raport); kopia właściciela <code>Alfa-uruchomiona</code>, wersja programu 0.0.75, bez portu debugowania;
+Alfy nie uruchamiałam (otwiera ją właściciel skrótem „Alfa”; po starcie pokaże „Co nowego” dla 0.0.75).</li>
 <li><strong>Kopia bezpieczeństwa:</strong> <code>scripts/backup.sh /f/Alfa</code> — na dysk F: (Seagate Backup Plus) do katalogu programu
 <strong><code>F:\Alfa\kopia-2026-10-28_0351</code></strong> (28.10, 03:51–03:59, commit <code>1f3a9c49</code>): paczka git z pełną historią
 (także gałąź Brokera do przeglądu <code>3d8e838f</code>), źródła <strong>bez plików kompilacji</strong> (w kopii 0 katalogów <code>target</code>
