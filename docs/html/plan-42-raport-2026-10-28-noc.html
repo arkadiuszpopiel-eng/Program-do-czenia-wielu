@@ -373,6 +373,10 @@ startowego zajmowały polskie teksty wszystkich okien. Teksty 17 działów otwie
 wtyczki, MCP, diagnostyka…) są teraz osobną częścią słownika, pobieraną równolegle ze startem; okna leniwe czekają
 na nią. Nowy test pilnuje, żeby kod startowy nie użył tekstu z tej części (sprawdziłam, że łapie celowo
 wstawiony błąd).</li>
+<li><strong>Przegląd zrzutów w prawdziwym oknie</strong> (menu trybu, okienko stanu, menu adresatki — 3 style × 2 motywy):
+menu „Tryb pracy” w stylu Szkło ma jednolite tło; bez kluczy API belka i okienko stanu pokazują profil
+„Lokalny” (ten, który działa), wybrany profil ma wyraźną obwódkę, a opis połączenia mówi, że modele w chmurze
+wymagają klucza.</li>
 </ul>
 <h3 id="propozycje-na-kolejne-kroki-nie-wprowadzone-wymagaja-decyzji">Propozycje na kolejne kroki (nie wprowadzone — wymagają decyzji)</h3>
 <ol>
@@ -422,13 +426,14 @@ a nowa prośba pokazuje bieżący poziom.</p>
 </li>
 </ul>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p><strong>Końcowe sprawdzenie po pracy nocnej:</strong> <code>node scripts/verify.mjs wersja</code> na commicie <code>5bc28f90</code> (28.10,
-02:01–02:30): <strong>18 z 19 kroków zielonych</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs
+<p><strong>Końcowe sprawdzenie po pracy nocnej:</strong> <code>node scripts/verify.mjs wersja</code> na commicie <code>8850c4a2</code> (28.10,
+02:37–03:05): <strong>zielone, 19 z 19 kroków</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs
 501/501, przeglądarka (Edge) 607/607, prawdziwa aplikacja 50/50 z pokryciem łącza 260 z 281 (92,5 %), linter,
-typy, lint CSS, zależności, audyt npm, SBOM. Czerwony był tylko krok „dokumenty”: nie odświeżyłam strony HTML
-historii zmian po dopisaniu dwóch linii do <code>CHANGELOG.md</code>. Commit <code>999ca689</code> zmienia wyłącznie
-<code>docs/html/changelog.html</code>; krok powtórzony osobno (<code>docs-html.mjs --verify</code>) — zielony. Ta wersja jest wgrana.</p>
-<p>Wcześniejszy bieg tej nocy (<code>8bbdf0a4</code>, 01:08–01:39) — zielony 19 z 19. Między biegami doszły dwie poprawki
+typy, lint CSS, dokumenty, zależności, audyt npm, SBOM. Ta wersja jest wgrana.</p>
+<p>Przedostatni bieg (<code>5bc28f90</code>, 02:01–02:30) miał 18 z 19 — czerwony był tylko krok „dokumenty” (nieodświeżona
+strona HTML historii zmian, poprawione w <code>999ca689</code>). Po nim doszła jeszcze jedna zmiana tekstu: okienko stanu
+bez kluczy mówi „Sieć działa; modele w chmurze wymagają klucza API” zamiast „Modele w chmurze są osiągalne”.</p>
+<p>Pierwszy bieg po pracy nocnej (<code>8bbdf0a4</code>, 01:08–01:39) — zielony 19 z 19. Po nim doszły dwie poprawki
 z przeglądu zrzutów w prawdziwym oknie (WebView2, wszystkie 3 style × 2 motywy, zrzuty <code>42a</code>, <code>42d</code>, <code>42e</code>):</p>
 <ul>
 <li><strong>Menu „Tryb pracy” w stylu Szkło:</strong> lista trybów miała osobne kryjące tło (reguła skóry dla każdego
