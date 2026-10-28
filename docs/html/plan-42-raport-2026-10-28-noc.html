@@ -422,10 +422,23 @@ a nowa prośba pokazuje bieżący poziom.</p>
 </li>
 </ul>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p><strong>Końcowe sprawdzenie po pracy nocnej:</strong> <code>node scripts/verify.mjs wersja</code> na commicie <code>8bbdf0a4</code> (28.10, 01:08–01:39):
-<strong>zielone, 19 z 19 kroków</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs 501/501, przeglądarka
-(Edge) 601/601, prawdziwa aplikacja 50/50 z pokryciem łącza 260 z 281 (92,5 %), linter, typy, lint CSS, dokumenty,
-zależności, audyt npm, SBOM. Ta wersja jest wgrana.</p>
+<p><strong>Końcowe sprawdzenie po pracy nocnej:</strong> <code>node scripts/verify.mjs wersja</code> na commicie <code>5bc28f90</code> (28.10,
+02:01–02:30): <strong>18 z 19 kroków zielonych</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs
+501/501, przeglądarka (Edge) 607/607, prawdziwa aplikacja 50/50 z pokryciem łącza 260 z 281 (92,5 %), linter,
+typy, lint CSS, zależności, audyt npm, SBOM. Czerwony był tylko krok „dokumenty”: nie odświeżyłam strony HTML
+historii zmian po dopisaniu dwóch linii do <code>CHANGELOG.md</code>. Commit <code>999ca689</code> zmienia wyłącznie
+<code>docs/html/changelog.html</code>; krok powtórzony osobno (<code>docs-html.mjs --verify</code>) — zielony. Ta wersja jest wgrana.</p>
+<p>Wcześniejszy bieg tej nocy (<code>8bbdf0a4</code>, 01:08–01:39) — zielony 19 z 19. Między biegami doszły dwie poprawki
+z przeglądu zrzutów w prawdziwym oknie (WebView2, wszystkie 3 style × 2 motywy, zrzuty <code>42a</code>, <code>42d</code>, <code>42e</code>):</p>
+<ul>
+<li><strong>Menu „Tryb pracy” w stylu Szkło:</strong> lista trybów miała osobne kryjące tło (reguła skóry dla każdego
+<code>[role=menu]</code>) i odcinała się prostokątem od nagłówka i stopki okienka. Test przeglądarkowy łapie powrót błędu
+(sprawdziłam: bez poprawki 2 czerwone).</li>
+<li><strong>Profil bez kluczy API:</strong> okienko stanu zaznaczało zapisaną „Hybrydę”, ale wyłączoną (wyglądała na
+nieaktywną), belka też mówiła „Hybryda”, a pasek pisania — „Lokalny”. Teraz wszędzie „Lokalny”, czyli profil,
+który naprawdę działa, z ostrzeżeniem o braku klucza; wybrany profil ma obwódkę (w jasnym Szkle tło wyboru
+zlewało się z grupą). Nowy test we wszystkich stylach i motywach.</li>
+</ul>
 <p>Przed końcowym sprawdzeniem zleciłam przegląd nocnych zmian interfejsu w świeżym kontekście (podział słownika,
 polecenie palety „Tryb pracy”, podpowiedź pod polem pisania, belka od 1280 px, nowe testy). Poważnych błędów nie
 znalazł; dwie drobne uwagi poprawiłam: błąd pobrania drugiej części słownika nie blokuje okien (otwierają się
@@ -455,9 +468,10 @@ w pisanej odpowiedzi i ich brak przy ograniczonym ruchu.</p>
 <h2 id="5-czego-nie-sprawdzilam">5. Czego nie sprawdziłam</h2>
 <ul>
 <li><strong>Liter z ust w prawdziwym oknie programu</strong> — sprawdzone w przeglądarce testowej (Edge) na atrapie, we
-wszystkich stylach i motywach. Menu trybu, panele chowane (znacznik, wysunięcie, schowanie) i teksty wszystkich
-stron Ustawień sprawdziłam już w prawdziwym oknie (WebView2, instancja testowa, test <code>e2e-app/z-night</code>, zrzuty
-<code>42a</code>–<code>42c</code>); wysunięty panel — we wszystkich 3 stylach × 2 motywach, reszta w stylu domyślnym.</li>
+wszystkich stylach i motywach. Menu trybu, okienko stanu, menu adresatki, pasek pisania w dwóch wierszach,
+panele chowane (znacznik, wysunięcie, schowanie) i teksty wszystkich stron Ustawień sprawdziłam już w prawdziwym
+oknie (WebView2, instancja testowa, test <code>e2e-app/z-night</code>, zrzuty <code>42a</code>–<code>42e</code>); menu, okienka i wysunięty
+panel — we wszystkich 3 stylach × 2 motywach, strony Ustawień — w stylu domyślnym.</li>
 <li><strong>Liter z ust w rytm prawdziwego głosu</strong> (pomiar poziomu mowy z syntezy) — sprawdzony tylko tryb bez
 pomiaru (pisana odpowiedź); w nocy bez dźwięku.</li>
 <li><strong>Okna Brokera przy zmianie trybu na żywo</strong> z prawdziwym Brokerem — sprawdzone testami kontraktu karty
