@@ -421,7 +421,16 @@ poziom „z”.</p>
 </li>
 </ul>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p>Pełne sprawdzenie <code>node scripts/verify.mjs wersja</code> na 0.0.75 (commit <code>9a0debd5</code>, 27.10 23:51): <strong>zielone, 19 z
+<p><strong>Końcowe sprawdzenie po pracy nocnej:</strong> <code>node scripts/verify.mjs wersja</code> na commicie <code>8bbdf0a4</code> (28.10, 01:08–01:39):
+<strong>zielone, 19 z 19 kroków</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs 501/501, przeglądarka
+(Edge) 601/601, prawdziwa aplikacja 50/50 z pokryciem łącza 260 z 281 (92,5 %), linter, typy, lint CSS, dokumenty,
+zależności, audyt npm, SBOM. Ta wersja jest wgrana.</p>
+<p>Przed końcowym sprawdzeniem zleciłam przegląd nocnych zmian interfejsu w świeżym kontekście (podział słownika,
+polecenie palety „Tryb pracy”, podpowiedź pod polem pisania, belka od 1280 px, nowe testy). Poważnych błędów nie
+znalazł; dwie drobne uwagi poprawiłam: błąd pobrania drugiej części słownika nie blokuje okien (otwierają się
+z kluczami zamiast tekstów i zapisują błąd w dzienniku), a test kluczy startowych łapie też przedrostki
+w rodzaju <code>conv.start.s${n}</code>.</p>
+<p>Pierwsze wgranie tej nocy — <code>node scripts/verify.mjs wersja</code> na 0.0.75 (commit <code>9a0debd5</code>, 27.10 23:51): <strong>zielone, 19 z
 19 kroków</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs 499/499, przeglądarka (Edge)
 594/594, prawdziwa aplikacja 49/49 z pokryciem łącza 259 z 281 (92,2 %), linter, typy, lint CSS, dokumenty,
 zależności, audyt npm, SBOM.</p>
