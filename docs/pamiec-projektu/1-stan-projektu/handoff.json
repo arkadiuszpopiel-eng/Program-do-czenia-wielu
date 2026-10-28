@@ -4,13 +4,13 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-28T03:10:00+01:00"
+    "updated": "2026-10-28T03:55:00+01:00"
   },
   "current_state": "Laptop. Wersja 0.0.75 wgrana ponownie 28.10 03:07 z d4da052c (deploy-owner --no-start); verify wersja na 8850c4a2 zielone 19/19. Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/42-raport-2026-10-28-noc.md. Kopia bezpieczeństwa F:\\Alfa\\kopia-<data>_<godzina> (backup.sh, bez target/node_modules) — przed 5:00.",
   "session_goal": "Właściciel 27.10 (/goal): 9 uwag do UI (Pipeline'y, Broker bez limitu czasu, tryb pracy w pasku, okienko stanu, symetryczna belka i pasek pisania, panele chowane z LED, awatary z literami, dzieci) + własne usprawnienia do 5:00, potem kopia na F: w katalogu programu bez plików kompilacji.",
   "in_progress": [
-    "Do decyzji właściciela: panele chowane domyślnie włączone?; odpowiedzi na 4 pytania etapu K (docs/plan/41); L4 a operacje administracyjne (raport 42 propozycja 5).",
-    "Gałąź do-przeglądu-broker-2026-10-28 (worktree alfa-broker-przeglad, commity 6dec9083, c3566dbe, 50872adb): poprawki ustaleń przeglądu Brokera z 27.10 — czeka na przegląd człowieka, NIE w wgranej wersji."
+    "Do decyzji właściciela: panele chowane domyślnie włączone?; odpowiedzi na 4 pytania etapu K (docs/plan/41); L4 a operacje administracyjne (raport 42 propozycja 5); wyróżnianie czytanego zdania (docs/plan/43).",
+    "Gałąź do-przegladu-broker-2026-10-28 (worktree alfa-broker-przeglad, commity 6dec9083, c3566dbe, 50872adb, 3d8e838f): poprawki ustaleń dwóch przeglądów Brokera — czeka na przegląd człowieka, NIE w wgranej wersji. Ryzyko otwarte: plik zapamiętanego poziomu zablokowany nawet do zapisu → obniżenie do L3 nie przetrwa restartu Brokera (P3-01)."
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
