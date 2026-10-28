@@ -444,6 +444,11 @@ trafia tylko do audytu. Pełne rozwiązanie na przyszłość to trwały stan Bro
 02:37–03:05): <strong>zielone, 19 z 19 kroków</strong> — Rust 3255 zielonych / 0 czerwonych / 41 pominiętych, interfejs
 501/501, przeglądarka (Edge) 607/607, prawdziwa aplikacja 50/50 z pokryciem łącza 260 z 281 (92,5 %), linter,
 typy, lint CSS, dokumenty, zależności, audyt npm, SBOM. Ta wersja jest wgrana.</p>
+<p>Po wgraniu (do 4:30) zmieniały się już tylko testy i dokumenty: nowy test słownika (żaden klucz w obu częściach)
+— testy jednostkowe 502/502. Ostatni pełny bieg przeglądarkowy (04:19–04:30): 606 z 607; czerwony test awatarów
+utknął na ekranie startowym ponad 30 s pod koniec długiego biegu na laptopie, a powtórzony osobno przeszedł
+30 z 30 razy (cały plik × 3) — niestabilność pod obciążeniem, nie błąd programu; trzy wcześniejsze pełne
+biegi tej nocy miały ten test zielony.</p>
 <p>Przedostatni bieg (<code>5bc28f90</code>, 02:01–02:30) miał 18 z 19 — czerwony był tylko krok „dokumenty” (nieodświeżona
 strona HTML historii zmian, poprawione w <code>999ca689</code>). Po nim doszła jeszcze jedna zmiana tekstu: okienko stanu
 bez kluczy mówi „Sieć działa; modele w chmurze wymagają klucza API” zamiast „Modele w chmurze są osiągalne”.</p>
