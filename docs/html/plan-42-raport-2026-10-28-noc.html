@@ -418,9 +418,10 @@ podniesienie kasuje tylko obniżenia starsze od prośby, a podniesienie do pozio
 nowe połączenie z Brokerem unieważnia czekające karty; karta podniesienia sesji bez terminu mówi „Bez terminu: do
 zmiany albo ponownego uruchomienia Alfy” zamiast „Na stałe … zostaje po restarcie”; test własności, że na L4
 obcy albo niepewnie rozpoznany głos nadal pyta; SPEC klasyfikatora zgodny z decyzją 27.10. Testy <code>app-broker</code>,
-<code>safety-broker-impl</code>, <code>broker-ui-contract</code>, <code>risk-classifier-contract</code> zielone, clippy i fmt czyste. Ostatnie
-drobne ustalenie też poprawiłam na tej gałęzi (commit <code>50872adb</code>): karta podniesienia, która czekała, gdy
-właściciel obniżył poziom tego samego celu (np. „panika” L0), pokazywała stary poziom „z” — teraz wygasa,
+<code>safety-broker-impl</code>, <code>broker-ui-contract</code>, <code>risk-classifier-contract</code> zielone, clippy i fmt czyste; pełne
+testy Rusta całego workspace na gałęzi (<code>50872adb</code>, 28.10 03:30): 3261 zielonych, 0 czerwonych, 41 pominiętych.
+Ostatnie drobne ustalenie też poprawiłam na tej gałęzi (commit <code>50872adb</code>): karta podniesienia, która czekała,
+gdy właściciel obniżył poziom tego samego celu (np. „panika” L0), pokazywała stary poziom „z” — teraz wygasa,
 a nowa prośba pokazuje bieżący poziom.</p>
 </li>
 <li><p>W katalogu silnika NextGO.Gray nic nie zmieniałam; nie używałam portu 9001.</p>
