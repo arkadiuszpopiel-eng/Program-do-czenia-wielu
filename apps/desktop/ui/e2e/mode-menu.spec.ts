@@ -22,6 +22,9 @@ for (const style of ['classic', 'glass', 'next'] as const) {
       );
       await expect(menu.getByRole('menuitemradio', { checked: true })).toBeFocused();
       await expect(page.getByText('Ctrl+Shift+F12')).toBeVisible();
+      // Lista leży w okienku: bez własnego tła (Szkło daje je samodzielnym `[role=menu]`).
+      await expect(menu).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+      await expect(menu).toHaveCSS('box-shadow', 'none');
       await expectAccessible(page, `menu trybu ${style} ${theme}`);
 
       // Klawisz 2: obniżenie działa od razu, pasek pokazuje nowy tryb.

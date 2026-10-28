@@ -119,11 +119,14 @@
     font-size: var(--alfa-font-size-xs);
     font-weight: var(--alfa-weight-semibold);
   }
-  .list {
+  /* Lista leży w okienku belki: bez tła i cienia, które styl Szkło daje samodzielnym `[role=menu]`. */
+  .menu .list {
     display: flex;
     flex-direction: column;
     gap: 2px;
     outline: none;
+    background: transparent;
+    box-shadow: none;
   }
   .item {
     display: grid;

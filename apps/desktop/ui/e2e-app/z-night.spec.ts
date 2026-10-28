@@ -34,13 +34,15 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
   if (await back.isVisible()) await back.click();
   await expect(main.locator('#alfa-composer')).toBeVisible({ timeout: 30_000 });
 
-  // Menu „Tryb pracy” z belki: cztery tryby, Esc zamyka bez zmiany.
-  await main.getByRole('button', { name: /^Tryb pracy: / }).click();
+  // Menu „Tryb pracy” z belki w każdym stylu i motywie: cztery tryby, Esc zamyka bez zmiany.
   const menu = main.getByRole('menu', { name: 'Tryb pracy' });
-  await expect(menu.getByRole('menuitemradio')).toHaveCount(4);
-  await shot(alfa, '42a-menu-trybu');
-  await main.keyboard.press('Escape');
-  await expect(menu).toHaveCount(0);
+  await inEverySkin(main, async (skin, theme) => {
+    await main.getByRole('button', { name: /^Tryb pracy: / }).click();
+    await expect(menu.getByRole('menuitemradio')).toHaveCount(4);
+    await shot(alfa, `42a-menu-trybu-${skin}-${theme}`);
+    await main.keyboard.press('Escape');
+    await expect(menu).toHaveCount(0);
+  });
 
   // Panele chowane: przełącznik z palety, znacznik przy krawędzi, wysunięcie po najechaniu.
   const toggle = async () => {
