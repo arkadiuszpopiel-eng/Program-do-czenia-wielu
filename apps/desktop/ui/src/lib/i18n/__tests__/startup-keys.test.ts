@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { plCore } from '../pl-core';
 import { plRest } from '../pl-rest';
 
 const src = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -47,6 +48,10 @@ describe('podział słownika PL', () => {
     ]) {
       expect(names).toContain(name);
     }
+  });
+
+  it('żaden klucz nie jest w obu częściach (druga po cichu nadpisałaby tekst startowy)', () => {
+    expect(restKeys.filter((k) => k in plCore)).toEqual([]);
   });
 
   it('kod startowy nie używa kluczy z `pl-rest`', () => {
